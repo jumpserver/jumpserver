@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-14 15:48+0800\n"
+"POT-Creation-Date: 2022-06-16 10:20+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -665,7 +665,7 @@ msgstr "すべて"
 #: assets/models/backup.py:52 assets/serializers/backup.py:32
 #: xpack/plugins/change_auth_plan/models/app.py:41
 #: xpack/plugins/change_auth_plan/models/asset.py:62
-#: xpack/plugins/change_auth_plan/serializers/base.py:49
+#: xpack/plugins/change_auth_plan/serializers/base.py:45
 msgid "Recipient"
 msgstr "受信者"
 
@@ -708,7 +708,7 @@ msgstr "アカウントのバックアップスナップショット"
 
 #: assets/models/backup.py:116 assets/serializers/backup.py:40
 #: xpack/plugins/change_auth_plan/models/base.py:125
-#: xpack/plugins/change_auth_plan/serializers/base.py:82
+#: xpack/plugins/change_auth_plan/serializers/base.py:78
 msgid "Trigger mode"
 msgstr "トリガーモード"
 
@@ -770,8 +770,8 @@ msgstr "確認済みの日付"
 #: xpack/plugins/change_auth_plan/models/base.py:42
 #: xpack/plugins/change_auth_plan/models/base.py:121
 #: xpack/plugins/change_auth_plan/models/base.py:196
-#: xpack/plugins/change_auth_plan/serializers/base.py:22
-#: xpack/plugins/change_auth_plan/serializers/base.py:77
+#: xpack/plugins/change_auth_plan/serializers/base.py:21
+#: xpack/plugins/change_auth_plan/serializers/base.py:73
 #: xpack/plugins/cloud/serializers/account_attrs.py:26
 msgid "Password"
 msgstr "パスワード"
@@ -1118,12 +1118,12 @@ msgstr "アクション"
 
 #: assets/serializers/backup.py:31 ops/mixin.py:106 ops/mixin.py:147
 #: settings/serializers/auth/ldap.py:65
-#: xpack/plugins/change_auth_plan/serializers/base.py:47
+#: xpack/plugins/change_auth_plan/serializers/base.py:43
 msgid "Periodic perform"
 msgstr "定期的なパフォーマンス"
 
 #: assets/serializers/backup.py:33
-#: xpack/plugins/change_auth_plan/serializers/base.py:50
+#: xpack/plugins/change_auth_plan/serializers/base.py:46
 msgid "Currently only mail sending is supported"
 msgstr "現在、メール送信のみがサポートされています"
 
@@ -1248,8 +1248,16 @@ msgstr "組織名"
 msgid "Asset hostname"
 msgstr "資産ホスト名"
 
-#: assets/serializers/utils.py:9
+#: assets/serializers/utils.py:11
 msgid "Password can not contains `{{` "
+msgstr "パスワードには '{{' を含まない"
+
+#: assets/serializers/utils.py:14
+msgid "Password can not contains `'` "
+msgstr "パスワードには '{{' を含まない"
+
+#: assets/serializers/utils.py:16
+msgid "Password can not contains `\"` "
 msgstr "パスワードには '{{' を含まない"
 
 #: assets/tasks/account_connectivity.py:30
@@ -1759,8 +1767,6 @@ msgid "{ApplicationPermission} REMOVE {SystemUser}"
 msgstr "{ApplicationPermission} 削除 {SystemUser}"
 
 #: authentication/api/confirm.py:40
-#, fuzzy
-#| msgid "Authentication failed (username or password incorrect): {}"
 msgid "Authentication failed password incorrect"
 msgstr "認証に失敗しました (ユーザー名またはパスワードが正しくありません): {}"
 
@@ -3070,7 +3076,7 @@ msgstr "Permedアプリケーション"
 msgid "Application permissions is about to expire"
 msgstr "アプリケーション権限の有効期限が近づいています"
 
-#: perms/notifications.py:137
+#: perms/notifications.py:138
 msgid "application permissions of organization {}"
 msgstr "Organization {} のアプリケーション権限"
 
@@ -3128,14 +3134,10 @@ msgstr "システムユーザーの表示"
 
 #: perms/templates/perms/_msg_item_permissions_expire.html:7
 #: perms/templates/perms/_msg_permed_items_expire.html:7
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "        The following %(item_type)s will expire in %(count)s days\n"
-#| "    "
+#, python-format
 msgid ""
 "\n"
-"        The following %(item_type)s will expire in %%(count)s days\n"
+"        The following %(item_type)s will expire in %(count)s days\n"
 "    "
 msgstr ""
 "\n"
@@ -3149,6 +3151,10 @@ msgstr "質問があったら、管理者に連絡して下さい"
 #: perms/tree/app.py:24
 msgid "My applications"
 msgstr "私のアプリケーション"
+
+#: perms/tree/app.py:41
+msgid "Empty"
+msgstr "空"
 
 #: perms/utils/asset/user_permission.py:620 rbac/tree.py:59
 msgid "My assets"
@@ -4292,8 +4298,6 @@ msgid "Enable database proxy"
 msgstr "属性マップの有効化"
 
 #: settings/serializers/terminal.py:37
-#, fuzzy
-#| msgid "Enable XRDP"
 msgid "Enable Razor"
 msgstr "XRDPの有効化"
 
@@ -4564,7 +4568,7 @@ msgstr "ホームページ"
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: templates/resource_download.html:18 templates/resource_download.html:30
+#: templates/resource_download.html:18 templates/resource_download.html:31
 msgid "Client"
 msgstr "クライアント"
 
@@ -4577,15 +4581,15 @@ msgstr ""
 "るために使用されており、現在はRDP SSHクライアントのみをサポートしています。"
 "「Telnetは将来的にサポートする"
 
-#: templates/resource_download.html:30
+#: templates/resource_download.html:31
 msgid "Microsoft"
 msgstr "マイクロソフト"
 
-#: templates/resource_download.html:30
+#: templates/resource_download.html:31
 msgid "Official"
 msgstr "公式"
 
-#: templates/resource_download.html:32
+#: templates/resource_download.html:33
 msgid ""
 "macOS needs to download the client to connect RDP asset, which comes with "
 "Windows"
@@ -4593,11 +4597,11 @@ msgstr ""
 "MacOSは、Windowsに付属のRDPアセットを接続するためにクライアントをダウンロード"
 "する必要があります"
 
-#: templates/resource_download.html:41
+#: templates/resource_download.html:42
 msgid "Windows Remote application publisher tools"
 msgstr "Windowsリモートアプリケーション発行者ツール"
 
-#: templates/resource_download.html:42
+#: templates/resource_download.html:43
 msgid ""
 "Jmservisor is the program used to pull up remote applications in Windows "
 "Remote Application publisher"
@@ -6281,15 +6285,15 @@ msgstr "パスワードの変更"
 msgid "Change SSH Key"
 msgstr "SSHキーの変更"
 
-#: xpack/plugins/change_auth_plan/serializers/base.py:48
+#: xpack/plugins/change_auth_plan/serializers/base.py:44
 msgid "Run times"
 msgstr "実行時間"
 
-#: xpack/plugins/change_auth_plan/serializers/base.py:62
+#: xpack/plugins/change_auth_plan/serializers/base.py:58
 msgid "* Please enter the correct password length"
 msgstr "* 正しいパスワードの長さを入力してください"
 
-#: xpack/plugins/change_auth_plan/serializers/base.py:65
+#: xpack/plugins/change_auth_plan/serializers/base.py:61
 msgid "* Password length range 6-30 bits"
 msgstr "* パスワードの長さの範囲6-30ビット"
 
