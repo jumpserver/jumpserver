@@ -22,7 +22,7 @@ class ConfirmViewSet(ListCreateAPIView):
 
     def check(self, confirm_type: str):
         if confirm_type == ConfirmType.MFA:
-            return bool(MFAOtp(self.user).is_active())
+            return self.user.mfa_enabled
 
         if confirm_type == ConfirmType.PASSWORD:
             return self.user.is_password_authenticate()
