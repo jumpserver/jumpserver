@@ -27,7 +27,7 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     }
     filterset_class = TicketFilter
     search_fields = [
-        'title', 'action', 'type', 'status', 'applicant_display'
+        'title', 'type', 'status', 'applicant_display'
     ]
     ordering_fields = (
         'title', 'applicant_display', 'status', 'state', 'action_display',
