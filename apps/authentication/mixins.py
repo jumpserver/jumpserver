@@ -337,13 +337,13 @@ class AuthACLMixin:
             raise errors.TimePeriodNotAllowed(username=user.username, request=self.request)
 
     def get_ticket(self):
-        from tickets.models import Ticket
+        from tickets.models import ApplyLoginTicket
         ticket_id = self.request.session.get("auth_ticket_id")
         logger.debug('Login confirm ticket id: {}'.format(ticket_id))
         if not ticket_id:
             ticket = None
         else:
-            ticket = Ticket.all().filter(id=ticket_id).first()
+            ticket = ApplyLoginTicket.all().filter(id=ticket_id).first()
         return ticket
 
     def get_ticket_or_create(self, confirm_setting):

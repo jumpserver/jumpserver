@@ -33,16 +33,17 @@ def _dump_args(args: dict):
 
 
 def get_push_unixlike_system_user_tasks(system_user, username=None, **kwargs):
-    comment = system_user.name
     algorithm = kwargs.get('algorithm')
     if username is None:
         username = system_user.username
 
+    comment = system_user.name
     if system_user.username_same_with_user:
         from users.models import User
         user = User.objects.filter(username=username).only('name', 'username').first()
         if user:
             comment = f'{system_user.name}[{str(user)}]'
+    comment = comment.replace(' ', '')
 
     password = system_user.password
     public_key = system_user.public_key
@@ -273,7 +274,7 @@ def push_system_user_a_asset_manual(system_user, asset, username=None):
     # if username is None:
     #     username = system_user.username
     task_name = gettext_noop("Push system users to asset: ") + "{}({}) => {}".format(
-        system_user.name, username, asset
+        system_user.name, username or system_user.username, asset
     )
     return push_system_user_util(system_user, [asset], task_name=task_name, username=username)
 

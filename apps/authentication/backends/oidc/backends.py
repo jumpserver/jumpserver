@@ -18,6 +18,7 @@ from django.urls import reverse
 from django.conf import settings
 
 from common.utils import get_logger
+from users.utils import construct_user_email
 
 from ..base import JMSBaseAuthBackend
 from .utils import validate_and_return_id_token, build_absolute_uri
@@ -39,17 +40,22 @@ class UserMixin:
         logger.debug(log_prompt.format('start'))
 
         sub = claims['sub']
-        name = claims.get('name', sub)
-        username = claims.get('preferred_username', sub)
-        email = claims.get('email', "{}@{}".format(username, 'jumpserver.openid'))
-        logger.debug(
-            log_prompt.format(
-                "sub: {}|name: {}|username: {}|email: {}".format(sub, name, username, email)
-            )
-        )
+
+        # Construct user attrs value
+        user_attrs = {}
+        for field, attr in settings.AUTH_OPENID_USER_ATTR_MAP.items():
+            user_attrs[field] = claims.get(attr, sub)
+        email = user_attrs.get('email', '')
+        email = construct_user_email(user_attrs.get('username'), email)
+        user_attrs.update({'email': email})
+
+        logger.debug(log_prompt.format(user_attrs))
+
+        username = user_attrs.get('username')
+        name = user_attrs.get('name')
 
         user, created = get_user_model().objects.get_or_create(
-            username=username, defaults={"name": name, "email": email}
+            username=username, defaults=user_attrs
         )
         logger.debug(log_prompt.format("user: {}|created: {}".format(user, created)))
         logger.debug(log_prompt.format("Send signal => openid create or update user"))

@@ -42,10 +42,11 @@ class TicketStep(CommonModelMixin):
     )
 
     def change_state(self, state, processor):
-        assignees = self.ticket_assignees.filter(assignee=processor)
-        if not assignees:
-            raise PermissionError('Only assignees can do this')
-        assignees.update(state=state)
+        if state != StepState.closed:
+            assignees = self.ticket_assignees.filter(assignee=processor)
+            if not assignees:
+                raise PermissionError('Only assignees can do this')
+            assignees.update(state=state)
         self.status = StepStatus.closed
         self.state = state
         self.save(update_fields=['state', 'status'])
@@ -187,6 +188,8 @@ class StatusMixin:
                 assignees_display.append(str(i.assignee))
                 if state != StepState.pending and state == i.state:
                     processor = i.assignee
+                if state != StepState.closed:
+                    processor = self.applicant
             step_info = {
                 'state': state,
                 'approval_level': step.level,

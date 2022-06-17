@@ -29,11 +29,12 @@ ARG TOOLS="                           \
     redis-tools                       \
     telnet                            \
     vim                               \
+    unzip                               \
     wget"
 
 RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
     && sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
-    && apt update \
+    && apt update && sleep 1 && apt update \
     && apt -y install ${BUILD_DEPENDENCIES} \
     && apt -y install ${DEPENDENCIES} \
     && apt -y install ${TOOLS} \
@@ -47,12 +48,19 @@ RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
     && mv /bin/sh /bin/sh.bak  \
     && ln -s /bin/bash /bin/sh
 
+ARG TARGETARCH
+ARG ORACLE_LIB_MAJOR=19
+ARG ORACLE_LIB_MINOR=10
+ENV ORACLE_FILE="instantclient-basiclite-linux.${TARGETARCH:-amd64}-${ORACLE_LIB_MAJOR}.${ORACLE_LIB_MINOR}.0.0.0dbru.zip"
+
 RUN mkdir -p /opt/oracle/ \
-    && wget https://download.jumpserver.org/public/instantclient-basiclite-linux.x64-21.1.0.0.0.tar \
-    && tar xf instantclient-basiclite-linux.x64-21.1.0.0.0.tar -C /opt/oracle/ \
-    && echo "/opt/oracle/instantclient_21_1" > /etc/ld.so.conf.d/oracle-instantclient.conf \
+    && cd /opt/oracle/ \
+    && wget https://download.jumpserver.org/files/oracle/${ORACLE_FILE} \
+    && unzip instantclient-basiclite-linux.${TARGETARCH-amd64}-19.10.0.0.0dbru.zip \
+    && mv instantclient_${ORACLE_LIB_MAJOR}_${ORACLE_LIB_MINOR} instantclient \
+    && echo "/opt/oracle/instantclient" > /etc/ld.so.conf.d/oracle-instantclient.conf \
     && ldconfig \
-    && rm -f instantclient-basiclite-linux.x64-21.1.0.0.0.tar
+    && rm -f ${ORACLE_FILE}
 
 WORKDIR /tmp/build
 COPY ./requirements ./requirements

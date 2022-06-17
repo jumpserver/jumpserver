@@ -9,14 +9,16 @@ from notifications.notifications import UserMessage
 
 
 class PermedAssetsWillExpireUserMsg(UserMessage):
-    def __init__(self, user, assets):
+    def __init__(self, user, assets, day_count=0):
         super().__init__(user)
         self.assets = assets
+        self.day_count = day_count
 
     def get_html_msg(self) -> dict:
         subject = _("You permed assets is about to expire")
         context = {
             'name': self.user.name,
+            'count': self.day_count,
             'items': [str(asset) for asset in self.assets],
             'item_type': _("permed assets"),
             'show_help': True
@@ -38,10 +40,11 @@ class PermedAssetsWillExpireUserMsg(UserMessage):
 
 class AssetPermsWillExpireForOrgAdminMsg(UserMessage):
 
-    def __init__(self, user, perms, org):
+    def __init__(self, user, perms, org, day_count=0):
         super().__init__(user)
         self.perms = perms
         self.org = org
+        self.day_count = day_count
 
     def get_items_with_url(self):
         items_with_url = []
@@ -59,6 +62,7 @@ class AssetPermsWillExpireForOrgAdminMsg(UserMessage):
         subject = _("Asset permissions is about to expire")
         context = {
             'name': self.user.name,
+            'count': self.day_count,
             'items_with_url': items_with_url,
             'item_type': _('asset permissions of organization {}').format(self.org)
         }
@@ -81,14 +85,16 @@ class AssetPermsWillExpireForOrgAdminMsg(UserMessage):
 
 
 class PermedAppsWillExpireUserMsg(UserMessage):
-    def __init__(self, user, apps):
+    def __init__(self, user, apps, day_count=0):
         super().__init__(user)
         self.apps = apps
+        self.day_count = day_count
 
     def get_html_msg(self) -> dict:
         subject = _("Your permed applications is about to expire")
         context = {
             'name': self.user.name,
+            'count': self.day_count,
             'item_type': _('permed applications'),
             'items': [str(app) for app in self.apps]
         }
@@ -109,10 +115,11 @@ class PermedAppsWillExpireUserMsg(UserMessage):
 
 
 class AppPermsWillExpireForOrgAdminMsg(UserMessage):
-    def __init__(self, user, perms, org):
+    def __init__(self, user, perms, org, day_count=0):
         super().__init__(user)
         self.perms = perms
         self.org = org
+        self.day_count = day_count
 
     def get_items_with_url(self):
         items_with_url = []
@@ -127,6 +134,7 @@ class AppPermsWillExpireForOrgAdminMsg(UserMessage):
         subject = _('Application permissions is about to expire')
         context = {
             'name': self.user.name,
+            'count': self.day_count,
             'item_type': _('application permissions of organization {}').format(self.org),
             'items_with_url': items
         }

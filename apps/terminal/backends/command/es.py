@@ -297,6 +297,9 @@ class QuerySet(DJQuerySet):
         self._command_store_config = command_store_config
         self._storage = CommandStore(command_store_config)
 
+        # 命令列表模糊搜索时报错
+        super().__init__()
+
     @lazyproperty
     def _grouped_method_calls(self):
         _method_calls = {k: list(v) for k, v in groupby(self._method_calls, lambda x: x[0])}

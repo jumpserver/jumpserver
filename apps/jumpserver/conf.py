@@ -161,6 +161,7 @@ class Config(dict):
         'SESSION_COOKIE_AGE': 3600 * 24,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE': False,
         'LOGIN_URL': reverse_lazy('authentication:login'),
+        'CONNECTION_TOKEN_EXPIRATION': 5 * 60,
 
         # Custom Config
         # Auth LDAP settings
@@ -191,6 +192,9 @@ class Config(dict):
         'AUTH_OPENID_CLIENT_AUTH_METHOD': 'client_secret_basic',
         'AUTH_OPENID_SHARE_SESSION': True,
         'AUTH_OPENID_IGNORE_SSL_VERIFICATION': True,
+        'AUTH_OPENID_USER_ATTR_MAP': {
+            'name': 'name', 'username': 'preferred_username', 'email': 'email'
+        },
 
         # OpenID 新配置参数 (version >= 1.5.9)
         'AUTH_OPENID_PROVIDER_ENDPOINT': 'https://oidc.example.com/',
@@ -320,8 +324,7 @@ class Config(dict):
         # 保留(Luna还在用)
         'TERMINAL_MAGNUS_ENABLED': True,
         'TERMINAL_KOKO_SSH_ENABLED': True,
-        # 保留(Luna还在用)
-        'XRDP_ENABLED': True,
+        'TERMINAL_RAZOR_ENABLED': True,
 
         # 安全配置
         'SECURITY_MFA_AUTH': 0,  # 0 不开启 1 全局开启 2 管理员开启

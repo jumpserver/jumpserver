@@ -26,6 +26,7 @@ urlpatterns = [
     path('feishu/event/subscription/callback/', api.FeiShuEventSubscriptionCallback.as_view(), name='feishu-event-subscription-callback'),
 
     path('auth/', api.TokenCreateApi.as_view(), name='user-auth'),
+    path('confirm/', api.ConfirmViewSet.as_view(), name='user-confirm'),
     path('tokens/', api.TokenCreateApi.as_view(), name='auth-token'),
     path('mfa/verify/', api.MFAChallengeVerifyApi.as_view(), name='mfa-verify'),
     path('mfa/challenge/', api.MFAChallengeVerifyApi.as_view(), name='mfa-challenge'),

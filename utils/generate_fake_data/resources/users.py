@@ -24,7 +24,6 @@ class UserGenerator(FakeDataGenerator):
     group_ids: list
 
     def pre_generate(self):
-        self.roles = list(dict(User.ROLE.choices).keys())
         self.group_ids = list(UserGroup.objects.all().values_list('id', flat=True))
 
     def set_org(self, users):
@@ -53,7 +52,6 @@ class UserGenerator(FakeDataGenerator):
                 username=username,
                 email=email,
                 name=username.title(),
-                role=choice(self.roles),
                 created_by='Faker'
             )
             users.append(u)
