@@ -1,3 +1,5 @@
+from rest_framework import serializers
+
 from perms.models import ApplicationPermission
 from orgs.utils import tmp_to_org
 from applications.models import Application
@@ -36,7 +38,20 @@ class ApplyApplicationSerializer(BaseApplyAssetApplicationSerializer, TicketAppl
 
 
 class ApplyApplicationDisplaySerializer(ApplyApplicationSerializer):
+    apply_applications = serializers.SerializerMethodField()
+    apply_system_users = serializers.SerializerMethodField()
+
     class Meta:
         model = ApplyApplicationSerializer.Meta.model
         fields = ApplyApplicationSerializer.Meta.fields
         read_only_fields = fields
+
+    @staticmethod
+    def get_apply_applications(instance):
+        with tmp_to_org(instance.org_id):
+            return instance.apply_applications.values_list('id', flat=True)
+
+    @staticmethod
+    def get_apply_system_users(instance):
+        with tmp_to_org(instance.org_id):
+            return instance.apply_system_users.values_list('id', flat=True)

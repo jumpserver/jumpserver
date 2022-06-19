@@ -8,7 +8,7 @@ from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from tickets.models import Ticket, TicketFlow
 
 __all__ = [
-    'TicketDisplaySerializer', 'TicketApplySerializer'
+    'TicketDisplaySerializer', 'TicketApplySerializer', 'TicketListSerializer'
 ]
 
 
@@ -27,6 +27,16 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
         ]
         fields_fk = ['applicant', ]
         fields = fields_small + fields_fk
+
+
+class TicketListSerializer(TicketSerializer):
+    class Meta:
+        model = Ticket
+        fields = [
+            'id', 'title', 'serial_num', 'type', 'type_display', 'status',
+            'state', 'rel_snapshot', 'date_created', 'rel_snapshot'
+        ]
+        read_only_fields = fields
 
 
 class TicketDisplaySerializer(TicketSerializer):

@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from perms.serializers.base import ActionsField
 from perms.models import AssetPermission
+from orgs.utils import tmp_to_org
 
 from tickets.models import ApplyAssetTicket
 from .ticket import TicketApplySerializer
@@ -44,7 +45,26 @@ class ApplyAssetSerializer(BaseApplyAssetApplicationSerializer, TicketApplySeria
 
 
 class ApplyAssetDisplaySerializer(ApplyAssetSerializer):
+    apply_nodes = serializers.SerializerMethodField()
+    apply_assets = serializers.SerializerMethodField()
+    apply_system_users = serializers.SerializerMethodField()
+
     class Meta:
         model = ApplyAssetSerializer.Meta.model
         fields = ApplyAssetSerializer.Meta.fields
         read_only_fields = fields
+
+    @staticmethod
+    def get_apply_nodes(instance):
+        with tmp_to_org(instance.org_id):
+            return instance.apply_nodes.values_list('id', flat=True)
+
+    @staticmethod
+    def get_apply_assets(instance):
+        with tmp_to_org(instance.org_id):
+            return instance.apply_assets.values_list('id', flat=True)
+
+    @staticmethod
+    def get_apply_system_users(instance):
+        with tmp_to_org(instance.org_id):
+            return instance.apply_system_users.values_list('id', flat=True)

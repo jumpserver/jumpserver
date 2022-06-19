@@ -2,11 +2,11 @@ from tickets.models import ApplyCommandTicket
 from .ticket import TicketApplySerializer
 
 __all__ = [
-    'CommandConfirmSerializer',
+    'ApplyCommandConfirmSerializer',
 ]
 
 
-class CommandConfirmSerializer(TicketApplySerializer):
+class ApplyCommandConfirmSerializer(TicketApplySerializer):
     class Meta:
         model = ApplyCommandTicket
         fields = TicketApplySerializer.Meta.fields + [

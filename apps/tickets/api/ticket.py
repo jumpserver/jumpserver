@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 #
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import MethodNotAllowed
 
 from common.const.http import POST, PUT
 from common.mixins.api import CommonApiMixin
+from orgs.utils import tmp_to_root_org
 
 from rbac.permissions import RBACPermission
 
@@ -27,6 +28,7 @@ __all__ = [
 class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     serializer_class = serializers.TicketDisplaySerializer
     serializer_classes = {
+        'list': serializers.TicketListSerializer,
         'open': serializers.TicketApplySerializer
     }
     model = Ticket
@@ -53,7 +55,8 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         raise MethodNotAllowed(self.action)
 
     def get_queryset(self):
-        queryset = self.model.get_user_related_tickets(self.request.user)
+        with tmp_to_root_org():
+            queryset = self.model.get_user_related_tickets(self.request.user)
         return queryset
 
     def perform_create(self, serializer):
@@ -119,6 +122,6 @@ class ApplyLoginAssetTicketViewSet(TicketViewSet):
 
 
 class ApplyCommandTicketViewSet(TicketViewSet):
-    serializer_class = serializers.CommandConfirmSerializer
+    serializer_class = serializers.ApplyCommandConfirmSerializer
     model = ApplyCommandTicket
     filterset_class = filters.ApplyCommandTicketFilter

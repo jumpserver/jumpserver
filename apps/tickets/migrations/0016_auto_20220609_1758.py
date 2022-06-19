@@ -11,8 +11,8 @@ from orgs.utils import tmp_to_org
 from tickets.const import TicketType
 from assets.models import Node, Asset, SystemUser, CommandFilterRule, CommandFilter
 from applications.models import Application
-from perms.models import Action
 from terminal.models import Session
+from perms.models import Action
 
 
 def time_conversion(t):
@@ -53,16 +53,29 @@ def apply_asset_migrate(apps):
     for instance in tickets:
         meta = instance.meta
         org_id = instance.org_id
+        apply_actions = meta.get('apply_actions')
+        if isinstance(apply_actions, list):
+            apply_actions = Action.choices_to_value(value=apply_actions)
+        elif isinstance(apply_actions, int):
+            apply_actions = apply_actions
+        else:
+            apply_actions = 0
         data = {
             'ticket_ptr_id': instance.pk,
             'apply_permission_name': meta.get('apply_permission_name', ''),
             'apply_date_start': time_conversion(meta.get('apply_date_start')),
             'apply_date_expired': time_conversion(meta.get('apply_date_expired')),
-            'apply_actions': Action.choices_to_value(value=meta.get('apply_actions', [])),
+            'apply_actions': apply_actions,
         }
         apply_nodes = list(set(meta.get('apply_nodes', [])) & nodes_dict.get(org_id, set()))
         apply_assets = list(set(meta.get('apply_assets', [])) & assets_dict.get(org_id, set()))
         apply_system_users = list(set(meta.get('apply_system_users', [])) & system_users_dict.get(org_id, set()))
+        if (not apply_nodes and not apply_assets) or not apply_system_users:
+            # 删除问题数据
+            instance.delete()
+            continue
+        if str(instance.id) == 'e83a1d54-01e0-422a-bbc7-885cbf3966dc':
+            print(apply_nodes, apply_assets, apply_system_users)
         rel_snapshot = {
             'applicant': instance.applicant_display,
             'apply_nodes': meta.get('apply_nodes_display', []),
@@ -70,7 +83,7 @@ def apply_asset_migrate(apps):
             'apply_system_users': meta.get('apply_system_users', []),
         }
         instance.rel_snapshot = rel_snapshot
-        instance.save()
+        instance.save(update_fields=['rel_snapshot'])
         child = ticket_apply_asset_model(**data)
         child.__dict__.update(instance.__dict__)
         child.save()
@@ -96,13 +109,17 @@ def apply_application_migrate(apps):
         }
         apply_applications = list(set(meta.get('apply_applications', [])) & apps_dict.get(org_id, set()))
         apply_system_users = list(set(meta.get('apply_system_users', [])) & system_users_dict.get(org_id, set()))
+        if not apply_applications or not apply_system_users:
+            # 删除问题数据
+            instance.delete()
+            continue
         rel_snapshot = {
             'applicant': instance.applicant_display,
             'apply_applications': meta.get('apply_applications_display', []),
             'apply_system_users': meta.get('apply_system_users', []),
         }
         instance.rel_snapshot = rel_snapshot
-        instance.save()
+        instance.save(update_fields=['rel_snapshot'])
         child = ticket_apply_app_model(**data)
         child.__dict__.update(instance.__dict__)
         child.save()
@@ -127,7 +144,7 @@ def login_confirm_migrate(apps):
             'applicant': instance.applicant_display
         }
         instance.rel_snapshot = rel_snapshot
-        instance.save()
+        instance.save(update_fields=['rel_snapshot'])
         child = ticket_apply_login_model(**data)
         child.__dict__.update(instance.__dict__)
         child.save()
@@ -181,7 +198,7 @@ def login_asset_confirm_migrate(apps):
             'apply_login_system_user': meta.get('apply_login_system_user', ''),
         }
         instance.rel_snapshot = rel_snapshot
-        instance.save()
+        instance.save(update_fields=['rel_snapshot'])
         child = ticket_apply_login_asset_model(**data)
         child.__dict__.update(instance.__dict__)
         child.save()
@@ -247,7 +264,7 @@ def command_confirm_migrate(apps):
             'apply_from_cmd_filter_rule': meta.get('apply_from_cmd_filter_rule_id', ''),
         }
         instance.rel_snapshot = rel_snapshot
-        instance.save()
+        instance.save(update_fields=['rel_snapshot'])
         child = ticket_apply_command_model(**data)
         child.__dict__.update(instance.__dict__)
         child.save()
@@ -450,10 +467,10 @@ class Migration(migrations.Migration):
             bases=('tickets.ticket',),
         ),
         migrations.RunPython(restructure_migrate),
-        migrations.RemoveField(
-            model_name='ticket',
-            name='meta',
-        ),
+        # migrations.RemoveField(
+        #     model_name='ticket',
+        #     name='meta',
+        # ),
         migrations.RemoveField(
             model_name='ticket',
             name='applicant_display',

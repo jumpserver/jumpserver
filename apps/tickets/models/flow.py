@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from users.models import User
 from common.mixins.models import CommonModelMixin
+
 from orgs.mixins.models import OrgModelMixin
 from orgs.models import Organization
 from orgs.utils import tmp_to_org, get_current_org_id

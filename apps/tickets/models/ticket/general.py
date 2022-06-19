@@ -283,6 +283,7 @@ class Ticket(StatusMixin, CommonModelMixin):
     )
     serial_num = models.CharField(_('Serial number'), max_length=128, unique=True, null=True)
     rel_snapshot = models.JSONField(verbose_name=_('Relation snapshot'), default=dict)
+    meta = models.JSONField(default=dict)
     org_id = models.CharField(
         max_length=36, blank=True, default='', verbose_name=_('Organization'), db_index=True
     )
