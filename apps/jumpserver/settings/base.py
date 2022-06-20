@@ -148,19 +148,8 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # 自定义的配置，SESSION_EXPIRE_AT_BROWSER_CLOSE 始终为 True, 下面这个来控制是否强制关闭后过期 cookie
 SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE = CONFIG.SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE
 SESSION_SAVE_EVERY_REQUEST = CONFIG.SESSION_SAVE_EVERY_REQUEST
-SESSION_ENGINE = 'jumpserver.rewriting.session'
-SESSION_REDIS = {
-    'url': '%(protocol)s://:%(password)s@%(host)s:%(port)s/%(db)s' % {
-        'protocol': 'rediss' if CONFIG.REDIS_USE_SSL else 'redis',
-        'password': CONFIG.REDIS_PASSWORD,
-        'host': CONFIG.REDIS_HOST,
-        'port': CONFIG.REDIS_PORT,
-        'db': CONFIG.REDIS_DB_CACHE,
-    },
-    'prefix': 'auth_session',
-    'socket_timeout': 1,
-    'retry_on_timeout': False
-}
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 # Database
@@ -283,7 +272,6 @@ REDIS_SSL_REQUIRED = CONFIG.REDIS_SSL_REQUIRED or 'none'
 
 CACHES = {
     'default': {
-        # 'BACKEND': 'redis_cache.RedisCache',
         'BACKEND': 'redis_lock.django_cache.RedisCache',
         'LOCATION': '%(protocol)s://:%(password)s@%(host)s:%(port)s/%(db)s' % {
             'protocol': 'rediss' if CONFIG.REDIS_USE_SSL else 'redis',

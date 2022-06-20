@@ -13,6 +13,7 @@ from itertools import chain
 import paramiko
 import sshpubkeys
 from itsdangerous import (
+    TimedSerializer,
     TimedJSONWebSignatureSerializer, JSONWebSignatureSerializer,
     BadSignature, SignatureExpired
 )

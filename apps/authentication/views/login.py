@@ -10,8 +10,7 @@ from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.http import HttpResponse
 from django.shortcuts import reverse, redirect
 from django.utils.decorators import method_decorator
-from django.db import transaction
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
@@ -182,6 +181,29 @@ class UserLoginView(mixins.AuthMixin, FormView):
         return [method for method in auth_methods if method['enabled']]
 
     @staticmethod
+    def get_support_langs():
+        langs = [
+            {
+                'title': '中文(简体)',
+                'code': 'zh-hans'
+            },
+            {
+                'title': 'English',
+                'code': 'en'
+            },
+            {
+                'title': '日本語',
+                'code': 'ja'
+            }
+        ]
+        return langs
+
+    def get_current_lang(self):
+        langs = self.get_support_langs()
+        matched_lang = filter(lambda x: x['code'] == get_language(), langs)
+        return next(matched_lang, langs[0])
+
+    @staticmethod
     def get_forgot_password_url():
         forgot_password_url = reverse('authentication:forgot-password')
         forgot_password_url = settings.FORGOT_PASSWORD_URL or forgot_password_url
@@ -191,6 +213,8 @@ class UserLoginView(mixins.AuthMixin, FormView):
         context = {
             'demo_mode': os.environ.get("DEMO_MODE"),
             'auth_methods': self.get_support_auth_methods(),
+            'langs': self.get_support_langs(),
+            'current_lang': self.get_current_lang(),
             'forgot_password_url': self.get_forgot_password_url(),
             **self.get_user_mfa_context(self.request.user)
         }
