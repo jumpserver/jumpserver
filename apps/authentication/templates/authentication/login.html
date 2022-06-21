@@ -38,6 +38,8 @@
             background-color: #ffffff;
             height: 1px;
             margin: 20px 0;
+            width: 30%;
+            display: inline-block;
         }
 
         .login-content {
@@ -78,7 +80,7 @@
             margin-bottom: 0;
         }
 
-        .captch-field .has-error .help-block {
+        .captcha-field .has-error .help-block {
             margin-top: -8px !important;
         }
 
@@ -87,25 +89,32 @@
         }
 
         .jms-title {
-            padding: 60px 10px 10px 60px;
+            padding: 60px 10px 10px;
         }
 
         .no-captcha-challenge .jms-title {
-            padding: 60px 10px 10px 60px;
+            padding: 60px 10px 10px;
         }
 
         .no-captcha-challenge .welcome-message {
             padding-top: 10px;
         }
 
+        .more-login-items {
+            margin-top: 10px;
+        }
+
         .more-login-item {
             border-right: 1px dashed #dedede;
-            padding-left: 5px;
-            padding-right: 5px;
+            padding: 2px 5px;
         }
 
         .more-login-item:last-child {
-            border: none;
+            border-right: none;
+        }
+
+        .more-login-item:hover {
+            color: #334554;
         }
 
         .select-con {
@@ -117,6 +126,7 @@
         }
 
         .login-page-language {
+            font-size: 12px!important;
             margin-right: -11px !important;
             padding-top: 12px !important;
             padding-left: 0 !important;
@@ -136,7 +146,32 @@
             font-weight:400;
             color: #151515;
             letter-spacing: 0;
-            text-align: left;
+        }
+        .more-methods-title {
+            position: relative;
+        }
+        .more-methods-title:before, .more-methods-title:after {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            content: '';
+            border: 1px dashed #e7eaec;
+            width: 35%;
+        }
+        .more-methods-title:before {
+            left: 0;
+        }
+        .more-methods-title:after {
+            right: 0;
+        }
+        .more-methods-title.ja:before, .more-methods-title.ja:after{
+            width: 26%;
+        }
+        .captcha-field .form-group {
+            margin-bottom: 5px;
+        }
+        .auto-login.form-group .checkbox {
+            margin: 5px 0;
         }
     </style>
 </head>
@@ -168,7 +203,7 @@
                 </li>
             </ul>
             <div class="jms-title">
-                <span style="">{% trans 'Login' %}</span>
+                <span style="">{{ JMS_TITLE }}</span>
             </div>
             <div class="contact-form col-md-10 col-md-offset-1">
                 <form id="login-form" action="" method="post" role="form" novalidate="novalidate">
@@ -202,18 +237,18 @@
                         {% include '_mfa_login_field.html' %}
                         </div>
                     {% elif form.captcha %}
-                        <div class="captch-field">
+                        <div class="captcha-field">
                             {% bootstrap_field form.captcha show_label=False %}
                         </div>
                     {% endif %}
-                    <div class="form-group" style="padding-top: 5px; margin-bottom: 10px">
+                    <div class="form-group auto-login" style="padding-top: 5px; margin-bottom: 0">
                         <div class="row">
                             <div class="col-md-6" style="text-align: left">
                                 {% if form.auto_login %}
                                     {% bootstrap_field form.auto_login form_group_class='' %}
                                 {% endif %}
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6" style="line-height: 25px">
                                 <a id="forgot_password" href="{{ forgot_password_url }}" style="float: right">
                                     <small>{% trans 'Forgot password' %}?</small>
                                 </a>
@@ -221,15 +256,18 @@
                         </div>
                     </div>
 
-                    <div class="form-group" style="">
-                        <button type="submit" class="btn btn-transparent" onclick="doLogin();return false;">{% trans 'Login' %}</button>
+                    <div class="form-group" style="margin-bottom: 10px;margin-top: 5px">
+                        <button type="submit" class="btn btn-transparent" onclick="doLogin();return false;">
+                            {% trans 'Login' %}
+                        </button>
                     </div>
 
                     <div>
                         {% if auth_methods %}
-                            <div class="hr-line-dashed"></div>
-                            <div style="display: inline-block; float: left">
-                            <b class="text-muted text-left" >{% trans "More login options" %}</b>
+                            <div class="more-methods-title {{ current_lang.code }}">
+                                    {% trans "More login options" %}
+                            </div>
+                            <div class="more-login-items">
                             {% for method in auth_methods %}
                                 <a href="{{ method.url }}" class="more-login-item">
                                     <i class="fa"><img src="{{ method.logo }}" height="13" width="13"></i> {{ method.name }}

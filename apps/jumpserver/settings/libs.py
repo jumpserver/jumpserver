@@ -64,7 +64,7 @@ SWAGGER_SETTINGS = {
 
 
 # Captcha settings, more see https://django-simple-captcha.readthedocs.io/en/latest/advanced.html
-CAPTCHA_IMAGE_SIZE = (140, 34)
+CAPTCHA_IMAGE_SIZE = (180, 34)
 CAPTCHA_FOREGROUND_COLOR = '#001100'
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
 CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
@@ -130,6 +130,7 @@ CELERY_TASK_EAGER_PROPAGATES = True
 CELERY_WORKER_REDIRECT_STDOUTS = True
 CELERY_WORKER_REDIRECT_STDOUTS_LEVEL = "INFO"
 CELERY_TASK_SOFT_TIME_LIMIT = 3600
+
 if CONFIG.REDIS_USE_SSL:
     CELERY_BROKER_USE_SSL = CELERY_REDIS_BACKEND_USE_SSL = {
         'ssl_cert_reqs': REDIS_SSL_REQUIRED,

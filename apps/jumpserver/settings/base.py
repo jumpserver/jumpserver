@@ -11,10 +11,19 @@ from django.urls import reverse_lazy
 from .. import const
 from ..const import CONFIG
 
+
+def exist_or_default(path, default):
+    if not os.path.exists(path):
+        path = default
+    return path
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 VERSION = const.VERSION
 BASE_DIR = const.BASE_DIR
 PROJECT_DIR = const.PROJECT_DIR
+DATA_DIR = os.path.join(PROJECT_DIR, 'data')
+CERTS_DIR = os.path.join(DATA_DIR, 'certs')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -149,7 +158,6 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE = CONFIG.SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE
 SESSION_SAVE_EVERY_REQUEST = CONFIG.SESSION_SAVE_EVERY_REQUEST
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-SESSION_CACHE_ALIAS = "default"
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 # Database
@@ -168,7 +176,6 @@ DATABASES = {
         'OPTIONS': DB_OPTIONS
     }
 }
-
 
 DB_CA_PATH = os.path.join(PROJECT_DIR, 'data', 'certs', 'db_ca.pem')
 if CONFIG.DB_ENGINE.lower() == 'mysql':
@@ -253,44 +260,40 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755
 
 # Cache use redis
-REDIS_SSL_KEYFILE = os.path.join(PROJECT_DIR, 'data', 'certs', 'redis_client.key')
-if not os.path.exists(REDIS_SSL_KEYFILE):
-    REDIS_SSL_KEYFILE = None
-
-REDIS_SSL_CERTFILE = os.path.join(PROJECT_DIR, 'data', 'certs', 'redis_client.crt')
-if not os.path.exists(REDIS_SSL_CERTFILE):
-    REDIS_SSL_CERTFILE = None
-
-REDIS_SSL_CA_CERTS = os.path.join(PROJECT_DIR, 'data', 'certs', 'redis_ca.crt')
-if not os.path.exists(REDIS_SSL_CA_CERTS):
-    REDIS_SSL_CA_CERTS = os.path.join(PROJECT_DIR, 'data', 'certs', 'redis_ca.pem')
-
-if not os.path.exists(REDIS_SSL_CA_CERTS):
-    REDIS_SSL_CA_CERTS = None
-
+REDIS_SSL_KEYFILE = exist_or_default(os.path.join(CERTS_DIR, 'redis_client.key'), None)
+REDIS_SSL_CERTFILE = exist_or_default(os.path.join(CERTS_DIR, 'redis_client.crt'), None)
+REDIS_SSL_CA_CERTS = exist_or_default(os.path.join(CERTS_DIR, 'redis_ca.pem'), None)
+REDIS_SSL_CA_CERTS = exist_or_default(os.path.join(CERTS_DIR, 'redis_ca.crt'), REDIS_SSL_CA_CERTS)
 REDIS_SSL_REQUIRED = CONFIG.REDIS_SSL_REQUIRED or 'none'
+REDIS_LOCATION_NO_DB = '%(protocol)s://:%(password)s@%(host)s:%(port)s/{}' % {
+    'protocol': 'rediss' if CONFIG.REDIS_USE_SSL else 'redis',
+    'password': CONFIG.REDIS_PASSWORD,
+    'host': CONFIG.REDIS_HOST,
+    'port': CONFIG.REDIS_PORT,
+}
 
-CACHES = {
-    'default': {
-        'BACKEND': 'redis_lock.django_cache.RedisCache',
-        'LOCATION': '%(protocol)s://:%(password)s@%(host)s:%(port)s/%(db)s' % {
-            'protocol': 'rediss' if CONFIG.REDIS_USE_SSL else 'redis',
-            'password': CONFIG.REDIS_PASSWORD,
-            'host': CONFIG.REDIS_HOST,
-            'port': CONFIG.REDIS_PORT,
-            'db': CONFIG.REDIS_DB_CACHE,
-        },
-        'OPTIONS': {
-            "REDIS_CLIENT_KWARGS": {"health_check_interval": 30},
-            "CONNECTION_POOL_KWARGS": {
-                'ssl_cert_reqs': REDIS_SSL_REQUIRED,
-                "ssl_keyfile": REDIS_SSL_KEYFILE,
-                "ssl_certfile": REDIS_SSL_CERTFILE,
-                "ssl_ca_certs": REDIS_SSL_CA_CERTS
-            } if CONFIG.REDIS_USE_SSL else {}
-        }
+REDIS_CACHE_DEFAULT = {
+    'BACKEND': 'redis_lock.django_cache.RedisCache',
+    'LOCATION': REDIS_LOCATION_NO_DB.format(CONFIG.REDIS_DB_CACHE),
+    'OPTIONS': {
+        "REDIS_CLIENT_KWARGS": {"health_check_interval": 30},
+        "CONNECTION_POOL_KWARGS": {
+            'ssl_cert_reqs': REDIS_SSL_REQUIRED,
+            "ssl_keyfile": REDIS_SSL_KEYFILE,
+            "ssl_certfile": REDIS_SSL_CERTFILE,
+            "ssl_ca_certs": REDIS_SSL_CA_CERTS
+        } if CONFIG.REDIS_USE_SSL else {}
     }
 }
+REDIS_CACHE_SESSION = dict(REDIS_CACHE_DEFAULT)
+REDIS_CACHE_SESSION['LOCATION'] = REDIS_LOCATION_NO_DB.format(CONFIG.REDIS_DB_SESSION)
+
+CACHES = {
+    'default': REDIS_CACHE_DEFAULT,
+    'session': REDIS_CACHE_SESSION
+}
+
+SESSION_CACHE_ALIAS = "session"
 
 FORCE_SCRIPT_NAME = CONFIG.FORCE_SCRIPT_NAME
 SESSION_COOKIE_SECURE = CONFIG.SESSION_COOKIE_SECURE
