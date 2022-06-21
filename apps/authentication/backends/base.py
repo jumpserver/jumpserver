@@ -52,8 +52,6 @@ class JMSBaseAuthBackend:
             logger.debug(info)
         return allow
 
-from redis_lock.django_cache import RedisCache
-from redis import StrictRedis
 
 class JMSModelBackend(JMSBaseAuthBackend, ModelBackend):
     pass

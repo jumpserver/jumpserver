@@ -6,6 +6,7 @@ import ssl
 from .base import REDIS_SSL_CA_CERTS, REDIS_SSL_CERTFILE, REDIS_SSL_KEYFILE, REDIS_SSL_REQUIRED
 from ..const import CONFIG, PROJECT_DIR
 
+
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
@@ -14,7 +15,6 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
-        # 'rest_framework.renderers.BrowsableAPIRenderer',
         'common.drf.renders.CSVFileRenderer',
         'common.drf.renders.ExcelFileRenderer',
 
@@ -47,9 +47,6 @@ REST_FRAMEWORK = {
     'DATETIME_INPUT_FORMATS': ['%Y/%m/%d %H:%M:%S %z', 'iso-8601', '%Y-%m-%d %H:%M:%S %z'],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'EXCEPTION_HANDLER': 'common.drf.exc_handlers.common_exception_handler',
-    # 'PAGE_SIZE': 100,
-    # 'MAX_PAGE_SIZE': 5000
-
 }
 
 SWAGGER_SETTINGS = {
@@ -127,17 +124,11 @@ CELERY_RESULT_SERIALIZER = 'pickle'
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_ACCEPT_CONTENT = ['json', 'pickle']
 CELERY_RESULT_EXPIRES = 600
-# CELERY_WORKER_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
-# CELERY_WORKER_LOG_FORMAT = '%(message)s'
-# CELERY_WORKER_TASK_LOG_FORMAT = '%(task_id)s %(task_name)s %(message)s'
 CELERY_WORKER_TASK_LOG_FORMAT = '%(message)s'
-# CELERY_WORKER_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
 CELERY_WORKER_LOG_FORMAT = '%(message)s'
 CELERY_TASK_EAGER_PROPAGATES = True
 CELERY_WORKER_REDIRECT_STDOUTS = True
 CELERY_WORKER_REDIRECT_STDOUTS_LEVEL = "INFO"
-# CELERY_WORKER_HIJACK_ROOT_LOGGER = True
-# CELERY_WORKER_MAX_TASKS_PER_CHILD = 40
 CELERY_TASK_SOFT_TIME_LIMIT = 3600
 if CONFIG.REDIS_USE_SSL:
     CELERY_BROKER_USE_SSL = CELERY_REDIS_BACKEND_USE_SSL = {
