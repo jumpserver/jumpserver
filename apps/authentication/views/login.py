@@ -210,16 +210,16 @@ class UserLoginView(mixins.AuthMixin, FormView):
         return forgot_password_url
 
     def get_context_data(self, **kwargs):
-        context = {
+        context = super().get_context_data(**kwargs)
+        context.update({
             'demo_mode': os.environ.get("DEMO_MODE"),
             'auth_methods': self.get_support_auth_methods(),
             'langs': self.get_support_langs(),
             'current_lang': self.get_current_lang(),
             'forgot_password_url': self.get_forgot_password_url(),
             **self.get_user_mfa_context(self.request.user)
-        }
-        kwargs.update(context)
-        return super().get_context_data(**kwargs)
+        })
+        return context
 
 
 class UserLoginGuardView(mixins.AuthMixin, RedirectView):
