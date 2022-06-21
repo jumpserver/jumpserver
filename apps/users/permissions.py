@@ -1,6 +1,8 @@
 from rest_framework import permissions
 
-from .utils import is_auth_password_time_valid, is_auth_confirm_time_valid
+from common.permissions import ReLoginUserConfirm
+from common.exceptions import UserConfirmRequired
+from .utils import is_auth_password_time_valid
 
 
 class IsAuthPasswdTimeValid(permissions.IsAuthenticated):
@@ -10,8 +12,10 @@ class IsAuthPasswdTimeValid(permissions.IsAuthenticated):
                and is_auth_password_time_valid(request.session)
 
 
-class IsAuthConfirmTimeValid(permissions.IsAuthenticated):
+class IsAuthConfirmTimeValid(ReLoginUserConfirm):
 
     def has_permission(self, request, view):
-        return super().has_permission(request, view) \
-               and is_auth_confirm_time_valid(request.session)
+        try:
+            return super().has_permission(request, view)
+        except UserConfirmRequired:
+            return False

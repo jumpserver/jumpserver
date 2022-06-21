@@ -9,7 +9,7 @@ from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
 from common.drf.filters import BaseFilterSet
 from common.mixins import RecordViewLogMixin
-from common.permissions import NeedMFAVerify
+from common.permissions import MFAUserConfirm
 from ..tasks.account_connectivity import test_accounts_connectivity_manual
 from ..models import AuthBook, Node
 from .. import serializers
@@ -88,7 +88,7 @@ class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
         'default': serializers.AccountSecretSerializer
     }
     http_method_names = ['get']
-    permission_classes = [RBACPermission, NeedMFAVerify]
+    permission_classes = [RBACPermission, MFAUserConfirm]
     rbac_perms = {
         'list': 'assets.view_assetaccountsecret',
         'retrieve': 'assets.view_assetaccountsecret',

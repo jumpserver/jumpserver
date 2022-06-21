@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-16 11:12+0800\n"
+"POT-Creation-Date: 2022-06-22 17:24+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,7 +30,7 @@ msgstr "Acls"
 #: orgs/models.py:65 perms/models/base.py:83 rbac/models/role.py:29
 #: settings/models.py:29 settings/serializers/sms.py:6
 #: terminal/models/endpoint.py:10 terminal/models/endpoint.py:59
-#: terminal/models/storage.py:25 terminal/models/task.py:16
+#: terminal/models/storage.py:26 terminal/models/task.py:16
 #: terminal/models/terminal.py:100 users/forms/profile.py:33
 #: users/models/group.py:15 users/models/user.py:661
 #: xpack/plugins/cloud/models.py:28
@@ -62,7 +62,7 @@ msgstr "アクティブ"
 #: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:68
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:34
 #: terminal/models/endpoint.py:21 terminal/models/endpoint.py:69
-#: terminal/models/storage.py:28 terminal/models/terminal.py:114
+#: terminal/models/storage.py:29 terminal/models/terminal.py:114
 #: tickets/models/comment.py:24 tickets/models/ticket.py:154
 #: users/models/group.py:16 users/models/user.py:698
 #: xpack/plugins/change_auth_plan/models/base.py:44
@@ -306,7 +306,7 @@ msgstr "カテゴリ"
 #: assets/models/cmd_filter.py:82 assets/models/user.py:250
 #: perms/models/application_permission.py:24
 #: perms/serializers/application/user_permission.py:34
-#: terminal/models/storage.py:57 terminal/models/storage.py:141
+#: terminal/models/storage.py:58 terminal/models/storage.py:142
 #: tickets/models/flow.py:56 tickets/models/ticket.py:131
 #: tickets/serializers/ticket/meta/ticket_type/apply_application.py:29
 #: xpack/plugins/change_auth_plan/models/app.py:28
@@ -761,7 +761,8 @@ msgstr "確認済みの日付"
 
 #: assets/models/base.py:177 assets/serializers/base.py:15
 #: assets/serializers/base.py:37 assets/serializers/system_user.py:29
-#: audits/signal_handlers.py:50 authentication/forms.py:32
+#: audits/signal_handlers.py:50 authentication/confirm/password.py:9
+#: authentication/forms.py:32
 #: authentication/templates/authentication/login.html:182
 #: settings/serializers/auth/ldap.py:25 settings/serializers/auth/ldap.py:46
 #: users/forms/profile.py:22 users/serializers/user.py:92
@@ -1766,29 +1767,13 @@ msgstr "{ApplicationPermission} 追加 {SystemUser}"
 msgid "{ApplicationPermission} REMOVE {SystemUser}"
 msgstr "{ApplicationPermission} 削除 {SystemUser}"
 
-#: authentication/api/confirm.py:40
-msgid "Authentication failed password incorrect"
-msgstr "認証に失敗しました (ユーザー名またはパスワードが正しくありません)"
-
-#: authentication/api/confirm.py:48
-msgid "Login time has exceeded {} minutes, please login again"
-msgstr "ログイン時間が {} 分を超えました。もう一度ログインしてください"
-
-#: authentication/api/confirm.py:72 common/exceptions.py:47
-msgid "This action require verify your MFA"
-msgstr "このアクションでは、MFAの確認が必要です。"
-
 #: authentication/api/connection_token.py:326
 msgid "Invalid token"
 msgstr "無効なトークン"
 
-#: authentication/api/mfa.py:64
+#: authentication/api/mfa.py:59
 msgid "Current user not support mfa type: {}"
 msgstr "現在のユーザーはmfaタイプをサポートしていません: {}"
-
-#: authentication/api/mfa.py:111
-msgid "Code is invalid, {}"
-msgstr "コードが無効です。{}"
 
 #: authentication/apps.py:7
 msgid "Authentication"
@@ -1846,6 +1831,14 @@ msgstr ""
 #: authentication/backends/drf.py:148
 msgid "Invalid token or cache refreshed."
 msgstr "無効なトークンまたはキャッシュの更新。"
+
+#: authentication/confirm/password.py:17
+msgid "Authentication failed password incorrect"
+msgstr "認証に失敗しました (ユーザー名またはパスワードが正しくありません)"
+
+#: authentication/confirm/relogin.py:10
+msgid "Login time has exceeded {} minutes, please login again"
+msgstr "ログイン時間が {} 分を超えました。もう一度ログインしてください"
 
 #: authentication/errors.py:26
 msgid "Username/password check failed"
@@ -2592,7 +2585,11 @@ msgstr "M2Mリバースは許可されません"
 msgid "Is referenced by other objects and cannot be deleted"
 msgstr "他のオブジェクトによって参照され、削除できません。"
 
-#: common/exceptions.py:53
+#: common/exceptions.py:46
+msgid "This action require confirm current user"
+msgstr "この操作には現在のユーザーを確認する必要があります。"
+
+#: common/exceptions.py:52
 msgid "Unexpect error occur"
 msgstr "予期しないエラーが発生します"
 
@@ -4925,15 +4922,15 @@ msgstr "スレッド"
 msgid "Boot Time"
 msgstr "ブート時間"
 
-#: terminal/models/storage.py:27
+#: terminal/models/storage.py:28
 msgid "Default storage"
 msgstr "デフォルトのストレージ"
 
-#: terminal/models/storage.py:135 terminal/models/terminal.py:108
+#: terminal/models/storage.py:136 terminal/models/terminal.py:108
 msgid "Command storage"
 msgstr "コマンドストレージ"
 
-#: terminal/models/storage.py:195 terminal/models/terminal.py:109
+#: terminal/models/storage.py:196 terminal/models/terminal.py:109
 msgid "Replay storage"
 msgstr "再生ストレージ"
 
@@ -6843,3 +6840,6 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "コミュニティ版"
+
+#~ msgid "Code is invalid, {}"
+#~ msgstr "コードが無効です。{}"

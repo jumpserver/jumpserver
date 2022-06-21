@@ -10,22 +10,17 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.serializers import ValidationError
 from rest_framework.response import Response
 
-from common.permissions import IsValidUser, NeedMFAVerify
 from common.utils import get_logger
 from common.exceptions import UnexpectError
 from users.models.user import User
-from ..serializers import OtpVerifySerializer
 from .. import serializers
 from .. import errors
-from ..mfa.otp import MFAOtp
 from ..mixins import AuthMixin
-
 
 logger = get_logger(__name__)
 
 __all__ = [
-    'MFAChallengeVerifyApi', 'UserOtpVerifyApi',
-    'MFASendCodeApi'
+    'MFAChallengeVerifyApi', 'MFASendCodeApi'
 ]
 
 
@@ -88,30 +83,3 @@ class MFAChallengeVerifyApi(AuthMixin, CreateAPIView):
             raise ValidationError(data)
         except errors.NeedMoreInfoError as e:
             return Response(e.as_data(), status=200)
-
-
-class UserOtpVerifyApi(CreateAPIView):
-    permission_classes = (IsValidUser,)
-    serializer_class = OtpVerifySerializer
-
-    def get(self, request, *args, **kwargs):
-        return Response({'code': 'valid', 'msg': 'verified'})
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        code = serializer.validated_data["code"]
-        otp = MFAOtp(request.user)
-
-        ok, error = otp.check_code(code)
-        if ok:
-            request.session["MFA_VERIFY_TIME"] = int(time.time())
-            return Response({"ok": "1"})
-        else:
-            return Response({"error": _("Code is invalid, {}").format(error)}, status=400)
-
-    def get_permissions(self):
-        if self.request.method.lower() == 'get' \
-                and settings.SECURITY_VIEW_AUTH_NEED_MFA:
-            self.permission_classes = [NeedMFAVerify]
-        return super().get_permissions()

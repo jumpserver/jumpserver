@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 #
 import time
-from rest_framework import permissions
+
 from django.conf import settings
-from common.exceptions import MFAVerifyRequired
+from rest_framework import permissions
+from rest_framework.request import Request
+
+from authentication.const import ConfirmType
+from common.exceptions import UserConfirmRequired
 
 
 class IsValidUser(permissions.IsAuthenticated, permissions.BasePermission):
@@ -29,15 +33,63 @@ class WithBootstrapToken(permissions.BasePermission):
         return settings.BOOTSTRAP_TOKEN == request_bootstrap_token
 
 
-class NeedMFAVerify(permissions.BasePermission):
+class UserConfirm(permissions.BasePermission):
+    confirm_type: str
+
     def has_permission(self, request, view):
         if not settings.SECURITY_VIEW_AUTH_NEED_MFA:
             return True
 
-        mfa_verify_time = request.session.get('MFA_VERIFY_TIME', 0)
-        if time.time() - mfa_verify_time < settings.SECURITY_MFA_VERIFY_TTL:
+        if self.validate(request):
             return True
-        raise MFAVerifyRequired()
+
+        raise UserConfirmRequired(code=self.confirm_type)
+
+    def is_allow(self, request: Request, confirm_type: str = None) -> bool:
+        confirm_time = self.confirm_time(request, confirm_type)
+        if time.time() - confirm_time < settings.SECURITY_MFA_VERIFY_TTL:
+            return True
+        return False
+
+    def validate(self, request: Request):
+        session_confirm_type = request.session.get('CONFIRM_TYPE')
+        if not session_confirm_type or session_confirm_type == self.confirm_type:
+            self.set_session(request)
+            return self.is_allow(request)
+
+        is_high_priority = ConfirmType.compare(self.confirm_type, session_confirm_type)
+        current_result = self.is_allow(request)
+        session_result = self.is_allow(request, session_confirm_type)
+
+        if is_high_priority:
+            self.set_session(request)
+            return current_result
+
+        if session_result:
+            return True
+
+        self.set_session(request)
+        return current_result
+
+    def confirm_time(self, request: Request, confirm_type: str = None):
+        confirm_type = confirm_type or self.confirm_type
+        session_key = f'{confirm_type.upper()}_USER_CONFIRM_TIME'
+        return request.session.get(session_key, 0)
+
+    def set_session(self, request: Request):
+        request.session['CONFIRM_TYPE'] = self.confirm_type
+
+
+class MFAUserConfirm(UserConfirm):
+    confirm_type = ConfirmType.MFA
+
+
+class PasswordUserConfirm(UserConfirm):
+    confirm_type = ConfirmType.PASSWORD
+
+
+class ReLoginUserConfirm(UserConfirm):
+    confirm_type = ConfirmType.ReLogin
 
 
 class IsObjectOwner(IsValidUser):

@@ -8,8 +8,8 @@ from django.db.utils import IntegrityError
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.exceptions import APIException
 
-from users.views import UserVerifyPasswordView
 from users.models import User
+from users.views import UserVerifyPasswordView
 from users.permissions import IsAuthConfirmTimeValid
 from common.utils import get_logger, FlashMessageUtil
 from common.utils.random import random_string

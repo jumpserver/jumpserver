@@ -2,9 +2,9 @@ from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from users.permissions import IsAuthConfirmTimeValid
 from users.models import User
 from common.utils import get_logger
+from common.permissions import ReLoginUserConfirm
 from common.mixins.api import RoleUserMixin, RoleAdminMixin
 from authentication import errors
 
@@ -26,7 +26,7 @@ class WeComQRUnBindBase(APIView):
 
 
 class WeComQRUnBindForUserApi(RoleUserMixin, WeComQRUnBindBase):
-    permission_classes = (IsAuthConfirmTimeValid,)
+    permission_classes = (ReLoginUserConfirm,)
 
 
 class WeComQRUnBindForAdminApi(RoleAdminMixin, WeComQRUnBindBase):
