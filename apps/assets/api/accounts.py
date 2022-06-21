@@ -1,9 +1,10 @@
-from django.db.models import F, Q
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView
+from rest_framework.exceptions import MethodNotAllowed
 
 from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
@@ -69,6 +70,9 @@ class AccountViewSet(OrgBulkModelViewSet):
         'partial_update': 'assets.change_assetaccountsecret',
     }
 
+    def create(self, request, *args, **kwargs):
+        raise MethodNotAllowed(self.action)
+
     def get_queryset(self):
         queryset = AuthBook.get_queryset()
         return queryset
@@ -120,4 +124,5 @@ class AccountTaskCreateAPI(CreateAPIView):
     def get_exception_handler(self):
         def handler(e, context):
             return Response({"error": str(e)}, status=400)
+
         return handler
