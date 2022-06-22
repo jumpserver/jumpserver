@@ -60,7 +60,7 @@ pytz==2022.1
 PyYAML==6.0
 redis==4.3.3
 requests==2.28.0
-# jms-storage==0.0.42
+jms-storage==0.0.43
 s3transfer==0.6.0
 simplejson==3.17.6
 six==1.16.0
