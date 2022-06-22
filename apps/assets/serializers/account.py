@@ -58,7 +58,15 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         return attrs
 
     def get_protocols(self, v):
-        return v.protocols.replace(' ', ', ')
+        """ protocols 是 queryset 中返回的，Post 创建成功后返回序列化时没有这个字段 """
+        if hasattr(v, 'protocols'):
+            protocols = v.protocols
+        elif hasattr(v, 'asset') and v.asset:
+            protocols = v.asset.protocols
+        else:
+            protocols = ''
+        protocols = protocols.replace(' ', ', ')
+        return protocols
 
     @classmethod
     def setup_eager_loading(cls, queryset):
