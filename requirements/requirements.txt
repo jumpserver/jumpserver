@@ -123,7 +123,7 @@ alibabacloud_dysmsapi20170525==2.0.2
 python-novaclient==11.0.1
 python-keystoneclient==4.3.0
 bce-python-sdk==0.8.64
-tencentcloud-sdk-python==3.0.477
+tencentcloud-sdk-python==3.0.66
 aliyun-python-sdk-core-v3==2.9.1
 aliyun-python-sdk-ecs==4.10.1
 huaweicloud-sdk-python==1.0.21
