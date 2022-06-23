@@ -10,8 +10,7 @@ from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.http import HttpResponse
 from django.shortcuts import reverse, redirect
 from django.utils.decorators import method_decorator
-from django.db import transaction
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
@@ -182,20 +181,59 @@ class UserLoginView(mixins.AuthMixin, FormView):
         return [method for method in auth_methods if method['enabled']]
 
     @staticmethod
+    def get_support_langs():
+        langs = [
+            {
+                'title': '中文(简体)',
+                'code': 'zh-hans'
+            },
+            {
+                'title': 'English',
+                'code': 'en'
+            },
+            {
+                'title': '日本語',
+                'code': 'ja'
+            }
+        ]
+        return langs
+
+    def get_current_lang(self):
+        langs = self.get_support_langs()
+        matched_lang = filter(lambda x: x['code'] == get_language(), langs)
+        return next(matched_lang, langs[0])
+
+    @staticmethod
     def get_forgot_password_url():
         forgot_password_url = reverse('authentication:forgot-password')
         forgot_password_url = settings.FORGOT_PASSWORD_URL or forgot_password_url
         return forgot_password_url
 
+    def get_extra_fields_count(self, context):
+        count = 0
+        if self.get_support_auth_methods():
+            count += 1
+        form = context.get('form')
+        if not form:
+            return count
+        if set(form.fields.keys()) & {'captcha', 'challenge', 'mfa_type'}:
+            count += 1
+        if form.errors or form.non_field_errors():
+            count += 1
+        return count
+
     def get_context_data(self, **kwargs):
-        context = {
+        context = super().get_context_data(**kwargs)
+        context.update({
             'demo_mode': os.environ.get("DEMO_MODE"),
             'auth_methods': self.get_support_auth_methods(),
+            'langs': self.get_support_langs(),
+            'current_lang': self.get_current_lang(),
             'forgot_password_url': self.get_forgot_password_url(),
+            'extra_fields_count': self.get_extra_fields_count(context),
             **self.get_user_mfa_context(self.request.user)
-        }
-        kwargs.update(context)
-        return super().get_context_data(**kwargs)
+        })
+        return context
 
 
 class UserLoginGuardView(mixins.AuthMixin, RedirectView):
@@ -258,8 +296,7 @@ class UserLoginWaitConfirmView(TemplateView):
         if ticket:
             timestamp_created = datetime.datetime.timestamp(ticket.date_created)
             ticket_detail_url = TICKET_DETAIL_URL.format(id=ticket_id, type=ticket.type)
-            assignees = ticket.current_node.first().ticket_assignees.all()
-            assignees_display = ', '.join([str(i.assignee) for i in assignees])
+            assignees_display = ', '.join([str(assignee) for assignee in ticket.current_assignees])
             msg = _("""Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>
                   Don't close this page""").format(assignees_display)
         else:

@@ -1,7 +1,7 @@
 import random
 
 from .base import FakeDataGenerator
-from system.models import *
+from terminal.models import *
 
 
 class StatGenerator(FakeDataGenerator):

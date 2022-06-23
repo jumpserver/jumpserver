@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import copy
 import os
 
 from importlib import import_module
@@ -77,7 +78,7 @@ class CommandStorage(CommonStorageModelMixin, CommonModelMixin):
     def config(self):
         config = self.meta
         config.update({'TYPE': self.type})
-        return config
+        return copy.deepcopy(config)
 
     @property
     def valid_config(self):

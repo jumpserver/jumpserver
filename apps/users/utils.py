@@ -255,3 +255,16 @@ def is_auth_password_time_valid(session):
 
 def is_auth_otp_time_valid(session):
     return is_auth_time_valid(session, 'auth_otp_expired_at')
+
+
+def is_confirm_time_valid(session, key):
+    if not settings.SECURITY_VIEW_AUTH_NEED_MFA:
+        return True
+    mfa_verify_time = session.get(key, 0)
+    if time.time() - mfa_verify_time < settings.SECURITY_MFA_VERIFY_TTL:
+        return True
+    return False
+
+
+def is_auth_confirm_time_valid(session):
+    return is_confirm_time_valid(session, 'MFA_VERIFY_TIME')

@@ -12,7 +12,7 @@ from common.utils import get_logger
 from . import const
 from .models import ReplayStorage
 from tickets.models import TicketSession, TicketStep, TicketAssignee
-from tickets.const import ProcessStatus
+from tickets.const import StepState
 
 
 logger = get_logger(__name__)

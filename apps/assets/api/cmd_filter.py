@@ -69,7 +69,7 @@ class CommandConfirmAPI(CreateAPIView):
             external=True, api_to_ui=True
         )
         ticket_detail_url = '{url}?type={type}'.format(url=ticket_detail_url, type=ticket.type)
-        ticket_assignees = ticket.current_node.first().ticket_assignees.all()
+        ticket_assignees = ticket.current_step.ticket_assignees.all()
         return {
             'check_confirm_status': {'method': 'GET', 'url': confirm_status_url},
             'close_confirm': {'method': 'DELETE', 'url': confirm_status_url},
