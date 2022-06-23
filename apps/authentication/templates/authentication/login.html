@@ -33,28 +33,23 @@
         }
 
         .form-group {
-            margin-bottom: 40px;
-            margin-top: 10px;
+            margin-bottom: 30px;
+            margin-top: 20px;
         }
 
-        .addition .form-group, .has-error .form-group  {
+        .extra-fields-1 .form-group {
+            margin-bottom: 30px;
+            margin-top: 15px;
+        }
+
+        .extra-fields-2 .form-group {
             margin-bottom: 20px;
             margin-top: 10px;
         }
 
-        .auth-methods.has-error .form-group, .auth-methods.addition .form-group {
-            margin-bottom: 15px;
-            margin-top: 5px;
-        }
-
-        .has-error.addition .form-group {
-            margin-bottom: 20px;
-            margin-top: 5px;
-        }
-
-        .auth-methods.addition.has-error .form-group {
+        .extra-fields-3 .form-group {
             margin-bottom: 10px;
-            margin-top: 5px;
+            margin-top: 10px;
         }
 
         .login-content {
@@ -185,11 +180,7 @@
 </head>
 
 <body>
-<div class="login-content
-    {% if form.errors or form.non_field_error %} has-error {% endif %}
-    {% if auth_methods %} auth-methods {% endif %}
-    {% if form.captcha or form.mfa_type or form.challenge %} addition {% endif %}
-">
+<div class="login-content extra-fields-{{ extra_fields_count }}">
     <div class="right-image-box">
         <a href="{% if not XPACK_ENABLED %}https://github.com/jumpserver/jumpserver.git{% endif %}">
             <img src="{{ LOGIN_IMAGE_URL }}" class="right-image"  alt="screen-image"/>
