@@ -240,17 +240,19 @@ def command_confirm_migrate(apps, *args):
 
     tickets = ticket_model.objects.filter(type=TicketType.command_confirm)
     session_ids = tickets.values_list('meta__apply_from_session_id', flat=True)
-    session_ids = session_model.objects.filter(id__in=session_ids).values_list('id', flat=True)
-
+    session_ids = session_model.objects.filter(id__in=list(session_ids)).values_list('id', flat=True)
+    session_ids = [str(i) for i in session_ids]
     command_filter_ids = tickets.values_list('meta__apply_from_cmd_filter_id', flat=True)
     command_filter_ids = command_filter_model.objects\
-        .filter(id__in=command_filter_ids)\
+        .filter(id__in=list(command_filter_ids))\
         .values_list('id', flat=True)
-
+    command_filter_ids = [str(i) for i in command_filter_ids]
     command_filter_rule_ids = tickets.values_list('meta__apply_from_cmd_filter_rule_id', flat=True)
     command_filter_rule_ids = command_filter_rule_model.objects\
-        .filter(id__in=command_filter_rule_ids)\
+        .filter(id__in=list(command_filter_rule_ids))\
         .values_list('id', flat=True)
+    command_filter_rule_ids = [str(i) for i in command_filter_rule_ids]
+
     ticket_apply_command_model = apps.get_model('tickets', 'ApplyCommandTicket')
 
     for instance in tickets:
@@ -287,7 +289,7 @@ def command_confirm_migrate(apps, *args):
             'apply_run_user': apply_run_user,
             'apply_run_asset': apply_run_asset,
             'apply_run_system_user': apply_run_system_user,
-            'apply_run_command': meta.get('apply_run_command', '')[:4096],
+            'apply_run_command': meta.get('apply_run_command', '')[:4090],
             'apply_from_session_id': apply_from_session_id,
             'apply_from_cmd_filter_id': apply_from_cmd_filter_id,
             'apply_from_cmd_filter_rule_id': apply_from_cmd_filter_rule_id,

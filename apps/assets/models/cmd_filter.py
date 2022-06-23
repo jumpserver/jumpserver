@@ -173,7 +173,7 @@ class CommandFilterRule(OrgModelMixin):
             'apply_run_user_id': session.user_id,
             'apply_run_asset_id': session.asset_id,
             'apply_run_system_user_id': session.system_user_id,
-            'apply_run_command': run_command[:4096],
+            'apply_run_command': run_command[:4090],
             'apply_from_session_id': str(session.id),
             'apply_from_cmd_filter_rule_id': str(cmd_filter_rule.id),
             'apply_from_cmd_filter_id': str(cmd_filter_rule.filter.id),
