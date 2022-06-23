@@ -2298,7 +2298,7 @@ msgstr "登录"
 
 #: authentication/templates/authentication/login.html:224
 msgid "More login options"
-msgstr "更多登录方式"
+msgstr "其他方式登录"
 
 #: authentication/templates/authentication/login_mfa.html:6
 msgid "MFA Auth"
