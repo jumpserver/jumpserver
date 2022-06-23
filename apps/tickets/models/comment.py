@@ -9,6 +9,10 @@ __all__ = ['Comment']
 
 
 class Comment(CommonModelMixin):
+    class Type(models.TextChoices):
+        state = 'state', _('State')
+        common = 'common', _('common')
+
     ticket = models.ForeignKey(
         'tickets.Ticket', on_delete=models.CASCADE, related_name='comments'
     )
@@ -18,6 +22,10 @@ class Comment(CommonModelMixin):
     )
     user_display = models.CharField(max_length=256, verbose_name=_("User display name"))
     body = models.TextField(verbose_name=_("Body"))
+    type = models.CharField(
+        max_length=16, choices=Type.choices, default=Type.common, verbose_name=_("Type")
+    )
+    state = models.CharField(max_length=16, null=True)
 
     class Meta:
         ordering = ('date_created', )

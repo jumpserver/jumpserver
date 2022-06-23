@@ -337,18 +337,18 @@ class AuthACLMixin:
             raise errors.TimePeriodNotAllowed(username=user.username, request=self.request)
 
     def get_ticket(self):
-        from tickets.models import Ticket
+        from tickets.models import ApplyLoginTicket
         ticket_id = self.request.session.get("auth_ticket_id")
         logger.debug('Login confirm ticket id: {}'.format(ticket_id))
         if not ticket_id:
             ticket = None
         else:
-            ticket = Ticket.all().filter(id=ticket_id).first()
+            ticket = ApplyLoginTicket.all().filter(id=ticket_id).first()
         return ticket
 
     def get_ticket_or_create(self, confirm_setting):
         ticket = self.get_ticket()
-        if not ticket or ticket.status_closed:
+        if not ticket or ticket.is_status(ticket.Status.closed):
             ticket = confirm_setting.create_confirm_ticket(self.request)
             self.request.session['auth_ticket_id'] = str(ticket.id)
         return ticket
@@ -357,16 +357,17 @@ class AuthACLMixin:
         ticket = self.get_ticket()
         if not ticket:
             raise errors.LoginConfirmOtherError('', "Not found")
-        if ticket.status_open:
+
+        if ticket.is_status(ticket.Status.open):
             raise errors.LoginConfirmWaitError(ticket.id)
-        elif ticket.state_approve:
+        elif ticket.is_state(ticket.State.approved):
             self.request.session["auth_confirm"] = "1"
             return
-        elif ticket.state_reject:
+        elif ticket.is_state(ticket.State.rejected):
             raise errors.LoginConfirmOtherError(
                 ticket.id, ticket.get_state_display()
             )
-        elif ticket.state_close:
+        elif ticket.is_state(ticket.State.closed):
             raise errors.LoginConfirmOtherError(
                 ticket.id, ticket.get_state_display()
             )

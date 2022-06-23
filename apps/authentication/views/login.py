@@ -282,8 +282,7 @@ class UserLoginWaitConfirmView(TemplateView):
         if ticket:
             timestamp_created = datetime.datetime.timestamp(ticket.date_created)
             ticket_detail_url = TICKET_DETAIL_URL.format(id=ticket_id, type=ticket.type)
-            assignees = ticket.current_node.first().ticket_assignees.all()
-            assignees_display = ', '.join([str(i.assignee) for i in assignees])
+            assignees_display = ', '.join([str(assignee) for assignee in ticket.current_assignees])
             msg = _("""Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>
                   Don't close this page""").format(assignees_display)
         else:

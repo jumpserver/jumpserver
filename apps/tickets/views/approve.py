@@ -50,13 +50,13 @@ class TicketDirectApproveView(TemplateView):
     def get_context_data(self, **kwargs):
         # 放入工单信息
         token = kwargs.get('token')
-        ticket_info = cache.get(token, {}).get('body', '')
+        content = cache.get(token, {}).get('content', [])
         if self.request.user.is_authenticated:
             prompt_msg = _('Click the button below to approve or reject')
         else:
             prompt_msg = _('After successful authentication, this ticket can be approved directly')
         kwargs.update({
-            'ticket_info': ticket_info, 'prompt_msg': prompt_msg,
+            'content': content, 'prompt_msg': prompt_msg,
             'login_url': '%s&next=%s' % (
                 self.login_url,
                 reverse('tickets:direct-approve', kwargs={'token': token})

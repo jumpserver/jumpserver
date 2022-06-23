@@ -361,3 +361,7 @@ def pretty_string(data: str, max_length=128, ellipsis_str='...'):
     end = data[-half:]
     data = f'{start}{ellipsis_str}{end}'
     return data
+
+
+def group_by_count(it, count):
+    return [it[i:i+count] for i in range(0, len(it), count)]
