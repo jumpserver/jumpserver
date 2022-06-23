@@ -287,7 +287,7 @@ def command_confirm_migrate(apps, *args):
             'apply_run_user': apply_run_user,
             'apply_run_asset': apply_run_asset,
             'apply_run_system_user': apply_run_system_user,
-            'apply_run_command': meta.get('apply_run_command', ''),
+            'apply_run_command': meta.get('apply_run_command', '')[:4096],
             'apply_from_session_id': apply_from_session_id,
             'apply_from_cmd_filter_id': apply_from_cmd_filter_id,
             'apply_from_cmd_filter_rule_id': apply_from_cmd_filter_rule_id,
