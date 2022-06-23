@@ -209,6 +209,19 @@ class UserLoginView(mixins.AuthMixin, FormView):
         forgot_password_url = settings.FORGOT_PASSWORD_URL or forgot_password_url
         return forgot_password_url
 
+    def get_extra_fields_count(self, context):
+        count = 0
+        if self.get_support_auth_methods():
+            count += 1
+        form = context.get('form')
+        if not form:
+            return count
+        if set(form.fields.keys()) & {'captcha', 'challenge', 'mfa_type'}:
+            count += 1
+        if form.errors or form.non_field_errors():
+            count += 1
+        return count
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
@@ -217,6 +230,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
             'langs': self.get_support_langs(),
             'current_lang': self.get_current_lang(),
             'forgot_password_url': self.get_forgot_password_url(),
+            'extra_fields_count': self.get_extra_fields_count(context),
             **self.get_user_mfa_context(self.request.user)
         })
         return context
