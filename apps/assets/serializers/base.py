@@ -13,7 +13,7 @@ from .utils import validate_password_for_ansible
 
 class AuthSerializer(serializers.ModelSerializer):
     password = EncryptedField(required=False, allow_blank=True, allow_null=True, max_length=1024, label=_('Password'))
-    private_key = EncryptedField(required=False, allow_blank=True, allow_null=True, max_length=4096, label=_('Private key'))
+    private_key = EncryptedField(required=False, allow_blank=True, allow_null=True, max_length=16384, label=_('Private key'))
 
     def gen_keys(self, private_key=None, password=None):
         if private_key is None:
@@ -38,7 +38,7 @@ class AuthSerializerMixin(serializers.ModelSerializer):
         validators=[validate_password_for_ansible]
     )
     private_key = EncryptedField(
-        label=_('SSH private key'), required=False, allow_blank=True, allow_null=True, max_length=4096
+        label=_('SSH private key'), required=False, allow_blank=True, allow_null=True, max_length=16384
     )
     passphrase = serializers.CharField(
         allow_blank=True, allow_null=True, required=False, max_length=512,
