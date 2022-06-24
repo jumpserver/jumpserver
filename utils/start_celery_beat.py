@@ -13,34 +13,18 @@ APPS_DIR = os.path.join(BASE_DIR, 'apps')
 
 sys.path.insert(0, BASE_DIR)
 from apps.jumpserver.const import CONFIG
+from apps.jumpserver.settings import REDIS_SSL_KEYFILE, REDIS_SSL_CERTFILE, REDIS_SSL_CA_CERTS
 
 os.environ.setdefault('PYTHONOPTIMIZE', '1')
 if os.getuid() == 0:
     os.environ.setdefault('C_FORCE_ROOT', '1')
 
-REDIS_SSL_KEYFILE = os.path.join(BASE_DIR, 'data', 'certs', 'redis_client.key')
-if not os.path.exists(REDIS_SSL_KEYFILE):
-    REDIS_SSL_KEYFILE = None
-
-REDIS_SSL_CERTFILE = os.path.join(BASE_DIR, 'data', 'certs', 'redis_client.crt')
-if not os.path.exists(REDIS_SSL_CERTFILE):
-    REDIS_SSL_CERTFILE = None
-
-REDIS_SSL_CA_CERTS = os.path.join(BASE_DIR, 'data', 'certs', 'redis_ca.crt')
-if not os.path.exists(REDIS_SSL_CA_CERTS):
-    REDIS_SSL_CA_CERTS = os.path.join(BASE_DIR, 'data', 'certs', 'redis_ca.pem')
-
-if not os.path.exists(REDIS_SSL_CA_CERTS):
-    REDIS_SSL_CA_CERTS = None
-
-REDIS_SSL_REQUIRED = CONFIG.REDIS_SSL_REQUIRED or 'none'
-
 params = {
     'host': CONFIG.REDIS_HOST,
     'port': CONFIG.REDIS_PORT,
     'password': CONFIG.REDIS_PASSWORD,
-    "ssl": CONFIG.REDIS_USE_SSL,
-    'ssl_cert_reqs': REDIS_SSL_REQUIRED,
+    "ssl": CONFIG.REDIS_SSL_ENABLED,
+    'ssl_cert_reqs': 'none',
     "ssl_keyfile": REDIS_SSL_KEYFILE,
     "ssl_certfile": REDIS_SSL_CERTFILE,
     "ssl_ca_certs": REDIS_SSL_CA_CERTS

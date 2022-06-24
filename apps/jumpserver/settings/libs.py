@@ -3,7 +3,7 @@
 import os
 import ssl
 
-from .base import REDIS_SSL_CA_CERTS, REDIS_SSL_CERTFILE, REDIS_SSL_KEYFILE, REDIS_SSL_REQUIRED
+from .base import REDIS_SSL_CA_CERTS, REDIS_SSL_CERTFILE, REDIS_SSL_KEYFILE
 from ..const import CONFIG, PROJECT_DIR
 
 
@@ -82,11 +82,11 @@ BOOTSTRAP3 = {
 
 
 # Django channels support websocket
-if not CONFIG.REDIS_USE_SSL:
+if not CONFIG.REDIS_SSL_ENABLED:
     context = None
 else:
     context = ssl.SSLContext()
-    context.check_hostname = bool(CONFIG.REDIS_SSL_REQUIRED)
+    context.check_hostname = False
     if REDIS_SSL_CA_CERTS:
         context.load_verify_locations(REDIS_SSL_CA_CERTS)
     if REDIS_SSL_CERTFILE and REDIS_SSL_KEYFILE:
@@ -113,7 +113,7 @@ CELERY_LOG_DIR = os.path.join(PROJECT_DIR, 'data', 'celery')
 
 # Celery using redis as broker
 CELERY_BROKER_URL = '%(protocol)s://:%(password)s@%(host)s:%(port)s/%(db)s' % {
-    'protocol': 'rediss' if CONFIG.REDIS_USE_SSL else 'redis',
+    'protocol': 'rediss' if CONFIG.REDIS_SSL_ENABLED else 'redis',
     'password': CONFIG.REDIS_PASSWORD,
     'host': CONFIG.REDIS_HOST,
     'port': CONFIG.REDIS_PORT,
@@ -131,9 +131,9 @@ CELERY_WORKER_REDIRECT_STDOUTS = True
 CELERY_WORKER_REDIRECT_STDOUTS_LEVEL = "INFO"
 CELERY_TASK_SOFT_TIME_LIMIT = 3600
 
-if CONFIG.REDIS_USE_SSL:
+if CONFIG.REDIS_SSL_ENABLED:
     CELERY_BROKER_USE_SSL = CELERY_REDIS_BACKEND_USE_SSL = {
-        'ssl_cert_reqs': REDIS_SSL_REQUIRED,
+        'ssl_cert_reqs': 'none',
         'ssl_ca_certs': REDIS_SSL_CA_CERTS,
         'ssl_certfile': REDIS_SSL_CERTFILE,
         'ssl_keyfile': REDIS_SSL_KEYFILE
