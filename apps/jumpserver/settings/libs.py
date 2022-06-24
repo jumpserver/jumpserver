@@ -3,7 +3,8 @@
 import os
 import ssl
 
-from .base import REDIS_SSL_CA_CERTS, REDIS_SSL_CERTFILE, REDIS_SSL_KEYFILE, REDIS_SSL_REQUIRED
+from .base import REDIS_SSL_CA_CERTS, REDIS_SSL_CERTFILE, REDIS_SSL_KEYFILE, \
+    REDIS_SSL_REQUIRED, REDIS_USE_SSL
 from ..const import CONFIG, PROJECT_DIR
 
 
@@ -82,15 +83,15 @@ BOOTSTRAP3 = {
 
 
 # Django channels support websocket
-if not CONFIG.REDIS_USE_SSL:
-    context = None
+if not REDIS_USE_SSL:
+    redis_ssl = None
 else:
-    context = ssl.SSLContext()
-    context.check_hostname = bool(CONFIG.REDIS_SSL_REQUIRED)
+    redis_ssl = ssl.SSLContext()
+    redis_ssl.check_hostname = bool(CONFIG.REDIS_SSL_REQUIRED)
     if REDIS_SSL_CA_CERTS:
-        context.load_verify_locations(REDIS_SSL_CA_CERTS)
+        redis_ssl.load_verify_locations(REDIS_SSL_CA_CERTS)
     if REDIS_SSL_CERTFILE and REDIS_SSL_KEYFILE:
-        context.load_cert_chain(REDIS_SSL_CERTFILE, REDIS_SSL_KEYFILE)
+        redis_ssl.load_cert_chain(REDIS_SSL_CERTFILE, REDIS_SSL_KEYFILE)
 
 CHANNEL_LAYERS = {
     'default': {
@@ -100,7 +101,7 @@ CHANNEL_LAYERS = {
                 'address': (CONFIG.REDIS_HOST, CONFIG.REDIS_PORT),
                 'db': CONFIG.REDIS_DB_WS,
                 'password': CONFIG.REDIS_PASSWORD or None,
-                'ssl':  context
+                'ssl':  redis_ssl
             }],
         },
     },
@@ -113,7 +114,7 @@ CELERY_LOG_DIR = os.path.join(PROJECT_DIR, 'data', 'celery')
 
 # Celery using redis as broker
 CELERY_BROKER_URL = '%(protocol)s://:%(password)s@%(host)s:%(port)s/%(db)s' % {
-    'protocol': 'rediss' if CONFIG.REDIS_USE_SSL else 'redis',
+    'protocol': 'rediss' if REDIS_USE_SSL else 'redis',
     'password': CONFIG.REDIS_PASSWORD,
     'host': CONFIG.REDIS_HOST,
     'port': CONFIG.REDIS_PORT,
@@ -131,7 +132,7 @@ CELERY_WORKER_REDIRECT_STDOUTS = True
 CELERY_WORKER_REDIRECT_STDOUTS_LEVEL = "INFO"
 CELERY_TASK_SOFT_TIME_LIMIT = 3600
 
-if CONFIG.REDIS_USE_SSL:
+if REDIS_USE_SSL:
     CELERY_BROKER_USE_SSL = CELERY_REDIS_BACKEND_USE_SSL = {
         'ssl_cert_reqs': REDIS_SSL_REQUIRED,
         'ssl_ca_certs': REDIS_SSL_CA_CERTS,
