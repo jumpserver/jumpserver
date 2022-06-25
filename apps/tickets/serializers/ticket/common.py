@@ -3,6 +3,7 @@ from django.db.models import Model
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
+from assets.models import SystemUser
 from orgs.utils import tmp_to_org
 from tickets.models import Ticket
 
@@ -36,6 +37,16 @@ class DefaultPermissionName(object):
 
 class BaseApplyAssetApplicationSerializer(serializers.Serializer):
     permission_model: Model
+
+    def filter_many_to_many_field(self, model, values: list, **kwargs):
+        org_id = self.initial_data.get('org_id')
+        ids = [instance.id for instance in values]
+        with tmp_to_org(org_id):
+            qs = model.objects.filter(id__in=ids, **kwargs).values_list('id', flat=True)
+        return list(qs)
+
+    def validate_apply_system_users(self, system_users):
+        return self.filter_many_to_many_field(SystemUser, system_users)
 
     def validate(self, attrs):
         attrs = super().validate(attrs)

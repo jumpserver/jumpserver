@@ -26,15 +26,9 @@ class ApplyApplicationSerializer(BaseApplyAssetApplicationSerializer, TicketAppl
         extra_kwargs = {}
         extra_kwargs.update(ticket_extra_kwargs)
 
-    def validate_apply_applications(self, apply_applications):
-        type = self.initial_data.get('apply_type')
-        org_id = self.initial_data.get('org_id')
-        application_ids = [app.id for app in apply_applications]
-        with tmp_to_org(org_id):
-            applications = Application.objects.filter(
-                id__in=application_ids, type=type
-            ).values_list('id', flat=True)
-        return list(applications)
+    def validate_apply_applications(self, applications):
+        tp = self.initial_data.get('apply_type')
+        return self.filter_many_to_many_field(Application, applications, type=tp)
 
 
 class ApplyApplicationDisplaySerializer(ApplyApplicationSerializer):
