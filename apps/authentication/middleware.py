@@ -46,6 +46,8 @@ class SessionCookieMiddleware(MiddlewareMixin):
 
     @staticmethod
     def set_cookie_public_key(request, response):
+        if request.path.startswith('/api'):
+            return
         pub_key_name = settings.SESSION_RSA_PUBLIC_KEY_NAME
         public_key = request.session.get(pub_key_name)
         cookie_key = request.COOKIES.get(pub_key_name)
