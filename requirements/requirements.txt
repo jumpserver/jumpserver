@@ -12,7 +12,6 @@ chardet==3.0.4
 configparser==3.5.0
 coreapi==2.3.3
 coreschema==0.0.4
-cryptography==36.0.1
 decorator==4.1.2
 Django==3.1.14
 django-auth-ldap==2.2.0
@@ -51,8 +50,9 @@ passlib==1.7.4
 Pillow==9.1.1
 pyasn1==0.4.8
 pycparser==2.21
-pycryptodome==3.14.1
-pycryptodomex==3.14.1
+cryptography==36.0.1
+pycryptodome==3.15.0
+pycryptodomex==3.15.0
 pyotp==2.6.0
 PyNaCl==1.5.0
 python-dateutil==2.8.2
@@ -60,7 +60,7 @@ pytz==2022.1
 PyYAML==6.0
 redis==4.3.3
 requests==2.28.0
-jms-storage==0.0.43
+jms-storage==0.0.44
 s3transfer==0.6.0
 simplejson==3.17.6
 six==1.16.0
