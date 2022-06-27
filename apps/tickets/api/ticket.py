@@ -32,6 +32,7 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         'open': serializers.TicketApplySerializer
     }
     model = Ticket
+    perm_model = Ticket
     filterset_class = filters.TicketFilter
     search_fields = [
         'title', 'type', 'status'
