@@ -189,7 +189,7 @@ class StatusMixin:
                 assignees_display.append(str(i.assignee))
                 if state != StepState.pending and state == i.state:
                     processor = i.assignee
-                if state != StepState.closed:
+                if state == StepState.closed:
                     processor = self.applicant
             step_info = {
                 'state': state,

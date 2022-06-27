@@ -34,10 +34,10 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     model = Ticket
     filterset_class = filters.TicketFilter
     search_fields = [
-        'title', 'type', 'status', 'applicant_display'
+        'title', 'type', 'status'
     ]
     ordering_fields = (
-        'title', 'applicant_display', 'status', 'state',
+        'title', 'status', 'state',
         'action_display', 'date_created', 'serial_num',
     )
     ordering = ('-date_created',)
@@ -67,7 +67,8 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
 
     @action(detail=False, methods=[POST], permission_classes=[RBACPermission, ])
     def open(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
+        with tmp_to_root_org():
+            return super().create(request, *args, **kwargs)
 
     @action(detail=True, methods=[PUT], permission_classes=[IsAssignee, ])
     def approve(self, request, *args, **kwargs):

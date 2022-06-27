@@ -4,6 +4,7 @@ from rest_framework import serializers
 from perms.serializers.base import ActionsField
 from perms.models import AssetPermission
 from orgs.utils import tmp_to_org
+from assets.models import Asset, Node
 
 from tickets.models import ApplyAssetTicket
 from .ticket import TicketApplySerializer
@@ -33,6 +34,12 @@ class ApplyAssetSerializer(BaseApplyAssetApplicationSerializer, TicketApplySeria
             'apply_assets': {'required': False, 'help_text': asset_or_node_help_text}
         }
         extra_kwargs.update(ticket_extra_kwargs)
+
+    def validate_apply_nodes(self, nodes):
+        return self.filter_many_to_many_field(Node, nodes)
+
+    def validate_apply_assets(self, assets):
+        return self.filter_many_to_many_field(Asset, assets)
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
