@@ -178,10 +178,12 @@ DATABASES = {
 }
 
 DB_CA_PATH = os.path.join(PROJECT_DIR, 'data', 'certs', 'db_ca.pem')
+DB_USE_SSL = False
 if CONFIG.DB_ENGINE.lower() == 'mysql':
     DB_OPTIONS['init_command'] = "SET sql_mode='STRICT_TRANS_TABLES'"
     if os.path.isfile(DB_CA_PATH):
         DB_OPTIONS['ssl'] = {'ca': DB_CA_PATH}
+        DB_USE_SSL = True
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -264,9 +266,11 @@ REDIS_SSL_KEYFILE = exist_or_default(os.path.join(CERTS_DIR, 'redis_client.key')
 REDIS_SSL_CERTFILE = exist_or_default(os.path.join(CERTS_DIR, 'redis_client.crt'), None)
 REDIS_SSL_CA_CERTS = exist_or_default(os.path.join(CERTS_DIR, 'redis_ca.pem'), None)
 REDIS_SSL_CA_CERTS = exist_or_default(os.path.join(CERTS_DIR, 'redis_ca.crt'), REDIS_SSL_CA_CERTS)
-REDIS_SSL_REQUIRED = CONFIG.REDIS_SSL_REQUIRED or 'none'
+REDIS_SSL_REQUIRED = 'none'
+REDIS_USE_SSL = CONFIG.REDIS_USE_SSL
+
 REDIS_LOCATION_NO_DB = '%(protocol)s://:%(password)s@%(host)s:%(port)s/{}' % {
-    'protocol': 'rediss' if CONFIG.REDIS_USE_SSL else 'redis',
+    'protocol': 'rediss' if REDIS_USE_SSL else 'redis',
     'password': CONFIG.REDIS_PASSWORD,
     'host': CONFIG.REDIS_HOST,
     'port': CONFIG.REDIS_PORT,
@@ -282,7 +286,7 @@ REDIS_CACHE_DEFAULT = {
             "ssl_keyfile": REDIS_SSL_KEYFILE,
             "ssl_certfile": REDIS_SSL_CERTFILE,
             "ssl_ca_certs": REDIS_SSL_CA_CERTS
-        } if CONFIG.REDIS_USE_SSL else {}
+        } if REDIS_USE_SSL else {}
     }
 }
 REDIS_CACHE_SESSION = dict(REDIS_CACHE_DEFAULT)
@@ -292,7 +296,6 @@ CACHES = {
     'default': REDIS_CACHE_DEFAULT,
     'session': REDIS_CACHE_SESSION
 }
-
 SESSION_CACHE_ALIAS = "session"
 
 FORCE_SCRIPT_NAME = CONFIG.FORCE_SCRIPT_NAME
