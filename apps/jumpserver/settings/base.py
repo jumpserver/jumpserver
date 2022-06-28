@@ -266,7 +266,7 @@ REDIS_SSL_KEYFILE = exist_or_default(os.path.join(CERTS_DIR, 'redis_client.key')
 REDIS_SSL_CERTFILE = exist_or_default(os.path.join(CERTS_DIR, 'redis_client.crt'), None)
 REDIS_SSL_CA_CERTS = exist_or_default(os.path.join(CERTS_DIR, 'redis_ca.pem'), None)
 REDIS_SSL_CA_CERTS = exist_or_default(os.path.join(CERTS_DIR, 'redis_ca.crt'), REDIS_SSL_CA_CERTS)
-REDIS_SSL_REQUIRED = CONFIG.REDIS_SSL_REQUIRED or 'none'
+REDIS_SSL_REQUIRED = 'none'
 REDIS_USE_SSL = CONFIG.REDIS_USE_SSL
 
 REDIS_LOCATION_NO_DB = '%(protocol)s://:%(password)s@%(host)s:%(port)s/{}' % {
