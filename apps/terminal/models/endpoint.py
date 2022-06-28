@@ -33,12 +33,19 @@ class Endpoint(JMSModel):
         return getattr(self, f'{protocol}_port', 0)
 
     def is_default(self):
-        return self.id == self.default_id
+        return str(self.id) == self.default_id
 
     def delete(self, using=None, keep_parents=False):
         if self.is_default():
             return
         return super().delete(using, keep_parents)
+
+    def is_valid_for(self, protocol):
+        if self.is_default():
+            return True
+        if self.host and self.get_port(protocol) != 0:
+            return True
+        return False
 
     @classmethod
     def get_or_create_default(cls, request=None):
@@ -53,6 +60,22 @@ class Endpoint(JMSModel):
         if not endpoint.host and request:
             endpoint.host = request.get_host().split(':')[0]
         return endpoint
+
+    @classmethod
+    def match_by_instance_label(cls, instance, protocol):
+        from assets.models import Asset
+        from terminal.models import Session
+        if isinstance(instance, Session):
+            instance = instance.get_asset_or_application()
+        if not isinstance(instance, Asset):
+            return None
+        values = instance.labels.filter(name='endpoint').values_list('value', flat=True)
+        if not values:
+            return None
+        endpoints = cls.objects.filter(name__in=values).order_by('-date_updated')
+        for endpoint in endpoints:
+            if endpoint.is_valid_for(protocol):
+                return endpoint
 
 
 class EndpointRule(JMSModel):
@@ -82,11 +105,7 @@ class EndpointRule(JMSModel):
                 continue
             if not endpoint_rule.endpoint:
                 continue
-            if endpoint_rule.endpoint.is_default():
-                return endpoint_rule
-            if not endpoint_rule.endpoint.host:
-                continue
-            if endpoint_rule.endpoint.get_port(protocol) == 0:
+            if not endpoint_rule.endpoint.is_valid_for(protocol):
                 continue
             return endpoint_rule
 
