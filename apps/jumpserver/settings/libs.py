@@ -3,8 +3,10 @@
 import os
 import ssl
 
-from .base import REDIS_SSL_CA_CERTS, REDIS_SSL_CERTFILE, REDIS_SSL_KEYFILE, \
+from .base import (
+    REDIS_SSL_CA_CERTS, REDIS_SSL_CERTFILE, REDIS_SSL_KEYFILE,
     REDIS_SSL_REQUIRED, REDIS_USE_SSL
+)
 from ..const import CONFIG, PROJECT_DIR
 
 
@@ -73,7 +75,6 @@ CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
 # Django bootstrap3 setting, more see http://django-bootstrap3.readthedocs.io/en/latest/settings.html
 BOOTSTRAP3 = {
     'horizontal_label_class': 'col-md-2',
-    # Field class to use in horizontal forms
     'horizontal_field_class': 'col-md-9',
     # Set placeholder attributes to label if no placeholder is provided
     'set_placeholder': False,
