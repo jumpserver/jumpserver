@@ -55,10 +55,7 @@ class BaseHandler:
 
     def _send_processed_mail_to_applicant(self, step=None):
         applicant = self.ticket.applicant
-        if self.ticket.status == TicketStatus.closed:
-            processor = applicant
-        else:
-            processor = step.processor if step else self.ticket.processor
+        processor = step.processor if step else applicant
         logger.debug('Send processed mail to applicant: {}'.format(applicant))
         send_ticket_processed_mail_to_applicant(self.ticket, processor)
 

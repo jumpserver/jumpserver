@@ -23,7 +23,9 @@ class ApplyApplicationSerializer(BaseApplyAssetApplicationSerializer, TicketAppl
         fields = TicketApplySerializer.Meta.fields + writeable_fields + ['apply_permission_name']
         read_only_fields = list(set(fields) - set(writeable_fields))
         ticket_extra_kwargs = TicketApplySerializer.Meta.extra_kwargs
-        extra_kwargs = {}
+        extra_kwargs = {
+            'apply_system_users': {'required': True},
+        }
         extra_kwargs.update(ticket_extra_kwargs)
 
     def validate_apply_applications(self, applications):

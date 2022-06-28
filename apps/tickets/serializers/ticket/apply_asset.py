@@ -31,7 +31,8 @@ class ApplyAssetSerializer(BaseApplyAssetApplicationSerializer, TicketApplySeria
         ticket_extra_kwargs = TicketApplySerializer.Meta.extra_kwargs
         extra_kwargs = {
             'apply_nodes': {'required': False, 'help_text': asset_or_node_help_text},
-            'apply_assets': {'required': False, 'help_text': asset_or_node_help_text}
+            'apply_assets': {'required': False, 'help_text': asset_or_node_help_text},
+            'apply_system_users': {'required': True},
         }
         extra_kwargs.update(ticket_extra_kwargs)
 

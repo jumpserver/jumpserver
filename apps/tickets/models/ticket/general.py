@@ -13,6 +13,7 @@ from common.utils.timezone import as_current_tz
 from common.mixins.models import CommonModelMixin
 from common.db.encoder import ModelJSONFieldEncoder
 from orgs.models import Organization
+from orgs.utils import tmp_to_org
 from tickets.const import (
     TicketType, TicketStatus, TicketState,
     TicketLevel, StepState, StepStatus
@@ -336,14 +337,15 @@ class Ticket(StatusMixin, CommonModelMixin):
                 m2m_fields.add(name)
 
         snapshot = {}
-        for field in rel_fields:
-            value = getattr(self, field)
+        with tmp_to_org(self.org_id):
+            for field in rel_fields:
+                value = getattr(self, field)
 
-            if field in m2m_fields:
-                value = [str(v) for v in value.all()]
-            else:
-                value = str(value) if value else ''
-            snapshot[field] = value
+                if field in m2m_fields:
+                    value = [str(v) for v in value.all()]
+                else:
+                    value = str(value) if value else ''
+                snapshot[field] = value
 
         self.rel_snapshot.update(snapshot)
         if save:
