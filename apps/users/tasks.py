@@ -50,7 +50,7 @@ def check_password_expired_periodic():
 
 @shared_task
 def check_user_expired():
-    date_expired_lt = timezone.now() + timezone.timedelta(days=5)
+    date_expired_lt = timezone.now() + timezone.timedelta(days=User.DATE_EXPIRED_WARNING_DAYS)
     users = User.get_nature_users()\
         .filter(source=User.Source.local)\
         .filter(date_expired__lt=date_expired_lt)
