@@ -4,10 +4,11 @@
 from __future__ import unicode_literals
 import os
 import datetime
+from typing import Callable
 
 from django.templatetags.static import static
 from django.contrib.auth import login as auth_login, logout as auth_logout
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpRequest
 from django.shortcuts import reverse, redirect
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _, get_language
@@ -34,106 +35,9 @@ __all__ = [
 ]
 
 
-@method_decorator(sensitive_post_parameters(), name='dispatch')
-@method_decorator(csrf_protect, name='dispatch')
-@method_decorator(never_cache, name='dispatch')
-class UserLoginView(mixins.AuthMixin, FormView):
-    redirect_field_name = 'next'
-    template_name = 'authentication/login.html'
-
-    def redirect_third_party_auth_if_need(self, request):
-        # show jumpserver login page if request http://{JUMP-SERVER}/?admin=1
-        if self.request.GET.get("admin", 0):
-            return None
-
-        auth_types = [m for m in self.get_support_auth_methods() if m.get('auto_redirect')]
-        if not auth_types:
-            return None
-
-        # 明确直接登录哪个
-        login_to = settings.LOGIN_REDIRECT_TO_BACKEND.upper()
-        if login_to == 'DIRECT':
-            return None
-
-        auth_method = next(filter(lambda x: x['name'] == login_to, auth_types), None)
-        if not auth_method:
-            auth_method = auth_types[0]
-
-        auth_name, redirect_url = auth_method['name'], auth_method['url']
-        next_url = request.GET.get('next') or '/'
-        query_string = request.GET.urlencode()
-        redirect_url = '{}?next={}&{}'.format(redirect_url, next_url, query_string)
-
-        if settings.LOGIN_REDIRECT_MSG_ENABLED:
-            message_data = {
-                'title': _('Redirecting'),
-                'message': _("Redirecting to {} authentication").format(auth_name),
-                'redirect_url': redirect_url,
-                'interval': 3,
-                'has_cancel': True,
-                'cancel_url': reverse('authentication:login') + '?admin=1'
-            }
-            redirect_url = FlashMessageUtil.gen_message_url(message_data)
-        return redirect_url
-
-    def get(self, request, *args, **kwargs):
-        if request.user.is_staff:
-            first_login_url = redirect_user_first_login_or_index(
-                request, self.redirect_field_name
-            )
-            return redirect(first_login_url)
-        redirect_url = self.redirect_third_party_auth_if_need(request)
-        if redirect_url:
-            return redirect(redirect_url)
-        request.session.set_test_cookie()
-        return super().get(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        if not self.request.session.test_cookie_worked():
-            return HttpResponse(_("Please enable cookies and try again."))
-        # https://docs.djangoproject.com/en/3.1/topics/http/sessions/#setting-test-cookies
-        self.request.session.delete_test_cookie()
-
-        try:
-            self.check_user_auth(form.cleaned_data)
-        except errors.AuthFailedError as e:
-            form.add_error(None, e.msg)
-            self.set_login_failed_mark()
-            form_cls = get_user_login_form_cls(captcha=True)
-            new_form = form_cls(data=form.data)
-            new_form._errors = form.errors
-            context = self.get_context_data(form=new_form)
-            self.request.session.set_test_cookie()
-            return self.render_to_response(context)
-        except (
-                errors.MFAUnsetError,
-                errors.PasswordTooSimple,
-                errors.PasswordRequireResetError,
-                errors.PasswordNeedUpdate
-        ) as e:
-            return redirect(e.url)
-        except (
-                errors.MFAFailedError,
-                errors.BlockMFAError,
-                errors.MFACodeRequiredError,
-                errors.SMSCodeRequiredError,
-                errors.UserPhoneNotSet,
-                errors.BlockGlobalIpLoginError
-        ) as e:
-            form.add_error('code', e.msg)
-            return super().form_invalid(form)
-        self.clear_rsa_key()
-        return self.redirect_to_guard_view()
-
-    def get_form_class(self):
-        if self.check_is_need_captcha():
-            return get_user_login_form_cls(captcha=True)
-        else:
-            return get_user_login_form_cls()
-
-    def clear_rsa_key(self):
-        self.request.session[RSA_PRIVATE_KEY] = None
-        self.request.session[RSA_PUBLIC_KEY] = None
+class UserLoginContextMixin:
+    get_user_mfa_context: Callable
+    request: HttpRequest
 
     @staticmethod
     def get_support_auth_methods():
@@ -234,6 +138,103 @@ class UserLoginView(mixins.AuthMixin, FormView):
             **self.get_user_mfa_context(self.request.user)
         })
         return context
+
+
+@method_decorator(sensitive_post_parameters(), name='dispatch')
+@method_decorator(csrf_protect, name='dispatch')
+@method_decorator(never_cache, name='dispatch')
+class UserLoginView(mixins.AuthMixin, UserLoginContextMixin, FormView):
+    redirect_field_name = 'next'
+    template_name = 'authentication/login.html'
+
+    def redirect_third_party_auth_if_need(self, request):
+        # show jumpserver login page if request http://{JUMP-SERVER}/?admin=1
+        if self.request.GET.get("admin", 0):
+            return None
+
+        auth_types = [m for m in self.get_support_auth_methods() if m.get('auto_redirect')]
+        if not auth_types:
+            return None
+
+        # 明确直接登录哪个
+        login_to = settings.LOGIN_REDIRECT_TO_BACKEND.upper()
+        if login_to == 'DIRECT':
+            return None
+
+        auth_method = next(filter(lambda x: x['name'] == login_to, auth_types), None)
+        if not auth_method:
+            auth_method = auth_types[0]
+
+        auth_name, redirect_url = auth_method['name'], auth_method['url']
+        next_url = request.GET.get('next') or '/'
+        query_string = request.GET.urlencode()
+        redirect_url = '{}?next={}&{}'.format(redirect_url, next_url, query_string)
+
+        if settings.LOGIN_REDIRECT_MSG_ENABLED:
+            message_data = {
+                'title': _('Redirecting'),
+                'message': _("Redirecting to {} authentication").format(auth_name),
+                'redirect_url': redirect_url,
+                'interval': 3,
+                'has_cancel': True,
+                'cancel_url': reverse('authentication:login') + '?admin=1'
+            }
+            redirect_url = FlashMessageUtil.gen_message_url(message_data)
+        return redirect_url
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_staff:
+            first_login_url = redirect_user_first_login_or_index(
+                request, self.redirect_field_name
+            )
+            return redirect(first_login_url)
+        redirect_url = self.redirect_third_party_auth_if_need(request)
+        if redirect_url:
+            return redirect(redirect_url)
+        request.session.set_test_cookie()
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        if not self.request.session.test_cookie_worked():
+            return HttpResponse(_("Please enable cookies and try again."))
+        # https://docs.djangoproject.com/en/3.1/topics/http/sessions/#setting-test-cookies
+        self.request.session.delete_test_cookie()
+
+        try:
+            self.check_user_auth(form.cleaned_data)
+        except errors.AuthFailedError as e:
+            form.add_error(None, e.msg)
+            self.set_login_failed_mark()
+            form_cls = get_user_login_form_cls(captcha=True)
+            new_form = form_cls(data=form.data)
+            new_form._errors = form.errors
+            context = self.get_context_data(form=new_form)
+            self.request.session.set_test_cookie()
+            return self.render_to_response(context)
+        except errors.NeedRedirectError as e:
+            return redirect(e.url)
+        except (
+                errors.MFAFailedError,
+                errors.BlockMFAError,
+                errors.MFACodeRequiredError,
+                errors.SMSCodeRequiredError,
+                errors.UserPhoneNotSet,
+                errors.BlockGlobalIpLoginError
+        ) as e:
+            form.add_error('code', e.msg)
+            return super().form_invalid(form)
+        self.clear_rsa_key()
+        return self.redirect_to_guard_view()
+
+    def get_form_class(self):
+        if self.check_is_need_captcha():
+            return get_user_login_form_cls(captcha=True)
+        else:
+            return get_user_login_form_cls()
+
+    def clear_rsa_key(self):
+        self.request.session[RSA_PRIVATE_KEY] = None
+        self.request.session[RSA_PUBLIC_KEY] = None
 
 
 class UserLoginGuardView(mixins.AuthMixin, RedirectView):
