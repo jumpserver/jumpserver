@@ -193,8 +193,8 @@ class MFAMixin:
     def _check_if_no_active_mfa(self, user):
         active_mfa_mapper = user.active_mfa_backends_mapper
         if not active_mfa_mapper:
-            url = reverse('authentication:user-otp-enable-start')
-            raise errors.MFAUnsetError(user, self.request, url)
+            set_url = reverse('authentication:user-otp-enable-start')
+            raise errors.MFAUnsetError(set_url, user, self.request)
 
     def _check_login_page_mfa_if_need(self, user):
         if not settings.SECURITY_MFA_IN_LOGIN_PAGE:
