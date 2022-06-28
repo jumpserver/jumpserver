@@ -15,7 +15,7 @@ from ..tasks.account_connectivity import test_accounts_connectivity_manual
 from ..models import AuthBook, Node
 from .. import serializers
 
-__all__ = ['AccountViewSet', 'AccountSecretsViewSet', 'AccountTaskCreateAPI']
+__all__ = ['AccountFilterSet', 'AccountViewSet', 'AccountSecretsViewSet', 'AccountTaskCreateAPI']
 
 
 class AccountFilterSet(BaseFilterSet):

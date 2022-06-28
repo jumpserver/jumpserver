@@ -11,8 +11,10 @@ app_name = 'applications'
 router = BulkRouter()
 router.register(r'applications', api.ApplicationViewSet, 'application')
 router.register(r'accounts', api.ApplicationAccountViewSet, 'application-account')
+router.register(r'accounts-history', api.ApplicationAccountHistoryViewSet, 'application-account-history')
 router.register(r'system-users-apps-relations', api.SystemUserAppRelationViewSet, 'system-users-apps-relation')
 router.register(r'account-secrets', api.ApplicationAccountSecretViewSet, 'application-account-secret')
+router.register(r'account-history-secrets', api.ApplicationAccountHistorySecretViewSet, 'application-account-history-secret')
 
 
 urlpatterns = [

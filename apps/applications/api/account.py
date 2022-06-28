@@ -23,7 +23,7 @@ class AccountFilterSet(BaseFilterSet):
 
     class Meta:
         model = Account
-        fields = ['app', 'systemuser']
+        fields = ['app', 'systemuser', 'id']
 
     @property
     def qs(self):

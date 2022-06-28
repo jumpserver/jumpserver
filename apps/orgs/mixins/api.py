@@ -2,8 +2,6 @@
 #
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework_bulk import BulkModelViewSet
-from rest_framework.exceptions import MethodNotAllowed
-from django.utils.translation import ugettext_lazy as _
 
 from common.mixins import CommonApiMixin, RelationMixin
 from orgs.utils import current_org
