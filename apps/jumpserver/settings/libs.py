@@ -4,7 +4,7 @@ import os
 import ssl
 
 from .base import (
-    REDIS_SSL_CA_CERTS, REDIS_SSL_CERTFILE, REDIS_SSL_KEYFILE,
+    REDIS_SSL_CA, REDIS_SSL_CERT, REDIS_SSL_KEY,
     REDIS_SSL_REQUIRED, REDIS_USE_SSL
 )
 from ..const import CONFIG, PROJECT_DIR
@@ -89,10 +89,10 @@ if not REDIS_USE_SSL:
 else:
     redis_ssl = ssl.SSLContext()
     redis_ssl.check_hostname = bool(CONFIG.REDIS_SSL_REQUIRED)
-    if REDIS_SSL_CA_CERTS:
-        redis_ssl.load_verify_locations(REDIS_SSL_CA_CERTS)
-    if REDIS_SSL_CERTFILE and REDIS_SSL_KEYFILE:
-        redis_ssl.load_cert_chain(REDIS_SSL_CERTFILE, REDIS_SSL_KEYFILE)
+    if REDIS_SSL_CA:
+        redis_ssl.load_verify_locations(REDIS_SSL_CA)
+    if REDIS_SSL_CERT and REDIS_SSL_KEY:
+        redis_ssl.load_cert_chain(REDIS_SSL_CERT, REDIS_SSL_KEY)
 
 CHANNEL_LAYERS = {
     'default': {
@@ -136,9 +136,9 @@ CELERY_TASK_SOFT_TIME_LIMIT = 3600
 if REDIS_USE_SSL:
     CELERY_BROKER_USE_SSL = CELERY_REDIS_BACKEND_USE_SSL = {
         'ssl_cert_reqs': REDIS_SSL_REQUIRED,
-        'ssl_ca_certs': REDIS_SSL_CA_CERTS,
-        'ssl_certfile': REDIS_SSL_CERTFILE,
-        'ssl_keyfile': REDIS_SSL_KEYFILE
+        'ssl_ca_certs': REDIS_SSL_CA,
+        'ssl_certfile': REDIS_SSL_CERT,
+        'ssl_keyfile': REDIS_SSL_KEY
     }
 
 ANSIBLE_LOG_DIR = os.path.join(PROJECT_DIR, 'data', 'ansible')

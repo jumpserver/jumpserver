@@ -266,10 +266,10 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755
 
 # Cache use redis
-REDIS_SSL_KEYFILE = exist_or_default(os.path.join(CERTS_DIR, 'redis_client.key'), None)
-REDIS_SSL_CERTFILE = exist_or_default(os.path.join(CERTS_DIR, 'redis_client.crt'), None)
-REDIS_SSL_CA_CERTS = exist_or_default(os.path.join(CERTS_DIR, 'redis_ca.pem'), None)
-REDIS_SSL_CA_CERTS = exist_or_default(os.path.join(CERTS_DIR, 'redis_ca.crt'), REDIS_SSL_CA_CERTS)
+REDIS_SSL_KEY = exist_or_default(os.path.join(CERTS_DIR, 'redis_client.key'), None)
+REDIS_SSL_CERT = exist_or_default(os.path.join(CERTS_DIR, 'redis_client.crt'), None)
+REDIS_SSL_CA = exist_or_default(os.path.join(CERTS_DIR, 'redis_ca.pem'), None)
+REDIS_SSL_CA = exist_or_default(os.path.join(CERTS_DIR, 'redis_ca.crt'), REDIS_SSL_CA)
 REDIS_SSL_REQUIRED = 'none'
 REDIS_USE_SSL = CONFIG.REDIS_USE_SSL
 
@@ -287,9 +287,9 @@ REDIS_CACHE_DEFAULT = {
         "REDIS_CLIENT_KWARGS": {"health_check_interval": 30},
         "CONNECTION_POOL_KWARGS": {
             'ssl_cert_reqs': REDIS_SSL_REQUIRED,
-            "ssl_keyfile": REDIS_SSL_KEYFILE,
-            "ssl_certfile": REDIS_SSL_CERTFILE,
-            "ssl_ca_certs": REDIS_SSL_CA_CERTS
+            "ssl_keyfile": REDIS_SSL_KEY,
+            "ssl_certfile": REDIS_SSL_CERT,
+            "ssl_ca_certs": REDIS_SSL_CA
         } if REDIS_USE_SSL else {}
     }
 }
