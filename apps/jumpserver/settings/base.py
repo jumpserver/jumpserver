@@ -36,6 +36,8 @@ BOOTSTRAP_TOKEN = CONFIG.BOOTSTRAP_TOKEN
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = CONFIG.DEBUG
+# SECURITY WARNING: If you run with debug turned on, more debug msg with be log
+DEBUG_DEV = CONFIG.DEBUG_DEV
 
 # Absolute url for some case, for example email link
 SITE_URL = CONFIG.SITE_URL
@@ -106,6 +108,8 @@ MIDDLEWARE = [
     'authentication.middleware.SessionCookieMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
 ]
+
+
 
 ROOT_URLCONF = 'jumpserver.urls'
 
@@ -301,3 +305,26 @@ SESSION_CACHE_ALIAS = "session"
 FORCE_SCRIPT_NAME = CONFIG.FORCE_SCRIPT_NAME
 SESSION_COOKIE_SECURE = CONFIG.SESSION_COOKIE_SECURE
 CSRF_COOKIE_SECURE = CONFIG.CSRF_COOKIE_SECURE
+
+# For Debug toolbar
+INTERNAL_IPS = ["127.0.0.1"]
+if DEBUG_DEV:
+    INSTALLED_APPS = ['debug_toolbar', 'pympler'] + INSTALLED_APPS
+    MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
+    DEBUG_TOOLBAR_PANELS = [
+        'debug_toolbar.panels.history.HistoryPanel',
+        'debug_toolbar.panels.versions.VersionsPanel',
+        'debug_toolbar.panels.timer.TimerPanel',
+        'debug_toolbar.panels.settings.SettingsPanel',
+        'debug_toolbar.panels.headers.HeadersPanel',
+        'debug_toolbar.panels.request.RequestPanel',
+        'debug_toolbar.panels.sql.SQLPanel',
+        'debug_toolbar.panels.staticfiles.StaticFilesPanel',
+        'debug_toolbar.panels.templates.TemplatesPanel',
+        'debug_toolbar.panels.cache.CachePanel',
+        'debug_toolbar.panels.signals.SignalsPanel',
+        'debug_toolbar.panels.logging.LoggingPanel',
+        'debug_toolbar.panels.redirects.RedirectsPanel',
+        'debug_toolbar.panels.profiling.ProfilingPanel',
+        'pympler.panels.MemoryPanel',
+    ]

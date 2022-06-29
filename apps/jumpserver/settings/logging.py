@@ -136,7 +136,7 @@ LOGGING = {
     }
 }
 
-if os.environ.get("DEBUG_DB"):
+if CONFIG.DEBUG_DEV:
     LOGGING['loggers']['django.db'] = {
        'handlers': ['console', 'file'],
        'level': 'DEBUG'

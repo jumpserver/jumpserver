@@ -128,6 +128,7 @@ class Config(dict):
         'SECRET_KEY': '',
         'BOOTSTRAP_TOKEN': '',
         'DEBUG': False,
+        'DEBUG_DEV': False,
         'LOG_LEVEL': 'DEBUG',
         'LOG_DIR': os.path.join(PROJECT_DIR, 'logs'),
         'DB_ENGINE': 'mysql',
