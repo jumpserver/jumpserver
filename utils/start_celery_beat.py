@@ -25,9 +25,9 @@ params = {
     'password': settings.REDIS_PASSWORD,
     'ssl': settings.REDIS_USE_SSL,
     'ssl_cert_reqs': settings.REDIS_SSL_REQUIRED,
-    'ssl_keyfile': settings.REDIS_SSL_KEYFILE,
-    'ssl_certfile': settings.REDIS_SSL_CERTFILE,
-    'ssl_ca_certs': settings.REDIS_SSL_CA_CERTS
+    'ssl_keyfile': settings.REDIS_SSL_KEY,
+    'ssl_certfile': settings.REDIS_SSL_CERT,
+    'ssl_ca_certs': settings.REDIS_SSL_CA
 }
 print("Pamras: ", params)
 redis = Redis(**params)

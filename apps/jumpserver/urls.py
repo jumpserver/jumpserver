@@ -79,6 +79,11 @@ urlpatterns += [
     re_path('api/redoc/?', views.get_swagger_view().with_ui('redoc', cache_timeout=1), name='redoc'),
 ]
 
+if settings.DEBUG_DEV:
+    urlpatterns += [
+        path('__debug__/', include('debug_toolbar.urls')),
+    ]
+
 
 # 兼容之前的
 old_app_pattern = '|'.join(apps)

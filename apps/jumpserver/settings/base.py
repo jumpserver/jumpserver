@@ -36,6 +36,8 @@ BOOTSTRAP_TOKEN = CONFIG.BOOTSTRAP_TOKEN
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = CONFIG.DEBUG
+# SECURITY WARNING: If you run with debug turned on, more debug msg with be log
+DEBUG_DEV = CONFIG.DEBUG_DEV
 
 # Absolute url for some case, for example email link
 SITE_URL = CONFIG.SITE_URL
@@ -106,6 +108,8 @@ MIDDLEWARE = [
     'authentication.middleware.SessionCookieMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
 ]
+
+
 
 ROOT_URLCONF = 'jumpserver.urls'
 
@@ -262,10 +266,10 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755
 
 # Cache use redis
-REDIS_SSL_KEYFILE = exist_or_default(os.path.join(CERTS_DIR, 'redis_client.key'), None)
-REDIS_SSL_CERTFILE = exist_or_default(os.path.join(CERTS_DIR, 'redis_client.crt'), None)
-REDIS_SSL_CA_CERTS = exist_or_default(os.path.join(CERTS_DIR, 'redis_ca.pem'), None)
-REDIS_SSL_CA_CERTS = exist_or_default(os.path.join(CERTS_DIR, 'redis_ca.crt'), REDIS_SSL_CA_CERTS)
+REDIS_SSL_KEY = exist_or_default(os.path.join(CERTS_DIR, 'redis_client.key'), None)
+REDIS_SSL_CERT = exist_or_default(os.path.join(CERTS_DIR, 'redis_client.crt'), None)
+REDIS_SSL_CA = exist_or_default(os.path.join(CERTS_DIR, 'redis_ca.pem'), None)
+REDIS_SSL_CA = exist_or_default(os.path.join(CERTS_DIR, 'redis_ca.crt'), REDIS_SSL_CA)
 REDIS_SSL_REQUIRED = 'none'
 REDIS_USE_SSL = CONFIG.REDIS_USE_SSL
 
@@ -283,9 +287,9 @@ REDIS_CACHE_DEFAULT = {
         "REDIS_CLIENT_KWARGS": {"health_check_interval": 30},
         "CONNECTION_POOL_KWARGS": {
             'ssl_cert_reqs': REDIS_SSL_REQUIRED,
-            "ssl_keyfile": REDIS_SSL_KEYFILE,
-            "ssl_certfile": REDIS_SSL_CERTFILE,
-            "ssl_ca_certs": REDIS_SSL_CA_CERTS
+            "ssl_keyfile": REDIS_SSL_KEY,
+            "ssl_certfile": REDIS_SSL_CERT,
+            "ssl_ca_certs": REDIS_SSL_CA
         } if REDIS_USE_SSL else {}
     }
 }
@@ -301,3 +305,26 @@ SESSION_CACHE_ALIAS = "session"
 FORCE_SCRIPT_NAME = CONFIG.FORCE_SCRIPT_NAME
 SESSION_COOKIE_SECURE = CONFIG.SESSION_COOKIE_SECURE
 CSRF_COOKIE_SECURE = CONFIG.CSRF_COOKIE_SECURE
+
+# For Debug toolbar
+INTERNAL_IPS = ["127.0.0.1"]
+if DEBUG_DEV:
+    INSTALLED_APPS = ['debug_toolbar', 'pympler'] + INSTALLED_APPS
+    MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
+    DEBUG_TOOLBAR_PANELS = [
+        'debug_toolbar.panels.history.HistoryPanel',
+        'debug_toolbar.panels.versions.VersionsPanel',
+        'debug_toolbar.panels.timer.TimerPanel',
+        'debug_toolbar.panels.settings.SettingsPanel',
+        'debug_toolbar.panels.headers.HeadersPanel',
+        'debug_toolbar.panels.request.RequestPanel',
+        'debug_toolbar.panels.sql.SQLPanel',
+        'debug_toolbar.panels.staticfiles.StaticFilesPanel',
+        'debug_toolbar.panels.templates.TemplatesPanel',
+        'debug_toolbar.panels.cache.CachePanel',
+        'debug_toolbar.panels.signals.SignalsPanel',
+        'debug_toolbar.panels.logging.LoggingPanel',
+        'debug_toolbar.panels.redirects.RedirectsPanel',
+        'debug_toolbar.panels.profiling.ProfilingPanel',
+        'pympler.panels.MemoryPanel',
+    ]
