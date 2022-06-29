@@ -29,7 +29,9 @@ class AuthBook(BaseUser, AbsConnectivity):
         permissions = [
             ('test_authbook', _('Can test asset account connectivity')),
             ('view_assetaccountsecret', _('Can view asset account secret')),
-            ('change_assetaccountsecret', _('Can change asset account secret'))
+            ('change_assetaccountsecret', _('Can change asset account secret')),
+            ('view_assethistoryaccount', _('Can view asset history account')),
+            ('view_assethistoryaccountsecret', _('Can view asset history account secret')),
         ]
 
     def __init__(self, *args, **kwargs):

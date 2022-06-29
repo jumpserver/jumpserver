@@ -24,12 +24,12 @@ class AccountHistoryViewSet(AccountViewSet):
     serializer_classes = {
         'default': serializers.AccountHistorySerializer,
     }
+    rbac_perms = {
+        'list': 'assets.view_assethistoryaccount',
+        'retrieve': 'assets.view_assethistoryaccount',
+    }
 
-    def update(self, request, *args, **kwargs):
-        raise MethodNotAllowed(self.action)
-
-    def destroy(self, request, *args, **kwargs):
-        raise MethodNotAllowed(self.action)
+    http_method_names = ['get', 'options']
 
     def get_queryset(self):
         queryset = self.model.objects.all() \
@@ -46,6 +46,6 @@ class AccountHistorySecretsViewSet(RecordViewLogMixin, AccountHistoryViewSet):
     }
     http_method_names = ['get']
     rbac_perms = {
-        'list': 'assets.view_assetaccountsecret',
-        'retrieve': 'assets.view_assetaccountsecret',
+        'list': 'assets.view_assethistoryaccountsecret',
+        'retrieve': 'assets.view_assethistoryaccountsecret',
     }

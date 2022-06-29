@@ -11,7 +11,9 @@ class AccountHistorySerializer(AccountSerializer):
 
     class Meta:
         model = AuthBook.history.model
-        fields = AccountSerializer.Meta.fields + ['history_id']
+        fields = AccountSerializer.Meta.fields_mini + \
+                 AccountSerializer.Meta.fields_write_only + \
+                 AccountSerializer.Meta.fields_fk + ['history_id']
         read_only_fields = fields
         ref_name = 'AccountHistorySerializer'
 
@@ -21,11 +23,15 @@ class AccountHistorySerializer(AccountSerializer):
             return ''
         return str(instance.systemuser)
 
+    def get_field_names(self, declared_fields, info):
+        fields = super().get_field_names(declared_fields, info)
+        fields = list(set(fields) - {'org_name'})
+        return fields
+
     def to_representation(self, instance):
         return super(AccountSerializer, self).to_representation(instance)
 
 
 class AccountHistorySecretSerializer(SecretReadableMixin, AccountHistorySerializer):
     class Meta(AccountHistorySerializer.Meta):
-        fields_backup = AccountSecretSerializer.Meta.fields_backup
         extra_kwargs = AccountSecretSerializer.Meta.extra_kwargs

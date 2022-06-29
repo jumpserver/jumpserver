@@ -652,6 +652,14 @@ msgstr "可以查看资产账号密码"
 msgid "Can change asset account secret"
 msgstr "可以更改资产账号密码"
 
+#: assets/models/authbook.py:33
+msgid "Can view asset history account"
+msgstr "可以查看资产历史账号"
+
+#: assets/models/authbook.py:34
+msgid "Can view asset history account secret"
+msgstr "可以查看资产历史账号密码"
+
 #: assets/models/backup.py:30 perms/models/base.py:54
 #: settings/serializers/terminal.py:12
 msgid "All"
@@ -1065,6 +1073,7 @@ msgstr ""
 "置加密密码"
 
 #: assets/serializers/account.py:36 assets/serializers/account.py:87
+#: assets/serializers/account_history.py:10
 msgid "System user display"
 msgstr "系统用户名称"
 
@@ -5243,12 +5252,6 @@ msgstr "工单流程"
 #: tickets/models/ticket/general.py:284
 msgid "Approval step"
 msgstr "审批步骤"
-
-#: tickets/models/ticket/general.py:287
-#, fuzzy
-#| msgid "Change auth plan snapshot"
-msgid "Relation snapshot"
-msgstr "改密计划快照"
 
 #: tickets/models/ticket/general.py:380
 msgid "Please try again"
