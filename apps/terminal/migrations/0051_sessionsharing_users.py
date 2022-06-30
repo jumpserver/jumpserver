@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('terminal', '0049_endpoint_redis_port'),
+        ('terminal', '0050_auto_20220606_1745'),
     ]
 
     operations = [
