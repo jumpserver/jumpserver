@@ -293,7 +293,6 @@ def command_confirm_migrate(apps, *args):
         rel_snapshot = {
             'applicant': instance.applicant_display,
             'apply_run_user': meta.get('apply_run_user', ''),
-            'apply_run_asset': meta.get('apply_run_asset', ''),
             'apply_run_system_user': meta.get('apply_run_system_user', ''),
             'apply_from_session': meta.get('apply_from_session_id', ''),
             'apply_from_cmd_filter': meta.get('apply_from_cmd_filter_id', ''),
