@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-29 18:09+0800\n"
+"POT-Creation-Date: 2022-06-30 15:51+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -49,7 +49,7 @@ msgstr "1-100、低い値は最初に一致します"
 
 #: acls/models/base.py:31 authentication/models.py:18
 #: authentication/templates/authentication/_access_key_modal.html:32
-#: perms/models/base.py:88 terminal/models/sharing.py:26 tickets/const.py:39
+#: perms/models/base.py:88 terminal/models/sharing.py:28 tickets/const.py:39
 msgid "Active"
 msgstr "アクティブ"
 
@@ -63,7 +63,7 @@ msgstr "アクティブ"
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:34
 #: terminal/models/endpoint.py:21 terminal/models/endpoint.py:92
 #: terminal/models/storage.py:29 terminal/models/terminal.py:114
-#: tickets/models/comment.py:32 tickets/models/ticket/general.py:277
+#: tickets/models/comment.py:32 tickets/models/ticket/general.py:278
 #: users/models/group.py:16 users/models/user.py:698
 #: xpack/plugins/change_auth_plan/models/base.py:44
 #: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:116
@@ -92,9 +92,10 @@ msgstr "ログイン確認"
 #: rbac/builtin.py:118 rbac/models/rolebinding.py:41
 #: terminal/backends/command/models.py:20
 #: terminal/backends/command/serializers.py:12 terminal/models/session.py:44
-#: terminal/notifications.py:91 terminal/notifications.py:139
-#: tickets/models/comment.py:21 users/const.py:14 users/models/user.py:888
-#: users/models/user.py:919 users/serializers/group.py:19
+#: terminal/models/sharing.py:33 terminal/notifications.py:91
+#: terminal/notifications.py:139 tickets/models/comment.py:21 users/const.py:14
+#: users/models/user.py:890 users/models/user.py:921
+#: users/serializers/group.py:19
 msgid "User"
 msgstr "ユーザー"
 
@@ -309,7 +310,7 @@ msgstr "カテゴリ"
 #: terminal/models/storage.py:58 terminal/models/storage.py:142
 #: tickets/models/comment.py:26 tickets/models/flow.py:57
 #: tickets/models/ticket/apply_application.py:17
-#: tickets/models/ticket/general.py:262
+#: tickets/models/ticket/general.py:263
 #: xpack/plugins/change_auth_plan/models/app.py:28
 #: xpack/plugins/change_auth_plan/models/app.py:153
 msgid "Type"
@@ -355,7 +356,7 @@ msgstr "タイプ表示"
 #: assets/serializers/cmd_filter.py:48 common/db/models.py:114
 #: common/mixins/models.py:50 ops/models/adhoc.py:39 ops/models/command.py:30
 #: orgs/models.py:67 orgs/models.py:217 perms/models/base.py:92
-#: users/models/group.py:18 users/models/user.py:920
+#: users/models/group.py:18 users/models/user.py:922
 #: xpack/plugins/cloud/models.py:125
 msgid "Date created"
 msgstr "作成された日付"
@@ -499,7 +500,7 @@ msgid "Charset"
 msgstr "シャーセット"
 
 #: assets/models/asset.py:141 assets/serializers/asset.py:176
-#: tickets/models/ticket/general.py:287
+#: tickets/models/ticket/general.py:288
 msgid "Meta"
 msgstr "メタ"
 
@@ -521,7 +522,7 @@ msgstr "ベンダー"
 msgid "Model"
 msgstr "モデル"
 
-#: assets/models/asset.py:170 tickets/models/ticket/general.py:285
+#: assets/models/asset.py:170 tickets/models/ticket/general.py:286
 msgid "Serial number"
 msgstr "シリアル番号"
 
@@ -711,7 +712,7 @@ msgid "Trigger mode"
 msgstr "トリガーモード"
 
 #: assets/models/backup.py:119 audits/models.py:127
-#: terminal/models/sharing.py:94
+#: terminal/models/sharing.py:106
 #: xpack/plugins/change_auth_plan/models/base.py:201
 #: xpack/plugins/change_auth_plan/serializers/app.py:66
 #: xpack/plugins/change_auth_plan/serializers/asset.py:180
@@ -821,7 +822,7 @@ msgid "Default"
 msgstr "デフォルト"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14 rbac/const.py:6
-#: users/models/user.py:905
+#: users/models/user.py:907
 msgid "System"
 msgstr "システム"
 
@@ -1380,7 +1381,7 @@ msgstr "監査"
 
 #: audits/models.py:27 audits/models.py:59
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: rbac/tree.py:228
+#: rbac/tree.py:226
 msgid "Delete"
 msgstr "削除"
 
@@ -1409,7 +1410,7 @@ msgid "Symlink"
 msgstr "Symlink"
 
 #: audits/models.py:38 audits/models.py:66 audits/models.py:89
-#: terminal/models/session.py:51 terminal/models/sharing.py:82
+#: terminal/models/session.py:51 terminal/models/sharing.py:94
 msgid "Remote addr"
 msgstr "リモートaddr"
 
@@ -1421,8 +1422,8 @@ msgstr "操作"
 msgid "Filename"
 msgstr "ファイル名"
 
-#: audits/models.py:43 audits/models.py:117 terminal/models/sharing.py:90
-#: tickets/views/approve.py:98
+#: audits/models.py:43 audits/models.py:117 terminal/models/sharing.py:102
+#: tickets/views/approve.py:115
 #: xpack/plugins/change_auth_plan/serializers/app.py:87
 #: xpack/plugins/change_auth_plan/serializers/asset.py:198
 msgid "Success"
@@ -1434,15 +1435,15 @@ msgstr "ファイル転送ログ"
 
 #: audits/models.py:56
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:225
+#: rbac/tree.py:223
 msgid "Create"
 msgstr "作成"
 
-#: audits/models.py:57 rbac/tree.py:226
+#: audits/models.py:57 rbac/tree.py:224
 msgid "View"
 msgstr "表示"
 
-#: audits/models.py:58 rbac/tree.py:227 templates/_csv_import_export.html:18
+#: audits/models.py:58 rbac/tree.py:225 templates/_csv_import_export.html:18
 #: templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "更新"
@@ -1510,7 +1511,7 @@ msgid "MFA"
 msgstr "MFA"
 
 #: audits/models.py:128 terminal/models/status.py:33
-#: tickets/models/ticket/general.py:270 xpack/plugins/cloud/models.py:175
+#: tickets/models/ticket/general.py:271 xpack/plugins/cloud/models.py:175
 #: xpack/plugins/cloud/models.py:227
 msgid "Status"
 msgstr "ステータス"
@@ -1581,13 +1582,13 @@ msgid "Auth Token"
 msgstr "認証トークン"
 
 #: audits/signal_handlers.py:53 authentication/notifications.py:73
-#: authentication/views/login.py:163 authentication/views/wecom.py:177
+#: authentication/views/login.py:67 authentication/views/wecom.py:177
 #: notifications/backends/__init__.py:11 users/models/user.py:720
 msgid "WeCom"
 msgstr "企業微信"
 
 #: audits/signal_handlers.py:54 authentication/views/dingtalk.py:179
-#: authentication/views/login.py:169 notifications/backends/__init__.py:12
+#: authentication/views/login.py:73 notifications/backends/__init__.py:12
 #: users/models/user.py:721
 msgid "DingTalk"
 msgstr "DingTalk"
@@ -1845,59 +1846,59 @@ msgstr ""
 msgid "Invalid token or cache refreshed."
 msgstr "無効なトークンまたはキャッシュの更新。"
 
-#: authentication/errors.py:26
+#: authentication/errors/const.py:18
 msgid "Username/password check failed"
 msgstr "ユーザー名/パスワードのチェックに失敗しました"
 
-#: authentication/errors.py:27
+#: authentication/errors/const.py:19
 msgid "Password decrypt failed"
 msgstr "パスワードの復号化に失敗しました"
 
-#: authentication/errors.py:28
+#: authentication/errors/const.py:20
 msgid "MFA failed"
 msgstr "MFAに失敗しました"
 
-#: authentication/errors.py:29
+#: authentication/errors/const.py:21
 msgid "MFA unset"
 msgstr "MFAセットなし"
 
-#: authentication/errors.py:30
+#: authentication/errors/const.py:22
 msgid "Username does not exist"
 msgstr "ユーザー名が存在しません"
 
-#: authentication/errors.py:31
+#: authentication/errors/const.py:23
 msgid "Password expired"
 msgstr "パスワード期限切れ"
 
-#: authentication/errors.py:32
+#: authentication/errors/const.py:24
 msgid "Disabled or expired"
 msgstr "無効または期限切れ"
 
-#: authentication/errors.py:33
+#: authentication/errors/const.py:25
 msgid "This account is inactive."
 msgstr "このアカウントは非アクティブです。"
 
-#: authentication/errors.py:34
+#: authentication/errors/const.py:26
 msgid "This account is expired"
 msgstr "このアカウントは期限切れです"
 
-#: authentication/errors.py:35
+#: authentication/errors/const.py:27
 msgid "Auth backend not match"
 msgstr "Authバックエンドが一致しない"
 
-#: authentication/errors.py:36
+#: authentication/errors/const.py:28
 msgid "ACL is not allowed"
 msgstr "ACLは許可されません"
 
-#: authentication/errors.py:37
+#: authentication/errors/const.py:29
 msgid "Only local users are allowed"
 msgstr "ローカルユーザーのみが許可されています"
 
-#: authentication/errors.py:47
+#: authentication/errors/const.py:39
 msgid "No session found, check your cookie"
 msgstr "セッションが見つかりませんでした。クッキーを確認してください"
 
-#: authentication/errors.py:49
+#: authentication/errors/const.py:41
 #, python-brace-format
 msgid ""
 "The username or password you entered is incorrect, please enter it again. "
@@ -1908,7 +1909,7 @@ msgstr ""
 "{times_try} 回試すこともできます (アカウントは {block_time} 分の間一時的に"
 "ロックされます)"
 
-#: authentication/errors.py:55 authentication/errors.py:63
+#: authentication/errors/const.py:47 authentication/errors/const.py:55
 msgid ""
 "The account has been locked (please contact admin to unlock it or try again "
 "after {} minutes)"
@@ -1916,7 +1917,7 @@ msgstr ""
 "アカウントがロックされています (管理者に連絡してロックを解除するか、 {} 分後"
 "にもう一度お試しください)"
 
-#: authentication/errors.py:59
+#: authentication/errors/const.py:51
 msgid ""
 "The ip has been locked (please contact admin to unlock it or try again after "
 "{} minutes)"
@@ -1924,7 +1925,7 @@ msgstr ""
 "IPがロックされています (管理者に連絡してロックを解除するか、 {} 分後にもう一"
 "度お試しください)"
 
-#: authentication/errors.py:67
+#: authentication/errors/const.py:59
 #, python-brace-format
 msgid ""
 "{error}, You can also try {times_try} times (The account will be temporarily "
@@ -1933,66 +1934,66 @@ msgstr ""
 "{error},{times_try} 回も試すことができます (アカウントは {block_time} 分の間"
 "一時的にロックされます)"
 
-#: authentication/errors.py:71
+#: authentication/errors/const.py:63
 msgid "MFA required"
 msgstr "MFAが必要"
 
-#: authentication/errors.py:72
+#: authentication/errors/const.py:64
 msgid "MFA not set, please set it first"
 msgstr "MFAをセットしない、最初にセットしてください"
 
-#: authentication/errors.py:73
+#: authentication/errors/const.py:65
 msgid "Login confirm required"
 msgstr "ログイン確認が必要"
 
-#: authentication/errors.py:74
+#: authentication/errors/const.py:66
 msgid "Wait login confirm ticket for accept"
 msgstr "受け入れのためのログイン確認チケットを待つ"
 
-#: authentication/errors.py:75
+#: authentication/errors/const.py:67
 msgid "Login confirm ticket was {}"
 msgstr "ログイン確認チケットは {} でした"
 
-#: authentication/errors.py:255
+#: authentication/errors/failed.py:145
 msgid "IP is not allowed"
 msgstr "IPは許可されていません"
 
-#: authentication/errors.py:262
+#: authentication/errors/failed.py:152
 msgid "Time Period is not allowed"
 msgstr "期間は許可されていません"
 
-#: authentication/errors.py:295
-msgid "SSO auth closed"
-msgstr "SSO authは閉鎖されました"
-
-#: authentication/errors.py:300 authentication/mixins.py:306
-msgid "Your password is too simple, please change it for security"
-msgstr "パスワードがシンプルすぎるので、セキュリティのために変更してください"
-
-#: authentication/errors.py:309 authentication/mixins.py:313
-msgid "You should to change your password before login"
-msgstr "ログインする前にパスワードを変更する必要があります"
-
-#: authentication/errors.py:318 authentication/mixins.py:320
-msgid "Your password has expired, please reset before logging in"
-msgstr ""
-"パスワードの有効期限が切れました。ログインする前にリセットしてください。"
-
-#: authentication/errors.py:352
-msgid "Your password is invalid"
-msgstr "パスワードが無効です"
-
-#: authentication/errors.py:357
+#: authentication/errors/failed.py:157
 msgid "Please enter MFA code"
 msgstr "MFAコードを入力してください"
 
-#: authentication/errors.py:362
+#: authentication/errors/failed.py:162
 msgid "Please enter SMS code"
 msgstr "SMSコードを入力してください"
 
-#: authentication/errors.py:367 users/exceptions.py:15
+#: authentication/errors/failed.py:167 users/exceptions.py:15
 msgid "Phone not set"
 msgstr "電話が設定されていない"
+
+#: authentication/errors/mfa.py:8
+msgid "SSO auth closed"
+msgstr "SSO authは閉鎖されました"
+
+#: authentication/errors/mfa.py:38
+msgid "Your password is invalid"
+msgstr "パスワードが無効です"
+
+#: authentication/errors/redirect.py:79 authentication/mixins.py:306
+msgid "Your password is too simple, please change it for security"
+msgstr "パスワードがシンプルすぎるので、セキュリティのために変更してください"
+
+#: authentication/errors/redirect.py:88 authentication/mixins.py:313
+msgid "You should to change your password before login"
+msgstr "ログインする前にパスワードを変更する必要があります"
+
+#: authentication/errors/redirect.py:97 authentication/mixins.py:320
+msgid "Your password has expired, please reset before logging in"
+msgstr ""
+"パスワードの有効期限が切れました。ログインする前にリセットしてください。"
 
 #: authentication/forms.py:45
 msgid "{} days auto login"
@@ -2216,7 +2217,7 @@ msgstr "コードエラー"
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_rest_password_success.html:2
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:2
-#: jumpserver/conf.py:305 ops/tasks.py:145 ops/tasks.py:148
+#: jumpserver/conf.py:307 ops/tasks.py:145 ops/tasks.py:148
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: perms/templates/perms/_msg_permed_items_expire.html:3
 #: tickets/templates/tickets/approve_check_password.html:33
@@ -2421,7 +2422,7 @@ msgstr "FeiShuクエリユーザーが失敗しました"
 msgid "The FeiShu is already bound to another user"
 msgstr "FeiShuはすでに別のユーザーにバインドされています"
 
-#: authentication/views/feishu.py:143 authentication/views/login.py:175
+#: authentication/views/feishu.py:143 authentication/views/login.py:79
 #: notifications/backends/__init__.py:14 users/models/user.py:722
 msgid "FeiShu"
 msgstr "本を飛ばす"
@@ -2442,19 +2443,19 @@ msgstr "本を飛ばすは拘束されていません"
 msgid "Please login with a password and then bind the FeiShu"
 msgstr "パスワードでログインしてから本を飛ばすをバインドしてください"
 
-#: authentication/views/login.py:69
+#: authentication/views/login.py:175
 msgid "Redirecting"
 msgstr "リダイレクト"
 
-#: authentication/views/login.py:70
+#: authentication/views/login.py:176
 msgid "Redirecting to {} authentication"
 msgstr "{} 認証へのリダイレクト"
 
-#: authentication/views/login.py:93
+#: authentication/views/login.py:199
 msgid "Please enable cookies and try again."
 msgstr "クッキーを有効にして、もう一度お試しください。"
 
-#: authentication/views/login.py:300
+#: authentication/views/login.py:301
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -2462,15 +2463,15 @@ msgstr ""
 "<b>{}</b> 確認を待ちます。彼女/彼へのリンクをコピーすることもできます <br/>\n"
 "                  このページを閉じないでください"
 
-#: authentication/views/login.py:305
+#: authentication/views/login.py:306
 msgid "No ticket found"
 msgstr "チケットが見つかりません"
 
-#: authentication/views/login.py:339
+#: authentication/views/login.py:340
 msgid "Logout success"
 msgstr "ログアウト成功"
 
-#: authentication/views/login.py:340
+#: authentication/views/login.py:341
 msgid "Logout success, return login page"
 msgstr "ログアウト成功、ログインページを返す"
 
@@ -2678,11 +2679,11 @@ msgstr "特殊文字を含むべきではない"
 msgid "The mobile phone number format is incorrect"
 msgstr "携帯電話番号の形式が正しくありません"
 
-#: jumpserver/conf.py:304
+#: jumpserver/conf.py:306
 msgid "Create account successfully"
 msgstr "アカウントを正常に作成"
 
-#: jumpserver/conf.py:306
+#: jumpserver/conf.py:308
 msgid "Your account has been created successfully"
 msgstr "アカウントが正常に作成されました"
 
@@ -2937,14 +2938,14 @@ msgstr ""
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "組織のリソース ({}) は削除できません"
 
-#: orgs/apps.py:7 rbac/tree.py:115
+#: orgs/apps.py:7 rbac/tree.py:113
 msgid "App organizations"
 msgstr "アプリ組織"
 
 #: orgs/mixins/models.py:46 orgs/mixins/serializers.py:25 orgs/models.py:80
 #: orgs/models.py:211 rbac/const.py:7 rbac/models/rolebinding.py:48
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:62
-#: tickets/models/ticket/general.py:289 tickets/serializers/ticket/ticket.py:51
+#: tickets/models/ticket/general.py:290 tickets/serializers/ticket/ticket.py:51
 msgid "Organization"
 msgstr "組織"
 
@@ -3153,7 +3154,7 @@ msgstr "私のアプリケーション"
 msgid "Empty"
 msgstr "空"
 
-#: perms/utils/asset/user_permission.py:620 rbac/tree.py:59
+#: perms/utils/asset/user_permission.py:620 rbac/tree.py:57
 msgid "My assets"
 msgstr "私の資産"
 
@@ -3288,83 +3289,83 @@ msgstr "ロール表示"
 msgid "Has bound this role"
 msgstr "この役割をバインドしました"
 
-#: rbac/tree.py:20 rbac/tree.py:21
+#: rbac/tree.py:18 rbac/tree.py:19
 msgid "All permissions"
 msgstr "すべての権限"
 
-#: rbac/tree.py:27
+#: rbac/tree.py:25
 msgid "Console view"
 msgstr "コンソールビュー"
 
-#: rbac/tree.py:28
+#: rbac/tree.py:26
 msgid "Workbench view"
 msgstr "ワークスペースビュー"
 
-#: rbac/tree.py:29
+#: rbac/tree.py:27
 msgid "Audit view"
 msgstr "監査ビュー"
 
-#: rbac/tree.py:30 settings/models.py:140
+#: rbac/tree.py:28 settings/models.py:140
 msgid "System setting"
 msgstr "システム設定"
 
-#: rbac/tree.py:31
+#: rbac/tree.py:29
 msgid "Other"
 msgstr "その他"
 
-#: rbac/tree.py:39
+#: rbac/tree.py:37
 msgid "Accounts"
 msgstr "アカウント"
 
-#: rbac/tree.py:43
+#: rbac/tree.py:41
 msgid "Session audits"
 msgstr "セッション監査"
 
-#: rbac/tree.py:53
+#: rbac/tree.py:51
 msgid "Cloud import"
 msgstr "クラウドインポート"
 
-#: rbac/tree.py:54
+#: rbac/tree.py:52
 msgid "Backup account"
 msgstr "バックアップアカウント"
 
-#: rbac/tree.py:55
+#: rbac/tree.py:53
 msgid "Gather account"
 msgstr "アカウントを集める"
 
-#: rbac/tree.py:56
+#: rbac/tree.py:54
 msgid "App change auth"
 msgstr "応用改密"
 
-#: rbac/tree.py:57
+#: rbac/tree.py:55
 msgid "Asset change auth"
 msgstr "資産の改ざん"
 
-#: rbac/tree.py:58
+#: rbac/tree.py:56
 msgid "Terminal setting"
 msgstr "ターミナル設定"
 
-#: rbac/tree.py:60
+#: rbac/tree.py:58
 msgid "My apps"
 msgstr "マイアプリ"
 
-#: rbac/tree.py:116
+#: rbac/tree.py:114
 msgid "Ticket comment"
 msgstr "チケットコメント"
 
-#: rbac/tree.py:117 tickets/models/ticket/general.py:294
+#: rbac/tree.py:115 tickets/models/ticket/general.py:295
 msgid "Ticket"
 msgstr "チケット"
 
-#: rbac/tree.py:118
+#: rbac/tree.py:116
 msgid "Common setting"
 msgstr "共通設定"
 
-#: rbac/tree.py:119
+#: rbac/tree.py:117
 msgid "View permission tree"
 msgstr "権限ツリーの表示"
 
-#: rbac/tree.py:120
+#: rbac/tree.py:118
 msgid "Execute batch command"
 msgstr "バッチ実行コマンド"
 
@@ -3490,7 +3491,7 @@ msgstr "ログインリダイレクトの有効化msg"
 msgid "Enable CAS Auth"
 msgstr "CAS 認証の有効化"
 
-#: settings/serializers/auth/cas.py:11 settings/serializers/auth/oidc.py:47
+#: settings/serializers/auth/cas.py:11 settings/serializers/auth/oidc.py:48
 msgid "Server url"
 msgstr "サービス側アドレス"
 
@@ -3555,7 +3556,7 @@ msgstr "ユーザー検索フィルター"
 msgid "Choice may be (cn|uid|sAMAccountName)=%(user)s)"
 msgstr "選択は (cnまたはuidまたはsAMAccountName)=%(user)s)"
 
-#: settings/serializers/auth/ldap.py:57 settings/serializers/auth/oidc.py:35
+#: settings/serializers/auth/ldap.py:57 settings/serializers/auth/oidc.py:36
 msgid "User attr map"
 msgstr "ユーザー属性マッピング"
 
@@ -3579,32 +3580,32 @@ msgstr "ページサイズを検索"
 msgid "Enable LDAP auth"
 msgstr "LDAP認証の有効化"
 
-#: settings/serializers/auth/oidc.py:14
+#: settings/serializers/auth/oidc.py:15
 msgid "Base site url"
 msgstr "ベースサイトのアドレス"
 
-#: settings/serializers/auth/oidc.py:17
+#: settings/serializers/auth/oidc.py:18
 msgid "Client Id"
 msgstr "クライアントID"
 
-#: settings/serializers/auth/oidc.py:20
+#: settings/serializers/auth/oidc.py:21
 #: xpack/plugins/cloud/serializers/account_attrs.py:36
 msgid "Client Secret"
 msgstr "クライアント秘密"
 
-#: settings/serializers/auth/oidc.py:28
+#: settings/serializers/auth/oidc.py:29
 msgid "Client authentication method"
 msgstr "クライアント認証方式"
 
-#: settings/serializers/auth/oidc.py:30
+#: settings/serializers/auth/oidc.py:31
 msgid "Share session"
 msgstr "セッションの共有"
 
-#: settings/serializers/auth/oidc.py:32
+#: settings/serializers/auth/oidc.py:33
 msgid "Ignore ssl verification"
 msgstr "Ssl検証を無視する"
 
-#: settings/serializers/auth/oidc.py:36
+#: settings/serializers/auth/oidc.py:37
 msgid ""
 "User attr map present how to map OpenID user attr to jumpserver, username,"
 "name,email is jumpserver attr"
@@ -3612,71 +3613,71 @@ msgstr ""
 "ユーザー属性マッピングは、OpenIDのユーザー属性をjumpserverユーザーにマッピン"
 "グする方法、username, name,emailはjumpserverのユーザーが必要とする属性です"
 
-#: settings/serializers/auth/oidc.py:44
+#: settings/serializers/auth/oidc.py:45
 msgid "Use Keycloak"
 msgstr "Keycloakを使用する"
 
-#: settings/serializers/auth/oidc.py:50
+#: settings/serializers/auth/oidc.py:51
 msgid "Realm name"
 msgstr "レルム名"
 
-#: settings/serializers/auth/oidc.py:56
+#: settings/serializers/auth/oidc.py:57
 msgid "Enable OPENID Auth"
 msgstr "OIDC認証の有効化"
 
-#: settings/serializers/auth/oidc.py:58
+#: settings/serializers/auth/oidc.py:59
 msgid "Provider endpoint"
 msgstr "プロバイダーエンドポイント"
 
-#: settings/serializers/auth/oidc.py:61
+#: settings/serializers/auth/oidc.py:62
 msgid "Provider auth endpoint"
 msgstr "認証エンドポイントアドレス"
 
-#: settings/serializers/auth/oidc.py:64
+#: settings/serializers/auth/oidc.py:65
 msgid "Provider token endpoint"
 msgstr "プロバイダートークンエンドポイント"
 
-#: settings/serializers/auth/oidc.py:67
+#: settings/serializers/auth/oidc.py:68
 msgid "Provider jwks endpoint"
 msgstr "プロバイダーjwksエンドポイント"
 
-#: settings/serializers/auth/oidc.py:70
+#: settings/serializers/auth/oidc.py:71
 msgid "Provider userinfo endpoint"
 msgstr "プロバイダーuserinfoエンドポイント"
 
-#: settings/serializers/auth/oidc.py:73
+#: settings/serializers/auth/oidc.py:74
 msgid "Provider end session endpoint"
 msgstr "プロバイダーのセッション終了エンドポイント"
 
-#: settings/serializers/auth/oidc.py:76
+#: settings/serializers/auth/oidc.py:77
 msgid "Provider sign alg"
 msgstr "プロビダーサインalg"
 
-#: settings/serializers/auth/oidc.py:79
+#: settings/serializers/auth/oidc.py:80
 msgid "Provider sign key"
 msgstr "プロバイダ署名キー"
 
-#: settings/serializers/auth/oidc.py:81
+#: settings/serializers/auth/oidc.py:82
 msgid "Scopes"
 msgstr "スコープ"
 
-#: settings/serializers/auth/oidc.py:83
+#: settings/serializers/auth/oidc.py:84
 msgid "Id token max age"
 msgstr "IDトークンの最大年齢"
 
-#: settings/serializers/auth/oidc.py:86
+#: settings/serializers/auth/oidc.py:87
 msgid "Id token include claims"
 msgstr "IDトークンにはクレームが含まれます"
 
-#: settings/serializers/auth/oidc.py:88
+#: settings/serializers/auth/oidc.py:89
 msgid "Use state"
 msgstr "使用状態"
 
-#: settings/serializers/auth/oidc.py:89
+#: settings/serializers/auth/oidc.py:90
 msgid "Use nonce"
 msgstr "Nonceを使用"
 
-#: settings/serializers/auth/oidc.py:91 settings/serializers/auth/saml2.py:33
+#: settings/serializers/auth/oidc.py:92 settings/serializers/auth/saml2.py:33
 msgid "Always update user"
 msgstr "常にユーザーを更新"
 
@@ -4696,9 +4697,9 @@ msgid "Output"
 msgstr "出力"
 
 #: terminal/backends/command/models.py:25 terminal/models/replay.py:9
-#: terminal/models/sharing.py:17 terminal/models/sharing.py:64
+#: terminal/models/sharing.py:19 terminal/models/sharing.py:76
 #: terminal/templates/terminal/_msg_command_alert.html:10
-#: tickets/models/ticket/command_confirm.py:23
+#: tickets/models/ticket/command_confirm.py:20
 msgid "Session"
 msgstr "セッション"
 
@@ -4810,7 +4811,7 @@ msgstr "セッションのリプレイをアップロードできます"
 msgid "Can download session replay"
 msgstr "セッション再生をダウンロードできます"
 
-#: terminal/models/session.py:50 terminal/models/sharing.py:87
+#: terminal/models/session.py:50 terminal/models/sharing.py:99
 msgid "Login from"
 msgstr "ログイン元"
 
@@ -4842,56 +4843,62 @@ msgstr "セッションを終了できます"
 msgid "Can validate session action perm"
 msgstr "セッションアクションのパーマを検証できます"
 
-#: terminal/models/sharing.py:22
+#: terminal/models/sharing.py:24
 msgid "Creator"
 msgstr "作成者"
 
-#: terminal/models/sharing.py:24 terminal/models/sharing.py:66
+#: terminal/models/sharing.py:26 terminal/models/sharing.py:78
 msgid "Verify code"
 msgstr "コードの確認"
 
-#: terminal/models/sharing.py:29
+#: terminal/models/sharing.py:31
 msgid "Expired time (min)"
 msgstr "期限切れ時間 (分)"
 
-#: terminal/models/sharing.py:34 terminal/models/sharing.py:69
+#: terminal/models/sharing.py:37 terminal/models/sharing.py:81
 msgid "Session sharing"
 msgstr "セッション共有"
 
-#: terminal/models/sharing.py:36
+#: terminal/models/sharing.py:39
 msgid "Can add super session sharing"
 msgstr "スーパーセッション共有を追加できます"
 
-#: terminal/models/sharing.py:54
+#: terminal/models/sharing.py:64
 msgid "Link not active"
 msgstr "リンクがアクティブでない"
 
-#: terminal/models/sharing.py:56
+#: terminal/models/sharing.py:66
 msgid "Link expired"
 msgstr "リンク期限切れ"
 
-#: terminal/models/sharing.py:73 terminal/serializers/sharing.py:49
+#: terminal/models/sharing.py:68
+#, fuzzy
+#| msgid "IP is not allowed"
+msgid "User not allowed to join"
+msgstr "IPは許可されていません"
+
+#: terminal/models/sharing.py:85 terminal/serializers/sharing.py:58
 msgid "Joiner"
 msgstr "ジョイナー"
 
-#: terminal/models/sharing.py:76
+#: terminal/models/sharing.py:88
 msgid "Date joined"
 msgstr "参加日"
 
-#: terminal/models/sharing.py:79
+#: terminal/models/sharing.py:91
 msgid "Date left"
 msgstr "日付が残っています"
 
-#: terminal/models/sharing.py:97 tickets/const.py:26
+#: terminal/models/sharing.py:109 tickets/const.py:26
 #: xpack/plugins/change_auth_plan/models/base.py:192
 msgid "Finished"
 msgstr "終了"
 
-#: terminal/models/sharing.py:102
+#: terminal/models/sharing.py:114
 msgid "Session join record"
 msgstr "セッション参加記録"
 
-#: terminal/models/sharing.py:118
+#: terminal/models/sharing.py:130
 msgid "Invalid verification code"
 msgstr "検証コードが無効"
 
@@ -4974,7 +4981,9 @@ msgstr "一括危険コマンド警告"
 #: terminal/serializers/endpoint.py:39
 msgid ""
 "If asset IP addresses under different endpoints conflict, use asset labels"
-msgstr "異なるエンドポイントの下に競合するアセットIPがある場合は、アセットタグを使用して実装します"
+msgstr ""
+"異なるエンドポイントの下に競合するアセットIPがある場合は、アセットタグを使用"
+"して実装します"
 
 #: terminal/serializers/session.py:31
 msgid "User ID"
@@ -5180,7 +5189,7 @@ msgstr ""
 "チケットのタイトル: {} チケット申請者: {} チケットプロセッサ: {} チケットID: "
 "{}"
 
-#: tickets/handlers/base.py:75
+#: tickets/handlers/base.py:72
 msgid "{} {} the ticket"
 msgstr "{} {} チケット"
 
@@ -5196,8 +5205,8 @@ msgstr "応用ログイン都市"
 msgid "Applied login datetime"
 msgstr "適用されたログインの日付時間"
 
-#: tickets/models/comment.py:13 tickets/models/ticket/general.py:38
-#: tickets/models/ticket/general.py:266
+#: tickets/models/comment.py:13 tickets/models/ticket/general.py:39
+#: tickets/models/ticket/general.py:267
 msgid "State"
 msgstr "状態"
 
@@ -5214,7 +5223,7 @@ msgid "Body"
 msgstr "ボディ"
 
 #: tickets/models/flow.py:20 tickets/models/flow.py:62
-#: tickets/models/ticket/general.py:34
+#: tickets/models/ticket/general.py:35
 msgid "Approve level"
 msgstr "レベルを承認する"
 
@@ -5269,61 +5278,61 @@ msgstr "資産の適用"
 msgid "Run user"
 msgstr "ユーザーの実行"
 
-#: tickets/models/ticket/command_confirm.py:14
+#: tickets/models/ticket/command_confirm.py:12
 msgid "Run asset"
 msgstr "アセットの実行"
 
-#: tickets/models/ticket/command_confirm.py:18
+#: tickets/models/ticket/command_confirm.py:15
 msgid "Run system user"
 msgstr "システムユーザーの実行"
 
-#: tickets/models/ticket/command_confirm.py:20
+#: tickets/models/ticket/command_confirm.py:17
 msgid "Run command"
 msgstr "実行コマンド"
 
-#: tickets/models/ticket/command_confirm.py:27
+#: tickets/models/ticket/command_confirm.py:24
 msgid "From cmd filter"
 msgstr "コマンドフィルタ規則から"
 
-#: tickets/models/ticket/command_confirm.py:31
+#: tickets/models/ticket/command_confirm.py:28
 msgid "From cmd filter rule"
 msgstr "コマンドフィルタ規則から"
 
-#: tickets/models/ticket/general.py:69
+#: tickets/models/ticket/general.py:70
 msgid "Ticket step"
 msgstr "チケットステップ"
 
-#: tickets/models/ticket/general.py:87
+#: tickets/models/ticket/general.py:88
 msgid "Ticket assignee"
 msgstr "割り当てられたチケット"
 
-#: tickets/models/ticket/general.py:259
+#: tickets/models/ticket/general.py:260
 msgid "Title"
 msgstr "タイトル"
 
-#: tickets/models/ticket/general.py:275
+#: tickets/models/ticket/general.py:276
 msgid "Applicant"
 msgstr "応募者"
 
-#: tickets/models/ticket/general.py:280
+#: tickets/models/ticket/general.py:281
 msgid "TicketFlow"
 msgstr "作業指示プロセス"
 
-#: tickets/models/ticket/general.py:283
+#: tickets/models/ticket/general.py:284
 msgid "Approval step"
 msgstr "承認ステップ"
 
-#: tickets/models/ticket/general.py:286
+#: tickets/models/ticket/general.py:287
 #, fuzzy
 #| msgid "Change auth plan snapshot"
 msgid "Relation snapshot"
 msgstr "計画スナップショットの暗号化"
 
-#: tickets/models/ticket/general.py:378
+#: tickets/models/ticket/general.py:380
 msgid "Please try again"
 msgstr "もう一度お試しください"
 
-#: tickets/models/ticket/general.py:385
+#: tickets/models/ticket/general.py:387
 msgid "Super ticket"
 msgstr "スーパーチケット"
 
@@ -5417,7 +5426,7 @@ msgid "Ticket information"
 msgstr "作業指示情報"
 
 #: tickets/templates/tickets/approve_check_password.html:29
-#: tickets/views/approve.py:25
+#: tickets/views/approve.py:39
 msgid "Ticket approval"
 msgstr "作業指示の承認"
 
@@ -5429,26 +5438,26 @@ msgstr "承認"
 msgid "Go Login"
 msgstr "ログイン"
 
-#: tickets/views/approve.py:26
+#: tickets/views/approve.py:40
 msgid ""
 "This ticket does not exist, the process has ended, or this link has expired"
 msgstr ""
 "このワークシートが存在しないか、ワークシートが終了したか、このリンクが無効に"
 "なっています"
 
-#: tickets/views/approve.py:55
+#: tickets/views/approve.py:69
 msgid "Click the button below to approve or reject"
 msgstr "下のボタンをクリックして同意または拒否。"
 
-#: tickets/views/approve.py:57
+#: tickets/views/approve.py:71
 msgid "After successful authentication, this ticket can be approved directly"
 msgstr "認証に成功した後、作業指示書は直接承認することができる。"
 
-#: tickets/views/approve.py:79
+#: tickets/views/approve.py:93
 msgid "Illegal approval action"
 msgstr "無効な承認アクション"
 
-#: tickets/views/approve.py:89
+#: tickets/views/approve.py:106
 msgid "This user is not authorized to approve this ticket"
 msgstr "このユーザーはこの作業指示を承認する権限がありません"
 
@@ -5599,27 +5608,27 @@ msgstr "最終更新日パスワード"
 msgid "Need update password"
 msgstr "更新パスワードが必要"
 
-#: users/models/user.py:890
+#: users/models/user.py:892
 msgid "Can invite user"
 msgstr "ユーザーを招待できます"
 
-#: users/models/user.py:891
+#: users/models/user.py:893
 msgid "Can remove user"
 msgstr "ユーザーを削除できます"
 
-#: users/models/user.py:892
+#: users/models/user.py:894
 msgid "Can match user"
 msgstr "ユーザーに一致できます"
 
-#: users/models/user.py:901
+#: users/models/user.py:903
 msgid "Administrator"
 msgstr "管理者"
 
-#: users/models/user.py:904
+#: users/models/user.py:906
 msgid "Administrator is the super user of system"
 msgstr "管理者はシステムのスーパーユーザーです"
 
-#: users/models/user.py:929
+#: users/models/user.py:931
 msgid "User password history"
 msgstr "ユーザーパスワード履歴"
 
@@ -5674,13 +5683,21 @@ msgstr "新しく設定されたパスワードが一致しない"
 msgid "Is first login"
 msgstr "最初のログインです"
 
-#: users/serializers/user.py:26 users/serializers/user.py:33
+#: users/serializers/user.py:26
 msgid "System roles"
 msgstr "システムの役割"
 
-#: users/serializers/user.py:31 users/serializers/user.py:34
+#: users/serializers/user.py:31
 msgid "Org roles"
 msgstr "組織ロール"
+
+#: users/serializers/user.py:33
+msgid "System roles display"
+msgstr "システムロール表示"
+
+#: users/serializers/user.py:34
+msgid "Org roles display"
+msgstr "組織ロール表示"
 
 #: users/serializers/user.py:79
 #: xpack/plugins/change_auth_plan/models/base.py:35
