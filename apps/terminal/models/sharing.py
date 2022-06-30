@@ -3,6 +3,8 @@ import datetime
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from orgs.utils import tmp_to_root_org
+from users.models import User
 
 from common.mixins import CommonModelMixin
 from orgs.mixins.models import OrgModelMixin
@@ -28,7 +30,7 @@ class SessionSharing(CommonModelMixin, OrgModelMixin):
     expired_time = models.IntegerField(
         default=0, verbose_name=_('Expired time (min)'), db_index=True
     )
-    users = models.CharField(max_length=1024, verbose_name=_("User"), default=list)
+    users = models.TextField(blank=True, verbose_name=_("User"))
 
     class Meta:
         ordering = ('-date_created', )
@@ -39,6 +41,13 @@ class SessionSharing(CommonModelMixin, OrgModelMixin):
 
     def __str__(self):
         return 'Creator: {}'.format(self.creator)
+
+    def users_display(self):
+        with tmp_to_root_org():
+            user_ids = self.users.split(',')
+            users = User.objects.filter(id__in=user_ids)
+            users = [str(user) for user in users]
+        return users
 
     @property
     def date_expired(self):

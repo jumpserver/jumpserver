@@ -9,7 +9,7 @@ __all__ = ['SessionSharingSerializer', 'SessionJoinRecordSerializer']
 
 class SessionSharingSerializer(OrgResourceModelSerializerMixin):
     users = serializers.ListSerializer(
-        child=serializers.CharField(max_length=36), write_only=True, default=list, allow_null=True
+        child=serializers.CharField(max_length=36), allow_null=True, write_only=True
     )
 
     class Meta:
@@ -17,7 +17,7 @@ class SessionSharingSerializer(OrgResourceModelSerializerMixin):
         fields_mini = ['id']
         fields_small = fields_mini + [
             'verify_code', 'is_active', 'expired_time', 'created_by',
-            'date_created', 'date_updated', 'users'
+            'date_created', 'date_updated', 'users', 'users_display'
         ]
         fields_fk = ['session', 'creator']
         fields = fields_small + fields_fk
