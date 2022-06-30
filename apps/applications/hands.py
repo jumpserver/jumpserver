@@ -11,5 +11,4 @@
 """
 
 
-from common.permissions import MFAUserConfirm
 from users.models import User, UserGroup

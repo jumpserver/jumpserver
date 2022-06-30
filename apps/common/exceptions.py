@@ -42,9 +42,12 @@ class ReferencedByOthers(JMSException):
 
 
 class UserConfirmRequired(JMSException):
-    def __init__(self, detail=None, code=None):
+    def __init__(self, code=None):
+        detail = {
+            'code': code,
+            'detail': _('This action require confirm current user')
+        }
         super().__init__(detail=detail, code=code)
-    default_detail = _('This action require confirm current user')
 
 
 class UnexpectError(JMSException):

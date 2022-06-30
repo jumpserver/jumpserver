@@ -33,66 +33,21 @@ class WithBootstrapToken(permissions.BasePermission):
         return settings.BOOTSTRAP_TOKEN == request_bootstrap_token
 
 
-class UserConfirm(permissions.BasePermission):
-    confirm_type: str
+class UserConfirmation(permissions.BasePermission):
+    min_level = 1
+    ttl = 300
 
     def has_permission(self, request, view):
-        if not settings.SECURITY_VIEW_AUTH_NEED_MFA:
-            return True
+        confirm_level = request.session.get('CONFIRM_LEVEL')
+        confirm_time = request.session.get('CONFIRM_TIME')
 
-        if self.validate(request):
-            return True
+        if not confirm_level or not confirm_time or \
+                confirm_level < self.min_level or \
+                confirm_time < time.time() - self.ttl:
+            raise UserConfirmRequired(code=self.min_level)
+        return True
 
-        raise UserConfirmRequired(code=self.confirm_type)
-
-    def is_allow(self, request: Request, confirm_type: str = None) -> bool:
-        confirm_time = self.confirm_time(request, confirm_type)
-        if time.time() - confirm_time < settings.SECURITY_MFA_VERIFY_TTL:
-            return True
-        return False
-
-    def validate(self, request: Request):
-        session_confirm_type = request.session.get('CONFIRM_TYPE')
-        if not session_confirm_type or session_confirm_type == self.confirm_type:
-            self.set_session(request)
-            return self.is_allow(request)
-
-        is_high_priority = ConfirmType.compare(self.confirm_type, session_confirm_type)
-        current_result = self.is_allow(request)
-        session_result = self.is_allow(request, session_confirm_type)
-
-        if is_high_priority:
-            self.set_session(request)
-            return current_result
-
-        if session_result:
-            return True
-
-        self.set_session(request)
-        return current_result
-
-    def confirm_time(self, request: Request, confirm_type: str = None):
-        confirm_type = confirm_type or self.confirm_type
-        session_key = f'{confirm_type.upper()}_USER_CONFIRM_TIME'
-        return request.session.get(session_key, 0)
-
-    def set_session(self, request: Request):
-        request.session['CONFIRM_TYPE'] = self.confirm_type
-
-
-class MFAUserConfirm(UserConfirm):
-    confirm_type = ConfirmType.MFA
-
-
-class PasswordUserConfirm(UserConfirm):
-    confirm_type = ConfirmType.PASSWORD
-
-
-class ReLoginUserConfirm(UserConfirm):
-    confirm_type = ConfirmType.ReLogin
-
-
-class IsObjectOwner(IsValidUser):
-    def has_object_permission(self, request, view, obj):
-        return (super().has_object_permission(request, view, obj) and
-                request.user == getattr(obj, 'user', None))
+    @classmethod
+    def require(cls, min_level=1, ttl=300):
+        name = 'UserConfirmationLevel{}TTL{}'.format(min_level, ttl)
+        return type(name, (cls,), {'min_level': min_level, 'ttl': ttl})

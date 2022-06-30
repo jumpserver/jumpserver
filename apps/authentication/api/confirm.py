@@ -22,9 +22,10 @@ class ConfirmApi(RetrieveAPIView, CreateAPIView):
     def user(self):
         return self.request.user
 
-    @property
-    def confirm_type(self):
-        return self.request.session.get('CONFIRM_TYPE')
+    @staticmethod
+    def confirm_type(level: int):
+        level = int(level)
+        return ConfirmType.values[level - 1]
 
     def confirm_backend(self, confirm_type: str):
         user = self.user
@@ -32,7 +33,8 @@ class ConfirmApi(RetrieveAPIView, CreateAPIView):
         return CONFIRM_BACKEND_MAP[confirm_type](user, request)
 
     def retrieve(self, request, *args, **kwargs):
-        confirm_type = self.confirm_type
+        level = request.query_params.get('level')
+        confirm_type = self.confirm_type(level)
         while True:
             backend = self.confirm_backend(confirm_type)
             if backend.check:
@@ -52,13 +54,16 @@ class ConfirmApi(RetrieveAPIView, CreateAPIView):
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
 
+        level = validated_data.get('level')
         mfa_type = validated_data.get('mfa_type')
         secret_key = validated_data.get('secret_key')
 
-        backend = self.confirm_backend(self.confirm_type)
+        confirm_type = self.confirm_type(level)
+
+        backend = self.confirm_backend(confirm_type)
         ok, msg = backend.authenticate(secret_key, mfa_type)
         if ok:
-            session_key = f'{self.confirm_type.upper()}_USER_CONFIRM_TIME'
-            request.session[session_key] = int(time.time())
+            request.session['CONFIRM_LEVEL'] = level
+            request.session['CONFIRM_TIME'] = int(time.time())
             return Response('ok')
         return Response({'error': msg}, status=400)

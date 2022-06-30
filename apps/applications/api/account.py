@@ -7,10 +7,10 @@ from django.db.models import Q
 from common.drf.filters import BaseFilterSet
 from common.drf.api import JMSBulkModelViewSet
 from common.mixins import RecordViewLogMixin
+from common.permissions import UserConfirmation
 from rbac.permissions import RBACPermission
 from assets.models import SystemUser
 from ..models import Account
-from ..hands import MFAUserConfirm
 from .. import serializers
 
 
@@ -57,7 +57,7 @@ class SystemUserAppRelationViewSet(ApplicationAccountViewSet):
 
 class ApplicationAccountSecretViewSet(RecordViewLogMixin, ApplicationAccountViewSet):
     serializer_class = serializers.AppAccountSecretSerializer
-    permission_classes = [RBACPermission, MFAUserConfirm]
+    permission_classes = [RBACPermission, UserConfirmation.require(3)]
     http_method_names = ['get', 'options']
     rbac_perms = {
         'retrieve': 'applications.view_applicationaccountsecret',

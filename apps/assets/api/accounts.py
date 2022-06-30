@@ -1,4 +1,4 @@
-from django.db.models import F, Q
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filters
 from rest_framework.decorators import action
@@ -9,7 +9,7 @@ from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
 from common.drf.filters import BaseFilterSet
 from common.mixins import RecordViewLogMixin
-from common.permissions import MFAUserConfirm
+from common.permissions import UserConfirmation
 from ..tasks.account_connectivity import test_accounts_connectivity_manual
 from ..models import AuthBook, Node
 from .. import serializers
@@ -88,7 +88,7 @@ class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
         'default': serializers.AccountSecretSerializer
     }
     http_method_names = ['get']
-    permission_classes = [RBACPermission, MFAUserConfirm]
+    permission_classes = [RBACPermission, UserConfirmation.require(3)]
     rbac_perms = {
         'list': 'assets.view_assetaccountsecret',
         'retrieve': 'assets.view_assetaccountsecret',
