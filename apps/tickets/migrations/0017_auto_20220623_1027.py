@@ -263,11 +263,6 @@ def command_confirm_migrate(apps, *args):
             name=name_username[0], username=name_username[1]
         ).first() if name_username else None
 
-        hostname_ip = analysis_instance_name(meta.get('apply_run_asset'))
-        apply_run_asset = asset_model.objects.filter(
-            org_id=instance.org_id, hostname=hostname_ip[0], ip=hostname_ip[1]
-        ).first() if hostname_ip else None
-
         name_username = analysis_instance_name(meta.get('apply_run_system_user'))
         apply_run_system_user = system_user_model.objects.filter(
             org_id=instance.org_id, name=name_username[0], username=name_username[1]
@@ -287,7 +282,7 @@ def command_confirm_migrate(apps, *args):
         data = {
             'ticket_ptr_id': instance.pk,
             'apply_run_user': apply_run_user,
-            'apply_run_asset': apply_run_asset,
+            'apply_run_asset': meta.get('apply_run_asset', ''),
             'apply_run_system_user': apply_run_system_user,
             'apply_run_command': meta.get('apply_run_command', '')[:4090],
             'apply_from_session_id': apply_from_session_id,

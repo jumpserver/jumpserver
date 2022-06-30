@@ -171,7 +171,7 @@ class CommandFilterRule(OrgModelMixin):
             'type': TicketType.command_confirm,
             'applicant': session.user_obj,
             'apply_run_user_id': session.user_id,
-            'apply_run_asset_id': session.asset_id,
+            'apply_run_asset': str(session.asset),
             'apply_run_system_user_id': session.system_user_id,
             'apply_run_command': run_command[:4090],
             'apply_from_session_id': str(session.id),
