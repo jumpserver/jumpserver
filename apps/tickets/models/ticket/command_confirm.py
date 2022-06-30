@@ -9,7 +9,7 @@ class ApplyCommandTicket(Ticket):
         'users.User', on_delete=models.SET_NULL,
         null=True, verbose_name=_('Run user')
     )
-    apply_run_asset = models.CharField(max_length=128, verbose_name=_('Run asset'), default='')
+    apply_run_asset = models.CharField(max_length=128, verbose_name=_('Run asset'))
     apply_run_system_user = models.ForeignKey(
         'assets.SystemUser', on_delete=models.SET_NULL,
         null=True, verbose_name=_('Run system user')

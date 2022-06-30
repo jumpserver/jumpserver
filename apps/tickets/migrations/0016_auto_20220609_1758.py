@@ -79,9 +79,9 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='ticketstep',
             name='state',
-            field=models.CharField(choices=[('pending', 'Open'), ('approved', 'Approved'), ('rejected', 'Rejected'),
-                                            ('closed', 'Closed')], default='pending', max_length=64,
-                                   verbose_name='State'),
+            field=models.CharField(choices=[('pending', 'Pending'), ('approved', 'Approved'), ('rejected', 'Rejected'),
+                                            ('closed', 'Closed'), ('reopen', 'Reopen')], default='pending',
+                                   max_length=64, verbose_name='State'),
         ),
         migrations.CreateModel(
             name='ApplyLoginAssetTicket',
