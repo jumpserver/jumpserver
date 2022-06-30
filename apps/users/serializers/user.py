@@ -30,8 +30,8 @@ class RolesSerializerMixin(serializers.Serializer):
         child_relation=serializers.PrimaryKeyRelatedField(queryset=Role.org_roles),
         label=_('Org roles'),
     )
-    system_roles_display = serializers.SerializerMethodField(label=_('System roles'))
-    org_roles_display = serializers.SerializerMethodField(label=_('Org roles'))
+    system_roles_display = serializers.SerializerMethodField(label=_('System roles display'))
+    org_roles_display = serializers.SerializerMethodField(label=_('Org roles display'))
 
     @staticmethod
     def get_system_roles_display(user):
@@ -142,6 +142,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
             'password': {'write_only': True, 'required': False, 'allow_null': True, 'allow_blank': True},
             'public_key': {'write_only': True},
             'is_first_login': {'label': _('Is first login'), 'read_only': True},
+            'is_active': {'label': _('Is active')},
             'is_valid': {'label': _('Is valid')},
             'is_service_account': {'label': _('Is service account')},
             'is_expired': {'label': _('Is expired')},

@@ -33,7 +33,7 @@ __all__ = [
 
 class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelViewSet):
     filterset_class = UserFilter
-    search_fields = ('username', 'email', 'name', 'id', 'source', 'role')
+    search_fields = ('username', 'email', 'name', 'id', 'source', 'role', 'is_active')
     serializer_classes = {
         'default': UserSerializer,
         'suggestion': MiniUserSerializer,
