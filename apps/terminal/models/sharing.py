@@ -28,6 +28,7 @@ class SessionSharing(CommonModelMixin, OrgModelMixin):
     expired_time = models.IntegerField(
         default=0, verbose_name=_('Expired time (min)'), db_index=True
     )
+    users = models.CharField(max_length=1024, verbose_name=_("User"), default=list)
 
     class Meta:
         ordering = ('-date_created', )
@@ -49,11 +50,13 @@ class SessionSharing(CommonModelMixin, OrgModelMixin):
             return False
         return True
 
-    def can_join(self):
+    def can_join(self, joiner):
         if not self.is_active:
             return False, _('Link not active')
         if not self.is_expired:
             return False, _('Link expired')
+        if self.users and str(joiner.id) not in self.users.split(','):
+            return False, _('User not allowed to join')
         return True, ''
 
 
@@ -110,7 +113,7 @@ class SessionJoinRecord(CommonModelMixin, OrgModelMixin):
 
     def can_join(self):
         # sharing
-        sharing_can_join, reason = self.sharing.can_join()
+        sharing_can_join, reason = self.sharing.can_join(self.joiner)
         if not sharing_can_join:
             return False, reason
         # self
