@@ -12,6 +12,7 @@ __all__ = [
 
 class SessionSerializer(BulkOrgResourceModelSerializer):
     org_id = serializers.CharField(allow_blank=True)
+    terminal_display = serializers.CharField(read_only=True, label=_('Terminal display'))
 
     class Meta:
         model = Session
@@ -23,8 +24,8 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
             "is_success", "is_finished", "has_replay",
             "date_start", "date_end",
         ]
-        fields_fk = ["terminal",]
-        fields_custom = ["can_replay", "can_join", "can_terminate",]
+        fields_fk = ["terminal", ]
+        fields_custom = ["can_replay", "can_join", "can_terminate", 'terminal_display']
         fields = fields_small + fields_fk + fields_custom
         extra_kwargs = {
             "protocol": {'label': _('Protocol')},
@@ -38,6 +39,7 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
             'terminal': {'label': _('Terminal')},
             'is_finished': {'label': _('Is finished')},
             'can_terminate': {'label': _('Can terminate')},
+            'terminal_display': {'label': _('Terminal display')},
         }
 
 
@@ -45,7 +47,7 @@ class SessionDisplaySerializer(SessionSerializer):
     command_amount = serializers.IntegerField(read_only=True, label=_('Command amount'))
 
     class Meta(SessionSerializer.Meta):
-        fields = SessionSerializer.Meta.fields + ['command_amount']
+        fields = SessionSerializer.Meta.fields + ['command_amount', ]
 
 
 class ReplaySerializer(serializers.Serializer):
