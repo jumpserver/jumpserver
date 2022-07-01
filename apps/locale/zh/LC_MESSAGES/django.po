@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-30 15:51+0800\n"
+"POT-Creation-Date: 2022-07-01 19:05+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -209,7 +209,7 @@ msgid "Unsupported protocols: {}"
 msgstr "不支持的协议: {}"
 
 #: acls/serializers/login_asset_acl.py:98
-#: tickets/serializers/ticket/ticket.py:65
+#: tickets/serializers/ticket/ticket.py:78
 msgid "The organization `{}` does not exist"
 msgstr "组织 `{}` 不存在"
 
@@ -339,7 +339,7 @@ msgstr "类别名称"
 #: applications/serializers/application.py:102
 #: assets/serializers/cmd_filter.py:34 assets/serializers/system_user.py:34
 #: audits/serializers.py:29 perms/serializers/application/permission.py:19
-#: tickets/serializers/flow.py:48 tickets/serializers/ticket/ticket.py:16
+#: tickets/serializers/flow.py:48 tickets/serializers/ticket/ticket.py:17
 msgid "Type display"
 msgstr "类型名称"
 
@@ -580,6 +580,7 @@ msgstr "节点"
 
 #: assets/models/asset.py:219 assets/models/cmd_filter.py:47
 #: assets/models/domain.py:65 assets/models/label.py:22
+#: users/serializers/user.py:145
 msgid "Is active"
 msgstr "激活"
 
@@ -1520,7 +1521,7 @@ msgstr "用户登录日志"
 msgid "Operate display"
 msgstr "操作名称"
 
-#: audits/serializers.py:30 tickets/serializers/ticket/ticket.py:17
+#: audits/serializers.py:30 tickets/serializers/ticket/ticket.py:18
 msgid "Status display"
 msgstr "状态名称"
 
@@ -1932,7 +1933,7 @@ msgstr "等待登录复核处理"
 
 #: authentication/errors/const.py:67
 msgid "Login confirm ticket was {}"
-msgstr "登录复核 {}"
+msgstr "登录复核: {}"
 
 #: authentication/errors/failed.py:145
 msgid "IP is not allowed"
@@ -2110,7 +2111,7 @@ msgstr "绑定提醒"
 #: perms/serializers/application/permission.py:20
 #: perms/serializers/application/permission.py:41
 #: perms/serializers/asset/permission.py:19
-#: perms/serializers/asset/permission.py:45 users/serializers/user.py:145
+#: perms/serializers/asset/permission.py:45 users/serializers/user.py:146
 msgid "Is valid"
 msgstr "账号是否有效"
 
@@ -2535,7 +2536,7 @@ msgstr "对象"
 msgid "The file content overflowed (The maximum length `{}` bytes)"
 msgstr "文件内容太大 (最大长度 `{}` 字节)"
 
-#: common/drf/parsers/base.py:153
+#: common/drf/parsers/base.py:159
 msgid "Parse file error: {}"
 msgstr "解析文件错误: {}"
 
@@ -2909,7 +2910,7 @@ msgstr "组织管理"
 #: orgs/mixins/models.py:46 orgs/mixins/serializers.py:25 orgs/models.py:80
 #: orgs/models.py:211 rbac/const.py:7 rbac/models/rolebinding.py:48
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:62
-#: tickets/models/ticket/general.py:290 tickets/serializers/ticket/ticket.py:51
+#: tickets/models/ticket/general.py:290 tickets/serializers/ticket/ticket.py:64
 msgid "Organization"
 msgstr "组织"
 
@@ -3046,7 +3047,7 @@ msgstr "组织 ({}) 的应用授权"
 #: perms/serializers/application/permission.py:40
 #: perms/serializers/asset/permission.py:20
 #: perms/serializers/asset/permission.py:44 users/serializers/user.py:87
-#: users/serializers/user.py:147
+#: users/serializers/user.py:148
 msgid "Is expired"
 msgstr "已过期"
 
@@ -5333,7 +5334,7 @@ msgstr "过期时间要大于开始时间"
 msgid "Permission named `{}` already exists"
 msgstr "授权名称 `{}` 已存在"
 
-#: tickets/serializers/ticket/ticket.py:76
+#: tickets/serializers/ticket/ticket.py:89
 msgid "The ticket flow `{}` does not exist"
 msgstr "工单流程 `{}` 不存在"
 
@@ -5502,7 +5503,7 @@ msgstr "强制启用"
 msgid "Local"
 msgstr "数据库"
 
-#: users/models/user.py:673 users/serializers/user.py:146
+#: users/models/user.py:673 users/serializers/user.py:147
 msgid "Is service account"
 msgstr "服务账号"
 
@@ -5647,63 +5648,63 @@ msgstr "登录被阻塞"
 msgid "Can public key authentication"
 msgstr "能否公钥认证"
 
-#: users/serializers/user.py:148
+#: users/serializers/user.py:149
 msgid "Avatar url"
 msgstr "头像路径"
 
-#: users/serializers/user.py:150
+#: users/serializers/user.py:151
 msgid "Groups name"
 msgstr "用户组名"
 
-#: users/serializers/user.py:151
+#: users/serializers/user.py:152
 msgid "Source name"
 msgstr "用户来源名"
 
-#: users/serializers/user.py:152
+#: users/serializers/user.py:153
 msgid "Organization role name"
 msgstr "组织角色名称"
 
-#: users/serializers/user.py:153
+#: users/serializers/user.py:154
 msgid "Super role name"
 msgstr "超级角色名称"
 
-#: users/serializers/user.py:154
+#: users/serializers/user.py:155
 msgid "Total role name"
 msgstr "汇总角色名称"
 
-#: users/serializers/user.py:156
+#: users/serializers/user.py:157
 msgid "Is wecom bound"
 msgstr "是否绑定了企业微信"
 
-#: users/serializers/user.py:157
+#: users/serializers/user.py:158
 msgid "Is dingtalk bound"
 msgstr "是否绑定了钉钉"
 
-#: users/serializers/user.py:158
+#: users/serializers/user.py:159
 msgid "Is feishu bound"
 msgstr "是否绑定了飞书"
 
-#: users/serializers/user.py:159
+#: users/serializers/user.py:160
 msgid "Is OTP bound"
 msgstr "是否绑定了虚拟 MFA"
 
-#: users/serializers/user.py:161
+#: users/serializers/user.py:162
 msgid "System role name"
 msgstr "系统角色名称"
 
-#: users/serializers/user.py:201
+#: users/serializers/user.py:202
 msgid "User cannot self-update fields: {}"
 msgstr "用户不能更新自己的字段: {}"
 
-#: users/serializers/user.py:258
+#: users/serializers/user.py:259
 msgid "Select users"
 msgstr "选择用户"
 
-#: users/serializers/user.py:259
+#: users/serializers/user.py:260
 msgid "For security, only list several users"
 msgstr "为了安全，仅列出几个用户"
 
-#: users/serializers/user.py:294
+#: users/serializers/user.py:295
 msgid "name not unique"
 msgstr "名称重复"
 

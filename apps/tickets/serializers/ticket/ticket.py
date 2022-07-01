@@ -6,6 +6,7 @@ from rest_framework import serializers
 from orgs.models import Organization
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from tickets.models import Ticket, TicketFlow
+from tickets.const import TicketType
 
 __all__ = [
     'TicketDisplaySerializer', 'TicketApplySerializer', 'TicketListSerializer'
@@ -27,6 +28,18 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
         ]
         fields_fk = ['applicant', ]
         fields = fields_small + fields_fk
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_type_choices()
+
+    def set_type_choices(self):
+        tp = self.fields.get('type')
+        if not tp:
+            return
+        choices = tp._choices
+        choices.pop(TicketType.general, None)
+        tp._choices = choices
 
 
 class TicketListSerializer(TicketSerializer):

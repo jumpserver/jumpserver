@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-30 15:51+0800\n"
+"POT-Creation-Date: 2022-07-01 19:05+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -213,7 +213,7 @@ msgid "Unsupported protocols: {}"
 msgstr "サポートされていないプロトコル: {}"
 
 #: acls/serializers/login_asset_acl.py:98
-#: tickets/serializers/ticket/ticket.py:65
+#: tickets/serializers/ticket/ticket.py:78
 msgid "The organization `{}` does not exist"
 msgstr "組織 '{}'は存在しません"
 
@@ -344,7 +344,7 @@ msgstr "カテゴリ表示"
 #: applications/serializers/application.py:102
 #: assets/serializers/cmd_filter.py:34 assets/serializers/system_user.py:34
 #: audits/serializers.py:29 perms/serializers/application/permission.py:19
-#: tickets/serializers/flow.py:48 tickets/serializers/ticket/ticket.py:16
+#: tickets/serializers/flow.py:48 tickets/serializers/ticket/ticket.py:17
 msgid "Type display"
 msgstr "タイプ表示"
 
@@ -585,6 +585,7 @@ msgstr "ノード"
 
 #: assets/models/asset.py:219 assets/models/cmd_filter.py:47
 #: assets/models/domain.py:65 assets/models/label.py:22
+#: users/serializers/user.py:145
 msgid "Is active"
 msgstr "アクティブです。"
 
@@ -1532,7 +1533,7 @@ msgstr "ユーザーログインログ"
 msgid "Operate display"
 msgstr "ディスプレイを操作する"
 
-#: audits/serializers.py:30 tickets/serializers/ticket/ticket.py:17
+#: audits/serializers.py:30 tickets/serializers/ticket/ticket.py:18
 msgid "Status display"
 msgstr "ステータス表示"
 
@@ -2131,7 +2132,7 @@ msgstr "バインディングリマインダー"
 #: perms/serializers/application/permission.py:20
 #: perms/serializers/application/permission.py:41
 #: perms/serializers/asset/permission.py:19
-#: perms/serializers/asset/permission.py:45 users/serializers/user.py:145
+#: perms/serializers/asset/permission.py:45 users/serializers/user.py:146
 msgid "Is valid"
 msgstr "有効です"
 
@@ -2565,7 +2566,7 @@ msgstr "オブジェクト"
 msgid "The file content overflowed (The maximum length `{}` bytes)"
 msgstr "ファイルの内容がオーバーフローしました (最大長 '{}' バイト)"
 
-#: common/drf/parsers/base.py:153
+#: common/drf/parsers/base.py:159
 msgid "Parse file error: {}"
 msgstr "解析ファイルエラー: {}"
 
@@ -2945,7 +2946,7 @@ msgstr "アプリ組織"
 #: orgs/mixins/models.py:46 orgs/mixins/serializers.py:25 orgs/models.py:80
 #: orgs/models.py:211 rbac/const.py:7 rbac/models/rolebinding.py:48
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:62
-#: tickets/models/ticket/general.py:290 tickets/serializers/ticket/ticket.py:51
+#: tickets/models/ticket/general.py:290 tickets/serializers/ticket/ticket.py:64
 msgid "Organization"
 msgstr "組織"
 
@@ -3082,7 +3083,7 @@ msgstr "Organization {} のアプリケーション権限"
 #: perms/serializers/application/permission.py:40
 #: perms/serializers/asset/permission.py:20
 #: perms/serializers/asset/permission.py:44 users/serializers/user.py:87
-#: users/serializers/user.py:147
+#: users/serializers/user.py:148
 msgid "Is expired"
 msgstr "期限切れです"
 
@@ -5409,7 +5410,7 @@ msgstr "有効期限は開始日より大きくする必要があります"
 msgid "Permission named `{}` already exists"
 msgstr "'{}'という名前の権限は既に存在します"
 
-#: tickets/serializers/ticket/ticket.py:76
+#: tickets/serializers/ticket/ticket.py:89
 msgid "The ticket flow `{}` does not exist"
 msgstr "チケットフロー '{}'が存在しない"
 
@@ -5580,7 +5581,7 @@ msgstr "強制有効"
 msgid "Local"
 msgstr "ローカル"
 
-#: users/models/user.py:673 users/serializers/user.py:146
+#: users/models/user.py:673 users/serializers/user.py:147
 msgid "Is service account"
 msgstr "サービスアカウントです"
 
@@ -5725,63 +5726,63 @@ msgstr "ログインブロック"
 msgid "Can public key authentication"
 msgstr "公開鍵認証が可能"
 
-#: users/serializers/user.py:148
+#: users/serializers/user.py:149
 msgid "Avatar url"
 msgstr "アバターURL"
 
-#: users/serializers/user.py:150
+#: users/serializers/user.py:151
 msgid "Groups name"
 msgstr "グループ名"
 
-#: users/serializers/user.py:151
+#: users/serializers/user.py:152
 msgid "Source name"
 msgstr "ソース名"
 
-#: users/serializers/user.py:152
+#: users/serializers/user.py:153
 msgid "Organization role name"
 msgstr "組織の役割名"
 
-#: users/serializers/user.py:153
+#: users/serializers/user.py:154
 msgid "Super role name"
 msgstr "スーパーロール名"
 
-#: users/serializers/user.py:154
+#: users/serializers/user.py:155
 msgid "Total role name"
 msgstr "合計ロール名"
 
-#: users/serializers/user.py:156
+#: users/serializers/user.py:157
 msgid "Is wecom bound"
 msgstr "企業の微信をバインドしているかどうか"
 
-#: users/serializers/user.py:157
+#: users/serializers/user.py:158
 msgid "Is dingtalk bound"
 msgstr "ピンをバインドしているかどうか"
 
-#: users/serializers/user.py:158
+#: users/serializers/user.py:159
 msgid "Is feishu bound"
 msgstr "飛本を縛ったかどうか"
 
-#: users/serializers/user.py:159
+#: users/serializers/user.py:160
 msgid "Is OTP bound"
 msgstr "仮想MFAがバインドされているか"
 
-#: users/serializers/user.py:161
+#: users/serializers/user.py:162
 msgid "System role name"
 msgstr "システムロール名"
 
-#: users/serializers/user.py:201
+#: users/serializers/user.py:202
 msgid "User cannot self-update fields: {}"
 msgstr "ユーザーは自分のフィールドを更新できません: {}"
 
-#: users/serializers/user.py:258
+#: users/serializers/user.py:259
 msgid "Select users"
 msgstr "ユーザーの選択"
 
-#: users/serializers/user.py:259
+#: users/serializers/user.py:260
 msgid "For security, only list several users"
 msgstr "セキュリティのために、複数のユーザーのみをリストします"
 
-#: users/serializers/user.py:294
+#: users/serializers/user.py:295
 msgid "name not unique"
 msgstr "名前が一意ではない"
 
