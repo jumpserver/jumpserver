@@ -45,7 +45,7 @@ class SmartEndpointViewMixin:
         # 用来方便测试
         target_ip = request.GET.get('target_ip', '')
         if not target_ip and callable(getattr(instance, 'get_target_ip', None)):
-            target_ip = instance.get_target_ip(request)
+            target_ip = instance.get_target_ip()
         endpoint = EndpointRule.match_endpoint(target_ip, protocol, request)
         return endpoint
 
