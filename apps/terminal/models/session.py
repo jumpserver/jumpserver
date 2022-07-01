@@ -15,7 +15,7 @@ from applications.models import Application
 from users.models import User
 from orgs.mixins.models import OrgModelMixin
 from django.db.models import TextChoices
-from common.utils import get_object_or_none
+from common.utils import get_object_or_none, lazyproperty
 from ..backends import get_multi_command_storage
 
 
@@ -160,6 +160,11 @@ class Session(OrgModelMixin):
             return False
         else:
             return True
+
+    @lazyproperty
+    def terminal_display(self):
+        display = self.terminal.name if self.terminal else ''
+        return display
 
     def save_replay_to_storage_with_version(self, f, version=2):
         suffix = self.SUFFIX_MAP.get(version, '.cast.gz')
