@@ -47,5 +47,5 @@ class SessionCommandSerializer(SimpleSessionCommandSerializer):
 
     def validate_system_user(self, value):
         if len(value) > 64:
-            value = pretty_string(value, 32)
+            value = pretty_string(value, 64)
         return value
