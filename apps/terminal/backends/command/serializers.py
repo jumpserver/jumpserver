@@ -2,6 +2,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
+from common.utils import pretty_string
 from .models import AbstractSessionCommand
 
 __all__ = ['SessionCommandSerializer', 'InsecureCommandAlertSerializer']
@@ -46,5 +47,5 @@ class SessionCommandSerializer(SimpleSessionCommandSerializer):
 
     def validate_system_user(self, value):
         if len(value) > 64:
-            value = value[:32] + value[-32:]
+            value = pretty_string(value, 32)
         return value
