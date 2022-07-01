@@ -3,6 +3,7 @@
 import os
 import tarfile
 
+from django.db.models import F
 from django.shortcuts import get_object_or_404, reverse
 from django.utils.translation import ugettext as _
 from django.utils.encoding import escape_uri_path
@@ -105,6 +106,11 @@ class SessionViewSet(OrgBulkModelViewSet):
         disposition = "attachment; filename*=UTF-8''{}".format(filename)
         response["Content-Disposition"] = disposition
         return response
+
+    def get_queryset(self):
+        queryset = super().get_queryset().prefetch_related('terminal')\
+            .annotate(terminal_display=F('terminal__name'))
+        return queryset
 
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
