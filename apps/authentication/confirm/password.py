@@ -8,7 +8,6 @@ class ConfirmPassword(BaseConfirm):
     name = 'password'
     display_name = _('Password')
 
-    @property
     def check(self):
         return self.user.is_password_authenticate()
 

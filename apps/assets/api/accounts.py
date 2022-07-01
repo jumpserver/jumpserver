@@ -10,6 +10,7 @@ from rbac.permissions import RBACPermission
 from common.drf.filters import BaseFilterSet
 from common.mixins import RecordViewLogMixin
 from common.permissions import UserConfirmation
+from authentication.const import ConfirmType
 from ..tasks.account_connectivity import test_accounts_connectivity_manual
 from ..models import AuthBook, Node
 from .. import serializers
@@ -88,7 +89,7 @@ class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
         'default': serializers.AccountSecretSerializer
     }
     http_method_names = ['get']
-    permission_classes = [RBACPermission, UserConfirmation.require(3)]
+    permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
     rbac_perms = {
         'list': 'assets.view_assetaccountsecret',
         'retrieve': 'assets.view_assetaccountsecret',

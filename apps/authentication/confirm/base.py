@@ -17,7 +17,6 @@ class BaseConfirm(abc.ABC):
     def display_name(self) -> str:
         return ''
 
-    @property
     @abc.abstractmethod
     def check(self) -> bool:
         return False

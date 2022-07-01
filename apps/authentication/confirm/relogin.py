@@ -14,7 +14,6 @@ class ConfirmReLogin(BaseConfirm):
     name = 'relogin'
     display_name = 'Re-Login'
 
-    @property
     def check(self):
         return not self.user.is_password_authenticate()
 
