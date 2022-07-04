@@ -657,6 +657,14 @@ msgstr "資産アカウントの秘密を表示できます"
 msgid "Can change asset account secret"
 msgstr "資産口座の秘密を変更できます"
 
+#: assets/models/authbook.py:33
+msgid "Can view asset history account"
+msgstr "資産履歴アカウントを表示できます"
+
+#: assets/models/authbook.py:34
+msgid "Can view asset history account secret"
+msgstr "資産履歴アカウントパスワードを表示できます"
+
 #: assets/models/backup.py:30 perms/models/base.py:54
 #: settings/serializers/terminal.py:12
 msgid "All"
@@ -1074,6 +1082,7 @@ msgstr ""
 "定してください暗号化パスワード"
 
 #: assets/serializers/account.py:36 assets/serializers/account.py:87
+#: assets/serializers/account_history.py:10
 msgid "System user display"
 msgstr "システムユーザー表示"
 
