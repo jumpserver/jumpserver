@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-04 14:53+0800\n"
+"POT-Creation-Date: 2022-07-04 15:10+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1757,7 +1757,7 @@ msgstr "{ApplicationPermission} 移除 {SystemUser}"
 
 #: authentication/api/confirm.py:33
 msgid "This action require verify your MFA"
-msgstr "此操作需要确认当前用户"
+msgstr "此操作需要验证您的 MFA"
 
 #: authentication/api/connection_token.py:326
 msgid "Invalid token"
@@ -4597,8 +4597,7 @@ msgstr "测试失败: 账号无效"
 msgid "Have online sessions"
 msgstr "有在线会话"
 
-#: terminal/apps.py:9 terminal/serializers/session.py:15
-#: terminal/serializers/session.py:42
+#: terminal/apps.py:9
 msgid "Terminals"
 msgstr "终端管理"
 
@@ -4911,6 +4910,10 @@ msgstr "批量危险命令告警"
 msgid ""
 "If asset IP addresses under different endpoints conflict, use asset labels"
 msgstr "如果不同端点下的资产 IP 有冲突，使用资产标签实现"
+
+#: terminal/serializers/session.py:15 terminal/serializers/session.py:42
+msgid "Terminal display"
+msgstr "终端显示"
 
 #: terminal/serializers/session.py:32
 msgid "User ID"
