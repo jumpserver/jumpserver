@@ -25,5 +25,5 @@ class TicketStatusApi(mixins.AuthMixin, APIView):
         ticket = self.get_ticket()
         if ticket:
             request.session.pop('auth_ticket_id', '')
-            ticket.close(processor=self.get_user_from_session())
+            ticket.close()
         return Response('', status=200)

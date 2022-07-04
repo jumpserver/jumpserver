@@ -12,8 +12,6 @@ from django.db.models import F, Count
 from common.tree import TreeNode
 from .models import Permission, ContentType
 
-DEBUG_DB = os.environ.get('DEBUG_DB', '0') == '1'
-
 # 根节点
 root_node_data = {
     'id': '$ROOT$',
@@ -349,7 +347,7 @@ class PermissionTreeUtil:
 
             # name 要特殊处理，解决 i18n 问题
             name, icon = self._get_permission_name_icon(p, content_types_name_mapper)
-            if DEBUG_DB:
+            if settings.DEBUG_DEV:
                 name += '[{}]'.format(p.app_label_codename)
 
             pid = model_id
@@ -394,9 +392,9 @@ class PermissionTreeUtil:
         }
         node_data['title'] = node_data['id']
         node = TreeNode(**node_data)
-        if DEBUG_DB:
+        if settings.DEBUG_DEV:
             node.name += ('[' + node.id + ']')
-        if DEBUG_DB:
+        if settings.DEBUG_DEV:
             node.name += ('-' + node.id)
         return node
 

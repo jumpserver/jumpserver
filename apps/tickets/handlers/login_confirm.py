@@ -1,14 +1,15 @@
 from django.utils.translation import ugettext as _
+from tickets.models import ApplyLoginTicket
 from .base import BaseHandler
 
 
 class Handler(BaseHandler):
+    ticket: ApplyLoginTicket
 
-    # body
     def _construct_meta_body_of_open(self):
-        apply_login_ip = self.ticket.meta.get('apply_login_ip')
-        apply_login_city = self.ticket.meta.get('apply_login_city')
-        apply_login_datetime = self.ticket.meta.get('apply_login_datetime')
+        apply_login_ip = self.ticket.apply_login_ip
+        apply_login_city = self.ticket.apply_login_city
+        apply_login_datetime = self.ticket.apply_login_datetime
         applied_body = '''
             {}: {}
             {}: {}

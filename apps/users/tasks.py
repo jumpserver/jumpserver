@@ -3,6 +3,7 @@
 
 from celery import shared_task
 from django.conf import settings
+from django.utils import timezone
 
 from users.notifications import PasswordExpirationReminderMsg
 from ops.celery.utils import (
@@ -49,7 +50,11 @@ def check_password_expired_periodic():
 
 @shared_task
 def check_user_expired():
-    users = User.get_nature_users().filter(source=User.Source.local)
+    date_expired_lt = timezone.now() + timezone.timedelta(days=User.DATE_EXPIRED_WARNING_DAYS)
+    users = User.get_nature_users()\
+        .filter(source=User.Source.local)\
+        .filter(date_expired__lt=date_expired_lt)
+
     for user in users:
         if not user.is_valid:
             continue
@@ -57,7 +62,6 @@ def check_user_expired():
             continue
         msg = "The user {} will expires in {} days"
         logger.info(msg.format(user, user.expired_remain_days))
-
         UserExpirationReminderMsg(user).publish_async()
 
 

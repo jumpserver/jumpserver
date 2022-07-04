@@ -17,7 +17,7 @@ class UserFilter(BaseFilterSet):
         model = User
         fields = (
             'id', 'username', 'email', 'name', 'source',
-            'org_roles', 'system_roles',
+            'org_roles', 'system_roles', 'is_active',
         )
 
     @staticmethod

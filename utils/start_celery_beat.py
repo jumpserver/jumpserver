@@ -10,39 +10,29 @@ from redis import Redis
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 APPS_DIR = os.path.join(BASE_DIR, 'apps')
+CERTS_DIR = os.path.join(BASE_DIR, 'data', 'certs')
 
-sys.path.insert(0, BASE_DIR)
-from apps.jumpserver.const import CONFIG
+sys.path.insert(0, APPS_DIR)
+from jumpserver import settings
 
 os.environ.setdefault('PYTHONOPTIMIZE', '1')
 if os.getuid() == 0:
     os.environ.setdefault('C_FORCE_ROOT', '1')
 
-REDIS_SSL_KEYFILE = os.path.join(BASE_DIR, 'data', 'certs', 'redis_client.key')
-if not os.path.exists(REDIS_SSL_KEYFILE):
-    REDIS_SSL_KEYFILE = None
-
-REDIS_SSL_CERTFILE = os.path.join(BASE_DIR, 'data', 'certs', 'redis_client.crt')
-if not os.path.exists(REDIS_SSL_CERTFILE):
-    REDIS_SSL_CERTFILE = None
-
-REDIS_SSL_CA_CERTS = os.path.join(BASE_DIR, 'data', 'certs', 'redis_ca.crt')
-if not os.path.exists(REDIS_SSL_CA_CERTS):
-    REDIS_SSL_CA_CERTS = os.path.join(BASE_DIR, 'data', 'certs', 'redis_ca.pem')
-
 params = {
-    'host': CONFIG.REDIS_HOST,
-    'port': CONFIG.REDIS_PORT,
-    'password': CONFIG.REDIS_PASSWORD,
-    "ssl": CONFIG.REDIS_USE_SSL,
-    'ssl_cert_reqs': CONFIG.REDIS_SSL_REQUIRED,
-    "ssl_keyfile": REDIS_SSL_KEYFILE,
-    "ssl_certfile": REDIS_SSL_CERTFILE,
-    "ssl_ca_certs": REDIS_SSL_CA_CERTS
+    'host': settings.REDIS_HOST,
+    'port': settings.REDIS_PORT,
+    'password': settings.REDIS_PASSWORD,
+    'ssl': settings.REDIS_USE_SSL,
+    'ssl_cert_reqs': settings.REDIS_SSL_REQUIRED,
+    'ssl_keyfile': settings.REDIS_SSL_KEY,
+    'ssl_certfile': settings.REDIS_SSL_CERT,
+    'ssl_ca_certs': settings.REDIS_SSL_CA
 }
+print("Pamras: ", params)
 redis = Redis(**params)
 scheduler = "django_celery_beat.schedulers:DatabaseScheduler"
-
+processes = []
 cmd = [
     'celery',
     '-A', 'ops',
@@ -51,8 +41,6 @@ cmd = [
     '--scheduler', scheduler,
     '--max-interval', '60'
 ]
-
-processes = []
 
 
 def stop_beat_process(sig, frame):

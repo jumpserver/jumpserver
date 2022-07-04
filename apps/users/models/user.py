@@ -721,6 +721,8 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     dingtalk_id = models.CharField(null=True, default=None, unique=True, max_length=128, verbose_name=_('DingTalk'))
     feishu_id = models.CharField(null=True, default=None, unique=True, max_length=128, verbose_name=_('FeiShu'))
 
+    DATE_EXPIRED_WARNING_DAYS = 5
+
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
 
@@ -776,7 +778,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
 
     @property
     def will_expired(self):
-        if 0 <= self.expired_remain_days < 5:
+        if 0 <= self.expired_remain_days <= self.DATE_EXPIRED_WARNING_DAYS:
             return True
         else:
             return False

@@ -3,6 +3,8 @@ import datetime
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from orgs.utils import tmp_to_root_org
+from users.models import User
 
 from common.mixins import CommonModelMixin
 from orgs.mixins.models import OrgModelMixin
@@ -28,6 +30,7 @@ class SessionSharing(CommonModelMixin, OrgModelMixin):
     expired_time = models.IntegerField(
         default=0, verbose_name=_('Expired time (min)'), db_index=True
     )
+    users = models.TextField(blank=True, verbose_name=_("User"))
 
     class Meta:
         ordering = ('-date_created', )
@@ -39,6 +42,13 @@ class SessionSharing(CommonModelMixin, OrgModelMixin):
     def __str__(self):
         return 'Creator: {}'.format(self.creator)
 
+    def users_display(self):
+        with tmp_to_root_org():
+            user_ids = self.users.split(',')
+            users = User.objects.filter(id__in=user_ids)
+            users = [str(user) for user in users]
+        return users
+
     @property
     def date_expired(self):
         return self.date_created + datetime.timedelta(minutes=self.expired_time)
@@ -49,11 +59,13 @@ class SessionSharing(CommonModelMixin, OrgModelMixin):
             return False
         return True
 
-    def can_join(self):
+    def can_join(self, joiner):
         if not self.is_active:
             return False, _('Link not active')
         if not self.is_expired:
             return False, _('Link expired')
+        if self.users and str(joiner.id) not in self.users.split(','):
+            return False, _('User not allowed to join')
         return True, ''
 
 
@@ -110,7 +122,7 @@ class SessionJoinRecord(CommonModelMixin, OrgModelMixin):
 
     def can_join(self):
         # sharing
-        sharing_can_join, reason = self.sharing.can_join()
+        sharing_can_join, reason = self.sharing.can_join(self.joiner)
         if not sharing_can_join:
             return False, reason
         # self

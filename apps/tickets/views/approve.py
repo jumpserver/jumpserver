@@ -7,17 +7,31 @@ from django.shortcuts import redirect, reverse
 from django.core.cache import cache
 from django.utils.translation import ugettext as _
 
-from tickets.models import Ticket
+from orgs.utils import tmp_to_root_org
+from tickets.models import (
+    Ticket, ApplyAssetTicket, ApplyApplicationTicket,
+    ApplyLoginTicket, ApplyLoginAssetTicket, ApplyCommandTicket
+)
+from tickets.const import TicketType
 from tickets.errors import AlreadyClosed
 from common.utils import get_logger, FlashMessageUtil
 
 logger = get_logger(__name__)
+
 __all__ = ['TicketDirectApproveView']
 
 
 class TicketDirectApproveView(TemplateView):
     template_name = 'tickets/approve_check_password.html'
     redirect_field_name = 'next'
+
+    TICKET_SUB_MODEL_MAP = {
+        TicketType.apply_asset: ApplyAssetTicket,
+        TicketType.apply_application: ApplyApplicationTicket,
+        TicketType.login_confirm: ApplyLoginTicket,
+        TicketType.login_asset_confirm: ApplyLoginAssetTicket,
+        TicketType.command_confirm: ApplyCommandTicket,
+    }
 
     @property
     def message_data(self):
@@ -50,13 +64,13 @@ class TicketDirectApproveView(TemplateView):
     def get_context_data(self, **kwargs):
         # 放入工单信息
         token = kwargs.get('token')
-        ticket_info = cache.get(token, {}).get('body', '')
+        content = cache.get(token, {}).get('content', [])
         if self.request.user.is_authenticated:
             prompt_msg = _('Click the button below to approve or reject')
         else:
             prompt_msg = _('After successful authentication, this ticket can be approved directly')
         kwargs.update({
-            'ticket_info': ticket_info, 'prompt_msg': prompt_msg,
+            'content': content, 'prompt_msg': prompt_msg,
             'login_url': '%s&next=%s' % (
                 self.login_url,
                 reverse('tickets:direct-approve', kwargs={'token': token})
@@ -84,7 +98,10 @@ class TicketDirectApproveView(TemplateView):
             return self.redirect_message_response(redirect_url=self.login_url)
         try:
             ticket_id = ticket_info.get('ticket_id')
-            ticket = Ticket.all().get(id=ticket_id)
+            with tmp_to_root_org():
+                ticket = Ticket.all().get(id=ticket_id)
+                ticket_sub_model = self.TICKET_SUB_MODEL_MAP[ticket.type]
+                ticket = ticket_sub_model.objects.get(id=ticket_id)
             if not ticket.has_current_assignee(user):
                 raise Exception(_("This user is not authorized to approve this ticket"))
             getattr(ticket, action)(user)

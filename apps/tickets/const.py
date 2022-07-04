@@ -14,20 +14,29 @@ class TicketType(TextChoices):
 
 
 class TicketState(TextChoices):
-    open = 'open', _('Open')
+    pending = 'pending', _('Open')
     approved = 'approved', _('Approved')
     rejected = 'rejected', _('Rejected')
-    closed = 'closed', _('Closed')
-
-
-class ProcessStatus(TextChoices):
-    notified = 'notified', _('Notified')
-    approved = 'approved', _('Approved')
-    rejected = 'rejected', _('Rejected')
+    closed = 'closed', _("Cancel")
+    reopen = 'reopen', _("Reopen")
 
 
 class TicketStatus(TextChoices):
     open = 'open', _("Open")
+    closed = 'closed', _("Finished")
+
+
+class StepState(TextChoices):
+    pending = 'pending', _('Pending')
+    approved = 'approved', _('Approved')
+    rejected = 'rejected', _('Rejected')
+    closed = 'closed', _("Closed")
+    reopen = 'reopen', _("Reopen")
+
+
+class StepStatus(TextChoices):
+    pending = 'pending', _('Pending')
+    active = 'active', _('Active')
     closed = 'closed', _("Closed")
 
 
@@ -38,7 +47,7 @@ class TicketAction(TextChoices):
     reject = 'reject', _('Reject')
 
 
-class TicketApprovalLevel(IntegerChoices):
+class TicketLevel(IntegerChoices):
     one = 1, _("One level")
     two = 2, _("Two level")
 

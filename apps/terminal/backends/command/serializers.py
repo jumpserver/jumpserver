@@ -2,6 +2,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
+from common.utils import pretty_string
 from .models import AbstractSessionCommand
 
 __all__ = ['SessionCommandSerializer', 'InsecureCommandAlertSerializer']
@@ -32,7 +33,7 @@ class SessionCommandSerializer(SimpleSessionCommandSerializer):
     """使用这个类作为基础Command Log Serializer类, 用来序列化"""
 
     id = serializers.UUIDField(read_only=True)
-    system_user = serializers.CharField(max_length=64, label=_("System user"))
+    system_user = serializers.CharField(label=_("System user"))  # 限制 64 字符，不能直接迁移成 128 字符，命令表数据量会比较大
     output = serializers.CharField(max_length=2048, allow_blank=True, label=_("Output"))
     risk_level_display = serializers.SerializerMethodField(label=_('Risk level display'))
     timestamp = serializers.IntegerField(label=_('Timestamp'))
@@ -43,3 +44,8 @@ class SessionCommandSerializer(SimpleSessionCommandSerializer):
     def get_risk_level_display(obj):
         risk_mapper = dict(AbstractSessionCommand.RISK_LEVEL_CHOICES)
         return risk_mapper.get(obj.risk_level)
+
+    def validate_system_user(self, value):
+        if len(value) > 64:
+            value = pretty_string(value, 64)
+        return value
