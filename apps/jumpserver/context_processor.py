@@ -15,12 +15,14 @@ default_context = {
     'LOGIN_DINGTALK_LOGO_URL': static('img/login_dingtalk_logo.png'),
     'LOGIN_FEISHU_LOGO_URL': static('img/login_feishu_logo.png'),
     'JMS_TITLE': _('JumpServer Open Source Bastion Host'),
+    'PRIMARY_COLOR': '#1ab394',
 }
 
-if settings.THEME != 'default':
+if settings.THEME == 'chinese_red':
     default_context.update({
         'LOGO_URL': static('img/logo_white.png'),
         'LOGO_TEXT_URL': static('img/logo_text_white.png'),
+        'PRIMARY_COLOR': '#bd1a2d',
     })
 
 default_interface = {

@@ -22,10 +22,5 @@
 </style>
 
 <script>
-  const theme = "{{ THEME }}"
-  let primaryColor = "#1ab394"
-  if (theme === "original") {
-    primaryColor = '#bd1a2d'
-  }
-  document.documentElement.style.setProperty('--primary-color', primaryColor)
+  document.documentElement.style.setProperty('--primary-color', "{{ PRIMARY_COLOR }}");
 </script>
