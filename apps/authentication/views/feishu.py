@@ -8,16 +8,17 @@ from django.db.utils import IntegrityError
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.exceptions import APIException
 
-from users.permissions import IsAuthConfirmTimeValid
-from users.views import UserVerifyPasswordView
 from users.models import User
+from users.views import UserVerifyPasswordView
 from common.utils import get_logger, FlashMessageUtil
 from common.utils.random import random_string
 from common.utils.django import reverse, get_object_or_none
-from common.mixins.views import PermissionsMixin
+from common.mixins.views import UserConfirmRequiredExceptionMixin, PermissionsMixin
+from common.permissions import UserConfirmation
 from common.sdk.im.feishu import FeiShu, URL
 from common.utils.common import get_request_ip
 from authentication import errors
+from authentication.const import ConfirmType
 from authentication.mixins import AuthMixin
 from authentication.notifications import OAuthBindMessage
 
@@ -27,7 +28,7 @@ logger = get_logger(__file__)
 FEISHU_STATE_SESSION_KEY = '_feishu_state'
 
 
-class FeiShuQRMixin(PermissionsMixin, View):
+class FeiShuQRMixin(UserConfirmRequiredExceptionMixin, PermissionsMixin, View):
     def dispatch(self, request, *args, **kwargs):
         try:
             return super().dispatch(request, *args, **kwargs)
@@ -89,7 +90,7 @@ class FeiShuQRMixin(PermissionsMixin, View):
 
 
 class FeiShuQRBindView(FeiShuQRMixin, View):
-    permission_classes = (IsAuthenticated, IsAuthConfirmTimeValid)
+    permission_classes = (IsAuthenticated, UserConfirmation.require(ConfirmType.ReLogin))
 
     def get(self, request: HttpRequest):
         user = request.user

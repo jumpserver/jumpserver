@@ -1754,29 +1754,13 @@ msgstr "{ApplicationPermission} 添加 {SystemUser}"
 msgid "{ApplicationPermission} REMOVE {SystemUser}"
 msgstr "{ApplicationPermission} 移除 {SystemUser}"
 
-#: authentication/api/confirm.py:40
-msgid "Authentication failed password incorrect"
-msgstr "认证失败 (用户名或密码不正确)"
-
-#: authentication/api/confirm.py:48
-msgid "Login time has exceeded {} minutes, please login again"
-msgstr "登录时长已超过 {} 分钟，请重新登录"
-
-#: authentication/api/confirm.py:72 common/exceptions.py:47
-msgid "This action require verify your MFA"
-msgstr "这个操作需要验证 MFA"
-
 #: authentication/api/connection_token.py:326
 msgid "Invalid token"
 msgstr "无效的令牌"
 
-#: authentication/api/mfa.py:64
+#: authentication/api/mfa.py:59
 msgid "Current user not support mfa type: {}"
 msgstr "当前用户不支持 MFA 类型: {}"
-
-#: authentication/api/mfa.py:111
-msgid "Code is invalid, {}"
-msgstr "验证码无效: {}"
 
 #: authentication/apps.py:7
 msgid "Authentication"
@@ -1833,6 +1817,15 @@ msgstr "无效的令牌头。符号字符串不应包含无效字符。"
 msgid "Invalid token or cache refreshed."
 msgstr "刷新的令牌或缓存无效。"
 
+#: authentication/confirm/password.py:17
+msgid "Authentication failed password incorrect"
+msgstr "认证失败 (用户名或密码不正确)"
+
+#: authentication/confirm/relogin.py:10
+msgid "Login time has exceeded {} minutes, please login again"
+msgstr "登录时长已超过 {} 分钟，请重新登录"
+
+#: authentication/errors.py:26
 #: authentication/errors/const.py:18
 msgid "Username/password check failed"
 msgstr "用户名/密码 校验失败"
@@ -2561,7 +2554,11 @@ msgstr "多对多反向是不被允许的"
 msgid "Is referenced by other objects and cannot be deleted"
 msgstr "被其他对象关联，不能删除"
 
-#: common/exceptions.py:53
+#: common/exceptions.py:46
+msgid "This action require confirm current user"
+msgstr "此操作需要确认当前用户"
+
+#: common/exceptions.py:52
 msgid "Unexpect error occur"
 msgstr "发生意外错误"
 
@@ -6653,3 +6650,6 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Code is invalid, {}"
+#~ msgstr "验证码无效: {}"

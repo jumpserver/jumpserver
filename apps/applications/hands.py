@@ -11,5 +11,4 @@
 """
 
 
-from common.permissions import NeedMFAVerify
 from users.models import User, UserGroup

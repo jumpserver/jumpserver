@@ -4,9 +4,8 @@ from rest_framework import serializers
 
 from common.drf.fields import EncryptedField
 
-
 __all__ = [
-    'OtpVerifySerializer', 'MFAChallengeSerializer', 'MFASelectTypeSerializer',
+    'MFAChallengeSerializer', 'MFASelectTypeSerializer',
     'PasswordVerifySerializer',
 ]
 
@@ -29,7 +28,3 @@ class MFAChallengeSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         pass
-
-
-class OtpVerifySerializer(serializers.Serializer):
-    code = serializers.CharField(max_length=6, min_length=6)
