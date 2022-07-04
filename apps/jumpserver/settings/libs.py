@@ -20,7 +20,6 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'common.drf.renders.CSVFileRenderer',
         'common.drf.renders.ExcelFileRenderer',
-
     ),
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',
