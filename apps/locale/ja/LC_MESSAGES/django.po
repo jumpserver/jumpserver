@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-04 14:53+0800\n"
+"POT-Creation-Date: 2022-07-04 15:10+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1769,7 +1769,7 @@ msgstr "{ApplicationPermission} 削除 {SystemUser}"
 
 #: authentication/api/confirm.py:33
 msgid "This action require verify your MFA"
-msgstr "このアクションでは、MFAの確認が必要です。"
+msgstr "この操作には、MFAを検証する必要があります"
 
 #: authentication/api/connection_token.py:326
 msgid "Invalid token"
@@ -4669,8 +4669,7 @@ msgstr "テスト失敗: アカウントが無効"
 msgid "Have online sessions"
 msgstr "オンラインセッションを持つ"
 
-#: terminal/apps.py:9 terminal/serializers/session.py:15
-#: terminal/serializers/session.py:42
+#: terminal/apps.py:9
 msgid "Terminals"
 msgstr "ターミナル管理"
 
@@ -4985,6 +4984,10 @@ msgid ""
 msgstr ""
 "異なるエンドポイントの下に競合するアセットIPがある場合は、アセットタグを使用"
 "して実装します"
+
+#: terminal/serializers/session.py:15 terminal/serializers/session.py:42
+msgid "Terminal display"
+msgstr "ターミナルディスプレイ"
 
 #: terminal/serializers/session.py:32
 msgid "User ID"

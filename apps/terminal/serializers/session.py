@@ -12,7 +12,7 @@ __all__ = [
 
 class SessionSerializer(BulkOrgResourceModelSerializer):
     org_id = serializers.CharField(allow_blank=True)
-    terminal_display = serializers.CharField(read_only=True, label=_('Terminals'))
+    terminal_display = serializers.CharField(read_only=True, label=_('Terminal display'))
 
     class Meta:
         model = Session
@@ -39,7 +39,7 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
             'terminal': {'label': _('Terminal')},
             'is_finished': {'label': _('Is finished')},
             'can_terminate': {'label': _('Can terminate')},
-            'terminal_display': {'label': _('Terminals')},
+            'terminal_display': {'label': _('Terminal display')},
         }
 
 
