@@ -413,6 +413,8 @@ class Config(dict):
         'FORGOT_PASSWORD_URL': '',
         'HEALTH_CHECK_TOKEN': '',
 
+        # Theme
+        'THEME': 'default',
     }
 
     @staticmethod

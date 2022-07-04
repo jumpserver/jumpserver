@@ -10,6 +10,11 @@
     {% include '_head_css_js.html' %}
     <link href="{% static 'css/jumpserver.css' %}" rel="stylesheet">
     {% block custom_head_css_js %} {% endblock %}
+    <style>
+        :root {
+            --primary-color: var(--primary-color);
+        }
+    </style>
 </head>
 <body>
 <div id="wrapper">
@@ -47,5 +52,6 @@ $(document).ready(function () {
     var pathKey = getMessagePathKey();
     window.localStorage.setItem(pathKey, '1')
 })
+
 </script>
 </html>

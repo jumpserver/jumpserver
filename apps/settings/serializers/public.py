@@ -7,6 +7,7 @@ __all__ = ['PublicSettingSerializer', 'PrivateSettingSerializer']
 
 
 class PublicSettingSerializer(serializers.Serializer):
+    THEME = serializers.CharField(max_length=32, default='default')
     XPACK_ENABLED = serializers.BooleanField()
     LOGIN_TITLE = serializers.CharField()
     LOGO_URLS = serializers.DictField()
@@ -41,5 +42,5 @@ class PrivateSettingSerializer(PublicSettingSerializer):
 
     ANNOUNCEMENT_ENABLED = serializers.BooleanField()
     ANNOUNCEMENT = serializers.DictField()
-    
+
     TICKETS_ENABLED = serializers.BooleanField()

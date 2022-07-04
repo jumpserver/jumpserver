@@ -17,6 +17,12 @@ default_context = {
     'JMS_TITLE': _('JumpServer Open Source Bastion Host'),
 }
 
+if settings.THEME != 'default':
+    default_context.update({
+        'LOGO_URL': static('img/logo_white.png'),
+        'LOGO_TEXT_URL': static('img/logo_text_white.png'),
+    })
+
 default_interface = {
     'login_title': default_context['JMS_TITLE'],
     'logo_logout': default_context['LOGO_URL'],
@@ -36,6 +42,7 @@ def jumpserver_processor(request):
         'SECURITY_MFA_VERIFY_TTL': settings.SECURITY_MFA_VERIFY_TTL,
         'FORCE_SCRIPT_NAME': settings.FORCE_SCRIPT_NAME,
         'SECURITY_VIEW_AUTH_NEED_MFA': settings.SECURITY_VIEW_AUTH_NEED_MFA,
+        'THEME': settings.THEME,
     })
     return context
 

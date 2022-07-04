@@ -15,5 +15,17 @@
 <script src="{% static 'js/plugins/datatables/datatables.min.js' %}"></script>
 <script src="{% url 'javascript-catalog' %}"></script>
 <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+<style>
+    :root {
+        --primary-color: #1ab394;
+    }
+</style>
 
-
+<script>
+  const theme = "{{ THEME }}"
+  let primaryColor = "#1ab394"
+  if (theme === "original") {
+    primaryColor = '#bd1a2d'
+  }
+  document.documentElement.style.setProperty('--primary-color', primaryColor)
+</script>

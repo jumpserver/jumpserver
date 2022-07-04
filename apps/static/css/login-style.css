@@ -272,14 +272,14 @@ fieldset[disabled] .btn-login.active {
 
 .btn-transparent {
     color: #fff;
-    border: 1px solid #1ab394;
+    border: 1px solid var(--primary-color);
     display: inline-block;
     font-size: 13px;
     letter-spacing: 1px;
     padding: 10px 30px;
     text-transform: uppercase;
     border-radius: 5px;
-    background: #259980;
+    background: var(--primary-color);
     width: 100%;
 }
 
