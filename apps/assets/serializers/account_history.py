@@ -13,7 +13,8 @@ class AccountHistorySerializer(AccountSerializer):
         model = AuthBook.history.model
         fields = AccountSerializer.Meta.fields_mini + \
                  AccountSerializer.Meta.fields_write_only + \
-                 AccountSerializer.Meta.fields_fk + ['history_id']
+                 AccountSerializer.Meta.fields_fk + \
+                 ['history_id', 'date_created', 'date_updated']
         read_only_fields = fields
         ref_name = 'AccountHistorySerializer'
 

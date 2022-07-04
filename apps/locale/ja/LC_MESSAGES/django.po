@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-01 19:05+0800\n"
+"POT-Creation-Date: 2022-07-04 15:10+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -91,7 +91,7 @@ msgstr "ログイン確認"
 #: authentication/models.py:51 orgs/models.py:214 perms/models/base.py:84
 #: rbac/builtin.py:118 rbac/models/rolebinding.py:41
 #: terminal/backends/command/models.py:20
-#: terminal/backends/command/serializers.py:12 terminal/models/session.py:44
+#: terminal/backends/command/serializers.py:13 terminal/models/session.py:44
 #: terminal/models/sharing.py:33 terminal/notifications.py:91
 #: terminal/notifications.py:139 tickets/models/comment.py:21 users/const.py:14
 #: users/models/user.py:890 users/models/user.py:921
@@ -132,7 +132,7 @@ msgstr "システムユーザー"
 #: assets/models/gathered_user.py:14 assets/serializers/label.py:30
 #: assets/serializers/system_user.py:268 audits/models.py:39
 #: perms/models/asset_permission.py:23 terminal/backends/command/models.py:21
-#: terminal/backends/command/serializers.py:13 terminal/models/session.py:46
+#: terminal/backends/command/serializers.py:14 terminal/models/session.py:46
 #: terminal/notifications.py:90
 #: xpack/plugins/change_auth_plan/models/asset.py:199
 #: xpack/plugins/change_auth_plan/serializers/asset.py:181
@@ -204,7 +204,7 @@ msgstr ""
 
 #: acls/serializers/login_asset_acl.py:55 assets/models/asset.py:213
 #: assets/models/domain.py:62 assets/models/user.py:252
-#: terminal/serializers/session.py:30 terminal/serializers/storage.py:68
+#: terminal/serializers/session.py:31 terminal/serializers/storage.py:68
 msgid "Protocol"
 msgstr "プロトコル"
 
@@ -269,7 +269,7 @@ msgstr "アプリケーション"
 #: assets/models/cmd_filter.py:42 assets/models/user.py:342 audits/models.py:40
 #: perms/models/application_permission.py:33
 #: perms/models/asset_permission.py:25 terminal/backends/command/models.py:22
-#: terminal/backends/command/serializers.py:35 terminal/models/session.py:48
+#: terminal/backends/command/serializers.py:36 terminal/models/session.py:48
 #: xpack/plugins/change_auth_plan/models/app.py:36
 #: xpack/plugins/change_auth_plan/models/app.py:147
 #: xpack/plugins/change_auth_plan/serializers/app.py:65
@@ -731,7 +731,7 @@ msgstr "理由"
 
 #: assets/models/backup.py:121 audits/serializers.py:82
 #: audits/serializers.py:97 ops/models/adhoc.py:260
-#: terminal/serializers/session.py:35
+#: terminal/serializers/session.py:36
 #: xpack/plugins/change_auth_plan/models/base.py:202
 #: xpack/plugins/change_auth_plan/serializers/app.py:67
 #: xpack/plugins/change_auth_plan/serializers/asset.py:182
@@ -769,7 +769,8 @@ msgstr "確認済みの日付"
 
 #: assets/models/base.py:177 assets/serializers/base.py:15
 #: assets/serializers/base.py:37 assets/serializers/system_user.py:29
-#: audits/signal_handlers.py:50 authentication/forms.py:32
+#: audits/signal_handlers.py:50 authentication/confirm/password.py:9
+#: authentication/forms.py:32
 #: authentication/templates/authentication/login.html:228
 #: settings/serializers/auth/ldap.py:25 settings/serializers/auth/ldap.py:46
 #: users/forms/profile.py:22 users/serializers/user.py:92
@@ -853,7 +854,7 @@ msgid "Regex"
 msgstr "正規情報"
 
 #: assets/models/cmd_filter.py:68 ops/models/command.py:26
-#: terminal/backends/command/serializers.py:14 terminal/models/session.py:55
+#: terminal/backends/command/serializers.py:15 terminal/models/session.py:55
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
 msgid "Command"
@@ -1467,7 +1468,7 @@ msgid "Resource"
 msgstr "リソース"
 
 #: audits/models.py:67 audits/models.py:90
-#: terminal/backends/command/serializers.py:39
+#: terminal/backends/command/serializers.py:40
 msgid "Datetime"
 msgstr "時間"
 
@@ -1592,7 +1593,7 @@ msgid "Auth Token"
 msgstr "認証トークン"
 
 #: audits/signal_handlers.py:53 authentication/notifications.py:73
-#: authentication/views/login.py:67 authentication/views/wecom.py:177
+#: authentication/views/login.py:67 authentication/views/wecom.py:178
 #: notifications/backends/__init__.py:11 users/models/user.py:720
 msgid "WeCom"
 msgstr "企業微信"
@@ -1775,29 +1776,17 @@ msgstr "{ApplicationPermission} 追加 {SystemUser}"
 msgid "{ApplicationPermission} REMOVE {SystemUser}"
 msgstr "{ApplicationPermission} 削除 {SystemUser}"
 
-#: authentication/api/confirm.py:40
-msgid "Authentication failed password incorrect"
-msgstr "認証に失敗しました (ユーザー名またはパスワードが正しくありません)"
-
-#: authentication/api/confirm.py:48
-msgid "Login time has exceeded {} minutes, please login again"
-msgstr "ログイン時間が {} 分を超えました。もう一度ログインしてください"
-
-#: authentication/api/confirm.py:72 common/exceptions.py:47
+#: authentication/api/confirm.py:33
 msgid "This action require verify your MFA"
-msgstr "このアクションでは、MFAの確認が必要です。"
+msgstr "この操作には、MFAを検証する必要があります"
 
 #: authentication/api/connection_token.py:326
 msgid "Invalid token"
 msgstr "無効なトークン"
 
-#: authentication/api/mfa.py:64
+#: authentication/api/mfa.py:59
 msgid "Current user not support mfa type: {}"
 msgstr "現在のユーザーはmfaタイプをサポートしていません: {}"
-
-#: authentication/api/mfa.py:111
-msgid "Code is invalid, {}"
-msgstr "コードが無効です。{}"
 
 #: authentication/apps.py:7
 msgid "Authentication"
@@ -1855,6 +1844,14 @@ msgstr ""
 #: authentication/backends/drf.py:148
 msgid "Invalid token or cache refreshed."
 msgstr "無効なトークンまたはキャッシュの更新。"
+
+#: authentication/confirm/password.py:16
+msgid "Authentication failed password incorrect"
+msgstr "認証に失敗しました (ユーザー名またはパスワードが正しくありません)"
+
+#: authentication/confirm/relogin.py:10
+msgid "Login time has exceeded {} minutes, please login again"
+msgstr "ログイン時間が {} 分を超えました。もう一度ログインしてください"
 
 #: authentication/errors/const.py:18
 msgid "Username/password check failed"
@@ -2378,8 +2375,8 @@ msgstr "DingTalkエラー、システム管理者に連絡してください"
 msgid "DingTalk Error"
 msgstr "DingTalkエラー"
 
-#: authentication/views/dingtalk.py:56 authentication/views/feishu.py:50
-#: authentication/views/wecom.py:55
+#: authentication/views/dingtalk.py:56 authentication/views/feishu.py:51
+#: authentication/views/wecom.py:56
 msgid ""
 "The system configuration is incorrect. Please contact your administrator"
 msgstr "システム設定が正しくありません。管理者に連絡してください"
@@ -2388,7 +2385,7 @@ msgstr "システム設定が正しくありません。管理者に連絡して
 msgid "DingTalk is already bound"
 msgstr "DingTalkはすでにバインドされています"
 
-#: authentication/views/dingtalk.py:148 authentication/views/wecom.py:147
+#: authentication/views/dingtalk.py:148 authentication/views/wecom.py:148
 msgid "Invalid user_id"
 msgstr "無効なuser_id"
 
@@ -2416,40 +2413,40 @@ msgstr "DingTalkはバインドされていません"
 msgid "Please login with a password and then bind the DingTalk"
 msgstr "パスワードでログインし、DingTalkをバインドしてください"
 
-#: authentication/views/feishu.py:38
+#: authentication/views/feishu.py:39
 msgid "FeiShu Error"
 msgstr "FeiShuエラー"
 
-#: authentication/views/feishu.py:86
+#: authentication/views/feishu.py:87
 msgid "FeiShu is already bound"
 msgstr "FeiShuはすでにバインドされています"
 
-#: authentication/views/feishu.py:128
+#: authentication/views/feishu.py:129
 msgid "FeiShu query user failed"
 msgstr "FeiShuクエリユーザーが失敗しました"
 
-#: authentication/views/feishu.py:137
+#: authentication/views/feishu.py:138
 msgid "The FeiShu is already bound to another user"
 msgstr "FeiShuはすでに別のユーザーにバインドされています"
 
-#: authentication/views/feishu.py:143 authentication/views/login.py:79
+#: authentication/views/feishu.py:144 authentication/views/login.py:79
 #: notifications/backends/__init__.py:14 users/models/user.py:722
 msgid "FeiShu"
 msgstr "本を飛ばす"
 
-#: authentication/views/feishu.py:144
+#: authentication/views/feishu.py:145
 msgid "Binding FeiShu successfully"
 msgstr "本を飛ばすのバインドに成功"
 
-#: authentication/views/feishu.py:196
+#: authentication/views/feishu.py:197
 msgid "Failed to get user from FeiShu"
 msgstr "本を飛ばすからユーザーを取得できませんでした"
 
-#: authentication/views/feishu.py:202
+#: authentication/views/feishu.py:203
 msgid "FeiShu is not bound"
 msgstr "本を飛ばすは拘束されていません"
 
-#: authentication/views/feishu.py:203
+#: authentication/views/feishu.py:204
 msgid "Please login with a password and then bind the FeiShu"
 msgstr "パスワードでログインしてから本を飛ばすをバインドしてください"
 
@@ -2485,39 +2482,39 @@ msgstr "ログアウト成功"
 msgid "Logout success, return login page"
 msgstr "ログアウト成功、ログインページを返す"
 
-#: authentication/views/wecom.py:40
+#: authentication/views/wecom.py:41
 msgid "WeCom Error, Please contact your system administrator"
 msgstr "企業微信エラー、システム管理者に連絡してください"
 
-#: authentication/views/wecom.py:43
+#: authentication/views/wecom.py:44
 msgid "WeCom Error"
 msgstr "企業微信エラー"
 
-#: authentication/views/wecom.py:79
+#: authentication/views/wecom.py:80
 msgid "WeCom is already bound"
 msgstr "企業の微信はすでにバインドされています"
 
-#: authentication/views/wecom.py:162
+#: authentication/views/wecom.py:163
 msgid "WeCom query user failed"
 msgstr "企業微信ユーザーの問合せに失敗しました"
 
-#: authentication/views/wecom.py:171
+#: authentication/views/wecom.py:172
 msgid "The WeCom is already bound to another user"
 msgstr "この企業の微信はすでに他のユーザーをバインドしている。"
 
-#: authentication/views/wecom.py:178
+#: authentication/views/wecom.py:179
 msgid "Binding WeCom successfully"
 msgstr "企業の微信のバインドに成功"
 
-#: authentication/views/wecom.py:230 authentication/views/wecom.py:284
+#: authentication/views/wecom.py:231 authentication/views/wecom.py:285
 msgid "Failed to get user from WeCom"
 msgstr "企業の微信からユーザーを取得できませんでした"
 
-#: authentication/views/wecom.py:236 authentication/views/wecom.py:290
+#: authentication/views/wecom.py:237 authentication/views/wecom.py:291
 msgid "WeCom is not bound"
 msgstr "企業の微信をバインドしていません"
 
-#: authentication/views/wecom.py:237 authentication/views/wecom.py:291
+#: authentication/views/wecom.py:238 authentication/views/wecom.py:292
 msgid "Please login with a password and then bind the WeCom"
 msgstr "パスワードでログインしてからWeComをバインドしてください"
 
@@ -2600,7 +2597,11 @@ msgstr "M2Mリバースは許可されません"
 msgid "Is referenced by other objects and cannot be deleted"
 msgstr "他のオブジェクトによって参照され、削除できません。"
 
-#: common/exceptions.py:53
+#: common/exceptions.py:48
+msgid "This action require confirm current user"
+msgstr "このアクションでは、MFAの確認が必要です。"
+
+#: common/exceptions.py:56
 msgid "Unexpect error occur"
 msgstr "予期しないエラーが発生します"
 
@@ -2616,15 +2617,15 @@ msgstr "は破棄されます"
 msgid "discard time"
 msgstr "時間を捨てる"
 
-#: common/mixins/views.py:42
+#: common/mixins/views.py:52
 msgid "Export all"
 msgstr "すべてエクスポート"
 
-#: common/mixins/views.py:44
+#: common/mixins/views.py:54
 msgid "Export only selected items"
 msgstr "選択項目のみエクスポート"
 
-#: common/mixins/views.py:49
+#: common/mixins/views.py:59
 #, python-format
 msgid "Export filtered: %s"
 msgstr "検索のエクスポート: %s"
@@ -2853,7 +2854,7 @@ msgid "End time"
 msgstr "終了時間"
 
 #: ops/models/adhoc.py:259 ops/models/command.py:29
-#: terminal/serializers/session.py:39
+#: terminal/serializers/session.py:40
 msgid "Is finished"
 msgstr "終了しました"
 
@@ -4625,19 +4626,19 @@ msgstr "フィルター"
 msgid "Not found protocol query params"
 msgstr "プロトコルクエリパラメータが見つかりません"
 
-#: terminal/api/session.py:210
+#: terminal/api/session.py:216
 msgid "Session does not exist: {}"
 msgstr "セッションが存在しません: {}"
 
-#: terminal/api/session.py:213
+#: terminal/api/session.py:219
 msgid "Session is finished or the protocol not supported"
 msgstr "セッションが終了したか、プロトコルがサポートされていません"
 
-#: terminal/api/session.py:218
+#: terminal/api/session.py:224
 msgid "User does not exist: {}"
 msgstr "ユーザーが存在しない: {}"
 
-#: terminal/api/session.py:226
+#: terminal/api/session.py:232
 msgid "User does not have permission"
 msgstr "ユーザーに権限がありません"
 
@@ -4702,7 +4703,7 @@ msgid "Input"
 msgstr "入力"
 
 #: terminal/backends/command/models.py:24
-#: terminal/backends/command/serializers.py:36
+#: terminal/backends/command/serializers.py:37
 msgid "Output"
 msgstr "出力"
 
@@ -4714,23 +4715,23 @@ msgid "Session"
 msgstr "セッション"
 
 #: terminal/backends/command/models.py:26
-#: terminal/backends/command/serializers.py:17
+#: terminal/backends/command/serializers.py:18
 msgid "Risk level"
 msgstr "リスクレベル"
 
-#: terminal/backends/command/serializers.py:15
+#: terminal/backends/command/serializers.py:16
 msgid "Session ID"
 msgstr "セッションID"
 
-#: terminal/backends/command/serializers.py:37
+#: terminal/backends/command/serializers.py:38
 msgid "Risk level display"
 msgstr "リスクレベル表示"
 
-#: terminal/backends/command/serializers.py:38
+#: terminal/backends/command/serializers.py:39
 msgid "Timestamp"
 msgstr "タイムスタンプ"
 
-#: terminal/backends/command/serializers.py:40 terminal/models/terminal.py:105
+#: terminal/backends/command/serializers.py:41 terminal/models/terminal.py:105
 msgid "Remote Address"
 msgstr "リモートアドレス"
 
@@ -4833,23 +4834,23 @@ msgstr "リプレイ"
 msgid "Date end"
 msgstr "終了日"
 
-#: terminal/models/session.py:255
+#: terminal/models/session.py:260
 msgid "Session record"
 msgstr "セッション記録"
 
-#: terminal/models/session.py:257
+#: terminal/models/session.py:262
 msgid "Can monitor session"
 msgstr "セッションを監視できます"
 
-#: terminal/models/session.py:258
+#: terminal/models/session.py:263
 msgid "Can share session"
 msgstr "セッションを共有できます"
 
-#: terminal/models/session.py:259
+#: terminal/models/session.py:264
 msgid "Can terminate session"
 msgstr "セッションを終了できます"
 
-#: terminal/models/session.py:260
+#: terminal/models/session.py:265
 msgid "Can validate session action perm"
 msgstr "セッションアクションのパーマを検証できます"
 
@@ -4882,8 +4883,6 @@ msgid "Link expired"
 msgstr "リンク期限切れ"
 
 #: terminal/models/sharing.py:68
-#, fuzzy
-#| msgid "IP is not allowed"
 msgid "User not allowed to join"
 msgstr "IPは許可されていません"
 
@@ -4964,7 +4963,7 @@ msgstr "クワーグ"
 msgid "type"
 msgstr "タイプ"
 
-#: terminal/models/terminal.py:183 terminal/serializers/session.py:38
+#: terminal/models/terminal.py:183 terminal/serializers/session.py:39
 msgid "Terminal"
 msgstr "ターミナル"
 
@@ -4995,35 +4994,39 @@ msgstr ""
 "異なるエンドポイントの下に競合するアセットIPがある場合は、アセットタグを使用"
 "して実装します"
 
-#: terminal/serializers/session.py:31
+#: terminal/serializers/session.py:15 terminal/serializers/session.py:42
+msgid "Terminal display"
+msgstr "ターミナルディスプレイ"
+
+#: terminal/serializers/session.py:32
 msgid "User ID"
 msgstr "ユーザーID"
 
-#: terminal/serializers/session.py:32
+#: terminal/serializers/session.py:33
 msgid "Asset ID"
 msgstr "資産ID"
 
-#: terminal/serializers/session.py:33
+#: terminal/serializers/session.py:34
 msgid "System user ID"
 msgstr "システムユーザーID"
 
-#: terminal/serializers/session.py:34
+#: terminal/serializers/session.py:35
 msgid "Login from display"
 msgstr "表示からのログイン"
 
-#: terminal/serializers/session.py:36
+#: terminal/serializers/session.py:37
 msgid "Can replay"
 msgstr "再生できます"
 
-#: terminal/serializers/session.py:37
+#: terminal/serializers/session.py:38
 msgid "Can join"
 msgstr "参加できます"
 
-#: terminal/serializers/session.py:40
+#: terminal/serializers/session.py:41
 msgid "Can terminate"
 msgstr "終了できます"
 
-#: terminal/serializers/session.py:45
+#: terminal/serializers/session.py:47
 msgid "Command amount"
 msgstr "コマンド量"
 
@@ -5142,10 +5145,8 @@ msgid "Reopen"
 msgstr ""
 
 #: tickets/const.py:30 tickets/const.py:38
-#, fuzzy
-#| msgid "Role binding"
 msgid "Pending"
-msgstr "ロールバインディング"
+msgstr "未定"
 
 #: tickets/const.py:33 tickets/const.py:40
 msgid "Closed"
@@ -5332,6 +5333,10 @@ msgstr "作業指示プロセス"
 msgid "Approval step"
 msgstr "承認ステップ"
 
+#: tickets/models/ticket/general.py:287
+msgid "Relation snapshot"
+msgstr "製造オーダスナップショット"
+
 #: tickets/models/ticket/general.py:380
 msgid "Please try again"
 msgstr "もう一度お試しください"
@@ -5365,14 +5370,10 @@ msgid "Ticket applied info"
 msgstr "チケット適用情報"
 
 #: tickets/notifications.py:116
-#, fuzzy
-#| msgid "Your has a new ticket, applicant - {}"
 msgid "Your has a new ticket"
 msgstr "新しいチケットがあります- {}"
 
 #: tickets/notifications.py:120
-#, fuzzy
-#| msgid "New Ticket - {} ({})"
 msgid "{}: New Ticket - {} ({})"
 msgstr "新しいチケット- {} ({})"
 

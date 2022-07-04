@@ -1,9 +1,7 @@
 from django.db.models import F
 
-from rest_framework.exceptions import MethodNotAllowed
-
 from assets.api.accounts import (
-    AccountFilterSet, AccountViewSet
+    AccountFilterSet, AccountViewSet, AccountSecretsViewSet
 )
 from common.mixins import RecordViewLogMixin
 from .. import serializers
@@ -32,11 +30,7 @@ class AccountHistoryViewSet(AccountViewSet):
     http_method_names = ['get', 'options']
 
     def get_queryset(self):
-        queryset = self.model.objects.all() \
-            .annotate(ip=F('asset__ip')) \
-            .annotate(hostname=F('asset__hostname')) \
-            .annotate(platform=F('asset__platform__name')) \
-            .annotate(protocols=F('asset__protocols'))
+        queryset = AuthBook.get_queryset(is_history_model=True)
         return queryset
 
 
@@ -45,6 +39,7 @@ class AccountHistorySecretsViewSet(RecordViewLogMixin, AccountHistoryViewSet):
         'default': serializers.AccountHistorySecretSerializer
     }
     http_method_names = ['get']
+    permission_classes = AccountSecretsViewSet.permission_classes
     rbac_perms = {
         'list': 'assets.view_assethistoryaccountsecret',
         'retrieve': 'assets.view_assethistoryaccountsecret',
