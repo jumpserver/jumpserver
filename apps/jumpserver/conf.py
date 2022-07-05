@@ -327,6 +327,7 @@ class Config(dict):
         'TERMINAL_MAGNUS_ENABLED': True,
         'TERMINAL_KOKO_SSH_ENABLED': True,
         'TERMINAL_RAZOR_ENABLED': True,
+        'TERMINAL_OMNIDB_ENABLED': True,
 
         # 安全配置
         'SECURITY_MFA_AUTH': 0,  # 0 不开启 1 全局开启 2 管理员开启
