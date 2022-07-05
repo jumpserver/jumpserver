@@ -23,7 +23,7 @@ class NeedMoreInfoError(Exception):
 
 
 class NeedRedirectError(JMSException):
-    def __init__(self, url):
+    def __init__(self, url, *args, **kwargs):
         self.url = url
 
 
@@ -79,8 +79,7 @@ class PasswordTooSimple(NeedRedirectError):
     default_detail = _('Your password is too simple, please change it for security')
 
     def __init__(self, url, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.url = url
+        super().__init__(url, *args, **kwargs)
 
 
 class PasswordNeedUpdate(NeedRedirectError):
@@ -88,8 +87,7 @@ class PasswordNeedUpdate(NeedRedirectError):
     default_detail = _('You should to change your password before login')
 
     def __init__(self, url, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.url = url
+        super().__init__(url, *args, **kwargs)
 
 
 class PasswordRequireResetError(NeedRedirectError):
@@ -97,13 +95,12 @@ class PasswordRequireResetError(NeedRedirectError):
     default_detail = _('Your password has expired, please reset before logging in')
 
     def __init__(self, url, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.url = url
+        super().__init__(url, *args, **kwargs)
 
 
 class MFAUnsetError(NeedRedirectError):
     error = const.reason_mfa_unset
     msg = const.mfa_unset_msg
 
-    def __init__(self, url, user, request):
-        self.url = url
+    def __init__(self, url, *args, **kwargs):
+        super().__init__(url, *args, **kwargs)
