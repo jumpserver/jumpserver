@@ -30,8 +30,8 @@
 
 
     <script>
-        $('.change-color li:eq(1) i').css('color', 'red');
-        $('.change-color li:eq(2) i').css('color', 'red');
+        $('.change-color li:eq(1) i').css('color', '{{ INTERFACE.primary_color }}');
+        $('.change-color li:eq(2) i').css('color', '{{ INTERFACE.primary_color }}');
 
         function submitForm() {
             $('#bind-form').submit()
