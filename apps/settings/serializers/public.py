@@ -38,6 +38,7 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     TERMINAL_RAZOR_ENABLED = serializers.BooleanField()
     TERMINAL_MAGNUS_ENABLED = serializers.BooleanField()
     TERMINAL_KOKO_SSH_ENABLED = serializers.BooleanField()
+    TERMINAL_OMNIDB_ENABLED = serializers.BooleanField()
 
     ANNOUNCEMENT_ENABLED = serializers.BooleanField()
     ANNOUNCEMENT = serializers.DictField()
