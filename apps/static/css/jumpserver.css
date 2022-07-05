@@ -13,11 +13,11 @@
 
 .primary-panel .ibox-title {
     color: #ffffff;
-    background-color: #1AB394;
+    background-color: var(--primary-color);
 }
 
 .primary-panel .ibox-content {
-    border: 1px solid #1AB394;
+    border: 1px solid var(--primary-color);
 }
 
 .info-panel .ibox-title {
@@ -34,7 +34,7 @@ th a {
 }
 
 .select2-container--default .select2-results__option--highlighted[aria-selected] {
-    background-color: #1ab394 !important;
+    background-color: var(--primary-color) !important;
     /*color: #333 !important;*/
 }
 
@@ -45,7 +45,7 @@ th a {
 }
 
 .select2-container--forcus {
-    border: 1px solid #1AB394 !important;
+    border: 1px solid var(--primary-color) !important;
 }
 
 .select2-selection__choice,
@@ -64,7 +64,7 @@ th a {
 }
 
 .select2-container--default.select2-container--focus .select2-selection--multiple {
-    border: 1px solid #1ab394 !important;
+    border: 1px solid var(--primary-color) !important;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3) !important;
 }
 
@@ -79,7 +79,7 @@ th a {
 }
 
 table.dataTable tbody > tr.selected, table.dataTable tbody > tr > .selected {
-    background-color: #1ab394 !important;
+    background-color: var(--primary-color) !important;
 }
 
 table.dataTable tbody tr.selected a,
@@ -358,7 +358,7 @@ div.dataTables_wrapper div.dataTables_filter {
     width: 150px;
     float: left;
     font-size: 22px;
-    color: #1ab394;
+    color: var(--primary-color);
 }
 
 .logo-element {

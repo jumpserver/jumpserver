@@ -413,7 +413,6 @@ class Config(dict):
 
         'FORGOT_PASSWORD_URL': '',
         'HEALTH_CHECK_TOKEN': '',
-
     }
 
     @staticmethod
