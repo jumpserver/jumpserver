@@ -5,9 +5,9 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="shortcut icon" href="{{ FAVICON_URL }}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{ INTERFACE.favicon }}" type="image/x-icon">
     <title>
-        {{ JMS_TITLE }}
+        {{ INTERFACE.login_title }}
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% include '_head_css_js.html' %}
@@ -183,7 +183,7 @@
 <div class="login-content extra-fields-{{ extra_fields_count }}">
     <div class="right-image-box">
         <a href="{% if not XPACK_ENABLED %}https://github.com/jumpserver/jumpserver.git{% endif %}">
-            <img src="{{ LOGIN_IMAGE_URL }}" class="right-image"  alt="screen-image"/>
+            <img src="{{ INTERFACE.login_image }}" class="right-image" alt="screen-image"/>
         </a>
     </div>
     <div class="left-form-box {% if not form.challenge and not form.captcha %} no-captcha-challenge {% endif %}">
@@ -206,7 +206,7 @@
                 </li>
             </ul>
             <div class="jms-title">
-                <span style="">{{ JMS_TITLE }}</span>
+                <span style="">{{ INTERFACE.login_title }}</span>
             </div>
             <div class="contact-form col-md-10 col-md-offset-1">
                 <form id="login-form" action="" method="post" role="form" novalidate="novalidate">

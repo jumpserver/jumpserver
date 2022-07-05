@@ -3,9 +3,9 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.conf import settings
 
 from jumpserver.utils import has_valid_xpack_license, get_xpack_license_info
-from common.utils import get_logger
+from common.utils import get_logger, lazyproperty
 from .. import serializers
-from ..utils import get_interface_setting
+from ..utils import get_interface_setting_or_default
 
 logger = get_logger(__name__)
 
@@ -16,22 +16,14 @@ class OpenPublicSettingApi(generics.RetrieveAPIView):
     permission_classes = (AllowAny,)
     serializer_class = serializers.PublicSettingSerializer
 
-    @staticmethod
-    def get_logo_urls():
-        interface = get_interface_setting()
-        keys = ['logo_logout', 'logo_index', 'login_image', 'favicon']
-        return {k: interface[k] for k in keys}
-
-    @staticmethod
-    def get_login_title():
-        interface = get_interface_setting()
-        return interface['login_title']
+    @lazyproperty
+    def interface_setting(self):
+        return get_interface_setting_or_default()
 
     def get_object(self):
         return {
             "XPACK_ENABLED": settings.XPACK_ENABLED,
-            "LOGIN_TITLE": self.get_login_title(),
-            "LOGO_URLS": self.get_logo_urls(),
+            "INTERFACE": self.interface_setting
         }
 
 

@@ -5,8 +5,8 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title> {{ JMS_TITLE }} </title>
-        <link rel="shortcut icon" href="{{ FAVICON_URL }}" type="image/x-icon">
+		<title> {{ INTERFACE.login_title }} </title>
+        <link rel="shortcut icon" href="{{ INTERFACE.favicon }}" type="image/x-icon">
         {% include '_head_css_js.html' %}
         <link href="{% static 'css/jumpserver.css' %}" rel="stylesheet">
         <link href="{% static 'css/style.css' %}" rel="stylesheet">
@@ -18,9 +18,9 @@
 		 <header>
 		 	<div class="logo">
 		 		<a href="{% url 'index' %}">
-                    <img src="{{ LOGO_URL }}" alt="" width="50px" height="50px"/>
+                    <img src="{{ INTERFACE.logo_logout }}" alt="" width="50px" height="50px"/>
                 </a>
-		 		<span style="font-size: 18px; line-height: 50px">{{ JMS_TITLE }}</span>
+		 		<span style="font-size: 18px; line-height: 50px">{{ INTERFACE.login_title }}</span>
 		 	</div>
 		 	<div>
                 <a href="{% url 'index' %}">{% trans 'Home page' %}</a>
