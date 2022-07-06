@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-04 15:10+0800\n"
+"POT-Creation-Date: 2022-07-06 16:47+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1973,11 +1973,11 @@ msgstr "您的密码无效"
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors/redirect.py:88 authentication/mixins.py:313
+#: authentication/errors/redirect.py:87 authentication/mixins.py:313
 msgid "You should to change your password before login"
 msgstr "登录完成前，请先修改密码"
 
-#: authentication/errors/redirect.py:97 authentication/mixins.py:320
+#: authentication/errors/redirect.py:95 authentication/mixins.py:320
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
@@ -2189,7 +2189,7 @@ msgid "Need MFA for view auth"
 msgstr "需要 MFA 认证来查看账号信息"
 
 #: authentication/templates/authentication/_mfa_confirm_modal.html:20
-#: templates/_modal.html:23 templates/flash_message_standalone.html:34
+#: templates/_modal.html:23 templates/flash_message_standalone.html:37
 #: users/templates/users/user_password_verify.html:20
 msgid "Confirm"
 msgstr "确认"
@@ -2668,7 +2668,7 @@ msgstr "创建账号成功"
 msgid "Your account has been created successfully"
 msgstr "你的账号已创建成功"
 
-#: jumpserver/context_processor.py:17
+#: jumpserver/context_processor.py:12
 msgid "JumpServer Open Source Bastion Host"
 msgstr "JumpServer 开源堡垒机"
 
@@ -4506,7 +4506,7 @@ msgstr "验证码已发送"
 msgid "Home page"
 msgstr "首页"
 
-#: templates/flash_message_standalone.html:25 tickets/const.py:20
+#: templates/flash_message_standalone.html:28 tickets/const.py:20
 msgid "Cancel"
 msgstr "取消"
 
@@ -4545,10 +4545,6 @@ msgid ""
 "Jmservisor is the program used to pull up remote applications in Windows "
 "Remote Application publisher"
 msgstr "Jmservisor 是在 windows 远程应用发布服务器中用来拉起远程应用的程序"
-
-#: templates/rest_framework/base.html:128
-msgid "Filters"
-msgstr "过滤"
 
 #: terminal/api/endpoint.py:26
 msgid "Not found protocol query params"
@@ -6606,27 +6602,31 @@ msgstr "恢复默认成功！"
 msgid "Interface settings"
 msgstr "界面设置"
 
-#: xpack/plugins/interface/models.py:16
+#: xpack/plugins/interface/models.py:22
 msgid "Title of login page"
 msgstr "登录页面标题"
 
-#: xpack/plugins/interface/models.py:20
+#: xpack/plugins/interface/models.py:26
 msgid "Image of login page"
 msgstr "登录页面图片"
 
-#: xpack/plugins/interface/models.py:24
+#: xpack/plugins/interface/models.py:30
 msgid "Website icon"
 msgstr "网站图标"
 
-#: xpack/plugins/interface/models.py:28
+#: xpack/plugins/interface/models.py:34
 msgid "Logo of management page"
 msgstr "管理页面logo"
 
-#: xpack/plugins/interface/models.py:32
+#: xpack/plugins/interface/models.py:38
 msgid "Logo of logout page"
 msgstr "退出页面logo"
 
-#: xpack/plugins/interface/models.py:36
+#: xpack/plugins/interface/models.py:40
+msgid "Theme"
+msgstr "主题"
+
+#: xpack/plugins/interface/models.py:43
 msgid "Interface setting"
 msgstr "界面设置"
 
@@ -6657,6 +6657,21 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Classic green"
+#~ msgstr "经典绿"
+
+#~ msgid "Chinese red"
+#~ msgstr "中国红"
+
+#~ msgid "Tech blue"
+#~ msgstr "科技蓝"
+
+#~ msgid "Deep black"
+#~ msgstr "深邃黑"
+
+#~ msgid "Filters"
+#~ msgstr "过滤"
 
 #~ msgid "Code is invalid, {}"
 #~ msgstr "验证码无效: {}"
