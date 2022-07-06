@@ -1,5 +1,4 @@
 import uuid
-
 from datetime import datetime, timedelta
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -8,6 +7,7 @@ from rest_framework.authtoken.models import Token
 from orgs.mixins.models import OrgModelMixin
 
 from common.db import models
+from common.utils import lazyproperty
 
 
 class AccessKey(models.Model):
@@ -101,6 +101,131 @@ class ConnectionToken(OrgModelMixin, models.JMSModel):
     @classmethod
     def get_default_date_expired(cls):
         return datetime.now() + timedelta(seconds=settings.CONNECTION_TOKEN_EXPIRATION)
+
+    @property
+    def is_expired(self):
+        return self.date_expired < timezone.now()
+
+    def is_type(self, tp):
+        return self.type == tp
+
+    domain = gateway = remote_app = cmd_filter_rules = None
+
+    actions = expired_at = None  # actions 和 expired_at 在 check_valid() 中赋值
+
+    def check_valid(self):
+        from perms.utils.asset.permission import validate_permission as asset_validate_permission
+        from perms.utils.application.permission import validate_permission as app_validate_permission
+
+        if self.is_expired:
+            is_valid = False
+            error = _('Connection token expired at: {}').format(self.date_expired)
+            return is_valid, error
+
+        if not self.user:
+            is_valid = False
+            error = _('User not exists')
+            return is_valid, error
+        if not self.user.is_valid:
+            is_valid = False
+            error = _('User invalid, disabled or expired')
+            return is_valid, error
+
+        if not self.system_user:
+            is_valid = False
+            error = _('System user not exists')
+            return is_valid, error
+
+        if self.is_type(self.Type.asset):
+            if not self.asset:
+                is_valid = False
+                error = _('Asset not exists')
+                return is_valid, error
+            if not self.asset.is_active:
+                is_valid = False
+                error = _('Asset inactive')
+                return is_valid, error
+            has_perm, actions, expired_at = asset_validate_permission(
+                self.user, self.asset, self.system_user
+            )
+            if not has_perm:
+                is_valid = False
+                error = _('User has no permission to access asset or permission expired')
+                return is_valid, error
+            self.actions = actions
+            self.expired_at = expired_at
+
+        elif self.is_type(self.Type.application):
+            if not self.application:
+                is_valid = False
+                error = _('Application not exists')
+                return is_valid, error
+            has_perm, actions, expired_at = app_validate_permission(
+                self.user, self.application, self.system_user
+            )
+            if not has_perm:
+                is_valid = False
+                error = _('User has no permission to access application or permission expired')
+                return is_valid, error
+            self.actions = actions
+            self.expired_at = expired_at
+
+        return True, ''
+
+    def load_secret_detail_attrs(self):
+        self.domain = self.get_domain()
+        self.gateway = self.get_gateway()
+        self.remote_app = self.get_remote_app()
+        self.cmd_filter_rules = self.get_cmd_filter_rules()
+        # 已在 check_valid() 中赋值
+        # self.actions = actions
+        # self.expired_at = expired_at
+        self.load_system_user_auth()
+
+    def get_domain(self):
+        if self.asset:
+            return self.asset.domain
+        if not self.application:
+            return
+        if self.application.category_remote_app:
+            asset = self.application.get_remote_app_asset()
+            domain = asset.domain if asset else None
+        else:
+            domain = self.application.domain
+        return domain
+
+    def get_gateway(self):
+        from assets.models import Domain
+        if not self.domain:
+            return
+        self.domain: Domain
+        return self.domain.random_gateway()
+
+    def get_remote_app(self):
+        if not self.application:
+            return {}
+        if not self.application.category_remote_app:
+            return {}
+        return self.application.get_rdp_remote_app_setting()
+
+    def get_cmd_filter_rules(self):
+        from assets.models import CommandFilterRule
+        kwargs = {
+            'user_id': self.user.id,
+            'system_user_id': self.system_user.id,
+        }
+        if self.asset:
+            kwargs['asset_id'] = self.asset.id
+        elif self.application:
+            kwargs['application_id'] = self.application_id
+        rules = CommandFilterRule.get_queryset(**kwargs)
+        return rules
+
+    def load_system_user_auth(self):
+        if self.asset:
+            self.system_user.load_asset_more_auth(self.asset.id, self.user.username, self.user.id)
+        elif self.application:
+            self.system_user.load_app_more_auth(self.application.id, self.user.username, self.user.id)
 
 
 class TempToken(models.JMSModel):

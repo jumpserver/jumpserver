@@ -16,7 +16,7 @@ __all__ = [
     'ConnectionTokenUserSerializer', 'ConnectionTokenFilterRuleSerializer',
     'ConnectionTokenAssetSerializer', 'ConnectionTokenSystemUserSerializer',
     'ConnectionTokenDomainSerializer', 'ConnectionTokenRemoteAppSerializer',
-    'ConnectionTokenGatewaySerializer', 'ConnectionTokenSecretSerializer',
+    'ConnectionTokenGatewaySerializer', 'ConnectionTokenSecretSerializer1',
     'SuperConnectionTokenSerializer'
 ]
 
@@ -150,7 +150,7 @@ class ConnectionTokenFilterRuleSerializer(serializers.ModelSerializer):
         ]
 
 
-class ConnectionTokenSecretSerializer(serializers.Serializer):
+class ConnectionTokenSecretSerializer1(serializers.Serializer):
     id = serializers.CharField(read_only=True)
     secret = serializers.CharField(read_only=True)
     type = serializers.ChoiceField(choices=[('application', 'Application'), ('asset', 'Asset')])

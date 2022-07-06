@@ -1,17 +1,18 @@
 from rest_framework import serializers
-from django.conf import settings
-from datetime import datetime, timedelta
 
 from django.utils.translation import ugettext_lazy as _
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from authentication.models import ConnectionToken
 from common.utils import pretty_string
 from common.utils.random import random_string
+from assets.models import Asset, SystemUser, Gateway, Domain, CommandFilterRule
+from users.models import User
 from applications.models import Application
-from assets.models import Asset
+from assets.serializers import ProtocolsField
+from perms.serializers.base import ActionsField
 
 
-__all__ = ['ConnectionTokenSerializer']
+__all__ = ['ConnectionTokenSerializer', 'ConnectionTokenSecretSerializer']
 
 
 class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
@@ -66,3 +67,87 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
             'application_display': pretty_string(str(application), max_length=128),
             'org_id': org_id,
         }
+
+
+#
+# Connection Token Secret
+#
+
+
+class ConnectionTokenUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'name', 'username', 'email']
+
+
+class ConnectionTokenAssetSerializer(serializers.ModelSerializer):
+    protocols = ProtocolsField(label='Protocols', read_only=True)
+
+    class Meta:
+        model = Asset
+        fields = ['id', 'hostname', 'ip', 'protocols', 'org_id']
+
+
+class ConnectionTokenSystemUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SystemUser
+        fields = [
+            'id', 'name', 'username', 'password', 'private_key',
+            'protocol', 'ad_domain', 'org_id'
+        ]
+
+
+class ConnectionTokenGatewaySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Gateway
+        fields = ['id', 'ip', 'port', 'username', 'password', 'private_key']
+
+
+class ConnectionTokenRemoteAppSerializer(serializers.Serializer):
+    program = serializers.CharField(allow_null=True, allow_blank=True)
+    working_directory = serializers.CharField(allow_null=True, allow_blank=True)
+    parameters = serializers.CharField(allow_null=True, allow_blank=True)
+
+
+class ConnectionTokenApplicationSerializer(serializers.ModelSerializer):
+    attrs = serializers.JSONField(read_only=True)
+
+    class Meta:
+        model = Application
+        fields = ['id', 'name', 'category', 'type', 'attrs', 'org_id']
+
+
+class ConnectionTokenDomainSerializer(serializers.ModelSerializer):
+    gateways = ConnectionTokenGatewaySerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Domain
+        fields = ['id', 'name', 'gateways']
+
+
+class ConnectionTokenCmdFilterRuleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CommandFilterRule
+        fields = [
+            'id', 'type', 'content', 'ignore_case', 'pattern',
+            'priority', 'action', 'date_created',
+        ]
+
+
+class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
+    user = ConnectionTokenUserSerializer(read_only=True)
+    asset = ConnectionTokenAssetSerializer(read_only=True)
+    application = ConnectionTokenApplicationSerializer(read_only=True)
+    remote_app = ConnectionTokenRemoteAppSerializer(read_only=True)
+    system_user = ConnectionTokenSystemUserSerializer(read_only=True)
+    gateway = ConnectionTokenGatewaySerializer(read_only=True)
+    domain = ConnectionTokenDomainSerializer(read_only=True)
+    cmd_filter_rules = ConnectionTokenCmdFilterRuleSerializer(many=True)
+    actions = ActionsField()
+
+    class Meta:
+        model = ConnectionToken
+        fields = [
+            'id', 'secret', 'type', 'user', 'asset', 'application', 'system_user',
+            'remote_app', 'cmd_filter_rules', 'domain', 'gateway', 'actions', 'expired_at',
+        ]
