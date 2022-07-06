@@ -46,8 +46,8 @@ if settings.XPACK_ENABLED:
 
 
 apps = [
-    'users', 'assets', 'perms', 'terminal', 'ops', 'audits', 'orgs', 'auth',
-    'applications', 'tickets', 'settings', 'xpack',
+    'users', 'assets', 'perms', 'terminal', 'ops', 'audits',
+    'orgs', 'auth', 'applications', 'tickets', 'settings', 'xpack',
     'flower', 'luna', 'koko', 'ws', 'docs', 'redocs',
 ]
 
