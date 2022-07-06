@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-06 10:27+0800\n"
+"POT-Creation-Date: 2022-07-06 16:47+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -6602,47 +6602,31 @@ msgstr "恢复默认成功！"
 msgid "Interface settings"
 msgstr "界面设置"
 
-#: xpack/plugins/interface/models.py:15
-msgid "Classic green"
-msgstr "经典绿"
-
-#: xpack/plugins/interface/models.py:16
-msgid "Chinese red"
-msgstr "中国红"
-
-#: xpack/plugins/interface/models.py:17
-msgid "Tech blue"
-msgstr "科技蓝"
-
-#: xpack/plugins/interface/models.py:18
-msgid "Deep black"
-msgstr "深邃黑"
-
-#: xpack/plugins/interface/models.py:28
+#: xpack/plugins/interface/models.py:22
 msgid "Title of login page"
 msgstr "登录页面标题"
 
-#: xpack/plugins/interface/models.py:32
+#: xpack/plugins/interface/models.py:26
 msgid "Image of login page"
 msgstr "登录页面图片"
 
-#: xpack/plugins/interface/models.py:36
+#: xpack/plugins/interface/models.py:30
 msgid "Website icon"
 msgstr "网站图标"
 
-#: xpack/plugins/interface/models.py:40
+#: xpack/plugins/interface/models.py:34
 msgid "Logo of management page"
 msgstr "管理页面logo"
 
-#: xpack/plugins/interface/models.py:44
+#: xpack/plugins/interface/models.py:38
 msgid "Logo of logout page"
 msgstr "退出页面logo"
 
-#: xpack/plugins/interface/models.py:48
+#: xpack/plugins/interface/models.py:40
 msgid "Theme"
 msgstr "主题"
 
-#: xpack/plugins/interface/models.py:52
+#: xpack/plugins/interface/models.py:43
 msgid "Interface setting"
 msgstr "界面设置"
 
@@ -6673,6 +6657,18 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Classic green"
+#~ msgstr "经典绿"
+
+#~ msgid "Chinese red"
+#~ msgstr "中国红"
+
+#~ msgid "Tech blue"
+#~ msgstr "科技蓝"
+
+#~ msgid "Deep black"
+#~ msgstr "深邃黑"
 
 #~ msgid "Filters"
 #~ msgstr "过滤"
