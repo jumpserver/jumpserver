@@ -1,9 +1,11 @@
 import uuid
 
+from datetime import datetime, timedelta
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from rest_framework.authtoken.models import Token
+from orgs.mixins.models import OrgModelMixin
 
 from common.db import models
 
@@ -54,15 +56,51 @@ class SSOToken(models.JMSBaseModel):
         verbose_name = _('SSO token')
 
 
-class ConnectionToken(models.JMSBaseModel):
-    # Todo: 未来可能放到这里，不记录到 redis 了，虽然方便，但是不易于审计
-    # Todo: add connection token 可能要授权给 普通用户, 或者放开就行
+class ConnectionToken(OrgModelMixin, models.JMSModel):
+    class Type(models.TextChoices):
+        asset = 'asset', _('Asset')
+        application = 'application', _('Application')
+
+    type = models.CharField(
+        max_length=16, default=Type.asset, choices=Type.choices, verbose_name=_("Type")
+    )
+    secret = models.CharField(max_length=64, default='', verbose_name=_("Secret"))
+    date_expired = models.DateTimeField(null=True, verbose_name=_("Date expired"))
+
+    user = models.ForeignKey(
+        'users.User', on_delete=models.SET_NULL, verbose_name=_('User'),
+        related_name='connection_tokens', null=True, blank=True
+    )
+    user_display = models.CharField(max_length=128, default='', verbose_name=_("User display"))
+    system_user = models.ForeignKey(
+        'assets.SystemUser', on_delete=models.SET_NULL, verbose_name=_('System user'),
+        related_name='connection_tokens', null=True, blank=True
+    )
+    system_user_display = models.CharField(
+        max_length=128, default='', verbose_name=_("System user display")
+    )
+    asset = models.ForeignKey(
+        'assets.Asset', on_delete=models.SET_NULL, verbose_name=_('Asset'),
+        related_name='connection_tokens', null=True, blank=True
+    )
+    asset_display = models.CharField(max_length=128, default='', verbose_name=_("Asset display"))
+    application = models.ForeignKey(
+        'applications.Application', on_delete=models.SET_NULL, verbose_name=_('Application'),
+        related_name='connection_tokens', null=True, blank=True
+    )
+    application_display = models.CharField(
+        max_length=128, default='', verbose_name=_("Application display")
+    )
 
     class Meta:
         verbose_name = _('Connection token')
         permissions = [
             ('view_connectiontokensecret', _('Can view connection token secret'))
         ]
+
+    @classmethod
+    def get_default_date_expired(cls):
+        return datetime.now() + timedelta(seconds=settings.CONNECTION_TOKEN_EXPIRATION)
 
 
 class TempToken(models.JMSModel):

@@ -7,9 +7,12 @@ from assets.models import Asset, SystemUser, Gateway, Domain, CommandFilterRule
 from applications.models import Application
 from assets.serializers import ProtocolsField
 from perms.serializers.base import ActionsField
+from orgs.mixins.serializers import OrgResourceModelSerializerMixin
+from authentication.models import ConnectionToken
 
 __all__ = [
-    'ConnectionTokenSerializer', 'ConnectionTokenApplicationSerializer',
+    # 'ConnectionTokenSerializer',
+    'ConnectionTokenApplicationSerializer',
     'ConnectionTokenUserSerializer', 'ConnectionTokenFilterRuleSerializer',
     'ConnectionTokenAssetSerializer', 'ConnectionTokenSystemUserSerializer',
     'ConnectionTokenDomainSerializer', 'ConnectionTokenRemoteAppSerializer',
@@ -18,7 +21,25 @@ __all__ = [
 ]
 
 
-class ConnectionTokenSerializer(serializers.Serializer):
+class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
+
+    class Meta:
+        model = ConnectionToken
+        fields_mini = ['id', 'type']
+        fields_small = fields_mini + [
+            'user_display', 'system_user_display', 'asset_display', 'app_display',
+            'date_expired',
+        ]
+        fields_fk = [
+            'user', 'system_user', 'asset', 'app'
+        ]
+        fields = fields_small + fields_fk + [
+            'date_created', 'date_updated', 'created_by', 'updated_by',
+            'org_id', 'org_name',
+        ]
+
+
+class ConnectionTokenSerializer1(serializers.ModelSerializer):
     system_user = serializers.CharField(max_length=128, required=True)
     asset = serializers.CharField(max_length=128, required=False)
     application = serializers.CharField(max_length=128, required=False)

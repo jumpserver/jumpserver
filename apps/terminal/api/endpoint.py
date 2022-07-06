@@ -56,7 +56,7 @@ class SmartEndpointViewMixin:
         session_id = request.GET.get('session_id')
         token = request.GET.get('token')
         if token:
-            from authentication.api.connection_token import TokenCacheMixin as TokenUtil
+            from authentication.api.connection_token1 import TokenCacheMixin as TokenUtil
             value = TokenUtil().get_token_from_cache(token)
             if value:
                 if value.get('type') == 'asset':
