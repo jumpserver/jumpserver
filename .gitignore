@@ -31,7 +31,6 @@ media
 celerybeat.pid
 django.db
 celerybeat-schedule.db
-data/static
 docs/_build/
 xpack
 xpack.bak
@@ -41,4 +40,4 @@ logs/*
 release/*
 releashe
 /apps/script.py
-data/certs
+data/*
