@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from common.utils.random import random_string
+from common.utils.common import pretty_string
 from ..models import SessionSharing, SessionJoinRecord
 
 __all__ = ['SessionSharingSerializer', 'SessionJoinRecordSerializer']
@@ -24,7 +25,7 @@ class SessionSharingSerializer(OrgResourceModelSerializerMixin):
         session = validated_data.get('session')
         if session:
             validated_data['creator_id'] = session.user_id
-            validated_data['created_by'] = str(session.user)
+            validated_data['created_by'] = pretty_string(str(session.user), max_length=32)
             validated_data['org_id'] = session.org_id
         return super().create(validated_data)
 
