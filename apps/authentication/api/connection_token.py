@@ -1,4 +1,6 @@
 import os
+import json
+import base64
 import urllib.parse
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -6,6 +8,7 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
+
 
 
 from common.drf.api import JMSModelViewSet
@@ -30,8 +33,30 @@ class ConnectionTokenViewSet(RootOrgViewMixin, JMSModelViewSet):
         'create': 'authentication.add_connectiontoken',
         'get_secret_detail': 'authentication.view_connectiontokensecret',
         'get_rdp_file': 'authentication.add_connectiontoken',
+        'get_client_protocol_url': 'authentication.add_connectiontoken',
     }
     queryset = ConnectionToken.objects.all()
+
+    def create_connection_token(self):
+        data = self.request.query_params if self.request.method == 'GET' else self.request.data
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        token: ConnectionToken = serializer.instance
+        self.check_token_valid(token)
+        token.load_extra_attrs()
+        return token
+
+    def perform_create(self, serializer):
+        user, asset, application, system_user = self.get_request_resources(serializer)
+        self.check_user_has_resource_permission(user, asset, application, system_user)
+        return super(ConnectionTokenViewSet, self).perform_create(serializer)
+
+    @staticmethod
+    def check_token_valid(token):
+        is_valid, error = token.check_valid()
+        if not is_valid:
+            raise PermissionDenied(error)
 
     @staticmethod
     def get_request_resources(serializer):
@@ -40,11 +65,6 @@ class ConnectionTokenViewSet(RootOrgViewMixin, JMSModelViewSet):
         application = serializer.validated_data.get('application')
         system_user = serializer.validated_data.get('system_user')
         return user, asset, application, system_user
-
-    def perform_create(self, serializer):
-        user, asset, application, system_user = self.get_request_resources(serializer)
-        self.check_user_has_resource_permission(user, asset, application, system_user)
-        return super(ConnectionTokenViewSet, self).perform_create(serializer)
 
     @staticmethod
     def check_user_has_resource_permission(user, asset, application, system_user):
@@ -61,6 +81,20 @@ class ConnectionTokenViewSet(RootOrgViewMixin, JMSModelViewSet):
                     f'user={user.id} system_user={system_user.id} application={application.id}'
             raise PermissionDenied(error)
 
+    def get_smart_endpoint(self, protocol, asset=None, application=None):
+        if asset:
+            target_ip = asset.get_target_ip()
+        elif application:
+            target_ip = application.get_target_ip()
+        else:
+            target_ip = ''
+        endpoint = EndpointRule.match_endpoint(target_ip, protocol, self.request)
+        return endpoint
+
+    #
+    # get secret detail (API)
+    #
+
     @action(methods=['POST'], detail=False, url_path='secret-info/detail')
     def get_secret_detail(self, request, *args, **kwargs):
         # 非常重要的 api，在逻辑层再判断一下，双重保险
@@ -69,28 +103,70 @@ class ConnectionTokenViewSet(RootOrgViewMixin, JMSModelViewSet):
             raise PermissionDenied('Not allow to view secret')
         token_id = request.data.get('token') or ''
         token = get_object_or_404(ConnectionToken, pk=token_id)
-        is_valid, error = token.check_valid()
-        if not is_valid:
-            return Response(data={'error': error}, status=status.HTTP_403_FORBIDDEN)
+        self.check_token_valid(token)
         token.load_extra_attrs()
         serializer = self.get_serializer(instance=token)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    #
+    # get rdp file (API)
+    #
+
     @action(methods=['POST', 'GET'], detail=False, url_path='rdp/file')
     def get_rdp_file(self, request, *args, **kwargs):
-        data = request.query_params if request.method == 'GET' else request.data
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        token: ConnectionToken = serializer.instance
-        is_valid, error = token.check_valid()
-        if not is_valid:
-            return Response(data={'error': error}, status=status.HTTP_403_FORBIDDEN)
-        token.load_extra_attrs()
+        token = self.create_connection_token()
         filename, content = self.get_rdp_file_info(token)
+        filename = '{}.rdp'.format(filename)
         response = HttpResponse(content, content_type='application/octet-stream')
         response['Content-Disposition'] = 'attachment; filename*=UTF-8\'\'%s' % filename
         return response
+
+    @staticmethod
+    def parse_env_bool(env_key, env_default, true_value, false_value):
+        return true_value if is_true(os.getenv(env_key, env_default)) else false_value
+
+    #
+    # get client protocol url (API)
+    #
+
+    @action(methods=['POST', 'GET'], detail=False, url_path='client-url')
+    def get_client_protocol_url(self, request, *args, **kwargs):
+        token = self.create_connection_token()
+        try:
+            protocol_data = self.get_client_protocol_data(token)
+        except ValueError as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        protocol_data = json.dumps(protocol_data).encode()
+        protocol_data = base64.b64encode(protocol_data).decode()
+        data = {
+            'url': 'jms://{}'.format(protocol_data)
+        }
+        return Response(data=data)
+
+    def get_client_protocol_data(self, token: ConnectionToken):
+        from assets.models import SystemUser
+        protocol = token.system_user.protocol
+        username = token.user.username
+        rdp_config = ssh_token = ''
+        if protocol == SystemUser.Protocol.rdp:
+            filename, rdp_config = self.get_rdp_file_info(token)
+        elif protocol == SystemUser.Protocol.ssh:
+            filename, ssh_token = self.get_ssh_token(token)
+        else:
+            raise ValueError('Protocol not support: {}'.format(protocol))
+
+        return {
+            "filename": filename,
+            "protocol": protocol,
+            "username": username,
+            "token": ssh_token,
+            "config": rdp_config
+        }
+
+    #
+    # get rdp file info
+    #
 
     def get_rdp_file_info(self, token: ConnectionToken):
         rdp_options = {
@@ -172,7 +248,7 @@ class ConnectionTokenViewSet(RootOrgViewMixin, JMSModelViewSet):
         else:
             name = '*'
 
-        filename = "{}-{}-jumpserver.rdp".format(token.user.username, name)
+        filename = "{}-{}-jumpserver".format(token.user.username, name)
         filename = urllib.parse.quote(filename)
 
         content = ''
@@ -181,17 +257,28 @@ class ConnectionTokenViewSet(RootOrgViewMixin, JMSModelViewSet):
 
         return filename, content
 
-    def get_smart_endpoint(self, protocol, asset=None, application=None):
-        if asset:
-            target_ip = asset.get_target_ip()
-        elif application:
-            target_ip = application.get_target_ip()
-        else:
-            target_ip = ''
-        endpoint = EndpointRule.match_endpoint(target_ip, protocol, self.request)
-        return endpoint
+    #
+    # get ssh token
+    #
 
-    @staticmethod
-    def parse_env_bool(env_key, env_default, true_value, false_value):
-        return true_value if is_true(os.getenv(env_key, env_default)) else false_value
+    def get_ssh_token(self, token: ConnectionToken):
+        if token.asset:
+            name = token.asset.hostname
+        elif token.application:
+            name = token.application.name
+        else:
+            name = '*'
+        filename = f'{token.user.username}-{name}-jumpserver'
+
+        endpoint = self.get_smart_endpoint(
+            protocol='ssh', asset=token.asset, application=token.application
+        )
+        data = {
+            'ip': endpoint.host,
+            'port': str(endpoint.ssh_port),
+            'username': 'JMS-{}'.format(str(token.id)),
+            'password': token.secret
+        }
+        token = json.dumps(data)
+        return filename, token
 
