@@ -4,7 +4,6 @@ import json
 from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import reverse
-from django.db.models.fields import related
 from django.template.loader import render_to_string
 from django.forms import model_to_dict
 from django.utils.translation import ugettext_lazy as _
@@ -75,13 +74,7 @@ class BaseTicketMessage(UserMessage):
         for name in item_names:
             field = fields[name]
             item = {'name': name, 'title': field.verbose_name}
-            value = data.get(name)
-            if hasattr(self.ticket, f'get_{name}_display'):
-                value = getattr(self.ticket, f'get_{name}_display')()
-            elif isinstance(field, related.ForeignKey):
-                value = self.ticket.rel_snapshot[name]
-            elif isinstance(field, related.ManyToManyField):
-                value = ', '.join(self.ticket.rel_snapshot[name])
+            value = self.ticket.get_field_display(name, field, data)
             item['value'] = value
             items.append(item)
         return items
@@ -113,7 +106,7 @@ class TicketAppliedToAssigneeMessage(BaseTicketMessage):
 
     @property
     def content_title(self):
-        return _('Your has a new ticket')
+        return _('Your has a new ticket, applicant - {}').format(self.ticket.applicant)
 
     @property
     def subject(self):

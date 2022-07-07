@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-06 16:47+0800\n"
+"POT-Creation-Date: 2022-07-08 18:06+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -62,7 +62,7 @@ msgstr "激活中"
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:34
 #: terminal/models/endpoint.py:21 terminal/models/endpoint.py:92
 #: terminal/models/storage.py:29 terminal/models/terminal.py:114
-#: tickets/models/comment.py:32 tickets/models/ticket/general.py:278
+#: tickets/models/comment.py:32 tickets/models/ticket/general.py:288
 #: users/models/group.py:16 users/models/user.py:698
 #: xpack/plugins/change_auth_plan/models/base.py:44
 #: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:116
@@ -302,10 +302,10 @@ msgstr "类别"
 #: assets/models/cmd_filter.py:82 assets/models/user.py:250
 #: perms/models/application_permission.py:24
 #: perms/serializers/application/user_permission.py:34
-#: terminal/models/storage.py:58 terminal/models/storage.py:142
+#: terminal/models/storage.py:58 terminal/models/storage.py:143
 #: tickets/models/comment.py:26 tickets/models/flow.py:57
 #: tickets/models/ticket/apply_application.py:17
-#: tickets/models/ticket/general.py:263
+#: tickets/models/ticket/general.py:273
 #: xpack/plugins/change_auth_plan/models/app.py:28
 #: xpack/plugins/change_auth_plan/models/app.py:153
 msgid "Type"
@@ -408,6 +408,8 @@ msgstr "应用路径"
 
 #: applications/serializers/attrs/application_category/remote_app.py:44
 #: assets/serializers/system_user.py:167
+#: tickets/serializers/ticket/apply_application.py:35
+#: tickets/serializers/ticket/common.py:59
 #: xpack/plugins/change_auth_plan/serializers/asset.py:67
 #: xpack/plugins/change_auth_plan/serializers/asset.py:70
 #: xpack/plugins/change_auth_plan/serializers/asset.py:73
@@ -495,7 +497,7 @@ msgid "Charset"
 msgstr "编码"
 
 #: assets/models/asset.py:141 assets/serializers/asset.py:176
-#: tickets/models/ticket/general.py:288
+#: tickets/models/ticket/general.py:298
 msgid "Meta"
 msgstr "元数据"
 
@@ -517,7 +519,7 @@ msgstr "制造商"
 msgid "Model"
 msgstr "型号"
 
-#: assets/models/asset.py:170 tickets/models/ticket/general.py:286
+#: assets/models/asset.py:170 tickets/models/ticket/general.py:296
 msgid "Serial number"
 msgstr "序列号"
 
@@ -1510,7 +1512,7 @@ msgid "MFA"
 msgstr "MFA"
 
 #: audits/models.py:128 terminal/models/status.py:33
-#: tickets/models/ticket/general.py:271 xpack/plugins/cloud/models.py:175
+#: tickets/models/ticket/general.py:281 xpack/plugins/cloud/models.py:175
 #: xpack/plugins/cloud/models.py:227
 msgid "Status"
 msgstr "状态"
@@ -2498,7 +2500,7 @@ msgstr "%(name)s 创建成功"
 msgid "%(name)s was updated successfully"
 msgstr "%(name)s 更新成功"
 
-#: common/db/encoder.py:10
+#: common/db/encoder.py:11
 msgid "ugettext_lazy"
 msgstr "ugettext_lazy"
 
@@ -2920,7 +2922,7 @@ msgstr "组织管理"
 #: orgs/mixins/models.py:46 orgs/mixins/serializers.py:25 orgs/models.py:80
 #: orgs/models.py:211 rbac/const.py:7 rbac/models/rolebinding.py:48
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:62
-#: tickets/models/ticket/general.py:290 tickets/serializers/ticket/ticket.py:64
+#: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:64
 msgid "Organization"
 msgstr "组织"
 
@@ -3325,7 +3327,7 @@ msgstr "我的应用"
 msgid "Ticket comment"
 msgstr "工单评论"
 
-#: rbac/tree.py:115 tickets/models/ticket/general.py:295
+#: rbac/tree.py:115 tickets/models/ticket/general.py:305
 msgid "Ticket"
 msgstr "工单管理"
 
@@ -4810,7 +4812,7 @@ msgstr "链接过期"
 msgid "User not allowed to join"
 msgstr "来源 IP 不被允许登录"
 
-#: terminal/models/sharing.py:85 terminal/serializers/sharing.py:58
+#: terminal/models/sharing.py:85 terminal/serializers/sharing.py:59
 msgid "Joiner"
 msgstr "加入者"
 
@@ -4867,11 +4869,11 @@ msgstr "运行时间"
 msgid "Default storage"
 msgstr "默认存储"
 
-#: terminal/models/storage.py:136 terminal/models/terminal.py:108
+#: terminal/models/storage.py:137 terminal/models/terminal.py:108
 msgid "Command storage"
 msgstr "命令存储"
 
-#: terminal/models/storage.py:196 terminal/models/terminal.py:109
+#: terminal/models/storage.py:197 terminal/models/terminal.py:109
 msgid "Replay storage"
 msgstr "录像存储"
 
@@ -5120,7 +5122,19 @@ msgid ""
 msgstr ""
 "通过工单创建, 工单标题: {}, 工单申请人: {}, 工单处理人: {}, 工单 ID: {}"
 
-#: tickets/handlers/base.py:72
+#: tickets/handlers/base.py:79
+msgid "Change field"
+msgstr "变更字段"
+
+#: tickets/handlers/base.py:79
+msgid "Before change"
+msgstr "变更前"
+
+#: tickets/handlers/base.py:79
+msgid "After change"
+msgstr "变更后"
+
+#: tickets/handlers/base.py:91
 msgid "{} {} the ticket"
 msgstr "{} {} 工单"
 
@@ -5136,8 +5150,8 @@ msgstr "申请登录的城市"
 msgid "Applied login datetime"
 msgstr "申请登录的日期"
 
-#: tickets/models/comment.py:13 tickets/models/ticket/general.py:39
-#: tickets/models/ticket/general.py:267
+#: tickets/models/comment.py:13 tickets/models/ticket/general.py:41
+#: tickets/models/ticket/general.py:277
 msgid "State"
 msgstr "状态"
 
@@ -5154,7 +5168,7 @@ msgid "Body"
 msgstr "内容"
 
 #: tickets/models/flow.py:20 tickets/models/flow.py:62
-#: tickets/models/ticket/general.py:35
+#: tickets/models/ticket/general.py:37
 msgid "Approve level"
 msgstr "审批级别"
 
@@ -5180,8 +5194,8 @@ msgstr "工单会话"
 
 #: tickets/models/ticket/apply_application.py:11
 #: tickets/models/ticket/apply_asset.py:13
-msgid "Apply name"
-msgstr "应用名称"
+msgid "Permission name"
+msgstr "授权规则名称"
 
 #: tickets/models/ticket/apply_application.py:20
 msgid "Apply applications"
@@ -5229,39 +5243,39 @@ msgstr "来自命令过滤规则"
 msgid "From cmd filter rule"
 msgstr "来自命令过滤规则"
 
-#: tickets/models/ticket/general.py:70
+#: tickets/models/ticket/general.py:72
 msgid "Ticket step"
 msgstr "工单步骤"
 
-#: tickets/models/ticket/general.py:88
+#: tickets/models/ticket/general.py:90
 msgid "Ticket assignee"
 msgstr "工单受理人"
 
-#: tickets/models/ticket/general.py:260
+#: tickets/models/ticket/general.py:270
 msgid "Title"
 msgstr "标题"
 
-#: tickets/models/ticket/general.py:276
+#: tickets/models/ticket/general.py:286
 msgid "Applicant"
 msgstr "申请人"
 
-#: tickets/models/ticket/general.py:281
+#: tickets/models/ticket/general.py:291
 msgid "TicketFlow"
 msgstr "工单流程"
 
-#: tickets/models/ticket/general.py:284
+#: tickets/models/ticket/general.py:294
 msgid "Approval step"
 msgstr "审批步骤"
 
-#: tickets/models/ticket/general.py:287
+#: tickets/models/ticket/general.py:297
 msgid "Relation snapshot"
 msgstr "工单快照"
 
-#: tickets/models/ticket/general.py:380
+#: tickets/models/ticket/general.py:390
 msgid "Please try again"
 msgstr "请再次尝试"
 
-#: tickets/models/ticket/general.py:387
+#: tickets/models/ticket/general.py:421
 msgid "Super ticket"
 msgstr "超级工单"
 
@@ -5281,27 +5295,27 @@ msgstr "登录系统用户"
 msgid "Login datetime"
 msgstr "登录日期"
 
-#: tickets/notifications.py:64
+#: tickets/notifications.py:63
 msgid "Ticket basic info"
 msgstr "工单基本信息"
 
-#: tickets/notifications.py:65
+#: tickets/notifications.py:64
 msgid "Ticket applied info"
 msgstr "工单申请信息"
 
-#: tickets/notifications.py:116
-msgid "Your has a new ticket"
+#: tickets/notifications.py:109
+msgid "Your has a new ticket, applicant - {}"
 msgstr "你有一个新的工单, 申请人 - {}"
 
-#: tickets/notifications.py:120
+#: tickets/notifications.py:113
 msgid "{}: New Ticket - {} ({})"
 msgstr "新工单 - {} ({})"
 
-#: tickets/notifications.py:164
+#: tickets/notifications.py:157
 msgid "Your ticket has been processed, processor - {}"
 msgstr "你的工单已被处理, 处理人 - {}"
 
-#: tickets/notifications.py:168
+#: tickets/notifications.py:161
 msgid "Ticket has processed - {} ({})"
 msgstr "你的工单已被处理, 处理人 - {} ({})"
 
@@ -5322,19 +5336,19 @@ msgid "Processor"
 msgstr "处理人"
 
 #: tickets/serializers/ticket/common.py:16
-#: tickets/serializers/ticket/common.py:68
+#: tickets/serializers/ticket/common.py:79
 msgid "Created by ticket ({}-{})"
 msgstr "通过工单创建 ({}-{})"
 
-#: tickets/serializers/ticket/common.py:58
+#: tickets/serializers/ticket/common.py:69
 msgid "The expiration date should be greater than the start date"
 msgstr "过期时间要大于开始时间"
 
-#: tickets/serializers/ticket/common.py:74
+#: tickets/serializers/ticket/common.py:85
 msgid "Permission named `{}` already exists"
 msgstr "授权名称 `{}` 已存在"
 
-#: tickets/serializers/ticket/ticket.py:89
+#: tickets/serializers/ticket/ticket.py:92
 msgid "The ticket flow `{}` does not exist"
 msgstr "工单流程 `{}` 不存在"
 
@@ -6590,11 +6604,7 @@ msgstr "资产为空，请更改节点"
 msgid "Executed times"
 msgstr "执行次数"
 
-#: xpack/plugins/interface/api.py:50
-msgid "It is already in the default setting state!"
-msgstr "当前已经是初始化状态！"
-
-#: xpack/plugins/interface/api.py:53
+#: xpack/plugins/interface/api.py:52
 msgid "Restore default successfully."
 msgstr "恢复默认成功！"
 
@@ -6657,6 +6667,12 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Apply name"
+#~ msgstr "应用名称"
+
+#~ msgid "It is already in the default setting state!"
+#~ msgstr "当前已经是初始化状态！"
 
 #~ msgid "Classic green"
 #~ msgstr "经典绿"

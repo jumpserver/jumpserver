@@ -38,14 +38,25 @@ class DefaultPermissionName(object):
 class BaseApplyAssetApplicationSerializer(serializers.Serializer):
     permission_model: Model
 
+    @property
+    def is_final_approval(self):
+        instance = self.instance
+        if not instance:
+            return False
+        if instance.approval_step == instance.ticket_steps.count():
+            return True
+        return False
+
     def filter_many_to_many_field(self, model, values: list, **kwargs):
-        org_id = self.initial_data.get('org_id')
+        org_id = self.instance.org_id if self.instance else self.initial_data.get('org_id')
         ids = [instance.id for instance in values]
         with tmp_to_org(org_id):
             qs = model.objects.filter(id__in=ids, **kwargs).values_list('id', flat=True)
         return list(qs)
 
     def validate_apply_system_users(self, system_users):
+        if self.is_final_approval and not system_users:
+            raise serializers.ValidationError(_('This field is required.'))
         return self.filter_many_to_many_field(SystemUser, system_users)
 
     def validate(self, attrs):
@@ -72,3 +83,10 @@ class BaseApplyAssetApplicationSerializer(serializers.Serializer):
                 instance.save()
                 return instance
         raise serializers.ValidationError(_('Permission named `{}` already exists'.format(name)))
+
+    @atomic
+    def update(self, instance, validated_data):
+        old_rel_snapshot = instance.get_local_snapshot()
+        instance = super().update(instance, validated_data)
+        instance.old_rel_snapshot = old_rel_snapshot
+        return instance
