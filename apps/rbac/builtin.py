@@ -6,7 +6,6 @@ _view_root_perms = (
     ('orgs', 'organization', 'view', 'rootorg'),
 )
 
-# 工作台也区分组织后再考虑
 user_perms = (
     ('rbac', 'menupermission', 'view', 'workbench'),
     ('rbac', 'menupermission', 'view', 'webterminal'),
@@ -25,7 +24,7 @@ system_user_perms = (
     ('authentication', 'temptoken', 'add,change,view', 'temptoken'),
     ('authentication', 'accesskey', '*', '*'),
     ('tickets', 'ticket', 'view', 'ticket'),
-) + user_perms
+) + user_perms + _view_root_perms
 
 _auditor_perms = (
     ('rbac', 'menupermission', 'view', 'audit'),
