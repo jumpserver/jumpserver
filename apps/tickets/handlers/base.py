@@ -5,7 +5,7 @@ from tickets.utils import (
     send_ticket_processed_mail_to_applicant,
     send_ticket_applied_mail_to_assignees
 )
-from tickets.const import TicketState, TicketStatus
+from tickets.const import TicketState, TicketType
 
 logger = get_logger(__name__)
 
@@ -59,6 +59,24 @@ class BaseHandler:
         logger.debug('Send processed mail to applicant: {}'.format(applicant))
         send_ticket_processed_mail_to_applicant(self.ticket, processor)
 
+    def _diff_prev_approve_info(self, state):
+        diff_info = ''
+        if state != TicketState.approved:
+            return diff_info
+        if self.ticket.type not in [TicketType.apply_asset, TicketType.apply_application]:
+            return diff_info
+
+        old_rel_snapshot = self.ticket.old_rel_snapshot
+        current_rel_snapshot = self.ticket.get_local_snapshot()
+        diff = set(current_rel_snapshot.items()) - set(old_rel_snapshot.items())
+        if not diff:
+            return diff_info
+
+        diff_info += '对审批信息作出如下修改:\n'
+        for k, v in sorted(list(diff), reverse=True):
+            diff_info += f'    {k}: {old_rel_snapshot[k]} ==> {v}\n'
+        return diff_info
+
     def _create_state_change_comment(self, state):
         # 打开或关闭工单，备注显示是自己，其他是受理人
         if state in [TicketState.reopen, TicketState.pending, TicketState.closed]:
@@ -68,8 +86,10 @@ class BaseHandler:
 
         user_display = str(user)
         state_display = getattr(TicketState, state).label
+        base_info = _('{} {} the ticket').format(user_display, state_display)
+        diff_info = self._diff_prev_approve_info(state)
         data = {
-            'body': _('{} {} the ticket').format(user_display, state_display),
+            'body': f'{base_info}\n{diff_info}',
             'user': user,
             'user_display': str(user),
             'type': 'state',

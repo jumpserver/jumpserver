@@ -5294,7 +5294,7 @@ msgid "Ticket applied info"
 msgstr "工单申请信息"
 
 #: tickets/notifications.py:116
-msgid "Your has a new ticket"
+msgid "Your has a new ticket, applicant - {}"
 msgstr "你有一个新的工单, 申请人 - {}"
 
 #: tickets/notifications.py:120

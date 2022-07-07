@@ -102,7 +102,7 @@ def apply_asset_migrate(apps, *args):
             'applicant': instance.applicant_display,
             'apply_nodes': meta.get('apply_nodes_display', []),
             'apply_assets': meta.get('apply_assets_display', []),
-            'apply_system_users': meta.get('apply_system_users', []),
+            'apply_system_users': meta.get('apply_system_users_display', []),
         }
         instance.rel_snapshot = rel_snapshot
         instance.save(update_fields=['rel_snapshot'])
@@ -140,7 +140,7 @@ def apply_application_migrate(apps, *args):
         rel_snapshot = {
             'applicant': instance.applicant_display,
             'apply_applications': meta.get('apply_applications_display', []),
-            'apply_system_users': meta.get('apply_system_users', []),
+            'apply_system_users': meta.get('apply_system_users_display', []),
         }
         instance.rel_snapshot = rel_snapshot
         instance.save(update_fields=['rel_snapshot'])

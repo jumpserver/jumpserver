@@ -21,8 +21,12 @@ class ActionsField(serializers.MultipleChoiceField):
         return Action.value_to_choices(value)
 
     def to_internal_value(self, data):
-        if data is None:
+        if not self.allow_empty and not data:
+            self.fail('empty')
+
+        if not data:
             return data
+
         return Action.choices_to_value(data)
 
 

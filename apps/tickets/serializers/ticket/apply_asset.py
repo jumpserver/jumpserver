@@ -10,13 +10,13 @@ from tickets.models import ApplyAssetTicket
 from .ticket import TicketApplySerializer
 from .common import BaseApplyAssetApplicationSerializer
 
-__all__ = ['ApplyAssetSerializer', 'ApplyAssetDisplaySerializer']
+__all__ = ['ApplyAssetSerializer', 'ApplyAssetDisplaySerializer', 'ApproveAssetSerializer']
 
 asset_or_node_help_text = _("Select at least one asset or node")
 
 
 class ApplyAssetSerializer(BaseApplyAssetApplicationSerializer, TicketApplySerializer):
-    apply_actions = ActionsField(required=True, allow_null=True)
+    apply_actions = ActionsField(required=True, allow_empty=False)
     permission_model = AssetPermission
 
     class Meta:
@@ -30,9 +30,9 @@ class ApplyAssetSerializer(BaseApplyAssetApplicationSerializer, TicketApplySeria
         read_only_fields = list(set(fields) - set(writeable_fields))
         ticket_extra_kwargs = TicketApplySerializer.Meta.extra_kwargs
         extra_kwargs = {
-            'apply_nodes': {'required': False, 'help_text': asset_or_node_help_text},
-            'apply_assets': {'required': False, 'help_text': asset_or_node_help_text},
-            'apply_system_users': {'required': True},
+            'apply_nodes': {'required': False, 'allow_empty': True},
+            'apply_assets': {'required': False, 'allow_empty': True},
+            'apply_system_users': {'required': False, 'allow_empty': True},
         }
         extra_kwargs.update(ticket_extra_kwargs)
 
@@ -44,12 +44,20 @@ class ApplyAssetSerializer(BaseApplyAssetApplicationSerializer, TicketApplySeria
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
-        if not attrs.get('apply_nodes') and not attrs.get('apply_assets'):
+        if self.is_final_approval and (
+                not attrs.get('apply_nodes') and not attrs.get('apply_assets')
+        ):
             raise serializers.ValidationError({
                 'apply_nodes': asset_or_node_help_text,
                 'apply_assets': asset_or_node_help_text,
             })
+
         return attrs
+
+
+class ApproveAssetSerializer(ApplyAssetSerializer):
+    class Meta(ApplyAssetSerializer.Meta):
+        read_only_fields = ApplyAssetSerializer.Meta.read_only_fields + ['title', 'type']
 
 
 class ApplyAssetDisplaySerializer(ApplyAssetSerializer):
