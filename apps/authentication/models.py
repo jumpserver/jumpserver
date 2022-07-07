@@ -100,7 +100,7 @@ class ConnectionToken(OrgModelMixin, models.JMSModel):
 
     @classmethod
     def get_default_date_expired(cls):
-        return datetime.now() + timedelta(seconds=settings.CONNECTION_TOKEN_EXPIRATION)
+        return timezone.now() + timedelta(seconds=settings.CONNECTION_TOKEN_EXPIRATION)
 
     @property
     def is_expired(self):
@@ -172,7 +172,7 @@ class ConnectionToken(OrgModelMixin, models.JMSModel):
 
         return True, ''
 
-    def load_secret_detail_attrs(self):
+    def load_extra_attrs(self):
         self.domain = self.get_domain()
         self.gateway = self.get_gateway()
         self.remote_app = self.get_remote_app()

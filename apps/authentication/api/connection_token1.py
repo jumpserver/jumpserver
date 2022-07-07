@@ -112,10 +112,12 @@ class ClientProtocolMixin:
         }
 
         asset, application, system_user, user = self.get_request_resource(serializer)
+
         height = self.request.query_params.get('height')
         width = self.request.query_params.get('width')
         full_screen = is_true(self.request.query_params.get('full_screen'))
         drives_redirect = is_true(self.request.query_params.get('drives_redirect'))
+
         token, secret = self.create_token(user, asset, application, system_user)
 
         # 设置磁盘挂载
