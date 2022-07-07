@@ -12,7 +12,10 @@ from assets.serializers import ProtocolsField
 from perms.serializers.base import ActionsField
 
 
-__all__ = ['ConnectionTokenSerializer', 'ConnectionTokenSecretSerializer']
+__all__ = [
+    'ConnectionTokenSerializer', 'ConnectionTokenSecretSerializer',
+    'SuperConnectionTokenSerializer'
+]
 
 
 class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
@@ -30,6 +33,8 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
             'user', 'system_user', 'asset', 'application',
         ]
         read_only_fields = [
+            # 普通 Token 不支持指定 user
+            'user',
             'user_display', 'system_user_display', 'asset_display', 'application_display',
         ]
         fields = fields_small + fields_fk + read_only_fields
@@ -39,9 +44,17 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         attrs.update(fields_attrs)
         return attrs
 
-    @staticmethod
-    def construct_internal_fields_attrs(attrs):
-        user = attrs.get('user') or ''
+    @property
+    def request_user(self):
+        request = self.context.get('request')
+        if request:
+            return request.user
+
+    def get_user(self, attrs):
+        return self.request_user
+
+    def construct_internal_fields_attrs(self, attrs):
+        user = self.get_user(attrs)
         system_user = attrs.get('system_user') or ''
         asset = attrs.get('asset') or ''
         application = attrs.get('application') or ''
@@ -59,6 +72,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
 
         return {
             'type': tp,
+            'user': user,
             'secret': secret,
             'date_expired': date_expired,
             'user_display': pretty_string(str(user), max_length=128),
@@ -67,6 +81,22 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
             'application_display': pretty_string(str(application), max_length=128),
             'org_id': org_id,
         }
+
+
+#
+# SuperConnectionTokenSerializer
+#
+
+
+class SuperConnectionTokenSerializer(ConnectionTokenSerializer):
+
+    class Meta(ConnectionTokenSerializer.Meta):
+        read_only_fields = [
+            'user_display', 'system_user_display', 'asset_display', 'application_display',
+        ]
+
+    def get_user(self, attrs):
+        return attrs.get('user') or self.request_user
 
 
 #

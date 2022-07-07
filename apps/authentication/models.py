@@ -109,6 +109,11 @@ class ConnectionToken(OrgModelMixin, models.JMSModel):
     def is_type(self, tp):
         return self.type == tp
 
+    def renewal(self):
+        """ 续期 Token，将来支持用户自定义创建 token 后，续期策略要修改 """
+        self.date_expired = self.get_default_date_expired()
+        self.save()
+
     domain = gateway = remote_app = cmd_filter_rules = None
 
     actions = expired_at = None  # actions 和 expired_at 在 check_valid() 中赋值

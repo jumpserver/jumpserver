@@ -9,18 +9,18 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 
-
-
 from common.drf.api import JMSModelViewSet
 from common.http import is_true
 from orgs.mixins.api import RootOrgViewMixin
 from perms.models.base import Action
 from terminal.models import EndpointRule
-from ..serializers import ConnectionTokenSerializer, ConnectionTokenSecretSerializer
+from ..serializers import (
+    ConnectionTokenSerializer, ConnectionTokenSecretSerializer, SuperConnectionTokenSerializer
+)
 from ..models import ConnectionToken
 
 
-__all__ = ['ConnectionTokenViewSet']
+__all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
 
 
 class ConnectionTokenViewSet(RootOrgViewMixin, JMSModelViewSet):
@@ -281,4 +281,30 @@ class ConnectionTokenViewSet(RootOrgViewMixin, JMSModelViewSet):
         }
         token = json.dumps(data)
         return filename, token
+
+
+class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
+    serializer_classes = {
+        'default': SuperConnectionTokenSerializer,
+    }
+    rbac_perms = {
+        'create': 'authentication.add_superconnectiontoken',
+        'renewal': 'authentication.add_superconnectiontoken'
+    }
+
+    @action(methods=['PATCH'], detail=False)
+    def renewal(self, request, *args, **kwargs):
+        from common.utils.timezone import as_current_tz
+
+        token_id = request.data.get('token') or ''
+        token = get_object_or_404(ConnectionToken, pk=token_id)
+        date_expired = as_current_tz(token.date_expired)
+        if token.is_expired:
+            raise PermissionDenied('Token is expired at: {}'.format(date_expired))
+        token.renewal()
+        data = {
+            'ok': True,
+            'msg': f'Token is renewed, date expired: {date_expired}'
+        }
+        return Response(data=data, status=status.HTTP_200_OK)
 
