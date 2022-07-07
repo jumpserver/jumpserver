@@ -33,7 +33,7 @@ class WithBootstrapToken(permissions.BasePermission):
 
 
 class UserConfirmation(permissions.BasePermission):
-    ttl = 300
+    ttl = 60 * 5
     min_level = 1
     confirm_type = ConfirmType.ReLogin
 

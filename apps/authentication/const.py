@@ -18,7 +18,9 @@ class ConfirmType(TextChoices):
     @classmethod
     def get_can_confirm_types(cls, confirm_type):
         start = cls.values.index(confirm_type)
-        return cls.values[start:]
+        types = cls.values[start:]
+        types.reverse()
+        return types
 
     @classmethod
     def get_can_confirm_backend_classes(cls, confirm_type):
