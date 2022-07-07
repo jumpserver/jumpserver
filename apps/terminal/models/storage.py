@@ -85,7 +85,8 @@ class CommandStorage(CommonStorageModelMixin, CommonModelMixin):
         config = self.config
         if self.type_es and config.get('INDEX_BY_DATE'):
             engine_mod = import_module(TYPE_ENGINE_MAPPING[self.type])
-            store = engine_mod.CommandStore(config)
+            # 这里使用一个全新的 config, 防止修改当前的 config
+            store = engine_mod.CommandStore(self.config)
             store._ensure_index_exists()
             index_prefix = config.get('INDEX') or 'jumpserver'
             date = local_now_date_display()
