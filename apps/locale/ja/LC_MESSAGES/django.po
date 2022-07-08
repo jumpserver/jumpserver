@@ -4598,6 +4598,10 @@ msgstr "マイクロソフト"
 msgid "Official"
 msgstr "公式"
 
+#: templates/resource_download.html:51
+msgid "Offline video player"
+msgstr "オフラインビデオプレーヤー"
+
 #: templates/resource_download.html:33
 msgid ""
 "macOS needs to download the client to connect RDP asset, which comes with "
