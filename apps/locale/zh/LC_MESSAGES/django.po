@@ -4530,6 +4530,10 @@ msgstr "微软"
 msgid "Official"
 msgstr "官方"
 
+#: templates/resource_download.html:51
+msgid "Offline video player"
+msgstr "离线录像播放器"
+
 #: templates/resource_download.html:33
 msgid ""
 "macOS needs to download the client to connect RDP asset, which comes with "
