@@ -65,6 +65,7 @@ class ConnectionToken(OrgModelMixin, models.JMSModel):
         max_length=16, default=Type.asset, choices=Type.choices, verbose_name=_("Type")
     )
     secret = models.CharField(max_length=64, default='', verbose_name=_("Secret"))
+    # 迁移所以 null=True
     date_expired = models.DateTimeField(null=True, verbose_name=_("Date expired"))
 
     user = models.ForeignKey(
@@ -104,7 +105,14 @@ class ConnectionToken(OrgModelMixin, models.JMSModel):
 
     @property
     def is_expired(self):
+        if self.date_expired is None:
+            self.date_expired = timezone.now()
+            self.save()
         return self.date_expired < timezone.now()
+
+    @property
+    def is_valid(self):
+        return not self.is_expired
 
     def is_type(self, tp):
         return self.type == tp

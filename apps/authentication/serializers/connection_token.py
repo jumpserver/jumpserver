@@ -19,13 +19,14 @@ __all__ = [
 
 
 class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
+    type_display = serializers.ReadOnlyField(source='get_type_display', label=_("Type display"))
+    validity = serializers.BooleanField(source='is_valid', label=_('Validity'))
 
     class Meta:
         model = ConnectionToken
         fields_mini = ['id', 'type']
         fields_small = fields_mini + [
-            'secret',
-            'date_expired',
+            'secret', 'date_expired',
             'date_created', 'date_updated', 'created_by', 'updated_by',
             'org_id', 'org_name',
         ]
@@ -34,8 +35,9 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         ]
         read_only_fields = [
             # 普通 Token 不支持指定 user
-            'user',
-            'user_display', 'system_user_display', 'asset_display', 'application_display',
+            'user', 'validity',
+            'type_display', 'user_display', 'system_user_display', 'asset_display',
+            'application_display',
         ]
         fields = fields_small + fields_fk + read_only_fields
 
