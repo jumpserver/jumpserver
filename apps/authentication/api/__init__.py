@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 
-# from .connection_token1 import *
 from .connection_token import *
 from .token import *
 from .mfa import *

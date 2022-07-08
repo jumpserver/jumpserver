@@ -12,8 +12,6 @@ router.register('sso', api.SSOViewSet, 'sso')
 router.register('temp-tokens', api.TempTokenViewSet, 'temp-token')
 router.register('connection-token', api.ConnectionTokenViewSet, 'connection-token')
 router.register('super-connection-token', api.SuperConnectionTokenViewSet, 'super-connection-token')
-# router.register('connection-token', api.UserConnectionTokenViewSet, 'connection-token')
-# router.register('super-connection-token', api.UserSuperConnectionTokenViewSet, 'super-connection-token')
 
 
 urlpatterns = [
