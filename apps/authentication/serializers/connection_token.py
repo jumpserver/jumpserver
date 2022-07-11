@@ -14,7 +14,7 @@ from perms.serializers.base import ActionsField
 
 __all__ = [
     'ConnectionTokenSerializer', 'ConnectionTokenSecretSerializer',
-    'SuperConnectionTokenSerializer'
+    'SuperConnectionTokenSerializer', 'ConnectionTokenDisplaySerializer'
 ]
 
 
@@ -82,6 +82,13 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
             'asset_display': pretty_string(str(asset), max_length=128),
             'application_display': pretty_string(str(application), max_length=128),
             'org_id': org_id,
+        }
+
+
+class ConnectionTokenDisplaySerializer(ConnectionTokenSerializer):
+    class Meta(ConnectionTokenSerializer.Meta):
+        extra_kwargs = {
+            'secret': {'write_only': True},
         }
 
 
