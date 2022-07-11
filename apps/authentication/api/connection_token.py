@@ -16,7 +16,8 @@ from orgs.mixins.api import RootOrgViewMixin
 from perms.models.base import Action
 from terminal.models import EndpointRule
 from ..serializers import (
-    ConnectionTokenSerializer, ConnectionTokenSecretSerializer, SuperConnectionTokenSerializer
+    ConnectionTokenSerializer, ConnectionTokenSecretSerializer, SuperConnectionTokenSerializer,
+    ConnectionTokenDisplaySerializer,
 )
 from ..models import ConnectionToken
 
@@ -209,6 +210,8 @@ class ConnectionTokenViewSet(ConnectionTokenMixin, RootOrgViewMixin, JMSModelVie
     search_fields = filterset_fields
     serializer_classes = {
         'default': ConnectionTokenSerializer,
+        'list': ConnectionTokenDisplaySerializer,
+        'retrieve': ConnectionTokenDisplaySerializer,
         'get_secret_detail': ConnectionTokenSecretSerializer,
     }
     rbac_perms = {
