@@ -1,5 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import unicode_literals
+import os
 
 from django.urls import path, include, re_path
 from django.conf import settings
@@ -45,8 +46,8 @@ if settings.XPACK_ENABLED:
 
 
 apps = [
-    'users', 'assets', 'perms', 'terminal', 'ops', 'audits', 'orgs', 'auth',
-    'applications', 'tickets', 'settings', 'xpack',
+    'users', 'assets', 'perms', 'terminal', 'ops', 'audits',
+    'orgs', 'auth', 'applications', 'tickets', 'settings', 'xpack',
     'flower', 'luna', 'koko', 'ws', 'docs', 'redocs',
 ]
 
@@ -79,7 +80,7 @@ urlpatterns += [
     re_path('api/redoc/?', views.get_swagger_view().with_ui('redoc', cache_timeout=1), name='redoc'),
 ]
 
-if settings.DEBUG_DEV:
+if os.environ.get('DEBUG_TOOLBAR', False):
     urlpatterns += [
         path('__debug__/', include('debug_toolbar.urls')),
     ]

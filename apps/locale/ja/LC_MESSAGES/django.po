@@ -4651,6 +4651,10 @@ msgstr "マイクロソフト"
 msgid "Official"
 msgstr "公式"
 
+#: templates/resource_download.html:51
+msgid "Offline video player"
+msgstr "オフラインビデオプレーヤー"
+
 #: templates/resource_download.html:33
 msgid ""
 "macOS needs to download the client to connect RDP asset, which comes with "
@@ -6761,7 +6765,7 @@ msgstr "ログアウトページのロゴ"
 
 #: xpack/plugins/interface/models.py:40
 msgid "Theme"
-msgstr ""
+msgstr "テーマ"
 
 #: xpack/plugins/interface/models.py:43
 msgid "Interface setting"
@@ -6794,12 +6798,3 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "コミュニティ版"
-
-#~ msgid "It is already in the default setting state!"
-#~ msgstr "すでにデフォルトの設定状態です!"
-
-#~ msgid "Invalid token"
-#~ msgstr "無効なトークン"
-
-#~ msgid "Filters"
-#~ msgstr "フィルター"

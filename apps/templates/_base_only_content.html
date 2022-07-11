@@ -27,10 +27,12 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="ibox-content">
-                    <img src="{{ INTERFACE.logo_logout }}" style="margin: auto" width="50" height="50">
-                    <h2 class="font-bold" style="display: inline">{% block title %}{% endblock %}</h2>
-                    <h1></h1>
-                    {% block content %} {% endblock %}
+                    <h2 class="font-bold">
+                        {% block title %}{% endblock %}
+                    </h2>
+                    <div style="margin: 10px 0">
+                        {% block content %} {% endblock %}
+                    </div>
                 </div>
             </div>
         </div>
