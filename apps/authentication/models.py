@@ -8,6 +8,7 @@ from orgs.mixins.models import OrgModelMixin
 
 from common.db import models
 from common.utils import lazyproperty
+from common.utils.timezone import as_current_tz
 
 
 class AccessKey(models.Model):
@@ -57,7 +58,7 @@ class SSOToken(models.JMSBaseModel):
 
 
 def date_expired_default():
-    return timezone.now()
+    return timezone.now() + timedelta(seconds=settings.CONNECTION_TOKEN_EXPIRATION)
 
 
 class ConnectionToken(OrgModelMixin, models.JMSModel):
@@ -107,7 +108,7 @@ class ConnectionToken(OrgModelMixin, models.JMSModel):
 
     @classmethod
     def get_default_date_expired(cls):
-        return timezone.now() + timedelta(seconds=settings.CONNECTION_TOKEN_EXPIRATION)
+        return date_expired_default()
 
     @property
     def is_expired(self):
@@ -137,7 +138,7 @@ class ConnectionToken(OrgModelMixin, models.JMSModel):
 
         if self.is_expired:
             is_valid = False
-            error = _('Connection token expired at: {}').format(self.date_expired)
+            error = _('Connection token expired at: {}').format(as_current_tz(self.date_expired))
             return is_valid, error
 
         if not self.user:
