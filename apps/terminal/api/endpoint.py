@@ -54,15 +54,15 @@ class SmartEndpointViewMixin:
         asset_id = request.GET.get('asset_id')
         app_id = request.GET.get('app_id')
         session_id = request.GET.get('session_id')
-        token = request.GET.get('token')
-        if token:
-            from authentication.api.connection_token import TokenCacheMixin as TokenUtil
-            value = TokenUtil().get_token_from_cache(token)
-            if value:
-                if value.get('type') == 'asset':
-                    asset_id = value.get('asset')
-                else:
-                    app_id = value.get('application')
+        token_id = request.GET.get('token')
+        if token_id:
+            from authentication.models import ConnectionToken
+            token = ConnectionToken.objects.filter(id=token_id).first()
+            if token:
+                if token.asset:
+                    asset_id = token.asset.id
+                elif token.application:
+                    app_id = token.application.id
         if asset_id:
             pk, model = asset_id, Asset
         elif app_id:
