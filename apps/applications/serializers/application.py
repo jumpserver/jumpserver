@@ -4,6 +4,7 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+from orgs.utils import get_current_org
 from assets.serializers.base import AuthSerializerMixin
 from common.drf.serializers import MethodSerializer, SecretReadableMixin
 from .attrs import (
@@ -150,6 +151,10 @@ class AppAccountSerializer(AppSerializerMixin, AuthSerializerMixin, BulkOrgResou
     def to_representation(self, instance):
         instance.load_auth()
         return super().to_representation(instance)
+
+    @staticmethod
+    def bulk_create_org_id():
+        return get_current_org().id
 
 
 class AppAccountSecretSerializer(SecretReadableMixin, AppAccountSerializer):

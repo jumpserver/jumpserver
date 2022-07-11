@@ -2,12 +2,13 @@
 #
 from collections import Iterable
 
-from django.db.models import Prefetch, F, NOT_PROVIDED
+from django.db.models import NOT_PROVIDED
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.utils import html
 from rest_framework.settings import api_settings
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SkipField, empty
+
 __all__ = ['BulkSerializerMixin', 'BulkListSerializerMixin', 'CommonSerializerMixin', 'CommonBulkSerializerMixin']
 
 
@@ -16,6 +17,7 @@ class BulkSerializerMixin(object):
     Become rest_framework_bulk not support uuid as a primary key
     so rewrite it. https://github.com/miki725/django-rest-framework-bulk/issues/66
     """
+
     def to_internal_value(self, data):
         from rest_framework_bulk import BulkListSerializer
         ret = super(BulkSerializerMixin, self).to_internal_value(data)
@@ -130,9 +132,12 @@ class BulkListSerializerMixin(object):
         model_bulk_create_kwargs = getattr(self.child.Meta, 'model_bulk_create_kwargs', {})
 
         if use_model_bulk_create:
-            to_create = [
-                ModelClass(**attrs) for attrs in validated_data
-            ]
+            org_id = getattr(self.child, 'bulk_create_org_id', lambda: None)()
+            to_create = []
+            for attrs in validated_data:
+                if org_id is not None:
+                    attrs['org_id'] = org_id
+                to_create.append(ModelClass(**attrs))
             objs = ModelClass._default_manager.bulk_create(
                 to_create, **model_bulk_create_kwargs
             )
@@ -279,17 +284,6 @@ class DynamicFieldsMixin:
 
         for field in exclude_field_names or []:
             self.fields.pop(field, None)
-
-
-class EagerLoadQuerySetFields:
-    def setup_eager_loading(self, queryset):
-        """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related(
-            Prefetch('nodes'),
-            Prefetch('labels'),
-        ).select_related('admin_user', 'domain', 'platform') \
-         .annotate(platform_base=F('platform__base'))
-        return queryset
 
 
 class CommonSerializerMixin(DynamicFieldsMixin, DefaultValueFieldsMixin):
