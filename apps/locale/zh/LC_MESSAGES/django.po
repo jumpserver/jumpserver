@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-11 15:52+0800\n"
+"POT-Creation-Date: 2022-07-11 17:46+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -87,7 +87,7 @@ msgstr "登录复核"
 #: acls/models/login_acl.py:24 acls/models/login_asset_acl.py:20
 #: assets/models/cmd_filter.py:30 assets/models/label.py:15 audits/models.py:37
 #: audits/models.py:62 audits/models.py:87 audits/serializers.py:100
-#: authentication/models.py:53 authentication/models.py:72 orgs/models.py:214
+#: authentication/models.py:53 authentication/models.py:77 orgs/models.py:214
 #: perms/models/base.py:84 rbac/builtin.py:118 rbac/models/rolebinding.py:41
 #: terminal/backends/command/models.py:20
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:44
@@ -130,7 +130,7 @@ msgstr "系统用户"
 #: assets/models/backup.py:31 assets/models/cmd_filter.py:38
 #: assets/models/gathered_user.py:14 assets/serializers/label.py:30
 #: assets/serializers/system_user.py:268 audits/models.py:39
-#: authentication/models.py:61 authentication/models.py:84
+#: authentication/models.py:65 authentication/models.py:89
 #: perms/models/asset_permission.py:23 terminal/backends/command/models.py:21
 #: terminal/backends/command/serializers.py:14 terminal/models/session.py:46
 #: terminal/notifications.py:90
@@ -156,7 +156,7 @@ msgstr "格式为逗号分隔的字符串, * 表示匹配所有. "
 #: acls/serializers/login_asset_acl.py:51 assets/models/base.py:176
 #: assets/models/gathered_user.py:15 audits/models.py:121
 #: authentication/forms.py:25 authentication/forms.py:27
-#: authentication/models.py:249
+#: authentication/models.py:244
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
 #: ops/models/adhoc.py:159 users/forms/profile.py:32 users/models/user.py:659
@@ -257,14 +257,14 @@ msgstr "自定义"
 
 #: applications/models/account.py:12 applications/models/application.py:234
 #: assets/models/backup.py:32 assets/models/cmd_filter.py:45
-#: authentication/models.py:62 authentication/models.py:89
+#: authentication/models.py:66 authentication/models.py:94
 #: perms/models/application_permission.py:28
 msgid "Application"
 msgstr "应用程序"
 
 #: applications/models/account.py:15 assets/models/authbook.py:20
 #: assets/models/cmd_filter.py:42 assets/models/user.py:342 audits/models.py:40
-#: authentication/models.py:77 perms/models/application_permission.py:33
+#: authentication/models.py:82 perms/models/application_permission.py:33
 #: perms/models/asset_permission.py:25 terminal/backends/command/models.py:22
 #: terminal/backends/command/serializers.py:36 terminal/models/session.py:48
 #: xpack/plugins/change_auth_plan/models/app.py:36
@@ -302,7 +302,7 @@ msgstr "类别"
 #: applications/models/application.py:222
 #: applications/serializers/application.py:101 assets/models/backup.py:49
 #: assets/models/cmd_filter.py:82 assets/models/user.py:250
-#: authentication/models.py:65 perms/models/application_permission.py:24
+#: authentication/models.py:69 perms/models/application_permission.py:24
 #: perms/serializers/application/user_permission.py:34
 #: terminal/models/storage.py:58 terminal/models/storage.py:142
 #: tickets/models/comment.py:26 tickets/models/flow.py:57
@@ -368,7 +368,7 @@ msgid "Date updated"
 msgstr "更新日期"
 
 #: applications/serializers/application.py:121
-#: applications/serializers/application.py:166 authentication/models.py:93
+#: applications/serializers/application.py:166 authentication/models.py:98
 msgid "Application display"
 msgstr "应用名称"
 
@@ -761,7 +761,7 @@ msgstr "失败"
 msgid "Connectivity"
 msgstr "可连接性"
 
-#: assets/models/base.py:40 authentication/models.py:252
+#: assets/models/base.py:40 authentication/models.py:247
 msgid "Date verified"
 msgstr "校验日期"
 
@@ -1077,7 +1077,7 @@ msgstr ""
 "置加密密码"
 
 #: assets/serializers/account.py:36 assets/serializers/account.py:87
-#: assets/serializers/account_history.py:10 authentication/models.py:81
+#: assets/serializers/account_history.py:10 authentication/models.py:86
 msgid "System user display"
 msgstr "系统用户名称"
 
@@ -1567,7 +1567,7 @@ msgstr "运行用户"
 msgid "Run as display"
 msgstr "运行用户名称"
 
-#: audits/serializers.py:102 authentication/models.py:75
+#: audits/serializers.py:102 authentication/models.py:80
 #: rbac/serializers/rolebinding.py:21
 msgid "User display"
 msgstr "用户名称"
@@ -1596,7 +1596,7 @@ msgstr "企业微信"
 msgid "DingTalk"
 msgstr "钉钉"
 
-#: audits/signal_handlers.py:55 authentication/models.py:256
+#: audits/signal_handlers.py:55 authentication/models.py:251
 msgid "Temporary token"
 msgstr "临时密码"
 
@@ -2077,71 +2077,71 @@ msgstr "过期时间"
 msgid "SSO token"
 msgstr "SSO token"
 
-#: authentication/models.py:67 authentication/models.py:250
+#: authentication/models.py:71 authentication/models.py:245
 #: authentication/templates/authentication/_access_key_modal.html:31
 #: settings/serializers/auth/radius.py:17
 msgid "Secret"
 msgstr "密钥"
 
-#: authentication/models.py:69 authentication/models.py:253
+#: authentication/models.py:73 authentication/models.py:248
 #: perms/models/base.py:90 tickets/models/ticket/apply_application.py:26
 #: tickets/models/ticket/apply_asset.py:24 users/models/user.py:703
 msgid "Date expired"
 msgstr "失效日期"
 
-#: authentication/models.py:87
+#: authentication/models.py:92
 msgid "Asset display"
 msgstr "资产名称"
 
-#: authentication/models.py:98
+#: authentication/models.py:103
 msgid "Connection token"
 msgstr "连接令牌"
 
-#: authentication/models.py:100
+#: authentication/models.py:105
 msgid "Can view connection token secret"
 msgstr "可以查看连接令牌密文"
 
-#: authentication/models.py:139
+#: authentication/models.py:140
 msgid "Connection token expired at: {}"
 msgstr "连接令牌过期: {}"
 
-#: authentication/models.py:144
+#: authentication/models.py:145
 msgid "User not exists"
 msgstr "用户不存在"
 
-#: authentication/models.py:148
+#: authentication/models.py:149
 msgid "User invalid, disabled or expired"
 msgstr "用户无效，已禁用或已过期"
 
-#: authentication/models.py:153
+#: authentication/models.py:154
 msgid "System user not exists"
 msgstr "系统用户不存在"
 
-#: authentication/models.py:159
+#: authentication/models.py:160
 msgid "Asset not exists"
 msgstr "资产不存在"
 
-#: authentication/models.py:163
+#: authentication/models.py:164
 msgid "Asset inactive"
 msgstr "资产未激活"
 
-#: authentication/models.py:170
+#: authentication/models.py:171
 msgid "User has no permission to access asset or permission expired"
 msgstr "用户没有权限访问资产或权限已过期"
 
-#: authentication/models.py:178
+#: authentication/models.py:179
 msgid "Application not exists"
 msgstr "应用不存在"
 
-#: authentication/models.py:185
+#: authentication/models.py:186
 msgid "User has no permission to access application or permission expired"
 msgstr "用户没有权限访问应用或权限已过期"
 
-#: authentication/models.py:251
+#: authentication/models.py:246
 msgid "Verified"
 msgstr "已校验"
 
-#: authentication/models.py:272
+#: authentication/models.py:267
 msgid "Super connection token"
 msgstr "超级连接令牌"
 
@@ -6635,11 +6635,7 @@ msgstr "资产为空，请更改节点"
 msgid "Executed times"
 msgstr "执行次数"
 
-#: xpack/plugins/interface/api.py:50
-msgid "It is already in the default setting state!"
-msgstr "当前已经是初始化状态！"
-
-#: xpack/plugins/interface/api.py:53
+#: xpack/plugins/interface/api.py:52
 msgid "Restore default successfully."
 msgstr "恢复默认成功！"
 
@@ -6647,31 +6643,31 @@ msgstr "恢复默认成功！"
 msgid "Interface settings"
 msgstr "界面设置"
 
-#: xpack/plugins/interface/models.py:28
+#: xpack/plugins/interface/models.py:22
 msgid "Title of login page"
 msgstr "登录页面标题"
 
-#: xpack/plugins/interface/models.py:32
+#: xpack/plugins/interface/models.py:26
 msgid "Image of login page"
 msgstr "登录页面图片"
 
-#: xpack/plugins/interface/models.py:36
+#: xpack/plugins/interface/models.py:30
 msgid "Website icon"
 msgstr "网站图标"
 
-#: xpack/plugins/interface/models.py:40
+#: xpack/plugins/interface/models.py:34
 msgid "Logo of management page"
 msgstr "管理页面logo"
 
-#: xpack/plugins/interface/models.py:44
+#: xpack/plugins/interface/models.py:38
 msgid "Logo of logout page"
 msgstr "退出页面logo"
 
-#: xpack/plugins/interface/models.py:48
+#: xpack/plugins/interface/models.py:40
 msgid "Theme"
 msgstr ""
 
-#: xpack/plugins/interface/models.py:52
+#: xpack/plugins/interface/models.py:43
 msgid "Interface setting"
 msgstr "界面设置"
 
@@ -6702,6 +6698,9 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "It is already in the default setting state!"
+#~ msgstr "当前已经是初始化状态！"
 
 #~ msgid "Invalid token"
 #~ msgstr "无效的令牌"
