@@ -81,4 +81,8 @@ class Migration(migrations.Migration):
             name='id',
             field=models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False),
         ),
+        migrations.AlterModelOptions(
+            name='connectiontoken',
+            options={'ordering': ('-date_expired',), 'permissions': [('view_connectiontokensecret', 'Can view connection token secret')], 'verbose_name': 'Connection token'},
+        ),
     ]
