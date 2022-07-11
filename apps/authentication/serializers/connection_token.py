@@ -20,7 +20,7 @@ __all__ = [
 
 class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
     type_display = serializers.ReadOnlyField(source='get_type_display', label=_("Type display"))
-    validity = serializers.BooleanField(source='is_valid', label=_('Validity'))
+    validity = serializers.BooleanField(source='is_valid', read_only=True, label=_('Validity'))
 
     class Meta:
         model = ConnectionToken
@@ -94,6 +94,7 @@ class SuperConnectionTokenSerializer(ConnectionTokenSerializer):
 
     class Meta(ConnectionTokenSerializer.Meta):
         read_only_fields = [
+            'validity',
             'user_display', 'system_user_display', 'asset_display', 'application_display',
         ]
 

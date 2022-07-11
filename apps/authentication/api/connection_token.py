@@ -24,6 +24,11 @@ __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
 
 
 class ConnectionTokenViewSet(RootOrgViewMixin, JMSModelViewSet):
+    filterset_fields = (
+        'type',
+        'user_display', 'system_user_display', 'application_display', 'asset_display'
+    )
+    search_fields = filterset_fields
     serializer_classes = {
         'default': ConnectionTokenSerializer,
         'get_secret_detail': ConnectionTokenSecretSerializer,
@@ -31,6 +36,7 @@ class ConnectionTokenViewSet(RootOrgViewMixin, JMSModelViewSet):
     rbac_perms = {
         'retrieve': 'authentication.view_connectiontoken',
         'create': 'authentication.add_connectiontoken',
+        'expire': 'authentication.add_connectiontoken',
         'get_secret_detail': 'authentication.view_connectiontokensecret',
         'get_rdp_file': 'authentication.add_connectiontoken',
         'get_client_protocol_url': 'authentication.add_connectiontoken',
@@ -281,6 +287,16 @@ class ConnectionTokenViewSet(RootOrgViewMixin, JMSModelViewSet):
         }
         token = json.dumps(data)
         return filename, token
+
+    #
+    # expire
+    #
+
+    @action(methods=['PATCH'], detail=True)
+    def expire(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.expire()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
