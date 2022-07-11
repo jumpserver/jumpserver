@@ -8,6 +8,7 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.request import Request
 
 from common.drf.api import JMSModelViewSet
 from common.http import is_true
@@ -23,50 +24,18 @@ from ..models import ConnectionToken
 __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
 
 
-class ConnectionTokenViewSet(RootOrgViewMixin, JMSModelViewSet):
-    filterset_fields = (
-        'type',
-        'user_display', 'system_user_display', 'application_display', 'asset_display'
-    )
-    search_fields = filterset_fields
-    serializer_classes = {
-        'default': ConnectionTokenSerializer,
-        'get_secret_detail': ConnectionTokenSecretSerializer,
-    }
-    rbac_perms = {
-        'retrieve': 'authentication.view_connectiontoken',
-        'create': 'authentication.add_connectiontoken',
-        'expire': 'authentication.add_connectiontoken',
-        'get_secret_detail': 'authentication.view_connectiontokensecret',
-        'get_rdp_file': 'authentication.add_connectiontoken',
-        'get_client_protocol_url': 'authentication.add_connectiontoken',
-    }
-    queryset = ConnectionToken.objects.all()
-
-    def create_connection_token(self):
-        data = self.request.query_params if self.request.method == 'GET' else self.request.data
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        token: ConnectionToken = serializer.instance
-        self.check_token_valid(token)
-        token.load_extra_attrs()
-        return token
-
-    def perform_create(self, serializer):
-        user, asset, application, system_user = self.get_request_resources(serializer)
-        self.check_user_has_resource_permission(user, asset, application, system_user)
-        return super(ConnectionTokenViewSet, self).perform_create(serializer)
+class ConnectionTokenMixin:
+    request: Request
 
     @staticmethod
-    def check_token_valid(token):
+    def check_token_valid(token: ConnectionToken):
         is_valid, error = token.check_valid()
         if not is_valid:
             raise PermissionDenied(error)
 
     @staticmethod
     def get_request_resources(serializer):
-        user = serializer.validated_data.get('user')  # or self.request.user
+        user = serializer.validated_data.get('user')
         asset = serializer.validated_data.get('asset')
         application = serializer.validated_data.get('application')
         system_user = serializer.validated_data.get('system_user')
@@ -97,58 +66,9 @@ class ConnectionTokenViewSet(RootOrgViewMixin, JMSModelViewSet):
         endpoint = EndpointRule.match_endpoint(target_ip, protocol, self.request)
         return endpoint
 
-    #
-    # get secret detail (API)
-    #
-
-    @action(methods=['POST'], detail=False, url_path='secret-info/detail')
-    def get_secret_detail(self, request, *args, **kwargs):
-        # 非常重要的 api，在逻辑层再判断一下，双重保险
-        perm_required = 'authentication.view_connectiontokensecret'
-        if not request.user.has_perm(perm_required):
-            raise PermissionDenied('Not allow to view secret')
-        token_id = request.data.get('token') or ''
-        token = get_object_or_404(ConnectionToken, pk=token_id)
-        self.check_token_valid(token)
-        token.load_extra_attrs()
-        serializer = self.get_serializer(instance=token)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    #
-    # get rdp file (API)
-    #
-
-    @action(methods=['POST', 'GET'], detail=False, url_path='rdp/file')
-    def get_rdp_file(self, request, *args, **kwargs):
-        token = self.create_connection_token()
-        filename, content = self.get_rdp_file_info(token)
-        filename = '{}.rdp'.format(filename)
-        response = HttpResponse(content, content_type='application/octet-stream')
-        response['Content-Disposition'] = 'attachment; filename*=UTF-8\'\'%s' % filename
-        return response
-
     @staticmethod
     def parse_env_bool(env_key, env_default, true_value, false_value):
         return true_value if is_true(os.getenv(env_key, env_default)) else false_value
-
-    #
-    # get client protocol url (API)
-    #
-
-    @action(methods=['POST', 'GET'], detail=False, url_path='client-url')
-    def get_client_protocol_url(self, request, *args, **kwargs):
-        token = self.create_connection_token()
-        try:
-            protocol_data = self.get_client_protocol_data(token)
-        except ValueError as e:
-            return Response(data={'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-        protocol_data = json.dumps(protocol_data).encode()
-        protocol_data = base64.b64encode(protocol_data).decode()
-        data = {
-            'url': 'jms://{}'.format(protocol_data)
-        }
-        return Response(data=data)
 
     def get_client_protocol_data(self, token: ConnectionToken):
         from assets.models import SystemUser
@@ -169,10 +89,6 @@ class ConnectionTokenViewSet(RootOrgViewMixin, JMSModelViewSet):
             "token": ssh_token,
             "config": rdp_config
         }
-
-    #
-    # get rdp file info
-    #
 
     def get_rdp_file_info(self, token: ConnectionToken):
         rdp_options = {
@@ -263,10 +179,6 @@ class ConnectionTokenViewSet(RootOrgViewMixin, JMSModelViewSet):
 
         return filename, content
 
-    #
-    # get ssh token
-    #
-
     def get_ssh_token(self, token: ConnectionToken):
         if token.asset:
             name = token.asset.hostname
@@ -288,9 +200,77 @@ class ConnectionTokenViewSet(RootOrgViewMixin, JMSModelViewSet):
         token = json.dumps(data)
         return filename, token
 
-    #
-    # expire
-    #
+
+class ConnectionTokenViewSet(ConnectionTokenMixin, RootOrgViewMixin, JMSModelViewSet):
+    filterset_fields = (
+        'type',
+        'user_display', 'system_user_display', 'application_display', 'asset_display'
+    )
+    search_fields = filterset_fields
+    serializer_classes = {
+        'default': ConnectionTokenSerializer,
+        'get_secret_detail': ConnectionTokenSecretSerializer,
+    }
+    rbac_perms = {
+        'retrieve': 'authentication.view_connectiontoken',
+        'create': 'authentication.add_connectiontoken',
+        'expire': 'authentication.add_connectiontoken',
+        'get_secret_detail': 'authentication.view_connectiontokensecret',
+        'get_rdp_file': 'authentication.add_connectiontoken',
+        'get_client_protocol_url': 'authentication.add_connectiontoken',
+    }
+    queryset = ConnectionToken.objects.all()
+
+    def create_connection_token(self):
+        data = self.request.query_params if self.request.method == 'GET' else self.request.data
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        token: ConnectionToken = serializer.instance
+        return token
+
+    def perform_create(self, serializer):
+        user, asset, application, system_user = self.get_request_resources(serializer)
+        self.check_user_has_resource_permission(user, asset, application, system_user)
+        return super(ConnectionTokenViewSet, self).perform_create(serializer)
+
+    @action(methods=['POST'], detail=False, url_path='secret-info/detail')
+    def get_secret_detail(self, request, *args, **kwargs):
+        # 非常重要的 api，在逻辑层再判断一下，双重保险
+        perm_required = 'authentication.view_connectiontokensecret'
+        if not request.user.has_perm(perm_required):
+            raise PermissionDenied('Not allow to view secret')
+        token_id = request.data.get('token') or ''
+        token = get_object_or_404(ConnectionToken, pk=token_id)
+        self.check_token_valid(token)
+        token.load_system_user_auth()
+        serializer = self.get_serializer(instance=token)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(methods=['POST', 'GET'], detail=False, url_path='rdp/file')
+    def get_rdp_file(self, request, *args, **kwargs):
+        token = self.create_connection_token()
+        self.check_token_valid(token)
+        filename, content = self.get_rdp_file_info(token)
+        filename = '{}.rdp'.format(filename)
+        response = HttpResponse(content, content_type='application/octet-stream')
+        response['Content-Disposition'] = 'attachment; filename*=UTF-8\'\'%s' % filename
+        return response
+
+    @action(methods=['POST', 'GET'], detail=False, url_path='client-url')
+    def get_client_protocol_url(self, request, *args, **kwargs):
+        token = self.create_connection_token()
+        self.check_token_valid(token)
+        try:
+            protocol_data = self.get_client_protocol_data(token)
+        except ValueError as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        protocol_data = json.dumps(protocol_data).encode()
+        protocol_data = base64.b64encode(protocol_data).decode()
+        data = {
+            'url': 'jms://{}'.format(protocol_data)
+        }
+        return Response(data=data)
 
     @action(methods=['PATCH'], detail=True)
     def expire(self, request, *args, **kwargs):

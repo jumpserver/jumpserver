@@ -56,6 +56,10 @@ class SSOToken(models.JMSBaseModel):
         verbose_name = _('SSO token')
 
 
+def date_expired_default():
+    return timezone.now()
+
+
 class ConnectionToken(OrgModelMixin, models.JMSModel):
     class Type(models.TextChoices):
         asset = 'asset', _('Asset')
@@ -65,8 +69,9 @@ class ConnectionToken(OrgModelMixin, models.JMSModel):
         max_length=16, default=Type.asset, choices=Type.choices, verbose_name=_("Type")
     )
     secret = models.CharField(max_length=64, default='', verbose_name=_("Secret"))
-    # 迁移需要 null=True
-    date_expired = models.DateTimeField(null=True, verbose_name=_("Date expired"))
+    date_expired = models.DateTimeField(
+        default=date_expired_default, verbose_name=_("Date expired")
+    )
 
     user = models.ForeignKey(
         'users.User', on_delete=models.SET_NULL, verbose_name=_('User'),
@@ -106,8 +111,6 @@ class ConnectionToken(OrgModelMixin, models.JMSModel):
 
     @property
     def is_expired(self):
-        if self.date_expired is None:
-            self.expire()
         return self.date_expired < timezone.now()
 
     def expire(self):
@@ -125,8 +128,6 @@ class ConnectionToken(OrgModelMixin, models.JMSModel):
         """ 续期 Token，将来支持用户自定义创建 token 后，续期策略要修改 """
         self.date_expired = self.get_default_date_expired()
         self.save()
-
-    domain = gateway = remote_app = cmd_filter_rules = None
 
     actions = expired_at = None  # actions 和 expired_at 在 check_valid() 中赋值
 
@@ -189,17 +190,8 @@ class ConnectionToken(OrgModelMixin, models.JMSModel):
 
         return True, ''
 
-    def load_extra_attrs(self):
-        self.domain = self.get_domain()
-        self.gateway = self.get_gateway()
-        self.remote_app = self.get_remote_app()
-        self.cmd_filter_rules = self.get_cmd_filter_rules()
-        # 已在 check_valid() 中赋值
-        # self.actions = actions
-        # self.expired_at = expired_at
-        self.load_system_user_auth()
-
-    def get_domain(self):
+    @lazyproperty
+    def domain(self):
         if self.asset:
             return self.asset.domain
         if not self.application:
@@ -211,21 +203,24 @@ class ConnectionToken(OrgModelMixin, models.JMSModel):
             domain = self.application.domain
         return domain
 
-    def get_gateway(self):
+    @lazyproperty
+    def gateway(self):
         from assets.models import Domain
         if not self.domain:
             return
         self.domain: Domain
         return self.domain.random_gateway()
 
-    def get_remote_app(self):
+    @lazyproperty
+    def remote_app(self):
         if not self.application:
             return {}
         if not self.application.category_remote_app:
             return {}
         return self.application.get_rdp_remote_app_setting()
 
-    def get_cmd_filter_rules(self):
+    @lazyproperty
+    def cmd_filter_rules(self):
         from assets.models import CommandFilterRule
         kwargs = {
             'user_id': self.user.id,
