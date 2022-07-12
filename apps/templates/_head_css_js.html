@@ -22,8 +22,8 @@
 </style>
 
 <script>
-  const theme = "{{ INTERFACE.theme }}";
-  if (theme && theme.colors && theme.colors['--color-primary']) {
-    document.documentElement.style.setProperty('--primary-color', theme.colors['--color-primary']);
+  const themeInfo = {{ INTERFACE.theme_info | safe }};
+  if (themeInfo && themeInfo.colors && themeInfo.colors['--color-primary']) {
+    document.documentElement.style.setProperty('--primary-color', themeInfo.colors['--color-primary']);
   }
 </script>

@@ -300,5 +300,4 @@ class WeComOAuthLoginCallbackView(AuthMixin, WeComOAuthMixin, View):
             msg = e.msg
             response = self.get_failed_response(login_url, title=msg, msg=msg)
             return response
-
         return self.redirect_to_guard_view()
