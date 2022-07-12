@@ -114,6 +114,14 @@ class ConnectionToken(OrgModelMixin, models.JMSModel):
     def is_expired(self):
         return self.date_expired < timezone.now()
 
+    @property
+    def expire_time(self):
+        interval = self.date_expired - timezone.now()
+        seconds = interval.total_seconds()
+        if seconds < 0:
+            seconds = 0
+        return int(seconds)
+
     def expire(self):
         self.date_expired = timezone.now()
         self.save()
