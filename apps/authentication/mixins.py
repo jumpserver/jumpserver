@@ -443,13 +443,15 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
         LoginIpBlockUtil(ip).clean_block_if_need()
         return user
 
-    def mark_password_ok(self, user, auto_login=False):
+    def mark_password_ok(self, user, auto_login=False, auth_backend=None):
         request = self.request
         request.session['auth_password'] = 1
         request.session['auth_password_expired_at'] = time.time() + settings.AUTH_EXPIRED_SECONDS
         request.session['user_id'] = str(user.id)
         request.session['auto_login'] = auto_login
-        request.session['auth_backend'] = getattr(user, 'backend', settings.AUTH_BACKEND_MODEL)
+        if not auth_backend:
+            auth_backend = getattr(user, 'backend', settings.AUTH_BACKEND_MODEL)
+        request.session['auth_backend'] = auth_backend
 
     def check_oauth2_auth(self, user: User, auth_backend):
         ip = self.get_request_ip()
@@ -469,7 +471,7 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
         LoginIpBlockUtil(ip).clean_block_if_need()
         MFABlockUtils(user.username, ip).clean_failed_count()
 
-        self.mark_password_ok(user, False)
+        self.mark_password_ok(user, False, auth_backend)
         return user
 
     def get_user_or_auth(self, valid_data):
