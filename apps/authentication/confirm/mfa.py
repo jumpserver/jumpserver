@@ -8,7 +8,7 @@ class ConfirmMFA(BaseConfirm):
     display_name = 'MFA'
 
     def check(self):
-        return self.user.active_mfa_backends
+        return self.user.active_mfa_backends and self.user.mfa_enabled
 
     @property
     def content(self):
