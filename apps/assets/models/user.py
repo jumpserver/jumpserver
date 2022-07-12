@@ -15,7 +15,7 @@ from .asset import Asset
 from .authbook import AuthBook
 
 
-__all__ = ['AdminUser', 'SystemUser']
+__all__ = ['AdminUser', 'SystemUser', 'ProtocolMixin']
 logger = logging.getLogger(__name__)
 
 

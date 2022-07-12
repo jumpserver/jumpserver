@@ -137,3 +137,4 @@ class AuthBook(BaseUser, AbsConnectivity):
     def __str__(self):
         return self.smart_name
 
+
