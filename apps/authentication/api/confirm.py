@@ -7,9 +7,16 @@ from rest_framework.generics import RetrieveAPIView, CreateAPIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from common.permissions import IsValidUser
+from common.permissions import IsValidUser, UserConfirmation
 from ..const import ConfirmType
 from ..serializers import ConfirmSerializer
+
+
+class ConfirmBindORUNBindOAuth(RetrieveAPIView):
+    permission_classes = (UserConfirmation.require(ConfirmType.ReLogin),)
+
+    def retrieve(self, request, *args, **kwargs):
+        return Response('ok')
 
 
 class ConfirmApi(RetrieveAPIView, CreateAPIView):
