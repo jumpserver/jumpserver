@@ -20,7 +20,8 @@ __all__ = [
 
 class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
     type_display = serializers.ReadOnlyField(source='get_type_display', label=_("Type display"))
-    validity = serializers.BooleanField(source='is_valid', read_only=True, label=_('Validity'))
+    is_valid = serializers.BooleanField(read_only=True, label=_('Validity'))
+    expire_time = serializers.IntegerField(read_only=True, label=_('Expired time'))
 
     class Meta:
         model = ConnectionToken
@@ -35,7 +36,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         ]
         read_only_fields = [
             # 普通 Token 不支持指定 user
-            'user', 'validity',
+            'user', 'is_valid', 'expire_time',
             'type_display', 'user_display', 'system_user_display', 'asset_display',
             'application_display',
         ]
@@ -184,6 +185,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     domain = ConnectionTokenDomainSerializer(read_only=True)
     cmd_filter_rules = ConnectionTokenCmdFilterRuleSerializer(many=True)
     actions = ActionsField()
+    expired_at = serializers.IntegerField()
 
     class Meta:
         model = ConnectionToken
