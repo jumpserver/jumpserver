@@ -63,7 +63,7 @@ msgstr "アクティブ"
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:34
 #: terminal/models/endpoint.py:21 terminal/models/endpoint.py:92
 #: terminal/models/storage.py:29 terminal/models/terminal.py:114
-#: tickets/models/comment.py:32 tickets/models/ticket/general.py:278
+#: tickets/models/comment.py:32 tickets/models/ticket/general.py:288
 #: users/models/group.py:16 users/models/user.py:698
 #: xpack/plugins/change_auth_plan/models/base.py:44
 #: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:116
@@ -309,10 +309,10 @@ msgstr "カテゴリ"
 #: assets/models/cmd_filter.py:82 assets/models/user.py:250
 #: authentication/models.py:69 perms/models/application_permission.py:24
 #: perms/serializers/application/user_permission.py:34
-#: terminal/models/storage.py:58 terminal/models/storage.py:142
+#: terminal/models/storage.py:58 terminal/models/storage.py:143
 #: tickets/models/comment.py:26 tickets/models/flow.py:57
 #: tickets/models/ticket/apply_application.py:17
-#: tickets/models/ticket/general.py:263
+#: tickets/models/ticket/general.py:273
 #: xpack/plugins/change_auth_plan/models/app.py:28
 #: xpack/plugins/change_auth_plan/models/app.py:153
 msgid "Type"
@@ -416,6 +416,8 @@ msgstr "アプリケーションパス"
 
 #: applications/serializers/attrs/application_category/remote_app.py:44
 #: assets/serializers/system_user.py:167
+#: tickets/serializers/ticket/apply_application.py:35
+#: tickets/serializers/ticket/common.py:59
 #: xpack/plugins/change_auth_plan/serializers/asset.py:67
 #: xpack/plugins/change_auth_plan/serializers/asset.py:70
 #: xpack/plugins/change_auth_plan/serializers/asset.py:73
@@ -503,7 +505,7 @@ msgid "Charset"
 msgstr "シャーセット"
 
 #: assets/models/asset.py:141 assets/serializers/asset.py:176
-#: tickets/models/ticket/general.py:288
+#: tickets/models/ticket/general.py:298
 msgid "Meta"
 msgstr "メタ"
 
@@ -525,7 +527,7 @@ msgstr "ベンダー"
 msgid "Model"
 msgstr "モデル"
 
-#: assets/models/asset.py:170 tickets/models/ticket/general.py:286
+#: assets/models/asset.py:170 tickets/models/ticket/general.py:296
 msgid "Serial number"
 msgstr "シリアル番号"
 
@@ -1525,7 +1527,7 @@ msgid "MFA"
 msgstr "MFA"
 
 #: audits/models.py:128 terminal/models/status.py:33
-#: tickets/models/ticket/general.py:271 xpack/plugins/cloud/models.py:175
+#: tickets/models/ticket/general.py:281 xpack/plugins/cloud/models.py:175
 #: xpack/plugins/cloud/models.py:227
 msgid "Status"
 msgstr "ステータス"
@@ -2581,7 +2583,7 @@ msgstr "%(name)s が正常に作成されました"
 msgid "%(name)s was updated successfully"
 msgstr "%(name)s は正常に更新されました"
 
-#: common/db/encoder.py:10
+#: common/db/encoder.py:11
 msgid "ugettext_lazy"
 msgstr "ugettext_lazy"
 
@@ -3009,7 +3011,7 @@ msgstr "アプリ組織"
 #: orgs/mixins/models.py:46 orgs/mixins/serializers.py:25 orgs/models.py:80
 #: orgs/models.py:211 rbac/const.py:7 rbac/models/rolebinding.py:48
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:62
-#: tickets/models/ticket/general.py:290 tickets/serializers/ticket/ticket.py:64
+#: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:64
 msgid "Organization"
 msgstr "組織"
 
@@ -3417,7 +3419,7 @@ msgstr "マイアプリ"
 msgid "Ticket comment"
 msgstr "チケットコメント"
 
-#: rbac/tree.py:115 tickets/models/ticket/general.py:295
+#: rbac/tree.py:115 tickets/models/ticket/general.py:305
 msgid "Ticket"
 msgstr "チケット"
 
@@ -4939,7 +4941,7 @@ msgstr "リンク期限切れ"
 msgid "User not allowed to join"
 msgstr "IPは許可されていません"
 
-#: terminal/models/sharing.py:85 terminal/serializers/sharing.py:58
+#: terminal/models/sharing.py:85 terminal/serializers/sharing.py:59
 msgid "Joiner"
 msgstr "ジョイナー"
 
@@ -4996,11 +4998,11 @@ msgstr "ブート時間"
 msgid "Default storage"
 msgstr "デフォルトのストレージ"
 
-#: terminal/models/storage.py:136 terminal/models/terminal.py:108
+#: terminal/models/storage.py:137 terminal/models/terminal.py:108
 msgid "Command storage"
 msgstr "コマンドストレージ"
 
-#: terminal/models/storage.py:196 terminal/models/terminal.py:109
+#: terminal/models/storage.py:197 terminal/models/terminal.py:109
 msgid "Replay storage"
 msgstr "再生ストレージ"
 
@@ -5253,7 +5255,19 @@ msgstr ""
 "チケットのタイトル: {} チケット申請者: {} チケットプロセッサ: {} チケットID: "
 "{}"
 
-#: tickets/handlers/base.py:72
+#: tickets/handlers/base.py:79
+msgid "Change field"
+msgstr "フィールドを変更"
+
+#: tickets/handlers/base.py:79
+msgid "Before change"
+msgstr "変更前"
+
+#: tickets/handlers/base.py:79
+msgid "After change"
+msgstr "変更後"
+
+#: tickets/handlers/base.py:91
 msgid "{} {} the ticket"
 msgstr "{} {} チケット"
 
@@ -5269,8 +5283,8 @@ msgstr "応用ログイン都市"
 msgid "Applied login datetime"
 msgstr "適用されたログインの日付時間"
 
-#: tickets/models/comment.py:13 tickets/models/ticket/general.py:39
-#: tickets/models/ticket/general.py:267
+#: tickets/models/comment.py:13 tickets/models/ticket/general.py:41
+#: tickets/models/ticket/general.py:277
 msgid "State"
 msgstr "状態"
 
@@ -5287,7 +5301,7 @@ msgid "Body"
 msgstr "ボディ"
 
 #: tickets/models/flow.py:20 tickets/models/flow.py:62
-#: tickets/models/ticket/general.py:35
+#: tickets/models/ticket/general.py:37
 msgid "Approve level"
 msgstr "レベルを承認する"
 
@@ -5313,8 +5327,8 @@ msgstr "チケットセッションの関係"
 
 #: tickets/models/ticket/apply_application.py:11
 #: tickets/models/ticket/apply_asset.py:13
-msgid "Apply name"
-msgstr "名前を適用"
+msgid "Permission name"
+msgstr "認可ルール名"
 
 #: tickets/models/ticket/apply_application.py:20
 msgid "Apply applications"
@@ -5362,39 +5376,39 @@ msgstr "コマンドフィルタ規則から"
 msgid "From cmd filter rule"
 msgstr "コマンドフィルタ規則から"
 
-#: tickets/models/ticket/general.py:70
+#: tickets/models/ticket/general.py:72
 msgid "Ticket step"
 msgstr "チケットステップ"
 
-#: tickets/models/ticket/general.py:88
+#: tickets/models/ticket/general.py:90
 msgid "Ticket assignee"
 msgstr "割り当てられたチケット"
 
-#: tickets/models/ticket/general.py:260
+#: tickets/models/ticket/general.py:270
 msgid "Title"
 msgstr "タイトル"
 
-#: tickets/models/ticket/general.py:276
+#: tickets/models/ticket/general.py:286
 msgid "Applicant"
 msgstr "応募者"
 
-#: tickets/models/ticket/general.py:281
+#: tickets/models/ticket/general.py:291
 msgid "TicketFlow"
 msgstr "作業指示プロセス"
 
-#: tickets/models/ticket/general.py:284
+#: tickets/models/ticket/general.py:294
 msgid "Approval step"
 msgstr "承認ステップ"
 
-#: tickets/models/ticket/general.py:287
+#: tickets/models/ticket/general.py:297
 msgid "Relation snapshot"
 msgstr "製造オーダスナップショット"
 
-#: tickets/models/ticket/general.py:380
+#: tickets/models/ticket/general.py:390
 msgid "Please try again"
 msgstr "もう一度お試しください"
 
-#: tickets/models/ticket/general.py:387
+#: tickets/models/ticket/general.py:421
 msgid "Super ticket"
 msgstr "スーパーチケット"
 
@@ -5414,27 +5428,27 @@ msgstr "ログインシステムユーザー"
 msgid "Login datetime"
 msgstr "ログイン日時"
 
-#: tickets/notifications.py:64
+#: tickets/notifications.py:63
 msgid "Ticket basic info"
 msgstr "チケット基本情報"
 
-#: tickets/notifications.py:65
+#: tickets/notifications.py:64
 msgid "Ticket applied info"
 msgstr "チケット適用情報"
 
-#: tickets/notifications.py:116
-msgid "Your has a new ticket"
+#: tickets/notifications.py:109
+msgid "Your has a new ticket, applicant - {}"
 msgstr "新しいチケットがあります- {}"
 
-#: tickets/notifications.py:120
+#: tickets/notifications.py:113
 msgid "{}: New Ticket - {} ({})"
 msgstr "新しいチケット- {} ({})"
 
-#: tickets/notifications.py:164
+#: tickets/notifications.py:157
 msgid "Your ticket has been processed, processor - {}"
 msgstr "チケットが処理されました。プロセッサー- {}"
 
-#: tickets/notifications.py:168
+#: tickets/notifications.py:161
 msgid "Ticket has processed - {} ({})"
 msgstr "チケットが処理済み- {} ({})"
 
@@ -5455,19 +5469,19 @@ msgid "Processor"
 msgstr "プロセッサ"
 
 #: tickets/serializers/ticket/common.py:16
-#: tickets/serializers/ticket/common.py:68
+#: tickets/serializers/ticket/common.py:79
 msgid "Created by ticket ({}-{})"
 msgstr "チケットで作成 ({}-{})"
 
-#: tickets/serializers/ticket/common.py:58
+#: tickets/serializers/ticket/common.py:69
 msgid "The expiration date should be greater than the start date"
 msgstr "有効期限は開始日より大きくする必要があります"
 
-#: tickets/serializers/ticket/common.py:74
+#: tickets/serializers/ticket/common.py:85
 msgid "Permission named `{}` already exists"
 msgstr "'{}'という名前の権限は既に存在します"
 
-#: tickets/serializers/ticket/ticket.py:89
+#: tickets/serializers/ticket/ticket.py:92
 msgid "The ticket flow `{}` does not exist"
 msgstr "チケットフロー '{}'が存在しない"
 

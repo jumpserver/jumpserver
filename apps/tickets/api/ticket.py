@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import MethodNotAllowed
 
-from common.const.http import POST, PUT
+from common.const.http import POST, PUT, PATCH
 from common.mixins.api import CommonApiMixin
 from orgs.utils import tmp_to_root_org
 
@@ -71,32 +71,34 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         with tmp_to_root_org():
             return super().create(request, *args, **kwargs)
 
-    @action(detail=True, methods=[PUT], permission_classes=[IsAssignee, ])
+    @action(detail=True, methods=[PUT, PATCH], permission_classes=[IsAssignee, ])
     def approve(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        serializer = self.get_serializer(instance)
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()
         instance.approve(processor=request.user)
-        return Response(serializer.data)
+        return Response('ok')
 
     @action(detail=True, methods=[PUT], permission_classes=[IsAssignee, ])
     def reject(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer = self.get_serializer(instance)
         instance.reject(processor=request.user)
-        return Response(serializer.data)
+        return Response('ok')
 
     @action(detail=True, methods=[PUT], permission_classes=[IsApplicant, ])
     def close(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer = self.get_serializer(instance)
         instance.close()
-        return Response(serializer.data)
+        return Response('ok')
 
 
 class ApplyAssetTicketViewSet(TicketViewSet):
     serializer_class = serializers.ApplyAssetDisplaySerializer
     serializer_classes = {
-        'open': serializers.ApplyAssetSerializer
+        'open': serializers.ApplyAssetSerializer,
+        'approve': serializers.ApproveAssetSerializer
     }
     model = ApplyAssetTicket
     filterset_class = filters.ApplyAssetTicketFilter
@@ -105,7 +107,8 @@ class ApplyAssetTicketViewSet(TicketViewSet):
 class ApplyApplicationTicketViewSet(TicketViewSet):
     serializer_class = serializers.ApplyApplicationDisplaySerializer
     serializer_classes = {
-        'open': serializers.ApplyApplicationSerializer
+        'open': serializers.ApplyApplicationSerializer,
+        'approve': serializers.ApproveApplicationSerializer
     }
     model = ApplyApplicationTicket
     filterset_class = filters.ApplyApplicationTicketFilter
