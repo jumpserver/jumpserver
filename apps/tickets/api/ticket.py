@@ -29,7 +29,8 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     serializer_class = serializers.TicketDisplaySerializer
     serializer_classes = {
         'list': serializers.TicketListSerializer,
-        'open': serializers.TicketApplySerializer
+        'open': serializers.TicketApplySerializer,
+        'approve': serializers.TicketApproveSerializer
     }
     model = Ticket
     perm_model = Ticket

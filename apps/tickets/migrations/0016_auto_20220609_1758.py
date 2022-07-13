@@ -139,7 +139,7 @@ class Migration(migrations.Migration):
                 ('ticket_ptr',
                  models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True,
                                       primary_key=True, serialize=False, to='tickets.ticket')),
-                ('apply_permission_name', models.CharField(max_length=128, verbose_name='Apply name')),
+                ('apply_permission_name', models.CharField(max_length=128, verbose_name='Permission name')),
                 ('apply_actions', models.IntegerField(
                     choices=[(255, 'All'), (1, 'Connect'), (2, 'Upload file'), (4, 'Download file'),
                              (6, 'Upload download'), (8, 'Clipboard copy'), (16, 'Clipboard paste'),
@@ -162,7 +162,7 @@ class Migration(migrations.Migration):
                 ('ticket_ptr',
                  models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True,
                                       primary_key=True, serialize=False, to='tickets.ticket')),
-                ('apply_permission_name', models.CharField(max_length=128, verbose_name='Apply name')),
+                ('apply_permission_name', models.CharField(max_length=128, verbose_name='Permission name')),
                 ('apply_category',
                  models.CharField(choices=[('db', 'Database'), ('remote_app', 'Remote app'), ('cloud', 'Cloud')],
                                   max_length=16, verbose_name='Category')),
