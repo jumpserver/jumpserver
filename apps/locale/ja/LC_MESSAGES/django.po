@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-13 16:25+0800\n"
+"POT-Creation-Date: 2022-07-13 19:45+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -89,7 +89,7 @@ msgstr "ログイン確認"
 #: assets/models/cmd_filter.py:30 assets/models/label.py:15 audits/models.py:37
 #: audits/models.py:62 audits/models.py:87 audits/serializers.py:100
 #: authentication/models.py:54 authentication/models.py:78 orgs/models.py:214
-#: perms/models/base.py:84 rbac/builtin.py:118 rbac/models/rolebinding.py:41
+#: perms/models/base.py:84 rbac/builtin.py:117 rbac/models/rolebinding.py:41
 #: terminal/backends/command/models.py:20
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:44
 #: terminal/models/sharing.py:33 terminal/notifications.py:91
@@ -164,7 +164,7 @@ msgstr "コンマ区切り文字列の形式。* はすべて一致すること�
 #: users/templates/users/_msg_user_created.html:12
 #: xpack/plugins/change_auth_plan/models/asset.py:34
 #: xpack/plugins/change_auth_plan/models/asset.py:195
-#: xpack/plugins/cloud/serializers/account_attrs.py:24
+#: xpack/plugins/cloud/serializers/account_attrs.py:26
 msgid "Username"
 msgstr "ユーザー名"
 
@@ -214,7 +214,7 @@ msgid "Unsupported protocols: {}"
 msgstr "サポートされていないプロトコル: {}"
 
 #: acls/serializers/login_asset_acl.py:98
-#: tickets/serializers/ticket/ticket.py:78
+#: tickets/serializers/ticket/ticket.py:85
 msgid "The organization `{}` does not exist"
 msgstr "組織 '{}'は存在しません"
 
@@ -329,7 +329,7 @@ msgid "Domain"
 msgstr "ドメイン"
 
 #: applications/models/application.py:231 xpack/plugins/cloud/models.py:33
-#: xpack/plugins/cloud/serializers/account.py:60
+#: xpack/plugins/cloud/serializers/account.py:61
 msgid "Attrs"
 msgstr "ツールバーの"
 
@@ -394,7 +394,7 @@ msgstr "クラスター"
 #: applications/serializers/attrs/application_category/db.py:11
 #: ops/models/adhoc.py:157 settings/serializers/auth/radius.py:14
 #: terminal/models/endpoint.py:11
-#: xpack/plugins/cloud/serializers/account_attrs.py:70
+#: xpack/plugins/cloud/serializers/account_attrs.py:72
 msgid "Host"
 msgstr "ホスト"
 
@@ -408,7 +408,7 @@ msgstr "ホスト"
 #: applications/serializers/attrs/application_type/sqlserver.py:10
 #: assets/models/asset.py:214 assets/models/domain.py:62
 #: settings/serializers/auth/radius.py:15
-#: xpack/plugins/cloud/serializers/account_attrs.py:71
+#: xpack/plugins/cloud/serializers/account_attrs.py:73
 msgid "Port"
 msgstr "ポート"
 
@@ -427,7 +427,7 @@ msgstr "アプリケーションパス"
 #: xpack/plugins/change_auth_plan/serializers/asset.py:70
 #: xpack/plugins/change_auth_plan/serializers/asset.py:73
 #: xpack/plugins/change_auth_plan/serializers/asset.py:104
-#: xpack/plugins/cloud/serializers/account_attrs.py:54
+#: xpack/plugins/cloud/serializers/account_attrs.py:56
 msgid "This field is required."
 msgstr "このフィールドは必須です。"
 
@@ -525,6 +525,7 @@ msgstr "内部"
 #: assets/models/asset.py:162 assets/models/asset.py:216
 #: assets/serializers/account.py:15 assets/serializers/asset.py:63
 #: perms/serializers/asset/user_permission.py:43
+#: xpack/plugins/cloud/serializers/account_attrs.py:159
 msgid "Platform"
 msgstr "プラットフォーム"
 
@@ -769,7 +770,7 @@ msgstr "OK"
 #: assets/models/base.py:32 audits/models.py:118
 #: xpack/plugins/change_auth_plan/serializers/app.py:88
 #: xpack/plugins/change_auth_plan/serializers/asset.py:199
-#: xpack/plugins/cloud/const.py:32
+#: xpack/plugins/cloud/const.py:33
 msgid "Failed"
 msgstr "失敗しました"
 
@@ -795,7 +796,7 @@ msgstr "確認済みの日付"
 #: xpack/plugins/change_auth_plan/models/base.py:196
 #: xpack/plugins/change_auth_plan/serializers/base.py:21
 #: xpack/plugins/change_auth_plan/serializers/base.py:73
-#: xpack/plugins/cloud/serializers/account_attrs.py:26
+#: xpack/plugins/cloud/serializers/account_attrs.py:28
 msgid "Password"
 msgstr "パスワード"
 
@@ -2739,7 +2740,7 @@ msgstr "確認コードが正しくありません"
 msgid "Please wait {} seconds before sending"
 msgstr "{} 秒待ってから送信してください"
 
-#: common/utils/ip/geoip/utils.py:24
+#: common/utils/ip/geoip/utils.py:24 xpack/plugins/cloud/const.py:24
 msgid "LAN"
 msgstr "LAN"
 
@@ -3022,10 +3023,10 @@ msgstr "組織のリソース ({}) は削除できません"
 msgid "App organizations"
 msgstr "アプリ組織"
 
-#: orgs/mixins/models.py:54 orgs/mixins/serializers.py:25 orgs/models.py:80
+#: orgs/mixins/models.py:57 orgs/mixins/serializers.py:25 orgs/models.py:80
 #: orgs/models.py:211 rbac/const.py:7 rbac/models/rolebinding.py:48
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:62
-#: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:64
+#: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:71
 msgid "Organization"
 msgstr "組織"
 
@@ -3258,27 +3259,27 @@ msgstr "{} 少なくとも1つのシステムロール"
 msgid "RBAC"
 msgstr "RBAC"
 
-#: rbac/builtin.py:109
+#: rbac/builtin.py:108
 msgid "SystemAdmin"
 msgstr "システム管理者"
 
-#: rbac/builtin.py:112
+#: rbac/builtin.py:111
 msgid "SystemAuditor"
 msgstr "システム監査人"
 
-#: rbac/builtin.py:115
+#: rbac/builtin.py:114
 msgid "SystemComponent"
 msgstr "システムコンポーネント"
 
-#: rbac/builtin.py:121
+#: rbac/builtin.py:120
 msgid "OrgAdmin"
 msgstr "組織管理者"
 
-#: rbac/builtin.py:124
+#: rbac/builtin.py:123
 msgid "OrgAuditor"
 msgstr "監査員を組織する"
 
-#: rbac/builtin.py:127
+#: rbac/builtin.py:126
 msgid "OrgUser"
 msgstr "組織ユーザー"
 
@@ -3665,7 +3666,7 @@ msgid "Client Id"
 msgstr "クライアントID"
 
 #: settings/serializers/auth/oidc.py:21
-#: xpack/plugins/cloud/serializers/account_attrs.py:36
+#: xpack/plugins/cloud/serializers/account_attrs.py:38
 msgid "Client Secret"
 msgstr "クライアント秘密"
 
@@ -5116,12 +5117,12 @@ msgid "Bucket"
 msgstr "バケット"
 
 #: terminal/serializers/storage.py:30
-#: xpack/plugins/cloud/serializers/account_attrs.py:15
+#: xpack/plugins/cloud/serializers/account_attrs.py:17
 msgid "Access key id"
 msgstr "アクセスキー"
 
 #: terminal/serializers/storage.py:34
-#: xpack/plugins/cloud/serializers/account_attrs.py:18
+#: xpack/plugins/cloud/serializers/account_attrs.py:20
 msgid "Access key secret"
 msgstr "アクセスキーシークレット"
 
@@ -5277,19 +5278,19 @@ msgstr ""
 "チケットのタイトル: {} チケット申請者: {} チケットプロセッサ: {} チケットID: "
 "{}"
 
-#: tickets/handlers/base.py:79
+#: tickets/handlers/base.py:84
 msgid "Change field"
 msgstr "フィールドを変更"
 
-#: tickets/handlers/base.py:79
+#: tickets/handlers/base.py:84
 msgid "Before change"
 msgstr "変更前"
 
-#: tickets/handlers/base.py:79
+#: tickets/handlers/base.py:84
 msgid "After change"
 msgstr "変更後"
 
-#: tickets/handlers/base.py:91
+#: tickets/handlers/base.py:96
 msgid "{} {} the ticket"
 msgstr "{} {} チケット"
 
@@ -5503,7 +5504,7 @@ msgstr "有効期限は開始日より大きくする必要があります"
 msgid "Permission named `{}` already exists"
 msgstr "'{}'という名前の権限は既に存在します"
 
-#: tickets/serializers/ticket/ticket.py:92
+#: tickets/serializers/ticket/ticket.py:99
 msgid "The ticket flow `{}` does not exist"
 msgstr "チケットフロー '{}'が存在しない"
 
@@ -6376,31 +6377,31 @@ msgstr "谷歌雲"
 msgid "Fusion Compute"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:27
+#: xpack/plugins/cloud/const.py:28
 msgid "Instance name"
 msgstr "インスタンス名"
 
-#: xpack/plugins/cloud/const.py:28
+#: xpack/plugins/cloud/const.py:29
 msgid "Instance name and Partial IP"
 msgstr "インスタンス名と部分IP"
 
-#: xpack/plugins/cloud/const.py:33
+#: xpack/plugins/cloud/const.py:34
 msgid "Succeed"
 msgstr "成功"
 
-#: xpack/plugins/cloud/const.py:37
+#: xpack/plugins/cloud/const.py:38
 msgid "Unsync"
 msgstr "同期していません"
 
-#: xpack/plugins/cloud/const.py:38
+#: xpack/plugins/cloud/const.py:39
 msgid "New Sync"
 msgstr "新しい同期"
 
-#: xpack/plugins/cloud/const.py:39
+#: xpack/plugins/cloud/const.py:40
 msgid "Synced"
 msgstr "同期済み"
 
-#: xpack/plugins/cloud/const.py:40
+#: xpack/plugins/cloud/const.py:41
 msgid "Released"
 msgstr "リリース済み"
 
@@ -6670,51 +6671,83 @@ msgstr "華南-広州-友好ユーザー環境"
 msgid "CN East-Suqian"
 msgstr "華東-宿遷"
 
-#: xpack/plugins/cloud/serializers/account.py:61
+#: xpack/plugins/cloud/serializers/account.py:62
 msgid "Validity display"
 msgstr "有効表示"
 
-#: xpack/plugins/cloud/serializers/account.py:62
+#: xpack/plugins/cloud/serializers/account.py:63
 msgid "Provider display"
 msgstr "プロバイダ表示"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:33
+#: xpack/plugins/cloud/serializers/account_attrs.py:35
 msgid "Client ID"
 msgstr "クライアントID"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:39
+#: xpack/plugins/cloud/serializers/account_attrs.py:41
 msgid "Tenant ID"
 msgstr "テナントID"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:42
+#: xpack/plugins/cloud/serializers/account_attrs.py:44
 msgid "Subscription ID"
 msgstr "サブスクリプションID"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:93
-#: xpack/plugins/cloud/serializers/account_attrs.py:98
-#: xpack/plugins/cloud/serializers/account_attrs.py:122
+#: xpack/plugins/cloud/serializers/account_attrs.py:95
+#: xpack/plugins/cloud/serializers/account_attrs.py:100
+#: xpack/plugins/cloud/serializers/account_attrs.py:124
 msgid "API Endpoint"
 msgstr "APIエンドポイント"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:104
+#: xpack/plugins/cloud/serializers/account_attrs.py:106
 msgid "Auth url"
 msgstr "認証アドレス"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:105
+#: xpack/plugins/cloud/serializers/account_attrs.py:107
 msgid "eg: http://openstack.example.com:5000/v3"
 msgstr "例えば: http://openstack.example.com:5000/v3"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:108
+#: xpack/plugins/cloud/serializers/account_attrs.py:110
 msgid "User domain"
 msgstr "ユーザードメイン"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:115
+#: xpack/plugins/cloud/serializers/account_attrs.py:117
 msgid "Service account key"
 msgstr "サービスアカウントキー"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:116
+#: xpack/plugins/cloud/serializers/account_attrs.py:118
 msgid "The file is in JSON format"
 msgstr "ファイルはJSON形式です。"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:131
+msgid "IP address invalid `{}`, {}"
+msgstr "IPアドレスが無効: '{}', {}"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:137
+msgid ""
+"Format for comma-delimited string,Such as: 192.168.1.0/24, "
+"10.0.0.0-10.0.0.255"
+msgstr "形式はコンマ区切りの文字列です，例：192.168.1.0/24,10.0.0.0-10.0.0.255"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:141
+msgid ""
+"The port is used to detect the validity of the IP address. When the "
+"synchronization task is executed, only the valid IP address will be "
+"synchronized. <br>If the port is 0, all IP addresses are valid."
+msgstr ""
+"このポートは、 IP アドレスの有効性を検出するために使用されます。"
+"同期タスクが実行されると、有効な IP アドレスのみが同期されます。 <br>"
+"ポートが0の場合、すべてのIPアドレスが有効です。"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:149
+msgid "Hostname prefix"
+msgstr "ホスト名プレフィックス"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:152
+msgid "IP segment"
+msgstr "IP セグメント"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:156
+msgid "Test port"
+msgstr "テストポート"
 
 #: xpack/plugins/cloud/serializers/task.py:29
 msgid ""
@@ -6834,6 +6867,13 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "コミュニティ版"
+
+#~ msgid ""
+#~ "The port is used to test IP connectivity. If the port is 0, all IP are "
+#~ "added."
+#~ msgstr ""
+#~ "ポートは、IPの接続をテストするために使用されます。ポートが0の場合、すべて"
+#~ "のIPを追加することを意味します。"
 
 #~ msgid "User cannot self-update fields: {}"
 #~ msgstr "ユーザーは自分のフィールドを更新できません: {}"
