@@ -77,7 +77,8 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
+        with tmp_to_root_org():
+            serializer.is_valid(raise_exception=True)
         instance = serializer.save()
         instance.approve(processor=request.user)
         return Response('ok')
