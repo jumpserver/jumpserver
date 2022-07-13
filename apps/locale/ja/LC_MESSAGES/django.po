@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-12 17:58+0800\n"
+"POT-Creation-Date: 2022-07-13 16:25+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,13 +23,13 @@ msgid "Acls"
 msgstr "Acls"
 
 #: acls/models/base.py:25 acls/serializers/login_asset_acl.py:47
-#: applications/models/application.py:217 assets/models/asset.py:138
+#: applications/models/application.py:220 assets/models/asset.py:138
 #: assets/models/base.py:175 assets/models/cluster.py:18
 #: assets/models/cmd_filter.py:27 assets/models/domain.py:23
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
 #: orgs/models.py:65 perms/models/base.py:83 rbac/models/role.py:29
 #: settings/models.py:29 settings/serializers/sms.py:6
-#: terminal/models/endpoint.py:10 terminal/models/endpoint.py:82
+#: terminal/models/endpoint.py:10 terminal/models/endpoint.py:88
 #: terminal/models/storage.py:26 terminal/models/task.py:16
 #: terminal/models/terminal.py:100 users/forms/profile.py:33
 #: users/models/group.py:15 users/models/user.py:661
@@ -38,12 +38,12 @@ msgid "Name"
 msgstr "名前"
 
 #: acls/models/base.py:27 assets/models/cmd_filter.py:84
-#: assets/models/user.py:251 terminal/models/endpoint.py:85
+#: assets/models/user.py:251 terminal/models/endpoint.py:91
 msgid "Priority"
 msgstr "優先順位"
 
 #: acls/models/base.py:28 assets/models/cmd_filter.py:84
-#: assets/models/user.py:251 terminal/models/endpoint.py:86
+#: assets/models/user.py:251 terminal/models/endpoint.py:92
 msgid "1-100, the lower the value will be match first"
 msgstr "1-100、低い値は最初に一致します"
 
@@ -53,7 +53,7 @@ msgstr "1-100、低い値は最初に一致します"
 msgid "Active"
 msgstr "アクティブ"
 
-#: acls/models/base.py:32 applications/models/application.py:230
+#: acls/models/base.py:32 applications/models/application.py:233
 #: assets/models/asset.py:143 assets/models/asset.py:231
 #: assets/models/backup.py:54 assets/models/base.py:180
 #: assets/models/cluster.py:29 assets/models/cmd_filter.py:48
@@ -61,7 +61,7 @@ msgstr "アクティブ"
 #: assets/models/domain.py:65 assets/models/group.py:23
 #: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:68
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:34
-#: terminal/models/endpoint.py:21 terminal/models/endpoint.py:92
+#: terminal/models/endpoint.py:23 terminal/models/endpoint.py:98
 #: terminal/models/storage.py:29 terminal/models/terminal.py:114
 #: tickets/models/comment.py:32 tickets/models/ticket/general.py:288
 #: users/models/group.py:16 users/models/user.py:698
@@ -157,7 +157,7 @@ msgstr "コンマ区切り文字列の形式。* はすべて一致すること�
 #: acls/serializers/login_asset_acl.py:51 assets/models/base.py:176
 #: assets/models/gathered_user.py:15 audits/models.py:121
 #: authentication/forms.py:25 authentication/forms.py:27
-#: authentication/models.py:245
+#: authentication/models.py:253
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
 #: ops/models/adhoc.py:159 users/forms/profile.py:32 users/models/user.py:659
@@ -185,7 +185,7 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
-#: settings/serializers/terminal.py:8 terminal/serializers/endpoint.py:42
+#: settings/serializers/terminal.py:8 terminal/serializers/endpoint.py:54
 msgid "IP"
 msgstr "IP"
 
@@ -241,7 +241,7 @@ msgstr ""
 msgid "Time Period"
 msgstr "期間"
 
-#: applications/apps.py:9 applications/models/application.py:63
+#: applications/apps.py:9 applications/models/application.py:64
 msgid "Applications"
 msgstr "アプリケーション"
 
@@ -260,7 +260,11 @@ msgstr "リモートアプリ"
 msgid "Custom"
 msgstr "カスタム"
 
-#: applications/models/account.py:12 applications/models/application.py:234
+#: applications/const.py:91 rbac/tree.py:29
+msgid "Other"
+msgstr "その他"
+
+#: applications/models/account.py:12 applications/models/application.py:237
 #: assets/models/backup.py:32 assets/models/cmd_filter.py:45
 #: authentication/models.py:67 authentication/models.py:95
 #: perms/models/application_permission.py:28
@@ -278,8 +282,9 @@ msgstr "アプリケーション"
 msgid "System user"
 msgstr "システムユーザー"
 
-#: applications/models/account.py:17 assets/models/authbook.py:21
-#: settings/serializers/auth/cas.py:18
+#: applications/models/account.py:17
+#: applications/serializers/attrs/application_type/oracle.py:13
+#: assets/models/authbook.py:21 settings/serializers/auth/cas.py:18
 msgid "Version"
 msgstr "バージョン"
 
@@ -295,7 +300,7 @@ msgstr "アプリケーションアカウントの秘密を表示できます"
 msgid "Can change application account secret"
 msgstr "アプリケーションアカウントの秘密を変更できます"
 
-#: applications/models/application.py:219
+#: applications/models/application.py:222
 #: applications/serializers/application.py:99 assets/models/label.py:21
 #: perms/models/application_permission.py:21
 #: perms/serializers/application/user_permission.py:33
@@ -304,7 +309,7 @@ msgstr "アプリケーションアカウントの秘密を変更できます"
 msgid "Category"
 msgstr "カテゴリ"
 
-#: applications/models/application.py:222
+#: applications/models/application.py:225
 #: applications/serializers/application.py:101 assets/models/backup.py:49
 #: assets/models/cmd_filter.py:82 assets/models/user.py:250
 #: authentication/models.py:70 perms/models/application_permission.py:24
@@ -318,21 +323,21 @@ msgstr "カテゴリ"
 msgid "Type"
 msgstr "タイプ"
 
-#: applications/models/application.py:226 assets/models/asset.py:217
+#: applications/models/application.py:229 assets/models/asset.py:217
 #: assets/models/domain.py:29 assets/models/domain.py:64
 msgid "Domain"
 msgstr "ドメイン"
 
-#: applications/models/application.py:228 xpack/plugins/cloud/models.py:33
+#: applications/models/application.py:231 xpack/plugins/cloud/models.py:33
 #: xpack/plugins/cloud/serializers/account.py:60
 msgid "Attrs"
 msgstr "ツールバーの"
 
-#: applications/models/application.py:238
+#: applications/models/application.py:241
 msgid "Can match application"
 msgstr "アプリケーションを一致させることができます"
 
-#: applications/models/application.py:305
+#: applications/models/application.py:320
 msgid "Application user"
 msgstr "アプリケーションユーザー"
 
@@ -397,7 +402,7 @@ msgstr "ホスト"
 #: applications/serializers/attrs/application_type/mongodb.py:10
 #: applications/serializers/attrs/application_type/mysql.py:10
 #: applications/serializers/attrs/application_type/mysql_workbench.py:22
-#: applications/serializers/attrs/application_type/oracle.py:10
+#: applications/serializers/attrs/application_type/oracle.py:16
 #: applications/serializers/attrs/application_type/pgsql.py:10
 #: applications/serializers/attrs/application_type/redis.py:10
 #: applications/serializers/attrs/application_type/sqlserver.py:10
@@ -466,6 +471,10 @@ msgstr "Mysql workbench のユーザー名"
 #: applications/serializers/attrs/application_type/mysql_workbench.py:42
 msgid "Mysql workbench password"
 msgstr "Mysql workbench パスワード"
+
+#: applications/serializers/attrs/application_type/oracle.py:14
+msgid "Magnus currently supports only 11g and 12c connections"
+msgstr "現在、Magnusは11gおよび12cバージョンへの接続のみをサポートしています"
 
 #: applications/serializers/attrs/application_type/vmware_client.py:26
 msgid "Vmware username"
@@ -768,7 +777,7 @@ msgstr "失敗しました"
 msgid "Connectivity"
 msgstr "接続性"
 
-#: assets/models/base.py:40 authentication/models.py:248
+#: assets/models/base.py:40 authentication/models.py:256
 msgid "Date verified"
 msgstr "確認済みの日付"
 
@@ -1616,7 +1625,7 @@ msgstr "本を飛ばす"
 msgid "DingTalk"
 msgstr "DingTalk"
 
-#: audits/signal_handlers.py:56 authentication/models.py:252
+#: audits/signal_handlers.py:56 authentication/models.py:260
 msgid "Temporary token"
 msgstr "仮パスワード"
 
@@ -2106,13 +2115,13 @@ msgstr "期限切れ"
 msgid "SSO token"
 msgstr "SSO token"
 
-#: authentication/models.py:72 authentication/models.py:246
+#: authentication/models.py:72 authentication/models.py:254
 #: authentication/templates/authentication/_access_key_modal.html:31
 #: settings/serializers/auth/radius.py:17
 msgid "Secret"
 msgstr "ひみつ"
 
-#: authentication/models.py:74 authentication/models.py:249
+#: authentication/models.py:74 authentication/models.py:257
 #: perms/models/base.py:90 tickets/models/ticket/apply_application.py:26
 #: tickets/models/ticket/apply_asset.py:24 users/models/user.py:703
 msgid "Date expired"
@@ -2130,51 +2139,51 @@ msgstr "接続トークン"
 msgid "Can view connection token secret"
 msgstr "接続トークンの秘密を表示できます"
 
-#: authentication/models.py:141
+#: authentication/models.py:149
 msgid "Connection token expired at: {}"
 msgstr "接続トークンの有効期限: {}"
 
-#: authentication/models.py:146
+#: authentication/models.py:154
 msgid "User not exists"
 msgstr "ユーザーは存在しません"
 
-#: authentication/models.py:150
+#: authentication/models.py:158
 msgid "User invalid, disabled or expired"
 msgstr "ユーザーが無効、無効、または期限切れです"
 
-#: authentication/models.py:155
+#: authentication/models.py:163
 msgid "System user not exists"
 msgstr "システムユーザーが存在しません"
 
-#: authentication/models.py:161
+#: authentication/models.py:169
 msgid "Asset not exists"
 msgstr "アセットが存在しません"
 
-#: authentication/models.py:165
+#: authentication/models.py:173
 msgid "Asset inactive"
 msgstr "アセットがアクティブ化されていません"
 
-#: authentication/models.py:172
+#: authentication/models.py:180
 msgid "User has no permission to access asset or permission expired"
 msgstr ""
 "ユーザーがアセットにアクセスする権限を持っていないか、権限の有効期限が切れて"
 "います"
 
-#: authentication/models.py:180
+#: authentication/models.py:188
 msgid "Application not exists"
 msgstr "アプリが存在しません"
 
-#: authentication/models.py:187
+#: authentication/models.py:195
 msgid "User has no permission to access application or permission expired"
 msgstr ""
 "ユーザーがアプリにアクセスする権限を持っていないか、権限の有効期限が切れてい"
 "ます"
 
-#: authentication/models.py:247
+#: authentication/models.py:255
 msgid "Verified"
 msgstr "確認済み"
 
-#: authentication/models.py:268
+#: authentication/models.py:276
 msgid "Super connection token"
 msgstr "スーパー接続トークン"
 
@@ -2191,7 +2200,11 @@ msgstr "バインディングリマインダー"
 msgid "Validity"
 msgstr "有効性"
 
-#: authentication/serializers/connection_token.py:73
+#: authentication/serializers/connection_token.py:24
+msgid "Expired time"
+msgstr "期限切れ時間"
+
+#: authentication/serializers/connection_token.py:74
 msgid "Asset or application required"
 msgstr "アセットまたはアプリが必要"
 
@@ -3009,7 +3022,7 @@ msgstr "組織のリソース ({}) は削除できません"
 msgid "App organizations"
 msgstr "アプリ組織"
 
-#: orgs/mixins/models.py:46 orgs/mixins/serializers.py:25 orgs/models.py:80
+#: orgs/mixins/models.py:54 orgs/mixins/serializers.py:25 orgs/models.py:80
 #: orgs/models.py:211 rbac/const.py:7 rbac/models/rolebinding.py:48
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:62
 #: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:64
@@ -3375,10 +3388,6 @@ msgstr "監査ビュー"
 #: rbac/tree.py:28 settings/models.py:140
 msgid "System setting"
 msgstr "システム設定"
-
-#: rbac/tree.py:29
-msgid "Other"
-msgstr "その他"
 
 #: rbac/tree.py:37
 msgid "Accounts"
@@ -4678,7 +4687,7 @@ msgstr ""
 msgid "Offline video player"
 msgstr "オフラインビデオプレーヤー"
 
-#: terminal/api/endpoint.py:26
+#: terminal/api/endpoint.py:33
 msgid "Not found protocol query params"
 msgstr "プロトコルクエリパラメータが見つかりません"
 
@@ -4851,18 +4860,26 @@ msgstr "PostgreSQL ポート"
 msgid "Redis Port"
 msgstr "Redis ポート"
 
-#: terminal/models/endpoint.py:26 terminal/models/endpoint.py:90
-#: terminal/serializers/endpoint.py:45 terminal/serializers/storage.py:38
+#: terminal/models/endpoint.py:21
+msgid "Oracle 11g Port"
+msgstr "Oracle 11g ポート"
+
+#: terminal/models/endpoint.py:22
+msgid "Oracle 12c Port"
+msgstr "Oracle 12c ポート"
+
+#: terminal/models/endpoint.py:28 terminal/models/endpoint.py:96
+#: terminal/serializers/endpoint.py:57 terminal/serializers/storage.py:38
 #: terminal/serializers/storage.py:50 terminal/serializers/storage.py:80
 #: terminal/serializers/storage.py:90 terminal/serializers/storage.py:98
 msgid "Endpoint"
 msgstr "エンドポイント"
 
-#: terminal/models/endpoint.py:83
+#: terminal/models/endpoint.py:89
 msgid "IP group"
 msgstr "IP グループ"
 
-#: terminal/models/endpoint.py:95
+#: terminal/models/endpoint.py:101
 msgid "Endpoint rule"
 msgstr "エンドポイントルール"
 
@@ -5043,7 +5060,11 @@ msgstr "レベル"
 msgid "Batch danger command alert"
 msgstr "一括危険コマンド警告"
 
-#: terminal/serializers/endpoint.py:39
+#: terminal/serializers/endpoint.py:12
+msgid "Oracle port"
+msgstr ""
+
+#: terminal/serializers/endpoint.py:51
 msgid ""
 "If asset IP addresses under different endpoints conflict, use asset labels"
 msgstr ""
@@ -6703,12 +6724,11 @@ msgid ""
 "all instances and randomly match IP addresses. <br>Format for comma-"
 "delimited string, Such as: 192.168.1.0/24, 10.1.1.1-10.1.1.20"
 msgstr ""
-"IP範囲に一致するインスタンスのみが同期されます。<br>"
-"インスタンスに複数のIPアドレスが含まれている場合、一致する最初のIPアドレスが作成されたアセットのIPとして使用されます。 <br>"
-"デフォルト値の*は、すべてのインスタンスを同期し、IPアドレスをランダムに一致させることを意味します。 <br>"
-"形式はコンマ区切りの文字列です。例：192.168.1.0/24,10.1.1.1-10.1.1.20"
-
-
+"IP範囲に一致するインスタンスのみが同期されます。<br>インスタンスに複数のIPア"
+"ドレスが含まれている場合、一致する最初のIPアドレスが作成されたアセットのIPと"
+"して使用されます。 <br>デフォルト値の*は、すべてのインスタンスを同期し、IPア"
+"ドレスをランダムに一致させることを意味します。 <br>形式はコンマ区切りの文字列"
+"です。例：192.168.1.0/24,10.1.1.1-10.1.1.20"
 
 #: xpack/plugins/cloud/serializers/task.py:36
 msgid "History count"

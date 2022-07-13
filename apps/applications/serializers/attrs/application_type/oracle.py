@@ -10,6 +10,7 @@ __all__ = ['OracleSerializer']
 class OracleSerializer(DBSerializer):
     version = serializers.ChoiceField(
         choices=OracleVersion.choices, default=OracleVersion.version_other,
-        allow_null=True, label=_('Version')
+        allow_null=True, label=_('Version'),
+        help_text=_('Magnus currently supports only 11g and 12c connections')
     )
     port = serializers.IntegerField(default=1521, label=_('Port'), allow_null=True)
