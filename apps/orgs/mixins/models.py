@@ -41,6 +41,14 @@ class OrgManager(models.Manager):
         return self
 
 
+    def bulk_create(self, objs, batch_size=None, ignore_conflicts=False):
+        org = get_current_org()
+        org_id = org.id
+        for obj in objs:
+            obj.org_id = org_id
+        return super().bulk_create(objs, batch_size, ignore_conflicts)
+
+
 class OrgModelMixin(models.Model):
     org_id = models.CharField(max_length=36, blank=True, default='',
                               verbose_name=_("Organization"), db_index=True)
