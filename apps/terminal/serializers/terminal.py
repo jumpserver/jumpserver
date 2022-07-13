@@ -119,7 +119,7 @@ class TerminalRegistrationSerializer(serializers.ModelSerializer):
         data = {'name': name}
         kwargs = {'data': data}
         if self.instance and self.instance.user:
-            kwargs['instance'] = self.instance.user
+            kwargs['target_instance'] = self.instance.user
         self.service_account = ServiceAccountSerializer(**kwargs)
         valid = self.service_account.is_valid(raise_exception=True)
         return valid
