@@ -3,6 +3,7 @@ import platform
 
 if platform.system() == 'Darwin' and platform.machine() == 'arm64':
     import pymysql
+
     pymysql.version_info = (1, 4, 2, "final", 0)
     pymysql.install_as_MySQLdb()
 
@@ -109,8 +110,6 @@ MIDDLEWARE = [
     'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
-
-
 ROOT_URLCONF = 'jumpserver.urls'
 
 TEMPLATES = [
@@ -161,7 +160,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # 自定义的配置，SESSION_EXPIRE_AT_BROWSER_CLOSE 始终为 True, 下面这个来控制是否强制关闭后过期 cookie
 SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE = CONFIG.SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE
 SESSION_SAVE_EVERY_REQUEST = CONFIG.SESSION_SAVE_EVERY_REQUEST
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_ENGINE = "django.contrib.sessions.backends.{}".format(CONFIG.SESSION_ENGINE)
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 # Database
