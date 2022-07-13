@@ -2742,7 +2742,7 @@ msgstr "{} 秒待ってから送信してください"
 
 #: common/utils/ip/geoip/utils.py:24 xpack/plugins/cloud/const.py:24
 msgid "LAN"
-msgstr "LAN"
+msgstr "ローカルエリアネットワーク"
 
 #: common/utils/ip/geoip/utils.py:26 common/utils/ip/utils.py:78
 msgid "Invalid ip"

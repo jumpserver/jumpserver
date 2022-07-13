@@ -2708,7 +2708,7 @@ msgstr "请在 {} 秒后发送"
 
 #: common/utils/ip/geoip/utils.py:24 xpack/plugins/cloud/const.py:24
 msgid "LAN"
-msgstr "LAN"
+msgstr "局域网"
 
 #: common/utils/ip/geoip/utils.py:26 common/utils/ip/utils.py:78
 msgid "Invalid ip"
