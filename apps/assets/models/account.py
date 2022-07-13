@@ -25,3 +25,6 @@ class Account(BaseUser, ProtocolMixin):
             ('view_assethistoryaccount', _('Can view asset history account')),
             ('view_assethistoryaccountsecret', _('Can view asset history account secret')),
         ]
+
+    def __str__(self):
+        return '{}//{}@{}'.format(self.protocol, self.username, self.asset.hostname)
