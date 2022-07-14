@@ -39,6 +39,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'sms': serializers.SMSSettingSerializer,
         'alibaba': serializers.AlibabaSMSSettingSerializer,
         'tencent': serializers.TencentSMSSettingSerializer,
+        'cmpp2': serializers.CMPP2SMSSettingSerializer,
     }
 
     rbac_category_permissions = {
