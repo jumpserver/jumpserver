@@ -6,7 +6,7 @@ from rest_framework import serializers
 
 from common.mixins import CommonBulkSerializerMixin
 from common.validators import PhoneValidator
-from common.utils import pretty_string
+from common.utils import pretty_string, get_logger
 from common.drf.fields import EncryptedField
 from rbac.builtin import BuiltinRole
 from rbac.permissions import RBACPermission
@@ -19,6 +19,8 @@ __all__ = [
     'InviteSerializer', 'ServiceAccountSerializer',
 ]
 
+logger = get_logger(__file__)
+
 
 class RolesSerializerMixin(serializers.Serializer):
     system_roles = serializers.ManyRelatedField(
@@ -30,8 +32,8 @@ class RolesSerializerMixin(serializers.Serializer):
         child_relation=serializers.PrimaryKeyRelatedField(queryset=Role.org_roles),
         label=_('Org roles'),
     )
-    system_roles_display = serializers.SerializerMethodField(label=_('System roles'))
-    org_roles_display = serializers.SerializerMethodField(label=_('Org roles'))
+    system_roles_display = serializers.SerializerMethodField(label=_('System roles display'))
+    org_roles_display = serializers.SerializerMethodField(label=_('Org roles display'))
 
     @staticmethod
     def get_system_roles_display(user):
@@ -142,6 +144,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
             'password': {'write_only': True, 'required': False, 'allow_null': True, 'allow_blank': True},
             'public_key': {'write_only': True},
             'is_first_login': {'label': _('Is first login'), 'read_only': True},
+            'is_active': {'label': _('Is active')},
             'is_valid': {'label': _('Is valid')},
             'is_service_account': {'label': _('Is service account')},
             'is_expired': {'label': _('Is expired')},
@@ -198,8 +201,10 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         if not disallow_fields:
             return attrs
         # 用户自己不能更新自己的一些字段
-        error = _('User cannot self-update fields: {}').format(disallow_fields)
-        raise serializers.ValidationError(error)
+        logger.debug('Disallow update self fields: %s', disallow_fields)
+        for field in disallow_fields:
+            attrs.pop(field, None)
+        return attrs
 
     def validate(self, attrs):
         attrs = self.check_disallow_self_update_fields(attrs)

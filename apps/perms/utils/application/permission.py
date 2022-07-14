@@ -80,14 +80,3 @@ def get_application_system_user_ids(user, application):
 def has_application_system_permission(user, application, system_user):
     system_user_ids = get_application_system_user_ids(user, application)
     return system_user.id in system_user_ids
-
-
-def get_application_actions(user, application, system_user):
-    perm_ids = get_user_all_app_perm_ids(user)
-    actions = ApplicationPermission.objects.filter(
-        applications=application, system_users=system_user,
-        id__in=list(perm_ids)
-    ).values_list('actions', flat=True)
-
-    actions = reduce(lambda x, y: x | y, actions, 0)
-    return actions

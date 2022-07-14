@@ -9,7 +9,7 @@ import paramiko
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import get_logger
+from common.utils import get_logger, lazyproperty
 from orgs.mixins.models import OrgModelMixin
 from .base import BaseUser
 
@@ -36,7 +36,7 @@ class Domain(OrgModelMixin):
     def has_gateway(self):
         return self.gateway_set.filter(is_active=True).exists()
 
-    @property
+    @lazyproperty
     def gateways(self):
         return self.gateway_set.filter(is_active=True)
 
@@ -44,8 +44,9 @@ class Domain(OrgModelMixin):
         gateways = [gw for gw in self.gateways if gw.is_connective]
         if gateways:
             return random.choice(gateways)
-        else:
-            logger.warn(f'Gateway all bad. domain={self}, gateway_num={len(self.gateways)}.')
+
+        logger.warn(f'Gateway all bad. domain={self}, gateway_num={len(self.gateways)}.')
+        if self.gateways:
             return random.choice(self.gateways)
 
 

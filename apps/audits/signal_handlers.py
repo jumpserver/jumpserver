@@ -51,6 +51,7 @@ class AuthBackendLabelMapping(LazyObject):
         backend_label_mapping[settings.AUTH_BACKEND_SSO] = _('SSO')
         backend_label_mapping[settings.AUTH_BACKEND_AUTH_TOKEN] = _('Auth Token')
         backend_label_mapping[settings.AUTH_BACKEND_WECOM] = _('WeCom')
+        backend_label_mapping[settings.AUTH_BACKEND_FEISHU] = _('FeiShu')
         backend_label_mapping[settings.AUTH_BACKEND_DINGTALK] = _('DingTalk')
         backend_label_mapping[settings.AUTH_BACKEND_TEMP_TOKEN] = _('Temporary token')
         return backend_label_mapping
@@ -277,7 +278,6 @@ def on_user_auth_success(sender, user, request, login_type=None, **kwargs):
     check_different_city_login_if_need(user, request)
     data = generate_data(user.username, request, login_type=login_type)
     request.session['login_time'] = data['datetime'].strftime("%Y-%m-%d %H:%M:%S")
-    request.session["MFA_VERIFY_TIME"] = int(time.time())
     data.update({'mfa': int(user.mfa_enabled), 'status': True})
     write_login_log(**data)
 

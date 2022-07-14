@@ -10,23 +10,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='nodepermission',
-            name='node',
-        ),
-        migrations.RemoveField(
-            model_name='nodepermission',
-            name='system_user',
-        ),
-        migrations.RemoveField(
-            model_name='nodepermission',
-            name='user_group',
-        ),
         migrations.AlterModelOptions(
             name='assetpermission',
             options={'ordering': ('name',), 'verbose_name': 'Asset permission'},
-        ),
-        migrations.DeleteModel(
-            name='NodePermission',
         ),
     ]

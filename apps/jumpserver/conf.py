@@ -128,6 +128,7 @@ class Config(dict):
         'SECRET_KEY': '',
         'BOOTSTRAP_TOKEN': '',
         'DEBUG': False,
+        'DEBUG_DEV': False,
         'LOG_LEVEL': 'DEBUG',
         'LOG_DIR': os.path.join(PROJECT_DIR, 'logs'),
         'DB_ENGINE': 'mysql',
@@ -139,6 +140,7 @@ class Config(dict):
         'REDIS_HOST': '127.0.0.1',
         'REDIS_PORT': 6379,
         'REDIS_PASSWORD': '',
+        'REDIS_USE_SSL': False,
         # Default value
         'REDIS_DB_CELERY': 3,
         'REDIS_DB_CACHE': 4,
@@ -158,7 +160,7 @@ class Config(dict):
         'SESSION_COOKIE_DOMAIN': None,
         'CSRF_COOKIE_DOMAIN': None,
         'SESSION_COOKIE_NAME_PREFIX': None,
-        'SESSION_COOKIE_AGE': 3600 * 24,
+        'SESSION_COOKIE_AGE': 3600,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE': False,
         'LOGIN_URL': reverse_lazy('authentication:login'),
         'CONNECTION_TOKEN_EXPIRATION': 5 * 60,
@@ -325,6 +327,7 @@ class Config(dict):
         'TERMINAL_MAGNUS_ENABLED': True,
         'TERMINAL_KOKO_SSH_ENABLED': True,
         'TERMINAL_RAZOR_ENABLED': True,
+        'TERMINAL_OMNIDB_ENABLED': True,
 
         # 安全配置
         'SECURITY_MFA_AUTH': 0,  # 0 不开启 1 全局开启 2 管理员开启
@@ -380,6 +383,7 @@ class Config(dict):
         'SESSION_COOKIE_SECURE': False,
         'CSRF_COOKIE_SECURE': False,
         'REFERER_CHECK_ENABLED': False,
+        'SESSION_ENGINE': 'cache',
         'SESSION_SAVE_EVERY_REQUEST': True,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE': False,
         'SERVER_REPLAY_STORAGE': {},
@@ -410,7 +414,6 @@ class Config(dict):
 
         'FORGOT_PASSWORD_URL': '',
         'HEALTH_CHECK_TOKEN': '',
-
     }
 
     @staticmethod

@@ -41,10 +41,13 @@ class ReferencedByOthers(JMSException):
     default_detail = _('Is referenced by other objects and cannot be deleted')
 
 
-class MFAVerifyRequired(JMSException):
-    status_code = status.HTTP_400_BAD_REQUEST
-    default_code = 'mfa_verify_required'
-    default_detail = _('This action require verify your MFA')
+class UserConfirmRequired(JMSException):
+    def __init__(self, code=None):
+        detail = {
+            'code': code,
+            'detail': _('This action require confirm current user')
+        }
+        super().__init__(detail=detail, code=code)
 
 
 class UnexpectError(JMSException):

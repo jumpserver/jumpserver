@@ -2,16 +2,26 @@
 #
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.mixins import UserPassesTestMixin
+from django.http.response import JsonResponse
 from rest_framework import permissions
-from rest_framework.decorators import action
 from rest_framework.request import Request
-from rest_framework.response import Response
 
-from common.permissions import IsValidUser
+from common.exceptions import UserConfirmRequired
 from audits.utils import create_operate_log
 from audits.models import OperateLog
 
-__all__ = ["PermissionsMixin", "RecordViewLogMixin"]
+__all__ = ["PermissionsMixin", "RecordViewLogMixin", "UserConfirmRequiredExceptionMixin"]
+
+
+class UserConfirmRequiredExceptionMixin:
+    """
+    异常处理
+    """
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            return super().dispatch(request, *args, **kwargs)
+        except UserConfirmRequired as e:
+            return JsonResponse(e.detail, status=e.status_code)
 
 
 class PermissionsMixin(UserPassesTestMixin):

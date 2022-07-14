@@ -6,12 +6,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="{{ FAVICON_URL }}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{ INTERFACE.favicon }}" type="image/x-icon">
     <title>{% block html_title %}{% endblock %}</title>
 
     {% include '_head_css_js.html' %}
     <link href="{% static "css/jumpserver.css" %}" rel="stylesheet">
-    <script src="{% static "js/jumpserver.js" %}"></script>
+    <script src="{% static "js/jumpserver.js" %}?_=9"></script>
     <style>
         .passwordBox {
             max-width: 560px;
@@ -27,10 +27,12 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="ibox-content">
-                    <img src="{{ LOGO_URL }}" style="margin: auto" width="50" height="50">
-                    <h2 class="font-bold" style="display: inline">{% block title %}{% endblock %}</h2>
-                    <h1></h1>
-                    {% block content %} {% endblock %}
+                    <h2 class="font-bold">
+                        {% block title %}{% endblock %}
+                    </h2>
+                    <div style="margin: 10px 0">
+                        {% block content %} {% endblock %}
+                    </div>
                 </div>
             </div>
         </div>

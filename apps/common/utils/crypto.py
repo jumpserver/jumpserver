@@ -260,7 +260,7 @@ def decrypt_password(value):
     try:
         password = aes.decrypt(password_cipher)
     except UnicodeDecodeError as e:
-        logging.error("Decript password error: {}, {}".format(password_cipher, e))
+        logging.error("Decrypt password error: {}, {}".format(password_cipher, e))
         return value
     return password
 

@@ -1,11 +1,11 @@
 # SECURITY WARNING: keep the secret key used in production secret!
 # 加密密钥 生产环境中请修改为随机字符串，请勿外泄, 可使用命令生成
 # $ cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 49;echo
-SECRET_KEY: 
+SECRET_KEY:
 
 # SECURITY WARNING: keep the bootstrap token used in production secret!
 # 预共享Token coco和guacamole用来注册服务账号，不在使用原来的注册接受机制
-BOOTSTRAP_TOKEN: 
+BOOTSTRAP_TOKEN:
 
 # Development env open this, when error occur display the full process track, Production disable it
 # DEBUG 模式 开启DEBUG后遇到错误时可以看到更多日志
@@ -14,11 +14,11 @@ BOOTSTRAP_TOKEN:
 # DEBUG, INFO, WARNING, ERROR, CRITICAL can set. See https://docs.djangoproject.com/en/1.10/topics/logging/
 # 日志级别
 # LOG_LEVEL: DEBUG
-# LOG_DIR: 
+# LOG_DIR:
 
-# Session expiration setting, Default 24 hour, Also set expired on on browser close
-# 浏览器Session过期时间，默认24小时, 也可以设置浏览器关闭则过期
-# SESSION_COOKIE_AGE: 86400
+# Session expiration setting, Default 1 hour, Also set expired on on browser close
+# 浏览器Session过期时间，默认 1 小时, 也可以设置浏览器关闭则过期
+# SESSION_COOKIE_AGE: 3600
 # SESSION_EXPIRE_AT_BROWSER_CLOSE: false
 
 # Database setting, Support sqlite3, mysql, postgres ....
@@ -28,14 +28,14 @@ BOOTSTRAP_TOKEN:
 # SQLite setting:
 # 使用单文件sqlite数据库
 # DB_ENGINE: sqlite3
-# DB_NAME: 
+# DB_NAME:
 # MySQL or postgres setting like:
 # 使用Mysql作为数据库
 DB_ENGINE: mysql
 DB_HOST: 127.0.0.1
 DB_PORT: 3306
 DB_USER: jumpserver
-DB_PASSWORD: 
+DB_PASSWORD:
 DB_NAME: jumpserver
 
 # When Django start it will bind this host and port
@@ -49,46 +49,9 @@ WS_LISTEN_PORT: 8070
 # Redis配置
 REDIS_HOST: 127.0.0.1
 REDIS_PORT: 6379
-# REDIS_PASSWORD: 
+# REDIS_PASSWORD:
 # REDIS_DB_CELERY: 3
 # REDIS_DB_CACHE: 4
-
-# Use OpenID Authorization
-# 使用 OpenID 进行认证设置
-# AUTH_OPENID: False # True or False
-# BASE_SITE_URL: None
-# AUTH_OPENID_CLIENT_ID: client-id
-# AUTH_OPENID_CLIENT_SECRET: client-secret
-# AUTH_OPENID_PROVIDER_ENDPOINT: https://op-example.com/
-# AUTH_OPENID_PROVIDER_AUTHORIZATION_ENDPOINT: https://op-example.com/authorize
-# AUTH_OPENID_PROVIDER_TOKEN_ENDPOINT: https://op-example.com/token
-# AUTH_OPENID_PROVIDER_JWKS_ENDPOINT: https://op-example.com/jwks
-# AUTH_OPENID_PROVIDER_USERINFO_ENDPOINT: https://op-example.com/userinfo
-# AUTH_OPENID_PROVIDER_END_SESSION_ENDPOINT: https://op-example.com/logout
-# AUTH_OPENID_PROVIDER_SIGNATURE_ALG: HS256
-# AUTH_OPENID_PROVIDER_SIGNATURE_KEY: None
-# AUTH_OPENID_SCOPES: "openid profile email"
-# AUTH_OPENID_ID_TOKEN_MAX_AGE: 60
-# AUTH_OPENID_ID_TOKEN_INCLUDE_CLAIMS: True
-# AUTH_OPENID_USE_STATE: True
-# AUTH_OPENID_USE_NONCE: True
-# AUTH_OPENID_SHARE_SESSION: True
-# AUTH_OPENID_IGNORE_SSL_VERIFICATION: True
-# AUTH_OPENID_ALWAYS_UPDATE_USER: True
-
-# Use Radius authorization
-# 使用Radius来认证
-# AUTH_RADIUS: false
-# RADIUS_SERVER: localhost
-# RADIUS_PORT: 1812
-# RADIUS_SECRET: 
-
-# CAS 配置
-# AUTH_CAS': False,
-# CAS_SERVER_URL': "http://host/cas/",
-# CAS_ROOT_PROXIED_AS': 'http://jumpserver-host:port',  
-# CAS_LOGOUT_COMPLETELY': True,
-# CAS_VERSION': 3,
 
 # LDAP/AD settings
 # LDAP 搜索分页数量
@@ -114,13 +77,6 @@ REDIS_PORT: 6379
 # OTP_VALID_WINDOW: 0
 # OTP_ISSUER_NAME: Jumpserver
 
-# Perm show single asset to ungrouped node
-# 是否把未授权节点资产放入到 未分组 节点中
-# PERM_SINGLE_ASSET_TO_UNGROUP_NODE: False
-#
-# 同一账号仅允许在一台设备登录
-# USER_LOGIN_SINGLE_MACHINE_ENABLED: False
-#
 # 启用定时任务
 # PERIOD_TASK_ENABLED: True
 #
@@ -130,17 +86,11 @@ REDIS_PORT: 6379
 # 是否开启 Luna 水印
 # SECURITY_WATERMARK_ENABLED: False
 
-# 健康检查的token，默认是空
-# HEALTH_CHECK_TOKEN: ''
-
 # 浏览器关闭页面后，会话过期
 # SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE: False
 
 # 每次api请求，session续期
 # SESSION_SAVE_EVERY_REQUEST: True
-
-# 硬盘检查
-# DISK_CHECK_ENABLED: True
 
 # 仅允许用户从来源处登录
 # ONLY_ALLOW_AUTH_FROM_SOURCE: False

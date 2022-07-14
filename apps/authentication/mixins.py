@@ -193,8 +193,8 @@ class MFAMixin:
     def _check_if_no_active_mfa(self, user):
         active_mfa_mapper = user.active_mfa_backends_mapper
         if not active_mfa_mapper:
-            url = reverse('authentication:user-otp-enable-start')
-            raise errors.MFAUnsetError(user, self.request, url)
+            set_url = reverse('authentication:user-otp-enable-start')
+            raise errors.MFAUnsetError(set_url, user, self.request)
 
     def _check_login_page_mfa_if_need(self, user):
         if not settings.SECURITY_MFA_IN_LOGIN_PAGE:
@@ -337,18 +337,18 @@ class AuthACLMixin:
             raise errors.TimePeriodNotAllowed(username=user.username, request=self.request)
 
     def get_ticket(self):
-        from tickets.models import Ticket
+        from tickets.models import ApplyLoginTicket
         ticket_id = self.request.session.get("auth_ticket_id")
         logger.debug('Login confirm ticket id: {}'.format(ticket_id))
         if not ticket_id:
             ticket = None
         else:
-            ticket = Ticket.all().filter(id=ticket_id).first()
+            ticket = ApplyLoginTicket.all().filter(id=ticket_id).first()
         return ticket
 
     def get_ticket_or_create(self, confirm_setting):
         ticket = self.get_ticket()
-        if not ticket or ticket.status_closed:
+        if not ticket or ticket.is_status(ticket.Status.closed):
             ticket = confirm_setting.create_confirm_ticket(self.request)
             self.request.session['auth_ticket_id'] = str(ticket.id)
         return ticket
@@ -357,16 +357,17 @@ class AuthACLMixin:
         ticket = self.get_ticket()
         if not ticket:
             raise errors.LoginConfirmOtherError('', "Not found")
-        if ticket.status_open:
+
+        if ticket.is_status(ticket.Status.open):
             raise errors.LoginConfirmWaitError(ticket.id)
-        elif ticket.state_approve:
+        elif ticket.is_state(ticket.State.approved):
             self.request.session["auth_confirm"] = "1"
             return
-        elif ticket.state_reject:
+        elif ticket.is_state(ticket.State.rejected):
             raise errors.LoginConfirmOtherError(
                 ticket.id, ticket.get_state_display()
             )
-        elif ticket.state_close:
+        elif ticket.is_state(ticket.State.closed):
             raise errors.LoginConfirmOtherError(
                 ticket.id, ticket.get_state_display()
             )
@@ -442,13 +443,15 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
         LoginIpBlockUtil(ip).clean_block_if_need()
         return user
 
-    def mark_password_ok(self, user, auto_login=False):
+    def mark_password_ok(self, user, auto_login=False, auth_backend=None):
         request = self.request
         request.session['auth_password'] = 1
         request.session['auth_password_expired_at'] = time.time() + settings.AUTH_EXPIRED_SECONDS
         request.session['user_id'] = str(user.id)
         request.session['auto_login'] = auto_login
-        request.session['auth_backend'] = getattr(user, 'backend', settings.AUTH_BACKEND_MODEL)
+        if not auth_backend:
+            auth_backend = getattr(user, 'backend', settings.AUTH_BACKEND_MODEL)
+        request.session['auth_backend'] = auth_backend
 
     def check_oauth2_auth(self, user: User, auth_backend):
         ip = self.get_request_ip()
@@ -468,7 +471,7 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
         LoginIpBlockUtil(ip).clean_block_if_need()
         MFABlockUtils(user.username, ip).clean_failed_count()
 
-        self.mark_password_ok(user, False)
+        self.mark_password_ok(user, False, auth_backend)
         return user
 
     def get_user_or_auth(self, valid_data):

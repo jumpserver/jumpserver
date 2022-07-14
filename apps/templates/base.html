@@ -5,11 +5,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="renderer" content="webkit">
-    <title>{{ JMS_TITLE }}</title>
-    <link rel="shortcut icon" href="{{ FAVICON_URL }}" type="image/x-icon">
+    <title>{{ INTERFACE.login_title }}</title>
+    <link rel="shortcut icon" href="{{ INTERFACE.favicon }}" type="image/x-icon">
     {% include '_head_css_js.html' %}
     <link href="{% static 'css/jumpserver.css' %}" rel="stylesheet">
     {% block custom_head_css_js %} {% endblock %}
+    <style>
+        :root {
+            --primary-color: var(--primary-color);
+        }
+    </style>
 </head>
 <body>
 <div id="wrapper">
@@ -47,5 +52,6 @@ $(document).ready(function () {
     var pathKey = getMessagePathKey();
     window.localStorage.setItem(pathKey, '1')
 })
+
 </script>
 </html>

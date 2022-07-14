@@ -18,6 +18,8 @@ class Endpoint(JMSModel):
     mariadb_port = PortField(default=33061, verbose_name=_('MariaDB Port'))
     postgresql_port = PortField(default=54320, verbose_name=_('PostgreSQL Port'))
     redis_port = PortField(default=63790, verbose_name=_('Redis Port'))
+    oracle_11g_port = PortField(default=15211, verbose_name=_('Oracle 11g Port'))
+    oracle_12c_port = PortField(default=15212, verbose_name=_('Oracle 12c Port'))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
     default_id = '00000000-0000-0000-0000-000000000001'
@@ -32,13 +34,24 @@ class Endpoint(JMSModel):
     def get_port(self, protocol):
         return getattr(self, f'{protocol}_port', 0)
 
+    def get_oracle_port(self, version):
+        protocol = f'oracle_{version}'
+        return self.get_port(protocol)
+
     def is_default(self):
-        return self.id == self.default_id
+        return str(self.id) == self.default_id
 
     def delete(self, using=None, keep_parents=False):
         if self.is_default():
             return
         return super().delete(using, keep_parents)
+
+    def is_valid_for(self, protocol):
+        if self.is_default():
+            return True
+        if self.host and self.get_port(protocol) != 0:
+            return True
+        return False
 
     @classmethod
     def get_or_create_default(cls, request=None):
@@ -53,6 +66,22 @@ class Endpoint(JMSModel):
         if not endpoint.host and request:
             endpoint.host = request.get_host().split(':')[0]
         return endpoint
+
+    @classmethod
+    def match_by_instance_label(cls, instance, protocol):
+        from assets.models import Asset
+        from terminal.models import Session
+        if isinstance(instance, Session):
+            instance = instance.get_asset_or_application()
+        if not isinstance(instance, Asset):
+            return None
+        values = instance.labels.filter(name='endpoint').values_list('value', flat=True)
+        if not values:
+            return None
+        endpoints = cls.objects.filter(name__in=values).order_by('-date_updated')
+        for endpoint in endpoints:
+            if endpoint.is_valid_for(protocol):
+                return endpoint
 
 
 class EndpointRule(JMSModel):
@@ -82,11 +111,7 @@ class EndpointRule(JMSModel):
                 continue
             if not endpoint_rule.endpoint:
                 continue
-            if endpoint_rule.endpoint.is_default():
-                return endpoint_rule
-            if not endpoint_rule.endpoint.host:
-                continue
-            if endpoint_rule.endpoint.get_port(protocol) == 0:
+            if not endpoint_rule.endpoint.is_valid_for(protocol):
                 continue
             return endpoint_rule
 
