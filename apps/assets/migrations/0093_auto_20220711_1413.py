@@ -10,16 +10,18 @@ def migrate_accounts(apps, schema_editor):
 
     count = 0
     bulk_size = 1000
+    print("\nStart migrate accounts")
     while True:
+        start = time.time()
         auth_books = auth_book_model.objects \
-                    .prefetch_related('systemuser') \
-                    .all()[count:count+bulk_size]
+            .prefetch_related('systemuser') \
+            .all()[count:count+bulk_size]
+        count += len(auth_books)
         if not auth_books:
             break
 
         accounts = []
-        start = time.time()
-        # authbook 和 account 相同的属性
+        # auth book 和 account 相同的属性
         same_attrs = [
             'id', 'comment', 'date_created', 'date_updated',
             'created_by', 'asset_id', 'org_id',
@@ -47,9 +49,8 @@ def migrate_accounts(apps, schema_editor):
 
         account_model.objects.bulk_create(accounts, ignore_conflicts=True)
         print("Create accounts: {}-{} using: {:.2f}s".format(
-            count, count + len(accounts), time.time()-start
+            count - bulk_size, count, time.time()-start
         ))
-        count += len(auth_books)
 
 
 class Migration(migrations.Migration):

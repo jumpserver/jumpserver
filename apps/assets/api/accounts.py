@@ -12,7 +12,7 @@ from common.mixins import RecordViewLogMixin
 from common.permissions import UserConfirmation
 from authentication.const import ConfirmType
 from ..tasks.account_connectivity import test_accounts_connectivity_manual
-from ..models import AuthBook, Node
+from ..models import Node, Account
 from .. import serializers
 
 __all__ = ['AccountFilterSet', 'AccountViewSet', 'AccountSecretsViewSet', 'AccountTaskCreateAPI']
@@ -50,16 +50,16 @@ class AccountFilterSet(BaseFilterSet):
         return qs
 
     class Meta:
-        model = AuthBook
+        model = Account
         fields = [
-            'asset', 'systemuser', 'id',
+            'asset', 'id',
         ]
 
 
 class AccountViewSet(OrgBulkModelViewSet):
-    model = AuthBook
-    filterset_fields = ("username", "asset", "systemuser", 'ip', 'hostname')
-    search_fields = ('username', 'ip', 'hostname', 'systemuser__username')
+    model = Account
+    filterset_fields = ("username", "asset", 'ip', 'hostname')
+    search_fields = ('username', 'ip', 'hostname')
     filterset_class = AccountFilterSet
     serializer_classes = {
         'default': serializers.AccountSerializer,
@@ -69,10 +69,6 @@ class AccountViewSet(OrgBulkModelViewSet):
         'verify_account': 'assets.test_authbook',
         'partial_update': 'assets.change_assetaccountsecret',
     }
-
-    def get_queryset(self):
-        queryset = AuthBook.get_queryset()
-        return queryset
 
     @action(methods=['post'], detail=True, url_path='verify')
     def verify_account(self, request, *args, **kwargs):
@@ -106,7 +102,7 @@ class AccountTaskCreateAPI(CreateAPIView):
         return request.user.has_perm('assets.test_assetconnectivity')
 
     def get_accounts(self):
-        queryset = AuthBook.objects.all()
+        queryset = Account.objects.all()
         queryset = self.filter_queryset(queryset)
         return queryset
 

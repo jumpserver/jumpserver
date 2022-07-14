@@ -8,7 +8,7 @@ from django.utils.translation import ugettext as _, gettext_noop
 from assets.models import Asset
 from common.utils import get_logger
 from orgs.utils import tmp_to_org, org_aware_func
-from ..models import SystemUser, Connectivity, AuthBook
+from ..models import SystemUser, Connectivity, Account
 from . import const
 from .utils import (
     clean_ansible_task_hosts, group_asset_by_platform
@@ -34,11 +34,11 @@ def set_assets_accounts_connectivity(system_user, assets, results_summary):
         else:
             asset_ids_failed.add(asset.id)
 
-    accounts_ok = AuthBook.objects.filter(asset_id__in=asset_ids_ok, systemuser=system_user)
-    accounts_failed = AuthBook.objects.filter(asset_id__in=asset_ids_failed, systemuser=system_user)
+    accounts_ok = Account.objects.filter(asset_id__in=asset_ids_ok, systemuser=system_user)
+    accounts_failed = Account.objects.filter(asset_id__in=asset_ids_failed, systemuser=system_user)
 
-    AuthBook.bulk_set_connectivity(accounts_ok, Connectivity.ok)
-    AuthBook.bulk_set_connectivity(accounts_failed, Connectivity.failed)
+    Account.bulk_set_connectivity(accounts_ok, Connectivity.ok)
+    Account.bulk_set_connectivity(accounts_failed, Connectivity.failed)
 
 
 @org_aware_func("system_user")

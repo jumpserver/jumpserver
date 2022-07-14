@@ -3,15 +3,20 @@ from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
 from .user import ProtocolMixin
-from .base import BaseUser
+from .base import BaseUser, AbsConnectivity
 
 
 __all__ = ['Account']
 
 
-class Account(BaseUser, ProtocolMixin):
+class Account(BaseUser, AbsConnectivity, ProtocolMixin):
+    class Type(models.TextChoices):
+        common = 'common', _('Common user')
+        admin = 'admin', _('Admin user')
+
     protocol = models.CharField(max_length=16, choices=ProtocolMixin.Protocol.choices,
                                 default='ssh', verbose_name=_('Protocol'))
+    type = models.CharField(max_length=16, choices=Type.choices, default=Type.common, verbose_name=_("Type"))
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, verbose_name=_('Asset'))
     version = models.IntegerField(default=1, verbose_name=_('Version'))
     history = HistoricalRecords()

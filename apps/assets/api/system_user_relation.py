@@ -68,7 +68,6 @@ class BaseRelationViewSet(RelationMixin, OrgBulkModelViewSet):
 
 
 class SystemUserAssetRelationViewSet(BaseRelationViewSet):
-    perm_model = models.AuthBook
     serializer_class = serializers.SystemUserAssetRelationSerializer
     model = models.SystemUser.assets.through
     filterset_fields = [
