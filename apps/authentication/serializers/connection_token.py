@@ -61,7 +61,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         system_user = attrs.get('system_user') or ''
         asset = attrs.get('asset') or ''
         application = attrs.get('application') or ''
-        secret = attrs.get('secret') or random_string(64)
+        secret = attrs.get('secret') or random_string(16)
         date_expired = attrs.get('date_expired') or ConnectionToken.get_default_date_expired()
 
         if isinstance(asset, Asset):
