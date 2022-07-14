@@ -308,7 +308,7 @@ class Application(CommonModelMixin, OrgModelMixin, ApplicationTreeNodeMixin):
         """ Oracle 类型需要单独处理，因为要携带版本号 """
         if not self.is_type(self.APP_TYPE.oracle):
             return
-        version = self.attrs.get('version', OracleVersion.version_other)
+        version = self.attrs.get('version', OracleVersion.version_12c)
         if version == OracleVersion.version_other:
             return
         return 'oracle_%s' % version
