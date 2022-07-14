@@ -10,6 +10,7 @@ from common.mixins import CommonModelMixin
 from common.tree import TreeNode
 from common.utils import is_uuid
 from assets.models import Asset, SystemUser
+from ..const import OracleVersion
 
 from ..utils import KubernetesTree
 from .. import const
@@ -214,6 +215,8 @@ class ApplicationTreeNodeMixin:
 
 
 class Application(CommonModelMixin, OrgModelMixin, ApplicationTreeNodeMixin):
+    APP_TYPE = const.AppType
+
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     category = models.CharField(
         max_length=16, choices=const.AppCategory.choices, verbose_name=_('Category')
@@ -254,6 +257,9 @@ class Application(CommonModelMixin, OrgModelMixin, ApplicationTreeNodeMixin):
     @property
     def category_db(self):
         return self.category == const.AppCategory.db.value
+
+    def is_type(self, tp):
+        return self.type == tp
 
     def get_rdp_remote_app_setting(self):
         from applications.serializers.attrs import get_serializer_class_by_application_type
@@ -297,6 +303,15 @@ class Application(CommonModelMixin, OrgModelMixin, ApplicationTreeNodeMixin):
         elif self.category_db:
             target_ip = self.attrs.get('host')
         return target_ip
+
+    def get_target_protocol_for_oracle(self):
+        """ Oracle 类型需要单独处理，因为要携带版本号 """
+        if not self.is_type(self.APP_TYPE.oracle):
+            return
+        version = self.attrs.get('version', OracleVersion.version_other)
+        if version == OracleVersion.version_other:
+            return
+        return 'oracle_%s' % version
 
 
 class ApplicationUser(SystemUser):

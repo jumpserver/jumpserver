@@ -4,6 +4,7 @@ import logging
 from datetime import datetime
 
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone as dj_timezone
 from django.db import models
 from django.conf import settings
 
@@ -18,6 +19,7 @@ class ModelJSONFieldEncoder(json.JSONEncoder):
         if isinstance(obj, str_cls):
             return str(obj)
         elif isinstance(obj, datetime):
+            obj = dj_timezone.localtime(obj)
             return obj.strftime(settings.DATETIME_DISPLAY_FORMAT)
         elif isinstance(obj, (list, tuple)) and len(obj) > 0 \
                 and isinstance(obj[0], models.Model):

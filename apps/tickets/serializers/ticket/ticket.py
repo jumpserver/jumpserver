@@ -9,7 +9,7 @@ from tickets.models import Ticket, TicketFlow
 from tickets.const import TicketType
 
 __all__ = [
-    'TicketDisplaySerializer', 'TicketApplySerializer', 'TicketListSerializer'
+    'TicketDisplaySerializer', 'TicketApplySerializer', 'TicketListSerializer', 'TicketApproveSerializer'
 ]
 
 
@@ -59,6 +59,13 @@ class TicketDisplaySerializer(TicketSerializer):
         read_only_fields = fields
 
 
+class TicketApproveSerializer(TicketSerializer):
+    class Meta:
+        model = Ticket
+        fields = TicketSerializer.Meta.fields
+        read_only_fields = fields
+
+
 class TicketApplySerializer(TicketSerializer):
     org_id = serializers.CharField(
         required=True, max_length=36, allow_blank=True, label=_("Organization")
@@ -80,6 +87,9 @@ class TicketApplySerializer(TicketSerializer):
         return org_id
 
     def validate(self, attrs):
+        if self.instance:
+            return attrs
+
         ticket_type = attrs.get('type')
         org_id = attrs.get('org_id')
         flow = TicketFlow.get_org_related_flows(org_id=org_id).filter(type=ticket_type).first()

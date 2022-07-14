@@ -109,9 +109,3 @@ def get_asset_system_user_ids_with_actions_by_group(group: UserGroup, asset: Ass
         user_groups=group
     ).valid().values_list('id', flat=True).distinct()
     return get_asset_system_user_ids_with_actions(asset_perm_ids, asset)
-
-
-def get_asset_actions(user, asset, system_user):
-    systemuser_actions_mapper = get_asset_system_user_ids_with_actions_by_user(user, asset)
-    actions = systemuser_actions_mapper.get(system_user.id, 0)
-    return actions

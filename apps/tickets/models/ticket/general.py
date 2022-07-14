@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+import json
 from typing import Callable
 
 from django.db import models
@@ -7,6 +8,7 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.db.utils import IntegrityError
 from django.db.models.fields import related
+from django.forms import model_to_dict
 
 from common.exceptions import JMSException
 from common.utils.timezone import as_current_tz
@@ -97,6 +99,7 @@ class StatusMixin:
 
     state: str
     status: str
+    applicant_id: str
     applicant: models.ForeignKey
     current_step: TicketStep
     save: Callable
@@ -130,6 +133,7 @@ class StatusMixin:
         self._open()
 
     def approve(self, processor):
+        self.set_rel_snapshot()
         self._change_state(StepState.approved, processor)
 
     def reject(self, processor):
@@ -178,28 +182,34 @@ class StatusMixin:
     @property
     def process_map(self):
         process_map = []
-        steps = self.ticket_steps.all()
-        for step in steps:
+        for step in self.ticket_steps.all():
+            processor_id = ''
             assignee_ids = []
+            processor_display = ''
             assignees_display = []
-            ticket_assignees = step.ticket_assignees.all()
-            processor = None
             state = step.state
-            for i in ticket_assignees:
-                assignee_ids.append(i.assignee_id)
-                assignees_display.append(str(i.assignee))
+            for i in step.ticket_assignees.all().prefetch_related('assignee'):
+                assignee_id = i.assignee_id
+                assignee_display = str(i.assignee)
+
                 if state != StepState.pending and state == i.state:
-                    processor = i.assignee
+                    processor_id = assignee_id
+                    processor_display = assignee_display
                 if state == StepState.closed:
-                    processor = self.applicant
+                    processor_id = self.applicant_id
+                    processor_display = str(self.applicant)
+
+                assignee_ids.append(assignee_id)
+                assignees_display.append(assignee_display)
+
             step_info = {
                 'state': state,
                 'approval_level': step.level,
                 'assignees': assignee_ids,
                 'assignees_display': assignees_display,
                 'approval_date': str(step.date_updated),
-                'processor': processor.id if processor else '',
-                'processor_display': str(processor) if processor else ''
+                'processor': processor_id,
+                'processor_display': processor_display
             }
             process_map.append(step_info)
         return process_map
@@ -379,6 +389,30 @@ class Ticket(StatusMixin, CommonModelMixin):
                 # 但概率小，这里只报错，用户重新提交即可
                 raise JMSException(detail=_('Please try again'), code='please_try_again')
             raise e
+
+    def get_field_display(self, name, field, data: dict):
+        value = data.get(name)
+        if hasattr(self, f'get_{name}_display'):
+            value = getattr(self, f'get_{name}_display')()
+        elif isinstance(field, related.ForeignKey):
+            value = self.rel_snapshot[name]
+        elif isinstance(field, related.ManyToManyField):
+            value = ', '.join(self.rel_snapshot[name])
+        return value
+
+    def get_local_snapshot(self):
+        fields = self._meta._forward_fields_map
+        json_data = json.dumps(model_to_dict(self), cls=ModelJSONFieldEncoder)
+        data = json.loads(json_data)
+        snapshot = {}
+        local_fields = self._meta.local_fields + self._meta.local_many_to_many
+        excludes = ['ticket_ptr']
+        item_names = [field.name for field in local_fields if field.name not in excludes]
+        for name in item_names:
+            field = fields[name]
+            value = self.get_field_display(name, field, data)
+            snapshot[field.verbose_name] = value
+        return snapshot
 
 
 class SuperTicket(Ticket):

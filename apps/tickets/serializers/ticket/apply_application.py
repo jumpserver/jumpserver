@@ -1,3 +1,4 @@
+from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 from perms.models import ApplicationPermission
@@ -7,7 +8,7 @@ from tickets.models import ApplyApplicationTicket
 from .ticket import TicketApplySerializer
 from .common import BaseApplyAssetApplicationSerializer
 
-__all__ = ['ApplyApplicationSerializer', 'ApplyApplicationDisplaySerializer']
+__all__ = ['ApplyApplicationSerializer', 'ApplyApplicationDisplaySerializer', 'ApproveApplicationSerializer']
 
 
 class ApplyApplicationSerializer(BaseApplyAssetApplicationSerializer, TicketApplySerializer):
@@ -24,13 +25,21 @@ class ApplyApplicationSerializer(BaseApplyAssetApplicationSerializer, TicketAppl
         read_only_fields = list(set(fields) - set(writeable_fields))
         ticket_extra_kwargs = TicketApplySerializer.Meta.extra_kwargs
         extra_kwargs = {
-            'apply_system_users': {'required': True},
+            'apply_applications': {'required': False, 'allow_empty': True},
+            'apply_system_users': {'required': False, 'allow_empty': True},
         }
         extra_kwargs.update(ticket_extra_kwargs)
 
     def validate_apply_applications(self, applications):
+        if self.is_final_approval and not applications:
+            raise serializers.ValidationError(_('This field is required.'))
         tp = self.initial_data.get('apply_type')
         return self.filter_many_to_many_field(Application, applications, type=tp)
+
+
+class ApproveApplicationSerializer(ApplyApplicationSerializer):
+    class Meta(ApplyApplicationSerializer.Meta):
+        read_only_fields = ApplyApplicationSerializer.Meta.read_only_fields + ['title', 'type']
 
 
 class ApplyApplicationDisplaySerializer(ApplyApplicationSerializer):
