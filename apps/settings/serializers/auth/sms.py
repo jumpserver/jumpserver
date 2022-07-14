@@ -57,8 +57,8 @@ class CMPP2SMSSettingSerializer(BaseSMSSettingSerializer):
     CMPP2_SERVICE_ID = serializers.CharField(max_length=256, required=True, label=_('Business type(Service id)'))
     CMPP2_VERIFY_SIGN_NAME = serializers.CharField(max_length=256, required=True, label=_('Signature'))
     CMPP2_VERIFY_TEMPLATE_CODE = serializers.CharField(
-        max_length=69, required=True, label=_('Template code'),
-        help_text=_('Template need contain {code} and Signature + template length does not exceed 70 words. '
+        max_length=69, required=True, label=_('Template'),
+        help_text=_('Template need contain {code} and Signature + template length does not exceed 67 words. '
                     'For example, your verification code is {code}, which is valid for 5 minutes. '
                     'Please do not disclose it to others.')
     )
@@ -70,5 +70,5 @@ class CMPP2SMSSettingSerializer(BaseSMSSettingSerializer):
             raise serializers.ValidationError(_('The template needs to contain {code}'))
         if len(sign_name + template_code) > 65:
             # 保证验证码内容在一条短信中(长度小于70字), 签名两边的括号和空格占3个字，再减去2个即可(验证码占用4个但占位符6个
-            raise serializers.ValidationError(_('Signature + Template code must not exceed 67 words'))
+            raise serializers.ValidationError(_('Signature + Template must not exceed 65 words'))
         return attrs
