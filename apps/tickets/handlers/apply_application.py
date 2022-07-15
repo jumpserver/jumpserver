@@ -16,16 +16,18 @@ class Handler(BaseHandler):
 
     # permission
     def _create_application_permission(self):
-        with tmp_to_root_org():
+        org_id = self.ticket.org_id
+        with tmp_to_org(org_id):
             application_permission = ApplicationPermission.objects.filter(id=self.ticket.id).first()
             if application_permission:
                 return application_permission
 
+            apply_applications = self.ticket.apply_applications.all()
+            apply_system_users = self.ticket.apply_system_users.all()
+
         apply_permission_name = self.ticket.apply_permission_name
         apply_category = self.ticket.apply_category
         apply_type = self.ticket.apply_type
-        apply_applications = self.ticket.apply_applications.all()
-        apply_system_users = self.ticket.apply_system_users.all()
         apply_date_start = self.ticket.apply_date_start
         apply_date_expired = self.ticket.apply_date_expired
         permission_created_by = '{}:{}'.format(
