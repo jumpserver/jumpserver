@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-13 16:25+0800\n"
+"POT-Creation-Date: 2022-07-15 17:15+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -89,7 +89,7 @@ msgstr "ログイン確認"
 #: assets/models/cmd_filter.py:30 assets/models/label.py:15 audits/models.py:37
 #: audits/models.py:62 audits/models.py:87 audits/serializers.py:100
 #: authentication/models.py:54 authentication/models.py:78 orgs/models.py:214
-#: perms/models/base.py:84 rbac/builtin.py:118 rbac/models/rolebinding.py:41
+#: perms/models/base.py:84 rbac/builtin.py:117 rbac/models/rolebinding.py:41
 #: terminal/backends/command/models.py:20
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:44
 #: terminal/models/sharing.py:33 terminal/notifications.py:91
@@ -214,7 +214,7 @@ msgid "Unsupported protocols: {}"
 msgstr "サポートされていないプロトコル: {}"
 
 #: acls/serializers/login_asset_acl.py:98
-#: tickets/serializers/ticket/ticket.py:78
+#: tickets/serializers/ticket/ticket.py:85
 msgid "The organization `{}` does not exist"
 msgstr "組織 '{}'は存在しません"
 
@@ -2002,6 +2002,24 @@ msgstr "電話が設定されていない"
 msgid "SSO auth closed"
 msgstr "SSO authは閉鎖されました"
 
+#: authentication/errors/mfa.py:18 authentication/views/wecom.py:80
+msgid "WeCom is already bound"
+msgstr "企業の微信はすでにバインドされています"
+
+#: authentication/errors/mfa.py:23 authentication/views/wecom.py:237
+#: authentication/views/wecom.py:291
+msgid "WeCom is not bound"
+msgstr "企業の微信をバインドしていません"
+
+#: authentication/errors/mfa.py:28 authentication/views/dingtalk.py:242
+#: authentication/views/dingtalk.py:296
+msgid "DingTalk is not bound"
+msgstr "DingTalkはバインドされていません"
+
+#: authentication/errors/mfa.py:33 authentication/views/feishu.py:203
+msgid "FeiShu is not bound"
+msgstr "本を飛ばすは拘束されていません"
+
 #: authentication/errors/mfa.py:38
 msgid "Your password is invalid"
 msgstr "パスワードが無効です"
@@ -2479,10 +2497,6 @@ msgstr "DingTalkのバインドに成功"
 msgid "Failed to get user from DingTalk"
 msgstr "DingTalkからユーザーを取得できませんでした"
 
-#: authentication/views/dingtalk.py:242 authentication/views/dingtalk.py:296
-msgid "DingTalk is not bound"
-msgstr "DingTalkはバインドされていません"
-
 #: authentication/views/dingtalk.py:243 authentication/views/dingtalk.py:297
 msgid "Please login with a password and then bind the DingTalk"
 msgstr "パスワードでログインし、DingTalkをバインドしてください"
@@ -2510,10 +2524,6 @@ msgstr "本を飛ばすのバインドに成功"
 #: authentication/views/feishu.py:197
 msgid "Failed to get user from FeiShu"
 msgstr "本を飛ばすからユーザーを取得できませんでした"
-
-#: authentication/views/feishu.py:203
-msgid "FeiShu is not bound"
-msgstr "本を飛ばすは拘束されていません"
 
 #: authentication/views/feishu.py:204
 msgid "Please login with a password and then bind the FeiShu"
@@ -2559,10 +2569,6 @@ msgstr "企業微信エラー、システム管理者に連絡してください
 msgid "WeCom Error"
 msgstr "企業微信エラー"
 
-#: authentication/views/wecom.py:80
-msgid "WeCom is already bound"
-msgstr "企業の微信はすでにバインドされています"
-
 #: authentication/views/wecom.py:163
 msgid "WeCom query user failed"
 msgstr "企業微信ユーザーの問合せに失敗しました"
@@ -2578,10 +2584,6 @@ msgstr "企業の微信のバインドに成功"
 #: authentication/views/wecom.py:231 authentication/views/wecom.py:285
 msgid "Failed to get user from WeCom"
 msgstr "企業の微信からユーザーを取得できませんでした"
-
-#: authentication/views/wecom.py:237 authentication/views/wecom.py:291
-msgid "WeCom is not bound"
-msgstr "企業の微信をバインドしていません"
 
 #: authentication/views/wecom.py:238 authentication/views/wecom.py:292
 msgid "Please login with a password and then bind the WeCom"
@@ -3022,10 +3024,10 @@ msgstr "組織のリソース ({}) は削除できません"
 msgid "App organizations"
 msgstr "アプリ組織"
 
-#: orgs/mixins/models.py:54 orgs/mixins/serializers.py:25 orgs/models.py:80
+#: orgs/mixins/models.py:57 orgs/mixins/serializers.py:25 orgs/models.py:80
 #: orgs/models.py:211 rbac/const.py:7 rbac/models/rolebinding.py:48
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:62
-#: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:64
+#: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:71
 msgid "Organization"
 msgstr "組織"
 
@@ -3258,27 +3260,27 @@ msgstr "{} 少なくとも1つのシステムロール"
 msgid "RBAC"
 msgstr "RBAC"
 
-#: rbac/builtin.py:109
+#: rbac/builtin.py:108
 msgid "SystemAdmin"
 msgstr "システム管理者"
 
-#: rbac/builtin.py:112
+#: rbac/builtin.py:111
 msgid "SystemAuditor"
 msgstr "システム監査人"
 
-#: rbac/builtin.py:115
+#: rbac/builtin.py:114
 msgid "SystemComponent"
 msgstr "システムコンポーネント"
 
-#: rbac/builtin.py:121
+#: rbac/builtin.py:120
 msgid "OrgAdmin"
 msgstr "組織管理者"
 
-#: rbac/builtin.py:124
+#: rbac/builtin.py:123
 msgid "OrgAuditor"
 msgstr "監査員を組織する"
 
-#: rbac/builtin.py:127
+#: rbac/builtin.py:126
 msgid "OrgUser"
 msgstr "組織ユーザー"
 
@@ -4687,7 +4689,7 @@ msgstr ""
 msgid "Offline video player"
 msgstr "オフラインビデオプレーヤー"
 
-#: terminal/api/endpoint.py:33
+#: terminal/api/endpoint.py:34
 msgid "Not found protocol query params"
 msgstr "プロトコルクエリパラメータが見つかりません"
 
@@ -5261,7 +5263,7 @@ msgstr "カスタムユーザー"
 msgid "Ticket already closed"
 msgstr "チケットはすでに閉じています"
 
-#: tickets/handlers/apply_application.py:35
+#: tickets/handlers/apply_application.py:37
 msgid ""
 "Created by the ticket, ticket title: {}, ticket applicant: {}, ticket "
 "processor: {}, ticket ID: {}"
@@ -5269,7 +5271,7 @@ msgstr ""
 "チケットによって作成されたチケットタイトル: {}、チケット申請者: {}、チケット"
 "処理者: {}、チケットID: {}"
 
-#: tickets/handlers/apply_asset.py:35
+#: tickets/handlers/apply_asset.py:37
 msgid ""
 "Created by the ticket ticket title: {} ticket applicant: {} ticket "
 "processor: {} ticket ID: {}"
@@ -5277,19 +5279,19 @@ msgstr ""
 "チケットのタイトル: {} チケット申請者: {} チケットプロセッサ: {} チケットID: "
 "{}"
 
-#: tickets/handlers/base.py:79
+#: tickets/handlers/base.py:84
 msgid "Change field"
 msgstr "フィールドを変更"
 
-#: tickets/handlers/base.py:79
+#: tickets/handlers/base.py:84
 msgid "Before change"
 msgstr "変更前"
 
-#: tickets/handlers/base.py:79
+#: tickets/handlers/base.py:84
 msgid "After change"
 msgstr "変更後"
 
-#: tickets/handlers/base.py:91
+#: tickets/handlers/base.py:96
 msgid "{} {} the ticket"
 msgstr "{} {} チケット"
 
@@ -5503,7 +5505,7 @@ msgstr "有効期限は開始日より大きくする必要があります"
 msgid "Permission named `{}` already exists"
 msgstr "'{}'という名前の権限は既に存在します"
 
-#: tickets/serializers/ticket/ticket.py:92
+#: tickets/serializers/ticket/ticket.py:99
 msgid "The ticket flow `{}` does not exist"
 msgstr "チケットフロー '{}'が存在しない"
 
