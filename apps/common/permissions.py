@@ -7,6 +7,9 @@ from rest_framework import permissions
 
 from authentication.const import ConfirmType
 from common.exceptions import UserConfirmRequired
+from orgs.utils import tmp_to_root_org
+from authentication.models import ConnectionToken
+from common.utils import get_object_or_none
 
 
 class IsValidUser(permissions.IsAuthenticated, permissions.BasePermission):
@@ -15,6 +18,22 @@ class IsValidUser(permissions.IsAuthenticated, permissions.BasePermission):
     def has_permission(self, request, view):
         return super(IsValidUser, self).has_permission(request, view) \
                and request.user.is_valid
+
+
+class IsValidUserOrConnectionToken(IsValidUser):
+
+    def has_permission(self, request, view):
+        return super(IsValidUserOrConnectionToken, self).has_permission(request, view) \
+               or self.is_valid_connection_token(request)
+
+    @staticmethod
+    def is_valid_connection_token(request):
+        token_id = request.query_params.get('token')
+        if not token_id:
+            return False
+        with tmp_to_root_org():
+            token = get_object_or_none(ConnectionToken, id=token_id)
+        return token and token.is_valid
 
 
 class OnlySuperUser(IsValidUser):
