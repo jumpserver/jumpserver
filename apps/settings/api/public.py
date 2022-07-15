@@ -3,7 +3,11 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.conf import settings
 
 from jumpserver.utils import has_valid_xpack_license, get_xpack_license_info
-from common.utils import get_logger, lazyproperty
+from common.utils import get_logger, lazyproperty, get_object_or_none
+from authentication.models import ConnectionToken
+from orgs.utils import tmp_to_root_org
+from common.permissions import IsValidUserOrConnectionToken
+
 from .. import serializers
 from ..utils import get_interface_setting_or_default
 
@@ -28,7 +32,7 @@ class OpenPublicSettingApi(generics.RetrieveAPIView):
 
 
 class PublicSettingApi(OpenPublicSettingApi):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsValidUserOrConnectionToken,)
     serializer_class = serializers.PrivateSettingSerializer
 
     def get_object(self):
