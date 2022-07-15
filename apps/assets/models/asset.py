@@ -238,16 +238,6 @@ class Asset(AbsConnectivity, AbsHardwareInfo, ProtocolsMixin, NodesRelationMixin
     def get_target_ip(self):
         return self.ip
 
-    def set_admin_user_relation(self):
-        from .authbook import AuthBook
-        if not self.admin_user:
-            return
-        if self.admin_user.type != 'admin':
-            raise ValidationError('System user should be type admin')
-
-        defaults = {'asset': self, 'systemuser': self.admin_user, 'org_id': self.org_id}
-        AuthBook.objects.get_or_create(defaults=defaults, asset=self, systemuser=self.admin_user)
-
     @property
     def admin_user_display(self):
         if not self.admin_user:

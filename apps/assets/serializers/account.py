@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
+from django.db.models import F
 
-from assets.models import AuthBook
+from assets.models import Account
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 from .base import AuthSerializerMixin
@@ -13,7 +14,6 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     ip = serializers.ReadOnlyField(label=_("IP"))
     hostname = serializers.ReadOnlyField(label=_("Hostname"))
     platform = serializers.ReadOnlyField(label=_("Platform"))
-    protocols = serializers.SerializerMethodField(label=_("Protocols"))
     date_created = serializers.DateTimeField(
         label=_('Date created'), format="%Y/%m/%d %H:%M:%S", read_only=True
     )
@@ -22,18 +22,20 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     )
 
     class Meta:
-        model = AuthBook
-        fields_mini = ['id', 'username', 'ip', 'hostname', 'platform', 'protocols', 'version']
-        fields_write_only = ['password', 'private_key', "public_key", 'passphrase']
+        model = Account
+        fields_mini = [
+            'id', 'type', 'username', 'ip', 'hostname',
+            'platform', 'protocol', 'version'
+        ]
+        fields_write_only = ['password', 'private_key', 'public_key', 'passphrase']
         fields_other = ['date_created', 'date_updated', 'connectivity', 'date_verified', 'comment']
         fields_small = fields_mini + fields_write_only + fields_other
-        fields_fk = ['asset', 'systemuser', 'systemuser_display']
+        fields_fk = ['asset']
         fields = fields_small + fields_fk
         extra_kwargs = {
             'username': {'required': True},
             'private_key': {'write_only': True},
             'public_key': {'write_only': True},
-            'systemuser_display': {'label': _('System user display')}
         }
         ref_name = 'AssetAccountSerializer'
 
@@ -52,26 +54,13 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         attrs = self._validate_gen_key(attrs)
         return attrs
 
-    def get_protocols(self, v):
-        """ protocols 是 queryset 中返回的，Post 创建成功后返回序列化时没有这个字段 """
-        if hasattr(v, 'protocols'):
-            protocols = v.protocols
-        elif hasattr(v, 'asset') and v.asset:
-            protocols = v.asset.protocols
-        else:
-            protocols = ''
-        protocols = protocols.replace(' ', ', ')
-        return protocols
-
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('systemuser', 'asset')
+        queryset = queryset.prefetch_related('asset')\
+            .annotate(ip=F('asset__ip')) \
+            .annotate(hostname=F('asset__hostname'))
         return queryset
-
-    def to_representation(self, instance):
-        instance.load_auth()
-        return super().to_representation(instance)
 
 
 class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):

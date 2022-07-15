@@ -9,6 +9,7 @@ from assets.models import AuthBook
 __all__ = ['add_nodes_assets_to_system_users']
 
 
+# Todo: 等待优化
 @shared_task
 @tmp_to_root_org()
 def add_nodes_assets_to_system_users(nodes_keys, system_users):

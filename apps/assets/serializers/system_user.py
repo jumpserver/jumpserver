@@ -47,9 +47,9 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         fields_small = fields_mini + fields_write_only + [
             'token', 'ssh_key_fingerprint',
             'type', 'type_display', 'protocol', 'is_asset_protocol',
-            'login_mode', 'login_mode_display', 'priority',
+            'auto_create_account', 'login_mode', 'login_mode_display', 'priority',
             'sudo', 'shell', 'sftp_root', 'home', 'system_groups', 'ad_domain',
-            'username_same_with_user', 'auto_push', 'auto_generate_key',
+            'username_same_with_user', 'auto_push_account', 'auto_generate_key',
             'su_enabled', 'su_from',
             'date_created', 'date_updated', 'comment', 'created_by',
         ]
@@ -191,7 +191,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         attrs['protocol'] = SystemUser.Protocol.ssh
         attrs['login_mode'] = SystemUser.LOGIN_AUTO
         attrs['username_same_with_user'] = False
-        attrs['auto_push'] = False
+        attrs['auto_push_account'] = False
         return attrs
 
     def _validate_gen_key(self, attrs):
@@ -259,7 +259,7 @@ class SystemUserWithAuthInfoSerializer(SecretReadableMixin, SystemUserSerializer
         fields_small = fields_mini + fields_write_only + [
             'protocol', 'login_mode', 'login_mode_display', 'priority',
             'sudo', 'shell', 'ad_domain', 'sftp_root', 'token',
-            "username_same_with_user", 'auto_push', 'auto_generate_key',
+            "username_same_with_user", 'auto_push_account', 'auto_generate_key',
             'comment',
         ]
         fields = fields_small

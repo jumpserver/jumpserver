@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import Asset, Node, Platform, SystemUser
+from .account import AccountSerializer
 
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
@@ -70,6 +71,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     labels_display = serializers.ListField(
         child=serializers.CharField(), label=_('Labels name'), required=False, read_only=True
     )
+    accounts = AccountSerializer(many=True, write_only=True, required=False)
 
     """
     资产的数据结构
@@ -92,7 +94,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'domain', 'domain_display', 'platform', 'admin_user', 'admin_user_display'
         ]
         fields_m2m = [
-            'nodes', 'nodes_display', 'labels', 'labels_display',
+            'nodes', 'nodes_display', 'labels', 'labels_display', 'accounts'
         ]
         read_only_fields = [
             'connectivity', 'date_verified', 'cpu_info', 'hardware_info',
@@ -106,6 +108,11 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'admin_user_display': {'label': _('Admin user display'), 'read_only': True},
             'cpu_info': {'label': _('CPU info')},
         }
+
+    def __init__(self, *args, **kwargs):
+        data = kwargs.get('data', {})
+        self.accounts_data = data.pop('accounts', [])
+        super().__init__(*args, **kwargs)
 
     def get_fields(self):
         fields = super().get_fields()
@@ -151,10 +158,24 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             nodes_to_set.append(node)
         instance.nodes.set(nodes_to_set)
 
+    @staticmethod
+    def add_accounts(instance, accounts_data):
+        for data in accounts_data:
+            data['asset'] = instance.id
+        print("Data: ", accounts_data)
+        serializer = AccountSerializer(data=accounts_data, many=True)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except Exception as e:
+            raise serializers.ValidationError({'accounts': e})
+        serializer.save()
+
     def create(self, validated_data):
         self.compatible_with_old_protocol(validated_data)
         nodes_display = validated_data.pop('nodes_display', '')
         instance = super().create(validated_data)
+        if self.accounts_data:
+            self.add_accounts(instance, self.accounts_data)
         self.perform_nodes_display_create(instance, nodes_display)
         return instance
 

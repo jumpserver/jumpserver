@@ -785,13 +785,13 @@ msgstr "密码"
 #: xpack/plugins/change_auth_plan/models/asset.py:130
 #: xpack/plugins/change_auth_plan/models/asset.py:206
 msgid "SSH private key"
-msgstr "SSH密钥"
+msgstr "SSH 密钥"
 
 #: assets/models/base.py:179 xpack/plugins/change_auth_plan/models/asset.py:56
 #: xpack/plugins/change_auth_plan/models/asset.py:126
 #: xpack/plugins/change_auth_plan/models/asset.py:202
 msgid "SSH public key"
-msgstr "SSH公钥"
+msgstr "SSH 公钥"
 
 #: assets/models/cluster.py:20
 msgid "Bandwidth"
@@ -2067,7 +2067,7 @@ msgstr "Access key"
 
 #: authentication/models.py:41
 msgid "Private Token"
-msgstr "SSH密钥"
+msgstr "SSH 密钥"
 
 #: authentication/models.py:50
 msgid "Expired"
@@ -5468,7 +5468,7 @@ msgstr "原来密码错误"
 
 #: users/forms/profile.py:129
 msgid "Automatically configure and download the SSH key"
-msgstr "自动配置并下载SSH密钥"
+msgstr "自动配置并下载 SSH 密钥"
 
 #: users/forms/profile.py:131
 msgid "ssh public key"
@@ -5489,11 +5489,11 @@ msgstr "不能和原来的密钥相同"
 #: users/forms/profile.py:150 users/serializers/profile.py:100
 #: users/serializers/profile.py:183 users/serializers/profile.py:210
 msgid "Not a valid ssh public key"
-msgstr "SSH密钥不合法"
+msgstr "SSH 密钥不合法"
 
 #: users/forms/profile.py:161 users/models/user.py:692
 msgid "Public key"
-msgstr "SSH公钥"
+msgstr "SSH 公钥"
 
 #: users/models/user.py:558
 msgid "Force enable"

@@ -32,4 +32,4 @@ class Account(BaseUser, AbsConnectivity, ProtocolMixin):
         ]
 
     def __str__(self):
-        return '{}//{}@{}'.format(self.protocol, self.username, self.asset.hostname)
+        return '{}://{}@{}'.format(self.protocol, self.username, self.asset.hostname)

@@ -7,7 +7,7 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from assets.models import AuthBook
+from assets.models import Account
 from assets.serializers import AccountSecretSerializer
 from assets.notifications import AccountBackupExecutionTaskMsg
 from applications.models import Account
@@ -74,9 +74,9 @@ class AssetAccountHandler(BaseAccountHandler):
     @classmethod
     def create_data_map(cls):
         data_map = defaultdict(list)
-        sheet_name = AuthBook._meta.verbose_name
+        sheet_name = Account._meta.verbose_name
 
-        accounts = AuthBook.get_queryset().select_related('systemuser')
+        accounts = Account.get_queryset()
         if not accounts.first():
             return data_map
 
