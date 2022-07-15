@@ -70,7 +70,7 @@ class Migration(migrations.Migration):
                 ('created_by', models.CharField(max_length=128, null=True, verbose_name='Created by')),
                 ('protocol', models.CharField(choices=[('ssh', 'SSH'), ('rdp', 'RDP'), ('telnet', 'Telnet'), ('vnc', 'VNC'), ('mysql', 'MySQL'), ('oracle', 'Oracle'), ('mariadb', 'MariaDB'), ('postgresql', 'PostgreSQL'), ('sqlserver', 'SQLServer'), ('redis', 'Redis'), ('mongodb', 'MongoDB'), ('k8s', 'K8S')], default='ssh', max_length=16, verbose_name='Protocol')),
                 ('type', models.CharField(choices=[('common', 'Common user'), ('admin', 'Admin user')], default='common', max_length=16, verbose_name='Type')),
-                ('version', models.IntegerField(default=1, verbose_name='Version')),
+                ('version', models.IntegerField(default=0, verbose_name='Version')),
                 ('asset', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='assets.asset', verbose_name='Asset')),
             ],
             options={

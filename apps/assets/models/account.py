@@ -18,7 +18,7 @@ class Account(BaseUser, AbsConnectivity, ProtocolMixin):
                                 default='ssh', verbose_name=_('Protocol'))
     type = models.CharField(max_length=16, choices=Type.choices, default=Type.common, verbose_name=_("Type"))
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, verbose_name=_('Asset'))
-    version = models.IntegerField(default=1, verbose_name=_('Version'))
+    version = models.IntegerField(default=0, verbose_name=_('Version'))
     history = HistoricalRecords()
 
     class Meta:
