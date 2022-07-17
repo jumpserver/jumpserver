@@ -8,7 +8,7 @@ __all__ = ['ApplyApplicationTicket']
 
 
 class ApplyApplicationTicket(Ticket):
-    apply_permission_name = models.CharField(max_length=128, verbose_name=_('Apply name'))
+    apply_permission_name = models.CharField(max_length=128, verbose_name=_('Permission name'))
     # 申请信息
     apply_category = models.CharField(
         max_length=16, choices=AppCategory.choices, verbose_name=_('Category')
