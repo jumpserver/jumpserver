@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='systemuser',
-            name='auto_create_account',
+            name='account_template_enabled',
             field=models.BooleanField(default=False, verbose_name='Auto account if not exist'),
         ),
     ]

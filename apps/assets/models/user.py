@@ -108,8 +108,8 @@ class SystemUser(ProtocolMixin, BaseUser):
     protocol = models.CharField(max_length=16, choices=ProtocolMixin.Protocol.choices, default='ssh', verbose_name=_('Protocol'))
 
     login_mode = models.CharField(choices=LOGIN_MODE_CHOICES, default=LOGIN_AUTO, max_length=10, verbose_name=_('Login mode'))
-    auto_create_account = models.BooleanField(default=False, verbose_name=_("自动创建账号"))
-    auto_push_account = models.BooleanField(default=True, verbose_name=_('推送账号到资产'))
+    account_template_enabled = models.BooleanField(default=False, verbose_name=_("启用账号模版"))
+    auto_push_account = models.BooleanField(default=True, verbose_name=_('自动推送账号'))
     type = models.CharField(max_length=16, choices=Type.choices, default=Type.common, verbose_name=_('Type'))
     sudo = models.TextField(default='/bin/whoami', verbose_name=_('Sudo'))
     shell = models.CharField(max_length=64,  default='/bin/bash', verbose_name=_('Shell'))

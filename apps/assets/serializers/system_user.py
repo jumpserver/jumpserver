@@ -47,7 +47,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         fields_small = fields_mini + fields_write_only + [
             'token', 'ssh_key_fingerprint',
             'type', 'type_display', 'protocol', 'is_asset_protocol',
-            'auto_create_account', 'login_mode', 'login_mode_display', 'priority',
+            'account_template_enabled', 'login_mode', 'login_mode_display', 'priority',
             'sudo', 'shell', 'sftp_root', 'home', 'system_groups', 'ad_domain',
             'username_same_with_user', 'auto_push_account', 'auto_generate_key',
             'su_enabled', 'su_from',
