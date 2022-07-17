@@ -1,33 +1,61 @@
+from functools import wraps
 from django.db.models.signals import post_save, pre_delete, pre_save, post_delete
 from django.dispatch import receiver
 
 from orgs.models import Organization
 from assets.models import Node
-from perms.models import (AssetPermission, ApplicationPermission)
+from perms.models import AssetPermission, ApplicationPermission
 from users.models import UserGroup, User
+from users.signals import pre_user_leave_org
 from applications.models import Application
 from terminal.models import Session
+from rbac.models import OrgRoleBinding, SystemRoleBinding, RoleBinding
 from assets.models import Asset, SystemUser, Domain, Gateway
 from orgs.caches import OrgResourceStatisticsCache
+from orgs.utils import current_org
+from common.utils import get_logger
+
+logger = get_logger(__name__)
 
 
-def refresh_user_amount_on_user_create_or_delete(user_id):
-    orgs = Organization.objects.filter(m2m_org_members__user_id=user_id).distinct()
+def refresh_cache(name, org):
+    names = None
+    if isinstance(name, (str,)):
+        names = [name, ]
+    if isinstance(names, (list, tuple)):
+        for name in names:
+            OrgResourceStatisticsCache(org).expire(name)
+            OrgResourceStatisticsCache(Organization.root()).expire(name)
+    else:
+        logger.warning('refresh cache fail: {}'.format(name))
+
+
+def refresh_user_amount_cache(user):
+    orgs = user.orgs.distinct()
     for org in orgs:
-        org_cache = OrgResourceStatisticsCache(org)
-        org_cache.expire('users_amount')
-    OrgResourceStatisticsCache(Organization.root()).expire('users_amount')
+        refresh_cache('users_amount', org)
 
 
-@receiver(post_save, sender=User)
-def on_user_create_refresh_cache(sender, instance, created, **kwargs):
+@receiver(post_save, sender=OrgRoleBinding)
+def on_user_create_or_invite_refresh_cache(sender, instance, created, **kwargs):
     if created:
-        refresh_user_amount_on_user_create_or_delete(instance.id)
+        refresh_cache('users_amount', instance.org)
+
+
+@receiver(post_save, sender=SystemRoleBinding)
+def on_user_global_create_refresh_cache(sender, instance, created, **kwargs):
+    if created and current_org.is_root():
+        refresh_cache('users_amount', current_org)
+
+
+@receiver(pre_user_leave_org)
+def on_user_remove_refresh_cache(sender, org=None, **kwargs):
+    refresh_cache('users_amount', org)
 
 
 @receiver(pre_delete, sender=User)
 def on_user_delete_refresh_cache(sender, instance, **kwargs):
-    refresh_user_amount_on_user_create_or_delete(instance.id)
+    refresh_user_amount_cache(instance)
 
 
 # @receiver(m2m_changed, sender=OrganizationMember)
@@ -57,15 +85,17 @@ class OrgResourceStatisticsRefreshUtil:
         Node: ['nodes_amount'],
         Asset: ['assets_amount'],
         UserGroup: ['groups_amount'],
+        RoleBinding: ['users_amount']
     }
 
     @classmethod
     def refresh_if_need(cls, instance):
         cache_field_name = cls.model_cache_field_mapper.get(type(instance))
-        if cache_field_name:
-            org_cache = OrgResourceStatisticsCache(instance.org)
-            org_cache.expire(*cache_field_name)
-            OrgResourceStatisticsCache(Organization.root()).expire(*cache_field_name)
+        if not cache_field_name:
+            return
+        OrgResourceStatisticsCache(Organization.root()).expire(*cache_field_name)
+        if instance.org:
+            OrgResourceStatisticsCache(instance.org).expire(*cache_field_name)
 
 
 @receiver(post_save)

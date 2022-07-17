@@ -1,7 +1,10 @@
 import base64
-from Cryptodome.Cipher import AES
+import logging
+from Cryptodome.Cipher import AES, PKCS1_v1_5
 from Cryptodome.Util.Padding import pad
 from Cryptodome.Random import get_random_bytes
+from Cryptodome.PublicKey import RSA
+from Cryptodome import Random
 from gmssl.sm4 import CryptSM4, SM4_ENCRYPT, SM4_DECRYPT
 
 from django.conf import settings
@@ -88,12 +91,13 @@ class AESCrypto:
 
     def encrypt(self, text):
         aes = self.aes()
-        return str(base64.encodebytes(aes.encrypt(self.to_16(text))),
-                   encoding='utf8').replace('\n', '')  # 加密
+        cipher = base64.encodebytes(aes.encrypt(self.to_16(text)))
+        return str(cipher, encoding='utf8').replace('\n', '')  # 加密
 
     def decrypt(self, text):
         aes = self.aes()
-        return str(aes.decrypt(base64.decodebytes(bytes(text, encoding='utf8'))).rstrip(b'\0').decode("utf8"))  # 解密
+        text_decoded = base64.decodebytes(bytes(text, encoding='utf8'))
+        return str(aes.decrypt(text_decoded).rstrip(b'\0').decode("utf8"))
 
 
 class AESCryptoGCM:
@@ -191,6 +195,74 @@ class Crypto:
                     return origin_text
             except (TypeError, ValueError, UnicodeDecodeError, IndexError):
                 continue
+
+
+def gen_key_pair(length=1024):
+    """ 生成加密key
+    用于登录页面提交用户名/密码时，对密码进行加密（前端）/解密（后端）
+    """
+    random_generator = Random.new().read
+    rsa = RSA.generate(length, random_generator)
+    rsa_private_key = rsa.exportKey().decode()
+    rsa_public_key = rsa.publickey().exportKey().decode()
+    return rsa_private_key, rsa_public_key
+
+
+def rsa_encrypt(message, rsa_public_key):
+    """ 加密登录密码 """
+    key = RSA.importKey(rsa_public_key)
+    cipher = PKCS1_v1_5.new(key)
+    cipher_text = base64.b64encode(cipher.encrypt(message.encode())).decode()
+    return cipher_text
+
+
+def rsa_decrypt(cipher_text, rsa_private_key=None):
+    """ 解密登录密码 """
+    if rsa_private_key is None:
+        # rsa_private_key 为 None，可以能是API请求认证，不需要解密
+        return cipher_text
+
+    key = RSA.importKey(rsa_private_key)
+    cipher = PKCS1_v1_5.new(key)
+    cipher_decoded = base64.b64decode(cipher_text.encode())
+    # Todo: 弄明白为何要以下这么写，https://xbuba.com/questions/57035263
+    if len(cipher_decoded) == 127:
+        hex_fixed = '00' + cipher_decoded.hex()
+        cipher_decoded = base64.b16decode(hex_fixed.upper())
+    message = cipher.decrypt(cipher_decoded, b'error').decode()
+    return message
+
+
+def rsa_decrypt_by_session_pkey(value):
+    from jumpserver.utils import current_request
+    if not current_request:
+        return value
+    private_key_name = settings.SESSION_RSA_PRIVATE_KEY_NAME
+    private_key = current_request.session.get(private_key_name)
+
+    if not private_key or not value:
+        return value
+
+    try:
+        value = rsa_decrypt(value, private_key)
+    except Exception as e:
+        logging.error('Decrypt field error: {}'.format(e))
+    return value
+
+
+def decrypt_password(value):
+    cipher = value.split(':')
+    if len(cipher) != 2:
+        return value
+    key_cipher, password_cipher = cipher
+    aes_key = rsa_decrypt_by_session_pkey(key_cipher)
+    aes = get_aes_crypto(aes_key, 'ECB')
+    try:
+        password = aes.decrypt(password_cipher)
+    except UnicodeDecodeError as e:
+        logging.error("Decrypt password error: {}, {}".format(password_cipher, e))
+        return value
+    return password
 
 
 crypto = Crypto()

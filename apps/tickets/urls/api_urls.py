@@ -10,6 +10,11 @@ app_name = 'tickets'
 router = BulkRouter()
 
 router.register('tickets', api.TicketViewSet, 'ticket')
+router.register('apply-asset-tickets', api.ApplyAssetTicketViewSet, 'apply-asset-ticket')
+router.register('apply-app-tickets', api.ApplyApplicationTicketViewSet, 'apply-app-ticket')
+router.register('apply-login-tickets', api.ApplyLoginTicketViewSet, 'apply-login-ticket')
+router.register('apply-login-asset-tickets', api.ApplyLoginAssetTicketViewSet, 'apply-login-asset-ticket')
+router.register('apply-command-tickets', api.ApplyCommandTicketViewSet, 'apply-command-ticket')
 router.register('flows', api.TicketFlowViewSet, 'flows')
 router.register('comments', api.CommentViewSet, 'comment')
 router.register('ticket-session-relation', api.TicketSessionRelationViewSet, 'ticket-session-relation')

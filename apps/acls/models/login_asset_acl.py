@@ -85,19 +85,18 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
     @classmethod
     def create_login_asset_confirm_ticket(cls, user, asset, system_user, assignees, org_id):
         from tickets.const import TicketType
-        from tickets.models import Ticket
+        from tickets.models import ApplyLoginAssetTicket
+        title = _('Login asset confirm') + ' ({})'.format(user)
         data = {
-            'title': _('Login asset confirm') + ' ({})'.format(user),
+            'title': title,
             'type': TicketType.login_asset_confirm,
-            'meta': {
-                'apply_login_user': str(user),
-                'apply_login_asset': str(asset),
-                'apply_login_system_user': str(system_user),
-            },
+            'applicant': user,
+            'apply_login_user': user,
+            'apply_login_asset': asset,
+            'apply_login_system_user': system_user,
             'org_id': org_id,
         }
-        ticket = Ticket.objects.create(**data)
-        ticket.create_process_map_and_node(assignees)
-        ticket.open(applicant=user)
+        ticket = ApplyLoginAssetTicket.objects.create(**data)
+        ticket.open_by_system(assignees)
         return ticket
 

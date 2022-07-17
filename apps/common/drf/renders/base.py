@@ -73,7 +73,10 @@ class BaseFileRenderer(BaseRenderer):
             row = []
             for field in render_fields:
                 value = item.get(field.field_name)
-                value = str(value) if value else ''
+                if value is None:
+                    value = ''
+                else:
+                    value = str(value)
                 row.append(value)
             yield row
 

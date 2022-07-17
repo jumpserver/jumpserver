@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from common.utils import validate_ssh_public_key
+from common.drf.fields import EncryptedField
 from ..models import User
 
 from .user import UserSerializer
@@ -16,9 +17,9 @@ class UserOrgSerializer(serializers.Serializer):
 
 
 class UserUpdatePasswordSerializer(serializers.ModelSerializer):
-    old_password = serializers.CharField(required=True, max_length=128, write_only=True)
-    new_password = serializers.CharField(required=True, max_length=128, write_only=True)
-    new_password_again = serializers.CharField(required=True, max_length=128, write_only=True)
+    old_password = EncryptedField(required=True, max_length=128)
+    new_password = EncryptedField(required=True, max_length=128)
+    new_password_again = EncryptedField(required=True, max_length=128)
 
     class Meta:
         model = User
@@ -41,11 +42,13 @@ class UserUpdatePasswordSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(msg)
         return value
 
-    def validate_new_password_again(self, value):
-        if value != self.initial_data.get('new_password', ''):
+    def validate(self, values):
+        new_password = values.get('new_password', '')
+        new_password_again = values.get('new_password_again', '')
+        if new_password != new_password_again:
             msg = _('The newly set password is inconsistent')
-            raise serializers.ValidationError(msg)
-        return value
+            raise serializers.ValidationError({'new_password_again': msg})
+        return values
 
     def update(self, instance, validated_data):
         new_password = self.validated_data.get('new_password')
@@ -54,18 +57,20 @@ class UserUpdatePasswordSerializer(serializers.ModelSerializer):
 
 
 class UserUpdateSecretKeySerializer(serializers.ModelSerializer):
-    new_secret_key = serializers.CharField(required=True, max_length=128, write_only=True)
-    new_secret_key_again = serializers.CharField(required=True, max_length=128, write_only=True)
+    new_secret_key = EncryptedField(required=True, max_length=128)
+    new_secret_key_again = EncryptedField(required=True, max_length=128)
 
     class Meta:
         model = User
         fields = ['new_secret_key', 'new_secret_key_again']
 
-    def validate_new_secret_key_again(self, value):
-        if value != self.initial_data.get('new_secret_key', ''):
+    def validate(self, values):
+        new_secret_key = values.get('new_secret_key', '')
+        new_secret_key_again = values.get('new_secret_key_again', '')
+        if new_secret_key != new_secret_key_again:
             msg = _('The newly set password is inconsistent')
-            raise serializers.ValidationError(msg)
-        return value
+            raise serializers.ValidationError({'new_secret_key_again': msg})
+        return values
 
     def update(self, instance, validated_data):
         new_secret_key = self.validated_data.get('new_secret_key')
@@ -121,14 +126,16 @@ class UserProfileSerializer(UserSerializer):
     mfa_level = serializers.ChoiceField(choices=MFA_LEVEL_CHOICES, label=_('MFA'), required=False)
     guide_url = serializers.SerializerMethodField()
     receive_backends = serializers.ListField(child=serializers.CharField(), read_only=True)
-    orgs = UserOrgSerializer(many=True, read_only=True, source='all_orgs')
-    myorgs = UserOrgSerializer(many=True, read_only=True, source='my_orgs')
+    console_orgs = UserOrgSerializer(many=True, read_only=True)
+    audit_orgs = UserOrgSerializer(many=True, read_only=True)
+    workbench_orgs = UserOrgSerializer(many=True, read_only=True)
     perms = serializers.ListField(label=_("Perms"), read_only=True)
 
     class Meta(UserSerializer.Meta):
         read_only_fields = [
             'date_joined', 'last_login', 'created_by', 'source',
-            'receive_backends', 'orgs', 'myorgs', 'perms',
+            'console_orgs', 'audit_orgs', 'workbench_orgs',
+            'receive_backends', 'perms',
         ]
         fields = UserSerializer.Meta.fields + [
             'public_key_comment', 'public_key_hash_md5', 'guide_url',

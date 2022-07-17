@@ -12,9 +12,11 @@ from django.core.cache import cache
 
 from assets.models import Asset
 from assets.const import Protocol
+from applications.models import Application
 from users.models import User
 from orgs.mixins.models import OrgModelMixin
 from django.db.models import TextChoices
+from common.utils import get_object_or_none, lazyproperty
 from ..backends import get_multi_command_storage
 
 
@@ -137,6 +139,11 @@ class Session(OrgModelMixin):
         else:
             return True
 
+    @lazyproperty
+    def terminal_display(self):
+        display = self.terminal.name if self.terminal else ''
+        return display
+
     def save_replay_to_storage_with_version(self, f, version=2):
         suffix = self.SUFFIX_MAP.get(version, '.cast.gz')
         local_path = self.get_local_storage_path_by_suffix(suffix)
@@ -171,6 +178,17 @@ class Session(OrgModelMixin):
     @property
     def login_from_display(self):
         return self.get_login_from_display()
+
+    def get_asset_or_application(self):
+        instance = get_object_or_none(Asset, pk=self.asset_id)
+        if not instance:
+            instance = get_object_or_none(Application, pk=self.asset_id)
+        return instance
+
+    def get_target_ip(self):
+        instance = self.get_asset_or_application()
+        target_ip = instance.get_target_ip() if instance else ''
+        return target_ip
 
     @classmethod
     def generate_fake(cls, count=100, is_finished=True):

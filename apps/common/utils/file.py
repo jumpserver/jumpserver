@@ -1,6 +1,8 @@
 import os
 import csv
+
 import pyzipper
+import requests
 
 
 def create_csv_file(filename, headers, rows, ):
@@ -18,3 +20,11 @@ def encrypt_and_compress_zip_file(filename, secret_password, encrypted_filenames
         for encrypted_filename in encrypted_filenames:
             with open(encrypted_filename, 'rb') as f:
                 zf.writestr(os.path.basename(encrypted_filename), f.read())
+
+
+def download_file(src, path):
+    with requests.get(src, stream=True) as r:
+        r.raise_for_status()
+        with open(path, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                f.write(chunk)

@@ -32,17 +32,18 @@ def _dump_args(args: dict):
     return ' '.join([f'{k}={v}' for k, v in args.items() if v is not Empty])
 
 
-def get_push_unixlike_system_user_tasks(system_user, username=None):
-    comment = system_user.name
-
+def get_push_unixlike_system_user_tasks(system_user, username=None, **kwargs):
+    algorithm = kwargs.get('algorithm')
     if username is None:
         username = system_user.username
 
+    comment = system_user.name
     if system_user.username_same_with_user:
         from users.models import User
         user = User.objects.filter(username=username).only('name', 'username').first()
         if user:
             comment = f'{system_user.name}[{str(user)}]'
+    comment = comment.replace(' ', '')
 
     password = system_user.password
     public_key = system_user.public_key
@@ -104,7 +105,7 @@ def get_push_unixlike_system_user_tasks(system_user, username=None):
                 'module': 'user',
                 'args': 'name={} shell={} state=present password={}'.format(
                     username, system_user.shell,
-                    encrypt_password(password, salt="K3mIlKK"),
+                    encrypt_password(password, salt="K3mIlKK", algorithm=algorithm),
                 ),
             }
         })
@@ -138,7 +139,7 @@ def get_push_unixlike_system_user_tasks(system_user, username=None):
     return tasks
 
 
-def get_push_windows_system_user_tasks(system_user: SystemUser, username=None):
+def get_push_windows_system_user_tasks(system_user: SystemUser, username=None, **kwargs):
     if username is None:
         username = system_user.username
     password = system_user.password
@@ -176,7 +177,7 @@ def get_push_windows_system_user_tasks(system_user: SystemUser, username=None):
     return tasks
 
 
-def get_push_system_user_tasks(system_user, platform="unixlike", username=None):
+def get_push_system_user_tasks(system_user, platform="unixlike", username=None, algorithm=None):
     """
     获取推送系统用户的 ansible 命令，跟资产无关
     :param system_user:
@@ -190,16 +191,16 @@ def get_push_system_user_tasks(system_user, platform="unixlike", username=None):
     }
     get_tasks = get_task_map.get(platform, get_push_unixlike_system_user_tasks)
     if not system_user.username_same_with_user:
-        return get_tasks(system_user)
+        return get_tasks(system_user, algorithm=algorithm)
     tasks = []
     # 仅推送这个username
     if username is not None:
-        tasks.extend(get_tasks(system_user, username))
+        tasks.extend(get_tasks(system_user, username, algorithm=algorithm))
         return tasks
     users = system_user.users.all().values_list('username', flat=True)
     print(_("System user is dynamic: {}").format(list(users)))
     for _username in users:
-        tasks.extend(get_tasks(system_user, _username))
+        tasks.extend(get_tasks(system_user, _username, algorithm=algorithm))
     return tasks
 
 
@@ -244,7 +245,11 @@ def push_system_user_util(system_user, assets, task_name, username=None):
         for u in usernames:
             for a in _assets:
                 system_user.load_asset_special_auth(a, u)
-                tasks = get_push_system_user_tasks(system_user, platform, username=u)
+                algorithm = 'des' if a.platform.name == 'AIX' else 'sha512'
+                tasks = get_push_system_user_tasks(
+                    system_user, platform, username=u,
+                    algorithm=algorithm
+                )
                 run_task(tasks, [a])
 
 
@@ -269,7 +274,7 @@ def push_system_user_a_asset_manual(system_user, asset, username=None):
     # if username is None:
     #     username = system_user.username
     task_name = gettext_noop("Push system users to asset: ") + "{}({}) => {}".format(
-        system_user.name, username, asset
+        system_user.name, username or system_user.username, asset
     )
     return push_system_user_util(system_user, [asset], task_name=task_name, username=username)
 

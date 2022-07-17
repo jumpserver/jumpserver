@@ -1,13 +1,13 @@
 import os
 import time
-import pandas as pd
+from openpyxl import Workbook
 from collections import defaultdict, OrderedDict
 
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from assets.models import AuthBook
+from assets.models import Account
 from assets.serializers import AccountSecretSerializer
 from assets.notifications import AccountBackupExecutionTaskMsg
 from applications.models import Account
@@ -48,7 +48,7 @@ class BaseAccountHandler:
                 _fields = cls.get_header_fields(v)
                 header_fields.update(_fields)
             else:
-                header_fields[field] = v.label
+                header_fields[field] = str(v.label)
         return header_fields
 
     @classmethod
@@ -59,7 +59,7 @@ class BaseAccountHandler:
         data = cls.unpack_data(serializer.data)
         row_dict = {}
         for field, header_name in header_fields.items():
-            row_dict[header_name] = data[field]
+            row_dict[header_name] = str(data[field])
         return row_dict
 
 
@@ -72,24 +72,24 @@ class AssetAccountHandler(BaseAccountHandler):
         return filename
 
     @classmethod
-    def create_df(cls):
-        df_dict = defaultdict(list)
-        sheet_name = AuthBook._meta.verbose_name
+    def create_data_map(cls):
+        data_map = defaultdict(list)
+        sheet_name = Account._meta.verbose_name
 
-        accounts = AuthBook.get_queryset().select_related('systemuser')
+        accounts = Account.get_queryset()
         if not accounts.first():
-            return df_dict
+            return data_map
 
         header_fields = cls.get_header_fields(AccountSecretSerializer(accounts.first()))
         for account in accounts:
             account.load_auth()
             row = cls.create_row(account, AccountSecretSerializer, header_fields)
-            df_dict[sheet_name].append(row)
-        for k, v in df_dict.items():
-            df_dict[k] = pd.DataFrame(v)
+            if sheet_name not in data_map:
+                data_map[sheet_name].append(list(row.keys()))
+            data_map[sheet_name].append(list(row.values()))
 
         logger.info('\n\033[33m- 共收集 {} 条资产账号\033[0m'.format(accounts.count()))
-        return df_dict
+        return data_map
 
 
 class AppAccountHandler(BaseAccountHandler):
@@ -101,19 +101,19 @@ class AppAccountHandler(BaseAccountHandler):
         return filename
 
     @classmethod
-    def create_df(cls):
-        df_dict = defaultdict(list)
+    def create_data_map(cls):
+        data_map = defaultdict(list)
         accounts = Account.get_queryset().select_related('systemuser')
         for account in accounts:
             account.load_auth()
             app_type = account.type
             sheet_name = AppType.get_label(app_type)
             row = cls.create_row(account, AppAccountSecretSerializer)
-            df_dict[sheet_name].append(row)
-        for k, v in df_dict.items():
-            df_dict[k] = pd.DataFrame(v)
+            if sheet_name not in data_map:
+                data_map[sheet_name].append(list(row.keys()))
+            data_map[sheet_name].append(list(row.values()))
         logger.info('\n\033[33m- 共收集{}条应用账号\033[0m'.format(accounts.count()))
-        return df_dict
+        return data_map
 
 
 handler_map = {
@@ -142,24 +142,24 @@ class AccountBackupHandler:
             if not handler:
                 continue
 
-            df_dict = handler.create_df()
-            if not df_dict:
+            data_map = handler.create_data_map()
+            if not data_map:
                 continue
 
             filename = handler.get_filename(self.plan_name)
-            with pd.ExcelWriter(filename) as w:
-                for sheet, df in df_dict.items():
-                    sheet = sheet.replace(' ', '-')
-                    getattr(df, 'to_excel')(w, sheet_name=sheet, index=False)
+
+            wb = Workbook(filename)
+            for sheet, data in data_map.items():
+                ws = wb.create_sheet(str(sheet))
+                for row in data:
+                    ws.append(row)
+            wb.save(filename)
             files.append(filename)
         timedelta = round((time.time() - time_start), 2)
         logger.info('步骤完成: 用时 {}s'.format(timedelta))
         return files
 
-    def send_backup_mail(self, files):
-        recipients = self.execution.plan_snapshot.get('recipients')
-        if not recipients:
-            return
+    def send_backup_mail(self, files, recipients):
         if not files:
             return
         recipients = User.objects.filter(id__in=list(recipients))
@@ -198,8 +198,16 @@ class AccountBackupHandler:
         is_success = False
         error = '-'
         try:
-            files = self.create_excel()
-            self.send_backup_mail(files)
+            recipients = self.execution.plan_snapshot.get('recipients')
+            if not recipients:
+                logger.info(
+                    '\n'
+                    '\033[32m>>> 该备份任务未分配收件人\033[0m'
+                    ''
+                )
+            else:
+                files = self.create_excel()
+                self.send_backup_mail(files, recipients)
         except Exception as e:
             self.is_frozen = True
             logger.error('任务执行被异常中断')

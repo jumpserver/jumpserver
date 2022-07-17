@@ -5,17 +5,18 @@ from django.utils.translation import ugettext_lazy as _
 
 from users.models import User
 from common.mixins.models import CommonModelMixin
+
 from orgs.mixins.models import OrgModelMixin
 from orgs.models import Organization
 from orgs.utils import tmp_to_org, get_current_org_id
-from ..const import TicketType, TicketApprovalLevel, TicketApprovalStrategy
+from ..const import TicketType, TicketLevel, TicketApprovalStrategy
 
 __all__ = ['TicketFlow', 'ApprovalRule']
 
 
 class ApprovalRule(CommonModelMixin):
     level = models.SmallIntegerField(
-        default=TicketApprovalLevel.one, choices=TicketApprovalLevel.choices,
+        default=TicketLevel.one, choices=TicketLevel.choices,
         verbose_name=_('Approve level')
     )
     strategy = models.CharField(
@@ -56,8 +57,8 @@ class TicketFlow(CommonModelMixin, OrgModelMixin):
         default=TicketType.general, verbose_name=_("Type")
     )
     approval_level = models.SmallIntegerField(
-        default=TicketApprovalLevel.one,
-        choices=TicketApprovalLevel.choices,
+        default=TicketLevel.one,
+        choices=TicketLevel.choices,
         verbose_name=_('Approve level')
     )
     rules = models.ManyToManyField(ApprovalRule, related_name='ticket_flows')

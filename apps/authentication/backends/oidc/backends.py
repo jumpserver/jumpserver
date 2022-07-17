@@ -18,6 +18,7 @@ from django.urls import reverse
 from django.conf import settings
 
 from common.utils import get_logger
+from users.utils import construct_user_email
 
 from ..base import JMSBaseAuthBackend
 from .utils import validate_and_return_id_token, build_absolute_uri
@@ -39,17 +40,22 @@ class UserMixin:
         logger.debug(log_prompt.format('start'))
 
         sub = claims['sub']
-        name = claims.get('name', sub)
-        username = claims.get('preferred_username', sub)
-        email = claims.get('email', "{}@{}".format(username, 'jumpserver.openid'))
-        logger.debug(
-            log_prompt.format(
-                "sub: {}|name: {}|username: {}|email: {}".format(sub, name, username, email)
-            )
-        )
+
+        # Construct user attrs value
+        user_attrs = {}
+        for field, attr in settings.AUTH_OPENID_USER_ATTR_MAP.items():
+            user_attrs[field] = claims.get(attr, sub)
+        email = user_attrs.get('email', '')
+        email = construct_user_email(user_attrs.get('username'), email)
+        user_attrs.update({'email': email})
+
+        logger.debug(log_prompt.format(user_attrs))
+
+        username = user_attrs.get('username')
+        name = user_attrs.get('name')
 
         user, created = get_user_model().objects.get_or_create(
-            username=username, defaults={"name": name, "email": email}
+            username=username, defaults=user_attrs
         )
         logger.debug(log_prompt.format("user: {}|created: {}".format(user, created)))
         logger.debug(log_prompt.format("Send signal => openid create or update user"))
@@ -103,21 +109,44 @@ class OIDCAuthCodeBackend(OIDCBaseBackend):
         # Prepares the token payload that will be used to request an authentication token to the
         # token endpoint of the OIDC provider.
         logger.debug(log_prompt.format('Prepares token payload'))
+        """ 
+        The reason for need not client_id and client_secret in token_payload.
+        OIDC protocol indicate client's token_endpoint_auth_method only accept one type in
+            - client_secret_basic
+            - client_secret_post
+            - client_secret_jwt
+            - private_key_jwt
+            - none
+        If the client offer more than one auth method type to OIDC, OIDC will auth client failed.
+        OIDC default use client_secret_basic, 
+        this type only need in headers add Authorization=Basic xxx.
+        
+        More info see: https://github.com/jumpserver/jumpserver/issues/8165
+        More info see: https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication
+        """
         token_payload = {
-            'client_id': settings.AUTH_OPENID_CLIENT_ID,
-            'client_secret': settings.AUTH_OPENID_CLIENT_SECRET,
             'grant_type': 'authorization_code',
             'code': code,
             'redirect_uri': build_absolute_uri(
                 request, path=reverse(settings.AUTH_OPENID_AUTH_LOGIN_CALLBACK_URL_NAME)
             )
         }
-
-        # Prepares the token headers that will be used to request an authentication token to the
-        # token endpoint of the OIDC provider.
-        logger.debug(log_prompt.format('Prepares token headers'))
-        basic_token = "{}:{}".format(settings.AUTH_OPENID_CLIENT_ID, settings.AUTH_OPENID_CLIENT_SECRET)
-        headers = {"Authorization": "Basic {}".format(base64.b64encode(basic_token.encode()).decode())}
+        if settings.AUTH_OPENID_CLIENT_AUTH_METHOD == 'client_secret_post':
+            token_payload.update({
+                'client_id': settings.AUTH_OPENID_CLIENT_ID,
+                'client_secret': settings.AUTH_OPENID_CLIENT_SECRET,
+            })
+            headers = None
+        else:
+            # Prepares the token headers that will be used to request an authentication token to the
+            # token endpoint of the OIDC provider.
+            logger.debug(log_prompt.format('Prepares token headers'))
+            basic_token = "{}:{}".format(
+                settings.AUTH_OPENID_CLIENT_ID, settings.AUTH_OPENID_CLIENT_SECRET
+            )
+            headers = {
+                "Authorization": "Basic {}".format(base64.b64encode(basic_token.encode()).decode())
+            }
 
         # Calls the token endpoint.
         logger.debug(log_prompt.format('Call the token endpoint'))
@@ -258,6 +287,11 @@ class OIDCAuthPasswordBackend(OIDCBaseBackend):
         try:
             claims_response.raise_for_status()
             claims = claims_response.json()
+            preferred_username = claims.get('preferred_username')
+            if preferred_username and \
+                    preferred_username.lower() == username.lower() and \
+                    preferred_username != username:
+                return
         except Exception as e:
             error = "Json claims response error, claims response " \
                     "content is: {}, error is: {}".format(claims_response.content, str(e))
@@ -286,5 +320,3 @@ class OIDCAuthPasswordBackend(OIDCBaseBackend):
             openid_user_login_failed.send(
                 sender=self.__class__, request=request, username=username, reason="User is invalid"
             )
-            return None
-

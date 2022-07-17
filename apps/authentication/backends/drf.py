@@ -198,6 +198,6 @@ class SignatureAuthentication(signature.SignatureAuthentication):
                 return None, None
             user, secret = key.user, str(key.secret)
             return user, secret
-        except AccessKey.DoesNotExist:
+        except (AccessKey.DoesNotExist, exceptions.ValidationError):
             return None, None
 

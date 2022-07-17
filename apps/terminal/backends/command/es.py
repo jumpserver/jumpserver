@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 #
+import pytz
+import inspect
+
 from datetime import datetime
 from functools import reduce, partial
 from itertools import groupby
-import pytz
 from uuid import UUID
-import inspect
 
 from django.utils.translation import gettext_lazy as _
 from django.db.models import QuerySet as DJQuerySet
@@ -15,9 +16,9 @@ from elasticsearch.exceptions import RequestError, NotFoundError
 
 from common.utils.common import lazyproperty
 from common.utils import get_logger
+from common.utils.timezone import local_now_date_display, utc_now
 from common.exceptions import JMSException
 from .models import AbstractSessionCommand
-
 
 logger = get_logger(__file__)
 
@@ -27,14 +28,20 @@ class InvalidElasticsearch(JMSException):
     default_detail = _('Invalid elasticsearch config')
 
 
-class CommandStore():
+class NotSupportElasticsearch8(JMSException):
+    default_code = 'not_support_elasticsearch8'
+    default_detail = _('Not Support Elasticsearch8')
+
+
+class CommandStore(object):
     def __init__(self, config):
-        hosts = config.get("HOSTS")
-        kwargs = config.get("OTHER", {})
-        self.index = config.get("INDEX") or 'jumpserver'
         self.doc_type = config.get("DOC_TYPE") or '_doc'
+        self.index_prefix = config.get('INDEX') or 'jumpserver'
+        self.is_index_by_date = bool(config.get('INDEX_BY_DATE'))
         self.exact_fields = {}
         self.match_fields = {}
+        hosts = config.get("HOSTS")
+        kwargs = config.get("OTHER", {})
 
         ignore_verify_certs = kwargs.pop('IGNORE_VERIFY_CERTS', False)
         if ignore_verify_certs:
@@ -51,9 +58,26 @@ class CommandStore():
         else:
             self.match_fields.update(may_exact_fields)
 
+        self.init_index(config)
+
+    def init_index(self, config):
+        if self.is_index_by_date:
+            date = local_now_date_display()
+            self.index = '%s-%s' % (self.index_prefix, date)
+            self.query_index = '%s-alias' % self.index_prefix
+        else:
+            self.index = config.get("INDEX") or 'jumpserver'
+            self.query_index = config.get("INDEX") or 'jumpserver'
+
     def is_new_index_type(self):
         if not self.ping(timeout=3):
             return False
+
+        info = self.es.info()
+        version = info['version']['number'].split('.')[0]
+
+        if version == '8':
+            raise NotSupportElasticsearch8
 
         try:
             # 获取索引信息，如果没有定义，直接返回
@@ -62,8 +86,12 @@ class CommandStore():
             return False
 
         try:
-            # 检测索引是不是新的类型
-            properties = data[self.index]['mappings']['properties']
+            if version == '6':
+                # 检测索引是不是新的类型 es6
+                properties = data[self.index]['mappings']['data']['properties']
+            else:
+                # 检测索引是不是新的类型 es7 default index type: _doc
+                properties = data[self.index]['mappings']['properties']
             if properties['session']['type'] == 'keyword' \
                     and properties['org_id']['type'] == 'keyword':
                 return True
@@ -76,29 +104,39 @@ class CommandStore():
         self._ensure_index_exists()
 
     def _ensure_index_exists(self):
-        mappings = {
-            "mappings": {
-                "properties": {
-                    "session": {
-                        "type": "keyword"
-                    },
-                    "org_id": {
-                        "type": "keyword"
-                    },
-                    "@timestamp": {
-                        "type": "date"
-                    },
-                    "timestamp": {
-                        "type": "long"
-                    }
-                }
+        properties = {
+            "session": {
+                "type": "keyword"
+            },
+            "org_id": {
+                "type": "keyword"
+            },
+            "@timestamp": {
+                "type": "date"
+            },
+            "timestamp": {
+                "type": "long"
             }
         }
+        info = self.es.info()
+        version = info['version']['number'].split('.')[0]
+        if version == '6':
+            mappings = {'mappings': {'data': {'properties': properties}}}
+        else:
+            mappings = {'mappings': {'properties': properties}}
 
+        if self.is_index_by_date:
+            mappings['aliases'] = {
+                self.query_index: {}
+            }
         try:
             self.es.indices.create(self.index, body=mappings)
+            return
         except RequestError as e:
-            logger.exception(e)
+            if e.error == 'resource_already_exists_exception':
+                logger.warning(e)
+            else:
+                logger.exception(e)
 
     @staticmethod
     def make_data(command):
@@ -134,7 +172,7 @@ class CommandStore():
         body = self.get_query_body(**query)
 
         data = self.es.search(
-            index=self.index, doc_type=self.doc_type, body=body, from_=from_, size=size,
+            index=self.query_index, doc_type=self.doc_type, body=body, from_=from_, size=size,
             sort=sort
         )
         source_data = []
@@ -147,7 +185,7 @@ class CommandStore():
 
     def count(self, **query):
         body = self.get_query_body(**query)
-        data = self.es.count(index=self.index, doc_type=self.doc_type, body=body)
+        data = self.es.count(index=self.query_index, doc_type=self.doc_type, body=body)
         return data["count"]
 
     def __getattr__(self, item):
@@ -208,7 +246,7 @@ class CommandStore():
         elif org_id in (real_default_org_id, ''):
             match.pop('org_id')
             should.append({
-                'bool':{
+                'bool': {
                     'must_not': [
                         {
                             'wildcard': {'org_id': '*'}
@@ -226,20 +264,20 @@ class CommandStore():
                     ],
                     'should': should,
                     'filter': [
-                        {
-                            'term': {k: v}
-                        } for k, v in exact.items()
-                    ] + [
-                        {
-                            'range': {
-                                'timestamp': timestamp_range
-                            }
-                        }
-                    ] + [
-                        {
-                            'ids': {k: v}
-                        } for k, v in index.items()
-                    ]
+                                  {
+                                      'term': {k: v}
+                                  } for k, v in exact.items()
+                              ] + [
+                                  {
+                                      'range': {
+                                          'timestamp': timestamp_range
+                                      }
+                                  }
+                              ] + [
+                                  {
+                                      'ids': {k: v}
+                                  } for k, v in index.items()
+                              ]
                 }
             },
         }
@@ -258,6 +296,9 @@ class QuerySet(DJQuerySet):
         self._method_calls = []
         self._command_store_config = command_store_config
         self._storage = CommandStore(command_store_config)
+
+        # 命令列表模糊搜索时报错
+        super().__init__()
 
     @lazyproperty
     def _grouped_method_calls(self):
@@ -326,8 +367,8 @@ class QuerySet(DJQuerySet):
 
     def __getattribute__(self, item):
         if any((
-            item.startswith('__'),
-            item in QuerySet.__dict__,
+                item.startswith('__'),
+                item in QuerySet.__dict__,
         )):
             return object.__getattribute__(self, item)
 

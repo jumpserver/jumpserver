@@ -20,7 +20,7 @@ from django.shortcuts import reverse
 from orgs.utils import current_org
 from orgs.models import Organization
 from rbac.const import Scope
-from common import fields
+from common.db import fields
 from common.utils import (
     date_expired_default, get_logger, lazyproperty, random_string, bulk_create_with_signal
 )
@@ -78,7 +78,7 @@ class AuthMixin:
     def is_history_password(self, password):
         allow_history_password_count = settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT
         history_passwords = self.history_passwords.all() \
-            .order_by('-date_created')[:int(allow_history_password_count)]
+                                .order_by('-date_created')[:int(allow_history_password_count)]
 
         for history_password in history_passwords:
             if check_password(password, history_password.password):
@@ -401,10 +401,12 @@ class RoleMixin:
     def is_staff(self, value):
         pass
 
+    service_account_email_suffix = '@local.domain'
+
     @classmethod
-    def create_service_account(cls, name, comment):
+    def create_service_account(cls, name, email, comment):
         app = cls.objects.create(
-            username=name, name=name, email='{}@local.domain'.format(name),
+            username=name, name=name, email=email,
             comment=comment, is_first_login=False,
             created_by='System', is_service_account=True,
         )
@@ -453,7 +455,7 @@ class RoleMixin:
         if org is None:
             org = current_org
         if not org.is_root():
-            queryset = current_org.get_members()
+            queryset = org.get_members()
         queryset = cls.filter_not_service_account(queryset)
         return queryset
 
@@ -719,12 +721,14 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     dingtalk_id = models.CharField(null=True, default=None, unique=True, max_length=128, verbose_name=_('DingTalk'))
     feishu_id = models.CharField(null=True, default=None, unique=True, max_length=128, verbose_name=_('FeiShu'))
 
+    DATE_EXPIRED_WARNING_DAYS = 5
+
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
 
     @classmethod
     def get_group_ids_by_user_id(cls, user_id):
-        group_ids = cls.groups.through.objects.filter(user_id=user_id)\
+        group_ids = cls.groups.through.objects.filter(user_id=user_id) \
             .distinct().values_list('usergroup_id', flat=True)
         group_ids = list(group_ids)
         return group_ids
@@ -774,7 +778,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
 
     @property
     def will_expired(self):
-        if 0 <= self.expired_remain_days < 5:
+        if 0 <= self.expired_remain_days <= self.DATE_EXPIRED_WARNING_DAYS:
             return True
         else:
             return False
@@ -788,6 +792,11 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     @property
     def is_local(self):
         return self.source == self.Source.local.value
+
+    def is_password_authenticate(self):
+        cas = self.Source.cas
+        saml2 = self.Source.saml2
+        return self.source not in [cas, saml2]
 
     def set_unprovide_attr_if_need(self):
         if not self.name:
@@ -861,23 +870,20 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
             return None
         return self.SOURCE_BACKEND_MAPPING.get(self.source, [])
 
-    @property
-    def all_orgs(self):
-        from rbac.builtin import BuiltinRole
-        has_system_role = self.system_roles.all()\
-            .exclude(name=BuiltinRole.system_user.name)\
-            .exists()
-        if has_system_role:
-            orgs = list(Organization.objects.all())
-        else:
-            orgs = list(self.orgs.all().distinct())
-        if self.has_perm('orgs.view_rootorg'):
-            orgs = [Organization.root()] + orgs
-        return orgs
+    @lazyproperty
+    def console_orgs(self):
+        from rbac.models import RoleBinding
+        return RoleBinding.get_user_has_the_perm_orgs('rbac.view_console', self)
 
-    @property
-    def my_orgs(self):
-        return list(self.orgs.all().distinct())
+    @lazyproperty
+    def audit_orgs(self):
+        from rbac.models import RoleBinding
+        return RoleBinding.get_user_has_the_perm_orgs('rbac.view_audit', self)
+
+    @lazyproperty
+    def workbench_orgs(self):
+        from rbac.models import RoleBinding
+        return RoleBinding.get_user_has_the_perm_orgs('rbac.view_workbench', self)
 
     class Meta:
         ordering = ['username']

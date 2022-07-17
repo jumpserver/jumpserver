@@ -1,4 +1,4 @@
-from django.db.models import F, Q
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filters
 from rest_framework.decorators import action
@@ -8,12 +8,14 @@ from rest_framework.generics import CreateAPIView
 from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
 from common.drf.filters import BaseFilterSet
-from common.permissions import NeedMFAVerify
+from common.mixins import RecordViewLogMixin
+from common.permissions import UserConfirmation
+from authentication.const import ConfirmType
 from ..tasks.account_connectivity import test_accounts_connectivity_manual
-from ..models import AuthBook, Node
+from ..models import Node, Account
 from .. import serializers
 
-__all__ = ['AccountViewSet', 'AccountSecretsViewSet', 'AccountTaskCreateAPI']
+__all__ = ['AccountFilterSet', 'AccountViewSet', 'AccountSecretsViewSet', 'AccountTaskCreateAPI']
 
 
 class AccountFilterSet(BaseFilterSet):
@@ -48,16 +50,16 @@ class AccountFilterSet(BaseFilterSet):
         return qs
 
     class Meta:
-        model = AuthBook
+        model = Account
         fields = [
-            'asset', 'systemuser', 'id',
+            'asset', 'id',
         ]
 
 
 class AccountViewSet(OrgBulkModelViewSet):
-    model = AuthBook
-    filterset_fields = ("username", "asset", "systemuser", 'ip', 'hostname')
-    search_fields = ('username', 'ip', 'hostname', 'systemuser__username')
+    model = Account
+    filterset_fields = ("username", "asset", 'ip', 'hostname')
+    search_fields = ('username', 'ip', 'hostname')
     filterset_class = AccountFilterSet
     serializer_classes = {
         'default': serializers.AccountSerializer,
@@ -68,10 +70,6 @@ class AccountViewSet(OrgBulkModelViewSet):
         'partial_update': 'assets.change_assetaccountsecret',
     }
 
-    def get_queryset(self):
-        queryset = AuthBook.get_queryset()
-        return queryset
-
     @action(methods=['post'], detail=True, url_path='verify')
     def verify_account(self, request, *args, **kwargs):
         account = super().get_object()
@@ -79,7 +77,7 @@ class AccountViewSet(OrgBulkModelViewSet):
         return Response(data={'task': task.id})
 
 
-class AccountSecretsViewSet(AccountViewSet):
+class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
     """
     因为可能要导出所有账号，所以单独建立了一个 viewset
     """
@@ -87,7 +85,7 @@ class AccountSecretsViewSet(AccountViewSet):
         'default': serializers.AccountSecretSerializer
     }
     http_method_names = ['get']
-    permission_classes = [RBACPermission, NeedMFAVerify]
+    permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
     rbac_perms = {
         'list': 'assets.view_assetaccountsecret',
         'retrieve': 'assets.view_assetaccountsecret',
@@ -104,7 +102,7 @@ class AccountTaskCreateAPI(CreateAPIView):
         return request.user.has_perm('assets.test_assetconnectivity')
 
     def get_accounts(self):
-        queryset = AuthBook.objects.all()
+        queryset = Account.objects.all()
         queryset = self.filter_queryset(queryset)
         return queryset
 

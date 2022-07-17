@@ -8,19 +8,21 @@ from django.db.utils import IntegrityError
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.exceptions import APIException
 
-from users.views import UserVerifyPasswordView
-from users.utils import is_auth_password_time_valid
 from users.models import User
+from users.views import UserVerifyPasswordView
 from common.utils import get_logger, FlashMessageUtil
 from common.utils.random import random_string
 from common.utils.django import reverse, get_object_or_none
 from common.sdk.im.dingtalk import URL
-from common.mixins.views import PermissionsMixin
+from common.mixins.views import UserConfirmRequiredExceptionMixin, PermissionsMixin
+from common.permissions import UserConfirmation
 from authentication import errors
 from authentication.mixins import AuthMixin
+from authentication.const import ConfirmType
 from common.sdk.im.dingtalk import DingTalk
 from common.utils.common import get_request_ip
 from authentication.notifications import OAuthBindMessage
+from .mixins import METAMixin
 
 logger = get_logger(__file__)
 
@@ -28,7 +30,7 @@ logger = get_logger(__file__)
 DINGTALK_STATE_SESSION_KEY = '_dingtalk_state'
 
 
-class DingTalkBaseMixin(PermissionsMixin, View):
+class DingTalkBaseMixin(UserConfirmRequiredExceptionMixin, PermissionsMixin, View):
     def dispatch(self, request, *args, **kwargs):
         try:
             return super().dispatch(request, *args, **kwargs)
@@ -117,16 +119,11 @@ class DingTalkOAuthMixin(DingTalkBaseMixin, View):
 
 
 class DingTalkQRBindView(DingTalkQRMixin, View):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, UserConfirmation.require(ConfirmType.ReLogin))
 
     def get(self, request: HttpRequest):
         user = request.user
         redirect_url = request.GET.get('redirect_url')
-
-        if not is_auth_password_time_valid(request.session):
-            msg = _('Please verify your password first')
-            response = self.get_failed_response(redirect_url, msg, msg)
-            return response
 
         redirect_uri = reverse('authentication:dingtalk-qr-bind-callback', kwargs={'user_id': user.id}, external=True)
         redirect_uri += '?' + urlencode({'redirect_url': redirect_url})
@@ -200,14 +197,18 @@ class DingTalkEnableStartView(UserVerifyPasswordView):
         return success_url
 
 
-class DingTalkQRLoginView(DingTalkQRMixin, View):
+class DingTalkQRLoginView(DingTalkQRMixin, METAMixin, View):
     permission_classes = (AllowAny,)
 
     def get(self,  request: HttpRequest):
-        redirect_url = request.GET.get('redirect_url')
+        redirect_url = request.GET.get('redirect_url') or reverse('index')
+        next_url = self.get_next_url_from_meta() or reverse('index')
 
         redirect_uri = reverse('authentication:dingtalk-qr-login-callback', external=True)
-        redirect_uri += '?' + urlencode({'redirect_url': redirect_url})
+        redirect_uri += '?' + urlencode({
+            'redirect_url': redirect_url,
+            'next': next_url,
+        })
 
         url = self.get_qr_url(redirect_uri)
         return HttpResponseRedirect(url)

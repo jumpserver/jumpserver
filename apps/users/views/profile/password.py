@@ -7,7 +7,7 @@ from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.generic.edit import FormView
 
-from authentication.mixins import PasswordEncryptionViewMixin, AuthMixin
+from authentication.mixins import AuthMixin
 from authentication import errors
 
 from common.utils import get_logger
@@ -31,7 +31,7 @@ class UserVerifyPasswordView(AuthMixin, FormView):
             return redirect('authentication:login')
 
         try:
-            password = self.get_decrypted_password(username=user.username)
+            password = form.cleaned_data['password']
         except errors.AuthFailedError as e:
             form.add_error("password", _(f"Password invalid") + f'({e.msg})')
             return self.form_invalid(form)

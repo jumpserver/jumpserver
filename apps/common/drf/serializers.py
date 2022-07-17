@@ -9,10 +9,12 @@ from rest_framework.utils.serializer_helpers import BindingDict
 
 from common.mixins import BulkListSerializerMixin
 from common.mixins.serializers import BulkSerializerMixin
+from common.drf.fields import EncryptedField
 
 __all__ = [
     'MethodSerializer',
-    'EmptySerializer', 'BulkModelSerializer', 'AdaptedBulkListSerializer', 'CeleryTaskSerializer'
+    'EmptySerializer', 'BulkModelSerializer', 'AdaptedBulkListSerializer', 'CeleryTaskSerializer',
+    'SecretReadableMixin'
 ]
 
 
@@ -92,3 +94,21 @@ class ChoiceSerializer(serializers.Serializer):
 class GroupedChoiceSerailizer(ChoiceSerializer):
     children = ChoiceSerializer(many=True, label=_("Children"))
 
+
+class SecretReadableMixin(serializers.Serializer):
+    """ 加密字段 (EncryptedField) 可读性 """
+
+    def __init__(self, *args, **kwargs):
+        super(SecretReadableMixin, self).__init__(*args, **kwargs)
+        if not hasattr(self, 'Meta') or not hasattr(self.Meta, 'extra_kwargs'):
+            return
+        extra_kwargs = self.Meta.extra_kwargs
+        for field_name, serializer_field in self.fields.items():
+            if not isinstance(serializer_field, EncryptedField):
+                continue
+            if field_name not in extra_kwargs:
+                continue
+            field_extra_kwargs = extra_kwargs[field_name]
+            if 'write_only' not in field_extra_kwargs:
+                continue
+            serializer_field.write_only = field_extra_kwargs['write_only']

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 #
+import time
+
 from django.db.models.signals import (
     post_save, m2m_changed, pre_delete
 )
@@ -21,7 +23,7 @@ from jumpserver.utils import current_request
 from users.models import User
 from users.signals import post_user_change_password
 from terminal.models import Session, Command
-from .utils import write_login_log
+from .utils import write_login_log, create_operate_log
 from . import models, serializers
 from .models import OperateLog
 from orgs.utils import current_org
@@ -36,26 +38,6 @@ logger = get_logger(__name__)
 sys_logger = get_syslogger(__name__)
 json_render = JSONRenderer()
 
-MODELS_NEED_RECORD = (
-    # users
-    'User', 'UserGroup',
-    # acls
-    'LoginACL', 'LoginAssetACL', 'LoginConfirmSetting',
-    # assets
-    'Asset', 'Node', 'AdminUser', 'SystemUser', 'Domain', 'Gateway', 'CommandFilterRule',
-    'CommandFilter', 'Platform', 'AuthBook',
-    # applications
-    'Application',
-    # orgs
-    'Organization',
-    # settings
-    'Setting',
-    # perms
-    'AssetPermission', 'ApplicationPermission',
-    # xpack
-    'License', 'Account', 'SyncInstanceTask', 'ChangeAuthPlan', 'GatherUserTask',
-)
-
 
 class AuthBackendLabelMapping(LazyObject):
     @staticmethod
@@ -69,7 +51,9 @@ class AuthBackendLabelMapping(LazyObject):
         backend_label_mapping[settings.AUTH_BACKEND_SSO] = _('SSO')
         backend_label_mapping[settings.AUTH_BACKEND_AUTH_TOKEN] = _('Auth Token')
         backend_label_mapping[settings.AUTH_BACKEND_WECOM] = _('WeCom')
+        backend_label_mapping[settings.AUTH_BACKEND_FEISHU] = _('FeiShu')
         backend_label_mapping[settings.AUTH_BACKEND_DINGTALK] = _('DingTalk')
+        backend_label_mapping[settings.AUTH_BACKEND_TEMP_TOKEN] = _('Temporary token')
         return backend_label_mapping
 
     def _setup(self):
@@ -77,28 +61,6 @@ class AuthBackendLabelMapping(LazyObject):
 
 
 AUTH_BACKEND_LABEL_MAPPING = AuthBackendLabelMapping()
-
-
-def create_operate_log(action, sender, resource):
-    user = current_request.user if current_request else None
-    if not user or not user.is_authenticated:
-        return
-    model_name = sender._meta.object_name
-    if model_name not in MODELS_NEED_RECORD:
-        return
-    with translation.override('en'):
-        resource_type = sender._meta.verbose_name
-    remote_addr = get_request_ip(current_request)
-
-    data = {
-        "user": str(user), 'action': action, 'resource_type': resource_type,
-        'resource': str(resource), 'remote_addr': remote_addr,
-    }
-    with transaction.atomic():
-        try:
-            models.OperateLog.objects.create(**data)
-        except Exception as e:
-            logger.error("Create operate log error: {}".format(e))
 
 
 M2M_NEED_RECORD = {
@@ -315,6 +277,7 @@ def on_user_auth_success(sender, user, request, login_type=None, **kwargs):
     logger.debug('User login success: {}'.format(user.username))
     check_different_city_login_if_need(user, request)
     data = generate_data(user.username, request, login_type=login_type)
+    request.session['login_time'] = data['datetime'].strftime("%Y-%m-%d %H:%M:%S")
     data.update({'mfa': int(user.mfa_enabled), 'status': True})
     write_login_log(**data)
 

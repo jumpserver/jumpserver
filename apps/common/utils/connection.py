@@ -1,11 +1,9 @@
 import json
 import threading
+import redis
 
-from redis import Redis
-from django.conf import settings
+from django.core.cache import cache
 
-from jumpserver.const import CONFIG
-from common.http import is_true
 from common.db.utils import safe_db_connection
 from common.utils import get_logger
 
@@ -13,18 +11,9 @@ logger = get_logger(__name__)
 
 
 def get_redis_client(db=0):
-    params = {
-        'host': CONFIG.REDIS_HOST,
-        'port': CONFIG.REDIS_PORT,
-        'password': CONFIG.REDIS_PASSWORD,
-        'db': db,
-        "ssl": is_true(CONFIG.REDIS_USE_SSL),
-        'ssl_cert_reqs': CONFIG.REDIS_SSL_REQUIRED,
-        'ssl_keyfile': getattr(settings, 'REDIS_SSL_KEYFILE'),
-        'ssl_certfile': getattr(settings, 'REDIS_SSL_CERTFILE'),
-        'ssl_ca_certs': getattr(settings, 'REDIS_SSL_CA_CERTS'),
-    }
-    return Redis(**params)
+    client = cache.client.get_client()
+    assert isinstance(client, redis.Redis)
+    return client
 
 
 class Subscription:

@@ -6,7 +6,7 @@ from django.utils.translation import gettext_noop
 
 from common.utils import get_logger
 from orgs.utils import org_aware_func
-from ..models import Asset, Connectivity, AuthBook
+from ..models import Asset, Connectivity, Account
 from . import const
 from .utils import clean_ansible_task_hosts, group_asset_by_platform
 
@@ -18,6 +18,7 @@ __all__ = [
 ]
 
 
+# Todo: 这里可能有问题了
 def set_assets_accounts_connectivity(assets, results_summary):
     asset_ids_ok = set()
     asset_ids_failed = set()
@@ -33,11 +34,11 @@ def set_assets_accounts_connectivity(assets, results_summary):
     Asset.bulk_set_connectivity(asset_ids_ok, Connectivity.ok)
     Asset.bulk_set_connectivity(asset_ids_failed, Connectivity.failed)
 
-    accounts_ok = AuthBook.objects.filter(asset_id__in=asset_ids_ok, systemuser__type='admin')
-    accounts_failed = AuthBook.objects.filter(asset_id__in=asset_ids_failed, systemuser__type='admin')
+    accounts_ok = Account.objects.filter(asset_id__in=asset_ids_ok,)
+    accounts_failed = Account.objects.filter(asset_id__in=asset_ids_faile)
 
-    AuthBook.bulk_set_connectivity(accounts_ok, Connectivity.ok)
-    AuthBook.bulk_set_connectivity(accounts_failed, Connectivity.failed)
+    Account.bulk_set_connectivity(accounts_ok, Connectivity.ok)
+    Account.bulk_set_connectivity(accounts_failed, Connectivity.failed)
 
 
 @shared_task(queue="ansible")

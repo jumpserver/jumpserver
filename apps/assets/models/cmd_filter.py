@@ -165,24 +165,23 @@ class CommandFilterRule(OrgModelMixin):
 
     def create_command_confirm_ticket(self, run_command, session, cmd_filter_rule, org_id):
         from tickets.const import TicketType
-        from tickets.models import Ticket
+        from tickets.models import ApplyCommandTicket
         data = {
             'title': _('Command confirm') + ' ({})'.format(session.user),
             'type': TicketType.command_confirm,
-            'meta': {
-                'apply_run_user': session.user,
-                'apply_run_asset': session.asset,
-                'apply_run_system_user': session.system_user,
-                'apply_run_command': run_command,
-                'apply_from_session_id': str(session.id),
-                'apply_from_cmd_filter_rule_id': str(cmd_filter_rule.id),
-                'apply_from_cmd_filter_id': str(cmd_filter_rule.filter.id)
-            },
+            'applicant': session.user_obj,
+            'apply_run_user_id': session.user_id,
+            'apply_run_asset': str(session.asset),
+            'apply_run_system_user_id': session.system_user_id,
+            'apply_run_command': run_command[:4090],
+            'apply_from_session_id': str(session.id),
+            'apply_from_cmd_filter_rule_id': str(cmd_filter_rule.id),
+            'apply_from_cmd_filter_id': str(cmd_filter_rule.filter.id),
             'org_id': org_id,
         }
-        ticket = Ticket.objects.create(**data)
-        ticket.create_process_map_and_node(self.reviewers.all())
-        ticket.open(applicant=session.user_obj)
+        ticket = ApplyCommandTicket.objects.create(**data)
+        assignees = self.reviewers.all()
+        ticket.open_by_system(assignees)
         return ticket
 
     @classmethod

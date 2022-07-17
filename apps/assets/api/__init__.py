@@ -12,3 +12,4 @@ from .cmd_filter import *
 from .gathered_user import *
 from .favorite_asset import *
 from .account_backup import *
+from .account_history import *

@@ -11,7 +11,7 @@ from django.conf import settings
 from django.core.cache import cache
 
 from common.tasks import send_mail_async
-from common.utils import reverse, get_object_or_none, ip
+from common.utils import reverse, get_object_or_none, ip, pretty_string
 from .models import User
 
 logger = logging.getLogger('jumpserver')
@@ -46,13 +46,13 @@ def get_user_or_pre_auth_user(request):
 
 
 def redirect_user_first_login_or_index(request, redirect_field_name):
-    # if request.user.is_first_login:
-    #     return reverse('authentication:user-first-login')
-    url_in_post = request.POST.get(redirect_field_name)
-    if url_in_post:
-        return url_in_post
-    url_in_get = request.GET.get(redirect_field_name, reverse('index'))
-    return url_in_get
+    url = request.POST.get(redirect_field_name)
+    if not url:
+        url = request.GET.get(redirect_field_name)
+    # 防止 next 地址为 None
+    if not url or url.lower() in ['none']:
+        url = reverse('index')
+    return url
 
 
 def generate_otp_uri(username, otp_secret_key=None, issuer="JumpServer"):
@@ -229,12 +229,14 @@ class LoginIpBlockUtil(BlockGlobalIpUtilBase):
     BLOCK_KEY_TMPL = "_LOGIN_BLOCK_{}"
 
 
-def construct_user_email(username, email):
-    if '@' not in email:
-        if '@' in username:
-            email = username
-        else:
-            email = '{}@{}'.format(username, settings.EMAIL_SUFFIX)
+def construct_user_email(username, email, email_suffix=''):
+    if '@' in email:
+        return email
+    if '@' in username:
+        return username
+    if not email_suffix:
+        email_suffix = settings.EMAIL_SUFFIX
+    email = f'{username}@{email_suffix}'
     return email
 
 
@@ -253,3 +255,16 @@ def is_auth_password_time_valid(session):
 
 def is_auth_otp_time_valid(session):
     return is_auth_time_valid(session, 'auth_otp_expired_at')
+
+
+def is_confirm_time_valid(session, key):
+    if not settings.SECURITY_VIEW_AUTH_NEED_MFA:
+        return True
+    mfa_verify_time = session.get(key, 0)
+    if time.time() - mfa_verify_time < settings.SECURITY_MFA_VERIFY_TTL:
+        return True
+    return False
+
+
+def is_auth_confirm_time_valid(session):
+    return is_confirm_time_valid(session, 'MFA_VERIFY_TIME')

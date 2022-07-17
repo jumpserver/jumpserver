@@ -3,5 +3,5 @@
 from .terminal import *
 from .session import *
 from .storage import *
-from .command import *
 from .sharing import *
+from .endpoint import *

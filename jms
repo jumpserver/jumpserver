@@ -8,6 +8,7 @@ import time
 import argparse
 import sys
 import django
+import requests
 from django.core import management
 from django.db.utils import OperationalError
 
@@ -33,6 +34,7 @@ except ImportError as e:
 
 try:
     from jumpserver.const import CONFIG
+    from common.utils.file import download_file
 except ImportError as e:
     print("Import error: {}".format(e))
     print("Could not find config file, `cp config_example.yml config.yml`")
@@ -105,6 +107,20 @@ def compile_i18n_file():
     logging.info("Compile i18n files done")
 
 
+def download_ip_db():
+    db_base_dir = os.path.join(APP_DIR, 'common', 'utils', 'ip')
+    db_path_url_mapper = {
+        ('geoip', 'GeoLite2-City.mmdb'): 'https://jms-pkg.oss-cn-beijing.aliyuncs.com/ip/GeoLite2-City.mmdb',
+        ('ipip', 'ipipfree.ipdb'): 'https://jms-pkg.oss-cn-beijing.aliyuncs.com/ip/ipipfree.ipdb'
+    }
+    for p, src in db_path_url_mapper.items():
+        path = os.path.join(db_base_dir, *p)
+        if os.path.isfile(path) and os.path.getsize(path) > 1000:
+            continue
+        print("Download ip db: {}".format(path))
+        download_file(src, path)
+
+
 def upgrade_db():
     collect_static()
     perform_db_migrate()
@@ -114,6 +130,7 @@ def prepare():
     check_database_connection()
     upgrade_db()
     expire_caches()
+    download_ip_db()
 
 
 def start_services():

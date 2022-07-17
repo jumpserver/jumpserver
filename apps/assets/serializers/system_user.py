@@ -4,11 +4,13 @@ from django.db.models import Count
 
 from common.mixins.serializers import BulkSerializerMixin
 from common.utils import ssh_pubkey_gen
+from common.drf.fields import EncryptedField
+from common.drf.serializers import SecretReadableMixin
 from common.validators import alphanumeric_re, alphanumeric_cn_re, alphanumeric_win_re
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from assets.const import Protocol
 from ..models import SystemUser, Asset
-from .utils import validate_password_contains_left_double_curly_bracket
+from .utils import validate_password_for_ansible
 from .base import AuthSerializerMixin
 
 __all__ = [
@@ -24,9 +26,17 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     """
     系统用户
     """
+    password = EncryptedField(
+        label=_('Password'), required=False, allow_blank=True, allow_null=True, max_length=1024,
+        trim_whitespace=False, validators=[validate_password_for_ansible],
+        write_only=True
+    )
     auto_generate_key = serializers.BooleanField(initial=True, required=False, write_only=True)
     type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type display'))
     ssh_key_fingerprint = serializers.ReadOnlyField(label=_('SSH key fingerprint'))
+    token = EncryptedField(
+        label=_('Token'), required=False, write_only=True, style={'base_template': 'textarea.html'}
+    )
     applications_amount = serializers.IntegerField(
         source='apps_amount', read_only=True, label=_('Apps amount')
     )
@@ -38,24 +48,18 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         fields_small = fields_mini + fields_write_only + [
             'token', 'ssh_key_fingerprint',
             'type', 'type_display', 'protocol', 'is_asset_protocol',
-            'login_mode', 'login_mode_display', 'priority',
+            'account_template_enabled', 'login_mode', 'login_mode_display', 'priority',
             'sudo', 'shell', 'sftp_root', 'home', 'system_groups', 'ad_domain',
-            'username_same_with_user', 'auto_push', 'auto_generate_key',
+            'username_same_with_user', 'auto_push_account', 'auto_generate_key',
             'su_enabled', 'su_from',
             'date_created', 'date_updated', 'comment', 'created_by',
         ]
         fields_m2m = ['cmd_filters', 'assets_amount', 'applications_amount', 'nodes']
         fields = fields_small + fields_m2m
         extra_kwargs = {
-            'password': {
-                "write_only": True,
-                'trim_whitespace': False,
-                "validators": [validate_password_contains_left_double_curly_bracket]
-            },
             'cmd_filters': {"required": False, 'label': _('Command filter')},
             'public_key': {"write_only": True},
             'private_key': {"write_only": True},
-            'token': {"write_only": True},
             'nodes_amount': {'label': _('Nodes amount')},
             'assets_amount': {'label': _('Assets amount')},
             'login_mode_display': {'label': _('Login mode display')},
@@ -188,7 +192,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         attrs['protocol'] = Protocol.ssh
         attrs['login_mode'] = SystemUser.LOGIN_AUTO
         attrs['username_same_with_user'] = False
-        attrs['auto_push'] = False
+        attrs['auto_push_account'] = False
         return attrs
 
     def _validate_gen_key(self, attrs):
@@ -249,14 +253,14 @@ class MiniSystemUserSerializer(serializers.ModelSerializer):
         fields = SystemUserSerializer.Meta.fields_mini
 
 
-class SystemUserWithAuthInfoSerializer(SystemUserSerializer):
+class SystemUserWithAuthInfoSerializer(SecretReadableMixin, SystemUserSerializer):
     class Meta(SystemUserSerializer.Meta):
         fields_mini = ['id', 'name', 'username']
         fields_write_only = ['password', 'public_key', 'private_key']
         fields_small = fields_mini + fields_write_only + [
             'protocol', 'login_mode', 'login_mode_display', 'priority',
             'sudo', 'shell', 'ad_domain', 'sftp_root', 'token',
-            "username_same_with_user", 'auto_push', 'auto_generate_key',
+            "username_same_with_user", 'auto_push_account', 'auto_generate_key',
             'comment',
         ]
         fields = fields_small
@@ -265,6 +269,9 @@ class SystemUserWithAuthInfoSerializer(SystemUserSerializer):
             'assets_amount': {'label': _('Asset')},
             'login_mode_display': {'label': _('Login mode display')},
             'created_by': {'read_only': True},
+            'password': {'write_only': False},
+            'private_key': {'write_only': False},
+            'token': {'write_only': False}
         }
 
 
@@ -292,7 +299,7 @@ class SystemUserAssetRelationSerializer(RelationMixin, serializers.ModelSerializ
     asset_display = serializers.ReadOnlyField(label=_('Asset hostname'))
 
     class Meta:
-        model = SystemUser.assets.through
+        model = SystemUser
         fields = [
             "id", "asset", "asset_display", 'systemuser', 'systemuser_display',
             "connectivity", 'date_verified', 'org_id'

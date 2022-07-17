@@ -5,6 +5,7 @@ import time
 from django.core.cache import cache
 from django.conf import settings
 from django.db.models import Q, QuerySet
+from django.utils.translation import gettext as _
 
 from common.db.models import output_as_string, UnionQuerySet
 from common.utils.common import lazyproperty, timeit
@@ -202,7 +203,9 @@ class UserGrantedTreeRefreshController:
         user = self.user
 
         with tmp_to_root_org():
-            UserAssetGrantedTreeNodeRelation.objects.filter(user=user).exclude(org_id__in=self.org_ids).delete()
+            UserAssetGrantedTreeNodeRelation.objects.filter(user=user)\
+                .exclude(org_id__in=self.org_ids)\
+                .delete()
 
         if force or self.have_need_refresh_orgs():
             with UserGrantedTreeRebuildLock(user_id=user.id):
@@ -219,7 +222,9 @@ class UserGrantedTreeRefreshController:
                         utils = UserGrantedTreeBuildUtils(user)
                         utils.rebuild_user_granted_tree()
                         logger.info(
-                            f'Rebuild user tree ok: cost={time.time() - t_start} user={self.user} org={current_org}')
+                            f'Rebuild user tree ok: cost={time.time() - t_start} '
+                            f'user={self.user} org={current_org}'
+                        )
 
 
 class UserGrantedUtilsBase:
@@ -609,6 +614,22 @@ class UserGrantedNodesQueryUtils(UserGrantedUtilsBase):
         assets_query_utils = UserGrantedAssetsQueryUtils(self.user, self.asset_perm_ids)
         assets_amount = assets_query_utils.get_favorite_assets().values_list('id').count()
         return PermNode.get_favorite_node(assets_amount)
+
+    @staticmethod
+    def get_root_node():
+        name = _('My assets')
+        node = {
+            'id': '',
+            'name': name,
+            'title': name,
+            'pId': '',
+            'open': True,
+            'isParent': True,
+            'meta': {
+                'type': 'root'
+            }
+        }
+        return node
 
     def get_special_nodes(self):
         nodes = []

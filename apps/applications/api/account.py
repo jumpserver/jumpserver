@@ -2,14 +2,16 @@
 #
 
 from django_filters import rest_framework as filters
-from django.db.models import F, Q
+from django.db.models import Q
 
 from common.drf.filters import BaseFilterSet
 from common.drf.api import JMSBulkModelViewSet
+from common.mixins import RecordViewLogMixin
+from common.permissions import UserConfirmation
+from authentication.const import ConfirmType
 from rbac.permissions import RBACPermission
 from assets.models import SystemUser
 from ..models import Account
-from ..hands import NeedMFAVerify
 from .. import serializers
 
 
@@ -54,9 +56,9 @@ class SystemUserAppRelationViewSet(ApplicationAccountViewSet):
     perm_model = SystemUser
 
 
-class ApplicationAccountSecretViewSet(ApplicationAccountViewSet):
+class ApplicationAccountSecretViewSet(RecordViewLogMixin, ApplicationAccountViewSet):
     serializer_class = serializers.AppAccountSecretSerializer
-    permission_classes = [RBACPermission, NeedMFAVerify]
+    permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
     http_method_names = ['get', 'options']
     rbac_perms = {
         'retrieve': 'applications.view_applicationaccountsecret',

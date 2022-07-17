@@ -3,9 +3,11 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from ...models import Asset, Node, Platform, SystemUser
 from ..mixin import CategoryDisplayMixin
+from ..account import AccountSerializer
 
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
@@ -76,6 +78,7 @@ class AssetSerializer(CategoryDisplayMixin, OrgResourceModelSerializerMixin):
     platform_display = serializers.SlugField(
         source='platform.name', label=_("Platform display"), read_only=True
     )
+    accounts = AccountSerializer(many=True, write_only=True, required=False)
 
     """
     资产的数据结构
@@ -95,7 +98,7 @@ class AssetSerializer(CategoryDisplayMixin, OrgResourceModelSerializerMixin):
             'admin_user', 'admin_user_display'
         ]
         fields_m2m = [
-            'nodes', 'nodes_display', 'labels', 'labels_display',
+            'nodes', 'nodes_display', 'labels', 'labels_display', 'accounts'
         ]
         read_only_fields = [
             'category', 'category_display', 'type', 'type_display',
@@ -109,6 +112,11 @@ class AssetSerializer(CategoryDisplayMixin, OrgResourceModelSerializerMixin):
             'port': {'write_only': True},
             'admin_user_display': {'label': _('Admin user display'), 'read_only': True},
         }
+
+    def __init__(self, *args, **kwargs):
+        data = kwargs.get('data', {})
+        self.accounts_data = data.pop('accounts', [])
+        super().__init__(*args, **kwargs)
 
     def get_fields(self):
         fields = super().get_fields()
@@ -161,10 +169,24 @@ class AssetSerializer(CategoryDisplayMixin, OrgResourceModelSerializerMixin):
             nodes_to_set.append(node)
         instance.nodes.set(nodes_to_set)
 
+    @staticmethod
+    def add_accounts(instance, accounts_data):
+        for data in accounts_data:
+            data['asset'] = instance.id
+        print("Data: ", accounts_data)
+        serializer = AccountSerializer(data=accounts_data, many=True)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except Exception as e:
+            raise serializers.ValidationError({'accounts': e})
+        serializer.save()
+
     def create(self, validated_data):
         self.compatible_with_old_protocol(validated_data)
         nodes_display = validated_data.pop('nodes_display', '')
         instance = super().create(validated_data)
+        if self.accounts_data:
+            self.add_accounts(instance, self.accounts_data)
         self.perform_nodes_display_create(instance, nodes_display)
         return instance
 

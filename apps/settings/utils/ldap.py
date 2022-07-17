@@ -1,6 +1,7 @@
 # coding: utf-8
 #
 
+import os
 import json
 from ldap3 import Server, Connection, SIMPLE
 from ldap3.core.exceptions import (
@@ -21,12 +22,14 @@ from django.conf import settings
 from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
 from copy import deepcopy
+from collections import defaultdict
+from orgs.utils import tmp_to_org
 
 from common.const import LDAP_AD_ACCOUNT_DISABLE
 from common.utils import timeit, get_logger
 from common.db.utils import close_old_connections
 from users.utils import construct_user_email
-from users.models import User
+from users.models import User, UserGroup
 from authentication.backends.ldap import LDAPAuthorizationBackend, LDAPUser
 
 logger = get_logger(__file__)
@@ -185,6 +188,12 @@ class LDAPServerUtil(object):
             if attr == 'is_active' and mapping.lower() == 'useraccountcontrol' \
                     and value:
                 value = int(value) & LDAP_AD_ACCOUNT_DISABLE != LDAP_AD_ACCOUNT_DISABLE
+            if attr == 'groups' and mapping.lower() == 'memberof':
+                # AD: {'groups': 'memberOf'}
+                if isinstance(value, str) and value:
+                    value = [value]
+                if not isinstance(value, list):
+                    value = []
             user[attr] = value.strip() if isinstance(value, str) else value
         return user
 
@@ -244,10 +253,13 @@ class LDAPCacheUtil(object):
                 if user['username'] in self.search_users
             ]
         elif self.search_value:
-            filter_users = [
-                user for user in users
-                if self.search_value.lower() in ','.join(user.values()).lower()
-            ]
+            filter_users = []
+            for u in users:
+                search_value = self.search_value.lower()
+                user_all_attr_value = [v for v in u.values() if isinstance(v, str)]
+                if search_value not in ','.join(user_all_attr_value).lower():
+                    continue
+                filter_users.append(u)
         else:
             filter_users = users
         return filter_users
@@ -345,6 +357,7 @@ class LDAPSyncUtil(object):
 
 
 class LDAPImportUtil(object):
+    user_group_name_prefix = 'AD '
 
     def __init__(self):
         pass
@@ -365,21 +378,58 @@ class LDAPImportUtil(object):
         )
         return obj, created
 
+    def get_user_group_names(self, groups) -> list:
+        if not isinstance(groups, list):
+            logger.error('Groups type not list')
+            return []
+        group_names = []
+        for group in groups:
+            if not group:
+                continue
+            if not isinstance(group, str):
+                continue
+            # get group name for AD, Such as: CN=Users,CN=Builtin,DC=jms,DC=com
+            group_name = group.split(',')[0].split('=')[-1]
+            group_name = f'{self.user_group_name_prefix}{group_name}'.strip()
+            group_names.append(group_name)
+        return group_names
+
     def perform_import(self, users, org=None):
         logger.info('Start perform import ldap users, count: {}'.format(len(users)))
         errors = []
         objs = []
+        group_users_mapper = defaultdict(set)
         for user in users:
+            groups = user.pop('groups', [])
             try:
                 obj, created = self.update_or_create(user)
                 objs.append(obj)
             except Exception as e:
                 errors.append({user['username']: str(e)})
                 logger.error(e)
-        if org and org.is_root():
+                continue
+            try:
+                group_names = self.get_user_group_names(groups)
+                for group_name in group_names:
+                    group_users_mapper[group_name].add(obj)
+            except Exception as e:
+                errors.append({user['username']: str(e)})
+                logger.error(e)
+                continue
+        if not org:
             return
+        if org.is_root():
+            return
+        # add user to org
         for obj in objs:
             org.add_member(obj)
+        # add user to group
+        with tmp_to_org(org):
+            for group_name, users in group_users_mapper.items():
+                group, created = UserGroup.objects.get_or_create(
+                    name=group_name, defaults={'name': group_name}
+                )
+                group.users.add(*users)
         logger.info('End perform import ldap users')
         return errors
 

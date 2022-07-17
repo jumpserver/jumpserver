@@ -2,36 +2,44 @@
 #
 from rest_framework import viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
+from rest_framework.exceptions import MethodNotAllowed
 
-from common.const.http import POST, PUT
+from common.const.http import POST, PUT, PATCH
 from common.mixins.api import CommonApiMixin
-from common.drf.api import JMSBulkModelViewSet
+from orgs.utils import tmp_to_root_org
 
 from rbac.permissions import RBACPermission
 
 from tickets import serializers
-from tickets.models import Ticket, TicketFlow
-from tickets.filters import TicketFilter
+from tickets import filters
 from tickets.permissions.ticket import IsAssignee, IsApplicant
+from tickets.models import (
+    Ticket, ApplyAssetTicket, ApplyApplicationTicket,
+    ApplyLoginTicket, ApplyLoginAssetTicket, ApplyCommandTicket
+)
 
-__all__ = ['TicketViewSet', 'TicketFlowViewSet']
+__all__ = [
+    'TicketViewSet', 'ApplyAssetTicketViewSet', 'ApplyApplicationTicketViewSet',
+    'ApplyLoginTicketViewSet', 'ApplyLoginAssetTicketViewSet', 'ApplyCommandTicketViewSet'
+]
 
 
 class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     serializer_class = serializers.TicketDisplaySerializer
     serializer_classes = {
-        'open': serializers.TicketApplySerializer,
-        'approve': serializers.TicketApproveSerializer,
+        'list': serializers.TicketListSerializer,
+        'open': serializers.TicketApplySerializer
     }
-    filterset_class = TicketFilter
+    model = Ticket
+    perm_model = Ticket
+    filterset_class = filters.TicketFilter
     search_fields = [
-        'title', 'action', 'type', 'status', 'applicant_display'
+        'title', 'type', 'status'
     ]
     ordering_fields = (
-        'title', 'applicant_display', 'status', 'state', 'action_display',
-        'date_created', 'serial_num',
+        'title', 'status', 'state',
+        'action_display', 'date_created', 'serial_num',
     )
     ordering = ('-date_created',)
     rbac_perms = {
@@ -48,60 +56,77 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         raise MethodNotAllowed(self.action)
 
     def get_queryset(self):
-        queryset = Ticket.get_user_related_tickets(self.request.user)
+        with tmp_to_root_org():
+            queryset = self.model.get_user_related_tickets(self.request.user)
         return queryset
 
     def perform_create(self, serializer):
         instance = serializer.save()
-        instance.create_related_node()
-        instance.process_map = instance.create_process_map()
-        instance.open(applicant=self.request.user)
+        instance.applicant = self.request.user
+        instance.save(update_fields=['applicant'])
+        instance.open()
 
     @action(detail=False, methods=[POST], permission_classes=[RBACPermission, ])
     def open(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
+        with tmp_to_root_org():
+            return super().create(request, *args, **kwargs)
 
-    @action(detail=True, methods=[PUT], permission_classes=[IsAssignee, ])
+    @action(detail=True, methods=[PUT, PATCH], permission_classes=[IsAssignee, ])
     def approve(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        serializer = self.get_serializer(instance)
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()
         instance.approve(processor=request.user)
-        return Response(serializer.data)
+        return Response('ok')
 
     @action(detail=True, methods=[PUT], permission_classes=[IsAssignee, ])
     def reject(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer = self.get_serializer(instance)
         instance.reject(processor=request.user)
-        return Response(serializer.data)
+        return Response('ok')
 
     @action(detail=True, methods=[PUT], permission_classes=[IsApplicant, ])
     def close(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        instance.close(processor=request.user)
-        return Response(serializer.data)
+        instance.close()
+        return Response('ok')
 
 
-class TicketFlowViewSet(JMSBulkModelViewSet):
-    serializer_class = serializers.TicketFlowSerializer
+class ApplyAssetTicketViewSet(TicketViewSet):
+    serializer_class = serializers.ApplyAssetDisplaySerializer
+    serializer_classes = {
+        'open': serializers.ApplyAssetSerializer,
+        'approve': serializers.ApproveAssetSerializer
+    }
+    model = ApplyAssetTicket
+    filterset_class = filters.ApplyAssetTicketFilter
 
-    filterset_fields = ['id', 'type']
-    search_fields = ['id', 'type']
 
-    def destroy(self, request, *args, **kwargs):
-        raise MethodNotAllowed(self.action)
+class ApplyApplicationTicketViewSet(TicketViewSet):
+    serializer_class = serializers.ApplyApplicationDisplaySerializer
+    serializer_classes = {
+        'open': serializers.ApplyApplicationSerializer,
+        'approve': serializers.ApproveApplicationSerializer
+    }
+    model = ApplyApplicationTicket
+    filterset_class = filters.ApplyApplicationTicketFilter
 
-    def get_queryset(self):
-        queryset = TicketFlow.get_org_related_flows()
-        return queryset
 
-    def perform_create_or_update(self, serializer):
-        instance = serializer.save()
-        instance.save()
+class ApplyLoginTicketViewSet(TicketViewSet):
+    serializer_class = serializers.LoginConfirmSerializer
+    model = ApplyLoginTicket
+    filterset_class = filters.ApplyLoginTicketFilter
 
-    def perform_create(self, serializer):
-        self.perform_create_or_update(serializer)
 
-    def perform_update(self, serializer):
-        self.perform_create_or_update(serializer)
+class ApplyLoginAssetTicketViewSet(TicketViewSet):
+    serializer_class = serializers.LoginAssetConfirmSerializer
+    model = ApplyLoginAssetTicket
+    filterset_class = filters.ApplyLoginAssetTicketFilter
+
+
+class ApplyCommandTicketViewSet(TicketViewSet):
+    serializer_class = serializers.ApplyCommandConfirmSerializer
+    model = ApplyCommandTicket
+    filterset_class = filters.ApplyCommandTicketFilter

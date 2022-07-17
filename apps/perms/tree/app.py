@@ -28,9 +28,26 @@ class GrantedAppTreeUtil:
             'title': name,
             'pId': '',
             'open': True,
+            'iconSkin': 'applications',
             'isParent': True,
             'meta': {
                 'type': 'root'
+            }
+        })
+        return node
+
+    @staticmethod
+    def create_empty_node():
+        name = _("Empty")
+        node = TreeNode(**{
+            'id': 'empty',
+            'name': name,
+            'title': name,
+            'pId': '',
+            'isParent': True,
+            'children': [],
+            'meta': {
+                'type': 'application'
             }
         })
         return node
@@ -60,10 +77,9 @@ class GrantedAppTreeUtil:
     def create_tree_nodes(self, applications):
         tree_nodes = []
         if not applications:
-            return tree_nodes
+            return [self.create_empty_node()]
 
         root_node = self.create_root_node()
-        tree_nodes.append(root_node)
         organizations = self.filter_organizations(applications)
 
         for i, org in enumerate(organizations):

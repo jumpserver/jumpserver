@@ -16,6 +16,7 @@ import inspect
 from django.db import models
 from django.db.models import F, Value, ExpressionWrapper
 from enum import _EnumDict
+from django.db import transaction
 from django.db.models import QuerySet
 from django.db.models.functions import Concat
 from django.utils.translation import ugettext_lazy as _
@@ -188,3 +189,29 @@ class UnionQuerySet(QuerySet):
 
         qs = cls(assets1, assets2)
         return qs
+
+
+class MultiTableChildQueryset(QuerySet):
+
+    def bulk_create(self, objs, batch_size=None):
+        assert batch_size is None or batch_size > 0
+        if not objs:
+            return objs
+
+        self._for_write = True
+        objs = list(objs)
+        parent_model = self.model._meta.pk.related_model
+
+        parent_objs = []
+        for obj in objs:
+            parent_values = {}
+            for field in [f for f in parent_model._meta.fields if hasattr(obj, f.name)]:
+                parent_values[field.name] = getattr(obj, field.name)
+            parent_objs.append(parent_model(**parent_values))
+            setattr(obj, self.model._meta.pk.attname, obj.id)
+        parent_model.objects.bulk_create(parent_objs, batch_size=batch_size)
+
+        with transaction.atomic(using=self.db, savepoint=False):
+            self._batched_insert(objs, self.model._meta.local_fields, batch_size)
+
+        return objs

@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 
+import copy
 import os
+
 from importlib import import_module
 
 import jms_storage
@@ -9,7 +11,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from common.mixins import CommonModelMixin
 from common.utils import get_logger
-from common.fields.model import EncryptJsonDictTextField
+from common.db.fields import EncryptJsonDictTextField
+from common.utils.timezone import local_now_date_display
 from terminal.backends import TYPE_ENGINE_MAPPING
 from .terminal import Terminal
 from .command import Command
@@ -64,6 +67,10 @@ class CommandStorage(CommonStorageModelMixin, CommonModelMixin):
         return self.type == const.CommandStorageTypeChoices.server.value
 
     @property
+    def type_es(self):
+        return self.type == const.CommandStorageTypeChoices.es.value
+
+    @property
     def type_null_or_server(self):
         return self.type_null or self.type_server
 
@@ -71,6 +78,19 @@ class CommandStorage(CommonStorageModelMixin, CommonModelMixin):
     def config(self):
         config = self.meta
         config.update({'TYPE': self.type})
+        return copy.deepcopy(config)
+
+    @property
+    def valid_config(self):
+        config = self.config
+        if self.type_es and config.get('INDEX_BY_DATE'):
+            engine_mod = import_module(TYPE_ENGINE_MAPPING[self.type])
+            # 这里使用一个全新的 config, 防止修改当前的 config
+            store = engine_mod.CommandStore(self.config)
+            store._ensure_index_exists()
+            index_prefix = config.get('INDEX') or 'jumpserver'
+            date = local_now_date_display()
+            config['INDEX'] = '%s-%s' % (index_prefix, date)
         return config
 
     def is_valid(self):
@@ -89,16 +109,20 @@ class CommandStorage(CommonStorageModelMixin, CommonModelMixin):
         return Terminal.objects.filter(command_storage=self.name, is_deleted=False).exists()
 
     def get_command_queryset(self):
+        if self.type_null:
+            return Command.objects.none()
+
         if self.type_server:
-            qs = Command.objects.all()
-        else:
-            if self.type not in TYPE_ENGINE_MAPPING:
-                logger.error(f'Command storage `{self.type}` not support')
-                return Command.objects.none()
+            return Command.objects.all()
+
+        if self.type in TYPE_ENGINE_MAPPING:
             engine_mod = import_module(TYPE_ENGINE_MAPPING[self.type])
             qs = engine_mod.QuerySet(self.config)
             qs.model = Command
-        return qs
+            return qs
+
+        logger.error(f'Command storage `{self.type}` not support')
+        return Command.objects.none()
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):

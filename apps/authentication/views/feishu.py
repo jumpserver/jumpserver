@@ -8,16 +8,17 @@ from django.db.utils import IntegrityError
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.exceptions import APIException
 
-from users.utils import is_auth_password_time_valid
-from users.views import UserVerifyPasswordView
 from users.models import User
+from users.views import UserVerifyPasswordView
 from common.utils import get_logger, FlashMessageUtil
 from common.utils.random import random_string
 from common.utils.django import reverse, get_object_or_none
-from common.mixins.views import PermissionsMixin
+from common.mixins.views import UserConfirmRequiredExceptionMixin, PermissionsMixin
+from common.permissions import UserConfirmation
 from common.sdk.im.feishu import FeiShu, URL
 from common.utils.common import get_request_ip
 from authentication import errors
+from authentication.const import ConfirmType
 from authentication.mixins import AuthMixin
 from authentication.notifications import OAuthBindMessage
 
@@ -27,7 +28,7 @@ logger = get_logger(__file__)
 FEISHU_STATE_SESSION_KEY = '_feishu_state'
 
 
-class FeiShuQRMixin(PermissionsMixin, View):
+class FeiShuQRMixin(UserConfirmRequiredExceptionMixin, PermissionsMixin, View):
     def dispatch(self, request, *args, **kwargs):
         try:
             return super().dispatch(request, *args, **kwargs)
@@ -89,16 +90,11 @@ class FeiShuQRMixin(PermissionsMixin, View):
 
 
 class FeiShuQRBindView(FeiShuQRMixin, View):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, UserConfirmation.require(ConfirmType.ReLogin))
 
     def get(self, request: HttpRequest):
         user = request.user
         redirect_url = request.GET.get('redirect_url')
-
-        if not is_auth_password_time_valid(request.session):
-            msg = _('Please verify your password first')
-            response = self.get_failed_response(redirect_url, msg, msg)
-            return response
 
         redirect_uri = reverse('authentication:feishu-qr-bind-callback', external=True)
         redirect_uri += '?' + urlencode({'redirect_url': redirect_url})
@@ -170,10 +166,11 @@ class FeiShuQRLoginView(FeiShuQRMixin, View):
     permission_classes = (AllowAny,)
 
     def get(self,  request: HttpRequest):
-        redirect_url = request.GET.get('redirect_url')
-
+        redirect_url = request.GET.get('redirect_url') or reverse('index')
         redirect_uri = reverse('authentication:feishu-qr-login-callback', external=True)
-        redirect_uri += '?' + urlencode({'redirect_url': redirect_url})
+        redirect_uri += '?' + urlencode({
+            'redirect_url': redirect_url,
+        })
 
         url = self.get_qr_url(redirect_uri)
         return HttpResponseRedirect(url)

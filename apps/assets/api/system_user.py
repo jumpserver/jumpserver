@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 
 from common.utils import get_logger, get_object_or_none
-from common.utils.crypto import get_aes_crypto
 from common.permissions import IsValidUser
 from common.mixins.api import SuggestionMixin
 from orgs.mixins.api import OrgBulkModelViewSet
@@ -103,27 +102,17 @@ class SystemUserTempAuthInfoApi(generics.CreateAPIView):
     permission_classes = (IsValidUser,)
     serializer_class = SystemUserTempAuthSerializer
 
-    def decrypt_data_if_need(self, data):
-        csrf_token = self.request.META.get('CSRF_COOKIE')
-        aes = get_aes_crypto(csrf_token, 'ECB')
-        password = data.get('password', '')
-        try:
-            data['password'] = aes.decrypt(password)
-        except:
-            pass
-        return data
-
     def create(self, request, *args, **kwargs):
         serializer = super().get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         pk = kwargs.get('pk')
-        data = self.decrypt_data_if_need(serializer.validated_data)
-        instance_id = data.get('instance_id')
+        data = serializer.validated_data
+        asset_or_app_id = data.get('instance_id')
 
         with tmp_to_root_org():
             instance = get_object_or_404(SystemUser, pk=pk)
-            instance.set_temp_auth(instance_id, self.request.user.id, data)
+            instance.set_temp_auth(asset_or_app_id, self.request.user.id, data)
         return Response(serializer.data, status=201)
 
 

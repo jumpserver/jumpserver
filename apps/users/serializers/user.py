@@ -6,6 +6,8 @@ from rest_framework import serializers
 
 from common.mixins import CommonBulkSerializerMixin
 from common.validators import PhoneValidator
+from common.utils import pretty_string, get_logger
+from common.drf.fields import EncryptedField
 from rbac.builtin import BuiltinRole
 from rbac.permissions import RBACPermission
 from rbac.models import OrgRoleBinding, SystemRoleBinding, Role
@@ -16,6 +18,8 @@ __all__ = [
     'UserSerializer', 'MiniUserSerializer',
     'InviteSerializer', 'ServiceAccountSerializer',
 ]
+
+logger = get_logger(__file__)
 
 
 class RolesSerializerMixin(serializers.Serializer):
@@ -28,8 +32,8 @@ class RolesSerializerMixin(serializers.Serializer):
         child_relation=serializers.PrimaryKeyRelatedField(queryset=Role.org_roles),
         label=_('Org roles'),
     )
-    system_roles_display = serializers.SerializerMethodField(label=_('System roles'))
-    org_roles_display = serializers.SerializerMethodField(label=_('Org roles'))
+    system_roles_display = serializers.SerializerMethodField(label=_('System roles display'))
+    org_roles_display = serializers.SerializerMethodField(label=_('Org roles display'))
 
     @staticmethod
     def get_system_roles_display(user):
@@ -86,6 +90,9 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
     can_public_key_auth = serializers.ReadOnlyField(
         source='can_use_ssh_key_login', label=_('Can public key authentication')
     )
+    password = EncryptedField(
+        label=_('Password'), required=False, allow_blank=True, allow_null=True, max_length=1024
+    )
     # Todo: 这里看看该怎么搞
     # can_update = serializers.SerializerMethodField(label=_('Can update'))
     # can_delete = serializers.SerializerMethodField(label=_('Can delete'))
@@ -132,10 +139,12 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
             'date_joined', 'last_login', 'created_by', 'is_first_login',
             'wecom_id', 'dingtalk_id', 'feishu_id'
         ]
+        disallow_self_update_fields = ['is_active']
         extra_kwargs = {
             'password': {'write_only': True, 'required': False, 'allow_null': True, 'allow_blank': True},
             'public_key': {'write_only': True},
             'is_first_login': {'label': _('Is first login'), 'read_only': True},
+            'is_active': {'label': _('Is active')},
             'is_valid': {'label': _('Is valid')},
             'is_service_account': {'label': _('Is service account')},
             'is_expired': {'label': _('Is expired')},
@@ -180,7 +189,25 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
                 attrs.pop(field, None)
         return attrs
 
+    def check_disallow_self_update_fields(self, attrs):
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return attrs
+        if not self.instance:
+            return attrs
+        if request.user.id != self.instance.id:
+            return attrs
+        disallow_fields = set(list(attrs.keys())) & set(self.Meta.disallow_self_update_fields)
+        if not disallow_fields:
+            return attrs
+        # 用户自己不能更新自己的一些字段
+        logger.debug('Disallow update self fields: %s', disallow_fields)
+        for field in disallow_fields:
+            attrs.pop(field, None)
+        return attrs
+
     def validate(self, attrs):
+        attrs = self.check_disallow_self_update_fields(attrs)
         attrs = self.change_password_to_raw(attrs)
         attrs = self.clean_auth_fields(attrs)
         attrs.pop('password_strategy', None)
@@ -204,17 +231,6 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
             field = getattr(instance, field_name)
             field.set(value)
         return instance
-
-    def validate_is_active(self, is_active):
-        request = self.context.get('request')
-        if not request or not request.user.is_authenticated:
-            return is_active
-
-        user = request.user
-        if user.id == self.instance.id and not is_active:
-            # 用户自己不能禁用启用自己
-            raise serializers.ValidationError("Cannot inactive self")
-        return is_active
 
     def update(self, instance, validated_data):
         save_handler = partial(super().update, instance)
@@ -268,7 +284,9 @@ class ServiceAccountSerializer(serializers.ModelSerializer):
 
     def get_email(self):
         name = self.initial_data.get('name')
-        return '{}@serviceaccount.local'.format(name)
+        name_max_length = 128 - len(User.service_account_email_suffix)
+        name = pretty_string(name, max_length=name_max_length, ellipsis_str='-')
+        return '{}{}'.format(name, User.service_account_email_suffix)
 
     def validate_name(self, name):
         email = self.get_email()
@@ -283,6 +301,7 @@ class ServiceAccountSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         name = validated_data['name']
+        email = self.get_email()
         comment = validated_data.get('comment', '')
-        user, ak = User.create_service_account(name, comment)
+        user, ak = User.create_service_account(name, email, comment)
         return user

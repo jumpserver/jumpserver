@@ -1,5 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import unicode_literals
+import os
 
 from django.urls import path, include, re_path
 from django.conf import settings
@@ -31,6 +32,7 @@ api_v1 = [
 app_view_patterns = [
     path('auth/', include('authentication.urls.view_urls'), name='auth'),
     path('ops/', include('ops.urls.view_urls'), name='ops'),
+    path('tickets/', include('tickets.urls.view_urls'), name='tickets'),
     path('common/', include('common.urls.view_urls'), name='common'),
     re_path(r'flower/(?P<path>.*)', views.celery_flower_view, name='flower-view'),
     path('download/', views.ResourceDownload.as_view(), name='download'),
@@ -44,8 +46,8 @@ if settings.XPACK_ENABLED:
 
 
 apps = [
-    'users', 'assets', 'perms', 'terminal', 'ops', 'audits', 'orgs', 'auth',
-    'applications', 'tickets', 'settings', 'xpack',
+    'users', 'assets', 'perms', 'terminal', 'ops', 'audits',
+    'orgs', 'auth', 'applications', 'tickets', 'settings', 'xpack',
     'flower', 'luna', 'koko', 'ws', 'docs', 'redocs',
 ]
 
@@ -77,6 +79,11 @@ urlpatterns += [
     re_path('api/docs/?', views.get_swagger_view().with_ui('swagger', cache_timeout=1), name="docs"),
     re_path('api/redoc/?', views.get_swagger_view().with_ui('redoc', cache_timeout=1), name='redoc'),
 ]
+
+if os.environ.get('DEBUG_TOOLBAR', False):
+    urlpatterns += [
+        path('__debug__/', include('debug_toolbar.urls')),
+    ]
 
 
 # 兼容之前的

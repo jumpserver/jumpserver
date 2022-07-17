@@ -35,6 +35,9 @@ def on_user_auth_login_success(sender, user, request, **kwargs):
             session.delete()
         cache.set(lock_key, request.session.session_key, None)
 
+    # 标记登录，设置 cookie，前端可以控制刷新, Middleware 会拦截这个生成 cookie
+    request.session['auth_session_expiration_required'] = 1
+
 
 @receiver(openid_user_login_success)
 def on_oidc_user_login_success(sender, request, user, create=False, **kwargs):

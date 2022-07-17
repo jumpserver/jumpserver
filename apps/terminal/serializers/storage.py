@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
 #
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 from urllib.parse import urlparse
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import TextChoices
+
 from common.drf.serializers import MethodSerializer
-from common.drf.fields import ReadableHiddenField
+from common.drf.fields import ReadableHiddenField, EncryptedField
 from ..models import ReplayStorage, CommandStorage
 from .. import const
-from rest_framework.validators import UniqueValidator
 
 
 # Replay storage serializers
 # --------------------------
-
-
 def replay_storage_endpoint_format_validator(endpoint):
     h = urlparse(endpoint)
     if h.path:
@@ -27,12 +26,12 @@ class ReplayStorageTypeBaseSerializer(serializers.Serializer):
         required=True, max_length=1024, label=_('Bucket'), allow_null=True
     )
     ACCESS_KEY = serializers.CharField(
-        max_length=1024, required=False, allow_blank=True, write_only=True, label=_('Access key'),
-        allow_null=True,
+        max_length=1024, required=False, allow_blank=True,
+        label=_('Access key id'), allow_null=True,
     )
-    SECRET_KEY = serializers.CharField(
-        max_length=1024, required=False, allow_blank=True, write_only=True, label=_('Secret key'),
-        allow_null=True,
+    SECRET_KEY = EncryptedField(
+        max_length=1024, required=False, allow_blank=True,
+        label=_('Access key secret'), allow_null=True,
     )
     ENDPOINT = serializers.CharField(
         validators=[replay_storage_endpoint_format_validator],
@@ -110,15 +109,14 @@ class ReplayStorageTypeAzureSerializer(serializers.Serializer):
         max_length=1024, label=_('Container name'), allow_null=True
     )
     ACCOUNT_NAME = serializers.CharField(max_length=1024, label=_('Account name'), allow_null=True)
-    ACCOUNT_KEY = serializers.CharField(max_length=1024, label=_('Account key'), allow_null=True)
+    ACCOUNT_KEY = EncryptedField(max_length=1024, label=_('Account key'), allow_null=True)
     ENDPOINT_SUFFIX = serializers.ChoiceField(
         choices=EndpointSuffixChoices.choices, default=EndpointSuffixChoices.china.value,
         label=_('Endpoint suffix'), allow_null=True,
     )
 
+
 # mapping
-
-
 replay_storage_type_serializer_classes_mapping = {
     const.ReplayStorageTypeChoices.s3.value: ReplayStorageTypeS3Serializer,
     const.ReplayStorageTypeChoices.ceph.value: ReplayStorageTypeCephSerializer,
@@ -129,10 +127,9 @@ replay_storage_type_serializer_classes_mapping = {
     const.ReplayStorageTypeChoices.cos.value: ReplayStorageTypeCOSSerializer
 }
 
+
 # Command storage serializers
 # ---------------------------
-
-
 def command_storage_es_host_format_validator(host):
     h = urlparse(host)
     default_error_msg = _('The address format is incorrect')
@@ -151,7 +148,6 @@ def command_storage_es_host_format_validator(host):
 
 
 class CommandStorageTypeESSerializer(serializers.Serializer):
-
     hosts_help_text = '''
         Tip: If there are multiple hosts, use a comma (,) to separate them. <br>
         (eg: http://www.jumpserver.a.com:9100, http://www.jumpserver.b.com:9100)
@@ -159,6 +155,10 @@ class CommandStorageTypeESSerializer(serializers.Serializer):
     HOSTS = serializers.ListField(
         child=serializers.CharField(validators=[command_storage_es_host_format_validator]),
         label=_('Hosts'), help_text=_(hosts_help_text), allow_null=True
+    )
+    INDEX_BY_DATE = serializers.BooleanField(
+        default=False, label=_('Index by date'),
+        help_text=_('Whether to create an index by date')
     )
     INDEX = serializers.CharField(
         max_length=1024, default='jumpserver', label=_('Index'), allow_null=True
@@ -169,17 +169,14 @@ class CommandStorageTypeESSerializer(serializers.Serializer):
         source='OTHER.IGNORE_VERIFY_CERTS', allow_null=True,
     )
 
+
 # mapping
-
-
 command_storage_type_serializer_classes_mapping = {
     const.CommandStorageTypeChoices.es.value: CommandStorageTypeESSerializer
 }
 
 
 # BaseStorageSerializer
-
-
 class BaseStorageSerializer(serializers.ModelSerializer):
     storage_type_serializer_classes_mapping = {}
     meta = MethodSerializer()
@@ -223,8 +220,6 @@ class BaseStorageSerializer(serializers.ModelSerializer):
 
 
 # CommandStorageSerializer
-
-
 class CommandStorageSerializer(BaseStorageSerializer):
     storage_type_serializer_classes_mapping = command_storage_type_serializer_classes_mapping
 
@@ -236,8 +231,6 @@ class CommandStorageSerializer(BaseStorageSerializer):
 
 
 # ReplayStorageSerializer
-
-
 class ReplayStorageSerializer(BaseStorageSerializer):
     storage_type_serializer_classes_mapping = replay_storage_type_serializer_classes_mapping
 

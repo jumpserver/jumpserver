@@ -90,4 +90,3 @@ class Permission(DjangoPermission):
         permissions = cls.objects.all()
         permissions = cls.clean_permissions(permissions, scope=scope)
         return permissions
-

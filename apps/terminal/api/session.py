@@ -3,6 +3,7 @@
 import os
 import tarfile
 
+from django.db.models import F
 from django.shortcuts import get_object_or_404, reverse
 from django.utils.translation import ugettext as _
 from django.utils.encoding import escape_uri_path
@@ -42,10 +43,9 @@ class MySessionAPIView(generics.ListAPIView):
     serializer_class = serializers.SessionSerializer
 
     def get_queryset(self):
-        with tmp_to_root_org():
-            user = self.request.user
-            qs = Session.objects.filter(user_id=user.id)
-            return qs
+        user = self.request.user
+        qs = Session.objects.filter(user_id=user.id)
+        return qs
 
 
 class SessionViewSet(OrgBulkModelViewSet):
@@ -64,7 +64,7 @@ class SessionViewSet(OrgBulkModelViewSet):
     ]
     extra_filter_backends = [DatetimeRangeFilter]
     rbac_perms = {
-        'download': ['terminal.download_sessionreplay|terminal.view_sessionreplay']
+        'download': ['terminal.download_sessionreplay']
     }
 
     @staticmethod
@@ -106,6 +106,11 @@ class SessionViewSet(OrgBulkModelViewSet):
         disposition = "attachment; filename*=UTF-8''{}".format(filename)
         response["Content-Disposition"] = disposition
         return response
+
+    def get_queryset(self):
+        queryset = super().get_queryset().prefetch_related('terminal')\
+            .annotate(terminal_display=F('terminal__name'))
+        return queryset
 
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)

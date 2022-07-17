@@ -97,32 +97,25 @@ class LoginACL(BaseACL):
 
         return allow, reject_type
 
-    @staticmethod
-    def construct_confirm_ticket_meta(request=None):
+    def create_confirm_ticket(self, request):
+        from tickets import const
+        from tickets.models import ApplyLoginTicket
+        from orgs.models import Organization
+        title = _('Login confirm') + ' {}'.format(self.user)
         login_ip = get_request_ip(request) if request else ''
         login_ip = login_ip or '0.0.0.0'
         login_city = get_ip_city(login_ip)
         login_datetime = local_now_display()
-        ticket_meta = {
-            'apply_login_ip': login_ip,
-            'apply_login_city': login_city,
-            'apply_login_datetime': login_datetime,
-        }
-        return ticket_meta
-
-    def create_confirm_ticket(self, request=None):
-        from tickets import const
-        from tickets.models import Ticket
-        from orgs.models import Organization
-        ticket_title = _('Login confirm') + ' {}'.format(self.user)
-        ticket_meta = self.construct_confirm_ticket_meta(request)
         data = {
-            'title': ticket_title,
-            'type': const.TicketType.login_confirm.value,
-            'meta': ticket_meta,
+            'title': title,
+            'type': const.TicketType.login_confirm,
+            'applicant': self.user,
+            'apply_login_city': login_city,
+            'apply_login_ip': login_ip,
+            'apply_login_datetime': login_datetime,
             'org_id': Organization.ROOT_ID,
         }
-        ticket = Ticket.objects.create(**data)
-        ticket.create_process_map_and_node(self.reviewers.all())
-        ticket.open(self.user)
+        ticket = ApplyLoginTicket.objects.create(**data)
+        assignees = self.reviewers.all()
+        ticket.open_by_system(assignees)
         return ticket

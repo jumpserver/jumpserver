@@ -4,9 +4,11 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.decorators import action
 
 from common.drf.api import JMSModelViewSet
+from ..filters import RoleFilter
 from ..serializers import RoleSerializer, RoleUserSerializer
 from ..models import Role, SystemRole, OrgRole
 from .permission import PermissionViewSet
+from common.mixins.api import PaginatedResponseMixin
 
 __all__ = [
     'RoleViewSet', 'SystemRoleViewSet', 'OrgRoleViewSet',
@@ -14,14 +16,14 @@ __all__ = [
 ]
 
 
-class RoleViewSet(JMSModelViewSet):
+class RoleViewSet(PaginatedResponseMixin, JMSModelViewSet):
     queryset = Role.objects.all()
     serializer_classes = {
         'default': RoleSerializer,
         'users': RoleUserSerializer,
     }
-    filterset_fields = ['name', 'scope', 'builtin']
-    search_fields = filterset_fields
+    filterset_class = RoleFilter
+    search_fields = ('name', 'scope', 'builtin')
     rbac_perms = {
         'users': 'rbac.view_rolebinding'
     }
@@ -36,6 +38,21 @@ class RoleViewSet(JMSModelViewSet):
                 error = _("The role has been bound to users, can't be destroy")
                 raise PermissionDenied(error)
         return super().perform_destroy(instance)
+
+    def perform_create(self, serializer):
+        super(RoleViewSet, self).perform_create(serializer)
+        self.set_permissions_if_need(serializer.instance)
+
+    def set_permissions_if_need(self, instance):
+        if not isinstance(instance, Role):
+            return
+        clone_from = self.request.query_params.get('clone_from')
+        if not clone_from:
+            return
+        clone = Role.objects.filter(id=clone_from).first()
+        if not clone:
+            return
+        instance.permissions.set(clone.permissions.all())
 
     def perform_update(self, serializer):
         instance = serializer.instance
@@ -53,7 +70,7 @@ class RoleViewSet(JMSModelViewSet):
     def users(self, *args, **kwargs):
         role = self.get_object()
         queryset = role.users
-        return self.get_paginated_response_with_query_set(queryset)
+        return self.get_paginated_response_from_queryset(queryset)
 
 
 class SystemRoleViewSet(RoleViewSet):
@@ -89,7 +106,7 @@ class SystemRolePermissionsViewSet(BaseRolePermissionsViewSet):
     role_pk = 'system_role_pk'
     model = SystemRole
     rbac_perms = (
-        ('get_tree', 'rbac.view_systemrole'),
+        ('get_tree', 'rbac.view_permission'),
     )
 
 
@@ -98,6 +115,6 @@ class OrgRolePermissionsViewSet(BaseRolePermissionsViewSet):
     role_pk = 'org_role_pk'
     model = OrgRole
     rbac_perms = (
-        ('get_tree', 'rbac.view_orgrole'),
+        ('get_tree', 'rbac.view_permission'),
     )
 

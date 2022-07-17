@@ -14,7 +14,6 @@ from .local import thread_local
 
 pattern = re.compile(r'FROM `(\w+)`')
 logger = logging.getLogger("jumpserver.common")
-DEBUG_DB = os.environ.get('DEBUG_DB', '0') == '1'
 
 
 class Counter:
@@ -66,7 +65,7 @@ def on_request_finished_release_local(sender, **kwargs):
     thread_local.__release_local__()
 
 
-if settings.DEBUG and DEBUG_DB:
+if settings.DEBUG_DEV:
     request_finished.connect(on_request_finished_logging_db_query)
 else:
     request_finished.connect(on_request_finished_release_local)

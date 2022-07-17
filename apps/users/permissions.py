@@ -7,4 +7,4 @@ class IsAuthPasswdTimeValid(permissions.IsAuthenticated):
 
     def has_permission(self, request, view):
         return super().has_permission(request, view) \
-            and is_auth_password_time_valid(request.session)
+               and is_auth_password_time_valid(request.session)

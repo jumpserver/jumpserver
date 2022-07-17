@@ -31,6 +31,8 @@ def combine_seq(s1, s2, callback=None):
 
 
 def get_logger(name=''):
+    if '/' in name:
+        name = os.path.basename(name).replace('.py', '')
     return logging.getLogger('jumpserver.%s' % name)
 
 
@@ -338,3 +340,28 @@ def get_file_by_arch(dir, filename):
         settings.BASE_DIR, dir, platform_name, arch, filename
     )
     return file_path
+
+
+def pretty_string(data: str, max_length=128, ellipsis_str='...'):
+    """
+    params:
+       data: abcdefgh
+       max_length: 7
+       ellipsis_str: ...
+   return:
+       ab...gh
+    """
+    if len(data) < max_length:
+        return data
+    remain_length = max_length - len(ellipsis_str)
+    half = remain_length // 2
+    if half <= 1:
+        return data[:max_length]
+    start = data[:half]
+    end = data[-half:]
+    data = f'{start}{ellipsis_str}{end}'
+    return data
+
+
+def group_by_count(it, count):
+    return [it[i:i+count] for i in range(0, len(it), count)]

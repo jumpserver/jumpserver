@@ -36,7 +36,3 @@ class AssetRoleUserMixin(PermBaseMixin, _RoleUserMixin):
         ('get_tree', 'perms.view_myassets'),
         ('GET', 'perms.view_myassets'),
     )
-
-    def dispatch(self, *args, **kwargs):
-        with tmp_to_root_org():
-            return super().dispatch(*args, **kwargs)

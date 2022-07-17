@@ -1,6 +1,7 @@
-
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
+
+from common.drf.fields import EncryptedField
 
 __all__ = [
     'LDAPTestConfigSerializer', 'LDAPUserSerializer', 'LDAPTestLoginSerializer',
@@ -11,7 +12,7 @@ __all__ = [
 class LDAPTestConfigSerializer(serializers.Serializer):
     AUTH_LDAP_SERVER_URI = serializers.CharField(max_length=1024)
     AUTH_LDAP_BIND_DN = serializers.CharField(max_length=1024, required=False, allow_blank=True)
-    AUTH_LDAP_BIND_PASSWORD = serializers.CharField(required=False, allow_blank=True)
+    AUTH_LDAP_BIND_PASSWORD = EncryptedField(required=False, allow_blank=True)
     AUTH_LDAP_SEARCH_OU = serializers.CharField()
     AUTH_LDAP_SEARCH_FILTER = serializers.CharField()
     AUTH_LDAP_USER_ATTR_MAP = serializers.CharField()
@@ -21,7 +22,7 @@ class LDAPTestConfigSerializer(serializers.Serializer):
 
 class LDAPTestLoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=1024, required=True)
-    password = serializers.CharField(max_length=2014, required=True)
+    password = EncryptedField(max_length=2014, required=True, label=_("Password"))
 
 
 class LDAPUserSerializer(serializers.Serializer):
@@ -29,6 +30,7 @@ class LDAPUserSerializer(serializers.Serializer):
     username = serializers.CharField()
     name = serializers.CharField()
     email = serializers.CharField()
+    groups = serializers.ListField(child=serializers.CharField(), default=[])
     existing = serializers.BooleanField(read_only=True)
 
 
@@ -40,8 +42,9 @@ class LDAPSettingSerializer(serializers.Serializer):
         help_text=_('eg: ldap://localhost:389')
     )
     AUTH_LDAP_BIND_DN = serializers.CharField(required=False, max_length=1024, label=_('Bind DN'))
-    AUTH_LDAP_BIND_PASSWORD = serializers.CharField(max_length=1024, write_only=True, required=False,
-                                                    label=_('Password'))
+    AUTH_LDAP_BIND_PASSWORD = EncryptedField(
+        max_length=1024, required=False, label=_('Password')
+    )
     AUTH_LDAP_SEARCH_OU = serializers.CharField(
         max_length=1024, allow_blank=True, required=False, label=_('User OU'),
         help_text=_('Use | split multi OUs')
@@ -54,6 +57,9 @@ class LDAPSettingSerializer(serializers.Serializer):
         required=True, label=_('User attr map'),
         help_text=_('User attr map present how to map LDAP user attr to '
                     'jumpserver, username,name,email is jumpserver attr')
+    )
+    AUTH_LDAP_SYNC_ORG_ID = serializers.CharField(
+        required=False, label=_('Organization'), max_length=36
     )
     AUTH_LDAP_SYNC_IS_PERIODIC = serializers.BooleanField(
         required=False, label=_('Periodic perform')

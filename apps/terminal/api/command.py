@@ -1,20 +1,17 @@
 # -*- coding: utf-8 -*-
 #
-import time
 from django.conf import settings
 from django.utils import timezone
-from django.shortcuts import HttpResponse
 from rest_framework import generics
 from rest_framework.fields import DateTimeField
 from rest_framework.response import Response
-from django.template import loader
 
 from terminal.models import CommandStorage, Session, Command
 from terminal.filters import CommandFilter
 from orgs.utils import current_org
 from common.drf.api import JMSBulkModelViewSet
 from common.utils import get_logger
-from terminal.serializers import InsecureCommandAlertSerializer
+from terminal.backends.command.serializers import InsecureCommandAlertSerializer
 from terminal.exceptions import StorageInvalid
 from ..backends import (
     get_command_storage, get_multi_command_storage,
@@ -23,7 +20,7 @@ from ..backends import (
 from ..notifications import CommandAlertMessage
 
 logger = get_logger(__name__)
-__all__ = ['CommandViewSet', 'CommandExportApi', 'InsecureCommandAlertAPI']
+__all__ = ['CommandViewSet', 'InsecureCommandAlertAPI']
 
 
 class CommandQueryMixin:
@@ -189,29 +186,6 @@ class CommandViewSet(JMSBulkModelViewSet):
             msg = "Command not valid: {}".format(serializer.errors)
             logger.error(msg)
             return Response({"msg": msg}, status=401)
-
-
-class CommandExportApi(CommandQueryMixin, generics.ListAPIView):
-    serializer_class = SessionCommandSerializer
-    rbac_perms = {
-        'list': 'terminal.view_command'
-    }
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-
-        template = 'terminal/command_report.html'
-        context = {
-            'queryset': queryset,
-            'total_count': len(queryset),
-            'now': time.time(),
-        }
-        content = loader.render_to_string(template, context, request)
-        content_type = 'application/octet-stream'
-        response = HttpResponse(content, content_type)
-        filename = 'command-report-{}.html'.format(int(time.time()))
-        response['Content-Disposition'] = 'attachment; filename="%s"' % filename
-        return response
 
 
 class InsecureCommandAlertAPI(generics.CreateAPIView):

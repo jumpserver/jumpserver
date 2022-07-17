@@ -5,17 +5,20 @@
 {% block title %} {{ title }}{% endblock %}
 
 {% block content %}
+    <style>
+        .alert.alert-msg {
+            background: #F5F5F7;
+        }
+    </style>
     <div>
         <p>
+            <div class="alert alert-msg" id="messages">
             {% if error %}
-            <div class="alert alert-danger" id="messages">
                 {{ error }}
-            </div>
             {% else %}
-            <div class="alert alert-success" id="messages">
                 {{ message|safe }}
-            </div>
             {% endif %}
+            </div>
         </p>
 
         <div class="row">
@@ -43,7 +46,6 @@
 <script>
     var message = ''
     var time = '{{ interval }}'
-
     {% if error %}
         message = '{{ error }}'
     {% else %}

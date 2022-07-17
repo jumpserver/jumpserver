@@ -5,5 +5,5 @@ from .. import ws
 app_name = 'ops'
 
 urlpatterns = [
-    path('ws/ops/tasks/log/', ws.TaskLogWebsocket, name='task-log-ws'),
+    path('ws/ops/tasks/log/', ws.TaskLogWebsocket.as_asgi(), name='task-log-ws'),
 ]

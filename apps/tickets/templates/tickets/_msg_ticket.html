@@ -4,12 +4,26 @@
         {{ title | safe }}
     </p>
     <div>
-        {{ body | safe }}
+        {% for child in content %}
+            <h2>{{ child.title }}</h2>
+            <hr>
+            {% for item in child.content %}
+                <li style="list-style-type:none">
+                    <b>{{ item.title }}: </b> {{ item.value }}
+                </li>
+            {% endfor %}
+        {% endfor %}
     </div>
     <br>
     <div>
         <a href="{{ ticket_detail_url }}" target="_blank">
-            {% trans 'Click here to review' %}
+            {% trans 'View details' %}
         </a>
+        <br>
+        {% if ticket_approval_url %}
+            <a href="{{ ticket_approval_url }}" target="_blank">
+                {% trans 'Direct approval' %}
+            </a>
+        {% endif %}
     </div>
 </div>

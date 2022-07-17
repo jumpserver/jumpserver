@@ -65,7 +65,6 @@ class MyGrantedNodesWithAssetsAsTreeApi(SerializeToTreeNodeMixin, ListAPIView):
         all_assets = all_assets.annotate(parent_key=F('nodes__key')).prefetch_related('platform')
         data.extend(self.serialize_assets(all_assets))
 
-    @tmp_to_root_org()
     def list(self, request: Request, *args, **kwargs):
         """
         此算法依赖 UserGrantedMappingNode
@@ -129,6 +128,7 @@ class GrantedNodeChildrenWithAssetsAsTreeApiMixin(SerializeToTreeNodeMixin,
 
         nodes = PermNode.objects.none()
         assets = Asset.objects.none()
+        all_tree_nodes = []
 
         if not key:
             nodes = nodes_query_utils.get_top_level_nodes()
@@ -143,7 +143,9 @@ class GrantedNodeChildrenWithAssetsAsTreeApiMixin(SerializeToTreeNodeMixin,
 
         tree_nodes = self.serialize_nodes(nodes, with_asset_amount=True)
         tree_assets = self.serialize_assets(assets, key)
-        return Response(data=[*tree_nodes, *tree_assets])
+        all_tree_nodes.extend(tree_nodes)
+        all_tree_nodes.extend(tree_assets)
+        return Response(data=all_tree_nodes)
 
 
 class UserGrantedNodeChildrenWithAssetsAsTreeApi(AssetRoleAdminMixin, GrantedNodeChildrenWithAssetsAsTreeApiMixin):

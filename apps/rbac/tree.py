@@ -1,7 +1,8 @@
 #!/usr/bin/python
-from collections import defaultdict
-from typing import Callable
 import os
+from typing import Callable
+from treelib import Tree
+from treelib.exceptions import NodeIDAbsentError
 
 from django.utils.translation import gettext_lazy as _, gettext, get_language
 from django.conf import settings
@@ -10,8 +11,6 @@ from django.db.models import F, Count
 
 from common.tree import TreeNode
 from .models import Permission, ContentType
-
-DEBUG_DB = os.environ.get('DEBUG_DB', '0') == '1'
 
 # 根节点
 root_node_data = {
@@ -24,7 +23,7 @@ root_node_data = {
 # 第二层 view 节点，手动创建的
 view_nodes_data = [
     {'id': 'view_console', 'name': _('Console view')},
-    {'id': 'view_workspace', 'name': _('Workspace view')},
+    {'id': 'view_workbench', 'name': _('Workbench view')},
     {'id': 'view_audit', 'name': _('Audit view')},
     {'id': 'view_setting', 'name': _('System setting')},
     {'id': 'view_other', 'name': _('Other')},
@@ -55,8 +54,8 @@ extra_nodes_data = [
     {"id": "app_change_plan_node", "name": _("App change auth"), "pId": "accounts"},
     {"id": "asset_change_plan_node", "name": _("Asset change auth"), "pId": "accounts"},
     {"id": "terminal_node", "name": _("Terminal setting"), "pId": "view_setting"},
-    {'id': "my_assets", "name": _("My assets"), "pId": "view_workspace"},
-    {'id': "my_apps", "name": _("My apps"), "pId": "view_workspace"},
+    {'id': "my_assets", "name": _("My assets"), "pId": "view_workbench"},
+    {'id': "my_apps", "name": _("My apps"), "pId": "view_workbench"},
 ]
 
 # 将 model 放到其它节点下，而不是本来的 app 中
@@ -86,10 +85,12 @@ special_pid_mapper = {
     'terminal.replaystorage': 'terminal_node',
     'terminal.status': 'terminal_node',
     'terminal.task': 'terminal_node',
+    'terminal.endpoint': 'terminal_node',
+    'terminal.endpointrule': 'terminal_node',
     'audits.ftplog': 'terminal',
     'perms.view_myassets': 'my_assets',
     'perms.view_myapps': 'my_apps',
-    'ops.add_commandexecution': 'view_workspace',
+    'ops.add_commandexecution': 'view_workbench',
     'ops.view_commandexecution': 'audits',
     "perms.view_mykubernetsapp": "my_apps",
     "perms.connect_mykubernetsapp": "my_apps",
@@ -102,9 +103,9 @@ special_pid_mapper = {
     "settings.view_setting": "view_setting",
     "rbac.view_console": "view_console",
     "rbac.view_audit": "view_audit",
-    "rbac.view_workspace": "view_workspace",
-    "rbac.view_webterminal": "view_workspace",
-    "rbac.view_filemanager": "view_workspace",
+    "rbac.view_workbench": "view_workbench",
+    "rbac.view_webterminal": "view_workbench",
+    "rbac.view_filemanager": "view_workbench",
     'tickets.view_ticket': 'tickets'
 }
 
@@ -157,6 +158,65 @@ def sort_nodes(node):
     return value
 
 
+class CounterTree(Tree):
+    def get_total_count(self, node):
+        count = getattr(node, '_total_count', None)
+        if count is not None:
+            return count
+
+        if not node.data.isParent:
+            return 1
+
+        count = 0
+        children = self.children(node.identifier)
+        for child in children:
+            if child.data.isParent:
+                count += self.get_total_count(child)
+            else:
+                count += 1
+        node._total_count = count
+        return count
+
+    def get_checked_count(self, node):
+        count = getattr(node, '_checked_count', None)
+        if count is not None:
+            return count
+
+        if not node.data.isParent:
+            if node.data.checked:
+                return 1
+            else:
+                return 0
+
+        count = 0
+        children = self.children(node.identifier)
+        for child in children:
+            if child.data.isParent:
+                count += self.get_checked_count(child)
+            else:
+                if child.data.checked:
+                    count += 1
+        node._checked_count = count
+        return count
+
+    def add_nodes_to_tree(self, ztree_nodes, retry=0):
+        failed = []
+        for node in ztree_nodes:
+            pid = node.pId
+            if retry == 2:
+                pid = '$ROOT$'
+
+            try:
+                self.create_node(node.name, node.id, pid, data=node)
+            except NodeIDAbsentError:
+                failed.append(node)
+        if retry > 2:
+            return
+        if failed:
+            retry += 1
+            return self.add_nodes_to_tree(failed, retry)
+
+
 class PermissionTreeUtil:
     get_permissions: Callable
     action_mapper = {
@@ -181,8 +241,6 @@ class PermissionTreeUtil:
             Permission.get_permissions(scope)
         )
         self.check_disabled = check_disabled
-        self.total_counts = defaultdict(int)
-        self.checked_counts = defaultdict(int)
         self.lang = get_language()
 
     @staticmethod
@@ -209,37 +267,9 @@ class PermissionTreeUtil:
                 'name': name,
                 'pId': view,
             }
-            total_count = self.total_counts[app]
-            checked_count = self.checked_counts[app]
-            if total_count == 0:
-                continue
-            self.total_counts[view] += total_count
-            self.checked_counts[view] += checked_count
-            node = self._create_node(
-                app_data, total_count, checked_count,
-                'app', is_open=False
-            )
+            node = self._create_node(app_data, 'app', is_open=False)
             nodes.append(node)
         return nodes
-
-    def _get_model_counts_mapper(self):
-        model_counts = self.all_permissions \
-            .values('model', 'app', 'content_type') \
-            .order_by('content_type') \
-            .annotate(count=Count('content_type'))
-        model_check_counts = self.permissions \
-            .values('content_type', 'model') \
-            .order_by('content_type') \
-            .annotate(count=Count('content_type'))
-        model_counts_mapper = {
-            i['content_type']: i['count']
-            for i in model_counts
-        }
-        model_check_counts_mapper = {
-            i['content_type']: i['count']
-            for i in model_check_counts
-        }
-        return model_counts_mapper, model_check_counts_mapper
 
     @staticmethod
     def _check_model_xpack(model_id):
@@ -261,17 +291,10 @@ class PermissionTreeUtil:
             if not self._check_model_xpack(model_id):
                 continue
 
-            total_count = self.total_counts[model_id]
-            checked_count = self.checked_counts[model_id]
-            if total_count == 0:
-                continue
-
             # 获取 pid
             app = ct.app_label
             if model_id in special_pid_mapper:
                 app = special_pid_mapper[model_id]
-            self.total_counts[app] += total_count
-            self.checked_counts[app] += checked_count
 
             # 获取 name
             name = f'{ct.name}'
@@ -282,7 +305,7 @@ class PermissionTreeUtil:
                 'id': model_id,
                 'name': name,
                 'pId': app,
-            }, total_count, checked_count, 'model', is_open=False)
+            }, 'model', is_open=False)
             nodes.append(node)
         return nodes
 
@@ -324,7 +347,7 @@ class PermissionTreeUtil:
 
             # name 要特殊处理，解决 i18n 问题
             name, icon = self._get_permission_name_icon(p, content_types_name_mapper)
-            if DEBUG_DB:
+            if settings.DEBUG_DEV:
                 name += '[{}]'.format(p.app_label_codename)
 
             pid = model_id
@@ -332,10 +355,7 @@ class PermissionTreeUtil:
             if title in special_pid_mapper:
                 pid = special_pid_mapper[title]
 
-            self.total_counts[pid] += 1
             checked = p.id in permissions_id
-            if checked:
-                self.checked_counts[pid] += 1
 
             node = TreeNode(**{
                 'id': p.id,
@@ -345,7 +365,7 @@ class PermissionTreeUtil:
                 'isParent': False,
                 'chkDisabled': self.check_disabled,
                 'iconSkin': icon,
-                'checked': p.id in permissions_id,
+                'checked': checked,
                 'open': False,
                 'meta': {
                     'type': 'perm',
@@ -354,13 +374,11 @@ class PermissionTreeUtil:
             nodes.append(node)
         return nodes
 
-    def _create_node(self, data, total_count, checked_count, tp,
-                     is_parent=True, is_open=True, icon='', checked=None):
+    def _create_node(self, data, tp, is_parent=True, is_open=True, icon='', checked=None):
         assert data.get('id')
         assert data.get('name')
         assert data.get('pId') is not None
-        if checked is None:
-            checked = total_count == checked_count
+
         node_data = {
             'isParent': is_parent,
             'iconSkin': icon,
@@ -374,50 +392,62 @@ class PermissionTreeUtil:
         }
         node_data['title'] = node_data['id']
         node = TreeNode(**node_data)
-        if DEBUG_DB:
+        if settings.DEBUG_DEV:
             node.name += ('[' + node.id + ']')
-        if DEBUG_DB:
+        if settings.DEBUG_DEV:
             node.name += ('-' + node.id)
-        node.name += f'({checked_count}/{total_count})'
         return node
 
     def _create_root_tree_node(self):
-        total_count = self.all_permissions.count()
-        checked_count = self.permissions.count()
-        node = self._create_node(root_node_data, total_count, checked_count, 'root')
+        node = self._create_node(root_node_data, 'root')
         return node
 
     def _create_views_node(self):
         nodes = []
         for view_data in view_nodes_data:
-            view = view_data['id']
             data = {
                 **view_data,
                 'pId': '$ROOT$',
             }
-            total_count = self.total_counts[view]
-            checked_count = self.checked_counts[view]
-            if total_count == 0:
-                continue
-            node = self._create_node(data, total_count, checked_count, 'view', is_open=True)
+            node = self._create_node(data, 'view', is_open=True)
             nodes.append(node)
         return nodes
 
     def _create_extra_nodes(self):
         nodes = []
         for data in extra_nodes_data:
-            i = data['id']
-            pid = data['pId']
-            checked_count = self.checked_counts[i]
-            total_count = self.total_counts[i]
+            node = self._create_node(data, 'extra', is_open=False)
+            nodes.append(node)
+        return nodes
+
+    @staticmethod
+    def compute_nodes_count(ztree_nodes):
+        tree = CounterTree()
+        reverse_nodes = ztree_nodes[::-1]
+        root = reverse_nodes[0]
+        tree.create_node(root.name, root.id, data=root)
+        tree.add_nodes_to_tree(reverse_nodes[1:])
+        counter_nodes = tree.all_nodes()
+
+        node_counts = {}
+        for n in counter_nodes:
+            if not n:
+                continue
+            total_count = tree.get_total_count(n)
+            checked_count = tree.get_checked_count(n)
+            node_counts[n.identifier] = [checked_count, total_count]
+
+        nodes = []
+        for node in ztree_nodes:
+            counter = node_counts[node.id]
+            if not counter:
+                counter = [0, 0]
+            checked_count, total_count = counter
             if total_count == 0:
                 continue
-            self.total_counts[pid] += total_count
-            self.checked_counts[pid] += checked_count
-            node = self._create_node(
-                data, total_count, checked_count,
-                'extra', is_open=False
-            )
+            node.name += '({}/{})'.format(checked_count, total_count)
+            if checked_count != 0:
+                node.checked = True
             nodes.append(node)
         return nodes
 
@@ -429,5 +459,6 @@ class PermissionTreeUtil:
         nodes += self._create_views_node()
         nodes += [self._create_root_tree_node()]
 
+        nodes = self.compute_nodes_count(nodes)
         nodes.sort(key=sort_nodes)
         return nodes

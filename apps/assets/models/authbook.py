@@ -29,7 +29,9 @@ class AuthBook(BaseUser, AbsConnectivity):
         permissions = [
             ('test_authbook', _('Can test asset account connectivity')),
             ('view_assetaccountsecret', _('Can view asset account secret')),
-            ('change_assetaccountsecret', _('Can change asset account secret'))
+            ('change_assetaccountsecret', _('Can change asset account secret')),
+            ('view_assethistoryaccount', _('Can view asset history account')),
+            ('view_assethistoryaccountsecret', _('Can view asset history account secret')),
         ]
 
     def __init__(self, *args, **kwargs):
@@ -123,8 +125,9 @@ class AuthBook(BaseUser, AbsConnectivity):
         logger.debug('Update asset admin user: {} {}'.format(self.asset, self.systemuser))
 
     @classmethod
-    def get_queryset(cls):
-        queryset = cls.objects.all() \
+    def get_queryset(cls, is_history_model=False):
+        model = cls.history.model if is_history_model else cls
+        queryset = model.objects.all() \
             .annotate(ip=F('asset__ip')) \
             .annotate(hostname=F('asset__hostname')) \
             .annotate(platform=F('asset__platform__name')) \
@@ -133,4 +136,5 @@ class AuthBook(BaseUser, AbsConnectivity):
 
     def __str__(self):
         return self.smart_name
+
 

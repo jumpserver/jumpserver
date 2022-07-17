@@ -42,7 +42,7 @@ class NoSpecialChars:
 
 
 class PhoneValidator:
-    pattern = re.compile(r"^1[356789]\d{9}$")
+    pattern = re.compile(r"^1[3456789]\d{9}$")
     message = _('The mobile phone number format is incorrect')
 
     def __call__(self, value):

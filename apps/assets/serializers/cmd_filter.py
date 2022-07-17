@@ -31,24 +31,24 @@ class CommandFilterSerializer(BulkOrgResourceModelSerializer):
 
 
 class CommandFilterRuleSerializer(BulkOrgResourceModelSerializer):
-    type_display = serializers.ReadOnlyField(source='get_type_display')
-    action_display = serializers.ReadOnlyField(source='get_action_display')
+    type_display = serializers.ReadOnlyField(source='get_type_display', label=_("Type display"))
+    action_display = serializers.ReadOnlyField(source='get_action_display', label=_("Action display"))
 
     class Meta:
         model = CommandFilterRule
         fields_mini = ['id']
         fields_small = fields_mini + [
-           'type', 'type_display', 'content', 'ignore_case', 'pattern', 'priority',
-           'action', 'action_display', 'reviewers',
-           'date_created', 'date_updated',
-           'comment', 'created_by',
+            'type', 'type_display', 'content', 'ignore_case', 'pattern',
+            'priority', 'action', 'action_display', 'reviewers',
+            'date_created', 'date_updated', 'comment', 'created_by',
         ]
         fields_fk = ['filter']
         fields = fields_small + fields_fk
         extra_kwargs = {
             'date_created': {'label': _("Date created")},
             'date_updated': {'label': _("Date updated")},
-            'action_display': {'label': _("Action display")}
+            'action_display': {'label': _("Action display")},
+            'pattern': {'label': _("Pattern")}
         }
 
     def __init__(self, *args, **kwargs):

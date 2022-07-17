@@ -25,6 +25,7 @@ exclude_permissions = (
     ('authentication', 'connectiontoken', 'change,delete', 'connectiontoken'),
     ('authentication', 'ssotoken', '*', '*'),
     ('authentication', 'superconnectiontoken', 'change,delete', 'superconnectiontoken'),
+    ('authentication', 'temptoken', 'delete', 'temptoken'),
     ('users', 'userpasswordhistory', '*', '*'),
     ('applications', 'applicationuser', '*', '*'),
     ('applications', 'historicalaccount', '*', '*'),
@@ -68,6 +69,11 @@ exclude_permissions = (
     ('tickets', 'ticket', 'add,delete,change', 'ticket'),
     ('tickets', 'ticketstep', '*', '*'),
     ('tickets', 'approvalrule', '*', '*'),
+    ('tickets', 'applyloginticket', '*', '*'),
+    ('tickets', 'applyloginassetticket', '*', '*'),
+    ('tickets', 'applycommandticket', '*', '*'),
+    ('tickets', 'applyassetticket', '*', '*'),
+    ('tickets', 'applyapplicationticket', '*', '*'),
     ('tickets', 'superticket', 'delete', 'superticket'),
     ('tickets', 'ticketsession', 'view,delete', 'ticketsession'),
     ('xpack', 'interface', '*', '*'),
@@ -90,7 +96,7 @@ exclude_permissions = (
 
 
 only_system_permissions = (
-    ('assets', 'platform', '*', '*'),
+    ('assets', 'platform', 'add,change,delete', 'platform'),
     ('users', 'user', 'delete', 'user'),
     ('rbac', 'role', 'delete,add,change', 'role'),
     ('rbac', 'systemrole', '*', '*'),
@@ -107,8 +113,11 @@ only_system_permissions = (
     ('terminal', 'replaystorage', '*', '*'),
     ('terminal', 'status', '*', '*'),
     ('terminal', 'task', '*', '*'),
+    ('terminal', 'endpoint', '*', '*'),
+    ('terminal', 'endpointrule', '*', '*'),
     ('authentication', '*', '*', '*'),
     ('tickets', '*', '*', '*'),
+    ('orgs', 'organization', 'view', 'rootorg'),
 )
 
 only_org_permissions = (

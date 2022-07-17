@@ -121,6 +121,20 @@ class Role(JMSBaseModel):
     def is_org(self):
         return self.scope == const.Scope.org
 
+    @classmethod
+    def get_roles_by_perm(cls, perm):
+        app_label, codename = perm.split('.')
+        p = Permission.objects.filter(
+            codename=codename,
+            content_type__app_label=app_label
+        ).first()
+        if not p:
+            return p.roles.none()
+        role_ids = list(p.roles.all().values_list('id', flat=True))
+        admin_ids = [BuiltinRole.system_admin.id, BuiltinRole.org_admin.id]
+        role_ids += admin_ids
+        return cls.objects.filter(id__in=role_ids)
+
 
 class SystemRole(Role):
     objects = SystemRoleManager()

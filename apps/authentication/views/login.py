@@ -4,14 +4,14 @@
 from __future__ import unicode_literals
 import os
 import datetime
+from typing import Callable
 
 from django.templatetags.static import static
 from django.contrib.auth import login as auth_login, logout as auth_logout
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpRequest
 from django.shortcuts import reverse, redirect
 from django.utils.decorators import method_decorator
-from django.db import transaction
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
@@ -35,10 +35,115 @@ __all__ = [
 ]
 
 
+class UserLoginContextMixin:
+    get_user_mfa_context: Callable
+    request: HttpRequest
+
+    @staticmethod
+    def get_support_auth_methods():
+        auth_methods = [
+            {
+                'name': 'OpenID',
+                'enabled': settings.AUTH_OPENID,
+                'url': reverse('authentication:openid:login'),
+                'logo': static('img/login_oidc_logo.png'),
+                'auto_redirect': True  # 是否支持自动重定向
+            },
+            {
+                'name': 'CAS',
+                'enabled': settings.AUTH_CAS,
+                'url': reverse('authentication:cas:cas-login'),
+                'logo': static('img/login_cas_logo.png'),
+                'auto_redirect': True
+            },
+            {
+                'name': 'SAML2',
+                'enabled': settings.AUTH_SAML2,
+                'url': reverse('authentication:saml2:saml2-login'),
+                'logo': static('img/login_saml2_logo.png'),
+                'auto_redirect': True
+            },
+            {
+                'name': _('WeCom'),
+                'enabled': settings.AUTH_WECOM,
+                'url': reverse('authentication:wecom-qr-login'),
+                'logo': static('img/login_wecom_logo.png'),
+            },
+            {
+                'name': _('DingTalk'),
+                'enabled': settings.AUTH_DINGTALK,
+                'url': reverse('authentication:dingtalk-qr-login'),
+                'logo': static('img/login_dingtalk_logo.png')
+            },
+            {
+                'name': _('FeiShu'),
+                'enabled': settings.AUTH_FEISHU,
+                'url': reverse('authentication:feishu-qr-login'),
+                'logo': static('img/login_feishu_logo.png')
+            }
+        ]
+        return [method for method in auth_methods if method['enabled']]
+
+    @staticmethod
+    def get_support_langs():
+        langs = [
+            {
+                'title': '中文(简体)',
+                'code': 'zh-hans'
+            },
+            {
+                'title': 'English',
+                'code': 'en'
+            },
+            {
+                'title': '日本語',
+                'code': 'ja'
+            }
+        ]
+        return langs
+
+    def get_current_lang(self):
+        langs = self.get_support_langs()
+        matched_lang = filter(lambda x: x['code'] == get_language(), langs)
+        return next(matched_lang, langs[0])
+
+    @staticmethod
+    def get_forgot_password_url():
+        forgot_password_url = reverse('authentication:forgot-password')
+        forgot_password_url = settings.FORGOT_PASSWORD_URL or forgot_password_url
+        return forgot_password_url
+
+    def get_extra_fields_count(self, context):
+        count = 0
+        if self.get_support_auth_methods():
+            count += 1
+        form = context.get('form')
+        if not form:
+            return count
+        if set(form.fields.keys()) & {'captcha', 'challenge', 'mfa_type'}:
+            count += 1
+        if form.errors or form.non_field_errors():
+            count += 1
+        return count
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'demo_mode': os.environ.get("DEMO_MODE"),
+            'auth_methods': self.get_support_auth_methods(),
+            'langs': self.get_support_langs(),
+            'current_lang': self.get_current_lang(),
+            'forgot_password_url': self.get_forgot_password_url(),
+            'extra_fields_count': self.get_extra_fields_count(context),
+            **self.get_user_mfa_context(self.request.user)
+        })
+        return context
+
+
 @method_decorator(sensitive_post_parameters(), name='dispatch')
 @method_decorator(csrf_protect, name='dispatch')
 @method_decorator(never_cache, name='dispatch')
-class UserLoginView(mixins.AuthMixin, FormView):
+class UserLoginView(mixins.AuthMixin, UserLoginContextMixin, FormView):
     redirect_field_name = 'next'
     template_name = 'authentication/login.html'
 
@@ -96,7 +201,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
         self.request.session.delete_test_cookie()
 
         try:
-            self.check_user_auth(decrypt_passwd=True)
+            self.check_user_auth(form.cleaned_data)
         except errors.AuthFailedError as e:
             form.add_error(None, e.msg)
             self.set_login_failed_mark()
@@ -106,12 +211,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
             context = self.get_context_data(form=new_form)
             self.request.session.set_test_cookie()
             return self.render_to_response(context)
-        except (
-                errors.MFAUnsetError,
-                errors.PasswordTooSimple,
-                errors.PasswordRequireResetError,
-                errors.PasswordNeedUpdate
-        ) as e:
+        except errors.NeedRedirectError as e:
             return redirect(e.url)
         except (
                 errors.MFAFailedError,
@@ -136,67 +236,6 @@ class UserLoginView(mixins.AuthMixin, FormView):
         self.request.session[RSA_PRIVATE_KEY] = None
         self.request.session[RSA_PUBLIC_KEY] = None
 
-    @staticmethod
-    def get_support_auth_methods():
-        auth_methods = [
-            {
-                'name': 'OpenID',
-                'enabled': settings.AUTH_OPENID,
-                'url': reverse('authentication:openid:login'),
-                'logo': static('img/login_oidc_logo.png'),
-                'auto_redirect': True  # 是否支持自动重定向
-            },
-            {
-                'name': 'CAS',
-                'enabled': settings.AUTH_CAS,
-                'url': reverse('authentication:cas:cas-login'),
-                'logo': static('img/login_cas_logo.png'),
-                'auto_redirect': True
-            },
-            {
-                'name': 'SAML2',
-                'enabled': settings.AUTH_SAML2,
-                'url': reverse('authentication:saml2:saml2-login'),
-                'logo': static('img/login_saml2_logo.png'),
-                'auto_redirect': True
-            },
-            {
-                'name': _('WeCom'),
-                'enabled': settings.AUTH_WECOM,
-                'url': reverse('authentication:wecom-qr-login'),
-                'logo': static('img/login_wecom_logo.png'),
-            },
-            {
-                'name': _('DingTalk'),
-                'enabled': settings.AUTH_DINGTALK,
-                'url': reverse('authentication:dingtalk-qr-login'),
-                'logo': static('img/login_dingtalk_logo.png')
-            },
-            {
-                'name': _('FeiShu'),
-                'enabled': settings.AUTH_FEISHU,
-                'url': reverse('authentication:feishu-qr-login'),
-                'logo': static('img/login_feishu_logo.png')
-            }
-        ]
-        return [method for method in auth_methods if method['enabled']]
-
-    @staticmethod
-    def get_forgot_password_url():
-        forgot_password_url = reverse('authentication:forgot-password')
-        forgot_password_url = settings.FORGOT_PASSWORD_URL or forgot_password_url
-        return forgot_password_url
-
-    def get_context_data(self, **kwargs):
-        context = {
-            'demo_mode': os.environ.get("DEMO_MODE"),
-            'auth_methods': self.get_support_auth_methods(),
-            'forgot_password_url': self.get_forgot_password_url(),
-            **self.get_user_mfa_context(self.request.user)
-        }
-        kwargs.update(context)
-        return super().get_context_data(**kwargs)
-
 
 class UserLoginGuardView(mixins.AuthMixin, RedirectView):
     redirect_field_name = 'next'
@@ -219,7 +258,7 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         try:
-            user = self.check_user_auth_if_need()
+            user = self.get_user_from_session()
             self.check_user_mfa_if_need(user)
             self.check_user_login_confirm_if_need(user)
         except (errors.CredentialError, errors.SessionEmptyError) as e:
@@ -258,8 +297,7 @@ class UserLoginWaitConfirmView(TemplateView):
         if ticket:
             timestamp_created = datetime.datetime.timestamp(ticket.date_created)
             ticket_detail_url = TICKET_DETAIL_URL.format(id=ticket_id, type=ticket.type)
-            assignees = ticket.current_node.first().ticket_assignees.all()
-            assignees_display = ', '.join([str(i.assignee) for i in assignees])
+            assignees_display = ', '.join([str(assignee) for assignee in ticket.current_assignees])
             msg = _("""Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>
                   Don't close this page""").format(assignees_display)
         else:

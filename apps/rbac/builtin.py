@@ -2,10 +2,13 @@ from django.utils.translation import ugettext_noop
 
 from .const import Scope, system_exclude_permissions, org_exclude_permissions
 
-# Todo: 获取应该区分 系统用户，和组织用户的权限
+_view_root_perms = (
+    ('orgs', 'organization', 'view', 'rootorg'),
+)
+
 # 工作台也区分组织后再考虑
 user_perms = (
-    ('rbac', 'menupermission', 'view', 'workspace'),
+    ('rbac', 'menupermission', 'view', 'workbench'),
     ('rbac', 'menupermission', 'view', 'webterminal'),
     ('rbac', 'menupermission', 'view', 'filemanager'),
     ('perms', 'permedasset', 'view,connect', 'myassets'),
@@ -15,19 +18,28 @@ user_perms = (
     ('assets', 'node', 'match', 'node'),
     ('applications', 'application', 'match', 'application'),
     ('ops', 'commandexecution', 'add', 'commandexecution'),
-    ('authentication', 'connectiontoken', 'add', 'connectiontoken'),
-    ('tickets', 'ticket', 'view', 'ticket'),
 )
 
-auditor_perms = user_perms + (
+system_user_perms = (
+    ('authentication', 'connectiontoken', 'add', 'connectiontoken'),
+    ('authentication', 'temptoken', 'add,change,view', 'temptoken'),
+    ('authentication', 'accesskey', '*', '*'),
+    ('tickets', 'ticket', 'view', 'ticket'),
+) + user_perms
+
+_auditor_perms = (
     ('rbac', 'menupermission', 'view', 'audit'),
     ('audits', '*', '*', '*'),
     ('terminal', 'commandstorage', 'view', 'commandstorage'),
     ('terminal', 'sessionreplay', 'view,download', 'sessionreplay'),
     ('terminal', 'session', '*', '*'),
     ('terminal', 'command', '*', '*'),
-    ('ops', 'commandexecution', 'view', 'commandexecution')
+    ('ops', 'commandexecution', 'view', 'commandexecution'),
 )
+
+auditor_perms = user_perms + _auditor_perms
+
+system_auditor_perms = system_user_perms + _auditor_perms + _view_root_perms
 
 
 app_exclude_perms = [
@@ -59,7 +71,8 @@ class PredefineRole:
         from rbac.models import Role
         return Role.objects.get(id=self.id)
 
-    def _get_defaults(self):
+    @property
+    def default_perms(self):
         from rbac.models import Permission
         q = Permission.get_define_permissions_q(self.perms)
         permissions = Permission.get_permissions(self.scope)
@@ -72,9 +85,13 @@ class PredefineRole:
             permissions = permissions.exclude(q)
 
         perms = permissions.values_list('id', flat=True)
+        return perms
+
+    def _get_defaults(self):
+        perms = self.default_perms
         defaults = {
             'id': self.id, 'name': self.name, 'scope': self.scope,
-            'builtin': True, 'permissions': perms
+            'builtin': True, 'permissions': perms, 'created_by': 'System',
         }
         return defaults
 
@@ -92,13 +109,13 @@ class BuiltinRole:
         '1', ugettext_noop('SystemAdmin'), Scope.system, []
     )
     system_auditor = PredefineRole(
-        '2', ugettext_noop('SystemAuditor'), Scope.system, auditor_perms
+        '2', ugettext_noop('SystemAuditor'), Scope.system, system_auditor_perms
     )
     system_component = PredefineRole(
         '4', ugettext_noop('SystemComponent'), Scope.system, app_exclude_perms, 'exclude'
     )
     system_user = PredefineRole(
-        '3', ugettext_noop('User'), Scope.system, user_perms
+        '3', ugettext_noop('User'), Scope.system, system_user_perms
     )
     org_admin = PredefineRole(
         '5', ugettext_noop('OrgAdmin'), Scope.org, []
@@ -109,6 +126,8 @@ class BuiltinRole:
     org_user = PredefineRole(
         '7', ugettext_noop('OrgUser'), Scope.org, user_perms
     )
+    system_role_mapper = None
+    org_role_mapper = None
 
     @classmethod
     def get_roles(cls):
@@ -121,22 +140,24 @@ class BuiltinRole:
 
     @classmethod
     def get_system_role_by_old_name(cls, name):
-        mapper = {
-            'App': cls.system_component,
-            'Admin': cls.system_admin,
-            'User': cls.system_user,
-            'Auditor': cls.system_auditor
-        }
-        return mapper[name].get_role()
+        if not cls.system_role_mapper:
+            cls.system_role_mapper = {
+                'App': cls.system_component.get_role(),
+                'Admin': cls.system_admin.get_role(),
+                'User': cls.system_user.get_role(),
+                'Auditor': cls.system_auditor.get_role()
+            }
+        return cls.system_role_mapper[name]
 
     @classmethod
     def get_org_role_by_old_name(cls, name):
-        mapper = {
-            'Admin': cls.org_admin,
-            'User': cls.org_user,
-            'Auditor': cls.org_auditor,
-        }
-        return mapper[name].get_role()
+        if not cls.org_role_mapper:
+            cls.org_role_mapper = {
+                'Admin': cls.org_admin.get_role(),
+                'User': cls.org_user.get_role(),
+                'Auditor': cls.org_auditor.get_role(),
+            }
+        return cls.org_role_mapper[name]
 
     @classmethod
     def sync_to_db(cls, show_msg=False):

@@ -4,7 +4,7 @@ from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
 
 from users.models import User, UserGroup
-from assets.models import SystemUser
+from assets.models import Asset, SystemUser
 from applications.models import Application
 from common.utils import get_logger
 from common.exceptions import M2MReverseNotAllowed
@@ -48,6 +48,8 @@ def set_remote_app_asset_system_users_if_need(instance: ApplicationPermission, s
 
     attrs = instance.applications.all().values_list('attrs', flat=True)
     asset_ids = [attr['asset'] for attr in attrs if attr.get('asset')]
+    # 远程应用中资产可能在资产表里不存在
+    asset_ids = Asset.objects.filter(id__in=asset_ids).values_list('id', flat=True)
     if not asset_ids:
         return
 

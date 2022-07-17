@@ -34,10 +34,11 @@ celerybeat-schedule.db
 data/static
 docs/_build/
 xpack
+xpack.bak
 logs/*
 ### Vagrant ###
 .vagrant/
 release/*
 releashe
 /apps/script.py
-xpack.bak
+data/*

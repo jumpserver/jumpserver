@@ -13,20 +13,23 @@ User = get_user_model()
 
 
 class CreateUserMixin:
-    def get_django_user(self, username, password=None, *args, **kwargs):
+    @staticmethod
+    def get_django_user(username, password=None, *args, **kwargs):
         if isinstance(username, bytes):
             username = username.decode()
-        try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            if '@' in username:
-                email = username
-            else:
-                email_suffix = settings.EMAIL_SUFFIX
-                email = '{}@{}'.format(username, email_suffix)
-            user = User(username=username, name=username, email=email)
-            user.source = user.Source.radius.value
-            user.save()
+        user = User.objects.filter(username=username).first()
+        if user:
+            return user
+
+        if '@' in username:
+            email = username
+        else:
+            email_suffix = settings.EMAIL_SUFFIX
+            email = '{}@{}'.format(username, email_suffix)
+
+        user = User(username=username, name=username, email=email)
+        user.source = user.Source.radius.value
+        user.save()
         return user
 
     def _perform_radius_auth(self, client, packet):

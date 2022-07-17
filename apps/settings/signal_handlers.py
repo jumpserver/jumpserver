@@ -94,7 +94,7 @@ def monkey_patch_settings(sender, **kwargs):
     def monkey_patch_getattr(self, name):
         val = getattr(self._wrapped, name)
         # 只解析 defaults 中的 callable
-        if callable(val) and val.__module__ == 'jumpserver.conf':
+        if callable(val) and val.__module__.endswith('jumpserver.conf'):
             val = val()
         return val
 

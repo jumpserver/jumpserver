@@ -1,6 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
+from common.drf.fields import EncryptedField
 from ..application_category import RemoteAppSerializer
 
 __all__ = ['VMwareClientSerializer', 'VMwareClientSecretSerializer']
@@ -25,14 +26,14 @@ class VMwareClientSerializer(RemoteAppSerializer):
         max_length=128, allow_blank=True, required=False, label=_('Vmware username'),
         allow_null=True
     )
-    vmware_password = serializers.CharField(
-        max_length=128, allow_blank=True, required=False, write_only=True, label=_('Vmware password'),
-        allow_null=True
+    vmware_password = EncryptedField(
+        max_length=128, allow_blank=True, required=False,
+        label=_('Vmware password'), allow_null=True
     )
 
 
 class VMwareClientSecretSerializer(RemoteAppSerializer):
-    vmware_password = serializers.CharField(
-        max_length=128, allow_blank=True, required=False, read_only=True, label=_('Vmware password'),
-        allow_null=True
+    vmware_password = EncryptedField(
+        max_length=128, allow_blank=True, required=False, write_only=False,
+        label=_('Vmware password'), allow_null=True
     )

@@ -1,6 +1,5 @@
 # coding: utf-8
 #
-from django.shortcuts import get_object_or_404
 from orgs.mixins.api import OrgBulkModelViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response

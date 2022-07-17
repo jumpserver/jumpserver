@@ -6,12 +6,14 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from common.utils import ssh_pubkey_gen, ssh_private_key_gen, validate_ssh_private_key
+from common.drf.fields import EncryptedField
 from assets.models import Type
+from .utils import validate_password_for_ansible
 
 
 class AuthSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(required=False, allow_blank=True, allow_null=True, max_length=1024)
-    private_key = serializers.CharField(required=False, allow_blank=True, allow_null=True, max_length=4096)
+    password = EncryptedField(required=False, allow_blank=True, allow_null=True, max_length=1024, label=_('Password'))
+    private_key = EncryptedField(required=False, allow_blank=True, allow_null=True, max_length=16384, label=_('Private key'))
 
     def gen_keys(self, private_key=None, password=None):
         if private_key is None:
@@ -31,6 +33,13 @@ class AuthSerializer(serializers.ModelSerializer):
 
 
 class AuthSerializerMixin(serializers.ModelSerializer):
+    password = EncryptedField(
+        label=_('Password'), required=False, allow_blank=True, allow_null=True, max_length=1024,
+        validators=[validate_password_for_ansible]
+    )
+    private_key = EncryptedField(
+        label=_('SSH private key'), required=False, allow_blank=True, allow_null=True, max_length=16384
+    )
     passphrase = serializers.CharField(
         allow_blank=True, allow_null=True, required=False, max_length=512,
         write_only=True, label=_('Key password')

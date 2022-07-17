@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from assets.const import Category, AllTypes
-from common.fields.model import JsonDictTextField
+from common.db.fields import JsonDictTextField
 
 
 __all__ = ['Platform']

@@ -1,0 +1,41 @@
+{% load static %}
+{% load i18n %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{{ INTERFACE.favicon }}" type="image/x-icon">
+    <title>{% block html_title %}{% endblock %}</title>
+
+    {% include '_head_css_js.html' %}
+    <link href="{% static "css/jumpserver.css" %}" rel="stylesheet">
+    <script src="{% static "js/jumpserver.js" %}?_=9"></script>
+    <style>
+        .outerBox {
+            margin: 0 auto;
+            padding: 100px 20px 20px 20px;
+        }
+    </style>
+    {% block custom_head_css_js %} {% endblock %}
+</head>
+
+<body class="gray-bg">
+    <div class="outerBox animated fadeInDown">
+        <div class="row">
+            <div class="col-md-12">
+                    {% block content %} {% endblock %}
+            </div>
+        </div>
+        <hr/>
+        <div class="row">
+            <div class="col-md-12">
+                 {% include '_copyright.html' %}
+            </div>
+        </div>
+    </div>
+</body>
+{% include '_foot_js.html' %}
+{% block custom_foot_js %} {% endblock %}
+</html>

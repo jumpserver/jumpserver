@@ -11,6 +11,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import ValidationError
 
+from common.db.fields import JsonDictTextField
 from common.utils import lazyproperty
 from orgs.mixins.models import OrgModelMixin, OrgManager
 from assets.const import Category, AllTypes
@@ -147,7 +148,7 @@ class Asset(AbsConnectivity, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
 
     # Some information
     public_ip = models.CharField(max_length=128, blank=True, null=True, verbose_name=_('Public IP'))
-    number = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Asset number'))
+    number = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Asset number'))
 
     labels = models.ManyToManyField('assets.Label', blank=True, related_name='assets', verbose_name=_("Labels"))
     created_by = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Created by'))
@@ -159,15 +160,8 @@ class Asset(AbsConnectivity, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     def __str__(self):
         return '{0.hostname}({0.ip})'.format(self)
 
-    def set_admin_user_relation(self):
-        from assets.models import AuthBook
-        if not self.admin_user:
-            return
-        if self.admin_user.type != 'admin':
-            raise ValidationError('System user should be type admin')
-
-        defaults = {'asset': self, 'systemuser': self.admin_user, 'org_id': self.org_id}
-        AuthBook.objects.get_or_create(defaults=defaults, asset=self, systemuser=self.admin_user)
+    def get_target_ip(self):
+        return self.ip
 
     @property
     def admin_user_display(self):
@@ -222,7 +216,7 @@ class Asset(AbsConnectivity, ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
             'private_key': auth_user.private_key_file
         }
 
-        if not with_become:
+        if not with_become or self.is_windows():
             return info
 
         if become_user:
