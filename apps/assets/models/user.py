@@ -106,8 +106,10 @@ class SystemUser(ProtocolMixin, BaseUser):
         validators=[MinValueValidator(1), MaxValueValidator(100)]
     )
     protocol = models.CharField(max_length=16, choices=ProtocolMixin.Protocol.choices, default='ssh', verbose_name=_('Protocol'))
-
     login_mode = models.CharField(choices=LOGIN_MODE_CHOICES, default=LOGIN_AUTO, max_length=10, verbose_name=_('Login mode'))
+
+    # Todo: 重构平台后或许这里也得变化
+    # 账号模版
     account_template_enabled = models.BooleanField(default=False, verbose_name=_("启用账号模版"))
     auto_push_account = models.BooleanField(default=True, verbose_name=_('自动推送账号'))
     type = models.CharField(max_length=16, choices=Type.choices, default=Type.common, verbose_name=_('Type'))
@@ -118,7 +120,9 @@ class SystemUser(ProtocolMixin, BaseUser):
     home = models.CharField(max_length=4096, default='', verbose_name=_('Home'), blank=True)
     system_groups = models.CharField(default='', max_length=4096, verbose_name=_('System groups'), blank=True)
     ad_domain = models.CharField(default='', max_length=256)
+
     # linux su 命令 (switch user)
+    # Todo: 修改为 username, 不必系统用户了
     su_enabled = models.BooleanField(default=False, verbose_name=_('User switch'))
     su_from = models.ForeignKey('self', on_delete=models.SET_NULL, related_name='su_to', null=True, verbose_name=_("Switch from"))
 
