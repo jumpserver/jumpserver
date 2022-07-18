@@ -4883,7 +4883,7 @@ msgstr "链接过期"
 
 #: terminal/models/sharing.py:68
 msgid "User not allowed to join"
-msgstr "来源 IP 不被允许登录"
+msgstr "该用户无权加入会话"
 
 #: terminal/models/sharing.py:85 terminal/serializers/sharing.py:59
 msgid "Joiner"
