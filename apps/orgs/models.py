@@ -80,6 +80,7 @@ class Organization(OrgRoleMixin, models.Model):
         verbose_name = _("Organization")
         permissions = (
             ('view_rootorg', _('Can view root org')),
+            ('view_alljoinedorg', _('Can view all joined org')),
         )
 
     def __str__(self):

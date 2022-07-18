@@ -126,9 +126,16 @@ class RoleBinding(JMSModel):
             org_ids = [b.org.id for b in bindings if b.org]
             orgs = all_orgs.filter(id__in=org_ids)
 
+        workbench_perm = 'rbac.view_workbench'
         # 全局组织
-        if orgs and user.has_perm('orgs.view_rootorg'):
-            orgs = [Organization.root(), *list(orgs)]
+        if orgs and perm != workbench_perm and user.has_perm('orgs.view_rootorg'):
+            root_org = Organization.root()
+            orgs = [root_org, *list(orgs)]
+        elif orgs and perm == workbench_perm and user.has_perm('orgs.view_alljoinedorg'):
+            # Todo: 先复用组织
+            root_org = Organization.root()
+            root_org.name = _("All organizations")
+            orgs = [root_org, *list(orgs)]
         return orgs
 
 
