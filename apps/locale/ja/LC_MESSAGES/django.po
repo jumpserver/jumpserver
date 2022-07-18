@@ -4959,7 +4959,7 @@ msgstr "リンク期限切れ"
 
 #: terminal/models/sharing.py:68
 msgid "User not allowed to join"
-msgstr "IPは許可されていません"
+msgstr "ユーザーはセッションに参加できません"
 
 #: terminal/models/sharing.py:85 terminal/serializers/sharing.py:59
 msgid "Joiner"
