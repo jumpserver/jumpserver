@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-15 17:15+0800\n"
+"POT-Creation-Date: 2022-07-18 14:01+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -88,8 +88,8 @@ msgstr "ログイン確認"
 #: acls/models/login_acl.py:24 acls/models/login_asset_acl.py:20
 #: assets/models/cmd_filter.py:30 assets/models/label.py:15 audits/models.py:37
 #: audits/models.py:62 audits/models.py:87 audits/serializers.py:100
-#: authentication/models.py:54 authentication/models.py:78 orgs/models.py:214
-#: perms/models/base.py:84 rbac/builtin.py:117 rbac/models/rolebinding.py:41
+#: authentication/models.py:54 authentication/models.py:78 orgs/models.py:215
+#: perms/models/base.py:84 rbac/builtin.py:120 rbac/models/rolebinding.py:41
 #: terminal/backends/command/models.py:20
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:44
 #: terminal/models/sharing.py:33 terminal/notifications.py:91
@@ -363,7 +363,7 @@ msgstr "タイプ表示"
 #: assets/serializers/account.py:18 assets/serializers/cmd_filter.py:28
 #: assets/serializers/cmd_filter.py:48 common/db/models.py:114
 #: common/mixins/models.py:50 ops/models/adhoc.py:39 ops/models/command.py:30
-#: orgs/models.py:67 orgs/models.py:217 perms/models/base.py:92
+#: orgs/models.py:67 orgs/models.py:218 perms/models/base.py:92
 #: users/models/group.py:18 users/models/user.py:922
 #: xpack/plugins/cloud/models.py:125
 msgid "Date created"
@@ -373,7 +373,7 @@ msgstr "作成された日付"
 #: assets/models/gathered_user.py:20 assets/serializers/account.py:21
 #: assets/serializers/cmd_filter.py:29 assets/serializers/cmd_filter.py:49
 #: common/db/models.py:115 common/mixins/models.py:51 ops/models/adhoc.py:40
-#: orgs/models.py:218
+#: orgs/models.py:219
 msgid "Date updated"
 msgstr "更新日"
 
@@ -624,7 +624,7 @@ msgstr "ラベル"
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:52
 #: assets/models/cmd_filter.py:99 assets/models/group.py:21
 #: common/db/models.py:112 common/mixins/models.py:49 orgs/models.py:66
-#: orgs/models.py:219 perms/models/base.py:91 users/models/user.py:706
+#: orgs/models.py:220 perms/models/base.py:91 users/models/user.py:706
 #: users/serializers/group.py:33
 #: xpack/plugins/change_auth_plan/models/base.py:48
 #: xpack/plugins/cloud/models.py:122 xpack/plugins/gathered_user/models.py:30
@@ -735,7 +735,7 @@ msgid "Trigger mode"
 msgstr "トリガーモード"
 
 #: assets/models/backup.py:119 audits/models.py:127
-#: terminal/models/sharing.py:106
+#: terminal/models/sharing.py:108
 #: xpack/plugins/change_auth_plan/models/base.py:201
 #: xpack/plugins/change_auth_plan/serializers/app.py:66
 #: xpack/plugins/change_auth_plan/serializers/asset.py:180
@@ -1435,7 +1435,7 @@ msgid "Symlink"
 msgstr "Symlink"
 
 #: audits/models.py:38 audits/models.py:66 audits/models.py:89
-#: terminal/models/session.py:51 terminal/models/sharing.py:94
+#: terminal/models/session.py:51 terminal/models/sharing.py:96
 msgid "Remote addr"
 msgstr "リモートaddr"
 
@@ -1447,7 +1447,7 @@ msgstr "操作"
 msgid "Filename"
 msgstr "ファイル名"
 
-#: audits/models.py:43 audits/models.py:117 terminal/models/sharing.py:102
+#: audits/models.py:43 audits/models.py:117 terminal/models/sharing.py:104
 #: tickets/views/approve.py:115
 #: xpack/plugins/change_auth_plan/serializers/app.py:87
 #: xpack/plugins/change_auth_plan/serializers/asset.py:198
@@ -3025,7 +3025,7 @@ msgid "App organizations"
 msgstr "アプリ組織"
 
 #: orgs/mixins/models.py:57 orgs/mixins/serializers.py:25 orgs/models.py:80
-#: orgs/models.py:211 rbac/const.py:7 rbac/models/rolebinding.py:48
+#: orgs/models.py:212 rbac/const.py:7 rbac/models/rolebinding.py:48
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:62
 #: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:71
 msgid "Organization"
@@ -3039,7 +3039,11 @@ msgstr "グローバル組織"
 msgid "Can view root org"
 msgstr "グローバル組織を表示できます"
 
-#: orgs/models.py:216 rbac/models/role.py:46 rbac/models/rolebinding.py:44
+#: orgs/models.py:83
+msgid "Can view all joined org"
+msgstr "参加しているすべての組織を表示できます"
+
+#: orgs/models.py:217 rbac/models/role.py:46 rbac/models/rolebinding.py:44
 #: users/models/user.py:671
 msgid "Role"
 msgstr "ロール"
@@ -3260,27 +3264,27 @@ msgstr "{} 少なくとも1つのシステムロール"
 msgid "RBAC"
 msgstr "RBAC"
 
-#: rbac/builtin.py:108
+#: rbac/builtin.py:111
 msgid "SystemAdmin"
 msgstr "システム管理者"
 
-#: rbac/builtin.py:111
+#: rbac/builtin.py:114
 msgid "SystemAuditor"
 msgstr "システム監査人"
 
-#: rbac/builtin.py:114
+#: rbac/builtin.py:117
 msgid "SystemComponent"
 msgstr "システムコンポーネント"
 
-#: rbac/builtin.py:120
+#: rbac/builtin.py:123
 msgid "OrgAdmin"
 msgstr "組織管理者"
 
-#: rbac/builtin.py:123
+#: rbac/builtin.py:126
 msgid "OrgAuditor"
 msgstr "監査員を組織する"
 
-#: rbac/builtin.py:126
+#: rbac/builtin.py:129
 msgid "OrgUser"
 msgstr "組織ユーザー"
 
@@ -3336,18 +3340,22 @@ msgstr "組織の役割"
 msgid "Role binding"
 msgstr "ロールバインディング"
 
-#: rbac/models/rolebinding.py:159
+#: rbac/models/rolebinding.py:137
+msgid "All organizations"
+msgstr "全ての組織"
+
+#: rbac/models/rolebinding.py:166
 msgid ""
 "User last role in org, can not be delete, you can remove user from org "
 "instead"
 msgstr ""
 "ユーザーの最後のロールは削除できません。ユーザーを組織から削除できます。"
 
-#: rbac/models/rolebinding.py:166
+#: rbac/models/rolebinding.py:173
 msgid "Organization role binding"
 msgstr "組織の役割バインディング"
 
-#: rbac/models/rolebinding.py:181
+#: rbac/models/rolebinding.py:188
 msgid "System role binding"
 msgstr "システムロールバインディング"
 
@@ -4775,7 +4783,7 @@ msgid "Output"
 msgstr "出力"
 
 #: terminal/backends/command/models.py:25 terminal/models/replay.py:9
-#: terminal/models/sharing.py:19 terminal/models/sharing.py:76
+#: terminal/models/sharing.py:19 terminal/models/sharing.py:78
 #: terminal/templates/terminal/_msg_command_alert.html:10
 #: tickets/models/ticket/command_confirm.py:20
 msgid "Session"
@@ -4897,7 +4905,7 @@ msgstr "セッションのリプレイをアップロードできます"
 msgid "Can download session replay"
 msgstr "セッション再生をダウンロードできます"
 
-#: terminal/models/session.py:50 terminal/models/sharing.py:99
+#: terminal/models/session.py:50 terminal/models/sharing.py:101
 msgid "Login from"
 msgstr "ログイン元"
 
@@ -4933,7 +4941,7 @@ msgstr "セッションアクションのパーマを検証できます"
 msgid "Creator"
 msgstr "作成者"
 
-#: terminal/models/sharing.py:26 terminal/models/sharing.py:78
+#: terminal/models/sharing.py:26 terminal/models/sharing.py:80
 msgid "Verify code"
 msgstr "コードの確認"
 
@@ -4941,7 +4949,7 @@ msgstr "コードの確認"
 msgid "Expired time (min)"
 msgstr "期限切れ時間 (分)"
 
-#: terminal/models/sharing.py:37 terminal/models/sharing.py:81
+#: terminal/models/sharing.py:37 terminal/models/sharing.py:83
 msgid "Session sharing"
 msgstr "セッション共有"
 
@@ -4949,40 +4957,40 @@ msgstr "セッション共有"
 msgid "Can add super session sharing"
 msgstr "スーパーセッション共有を追加できます"
 
-#: terminal/models/sharing.py:64
+#: terminal/models/sharing.py:66
 msgid "Link not active"
 msgstr "リンクがアクティブでない"
 
-#: terminal/models/sharing.py:66
+#: terminal/models/sharing.py:68
 msgid "Link expired"
 msgstr "リンク期限切れ"
 
-#: terminal/models/sharing.py:68
+#: terminal/models/sharing.py:70
 msgid "User not allowed to join"
 msgstr "ユーザーはセッションに参加できません"
 
-#: terminal/models/sharing.py:85 terminal/serializers/sharing.py:59
+#: terminal/models/sharing.py:87 terminal/serializers/sharing.py:59
 msgid "Joiner"
 msgstr "ジョイナー"
 
-#: terminal/models/sharing.py:88
+#: terminal/models/sharing.py:90
 msgid "Date joined"
 msgstr "参加日"
 
-#: terminal/models/sharing.py:91
+#: terminal/models/sharing.py:93
 msgid "Date left"
 msgstr "日付が残っています"
 
-#: terminal/models/sharing.py:109 tickets/const.py:26
+#: terminal/models/sharing.py:111 tickets/const.py:26
 #: xpack/plugins/change_auth_plan/models/base.py:192
 msgid "Finished"
 msgstr "終了"
 
-#: terminal/models/sharing.py:114
+#: terminal/models/sharing.py:116
 msgid "Session join record"
 msgstr "セッション参加記録"
 
-#: terminal/models/sharing.py:130
+#: terminal/models/sharing.py:132
 msgid "Invalid verification code"
 msgstr "検証コードが無効"
 
