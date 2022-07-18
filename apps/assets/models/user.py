@@ -199,6 +199,10 @@ class SystemUser(ProtocolMixin, BaseUser):
             return
         self.su_from.assets.add(*tuple(assets_or_ids))
 
+    @classmethod
+    def create_accounts_with_assets(cls, asset_ids, system_user_ids):
+        pass
+
     class Meta:
         ordering = ['name']
         unique_together = [('name', 'org_id')]
@@ -206,6 +210,12 @@ class SystemUser(ProtocolMixin, BaseUser):
         permissions = [
             ('match_systemuser', _('Can match system user')),
         ]
+
+
+class SystemUserAccount(models.Model):
+    system_user = models.ForeignKey('SystemUser', on_delete=models.CASCADE, related_name='accounts')
+    account = models.ForeignKey('assets.Account', on_delete=models.CASCADE, related_name='system_users')
+    date_created = models.DateTimeField(auto_now_add=True)
 
 
 # Deprecated: 准备废弃

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from django.db.models.signals import (
-    post_save, m2m_changed, pre_save, pre_delete, post_delete
+    post_save, m2m_changed
 )
 from django.dispatch import receiver
 
@@ -32,6 +32,9 @@ def on_system_user_assets_change(instance, action, model, pk_set, **kwargs):
         logger.debug('No system user found')
         return
 
+    if action != POST_ADD:
+        return
+
     if model == Asset:
         system_user_ids = [instance.id]
         asset_ids = pk_set
@@ -39,6 +42,7 @@ def on_system_user_assets_change(instance, action, model, pk_set, **kwargs):
         system_user_ids = pk_set
         asset_ids = [instance.id]
     # todo: Auto create account if need
+    SystemUser.create_accounts_with_assets(asset_ids, system_user_ids)
 
 
 @receiver(m2m_changed, sender=SystemUser.users.through)
