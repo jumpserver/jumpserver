@@ -91,11 +91,6 @@ class ConnectionTokenMixin:
             "config": rdp_config
         }
 
-    def get_host(self, endpoint):
-        if not endpoint.host:
-            return self.request.get_host()
-        return endpoint.host
-
     def get_rdp_file_info(self, token: ConnectionToken):
         rdp_options = {
             'full address:s': '',
@@ -145,9 +140,7 @@ class ConnectionTokenMixin:
         endpoint = self.get_smart_endpoint(
             protocol='rdp', asset=token.asset, application=token.application
         )
-        # TODO 暂时获取一下host，后续优化
-        host  = self.get_host(endpoint)
-        rdp_options['full address:s'] = f'{host}:{endpoint.rdp_port}'
+        rdp_options['full address:s'] = f'{endpoint.host}:{endpoint.rdp_port}'
 
         # 设置用户名
         rdp_options['username:s'] = '{}|{}'.format(token.user.username, str(token.id))
@@ -199,10 +192,8 @@ class ConnectionTokenMixin:
         endpoint = self.get_smart_endpoint(
             protocol='ssh', asset=token.asset, application=token.application
         )
-        # TODO 暂时获取一下host，后续优化
-        host  = self.get_host(endpoint)
         data = {
-            'ip': host,
+            'ip': endpoint.host,
             'port': str(endpoint.ssh_port),
             'username': 'JMS-{}'.format(str(token.id)),
             'password': token.secret

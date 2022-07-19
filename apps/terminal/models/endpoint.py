@@ -63,8 +63,6 @@ class Endpoint(JMSModel):
             'http_port': 0,
         }
         endpoint, created = cls.objects.get_or_create(id=cls.default_id, defaults=data)
-        if not endpoint.host and request:
-            endpoint.host = request.get_host().split(':')[0]
         return endpoint
 
     @classmethod
@@ -122,4 +120,7 @@ class EndpointRule(JMSModel):
             endpoint = endpoint_rule.endpoint
         else:
             endpoint = Endpoint.get_or_create_default(request)
+        if not endpoint.host and request:
+            # 动态添加 current request host
+            endpoint.host = request.get_host().split(':')[0]
         return endpoint
