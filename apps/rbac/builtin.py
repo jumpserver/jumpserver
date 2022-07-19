@@ -23,7 +23,7 @@ user_perms = (
 )
 
 system_user_perms = (
-    ('authentication', 'connectiontoken', 'add', 'connectiontoken'),
+    ('authentication', 'connectiontoken', 'add,view', 'connectiontoken'),
     ('authentication', 'temptoken', 'add,change,view', 'temptoken'),
     ('authentication', 'accesskey', '*', '*'),
     ('tickets', 'ticket', 'view', 'ticket'),

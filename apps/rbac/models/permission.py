@@ -60,11 +60,11 @@ class Permission(DjangoPermission):
             if actions == '*' and resource == '*':
                 pass
             elif actions == '*' and resource != '*':
-                kwargs['codename__iregex'] = r'[a-z]+_{}'.format(resource)
+                kwargs['codename__iregex'] = r'[a-z]+_{}$'.format(resource)
             elif actions != '*' and resource == '*':
                 kwargs['codename__iregex'] = r'({})_[a-z]+'.format(actions_regex)
             else:
-                kwargs['codename__iregex'] = r'({})_{}'.format(actions_regex, resource)
+                kwargs['codename__iregex'] = r'({})_{}$'.format(actions_regex, resource)
             q |= Q(**kwargs)
         return q
 
