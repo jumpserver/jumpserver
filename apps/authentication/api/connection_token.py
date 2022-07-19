@@ -233,6 +233,11 @@ class ConnectionTokenViewSet(ConnectionTokenMixin, RootOrgViewMixin, JMSModelVie
     }
     queryset = ConnectionToken.objects.all()
 
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        queryset = queryset.filter(user=self.request.user)
+        return queryset
+
     def create_connection_token(self):
         data = self.request.query_params if self.request.method == 'GET' else self.request.data
         serializer = self.get_serializer(data=data)
