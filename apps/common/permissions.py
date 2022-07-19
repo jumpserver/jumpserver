@@ -57,6 +57,9 @@ class UserConfirmation(permissions.BasePermission):
     confirm_type = ConfirmType.ReLogin
 
     def has_permission(self, request, view):
+        if not settings.SECURITY_VIEW_AUTH_NEED_MFA:
+            return True
+
         confirm_level = request.session.get('CONFIRM_LEVEL')
         confirm_time = request.session.get('CONFIRM_TIME')
 
