@@ -3,6 +3,10 @@ import uuid
 
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
+from common.permissions import IsValidUserOrConnectionToken
+from common.utils import get_object_or_none
+from orgs.utils import tmp_to_root_org
+from authentication.models import ConnectionToken
 
 from users.notifications import (
     ResetPasswordMsg, ResetPasswordSuccessMsg, ResetSSHKeyMsg,
@@ -44,11 +48,22 @@ class UserResetPKApi(UserQuerysetMixin, generics.UpdateAPIView):
 
 
 class UserProfileApi(generics.RetrieveUpdateAPIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsValidUserOrConnectionToken,)
     serializer_class = serializers.UserProfileSerializer
 
     def get_object(self):
-        return self.request.user
+        user = self.get_connection_token_user()
+        if not user:
+            user = self.request.user
+        return user
+
+    def get_connection_token_user(self):
+        token_id = self.request.query_params.get('token')
+        if not token_id:
+            return False
+        with tmp_to_root_org():
+            token = get_object_or_none(ConnectionToken, id=token_id)
+        return token.user
 
 
 class UserPasswordApi(generics.RetrieveUpdateAPIView):
