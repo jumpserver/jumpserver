@@ -73,7 +73,7 @@ def check_asset_permission_will_expired():
 
     for asset_perm in asset_perms:
         date_expired = dt_parser(asset_perm.date_expired)
-        remain_days = (end - date_expired).days
+        remain_days = (date_expired - start).days
 
         org = asset_perm.org
         # 资产授权按照组织分类
@@ -121,7 +121,7 @@ def check_app_permission_will_expired():
 
     for app_perm in app_perms:
         date_expired = dt_parser(app_perm.date_expired)
-        remain_days = (end - date_expired).days
+        remain_days = (date_expired - start).days
 
         org = app_perm.org
         if org in org_perm_remain_day_mapper[remain_days]:
