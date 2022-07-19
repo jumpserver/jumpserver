@@ -52,10 +52,11 @@ class UserProfileApi(generics.RetrieveUpdateAPIView):
     serializer_class = serializers.UserProfileSerializer
 
     def get_object(self):
-        user = self.get_connection_token_user()
-        if not user:
-            user = self.request.user
-        return user
+        if self.request.user.is_anonymous:
+            user = self.get_connection_token_user()
+            if user:
+                return user
+        return self.request.user
 
     def get_connection_token_user(self):
         token_id = self.request.query_params.get('token')

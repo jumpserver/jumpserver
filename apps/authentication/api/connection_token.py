@@ -231,12 +231,9 @@ class ConnectionTokenViewSet(ConnectionTokenMixin, RootOrgViewMixin, JMSModelVie
         'get_rdp_file': 'authentication.add_connectiontoken',
         'get_client_protocol_url': 'authentication.add_connectiontoken',
     }
-    queryset = ConnectionToken.objects.all()
 
-    def filter_queryset(self, queryset):
-        queryset = super().filter_queryset(queryset)
-        queryset = queryset.filter(user=self.request.user)
-        return queryset
+    def get_queryset(self):
+        return ConnectionToken.objects.filter(user=self.request.user)
 
     def create_connection_token(self):
         data = self.request.query_params if self.request.method == 'GET' else self.request.data
