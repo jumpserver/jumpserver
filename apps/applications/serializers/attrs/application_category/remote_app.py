@@ -31,7 +31,7 @@ class ExistAssetPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
 
 
 class RemoteAppSerializer(serializers.Serializer):
-    asset_info = serializers.SerializerMethodField()
+    asset_info = serializers.SerializerMethodField(label=_('Asset Info'))
     asset = ExistAssetPrimaryKeyRelatedField(
         queryset=Asset.objects, required=True, label=_("Asset"), allow_null=True
     )

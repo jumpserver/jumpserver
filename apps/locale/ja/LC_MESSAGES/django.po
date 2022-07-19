@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-18 14:01+0800\n"
+"POT-Creation-Date: 2022-07-19 10:45+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -411,6 +411,10 @@ msgstr "ホスト"
 #: xpack/plugins/cloud/serializers/account_attrs.py:71
 msgid "Port"
 msgstr "ポート"
+
+#: applications/serializers/attrs/application_category/remote_app.py:34
+msgid "Asset Info"
+msgstr "資産情報"
 
 #: applications/serializers/attrs/application_category/remote_app.py:39
 #: applications/serializers/attrs/application_type/chrome.py:14
