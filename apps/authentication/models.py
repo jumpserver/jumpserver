@@ -232,11 +232,8 @@ class ConnectionToken(OrgModelMixin, models.JMSModel):
     def asset_or_remote_app_asset(self):
         if self.asset:
             return self.asset
-        if not self.application:
-            return
-        if not self.application.category_remote_app:
-            return
-        return self.application.get_remote_app_asset()
+        if self.application and self.application.category_remote_app:
+            return self.application.get_remote_app_asset()
 
     @lazyproperty
     def cmd_filter_rules(self):
