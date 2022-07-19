@@ -60,9 +60,11 @@ class UserProfileApi(generics.RetrieveUpdateAPIView):
     def get_connection_token_user(self):
         token_id = self.request.query_params.get('token')
         if not token_id:
-            return False
+            return
         with tmp_to_root_org():
             token = get_object_or_none(ConnectionToken, id=token_id)
+        if not token:
+            return
         return token.user
 
 
