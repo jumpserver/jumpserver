@@ -177,7 +177,7 @@ class ConnectionTokenCmdFilterRuleSerializer(serializers.ModelSerializer):
 
 class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     user = ConnectionTokenUserSerializer(read_only=True)
-    asset = ConnectionTokenAssetSerializer(read_only=True)
+    asset = ConnectionTokenAssetSerializer(read_only=True, source='asset_or_remote_app_asset')
     application = ConnectionTokenApplicationSerializer(read_only=True)
     remote_app = ConnectionTokenRemoteAppSerializer(read_only=True)
     system_user = ConnectionTokenSystemUserSerializer(read_only=True)
