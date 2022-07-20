@@ -226,6 +226,14 @@ class ConnectionTokenViewSet(ConnectionTokenMixin, RootOrgViewMixin, JMSModelVie
     def get_queryset(self):
         return ConnectionToken.objects.filter(user=self.request.user)
 
+    def get_object(self):
+        if self.request.user.is_service_account:
+            # 组件获取 token 详情
+            obj = get_object_or_404(ConnectionToken, pk=self.kwargs.get('pk'))
+        else:
+            obj = super(ConnectionTokenViewSet, self).get_object()
+        return obj
+
     def create_connection_token(self):
         data = self.request.query_params if self.request.method == 'GET' else self.request.data
         serializer = self.get_serializer(data=data)
