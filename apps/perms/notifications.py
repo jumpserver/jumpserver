@@ -1,6 +1,3 @@
-from urllib.parse import urljoin
-
-from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.template.loader import render_to_string
 
@@ -52,7 +49,7 @@ class AssetPermsWillExpireForOrgAdminMsg(UserMessage):
             url = js_reverse(
                 'perms:asset-permission-detail',
                 kwargs={'pk': perm.id}, external=True,
-                api_to_ui=True
+                api_to_ui=True, is_console=True
             ) + f'?oid={perm.org_id}'
             items_with_url.append([perm.name, url])
         return items_with_url
@@ -123,9 +120,12 @@ class AppPermsWillExpireForOrgAdminMsg(UserMessage):
 
     def get_items_with_url(self):
         items_with_url = []
-        perm_detail_url = urljoin(settings.SITE_URL, '/ui/#/perms/app-permissions/{}')
         for perm in self.perms:
-            url = perm_detail_url.format(perm.id) + f'?oid={perm.org_id}'
+            url = js_reverse(
+                'perms:application-permission-detail',
+                kwargs={'pk': perm.id}, external=True,
+                api_to_ui=True, is_console=True
+            ) + f'?oid={perm.org_id}'
             items_with_url.append([perm.name, url])
         return items_with_url
 
