@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-19 10:45+0800\n"
+"POT-Creation-Date: 2022-07-20 13:51+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgstr "Acls"
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
 #: orgs/models.py:65 perms/models/base.py:83 rbac/models/role.py:29
 #: settings/models.py:29 settings/serializers/sms.py:6
-#: terminal/models/endpoint.py:10 terminal/models/endpoint.py:88
+#: terminal/models/endpoint.py:10 terminal/models/endpoint.py:86
 #: terminal/models/storage.py:26 terminal/models/task.py:16
 #: terminal/models/terminal.py:100 users/forms/profile.py:33
 #: users/models/group.py:15 users/models/user.py:661
@@ -38,12 +38,12 @@ msgid "Name"
 msgstr "名前"
 
 #: acls/models/base.py:27 assets/models/cmd_filter.py:84
-#: assets/models/user.py:251 terminal/models/endpoint.py:91
+#: assets/models/user.py:251 terminal/models/endpoint.py:89
 msgid "Priority"
 msgstr "優先順位"
 
 #: acls/models/base.py:28 assets/models/cmd_filter.py:84
-#: assets/models/user.py:251 terminal/models/endpoint.py:92
+#: assets/models/user.py:251 terminal/models/endpoint.py:90
 msgid "1-100, the lower the value will be match first"
 msgstr "1-100、低い値は最初に一致します"
 
@@ -61,7 +61,7 @@ msgstr "アクティブ"
 #: assets/models/domain.py:65 assets/models/group.py:23
 #: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:68
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:34
-#: terminal/models/endpoint.py:23 terminal/models/endpoint.py:98
+#: terminal/models/endpoint.py:23 terminal/models/endpoint.py:96
 #: terminal/models/storage.py:29 terminal/models/terminal.py:114
 #: tickets/models/comment.py:32 tickets/models/ticket/general.py:288
 #: users/models/group.py:16 users/models/user.py:698
@@ -157,7 +157,7 @@ msgstr "コンマ区切り文字列の形式。* はすべて一致すること�
 #: acls/serializers/login_asset_acl.py:51 assets/models/base.py:176
 #: assets/models/gathered_user.py:15 audits/models.py:121
 #: authentication/forms.py:25 authentication/forms.py:27
-#: authentication/models.py:253
+#: authentication/models.py:260
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
 #: ops/models/adhoc.py:159 users/forms/profile.py:32 users/models/user.py:659
@@ -781,7 +781,7 @@ msgstr "失敗しました"
 msgid "Connectivity"
 msgstr "接続性"
 
-#: assets/models/base.py:40 authentication/models.py:256
+#: assets/models/base.py:40 authentication/models.py:263
 msgid "Date verified"
 msgstr "確認済みの日付"
 
@@ -1629,7 +1629,7 @@ msgstr "本を飛ばす"
 msgid "DingTalk"
 msgstr "DingTalk"
 
-#: audits/signal_handlers.py:56 authentication/models.py:260
+#: audits/signal_handlers.py:56 authentication/models.py:267
 msgid "Temporary token"
 msgstr "仮パスワード"
 
@@ -2137,13 +2137,13 @@ msgstr "期限切れ"
 msgid "SSO token"
 msgstr "SSO token"
 
-#: authentication/models.py:72 authentication/models.py:254
+#: authentication/models.py:72 authentication/models.py:261
 #: authentication/templates/authentication/_access_key_modal.html:31
 #: settings/serializers/auth/radius.py:17
 msgid "Secret"
 msgstr "ひみつ"
 
-#: authentication/models.py:74 authentication/models.py:257
+#: authentication/models.py:74 authentication/models.py:264
 #: perms/models/base.py:90 tickets/models/ticket/apply_application.py:26
 #: tickets/models/ticket/apply_asset.py:24 users/models/user.py:703
 msgid "Date expired"
@@ -2201,11 +2201,11 @@ msgstr ""
 "ユーザーがアプリにアクセスする権限を持っていないか、権限の有効期限が切れてい"
 "ます"
 
-#: authentication/models.py:255
+#: authentication/models.py:262
 msgid "Verified"
 msgstr "確認済み"
 
-#: authentication/models.py:276
+#: authentication/models.py:283
 msgid "Super connection token"
 msgstr "スーパー接続トークン"
 
@@ -4882,18 +4882,18 @@ msgstr "Oracle 11g ポート"
 msgid "Oracle 12c Port"
 msgstr "Oracle 12c ポート"
 
-#: terminal/models/endpoint.py:28 terminal/models/endpoint.py:96
+#: terminal/models/endpoint.py:28 terminal/models/endpoint.py:94
 #: terminal/serializers/endpoint.py:57 terminal/serializers/storage.py:38
 #: terminal/serializers/storage.py:50 terminal/serializers/storage.py:80
 #: terminal/serializers/storage.py:90 terminal/serializers/storage.py:98
 msgid "Endpoint"
 msgstr "エンドポイント"
 
-#: terminal/models/endpoint.py:89
+#: terminal/models/endpoint.py:87
 msgid "IP group"
 msgstr "IP グループ"
 
-#: terminal/models/endpoint.py:101
+#: terminal/models/endpoint.py:99
 msgid "Endpoint rule"
 msgstr "エンドポイントルール"
 
@@ -5050,7 +5050,7 @@ msgstr "クワーグ"
 msgid "type"
 msgstr "タイプ"
 
-#: terminal/models/terminal.py:183 terminal/serializers/session.py:39
+#: terminal/models/terminal.py:183
 msgid "Terminal"
 msgstr "ターミナル"
 
@@ -5112,6 +5112,10 @@ msgstr "再生できます"
 #: terminal/serializers/session.py:38
 msgid "Can join"
 msgstr "参加できます"
+
+#: terminal/serializers/session.py:39
+msgid "Terminal ID"
+msgstr "ターミナル ID"
 
 #: terminal/serializers/session.py:41
 msgid "Can terminate"

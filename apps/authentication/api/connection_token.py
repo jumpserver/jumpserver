@@ -1,3 +1,4 @@
+import abc
 import os
 import json
 import base64
@@ -16,8 +17,8 @@ from orgs.mixins.api import RootOrgViewMixin
 from perms.models.base import Action
 from terminal.models import EndpointRule
 from ..serializers import (
-    ConnectionTokenSerializer, ConnectionTokenSecretSerializer, SuperConnectionTokenSerializer,
-    ConnectionTokenDisplaySerializer,
+    ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
+    SuperConnectionTokenSerializer, ConnectionTokenDisplaySerializer,
 )
 from ..models import ConnectionToken
 
@@ -34,9 +35,12 @@ class ConnectionTokenMixin:
         if not is_valid:
             raise PermissionDenied(error)
 
-    @staticmethod
-    def get_request_resources(serializer):
-        user = serializer.validated_data.get('user')
+    @abc.abstractmethod
+    def get_request_resource_user(self, serializer):
+        raise NotImplementedError
+
+    def get_request_resources(self, serializer):
+        user = self.get_request_resource_user(serializer)
         asset = serializer.validated_data.get('asset')
         application = serializer.validated_data.get('application')
         system_user = serializer.validated_data.get('system_user')
@@ -91,11 +95,6 @@ class ConnectionTokenMixin:
             "config": rdp_config
         }
 
-    def get_host(self, endpoint):
-        if not endpoint.host:
-            return self.request.get_host()
-        return endpoint.host
-
     def get_rdp_file_info(self, token: ConnectionToken):
         rdp_options = {
             'full address:s': '',
@@ -145,9 +144,7 @@ class ConnectionTokenMixin:
         endpoint = self.get_smart_endpoint(
             protocol='rdp', asset=token.asset, application=token.application
         )
-        # TODO 暂时获取一下host，后续优化
-        host  = self.get_host(endpoint)
-        rdp_options['full address:s'] = f'{host}:{endpoint.rdp_port}'
+        rdp_options['full address:s'] = f'{endpoint.host}:{endpoint.rdp_port}'
 
         # 设置用户名
         rdp_options['username:s'] = '{}|{}'.format(token.user.username, str(token.id))
@@ -199,10 +196,8 @@ class ConnectionTokenMixin:
         endpoint = self.get_smart_endpoint(
             protocol='ssh', asset=token.asset, application=token.application
         )
-        # TODO 暂时获取一下host，后续优化
-        host  = self.get_host(endpoint)
         data = {
-            'ip': host,
+            'ip': endpoint.host,
             'port': str(endpoint.ssh_port),
             'username': 'JMS-{}'.format(str(token.id)),
             'password': token.secret
@@ -213,8 +208,8 @@ class ConnectionTokenMixin:
 
 class ConnectionTokenViewSet(ConnectionTokenMixin, RootOrgViewMixin, JMSModelViewSet):
     filterset_fields = (
-        'type',
-        'user_display', 'system_user_display', 'application_display', 'asset_display'
+        'type', 'user_display', 'system_user_display',
+        'application_display', 'asset_display'
     )
     search_fields = filterset_fields
     serializer_classes = {
@@ -234,6 +229,17 @@ class ConnectionTokenViewSet(ConnectionTokenMixin, RootOrgViewMixin, JMSModelVie
 
     def get_queryset(self):
         return ConnectionToken.objects.filter(user=self.request.user)
+
+    def get_request_resource_user(self, serializer):
+        return self.request.user
+
+    def get_object(self):
+        if self.request.user.is_service_account:
+            # TODO: 组件获取 token 详情，将来放在 Super-connection-token API 中
+            obj = get_object_or_404(ConnectionToken, pk=self.kwargs.get('pk'))
+        else:
+            obj = super(ConnectionTokenViewSet, self).get_object()
+        return obj
 
     def create_connection_token(self):
         data = self.request.query_params if self.request.method == 'GET' else self.request.data
@@ -301,6 +307,9 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         'create': 'authentication.add_superconnectiontoken',
         'renewal': 'authentication.add_superconnectiontoken'
     }
+
+    def get_request_resource_user(self, serializer):
+        return serializer.validated_data.get('user')
 
     @action(methods=['PATCH'], detail=False)
     def renewal(self, request, *args, **kwargs):

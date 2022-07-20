@@ -47,21 +47,6 @@ class AbstractSessionCommand(OrgModelMixin):
         risk_mapper = dict(cls.RISK_LEVEL_CHOICES)
         return risk_mapper.get(risk_level)
 
-    @classmethod
-    def from_dict(cls, d):
-        self = cls()
-        for k, v in d.items():
-            setattr(self, k, v)
-        return self
-
-    @classmethod
-    def from_multi_dict(cls, l):
-        commands = []
-        for d in l:
-            command = cls.from_dict(d)
-            commands.append(command)
-        return commands
-
     def to_dict(self):
         d = {}
         for field in self._meta.fields:
