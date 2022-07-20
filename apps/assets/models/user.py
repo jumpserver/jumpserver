@@ -7,6 +7,8 @@ import logging
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.shortcuts import get_object_or_404
+from django.core.cache import cache
 
 from common.utils import signer
 from users.models import User
@@ -205,13 +207,20 @@ class SystemUser(ProtocolMixin, BaseUser):
         pass
 
     def get_manual_account(self, user_id, asset_id):
-        pass
+        cache_key = 'manual_account_{}_{}_{}'.format(self.id, user_id, asset_id)
+        return cache.get(cache_key)
+
+    def create_manual_account(self, user_id, asset_id, account, ttl=300):
+        cache_key = 'manual_account_{}_{}_{}'.format(self.id, user_id, asset_id)
+        cache.set(cache_key, account, ttl)
 
     def get_auto_account(self, user_id, asset_id):
+        from .account import Account
         username = self.username
         if self.username_same_with_user:
             user = get_object_or_404(User, id=user_id)
             username = user.username
+        return get_object_or_404(Account, asset_id=asset_id, username=username)
 
     def get_account(self, user_id, asset_id):
         if self.login_mode == self.LOGIN_AUTO:
@@ -226,12 +235,6 @@ class SystemUser(ProtocolMixin, BaseUser):
         permissions = [
             ('match_systemuser', _('Can match system user')),
         ]
-
-
-class SystemUserAccount(models.Model):
-    system_user = models.ForeignKey('SystemUser', on_delete=models.CASCADE, related_name='accounts')
-    account = models.ForeignKey('assets.Account', on_delete=models.CASCADE, related_name='system_users')
-    date_created = models.DateTimeField(auto_now_add=True)
 
 
 # Deprecated: 准备废弃

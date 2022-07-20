@@ -82,9 +82,10 @@ class SystemUserAssetAccountApi(generics.RetrieveUpdateDestroyAPIView):
 
     def get_object(self):
         asset_id = self.kwargs.get('asset_id')
-        user_id = self.request.query_params.get("user_id")
+        user_id = self.kwargs.get("user_id")
         system_user = super().get_object()
-        return system_user.get_account(user_id, asset_id)
+        account = system_user.get_account(user_id, asset_id)
+        return account
 
 
 class SystemUserAuthInfoApi(generics.RetrieveUpdateDestroyAPIView):
