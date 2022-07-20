@@ -117,6 +117,9 @@ tencentcloud-sdk-python==3.0.662
 aliyun-python-sdk-core-v3==2.9.1
 aliyun-python-sdk-ecs==4.10.1
 huaweicloud-sdk-python==1.0.21
+# python-keystoneclient need keystoneauth1>=3.4.0
+# huaweicloud-sdk-python need keystoneauth1<=3.4.0
+keystoneauth1==3.4.0
 boto3==1.24.12
 botocore==1.27.12
 s3transfer==0.6.0
