@@ -16,8 +16,8 @@ from orgs.mixins.api import RootOrgViewMixin
 from perms.models.base import Action
 from terminal.models import EndpointRule
 from ..serializers import (
-    ConnectionTokenSerializer, ConnectionTokenSecretSerializer, SuperConnectionTokenSerializer,
-    ConnectionTokenDisplaySerializer,
+    ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
+    SuperConnectionTokenSerializer, ConnectionTokenDisplaySerializer,
 )
 from ..models import ConnectionToken
 
@@ -204,8 +204,8 @@ class ConnectionTokenMixin:
 
 class ConnectionTokenViewSet(ConnectionTokenMixin, RootOrgViewMixin, JMSModelViewSet):
     filterset_fields = (
-        'type',
-        'user_display', 'system_user_display', 'application_display', 'asset_display'
+        'type', 'user_display', 'system_user_display',
+        'application_display', 'asset_display'
     )
     search_fields = filterset_fields
     serializer_classes = {
