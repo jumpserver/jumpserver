@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-19 10:45+0800\n"
+"POT-Creation-Date: 2022-07-20 13:51+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -28,7 +28,7 @@ msgstr "访问控制"
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
 #: orgs/models.py:65 perms/models/base.py:83 rbac/models/role.py:29
 #: settings/models.py:29 settings/serializers/sms.py:6
-#: terminal/models/endpoint.py:10 terminal/models/endpoint.py:88
+#: terminal/models/endpoint.py:10 terminal/models/endpoint.py:86
 #: terminal/models/storage.py:26 terminal/models/task.py:16
 #: terminal/models/terminal.py:100 users/forms/profile.py:33
 #: users/models/group.py:15 users/models/user.py:661
@@ -37,12 +37,12 @@ msgid "Name"
 msgstr "名称"
 
 #: acls/models/base.py:27 assets/models/cmd_filter.py:84
-#: assets/models/user.py:251 terminal/models/endpoint.py:91
+#: assets/models/user.py:251 terminal/models/endpoint.py:89
 msgid "Priority"
 msgstr "优先级"
 
 #: acls/models/base.py:28 assets/models/cmd_filter.py:84
-#: assets/models/user.py:251 terminal/models/endpoint.py:92
+#: assets/models/user.py:251 terminal/models/endpoint.py:90
 msgid "1-100, the lower the value will be match first"
 msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 
@@ -60,7 +60,7 @@ msgstr "激活中"
 #: assets/models/domain.py:65 assets/models/group.py:23
 #: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:68
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:34
-#: terminal/models/endpoint.py:23 terminal/models/endpoint.py:98
+#: terminal/models/endpoint.py:23 terminal/models/endpoint.py:96
 #: terminal/models/storage.py:29 terminal/models/terminal.py:114
 #: tickets/models/comment.py:32 tickets/models/ticket/general.py:288
 #: users/models/group.py:16 users/models/user.py:698
@@ -156,7 +156,7 @@ msgstr "格式为逗号分隔的字符串, * 表示匹配所有. "
 #: acls/serializers/login_asset_acl.py:51 assets/models/base.py:176
 #: assets/models/gathered_user.py:15 audits/models.py:121
 #: authentication/forms.py:25 authentication/forms.py:27
-#: authentication/models.py:253
+#: authentication/models.py:260
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
 #: ops/models/adhoc.py:159 users/forms/profile.py:32 users/models/user.py:659
@@ -776,7 +776,7 @@ msgstr "失败"
 msgid "Connectivity"
 msgstr "可连接性"
 
-#: assets/models/base.py:40 authentication/models.py:256
+#: assets/models/base.py:40 authentication/models.py:263
 msgid "Date verified"
 msgstr "校验日期"
 
@@ -1617,7 +1617,7 @@ msgstr "飞书"
 msgid "DingTalk"
 msgstr "钉钉"
 
-#: audits/signal_handlers.py:56 authentication/models.py:260
+#: audits/signal_handlers.py:56 authentication/models.py:267
 msgid "Temporary token"
 msgstr "临时密码"
 
@@ -2116,13 +2116,13 @@ msgstr "过期时间"
 msgid "SSO token"
 msgstr "SSO token"
 
-#: authentication/models.py:72 authentication/models.py:254
+#: authentication/models.py:72 authentication/models.py:261
 #: authentication/templates/authentication/_access_key_modal.html:31
 #: settings/serializers/auth/radius.py:17
 msgid "Secret"
 msgstr "密钥"
 
-#: authentication/models.py:74 authentication/models.py:257
+#: authentication/models.py:74 authentication/models.py:264
 #: perms/models/base.py:90 tickets/models/ticket/apply_application.py:26
 #: tickets/models/ticket/apply_asset.py:24 users/models/user.py:703
 msgid "Date expired"
@@ -2176,11 +2176,11 @@ msgstr "应用不存在"
 msgid "User has no permission to access application or permission expired"
 msgstr "用户没有权限访问应用或权限已过期"
 
-#: authentication/models.py:255
+#: authentication/models.py:262
 msgid "Verified"
 msgstr "已校验"
 
-#: authentication/models.py:276
+#: authentication/models.py:283
 msgid "Super connection token"
 msgstr "超级连接令牌"
 
@@ -4806,18 +4806,18 @@ msgstr "Oracle 11g 端口"
 msgid "Oracle 12c Port"
 msgstr "Oracle 12c 端口"
 
-#: terminal/models/endpoint.py:28 terminal/models/endpoint.py:96
+#: terminal/models/endpoint.py:28 terminal/models/endpoint.py:94
 #: terminal/serializers/endpoint.py:57 terminal/serializers/storage.py:38
 #: terminal/serializers/storage.py:50 terminal/serializers/storage.py:80
 #: terminal/serializers/storage.py:90 terminal/serializers/storage.py:98
 msgid "Endpoint"
 msgstr "端点"
 
-#: terminal/models/endpoint.py:89
+#: terminal/models/endpoint.py:87
 msgid "IP group"
 msgstr "IP 组"
 
-#: terminal/models/endpoint.py:101
+#: terminal/models/endpoint.py:99
 msgid "Endpoint rule"
 msgstr "端点规则"
 
@@ -4974,7 +4974,7 @@ msgstr "其它参数"
 msgid "type"
 msgstr "类型"
 
-#: terminal/models/terminal.py:183 terminal/serializers/session.py:39
+#: terminal/models/terminal.py:183
 msgid "Terminal"
 msgstr "终端"
 
@@ -5034,6 +5034,10 @@ msgstr "是否可重放"
 #: terminal/serializers/session.py:38
 msgid "Can join"
 msgstr "是否可加入"
+
+#: terminal/serializers/session.py:39
+msgid "Terminal ID"
+msgstr "终端 ID"
 
 #: terminal/serializers/session.py:41
 msgid "Can terminate"
