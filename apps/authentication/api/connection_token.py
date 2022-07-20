@@ -1,3 +1,4 @@
+import abc
 import os
 import json
 import base64
@@ -34,9 +35,12 @@ class ConnectionTokenMixin:
         if not is_valid:
             raise PermissionDenied(error)
 
-    @staticmethod
-    def get_request_resources(serializer):
-        user = serializer.validated_data.get('user')
+    @abc.abstractmethod
+    def get_request_resource_user(self, serializer):
+        raise NotImplementedError
+
+    def get_request_resources(self, serializer):
+        user = self.get_request_resource_user(serializer)
         asset = serializer.validated_data.get('asset')
         application = serializer.validated_data.get('application')
         system_user = serializer.validated_data.get('system_user')
@@ -226,6 +230,9 @@ class ConnectionTokenViewSet(ConnectionTokenMixin, RootOrgViewMixin, JMSModelVie
     def get_queryset(self):
         return ConnectionToken.objects.filter(user=self.request.user)
 
+    def get_request_resource_user(self, serializer):
+        return self.request.user
+
     def get_object(self):
         if self.request.user.is_service_account:
             # 组件获取 token 详情
@@ -300,6 +307,9 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         'create': 'authentication.add_superconnectiontoken',
         'renewal': 'authentication.add_superconnectiontoken'
     }
+
+    def get_request_resource_user(self, serializer):
+        return serializer.validated_data.get('user')
 
     @action(methods=['PATCH'], detail=False)
     def renewal(self, request, *args, **kwargs):
