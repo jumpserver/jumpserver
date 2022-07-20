@@ -18,7 +18,7 @@ from common.utils.common import lazyproperty
 from common.utils import get_logger
 from common.utils.timezone import local_now_date_display, utc_now
 from common.exceptions import JMSException
-from .models import AbstractSessionCommand
+from terminal.models import Command
 
 logger = get_logger(__file__)
 
@@ -181,7 +181,7 @@ class CommandStore(object):
                 item['_source'].update({'id': item['_id']})
                 source_data.append(item['_source'])
 
-        return AbstractSessionCommand.from_multi_dict(source_data)
+        return Command.from_multi_dict(source_data)
 
     def count(self, **query):
         body = self.get_query_body(**query)
