@@ -1,3 +1,4 @@
+import abc
 import os
 import json
 import base64
@@ -34,9 +35,12 @@ class ConnectionTokenMixin:
         if not is_valid:
             raise PermissionDenied(error)
 
-    @staticmethod
-    def get_request_resources(serializer):
-        user = serializer.validated_data.get('user')
+    @abc.abstractmethod
+    def get_request_resource_user(self, serializer):
+        raise NotImplementedError
+
+    def get_request_resources(self, serializer):
+        user = self.get_request_resource_user(serializer)
         asset = serializer.validated_data.get('asset')
         application = serializer.validated_data.get('application')
         system_user = serializer.validated_data.get('system_user')
@@ -226,6 +230,17 @@ class ConnectionTokenViewSet(ConnectionTokenMixin, RootOrgViewMixin, JMSModelVie
     def get_queryset(self):
         return ConnectionToken.objects.filter(user=self.request.user)
 
+    def get_request_resource_user(self, serializer):
+        return self.request.user
+
+    def get_object(self):
+        if self.request.user.is_service_account:
+            # TODO: 组件获取 token 详情，将来放在 Super-connection-token API 中
+            obj = get_object_or_404(ConnectionToken, pk=self.kwargs.get('pk'))
+        else:
+            obj = super(ConnectionTokenViewSet, self).get_object()
+        return obj
+
     def create_connection_token(self):
         data = self.request.query_params if self.request.method == 'GET' else self.request.data
         serializer = self.get_serializer(data=data)
@@ -292,6 +307,9 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         'create': 'authentication.add_superconnectiontoken',
         'renewal': 'authentication.add_superconnectiontoken'
     }
+
+    def get_request_resource_user(self, serializer):
+        return serializer.validated_data.get('user')
 
     @action(methods=['PATCH'], detail=False)
     def renewal(self, request, *args, **kwargs):
