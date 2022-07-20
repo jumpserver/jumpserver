@@ -11,7 +11,7 @@ default_interface = dict((
     ('favicon', static('img/facio.ico')),
     ('login_title', _('JumpServer Open Source Bastion Host')),
     ('theme', 'classic_green'),
-    ('theme_info', None),
+    ('theme_info', {}),
 ))
 
 default_context = {
