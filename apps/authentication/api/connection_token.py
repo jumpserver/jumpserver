@@ -235,7 +235,7 @@ class ConnectionTokenViewSet(ConnectionTokenMixin, RootOrgViewMixin, JMSModelVie
 
     def get_object(self):
         if self.request.user.is_service_account:
-            # 组件获取 token 详情
+            # TODO: 组件获取 token 详情，将来放在 Super-connection-token API 中
             obj = get_object_or_404(ConnectionToken, pk=self.kwargs.get('pk'))
         else:
             obj = super(ConnectionTokenViewSet, self).get_object()
