@@ -49,6 +49,7 @@ urlpatterns = [
     path('system-users/<uuid:pk>/assets/', api.SystemUserAssetsListView.as_view(), name='system-user-assets'),
     path('system-users/<uuid:pk>/assets/<uuid:asset_id>/auth-info/', api.SystemUserAssetAuthInfoApi.as_view(), name='system-user-asset-auth-info'),
     path('system-users/<uuid:pk>/applications/<uuid:app_id>/auth-info/', api.SystemUserAppAuthInfoApi.as_view(), name='system-user-app-auth-info'),
+    path('system-users/<uuid:pk>/assets/<uuid:asset_id>/account/', api.SystemUserAssetAccountApi.as_view(), name='system-user-asset-account'),
     path('system-users/<uuid:pk>/temp-auth/', api.SystemUserTempAuthInfoApi.as_view(), name='system-user-asset-temp-info'),
     path('system-users/<uuid:pk>/tasks/', api.SystemUserTaskApi.as_view(), name='system-user-task-create'),
     path('system-users/<uuid:pk>/cmd-filter-rules/', api.SystemUserCommandFilterRuleListApi.as_view(), name='system-user-cmd-filter-rule-list'),

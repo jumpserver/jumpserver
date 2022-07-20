@@ -9,9 +9,8 @@ from common.mixins.api import SuggestionMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
 from orgs.utils import tmp_to_root_org
-from ..models import SystemUser, CommandFilterRule
+from ..models import SystemUser, CommandFilterRule, Account
 from .. import serializers
-from ..serializers import SystemUserWithAuthInfoSerializer, SystemUserTempAuthSerializer
 from ..tasks import (
     push_system_user_to_assets_manual, test_system_user_connectivity_manual,
     push_system_user_to_assets
@@ -21,7 +20,7 @@ logger = get_logger(__file__)
 __all__ = [
     'SystemUserViewSet', 'SystemUserAuthInfoApi', 'SystemUserAssetAuthInfoApi',
     'SystemUserCommandFilterRuleListApi', 'SystemUserTaskApi', 'SystemUserAssetsListView',
-    'SystemUserTempAuthInfoApi', 'SystemUserAppAuthInfoApi',
+    'SystemUserTempAuthInfoApi', 'SystemUserAppAuthInfoApi', 'SystemUserAssetAccountApi'
 ]
 
 
@@ -77,12 +76,23 @@ class SystemUserViewSet(SuggestionMixin, OrgBulkModelViewSet):
         return Response(serializer.data)
 
 
+class SystemUserAssetAccountApi(generics.RetrieveUpdateDestroyAPIView):
+    model = Account
+    serializer_class = serializers.AccountSerializer
+
+    def get_object(self):
+        asset_id = self.kwargs.get('asset_id')
+        user_id = self.request.query_params.get("user_id")
+        system_user = super().get_object()
+        return system_user.get_account(user_id, asset_id)
+
+
 class SystemUserAuthInfoApi(generics.RetrieveUpdateDestroyAPIView):
     """
     Get system user auth info
     """
     model = SystemUser
-    serializer_class = SystemUserWithAuthInfoSerializer
+    serializer_class = serializers.SystemUserWithAuthInfoSerializer
     rbac_perms = {
         'retrieve': 'assets.view_systemusersecret',
         'list': 'assets.view_systemusersecret',
@@ -99,7 +109,7 @@ class SystemUserAuthInfoApi(generics.RetrieveUpdateDestroyAPIView):
 class SystemUserTempAuthInfoApi(generics.CreateAPIView):
     model = SystemUser
     permission_classes = (IsValidUser,)
-    serializer_class = SystemUserTempAuthSerializer
+    serializer_class = serializers.SystemUserTempAuthSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = super().get_serializer(data=request.data)
@@ -120,7 +130,7 @@ class SystemUserAssetAuthInfoApi(generics.RetrieveAPIView):
     Get system user with asset auth info
     """
     model = SystemUser
-    serializer_class = SystemUserWithAuthInfoSerializer
+    serializer_class = serializers.SystemUserWithAuthInfoSerializer
 
     def get_object(self):
         instance = super().get_object()
@@ -136,7 +146,7 @@ class SystemUserAppAuthInfoApi(generics.RetrieveAPIView):
     Get system user with asset auth info
     """
     model = SystemUser
-    serializer_class = SystemUserWithAuthInfoSerializer
+    serializer_class = serializers.SystemUserWithAuthInfoSerializer
     rbac_perms = {
         'retrieve': 'assets.view_systemusersecret',
     }

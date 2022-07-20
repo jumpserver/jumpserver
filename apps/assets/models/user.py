@@ -9,6 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 from common.utils import signer
+from users.models import User
 from .base import BaseUser
 from .asset import Asset
 
@@ -202,6 +203,21 @@ class SystemUser(ProtocolMixin, BaseUser):
     @classmethod
     def create_accounts_with_assets(cls, asset_ids, system_user_ids):
         pass
+
+    def get_manual_account(self, user_id, asset_id):
+        pass
+
+    def get_auto_account(self, user_id, asset_id):
+        username = self.username
+        if self.username_same_with_user:
+            user = get_object_or_404(User, id=user_id)
+            username = user.username
+
+    def get_account(self, user_id, asset_id):
+        if self.login_mode == self.LOGIN_AUTO:
+            return self.get_manual_account(user_id, asset_id)
+        else:
+            return self.get_auto_account(user_id, asset_id)
 
     class Meta:
         ordering = ['name']
