@@ -27,9 +27,8 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         model = ConnectionToken
         fields_mini = ['id', 'type']
         fields_small = fields_mini + [
-            'secret', 'date_expired',
-            'date_created', 'date_updated', 'created_by', 'updated_by',
-            'org_id', 'org_name',
+            'secret', 'date_expired', 'date_created', 'date_updated',
+            'created_by', 'updated_by', 'org_id', 'org_name',
         ]
         fields_fk = [
             'user', 'system_user', 'asset', 'application',
@@ -37,8 +36,8 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         read_only_fields = [
             # 普通 Token 不支持指定 user
             'user', 'is_valid', 'expire_time',
-            'type_display', 'user_display', 'system_user_display', 'asset_display',
-            'application_display',
+            'type_display', 'user_display', 'system_user_display',
+            'asset_display', 'application_display',
         ]
         fields = fields_small + fields_fk + read_only_fields
 
@@ -102,8 +101,8 @@ class SuperConnectionTokenSerializer(ConnectionTokenSerializer):
 
     class Meta(ConnectionTokenSerializer.Meta):
         read_only_fields = [
-            'validity',
-            'user_display', 'system_user_display', 'asset_display', 'application_display',
+            'validity', 'user_display', 'system_user_display',
+            'asset_display', 'application_display',
         ]
 
     def get_user(self, attrs):
