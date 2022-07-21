@@ -259,7 +259,7 @@ def decrypt_password(value):
     aes = get_aes_crypto(aes_key, 'ECB')
     try:
         password = aes.decrypt(password_cipher)
-    except UnicodeDecodeError as e:
+    except Exception as e:
         logging.error("Decrypt password error: {}, {}".format(password_cipher, e))
         return value
     return password

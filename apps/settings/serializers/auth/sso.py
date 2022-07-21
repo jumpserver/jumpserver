@@ -1,4 +1,3 @@
-
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
@@ -14,5 +13,5 @@ class SSOSettingSerializer(serializers.Serializer):
     )
     AUTH_SSO_AUTHKEY_TTL = serializers.IntegerField(
         required=False, label=_('SSO auth key TTL'), help_text=_("Unit: second"),
-        min_value=1, max_value=60*30
+        min_value=60, max_value=60 * 30
     )
