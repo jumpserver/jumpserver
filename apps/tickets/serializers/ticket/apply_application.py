@@ -2,6 +2,7 @@ from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 from perms.models import ApplicationPermission
+from perms.serializers.base import ActionsField
 from orgs.utils import tmp_to_org
 from applications.models import Application
 from tickets.models import ApplyApplicationTicket
@@ -12,6 +13,7 @@ __all__ = ['ApplyApplicationSerializer', 'ApplyApplicationDisplaySerializer', 'A
 
 
 class ApplyApplicationSerializer(BaseApplyAssetApplicationSerializer, TicketApplySerializer):
+    apply_actions = ActionsField(required=True, allow_empty=False)
     permission_model = ApplicationPermission
 
     class Meta:
@@ -19,9 +21,10 @@ class ApplyApplicationSerializer(BaseApplyAssetApplicationSerializer, TicketAppl
         writeable_fields = [
             'id', 'title', 'type', 'apply_category',
             'apply_type', 'apply_applications', 'apply_system_users',
-            'apply_date_start', 'apply_date_expired', 'org_id'
+            'apply_actions', 'apply_date_start', 'apply_date_expired', 'org_id'
         ]
-        fields = TicketApplySerializer.Meta.fields + writeable_fields + ['apply_permission_name']
+        fields = TicketApplySerializer.Meta.fields + \
+                 writeable_fields + ['apply_permission_name', 'apply_actions_display']
         read_only_fields = list(set(fields) - set(writeable_fields))
         ticket_extra_kwargs = TicketApplySerializer.Meta.extra_kwargs
         extra_kwargs = {
