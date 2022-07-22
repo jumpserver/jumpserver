@@ -405,6 +405,7 @@ class Config(dict):
         'CONNECTION_TOKEN_ENABLED': False,
 
         'PERM_SINGLE_ASSET_TO_UNGROUP_NODE': False,
+        'TICKET_AUTHORIZE_DEFAULT_TIME': 7,
         'WINDOWS_SSH_DEFAULT_SHELL': 'cmd',
         'PERIOD_TASK_ENABLED': True,
 
