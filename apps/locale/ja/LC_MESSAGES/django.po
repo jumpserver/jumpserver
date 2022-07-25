@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-22 14:49+0800\n"
+"POT-Creation-Date: 2022-07-25 13:53+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -304,7 +304,7 @@ msgstr "アプリケーションアカウントの秘密を変更できます"
 #: applications/serializers/application.py:99 assets/models/label.py:21
 #: perms/models/application_permission.py:21
 #: perms/serializers/application/user_permission.py:33
-#: tickets/models/ticket/apply_application.py:14
+#: tickets/models/ticket/apply_application.py:15
 #: xpack/plugins/change_auth_plan/models/app.py:25
 msgid "Category"
 msgstr "カテゴリ"
@@ -316,7 +316,7 @@ msgstr "カテゴリ"
 #: perms/serializers/application/user_permission.py:34
 #: terminal/models/storage.py:58 terminal/models/storage.py:143
 #: tickets/models/comment.py:26 tickets/models/flow.py:57
-#: tickets/models/ticket/apply_application.py:17
+#: tickets/models/ticket/apply_application.py:18
 #: tickets/models/ticket/general.py:273
 #: xpack/plugins/change_auth_plan/models/app.py:28
 #: xpack/plugins/change_auth_plan/models/app.py:153
@@ -425,7 +425,7 @@ msgstr "アプリケーションパス"
 
 #: applications/serializers/attrs/application_category/remote_app.py:44
 #: assets/serializers/system_user.py:167
-#: tickets/serializers/ticket/apply_application.py:35
+#: tickets/serializers/ticket/apply_application.py:38
 #: tickets/serializers/ticket/common.py:59
 #: xpack/plugins/change_auth_plan/serializers/asset.py:67
 #: xpack/plugins/change_auth_plan/serializers/asset.py:70
@@ -711,7 +711,7 @@ msgstr "タイミングトリガー"
 
 #: assets/models/backup.py:105 audits/models.py:44 ops/models/command.py:31
 #: perms/models/base.py:89 terminal/models/session.py:58
-#: tickets/models/ticket/apply_application.py:25
+#: tickets/models/ticket/apply_application.py:29
 #: tickets/models/ticket/apply_asset.py:23
 #: xpack/plugins/change_auth_plan/models/base.py:112
 #: xpack/plugins/change_auth_plan/models/base.py:203
@@ -1141,6 +1141,7 @@ msgstr "CPU情報"
 #: perms/serializers/application/permission.py:42
 #: perms/serializers/asset/permission.py:18
 #: perms/serializers/asset/permission.py:46
+#: tickets/models/ticket/apply_application.py:27
 #: tickets/models/ticket/apply_asset.py:21
 msgid "Actions"
 msgstr "アクション"
@@ -2144,7 +2145,7 @@ msgid "Secret"
 msgstr "ひみつ"
 
 #: authentication/models.py:74 authentication/models.py:264
-#: perms/models/base.py:90 tickets/models/ticket/apply_application.py:26
+#: perms/models/base.py:90 tickets/models/ticket/apply_application.py:30
 #: tickets/models/ticket/apply_asset.py:24 users/models/user.py:703
 msgid "Date expired"
 msgstr "期限切れの日付"
@@ -3135,6 +3136,11 @@ msgstr "クリップボードコピーペースト"
 #: perms/models/base.py:94
 msgid "From ticket"
 msgstr "チケットから"
+
+#: perms/notifications.py:12 perms/notifications.py:44
+#: perms/notifications.py:88 perms/notifications.py:119
+msgid "today"
+msgstr "今"
 
 #: perms/notifications.py:15
 msgid "You permed assets is about to expire"
@@ -5283,7 +5289,7 @@ msgstr "カスタムユーザー"
 msgid "Ticket already closed"
 msgstr "チケットはすでに閉じています"
 
-#: tickets/handlers/apply_application.py:37
+#: tickets/handlers/apply_application.py:38
 msgid ""
 "Created by the ticket, ticket title: {}, ticket applicant: {}, ticket "
 "processor: {}, ticket ID: {}"
@@ -5369,16 +5375,16 @@ msgstr "チケットの流れ"
 msgid "Ticket session relation"
 msgstr "チケットセッションの関係"
 
-#: tickets/models/ticket/apply_application.py:11
+#: tickets/models/ticket/apply_application.py:12
 #: tickets/models/ticket/apply_asset.py:13
 msgid "Permission name"
 msgstr "認可ルール名"
 
-#: tickets/models/ticket/apply_application.py:20
+#: tickets/models/ticket/apply_application.py:21
 msgid "Apply applications"
 msgstr "アプリケーションの適用"
 
-#: tickets/models/ticket/apply_application.py:23
+#: tickets/models/ticket/apply_application.py:24
 #: tickets/models/ticket/apply_asset.py:18
 msgid "Apply system users"
 msgstr "システムユーザーの適用"
