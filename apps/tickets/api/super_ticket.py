@@ -20,4 +20,4 @@ class SuperTicketStatusAPI(RetrieveDestroyAPIView):
             return Ticket.objects.all()
 
     def perform_destroy(self, instance):
-        instance.close(processor=instance.applicant)
+        instance.close()
