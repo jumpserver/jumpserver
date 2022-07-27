@@ -45,12 +45,10 @@ urlpatterns = [
     path('assets/<uuid:pk>/perm-user-groups/', api.AssetPermUserGroupListApi.as_view(), name='asset-perm-user-group-list'),
     path('assets/<uuid:pk>/perm-user-groups/<uuid:perm_user_group_id>/permissions/', api.AssetPermUserGroupPermissionsListApi.as_view(), name='asset-perm-user-group-permission-list'),
 
-    path('system-users/<uuid:pk>/auth-info/', api.SystemUserAuthInfoApi.as_view(), name='system-user-auth-info'),
     path('system-users/<uuid:pk>/assets/', api.SystemUserAssetsListView.as_view(), name='system-user-assets'),
-    path('system-users/<uuid:pk>/assets/<uuid:asset_id>/auth-info/', api.SystemUserAssetAuthInfoApi.as_view(), name='system-user-asset-auth-info'),
     path('system-users/<uuid:pk>/applications/<uuid:app_id>/auth-info/', api.SystemUserAppAuthInfoApi.as_view(), name='system-user-app-auth-info'),
     path('system-users/<uuid:pk>/assets/<uuid:asset_id>/users/<uuid:user_id>/account/', api.SystemUserAssetAccountApi.as_view(), name='system-user-asset-account'),
-    path('system-users/<uuid:pk>/temp-auth/', api.SystemUserTempAuthInfoApi.as_view(), name='system-user-asset-temp-info'),
+    path('system-users/<uuid:pk>/assets/<uuid:asset_id>/users/<uuid:user_id>/account-secret/', api.SystemUserAssetAccountSecretApi.as_view(), name='system-user-asset-account-secret'),
     path('system-users/<uuid:pk>/tasks/', api.SystemUserTaskApi.as_view(), name='system-user-task-create'),
     path('system-users/<uuid:pk>/cmd-filter-rules/', api.SystemUserCommandFilterRuleListApi.as_view(), name='system-user-cmd-filter-rule-list'),
     path('cmd-filter-rules/', api.SystemUserCommandFilterRuleListApi.as_view(), name='cmd-filter-rules'),

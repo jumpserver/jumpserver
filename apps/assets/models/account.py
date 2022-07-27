@@ -27,10 +27,10 @@ class Account(BaseUser, AbsConnectivity, ProtocolMixin):
         verbose_name = _('Account')
         unique_together = [('username', 'asset')]
         permissions = [
-            ('view_assetaccountsecret', _('Can view asset account secret')),
-            ('change_assetaccountsecret', _('Can change asset account secret')),
-            ('view_assethistoryaccount', _('Can view asset history account')),
-            ('view_assethistoryaccountsecret', _('Can view asset history account secret')),
+            ('view_accountsecret', _('Can view asset account secret')),
+            ('change_accountsecret', _('Can change asset account secret')),
+            ('view_historyaccount', _('Can view asset history account')),
+            ('view_historyaccountsecret', _('Can view asset history account secret')),
         ]
 
     def __str__(self):

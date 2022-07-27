@@ -223,7 +223,7 @@ class SystemUser(ProtocolMixin, BaseUser):
         return get_object_or_404(Account, asset_id=asset_id, username=username)
 
     def get_account(self, user_id, asset_id):
-        if self.login_mode == self.LOGIN_AUTO:
+        if self.login_mode == self.LOGIN_MANUAL:
             return self.get_manual_account(user_id, asset_id)
         else:
             return self.get_auto_account(user_id, asset_id)

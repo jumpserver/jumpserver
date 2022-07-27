@@ -75,7 +75,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'verbose_name': 'Account',
-                'permissions': [('view_assetaccountsecret', 'Can view asset account secret'), ('change_assetaccountsecret', 'Can change asset account secret'), ('view_assethistoryaccount', 'Can view asset history account'), ('view_assethistoryaccountsecret', 'Can view asset history account secret')],
+                'permissions': [('view_accountsecret', 'Can view asset account secret'), ('change_accountsecret', 'Can change asset account secret'), ('view_historyaccount', 'Can view asset history account'), ('view_historyaccountsecret', 'Can view asset history account secret')],
                 'unique_together': {('username', 'asset')},
             },
             bases=(models.Model, assets.models.base.AuthMixin, assets.models.user.ProtocolMixin),

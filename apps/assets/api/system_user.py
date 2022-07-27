@@ -2,6 +2,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.viewsets import GenericViewSet
 
 from common.utils import get_logger, get_object_or_none
 from common.permissions import IsValidUser
@@ -20,7 +21,8 @@ logger = get_logger(__file__)
 __all__ = [
     'SystemUserViewSet', 'SystemUserAuthInfoApi', 'SystemUserAssetAuthInfoApi',
     'SystemUserCommandFilterRuleListApi', 'SystemUserTaskApi', 'SystemUserAssetsListView',
-    'SystemUserTempAuthInfoApi', 'SystemUserAppAuthInfoApi', 'SystemUserAssetAccountApi'
+    'SystemUserTempAuthInfoApi', 'SystemUserAppAuthInfoApi', 'SystemUserAssetAccountApi',
+    'SystemUserAssetAccountSecretApi',
 ]
 
 
@@ -76,16 +78,53 @@ class SystemUserViewSet(SuggestionMixin, OrgBulkModelViewSet):
         return Response(serializer.data)
 
 
-class SystemUserAssetAccountApi(generics.RetrieveUpdateDestroyAPIView):
+class SystemUserAccountViewSet(GenericViewSet):
+    model = Account
+    serializer_classes = {
+        'default': serializers.AccountSerializer,
+        'account_secret': serializers.AccountSecretSerializer,
+    }
+
+    def get_object(self):
+        system_user_id = self.kwargs.get('pk')
+        asset_id = self.kwargs.get('asset_id')
+        user_id = self.kwargs.get("user_id")
+        system_user = SystemUser.objects.get(id=system_user_id)
+        account = system_user.get_account(user_id, asset_id)
+        return account
+
+    @action(methods=['get'], detail=False, url_path='account')
+    def account(self, request, *args, **kwargs):
+        pass
+
+    @action(methods=['get'], detail=False, url_path='account-secret')
+    def account_secret(self):
+        pass
+
+    @action(methods=['put'], detail=False, url_path='manual-account')
+    def manual_account(self, request, *args, **kwargs):
+        pass
+
+
+class SystemUserAssetAccountApi(generics.RetrieveAPIView):
     model = Account
     serializer_class = serializers.AccountSerializer
 
     def get_object(self):
+        system_user_id = self.kwargs.get('pk')
         asset_id = self.kwargs.get('asset_id')
         user_id = self.kwargs.get("user_id")
-        system_user = super().get_object()
+        system_user = SystemUser.objects.get(id=system_user_id)
         account = system_user.get_account(user_id, asset_id)
         return account
+
+
+class SystemUserAssetAccountSecretApi(SystemUserAssetAccountApi):
+    model = Account
+    serializer_class = serializers.AccountSecretSerializer
+    rbac_perms = {
+        'retrieve': 'assets.view_accountsecret'
+    }
 
 
 class SystemUserAuthInfoApi(generics.RetrieveUpdateDestroyAPIView):
@@ -93,13 +132,21 @@ class SystemUserAuthInfoApi(generics.RetrieveUpdateDestroyAPIView):
     Get system user auth info
     """
     model = SystemUser
-    serializer_class = serializers.SystemUserWithAuthInfoSerializer
+    serializer_class = serializers.AccountSerializer
     rbac_perms = {
         'retrieve': 'assets.view_systemusersecret',
         'list': 'assets.view_systemusersecret',
         'change': 'assets.change_systemuser',
         'destroy': 'assets.change_systemuser',
     }
+
+    def get_object(self):
+        system_user_id = self.kwargs.get('pk')
+        asset_id = self.kwargs.get('asset_id')
+        user_id = self.kwargs.get("user_id")
+        system_user = SystemUser.objects.get(id=system_user_id)
+        account = system_user.get_account(user_id, asset_id)
+        return account
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
