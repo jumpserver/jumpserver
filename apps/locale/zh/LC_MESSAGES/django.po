@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-20 13:51+0800\n"
+"POT-Creation-Date: 2022-07-29 11:26+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -26,7 +26,7 @@ msgstr "访问控制"
 #: assets/models/base.py:175 assets/models/cluster.py:18
 #: assets/models/cmd_filter.py:27 assets/models/domain.py:23
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
-#: orgs/models.py:65 perms/models/base.py:83 rbac/models/role.py:29
+#: orgs/models.py:70 perms/models/base.py:83 rbac/models/role.py:29
 #: settings/models.py:29 settings/serializers/sms.py:6
 #: terminal/models/endpoint.py:10 terminal/models/endpoint.py:86
 #: terminal/models/storage.py:26 terminal/models/task.py:16
@@ -58,7 +58,7 @@ msgstr "激活中"
 #: assets/models/cluster.py:29 assets/models/cmd_filter.py:48
 #: assets/models/cmd_filter.py:96 assets/models/domain.py:24
 #: assets/models/domain.py:65 assets/models/group.py:23
-#: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:68
+#: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:73
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:34
 #: terminal/models/endpoint.py:23 terminal/models/endpoint.py:96
 #: terminal/models/storage.py:29 terminal/models/terminal.py:114
@@ -79,7 +79,7 @@ msgstr "拒绝"
 msgid "Allow"
 msgstr "允许"
 
-#: acls/models/login_acl.py:20 acls/models/login_acl.py:104
+#: acls/models/login_acl.py:20 acls/models/login_acl.py:75
 #: acls/models/login_asset_acl.py:17 tickets/const.py:9
 msgid "Login confirm"
 msgstr "登录复核"
@@ -87,7 +87,7 @@ msgstr "登录复核"
 #: acls/models/login_acl.py:24 acls/models/login_asset_acl.py:20
 #: assets/models/cmd_filter.py:30 assets/models/label.py:15 audits/models.py:37
 #: audits/models.py:62 audits/models.py:87 audits/serializers.py:100
-#: authentication/models.py:54 authentication/models.py:78 orgs/models.py:215
+#: authentication/models.py:54 authentication/models.py:78 orgs/models.py:220
 #: perms/models/base.py:84 rbac/builtin.py:120 rbac/models/rolebinding.py:41
 #: terminal/backends/command/models.py:20
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:44
@@ -358,7 +358,7 @@ msgstr "类型名称"
 #: assets/serializers/account.py:18 assets/serializers/cmd_filter.py:28
 #: assets/serializers/cmd_filter.py:48 common/db/models.py:114
 #: common/mixins/models.py:50 ops/models/adhoc.py:39 ops/models/command.py:30
-#: orgs/models.py:67 orgs/models.py:218 perms/models/base.py:92
+#: orgs/models.py:72 orgs/models.py:223 perms/models/base.py:92
 #: users/models/group.py:18 users/models/user.py:922
 #: xpack/plugins/cloud/models.py:125
 msgid "Date created"
@@ -368,7 +368,7 @@ msgstr "创建日期"
 #: assets/models/gathered_user.py:20 assets/serializers/account.py:21
 #: assets/serializers/cmd_filter.py:29 assets/serializers/cmd_filter.py:49
 #: common/db/models.py:115 common/mixins/models.py:51 ops/models/adhoc.py:40
-#: orgs/models.py:219
+#: orgs/models.py:224
 msgid "Date updated"
 msgstr "更新日期"
 
@@ -622,8 +622,8 @@ msgstr "标签管理"
 #: assets/models/asset.py:229 assets/models/base.py:183
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:52
 #: assets/models/cmd_filter.py:99 assets/models/group.py:21
-#: common/db/models.py:112 common/mixins/models.py:49 orgs/models.py:66
-#: orgs/models.py:220 perms/models/base.py:91 users/models/user.py:706
+#: common/db/models.py:112 common/mixins/models.py:49 orgs/models.py:71
+#: orgs/models.py:225 perms/models/base.py:91 users/models/user.py:706
 #: users/serializers/group.py:33
 #: xpack/plugins/change_auth_plan/models/base.py:48
 #: xpack/plugins/cloud/models.py:122 xpack/plugins/gathered_user/models.py:30
@@ -902,11 +902,11 @@ msgstr "忽略大小写"
 msgid "Command filter rule"
 msgstr "命令过滤规则"
 
-#: assets/models/cmd_filter.py:144
+#: assets/models/cmd_filter.py:147
 msgid "The generated regular expression is incorrect: {}"
 msgstr "生成的正则表达式有误"
 
-#: assets/models/cmd_filter.py:170 tickets/const.py:13
+#: assets/models/cmd_filter.py:173 tickets/const.py:13
 msgid "Command confirm"
 msgstr "命令复核"
 
@@ -1900,7 +1900,7 @@ msgstr "此账号已过期"
 msgid "Auth backend not match"
 msgstr "没有匹配到认证后端"
 
-#: authentication/errors/const.py:28
+#: authentication/errors/const.py:28 authentication/errors/failed.py:145
 msgid "ACL is not allowed"
 msgstr "ACL 不被允许"
 
@@ -1962,23 +1962,15 @@ msgstr "等待登录复核处理"
 msgid "Login confirm ticket was {}"
 msgstr "登录复核: {}"
 
-#: authentication/errors/failed.py:145
-msgid "IP is not allowed"
-msgstr "来源 IP 不被允许登录"
-
-#: authentication/errors/failed.py:152
-msgid "Time Period is not allowed"
-msgstr "该 时间段 不被允许登录"
-
-#: authentication/errors/failed.py:157
+#: authentication/errors/failed.py:150
 msgid "Please enter MFA code"
 msgstr "请输入 MFA 验证码"
 
-#: authentication/errors/failed.py:162
+#: authentication/errors/failed.py:155
 msgid "Please enter SMS code"
 msgstr "请输入短信验证码"
 
-#: authentication/errors/failed.py:167 users/exceptions.py:15
+#: authentication/errors/failed.py:160 users/exceptions.py:15
 msgid "Phone not set"
 msgstr "手机号没有设置"
 
@@ -2201,7 +2193,7 @@ msgstr "有效"
 msgid "Expired time"
 msgstr "过期时间"
 
-#: authentication/serializers/connection_token.py:74
+#: authentication/serializers/connection_token.py:73
 msgid "Asset or application required"
 msgstr "资产或应用必填"
 
@@ -2988,26 +2980,26 @@ msgstr "组织存在资源 ({}) 不能被删除"
 msgid "App organizations"
 msgstr "组织管理"
 
-#: orgs/mixins/models.py:57 orgs/mixins/serializers.py:25 orgs/models.py:80
-#: orgs/models.py:212 rbac/const.py:7 rbac/models/rolebinding.py:48
+#: orgs/mixins/models.py:57 orgs/mixins/serializers.py:25 orgs/models.py:85
+#: orgs/models.py:217 rbac/const.py:7 rbac/models/rolebinding.py:48
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:62
 #: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:71
 msgid "Organization"
 msgstr "组织"
 
-#: orgs/models.py:74
+#: orgs/models.py:79
 msgid "GLOBAL"
 msgstr "全局组织"
 
-#: orgs/models.py:82
+#: orgs/models.py:87
 msgid "Can view root org"
 msgstr "可以查看全局组织"
 
-#: orgs/models.py:83
+#: orgs/models.py:88
 msgid "Can view all joined org"
 msgstr "可以查看所有加入的组织"
 
-#: orgs/models.py:217 rbac/models/role.py:46 rbac/models/rolebinding.py:44
+#: orgs/models.py:222 rbac/models/role.py:46 rbac/models/rolebinding.py:44
 #: users/models/user.py:671
 msgid "Role"
 msgstr "角色"
@@ -3096,27 +3088,27 @@ msgstr "剪贴板复制粘贴"
 msgid "From ticket"
 msgstr "来自工单"
 
-#: perms/notifications.py:18
+#: perms/notifications.py:15
 msgid "You permed assets is about to expire"
 msgstr "你授权的资产即将到期"
 
-#: perms/notifications.py:23
+#: perms/notifications.py:20
 msgid "permed assets"
 msgstr "授权的资产"
 
-#: perms/notifications.py:62
+#: perms/notifications.py:59
 msgid "Asset permissions is about to expire"
 msgstr "资产授权规则将要过期"
 
-#: perms/notifications.py:67
+#: perms/notifications.py:64
 msgid "asset permissions of organization {}"
 msgstr "组织 ({}) 的资产授权"
 
-#: perms/notifications.py:94
+#: perms/notifications.py:91
 msgid "Your permed applications is about to expire"
 msgstr "你授权的应用即将过期"
 
-#: perms/notifications.py:98
+#: perms/notifications.py:95
 msgid "permed applications"
 msgstr "授权的应用"
 
@@ -3782,19 +3774,19 @@ msgstr "模板"
 msgid "Test phone"
 msgstr "测试手机号"
 
-#: settings/serializers/auth/sso.py:12
+#: settings/serializers/auth/sso.py:11
 msgid "Enable SSO auth"
 msgstr "启用 SSO Token 认证"
 
-#: settings/serializers/auth/sso.py:13
+#: settings/serializers/auth/sso.py:12
 msgid "Other service can using SSO token login to JumpServer without password"
 msgstr "其它系统可以使用 SSO Token 对接 JumpServer, 免去登录的过程"
 
-#: settings/serializers/auth/sso.py:16
+#: settings/serializers/auth/sso.py:15
 msgid "SSO auth key TTL"
 msgstr "Token 有效期"
 
-#: settings/serializers/auth/sso.py:16
+#: settings/serializers/auth/sso.py:15
 msgid "Unit: second"
 msgstr "单位: 秒"
 
@@ -4762,7 +4754,7 @@ msgstr "不支持批量创建"
 msgid "Storage is invalid"
 msgstr "存储无效"
 
-#: terminal/models/command.py:53
+#: terminal/models/command.py:66
 msgid "Command record"
 msgstr "命令记录"
 
@@ -6755,6 +6747,12 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "IP is not allowed"
+#~ msgstr "来源 IP 不被允许登录"
+
+#~ msgid "Time Period is not allowed"
+#~ msgstr "该 时间段 不被允许登录"
 
 #~ msgid "User cannot self-update fields: {}"
 #~ msgstr "用户不能更新自己的字段: {}"
