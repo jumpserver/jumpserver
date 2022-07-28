@@ -40,23 +40,6 @@ class SystemUser(ProtocolMixin, BaseUser):
             username = '*'
         return '{0.name}({1})'.format(self, username)
 
-    @property
-    def cmd_filter_rules(self):
-        from .cmd_filter import CommandFilterRule
-        rules = CommandFilterRule.objects.filter(
-            filter__in=self.cmd_filters.all()
-        ).distinct()
-        return rules
-
-    def is_command_can_run(self, command):
-        for rule in self.cmd_filter_rules:
-            action, matched_cmd = rule.match(command)
-            if action == rule.ActionChoices.allow:
-                return True, None
-            elif action == rule.ActionChoices.deny:
-                return False, matched_cmd
-        return True, None
-
     @classmethod
     def create_accounts_with_assets(cls, asset_ids, system_user_ids):
         pass

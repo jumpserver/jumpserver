@@ -9,7 +9,7 @@ from orgs.mixins.models import OrgModelMixin
 from common.mixins import CommonModelMixin
 from common.tree import TreeNode
 from common.utils import is_uuid
-from assets.models import Asset, SystemUser
+from assets.models import Asset
 
 from ..utils import KubernetesTree
 from .. import const

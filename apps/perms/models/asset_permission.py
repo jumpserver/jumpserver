@@ -6,7 +6,7 @@ from django.db.models import F, TextChoices
 from orgs.mixins.models import OrgModelMixin
 from common.db import models
 from common.utils import lazyproperty
-from assets.models import Asset, SystemUser, Node, FamilyMixin
+from assets.models import Asset, Node, FamilyMixin
 
 from .base import BasePermission
 
