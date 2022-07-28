@@ -19,8 +19,8 @@ from assets.api import FilterAssetByNodeMixin
 from ..models import Asset, Node, Platform, Gateway
 from .. import serializers
 from ..tasks import (
-    update_assets_hardware_info_manual, test_assets_connectivity_manual,
-    test_system_users_connectivity_a_asset, push_system_users_a_asset
+    update_assets_hardware_info_manual,
+    test_assets_connectivity_manual,
 )
 from ..filters import FilterAssetByNodeFilterBackend, LabelFilterBackend, IpInFilterBackend
 

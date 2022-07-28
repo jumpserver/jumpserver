@@ -20,14 +20,10 @@ router.register(r'labels', api.LabelViewSet, 'label')
 router.register(r'nodes', api.NodeViewSet, 'node')
 router.register(r'domains', api.DomainViewSet, 'domain')
 router.register(r'gateways', api.GatewayViewSet, 'gateway')
-router.register(r'cmd-filters', api.CommandFilterViewSet, 'cmd-filter')
 router.register(r'gathered-users', api.GatheredUserViewSet, 'gathered-user')
 router.register(r'favorite-assets', api.FavoriteAssetViewSet, 'favorite-asset')
 router.register(r'account-backup-plans', api.AccountBackupPlanViewSet, 'account-backup')
 router.register(r'account-backup-plan-executions', api.AccountBackupPlanExecutionViewSet, 'account-backup-execution')
-
-cmd_filter_router = routers.NestedDefaultRouter(router, r'cmd-filters', lookup='filter')
-cmd_filter_router.register(r'rules', api.CommandFilterRuleViewSet, 'cmd-filter-rule')
 
 
 urlpatterns = [
@@ -54,10 +50,7 @@ urlpatterns = [
     path('nodes/<uuid:pk>/tasks/', api.NodeTaskCreateApi.as_view(), name='node-task-create'),
 
     path('gateways/<uuid:pk>/test-connective/', api.GatewayTestConnectionApi.as_view(), name='test-gateway-connective'),
-
-    path('cmd-filters/command-confirm/', api.CommandConfirmAPI.as_view(), name='command-confirm'),
-
 ]
 
-urlpatterns += router.urls + cmd_filter_router.urls
+urlpatterns += router.urls
 

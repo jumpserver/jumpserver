@@ -20,7 +20,6 @@ from common.decorator import on_transaction_commit
 from common.signals import django_ready
 from common.utils import get_logger
 from common.utils.connection import RedisPubSub
-from assets.models import CommandFilterRule
 from users.signals import post_user_leave_org
 
 
@@ -141,7 +140,7 @@ def _clear_users_from_org(org, users):
     for m in models:
         _remove_users(m, users, org)
 
-    _remove_users(CommandFilterRule, users, org, user_field_name='reviewers')
+    # _remove_users(CommandFilterRule, users, org, user_field_name='reviewers')
 
 
 @receiver(post_save, sender=User)
