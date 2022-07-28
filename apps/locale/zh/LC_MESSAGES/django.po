@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-25 13:53+0800\n"
+"POT-Creation-Date: 2022-07-28 13:43+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -4271,7 +4271,7 @@ msgstr "会话分享"
 
 #: settings/serializers/security.py:180
 msgid "Enabled, Allows user active session to be shared with other users"
-msgstr "开启后允许用户分享已连接的资产会话给它人，协同工作"
+msgstr "开启后允许用户分享已连接的资产会话给他人，协同工作"
 
 #: settings/serializers/security.py:183
 msgid "Remote Login Protection"
