@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-20 13:51+0800\n"
+"POT-Creation-Date: 2022-07-29 11:26+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,7 +27,7 @@ msgstr "Acls"
 #: assets/models/base.py:175 assets/models/cluster.py:18
 #: assets/models/cmd_filter.py:27 assets/models/domain.py:23
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
-#: orgs/models.py:65 perms/models/base.py:83 rbac/models/role.py:29
+#: orgs/models.py:70 perms/models/base.py:83 rbac/models/role.py:29
 #: settings/models.py:29 settings/serializers/sms.py:6
 #: terminal/models/endpoint.py:10 terminal/models/endpoint.py:86
 #: terminal/models/storage.py:26 terminal/models/task.py:16
@@ -59,7 +59,7 @@ msgstr "アクティブ"
 #: assets/models/cluster.py:29 assets/models/cmd_filter.py:48
 #: assets/models/cmd_filter.py:96 assets/models/domain.py:24
 #: assets/models/domain.py:65 assets/models/group.py:23
-#: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:68
+#: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:73
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:34
 #: terminal/models/endpoint.py:23 terminal/models/endpoint.py:96
 #: terminal/models/storage.py:29 terminal/models/terminal.py:114
@@ -80,7 +80,7 @@ msgstr "拒否"
 msgid "Allow"
 msgstr "許可"
 
-#: acls/models/login_acl.py:20 acls/models/login_acl.py:104
+#: acls/models/login_acl.py:20 acls/models/login_acl.py:75
 #: acls/models/login_asset_acl.py:17 tickets/const.py:9
 msgid "Login confirm"
 msgstr "ログイン確認"
@@ -88,7 +88,7 @@ msgstr "ログイン確認"
 #: acls/models/login_acl.py:24 acls/models/login_asset_acl.py:20
 #: assets/models/cmd_filter.py:30 assets/models/label.py:15 audits/models.py:37
 #: audits/models.py:62 audits/models.py:87 audits/serializers.py:100
-#: authentication/models.py:54 authentication/models.py:78 orgs/models.py:215
+#: authentication/models.py:54 authentication/models.py:78 orgs/models.py:220
 #: perms/models/base.py:84 rbac/builtin.py:120 rbac/models/rolebinding.py:41
 #: terminal/backends/command/models.py:20
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:44
@@ -363,7 +363,7 @@ msgstr "タイプ表示"
 #: assets/serializers/account.py:18 assets/serializers/cmd_filter.py:28
 #: assets/serializers/cmd_filter.py:48 common/db/models.py:114
 #: common/mixins/models.py:50 ops/models/adhoc.py:39 ops/models/command.py:30
-#: orgs/models.py:67 orgs/models.py:218 perms/models/base.py:92
+#: orgs/models.py:72 orgs/models.py:223 perms/models/base.py:92
 #: users/models/group.py:18 users/models/user.py:922
 #: xpack/plugins/cloud/models.py:125
 msgid "Date created"
@@ -373,7 +373,7 @@ msgstr "作成された日付"
 #: assets/models/gathered_user.py:20 assets/serializers/account.py:21
 #: assets/serializers/cmd_filter.py:29 assets/serializers/cmd_filter.py:49
 #: common/db/models.py:115 common/mixins/models.py:51 ops/models/adhoc.py:40
-#: orgs/models.py:219
+#: orgs/models.py:224
 msgid "Date updated"
 msgstr "更新日"
 
@@ -627,8 +627,8 @@ msgstr "ラベル"
 #: assets/models/asset.py:229 assets/models/base.py:183
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:52
 #: assets/models/cmd_filter.py:99 assets/models/group.py:21
-#: common/db/models.py:112 common/mixins/models.py:49 orgs/models.py:66
-#: orgs/models.py:220 perms/models/base.py:91 users/models/user.py:706
+#: common/db/models.py:112 common/mixins/models.py:49 orgs/models.py:71
+#: orgs/models.py:225 perms/models/base.py:91 users/models/user.py:706
 #: users/serializers/group.py:33
 #: xpack/plugins/change_auth_plan/models/base.py:48
 #: xpack/plugins/cloud/models.py:122 xpack/plugins/gathered_user/models.py:30
@@ -907,11 +907,11 @@ msgstr "家を無視する"
 msgid "Command filter rule"
 msgstr "コマンドフィルタルール"
 
-#: assets/models/cmd_filter.py:144
+#: assets/models/cmd_filter.py:147
 msgid "The generated regular expression is incorrect: {}"
 msgstr "生成された正規表現が正しくありません: {}"
 
-#: assets/models/cmd_filter.py:170 tickets/const.py:13
+#: assets/models/cmd_filter.py:173 tickets/const.py:13
 msgid "Command confirm"
 msgstr "コマンドの確認"
 
@@ -1914,7 +1914,7 @@ msgstr "このアカウントは期限切れです"
 msgid "Auth backend not match"
 msgstr "Authバックエンドが一致しない"
 
-#: authentication/errors/const.py:28
+#: authentication/errors/const.py:28 authentication/errors/failed.py:145
 msgid "ACL is not allowed"
 msgstr "ACLは許可されません"
 
@@ -1982,23 +1982,15 @@ msgstr "受け入れのためのログイン確認チケットを待つ"
 msgid "Login confirm ticket was {}"
 msgstr "ログイン確認チケットは {} でした"
 
-#: authentication/errors/failed.py:145
-msgid "IP is not allowed"
-msgstr "IPは許可されていません"
-
-#: authentication/errors/failed.py:152
-msgid "Time Period is not allowed"
-msgstr "期間は許可されていません"
-
-#: authentication/errors/failed.py:157
+#: authentication/errors/failed.py:150
 msgid "Please enter MFA code"
 msgstr "MFAコードを入力してください"
 
-#: authentication/errors/failed.py:162
+#: authentication/errors/failed.py:155
 msgid "Please enter SMS code"
 msgstr "SMSコードを入力してください"
 
-#: authentication/errors/failed.py:167 users/exceptions.py:15
+#: authentication/errors/failed.py:160 users/exceptions.py:15
 msgid "Phone not set"
 msgstr "電話が設定されていない"
 
@@ -2226,7 +2218,7 @@ msgstr "有効性"
 msgid "Expired time"
 msgstr "期限切れ時間"
 
-#: authentication/serializers/connection_token.py:74
+#: authentication/serializers/connection_token.py:73
 msgid "Asset or application required"
 msgstr "アセットまたはアプリが必要"
 
@@ -3028,26 +3020,26 @@ msgstr "組織のリソース ({}) は削除できません"
 msgid "App organizations"
 msgstr "アプリ組織"
 
-#: orgs/mixins/models.py:57 orgs/mixins/serializers.py:25 orgs/models.py:80
-#: orgs/models.py:212 rbac/const.py:7 rbac/models/rolebinding.py:48
+#: orgs/mixins/models.py:57 orgs/mixins/serializers.py:25 orgs/models.py:85
+#: orgs/models.py:217 rbac/const.py:7 rbac/models/rolebinding.py:48
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:62
 #: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:71
 msgid "Organization"
 msgstr "組織"
 
-#: orgs/models.py:74
+#: orgs/models.py:79
 msgid "GLOBAL"
 msgstr "グローバル組織"
 
-#: orgs/models.py:82
+#: orgs/models.py:87
 msgid "Can view root org"
 msgstr "グローバル組織を表示できます"
 
-#: orgs/models.py:83
+#: orgs/models.py:88
 msgid "Can view all joined org"
 msgstr "参加しているすべての組織を表示できます"
 
-#: orgs/models.py:217 rbac/models/role.py:46 rbac/models/rolebinding.py:44
+#: orgs/models.py:222 rbac/models/role.py:46 rbac/models/rolebinding.py:44
 #: users/models/user.py:671
 msgid "Role"
 msgstr "ロール"
@@ -3136,27 +3128,27 @@ msgstr "クリップボードコピーペースト"
 msgid "From ticket"
 msgstr "チケットから"
 
-#: perms/notifications.py:18
+#: perms/notifications.py:15
 msgid "You permed assets is about to expire"
 msgstr "パーマ資産の有効期限が近づいています"
 
-#: perms/notifications.py:23
+#: perms/notifications.py:20
 msgid "permed assets"
 msgstr "パーマ資産"
 
-#: perms/notifications.py:62
+#: perms/notifications.py:59
 msgid "Asset permissions is about to expire"
 msgstr "資産権限の有効期限が近づいています"
 
-#: perms/notifications.py:67
+#: perms/notifications.py:64
 msgid "asset permissions of organization {}"
 msgstr "組織 {} の資産権限"
 
-#: perms/notifications.py:94
+#: perms/notifications.py:91
 msgid "Your permed applications is about to expire"
 msgstr "パーマアプリケーションの有効期限が近づいています"
 
-#: perms/notifications.py:98
+#: perms/notifications.py:95
 msgid "permed applications"
 msgstr "Permedアプリケーション"
 
@@ -3825,20 +3817,20 @@ msgstr "テンプレートコード"
 msgid "Test phone"
 msgstr "テスト電話"
 
-#: settings/serializers/auth/sso.py:12
+#: settings/serializers/auth/sso.py:11
 msgid "Enable SSO auth"
 msgstr "SSO Token認証の有効化"
 
-#: settings/serializers/auth/sso.py:13
+#: settings/serializers/auth/sso.py:12
 msgid "Other service can using SSO token login to JumpServer without password"
 msgstr ""
 "他のサービスはパスワードなしでJumpServerへのSSOトークンログインを使用できます"
 
-#: settings/serializers/auth/sso.py:16
+#: settings/serializers/auth/sso.py:15
 msgid "SSO auth key TTL"
 msgstr "Token有効期間"
 
-#: settings/serializers/auth/sso.py:16
+#: settings/serializers/auth/sso.py:15
 msgid "Unit: second"
 msgstr "単位: 秒"
 
@@ -4838,7 +4830,7 @@ msgstr "一括作成非サポート"
 msgid "Storage is invalid"
 msgstr "ストレージが無効です"
 
-#: terminal/models/command.py:53
+#: terminal/models/command.py:66
 msgid "Command record"
 msgstr "コマンドレコード"
 
@@ -6852,6 +6844,12 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "コミュニティ版"
+
+#~ msgid "IP is not allowed"
+#~ msgstr "IPは許可されていません"
+
+#~ msgid "Time Period is not allowed"
+#~ msgstr "期間は許可されていません"
 
 #~ msgid "User cannot self-update fields: {}"
 #~ msgstr "ユーザーは自分のフィールドを更新できません: {}"
