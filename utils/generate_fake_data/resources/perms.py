@@ -47,12 +47,6 @@ class AssetPermissionGenerator(FakeDataGenerator):
         relation_name = 'node_id'
         self.set_relations(perms, through, relation_name, choices)
 
-    def set_system_users(self, perms):
-        through = AssetPermission.system_users.through
-        choices = self.system_user_ids
-        relation_name = 'systemuser_id'
-        self.set_relations(perms, through, relation_name, choices)
-
     def set_relations(self, perms, through, relation_name, choices, choice_count=None):
         relations = []
 
@@ -79,4 +73,3 @@ class AssetPermissionGenerator(FakeDataGenerator):
         self.set_user_groups(created)
         self.set_assets(created)
         self.set_nodes(created)
-        self.set_system_users(created)

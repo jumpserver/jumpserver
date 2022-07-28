@@ -11,11 +11,7 @@ from perms.utils.asset.user_permission import get_user_all_asset_perm_ids
 logger = get_logger(__file__)
 
 
-def validate_permission(user, asset, system_user, action='connect'):
-
-    if not system_user.protocol in asset.protocols_as_dict.keys():
-        return False, time.time()
-
+def validate_permission(user, asset, account, action='connect'):
     asset_perm_ids = get_user_all_asset_perm_ids(user)
 
     asset_perm_ids_from_asset = AssetPermission.assets.through.objects.filter(
@@ -28,9 +24,7 @@ def validate_permission(user, asset, system_user, action='connect'):
     for node in nodes:
         ancestor_keys = node.get_ancestor_keys(with_self=True)
         node_keys.update(ancestor_keys)
-    node_ids = Node.objects.filter(key__in=node_keys).values_list('id', flat=True)
-
-    node_ids = set(node_ids)
+    node_ids = set(Node.objects.filter(key__in=node_keys).values_list('id', flat=True))
 
     asset_perm_ids_from_node = AssetPermission.nodes.through.objects.filter(
         assetpermission_id__in=asset_perm_ids,
@@ -39,16 +33,9 @@ def validate_permission(user, asset, system_user, action='connect'):
 
     asset_perm_ids = {*asset_perm_ids_from_asset, *asset_perm_ids_from_node}
 
-    asset_perm_ids = AssetPermission.system_users.through.objects.filter(
-        assetpermission_id__in=asset_perm_ids,
-        systemuser_id=system_user.id
-    ).values_list('assetpermission_id', flat=True)
-
-    asset_perm_ids = set(asset_perm_ids)
-
-    asset_perms = AssetPermission.objects.filter(
-        id__in=asset_perm_ids
-    ).order_by('-date_expired')
+    asset_perms = AssetPermission.objects\
+        .filter(id__in=asset_perm_ids, accounts__contains=account)\
+        .order_by('-date_expired')
 
     if asset_perms:
         actions = set()

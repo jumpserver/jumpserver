@@ -5,23 +5,17 @@ from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
 
 from common.utils import get_logger, get_object_or_none
-from common.permissions import IsValidUser
 from common.mixins.api import SuggestionMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
-from orgs.utils import tmp_to_root_org
 from ..models import SystemUser, CommandFilterRule, Account
 from .. import serializers
-from ..tasks import (
-    push_system_user_to_assets_manual, test_system_user_connectivity_manual,
-    push_system_user_to_assets
-)
 
 logger = get_logger(__file__)
 __all__ = [
-    'SystemUserViewSet', 'SystemUserAuthInfoApi', 'SystemUserAssetAuthInfoApi',
-    'SystemUserCommandFilterRuleListApi', 'SystemUserTaskApi', 'SystemUserAssetsListView',
-    'SystemUserTempAuthInfoApi', 'SystemUserAppAuthInfoApi', 'SystemUserAssetAccountApi',
+    'SystemUserViewSet', 'SystemUserAuthInfoApi',
+    'SystemUserCommandFilterRuleListApi',
+    'SystemUserAssetAccountApi',
     'SystemUserAssetAccountSecretApi',
 ]
 
@@ -35,7 +29,6 @@ class SystemUserViewSet(SuggestionMixin, OrgBulkModelViewSet):
         'name': ['exact'],
         'username': ['exact'],
         'protocol': ['exact', 'in'],
-        'type': ['exact', 'in'],
     }
     search_fields = filterset_fields
     serializer_class = serializers.SystemUserSerializer
@@ -154,116 +147,6 @@ class SystemUserAuthInfoApi(generics.RetrieveUpdateDestroyAPIView):
         return Response(status=204)
 
 
-class SystemUserTempAuthInfoApi(generics.CreateAPIView):
-    model = SystemUser
-    permission_classes = (IsValidUser,)
-    serializer_class = serializers.SystemUserTempAuthSerializer
-
-    def create(self, request, *args, **kwargs):
-        serializer = super().get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        pk = kwargs.get('pk')
-        data = serializer.validated_data
-        asset_or_app_id = data.get('instance_id')
-
-        with tmp_to_root_org():
-            instance = get_object_or_404(SystemUser, pk=pk)
-            instance.set_temp_auth(asset_or_app_id, self.request.user.id, data)
-        return Response(serializer.data, status=201)
-
-
-class SystemUserAssetAuthInfoApi(generics.RetrieveAPIView):
-    """
-    Get system user with asset auth info
-    """
-    model = SystemUser
-    serializer_class = serializers.SystemUserWithAuthInfoSerializer
-
-    def get_object(self):
-        instance = super().get_object()
-        asset_id = self.kwargs.get('asset_id')
-        user_id = self.request.query_params.get("user_id")
-        username = self.request.query_params.get("username")
-        instance.load_asset_more_auth(asset_id, username, user_id)
-        return instance
-
-
-class SystemUserAppAuthInfoApi(generics.RetrieveAPIView):
-    """
-    Get system user with asset auth info
-    """
-    model = SystemUser
-    serializer_class = serializers.SystemUserWithAuthInfoSerializer
-    rbac_perms = {
-        'retrieve': 'assets.view_systemusersecret',
-    }
-
-    def get_object(self):
-        instance = super().get_object()
-        app_id = self.kwargs.get('app_id')
-        user_id = self.request.query_params.get("user_id")
-        username = self.request.query_params.get("username")
-        instance.load_app_more_auth(app_id, username, user_id)
-        return instance
-
-
-class SystemUserTaskApi(generics.CreateAPIView):
-    serializer_class = serializers.SystemUserTaskSerializer
-
-    def do_push(self, system_user, asset_ids=None):
-        if asset_ids is None:
-            task = push_system_user_to_assets_manual.delay(system_user)
-        else:
-            username = self.request.query_params.get('username')
-            task = push_system_user_to_assets.delay(
-                system_user.id, asset_ids, username=username
-            )
-        return task
-
-    @staticmethod
-    def do_test(system_user, asset_ids):
-        task = test_system_user_connectivity_manual.delay(system_user, asset_ids)
-        return task
-
-    def get_object(self):
-        pk = self.kwargs.get('pk')
-        return get_object_or_404(SystemUser, pk=pk)
-
-    def check_permissions(self, request):
-        action = request.data.get('action')
-        action_perm_require = {
-            'push': 'assets.push_assetsystemuser',
-            'test': 'assets.test_assetconnectivity'
-        }
-        perm_required = action_perm_require.get(action)
-        has = self.request.user.has_perm(perm_required)
-
-        if not has:
-            self.permission_denied(request)
-
-    def perform_create(self, serializer):
-        action = serializer.validated_data["action"]
-        asset = serializer.validated_data.get('asset')
-
-        if asset:
-            assets = [asset]
-        else:
-            assets = serializer.validated_data.get('assets') or []
-
-        asset_ids = [asset.id for asset in assets]
-        asset_ids = asset_ids if asset_ids else None
-
-        system_user = self.get_object()
-        if action == 'push':
-            task = self.do_push(system_user, asset_ids)
-        else:
-            task = self.do_test(system_user, asset_ids)
-        data = getattr(serializer, '_data', {})
-        data["task"] = task.id
-        setattr(serializer, '_data', data)
-
-
 class SystemUserCommandFilterRuleListApi(generics.ListAPIView):
     rbac_perms = {
         'list': 'assets.view_commandfilterule'
@@ -291,19 +174,3 @@ class SystemUserCommandFilterRuleListApi(generics.ListAPIView):
         )
         return rules
 
-
-class SystemUserAssetsListView(generics.ListAPIView):
-    serializer_class = serializers.AssetSimpleSerializer
-    filterset_fields = ("hostname", "ip")
-    search_fields = filterset_fields
-    rbac_perms = {
-        'list': 'assets.view_asset'
-    }
-
-    def get_object(self):
-        pk = self.kwargs.get('pk')
-        return get_object_or_404(SystemUser, pk=pk)
-
-    def get_queryset(self):
-        system_user = self.get_object()
-        return system_user.get_all_assets()

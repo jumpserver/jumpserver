@@ -91,7 +91,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'cpu_info', 'hardware_info',
         ]
         fields_fk = [
-            'domain', 'domain_display', 'platform', 'admin_user', 'admin_user_display'
+            'domain', 'domain_display', 'platform',
         ]
         fields_m2m = [
             'nodes', 'nodes_display', 'labels', 'labels_display', 'accounts'
@@ -114,19 +114,10 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
         self.accounts_data = data.pop('accounts', [])
         super().__init__(*args, **kwargs)
 
-    def get_fields(self):
-        fields = super().get_fields()
-
-        admin_user_field = fields.get('admin_user')
-        # 因为 mixin 中对 fields 有处理，可能不需要返回 admin_user
-        if admin_user_field:
-            admin_user_field.queryset = SystemUser.objects.filter(type=SystemUser.Type.admin)
-        return fields
-
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('domain', 'platform', 'admin_user')
+        queryset = queryset.prefetch_related('domain', 'platform')
         queryset = queryset.prefetch_related('nodes', 'labels')
         return queryset
 
@@ -162,7 +153,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     def add_accounts(instance, accounts_data):
         for data in accounts_data:
             data['asset'] = instance.id
-        print("Data: ", accounts_data)
         serializer = AccountSerializer(data=accounts_data, many=True)
         try:
             serializer.is_valid(raise_exception=True)

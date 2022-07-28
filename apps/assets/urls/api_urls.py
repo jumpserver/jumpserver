@@ -17,7 +17,6 @@ router.register(r'accounts-history', api.AccountHistoryViewSet, 'account-history
 router.register(r'account-history-secrets', api.AccountHistorySecretsViewSet, 'account-history-secret')
 router.register(r'platforms', api.AssetPlatformViewSet, 'platform')
 router.register(r'system-users', api.SystemUserViewSet, 'system-user')
-router.register(r'admin-users', api.AdminUserViewSet, 'admin-user')
 router.register(r'labels', api.LabelViewSet, 'label')
 router.register(r'nodes', api.NodeViewSet, 'node')
 router.register(r'domains', api.DomainViewSet, 'domain')
@@ -25,9 +24,6 @@ router.register(r'gateways', api.GatewayViewSet, 'gateway')
 router.register(r'cmd-filters', api.CommandFilterViewSet, 'cmd-filter')
 router.register(r'gathered-users', api.GatheredUserViewSet, 'gathered-user')
 router.register(r'favorite-assets', api.FavoriteAssetViewSet, 'favorite-asset')
-router.register(r'system-users-assets-relations', api.SystemUserAssetRelationViewSet, 'system-users-assets-relation')
-router.register(r'system-users-nodes-relations', api.SystemUserNodeRelationViewSet, 'system-users-nodes-relation')
-router.register(r'system-users-users-relations', api.SystemUserUserRelationViewSet, 'system-users-users-relation')
 router.register(r'account-backup-plans', api.AccountBackupPlanViewSet, 'account-backup')
 router.register(r'account-backup-plan-executions', api.AccountBackupPlanExecutionViewSet, 'account-backup-execution')
 
@@ -45,11 +41,8 @@ urlpatterns = [
     path('assets/<uuid:pk>/perm-user-groups/', api.AssetPermUserGroupListApi.as_view(), name='asset-perm-user-group-list'),
     path('assets/<uuid:pk>/perm-user-groups/<uuid:perm_user_group_id>/permissions/', api.AssetPermUserGroupPermissionsListApi.as_view(), name='asset-perm-user-group-permission-list'),
 
-    path('system-users/<uuid:pk>/assets/', api.SystemUserAssetsListView.as_view(), name='system-user-assets'),
-    path('system-users/<uuid:pk>/applications/<uuid:app_id>/auth-info/', api.SystemUserAppAuthInfoApi.as_view(), name='system-user-app-auth-info'),
     path('system-users/<uuid:pk>/assets/<uuid:asset_id>/users/<uuid:user_id>/account/', api.SystemUserAssetAccountApi.as_view(), name='system-user-asset-account'),
     path('system-users/<uuid:pk>/assets/<uuid:asset_id>/users/<uuid:user_id>/account-secret/', api.SystemUserAssetAccountSecretApi.as_view(), name='system-user-asset-account-secret'),
-    path('system-users/<uuid:pk>/tasks/', api.SystemUserTaskApi.as_view(), name='system-user-task-create'),
     path('system-users/<uuid:pk>/cmd-filter-rules/', api.SystemUserCommandFilterRuleListApi.as_view(), name='system-user-cmd-filter-rule-list'),
     path('cmd-filter-rules/', api.SystemUserCommandFilterRuleListApi.as_view(), name='cmd-filter-rules'),
 
