@@ -16,7 +16,7 @@
 
 
 
-JumpServer 是全球首款开源的堡垒机，使用 GPLv3 开源协议，是符合 4A 规范的运维安全审计系统。
+JumpServer 是广受欢迎的开源堡垒机，是符合 4A 规范的专业运维安全审计系统。
 
 JumpServer 使用 Python 开发，配备了业界领先的 Web Terminal 方案，交互界面美观、用户体验好。
 
