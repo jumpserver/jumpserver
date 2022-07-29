@@ -4263,7 +4263,7 @@ msgstr "会话分享"
 
 #: settings/serializers/security.py:180
 msgid "Enabled, Allows user active session to be shared with other users"
-msgstr "开启后允许用户分享已连接的资产会话给它人，协同工作"
+msgstr "开启后允许用户分享已连接的资产会话给他人，协同工作"
 
 #: settings/serializers/security.py:183
 msgid "Remote Login Protection"
