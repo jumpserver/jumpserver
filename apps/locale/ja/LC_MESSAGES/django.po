@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-28 13:43+0800\n"
+"POT-Creation-Date: 2022-07-29 10:56+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -80,7 +80,7 @@ msgstr "拒否"
 msgid "Allow"
 msgstr "許可"
 
-#: acls/models/login_acl.py:20 acls/models/login_acl.py:104
+#: acls/models/login_acl.py:20 acls/models/login_acl.py:75
 #: acls/models/login_asset_acl.py:17 tickets/const.py:9
 msgid "Login confirm"
 msgstr "ログイン確認"
@@ -1915,7 +1915,7 @@ msgstr "このアカウントは期限切れです"
 msgid "Auth backend not match"
 msgstr "Authバックエンドが一致しない"
 
-#: authentication/errors/const.py:28
+#: authentication/errors/const.py:28 authentication/errors/failed.py:145
 msgid "ACL is not allowed"
 msgstr "ACLは許可されません"
 
@@ -1983,23 +1983,15 @@ msgstr "受け入れのためのログイン確認チケットを待つ"
 msgid "Login confirm ticket was {}"
 msgstr "ログイン確認チケットは {} でした"
 
-#: authentication/errors/failed.py:145
-msgid "IP is not allowed"
-msgstr "IPは許可されていません"
-
-#: authentication/errors/failed.py:152
-msgid "Time Period is not allowed"
-msgstr "期間は許可されていません"
-
-#: authentication/errors/failed.py:157
+#: authentication/errors/failed.py:150
 msgid "Please enter MFA code"
 msgstr "MFAコードを入力してください"
 
-#: authentication/errors/failed.py:162
+#: authentication/errors/failed.py:155
 msgid "Please enter SMS code"
 msgstr "SMSコードを入力してください"
 
-#: authentication/errors/failed.py:167 users/exceptions.py:15
+#: authentication/errors/failed.py:160 users/exceptions.py:15
 msgid "Phone not set"
 msgstr "電話が設定されていない"
 
@@ -6862,6 +6854,12 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "コミュニティ版"
+
+#~ msgid "IP is not allowed"
+#~ msgstr "IPは許可されていません"
+
+#~ msgid "Time Period is not allowed"
+#~ msgstr "期間は許可されていません"
 
 #~ msgid "User cannot self-update fields: {}"
 #~ msgstr "ユーザーは自分のフィールドを更新できません: {}"

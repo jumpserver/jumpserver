@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-28 13:43+0800\n"
+"POT-Creation-Date: 2022-07-29 10:56+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -79,7 +79,7 @@ msgstr "拒绝"
 msgid "Allow"
 msgstr "允许"
 
-#: acls/models/login_acl.py:20 acls/models/login_acl.py:104
+#: acls/models/login_acl.py:20 acls/models/login_acl.py:75
 #: acls/models/login_asset_acl.py:17 tickets/const.py:9
 msgid "Login confirm"
 msgstr "登录复核"
@@ -1901,7 +1901,7 @@ msgstr "此账号已过期"
 msgid "Auth backend not match"
 msgstr "没有匹配到认证后端"
 
-#: authentication/errors/const.py:28
+#: authentication/errors/const.py:28 authentication/errors/failed.py:145
 msgid "ACL is not allowed"
 msgstr "ACL 不被允许"
 
@@ -1963,23 +1963,15 @@ msgstr "等待登录复核处理"
 msgid "Login confirm ticket was {}"
 msgstr "登录复核: {}"
 
-#: authentication/errors/failed.py:145
-msgid "IP is not allowed"
-msgstr "来源 IP 不被允许登录"
-
-#: authentication/errors/failed.py:152
-msgid "Time Period is not allowed"
-msgstr "该 时间段 不被允许登录"
-
-#: authentication/errors/failed.py:157
+#: authentication/errors/failed.py:150
 msgid "Please enter MFA code"
 msgstr "请输入 MFA 验证码"
 
-#: authentication/errors/failed.py:162
+#: authentication/errors/failed.py:155
 msgid "Please enter SMS code"
 msgstr "请输入短信验证码"
 
-#: authentication/errors/failed.py:167 users/exceptions.py:15
+#: authentication/errors/failed.py:160 users/exceptions.py:15
 msgid "Phone not set"
 msgstr "手机号没有设置"
 
@@ -6765,6 +6757,12 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "IP is not allowed"
+#~ msgstr "来源 IP 不被允许登录"
+
+#~ msgid "Time Period is not allowed"
+#~ msgstr "该 时间段 不被允许登录"
 
 #~ msgid "User cannot self-update fields: {}"
 #~ msgstr "用户不能更新自己的字段: {}"

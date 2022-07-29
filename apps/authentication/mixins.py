@@ -328,13 +328,56 @@ class AuthACLMixin:
 
     def _check_login_acl(self, user, ip):
         # ACL 限制用户登录
-        is_allowed, limit_type = LoginACL.allow_user_to_login(user, ip)
-        if is_allowed:
+        acl = LoginACL.match(user, ip)
+        if not acl:
             return
-        if limit_type == 'ip':
-            raise errors.LoginIPNotAllowed(username=user.username, request=self.request)
-        elif limit_type == 'time':
-            raise errors.TimePeriodNotAllowed(username=user.username, request=self.request)
+
+        acl: LoginACL
+        if acl.is_action(acl.ActionChoices.allow):
+            return
+
+        if acl.is_action(acl.ActionChoices.reject):
+            raise errors.LoginACLNotAllowed(username=user.username, request=self.request)
+
+        if acl.is_action(acl.ActionChoices.confirm):
+            self.request.session['auth_confirm_required'] = '1'
+            self.request.session['auth_acl_id'] = str(acl.id)
+            return
+
+    def check_user_login_confirm_if_need(self, user):
+        if not self.request.session.get("auth_confirm_required"):
+            return
+        acl_id = self.request.session.get('auth_acl_id')
+        logger.debug('Login confirm acl id: {}'.format(acl_id))
+        if not acl_id:
+            return
+        acl = LoginACL.filter_acl(user).filter(id=acl_id).first()
+        if not acl:
+            return
+        if not acl.is_action(acl.ActionChoices.confirm):
+            return
+        self.get_ticket_or_create(acl)
+        self.check_user_login_confirm()
+
+    def get_ticket_or_create(self, acl):
+        ticket = self.get_ticket()
+        if not ticket or ticket.is_state(ticket.State.closed):
+            ticket = acl.create_confirm_ticket(self.request)
+            self.request.session['auth_ticket_id'] = str(ticket.id)
+        return ticket
+
+    def check_user_login_confirm(self):
+        ticket = self.get_ticket()
+        if not ticket:
+            raise errors.LoginConfirmOtherError('', "Not found")
+        elif ticket.is_state(ticket.State.approved):
+            self.request.session["auth_confirm_required"] = ''
+            return
+        elif ticket.is_status(ticket.Status.open):
+            raise errors.LoginConfirmWaitError(ticket.id)
+        else:
+            # rejected, closed
+            raise errors.LoginConfirmOtherError(ticket.id, ticket.get_state_display())
 
     def get_ticket(self):
         from tickets.models import ApplyLoginTicket
@@ -345,44 +388,6 @@ class AuthACLMixin:
         else:
             ticket = ApplyLoginTicket.all().filter(id=ticket_id).first()
         return ticket
-
-    def get_ticket_or_create(self, confirm_setting):
-        ticket = self.get_ticket()
-        if not ticket or ticket.is_status(ticket.Status.closed):
-            ticket = confirm_setting.create_confirm_ticket(self.request)
-            self.request.session['auth_ticket_id'] = str(ticket.id)
-        return ticket
-
-    def check_user_login_confirm(self):
-        ticket = self.get_ticket()
-        if not ticket:
-            raise errors.LoginConfirmOtherError('', "Not found")
-
-        if ticket.is_status(ticket.Status.open):
-            raise errors.LoginConfirmWaitError(ticket.id)
-        elif ticket.is_state(ticket.State.approved):
-            self.request.session["auth_confirm"] = "1"
-            return
-        elif ticket.is_state(ticket.State.rejected):
-            raise errors.LoginConfirmOtherError(
-                ticket.id, ticket.get_state_display()
-            )
-        elif ticket.is_state(ticket.State.closed):
-            raise errors.LoginConfirmOtherError(
-                ticket.id, ticket.get_state_display()
-            )
-        else:
-            raise errors.LoginConfirmOtherError(
-                ticket.id, ticket.get_status_display()
-            )
-
-    def check_user_login_confirm_if_need(self, user):
-        ip = self.get_request_ip()
-        is_allowed, confirm_setting = LoginACL.allow_user_confirm_if_need(user, ip)
-        if self.request.session.get('auth_confirm') or not is_allowed:
-            return
-        self.get_ticket_or_create(confirm_setting)
-        self.check_user_login_confirm()
 
 
 class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPostCheckMixin):
@@ -482,7 +487,9 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
             return self.check_user_auth(valid_data)
 
     def clear_auth_mark(self):
-        keys = ['auth_password', 'user_id', 'auth_confirm', 'auth_ticket_id']
+        keys = [
+            'auth_password', 'user_id', 'auth_confirm_required', 'auth_ticket_id', 'auth_acl_id'
+        ]
         for k in keys:
             self.request.session.pop(k, '')
 
