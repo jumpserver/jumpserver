@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
 from common.utils import get_logger, get_object_or_none
-from common.mixins.api import SuggestionMixin
+from common.mixins.api import SuggestionMixin, RenderToJsonMixin
 from users.models import User, UserGroup
 from users.serializers import UserSerializer, UserGroupSerializer
 from users.filters import UserFilter
@@ -88,7 +88,7 @@ class AssetPlatformRetrieveApi(RetrieveAPIView):
         return asset.platform
 
 
-class AssetPlatformViewSet(ModelViewSet):
+class AssetPlatformViewSet(ModelViewSet, RenderToJsonMixin):
     queryset = Platform.objects.all()
     serializer_class = serializers.PlatformSerializer
     filterset_fields = ['name', 'base']
