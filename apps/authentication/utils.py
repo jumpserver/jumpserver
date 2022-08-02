@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+from urllib.parse import urljoin
 
 from django.conf import settings
 
@@ -29,3 +30,17 @@ def check_different_city_login_if_need(user, request):
 
         if last_user_login and last_user_login.city != city:
             DifferentCityLoginMessage(user, ip, city).publish_async()
+
+
+def build_absolute_uri(request, path=None):
+    """
+    Build absolute redirect uri
+    """
+    if path is None:
+        path = '/'
+
+    if settings.BASE_SITE_URL:
+        redirect_uri = urljoin(settings.BASE_SITE_URL, path)
+    else:
+        redirect_uri = request.build_absolute_uri(path)
+    return redirect_uri

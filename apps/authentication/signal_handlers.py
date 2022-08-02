@@ -12,6 +12,9 @@ from authentication.backends.oidc.signals import (
 from authentication.backends.saml2.signals import (
     saml2_user_authenticated, saml2_user_authentication_failed
 )
+from authentication.backends.oauth2.signals import (
+    oauth2_user_login_failed, oauth2_user_login_success
+)
 from .signals import post_auth_success, post_auth_failed
 
 
@@ -66,4 +69,16 @@ def on_saml2_user_login_success(sender, request, user, **kwargs):
 @receiver(saml2_user_authentication_failed)
 def on_saml2_user_login_failed(sender, request, username, reason, **kwargs):
     request.session['auth_backend'] = settings.AUTH_BACKEND_SAML2
+    post_auth_failed.send(sender, username=username, request=request, reason=reason)
+
+
+@receiver(oauth2_user_login_success)
+def on_oauth2_user_login_success(sender, request, user, **kwargs):
+    request.session['auth_backend'] = settings.AUTH_BACKEND_OAUTH2
+    post_auth_success.send(sender, user=user, request=request)
+
+
+@receiver(oauth2_user_login_failed)
+def on_oauth2_user_login_failed(sender, username, request, reason, **kwargs):
+    request.session['auth_backend'] = settings.AUTH_BACKEND_OAUTH2
     post_auth_failed.send(sender, username=username, request=request, reason=reason)

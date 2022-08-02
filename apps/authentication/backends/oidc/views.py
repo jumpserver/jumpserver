@@ -20,7 +20,8 @@ from django.utils.crypto import get_random_string
 from django.utils.http import is_safe_url, urlencode
 from django.views.generic import View
 
-from .utils import get_logger, build_absolute_uri
+from authentication.utils import build_absolute_uri
+from .utils import get_logger
 
 
 logger = get_logger(__file__)

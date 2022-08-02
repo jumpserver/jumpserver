@@ -64,6 +64,13 @@ class UserLoginContextMixin:
                 'auto_redirect': True
             },
             {
+                'name': 'OAuth2',
+                'enabled': settings.AUTH_OAUTH2,
+                'url': reverse('authentication:oauth2:login'),
+                'logo': static('img/login_saml2_logo.png'),
+                'auto_redirect': True
+            },
+            {
                 'name': _('WeCom'),
                 'enabled': settings.AUTH_WECOM,
                 'url': reverse('authentication:wecom-qr-login'),

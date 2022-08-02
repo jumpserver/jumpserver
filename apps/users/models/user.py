@@ -628,6 +628,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         radius = 'radius', 'Radius'
         cas = 'cas', 'CAS'
         saml2 = 'saml2', 'SAML2'
+        oauth2 = 'oauth2', 'OAuth2'
 
     SOURCE_BACKEND_MAPPING = {
         Source.local: [
@@ -651,6 +652,9 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         ],
         Source.saml2: [
             settings.AUTH_BACKEND_SAML2
+        ],
+        Source.oauth2: [
+            settings.AUTH_BACKEND_OAUTH2
         ],
     }
 

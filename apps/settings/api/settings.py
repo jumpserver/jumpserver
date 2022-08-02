@@ -34,6 +34,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'cas': serializers.CASSettingSerializer,
         'sso': serializers.SSOSettingSerializer,
         'saml2': serializers.SAML2SettingSerializer,
+        'oauth2': serializers.OAuth2SettingSerializer,
         'clean': serializers.CleaningSerializer,
         'other': serializers.OtherSettingSerializer,
         'sms': serializers.SMSSettingSerializer,
