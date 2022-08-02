@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-29 11:26+0800\n"
+"POT-Creation-Date: 2022-08-02 14:32+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1914,7 +1914,7 @@ msgstr "このアカウントは期限切れです"
 msgid "Auth backend not match"
 msgstr "Authバックエンドが一致しない"
 
-#: authentication/errors/const.py:28 authentication/errors/failed.py:145
+#: authentication/errors/const.py:28
 msgid "ACL is not allowed"
 msgstr "ACLは許可されません"
 
@@ -1981,6 +1981,10 @@ msgstr "受け入れのためのログイン確認チケットを待つ"
 #: authentication/errors/const.py:67
 msgid "Login confirm ticket was {}"
 msgstr "ログイン確認チケットは {} でした"
+
+#: authentication/errors/failed.py:145
+msgid "Current IP and Time period is not allowed"
+msgstr "現在の IP と期間はログインを許可されていません"
 
 #: authentication/errors/failed.py:150
 msgid "Please enter MFA code"
@@ -6847,9 +6851,6 @@ msgstr "コミュニティ版"
 
 #~ msgid "IP is not allowed"
 #~ msgstr "IPは許可されていません"
-
-#~ msgid "Time Period is not allowed"
-#~ msgstr "期間は許可されていません"
 
 #~ msgid "User cannot self-update fields: {}"
 #~ msgstr "ユーザーは自分のフィールドを更新できません: {}"

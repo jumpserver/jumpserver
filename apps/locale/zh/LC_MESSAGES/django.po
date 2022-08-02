@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-29 11:26+0800\n"
+"POT-Creation-Date: 2022-08-02 14:32+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1900,7 +1900,7 @@ msgstr "此账号已过期"
 msgid "Auth backend not match"
 msgstr "没有匹配到认证后端"
 
-#: authentication/errors/const.py:28 authentication/errors/failed.py:145
+#: authentication/errors/const.py:28
 msgid "ACL is not allowed"
 msgstr "ACL 不被允许"
 
@@ -1961,6 +1961,10 @@ msgstr "等待登录复核处理"
 #: authentication/errors/const.py:67
 msgid "Login confirm ticket was {}"
 msgstr "登录复核: {}"
+
+#: authentication/errors/failed.py:145
+msgid "Current IP and Time period is not allowed"
+msgstr "当前 IP 和时间段不被允许登录"
 
 #: authentication/errors/failed.py:150
 msgid "Please enter MFA code"
@@ -6750,9 +6754,6 @@ msgstr "社区版"
 
 #~ msgid "IP is not allowed"
 #~ msgstr "来源 IP 不被允许登录"
-
-#~ msgid "Time Period is not allowed"
-#~ msgstr "该 时间段 不被允许登录"
 
 #~ msgid "User cannot self-update fields: {}"
 #~ msgstr "用户不能更新自己的字段: {}"
