@@ -307,6 +307,18 @@ CSRF_COOKIE_SECURE = CONFIG.CSRF_COOKIE_SECURE
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+]
+
+
+GMSSL_ENABLED = CONFIG.GMSSL_ENABLED
+if GMSSL_ENABLED:
+    PASSWORD_HASHERS.insert(0, 'common.hashers.PBKDF2SM3PasswordHasher')
+
 # For Debug toolbar
 INTERNAL_IPS = ["127.0.0.1"]
 if os.environ.get('DEBUG_TOOLBAR', False):
@@ -315,3 +327,4 @@ if os.environ.get('DEBUG_TOOLBAR', False):
     DEBUG_TOOLBAR_PANELS = [
         'debug_toolbar.panels.profiling.ProfilingPanel',
     ]
+

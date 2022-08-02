@@ -387,7 +387,8 @@ class Config(dict):
         'SESSION_SAVE_EVERY_REQUEST': True,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE': False,
         'SERVER_REPLAY_STORAGE': {},
-        'SECURITY_DATA_CRYPTO_ALGO': 'aes',
+        'SECURITY_DATA_CRYPTO_ALGO': None,
+        'GMSSL_ENABLED': False,
 
         # 记录清理清理
         'LOGIN_LOG_KEEP_DAYS': 200,

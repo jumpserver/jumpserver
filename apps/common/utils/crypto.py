@@ -162,34 +162,42 @@ gm_sm4_ecb_crypto = get_gm_sm4_ecb_crypto()
 
 
 class Crypto:
-    cryptoes = {
+    cryptor_map = {
         'aes_ecb': aes_ecb_crypto,
         'aes_gcm': aes_crypto,
         'aes': aes_crypto,
         'gm_sm4_ecb': gm_sm4_ecb_crypto,
         'gm': gm_sm4_ecb_crypto,
     }
+    cryptos = []
 
     def __init__(self):
-        cryptoes = self.__class__.cryptoes.copy()
-        crypto = cryptoes.pop(settings.SECURITY_DATA_CRYPTO_ALGO, None)
-        if crypto is None:
+        crypt_algo = settings.SECURITY_DATA_CRYPTO_ALGO
+        if not crypt_algo:
+            if settings.GMSSL_ENABLED:
+                crypt_algo = 'gm'
+            else:
+                crypt_algo = 'aes'
+
+        cryptor = self.cryptor_map.get(crypt_algo, None)
+        if cryptor is None:
             raise ImproperlyConfigured(
                 f'Crypto method not supported {settings.SECURITY_DATA_CRYPTO_ALGO}'
             )
-        self.cryptoes = [crypto, *cryptoes.values()]
+        others = set(self.cryptor_map.values()) - {cryptor}
+        self.cryptos = [cryptor, *others]
 
     @property
     def encryptor(self):
-        return self.cryptoes[0]
+        return self.cryptos[0]
 
     def encrypt(self, text):
         return self.encryptor.encrypt(text)
 
     def decrypt(self, text):
-        for decryptor in self.cryptoes:
+        for cryptor in self.cryptos:
             try:
-                origin_text = decryptor.decrypt(text)
+                origin_text = cryptor.decrypt(text)
                 if origin_text:
                     # 有时不同算法解密不报错，但是返回空字符串
                     return origin_text
