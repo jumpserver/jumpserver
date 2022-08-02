@@ -255,6 +255,8 @@ def decrypt_password(value):
     if len(cipher) != 2:
         return value
     key_cipher, password_cipher = cipher
+    if not all([key_cipher, password_cipher]):
+        return value
     aes_key = rsa_decrypt_by_session_pkey(key_cipher)
     aes = get_aes_crypto(aes_key, 'ECB')
     try:
