@@ -9,7 +9,6 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import ugettext_lazy as _
 
 from users.models import User, UserGroup
-from applications.models import Application
 from ..models import SystemUser, Asset
 
 from common.utils import lazyproperty, get_logger, get_object_or_none
@@ -125,6 +124,9 @@ class CommandFilterRule(OrgModelMixin):
                 regex.append(cmd)
                 continue
 
+            if not cmd:
+                continue
+
             # 如果是单个字符
             if cmd[-1].isalpha():
                 regex.append(r'\b{0}\b'.format(cmd))
@@ -187,6 +189,7 @@ class CommandFilterRule(OrgModelMixin):
     @classmethod
     def get_queryset(cls, user_id=None, user_group_id=None, system_user_id=None,
                      asset_id=None, application_id=None, org_id=None):
+        from applications.models import Application
         user_groups = []
         user = get_object_or_none(User, pk=user_id)
         if user:

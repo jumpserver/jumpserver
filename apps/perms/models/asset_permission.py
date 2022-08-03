@@ -7,7 +7,7 @@ from django.db import models
 from orgs.mixins.models import OrgModelMixin
 from common.utils import lazyproperty
 from common.db.models import BaseCreateUpdateModel
-from assets.models import Asset, SystemUser, Node, FamilyMixin
+from assets.models import Asset, Node, FamilyMixin
 
 from .base import BasePermission
 
@@ -23,14 +23,13 @@ logger = logging.getLogger(__name__)
 class AssetPermission(BasePermission):
     assets = models.ManyToManyField('assets.Asset', related_name='granted_by_permissions', blank=True, verbose_name=_("Asset"))
     nodes = models.ManyToManyField('assets.Node', related_name='granted_by_permissions', blank=True, verbose_name=_("Nodes"))
-    system_users = models.ManyToManyField('assets.SystemUser', related_name='granted_by_permissions', blank=True, verbose_name=_("System user"))
+    accounts = models.JSONField(default=list, verbose_name=_("Accounts"))
 
     class Meta:
         unique_together = [('org_id', 'name')]
         verbose_name = _("Asset permission")
         ordering = ('name',)
-        permissions = [
-        ]
+        permissions = []
 
     @lazyproperty
     def users_amount(self):
@@ -48,16 +47,11 @@ class AssetPermission(BasePermission):
     def nodes_amount(self):
         return self.nodes.count()
 
-    @lazyproperty
-    def system_users_amount(self):
-        return self.system_users.count()
-
     @classmethod
     def get_queryset_with_prefetch(cls):
         return cls.objects.all().valid().prefetch_related(
             models.Prefetch('nodes', queryset=Node.objects.all().only('key')),
             models.Prefetch('assets', queryset=Asset.objects.all().only('id')),
-            models.Prefetch('system_users', queryset=SystemUser.objects.all().only('id'))
         ).order_by()
 
     def get_all_assets(self):
@@ -79,10 +73,6 @@ class AssetPermission(BasePermission):
 
     def assets_display(self):
         names = [asset.hostname for asset in self.assets.all()]
-        return names
-
-    def system_users_display(self):
-        names = [system_user.name for system_user in self.system_users.all()]
         return names
 
     def nodes_display(self):

@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from rest_framework import generics
-from django.db.models import F, Value
-from django.db.models.functions import Concat
+from django.db.models import F
 from django.shortcuts import get_object_or_404
 
 from orgs.mixins.api import OrgRelationMixin
@@ -15,8 +14,7 @@ from perms.utils.asset.user_permission import UserGrantedAssetsQueryUtils
 __all__ = [
     'AssetPermissionUserRelationViewSet', 'AssetPermissionUserGroupRelationViewSet',
     'AssetPermissionAssetRelationViewSet', 'AssetPermissionNodeRelationViewSet',
-    'AssetPermissionSystemUserRelationViewSet', 'AssetPermissionAllAssetListApi',
-    'AssetPermissionAllUserListApi',
+    'AssetPermissionAllAssetListApi', 'AssetPermissionAllUserListApi',
 ]
 
 
@@ -117,21 +115,3 @@ class AssetPermissionNodeRelationViewSet(RelationMixin):
             .annotate(node_key=F('node__key'))
         return queryset
 
-
-class AssetPermissionSystemUserRelationViewSet(RelationMixin):
-    serializer_class = serializers.AssetPermissionSystemUserRelationSerializer
-    m2m_field = models.AssetPermission.system_users.field
-    filterset_fields = [
-        'id', 'systemuser', 'assetpermission',
-    ]
-    search_fields = [
-        "assetpermission__name", "systemuser__name", "systemuser__username"
-    ]
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        queryset = queryset.annotate(
-            systemuser_display=Concat(
-                F('systemuser__name'), Value('('), F('systemuser__username'), Value(')')
-            ))
-        return queryset

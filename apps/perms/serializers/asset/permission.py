@@ -22,7 +22,6 @@ class AssetPermissionSerializer(BasePermissionSerializer):
     user_groups_display = serializers.ListField(child=serializers.CharField(), label=_('User groups display'), required=False)
     assets_display = serializers.ListField(child=serializers.CharField(), label=_('Assets display'), required=False)
     nodes_display = serializers.ListField(child=serializers.CharField(), label=_('Nodes display'), required=False)
-    system_users_display = serializers.ListField(child=serializers.CharField(), label=_('System users display'), required=False)
 
     class Meta:
         model = AssetPermission
@@ -34,9 +33,9 @@ class AssetPermissionSerializer(BasePermissionSerializer):
         ]
         fields_m2m = [
             'users', 'users_display', 'user_groups', 'user_groups_display', 'assets',
-            'assets_display', 'nodes', 'nodes_display', 'system_users', 'system_users_display',
+            'assets_display', 'nodes', 'nodes_display', 'accounts',
             'users_amount', 'user_groups_amount', 'assets_amount',
-            'nodes_amount', 'system_users_amount',
+            'nodes_amount',
         ]
         fields = fields_small + fields_m2m
         read_only_fields = ['created_by', 'date_created', 'from_ticket']
@@ -48,29 +47,15 @@ class AssetPermissionSerializer(BasePermissionSerializer):
             'user_groups_amount': {'label': _('User groups amount')},
             'assets_amount': {'label': _('Assets amount')},
             'nodes_amount': {'label': _('Nodes amount')},
-            'system_users_amount': {'label': _('System users amount')},
         }
 
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
         queryset = queryset.prefetch_related(
-            'users', 'user_groups', 'assets', 'nodes', 'system_users'
+            'users', 'user_groups', 'assets', 'nodes',
         )
         return queryset
-
-    def to_internal_value(self, data):
-        if 'system_users_display' in data:
-            # system_users_display 转化为 system_users
-            system_users = data.get('system_users', [])
-            system_users_display = data.pop('system_users_display')
-
-            for name in system_users_display:
-                system_user = SystemUser.objects.filter(name=name).first()
-                if system_user and system_user.id not in system_users:
-                    system_users.append(system_user.id)
-            data['system_users'] = system_users
-        return super().to_internal_value(data)
 
     @staticmethod
     def perform_display_create(instance, **kwargs):

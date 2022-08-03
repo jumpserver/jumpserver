@@ -125,9 +125,8 @@ class AuthBook(BaseUser, AbsConnectivity):
         logger.debug('Update asset admin user: {} {}'.format(self.asset, self.systemuser))
 
     @classmethod
-    def get_queryset(cls, is_history_model=False):
-        model = cls.history.model if is_history_model else cls
-        queryset = model.objects.all() \
+    def get_queryset(cls):
+        queryset = cls.objects.all() \
             .annotate(ip=F('asset__ip')) \
             .annotate(hostname=F('asset__hostname')) \
             .annotate(platform=F('asset__platform__name')) \
@@ -136,5 +135,3 @@ class AuthBook(BaseUser, AbsConnectivity):
 
     def __str__(self):
         return self.smart_name
-
-

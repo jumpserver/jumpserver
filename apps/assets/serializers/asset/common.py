@@ -94,8 +94,7 @@ class AssetSerializer(CategoryDisplayMixin, OrgResourceModelSerializerMixin):
             'public_ip', 'number', 'comment',
         ]
         fields_fk = [
-            'domain', 'domain_display', 'platform', 'platform_display',
-            'admin_user', 'admin_user_display'
+            'domain', 'domain_display', 'platform',
         ]
         fields_m2m = [
             'nodes', 'nodes_display', 'labels', 'labels_display', 'accounts'
@@ -137,7 +136,7 @@ class AssetSerializer(CategoryDisplayMixin, OrgResourceModelSerializerMixin):
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('domain', 'platform', 'admin_user')
+        queryset = queryset.prefetch_related('domain', 'platform')
         queryset = queryset.prefetch_related('nodes', 'labels')
         return queryset
 
@@ -173,7 +172,6 @@ class AssetSerializer(CategoryDisplayMixin, OrgResourceModelSerializerMixin):
     def add_accounts(instance, accounts_data):
         for data in accounts_data:
             data['asset'] = instance.id
-        print("Data: ", accounts_data)
         serializer = AccountSerializer(data=accounts_data, many=True)
         try:
             serializer.is_valid(raise_exception=True)

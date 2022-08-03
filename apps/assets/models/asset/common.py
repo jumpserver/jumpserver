@@ -9,7 +9,6 @@ from collections import OrderedDict
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from rest_framework.exceptions import ValidationError
 
 from common.db.fields import JsonDictTextField
 from common.utils import lazyproperty
@@ -20,16 +19,6 @@ from ..base import AbsConnectivity
 
 __all__ = ['Asset', 'ProtocolsMixin', 'AssetQuerySet', 'default_node', 'default_cluster']
 logger = logging.getLogger(__name__)
-
-
-def default_cluster():
-    from assets.models import Cluster
-    name = "Default"
-    defaults = {"name": name}
-    cluster, created = Cluster.objects.get_or_create(
-        defaults=defaults, name=name
-    )
-    return cluster.id
 
 
 def default_node():

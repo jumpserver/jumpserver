@@ -62,20 +62,19 @@ class ValidateUserApplicationPermissionApi(APIView):
     def get(self, request, *args, **kwargs):
         user_id = request.query_params.get('user_id', '')
         application_id = request.query_params.get('application_id', '')
-        system_user_id = request.query_params.get('system_user_id', '')
+        account = system_user_id = request.query_params.get('account', '')
 
         data = {
             'has_permission': False,
             'expire_at': int(time.time()),
             'actions': []
         }
-        if not all((user_id, application_id, system_user_id)):
+        if not all((user_id, application_id, account)):
             return Response(data)
 
         user = User.objects.get(id=user_id)
         application = Application.objects.get(id=application_id)
-        system_user = SystemUser.objects.get(id=system_user_id)
-        has_perm, actions, expire_at = validate_permission(user, application, system_user)
+        has_perm, actions, expire_at = validate_permission(user, application, account)
         status_code = status.HTTP_200_OK if has_perm else status.HTTP_403_FORBIDDEN
         data = {
             'has_permission': has_perm,

@@ -11,68 +11,18 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from assets.const import Protocol
 from common.utils import signer
 from .base import BaseUser
-from .asset import Asset
+from .protocol import ProtocolMixin
 
 
-__all__ = ['AdminUser', 'SystemUser', 'ProtocolMixin']
+__all__ = ['SystemUser']
 logger = logging.getLogger(__name__)
-
-
-class ProtocolMixin:
-    protocol: str
-    Protocol = Protocol
-
-    SUPPORT_PUSH_PROTOCOLS = [Protocol.ssh, Protocol.rdp]
-
-    ASSET_CATEGORY_PROTOCOLS = [
-        Protocol.ssh, Protocol.rdp, Protocol.telnet, Protocol.vnc
-    ]
-    APPLICATION_CATEGORY_REMOTE_APP_PROTOCOLS = [
-        Protocol.rdp
-    ]
-    APPLICATION_CATEGORY_DB_PROTOCOLS = [
-        Protocol.mysql, Protocol.mariadb, Protocol.oracle,
-        Protocol.postgresql, Protocol.sqlserver,
-        Protocol.redis, Protocol.mongodb
-    ]
-    APPLICATION_CATEGORY_CLOUD_PROTOCOLS = [
-        Protocol.k8s
-    ]
-    APPLICATION_CATEGORY_PROTOCOLS = [
-        *APPLICATION_CATEGORY_REMOTE_APP_PROTOCOLS,
-        *APPLICATION_CATEGORY_DB_PROTOCOLS,
-        *APPLICATION_CATEGORY_CLOUD_PROTOCOLS
-    ]
-
-    @property
-    def is_protocol_support_push(self):
-        return self.protocol in self.SUPPORT_PUSH_PROTOCOLS
-
-    @classmethod
-    def get_protocol_by_application_type(cls, app_type):
-        from applications.const import AppType
-        if app_type in cls.APPLICATION_CATEGORY_PROTOCOLS:
-            protocol = app_type
-        elif app_type in AppType.remote_app_types():
-            protocol = cls.Protocol.rdp
-        else:
-            protocol = None
-        return protocol
-
-    @property
-    def can_perm_to_asset(self):
-        return self.protocol in self.ASSET_CATEGORY_PROTOCOLS
-
-    @property
-    def is_asset_protocol(self):
-        return self.protocol in self.ASSET_CATEGORY_PROTOCOLS
 
 
 class SystemUser(ProtocolMixin, BaseUser):
     LOGIN_AUTO = 'auto'
     LOGIN_MANUAL = 'manual'
     LOGIN_MODE_CHOICES = (
-        (LOGIN_AUTO, _('使用账号')),
+        (LOGIN_AUTO, _('Automatic managed')),
         (LOGIN_MANUAL, _('Manually input'))
     )
 
@@ -84,34 +34,24 @@ class SystemUser(ProtocolMixin, BaseUser):
     nodes = models.ManyToManyField('assets.Node', blank=True, verbose_name=_("Nodes"))
     assets = models.ManyToManyField(
         'assets.Asset', blank=True, verbose_name=_("Assets"),
+        through='assets.AuthBook', through_fields=['systemuser', 'asset'],
         related_name='system_users'
     )
     users = models.ManyToManyField('users.User', blank=True, verbose_name=_("Users"))
     groups = models.ManyToManyField('users.UserGroup', blank=True, verbose_name=_("User groups"))
-    priority = models.IntegerField(
-        default=81, verbose_name=_("Priority"),
-        help_text=_("1-100, the lower the value will be match first"),
-        validators=[MinValueValidator(1), MaxValueValidator(100)]
-    )
-    protocol = models.CharField(max_length=16, choices=Protocol.choices, default='ssh', verbose_name=_('Protocol'))
-    login_mode = models.CharField(choices=LOGIN_MODE_CHOICES, default=LOGIN_AUTO, max_length=10, verbose_name=_('Login mode'))
-
-    # Todo: 重构平台后或许这里也得变化
-    # 账号模版
-    account_template_enabled = models.BooleanField(default=False, verbose_name=_("启用账号模版"))
-    auto_push_account = models.BooleanField(default=True, verbose_name=_('自动推送账号'))
     type = models.CharField(max_length=16, choices=Type.choices, default=Type.common, verbose_name=_('Type'))
+    priority = models.IntegerField(default=81, verbose_name=_("Priority"), help_text=_("1-100, the lower the value will be match first"), validators=[MinValueValidator(1), MaxValueValidator(100)])
+    protocol = models.CharField(max_length=16, choices=ProtocolMixin.Protocol.choices, default='ssh', verbose_name=_('Protocol'))
     auto_push = models.BooleanField(default=True, verbose_name=_('Auto push'))
     sudo = models.TextField(default='/bin/whoami', verbose_name=_('Sudo'))
     shell = models.CharField(max_length=64,  default='/bin/bash', verbose_name=_('Shell'))
+    login_mode = models.CharField(choices=LOGIN_MODE_CHOICES, default=LOGIN_AUTO, max_length=10, verbose_name=_('Login mode'))
     sftp_root = models.CharField(default='tmp', max_length=128, verbose_name=_("SFTP Root"))
     token = models.TextField(default='', verbose_name=_('Token'))
     home = models.CharField(max_length=4096, default='', verbose_name=_('Home'), blank=True)
     system_groups = models.CharField(default='', max_length=4096, verbose_name=_('System groups'), blank=True)
     ad_domain = models.CharField(default='', max_length=256)
-
     # linux su 命令 (switch user)
-    # Todo: 修改为 username, 不必系统用户了
     su_enabled = models.BooleanField(default=False, verbose_name=_('User switch'))
     su_from = models.ForeignKey('self', on_delete=models.SET_NULL, related_name='su_to', null=True, verbose_name=_("Switch from"))
 
@@ -130,7 +70,7 @@ class SystemUser(ProtocolMixin, BaseUser):
         return self.get_login_mode_display()
 
     def is_need_push(self):
-        if self.auto_push_account and self.is_protocol_support_push:
+        if self.auto_push and self.is_protocol_support_push:
             return True
         else:
             return False
@@ -165,7 +105,7 @@ class SystemUser(ProtocolMixin, BaseUser):
         return True, None
 
     def get_all_assets(self):
-        from assets.models import Node
+        from assets.models import Node, Asset
         nodes_keys = self.nodes.all().values_list('key', flat=True)
         asset_ids = set(self.assets.all().values_list('id', flat=True))
         nodes_asset_ids = Node.get_nodes_all_asset_ids_by_keys(nodes_keys)

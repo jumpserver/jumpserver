@@ -12,7 +12,6 @@ __all__ = [
     'AssetPermissionUserGroupRelationSerializer',
     "AssetPermissionAssetRelationSerializer",
     'AssetPermissionNodeRelationSerializer',
-    'AssetPermissionSystemUserRelationSerializer',
     'AssetPermissionAllAssetSerializer',
     'AssetPermissionAllUserSerializer',
 ]
@@ -98,14 +97,4 @@ class AssetPermissionNodeRelationSerializer(RelationMixin, serializers.ModelSeri
         model = AssetPermission.nodes.through
         fields = [
             'id', 'node', "node_display",
-        ]
-
-
-class AssetPermissionSystemUserRelationSerializer(RelationMixin, serializers.ModelSerializer):
-    systemuser_display = serializers.ReadOnlyField()
-
-    class Meta:
-        model = AssetPermission.system_users.through
-        fields = [
-            'id', 'systemuser', 'systemuser_display'
         ]

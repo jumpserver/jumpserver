@@ -69,11 +69,6 @@ M2M_NEED_RECORD = {
         _('{User} JOINED {UserGroup}'),
         _('{User} LEFT {UserGroup}')
     ),
-    SystemUser.assets.through._meta.object_name: (
-        _('Asset and SystemUser'),
-        _('{Asset} ADD {SystemUser}'),
-        _('{Asset} REMOVE {SystemUser}')
-    ),
     Asset.nodes.through._meta.object_name: (
         _('Node and Asset'),
         _('{Node} ADD {Asset}'),
@@ -98,11 +93,6 @@ M2M_NEED_RECORD = {
         _('Node permission'),
         _('{AssetPermission} ADD {Node}'),
         _('{AssetPermission} REMOVE {Node}'),
-    ),
-    AssetPermission.system_users.through._meta.object_name: (
-        _('Asset permission and SystemUser'),
-        _('{AssetPermission} ADD {SystemUser}'),
-        _('{AssetPermission} REMOVE {SystemUser}'),
     ),
     ApplicationPermission.users.through._meta.object_name: (
         _('User application permissions'),
