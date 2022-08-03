@@ -16,14 +16,6 @@ def add_default_group(apps, schema_editor):
     )
 
 
-def add_default_cluster(apps, schema_editor):
-    cluster_model = apps.get_model("assets", "Cluster")
-    db_alias = schema_editor.connection.alias
-    cluster_model.objects.using(db_alias).create(
-        name="Default"
-    )
-
-
 class Migration(migrations.Migration):
 
     initial = True
@@ -163,6 +155,5 @@ class Migration(migrations.Migration):
             unique_together=set([('ip', 'port')]),
         ),
 
-        migrations.RunPython(add_default_cluster),
         migrations.RunPython(add_default_group),
     ]
