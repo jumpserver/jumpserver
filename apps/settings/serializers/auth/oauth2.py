@@ -1,4 +1,5 @@
 
+import json
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
@@ -9,9 +10,20 @@ __all__ = [
 ]
 
 
+class SettingImageField(serializers.ImageField):
+    def to_representation(self, value):
+        return value
+
+
 class OAuth2SettingSerializer(serializers.Serializer):
     AUTH_OAUTH2 = serializers.BooleanField(
         default=False, required=False, label=_('Enable OAuth2 Auth')
+    )
+    AUTH_OAUTH2_LOGO_PATH = SettingImageField(
+        allow_null=True, required=False, label=_('Logo')
+    )
+    AUTH_OAUTH2_LOGO_TITLE = serializers.CharField(
+        required=False, max_length=16, label=_('Logo title')
     )
     AUTH_OAUTH2_CLIENT_ID = serializers.CharField(
         required=False, max_length=1024, label=_('Client Id')
@@ -36,6 +48,8 @@ class OAuth2SettingSerializer(serializers.Serializer):
         required=False, max_length=1024, label=_('Provider userinfo endpoint')
     )
     AUTH_OAUTH2_USER_ATTR_MAP = serializers.DictField(
-        required=True, label=_('User attr map')
+        required=False, label=_('User attr map')
     )
-    AUTH_OAUTH2_ALWAYS_UPDATE_USER = serializers.BooleanField(required=False, label=_('Always update user'))
+    AUTH_OAUTH2_ALWAYS_UPDATE_USER = serializers.BooleanField(
+        required=False, label=_('Always update user')
+    )

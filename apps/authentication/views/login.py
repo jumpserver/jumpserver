@@ -40,7 +40,13 @@ class UserLoginContextMixin:
     request: HttpRequest
 
     @staticmethod
-    def get_support_auth_methods():
+    def static_or_direct(logo_path):
+        if logo_path.startswith('img/'):
+            return static(logo_path)
+        else:
+            return logo_path
+
+    def get_support_auth_methods(self):
         auth_methods = [
             {
                 'name': 'OpenID',
@@ -64,10 +70,10 @@ class UserLoginContextMixin:
                 'auto_redirect': True
             },
             {
-                'name': 'OAuth2',
+                'name': settings.AUTH_OAUTH2_LOGO_TITLE,
                 'enabled': settings.AUTH_OAUTH2,
                 'url': reverse('authentication:oauth2:login'),
-                'logo': static('img/login_oauth2_logo.png'),
+                'logo': self.static_or_direct(settings.AUTH_OAUTH2_LOGO_PATH),
                 'auto_redirect': True
             },
             {
