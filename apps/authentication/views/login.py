@@ -67,7 +67,7 @@ class UserLoginContextMixin:
                 'name': 'OAuth2',
                 'enabled': settings.AUTH_OAUTH2,
                 'url': reverse('authentication:oauth2:login'),
-                'logo': static('img/login_saml2_logo.png'),
+                'logo': static('img/login_oauth2_logo.png'),
                 'auto_redirect': True
             },
             {

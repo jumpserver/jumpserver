@@ -69,8 +69,8 @@ class OAuth2Backend(JMSModelBackend):
     @staticmethod
     def get_query_dict(response_data, query_dict):
         query_dict.update({
-            'uid': response_data.get('uid'),
-            'access_token': response_data.get('access_token')
+            'uid': response_data.get('uid', ''),
+            'access_token': response_data.get('access_token', '')
         })
         return query_dict
 
@@ -84,7 +84,8 @@ class OAuth2Backend(JMSModelBackend):
         query_dict = {
             'client_id': settings.AUTH_OAUTH2_CLIENT_ID,
             'client_secret': settings.AUTH_OAUTH2_CLIENT_SECRET,
-            'grant_type': 'authorization_code', 'code': code,
+            'grant_type': 'authorization_code',
+            'code': code,
             'redirect_uri': build_absolute_uri(
                 request, path=reverse(settings.AUTH_OAUTH2_AUTH_LOGIN_CALLBACK_URL_NAME)
             )
@@ -95,7 +96,10 @@ class OAuth2Backend(JMSModelBackend):
         token_method = settings.AUTH_OAUTH2_ACCESS_TOKEN_METHOD.lower()
         requests_func = getattr(requests, token_method, requests.get)
         logger.debug(log_prompt.format('Call the access token endpoint[method: %s]' % token_method))
-        access_token_response = requests_func(access_token_url)
+        headers = {
+            'Accept': 'application/json'
+        }
+        access_token_response = requests_func(access_token_url, headers=headers)
         try:
             access_token_response.raise_for_status()
             access_token_response_data = access_token_response.json()
@@ -108,17 +112,23 @@ class OAuth2Backend(JMSModelBackend):
 
         query_dict = self.get_query_dict(response_data, query_dict)
 
+        headers = {
+            'Accept': 'application/json',
+            'Authorization': 'token {}'.format(response_data.get('access_token', ''))
+        }
+
         logger.debug(log_prompt.format('Get userinfo endpoint'))
         userinfo_url = '{url}?{query}'.format(
             url=settings.AUTH_OAUTH2_PROVIDER_USERINFO_ENDPOINT,
             query=urlencode(query_dict)
         )
-        userinfo_response = requests.get(userinfo_url)
+        userinfo_response = requests.get(userinfo_url, headers=headers)
         try:
             userinfo_response.raise_for_status()
             userinfo_response_data = userinfo_response.json()
-            userinfo = userinfo_response_data.get('data')
-            if not userinfo:
+            if 'data' in userinfo_response_data:
+                userinfo = userinfo_response_data['data']
+            else:
                 userinfo = userinfo_response_data
         except Exception as e:
             error = "Json userinfo response error, userinfo response " \

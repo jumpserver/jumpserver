@@ -19,7 +19,7 @@ from django.urls import reverse
 from django.conf import settings
 
 from common.utils import get_logger
-from authentication.utils import build_absolute_uri
+from authentication.utils import build_absolute_uri_for_oidc
 from users.utils import construct_user_email
 
 from ..base import JMSBaseAuthBackend
@@ -129,7 +129,7 @@ class OIDCAuthCodeBackend(OIDCBaseBackend):
         token_payload = {
             'grant_type': 'authorization_code',
             'code': code,
-            'redirect_uri': build_absolute_uri(
+            'redirect_uri': build_absolute_uri_for_oidc(
                 request, path=reverse(settings.AUTH_OPENID_AUTH_LOGIN_CALLBACK_URL_NAME)
             )
         }
