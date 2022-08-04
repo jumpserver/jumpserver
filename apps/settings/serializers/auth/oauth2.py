@@ -1,9 +1,9 @@
 
-import json
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from common.drf.fields import EncryptedField
+from common.utils import static_or_direct
 
 __all__ = [
     'OAuth2SettingSerializer',
@@ -12,7 +12,7 @@ __all__ = [
 
 class SettingImageField(serializers.ImageField):
     def to_representation(self, value):
-        return value
+        return static_or_direct(value)
 
 
 class OAuth2SettingSerializer(serializers.Serializer):
@@ -22,8 +22,8 @@ class OAuth2SettingSerializer(serializers.Serializer):
     AUTH_OAUTH2_LOGO_PATH = SettingImageField(
         allow_null=True, required=False, label=_('Logo')
     )
-    AUTH_OAUTH2_LOGO_TITLE = serializers.CharField(
-        required=False, max_length=16, label=_('Logo title')
+    AUTH_OAUTH2_PROVIDER = serializers.CharField(
+        required=False, max_length=16, label=_('Service provider')
     )
     AUTH_OAUTH2_CLIENT_ID = serializers.CharField(
         required=False, max_length=1024, label=_('Client Id')

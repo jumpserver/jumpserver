@@ -21,7 +21,7 @@ from django.conf import settings
 from django.urls import reverse_lazy
 from django.contrib.auth import BACKEND_SESSION_KEY
 
-from common.utils import FlashMessageUtil
+from common.utils import FlashMessageUtil, static_or_direct
 from users.utils import (
     redirect_user_first_login_or_index
 )
@@ -38,13 +38,6 @@ __all__ = [
 class UserLoginContextMixin:
     get_user_mfa_context: Callable
     request: HttpRequest
-
-    @staticmethod
-    def static_or_direct(logo_path):
-        if logo_path.startswith('img/'):
-            return static(logo_path)
-        else:
-            return logo_path
 
     def get_support_auth_methods(self):
         auth_methods = [
@@ -70,10 +63,10 @@ class UserLoginContextMixin:
                 'auto_redirect': True
             },
             {
-                'name': settings.AUTH_OAUTH2_LOGO_TITLE,
+                'name': settings.AUTH_OAUTH2_PROVIDER,
                 'enabled': settings.AUTH_OAUTH2,
                 'url': reverse('authentication:oauth2:login'),
-                'logo': self.static_or_direct(settings.AUTH_OAUTH2_LOGO_PATH),
+                'logo': static_or_direct(settings.AUTH_OAUTH2_LOGO_PATH),
                 'auto_redirect': True
             },
             {
