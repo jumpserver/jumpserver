@@ -12,7 +12,6 @@ from assets.models import Asset, Node, Gateway
 from assets import serializers
 from assets.tasks import (
     update_assets_hardware_info_manual, test_assets_connectivity_manual,
-    test_system_users_connectivity_a_asset, push_system_users_a_asset
 )
 from assets.filters import FilterAssetByNodeFilterBackend, LabelFilterBackend, IpInFilterBackend
 

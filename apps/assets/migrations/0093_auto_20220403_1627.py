@@ -41,12 +41,33 @@ def migrate_hardware(apps, *args):
         created += len(hardware_infos)
 
 
+def migrate_to_host(apps, schema_editor):
+    asset_model = apps.get_model("assets", "Asset")
+    host_model = apps.get_model("assets", 'Host')
+    db_alias = schema_editor.connection.alias
+
+    created = 0
+    batch_size = 1000
+
+    while True:
+        start = created
+        end = created + batch_size
+        assets = asset_model.objects.using(db_alias).all()[start:end]
+        if not assets:
+            break
+
+        hosts = [host_model(asset_ptr=asset) for asset in assets]
+        host_model.objects.using(db_alias).bulk_create(hosts, ignore_conflicts=True)
+        created += len(hosts)
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0092_hardware'),
+        ('assets', '0092_add_host'),
     ]
 
     operations = [
-        migrations.RunPython(migrate_hardware)
+        migrations.RunPython(migrate_to_host),
+        migrations.RunPython(migrate_hardware),
     ]
