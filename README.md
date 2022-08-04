@@ -95,11 +95,15 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 
 ### 案例研究
 
-- [JumpServer 堡垒机护航顺丰科技超大规模资产安全运维](https://blog.fit2cloud.com/?p=1147)
-- [JumpServer 堡垒机让“大智慧”的混合 IT 运维更智慧](https://blog.fit2cloud.com/?p=882)
-- [携程 JumpServer 堡垒机部署与运营实战](https://blog.fit2cloud.com/?p=851)
-- [小红书的JumpServer堡垒机大规模资产跨版本迁移之路](https://blog.fit2cloud.com/?p=516)
-- [JumpServer堡垒机助力中手游提升多云环境下安全运维能力](https://blog.fit2cloud.com/?p=732)
+- [腾讯海外游戏：基于JumpServer构建游戏安全运营能力](https://blog.fit2cloud.com/?p=3704)
+- [万华化学：通过JumpServer管理全球化分布式IT资产，并且实现与云管平台的联动](https://blog.fit2cloud.com/?p=3504)
+- [雪花啤酒：JumpServer堡垒机使用体会](https://blog.fit2cloud.com/?p=3412)
+- [顺丰科技：JumpServer 堡垒机护航顺丰科技超大规模资产安全运维](https://blog.fit2cloud.com/?p=1147)
+- [沐瞳游戏：通过JumpServer管控多项目分布式资产](https://blog.fit2cloud.com/?p=3213)
+- [携程：JumpServer 堡垒机部署与运营实战](https://blog.fit2cloud.com/?p=851)
+- [大智慧：JumpServer 堡垒机让“大智慧”的混合 IT 运维更智慧](https://blog.fit2cloud.com/?p=882)
+- [小红书：的JumpServer堡垒机大规模资产跨版本迁移之路](https://blog.fit2cloud.com/?p=516)
+- [中手游：JumpServer堡垒机助力中手游提升多云环境下安全运维能力](https://blog.fit2cloud.com/?p=732)
 - [中通快递：JumpServer主机安全运维实践](https://blog.fit2cloud.com/?p=708)
 - [东方明珠：JumpServer高效管控异构化、分布式云端资产](https://blog.fit2cloud.com/?p=687)
 - [江苏农信：JumpServer堡垒机助力行业云安全运维](https://blog.fit2cloud.com/?p=666)
