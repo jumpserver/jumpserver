@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-04 11:07+0800\n"
+"POT-Creation-Date: 2022-08-04 14:17+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1867,6 +1867,10 @@ msgstr ""
 msgid "Invalid token or cache refreshed."
 msgstr "無効なトークンまたはキャッシュの更新。"
 
+#: authentication/backends/oauth2/backends.py:155 authentication/models.py:158
+msgid "User invalid, disabled or expired"
+msgstr "ユーザーが無効、無効、または期限切れです"
+
 #: authentication/confirm/password.py:16
 msgid "Authentication failed password incorrect"
 msgstr "認証に失敗しました (ユーザー名またはパスワードが正しくありません)"
@@ -2165,10 +2169,6 @@ msgstr "接続トークンの有効期限: {}"
 #: authentication/models.py:154
 msgid "User not exists"
 msgstr "ユーザーは存在しません"
-
-#: authentication/models.py:158
-msgid "User invalid, disabled or expired"
-msgstr "ユーザーが無効、無効、または期限切れです"
 
 #: authentication/models.py:163
 msgid "System user not exists"

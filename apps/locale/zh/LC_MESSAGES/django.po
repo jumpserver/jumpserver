@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-04 11:07+0800\n"
+"POT-Creation-Date: 2022-08-04 14:17+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1853,6 +1853,10 @@ msgstr "无效的令牌头。符号字符串不应包含无效字符。"
 msgid "Invalid token or cache refreshed."
 msgstr "刷新的令牌或缓存无效。"
 
+#: authentication/backends/oauth2/backends.py:155 authentication/models.py:158
+msgid "User invalid, disabled or expired"
+msgstr "用户无效，已禁用或已过期"
+
 #: authentication/confirm/password.py:16
 msgid "Authentication failed password incorrect"
 msgstr "认证失败 (用户名或密码不正确)"
@@ -2144,10 +2148,6 @@ msgstr "连接令牌过期: {}"
 #: authentication/models.py:154
 msgid "User not exists"
 msgstr "用户不存在"
-
-#: authentication/models.py:158
-msgid "User invalid, disabled or expired"
-msgstr "用户无效，已禁用或已过期"
 
 #: authentication/models.py:163
 msgid "System user not exists"

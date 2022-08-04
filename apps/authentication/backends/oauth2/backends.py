@@ -152,6 +152,6 @@ class OAuth2Backend(JMSModelBackend):
             logger.debug(log_prompt.format('Send signal => oauth2 user login failed'))
             oauth2_user_login_failed.send(
                 sender=self.__class__, request=request, username=user.username,
-                reason="User is invalid"
+                reason=_('User invalid, disabled or expired')
             )
             return None
