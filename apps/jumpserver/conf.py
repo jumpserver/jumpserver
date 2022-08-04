@@ -15,13 +15,15 @@ import errno
 import json
 import yaml
 import copy
+import base64
+import logging
 from importlib import import_module
 from urllib.parse import urljoin, urlparse
-import logging
+from gmssl.sm4 import CryptSM4, SM4_ENCRYPT, SM4_DECRYPT
 
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
-from .config_crypto import ConfigCrypto
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
@@ -81,6 +83,33 @@ def build_absolute_uri(base, uri):
 
 class DoesNotExist(Exception):
     pass
+
+
+class ConfigCrypto:
+    def __init__(self, key):
+        self.safe_key = self.process_key(key)
+        self.sm4_encryptor = CryptSM4()
+        self.sm4_encryptor.set_key(self.safe_key, SM4_ENCRYPT)
+
+        self.sm4_decryptor = CryptSM4()
+        self.sm4_decryptor.set_key(self.safe_key, SM4_DECRYPT)
+
+    @staticmethod
+    def process_key(secret_encrypt_key):
+        key = secret_encrypt_key.encode()
+        if len(key) >= 16:
+            key = key[:16]
+        else:
+            key += b'\0' * (16 - len(key))
+        return key
+
+    def encrypt(self, data):
+        data = bytes(data, encoding='utf8')
+        return base64.b64encode(self.sm4_encryptor.crypt_ecb(data)).decode('utf8')
+
+    def decrypt(self, data):
+        data = base64.urlsafe_b64decode(bytes(data, encoding='utf8'))
+        return self.sm4_decryptor.crypt_ecb(data).decode('utf8')
 
 
 class Config(dict):
