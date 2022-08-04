@@ -17,10 +17,11 @@ import yaml
 import copy
 from importlib import import_module
 from urllib.parse import urljoin, urlparse
+from gmssl.sm4 import CryptSM4, SM4_DECRYPT
 
 from django.urls import reverse_lazy
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
@@ -39,9 +40,9 @@ def import_string(dotted_path):
     try:
         return getattr(module, class_name)
     except AttributeError as err:
-        raise ImportError('Module "%s" does not define a "%s" attribute/class' % (
-            module_path, class_name)
-                          ) from err
+        raise ImportError(
+            'Module "%s" does not define a "%s" attribute/class' %
+            (module_path, class_name)) from err
 
 
 def is_absolute_uri(uri):
@@ -416,6 +417,19 @@ class Config(dict):
         'FORGOT_PASSWORD_URL': '',
         'HEALTH_CHECK_TOKEN': '',
     }
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.secret_encryptor = self.get_secret_encryptor()
+
+    def get_secret_encryptor(self):
+        # https://the-x.cn/cryptography/Sm4.aspx
+        secret_encrypt_key = os.environ.get('SECRET_ENCRYPT_KEY', '')
+        if not secret_encrypt_key:
+            return None
+        sm4 = CryptSM4()
+
+        return
 
     @staticmethod
     def convert_keycloak_to_openid(keycloak_config):

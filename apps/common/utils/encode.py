@@ -222,7 +222,6 @@ def ensure_last_char_is_ascii(data):
     remain = ''
 
 
-secret_pattern = re.compile(r'password|secret|key', re.IGNORECASE)
 
 
 def data_to_json(data, sort_keys=True, indent=2, cls=None):

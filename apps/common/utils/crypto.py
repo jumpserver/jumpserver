@@ -1,7 +1,7 @@
 import base64
 import logging
+import re
 from Cryptodome.Cipher import AES, PKCS1_v1_5
-from Cryptodome.Util.Padding import pad
 from Cryptodome.Random import get_random_bytes
 from Cryptodome.PublicKey import RSA
 from Cryptodome import Random
@@ -11,17 +11,21 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 
-def process_key(key):
+secret_pattern = re.compile(r'password|secret|key|token', re.IGNORECASE)
+
+
+def padding_key(key, length=32):
     """
     返回32 bytes 的key
     """
     if not isinstance(key, bytes):
         key = bytes(key, encoding='utf-8')
 
-    if len(key) >= 32:
-        return key[:32]
+    if len(key) >= length:
+        return key[:length]
 
-    return pad(key, 32)
+    key += b'\0' * (length - len(key))
+    return key
 
 
 class BaseCrypto:
@@ -45,7 +49,7 @@ class BaseCrypto:
 
 class GMSM4EcbCrypto(BaseCrypto):
     def __init__(self, key):
-        self.key = process_key(key)
+        self.key = padding_key(key)
         self.sm4_encryptor = CryptSM4()
         self.sm4_encryptor.set_key(self.key, SM4_ENCRYPT)
 
@@ -106,7 +110,7 @@ class AESCryptoGCM:
     """
 
     def __init__(self, key):
-        self.key = process_key(key)
+        self.key = padding_key(key)
 
     def encrypt(self, text):
         """
@@ -144,11 +148,10 @@ class AESCryptoGCM:
 def get_aes_crypto(key=None, mode='GCM'):
     if key is None:
         key = settings.SECRET_KEY
-    if mode == 'ECB':
-        a = AESCrypto(key)
-    elif mode == 'GCM':
-        a = AESCryptoGCM(key)
-    return a
+    if mode == 'GCM':
+        return AESCryptoGCM(key)
+    else:
+        return AESCrypto(key)
 
 
 def get_gm_sm4_ecb_crypto(key=None):
