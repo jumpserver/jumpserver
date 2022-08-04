@@ -39,7 +39,7 @@ class SAML2Backend(JMSModelBackend):
         return user, created
 
     def authenticate(self, request, saml_user_data=None, **kwargs):
-        log_prompt = "Process authenticate [SAML2AuthCodeBackend]: {}"
+        log_prompt = "Process authenticate [SAML2Backend]: {}"
         logger.debug(log_prompt.format('Start'))
         if saml_user_data is None:
             logger.error(log_prompt.format('saml_user_data is missing'))
@@ -48,7 +48,7 @@ class SAML2Backend(JMSModelBackend):
         logger.debug(log_prompt.format('saml data, {}'.format(saml_user_data)))
         username = saml_user_data.get('username')
         if not username:
-            logger.debug(log_prompt.format('username is missing'))
+            logger.warning(log_prompt.format('username is missing'))
             return None
 
         user, created = self.get_or_create_from_saml_data(request, **saml_user_data)

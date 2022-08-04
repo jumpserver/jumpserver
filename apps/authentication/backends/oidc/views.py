@@ -20,7 +20,8 @@ from django.utils.crypto import get_random_string
 from django.utils.http import is_safe_url, urlencode
 from django.views.generic import View
 
-from .utils import get_logger, build_absolute_uri
+from authentication.utils import build_absolute_uri_for_oidc
+from .utils import get_logger
 
 
 logger = get_logger(__file__)
@@ -50,7 +51,7 @@ class OIDCAuthRequestView(View):
             'scope': settings.AUTH_OPENID_SCOPES,
             'response_type': 'code',
             'client_id': settings.AUTH_OPENID_CLIENT_ID,
-            'redirect_uri': build_absolute_uri(
+            'redirect_uri': build_absolute_uri_for_oidc(
                 request, path=reverse(settings.AUTH_OPENID_AUTH_LOGIN_CALLBACK_URL_NAME)
             )
         })
@@ -216,7 +217,7 @@ class OIDCEndSessionView(View):
         """ Returns the end-session URL. """
         q = QueryDict(mutable=True)
         q[settings.AUTH_OPENID_PROVIDER_END_SESSION_REDIRECT_URI_PARAMETER] = \
-            build_absolute_uri(self.request, path=settings.LOGOUT_REDIRECT_URL or '/')
+            build_absolute_uri_for_oidc(self.request, path=settings.LOGOUT_REDIRECT_URL or '/')
         q[settings.AUTH_OPENID_PROVIDER_END_SESSION_ID_TOKEN_PARAMETER] = \
             self.request.session['oidc_auth_id_token']
         return '{}?{}'.format(settings.AUTH_OPENID_PROVIDER_END_SESSION_ENDPOINT, q.urlencode())
