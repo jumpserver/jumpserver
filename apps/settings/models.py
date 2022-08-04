@@ -125,10 +125,10 @@ class Setting(models.Model):
     @classmethod
     def save_to_file(cls, value: InMemoryUploadedFile):
         filename = value.name
-        file_path = os.path.join(settings.MEDIA_ROOT, 'settings', filename)
-        default_storage.save(file_path, ContentFile(value.read()))
-        value = os.path.join(settings.MEDIA_URL, 'settings', filename)
-        return value
+        filepath = f'settings/{filename}'
+        path = default_storage.save(filepath, ContentFile(value.read()))
+        url = default_storage.url(path)
+        return url
 
     @classmethod
     def update_or_create(cls, name='', value='', encrypted=False, category=''):
