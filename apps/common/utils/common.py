@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import re
+from django.templatetags.static import static
 from collections import OrderedDict
 from itertools import chain
 import logging
@@ -365,3 +366,10 @@ def pretty_string(data: str, max_length=128, ellipsis_str='...'):
 
 def group_by_count(it, count):
     return [it[i:i+count] for i in range(0, len(it), count)]
+
+
+def static_or_direct(logo_path):
+    if logo_path.startswith('img/'):
+        return static(logo_path)
+    else:
+        return logo_path

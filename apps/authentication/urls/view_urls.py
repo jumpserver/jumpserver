@@ -56,9 +56,11 @@ urlpatterns = [
     path('profile/otp/disable/', users_view.UserOtpDisableView.as_view(),
          name='user-otp-disable'),
 
-    # openid
+    # other authentication protocol
     path('cas/', include(('authentication.backends.cas.urls', 'authentication'), namespace='cas')),
     path('openid/', include(('authentication.backends.oidc.urls', 'authentication'), namespace='openid')),
     path('saml2/', include(('authentication.backends.saml2.urls', 'authentication'), namespace='saml2')),
+    path('oauth2/', include(('authentication.backends.oauth2.urls', 'authentication'), namespace='oauth2')),
+
     path('captcha/', include('captcha.urls')),
 ]

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-02 11:39+0800\n"
+"POT-Creation-Date: 2022-08-04 14:17+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,11 +28,11 @@ msgstr "Acls"
 #: assets/models/cmd_filter.py:27 assets/models/domain.py:23
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
 #: orgs/models.py:70 perms/models/base.py:83 rbac/models/role.py:29
-#: settings/models.py:29 settings/serializers/sms.py:6
+#: settings/models.py:33 settings/serializers/sms.py:6
 #: terminal/models/endpoint.py:10 terminal/models/endpoint.py:86
 #: terminal/models/storage.py:26 terminal/models/task.py:16
 #: terminal/models/terminal.py:100 users/forms/profile.py:33
-#: users/models/group.py:15 users/models/user.py:661
+#: users/models/group.py:15 users/models/user.py:665
 #: xpack/plugins/cloud/models.py:28
 msgid "Name"
 msgstr "名前"
@@ -60,11 +60,11 @@ msgstr "アクティブ"
 #: assets/models/cmd_filter.py:96 assets/models/domain.py:24
 #: assets/models/domain.py:65 assets/models/group.py:23
 #: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:73
-#: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:34
+#: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:38
 #: terminal/models/endpoint.py:23 terminal/models/endpoint.py:96
 #: terminal/models/storage.py:29 terminal/models/terminal.py:114
 #: tickets/models/comment.py:32 tickets/models/ticket/general.py:288
-#: users/models/group.py:16 users/models/user.py:698
+#: users/models/group.py:16 users/models/user.py:702
 #: xpack/plugins/change_auth_plan/models/base.py:44
 #: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:116
 #: xpack/plugins/gathered_user/models.py:26
@@ -94,7 +94,7 @@ msgstr "ログイン確認"
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:44
 #: terminal/models/sharing.py:33 terminal/notifications.py:91
 #: terminal/notifications.py:139 tickets/models/comment.py:21 users/const.py:14
-#: users/models/user.py:890 users/models/user.py:921
+#: users/models/user.py:894 users/models/user.py:925
 #: users/serializers/group.py:19
 msgid "User"
 msgstr "ユーザー"
@@ -160,7 +160,7 @@ msgstr "コンマ区切り文字列の形式。* はすべて一致すること�
 #: authentication/models.py:260
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
-#: ops/models/adhoc.py:159 users/forms/profile.py:32 users/models/user.py:659
+#: ops/models/adhoc.py:159 users/forms/profile.py:32 users/models/user.py:663
 #: users/templates/users/_msg_user_created.html:12
 #: xpack/plugins/change_auth_plan/models/asset.py:34
 #: xpack/plugins/change_auth_plan/models/asset.py:195
@@ -364,7 +364,7 @@ msgstr "タイプ表示"
 #: assets/serializers/cmd_filter.py:48 common/db/models.py:114
 #: common/mixins/models.py:50 ops/models/adhoc.py:39 ops/models/command.py:30
 #: orgs/models.py:72 orgs/models.py:223 perms/models/base.py:92
-#: users/models/group.py:18 users/models/user.py:922
+#: users/models/group.py:18 users/models/user.py:926
 #: xpack/plugins/cloud/models.py:125
 msgid "Date created"
 msgstr "作成された日付"
@@ -628,7 +628,7 @@ msgstr "ラベル"
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:52
 #: assets/models/cmd_filter.py:99 assets/models/group.py:21
 #: common/db/models.py:112 common/mixins/models.py:49 orgs/models.py:71
-#: orgs/models.py:225 perms/models/base.py:91 users/models/user.py:706
+#: orgs/models.py:225 perms/models/base.py:91 users/models/user.py:710
 #: users/serializers/group.py:33
 #: xpack/plugins/change_auth_plan/models/base.py:48
 #: xpack/plugins/cloud/models.py:122 xpack/plugins/gathered_user/models.py:30
@@ -824,7 +824,7 @@ msgstr "帯域幅"
 msgid "Contact"
 msgstr "連絡先"
 
-#: assets/models/cluster.py:22 users/models/user.py:681
+#: assets/models/cluster.py:22 users/models/user.py:685
 msgid "Phone"
 msgstr "電話"
 
@@ -850,7 +850,7 @@ msgid "Default"
 msgstr "デフォルト"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14 rbac/const.py:6
-#: users/models/user.py:907
+#: users/models/user.py:911
 msgid "System"
 msgstr "システム"
 
@@ -859,7 +859,7 @@ msgid "Default Cluster"
 msgstr "デフォルトクラスター"
 
 #: assets/models/cmd_filter.py:34 perms/models/base.py:86
-#: users/models/group.py:31 users/models/user.py:667
+#: users/models/group.py:31 users/models/user.py:671
 msgid "User group"
 msgstr "ユーザーグループ"
 
@@ -960,7 +960,7 @@ msgstr "資産グループ"
 msgid "Default asset group"
 msgstr "デフォルトアセットグループ"
 
-#: assets/models/label.py:19 assets/models/node.py:546 settings/models.py:30
+#: assets/models/label.py:19 assets/models/node.py:546 settings/models.py:34
 msgid "Value"
 msgstr "値"
 
@@ -1157,7 +1157,7 @@ msgstr "定期的なパフォーマンス"
 msgid "Currently only mail sending is supported"
 msgstr "現在、メール送信のみがサポートされています"
 
-#: assets/serializers/base.py:16 users/models/user.py:689
+#: assets/serializers/base.py:16 users/models/user.py:693
 msgid "Private key"
 msgstr "ssh秘密鍵"
 
@@ -1507,7 +1507,7 @@ msgstr "パスワード変更ログ"
 msgid "Disabled"
 msgstr "無効"
 
-#: audits/models.py:112 settings/models.py:33
+#: audits/models.py:112 settings/models.py:37
 msgid "Enabled"
 msgstr "有効化"
 
@@ -1535,7 +1535,7 @@ msgstr "ユーザーエージェント"
 
 #: audits/models.py:126
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
-#: users/forms/profile.py:65 users/models/user.py:684
+#: users/forms/profile.py:65 users/models/user.py:688
 #: users/serializers/profile.py:126
 msgid "MFA"
 msgstr "MFA"
@@ -1613,20 +1613,20 @@ msgid "Auth Token"
 msgstr "認証トークン"
 
 #: audits/signal_handlers.py:53 authentication/notifications.py:73
-#: authentication/views/login.py:67 authentication/views/wecom.py:178
-#: notifications/backends/__init__.py:11 users/models/user.py:720
+#: authentication/views/login.py:73 authentication/views/wecom.py:178
+#: notifications/backends/__init__.py:11 users/models/user.py:724
 msgid "WeCom"
 msgstr "企業微信"
 
 #: audits/signal_handlers.py:54 authentication/views/feishu.py:144
-#: authentication/views/login.py:79 notifications/backends/__init__.py:14
-#: users/models/user.py:722
+#: authentication/views/login.py:85 notifications/backends/__init__.py:14
+#: users/models/user.py:726
 msgid "FeiShu"
 msgstr "本を飛ばす"
 
 #: audits/signal_handlers.py:55 authentication/views/dingtalk.py:179
-#: authentication/views/login.py:73 notifications/backends/__init__.py:12
-#: users/models/user.py:721
+#: authentication/views/login.py:79 notifications/backends/__init__.py:12
+#: users/models/user.py:725
 msgid "DingTalk"
 msgstr "DingTalk"
 
@@ -1866,6 +1866,10 @@ msgstr ""
 #: authentication/backends/drf.py:148
 msgid "Invalid token or cache refreshed."
 msgstr "無効なトークンまたはキャッシュの更新。"
+
+#: authentication/backends/oauth2/backends.py:155 authentication/models.py:158
+msgid "User invalid, disabled or expired"
+msgstr "ユーザーが無効、無効、または期限切れです"
 
 #: authentication/confirm/password.py:16
 msgid "Authentication failed password incorrect"
@@ -2142,7 +2146,7 @@ msgstr "ひみつ"
 
 #: authentication/models.py:74 authentication/models.py:264
 #: perms/models/base.py:90 tickets/models/ticket/apply_application.py:30
-#: tickets/models/ticket/apply_asset.py:24 users/models/user.py:703
+#: tickets/models/ticket/apply_asset.py:24 users/models/user.py:707
 msgid "Date expired"
 msgstr "期限切れの日付"
 
@@ -2165,10 +2169,6 @@ msgstr "接続トークンの有効期限: {}"
 #: authentication/models.py:154
 msgid "User not exists"
 msgstr "ユーザーは存在しません"
-
-#: authentication/models.py:158
-msgid "User invalid, disabled or expired"
-msgstr "ユーザーが無効、無効、または期限切れです"
 
 #: authentication/models.py:163
 msgid "System user not exists"
@@ -2317,7 +2317,7 @@ msgstr "コードエラー"
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_rest_password_success.html:2
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:2
-#: jumpserver/conf.py:307 ops/tasks.py:145 ops/tasks.py:148
+#: jumpserver/conf.py:323 ops/tasks.py:145 ops/tasks.py:148
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: perms/templates/perms/_msg_permed_items_expire.html:3
 #: tickets/templates/tickets/approve_check_password.html:33
@@ -2530,19 +2530,19 @@ msgstr "本を飛ばすからユーザーを取得できませんでした"
 msgid "Please login with a password and then bind the FeiShu"
 msgstr "パスワードでログインしてから本を飛ばすをバインドしてください"
 
-#: authentication/views/login.py:175
+#: authentication/views/login.py:181
 msgid "Redirecting"
 msgstr "リダイレクト"
 
-#: authentication/views/login.py:176
+#: authentication/views/login.py:182
 msgid "Redirecting to {} authentication"
 msgstr "{} 認証へのリダイレクト"
 
-#: authentication/views/login.py:199
+#: authentication/views/login.py:205
 msgid "Please enable cookies and try again."
 msgstr "クッキーを有効にして、もう一度お試しください。"
 
-#: authentication/views/login.py:301
+#: authentication/views/login.py:307
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -2550,15 +2550,15 @@ msgstr ""
 "<b>{}</b> 確認を待ちます。彼女/彼へのリンクをコピーすることもできます <br/>\n"
 "                  このページを閉じないでください"
 
-#: authentication/views/login.py:306
+#: authentication/views/login.py:312
 msgid "No ticket found"
 msgstr "チケットが見つかりません"
 
-#: authentication/views/login.py:340
+#: authentication/views/login.py:346
 msgid "Logout success"
 msgstr "ログアウト成功"
 
-#: authentication/views/login.py:341
+#: authentication/views/login.py:347
 msgid "Logout success, return login page"
 msgstr "ログアウト成功、ログインページを返す"
 
@@ -2762,11 +2762,11 @@ msgstr "特殊文字を含むべきではない"
 msgid "The mobile phone number format is incorrect"
 msgstr "携帯電話番号の形式が正しくありません"
 
-#: jumpserver/conf.py:306
+#: jumpserver/conf.py:322
 msgid "Create account successfully"
 msgstr "アカウントを正常に作成"
 
-#: jumpserver/conf.py:308
+#: jumpserver/conf.py:324
 msgid "Your account has been created successfully"
 msgstr "アカウントが正常に作成されました"
 
@@ -2811,7 +2811,7 @@ msgid "Notifications"
 msgstr "通知"
 
 #: notifications/backends/__init__.py:10 users/forms/profile.py:102
-#: users/models/user.py:663
+#: users/models/user.py:667
 msgid "Email"
 msgstr "メール"
 
@@ -3045,7 +3045,7 @@ msgid "Can view all joined org"
 msgstr "参加しているすべての組織を表示できます"
 
 #: orgs/models.py:222 rbac/models/role.py:46 rbac/models/rolebinding.py:44
-#: users/models/user.py:671
+#: users/models/user.py:675
 msgid "Role"
 msgstr "ロール"
 
@@ -3323,6 +3323,7 @@ msgid "Permission"
 msgstr "権限"
 
 #: rbac/models/role.py:31 rbac/models/rolebinding.py:38
+#: settings/serializers/auth/oauth2.py:35
 msgid "Scope"
 msgstr "スコープ"
 
@@ -3401,7 +3402,7 @@ msgstr "ワークスペースビュー"
 msgid "Audit view"
 msgstr "監査ビュー"
 
-#: rbac/tree.py:28 settings/models.py:140
+#: rbac/tree.py:28 settings/models.py:156
 msgid "System setting"
 msgstr "システム設定"
 
@@ -3499,43 +3500,43 @@ msgstr "{} 人のユーザーを正常にインポートしました (組織: {}
 msgid "Settings"
 msgstr "設定"
 
-#: settings/models.py:142
+#: settings/models.py:158
 msgid "Can change email setting"
 msgstr "メール設定を変更できます"
 
-#: settings/models.py:143
+#: settings/models.py:159
 msgid "Can change auth setting"
 msgstr "資格認定の設定"
 
-#: settings/models.py:144
+#: settings/models.py:160
 msgid "Can change system msg sub setting"
 msgstr "システムmsgサブ设定を変更できます"
 
-#: settings/models.py:145
+#: settings/models.py:161
 msgid "Can change sms setting"
 msgstr "Smsの設定を変えることができます"
 
-#: settings/models.py:146
+#: settings/models.py:162
 msgid "Can change security setting"
 msgstr "セキュリティ設定を変更できます"
 
-#: settings/models.py:147
+#: settings/models.py:163
 msgid "Can change clean setting"
 msgstr "きれいな設定を変えることができます"
 
-#: settings/models.py:148
+#: settings/models.py:164
 msgid "Can change interface setting"
 msgstr "インターフェイスの設定を変えることができます"
 
-#: settings/models.py:149
+#: settings/models.py:165
 msgid "Can change license setting"
 msgstr "ライセンス設定を変更できます"
 
-#: settings/models.py:150
+#: settings/models.py:166
 msgid "Can change terminal setting"
 msgstr "ターミナルの設定を変えることができます"
 
-#: settings/models.py:151
+#: settings/models.py:167
 msgid "Can change other setting"
 msgstr "他の設定を変えることができます"
 
@@ -3648,7 +3649,8 @@ msgstr "ユーザー検索フィルター"
 msgid "Choice may be (cn|uid|sAMAccountName)=%(user)s)"
 msgstr "選択は (cnまたはuidまたはsAMAccountName)=%(user)s)"
 
-#: settings/serializers/auth/ldap.py:57 settings/serializers/auth/oidc.py:36
+#: settings/serializers/auth/ldap.py:57 settings/serializers/auth/oauth2.py:51
+#: settings/serializers/auth/oidc.py:36
 msgid "User attr map"
 msgstr "ユーザー属性マッピング"
 
@@ -3672,22 +3674,51 @@ msgstr "ページサイズを検索"
 msgid "Enable LDAP auth"
 msgstr "LDAP認証の有効化"
 
-#: settings/serializers/auth/oidc.py:15
-msgid "Base site url"
-msgstr "ベースサイトのアドレス"
+#: settings/serializers/auth/oauth2.py:20
+msgid "Enable OAuth2 Auth"
+msgstr "OAuth2認証の有効化"
 
-#: settings/serializers/auth/oidc.py:18
+#: settings/serializers/auth/oauth2.py:23
+msgid "Logo"
+msgstr "アイコン"
+
+#: settings/serializers/auth/oauth2.py:26
+msgid "Service provider"
+msgstr "サービスプロバイダー"
+
+#: settings/serializers/auth/oauth2.py:29 settings/serializers/auth/oidc.py:18
 msgid "Client Id"
 msgstr "クライアントID"
 
-#: settings/serializers/auth/oidc.py:21
+#: settings/serializers/auth/oauth2.py:32 settings/serializers/auth/oidc.py:21
 #: xpack/plugins/cloud/serializers/account_attrs.py:36
 msgid "Client Secret"
 msgstr "クライアント秘密"
 
-#: settings/serializers/auth/oidc.py:29
+#: settings/serializers/auth/oauth2.py:38 settings/serializers/auth/oidc.py:62
+msgid "Provider auth endpoint"
+msgstr "認証エンドポイントアドレス"
+
+#: settings/serializers/auth/oauth2.py:41 settings/serializers/auth/oidc.py:65
+msgid "Provider token endpoint"
+msgstr "プロバイダートークンエンドポイント"
+
+#: settings/serializers/auth/oauth2.py:44 settings/serializers/auth/oidc.py:29
 msgid "Client authentication method"
 msgstr "クライアント認証方式"
+
+#: settings/serializers/auth/oauth2.py:48 settings/serializers/auth/oidc.py:71
+msgid "Provider userinfo endpoint"
+msgstr "プロバイダーuserinfoエンドポイント"
+
+#: settings/serializers/auth/oauth2.py:54 settings/serializers/auth/oidc.py:92
+#: settings/serializers/auth/saml2.py:33
+msgid "Always update user"
+msgstr "常にユーザーを更新"
+
+#: settings/serializers/auth/oidc.py:15
+msgid "Base site url"
+msgstr "ベースサイトのアドレス"
 
 #: settings/serializers/auth/oidc.py:31
 msgid "Share session"
@@ -3721,21 +3752,9 @@ msgstr "OIDC認証の有効化"
 msgid "Provider endpoint"
 msgstr "プロバイダーエンドポイント"
 
-#: settings/serializers/auth/oidc.py:62
-msgid "Provider auth endpoint"
-msgstr "認証エンドポイントアドレス"
-
-#: settings/serializers/auth/oidc.py:65
-msgid "Provider token endpoint"
-msgstr "プロバイダートークンエンドポイント"
-
 #: settings/serializers/auth/oidc.py:68
 msgid "Provider jwks endpoint"
 msgstr "プロバイダーjwksエンドポイント"
-
-#: settings/serializers/auth/oidc.py:71
-msgid "Provider userinfo endpoint"
-msgstr "プロバイダーuserinfoエンドポイント"
 
 #: settings/serializers/auth/oidc.py:74
 msgid "Provider end session endpoint"
@@ -3768,10 +3787,6 @@ msgstr "使用状態"
 #: settings/serializers/auth/oidc.py:90
 msgid "Use nonce"
 msgstr "Nonceを使用"
-
-#: settings/serializers/auth/oidc.py:92 settings/serializers/auth/saml2.py:33
-msgid "Always update user"
-msgstr "常にユーザーを更新"
 
 #: settings/serializers/auth/radius.py:13
 msgid "Enable Radius Auth"
@@ -5686,7 +5701,7 @@ msgstr "公開鍵は古いものと同じであってはなりません。"
 msgid "Not a valid ssh public key"
 msgstr "有効なssh公開鍵ではありません"
 
-#: users/forms/profile.py:161 users/models/user.py:692
+#: users/forms/profile.py:161 users/models/user.py:696
 msgid "Public key"
 msgstr "公開キー"
 
@@ -5698,55 +5713,55 @@ msgstr "強制有効"
 msgid "Local"
 msgstr "ローカル"
 
-#: users/models/user.py:673 users/serializers/user.py:149
+#: users/models/user.py:677 users/serializers/user.py:149
 msgid "Is service account"
 msgstr "サービスアカウントです"
 
-#: users/models/user.py:675
+#: users/models/user.py:679
 msgid "Avatar"
 msgstr "アバター"
 
-#: users/models/user.py:678
+#: users/models/user.py:682
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user.py:695
+#: users/models/user.py:699
 msgid "Secret key"
 msgstr "秘密キー"
 
-#: users/models/user.py:711
+#: users/models/user.py:715
 msgid "Source"
 msgstr "ソース"
 
-#: users/models/user.py:715
+#: users/models/user.py:719
 msgid "Date password last updated"
 msgstr "最終更新日パスワード"
 
-#: users/models/user.py:718
+#: users/models/user.py:722
 msgid "Need update password"
 msgstr "更新パスワードが必要"
 
-#: users/models/user.py:892
+#: users/models/user.py:896
 msgid "Can invite user"
 msgstr "ユーザーを招待できます"
 
-#: users/models/user.py:893
+#: users/models/user.py:897
 msgid "Can remove user"
 msgstr "ユーザーを削除できます"
 
-#: users/models/user.py:894
+#: users/models/user.py:898
 msgid "Can match user"
 msgstr "ユーザーに一致できます"
 
-#: users/models/user.py:903
+#: users/models/user.py:907
 msgid "Administrator"
 msgstr "管理者"
 
-#: users/models/user.py:906
+#: users/models/user.py:910
 msgid "Administrator is the super user of system"
 msgstr "管理者はシステムのスーパーユーザーです"
 
-#: users/models/user.py:931
+#: users/models/user.py:935
 msgid "User password history"
 msgstr "ユーザーパスワード履歴"
 
@@ -6858,6 +6873,9 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "コミュニティ版"
+
+#~ msgid "Logo title"
+#~ msgstr "アイコンタイトル"
 
 #~ msgid "IP is not allowed"
 #~ msgstr "IPは許可されていません"
