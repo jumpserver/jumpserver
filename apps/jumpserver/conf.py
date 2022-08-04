@@ -17,16 +17,18 @@ import yaml
 import copy
 from importlib import import_module
 from urllib.parse import urljoin, urlparse
-from gmssl.sm4 import CryptSM4, SM4_DECRYPT
+import logging
 
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
-
+from .config_crypto import ConfigCrypto
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
 XPACK_DIR = os.path.join(BASE_DIR, 'xpack')
 HAS_XPACK = os.path.isdir(XPACK_DIR)
+
+logger = logging.getLogger('jumpserver.conf')
 
 
 def import_string(dotted_path):
@@ -437,16 +439,20 @@ class Config(dict):
 
     def __init__(self, *args):
         super().__init__(*args)
+        self.secret_keys = [
+            'SECRET_KEY', 'DB_PASSWORD', 'REDIS_PASSWORD',
+        ]
         self.secret_encryptor = self.get_secret_encryptor()
 
-    def get_secret_encryptor(self):
+    @staticmethod
+    def get_secret_encryptor():
+        # 使用 SM4 加密配置文件敏感信息
         # https://the-x.cn/cryptography/Sm4.aspx
         secret_encrypt_key = os.environ.get('SECRET_ENCRYPT_KEY', '')
         if not secret_encrypt_key:
             return None
-        sm4 = CryptSM4()
-
-        return
+        print('Info: Using SM4 to encrypt config secret value')
+        return ConfigCrypto(secret_encrypt_key)
 
     @staticmethod
     def convert_keycloak_to_openid(keycloak_config):
@@ -459,7 +465,6 @@ class Config(dict):
         """
 
         openid_config = copy.deepcopy(keycloak_config)
-
         auth_openid = openid_config.get('AUTH_OPENID')
         auth_openid_realm_name = openid_config.get('AUTH_OPENID_REALM_NAME')
         auth_openid_server_url = openid_config.get('AUTH_OPENID_SERVER_URL')
@@ -585,17 +590,29 @@ class Config(dict):
             value = self.convert_type(item, value)
         return value
 
+    def decrypt_if_need(self, value, item):
+        if not self.secret_encryptor:
+            return value
+
+        if item not in self.secret_keys:
+            return value
+
+        try:
+            plaintext = self.secret_encryptor.decrypt(value)
+            if plaintext:
+                value = plaintext
+        except Exception as e:
+            logger.error('decrypt %s error: %s', item, e)
+        return value
+
     def get(self, item):
         # 再从配置文件中获取
         value = self.get_from_config(item)
-        if value is not None:
-            return value
-        # 其次从环境变量来
-        value = self.get_from_env(item)
-        if value is not None:
-            return value
-        value = self.defaults.get(item)
-        return value
+        if value is None:
+            value = self.get_from_env(item)
+        if value is None:
+            value = self.defaults.get(item)
+        return self.decrypt_if_need(value, item)
 
     def __getitem__(self, item):
         return self.get(item)

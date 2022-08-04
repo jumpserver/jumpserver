@@ -196,7 +196,8 @@ def encrypt_password(password, salt=None, algorithm='sha512'):
         return des_crypt.hash(password, salt=salt[:2])
 
     support_algorithm = {
-        'sha512': sha512, 'des': des
+        'sha512': sha512,
+        'des': des
     }
 
     if isinstance(algorithm, str):

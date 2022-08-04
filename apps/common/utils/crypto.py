@@ -74,9 +74,8 @@ class AESCrypto:
     """
 
     def __init__(self, key):
-        if len(key) > 32:
-            key = key[:32]
-        self.key = self.to_16(key)
+        self.key = padding_key(key)
+        self.aes = AES.new(self.key, AES.MODE_ECB)
 
     @staticmethod
     def to_16(key):
@@ -91,17 +90,15 @@ class AESCrypto:
         return key  # 返回bytes
 
     def aes(self):
-        return AES.new(self.key, AES.MODE_ECB)  # 初始化加密器
+        return AES.new(self.key, AES.MODE_ECB)
 
     def encrypt(self, text):
-        aes = self.aes()
-        cipher = base64.encodebytes(aes.encrypt(self.to_16(text)))
+        cipher = base64.encodebytes(self.aes.encrypt(self.to_16(text)))
         return str(cipher, encoding='utf8').replace('\n', '')  # 加密
 
     def decrypt(self, text):
-        aes = self.aes()
         text_decoded = base64.decodebytes(bytes(text, encoding='utf8'))
-        return str(aes.decrypt(text_decoded).rstrip(b'\0').decode("utf8"))
+        return str(self.aes.decrypt(text_decoded).rstrip(b'\0').decode("utf8"))
 
 
 class AESCryptoGCM:
@@ -137,7 +134,6 @@ class AESCryptoGCM:
         nonce = base64.b64decode(metadata[24:48])
         tag = base64.b64decode(metadata[48:])
         ciphertext = base64.b64decode(text[72:])
-
         cipher = AES.new(self.key, AES.MODE_GCM, nonce=nonce)
 
         cipher.update(header)
