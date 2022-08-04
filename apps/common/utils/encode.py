@@ -222,8 +222,6 @@ def ensure_last_char_is_ascii(data):
     remain = ''
 
 
-
-
 def data_to_json(data, sort_keys=True, indent=2, cls=None):
     if cls is None:
         cls = DjangoJSONEncoder
