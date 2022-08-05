@@ -1,7 +1,7 @@
 import base64
 import logging
+import re
 from Cryptodome.Cipher import AES, PKCS1_v1_5
-from Cryptodome.Util.Padding import pad
 from Cryptodome.Random import get_random_bytes
 from Cryptodome.PublicKey import RSA
 from Cryptodome import Random
@@ -11,21 +11,25 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 
-def process_key(key):
+secret_pattern = re.compile(r'password|secret|key|token', re.IGNORECASE)
+
+
+def padding_key(key, max_length=32):
     """
     返回32 bytes 的key
     """
     if not isinstance(key, bytes):
         key = bytes(key, encoding='utf-8')
 
-    if len(key) >= 32:
-        return key[:32]
+    if len(key) >= max_length:
+        return key[:max_length]
 
-    return pad(key, 32)
+    while len(key) % 16 != 0:
+        key += b'\0'
+    return key
 
 
 class BaseCrypto:
-
     def encrypt(self, text):
         return base64.urlsafe_b64encode(
             self._encrypt(bytes(text, encoding='utf8'))
@@ -45,7 +49,7 @@ class BaseCrypto:
 
 class GMSM4EcbCrypto(BaseCrypto):
     def __init__(self, key):
-        self.key = process_key(key)
+        self.key = padding_key(key, 16)
         self.sm4_encryptor = CryptSM4()
         self.sm4_encryptor.set_key(self.key, SM4_ENCRYPT)
 
@@ -70,9 +74,8 @@ class AESCrypto:
     """
 
     def __init__(self, key):
-        if len(key) > 32:
-            key = key[:32]
-        self.key = self.to_16(key)
+        self.key = padding_key(key, 32)
+        self.aes = AES.new(self.key, AES.MODE_ECB)
 
     @staticmethod
     def to_16(key):
@@ -87,17 +90,15 @@ class AESCrypto:
         return key  # 返回bytes
 
     def aes(self):
-        return AES.new(self.key, AES.MODE_ECB)  # 初始化加密器
+        return AES.new(self.key, AES.MODE_ECB)
 
     def encrypt(self, text):
-        aes = self.aes()
-        cipher = base64.encodebytes(aes.encrypt(self.to_16(text)))
+        cipher = base64.encodebytes(self.aes.encrypt(self.to_16(text)))
         return str(cipher, encoding='utf8').replace('\n', '')  # 加密
 
     def decrypt(self, text):
-        aes = self.aes()
         text_decoded = base64.decodebytes(bytes(text, encoding='utf8'))
-        return str(aes.decrypt(text_decoded).rstrip(b'\0').decode("utf8"))
+        return str(self.aes.decrypt(text_decoded).rstrip(b'\0').decode("utf8"))
 
 
 class AESCryptoGCM:
@@ -106,7 +107,7 @@ class AESCryptoGCM:
     """
 
     def __init__(self, key):
-        self.key = process_key(key)
+        self.key = padding_key(key)
 
     def encrypt(self, text):
         """
@@ -133,7 +134,6 @@ class AESCryptoGCM:
         nonce = base64.b64decode(metadata[24:48])
         tag = base64.b64decode(metadata[48:])
         ciphertext = base64.b64decode(text[72:])
-
         cipher = AES.new(self.key, AES.MODE_GCM, nonce=nonce)
 
         cipher.update(header)
@@ -144,11 +144,10 @@ class AESCryptoGCM:
 def get_aes_crypto(key=None, mode='GCM'):
     if key is None:
         key = settings.SECRET_KEY
-    if mode == 'ECB':
-        a = AESCrypto(key)
-    elif mode == 'GCM':
-        a = AESCryptoGCM(key)
-    return a
+    if mode == 'GCM':
+        return AESCryptoGCM(key)
+    else:
+        return AESCrypto(key)
 
 
 def get_gm_sm4_ecb_crypto(key=None):
