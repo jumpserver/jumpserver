@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
+from common.db.models import JMSBaseModel
 from .protocol import ProtocolMixin
 from .base import BaseUser, AbsConnectivity
 
@@ -35,3 +36,7 @@ class Account(BaseUser, AbsConnectivity, ProtocolMixin):
 
     def __str__(self):
         return '{}://{}@{}'.format(self.protocol, self.username, self.asset.hostname)
+
+
+class AccountTemplate(JMSBaseModel):
+    pass
