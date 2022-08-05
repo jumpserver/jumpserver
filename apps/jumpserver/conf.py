@@ -494,7 +494,6 @@ class Config(dict):
 
     def __init__(self, *args):
         super().__init__(*args)
-
         self.secret_encryptor = ConfigCrypto.get_secret_encryptor()
 
     @staticmethod
