@@ -86,6 +86,10 @@ class DoesNotExist(Exception):
 
 
 class ConfigCrypto:
+    secret_keys = [
+        'SECRET_KEY', 'DB_PASSWORD', 'REDIS_PASSWORD',
+    ]
+
     def __init__(self, key):
         self.safe_key = self.process_key(key)
         self.sm4_encryptor = CryptSM4()
@@ -110,6 +114,28 @@ class ConfigCrypto:
     def decrypt(self, data):
         data = base64.urlsafe_b64decode(bytes(data, encoding='utf8'))
         return self.sm4_decryptor.crypt_ecb(data).decode('utf8')
+
+    def decrypt_if_need(self, value, item):
+        if item not in self.secret_keys:
+            return value
+
+        try:
+            plaintext = self.decrypt(value)
+            if plaintext:
+                value = plaintext
+        except Exception as e:
+            logger.error('decrypt %s error: %s', item, e)
+        return value
+
+    @classmethod
+    def get_secret_encryptor(cls):
+        # 使用 SM4 加密配置文件敏感信息
+        # https://the-x.cn/cryptography/Sm4.aspx
+        secret_encrypt_key = os.environ.get('SECRET_ENCRYPT_KEY', '')
+        if not secret_encrypt_key:
+            return None
+        print('Info: Using SM4 to encrypt config secret value')
+        return cls(secret_encrypt_key)
 
 
 class Config(dict):
@@ -468,20 +494,8 @@ class Config(dict):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.secret_keys = [
-            'SECRET_KEY', 'DB_PASSWORD', 'REDIS_PASSWORD',
-        ]
-        self.secret_encryptor = self.get_secret_encryptor()
 
-    @staticmethod
-    def get_secret_encryptor():
-        # 使用 SM4 加密配置文件敏感信息
-        # https://the-x.cn/cryptography/Sm4.aspx
-        secret_encrypt_key = os.environ.get('SECRET_ENCRYPT_KEY', '')
-        if not secret_encrypt_key:
-            return None
-        print('Info: Using SM4 to encrypt config secret value')
-        return ConfigCrypto(secret_encrypt_key)
+        self.secret_encryptor = ConfigCrypto.get_secret_encryptor()
 
     @staticmethod
     def convert_keycloak_to_openid(keycloak_config):
@@ -619,21 +633,6 @@ class Config(dict):
             value = self.convert_type(item, value)
         return value
 
-    def decrypt_if_need(self, value, item):
-        if not self.secret_encryptor:
-            return value
-
-        if item not in self.secret_keys:
-            return value
-
-        try:
-            plaintext = self.secret_encryptor.decrypt(value)
-            if plaintext:
-                value = plaintext
-        except Exception as e:
-            logger.error('decrypt %s error: %s', item, e)
-        return value
-
     def get(self, item):
         # 再从配置文件中获取
         value = self.get_from_config(item)
@@ -641,7 +640,9 @@ class Config(dict):
             value = self.get_from_env(item)
         if value is None:
             value = self.defaults.get(item)
-        return self.decrypt_if_need(value, item)
+        if self.secret_encryptor:
+            value = self.secret_encryptor.decrypt_if_need(value, item)
+        return value
 
     def __getitem__(self, item):
         return self.get(item)
