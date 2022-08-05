@@ -97,24 +97,9 @@ class AssetSerializer(CategoryDisplayMixin, OrgResourceModelSerializerMixin):
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('domain', 'platform')
+        queryset = queryset.prefetch_related('domain', 'platform', 'protocols')
         queryset = queryset.prefetch_related('nodes', 'labels')
         return queryset
-
-    def compatible_with_old_protocol(self, validated_data):
-        protocols_data = validated_data.pop("protocols", [])
-
-        # 兼容老的api
-        name = validated_data.get("protocol")
-        port = validated_data.get("port")
-        if not protocols_data and name and port:
-            protocols_data.insert(0, '/'.join([name, str(port)]))
-        elif not name and not port and protocols_data:
-            protocol = protocols_data[0].split('/')
-            validated_data["protocol"] = protocol[0]
-            validated_data["port"] = int(protocol[1])
-        if protocols_data:
-            validated_data["protocols"] = protocols_data
 
     def perform_nodes_display_create(self, instance, nodes_display):
         if not nodes_display:
