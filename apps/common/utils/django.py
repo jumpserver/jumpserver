@@ -8,12 +8,14 @@ from django.utils import timezone
 from django.db import models
 from django.db.models.signals import post_save, pre_save
 
-
 UUID_PATTERN = re.compile(r'[0-9a-zA-Z\-]{36}')
 
 
-def reverse(view_name, urlconf=None, args=None, kwargs=None,
-            current_app=None, external=False, api_to_ui=False):
+def reverse(
+        view_name, urlconf=None, args=None, kwargs=None,
+        current_app=None, external=False, api_to_ui=False,
+        is_console=False, is_audit=False, is_workbench=False
+):
     url = dj_reverse(view_name, urlconf=urlconf, args=args,
                      kwargs=kwargs, current_app=current_app)
 
@@ -21,7 +23,15 @@ def reverse(view_name, urlconf=None, args=None, kwargs=None,
         site_url = settings.SITE_URL
         url = site_url.strip('/') + url
     if api_to_ui:
-        url = url.replace('api/v1', 'ui/#').rstrip('/')
+        replace_str = 'ui/#'
+        if is_console:
+            replace_str += '/console'
+        elif is_audit:
+            replace_str += '/audit'
+        elif is_workbench:
+            replace_str += '/workbench'
+
+        url = url.replace('api/v1', replace_str).rstrip('/')
     return url
 
 
@@ -38,7 +48,7 @@ def date_expired_default():
         years = int(settings.DEFAULT_EXPIRED_YEARS)
     except TypeError:
         years = 70
-    return timezone.now() + timezone.timedelta(days=365*years)
+    return timezone.now() + timezone.timedelta(days=365 * years)
 
 
 def union_queryset(*args, base_queryset=None):

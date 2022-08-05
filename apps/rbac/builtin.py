@@ -5,6 +5,9 @@ from .const import Scope, system_exclude_permissions, org_exclude_permissions
 _view_root_perms = (
     ('orgs', 'organization', 'view', 'rootorg'),
 )
+_view_all_joined_org_perms = (
+    ('orgs', 'organization', 'view', 'alljoinedorg'),
+)
 
 user_perms = (
     ('rbac', 'menupermission', 'view', 'workbench'),
@@ -20,11 +23,11 @@ user_perms = (
 )
 
 system_user_perms = (
-    ('authentication', 'connectiontoken', 'add', 'connectiontoken'),
+    ('authentication', 'connectiontoken', 'add,view', 'connectiontoken'),
     ('authentication', 'temptoken', 'add,change,view', 'temptoken'),
     ('authentication', 'accesskey', '*', '*'),
     ('tickets', 'ticket', 'view', 'ticket'),
-) + user_perms + _view_root_perms
+) + user_perms + _view_all_joined_org_perms
 
 _auditor_perms = (
     ('rbac', 'menupermission', 'view', 'audit'),

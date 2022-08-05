@@ -130,7 +130,7 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
         for asset in command['assets']:
             url = reverse(
                 'assets:asset-detail', kwargs={'pk': asset.id},
-                api_to_ui=True, external=True
+                api_to_ui=True, external=True, is_console=True
             ) + '?oid={}'.format(asset.org_id)
             assets_with_url.append([asset, url])
 

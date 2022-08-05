@@ -1,8 +1,9 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .general import Ticket
+from perms.models import Action
 from applications.const import AppCategory, AppType
+from .general import Ticket
 
 __all__ = ['ApplyApplicationTicket']
 
@@ -22,6 +23,9 @@ class ApplyApplicationTicket(Ticket):
     apply_system_users = models.ManyToManyField(
         'assets.SystemUser', verbose_name=_('Apply system users'),
     )
+    apply_actions = models.IntegerField(
+        choices=Action.DB_CHOICES, default=Action.ALL, verbose_name=_('Actions')
+    )
     apply_date_start = models.DateTimeField(verbose_name=_('Date start'), null=True)
     apply_date_expired = models.DateTimeField(verbose_name=_('Date expired'), null=True)
 
@@ -32,3 +36,10 @@ class ApplyApplicationTicket(Ticket):
     @property
     def apply_type_display(self):
         return AppType.get_label(self.apply_type)
+
+    @property
+    def apply_actions_display(self):
+        return Action.value_to_choices_display(self.apply_actions)
+
+    def get_apply_actions_display(self):
+        return ', '.join(self.apply_actions_display)

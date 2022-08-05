@@ -265,6 +265,22 @@ class Config(dict):
         'AUTH_SAML2_PROVIDER_AUTHORIZATION_ENDPOINT': '/',
         'AUTH_SAML2_AUTHENTICATION_FAILURE_REDIRECT_URI': '/',
 
+        # OAuth2 认证
+        'AUTH_OAUTH2': False,
+        'AUTH_OAUTH2_LOGO_PATH': 'img/login_oauth2_logo.png',
+        'AUTH_OAUTH2_PROVIDER': 'OAuth2',
+        'AUTH_OAUTH2_ALWAYS_UPDATE_USER': True,
+        'AUTH_OAUTH2_CLIENT_ID': 'client-id',
+        'AUTH_OAUTH2_SCOPE': '',
+        'AUTH_OAUTH2_CLIENT_SECRET': '',
+        'AUTH_OAUTH2_PROVIDER_AUTHORIZATION_ENDPOINT': 'https://oauth2.example.com/authorize',
+        'AUTH_OAUTH2_PROVIDER_USERINFO_ENDPOINT': 'https://oauth2.example.com/userinfo',
+        'AUTH_OAUTH2_ACCESS_TOKEN_ENDPOINT': 'https://oauth2.example.com/access_token',
+        'AUTH_OAUTH2_ACCESS_TOKEN_METHOD': 'GET',
+        'AUTH_OAUTH2_USER_ATTR_MAP': {
+            'name': 'name', 'username': 'username', 'email': 'email'
+        },
+
         'AUTH_TEMP_TOKEN': False,
 
         # 企业微信
@@ -387,7 +403,8 @@ class Config(dict):
         'SESSION_SAVE_EVERY_REQUEST': True,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE': False,
         'SERVER_REPLAY_STORAGE': {},
-        'SECURITY_DATA_CRYPTO_ALGO': 'aes',
+        'SECURITY_DATA_CRYPTO_ALGO': None,
+        'GMSSL_ENABLED': False,
 
         # 记录清理清理
         'LOGIN_LOG_KEEP_DAYS': 200,
@@ -405,6 +422,7 @@ class Config(dict):
         'CONNECTION_TOKEN_ENABLED': False,
 
         'PERM_SINGLE_ASSET_TO_UNGROUP_NODE': False,
+        'TICKET_AUTHORIZE_DEFAULT_TIME': 7,
         'WINDOWS_SSH_DEFAULT_SHELL': 'cmd',
         'PERIOD_TASK_ENABLED': True,
 

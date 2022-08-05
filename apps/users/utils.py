@@ -230,6 +230,8 @@ class LoginIpBlockUtil(BlockGlobalIpUtilBase):
 
 
 def construct_user_email(username, email, email_suffix=''):
+    if email is None:
+        email = ''
     if '@' in email:
         return email
     if '@' in username:
