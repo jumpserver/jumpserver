@@ -3,8 +3,6 @@ from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
 
 from assets.models import Platform
-from assets.serializers.asset import ProtocolsField
-from assets.const import Protocol
 from .mixin import CategoryDisplayMixin
 
 __all__ = ['PlatformSerializer']
@@ -12,7 +10,7 @@ __all__ = ['PlatformSerializer']
 
 class PlatformSerializer(CategoryDisplayMixin, serializers.ModelSerializer):
     meta = serializers.DictField(required=False, allow_null=True, label=_('Meta'))
-    protocols_default = ProtocolsField(label=_('Protocols'), required=False)
+    protocols_default = serializers.ListField(label=_('Protocols'), required=False)
     type_limits = serializers.ReadOnlyField(required=False, read_only=True)
 
     def __init__(self, *args, **kwargs):

@@ -5,7 +5,6 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
 from assets.models import Node, SystemUser, Asset, Platform
-from assets.serializers import ProtocolsField
 from perms.serializers.base import ActionsField
 
 __all__ = [
@@ -38,7 +37,6 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
     """
     被授权资产的数据结构
     """
-    protocols = ProtocolsField(label=_('Protocols'), required=False, read_only=True)
     platform = serializers.SlugRelatedField(
         slug_field='name', queryset=Platform.objects.all(), label=_("Platform")
     )

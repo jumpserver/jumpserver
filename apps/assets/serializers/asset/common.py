@@ -3,70 +3,30 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
-from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
-from ...models import Asset, Node, Platform, SystemUser
+from ...models import Asset, Node, Platform, SystemUser, Protocol, Label
 from ..mixin import CategoryDisplayMixin
 from ..account import AccountSerializer
 
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
-    'AssetTaskSerializer', 'AssetsTaskSerializer', 'ProtocolsField',
+    'AssetTaskSerializer', 'AssetsTaskSerializer',
 ]
 
 
-class ProtocolField(serializers.RegexField):
-    default_error_messages = {
-        'invalid': _('Protocol format should {}/{}').format('protocol', '1-65535')
-    }
-    regex = r'^(\w+)/(\d{1,5})$'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(self.regex, **kwargs)
+class AssetProtocolsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Protocol
+        fields = ['id', 'name', 'port']
 
 
-def validate_duplicate_protocols(values):
-    errors = []
-    names = []
-
-    print("Value is: ", values)
-
-    for value in values.split(' '):
-        if not value or '/' not in value:
-            continue
-        name = value.split('/')[0]
-        if name in names:
-            errors.append(_("Protocol duplicate: {}").format(name))
-        names.append(name)
-        errors.append('')
-    if any(errors):
-        raise serializers.ValidationError(errors)
-
-
-class ProtocolsField(serializers.ListField):
-    default_validators = [validate_duplicate_protocols]
-
-    def __init__(self, *args, **kwargs):
-        kwargs['child'] = ProtocolField()
-        kwargs['allow_null'] = True
-        kwargs['allow_empty'] = True
-        kwargs['min_length'] = 1
-        kwargs['max_length'] = 32
-        super().__init__(*args, **kwargs)
-
-    def to_representation(self, value):
-        if not value:
-            return []
-        if isinstance(value, str):
-            return value.split(' ')
-        return value
-
-    def to_internal_value(self, data):
-        return ' '.join(data)
+class AssetLabelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Label
+        fields = ['id', 'name', 'value']
 
 
 class AssetSerializer(CategoryDisplayMixin, OrgResourceModelSerializerMixin):
-    protocols = ProtocolsField(label=_('Protocols'), required=False, default=['ssh/22'])
     domain_display = serializers.ReadOnlyField(source='domain.name', label=_('Domain name'))
     nodes_display = serializers.ListField(
         child=serializers.CharField(), label=_('Nodes name'), required=False
@@ -75,10 +35,12 @@ class AssetSerializer(CategoryDisplayMixin, OrgResourceModelSerializerMixin):
         child=serializers.CharField(), label=_('Labels name'),
         required=False, read_only=True
     )
+    labels = AssetLabelSerializer(many=True, required=False)
     platform_display = serializers.SlugField(
         source='platform.name', label=_("Platform display"), read_only=True
     )
     accounts = AccountSerializer(many=True, write_only=True, required=False)
+    protocols = AssetProtocolsSerializer(many=True)
 
     """
     资产的数据结构
@@ -87,17 +49,16 @@ class AssetSerializer(CategoryDisplayMixin, OrgResourceModelSerializerMixin):
     class Meta:
         model = Asset
         fields_mini = [
-            'id', 'hostname', 'ip', 'platform', 'protocols'
+            'id', 'hostname', 'ip',
         ]
         fields_small = fields_mini + [
-            'protocol', 'port', 'is_active',
-            'public_ip', 'number', 'comment',
+            'is_active', 'number', 'comment',
         ]
         fields_fk = [
-            'domain', 'domain_display', 'platform',
+            'domain', 'domain_display', 'platform', 'platform', 'platform_display',
         ]
         fields_m2m = [
-            'nodes', 'nodes_display', 'labels', 'labels_display', 'accounts'
+            'nodes', 'nodes_display', 'labels', 'labels_display', 'accounts', 'protocols',
         ]
         read_only_fields = [
             'category', 'category_display', 'type', 'type_display',

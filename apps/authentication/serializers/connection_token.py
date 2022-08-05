@@ -8,7 +8,6 @@ from common.utils.random import random_string
 from assets.models import Asset, SystemUser, Gateway, Domain, CommandFilterRule
 from users.models import User
 from applications.models import Application
-from assets.serializers import ProtocolsField
 from perms.serializers.base import ActionsField
 
 
@@ -122,7 +121,6 @@ class ConnectionTokenUserSerializer(serializers.ModelSerializer):
 
 
 class ConnectionTokenAssetSerializer(serializers.ModelSerializer):
-    protocols = ProtocolsField(label='Protocols', read_only=True)
 
     class Meta:
         model = Asset
