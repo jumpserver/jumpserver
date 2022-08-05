@@ -316,8 +316,11 @@ PASSWORD_HASHERS = [
 
 
 GMSSL_ENABLED = CONFIG.GMSSL_ENABLED
+GM_HASHER = 'common.hashers.PBKDF2SM3PasswordHasher'
 if GMSSL_ENABLED:
-    PASSWORD_HASHERS.insert(0, 'common.hashers.PBKDF2SM3PasswordHasher')
+    PASSWORD_HASHERS.insert(0, GM_HASHER)
+else:
+    PASSWORD_HASHERS.append(GM_HASHER)
 
 # For Debug toolbar
 INTERNAL_IPS = ["127.0.0.1"]
