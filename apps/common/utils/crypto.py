@@ -14,22 +14,22 @@ from django.core.exceptions import ImproperlyConfigured
 secret_pattern = re.compile(r'password|secret|key|token', re.IGNORECASE)
 
 
-def padding_key(key, length=32):
+def padding_key(key, max_length=32):
     """
     返回32 bytes 的key
     """
     if not isinstance(key, bytes):
         key = bytes(key, encoding='utf-8')
 
-    if len(key) >= length:
-        return key[:length]
+    if len(key) >= max_length:
+        return key[:max_length]
 
-    key += b'\0' * (length - len(key))
+    while len(key) % 16 != 0:
+        key += b'\0'
     return key
 
 
 class BaseCrypto:
-
     def encrypt(self, text):
         return base64.urlsafe_b64encode(
             self._encrypt(bytes(text, encoding='utf8'))
@@ -49,7 +49,7 @@ class BaseCrypto:
 
 class GMSM4EcbCrypto(BaseCrypto):
     def __init__(self, key):
-        self.key = padding_key(key)
+        self.key = padding_key(key, 16)
         self.sm4_encryptor = CryptSM4()
         self.sm4_encryptor.set_key(self.key, SM4_ENCRYPT)
 
@@ -74,7 +74,7 @@ class AESCrypto:
     """
 
     def __init__(self, key):
-        self.key = padding_key(key)
+        self.key = padding_key(key, 32)
         self.aes = AES.new(self.key, AES.MODE_ECB)
 
     @staticmethod

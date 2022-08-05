@@ -49,7 +49,7 @@ class JMSBaseAuthBackend:
         if not allow:
             info = 'User {} skip authentication backend {}, because it not in {}'
             info = info.format(username, backend_name, ','.join(allowed_backend_names))
-            logger.debug(info)
+            logger.info(info)
         return allow
 
 
