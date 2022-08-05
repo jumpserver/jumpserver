@@ -5,7 +5,7 @@ from common.db.models import IncludesTextChoicesMeta
 
 __all__ = [
     'Category', 'HostTypes', 'NetworkTypes', 'DatabaseTypes',
-    'RemoteAppTypes', 'CloudTypes', 'Protocol', 'AllTypes',
+    'WebTypes', 'CloudTypes', 'Protocol', 'AllTypes',
 ]
 
 
@@ -19,8 +19,8 @@ class Category(PlatformMixin, models.TextChoices):
     HOST = 'host', _('Host')
     NETWORK = 'network', _("NetworkDevice")
     DATABASE = 'database', _("Database")
-    REMOTE_APP = 'remote_app', _("Remote app")
     CLOUD = 'cloud', _("Clouding")
+    WEB = 'web', _("Web")
 
     @classmethod
     def platform_limits(cls):
@@ -36,8 +36,8 @@ class Category(PlatformMixin, models.TextChoices):
             cls.DATABASE: {
                 'has_domain': True
             },
-            cls.REMOTE_APP: {
-                'has_domain': True
+            cls.WEB: {
+                'has_domain': False,
             },
             cls.CLOUD: {
                 'has_domain': False,
@@ -97,11 +97,8 @@ class DatabaseTypes(PlatformMixin, models.TextChoices):
         return meta
 
 
-class RemoteAppTypes(PlatformMixin, models.TextChoices):
-    CHROME = 'chrome', 'Chrome'
-    VSPHERE = 'vmware_client', 'vSphere client'
-    MYSQL_WORKBENCH = 'mysql_workbench', 'MySQL workbench'
-    GENERAL_REMOTE_APP = 'general_remote_app', _("Custom")
+class WebTypes(PlatformMixin, models.TextChoices):
+    General = 'general', 'General'
 
 
 class CloudTypes(PlatformMixin, models.TextChoices):
@@ -112,7 +109,7 @@ class AllTypes(metaclass=IncludesTextChoicesMeta):
     choices: list
     includes = [
         HostTypes, NetworkTypes, DatabaseTypes,
-        RemoteAppTypes, CloudTypes
+        WebTypes, CloudTypes
     ]
 
     @classmethod
@@ -140,7 +137,7 @@ class AllTypes(metaclass=IncludesTextChoicesMeta):
             (Category.HOST, HostTypes),
             (Category.NETWORK, NetworkTypes),
             (Category.DATABASE, DatabaseTypes),
-            (Category.REMOTE_APP, RemoteAppTypes),
+            (Category.WEB, WebTypes),
             (Category.CLOUD, CloudTypes)
         )
 

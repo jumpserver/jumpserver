@@ -27,6 +27,7 @@ from ..tasks import (
     check_node_assets_amount_task
 )
 from .. import serializers
+from ..const import AllTypes
 from .mixin import SerializeToTreeNodeMixin
 from assets.locks import NodeAddChildrenLock
 
@@ -195,6 +196,14 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
             "org_id", "protocols", "is_active",
         ).prefetch_related('platform')
         return self.serialize_assets(assets, self.instance.key)
+
+
+class CategoryTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
+    def list(self, request, *args, **kwargs):
+        category_types = AllTypes.category_types()
+        nodes = self.get_queryset().order_by('value')
+        nodes = self.serialize_nodes(nodes, with_asset_amount=True)
+        return Response(data=nodes)
 
 
 class NodeAssetsApi(generics.ListAPIView):
