@@ -48,5 +48,5 @@ def build_absolute_uri_for_oidc(request, path=None):
         # OIDC 专用配置项
         redirect_uri = urljoin(settings.BASE_SITE_URL, path)
     else:
-        redirect_uri = build_absolute_uri(request, path)
+        redirect_uri = request.build_absolute_uri(path)
     return redirect_uri

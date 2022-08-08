@@ -18,7 +18,6 @@ class OAuth2AuthRequestView(View):
         log_prompt = "Process OAuth2 GET requests: {}"
         logger.debug(log_prompt.format('Start'))
 
-        base_url = settings.AUTH_OAUTH2_PROVIDER_AUTHORIZATION_ENDPOINT
         query_dict = {
             'client_id': settings.AUTH_OAUTH2_CLIENT_ID, 'response_type': 'code',
             'scope': settings.AUTH_OAUTH2_SCOPE,
@@ -27,7 +26,10 @@ class OAuth2AuthRequestView(View):
             )
         }
 
-        redirect_url = '{url}?{query}'.format(url=base_url, query=urlencode(query_dict))
+        redirect_url = '{url}?{query}'.format(
+            url=settings.AUTH_OAUTH2_PROVIDER_AUTHORIZATION_ENDPOINT,
+            query=urlencode(query_dict)
+        )
         logger.debug(log_prompt.format('Redirect login url'))
         return HttpResponseRedirect(redirect_url)
 
