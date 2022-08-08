@@ -160,7 +160,7 @@ class Config(dict):
         'SESSION_COOKIE_DOMAIN': None,
         'CSRF_COOKIE_DOMAIN': None,
         'SESSION_COOKIE_NAME_PREFIX': None,
-        'SESSION_COOKIE_AGE': 3600,
+        'SESSION_COOKIE_AGE': 3600 * 24,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE': False,
         'LOGIN_URL': reverse_lazy('authentication:login'),
         'CONNECTION_TOKEN_EXPIRATION': 5 * 60,
