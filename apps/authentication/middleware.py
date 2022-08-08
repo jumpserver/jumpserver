@@ -58,28 +58,29 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
         # 没有认证过，证明不是从 第三方 来的
         if request.user.is_anonymous:
             return response
-        if request.session.get('auth_third_party_required'):
-            ip = get_request_ip(request)
-            try:
-                self._check_login_acl(request.user, ip)
-            except Exception as e:
-                auth_logout(request)
-                context = {
-                    'title': _('Authentication failed'),
-                    'message': _('Authentication failed (before login check failed): {}').format(e),
-                    'interval': 10,
-                    'redirect_url': reverse('authentication:login'),
-                    'auto_redirect': True,
-                }
-                request.session.pop('auth_third_party_required', '')
-                return render(request, 'authentication/auth_fail_flash_message_standalone.html', context)
+        if not request.session.get('auth_third_party_required'):
+            return response
+        ip = get_request_ip(request)
+        try:
+            self._check_login_acl(request.user, ip)
+        except Exception as e:
+            auth_logout(request)
+            context = {
+                'title': _('Authentication failed'),
+                'message': _('Authentication failed (before login check failed): {}').format(e),
+                'interval': 10,
+                'redirect_url': reverse('authentication:login'),
+                'auto_redirect': True,
+            }
+            response = render(request, 'authentication/auth_fail_flash_message_standalone.html', context)
+        else:
             guard_url = reverse('authentication:login-guard')
             args = request.META.get('QUERY_STRING', '')
             if args:
                 guard_url = "%s?%s" % (guard_url, args)
+            response = redirect(guard_url)
+        finally:
             request.session.pop('auth_third_party_required', '')
-            return redirect(guard_url)
-        else:
             return response
 
 

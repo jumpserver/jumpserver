@@ -25,7 +25,8 @@ def on_user_auth_login_success(sender, user, request, **kwargs):
             and user.mfa_enabled \
             and not request.session.get('auth_mfa'):
         request.session['auth_mfa_required'] = 1
-
+    if request.session.get('auth_backend') in [settings.AUTH_BACKEND_OIDC_CODE, settings.AUTH_BACKEND_CAS, settings.AUTH_BACKEND_SAML2]:
+        request.session['auth_third_party_required'] = 1
     # 单点登录，超过了自动退出
     if settings.USER_LOGIN_SINGLE_MACHINE_ENABLED:
         lock_key = 'single_machine_login_' + str(user.id)
@@ -42,7 +43,6 @@ def on_user_auth_login_success(sender, user, request, **kwargs):
 @receiver(openid_user_login_success)
 def on_oidc_user_login_success(sender, request, user, create=False, **kwargs):
     request.session['auth_backend'] = settings.AUTH_BACKEND_OIDC_CODE
-    request.session['auth_third_party_required'] = 1
     post_auth_success.send(sender, user=user, request=request)
 
 
@@ -55,14 +55,12 @@ def on_oidc_user_login_failed(sender, username, request, reason, **kwargs):
 @receiver(cas_user_authenticated)
 def on_cas_user_login_success(sender, request, user, **kwargs):
     request.session['auth_backend'] = settings.AUTH_BACKEND_CAS
-    request.session['auth_third_party_required'] = 1
     post_auth_success.send(sender, user=user, request=request)
 
 
 @receiver(saml2_user_authenticated)
 def on_saml2_user_login_success(sender, request, user, **kwargs):
     request.session['auth_backend'] = settings.AUTH_BACKEND_SAML2
-    request.session['auth_third_party_required'] = 1
     post_auth_success.send(sender, user=user, request=request)
 
 
