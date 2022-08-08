@@ -43,6 +43,9 @@ DEBUG_DEV = CONFIG.DEBUG_DEV
 # Absolute url for some case, for example email link
 SITE_URL = CONFIG.SITE_URL
 
+# https://docs.djangoproject.com/en/4.1/ref/settings/
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # LOG LEVEL
 LOG_LEVEL = CONFIG.LOG_LEVEL
 
