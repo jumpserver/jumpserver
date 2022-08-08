@@ -128,6 +128,11 @@ class SystemUser(ProtocolMixin, BaseUser):
             return
         self.su_from.assets.add(*tuple(assets_or_ids))
 
+    # TODO 暂时为了接口文档添加
+    @property
+    def auto_push_account(self):
+        return
+
     class Meta:
         ordering = ['name']
         unique_together = [('name', 'org_id')]

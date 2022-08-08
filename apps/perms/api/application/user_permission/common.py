@@ -10,7 +10,7 @@ from rest_framework.generics import (
     ListAPIView, get_object_or_404
 )
 
-from orgs.utils import tmp_to_root_org, get_current_org
+from orgs.utils import tmp_to_root_org
 from applications.models import Application
 from perms.utils.application.permission import (
     get_application_system_user_ids,
@@ -19,7 +19,6 @@ from perms.utils.application.permission import (
 from .mixin import AppRoleAdminMixin, AppRoleUserMixin
 from perms.hands import User, SystemUser
 from perms import serializers
-
 
 __all__ = [
     'UserGrantedApplicationSystemUsersApi',
@@ -40,7 +39,7 @@ class BaseGrantedApplicationSystemUsersApi(ListAPIView):
         application_id = self.kwargs.get('application_id')
         application = get_object_or_404(Application, id=application_id)
         system_user_ids = self.get_application_system_user_ids(application)
-        system_users = SystemUser.objects.filter(id__in=system_user_ids)\
+        system_users = SystemUser.objects.filter(id__in=system_user_ids) \
             .only(*self.only_fields).order_by('priority')
         return system_users
 

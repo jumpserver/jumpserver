@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
             model_name='asset',
             name='platform',
             field=models.ForeignKey(
-                default=assets.models.Platform.default,
+                default='',
                 on_delete=django.db.models.deletion.PROTECT,
                 related_name='assets', to='assets.Platform',
                 verbose_name='Platform'),

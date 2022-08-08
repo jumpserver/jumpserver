@@ -183,7 +183,7 @@ class Asset(AbsConnectivity, NodesRelationMixin, OrgModelMixin):
 
     def get_all_system_users(self):
         from assets.models import SystemUser
-        system_user_ids = SystemUser.assets.through.objects.filter(asset=self)\
+        system_user_ids = SystemUser.assets.through.objects.filter(asset=self) \
             .values_list('systemuser_id', flat=True)
         system_users = SystemUser.objects.filter(id__in=system_user_ids)
         return system_users
@@ -192,6 +192,11 @@ class Asset(AbsConnectivity, NodesRelationMixin, OrgModelMixin):
         self.type = self.platform.type
         self.category = self.platform.category
         return super().save(*args, **kwargs)
+
+    # TODO 暂时为了接口文档添加
+    @property
+    def os(self):
+        return
 
     class Meta:
         unique_together = [('org_id', 'hostname')]
