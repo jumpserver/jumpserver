@@ -1,20 +1,19 @@
-import copy
 from rest_framework import serializers
 from rest_framework.serializers import Serializer
 from rest_framework.serializers import ModelSerializer
 from rest_framework_bulk.serializers import BulkListSerializer
 from django.utils.translation import gettext_lazy as _
 from django.utils.functional import cached_property
-from rest_framework.utils.serializer_helpers import BindingDict
+from drf_writable_nested.serializers import WritableNestedModelSerializer
 
 from common.mixins import BulkListSerializerMixin
 from common.mixins.serializers import BulkSerializerMixin
 from common.drf.fields import EncryptedField
 
 __all__ = [
-    'MethodSerializer',
-    'EmptySerializer', 'BulkModelSerializer', 'AdaptedBulkListSerializer', 'CeleryTaskSerializer',
-    'SecretReadableMixin'
+    'MethodSerializer', 'EmptySerializer', 'BulkModelSerializer',
+    'AdaptedBulkListSerializer', 'CeleryTaskSerializer',
+    'SecretReadableMixin', 'JMSWritableNestedModelSerializer',
 ]
 
 
@@ -112,3 +111,12 @@ class SecretReadableMixin(serializers.Serializer):
             if 'write_only' not in field_extra_kwargs:
                 continue
             serializer_field.write_only = field_extra_kwargs['write_only']
+
+
+class JMSWritableNestedModelSerializer(WritableNestedModelSerializer):
+
+    def _get_related_pk(self, data, model_class):
+        pk = data.get('pk') or data.get('id') or data.get(model_class._meta.pk.attname)
+        if pk:
+            return str(pk)
+        return None
