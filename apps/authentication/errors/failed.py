@@ -12,12 +12,13 @@ class AuthFailedNeedLogMixin:
     username = ''
     request = None
     error = ''
+    msg = ''
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         post_auth_failed.send(
             sender=self.__class__, username=self.username,
-            request=self.request, reason=self.error
+            request=self.request, reason=self.msg
         )
 
 
