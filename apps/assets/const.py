@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from common.db.models import IncludesTextChoicesMeta
+from common.tree import TreeNode
 
 
 __all__ = [
@@ -159,6 +160,32 @@ class AllTypes(metaclass=IncludesTextChoicesMeta):
     def serialize_to_objs(choices):
         title = ['value', 'display_name']
         return [dict(zip(title, choice)) for choice in choices]
+
+    @staticmethod
+    def choice_to_node(choice, pid, opened=True, is_parent=True, meta=None):
+        node = TreeNode(**{
+            'id': choice.name,
+            'name': choice.label,
+            'title': choice.label,
+            'pId': pid,
+            'open': opened,
+            'isParent': is_parent,
+        })
+        if meta:
+            node.meta = meta
+        return node
+
+    @classmethod
+    def to_tree_nodes(cls):
+        root = TreeNode(id='ROOT', name='类型节点', title='类型节点')
+        nodes = [root]
+        for category, types in cls.category_types():
+            category_node = cls.choice_to_node(category, 'ROOT', meta={'type': 'category'})
+            nodes.append(category_node)
+            for tp in types:
+                tp_node = cls.choice_to_node(tp, category_node.id, meta={'type': 'type'})
+                nodes.append(tp_node)
+        return nodes
 
 
 class Protocol(models.TextChoices):

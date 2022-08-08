@@ -45,12 +45,6 @@ if settings.XPACK_ENABLED:
     )
 
 
-apps = [
-    'users', 'assets', 'perms', 'terminal', 'ops', 'audits',
-    'orgs', 'auth', 'applications', 'tickets', 'settings', 'xpack',
-    'flower', 'luna', 'koko', 'ws', 'docs', 'redocs',
-]
-
 urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
     path('api/v1/', include(api_v1)),
@@ -84,12 +78,6 @@ if os.environ.get('DEBUG_TOOLBAR', False):
     urlpatterns += [
         path('__debug__/', include('debug_toolbar.urls')),
     ]
-
-
-# 兼容之前的
-old_app_pattern = '|'.join(apps)
-old_app_pattern = r'^{}'.format(old_app_pattern)
-urlpatterns += [re_path(old_app_pattern, views.redirect_old_apps_view)]
 
 
 handler404 = 'jumpserver.views.handler404'

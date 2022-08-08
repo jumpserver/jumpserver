@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 from functools import partial
 from collections import namedtuple, defaultdict
+from django.core.exceptions import PermissionDenied
 
 from rest_framework import status
 from rest_framework.serializers import ValidationError
@@ -35,9 +36,8 @@ logger = get_logger(__file__)
 __all__ = [
     'NodeViewSet', 'NodeChildrenApi', 'NodeAssetsApi',
     'NodeAddAssetsApi', 'NodeRemoveAssetsApi', 'MoveAssetsToNodeApi',
-    'NodeAddChildrenApi', 'NodeListAsTreeApi',
-    'NodeChildrenAsTreeApi',
-    'NodeTaskCreateApi',
+    'NodeAddChildrenApi', 'NodeListAsTreeApi', 'NodeChildrenAsTreeApi',
+    'NodeTaskCreateApi', 'CategoryTreeApi',
 ]
 
 
@@ -199,11 +199,17 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
 
 
 class CategoryTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
+    serializer_class = TreeNodeSerializer
+
+    def check_permissions(self, request):
+        if not request.user.has_perm('assets.view_asset'):
+            raise PermissionDenied
+        return True
+
     def list(self, request, *args, **kwargs):
-        category_types = AllTypes.category_types()
-        nodes = self.get_queryset().order_by('value')
-        nodes = self.serialize_nodes(nodes, with_asset_amount=True)
-        return Response(data=nodes)
+        nodes = AllTypes.to_tree_nodes()
+        serializer = self.get_serializer(nodes, many=True)
+        return Response(data=serializer.data)
 
 
 class NodeAssetsApi(generics.ListAPIView):
