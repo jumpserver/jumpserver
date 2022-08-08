@@ -2,9 +2,11 @@
 #
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
+from drf_writable_nested.serializers import WritableNestedModelSerializer
+
 
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
-from ...models import Asset, Node, Platform, SystemUser, Protocol, Label
+from ...models import Asset, Node, Platform, Protocol, Label, Domain
 from ..mixin import CategoryDisplayMixin
 from ..account import AccountSerializer
 
@@ -24,22 +26,52 @@ class AssetLabelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Label
         fields = ['id', 'name', 'value']
+        extra_kwargs = {
+            'value': {'required': False}
+        }
 
 
-class AssetSerializer(CategoryDisplayMixin, OrgResourceModelSerializerMixin):
-    domain_display = serializers.ReadOnlyField(source='domain.name', label=_('Domain name'))
-    nodes_display = serializers.ListField(
-        child=serializers.CharField(), label=_('Nodes name'), required=False
-    )
-    labels_display = serializers.ListField(
-        child=serializers.CharField(), label=_('Labels name'),
-        required=False, read_only=True
-    )
+class AssetPlatformSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Platform
+        fields = ['id', 'name']
+        extra_kwargs = {
+            'name': {'required': False}
+        }
+
+
+class AssetDomainSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Domain
+        fields = ['id', 'name']
+
+
+class AssetNodesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Node
+        fields = ['id', 'value']
+        extra_kwargs = {
+            'value': {'required': False}
+        }
+
+
+class AssetSerializer(CategoryDisplayMixin, WritableNestedModelSerializer, OrgResourceModelSerializerMixin):
+    domain = AssetDomainSerializer(required=False)
+    # nodes_display = serializers.ListField(
+    #     child=serializers.CharField(), label=_('Nodes name'), required=False
+    # )
     labels = AssetLabelSerializer(many=True, required=False)
-    platform_display = serializers.SlugField(
-        source='platform.name', label=_("Platform display"), read_only=True
-    )
-    accounts = AccountSerializer(many=True, write_only=True, required=False)
+    # labels_display = serializers.ListField(
+    #     child=serializers.CharField(), label=_('Labels name'),
+    #     required=False, read_only=True
+    # )
+    # labels = AssetLabelSerializer(many=True, required=False)
+    # platform_display = serializers.SlugField(
+    #     source='platform.name', label=_("Platform display"), read_only=True
+    # )
+    nodes = AssetNodesSerializer(many=True, required=False)
+    platform = AssetPlatformSerializer(required=False)
+    accounts = AccountSerializer(many=True, required=False)
     protocols = AssetProtocolsSerializer(many=True)
 
     """
@@ -55,10 +87,12 @@ class AssetSerializer(CategoryDisplayMixin, OrgResourceModelSerializerMixin):
             'is_active', 'number', 'comment',
         ]
         fields_fk = [
-            'domain', 'domain_display', 'platform', 'platform', 'platform_display',
+            'domain', 'platform', 'platform',
+            # 'domain_display', 'platform_display',
         ]
         fields_m2m = [
-            'nodes', 'nodes_display', 'labels', 'labels_display', 'accounts', 'protocols',
+            'nodes', 'labels', 'accounts', 'protocols',
+            # 'labels_display','nodes_display',
         ]
         read_only_fields = [
             'category', 'category_display', 'type', 'type_display',
@@ -77,15 +111,6 @@ class AssetSerializer(CategoryDisplayMixin, OrgResourceModelSerializerMixin):
         data = kwargs.get('data', {})
         self.accounts_data = data.pop('accounts', [])
         super().__init__(*args, **kwargs)
-
-    def get_fields(self):
-        fields = super().get_fields()
-
-        admin_user_field = fields.get('admin_user')
-        # 因为 mixin 中对 fields 有处理，可能不需要返回 admin_user
-        if admin_user_field:
-            admin_user_field.queryset = SystemUser.objects.filter(type=SystemUser.Type.admin)
-        return fields
 
     def validate_type(self, value):
         print(self.initial_data)
@@ -126,7 +151,6 @@ class AssetSerializer(CategoryDisplayMixin, OrgResourceModelSerializerMixin):
         serializer.save()
 
     def create(self, validated_data):
-        self.compatible_with_old_protocol(validated_data)
         nodes_display = validated_data.pop('nodes_display', '')
         instance = super().create(validated_data)
         if self.accounts_data:
@@ -136,7 +160,6 @@ class AssetSerializer(CategoryDisplayMixin, OrgResourceModelSerializerMixin):
 
     def update(self, instance, validated_data):
         nodes_display = validated_data.pop('nodes_display', '')
-        self.compatible_with_old_protocol(validated_data)
         instance = super().update(instance, validated_data)
         self.perform_nodes_display_create(instance, nodes_display)
         return instance
@@ -177,7 +200,4 @@ class AssetTaskSerializer(AssetsTaskSerializer):
     action = serializers.ChoiceField(choices=ACTION_CHOICES, write_only=True)
     asset = serializers.PrimaryKeyRelatedField(
         queryset=Asset.objects, required=False, allow_empty=True, many=False
-    )
-    system_users = serializers.PrimaryKeyRelatedField(
-        queryset=SystemUser.objects, required=False, allow_empty=True, many=True
     )

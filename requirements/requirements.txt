@@ -74,6 +74,7 @@ djangorestframework==3.13.1
 djangorestframework-bulk==0.2.1
 django-simple-history==3.1.1
 drf-nested-routers==0.93.4
+drf-writable-nested==0.6.4
 rest_condition==1.0.3
 drf-yasg==1.20.0
 coreapi==2.3.3
