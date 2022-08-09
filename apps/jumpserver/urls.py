@@ -21,7 +21,6 @@ api_v1 = [
     path('settings/', include('settings.urls.api_urls', namespace='api-settings')),
     path('authentication/', include('authentication.urls.api_urls', namespace='api-auth')),
     path('common/', include('common.urls.api_urls', namespace='api-common')),
-    path('applications/', include('applications.urls.api_urls', namespace='api-applications')),
     path('tickets/', include('tickets.urls.api_urls', namespace='api-tickets')),
     path('acls/', include('acls.urls.api_urls', namespace='api-acls')),
     path('notifications/', include('notifications.urls.api_urls', namespace='api-notifications')),

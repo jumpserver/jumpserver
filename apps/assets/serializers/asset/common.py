@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.drf.serializers import JMSWritableNestedModelSerializer
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
-from ...models import Asset, Node, Platform, Protocol, Label, Domain
+from ...models import Asset, Node, Platform, Protocol, Label, Domain, Account
 from ..mixin import CategoryDisplayMixin
 from ..account import AccountSerializer
 
@@ -59,7 +59,7 @@ class AssetSerializer(CategoryDisplayMixin,
                       OrgResourceModelSerializerMixin):
     domain = AssetDomainSerializer(required=False)
     nodes_display = serializers.ListField(
-        child=serializers.CharField(), label=_('Nodes name'), required=False
+        child=serializers.CharField(), label=_('Nodes name'), required=False,
     )
     labels = AssetLabelSerializer(many=True, required=False)
     nodes = AssetNodesSerializer(many=True, required=False)
@@ -105,7 +105,6 @@ class AssetSerializer(CategoryDisplayMixin,
         super().__init__(*args, **kwargs)
 
     def validate_type(self, value):
-        print(self.initial_data)
         return value
 
     def validate_category(self, value):

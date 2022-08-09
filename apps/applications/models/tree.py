@@ -5,7 +5,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 from common.tree import TreeNode
-from ..utils import KubernetesTree
 from .. import const
 
 
