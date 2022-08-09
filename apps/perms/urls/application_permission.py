@@ -37,6 +37,8 @@ permission_urlpatterns = [
 
     # 验证用户是否有某个应用的权限
     path('user/validate/', api.ValidateUserApplicationPermissionApi.as_view(), name='validate-user-application-permission'),
+
+    path('applications/actions/', api.ApplicationPermissionActionsApi.as_view(), name='application-actions'),
 ]
 
 application_permission_urlpatterns = [
