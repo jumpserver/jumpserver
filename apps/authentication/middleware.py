@@ -62,6 +62,7 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
             return response
         ip = get_request_ip(request)
         try:
+            self.request = request
             self._check_login_acl(request.user, ip)
         except Exception as e:
             auth_logout(request)

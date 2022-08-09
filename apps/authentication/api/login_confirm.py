@@ -17,6 +17,7 @@ class TicketStatusApi(mixins.AuthMixin, APIView):
     def get(self, request, *args, **kwargs):
         try:
             self.check_user_login_confirm()
+            self.request.session['auth_login_confirmed'] = 1
             return Response({"msg": "ok"})
         except errors.NeedMoreInfoError as e:
             return Response(e.as_data(), status=200)
