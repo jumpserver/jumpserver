@@ -6,6 +6,7 @@ from django.core.cache import cache
 from django.dispatch import receiver
 from django_cas_ng.signals import cas_user_authenticated
 
+from apps.jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
 from authentication.backends.oidc.signals import (
     openid_user_login_failed, openid_user_login_success
 )
@@ -28,7 +29,8 @@ def on_user_auth_login_success(sender, user, request, **kwargs):
             and user.mfa_enabled \
             and not request.session.get('auth_mfa'):
         request.session['auth_mfa_required'] = 1
-
+    if request.session.get('auth_backend') in AUTHENTICATION_BACKENDS_THIRD_PARTY:
+        request.session['auth_third_party_required'] = 1
     # 单点登录，超过了自动退出
     if settings.USER_LOGIN_SINGLE_MACHINE_ENABLED:
         lock_key = 'single_machine_login_' + str(user.id)
