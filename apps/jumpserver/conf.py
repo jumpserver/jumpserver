@@ -376,6 +376,15 @@ class Config(dict):
         'TENCENT_VERIFY_SIGN_NAME': '',
         'TENCENT_VERIFY_TEMPLATE_CODE': '',
 
+        'CMPP2_HOST': '',
+        'CMPP2_PORT': 7890,
+        'CMPP2_SP_ID': '',
+        'CMPP2_SP_SECRET': '',
+        'CMPP2_SRC_ID': '',
+        'CMPP2_SERVICE_ID': '',
+        'CMPP2_VERIFY_SIGN_NAME': '',
+        'CMPP2_VERIFY_TEMPLATE_CODE': '{code}',
+
         # Email
         'EMAIL_CUSTOM_USER_CREATED_SUBJECT': _('Create account successfully'),
         'EMAIL_CUSTOM_USER_CREATED_HONORIFIC': _('Hello'),

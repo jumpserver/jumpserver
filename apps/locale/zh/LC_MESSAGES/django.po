@@ -87,8 +87,8 @@ msgstr "登录复核"
 #: acls/models/login_acl.py:24 acls/models/login_asset_acl.py:20
 #: assets/models/cmd_filter.py:30 assets/models/label.py:15 audits/models.py:37
 #: audits/models.py:62 audits/models.py:87 audits/serializers.py:100
-#: authentication/models.py:54 authentication/models.py:78 orgs/models.py:220
-#: perms/models/base.py:84 rbac/builtin.py:120 rbac/models/rolebinding.py:41
+#: authentication/models.py:54 authentication/models.py:78 orgs/models.py:214
+#: perms/models/base.py:84 rbac/builtin.py:117 rbac/models/rolebinding.py:41
 #: terminal/backends/command/models.py:20
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:44
 #: terminal/models/sharing.py:33 terminal/notifications.py:91
@@ -388,8 +388,8 @@ msgstr "集群"
 
 #: applications/serializers/attrs/application_category/db.py:11
 #: ops/models/adhoc.py:157 settings/serializers/auth/radius.py:14
-#: terminal/models/endpoint.py:11
-#: xpack/plugins/cloud/serializers/account_attrs.py:72
+#: settings/serializers/auth/sms.py:52 terminal/models/endpoint.py:11
+#: xpack/plugins/cloud/serializers/account_attrs.py:70
 msgid "Host"
 msgstr "主机"
 
@@ -402,8 +402,8 @@ msgstr "主机"
 #: applications/serializers/attrs/application_type/redis.py:10
 #: applications/serializers/attrs/application_type/sqlserver.py:10
 #: assets/models/asset.py:214 assets/models/domain.py:62
-#: settings/serializers/auth/radius.py:15
-#: xpack/plugins/cloud/serializers/account_attrs.py:73
+#: settings/serializers/auth/radius.py:15 settings/serializers/auth/sms.py:53
+#: xpack/plugins/cloud/serializers/account_attrs.py:71
 msgid "Port"
 msgstr "端口"
 
@@ -586,7 +586,7 @@ msgstr "主机名原始"
 
 #: assets/models/asset.py:215 assets/serializers/account.py:16
 #: assets/serializers/asset.py:65 perms/serializers/asset/user_permission.py:41
-#: xpack/plugins/cloud/models.py:107 xpack/plugins/cloud/serializers/task.py:43
+#: xpack/plugins/cloud/models.py:107 xpack/plugins/cloud/serializers/task.py:42
 msgid "Protocols"
 msgstr "协议组"
 
@@ -985,7 +985,7 @@ msgid "Parent key"
 msgstr "ssh私钥"
 
 #: assets/models/node.py:559 assets/serializers/system_user.py:267
-#: xpack/plugins/cloud/models.py:96 xpack/plugins/cloud/serializers/task.py:70
+#: xpack/plugins/cloud/models.py:96 xpack/plugins/cloud/serializers/task.py:69
 msgid "Node"
 msgstr "节点"
 
@@ -2293,7 +2293,7 @@ msgstr "代码错误"
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_rest_password_success.html:2
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:2
-#: jumpserver/conf.py:323 ops/tasks.py:145 ops/tasks.py:148
+#: jumpserver/conf.py:316 ops/tasks.py:145 ops/tasks.py:148
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: perms/templates/perms/_msg_permed_items_expire.html:3
 #: tickets/templates/tickets/approve_check_password.html:33
@@ -2689,11 +2689,15 @@ msgstr "阿里云"
 msgid "Tencent cloud"
 msgstr "腾讯云"
 
-#: common/sdk/sms/endpoint.py:28
+#: common/sdk/sms/endpoint.py:18
+msgid "CMPP v2.0"
+msgstr "CMPP v2.0"
+
+#: common/sdk/sms/endpoint.py:29
 msgid "SMS provider not support: {}"
 msgstr "短信服务商不支持：{}"
 
-#: common/sdk/sms/endpoint.py:49
+#: common/sdk/sms/endpoint.py:50
 msgid "SMS verification code signature or template invalid"
 msgstr "短信验证码签名或模版无效"
 
@@ -2729,11 +2733,11 @@ msgstr "不能包含特殊字符"
 msgid "The mobile phone number format is incorrect"
 msgstr "手机号格式不正确"
 
-#: jumpserver/conf.py:322
+#: jumpserver/conf.py:315
 msgid "Create account successfully"
 msgstr "创建账号成功"
 
-#: jumpserver/conf.py:324
+#: jumpserver/conf.py:317
 msgid "Your account has been created successfully"
 msgstr "你的账号已创建成功"
 
@@ -2986,8 +2990,8 @@ msgstr "组织存在资源 ({}) 不能被删除"
 msgid "App organizations"
 msgstr "组织管理"
 
-#: orgs/mixins/models.py:57 orgs/mixins/serializers.py:25 orgs/models.py:85
-#: orgs/models.py:217 rbac/const.py:7 rbac/models/rolebinding.py:48
+#: orgs/mixins/models.py:57 orgs/mixins/serializers.py:25 orgs/models.py:80
+#: orgs/models.py:211 rbac/const.py:7 rbac/models/rolebinding.py:48
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:62
 #: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:71
 msgid "Organization"
@@ -3229,27 +3233,27 @@ msgstr "{} 至少有一个系统角色"
 msgid "RBAC"
 msgstr "RBAC"
 
-#: rbac/builtin.py:111
+#: rbac/builtin.py:108
 msgid "SystemAdmin"
 msgstr "系统管理员"
 
-#: rbac/builtin.py:114
+#: rbac/builtin.py:111
 msgid "SystemAuditor"
 msgstr "系统审计员"
 
-#: rbac/builtin.py:117
+#: rbac/builtin.py:114
 msgid "SystemComponent"
 msgstr "系统组件"
 
-#: rbac/builtin.py:123
+#: rbac/builtin.py:120
 msgid "OrgAdmin"
 msgstr "组织管理员"
 
-#: rbac/builtin.py:126
+#: rbac/builtin.py:123
 msgid "OrgAuditor"
 msgstr "组织审计员"
 
-#: rbac/builtin.py:129
+#: rbac/builtin.py:126
 msgid "OrgUser"
 msgstr "组织用户"
 
@@ -3420,13 +3424,8 @@ msgstr "查看授权树"
 msgid "Execute batch command"
 msgstr "执行批量命令"
 
-#: settings/api/alibaba_sms.py:31 settings/api/tencent_sms.py:35
-msgid "test_phone is required"
-msgstr "测试手机号 该字段是必填项。"
-
-#: settings/api/alibaba_sms.py:52 settings/api/dingtalk.py:31
-#: settings/api/feishu.py:36 settings/api/tencent_sms.py:57
-#: settings/api/wecom.py:37
+#: settings/api/dingtalk.py:31 settings/api/feishu.py:36
+#: settings/api/sms.py:131 settings/api/wecom.py:37
 msgid "Test success"
 msgstr "测试成功"
 
@@ -3453,6 +3452,14 @@ msgstr "获取 LDAP 用户为 None"
 #: settings/api/ldap.py:222
 msgid "Imported {} users successfully (Organization: {})"
 msgstr "成功导入 {} 个用户 ( 组织: {} )"
+
+#: settings/api/sms.py:113
+msgid "Invalid SMS platform"
+msgstr "无效的短信平台"
+
+#: settings/api/sms.py:119
+msgid "test_phone is required"
+msgstr "测试手机号 该字段是必填项。"
 
 #: settings/apps.py:7
 msgid "Settings"
@@ -3778,29 +3785,68 @@ msgstr "SP 密钥"
 msgid "SP cert"
 msgstr "SP 证书"
 
-#: settings/serializers/auth/sms.py:11
+#: settings/serializers/auth/sms.py:14
 msgid "Enable SMS"
 msgstr "启用 SMS"
 
-#: settings/serializers/auth/sms.py:13
-msgid "SMS provider"
-msgstr "短信服务商"
+#: settings/serializers/auth/sms.py:16
+msgid "SMS provider / Protocol"
+msgstr "短信服务商 / 协议"
 
-#: settings/serializers/auth/sms.py:18 settings/serializers/auth/sms.py:36
-#: settings/serializers/auth/sms.py:44 settings/serializers/email.py:65
+#: settings/serializers/auth/sms.py:21 settings/serializers/auth/sms.py:39
+#: settings/serializers/auth/sms.py:47 settings/serializers/auth/sms.py:58
+#: settings/serializers/email.py:65
 msgid "Signature"
 msgstr "签名"
 
-#: settings/serializers/auth/sms.py:19 settings/serializers/auth/sms.py:37
-#: settings/serializers/auth/sms.py:45
+#: settings/serializers/auth/sms.py:22 settings/serializers/auth/sms.py:40
+#: settings/serializers/auth/sms.py:48
 msgid "Template code"
 msgstr "模板"
 
-#: settings/serializers/auth/sms.py:23
+#: settings/serializers/auth/sms.py:26
 msgid "Test phone"
 msgstr "测试手机号"
 
-#: settings/serializers/auth/sso.py:11
+#: settings/serializers/auth/sms.py:54
+msgid "Gateway account(SP id)"
+msgstr "网关账号(SP id)"
+
+#: settings/serializers/auth/sms.py:55
+msgid "Gateway password(SP secret)"
+msgstr "网关密码(SP secret)"
+
+#: settings/serializers/auth/sms.py:56
+msgid "Original number(Src id)"
+msgstr "原始号码(Src id)"
+
+#: settings/serializers/auth/sms.py:57
+msgid "Business type(Service id)"
+msgstr "业务类型(Service id)"
+
+#: settings/serializers/auth/sms.py:60
+msgid "Template"
+msgstr "模板"
+
+#: settings/serializers/auth/sms.py:61
+msgid ""
+"Template need contain {code} and Signature + template length does not exceed "
+"67 words. For example, your verification code is {code}, which is valid for "
+"5 minutes. Please do not disclose it to others."
+msgstr ""
+"模板需要包含 {code}，并且模板+签名长度不能超过67个字。例如, 您的验证码是 "
+"{code}, 有效期为5分钟。请不要泄露给其他人。"
+
+#: settings/serializers/auth/sms.py:70
+#, python-brace-format
+msgid "The template needs to contain {code}"
+msgstr "模板需要包含 {code}"
+
+#: settings/serializers/auth/sms.py:73
+msgid "Signature + Template must not exceed 65 words"
+msgstr "模板+签名不能超过65个字"
+
+#: settings/serializers/auth/sso.py:12
 msgid "Enable SSO auth"
 msgstr "启用 SSO Token 认证"
 
@@ -6365,11 +6411,11 @@ msgstr "云账号"
 msgid "Test cloud account"
 msgstr "测试云账号"
 
-#: xpack/plugins/cloud/models.py:85 xpack/plugins/cloud/serializers/task.py:67
+#: xpack/plugins/cloud/models.py:85 xpack/plugins/cloud/serializers/task.py:66
 msgid "Account"
 msgstr "账号"
 
-#: xpack/plugins/cloud/models.py:88 xpack/plugins/cloud/serializers/task.py:38
+#: xpack/plugins/cloud/models.py:88 xpack/plugins/cloud/serializers/task.py:37
 msgid "Regions"
 msgstr "地域"
 
@@ -6377,19 +6423,19 @@ msgstr "地域"
 msgid "Hostname strategy"
 msgstr "主机名策略"
 
-#: xpack/plugins/cloud/models.py:100 xpack/plugins/cloud/serializers/task.py:68
+#: xpack/plugins/cloud/models.py:100 xpack/plugins/cloud/serializers/task.py:67
 msgid "Unix admin user"
 msgstr "Unix 管理员"
 
-#: xpack/plugins/cloud/models.py:104 xpack/plugins/cloud/serializers/task.py:69
+#: xpack/plugins/cloud/models.py:104 xpack/plugins/cloud/serializers/task.py:68
 msgid "Windows admin user"
 msgstr "Windows 管理员"
 
-#: xpack/plugins/cloud/models.py:110 xpack/plugins/cloud/serializers/task.py:46
+#: xpack/plugins/cloud/models.py:110 xpack/plugins/cloud/serializers/task.py:45
 msgid "IP network segment group"
 msgstr "IP网段组"
 
-#: xpack/plugins/cloud/models.py:113 xpack/plugins/cloud/serializers/task.py:72
+#: xpack/plugins/cloud/models.py:113 xpack/plugins/cloud/serializers/task.py:71
 msgid "Always update"
 msgstr "总是更新"
 
@@ -6694,34 +6740,32 @@ msgstr "测试端口"
 
 #: xpack/plugins/cloud/serializers/task.py:29
 msgid ""
-"Only instances matching the IP range will be synced. <br>If the instance "
-"contains multiple IP addresses, the first IP address that matches will be "
-"used as the IP for the created asset. <br>The default value of * means sync "
-"all instances and randomly match IP addresses. <br>Format for comma-"
-"delimited string, Such as: 192.168.1.0/24, 10.1.1.1-10.1.1.20"
+"The IP address that is first matched to will be used as the IP of the "
+"created asset. <br>The default * indicates a random match. <br>Format for "
+"comma-delimited string, Such as: 192.168.1.0/24, 10.1.1.1-10.1.1.20"
 msgstr ""
 "只有匹配到 IP 段的实例会被同步。<br>如果实例包含多个 IP 地址，那么第一个匹配"
 "到的 IP 地址将被用作创建的资产的 IP。<br>默认值 * 表示同步所有实例和随机匹配 "
 "IP 地址。<br>格式为以逗号分隔的字符串，例如:192.168.1.0/24,10.1.1.1-10.1.1.20"
 
-#: xpack/plugins/cloud/serializers/task.py:36
+#: xpack/plugins/cloud/serializers/task.py:35
 msgid "History count"
 msgstr "执行次数"
 
-#: xpack/plugins/cloud/serializers/task.py:37
+#: xpack/plugins/cloud/serializers/task.py:36
 msgid "Instance count"
 msgstr "实例个数"
 
-#: xpack/plugins/cloud/serializers/task.py:66
+#: xpack/plugins/cloud/serializers/task.py:65
 msgid "Linux admin user"
 msgstr "Linux 管理员"
 
-#: xpack/plugins/cloud/serializers/task.py:71
+#: xpack/plugins/cloud/serializers/task.py:70
 #: xpack/plugins/gathered_user/serializers.py:20
 msgid "Periodic display"
 msgstr "定时执行"
 
-#: xpack/plugins/cloud/utils.py:69
+#: xpack/plugins/cloud/utils.py:68
 msgid "Account unavailable"
 msgstr "账号无效"
 
