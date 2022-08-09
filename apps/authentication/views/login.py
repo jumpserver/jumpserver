@@ -21,7 +21,7 @@ from django.conf import settings
 from django.urls import reverse_lazy
 from django.contrib.auth import BACKEND_SESSION_KEY
 
-from common.utils import FlashMessageUtil
+from common.utils import FlashMessageUtil, static_or_direct
 from users.utils import (
     redirect_user_first_login_or_index
 )
@@ -39,8 +39,7 @@ class UserLoginContextMixin:
     get_user_mfa_context: Callable
     request: HttpRequest
 
-    @staticmethod
-    def get_support_auth_methods():
+    def get_support_auth_methods(self):
         auth_methods = [
             {
                 'name': 'OpenID',
@@ -61,6 +60,13 @@ class UserLoginContextMixin:
                 'enabled': settings.AUTH_SAML2,
                 'url': reverse('authentication:saml2:saml2-login'),
                 'logo': static('img/login_saml2_logo.png'),
+                'auto_redirect': True
+            },
+            {
+                'name': settings.AUTH_OAUTH2_PROVIDER,
+                'enabled': settings.AUTH_OAUTH2,
+                'url': reverse('authentication:oauth2:login'),
+                'logo': static_or_direct(settings.AUTH_OAUTH2_LOGO_PATH),
                 'auto_redirect': True
             },
             {

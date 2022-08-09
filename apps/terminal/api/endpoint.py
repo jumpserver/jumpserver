@@ -9,9 +9,9 @@ from assets.models import Asset
 from orgs.utils import tmp_to_root_org
 from applications.models import Application
 from terminal.models import Session
-from common.permissions import IsValidUser
 from ..models import Endpoint, EndpointRule
 from .. import serializers
+from common.permissions import IsValidUserOrConnectionToken
 
 
 __all__ = ['EndpointViewSet', 'EndpointRuleViewSet']
@@ -25,7 +25,8 @@ class SmartEndpointViewMixin:
     target_instance: None
     target_protocol: None
 
-    @action(methods=['get'], detail=False, permission_classes=[IsValidUser], url_path='smart')
+    @action(methods=['get'], detail=False, permission_classes=[IsValidUserOrConnectionToken],
+            url_path='smart')
     def smart(self, request, *args, **kwargs):
         self.target_instance = self.get_target_instance()
         self.target_protocol = self.get_target_protocol()

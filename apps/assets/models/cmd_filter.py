@@ -125,6 +125,9 @@ class CommandFilterRule(OrgModelMixin):
                 regex.append(cmd)
                 continue
 
+            if not cmd:
+                continue
+
             # 如果是单个字符
             if cmd[-1].isalpha():
                 regex.append(r'\b{0}\b'.format(cmd))

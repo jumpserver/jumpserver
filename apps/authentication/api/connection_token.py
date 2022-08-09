@@ -1,3 +1,4 @@
+import abc
 import os
 import json
 import base64
@@ -16,8 +17,8 @@ from orgs.mixins.api import RootOrgViewMixin
 from perms.models.base import Action
 from terminal.models import EndpointRule
 from ..serializers import (
-    ConnectionTokenSerializer, ConnectionTokenSecretSerializer, SuperConnectionTokenSerializer,
-    ConnectionTokenDisplaySerializer,
+    ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
+    SuperConnectionTokenSerializer, ConnectionTokenDisplaySerializer,
 )
 from ..models import ConnectionToken
 
@@ -34,9 +35,12 @@ class ConnectionTokenMixin:
         if not is_valid:
             raise PermissionDenied(error)
 
-    @staticmethod
-    def get_request_resources(serializer):
-        user = serializer.validated_data.get('user')
+    @abc.abstractmethod
+    def get_request_resource_user(self, serializer):
+        raise NotImplementedError
+
+    def get_request_resources(self, serializer):
+        user = self.get_request_resource_user(serializer)
         asset = serializer.validated_data.get('asset')
         application = serializer.validated_data.get('application')
         system_user = serializer.validated_data.get('system_user')
@@ -204,8 +208,8 @@ class ConnectionTokenMixin:
 
 class ConnectionTokenViewSet(ConnectionTokenMixin, RootOrgViewMixin, JMSModelViewSet):
     filterset_fields = (
-        'type',
-        'user_display', 'system_user_display', 'application_display', 'asset_display'
+        'type', 'user_display', 'system_user_display',
+        'application_display', 'asset_display'
     )
     search_fields = filterset_fields
     serializer_classes = {
@@ -222,7 +226,20 @@ class ConnectionTokenViewSet(ConnectionTokenMixin, RootOrgViewMixin, JMSModelVie
         'get_rdp_file': 'authentication.add_connectiontoken',
         'get_client_protocol_url': 'authentication.add_connectiontoken',
     }
-    queryset = ConnectionToken.objects.all()
+
+    def get_queryset(self):
+        return ConnectionToken.objects.filter(user=self.request.user)
+
+    def get_request_resource_user(self, serializer):
+        return self.request.user
+
+    def get_object(self):
+        if self.request.user.is_service_account:
+            # TODO: 组件获取 token 详情，将来放在 Super-connection-token API 中
+            obj = get_object_or_404(ConnectionToken, pk=self.kwargs.get('pk'))
+        else:
+            obj = super(ConnectionTokenViewSet, self).get_object()
+        return obj
 
     def create_connection_token(self):
         data = self.request.query_params if self.request.method == 'GET' else self.request.data
@@ -290,6 +307,9 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         'create': 'authentication.add_superconnectiontoken',
         'renewal': 'authentication.add_superconnectiontoken'
     }
+
+    def get_request_resource_user(self, serializer):
+        return serializer.validated_data.get('user')
 
     @action(methods=['PATCH'], detail=False)
     def renewal(self, request, *args, **kwargs):
