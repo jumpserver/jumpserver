@@ -4,10 +4,8 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
 from common.drf.serializers import JMSWritableNestedModelSerializer
-from orgs.mixins.serializers import OrgResourceModelSerializerMixin
-from ...models import Asset, Node, Platform, Protocol, Label, Domain, Account
-from ..mixin import CategoryDisplayMixin
 from ..account import AccountSerializer
+from ...models import Asset, Node, Platform, Protocol, Label, Domain, Account
 
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
@@ -18,14 +16,15 @@ __all__ = [
 class AssetProtocolsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Protocol
-        fields = ['pk', 'name', 'port']
+        fields = ['id', 'name', 'port']
 
 
 class AssetLabelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Label
-        fields = ['pk', 'name', 'value']
+        fields = ['id', 'name', 'value']
         extra_kwargs = {
+            'name': {'required': False},
             'value': {'required': False}
         }
 
@@ -33,7 +32,7 @@ class AssetLabelSerializer(serializers.ModelSerializer):
 class AssetPlatformSerializer(serializers.ModelSerializer):
     class Meta:
         model = Platform
-        fields = ['pk', 'name']
+        fields = ['id', 'name']
         extra_kwargs = {
             'name': {'required': False}
         }
@@ -42,35 +41,34 @@ class AssetPlatformSerializer(serializers.ModelSerializer):
 class AssetDomainSerializer(serializers.ModelSerializer):
     class Meta:
         model = Domain
-        fields = ['pk', 'name']
+        fields = ['id', 'name']
+        extra_kwargs = {
+            'name': {'required': False}
+        }
 
 
 class AssetNodesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Node
-        fields = ['pk', 'value']
+        fields = ['id', 'value']
         extra_kwargs = {
             'value': {'required': False}
         }
 
 
-class AssetSerializer(CategoryDisplayMixin,
-                      JMSWritableNestedModelSerializer,
-                      OrgResourceModelSerializerMixin):
+class AssetSerializer(JMSWritableNestedModelSerializer):
+    # category = ChoiceDisplayField(choices=Category.choices, required=False)
+    # type = ChoiceDisplayField(choices=AllTypes.choices, required=False)
     domain = AssetDomainSerializer(required=False)
-    nodes_display = serializers.ListField(
-        child=serializers.CharField(), label=_('Nodes name'), required=False,
-    )
+    platform = AssetPlatformSerializer(required=False)
     labels = AssetLabelSerializer(many=True, required=False)
     nodes = AssetNodesSerializer(many=True, required=False)
-    platform = AssetPlatformSerializer(required=False)
     accounts = AccountSerializer(many=True, required=False)
-    protocols = AssetProtocolsSerializer(many=True)
+    protocols = AssetProtocolsSerializer(many=True, required=False)
 
     """
     资产的数据结构
     """
-
     class Meta:
         model = Asset
         fields_mini = [
@@ -87,8 +85,8 @@ class AssetSerializer(CategoryDisplayMixin,
             'nodes_display',
         ]
         read_only_fields = [
-            'category', 'category_display', 'type', 'type_display',
-            'connectivity', 'date_verified', 'created_by', 'date_created',
+            'category', 'type', 'connectivity', 'date_verified',
+            'created_by', 'date_created',
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
         extra_kwargs = {

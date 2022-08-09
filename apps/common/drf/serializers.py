@@ -114,9 +114,10 @@ class SecretReadableMixin(serializers.Serializer):
 
 
 class JMSWritableNestedModelSerializer(WritableNestedModelSerializer):
-
-    def _get_related_pk(self, data, model_class):
-        pk = data.get('pk') or data.get('id') or data.get(model_class._meta.pk.attname)
-        if pk:
-            return str(pk)
-        return None
+    pass
+    #
+    # def _get_related_pk(self, data, model_class):
+    #     pk = data.get('pk') or data.get('id') or data.get(model_class._meta.pk.attname)
+    #     if pk:
+    #         return str(pk)
+    #     return None
