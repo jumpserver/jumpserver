@@ -143,6 +143,7 @@ class EncryptMixin:
             value = sp.get_prep_value(value)
         value = force_text(value)
         # 替换新的加密方式
+        return crypto.encrypt(value)
 
 
 class EncryptTextField(EncryptMixin, models.TextField):
