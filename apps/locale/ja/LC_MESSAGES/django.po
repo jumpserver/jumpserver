@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-10 14:50+0800\n"
+"POT-Creation-Date: 2022-08-10 19:03+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -529,7 +529,7 @@ msgstr "内部"
 #: assets/models/asset.py:162 assets/models/asset.py:216
 #: assets/serializers/account.py:15 assets/serializers/asset.py:63
 #: perms/serializers/asset/user_permission.py:43
-#: xpack/plugins/cloud/serializers/account_attrs.py:159
+#: xpack/plugins/cloud/serializers/account_attrs.py:162
 msgid "Platform"
 msgstr "プラットフォーム"
 
@@ -3924,6 +3924,7 @@ msgid "SSO auth key TTL"
 msgstr "Token有効期間"
 
 #: settings/serializers/auth/sso.py:15
+#: xpack/plugins/cloud/serializers/account_attrs.py:159
 msgid "Unit: second"
 msgstr "単位: 秒"
 
@@ -6846,6 +6847,10 @@ msgstr "IP セグメント"
 #: xpack/plugins/cloud/serializers/account_attrs.py:156
 msgid "Test port"
 msgstr "テストポート"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:159
+msgid "Test timeout"
+msgstr "テストタイムアウト"
 
 #: xpack/plugins/cloud/serializers/task.py:29
 msgid ""
