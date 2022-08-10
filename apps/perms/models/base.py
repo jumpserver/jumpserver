@@ -1,6 +1,9 @@
 #  coding: utf-8
 #
 
+# TODO: v3 delete 整个文件
+
+
 import uuid
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
