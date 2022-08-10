@@ -215,7 +215,8 @@ class CMPPClient(object):
         for i in range(self._times):
             try:
                 self.__socket.connect((self.ip, self.port))
-            except socket.timeout:
+            except Exception as err:
+                logger.warning('Failed to connect to the CMPP gateway server, err: %s' % str(err))
                 time.sleep(1)
             else:
                 self._is_connect = True
