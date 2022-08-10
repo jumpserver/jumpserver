@@ -10,6 +10,7 @@ from django.contrib.auth import logout as auth_logout
 from apps.authentication import mixins
 from common.utils import gen_key_pair
 from common.utils import get_request_ip
+from .signals import post_auth_failed
 
 
 class MFAMiddleware:
@@ -62,8 +63,13 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
             return response
         ip = get_request_ip(request)
         try:
+            self.request = request
             self._check_login_acl(request.user, ip)
         except Exception as e:
+            post_auth_failed.send(
+                sender=self.__class__, username=request.user.username,
+                request=self.request, reason=e.msg
+            )
             auth_logout(request)
             context = {
                 'title': _('Authentication failed'),
@@ -72,7 +78,8 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
                 'redirect_url': reverse('authentication:login'),
                 'auto_redirect': True,
             }
-            response = render(request, 'authentication/auth_fail_flash_message_standalone.html', context)
+            response = render(
+                request, 'authentication/auth_fail_flash_message_standalone.html', context)
         else:
             guard_url = reverse('authentication:login-guard')
             args = request.META.get('QUERY_STRING', '')
