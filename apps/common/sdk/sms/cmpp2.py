@@ -43,7 +43,7 @@ class CMPPBaseRequestInstance(object):
 class CMPPConnectRequestInstance(CMPPBaseRequestInstance):
     def __init__(self, sp_id, sp_secret):
         if len(sp_id) != 6:
-            raise ValueError("sp_id is 6 bits")
+            raise ValueError(_("sp_id is 6 bits"))
 
         super().__init__()
 

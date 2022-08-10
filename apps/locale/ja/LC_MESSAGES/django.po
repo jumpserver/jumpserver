@@ -2726,6 +2726,10 @@ msgstr "企業微信エラー、システム管理者に連絡してください
 msgid "Signature does not match"
 msgstr "署名が一致しない"
 
+#: common/sdk/sms/cmpp2.py:46
+msgid "sp_id is 6 bits"
+msgstr "SP idは6ビット"
+
 #: common/sdk/sms/cmpp2.py:216
 msgid "Failed to connect to the CMPP gateway server, err: {}"
 msgstr "接続ゲートウェイサーバエラー, 非: {}"
