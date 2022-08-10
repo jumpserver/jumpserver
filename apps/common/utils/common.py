@@ -369,7 +369,7 @@ def group_by_count(it, count):
     return [it[i:i+count] for i in range(0, len(it), count)]
 
 
-def test_ip_connectivity(host, port, timeout=3):
+def test_ip_connectivity(host, port, timeout=0.5):
     """
     timeout: seconds
     """
