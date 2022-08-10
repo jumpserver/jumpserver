@@ -4,6 +4,7 @@ import struct
 import time
 
 from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
 
 from common.utils import get_logger
 from common.exceptions import JMSException
@@ -212,15 +213,19 @@ class CMPPClient(object):
 
     def _connect(self):
         self.__socket.settimeout(5)
+        error_msg = _('Failed to connect to the CMPP gateway server, err: {}')
         for i in range(self._times):
             try:
                 self.__socket.connect((self.ip, self.port))
             except Exception as err:
-                logger.warning('Failed to connect to the CMPP gateway server, err: %s' % str(err))
+                error_msg = error_msg.format(str(err))
+                logger.warning(error_msg)
                 time.sleep(1)
             else:
                 self._is_connect = True
                 break
+        else:
+            raise JMSException(error_msg)
 
     def send(self, instance):
         if isinstance(instance, CMPPBaseRequestInstance):
@@ -300,9 +305,10 @@ class CMPP2SMS(BaseSMSClient):
             self.client = CMPPClient(
                 host=host, port=port, sp_id=sp_id, sp_secret=sp_secret, src_id=src_id, service_id=service_id
             )
-        except socket.timeout:
+        except Exception as err:
             self.client = None
-            logger.warning('CMPPv2.0 connect remote time out.')
+            logger.warning(err)
+            raise JMSException(err)
 
     @staticmethod
     def need_pre_check():

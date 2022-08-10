@@ -2692,6 +2692,10 @@ msgstr "企业微信错误，请联系系统管理员"
 msgid "Signature does not match"
 msgstr "签名不匹配"
 
+#: common/sdk/sms/cmpp2.py:216
+msgid "Failed to connect to the CMPP gateway server, err: {}"
+msgstr "连接网关服务器错误，错误：{}"
+
 #: common/sdk/sms/endpoint.py:16
 msgid "Alibaba cloud"
 msgstr "阿里云"
