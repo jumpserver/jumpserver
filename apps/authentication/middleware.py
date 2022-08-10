@@ -81,6 +81,8 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
             response = render(
                 request, 'authentication/auth_fail_flash_message_standalone.html', context)
         else:
+            if not self.request.session['auth_confirm_required']:
+                return response
             guard_url = reverse('authentication:login-guard')
             args = request.META.get('QUERY_STRING', '')
             if args:
