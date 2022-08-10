@@ -9,6 +9,10 @@ __all__ = ['Platform']
 
 
 class Platform(models.Model):
+    """
+    对资产提供 约束和默认值
+    对资产进行抽象
+    """
     CHARSET_CHOICES = (
         ('utf8', 'UTF-8'),
         ('gbk', 'GBK'),
@@ -26,27 +30,25 @@ class Platform(models.Model):
         verbose_name=_("Domain default")
     )
     protocols_enabled = models.BooleanField(default=True, verbose_name=_("Protocols enabled"))
-    protocols_default = models.CharField(
-        max_length=128, default='', blank=True, verbose_name=_("Protocols default")
+    protocols_default = models.JSONField(
+        max_length=128, default=list, blank=True, verbose_name=_("Protocols default")
     )
-    admin_user_enabled = models.BooleanField(default=True, verbose_name=_("Admin user enabled"))
-    admin_user_default = models.ForeignKey(
-        'assets.SystemUser', null=True, on_delete=models.SET_NULL,
-        verbose_name=_("Admin user default")
-    )
-
-    @classmethod
-    def get_type_meta(cls, category, tp):
-        meta = Category.platform_meta().get(category, {})
-        types = dict(AllTypes.category_types()).get(category)
-        types_meta = types.platform_meta() or {}
-        type_meta = types_meta.get(tp, {})
-        meta.update(type_meta)
-        return meta
+    # Accounts
+    # 这应该和账号有关
+    su_enabled = models.BooleanField(default=False)
+    su_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("SU method"))
+    ping_enabled = models.BooleanField(default=False)
+    ping_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Ping method"))
+    verify_account_enabled = models.BooleanField(default=False, verbose_name=_("Verify account enabled"))
+    verify_account_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Verify account method"))
+    create_account_enabled = models.BooleanField(default=False, verbose_name=_("Create account enabled"))
+    create_account_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Create account method"))
+    change_password_enabled = models.BooleanField(default=False, verbose_name=_("Change password enabled"))
+    change_password_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Change password method"))
 
     @property
-    def type_limits(self):
-        return AllTypes.get_type_limits(self.category, self.type)
+    def type_constraints(self):
+        return AllTypes.get_constraints(self.category, self.type)
 
     @classmethod
     def default(cls):
@@ -54,12 +56,6 @@ class Platform(models.Model):
             defaults={'name': 'Linux'}, name='Linux'
         )
         return linux.id
-
-    def is_windows(self):
-        return self.type.lower() in ('windows',)
-
-    def is_unixlike(self):
-        return self.type.lower() in ("linux", "unix", "macos", "bsd")
 
     def __str__(self):
         return self.name

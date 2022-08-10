@@ -12,8 +12,16 @@ __all__ = [
 
 class PlatformMixin:
     @classmethod
-    def platform_limits(cls):
-        return {}
+    def platform_constraints(cls):
+        return {
+            'has_domain': False,
+            'has_su': False,
+            'has_ping': False,
+            'has_change_password': False,
+            'has_verify_account': False,
+            'has_create_account': False,
+            '_protocols': []
+        }
 
 
 class Category(PlatformMixin, models.TextChoices):
@@ -24,25 +32,30 @@ class Category(PlatformMixin, models.TextChoices):
     WEB = 'web', _("Web")
 
     @classmethod
-    def platform_limits(cls):
+    def platform_constraints(cls) -> dict:
         return {
             cls.HOST: {
                 'has_domain': True,
-                'protocols_limit': ['ssh', 'rdp', 'vnc', 'telnet']
+                'has_ping': True,
+                'has_verify_account': True,
+                'has_change_password': True,
+                'has_create_account': True,
+                '_protocols': ['ssh', 'telnet']
             },
             cls.NETWORK: {
                 'has_domain': True,
-                'protocols_limit': ['ssh', 'telnet']
+                '_protocols': ['ssh', 'telnet']
             },
             cls.DATABASE: {
-                'has_domain': True
+                'has_domain': True,
             },
             cls.WEB: {
                 'has_domain': False,
+                '_protocols': []
             },
             cls.CLOUD: {
                 'has_domain': False,
-                'protocol_limit': []
+                '_protocols': []
             }
         }
 
@@ -57,18 +70,17 @@ class HostTypes(PlatformMixin, models.TextChoices):
     OTHER_HOST = 'other_host', _("Other host")
 
     @classmethod
-    def platform_limits(cls):
-        return {}
-
-    @classmethod
-    def get_default_port(cls):
-        defaults = {
-            cls.LINUX: 22,
-            cls.WINDOWS: 3389,
-            cls.UNIX: 22,
-            cls.BSD: 22,
-            cls.MACOS: 22,
-            cls.MAINFRAME: 22,
+    def platform_constraints(cls):
+        return {
+            cls.LINUX: {
+                '_protocols': ['ssh', 'rdp', 'vnc', 'telnet']
+            },
+            cls.WINDOWS: {
+                '_protocols': ['ssh', 'rdp', 'vnc']
+            },
+            cls.MACOS: {
+                '_protocols': ['ssh', 'vnc']
+            }
         }
 
 
@@ -89,11 +101,11 @@ class DatabaseTypes(PlatformMixin, models.TextChoices):
     REDIS = 'redis', 'Redis'
 
     @classmethod
-    def platform_limits(cls):
+    def platform_constraints(cls):
         meta = {}
         for name, label in cls.choices:
             meta[name] = {
-                'protocols_limit': [name]
+                'protocols': [name]
             }
         return meta
 
@@ -114,23 +126,25 @@ class AllTypes(metaclass=IncludesTextChoicesMeta):
     ]
 
     @classmethod
-    def get_type_limits(cls, category, tp):
-        limits = Category.platform_limits().get(category, {})
+    def get_constraints(cls, category, tp):
+        constraints = PlatformMixin.platform_constraints()
+        category_constraints = Category.platform_constraints().get(category) or {}
+        constraints.update(category_constraints)
+
         types_cls = dict(cls.category_types()).get(category)
         if not types_cls:
-            return {}
-        types_limits = types_cls.platform_limits() or {}
-        type_limits = types_limits.get(tp, {})
-        limits.update(type_limits)
+            return constraints
+        type_constraints = types_cls.platform_constraints().get(tp) or {}
+        constraints.update(type_constraints)
 
-        _protocols_limit = limits.get('protocols_limit', [])
+        _protocols = constraints.pop('_protocols', [])
         default_ports = Protocol.default_ports()
-        protocols_limit = []
-        for p in _protocols_limit:
+        protocols = []
+        for p in _protocols:
             port = default_ports.get(p, 0)
-            protocols_limit.append(f'{p}/{port}')
-        limits['protocols_limit'] = protocols_limit
-        return limits
+            protocols.append({'name': p, 'port': port})
+        constraints['protocols'] = protocols
+        return constraints
 
     @classmethod
     def category_types(cls):

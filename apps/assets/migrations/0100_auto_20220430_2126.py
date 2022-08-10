@@ -13,16 +13,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='platform',
-            name='admin_user_default',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='assets.systemuser', verbose_name='Admin user default'),
-        ),
-        migrations.AddField(
-            model_name='platform',
-            name='admin_user_enabled',
-            field=models.BooleanField(default=True, verbose_name='Admin user enabled'),
-        ),
-        migrations.AddField(
-            model_name='platform',
             name='domain_default',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='assets.domain', verbose_name='Domain default'),
         ),
@@ -34,12 +24,62 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='platform',
             name='protocols_default',
-            field=models.CharField(blank=True, default='', max_length=128, verbose_name='Protocols default'),
+            field=models.JSONField(blank=True, default=list, max_length=128, verbose_name='Protocols default'),
         ),
         migrations.AddField(
             model_name='platform',
             name='protocols_enabled',
             field=models.BooleanField(default=True, verbose_name='Protocols enabled'),
+        ),
+        migrations.AddField(
+            model_name='platform',
+            name='change_password_enabled',
+            field=models.BooleanField(default=False, verbose_name='Change password enabled'),
+        ),
+        migrations.AddField(
+            model_name='platform',
+            name='change_password_method',
+            field=models.TextField(blank=True, max_length=32, null=True, verbose_name='Change password method'),
+        ),
+        migrations.AddField(
+            model_name='platform',
+            name='create_account_enabled',
+            field=models.BooleanField(default=False, verbose_name='Create account enabled'),
+        ),
+        migrations.AddField(
+            model_name='platform',
+            name='create_account_method',
+            field=models.TextField(blank=True, max_length=32, null=True, verbose_name='Create account method'),
+        ),
+        migrations.AddField(
+            model_name='platform',
+            name='ping_enabled',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='platform',
+            name='ping_method',
+            field=models.TextField(blank=True, max_length=32, null=True, verbose_name='Ping method'),
+        ),
+        migrations.AddField(
+            model_name='platform',
+            name='su_enabled',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='platform',
+            name='su_method',
+            field=models.TextField(blank=True, max_length=32, null=True, verbose_name='SU method'),
+        ),
+        migrations.AddField(
+            model_name='platform',
+            name='verify_account_enabled',
+            field=models.BooleanField(default=False, verbose_name='Verify account enabled'),
+        ),
+        migrations.AddField(
+            model_name='platform',
+            name='verify_account_method',
+            field=models.TextField(blank=True, max_length=32, null=True, verbose_name='Verify account method'),
         ),
         migrations.AlterField(
             model_name='asset',

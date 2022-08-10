@@ -8,19 +8,15 @@ from .mixin import CategoryDisplayMixin
 __all__ = ['PlatformSerializer']
 
 
+class PlatformProtocolsSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=255, required=True)
+    port = serializers.IntegerField(max_value=65535, min_value=1, required=True)
+
+
 class PlatformSerializer(CategoryDisplayMixin, serializers.ModelSerializer):
     meta = serializers.DictField(required=False, allow_null=True, label=_('Meta'))
-    protocols_default = serializers.ListField(label=_('Protocols'), required=False)
-    type_limits = serializers.ReadOnlyField(required=False, read_only=True)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # TODO 修复 drf SlugField RegexValidator bug，之后记得删除
-        validators = self.fields['name'].validators
-        if isinstance(validators[-1], RegexValidator):
-            validators.pop()
-        # self.set_platform_meta()
+    protocols_default = PlatformProtocolsSerializer(label=_('Protocols'), many=True, required=False)
+    type_constraints = serializers.ReadOnlyField(required=False, read_only=True)
 
     class Meta:
         model = Platform
@@ -29,12 +25,16 @@ class PlatformSerializer(CategoryDisplayMixin, serializers.ModelSerializer):
             'meta', 'comment', 'charset',
             'category', 'category_display',
             'type', 'type_display',
-            'type_limits',
+            'su_enabled', 'su_method',
+            'ping_enabled', 'ping_method',
+            'verify_account_enabled', 'verify_account_method',
+            'create_account_enabled', 'create_account_method',
+            'change_password_enabled', 'change_password_method',
+            'type_constraints',
         ]
         fields_fk = [
             'domain_enabled', 'domain_default',
             'protocols_enabled', 'protocols_default',
-            'admin_user_enabled', 'admin_user_default',
         ]
         fields = fields_small + fields_fk
         read_only_fields = [
