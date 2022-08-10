@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-05 14:42+0800\n"
+"POT-Creation-Date: 2022-08-10 14:50+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -88,8 +88,8 @@ msgstr "ログイン確認"
 #: acls/models/login_acl.py:24 acls/models/login_asset_acl.py:20
 #: assets/models/cmd_filter.py:30 assets/models/label.py:15 audits/models.py:37
 #: audits/models.py:62 audits/models.py:87 audits/serializers.py:100
-#: authentication/models.py:54 authentication/models.py:78 orgs/models.py:214
-#: perms/models/base.py:84 rbac/builtin.py:117 rbac/models/rolebinding.py:41
+#: authentication/models.py:54 authentication/models.py:78 orgs/models.py:220
+#: perms/models/base.py:84 rbac/builtin.py:120 rbac/models/rolebinding.py:41
 #: terminal/backends/command/models.py:20
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:44
 #: terminal/models/sharing.py:33 terminal/notifications.py:91
@@ -394,7 +394,7 @@ msgstr "クラスター"
 #: applications/serializers/attrs/application_category/db.py:11
 #: ops/models/adhoc.py:157 settings/serializers/auth/radius.py:14
 #: settings/serializers/auth/sms.py:52 terminal/models/endpoint.py:11
-#: xpack/plugins/cloud/serializers/account_attrs.py:70
+#: xpack/plugins/cloud/serializers/account_attrs.py:72
 msgid "Host"
 msgstr "ホスト"
 
@@ -408,7 +408,7 @@ msgstr "ホスト"
 #: applications/serializers/attrs/application_type/sqlserver.py:10
 #: assets/models/asset.py:214 assets/models/domain.py:62
 #: settings/serializers/auth/radius.py:15 settings/serializers/auth/sms.py:53
-#: xpack/plugins/cloud/serializers/account_attrs.py:71
+#: xpack/plugins/cloud/serializers/account_attrs.py:73
 msgid "Port"
 msgstr "ポート"
 
@@ -591,7 +591,7 @@ msgstr "ホスト名生"
 
 #: assets/models/asset.py:215 assets/serializers/account.py:16
 #: assets/serializers/asset.py:65 perms/serializers/asset/user_permission.py:41
-#: xpack/plugins/cloud/models.py:107 xpack/plugins/cloud/serializers/task.py:42
+#: xpack/plugins/cloud/models.py:107 xpack/plugins/cloud/serializers/task.py:43
 msgid "Protocols"
 msgstr "プロトコル"
 
@@ -929,7 +929,8 @@ msgstr "テストゲートウェイ"
 msgid "Unable to connect to port {port} on {ip}"
 msgstr "{ip} でポート {port} に接続できません"
 
-#: assets/models/domain.py:134 xpack/plugins/cloud/providers/fc.py:48
+#: assets/models/domain.py:134 authentication/middleware.py:75
+#: xpack/plugins/cloud/providers/fc.py:48
 msgid "Authentication failed"
 msgstr "認証に失敗しました"
 
@@ -990,7 +991,7 @@ msgid "Parent key"
 msgstr "親キー"
 
 #: assets/models/node.py:559 assets/serializers/system_user.py:267
-#: xpack/plugins/cloud/models.py:96 xpack/plugins/cloud/serializers/task.py:69
+#: xpack/plugins/cloud/models.py:96 xpack/plugins/cloud/serializers/task.py:70
 msgid "Node"
 msgstr "ノード"
 
@@ -1988,19 +1989,19 @@ msgstr "受け入れのためのログイン確認チケットを待つ"
 msgid "Login confirm ticket was {}"
 msgstr "ログイン確認チケットは {} でした"
 
-#: authentication/errors/failed.py:145
+#: authentication/errors/failed.py:146
 msgid "Current IP and Time period is not allowed"
 msgstr "現在の IP と期間はログインを許可されていません"
 
-#: authentication/errors/failed.py:150
+#: authentication/errors/failed.py:151
 msgid "Please enter MFA code"
 msgstr "MFAコードを入力してください"
 
-#: authentication/errors/failed.py:155
+#: authentication/errors/failed.py:156
 msgid "Please enter SMS code"
 msgstr "SMSコードを入力してください"
 
-#: authentication/errors/failed.py:160 users/exceptions.py:15
+#: authentication/errors/failed.py:161 users/exceptions.py:15
 msgid "Phone not set"
 msgstr "電話が設定されていない"
 
@@ -2114,6 +2115,10 @@ msgstr "電話番号を設定して有効にする"
 #: authentication/mfa/sms.py:61
 msgid "Clear phone number to disable"
 msgstr "無効にする電話番号をクリアする"
+
+#: authentication/middleware.py:76 settings/utils/ldap.py:652
+msgid "Authentication failed (before login check failed): {}"
+msgstr "認証に失敗しました (ログインチェックが失敗する前): {}"
 
 #: authentication/mixins.py:256
 msgid "The MFA type ({}) is not enabled"
@@ -2304,6 +2309,7 @@ msgid "Need MFA for view auth"
 msgstr "ビューオートのためにMFAが必要"
 
 #: authentication/templates/authentication/_mfa_confirm_modal.html:20
+#: authentication/templates/authentication/auth_fail_flash_message_standalone.html:37
 #: templates/_modal.html:23 templates/flash_message_standalone.html:37
 #: users/templates/users/user_password_verify.html:20
 msgid "Confirm"
@@ -2318,7 +2324,7 @@ msgstr "コードエラー"
 #: authentication/templates/authentication/_msg_reset_password.html:3
 #: authentication/templates/authentication/_msg_rest_password_success.html:2
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:2
-#: jumpserver/conf.py:316 ops/tasks.py:145 ops/tasks.py:148
+#: jumpserver/conf.py:390 ops/tasks.py:145 ops/tasks.py:148
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: perms/templates/perms/_msg_permed_items_expire.html:3
 #: tickets/templates/tickets/approve_check_password.html:33
@@ -2408,6 +2414,11 @@ msgid ""
 msgstr ""
 "公開鍵の更新が開始されなかった場合、アカウントにセキュリティ上の問題がある可"
 "能性があります"
+
+#: authentication/templates/authentication/auth_fail_flash_message_standalone.html:28
+#: templates/flash_message_standalone.html:28 tickets/const.py:20
+msgid "Cancel"
+msgstr "キャンセル"
 
 #: authentication/templates/authentication/login.html:221
 msgid "Welcome back, please enter username and password to login"
@@ -2715,6 +2726,14 @@ msgstr "企業微信エラー、システム管理者に連絡してください
 msgid "Signature does not match"
 msgstr "署名が一致しない"
 
+#: common/sdk/sms/cmpp2.py:46
+msgid "sp_id is 6 bits"
+msgstr "SP idは6ビット"
+
+#: common/sdk/sms/cmpp2.py:216
+msgid "Failed to connect to the CMPP gateway server, err: {}"
+msgstr "接続ゲートウェイサーバエラー, 非: {}"
+
 #: common/sdk/sms/endpoint.py:16
 msgid "Alibaba cloud"
 msgstr "アリ雲"
@@ -2767,11 +2786,11 @@ msgstr "特殊文字を含むべきではない"
 msgid "The mobile phone number format is incorrect"
 msgstr "携帯電話番号の形式が正しくありません"
 
-#: jumpserver/conf.py:315
+#: jumpserver/conf.py:389
 msgid "Create account successfully"
 msgstr "アカウントを正常に作成"
 
-#: jumpserver/conf.py:317
+#: jumpserver/conf.py:391
 msgid "Your account has been created successfully"
 msgstr "アカウントが正常に作成されました"
 
@@ -3030,8 +3049,8 @@ msgstr "組織のリソース ({}) は削除できません"
 msgid "App organizations"
 msgstr "アプリ組織"
 
-#: orgs/mixins/models.py:57 orgs/mixins/serializers.py:25 orgs/models.py:80
-#: orgs/models.py:211 rbac/const.py:7 rbac/models/rolebinding.py:48
+#: orgs/mixins/models.py:57 orgs/mixins/serializers.py:25 orgs/models.py:85
+#: orgs/models.py:217 rbac/const.py:7 rbac/models/rolebinding.py:48
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:62
 #: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:71
 msgid "Organization"
@@ -3275,27 +3294,27 @@ msgstr "{} 少なくとも1つのシステムロール"
 msgid "RBAC"
 msgstr "RBAC"
 
-#: rbac/builtin.py:108
+#: rbac/builtin.py:111
 msgid "SystemAdmin"
 msgstr "システム管理者"
 
-#: rbac/builtin.py:111
+#: rbac/builtin.py:114
 msgid "SystemAuditor"
 msgstr "システム監査人"
 
-#: rbac/builtin.py:114
+#: rbac/builtin.py:117
 msgid "SystemComponent"
 msgstr "システムコンポーネント"
 
-#: rbac/builtin.py:120
+#: rbac/builtin.py:123
 msgid "OrgAdmin"
 msgstr "組織管理者"
 
-#: rbac/builtin.py:123
+#: rbac/builtin.py:126
 msgid "OrgAuditor"
 msgstr "監査員を組織する"
 
-#: rbac/builtin.py:126
+#: rbac/builtin.py:129
 msgid "OrgUser"
 msgstr "組織ユーザー"
 
@@ -3852,12 +3871,12 @@ msgid "Test phone"
 msgstr "テスト電話"
 
 #: settings/serializers/auth/sms.py:54
-msgid "Gateway account(SP id)"
-msgstr "ゲートウェイアカウント(SP id)"
+msgid "Enterprise code(SP id)"
+msgstr "企業コード(SP id)"
 
 #: settings/serializers/auth/sms.py:55
-msgid "Gateway password(SP secret)"
-msgstr "ゲートウェイパスワード(SP secret)"
+msgid "Shared secret(Shared secret)"
+msgstr "パスワードを共有する(Shared secret)"
 
 #: settings/serializers/auth/sms.py:56
 msgid "Original number(Src id)"
@@ -3872,6 +3891,7 @@ msgid "Template"
 msgstr "テンプレート"
 
 #: settings/serializers/auth/sms.py:61
+#, python-brace-format
 msgid ""
 "Template need contain {code} and Signature + template length does not exceed "
 "67 words. For example, your verification code is {code}, which is valid for "
@@ -3890,7 +3910,7 @@ msgstr "テンプレートには{code}を含める必要があります"
 msgid "Signature + Template must not exceed 65 words"
 msgstr "署名+テンプレートの長さは65文字以内"
 
-#: settings/serializers/auth/sso.py:12
+#: settings/serializers/auth/sso.py:11
 msgid "Enable SSO auth"
 msgstr "SSO Token認証の有効化"
 
@@ -4547,10 +4567,6 @@ msgstr "成功: {} 人のユーザーに一致"
 msgid "Authentication failed (configuration incorrect): {}"
 msgstr "認証に失敗しました (設定が正しくありません): {}"
 
-#: settings/utils/ldap.py:652
-msgid "Authentication failed (before login check failed): {}"
-msgstr "認証に失敗しました (ログインチェックが失敗する前): {}"
-
 #: settings/utils/ldap.py:654
 msgid "Authentication failed (username or password incorrect): {}"
 msgstr "認証に失敗しました (ユーザー名またはパスワードが正しくありません): {}"
@@ -4720,10 +4736,6 @@ msgstr "確認コードが送信されました"
 #: templates/_without_nav_base.html:26
 msgid "Home page"
 msgstr "ホームページ"
-
-#: templates/flash_message_standalone.html:28 tickets/const.py:20
-msgid "Cancel"
-msgstr "キャンセル"
 
 #: templates/resource_download.html:18 templates/resource_download.html:31
 msgid "Client"
@@ -6507,11 +6519,11 @@ msgstr "クラウドアカウント"
 msgid "Test cloud account"
 msgstr "クラウドアカウントのテスト"
 
-#: xpack/plugins/cloud/models.py:85 xpack/plugins/cloud/serializers/task.py:66
+#: xpack/plugins/cloud/models.py:85 xpack/plugins/cloud/serializers/task.py:67
 msgid "Account"
 msgstr "アカウント"
 
-#: xpack/plugins/cloud/models.py:88 xpack/plugins/cloud/serializers/task.py:37
+#: xpack/plugins/cloud/models.py:88 xpack/plugins/cloud/serializers/task.py:38
 msgid "Regions"
 msgstr "リージョン"
 
@@ -6519,19 +6531,19 @@ msgstr "リージョン"
 msgid "Hostname strategy"
 msgstr "ホスト名戦略"
 
-#: xpack/plugins/cloud/models.py:100 xpack/plugins/cloud/serializers/task.py:67
+#: xpack/plugins/cloud/models.py:100 xpack/plugins/cloud/serializers/task.py:68
 msgid "Unix admin user"
 msgstr "Unix adminユーザー"
 
-#: xpack/plugins/cloud/models.py:104 xpack/plugins/cloud/serializers/task.py:68
+#: xpack/plugins/cloud/models.py:104 xpack/plugins/cloud/serializers/task.py:69
 msgid "Windows admin user"
 msgstr "Windows管理者"
 
-#: xpack/plugins/cloud/models.py:110 xpack/plugins/cloud/serializers/task.py:45
+#: xpack/plugins/cloud/models.py:110 xpack/plugins/cloud/serializers/task.py:46
 msgid "IP network segment group"
 msgstr "IPネットワークセグメントグループ"
 
-#: xpack/plugins/cloud/models.py:113 xpack/plugins/cloud/serializers/task.py:71
+#: xpack/plugins/cloud/models.py:113 xpack/plugins/cloud/serializers/task.py:72
 msgid "Always update"
 msgstr "常に更新"
 
@@ -6837,9 +6849,11 @@ msgstr "テストポート"
 
 #: xpack/plugins/cloud/serializers/task.py:29
 msgid ""
-"The IP address that is first matched to will be used as the IP of the "
-"created asset. <br>The default * indicates a random match. <br>Format for "
-"comma-delimited string, Such as: 192.168.1.0/24, 10.1.1.1-10.1.1.20"
+"Only instances matching the IP range will be synced. <br>If the instance "
+"contains multiple IP addresses, the first IP address that matches will be "
+"used as the IP for the created asset. <br>The default value of * means sync "
+"all instances and randomly match IP addresses. <br>Format for comma-"
+"delimited string, Such as: 192.168.1.0/24, 10.1.1.1-10.1.1.20"
 msgstr ""
 "IP範囲に一致するインスタンスのみが同期されます。<br>インスタンスに複数のIPア"
 "ドレスが含まれている場合、一致する最初のIPアドレスが作成されたアセットのIPと"
@@ -6847,24 +6861,24 @@ msgstr ""
 "ドレスをランダムに一致させることを意味します。 <br>形式はコンマ区切りの文字列"
 "です。例：192.168.1.0/24,10.1.1.1-10.1.1.20"
 
-#: xpack/plugins/cloud/serializers/task.py:35
+#: xpack/plugins/cloud/serializers/task.py:36
 msgid "History count"
 msgstr "実行回数"
 
-#: xpack/plugins/cloud/serializers/task.py:36
+#: xpack/plugins/cloud/serializers/task.py:37
 msgid "Instance count"
 msgstr "インスタンス数"
 
-#: xpack/plugins/cloud/serializers/task.py:65
+#: xpack/plugins/cloud/serializers/task.py:66
 msgid "Linux admin user"
 msgstr "Linux管理者"
 
-#: xpack/plugins/cloud/serializers/task.py:70
+#: xpack/plugins/cloud/serializers/task.py:71
 #: xpack/plugins/gathered_user/serializers.py:20
 msgid "Periodic display"
 msgstr "定期的な表示"
 
-#: xpack/plugins/cloud/utils.py:68
+#: xpack/plugins/cloud/utils.py:69
 msgid "Account unavailable"
 msgstr "利用できないアカウント"
 

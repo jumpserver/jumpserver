@@ -136,4 +136,7 @@ class SMSTestingAPI(GenericAPIView):
                 error = e.detail
             status_code = status.HTTP_400_BAD_REQUEST
             data = {'error': error}
+        except Exception as e:
+            status_code = status.HTTP_400_BAD_REQUEST
+            data = {'error': str(e)}
         return Response(status=status_code, data=data)
