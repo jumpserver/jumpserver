@@ -117,7 +117,7 @@ class AssetPermissionFilter(PermissionBaseFilter):
         model = AssetPermission
         fields = (
             'user_id', 'username', 'system_user_id', 'system_user', 'user_group_id',
-            'user_group', 'node_id', 'node', 'asset_id', 'hostname', 'ip', 'name',
+            'user_group', 'node_id', 'node', 'asset_id', 'name', 'ip', 'name',
             'all', 'asset_id', 'is_valid', 'is_effective', 'from_ticket'
         )
 
@@ -157,7 +157,7 @@ class AssetPermissionFilter(PermissionBaseFilter):
     def filter_asset(self, queryset):
         is_query_all = self.get_query_param('all', True)
         asset_id = self.get_query_param('asset_id')
-        hostname = self.get_query_param('hostname')
+        hostname = self.get_query_param('name')
         ip = self.get_query_param('ip')
 
         if asset_id:

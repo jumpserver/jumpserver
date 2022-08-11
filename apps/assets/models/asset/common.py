@@ -2,16 +2,14 @@
 # -*- coding: utf-8 -*-
 #
 
-import uuid
 import logging
+import uuid
 from functools import reduce
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import lazyproperty
-from orgs.mixins.models import OrgModelMixin, OrgManager
-from assets.const import Category, AllTypes
+from orgs.mixins.models import OrgManager, JMSOrgBaseModel
 from ..platform import Platform
 from ..base import AbsConnectivity
 
@@ -67,14 +65,10 @@ class NodesRelationMixin:
         return nodes
 
 
-class Asset(AbsConnectivity, NodesRelationMixin, OrgModelMixin):
-    Category = Category
+class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    hostname = models.CharField(max_length=128, verbose_name=_('Hostname'))
+    name = models.CharField(max_length=128, verbose_name=_('Hostname'))
     ip = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
-    category = models.CharField(max_length=16, choices=Category.choices, verbose_name=_("Category"))
-    type = models.CharField(max_length=128, choices=AllTypes.choices, verbose_name=_("Type"))
-    _protocols = models.CharField(max_length=128, default='ssh/22', blank=True, verbose_name=_("Protocols"))
     protocols = models.ManyToManyField('Protocol', verbose_name=_("Protocols"), blank=True)
     platform = models.ForeignKey(Platform, default=Platform.default, on_delete=models.PROTECT,
                                  verbose_name=_("Platform"), related_name='assets')
@@ -84,16 +78,7 @@ class Asset(AbsConnectivity, NodesRelationMixin, OrgModelMixin):
                                    verbose_name=_("Nodes"))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
 
-    # Auth
-    admin_user = models.ForeignKey('assets.SystemUser', on_delete=models.SET_NULL, null=True,
-                                   verbose_name=_("Admin user"), related_name='admin_assets')
-    # Some information
-    public_ip = models.CharField(max_length=128, blank=True, null=True, verbose_name=_('Public IP'))
-    number = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Asset number'))
-
     labels = models.ManyToManyField('assets.Label', blank=True, related_name='assets', verbose_name=_("Labels"))
-    created_by = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Created by'))
-    date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
     objects = AssetManager.from_queryset(AssetQuerySet)()
@@ -105,12 +90,6 @@ class Asset(AbsConnectivity, NodesRelationMixin, OrgModelMixin):
         return self.ip
 
     @property
-    def admin_user_display(self):
-        if not self.admin_user:
-            return ''
-        return str(self.admin_user)
-
-    @property
     def is_valid(self):
         warning = ''
         if not self.is_active:
@@ -118,17 +97,6 @@ class Asset(AbsConnectivity, NodesRelationMixin, OrgModelMixin):
         if warning:
             return False, warning
         return True, warning
-
-    @lazyproperty
-    def platform_base(self):
-        return self.platform.type
-
-    @lazyproperty
-    def admin_user_username(self):
-        """求可连接性时，直接用用户名去取，避免再查一次admin user
-        serializer 中直接通过annotate方式返回了这个
-        """
-        return self.admin_user.username
 
     def nodes_display(self):
         names = []
@@ -142,12 +110,20 @@ class Asset(AbsConnectivity, NodesRelationMixin, OrgModelMixin):
             names.append(n.name + ':' + n.value)
         return names
 
+    @property
+    def type(self):
+        return self.platform.type
+
+    @property
+    def category(self):
+        return self.platform.category
+
     def as_node(self):
         from assets.models import Node
         fake_node = Node()
         fake_node.id = self.id
         fake_node.key = self.id
-        fake_node.value = self.hostname
+        fake_node.value = self.name
         fake_node.asset = self
         fake_node.is_node = False
         return fake_node
@@ -155,13 +131,14 @@ class Asset(AbsConnectivity, NodesRelationMixin, OrgModelMixin):
     def as_tree_node(self, parent_node):
         from common.tree import TreeNode
         icon_skin = 'file'
-        if self.platform_base.lower() == 'windows':
+        platform_type = self.platform.type.lower()
+        if platform_type == 'windows':
             icon_skin = 'windows'
-        elif self.platform_base.lower() == 'linux':
+        elif platform_type == 'linux':
             icon_skin = 'linux'
         data = {
             'id': str(self.id),
-            'name': self.hostname,
+            'name': self.name,
             'title': self.ip,
             'pId': parent_node.key,
             'isParent': False,
@@ -171,10 +148,9 @@ class Asset(AbsConnectivity, NodesRelationMixin, OrgModelMixin):
                 'type': 'asset',
                 'data': {
                     'id': self.id,
-                    'hostname': self.hostname,
+                    'name': self.name,
                     'ip': self.ip,
                     'protocols': self.protocols,
-                    'platform': self.platform_base,
                 }
             }
         }
@@ -188,20 +164,10 @@ class Asset(AbsConnectivity, NodesRelationMixin, OrgModelMixin):
         system_users = SystemUser.objects.filter(id__in=system_user_ids)
         return system_users
 
-    def save(self, *args, **kwargs):
-        self.type = self.platform.type
-        self.category = self.platform.category
-        return super().save(*args, **kwargs)
-
-    # TODO 暂时为了接口文档添加
-    @property
-    def os(self):
-        return
-
     class Meta:
-        unique_together = [('org_id', 'hostname')]
+        unique_together = [('org_id', 'name')]
         verbose_name = _("Asset")
-        ordering = ["hostname", ]
+        ordering = ["name", ]
         permissions = [
             ('refresh_assethardwareinfo', _('Can refresh asset hardware info')),
             ('test_assetconnectivity', _('Can test asset connectivity')),

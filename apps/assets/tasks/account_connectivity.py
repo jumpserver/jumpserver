@@ -28,7 +28,7 @@ def get_test_account_connectivity_tasks(asset):
     else:
         msg = _(
             "The asset {} system platform {} does not "
-            "support run Ansible tasks".format(asset.hostname, asset.platform)
+            "support run Ansible tasks".format(asset.name, asset.platform)
         )
         logger.info(msg)
         tasks = []

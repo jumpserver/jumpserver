@@ -31,6 +31,7 @@ class DeviceInfo(CommonModelMixin):
     os_version = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('OS version'))
     os_arch = models.CharField(max_length=16, blank=True, null=True, verbose_name=_('OS arch'))
     hostname_raw = models.CharField(max_length=128, blank=True, null=True, verbose_name=_('Hostname raw'))
+    number = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Asset number'))
 
     @property
     def cpu_info(self):
@@ -52,7 +53,7 @@ class DeviceInfo(CommonModelMixin):
             return ''
 
     def __str__(self):
-        return '{} of {}'.format(self.hardware_info, self.host.hostname)
+        return '{} of {}'.format(self.hardware_info, self.host.name)
 
     class Meta:
         verbose_name = _("DeviceInfo")

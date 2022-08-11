@@ -39,7 +39,7 @@ def set_assets_hardware_info(assets, result, **kwargs):
     success_result = result_raw.get('ok', {})
 
     for asset in assets:
-        hostname = asset.hostname
+        hostname = asset.name
         info = success_result.get(hostname, {})
         info = info.get('setup', {}).get('ansible_facts', {})
         if not info:
@@ -111,13 +111,13 @@ def update_assets_hardware_info_util(assets, task_name=None):
 
 @shared_task(queue="ansible")
 def update_asset_hardware_info_manual(asset):
-    task_name = gettext_noop("Update asset hardware info: ") + str(asset.hostname)
+    task_name = gettext_noop("Update asset hardware info: ") + str(asset.name)
     update_assets_hardware_info_util([asset], task_name=task_name)
 
 
 @shared_task(queue="ansible")
 def update_assets_hardware_info_manual(assets):
-    task_name = gettext_noop("Update assets hardware info: ") + str([asset.hostname for asset in assets])
+    task_name = gettext_noop("Update assets hardware info: ") + str([asset.name for asset in assets])
     update_assets_hardware_info_util(assets, task_name=task_name)
 
 

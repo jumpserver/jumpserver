@@ -20,7 +20,7 @@ class JMSBaseInventory(BaseInventory):
     def convert_to_ansible(self, asset, run_as_admin=False):
         info = {
             'id': asset.id,
-            'hostname': asset.hostname,
+            'name': asset.name,
             'ip': asset.ip,
             'port': asset.ssh_port,
             'vars': dict(),

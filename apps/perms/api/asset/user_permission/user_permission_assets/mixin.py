@@ -81,16 +81,16 @@ class UserGrantedNodeAssetsMixin:
 
 class AssetsSerializerFormatMixin:
     serializer_class = serializers.AssetGrantedSerializer
-    filterset_fields = ['hostname', 'ip', 'id', 'comment']
-    search_fields = ['hostname', 'ip', 'comment']
+    filterset_fields = ['name', 'ip', 'id', 'comment']
+    search_fields = ['name', 'ip', 'comment']
 
 
 class AssetsTreeFormatMixin(SerializeToTreeNodeMixin):
     """
     将 资产 序列化成树的结构返回
     """
-    filterset_fields = ['hostname', 'ip', 'id', 'comment']
-    search_fields = ['hostname', 'ip', 'comment']
+    filterset_fields = ['name', 'ip', 'id', 'comment']
+    search_fields = ['name', 'ip', 'comment']
 
     def list(self, request: Request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
@@ -99,6 +99,6 @@ class AssetsTreeFormatMixin(SerializeToTreeNodeMixin):
             # 如果用户搜索的条件不精准，会导致返回大量的无意义数据。
             # 这里限制一下返回数据的最大条数
             queryset = queryset[:999]
-            queryset = sorted(queryset, key=lambda asset: asset.hostname)
+            queryset = sorted(queryset, key=lambda asset: asset.name)
         data = self.serialize_assets(queryset, None)
         return Response(data=data)

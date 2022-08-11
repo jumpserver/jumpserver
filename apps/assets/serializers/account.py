@@ -12,7 +12,7 @@ from common.drf.serializers import SecretReadableMixin
 
 class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     ip = serializers.ReadOnlyField(label=_("IP"))
-    hostname = serializers.ReadOnlyField(label=_("Hostname"))
+    asset = serializers.ReadOnlyField(label=_("Asset"))
     platform = serializers.ReadOnlyField(label=_("Platform"))
     date_created = serializers.DateTimeField(
         label=_('Date created'), format="%Y/%m/%d %H:%M:%S", read_only=True
@@ -24,7 +24,7 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     class Meta:
         model = Account
         fields_mini = [
-            'id', 'type', 'username', 'ip', 'hostname',
+            'id', 'type', 'username', 'ip', 'name',
             'platform', 'version'
         ]
         fields_write_only = ['password', 'private_key', 'public_key', 'passphrase']
@@ -59,14 +59,14 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         """ Perform necessary eager loading of data. """
         queryset = queryset.prefetch_related('asset')\
             .annotate(ip=F('asset__ip')) \
-            .annotate(hostname=F('asset__hostname'))
+            .annotate(asset=F('asset__name'))
         return queryset
 
 
 class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
     class Meta(AccountSerializer.Meta):
         fields_backup = [
-            'hostname', 'ip', 'platform', 'protocols', 'username', 'password',
+            'name', 'ip', 'platform', 'protocols', 'username', 'password',
             'private_key', 'public_key', 'date_created', 'date_updated', 'version'
         ]
         extra_kwargs = {

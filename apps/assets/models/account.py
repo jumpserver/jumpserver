@@ -30,7 +30,7 @@ class Account(BaseUser, AbsConnectivity):
         ]
 
     def __str__(self):
-        return '{}@{}'.format(self.username, self.asset.hostname)
+        return '{}@{}'.format(self.username, self.asset.name)
 
 
 class AccountTemplate(JMSBaseModel):

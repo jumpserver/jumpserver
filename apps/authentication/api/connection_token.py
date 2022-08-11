@@ -160,7 +160,7 @@ class ConnectionTokenMixin:
         rdp_options['audiomode:i'] = self.parse_env_bool('JUMPSERVER_DISABLE_AUDIO', 'false', '2', '0')
 
         if token.asset:
-            name = token.asset.hostname
+            name = token.asset.name
         elif token.application and token.application.category_remote_app:
             app = '||jmservisor'
             name = token.application.name
@@ -182,7 +182,7 @@ class ConnectionTokenMixin:
 
     def get_ssh_token(self, token: ConnectionToken):
         if token.asset:
-            name = token.asset.hostname
+            name = token.asset.name
         elif token.application:
             name = token.application.name
         else:

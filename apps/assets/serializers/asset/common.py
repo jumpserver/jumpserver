@@ -57,8 +57,6 @@ class AssetNodesSerializer(serializers.ModelSerializer):
 
 
 class AssetSerializer(JMSWritableNestedModelSerializer):
-    # category = ChoiceDisplayField(choices=Category.choices, required=False)
-    # type = ChoiceDisplayField(choices=AllTypes.choices, required=False)
     domain = AssetDomainSerializer(required=False)
     platform = AssetPlatformSerializer(required=False)
     labels = AssetLabelSerializer(many=True, required=False)
@@ -72,10 +70,10 @@ class AssetSerializer(JMSWritableNestedModelSerializer):
     class Meta:
         model = Asset
         fields_mini = [
-            'id', 'hostname', 'ip',
+            'id', 'name', 'ip',
         ]
         fields_small = fields_mini + [
-            'is_active', 'number', 'comment',
+            'is_active', 'comment',
         ]
         fields_fk = [
             'domain', 'platform', 'platform',
@@ -90,7 +88,7 @@ class AssetSerializer(JMSWritableNestedModelSerializer):
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
         extra_kwargs = {
-            'hostname': {'label': _("Name")},
+            'name': {'label': _("Name")},
             'ip': {'label': _('IP/Host')},
             'protocol': {'write_only': True},
             'port': {'write_only': True},
@@ -101,12 +99,6 @@ class AssetSerializer(JMSWritableNestedModelSerializer):
         data = kwargs.get('data', {})
         self.accounts_data = data.pop('accounts', [])
         super().__init__(*args, **kwargs)
-
-    def validate_type(self, value):
-        return value
-
-    def validate_category(self, value):
-        return value
 
     @classmethod
     def setup_eager_loading(cls, queryset):
@@ -164,7 +156,7 @@ class AssetSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Asset
         fields = [
-            'id', 'hostname', 'ip', 'port',
+            'id', 'name', 'ip', 'port',
             'connectivity', 'date_verified'
         ]
 

@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 
 from common.utils import get_logger
+from common.db.models import JMSBaseModel
 from ..utils import (
     set_current_org, get_current_org, current_org, filter_org_queryset
 )
@@ -14,7 +15,7 @@ from ..models import Organization
 logger = get_logger(__file__)
 
 __all__ = [
-    'OrgManager', 'OrgModelMixin', 'Organization'
+    'OrgManager', 'OrgModelMixin', 'JMSOrgBaseModel'
 ]
 
 
@@ -39,7 +40,6 @@ class OrgManager(models.Manager):
             org = Organization.get_instance(org)
         set_current_org(org)
         return self
-
 
     def bulk_create(self, objs, batch_size=None, ignore_conflicts=False):
         org = get_current_org()
@@ -87,7 +87,7 @@ class OrgModelMixin(models.Model):
             name = getattr(self, attr)
         elif hasattr(self, 'name'):
             name = self.name
-        elif hasattr(self, 'hostname'):
+        elif hasattr(self, 'name'):
             name = self.hostname
         return name + self.sep + self.org_name
 
@@ -111,5 +111,10 @@ class OrgModelMixin(models.Model):
         if errors:
             raise ValidationError(errors)
 
+    class Meta:
+        abstract = True
+
+
+class JMSOrgBaseModel(JMSBaseModel, OrgModelMixin):
     class Meta:
         abstract = True

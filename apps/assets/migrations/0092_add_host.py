@@ -40,6 +40,7 @@ class Migration(migrations.Migration):
                 ('os_arch', models.CharField(blank=True, max_length=16, null=True, verbose_name='OS arch')),
                 ('hostname_raw', models.CharField(blank=True, max_length=128, null=True, verbose_name='Hostname raw')),
                 ('host', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='assets.host', verbose_name='Host')),
+                ('number', models.CharField(blank=True, max_length=128, null=True, verbose_name='Asset number')),
             ],
             options={
                 'verbose_name': 'DeviceInfo',

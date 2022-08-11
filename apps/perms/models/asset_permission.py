@@ -185,7 +185,7 @@ class AssetPermission(OrgModelMixin):
         return names
 
     def assets_display(self):
-        names = [asset.hostname for asset in self.assets.all()]
+        names = [asset.name for asset in self.assets.all()]
         return names
 
     def nodes_display(self):

@@ -12,7 +12,7 @@ from ops.ansible.inventory import BaseInventory
 class TestJMSInventory(unittest.TestCase):
     def setUp(self):
         host_list = [{
-            "hostname": "testserver1",
+            "name": "testserver1",
             "ip": "102.1.1.1",
             "port": 22,
             "username": "root",
@@ -26,7 +26,7 @@ class TestJMSInventory(unittest.TestCase):
             "groups": ["group1", "group2"],
             "vars": {"sexy": "yes"},
         }, {
-            "hostname": "testserver2",
+            "name": "testserver2",
             "ip": "8.8.8.8",
             "port": 2222,
             "username": "root",

@@ -33,8 +33,8 @@ class UserGroupMixin:
 class UserGroupGrantedAssetsApi(ListAPIView):
     serializer_class = serializers.AssetGrantedSerializer
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
-    filterset_fields = ['hostname', 'ip', 'id', 'comment']
-    search_fields = ['hostname', 'ip', 'comment']
+    filterset_fields = ['name', 'ip', 'id', 'comment']
+    search_fields = ['name', 'ip', 'comment']
     rbac_perms = {
         'list': 'perms.view_usergroupassets',
     }
@@ -70,8 +70,8 @@ class UserGroupGrantedAssetsApi(ListAPIView):
 class UserGroupGrantedNodeAssetsApi(ListAPIView):
     serializer_class = serializers.AssetGrantedSerializer
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
-    filterset_fields = ['hostname', 'ip', 'id', 'comment']
-    search_fields = ['hostname', 'ip', 'comment']
+    filterset_fields = ['name', 'ip', 'id', 'comment']
+    search_fields = ['name', 'ip', 'comment']
     rbac_perms = {
         'list': 'perms.view_usergroupassets',
     }

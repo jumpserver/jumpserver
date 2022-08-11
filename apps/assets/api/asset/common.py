@@ -27,15 +27,15 @@ class AssetViewSet(SuggestionMixin, FilterAssetByNodeMixin, OrgBulkModelViewSet)
     """
     model = Asset
     filterset_fields = {
-        'hostname': ['exact'],
+        'name': ['exact'],
         'ip': ['exact'],
         'system_users__id': ['exact'],
         'is_active': ['exact'],
         'protocols': ['exact', 'icontains']
     }
-    search_fields = ("hostname", "ip")
-    ordering_fields = ("hostname", "ip", "port")
-    ordering = ('hostname', )
+    search_fields = ("name", "ip")
+    ordering_fields = ("name", "ip", "port")
+    ordering = ('name', )
     serializer_classes = (
         ('default', serializers.AssetSerializer),
         ('suggestion', serializers.MiniAssetSerializer),

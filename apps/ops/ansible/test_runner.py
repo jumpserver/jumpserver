@@ -14,7 +14,7 @@ class TestAdHocRunner(unittest.TestCase):
     def setUp(self):
         host_data = [
             {
-                "hostname": "testserver",
+                "name": "testserver",
                 "ip": "192.168.244.185",
                 "port": 22,
                 "username": "root",
@@ -38,7 +38,7 @@ class TestCommandRunner(unittest.TestCase):
     def setUp(self):
         host_data = [
             {
-                "hostname": "testserver",
+                "name": "testserver",
                 "ip": "192.168.244.168",
                 "port": 22,
                 "username": "root",

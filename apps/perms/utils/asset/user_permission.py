@@ -513,7 +513,7 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
             assets = self._get_indirect_granted_node_assets(node.id)
         else:
             assets = Asset.objects.none()
-        assets = assets.order_by('hostname')
+        assets = assets.order_by('name')
         return assets
 
     def _get_indirect_granted_node_assets(self, id) -> AssetQuerySet:

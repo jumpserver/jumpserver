@@ -15,7 +15,7 @@ class BaseHost(Host):
         """
         初始化
         :param host_data:  {
-            "hostname": "",
+            "name": "",
             "ip": "",
             "port": "",
             # behind is not must be required
@@ -32,7 +32,7 @@ class BaseHost(Host):
         }
         """
         self.host_data = host_data
-        hostname = host_data.get('hostname') or host_data.get('ip')
+        hostname = host_data.get('name') or host_data.get('ip')
         port = host_data.get('port') or 22
         super().__init__(hostname, port)
         self.__set_required_variables()
@@ -82,7 +82,7 @@ class BaseInventory(InventoryManager):
         """
         用于生成动态构建Ansible Inventory. super().__init__ 会自动调用
         host_list: [{
-            "hostname": "",
+            "name": "",
             "ip": "",
             "port": "",
             "username": "",
@@ -136,7 +136,7 @@ class BaseInventory(InventoryManager):
         ungrouped = self.get_or_create_group('ungrouped')
         for host_data in self.host_list:
             host = self.host_manager_class(host_data=host_data)
-            self.hosts[host_data['hostname']] = host
+            self.hosts[host_data['name']] = host
             groups_data = host_data.get('groups')
             if groups_data:
                 for group_name in groups_data:

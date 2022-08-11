@@ -124,7 +124,7 @@ class ConnectionTokenAssetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Asset
-        fields = ['id', 'hostname', 'ip', 'protocols', 'org_id']
+        fields = ['id', 'name', 'ip', 'protocols', 'org_id']
 
 
 class ConnectionTokenSystemUserSerializer(serializers.ModelSerializer):

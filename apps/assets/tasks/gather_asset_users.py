@@ -70,7 +70,7 @@ def parse_windows_result_to_users(result):
 
 
 def add_asset_users(assets, results):
-    assets_map = {a.hostname: a for a in assets}
+    assets_map = {a.name: a for a in assets}
     parser_map = {
         'linux': parse_linux_result_to_users,
         'windows': parse_windows_result_to_users

@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 class TerminalSettingSerializer(serializers.Serializer):
     SORT_BY_CHOICES = (
-        ('hostname', _('Hostname')),
+        ('name', _('Hostname')),
         ('ip', _('IP'))
     )
 

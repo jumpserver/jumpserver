@@ -21,7 +21,7 @@ __all__ = ['AccountFilterSet', 'AccountViewSet', 'AccountSecretsViewSet', 'Accou
 class AccountFilterSet(BaseFilterSet):
     username = filters.CharFilter(method='do_nothing')
     ip = filters.CharFilter(field_name='ip', lookup_expr='exact')
-    hostname = filters.CharFilter(field_name='hostname', lookup_expr='exact')
+    hostname = filters.CharFilter(field_name='name', lookup_expr='exact')
     node = filters.CharFilter(method='do_nothing')
 
     @property
@@ -58,8 +58,8 @@ class AccountFilterSet(BaseFilterSet):
 
 class AccountViewSet(OrgBulkModelViewSet):
     model = Account
-    filterset_fields = ("username", "asset", 'ip', 'hostname')
-    search_fields = ('username', 'ip', 'hostname')
+    filterset_fields = ("username", "asset", 'ip', 'name')
+    search_fields = ('username', 'ip', 'name')
     filterset_class = AccountFilterSet
     serializer_classes = {
         'default': serializers.AccountSerializer,

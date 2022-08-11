@@ -26,7 +26,7 @@ def set_assets_accounts_connectivity(assets, results_summary):
     asset_hostnames_ok = results_summary.get('contacted', {}).keys()
 
     for asset in assets:
-        if asset.hostname in asset_hostnames_ok:
+        if asset.name in asset_hostnames_ok:
             asset_ids_ok.add(asset.id)
         else:
             asset_ids_failed.add(asset.id)
@@ -100,7 +100,7 @@ def test_asset_connectivity_manual(asset):
 
 @shared_task(queue="ansible")
 def test_assets_connectivity_manual(assets):
-    task_name = gettext_noop("Test assets connectivity: ") + str([asset.hostname for asset in assets])
+    task_name = gettext_noop("Test assets connectivity: ") + str([asset.name for asset in assets])
     summary = test_asset_connectivity_util(assets, task_name=task_name)
 
     if summary.get('dark'):

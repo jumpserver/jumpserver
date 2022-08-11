@@ -16,10 +16,10 @@ class GatheredUserSerializer(OrgResourceModelSerializerMixin):
             'present',
             'date_last_login', 'date_created', 'date_updated'
         ]
-        fields_fk = ['asset', 'hostname', 'ip']
+        fields_fk = ['asset', 'name', 'ip']
         fields = fields_small + fields_fk
         read_only_fields = fields
         extra_kwargs = {
-            'hostname': {'label': _("Hostname")},
+            'name': {'label': _("Hostname")},
             'ip': {'label': 'IP'},
         }

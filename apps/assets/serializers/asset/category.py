@@ -14,7 +14,7 @@ class DeviceSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'vendor', 'model', 'sn', 'cpu_model', 'cpu_count',
             'cpu_cores', 'cpu_vcpus', 'memory', 'disk_total', 'disk_info',
-            'os', 'os_version', 'os_arch', 'hostname_raw',
+            'os', 'os_version', 'os_arch', 'hostname_raw', 'number',
             'cpu_info', 'hardware_info', 'date_updated'
         ]
 
@@ -31,7 +31,7 @@ class DatabaseSerializer(AssetSerializer):
     class Meta(AssetSerializer.Meta):
         model = Database
         fields_mini = [
-            'id', 'hostname', 'ip', 'port', 'db_name',
+            'id', 'name', 'ip', 'port', 'db_name',
         ]
         fields_small = fields_mini + [
             'is_active', 'comment',

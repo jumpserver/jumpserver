@@ -57,7 +57,7 @@ class CommandExecution(OrgModelMixin):
 
     @lazyproperty
     def hosts_display(self):
-        return ','.join(self.hosts.all().values_list('hostname', flat=True))
+        return ','.join(self.hosts.all().values_list('name', flat=True))
 
     @property
     def result(self):
@@ -77,7 +77,7 @@ class CommandExecution(OrgModelMixin):
         return True
 
     def get_hosts_names(self):
-        return ','.join(self.hosts.all().values_list('hostname', flat=True))
+        return ','.join(self.hosts.all().values_list('name', flat=True))
 
     def cmd_filter_rules(self, asset_id=None):
         from assets.models import CommandFilterRule

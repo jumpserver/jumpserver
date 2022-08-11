@@ -61,7 +61,7 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
     @classmethod
     def filter_asset(cls, asset, queryset):
         queryset = queryset.filter(
-            Q(assets__hostname_group__contains=asset.hostname) |
+            Q(assets__hostname_group__contains=asset.name) |
             Q(assets__hostname_group__contains='*')
         )
         ids = [q.id for q in queryset if contains_ip(asset.ip, q.assets.get('ip_group', []))]

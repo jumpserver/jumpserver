@@ -21,7 +21,7 @@ class GatheredUser(OrgModelMixin):
 
     @property
     def hostname(self):
-        return self.asset.hostname
+        return self.asset.name
 
     @property
     def ip(self):
@@ -32,7 +32,7 @@ class GatheredUser(OrgModelMixin):
         ordering = ['asset']
 
     def __str__(self):
-        return '{}: {}'.format(self.asset.hostname, self.username)
+        return '{}: {}'.format(self.asset.name, self.username)
 
 
 

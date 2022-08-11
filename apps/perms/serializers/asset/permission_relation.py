@@ -83,7 +83,7 @@ class AssetPermissionAllAssetSerializer(serializers.Serializer):
     asset_display = serializers.SerializerMethodField()
 
     class Meta:
-        only_fields = ['id', 'hostname', 'ip']
+        only_fields = ['id', 'name', 'ip']
 
     @staticmethod
     def get_asset_display(obj):
