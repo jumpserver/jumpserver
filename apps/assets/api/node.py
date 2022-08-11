@@ -101,6 +101,8 @@ class NodeListAsTreeApi(generics.ListAPIView):
 
 class NodeChildrenApi(generics.ListCreateAPIView):
     serializer_class = serializers.NodeSerializer
+    search_fields = ('value',)
+
     instance = None
     is_initial = False
 
@@ -179,8 +181,15 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
     """
     model = Node
 
+    def filter_queryset(self, queryset):
+        if not self.request.GET.get('search'):
+            return queryset
+        queryset = super().filter_queryset(queryset)
+        queryset = self.model.get_ancestor_queryset(queryset)
+        return queryset
+
     def list(self, request, *args, **kwargs):
-        nodes = self.get_queryset().order_by('value')
+        nodes = self.filter_queryset(self.get_queryset()).order_by('value')
         nodes = self.serialize_nodes(nodes, with_asset_amount=True)
         assets = self.get_assets()
         data = [*nodes, *assets]
