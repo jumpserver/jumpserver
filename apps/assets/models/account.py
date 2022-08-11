@@ -5,7 +5,6 @@ from simple_history.models import HistoricalRecords
 from common.db.models import JMSBaseModel
 from .base import BaseUser, AbsConnectivity
 
-
 __all__ = ['Account']
 
 
@@ -33,5 +32,13 @@ class Account(BaseUser, AbsConnectivity):
         return '{}@{}'.format(self.username, self.asset.hostname)
 
 
-class AccountTemplate(JMSBaseModel):
-    pass
+class AccountTemplate(BaseUser, AbsConnectivity):
+    type = models.CharField(
+        max_length=16, choices=Account.Type.choices, default=Account.Type.common, verbose_name=_("Type")
+    )
+
+    class Meta:
+        verbose_name = _('Account Template')
+
+    def __str__(self):
+        return '{}'.format(self.username)
