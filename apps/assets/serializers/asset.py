@@ -189,6 +189,9 @@ class PlatformSerializer(serializers.ModelSerializer):
             'id', 'name', 'base', 'charset',
             'internal', 'meta', 'comment'
         ]
+        extra_kwargs = {
+            'internal': {'read_only': True},
+        }
 
 
 class AssetSimpleSerializer(serializers.ModelSerializer):

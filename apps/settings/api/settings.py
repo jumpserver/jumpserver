@@ -34,11 +34,13 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'cas': serializers.CASSettingSerializer,
         'sso': serializers.SSOSettingSerializer,
         'saml2': serializers.SAML2SettingSerializer,
+        'oauth2': serializers.OAuth2SettingSerializer,
         'clean': serializers.CleaningSerializer,
         'other': serializers.OtherSettingSerializer,
         'sms': serializers.SMSSettingSerializer,
         'alibaba': serializers.AlibabaSMSSettingSerializer,
         'tencent': serializers.TencentSMSSettingSerializer,
+        'cmpp2': serializers.CMPP2SMSSettingSerializer,
     }
 
     rbac_category_permissions = {
@@ -113,9 +115,12 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         return data
 
     def perform_update(self, serializer):
+        post_data_names = list(self.request.data.keys())
         settings_items = self.parse_serializer_data(serializer)
         serializer_data = getattr(serializer, 'data', {})
         for item in settings_items:
+            if item['name'] not in post_data_names:
+                continue
             changed, setting = Setting.update_or_create(**item)
             if not changed:
                 continue

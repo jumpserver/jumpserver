@@ -127,7 +127,7 @@ kubernetes==21.7.0
 # DB requirements
 mysqlclient==2.1.0
 PyMySQL==1.0.2
-cx-Oracle==8.2.1
+oracledb==1.0.1
 psycopg2-binary==2.9.1
 pymssql==2.1.5
 django-mysql==3.9.0
@@ -139,3 +139,4 @@ ipython==8.4.0
 ForgeryPy3==0.3.1
 django-debug-toolbar==3.5
 Pympler==1.0.1
+IPy==1.1

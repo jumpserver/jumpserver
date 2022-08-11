@@ -1,0 +1,70 @@
+{% extends '_base_only_content.html' %}
+{% load static %}
+{% load i18n %}
+{% block html_title %} {{ title }} {% endblock %}
+{% block title %} {{ title }}{% endblock %}
+
+{% block content %}
+    <style>
+        .alert.alert-msg {
+            background: #F5F5F7;
+        }
+    </style>
+    <div>
+        <p>
+            <div class="alert alert-msg" id="messages">
+            {% if error %}
+                {{ error }}
+            {% else %}
+                {{ message|safe }}
+            {% endif %}
+            </div>
+        </p>
+
+        <div class="row">
+            {% if has_cancel %}
+            <div class="col-sm-3">
+                <a href="{{ cancel_url }}" class="btn btn-default block full-width m-b">
+                    {% trans 'Cancel' %}
+                </a>
+            </div>
+            {% endif %}
+            <div class="col-sm-3">
+                <a href="{{ redirect_url }}" class="btn btn-primary block full-width m-b">
+                    {% if confirm_button %}
+                        {{ confirm_button }}
+                    {% else %}
+                        {% trans 'Confirm' %}
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block custom_foot_js %}
+<script>
+    var message = ''
+    var time = '{{ interval }}'
+    {% if error %}
+        message = '{{ error }}'
+    {% else %}
+        message = '{{ message|safe }}'
+    {% endif %}
+
+    function redirect_page() {
+        if (time >= 0) {
+            var msg = message + '， <b>' + time + '</b> ...';
+            $('#messages').html(msg);
+            time--;
+            setTimeout(redirect_page, 1000);
+        } else {
+            window.location.href = "{{ redirect_url }}";
+        }
+    }
+    {% if auto_redirect %}
+        window.onload = redirect_page;
+    {% endif %}
+</script>
+{% endblock %}
+

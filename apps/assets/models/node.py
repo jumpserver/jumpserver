@@ -25,7 +25,6 @@ from orgs.mixins.models import OrgModelMixin, OrgManager
 from orgs.utils import get_current_org, tmp_to_org, tmp_to_root_org
 from orgs.models import Organization
 
-
 __all__ = ['Node', 'FamilyMixin', 'compute_parent_key', 'NodeQuerySet']
 logger = get_logger(__name__)
 
@@ -97,6 +96,14 @@ class FamilyMixin:
         if with_self:
             q |= Q(key=self.key)
         return Node.objects.filter(q)
+
+    @classmethod
+    def get_ancestor_queryset(cls, queryset, with_self=True):
+        parent_keys = set()
+        for i in queryset:
+            parent_keys.update(set(i.get_ancestor_keys(with_self=with_self)))
+        queryset = queryset.model.objects.filter(key__in=list(parent_keys)).distinct()
+        return queryset
 
     @property
     def children(self):
@@ -396,7 +403,7 @@ class NodeAllAssetsMappingMixin:
                 mapping[ancestor_key].update(asset_ids)
 
         t3 = time.time()
-        logger.info('t1-t2(DB Query): {} s, t3-t2(Generate mapping): {} s'.format(t2-t1, t3-t2))
+        logger.info('t1-t2(DB Query): {} s, t3-t2(Generate mapping): {} s'.format(t2 - t1, t3 - t2))
         return mapping
 
 

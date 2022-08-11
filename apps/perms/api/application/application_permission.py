@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 #
-from applications.models import Application
-from perms.models import ApplicationPermission
+from rest_framework.response import Response
+from rest_framework.generics import RetrieveAPIView
+
 from perms import serializers
+from perms.models import ApplicationPermission
+from applications.models import Application
+from common.permissions import IsValidUser
 from ..base import BasePermissionViewSet
 
 
@@ -23,7 +27,7 @@ class ApplicationPermissionViewSet(BasePermissionViewSet):
         'application_id', 'application', 'app', 'app_name'
     ]
     ordering_fields = ('name',)
-    ordering = ('name', )
+    ordering = ('name',)
 
     def get_queryset(self):
         queryset = super().get_queryset().prefetch_related(
@@ -53,3 +57,11 @@ class ApplicationPermissionViewSet(BasePermissionViewSet):
         queryset = self.filter_application(queryset)
         return queryset
 
+
+class ApplicationPermissionActionsApi(RetrieveAPIView):
+    permission_classes = (IsValidUser,)
+
+    def retrieve(self, request, *args, **kwargs):
+        category = request.GET.get('category')
+        actions = ApplicationPermission.get_include_actions_choices(category=category)
+        return Response(data=actions)

@@ -22,7 +22,6 @@ from ..serializers import (
 )
 from ..models import ConnectionToken
 
-
 __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
 
 
@@ -174,15 +173,23 @@ class ConnectionTokenMixin:
             rdp_options['remoteapplicationname:s'] = name
         else:
             name = '*'
-
-        filename = "{}-{}-jumpserver".format(token.user.username, name)
-        filename = urllib.parse.quote(filename)
+        prefix_name = f'{token.user.username}-{name}'
+        filename = self.get_connect_filename(prefix_name)
 
         content = ''
         for k, v in rdp_options.items():
             content += f'{k}:{v}\n'
 
         return filename, content
+
+    @staticmethod
+    def get_connect_filename(prefix_name):
+        prefix_name = prefix_name.replace('/', '_')
+        prefix_name = prefix_name.replace('\\', '_')
+        prefix_name = prefix_name.replace('.', '_')
+        filename = f'{prefix_name}-jumpserver'
+        filename = urllib.parse.quote(filename)
+        return filename
 
     def get_ssh_token(self, token: ConnectionToken):
         if token.asset:
@@ -191,7 +198,8 @@ class ConnectionTokenMixin:
             name = token.application.name
         else:
             name = '*'
-        filename = f'{token.user.username}-{name}-jumpserver'
+        prefix_name = f'{token.user.username}-{name}'
+        filename = self.get_connect_filename(prefix_name)
 
         endpoint = self.get_smart_endpoint(
             protocol='ssh', asset=token.asset, application=token.application
@@ -326,4 +334,3 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
             'msg': f'Token is renewed, date expired: {date_expired}'
         }
         return Response(data=data, status=status.HTTP_200_OK)
-

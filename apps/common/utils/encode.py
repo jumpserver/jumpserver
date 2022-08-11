@@ -196,7 +196,8 @@ def encrypt_password(password, salt=None, algorithm='sha512'):
         return des_crypt.hash(password, salt=salt[:2])
 
     support_algorithm = {
-        'sha512': sha512, 'des': des
+        'sha512': sha512,
+        'des': des
     }
 
     if isinstance(algorithm, str):
@@ -220,9 +221,6 @@ signer = get_signer()
 
 def ensure_last_char_is_ascii(data):
     remain = ''
-
-
-secret_pattern = re.compile(r'password|secret|key', re.IGNORECASE)
 
 
 def data_to_json(data, sort_keys=True, indent=2, cls=None):

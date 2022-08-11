@@ -7,7 +7,7 @@ from .auth import (
     LDAPSettingSerializer, OIDCSettingSerializer, KeycloakSettingSerializer,
     CASSettingSerializer, RadiusSettingSerializer, FeiShuSettingSerializer,
     WeComSettingSerializer, DingTalkSettingSerializer, AlibabaSMSSettingSerializer,
-    TencentSMSSettingSerializer,
+    TencentSMSSettingSerializer, CMPP2SMSSettingSerializer
 )
 from .terminal import TerminalSettingSerializer
 from .security import SecuritySettingSerializer
@@ -37,6 +37,7 @@ class SettingsSerializer(
     CleaningSerializer,
     AlibabaSMSSettingSerializer,
     TencentSMSSettingSerializer,
+    CMPP2SMSSettingSerializer,
 ):
     # encrypt_fields 现在使用 write_only 来判断了
     pass
