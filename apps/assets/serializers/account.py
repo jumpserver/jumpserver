@@ -25,7 +25,7 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         model = Account
         fields_mini = [
             'id', 'type', 'username', 'ip', 'hostname',
-            'platform', 'protocol', 'version'
+            'platform', 'version'
         ]
         fields_write_only = ['password', 'private_key', 'public_key', 'passphrase']
         fields_other = ['date_created', 'date_updated', 'connectivity', 'date_verified', 'comment']
