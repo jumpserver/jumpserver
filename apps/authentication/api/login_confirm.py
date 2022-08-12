@@ -22,8 +22,8 @@ class TicketStatusApi(mixins.AuthMixin, APIView):
             self.request.session['auth_third_party_done'] = 1
             return Response({"msg": "ok"})
         except errors.LoginConfirmOtherError as e:
+            self.send_auth_signal(success=False, user=request.user, username=request.user.name, reason=e.as_data().get('msg'))
             auth_logout(request)
-            self.send_auth_signal(success=False, reason=e.as_data().get('msg'))
             return Response(e.as_data(), status=200)
         except errors.NeedMoreInfoError as e:
             self.send_auth_signal(success=False, reason=e.as_data().get('msg'))
