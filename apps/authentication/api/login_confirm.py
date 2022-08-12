@@ -26,7 +26,6 @@ class TicketStatusApi(mixins.AuthMixin, APIView):
             auth_logout(request)
             return Response(e.as_data(), status=200)
         except errors.NeedMoreInfoError as e:
-            self.send_auth_signal(success=False, reason=e.as_data().get('msg'))
             return Response(e.as_data(), status=200)
 
     def delete(self, request, *args, **kwargs):
