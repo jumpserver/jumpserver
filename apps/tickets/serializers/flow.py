@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from orgs.models import Organization
+from orgs.utils import get_current_org_id
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from tickets.models import TicketFlow, ApprovalRule
 from tickets.const import TicketApprovalStrategy
@@ -96,7 +97,9 @@ class TicketFlowSerializer(OrgResourceModelSerializerMixin):
 
     @atomic
     def update(self, instance, validated_data):
-        if instance.org_id == Organization.ROOT_ID:
+        current_org_id = get_current_org_id()
+        root_org_id = Organization.ROOT_ID
+        if instance.org_id == root_org_id and current_org_id != root_org_id:
             instance = self.create(validated_data)
         else:
             instance = self.create_or_update('update', validated_data, instance)
