@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 #
+import ipaddress
 from urllib.parse import urljoin
 
 from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
 
 from common.utils import validate_ip, get_ip_city, get_request_ip
 from common.utils import get_logger
@@ -23,8 +25,9 @@ def check_different_city_login_if_need(user, request):
     else:
         city = get_ip_city(ip) or DEFAULT_CITY
 
-    city_white = ['LAN', ]
-    if city not in city_white:
+    city_white = [_('LAN'), 'LAN']
+    is_private = ipaddress.ip_address(ip).is_private
+    if not is_private:
         last_user_login = UserLoginLog.objects.exclude(city__in=city_white) \
             .filter(username=user.username, status=True).first()
 
