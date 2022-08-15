@@ -35,7 +35,7 @@ class Platform(models.Model):
     )
     # Accounts
     # 这应该和账号有关
-    su_enabled = models.BooleanField(default=False)
+    su_enabled = models.BooleanField(default=False, verbose_name=_("Su enabled"))
     su_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("SU method"))
     ping_enabled = models.BooleanField(default=False)
     ping_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Ping method"))

@@ -13,12 +13,11 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.db.models import QuerySet
 
-from common.utils import random_string, signer
+from common.utils import random_string
 from common.utils import (
-    ssh_key_string_to_obj, ssh_key_gen, get_logger, lazyproperty
+    ssh_key_string_to_obj, ssh_key_gen, get_logger
 )
 from common.utils.encode import ssh_pubkey_gen
-from common.validators import alphanumeric
 from common.db import fields
 from orgs.mixins.models import OrgModelMixin
 
@@ -188,35 +187,8 @@ class BaseUser(OrgModelMixin, AuthMixin):
     APPS_AMOUNT_CACHE_KEY = "APP_USER_{}_APPS_AMOUNT"
     APP_USER_CACHE_TIME = 600
 
-    def get_related_assets(self):
-        assets = self.assets.filter(org_id=self.org_id)
-        return assets
-
-    def get_related_apps(self):
-        from applications.models import Account
-        apps = Account.objects.filter(systemuser=self)
-        return apps
-
     def get_username(self):
         return self.username
-
-    @lazyproperty
-    def assets_amount(self):
-        cache_key = self.ASSETS_AMOUNT_CACHE_KEY.format(self.id)
-        cached = cache.get(cache_key)
-        if not cached:
-            cached = self.get_related_assets().count()
-            cache.set(cache_key, cached, self.ASSET_USER_CACHE_TIME)
-        return cached
-
-    @property
-    def apps_amount(self):
-        cache_key = self.APPS_AMOUNT_CACHE_KEY.format(self.id)
-        cached = cache.get(cache_key)
-        if not cached:
-            cached = self.get_related_apps().count()
-            cache.set(cache_key, cached, self.APP_USER_CACHE_TIME)
-        return cached
 
     def expire_assets_amount(self):
         cache_key = self.ASSETS_AMOUNT_CACHE_KEY.format(self.id)

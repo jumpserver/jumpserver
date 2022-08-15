@@ -12,19 +12,13 @@ from common.drf.serializers import SecretReadableMixin
 
 class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     ip = serializers.ReadOnlyField(label=_("IP"))
-    asset = serializers.ReadOnlyField(label=_("Asset"))
+    asset_name = serializers.ReadOnlyField(label=_("Asset"))
     platform = serializers.ReadOnlyField(label=_("Platform"))
-    date_created = serializers.DateTimeField(
-        label=_('Date created'), format="%Y/%m/%d %H:%M:%S", read_only=True
-    )
-    date_updated = serializers.DateTimeField(
-        label=_('Date updated'), format="%Y/%m/%d %H:%M:%S", read_only=True
-    )
 
     class Meta:
         model = Account
         fields_mini = [
-            'id', 'type', 'username', 'ip', 'name',
+            'id', 'privileged', 'username', 'ip', 'asset_name',
             'platform', 'version'
         ]
         fields_write_only = ['password', 'private_key', 'public_key', 'passphrase']
@@ -59,7 +53,7 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         """ Perform necessary eager loading of data. """
         queryset = queryset.prefetch_related('asset')\
             .annotate(ip=F('asset__ip')) \
-            .annotate(asset=F('asset__name'))
+            .annotate(asset_name=F('asset__name'))
         return queryset
 
 

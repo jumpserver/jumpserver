@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
 from common.db.models import JMSBaseModel
+from common.db import fields
 from .base import BaseUser, AbsConnectivity
 
 
@@ -10,11 +11,8 @@ __all__ = ['Account']
 
 
 class Account(BaseUser, AbsConnectivity):
-    class Type(models.TextChoices):
-        common = 'common', _('Common user')
-        admin = 'admin', _('Admin user')
-
-    type = models.CharField(max_length=16, choices=Type.choices, default=Type.common, verbose_name=_("Type"))
+    token = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Token'))
+    privileged = models.BooleanField(verbose_name=_("Privileged account"), default=False)
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, verbose_name=_('Asset'))
     version = models.IntegerField(default=0, verbose_name=_('Version'))
     history = HistoricalRecords()
