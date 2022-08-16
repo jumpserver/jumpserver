@@ -87,7 +87,7 @@ class BaseTicketMessage(UserMessage):
     @property
     def spec_items(self):
         fields = self.ticket._meta.local_fields + self.ticket._meta.local_many_to_many
-        excludes = ['ticket_ptr']
+        excludes = ['ticket_ptr', 'flow']
         item_names = [field.name for field in fields if field.name not in excludes]
         return self._get_fields_items(item_names)
 

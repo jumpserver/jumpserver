@@ -56,7 +56,8 @@ class BlockGlobalIpLoginError(AuthFailedError):
     error = 'block_global_ip_login'
 
     def __init__(self, username, ip, **kwargs):
-        self.msg = const.block_ip_login_msg.format(settings.SECURITY_LOGIN_IP_LIMIT_TIME)
+        if not self.msg:
+            self.msg = const.block_ip_login_msg.format(settings.SECURITY_LOGIN_IP_LIMIT_TIME)
         LoginIpBlockUtil(ip).set_block_if_need()
         super().__init__(username=username, ip=ip, **kwargs)
 
@@ -66,22 +67,21 @@ class CredentialError(
     BlockGlobalIpLoginError, AuthFailedError
 ):
     def __init__(self, error, username, ip, request):
-        super().__init__(error=error, username=username, ip=ip, request=request)
         util = LoginBlockUtil(username, ip)
         times_remainder = util.get_remainder_times()
         block_time = settings.SECURITY_LOGIN_LIMIT_TIME
-
         if times_remainder < 1:
             self.msg = const.block_user_login_msg.format(settings.SECURITY_LOGIN_LIMIT_TIME)
-            return
-
-        default_msg = const.invalid_login_msg.format(
-            times_try=times_remainder, block_time=block_time
-        )
-        if error == const.reason_password_failed:
-            self.msg = default_msg
         else:
-            self.msg = const.reason_choices.get(error, default_msg)
+            default_msg = const.invalid_login_msg.format(
+                times_try=times_remainder, block_time=block_time
+            )
+            if error == const.reason_password_failed:
+                self.msg = default_msg
+            else:
+                self.msg = const.reason_choices.get(error, default_msg)
+        # 先处理 msg 在 super，记录日志时原因才准确
+        super().__init__(error=error, username=username, ip=ip, request=request)
 
 
 class MFAFailedError(AuthFailedNeedLogMixin, AuthFailedError):
