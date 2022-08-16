@@ -11,7 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.utils import get_logger, lazyproperty
 from orgs.mixins.models import OrgModelMixin
-from .base import BaseUser
+from .base import BaseAccount
 
 logger = get_logger(__file__)
 
@@ -50,7 +50,7 @@ class Domain(OrgModelMixin):
             return random.choice(self.gateways)
 
 
-class Gateway(BaseUser):
+class Gateway(BaseAccount):
     UNCONNECTIVE_KEY_TMPL = 'asset_unconnective_gateway_{}'
     UNCONNECTIVE_SILENCE_PERIOD_KEY_TMPL = 'asset_unconnective_gateway_silence_period_{}'
     UNCONNECTIVE_SILENCE_PERIOD_BEGIN_VALUE = 60 * 5

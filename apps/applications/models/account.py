@@ -4,11 +4,11 @@ from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import lazyproperty
-from assets.models.base import BaseUser
+from assets.models.base import BaseAccount
 from assets.models import SystemUser
 
 
-class Account(BaseUser):
+class Account(BaseAccount):
     app = models.ForeignKey(
         'applications.Application', on_delete=models.CASCADE, null=True, verbose_name=_('Application')
     )

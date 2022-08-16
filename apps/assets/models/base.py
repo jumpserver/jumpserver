@@ -169,13 +169,14 @@ class AuthMixin:
         )
 
 
-class BaseUser(OrgModelMixin, AuthMixin):
+class BaseAccount(OrgModelMixin, AuthMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     username = models.CharField(max_length=128, blank=True, verbose_name=_('Username'), db_index=True)
     password = fields.EncryptCharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
     private_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH private key'))
     public_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH public key'))
+    # token = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Token'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))

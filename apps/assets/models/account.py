@@ -2,14 +2,13 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
-from common.db.models import JMSBaseModel
 from common.db import fields
-from .base import BaseUser, AbsConnectivity
+from .base import BaseAccount, AbsConnectivity
 
 __all__ = ['Account']
 
 
-class Account(BaseUser, AbsConnectivity):
+class Account(BaseAccount, AbsConnectivity):
     token = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Token'))
     privileged = models.BooleanField(verbose_name=_("Privileged account"), default=False)
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, verbose_name=_('Asset'))
@@ -28,15 +27,3 @@ class Account(BaseUser, AbsConnectivity):
 
     def __str__(self):
         return '{}@{}'.format(self.username, self.asset.name)
-
-
-class AccountTemplate(BaseUser, AbsConnectivity):
-    type = models.CharField(
-        max_length=16, choices=Account.Type.choices, default=Account.Type.common, verbose_name=_("Type")
-    )
-
-    class Meta:
-        verbose_name = _('Account Template')
-
-    def __str__(self):
-        return '{}'.format(self.username)

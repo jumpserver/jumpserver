@@ -9,7 +9,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import ugettext_lazy as _
 
 from users.models import User, UserGroup
-from ..models import SystemUser, Asset
+from ..models import Asset
 
 from common.utils import lazyproperty, get_logger, get_object_or_none
 from orgs.mixins.models import OrgModelMixin
@@ -36,13 +36,7 @@ class CommandFilter(OrgModelMixin):
         'assets.Asset', related_name='cmd_filters', blank=True,
         verbose_name=_("Asset")
     )
-    system_users = models.ManyToManyField(
-        'assets.SystemUser', related_name='cmd_filters', blank=True,
-        verbose_name=_("System user"))
-    applications = models.ManyToManyField(
-        'applications.Application', related_name='cmd_filters', blank=True,
-        verbose_name=_("Application")
-    )
+    accounts = models.JSONField(default=list, verbose_name=_("Accounts"))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     comment = models.TextField(blank=True, default='', verbose_name=_("Comment"))
     date_created = models.DateTimeField(auto_now_add=True)

@@ -10,7 +10,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 from assets.const import Protocol
 from common.utils import signer
-from .base import BaseUser
+from .base import BaseAccount
 from .protocol import ProtocolMixin
 
 
@@ -18,7 +18,7 @@ __all__ = ['SystemUser']
 logger = logging.getLogger(__name__)
 
 
-class SystemUser(ProtocolMixin, BaseUser):
+class SystemUser(ProtocolMixin, BaseAccount):
     LOGIN_AUTO = 'auto'
     LOGIN_MANUAL = 'manual'
     LOGIN_MODE_CHOICES = (
@@ -143,7 +143,7 @@ class SystemUser(ProtocolMixin, BaseUser):
 
 
 # Deprecated: 准备废弃
-class AdminUser(BaseUser):
+class AdminUser(BaseAccount):
     """
     A privileged user that ansible can use it to push system user and so on
     """

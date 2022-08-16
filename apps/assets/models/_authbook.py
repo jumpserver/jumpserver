@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from simple_history.models import HistoricalRecords
 
 from common.utils import lazyproperty, get_logger
-from .base import BaseUser, AbsConnectivity
+from .base import BaseAccount, AbsConnectivity
 
 logger = get_logger(__name__)
 
@@ -15,7 +15,7 @@ logger = get_logger(__name__)
 __all__ = ['AuthBook']
 
 
-class AuthBook(BaseUser, AbsConnectivity):
+class AuthBook(BaseAccount, AbsConnectivity):
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, verbose_name=_('Asset'))
     systemuser = models.ForeignKey('assets.SystemUser', on_delete=models.CASCADE, null=True, verbose_name=_("System user"))
     version = models.IntegerField(default=1, verbose_name=_('Version'))
