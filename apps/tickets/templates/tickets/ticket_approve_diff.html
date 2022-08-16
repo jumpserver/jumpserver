@@ -2,6 +2,7 @@
 <html lang="en">
 <body>
 <p> {{ approve_info }}</p>
+{% if content %}
 <br>
 <div style="width:100%; overflow-x:scroll;">
     <table style="width:1000px; text-align:left">
@@ -20,5 +21,6 @@
 
     </table>
 </div>
+{% endif %}
 </body>
 </html>
