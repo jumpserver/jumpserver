@@ -6,7 +6,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404
 from assets.models import Asset
 from orgs.utils import tmp_to_root_org
-from applications.models import Application
 from terminal.models import Session
 from common.permissions import IsValidUser
 from ..models import Endpoint, EndpointRule
@@ -52,21 +51,16 @@ class SmartEndpointViewMixin:
     @staticmethod
     def get_target_instance(request):
         asset_id = request.GET.get('asset_id')
-        app_id = request.GET.get('app_id')
         session_id = request.GET.get('session_id')
         token_id = request.GET.get('token')
         if token_id:
             from authentication.models import ConnectionToken
             token = ConnectionToken.objects.filter(id=token_id).first()
-            if token:
-                if token.asset:
-                    asset_id = token.asset.id
-                elif token.application:
-                    app_id = token.application.id
+            if token and token.asset:
+                asset_id = token.asset.id
+
         if asset_id:
             pk, model = asset_id, Asset
-        elif app_id:
-            pk, model = app_id, Application
         elif session_id:
             pk, model = session_id, Session
         else:

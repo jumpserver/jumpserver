@@ -12,7 +12,6 @@ from django.core.cache import cache
 
 from assets.models import Asset
 from assets.const import Protocol
-from applications.models import Application
 from users.models import User
 from orgs.mixins.models import OrgModelMixin
 from django.db.models import TextChoices

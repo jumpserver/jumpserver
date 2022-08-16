@@ -80,25 +80,12 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
         related_name='connection_tokens', null=True, blank=True
     )
     user_display = models.CharField(max_length=128, default='', verbose_name=_("User display"))
-    system_user = models.ForeignKey(
-        'assets.SystemUser', on_delete=models.SET_NULL, verbose_name=_('System user'),
-        related_name='connection_tokens', null=True, blank=True
-    )
-    system_user_display = models.CharField(
-        max_length=128, default='', verbose_name=_("System user display")
-    )
     asset = models.ForeignKey(
         'assets.Asset', on_delete=models.SET_NULL, verbose_name=_('Asset'),
         related_name='connection_tokens', null=True, blank=True
     )
     asset_display = models.CharField(max_length=128, default='', verbose_name=_("Asset display"))
-    application = models.ForeignKey(
-        'applications.Application', on_delete=models.SET_NULL, verbose_name=_('Application'),
-        related_name='connection_tokens', null=True, blank=True
-    )
-    application_display = models.CharField(
-        max_length=128, default='', verbose_name=_("Application display")
-    )
+    account = models.CharField(max_length=128, default='', verbose_name=_("Account"))
 
     class Meta:
         ordering = ('-date_expired',)

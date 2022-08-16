@@ -4,7 +4,7 @@ from django.db.models import Subquery, OuterRef
 from common.drf.filters import BaseFilterSet
 
 from tickets.models import (
-    Ticket, TicketStep, ApplyAssetTicket, ApplyApplicationTicket,
+    Ticket, TicketStep, ApplyAssetTicket,
     ApplyLoginTicket, ApplyLoginAssetTicket, ApplyCommandTicket
 )
 
@@ -31,12 +31,6 @@ class TicketFilter(BaseFilterSet):
 class ApplyAssetTicketFilter(BaseFilterSet):
     class Meta:
         model = ApplyAssetTicket
-        fields = ('id',)
-
-
-class ApplyApplicationTicketFilter(BaseFilterSet):
-    class Meta:
-        model = ApplyApplicationTicket
         fields = ('id',)
 
 

@@ -13,13 +13,12 @@ MODELS_NEED_RECORD = (
     'Asset', 'Node', 'AdminUser', 'SystemUser', 'Domain', 'Gateway', 'CommandFilterRule',
     'CommandFilter', 'Platform', 'Account',
     # applications
-    'Application',
     # orgs
     'Organization',
     # settings
     'Setting',
     # perms
-    'AssetPermission', 'ApplicationPermission',
+    'AssetPermission',
     # xpack
     'License', 'Account', 'SyncInstanceTask', 'ChangeAuthPlan', 'GatherUserTask',
 )

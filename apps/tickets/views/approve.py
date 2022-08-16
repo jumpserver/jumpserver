@@ -9,7 +9,7 @@ from django.utils.translation import ugettext as _
 
 from orgs.utils import tmp_to_root_org
 from tickets.models import (
-    Ticket, ApplyAssetTicket, ApplyApplicationTicket,
+    Ticket, ApplyAssetTicket,
     ApplyLoginTicket, ApplyLoginAssetTicket, ApplyCommandTicket
 )
 from tickets.const import TicketType
@@ -27,7 +27,6 @@ class TicketDirectApproveView(TemplateView):
 
     TICKET_SUB_MODEL_MAP = {
         TicketType.apply_asset: ApplyAssetTicket,
-        TicketType.apply_application: ApplyApplicationTicket,
         TicketType.login_confirm: ApplyLoginTicket,
         TicketType.login_asset_confirm: ApplyLoginAssetTicket,
         TicketType.command_confirm: ApplyCommandTicket,

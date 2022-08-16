@@ -6,7 +6,6 @@ from assets.models import Node
 from perms.models import AssetPermission
 from users.models import UserGroup, User
 from users.signals import pre_user_leave_org
-from applications.models import Application
 from terminal.models import Session
 from rbac.models import OrgRoleBinding, SystemRoleBinding, RoleBinding
 from assets.models import Asset, SystemUser, Domain, Gateway
@@ -76,7 +75,6 @@ def on_user_delete_refresh_cache(sender, instance, **kwargs):
 class OrgResourceStatisticsRefreshUtil:
     model_cache_field_mapper = {
         AssetPermission: ['asset_perms_amount'],
-        Application: ['applications_amount'],
         Gateway: ['gateways_amount'],
         Domain: ['domains_amount'],
         SystemUser: ['system_users_amount', 'admin_users_amount'],

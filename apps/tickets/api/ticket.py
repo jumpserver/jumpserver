@@ -15,7 +15,7 @@ from tickets import serializers
 from tickets import filters
 from tickets.permissions.ticket import IsAssignee, IsApplicant
 from tickets.models import (
-    Ticket, ApplyAssetTicket, ApplyApplicationTicket,
+    Ticket, ApplyAssetTicket,
     ApplyLoginTicket, ApplyLoginAssetTicket, ApplyCommandTicket
 )
 

@@ -7,7 +7,6 @@ from common.utils import pretty_string
 from common.utils.random import random_string
 from assets.models import Asset, SystemUser, Gateway, Domain, CommandFilterRule
 from users.models import User
-from applications.models import Application
 from perms.serializers.base import ActionsField
 
 
@@ -66,9 +65,6 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         if isinstance(asset, Asset):
             tp = ConnectionToken.Type.asset
             org_id = asset.org_id
-        elif isinstance(application, Application):
-            tp = ConnectionToken.Type.application
-            org_id = application.org_id
         else:
             raise serializers.ValidationError(_('Asset or application required'))
 
@@ -148,14 +144,6 @@ class ConnectionTokenRemoteAppSerializer(serializers.Serializer):
     parameters = serializers.CharField(allow_null=True, allow_blank=True)
 
 
-class ConnectionTokenApplicationSerializer(serializers.ModelSerializer):
-    attrs = serializers.JSONField(read_only=True)
-
-    class Meta:
-        model = Application
-        fields = ['id', 'name', 'category', 'type', 'attrs', 'org_id']
-
-
 class ConnectionTokenDomainSerializer(serializers.ModelSerializer):
     gateways = ConnectionTokenGatewaySerializer(many=True, read_only=True)
 
@@ -176,7 +164,6 @@ class ConnectionTokenCmdFilterRuleSerializer(serializers.ModelSerializer):
 class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     user = ConnectionTokenUserSerializer(read_only=True)
     asset = ConnectionTokenAssetSerializer(read_only=True)
-    application = ConnectionTokenApplicationSerializer(read_only=True)
     remote_app = ConnectionTokenRemoteAppSerializer(read_only=True)
     system_user = ConnectionTokenSystemUserSerializer(read_only=True)
     gateway = ConnectionTokenGatewaySerializer(read_only=True)

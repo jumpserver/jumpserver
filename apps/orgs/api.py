@@ -17,7 +17,6 @@ from assets.models import (
     Asset, Domain, SystemUser, Label, Node, Gateway,
     CommandFilter, CommandFilterRule, GatheredUser
 )
-from applications.models import Application
 from perms.models import AssetPermission
 from orgs.utils import current_org, tmp_to_root_org
 from common.utils import get_logger
@@ -31,7 +30,6 @@ org_related_models = [
     User, UserGroup, Asset, Label, Domain, Gateway, Node, SystemUser, Label,
     CommandFilter, CommandFilterRule, GatheredUser,
     AssetPermission,
-    Application,
 ]
 
 

@@ -10,9 +10,6 @@ from rest_framework import serializers
 from assets.models import Account
 from assets.serializers import AccountSecretSerializer
 from assets.notifications import AccountBackupExecutionTaskMsg
-from applications.models import Account
-from applications.const import AppType
-from applications.serializers import AppAccountSecretSerializer
 from users.models import User
 from common.utils import get_logger
 from common.utils.timezone import local_now_display
@@ -76,7 +73,7 @@ class AssetAccountHandler(BaseAccountHandler):
         data_map = defaultdict(list)
         sheet_name = Account._meta.verbose_name
 
-        accounts = Account.get_queryset()
+        accounts = Account.objects.all()
         if not accounts.first():
             return data_map
 
@@ -91,34 +88,8 @@ class AssetAccountHandler(BaseAccountHandler):
         logger.info('\n\033[33m- 共收集 {} 条资产账号\033[0m'.format(accounts.count()))
         return data_map
 
-
-class AppAccountHandler(BaseAccountHandler):
-    @staticmethod
-    def get_filename(plan_name):
-        filename = os.path.join(
-            PATH, f'{plan_name}-{_("Application")}-{local_now_display()}-{time.time()}.xlsx'
-        )
-        return filename
-
-    @classmethod
-    def create_data_map(cls):
-        data_map = defaultdict(list)
-        accounts = Account.get_queryset().select_related('systemuser')
-        for account in accounts:
-            account.load_auth()
-            app_type = account.type
-            sheet_name = AppType.get_label(app_type)
-            row = cls.create_row(account, AppAccountSecretSerializer)
-            if sheet_name not in data_map:
-                data_map[sheet_name].append(list(row.keys()))
-            data_map[sheet_name].append(list(row.values()))
-        logger.info('\n\033[33m- 共收集{}条应用账号\033[0m'.format(accounts.count()))
-        return data_map
-
-
 handler_map = {
     'asset': AssetAccountHandler,
-    'application': AppAccountHandler
 }
 
 

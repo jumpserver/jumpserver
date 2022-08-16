@@ -12,7 +12,6 @@ from .base import AuthSerializerMixin
 
 class DomainSerializer(BulkOrgResourceModelSerializer):
     asset_count = serializers.SerializerMethodField(label=_('Assets amount'))
-    application_count = serializers.SerializerMethodField(label=_('Applications amount'))
     gateway_count = serializers.SerializerMethodField(label=_('Gateways count'))
 
     class Meta:
@@ -22,7 +21,7 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
             'comment', 'date_created'
         ]
         fields_m2m = [
-            'asset_count', 'assets', 'application_count', 'gateway_count',
+            'asset_count', 'assets', 'gateway_count',
         ]
         fields = fields_small + fields_m2m
         read_only_fields = ('asset_count', 'gateway_count', 'date_created')
@@ -33,10 +32,6 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
     @staticmethod
     def get_asset_count(obj):
         return obj.assets.count()
-
-    @staticmethod
-    def get_application_count(obj):
-        return obj.applications.count()
 
     @staticmethod
     def get_gateway_count(obj):
