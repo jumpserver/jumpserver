@@ -126,9 +126,12 @@ class CommandExecutionViewSet(ListModelMixin, OrgGenericViewSet):
 class CommandExecutionHostRelationViewSet(OrgRelationMixin, OrgBulkModelViewSet):
     serializer_class = CommandExecutionHostsRelationSerializer
     m2m_field = CommandExecution.hosts.field
-    filterset_fields = [
-        'id', 'asset', 'commandexecution'
-    ]
+    filterset_fields = {
+        'id': ['exact'],
+        'asset': ['exact'],
+        'asset__hostname': ['icontains'],
+        'commandexecution': ['exact'],
+    }
     search_fields = ('asset__hostname', )
     http_method_names = ['options', 'get']
     rbac_perms = {
