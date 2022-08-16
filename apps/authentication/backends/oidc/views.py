@@ -13,10 +13,11 @@ import time
 
 from django.conf import settings
 from django.contrib import auth
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import SuspiciousOperation, PermissionDenied
 from django.http import HttpResponseRedirect, QueryDict
 from django.urls import reverse
 from django.utils.crypto import get_random_string
+from django.utils.translation import gettext_lazy as _
 from django.utils.http import is_safe_url, urlencode
 from django.views.generic import View
 
@@ -157,6 +158,8 @@ class OIDCAuthCallbackView(View):
                 return HttpResponseRedirect(
                     next_url or settings.AUTH_OPENID_AUTHENTICATION_REDIRECT_URI
                 )
+            else:
+                raise PermissionDenied(_('Login failed.'))
 
         if 'error' in callback_params:
             logger.debug(

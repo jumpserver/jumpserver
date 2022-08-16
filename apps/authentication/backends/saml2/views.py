@@ -6,6 +6,8 @@ from django.views import View
 from django.contrib import auth as auth
 from django.urls import reverse
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseServerError
 
@@ -269,6 +271,8 @@ class Saml2AuthCallbackView(View, PrepareRequestMixin):
         if user and user.is_valid:
             logger.debug(log_prompt.format('Login: {}'.format(user)))
             auth.login(self.request, user)
+        else:
+            raise PermissionDenied(_('Login failed.'))
 
         logger.debug(log_prompt.format('Redirect'))
         next_url = saml_instance.redirect_to(post_data.get('RelayState', '/'))
