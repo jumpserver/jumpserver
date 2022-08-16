@@ -20,8 +20,9 @@ from tickets.models import (
 )
 
 __all__ = [
-    'TicketViewSet', 'ApplyAssetTicketViewSet', 'ApplyApplicationTicketViewSet',
-    'ApplyLoginTicketViewSet', 'ApplyLoginAssetTicketViewSet', 'ApplyCommandTicketViewSet'
+    'TicketViewSet', 'ApplyAssetTicketViewSet',
+    'ApplyLoginTicketViewSet', 'ApplyLoginAssetTicketViewSet',
+    'ApplyCommandTicketViewSet'
 ]
 
 
@@ -102,16 +103,6 @@ class ApplyAssetTicketViewSet(TicketViewSet):
     }
     model = ApplyAssetTicket
     filterset_class = filters.ApplyAssetTicketFilter
-
-
-class ApplyApplicationTicketViewSet(TicketViewSet):
-    serializer_class = serializers.ApplyApplicationDisplaySerializer
-    serializer_classes = {
-        'open': serializers.ApplyApplicationSerializer,
-        'approve': serializers.ApproveApplicationSerializer
-    }
-    model = ApplyApplicationTicket
-    filterset_class = filters.ApplyApplicationTicketFilter
 
 
 class ApplyLoginTicketViewSet(TicketViewSet):

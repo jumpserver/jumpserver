@@ -2,4 +2,3 @@
 #
 
 from .asset import *
-from .application import *

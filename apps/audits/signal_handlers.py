@@ -27,7 +27,7 @@ from .utils import write_login_log, create_operate_log
 from . import models, serializers
 from .models import OperateLog
 from orgs.utils import current_org
-from perms.models import AssetPermission, ApplicationPermission
+from perms.models import AssetPermission
 from terminal.backends.command.serializers import SessionCommandSerializer
 from terminal.serializers import SessionSerializer
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR
@@ -93,26 +93,6 @@ M2M_NEED_RECORD = {
         _('Node permission'),
         _('{AssetPermission} ADD {Node}'),
         _('{AssetPermission} REMOVE {Node}'),
-    ),
-    ApplicationPermission.users.through._meta.object_name: (
-        _('User application permissions'),
-        _('{ApplicationPermission} ADD {User}'),
-        _('{ApplicationPermission} REMOVE {User}'),
-    ),
-    ApplicationPermission.user_groups.through._meta.object_name: (
-        _('User group application permissions'),
-        _('{ApplicationPermission} ADD {UserGroup}'),
-        _('{ApplicationPermission} REMOVE {UserGroup}'),
-    ),
-    ApplicationPermission.applications.through._meta.object_name: (
-        _('Application permission'),
-        _('{ApplicationPermission} ADD {Application}'),
-        _('{ApplicationPermission} REMOVE {Application}'),
-    ),
-    ApplicationPermission.system_users.through._meta.object_name: (
-        _('Application permission and SystemUser'),
-        _('{ApplicationPermission} ADD {SystemUser}'),
-        _('{ApplicationPermission} REMOVE {SystemUser}'),
     ),
 }
 

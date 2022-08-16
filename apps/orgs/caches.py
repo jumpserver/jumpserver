@@ -9,7 +9,7 @@ from users.models import UserGroup, User
 from assets.models import Node, SystemUser, Domain, Gateway, Asset
 from terminal.models import Session
 from applications.models import Application
-from perms.models import AssetPermission, ApplicationPermission
+from perms.models import AssetPermission
 
 logger = get_logger(__file__)
 
@@ -61,7 +61,6 @@ class OrgResourceStatisticsCache(OrgRelatedCache):
     applications_amount = IntegerField(queryset=Application.objects)
 
     asset_perms_amount = IntegerField(queryset=AssetPermission.objects)
-    app_perms_amount = IntegerField(queryset=ApplicationPermission.objects)
 
     total_count_online_users = IntegerField()
     total_count_online_sessions = IntegerField()

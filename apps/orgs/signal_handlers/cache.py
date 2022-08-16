@@ -1,10 +1,9 @@
-from functools import wraps
 from django.db.models.signals import post_save, pre_delete, pre_save, post_delete
 from django.dispatch import receiver
 
 from orgs.models import Organization
 from assets.models import Node
-from perms.models import AssetPermission, ApplicationPermission
+from perms.models import AssetPermission
 from users.models import UserGroup, User
 from users.signals import pre_user_leave_org
 from applications.models import Application
@@ -76,7 +75,6 @@ def on_user_delete_refresh_cache(sender, instance, **kwargs):
 
 class OrgResourceStatisticsRefreshUtil:
     model_cache_field_mapper = {
-        ApplicationPermission: ['app_perms_amount'],
         AssetPermission: ['asset_perms_amount'],
         Application: ['applications_amount'],
         Gateway: ['gateways_amount'],
