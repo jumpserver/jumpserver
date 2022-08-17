@@ -14,9 +14,6 @@ class ApplyAssetTicket(Ticket):
     apply_nodes = models.ManyToManyField('assets.Node', verbose_name=_('Apply nodes'))
     # 申请信息
     apply_assets = models.ManyToManyField('assets.Asset', verbose_name=_('Apply assets'))
-    apply_system_users = models.ManyToManyField(
-        'assets.SystemUser', verbose_name=_('Apply system users')
-    )
     apply_accounts = models.JSONField(default=list, verbose_name=_('Apply accounts'))
     apply_actions = models.IntegerField(
         choices=Action.DB_CHOICES, default=Action.ALL, verbose_name=_('Actions')

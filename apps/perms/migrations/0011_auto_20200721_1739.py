@@ -3,7 +3,7 @@
 from django.db import migrations, models
 
 from django.db.models import F
-from ..models.base import Action
+from perms.models import Action
 
 
 def migrate_asset_permission(apps, schema_editor):

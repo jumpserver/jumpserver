@@ -15,8 +15,6 @@ class ApplyLoginAssetTicket(Ticket):
         'assets.Asset', on_delete=models.SET_NULL, null=True,
         verbose_name=_('Login asset'),
     )
-    apply_login_system_user = models.ForeignKey(
-        'assets.SystemUser', on_delete=models.SET_NULL, null=True,
-        verbose_name=_('Login system user'),
+    apply_login_account = models.CharField(
+        max_length=128, default='', verbose_name=_('Login account')
     )
-    apply_login_account = models.CharField(max_length=128, verbose_name=_('Login account'))

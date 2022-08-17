@@ -9,7 +9,6 @@ from django.conf import settings
 
 from assets.models import Asset, Node
 from orgs.mixins.api import RootOrgViewMixin
-from common.permissions import IsValidUser
 from rbac.permissions import RBACPermission
 from ..models import CommandExecution
 from ..serializers import CommandExecutionSerializer
