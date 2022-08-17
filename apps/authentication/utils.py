@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import ipaddress
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
@@ -39,7 +39,11 @@ def build_absolute_uri(request, path=None):
     """ Build absolute redirect """
     if path is None:
         path = '/'
-    redirect_uri = request.build_absolute_uri(path)
+    site_url = urlparse(settings.SITE_URL)
+    scheme = site_url.scheme or request.scheme
+    host = request.get_host()
+    url = f'{scheme}://{host}'
+    redirect_uri = urljoin(url, path)
     return redirect_uri
 
 
@@ -50,6 +54,5 @@ def build_absolute_uri_for_oidc(request, path=None):
     if settings.BASE_SITE_URL:
         # OIDC 专用配置项
         redirect_uri = urljoin(settings.BASE_SITE_URL, path)
-    else:
-        redirect_uri = request.build_absolute_uri(path)
-    return redirect_uri
+        return redirect_uri
+    return build_absolute_uri(request, path=path)
