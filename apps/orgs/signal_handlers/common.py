@@ -147,6 +147,9 @@ def _clear_users_from_org(org, users):
 @receiver(post_save, sender=User)
 @on_transaction_commit
 def on_user_created_set_default_org(sender, instance, created, **kwargs):
+    if not instance.id:
+        # 用户已被手动删除，instance.orgs 时会使用 id 进行查找报错，所以判断不存在id时不做处理
+        return
     if not created:
         return
     if instance.orgs.count() > 0:
