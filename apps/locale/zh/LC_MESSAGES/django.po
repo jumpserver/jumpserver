@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-10 19:03+0800\n"
+"POT-Creation-Date: 2022-08-17 16:28+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -347,7 +347,7 @@ msgstr "类别名称"
 #: assets/serializers/cmd_filter.py:34 assets/serializers/system_user.py:34
 #: audits/serializers.py:29 authentication/serializers/connection_token.py:22
 #: perms/serializers/application/permission.py:19
-#: tickets/serializers/flow.py:48 tickets/serializers/ticket/ticket.py:17
+#: tickets/serializers/flow.py:49 tickets/serializers/ticket/ticket.py:17
 msgid "Type display"
 msgstr "类型名称"
 
@@ -388,7 +388,7 @@ msgstr "集群"
 
 #: applications/serializers/attrs/application_category/db.py:11
 #: ops/models/adhoc.py:157 settings/serializers/auth/radius.py:14
-#: settings/serializers/auth/sms.py:52 terminal/models/endpoint.py:11
+#: settings/serializers/auth/sms.py:56 terminal/models/endpoint.py:11
 #: xpack/plugins/cloud/serializers/account_attrs.py:72
 msgid "Host"
 msgstr "主机"
@@ -402,7 +402,7 @@ msgstr "主机"
 #: applications/serializers/attrs/application_type/redis.py:10
 #: applications/serializers/attrs/application_type/sqlserver.py:10
 #: assets/models/asset.py:214 assets/models/domain.py:62
-#: settings/serializers/auth/radius.py:15 settings/serializers/auth/sms.py:53
+#: settings/serializers/auth/radius.py:15 settings/serializers/auth/sms.py:57
 #: xpack/plugins/cloud/serializers/account_attrs.py:73
 msgid "Port"
 msgstr "端口"
@@ -957,7 +957,7 @@ msgstr "资产组"
 msgid "Default asset group"
 msgstr "默认资产组"
 
-#: assets/models/label.py:19 assets/models/node.py:546 settings/models.py:34
+#: assets/models/label.py:19 assets/models/node.py:553 settings/models.py:34
 msgid "Value"
 msgstr "值"
 
@@ -965,32 +965,32 @@ msgstr "值"
 msgid "Label"
 msgstr "标签"
 
-#: assets/models/node.py:151
+#: assets/models/node.py:158
 msgid "New node"
 msgstr "新节点"
 
-#: assets/models/node.py:474
+#: assets/models/node.py:481
 msgid "empty"
 msgstr "空"
 
-#: assets/models/node.py:545 perms/models/asset_permission.py:101
+#: assets/models/node.py:552 perms/models/asset_permission.py:101
 msgid "Key"
 msgstr "键"
 
-#: assets/models/node.py:547 assets/serializers/node.py:20
+#: assets/models/node.py:554 assets/serializers/node.py:20
 msgid "Full value"
 msgstr "全称"
 
-#: assets/models/node.py:550 perms/models/asset_permission.py:102
+#: assets/models/node.py:557 perms/models/asset_permission.py:102
 msgid "Parent key"
 msgstr "ssh私钥"
 
-#: assets/models/node.py:559 assets/serializers/system_user.py:267
+#: assets/models/node.py:566 assets/serializers/system_user.py:267
 #: xpack/plugins/cloud/models.py:96 xpack/plugins/cloud/serializers/task.py:70
 msgid "Node"
 msgstr "节点"
 
-#: assets/models/node.py:562
+#: assets/models/node.py:569
 msgid "Can match node"
 msgstr "可以匹配节点"
 
@@ -2011,15 +2011,15 @@ msgstr "没有绑定飞书"
 msgid "Your password is invalid"
 msgstr "您的密码无效"
 
-#: authentication/errors/redirect.py:79 authentication/mixins.py:306
+#: authentication/errors/redirect.py:85 authentication/mixins.py:306
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors/redirect.py:87 authentication/mixins.py:313
+#: authentication/errors/redirect.py:93 authentication/mixins.py:313
 msgid "You should to change your password before login"
 msgstr "登录完成前，请先修改密码"
 
-#: authentication/errors/redirect.py:95 authentication/mixins.py:320
+#: authentication/errors/redirect.py:101 authentication/mixins.py:320
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
@@ -2434,9 +2434,14 @@ msgstr "复制链接"
 msgid "Return"
 msgstr "返回"
 
-#: authentication/templates/authentication/login_wait_confirm.html:113
+#: authentication/templates/authentication/login_wait_confirm.html:116
 msgid "Copy success"
 msgstr "复制成功"
+
+#: authentication/utils.py:28 common/utils/ip/geoip/utils.py:24
+#: xpack/plugins/cloud/const.py:24
+msgid "LAN"
+msgstr "局域网"
 
 #: authentication/views/dingtalk.py:41
 msgid "DingTalk Error, Please contact your system administrator"
@@ -2732,10 +2737,6 @@ msgstr "验证码错误"
 msgid "Please wait {} seconds before sending"
 msgstr "请在 {} 秒后发送"
 
-#: common/utils/ip/geoip/utils.py:24 xpack/plugins/cloud/const.py:24
-msgid "LAN"
-msgstr "局域网"
-
 #: common/utils/ip/geoip/utils.py:26 common/utils/ip/utils.py:78
 msgid "Invalid ip"
 msgstr "无效IP"
@@ -3009,7 +3010,7 @@ msgstr "组织存在资源 ({}) 不能被删除"
 msgid "App organizations"
 msgstr "组织管理"
 
-#: orgs/mixins/models.py:57 orgs/mixins/serializers.py:25 orgs/models.py:85
+#: orgs/mixins/models.py:56 orgs/mixins/serializers.py:25 orgs/models.py:85
 #: orgs/models.py:217 rbac/const.py:7 rbac/models/rolebinding.py:48
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:62
 #: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:71
@@ -3804,50 +3805,50 @@ msgstr "SP 密钥"
 msgid "SP cert"
 msgstr "SP 证书"
 
-#: settings/serializers/auth/sms.py:14
+#: settings/serializers/auth/sms.py:15
 msgid "Enable SMS"
 msgstr "启用 SMS"
 
-#: settings/serializers/auth/sms.py:16
+#: settings/serializers/auth/sms.py:17
 msgid "SMS provider / Protocol"
 msgstr "短信服务商 / 协议"
 
-#: settings/serializers/auth/sms.py:21 settings/serializers/auth/sms.py:39
-#: settings/serializers/auth/sms.py:47 settings/serializers/auth/sms.py:58
+#: settings/serializers/auth/sms.py:22 settings/serializers/auth/sms.py:43
+#: settings/serializers/auth/sms.py:51 settings/serializers/auth/sms.py:62
 #: settings/serializers/email.py:65
 msgid "Signature"
 msgstr "签名"
 
-#: settings/serializers/auth/sms.py:22 settings/serializers/auth/sms.py:40
-#: settings/serializers/auth/sms.py:48
+#: settings/serializers/auth/sms.py:23 settings/serializers/auth/sms.py:44
+#: settings/serializers/auth/sms.py:52
 msgid "Template code"
 msgstr "模板"
 
-#: settings/serializers/auth/sms.py:26
+#: settings/serializers/auth/sms.py:29
 msgid "Test phone"
 msgstr "测试手机号"
 
-#: settings/serializers/auth/sms.py:54
+#: settings/serializers/auth/sms.py:58
 msgid "Enterprise code(SP id)"
 msgstr "企业代码(SP id)"
 
-#: settings/serializers/auth/sms.py:55
+#: settings/serializers/auth/sms.py:59
 msgid "Shared secret(Shared secret)"
 msgstr "共享密码(Shared secret)"
 
-#: settings/serializers/auth/sms.py:56
+#: settings/serializers/auth/sms.py:60
 msgid "Original number(Src id)"
 msgstr "原始号码(Src id)"
 
-#: settings/serializers/auth/sms.py:57
+#: settings/serializers/auth/sms.py:61
 msgid "Business type(Service id)"
 msgstr "业务类型(Service id)"
 
-#: settings/serializers/auth/sms.py:60
+#: settings/serializers/auth/sms.py:64
 msgid "Template"
 msgstr "模板"
 
-#: settings/serializers/auth/sms.py:61
+#: settings/serializers/auth/sms.py:65
 #, python-brace-format
 msgid ""
 "Template need contain {code} and Signature + template length does not exceed "
@@ -3857,12 +3858,12 @@ msgstr ""
 "模板需要包含 {code}，并且模板+签名长度不能超过67个字。例如, 您的验证码是 "
 "{code}, 有效期为5分钟。请不要泄露给其他人。"
 
-#: settings/serializers/auth/sms.py:70
+#: settings/serializers/auth/sms.py:74
 #, python-brace-format
 msgid "The template needs to contain {code}"
 msgstr "模板需要包含 {code}"
 
-#: settings/serializers/auth/sms.py:73
+#: settings/serializers/auth/sms.py:77
 msgid "Signature + Template must not exceed 65 words"
 msgstr "模板+签名不能超过65个字"
 
@@ -5346,11 +5347,11 @@ msgstr "内容"
 msgid "Approve level"
 msgstr "审批级别"
 
-#: tickets/models/flow.py:25 tickets/serializers/flow.py:14
+#: tickets/models/flow.py:25 tickets/serializers/flow.py:15
 msgid "Approve strategy"
 msgstr "审批策略"
 
-#: tickets/models/flow.py:30 tickets/serializers/flow.py:15
+#: tickets/models/flow.py:30 tickets/serializers/flow.py:16
 msgid "Assignees"
 msgstr "受理人"
 
@@ -5493,15 +5494,15 @@ msgstr "你的工单已被处理, 处理人 - {}"
 msgid "Ticket has processed - {} ({})"
 msgstr "你的工单已被处理, 处理人 - {} ({})"
 
-#: tickets/serializers/flow.py:16
+#: tickets/serializers/flow.py:17
 msgid "Assignees display"
 msgstr "受理人名称"
 
-#: tickets/serializers/flow.py:42
+#: tickets/serializers/flow.py:43
 msgid "Please select the Assignees"
 msgstr "请选择受理人"
 
-#: tickets/serializers/flow.py:68
+#: tickets/serializers/flow.py:69
 msgid "The current organization type already exists"
 msgstr "当前组织已存在该类型"
 
