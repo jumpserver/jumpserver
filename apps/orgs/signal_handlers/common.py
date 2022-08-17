@@ -14,7 +14,6 @@ from orgs.models import Organization
 from orgs.hands import set_current_org, Node, get_current_org
 from perms.models import AssetPermission
 from users.models import UserGroup, User
-from assets.models import SystemUser
 from common.const.signals import PRE_REMOVE, POST_REMOVE
 from common.decorator import on_transaction_commit
 from common.signals import django_ready
@@ -135,7 +134,7 @@ def _clear_users_from_org(org, users):
     if not users:
         return
 
-    models = (AssetPermission, UserGroup, SystemUser)
+    models = (AssetPermission, UserGroup)
 
     for m in models:
         _remove_users(m, users, org)

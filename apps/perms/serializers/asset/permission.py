@@ -5,9 +5,8 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
 
-from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from perms.models import AssetPermission, Action
-from assets.models import Asset, Node, SystemUser
+from assets.models import Asset, Node
 from users.models import User, UserGroup
 from ..base import ActionsField, BasePermissionSerializer
 

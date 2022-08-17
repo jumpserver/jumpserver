@@ -13,7 +13,9 @@ from common.db.models import BaseCreateUpdateModel, BitOperationChoice, UnionQue
 
 
 __all__ = [
-    'AssetPermission', 'PermNode', 'UserAssetGrantedTreeNodeRelation',
+    'AssetPermission', 'PermNode',
+    'UserAssetGrantedTreeNodeRelation',
+    'Action'
 ]
 
 # 使用场景

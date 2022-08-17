@@ -5,7 +5,7 @@ from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from authentication.models import ConnectionToken
 from common.utils import pretty_string
 from common.utils.random import random_string
-from assets.models import Asset, SystemUser, Gateway, Domain, CommandFilterRule
+from assets.models import Asset, Gateway, Domain, CommandFilterRule
 from users.models import User
 from perms.serializers.base import ActionsField
 
@@ -123,15 +123,6 @@ class ConnectionTokenAssetSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'ip', 'protocols', 'org_id']
 
 
-class ConnectionTokenSystemUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SystemUser
-        fields = [
-            'id', 'name', 'username', 'password', 'private_key',
-            'protocol', 'ad_domain', 'org_id'
-        ]
-
-
 class ConnectionTokenGatewaySerializer(serializers.ModelSerializer):
     class Meta:
         model = Gateway
@@ -165,7 +156,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     user = ConnectionTokenUserSerializer(read_only=True)
     asset = ConnectionTokenAssetSerializer(read_only=True)
     remote_app = ConnectionTokenRemoteAppSerializer(read_only=True)
-    system_user = ConnectionTokenSystemUserSerializer(read_only=True)
+    account = serializers.CharField(read_only=True)
     gateway = ConnectionTokenGatewaySerializer(read_only=True)
     domain = ConnectionTokenDomainSerializer(read_only=True)
     cmd_filter_rules = ConnectionTokenCmdFilterRuleSerializer(many=True)

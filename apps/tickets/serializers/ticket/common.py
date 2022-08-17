@@ -3,7 +3,6 @@ from django.db.models import Model
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
-from assets.models import SystemUser
 from orgs.utils import tmp_to_org
 from tickets.models import Ticket
 
@@ -54,7 +53,7 @@ class BaseApplyAssetApplicationSerializer(serializers.Serializer):
             qs = model.objects.filter(id__in=ids, **kwargs).values_list('id', flat=True)
         return list(qs)
 
-    def validate_apply_system_users(self, system_users):
+    def validate_apply_account(self, system_users):
         if self.is_final_approval and not system_users:
             raise serializers.ValidationError(_('This field is required.'))
         return self.filter_many_to_many_field(SystemUser, system_users)

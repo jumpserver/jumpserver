@@ -19,3 +19,4 @@ class ApplyLoginAssetTicket(Ticket):
         'assets.SystemUser', on_delete=models.SET_NULL, null=True,
         verbose_name=_('Login system user'),
     )
+    apply_login_account = models.CharField(max_length=128, verbose_name=_('Login account'))

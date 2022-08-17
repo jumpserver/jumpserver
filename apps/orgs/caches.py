@@ -6,7 +6,7 @@ from orgs.utils import current_org, tmp_to_org
 from common.cache import Cache, IntegerField
 from common.utils import get_logger
 from users.models import UserGroup, User
-from assets.models import Node, SystemUser, Domain, Gateway, Asset
+from assets.models import Node, Domain, Gateway, Asset
 from terminal.models import Session
 from perms.models import AssetPermission
 
@@ -70,12 +70,6 @@ class OrgResourceStatisticsCache(OrgRelatedCache):
 
     def get_current_org(self):
         return self.org
-
-    def compute_admin_users_amount(self):
-        return SystemUser.objects.filter(type=SystemUser.Type.admin).count()
-
-    def compute_system_users_amount(self):
-        return SystemUser.objects.filter(type=SystemUser.Type.common).count()
 
     def compute_users_amount(self):
         amount = User.get_org_users(self.org).count()

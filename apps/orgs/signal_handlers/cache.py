@@ -8,7 +8,7 @@ from users.models import UserGroup, User
 from users.signals import pre_user_leave_org
 from terminal.models import Session
 from rbac.models import OrgRoleBinding, SystemRoleBinding, RoleBinding
-from assets.models import Asset, SystemUser, Domain, Gateway
+from assets.models import Asset, Domain, Gateway
 from orgs.caches import OrgResourceStatisticsCache
 from orgs.utils import current_org
 from common.utils import get_logger
@@ -77,7 +77,6 @@ class OrgResourceStatisticsRefreshUtil:
         AssetPermission: ['asset_perms_amount'],
         Gateway: ['gateways_amount'],
         Domain: ['domains_amount'],
-        SystemUser: ['system_users_amount', 'admin_users_amount'],
         Node: ['nodes_amount'],
         Asset: ['assets_amount'],
         UserGroup: ['groups_amount'],

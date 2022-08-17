@@ -19,7 +19,6 @@ class AssetPermissionGenerator(FakeDataGenerator):
     def pre_generate(self):
         self.node_ids = list(Node.objects.all().values_list('id', flat=True))
         self.asset_ids = list(Asset.objects.all().values_list('id', flat=True))
-        self.system_user_ids = list(SystemUser.objects.all().values_list('id', flat=True))
         self.user_ids = list(User.objects.all().values_list('id', flat=True))
         self.user_group_ids = list(UserGroup.objects.all().values_list('id', flat=True))
 

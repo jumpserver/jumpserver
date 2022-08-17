@@ -8,7 +8,7 @@ from django.utils.decorators import method_decorator
 from rest_framework.views import APIView, Response
 from rest_framework import status
 from rest_framework.generics import (
-    ListAPIView, get_object_or_404, RetrieveAPIView, DestroyAPIView
+    ListAPIView, get_object_or_404, RetrieveAPIView
 )
 
 from orgs.utils import tmp_to_root_org
@@ -16,7 +16,7 @@ from perms.utils.asset.permission import get_asset_system_user_ids_with_actions_
 from common.permissions import IsValidUser
 from common.utils import get_logger, lazyproperty
 
-from perms.hands import User, Asset, SystemUser
+from perms.hands import User, Asset
 from perms import serializers
 
 logger = get_logger(__name__)
@@ -25,7 +25,6 @@ __all__ = [
     'UserGrantedAssetSystemUsersForAdminApi',
     'ValidateUserAssetPermissionApi',
     'GetUserAssetPermissionActionsApi',
-    'UserAssetPermissionsCacheApi',
     'MyGrantedAssetSystemUsersApi',
 ]
 
@@ -45,19 +44,18 @@ class GetUserAssetPermissionActionsApi(RetrieveAPIView):
 
     def get_object(self):
         asset_id = self.request.query_params.get('asset_id', '')
-        system_id = self.request.query_params.get('system_user_id', '')
+        account = self.request.query_params.get('account', '')
 
         try:
             asset_id = uuid.UUID(asset_id)
-            system_id = uuid.UUID(system_id)
         except ValueError:
             return Response({'msg': False}, status=403)
 
         asset = get_object_or_404(Asset, id=asset_id)
-        system_user = get_object_or_404(SystemUser, id=system_id)
 
         system_users_actions = get_asset_system_user_ids_with_actions_by_user(self.get_user(), asset)
-        actions = system_users_actions.get(system_user.id)
+        # actions = system_users_actions.get(system_user.id)
+        actions = system_users_actions.get(account)
         return {"actions": actions}
 
 
@@ -70,7 +68,7 @@ class ValidateUserAssetPermissionApi(APIView):
     def get(self, request, *args, **kwargs):
         user_id = self.request.query_params.get('user_id', '')
         asset_id = request.query_params.get('asset_id', '')
-        system_id = request.query_params.get('system_user_id', '')
+        account = request.query_params.get('account', '')
         action_name = request.query_params.get('action_name', '')
 
         data = {
@@ -79,14 +77,13 @@ class ValidateUserAssetPermissionApi(APIView):
             'actions': []
         }
 
-        if not all((user_id, asset_id, system_id, action_name)):
+        if not all((user_id, asset_id, account, action_name)):
             return Response(data)
 
         user = User.objects.get(id=user_id)
         asset = Asset.objects.valid().get(id=asset_id)
-        system_user = SystemUser.objects.get(id=system_id)
 
-        has_perm, actions, expire_at = validate_permission(user, asset, system_user, action_name)
+        has_perm, actions, expire_at = validate_permission(user, asset, account, action_name)
         status_code = status.HTTP_200_OK if has_perm else status.HTTP_403_FORBIDDEN
         data = {
             'has_permission': has_perm,
@@ -97,8 +94,6 @@ class ValidateUserAssetPermissionApi(APIView):
 
 
 class UserGrantedAssetSystemUsersForAdminApi(ListAPIView):
-    serializer_class = serializers.AssetSystemUserSerializer
-    only_fields = serializers.AssetSystemUserSerializer.Meta.only_fields
     rbac_perms = {
         'list': 'perms.view_userassets'
     }
@@ -116,13 +111,6 @@ class UserGrantedAssetSystemUsersForAdminApi(ListAPIView):
 
     def get_asset_system_user_ids_with_actions(self, asset):
         return get_asset_system_user_ids_with_actions_by_user(self.user, asset)
-
-    def get_queryset(self):
-        system_user_ids = self.system_users_with_actions.keys()
-        system_users = SystemUser.objects.filter(id__in=system_user_ids) \
-            .only(*self.serializer_class.Meta.only_fields) \
-            .order_by('name')
-        return system_users
 
     def paginate_queryset(self, queryset):
         page = super().paginate_queryset(queryset)
@@ -148,8 +136,3 @@ class MyGrantedAssetSystemUsersApi(UserGrantedAssetSystemUsersForAdminApi):
     def user(self):
         return self.request.user
 
-
-# TODO 删除
-class UserAssetPermissionsCacheApi(DestroyAPIView):
-    def destroy(self, request, *args, **kwargs):
-        return Response(status=204)

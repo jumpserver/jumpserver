@@ -3,7 +3,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from orgs.models import Organization
-from assets.models import SystemUser
 from assets.const import Protocol
 from acls import models
 
@@ -59,14 +58,6 @@ class LoginAssetACLSystemUsersSerializer(serializers.Serializer):
             ', '.join([Protocol.ssh, Protocol.telnet])
         )
     )
-
-    @staticmethod
-    def validate_protocol_group(protocol_group):
-        unsupported_protocols = set(protocol_group) - set(SystemUser.ASSET_CATEGORY_PROTOCOLS + ['*'])
-        if unsupported_protocols:
-            error = _('Unsupported protocols: {}').format(unsupported_protocols)
-            raise serializers.ValidationError(error)
-        return protocol_group
 
 
 class LoginAssetACLSerializer(BulkOrgResourceModelSerializer):

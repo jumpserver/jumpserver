@@ -11,19 +11,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.CreateModel(
-            name='AccountTemplate',
-            fields=[
-                ('created_by', models.CharField(blank=True, max_length=32, null=True, verbose_name='Created by')),
-                ('updated_by', models.CharField(blank=True, max_length=32, null=True, verbose_name='Updated by')),
-                ('date_created', models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date created')),
-                ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
-                ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-            ],
-            options={
-                'abstract': False,
-            },
-        ),
         migrations.RemoveField(
             model_name='account',
             name='protocol',

@@ -13,7 +13,7 @@ from rest_framework.request import Request
 from common.drf.api import JMSModelViewSet
 from common.http import is_true
 from orgs.mixins.api import RootOrgViewMixin
-from perms.models.base import Action
+from perms.models import Action
 from terminal.models import EndpointRule
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer, SuperConnectionTokenSerializer,

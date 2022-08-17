@@ -16,7 +16,7 @@ from django.utils import translation
 from rest_framework.renderers import JSONRenderer
 from rest_framework.request import Request
 
-from assets.models import Asset, SystemUser
+from assets.models import Asset
 from authentication.signals import post_auth_failed, post_auth_success
 from authentication.utils import check_different_city_login_if_need
 from jumpserver.utils import current_request

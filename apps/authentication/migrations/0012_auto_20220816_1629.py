@@ -3,14 +3,14 @@
 from django.db import migrations, models
 
 
-def migrate_system_user_to_accounts(apps, schema_editor):
-    connection_token_model = apps.get_model("perms", "ConnectionToken")
+def migrate_system_user_to_account(apps, schema_editor):
+    connection_token_model = apps.get_model("authentication", "ConnectionToken")
     count = 0
     bulk_size = 10000
 
     while True:
         connection_tokens = connection_token_model.objects \
-            .prefect_related('system_users')[count:bulk_size]
+            .prefetch_related('system_users')[count:bulk_size]
         if not connection_tokens:
             break
         count += len(connection_tokens)
@@ -45,7 +45,7 @@ class Migration(migrations.Migration):
             name='account',
             field=models.CharField(default='', max_length=128, verbose_name='Account'),
         ),
-        migrations.RunPython(migrate_system_user_to_accounts),
+        migrations.RunPython(migrate_system_user_to_account),
         migrations.RemoveField(
             model_name='connectiontoken',
             name='system_user',

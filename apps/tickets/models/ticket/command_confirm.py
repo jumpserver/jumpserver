@@ -14,6 +14,7 @@ class ApplyCommandTicket(Ticket):
         'assets.SystemUser', on_delete=models.SET_NULL,
         null=True, verbose_name=_('Run system user')
     )
+    apply_run_account = models.CharField(max_length=128, verbose_name=_('Run account'))
     apply_run_command = models.CharField(max_length=4096, verbose_name=_('Run command'))
     apply_from_session = models.ForeignKey(
         'terminal.Session', on_delete=models.SET_NULL,

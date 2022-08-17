@@ -23,6 +23,7 @@ class CommandExecution(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     hosts = models.ManyToManyField('assets.Asset')
     run_as = models.ForeignKey('assets.SystemUser', on_delete=models.CASCADE)
+    account = models.CharField(max_length=128, verbose_name=_('account'))
     command = models.TextField(verbose_name=_("Command"))
     _result = models.TextField(blank=True, null=True, verbose_name=_('Result'))
     user = models.ForeignKey('users.User', on_delete=models.CASCADE, null=True)

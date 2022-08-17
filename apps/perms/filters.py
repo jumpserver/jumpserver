@@ -5,7 +5,7 @@ from common.db.models import UnionQuerySet
 from common.drf.filters import BaseFilterSet
 from common.utils import get_object_or_none
 from users.models import User, UserGroup
-from assets.models import Node, Asset, SystemUser
+from assets.models import Node, Asset
 from perms.models import AssetPermission
 
 
@@ -30,7 +30,6 @@ class PermissionBaseFilter(BaseFilterSet):
         qs = super().qs
         qs = self.filter_valid(qs)
         qs = self.filter_user(qs)
-        qs = self.filter_system_user(qs)
         qs = self.filter_user_group(qs)
         return qs
 
@@ -72,21 +71,6 @@ class PermissionBaseFilter(BaseFilterSet):
         queryset = queryset.filter(
             id__in=asset_perm_ids
         ).distinct()
-        return queryset
-
-    def filter_system_user(self, queryset):
-        system_user_id = self.get_query_param('system_user_id')
-        system_user_name = self.get_query_param('system_user')
-
-        if system_user_id:
-            system_user = get_object_or_none(SystemUser, pk=system_user_id)
-        elif system_user_name:
-            system_user = get_object_or_none(SystemUser, name=system_user_name)
-        else:
-            return queryset
-        if not system_user:
-            return queryset.none()
-        queryset = queryset.filter(system_users=system_user)
         return queryset
 
     def filter_user_group(self, queryset):
