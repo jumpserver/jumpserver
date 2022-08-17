@@ -32,7 +32,7 @@ ARG TOOLS="                           \
     unzip                             \
     wget"
 
-RUN sed -i 's@http://.*.debian.org@http://repo.huaweicloud.com@g' /etc/apt/sources.list \
+RUN sed -i 's@http://.*.debian.org@http://mirrors.ustc.edu.cn@g' /etc/apt/sources.list \
     && apt-get update \
     && apt-get -y install --no-install-recommends ${BUILD_DEPENDENCIES} \
     && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
