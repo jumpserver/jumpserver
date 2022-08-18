@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0107_auto_20220811_1449'),
+        ('assets', '0106_auto_20220811_1449'),
     ]
 
     operations = [
@@ -33,9 +33,5 @@ class Migration(migrations.Migration):
             model_name='asset',
             name='created_by',
             field=models.CharField(blank=True, max_length=32, null=True, verbose_name='Created by'),
-        ),
-        migrations.AlterUniqueTogether(
-            name='asset',
-            unique_together={('org_id', 'name')},
         ),
     ]

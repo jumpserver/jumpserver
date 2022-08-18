@@ -13,11 +13,10 @@ def migrate_command_filter_to_assets(apps, schema_editor):
     while True:
         start = time.time()
         command_filters = command_filter_model.objects.all() \
-                              .prefetch_related('system_users')[count:count + bulk_size]
-        count += len(command_filters)
+            .prefetch_related('system_users')[count:count + bulk_size]
         if not command_filters:
             break
-
+        count += len(command_filters)
         updated = []
         for command_filter in command_filters:
             command_filter.accounts = [s.username for s in command_filter.system_users.all()]
@@ -25,7 +24,7 @@ def migrate_command_filter_to_assets(apps, schema_editor):
         command_filter_model.objects.bulk_update(updated, ['accounts'])
 
         print("Create assets: {}-{} using: {:.2f}s".format(
-            count - bulk_size, count, time.time() - start
+            count - len(command_filters), count, time.time() - start
         ))
 
 
@@ -47,7 +46,7 @@ def migrate_command_filter_apps(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0110_auto_20220815_1831'),
+        ('assets', '0107_auto_20220811_1511'),
     ]
 
     operations = [

@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0111_auto_20220816_1022'),
+        ('assets', '0108_auto_20220816_1022'),
     ]
 
     operations = [
@@ -25,10 +25,6 @@ class Migration(migrations.Migration):
             model_name='historicalauthbook',
             name='systemuser',
         ),
-        migrations.AlterUniqueTogether(
-            name='systemuser',
-            unique_together=None,
-        ),
         migrations.RemoveField(
             model_name='systemuser',
             name='assets',
@@ -43,19 +39,6 @@ class Migration(migrations.Migration):
         ),
         migrations.RemoveField(
             model_name='systemuser',
-            name='su_from',
-        ),
-        migrations.RemoveField(
-            model_name='systemuser',
             name='users',
-        ),
-        migrations.DeleteModel(
-            name='AuthBook',
-        ),
-        migrations.DeleteModel(
-            name='HistoricalAuthBook',
-        ),
-        migrations.DeleteModel(
-            name='SystemUser',
         ),
     ]

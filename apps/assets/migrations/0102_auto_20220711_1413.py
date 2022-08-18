@@ -16,10 +16,10 @@ def migrate_accounts(apps, schema_editor):
         auth_books = auth_book_model.objects \
             .prefetch_related('systemuser') \
             .all()[count:count+bulk_size]
-        count += len(auth_books)
         if not auth_books:
             break
 
+        count += len(auth_books)
         accounts = []
         # auth book 和 account 相同的属性
         same_attrs = [
@@ -50,7 +50,7 @@ def migrate_accounts(apps, schema_editor):
 
         account_model.objects.bulk_create(accounts, ignore_conflicts=True)
         print("Create accounts: {}-{} using: {:.2f}s".format(
-            count - bulk_size, count, time.time()-start
+            count - len(auth_books), count, time.time()-start
         ))
 
 

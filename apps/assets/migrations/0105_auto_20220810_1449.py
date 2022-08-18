@@ -38,4 +38,9 @@ class Migration(migrations.Migration):
             name='type',
             field=models.CharField(choices=[('linux', 'Linux'), ('windows', 'Windows'), ('unix', 'Unix'), ('bsd', 'BSD'), ('macos', 'MacOS'), ('mainframe', 'Mainframe'), ('other_host', 'Other host'), ('switch', 'Switch'), ('router', 'Router'), ('firewall', 'Firewall'), ('other_network', 'Other device'), ('mysql', 'MySQL'), ('mariadb', 'MariaDB'), ('postgresql', 'PostgreSQL'), ('oracle', 'Oracle'), ('sqlserver', 'SQLServer'), ('mongodb', 'MongoDB'), ('redis', 'Redis'), ('general', 'General'), ('k8s', 'Kubernetes')], default='Linux', max_length=32, verbose_name='Type'),
         ),
+        migrations.AlterField(
+            model_name='platform',
+            name='su_enabled',
+            field=models.BooleanField(default=False, verbose_name='Su enabled'),
+        ),
     ]

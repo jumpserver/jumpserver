@@ -34,12 +34,12 @@ def migrate_system_to_account(apps, schema_editor):
                     new_value = [s.username for s in old_value]
                 else:
                     old_value = getattr(obj, old_field)
-                    new_value = old_value.username
+                    new_value = old_value.username if old_value else ''
                 setattr(obj, new_field, new_value)
                 updated.append(obj)
             model.objects.bulk_update(updated, [new_field])
             print("Migrate account: {}-{} using: {:.2f}s".format(
-                count - bulk_size, count, time.time()-start
+                count - len(objects), count, time.time()-start
             ))
 
 
