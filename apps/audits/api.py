@@ -12,6 +12,7 @@ from common.api import CommonGenericViewSet
 from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet, OrgRelationMixin
 from orgs.utils import current_org
 from ops.models import CommandExecution
+from . import filters
 from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog
 from .serializers import FTPLogSerializer, UserLoginLogSerializer, CommandExecutionSerializer
 from .serializers import OperateLogSerializer, PasswordChangeLogSerializer, CommandExecutionHostsRelationSerializer
@@ -126,12 +127,7 @@ class CommandExecutionViewSet(ListModelMixin, OrgGenericViewSet):
 class CommandExecutionHostRelationViewSet(OrgRelationMixin, OrgBulkModelViewSet):
     serializer_class = CommandExecutionHostsRelationSerializer
     m2m_field = CommandExecution.hosts.field
-    filterset_fields = {
-        'id': ['exact'],
-        'asset': ['exact'],
-        'asset__hostname': ['icontains'],
-        'commandexecution': ['exact'],
-    }
+    filterset_class = filters.CommandExecutionFilter
     search_fields = ('asset__hostname', )
     http_method_names = ['options', 'get']
     rbac_perms = {
