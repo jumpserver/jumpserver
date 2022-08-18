@@ -31,15 +31,13 @@ def migrate_accounts(apps, schema_editor):
 
         for auth_book in auth_books:
             values = {attr: getattr(auth_book, attr) for attr in same_attrs}
-            values['protocol'] = 'ssh'
             values['version'] = 1
 
             system_user = auth_book.systemuser
             if auth_book.systemuser:
                 values.update({attr: getattr(system_user, attr) for attr in auth_attrs})
-                values['protocol'] = system_user.protocol
                 values['created_by'] = str(system_user.id)
-                values['type'] = system_user.type
+                values['privileged'] = system_user.type == 'admin'
 
             auth_book_auth = {attr: getattr(auth_book, attr) for attr in auth_attrs}
             auth_book_auth = {attr: value for attr, value in auth_book_auth.items() if value}
