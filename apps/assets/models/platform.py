@@ -5,7 +5,13 @@ from assets.const import Category, AllTypes
 from common.db.fields import JsonDictTextField
 
 
-__all__ = ['Platform']
+__all__ = ['Platform', 'PlatformProtocol']
+
+
+class PlatformProtocol(models.Model):
+    name = models.CharField(max_length=32, verbose_name=_('Name'))
+    port = models.IntegerField(verbose_name=_('Port'))
+    setting = models.JSONField(verbose_name=_('Setting'), default=dict)
 
 
 class Platform(models.Model):
@@ -30,9 +36,7 @@ class Platform(models.Model):
         verbose_name=_("Domain default")
     )
     protocols_enabled = models.BooleanField(default=True, verbose_name=_("Protocols enabled"))
-    protocols_default = models.JSONField(
-        max_length=128, default=list, blank=True, verbose_name=_("Protocols default")
-    )
+    protocols = models.ManyToManyField(PlatformProtocol, blank=True, verbose_name=_("Protocols"))
     # Accounts
     # 这应该和账号有关
     su_enabled = models.BooleanField(default=False, verbose_name=_("Su enabled"))

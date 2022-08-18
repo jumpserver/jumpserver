@@ -28,7 +28,9 @@ class CommandExecutionViewSet(RootOrgViewMixin, viewsets.ModelViewSet):
         system_user = data["run_as"]
         user = self.request.user
 
-        q = Q(granted_by_permissions__system_users__id=system_user.id) & (
+        # TOdo:
+        # Q(granted_by_permissions__system_users__id=system_user.id) &
+        q = (
                 Q(granted_by_permissions__users=user) |
                 Q(granted_by_permissions__user_groups__users=user)
         )

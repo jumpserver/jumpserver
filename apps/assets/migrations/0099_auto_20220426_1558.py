@@ -18,9 +18,6 @@ def create_app_platform(apps, *args):
         {'name': 'MongoDB', 'category': 'database', 'type': 'mongodb'},
         {'name': 'Redis', 'category': 'database', 'type': 'redis'},
         {'name': 'Chrome', 'category': 'remote_app', 'type': 'chrome'},
-        {'name': 'vSphereClient', 'category': 'remote_app', 'type': 'vmware_client'},
-        {'name': 'MySQLWorkbench', 'category': 'remote_app', 'type': 'mysql_workbench'},
-        {'name': 'GeneralRemoteApp', 'category': 'remote_app', 'type': 'general_remote_app'},
         {'name': 'Kubernetes', 'category': 'cloud', 'type': 'k8s'},
     ]
 

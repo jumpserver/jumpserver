@@ -51,6 +51,6 @@ class ChoiceDisplayField(ChoiceField):
         if value in ('', None):
             return value
         return {
-            'name': value,
+            'value': value,
             'label': self.choice_mapper.get(six.text_type(value), value),
         }

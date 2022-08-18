@@ -29,7 +29,6 @@ class AssetViewSet(SuggestionMixin, FilterAssetByNodeMixin, OrgBulkModelViewSet)
     filterset_fields = {
         'name': ['exact'],
         'ip': ['exact'],
-        'system_users__id': ['exact'],
         'is_active': ['exact'],
         'protocols': ['exact', 'icontains']
     }

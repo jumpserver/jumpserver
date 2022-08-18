@@ -11,6 +11,15 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.CreateModel(
+            name='PlatformProtocol',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=32, verbose_name='Name')),
+                ('port', models.IntegerField(verbose_name='Port')),
+                ('setting', models.JSONField(default=dict, verbose_name='Setting')),
+            ],
+        ),
         migrations.AddField(
             model_name='platform',
             name='domain_default',
@@ -28,8 +37,8 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='platform',
-            name='protocols_enabled',
-            field=models.BooleanField(default=True, verbose_name='Protocols enabled'),
+            name='protocols',
+            field=models.ManyToManyField(blank=True, to='assets.PlatformProtocol', verbose_name='Protocols'),
         ),
         migrations.AddField(
             model_name='platform',
