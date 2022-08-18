@@ -13,3 +13,7 @@ class DBSerializer(serializers.Serializer):
     database = serializers.CharField(
         max_length=128, required=True, allow_null=True, label=_('Database')
     )
+    use_ssl = serializers.BooleanField(default=False, label=_('Use SSL'))
+    ca_cert = serializers.CharField(
+        max_length=10240, required=False, allow_null=True, label=_('CA certificate')
+    )
