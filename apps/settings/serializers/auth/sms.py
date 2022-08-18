@@ -2,6 +2,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from common.drf.fields import EncryptedField
+from common.validators import PhoneValidator
 from common.sdk.sms import BACKENDS
 
 __all__ = [
@@ -23,7 +24,10 @@ class SignTmplPairSerializer(serializers.Serializer):
 
 
 class BaseSMSSettingSerializer(serializers.Serializer):
-    SMS_TEST_PHONE = serializers.CharField(max_length=256, required=False, allow_blank=True, label=_('Test phone'))
+    SMS_TEST_PHONE = serializers.CharField(
+        max_length=256, required=False, validators=[PhoneValidator(), ],
+        allow_blank=True, label=_('Test phone')
+    )
 
     def to_representation(self, instance):
         data = super().to_representation(instance)

@@ -98,7 +98,10 @@ function doRequestAuth() {
         },
         error: function (text, data) {
         },
-        flash_message: false
+        beforeSend: function(request) {
+            request.setRequestHeader("X-JMS-LOGIN-TYPE", "W");
+        },
+        flash_message: false, // 是否显示flash消息
     })
 }
 function initClipboard() {

@@ -29,24 +29,22 @@ ARG TOOLS="                           \
     redis-tools                       \
     telnet                            \
     vim                               \
-    unzip                               \
+    unzip                             \
     wget"
 
-RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
-    && sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
-    && apt update && sleep 1 && apt update \
-    && apt -y install ${BUILD_DEPENDENCIES} \
-    && apt -y install ${DEPENDENCIES} \
-    && apt -y install ${TOOLS} \
+RUN sed -i 's@http://.*.debian.org@http://mirrors.ustc.edu.cn@g' /etc/apt/sources.list \
+    && apt-get update \
+    && apt-get -y install --no-install-recommends ${BUILD_DEPENDENCIES} \
+    && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
+    && apt-get -y install --no-install-recommends ${TOOLS} \
     && localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8 \
     && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && mkdir -p /root/.ssh/ \
     && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > /root/.ssh/config \
     && sed -i "s@# alias l@alias l@g" ~/.bashrc \
     && echo "set mouse-=a" > ~/.vimrc \
-    && rm -rf /var/lib/apt/lists/* \
-    && mv /bin/sh /bin/sh.bak  \
-    && ln -s /bin/bash /bin/sh
+    && echo "no" | dpkg-reconfigure dash \
+    && rm -rf /var/lib/apt/lists/*
 
 ARG TARGETARCH
 ARG ORACLE_LIB_MAJOR=19

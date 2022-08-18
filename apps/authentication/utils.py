@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 #
-from urllib.parse import urljoin
+import ipaddress
+from urllib.parse import urljoin, urlparse
 
 from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
 
 from common.utils import validate_ip, get_ip_city, get_request_ip
 from common.utils import get_logger
@@ -23,8 +25,9 @@ def check_different_city_login_if_need(user, request):
     else:
         city = get_ip_city(ip) or DEFAULT_CITY
 
-    city_white = ['LAN', ]
-    if city not in city_white:
+    city_white = [_('LAN'), 'LAN']
+    is_private = ipaddress.ip_address(ip).is_private
+    if not is_private:
         last_user_login = UserLoginLog.objects.exclude(city__in=city_white) \
             .filter(username=user.username, status=True).first()
 
@@ -36,7 +39,11 @@ def build_absolute_uri(request, path=None):
     """ Build absolute redirect """
     if path is None:
         path = '/'
-    redirect_uri = request.build_absolute_uri(path)
+    site_url = urlparse(settings.SITE_URL)
+    scheme = site_url.scheme or request.scheme
+    host = request.get_host()
+    url = f'{scheme}://{host}'
+    redirect_uri = urljoin(url, path)
     return redirect_uri
 
 
@@ -47,6 +54,5 @@ def build_absolute_uri_for_oidc(request, path=None):
     if settings.BASE_SITE_URL:
         # OIDC 专用配置项
         redirect_uri = urljoin(settings.BASE_SITE_URL, path)
-    else:
-        redirect_uri = request.build_absolute_uri(path)
-    return redirect_uri
+        return redirect_uri
+    return build_absolute_uri(request, path=path)
