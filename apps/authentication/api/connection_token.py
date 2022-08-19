@@ -45,16 +45,10 @@ class ConnectionTokenMixin:
     @staticmethod
     def check_user_has_resource_permission(user, asset, application, system_user):
         from perms.utils.asset import has_asset_system_permission
-        from perms.utils.application import has_application_system_permission
 
         if asset and not has_asset_system_permission(user, asset, system_user):
             error = f'User not has this asset and system user permission: ' \
                     f'user={user.id} system_user={system_user.id} asset={asset.id}'
-            raise PermissionDenied(error)
-
-        if application and not has_application_system_permission(user, application, system_user):
-            error = f'User not has this application and system user permission: ' \
-                    f'user={user.id} system_user={system_user.id} application={application.id}'
             raise PermissionDenied(error)
 
     def get_smart_endpoint(self, protocol, asset=None, application=None):
@@ -204,8 +198,7 @@ class ConnectionTokenMixin:
 
 class ConnectionTokenViewSet(ConnectionTokenMixin, RootOrgViewMixin, JMSModelViewSet):
     filterset_fields = (
-        'type',
-        'user_display', 'system_user_display', 'application_display', 'asset_display'
+        'type', 'user_display', 'asset_display'
     )
     search_fields = filterset_fields
     serializer_classes = {

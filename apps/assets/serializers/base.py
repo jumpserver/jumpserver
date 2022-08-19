@@ -13,7 +13,8 @@ from .utils import validate_password_for_ansible
 
 class AuthSerializer(serializers.ModelSerializer):
     password = EncryptedField(required=False, allow_blank=True, allow_null=True, max_length=1024, label=_('Password'))
-    private_key = EncryptedField(required=False, allow_blank=True, allow_null=True, max_length=16384, label=_('Private key'))
+    private_key = EncryptedField(required=False, allow_blank=True, allow_null=True, max_length=16384,
+                                 label=_('Private key'))
 
     def gen_keys(self, private_key=None, password=None):
         if private_key is None:
@@ -73,6 +74,17 @@ class AuthSerializerMixin(serializers.ModelSerializer):
             if not value:
                 validated_data.pop(field, None)
         validated_data.pop('passphrase', None)
+
+    def _validate_gen_key(self, attrs):
+        private_key = attrs.get('private_key')
+        if not private_key:
+            return attrs
+
+        password = attrs.get('passphrase')
+        username = attrs.get('username')
+        public_key = ssh_pubkey_gen(private_key, password=password, username=username)
+        attrs['public_key'] = public_key
+        return attrs
 
     def create(self, validated_data):
         self.clean_auth_fields(validated_data)

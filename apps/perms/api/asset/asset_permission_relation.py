@@ -80,12 +80,12 @@ class AssetPermissionAssetRelationViewSet(RelationMixin):
     filterset_fields = [
         'id', 'asset', 'assetpermission',
     ]
-    search_fields = ["id", "asset__hostname", "asset__ip", "assetpermission__name"]
+    search_fields = ["id", "asset__name", "asset__ip", "assetpermission__name"]
 
     def get_queryset(self):
         queryset = super().get_queryset()
         queryset = queryset \
-            .annotate(asset_display=F('asset__hostname'))
+            .annotate(asset_display=F('asset__name'))
         return queryset
 
 

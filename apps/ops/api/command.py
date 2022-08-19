@@ -25,7 +25,6 @@ class CommandExecutionViewSet(RootOrgViewMixin, viewsets.ModelViewSet):
     def check_hosts(self, serializer):
         data = serializer.validated_data
         assets = data["hosts"]
-        system_user = data["run_as"]
         user = self.request.user
 
         # TOdo:

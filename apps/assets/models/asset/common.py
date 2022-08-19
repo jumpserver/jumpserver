@@ -98,6 +98,11 @@ class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
             return False, warning
         return True, warning
 
+    def domain_display(self):
+        if self.domain:
+            return self.domain.name
+        return ''
+
     def nodes_display(self):
         names = []
         for n in self.nodes.all():
@@ -115,7 +120,15 @@ class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
         return self.platform.type
 
     @property
+    def type_display(self):
+        return self.platform.type
+
+    @property
     def category(self):
+        return self.platform.category
+
+    @property
+    def category_display(self):
         return self.platform.category
 
     def as_node(self):

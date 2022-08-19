@@ -31,7 +31,7 @@ class DatabaseSerializer(AssetSerializer):
     class Meta(AssetSerializer.Meta):
         model = Database
         fields_mini = [
-            'id', 'name', 'ip', 'port', 'db_name',
+            'id', 'name', 'ip', 'db_name',
         ]
         fields_small = fields_mini + [
             'is_active', 'comment',

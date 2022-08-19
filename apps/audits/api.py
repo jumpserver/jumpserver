@@ -107,11 +107,11 @@ class CommandExecutionViewSet(ListModelMixin, OrgGenericViewSet):
     ]
     filterset_fields = [
         'user__name', 'user__username', 'command',
-        'run_as__name', 'run_as__username', 'is_finished'
+        'account', 'is_finished'
     ]
     search_fields = [
         'command', 'user__name', 'user__username',
-        'run_as__name', 'run_as__username',
+        'account__username',
     ]
     ordering = ['-date_created']
 
@@ -121,7 +121,7 @@ class CommandExecutionViewSet(ListModelMixin, OrgGenericViewSet):
             return queryset.model.objects.none()
         if current_org.is_root():
             return queryset
-        queryset = queryset.filter(run_as__org_id=current_org.org_id())
+        # queryset = queryset.filter(run_as__org_id=current_org.org_id())
         return queryset
 
 
@@ -131,7 +131,7 @@ class CommandExecutionHostRelationViewSet(OrgRelationMixin, OrgBulkModelViewSet)
     filterset_fields = [
         'id', 'asset', 'commandexecution'
     ]
-    search_fields = ('asset__hostname', )
+    search_fields = ('asset__name', )
     http_method_names = ['options', 'get']
     rbac_perms = {
         'GET': 'ops.view_commandexecution',
@@ -142,7 +142,7 @@ class CommandExecutionHostRelationViewSet(OrgRelationMixin, OrgBulkModelViewSet)
         queryset = super().get_queryset()
         queryset = queryset.annotate(
             asset_display=Concat(
-                F('asset__hostname'), Value('('),
+                F('asset__name'), Value('('),
                 F('asset__ip'), Value(')')
             )
         )
