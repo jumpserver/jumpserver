@@ -132,6 +132,7 @@ function setAjaxCSRFToken() {
 
     $.ajaxSetup({
         beforeSend: function (xhr, settings) {
+            xhr.setRequestHeader("X-JMS-LOGIN-TYPE", "W");
             if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
                 xhr.setRequestHeader("X-CSRFToken", csrftoken);
             }
@@ -270,13 +271,11 @@ function requestApi(props) {
     if (typeof(dataBody) === "object") {
         dataBody = JSON.stringify(dataBody)
     }
-    var beforeSend = props.beforeSend || function (request) {}
 
     $.ajax({
         url: props.url,
         type: props.method || "PATCH",
         data: dataBody,
-        beforeSend: beforeSend,
         contentType: props.content_type || "application/json; charset=utf-8",
         dataType: props.data_type || "json"
     }).done(function (data, textStatue, jqXHR) {
