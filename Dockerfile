@@ -17,6 +17,7 @@ ARG DEPENDENCIES="                    \
     libxmlsec1-dev                    \
     libxmlsec1-openssl                \
     libaio-dev                        \
+    openssh-client                    \
     sshpass"
 
 ARG TOOLS="                           \
