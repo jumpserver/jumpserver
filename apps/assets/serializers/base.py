@@ -75,7 +75,8 @@ class AuthSerializerMixin(serializers.ModelSerializer):
                 validated_data.pop(field, None)
         validated_data.pop('passphrase', None)
 
-    def _validate_gen_key(self, attrs):
+    @staticmethod
+    def _validate_gen_key(attrs):
         private_key = attrs.get('private_key')
         if not private_key:
             return attrs
