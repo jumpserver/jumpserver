@@ -4,6 +4,7 @@ import re
 from Cryptodome.Cipher import AES, PKCS1_v1_5
 from Cryptodome.Random import get_random_bytes
 from Cryptodome.PublicKey import RSA
+from Cryptodome.Util.Padding import pad
 from Cryptodome import Random
 from gmssl.sm4 import CryptSM4, SM4_ENCRYPT, SM4_DECRYPT
 
@@ -107,7 +108,15 @@ class AESCryptoGCM:
     """
 
     def __init__(self, key):
-        self.key = padding_key(key)
+        self.key = self.process_key(key)
+
+    @staticmethod
+    def process_key(key):
+        if not isinstance(key, bytes):
+            key = bytes(key, encoding='utf-8')
+        if len(key) >= 32:
+            return key[:32]
+        return pad(key, 32)
 
     def encrypt(self, text):
         """
