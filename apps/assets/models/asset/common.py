@@ -10,6 +10,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.models import OrgManager, JMSOrgBaseModel
+from ...const import Category
 from ..platform import Platform
 from ..base import AbsConnectivity
 
@@ -121,7 +122,8 @@ class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
 
     @property
     def type_display(self):
-        return self.platform.type
+        value = self.platform.type
+        return Category.get_label(value)
 
     @property
     def category(self):
@@ -129,7 +131,8 @@ class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
 
     @property
     def category_display(self):
-        return self.platform.category
+        value = self.platform.category
+        return Category.get_label(value)
 
     def as_node(self):
         from assets.models import Node

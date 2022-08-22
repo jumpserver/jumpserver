@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from common.db.models import IncludesTextChoicesMeta
+from common.db.models import IncludesTextChoicesMeta, ChoicesMixin
 from common.tree import TreeNode
 
 
@@ -24,7 +24,7 @@ class PlatformMixin:
         }
 
 
-class Category(PlatformMixin, models.TextChoices):
+class Category(PlatformMixin, ChoicesMixin, models.TextChoices):
     HOST = 'host', _('Host')
     NETWORK = 'network', _("NetworkDevice")
     DATABASE = 'database', _("Database")
@@ -60,7 +60,7 @@ class Category(PlatformMixin, models.TextChoices):
         }
 
 
-class HostTypes(PlatformMixin, models.TextChoices):
+class HostTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
     LINUX = 'linux', 'Linux'
     WINDOWS = 'windows', 'Windows'
     UNIX = 'unix', 'Unix'
@@ -84,14 +84,14 @@ class HostTypes(PlatformMixin, models.TextChoices):
         }
 
 
-class NetworkTypes(PlatformMixin, models.TextChoices):
+class NetworkTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
     SWITCH = 'switch', _("Switch")
     ROUTER = 'router', _("Router")
     FIREWALL = 'firewall', _("Firewall")
     OTHER_NETWORK = 'other_network', _("Other device")
 
 
-class DatabaseTypes(PlatformMixin, models.TextChoices):
+class DatabaseTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
     MYSQL = 'mysql', 'MySQL'
     MARIADB = 'mariadb', 'MariaDB'
     POSTGRESQL = 'postgresql', 'PostgreSQL'
@@ -110,15 +110,15 @@ class DatabaseTypes(PlatformMixin, models.TextChoices):
         return meta
 
 
-class WebTypes(PlatformMixin, models.TextChoices):
+class WebTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
     General = 'general', 'General'
 
 
-class CloudTypes(PlatformMixin, models.TextChoices):
+class CloudTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
     K8S = 'k8s', 'Kubernetes'
 
 
-class AllTypes(metaclass=IncludesTextChoicesMeta):
+class AllTypes(ChoicesMixin, metaclass=IncludesTextChoicesMeta):
     choices: list
     includes = [
         HostTypes, NetworkTypes, DatabaseTypes,
@@ -202,7 +202,7 @@ class AllTypes(metaclass=IncludesTextChoicesMeta):
         return nodes
 
 
-class Protocol(models.TextChoices):
+class Protocol(ChoicesMixin, models.TextChoices):
     ssh = 'ssh', 'SSH'
     rdp = 'rdp', 'RDP'
     telnet = 'telnet', 'Telnet'

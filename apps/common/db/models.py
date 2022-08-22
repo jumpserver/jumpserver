@@ -85,6 +85,14 @@ class BitOperationChoice:
         return [(cls.NAME_MAP[i], j) for i, j in cls.DB_CHOICES]
 
 
+class ChoicesMixin:
+    _value2label_map_: dict
+
+    @classmethod
+    def get_label(cls, value: (str, int)):
+        return cls._value2label_map_[value]
+
+
 class BaseCreateUpdateModel(models.Model):
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     updated_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Updated by'))
