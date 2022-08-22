@@ -2,18 +2,20 @@
 #
 from rest_framework.decorators import action
 from rest_framework.response import Response
+import django_filters
 
+from common.drf.filters import BaseFilterSet
 from common.utils import get_logger, get_object_or_none
 from common.mixins.api import SuggestionMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
-from assets.api import FilterAssetByNodeMixin
 from assets.models import Asset, Node, Gateway
 from assets import serializers
 from assets.tasks import (
     update_assets_hardware_info_manual, test_assets_connectivity_manual,
 )
-from assets.filters import FilterAssetByNodeFilterBackend, LabelFilterBackend, IpInFilterBackend
+from assets.filters import NodeFilterBackend, LabelFilterBackend, IpInFilterBackend
+from ..mixin import NodeFilterMixin
 
 logger = get_logger(__file__)
 __all__ = [
@@ -21,17 +23,21 @@ __all__ = [
 ]
 
 
-class AssetViewSet(SuggestionMixin, FilterAssetByNodeMixin, OrgBulkModelViewSet):
+class AssetFilterSet(BaseFilterSet):
+    type = django_filters.CharFilter(field_name='platform__type', lookup_expr='exact')
+    category = django_filters.CharFilter(field_name='platform__category', lookup_expr='exact')
+
+    class Meta:
+        model = Asset
+        fields = ['name', 'ip', 'is_active', 'type', 'category']
+
+
+class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
     """
     API endpoint that allows Asset to be viewed or edited.
     """
     model = Asset
-    filterset_fields = {
-        'name': ['exact'],
-        'ip': ['exact'],
-        'is_active': ['exact'],
-        'protocols': ['exact', 'icontains']
-    }
+    filterset_class = AssetFilterSet
     search_fields = ("name", "ip")
     ordering_fields = ("name", "ip", "port")
     ordering = ('name', )
@@ -47,9 +53,9 @@ class AssetViewSet(SuggestionMixin, FilterAssetByNodeMixin, OrgBulkModelViewSet)
         ('gateways', 'assets.view_gateway')
     )
     extra_filter_backends = [
-        FilterAssetByNodeFilterBackend,
         LabelFilterBackend,
         IpInFilterBackend,
+        NodeFilterBackend
     ]
 
     def set_assets_node(self, assets):

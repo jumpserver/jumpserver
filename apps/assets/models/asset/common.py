@@ -9,6 +9,7 @@ from functools import reduce
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from common.utils import lazyproperty
 from orgs.mixins.models import OrgManager, JMSOrgBaseModel
 from ..platform import Platform
 from ..base import AbsConnectivity
@@ -110,11 +111,11 @@ class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
             names.append(n.name + ':' + n.value)
         return names
 
-    @property
+    @lazyproperty
     def type(self):
         return self.platform.type
 
-    @property
+    @lazyproperty
     def category(self):
         return self.platform.category
 

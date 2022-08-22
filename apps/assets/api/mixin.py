@@ -1,10 +1,10 @@
 from typing import List
+from rest_framework.request import Request
 
-from common.utils.common import timeit
+from common.utils import lazyproperty, timeit
 from assets.models import Node, Asset
 from assets.pagination import NodeAssetTreePagination
-from common.utils import lazyproperty
-from assets.utils import get_node, is_query_node_all_assets
+from assets.utils import get_node_from_request, is_query_node_all_assets
 
 
 class SerializeToTreeNodeMixin:
@@ -80,8 +80,9 @@ class SerializeToTreeNodeMixin:
         return data
 
 
-class FilterAssetByNodeMixin:
+class NodeFilterMixin:
     pagination_class = NodeAssetTreePagination
+    request: Request
 
     @lazyproperty
     def is_query_node_all_assets(self):
@@ -89,4 +90,4 @@ class FilterAssetByNodeMixin:
 
     @lazyproperty
     def node(self):
-        return get_node(self.request)
+        return get_node_from_request(self.request)

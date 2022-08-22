@@ -53,7 +53,7 @@ def is_query_node_all_assets(request):
     return is_true(query_all_arg)
 
 
-def get_node(request):
+def get_node_from_request(request):
     node_id = dict_get_any(request.query_params, ['node', 'node_id'])
     if not node_id:
         return None

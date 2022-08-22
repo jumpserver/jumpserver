@@ -1,7 +1,7 @@
 
 from assets.models import Host
 from assets.serializers import HostSerializer
-from .common import AssetViewSet
+from .asset import AssetViewSet
 
 __all__ = ['HostViewSet']
 

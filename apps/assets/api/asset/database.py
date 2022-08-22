@@ -1,7 +1,7 @@
 
 from assets.models import Database
 from assets.serializers import DatabaseSerializer
-from .common import AssetViewSet
+from .asset import AssetViewSet
 
 __all__ = ['DatabaseViewSet']
 

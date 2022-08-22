@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from common.utils import lazyproperty
 from perms.models import AssetPermission
 from assets.models import Asset, Node
-from perms.api.asset import user_permission as uapi
+from . import user_permission as uapi
 from perms import serializers
 from perms.utils.asset.permission import get_asset_system_user_ids_with_actions_by_group
 from assets.api.mixin import SerializeToTreeNodeMixin

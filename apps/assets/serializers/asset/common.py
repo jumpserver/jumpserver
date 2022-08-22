@@ -2,6 +2,7 @@
 #
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
+from django.db.models import F
 
 from common.drf.serializers import JMSWritableNestedModelSerializer
 from common.drf.fields import ChoiceDisplayField
@@ -107,7 +108,9 @@ class AssetSerializer(JMSWritableNestedModelSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('domain', 'platform', 'protocols')
+        queryset = queryset.prefetch_related('domain', 'platform', 'protocols')\
+            .annotate(category=F("platform__category"))\
+            .annotate(type=F("platform__type"))
         queryset = queryset.prefetch_related('nodes', 'labels')
         return queryset
 

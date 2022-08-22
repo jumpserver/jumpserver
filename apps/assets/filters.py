@@ -6,7 +6,7 @@ from rest_framework import filters
 from django.db.models import Q
 
 from .models import Label
-from assets.utils import is_query_node_all_assets, get_node
+from assets.utils import is_query_node_all_assets, get_node_from_request
 
 
 class AssetByNodeFilterBackend(filters.BaseFilterBackend):
@@ -31,7 +31,7 @@ class AssetByNodeFilterBackend(filters.BaseFilterBackend):
         return queryset.filter(nodes__key=node.key).distinct()
 
     def filter_queryset(self, request, queryset, view):
-        node = get_node(request)
+        node = get_node_from_request(request)
         if node is None:
             return queryset
 
@@ -42,9 +42,9 @@ class AssetByNodeFilterBackend(filters.BaseFilterBackend):
             return self.filter_node_related_direct(queryset, node)
 
 
-class FilterAssetByNodeFilterBackend(filters.BaseFilterBackend):
+class NodeFilterBackend(filters.BaseFilterBackend):
     """
-    需要与 `assets.api.mixin.FilterAssetByNodeMixin` 配合使用
+    需要与 `assets.api.mixin.NodeFilterMixin` 配合使用
     """
     fields = ['node', 'all']
 
@@ -58,10 +58,11 @@ class FilterAssetByNodeFilterBackend(filters.BaseFilterBackend):
         ]
 
     def filter_queryset(self, request, queryset, view):
-        node = view.node
+        node = get_node_from_request(request)
         if node is None:
             return queryset
-        query_all = view.is_query_node_all_assets
+
+        query_all = is_query_node_all_assets(request)
         if query_all:
             return queryset.filter(
                 Q(nodes__key__istartswith=f'{node.key}:') |
@@ -94,6 +95,9 @@ class LabelFilterBackend(filters.BaseFilterBackend):
         for kv in labels_query:
             if '#' in kv:
                 self.sep = '#'
+                break
+
+        for kv in labels_query:
             if self.sep not in kv:
                 continue
             key, value = kv.strip().split(self.sep)[:2]
