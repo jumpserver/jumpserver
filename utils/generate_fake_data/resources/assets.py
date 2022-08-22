@@ -5,6 +5,7 @@ import forgery_py
 from .base import FakeDataGenerator
 
 from assets.models import *
+from assets.const import AllTypes
 
 
 class NodesGenerator(FakeDataGenerator):
@@ -17,13 +18,34 @@ class NodesGenerator(FakeDataGenerator):
             parent.create_child()
 
 
+class PlatformGenerator(FakeDataGenerator):
+    resource = 'platform'
+    category_type: dict
+    categories: list
+
+    def pre_generate(self):
+        self.category_type = dict(AllTypes.category_types())
+        self.categories = list(self.category_type.keys())
+
+    def do_generate(self, batch, batch_size):
+        platforms = []
+        for i in batch:
+            data = {
+                'name': forgery_py.name.company_name(),
+                'category': ''
+            }
+            platforms.append(Platform(**data))
+        Platform.objects.bulk_create(platforms, ignore_conflicts=True)
+
+
 class AssetsGenerator(FakeDataGenerator):
     resource = 'asset'
-    admin_user_ids: list
     node_ids: list
+    platform_ids: list
 
     def pre_generate(self):
         self.node_ids = list(Node.objects.all().values_list('id', flat=True))
+        self.platform_ids = list(Platform.objects.all().values_list('id', flat=True))
 
     def set_assets_nodes(self, assets):
         for asset in assets:
@@ -39,8 +61,8 @@ class AssetsGenerator(FakeDataGenerator):
             hostname = f'{hostname}-{ip}'
             data = dict(
                 ip=ip,
-                hostname=hostname,
-                admin_user_id=choice(self.admin_user_ids),
+                name=hostname,
+                platform_id=choice(self.platform_ids),
                 created_by='Fake',
                 org_id=self.org.id
             )

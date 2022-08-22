@@ -17,11 +17,11 @@ class AssetPlatformViewSet(JMSModelViewSet):
         'default': PlatformSerializer,
         'categories': GroupedChoiceSerailizer
     }
-    filterset_fields = ['name']
+    filterset_fields = ['name', 'category', 'type']
     search_fields = ['name']
     rbac_perms = {
         'categories': 'assets.view_platform',
-        'type_constraints': 'assets-view_platform'
+        'type_constraints': 'assets.view_platform'
     }
 
     @action(methods=['GET'], detail=False)

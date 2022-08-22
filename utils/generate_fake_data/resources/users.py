@@ -4,7 +4,6 @@ import forgery_py
 from .base import FakeDataGenerator
 
 from users.models import *
-from orgs.models import OrganizationMember
 
 
 class UserGroupGenerator(FakeDataGenerator):

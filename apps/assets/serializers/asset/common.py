@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from common.drf.serializers import JMSWritableNestedModelSerializer
 from common.drf.fields import ChoiceDisplayField
 from ..account import AccountSerializer
-from ...models import Asset, Node, Platform, Protocol, Label, Domain, Account
+from ...models import Asset, Node, Platform, Protocol, Label, Domain
 from ...const import Category, AllTypes
 
 __all__ = [
