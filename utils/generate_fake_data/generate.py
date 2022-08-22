@@ -12,7 +12,7 @@ sys.path.insert(0, APPS_DIR)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "jumpserver.settings")
 django.setup()
 
-from resources.assets import AssetsGenerator, NodesGenerator
+from resources.assets import AssetsGenerator, NodesGenerator, PlatformGenerator
 from resources.users import UserGroupGenerator, UserGenerator
 from resources.perms import AssetPermissionGenerator
 from resources.terminal import CommandGenerator, SessionGenerator
@@ -20,6 +20,7 @@ from resources.terminal import CommandGenerator, SessionGenerator
 
 resource_generator_mapper = {
     'asset': AssetsGenerator,
+    'platform': PlatformGenerator,
     'node': NodesGenerator,
     'user': UserGenerator,
     'user_group': UserGroupGenerator,

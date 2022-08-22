@@ -30,9 +30,12 @@ class PlatformGenerator(FakeDataGenerator):
     def do_generate(self, batch, batch_size):
         platforms = []
         for i in batch:
+            category = choice(self.categories)
+            tp = choice(self.category_type[category].choices)
             data = {
                 'name': forgery_py.name.company_name(),
-                'category': ''
+                'category': choice(self.categories),
+                'type': tp
             }
             platforms.append(Platform(**data))
         Platform.objects.bulk_create(platforms, ignore_conflicts=True)
