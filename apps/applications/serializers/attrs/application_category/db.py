@@ -15,5 +15,5 @@ class DBSerializer(serializers.Serializer):
     )
     use_ssl = serializers.BooleanField(default=False, label=_('Use SSL'))
     ca_cert = serializers.CharField(
-        max_length=10240, required=False, allow_null=True, label=_('CA certificate')
+        required=False, allow_null=True, label=_('CA certificate')
     )
