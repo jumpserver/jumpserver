@@ -25,7 +25,7 @@ class SM2Mixin(BaseMixin):
         ecc_data = new_ecc_cipher_cla(len(plain_text))()
         ret = self._driver.SDF_ExternalEncrypt_ECC(self._session, c_int(alg_id), pointer(pk), plain_text,
                                                    c_int(len(plain_text)), pointer(ecc_data))
-        if not ret == 0:
+        if ret != 0:
             raise Exception("ecc encrypt failed", ret)
         return ecc_data.encode()
 
@@ -60,7 +60,7 @@ class SM2Mixin(BaseMixin):
         ret = self._driver.SDF_ExternalDecrypt_ECC(self._session, c_int(alg_id), pointer(vk),
                                                    pointer(ecc_data),
                                                    temp_data, pointer(temp_data_length))
-        if not ret == 0:
+        if ret != 0:
             raise Exception("ecc decrypt failed", ret)
         return bytes(temp_data[:temp_data_length.value])
 
@@ -68,20 +68,20 @@ class SM2Mixin(BaseMixin):
 class SM3Mixin(BaseMixin):
     def hash_init(self, alg_id):
         ret = self._driver.SDF_HashInit(self._session, c_int(alg_id), None, None, c_int(0))
-        if not ret == 0:
+        if ret != 0:
             raise PiicoError("hash init failed,alg id is {}".format(alg_id), ret)
 
     def hash_update(self, data):
         data = (c_ubyte * len(data))(*data)
         ret = self._driver.SDF_HashUpdate(self._session, data, c_int(len(data)))
-        if not ret == 0:
+        if ret != 0:
             raise PiicoError("hash update failed", ret)
 
     def hash_final(self):
         result_data = (c_ubyte * 32)()
         result_length = c_int()
         ret = self._driver.SDF_HashFinal(self._session, result_data, pointer(result_length))
-        if not ret == 0:
+        if ret != 0:
             raise PiicoError("hash final failed", ret)
         return bytes(result_data[:result_length.value])
 
@@ -94,13 +94,13 @@ class SM4Mixin(BaseMixin):
 
         key = c_void_p()
         ret = self._driver.SDF_ImportKey(self._session, key_val, c_int(len(key_val)), pointer(key))
-        if not ret == 0:
+        if ret != 0:
             raise PiicoError("import key failed", ret)
         return key
 
     def destroy_cipher_key(self, key):
         ret = self._driver.SDF_DestroyKey(self._session, key)
-        if not ret == 0:
+        if ret != 0:
             raise Exception("destroy key failed")
 
     def encrypt(self, plain_text, key, alg, iv=None):
@@ -119,11 +119,11 @@ class SM4Mixin(BaseMixin):
         if encrypt:
             ret = self._driver.SDF_Encrypt(self._session, key, c_int(alg), iv, text, c_int(len(text)), temp_data,
                                            pointer(temp_data_length))
-            if not ret == 0:
+            if ret != 0:
                 raise PiicoError("encrypt failed", ret)
         else:
             ret = self._driver.SDF_Decrypt(self._session, key, c_int(alg), iv, text, c_int(len(text)), temp_data,
                                            pointer(temp_data_length))
-            if not ret == 0:
+            if ret != 0:
                 raise PiicoError("decrypt failed", ret)
         return temp_data[:temp_data_length.value]

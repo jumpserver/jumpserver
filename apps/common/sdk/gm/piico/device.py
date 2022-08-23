@@ -10,7 +10,7 @@ class Device:
     _driver = None
     __device = None
 
-    def open(self, driver_path="./libpiico_ccmu"):
+    def open(self, driver_path="./libpiico_ccmu.so"):
         # load driver
         self.__load_driver(driver_path)
         # open device
@@ -20,14 +20,14 @@ class Device:
         if self.__device is None:
             raise Exception("device not turned on")
         ret = self._driver.SDF_CloseDevice(self.__device)
-        if not ret == 0:
+        if ret != 0:
             raise Exception("turn off device failed")
         self.__device = None
 
     def new_session(self):
         session = c_void_p()
         ret = self._driver.SDF_OpenSession(self.__device, pointer(session))
-        if not ret == 0:
+        if ret != 0:
             raise Exception("create session failed")
         return Session(self._driver, session)
 
@@ -65,6 +65,6 @@ class Device:
     def __open_device(self):
         device = c_void_p()
         ret = self._driver.SDF_OpenDevice(pointer(device))
-        if not ret == 0:
+        if ret != 0:
             raise PiicoError("open piico device failed", ret)
         self.__device = device
