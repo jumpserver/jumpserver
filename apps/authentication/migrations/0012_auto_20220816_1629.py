@@ -10,7 +10,7 @@ def migrate_system_user_to_account(apps, schema_editor):
 
     while True:
         connection_tokens = connection_token_model.objects \
-            .prefetch_related('system_users')[count:bulk_size]
+            .prefetch_related('system_user')[count:bulk_size]
         if not connection_tokens:
             break
         count += len(connection_tokens)

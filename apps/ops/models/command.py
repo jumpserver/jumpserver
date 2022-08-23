@@ -48,10 +48,6 @@ class CommandExecution(OrgModelMixin):
         return inv
 
     @lazyproperty
-    def run_as_display(self):
-        return str(self.run_as)
-
-    @lazyproperty
     def user_display(self):
         return str(self.user)
 

@@ -5,7 +5,7 @@ from simple_history.models import HistoricalRecords
 from common.db import fields
 from .base import BaseAccount, AbsConnectivity
 
-__all__ = ['Account']
+__all__ = ['Account', 'AccountTemplate']
 
 
 class Account(BaseAccount, AbsConnectivity):
@@ -27,3 +27,14 @@ class Account(BaseAccount, AbsConnectivity):
 
     def __str__(self):
         return '{}@{}'.format(self.username, self.asset.name)
+
+
+class AccountTemplate(BaseAccount, AbsConnectivity):
+    token = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Token'))
+    privileged = models.BooleanField(verbose_name=_("Privileged account"), default=False)
+
+    class Meta:
+        verbose_name = _('Account template')
+
+    def __str__(self):
+        return '{}@{}'.format(self.username, self.name)

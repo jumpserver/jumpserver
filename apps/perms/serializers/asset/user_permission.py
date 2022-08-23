@@ -25,7 +25,7 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Asset
         only_fields = [
-            "id", "name", "ip", "protocols", "os", 'domain',
+            "id", "name", "ip", "protocols", 'domain',
             "platform", "comment", "org_id", "is_active"
         ]
         fields = only_fields + ['org_name']

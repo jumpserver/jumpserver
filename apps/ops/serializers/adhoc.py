@@ -138,9 +138,8 @@ class CommandExecutionSerializer(serializers.ModelSerializer):
             'command', 'result', 'log_url',
             'is_finished', 'date_created', 'date_finished'
         ]
-        fields_fk = ['run_as']
         fields_m2m = ['hosts']
-        fields = fields_small + fields_fk + fields_m2m
+        fields = fields_small + fields_m2m
         read_only_fields = [
             'result', 'is_finished', 'log_url', 'date_created',
             'date_finished'

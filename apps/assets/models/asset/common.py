@@ -11,6 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.utils import lazyproperty
 from orgs.mixins.models import OrgManager, JMSOrgBaseModel
+from ...const import Category
 from ..platform import Platform
 from ..base import AbsConnectivity
 

@@ -5,6 +5,7 @@ from .common import AssetSerializer
 
 __all__ = [
     'DeviceSerializer', 'HostSerializer', 'DatabaseSerializer',
+    'NetworkSerializer', 'CloudSerializer',
 ]
 
 
