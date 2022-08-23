@@ -9,7 +9,7 @@ from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import current_org
 from perms import serializers
 from perms import models
-from perms.utils.asset.user_permission import UserGrantedAssetsQueryUtils
+from perms.utils.user_permission import UserGrantedAssetsQueryUtils
 
 __all__ = [
     'AssetPermissionUserRelationViewSet', 'AssetPermissionUserGroupRelationViewSet',

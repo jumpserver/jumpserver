@@ -1,4 +1,2 @@
-# coding: utf-8
-#
-
-from .asset import *
+from .permission import *
+from .user_permission import *

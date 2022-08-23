@@ -81,7 +81,7 @@ class SerializeToTreeNodeMixin:
 
 
 class NodeFilterMixin:
-    pagination_class = NodeAssetTreePagination
+    # pagination_class = NodeAssetTreePagination
     request: Request
 
     @lazyproperty

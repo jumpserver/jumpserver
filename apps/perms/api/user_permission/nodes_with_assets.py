@@ -11,7 +11,7 @@ from orgs.utils import tmp_to_root_org
 from common.permissions import IsValidUser
 from common.utils import get_logger, get_object_or_none
 from .mixin import AssetRoleUserMixin, AssetRoleAdminMixin
-from perms.utils.asset.user_permission import (
+from perms.utils.user_permission import (
     UserGrantedTreeBuildUtils, get_user_all_asset_perm_ids,
     UserGrantedNodesQueryUtils, UserGrantedAssetsQueryUtils,
 )

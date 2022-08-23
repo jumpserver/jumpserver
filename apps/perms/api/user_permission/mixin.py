@@ -7,7 +7,7 @@ from common.mixins.api import RoleAdminMixin as _RoleAdminMixin
 from common.mixins.api import RoleUserMixin as _RoleUserMixin
 from orgs.utils import tmp_to_root_org
 from users.models import User
-from perms.utils.asset.user_permission import UserGrantedTreeRefreshController
+from perms.utils.user_permission import UserGrantedTreeRefreshController
 
 
 class PermBaseMixin:

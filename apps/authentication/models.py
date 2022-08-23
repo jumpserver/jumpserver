@@ -129,7 +129,7 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
     actions = expired_at = None  # actions 和 expired_at 在 check_valid() 中赋值
 
     def check_valid(self):
-        from perms.utils.asset.permission import validate_permission as asset_validate_permission
+        from perms.utils.permission import validate_permission as asset_validate_permission
         from perms.utils.application.permission import validate_permission as app_validate_permission
 
         if self.is_expired:

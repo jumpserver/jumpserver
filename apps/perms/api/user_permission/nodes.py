@@ -13,7 +13,7 @@ from .mixin import AssetRoleAdminMixin, AssetRoleUserMixin
 from perms.hands import User
 from perms import serializers
 
-from perms.utils.asset.user_permission import UserGrantedNodesQueryUtils
+from perms.utils.user_permission import UserGrantedNodesQueryUtils
 
 
 logger = get_logger(__name__)

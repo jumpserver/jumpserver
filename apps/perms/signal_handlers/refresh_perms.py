@@ -10,7 +10,7 @@ from common.utils import get_logger
 from common.exceptions import M2MReverseNotAllowed
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR
 from perms.models import AssetPermission
-from perms.utils.asset.user_permission import UserGrantedTreeRefreshController
+from perms.utils.user_permission import UserGrantedTreeRefreshController
 
 
 logger = get_logger(__file__)

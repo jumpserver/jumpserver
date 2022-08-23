@@ -12,7 +12,10 @@ from common.utils.common import lazyproperty, timeit
 from assets.utils import NodeAssetsUtil
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
-from orgs.utils import tmp_to_org, current_org, ensure_in_real_or_default_org, tmp_to_root_org
+from orgs.utils import (
+    tmp_to_org, current_org,
+    ensure_in_real_or_default_org, tmp_to_root_org
+)
 from assets.models import (
     Asset, FavoriteAsset, AssetQuerySet, NodeQuerySet
 )

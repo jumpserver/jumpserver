@@ -16,7 +16,7 @@ from perms.notifications import (
     PermedAppsWillExpireUserMsg, AppPermsWillExpireForOrgAdminMsg
 )
 from perms.models import AssetPermission, ApplicationPermission
-from perms.utils.asset.user_permission import UserGrantedTreeRefreshController
+from perms.utils.user_permission import UserGrantedTreeRefreshController
 
 logger = get_logger(__file__)
 
