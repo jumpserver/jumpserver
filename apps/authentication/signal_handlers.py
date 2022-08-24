@@ -7,16 +7,7 @@ from django.dispatch import receiver
 from django_cas_ng.signals import cas_user_authenticated
 
 from apps.jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
-from authentication.backends.oidc.signals import (
-    openid_user_login_failed, openid_user_login_success
-)
-from authentication.backends.saml2.signals import (
-    saml2_user_authenticated, saml2_user_authentication_failed
-)
-from authentication.backends.oauth2.signals import (
-    oauth2_user_login_failed, oauth2_user_login_success
-)
-from .signals import post_auth_success, post_auth_failed
+from .signals import post_auth_success, post_auth_failed, user_auth_failed, user_auth_success
 
 
 @receiver(user_logged_in)
@@ -29,7 +20,8 @@ def on_user_auth_login_success(sender, user, request, **kwargs):
             and user.mfa_enabled \
             and not request.session.get('auth_mfa'):
         request.session['auth_mfa_required'] = 1
-    if not request.session.get("auth_third_party_done") and request.session.get('auth_backend') in AUTHENTICATION_BACKENDS_THIRD_PARTY:
+    if not request.session.get("auth_third_party_done") and \
+            request.session.get('auth_backend') in AUTHENTICATION_BACKENDS_THIRD_PARTY:
         request.session['auth_third_party_required'] = 1
     # 单点登录，超过了自动退出
     if settings.USER_LOGIN_SINGLE_MACHINE_ENABLED:
@@ -44,43 +36,19 @@ def on_user_auth_login_success(sender, user, request, **kwargs):
     request.session['auth_session_expiration_required'] = 1
 
 
-@receiver(openid_user_login_success)
-def on_oidc_user_login_success(sender, request, user, create=False, **kwargs):
-    request.session['auth_backend'] = settings.AUTH_BACKEND_OIDC_CODE
-    post_auth_success.send(sender, user=user, request=request)
-
-
-@receiver(openid_user_login_failed)
-def on_oidc_user_login_failed(sender, username, request, reason, **kwargs):
-    request.session['auth_backend'] = settings.AUTH_BACKEND_OIDC_CODE
-    post_auth_failed.send(sender, username=username, request=request, reason=reason)
-
-
 @receiver(cas_user_authenticated)
 def on_cas_user_login_success(sender, request, user, **kwargs):
     request.session['auth_backend'] = settings.AUTH_BACKEND_CAS
     post_auth_success.send(sender, user=user, request=request)
 
 
-@receiver(saml2_user_authenticated)
-def on_saml2_user_login_success(sender, request, user, **kwargs):
-    request.session['auth_backend'] = settings.AUTH_BACKEND_SAML2
+@receiver(user_auth_success)
+def on_user_login_success(sender, request, user, backend, create=False, **kwargs):
+    request.session['auth_backend'] = backend
     post_auth_success.send(sender, user=user, request=request)
 
 
-@receiver(saml2_user_authentication_failed)
-def on_saml2_user_login_failed(sender, request, username, reason, **kwargs):
-    request.session['auth_backend'] = settings.AUTH_BACKEND_SAML2
-    post_auth_failed.send(sender, username=username, request=request, reason=reason)
-
-
-@receiver(oauth2_user_login_success)
-def on_oauth2_user_login_success(sender, request, user, **kwargs):
-    request.session['auth_backend'] = settings.AUTH_BACKEND_OAUTH2
-    post_auth_success.send(sender, user=user, request=request)
-
-
-@receiver(oauth2_user_login_failed)
-def on_oauth2_user_login_failed(sender, username, request, reason, **kwargs):
-    request.session['auth_backend'] = settings.AUTH_BACKEND_OAUTH2
+@receiver(user_auth_failed)
+def on_user_login_failed(sender, username, request, reason, backend, **kwargs):
+    request.session['auth_backend'] = backend
     post_auth_failed.send(sender, username=username, request=request, reason=reason)
