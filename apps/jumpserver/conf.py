@@ -224,6 +224,8 @@ class Config(dict):
         'CONNECTION_TOKEN_EXPIRATION': 5 * 60,
 
         # Custom Config
+        'AUTH_CUSTOM': False,
+
         # Auth LDAP settings
         'AUTH_LDAP': False,
         'AUTH_LDAP_SERVER_URI': 'ldap://localhost:389',

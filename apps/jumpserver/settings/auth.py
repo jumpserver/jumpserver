@@ -2,7 +2,6 @@
 #
 import os
 import ldap
-from django.utils.translation import ugettext_lazy as _
 
 from ..const import CONFIG, PROJECT_DIR, BASE_DIR
 
@@ -197,7 +196,6 @@ AUTH_BACKEND_OAUTH2 = 'authentication.backends.oauth2.OAuth2Backend'
 AUTH_BACKEND_TEMP_TOKEN = 'authentication.backends.token.TempTokenAuthBackend'
 AUTH_BACKEND_CUSTOM = 'authentication.backends.custom.CustomAuthBackend'
 
-
 AUTHENTICATION_BACKENDS = [
     # 只做权限校验
     RBAC_BACKEND,
@@ -210,9 +208,12 @@ AUTHENTICATION_BACKENDS = [
     AUTH_BACKEND_WECOM, AUTH_BACKEND_DINGTALK, AUTH_BACKEND_FEISHU,
     # Token模式
     AUTH_BACKEND_AUTH_TOKEN, AUTH_BACKEND_SSO, AUTH_BACKEND_TEMP_TOKEN,
-    # 自定义模块
-    AUTH_BACKEND_CUSTOM
 ]
+
+AUTH_CUSTOM = CONFIG.AUTH_CUSTOM
+if AUTH_CUSTOM:
+    # 自定义认证模块
+    AUTHENTICATION_BACKENDS.append(AUTH_BACKEND_CUSTOM)
 
 AUTHENTICATION_BACKENDS_THIRD_PARTY = [AUTH_BACKEND_OIDC_CODE, AUTH_BACKEND_CAS, AUTH_BACKEND_SAML2, AUTH_BACKEND_OAUTH2]
 ONLY_ALLOW_EXIST_USER_AUTH = CONFIG.ONLY_ALLOW_EXIST_USER_AUTH

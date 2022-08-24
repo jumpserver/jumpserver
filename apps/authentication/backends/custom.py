@@ -17,6 +17,8 @@ class CustomAuthBackend(JMSModelBackend):
         return import_string(self.custom_auth_method_path)
 
     def is_enabled(self):
+        if not settings.AUTH_CUSTOM:
+            return False
         try:
             self.load_authenticate_method()
         except Exception as e:
