@@ -4,35 +4,6 @@ from itertools import groupby
 from django.db import migrations
 from django.db.models import F
 
-category_mapper = {
-    'Linux': ('host', 'linux'),
-    'Unix': ('host', 'unix'),
-    'MacOS': ('host', 'macos'),
-    'BSD': ('host', 'unix'),
-    'Windows': ('host', 'windows'),
-    'Other': ('host', 'other_host'),
-}
-
-
-def migrate_category_and_type(apps, *args):
-    asset_model = apps.get_model('assets', 'Asset')
-    assets_bases = asset_model.objects.all()\
-        .annotate(base=F("platform__base"))\
-        .values_list('id', 'base')\
-        .order_by('base')
-    base_assets = groupby(assets_bases, lambda a: a[1])
-
-    print("")
-    for base, grouper in base_assets:
-        asset_ids = [g[0] for g in grouper]
-        category_type = category_mapper.get(base)
-        if not category_type:
-            continue
-        print("Migrate {} to => {}".format(base, category_type))
-        category, tp = category_type
-        assets = asset_model.objects.filter(id__in=asset_ids)
-        assets.update(category=category, type=tp)
-
 
 class Migration(migrations.Migration):
 
@@ -41,5 +12,4 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(migrate_category_and_type)
     ]

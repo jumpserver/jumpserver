@@ -17,11 +17,8 @@ def create_app_platform(apps, *args):
         {'name': 'SQLServer', 'category': 'database', 'type': 'sqlserver'},
         {'name': 'MongoDB', 'category': 'database', 'type': 'mongodb'},
         {'name': 'Redis', 'category': 'database', 'type': 'redis'},
-        {'name': 'Chrome', 'category': 'remote_app', 'type': 'chrome'},
-        {'name': 'MysqlWorkbench', 'category': 'remote_app', 'type': 'mysql_workbench'},
-        {'name': 'VmwareClient', 'category': 'remote_app', 'type': 'vmware_client'},
-        {'name': 'General', 'category': 'remote_app', 'type': 'general_remote_app'},
         {'name': 'Kubernetes', 'category': 'cloud', 'type': 'k8s'},
+        {'name': 'Web', 'category': 'web', 'type': 'general'},
     ]
 
     for platform in platforms:
@@ -34,7 +31,7 @@ def get_prop_name_id(apps, app, category):
     asset_model = apps.get_model('assets', 'Asset')
     _id = app.id
     id_exists = asset_model.objects.filter(id=_id).exists()
-    if (id_exists):
+    if id_exists:
         _id = uuid.uuid4()
     name = app.name
     name_exists = asset_model.objects.filter(hostname=name).exists()

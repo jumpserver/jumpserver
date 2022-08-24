@@ -94,13 +94,13 @@ class AssetPermissionFilter(PermissionBaseFilter):
     node_id = filters.UUIDFilter(method='do_nothing')
     node = filters.CharFilter(method='do_nothing')
     asset_id = filters.UUIDFilter(method='do_nothing')
-    hostname = filters.CharFilter(method='do_nothing')
+    asset_name = filters.CharFilter(method='do_nothing')
     ip = filters.CharFilter(method='do_nothing')
 
     class Meta:
         model = AssetPermission
         fields = (
-            'user_id', 'username', 'system_user_id', 'system_user', 'user_group_id',
+            'user_id', 'username', 'user_group_id',
             'user_group', 'node_id', 'node', 'asset_id', 'name', 'ip', 'name',
             'all', 'asset_id', 'is_valid', 'is_effective', 'from_ticket'
         )
@@ -141,36 +141,36 @@ class AssetPermissionFilter(PermissionBaseFilter):
     def filter_asset(self, queryset):
         is_query_all = self.get_query_param('all', True)
         asset_id = self.get_query_param('asset_id')
-        hostname = self.get_query_param('name')
+        asset_name = self.get_query_param('asset_name')
         ip = self.get_query_param('ip')
 
         if asset_id:
             assets = Asset.objects.filter(pk=asset_id)
-        elif hostname:
-            assets = Asset.objects.filter(hostname=hostname)
+        elif asset_name:
+            assets = Asset.objects.filter(name=asset_name)
         elif ip:
             assets = Asset.objects.filter(ip=ip)
         else:
             return queryset
         if not assets:
             return queryset.none()
-        assetids = list(assets.values_list('id', flat=True))
+        asset_ids = list(assets.values_list('id', flat=True))
 
         if not is_query_all:
-            queryset = queryset.filter(assets__in=assetids)
+            queryset = queryset.filter(assets__in=asset_ids)
             return queryset
-        inherit_all_nodekeys = set()
-        inherit_nodekeys = set(assets.values_list('nodes__key', flat=True))
+        inherit_all_node_keys = set()
+        inherit_node_keys = set(assets.values_list('nodes__key', flat=True))
 
-        for key in inherit_nodekeys:
+        for key in inherit_node_keys:
             ancestor_keys = Node.get_node_ancestor_keys(key, with_self=True)
-            inherit_all_nodekeys.update(ancestor_keys)
+            inherit_all_node_keys.update(ancestor_keys)
 
-        inherit_all_nodeids = Node.objects.filter(key__in=inherit_all_nodekeys).values_list('id', flat=True)
-        inherit_all_nodeids = list(inherit_all_nodeids)
+        inherit_all_node_ids = Node.objects.filter(key__in=inherit_all_node_keys).values_list('id', flat=True)
+        inherit_all_node_ids = list(inherit_all_node_ids)
 
-        qs1 = queryset.filter(assets__in=assetids).distinct()
-        qs2 = queryset.filter(nodes__in=inherit_all_nodeids).distinct()
+        qs1 = queryset.filter(assets__in=asset_ids).distinct()
+        qs2 = queryset.filter(nodes__in=inherit_all_node_ids).distinct()
 
         qs = UnionQuerySet(qs1, qs2)
         return qs

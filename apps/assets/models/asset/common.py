@@ -112,6 +112,10 @@ class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
             names.append(n.name + ':' + n.value)
         return names
 
+    @property
+    def protocols_as_list(self):
+        return [{'name': p.name, 'port': p.port} for p in self.protocols.all()]
+
     @lazyproperty
     def type(self):
         return self.platform.type

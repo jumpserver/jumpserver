@@ -41,7 +41,7 @@ class SerializeToTreeNodeMixin:
     def get_platform(self, asset: Asset):
         default = 'file'
         icon = {'windows', 'linux'}
-        platform = asset.platform_base.lower()
+        platform = asset.platform.type.lower()
         if platform in icon:
             return platform
         return default
@@ -70,7 +70,7 @@ class SerializeToTreeNodeMixin:
                         'name': asset.name,
                         'ip': asset.ip,
                         'protocols': asset.protocols_as_list,
-                        'platform': asset.platform_base,
+                        'platform': asset.platform.id,
                         'org_name': asset.org_name
                     },
                 }
