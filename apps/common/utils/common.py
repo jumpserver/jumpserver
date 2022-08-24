@@ -12,6 +12,7 @@ import ipaddress
 import psutil
 import platform
 import os
+import socket
 
 from django.conf import settings
 
@@ -365,3 +366,18 @@ def pretty_string(data: str, max_length=128, ellipsis_str='...'):
 
 def group_by_count(it, count):
     return [it[i:i+count] for i in range(0, len(it), count)]
+
+
+def test_ip_connectivity(host, port, timeout=0.5):
+    """
+    timeout: seconds
+    """
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(timeout)
+    result = sock.connect_ex((host, int(port)))
+    sock.close()
+    if result == 0:
+        connectivity = True
+    else:
+        connectivity = False
+    return connectivity

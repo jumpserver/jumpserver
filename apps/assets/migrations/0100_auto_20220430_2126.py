@@ -32,8 +32,8 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='platform',
-            name='protocols_default',
-            field=models.JSONField(blank=True, default=list, max_length=128, verbose_name='Protocols default'),
+            name='protocols_enabled',
+            field=models.BooleanField(default=True, verbose_name='Protocols enabled'),
         ),
         migrations.AddField(
             model_name='platform',
