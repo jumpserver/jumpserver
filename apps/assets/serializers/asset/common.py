@@ -2,6 +2,7 @@
 #
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
+from django.db.transaction import atomic
 from django.db.models import F
 
 from common.drf.serializers import JMSWritableNestedModelSerializer
@@ -72,6 +73,7 @@ class AssetSerializer(JMSWritableNestedModelSerializer):
     """
     资产的数据结构
     """
+
     class Meta:
         model = Asset
         fields_mini = [
@@ -108,8 +110,8 @@ class AssetSerializer(JMSWritableNestedModelSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('domain', 'platform', 'protocols')\
-            .annotate(category=F("platform__category"))\
+        queryset = queryset.prefetch_related('domain', 'platform', 'protocols') \
+            .annotate(category=F("platform__category")) \
             .annotate(type=F("platform__type"))
         queryset = queryset.prefetch_related('nodes', 'labels')
         return queryset
@@ -138,6 +140,7 @@ class AssetSerializer(JMSWritableNestedModelSerializer):
             raise serializers.ValidationError({'accounts': e})
         serializer.save()
 
+    @atomic
     def create(self, validated_data):
         nodes_display = validated_data.pop('nodes_display', '')
         instance = super().create(validated_data)
@@ -146,6 +149,7 @@ class AssetSerializer(JMSWritableNestedModelSerializer):
         self.perform_nodes_display_create(instance, nodes_display)
         return instance
 
+    @atomic
     def update(self, instance, validated_data):
         nodes_display = validated_data.pop('nodes_display', '')
         instance = super().update(instance, validated_data)

@@ -1,45 +1,35 @@
-from rest_framework import serializers
-from django.utils.translation import ugettext_lazy as _
 from django.db.models import F
+from django.utils.translation import ugettext_lazy as _
+from rest_framework import serializers
 
-from assets.models import Account
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-
-from .base import AuthSerializerMixin
 from common.drf.serializers import SecretReadableMixin
+from assets.models import Account
+from assets.serializers.base import AuthSerializerMixin
+from .account_template import AccountTemplateSerializerMixin
+from .common import BaseAccountSerializer
 
 
-class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
+class AccountSerializer(
+    AccountTemplateSerializerMixin, AuthSerializerMixin, BulkOrgResourceModelSerializer
+):
     ip = serializers.ReadOnlyField(label=_("IP"))
     asset_name = serializers.ReadOnlyField(label=_("Asset"))
     platform = serializers.ReadOnlyField(label=_("Platform"))
 
-    class Meta:
+    class Meta(BaseAccountSerializer.Meta):
         model = Account
-        fields_mini = [
-            'id', 'privileged', 'username', 'ip', 'asset_name',
-            'platform', 'version'
-        ]
-        fields_write_only = ['password', 'private_key', 'public_key', 'passphrase']
-        fields_other = ['date_created', 'date_updated', 'connectivity', 'date_verified', 'comment']
-        fields_small = fields_mini + fields_write_only + fields_other
-        fields_fk = ['asset']
-        fields = fields_small + fields_fk
-        extra_kwargs = {
-            'username': {'required': True},
-            'private_key': {'write_only': True},
-            'public_key': {'write_only': True},
-        }
-        ref_name = 'AssetAccountSerializer'
+        fields = BaseAccountSerializer.Meta.fields + ['account_template', ]
 
     def validate(self, attrs):
         attrs = self._validate_gen_key(attrs)
+        attrs = super()._validate(attrs)
         return attrs
 
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('asset')\
+        queryset = queryset.prefetch_related('asset') \
             .annotate(ip=F('asset__ip')) \
             .annotate(asset_name=F('asset__name'))
         return queryset
