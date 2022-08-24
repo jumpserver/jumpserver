@@ -29,7 +29,7 @@ class CustomAuthBackend(JMSModelBackend):
     @staticmethod
     def get_or_create_user_from_userinfo(userinfo: dict):
         username = userinfo['username']
-        attrs = ['name', 'username', 'email']
+        attrs = ['name', 'username', 'email', 'is_active']
         defaults = {attr: userinfo[attr] for attr in attrs}
         user, created = get_user_model().objects.get_or_create(
             username=username, defaults=defaults
@@ -39,7 +39,7 @@ class CustomAuthBackend(JMSModelBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
         try:
             authenticate = self.load_authenticate_method()
-            userinfo: dict = authenticate(username=username, password=password)
+            userinfo: dict = authenticate(username=username, password=password, **kwargs)
             user, created = self.get_or_create_user_from_userinfo(userinfo)
         except Exception as e:
             logger.error('Custom authenticate error: {}'.format(e))
