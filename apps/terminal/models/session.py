@@ -31,8 +31,8 @@ class Session(OrgModelMixin):
     user_id = models.CharField(blank=True, default='', max_length=36, db_index=True)
     asset = models.CharField(max_length=128, verbose_name=_("Asset"), db_index=True)
     asset_id = models.CharField(blank=True, default='', max_length=36, db_index=True)
-    system_user = models.CharField(max_length=128, verbose_name=_("System user"), db_index=True)
-    system_user_id = models.CharField(blank=True, default='', max_length=36, db_index=True)
+    account = models.CharField(max_length=128, verbose_name=_("Account"), db_index=True)
+    protocol = models.CharField(default='ssh', max_length=16, db_index=True)
     login_from = models.CharField(max_length=2, choices=LOGIN_FROM.choices, default="ST", verbose_name=_("Login from"))
     remote_addr = models.CharField(max_length=128, verbose_name=_("Remote addr"), blank=True, null=True)
     is_success = models.BooleanField(default=True, db_index=True)
@@ -40,7 +40,6 @@ class Session(OrgModelMixin):
     has_replay = models.BooleanField(default=False, verbose_name=_("Replay"))
     has_command = models.BooleanField(default=False, verbose_name=_("Command"))
     terminal = models.ForeignKey('terminal.Terminal', null=True, on_delete=models.DO_NOTHING, db_constraint=False)
-    protocol = models.CharField(choices=Protocol.choices, default='ssh', max_length=16, db_index=True)
     date_start = models.DateTimeField(verbose_name=_("Date start"), db_index=True, default=timezone.now)
     date_end = models.DateTimeField(verbose_name=_("Date end"), null=True)
 
@@ -123,9 +122,9 @@ class Session(OrgModelMixin):
             return False
         if self.login_from == self.LOGIN_FROM.RT:
             return False
-        if Protocol in [
-            Protocol.SSH, Protocol.VNC, Protocol.RDP,
-            Protocol.TELNET, Protocol.K8S
+        if self.protocol in [
+            Protocol.ssh, Protocol.vnc, Protocol.rdp,
+            Protocol.telnet, Protocol.k8s
         ]:
             return True
         else:

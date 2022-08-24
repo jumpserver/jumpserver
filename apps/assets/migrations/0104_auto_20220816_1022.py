@@ -46,7 +46,7 @@ def migrate_command_filter_apps(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0107_auto_20220811_1511'),
+        ('assets', '0103_auto_20220811_1511'),
     ]
 
     operations = [

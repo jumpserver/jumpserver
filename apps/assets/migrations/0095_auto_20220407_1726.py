@@ -14,7 +14,7 @@ def migrate_platform_type_to_lower(apps, *args):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0096_auto_20220406_1546'),
+        ('assets', '0094_auto_20220402_1736'),
     ]
 
     operations = [
@@ -26,8 +26,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='platform',
             name='category',
-            field=models.CharField(default='host', max_length=16, verbose_name='Category'),
-            preserve_default=False,
+            field=models.CharField(default='host', max_length=32, verbose_name='Category'),
         ),
         migrations.AlterField(
             model_name='platform',

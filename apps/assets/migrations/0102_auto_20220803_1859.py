@@ -44,7 +44,7 @@ def migrate_asset_protocols(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0103_auto_20220803_1448'),
+        ('assets', '0101_auto_20220803_1448'),
     ]
 
     operations = [

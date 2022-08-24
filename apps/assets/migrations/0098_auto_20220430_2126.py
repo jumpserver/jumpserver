@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0099_auto_20220426_1558'),
+        ('assets', '0097_auto_20220426_1558'),
     ]
 
     operations = [
@@ -73,7 +73,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='platform',
             name='su_enabled',
-            field=models.BooleanField(default=False),
+            field=models.BooleanField(default=False, verbose_name='Su enabled'),
         ),
         migrations.AddField(
             model_name='platform',
@@ -89,15 +89,5 @@ class Migration(migrations.Migration):
             model_name='platform',
             name='verify_account_method',
             field=models.TextField(blank=True, max_length=32, null=True, verbose_name='Verify account method'),
-        ),
-        migrations.AlterField(
-            model_name='asset',
-            name='category',
-            field=models.CharField(choices=[('host', 'Host'), ('network', 'NetworkDevice'), ('database', 'Database'), ('remote_app', 'Remote app'), ('cloud', 'Clouding')], max_length=16, verbose_name='Category'),
-        ),
-        migrations.AlterField(
-            model_name='platform',
-            name='category',
-            field=models.CharField(choices=[('host', 'Host'), ('network', 'NetworkDevice'), ('database', 'Database'), ('remote_app', 'Remote app'), ('cloud', 'Clouding')], max_length=16, verbose_name='Category'),
         ),
     ]

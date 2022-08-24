@@ -24,8 +24,8 @@ class Platform(models.Model):
         ('gbk', 'GBK'),
     )
     name = models.SlugField(verbose_name=_("Name"), unique=True, allow_unicode=True)
-    category = models.CharField(max_length=16, choices=Category.choices, default=Category.HOST, verbose_name=_("Category"))
-    type = models.CharField(choices=AllTypes.choices, max_length=32, default='Linux', verbose_name=_("Type"))
+    category = models.CharField(default='host', max_length=32, verbose_name=_("Category"))
+    type = models.CharField(max_length=32, default='linux', verbose_name=_("Type"))
     charset = models.CharField(default='utf8', choices=CHARSET_CHOICES, max_length=8, verbose_name=_("Charset"))
     meta = JsonDictTextField(blank=True, null=True, verbose_name=_("Meta"))
     internal = models.BooleanField(default=False, verbose_name=_("Internal"))
