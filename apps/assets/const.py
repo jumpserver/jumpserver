@@ -5,7 +5,7 @@ from common.tree import TreeNode
 
 
 __all__ = [
-    'Category', 'HostTypes', 'NetworkTypes', 'DatabaseTypes',
+    'Category', 'HostTypes', 'NetworkingTypes', 'DatabaseTypes',
     'WebTypes', 'CloudTypes', 'Protocol', 'AllTypes',
 ]
 
@@ -26,7 +26,7 @@ class PlatformMixin:
 
 class Category(PlatformMixin, ChoicesMixin, models.TextChoices):
     HOST = 'host', _('Host')
-    NETWORK = 'network', _("NetworkDevice")
+    NETWORKING = 'networking', _("NetworkDevice")
     DATABASE = 'database', _("Database")
     CLOUD = 'cloud', _("Clouding")
     WEB = 'web', _("Web")
@@ -42,7 +42,7 @@ class Category(PlatformMixin, ChoicesMixin, models.TextChoices):
                 'has_create_account': True,
                 '_protocols': ['ssh', 'telnet']
             },
-            cls.NETWORK: {
+            cls.NETWORKING: {
                 'has_domain': True,
                 '_protocols': ['ssh', 'telnet']
             },
@@ -84,7 +84,7 @@ class HostTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
         }
 
 
-class NetworkTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
+class NetworkingTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
     SWITCH = 'switch', _("Switch")
     ROUTER = 'router', _("Router")
     FIREWALL = 'firewall', _("Firewall")
@@ -121,7 +121,7 @@ class CloudTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
 class AllTypes(ChoicesMixin, metaclass=IncludesTextChoicesMeta):
     choices: list
     includes = [
-        HostTypes, NetworkTypes, DatabaseTypes,
+        HostTypes, NetworkingTypes, DatabaseTypes,
         WebTypes, CloudTypes
     ]
 
@@ -150,7 +150,7 @@ class AllTypes(ChoicesMixin, metaclass=IncludesTextChoicesMeta):
     def category_types(cls):
         return (
             (Category.HOST, HostTypes),
-            (Category.NETWORK, NetworkTypes),
+            (Category.NETWORKING, NetworkingTypes),
             (Category.DATABASE, DatabaseTypes),
             (Category.WEB, WebTypes),
             (Category.CLOUD, CloudTypes)
@@ -217,6 +217,8 @@ class Protocol(ChoicesMixin, models.TextChoices):
     mongodb = 'mongodb', 'MongoDB'
 
     k8s = 'k8s', 'K8S'
+    http = 'http', 'HTTP'
+    https = 'https', 'HTTPS'
 
     @classmethod
     def host_protocols(cls):
@@ -245,6 +247,9 @@ class Protocol(ChoicesMixin, models.TextChoices):
             cls.mongodb: 27017,
             cls.redis: 6379,
 
-            cls.k8s: 0
+            cls.k8s: 0,
+
+            cls.http: 80,
+            cls.https: 443
         }
 

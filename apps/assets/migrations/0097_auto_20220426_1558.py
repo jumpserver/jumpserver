@@ -57,7 +57,6 @@ def migrate_database_to_asset(apps, *args):
         db = db_model(
             id=app.id, hostname=app.name, ip=attrs['host'],
             protocols='{}/{}'.format(app.type, attrs['port']),
-            category='database', type=app.type,
             db_name=attrs['database'] or '',
             platform=platforms_map[app.type],
             org_id=app.org_id
@@ -69,48 +68,48 @@ def migrate_database_to_asset(apps, *args):
             failed_apps.append(app)
             pass
 
-
-def migrate_remote_app_to_asset(apps, *args):
-    app_model = apps.get_model('applications', 'Application')
-    remote_app_model = apps.get_model('assets', 'RemoteApp')
-    host_model = apps.get_model('assets', 'Host')
-    platform_model = apps.get_model('assets', 'Platform')
-    applications = app_model.objects.filter(category='remote_app')
-    platforms = platform_model.objects.filter(category='remote_app')
-    platforms_map = {p.type: p for p in platforms}
-
-    connect_host_map = {}
-
-    for app in applications:
-        attrs = app.attrs
-        connect_host = attrs.pop('asset')
-        if connect_host:
-            connect_host = host_model.objects.filter(asset_ptr_id=connect_host).first()
-            connect_host_map[app.id] = connect_host
-
-    for app in applications:
-        tp = app.type
-        app_path = attrs.pop('path', '')
-        if tp == 'custom':
-            tp = 'general_remote_app'
-
-        print("Create remote app: {}".format(app.name))
-        remote_app = remote_app_model(
-            id=app.id, hostname=app.name, ip='',
-            protocols='',
-            category='remote_app', type=tp,
-            platform=platforms_map[tp],
-            org_id=app.org_id,
-
-            app_path=app_path,
-            connect_host=connect_host_map.get(app.id),
-            attrs=attrs,
-        )
-        try:
-            remote_app.save()
-        except Exception as e:
-            print("Error: ", e)
-            # remote_app.hostname = 'RemoteApp-' + remote_app.hostname
+#
+# def migrate_remote_app_to_asset(apps, *args):
+#     app_model = apps.get_model('applications', 'Application')
+#     remote_app_model = apps.get_model('assets', 'Web')
+#     host_model = apps.get_model('assets', 'Host')
+#     platform_model = apps.get_model('assets', 'Platform')
+#     applications = app_model.objects.filter(category='remote_app')
+#     platforms = platform_model.objects.filter(category='remote_app')
+#     platforms_map = {p.type: p for p in platforms}
+#
+#     connect_host_map = {}
+#
+#     for app in applications:
+#         attrs = app.attrs
+#         connect_host = attrs.pop('asset')
+#         if connect_host:
+#             connect_host = host_model.objects.filter(asset_ptr_id=connect_host).first()
+#             connect_host_map[app.id] = connect_host
+#
+#     for app in applications:
+#         tp = app.type
+#         attrs = app.attrs
+#         app_path = attrs.pop('path', '')
+#         if tp == 'custom':
+#             tp = 'general_remote_app'
+#
+#         print("Create remote app: {}".format(app.name))
+#         remote_app = remote_app_model(
+#             id=app.id, hostname=app.name, ip='',
+#             protocols='',
+#             platform=platforms_map[tp],
+#             org_id=app.org_id,
+#             app_path=app_path,
+#             connect_host=connect_host_map.get(app.id),
+#             attrs=attrs,
+#         )
+#         try:
+#             remote_app.save()
+#         except Exception as e:
+#             print("Error: ", e)
+#             # remote_app.hostname = 'RemoteApp-' + remote_app.hostname
+#
 
 
 def migrate_cloud_to_asset(apps, *args):
@@ -126,7 +125,6 @@ def migrate_cloud_to_asset(apps, *args):
         print("Create cloud: {}".format(app.name))
         cloud = cloud_model(
             id=app.id, hostname=app.name, ip='',
-            category='remote_app', type='k8s',
             protocols='',
             platform=platform,
             org_id=app.org_id,
@@ -176,7 +174,7 @@ def migrate_to_nodes(apps, *args):
     for org in orgs:
         node = create_app_nodes(apps, org.id)
         assets = asset_model.objects.filter(
-            category__in=['remote_app', 'database', 'cloud'],
+            platform__category__in=['remote_app', 'database', 'cloud'],
             org_id=org.id
         )
         if not node:
@@ -192,14 +190,13 @@ def migrate_to_nodes(apps, *args):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('assets', '0098_auto_20220426_1550'),
+        ('assets', '0096_auto_20220426_1550'),
         ('applications', '0020_auto_20220316_2028')
     ]
 
     operations = [
         migrations.RunPython(create_app_platform),
         migrations.RunPython(migrate_database_to_asset),
-        migrations.RunPython(migrate_remote_app_to_asset),
         migrations.RunPython(migrate_cloud_to_asset),
         migrations.RunPython(migrate_to_nodes)
     ]

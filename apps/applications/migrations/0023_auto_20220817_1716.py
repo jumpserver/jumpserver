@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
         ('applications', '0022_auto_20220817_1346'),
         ('perms', '0031_auto_20220816_1600'),
         ('ops', '0022_auto_20220817_1346'),
-        ('assets', '0109_auto_20220817_1544'),
+        ('assets', '0105_auto_20220817_1544'),
         ('tickets', '0020_auto_20220817_1346'),
     ]
 

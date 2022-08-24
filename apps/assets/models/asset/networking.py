@@ -2,5 +2,5 @@
 from .common import Asset
 
 
-class Network(Asset):
+class Networking(Asset):
     pass

@@ -13,6 +13,20 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='session',
             name='protocol',
-            field=models.CharField(choices=[('ssh', 'SSH'), ('rdp', 'RDP'), ('telnet', 'Telnet'), ('vnc', 'VNC'), ('mysql', 'MySQL'), ('mariadb', 'MariaDB'), ('oracle', 'Oracle'), ('postgresql', 'PostgreSQL'), ('sqlserver', 'SQLServer'), ('redis', 'Redis'), ('mongodb', 'MongoDB'), ('k8s', 'K8S')], db_index=True, default='ssh', max_length=16),
+            field=models.CharField(db_index=True, default='ssh', max_length=16),
+        ),
+        migrations.RenameField(
+            model_name='session',
+            old_name='system_user',
+            new_name='account',
+        ),
+        migrations.RemoveField(
+            model_name='session',
+            name='system_user_id',
+        ),
+        migrations.AlterField(
+            model_name='session',
+            name='account',
+            field=models.CharField(db_index=True, max_length=128, verbose_name='Account'),
         ),
     ]

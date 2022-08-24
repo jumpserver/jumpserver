@@ -2,6 +2,8 @@ from rest_framework import serializers
 
 from django.utils.translation import ugettext_lazy as _
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+
+from assets.const import Protocol
 from ..models import Session
 
 __all__ = [
@@ -13,16 +15,15 @@ __all__ = [
 class SessionSerializer(BulkOrgResourceModelSerializer):
     org_id = serializers.CharField(allow_blank=True)
     terminal_display = serializers.CharField(read_only=True, label=_('Terminal display'))
+    protocol = serializers.ChoiceField(choices=Protocol.choices, label=_("Protocol"))
 
     class Meta:
         model = Session
         fields_mini = ["id"]
         fields_small = fields_mini + [
-            "user", "asset", "system_user",
-            "user_id", "asset_id", "system_user_id",
-            "login_from", "login_from_display", "remote_addr", "protocol",
-            "is_success", "is_finished", "has_replay",
-            "date_start", "date_end",
+            "user", "asset", "user_id", "asset_id", 'account', "protocol",
+            "login_from", "login_from_display", "remote_addr", "is_success",
+            "is_finished", "has_replay", "date_start", "date_end",
         ]
         fields_fk = ["terminal", ]
         fields_custom = ["can_replay", "can_join", "can_terminate", 'terminal_display']
@@ -31,7 +32,6 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
             "protocol": {'label': _('Protocol')},
             'user_id': {'label': _('User ID')},
             'asset_id': {'label': _('Asset ID')},
-            'system_user_id': {'label': _('System user ID')},
             'login_from_display': {'label': _('Login from display')},
             'is_success': {'label': _('Is success')},
             'can_replay': {'label': _('Can replay')},

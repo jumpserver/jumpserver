@@ -55,7 +55,7 @@ class SessionViewSet(OrgBulkModelViewSet):
         'display': serializers.SessionDisplaySerializer,
     }
     search_fields = [
-        "user", "asset", "system_user", "remote_addr",
+        "user", "asset", "account", "remote_addr",
         "protocol", "is_finished", 'login_from',
     ]
     filterset_fields = search_fields + ['terminal']

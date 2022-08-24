@@ -55,7 +55,7 @@ def migrate_accounts(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0101_auto_20220711_1409'),
+        ('assets', '0099_auto_20220711_1409'),
     ]
 
     operations = [

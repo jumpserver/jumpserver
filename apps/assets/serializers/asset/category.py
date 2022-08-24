@@ -1,11 +1,11 @@
 from rest_framework import serializers
 
-from assets.models import DeviceInfo, Host, Database, Network, Cloud
+from assets.models import DeviceInfo, Host, Database, Networking, Cloud
 from .common import AssetSerializer
 
 __all__ = [
     'DeviceSerializer', 'HostSerializer', 'DatabaseSerializer',
-    'NetworkSerializer', 'CloudSerializer',
+    'NetworkingSerializer', 'CloudSerializer',
 ]
 
 
@@ -34,9 +34,9 @@ class DatabaseSerializer(AssetSerializer):
         fields = AssetSerializer.Meta.fields + ['db_name']
 
 
-class NetworkSerializer(AssetSerializer):
+class NetworkingSerializer(AssetSerializer):
     class Meta(AssetSerializer.Meta):
-        model = Network
+        model = Networking
 
 
 class CloudSerializer(AssetSerializer):
