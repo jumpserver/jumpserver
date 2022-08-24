@@ -1,6 +1,4 @@
-import os
 from django.conf import settings
-import inspect
 from django.utils.module_loading import import_string
 from common.utils import get_logger
 from django.contrib.auth import get_user_model
@@ -14,6 +12,9 @@ logger = get_logger(__file__)
 
 class CustomAuthBackend(JMSModelBackend):
     custom_auth_method_path = 'data.auth.main.authenticate'
+
+    def load_authenticate_method(self):
+        return import_string(self.custom_auth_method_path)
 
     def is_enabled(self):
         try:
@@ -34,9 +35,6 @@ class CustomAuthBackend(JMSModelBackend):
             username=username, defaults=defaults
         )
         return user, created
-
-    def load_authenticate_method(self):
-        return import_string(self.custom_auth_method_path)
 
     def authenticate(self, request, username=None, password=None, **kwargs):
         try:
