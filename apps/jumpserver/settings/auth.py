@@ -210,8 +210,26 @@ AUTHENTICATION_BACKENDS = [
     AUTH_BACKEND_AUTH_TOKEN, AUTH_BACKEND_SSO, AUTH_BACKEND_TEMP_TOKEN,
 ]
 
+
+def get_file_md5(filepath):
+    import hashlib
+    # 创建md5对象
+    m = hashlib.md5()
+    with open(filepath, 'rb') as f:
+        while True:
+            data = f.read(4096)
+            if not data:
+                break
+            # 更新md5对象
+            m.update(data)
+    # 返回md5对象
+    return m.hexdigest()
+
+
 AUTH_CUSTOM = CONFIG.AUTH_CUSTOM
-if AUTH_CUSTOM:
+AUTH_CUSTOM_FILE_MD5 = CONFIG.AUTH_CUSTOM_FILE_MD5
+AUTH_CUSTOM_FILE_PATH = os.path.join(PROJECT_DIR, 'data', 'auth', 'main.py')
+if AUTH_CUSTOM and AUTH_CUSTOM_FILE_MD5 == get_file_md5(AUTH_CUSTOM_FILE_PATH):
     # 自定义认证模块
     AUTHENTICATION_BACKENDS.append(AUTH_BACKEND_CUSTOM)
 

@@ -225,6 +225,7 @@ class Config(dict):
 
         # Custom Config
         'AUTH_CUSTOM': False,
+        'AUTH_CUSTOM_FILE_MD5': '',
 
         # Auth LDAP settings
         'AUTH_LDAP': False,

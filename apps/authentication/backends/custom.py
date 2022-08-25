@@ -4,29 +4,25 @@ from common.utils import get_logger
 from django.contrib.auth import get_user_model
 from authentication.signals import user_auth_failed, user_auth_success
 
-
 from .base import JMSModelBackend
 
 logger = get_logger(__file__)
 
+custom_authenticate_method = None
+
+if settings.AUTH_CUSTOM:
+    """ 保证自定义认证方法在服务运行时不能被更改，只在第一次调用时加载一次 """
+    try:
+        custom_auth_method_path = 'data.auth.main.authenticate'
+        custom_authenticate_method = import_string(custom_auth_method_path)
+    except Exception as e:
+        logger.warning('Import custom auth method failed: {}, Maybe not enabled'.format(e))
+
 
 class CustomAuthBackend(JMSModelBackend):
-    custom_auth_method_path = 'data.auth.main.authenticate'
-
-    def load_authenticate_method(self):
-        return import_string(self.custom_auth_method_path)
 
     def is_enabled(self):
-        if not settings.AUTH_CUSTOM:
-            return False
-        try:
-            self.load_authenticate_method()
-        except Exception as e:
-            logger.warning('Not enabled custom auth backend: {}'.format(e))
-            return False
-        else:
-            logger.info('Enabled custom auth backend')
-            return True
+        return settings.AUTH_CUSTOM and callable(custom_authenticate_method)
 
     @staticmethod
     def get_or_create_user_from_userinfo(userinfo: dict):
@@ -40,8 +36,9 @@ class CustomAuthBackend(JMSModelBackend):
 
     def authenticate(self, request, username=None, password=None, **kwargs):
         try:
-            authenticate = self.load_authenticate_method()
-            userinfo: dict = authenticate(username=username, password=password, **kwargs)
+            userinfo: dict = custom_authenticate_method(
+                username=username, password=password, **kwargs
+            )
             user, created = self.get_or_create_user_from_userinfo(userinfo)
         except Exception as e:
             logger.error('Custom authenticate error: {}'.format(e))
