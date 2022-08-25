@@ -10,5 +10,5 @@ celery_task_pre_key = "CELERY_"
 KEY_CACHE_RESOURCE_IDS = "RESOURCE_IDS_{}"
 
 # AD User AccountDisable
-# https://blog.csdn.net/bytxl/article/details/17763975
+# https://docs.microsoft.com/en-us/troubleshoot/windows-server/identity/useraccountcontrol-manipulate-account-properties
 LDAP_AD_ACCOUNT_DISABLE = 2
