@@ -1,6 +1,6 @@
 from django.views import View
 from django.conf import settings
-from django.contrib.auth import login
+from django.contrib import auth
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.http import urlencode
@@ -48,7 +48,7 @@ class OAuth2AuthCallbackView(View):
             user = authenticate(code=callback_params['code'], request=request)
             if user and user.is_valid:
                 logger.debug(log_prompt.format('Login: {}'.format(user)))
-                login(self.request, user)
+                auth.login(self.request, user)
                 logger.debug(log_prompt.format('Redirect'))
                 return HttpResponseRedirect(
                     settings.AUTH_OAUTH2_AUTHENTICATION_REDIRECT_URI
@@ -56,3 +56,33 @@ class OAuth2AuthCallbackView(View):
 
         logger.debug(log_prompt.format('Redirect'))
         return HttpResponseRedirect(settings.AUTH_OAUTH2_AUTHENTICATION_FAILURE_REDIRECT_URI)
+
+
+class OAuth2EndSessionView(View):
+    http_method_names = ['get', 'post', ]
+
+    def get(self, request):
+        """ Processes GET requests. """
+        log_prompt = "Process GET requests [OAuth2EndSessionView]: {}"
+        logger.debug(log_prompt.format('Start'))
+        return self.post(request)
+
+    def post(self, request):
+        """ Processes POST requests. """
+        log_prompt = "Process POST requests [OAuth2EndSessionView]: {}"
+        logger.debug(log_prompt.format('Start'))
+
+        logout_url = settings.LOGOUT_REDIRECT_URL or '/'
+
+        # Log out the current user.
+        if request.user.is_authenticated:
+            logger.debug(log_prompt.format('Log out the current user: {}'.format(request.user)))
+            auth.logout(request)
+
+            if settings.AUTH_OAUTH2_LOGOUT_COMPLETELY:
+                logger.debug(log_prompt.format('Log out OAUTH2 platform user session synchronously'))
+                next_url = settings.AUTH_OAUTH2_PROVIDER_END_SESSION_ENDPOINT
+                return HttpResponseRedirect(next_url)
+
+        logger.debug(log_prompt.format('Redirect'))
+        return HttpResponseRedirect(logout_url)
