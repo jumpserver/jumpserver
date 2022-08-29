@@ -25,9 +25,8 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         model = ConnectionToken
         fields_mini = ['id', 'type']
         fields_small = fields_mini + [
-            'secret', 'date_expired',
-            'date_created', 'date_updated', 'created_by', 'updated_by',
-            'org_id', 'org_name',
+            'secret', 'date_expired', 'date_created', 'date_updated',
+            'created_by', 'updated_by', 'org_id', 'org_name',
         ]
         fields_fk = [
             'user', 'system_user', 'asset', 'application',
@@ -35,8 +34,8 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         read_only_fields = [
             # 普通 Token 不支持指定 user
             'user', 'is_valid', 'expire_time',
-            'type_display', 'user_display', 'system_user_display', 'asset_display',
-            'application_display',
+            'type_display', 'user_display', 'system_user_display',
+            'asset_display', 'application_display',
         ]
         fields = fields_small + fields_fk + read_only_fields
 
@@ -59,7 +58,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         system_user = attrs.get('system_user') or ''
         asset = attrs.get('asset') or ''
         application = attrs.get('application') or ''
-        secret = attrs.get('secret') or random_string(64)
+        secret = attrs.get('secret') or random_string(16)
         date_expired = attrs.get('date_expired') or ConnectionToken.get_default_date_expired()
 
         if isinstance(asset, Asset):
@@ -97,8 +96,8 @@ class SuperConnectionTokenSerializer(ConnectionTokenSerializer):
 
     class Meta(ConnectionTokenSerializer.Meta):
         read_only_fields = [
-            'validity',
-            'user_display', 'system_user_display', 'asset_display', 'application_display',
+            'validity', 'user_display', 'system_user_display',
+            'asset_display', 'application_display',
         ]
 
     def get_user(self, attrs):
@@ -154,7 +153,12 @@ class ConnectionTokenCmdFilterRuleSerializer(serializers.ModelSerializer):
 
 class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     user = ConnectionTokenUserSerializer(read_only=True)
+<<<<<<< HEAD
     asset = ConnectionTokenAssetSerializer(read_only=True)
+=======
+    asset = ConnectionTokenAssetSerializer(read_only=True, source='asset_or_remote_app_asset')
+    application = ConnectionTokenApplicationSerializer(read_only=True)
+>>>>>>> origin
     remote_app = ConnectionTokenRemoteAppSerializer(read_only=True)
     account = serializers.CharField(read_only=True)
     gateway = ConnectionTokenGatewaySerializer(read_only=True)

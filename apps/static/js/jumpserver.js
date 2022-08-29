@@ -270,10 +270,12 @@ function requestApi(props) {
     if (typeof(dataBody) === "object") {
         dataBody = JSON.stringify(dataBody)
     }
+    var headers = props.headers || {}
 
     $.ajax({
         url: props.url,
         type: props.method || "PATCH",
+        headers: headers,
         data: dataBody,
         contentType: props.content_type || "application/json; charset=utf-8",
         dataType: props.data_type || "json"
@@ -1504,17 +1506,11 @@ function getStatusIcon(status, mapping, title) {
 
 
 function fillKey(key) {
-    let keySize = 128
-    // 如果超过 key 16 位, 最大取 32 位，需要更改填充
-    if (key.length > 16) {
-        key = key.slice(0, 32)
-        keySize = keySize * 2
+    const KeyLength = 16
+    if (key.length > KeyLength) {
+        key = key.slice(0, KeyLength)
     }
-    const filledKeyLength = keySize / 8
-    if (key.length >= filledKeyLength) {
-        return key.slice(0, filledKeyLength)
-    }
-    const filledKey = Buffer.alloc(keySize / 8)
+    const filledKey = Buffer.alloc(KeyLength)
     const keys = Buffer.from(key)
     for (let i = 0; i < keys.length; i++) {
         filledKey[i] = keys[i]

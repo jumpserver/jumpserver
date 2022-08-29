@@ -67,7 +67,7 @@ class SimpleMetadataWithFilters(SimpleMetadata):
 
         default = getattr(field, 'default', None)
         if default is not None and default != empty:
-            if isinstance(default, (str, int, bool, datetime.datetime, list)):
+            if isinstance(default, (str, int, bool, float, datetime.datetime, list)):
                 field_info['default'] = default
 
         for attr in self.attrs:

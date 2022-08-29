@@ -36,7 +36,7 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
             'is_success': {'label': _('Is success')},
             'can_replay': {'label': _('Can replay')},
             'can_join': {'label': _('Can join')},
-            'terminal': {'label': _('Terminal')},
+            'terminal': {'label': _('Terminal ID')},
             'is_finished': {'label': _('Is finished')},
             'can_terminate': {'label': _('Can terminate')},
             'terminal_display': {'label': _('Terminal display')},

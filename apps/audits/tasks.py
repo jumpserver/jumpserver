@@ -29,7 +29,7 @@ def clean_ftp_log_period():
     now = timezone.now()
     days = get_log_keep_day('FTP_LOG_KEEP_DAYS')
     expired_day = now - datetime.timedelta(days=days)
-    FTPLog.objects.filter(datetime__lt=expired_day).delete()
+    FTPLog.objects.filter(date_start__lt=expired_day).delete()
 
 
 @register_as_period_task(interval=3600*24)

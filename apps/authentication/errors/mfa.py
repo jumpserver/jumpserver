@@ -14,23 +14,23 @@ class WeComCodeInvalid(JMSException):
 
 
 class WeComBindAlready(JMSException):
-    default_code = 'wecom_bind_already'
-    default_detail = 'WeCom already binded'
+    default_code = 'wecom_not_bound'
+    default_detail = _('WeCom is already bound')
 
 
 class WeComNotBound(JMSException):
     default_code = 'wecom_not_bound'
-    default_detail = 'WeCom is not bound'
+    default_detail = _('WeCom is not bound')
 
 
 class DingTalkNotBound(JMSException):
     default_code = 'dingtalk_not_bound'
-    default_detail = 'DingTalk is not bound'
+    default_detail = _('DingTalk is not bound')
 
 
 class FeiShuNotBound(JMSException):
     default_code = 'feishu_not_bound'
-    default_detail = 'FeiShu is not bound'
+    default_detail = _('FeiShu is not bound')
 
 
 class PasswordInvalid(JMSException):

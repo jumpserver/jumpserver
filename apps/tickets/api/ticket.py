@@ -30,7 +30,8 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     serializer_class = serializers.TicketDisplaySerializer
     serializer_classes = {
         'list': serializers.TicketListSerializer,
-        'open': serializers.TicketApplySerializer
+        'open': serializers.TicketApplySerializer,
+        'approve': serializers.TicketApproveSerializer
     }
     model = Ticket
     perm_model = Ticket
@@ -77,7 +78,8 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
+        with tmp_to_root_org():
+            serializer.is_valid(raise_exception=True)
         instance = serializer.save()
         instance.approve(processor=request.user)
         return Response('ok')

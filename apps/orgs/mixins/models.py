@@ -45,7 +45,7 @@ class OrgManager(models.Manager):
         org = get_current_org()
         for obj in objs:
             if org.is_root():
-                if not self.org_id:
+                if not obj.org_id:
                     raise ValidationError('Please save in a organization')
             else:
                 obj.org_id = org.id

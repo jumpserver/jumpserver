@@ -9,7 +9,7 @@ from tickets.models import Ticket, TicketFlow
 from tickets.const import TicketType
 
 __all__ = [
-    'TicketDisplaySerializer', 'TicketApplySerializer', 'TicketListSerializer'
+    'TicketDisplaySerializer', 'TicketApplySerializer', 'TicketListSerializer', 'TicketApproveSerializer'
 ]
 
 
@@ -53,6 +53,13 @@ class TicketListSerializer(TicketSerializer):
 
 
 class TicketDisplaySerializer(TicketSerializer):
+    class Meta:
+        model = Ticket
+        fields = TicketSerializer.Meta.fields
+        read_only_fields = fields
+
+
+class TicketApproveSerializer(TicketSerializer):
     class Meta:
         model = Ticket
         fields = TicketSerializer.Meta.fields

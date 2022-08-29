@@ -15,6 +15,7 @@ logger = get_logger(__name__)
 class BACKENDS(TextChoices):
     ALIBABA = 'alibaba', _('Alibaba cloud')
     TENCENT = 'tencent', _('Tencent cloud')
+    CMPP2 = 'cmpp2', _('CMPP v2.0')
 
 
 class SMS:
@@ -43,7 +44,7 @@ class SMS:
         sign_name = getattr(settings, f'{self.client.SIGN_AND_TMPL_SETTING_FIELD_PREFIX}_VERIFY_SIGN_NAME')
         template_code = getattr(settings, f'{self.client.SIGN_AND_TMPL_SETTING_FIELD_PREFIX}_VERIFY_TEMPLATE_CODE')
 
-        if not (sign_name and template_code):
+        if self.client.need_pre_check() and not (sign_name and template_code):
             raise JMSException(
                 code='verify_code_sign_tmpl_invalid',
                 detail=_('SMS verification code signature or template invalid')

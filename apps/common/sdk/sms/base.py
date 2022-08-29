@@ -17,4 +17,8 @@ class BaseSMSClient:
     def send_sms(self, phone_numbers: list, sign_name: str, template_code: str, template_param: dict, **kwargs):
         raise NotImplementedError
 
+    @staticmethod
+    def need_pre_check():
+        return True
+
 

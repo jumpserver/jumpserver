@@ -64,7 +64,12 @@ class BaseHandler:
         diff_context = {}
         if state != TicketState.approved:
             return diff_context
+
         if self.ticket.type not in [TicketType.apply_asset, TicketType.apply_application]:
+            return diff_context
+
+        # 企业微信，钉钉审批不做diff
+        if not hasattr(self.ticket, 'old_rel_snapshot'):
             return diff_context
 
         old_rel_snapshot = self.ticket.old_rel_snapshot
