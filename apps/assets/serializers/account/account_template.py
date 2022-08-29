@@ -31,7 +31,6 @@ class AccountTemplateSerializer(AuthSerializerMixin, BulkOrgResourceModelSeriali
         for k, v in cls().fields.items():
             if v.required and k not in attrs:
                 required_field_dict[k] = error
-        print(required_field_dict)
         if not required_field_dict:
             return
         raise serializers.ValidationError(required_field_dict)

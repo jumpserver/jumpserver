@@ -4,10 +4,10 @@ from openpyxl import Workbook
 from collections import defaultdict, OrderedDict
 
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+from django.db.models import F
 from rest_framework import serializers
 
-from assets.models import Account
+from assets.models import Account, Type
 from assets.serializers import AccountSecretSerializer
 from assets.notifications import AccountBackupExecutionTaskMsg
 from users.models import User
@@ -64,33 +64,32 @@ class AssetAccountHandler(BaseAccountHandler):
     @staticmethod
     def get_filename(plan_name):
         filename = os.path.join(
-            PATH, f'{plan_name}-{_("Asset")}-{local_now_display()}-{time.time()}.xlsx'
+            PATH, f'{plan_name}-{local_now_display()}-{time.time()}.xlsx'
         )
         return filename
 
     @classmethod
-    def create_data_map(cls):
+    def create_data_map(cls, types: list):
         data_map = defaultdict(list)
-        sheet_name = Account._meta.verbose_name
 
-        accounts = Account.objects.all()
+        # TODO 可以优化一下查询 在账号上做type的缓存 避免数据量大时连表操作
+        accounts = Account.objects.filter(
+            asset__platform__in=types
+        ).annotate(type=F('asset__platform__type'))
         if not accounts.first():
             return data_map
 
+        type_dict = dict(Type.CHOICES)
         header_fields = cls.get_header_fields(AccountSecretSerializer(accounts.first()))
         for account in accounts:
-            account.load_auth()
+            sheet_name = type_dict[account.type]
             row = cls.create_row(account, AccountSecretSerializer, header_fields)
             if sheet_name not in data_map:
                 data_map[sheet_name].append(list(row.keys()))
             data_map[sheet_name].append(list(row.values()))
 
-        logger.info('\n\033[33m- 共收集 {} 条资产账号\033[0m'.format(accounts.count()))
+        logger.info('\n\033[33m- 共收集 {} 条账号\033[0m'.format(accounts.count()))
         return data_map
-
-handler_map = {
-    'asset': AssetAccountHandler,
-}
 
 
 class AccountBackupHandler:
@@ -108,24 +107,21 @@ class AccountBackupHandler:
         # Print task start date
         time_start = time.time()
         files = []
-        for account_type in self.execution.types:
-            handler = handler_map.get(account_type)
-            if not handler:
-                continue
+        types = self.execution.types
 
-            data_map = handler.create_data_map()
-            if not data_map:
-                continue
+        data_map = AssetAccountHandler.create_data_map(types)
+        if not data_map:
+            return files
 
-            filename = handler.get_filename(self.plan_name)
+        filename = AssetAccountHandler.get_filename(self.plan_name)
 
-            wb = Workbook(filename)
-            for sheet, data in data_map.items():
-                ws = wb.create_sheet(str(sheet))
-                for row in data:
-                    ws.append(row)
-            wb.save(filename)
-            files.append(filename)
+        wb = Workbook(filename)
+        for sheet, data in data_map.items():
+            ws = wb.create_sheet(str(sheet))
+            for row in data:
+                ws.append(row)
+        wb.save(filename)
+        files.append(filename)
         timedelta = round((time.time() - time_start), 2)
         logger.info('步骤完成: 用时 {}s'.format(timedelta))
         return files
