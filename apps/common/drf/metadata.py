@@ -33,7 +33,6 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         """
         actions = {}
         view.raw_action = getattr(view, 'action', None)
-        print("Request in metadata: ", request.path, request.GET)
         for method in self.methods & set(view.allowed_methods):
             if hasattr(view, 'action_map'):
                 view.action = view.action_map.get(method.lower(), view.action)

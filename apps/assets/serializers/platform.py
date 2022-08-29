@@ -10,7 +10,20 @@ from ..const import Category, AllTypes
 __all__ = ['PlatformSerializer']
 
 
+class ProtocolSettingSerializer(serializers.Serializer):
+    SECURITY_CHOICES = [
+        ('any', 'Any'),
+        ('rdp', 'RDP'),
+        ('tls', 'TLS'),
+        ('nla', 'NLA'),
+    ]
+    console = serializers.BooleanField(required=False)
+    security = serializers.ChoiceField(choices=SECURITY_CHOICES, default='any', required=False)
+
+
 class PlatformProtocolsSerializer(serializers.ModelSerializer):
+    setting = ProtocolSettingSerializer(required=False)
+
     class Meta:
         model = PlatformProtocol
         fields = ['id', 'name', 'port', 'setting']
@@ -33,18 +46,12 @@ class PlatformSerializer(JMSWritableNestedModelSerializer):
             'category', 'type',
         ]
         fields = fields_small + [
-            'domain_enabled', 'domain_default',
-            'su_enabled', 'su_method',
-            'protocols_enabled', 'protocols',
-            'ping_enabled', 'ping_method',
+            'domain_enabled', 'domain_default', 'su_enabled', 'su_method',
+            'protocols_enabled', 'protocols', 'ping_enabled', 'ping_method',
             'verify_account_enabled', 'verify_account_method',
             'create_account_enabled', 'create_account_method',
             'change_password_enabled', 'change_password_method',
-            'type_constraints',
-            'comment', 'charset',
-        ]
-        read_only_fields = [
-            'category_display', 'type_display',
+            'type_constraints', 'comment', 'charset',
         ]
         extra_kwargs = {
             'su_enabled': {'label': '启用切换账号'},
@@ -56,4 +63,17 @@ class PlatformSerializer(JMSWritableNestedModelSerializer):
             'change_password_method': {'label': '账号改密方式'},
         }
 
+    def validate_verify_account_method(self, value):
+        if not value and self.initial_data.get('verify_account_enabled', False):
+            raise serializers.ValidationError(_('This field is required.'))
+        return value
 
+    def validate_create_account_method(self, value):
+        if not value and self.initial_data.get('create_account_enabled', False):
+            raise serializers.ValidationError(_('This field is required.'))
+        return value
+
+    def validate_change_password_method(self, value):
+        if not value and self.initial_data.get('change_password_enabled', False):
+            raise serializers.ValidationError(_('This field is required.'))
+        return value

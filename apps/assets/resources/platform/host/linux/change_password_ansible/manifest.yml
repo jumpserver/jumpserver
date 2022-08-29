@@ -1,3 +1,4 @@
+id: change_password_ansible
 name: Change password using ansible
 version: 1
 description: 使用特权账号更改账号的密码

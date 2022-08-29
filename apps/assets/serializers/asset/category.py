@@ -42,3 +42,4 @@ class NetworkingSerializer(AssetSerializer):
 class CloudSerializer(AssetSerializer):
     class Meta(AssetSerializer.Meta):
         model = Cloud
+        fields = AssetSerializer.Meta.fields + ['cluster']

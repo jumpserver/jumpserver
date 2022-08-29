@@ -6,6 +6,7 @@ from common.drf.serializers import GroupedChoiceSerailizer
 from assets.models import Platform
 from assets.serializers import PlatformSerializer
 from assets.const import AllTypes, Category
+from assets.resources.platform import get_platform_methods
 
 
 __all__ = ['AssetPlatformViewSet']
@@ -21,7 +22,8 @@ class AssetPlatformViewSet(JMSModelViewSet):
     search_fields = ['name']
     rbac_perms = {
         'categories': 'assets.view_platform',
-        'type_constraints': 'assets.view_platform'
+        'type_constraints': 'assets.view_platform',
+        'ops_methods': 'assets.view_platform'
     }
 
     @action(methods=['GET'], detail=False)
@@ -36,6 +38,20 @@ class AssetPlatformViewSet(JMSModelViewSet):
         tp = request.query_params.get('type')
         limits = AllTypes.get_constraints(category, tp)
         return Response(limits)
+
+    @action(methods=['GET'], detail=False, url_path='ops-methods')
+    def ops_methods(self, request, *args, **kwargs):
+        category = request.query_params.get('category')
+        tp = request.query_params.get('type')
+        item = request.query_params.get('item')
+        methods = get_platform_methods()
+        if category:
+            methods = list(filter(lambda x: x['category'] == category, methods))
+        if tp:
+            methods = list(filter(lambda x: x['type'] == tp, methods))
+        if item:
+            methods = list(filter(lambda x: x.get('method') == item, methods))
+        return Response(methods)
 
     def check_object_permissions(self, request, obj):
         if request.method.lower() in ['delete', 'put', 'patch'] and obj.internal:
