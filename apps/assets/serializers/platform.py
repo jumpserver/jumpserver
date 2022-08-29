@@ -63,17 +63,13 @@ class PlatformSerializer(JMSWritableNestedModelSerializer):
             'change_password_method': {'label': '账号改密方式'},
         }
 
-    def validate_verify_account_method(self, value):
-        if not value and self.initial_data.get('verify_account_enabled', False):
-            raise serializers.ValidationError(_('This field is required.'))
-        return value
-
-    def validate_create_account_method(self, value):
-        if not value and self.initial_data.get('create_account_enabled', False):
-            raise serializers.ValidationError(_('This field is required.'))
-        return value
-
-    def validate_change_password_method(self, value):
-        if not value and self.initial_data.get('change_password_enabled', False):
-            raise serializers.ValidationError(_('This field is required.'))
-        return value
+    def validate(self, attrs):
+        fields_to_check = [
+            ('verify_account_enabled', 'verify_account_method'),
+            ('create_account_enabled', 'create_account_method'),
+            ('change_password_enabled', 'change_password_method'),
+        ]
+        for method_enabled, method_name in fields_to_check:
+            if attrs.get(method_enabled, False) and not attrs.get(method_name, False):
+                raise serializers.ValidationError({method_name: _('This field is required.')})
+        return attrs
