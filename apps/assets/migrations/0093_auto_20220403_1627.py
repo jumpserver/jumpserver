@@ -28,16 +28,19 @@ def migrate_hardware(apps, *args):
             break
 
         hardware_infos = []
+        hosts_updated = []
         for host in hosts:
             hardware = hardware_model()
             asset = asset_mapper[host.asset_ptr_id]
-            hardware.host = host
             hardware.date_updated = timezone.now()
             for name in fields:
                 setattr(hardware, name, getattr(asset, name))
             hardware_infos.append(hardware)
+            host.device_info_id = hardware.id
+            hosts_updated.append(host)
 
         hardware_model.objects.bulk_create(hardware_infos, ignore_conflicts=True)
+        host_model.objects.bulk_update(hosts_updated, ['device_info_id'])
         created += len(hardware_infos)
 
 

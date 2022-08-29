@@ -1,0 +1,15 @@
+- hosts: centos
+  gather_facts: no
+  vars:
+    account:
+      username: web
+      password: test123
+
+  tasks:
+    - name: Verify password
+      ping:
+      vars:
+        ansible_ssh_user: "{{ account.username }}"
+        ansible_ssh_pass: "{{ account.password }}"
+
+

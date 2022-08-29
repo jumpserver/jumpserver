@@ -7,13 +7,14 @@ from .common import Asset
 
 
 class Host(Asset):
+    device_info = models.OneToOneField('DeviceInfo', null=True, on_delete=models.SET_NULL, verbose_name=_("Host"))
+
     def save(self, *args, **kwargs):
         self.category = Category.HOST
         return super().save(*args, **kwargs)
 
 
 class DeviceInfo(CommonModelMixin):
-    host = models.ForeignKey(Host, on_delete=models.CASCADE, verbose_name=_("Host"))
     # Collect
     vendor = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('Vendor'))
     model = models.CharField(max_length=54, null=True, blank=True, verbose_name=_('Model'))

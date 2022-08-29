@@ -1,0 +1,15 @@
+- hosts: centos
+  gather_facts: no
+  vars:
+    account:
+      username: web
+      password: test123
+
+  tasks:
+    - name: Verify password
+      ping:
+      vars:
+        ansible_user: "{{ account.username }}"
+        ansible_pass: "{{ account.password }}"
+
+

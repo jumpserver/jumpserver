@@ -6,6 +6,7 @@ from common.drf.serializers import JMSWritableNestedModelSerializer
 from ..models import Platform, PlatformProtocol
 from ..const import Category, AllTypes
 
+
 __all__ = ['PlatformSerializer']
 
 
@@ -20,6 +21,10 @@ class PlatformSerializer(JMSWritableNestedModelSerializer):
     category = ChoiceDisplayField(choices=Category.choices, label=_("Category"))
     protocols = PlatformProtocolsSerializer(label=_('Protocols'), many=True, required=False)
     type_constraints = serializers.ReadOnlyField(required=False, read_only=True)
+    su_method = ChoiceDisplayField(
+        choices=[('sudo', 'sudo su -'), ('su', 'su - ')],
+        label='切换方式', required=False, default='sudo'
+    )
 
     class Meta:
         model = Platform
@@ -41,5 +46,14 @@ class PlatformSerializer(JMSWritableNestedModelSerializer):
         read_only_fields = [
             'category_display', 'type_display',
         ]
+        extra_kwargs = {
+            'su_enabled': {'label': '启用切换账号'},
+            'verify_account_enabled': {'label': '启用校验账号'},
+            'verify_account_method': {'label': '校验账号方式'},
+            'create_account_enabled': {'label': '启用创建账号'},
+            'create_account_method': {'label': '创建账号方式'},
+            'change_password_enabled': {'label': '启用账号改密'},
+            'change_password_method': {'label': '账号改密方式'},
+        }
 
 

@@ -1,0 +1,5 @@
+name: Create account by ansible
+version: 1
+description: 使用特权账号更改账号的密码
+author: ibuler
+method: create_account
