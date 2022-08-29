@@ -74,7 +74,7 @@ class AssetAccountHandler(BaseAccountHandler):
 
         # TODO 可以优化一下查询 在账号上做type的缓存 避免数据量大时连表操作
         accounts = Account.objects.filter(
-            asset__platform__in=types
+            asset__platform__type__in=types
         ).annotate(type=F('asset__platform__type'))
         if not accounts.first():
             return data_map
