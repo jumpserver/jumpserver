@@ -1,9 +1,13 @@
+import os
 import json
 
 from django.db import models
 from django.db.utils import ProgrammingError, OperationalError
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 from common.utils import signer, get_logger
 
@@ -119,6 +123,14 @@ class Setting(models.Model):
             self.__class__.update_or_create(key, value, encrypted=False, category=self.category)
 
     @classmethod
+    def save_to_file(cls, value: InMemoryUploadedFile):
+        filename = value.name
+        filepath = f'settings/{filename}'
+        path = default_storage.save(filepath, ContentFile(value.read()))
+        url = default_storage.url(path)
+        return url
+
+    @classmethod
     def update_or_create(cls, name='', value='', encrypted=False, category=''):
         """
         不能使用 Model 提供的，update_or_create 因为这里有 encrypted 和 cleaned_value
@@ -128,6 +140,10 @@ class Setting(models.Model):
         changed = False
         if not setting:
             setting = Setting(name=name, encrypted=encrypted, category=category)
+
+        if isinstance(value, InMemoryUploadedFile):
+            value = cls.save_to_file(value)
+
         if setting.cleaned_value != value:
             setting.encrypted = encrypted
             setting.cleaned_value = value

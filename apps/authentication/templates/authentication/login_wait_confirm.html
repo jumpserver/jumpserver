@@ -79,6 +79,9 @@ function doRequestAuth() {
      requestApi({
         url: url,
         method: "GET",
+        headers: {
+            "X-JMS-LOGIN-TYPE": "W"
+        },
         success: function (data) {
             if (!data.error && data.msg === 'ok') {
                 window.onbeforeunload = function(){};
@@ -98,7 +101,7 @@ function doRequestAuth() {
         },
         error: function (text, data) {
         },
-        flash_message: false
+        flash_message: false, // 是否显示flash消息
     })
 }
 function initClipboard() {

@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 
-import time
-
 from django.db import models
 from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
@@ -46,6 +44,21 @@ class Command(AbstractSessionCommand):
         ]
         cls.objects.bulk_create(commands)
         print(f'Create {len(commands)} commands of org ({org})')
+
+    @classmethod
+    def from_dict(cls, d):
+        self = cls()
+        for k, v in d.items():
+            setattr(self, k, v)
+        return self
+
+    @classmethod
+    def from_multi_dict(cls, l):
+        commands = []
+        for d in l:
+            command = cls.from_dict(d)
+            commands.append(command)
+        return commands
 
     class Meta:
         db_table = "terminal_command"

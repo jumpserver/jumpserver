@@ -15,17 +15,22 @@ import errno
 import json
 import yaml
 import copy
+import base64
+import logging
 from importlib import import_module
 from urllib.parse import urljoin, urlparse
+from gmssl.sm4 import CryptSM4, SM4_ENCRYPT, SM4_DECRYPT
 
 from django.urls import reverse_lazy
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
 XPACK_DIR = os.path.join(BASE_DIR, 'xpack')
 HAS_XPACK = os.path.isdir(XPACK_DIR)
+
+logger = logging.getLogger('jumpserver.conf')
 
 
 def import_string(dotted_path):
@@ -39,9 +44,9 @@ def import_string(dotted_path):
     try:
         return getattr(module, class_name)
     except AttributeError as err:
-        raise ImportError('Module "%s" does not define a "%s" attribute/class' % (
-            module_path, class_name)
-                          ) from err
+        raise ImportError(
+            'Module "%s" does not define a "%s" attribute/class' %
+            (module_path, class_name)) from err
 
 
 def is_absolute_uri(uri):
@@ -78,6 +83,59 @@ def build_absolute_uri(base, uri):
 
 class DoesNotExist(Exception):
     pass
+
+
+class ConfigCrypto:
+    secret_keys = [
+        'SECRET_KEY', 'DB_PASSWORD', 'REDIS_PASSWORD',
+    ]
+
+    def __init__(self, key):
+        self.safe_key = self.process_key(key)
+        self.sm4_encryptor = CryptSM4()
+        self.sm4_encryptor.set_key(self.safe_key, SM4_ENCRYPT)
+
+        self.sm4_decryptor = CryptSM4()
+        self.sm4_decryptor.set_key(self.safe_key, SM4_DECRYPT)
+
+    @staticmethod
+    def process_key(secret_encrypt_key):
+        key = secret_encrypt_key.encode()
+        if len(key) >= 16:
+            key = key[:16]
+        else:
+            key += b'\0' * (16 - len(key))
+        return key
+
+    def encrypt(self, data):
+        data = bytes(data, encoding='utf8')
+        return base64.b64encode(self.sm4_encryptor.crypt_ecb(data)).decode('utf8')
+
+    def decrypt(self, data):
+        data = base64.urlsafe_b64decode(bytes(data, encoding='utf8'))
+        return self.sm4_decryptor.crypt_ecb(data).decode('utf8')
+
+    def decrypt_if_need(self, value, item):
+        if item not in self.secret_keys:
+            return value
+
+        try:
+            plaintext = self.decrypt(value)
+            if plaintext:
+                value = plaintext
+        except Exception as e:
+            logger.error('decrypt %s error: %s', item, e)
+        return value
+
+    @classmethod
+    def get_secret_encryptor(cls):
+        # 使用 SM4 加密配置文件敏感信息
+        # https://the-x.cn/cryptography/Sm4.aspx
+        secret_encrypt_key = os.environ.get('SECRET_ENCRYPT_KEY', '')
+        if not secret_encrypt_key:
+            return None
+        print('Info: Using SM4 to encrypt config secret value')
+        return cls(secret_encrypt_key)
 
 
 class Config(dict):
@@ -160,7 +218,7 @@ class Config(dict):
         'SESSION_COOKIE_DOMAIN': None,
         'CSRF_COOKIE_DOMAIN': None,
         'SESSION_COOKIE_NAME_PREFIX': None,
-        'SESSION_COOKIE_AGE': 3600,
+        'SESSION_COOKIE_AGE': 3600 * 24,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE': False,
         'LOGIN_URL': reverse_lazy('authentication:login'),
         'CONNECTION_TOKEN_EXPIRATION': 5 * 60,
@@ -265,6 +323,22 @@ class Config(dict):
         'AUTH_SAML2_PROVIDER_AUTHORIZATION_ENDPOINT': '/',
         'AUTH_SAML2_AUTHENTICATION_FAILURE_REDIRECT_URI': '/',
 
+        # OAuth2 认证
+        'AUTH_OAUTH2': False,
+        'AUTH_OAUTH2_LOGO_PATH': 'img/login_oauth2_logo.png',
+        'AUTH_OAUTH2_PROVIDER': 'OAuth2',
+        'AUTH_OAUTH2_ALWAYS_UPDATE_USER': True,
+        'AUTH_OAUTH2_CLIENT_ID': 'client-id',
+        'AUTH_OAUTH2_SCOPE': '',
+        'AUTH_OAUTH2_CLIENT_SECRET': '',
+        'AUTH_OAUTH2_PROVIDER_AUTHORIZATION_ENDPOINT': 'https://oauth2.example.com/authorize',
+        'AUTH_OAUTH2_PROVIDER_USERINFO_ENDPOINT': 'https://oauth2.example.com/userinfo',
+        'AUTH_OAUTH2_ACCESS_TOKEN_ENDPOINT': 'https://oauth2.example.com/access_token',
+        'AUTH_OAUTH2_ACCESS_TOKEN_METHOD': 'GET',
+        'AUTH_OAUTH2_USER_ATTR_MAP': {
+            'name': 'name', 'username': 'username', 'email': 'email'
+        },
+
         'AUTH_TEMP_TOKEN': False,
 
         # 企业微信
@@ -301,6 +375,15 @@ class Config(dict):
         'TENCENT_SDKAPPID': '',
         'TENCENT_VERIFY_SIGN_NAME': '',
         'TENCENT_VERIFY_TEMPLATE_CODE': '',
+
+        'CMPP2_HOST': '',
+        'CMPP2_PORT': 7890,
+        'CMPP2_SP_ID': '',
+        'CMPP2_SP_SECRET': '',
+        'CMPP2_SRC_ID': '',
+        'CMPP2_SERVICE_ID': '',
+        'CMPP2_VERIFY_SIGN_NAME': '',
+        'CMPP2_VERIFY_TEMPLATE_CODE': '{code}',
 
         # Email
         'EMAIL_CUSTOM_USER_CREATED_SUBJECT': _('Create account successfully'),
@@ -387,7 +470,8 @@ class Config(dict):
         'SESSION_SAVE_EVERY_REQUEST': True,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE': False,
         'SERVER_REPLAY_STORAGE': {},
-        'SECURITY_DATA_CRYPTO_ALGO': 'aes',
+        'SECURITY_DATA_CRYPTO_ALGO': None,
+        'GMSSL_ENABLED': False,
 
         # 记录清理清理
         'LOGIN_LOG_KEEP_DAYS': 200,
@@ -405,6 +489,7 @@ class Config(dict):
         'CONNECTION_TOKEN_ENABLED': False,
 
         'PERM_SINGLE_ASSET_TO_UNGROUP_NODE': False,
+        'TICKET_AUTHORIZE_DEFAULT_TIME': 7,
         'WINDOWS_SSH_DEFAULT_SHELL': 'cmd',
         'PERIOD_TASK_ENABLED': True,
 
@@ -415,6 +500,10 @@ class Config(dict):
         'FORGOT_PASSWORD_URL': '',
         'HEALTH_CHECK_TOKEN': '',
     }
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.secret_encryptor = ConfigCrypto.get_secret_encryptor()
 
     @staticmethod
     def convert_keycloak_to_openid(keycloak_config):
@@ -427,7 +516,6 @@ class Config(dict):
         """
 
         openid_config = copy.deepcopy(keycloak_config)
-
         auth_openid = openid_config.get('AUTH_OPENID')
         auth_openid_realm_name = openid_config.get('AUTH_OPENID_REALM_NAME')
         auth_openid_server_url = openid_config.get('AUTH_OPENID_SERVER_URL')
@@ -556,13 +644,12 @@ class Config(dict):
     def get(self, item):
         # 再从配置文件中获取
         value = self.get_from_config(item)
-        if value is not None:
-            return value
-        # 其次从环境变量来
-        value = self.get_from_env(item)
-        if value is not None:
-            return value
-        value = self.defaults.get(item)
+        if value is None:
+            value = self.get_from_env(item)
+        if value is None:
+            value = self.defaults.get(item)
+        if self.secret_encryptor:
+            value = self.secret_encryptor.decrypt_if_need(value, item)
         return value
 
     def __getitem__(self, item):

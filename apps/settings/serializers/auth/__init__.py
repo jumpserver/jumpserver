@@ -9,3 +9,4 @@ from .sso import *
 from .base import *
 from .sms import *
 from .saml2 import *
+from .oauth2 import *

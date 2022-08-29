@@ -16,9 +16,14 @@ class OrgRoleMixin:
     def add_member(self, user, role=None):
         from rbac.builtin import BuiltinRole
         from .utils import tmp_to_org
-        role_id = BuiltinRole.org_user.id
+
         if role:
             role_id = role.id
+        elif user.is_service_account:
+            role_id = BuiltinRole.system_component.id
+        else:
+            role_id = BuiltinRole.org_user.id
+
         with tmp_to_org(self):
             defaults = {
                 'user': user, 'role_id': role_id,
@@ -80,6 +85,7 @@ class Organization(OrgRoleMixin, models.Model):
         verbose_name = _("Organization")
         permissions = (
             ('view_rootorg', _('Can view root org')),
+            ('view_alljoinedorg', _('Can view all joined org')),
         )
 
     def __str__(self):

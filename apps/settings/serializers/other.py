@@ -30,6 +30,11 @@ class OtherSettingSerializer(serializers.Serializer):
         help_text=_("Perm single to ungroup node")
     )
 
+    TICKET_AUTHORIZE_DEFAULT_TIME = serializers.IntegerField(
+        min_value=7, max_value=9999, required=False,
+        label=_("Ticket authorize default time"), help_text=_("Unit: day")
+    )
+
     HELP_DOCUMENT_URL = serializers.URLField(
         required=False, allow_blank=True, allow_null=True, label=_("Help Docs URL"),
         help_text=_('default: http://docs.jumpserver.org')

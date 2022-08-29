@@ -24,7 +24,7 @@ class SerializeToTreeNodeMixin:
                 'title': _name(node),
                 'pId': node.parent_key,
                 'isParent': True,
-                'open': node.is_org_root(),
+                'open': True,
                 'meta': {
                     'data': {
                         "id": node.id,

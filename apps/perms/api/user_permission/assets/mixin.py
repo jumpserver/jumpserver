@@ -33,7 +33,9 @@ class UserAllGrantedAssetsQuerysetMixin:
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
     pagination_class = AllGrantedAssetPagination
     user: User
-
+    ordering_fields = ("hostname", "ip", "port", "cpu_cores")
+    ordering = ('hostname', )
+    
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return Asset.objects.none()

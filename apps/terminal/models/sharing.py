@@ -43,6 +43,8 @@ class SessionSharing(CommonModelMixin, OrgModelMixin):
         return 'Creator: {}'.format(self.creator)
 
     def users_display(self):
+        if not self.users:
+            return []
         with tmp_to_root_org():
             user_ids = self.users.split(',')
             users = User.objects.filter(id__in=user_ids)

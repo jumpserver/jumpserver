@@ -6,6 +6,8 @@ from rest_framework.permissions import AllowAny
 
 from common.utils import get_logger
 from .. import errors, mixins
+from django.contrib.auth import logout as auth_logout
+
 
 __all__ = ['TicketStatusApi']
 logger = get_logger(__name__)
@@ -17,7 +19,15 @@ class TicketStatusApi(mixins.AuthMixin, APIView):
     def get(self, request, *args, **kwargs):
         try:
             self.check_user_login_confirm()
+            self.request.session['auth_third_party_done'] = 1
             return Response({"msg": "ok"})
+        except errors.LoginConfirmOtherError as e:
+            reason = e.msg
+            username = e.username
+            self.send_auth_signal(success=False, username=username, reason=reason)
+            # 若为三方登录，此时应退出登录
+            auth_logout(request)
+            return Response(e.as_data(), status=200)
         except errors.NeedMoreInfoError as e:
             return Response(e.as_data(), status=200)
 

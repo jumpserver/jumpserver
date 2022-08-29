@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 import re
+import socket
+from django.templatetags.static import static
 from collections import OrderedDict
 from itertools import chain
 import logging
@@ -381,3 +383,13 @@ def test_ip_connectivity(host, port, timeout=0.5):
     else:
         connectivity = False
     return connectivity
+<<<<<<< HEAD
+=======
+
+
+def static_or_direct(logo_path):
+    if logo_path.startswith('img/'):
+        return static(logo_path)
+    else:
+        return logo_path
+>>>>>>> origin

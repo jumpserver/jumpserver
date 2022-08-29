@@ -1,11 +1,16 @@
 import base64
 
-from django.shortcuts import redirect, reverse
+from django.shortcuts import redirect, reverse, render
 from django.utils.deprecation import MiddlewareMixin
 from django.http import HttpResponse
 from django.conf import settings
+from django.utils.translation import ugettext as _
+from django.contrib.auth import logout as auth_logout
 
+from apps.authentication import mixins
 from common.utils import gen_key_pair
+from common.utils import get_request_ip
+from .signals import post_auth_failed
 
 
 class MFAMiddleware:
@@ -13,6 +18,7 @@ class MFAMiddleware:
     这个 中间件 是用来全局拦截开启了 MFA 却没有认证的，如 OIDC, CAS，使用第三方库做的登录，直接 login 了，
     所以只能在 Middleware 中控制
     """
+
     def __init__(self, get_response):
         self.get_response = get_response
 
@@ -40,6 +46,50 @@ class MFAMiddleware:
 
         url = reverse('authentication:login-mfa') + '?_=middleware'
         return redirect(url)
+
+
+class ThirdPartyLoginMiddleware(mixins.AuthMixin):
+    """OpenID、CAS、SAML2登录规则设置验证"""
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        # 没有认证过，证明不是从 第三方 来的
+        if request.user.is_anonymous:
+            return response
+        if not request.session.get('auth_third_party_required'):
+            return response
+        ip = get_request_ip(request)
+        try:
+            self.request = request
+            self._check_login_acl(request.user, ip)
+        except Exception as e:
+            post_auth_failed.send(
+                sender=self.__class__, username=request.user.username,
+                request=self.request, reason=e.msg
+            )
+            auth_logout(request)
+            context = {
+                'title': _('Authentication failed'),
+                'message': _('Authentication failed (before login check failed): {}').format(e),
+                'interval': 10,
+                'redirect_url': reverse('authentication:login'),
+                'auto_redirect': True,
+            }
+            response = render(request, 'authentication/auth_fail_flash_message_standalone.html', context)
+        else:
+            if not self.request.session['auth_confirm_required']:
+                return response
+            guard_url = reverse('authentication:login-guard')
+            args = request.META.get('QUERY_STRING', '')
+            if args:
+                guard_url = "%s?%s" % (guard_url, args)
+            response = redirect(guard_url)
+        finally:
+            request.session.pop('auth_third_party_required', '')
+            return response
 
 
 class SessionCookieMiddleware(MiddlewareMixin):

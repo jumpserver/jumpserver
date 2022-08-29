@@ -9,6 +9,7 @@
 
 import base64
 import requests
+
 from rest_framework.exceptions import ParseError
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
@@ -18,10 +19,11 @@ from django.urls import reverse
 from django.conf import settings
 
 from common.utils import get_logger
+from authentication.utils import build_absolute_uri_for_oidc
 from users.utils import construct_user_email
 
 from ..base import JMSBaseAuthBackend
-from .utils import validate_and_return_id_token, build_absolute_uri
+from .utils import validate_and_return_id_token
 from .decorator import ssl_verification
 from .signals import (
     openid_create_or_update_user, openid_user_login_failed, openid_user_login_success
@@ -127,7 +129,7 @@ class OIDCAuthCodeBackend(OIDCBaseBackend):
         token_payload = {
             'grant_type': 'authorization_code',
             'code': code,
-            'redirect_uri': build_absolute_uri(
+            'redirect_uri': build_absolute_uri_for_oidc(
                 request, path=reverse(settings.AUTH_OPENID_AUTH_LOGIN_CALLBACK_URL_NAME)
             )
         }

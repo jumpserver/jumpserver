@@ -1,3 +1,4 @@
+import abc
 import os
 import json
 import base64
@@ -16,11 +17,10 @@ from orgs.mixins.api import RootOrgViewMixin
 from perms.models import Action
 from terminal.models import EndpointRule
 from ..serializers import (
-    ConnectionTokenSerializer, ConnectionTokenSecretSerializer, SuperConnectionTokenSerializer,
-    ConnectionTokenDisplaySerializer,
+    ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
+    SuperConnectionTokenSerializer, ConnectionTokenDisplaySerializer,
 )
 from ..models import ConnectionToken
-
 
 __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
 
@@ -34,9 +34,12 @@ class ConnectionTokenMixin:
         if not is_valid:
             raise PermissionDenied(error)
 
-    @staticmethod
-    def get_request_resources(serializer):
-        user = serializer.validated_data.get('user')
+    @abc.abstractmethod
+    def get_request_resource_user(self, serializer):
+        raise NotImplementedError
+
+    def get_request_resources(self, serializer):
+        user = self.get_request_resource_user(serializer)
         asset = serializer.validated_data.get('asset')
         application = serializer.validated_data.get('application')
         system_user = serializer.validated_data.get('system_user')
@@ -164,15 +167,23 @@ class ConnectionTokenMixin:
             rdp_options['remoteapplicationname:s'] = name
         else:
             name = '*'
-
-        filename = "{}-{}-jumpserver".format(token.user.username, name)
-        filename = urllib.parse.quote(filename)
+        prefix_name = f'{token.user.username}-{name}'
+        filename = self.get_connect_filename(prefix_name)
 
         content = ''
         for k, v in rdp_options.items():
             content += f'{k}:{v}\n'
 
         return filename, content
+
+    @staticmethod
+    def get_connect_filename(prefix_name):
+        prefix_name = prefix_name.replace('/', '_')
+        prefix_name = prefix_name.replace('\\', '_')
+        prefix_name = prefix_name.replace('.', '_')
+        filename = f'{prefix_name}-jumpserver'
+        filename = urllib.parse.quote(filename)
+        return filename
 
     def get_ssh_token(self, token: ConnectionToken):
         if token.asset:
@@ -181,7 +192,8 @@ class ConnectionTokenMixin:
             name = token.application.name
         else:
             name = '*'
-        filename = f'{token.user.username}-{name}-jumpserver'
+        prefix_name = f'{token.user.username}-{name}'
+        filename = self.get_connect_filename(prefix_name)
 
         endpoint = self.get_smart_endpoint(
             protocol='ssh', asset=token.asset, application=token.application
@@ -198,7 +210,12 @@ class ConnectionTokenMixin:
 
 class ConnectionTokenViewSet(ConnectionTokenMixin, RootOrgViewMixin, JMSModelViewSet):
     filterset_fields = (
+<<<<<<< HEAD
         'type', 'user_display', 'asset_display'
+=======
+        'type', 'user_display', 'system_user_display',
+        'application_display', 'asset_display'
+>>>>>>> origin
     )
     search_fields = filterset_fields
     serializer_classes = {
@@ -215,7 +232,20 @@ class ConnectionTokenViewSet(ConnectionTokenMixin, RootOrgViewMixin, JMSModelVie
         'get_rdp_file': 'authentication.add_connectiontoken',
         'get_client_protocol_url': 'authentication.add_connectiontoken',
     }
-    queryset = ConnectionToken.objects.all()
+
+    def get_queryset(self):
+        return ConnectionToken.objects.filter(user=self.request.user)
+
+    def get_request_resource_user(self, serializer):
+        return self.request.user
+
+    def get_object(self):
+        if self.request.user.is_service_account:
+            # TODO: 组件获取 token 详情，将来放在 Super-connection-token API 中
+            obj = get_object_or_404(ConnectionToken, pk=self.kwargs.get('pk'))
+        else:
+            obj = super(ConnectionTokenViewSet, self).get_object()
+        return obj
 
     def create_connection_token(self):
         data = self.request.query_params if self.request.method == 'GET' else self.request.data
@@ -284,6 +314,9 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         'renewal': 'authentication.add_superconnectiontoken'
     }
 
+    def get_request_resource_user(self, serializer):
+        return serializer.validated_data.get('user')
+
     @action(methods=['PATCH'], detail=False)
     def renewal(self, request, *args, **kwargs):
         from common.utils.timezone import as_current_tz
@@ -299,4 +332,3 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
             'msg': f'Token is renewed, date expired: {date_expired}'
         }
         return Response(data=data, status=status.HTTP_200_OK)
-
