@@ -5,8 +5,3 @@ type:
   - unix
   - linux
 method: change_password
-vars:
-  account:
-    username: test
-    password: teset123
-    public_key: test

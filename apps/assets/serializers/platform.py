@@ -7,7 +7,7 @@ from ..models import Platform, PlatformProtocol
 from ..const import Category, AllTypes
 
 
-__all__ = ['PlatformSerializer']
+__all__ = ['PlatformSerializer', 'PlatformOpsMethodSerializer']
 
 
 class ProtocolSettingSerializer(serializers.Serializer):
@@ -72,3 +72,11 @@ class PlatformSerializer(JMSWritableNestedModelSerializer):
             if attrs.get(method_enabled, False) and not attrs.get(method_name, False):
                 raise serializers.ValidationError({method_name: _('This field is required.')})
         return attrs
+
+
+class PlatformOpsMethodSerializer(serializers.Serializer):
+    id = serializers.CharField(read_only=True)
+    name = serializers.CharField(max_length=50, label=_('Name'))
+    category = serializers.CharField(max_length=50, label=_('Category'))
+    type = serializers.ListSerializer(child=serializers.CharField())
+    method = serializers.CharField()

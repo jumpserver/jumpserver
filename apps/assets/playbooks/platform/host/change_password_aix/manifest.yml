@@ -1,5 +1,4 @@
 id: change_password_aix
 name: Change password for AIX
-version: 1
 category: host
 method: change_password

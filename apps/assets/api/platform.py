@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from common.drf.api import JMSModelViewSet
 from common.drf.serializers import GroupedChoiceSerailizer
 from assets.models import Platform
-from assets.serializers import PlatformSerializer
+from assets.serializers import PlatformSerializer, PlatformOpsMethodSerializer
 from assets.const import AllTypes, Category
 from assets.playbooks.platform import filter_platform_methods
 
@@ -45,7 +45,8 @@ class AssetPlatformViewSet(JMSModelViewSet):
         tp = request.query_params.get('type')
         method = request.query_params.get('method')
         methods = filter_platform_methods(category, tp, method)
-        return Response(methods)
+        serializer = PlatformOpsMethodSerializer(methods, many=True)
+        return Response(serializer.data)
 
     def check_object_permissions(self, request, obj):
         if request.method.lower() in ['delete', 'put', 'patch'] and obj.internal:

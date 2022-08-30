@@ -76,7 +76,8 @@ class HostTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
                 '_protocols': ['ssh', 'rdp', 'vnc', 'telnet']
             },
             cls.WINDOWS: {
-                '_protocols': ['ssh', 'rdp', 'vnc']
+                '_protocols': ['ssh', 'rdp', 'vnc'],
+                'has_su': False
             },
             cls.MACOS: {
                 '_protocols': ['ssh', 'vnc']
