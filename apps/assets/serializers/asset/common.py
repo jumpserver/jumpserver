@@ -73,7 +73,6 @@ class AssetSerializer(JMSWritableNestedModelSerializer):
     """
     资产的数据结构
     """
-
     class Meta:
         model = Asset
         fields_mini = [

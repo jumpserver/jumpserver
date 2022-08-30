@@ -49,7 +49,6 @@ class PlatformSerializer(JMSWritableNestedModelSerializer):
             'domain_enabled', 'domain_default', 'su_enabled', 'su_method',
             'protocols_enabled', 'protocols', 'ping_enabled', 'ping_method',
             'verify_account_enabled', 'verify_account_method',
-            'create_account_enabled', 'create_account_method',
             'change_password_enabled', 'change_password_method',
             'type_constraints', 'comment', 'charset',
         ]
@@ -59,8 +58,8 @@ class PlatformSerializer(JMSWritableNestedModelSerializer):
             'verify_account_method': {'label': '校验账号方式'},
             'create_account_enabled': {'label': '启用创建账号'},
             'create_account_method': {'label': '创建账号方式'},
-            'change_password_enabled': {'label': '启用账号改密'},
-            'change_password_method': {'label': '账号改密方式'},
+            'change_password_enabled': {'label': '启用账号创建改密'},
+            'change_password_method': {'label': '账号创建改密方式'},
         }
 
     def validate(self, attrs):

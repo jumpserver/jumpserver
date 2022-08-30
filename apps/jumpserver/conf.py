@@ -124,7 +124,7 @@ class ConfigCrypto:
             if plaintext:
                 value = plaintext
         except Exception as e:
-            logger.error('decrypt %s error: %s', item, e)
+            pass
         return value
 
     @classmethod
@@ -134,7 +134,7 @@ class ConfigCrypto:
         secret_encrypt_key = os.environ.get('SECRET_ENCRYPT_KEY', '')
         if not secret_encrypt_key:
             return None
-        print('Info: Using SM4 to encrypt config secret value')
+        print('Info: try using SM4 to decrypt config secret value')
         return cls(secret_encrypt_key)
 
 

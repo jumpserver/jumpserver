@@ -1,0 +1,6 @@
+id: verify_account_ansible
+name: Ansible ping
+description: Ansible ping
+category: host
+type: all
+method: verify_account

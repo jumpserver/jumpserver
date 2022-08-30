@@ -1,8 +1,0 @@
-id: verify_account_ansible
-name: Change password using ansible
-version: 1
-description: 使用特权账号更改账号的密码
-author: ibuler
-category: host
-type: linux
-method: verify_account

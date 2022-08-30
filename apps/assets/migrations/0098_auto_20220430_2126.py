@@ -8,33 +8,20 @@ import django.db.models.deletion
 def migrate_platform_set_ops(apps, *args):
     platform_model = apps.get_model('assets', 'Platform')
 
-    Attr = namedtuple('ops', [
-        'su_enabled', 'su_method', 'domain_enabled',
-        'change_password_enabled', 'change_password_method',
-        'verify_account_enabled', 'verify_account_method',
-        'create_account_enabled', 'create_account_method',
-    ])
     default_ok = {
         'su_enabled': True,
         'su_method': 'sudo',
         'domain_enabled': True,
         'change_password_enabled': True,
-        'change_password_method': 'change_password_ansible',
+        'change_password_method': 'change_password_linux',
         'verify_account_enabled': True,
         'verify_account_method': 'verify_account_ansible',
-        'create_account_enabled': True,
-        'create_account_method': 'create_account_ansible',
     }
 
     platform_ops_map = {
-        'Linux': default_ok,
-        'Windows': default_ok,
-        'AIX': Attr(
-            True, 'sudo', True,
-            True, 'change_password_ansible',
-            True, 'verify_account_ansible',
-            True, 'create_account_ansible'
-        )
+        'Linux': {**default_ok, 'change_password_method': 'change_password_linux'},
+        'Windows': {**default_ok, 'change_password_method': 'change_password_windows'},
+        'AIX': {**default_ok, 'change_password_method': 'change_password_aix'},
     }
     platforms = platform_model.objects.all()
 

@@ -11,7 +11,8 @@ from .common import BaseAccountSerializer
 
 
 class AccountSerializer(
-    AccountTemplateSerializerMixin, AuthSerializerMixin, BulkOrgResourceModelSerializer
+    AccountTemplateSerializerMixin, AuthSerializerMixin,
+    BulkOrgResourceModelSerializer
 ):
     ip = serializers.ReadOnlyField(label=_("IP"))
     asset_name = serializers.ReadOnlyField(label=_("Asset"))

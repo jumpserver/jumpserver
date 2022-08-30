@@ -1,0 +1,9 @@
+id: change_password_example
+name: Change password example
+category: host
+method: change_password
+vars:
+  account:
+    username: test
+    password: teset123
+    public_key: test

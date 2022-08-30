@@ -6,7 +6,7 @@ from common.drf.serializers import GroupedChoiceSerailizer
 from assets.models import Platform
 from assets.serializers import PlatformSerializer
 from assets.const import AllTypes, Category
-from assets.resources.platform import get_platform_methods
+from assets.playbooks.platform import filter_platform_methods
 
 
 __all__ = ['AssetPlatformViewSet']
@@ -43,14 +43,8 @@ class AssetPlatformViewSet(JMSModelViewSet):
     def ops_methods(self, request, *args, **kwargs):
         category = request.query_params.get('category')
         tp = request.query_params.get('type')
-        item = request.query_params.get('item')
-        methods = get_platform_methods()
-        if category:
-            methods = list(filter(lambda x: x['category'] == category, methods))
-        if tp:
-            methods = list(filter(lambda x: x['type'] == tp, methods))
-        if item:
-            methods = list(filter(lambda x: x.get('method') == item, methods))
+        method = request.query_params.get('method')
+        methods = filter_platform_methods(category, tp, method)
         return Response(methods)
 
     def check_object_permissions(self, request, obj):
