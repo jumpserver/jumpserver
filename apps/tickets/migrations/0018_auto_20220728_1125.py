@@ -4,12 +4,21 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('tickets', '0017_auto_20220623_1027'),
     ]
 
     operations = [
+        migrations.AddField(
+            model_name='applyapplicationticket',
+            name='apply_actions',
+            field=models.IntegerField(
+                choices=[
+                    (255, 'All'), (1, 'Connect'), (2, 'Upload file'), (4, 'Download file'), (6, 'Upload download'),
+                    (8, 'Clipboard copy'), (16, 'Clipboard paste'), (24, 'Clipboard copy paste')
+                ], default=255,
+                verbose_name='Actions'),
+        ),
         migrations.AlterField(
             model_name='applyapplicationticket',
             name='apply_permission_name',
