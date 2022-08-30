@@ -1,9 +1,6 @@
 # coding:utf-8
-from django.urls import path, re_path
-from rest_framework_nested import routers
+from django.urls import path
 from rest_framework_bulk.routes import BulkRouter
-
-from common import api as capi
 
 from .. import api
 
@@ -13,6 +10,9 @@ router = BulkRouter()
 router.register(r'assets', api.AssetViewSet, 'asset')
 router.register(r'hosts', api.HostViewSet, 'host')
 router.register(r'databases', api.DatabaseViewSet, 'database')
+router.register(r'webs', api.WebViewSet, 'web')
+router.register(r'clouds', api.CloudViewSet, 'cloud')
+router.register(r'networks', api.NetworkViewSet, 'network')
 router.register(r'accounts', api.AccountViewSet, 'account')
 router.register(r'account-templates', api.AccountTemplateViewSet, 'account-template')
 router.register(r'account-secrets', api.AccountSecretsViewSet, 'account-secret')

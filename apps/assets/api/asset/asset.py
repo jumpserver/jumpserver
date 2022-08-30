@@ -40,7 +40,7 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
     filterset_class = AssetFilterSet
     search_fields = ("name", "ip")
     ordering_fields = ("name", "ip", "port")
-    ordering = ('name', )
+    ordering = ('name',)
     serializer_classes = (
         ('default', serializers.AssetSerializer),
         ('suggestion', serializers.MiniAssetSerializer),
@@ -173,5 +173,3 @@ class AssetsTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
         has = self.request.user.has_perm(perm_required)
         if not has:
             self.permission_denied(request)
-
-
