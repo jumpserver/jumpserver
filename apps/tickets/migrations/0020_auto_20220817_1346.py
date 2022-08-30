@@ -50,6 +50,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.AlterField(
+            model_name='applyassetticket',
+            name='apply_permission_name',
+            field=models.CharField(max_length=128, verbose_name='Permission name'),
+        ),
         migrations.AddField(
             model_name='applyassetticket',
             name='apply_accounts',
