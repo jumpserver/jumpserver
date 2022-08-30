@@ -26,17 +26,6 @@ class AccountHistoryViewSet(AccountViewSet):
     }
     http_method_names = ['get', 'options']
 
-<<<<<<< HEAD
-=======
-    def get_queryset(self):
-        queryset = self.model.objects.all() \
-            .annotate(ip=F('asset__ip')) \
-            .annotate(hostname=F('asset__hostname')) \
-            .annotate(platform=F('asset__platform__name')) \
-            .annotate(protocols=F('asset__protocols'))
-        return queryset
-
->>>>>>> origin
 
 class AccountHistorySecretsViewSet(RecordViewLogMixin, AccountHistoryViewSet):
     serializer_classes = {

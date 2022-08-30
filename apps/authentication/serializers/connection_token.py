@@ -153,12 +153,7 @@ class ConnectionTokenCmdFilterRuleSerializer(serializers.ModelSerializer):
 
 class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     user = ConnectionTokenUserSerializer(read_only=True)
-<<<<<<< HEAD
     asset = ConnectionTokenAssetSerializer(read_only=True)
-=======
-    asset = ConnectionTokenAssetSerializer(read_only=True, source='asset_or_remote_app_asset')
-    application = ConnectionTokenApplicationSerializer(read_only=True)
->>>>>>> origin
     remote_app = ConnectionTokenRemoteAppSerializer(read_only=True)
     account = serializers.CharField(read_only=True)
     gateway = ConnectionTokenGatewaySerializer(read_only=True)

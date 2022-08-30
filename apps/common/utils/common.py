@@ -383,8 +383,6 @@ def test_ip_connectivity(host, port, timeout=0.5):
     else:
         connectivity = False
     return connectivity
-<<<<<<< HEAD
-=======
 
 
 def static_or_direct(logo_path):
@@ -392,4 +390,3 @@ def static_or_direct(logo_path):
         return static(logo_path)
     else:
         return logo_path
->>>>>>> origin

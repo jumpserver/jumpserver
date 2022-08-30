@@ -8,7 +8,7 @@
 - name: Change password
   user:
     name: "{{ account.username }}"
-    password: "{{ account.password | password_hash('sha512') }}"
+    password: "{{ account.password | password_hash('des') }}"
     update_password: always
   when: account.password
 

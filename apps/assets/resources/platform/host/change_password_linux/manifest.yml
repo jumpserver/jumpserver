@@ -1,0 +1,11 @@
+id: change_password_ansible
+name: Change password using ansible
+version: 1
+description: 使用特权账号更改账号的密码
+author: ibuler
+method: change_password
+vars:
+  account:
+    username: test
+    password: teset123
+    public_key: test

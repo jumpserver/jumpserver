@@ -12,7 +12,7 @@ def get_platform_methods():
         for name in dirs:
             path = os.path.join(root, name)
             rel_path = path.replace(BASE_DIR, '.')
-            if len(rel_path.split('/')) != 4:
+            if len(rel_path.split('/')) != 3:
                 continue
             manifest_path = os.path.join(path, 'manifest.yml')
             if not os.path.exists(manifest_path):
@@ -22,10 +22,9 @@ def get_platform_methods():
                 manifest = yaml.safe_load(f)
             except yaml.YAMLError as e:
                 continue
-            current, category, tp, name = rel_path.split('/')
-            manifest.update({
-                'category': category,
-                'type': tp,
-            })
             methods.append(manifest)
     return methods
+
+
+if __name__ == '__main__':
+    print(get_platform_methods())

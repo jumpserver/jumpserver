@@ -68,49 +68,6 @@ def migrate_database_to_asset(apps, *args):
             failed_apps.append(app)
             pass
 
-#
-# def migrate_remote_app_to_asset(apps, *args):
-#     app_model = apps.get_model('applications', 'Application')
-#     remote_app_model = apps.get_model('assets', 'Web')
-#     host_model = apps.get_model('assets', 'Host')
-#     platform_model = apps.get_model('assets', 'Platform')
-#     applications = app_model.objects.filter(category='remote_app')
-#     platforms = platform_model.objects.filter(category='remote_app')
-#     platforms_map = {p.type: p for p in platforms}
-#
-#     connect_host_map = {}
-#
-#     for app in applications:
-#         attrs = app.attrs
-#         connect_host = attrs.pop('asset')
-#         if connect_host:
-#             connect_host = host_model.objects.filter(asset_ptr_id=connect_host).first()
-#             connect_host_map[app.id] = connect_host
-#
-#     for app in applications:
-#         tp = app.type
-#         attrs = app.attrs
-#         app_path = attrs.pop('path', '')
-#         if tp == 'custom':
-#             tp = 'general_remote_app'
-#
-#         print("Create remote app: {}".format(app.name))
-#         remote_app = remote_app_model(
-#             id=app.id, hostname=app.name, ip='',
-#             protocols='',
-#             platform=platforms_map[tp],
-#             org_id=app.org_id,
-#             app_path=app_path,
-#             connect_host=connect_host_map.get(app.id),
-#             attrs=attrs,
-#         )
-#         try:
-#             remote_app.save()
-#         except Exception as e:
-#             print("Error: ", e)
-#             # remote_app.hostname = 'RemoteApp-' + remote_app.hostname
-#
-
 
 def migrate_cloud_to_asset(apps, *args):
     app_model = apps.get_model('applications', 'Application')
@@ -119,6 +76,7 @@ def migrate_cloud_to_asset(apps, *args):
 
     applications = app_model.objects.filter(category='cloud')
     platform = platform_model.objects.filter(type='k8s').first()
+    print()
 
     for app in applications:
         attrs = app.attrs
