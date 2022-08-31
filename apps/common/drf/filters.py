@@ -85,7 +85,7 @@ class DatetimeRangeFilter(filters.BaseFilterBackend):
                         lookup = "__gte"
                     else:
                         lookup = "__lte"
-                    kwargs[attr+lookup] = value
+                    kwargs[attr + lookup] = value
                 except ValidationError as e:
                     print(e)
                     continue
@@ -171,4 +171,13 @@ def current_user_filter(user_field='user'):
     class CurrentUserFilter(filters.BaseFilterBackend):
         def filter_queryset(self, request, queryset, view):
             return queryset.filter(**{user_field: request.user})
+
     return CurrentUserFilter
+
+
+class UUIDInFilter(drf_filters.BaseInFilter, drf_filters.UUIDFilter):
+    pass
+
+
+class NumberInFilter(drf_filters.BaseInFilter, drf_filters.NumberFilter):
+    pass

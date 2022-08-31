@@ -5,7 +5,7 @@ from common.drf.api import JMSModelViewSet
 from common.drf.serializers import GroupedChoiceSerailizer
 from assets.models import Platform
 from assets.serializers import PlatformSerializer
-from assets.const import AllTypes, Category
+from assets.const import AllTypes
 from assets.resources.platform import get_platform_methods
 
 

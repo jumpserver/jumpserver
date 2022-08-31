@@ -1,5 +1,3 @@
-from django.db.models import Q
-from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -7,52 +5,40 @@ from rest_framework.generics import CreateAPIView
 
 from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
-from common.drf.filters import BaseFilterSet
+from common.drf.filters import BaseFilterSet, UUIDInFilter
 from common.mixins import RecordViewLogMixin
 from common.permissions import UserConfirmation
 from authentication.const import ConfirmType
 from ..tasks.account_connectivity import test_accounts_connectivity_manual
-from ..models import Node, Account
+from ..models import Account, Node
 from .. import serializers
 
 __all__ = ['AccountFilterSet', 'AccountViewSet', 'AccountSecretsViewSet', 'AccountTaskCreateAPI']
 
 
 class AccountFilterSet(BaseFilterSet):
-    username = filters.CharFilter(method='do_nothing')
     ip = filters.CharFilter(field_name='ip', lookup_expr='exact')
     hostname = filters.CharFilter(field_name='name', lookup_expr='exact')
-    node = filters.CharFilter(method='do_nothing')
+    username = filters.CharFilter(field_name="username", lookup_expr='exact')
+    assets = UUIDInFilter(field_name='asset_id', lookup_expr='in')
+    nodes = UUIDInFilter(method='filter_nodes')
 
-    @property
-    def qs(self):
-        qs = super().qs
-        qs = self.filter_username(qs)
-        qs = self.filter_node(qs)
-        qs = qs.distinct()
-        return qs
+    def filter_nodes(self, queryset, name, value):
+        nodes = Node.objects.filter(id__in=value)
+        if not nodes:
+            return queryset
 
-    def filter_username(self, qs):
-        username = self.get_query_param('username')
-        if not username:
-            return qs
-        qs = qs.filter(Q(username=username) | Q(systemuser__username=username)).distinct()
-        return qs
-
-    def filter_node(self, qs):
-        node_id = self.get_query_param('node')
-        if not node_id:
-            return qs
-        node = get_object_or_404(Node, pk=node_id)
-        node_ids = node.get_all_children(with_self=True).values_list('id', flat=True)
-        node_ids = list(node_ids)
-        qs = qs.filter(asset__nodes__in=node_ids)
-        return qs
+        node_qs = Node.objects.none()
+        for node in nodes:
+            node_qs |= node.get_all_children(with_self=True)
+        node_ids = list(node_qs.values_list('id', flat=True))
+        queryset = queryset.filter(asset__nodes__in=node_ids)
+        return queryset
 
     class Meta:
         model = Account
         fields = [
-            'asset', 'id',
+            'asset', 'id'
         ]
 
 
