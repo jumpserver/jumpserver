@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 # -*- coding: utf-8 -*-
 #
 from rest_framework.viewsets import ModelViewSet
@@ -309,5 +307,3 @@ class AssetPermUserGroupPermissionsListApi(BaseAssetPermUserOrUserGroupPermissio
         user_group_id = self.kwargs.get('perm_user_group_id')
         user_group = get_object_or_404(UserGroup, pk=user_group_id)
         return user_group
-
->>>>>>> origin
