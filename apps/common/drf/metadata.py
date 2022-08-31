@@ -90,6 +90,8 @@ class SimpleMetadataWithFilters(SimpleMetadata):
                 for choice_value, choice_name in dict(field.choices).items()
             ]
 
+        if field.__class__.__name__ == 'ChoiceDisplayField':
+            field_info['type'] = 'display_choice'
         return field_info
 
     def get_filters_fields(self, request, view):

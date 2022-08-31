@@ -1,0 +1,6 @@
+id: ansible_win_ping
+name: Ansible win ping
+category: host
+type:
+  - windows
+method: verify_account

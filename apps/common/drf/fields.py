@@ -54,3 +54,8 @@ class ChoiceDisplayField(ChoiceField):
             'value': value,
             'label': self.choice_mapper.get(six.text_type(value), value),
         }
+
+    def to_internal_value(self, data):
+        if isinstance(data, dict):
+            return data.get('value')
+        return super(ChoiceDisplayField, self).to_internal_value(data)

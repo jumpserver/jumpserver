@@ -40,7 +40,7 @@ class Platform(models.Model):
     # Accounts
     # 这应该和账号有关
     su_enabled = models.BooleanField(default=False, verbose_name=_("Su enabled"))
-    su_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("SU method"))
+    su_method = models.CharField(max_length=32, blank=True, null=True, verbose_name=_("SU method"))
     ping_enabled = models.BooleanField(default=False)
     ping_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Ping method"))
     verify_account_enabled = models.BooleanField(default=False, verbose_name=_("Verify account enabled"))
@@ -60,6 +60,74 @@ class Platform(models.Model):
             defaults={'name': 'Linux'}, name='Linux'
         )
         return linux.id
+
+    @staticmethod
+    def set_default_platforms_ops(platform_model):
+        default_ok = {
+            'su_enabled': True,
+            'su_method': 'sudo',
+            'domain_enabled': True,
+            'change_password_enabled': True,
+            'change_password_method': 'change_password_linux',
+            'verify_account_enabled': True,
+            'verify_account_method': 'ansible_posix_ping',
+        }
+        db_default = {
+            'su_enabled': False,
+            'domain_enabled': True,
+            'change_password_enabled': True,
+            'verify_account_enabled': True,
+        }
+
+        platform_ops_map = {
+            ('host', 'linux'): {
+                **default_ok,
+                'change_password_method': 'change_password_linux',
+                'verify_account_method': 'ansible_posix_ping'
+            },
+            ('host', 'windows'): {
+                **default_ok,
+                'su_enabled': False,
+                'change_password_method': 'change_password_windows',
+                'verify_account_method': 'ansible_win_ping'
+            },
+            ('host', 'unix'): {
+                **default_ok,
+                'verify_account_method': 'ansible_posix_ping',
+                'change_password_method': 'change_password_aix'
+            },
+            ('database', 'mysql'): {
+                **db_default,
+                'verify_account_method': 'mysql_ping',
+                'change_password_method': 'change_password_mysql'
+            },
+            ('database', 'postgresql'): {
+                **db_default,
+                'verify_account_method': 'postgresql_ping',
+                'change_password_method': 'change_password_postgresql'
+            },
+            ('database', 'oracle'): {
+                **db_default,
+                'verify_account_method': 'oracle_ping',
+                'change_password_method': 'change_password_oracle'
+            },
+            ('database', 'sqlserver'): {
+                **db_default,
+                'verify_account_method': 'mysql_ping',
+                'change_password_method': 'change_password_sqlserver'
+            },
+        }
+        platforms = platform_model.objects.all()
+
+        updated = []
+        for p in platforms:
+            attrs = platform_ops_map.get((p.category, p.type), {})
+            if not attrs:
+                continue
+            for k, v in attrs.items():
+                setattr(p, k, v)
+            updated.append(p)
+        platform_model.objects.bulk_update(updated, list(default_ok.keys()))
 
     def __str__(self):
         return self.name

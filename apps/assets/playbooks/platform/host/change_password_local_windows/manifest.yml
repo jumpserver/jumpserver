@@ -3,9 +3,5 @@ name: Change password local account for Windows
 version: 1
 method: change_password
 category: host
-type: windows
-vars:
-  account:
-    username: test
-    password: teset123
-    public_key: test
+type:
+  - windows

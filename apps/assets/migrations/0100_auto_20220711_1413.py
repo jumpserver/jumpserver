@@ -2,6 +2,12 @@
 
 import time
 from django.db import migrations
+from assets.models import Platform
+
+
+def migrate_platform_set_ops(apps, *args):
+    platform_model = apps.get_model('assets', 'Platform')
+    Platform.set_default_platforms_ops(platform_model)
 
 
 def migrate_accounts(apps, schema_editor):
@@ -59,5 +65,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(migrate_accounts)
+        migrations.RunPython(migrate_accounts),
+        migrations.RunPython(migrate_platform_set_ops)
     ]
