@@ -1,3 +1,4 @@
+
 from assets.models import Networking
 from .common import AssetSerializer
 

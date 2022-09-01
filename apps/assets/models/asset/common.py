@@ -11,7 +11,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.utils import lazyproperty
 from orgs.mixins.models import OrgManager, JMSOrgBaseModel
-from ...const import Category
 from ..platform import Platform
 from ..base import AbsConnectivity
 
@@ -82,7 +81,7 @@ class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
 
     labels = models.ManyToManyField('assets.Label', blank=True, related_name='assets', verbose_name=_("Labels"))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
-
+    info = models.JSONField(verbose_name='Info', default=dict, blank=True)
     objects = AssetManager.from_queryset(AssetQuerySet)()
 
     def __str__(self):

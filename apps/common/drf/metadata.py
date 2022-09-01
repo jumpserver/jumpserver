@@ -85,13 +85,13 @@ class SimpleMetadataWithFilters(SimpleMetadata):
             field_info['choices'] = [
                 {
                     'value': choice_value,
-                    'display_name': force_text(choice_name, strings_only=True)
+                    'label': force_text(choice_name, strings_only=True)
                 }
                 for choice_value, choice_name in dict(field.choices).items()
             ]
 
-        if field.__class__.__name__ == 'ChoiceDisplayField':
-            field_info['type'] = 'display_choice'
+        if field.__class__.__name__ == 'LabeledChoiceField':
+            field_info['type'] = 'labeled_choice'
         return field_info
 
     def get_filters_fields(self, request, view):

@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from assets.const import Category, AllTypes
+from assets.const import AllTypes
 from common.db.fields import JsonDictTextField
 
 
@@ -30,23 +30,14 @@ class Platform(models.Model):
     meta = JsonDictTextField(blank=True, null=True, verbose_name=_("Meta"))
     internal = models.BooleanField(default=False, verbose_name=_("Internal"))
     comment = models.TextField(blank=True, null=True, verbose_name=_("Comment"))
-    domain_enabled = models.BooleanField(default=True, verbose_name=_("Domain enabled"))
-    domain_default = models.ForeignKey(
-        'assets.Domain', null=True, on_delete=models.SET_NULL,
-        verbose_name=_("Domain default")
-    )
     protocols_enabled = models.BooleanField(default=True, verbose_name=_("Protocols enabled"))
     protocols = models.ManyToManyField(PlatformProtocol, blank=True, verbose_name=_("Protocols"))
     # Accounts
     # 这应该和账号有关
     su_enabled = models.BooleanField(default=False, verbose_name=_("Su enabled"))
     su_method = models.CharField(max_length=32, blank=True, null=True, verbose_name=_("SU method"))
-    ping_enabled = models.BooleanField(default=False)
-    ping_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Ping method"))
     verify_account_enabled = models.BooleanField(default=False, verbose_name=_("Verify account enabled"))
     verify_account_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Verify account method"))
-    create_account_enabled = models.BooleanField(default=False, verbose_name=_("Create account enabled"))
-    create_account_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Create account method"))
     change_password_enabled = models.BooleanField(default=False, verbose_name=_("Change password enabled"))
     change_password_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Change password method"))
 

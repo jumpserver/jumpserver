@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 
-from common.drf.fields import ChoiceDisplayField
+from common.drf.fields import LabeledChoiceField
 from common.drf.serializers import JMSWritableNestedModelSerializer
 from ..models import Platform, PlatformProtocol
 from ..const import Category, AllTypes
@@ -30,11 +30,11 @@ class PlatformProtocolsSerializer(serializers.ModelSerializer):
 
 
 class PlatformSerializer(JMSWritableNestedModelSerializer):
-    type = ChoiceDisplayField(choices=AllTypes.choices, label=_("Type"))
-    category = ChoiceDisplayField(choices=Category.choices, label=_("Category"))
+    type = LabeledChoiceField(choices=AllTypes.choices, label=_("Type"))
+    category = LabeledChoiceField(choices=Category.choices, label=_("Category"))
     protocols = PlatformProtocolsSerializer(label=_('Protocols'), many=True, required=False)
     type_constraints = serializers.ReadOnlyField(required=False, read_only=True)
-    su_method = ChoiceDisplayField(
+    su_method = LabeledChoiceField(
         choices=[('sudo', 'sudo su -'), ('su', 'su - ')],
         label='切换方式', required=False, default='sudo'
     )
@@ -54,6 +54,8 @@ class PlatformSerializer(JMSWritableNestedModelSerializer):
         ]
         extra_kwargs = {
             'su_enabled': {'label': '启用切换账号'},
+            'domain_enabled': {'label': "启用网域"},
+            'domain_default': {'label': "默认网域"},
             'verify_account_enabled': {'label': '启用校验账号'},
             'verify_account_method': {'label': '校验账号方式'},
             'create_account_enabled': {'label': '启用创建账号'},

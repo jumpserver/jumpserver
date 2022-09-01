@@ -16,7 +16,7 @@ __all__ = ['SystemUser']
 logger = logging.getLogger(__name__)
 
 
-class SystemUser(ProtocolMixin, BaseAccount):
+class SystemUser(BaseAccount, ProtocolMixin):
     LOGIN_AUTO = 'auto'
     LOGIN_MANUAL = 'manual'
     LOGIN_MODE_CHOICES = (
@@ -44,6 +44,7 @@ class SystemUser(ProtocolMixin, BaseAccount):
     # linux su 命令 (switch user)
     su_enabled = models.BooleanField(default=False, verbose_name=_('User switch'))
     su_from = models.ForeignKey('self', on_delete=models.SET_NULL, related_name='su_to', null=True, verbose_name=_("Switch from"))
+    privileged = None
 
     class Meta:
         ordering = ['name']

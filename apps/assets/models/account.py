@@ -2,14 +2,12 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
-from common.db import fields
 from .base import BaseAccount, AbsConnectivity
 
 __all__ = ['Account', 'AccountTemplate']
 
 
 class Account(BaseAccount, AbsConnectivity):
-    token = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Token'))
     privileged = models.BooleanField(verbose_name=_("Privileged account"), default=False)
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, verbose_name=_('Asset'))
     version = models.IntegerField(default=0, verbose_name=_('Version'))
@@ -30,7 +28,6 @@ class Account(BaseAccount, AbsConnectivity):
 
 
 class AccountTemplate(BaseAccount, AbsConnectivity):
-    token = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Token'))
     privileged = models.BooleanField(verbose_name=_("Privileged account"), default=False)
 
     class Meta:

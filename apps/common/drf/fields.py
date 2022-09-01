@@ -4,11 +4,13 @@ import six
 
 from rest_framework.fields import ChoiceField
 from rest_framework import serializers
+from django.core.exceptions import ObjectDoesNotExist
 
 from common.utils import decrypt_password
 
 __all__ = [
-    'ReadableHiddenField', 'EncryptedField', 'ChoiceDisplayField'
+    'ReadableHiddenField', 'EncryptedField', 'LabeledChoiceField',
+    'ObjectedRelatedField',
 ]
 
 
@@ -40,9 +42,9 @@ class EncryptedField(serializers.CharField):
         return decrypt_password(value)
 
 
-class ChoiceDisplayField(ChoiceField):
+class LabeledChoiceField(ChoiceField):
     def __init__(self, *args, **kwargs):
-        super(ChoiceDisplayField, self).__init__(*args, **kwargs)
+        super(LabeledChoiceField, self).__init__(*args, **kwargs)
         self.choice_mapper = {
             six.text_type(key): value for key, value in self.choices.items()
         }
@@ -58,4 +60,31 @@ class ChoiceDisplayField(ChoiceField):
     def to_internal_value(self, data):
         if isinstance(data, dict):
             return data.get('value')
-        return super(ChoiceDisplayField, self).to_internal_value(data)
+        return super(LabeledChoiceField, self).to_internal_value(data)
+
+
+class ObjectedRelatedField(serializers.RelatedField):
+    def __init__(self, **kwargs):
+        self.attrs = kwargs.pop('attrs', None) or ('id', 'name')
+        super().__init__(**kwargs)
+
+    def to_representation(self, value):
+        data = {}
+        for attr in self.attrs:
+            data[attr] = getattr(value, attr)
+        return data
+
+    def to_internal_value(self, data):
+        if isinstance(data, dict):
+            pk = data.get(self.attrs[0])
+        else:
+            pk = data
+        queryset = self.get_queryset()
+        try:
+            if isinstance(data, bool):
+                raise TypeError
+            return queryset.get(pk=pk)
+        except ObjectDoesNotExist:
+            self.fail('does_not_exist', pk_value=pk)
+        except (TypeError, ValueError):
+            self.fail('incorrect_type', data_type=type(pk).__name__)

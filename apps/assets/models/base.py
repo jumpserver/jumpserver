@@ -176,7 +176,7 @@ class BaseAccount(OrgModelMixin, AuthMixin):
     password = fields.EncryptCharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
     private_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH private key'))
     public_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH public key'))
-    # token = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Token'))
+    token = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Token'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))

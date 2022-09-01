@@ -77,7 +77,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='platform',
             name='su_method',
-            field=models.TextField(blank=True, max_length=32, null=True, verbose_name='SU method'),
+            field=models.CharField(blank=True, max_length=32, null=True, verbose_name='SU method'),
         ),
         migrations.AddField(
             model_name='platform',

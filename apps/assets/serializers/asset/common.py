@@ -6,7 +6,7 @@ from django.db.transaction import atomic
 from django.db.models import F
 
 from common.drf.serializers import JMSWritableNestedModelSerializer
-from common.drf.fields import ChoiceDisplayField
+from common.drf.fields import LabeledChoiceField, ObjectedRelatedField
 from ..account import AccountSerializer
 from ...models import Asset, Node, Platform, Protocol, Label, Domain
 from ...const import Category, AllTypes
@@ -42,33 +42,15 @@ class AssetPlatformSerializer(serializers.ModelSerializer):
         }
 
 
-class AssetDomainSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Domain
-        fields = ['id', 'name']
-        extra_kwargs = {
-            'name': {'required': False}
-        }
-
-
-class AssetNodesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Node
-        fields = ['id', 'value']
-        extra_kwargs = {
-            'value': {'required': False}
-        }
-
-
 class AssetSerializer(JMSWritableNestedModelSerializer):
-    category = ChoiceDisplayField(choices=Category.choices, read_only=True, label=_('Category'))
-    type = ChoiceDisplayField(choices=AllTypes.choices, read_only=True, label=_('Type'))
-    domain = AssetDomainSerializer(required=False)
-    platform = AssetPlatformSerializer(required=False)
-    labels = AssetLabelSerializer(many=True, required=False)
-    nodes = AssetNodesSerializer(many=True, required=False)
-    accounts = AccountSerializer(many=True, required=False)
-    protocols = AssetProtocolsSerializer(many=True, required=False)
+    category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
+    type = LabeledChoiceField(choices=AllTypes.choices, read_only=True, label=_('Type'))
+    domain = ObjectedRelatedField(required=False, queryset=Domain.objects, label=_('Domain'))
+    platform = ObjectedRelatedField(required=False, queryset=Platform.objects, label=_('Platform'))
+    nodes = ObjectedRelatedField(many=True, required=False, queryset=Node.objects, label=_('Nodes'))
+    labels = AssetLabelSerializer(many=True, required=False, label=_('Labels'))
+    accounts = AccountSerializer(many=True, required=False, label=_('Accounts'))
+    protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
 
     """
     资产的数据结构
