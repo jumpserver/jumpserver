@@ -46,8 +46,11 @@ class PlatformSerializer(JMSWritableNestedModelSerializer):
             'category', 'type',
         ]
         fields = fields_small + [
-            'domain_enabled', 'domain_default', 'su_enabled', 'su_method',
-            'protocols_enabled', 'protocols', 'ping_enabled', 'ping_method',
+            'protocols_enabled', 'protocols',
+            'gather_facts_enabled', 'gather_facts_method',
+            'su_enabled', 'su_method',
+            'gather_accounts_enabled', 'gather_accounts_method',
+            'create_account_enabled', 'create_account_method',
             'verify_account_enabled', 'verify_account_method',
             'change_password_enabled', 'change_password_method',
             'type_constraints', 'comment', 'charset',
@@ -56,12 +59,16 @@ class PlatformSerializer(JMSWritableNestedModelSerializer):
             'su_enabled': {'label': '启用切换账号'},
             'domain_enabled': {'label': "启用网域"},
             'domain_default': {'label': "默认网域"},
+            'gather_facts_enabled': {'label': '启用收集信息'},
+            'gather_facts_method': {'label': '收集信息方式'},
             'verify_account_enabled': {'label': '启用校验账号'},
             'verify_account_method': {'label': '校验账号方式'},
             'create_account_enabled': {'label': '启用创建账号'},
             'create_account_method': {'label': '创建账号方式'},
             'change_password_enabled': {'label': '启用账号创建改密'},
             'change_password_method': {'label': '账号创建改密方式'},
+            'gather_accounts_enabled': {'label': '启用账号收集'},
+            'gather_accounts_method': {'label': '收集账号方式'},
         }
 
     def validate(self, attrs):

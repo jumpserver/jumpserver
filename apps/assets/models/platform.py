@@ -26,20 +26,26 @@ class Platform(models.Model):
     name = models.SlugField(verbose_name=_("Name"), unique=True, allow_unicode=True)
     category = models.CharField(default='host', max_length=32, verbose_name=_("Category"))
     type = models.CharField(max_length=32, default='linux', verbose_name=_("Type"))
-    charset = models.CharField(default='utf8', choices=CHARSET_CHOICES, max_length=8, verbose_name=_("Charset"))
     meta = JsonDictTextField(blank=True, null=True, verbose_name=_("Meta"))
     internal = models.BooleanField(default=False, verbose_name=_("Internal"))
     comment = models.TextField(blank=True, null=True, verbose_name=_("Comment"))
+    # 资产有关的
+    charset = models.CharField(default='utf8', choices=CHARSET_CHOICES, max_length=8, verbose_name=_("Charset"))
     protocols_enabled = models.BooleanField(default=True, verbose_name=_("Protocols enabled"))
     protocols = models.ManyToManyField(PlatformProtocol, blank=True, verbose_name=_("Protocols"))
-    # Accounts
-    # 这应该和账号有关
+    gather_facts_enabled = models.BooleanField(default=False, verbose_name=_("Gather facts enabled"))
+    gather_facts_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Gather facts method"))
+    # 账号有关的
     su_enabled = models.BooleanField(default=False, verbose_name=_("Su enabled"))
     su_method = models.CharField(max_length=32, blank=True, null=True, verbose_name=_("SU method"))
-    verify_account_enabled = models.BooleanField(default=False, verbose_name=_("Verify account enabled"))
-    verify_account_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Verify account method"))
+    create_account_enabled = models.BooleanField(default=False, verbose_name=_("Create account enabled"))
+    create_account_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Create account method"))
     change_password_enabled = models.BooleanField(default=False, verbose_name=_("Change password enabled"))
     change_password_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Change password method"))
+    verify_account_enabled = models.BooleanField(default=False, verbose_name=_("Verify account enabled"))
+    verify_account_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Verify account method"))
+    gather_accounts_enabled = models.BooleanField(default=False, verbose_name=_("Gather facts enabled"))
+    gather_accounts_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Gather facts method"))
 
     @property
     def type_constraints(self):

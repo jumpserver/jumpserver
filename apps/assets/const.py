@@ -14,12 +14,13 @@ class PlatformMixin:
     @classmethod
     def platform_constraints(cls):
         return {
-            'has_domain': False,
-            'has_su': False,
-            'has_ping': False,
-            'has_change_password': False,
-            'has_verify_account': False,
-            'has_create_account': False,
+            'domain_enabled': False,
+            'gather_facts_enabled': False,
+            'su_enabled': False,
+            'change_password_enabled': False,
+            'verify_account_enabled': False,
+            'create_account_enabled': False,
+            'gather_accounts_enabled': False,
             '_protocols': []
         }
 
@@ -35,26 +36,29 @@ class Category(PlatformMixin, ChoicesMixin, models.TextChoices):
     def platform_constraints(cls) -> dict:
         return {
             cls.HOST: {
-                'has_domain': True,
-                'has_ping': True,
-                'has_verify_account': True,
-                'has_change_password': True,
-                'has_create_account': True,
+                'domain_enabled': True,
+                'su_enabled': True,
+                'ping_enabled': True,
+                'gather_facts_enabled': True,
+                'verify_account_enabled': True,
+                'change_password_enabled': True,
+                'create_account_enabled': True,
+                'gather_accounts_enabled': True,
                 '_protocols': ['ssh', 'telnet']
             },
             cls.NETWORKING: {
-                'has_domain': True,
+                'domain_enabled': True,
                 '_protocols': ['ssh', 'telnet']
             },
             cls.DATABASE: {
-                'has_domain': True,
+                'domain_enabled': True,
             },
             cls.WEB: {
-                'has_domain': False,
+                'domain_enabled': False,
                 '_protocols': []
             },
             cls.CLOUD: {
-                'has_domain': False,
+                'domain_enabled': False,
                 '_protocols': []
             }
         }
@@ -77,7 +81,7 @@ class HostTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
             },
             cls.WINDOWS: {
                 '_protocols': ['ssh', 'rdp', 'vnc'],
-                'has_su': False
+                'su_enabled': False
             },
             cls.MACOS: {
                 '_protocols': ['ssh', 'vnc']
