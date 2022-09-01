@@ -76,16 +76,28 @@ class AccountSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
 
 class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
     class Meta(AccountSerializer.Meta):
-        fields_backup = [
-            'hostname', 'ip', 'platform', 'protocols', 'username', 'password',
-            'private_key', 'public_key', 'date_created', 'date_updated', 'version'
-        ]
         extra_kwargs = {
             'password': {'write_only': False},
             'private_key': {'write_only': False},
             'public_key': {'write_only': False},
             'systemuser_display': {'label': _('System user display')}
         }
+
+
+class AccountBackUpSerializer(AccountSecretSerializer):
+    class Meta(AccountSecretSerializer.Meta):
+        fields = [
+            'id', 'hostname', 'ip', 'username', 'password',
+            'private_key', 'public_key', 'date_created',
+            'date_updated', 'version'
+        ]
+
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        return queryset
+
+    def to_representation(self, instance):
+        return super(AccountSerializer, self).to_representation(instance)
 
 
 class AccountTaskSerializer(serializers.Serializer):
