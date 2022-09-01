@@ -90,8 +90,19 @@ class SimpleMetadataWithFilters(SimpleMetadata):
                 for choice_value, choice_name in dict(field.choices).items()
             ]
 
-        if field.__class__.__name__ == 'LabeledChoiceField':
+        class_name = field.__class__.__name__
+        if class_name == 'LabeledChoiceField':
             field_info['type'] = 'labeled_choice'
+        elif class_name == 'ObjectRelatedField':
+            field_info['type'] = 'object_related_field'
+        elif class_name == 'ManyRelatedField':
+            child_relation_class_name = field.child_relation.__class__.__name__
+            if child_relation_class_name == 'ObjectRelatedField':
+                field_info['type'] = 'm2m_related_field'
+
+        # if field.label == '系统平台':
+        #     print("Field: ", class_name, field, field_info)
+
         return field_info
 
     def get_filters_fields(self, request, view):

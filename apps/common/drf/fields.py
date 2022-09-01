@@ -10,7 +10,7 @@ from common.utils import decrypt_password
 
 __all__ = [
     'ReadableHiddenField', 'EncryptedField', 'LabeledChoiceField',
-    'ObjectedRelatedField',
+    'ObjectRelatedField',
 ]
 
 
@@ -63,9 +63,10 @@ class LabeledChoiceField(ChoiceField):
         return super(LabeledChoiceField, self).to_internal_value(data)
 
 
-class ObjectedRelatedField(serializers.RelatedField):
+class ObjectRelatedField(serializers.RelatedField):
     def __init__(self, **kwargs):
         self.attrs = kwargs.pop('attrs', None) or ('id', 'name')
+        self.many = kwargs.get('many', False)
         super().__init__(**kwargs)
 
     def to_representation(self, value):

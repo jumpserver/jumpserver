@@ -6,7 +6,7 @@ from django.db.transaction import atomic
 from django.db.models import F
 
 from common.drf.serializers import JMSWritableNestedModelSerializer
-from common.drf.fields import LabeledChoiceField, ObjectedRelatedField
+from common.drf.fields import LabeledChoiceField, ObjectRelatedField
 from ..account import AccountSerializer
 from ...models import Asset, Node, Platform, Protocol, Label, Domain
 from ...const import Category, AllTypes
@@ -45,9 +45,9 @@ class AssetPlatformSerializer(serializers.ModelSerializer):
 class AssetSerializer(JMSWritableNestedModelSerializer):
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
     type = LabeledChoiceField(choices=AllTypes.choices, read_only=True, label=_('Type'))
-    domain = ObjectedRelatedField(required=False, queryset=Domain.objects, label=_('Domain'))
-    platform = ObjectedRelatedField(required=False, queryset=Platform.objects, label=_('Platform'))
-    nodes = ObjectedRelatedField(many=True, required=False, queryset=Node.objects, label=_('Nodes'))
+    domain = ObjectRelatedField(required=False, queryset=Domain.objects, label=_('Domain'))
+    platform = ObjectRelatedField(required=False, queryset=Platform.objects, label=_('Platform'))
+    nodes = ObjectRelatedField(many=True, required=False, queryset=Node.objects, label=_('Nodes'))
     labels = AssetLabelSerializer(many=True, required=False, label=_('Labels'))
     accounts = AccountSerializer(many=True, required=False, label=_('Accounts'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
