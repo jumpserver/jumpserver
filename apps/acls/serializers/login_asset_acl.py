@@ -38,7 +38,7 @@ class LoginAssetACLAssestsSerializer(serializers.Serializer):
     )
 
 
-class LoginAssetACLSystemUsersSerializer(serializers.Serializer):
+class LoginAssetACLAccountsSerializer(serializers.Serializer):
     protocol_group_help_text = _(
         'Format for comma-delimited string, with * indicating a match all. '
         'Protocol options: {}'
@@ -52,18 +52,12 @@ class LoginAssetACLSystemUsersSerializer(serializers.Serializer):
         default=['*'], child=serializers.CharField(max_length=128), label=_('Username'),
         help_text=common_help_text
     )
-    protocol_group = serializers.ListField(
-        default=['*'], child=serializers.CharField(max_length=16), label=_('Protocol'),
-        help_text=protocol_group_help_text.format(
-            ', '.join([Protocol.ssh, Protocol.telnet])
-        )
-    )
 
 
 class LoginAssetACLSerializer(BulkOrgResourceModelSerializer):
     users = LoginAssetACLUsersSerializer()
     assets = LoginAssetACLAssestsSerializer()
-    system_users = LoginAssetACLSystemUsersSerializer()
+    account = LoginAssetACLAccountsSerializer()
     reviewers_amount = serializers.IntegerField(read_only=True, source='reviewers.count')
     action_display = serializers.ReadOnlyField(source='get_action_display', label=_('Action'))
 
@@ -71,9 +65,8 @@ class LoginAssetACLSerializer(BulkOrgResourceModelSerializer):
         model = models.LoginAssetACL
         fields_mini = ['id', 'name']
         fields_small = fields_mini + [
-            'users', 'system_users', 'assets',
-            'is_active',
-            'date_created', 'date_updated',
+            'users', 'accounts', 'assets',
+            'is_active', 'date_created', 'date_updated',
             'priority', 'action', 'action_display', 'comment', 'created_by', 'org_id'
         ]
         fields_m2m = ['reviewers', 'reviewers_amount']
