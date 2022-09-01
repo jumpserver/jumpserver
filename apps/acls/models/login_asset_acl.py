@@ -18,7 +18,7 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
 
     # 条件
     users = models.JSONField(verbose_name=_('User'))
-    system_users = models.JSONField(verbose_name=_('System User'))
+    accounts = models.JSONField(verbose_name=_('Account'), default=dict)
     assets = models.JSONField(verbose_name=_('Asset'))
     # 动作
     action = models.CharField(
@@ -43,11 +43,11 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
         return self.name
 
     @classmethod
-    def filter(cls, user, asset, system_user, action):
+    def filter(cls, user, asset, account, action):
         queryset = cls.objects.filter(action=action)
         queryset = cls.filter_user(user, queryset)
         queryset = cls.filter_asset(asset, queryset)
-        queryset = cls.filter_system_user(system_user, queryset)
+        queryset = cls.filter_account(account, queryset)
         return queryset
 
     @classmethod
@@ -69,21 +69,18 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
         return queryset
 
     @classmethod
-    def filter_system_user(cls, system_user, queryset):
+    def filter_account(cls, account, queryset):
         queryset = queryset.filter(
-            Q(system_users__name_group__contains=system_user.name) |
-            Q(system_users__name_group__contains='*')
+            Q(accounts__name_group__contains=account.name) |
+            Q(accounts__name_group__contains='*')
         ).filter(
-            Q(system_users__username_group__contains=system_user.username) |
-            Q(system_users__username_group__contains='*')
-        ).filter(
-            Q(system_users__protocol_group__contains=system_user.protocol) |
-            Q(system_users__protocol_group__contains='*')
+            Q(accounts__username_group__contains=account.username) |
+            Q(accounts__username_group__contains='*')
         )
         return queryset
 
     @classmethod
-    def create_login_asset_confirm_ticket(cls, user, asset, system_user, assignees, org_id):
+    def create_login_asset_confirm_ticket(cls, user, asset, account, assignees, org_id):
         from tickets.const import TicketType
         from tickets.models import ApplyLoginAssetTicket
         title = _('Login asset confirm') + ' ({})'.format(user)
@@ -93,7 +90,7 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
             'applicant': user,
             'apply_login_user': user,
             'apply_login_asset': asset,
-            'apply_login_system_user': system_user,
+            'apply_login_account': account,
             'org_id': org_id,
         }
         ticket = ApplyLoginAssetTicket.objects.create(**data)

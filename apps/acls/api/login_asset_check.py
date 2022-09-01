@@ -26,7 +26,7 @@ class LoginAssetCheckAPI(CreateAPIView):
     def check_if_need_confirm(self):
         queries = {
             'user': self.serializer.user, 'asset': self.serializer.asset,
-            'system_user': self.serializer.system_user,
+            'account': self.serializer.account,
             'action': LoginAssetACL.ActionChoices.login_confirm
         }
         with tmp_to_org(self.serializer.org):
@@ -45,7 +45,7 @@ class LoginAssetCheckAPI(CreateAPIView):
         ticket = LoginAssetACL.create_login_asset_confirm_ticket(
             user=self.serializer.user,
             asset=self.serializer.asset,
-            system_user=self.serializer.system_user,
+            account=self.serializer.account,
             assignees=acl.reviewers.all(),
             org_id=self.serializer.org.id,
         )
