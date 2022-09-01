@@ -13,7 +13,7 @@ def telnet(dest_addr, port_number=23, timeout=10):
         return False, str(e)
     expected_regexes = [bytes(PROMPT_REGEX, encoding='ascii')]
     index, prompt_regex, output = connection.expect(expected_regexes, timeout=3)
-    return True, output.decode('ascii')
+    return True, output.decode('utf-8')
 
 
 if __name__ == "__main__":
