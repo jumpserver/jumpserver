@@ -28,6 +28,7 @@ class IncludesTextChoicesMeta(type):
         assert includes
 
         attrs = _EnumDict()
+        attrs._cls_name = classname
         for k, v in classdict.items():
             attrs[k] = v
 
