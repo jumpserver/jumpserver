@@ -1,12 +1,4 @@
 import os
-import platform
-
-if platform.system() == 'Darwin' and platform.machine() == 'arm64':
-    import pymysql
-
-    pymysql.version_info = (1, 4, 2, "final", 0)
-    pymysql.install_as_MySQLdb()
-
 from django.urls import reverse_lazy
 
 from .. import const
