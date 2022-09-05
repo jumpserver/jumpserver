@@ -49,15 +49,22 @@ class BaseAccountHandler:
         return header_fields
 
     @classmethod
-    def create_row(cls, account, serializer_cls, header_fields=None):
-        serializer = serializer_cls(account)
-        if not header_fields:
-            header_fields = cls.get_header_fields(serializer)
-        data = cls.unpack_data(serializer.data)
+    def create_row(cls, data, header_fields):
+        data = cls.unpack_data(data)
         row_dict = {}
         for field, header_name in header_fields.items():
-            row_dict[header_name] = str(data[field])
+            row_dict[header_name] = str(data.get(field, field))
         return row_dict
+
+    @classmethod
+    def add_rows(cls, data, header_fields, sheet):
+        data_map = defaultdict(list)
+        for i in data:
+            row = cls.create_row(i, header_fields)
+            if sheet not in data_map:
+                data_map[sheet].append(list(row.keys()))
+            data_map[sheet].append(list(row.values()))
+        return data_map
 
 
 class AssetAccountHandler(BaseAccountHandler):
@@ -73,22 +80,25 @@ class AssetAccountHandler(BaseAccountHandler):
         data_map = defaultdict(list)
 
         # TODO 可以优化一下查询 在账号上做type的缓存 避免数据量大时连表操作
-        accounts = Account.objects.filter(
+        qs = Account.objects.filter(
             asset__platform__type__in=types
         ).annotate(type=F('asset__platform__type'))
-        if not accounts.first():
+        if not qs.exists():
             return data_map
 
         type_dict = dict(Type.CHOICES)
-        header_fields = cls.get_header_fields(AccountSecretSerializer(accounts.first()))
-        for account in accounts:
-            sheet_name = type_dict[account.type]
-            row = cls.create_row(account, AccountSecretSerializer, header_fields)
-            if sheet_name not in data_map:
-                data_map[sheet_name].append(list(row.keys()))
-            data_map[sheet_name].append(list(row.values()))
+        header_fields = cls.get_header_fields(AccountSecretSerializer(qs.first()))
+        account_type_map = defaultdict(list)
+        for account in qs:
+            account_type_map[account.type].append(account)
 
-        logger.info('\n\033[33m- 共收集 {} 条账号\033[0m'.format(accounts.count()))
+        data_map = {}
+        for tp, accounts in account_type_map.items():
+            sheet_name = type_dict[tp]
+            data = AccountSecretSerializer(accounts, many=True).data
+            data_map.update(cls.add_rows(data, header_fields, sheet_name))
+
+        logger.info('\n\033[33m- 共收集 {} 条账号\033[0m'.format(qs.count()))
         return data_map
 
 
