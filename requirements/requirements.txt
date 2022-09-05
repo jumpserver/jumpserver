@@ -4,7 +4,7 @@ asn1crypto==0.24.0
 bcrypt==3.1.4
 billiard==3.6.4.0
 certifi==2018.1.18
-cffi==1.13.2
+cffi==1.15.1
 chardet==3.0.4
 configparser==3.5.0
 decorator==4.1.2
@@ -23,7 +23,7 @@ paramiko==2.11.0
 passlib==1.7.4
 pyasn1==0.4.8
 pycparser==2.21
-cryptography==36.0.1
+cryptography==37.0.4
 pycryptodome==3.15.0
 pycryptodomex==3.15.0
 gmssl==3.2.1
@@ -130,7 +130,7 @@ mysqlclient==2.1.0
 PyMySQL==1.0.2
 oracledb==1.0.1
 psycopg2-binary==2.9.1
-pymssql==2.1.5
+pymssql==2.2.5
 django-mysql==3.9.0
 django-redis==5.2.0
 python-redis-lock==3.7.0
@@ -140,5 +140,4 @@ ipython==8.4.0
 ForgeryPy3==0.3.1
 django-debug-toolbar==3.5
 Pympler==1.0.1
-IPy==1.1
 IPy==1.1
