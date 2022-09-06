@@ -57,6 +57,7 @@ class Gateway(BaseAccount):
     class Protocol(models.TextChoices):
         ssh = 'ssh', 'SSH'
 
+    name = models.CharField(max_length=128, verbose_name='Name')
     ip = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
     port = models.IntegerField(default=22, verbose_name=_('Port'))
     protocol = models.CharField(choices=Protocol.choices, max_length=16, default=Protocol.ssh, verbose_name=_("Protocol"))
@@ -64,6 +65,7 @@ class Gateway(BaseAccount):
     comment = models.CharField(max_length=128, blank=True, null=True, verbose_name=_("Comment"))
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
     token = None
+    privileged = None
 
     def __str__(self):
         return self.name

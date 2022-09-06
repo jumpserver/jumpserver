@@ -67,8 +67,7 @@ class AssetSerializer(JMSWritableNestedModelSerializer):
             'domain', 'platform', 'platform',
         ]
         fields_m2m = [
-            'nodes', 'labels', 'accounts', 'protocols',
-            'nodes_display',
+            'nodes', 'labels', 'accounts', 'protocols', 'nodes_display',
         ]
         read_only_fields = [
             'category', 'type', 'connectivity', 'date_verified',

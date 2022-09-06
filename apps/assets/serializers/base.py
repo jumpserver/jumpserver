@@ -11,43 +11,19 @@ from assets.models import Type
 from .utils import validate_password_for_ansible
 
 
-class AuthSerializer(serializers.ModelSerializer):
-    password = EncryptedField(required=False, allow_blank=True, allow_null=True, max_length=1024, label=_('Password'))
-    private_key = EncryptedField(required=False, allow_blank=True, allow_null=True, max_length=16384,
-                                 label=_('Private key'))
-
-    def gen_keys(self, private_key=None, password=None):
-        if private_key is None:
-            return None, None
-        public_key = ssh_pubkey_gen(private_key=private_key, password=password)
-        return private_key, public_key
-
-    def save(self, **kwargs):
-        password = self.validated_data.pop('password', None) or None
-        private_key = self.validated_data.pop('private_key', None) or None
-        self.instance = super().save(**kwargs)
-        if password or private_key:
-            private_key, public_key = self.gen_keys(private_key, password)
-            self.instance.set_auth(password=password, private_key=private_key,
-                                   public_key=public_key)
-        return self.instance
-
-
-class AuthSerializerMixin(serializers.ModelSerializer):
+class AuthValidateMixin(serializers.Serializer):
     password = EncryptedField(
-        label=_('Password'), required=False, allow_blank=True, allow_null=True, max_length=1024,
-        validators=[validate_password_for_ansible]
+        label=_('Password'), required=False, allow_blank=True, allow_null=True,
+        max_length=1024, validators=[validate_password_for_ansible]
     )
     private_key = EncryptedField(
-        label=_('SSH private key'), required=False, allow_blank=True, allow_null=True, max_length=16384
+        label=_('SSH private key'), required=False, allow_blank=True,
+        allow_null=True, max_length=16384
     )
     passphrase = serializers.CharField(
         allow_blank=True, allow_null=True, required=False, max_length=512,
         write_only=True, label=_('Key password')
     )
-
-    def validate_password(self, password):
-        return password
 
     def validate_private_key(self, private_key):
         if not private_key:
@@ -63,9 +39,6 @@ class AuthSerializerMixin(serializers.ModelSerializer):
         private_key.write_private_key(string_io)
         private_key = string_io.getvalue()
         return private_key
-
-    def validate_public_key(self, public_key):
-        return public_key
 
     @staticmethod
     def clean_auth_fields(validated_data):
@@ -87,6 +60,10 @@ class AuthSerializerMixin(serializers.ModelSerializer):
         attrs['public_key'] = public_key
         return attrs
 
+    def validate(self, attrs):
+        attrs = self._validate_gen_key(attrs)
+        return super().validate(attrs)
+
     def create(self, validated_data):
         self.clean_auth_fields(validated_data)
         return super().create(validated_data)
@@ -97,9 +74,9 @@ class AuthSerializerMixin(serializers.ModelSerializer):
 
 
 class TypesField(serializers.MultipleChoiceField):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs):
         kwargs['choices'] = Type.CHOICES
-        super().__init__(*args, **kwargs)
+        super().__init__(**kwargs)
 
     def to_representation(self, value):
         return Type.value_to_choices(value)

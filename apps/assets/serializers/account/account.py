@@ -4,29 +4,58 @@ from rest_framework import serializers
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.drf.serializers import SecretReadableMixin
-from assets.models import Account
-from assets.serializers.base import AuthSerializerMixin
-from .account_template import AccountTemplateSerializerMixin
-from .common import BaseAccountSerializer
+from assets.models import Account, AccountTemplate
+from assets.serializers.base import AuthValidateMixin
+from .common import AccountFieldsSerializerMixin
 
 
-class AccountSerializer(
-    AccountTemplateSerializerMixin,
-    AuthSerializerMixin,
-    BulkOrgResourceModelSerializer
-):
+class AccountSerializerCreateMixin(serializers.ModelSerializer):
+    template = serializers.UUIDField(
+        required=False, allow_null=True, write_only=True,
+        label=_('Account template')
+    )
+    push_to_asset = serializers.BooleanField(default=False, label=_("Push to asset"), write_only=True)
+
+    @staticmethod
+    def validate_template(value):
+        AccountTemplate.objects.get_or_create()
+        model = AccountTemplate
+        try:
+            return model.objects.get(id=value)
+        except AccountTemplate.DoesNotExist:
+            raise serializers.ValidationError(_('Account template not found'))
+
+    @staticmethod
+    def replace_attrs(account_template: AccountTemplate, attrs: dict):
+        exclude_fields = [
+            '_state', 'org_id', 'date_verified', 'id',
+            'date_created', 'date_updated', 'created_by'
+        ]
+        template_attrs = {k: v for k, v in account_template.__dict__.items() if k not in exclude_fields}
+        for k, v in template_attrs.items():
+            attrs.setdefault(k, v)
+
+    def validate(self, attrs):
+        account_template = attrs.pop('template', None)
+        if account_template:
+            self.replace_attrs(account_template, attrs)
+        push_to_asset = attrs.pop('push_to_asset', False)
+        return super().validate(attrs)
+
+
+class AccountSerializer(AuthValidateMixin,
+                        AccountSerializerCreateMixin,
+                        AccountFieldsSerializerMixin,
+                        BulkOrgResourceModelSerializer):
+    name = serializers.CharField(max_length=128, read_only=True, label=_("Name"))
     ip = serializers.ReadOnlyField(label=_("IP"))
     asset_name = serializers.ReadOnlyField(label=_("Asset"))
     platform = serializers.ReadOnlyField(label=_("Platform"))
 
-    class Meta(BaseAccountSerializer.Meta):
+    class Meta(AccountFieldsSerializerMixin.Meta):
         model = Account
-        fields = BaseAccountSerializer.Meta.fields + ['account_template', ]
-
-    def validate(self, attrs):
-        attrs = self._validate_gen_key(attrs)
-        attrs = super()._validate(attrs)
-        return attrs
+        fields = AccountFieldsSerializerMixin.Meta.fields \
+            + ['template', 'push_to_asset']
 
     @classmethod
     def setup_eager_loading(cls, queryset):
@@ -47,7 +76,6 @@ class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
             'password': {'write_only': False},
             'private_key': {'write_only': False},
             'public_key': {'write_only': False},
-            'systemuser_display': {'label': _('System user display')}
         }
 
 

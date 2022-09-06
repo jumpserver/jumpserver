@@ -2,13 +2,14 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
-from .base import BaseAccount, AbsConnectivity
+from common.utils import lazyproperty
+
+from .base import BaseAccount
 
 __all__ = ['Account', 'AccountTemplate']
 
 
-class Account(BaseAccount, AbsConnectivity):
-    privileged = models.BooleanField(verbose_name=_("Privileged account"), default=False)
+class Account(BaseAccount):
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, verbose_name=_('Asset'))
     version = models.IntegerField(default=0, verbose_name=_('Version'))
     history = HistoricalRecords()
@@ -23,15 +24,28 @@ class Account(BaseAccount, AbsConnectivity):
             ('view_historyaccountsecret', _('Can view asset history account secret')),
         ]
 
+    @property
+    def name(self):
+        return "{}({})_{}".format(self.asset_name, self.ip, self.username)
+
+    @lazyproperty
+    def ip(self):
+        return self.asset.ip
+
+    @lazyproperty
+    def asset_name(self):
+        return self.asset.name
+
     def __str__(self):
         return '{}@{}'.format(self.username, self.asset.name)
 
 
-class AccountTemplate(BaseAccount, AbsConnectivity):
-    privileged = models.BooleanField(verbose_name=_("Privileged account"), default=False)
-
+class AccountTemplate(BaseAccount):
     class Meta:
         verbose_name = _('Account template')
+        unique_together = (
+            ('name', 'org_id'),
+        )
 
     def __str__(self):
-        return '{}@{}'.format(self.username, self.name)
+        return self.username

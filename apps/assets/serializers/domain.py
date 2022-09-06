@@ -7,7 +7,7 @@ from common.validators import alphanumeric
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.drf.serializers import SecretReadableMixin
 from ..models import Domain, Gateway
-from .base import AuthSerializerMixin
+from .base import AuthValidateMixin
 
 
 class DomainSerializer(BulkOrgResourceModelSerializer):
@@ -38,17 +38,17 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
         return obj.gateway_set.all().count()
 
 
-class GatewaySerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
+class GatewaySerializer(AuthValidateMixin, BulkOrgResourceModelSerializer):
     is_connective = serializers.BooleanField(required=False, label=_('Connectivity'))
 
     class Meta:
         model = Gateway
-        fields_mini = ['id', 'name']
+        fields_mini = ['id', 'username']
         fields_write_only = [
             'password', 'private_key', 'public_key', 'passphrase'
         ]
         fields_small = fields_mini + fields_write_only + [
-            'username', 'ip', 'port', 'protocol',
+            'ip', 'port', 'protocol',
             'is_active', 'is_connective',
             'date_created', 'date_updated',
             'created_by', 'comment',

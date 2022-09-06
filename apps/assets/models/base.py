@@ -13,11 +13,10 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.db.models import QuerySet
 
-from common.utils import random_string
 from common.utils import (
-    ssh_key_string_to_obj, ssh_key_gen, get_logger
+    ssh_key_string_to_obj, ssh_key_gen, get_logger,
+    random_string, ssh_pubkey_gen,
 )
-from common.utils.encode import ssh_pubkey_gen
 from common.db import fields
 from orgs.mixins.models import OrgModelMixin
 
@@ -55,11 +54,29 @@ class AbsConnectivity(models.Model):
         abstract = True
 
 
-class AuthMixin:
-    private_key = ''
-    password = ''
-    public_key = ''
-    username = ''
+class BaseAccount(OrgModelMixin):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    name = models.CharField(max_length=128, verbose_name=_("Name"))
+    username = models.CharField(max_length=128, blank=True, verbose_name=_('Username'), db_index=True)
+    password = fields.EncryptCharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
+    private_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH private key'))
+    public_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH public key'))
+    token = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Token'))
+    privileged = models.BooleanField(verbose_name=_("Privileged account"), default=False)
+    comment = models.TextField(blank=True, verbose_name=_('Comment'))
+    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
+    date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
+    created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
+
+    ASSETS_AMOUNT_CACHE_KEY = "ASSET_USER_{}_ASSETS_AMOUNT"
+    ASSET_USER_CACHE_TIME = 600
+
+    APPS_AMOUNT_CACHE_KEY = "APP_USER_{}_APPS_AMOUNT"
+    APP_USER_CACHE_TIME = 600
+
+    def expire_assets_amount(self):
+        cache_key = self.ASSETS_AMOUNT_CACHE_KEY.format(self.id)
+        cache.delete(cache_key)
 
     @property
     def ssh_key_fingerprint(self):
@@ -115,18 +132,11 @@ class AuthMixin:
                 pass
         return None
 
-    def set_auth(self, password=None, private_key=None, public_key=None):
+    def set_auth(self, **kwargs):
         update_fields = []
-        if password:
-            self.password = password
-            update_fields.append('password')
-        if private_key:
-            self.private_key = private_key
-            update_fields.append('private_key')
-        if public_key:
-            self.public_key = public_key
-            update_fields.append('public_key')
-
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+            update_fields.append(k)
         if update_fields:
             self.save(update_fields=update_fields)
 
@@ -141,6 +151,7 @@ class AuthMixin:
         self.password = ''
         self.private_key = ''
         self.public_key = ''
+        self.token = ''
         self.save()
 
     @staticmethod
@@ -168,33 +179,6 @@ class AuthMixin:
             public_key=_public_key
         )
 
-
-class BaseAccount(OrgModelMixin, AuthMixin):
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    name = models.CharField(max_length=128, verbose_name=_('Name'))
-    username = models.CharField(max_length=128, blank=True, verbose_name=_('Username'), db_index=True)
-    password = fields.EncryptCharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
-    private_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH private key'))
-    public_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH public key'))
-    token = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Token'))
-    comment = models.TextField(blank=True, verbose_name=_('Comment'))
-    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
-    date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
-    created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
-
-    ASSETS_AMOUNT_CACHE_KEY = "ASSET_USER_{}_ASSETS_AMOUNT"
-    ASSET_USER_CACHE_TIME = 600
-
-    APPS_AMOUNT_CACHE_KEY = "APP_USER_{}_APPS_AMOUNT"
-    APP_USER_CACHE_TIME = 600
-
-    def get_username(self):
-        return self.username
-
-    def expire_assets_amount(self):
-        cache_key = self.ASSETS_AMOUNT_CACHE_KEY.format(self.id)
-        cache.delete(cache_key)
-
     def _to_secret_json(self):
         """Push system user use it"""
         return {
@@ -203,6 +187,7 @@ class BaseAccount(OrgModelMixin, AuthMixin):
             'password': self.password,
             'public_key': self.public_key,
             'private_key': self.private_key_file,
+            'token': self.token
         }
 
     class Meta:

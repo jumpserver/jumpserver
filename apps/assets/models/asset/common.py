@@ -78,7 +78,6 @@ class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
     nodes = models.ManyToManyField('assets.Node', default=default_node, related_name='assets',
                                    verbose_name=_("Nodes"))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
-
     labels = models.ManyToManyField('assets.Label', blank=True, related_name='assets', verbose_name=_("Labels"))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
     info = models.JSONField(verbose_name='Info', default=dict, blank=True)
