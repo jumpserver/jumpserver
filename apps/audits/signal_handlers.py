@@ -64,39 +64,39 @@ AUTH_BACKEND_LABEL_MAPPING = AuthBackendLabelMapping()
 
 
 M2M_NEED_RECORD = {
-    User.groups.through._meta.object_name: (
+    User.groups.through.__name__: (
         _('User and Group'),
         _('{User} JOINED {UserGroup}'),
         _('{User} LEFT {UserGroup}')
     ),
-    Asset.nodes.through._meta.object_name: (
+    Asset.nodes.through.__name__: (
         _('Node and Asset'),
         _('{Node} ADD {Asset}'),
         _('{Node} REMOVE {Asset}')
     ),
-    AssetPermission.users.through._meta.object_name: (
+    AssetPermission.users.through.__name__: (
         _('User asset permissions'),
         _('{AssetPermission} ADD {User}'),
         _('{AssetPermission} REMOVE {User}'),
     ),
-    AssetPermission.user_groups.through._meta.object_name: (
+    AssetPermission.user_groups.through.__name__: (
         _('User group asset permissions'),
         _('{AssetPermission} ADD {UserGroup}'),
         _('{AssetPermission} REMOVE {UserGroup}'),
     ),
-    AssetPermission.assets.through._meta.object_name: (
+    AssetPermission.assets.through.__name__: (
         _('Asset permission'),
         _('{AssetPermission} ADD {Asset}'),
         _('{AssetPermission} REMOVE {Asset}'),
     ),
-    AssetPermission.nodes.through._meta.object_name: (
+    AssetPermission.nodes.through.__name__: (
         _('Node permission'),
         _('{AssetPermission} ADD {Node}'),
         _('{AssetPermission} REMOVE {Node}'),
     ),
 }
 
-M2M_ACTION = {
+M2M_ACTION_MAPER = {
     POST_ADD: OperateLog.ACTION_CREATE,
     POST_REMOVE: OperateLog.ACTION_DELETE,
     POST_CLEAR: OperateLog.ACTION_DELETE,
@@ -104,34 +104,40 @@ M2M_ACTION = {
 
 
 @receiver(m2m_changed)
-def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
-    if action not in M2M_ACTION:
+def on_m2m_changed(sender, action, instance, model, pk_set, **kwargs):
+    if action not in M2M_ACTION_MAPER:
         return
 
     user = current_request.user if current_request else None
     if not user or not user.is_authenticated:
         return
 
-    sender_name = sender._meta.object_name
+    sender_name = sender.__name__
     if sender_name in M2M_NEED_RECORD:
         org_id = current_org.id
         remote_addr = get_request_ip(current_request)
         user = str(user)
         resource_type, resource_tmpl_add, resource_tmpl_remove = M2M_NEED_RECORD[sender_name]
-        action = M2M_ACTION[action]
+
+        action = M2M_ACTION_MAPER[action]
         if action == OperateLog.ACTION_CREATE:
             resource_tmpl = resource_tmpl_add
         elif action == OperateLog.ACTION_DELETE:
             resource_tmpl = resource_tmpl_remove
+        else:
+            return
 
         to_create = []
         objs = model.objects.filter(pk__in=pk_set)
 
-        instance_name = instance._meta.object_name
+        if isinstance(instance, Asset):
+            instance_name = Asset.__name__
+        else:
+            instance_name = instance.__class__.__name__
         instance_value = str(instance)
+        model_name = model.__name__
 
-        model_name = model._meta.object_name
-
+        print("Instace name: ", instance_name, instance_value)
         for obj in objs:
             resource = resource_tmpl.format(**{
                 instance_name: instance_value,

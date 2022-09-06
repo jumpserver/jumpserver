@@ -4,6 +4,7 @@ import six
 
 from rest_framework.fields import ChoiceField
 from rest_framework import serializers
+from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ObjectDoesNotExist
 
 from common.utils import decrypt_password
@@ -64,6 +65,12 @@ class LabeledChoiceField(ChoiceField):
 
 
 class ObjectRelatedField(serializers.RelatedField):
+    default_error_messages = {
+        'required': _('This field is required.'),
+        'does_not_exist': _('Invalid pk "{pk_value}" - object does not exist.'),
+        'incorrect_type': _('Incorrect type. Expected pk value, received {data_type}.'),
+    }
+
     def __init__(self, **kwargs):
         self.attrs = kwargs.pop('attrs', None) or ('id', 'name')
         self.many = kwargs.get('many', False)
@@ -76,10 +83,10 @@ class ObjectRelatedField(serializers.RelatedField):
         return data
 
     def to_internal_value(self, data):
-        if isinstance(data, dict):
-            pk = data.get(self.attrs[0])
-        else:
+        if not isinstance(data, dict):
             pk = data
+        else:
+            pk = data.get('id') or data.get('pk') or data.get(self.attrs[0])
         queryset = self.get_queryset()
         try:
             if isinstance(data, bool):
