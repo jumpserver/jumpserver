@@ -381,6 +381,13 @@ class Config(dict):
         'TENCENT_VERIFY_SIGN_NAME': '',
         'TENCENT_VERIFY_TEMPLATE_CODE': '',
 
+        'HUAWEI_APP_KEY': '',
+        'HUAWEI_APP_SECRET': '',
+        'HUAWEI_SMS_ENDPOINT': '',
+        'HUAWEI_SIGN_CHANNEL_NUM': '',
+        'HUAWEI_VERIFY_SIGN_NAME': '',
+        'HUAWEI_VERIFY_TEMPLATE_CODE': '',
+
         'CMPP2_HOST': '',
         'CMPP2_PORT': 7890,
         'CMPP2_SP_ID': '',
