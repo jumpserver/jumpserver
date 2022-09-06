@@ -62,7 +62,7 @@ jsonfield2==4.0.0.post0
 geoip2==4.5.0
 ipip-ipdb==1.6.1
 # Django environment
-Django==3.2.14
+Django==3.2.15
 django-bootstrap3==14.2.0
 django-filter==2.4.0
 django-formtools==2.2
