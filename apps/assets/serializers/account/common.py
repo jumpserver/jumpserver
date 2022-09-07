@@ -19,6 +19,8 @@ class AccountFieldsSerializerMixin(serializers.ModelSerializer):
         extra_kwargs = {
             'private_key': {'write_only': True},
             'public_key': {'write_only': True},
+            'token': {'write_only': True},
+            'password': {'write_only': True},
         }
 
     def validate_name(self, value):

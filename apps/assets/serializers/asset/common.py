@@ -49,6 +49,17 @@ class AssetPlatformSerializer(serializers.ModelSerializer):
         }
 
 
+class AssetAccountSerializer(AccountSerializer):
+    add_org_fields = False
+
+    class Meta(AccountSerializer.Meta):
+        fields_mini = [
+            'id', 'name', 'username', 'privileged', 'version'
+        ]
+        fields_write_only = ['password', 'private_key', 'public_key', 'passphrase', 'token']
+        fields = fields_mini + fields_write_only
+
+
 class AssetSerializer(JMSWritableNestedModelSerializer):
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
     type = LabeledChoiceField(choices=AllTypes.choices, read_only=True, label=_('Type'))
@@ -56,7 +67,7 @@ class AssetSerializer(JMSWritableNestedModelSerializer):
     platform = ObjectRelatedField(required=False, queryset=Platform.objects, label=_('Platform'))
     nodes = ObjectRelatedField(many=True, required=False, queryset=Node.objects, label=_('Nodes'))
     labels = AssetLabelSerializer(many=True, required=False, label=_('Labels'))
-    accounts = AccountSerializer(many=True, required=False, label=_('Accounts'))
+    accounts = AssetAccountSerializer(many=True, required=False, label=_('Accounts'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
     """
     资产的数据结构
