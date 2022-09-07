@@ -17,3 +17,10 @@ class DBSerializer(serializers.Serializer):
     ca_cert = serializers.CharField(
         required=False, allow_null=True, label=_('CA certificate')
     )
+    client_cert = serializers.CharField(
+        required=False, allow_null=True, label=_('Client certificate file')
+    )
+    key_file = serializers.CharField(
+        required=False, allow_null=True, label=_('Certificate key file')
+    )
+    allow_invalid_cert = serializers.BooleanField(default=False, label=_('Allow invalid cert'))
