@@ -19,6 +19,7 @@ class ProtocolSettingSerializer(serializers.Serializer):
     ]
     # Common
     required = serializers.BooleanField(required=True, initial=False, label=_("Required"))
+
     # RDP
     console = serializers.BooleanField(required=False)
     security = serializers.ChoiceField(choices=SECURITY_CHOICES, default='any', required=False)

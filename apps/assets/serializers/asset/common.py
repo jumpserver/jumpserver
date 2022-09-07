@@ -8,7 +8,7 @@ from django.db.models import F
 from common.drf.serializers import JMSWritableNestedModelSerializer
 from common.drf.fields import LabeledChoiceField, ObjectRelatedField
 from ..account import AccountSerializer
-from ...models import Asset, Node, Platform, Protocol, Label, Domain
+from ...models import Asset, Node, Platform, Protocol, Label, Domain, Account
 from ...const import Category, AllTypes
 
 __all__ = [
@@ -87,11 +87,6 @@ class AssetSerializer(JMSWritableNestedModelSerializer):
             'port': {'write_only': True},
             'admin_user_display': {'label': _('Admin user display'), 'read_only': True},
         }
-
-    def __init__(self, *args, **kwargs):
-        data = kwargs.get('data', {})
-        self.accounts_data = data.pop('accounts', [])
-        super().__init__(*args, **kwargs)
 
     @classmethod
     def setup_eager_loading(cls, queryset):

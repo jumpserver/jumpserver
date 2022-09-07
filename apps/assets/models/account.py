@@ -10,7 +10,7 @@ __all__ = ['Account', 'AccountTemplate']
 
 
 class Account(BaseAccount):
-    asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, verbose_name=_('Asset'))
+    asset = models.ForeignKey('assets.Asset', related_name='accounts', on_delete=models.CASCADE, verbose_name=_('Asset'))
     version = models.IntegerField(default=0, verbose_name=_('Version'))
     history = HistoricalRecords()
 
