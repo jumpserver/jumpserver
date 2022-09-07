@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from perms.serializers.base import ActionsField
+from perms.serializers.permission import ActionsField
 from perms.models import AssetPermission
 from orgs.utils import tmp_to_org
 from assets.models import Asset, Node

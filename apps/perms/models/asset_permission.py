@@ -89,6 +89,11 @@ class AssetPermission(OrgModelMixin):
     user_groups = models.ManyToManyField('users.UserGroup', blank=True, verbose_name=_("User group"), related_name='%(class)ss')
     assets = models.ManyToManyField('assets.Asset', related_name='granted_by_permissions', blank=True, verbose_name=_("Asset"))
     nodes = models.ManyToManyField('assets.Node', related_name='granted_by_permissions', blank=True, verbose_name=_("Nodes"))
+    # 只保存 @ALL (@INPUT @USER 默认包含，将来在全局设置中进行控制)
+    # 特殊的账号描述
+    # ['@ALL',]
+    # 指定账号授权
+    # ['web', 'root',]
     accounts = models.JSONField(default=list, verbose_name=_("Accounts"))
     actions = models.IntegerField(choices=Action.DB_CHOICES, default=Action.ALL, verbose_name=_("Actions"))
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))

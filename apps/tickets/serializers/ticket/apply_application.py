@@ -2,7 +2,7 @@ from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 from perms.models import ApplicationPermission
-from perms.serializers.base import ActionsField
+from perms.serializers.permission import ActionsField
 from orgs.utils import tmp_to_org
 from applications.models import Application
 from tickets.models import ApplyApplicationTicket

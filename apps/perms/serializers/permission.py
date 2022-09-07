@@ -2,50 +2,89 @@
 #
 
 from rest_framework import serializers
+from rest_framework.fields import empty
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
 
-from perms.models import AssetPermission, Action
 from assets.models import Asset, Node
 from users.models import User, UserGroup
-from ..base import ActionsField, BasePermissionSerializer
+from perms.models import AssetPermission, Action
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
-__all__ = ['AssetPermissionSerializer']
+__all__ = ['AssetPermissionSerializer', 'ActionsField']
 
 
-class AssetPermissionSerializer(BasePermissionSerializer):
+class ActionsField(serializers.MultipleChoiceField):
+    def __init__(self, **kwargs):
+        kwargs['choices'] = Action.CHOICES
+        super().__init__(**kwargs)
+
+    def run_validation(self, data=empty):
+        data = super(ActionsField, self).run_validation(data)
+        if isinstance(data, list):
+            data = Action.choices_to_value(value=data)
+        return data
+
+    def to_representation(self, value):
+        return Action.value_to_choices(value)
+
+    def to_internal_value(self, data):
+        if not self.allow_empty and not data:
+            self.fail('empty')
+        if not data:
+            return data
+        return Action.choices_to_value(data)
+
+
+class ActionsDisplayField(ActionsField):
+    def to_representation(self, value):
+        values = super().to_representation(value)
+        choices = dict(Action.CHOICES)
+        return [choices.get(i) for i in values]
+
+
+class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
+    users_display = serializers.ListField(
+        child=serializers.CharField(), label=_('Users display'), required=False
+    )
+    user_groups_display = serializers.ListField(
+        child=serializers.CharField(), label=_('User groups display'), required=False
+    )
+    assets_display = serializers.ListField(
+        child=serializers.CharField(), label=_('Assets display'), required=False
+    )
+    nodes_display = serializers.ListField(
+        child=serializers.CharField(), label=_('Nodes display'), required=False
+    )
     actions = ActionsField(required=False, allow_null=True, label=_("Actions"))
     is_valid = serializers.BooleanField(read_only=True, label=_("Is valid"))
     is_expired = serializers.BooleanField(read_only=True, label=_('Is expired'))
-    users_display = serializers.ListField(child=serializers.CharField(), label=_('Users display'), required=False)
-    user_groups_display = serializers.ListField(child=serializers.CharField(), label=_('User groups display'), required=False)
-    assets_display = serializers.ListField(child=serializers.CharField(), label=_('Assets display'), required=False)
-    nodes_display = serializers.ListField(child=serializers.CharField(), label=_('Nodes display'), required=False)
 
     class Meta:
         model = AssetPermission
         fields_mini = ['id', 'name']
         fields_small = fields_mini + [
             'is_active', 'is_expired', 'is_valid', 'actions',
+            'accounts',
             'created_by', 'date_created', 'date_expired',
             'date_start', 'comment', 'from_ticket'
         ]
         fields_m2m = [
             'users', 'users_display', 'user_groups', 'user_groups_display', 'assets',
-            'assets_display', 'nodes', 'nodes_display', 'accounts',
+            'assets_display', 'nodes', 'nodes_display',
             'users_amount', 'user_groups_amount', 'assets_amount',
             'nodes_amount',
         ]
         fields = fields_small + fields_m2m
         read_only_fields = ['created_by', 'date_created', 'from_ticket']
         extra_kwargs = {
-            'is_expired': {'label': _('Is expired')},
-            'is_valid': {'label': _('Is valid')},
-            'actions': {'label': _('Actions')},
             'users_amount': {'label': _('Users amount')},
             'user_groups_amount': {'label': _('User groups amount')},
             'assets_amount': {'label': _('Assets amount')},
             'nodes_amount': {'label': _('Nodes amount')},
+            'actions': {'label': _('Actions')},
+            'is_expired': {'label': _('Is expired')},
+            'is_valid': {'label': _('Is valid')},
         }
 
     @classmethod

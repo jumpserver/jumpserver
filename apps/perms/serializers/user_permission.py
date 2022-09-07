@@ -5,7 +5,7 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
 from assets.models import Node, Asset, Platform
-from perms.serializers.base import ActionsField
+from perms.serializers.permission import ActionsField
 
 __all__ = [
     'NodeGrantedSerializer',

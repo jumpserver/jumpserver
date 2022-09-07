@@ -7,7 +7,7 @@ from common.utils import pretty_string
 from common.utils.random import random_string
 from assets.models import Asset, Gateway, Domain, CommandFilterRule
 from users.models import User
-from perms.serializers.base import ActionsField
+from perms.serializers.permission import ActionsField
 
 
 __all__ = [
