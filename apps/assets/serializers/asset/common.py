@@ -22,11 +22,18 @@ class AssetProtocolsSerializer(serializers.ModelSerializer):
         model = Protocol
         fields = ['id', 'name', 'port']
 
+    def create(self, validated_data):
+        instance = Protocol.objects.filter(**validated_data).first()
+        if instance:
+            return instance
+        instance = Protocol.objects.create(**validated_data)
+        return instance
+
 
 class AssetLabelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Label
-        fields = ['id', 'name', 'value']
+        fields = ['name', 'value']
         extra_kwargs = {
             'name': {'required': False},
             'value': {'required': False}
@@ -51,7 +58,6 @@ class AssetSerializer(JMSWritableNestedModelSerializer):
     labels = AssetLabelSerializer(many=True, required=False, label=_('Labels'))
     accounts = AccountSerializer(many=True, required=False, label=_('Accounts'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
-
     """
     资产的数据结构
     """
@@ -109,23 +115,10 @@ class AssetSerializer(JMSWritableNestedModelSerializer):
             nodes_to_set.append(node)
         instance.nodes.set(nodes_to_set)
 
-    @staticmethod
-    def add_accounts(instance, accounts_data):
-        for data in accounts_data:
-            data['asset'] = instance.id
-        serializer = AccountSerializer(data=accounts_data, many=True)
-        try:
-            serializer.is_valid(raise_exception=True)
-        except Exception as e:
-            raise serializers.ValidationError({'accounts': e})
-        serializer.save()
-
     @atomic
     def create(self, validated_data):
         nodes_display = validated_data.pop('nodes_display', '')
         instance = super().create(validated_data)
-        if self.accounts_data:
-            self.add_accounts(instance, self.accounts_data)
         self.perform_nodes_display_create(instance, nodes_display)
         return instance
 

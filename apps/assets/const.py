@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+
 from common.db.models import IncludesTextChoicesMeta, ChoicesMixin
 from common.tree import TreeNode
 
@@ -44,21 +45,35 @@ class Category(PlatformMixin, ChoicesMixin, models.TextChoices):
                 'change_password_enabled': True,
                 'create_account_enabled': True,
                 'gather_accounts_enabled': True,
-                '_protocols': ['ssh', 'telnet']
+                '_protocols': ['ssh', 'sftp']
             },
             cls.NETWORKING: {
                 'domain_enabled': True,
+                'su_enabled': False,
+                'gather_facts_enabled': False,
+                'verify_account_enabled': False,
+                'change_password_enabled': False,
+                'create_account_enabled': False,
+                'gather_accounts_enabled': False,
                 '_protocols': ['ssh', 'telnet']
             },
             cls.DATABASE: {
                 'domain_enabled': True,
+                'su_enabled': False,
+                'gather_facts_enabled': True,
+                'verify_account_enabled': True,
+                'change_password_enabled': True,
+                'create_account_enabled': True,
+                'gather_accounts_enabled': True,
             },
             cls.WEB: {
                 'domain_enabled': False,
-                '_protocols': []
+                'su_enabled': False,
+                '_protocols': ['http', 'https']
             },
             cls.CLOUD: {
                 'domain_enabled': False,
+                'su_enabled': False,
                 '_protocols': []
             }
         }
@@ -77,7 +92,7 @@ class HostTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
     def platform_constraints(cls):
         return {
             cls.LINUX: {
-                '_protocols': ['ssh', 'rdp', 'vnc', 'telnet']
+                '_protocols': ['ssh', 'sftp', 'rdp', 'vnc', 'telnet']
             },
             cls.WINDOWS: {
                 '_protocols': ['ssh', 'rdp', 'vnc'],
@@ -110,7 +125,7 @@ class DatabaseTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
         meta = {}
         for name, label in cls.choices:
             meta[name] = {
-                'protocols': [name]
+                '_protocols': [name]
             }
         return meta
 
@@ -121,6 +136,14 @@ class WebTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
 
 class CloudTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
     K8S = 'k8s', 'Kubernetes'
+
+    @classmethod
+    def platform_constraints(cls):
+        return {
+            cls.K8S: {
+                '_protocols': ['k8s']
+            }
+        }
 
 
 class AllTypes(ChoicesMixin, metaclass=IncludesTextChoicesMeta):
@@ -209,6 +232,7 @@ class AllTypes(ChoicesMixin, metaclass=IncludesTextChoicesMeta):
 
 class Protocol(ChoicesMixin, models.TextChoices):
     ssh = 'ssh', 'SSH'
+    sftp = 'sftp', 'SFTP'
     rdp = 'rdp', 'RDP'
     telnet = 'telnet', 'Telnet'
     vnc = 'vnc', 'VNC'
@@ -240,6 +264,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
     def default_ports(cls):
         return {
             cls.ssh: 22,
+            cls.sftp: 22,
             cls.rdp: 3389,
             cls.vnc: 5900,
             cls.telnet: 21,

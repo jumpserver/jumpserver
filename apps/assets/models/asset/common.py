@@ -68,7 +68,7 @@ class NodesRelationMixin:
 
 class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    name = models.CharField(max_length=128, verbose_name=_('Hostname'))
+    name = models.CharField(max_length=128, verbose_name=_('Name'))
     ip = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
     protocols = models.ManyToManyField('Protocol', verbose_name=_("Protocols"), blank=True)
     platform = models.ForeignKey(Platform, default=Platform.default, on_delete=models.PROTECT,
