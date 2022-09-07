@@ -17,12 +17,17 @@ class ProtocolSettingSerializer(serializers.Serializer):
         ('tls', 'TLS'),
         ('nla', 'NLA'),
     ]
+    # Common
+    required = serializers.BooleanField(required=True, initial=False, label=_("Required"))
+    # RDP
     console = serializers.BooleanField(required=False)
     security = serializers.ChoiceField(choices=SECURITY_CHOICES, default='any', required=False)
+    # SFTP
+    sftp_home = serializers.CharField(default='/tmp', required=False)
 
 
 class PlatformProtocolsSerializer(serializers.ModelSerializer):
-    setting = ProtocolSettingSerializer(required=False)
+    setting = ProtocolSettingSerializer(required=False, allow_null=True)
 
     class Meta:
         model = PlatformProtocol
