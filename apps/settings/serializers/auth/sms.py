@@ -7,7 +7,7 @@ from common.sdk.sms import BACKENDS
 
 __all__ = [
     'SMSSettingSerializer', 'AlibabaSMSSettingSerializer', 'TencentSMSSettingSerializer',
-    'CMPP2SMSSettingSerializer'
+    'HuaweiSMSSettingSerializer', 'CMPP2SMSSettingSerializer'
 ]
 
 
@@ -50,6 +50,15 @@ class TencentSMSSettingSerializer(BaseSMSSettingSerializer):
     TENCENT_SDKAPPID = serializers.CharField(max_length=256, required=True, label='SDK app id')
     TENCENT_VERIFY_SIGN_NAME = serializers.CharField(max_length=256, required=True, label=_('Signature'))
     TENCENT_VERIFY_TEMPLATE_CODE = serializers.CharField(max_length=256, required=True, label=_('Template code'))
+
+
+class HuaweiSMSSettingSerializer(BaseSMSSettingSerializer):
+    HUAWEI_APP_KEY = serializers.CharField(max_length=256, required=True, label='App key')
+    HUAWEI_APP_SECRET = EncryptedField(max_length=256, required=False, label='App secret')
+    HUAWEI_SMS_ENDPOINT = serializers.CharField(max_length=1024, required=True, label=_('App Access Address'))
+    HUAWEI_SIGN_CHANNEL_NUM = serializers.CharField(max_length=1024, required=True, label=_('Signature channel number'))
+    HUAWEI_VERIFY_SIGN_NAME = serializers.CharField(max_length=256, required=True, label=_('Signature'))
+    HUAWEI_VERIFY_TEMPLATE_CODE = serializers.CharField(max_length=256, required=True, label=_('Template code'))
 
 
 class CMPP2SMSSettingSerializer(BaseSMSSettingSerializer):

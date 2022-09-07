@@ -16,7 +16,7 @@ from .. import const
 
 __all__ = [
     'AppSerializer', 'MiniAppSerializer', 'AppSerializerMixin',
-    'AppAccountSerializer', 'AppAccountSecretSerializer'
+    'AppAccountSerializer', 'AppAccountSecretSerializer', 'AppAccountBackUpSerializer'
 ]
 
 
@@ -32,21 +32,23 @@ class AppSerializerMixin(serializers.Serializer):
         return instance
 
     def get_attrs_serializer(self):
-        default_serializer = serializers.Serializer(read_only=True)
         instance = self.app
-        if instance:
-            _type = instance.type
-            _category = instance.category
-        else:
-            _type = self.context['request'].query_params.get('type')
-            _category = self.context['request'].query_params.get('category')
-        if _type:
-            if isinstance(self, AppAccountSecretSerializer):
-                serializer_class = type_secret_serializer_classes_mapping.get(_type)
+        tp = getattr(self, 'tp', None)
+        default_serializer = serializers.Serializer(read_only=True)
+        if not tp:
+            if instance:
+                tp = instance.type
+                category = instance.category
             else:
-                serializer_class = type_serializer_classes_mapping.get(_type)
-        elif _category:
-            serializer_class = category_serializer_classes_mapping.get(_category)
+                tp = self.context['request'].query_params.get('type')
+                category = self.context['request'].query_params.get('category')
+        if tp:
+            if isinstance(self, AppAccountBackUpSerializer):
+                serializer_class = type_secret_serializer_classes_mapping.get(tp)
+            else:
+                serializer_class = type_serializer_classes_mapping.get(tp)
+        elif category:
+            serializer_class = category_serializer_classes_mapping.get(category)
         else:
             serializer_class = default_serializer
 
@@ -154,11 +156,6 @@ class AppAccountSerializer(AppSerializerMixin, AuthSerializerMixin, BulkOrgResou
 
 class AppAccountSecretSerializer(SecretReadableMixin, AppAccountSerializer):
     class Meta(AppAccountSerializer.Meta):
-        fields_backup = [
-            'id', 'app_display', 'attrs', 'username', 'password', 'private_key',
-            'public_key', 'date_created', 'date_updated', 'version'
-        ]
-
         extra_kwargs = {
             'password': {'write_only': False},
             'private_key': {'write_only': False},
@@ -166,3 +163,22 @@ class AppAccountSecretSerializer(SecretReadableMixin, AppAccountSerializer):
             'app_display': {'label': _('Application display')},
             'systemuser_display': {'label': _('System User')}
         }
+
+
+class AppAccountBackUpSerializer(AppAccountSecretSerializer):
+    class Meta(AppAccountSecretSerializer.Meta):
+        fields = [
+            'id', 'app_display', 'attrs', 'username', 'password', 'private_key',
+            'public_key', 'date_created', 'date_updated', 'version'
+        ]
+
+    def __init__(self, *args, **kwargs):
+        self.tp = kwargs.pop('tp', None)
+        super().__init__(*args, **kwargs)
+
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        return queryset
+
+    def to_representation(self, instance):
+        return super(AppAccountSerializer, self).to_representation(instance)
