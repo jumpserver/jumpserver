@@ -40,8 +40,7 @@ class AssetPermissionUserRelationViewSet(RelationMixin):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset \
-            .annotate(user_display=F('user__name'))
+        queryset = queryset.annotate(user_display=F('user__name'))
         return queryset
 
 
@@ -69,8 +68,7 @@ class AssetPermissionUserGroupRelationViewSet(RelationMixin):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset \
-            .annotate(usergroup_display=F('usergroup__name'))
+        queryset = queryset.annotate(usergroup_display=F('usergroup__name'))
         return queryset
 
 
@@ -84,8 +82,7 @@ class AssetPermissionAssetRelationViewSet(RelationMixin):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset \
-            .annotate(asset_display=F('asset__name'))
+        queryset = queryset.annotate(asset_display=F('asset__name'))
         return queryset
 
 
@@ -111,7 +108,6 @@ class AssetPermissionNodeRelationViewSet(RelationMixin):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset \
-            .annotate(node_key=F('node__key'))
+        queryset = queryset.annotate(node_key=F('node__key'))
         return queryset
 

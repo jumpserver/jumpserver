@@ -5,6 +5,7 @@ from rest_framework_bulk.routes import BulkRouter
 
 from .. import api
 
+# v3 Done
 router = BulkRouter()
 router.register('asset-permissions', api.AssetPermissionViewSet, 'asset-permission')
 router.register('asset-permissions-users-relations', api.AssetPermissionUserRelationViewSet, 'asset-permissions-users-relation')
@@ -86,6 +87,8 @@ user_group_permission_urlpatterns = [
 ]
 
 permission_urlpatterns = [
+    # Todo: 获取规则中授权的所有账号列表
+    #
     # 授权规则中授权的资产
     path('<uuid:pk>/assets/all/', api.AssetPermissionAllAssetListApi.as_view(), name='asset-permission-all-assets'),
     path('<uuid:pk>/users/all/', api.AssetPermissionAllUserListApi.as_view(), name='asset-permission-all-users'),
