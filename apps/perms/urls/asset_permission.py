@@ -71,6 +71,7 @@ user_permission_urlpatterns = [
     path('<uuid:pk>/nodes/favorite/assets/', api.UserFavoriteGrantedAssetsForAdminApi.as_view(), name='user-ungrouped-assets'),
     path('nodes/favorite/assets/', api.MyFavoriteGrantedAssetsApi.as_view(), name='my-ungrouped-assets'),
 
+    # Todo: 删除
     # Asset System users
     path('<uuid:pk>/assets/<uuid:asset_id>/system-users/', api.UserGrantedAssetSystemUsersForAdminApi.as_view(), name='user-asset-system-users'),
     path('assets/<uuid:asset_id>/system-users/', api.MyGrantedAssetSystemUsersApi.as_view(), name='my-asset-system-users'),

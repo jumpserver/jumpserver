@@ -9,9 +9,12 @@ from .mixin import (
 )
 
 __all__ = [
-    'UserDirectGrantedAssetsForAdminApi', 'MyDirectGrantedAssetsApi', 'UserFavoriteGrantedAssetsForAdminApi',
-    'MyFavoriteGrantedAssetsApi', 'UserDirectGrantedAssetsAsTreeForAdminApi', 'MyUngroupAssetsAsTreeApi',
-    'UserAllGrantedAssetsApi', 'MyAllGrantedAssetsApi', 'MyAllAssetsAsTreeApi', 'UserGrantedNodeAssetsForAdminApi',
+    'UserDirectGrantedAssetsForAdminApi', 'MyDirectGrantedAssetsApi',
+    'UserFavoriteGrantedAssetsForAdminApi',
+    'MyFavoriteGrantedAssetsApi', 'UserDirectGrantedAssetsAsTreeForAdminApi',
+    'MyUngroupAssetsAsTreeApi',
+    'UserAllGrantedAssetsApi', 'MyAllGrantedAssetsApi', 'MyAllAssetsAsTreeApi',
+    'UserGrantedNodeAssetsForAdminApi',
     'MyGrantedNodeAssetsApi',
 ]
 
