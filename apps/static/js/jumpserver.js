@@ -270,13 +270,13 @@ function requestApi(props) {
     if (typeof(dataBody) === "object") {
         dataBody = JSON.stringify(dataBody)
     }
-    var beforeSend = props.beforeSend || function (request) {}
+    var headers = props.headers || {}
 
     $.ajax({
         url: props.url,
         type: props.method || "PATCH",
+        headers: headers,
         data: dataBody,
-        beforeSend: beforeSend,
         contentType: props.content_type || "application/json; charset=utf-8",
         dataType: props.data_type || "json"
     }).done(function (data, textStatue, jqXHR) {

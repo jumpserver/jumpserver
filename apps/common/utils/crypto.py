@@ -1,15 +1,18 @@
 import base64
 import logging
 import re
+
 from Cryptodome.Cipher import AES, PKCS1_v1_5
 from Cryptodome.Random import get_random_bytes
 from Cryptodome.PublicKey import RSA
+from Cryptodome.Util.Padding import pad
 from Cryptodome import Random
 from gmssl.sm4 import CryptSM4, SM4_ENCRYPT, SM4_DECRYPT
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
+from common.sdk.gm import piico
 
 secret_pattern = re.compile(r'password|secret|key|token', re.IGNORECASE)
 
@@ -63,6 +66,25 @@ class GMSM4EcbCrypto(BaseCrypto):
         return self.sm4_decryptor.crypt_ecb(data)
 
 
+class PiicoSM4EcbCrypto(BaseCrypto):
+
+    @staticmethod
+    def to_16(key):
+        while len(key) % 16 != 0:
+            key += b'\0'
+        return key  # 返回bytes
+
+    def __init__(self, key, device: piico.Device):
+        key = padding_key(key, 16)
+        self.cipher = device.new_sm4_ebc_cipher(key)
+
+    def _encrypt(self, data: bytes) -> bytes:
+        return self.cipher.encrypt(self.to_16(data))
+
+    def _decrypt(self, data: bytes) -> bytes:
+        return self.cipher.decrypt(data)
+
+
 class AESCrypto:
     """
     AES
@@ -107,7 +129,15 @@ class AESCryptoGCM:
     """
 
     def __init__(self, key):
-        self.key = padding_key(key)
+        self.key = self.process_key(key)
+
+    @staticmethod
+    def process_key(key):
+        if not isinstance(key, bytes):
+            key = bytes(key, encoding='utf-8')
+        if len(key) >= 32:
+            return key[:32]
+        return pad(key, 32)
 
     def encrypt(self, text):
         """
@@ -155,6 +185,11 @@ def get_gm_sm4_ecb_crypto(key=None):
     return GMSM4EcbCrypto(key)
 
 
+def get_piico_gm_sm4_ecb_crypto(device, key=None):
+    key = key or settings.SECRET_KEY
+    return PiicoSM4EcbCrypto(key, device)
+
+
 aes_ecb_crypto = get_aes_crypto(mode='ECB')
 aes_crypto = get_aes_crypto(mode='GCM')
 gm_sm4_ecb_crypto = get_gm_sm4_ecb_crypto()
@@ -174,10 +209,16 @@ class Crypto:
         crypt_algo = settings.SECURITY_DATA_CRYPTO_ALGO
         if not crypt_algo:
             if settings.GMSSL_ENABLED:
-                crypt_algo = 'gm'
+                if settings.PIICO_DEVICE_ENABLE:
+                    piico_driver_path = settings.PIICO_DRIVER_PATH if settings.PIICO_DRIVER_PATH \
+                        else "./lib/libpiico_ccmu.so"
+                    device = piico.open_piico_device(piico_driver_path)
+                    self.cryptor_map["piico_gm"] = get_piico_gm_sm4_ecb_crypto(device)
+                    crypt_algo = 'piico_gm'
+                else:
+                    crypt_algo = 'gm'
             else:
                 crypt_algo = 'aes'
-
         cryptor = self.cryptor_map.get(crypt_algo, None)
         if cryptor is None:
             raise ImproperlyConfigured(

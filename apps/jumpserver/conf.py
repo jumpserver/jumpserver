@@ -224,6 +224,9 @@ class Config(dict):
         'CONNECTION_TOKEN_EXPIRATION': 5 * 60,
 
         # Custom Config
+        'AUTH_CUSTOM': False,
+        'AUTH_CUSTOM_FILE_MD5': '',
+
         # Auth LDAP settings
         'AUTH_LDAP': False,
         'AUTH_LDAP_SERVER_URI': 'ldap://localhost:389',
@@ -331,8 +334,10 @@ class Config(dict):
         'AUTH_OAUTH2_CLIENT_ID': 'client-id',
         'AUTH_OAUTH2_SCOPE': '',
         'AUTH_OAUTH2_CLIENT_SECRET': '',
+        'AUTH_OAUTH2_LOGOUT_COMPLETELY': True,
         'AUTH_OAUTH2_PROVIDER_AUTHORIZATION_ENDPOINT': 'https://oauth2.example.com/authorize',
         'AUTH_OAUTH2_PROVIDER_USERINFO_ENDPOINT': 'https://oauth2.example.com/userinfo',
+        'AUTH_OAUTH2_PROVIDER_END_SESSION_ENDPOINT': 'https://oauth2.example.com/logout',
         'AUTH_OAUTH2_ACCESS_TOKEN_ENDPOINT': 'https://oauth2.example.com/access_token',
         'AUTH_OAUTH2_ACCESS_TOKEN_METHOD': 'GET',
         'AUTH_OAUTH2_USER_ATTR_MAP': {
@@ -375,6 +380,13 @@ class Config(dict):
         'TENCENT_SDKAPPID': '',
         'TENCENT_VERIFY_SIGN_NAME': '',
         'TENCENT_VERIFY_TEMPLATE_CODE': '',
+
+        'HUAWEI_APP_KEY': '',
+        'HUAWEI_APP_SECRET': '',
+        'HUAWEI_SMS_ENDPOINT': '',
+        'HUAWEI_SIGN_CHANNEL_NUM': '',
+        'HUAWEI_VERIFY_SIGN_NAME': '',
+        'HUAWEI_VERIFY_TEMPLATE_CODE': '',
 
         'CMPP2_HOST': '',
         'CMPP2_PORT': 7890,

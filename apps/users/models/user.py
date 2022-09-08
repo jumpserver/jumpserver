@@ -629,6 +629,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         cas = 'cas', 'CAS'
         saml2 = 'saml2', 'SAML2'
         oauth2 = 'oauth2', 'OAuth2'
+        custom = 'custom', 'Custom'
 
     SOURCE_BACKEND_MAPPING = {
         Source.local: [
@@ -656,6 +657,9 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         Source.oauth2: [
             settings.AUTH_BACKEND_OAUTH2
         ],
+        Source.custom: [
+            settings.AUTH_BACKEND_CUSTOM
+        ]
     }
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)

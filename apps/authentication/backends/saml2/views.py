@@ -3,7 +3,7 @@ import copy
 from urllib import parse
 
 from django.views import View
-from django.contrib import auth as auth
+from django.contrib import auth
 from django.urls import reverse
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
