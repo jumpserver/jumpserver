@@ -14,6 +14,7 @@ from common.utils import get_logger
 from common.db.encoder import ModelJSONFieldEncoder
 from common.db.models import BitOperationChoice
 from common.mixins.models import CommonModelMixin
+from common.const.choices import Trigger
 from ..const import AllTypes, Category
 
 __all__ = ['AccountBackupPlan', 'AccountBackupPlanExecution', 'Type']
@@ -89,7 +90,7 @@ class AccountBackupPlan(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
         from ..tasks import execute_account_backup_plan
         name = "account_backup_plan_period_{}".format(str(self.id)[:8])
         task = execute_account_backup_plan.name
-        args = (str(self.id), AccountBackupPlanExecution.Trigger.timing)
+        args = (str(self.id), Trigger.timing)
         kwargs = {}
         return name, task, args, kwargs
 
@@ -120,10 +121,6 @@ class AccountBackupPlan(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
 
 
 class AccountBackupPlanExecution(OrgModelMixin):
-    class Trigger(models.TextChoices):
-        manual = 'manual', _('Manual trigger')
-        timing = 'timing', _('Timing trigger')
-
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     date_start = models.DateTimeField(
         auto_now_add=True, verbose_name=_('Date start')
