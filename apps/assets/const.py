@@ -92,7 +92,7 @@ class HostTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
     def platform_constraints(cls):
         return {
             cls.LINUX: {
-                '_protocols': ['ssh', 'sftp', 'rdp', 'vnc', 'telnet']
+                '_protocols': ['ssh', 'rdp', 'vnc', 'telnet']
             },
             cls.WINDOWS: {
                 '_protocols': ['ssh', 'rdp', 'vnc'],

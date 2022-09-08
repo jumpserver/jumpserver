@@ -17,14 +17,13 @@ class ProtocolSettingSerializer(serializers.Serializer):
         ('tls', 'TLS'),
         ('nla', 'NLA'),
     ]
-    # Common
-    required = serializers.BooleanField(required=True, initial=False, label=_("Required"))
-
     # RDP
     console = serializers.BooleanField(required=False)
-    security = serializers.ChoiceField(choices=SECURITY_CHOICES, default='any', required=False)
+    security = serializers.ChoiceField(choices=SECURITY_CHOICES, default='any')
+
     # SFTP
-    sftp_home = serializers.CharField(default='/tmp', required=False)
+    sftp_enabled = serializers.BooleanField(default=True, label=_("SFTP enabled"))
+    sftp_home = serializers.CharField(default='/tmp', label=_("SFTP home"))
 
 
 class PlatformProtocolsSerializer(serializers.ModelSerializer):
@@ -39,7 +38,6 @@ class PlatformSerializer(JMSWritableNestedModelSerializer):
     type = LabeledChoiceField(choices=AllTypes.choices, label=_("Type"))
     category = LabeledChoiceField(choices=Category.choices, label=_("Category"))
     protocols = PlatformProtocolsSerializer(label=_('Protocols'), many=True, required=False)
-    type_constraints = serializers.ReadOnlyField(required=False, read_only=True)
     su_method = LabeledChoiceField(
         choices=[('sudo', 'sudo su -'), ('su', 'su - ')],
         label='切换方式', required=False, default='sudo'
@@ -49,17 +47,17 @@ class PlatformSerializer(JMSWritableNestedModelSerializer):
         model = Platform
         fields_mini = ['id', 'name', 'internal']
         fields_small = fields_mini + [
-            'category', 'type',
+            'category', 'type', 'charset',
         ]
         fields = fields_small + [
-            'protocols_enabled', 'protocols',
+            'protocols_enabled', 'protocols', 'domain_enabled',
             'gather_facts_enabled', 'gather_facts_method',
             'su_enabled', 'su_method',
             'gather_accounts_enabled', 'gather_accounts_method',
             'create_account_enabled', 'create_account_method',
             'verify_account_enabled', 'verify_account_method',
             'change_password_enabled', 'change_password_method',
-            'type_constraints', 'comment', 'charset',
+            'comment',
         ]
         extra_kwargs = {
             'su_enabled': {'label': '启用切换账号'},
