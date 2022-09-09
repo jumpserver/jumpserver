@@ -111,7 +111,7 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
         # 资产
         assets_to_set = Asset.objects.filter(
             Q(ip__in=kwargs.get('assets_display')) |
-            Q(hostname__in=kwargs.get('assets_display'))
+            Q(name__in=kwargs.get('assets_display'))
         ).distinct()
         instance.assets.add(*assets_to_set)
         # 节点
