@@ -131,7 +131,7 @@ class DatabaseTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
 
 
 class WebTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
-    General = 'general', 'General'
+    WEBSITE = 'website', _('General Website')
 
 
 class CloudTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
