@@ -31,7 +31,7 @@ class Platform(models.Model):
     comment = models.TextField(blank=True, null=True, verbose_name=_("Comment"))
     # 资产有关的
     charset = models.CharField(default='utf8', choices=CHARSET_CHOICES, max_length=8, verbose_name=_("Charset"))
-    domain_enabled = models.BooleanField(default=True, verbose_name=_("Domain enalbed"))
+    domain_enabled = models.BooleanField(default=True, verbose_name=_("Domain enabled"))
     protocols_enabled = models.BooleanField(default=True, verbose_name=_("Protocols enabled"))
     protocols = models.ManyToManyField(PlatformProtocol, blank=True, verbose_name=_("Protocols"))
     gather_facts_enabled = models.BooleanField(default=False, verbose_name=_("Gather facts enabled"))

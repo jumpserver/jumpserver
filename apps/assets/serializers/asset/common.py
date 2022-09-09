@@ -69,20 +69,12 @@ class AssetSerializer(JMSWritableNestedModelSerializer):
     labels = AssetLabelSerializer(many=True, required=False, label=_('Labels'))
     accounts = AssetAccountSerializer(many=True, required=False, label=_('Accounts'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
-    """
-    资产的数据结构
-    """
+
     class Meta:
         model = Asset
-        fields_mini = [
-            'id', 'name', 'ip',
-        ]
-        fields_small = fields_mini + [
-            'is_active', 'comment',
-        ]
-        fields_fk = [
-            'domain', 'platform', 'platform',
-        ]
+        fields_mini = ['id', 'name', 'ip']
+        fields_small = fields_mini + ['is_active', 'comment']
+        fields_fk = ['domain', 'platform', 'platform']
         fields_m2m = [
             'nodes', 'labels', 'accounts', 'protocols', 'nodes_display',
         ]
@@ -94,9 +86,6 @@ class AssetSerializer(JMSWritableNestedModelSerializer):
         extra_kwargs = {
             'name': {'label': _("Name")},
             'ip': {'label': _('IP/Host')},
-            'protocol': {'write_only': True},
-            'port': {'write_only': True},
-            'admin_user_display': {'label': _('Admin user display'), 'read_only': True},
         }
 
     @classmethod
@@ -120,6 +109,17 @@ class AssetSerializer(JMSWritableNestedModelSerializer):
                 node = Node.create_node_by_full_value(full_value)
             nodes_to_set.append(node)
         instance.nodes.set(nodes_to_set)
+
+    def validate_nodes(self, nodes):
+        print("Nodes: ", nodes)
+        if nodes:
+            return nodes
+        request = self.context.get('request')
+        if not request:
+            return []
+        node_id = request.query_params.get('node_id')
+        if not node_id:
+            return []
 
     @atomic
     def create(self, validated_data):
