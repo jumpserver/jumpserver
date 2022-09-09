@@ -158,7 +158,7 @@ class AppAccountHandler(BaseAccountHandler):
                 continue
             for account in accounts:
                 cls.replace_account_info(account, app_dict, system_user_dict)
-            data = AppAccountBackUpSerializer(accounts, many=True, app_type=app_type).data
+            data = AppAccountBackUpSerializer(accounts, many=True, tp=app_type).data
             data_map.update(cls.add_rows(data, header_fields, sheet_name))
         logger.info('\n\033[33m- 共收集{}条应用账号\033[0m'.format(qs.count()))
         return data_map
