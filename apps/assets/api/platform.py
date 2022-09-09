@@ -6,7 +6,7 @@ from common.drf.serializers import GroupedChoiceSerailizer
 from assets.models import Platform
 from assets.serializers import PlatformSerializer, PlatformOpsMethodSerializer
 from assets.const import AllTypes, Category
-from assets.playbooks.platform import filter_platform_methods
+from assets.playbooks import filter_platform_methods
 
 
 __all__ = ['AssetPlatformViewSet']

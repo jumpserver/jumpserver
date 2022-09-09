@@ -8,4 +8,7 @@ __all__ = ['WebSerializer']
 class WebSerializer(AssetSerializer):
     class Meta(AssetSerializer.Meta):
         model = Web
-        fields = AssetSerializer.Meta.fields + ['url']
+        fields = AssetSerializer.Meta.fields + [
+            'url', 'autofill', 'username_selector',
+            'password_selector', 'submit_selector'
+        ]
