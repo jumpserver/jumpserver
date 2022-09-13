@@ -1549,10 +1549,13 @@ function encryptPassword(password) {
     if (!password) {
         return ''
     }
-    const aesKey = (Math.random() + 1).toString(36).substring(2)
     // public key 是 base64 存储的
-    const rsaPublicKeyText = getCookie('jms_public_key')
-        .replaceAll('"', '')
+    let rsaPublicKeyText = getCookie('jms_public_key')
+    if (!rsaPublicKeyText) {
+        return password
+    }
+    const aesKey = (Math.random() + 1).toString(36).substring(2)
+    rsaPublicKeyText = rsaPublicKeyText.replaceAll('"', '')
     const rsaPublicKey = atob(rsaPublicKeyText)
     const keyCipher = rsaEncrypt(aesKey, rsaPublicKey)
     const passwordCipher = aesEncrypt(password, aesKey)
