@@ -24,7 +24,7 @@ user_permission_urlpatterns = [
     path('assets/', api.MyAllGrantedAssetsApi.as_view(), name='my-assets'),
 
     # Tree Node 的数据格式返回
-    path('<uuid:pk>/assets/tree/', api.UserDirectGrantedAssetsAsTreeForAdminApi.as_view(), name='user-assets-as-tree'),
+    path('<uuid:pk>/assets/tree/', api.UserDirectGrantedAssetsAsTreeApi.as_view(), name='user-assets-as-tree'),
     path('assets/tree/', api.MyAllAssetsAsTreeApi.as_view(), name='my-assets-as-tree'),
     path('ungroup/assets/tree/', api.MyUngroupAssetsAsTreeApi.as_view(), name='my-ungroup-assets-as-tree'),
     # ^--------------------------------------------------------^
@@ -60,15 +60,15 @@ user_permission_urlpatterns = [
     path('nodes/children-with-assets/tree/', api.MyGrantedNodeChildrenWithAssetsAsTreeApi.as_view(), name='my-nodes-children-with-assets-as-tree'),
 
     # 查询授权树上某个节点的所有资产
-    path('<uuid:pk>/nodes/<uuid:node_id>/assets/', api.UserGrantedNodeAssetsForAdminApi.as_view(), name='user-node-assets'),
+    path('<uuid:pk>/nodes/<uuid:node_id>/assets/', api.UserGrantedNodeAssetsApi.as_view(), name='user-node-assets'),
     path('nodes/<uuid:node_id>/assets/', api.MyGrantedNodeAssetsApi.as_view(), name='my-node-assets'),
 
     # 未分组的资产
-    path('<uuid:pk>/nodes/ungrouped/assets/', api.UserDirectGrantedAssetsForAdminApi.as_view(), name='user-ungrouped-assets'),
+    path('<uuid:pk>/nodes/ungrouped/assets/', api.UserDirectGrantedAssetsApi.as_view(), name='user-ungrouped-assets'),
     path('nodes/ungrouped/assets/', api.MyDirectGrantedAssetsApi.as_view(), name='my-ungrouped-assets'),
 
     # 收藏的资产
-    path('<uuid:pk>/nodes/favorite/assets/', api.UserFavoriteGrantedAssetsForAdminApi.as_view(), name='user-ungrouped-assets'),
+    path('<uuid:pk>/nodes/favorite/assets/', api.UserFavoriteGrantedAssetsApi.as_view(), name='user-ungrouped-assets'),
     path('nodes/favorite/assets/', api.MyFavoriteGrantedAssetsApi.as_view(), name='my-ungrouped-assets'),
 
     # Todo: 删除
