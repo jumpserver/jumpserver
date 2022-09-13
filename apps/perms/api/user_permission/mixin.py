@@ -3,14 +3,14 @@
 from rest_framework.request import Request
 
 from common.http import is_true
-from common.mixins.api import RoleAdminMixin as _RoleAdminMixin
-from common.mixins.api import RoleUserMixin as _RoleUserMixin
+from common.mixins.api import RoleAdminMixin
+from common.mixins.api import RoleUserMixin
 from orgs.utils import tmp_to_root_org
 from users.models import User
 from perms.utils.user_permission import UserGrantedTreeRefreshController
 
 
-class PermBaseMixin:
+class RebuildTreeMixin:
     user: User
 
     def get(self, request: Request, *args, **kwargs):
@@ -20,7 +20,7 @@ class PermBaseMixin:
         return super().get(request, *args, **kwargs)
 
 
-class AssetRoleAdminMixin(PermBaseMixin, _RoleAdminMixin):
+class AssetRoleAdminMixin(RebuildTreeMixin, RoleAdminMixin):
     rbac_perms = (
         ('list', 'perms.view_userassets'),
         ('retrieve', 'perms.view_userassets'),
@@ -29,7 +29,7 @@ class AssetRoleAdminMixin(PermBaseMixin, _RoleAdminMixin):
     )
 
 
-class AssetRoleUserMixin(PermBaseMixin, _RoleUserMixin):
+class AssetRoleUserMixin(RebuildTreeMixin, RoleUserMixin):
     rbac_perms = (
         ('list', 'perms.view_myassets'),
         ('retrieve', 'perms.view_myassets'),

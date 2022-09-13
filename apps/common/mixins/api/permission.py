@@ -27,7 +27,6 @@ class RoleAdminMixin:
         user_id = self.kwargs.get(self.user_id_url_kwarg)
         if hasattr(self, 'swagger_fake_view') and not user_id:
             return self.request.user  # NOQA
-
         user_model = get_user_model()
         return user_model.objects.get(id=user_id)
 

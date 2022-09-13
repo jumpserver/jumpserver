@@ -64,6 +64,7 @@ class UserGrantedNodeAssetsMixin:
     pagination_class = NodeGrantedAssetPagination
     pagination_node: Node
     user: User
+    kwargs: dict
 
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
@@ -91,6 +92,9 @@ class AssetsTreeFormatMixin(SerializeToTreeNodeMixin):
     """
     将 资产 序列化成树的结构返回
     """
+    filter_queryset: callable
+    get_queryset: callable
+
     filterset_fields = ['name', 'ip', 'id', 'comment']
     search_fields = ['name', 'ip', 'comment']
 
