@@ -70,7 +70,8 @@ class UserConfirmation(permissions.BasePermission):
         return True
 
     @classmethod
-    def require(cls, confirm_type=ConfirmType.ReLogin, ttl=300):
+    def require(cls, confirm_type=ConfirmType.ReLogin, ttl=60 * 5):
         min_level = ConfirmType.values.index(confirm_type) + 1
+        ttl = settings.SECURITY_MFA_VERIFY_TTL if confirm_type == ConfirmType.MFA else ttl
         name = 'UserConfirmationLevel{}TTL{}'.format(min_level, ttl)
         return type(name, (cls,), {'min_level': min_level, 'ttl': ttl, 'confirm_type': confirm_type})
