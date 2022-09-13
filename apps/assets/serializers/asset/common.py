@@ -54,9 +54,12 @@ class AssetAccountSerializer(AccountSerializer):
 
     class Meta(AccountSerializer.Meta):
         fields_mini = [
-            'id', 'name', 'username', 'privileged', 'version'
+            'id', 'name', 'username', 'privileged', 'version',
         ]
-        fields_write_only = ['password', 'private_key', 'public_key', 'passphrase', 'token']
+        fields_write_only = [
+            'password', 'private_key', 'public_key',
+            'passphrase', 'token', 'push_now'
+        ]
         fields = fields_mini + fields_write_only
 
 

@@ -14,7 +14,9 @@ class AccountSerializerCreateMixin(serializers.ModelSerializer):
         required=False, allow_null=True, write_only=True,
         label=_('Account template')
     )
-    push_to_asset = serializers.BooleanField(default=False, label=_("Push to asset"), write_only=True)
+    push_now = serializers.BooleanField(
+        default=False, label=_("Push now"), write_only=True
+    )
 
     @staticmethod
     def validate_template(value):
@@ -39,8 +41,16 @@ class AccountSerializerCreateMixin(serializers.ModelSerializer):
         account_template = attrs.pop('template', None)
         if account_template:
             self.replace_attrs(account_template, attrs)
-        push_to_asset = attrs.pop('push_to_asset', False)
+        self.push_now = attrs.pop('push_now', False)
         return super().validate(attrs)
+
+    def create(self, validated_data):
+        instance = super().create(validated_data)
+        if self.push_now:
+            print("Start push account to asset")
+            # Todo: push it
+            pass
+        return instance
 
 
 class AccountSerializer(AuthValidateMixin,
@@ -55,7 +65,7 @@ class AccountSerializer(AuthValidateMixin,
     class Meta(AccountFieldsSerializerMixin.Meta):
         model = Account
         fields = AccountFieldsSerializerMixin.Meta.fields \
-            + ['template', 'push_to_asset']
+            + ['template', 'push_now']
 
     @classmethod
     def setup_eager_loading(cls, queryset):

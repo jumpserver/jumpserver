@@ -23,17 +23,16 @@ class Account(BaseAccount):
 
     class Meta:
         verbose_name = _('Account')
-        unique_together = [('username', 'asset')]
+        unique_together = [
+            ('username', 'asset'),
+            ('name', 'asset'),
+        ]
         permissions = [
             ('view_accountsecret', _('Can view asset account secret')),
             ('change_accountsecret', _('Can change asset account secret')),
             ('view_historyaccount', _('Can view asset history account')),
             ('view_historyaccountsecret', _('Can view asset history account secret')),
         ]
-
-    @property
-    def name(self):
-        return "{}({})_{}".format(self.asset_name, self.ip, self.username)
 
     @lazyproperty
     def ip(self):
