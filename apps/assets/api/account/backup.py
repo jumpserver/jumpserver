@@ -4,9 +4,9 @@ from rest_framework import status, viewsets
 from rest_framework.response import Response
 
 from orgs.mixins.api import OrgBulkModelViewSet
-from .. import serializers
-from ..tasks import execute_account_backup_plan
-from ..models import (
+from assets import serializers
+from assets.tasks import execute_account_backup_plan
+from assets.models import (
     AccountBackupPlan, AccountBackupPlanExecution
 )
 

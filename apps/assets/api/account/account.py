@@ -9,9 +9,9 @@ from common.drf.filters import BaseFilterSet, UUIDInFilter
 from common.mixins import RecordViewLogMixin
 from common.permissions import UserConfirmation
 from authentication.const import ConfirmType
-from ..tasks.account_connectivity import test_accounts_connectivity_manual
-from ..models import Account, Node
-from .. import serializers
+from assets.tasks.account_connectivity import test_accounts_connectivity_manual
+from assets.models import Account, Node
+from assets import serializers
 
 __all__ = ['AccountFilterSet', 'AccountViewSet', 'AccountSecretsViewSet', 'AccountTaskCreateAPI']
 

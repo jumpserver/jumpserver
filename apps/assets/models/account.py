@@ -10,7 +10,14 @@ __all__ = ['Account', 'AccountTemplate']
 
 
 class Account(BaseAccount):
-    asset = models.ForeignKey('assets.Asset', related_name='accounts', on_delete=models.CASCADE, verbose_name=_('Asset'))
+    asset = models.ForeignKey(
+        'assets.Asset', related_name='accounts',
+        on_delete=models.CASCADE, verbose_name=_('Asset')
+    )
+    su_from = models.ForeignKey(
+        'assets.Account', related_name='su_to', null=True,
+        on_delete=models.SET_NULL, verbose_name=_("Su from")
+    )
     version = models.IntegerField(default=0, verbose_name=_('Version'))
     history = HistoricalRecords()
 
