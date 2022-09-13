@@ -26,10 +26,11 @@ __all__ = [
 class AssetFilterSet(BaseFilterSet):
     type = django_filters.CharFilter(field_name='platform__type', lookup_expr='exact')
     category = django_filters.CharFilter(field_name='platform__category', lookup_expr='exact')
+    hostname = django_filters.CharFilter(field_name='name', lookup_expr='exact')
 
     class Meta:
         model = Asset
-        fields = ['name', 'ip', 'is_active', 'type', 'category']
+        fields = ['name', 'ip', 'is_active', 'type', 'category', 'hostname']
 
 
 class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
@@ -39,7 +40,7 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
     model = Asset
     filterset_class = AssetFilterSet
     search_fields = ("name", "ip")
-    ordering_fields = ("name", "ip", "port")
+    ordering_fields = ("name", "ip")
     ordering = ('name',)
     serializer_classes = (
         ('default', serializers.AssetSerializer),
@@ -57,21 +58,6 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
         IpInFilterBackend,
         NodeFilterBackend
     ]
-
-    def set_assets_node(self, assets):
-        if not isinstance(assets, list):
-            assets = [assets]
-        node_id = self.request.query_params.get('node_id')
-        if not node_id:
-            return
-        node = get_object_or_none(Node, pk=node_id)
-        if not node:
-            return
-        node.assets.add(*assets)
-
-    def perform_create(self, serializer):
-        assets = serializer.save()
-        self.set_assets_node(assets)
 
     @action(methods=['GET'], detail=True, url_path='platform')
     def platform(self, *args, **kwargs):

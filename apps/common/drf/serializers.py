@@ -14,6 +14,7 @@ __all__ = [
     'MethodSerializer', 'EmptySerializer', 'BulkModelSerializer',
     'AdaptedBulkListSerializer', 'CeleryTaskSerializer',
     'SecretReadableMixin', 'JMSWritableNestedModelSerializer',
+    'GroupedChoiceSerializer',
 ]
 
 
@@ -90,7 +91,7 @@ class ChoiceSerializer(serializers.Serializer):
     value = serializers.CharField(label=_("Value"))
 
 
-class GroupedChoiceSerailizer(ChoiceSerializer):
+class GroupedChoiceSerializer(ChoiceSerializer):
     children = ChoiceSerializer(many=True, label=_("Children"))
 
 

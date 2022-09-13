@@ -92,7 +92,7 @@ class HostTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
     def platform_constraints(cls):
         return {
             cls.LINUX: {
-                '_protocols': ['ssh', 'sftp', 'rdp', 'vnc', 'telnet']
+                '_protocols': ['ssh', 'rdp', 'vnc', 'telnet']
             },
             cls.WINDOWS: {
                 '_protocols': ['ssh', 'rdp', 'vnc'],
@@ -131,7 +131,7 @@ class DatabaseTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
 
 
 class WebTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
-    General = 'general', 'General'
+    WEBSITE = 'website', _('General Website')
 
 
 class CloudTypes(PlatformMixin, ChoicesMixin, models.TextChoices):

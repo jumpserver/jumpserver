@@ -8,7 +8,7 @@ from django.db.models import F
 from common.drf.serializers import JMSWritableNestedModelSerializer
 from common.drf.fields import LabeledChoiceField, ObjectRelatedField
 from ..account import AccountSerializer
-from ...models import Asset, Node, Platform, Protocol, Label, Domain
+from ...models import Asset, Node, Platform, Protocol, Label, Domain, Account
 from ...const import Category, AllTypes
 
 __all__ = [
@@ -49,6 +49,17 @@ class AssetPlatformSerializer(serializers.ModelSerializer):
         }
 
 
+class AssetAccountSerializer(AccountSerializer):
+    add_org_fields = False
+
+    class Meta(AccountSerializer.Meta):
+        fields_mini = [
+            'id', 'name', 'username', 'privileged', 'version'
+        ]
+        fields_write_only = ['password', 'private_key', 'public_key', 'passphrase', 'token']
+        fields = fields_mini + fields_write_only
+
+
 class AssetSerializer(JMSWritableNestedModelSerializer):
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
     type = LabeledChoiceField(choices=AllTypes.choices, read_only=True, label=_('Type'))
@@ -56,22 +67,14 @@ class AssetSerializer(JMSWritableNestedModelSerializer):
     platform = ObjectRelatedField(required=False, queryset=Platform.objects, label=_('Platform'))
     nodes = ObjectRelatedField(many=True, required=False, queryset=Node.objects, label=_('Nodes'))
     labels = AssetLabelSerializer(many=True, required=False, label=_('Labels'))
-    accounts = AccountSerializer(many=True, required=False, label=_('Accounts'))
+    accounts = AssetAccountSerializer(many=True, required=False, label=_('Accounts'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
-    """
-    资产的数据结构
-    """
+
     class Meta:
         model = Asset
-        fields_mini = [
-            'id', 'name', 'ip',
-        ]
-        fields_small = fields_mini + [
-            'is_active', 'comment',
-        ]
-        fields_fk = [
-            'domain', 'platform', 'platform',
-        ]
+        fields_mini = ['id', 'name', 'ip']
+        fields_small = fields_mini + ['is_active', 'comment']
+        fields_fk = ['domain', 'platform', 'platform']
         fields_m2m = [
             'nodes', 'labels', 'accounts', 'protocols', 'nodes_display',
         ]
@@ -83,15 +86,7 @@ class AssetSerializer(JMSWritableNestedModelSerializer):
         extra_kwargs = {
             'name': {'label': _("Name")},
             'ip': {'label': _('IP/Host')},
-            'protocol': {'write_only': True},
-            'port': {'write_only': True},
-            'admin_user_display': {'label': _('Admin user display'), 'read_only': True},
         }
-
-    def __init__(self, *args, **kwargs):
-        data = kwargs.get('data', {})
-        self.accounts_data = data.pop('accounts', [])
-        super().__init__(*args, **kwargs)
 
     @classmethod
     def setup_eager_loading(cls, queryset):
@@ -114,6 +109,17 @@ class AssetSerializer(JMSWritableNestedModelSerializer):
                 node = Node.create_node_by_full_value(full_value)
             nodes_to_set.append(node)
         instance.nodes.set(nodes_to_set)
+
+    def validate_nodes(self, nodes):
+        print("Nodes: ", nodes)
+        if nodes:
+            return nodes
+        request = self.context.get('request')
+        if not request:
+            return []
+        node_id = request.query_params.get('node_id')
+        if not node_id:
+            return []
 
     @atomic
     def create(self, validated_data):

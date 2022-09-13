@@ -2,11 +2,11 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from common.drf.api import JMSModelViewSet
-from common.drf.serializers import GroupedChoiceSerailizer
+from common.drf.serializers import GroupedChoiceSerializer
 from assets.models import Platform
 from assets.serializers import PlatformSerializer, PlatformOpsMethodSerializer
-from assets.const import AllTypes, Category
-from assets.playbooks.platform import filter_platform_methods
+from assets.const import AllTypes
+from assets.playbooks import filter_platform_methods
 
 
 __all__ = ['AssetPlatformViewSet']
@@ -16,7 +16,7 @@ class AssetPlatformViewSet(JMSModelViewSet):
     queryset = Platform.objects.all()
     serializer_classes = {
         'default': PlatformSerializer,
-        'categories': GroupedChoiceSerailizer
+        'categories': GroupedChoiceSerializer
     }
     filterset_fields = ['name', 'category', 'type']
     search_fields = ['name']

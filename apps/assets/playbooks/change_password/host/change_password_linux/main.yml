@@ -1,4 +1,3 @@
-{% for account in accounts %}
 - hosts: {{ account.asset.name }}
   vars:
     account:
@@ -7,4 +6,3 @@
       public_key: {{ account.public_key }}
   roles:
     - change_password
-{% endfor %}

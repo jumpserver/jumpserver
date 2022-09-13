@@ -24,6 +24,7 @@ class OrgResourceSerializerMixin(CommonSerializerMixin, serializers.Serializer):
     """
     org_id = serializers.ReadOnlyField(default=get_current_org_id_for_serializer, label=_("Organization"))
     org_name = serializers.ReadOnlyField(label=_("Org name"))
+    add_org_fields = True
 
     def get_validators(self):
         _validators = super().get_validators()
@@ -38,7 +39,8 @@ class OrgResourceSerializerMixin(CommonSerializerMixin, serializers.Serializer):
 
     def get_field_names(self, declared_fields, info):
         fields = super().get_field_names(declared_fields, info)
-        fields.extend(["org_id", "org_name"])
+        if self.add_org_fields:
+            fields.extend(["org_id", "org_name"])
         return fields
 
 
