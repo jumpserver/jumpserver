@@ -4,7 +4,8 @@ from rest_framework import serializers
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.drf.serializers import SecretReadableMixin
-from assets.models import Account, AccountTemplate
+from common.drf.fields import ObjectRelatedField
+from assets.models import Account, AccountTemplate, Asset
 from assets.serializers.base import AuthValidateMixin
 from .common import AccountFieldsSerializerMixin
 
@@ -57,9 +58,7 @@ class AccountSerializer(AuthValidateMixin,
                         AccountSerializerCreateMixin,
                         AccountFieldsSerializerMixin,
                         BulkOrgResourceModelSerializer):
-    name = serializers.CharField(max_length=128, read_only=True, label=_("Name"))
-    ip = serializers.ReadOnlyField(label=_("IP"))
-    asset_name = serializers.ReadOnlyField(label=_("Asset"))
+    asset = ObjectRelatedField(required=False, queryset=Asset.objects, label=_('Asset'), attrs=('id', 'name', 'ip'))
     platform = serializers.ReadOnlyField(label=_("Platform"))
 
     class Meta(AccountFieldsSerializerMixin.Meta):
