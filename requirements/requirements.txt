@@ -91,7 +91,7 @@ eventlet==0.33.1
 greenlet==1.1.2
 gunicorn==20.1.0
 celery==5.2.7
-flower==1.0.0
+flower==1.2.0
 django-celery-beat==2.3.0
 kombu==5.2.4
 # Auth
