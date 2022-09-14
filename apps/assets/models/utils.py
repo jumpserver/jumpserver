@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.utils import timezone
-from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
@@ -21,3 +19,53 @@ def private_key_validator(value):
             _('%(value)s is not an even number'),
             params={'value': value},
         )
+
+
+def update_internal_platforms(platform_model):
+    from assets.const import AllTypes
+
+    platforms = [
+        {'name': 'Linux', 'category': 'host', 'type': 'linux'},
+        {'name': 'BSD', 'category': 'host', 'type': 'unix'},
+        {'name': 'Unix', 'category': 'host', 'type': 'unix'},
+        {'name': 'MacOS', 'category': 'host', 'type': 'unix'},
+        {'name': 'Windows', 'category': 'host', 'type': 'unix'},
+        {
+            'name': 'AIX', 'category': 'host', 'type': 'unix',
+            'create_account_method': 'create_account_aix',
+            'change_password_method': 'change_password_aix',
+        },
+        {'name': 'Windows', 'category': 'host', 'type': 'windows'},
+        {'name': 'Windows-TLS', 'category': 'host', 'type': 'windows'},
+        {'name': 'Windows-RDP', 'category': 'host', 'type': 'windows'},
+
+        # 数据库
+        {'name': 'MySQL', 'category': 'database', 'type': 'mysql'},
+        {'name': 'PostgreSQL', 'category': 'database', 'type': 'postgresql'},
+        {'name': 'Oracle', 'category': 'database', 'type': 'oracle'},
+        {'name': 'SQLServer', 'category': 'database', 'type': 'sqlserver'},
+        {'name': 'MongoDB', 'category': 'database', 'type': 'mongodb'},
+        {'name': 'Redis', 'category': 'database', 'type': 'redis'},
+
+        # 网络设备
+        {'name': 'Generic', 'category': 'networking', 'type': 'general'},
+        {'name': 'Huawei', 'category': 'networking', 'type': 'general'},
+        {'name': 'Cisco', 'category': 'networking', 'type': 'general'},
+        {'name': 'H3C', 'category': 'networking', 'type': 'general'},
+
+        # Web
+
+        # Cloud
+    ]
+
+    platforms = platform_model.objects.all()
+
+    updated = []
+    for p in platforms:
+        attrs = platform_ops_map.get((p.category, p.type), {})
+        if not attrs:
+            continue
+        for k, v in attrs.items():
+            setattr(p, k, v)
+        updated.append(p)
+    platform_model.objects.bulk_update(updated, list(default_ok.keys()))

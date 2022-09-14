@@ -3,7 +3,6 @@ from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
 from common.utils import lazyproperty
-
 from .base import BaseAccount
 
 __all__ = ['Account', 'AccountTemplate']

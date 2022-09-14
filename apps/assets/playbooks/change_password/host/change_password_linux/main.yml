@@ -1,4 +1,4 @@
-- hosts: {{ account.asset.name }}
+- hosts: all
   vars:
     account:
       username: {{ account.username }}

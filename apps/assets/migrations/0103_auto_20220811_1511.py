@@ -41,6 +41,11 @@ class Migration(migrations.Migration):
             old_name='hostname',
             new_name='name',
         ),
+        migrations.AlterField(
+            model_name='asset',
+            name='name',
+            field=models.CharField(max_length=128, verbose_name='Name'),
+        ),
         migrations.AddField(
             model_name='asset',
             name='date_updated',

@@ -69,9 +69,7 @@ class AccountSerializer(AuthValidateMixin,
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('asset') \
-            .annotate(ip=F('asset__ip')) \
-            .annotate(asset_name=F('asset__name'))
+        queryset = queryset.prefetch_related('asset')
         return queryset
 
 

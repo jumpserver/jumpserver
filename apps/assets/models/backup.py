@@ -71,7 +71,7 @@ class Type(BitOperationChoice):
 
 class AccountBackupPlan(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    types = models.BigIntegerField(choices=Type.DB_CHOICES, default=Type.ALL, verbose_name=_('Type'))
+    types = models.BigIntegerField()
     recipients = models.ManyToManyField(
         'users.User', related_name='recipient_escape_route_plans', blank=True,
         verbose_name=_("Recipient")

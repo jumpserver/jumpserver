@@ -39,6 +39,7 @@ class Migration(migrations.Migration):
                 ('history_type', models.CharField(choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')], max_length=1)),
                 ('asset', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='assets.asset', verbose_name='Asset')),
                 ('history_user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
+                ('su_from', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='assets.account', verbose_name='Su from')),
             ],
             options={
                 'verbose_name': 'historical Account',
@@ -65,7 +66,8 @@ class Migration(migrations.Migration):
                 ('created_by', models.CharField(max_length=128, null=True, verbose_name='Created by')),
                 ('privileged', models.BooleanField(default=False, verbose_name='Privileged account')),
                 ('version', models.IntegerField(default=0, verbose_name='Version')),
-                ('asset', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='assets.asset', verbose_name='Asset')),
+                ('asset', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='accounts', to='assets.asset', verbose_name='Asset')),
+                ('su_from', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='su_to', to='assets.account', verbose_name='Su from')),
             ],
             options={
                 'verbose_name': 'Account',

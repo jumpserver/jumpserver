@@ -12,38 +12,15 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.CreateModel(
-            name='DeviceInfo',
-            fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('created_by', models.CharField(blank=True, max_length=32, null=True, verbose_name='Created by')),
-                ('date_created', models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date created')),
-                ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
-                ('vendor', models.CharField(blank=True, max_length=64, null=True, verbose_name='Vendor')),
-                ('model', models.CharField(blank=True, max_length=54, null=True, verbose_name='Model')),
-                ('sn', models.CharField(blank=True, max_length=128, null=True, verbose_name='Serial number')),
-                ('cpu_model', models.CharField(blank=True, max_length=64, null=True, verbose_name='CPU model')),
-                ('cpu_count', models.IntegerField(null=True, verbose_name='CPU count')),
-                ('cpu_cores', models.IntegerField(null=True, verbose_name='CPU cores')),
-                ('cpu_vcpus', models.IntegerField(null=True, verbose_name='CPU vcpus')),
-                ('memory', models.CharField(blank=True, max_length=64, null=True, verbose_name='Memory')),
-                ('disk_total', models.CharField(blank=True, max_length=1024, null=True, verbose_name='Disk total')),
-                ('disk_info', models.CharField(blank=True, max_length=1024, null=True, verbose_name='Disk info')),
-                ('os', models.CharField(blank=True, max_length=128, null=True, verbose_name='OS')),
-                ('os_version', models.CharField(blank=True, max_length=16, null=True, verbose_name='OS version')),
-                ('os_arch', models.CharField(blank=True, max_length=16, null=True, verbose_name='OS arch')),
-                ('hostname_raw', models.CharField(blank=True, max_length=128, null=True, verbose_name='Hostname raw')),
-                ('number', models.CharField(blank=True, max_length=128, null=True, verbose_name='Asset number')),
-            ],
-            options={
-                'verbose_name': 'DeviceInfo',
-            },
+        migrations.AddField(
+            model_name='asset',
+            name='info',
+            field=models.JSONField(blank=True, default=dict, verbose_name='Info'),
         ),
         migrations.CreateModel(
             name='Host',
             fields=[
                 ('asset_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='assets.asset')),
-                ('device_info', models.OneToOneField(null=True, on_delete=django.db.models.deletion.SET_NULL, to='assets.deviceinfo', verbose_name='Host')),
             ],
         ),
     ]

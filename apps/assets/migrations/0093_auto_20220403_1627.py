@@ -4,46 +4,6 @@ from django.utils import timezone
 from django.db import migrations, models
 
 
-def migrate_hardware(apps, *args):
-    host_model = apps.get_model('assets', 'Host')
-    asset_model = apps.get_model('assets', 'Asset')
-    hardware_model = apps.get_model('assets', 'DeviceInfo')
-
-    created = 0
-    batch_size = 1000
-
-    excludes = ['id', 'host', 'date_updated']
-    fields = [f.name for f in hardware_model._meta.fields]
-    fields = [name for name in fields if name not in excludes]
-
-    while True:
-        start = created
-        end = created + batch_size
-        hosts = host_model.objects.all()[start:end]
-        asset_ids = [h.asset_ptr_id for h in hosts]
-        assets = asset_model.objects.filter(id__in=asset_ids)
-        asset_mapper = {a.id: a for a in assets}
-
-        if not hosts:
-            break
-
-        hardware_infos = []
-        hosts_updated = []
-        for host in hosts:
-            hardware = hardware_model()
-            asset = asset_mapper[host.asset_ptr_id]
-            hardware.date_updated = timezone.now()
-            for name in fields:
-                setattr(hardware, name, getattr(asset, name))
-            hardware_infos.append(hardware)
-            host.device_info_id = hardware.id
-            hosts_updated.append(host)
-
-        hardware_model.objects.bulk_create(hardware_infos, ignore_conflicts=True)
-        host_model.objects.bulk_update(hosts_updated, ['device_info_id'])
-        created += len(hardware_infos)
-
-
 def migrate_to_host(apps, schema_editor):
     asset_model = apps.get_model("assets", "Asset")
     host_model = apps.get_model("assets", 'Host')
@@ -64,6 +24,34 @@ def migrate_to_host(apps, schema_editor):
         created += len(hosts)
 
 
+def migrate_hardware_info(apps, *args):
+    asset_model = apps.get_model("assets", "Asset")
+
+    count = 0
+    batch_size = 1000
+    hardware_fields = [
+        'vendor', 'model', 'sn', 'cpu_model', 'cpu_count', 'cpu_cores',
+        'cpu_vcpus', 'memory', 'disk_total', 'disk_info', 'os', 'os_arch',
+        'os_version', 'hostname_raw', 'number'
+    ]
+
+    while True:
+        start = count
+        end = count + batch_size
+        assets = asset_model.objects.all()[start:end]
+        if not assets:
+            break
+
+        updated = []
+        for asset in assets:
+            info = {getattr(asset, field) for field in hardware_fields if getattr(asset, field)}
+            if not info:
+                continue
+            asset.info = info
+            updated.append(asset)
+        asset_model.objects.bulk_update(updated, ['info'])
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -71,6 +59,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(migrate_hardware_info),
         migrations.RunPython(migrate_to_host),
-        migrations.RunPython(migrate_hardware),
     ]
