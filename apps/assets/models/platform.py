@@ -66,7 +66,7 @@ class Platform(models.Model):
             'su_method': 'sudo',
             'domain_enabled': True,
             'change_password_enabled': True,
-            'change_password_method': 'change_password_linux',
+            'change_password_method': 'linux',
             'verify_account_enabled': True,
             'verify_account_method': 'ansible_posix_ping',
         }
@@ -80,7 +80,7 @@ class Platform(models.Model):
         platform_ops_map = {
             ('host', 'linux'): {
                 **default_ok,
-                'change_password_method': 'change_password_linux',
+                'change_password_method': 'linux',
                 'verify_account_method': 'ansible_posix_ping'
             },
             ('host', 'windows'): {

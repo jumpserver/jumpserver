@@ -49,10 +49,10 @@ class AccountViewSet(OrgBulkModelViewSet):
     filterset_class = AccountFilterSet
     serializer_classes = {
         'default': serializers.AccountSerializer,
-        'verify_account': serializers.AssetTaskSerializer
+        'verify': serializers.AssetTaskSerializer
     }
     rbac_perms = {
-        'verify_account': 'assets.test_authbook',
+        'verify': 'assets.test_authbook',
         'partial_update': 'assets.change_assetaccountsecret',
     }
 

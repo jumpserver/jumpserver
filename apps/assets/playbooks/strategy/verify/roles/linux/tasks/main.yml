@@ -1,0 +1,8 @@
+- name: Verify user
+  ping:
+  vars:
+    ansible_user: "{{ item }}"
+    ansible_pass: "{{ password }}"
+    ansible_connection: "{{ connection_type | default('ssh') }}"
+    ansible_ssh_private_key_file: "{{ private_key_file }}"
+  with_items: "{{ usernames }}"

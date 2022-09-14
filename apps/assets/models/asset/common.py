@@ -89,6 +89,10 @@ class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
     def get_target_ip(self):
         return self.ip
 
+    def get_target_ssh_port(self):
+        protocol = self.protocols.all().filter(name='ssh').first()
+        return protocol.port if protocol else 22
+
     @property
     def is_valid(self):
         warning = ''
