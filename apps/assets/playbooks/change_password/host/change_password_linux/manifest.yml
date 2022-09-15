@@ -1,7 +1,0 @@
-id: change_password_linux
-name: Change password for Linux
-category: host
-type:
-  - unix
-  - linux
-method: change_password

@@ -10,7 +10,7 @@ class ExecutionManager:
         StrategyChoice.push: PushExecutionManager,
         StrategyChoice.verify: VerifyExecutionManager,
         StrategyChoice.collect: CollectExecutionManager,
-        StrategyChoice.change_auth: ChangeAuthExecutionManager,
+        StrategyChoice.change_password: ChangeAuthExecutionManager,
     }
 
     def __new__(cls, execution):
@@ -23,7 +23,7 @@ class TaskHandler:
         StrategyChoice.push: PushHandler,
         StrategyChoice.verify: VerifyHandler,
         StrategyChoice.collect: CollectHandler,
-        StrategyChoice.change_auth: ChangeAuthHandler,
+        StrategyChoice.change_password: ChangeAuthHandler,
     }
 
     def __new__(cls, task, show_step_info):
