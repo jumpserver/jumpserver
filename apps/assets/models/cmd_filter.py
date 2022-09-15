@@ -101,7 +101,6 @@ class CommandFilterRule(OrgModelMixin):
             s = self.construct_command_regex(content=self.content)
         else:
             s = r'{0}'.format(self.content)
-
         return s
 
     @classmethod

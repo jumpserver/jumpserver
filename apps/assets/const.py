@@ -16,8 +16,10 @@ class PlatformMixin:
     def platform_constraints(cls):
         return {
             'domain_enabled': False,
-            'gather_facts_enabled': False,
             'su_enabled': False,
+            'vendor_enabled': False,
+            'ping_enabled': False,
+            'gather_facts_enabled': False,
             'change_password_enabled': False,
             'verify_account_enabled': False,
             'create_account_enabled': False,
@@ -49,6 +51,15 @@ class Category(PlatformMixin, ChoicesMixin, models.TextChoices):
             },
             cls.NETWORKING: {
                 'domain_enabled': True,
+                'brand_enabled': True,
+                'brands': [
+                    ('huawei', 'Huawei'),
+                    ('cisco', 'Cisco'),
+                    ('juniper', 'Juniper'),
+                    ('h3c', 'H3C'),
+                    ('dell', 'Dell'),
+                    ('other', 'Other'),
+                ],
                 'su_enabled': False,
                 'ping_enabled': True, 'ping_method': 'ping',
                 'gather_facts_enabled': False,
@@ -125,7 +136,6 @@ class NetworkingTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
     SWITCH = 'switch', _("Switch")
     ROUTER = 'router', _("Router")
     FIREWALL = 'firewall', _("Firewall")
-    OTHER_NETWORK = 'other', _("Other device")
 
 
 class DatabaseTypes(PlatformMixin, ChoicesMixin, models.TextChoices):

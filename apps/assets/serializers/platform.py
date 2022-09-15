@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from common.drf.fields import LabeledChoiceField
 from common.drf.serializers import JMSWritableNestedModelSerializer
-from ..models import Platform, PlatformProtocol
+from ..models import Platform, PlatformProtocol, PlatformAutomation
 from ..const import Category, AllTypes
 
 
@@ -26,43 +26,18 @@ class ProtocolSettingSerializer(serializers.Serializer):
     sftp_home = serializers.CharField(default='/tmp', label=_("SFTP home"))
 
 
-class PlatformProtocolsSerializer(serializers.ModelSerializer):
-    setting = ProtocolSettingSerializer(required=False, allow_null=True)
-
+class PlatformAutomationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PlatformProtocol
-        fields = ['id', 'name', 'port', 'setting']
-
-
-class PlatformSerializer(JMSWritableNestedModelSerializer):
-    type = LabeledChoiceField(choices=AllTypes.choices, label=_("Type"))
-    category = LabeledChoiceField(choices=Category.choices, label=_("Category"))
-    protocols = PlatformProtocolsSerializer(label=_('Protocols'), many=True, required=False)
-    su_method = LabeledChoiceField(
-        choices=[('sudo', 'sudo su -'), ('su', 'su - ')],
-        label='切换方式', required=False, default='sudo'
-    )
-
-    class Meta:
-        model = Platform
-        fields_mini = ['id', 'name', 'internal']
-        fields_small = fields_mini + [
-            'category', 'type', 'charset',
-        ]
-        fields = fields_small + [
-            'protocols_enabled', 'protocols', 'domain_enabled',
+        model = PlatformAutomation
+        fields = [
+            'id', 'ping_enabled', 'ping_method',
             'gather_facts_enabled', 'gather_facts_method',
-            'su_enabled', 'su_method',
-            'gather_accounts_enabled', 'gather_accounts_method',
             'create_account_enabled', 'create_account_method',
-            'verify_account_enabled', 'verify_account_method',
             'change_password_enabled', 'change_password_method',
-            'comment',
+            'verify_account_enabled', 'verify_account_method',
+            'gather_accounts_enabled', 'gather_accounts_method',
         ]
         extra_kwargs = {
-            'su_enabled': {'label': '启用切换账号'},
-            'domain_enabled': {'label': "启用网域"},
-            'domain_default': {'label': "默认网域"},
             'gather_facts_enabled': {'label': '启用收集信息'},
             'gather_facts_method': {'label': '收集信息方式'},
             'verify_account_enabled': {'label': '启用校验账号'},
@@ -75,16 +50,58 @@ class PlatformSerializer(JMSWritableNestedModelSerializer):
             'gather_accounts_method': {'label': '收集账号方式'},
         }
 
-    def validate(self, attrs):
-        fields_to_check = [
-            ('verify_account_enabled', 'verify_account_method'),
-            ('create_account_enabled', 'create_account_method'),
-            ('change_password_enabled', 'change_password_method'),
+
+class PlatformProtocolsSerializer(serializers.ModelSerializer):
+    setting = ProtocolSettingSerializer(required=False, allow_null=True)
+
+    class Meta:
+        model = PlatformProtocol
+        fields = ['id', 'name', 'port', 'setting']
+
+
+class PlatformSerializer(JMSWritableNestedModelSerializer):
+    type = LabeledChoiceField(choices=AllTypes.choices, label=_("Type"))
+    category = LabeledChoiceField(choices=Category.choices, label=_("Category"))
+    protocols = PlatformProtocolsSerializer(label=_('Protocols'), many=True, required=False)
+    automation = PlatformAutomationSerializer(label=_('Automation'), required=False)
+    su_method = LabeledChoiceField(
+        choices=[('sudo', 'sudo su -'), ('su', 'su - ')],
+        label='切换方式', required=False, default='sudo'
+    )
+    brand = LabeledChoiceField(choices=[], label='厂商', required=False, allow_null=True)
+
+    class Meta:
+        model = Platform
+        fields_mini = ['id', 'name', 'internal']
+        fields_small = fields_mini + [
+            'category', 'type', 'charset',
         ]
-        for method_enabled, method_name in fields_to_check:
-            if attrs.get(method_enabled, False) and not attrs.get(method_name, False):
-                raise serializers.ValidationError({method_name: _('This field is required.')})
-        return attrs
+        fields = fields_small + [
+            'protocols_enabled', 'protocols', 'domain_enabled',
+            'su_enabled', 'su_method', 'brand', 'automation', 'comment',
+        ]
+        extra_kwargs = {
+            'su_enabled': {'label': '启用切换账号'},
+            'domain_enabled': {'label': "启用网域"},
+            'domain_default': {'label': "默认网域"},
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_brand_choices()
+
+    def set_brand_choices(self):
+        field = self.fields.get('brand')
+        request = self.context.get('request')
+        if not field or not request:
+            return
+        category = request.query_params.get('category', '')
+        constraints = Category.platform_constraints().get(category)
+        if not constraints:
+            return
+        field.choices = constraints.get('brands', [])
+        if field.choices:
+            field.required = True
 
 
 class PlatformOpsMethodSerializer(serializers.Serializer):
