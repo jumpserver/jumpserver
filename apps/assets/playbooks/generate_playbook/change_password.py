@@ -22,7 +22,7 @@ class GenerateChangePasswordPlaybook(BaseGeneratePlaybook):
         self.relation_asset_map = self.get_username_relation_asset_map(usernames)
 
     def get_username_relation_asset_map(self, usernames):
-        # TODO 没牛逼用户的资产 网关
+        # TODO 没特权用户的资产 要考虑网关
 
         complete_map = {
             asset: list(asset.accounts.value_list('username', flat=True))
@@ -34,6 +34,9 @@ class GenerateChangePasswordPlaybook(BaseGeneratePlaybook):
 
         relation_map = {}
         for asset, usernames in complete_map.items():
+            usernames = list(set(usernames) & set(usernames))
+            if not usernames:
+                continue
             relation_map[asset] = list(set(usernames) & set(usernames))
         return relation_map
 
@@ -59,7 +62,6 @@ class GenerateChangePasswordPlaybook(BaseGeneratePlaybook):
                 'ansible_port': asset.get_target_ssh_port(),  # TODO 需要根绝协议取端口号
                 'ansible_user': asset.admin_user.username,
                 'ansible_pass': asset.admin_user.username,
-                'ansible_connection': 'ssh',
                 'usernames': usernames,
             }
             pathname = os.path.join(host_vars_pathname, f'{asset.name}.yml')

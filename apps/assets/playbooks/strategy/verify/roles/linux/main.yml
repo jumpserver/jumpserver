@@ -1,7 +1,5 @@
 - hosts: all
   vars:
     connection_type: ssh
-    password:
-      value: {{ password}}
   roles:
     - linux
