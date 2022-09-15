@@ -5,7 +5,6 @@ from rest_framework_bulk.routes import BulkRouter
 
 from .. import api
 
-# v3 Done
 router = BulkRouter()
 router.register('asset-permissions', api.AssetPermissionViewSet, 'asset-permission')
 router.register('asset-permissions-users-relations', api.AssetPermissionUserRelationViewSet, 'asset-permissions-users-relation')
@@ -14,42 +13,31 @@ router.register('asset-permissions-assets-relations', api.AssetPermissionAssetRe
 router.register('asset-permissions-nodes-relations', api.AssetPermissionNodeRelationViewSet, 'asset-permissions-nodes-relation')
 
 user_permission_urlpatterns = [
-    # 统一说明：
-    # `<uuid:pk>`: `User.pk`
-    # 直接授权：在 `AssetPermission` 中关联的对象
-
-    # ---------------------------------------------------------
     # 以 serializer 格式返回
     path('<uuid:pk>/assets/', api.UserAllGrantedAssetsApi.as_view(), name='user-assets'),
     path('assets/', api.MyAllGrantedAssetsApi.as_view(), name='my-assets'),
-
     # Tree Node 的数据格式返回
     path('<uuid:pk>/assets/tree/', api.UserDirectGrantedAssetsAsTreeApi.as_view(), name='user-assets-as-tree'),
     path('assets/tree/', api.MyAllAssetsAsTreeApi.as_view(), name='my-assets-as-tree'),
     path('ungroup/assets/tree/', api.MyUngroupAssetsAsTreeApi.as_view(), name='my-ungroup-assets-as-tree'),
-    # ^--------------------------------------------------------^
 
     # 获取用户所有`直接授权的节点`与`直接授权资产`关联的节点
     # 以 serializer 格式返回
-    path('<uuid:pk>/nodes/', api.UserGrantedNodesForAdminApi.as_view(), name='user-nodes'),
+    path('<uuid:pk>/nodes/', api.UserGrantedNodesApi.as_view(), name='user-nodes'),
     path('nodes/', api.MyGrantedNodesApi.as_view(), name='my-nodes'),
-
     # 以 Tree Node 的数据格式返回
     path('<uuid:pk>/nodes/tree/', api.MyGrantedNodesAsTreeApi.as_view(), name='user-nodes-as-tree'),
     path('nodes/tree/', api.MyGrantedNodesAsTreeApi.as_view(), name='my-nodes-as-tree'),
-    # ^--------------------------------------------------------^
 
     # 一层一层的获取用户授权的节点，
     # 以 Serializer 的数据格式返回
     path('<uuid:pk>/nodes/children/', api.UserGrantedNodeChildrenForAdminApi.as_view(), name='user-nodes-children'),
     path('nodes/children/', api.MyGrantedNodeChildrenApi.as_view(), name='my-nodes-children'),
-
     # 以 Tree Node 的数据格式返回
     path('<uuid:pk>/nodes/children/tree/', api.UserGrantedNodeChildrenAsTreeForAdminApi.as_view(), name='user-nodes-children-as-tree'),
     # 部分调用位置
     # - 普通用户 -> 我的资产 -> 展开节点 时调用
     path('nodes/children/tree/', api.MyGrantedNodeChildrenAsTreeApi.as_view(), name='my-nodes-children-as-tree'),
-    # ^--------------------------------------------------------^
 
     # 此接口会返回整棵树
     # 普通用户 -> 命令执行 -> 左侧树
@@ -75,6 +63,11 @@ user_permission_urlpatterns = [
     # Asset System users
     path('<uuid:pk>/assets/<uuid:asset_id>/system-users/', api.UserGrantedAssetSystemUsersForAdminApi.as_view(), name='user-asset-system-users'),
     path('assets/<uuid:asset_id>/system-users/', api.MyGrantedAssetSystemUsersApi.as_view(), name='my-asset-system-users'),
+
+    # Todo: 增加
+    # 获取所有和资产相关联的账号列表
+    path('<uuid:pk>/assets/<uuid:asset_id>/accounts/', api.UserGrantedAssetAccounts.as_view(), name='user-asset-accounts'),
+    path('assets/<uuid:asset_id>/accounts/', api.MyGrantedAssetAccounts.as_view(), name='my-asset-accounts')
 ]
 
 user_group_permission_urlpatterns = [

@@ -5,8 +5,10 @@
 import logging
 import uuid
 from functools import reduce
+from collections import Iterable
 
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import lazyproperty
@@ -57,13 +59,17 @@ class NodesRelationMixin:
         return nodes
 
     def get_all_nodes(self, flat=False):
-        nodes = []
+        from ..node import Node
+        node_keys = set()
         for node in self.get_nodes():
-            _nodes = node.get_ancestors(with_self=True)
-            nodes.append(_nodes)
+            ancestor_keys = node.get_ancestor_keys(with_self=True)
+            node_keys.update(ancestor_keys)
+        nodes = Node.objects.filter(key__in=node_keys).distinct()
         if flat:
-            nodes = list(reduce(lambda x, y: set(x) | set(y), nodes))
-        return nodes
+            node_ids = set(nodes.values_list('id', flat=True))
+            return node_ids
+        else:
+            return nodes
 
 
 class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
@@ -160,6 +166,14 @@ class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
         }
         tree_node = TreeNode(**data)
         return tree_node
+
+    def filter_accounts(self, account_names=None):
+        if account_names is None:
+            return self.accounts.all()
+        assert isinstance(account_names, Iterable), '`account_names` must be an iterable object'
+        queries = Q(name__in=account_names) | Q(username__in=account_names)
+        accounts = self.accounts.filter(queries)
+        return accounts
 
     class Meta:
         unique_together = [('org_id', 'name')]

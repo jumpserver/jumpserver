@@ -19,7 +19,7 @@ from perms.utils.user_permission import UserGrantedNodesQueryUtils
 logger = get_logger(__name__)
 
 __all__ = [
-    'UserGrantedNodesForAdminApi',
+    'UserGrantedNodesApi',
     'MyGrantedNodesApi',
     'MyGrantedNodesAsTreeApi',
     'UserGrantedNodeChildrenForAdminApi',
@@ -118,11 +118,11 @@ class MyGrantedNodeChildrenAsTreeApi(AssetRoleUserMixin, UserGrantedNodeChildren
         return permissions
 
 
-class UserGrantedNodesForAdminApi(AssetRoleAdminMixin, UserGrantedNodesMixin, BaseGrantedNodeApi):
+class UserGrantedNodesApi(AssetRoleAdminMixin, UserGrantedNodesMixin, BaseGrantedNodeApi):
     pass
 
 
-class MyGrantedNodesApi(AssetRoleUserMixin, UserGrantedNodesMixin, BaseGrantedNodeApi):
+class MyGrantedNodesApi(AssetRoleUserMixin, UserGrantedNodesApi):
     pass
 
 
