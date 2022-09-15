@@ -40,7 +40,7 @@ def migrate_accounts(apps, schema_editor):
             values['version'] = 1
 
             system_user = auth_book.systemuser
-            if auth_book.systemuser:
+            if system_user:
                 values.update({attr: getattr(system_user, attr) for attr in auth_attrs})
                 values['created_by'] = str(system_user.id)
                 values['privileged'] = system_user.type == 'admin'
@@ -48,6 +48,7 @@ def migrate_accounts(apps, schema_editor):
             auth_book_auth = {attr: getattr(auth_book, attr) for attr in auth_attrs}
             auth_book_auth = {attr: value for attr, value in auth_book_auth.items() if value}
             values.update(auth_book_auth)
+            values['name'] = values['username']
 
             account = account_model(**values)
             accounts.append(account)

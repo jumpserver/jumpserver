@@ -1,6 +1,6 @@
 from orgs.mixins.api import OrgBulkModelViewSet
-from ..models import AccountTemplate
-from .. import serializers
+from assets.models import AccountTemplate
+from assets import serializers
 
 
 class AccountTemplateViewSet(OrgBulkModelViewSet):

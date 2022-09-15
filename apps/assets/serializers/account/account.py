@@ -4,7 +4,8 @@ from rest_framework import serializers
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.drf.serializers import SecretReadableMixin
-from assets.models import Account, AccountTemplate
+from common.drf.fields import ObjectRelatedField
+from assets.models import Account, AccountTemplate, Asset
 from assets.serializers.base import AuthValidateMixin
 from .common import AccountFieldsSerializerMixin
 
@@ -14,7 +15,9 @@ class AccountSerializerCreateMixin(serializers.ModelSerializer):
         required=False, allow_null=True, write_only=True,
         label=_('Account template')
     )
-    push_to_asset = serializers.BooleanField(default=False, label=_("Push to asset"), write_only=True)
+    push_now = serializers.BooleanField(
+        default=False, label=_("Push now"), write_only=True
+    )
 
     @staticmethod
     def validate_template(value):
@@ -39,30 +42,34 @@ class AccountSerializerCreateMixin(serializers.ModelSerializer):
         account_template = attrs.pop('template', None)
         if account_template:
             self.replace_attrs(account_template, attrs)
-        push_to_asset = attrs.pop('push_to_asset', False)
+        self.push_now = attrs.pop('push_now', False)
         return super().validate(attrs)
+
+    def create(self, validated_data):
+        instance = super().create(validated_data)
+        if self.push_now:
+            print("Start push account to asset")
+            # Todo: push it
+            pass
+        return instance
 
 
 class AccountSerializer(AuthValidateMixin,
                         AccountSerializerCreateMixin,
                         AccountFieldsSerializerMixin,
                         BulkOrgResourceModelSerializer):
-    name = serializers.CharField(max_length=128, read_only=True, label=_("Name"))
-    ip = serializers.ReadOnlyField(label=_("IP"))
-    asset_name = serializers.ReadOnlyField(label=_("Asset"))
+    asset = ObjectRelatedField(required=False, queryset=Asset.objects, label=_('Asset'), attrs=('id', 'name', 'ip'))
     platform = serializers.ReadOnlyField(label=_("Platform"))
 
     class Meta(AccountFieldsSerializerMixin.Meta):
         model = Account
         fields = AccountFieldsSerializerMixin.Meta.fields \
-            + ['template', 'push_to_asset']
+            + ['template', 'push_now']
 
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('asset') \
-            .annotate(ip=F('asset__ip')) \
-            .annotate(asset_name=F('asset__name'))
+        queryset = queryset.prefetch_related('asset')
         return queryset
 
 

@@ -21,6 +21,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
                 ('id', models.UUIDField(db_index=True, default=uuid.uuid4)),
+                ('name', models.CharField(max_length=128, verbose_name='Name')),
                 ('username', models.CharField(blank=True, db_index=True, max_length=128, verbose_name='Username')),
                 ('password', common.db.fields.EncryptCharField(blank=True, max_length=256, null=True, verbose_name='Password')),
                 ('private_key', common.db.fields.EncryptTextField(blank=True, null=True, verbose_name='SSH private key')),
@@ -38,6 +39,7 @@ class Migration(migrations.Migration):
                 ('history_type', models.CharField(choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')], max_length=1)),
                 ('asset', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='assets.asset', verbose_name='Asset')),
                 ('history_user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
+                ('su_from', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='assets.account', verbose_name='Su from')),
             ],
             options={
                 'verbose_name': 'historical Account',
@@ -52,6 +54,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
+                ('name', models.CharField(max_length=128, verbose_name='Name')),
                 ('username', models.CharField(blank=True, db_index=True, max_length=128, verbose_name='Username')),
                 ('password', common.db.fields.EncryptCharField(blank=True, max_length=256, null=True, verbose_name='Password')),
                 ('private_key', common.db.fields.EncryptTextField(blank=True, null=True, verbose_name='SSH private key')),
@@ -63,12 +66,13 @@ class Migration(migrations.Migration):
                 ('created_by', models.CharField(max_length=128, null=True, verbose_name='Created by')),
                 ('privileged', models.BooleanField(default=False, verbose_name='Privileged account')),
                 ('version', models.IntegerField(default=0, verbose_name='Version')),
-                ('asset', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='assets.asset', verbose_name='Asset')),
+                ('asset', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='accounts', to='assets.asset', verbose_name='Asset')),
+                ('su_from', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='su_to', to='assets.account', verbose_name='Su from')),
             ],
             options={
                 'verbose_name': 'Account',
                 'permissions': [('view_accountsecret', 'Can view asset account secret'), ('change_accountsecret', 'Can change asset account secret'), ('view_historyaccount', 'Can view asset history account'), ('view_historyaccountsecret', 'Can view asset history account secret')],
-                'unique_together': {('username', 'asset')},
+                'unique_together': {('username', 'asset'), ('name', 'asset')},
             },
         ),
     ]

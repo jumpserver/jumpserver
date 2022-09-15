@@ -8,8 +8,8 @@ __all__ = ['AccountFieldsSerializerMixin']
 class AccountFieldsSerializerMixin(serializers.ModelSerializer):
     class Meta:
         fields_mini = [
-            'id', 'name', 'username', 'privileged', 'ip',
-            'asset_name', 'platform', 'version'
+            'id', 'name', 'username', 'privileged',
+            'platform', 'version'
         ]
         fields_write_only = ['password', 'private_key', 'public_key', 'passphrase']
         fields_other = ['date_created', 'date_updated', 'comment']

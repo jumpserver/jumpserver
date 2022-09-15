@@ -38,18 +38,19 @@ class Category(PlatformMixin, ChoicesMixin, models.TextChoices):
         return {
             cls.HOST: {
                 'domain_enabled': True,
-                'su_enabled': True,
-                'ping_enabled': True,
-                'gather_facts_enabled': True,
-                'verify_account_enabled': True,
-                'change_password_enabled': True,
-                'create_account_enabled': True,
-                'gather_accounts_enabled': True,
-                '_protocols': ['ssh', 'sftp']
+                'su_enabled': True, 'su_method': 'sudo',
+                'ping_enabled': True, 'ping_method': 'ping',
+                'gather_facts_enabled': True, 'gather_facts_method': 'gather_facts_posix',
+                'verify_account_enabled': True, 'verify_account_method': 'verify_account_posix',
+                'change_password_enabled': True, 'change_password_method': 'change_password_posix',
+                'create_account_enabled': True, 'create_account_method': 'create_account_posix',
+                'gather_accounts_enabled': True, 'gather_accounts_method': 'gather_accounts_posix',
+                '_protocols': ['ssh', 'telnet'],
             },
             cls.NETWORKING: {
                 'domain_enabled': True,
                 'su_enabled': False,
+                'ping_enabled': True, 'ping_method': 'ping',
                 'gather_facts_enabled': False,
                 'verify_account_enabled': False,
                 'change_password_enabled': False,
@@ -65,15 +66,28 @@ class Category(PlatformMixin, ChoicesMixin, models.TextChoices):
                 'change_password_enabled': True,
                 'create_account_enabled': True,
                 'gather_accounts_enabled': True,
+                '_protocols': []
             },
             cls.WEB: {
                 'domain_enabled': False,
                 'su_enabled': False,
+                'ping_enabled': False,
+                'gather_facts_enabled': False,
+                'verify_account_enabled': False,
+                'change_password_enabled': False,
+                'create_account_enabled': False,
+                'gather_accounts_enabled': False,
                 '_protocols': ['http', 'https']
             },
             cls.CLOUD: {
                 'domain_enabled': False,
                 'su_enabled': False,
+                'ping_enabled': False,
+                'gather_facts_enabled': False,
+                'verify_account_enabled': False,
+                'change_password_enabled': False,
+                'create_account_enabled': False,
+                'gather_accounts_enabled': False,
                 '_protocols': []
             }
         }
@@ -83,9 +97,6 @@ class HostTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
     LINUX = 'linux', 'Linux'
     WINDOWS = 'windows', 'Windows'
     UNIX = 'unix', 'Unix'
-    BSD = 'bsd', 'BSD'
-    MACOS = 'macos', 'MacOS'
-    MAINFRAME = 'mainframe', _("Mainframe")
     OTHER_HOST = 'other_host', _("Other host")
 
     @classmethod
@@ -95,20 +106,26 @@ class HostTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
                 '_protocols': ['ssh', 'rdp', 'vnc', 'telnet']
             },
             cls.WINDOWS: {
-                '_protocols': ['ssh', 'rdp', 'vnc'],
+                'gather_facts_method': 'gather_facts_windows',
+                'verify_account_method': 'verify_account_windows',
+                'change_password_method': 'change_password_windows',
+                'create_account_method': 'create_account_windows',
+                'gather_accounts_method': 'gather_accounts_windows',
+                '_protocols': ['rdp', 'ssh', 'vnc'],
                 'su_enabled': False
             },
-            cls.MACOS: {
+            cls.UNIX: {
                 '_protocols': ['ssh', 'vnc']
             }
         }
 
 
 class NetworkingTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
+    GENERAL = 'general', _("General device")
     SWITCH = 'switch', _("Switch")
     ROUTER = 'router', _("Router")
     FIREWALL = 'firewall', _("Firewall")
-    OTHER_NETWORK = 'other_network', _("Other device")
+    OTHER_NETWORK = 'other', _("Other device")
 
 
 class DatabaseTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
@@ -125,7 +142,12 @@ class DatabaseTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
         meta = {}
         for name, label in cls.choices:
             meta[name] = {
-                '_protocols': [name]
+                '_protocols': [name],
+                'gather_facts_method': f'gather_facts_{name}',
+                'verify_account_method': f'verify_account_{name}',
+                'change_password_method': f'change_password_{name}',
+                'create_account_method': f'create_account_{name}',
+                'gather_accounts_method': f'gather_accounts_{name}',
             }
         return meta
 
