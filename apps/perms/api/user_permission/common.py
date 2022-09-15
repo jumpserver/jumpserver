@@ -3,6 +3,7 @@
 import uuid
 import time
 
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from rest_framework.views import APIView, Response
@@ -20,6 +21,7 @@ from common.utils import get_logger, lazyproperty
 
 from perms.hands import User, Asset
 from perms import serializers
+from perms.models import AssetPermission
 
 logger = get_logger(__name__)
 
@@ -28,6 +30,8 @@ __all__ = [
     'ValidateUserAssetPermissionApi',
     'GetUserAssetPermissionActionsApi',
     'MyGrantedAssetSystemUsersApi',
+    'UserGrantedAssetAccounts',
+    'MyGrantedAssetAccounts',
 ]
 
 
@@ -138,3 +142,37 @@ class MyGrantedAssetSystemUsersApi(UserGrantedAssetSystemUsersForAdminApi):
     def user(self):
         return self.request.user
 
+
+class UserGrantedAssetAccounts(ListAPIView):
+    serializer_class = serializers.AccountsGrantedSerializer
+    rbac_perms = {
+        'list': 'perms.view_userassets'
+    }
+
+    @lazyproperty
+    def user(self):
+        user_id = self.kwargs.get('pk')
+        return User.objects.get(id=user_id)
+
+    @lazyproperty
+    def asset(self):
+        asset_id = self.kwargs.get('asset_id')
+        kwargs = {'id': asset_id, 'is_active': True}
+        asset = get_object_or_404(Asset, **kwargs)
+        return asset
+
+    def get_queryset(self):
+        # 获取用户-资产的授权规则
+        assetperms = AssetPermission.filter_permissions(self.user, self.asset)
+        account_names = AssetPermission.get_account_names(assetperms)
+        accounts = self.asset.filter_accounts(account_names)
+        # 构造默认包含的账号，如: @INPUT @USER
+        return accounts
+
+
+class MyGrantedAssetAccounts(UserGrantedAssetAccounts):
+    permission_classes = (IsValidUser,)
+
+    @lazyproperty
+    def user(self):
+        return self.request.user

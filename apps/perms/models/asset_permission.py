@@ -1,16 +1,16 @@
 import uuid
 import logging
+from functools import reduce
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.db.models import F, Q, TextChoices
 
-from assets.models import Asset, Node, FamilyMixin
+from assets.models import Asset, Node, FamilyMixin, Account
 from orgs.mixins.models import OrgModelMixin
 from orgs.mixins.models import OrgManager
 from common.utils import lazyproperty, date_expired_default
 from common.db.models import BaseCreateUpdateModel, BitOperationChoice, UnionQuerySet
-
 
 __all__ = [
     'AssetPermission', 'PermNode',
@@ -85,26 +85,38 @@ class AssetPermissionManager(OrgManager):
 class AssetPermission(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
-    users = models.ManyToManyField('users.User', blank=True, verbose_name=_("User"), related_name='%(class)ss')
-    user_groups = models.ManyToManyField('users.UserGroup', blank=True, verbose_name=_("User group"), related_name='%(class)ss')
-    assets = models.ManyToManyField('assets.Asset', related_name='granted_by_permissions', blank=True, verbose_name=_("Asset"))
-    nodes = models.ManyToManyField('assets.Node', related_name='granted_by_permissions', blank=True, verbose_name=_("Nodes"))
+    users = models.ManyToManyField('users.User', blank=True, verbose_name=_("User"),
+                                   related_name='%(class)ss')
+    user_groups = models.ManyToManyField('users.UserGroup', blank=True,
+                                         verbose_name=_("User group"), related_name='%(class)ss')
+    assets = models.ManyToManyField('assets.Asset', related_name='granted_by_permissions',
+                                    blank=True, verbose_name=_("Asset"))
+    nodes = models.ManyToManyField('assets.Node', related_name='granted_by_permissions', blank=True,
+                                   verbose_name=_("Nodes"))
     # 只保存 @ALL (@INPUT @USER 默认包含，将来在全局设置中进行控制)
     # 特殊的账号描述
     # ['@ALL',]
     # 指定账号授权
     # ['web', 'root',]
     accounts = models.JSONField(default=list, verbose_name=_("Accounts"))
-    actions = models.IntegerField(choices=Action.DB_CHOICES, default=Action.ALL, verbose_name=_("Actions"))
+    actions = models.IntegerField(choices=Action.DB_CHOICES, default=Action.ALL,
+                                  verbose_name=_("Actions"))
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
-    date_start = models.DateTimeField(default=timezone.now, db_index=True, verbose_name=_("Date start"))
-    date_expired = models.DateTimeField(default=date_expired_default, db_index=True, verbose_name=_('Date expired'))
+    date_start = models.DateTimeField(default=timezone.now, db_index=True,
+                                      verbose_name=_("Date start"))
+    date_expired = models.DateTimeField(default=date_expired_default, db_index=True,
+                                        verbose_name=_('Date expired'))
     created_by = models.CharField(max_length=128, blank=True, verbose_name=_('Created by'))
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
     from_ticket = models.BooleanField(default=False, verbose_name=_('From ticket'))
     comment = models.TextField(verbose_name=_('Comment'), blank=True)
 
     objects = AssetPermissionManager.from_queryset(AssetPermissionQuerySet)()
+
+    class SpecialAccount(models.TextChoices):
+        ALL = '@ALL', 'All'
+        INPUT = '@INPUT',  'Input'
+        USER = '@USER', 'User'
 
     class Meta:
         unique_together = [('org_id', 'name')]
@@ -174,14 +186,17 @@ class AssetPermission(OrgModelMixin):
             models.Prefetch('assets', queryset=Asset.objects.all().only('id')),
         ).order_by()
 
-    def get_all_assets(self):
+    def get_all_assets(self, flat=False):
         from assets.models import Node
         nodes_keys = self.nodes.all().values_list('key', flat=True)
         asset_ids = set(self.assets.all().values_list('id', flat=True))
         nodes_asset_ids = Node.get_nodes_all_asset_ids_by_keys(nodes_keys)
         asset_ids.update(nodes_asset_ids)
-        assets = Asset.objects.filter(id__in=asset_ids)
-        return assets
+        if flat:
+            return asset_ids
+        else:
+            assets = Asset.objects.filter(id__in=asset_ids)
+            return assets
 
     def users_display(self):
         names = [user.username for user in self.users.all()]
@@ -199,6 +214,94 @@ class AssetPermission(OrgModelMixin):
         names = [node.full_value for node in self.nodes.all()]
         return names
 
+    def get_asset_accounts(self):
+        asset_ids = self.get_all_assets(flat=True)
+        queries = Q(asset_id__in=asset_ids) \
+                  & (Q(username__in=self.accounts) | Q(name__in=self.accounts))
+        accounts = Account.objects.filter(queries)
+        return accounts
+
+    @classmethod
+    def get_account_names(cls, perms):
+        account_names = set()
+        for perm in perms:
+            perm: cls
+            if not isinstance(perm.accounts, list):
+                continue
+            account_names.update(perm.accounts)
+        return account_names
+
+    @classmethod
+    def filter_permissions(cls, user=None, asset=None, account=None):
+        """ 获取同时包含 用户-资产-账号 的授权规则 """
+        assetperm_ids = []
+        if user:
+            user_assetperm_ids = cls.filter_permissions_by_user(user, flat=True)
+            assetperm_ids.append(user_assetperm_ids)
+        if asset:
+            asset_assetperm_ids = cls.filter_permissions_by_asset(asset, flat=True)
+            assetperm_ids.append(asset_assetperm_ids)
+        if account:
+            account_assetperm_ids = cls.filter_permissions_by_account(account, flat=True)
+            assetperm_ids.append(account_assetperm_ids)
+        # & 是同时满足，比如有用户，但是用户的规则是空，那么返回也应该是空
+        assetperm_ids = list(reduce(lambda x, y: set(x) & set(y), assetperm_ids))
+        assetperms = cls.objects.filter(id__in=assetperm_ids).valid().order_by('-date_expired')
+        return assetperms
+
+    @classmethod
+    def filter_permissions_by_user(cls, user, with_group=True, flat=False):
+        assetperm_ids = set()
+        user_assetperm_ids = AssetPermission.users.through.objects \
+            .filter(user_id=user.id) \
+            .values_list('assetpermission_id', flat=True) \
+            .distinct()
+        assetperm_ids.update(user_assetperm_ids)
+
+        if with_group:
+            usergroup_ids = user.get_groups(flat=True)
+            usergroups_assetperm_id = AssetPermission.user_groups.through.objects \
+                .filter(usergroup_id__in=usergroup_ids) \
+                .values_list('assetpermission_id', flat=True) \
+                .distinct()
+            assetperm_ids.update(usergroups_assetperm_id)
+
+        if flat:
+            return assetperm_ids
+        else:
+            assetperms = cls.objects.filter(id__in=assetperm_ids).valid()
+            return assetperms
+
+    @classmethod
+    def filter_permissions_by_asset(cls, asset, with_node=True, flat=False):
+        assetperm_ids = set()
+        asset_assetperm_ids = AssetPermission.assets.through.objects \
+            .filter(asset_id=asset.id) \
+            .values_list('assetpermission_id', flat=True)
+        assetperm_ids.update(asset_assetperm_ids)
+
+        if with_node:
+            node_ids = asset.get_all_nodes(flat=True)
+            node_assetperm_ids = AssetPermission.nodes.through.objects \
+                .filter(node_id__in=node_ids) \
+                .values_list('assetpermission_id', flat=True)
+            assetperm_ids.update(node_assetperm_ids)
+
+        if flat:
+            return assetperm_ids
+        else:
+            assetperms = cls.objects.filter(id__in=assetperm_ids).valid()
+            return assetperms
+
+    @classmethod
+    def filter_permissions_by_account(cls, account, flat=False):
+        assetperms = cls.objects.filter(accounts__contains=account).valid()
+        if flat:
+            assetperm_ids = assetperms.values_list('id', flat=True)
+            return assetperm_ids
+        else:
+            return assetperms
+
 
 class UserAssetGrantedTreeNodeRelation(OrgModelMixin, FamilyMixin, BaseCreateUpdateModel):
     class NodeFrom(TextChoices):
@@ -210,7 +313,8 @@ class UserAssetGrantedTreeNodeRelation(OrgModelMixin, FamilyMixin, BaseCreateUpd
     node = models.ForeignKey('assets.Node', default=None, on_delete=models.CASCADE,
                              db_constraint=False, null=False, related_name='granted_node_rels')
     node_key = models.CharField(max_length=64, verbose_name=_("Key"), db_index=True)
-    node_parent_key = models.CharField(max_length=64, default='', verbose_name=_('Parent key'), db_index=True)
+    node_parent_key = models.CharField(max_length=64, default='', verbose_name=_('Parent key'),
+                                       db_index=True)
     node_from = models.CharField(choices=NodeFrom.choices, max_length=16, db_index=True)
     node_assets_amount = models.IntegerField(default=0)
 
@@ -297,4 +401,3 @@ class PermedAsset(Asset):
             ('view_userassets', _('Can view user assets')),
             ('view_usergroupassets', _('Can view usergroup assets')),
         ]
-
