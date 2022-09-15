@@ -10,12 +10,13 @@ from .common import AccountFieldsSerializerMixin
 class AccountTemplateSerializer(AuthValidateMixin, BulkOrgResourceModelSerializer):
     class Meta:
         model = AccountTemplate
-        fields_mini = ['id', 'privileged', 'username']
+        fields_mini = ['id', 'name', 'username', 'privileged']
         fields_write_only = AccountFieldsSerializerMixin.Meta.fields_write_only
         fields_other = AccountFieldsSerializerMixin.Meta.fields_other
         fields = fields_mini + fields_write_only + fields_other
         extra_kwargs = {
             'username': {'required': True},
+            'name': {'required': True},
             'private_key': {'write_only': True},
             'public_key': {'write_only': True},
         }

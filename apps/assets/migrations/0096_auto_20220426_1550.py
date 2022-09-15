@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
             bases=('assets.asset',),
         ),
         migrations.CreateModel(
-            name='Networking',
+            name='Device',
             fields=[
                 ('asset_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='assets.asset')),
             ],

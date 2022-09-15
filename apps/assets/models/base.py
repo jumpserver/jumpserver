@@ -62,7 +62,7 @@ class BaseAccount(OrgModelMixin):
     private_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH private key'))
     public_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH public key'))
     token = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Token'))
-    privileged = models.BooleanField(verbose_name=_("Privileged account"), default=False)
+    privileged = models.BooleanField(verbose_name=_("Privileged"), default=False)
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))

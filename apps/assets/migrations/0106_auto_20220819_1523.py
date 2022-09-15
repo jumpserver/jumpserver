@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                 ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
                 ('created_by', models.CharField(max_length=128, null=True, verbose_name='Created by')),
                 ('token', common.db.fields.EncryptTextField(blank=True, null=True, verbose_name='Token')),
-                ('privileged', models.BooleanField(default=False, verbose_name='Privileged account')),
+                ('privileged', models.BooleanField(default=False, verbose_name='Privileged')),
             ],
             options={
                 'verbose_name': 'Account template',

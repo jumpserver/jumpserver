@@ -6,7 +6,7 @@ from common.tree import TreeNode
 
 
 __all__ = [
-    'Category', 'HostTypes', 'NetworkingTypes', 'DatabaseTypes',
+    'Category', 'HostTypes', 'DeviceTypes', 'DatabaseTypes',
     'WebTypes', 'CloudTypes', 'Protocol', 'AllTypes',
 ]
 
@@ -17,7 +17,7 @@ class PlatformMixin:
         return {
             'domain_enabled': False,
             'su_enabled': False,
-            'vendor_enabled': False,
+            'brand_enabled': False,
             'ping_enabled': False,
             'gather_facts_enabled': False,
             'change_password_enabled': False,
@@ -30,9 +30,9 @@ class PlatformMixin:
 
 class Category(PlatformMixin, ChoicesMixin, models.TextChoices):
     HOST = 'host', _('Host')
-    NETWORKING = 'networking', _("NetworkDevice")
+    DEVICE = 'device', _("Device")
     DATABASE = 'database', _("Database")
-    CLOUD = 'cloud', _("Clouding")
+    CLOUD = 'cloud', _("Cloud service")
     WEB = 'web', _("Web")
 
     @classmethod
@@ -49,7 +49,7 @@ class Category(PlatformMixin, ChoicesMixin, models.TextChoices):
                 'gather_accounts_enabled': True, 'gather_accounts_method': 'gather_accounts_posix',
                 '_protocols': ['ssh', 'telnet'],
             },
-            cls.NETWORKING: {
+            cls.DEVICE: {
                 'domain_enabled': True,
                 'brand_enabled': True,
                 'brands': [
@@ -108,7 +108,7 @@ class HostTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
     LINUX = 'linux', 'Linux'
     WINDOWS = 'windows', 'Windows'
     UNIX = 'unix', 'Unix'
-    OTHER_HOST = 'other_host', _("Other host")
+    OTHER_HOST = 'other', _("Other")
 
     @classmethod
     def platform_constraints(cls):
@@ -131,7 +131,7 @@ class HostTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
         }
 
 
-class NetworkingTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
+class DeviceTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
     GENERAL = 'general', _("General device")
     SWITCH = 'switch', _("Switch")
     ROUTER = 'router', _("Router")
@@ -163,7 +163,7 @@ class DatabaseTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
 
 
 class WebTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
-    WEBSITE = 'website', _('General Website')
+    WEBSITE = 'website', _('General website')
 
 
 class CloudTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
@@ -181,7 +181,7 @@ class CloudTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
 class AllTypes(ChoicesMixin, metaclass=IncludesTextChoicesMeta):
     choices: list
     includes = [
-        HostTypes, NetworkingTypes, DatabaseTypes,
+        HostTypes, DeviceTypes, DatabaseTypes,
         WebTypes, CloudTypes
     ]
 
@@ -210,7 +210,7 @@ class AllTypes(ChoicesMixin, metaclass=IncludesTextChoicesMeta):
     def category_types(cls):
         return (
             (Category.HOST, HostTypes),
-            (Category.NETWORKING, NetworkingTypes),
+            (Category.DEVICE, DeviceTypes),
             (Category.DATABASE, DatabaseTypes),
             (Category.WEB, WebTypes),
             (Category.CLOUD, CloudTypes)

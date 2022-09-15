@@ -38,6 +38,8 @@ class PlatformAutomationSerializer(serializers.ModelSerializer):
             'gather_accounts_enabled', 'gather_accounts_method',
         ]
         extra_kwargs = {
+            'ping_enabled': {'label': '启用资产探测'},
+            'ping_method': {'label': '探测方式'},
             'gather_facts_enabled': {'label': '启用收集信息'},
             'gather_facts_method': {'label': '收集信息方式'},
             'verify_account_enabled': {'label': '启用校验账号'},
@@ -82,6 +84,7 @@ class PlatformSerializer(JMSWritableNestedModelSerializer):
         ]
         extra_kwargs = {
             'su_enabled': {'label': '启用切换账号'},
+            'protocols_enabled': {'label': '启用协议'},
             'domain_enabled': {'label': "启用网域"},
             'domain_default': {'label': "默认网域"},
         }

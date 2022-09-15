@@ -1,13 +1,13 @@
 
 from assets.serializers import HostSerializer
-from assets.models import Networking
+from assets.models import Device
 from .asset import AssetViewSet
 
-__all__ = ['NetworkViewSet']
+__all__ = ['DeviceViewSet']
 
 
-class NetworkViewSet(AssetViewSet):
-    model = Networking
+class DeviceViewSet(AssetViewSet):
+    model = Device
 
     def get_serializer_classes(self):
         serializer_classes = super().get_serializer_classes()

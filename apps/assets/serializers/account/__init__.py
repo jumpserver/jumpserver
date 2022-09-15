@@ -1,3 +1,3 @@
 from .account import *
-from .account_history import *
-from .account_template import *
+from .history import *
+from .template import *
