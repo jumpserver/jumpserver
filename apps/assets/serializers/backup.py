@@ -7,8 +7,6 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ops.mixin import PeriodTaskSerializerMixin
 from common.utils import get_logger
 
-from .base import TypesField
-
 from ..models import AccountBackupPlan, AccountBackupPlanExecution
 
 logger = get_logger(__file__)
@@ -17,14 +15,12 @@ __all__ = ['AccountBackupPlanSerializer', 'AccountBackupPlanExecutionSerializer'
 
 
 class AccountBackupPlanSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSerializer):
-    types = TypesField(required=False, allow_null=True, label=_("Actions"))
-
     class Meta:
         model = AccountBackupPlan
         fields = [
             'id', 'name', 'is_periodic', 'interval', 'crontab', 'date_created',
             'date_updated', 'created_by', 'periodic_display', 'comment',
-            'recipients', 'types'
+            'recipients', 'categories'
         ]
         extra_kwargs = {
             'name': {'required': True},
