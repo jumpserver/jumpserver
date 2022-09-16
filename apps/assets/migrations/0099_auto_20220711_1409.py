@@ -39,7 +39,6 @@ class Migration(migrations.Migration):
                 ('history_type', models.CharField(choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')], max_length=1)),
                 ('asset', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='assets.asset', verbose_name='Asset')),
                 ('history_user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
-                ('su_from', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='assets.account', verbose_name='Su from')),
             ],
             options={
                 'verbose_name': 'historical Account',
@@ -67,12 +66,21 @@ class Migration(migrations.Migration):
                 ('privileged', models.BooleanField(default=False, verbose_name='Privileged')),
                 ('version', models.IntegerField(default=0, verbose_name='Version')),
                 ('asset', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='accounts', to='assets.asset', verbose_name='Asset')),
-                ('su_from', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='su_to', to='assets.account', verbose_name='Su from')),
             ],
             options={
                 'verbose_name': 'Account',
                 'permissions': [('view_accountsecret', 'Can view asset account secret'), ('change_accountsecret', 'Can change asset account secret'), ('view_historyaccount', 'Can view asset history account'), ('view_historyaccountsecret', 'Can view asset history account secret')],
                 'unique_together': {('username', 'asset'), ('name', 'asset')},
             },
+        ),
+        migrations.AddField(
+            model_name='account',
+            name='su_from',
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='su_to', to='assets.account', verbose_name='Su from'),
+        ),
+        migrations.AddField(
+            model_name='historicalaccount',
+            name='su_from',
+            field=models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='assets.account', verbose_name='Su from'),
         ),
     ]

@@ -36,9 +36,20 @@ def update_internal_platforms(platform_model):
             'change_password_method': 'change_password_aix',
         },
         {'name': 'Windows', 'category': 'host', 'type': 'windows'},
-        {'name': 'Windows-TLS', 'category': 'host', 'type': 'windows'},
-        {'name': 'Windows-RDP', 'category': 'host', 'type': 'windows'},
-
+        {
+            'name': 'Windows-TLS', 'category': 'host', 'type': 'windows',
+            'protocols': [
+                {'name': 'rdp', 'port': 3389, 'setting': {'security': 'tls'}},
+                {'name': 'ssh', 'port': 22},
+            ]
+        },
+        {
+            'name': 'Windows-RDP', 'category': 'host', 'type': 'windows',
+            'protocols': [
+                {'name': 'rdp', 'port': 3389, 'setting': {'security': 'rdp'}},
+                {'name': 'ssh', 'port': 22},
+            ]
+        },
         # 数据库
         {'name': 'MySQL', 'category': 'database', 'type': 'mysql'},
         {'name': 'PostgreSQL', 'category': 'database', 'type': 'postgresql'},
@@ -48,10 +59,10 @@ def update_internal_platforms(platform_model):
         {'name': 'Redis', 'category': 'database', 'type': 'redis'},
 
         # 网络设备
-        {'name': 'Generic', 'category': 'networking', 'type': 'general'},
-        {'name': 'Huawei', 'category': 'networking', 'type': 'general'},
-        {'name': 'Cisco', 'category': 'networking', 'type': 'general'},
-        {'name': 'H3C', 'category': 'networking', 'type': 'general'},
+        {'name': 'Generic', 'category': 'networking', 'type': 'general', 'brand': 'other'},
+        {'name': 'Huawei', 'category': 'networking', 'type': 'general', 'brand': 'huawei'},
+        {'name': 'Cisco', 'category': 'networking', 'type': 'general', 'brand': 'cisco'},
+        {'name': 'H3C', 'category': 'networking', 'type': 'general', 'brand': 'h3c'},
 
         # Web
 

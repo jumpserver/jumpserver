@@ -9,19 +9,16 @@ def migrate_to_host(apps, schema_editor):
     host_model = apps.get_model("assets", 'Host')
     db_alias = schema_editor.connection.alias
 
-    created = 0
+    count = 0
     batch_size = 1000
 
     while True:
-        start = created
-        end = created + batch_size
-        assets = asset_model.objects.using(db_alias).all()[start:end]
+        assets = asset_model.objects.using(db_alias).all()[count:count+batch_size]
         if not assets:
             break
-
+        count += len(assets)
         hosts = [host_model(asset_ptr=asset) for asset in assets]
         host_model.objects.using(db_alias).bulk_create(hosts, ignore_conflicts=True)
-        created += len(hosts)
 
 
 def migrate_hardware_info(apps, *args):
@@ -36,15 +33,14 @@ def migrate_hardware_info(apps, *args):
     ]
 
     while True:
-        start = count
-        end = count + batch_size
-        assets = asset_model.objects.all()[start:end]
+        assets = asset_model.objects.all()[count:count+batch_size]
         if not assets:
             break
+        count += len(assets)
 
         updated = []
         for asset in assets:
-            info = {getattr(asset, field) for field in hardware_fields if getattr(asset, field)}
+            info = {field: getattr(asset, field) for field in hardware_fields if getattr(asset, field)}
             if not info:
                 continue
             asset.info = info

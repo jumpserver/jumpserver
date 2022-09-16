@@ -2,7 +2,7 @@
   vars:
     connection_type: ssh
     password:
-      value: {{ password}}
+      value: {{ password }}
     public_key:
       value: {{ jms_key }}
       exclusive: {{ exclusive }}
