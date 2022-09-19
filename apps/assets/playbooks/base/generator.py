@@ -4,10 +4,11 @@ import shutil
 from typing import List
 
 from django.conf import settings
+
 from assets.models import Asset
 
 
-class BaseGeneratePlaybook:
+class BaseRunner:
     src_filepath: str
 
     def __init__(self, assets: List[Asset], strategy):

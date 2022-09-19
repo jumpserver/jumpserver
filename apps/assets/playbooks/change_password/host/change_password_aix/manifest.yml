@@ -1,0 +1,6 @@
+id: change_password_aix
+name: Change password for AIX
+category: host
+type:
+  - aix
+method: change_password

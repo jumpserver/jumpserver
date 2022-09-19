@@ -16,6 +16,7 @@ class PlatformMixin:
     def platform_constraints(cls):
         return {
             'domain_enabled': False,
+            'url_enabled': False,
             'su_enabled': False,
             'brand_enabled': False,
             'ping_enabled': False,
@@ -88,7 +89,7 @@ class Category(PlatformMixin, ChoicesMixin, models.TextChoices):
                 'change_password_enabled': False,
                 'create_account_enabled': False,
                 'gather_accounts_enabled': False,
-                '_protocols': ['http', 'https']
+                '_protocols': ['http']
             },
             cls.CLOUD: {
                 'domain_enabled': False,
@@ -168,12 +169,16 @@ class WebTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
 
 class CloudTypes(PlatformMixin, ChoicesMixin, models.TextChoices):
     K8S = 'k8s', 'Kubernetes'
+    VSPHERE = 'vsphere', 'VMware vSphere'
 
     @classmethod
     def platform_constraints(cls):
         return {
             cls.K8S: {
                 '_protocols': ['k8s']
+            },
+            cls.VSPHERE: {
+                '_protocols': ['vsphere']
             }
         }
 

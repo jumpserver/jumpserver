@@ -1,0 +1,6 @@
+id: change_password_postgresql
+name: Change password for PostgreSQL
+category: database
+type:
+  - postgresql
+method: change_password

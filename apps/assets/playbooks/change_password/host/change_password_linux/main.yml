@@ -1,0 +1,8 @@
+- hosts: all
+  vars:
+    account:
+      username: {{ account.username }}
+      password: {{ account.password }}
+      public_key: {{ account.public_key }}
+  roles:
+    - change_password

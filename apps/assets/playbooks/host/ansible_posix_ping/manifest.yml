@@ -1,0 +1,10 @@
+id: ansible_posix_ping
+name: Ansible posix ping
+description: Ansible ping
+category: host
+type:
+  - linux
+  - unix
+  - macos
+  - bsd
+method: verify_account

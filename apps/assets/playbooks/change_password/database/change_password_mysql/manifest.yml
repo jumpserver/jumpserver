@@ -1,0 +1,6 @@
+id: change_password_mysql
+name: Change password for MySQL
+category: database
+type:
+  - mysql
+method: change_password

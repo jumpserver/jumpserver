@@ -1,0 +1,8 @@
+id: change_password_sqlserver
+name: Change password for SQLServer
+version: 1
+category: database
+type:
+  - sqlserver
+method: change_password
+

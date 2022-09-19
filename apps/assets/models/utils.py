@@ -59,14 +59,17 @@ def update_internal_platforms(platform_model):
         {'name': 'Redis', 'category': 'database', 'type': 'redis'},
 
         # 网络设备
-        {'name': 'Generic', 'category': 'networking', 'type': 'general', 'brand': 'other'},
-        {'name': 'Huawei', 'category': 'networking', 'type': 'general', 'brand': 'huawei'},
-        {'name': 'Cisco', 'category': 'networking', 'type': 'general', 'brand': 'cisco'},
-        {'name': 'H3C', 'category': 'networking', 'type': 'general', 'brand': 'h3c'},
+        {'name': 'Generic', 'category': 'device', 'type': 'general', 'brand': 'other'},
+        {'name': 'Huawei', 'category': 'device', 'type': 'general', 'brand': 'huawei'},
+        {'name': 'Cisco', 'category': 'device', 'type': 'general', 'brand': 'cisco'},
+        {'name': 'H3C', 'category': 'device', 'type': 'general', 'brand': 'h3c'},
 
         # Web
+        {'name': 'Website', 'category': 'web', 'type': 'general'},
 
         # Cloud
+        {'name': 'Kubernetes', 'category': 'cloud', 'type': 'k8s'},
+        {'name': 'VMware vSphere', 'category': 'cloud', 'type': 'vsphere'},
     ]
 
     platforms = platform_model.objects.all()
