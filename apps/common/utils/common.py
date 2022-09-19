@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 import re
-import socket
 from django.templatetags.static import static
 from collections import OrderedDict
 from itertools import chain

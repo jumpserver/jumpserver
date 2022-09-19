@@ -74,7 +74,7 @@ def test_user_connectivity(task_name, asset, username, password=None, private_ke
 @org_aware_func("account")
 def test_account_connectivity_util(account, task_name):
     """
-    :param account: <AuthBook>对象
+    :param account: <Account>对象
     :param task_name:
     :return:
     """
@@ -101,7 +101,7 @@ def test_account_connectivity_util(account, task_name):
 @shared_task(queue="ansible")
 def test_accounts_connectivity_manual(accounts):
     """
-    :param accounts: <AuthBook>对象
+    :param accounts: <Account>对象
     """
     for account in accounts:
         task_name = gettext_noop("Test account connectivity: ") + str(account)

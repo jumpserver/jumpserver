@@ -1,45 +1,19 @@
-from django_filters import rest_framework as filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView
 
 from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
-from common.drf.filters import BaseFilterSet, UUIDInFilter
+
 from common.mixins import RecordViewLogMixin
 from common.permissions import UserConfirmation
 from authentication.const import ConfirmType
+from assets.models import Account
+from assets.filters import AccountFilterSet
 from assets.tasks.account_connectivity import test_accounts_connectivity_manual
-from assets.models import Account, Node
 from assets import serializers
 
-__all__ = ['AccountFilterSet', 'AccountViewSet', 'AccountSecretsViewSet', 'AccountTaskCreateAPI']
-
-
-class AccountFilterSet(BaseFilterSet):
-    ip = filters.CharFilter(field_name='ip', lookup_expr='exact')
-    hostname = filters.CharFilter(field_name='name', lookup_expr='exact')
-    username = filters.CharFilter(field_name="username", lookup_expr='exact')
-    assets = UUIDInFilter(field_name='asset_id', lookup_expr='in')
-    nodes = UUIDInFilter(method='filter_nodes')
-
-    def filter_nodes(self, queryset, name, value):
-        nodes = Node.objects.filter(id__in=value)
-        if not nodes:
-            return queryset
-
-        node_qs = Node.objects.none()
-        for node in nodes:
-            node_qs |= node.get_all_children(with_self=True)
-        node_ids = list(node_qs.values_list('id', flat=True))
-        queryset = queryset.filter(asset__nodes__in=node_ids)
-        return queryset
-
-    class Meta:
-        model = Account
-        fields = [
-            'asset', 'id'
-        ]
+__all__ = ['AccountViewSet', 'AccountSecretsViewSet', 'AccountTaskCreateAPI']
 
 
 class AccountViewSet(OrgBulkModelViewSet):
@@ -52,7 +26,7 @@ class AccountViewSet(OrgBulkModelViewSet):
         'verify': serializers.AssetTaskSerializer
     }
     rbac_perms = {
-        'verify': 'assets.test_authbook',
+        'verify': 'assets.test_account',
         'partial_update': 'assets.change_assetaccountsecret',
     }
 

@@ -1,4 +1,3 @@
-from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
@@ -21,20 +20,20 @@ class AccountSerializerCreateMixin(serializers.ModelSerializer):
 
     @staticmethod
     def validate_template(value):
-        AccountTemplate.objects.get_or_create()
-        model = AccountTemplate
         try:
-            return model.objects.get(id=value)
+            return AccountTemplate.objects.get(id=value)
         except AccountTemplate.DoesNotExist:
             raise serializers.ValidationError(_('Account template not found'))
 
     @staticmethod
     def replace_attrs(account_template: AccountTemplate, attrs: dict):
         exclude_fields = [
-            '_state', 'org_id', 'date_verified', 'id',
-            'date_created', 'date_updated', 'created_by'
+            '_state', 'org_id', 'id', 'date_created', 'date_updated'
         ]
-        template_attrs = {k: v for k, v in account_template.__dict__.items() if k not in exclude_fields}
+        template_attrs = {
+            k: v for k, v in account_template.__dict__.items()
+            if k not in exclude_fields
+        }
         for k, v in template_attrs.items():
             attrs.setdefault(k, v)
 
@@ -48,17 +47,19 @@ class AccountSerializerCreateMixin(serializers.ModelSerializer):
     def create(self, validated_data):
         instance = super().create(validated_data)
         if self.push_now:
-            print("Start push account to asset")
             # Todo: push it
-            pass
+            print("Start push account to asset")
         return instance
 
 
-class AccountSerializer(AuthValidateMixin,
-                        AccountSerializerCreateMixin,
-                        AccountFieldsSerializerMixin,
-                        BulkOrgResourceModelSerializer):
-    asset = ObjectRelatedField(required=False, queryset=Asset.objects, label=_('Asset'), attrs=('id', 'name', 'ip'))
+class AccountSerializer(
+    AuthValidateMixin, AccountSerializerCreateMixin,
+    AccountFieldsSerializerMixin, BulkOrgResourceModelSerializer
+):
+    asset = ObjectRelatedField(
+        required=False, queryset=Asset.objects,
+        label=_('Asset'), attrs=('id', 'name', 'ip')
+    )
     platform = serializers.ReadOnlyField(label=_("Platform"))
 
     class Meta(AccountFieldsSerializerMixin.Meta):
