@@ -1,9 +1,8 @@
-from .account import (
-    AccountFilterSet, AccountViewSet, AccountSecretsViewSet
-)
-from common.mixins import RecordViewLogMixin
 from assets import serializers
 from assets.models import Account
+from assets.filters import AccountFilterSet
+from common.mixins import RecordViewLogMixin
+from .account import AccountViewSet, AccountSecretsViewSet
 
 __all__ = ['AccountHistoryViewSet', 'AccountHistorySecretsViewSet']
 

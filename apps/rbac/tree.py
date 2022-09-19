@@ -61,7 +61,7 @@ extra_nodes_data = [
 # 将 model 放到其它节点下，而不是本来的 app 中
 special_pid_mapper = {
     'common.permission': 'view_other',
-    "assets.authbook": "accounts",
+    "assets.account": "accounts",
     "applications.account": "accounts",
     'xpack.account': 'cloud_import',
     'xpack.syncinstancedetail': 'cloud_import',

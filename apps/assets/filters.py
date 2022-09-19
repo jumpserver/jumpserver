@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 #
-
-from rest_framework.compat import coreapi, coreschema
-from rest_framework import filters
 from django.db.models import Q
+from rest_framework import filters
+from rest_framework.compat import coreapi, coreschema
 
-from .models import Label
+from common.drf.filters import BaseFilterSet, UUIDInFilter
 from assets.utils import is_query_node_all_assets, get_node_from_request
+from .models import Label, Node, Account
 
 
 class AssetByNodeFilterBackend(filters.BaseFilterBackend):
@@ -109,7 +109,7 @@ class LabelFilterBackend(filters.BaseFilterBackend):
                 q = Q(name=key, value=value)
         if not q:
             return []
-        labels = Label.objects.filter(q, is_active=True)\
+        labels = Label.objects.filter(q, is_active=True) \
             .values_list('id', flat=True)
         return labels
 
@@ -153,4 +153,31 @@ class IpInFilterBackend(filters.BaseFilterBackend):
                     description='ip in filter'
                 )
             )
+        ]
+
+
+class AccountFilterSet(BaseFilterSet):
+    from django_filters import rest_framework as filters
+    ip = filters.CharFilter(field_name='ip', lookup_expr='exact')
+    hostname = filters.CharFilter(field_name='name', lookup_expr='exact')
+    username = filters.CharFilter(field_name="username", lookup_expr='exact')
+    assets = UUIDInFilter(field_name='asset_id', lookup_expr='in')
+    nodes = UUIDInFilter(method='filter_nodes')
+
+    def filter_nodes(self, queryset, name, value):
+        nodes = Node.objects.filter(id__in=value)
+        if not nodes:
+            return queryset
+
+        node_qs = Node.objects.none()
+        for node in nodes:
+            node_qs |= node.get_all_children(with_self=True)
+        node_ids = list(node_qs.values_list('id', flat=True))
+        queryset = queryset.filter(asset__nodes__in=node_ids)
+        return queryset
+
+    class Meta:
+        model = Account
+        fields = [
+            'asset', 'id'
         ]
