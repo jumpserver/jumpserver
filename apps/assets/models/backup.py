@@ -12,66 +12,17 @@ from orgs.mixins.models import OrgModelMixin
 from ops.mixin import PeriodTaskModelMixin
 from common.utils import get_logger
 from common.db.encoder import ModelJSONFieldEncoder
-from common.db.models import BitOperationChoice
 from common.mixins.models import CommonModelMixin
 from common.const.choices import Trigger
-from ..const import AllTypes, Category
 
-__all__ = ['AccountBackupPlan', 'AccountBackupPlanExecution', 'Type']
+__all__ = ['AccountBackupPlan', 'AccountBackupPlanExecution']
 
 logger = get_logger(__file__)
 
 
-def _choice_map(default=None):
-    offset = 0
-    temp_key = 0b1
-
-    if default is None:
-        _all = (0b1 << 32) - 1
-    else:
-        _all = default
-
-    choices = {
-        _all: ('all', 'All')
-    }
-
-    for info in AllTypes.grouped_choices_to_objs():
-        temp_keys = []
-        for c in info['children']:
-            key = temp_key << offset
-            temp_keys.append(key)
-            choices[key] = (c['value'], c['display_name'])
-            offset += 1
-        parent_key = reduce(lambda x, y: x | y, temp_keys)
-        choices[parent_key] = (info['value'], info['display_name'])
-    return choices
-
-
-class Type(BitOperationChoice):
-    NONE = 0
-
-    ALL = (0b1 << 32) - 1
-    TYPE_MAP = _choice_map(ALL)
-
-    DB_CHOICES = tuple((k, v[1]) for k, v in TYPE_MAP.items())
-
-    NAME_MAP = {k: v[0] for k, v in TYPE_MAP.items()}
-
-    NAME_MAP_REVERSE = {v: k for k, v in NAME_MAP.items()}
-    CHOICES = []
-    for i, j in DB_CHOICES:
-        CHOICES.append((NAME_MAP[i], j))
-
-    @classmethod
-    def get_types(cls, value: int) -> list:
-        exclude_types = ['all'] + Category.values
-        current_all = cls.value_to_choices(value)
-        return list(filter(lambda x: x not in exclude_types, current_all))
-
-
 class AccountBackupPlan(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    types = models.BigIntegerField()
+    categories = models.JSONField(default=list)
     recipients = models.ManyToManyField(
         'users.User', related_name='recipient_escape_route_plans', blank=True,
         verbose_name=_("Recipient")
@@ -102,7 +53,7 @@ class AccountBackupPlan(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
             'crontab': self.crontab,
             'org_id': self.org_id,
             'created_by': self.created_by,
-            'types': Type.get_types(self.types),
+            'categories': self.categories,
             'recipients': {
                 str(recipient.id): (str(recipient), bool(recipient.secret_key))
                 for recipient in self.recipients.all()
@@ -149,9 +100,9 @@ class AccountBackupPlanExecution(OrgModelMixin):
         verbose_name = _('Account backup execution')
 
     @property
-    def types(self):
-        types = self.plan_snapshot.get('types')
-        return types
+    def categories(self):
+        categories = self.plan_snapshot.get('categories')
+        return categories
 
     @property
     def recipients(self):

@@ -7,7 +7,8 @@ from django.conf import settings
 from django.db.models import F
 from rest_framework import serializers
 
-from assets.models import Account, Type
+from assets.models import Account
+from assets.const import AllTypes
 from assets.serializers import AccountSecretSerializer
 from assets.notifications import AccountBackupExecutionTaskMsg
 from users.models import User
@@ -76,25 +77,29 @@ class AssetAccountHandler(BaseAccountHandler):
         return filename
 
     @classmethod
-    def create_data_map(cls, types: list):
+    def create_data_map(cls, categories: list):
         data_map = defaultdict(list)
 
-        # TODO 可以优化一下查询 在账号上做type的缓存 避免数据量大时连表操作
+        # TODO 可以优化一下查询 在账号上做 category 的缓存 避免数据量大时连表操作
         qs = Account.objects.filter(
-            asset__platform__type__in=types
-        ).annotate(type=F('asset__platform__type'))
+            asset__platform__category__in=categories
+        ).annotate(category=F('asset__platform__category'))
         if not qs.exists():
             return data_map
 
-        type_dict = dict(Type.CHOICES)
+        category_dict = {}
+        for i in AllTypes.grouped_choices_to_objs():
+            for j in i['children']:
+                category_dict[j['value']] = j['display_name']
+
         header_fields = cls.get_header_fields(AccountSecretSerializer(qs.first()))
-        account_type_map = defaultdict(list)
+        account_category_map = defaultdict(list)
         for account in qs:
-            account_type_map[account.type].append(account)
+            account_category_map[account.category].append(account)
 
         data_map = {}
-        for tp, accounts in account_type_map.items():
-            sheet_name = type_dict[tp]
+        for category, accounts in account_category_map.items():
+            sheet_name = category_dict.get(category, category)
             data = AccountSecretSerializer(accounts, many=True).data
             data_map.update(cls.add_rows(data, header_fields, sheet_name))
 
@@ -117,9 +122,9 @@ class AccountBackupHandler:
         # Print task start date
         time_start = time.time()
         files = []
-        types = self.execution.types
+        categories = self.execution.categories
 
-        data_map = AssetAccountHandler.create_data_map(types)
+        data_map = AssetAccountHandler.create_data_map(categories)
         if not data_map:
             return files
 
