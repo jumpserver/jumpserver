@@ -58,6 +58,8 @@ class BaseAccount(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_("Name"))
     username = models.CharField(max_length=128, blank=True, verbose_name=_('Username'), db_index=True)
+    secret_type = models.CharField(max_length=16, default='password', verbose_name=_('Secret type'))
+    secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Secret'))
     password = fields.EncryptCharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
     private_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH private key'))
     public_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH public key'))

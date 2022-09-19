@@ -89,23 +89,6 @@ class PlatformSerializer(JMSWritableNestedModelSerializer):
             'domain_default': {'label': "默认网域"},
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.set_brand_choices()
-
-    def set_brand_choices(self):
-        field = self.fields.get('brand')
-        request = self.context.get('request')
-        if not field or not request:
-            return
-        category = request.query_params.get('category', '')
-        constraints = Category.platform_constraints().get(category)
-        if not constraints:
-            return
-        field.choices = constraints.get('brands', [])
-        if field.choices:
-            field.required = True
-
 
 class PlatformOpsMethodSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)

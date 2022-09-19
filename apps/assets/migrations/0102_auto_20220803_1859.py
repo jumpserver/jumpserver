@@ -31,7 +31,7 @@ def migrate_asset_protocols(apps, schema_editor):
                 protocol = protocol_map.get(name_port)
                 if not protocol:
                     protocol = protocol_model.objects.get_or_create(
-                        defaults={'name': name, 'port': port},
+                        defaults={'name': name, 'port': port, 'asset': asset},
                         name=name, port=port
                     )[0]
                 assets_protocols.append(asset_protocol_through(asset_id=asset.id, protocol_id=protocol.id))

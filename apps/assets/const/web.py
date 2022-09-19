@@ -1,16 +1,37 @@
+from django.utils.translation import gettext_lazy as _
 
-class WebTypes(ConstrainMixin, ChoicesMixin, models.TextChoices):
+from .base import BaseType
+
+
+class WebTypes(BaseType):
     WEBSITE = 'website', _('General website')
 
-    def category_constrains(self):
+    @classmethod
+    def _get_base_constrains(cls) -> dict:
         return {
-            'domain_enabled': False,
-            'su_enabled': False,
-            'ping_enabled': False,
-            'gather_facts_enabled': False,
-            'verify_account_enabled': False,
-            'change_password_enabled': False,
-            'create_account_enabled': False,
-            'gather_accounts_enabled': False,
-            '_protocols': ['http', 'https']
+            '*': {
+                'domain_enabled': False,
+                'su_enabled': False,
+            }
+        }
+
+    @classmethod
+    def _get_automation_constrains(cls) -> dict:
+        constrains = {
+            '*': {
+                'gather_facts_enabled': False,
+                'verify_account_enabled': False,
+                'change_password_enabled': False,
+                'create_account_enabled': False,
+                'gather_accounts_enabled': False,
+            }
+        }
+        return constrains
+
+    @classmethod
+    def _get_protocol_constrains(cls) -> dict:
+        return {
+            '*': {
+                'choices': ['http', 'api'],
+            }
         }

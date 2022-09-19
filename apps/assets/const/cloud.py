@@ -1,31 +1,40 @@
-from django.db import models
-
-from common.db.models import ChoicesMixin
+from .base import BaseType
 
 
-from .category import ConstrainMixin
-
-
-class CloudTypes(ConstrainMixin, ChoicesMixin, models.TextChoices):
+class CloudTypes(BaseType):
+    PUBLIC = 'public', 'Public cloud'
+    PRIVATE = 'private', 'Private cloud'
     K8S = 'k8s', 'Kubernetes'
 
-    def category_constrains(self):
+    @classmethod
+    def _get_base_constrains(cls) -> dict:
         return {
-            'domain_enabled': False,
-            'su_enabled': False,
-            'ping_enabled': False,
-            'gather_facts_enabled': False,
-            'verify_account_enabled': False,
-            'change_password_enabled': False,
-            'create_account_enabled': False,
-            'gather_accounts_enabled': False,
-            '_protocols': []
+            '*': {
+                'domain_enabled': False,
+                'su_enabled': False,
+            }
         }
 
     @classmethod
-    def platform_constraints(cls):
+    def _get_automation_constrains(cls) -> dict:
+        constrains = {
+            '*': {
+                'gather_facts_enabled': False,
+                'verify_account_enabled': False,
+                'change_password_enabled': False,
+                'create_account_enabled': False,
+                'gather_accounts_enabled': False,
+            }
+        }
+        return constrains
+
+    @classmethod
+    def _get_protocol_constrains(cls) -> dict:
         return {
+            '*': {
+                'choices': ['http', 'api'],
+            },
             cls.K8S: {
-                '_protocols': ['k8s']
+                'choices': ['k8s']
             }
         }

@@ -16,7 +16,7 @@ from orgs.mixins.models import OrgManager, JMSOrgBaseModel
 from ..platform import Platform
 from ..base import AbsConnectivity
 
-__all__ = ['Asset', 'AssetQuerySet', 'default_node']
+__all__ = ['Asset', 'AssetQuerySet', 'default_node', 'Protocol']
 logger = logging.getLogger(__name__)
 
 
@@ -72,11 +72,16 @@ class NodesRelationMixin:
             return nodes
 
 
+class Protocol(models.Model):
+    name = models.CharField(max_length=32, verbose_name=_("Name"))
+    port = models.IntegerField(verbose_name=_("Port"))
+    asset = models.ForeignKey('Asset', on_delete=models.CASCADE, related_name='protocols', verbose_name=_("Asset"))
+
+
 class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     ip = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
-    protocols = models.ManyToManyField('Protocol', verbose_name=_("Protocols"), blank=True)
     platform = models.ForeignKey(Platform, default=Platform.default, on_delete=models.PROTECT,
                                  verbose_name=_("Platform"), related_name='assets')
     domain = models.ForeignKey("assets.Domain", null=True, blank=True, related_name='assets',

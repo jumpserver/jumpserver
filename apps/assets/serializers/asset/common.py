@@ -8,7 +8,7 @@ from django.db.models import F
 from common.drf.serializers import JMSWritableNestedModelSerializer
 from common.drf.fields import LabeledChoiceField, ObjectRelatedField
 from ..account import AccountSerializer
-from ...models import Asset, Node, Platform, Protocol, Label, Domain, Account
+from ...models import Asset, Node, Platform, Label, Domain, Account, Protocol
 from ...const import Category, AllTypes
 
 __all__ = [

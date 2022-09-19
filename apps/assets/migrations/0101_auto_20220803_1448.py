@@ -10,14 +10,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.CreateModel(
-            name='Protocol',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=32, verbose_name='Name')),
-                ('port', models.IntegerField(verbose_name='Port')),
-            ],
-        ),
         migrations.RemoveField(
             model_name='asset',
             name='port',
@@ -26,24 +18,24 @@ class Migration(migrations.Migration):
             model_name='asset',
             name='protocol',
         ),
-        migrations.AddField(
+        migrations.RenameField(
             model_name='asset',
-            name='_protocols',
-            field=models.CharField(blank=True, default='ssh/22', max_length=128, verbose_name='Protocols'),
-        ),
-        migrations.RemoveField(
-            model_name='asset',
-            name='protocols',
+            old_name='protocols',
+            new_name='_protocols',
         ),
         migrations.AlterField(
             model_name='systemuser',
             name='protocol',
             field=models.CharField(default='ssh', max_length=16, verbose_name='Protocol'),
         ),
-        migrations.AddField(
-            model_name='asset',
-            name='protocols',
-            field=models.ManyToManyField(blank=True, to='assets.Protocol', verbose_name='Protocols'),
+        migrations.CreateModel(
+            name='Protocol',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=32, verbose_name='Name')),
+                ('port', models.IntegerField(verbose_name='Port')),
+                ('asset', models.ForeignKey(on_delete=models.deletion.CASCADE, related_name='protocols', to='assets.asset', verbose_name='Asset')),
+            ],
         ),
         migrations.DeleteModel(
             name='Cluster',

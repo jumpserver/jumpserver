@@ -1,6 +1,8 @@
 
+from .base import BaseType
 
-class DatabaseTypes(ConstrainMixin, ChoicesMixin, models.TextChoices):
+
+class DatabaseTypes(BaseType):
     MYSQL = 'mysql', 'MySQL'
     MARIADB = 'mariadb', 'MariaDB'
     POSTGRESQL = 'postgresql', 'PostgreSQL'
@@ -9,28 +11,33 @@ class DatabaseTypes(ConstrainMixin, ChoicesMixin, models.TextChoices):
     MONGODB = 'mongodb', 'MongoDB'
     REDIS = 'redis', 'Redis'
 
-    def category_constrains(self):
+    @classmethod
+    def _get_base_constrains(cls) -> dict:
         return {
-            'domain_enabled': True,
-            'su_enabled': False,
-            'gather_facts_enabled': True,
-            'verify_account_enabled': True,
-            'change_password_enabled': True,
-            'create_account_enabled': True,
-            'gather_accounts_enabled': True,
-            '_protocols': []
+            '*': {
+                'domain_enabled': True,
+                'su_enabled': False,
+            }
         }
 
     @classmethod
-    def platform_constraints(cls):
-        meta = {}
-        for name, label in cls.choices:
-            meta[name] = {
-                '_protocols': [name],
-                'gather_facts_method': f'gather_facts_{name}',
-                'verify_account_method': f'verify_account_{name}',
-                'change_password_method': f'change_password_{name}',
-                'create_account_method': f'create_account_{name}',
-                'gather_accounts_method': f'gather_accounts_{name}',
+    def _get_automation_constrains(cls) -> dict:
+        constrains = {
+            '*': {
+                'gather_facts_enabled': True,
+                'gather_accounts_enabled': True,
+                'verify_account_enabled': True,
+                'change_password_enabled': True,
+                'create_account_enabled': True,
             }
-        return meta
+        }
+        return constrains
+
+    @classmethod
+    def _get_protocol_constrains(cls) -> dict:
+        return {
+            '*': {
+                'choices': '__self__',
+            }
+        }
+

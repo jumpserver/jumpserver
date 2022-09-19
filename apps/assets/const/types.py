@@ -1,12 +1,14 @@
 from common.db.models import IncludesTextChoicesMeta, ChoicesMixin
 from common.tree import TreeNode
 
+from .base import BaseType
 from .category import Category
 from .host import HostTypes
 from .device import DeviceTypes
 from .database import DatabaseTypes
 from .web import WebTypes
 from .cloud import CloudTypes
+from .protocol import Protocol
 
 
 class AllTypes(ChoicesMixin, metaclass=IncludesTextChoicesMeta):
@@ -18,24 +20,11 @@ class AllTypes(ChoicesMixin, metaclass=IncludesTextChoicesMeta):
 
     @classmethod
     def get_constraints(cls, category, tp):
-        constraints = ConstrainMixin.platform_constraints()
-        category_constraints = Category.platform_constraints().get(category) or {}
-        constraints.update(category_constraints)
-
         types_cls = dict(cls.category_types()).get(category)
         if not types_cls:
-            return constraints
-        type_constraints = types_cls.platform_constraints().get(tp) or {}
-        constraints.update(type_constraints)
-
-        _protocols = constraints.pop('_protocols', [])
-        default_ports = Protocol.default_ports()
-        protocols = []
-        for p in _protocols:
-            port = default_ports.get(p, 0)
-            protocols.append({'name': p, 'port': port})
-        constraints['protocols'] = protocols
-        return constraints
+            return {}
+        type_constraints = types_cls.get_constrains()
+        return type_constraints.get(tp, {})
 
     @classmethod
     def category_types(cls):

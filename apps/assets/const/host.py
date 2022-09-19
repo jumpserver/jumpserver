@@ -1,40 +1,44 @@
+from .base import BaseType
 
-class HostTypes(ConstrainMixin, ChoicesMixin, models.TextChoices):
+
+class HostTypes(BaseType):
     LINUX = 'linux', 'Linux'
     WINDOWS = 'windows', 'Windows'
     UNIX = 'unix', 'Unix'
-    OTHER_HOST = 'other', _("Other")
+    OTHER_HOST = 'other', "Other"
 
-    @staticmethod
-    def category_constrains():
+    @classmethod
+    def _get_base_constrains(cls) -> dict:
         return {
-            'domain_enabled': True,
-            'su_enabled': True, 'su_method': 'sudo',
-            'ping_enabled': True, 'ping_method': 'ping',
-            'gather_facts_enabled': True, 'gather_facts_method': 'gather_facts_posix',
-            'verify_account_enabled': True, 'verify_account_method': 'verify_account_posix',
-            'change_password_enabled': True, 'change_password_method': 'change_password_posix',
-            'create_account_enabled': True, 'create_account_method': 'create_account_posix',
-            'gather_accounts_enabled': True, 'gather_accounts_method': 'gather_accounts_posix',
-            '_protocols': ['ssh', 'telnet'],
+            '*': {
+                'domain_enabled': True,
+                'su_enabled': True,
+            },
+            cls.WINDOWS: {
+                'su_enabled': False,
+            },
+            cls.OTHER_HOST: {
+                'su_enabled': False,
+            }
         }
 
     @classmethod
-    def platform_constraints(cls):
+    def _get_protocol_constrains(cls) -> dict:
         return {
-            cls.LINUX: {
-                '_protocols': ['ssh', 'rdp', 'vnc', 'telnet']
-            },
-            cls.WINDOWS: {
-                'gather_facts_method': 'gather_facts_windows',
-                'verify_account_method': 'verify_account_windows',
-                'change_password_method': 'change_password_windows',
-                'create_account_method': 'create_account_windows',
-                'gather_accounts_method': 'gather_accounts_windows',
-                '_protocols': ['rdp', 'ssh', 'vnc'],
-                'su_enabled': False
-            },
-            cls.UNIX: {
-                '_protocols': ['ssh', 'vnc']
+            '*': {
+               'choices': ['ssh', 'telnet', 'vnc', 'rdp']
+            }
+        }
+
+    @classmethod
+    def _get_automation_constrains(cls) -> dict:
+        return {
+            '*': {
+                'ping_enabled': True,
+                'gather_facts_enabled': True,
+                'gather_accounts_enabled': True,
+                'verify_account_enabled': True,
+                'change_password_enabled': True,
+                'create_account_enabled': True,
             }
         }

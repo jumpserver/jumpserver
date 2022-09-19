@@ -13,6 +13,5 @@ from .backup import *
 from ._user import *
 # 废弃以下
 # from ._authbook import *
-from .protocol import *
 from .cmd_filter import *
 
