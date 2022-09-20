@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 #
+import django_filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
-import django_filters
 
+from common.utils import get_logger
 from common.drf.filters import BaseFilterSet
-from common.utils import get_logger, get_object_or_none
 from common.mixins.api import SuggestionMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
-from assets.models import Asset, Node, Gateway
 from assets import serializers
+from assets.models import Asset, Gateway
 from assets.tasks import (
     update_assets_hardware_info_manual, test_assets_connectivity_manual,
 )

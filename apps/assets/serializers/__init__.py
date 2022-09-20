@@ -8,6 +8,6 @@ from .domain import *
 from .gathered_user import *
 from .favorite_asset import *
 from .account import *
-from .backup import *
+from assets.serializers.account.backup import *
 from .platform import *
 from .cagegory import *

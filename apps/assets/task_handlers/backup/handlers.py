@@ -90,7 +90,7 @@ class AssetAccountHandler(BaseAccountHandler):
         category_dict = {}
         for i in AllTypes.grouped_choices_to_objs():
             for j in i['children']:
-                category_dict[j['value']] = j['display_name']
+                category_dict[j['value']] = j['label']
 
         header_fields = cls.get_header_fields(AccountSecretSerializer(qs.first()))
         account_category_map = defaultdict(list)

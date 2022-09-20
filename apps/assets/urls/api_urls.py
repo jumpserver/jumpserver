@@ -7,6 +7,7 @@ from .. import api
 app_name = 'assets'
 
 router = BulkRouter()
+router.register(r'categories', api.CategoryViewSet, 'category')
 router.register(r'assets', api.AssetViewSet, 'asset')
 router.register(r'hosts', api.HostViewSet, 'host')
 router.register(r'devices', api.DeviceViewSet, 'device')
@@ -28,11 +29,8 @@ router.register(r'favorite-assets', api.FavoriteAssetViewSet, 'favorite-asset')
 router.register(r'account-backup-plans', api.AccountBackupPlanViewSet, 'account-backup')
 router.register(r'account-backup-plan-executions', api.AccountBackupPlanExecutionViewSet, 'account-backup-execution')
 
-
 urlpatterns = [
     # path('assets/<uuid:pk>/gateways/', api.AssetGatewayListApi.as_view(), name='asset-gateway-list'),
-    path('categories/', api.CategoryListApi.as_view(), name='category-list'),
-    path('categories/types/', api.TypeListApi.as_view(), name='type-list'),
     path('assets/<uuid:pk>/tasks/', api.AssetTaskCreateApi.as_view(), name='asset-task-create'),
     path('assets/tasks/', api.AssetsTaskCreateApi.as_view(), name='assets-task-create'),
     path('assets/<uuid:pk>/perm-users/', api.AssetPermUserListApi.as_view(), name='asset-perm-user-list'),

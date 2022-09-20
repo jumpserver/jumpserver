@@ -44,33 +44,37 @@ class AllTypes(ChoicesMixin, metaclass=IncludesTextChoicesMeta):
         return constraints
 
     @classmethod
-    def types(cls):
+    def types(cls, with_constraints=True):
         types = []
         for category, tps in cls.category_types():
-            for tp in tps:
-                types.append(cls.serialize_type(category, tp))
+            types.extend([cls.serialize_type(category, tp, with_constraints) for tp in tps])
         return types
 
     @classmethod
-    def categories(cls):
+    def categories(cls, with_constraints=True):
         categories = []
         for category, tps in cls.category_types():
             category_data = {
                 'id': category.value,
                 'name': category.label,
-                'children': [cls.serialize_type(category, tp) for tp in tps]
+                'children': [cls.serialize_type(category, tp, with_constraints) for tp in tps]
             }
             categories.append(category_data)
         return categories
 
     @classmethod
-    def serialize_type(cls, category, tp):
-        return {
+    def serialize_type(cls, category, tp, with_constraints=True):
+        data = {
             'id': tp.value,
             'name': tp.label,
             'category': category,
-            'constraints': cls.get_constraints(category, tp)
         }
+
+        if with_constraints:
+            data['constraints'] = cls.get_constraints(category, tp)
+        else:
+            data['constraints'] = []
+        return data
 
     @classmethod
     def category_types(cls):
