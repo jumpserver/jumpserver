@@ -5,7 +5,7 @@ from .common import Asset
 
 
 class Cloud(Asset):
-    cluster = models.CharField(max_length=4096, verbose_name=_("Cluster"))
+    url = models.CharField(max_length=4096, verbose_name=_("Url"))
 
     def __str__(self):
         return self.name

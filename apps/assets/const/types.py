@@ -13,7 +13,7 @@ class AllTypes(ChoicesMixin, metaclass=IncludesTextChoicesMeta):
     choices: list
     includes = [
         HostTypes, DeviceTypes, DatabaseTypes,
-        WebTypes, CloudTypes
+        CloudTypes, WebTypes,
     ]
     _category_constrains = {}
 

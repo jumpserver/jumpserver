@@ -72,12 +72,6 @@ class BaseAccount(OrgModelMixin):
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
     created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
 
-    ASSETS_AMOUNT_CACHE_KEY = "ASSET_USER_{}_ASSETS_AMOUNT"
-    ASSET_USER_CACHE_TIME = 600
-
-    APPS_AMOUNT_CACHE_KEY = "APP_USER_{}_APPS_AMOUNT"
-    APP_USER_CACHE_TIME = 600
-
     @property
     def public_key(self):
         return ''

@@ -86,7 +86,7 @@ def migrate_cloud_to_asset(apps, *args):
             protocols='',
             platform=platform,
             org_id=app.org_id,
-            cluster=attrs.get('cluster', '')
+            url=attrs.get('cluster', '')
         )
 
         try:

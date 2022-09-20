@@ -30,11 +30,11 @@ class BaseType(TextChoices):
 
     @classmethod
     def _parse_protocols(cls, protocol, tp):
-        default_ports = Protocol.default_ports()
+        settings = Protocol.settings()
         choices = protocol.get('choices', [])
         if choices == '__self__':
             choices = [tp]
-        protocols = [{'name': name, 'port': default_ports.get(name, 0)} for name in choices]
+        protocols = [{'name': name, **settings.get(name, {})} for name in choices]
         return protocols
 
     @classmethod

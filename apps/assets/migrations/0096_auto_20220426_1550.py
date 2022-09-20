@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
             name='Cloud',
             fields=[
                 ('asset_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='assets.asset')),
-                ('cluster', models.CharField(max_length=4096, verbose_name='Cluster')),
+                ('url', models.CharField(max_length=4096, verbose_name='Cluster')),
             ],
             options={
                 'abstract': False,
