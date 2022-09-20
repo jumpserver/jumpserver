@@ -22,7 +22,7 @@ def check_platform_methods(methods):
             raise ValueError("Duplicate id: {}".format(_id))
 
 
-def get_platform_methods():
+def get_platform_automation_methods():
     methods = []
     for root, dirs, files in os.walk(BASE_DIR, topdown=False):
         for name in files:
@@ -47,8 +47,8 @@ def filter_key(manifest, attr, value):
     return value in manifest_value or 'all' in manifest_value
 
 
-def filter_platform_methods(category, tp, method):
-    methods = platform_ops_methods
+def filter_platform_methods(category, tp, method=None):
+    methods = platform_automation_methods
     if category:
         methods = filter(partial(filter_key, attr='category', value=category), methods)
     if tp:
@@ -58,8 +58,8 @@ def filter_platform_methods(category, tp, method):
     return methods
 
 
-platform_ops_methods = get_platform_methods()
+platform_automation_methods = get_platform_automation_methods()
 
 
 if __name__ == '__main__':
-    print(get_platform_methods())
+    print(get_platform_automation_methods())

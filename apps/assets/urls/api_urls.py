@@ -31,6 +31,8 @@ router.register(r'account-backup-plan-executions', api.AccountBackupPlanExecutio
 
 urlpatterns = [
     # path('assets/<uuid:pk>/gateways/', api.AssetGatewayListApi.as_view(), name='asset-gateway-list'),
+    path('categories/', api.CategoryListApi.as_view(), name='category-list'),
+    path('categories/types/', api.TypeListApi.as_view(), name='type-list'),
     path('assets/<uuid:pk>/tasks/', api.AssetTaskCreateApi.as_view(), name='asset-task-create'),
     path('assets/tasks/', api.AssetsTaskCreateApi.as_view(), name='assets-task-create'),
     path('assets/<uuid:pk>/perm-users/', api.AssetPermUserListApi.as_view(), name='asset-perm-user-list'),

@@ -1,14 +1,12 @@
 from common.db.models import IncludesTextChoicesMeta, ChoicesMixin
 from common.tree import TreeNode
 
-from .base import BaseType
 from .category import Category
 from .host import HostTypes
 from .device import DeviceTypes
 from .database import DatabaseTypes
 from .web import WebTypes
 from .cloud import CloudTypes
-from .protocol import Protocol
 
 
 class AllTypes(ChoicesMixin, metaclass=IncludesTextChoicesMeta):
@@ -17,6 +15,7 @@ class AllTypes(ChoicesMixin, metaclass=IncludesTextChoicesMeta):
         HostTypes, DeviceTypes, DatabaseTypes,
         WebTypes, CloudTypes
     ]
+    _category_constrains = {}
 
     @classmethod
     def get_constraints(cls, category, tp):
@@ -24,7 +23,54 @@ class AllTypes(ChoicesMixin, metaclass=IncludesTextChoicesMeta):
         if not types_cls:
             return {}
         type_constraints = types_cls.get_constrains()
-        return type_constraints.get(tp, {})
+        constraints = type_constraints.get(tp, {})
+        cls.set_automation_methods(category, tp, constraints)
+        return constraints
+
+    @classmethod
+    def set_automation_methods(cls, category, tp, constraints):
+        from assets.playbooks import filter_platform_methods
+        automation = constraints.get('automation', {})
+        automation_methods = {}
+        for item, enabled in automation.items():
+            if not enabled:
+                continue
+            item_name = item.replace('_enabled', '')
+            methods = filter_platform_methods(category, tp, item_name)
+            methods = [{'name': m['name'], 'id': m['id']} for m in methods]
+            automation_methods[item_name+'_methods'] = methods
+        automation.update(automation_methods)
+        constraints['automation'] = automation
+        return constraints
+
+    @classmethod
+    def types(cls):
+        types = []
+        for category, tps in cls.category_types():
+            for tp in tps:
+                types.append(cls.serialize_type(category, tp))
+        return types
+
+    @classmethod
+    def categories(cls):
+        categories = []
+        for category, tps in cls.category_types():
+            category_data = {
+                'id': category.value,
+                'name': category.label,
+                'children': [cls.serialize_type(category, tp) for tp in tps]
+            }
+            categories.append(category_data)
+        return categories
+
+    @classmethod
+    def serialize_type(cls, category, tp):
+        return {
+            'id': tp.value,
+            'name': tp.label,
+            'category': category,
+            'constraints': cls.get_constraints(category, tp)
+        }
 
     @classmethod
     def category_types(cls):

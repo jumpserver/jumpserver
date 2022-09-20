@@ -10,3 +10,4 @@ from .favorite_asset import *
 from .account import *
 from .backup import *
 from .platform import *
+from .cagegory import *

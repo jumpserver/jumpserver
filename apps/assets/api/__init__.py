@@ -1,4 +1,5 @@
 from .mixin import *
+from .category import *
 from .platform import *
 from .asset import *
 from .label import *
