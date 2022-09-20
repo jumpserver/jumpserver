@@ -7,7 +7,7 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ops.mixin import PeriodTaskSerializerMixin
 from common.utils import get_logger
 
-from ..models import AccountBackupPlan, AccountBackupPlanExecution
+from assets.models import AccountBackupPlan, AccountBackupPlanExecution
 
 logger = get_logger(__file__)
 

@@ -20,7 +20,7 @@ class GatheredUser(OrgModelMixin):
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
 
     @property
-    def hostname(self):
+    def name(self):
         return self.asset.name
 
     @property

@@ -87,7 +87,7 @@ class CeleryTaskSerializer(serializers.Serializer):
 
 
 class ChoiceSerializer(serializers.Serializer):
-    display_name = serializers.CharField(label=_("Display name"))
+    label = serializers.CharField(label=_("Label"))
     value = serializers.CharField(label=_("Value"))
 
 

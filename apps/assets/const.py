@@ -232,7 +232,7 @@ class AllTypes(ChoicesMixin, metaclass=IncludesTextChoicesMeta):
 
     @staticmethod
     def serialize_to_objs(choices):
-        title = ['value', 'display_name']
+        title = ['value', 'label']
         return [dict(zip(title, choice)) for choice in choices]
 
     @staticmethod
