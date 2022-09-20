@@ -23,7 +23,7 @@ class Account(BaseAccount):
     class Meta:
         verbose_name = _('Account')
         unique_together = [
-            ('username', 'asset'),
+            ('username', 'asset', 'secret_type'),
             ('name', 'asset'),
         ]
         permissions = [

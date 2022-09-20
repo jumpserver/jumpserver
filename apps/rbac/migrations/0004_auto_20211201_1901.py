@@ -13,6 +13,7 @@ def migrate_system_role_binding(apps, schema_editor):
 
     count = 0
     bulk_size = 1000
+    print('')
     while True:
         users = user_model.objects.using(db_alias) \
             .only('role', 'id') \

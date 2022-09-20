@@ -52,7 +52,6 @@ class Platform(models.Model):
     comment = models.TextField(blank=True, null=True, verbose_name=_("Comment"))
     # 资产有关的
     charset = models.CharField(default='utf8', choices=CHARSET_CHOICES, max_length=8, verbose_name=_("Charset"))
-    brand = models.CharField(max_length=128, blank=True, null=True, verbose_name=_("Brand"))  # 厂商主要是给网络设备
     domain_enabled = models.BooleanField(default=True, verbose_name=_("Domain enabled"))
     protocols_enabled = models.BooleanField(default=True, verbose_name=_("Protocols enabled"))
     protocols = models.ManyToManyField(PlatformProtocol, blank=True, verbose_name=_("Protocols"))

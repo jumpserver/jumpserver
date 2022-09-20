@@ -22,13 +22,6 @@ class AssetProtocolsSerializer(serializers.ModelSerializer):
         model = Protocol
         fields = ['id', 'name', 'port']
 
-    def create(self, validated_data):
-        instance = Protocol.objects.filter(**validated_data).first()
-        if instance:
-            return instance
-        instance = Protocol.objects.create(**validated_data)
-        return instance
-
 
 class AssetLabelSerializer(serializers.ModelSerializer):
     class Meta:
@@ -55,10 +48,10 @@ class AssetAccountSerializer(AccountSerializer):
     class Meta(AccountSerializer.Meta):
         fields_mini = [
             'id', 'name', 'username', 'privileged', 'version',
+            'secret_type',
         ]
         fields_write_only = [
-            'password', 'private_key', 'public_key',
-            'passphrase', 'token', 'push_now'
+            'secret', 'passphrase', 'push_now'
         ]
         fields = fields_mini + fields_write_only
 

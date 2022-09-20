@@ -10,6 +10,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import get_logger, lazyproperty
+from common.db import fields
 from orgs.mixins.models import OrgModelMixin
 from .base import BaseAccount
 
@@ -64,7 +65,12 @@ class Gateway(BaseAccount):
     domain = models.ForeignKey(Domain, on_delete=models.CASCADE, verbose_name=_("Domain"))
     comment = models.CharField(max_length=128, blank=True, null=True, verbose_name=_("Comment"))
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
-    token = None
+    password = fields.EncryptCharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
+    private_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH private key'))
+    public_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH public key'))
+
+    secret = None
+    secret_type = None
     privileged = None
 
     def __str__(self):

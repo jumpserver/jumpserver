@@ -18,11 +18,24 @@ class Migration(migrations.Migration):
         ),
         migrations.RemoveField(
             model_name='asset',
-            name='_protocols',
+            name='admin_user',
         ),
         migrations.RemoveField(
             model_name='asset',
-            name='admin_user',
+            name='port',
+        ),
+        migrations.RemoveField(
+            model_name='asset',
+            name='protocol',
+        ),
+        migrations.RemoveField(
+            model_name='asset',
+            name='_protocols',
+        ),
+        migrations.AlterField(
+            model_name='systemuser',
+            name='protocol',
+            field=models.CharField(default='ssh', max_length=16, verbose_name='Protocol'),
         ),
         migrations.RemoveField(
             model_name='asset',

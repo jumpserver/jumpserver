@@ -16,7 +16,7 @@ def migrate_system_to_account(apps, schema_editor):
     )
 
     for model, old_field, new_field, m2m in model_system_user_account:
-        print("Start migrate '{}' system user to account".format(model))
+        print("Start migrate '{}' system user to account".format(model.__name__))
         count = 0
         bulk_size = 1000
 

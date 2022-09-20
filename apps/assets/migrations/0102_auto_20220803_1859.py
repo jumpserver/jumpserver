@@ -6,12 +6,10 @@ from django.db import migrations
 def migrate_asset_protocols(apps, schema_editor):
     asset_model = apps.get_model('assets', 'Asset')
     protocol_model = apps.get_model('assets', 'Protocol')
-    asset_protocol_through = asset_model.protocols.through
 
     count = 0
     bulk_size = 1000
     print("\nStart migrate asset protocols")
-    protocol_map = {}
     while True:
         start = time.time()
         assets = asset_model.objects.all()[count:count+bulk_size]
@@ -19,23 +17,25 @@ def migrate_asset_protocols(apps, schema_editor):
             break
         count += len(assets)
         assets_protocols = []
-        for asset in assets:
-            old_protocols = asset._protocols
 
-            for name_port in old_protocols.split(','):
+        for asset in assets:
+            old_protocols = asset._protocols or '{}/{}'.format(asset.protocol, asset.port) or 'ssh/22'
+
+            if ',' in old_protocols:
+                _protocols = old_protocols.split(',')
+            else:
+                _protocols = old_protocols.split()
+
+            for name_port in _protocols:
                 name_port_list = name_port.split('/')
                 if len(name_port_list) != 2:
                     continue
 
                 name, port = name_port_list
-                protocol = protocol_map.get(name_port)
-                if not protocol:
-                    protocol = protocol_model.objects.get_or_create(
-                        defaults={'name': name, 'port': port, 'asset': asset},
-                        name=name, port=port
-                    )[0]
-                assets_protocols.append(asset_protocol_through(asset_id=asset.id, protocol_id=protocol.id))
-        asset_model.protocols.through.objects.bulk_create(assets_protocols, ignore_conflicts=True)
+                protocol = protocol_model(**{'name': name, 'port': port, 'asset': asset})
+                assets_protocols.append(protocol)
+
+        protocol_model.objects.bulk_create(assets_protocols, ignore_conflicts=True)
         print("Create asset protocols: {}-{} using: {:.2f}s".format(
             count - len(assets), count, time.time()-start
         ))

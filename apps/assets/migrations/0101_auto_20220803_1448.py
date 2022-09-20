@@ -10,23 +10,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='asset',
-            name='port',
-        ),
-        migrations.RemoveField(
-            model_name='asset',
-            name='protocol',
-        ),
         migrations.RenameField(
             model_name='asset',
             old_name='protocols',
             new_name='_protocols',
-        ),
-        migrations.AlterField(
-            model_name='systemuser',
-            name='protocol',
-            field=models.CharField(default='ssh', max_length=16, verbose_name='Protocol'),
         ),
         migrations.CreateModel(
             name='Protocol',

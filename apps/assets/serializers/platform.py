@@ -70,7 +70,6 @@ class PlatformSerializer(JMSWritableNestedModelSerializer):
         choices=[('sudo', 'sudo su -'), ('su', 'su - ')],
         label='切换方式', required=False, default='sudo'
     )
-    brand = LabeledChoiceField(choices=[], label='厂商', required=False, allow_null=True)
 
     class Meta:
         model = Platform
@@ -80,7 +79,7 @@ class PlatformSerializer(JMSWritableNestedModelSerializer):
         ]
         fields = fields_small + [
             'protocols_enabled', 'protocols', 'domain_enabled',
-            'su_enabled', 'su_method', 'brand', 'automation', 'comment',
+            'su_enabled', 'su_method', 'automation', 'comment',
         ]
         extra_kwargs = {
             'su_enabled': {'label': '启用切换账号'},

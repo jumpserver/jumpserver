@@ -77,6 +77,9 @@ class Protocol(models.Model):
     port = models.IntegerField(verbose_name=_("Port"))
     asset = models.ForeignKey('Asset', on_delete=models.CASCADE, related_name='protocols', verbose_name=_("Asset"))
 
+    def __str__(self):
+        return '{}/{}'.format(self.name, self.port)
+
 
 class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
