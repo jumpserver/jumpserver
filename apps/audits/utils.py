@@ -36,13 +36,13 @@ def write_content_to_excel(response, header=None, login_logs=None, fields=None):
 def write_login_log(*args, **kwargs):
     from audits.models import UserLoginLog
 
-    ip = kwargs.get('address') or ''
+    ip = kwargs.get('ip') or ''
     if not (ip and validate_ip(ip)):
         ip = ip[:15]
         city = DEFAULT_CITY
     else:
         city = get_ip_city(ip) or DEFAULT_CITY
-    kwargs.update({'address': ip, 'city': city})
+    kwargs.update({'ip': ip, 'city': city})
     UserLoginLog.objects.create(**kwargs)
 
 
