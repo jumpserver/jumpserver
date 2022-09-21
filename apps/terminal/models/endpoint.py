@@ -14,6 +14,8 @@ class Endpoint(JMSModel):
     http_port = PortField(default=80, verbose_name=_('HTTP Port'))
     ssh_port = PortField(default=2222, verbose_name=_('SSH Port'))
     rdp_port = PortField(default=3389, verbose_name=_('RDP Port'))
+
+    # Todo: Delete
     mysql_port = PortField(default=33060, verbose_name=_('MySQL Port'))
     mariadb_port = PortField(default=33061, verbose_name=_('MariaDB Port'))
     postgresql_port = PortField(default=54320, verbose_name=_('PostgreSQL Port'))

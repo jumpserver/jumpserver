@@ -12,7 +12,6 @@ from common.utils import is_uuid
 from assets.models import Asset, SystemUser
 from ..const import OracleVersion
 
-from ..utils import KubernetesTree
 from .. import const
 
 
@@ -175,6 +174,7 @@ class ApplicationTreeNodeMixin:
         return pid
 
     def as_tree_node(self, pid, k8s_as_tree=False):
+        from ..utils import KubernetesTree
         if self.type == const.AppType.k8s and k8s_as_tree:
             node = KubernetesTree(pid).as_tree_node(self)
         else:
