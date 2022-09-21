@@ -42,3 +42,4 @@ version-resolver:
 template: |
   ## 版本变化  What’s Changed
   $CHANGES
+
