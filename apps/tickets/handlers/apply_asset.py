@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext as _
 
 from perms.models import AssetPermission
-from orgs.utils import tmp_to_org, tmp_to_root_org
+from orgs.utils import tmp_to_org
 from tickets.models import ApplyAssetTicket
 from .base import BaseHandler
 
@@ -24,7 +24,6 @@ class Handler(BaseHandler):
 
             apply_nodes = self.ticket.apply_nodes.all()
             apply_assets = self.ticket.apply_assets.all()
-            apply_system_users = self.ticket.apply_system_users.all()
 
         apply_permission_name = self.ticket.apply_permission_name
         apply_actions = self.ticket.apply_actions
@@ -61,6 +60,5 @@ class Handler(BaseHandler):
             asset_permission.users.add(self.ticket.applicant)
             asset_permission.nodes.set(apply_nodes)
             asset_permission.assets.set(apply_assets)
-            asset_permission.system_users.set(apply_system_users)
 
         return asset_permission

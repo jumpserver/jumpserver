@@ -90,7 +90,7 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
             'applicant': user,
             'apply_login_user': user,
             'apply_login_asset': asset,
-            'apply_login_account': account,
+            'apply_login_account': str(account),
             'org_id': org_id,
         }
         ticket = ApplyLoginAssetTicket.objects.create(**data)

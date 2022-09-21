@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-import uuid
 import re
+import uuid
 
 from django.db import models
 from django.db.models import Q
@@ -9,10 +9,9 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import ugettext_lazy as _
 
 from users.models import User, UserGroup
-from ..models import Asset
-
-from common.utils import lazyproperty, get_logger, get_object_or_none
 from orgs.mixins.models import OrgModelMixin
+from common.utils import lazyproperty, get_logger, get_object_or_none
+from ..models import Asset, Account
 
 logger = get_logger(__file__)
 
@@ -167,7 +166,7 @@ class CommandFilterRule(OrgModelMixin):
             'applicant': session.user_obj,
             'apply_run_user_id': session.user_id,
             'apply_run_asset': str(session.asset),
-            'apply_run_system_user_id': session.system_user_id,
+            'apply_run_account': str(session.account),
             'apply_run_command': run_command[:4090],
             'apply_from_session_id': str(session.id),
             'apply_from_cmd_filter_rule_id': str(cmd_filter_rule.id),
@@ -180,9 +179,10 @@ class CommandFilterRule(OrgModelMixin):
         return ticket
 
     @classmethod
-    def get_queryset(cls, user_id=None, user_group_id=None, system_user_id=None,
-                     asset_id=None, application_id=None, org_id=None):
-        from applications.models import Application
+    def get_queryset(
+            cls, user_id=None, user_group_id=None, system_user_id=None,
+            asset_id=None, org_id=None
+    ):
         user_groups = []
         user = get_object_or_none(User, pk=user_id)
         if user:
@@ -191,23 +191,19 @@ class CommandFilterRule(OrgModelMixin):
         if user_group:
             org_id = user_group.org_id
             user_groups.append(user_group)
-        system_user = get_object_or_none(SystemUser, pk=system_user_id)
+        account = get_object_or_none(Account, pk=system_user_id)
         asset = get_object_or_none(Asset, pk=asset_id)
-        application = get_object_or_none(Application, pk=application_id)
         q = Q()
         if user:
             q |= Q(users=user)
         if user_groups:
             q |= Q(user_groups__in=set(user_groups))
-        if system_user:
-            org_id = system_user.org_id
-            q |= Q(system_users=system_user)
+        if account:
+            org_id = account.org_id
+            q |= Q(accounts=account)
         if asset:
             org_id = asset.org_id
             q |= Q(assets=asset)
-        if application:
-            org_id = application.org_id
-            q |= Q(applications=application)
         if q:
             cmd_filters = CommandFilter.objects.filter(q).filter(is_active=True)
             if org_id:
