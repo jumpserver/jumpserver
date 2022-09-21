@@ -55,9 +55,9 @@ class AllTypes(ChoicesMixin, metaclass=IncludesTextChoicesMeta):
         categories = []
         for category, tps in cls.category_types():
             category_data = {
-                'id': category.value,
-                'name': category.label,
-                'children': [cls.serialize_type(category, tp, with_constraints) for tp in tps]
+                'value': category.value,
+                'label': category.label,
+                'types': [cls.serialize_type(category, tp, with_constraints) for tp in tps]
             }
             categories.append(category_data)
         return categories
@@ -65,8 +65,8 @@ class AllTypes(ChoicesMixin, metaclass=IncludesTextChoicesMeta):
     @classmethod
     def serialize_type(cls, category, tp, with_constraints=True):
         data = {
-            'id': tp.value,
-            'name': tp.label,
+            'value': tp.value,
+            'label': tp.label,
             'category': category,
         }
 
@@ -85,25 +85,6 @@ class AllTypes(ChoicesMixin, metaclass=IncludesTextChoicesMeta):
             (Category.WEB, WebTypes),
             (Category.CLOUD, CloudTypes)
         )
-
-    @classmethod
-    def grouped_choices(cls):
-        grouped_types = [(str(ca), tp.choices) for ca, tp in cls.category_types()]
-        return grouped_types
-
-    @classmethod
-    def grouped_choices_to_objs(cls):
-        choices = cls.serialize_to_objs(Category.choices)
-        mapper = dict(cls.grouped_choices())
-        for choice in choices:
-            children = cls.serialize_to_objs(mapper[choice['value']])
-            choice['children'] = children
-        return choices
-
-    @staticmethod
-    def serialize_to_objs(choices):
-        title = ['value', 'display_name']
-        return [dict(zip(title, choice)) for choice in choices]
 
     @staticmethod
     def choice_to_node(choice, pid, opened=True, is_parent=True, meta=None):
