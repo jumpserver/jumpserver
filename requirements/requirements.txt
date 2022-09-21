@@ -62,7 +62,7 @@ jsonfield2==4.0.0.post0
 geoip2==4.5.0
 ipip-ipdb==1.6.1
 # Django environment
-Django==3.2.14
+Django==3.2.15
 django-bootstrap3==14.2.0
 django-filter==2.4.0
 django-formtools==2.2
@@ -91,7 +91,7 @@ eventlet==0.33.1
 greenlet==1.1.2
 gunicorn==20.1.0
 celery==5.2.7
-flower==1.0.0
+flower==1.2.0
 django-celery-beat==2.3.0
 kombu==5.2.4
 # Auth
@@ -134,6 +134,7 @@ django-mysql==3.9.0
 django-redis==5.2.0
 python-redis-lock==3.7.0
 redis==4.3.3
+pymongo==4.2.0
 # Debug
 ipython==8.4.0
 ForgeryPy3==0.3.1

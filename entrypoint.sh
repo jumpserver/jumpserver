@@ -11,6 +11,9 @@ action="${1-start}"
 service="${2-all}"
 
 trap cleanup EXIT
+
+rm -f /opt/jumpserver/tmp/*.pid
+
 if [[ "$action" == "bash" || "$action" == "sh" ]];then
     bash
 elif [[ "$action" == "sleep" ]];then
@@ -19,4 +22,3 @@ elif [[ "$action" == "sleep" ]];then
 else
     python jms "${action}" "${service}"
 fi
-

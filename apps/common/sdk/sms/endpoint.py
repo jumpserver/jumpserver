@@ -15,6 +15,7 @@ logger = get_logger(__name__)
 class BACKENDS(TextChoices):
     ALIBABA = 'alibaba', _('Alibaba cloud')
     TENCENT = 'tencent', _('Tencent cloud')
+    HUAWEI = 'huawei', _('Huawei Cloud')
     CMPP2 = 'cmpp2', _('CMPP v2.0')
 
 

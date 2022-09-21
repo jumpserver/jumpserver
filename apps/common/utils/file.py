@@ -4,6 +4,10 @@ import csv
 import pyzipper
 import requests
 
+from hashlib import md5
+
+from django.conf import settings
+
 
 def create_csv_file(filename, headers, rows, ):
     with open(filename, 'w', encoding='utf-8-sig')as f:
@@ -28,3 +32,18 @@ def download_file(src, path):
         with open(path, 'wb') as f:
             for chunk in r.iter_content(chunk_size=8192):
                 f.write(chunk)
+
+
+def save_content_to_temp_path(content, file_mode=0o400):
+    if not content:
+        return
+
+    project_dir = settings.PROJECT_DIR
+    tmp_dir = os.path.join(project_dir, 'tmp')
+    filename = '.' + md5(content.encode('utf-8')).hexdigest()
+    filepath = os.path.join(tmp_dir, filename)
+    if not os.path.exists(filepath):
+        with open(filepath, 'w') as f:
+            f.write(content)
+        os.chmod(filepath, file_mode)
+    return filepath
