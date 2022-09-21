@@ -150,7 +150,7 @@ class IpInFilterBackend(filters.BaseFilterBackend):
                 name='ips', location='query', required=False, type='string',
                 schema=coreschema.String(
                     title='ips',
-                    description='ip in filter'
+                    description='address in filter'
                 )
             )
         ]
@@ -158,7 +158,7 @@ class IpInFilterBackend(filters.BaseFilterBackend):
 
 class AccountFilterSet(BaseFilterSet):
     from django_filters import rest_framework as filters
-    ip = filters.CharFilter(field_name='ip', lookup_expr='exact')
+    ip = filters.CharFilter(field_name='address', lookup_expr='exact')
     hostname = filters.CharFilter(field_name='name', lookup_expr='exact')
     username = filters.CharFilter(field_name="username", lookup_expr='exact')
     assets = UUIDInFilter(field_name='asset_id', lookup_expr='in')

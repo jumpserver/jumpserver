@@ -88,7 +88,7 @@ class AssetPermissionAssetRelationViewSet(RelationMixin):
 
 class AssetPermissionAllAssetListApi(generics.ListAPIView):
     serializer_class = serializers.AssetPermissionAllAssetSerializer
-    filterset_fields = ("name", "ip")
+    filterset_fields = ("name", "address")
     search_fields = filterset_fields
 
     def get_queryset(self):

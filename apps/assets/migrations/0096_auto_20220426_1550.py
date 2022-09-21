@@ -36,7 +36,6 @@ class Migration(migrations.Migration):
             name='Cloud',
             fields=[
                 ('asset_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='assets.asset')),
-                ('url', models.CharField(max_length=4096, verbose_name='Cluster')),
             ],
             options={
                 'abstract': False,
@@ -47,7 +46,6 @@ class Migration(migrations.Migration):
             name='Web',
             fields=[
                 ('asset_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='assets.asset')),
-                ('url', models.CharField(max_length=1024, verbose_name='url')),
                 ('autofill', models.CharField(default='basic', max_length=16)),
                 ('password_selector', models.CharField(blank=True, default='', max_length=128)),
                 ('submit_selector', models.CharField(blank=True, default='', max_length=128)),

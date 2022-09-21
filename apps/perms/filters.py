@@ -142,7 +142,7 @@ class AssetPermissionFilter(PermissionBaseFilter):
         is_query_all = self.get_query_param('all', True)
         asset_id = self.get_query_param('asset_id')
         asset_name = self.get_query_param('asset_name')
-        ip = self.get_query_param('ip')
+        ip = self.get_query_param('address')
 
         if asset_id:
             assets = Asset.objects.filter(pk=asset_id)

@@ -40,7 +40,7 @@ class BaseHost(Host):
 
     def __set_required_variables(self):
         host_data = self.host_data
-        self.set_variable('ansible_host', host_data['ip'])
+        self.set_variable('ansible_host', host_data['address'])
         self.set_variable('ansible_port', host_data['port'])
 
         if host_data.get('username'):

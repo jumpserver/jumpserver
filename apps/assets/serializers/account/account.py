@@ -58,7 +58,7 @@ class AccountSerializer(
 ):
     asset = ObjectRelatedField(
         required=False, queryset=Asset.objects,
-        label=_('Asset'), attrs=('id', 'name', 'ip')
+        label=_('Asset'), attrs=('id', 'name', 'address')
     )
     platform = serializers.ReadOnlyField(label=_("Platform"))
 
@@ -77,7 +77,7 @@ class AccountSerializer(
 class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
     class Meta(AccountSerializer.Meta):
         fields_backup = [
-            'name', 'ip', 'platform', 'protocols', 'username', 'password',
+            'name', 'address', 'platform', 'protocols', 'username', 'password',
             'private_key', 'public_key', 'date_created', 'date_updated', 'version'
         ]
         extra_kwargs = {

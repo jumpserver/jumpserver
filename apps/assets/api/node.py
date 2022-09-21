@@ -201,7 +201,7 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
         if not self.instance or not include_assets:
             return []
         assets = self.instance.get_assets().only(
-            "id", "name", "ip", "platform_id",
+            "id", "name", "address", "platform_id",
             "org_id", "is_active",
         ).prefetch_related('platform')
         return self.serialize_assets(assets, self.instance.key)

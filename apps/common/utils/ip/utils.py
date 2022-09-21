@@ -75,7 +75,7 @@ def contains_ip(ip, ip_group):
 
 def get_ip_city(ip):
     if not ip or not isinstance(ip, str):
-        return _("Invalid ip")
+        return _("Invalid address")
     if ':' in ip:
         return 'IPv6'
 

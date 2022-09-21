@@ -9,6 +9,12 @@ class WebSerializer(AssetSerializer):
     class Meta(AssetSerializer.Meta):
         model = Web
         fields = AssetSerializer.Meta.fields + [
-            'url', 'autofill', 'username_selector',
+            'autofill', 'username_selector',
             'password_selector', 'submit_selector'
         ]
+        extra_kwargs = {
+            **AssetSerializer.Meta.extra_kwargs,
+            'address': {
+                'label': 'URL'
+            }
+        }

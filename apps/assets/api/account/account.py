@@ -18,8 +18,8 @@ __all__ = ['AccountViewSet', 'AccountSecretsViewSet', 'AccountTaskCreateAPI']
 
 class AccountViewSet(OrgBulkModelViewSet):
     model = Account
-    filterset_fields = ("username", "asset", 'ip', 'name')
-    search_fields = ('username', 'ip', 'name')
+    filterset_fields = ("username", "asset", 'address', 'name')
+    search_fields = ('username', 'address', 'name')
     filterset_class = AccountFilterSet
     serializer_classes = {
         'default': serializers.AccountSerializer,

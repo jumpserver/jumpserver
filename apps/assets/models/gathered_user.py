@@ -25,7 +25,7 @@ class GatheredUser(OrgModelMixin):
 
     @property
     def ip(self):
-        return self.asset.ip
+        return self.asset.address
 
     class Meta:
         verbose_name = _('GatherUser')

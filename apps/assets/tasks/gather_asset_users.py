@@ -95,7 +95,7 @@ def add_asset_users(assets, results):
             for username, data in users.items():
                 defaults = {'asset': asset, 'username': username, 'present': True}
                 if data.get("ip"):
-                    defaults["ip_last_login"] = data["ip"][:32]
+                    defaults["ip_last_login"] = data["address"][:32]
                 if data.get("date"):
                     defaults["date_last_login"] = data["date"]
                 GatheredUser.objects.update_or_create(

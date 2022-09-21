@@ -117,7 +117,7 @@ def download_ip_db():
         path = os.path.join(db_base_dir, *p)
         if os.path.isfile(path) and os.path.getsize(path) > 1000:
             continue
-        print("Download ip db: {}".format(path))
+        print("Download address db: {}".format(path))
         download_file(src, path)
 
 

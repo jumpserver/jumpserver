@@ -84,7 +84,7 @@ class Protocol(models.Model):
 class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
-    ip = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
+    address = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
     platform = models.ForeignKey(Platform, default=Platform.default, on_delete=models.PROTECT,
                                  verbose_name=_("Platform"), related_name='assets')
     domain = models.ForeignKey("assets.Domain", null=True, blank=True, related_name='assets',
@@ -101,7 +101,7 @@ class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
         return '{0.name}({0.ip})'.format(self)
 
     def get_target_ip(self):
-        return self.ip
+        return self.address
 
     def get_target_ssh_port(self):
         protocol = self.protocols.all().filter(name='ssh').first()
@@ -161,7 +161,7 @@ class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
         data = {
             'id': str(self.id),
             'name': self.name,
-            'title': self.ip,
+            'title': self.address,
             'pId': parent_node.key,
             'isParent': False,
             'open': False,
@@ -171,7 +171,7 @@ class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
                 'data': {
                     'id': self.id,
                     'name': self.name,
-                    'ip': self.ip,
+                    'address': self.address,
                     'protocols': self.protocols,
                 }
             }

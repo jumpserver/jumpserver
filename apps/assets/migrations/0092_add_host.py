@@ -17,6 +17,11 @@ class Migration(migrations.Migration):
             name='info',
             field=models.JSONField(blank=True, default=dict, verbose_name='Info'),
         ),
+        migrations.RenameField(
+            model_name='asset',
+            old_name='ip',
+            new_name='address',
+        ),
         migrations.CreateModel(
             name='Host',
             fields=[

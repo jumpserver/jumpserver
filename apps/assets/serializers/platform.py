@@ -25,6 +25,8 @@ class ProtocolSettingSerializer(serializers.Serializer):
     sftp_enabled = serializers.BooleanField(default=True, label=_("SFTP enabled"))
     sftp_home = serializers.CharField(default='/tmp', label=_("SFTP home"))
 
+    via_http = serializers.BooleanField(default=False, label=_("Via HTTP"))
+
 
 class PlatformAutomationSerializer(serializers.ModelSerializer):
     class Meta:

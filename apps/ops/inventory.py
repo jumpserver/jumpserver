@@ -19,7 +19,7 @@ class JMSBaseInventory(BaseInventory):
         info = {
             'id': asset.id,
             'name': asset.name,
-            'ip': asset.ip,
+            'ip': asset.address,
             'port': asset.ssh_port,
             'vars': dict(),
             'groups': [],
@@ -49,7 +49,7 @@ class JMSBaseInventory(BaseInventory):
         proxy_command_list = [
             "ssh", "-o", "Port={}".format(gateway.port),
             "-o", "StrictHostKeyChecking=no",
-            "{}@{}".format(gateway.username, gateway.ip),
+            "{}@{}".format(gateway.username, gateway.address),
             "-W", "%h:%p", "-q",
         ]
 

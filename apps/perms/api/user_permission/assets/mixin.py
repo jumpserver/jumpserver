@@ -32,7 +32,7 @@ class UserDirectGrantedAssetsQuerysetMixin:
 class UserAllGrantedAssetsQuerysetMixin:
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
     pagination_class = AllGrantedAssetPagination
-    ordering_fields = ("hostname", "ip", "port", "cpu_cores")
+    ordering_fields = ("hostname", "address", "port", "cpu_cores")
     ordering = ('hostname', )
 
     user: User
@@ -84,8 +84,8 @@ class UserGrantedNodeAssetsMixin:
 
 class AssetsSerializerFormatMixin:
     serializer_class = serializers.AssetGrantedSerializer
-    filterset_fields = ['name', 'ip', 'id', 'comment']
-    search_fields = ['name', 'ip', 'comment']
+    filterset_fields = ['name', 'address', 'id', 'comment']
+    search_fields = ['name', 'address', 'comment']
 
 
 class AssetsTreeFormatMixin(SerializeToTreeNodeMixin):
@@ -95,8 +95,8 @@ class AssetsTreeFormatMixin(SerializeToTreeNodeMixin):
     filter_queryset: callable
     get_queryset: callable
 
-    filterset_fields = ['name', 'ip', 'id', 'comment']
-    search_fields = ['name', 'ip', 'comment']
+    filterset_fields = ['name', 'address', 'id', 'comment']
+    search_fields = ['name', 'address', 'comment']
 
     def list(self, request: Request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())

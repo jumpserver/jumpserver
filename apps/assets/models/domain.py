@@ -136,7 +136,7 @@ class Gateway(BaseAccount):
                socket.gaierror) as e:
             err = str(e)
             if err.startswith('[Errno None] Unable to connect to port'):
-                err = _('Unable to connect to port {port} on {ip}')
+                err = _('Unable to connect to port {port} on {address}')
                 err = err.format(port=self.port, ip=self.ip)
             elif err == 'Authentication failed.':
                 err = _('Authentication failed')

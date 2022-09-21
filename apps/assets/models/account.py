@@ -35,7 +35,7 @@ class Account(BaseAccount):
 
     @lazyproperty
     def ip(self):
-        return self.asset.ip
+        return self.asset.address
 
     @lazyproperty
     def asset_name(self):

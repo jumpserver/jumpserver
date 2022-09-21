@@ -30,7 +30,7 @@ class AssetFilterSet(BaseFilterSet):
 
     class Meta:
         model = Asset
-        fields = ['name', 'ip', 'is_active', 'type', 'category', 'hostname']
+        fields = ['name', 'address', 'is_active', 'type', 'category', 'hostname']
 
 
 class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
@@ -39,8 +39,8 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
     """
     model = Asset
     filterset_class = AssetFilterSet
-    search_fields = ("name", "ip")
-    ordering_fields = ("name", "ip")
+    search_fields = ("name", "address")
+    ordering_fields = ("name", "address")
     ordering = ('name',)
     serializer_classes = (
         ('default', serializers.AssetSerializer),

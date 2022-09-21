@@ -57,7 +57,7 @@ class SerializeToTreeNodeMixin:
             {
                 'id': str(asset.id),
                 'name': asset.name,
-                'title': asset.ip,
+                'title': asset.address,
                 'pId': get_pid(asset),
                 'isParent': False,
                 'open': False,
@@ -68,7 +68,7 @@ class SerializeToTreeNodeMixin:
                     'data': {
                         'id': asset.id,
                         'name': asset.name,
-                        'ip': asset.ip,
+                        'address': asset.address,
                         'protocols': asset.protocols_as_list,
                         'platform': asset.platform.id,
                         'org_name': asset.org_name

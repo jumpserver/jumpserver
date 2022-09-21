@@ -20,14 +20,13 @@ class Protocol(ChoicesMixin, models.TextChoices):
 
     k8s = 'k8s', 'K8S'
     http = 'http', 'HTTP'
-    https = 'https', 'HTTPS'
 
     @classmethod
-    def device_settings(cls):
+    def device_protocols(cls):
         return {
             cls.ssh: {
                 'port': 22,
-                'secret_type': ['password', 'ssh_key'],
+                'secret_types': ['password', 'ssh_key'],
                 'setting': {
                     'sftp_enabled': True,
                     'sftp_home': '/tmp',
@@ -35,7 +34,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
             },
             cls.rdp: {
                 'port': 3389,
-                'secret_type': ['password'],
+                'secret_types': ['password'],
                 'setting': {
                     'console': True,
                     'security': 'any',
@@ -43,64 +42,63 @@ class Protocol(ChoicesMixin, models.TextChoices):
             },
             cls.vnc: {
                 'port': 5900,
-                'secret_type': ['password'],
+                'secret_types': ['password'],
             },
             cls.telnet: {
                 'port': 23,
-                'secret_type': ['password'],
+                'secret_types': ['password'],
             },
         }
 
     @classmethod
-    def db_settings(cls):
+    def database_protocols(cls):
         return {
             cls.mysql: {
                 'port': 3306,
-                'secret_type': ['password'],
+                'secret_types': ['password'],
                 'setting': {
                 }
             },
             cls.mariadb: {
                 'port': 3306,
-                'secret_type': ['password'],
+                'secret_types': ['password'],
             },
             cls.postgresql: {
                 'port': 5432,
-                'secret_type': ['password'],
+                'secret_types': ['password'],
             },
             cls.oracle: {
                 'port': 1521,
-                'secret_type': ['password'],
+                'secret_types': ['password'],
             },
             cls.sqlserver: {
                 'port': 1433,
-                'secret_type': ['password'],
+                'secret_types': ['password'],
             },
             cls.mongodb: {
                 'port': 27017,
-                'secret_type': ['password'],
+                'secret_types': ['password'],
             },
             cls.redis: {
                 'port': 6379,
-                'secret_type': ['password'],
+                'secret_types': ['password'],
             },
         }
 
     @classmethod
-    def cloud_settings(cls):
+    def cloud_protocols(cls):
         return {
             cls.k8s: {
                 'port': 443,
-                'secret_type': ['token'],
-                'setting': {
-                    'via_http': True
-                }
+                'secret_types': ['token'],
             },
             cls.http: {
                 'port': 80,
-                'secret_type': ['password'],
+                'secret_types': ['password'],
                 'setting': {
-                    'ssl': True
+                    'username_selector': '',
+                    'password_selector': '',
+                    'submit_selector': '',
                 }
             },
         }
@@ -108,30 +106,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
     @classmethod
     def settings(cls):
         return {
-            **cls.device_settings(),
-            **cls.db_settings(),
-            **cls.cloud_settings()
+            **cls.device_protocols(),
+            **cls.database_protocols(),
+            **cls.cloud_protocols()
         }
-
-    @classmethod
-    def default_ports(cls):
-        return {
-            cls.ssh: 22,
-            cls.sftp: 22,
-            cls.rdp: 3389,
-            cls.vnc: 5900,
-            cls.telnet: 21,
-
-            cls.mysql: 3306,
-            cls.mariadb: 3306,
-            cls.postgresql: 5432,
-            cls.oracle: 1521,
-            cls.sqlserver: 1433,
-            cls.mongodb: 27017,
-            cls.redis: 6379,
-
-            cls.k8s: 0,
-
-            cls.http: 80,
-        }
-

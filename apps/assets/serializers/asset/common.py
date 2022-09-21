@@ -68,7 +68,7 @@ class AssetSerializer(JMSWritableNestedModelSerializer):
 
     class Meta:
         model = Asset
-        fields_mini = ['id', 'name', 'ip']
+        fields_mini = ['id', 'name', 'address']
         fields_small = fields_mini + ['is_active', 'comment']
         fields_fk = ['domain', 'platform', 'platform']
         fields_m2m = [
@@ -81,7 +81,7 @@ class AssetSerializer(JMSWritableNestedModelSerializer):
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
         extra_kwargs = {
             'name': {'label': _("Name")},
-            'ip': {'label': _('IP/Host')},
+            'address': {'label': _('Address')},
         }
 
     @classmethod
@@ -142,7 +142,7 @@ class AssetSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Asset
         fields = [
-            'id', 'name', 'ip', 'port',
+            'id', 'name', 'address', 'port',
             'connectivity', 'date_verified'
         ]
 
