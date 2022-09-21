@@ -10,6 +10,7 @@ class CloudTypes(BaseType):
     def _get_base_constrains(cls) -> dict:
         return {
             '*': {
+                'charset_enabled': False,
                 'domain_enabled': False,
                 'su_enabled': False,
             }
@@ -32,7 +33,7 @@ class CloudTypes(BaseType):
     def _get_protocol_constrains(cls) -> dict:
         return {
             '*': {
-                'choices': ['http', 'api'],
+                'choices': ['http'],
             },
             cls.K8S: {
                 'choices': ['k8s']

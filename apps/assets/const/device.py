@@ -4,7 +4,7 @@ from .base import BaseType
 
 
 class DeviceTypes(BaseType):
-    GENERAL = 'general', _("General device")
+    GENERAL = 'general', _("General")
     SWITCH = 'switch', _("Switch")
     ROUTER = 'router', _("Router")
     FIREWALL = 'firewall', _("Firewall")
@@ -13,6 +13,7 @@ class DeviceTypes(BaseType):
     def _get_base_constrains(cls) -> dict:
         return {
             '*': {
+                'charset_enabled': False,
                 'domain_enabled': True,
                 'su_enabled': False,
             }

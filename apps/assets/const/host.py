@@ -11,6 +11,7 @@ class HostTypes(BaseType):
     def _get_base_constrains(cls) -> dict:
         return {
             '*': {
+                'charset_enabled': True,
                 'domain_enabled': True,
                 'su_enabled': True,
             },

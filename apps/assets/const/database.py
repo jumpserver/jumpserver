@@ -15,6 +15,7 @@ class DatabaseTypes(BaseType):
     def _get_base_constrains(cls) -> dict:
         return {
             '*': {
+                'charset_enabled': False,
                 'domain_enabled': True,
                 'su_enabled': False,
             }

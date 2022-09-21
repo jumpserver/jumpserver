@@ -526,7 +526,7 @@ msgstr "内部的"
 #: perms/serializers/asset/user_permission.py:43
 #: xpack/plugins/cloud/serializers/account_attrs.py:162
 msgid "Platform"
-msgstr "系统平台"
+msgstr "资产平台"
 
 #: assets/models/asset.py:168
 msgid "Vendor"

@@ -25,7 +25,11 @@ class ProtocolSettingSerializer(serializers.Serializer):
     sftp_enabled = serializers.BooleanField(default=True, label=_("SFTP enabled"))
     sftp_home = serializers.CharField(default='/tmp', label=_("SFTP home"))
 
-    via_http = serializers.BooleanField(default=False, label=_("Via HTTP"))
+    # HTTP
+    auto_fill = serializers.BooleanField(default=False, label=_("Auto fill"))
+    username_selector = serializers.CharField(default='', label=_("Username selector"))
+    password_selector = serializers.CharField(default='', label=_("Password selector"))
+    submit_selector = serializers.CharField(default='', label=_("Submit selector"))
 
 
 class PlatformAutomationSerializer(serializers.ModelSerializer):

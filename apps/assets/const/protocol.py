@@ -96,9 +96,9 @@ class Protocol(ChoicesMixin, models.TextChoices):
                 'port': 80,
                 'secret_types': ['password'],
                 'setting': {
-                    'username_selector': '',
-                    'password_selector': '',
-                    'submit_selector': '',
+                    'username_selector': 'input[type=text]',
+                    'password_selector': 'input[type=password]',
+                    'submit_selector': 'button[type=submit]',
                 }
             },
         }

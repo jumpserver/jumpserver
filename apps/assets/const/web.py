@@ -4,12 +4,13 @@ from .base import BaseType
 
 
 class WebTypes(BaseType):
-    WEBSITE = 'website', _('General website')
+    WEBSITE = 'website', _('Website')
 
     @classmethod
     def _get_base_constrains(cls) -> dict:
         return {
             '*': {
+                'charset_enabled': False,
                 'domain_enabled': False,
                 'su_enabled': False,
             }
@@ -32,6 +33,6 @@ class WebTypes(BaseType):
     def _get_protocol_constrains(cls) -> dict:
         return {
             '*': {
-                'choices': ['http', 'api'],
+                'choices': ['http'],
             }
         }
