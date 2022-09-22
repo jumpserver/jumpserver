@@ -2,8 +2,9 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 from common.drf.serializers import BulkModelSerializer
 from acls.serializers.rules import ip_group_child_validator, ip_group_help_text
-from applications.utils import db_port_manager
+from ..utils import db_port_manager
 from ..models import Endpoint, EndpointRule
+
 
 __all__ = ['EndpointSerializer', 'EndpointRuleSerializer']
 
