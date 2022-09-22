@@ -1,12 +1,13 @@
-from common.decorator import Singleton
+from django.utils.translation import ugettext_lazy as _
 from django.core.cache import cache
 from django.conf import settings
+
+from common.decorator import Singleton
+from common.utils import get_logger, get_object_or_none
+from common.exceptions import JMSException
 from applications.const import AppCategory
 from applications.models import Application
-from common.utils import get_logger
-from common.utils import get_object_or_none
 from orgs.utils import tmp_to_root_org
-from common.exceptions import JMSException
 
 
 logger = get_logger(__file__)
@@ -23,7 +24,7 @@ class DBPortManager(object):
         self.port_limit = settings.MAGNUS_DB_PORTS_LIMIT_COUNT
         self.port_end = self.port_start + self.port_limit
         # 可以使用的端口列表
-        self.all_available_ports = list(range(self.port_start, self.port_end + 1))
+        self.all_available_ports = list(range(self.port_start, self.port_end))
 
     @property
     def magnus_listen_port_range(self):
@@ -73,10 +74,13 @@ class DBPortManager(object):
         already_use_ports = self.get_already_use_ports()
         available_ports = sorted(list(set(self.all_available_ports) - set(already_use_ports)))
         if len(available_ports) <= 0:
-            raise JMSException(
-                'No port is available, All available port count: {}, Already use port count: {}'
-                ''.format(len(self.all_available_ports), len(already_use_ports))
+            msg = _('No ports can be used, check and modify the limit on the number '
+                    'of ports that Magnus listens on in the configuration file.')
+            tips = _('All available port count: {}, Already use port count: {}').format(
+                len(self.all_available_ports), len(already_use_ports)
             )
+            error = msg + tips
+            raise JMSException(error)
         port = available_ports[0]
         logger.debug('Get next available port: {}'.format(port))
         return port

@@ -6,7 +6,6 @@ from ..utils import db_port_manager, DBPortManager
 from common.db.models import JMSModel
 from common.db.fields import PortField
 from common.utils.ip import contains_ip
-from common.exceptions import JMSException
 
 db_port_manager: DBPortManager
 

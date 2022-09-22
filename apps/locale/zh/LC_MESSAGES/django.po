@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-22 17:23+0800\n"
+"POT-Creation-Date: 2022-09-22 19:01+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -28,7 +28,7 @@ msgstr "访问控制"
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
 #: orgs/models.py:70 perms/models/base.py:83 rbac/models/role.py:29
 #: settings/models.py:33 settings/serializers/sms.py:6
-#: terminal/models/endpoint.py:13 terminal/models/endpoint.py:90
+#: terminal/models/endpoint.py:14 terminal/models/endpoint.py:87
 #: terminal/models/storage.py:26 terminal/models/task.py:16
 #: terminal/models/terminal.py:100 users/forms/profile.py:33
 #: users/models/group.py:15 users/models/user.py:669
@@ -37,12 +37,12 @@ msgid "Name"
 msgstr "名称"
 
 #: acls/models/base.py:27 assets/models/cmd_filter.py:84
-#: assets/models/user.py:251 terminal/models/endpoint.py:93
+#: assets/models/user.py:251 terminal/models/endpoint.py:90
 msgid "Priority"
 msgstr "优先级"
 
 #: acls/models/base.py:28 assets/models/cmd_filter.py:84
-#: assets/models/user.py:251 terminal/models/endpoint.py:94
+#: assets/models/user.py:251 terminal/models/endpoint.py:91
 msgid "1-100, the lower the value will be match first"
 msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 
@@ -60,7 +60,7 @@ msgstr "激活中"
 #: assets/models/domain.py:65 assets/models/group.py:23
 #: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:73
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:38
-#: terminal/models/endpoint.py:21 terminal/models/endpoint.py:100
+#: terminal/models/endpoint.py:22 terminal/models/endpoint.py:97
 #: terminal/models/storage.py:29 terminal/models/terminal.py:114
 #: tickets/models/comment.py:32 tickets/models/ticket/general.py:288
 #: users/models/group.py:16 users/models/user.py:706
@@ -183,7 +183,7 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
-#: settings/serializers/terminal.py:8 terminal/serializers/endpoint.py:53
+#: settings/serializers/terminal.py:8 terminal/serializers/endpoint.py:54
 msgid "IP"
 msgstr "IP"
 
@@ -383,7 +383,7 @@ msgstr "集群"
 
 #: applications/serializers/attrs/application_category/db.py:11
 #: ops/models/adhoc.py:157 settings/serializers/auth/radius.py:14
-#: settings/serializers/auth/sms.py:65 terminal/models/endpoint.py:14
+#: settings/serializers/auth/sms.py:65 terminal/models/endpoint.py:15
 #: xpack/plugins/cloud/serializers/account_attrs.py:72
 msgid "Host"
 msgstr "主机"
@@ -4874,34 +4874,34 @@ msgstr "存储无效"
 msgid "Command record"
 msgstr "命令记录"
 
-#: terminal/models/endpoint.py:16
+#: terminal/models/endpoint.py:17
 msgid "HTTPS Port"
 msgstr "HTTPS 端口"
 
-#: terminal/models/endpoint.py:17 terminal/models/terminal.py:107
+#: terminal/models/endpoint.py:18 terminal/models/terminal.py:107
 msgid "HTTP Port"
 msgstr "HTTP 端口"
 
-#: terminal/models/endpoint.py:18 terminal/models/terminal.py:106
+#: terminal/models/endpoint.py:19 terminal/models/terminal.py:106
 msgid "SSH Port"
 msgstr "SSH 端口"
 
-#: terminal/models/endpoint.py:19
+#: terminal/models/endpoint.py:20
 msgid "RDP Port"
 msgstr "RDP 端口"
 
-#: terminal/models/endpoint.py:26 terminal/models/endpoint.py:98
-#: terminal/serializers/endpoint.py:56 terminal/serializers/storage.py:38
+#: terminal/models/endpoint.py:27 terminal/models/endpoint.py:95
+#: terminal/serializers/endpoint.py:57 terminal/serializers/storage.py:38
 #: terminal/serializers/storage.py:50 terminal/serializers/storage.py:80
 #: terminal/serializers/storage.py:90 terminal/serializers/storage.py:98
 msgid "Endpoint"
 msgstr "端点"
 
-#: terminal/models/endpoint.py:91
+#: terminal/models/endpoint.py:88
 msgid "IP group"
 msgstr "IP 组"
 
-#: terminal/models/endpoint.py:103
+#: terminal/models/endpoint.py:100
 msgid "Endpoint rule"
 msgstr "端点规则"
 
@@ -5082,21 +5082,21 @@ msgstr "级别"
 msgid "Batch danger command alert"
 msgstr "批量危险命令告警"
 
-#: terminal/serializers/endpoint.py:13
+#: terminal/serializers/endpoint.py:14
 msgid "Magnus listen db port"
 msgstr "Magnus 监听的数据库端口"
 
-#: terminal/serializers/endpoint.py:16
+#: terminal/serializers/endpoint.py:17
 msgid "Magnus Listen port range"
 msgstr "Magnus 监听的端口范围"
 
-#: terminal/serializers/endpoint.py:18
+#: terminal/serializers/endpoint.py:19
 msgid ""
 "The range of ports that Magnus listens on is modified in the configuration "
 "file"
 msgstr "请在配置文件中修改 Magnus 监听的端口范围"
 
-#: terminal/serializers/endpoint.py:50
+#: terminal/serializers/endpoint.py:51
 msgid ""
 "If asset IP addresses under different endpoints conflict, use asset labels"
 msgstr "如果不同端点下的资产 IP 有冲突，使用资产标签实现"
@@ -5222,6 +5222,16 @@ msgstr "没有发现"
 #: terminal/templates/terminal/_msg_command_alert.html:10
 msgid "view"
 msgstr "查看"
+
+#: terminal/utils/db_port_mapper.py:77
+msgid ""
+"No ports can be used, check and modify the limit on the number of ports that "
+"Magnus listens on in the configuration file."
+msgstr "没有端口可以使用，检查并修改配置文件中 Magnus 监听的端口数量限制。"
+
+#: terminal/utils/db_port_mapper.py:79
+msgid "All available port count: {}, Already use port count: {}"
+msgstr "所有可用端口数量：{}，已使用端口数量：{}"
 
 #: tickets/apps.py:7
 msgid "Tickets"
@@ -6897,24 +6907,3 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
-
-#~ msgid "Magnus currently supports only 11g and 12c connections"
-#~ msgstr "目前 Magnus 只支持连接 11g、12c 版本"
-
-#~ msgid "MySQL Port"
-#~ msgstr "MySQL 端口"
-
-#~ msgid "MariaDB Port"
-#~ msgstr "MariaDB 端口"
-
-#~ msgid "PostgreSQL Port"
-#~ msgstr "PostgreSQL 端口"
-
-#~ msgid "Redis Port"
-#~ msgstr "Redis 端口"
-
-#~ msgid "Oracle 11g Port"
-#~ msgstr "Oracle 11g 端口"
-
-#~ msgid "Oracle 12c Port"
-#~ msgstr "Oracle 12c 端口"
