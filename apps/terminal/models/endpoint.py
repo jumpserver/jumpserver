@@ -2,11 +2,13 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 from applications.models import Application
-from applications.utils import db_port_manager
+from ..utils import db_port_manager, DBPortManager
 from common.db.models import JMSModel
 from common.db.fields import PortField
 from common.utils.ip import contains_ip
 from common.exceptions import JMSException
+
+db_port_manager: DBPortManager
 
 
 class Endpoint(JMSModel):
@@ -34,10 +36,6 @@ class Endpoint(JMSModel):
             port = getattr(self, f'{protocol}_port', 0)
         elif isinstance(target_instance, Application) and target_instance.category_db:
             port = db_port_manager.get_port_by_db(target_instance)
-            if port is None:
-                error = 'No application port is matched, application id: {}' \
-                        ''.format(target_instance.id)
-                raise JMSException(error)
         else:
             port = 0
         return port
