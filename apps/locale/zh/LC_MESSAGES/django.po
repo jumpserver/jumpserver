@@ -4735,11 +4735,17 @@ msgstr "Windows 远程应用发布服务器工具"
 
 #: templates/resource_download.html:43
 msgid ""
+"OpenSSH is a program used to connect remote applications in the Windows "
+"Remote Application Publisher"
+msgstr "OpenSSH 是在 windows 远程应用发布服务器中用来连接远程应用的程序"
+
+#: templates/resource_download.html:48
+msgid ""
 "Jmservisor is the program used to pull up remote applications in Windows "
 "Remote Application publisher"
 msgstr "Jmservisor 是在 windows 远程应用发布服务器中用来拉起远程应用的程序"
 
-#: templates/resource_download.html:51
+#: templates/resource_download.html:57
 msgid "Offline video player"
 msgstr "离线录像播放器"
 
