@@ -29,6 +29,27 @@ class DBPortManager(object):
         mapper = dict(zip(self.all_usable_ports, list(db_ids)))
         self.set_mapper(mapper)
 
+    def add(self, db: Application):
+        mapper = self.get_mapper()
+        usable_port = self.get_next_usable_port()
+        if not usable_port:
+            return False
+        mapper.update({usable_port: str(db.id)})
+        self.set_mapper(mapper)
+        return True
+
+    def pop(self, db: Application):
+        mapper = self.get_mapper()
+        to_delete_port = self.get_port_by_db(db)
+        mapper.pop(to_delete_port, None)
+        self.set_mapper(mapper)
+
+    def get_port_by_db(self, db):
+        mapper = self.get_mapper()
+        for port, db_id in mapper.items():
+            if db_id == str(db.id):
+                return port
+
     def get_db_by_port(self, port):
         mapper = self.get_mapper()
         db_id = mapper.get(port, None)
@@ -43,36 +64,17 @@ class DBPortManager(object):
             msg = 'Port not in port-db mapper, port: {}'.format(port)
         return db, msg
 
-    def add(self, db: Application):
-        mapper = self.get_mapper()
-        usable_port = self.get_next_usable_port()
-        if not usable_port:
-            return False
-        mapper.update({usable_port: str(db.id)})
-        self.set_mapper(mapper)
-        return True
-
-    def pop(self, db: Application):
-        mapper = self.get_mapper()
-        to_delete_port = None
-        for port, db_id in mapper.items():
-            if db_id == str(db.id):
-                to_delete_port = port
-                break
-        mapper.pop(to_delete_port, None)
-        self.set_mapper(mapper)
-
     def get_next_usable_port(self):
         already_use_ports = self.get_already_use_ports()
         usable_ports = list(set(self.all_usable_ports) - set(already_use_ports))
         if len(usable_ports) > 1:
             return usable_ports[0]
-        else:
-            already_use_ports = self.get_already_use_ports()
-            msg = 'No port is usable, All usable port count: {}, Already use port count: {}'.format(
-                len(self.all_usable_ports), len(already_use_ports)
-            )
-            logger.warning(msg)
+
+        already_use_ports = self.get_already_use_ports()
+        msg = 'No port is usable, All usable port count: {}, Already use port count: {}'.format(
+            len(self.all_usable_ports), len(already_use_ports)
+        )
+        logger.warning(msg)
 
     def get_already_use_ports(self):
         mapper = self.get_mapper()
@@ -82,6 +84,11 @@ class DBPortManager(object):
         return cache.get(self.CACHE_KEY, {})
 
     def set_mapper(self, value):
+        """
+        value: {
+            port: db_id
+        }
+        """
         cache.set(self.CACHE_KEY, value, timeout=None)
 
 
