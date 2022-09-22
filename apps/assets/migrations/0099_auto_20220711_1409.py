@@ -79,4 +79,24 @@ class Migration(migrations.Migration):
             name='su_from',
             field=models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='assets.account', verbose_name='Su from'),
         ),
+        migrations.CreateModel(
+            name='AccountTemplate',
+            fields=[
+                ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
+                ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
+                ('name', models.CharField(max_length=128, verbose_name='Name')),
+                ('username', models.CharField(blank=True, db_index=True, max_length=128, verbose_name='Username')),
+                ('secret_type', models.CharField(choices=[('password', 'Password'), ('ssh_key', 'SSH key'), ('access_key', 'Access key'), ('token', 'Token')], default='password', max_length=16, verbose_name='Secret type'),),
+                ('secret', common.db.fields.EncryptTextField(blank=True, null=True, verbose_name='Secret')),
+                ('comment', models.TextField(blank=True, verbose_name='Comment')),
+                ('date_created', models.DateTimeField(auto_now_add=True, verbose_name='Date created')),
+                ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
+                ('created_by', models.CharField(max_length=128, null=True, verbose_name='Created by')),
+                ('privileged', models.BooleanField(default=False, verbose_name='Privileged')),
+            ],
+            options={
+                'verbose_name': 'Account template',
+                'unique_together': {('name', 'org_id')},
+            },
+        ),
     ]

@@ -49,10 +49,15 @@ def migrate_backup_types(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('assets', '0108_auto_20220915_1032'),
+        ('assets', '0105_auto_20220817_1544'),
     ]
 
     operations = [
+        migrations.AlterField(
+            model_name='accountbackupplan',
+            name='types',
+            field=models.BigIntegerField(),
+        ),
         migrations.AddField(
             model_name='accountbackupplan',
             name='categories',

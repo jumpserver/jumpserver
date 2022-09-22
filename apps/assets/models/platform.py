@@ -18,6 +18,7 @@ class PlatformProtocol(models.Model):
     name = models.CharField(max_length=32, verbose_name=_('Name'))
     port = models.IntegerField(verbose_name=_('Port'))
     setting = models.JSONField(verbose_name=_('Setting'), default=dict)
+    platform = models.ForeignKey('Platform', on_delete=models.CASCADE, related_name='protocols')
 
 
 class PlatformAutomation(models.Model):
@@ -54,11 +55,11 @@ class Platform(models.Model):
     charset = models.CharField(default='utf8', choices=CHARSET_CHOICES, max_length=8, verbose_name=_("Charset"))
     domain_enabled = models.BooleanField(default=True, verbose_name=_("Domain enabled"))
     protocols_enabled = models.BooleanField(default=True, verbose_name=_("Protocols enabled"))
-    protocols = models.ManyToManyField(PlatformProtocol, blank=True, verbose_name=_("Protocols"))
     # 账号有关的
     su_enabled = models.BooleanField(default=False, verbose_name=_("Su enabled"))
     su_method = models.CharField(max_length=32, blank=True, null=True, verbose_name=_("SU method"))
-    automation = models.OneToOneField(PlatformAutomation, on_delete=models.CASCADE, related_name='platform', blank=True, null=True, verbose_name=_("Automation"))
+    automation = models.OneToOneField(PlatformAutomation, on_delete=models.CASCADE, related_name='platform',
+                                      blank=True, null=True, verbose_name=_("Automation"))
 
     @property
     def type_constraints(self):

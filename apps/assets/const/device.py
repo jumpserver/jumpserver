@@ -39,3 +39,12 @@ class DeviceTypes(BaseType):
                 'create_account_enabled': False,
             }
         }
+
+    @classmethod
+    def internal_platforms(cls):
+        return {
+            cls.GENERAL: [{'name': 'General'}, {'name': 'Cisco'}, {'name': 'Huawei'}, {'name': 'H3C'}],
+            cls.SWITCH: [],
+            cls.ROUTER: [],
+            cls.FIREWALL: []
+        }

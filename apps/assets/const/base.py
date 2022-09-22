@@ -49,3 +49,10 @@ class BaseType(TextChoices):
     def _get_automation_constrains(cls) -> dict:
         raise NotImplementedError
 
+    @classmethod
+    def internal_platforms(cls):
+        raise NotImplementedError
+
+    @classmethod
+    def create_or_update_internal_platforms(cls):
+        data = cls._internal_platforms()

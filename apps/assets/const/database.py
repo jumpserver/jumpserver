@@ -42,3 +42,15 @@ class DatabaseTypes(BaseType):
             }
         }
 
+    @classmethod
+    def internal_platforms(cls):
+        return {
+            cls.MYSQL: [{'name': 'MySQL'}],
+            cls.MARIADB: [{'name': 'MariaDB'}],
+            cls.POSTGRESQL: [{'name': 'PostgreSQL'}],
+            cls.ORACLE: [{'name': 'Oracle'}],
+            cls.SQLSERVER: [{'name': 'SQLServer'}],
+            cls.MONGODB: [{'name': 'MongoDB'}],
+            cls.REDIS: [{'name': 'Redis'}],
+        }
+

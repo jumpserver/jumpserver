@@ -24,7 +24,4 @@ class Migration(migrations.Migration):
                 ('asset', models.ForeignKey(on_delete=models.deletion.CASCADE, related_name='protocols', to='assets.asset', verbose_name='Asset')),
             ],
         ),
-        migrations.DeleteModel(
-            name='Cluster',
-        ),
     ]

@@ -59,6 +59,11 @@ class Migration(migrations.Migration):
             name='name',
             field=models.CharField(max_length=128, verbose_name='Name'),
         ),
+        migrations.RenameField(
+            model_name='asset',
+            old_name='ip',
+            new_name='address',
+        ),
         migrations.AddField(
             model_name='asset',
             name='date_updated',
@@ -74,4 +79,5 @@ class Migration(migrations.Migration):
             name='created_by',
             field=models.CharField(blank=True, max_length=32, null=True, verbose_name='Created by'),
         ),
+
     ]

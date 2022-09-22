@@ -66,4 +66,7 @@ class Migration(migrations.Migration):
             model_name='asset',
             name='vendor',
         ),
+        migrations.DeleteModel(
+            name='Cluster',
+        ),
     ]

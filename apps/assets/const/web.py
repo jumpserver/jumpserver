@@ -36,3 +36,11 @@ class WebTypes(BaseType):
                 'choices': ['http'],
             }
         }
+
+    @classmethod
+    def internal_platforms(cls):
+        return {
+            cls.WEBSITE: [
+                {'name': 'Website'},
+            ],
+        }
