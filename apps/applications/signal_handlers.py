@@ -6,7 +6,9 @@ from common.signals import django_ready
 from django.dispatch import receiver
 from common.utils import get_logger
 from .models import Application
-from .utils import db_port_manager
+from .utils import db_port_manager, DBPortManager
+
+db_port_manager: DBPortManager
 
 
 logger = get_logger(__file__)

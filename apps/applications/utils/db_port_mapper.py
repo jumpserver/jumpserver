@@ -5,6 +5,7 @@ from applications.const import AppCategory
 from applications.models import Application
 from common.utils import get_logger
 from common.utils import get_object_or_none
+from orgs.utils import tmp_to_root_org
 
 
 logger = get_logger(__file__)
@@ -19,9 +20,13 @@ class DBPortManager(object):
     def __init__(self):
         self.port_start = settings.MAGNUS_DB_PORTS_START
         self.port_limit = settings.MAGNUS_DB_PORTS_LIMIT_COUNT
-        self.port_end = self.port_start + self.port_limit + 1
+        self.port_end = self.port_start + self.port_limit
         # 可以使用的端口列表
-        self.all_usable_ports = [i for i in range(self.port_start, self.port_end)]
+        self.all_usable_ports = [i for i in range(self.port_start, self.port_end+1)]
+
+    @property
+    def magnus_listen_port_range(self):
+        return f'{self.port_start}-{self.port_end}'
 
     def init(self):
         db_ids = Application.objects.filter(category=AppCategory.db).values_list('id', flat=True)
@@ -57,7 +62,8 @@ class DBPortManager(object):
         mapper = self.get_mapper()
         db_id = mapper.get(port, None)
         if db_id:
-            db = get_object_or_none(Application, id=db_id)
+            with tmp_to_root_org():
+                db = get_object_or_none(Application, id=db_id)
             if not db:
                 msg = 'Database not exists, database id: {}'.format(db_id)
             else:
@@ -69,11 +75,12 @@ class DBPortManager(object):
 
     def get_next_usable_port(self):
         already_use_ports = self.get_already_use_ports()
-        usable_ports = list(set(self.all_usable_ports) - set(already_use_ports))
+        usable_ports = sorted(list(set(self.all_usable_ports) - set(already_use_ports)))
         if len(usable_ports) > 1:
-            return usable_ports[0]
+            port = usable_ports[0]
+            logger.debug('Get next usable port: {}'.format(port))
+            return port
 
-        already_use_ports = self.get_already_use_ports()
         msg = 'No port is usable, All usable port count: {}, Already use port count: {}'.format(
             len(self.all_usable_ports), len(already_use_ports)
         )
@@ -81,7 +88,7 @@ class DBPortManager(object):
 
     def get_already_use_ports(self):
         mapper = self.get_mapper()
-        return list(mapper.keys())
+        return sorted(list(mapper.keys()))
 
     def get_mapper(self):
         return cache.get(self.CACHE_KEY, {})
