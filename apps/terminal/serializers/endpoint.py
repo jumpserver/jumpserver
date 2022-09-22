@@ -2,25 +2,23 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 from common.drf.serializers import BulkModelSerializer
 from acls.serializers.rules import ip_group_child_validator, ip_group_help_text
+from django.conf import settings
 from ..models import Endpoint, EndpointRule
 
 __all__ = ['EndpointSerializer', 'EndpointRuleSerializer']
 
 
 class EndpointSerializer(BulkModelSerializer):
-    # 解决 luna 处理繁琐的问题，oracle_port 返回匹配到的端口
-    oracle_port = serializers.SerializerMethodField(label=_('Oracle port'))
+    # 解决 luna 处理繁琐的问题, 返回 magnus 监听的当前 db 的 port
+    magnus_listen_db_port = serializers.SerializerMethodField(label=_('Magnus listen db port'))
+    magnus_listen_port_range = serializers.SerializerMethodField(label=_('Magnus Listen port range'))
 
     class Meta:
         model = Endpoint
         fields_mini = ['id', 'name']
         fields_small = [
             'host',
-            'https_port', 'http_port', 'ssh_port',
-            'rdp_port', 'mysql_port', 'mariadb_port',
-            'postgresql_port', 'redis_port',
-            'oracle_11g_port', 'oracle_12c_port',
-            'oracle_port',
+            'https_port', 'http_port', 'ssh_port', 'rdp_port',
         ]
         fields = fields_mini + fields_small + [
             'comment', 'date_created', 'date_updated', 'created_by'
@@ -30,19 +28,20 @@ class EndpointSerializer(BulkModelSerializer):
             'http_port': {'default': 80},
             'ssh_port': {'default': 2222},
             'rdp_port': {'default': 3389},
-            'mysql_port': {'default': 33060},
-            'mariadb_port': {'default': 33061},
-            'postgresql_port': {'default': 54320},
-            'redis_port': {'default': 63790},
-            'oracle_11g_port': {'default': 15211},
-            'oracle_12c_port': {'default': 15212},
         }
 
-    def get_oracle_port(self, obj: Endpoint):
+    def get_magnus_listen_db_port(self, obj: Endpoint):
         view = self.context.get('view')
         if not view or view.action not in ['smart']:
             return 0
-        return obj.get_port(view.target_protocol)
+        return obj.get_port(view.target_instance, view.target_protocol)
+
+    @staticmethod
+    def get_magnus_listen_port_range(obj: Endpoint):
+        port_start = settings.MAGNUS_DB_PORTS_START
+        port_limit = settings.MAGNUS_DB_PORTS_LIMIT_COUNT
+        port_end = port_start + port_limit + 1
+        return f'{port_start} - {port_end}'
 
 
 class EndpointRuleSerializer(BulkModelSerializer):

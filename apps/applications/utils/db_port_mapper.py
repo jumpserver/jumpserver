@@ -49,6 +49,9 @@ class DBPortManager(object):
         for port, db_id in mapper.items():
             if db_id == str(db.id):
                 return port
+        logger.warning(
+            'Not matched db port, db_id: {}, mapper length: {}'.format(db.id, len(mapper))
+        )
 
     def get_db_by_port(self, port):
         mapper = self.get_mapper()
