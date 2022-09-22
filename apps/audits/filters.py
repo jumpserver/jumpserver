@@ -49,7 +49,7 @@ class CommandExecutionFilter(BaseFilterSet):
         queryset = queryset.annotate(
             hostname_ip=Concat(
                 F('asset__hostname'), Value('('),
-                F('asset__ip'), Value(')')
+                F('asset__address'), Value(')')
             )
         ).filter(hostname_ip__icontains=value)
         return queryset

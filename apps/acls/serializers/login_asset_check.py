@@ -2,8 +2,7 @@ from rest_framework import serializers
 from orgs.utils import tmp_to_root_org
 from common.utils import get_object_or_none, lazyproperty
 from users.models import User
-from assets.models import Asset
-
+from assets.models import Asset, Account
 
 __all__ = ['LoginAssetCheckSerializer']
 
@@ -18,7 +17,7 @@ class LoginAssetCheckSerializer(serializers.Serializer):
         super().__init__(*args, **kwargs)
         self.user = None
         self.asset = None
-        self._account = None
+        self.account = None
         self._account_username = None
 
     def validate_user_id(self, user_id):
@@ -28,6 +27,10 @@ class LoginAssetCheckSerializer(serializers.Serializer):
     def validate_asset_id(self, asset_id):
         self.asset = self.validate_object_exist(Asset, asset_id)
         return asset_id
+
+    def validate_account_id(self, account_id):
+        self.account = self.validate_object_exist(Account, account_id)
+        return account_id
 
     @staticmethod
     def validate_object_exist(model, field_id):

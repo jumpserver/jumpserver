@@ -53,17 +53,16 @@ class BaseApplyAssetApplicationSerializer(serializers.Serializer):
             qs = model.objects.filter(id__in=ids, **kwargs).values_list('id', flat=True)
         return list(qs)
 
-    def validate_apply_account(self, system_users):
-        if self.is_final_approval and not system_users:
+    def validate_apply_accounts(self, accounts):
+        if self.is_final_approval and not accounts:
             raise serializers.ValidationError(_('This field is required.'))
-        return self.filter_many_to_many_field(SystemUser, system_users)
+        return accounts
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
 
         apply_date_start = attrs['apply_date_start'].strftime('%Y-%m-%d %H:%M:%S')
         apply_date_expired = attrs['apply_date_expired'].strftime('%Y-%m-%d %H:%M:%S')
-
         if apply_date_expired <= apply_date_start:
             error = _('The expiration date should be greater than the start date')
             raise serializers.ValidationError({'apply_date_expired': error})

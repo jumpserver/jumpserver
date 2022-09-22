@@ -78,7 +78,7 @@ class AssetPermissionAssetRelationViewSet(RelationMixin):
     filterset_fields = [
         'id', 'asset', 'assetpermission',
     ]
-    search_fields = ["id", "asset__name", "asset__ip", "assetpermission__name"]
+    search_fields = ["id", "asset__name", "asset__address", "assetpermission__name"]
 
     def get_queryset(self):
         queryset = super().get_queryset()

@@ -144,7 +144,7 @@ class CommandExecutionHostRelationViewSet(OrgRelationMixin, OrgBulkModelViewSet)
         queryset = queryset.annotate(
             asset_display=Concat(
                 F('asset__name'), Value('('),
-                F('asset__ip'), Value(')')
+                F('asset__address'), Value(')')
             )
         )
         return queryset
