@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-15 15:52+0800\n"
+"POT-Creation-Date: 2022-09-22 17:23+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -22,13 +22,13 @@ msgid "Acls"
 msgstr "访问控制"
 
 #: acls/models/base.py:25 acls/serializers/login_asset_acl.py:47
-#: applications/models/application.py:220 assets/models/asset.py:138
+#: applications/models/application.py:219 assets/models/asset.py:138
 #: assets/models/base.py:175 assets/models/cluster.py:18
 #: assets/models/cmd_filter.py:27 assets/models/domain.py:23
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
 #: orgs/models.py:70 perms/models/base.py:83 rbac/models/role.py:29
 #: settings/models.py:33 settings/serializers/sms.py:6
-#: terminal/models/endpoint.py:10 terminal/models/endpoint.py:86
+#: terminal/models/endpoint.py:13 terminal/models/endpoint.py:90
 #: terminal/models/storage.py:26 terminal/models/task.py:16
 #: terminal/models/terminal.py:100 users/forms/profile.py:33
 #: users/models/group.py:15 users/models/user.py:669
@@ -37,12 +37,12 @@ msgid "Name"
 msgstr "名称"
 
 #: acls/models/base.py:27 assets/models/cmd_filter.py:84
-#: assets/models/user.py:251 terminal/models/endpoint.py:89
+#: assets/models/user.py:251 terminal/models/endpoint.py:93
 msgid "Priority"
 msgstr "优先级"
 
 #: acls/models/base.py:28 assets/models/cmd_filter.py:84
-#: assets/models/user.py:251 terminal/models/endpoint.py:90
+#: assets/models/user.py:251 terminal/models/endpoint.py:94
 msgid "1-100, the lower the value will be match first"
 msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 
@@ -52,7 +52,7 @@ msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 msgid "Active"
 msgstr "激活中"
 
-#: acls/models/base.py:32 applications/models/application.py:233
+#: acls/models/base.py:32 applications/models/application.py:232
 #: assets/models/asset.py:143 assets/models/asset.py:231
 #: assets/models/backup.py:54 assets/models/base.py:180
 #: assets/models/cluster.py:29 assets/models/cmd_filter.py:48
@@ -60,7 +60,7 @@ msgstr "激活中"
 #: assets/models/domain.py:65 assets/models/group.py:23
 #: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:73
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:38
-#: terminal/models/endpoint.py:23 terminal/models/endpoint.py:96
+#: terminal/models/endpoint.py:21 terminal/models/endpoint.py:100
 #: terminal/models/storage.py:29 terminal/models/terminal.py:114
 #: tickets/models/comment.py:32 tickets/models/ticket/general.py:288
 #: users/models/group.py:16 users/models/user.py:706
@@ -183,7 +183,7 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
-#: settings/serializers/terminal.py:8 terminal/serializers/endpoint.py:54
+#: settings/serializers/terminal.py:8 terminal/serializers/endpoint.py:53
 msgid "IP"
 msgstr "IP"
 
@@ -236,7 +236,7 @@ msgstr ""
 msgid "Time Period"
 msgstr "时段"
 
-#: applications/apps.py:9 applications/models/application.py:64
+#: applications/apps.py:9 applications/models/application.py:62
 msgid "Applications"
 msgstr "应用管理"
 
@@ -255,11 +255,7 @@ msgstr "远程应用"
 msgid "Custom"
 msgstr "自定义"
 
-#: applications/const.py:91 rbac/tree.py:29
-msgid "Other"
-msgstr "其它"
-
-#: applications/models/account.py:12 applications/models/application.py:237
+#: applications/models/account.py:12 applications/models/application.py:236
 #: assets/models/backup.py:32 assets/models/cmd_filter.py:45
 #: authentication/models.py:67 authentication/models.py:95
 #: perms/models/application_permission.py:28
@@ -277,9 +273,8 @@ msgstr "应用程序"
 msgid "System user"
 msgstr "系统用户"
 
-#: applications/models/account.py:17
-#: applications/serializers/attrs/application_type/oracle.py:13
-#: assets/models/authbook.py:21 settings/serializers/auth/cas.py:18
+#: applications/models/account.py:17 assets/models/authbook.py:21
+#: settings/serializers/auth/cas.py:18
 msgid "Version"
 msgstr "版本"
 
@@ -295,7 +290,7 @@ msgstr "可以查看应用账号密码"
 msgid "Can change application account secret"
 msgstr "可以查看应用账号密码"
 
-#: applications/models/application.py:222
+#: applications/models/application.py:221
 #: applications/serializers/application.py:101 assets/models/label.py:21
 #: perms/models/application_permission.py:21
 #: perms/serializers/application/user_permission.py:33
@@ -304,7 +299,7 @@ msgstr "可以查看应用账号密码"
 msgid "Category"
 msgstr "类别"
 
-#: applications/models/application.py:225
+#: applications/models/application.py:224
 #: applications/serializers/application.py:103 assets/models/backup.py:49
 #: assets/models/cmd_filter.py:82 assets/models/user.py:250
 #: authentication/models.py:70 perms/models/application_permission.py:24
@@ -318,21 +313,21 @@ msgstr "类别"
 msgid "Type"
 msgstr "类型"
 
-#: applications/models/application.py:229 assets/models/asset.py:217
+#: applications/models/application.py:228 assets/models/asset.py:217
 #: assets/models/domain.py:29 assets/models/domain.py:64
 msgid "Domain"
 msgstr "网域"
 
-#: applications/models/application.py:231 xpack/plugins/cloud/models.py:33
+#: applications/models/application.py:230 xpack/plugins/cloud/models.py:33
 #: xpack/plugins/cloud/serializers/account.py:63
 msgid "Attrs"
 msgstr "属性"
 
-#: applications/models/application.py:241
+#: applications/models/application.py:240
 msgid "Can match application"
 msgstr "匹配应用"
 
-#: applications/models/application.py:320
+#: applications/models/application.py:310
 msgid "Application user"
 msgstr "应用用户"
 
@@ -388,7 +383,7 @@ msgstr "集群"
 
 #: applications/serializers/attrs/application_category/db.py:11
 #: ops/models/adhoc.py:157 settings/serializers/auth/radius.py:14
-#: settings/serializers/auth/sms.py:65 terminal/models/endpoint.py:11
+#: settings/serializers/auth/sms.py:65 terminal/models/endpoint.py:14
 #: xpack/plugins/cloud/serializers/account_attrs.py:72
 msgid "Host"
 msgstr "主机"
@@ -397,7 +392,7 @@ msgstr "主机"
 #: applications/serializers/attrs/application_type/mongodb.py:10
 #: applications/serializers/attrs/application_type/mysql.py:10
 #: applications/serializers/attrs/application_type/mysql_workbench.py:22
-#: applications/serializers/attrs/application_type/oracle.py:16
+#: applications/serializers/attrs/application_type/oracle.py:10
 #: applications/serializers/attrs/application_type/pgsql.py:10
 #: applications/serializers/attrs/application_type/redis.py:10
 #: applications/serializers/attrs/application_type/sqlserver.py:10
@@ -491,10 +486,6 @@ msgstr "Mysql 工作台 用户名"
 #: applications/serializers/attrs/application_type/mysql_workbench.py:42
 msgid "Mysql workbench password"
 msgstr "Mysql 工作台 密码"
-
-#: applications/serializers/attrs/application_type/oracle.py:14
-msgid "Magnus currently supports only 11g and 12c connections"
-msgstr "目前 Magnus 只支持连接 11g、12c 版本"
 
 #: applications/serializers/attrs/application_type/vmware_client.py:26
 msgid "Vmware username"
@@ -3414,6 +3405,10 @@ msgstr "审计台"
 msgid "System setting"
 msgstr "系统设置"
 
+#: rbac/tree.py:29
+msgid "Other"
+msgstr "其它"
+
 #: rbac/tree.py:37
 msgid "Accounts"
 msgstr "账号管理"
@@ -4879,58 +4874,34 @@ msgstr "存储无效"
 msgid "Command record"
 msgstr "命令记录"
 
-#: terminal/models/endpoint.py:13
+#: terminal/models/endpoint.py:16
 msgid "HTTPS Port"
 msgstr "HTTPS 端口"
 
-#: terminal/models/endpoint.py:14 terminal/models/terminal.py:107
+#: terminal/models/endpoint.py:17 terminal/models/terminal.py:107
 msgid "HTTP Port"
 msgstr "HTTP 端口"
 
-#: terminal/models/endpoint.py:15 terminal/models/terminal.py:106
+#: terminal/models/endpoint.py:18 terminal/models/terminal.py:106
 msgid "SSH Port"
 msgstr "SSH 端口"
 
-#: terminal/models/endpoint.py:16
+#: terminal/models/endpoint.py:19
 msgid "RDP Port"
 msgstr "RDP 端口"
 
-#: terminal/models/endpoint.py:17
-msgid "MySQL Port"
-msgstr "MySQL 端口"
-
-#: terminal/models/endpoint.py:18
-msgid "MariaDB Port"
-msgstr "MariaDB 端口"
-
-#: terminal/models/endpoint.py:19
-msgid "PostgreSQL Port"
-msgstr "PostgreSQL 端口"
-
-#: terminal/models/endpoint.py:20
-msgid "Redis Port"
-msgstr "Redis 端口"
-
-#: terminal/models/endpoint.py:21
-msgid "Oracle 11g Port"
-msgstr "Oracle 11g 端口"
-
-#: terminal/models/endpoint.py:22
-msgid "Oracle 12c Port"
-msgstr "Oracle 12c 端口"
-
-#: terminal/models/endpoint.py:28 terminal/models/endpoint.py:94
-#: terminal/serializers/endpoint.py:57 terminal/serializers/storage.py:38
+#: terminal/models/endpoint.py:26 terminal/models/endpoint.py:98
+#: terminal/serializers/endpoint.py:56 terminal/serializers/storage.py:38
 #: terminal/serializers/storage.py:50 terminal/serializers/storage.py:80
 #: terminal/serializers/storage.py:90 terminal/serializers/storage.py:98
 msgid "Endpoint"
 msgstr "端点"
 
-#: terminal/models/endpoint.py:87
+#: terminal/models/endpoint.py:91
 msgid "IP group"
 msgstr "IP 组"
 
-#: terminal/models/endpoint.py:99
+#: terminal/models/endpoint.py:103
 msgid "Endpoint rule"
 msgstr "端点规则"
 
@@ -5111,11 +5082,21 @@ msgstr "级别"
 msgid "Batch danger command alert"
 msgstr "批量危险命令告警"
 
-#: terminal/serializers/endpoint.py:12
-msgid "Oracle port"
-msgstr ""
+#: terminal/serializers/endpoint.py:13
+msgid "Magnus listen db port"
+msgstr "Magnus 监听的数据库端口"
 
-#: terminal/serializers/endpoint.py:51
+#: terminal/serializers/endpoint.py:16
+msgid "Magnus Listen port range"
+msgstr "Magnus 监听的端口范围"
+
+#: terminal/serializers/endpoint.py:18
+msgid ""
+"The range of ports that Magnus listens on is modified in the configuration "
+"file"
+msgstr "请在配置文件中修改 Magnus 监听的端口范围"
+
+#: terminal/serializers/endpoint.py:50
 msgid ""
 "If asset IP addresses under different endpoints conflict, use asset labels"
 msgstr "如果不同端点下的资产 IP 有冲突，使用资产标签实现"
@@ -6916,3 +6897,24 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Magnus currently supports only 11g and 12c connections"
+#~ msgstr "目前 Magnus 只支持连接 11g、12c 版本"
+
+#~ msgid "MySQL Port"
+#~ msgstr "MySQL 端口"
+
+#~ msgid "MariaDB Port"
+#~ msgstr "MariaDB 端口"
+
+#~ msgid "PostgreSQL Port"
+#~ msgstr "PostgreSQL 端口"
+
+#~ msgid "Redis Port"
+#~ msgstr "Redis 端口"
+
+#~ msgid "Oracle 11g Port"
+#~ msgstr "Oracle 11g 端口"
+
+#~ msgid "Oracle 12c Port"
+#~ msgstr "Oracle 12c 端口"
