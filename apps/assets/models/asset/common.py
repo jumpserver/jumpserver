@@ -98,7 +98,7 @@ class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
     objects = AssetManager.from_queryset(AssetQuerySet)()
 
     def __str__(self):
-        return '{0.name}({0.ip})'.format(self)
+        return '{0.name}({0.address})'.format(self)
 
     def get_target_ip(self):
         return self.address
