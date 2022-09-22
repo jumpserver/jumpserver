@@ -62,12 +62,15 @@ class ConnectionTokenMixin:
 
     def get_smart_endpoint(self, protocol, asset=None, application=None):
         if asset:
+            target_instance = asset
             target_ip = asset.get_target_ip()
         elif application:
+            target_instance = application
             target_ip = application.get_target_ip()
         else:
+            target_instance = None
             target_ip = ''
-        endpoint = EndpointRule.match_endpoint(target_ip, protocol, self.request)
+        endpoint = EndpointRule.match_endpoint(target_instance, target_ip, protocol, self.request)
         return endpoint
 
     @staticmethod

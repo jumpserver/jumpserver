@@ -47,11 +47,12 @@ class SmartEndpointViewMixin:
         return Endpoint.match_by_instance_label(self.target_instance, self.target_protocol)
 
     def match_endpoint_by_target_ip(self):
-        # 用来方便测试
-        target_ip = self.request.GET.get('target_ip', '')
+        target_ip = self.request.GET.get('target_ip', '')  # 支持target_ip参数，用来方便测试
         if not target_ip and callable(getattr(self.target_instance, 'get_target_ip', None)):
             target_ip = self.target_instance.get_target_ip()
-        endpoint = EndpointRule.match_endpoint(target_ip, self.target_protocol, self.request)
+        endpoint = EndpointRule.match_endpoint(
+            self.target_instance, target_ip, self.target_protocol, self.request
+        )
         return endpoint
 
     def get_target_instance(self):
@@ -83,12 +84,7 @@ class SmartEndpointViewMixin:
             return instance
 
     def get_target_protocol(self):
-        protocol = None
-        if isinstance(self.target_instance, Application) and self.target_instance.is_type(Application.APP_TYPE.oracle):
-            protocol = self.target_instance.get_target_protocol_for_oracle()
-        if not protocol:
-            protocol = self.request.GET.get('protocol')
-        return protocol
+        return self.request.GET.get('protocol')
 
 
 class EndpointViewSet(SmartEndpointViewMixin, JMSBulkModelViewSet):
