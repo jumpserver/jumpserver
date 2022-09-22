@@ -60,6 +60,10 @@ class DBPortManager(object):
         )
 
     def get_db_by_port(self, port):
+        try:
+            port = int(port)
+        except Exception as e:
+            raise JMSException('Port type error: {}'.format(e))
         mapper = self.get_mapper()
         db_id = mapper.get(port, None)
         if not db_id:
