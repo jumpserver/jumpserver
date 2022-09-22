@@ -28,7 +28,7 @@ class DBPortManager(object):
 
     @property
     def magnus_listen_port_range(self):
-        return f'{self.port_start}-{self.port_end}'
+        return f'{self.port_start}-{self.port_end - 1}'
 
     def init(self):
         with tmp_to_root_org():
