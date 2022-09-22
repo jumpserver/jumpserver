@@ -16,14 +16,8 @@ class HostTypes(BaseType):
                 'domain_enabled': True,
                 'su_enabled': True,
                 'su_methods': [
-                    {
-                      'name': 'sudo su',
-                      'id': 'sudo su'
-                    },
-                    {
-                        'name': 'su -',
-                        'id': 'su -'
-                    }
+                    {'name': 'sudo su', 'id': 'sudo su'},
+                    {'name': 'su -', 'id': 'su -'}
                 ],
             },
             cls.WINDOWS: {
@@ -72,10 +66,10 @@ class HostTypes(BaseType):
             ],
             cls.WINDOWS: [
                 {'name': 'Windows'},
-                {'name': 'Windows-TLS', 'protocol_settings': {
+                {'name': 'Windows-TLS', 'protocols_setting': {
                     'rdp': {'security': 'tls'},
                 }},
-                {'name': 'Windows-RDP', 'protocol_settings': {
+                {'name': 'Windows-RDP', 'protocols_setting': {
                     'rdp': {'security': 'rdp'},
                 }}
             ],

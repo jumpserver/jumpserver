@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from common.db.models import IncludesTextChoicesMeta, ChoicesMixin
 from common.tree import TreeNode
 
@@ -161,14 +163,47 @@ class AllTypes(ChoicesMixin, metaclass=IncludesTextChoicesMeta):
 
     @classmethod
     def create_or_update_internal_platforms(cls):
-        from assets.models import Platform
+        from assets.models import Platform, PlatformAutomation, PlatformProtocol
+        print("Create internal platforms")
         for category, type_cls in cls.category_types():
+            print("## Category: {}".format(category.label))
             data = type_cls.internal_platforms()
-            for tp, platform_datas in data.items():
-                for d in platform_datas:
-                    platform_data = {
-                        **d, 'category': category.value, 'type': tp.value,
-                        'internal': True, 'charset': 'utf-8'
-                    }
 
+            for tp, platform_datas in data.items():
+                print("  >> Type: {}".format(tp.label))
+                default_platform_data = cls.get_type_default_platform(category, tp)
+                default_automation = default_platform_data.pop('automation', {})
+                default_protocols = default_platform_data.pop('protocols', [])
+
+                for d in platform_datas:
+                    name = d['name']
+                    print("    - Platform: {}".format(name))
+                    _automation = d.pop('automation', {})
+                    _protocols = d.pop('_protocols', [])
+                    _protocols_setting = d.pop('protocols_setting', {})
+
+                    protocols_data = deepcopy(default_protocols)
+                    if _protocols:
+                        protocols_data = [p for p in protocols_data if p['name'] in _protocols]
+                    for p in protocols_data:
+                        p['setting'] = {**_protocols_setting.get(p['name'], {}), **p.get('setting', {})}
+
+                    platform_data = {**default_platform_data, **d}
+                    automation_data = {**default_automation, **_automation}
+                    platform, created = Platform.objects.update_or_create(
+                        defaults=platform_data, name=platform_data['name']
+                    )
+
+                    if not platform.automation:
+                        automation = PlatformAutomation.objects.create()
+                        platform.automation = automation
+                        platform.save()
+                    else:
+                        automation = platform.automation
+                    for k, v in automation_data.items():
+                        setattr(automation, k, v)
+                    automation.save()
+
+                    platform.protocols.all().delete()
+                    [PlatformProtocol.objects.create(**p, platform=platform) for p in protocols_data]
 
