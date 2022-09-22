@@ -1,7 +1,7 @@
 # coding: utf-8
 #
 from orgs.mixins.api import OrgBulkModelViewSet
-from rest_framework import generics, status
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -60,8 +60,11 @@ class DBListenPortViewSet(GenericViewSet):
     def db_info(self, request, *args, **kwargs):
         port = request.data.get("port")
         db, msg = db_port_manager.get_db_by_port(port)
-        if db is None:
+        if db:
+            serializer = serializers.AppSerializer(instance=db)
+            data = serializer.data
+            _status = status.HTTP_200_OK
+        else:
             data = {'error': msg}
-            return Response(data=data, status=status.HTTP_404_NOT_FOUND)
-        serializer = serializers.AppSerializer(instance=db)
-        return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+            _status = status.HTTP_404_NOT_FOUND
+        return Response(data=data, status=_status)
