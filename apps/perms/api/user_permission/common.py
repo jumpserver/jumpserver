@@ -163,7 +163,7 @@ class UserGrantedAssetAccounts(ListAPIView):
 
     def get_queryset(self):
         # 获取用户-资产的授权规则
-        assetperms = AssetPermission.filter_permissions(self.user, self.asset)
+        assetperms = AssetPermission.filter(self.user, self.asset)
         account_names = AssetPermission.get_account_names(assetperms)
         accounts = self.asset.filter_accounts(account_names)
         # 构造默认包含的账号，如: @INPUT @USER
