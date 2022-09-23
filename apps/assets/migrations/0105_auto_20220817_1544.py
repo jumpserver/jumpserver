@@ -10,12 +10,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.DeleteModel(
-            name='AdminUser',
-        ),
-        migrations.DeleteModel(
-            name='Cluster',
-        ),
         migrations.RemoveField(
             model_name='historicalauthbook',
             name='asset',
@@ -61,5 +55,11 @@ class Migration(migrations.Migration):
         ),
         migrations.DeleteModel(
             name='AuthBook',
+        ),
+        # migrations.DeleteModel(
+        #     name='AdminUser',
+        # ),
+        migrations.DeleteModel(
+            name='Cluster',
         ),
     ]

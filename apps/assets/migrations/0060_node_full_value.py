@@ -31,7 +31,7 @@ def migrate_nodes_full_value(apps, schema_editor):
     model = apps.get_model("assets", "Node")
     db_alias = schema_editor.connection.alias
     nodes = model.objects.using(db_alias).all()
-    print("- Start migrate node full value")
+    print("\n- Start migrate node full value")
     for i, node in enumerate(list(nodes)):
         print("{} start migrate {} node full value".format(i, node.value))
         ancestor_keys = get_node_ancestor_keys(node.key, True)
