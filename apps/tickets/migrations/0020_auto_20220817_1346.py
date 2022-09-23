@@ -39,7 +39,7 @@ def migrate_system_to_account(apps, schema_editor):
                 setattr(obj, new_field, new_value)
                 updated.append(obj)
             model.objects.bulk_update(updated, [new_field])
-            print("Migrate account: {}-{} using: {:.2f}s".format(
+            print("    Migrate account: {}-{} using: {:.2f}s".format(
                 count - len(objects), count, time.time()-start
             ))
 
