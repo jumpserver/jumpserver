@@ -112,7 +112,7 @@ def apply_application_migrate(apps, *args):
     init_global_dict(apps)
 
     ticket_model = apps.get_model('tickets', 'Ticket')
-    tickets = ticket_model.objects.filter(type=TicketType.apply_application)
+    tickets = ticket_model.objects.filter(type='apply_application')
     ticket_apply_app_model = apps.get_model('tickets', 'ApplyApplicationTicket')
 
     for instance in tickets:

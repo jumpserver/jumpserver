@@ -33,5 +33,25 @@ class Migration(migrations.Migration):
             name='type',
             field=models.CharField(default='linux', max_length=32, verbose_name='Type'),
         ),
+        migrations.AddField(
+            model_name='platform',
+            name='domain_enabled',
+            field=models.BooleanField(default=True, verbose_name='Domain enabled'),
+        ),
+        migrations.AddField(
+            model_name='platform',
+            name='protocols_enabled',
+            field=models.BooleanField(default=True, verbose_name='Protocols enabled'),
+        ),
+        migrations.AddField(
+            model_name='platform',
+            name='su_enabled',
+            field=models.BooleanField(default=False, verbose_name='Su enabled'),
+        ),
+        migrations.AddField(
+            model_name='platform',
+            name='su_method',
+            field=models.CharField(blank=True, max_length=32, null=True, verbose_name='SU method'),
+        ),
         migrations.RunPython(migrate_platform_type_to_lower)
     ]

@@ -45,39 +45,4 @@ class Migration(migrations.Migration):
             model_name='asset',
             name='public_ip',
         ),
-        migrations.AlterModelOptions(
-            name='asset',
-            options={'ordering': ['name'], 'permissions': [('refresh_assethardwareinfo', 'Can refresh asset hardware info'), ('test_assetconnectivity', 'Can test asset connectivity'), ('push_assetsystemuser', 'Can push system user to asset'), ('match_asset', 'Can match asset'), ('add_assettonode', 'Add asset to node'), ('move_assettonode', 'Move asset to node')], 'verbose_name': 'Asset'},
-        ),
-        migrations.RenameField(
-            model_name='asset',
-            old_name='hostname',
-            new_name='name',
-        ),
-        migrations.AlterField(
-            model_name='asset',
-            name='name',
-            field=models.CharField(max_length=128, verbose_name='Name'),
-        ),
-        migrations.RenameField(
-            model_name='asset',
-            old_name='ip',
-            new_name='address',
-        ),
-        migrations.AddField(
-            model_name='asset',
-            name='date_updated',
-            field=models.DateTimeField(auto_now=True, verbose_name='Date updated'),
-        ),
-        migrations.AddField(
-            model_name='asset',
-            name='updated_by',
-            field=models.CharField(blank=True, max_length=32, null=True, verbose_name='Updated by'),
-        ),
-        migrations.AlterField(
-            model_name='asset',
-            name='created_by',
-            field=models.CharField(blank=True, max_length=32, null=True, verbose_name='Created by'),
-        ),
-
     ]

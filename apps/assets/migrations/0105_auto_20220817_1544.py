@@ -13,6 +13,9 @@ class Migration(migrations.Migration):
         migrations.DeleteModel(
             name='AdminUser',
         ),
+        migrations.DeleteModel(
+            name='Cluster',
+        ),
         migrations.RemoveField(
             model_name='historicalauthbook',
             name='asset',

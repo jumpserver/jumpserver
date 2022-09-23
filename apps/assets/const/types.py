@@ -137,8 +137,8 @@ class AllTypes(ChoicesMixin, metaclass=IncludesTextChoicesMeta):
     def get_type_default_platform(cls, category, tp):
         constraints = cls.get_constraints(category, tp)
         data = {
-            'name': tp.label, 'category': category.value,
-            'type': tp.value, 'internal': True,
+            'category': category,
+            'type': tp, 'internal': True,
             'charset': constraints.get('charset', 'utf-8'),
             'domain_enabled': constraints.get('domain_enabled', False),
             'su_enabled': constraints.get('su_enabled', False),
@@ -162,8 +162,30 @@ class AllTypes(ChoicesMixin, metaclass=IncludesTextChoicesMeta):
         return data
 
     @classmethod
-    def create_or_update_internal_platforms(cls):
+    def create_or_update_by_platform_data(cls, name, platform_data):
         from assets.models import Platform, PlatformAutomation, PlatformProtocol
+
+        automation_data = platform_data.pop('automation', {})
+        protocols_data = platform_data.pop('protocols', [])
+
+        platform, created = Platform.objects.update_or_create(
+            defaults=platform_data, name=name
+        )
+        if not platform.automation:
+            automation = PlatformAutomation.objects.create()
+            platform.automation = automation
+            platform.save()
+        else:
+            automation = platform.automation
+        for k, v in automation_data.items():
+            setattr(automation, k, v)
+        automation.save()
+
+        platform.protocols.all().delete()
+        [PlatformProtocol.objects.create(**p, platform=platform) for p in protocols_data]
+
+    @classmethod
+    def create_or_update_internal_platforms(cls):
         print("Create internal platforms")
         for category, type_cls in cls.category_types():
             print("## Category: {}".format(category.label))
@@ -188,22 +210,31 @@ class AllTypes(ChoicesMixin, metaclass=IncludesTextChoicesMeta):
                     for p in protocols_data:
                         p['setting'] = {**_protocols_setting.get(p['name'], {}), **p.get('setting', {})}
 
-                    platform_data = {**default_platform_data, **d}
-                    automation_data = {**default_automation, **_automation}
-                    platform, created = Platform.objects.update_or_create(
-                        defaults=platform_data, name=platform_data['name']
-                    )
+                    platform_data = {
+                        **default_platform_data, **d,
+                        'automation': {**default_automation, **_automation},
+                        'protocols': protocols_data
+                    }
+                    cls.create_or_update_by_platform_data(name, platform_data)
 
-                    if not platform.automation:
-                        automation = PlatformAutomation.objects.create()
-                        platform.automation = automation
-                        platform.save()
-                    else:
-                        automation = platform.automation
-                    for k, v in automation_data.items():
-                        setattr(automation, k, v)
-                    automation.save()
+    @classmethod
+    def update_user_create_platforms(cls, platform_cls):
+        internal_platforms = []
+        for category, type_cls in cls.category_types():
+            data = type_cls.internal_platforms()
+            for tp, platform_datas in data.items():
+                for d in platform_datas:
+                    internal_platforms.append(d['name'])
 
-                    platform.protocols.all().delete()
-                    [PlatformProtocol.objects.create(**p, platform=platform) for p in protocols_data]
+        user_platforms = platform_cls.objects.exclude(name__in=internal_platforms)
+        user_platforms.update(internal=False)
+
+        for platform in user_platforms:
+            print("Update platform: {}".format(platform.name))
+            platform_data = cls.get_type_default_platform(platform.category, platform.type)
+            cls.create_or_update_by_platform_data(platform.name, platform_data)
+
+
+
+
 
