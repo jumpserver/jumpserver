@@ -16,6 +16,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.hashers import check_password
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import reverse
+from django.utils.module_loading import import_string
 
 from orgs.utils import current_org
 from orgs.models import Organization
@@ -602,8 +603,11 @@ class MFAMixin:
 
     @staticmethod
     def get_user_mfa_backends(user):
-        from authentication.mfa import MFA_BACKENDS
-        backends = [cls(user) for cls in MFA_BACKENDS if cls.global_enabled()]
+        backends = []
+        for cls in settings.MFA_BACKENDS:
+            cls = import_string(cls)
+            if cls.global_enabled():
+                backends.append(cls(user))
         return backends
 
     def get_active_mfa_backend_by_type(self, mfa_type):

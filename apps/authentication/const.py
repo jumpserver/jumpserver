@@ -2,7 +2,7 @@ from django.db.models import TextChoices
 
 from authentication.confirm import CONFIRM_BACKENDS
 from .confirm import ConfirmMFA, ConfirmPassword, ConfirmReLogin
-from .mfa import MFAOtp, MFASms, MFARadius
+from .mfa import MFAOtp, MFASms, MFARadius, MFACustom
 
 RSA_PRIVATE_KEY = 'rsa_private_key'
 RSA_PUBLIC_KEY = 'rsa_public_key'
@@ -35,3 +35,4 @@ class MFAType(TextChoices):
     OTP = MFAOtp.name, MFAOtp.display_name
     SMS = MFASms.name, MFASms.display_name
     Radius = MFARadius.name, MFARadius.display_name
+    Custom = MFACustom.name, MFACustom.display_name
