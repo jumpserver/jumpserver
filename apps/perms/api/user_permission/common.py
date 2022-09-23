@@ -19,7 +19,7 @@ from perms.utils.permission import (
 from common.permissions import IsValidUser
 from common.utils import get_logger, lazyproperty
 
-from perms.hands import User, Asset
+from perms.hands import User, Asset, Account
 from perms import serializers
 from perms.models import AssetPermission
 
@@ -150,7 +150,7 @@ class UserGrantedAssetAccounts(ListAPIView):
     }
 
     @lazyproperty
-    def user(self):
+    def user(self) -> User:
         user_id = self.kwargs.get('pk')
         return User.objects.get(id=user_id)
 
@@ -163,11 +163,14 @@ class UserGrantedAssetAccounts(ListAPIView):
 
     def get_queryset(self):
         # 获取用户-资产的授权规则
-        assetperms = AssetPermission.filter_permissions(self.user, self.asset)
+        assetperms = AssetPermission.filter(self.user, self.asset)
         account_names = AssetPermission.get_account_names(assetperms)
-        accounts = self.asset.filter_accounts(account_names)
+        accounts = list(self.asset.filter_accounts(account_names))
+        # @INPUT @USER
+        inner_accounts = [Account.get_input_account(), Account.get_user_account(self.user.username)]
+        all_accounts = accounts + inner_accounts
         # 构造默认包含的账号，如: @INPUT @USER
-        return accounts
+        return all_accounts
 
 
 class MyGrantedAssetAccounts(UserGrantedAssetAccounts):

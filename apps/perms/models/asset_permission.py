@@ -83,6 +83,9 @@ class AssetPermissionManager(OrgManager):
 
 
 class AssetPermission(OrgModelMixin):
+    class SpecialAccount(models.TextChoices):
+        ALL = '@ALL', 'All'
+
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     users = models.ManyToManyField('users.User', blank=True, verbose_name=_("User"),
@@ -112,11 +115,6 @@ class AssetPermission(OrgModelMixin):
     comment = models.TextField(verbose_name=_('Comment'), blank=True)
 
     objects = AssetPermissionManager.from_queryset(AssetPermissionQuerySet)()
-
-    class SpecialAccount(models.TextChoices):
-        ALL = '@ALL', 'All'
-        INPUT = '@INPUT',  'Input'
-        USER = '@USER', 'User'
 
     class Meta:
         unique_together = [('org_id', 'name')]
@@ -232,17 +230,17 @@ class AssetPermission(OrgModelMixin):
         return account_names
 
     @classmethod
-    def filter_permissions(cls, user=None, asset=None, account=None):
+    def filter(cls, user=None, asset=None, account=None):
         """ 获取同时包含 用户-资产-账号 的授权规则 """
         assetperm_ids = []
         if user:
-            user_assetperm_ids = cls.filter_permissions_by_user(user, flat=True)
+            user_assetperm_ids = cls.filter_by_user(user, flat=True)
             assetperm_ids.append(user_assetperm_ids)
         if asset:
-            asset_assetperm_ids = cls.filter_permissions_by_asset(asset, flat=True)
+            asset_assetperm_ids = cls.filter_by_asset(asset, flat=True)
             assetperm_ids.append(asset_assetperm_ids)
         if account:
-            account_assetperm_ids = cls.filter_permissions_by_account(account, flat=True)
+            account_assetperm_ids = cls.filter_by_account(account, flat=True)
             assetperm_ids.append(account_assetperm_ids)
         # & 是同时满足，比如有用户，但是用户的规则是空，那么返回也应该是空
         assetperm_ids = list(reduce(lambda x, y: set(x) & set(y), assetperm_ids))
@@ -250,7 +248,7 @@ class AssetPermission(OrgModelMixin):
         return assetperms
 
     @classmethod
-    def filter_permissions_by_user(cls, user, with_group=True, flat=False):
+    def filter_by_user(cls, user, with_group=True, flat=False):
         assetperm_ids = set()
         user_assetperm_ids = AssetPermission.users.through.objects \
             .filter(user_id=user.id) \
@@ -273,7 +271,7 @@ class AssetPermission(OrgModelMixin):
             return assetperms
 
     @classmethod
-    def filter_permissions_by_asset(cls, asset, with_node=True, flat=False):
+    def filter_by_asset(cls, asset, with_node=True, flat=False):
         assetperm_ids = set()
         asset_assetperm_ids = AssetPermission.assets.through.objects \
             .filter(asset_id=asset.id) \
@@ -294,8 +292,9 @@ class AssetPermission(OrgModelMixin):
             return assetperms
 
     @classmethod
-    def filter_permissions_by_account(cls, account, flat=False):
-        assetperms = cls.objects.filter(accounts__contains=account).valid()
+    def filter_by_account(cls, account, flat=False):
+        queries = Q(accounts__contains=account) | Q(accounts__contains=cls.SpecialAccount.ALL.value)
+        assetperms = cls.objects.filter(queries).valid()
         if flat:
             assetperm_ids = assetperms.values_list('id', flat=True)
             return assetperm_ids

@@ -9,6 +9,10 @@ __all__ = ['Account', 'AccountTemplate']
 
 
 class Account(BaseAccount):
+    class InnerAccount(models.TextChoices):
+        INPUT = '@INPUT', '@INPUT'
+        USER = '@USER', '@USER'
+
     asset = models.ForeignKey(
         'assets.Asset', related_name='accounts',
         on_delete=models.CASCADE, verbose_name=_('Asset')
@@ -39,6 +43,16 @@ class Account(BaseAccount):
 
     def __str__(self):
         return '{}@{}'.format(self.username, self.asset.name)
+
+    @classmethod
+    def get_input_account(cls):
+        """ @INPUT 手动登录的账号(any) """
+        return cls(name=cls.InnerAccount.INPUT.value, username='')
+
+    @classmethod
+    def get_user_account(cls, username):
+        """ @USER 动态用户的账号(self) """
+        return cls(name=cls.InnerAccount.USER.value, username=username)
 
 
 class AccountTemplate(BaseAccount):

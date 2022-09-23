@@ -4,8 +4,6 @@
 
 import logging
 import uuid
-from functools import reduce
-from collections import Iterable
 
 from django.db import models
 from django.db.models import Q
@@ -180,9 +178,11 @@ class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
         return tree_node
 
     def filter_accounts(self, account_names=None):
+        from perms.models import AssetPermission
         if account_names is None:
             return self.accounts.all()
-        assert isinstance(account_names, Iterable), '`account_names` must be an iterable object'
+        if AssetPermission.SpecialAccount.ALL in account_names:
+            return self.accounts.all()
         queries = Q(name__in=account_names) | Q(username__in=account_names)
         accounts = self.accounts.filter(queries)
         return accounts
