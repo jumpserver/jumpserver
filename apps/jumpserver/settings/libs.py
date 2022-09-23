@@ -9,7 +9,6 @@ from .base import (
 )
 from ..const import CONFIG, PROJECT_DIR
 
-
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
@@ -64,7 +63,6 @@ SWAGGER_SETTINGS = {
     'DEFAULT_INFO': 'jumpserver.views.swagger.api_info',
 }
 
-
 # Captcha settings, more see https://django-simple-captcha.readthedocs.io/en/latest/advanced.html
 CAPTCHA_IMAGE_SIZE = (180, 38)
 CAPTCHA_FOREGROUND_COLOR = '#001100'
@@ -80,7 +78,6 @@ BOOTSTRAP3 = {
     'success_css_class': '',
     'required_css_class': 'required',
 }
-
 
 # Django channels support websocket
 if not REDIS_USE_SSL:
@@ -101,13 +98,12 @@ CHANNEL_LAYERS = {
                 'address': (CONFIG.REDIS_HOST, CONFIG.REDIS_PORT),
                 'db': CONFIG.REDIS_DB_WS,
                 'password': CONFIG.REDIS_PASSWORD or None,
-                'ssl':  redis_ssl
+                'ssl': redis_ssl
             }],
         },
     },
 }
 ASGI_APPLICATION = 'jumpserver.routing.application'
-
 
 # Dump all celery log to here
 CELERY_LOG_DIR = os.path.join(PROJECT_DIR, 'data', 'celery')
@@ -149,3 +145,8 @@ REDIS_PORT = CONFIG.REDIS_PORT
 REDIS_PASSWORD = CONFIG.REDIS_PASSWORD
 
 DJANGO_REDIS_SCAN_ITERSIZE = 1000
+
+# GM DEVICE
+GMSSL_ENABLED = CONFIG.GMSSL_ENABLED
+PIICO_DEVICE_ENABLE = CONFIG.PIICO_DEVICE_ENABLE
+PIICO_DRIVER_PATH = CONFIG.PIICO_DRIVER_PATH
