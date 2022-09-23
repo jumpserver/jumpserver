@@ -83,6 +83,9 @@ class AssetPermissionManager(OrgManager):
 
 
 class AssetPermission(OrgModelMixin):
+    class SpecialAccount(models.TextChoices):
+        ALL = '@ALL', 'All'
+
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     users = models.ManyToManyField('users.User', blank=True, verbose_name=_("User"),
@@ -112,11 +115,6 @@ class AssetPermission(OrgModelMixin):
     comment = models.TextField(verbose_name=_('Comment'), blank=True)
 
     objects = AssetPermissionManager.from_queryset(AssetPermissionQuerySet)()
-
-    class SpecialAccount(models.TextChoices):
-        ALL = '@ALL', 'All'
-        INPUT = '@INPUT',  'Input'
-        USER = '@USER', 'User'
 
     class Meta:
         unique_together = [('org_id', 'name')]
@@ -295,7 +293,8 @@ class AssetPermission(OrgModelMixin):
 
     @classmethod
     def filter_by_account(cls, account, flat=False):
-        assetperms = cls.objects.filter(accounts__contains=account).valid()
+        queries = Q(accounts__contains=account) | Q(accounts__contains=cls.SpecialAccount.ALL.value)
+        assetperms = cls.objects.filter(queries).valid()
         if flat:
             assetperm_ids = assetperms.values_list('id', flat=True)
             return assetperm_ids
