@@ -73,11 +73,17 @@ class BaseAccount(OrgModelMixin):
     created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
 
     @property
-    def public_key(self):
-        return ''
+    def has_secret(self):
+        return bool(self.secret)
 
     @property
     def private_key(self):
+        if self.secret_type == self.SecretType.ssh_key:
+            return self.secret
+        return None
+
+    @property
+    def public_key(self):
         return ''
 
     @private_key.setter
@@ -93,10 +99,6 @@ class BaseAccount(OrgModelMixin):
     def password(self, value):
         self.secret = value
         self.secret_type = 'password'
-
-    def expire_assets_amount(self):
-        cache_key = self.ASSETS_AMOUNT_CACHE_KEY.format(self.id)
-        cache.delete(cache_key)
 
     @property
     def ssh_key_fingerprint(self):
@@ -152,52 +154,14 @@ class BaseAccount(OrgModelMixin):
                 pass
         return None
 
-    def set_auth(self, **kwargs):
-        update_fields = []
-        for k, v in kwargs.items():
-            setattr(self, k, v)
-            update_fields.append(k)
-        if update_fields:
-            self.save(update_fields=update_fields)
-
-    def _merge_auth(self, other):
-        if other.password:
-            self.password = other.password
-        if other.public_key or other.private_key:
-            self.private_key = other.private_key
-            self.public_key = other.public_key
-
-    def clear_auth(self):
-        self.password = ''
-        self.private_key = ''
-        self.public_key = ''
-        self.token = ''
-        self.save()
-
     @staticmethod
     def gen_password(length=36):
         return random_string(length, special_char=True)
 
     @staticmethod
     def gen_key(username):
-        private_key, public_key = ssh_key_gen(
-            username=username
-        )
+        private_key, public_key = ssh_key_gen(username=username)
         return private_key, public_key
-
-    def auto_gen_auth(self, password=True, key=True):
-        _password = None
-        _private_key = None
-        _public_key = None
-
-        if password:
-            _password = self.gen_password()
-        if key:
-            _private_key, _public_key = self.gen_key(self.username)
-        self.set_auth(
-            password=_password, private_key=_private_key,
-            public_key=_public_key
-        )
 
     def _to_secret_json(self):
         """Push system user use it"""

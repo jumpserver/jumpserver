@@ -1,17 +1,14 @@
 
 from assets.models import Account
 from common.drf.serializers import SecretReadableMixin
-from .common import AccountFieldsSerializerMixin
+from .base import BaseAccountSerializer
 from .account import AccountSerializer, AccountSecretSerializer
 
 
 class AccountHistorySerializer(AccountSerializer):
     class Meta:
         model = Account.history.model
-        fields = AccountFieldsSerializerMixin.Meta.fields_mini + \
-                 AccountFieldsSerializerMixin.Meta.fields_write_only + \
-                 AccountFieldsSerializerMixin.Meta.fields_fk + \
-                 ['history_id', 'date_created', 'date_updated']
+        fields = BaseAccountSerializer.Meta.fields_mini
         read_only_fields = fields
         ref_name = 'AccountHistorySerializer'
 

@@ -1,12 +1,10 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.drf.serializers import SecretReadableMixin
 from common.drf.fields import ObjectRelatedField
 from assets.models import Account, AccountTemplate, Asset
-from assets.serializers.base import AuthValidateMixin
-from .common import AccountFieldsSerializerMixin
+from .base import BaseAccountSerializer
 
 
 class AccountSerializerCreateMixin(serializers.ModelSerializer):
@@ -28,7 +26,8 @@ class AccountSerializerCreateMixin(serializers.ModelSerializer):
     @staticmethod
     def replace_attrs(account_template: AccountTemplate, attrs: dict):
         exclude_fields = [
-            '_state', 'org_id', 'id', 'date_created', 'date_updated'
+            '_state', 'org_id', 'id', 'date_created',
+            'date_updated'
         ]
         template_attrs = {
             k: v for k, v in account_template.__dict__.items()
@@ -52,34 +51,36 @@ class AccountSerializerCreateMixin(serializers.ModelSerializer):
         return instance
 
 
-class AccountSerializer(
-    AuthValidateMixin, AccountSerializerCreateMixin,
-    AccountFieldsSerializerMixin, BulkOrgResourceModelSerializer
-):
+class AccountSerializer(AccountSerializerCreateMixin, BaseAccountSerializer):
     asset = ObjectRelatedField(
         required=False, queryset=Asset.objects,
         label=_('Asset'), attrs=('id', 'name', 'address')
     )
-    platform = serializers.ReadOnlyField(label=_("Platform"))
 
-    class Meta(AccountFieldsSerializerMixin.Meta):
+    class Meta(BaseAccountSerializer.Meta):
         model = Account
-        fields = AccountFieldsSerializerMixin.Meta.fields \
+        fields = BaseAccountSerializer.Meta.fields \
+            + ['su_from', 'version', 'asset'] \
             + ['template', 'push_now']
+        extra_kwargs = {
+            **BaseAccountSerializer.Meta.extra_kwargs,
+            'name': {'required': False, 'allow_null': True},
+        }
+
+    def __init__(self, *args, data=None, **kwargs):
+        super().__init__(*args, data=data, **kwargs)
+        if data and 'name' not in data:
+            data['name'] = data.get('username')
 
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('asset')
+        queryset = queryset.prefetch_related('asset', 'asset__platform')
         return queryset
 
 
 class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
     class Meta(AccountSerializer.Meta):
-        fields_backup = [
-            'name', 'address', 'platform', 'protocols', 'username', 'password',
-            'private_key', 'public_key', 'date_created', 'date_updated', 'version'
-        ]
         extra_kwargs = {
             'password': {'write_only': False},
             'private_key': {'write_only': False},

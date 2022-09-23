@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 #
+from io import StringIO
+
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 from django.db.transaction import atomic
@@ -7,6 +9,7 @@ from django.db.models import F
 
 from common.drf.serializers import JMSWritableNestedModelSerializer
 from common.drf.fields import LabeledChoiceField, ObjectRelatedField
+from common.utils import validate_ssh_private_key, ssh_private_key_gen
 from ..account import AccountSerializer
 from ...models import Asset, Node, Platform, Label, Domain, Account, Protocol
 from ...const import Category, AllTypes
@@ -47,13 +50,15 @@ class AssetAccountSerializer(AccountSerializer):
 
     class Meta(AccountSerializer.Meta):
         fields_mini = [
-            'id', 'name', 'username', 'privileged', 'version',
-            'secret_type',
+            'id', 'name', 'username', 'privileged',
+            'version', 'secret_type',
         ]
         fields_write_only = [
-            'secret', 'passphrase', 'push_now'
+            'secret',  'push_now'
         ]
         fields = fields_mini + fields_write_only
+
+
 
 
 class AssetSerializer(JMSWritableNestedModelSerializer):

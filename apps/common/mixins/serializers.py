@@ -2,13 +2,18 @@
 #
 from collections import Iterable
 
-from django.db.models import Prefetch, F, NOT_PROVIDED
+from django.db.models import NOT_PROVIDED
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.utils import html
 from rest_framework.settings import api_settings
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SkipField, empty
-__all__ = ['BulkSerializerMixin', 'BulkListSerializerMixin', 'CommonSerializerMixin', 'CommonBulkSerializerMixin']
+
+
+__all__ = [
+    'BulkSerializerMixin', 'BulkListSerializerMixin',
+    'CommonSerializerMixin', 'CommonBulkSerializerMixin'
+]
 
 
 class BulkSerializerMixin(object):
@@ -281,20 +286,12 @@ class DynamicFieldsMixin:
             self.fields.pop(field, None)
 
 
-class EagerLoadQuerySetFields:
-    def setup_eager_loading(self, queryset):
-        """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related(
-            Prefetch('nodes'),
-            Prefetch('labels'),
-        ).select_related('admin_user', 'domain', 'platform') \
-         .annotate(platform_base=F('platform__base'))
-        return queryset
-
-
 class CommonSerializerMixin(DynamicFieldsMixin, DefaultValueFieldsMixin):
     instance: None
     initial_data: dict
+    common_fields = [
+        'comment', 'created_by', 'date_created', 'date_updated',
+    ]
 
     def get_initial_value(self, attr, default=None):
         value = self.initial_data.get(attr)
@@ -304,6 +301,12 @@ class CommonSerializerMixin(DynamicFieldsMixin, DefaultValueFieldsMixin):
             value = getattr(self.instance, attr, default)
             return value
         return default
+
+    def get_field_names(self, declared_fields, info):
+        names = super().get_field_names(declared_fields, info)
+        common_names = [i for i in self.common_fields if i in names]
+        primary_names = [i for i in names if i not in self.common_fields]
+        return primary_names + common_names
 
 
 class CommonBulkSerializerMixin(BulkSerializerMixin, CommonSerializerMixin):

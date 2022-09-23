@@ -164,8 +164,9 @@ class BuiltinRole:
     @classmethod
     def sync_to_db(cls, show_msg=False):
         roles = cls.get_roles()
+        print("\n  Update builtin roles")
 
         for pre_role in roles.values():
             role, created = pre_role.update_or_create_role()
             if show_msg:
-                print("Update builtin Role: {} - {}".format(role.name, created))
+                print("    - Update: {} - {}".format(role.name, created))

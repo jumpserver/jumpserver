@@ -20,6 +20,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
 
     k8s = 'k8s', 'K8S'
     http = 'http', 'HTTP'
+    _settings = None
 
     @classmethod
     def device_protocols(cls):
@@ -106,7 +107,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
     @classmethod
     def settings(cls):
         return {
-            **cls.device_protocols(),
-            **cls.database_protocols(),
-            **cls.cloud_protocols()
+             **cls.device_protocols(),
+             **cls.database_protocols(),
+             **cls.cloud_protocols()
         }

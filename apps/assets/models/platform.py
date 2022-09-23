@@ -4,6 +4,8 @@ from django.utils.translation import gettext_lazy as _
 from assets.const import AllTypes
 from common.db.fields import JsonDictTextField
 
+from assets.const import Protocol
+
 
 __all__ = ['Platform', 'PlatformProtocol', 'PlatformAutomation']
 
@@ -19,6 +21,13 @@ class PlatformProtocol(models.Model):
     port = models.IntegerField(verbose_name=_('Port'))
     setting = models.JSONField(verbose_name=_('Setting'), default=dict)
     platform = models.ForeignKey('Platform', on_delete=models.CASCADE, related_name='protocols')
+
+    def __str__(self):
+        return '{}/{}'.format(self.name, self.port)
+
+    @property
+    def secret_types(self):
+        return Protocol.settings().get(self.name, {}).get('secret_types')
 
 
 class PlatformAutomation(models.Model):

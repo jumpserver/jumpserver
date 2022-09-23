@@ -23,7 +23,6 @@ __all__ = [
 
 
 class MethodSerializer(serializers.Serializer):
-
     def __init__(self, method_name=None, **kwargs):
         self.method_name = method_name
         super().__init__(**kwargs)

@@ -34,12 +34,8 @@ class Account(BaseAccount):
         ]
 
     @lazyproperty
-    def ip(self):
-        return self.asset.address
-
-    @lazyproperty
-    def asset_name(self):
-        return self.asset.name
+    def platform(self):
+        return self.asset.platform
 
     def __str__(self):
         return '{}@{}'.format(self.username, self.asset.name)

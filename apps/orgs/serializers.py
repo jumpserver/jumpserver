@@ -11,8 +11,6 @@ class ResourceStatisticsSerializer(serializers.Serializer):
 
     assets_amount = serializers.IntegerField(required=False)
     nodes_amount = serializers.IntegerField(required=False)
-    admin_users_amount = serializers.IntegerField(required=False)
-    system_users_amount = serializers.IntegerField(required=False)
     domains_amount = serializers.IntegerField(required=False)
     gateways_amount = serializers.IntegerField(required=False)
 
