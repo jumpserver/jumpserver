@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
-from common.drf.serializers import BulkModelSerializer, AdaptedBulkListSerializer
+from common.drf.serializers import BulkModelSerializer
 from common.utils import is_uuid
 from users.serializers import ServiceAccountSerializer
 from common.utils import get_request_ip, pretty_string

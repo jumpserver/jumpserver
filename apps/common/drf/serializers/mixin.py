@@ -1,19 +1,41 @@
-# -*- coding: utf-8 -*-
-#
 from collections import Iterable
 
 from django.db.models import NOT_PROVIDED
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.utils import html
+from rest_framework import serializers
 from rest_framework.settings import api_settings
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SkipField, empty
 
+from common.drf.fields import EncryptedField
+from common.utils import lazyproperty
+
 
 __all__ = [
     'BulkSerializerMixin', 'BulkListSerializerMixin',
-    'CommonSerializerMixin', 'CommonBulkSerializerMixin'
+    'CommonSerializerMixin', 'CommonBulkSerializerMixin',
+    'SecretReadableMixin',
 ]
+
+
+class SecretReadableMixin(serializers.Serializer):
+    """ 加密字段 (EncryptedField) 可读性 """
+
+    def __init__(self, *args, **kwargs):
+        super(SecretReadableMixin, self).__init__(*args, **kwargs)
+        if not hasattr(self, 'Meta') or not hasattr(self.Meta, 'extra_kwargs'):
+            return
+        extra_kwargs = self.Meta.extra_kwargs
+        for field_name, serializer_field in self.fields.items():
+            if not isinstance(serializer_field, EncryptedField):
+                continue
+            if field_name not in extra_kwargs:
+                continue
+            field_extra_kwargs = extra_kwargs[field_name]
+            if 'write_only' not in field_extra_kwargs:
+                continue
+            serializer_field.write_only = field_extra_kwargs['write_only']
 
 
 class BulkSerializerMixin(object):
@@ -56,15 +78,15 @@ class BulkSerializerMixin(object):
 
     @classmethod
     def many_init(cls, *args, **kwargs):
+        from .common import AdaptedBulkListSerializer
         meta = getattr(cls, 'Meta', None)
         assert meta is not None, 'Must have `Meta`'
         if not hasattr(meta, 'list_serializer_class'):
-            from common.drf.serializers import AdaptedBulkListSerializer
             meta.list_serializer_class = AdaptedBulkListSerializer
         return super(BulkSerializerMixin, cls).many_init(*args, **kwargs)
 
 
-class BulkListSerializerMixin(object):
+class BulkListSerializerMixin:
     """
     Become rest_framework_bulk doing bulk update raise Exception:
     'QuerySet' object has no attribute 'pk' when doing bulk update
@@ -289,9 +311,12 @@ class DynamicFieldsMixin:
 class CommonSerializerMixin(DynamicFieldsMixin, DefaultValueFieldsMixin):
     instance: None
     initial_data: dict
-    common_fields = [
+    common_fields = (
         'comment', 'created_by', 'date_created', 'date_updated',
-    ]
+    )
+    secret_fields = (
+        'password', 'token', 'secret', 'key', 'private_key', 'public_key',
+    )
 
     def get_initial_value(self, attr, default=None):
         value = self.initial_data.get(attr)
@@ -301,6 +326,14 @@ class CommonSerializerMixin(DynamicFieldsMixin, DefaultValueFieldsMixin):
             value = getattr(self.instance, attr, default)
             return value
         return default
+
+    def get_fields(self):
+        fields = super().get_fields()
+        for name, field in fields.items():
+            if name in self.secret_fields and \
+                    not isinstance(self, SecretReadableMixin):
+                field.write_only = True
+        return fields
 
     def get_field_names(self, declared_fields, info):
         names = super().get_field_names(declared_fields, info)

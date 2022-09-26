@@ -1,3 +1,4 @@
+
 from rest_framework import serializers
 from rest_framework.serializers import Serializer
 from rest_framework.serializers import ModelSerializer
@@ -6,20 +7,15 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.functional import cached_property
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 
-from common.mixins import BulkListSerializerMixin
-from common.mixins.serializers import BulkSerializerMixin
-from common.drf.fields import EncryptedField
+from .mixin import BulkListSerializerMixin, BulkSerializerMixin
+
 
 __all__ = [
     'MethodSerializer', 'EmptySerializer', 'BulkModelSerializer',
     'AdaptedBulkListSerializer', 'CeleryTaskSerializer',
-    'SecretReadableMixin', 'JMSWritableNestedModelSerializer',
+    'JMSWritableNestedModelSerializer',
     'GroupedChoiceSerializer',
 ]
-
-
-# MethodSerializer
-# ----------------
 
 
 class MethodSerializer(serializers.Serializer):
@@ -65,10 +61,6 @@ class MethodSerializer(serializers.Serializer):
         return self.serializer.get_initial()
 
 
-# Other Serializer
-# ----------------
-
-
 class EmptySerializer(Serializer):
     pass
 
@@ -94,30 +86,5 @@ class GroupedChoiceSerializer(ChoiceSerializer):
     children = ChoiceSerializer(many=True, label=_("Children"))
 
 
-class SecretReadableMixin(serializers.Serializer):
-    """ 加密字段 (EncryptedField) 可读性 """
-
-    def __init__(self, *args, **kwargs):
-        super(SecretReadableMixin, self).__init__(*args, **kwargs)
-        if not hasattr(self, 'Meta') or not hasattr(self.Meta, 'extra_kwargs'):
-            return
-        extra_kwargs = self.Meta.extra_kwargs
-        for field_name, serializer_field in self.fields.items():
-            if not isinstance(serializer_field, EncryptedField):
-                continue
-            if field_name not in extra_kwargs:
-                continue
-            field_extra_kwargs = extra_kwargs[field_name]
-            if 'write_only' not in field_extra_kwargs:
-                continue
-            serializer_field.write_only = field_extra_kwargs['write_only']
-
-
 class JMSWritableNestedModelSerializer(WritableNestedModelSerializer):
     pass
-    #
-    # def _get_related_pk(self, data, model_class):
-    #     pk = data.get('pk') or data.get('id') or data.get(model_class._meta.pk.attname)
-    #     if pk:
-    #         return str(pk)
-    #     return None

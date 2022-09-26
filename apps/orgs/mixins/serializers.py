@@ -5,7 +5,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from common.validators import ProjectUniqueValidator
-from common.mixins import BulkSerializerMixin, CommonSerializerMixin
+from common.drf.serializers import BulkSerializerMixin, CommonSerializerMixin
 from ..utils import get_current_org_id_for_serializer
 
 

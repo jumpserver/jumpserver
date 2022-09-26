@@ -4,7 +4,7 @@ from functools import partial
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.mixins import CommonBulkSerializerMixin
+from common.drf.serializers import CommonBulkSerializerMixin
 from common.validators import PhoneValidator
 from common.utils import pretty_string, get_logger
 from common.drf.fields import EncryptedField
