@@ -33,7 +33,7 @@ class EBCCipher:
     def __padding(val):
         # padding
         val = bytes(val)
-        while len(val) % 16 != 0:
+        while len(val) == 0 or len(val) % 16 != 0:
             val += b'\0'
         return val
 
