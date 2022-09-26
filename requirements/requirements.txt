@@ -1,5 +1,6 @@
 amqp==5.0.9
-ansible==2.10.7
+ansible==6.4.0
+ansible-runner==4.8.0
 asn1crypto==0.24.0
 bcrypt==3.1.4
 billiard==3.6.4.0
@@ -141,3 +142,4 @@ ForgeryPy3==0.3.1
 django-debug-toolbar==3.5
 Pympler==1.0.1
 IPy==1.1
+

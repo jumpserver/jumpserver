@@ -31,8 +31,8 @@ class DomainViewSet(OrgBulkModelViewSet):
 
 class GatewayViewSet(OrgBulkModelViewSet):
     model = Gateway
-    filterset_fields = ("domain__name", "name", "username", "address", "domain")
-    search_fields = ("domain__name", "name", "username", "address")
+    filterset_fields = ("domain__name", "name", "username", "domain")
+    search_fields = ("domain__name", "name", "username", )
     serializer_class = serializers.GatewaySerializer
 
 
