@@ -233,6 +233,8 @@ class Crypto:
         return self.cryptos[0]
 
     def encrypt(self, text):
+        if text is None:
+            return text
         return self.encryptor.encrypt(text)
 
     def decrypt(self, text):
