@@ -83,7 +83,7 @@ class PiicoSM4EcbCrypto(BaseCrypto):
 
     def _decrypt(self, data: bytes) -> bytes:
         bs = self.cipher.decrypt(data)
-        return bs[:bs.index(0)]
+        return bs.rstrip(b'\0')
 
 
 class AESCrypto:
