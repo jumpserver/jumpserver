@@ -31,6 +31,10 @@ class DeviceTypes(BaseType):
     def _get_automation_constrains(cls) -> dict:
         return {
             '*': {
+                'ansible_enabled': True,
+                'ansible_config': {
+                    'ansible_connection': 'local',
+                },
                 'ping_enabled': True,
                 'gather_facts_enabled': False,
                 'gather_accounts_enabled': False,

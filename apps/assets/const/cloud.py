@@ -20,6 +20,8 @@ class CloudTypes(BaseType):
     def _get_automation_constrains(cls) -> dict:
         constrains = {
             '*': {
+                'ansible_enabled': False,
+                'ansible_config': {},
                 'gather_facts_enabled': False,
                 'verify_account_enabled': False,
                 'change_password_enabled': False,

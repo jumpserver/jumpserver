@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from common.drf.fields import LabeledChoiceField
 from common.drf.serializers import JMSWritableNestedModelSerializer
 from ..models import Platform, PlatformProtocol, PlatformAutomation
-from ..const import Category, AllTypes, Protocol
+from ..const import Category, AllTypes
 
 
 __all__ = ['PlatformSerializer', 'PlatformOpsMethodSerializer']
@@ -36,7 +36,8 @@ class PlatformAutomationSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlatformAutomation
         fields = [
-            'id', 'ping_enabled', 'ping_method',
+            'id', 'ansible_enabled', 'ansible_config',
+            'ping_enabled', 'ping_method',
             'gather_facts_enabled', 'gather_facts_method',
             'create_account_enabled', 'create_account_method',
             'change_password_enabled', 'change_password_method',
@@ -68,7 +69,7 @@ class PlatformProtocolsSerializer(serializers.ModelSerializer):
 
 
 class PlatformSerializer(JMSWritableNestedModelSerializer):
-    type = LabeledChoiceField(choices=AllTypes.choices, label=_("Type"))
+    type = LabeledChoiceField(choices=AllTypes.choices(), label=_("Type"))
     category = LabeledChoiceField(choices=Category.choices, label=_("Category"))
     protocols = PlatformProtocolsSerializer(label=_('Protocols'), many=True, required=False)
     automation = PlatformAutomationSerializer(label=_('Automation'), required=False)

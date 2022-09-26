@@ -25,6 +25,10 @@ class DatabaseTypes(BaseType):
     def _get_automation_constrains(cls) -> dict:
         constrains = {
             '*': {
+                'ansible_enabled': True,
+                'ansible_config': {
+                    'ansible_connection': 'local',
+                },
                 'gather_facts_enabled': True,
                 'gather_accounts_enabled': True,
                 'verify_account_enabled': True,

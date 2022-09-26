@@ -59,11 +59,9 @@ class AssetAccountSerializer(AccountSerializer):
         fields = fields_mini + fields_write_only
 
 
-
-
 class AssetSerializer(JMSWritableNestedModelSerializer):
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
-    type = LabeledChoiceField(choices=AllTypes.choices, read_only=True, label=_('Type'))
+    type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
     domain = ObjectRelatedField(required=False, queryset=Domain.objects, label=_('Domain'))
     platform = ObjectRelatedField(required=False, queryset=Platform.objects, label=_('Platform'))
     nodes = ObjectRelatedField(many=True, required=False, queryset=Node.objects, label=_('Nodes'))
