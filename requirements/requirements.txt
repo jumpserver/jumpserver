@@ -136,6 +136,7 @@ django-mysql==3.9.0
 django-redis==5.2.0
 python-redis-lock==3.7.0
 redis==4.3.3
+pyOpenSSL==22.0.0
 # Debug
 ipython==8.4.0
 ForgeryPy3==0.3.1
