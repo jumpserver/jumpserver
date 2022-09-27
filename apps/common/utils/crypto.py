@@ -244,7 +244,7 @@ class Crypto:
                 if origin_text:
                     # 有时不同算法解密不报错，但是返回空字符串
                     return origin_text
-            except (TypeError, ValueError, UnicodeDecodeError, IndexError):
+            except Exception:
                 continue
 
 
