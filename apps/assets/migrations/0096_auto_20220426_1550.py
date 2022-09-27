@@ -25,6 +25,8 @@ class Migration(migrations.Migration):
             name='PlatformAutomation',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('ansible_enabled', models.BooleanField(default=False, verbose_name='Enabled')),
+                ('ansible_config', models.JSONField(default=dict, verbose_name='Ansible config')),
                 ('ping_enabled', models.BooleanField(default=False, verbose_name='Ping enabled')),
                 ('ping_method', models.CharField(blank=True, max_length=32, null=True, verbose_name='Ping method')),
                 ('gather_facts_enabled', models.BooleanField(default=False, verbose_name='Gather facts enabled')),

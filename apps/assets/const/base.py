@@ -52,7 +52,3 @@ class BaseType(TextChoices):
     @classmethod
     def internal_platforms(cls):
         raise NotImplementedError
-
-    @classmethod
-    def create_or_update_internal_platforms(cls):
-        data = cls._internal_platforms()

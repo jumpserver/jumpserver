@@ -31,6 +31,8 @@ class PlatformProtocol(models.Model):
 
 
 class PlatformAutomation(models.Model):
+    ansible_enabled = models.BooleanField(default=False, verbose_name=_("Enabled"))
+    ansible_config = models.JSONField(default=dict, verbose_name=_("Ansible config"))
     ping_enabled = models.BooleanField(default=False, verbose_name=_("Ping enabled"))
     ping_method = models.CharField(max_length=32, blank=True, null=True, verbose_name=_("Ping method"))
     gather_facts_enabled = models.BooleanField(default=False, verbose_name=_("Gather facts enabled"))

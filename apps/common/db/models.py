@@ -15,34 +15,10 @@ import inspect
 
 from django.db import models
 from django.db.models import F, Value, ExpressionWrapper
-from enum import _EnumDict
 from django.db import transaction
 from django.db.models import QuerySet
 from django.db.models.functions import Concat
 from django.utils.translation import ugettext_lazy as _
-
-
-class IncludesTextChoicesMeta(type):
-    def __new__(metacls, classname, bases, classdict):
-        includes = classdict.pop('includes', None)
-        assert includes
-
-        attrs = _EnumDict()
-        attrs._cls_name = classname
-        for k, v in classdict.items():
-            attrs[k] = v
-
-        for cls in includes:
-            _member_names_ = cls._member_names_
-            _member_map_ = cls._member_map_
-            _value2label_map_ = cls._value2label_map_
-
-            for name in _member_names_:
-                value = str(_member_map_[name])
-                label = _value2label_map_[value]
-                attrs[name] = value, label
-        bases = (models.TextChoices,)
-        return type(classname, bases, attrs)
 
 
 class BitOperationChoice:

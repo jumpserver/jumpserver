@@ -40,13 +40,23 @@ class HostTypes(BaseType):
     def _get_automation_constrains(cls) -> dict:
         return {
             '*': {
+                'ansible_enabled': True,
+                'ansible_config': {
+                    'ansible_connection': 'smart',
+                },
                 'ping_enabled': True,
                 'gather_facts_enabled': True,
                 'gather_accounts_enabled': True,
                 'verify_account_enabled': True,
                 'change_password_enabled': True,
                 'create_account_enabled': True,
-            }
+            },
+            cls.WINDOWS: {
+                'ansible_config': {
+                    'ansible_shell_type': 'powershell',
+                    'ansible_connection': 'ssh',
+                },
+            },
         }
 
     @classmethod

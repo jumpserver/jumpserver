@@ -83,7 +83,7 @@ class BaseInventory(InventoryManager):
         用于生成动态构建Ansible Inventory. super().__init__ 会自动调用
         host_list: [{
             "name": "",
-            "ip": "",
+            "address": "",
             "port": "",
             "username": "",
             "password": "",
@@ -154,3 +154,14 @@ class BaseInventory(InventoryManager):
         return self.get_hosts(pattern)
 
 
+class JMSInventory:
+    def __init__(self, assets, account=None, ansible_connection='ssh',
+                 account_policy='smart', host_var_callback=None):
+        """
+        :param assets:
+        :param account: account username name if not set use account_policy
+        :param ansible_connection: ssh, local,
+        :param account_policy:
+        :param host_var_callback:
+        """
+        pass

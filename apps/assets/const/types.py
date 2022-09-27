@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from common.db.models import IncludesTextChoicesMeta, ChoicesMixin
+from common.db.models import ChoicesMixin
 from common.tree import TreeNode
 
 from .category import Category
@@ -11,13 +11,20 @@ from .web import WebTypes
 from .cloud import CloudTypes
 
 
-class AllTypes(ChoicesMixin, metaclass=IncludesTextChoicesMeta):
+class AllTypes(ChoicesMixin):
     choices: list
     includes = [
         HostTypes, DeviceTypes, DatabaseTypes,
         CloudTypes, WebTypes,
     ]
     _category_constrains = {}
+
+    @classmethod
+    def choices(cls):
+        choices = []
+        for tp in cls.includes:
+            choices.extend(tp.choices)
+        return choices
 
     @classmethod
     def get_constraints(cls, category, tp):
