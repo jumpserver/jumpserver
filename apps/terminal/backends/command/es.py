@@ -184,9 +184,14 @@ class CommandStore(object):
         return Command.from_multi_dict(source_data)
 
     def count(self, **query):
-        body = self.get_query_body(**query)
-        data = self.es.count(index=self.query_index, doc_type=self.doc_type, body=body)
-        return data["count"]
+        try:
+            body = self.get_query_body(**query)
+            data = self.es.count(index=self.query_index, doc_type=self.doc_type, body=body)
+            count = data["count"]
+        except Exception as e:
+            logger.error('ES count error: {}'.format(e))
+            count = 0
+        return count
 
     def __getattr__(self, item):
         return getattr(self.es, item)
