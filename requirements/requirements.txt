@@ -1,6 +1,6 @@
 amqp==5.0.9
 ansible==6.4.0
-ansible-runner==4.8.0
+ansible-runner==2.2.1
 asn1crypto==0.24.0
 bcrypt==3.1.4
 billiard==3.6.4.0
