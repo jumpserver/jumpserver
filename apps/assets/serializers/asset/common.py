@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-from io import StringIO
 
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
@@ -9,7 +8,6 @@ from django.db.models import F
 
 from common.drf.serializers import JMSWritableNestedModelSerializer
 from common.drf.fields import LabeledChoiceField, ObjectRelatedField
-from common.utils import validate_ssh_private_key, ssh_private_key_gen
 from ..account import AccountSerializer
 from ...models import Asset, Node, Platform, Label, Domain, Account, Protocol
 from ...const import Category, AllTypes
@@ -29,7 +27,7 @@ class AssetProtocolsSerializer(serializers.ModelSerializer):
 class AssetLabelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Label
-        fields = ['name', 'value']
+        fields = ['id', 'name', 'value']
         extra_kwargs = {
             'name': {'required': False},
             'value': {'required': False}
@@ -62,7 +60,7 @@ class AssetAccountSerializer(AccountSerializer):
 class AssetSerializer(JMSWritableNestedModelSerializer):
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
-    domain = ObjectRelatedField(required=False, queryset=Domain.objects, label=_('Domain'))
+    domain = ObjectRelatedField(required=False, queryset=Domain.objects, label=_('Domain'), allow_null=True)
     platform = ObjectRelatedField(required=False, queryset=Platform.objects, label=_('Platform'))
     nodes = ObjectRelatedField(many=True, required=False, queryset=Node.objects, label=_('Nodes'))
     labels = AssetLabelSerializer(many=True, required=False, label=_('Labels'))
