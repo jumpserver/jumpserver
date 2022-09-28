@@ -183,7 +183,8 @@ class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
             return self.accounts.all()
         if AssetPermission.SpecialAccount.ALL in account_names:
             return self.accounts.all()
-        queries = Q(name__in=account_names) | Q(username__in=account_names)
+        # queries = Q(name__in=account_names) | Q(username__in=account_names)
+        queries = Q(username__in=account_names)
         accounts = self.accounts.filter(queries)
         return accounts
 

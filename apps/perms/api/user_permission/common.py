@@ -2,8 +2,8 @@
 #
 import uuid
 import time
+from collections import defaultdict
 
-from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from rest_framework.views import APIView, Response
@@ -21,7 +21,7 @@ from common.utils import get_logger, lazyproperty
 
 from perms.hands import User, Asset, Account
 from perms import serializers
-from perms.models import AssetPermission
+from perms.models import AssetPermission, Action
 
 logger = get_logger(__name__)
 
@@ -162,15 +162,19 @@ class UserGrantedAssetAccounts(ListAPIView):
         return asset
 
     def get_queryset(self):
-        # 获取用户-资产的授权规则
-        assetperms = AssetPermission.filter(self.user, self.asset)
-        account_names = AssetPermission.get_account_names(assetperms)
-        accounts = list(self.asset.filter_accounts(account_names))
+        accounts = AssetPermission.get_user_perm_asset_accounts(
+            self.user, self.asset, with_actions=True
+        )
+        return accounts
         # @INPUT @USER
-        inner_accounts = [Account.get_input_account(), Account.get_user_account(self.user.username)]
-        all_accounts = accounts + inner_accounts
+        # inner_accounts = [
+        #     Account.get_input_account(), Account.get_user_account(self.user.username)
+        # ]
+        # for inner_account in inner_accounts:
+        #     inner_account.actions = Action.ALL
+        # accounts = accounts + inner_accounts
         # 构造默认包含的账号，如: @INPUT @USER
-        return all_accounts
+        # return accounts
 
 
 class MyGrantedAssetAccounts(UserGrantedAssetAccounts):

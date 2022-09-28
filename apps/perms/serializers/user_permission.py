@@ -49,8 +49,9 @@ class AccountsGrantedSerializer(serializers.ModelSerializer):
 
     # Todo: 添加前端登录逻辑中需要的一些字段，比如：是否需要手动输入密码
     # need_manual = serializers.BooleanField(label=_('Need manual input'))
+    actions = ActionsField(read_only=True)
 
     class Meta:
         model = Account
-        fields = ['id', 'name', 'username']
+        fields = ['id', 'name', 'username', 'actions']
         read_only_fields = fields

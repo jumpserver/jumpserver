@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
@@ -53,6 +54,11 @@ class Account(BaseAccount):
     def get_user_account(cls, username):
         """ @USER 动态用户的账号(self) """
         return cls(name=cls.InnerAccount.USER.value, username=username)
+
+    @classmethod
+    def filter(cls, asset_ids, account_usernames):
+        queries = Q(asset_id__in=asset_ids) & Q(username__in=account_usernames)
+        return cls.objects.filter(queries)
 
 
 class AccountTemplate(BaseAccount):

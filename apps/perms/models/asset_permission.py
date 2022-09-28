@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.db.models import F, Q, TextChoices
+from collections import defaultdict
 
 from assets.models import Asset, Node, FamilyMixin, Account
 from orgs.mixins.models import OrgModelMixin
@@ -74,6 +75,11 @@ class AssetPermissionQuerySet(models.QuerySet):
     def invalid(self):
         now = timezone.now()
         q = (Q(is_active=False) | Q(date_start__gt=now) | Q(date_expired__lt=now))
+        return self.filter(q)
+
+    def filter_by_accounts(self, accounts):
+        q = Q(accounts__contains=accounts) | \
+            Q(accounts__contains=AssetPermission.SpecialAccount.ALL.value)
         return self.filter(q)
 
 
@@ -212,94 +218,96 @@ class AssetPermission(OrgModelMixin):
         names = [node.full_value for node in self.nodes.all()]
         return names
 
+    # Related accounts
     def get_asset_accounts(self):
         asset_ids = self.get_all_assets(flat=True)
-        queries = Q(asset_id__in=asset_ids) \
-                  & (Q(username__in=self.accounts) | Q(name__in=self.accounts))
-        accounts = Account.objects.filter(queries)
+        accounts = Account.filter(asset_ids, self.accounts)
         return accounts
 
     @classmethod
-    def get_account_names(cls, perms):
+    def get_user_perm_asset_accounts(cls, user, asset: Asset, with_actions=False):
+        perms = cls.filter(user, asset)
+        all_account_names = cls.retrieve_account_names(perms)
+        accounts = asset.filter_accounts(all_account_names)
+        if with_actions:
+            cls.set_accounts_actions(accounts, perms=perms)
+        return accounts
+
+    @classmethod
+    def set_accounts_actions(cls, accounts, perms):
+        # set account actions
+        account_names = accounts.values_list('username', flat=True)
+        perms = perms.filter_by_accounts(account_names)
+        account_names_actions_map = defaultdict(set)
+        account_names_actions = perms.values_list('accounts', 'actions')
+        for account_names, actions in account_names_actions:
+            for account_name in account_names:
+                account_names_actions_map[account_name] |= actions
+        for account in accounts:
+            account.actions = account_names_actions_map.get(account.username)
+        return accounts
+
+    @classmethod
+    def retrieve_account_names(cls, perms):
         account_names = set()
         for perm in perms:
-            perm: cls
             if not isinstance(perm.accounts, list):
                 continue
             account_names.update(perm.accounts)
         return account_names
 
     @classmethod
-    def filter(cls, user=None, asset=None, account=None):
+    def filter(cls, user=None, asset=None, account_names=None):
         """ 获取同时包含 用户-资产-账号 的授权规则 """
-        assetperm_ids = []
+        perm_ids = []
         if user:
             user_assetperm_ids = cls.filter_by_user(user, flat=True)
-            assetperm_ids.append(user_assetperm_ids)
+            perm_ids.append(user_assetperm_ids)
         if asset:
             asset_assetperm_ids = cls.filter_by_asset(asset, flat=True)
-            assetperm_ids.append(asset_assetperm_ids)
-        if account:
-            account_assetperm_ids = cls.filter_by_account(account, flat=True)
-            assetperm_ids.append(account_assetperm_ids)
+            perm_ids.append(asset_assetperm_ids)
         # & 是同时满足，比如有用户，但是用户的规则是空，那么返回也应该是空
-        assetperm_ids = list(reduce(lambda x, y: set(x) & set(y), assetperm_ids))
-        assetperms = cls.objects.filter(id__in=assetperm_ids).valid().order_by('-date_expired')
-        return assetperms
+        perm_ids = list(reduce(lambda x, y: set(x) & set(y), perm_ids))
+        perms = cls.objects.filter(id__in=perm_ids)
+        if account_names:
+            perms = perms.filter_by_accounts(account_names)
+        return perms.valid().order_by('-date_expired')
 
     @classmethod
     def filter_by_user(cls, user, with_group=True, flat=False):
-        assetperm_ids = set()
-        user_assetperm_ids = AssetPermission.users.through.objects \
-            .filter(user_id=user.id) \
-            .values_list('assetpermission_id', flat=True) \
-            .distinct()
-        assetperm_ids.update(user_assetperm_ids)
-
+        perm_ids = set()
+        user_perm_ids = AssetPermission.users.through.objects.filter(
+            user_id=user.id
+        ).values_list('assetpermission_id', flat=True).distinct()
+        perm_ids.update(user_perm_ids)
         if with_group:
             usergroup_ids = user.get_groups(flat=True)
-            usergroups_assetperm_id = AssetPermission.user_groups.through.objects \
-                .filter(usergroup_id__in=usergroup_ids) \
-                .values_list('assetpermission_id', flat=True) \
-                .distinct()
-            assetperm_ids.update(usergroups_assetperm_id)
-
+            usergroups_perm_id = AssetPermission.user_groups.through.objects.filter(
+                usergroup_id__in=usergroup_ids
+            ).values_list('assetpermission_id', flat=True).distinct()
+            perm_ids.update(usergroups_perm_id)
         if flat:
-            return assetperm_ids
-        else:
-            assetperms = cls.objects.filter(id__in=assetperm_ids).valid()
-            return assetperms
+            return perm_ids
+        perms = cls.objects.filter(id__in=perm_ids).valid()
+        return perms
 
     @classmethod
     def filter_by_asset(cls, asset, with_node=True, flat=False):
-        assetperm_ids = set()
-        asset_assetperm_ids = AssetPermission.assets.through.objects \
-            .filter(asset_id=asset.id) \
-            .values_list('assetpermission_id', flat=True)
-        assetperm_ids.update(asset_assetperm_ids)
-
+        perm_ids = set()
+        asset_perm_ids = AssetPermission.assets.through.objects.filter(
+            asset_id=asset.id
+        ).values_list('assetpermission_id', flat=True).distinct()
+        perm_ids.update(asset_perm_ids)
         if with_node:
             node_ids = asset.get_all_nodes(flat=True)
-            node_assetperm_ids = AssetPermission.nodes.through.objects \
-                .filter(node_id__in=node_ids) \
-                .values_list('assetpermission_id', flat=True)
-            assetperm_ids.update(node_assetperm_ids)
-
+            node_perm_ids = AssetPermission.nodes.through.objects.filter(
+                node_id__in=node_ids
+            ).values_list('assetpermission_id', flat=True).distinct()
+            perm_ids.update(node_perm_ids)
         if flat:
-            return assetperm_ids
-        else:
-            assetperms = cls.objects.filter(id__in=assetperm_ids).valid()
-            return assetperms
-
-    @classmethod
-    def filter_by_account(cls, account, flat=False):
-        queries = Q(accounts__contains=account) | Q(accounts__contains=cls.SpecialAccount.ALL.value)
-        assetperms = cls.objects.filter(queries).valid()
-        if flat:
-            assetperm_ids = assetperms.values_list('id', flat=True)
-            return assetperm_ids
-        else:
-            return assetperms
+            return perm_ids
+        perms = cls.objects.filter(id__in=perm_ids).valid()
+        return perms
 
 
 class UserAssetGrantedTreeNodeRelation(OrgModelMixin, FamilyMixin, BaseCreateUpdateModel):
