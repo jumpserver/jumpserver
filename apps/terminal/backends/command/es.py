@@ -169,6 +169,14 @@ class CommandStore(object):
         return self.es.index(index=self.index, doc_type=self.doc_type, body=data)
 
     def filter(self, query: dict, from_=None, size=None, sort=None):
+        try:
+            data = self._filter(query, from_, size, sort)
+        except Exception as e:
+            logger.error('ES filter error: {}'.format(e))
+            data = []
+        return data
+
+    def _filter(self, query: dict, from_=None, size=None, sort=None):
         body = self.get_query_body(**query)
 
         data = self.es.search(
