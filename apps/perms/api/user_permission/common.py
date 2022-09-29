@@ -30,8 +30,10 @@ __all__ = [
     'ValidateUserAssetPermissionApi',
     'GetUserAssetPermissionActionsApi',
     'MyGrantedAssetSystemUsersApi',
-    'UserGrantedAssetAccounts',
-    'MyGrantedAssetAccounts',
+    'UserGrantedAssetAccountsApi',
+    'MyGrantedAssetAccountsApi',
+    'UserGrantedAssetSpecialAccountsApi',
+    'MyGrantedAssetSpecialAccountsApi',
 ]
 
 
@@ -143,7 +145,7 @@ class MyGrantedAssetSystemUsersApi(UserGrantedAssetSystemUsersForAdminApi):
         return self.request.user
 
 
-class UserGrantedAssetAccounts(ListAPIView):
+class UserGrantedAssetAccountsApi(ListAPIView):
     serializer_class = serializers.AccountsGrantedSerializer
     rbac_perms = {
         'list': 'perms.view_userassets'
@@ -162,22 +164,40 @@ class UserGrantedAssetAccounts(ListAPIView):
         return asset
 
     def get_queryset(self):
-        accounts = AssetPermission.get_user_perm_asset_accounts(
-            self.user, self.asset, with_actions=True
-        )
+        accounts = AssetPermission.get_perm_asset_accounts(user=self.user, asset=self.asset)
         return accounts
-        # @INPUT @USER
-        # inner_accounts = [
-        #     Account.get_input_account(), Account.get_user_account(self.user.username)
-        # ]
-        # for inner_account in inner_accounts:
-        #     inner_account.actions = Action.ALL
-        # accounts = accounts + inner_accounts
+
+
+class MyGrantedAssetAccountsApi(UserGrantedAssetAccountsApi):
+    permission_classes = (IsValidUser,)
+
+    @lazyproperty
+    def user(self):
+        return self.request.user
+
+
+class UserGrantedAssetSpecialAccountsApi(ListAPIView):
+    serializer_class = serializers.AccountsGrantedSerializer
+    rbac_perms = {
+        'list': 'perms.view_userassets'
+    }
+
+    @lazyproperty
+    def user(self):
+        return self.request.user
+
+    def get_queryset(self):
         # 构造默认包含的账号，如: @INPUT @USER
-        # return accounts
+        accounts = [
+            Account.get_input_account(),
+            Account.get_user_account(self.user.username)
+        ]
+        for account in accounts:
+            account.actions = Action.ALL
+        return accounts
 
 
-class MyGrantedAssetAccounts(UserGrantedAssetAccounts):
+class MyGrantedAssetSpecialAccountsApi(UserGrantedAssetSpecialAccountsApi):
     permission_classes = (IsValidUser,)
 
     @lazyproperty

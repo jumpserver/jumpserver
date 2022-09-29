@@ -225,10 +225,10 @@ class AssetPermission(OrgModelMixin):
         return accounts
 
     @classmethod
-    def get_user_perm_asset_accounts(cls, user, asset: Asset, with_actions=False):
-        perms = cls.filter(user, asset)
-        all_account_names = cls.retrieve_account_names(perms)
-        accounts = asset.filter_accounts(all_account_names)
+    def get_perm_asset_accounts(cls, user=None, user_group=None, asset=None, with_actions=True):
+        perms = cls.filter(user=user, user_group=user_group, asset=asset)
+        account_names = cls.retrieve_account_names(perms)
+        accounts = asset.filter_accounts(account_names)
         if with_actions:
             cls.set_accounts_actions(accounts, perms=perms)
         return accounts
@@ -257,15 +257,20 @@ class AssetPermission(OrgModelMixin):
         return account_names
 
     @classmethod
-    def filter(cls, user=None, asset=None, account_names=None):
-        """ 获取同时包含 用户-资产-账号 的授权规则 """
+    def filter(cls, user=None, user_group=None, asset=None, account_names=None):
+        """ 获取同时包含 用户(组)-资产-账号 的授权规则 """
         perm_ids = []
         if user:
-            user_assetperm_ids = cls.filter_by_user(user, flat=True)
-            perm_ids.append(user_assetperm_ids)
+            user_perm_ids = cls.filter_by_user(user, flat=True)
+            perm_ids.append(user_perm_ids)
+
+        if user_group:
+            user_group_perm_ids = cls.filter_by_user_group(user_group, flat=True)
+            perm_ids.append(user_group_perm_ids)
+
         if asset:
-            asset_assetperm_ids = cls.filter_by_asset(asset, flat=True)
-            perm_ids.append(asset_assetperm_ids)
+            asset_perm_ids = cls.filter_by_asset(asset, flat=True)
+            perm_ids.append(asset_perm_ids)
         # & 是同时满足，比如有用户，但是用户的规则是空，那么返回也应该是空
         perm_ids = list(reduce(lambda x, y: set(x) & set(y), perm_ids))
         perms = cls.objects.filter(id__in=perm_ids)
@@ -288,6 +293,16 @@ class AssetPermission(OrgModelMixin):
             perm_ids.update(usergroups_perm_id)
         if flat:
             return perm_ids
+        perms = cls.objects.filter(id__in=perm_ids).valid()
+        return perms
+
+    @classmethod
+    def filter_by_user_group(cls, user_group, flat=False):
+        perm_ids = AssetPermission.user_groups.through.objects.filter(
+            usergroup_id=user_group
+        ).values_list('assetpermission_id', flat=True)
+        if flat:
+            return set(perm_ids)
         perms = cls.objects.filter(id__in=perm_ids).valid()
         return perms
 

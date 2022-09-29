@@ -65,10 +65,13 @@ user_permission_urlpatterns = [
     path('<uuid:pk>/assets/<uuid:asset_id>/system-users/', api.UserGrantedAssetSystemUsersForAdminApi.as_view(), name='user-asset-system-users'),
     path('assets/<uuid:asset_id>/system-users/', api.MyGrantedAssetSystemUsersApi.as_view(), name='my-asset-system-users'),
 
-    # Todo: v3 增加
+    # Todo: v3 增加 Done.
     # 获取所有和资产-用户关联的账号列表
-    path('<uuid:pk>/assets/<uuid:asset_id>/accounts/', api.UserGrantedAssetAccounts.as_view(), name='user-asset-accounts'),
-    path('assets/<uuid:asset_id>/accounts/', api.MyGrantedAssetAccounts.as_view(), name='my-asset-accounts')
+    path('<uuid:pk>/assets/<uuid:asset_id>/accounts/', api.UserGrantedAssetAccountsApi.as_view(), name='user-asset-accounts'),
+    path('assets/<uuid:asset_id>/accounts/', api.MyGrantedAssetAccountsApi.as_view(), name='my-asset-accounts'),
+    # 用户登录资产的特殊账号, @INPUT, @USER 等
+    path('<uuid:pk>/assets/special-accounts/', api.UserGrantedAssetSpecialAccountsApi.as_view(), name='user-special-accounts'),
+    path('/assets/special-accounts/', api.MyGrantedAssetSpecialAccountsApi.as_view(), name='my-special-accounts'),
 ]
 
 user_group_permission_urlpatterns = [
@@ -83,7 +86,7 @@ user_group_permission_urlpatterns = [
     path('<uuid:pk>/assets/<uuid:asset_id>/system-users/', api.UserGroupGrantedAssetSystemUsersApi.as_view(), name='user-group-asset-system-users'),
     # Todo: v3 增加
     # 获取所有和资产-用户组关联的账号列表
-    path('<uuid:pk>/assets/<uuid:asset_id>/accounts/', api.UserGrantedAssetAccounts.as_view(), name='user-asset-accounts'),
+    path('<uuid:pk>/assets/<uuid:asset_id>/accounts/', api.UserGroupGrantedAssetAccountsApi.as_view(), name='user-group-asset-accounts'),
 ]
 
 permission_urlpatterns = [
