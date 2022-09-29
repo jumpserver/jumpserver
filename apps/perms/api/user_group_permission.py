@@ -11,7 +11,6 @@ from perms.models import AssetPermission
 from assets.models import Asset, Node
 from . import user_permission as uapi
 from perms import serializers
-from perms.utils.permission import get_asset_system_user_ids_with_actions_by_group
 from assets.api.mixin import SerializeToTreeNodeMixin
 from users.models import UserGroup
 
@@ -19,16 +18,8 @@ __all__ = [
     'UserGroupGrantedAssetsApi', 'UserGroupGrantedNodesApi',
     'UserGroupGrantedNodeAssetsApi',
     'UserGroupGrantedNodeChildrenAsTreeApi',
-    'UserGroupGrantedAssetSystemUsersApi',
     'UserGroupGrantedAssetAccountsApi',
 ]
-
-
-class UserGroupMixin:
-    @lazyproperty
-    def group(self):
-        group_id = self.kwargs.get('pk')
-        return UserGroup.objects.get(id=group_id)
 
 
 class UserGroupGrantedAssetsApi(ListAPIView):
@@ -199,11 +190,6 @@ class UserGroupGrantedNodeChildrenAsTreeApi(SerializeToTreeNodeMixin, ListAPIVie
         nodes = self.get_nodes()
         nodes = self.serialize_nodes(nodes)
         return Response(data=nodes)
-
-
-class UserGroupGrantedAssetSystemUsersApi(UserGroupMixin, uapi.UserGrantedAssetSystemUsersForAdminApi):
-    def get_asset_system_user_ids_with_actions(self, asset):
-        return get_asset_system_user_ids_with_actions_by_group(self.group, asset)
 
 
 class UserGroupGrantedAssetAccountsApi(uapi.UserGrantedAssetAccountsApi):

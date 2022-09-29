@@ -85,14 +85,7 @@ def get_asset_system_user_ids_with_actions_by_user(user: User, asset: Asset):
 
 def has_asset_system_permission(user: User, asset: Asset, account: str):
     systemuser_actions_mapper = get_asset_system_user_ids_with_actions_by_user(user, asset)
-    actions = systemuser_actions_mapper.get(system_user.id, 0)
+    actions = systemuser_actions_mapper.get(account, 0)
     if actions:
         return True
     return False
-
-
-def get_asset_system_user_ids_with_actions_by_group(group: UserGroup, asset: Asset):
-    asset_perm_ids = AssetPermission.objects.filter(
-        user_groups=group
-    ).valid().values_list('id', flat=True).distinct()
-    return get_asset_system_user_ids_with_actions(asset_perm_ids, asset)
