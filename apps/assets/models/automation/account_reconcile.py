@@ -1,12 +1,12 @@
 from django.utils.translation import ugettext_lazy as _
 
 from ops.const import StrategyChoice
-from .common import AutomationStrategy
+from .base import BaseAutomation
 
 
-class PushStrategy(AutomationStrategy):
+class ReconcileAutomation(BaseAutomation):
     class Meta:
-        verbose_name = _("Push strategy")
+        verbose_name = _("Reconcile strategy")
 
     def to_attr_json(self):
         attr_json = super().to_attr_json()

@@ -6,7 +6,7 @@ from orgs.utils import current_org, tmp_to_org
 from common.cache import Cache, IntegerField
 from common.utils import get_logger
 from users.models import UserGroup, User
-from assets.models import Node, Domain, Gateway, Asset
+from assets.models import Node, Domain, Gateway, Asset, Account
 from terminal.models import Session
 from perms.models import AssetPermission
 
@@ -52,6 +52,7 @@ class OrgResourceStatisticsCache(OrgRelatedCache):
 
     assets_amount = IntegerField()
     nodes_amount = IntegerField(queryset=Node.objects)
+    accounts_amount = IntegerField(queryset=Account.objects)
     domains_amount = IntegerField(queryset=Domain.objects)
     gateways_amount = IntegerField(queryset=Gateway.objects)
     asset_perms_amount = IntegerField(queryset=AssetPermission.objects)

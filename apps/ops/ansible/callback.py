@@ -72,6 +72,15 @@ class AdHocResultCallback(CallbackMixin, CallbackModule, CMDCallBackModule):
     Task result Callback
     """
     context = None
+    events = [
+        'runner_on_failed', 'runner_on_ok',
+        'runner_on_skipped', 'runner_on_unreachable',
+    ]
+
+    def event_handler(self, data):
+        event = data.get('event', None)
+        print("Event: ", event)
+        print("Event Data: ", json.dumps(data))
 
     def clean_result(self, t, host, task_name, task_result):
         contacted = self.results_summary["contacted"]

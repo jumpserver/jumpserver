@@ -12,8 +12,7 @@ from ops.tasks import execute_automation_strategy
 from ops.task_handlers import ExecutionManager
 
 
-class AutomationStrategy(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+class BaseAutomation(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
     accounts = models.JSONField(default=list, verbose_name=_("Accounts"))
     nodes = models.ManyToManyField(
         'assets.Node', related_name='automation_strategy', blank=True, verbose_name=_("Nodes")
@@ -21,6 +20,7 @@ class AutomationStrategy(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
     assets = models.ManyToManyField(
         'assets.Asset', related_name='automation_strategy', blank=True, verbose_name=_("Assets")
     )
+    type = models.CharField(max_length=16, verbose_name=_('Type'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
 
     def __str__(self):
@@ -67,7 +67,7 @@ class AutomationStrategyExecution(OrgModelMixin):
         default=dict, blank=True, null=True, verbose_name=_('Automation snapshot')
     )
     strategy = models.ForeignKey(
-        'AutomationStrategy', related_name='execution', on_delete=models.CASCADE,
+        'assets.models.automation.base.BaseAutomation', related_name='execution', on_delete=models.CASCADE,
         verbose_name=_('Automation strategy')
     )
     trigger = models.CharField(

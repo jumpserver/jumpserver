@@ -33,7 +33,7 @@ class AccountViewSet(OrgBulkModelViewSet):
     @action(methods=['post'], detail=True, url_path='verify')
     def verify_account(self, request, *args, **kwargs):
         account = super().get_object()
-        task = test_accounts_connectivity_manual.delay([account])
+        task = test_accounts_connectivity_manual.delay([account.id])
         return Response(data={'task': task.id})
 
 
@@ -67,8 +67,8 @@ class AccountTaskCreateAPI(CreateAPIView):
         return queryset
 
     def perform_create(self, serializer):
-        accounts = self.get_accounts()
-        task = test_accounts_connectivity_manual.delay(accounts)
+        account_ids = self.get_accounts().values_list('id', flat=True)
+        task = test_accounts_connectivity_manual.delay(account_ids)
         data = getattr(serializer, '_data', {})
         data["task"] = task.id
         setattr(serializer, '_data', data)

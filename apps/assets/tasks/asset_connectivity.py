@@ -5,8 +5,8 @@ from celery import shared_task
 from django.utils.translation import gettext_noop
 
 from common.utils import get_logger
-from orgs.utils import org_aware_func
-from ..models import Asset, Connectivity, Account
+from orgs.utils import org_aware_func, tmp_to_root_org
+from ..models import Asset, Connectivity, Account, Node
 from . import const
 from .utils import clean_ansible_task_hosts, group_asset_by_platform
 
@@ -41,8 +41,7 @@ def set_assets_accounts_connectivity(assets, results_summary):
     Account.bulk_set_connectivity(accounts_failed, Connectivity.failed)
 
 
-@shared_task(queue="ansible")
-@org_aware_func("assets")
+@org_aware_func('assets')
 def test_asset_connectivity_util(assets, task_name=None):
     from ops.utils import update_or_create_ansible_task
 
@@ -88,7 +87,10 @@ def test_asset_connectivity_util(assets, task_name=None):
 
 
 @shared_task(queue="ansible")
-def test_asset_connectivity_manual(asset):
+def test_asset_connectivity_manual(asset_id):
+    asset = Asset.objects.filter(id=asset_id).first()
+    if not asset:
+        return
     task_name = gettext_noop("Test assets connectivity: ") + str(asset)
     summary = test_asset_connectivity_util([asset], task_name=task_name)
 
@@ -99,7 +101,9 @@ def test_asset_connectivity_manual(asset):
 
 
 @shared_task(queue="ansible")
-def test_assets_connectivity_manual(assets):
+def test_assets_connectivity_manual(asset_ids):
+    with tmp_to_root_org():
+        assets = Asset.objects.filter(id__in=asset_ids)
     task_name = gettext_noop("Test assets connectivity: ") + str([asset.name for asset in assets])
     summary = test_asset_connectivity_util(assets, task_name=task_name)
 
@@ -110,7 +114,10 @@ def test_assets_connectivity_manual(assets):
 
 
 @shared_task(queue="ansible")
-def test_node_assets_connectivity_manual(node):
+def test_node_assets_connectivity_manual(node_id):
+    with tmp_to_root_org():
+        node = Node.objects.get(id=node_id)
+
     task_name = gettext_noop("Test if the assets under the node are connectable: ") + node.name
     assets = node.get_all_assets()
     result = test_asset_connectivity_util(assets, task_name=task_name)

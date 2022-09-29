@@ -6,6 +6,6 @@ logger = get_logger(__file__)
 
 
 @shared_task
-def refresh_org_cache_task(cache, *fields):
-    logger.info(f'CACHE: refresh <org: {cache.get_current_org()}> {cache.key}.{fields}')
-    cache.refresh(*fields)
+def refresh_org_cache_task(*fields):
+    from .caches import OrgResourceStatisticsCache
+    OrgResourceStatisticsCache.refresh(*fields)
