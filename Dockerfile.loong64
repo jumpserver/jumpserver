@@ -12,7 +12,6 @@ ARG DEPENDENCIES="                    \
         freetds-dev                   \
         libpq-dev                     \
         libffi-dev                    \
-        libjpeg62-turbo-dev           \
         libldap2-dev                  \
         libsasl2-dev                  \
         libxml2-dev                   \
@@ -26,27 +25,28 @@ ARG TOOLS="                           \
         ca-certificates               \
         curl                          \
         default-mysql-client          \
-        gettext                       \
         iputils-ping                  \
         locales                       \
         netcat                        \
         redis-server                  \
         telnet                        \
         vim                           \
+        unzip                         \
         wget"
 
-RUN set -ex \
+RUN --mount=type=cache,target=/var/cache/apt \
+    set -ex \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && apt-get update \
     && apt-get -y install --no-install-recommends ${BUILD_DEPENDENCIES} \
     && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
     && apt-get -y install --no-install-recommends ${TOOLS} \
-    && localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8 \
     && mkdir -p /root/.ssh/ \
     && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > /root/.ssh/config \
     && sed -i "s@# alias l@alias l@g" ~/.bashrc \
     && echo "set mouse-=a" > ~/.vimrc \
     && echo "no" | dpkg-reconfigure dash \
+    && echo "zh_CN.UTF-8" | dpkg-reconfigure locales \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
@@ -57,16 +57,18 @@ ARG PIP_MIRROR=https://pypi.douban.com/simple
 ENV PIP_MIRROR=$PIP_MIRROR
 ARG PIP_JMS_MIRROR=https://pypi.douban.com/simple
 ENV PIP_JMS_MIRROR=$PIP_JMS_MIRROR
-# 因为以 jms 或者 jumpserver 开头的 mirror 上可能没有
-RUN pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel==0.34.2 -i ${PIP_MIRROR} \
+
+RUN --mount=type=cache,target=/root/.cache/pip \
+    set -ex \
     && pip config set global.index-url ${PIP_MIRROR} \
-    && pip install --no-cache-dir https://download.jumpserver.org/pypi/simple/cryptography/cryptography-36.0.1-cp38-cp38-linux_loongarch64.whl \
-    && pip install --no-cache-dir https://download.jumpserver.org/pypi/simple/greenlet/greenlet-1.1.2-cp38-cp38-linux_loongarch64.whl \
-    && pip install --no-cache-dir $(grep 'PyNaCl' requirements/requirements.txt) \
-    && GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=true pip install --no-cache-dir grpcio \
-    && pip install --no-cache-dir $(grep -E 'jms|jumpserver' requirements/requirements.txt) -i ${PIP_JMS_MIRROR} \
-    && pip install --no-cache-dir -r requirements/requirements.txt \
-    && rm -rf ~/.cache/pip
+    && pip install --upgrade pip \
+    && pip install --upgrade setuptools wheel \
+    && pip install https://download.jumpserver.org/pypi/simple/cryptography/cryptography-36.0.1-cp38-cp38-linux_loongarch64.whl \
+    && pip install https://download.jumpserver.org/pypi/simple/greenlet/greenlet-1.1.2-cp38-cp38-linux_loongarch64.whl \
+    && pip install $(grep 'PyNaCl' requirements/requirements.txt) \
+    && GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=true pip install grpcio \
+    && pip install $(grep -E 'jms|jumpserver' requirements/requirements.txt) -i ${PIP_JMS_MIRROR} \
+    && pip install -r requirements/requirements.txt
 
 ARG VERSION
 ENV VERSION=$VERSION
