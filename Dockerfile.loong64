@@ -1,3 +1,13 @@
+FROM python:3.8-slim as stage-build
+ARG TARGETARCH
+
+ARG VERSION
+ENV VERSION=$VERSION
+
+WORKDIR /opt/jumpserver
+ADD . .
+RUN cd utils && bash -ixeu build.sh
+
 FROM python:3.8-slim
 ARG TARGETARCH
 MAINTAINER JumpServer Team <ibuler@qq.com>
@@ -69,15 +79,9 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     && pip install $(grep -E 'jms|jumpserver' requirements/requirements.txt) -i ${PIP_JMS_MIRROR} \
     && pip install -r requirements/requirements.txt
 
-ARG VERSION
-ENV VERSION=$VERSION
-
-ADD . .
-RUN cd utils \
-    && bash -ixeu build.sh \
-    && mv ../release/jumpserver /opt/jumpserver \
-    && rm -rf /tmp/build \
-    && echo > /opt/jumpserver/config.yml
+COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
+RUN echo > /opt/jumpserver/config.yml \
+    && rm -rf /tmp/build
 
 WORKDIR /opt/jumpserver
 VOLUME /opt/jumpserver/data
