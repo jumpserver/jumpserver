@@ -84,7 +84,7 @@ user_group_permission_urlpatterns = [
 
     # Todo: v3 删除
     path('<uuid:pk>/assets/<uuid:asset_id>/system-users/', api.UserGroupGrantedAssetSystemUsersApi.as_view(), name='user-group-asset-system-users'),
-    # Todo: v3 增加
+    # Todo: v3 增加 Done.
     # 获取所有和资产-用户组关联的账号列表
     path('<uuid:pk>/assets/<uuid:asset_id>/accounts/', api.UserGroupGrantedAssetAccountsApi.as_view(), name='user-group-asset-accounts'),
 ]
@@ -95,7 +95,8 @@ permission_urlpatterns = [
     path('<uuid:pk>/users/all/', api.AssetPermissionAllUserListApi.as_view(), name='asset-permission-all-users'),
 
     # 验证用户是否有某个资产和系统用户的权限
-    # Todo: API 需要修改，验证用户有某个账号的权限
+    # Todo: v3 API 需要修改，验证用户有某个账号的权限 # 先不动, v3 中可能会修改连接资产时的逻辑,
+    #  直接获取认证信息，获取不到就时没有权限，就不需要校验了
     path('user/validate/', api.ValidateUserAssetPermissionApi.as_view(), name='validate-user-asset-permission'),
     path('user/actions/', api.GetUserAssetPermissionActionsApi.as_view(), name='get-user-asset-permission-actions'),
 

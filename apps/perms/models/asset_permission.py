@@ -258,8 +258,9 @@ class AssetPermission(OrgModelMixin):
 
     @classmethod
     def filter(cls, user=None, user_group=None, asset=None, account_names=None):
-        """ 获取同时包含 用户(组)-资产-账号 的授权规则 """
+        """ 获取同时包含 用户(组)-资产-账号 的授权规则, 条件之间都是 & 的关系"""
         perm_ids = []
+
         if user:
             user_perm_ids = cls.filter_by_user(user, flat=True)
             perm_ids.append(user_perm_ids)
@@ -271,12 +272,16 @@ class AssetPermission(OrgModelMixin):
         if asset:
             asset_perm_ids = cls.filter_by_asset(asset, flat=True)
             perm_ids.append(asset_perm_ids)
+
         # & 是同时满足，比如有用户，但是用户的规则是空，那么返回也应该是空
         perm_ids = list(reduce(lambda x, y: set(x) & set(y), perm_ids))
         perms = cls.objects.filter(id__in=perm_ids)
+
         if account_names:
             perms = perms.filter_by_accounts(account_names)
-        return perms.valid().order_by('-date_expired')
+
+        perms = perms.valid().order_by('-date_expired')
+        return perms
 
     @classmethod
     def filter_by_user(cls, user, with_group=True, flat=False):
