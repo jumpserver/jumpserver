@@ -47,7 +47,8 @@ RUN --mount=type=cache,target=/var/cache/apt \
     && sed -i "s@# alias l@alias l@g" ~/.bashrc \
     && echo "set mouse-=a" > ~/.vimrc \
     && echo "no" | dpkg-reconfigure dash \
-    && echo "zh_CN.UTF-8" | dpkg-reconfigure locales
+    && echo "zh_CN.UTF-8" | dpkg-reconfigure locales \
+    && rm -rf /var/lib/apt/lists/*
 
 ARG ORACLE_LIB_MAJOR=19
 ARG ORACLE_LIB_MINOR=10
