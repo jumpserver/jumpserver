@@ -108,7 +108,6 @@ class AssetSerializer(JMSWritableNestedModelSerializer):
         instance.nodes.set(nodes_to_set)
 
     def validate_nodes(self, nodes):
-        print("Nodes: ", nodes)
         if nodes:
             return nodes
         request = self.context.get('request')

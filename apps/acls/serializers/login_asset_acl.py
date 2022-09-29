@@ -57,7 +57,7 @@ class LoginAssetACLAccountsSerializer(serializers.Serializer):
 class LoginAssetACLSerializer(BulkOrgResourceModelSerializer):
     users = LoginAssetACLUsersSerializer()
     assets = LoginAssetACLAssestsSerializer()
-    account = LoginAssetACLAccountsSerializer()
+    accounts = LoginAssetACLAccountsSerializer()
     reviewers_amount = serializers.IntegerField(read_only=True, source='reviewers.count')
     action_display = serializers.ReadOnlyField(source='get_action_display', label=_('Action'))
 

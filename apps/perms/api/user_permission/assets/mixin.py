@@ -32,8 +32,8 @@ class UserDirectGrantedAssetsQuerysetMixin:
 class UserAllGrantedAssetsQuerysetMixin:
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
     pagination_class = AllGrantedAssetPagination
-    ordering_fields = ("hostname", "address", "port", "cpu_cores")
-    ordering = ('hostname', )
+    ordering_fields = ("name", "address", "port", "cpu_cores")
+    ordering = ('name', )
 
     user: User
 
@@ -41,7 +41,8 @@ class UserAllGrantedAssetsQuerysetMixin:
         if getattr(self, 'swagger_fake_view', False):
             return Asset.objects.none()
         queryset = UserGrantedAssetsQueryUtils(self.user).get_all_granted_assets()
-        queryset = queryset.prefetch_related('platform').only(*self.only_fields)
+        only_fields = [i for i in self.only_fields if i not in ['protocols']]
+        queryset = queryset.prefetch_related('platform', 'protocols').only(*only_fields)
         return queryset
 
 
