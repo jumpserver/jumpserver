@@ -87,6 +87,18 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
             'is_valid': {'label': _('Is valid')},
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_actions_field()
+
+    def set_actions_field(self):
+        actions = self.fields.get('actions')
+        if not actions:
+            return
+        choices = actions._choices
+        actions._choices = choices
+        actions.default = list(choices.keys())
+
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
@@ -110,7 +122,7 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
         instance.user_groups.add(*user_groups_to_set)
         # 资产
         assets_to_set = Asset.objects.filter(
-            Q(ip__in=kwargs.get('assets_display')) |
+            Q(address__in=kwargs.get('assets_display')) |
             Q(name__in=kwargs.get('assets_display'))
         ).distinct()
         instance.assets.add(*assets_to_set)
