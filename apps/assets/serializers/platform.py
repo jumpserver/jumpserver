@@ -6,7 +6,6 @@ from common.drf.serializers import JMSWritableNestedModelSerializer
 from ..models import Platform, PlatformProtocol, PlatformAutomation
 from ..const import Category, AllTypes
 
-
 __all__ = ['PlatformSerializer', 'PlatformOpsMethodSerializer']
 
 
@@ -27,9 +26,9 @@ class ProtocolSettingSerializer(serializers.Serializer):
 
     # HTTP
     auto_fill = serializers.BooleanField(default=False, label=_("Auto fill"))
-    username_selector = serializers.CharField(default='', label=_("Username selector"))
-    password_selector = serializers.CharField(default='', label=_("Password selector"))
-    submit_selector = serializers.CharField(default='', label=_("Submit selector"))
+    username_selector = serializers.CharField(default='', allow_blank=True, label=_("Username selector"))
+    password_selector = serializers.CharField(default='', allow_blank=True, label=_("Password selector"))
+    submit_selector = serializers.CharField(default='', allow_blank=True, label=_("Submit selector"))
 
 
 class PlatformAutomationSerializer(serializers.ModelSerializer):
