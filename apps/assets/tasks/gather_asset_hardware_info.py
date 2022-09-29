@@ -9,8 +9,9 @@ from django.utils.translation import ugettext as _, gettext_noop
 from common.utils import (
     capacity_convert, sum_capacity, get_logger
 )
-from orgs.utils import org_aware_func
+from orgs.utils import org_aware_func, tmp_to_root_org
 from . import const
+from ..models import Asset, Node
 from .utils import clean_ansible_task_hosts
 
 
@@ -27,7 +28,6 @@ def set_assets_hardware_info(assets, result, **kwargs):
     """
     Using ops task run result, to update asset info
 
-    @shared_task must be exit, because we using it as a task callback, is must
     be a celery task also
     :param assets:
     :param result:
@@ -83,15 +83,15 @@ def set_assets_hardware_info(assets, result, **kwargs):
     return assets_updated
 
 
-@shared_task
-@org_aware_func("assets")
+@org_aware_func('assets')
 def update_assets_hardware_info_util(assets, task_name=None):
     """
     Using ansible api to update asset hardware info
-    :param assets:  asset seq
+    :param asset_ids:  asset seq
     :param task_name: task_name running
     :return: result summary ['contacted': {}, 'dark': {}]
     """
+
     from ops.utils import update_or_create_ansible_task
     if task_name is None:
         task_name = gettext_noop("Update some assets hardware info. ")
@@ -110,15 +110,19 @@ def update_assets_hardware_info_util(assets, task_name=None):
 
 
 @shared_task(queue="ansible")
-def update_asset_hardware_info_manual(asset):
+def update_asset_hardware_info_manual(asset_id):
+    with tmp_to_root_org():
+        asset = Asset.objects.filter(id=asset_id).first()
+    if not asset:
+        return
     task_name = gettext_noop("Update asset hardware info: ") + str(asset.name)
     update_assets_hardware_info_util([asset], task_name=task_name)
 
 
 @shared_task(queue="ansible")
-def update_assets_hardware_info_manual(assets):
+def update_assets_hardware_info_manual(asset_ids):
     task_name = gettext_noop("Update assets hardware info: ") + str([asset.name for asset in assets])
-    update_assets_hardware_info_util(assets, task_name=task_name)
+    update_assets_hardware_info_util(asset_ids, task_name=task_name)
 
 
 @shared_task(queue="ansible")
@@ -133,7 +137,12 @@ def update_assets_hardware_info_period():
 
 
 @shared_task(queue="ansible")
-def update_node_assets_hardware_info_manual(node):
+def update_node_assets_hardware_info_manual(node_id):
+    with tmp_to_root_org():
+        node = Node.objects.filter(id=node_id).first()
+    if not node:
+        return
+
     task_name = gettext_noop("Update node asset hardware information: ") + str(node.name)
     assets = node.get_all_assets()
     result = update_assets_hardware_info_util(assets, task_name=task_name)

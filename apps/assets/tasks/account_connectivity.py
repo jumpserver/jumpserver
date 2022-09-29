@@ -5,7 +5,7 @@ from django.utils.translation import ugettext as _, gettext_noop
 
 from common.utils import get_logger
 from orgs.utils import org_aware_func
-from ..models import Connectivity
+from ..models import Connectivity, Account
 from . import const
 from .utils import check_asset_can_run_ansible
 
@@ -99,10 +99,11 @@ def test_account_connectivity_util(account, task_name):
 
 
 @shared_task(queue="ansible")
-def test_accounts_connectivity_manual(accounts):
+def test_accounts_connectivity_manual(account_ids):
     """
     :param accounts: <Account>对象
     """
+    accounts = Account.objects.filter(id__in=account_ids)
     for account in accounts:
         task_name = gettext_noop("Test account connectivity: ") + str(account)
         test_account_connectivity_util(account, task_name)

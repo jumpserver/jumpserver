@@ -1,38 +1,19 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from common.db import fields
 from ops.const import SSHKeyStrategy, PasswordStrategy, StrategyChoice
 from ops.utils import generate_random_password
-from common.db.fields import (
-    EncryptCharField, EncryptTextField, JsonDictCharField
-)
-from .common import AutomationStrategy
+from .base import BaseAutomation
 
 
-class ChangeAuthStrategy(AutomationStrategy):
-    is_password = models.BooleanField(default=True)
-    password_strategy = models.CharField(
-        max_length=128, blank=True, null=True, choices=PasswordStrategy.choices,
-        verbose_name=_('Password strategy')
-    )
-    password_rules = JsonDictCharField(
-        max_length=2048, blank=True, null=True, verbose_name=_('Password rules')
-    )
-    password = EncryptCharField(
-        max_length=256, blank=True, null=True, verbose_name=_('Password')
-    )
+class ChangePasswordAutomation(BaseAutomation):
+    class PasswordStrategy(models.TextChoices):
+        custom = 'specific', _('Specific')
+        random_one = 'random_one', _('All assets use the same random password')
+        random_all = 'random_all', _('All assets use different random password')
 
-    is_ssh_key = models.BooleanField(default=False)
-    ssh_key_strategy = models.CharField(
-        max_length=128, blank=True, null=True, choices=SSHKeyStrategy.choices,
-        verbose_name=_('SSH Key strategy')
-    )
-    private_key = EncryptTextField(
-        max_length=4096, blank=True, null=True, verbose_name=_('SSH private key')
-    )
-    public_key = EncryptTextField(
-        max_length=4096, blank=True, null=True, verbose_name=_('SSH public key')
-    )
+    password = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Secret'))
     recipients = models.ManyToManyField(
         'users.User', related_name='recipients_change_auth_strategy', blank=True,
         verbose_name=_("Recipient")

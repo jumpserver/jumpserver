@@ -1,10 +1,10 @@
 # coding: utf-8
 import os
 import subprocess
-import time
 
 from django.conf import settings
 from celery import shared_task, subtask
+from celery import signals
 
 from celery.exceptions import SoftTimeLimitExceeded
 from django.utils import timezone
@@ -30,7 +30,7 @@ def rerun_task():
     pass
 
 
-@shared_task(queue="ansible")
+@shared_task(queue="ansible", verbose_name=_("Run ansible task"))
 def run_ansible_task(tid, callback=None, **kwargs):
     """
     :param tid: is the tasks serialized data
@@ -49,7 +49,7 @@ def run_ansible_task(tid, callback=None, **kwargs):
         return result
 
 
-@shared_task(soft_time_limit=60, queue="ansible")
+@shared_task(soft_time_limit=60, queue="ansible", verbose_name=_("Run ansible command"))
 def run_command_execution(cid, **kwargs):
     with tmp_to_root_org():
         execution = get_object_or_none(CommandExecution, id=cid)
@@ -136,7 +136,7 @@ def check_server_performance_period():
     ServerPerformanceCheckUtil().check_and_publish()
 
 
-@shared_task(queue="ansible")
+@shared_task(queue="ansible", verbose_name=_("Hello"))
 def hello(name, callback=None):
     from users.models import User
     import time
@@ -149,35 +149,9 @@ def hello(name, callback=None):
 
 
 @shared_task
-# @after_app_shutdown_clean_periodic
-# @register_as_period_task(interval=30)
-def hello123():
-    return None
-
-
-@shared_task
 def hello_callback(result):
     print(result)
     print("Hello callback")
-
-
-@shared_task
-def add(a, b):
-    time.sleep(5)
-    return a + b
-
-
-@shared_task
-def add_m(x):
-    from celery import chain
-    a = range(x)
-    b = [a[i:i + 10] for i in range(0, len(a), 10)]
-    s = list()
-    s.append(add.s(b[0], b[1]))
-    for i in b[1:]:
-        s.append(add.s(i))
-    res = chain(*tuple(s))()
-    return res
 
 
 @shared_task
@@ -190,4 +164,5 @@ def execute_automation_strategy(pid, trigger):
         return
     with tmp_to_org(instance.org):
         instance.execute(trigger)
+
 
