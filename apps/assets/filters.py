@@ -161,6 +161,7 @@ class AccountFilterSet(BaseFilterSet):
     ip = filters.CharFilter(field_name='address', lookup_expr='exact')
     hostname = filters.CharFilter(field_name='name', lookup_expr='exact')
     username = filters.CharFilter(field_name="username", lookup_expr='exact')
+    address = filters.CharFilter(field_name="asset__address", lookup_expr='exact')
     assets = UUIDInFilter(field_name='asset_id', lookup_expr='in')
     nodes = UUIDInFilter(method='filter_nodes')
 
