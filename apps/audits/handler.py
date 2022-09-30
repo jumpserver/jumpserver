@@ -22,8 +22,8 @@ class ModelClient:
         if op_log is not None:
             raw_after = op_log.after or {}
             raw_before = op_log.before or {}
-            cur_before = kwargs.get('before', {})
-            cur_after = kwargs.get('after', {})
+            cur_before = kwargs.get('before') or {}
+            cur_after = kwargs.get('after') or {}
             raw_before.update(cur_before)
             raw_after.update(cur_after)
             op_log.before = raw_before
@@ -130,16 +130,18 @@ class OperatorLogHandler(metaclass=Singleton):
         return resource_display
 
     @staticmethod
-    def data_desensitization(before, after):
+    def __data_desensitization_dict_handle(dict_item):
         encrypt_value = '******'
+        for key, value in dict_item.items():
+            if str(value).startswith('encrypt|'):
+                dict_item[key] = encrypt_value
+        return dict_item
+
+    def data_desensitization(self, before, after):
         if before:
-            for key, value in before.items():
-                if str(value).startswith('encrypt|'):
-                    before[key] = encrypt_value
+            before = self.__data_desensitization_dict_handle(before)
         if after:
-            for key, value in after.items():
-                if str(value).startswith('encrypt|'):
-                    after[key] = encrypt_value
+            after = self.__data_desensitization_dict_handle(after)
         return before, after
 
     def create_or_update_operate_log(

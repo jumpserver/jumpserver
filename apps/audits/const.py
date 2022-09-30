@@ -29,5 +29,6 @@ MODELS_NEED_RECORD = (
     # rbac
     'Role', 'SystemRole', 'OrgRole', 'RoleBinding', 'OrgRoleBinding', 'SystemRoleBinding',
     # xpack
-    'License', 'Account', 'SyncInstanceTask', 'ChangeAuthPlan', 'GatherUserTask', 'Interface',
+    'License', 'Account', 'SyncInstanceTask', 'ChangeAuthPlan', 'ApplicationChangeAuthPlan',
+    'GatherUserTask', 'Interface',
 )

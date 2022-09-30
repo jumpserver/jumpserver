@@ -92,6 +92,14 @@ M2M_NEED_RECORD = {
     CommandFilter.system_users.through._meta.object_name: _('Command filter and SystemUser'),
 }
 
+if settings.XPACK_ENABLED:
+    from xpack.plugins.change_auth_plan.models import ApplicationChangeAuthPlan
+    M2M_NEED_RECORD_XPACK = {
+        ApplicationChangeAuthPlan.apps.through._meta.object_name: _('Change auth plan and Application'),
+        ApplicationChangeAuthPlan.system_users.through._meta.object_name: _('Change auth plan and SystemUser'),
+    }
+    M2M_NEED_RECORD.update(M2M_NEED_RECORD_XPACK)
+
 M2M_ACTION = {
     POST_ADD: OperateLog.ACTION_CREATE,
     POST_REMOVE: OperateLog.ACTION_DELETE,
@@ -117,16 +125,19 @@ def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
         objs_display = [str(o) for o in objs]
         action = M2M_ACTION[action]
         changed_field = current_instance.get(field_name, [])
-        before = None
-        after = {field_name: changed_field}
+
+        after, before, before_value = None, None, None
         if action == OperateLog.ACTION_CREATE:
-            before = {field_name: list(set(changed_field) - set(objs_display))}
+            before_value = list(set(changed_field) - set(objs_display))
         elif action == OperateLog.ACTION_DELETE:
-            before = {
-                field_name: list(
-                    set(changed_field).symmetric_difference(set(objs_display))
-                )
-            }
+            before_value = list(
+                set(changed_field).symmetric_difference(set(objs_display))
+            )
+
+        if changed_field:
+            after = {field_name: changed_field}
+        if before_value:
+            before = before_value
 
         create_or_update_operate_log(
             OperateLog.ACTION_UPDATE, resource_type,
@@ -160,11 +171,10 @@ def on_object_pre_create_or_update(sender, instance=None, raw=False, using=None,
     )
     if not ok:
         return
-
+    instance_before_data = {'id': instance.id}
     raw_instance = type(instance).objects.filter(pk=instance.id).first()
-    if raw_instance is None:
-        return
-    instance_before_data = model_to_dict(raw_instance)
+    if raw_instance:
+        instance_before_data = model_to_dict(raw_instance)
     operate_log_id = str(uuid.uuid4())
     instance_before_data['operate_log_id'] = operate_log_id
     setattr(instance, 'operate_log_id', operate_log_id)

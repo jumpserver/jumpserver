@@ -62,10 +62,14 @@ def get_resource_display(resource):
 def model_to_dict_for_operate_log(
         instance, include_model_fields=True, include_related_fields=True
 ):
+    need_continue_fields = ['date_updated']
     opts = instance._meta
     data = {}
     for f in chain(opts.concrete_fields, opts.private_fields):
         if isinstance(f, (models.FileField, models.ImageField)):
+            continue
+
+        if getattr(f, 'attname', None) in need_continue_fields:
             continue
 
         value = getattr(instance, f.name) or getattr(instance, f.attname)
@@ -77,7 +81,7 @@ def model_to_dict_for_operate_log(
         elif isinstance(f, (
             fields.EncryptCharField, fields.EncryptTextField,
             fields.EncryptJsonDictCharField, fields.EncryptJsonDictTextField
-        )) or getattr(f, 'attname') == 'password':
+        )) or getattr(f, 'attname', '') == 'password':
             value = 'encrypt|%s' % value
         elif isinstance(value, list):
             value = [str(v) for v in value]
