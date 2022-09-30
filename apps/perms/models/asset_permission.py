@@ -78,7 +78,7 @@ class AssetPermissionQuerySet(models.QuerySet):
         return self.filter(q)
 
     def filter_by_accounts(self, accounts):
-        q = Q(accounts__contains=accounts) | \
+        q = Q(accounts__contains=list(accounts)) | \
             Q(accounts__contains=AssetPermission.SpecialAccount.ALL.value)
         return self.filter(q)
 
@@ -238,7 +238,7 @@ class AssetPermission(OrgModelMixin):
         # set account actions
         account_names = accounts.values_list('username', flat=True)
         perms = perms.filter_by_accounts(account_names)
-        account_names_actions_map = defaultdict(set)
+        account_names_actions_map = defaultdict(int)
         account_names_actions = perms.values_list('accounts', 'actions')
         for account_names, actions in account_names_actions:
             for account_name in account_names:

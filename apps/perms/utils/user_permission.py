@@ -647,7 +647,7 @@ class UserGrantedNodesQueryUtils(UserGrantedUtilsBase):
     def get_whole_tree_nodes(self, with_special=True):
         """
         这里的 granted nodes, 是整棵树需要的node，推算出来的也算
-        :param user:
+        :param with_special:
         :return:
         """
         nodes = PermNode.objects.filter(
