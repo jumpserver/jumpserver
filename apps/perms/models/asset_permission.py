@@ -235,17 +235,21 @@ class AssetPermission(OrgModelMixin):
 
     @classmethod
     def set_accounts_actions(cls, accounts, perms):
-        # set account actions
+        account_names_actions_map = cls.get_account_names_actions_map(accounts, perms)
+        for account in accounts:
+            account.actions = account_names_actions_map.get(account.username)
+        return accounts
+
+    @classmethod
+    def get_account_names_actions_map(cls, accounts, perms):
+        account_names_actions_map = defaultdict(int)
         account_names = accounts.values_list('username', flat=True)
         perms = perms.filter_by_accounts(account_names)
-        account_names_actions_map = defaultdict(int)
         account_names_actions = perms.values_list('accounts', 'actions')
         for account_names, actions in account_names_actions:
             for account_name in account_names:
                 account_names_actions_map[account_name] |= actions
-        for account in accounts:
-            account.actions = account_names_actions_map.get(account.username)
-        return accounts
+        return account_names_actions_map
 
     @classmethod
     def retrieve_account_names(cls, perms):
