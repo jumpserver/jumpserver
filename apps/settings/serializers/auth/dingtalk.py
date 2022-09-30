@@ -7,6 +7,8 @@ __all__ = ['DingTalkSettingSerializer']
 
 
 class DingTalkSettingSerializer(serializers.Serializer):
+    PREFIX_TITLE = '%s-%s' % (_('Authentication'), _('DingTalk'))
+
     DINGTALK_AGENTID = serializers.CharField(max_length=256, required=True, label='AgentId')
     DINGTALK_APPKEY = serializers.CharField(max_length=256, required=True, label='AppKey')
     DINGTALK_APPSECRET = EncryptedField(max_length=256, required=False, label='AppSecret')

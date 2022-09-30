@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-from rest_framework.mixins import ListModelMixin, CreateModelMixin
+from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin
 from django.db.models import F, Value
 from django.db.models.functions import Concat
 from rest_framework.permissions import IsAuthenticated
@@ -15,7 +15,10 @@ from ops.models import CommandExecution
 from . import filters
 from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog
 from .serializers import FTPLogSerializer, UserLoginLogSerializer, CommandExecutionSerializer
-from .serializers import OperateLogSerializer, PasswordChangeLogSerializer, CommandExecutionHostsRelationSerializer
+from .serializers import (
+    OperateLogSerializer, OperateLogActionDetailSerializer,
+    PasswordChangeLogSerializer, CommandExecutionHostsRelationSerializer
+)
 
 
 class FTPLogViewSet(CreateModelMixin,
@@ -68,7 +71,7 @@ class MyLoginLogAPIView(UserLoginCommonMixin, generics.ListAPIView):
         return qs
 
 
-class OperateLogViewSet(ListModelMixin, OrgGenericViewSet):
+class OperateLogViewSet(RetrieveModelMixin, ListModelMixin, OrgGenericViewSet):
     model = OperateLog
     serializer_class = OperateLogSerializer
     extra_filter_backends = [DatetimeRangeFilter]
@@ -78,6 +81,11 @@ class OperateLogViewSet(ListModelMixin, OrgGenericViewSet):
     filterset_fields = ['user', 'action', 'resource_type', 'resource', 'remote_addr']
     search_fields = ['resource']
     ordering = ['-datetime']
+
+    def get_serializer_class(self):
+        if self.request.query_params.get('type') == 'action_detail':
+            return OperateLogActionDetailSerializer
+        return super().get_serializer_class()
 
 
 class PasswordChangeLogViewSet(ListModelMixin, CommonGenericViewSet):

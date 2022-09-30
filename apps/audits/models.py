@@ -4,8 +4,9 @@ from django.db import models
 from django.db.models import Q
 from django.utils.translation import gettext, ugettext_lazy as _
 from django.utils import timezone
-from common.utils import lazyproperty
 
+from common.utils import lazyproperty
+from common.db.encoder import ModelJSONFieldEncoder
 from orgs.mixins.models import OrgModelMixin, Organization
 from orgs.utils import current_org
 
@@ -65,6 +66,8 @@ class OperateLog(OrgModelMixin):
     resource = models.CharField(max_length=128, verbose_name=_("Resource"))
     remote_addr = models.CharField(max_length=128, verbose_name=_("Remote addr"), blank=True, null=True)
     datetime = models.DateTimeField(auto_now=True, verbose_name=_('Datetime'), db_index=True)
+    before = models.JSONField(default=dict, encoder=ModelJSONFieldEncoder, null=True)
+    after = models.JSONField(default=dict, encoder=ModelJSONFieldEncoder, null=True)
 
     def __str__(self):
         return "<{}> {} <{}>".format(self.user, self.action, self.resource)

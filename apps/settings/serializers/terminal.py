@@ -3,6 +3,8 @@ from rest_framework import serializers
 
 
 class TerminalSettingSerializer(serializers.Serializer):
+    PREFIX_TITLE = _('Terminal')
+
     SORT_BY_CHOICES = (
         ('hostname', _('Hostname')),
         ('ip', _('IP'))

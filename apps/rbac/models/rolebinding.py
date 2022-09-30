@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from rest_framework.serializers import ValidationError
 
-from common.db.models import JMSModel
+from common.db.models import JMSModel, CASCADE_SIGNAL_SKIP
 from common.utils import lazyproperty
 from orgs.utils import current_org, tmp_to_root_org
 from .role import Role
@@ -38,7 +38,7 @@ class RoleBinding(JMSModel):
         verbose_name=_('Scope')
     )
     user = models.ForeignKey(
-        'users.User', related_name='role_bindings', on_delete=models.CASCADE, verbose_name=_('User')
+        'users.User', related_name='role_bindings', on_delete=CASCADE_SIGNAL_SKIP, verbose_name=_('User')
     )
     role = models.ForeignKey(
         Role, related_name='role_bindings', on_delete=models.CASCADE, verbose_name=_('Role')
@@ -56,7 +56,7 @@ class RoleBinding(JMSModel):
         ]
 
     def __str__(self):
-        display = '{user} & {role}'.format(user=self.user, role=self.role)
+        display = '{role} -> {user}'.format(user=self.user, role=self.role)
         if self.org:
             display += ' | {org}'.format(org=self.org)
         return display

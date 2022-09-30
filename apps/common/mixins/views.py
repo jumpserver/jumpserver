@@ -7,7 +7,7 @@ from rest_framework import permissions
 from rest_framework.request import Request
 
 from common.exceptions import UserConfirmRequired
-from audits.utils import create_operate_log
+from audits.handler import create_or_update_operate_log
 from audits.models import OperateLog
 
 __all__ = ["PermissionsMixin", "RecordViewLogMixin", "UserConfirmRequiredExceptionMixin"]
@@ -62,10 +62,18 @@ class RecordViewLogMixin:
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
         resource = self.get_resource_display(request)
-        create_operate_log(self.ACTION, self.model, resource)
+        resource_type = self.model._meta.verbose_name
+        create_or_update_operate_log(
+            self.ACTION, resource_type, force=True,
+            resource=resource
+        )
         return response
 
     def retrieve(self, request, *args, **kwargs):
         response = super().retrieve(request, *args, **kwargs)
-        create_operate_log(self.ACTION, self.model, self.get_object())
+        resource_type = self.model._meta.verbose_name
+        create_or_update_operate_log(
+            self.ACTION, resource_type, force=True,
+            resource=self.get_object()
+        )
         return response

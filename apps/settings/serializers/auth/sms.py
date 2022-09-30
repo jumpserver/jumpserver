@@ -24,6 +24,8 @@ class SignTmplPairSerializer(serializers.Serializer):
 
 
 class BaseSMSSettingSerializer(serializers.Serializer):
+    PREFIX_TITLE = _('SMS')
+
     SMS_TEST_PHONE = serializers.CharField(
         max_length=256, required=False, validators=[PhoneValidator(), ],
         allow_blank=True, label=_('Test phone')
