@@ -9,6 +9,9 @@ from common.utils.encode import Singleton
 from settings.serializers import SettingsSerializer
 from jumpserver.utils import current_request
 from audits.models import OperateLog
+from orgs.utils import get_current_org_id
+
+from .backends import get_operate_log_storage
 
 
 logger = get_logger(__name__)
@@ -32,20 +35,6 @@ class ModelClient:
         else:
             OperateLog.objects.create(**kwargs)
 
-    @staticmethod
-    def update(log_id, **kwargs):
-        OperateLog.objects.update(id=log_id, **kwargs)
-
-
-class ESClient:
-    @staticmethod
-    def save(**kwargs):
-        pass
-
-    @staticmethod
-    def update(log_id, **kwargs):
-        pass
-
 
 class OperatorLogHandler(metaclass=Singleton):
     CACHE_KEY = 'OPERATOR_LOG_CACHE_KEY'
@@ -55,7 +44,7 @@ class OperatorLogHandler(metaclass=Singleton):
 
     @staticmethod
     def get_storage_client():
-        client = ModelClient()
+        client = get_operate_log_storage()
         return client
 
     @staticmethod
@@ -161,8 +150,9 @@ class OperatorLogHandler(metaclass=Singleton):
 
         data = {
             'id': log_id, "user": str(user), 'action': action,
-            'resource_type': resource_type, 'resource': resource_display,
-            'remote_addr': remote_addr, 'before': before, 'after': after
+            'resource_type': str(resource_type), 'resource': resource_display,
+            'remote_addr': remote_addr, 'before': before, 'after': after,
+            'org_id': get_current_org_id(),
         }
         with transaction.atomic():
             try:
@@ -175,7 +165,6 @@ class OperatorLogHandler(metaclass=Singleton):
 
 op_handler = OperatorLogHandler()
 create_or_update_operate_log = op_handler.create_or_update_operate_log
-
 cache_instance_before_data = op_handler.cache_instance_before_data
 get_instance_current_with_cache_diff = op_handler.get_instance_current_with_cache_diff
 get_instance_dict_from_cache = op_handler.get_instance_dict_from_cache

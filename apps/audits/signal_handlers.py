@@ -137,7 +137,7 @@ def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
         if changed_field:
             after = {field_name: changed_field}
         if before_value:
-            before = before_value
+            before = {field_name: before_value}
 
         create_or_update_operate_log(
             OperateLog.ACTION_UPDATE, resource_type,

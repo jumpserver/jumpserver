@@ -81,6 +81,21 @@ class OperateLog(OrgModelMixin):
             self.org_id = Organization.ROOT_ID
         return super(OperateLog, self).save(*args, **kwargs)
 
+    @classmethod
+    def from_dict(cls, d):
+        self = cls()
+        for k, v in d.items():
+            setattr(self, k, v)
+        return self
+
+    @classmethod
+    def from_multi_dict(cls, l):
+        operate_logs = []
+        for d in l:
+            operate_log = cls.from_dict(d)
+            operate_logs.append(operate_log)
+        return operate_logs
+
     class Meta:
         verbose_name = _("Operate log")
 

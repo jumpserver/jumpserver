@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 #
+from importlib import import_module
+
 from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin
 from django.db.models import F, Value
 from django.db.models.functions import Concat
+from django.conf import settings
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
 
@@ -13,6 +16,7 @@ from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet, OrgRelationM
 from orgs.utils import current_org
 from ops.models import CommandExecution
 from . import filters
+from .backends import TYPE_ENGINE_MAPPING
 from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog
 from .serializers import FTPLogSerializer, UserLoginLogSerializer, CommandExecutionSerializer
 from .serializers import (
@@ -86,6 +90,16 @@ class OperateLogViewSet(RetrieveModelMixin, ListModelMixin, OrgGenericViewSet):
         if self.request.query_params.get('type') == 'action_detail':
             return OperateLogActionDetailSerializer
         return super().get_serializer_class()
+
+    def get_queryset(self):
+        es_config = settings.OPERATE_LOG_ELASTICSEARCH_CONFIG
+        if es_config:
+            engine_mod = import_module(TYPE_ENGINE_MAPPING['es'])
+            qs = engine_mod.QuerySet(es_config)
+            qs.model = OperateLog
+        else:
+            qs = OperateLog.objects.all()
+        return qs
 
 
 class PasswordChangeLogViewSet(ListModelMixin, CommonGenericViewSet):
