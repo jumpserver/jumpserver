@@ -11,16 +11,14 @@ from common.drf.filters import DatetimeRangeFilter
 from common.api import CommonGenericViewSet
 from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet, OrgRelationMixin
 from orgs.utils import current_org
-from ops.models import CommandExecution
+# from ops.models import CommandExecution
 from . import filters
 from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog
-from .serializers import FTPLogSerializer, UserLoginLogSerializer, CommandExecutionSerializer
-from .serializers import OperateLogSerializer, PasswordChangeLogSerializer, CommandExecutionHostsRelationSerializer
+from .serializers import FTPLogSerializer, UserLoginLogSerializer
+from .serializers import OperateLogSerializer, PasswordChangeLogSerializer
 
 
-class FTPLogViewSet(CreateModelMixin,
-                    ListModelMixin,
-                    OrgGenericViewSet):
+class FTPLogViewSet(CreateModelMixin, ListModelMixin, OrgGenericViewSet):
     model = FTPLog
     serializer_class = FTPLogSerializer
     extra_filter_backends = [DatetimeRangeFilter]
@@ -98,53 +96,53 @@ class PasswordChangeLogViewSet(ListModelMixin, CommonGenericViewSet):
         )
         return queryset
 
-
-class CommandExecutionViewSet(ListModelMixin, OrgGenericViewSet):
-    model = CommandExecution
-    serializer_class = CommandExecutionSerializer
-    extra_filter_backends = [DatetimeRangeFilter]
-    date_range_filter_fields = [
-        ('date_start', ('date_from', 'date_to'))
-    ]
-    filterset_fields = [
-        'user__name', 'user__username', 'command',
-        'account', 'is_finished'
-    ]
-    search_fields = [
-        'command', 'user__name', 'user__username',
-        'account__username',
-    ]
-    ordering = ['-date_created']
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        if getattr(self, 'swagger_fake_view', False):
-            return queryset.model.objects.none()
-        if current_org.is_root():
-            return queryset
-        # queryset = queryset.filter(run_as__org_id=current_org.org_id())
-        return queryset
-
-
-class CommandExecutionHostRelationViewSet(OrgRelationMixin, OrgBulkModelViewSet):
-    serializer_class = CommandExecutionHostsRelationSerializer
-    m2m_field = CommandExecution.hosts.field
-    filterset_fields = [
-        'id', 'asset', 'commandexecution'
-    ]
-    search_fields = ('asset__name', )
-    http_method_names = ['options', 'get']
-    rbac_perms = {
-        'GET': 'ops.view_commandexecution',
-        'list': 'ops.view_commandexecution',
-    }
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        queryset = queryset.annotate(
-            asset_display=Concat(
-                F('asset__name'), Value('('),
-                F('asset__address'), Value(')')
-            )
-        )
-        return queryset
+# Todo: 看看怎么搞
+# class CommandExecutionViewSet(ListModelMixin, OrgGenericViewSet):
+#     model = CommandExecution
+#     serializer_class = CommandExecutionSerializer
+#     extra_filter_backends = [DatetimeRangeFilter]
+#     date_range_filter_fields = [
+#         ('date_start', ('date_from', 'date_to'))
+#     ]
+#     filterset_fields = [
+#         'user__name', 'user__username', 'command',
+#         'account', 'is_finished'
+#     ]
+#     search_fields = [
+#         'command', 'user__name', 'user__username',
+#         'account__username',
+#     ]
+#     ordering = ['-date_created']
+#
+#     def get_queryset(self):
+#         queryset = super().get_queryset()
+#         if getattr(self, 'swagger_fake_view', False):
+#             return queryset.model.objects.none()
+#         if current_org.is_root():
+#             return queryset
+#         # queryset = queryset.filter(run_as__org_id=current_org.org_id())
+#         return queryset
+#
+#
+# class CommandExecutionHostRelationViewSet(OrgRelationMixin, OrgBulkModelViewSet):
+#     serializer_class = CommandExecutionHostsRelationSerializer
+#     m2m_field = CommandExecution.hosts.field
+#     filterset_fields = [
+#         'id', 'asset', 'commandexecution'
+#     ]
+#     search_fields = ('asset__name', )
+#     http_method_names = ['options', 'get']
+#     rbac_perms = {
+#         'GET': 'ops.view_commandexecution',
+#         'list': 'ops.view_commandexecution',
+#     }
+#
+#     def get_queryset(self):
+#         queryset = super().get_queryset()
+#         queryset = queryset.annotate(
+#             asset_display=Concat(
+#                 F('asset__name'), Value('('),
+#                 F('asset__address'), Value(')')
+#             )
+#         )
+#         return queryset

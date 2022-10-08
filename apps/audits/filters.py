@@ -5,10 +5,9 @@ from rest_framework import filters
 from rest_framework.compat import coreapi, coreschema
 
 from orgs.utils import current_org
-from ops.models import CommandExecution
 from common.drf.filters import BaseFilterSet
 
-__all__ = ['CurrentOrgMembersFilter', 'CommandExecutionFilter']
+__all__ = ['CurrentOrgMembersFilter']
 
 
 class CurrentOrgMembersFilter(filters.BaseFilterBackend):
@@ -35,21 +34,21 @@ class CurrentOrgMembersFilter(filters.BaseFilterBackend):
             queryset = queryset.filter(user__in=self._get_user_list())
         return queryset
 
-
-class CommandExecutionFilter(BaseFilterSet):
-    hostname_ip = CharFilter(method='filter_hostname_ip')
-
-    class Meta:
-        model = CommandExecution.hosts.through
-        fields = (
-            'id', 'asset', 'commandexecution', 'hostname_ip'
-        )
-
-    def filter_hostname_ip(self, queryset, name, value):
-        queryset = queryset.annotate(
-            hostname_ip=Concat(
-                F('asset__hostname'), Value('('),
-                F('asset__address'), Value(')')
-            )
-        ).filter(hostname_ip__icontains=value)
-        return queryset
+#
+# class CommandExecutionFilter(BaseFilterSet):
+#     hostname_ip = CharFilter(method='filter_hostname_ip')
+#
+#     class Meta:
+#         model = CommandExecution.hosts.through
+#         fields = (
+#             'id', 'asset', 'commandexecution', 'hostname_ip'
+#         )
+#
+#     def filter_hostname_ip(self, queryset, name, value):
+#         queryset = queryset.annotate(
+#             hostname_ip=Concat(
+#                 F('asset__hostname'), Value('('),
+#                 F('asset__address'), Value(')')
+#             )
+#         ).filter(hostname_ip__icontains=value)
+#         return queryset

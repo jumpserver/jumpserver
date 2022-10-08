@@ -15,7 +15,7 @@ class DefaultCallback:
             dark={},
             skipped=[],
         )
-        self.status = 'starting'
+        self.status = 'running'
         self.finished = False
 
     def is_success(self):
