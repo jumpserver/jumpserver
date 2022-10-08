@@ -37,9 +37,6 @@ class AdHocRunner:
         if not os.path.exists(self.project_dir):
             os.mkdir(self.project_dir, 0o755)
 
-        print("inventory: ")
-        print(self.inventory)
-
         ansible_runner.run(
             host_pattern=self.pattern,
             private_data_dir=self.project_dir,

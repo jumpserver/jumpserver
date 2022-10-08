@@ -3,6 +3,8 @@ from collections import defaultdict
 import json
 import os
 
+from django.utils.translation import gettext as _
+
 
 __all__ = ['JMSInventory']
 
@@ -60,6 +62,7 @@ class JMSInventory:
         host = {'name': asset.name, 'vars': {
             'asset_id': str(asset.id), 'asset_name': asset.name,
             'asset_type': asset.type, 'asset_category': asset.category,
+            'exclude': ''
         }}
         ansible_connection = automation.ansible_config.get('ansible_connection', 'ssh')
         gateway = None
@@ -87,6 +90,8 @@ class JMSInventory:
                     host['ansible_password'] = account.secret
                 elif account.secret_type == 'private_key' and account.secret:
                     host['ssh_private_key'] = account.private_key_file
+            else:
+                host['vars']['exclude'] = _("No account found")
 
             if gateway:
                 host['vars'].update(self.make_proxy_command(gateway))
@@ -99,28 +104,26 @@ class JMSInventory:
 
     def select_account(self, asset):
         accounts = list(asset.accounts.all())
-        if not accounts:
-            return None
-
         account_selected = None
         account_username = self.account_username
 
         if isinstance(self.account_username, str):
             account_username = [self.account_username]
+
         if account_username:
             for username in account_username:
                 account_matched = list(filter(lambda account: account.username == username, accounts))
                 if account_matched:
                     account_selected = account_matched[0]
-                    return account_selected
+                    break
 
         if not account_selected:
             if self.account_policy in ['privileged_must', 'privileged_first']:
-                account_selected = list(filter(lambda account: account.is_privileged, accounts))
-                account_selected = account_selected[0] if account_selected else None
+                account_matched = list(filter(lambda account: account.is_privileged, accounts))
+                account_selected = account_matched[0] if account_matched else None
 
         if not account_selected and self.account_policy == 'privileged_first':
-            account_selected = accounts[0]
+            account_selected = accounts[0] if accounts else None
         return account_selected
 
     def generate(self):
@@ -130,14 +133,20 @@ class JMSInventory:
             automation = platform.automation
             protocols = platform.protocols.all()
 
-            if not automation.ansible_enabled:
-                continue
-
             for asset in self.assets:
                 account = self.select_account(asset)
                 host = self.asset_to_host(asset, account, automation, protocols)
+                if not automation.ansible_enabled:
+                    host['vars']['exclude'] = _('Ansible disabled')
                 hosts.append(host)
 
+        exclude_hosts = list(filter(lambda x: x.get('exclude'), hosts))
+        if exclude_hosts:
+            print(_("Skip hosts below:"))
+            for host in exclude_hosts:
+                print("  {}:\t{}".format(host['name'], host['exclude']))
+
+        hosts = list(filter(lambda x: not x.get('exclude'), hosts))
         data = {'all': {'hosts': {}}}
         for host in hosts:
             name = host.pop('name')
