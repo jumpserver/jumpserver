@@ -27,7 +27,11 @@ class Playbook(BaseAnsibleTask):
     last_execution = models.ForeignKey('PlaybookExecution', verbose_name=_("Last execution"), on_delete=models.SET_NULL, null=True, blank=True)
 
     def get_register_task(self):
-        pass
+        name = "automation_strategy_period_{}".format(str(self.id)[:8])
+        task = execute_automation_strategy.name
+        args = (str(self.id), Trigger.timing)
+        kwargs = {}
+        return name, task, args, kwargs
 
 
 class PlaybookExecution(BaseAnsibleExecution):
