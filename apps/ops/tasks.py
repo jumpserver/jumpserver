@@ -20,7 +20,7 @@ from .celery.utils import (
     create_or_update_celery_periodic_tasks, get_celery_periodic_task,
     disable_celery_periodic_task, delete_celery_periodic_task
 )
-from .models import CommandExecution, CeleryTask
+from .models import CeleryTask, AdHoc, Playbook
 from .notifications import ServerPerformanceCheckUtil
 
 logger = get_logger(__file__)
@@ -30,41 +30,48 @@ def rerun_task():
     pass
 
 
-@shared_task(queue="ansible", verbose_name=_("Run ansible task"))
-def run_ansible_task(tid, callback=None, **kwargs):
+@shared_task(soft_time_limit=60, queue="ansible", verbose_name=_("Run ansible task"))
+def run_adhoc(tid, **kwargs):
     """
     :param tid: is the tasks serialized data
     :param callback: callback function name
     :return:
     """
     with tmp_to_root_org():
-        task = get_object_or_none(Task, id=tid)
+        task = get_object_or_none(AdHoc, id=tid)
     if not task:
         logger.error("No task found")
         return
     with tmp_to_org(task.org):
-        result = task.run()
-        if callback is not None:
-            subtask(callback).delay(result, task_name=task.name)
-        return result
+        execution = task.create_execution()
+        try:
+            execution.start(**kwargs)
+        except SoftTimeLimitExceeded:
+            execution.set_error('Run timeout')
+            logger.error("Run adhoc timeout")
+        except Exception as e:
+            execution.set_error(e)
+            logger.error("Start adhoc execution error: {}".format(e))
 
 
 @shared_task(soft_time_limit=60, queue="ansible", verbose_name=_("Run ansible command"))
-def run_command_execution(cid, **kwargs):
+def run_playbook(pid, **kwargs):
     with tmp_to_root_org():
-        execution = get_object_or_none(CommandExecution, id=cid)
-    if not execution:
-        logger.error("Not found the execution id: {}".format(cid))
+        task = get_object_or_none(Playbook, id=pid)
+    if not task:
+        logger.error("No task found")
         return
-    with tmp_to_org(execution.run_as.org):
+
+    with tmp_to_org(task.org):
+        execution = task.create_execution()
         try:
-            os.environ.update({
-                "TERM_ROWS": kwargs.get("rows", ""),
-                "TERM_COLS": kwargs.get("cols", ""),
-            })
-            execution.run()
+            execution.start(**kwargs)
         except SoftTimeLimitExceeded:
-            logger.error("Run time out")
+            execution.set_error('Run timeout')
+            logger.error("Run playbook timeout")
+        except Exception as e:
+            execution.set_error(e)
+            logger.error("Run playbook execution error: {}".format(e))
 
 
 @shared_task

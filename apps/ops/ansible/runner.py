@@ -1,7 +1,9 @@
 import uuid
-import ansible_runner
+import os
 
+import ansible_runner
 from django.conf import settings
+
 from .callback import DefaultCallback
 
 
@@ -11,7 +13,7 @@ class AdHocRunner:
         "reboot", 'shutdown', 'poweroff', 'halt', 'dd', 'half', 'top'
     ]
 
-    def __init__(self, inventory, module, module_args, pattern='*', project_dir='/tmp/'):
+    def __init__(self, inventory, module, module_args='', pattern='*', project_dir='/tmp/'):
         self.id = uuid.uuid4()
         self.inventory = inventory
         self.pattern = pattern
@@ -31,6 +33,12 @@ class AdHocRunner:
         self.check_module()
         if verbosity is None and settings.DEBUG:
             verbosity = 1
+
+        if not os.path.exists(self.project_dir):
+            os.mkdir(self.project_dir, 0o755)
+
+        print("inventory: ")
+        print(self.inventory)
 
         ansible_runner.run(
             host_pattern=self.pattern,

@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 from collections import defaultdict
 import json
+import os
 
 
 __all__ = ['JMSInventory']
@@ -136,15 +137,19 @@ class JMSInventory:
                 account = self.select_account(asset)
                 host = self.asset_to_host(asset, account, automation, protocols)
                 hosts.append(host)
-        return hosts
 
-    def write_to_file(self, path):
-        hosts = self.generate()
         data = {'all': {'hosts': {}}}
         for host in hosts:
             name = host.pop('name')
             var = host.pop('vars', {})
             host.update(var)
             data['all']['hosts'][name] = host
+        return data
+
+    def write_to_file(self, path):
+        data = self.generate()
+        path_dir = os.path.dirname(path)
+        if not os.path.exists(path_dir):
+            os.makedirs(path_dir, 0o700, True)
         with open(path, 'w') as f:
             f.write(json.dumps(data, indent=4))
