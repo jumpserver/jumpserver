@@ -3,8 +3,7 @@ from __future__ import unicode_literals
 from rest_framework import serializers
 from django.shortcuts import reverse
 
-from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from ..models import Task, AdHoc, AdHocExecution, CommandExecution
+from ..models import AdHoc, AdHocExecution
 
 
 class AdHocExecutionSerializer(serializers.ModelSerializer):
@@ -48,36 +47,6 @@ class AdHocExecutionExcludeResultSerializer(AdHocExecutionSerializer):
             'date_finished', 'timedelta', 'is_finished', 'is_success',
             'short_id', 'adhoc_short_id', 'last_success', 'last_failure'
         ]
-
-
-class TaskSerializer(BulkOrgResourceModelSerializer):
-    summary = serializers.ReadOnlyField(source='history_summary')
-    latest_execution = AdHocExecutionExcludeResultSerializer(read_only=True)
-
-    class Meta:
-        model = Task
-        fields_mini = ['id', 'name', 'display_name']
-        fields_small = fields_mini + [
-            'interval', 'crontab',
-            'is_periodic', 'is_deleted',
-            'date_created', 'date_updated',
-            'comment',
-        ]
-        fields_fk = ['latest_execution']
-        fields_custom = ['summary']
-        fields = fields_small + fields_fk + fields_custom
-        read_only_fields = [
-            'is_deleted', 'date_created', 'date_updated',
-            'latest_adhoc', 'latest_execution', 'total_run_amount',
-            'success_run_amount', 'summary',
-        ]
-
-
-class TaskDetailSerializer(TaskSerializer):
-    contents = serializers.ListField(source='latest_adhoc.tasks')
-
-    class Meta(TaskSerializer.Meta):
-        fields = TaskSerializer.Meta.fields + ['contents']
 
 
 class AdHocSerializer(serializers.ModelSerializer):
@@ -127,26 +96,26 @@ class AdHocDetailSerializer(AdHocSerializer):
         ]
 
 
-class CommandExecutionSerializer(serializers.ModelSerializer):
-    result = serializers.JSONField(read_only=True)
-    log_url = serializers.SerializerMethodField()
-
-    class Meta:
-        model = CommandExecution
-        fields_mini = ['id']
-        fields_small = fields_mini + [
-            'command', 'result', 'log_url',
-            'is_finished', 'date_created', 'date_finished'
-        ]
-        fields_m2m = ['hosts']
-        fields = fields_small + fields_m2m
-        read_only_fields = [
-            'result', 'is_finished', 'log_url', 'date_created',
-            'date_finished'
-        ]
-        ref_name = 'OpsCommandExecution'
-
-    @staticmethod
-    def get_log_url(obj):
-        return reverse('api-ops:celery-task-log', kwargs={'pk': obj.id})
+# class CommandExecutionSerializer(serializers.ModelSerializer):
+#     result = serializers.JSONField(read_only=True)
+#     log_url = serializers.SerializerMethodField()
+#
+#     class Meta:
+#         model = CommandExecution
+#         fields_mini = ['id']
+#         fields_small = fields_mini + [
+#             'command', 'result', 'log_url',
+#             'is_finished', 'date_created', 'date_finished'
+#         ]
+#         fields_m2m = ['hosts']
+#         fields = fields_small + fields_m2m
+#         read_only_fields = [
+#             'result', 'is_finished', 'log_url', 'date_created',
+#             'date_finished'
+#         ]
+#         ref_name = 'OpsCommandExecution'
+#
+#     @staticmethod
+#     def get_log_url(obj):
+#         return reverse('api-ops:celery-task-log', kwargs={'pk': obj.id})
 

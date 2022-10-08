@@ -20,7 +20,7 @@ from .celery.utils import (
     create_or_update_celery_periodic_tasks, get_celery_periodic_task,
     disable_celery_periodic_task, delete_celery_periodic_task
 )
-from .models import Task, CommandExecution, CeleryTask
+from .models import CommandExecution, CeleryTask
 from .notifications import ServerPerformanceCheckUtil
 
 logger = get_logger(__file__)

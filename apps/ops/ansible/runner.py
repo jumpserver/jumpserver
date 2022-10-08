@@ -68,3 +68,11 @@ class PlaybookRunner:
             **kwargs
         )
         return self.cb
+
+
+class CommandRunner(AdHocRunner):
+    def __init__(self, inventory, command, pattern='*', project_dir='/tmp/'):
+        super().__init__(inventory, 'shell', command, pattern, project_dir)
+
+    def run(self, verbosity=0, **kwargs):
+        return super().run(verbosity, **kwargs)

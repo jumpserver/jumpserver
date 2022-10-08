@@ -3,21 +3,19 @@ from collections import defaultdict
 import json
 
 
-__all__ = [
-    'JMSInventory',
-]
+__all__ = ['JMSInventory']
 
 
 class JMSInventory:
-    def __init__(self, assets, account_username=None, account_policy='smart', host_var_callback=None):
+    def __init__(self, assets, account='', account_policy='smart', host_var_callback=None):
         """
         :param assets:
-        :param account_username: account username name if not set use account_policy
+        :param account: account username name if not set use account_policy
         :param account_policy:
         :param host_var_callback:
         """
         self.assets = self.clean_assets(assets)
-        self.account_username = account_username
+        self.account_username = account
         self.account_policy = account_policy
         self.host_var_callback = host_var_callback
 

@@ -4,15 +4,14 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from common.const.choices import Trigger
-from common.mixins.models import CommonModelMixin
 from common.db.fields import EncryptJsonDictTextField
-from orgs.mixins.models import OrgModelMixin
+from orgs.mixins.models import OrgModelMixin, JMSOrgBaseModel
 from ops.mixin import PeriodTaskModelMixin
 from ops.tasks import execute_automation_strategy
 from ops.task_handlers import ExecutionManager
 
 
-class BaseAutomation(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
+class BaseAutomation(JMSOrgBaseModel, PeriodTaskModelMixin):
     accounts = models.JSONField(default=list, verbose_name=_("Accounts"))
     nodes = models.ManyToManyField(
         'assets.Node', related_name='automation_strategy', blank=True, verbose_name=_("Nodes")
@@ -67,7 +66,7 @@ class AutomationStrategyExecution(OrgModelMixin):
         default=dict, blank=True, null=True, verbose_name=_('Automation snapshot')
     )
     strategy = models.ForeignKey(
-        'assets.models.automation.base.BaseAutomation', related_name='execution', on_delete=models.CASCADE,
+        'BaseAutomation', related_name='execution', on_delete=models.CASCADE,
         verbose_name=_('Automation strategy')
     )
     trigger = models.CharField(
