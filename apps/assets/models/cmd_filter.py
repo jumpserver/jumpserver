@@ -212,7 +212,7 @@ class CommandFilterRule(OrgModelMixin):
         node = get_object_or_none(Node, pk=node_id)
         if node:
             org_id = node.org_id
-            nodes.append(node)
+            nodes.extend(list(node.get_ancestors(with_self=True)))
 
         system_user = get_object_or_none(SystemUser, pk=system_user_id)
         application = get_object_or_none(Application, pk=application_id)
