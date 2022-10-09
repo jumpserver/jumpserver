@@ -10,7 +10,7 @@ __all__ = ['AccountHistoryViewSet', 'AccountHistorySecretsViewSet']
 class AccountHistoryFilterSet(AccountFilterSet):
     class Meta:
         model = Account.history.model
-        fields = AccountFilterSet.Meta.fields
+        fields = ['id', 'secret_type']
 
 
 class AccountHistoryViewSet(AccountViewSet):

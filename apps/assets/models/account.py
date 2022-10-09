@@ -9,6 +9,23 @@ from .base import BaseAccount
 __all__ = ['Account', 'AccountTemplate']
 
 
+class AccountHistoricalRecords(HistoricalRecords):
+    def __init__(self, *args, **kwargs):
+        self.included_fields = kwargs.pop('included_fields', None)
+        super().__init__(*args, **kwargs)
+
+    def fields_included(self, model):
+        fields = []
+        for field in model._meta.fields:
+            if self.included_fields is None:
+                if field.name not in self.excluded_fields:
+                    fields.append(field)
+            else:
+                if field.name in self.included_fields:
+                    fields.append(field)
+        return fields
+
+
 class Account(BaseAccount):
     class InnerAccount(models.TextChoices):
         INPUT = '@INPUT', '@INPUT'
@@ -23,7 +40,9 @@ class Account(BaseAccount):
         on_delete=models.SET_NULL, verbose_name=_("Su from")
     )
     version = models.IntegerField(default=0, verbose_name=_('Version'))
-    history = HistoricalRecords()
+    history = AccountHistoricalRecords(
+        included_fields=['id', 'secret_type', 'secret']
+    )
 
     class Meta:
         verbose_name = _('Account')
