@@ -1,7 +1,7 @@
 # ~*~ coding: utf-8 ~*~
-from collections import defaultdict
 import json
 import os
+from collections import defaultdict
 
 from django.utils.translation import gettext as _
 
@@ -10,7 +10,7 @@ __all__ = ['JMSInventory']
 
 
 class JMSInventory:
-    def __init__(self, assets, account='', account_policy='smart', host_var_callback=None):
+    def __init__(self, assets, account='', account_policy='smart', host_var_callback=None, host_duplicator=None):
         """
         :param assets:
         :param account: account username name if not set use account_policy
@@ -21,6 +21,7 @@ class JMSInventory:
         self.account_username = account
         self.account_policy = account_policy
         self.host_var_callback = host_var_callback
+        self.host_duplicator = host_duplicator
 
     @staticmethod
     def clean_assets(assets):
@@ -59,11 +60,16 @@ class JMSInventory:
         return {"ansible_ssh_common_args": proxy_command}
 
     def asset_to_host(self, asset, account, automation, protocols):
-        host = {'name': asset.name, 'vars': {
-            'asset_id': str(asset.id), 'asset_name': asset.name,
-            'asset_type': asset.type, 'asset_category': asset.category,
+        host = {
+            'name': asset.name,
+            'asset': {
+                'id': asset.id, 'name': asset.name, 'ip': asset.ip,
+                'type': asset.type, 'category': asset.category,
+                'protocol': asset.protocol, 'port': asset.port,
+                'protocols': [{'name': p.name, 'port': p.port} for p in protocols],
+            },
             'exclude': ''
-        }}
+        }
         ansible_connection = automation.ansible_config.get('ansible_connection', 'ssh')
         gateway = None
         if asset.domain:
@@ -91,15 +97,15 @@ class JMSInventory:
                 elif account.secret_type == 'private_key' and account.secret:
                     host['ssh_private_key'] = account.private_key_file
             else:
-                host['vars']['exclude'] = _("No account found")
+                host['exclude'] = _("No account found")
 
             if gateway:
-                host['vars'].update(self.make_proxy_command(gateway))
+                host.update(self.make_proxy_command(gateway))
 
         if self.host_var_callback:
             callback_var = self.host_var_callback(asset)
             if isinstance(callback_var, dict):
-                host['vars'].update(callback_var)
+                host.update(callback_var)
         return host
 
     def select_account(self, asset):
@@ -137,8 +143,11 @@ class JMSInventory:
                 account = self.select_account(asset)
                 host = self.asset_to_host(asset, account, automation, protocols)
                 if not automation.ansible_enabled:
-                    host['vars']['exclude'] = _('Ansible disabled')
-                hosts.append(host)
+                    host['exclude'] = _('Ansible disabled')
+                if self.host_duplicator:
+                    hosts.extend(self.host_duplicator(host, asset=asset, account=account, platform=platform))
+                else:
+                    hosts.append(host)
 
         exclude_hosts = list(filter(lambda x: x.get('exclude'), hosts))
         if exclude_hosts:
@@ -150,8 +159,6 @@ class JMSInventory:
         data = {'all': {'hosts': {}}}
         for host in hosts:
             name = host.pop('name')
-            var = host.pop('vars', {})
-            host.update(var)
             data['all']['hosts'][name] = host
         return data
 

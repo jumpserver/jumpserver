@@ -1,0 +1,14 @@
+## all connection vars
+hostname asset_name=name asset_type=type asset_primary_protocol=ssh asset_primary_port=22 asset_protocols=[]
+
+## local connection
+hostname ansible_connection=local
+
+## local connection with gateway
+hostname ansible_connection=ssh ansible_user=gateway.username ansible_port=gateway.port ansible_host=gateway.host ansible_ssh_private_key_file=gateway.key
+
+## ssh connection for windows
+hostname ansible_connection=ssh ansible_shell_type=powershell/cmd ansible_user=windows.username ansible_port=windows.port ansible_host=windows.host ansible_ssh_private_key_file=windows.key
+
+## ssh connection
+hostname ansible_user=user ansible_password=pass ansible_host=host ansible_port=port ansible_ssh_private_key_file=key ssh_args="-o StrictHostKeyChecking=no"

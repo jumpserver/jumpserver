@@ -1,0 +1,29 @@
+- hosts: demo
+  tasks:
+    - name: ping
+      ping:
+
+    #- name: print variables
+    #  debug:
+    #    msg: "Username: {{ account.username }}, Password: {{ account.password }}"
+
+    - name: Change password
+      user:
+        name: "{{ account.username }}"
+        password: "{{ account.password | password_hash('des') }}"
+        update_password: always
+      when: account.password
+
+    - name: Change public key
+      authorized_key:
+        user: "{{ account.username }}"
+        key: "{{ account.public_key }}"
+        state: present
+      when: account.public_key
+
+    - name: Verify password
+      ping:
+      vars:
+        ansible_user: "{{ account.username }}"
+        ansible_pass: "{{ account.password }}"
+        ansible_ssh_connection: paramiko

@@ -52,7 +52,7 @@ class BaseAnsibleExecution(models.Model):
     creator = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
     date_start = models.DateTimeField(null=True, verbose_name=_('Date start'), db_index=True)
-    date_finished = models.DateTimeField(null=True)
+    date_finished = models.DateTimeField(null=True, verbose_name=_("Date finished"))
 
     class Meta:
         abstract = True

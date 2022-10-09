@@ -71,7 +71,7 @@ class DefaultCallback:
     def runner_on_start(self, event_data, **kwargs):
         pass
 
-    def runer_retry(self, event_data, **kwargs):
+    def runner_retry(self, event_data, **kwargs):
         pass
 
     def runner_on_file_diff(self, event_data, **kwargs):
