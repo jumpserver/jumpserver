@@ -1,5 +1,0 @@
-- hosts: all
-  vars:
-    connection_type: ssh
-  roles:
-    - linux

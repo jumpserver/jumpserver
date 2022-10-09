@@ -8,7 +8,7 @@ from common.utils import get_logger, get_object_or_none
 from orgs.utils import org_aware_func
 from jumpserver.const import PROJECT_DIR
 
-from .models import Task, AdHoc
+from .models import AdHoc
 from .const import DEFAULT_PASSWORD_RULES
 
 logger = get_logger(__file__)

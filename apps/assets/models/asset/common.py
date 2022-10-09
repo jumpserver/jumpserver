@@ -4,6 +4,7 @@
 
 import logging
 import uuid
+from collections import defaultdict
 
 from django.db import models
 from django.db.models import Q
@@ -40,6 +41,12 @@ class AssetQuerySet(models.QuerySet):
 
     def has_protocol(self, name):
         return self.filter(protocols__contains=name)
+
+    def group_by_platform(self) -> dict:
+        groups = defaultdict(list)
+        for asset in self.all():
+            groups[asset.platform].append(asset)
+        return groups
 
 
 class NodesRelationMixin:
@@ -125,6 +132,22 @@ class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
         for n in self.labels.all():
             names.append(n.name + ':' + n.value)
         return names
+
+    @lazyproperty
+    def primary_protocol(self):
+        return self.protocols.first()
+
+    @lazyproperty
+    def protocol(self):
+        if not self.primary_protocol:
+            return 'none'
+        return self.primary_protocol.name
+
+    @lazyproperty
+    def port(self):
+        if not self.primary_protocol:
+            return 0
+        return self.primary_protocol.port
 
     @property
     def protocols_as_list(self):
