@@ -116,7 +116,7 @@ class NodesRelationMixin:
         nodes = []
         for node in self.get_nodes():
             _nodes = node.get_ancestors(with_self=True)
-            nodes.append(_nodes)
+            nodes.extend(list(_nodes))
         if flat:
             nodes = list(reduce(lambda x, y: set(x) | set(y), nodes))
         return nodes

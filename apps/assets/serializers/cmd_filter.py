@@ -21,7 +21,7 @@ class CommandFilterSerializer(BulkOrgResourceModelSerializer):
             'comment', 'created_by',
         ]
         fields_fk = ['rules']
-        fields_m2m = ['users', 'user_groups', 'system_users', 'assets', 'applications']
+        fields_m2m = ['users', 'user_groups', 'system_users', 'nodes', 'assets', 'applications']
         fields = fields_small + fields_fk + fields_m2m
         extra_kwargs = {
             'rules': {'read_only': True},
