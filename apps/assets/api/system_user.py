@@ -208,7 +208,8 @@ class SystemUserTaskApi(generics.CreateAPIView):
 
 class SystemUserCommandFilterRuleListApi(generics.ListAPIView):
     rbac_perms = {
-        'list': 'assets.view_commandfilterule'
+        'list': 'assets.view_commandfilterule',
+        'GET': 'assets.view_commandfilterule',
     }
 
     def get_serializer_class(self):
@@ -223,12 +224,14 @@ class SystemUserCommandFilterRuleListApi(generics.ListAPIView):
         if not system_user:
             system_user_id = self.request.query_params.get('system_user_id')
         asset_id = self.request.query_params.get('asset_id')
+        node_id = self.request.query_params.get('node_id')
         application_id = self.request.query_params.get('application_id')
         rules = CommandFilterRule.get_queryset(
             user_id=user_id,
             user_group_id=user_group_id,
             system_user_id=system_user_id,
             asset_id=asset_id,
+            node_id=node_id,
             application_id=application_id
         )
         return rules
