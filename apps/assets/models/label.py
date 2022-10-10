@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 #
 
-import uuid
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from orgs.mixins.models import OrgModelMixin
+
+from orgs.mixins.models import JMSOrgBaseModel
 
 
-class Label(OrgModelMixin):
+class Label(JMSOrgBaseModel):
     SYSTEM_CATEGORY = "S"
     USER_CATEGORY = "U"
     CATEGORY_CHOICES = (

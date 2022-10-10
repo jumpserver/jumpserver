@@ -20,7 +20,7 @@ class BasePlaybookManager:
     def playbook_dir_path(self):
         ansible_dir = settings.ANSIBLE_DIR
         path = os.path.join(
-            ansible_dir, self.automation.type, self.automation.name,
+            ansible_dir, self.automation.type, self.automation.name.replace(' ', '_'),
             timezone.now().strftime('%Y%m%d_%H%M%S')
         )
         return path
@@ -41,12 +41,13 @@ class BasePlaybookManager:
     def prepare_playbook_dir(self):
         inventory_dir = os.path.dirname(self.inventory_path)
         playbook_dir = os.path.dirname(self.playbook_path)
-        for d in [inventory_dir, playbook_dir]:
+        for d in [inventory_dir, playbook_dir, self.playbook_dir_path]:
+            print("Create dir: {}".format(d))
             if not os.path.exists(d):
                 os.makedirs(d, exist_ok=True, mode=0o755)
 
     def inventory_kwargs(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     def generate_inventory(self):
         inventory = JMSInventory(
@@ -58,10 +59,10 @@ class BasePlaybookManager:
         print("Generate inventory done: {}".format(self.inventory_path))
 
     def generate_playbook(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     def get_runner(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     def run(self, **kwargs):
         self.generate()
