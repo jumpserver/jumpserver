@@ -63,7 +63,7 @@ class JMSInventory:
         host = {
             'name': asset.name,
             'asset': {
-                'id': asset.id, 'name': asset.name, 'ip': asset.ip,
+                'id': str(asset.id), 'name': asset.name, 'address': asset.address,
                 'type': asset.type, 'category': asset.category,
                 'protocol': asset.protocol, 'port': asset.port,
                 'protocols': [{'name': p.name, 'port': p.port} for p in protocols],
@@ -125,7 +125,7 @@ class JMSInventory:
 
         if not account_selected:
             if self.account_policy in ['privileged_must', 'privileged_first']:
-                account_matched = list(filter(lambda account: account.is_privileged, accounts))
+                account_matched = list(filter(lambda account: account.privileged, accounts))
                 account_selected = account_matched[0] if account_matched else None
 
         if not account_selected and self.account_policy == 'privileged_first':
@@ -152,8 +152,8 @@ class JMSInventory:
         exclude_hosts = list(filter(lambda x: x.get('exclude'), hosts))
         if exclude_hosts:
             print(_("Skip hosts below:"))
-            for host in exclude_hosts:
-                print("  {}:\t{}".format(host['name'], host['exclude']))
+            for i, host in enumerate(exclude_hosts, start=1):
+                print("{}: [{}] \t{}".format(i, host['name'], host['exclude']))
 
         hosts = list(filter(lambda x: not x.get('exclude'), hosts))
         data = {'all': {'hosts': {}}}

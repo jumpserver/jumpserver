@@ -34,7 +34,7 @@ class ChangePasswordManager(BasePlaybookManager):
             automation.change_password_method in self.id_method_mapper
 
         if not change_password_enabled:
-            host.exclude = _('Change password disabled')
+            host['exclude'] = _('Change password disabled')
             return [host]
 
         hosts = []
@@ -60,13 +60,17 @@ class ChangePasswordManager(BasePlaybookManager):
         playbook = []
         for method_id, host_names in self.method_hosts_mapper.items():
             method = self.id_method_mapper[method_id]
-            playbook_dir_path = method['dir']
-            playbook_dir_name = os.path.dirname(playbook_dir_path)
-            shutil.copytree(playbook_dir_path, self.playbook_dir_path)
-            sub_playbook_path = os.path.join(self.playbook_dir_path, playbook_dir_name, 'main.yml')
+            method_playbook_dir_path = method['dir']
+            method_playbook_dir_name = os.path.basename(method_playbook_dir_path)
+            sub_playbook_dir = os.path.join(os.path.dirname(self.playbook_path), method_playbook_dir_name)
+            shutil.copytree(method_playbook_dir_path, sub_playbook_dir)
+            sub_playbook_path = os.path.join(sub_playbook_dir, 'main.yml')
 
             with open(sub_playbook_path, 'r') as f:
                 host_playbook_play = yaml.safe_load(f)
+
+            if isinstance(host_playbook_play, list):
+                host_playbook_play = host_playbook_play[0]
 
             plays = []
             for name in host_names:
@@ -75,17 +79,24 @@ class ChangePasswordManager(BasePlaybookManager):
                 plays.append(play)
 
             with open(sub_playbook_path, 'w') as f:
-                yaml.safe_dump(plays, f, default_flow_style=False)
+                yaml.safe_dump(plays, f)
 
             playbook.append({
                 'name': method['name'],
-                'import_playbook': playbook_dir_name + '/' + 'main.yml'
+                'import_playbook': os.path.join(method_playbook_dir_name, 'main.yml')
             })
 
         with open(self.playbook_path, 'w') as f:
-            yaml.safe_dump(playbook, f, default_flow_style=False)
+            yaml.safe_dump(playbook, f)
 
         print("Generate playbook done: " + self.playbook_path)
+
+    def get_runner(self):
+        return PlaybookRunner(
+            self.inventory_path,
+            self.playbook_path,
+            self.playbook_dir_path
+        )
 
 
 

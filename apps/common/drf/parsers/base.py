@@ -39,7 +39,7 @@ class BaseFileParser(BaseParser):
 
     @abc.abstractmethod
     def generate_rows(self, stream_data):
-        raise NotImplemented
+        raise NotImplementedError
 
     def get_column_titles(self, rows):
         return next(rows)

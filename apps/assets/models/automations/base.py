@@ -58,9 +58,8 @@ class BaseAutomation(JMSOrgBaseModel, PeriodTaskModelMixin):
         except AttributeError:
             eid = str(uuid.uuid4())
 
-        execution = AutomationExecution.objects.create(
-            id=eid, strategy=self, trigger=trigger,
-            snapshot=self.to_attr_json(),
+        execution = self.executions.create(
+            id=eid, trigger=trigger,
         )
         return execution.start()
 

@@ -29,10 +29,10 @@ class BaseAnsibleTask(PeriodTaskModelMixin, JMSOrgBaseModel):
         return inv
 
     def get_register_task(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     def to_json(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     def create_execution(self):
         execution = self.executions.create()
@@ -71,7 +71,7 @@ class BaseAnsibleExecution(models.Model):
         return os.path.join(self.private_dir, 'inventory', 'hosts')
 
     def get_runner(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     def finish_task(self):
         self.date_finished = timezone.now()
