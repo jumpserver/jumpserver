@@ -6,7 +6,7 @@ from collections import defaultdict
 import yaml
 from django.utils.translation import gettext as _
 
-from ops.ansible import PlaybookRunner, JMSInventory
+from ops.ansible import PlaybookRunner
 from ..base.manager import BasePlaybookManager
 from assets.automations.methods import platform_automation_methods
 
@@ -19,6 +19,7 @@ class ChangePasswordManager(BasePlaybookManager):
             for method in platform_automation_methods
         }
         self.method_hosts_mapper = defaultdict(list)
+        self.playbooks = []
 
     def host_duplicator(self, host, asset=None, account=None, platform=None, **kwargs):
         accounts = asset.accounts.all()
@@ -72,19 +73,23 @@ class ChangePasswordManager(BasePlaybookManager):
             if isinstance(host_playbook_play, list):
                 host_playbook_play = host_playbook_play[0]
 
-            plays = []
-            for name in host_names:
+            step = 10
+            hosts_grouped = [host_names[i:i+step] for i in range(0, len(host_names), step)]
+            for i, hosts in enumerate(hosts_grouped):
+                plays = []
                 play = deepcopy(host_playbook_play)
-                play['hosts'] = name
+                play['hosts'] = ':'.join(hosts)
                 plays.append(play)
 
-            with open(sub_playbook_path, 'w') as f:
-                yaml.safe_dump(plays, f)
+                playbook_path = os.path.join(sub_playbook_dir, 'part_{}.yml'.format(i))
+                with open(playbook_path, 'w') as f:
+                    yaml.safe_dump(plays, f)
+                self.playbooks.append(playbook_path)
 
-            playbook.append({
-                'name': method['name'],
-                'import_playbook': os.path.join(method_playbook_dir_name, 'main.yml')
-            })
+                playbook.append({
+                    'name': method['name'] + ' for part {}'.format(i),
+                    'import_playbook': os.path.join(method_playbook_dir_name, 'part_{}.yml'.format(i))
+                })
 
         with open(self.playbook_path, 'w') as f:
             yaml.safe_dump(playbook, f)
@@ -97,6 +102,5 @@ class ChangePasswordManager(BasePlaybookManager):
             self.playbook_path,
             self.playbook_dir_path
         )
-
 
 
