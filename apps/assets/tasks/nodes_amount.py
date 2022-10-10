@@ -8,6 +8,8 @@ from assets.utils import check_node_assets_amount
 
 from common.utils.lock import AcquireFailed
 from common.utils import get_logger
+from common.const.crontab import CRONTAB_AT_AM_TWO
+
 
 logger = get_logger(__file__)
 
@@ -29,7 +31,7 @@ def check_node_assets_amount_task(org_id=None):
             logger.error(error)
 
 
-@register_as_period_task(crontab='0 2 * * *')
+@register_as_period_task(crontab=CRONTAB_AT_AM_TWO)
 @shared_task
 def check_node_assets_amount_period_task():
     check_node_assets_amount_task()

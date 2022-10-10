@@ -10,6 +10,7 @@ from celery import shared_task
 from orgs.utils import tmp_to_root_org
 from common.utils import get_logger
 from common.utils.timezone import local_now, dt_formatter, dt_parser
+from common.const.crontab import CRONTAB_AT_AM_TEN
 from ops.celery.decorator import register_as_period_task
 from perms.notifications import (
     PermedAssetsWillExpireUserMsg, AssetPermsWillExpireForOrgAdminMsg,
@@ -54,7 +55,7 @@ def check_asset_permission_expired():
     UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids_cross_orgs(asset_perm_ids)
 
 
-@register_as_period_task(crontab='0 10 * * *')
+@register_as_period_task(crontab=CRONTAB_AT_AM_TEN)
 @shared_task()
 @atomic()
 @tmp_to_root_org()
