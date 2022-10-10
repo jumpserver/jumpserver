@@ -1,29 +1,46 @@
-- hosts: demo
+- hosts: mysql
+  gather_facts: no
+  vars:
+    ansible_python_interpreter: /usr/local/bin/python
+    jms_account:
+      username: root
+      password: redhat
+    jms_asset:
+      address: 127.0.0.1
+      port: 3306
+    account:
+      username: web1
+      password: jumpserver
+
   tasks:
-    - name: ping
-      ping:
+    - name: Test MySQL connection
+      community.mysql.mysql_info:
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        filter: version
+      register: db_info
 
-    #- name: print variables
-    #  debug:
-    #    msg: "Username: {{ account.username }}, Password: {{ account.password }}"
+    - name: MySQL version
+      debug:
+        var: db_info.version.full
 
-    - name: Change password
-      user:
+    - name: Change MySQL password
+      community.mysql.mysql_user:
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
         name: "{{ account.username }}"
-        password: "{{ account.password | password_hash('des') }}"
-        update_password: always
-      when: account.password
-
-    - name: Change public key
-      authorized_key:
-        user: "{{ account.username }}"
-        key: "{{ account.public_key }}"
-        state: present
-      when: account.public_key
+        password: "{{ account.secret }}"
+        host: "%"
+      when: db_info is succeeded
 
     - name: Verify password
-      ping:
-      vars:
-        ansible_user: "{{ account.username }}"
-        ansible_pass: "{{ account.password }}"
-        ansible_ssh_connection: paramiko
+      community.mysql.mysql_info:
+        login_user: "{{ account.username }}"
+        login_password: "{{ account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        filter: version

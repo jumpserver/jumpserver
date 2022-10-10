@@ -1,10 +1,45 @@
-{% for account in accounts %}
-- hosts: {{ account.asset.name }}
+- hosts: mysql
+  gather_facts: no
   vars:
+    ansible_python_interpreter: /usr/local/bin/python
+    jms_account:
+      username: postgre
+      password: postgre
+    jms_asset:
+      address: 127.0.0.1
+      port: 5432
     account:
-      username: {{ account.username }}
-      password: {{ account.password }}
-      public_key: {{ account.public_key }}
-  roles:
-    - change_password
-{% endfor %}
+      username: web1
+      secret: jumpserver
+
+  tasks:
+    - name: Test PostgreSQL connection
+      community.postgresql.postgresql_info:
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+      register: db_info
+
+    - name: Display PostgreSQL version
+      debug:
+        var: db_info.version.full
+
+    - name: Change PostgreSQL password
+      community.postgresql.postgresql_user:
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        name: "{{ account.username }}"
+        password: "{{ account.secret }}"
+        comment: Updated by jumpserver
+        state: present
+      when: db_info is succeeded
+
+    - name: Verify password
+      community.postgresql.postgresql_info:
+        login_user: "{{ account.username }}"
+        login_password: "{{ account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"

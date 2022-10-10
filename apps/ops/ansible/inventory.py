@@ -62,13 +62,16 @@ class JMSInventory:
     def asset_to_host(self, asset, account, automation, protocols):
         host = {
             'name': asset.name,
-            'asset': {
+            'jms_asset': {
                 'id': str(asset.id), 'name': asset.name, 'address': asset.address,
                 'type': asset.type, 'category': asset.category,
                 'protocol': asset.protocol, 'port': asset.port,
                 'protocols': [{'name': p.name, 'port': p.port} for p in protocols],
             },
-            'exclude': ''
+            'jms_account':  {
+                'id': str(account.id), 'username': account.username,
+                'secret': account.secret, 'secret_type': account.secret_type
+            } if account else None
         }
         ansible_connection = automation.ansible_config.get('ansible_connection', 'ssh')
         gateway = None
