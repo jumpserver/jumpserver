@@ -6,13 +6,11 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from assets import serializers
+from assets.models import Asset
 from assets.filters import IpInFilterBackend, LabelFilterBackend, NodeFilterBackend
-from assets.models import Asset, Gateway
 from assets.tasks import (
-    push_accounts_to_assets,
-    test_assets_connectivity_manual,
-    update_assets_hardware_info_manual,
-    verify_accounts_connectivity,
+    push_accounts_to_assets, test_assets_connectivity_manual,
+    update_assets_hardware_info_manual, verify_accounts_connectivity,
 )
 from common.drf.filters import BaseFilterSet
 from common.mixins.api import SuggestionMixin
@@ -74,7 +72,7 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
     def gateways(self, *args, **kwargs):
         asset = self.get_object()
         if not asset.domain:
-            gateways = Gateway.objects.none()
+            gateways = Asset.objects.none()
         else:
             gateways = asset.domain.gateways.filter(protocol="ssh")
         return self.get_paginated_response_from_queryset(gateways)
