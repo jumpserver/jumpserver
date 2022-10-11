@@ -53,7 +53,9 @@ class Subscription:
                     error(msg, item)
                     logger.error('Subscribe handler handle msg error: {}'.format(e))
         except Exception as e:
-            logger.error('Consume msg error: {}'.format(e))
+            # 正常的 websocket 断开时, redis 会断开连接，避免日志太多
+            # logger.error('Consume msg error: {}'.format(e))
+            pass
 
         try:
             complete()
