@@ -55,7 +55,9 @@ class OAuth2AuthCallbackView(View):
                 )
 
         logger.debug(log_prompt.format('Redirect'))
-        return HttpResponseRedirect(settings.AUTH_OAUTH2_AUTHENTICATION_FAILURE_REDIRECT_URI)
+        # OAuth2 服务端认证成功, 但是用户被禁用了, 这时候需要调用服务端的logout
+        redirect_url = settings.AUTH_OAUTH2_PROVIDER_END_SESSION_ENDPOINT
+        return HttpResponseRedirect(redirect_url)
 
 
 class OAuth2EndSessionView(View):
