@@ -1,1 +1,1 @@
-from .methods import platform_automation_methods
+from .methods import *

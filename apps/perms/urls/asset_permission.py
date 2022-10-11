@@ -65,7 +65,7 @@ user_permission_urlpatterns = [
     path('assets/<uuid:asset_id>/accounts/', api.MyGrantedAssetAccountsApi.as_view(), name='my-asset-accounts'),
     # 用户登录资产的特殊账号, @INPUT, @USER 等
     path('<uuid:pk>/assets/special-accounts/', api.UserGrantedAssetSpecialAccountsApi.as_view(), name='user-special-accounts'),
-    path('/assets/special-accounts/', api.MyGrantedAssetSpecialAccountsApi.as_view(), name='my-special-accounts'),
+    path('assets/special-accounts/', api.MyGrantedAssetSpecialAccountsApi.as_view(), name='my-special-accounts'),
 ]
 
 user_group_permission_urlpatterns = [
