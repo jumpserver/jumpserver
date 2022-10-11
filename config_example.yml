@@ -80,8 +80,6 @@ REDIS_PORT: 6379
 # 启用定时任务
 # PERIOD_TASK_ENABLED: True
 #
-# Windows 登录跳过手动输入密码
-# WINDOWS_SKIP_ALL_MANUAL_PASSWORD: False
 
 # 是否开启 Luna 水印
 # SECURITY_WATERMARK_ENABLED: False
@@ -97,3 +95,4 @@ REDIS_PORT: 6379
 
 # 仅允许已存在的用户登录，不允许第三方认证后，自动创建用户
 # ONLY_ALLOW_EXIST_USER_AUTH: False
+

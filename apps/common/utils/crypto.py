@@ -82,7 +82,8 @@ class PiicoSM4EcbCrypto(BaseCrypto):
         return self.cipher.encrypt(self.to_16(data))
 
     def _decrypt(self, data: bytes) -> bytes:
-        return self.cipher.decrypt(data)
+        bs = self.cipher.decrypt(data)
+        return bs.rstrip(b'\0')
 
 
 class AESCrypto:
@@ -232,6 +233,8 @@ class Crypto:
         return self.cryptos[0]
 
     def encrypt(self, text):
+        if text is None:
+            return text
         return self.encryptor.encrypt(text)
 
     def decrypt(self, text):
@@ -241,7 +244,7 @@ class Crypto:
                 if origin_text:
                     # 有时不同算法解密不报错，但是返回空字符串
                     return origin_text
-            except (TypeError, ValueError, UnicodeDecodeError, IndexError):
+            except Exception:
                 continue
 
 

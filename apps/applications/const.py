@@ -83,9 +83,3 @@ class AppType(models.TextChoices):
         if AppCategory.is_xpack(category):
             return True
         return tp in ['oracle', 'postgresql', 'sqlserver']
-
-
-class OracleVersion(models.TextChoices):
-    version_11g = '11g', '11g'
-    version_12c = '12c', '12c'
-    version_other = 'other', _('Other')

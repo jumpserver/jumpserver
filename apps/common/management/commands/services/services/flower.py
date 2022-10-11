@@ -19,11 +19,13 @@ class FlowerService(BaseService):
             'celery',
             '-A', 'ops',
             'flower',
-            '-l', 'INFO',
+            '-logging=info',
             '--url_prefix=/core/flower',
             '--auto_refresh=False',
             '--max_tasks=1000',
-            '--tasks_columns=uuid,name,args,state,received,started,runtime,worker'
+            '--persistent=True',
+            '-db=/opt/jumpserver/data/flower.db',
+            '--state_save_interval=600000'
         ]
         return cmd
 

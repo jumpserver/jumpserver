@@ -19,7 +19,7 @@ class ApplyApplicationSerializer(BaseApplyAssetApplicationSerializer, TicketAppl
     class Meta:
         model = ApplyApplicationTicket
         writeable_fields = [
-            'id', 'title', 'type', 'apply_category',
+            'id', 'title', 'type', 'apply_category', 'comment',
             'apply_type', 'apply_applications', 'apply_system_users',
             'apply_actions', 'apply_date_start', 'apply_date_expired', 'org_id'
         ]
