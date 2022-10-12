@@ -52,12 +52,14 @@ class AdHocRunner:
 
 
 class PlaybookRunner:
-    def __init__(self, inventory, playbook, project_dir='/tmp/'):
+    def __init__(self, inventory, playbook, project_dir='/tmp/', callback=None):
         self.id = uuid.uuid4()
         self.inventory = inventory
         self.playbook = playbook
         self.project_dir = project_dir
-        self.cb = DefaultCallback()
+        if not callback:
+            callback = DefaultCallback()
+        self.cb = callback
 
     def run(self, verbosity=0, **kwargs):
         if verbosity is None and settings.DEBUG:

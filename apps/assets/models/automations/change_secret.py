@@ -19,6 +19,10 @@ class ChangePasswordAutomation(BaseAutomation):
         verbose_name=_("Recipient")
     )
 
+    def save(self, *args, **kwargs):
+        self.type = 'change_password'
+        super().save(*args, **kwargs)
+
     class Meta:
         verbose_name = _("Change auth strategy")
 

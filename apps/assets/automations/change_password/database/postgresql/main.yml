@@ -1,24 +1,26 @@
-- hosts: mysql
+- hosts: postgre
   gather_facts: no
   vars:
     ansible_python_interpreter: /usr/local/bin/python
     jms_account:
       username: postgre
-      password: postgre
+      secret: postgre
     jms_asset:
       address: 127.0.0.1
       port: 5432
+      database: testdb
     account:
-      username: web1
+      username: test
       secret: jumpserver
 
   tasks:
     - name: Test PostgreSQL connection
-      community.postgresql.postgresql_info:
+      community.postgresql.postgresql_ping:
         login_user: "{{ jms_account.username }}"
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
+        login_db: "{{ jms_asset.database }}"
       register: db_info
 
     - name: Display PostgreSQL version
@@ -31,15 +33,15 @@
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
+        db: "{{ jms_asset.database }}"
         name: "{{ account.username }}"
         password: "{{ account.secret }}"
-        comment: Updated by jumpserver
-        state: present
       when: db_info is succeeded
 
     - name: Verify password
-      community.postgresql.postgresql_info:
+      community.postgresql.postgresql_ping:
         login_user: "{{ account.username }}"
         login_password: "{{ account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
+        db: "{{ jms_asset.database }}"
