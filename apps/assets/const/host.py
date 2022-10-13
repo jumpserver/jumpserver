@@ -48,12 +48,12 @@ class HostTypes(BaseType):
                 'gather_facts_enabled': True,
                 'gather_accounts_enabled': True,
                 'verify_account_enabled': True,
-                'change_password_enabled': True,
+                'change_secret_enabled': True,
                 'create_account_enabled': True,
             },
             cls.WINDOWS: {
                 'ansible_config': {
-                    'ansible_shell_type': 'powershell',
+                    'ansible_shell_type': 'cmd',
                     'ansible_connection': 'ssh',
                 },
             },
@@ -71,7 +71,7 @@ class HostTypes(BaseType):
                 {'name': 'BSD'},
                 {'name': 'AIX', 'automation': {
                     'create_account_method': 'create_account_aix',
-                    'change_password_method': 'change_password_aix'
+                    'change_secret_method': 'change_secret_aix'
                 }},
             ],
             cls.WINDOWS: [

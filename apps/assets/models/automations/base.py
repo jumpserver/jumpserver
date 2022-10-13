@@ -9,7 +9,6 @@ from orgs.mixins.models import OrgModelMixin, JMSOrgBaseModel
 from ops.mixin import PeriodTaskModelMixin
 from ops.tasks import execute_automation_strategy
 from assets.models import Node, Asset
-from assets.automations.endpoint import ExecutionManager
 
 
 class BaseAutomation(JMSOrgBaseModel, PeriodTaskModelMixin):
@@ -21,6 +20,7 @@ class BaseAutomation(JMSOrgBaseModel, PeriodTaskModelMixin):
         'assets.Asset', blank=True, verbose_name=_("Assets")
     )
     type = models.CharField(max_length=16, verbose_name=_('Type'))
+    is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
 
     def __str__(self):
@@ -94,5 +94,6 @@ class AutomationExecution(OrgModelMixin):
         return self.snapshot['type']
 
     def start(self):
+        from assets.automations.endpoint import ExecutionManager
         manager = ExecutionManager(execution=self)
         return manager.run()

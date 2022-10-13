@@ -26,7 +26,7 @@ class JMSInventory:
     def clean_assets(assets):
         from assets.models import Asset
         asset_ids = [asset.id for asset in assets]
-        assets = Asset.objects.filter(id__in=asset_ids)\
+        assets = Asset.objects.filter(id__in=asset_ids, is_active=True)\
             .prefetch_related('platform', 'domain', 'accounts')
         return assets
 
@@ -58,9 +58,9 @@ class JMSInventory:
         )
         return {"ansible_ssh_common_args": proxy_command}
 
-    def asset_to_host(self, asset, account, automation, protocols):
+    def asset_to_host(self, asset, account, automation, protocols, platform):
         host = {
-            'name': asset.name,
+            'name': '{}'.format(asset.name),
             'jms_asset': {
                 'id': str(asset.id), 'name': asset.name, 'address': asset.address,
                 'type': asset.type, 'category': asset.category,
@@ -72,7 +72,9 @@ class JMSInventory:
                 'secret': account.secret, 'secret_type': account.secret_type
             } if account else None
         }
-        ansible_connection = automation.ansible_config.get('ansible_connection', 'ssh')
+        ansible_config = dict(automation.ansible_config)
+        ansible_connection = ansible_config.pop('ansible_connection', 'ssh')
+        host.update(ansible_config)
         gateway = None
         if asset.domain:
             gateway = asset.domain.select_gateway()
@@ -136,9 +138,9 @@ class JMSInventory:
             automation = platform.automation
             protocols = platform.protocols.all()
 
-            for asset in self.assets:
+            for asset in assets:
                 account = self.select_account(asset)
-                host = self.asset_to_host(asset, account, automation, protocols)
+                host = self.asset_to_host(asset, account, automation, protocols, platform)
 
                 if not automation.ansible_enabled:
                     host['error'] = _('Ansible disabled')

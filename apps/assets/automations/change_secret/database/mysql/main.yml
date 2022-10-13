@@ -4,13 +4,13 @@
     ansible_python_interpreter: /usr/local/bin/python
     jms_account:
       username: root
-      password: redhat
+      secret: redhat
     jms_asset:
       address: 127.0.0.1
       port: 3306
     account:
       username: web1
-      password: jumpserver
+      secret: jumpserver
 
   tasks:
     - name: Test MySQL connection

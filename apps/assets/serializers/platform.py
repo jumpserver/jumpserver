@@ -39,7 +39,7 @@ class PlatformAutomationSerializer(serializers.ModelSerializer):
             'ping_enabled', 'ping_method',
             'gather_facts_enabled', 'gather_facts_method',
             'create_account_enabled', 'create_account_method',
-            'change_password_enabled', 'change_password_method',
+            'change_secret_enabled', 'change_secret_method',
             'verify_account_enabled', 'verify_account_method',
             'gather_accounts_enabled', 'gather_accounts_method',
         ]
@@ -52,8 +52,8 @@ class PlatformAutomationSerializer(serializers.ModelSerializer):
             'verify_account_method': {'label': '校验账号方式'},
             'create_account_enabled': {'label': '启用创建账号'},
             'create_account_method': {'label': '创建账号方式'},
-            'change_password_enabled': {'label': '启用账号创建改密'},
-            'change_password_method': {'label': '账号创建改密方式'},
+            'change_secret_enabled': {'label': '启用账号创建改密'},
+            'change_secret_method': {'label': '账号创建改密方式'},
             'gather_accounts_enabled': {'label': '启用账号收集'},
             'gather_accounts_method': {'label': '收集账号方式'},
         }

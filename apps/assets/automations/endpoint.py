@@ -1,12 +1,12 @@
 # from .backup.manager import AccountBackupExecutionManager
 #
 #
-from .change_password.manager import ChangePasswordManager
+from .change_secret.manager import ChangeSecretManager
 
 
 class ExecutionManager:
     manager_type_mapper = {
-        'change_password': ChangePasswordManager,
+        'change_secret': ChangeSecretManager,
     }
 
     def __init__(self, execution):

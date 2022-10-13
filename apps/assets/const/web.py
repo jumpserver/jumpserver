@@ -22,7 +22,7 @@ class WebTypes(BaseType):
             '*': {
                 'gather_facts_enabled': False,
                 'verify_account_enabled': False,
-                'change_password_enabled': False,
+                'change_secret_enabled': False,
                 'create_account_enabled': False,
                 'gather_accounts_enabled': False,
             }

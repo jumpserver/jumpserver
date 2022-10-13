@@ -17,7 +17,6 @@ logger = get_logger(__name__)
 
 class PlaybookCallback(DefaultCallback):
     def playbook_on_stats(self, event_data, **kwargs):
-        print("\n*** 分任务结果")
         super().playbook_on_stats(event_data, **kwargs)
 
 
@@ -127,7 +126,7 @@ class BasePlaybookManager:
                 playbook_path = os.path.join(sub_playbook_dir, 'part_{}.yml'.format(i))
                 with open(playbook_path, 'w') as f:
                     yaml.safe_dump(plays, f)
-                self.playbooks.append(playbook_path)
+                self.playbooks.append([playbook_path, hosts])
 
                 main_playbook.append({
                     'name': method['name'] + ' for part {}'.format(i),
@@ -157,6 +156,9 @@ class BasePlaybookManager:
     def on_runner_failed(self, runner, e):
         print("Runner failed: {} {}".format(e, self))
 
+    def before_runner_start(self, runner):
+        pass
+
     def run(self, **kwargs):
         self.generate()
         runners = self.get_runners()
@@ -168,6 +170,7 @@ class BasePlaybookManager:
         for i, runner in enumerate(runners, start=1):
             if len(runners) > 1:
                 print(">>> 开始执行第 {} 批任务".format(i))
+            self.before_runner_start(runner)
             try:
                 cb = runner.run(**kwargs)
                 self.on_runner_done(runner, cb)

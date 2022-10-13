@@ -6,5 +6,5 @@
       password: {{ account.password }}
       public_key: {{ account.public_key }}
   roles:
-    - change_password
+    - change_secret
 {% endfor %}

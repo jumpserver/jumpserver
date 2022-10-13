@@ -32,7 +32,7 @@ class DatabaseTypes(BaseType):
                 'gather_facts_enabled': True,
                 'gather_accounts_enabled': True,
                 'verify_account_enabled': True,
-                'change_password_enabled': True,
+                'change_secret_enabled': True,
                 'create_account_enabled': True,
             }
         }

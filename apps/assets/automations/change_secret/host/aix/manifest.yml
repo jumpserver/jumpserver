@@ -1,6 +1,6 @@
-id: change_password_aix
+id: change_secret_aix
 name: Change password for AIX
 category: host
 type:
   - aix
-method: change_password
+method: change_secret
