@@ -89,3 +89,12 @@ def has_asset_system_permission(user: User, asset: Asset, account: str):
     if actions:
         return True
     return False
+
+
+class AssetPermissionUtil(object):
+
+    def get_permed_accounts(self, user=None, asset=None):
+        pass
+
+    def get_related_permissions(self, user=None, asset=None):
+        pass

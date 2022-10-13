@@ -11,7 +11,8 @@ from assets.models import Asset, Node, FamilyMixin, Account
 from orgs.mixins.models import OrgModelMixin
 from orgs.mixins.models import OrgManager
 from common.utils import lazyproperty, date_expired_default
-from common.db.models import BaseCreateUpdateModel, BitOperationChoice, UnionQuerySet
+from common.db.models import BaseCreateUpdateModel, UnionQuerySet
+from .const import Action, SpecialAccount
 
 __all__ = [
     'AssetPermission', 'PermNode',
@@ -21,44 +22,6 @@ __all__ = [
 
 # 使用场景
 logger = logging.getLogger(__name__)
-
-
-class Action(BitOperationChoice):
-    ALL = 0xff
-    CONNECT = 0b1
-    UPLOAD = 0b1 << 1
-    DOWNLOAD = 0b1 << 2
-    CLIPBOARD_COPY = 0b1 << 3
-    CLIPBOARD_PASTE = 0b1 << 4
-    UPDOWNLOAD = UPLOAD | DOWNLOAD
-    CLIPBOARD_COPY_PASTE = CLIPBOARD_COPY | CLIPBOARD_PASTE
-
-    DB_CHOICES = (
-        (ALL, _('All')),
-        (CONNECT, _('Connect')),
-        (UPLOAD, _('Upload file')),
-        (DOWNLOAD, _('Download file')),
-        (UPDOWNLOAD, _("Upload download")),
-        (CLIPBOARD_COPY, _('Clipboard copy')),
-        (CLIPBOARD_PASTE, _('Clipboard paste')),
-        (CLIPBOARD_COPY_PASTE, _('Clipboard copy paste'))
-    )
-
-    NAME_MAP = {
-        ALL: "all",
-        CONNECT: "connect",
-        UPLOAD: "upload_file",
-        DOWNLOAD: "download_file",
-        UPDOWNLOAD: "updownload",
-        CLIPBOARD_COPY: 'clipboard_copy',
-        CLIPBOARD_PASTE: 'clipboard_paste',
-        CLIPBOARD_COPY_PASTE: 'clipboard_copy_paste'
-    }
-
-    NAME_MAP_REVERSE = {v: k for k, v in NAME_MAP.items()}
-    CHOICES = []
-    for i, j in DB_CHOICES:
-        CHOICES.append((NAME_MAP[i], j))
 
 
 class AssetPermissionQuerySet(models.QuerySet):
@@ -79,7 +42,7 @@ class AssetPermissionQuerySet(models.QuerySet):
 
     def filter_by_accounts(self, accounts):
         q = Q(accounts__contains=list(accounts)) | \
-            Q(accounts__contains=AssetPermission.SpecialAccount.ALL.value)
+            Q(accounts__contains=SpecialAccount.ALL.value)
         return self.filter(q)
 
 
@@ -89,32 +52,32 @@ class AssetPermissionManager(OrgManager):
 
 
 class AssetPermission(OrgModelMixin):
-    class SpecialAccount(models.TextChoices):
-        ALL = '@ALL', 'All'
-
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
-    users = models.ManyToManyField('users.User', blank=True, verbose_name=_("User"),
-                                   related_name='%(class)ss')
-    user_groups = models.ManyToManyField('users.UserGroup', blank=True,
-                                         verbose_name=_("User group"), related_name='%(class)ss')
-    assets = models.ManyToManyField('assets.Asset', related_name='granted_by_permissions',
-                                    blank=True, verbose_name=_("Asset"))
-    nodes = models.ManyToManyField('assets.Node', related_name='granted_by_permissions', blank=True,
-                                   verbose_name=_("Nodes"))
-    # 只保存 @ALL (@INPUT @USER 默认包含，将来在全局设置中进行控制)
-    # 特殊的账号描述
-    # ['@ALL',]
-    # 指定账号授权
-    # ['web', 'root',]
+    users = models.ManyToManyField(
+        'users.User', related_name='%(class)ss', blank=True, verbose_name=_("User")
+    )
+    user_groups = models.ManyToManyField(
+        'users.UserGroup', related_name='%(class)ss', blank=True, verbose_name=_("User group")
+    )
+    assets = models.ManyToManyField(
+        'assets.Asset', related_name='granted_by_permissions', blank=True, verbose_name=_("Asset")
+    )
+    nodes = models.ManyToManyField(
+        'assets.Node', related_name='granted_by_permissions', blank=True, verbose_name=_("Nodes")
+    )
+    # 特殊的账号: @ALL, @INPUT @USER 默认包含，将来在全局设置中进行控制.
     accounts = models.JSONField(default=list, verbose_name=_("Accounts"))
-    actions = models.IntegerField(choices=Action.DB_CHOICES, default=Action.ALL,
-                                  verbose_name=_("Actions"))
+    actions = models.IntegerField(
+        choices=Action.DB_CHOICES, default=Action.ALL, verbose_name=_("Actions")
+    )
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
-    date_start = models.DateTimeField(default=timezone.now, db_index=True,
-                                      verbose_name=_("Date start"))
-    date_expired = models.DateTimeField(default=date_expired_default, db_index=True,
-                                        verbose_name=_('Date expired'))
+    date_start = models.DateTimeField(
+        default=timezone.now, db_index=True, verbose_name=_("Date start")
+    )
+    date_expired = models.DateTimeField(
+        default=date_expired_default, db_index=True, verbose_name=_('Date expired')
+    )
     created_by = models.CharField(max_length=128, blank=True, verbose_name=_('Created by'))
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
     from_ticket = models.BooleanField(default=False, verbose_name=_('From ticket'))
@@ -132,10 +95,6 @@ class AssetPermission(OrgModelMixin):
         return self.name
 
     @property
-    def id_str(self):
-        return str(self.id)
-
-    @property
     def is_expired(self):
         if self.date_expired > timezone.now() > self.date_start:
             return False
@@ -147,15 +106,6 @@ class AssetPermission(OrgModelMixin):
             return True
         return False
 
-    @property
-    def all_users(self):
-        from users.models import User
-        users_query = self._meta.get_field('users').related_query_name()
-        user_groups_query = self._meta.get_field('user_groups').related_query_name()
-        users_q = Q(**{f'{users_query}': self})
-        user_groups_q = Q(**{f'groups__{user_groups_query}': self})
-        return User.objects.filter(users_q | user_groups_q).distinct()
-
     def get_all_users(self):
         from users.models import User
         user_ids = self.users.all().values_list('id', flat=True)
@@ -166,6 +116,21 @@ class AssetPermission(OrgModelMixin):
         qs2 = User.objects.filter(groups__id__in=group_ids).distinct()
         qs = UnionQuerySet(qs1, qs2)
         return qs
+
+    def get_all_assets(self, flat=False):
+        from assets.models import Node
+        nodes_keys = self.nodes.all().values_list('key', flat=True)
+        asset_ids = set(self.assets.all().values_list('id', flat=True))
+        nodes_asset_ids = Node.get_nodes_all_asset_ids_by_keys(nodes_keys)
+        asset_ids.update(nodes_asset_ids)
+        if flat:
+            return asset_ids
+        assets = Asset.objects.filter(id__in=asset_ids)
+        return assets
+
+    def get_all_accounts(self):
+        """ TODO: 获取所有账号 (Account 对象) """
+        pass
 
     @lazyproperty
     def users_amount(self):
@@ -182,25 +147,6 @@ class AssetPermission(OrgModelMixin):
     @lazyproperty
     def nodes_amount(self):
         return self.nodes.count()
-
-    @classmethod
-    def get_queryset_with_prefetch(cls):
-        return cls.objects.all().valid().prefetch_related(
-            models.Prefetch('nodes', queryset=Node.objects.all().only('key')),
-            models.Prefetch('assets', queryset=Asset.objects.all().only('id')),
-        ).order_by()
-
-    def get_all_assets(self, flat=False):
-        from assets.models import Node
-        nodes_keys = self.nodes.all().values_list('key', flat=True)
-        asset_ids = set(self.assets.all().values_list('id', flat=True))
-        nodes_asset_ids = Node.get_nodes_all_asset_ids_by_keys(nodes_keys)
-        asset_ids.update(nodes_asset_ids)
-        if flat:
-            return asset_ids
-        else:
-            assets = Asset.objects.filter(id__in=asset_ids)
-            return assets
 
     def users_display(self):
         names = [user.username for user in self.users.all()]
