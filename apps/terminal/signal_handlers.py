@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from django.db.models.signals import post_save, post_delete
+from django.db.utils import ProgrammingError
 
 from common.signals import django_ready
 from django.dispatch import receiver
@@ -17,7 +18,10 @@ logger = get_logger(__file__)
 @receiver(django_ready)
 def init_db_port_mapper(sender, **kwargs):
     logger.info('Init db port mapper')
-    db_port_manager.init()
+    try:
+        db_port_manager.init()
+    except (ProgrammingError,) as e:
+        logger.error('Init db port mapper error: {}'.format(e))
 
 
 @receiver(post_save, sender=Application)
