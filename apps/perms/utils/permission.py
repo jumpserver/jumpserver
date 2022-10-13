@@ -11,10 +11,6 @@ from perms.utils.user_permission import get_user_all_asset_perm_ids
 logger = get_logger(__file__)
 
 
-class AssetPermissionUtil(object):
-    pass
-
-
 def validate_permission(user, asset, account, action='connect'):
     asset_perm_ids = get_user_all_asset_perm_ids(user)
 
@@ -93,3 +89,12 @@ def has_asset_system_permission(user: User, asset: Asset, account: str):
     if actions:
         return True
     return False
+
+
+class AssetPermissionUtil(object):
+
+    def get_permed_accounts(self, user=None, asset=None):
+        pass
+
+    def get_related_permissions(self, user=None, asset=None):
+        pass
