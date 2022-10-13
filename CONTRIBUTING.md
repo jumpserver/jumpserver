@@ -23,3 +23,4 @@ When reporting issues, always include:
 
 Because the issues are open to the public, when submitting files, be sure to remove any sensitive information, e.g. user name, password, IP address, and company name. You can
 replace those parts with "REDACTED" or other strings like "****".
+

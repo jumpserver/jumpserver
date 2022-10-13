@@ -23,7 +23,7 @@ class ApplyAssetSerializer(BaseApplyAssetApplicationSerializer, TicketApplySeria
         model = ApplyAssetTicket
         writeable_fields = [
             'id', 'title', 'type', 'apply_nodes', 'apply_assets',
-            'apply_system_users', 'apply_actions',
+            'apply_system_users', 'apply_actions', 'comment',
             'apply_date_start', 'apply_date_expired', 'org_id'
         ]
         fields = TicketApplySerializer.Meta.fields + \

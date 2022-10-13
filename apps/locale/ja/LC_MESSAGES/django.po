@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-15 15:52+0800\n"
+"POT-Creation-Date: 2022-09-22 19:01+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,13 +23,13 @@ msgid "Acls"
 msgstr "Acls"
 
 #: acls/models/base.py:25 acls/serializers/login_asset_acl.py:47
-#: applications/models/application.py:220 assets/models/asset.py:138
+#: applications/models/application.py:219 assets/models/asset.py:138
 #: assets/models/base.py:175 assets/models/cluster.py:18
 #: assets/models/cmd_filter.py:27 assets/models/domain.py:23
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
 #: orgs/models.py:70 perms/models/base.py:83 rbac/models/role.py:29
 #: settings/models.py:33 settings/serializers/sms.py:6
-#: terminal/models/endpoint.py:10 terminal/models/endpoint.py:86
+#: terminal/models/endpoint.py:14 terminal/models/endpoint.py:87
 #: terminal/models/storage.py:26 terminal/models/task.py:16
 #: terminal/models/terminal.py:100 users/forms/profile.py:33
 #: users/models/group.py:15 users/models/user.py:669
@@ -38,12 +38,12 @@ msgid "Name"
 msgstr "名前"
 
 #: acls/models/base.py:27 assets/models/cmd_filter.py:84
-#: assets/models/user.py:251 terminal/models/endpoint.py:89
+#: assets/models/user.py:251 terminal/models/endpoint.py:90
 msgid "Priority"
 msgstr "優先順位"
 
 #: acls/models/base.py:28 assets/models/cmd_filter.py:84
-#: assets/models/user.py:251 terminal/models/endpoint.py:90
+#: assets/models/user.py:251 terminal/models/endpoint.py:91
 msgid "1-100, the lower the value will be match first"
 msgstr "1-100、低い値は最初に一致します"
 
@@ -53,7 +53,7 @@ msgstr "1-100、低い値は最初に一致します"
 msgid "Active"
 msgstr "アクティブ"
 
-#: acls/models/base.py:32 applications/models/application.py:233
+#: acls/models/base.py:32 applications/models/application.py:232
 #: assets/models/asset.py:143 assets/models/asset.py:231
 #: assets/models/backup.py:54 assets/models/base.py:180
 #: assets/models/cluster.py:29 assets/models/cmd_filter.py:48
@@ -61,7 +61,7 @@ msgstr "アクティブ"
 #: assets/models/domain.py:65 assets/models/group.py:23
 #: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:73
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:38
-#: terminal/models/endpoint.py:23 terminal/models/endpoint.py:96
+#: terminal/models/endpoint.py:22 terminal/models/endpoint.py:97
 #: terminal/models/storage.py:29 terminal/models/terminal.py:114
 #: tickets/models/comment.py:32 tickets/models/ticket/general.py:288
 #: users/models/group.py:16 users/models/user.py:706
@@ -241,7 +241,7 @@ msgstr ""
 msgid "Time Period"
 msgstr "期間"
 
-#: applications/apps.py:9 applications/models/application.py:64
+#: applications/apps.py:9 applications/models/application.py:62
 msgid "Applications"
 msgstr "アプリケーション"
 
@@ -260,11 +260,7 @@ msgstr "リモートアプリ"
 msgid "Custom"
 msgstr "カスタム"
 
-#: applications/const.py:91 rbac/tree.py:29
-msgid "Other"
-msgstr "その他"
-
-#: applications/models/account.py:12 applications/models/application.py:237
+#: applications/models/account.py:12 applications/models/application.py:236
 #: assets/models/backup.py:32 assets/models/cmd_filter.py:45
 #: authentication/models.py:67 authentication/models.py:95
 #: perms/models/application_permission.py:28
@@ -282,9 +278,8 @@ msgstr "アプリケーション"
 msgid "System user"
 msgstr "システムユーザー"
 
-#: applications/models/account.py:17
-#: applications/serializers/attrs/application_type/oracle.py:13
-#: assets/models/authbook.py:21 settings/serializers/auth/cas.py:18
+#: applications/models/account.py:17 assets/models/authbook.py:21
+#: settings/serializers/auth/cas.py:18
 msgid "Version"
 msgstr "バージョン"
 
@@ -300,7 +295,7 @@ msgstr "アプリケーションアカウントの秘密を表示できます"
 msgid "Can change application account secret"
 msgstr "アプリケーションアカウントの秘密を変更できます"
 
-#: applications/models/application.py:222
+#: applications/models/application.py:221
 #: applications/serializers/application.py:101 assets/models/label.py:21
 #: perms/models/application_permission.py:21
 #: perms/serializers/application/user_permission.py:33
@@ -309,7 +304,7 @@ msgstr "アプリケーションアカウントの秘密を変更できます"
 msgid "Category"
 msgstr "カテゴリ"
 
-#: applications/models/application.py:225
+#: applications/models/application.py:224
 #: applications/serializers/application.py:103 assets/models/backup.py:49
 #: assets/models/cmd_filter.py:82 assets/models/user.py:250
 #: authentication/models.py:70 perms/models/application_permission.py:24
@@ -323,21 +318,21 @@ msgstr "カテゴリ"
 msgid "Type"
 msgstr "タイプ"
 
-#: applications/models/application.py:229 assets/models/asset.py:217
+#: applications/models/application.py:228 assets/models/asset.py:217
 #: assets/models/domain.py:29 assets/models/domain.py:64
 msgid "Domain"
 msgstr "ドメイン"
 
-#: applications/models/application.py:231 xpack/plugins/cloud/models.py:33
+#: applications/models/application.py:230 xpack/plugins/cloud/models.py:33
 #: xpack/plugins/cloud/serializers/account.py:63
 msgid "Attrs"
 msgstr "ツールバーの"
 
-#: applications/models/application.py:241
+#: applications/models/application.py:240
 msgid "Can match application"
 msgstr "アプリケーションを一致させることができます"
 
-#: applications/models/application.py:320
+#: applications/models/application.py:310
 msgid "Application user"
 msgstr "アプリケーションユーザー"
 
@@ -393,7 +388,7 @@ msgstr "クラスター"
 
 #: applications/serializers/attrs/application_category/db.py:11
 #: ops/models/adhoc.py:157 settings/serializers/auth/radius.py:14
-#: settings/serializers/auth/sms.py:65 terminal/models/endpoint.py:11
+#: settings/serializers/auth/sms.py:65 terminal/models/endpoint.py:15
 #: xpack/plugins/cloud/serializers/account_attrs.py:72
 msgid "Host"
 msgstr "ホスト"
@@ -402,7 +397,7 @@ msgstr "ホスト"
 #: applications/serializers/attrs/application_type/mongodb.py:10
 #: applications/serializers/attrs/application_type/mysql.py:10
 #: applications/serializers/attrs/application_type/mysql_workbench.py:22
-#: applications/serializers/attrs/application_type/oracle.py:16
+#: applications/serializers/attrs/application_type/oracle.py:10
 #: applications/serializers/attrs/application_type/pgsql.py:10
 #: applications/serializers/attrs/application_type/redis.py:10
 #: applications/serializers/attrs/application_type/sqlserver.py:10
@@ -496,10 +491,6 @@ msgstr "Mysql workbench のユーザー名"
 #: applications/serializers/attrs/application_type/mysql_workbench.py:42
 msgid "Mysql workbench password"
 msgstr "Mysql workbench パスワード"
-
-#: applications/serializers/attrs/application_type/oracle.py:14
-msgid "Magnus currently supports only 11g and 12c connections"
-msgstr "現在、Magnusは11gおよび12cバージョンへの接続のみをサポートしています"
 
 #: applications/serializers/attrs/application_type/vmware_client.py:26
 msgid "Vmware username"
@@ -3457,6 +3448,10 @@ msgstr "監査ビュー"
 msgid "System setting"
 msgstr "システム設定"
 
+#: rbac/tree.py:29
+msgid "Other"
+msgstr "その他"
+
 #: rbac/tree.py:37
 msgid "Accounts"
 msgstr "アカウント"
@@ -4956,58 +4951,34 @@ msgstr "ストレージが無効です"
 msgid "Command record"
 msgstr "コマンドレコード"
 
-#: terminal/models/endpoint.py:13
+#: terminal/models/endpoint.py:17
 msgid "HTTPS Port"
 msgstr "HTTPS ポート"
 
-#: terminal/models/endpoint.py:14 terminal/models/terminal.py:107
+#: terminal/models/endpoint.py:18 terminal/models/terminal.py:107
 msgid "HTTP Port"
 msgstr "HTTP ポート"
 
-#: terminal/models/endpoint.py:15 terminal/models/terminal.py:106
+#: terminal/models/endpoint.py:19 terminal/models/terminal.py:106
 msgid "SSH Port"
 msgstr "SSH ポート"
 
-#: terminal/models/endpoint.py:16
+#: terminal/models/endpoint.py:20
 msgid "RDP Port"
 msgstr "RDP ポート"
 
-#: terminal/models/endpoint.py:17
-msgid "MySQL Port"
-msgstr "MySQL ポート"
-
-#: terminal/models/endpoint.py:18
-msgid "MariaDB Port"
-msgstr "MariaDB ポート"
-
-#: terminal/models/endpoint.py:19
-msgid "PostgreSQL Port"
-msgstr "PostgreSQL ポート"
-
-#: terminal/models/endpoint.py:20
-msgid "Redis Port"
-msgstr "Redis ポート"
-
-#: terminal/models/endpoint.py:21
-msgid "Oracle 11g Port"
-msgstr "Oracle 11g ポート"
-
-#: terminal/models/endpoint.py:22
-msgid "Oracle 12c Port"
-msgstr "Oracle 12c ポート"
-
-#: terminal/models/endpoint.py:28 terminal/models/endpoint.py:94
+#: terminal/models/endpoint.py:27 terminal/models/endpoint.py:95
 #: terminal/serializers/endpoint.py:57 terminal/serializers/storage.py:38
 #: terminal/serializers/storage.py:50 terminal/serializers/storage.py:80
 #: terminal/serializers/storage.py:90 terminal/serializers/storage.py:98
 msgid "Endpoint"
 msgstr "エンドポイント"
 
-#: terminal/models/endpoint.py:87
+#: terminal/models/endpoint.py:88
 msgid "IP group"
 msgstr "IP グループ"
 
-#: terminal/models/endpoint.py:99
+#: terminal/models/endpoint.py:100
 msgid "Endpoint rule"
 msgstr "エンドポイントルール"
 
@@ -5188,9 +5159,19 @@ msgstr "レベル"
 msgid "Batch danger command alert"
 msgstr "一括危険コマンド警告"
 
-#: terminal/serializers/endpoint.py:12
-msgid "Oracle port"
-msgstr ""
+#: terminal/serializers/endpoint.py:14
+msgid "Magnus listen db port"
+msgstr "Magnus がリッスンするデータベース ポート"
+
+#: terminal/serializers/endpoint.py:17
+msgid "Magnus Listen port range"
+msgstr "Magnus がリッスンするポート範囲"
+
+#: terminal/serializers/endpoint.py:19
+msgid ""
+"The range of ports that Magnus listens on is modified in the configuration "
+"file"
+msgstr "Magnus がリッスンするポート範囲を構成ファイルで変更してください"
 
 #: terminal/serializers/endpoint.py:51
 msgid ""
@@ -5320,6 +5301,16 @@ msgstr "見つかりません"
 #: terminal/templates/terminal/_msg_command_alert.html:10
 msgid "view"
 msgstr "表示"
+
+#: terminal/utils/db_port_mapper.py:77
+msgid ""
+"No ports can be used, check and modify the limit on the number of ports that "
+"Magnus listens on in the configuration file."
+msgstr "使用できるポートがありません。設定ファイルで Magnus がリッスンするポート数の制限を確認して変更してください. "
+
+#: terminal/utils/db_port_mapper.py:79
+msgid "All available port count: {}, Already use port count: {}"
+msgstr "使用可能なすべてのポート数: {}、すでに使用しているポート数: {}"
 
 #: tickets/apps.py:7
 msgid "Tickets"

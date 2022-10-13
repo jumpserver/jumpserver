@@ -22,9 +22,7 @@ JumpServer 使用 Python 开发，配备了业界领先的 Web Terminal 方案�
 
 JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向扩展，无资产数量及并发限制。
 
-改变世界，从一点点开始 ...
 
-> 如需进一步了解 JumpServer 开源项目，推荐阅读 [JumpServer 的初心和使命](https://mp.weixin.qq.com/s/S6q_2rP_9MwaVwyqLQnXzA)
 
 ### 特色优势
 
@@ -102,7 +100,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 - [沐瞳游戏：通过JumpServer管控多项目分布式资产](https://blog.fit2cloud.com/?p=3213)
 - [携程：JumpServer 堡垒机部署与运营实战](https://blog.fit2cloud.com/?p=851)
 - [大智慧：JumpServer 堡垒机让“大智慧”的混合 IT 运维更智慧](https://blog.fit2cloud.com/?p=882)
-- [小红书：的JumpServer堡垒机大规模资产跨版本迁移之路](https://blog.fit2cloud.com/?p=516)
+- [小红书：JumpServer 堡垒机大规模资产跨版本迁移之路](https://blog.fit2cloud.com/?p=516)
 - [中手游：JumpServer堡垒机助力中手游提升多云环境下安全运维能力](https://blog.fit2cloud.com/?p=732)
 - [中通快递：JumpServer主机安全运维实践](https://blog.fit2cloud.com/?p=708)
 - [东方明珠：JumpServer高效管控异构化、分布式云端资产](https://blog.fit2cloud.com/?p=687)

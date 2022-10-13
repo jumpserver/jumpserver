@@ -10,9 +10,7 @@ from common.mixins import CommonModelMixin
 from common.tree import TreeNode
 from common.utils import is_uuid
 from assets.models import Asset, SystemUser
-from ..const import OracleVersion
 
-from ..utils import KubernetesTree
 from .. import const
 
 
@@ -175,6 +173,7 @@ class ApplicationTreeNodeMixin:
         return pid
 
     def as_tree_node(self, pid, k8s_as_tree=False):
+        from ..utils import KubernetesTree
         if self.type == const.AppType.k8s and k8s_as_tree:
             node = KubernetesTree(pid).as_tree_node(self)
         else:
@@ -303,15 +302,6 @@ class Application(CommonModelMixin, OrgModelMixin, ApplicationTreeNodeMixin):
         elif self.category_db:
             target_ip = self.attrs.get('host')
         return target_ip
-
-    def get_target_protocol_for_oracle(self):
-        """ Oracle 类型需要单独处理，因为要携带版本号 """
-        if not self.is_type(self.APP_TYPE.oracle):
-            return
-        version = self.attrs.get('version', OracleVersion.version_12c)
-        if version == OracleVersion.version_other:
-            return
-        return 'oracle_%s' % version
 
 
 class ApplicationUser(SystemUser):

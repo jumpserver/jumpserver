@@ -271,7 +271,10 @@ class Saml2AuthCallbackView(View, PrepareRequestMixin):
             auth.login(self.request, user)
 
         logger.debug(log_prompt.format('Redirect'))
-        next_url = saml_instance.redirect_to(post_data.get('RelayState', '/'))
+        redir = post_data.get('RelayState')
+        if not redir or len(redir) == 0:
+          redir = "/"
+        next_url = saml_instance.redirect_to(redir)
         return HttpResponseRedirect(next_url)
 
     @csrf_exempt

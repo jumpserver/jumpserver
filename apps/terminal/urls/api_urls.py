@@ -24,6 +24,7 @@ router.register(r'session-sharings', api.SessionSharingViewSet, 'session-sharing
 router.register(r'session-join-records', api.SessionJoinRecordsViewSet, 'session-sharing-record')
 router.register(r'endpoints', api.EndpointViewSet, 'endpoint')
 router.register(r'endpoint-rules', api.EndpointRuleViewSet, 'endpoint-rule')
+router.register(r'db-listen-ports', api.DBListenPortViewSet, 'db-listen-ports')
 
 urlpatterns = [
     path('my-sessions/', api.MySessionAPIView.as_view(), name='my-session'),
