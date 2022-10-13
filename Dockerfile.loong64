@@ -22,6 +22,7 @@ ARG DEPENDENCIES="                    \
         freetds-dev                   \
         libpq-dev                     \
         libffi-dev                    \
+        libjpeg-dev                   \
         libldap2-dev                  \
         libsasl2-dev                  \
         libxml2-dev                   \
