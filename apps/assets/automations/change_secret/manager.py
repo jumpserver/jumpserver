@@ -121,8 +121,10 @@ class ChangeSecretManager(BasePlaybookManager):
         ChangeSecretRecord.objects.bulk_create(records)
         return inventory_hosts
 
-    def on_runner_done(self, runner, cb):
-        summary = runner.summary
+    def on_runner_success(self, runner, cb):
+        summary = cb.summary
+        print("Summary: ")
+        print(summary)
 
     def on_runner_failed(self, runner, e):
         pass
