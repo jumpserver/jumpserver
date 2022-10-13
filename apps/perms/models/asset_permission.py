@@ -11,7 +11,8 @@ from assets.models import Asset, Node, FamilyMixin, Account
 from orgs.mixins.models import OrgModelMixin
 from orgs.mixins.models import OrgManager
 from common.utils import lazyproperty, date_expired_default
-from common.db.models import BaseCreateUpdateModel, BitOperationChoice, UnionQuerySet
+from common.db.models import BaseCreateUpdateModel, UnionQuerySet
+from .const import Action, SpecialAccount
 
 __all__ = [
     'AssetPermission', 'PermNode',
@@ -21,44 +22,6 @@ __all__ = [
 
 # 使用场景
 logger = logging.getLogger(__name__)
-
-
-class Action(BitOperationChoice):
-    ALL = 0xff
-    CONNECT = 0b1
-    UPLOAD = 0b1 << 1
-    DOWNLOAD = 0b1 << 2
-    CLIPBOARD_COPY = 0b1 << 3
-    CLIPBOARD_PASTE = 0b1 << 4
-    UPDOWNLOAD = UPLOAD | DOWNLOAD
-    CLIPBOARD_COPY_PASTE = CLIPBOARD_COPY | CLIPBOARD_PASTE
-
-    DB_CHOICES = (
-        (ALL, _('All')),
-        (CONNECT, _('Connect')),
-        (UPLOAD, _('Upload file')),
-        (DOWNLOAD, _('Download file')),
-        (UPDOWNLOAD, _("Upload download")),
-        (CLIPBOARD_COPY, _('Clipboard copy')),
-        (CLIPBOARD_PASTE, _('Clipboard paste')),
-        (CLIPBOARD_COPY_PASTE, _('Clipboard copy paste'))
-    )
-
-    NAME_MAP = {
-        ALL: "all",
-        CONNECT: "connect",
-        UPLOAD: "upload_file",
-        DOWNLOAD: "download_file",
-        UPDOWNLOAD: "updownload",
-        CLIPBOARD_COPY: 'clipboard_copy',
-        CLIPBOARD_PASTE: 'clipboard_paste',
-        CLIPBOARD_COPY_PASTE: 'clipboard_copy_paste'
-    }
-
-    NAME_MAP_REVERSE = {v: k for k, v in NAME_MAP.items()}
-    CHOICES = []
-    for i, j in DB_CHOICES:
-        CHOICES.append((NAME_MAP[i], j))
 
 
 class AssetPermissionQuerySet(models.QuerySet):
@@ -79,7 +42,7 @@ class AssetPermissionQuerySet(models.QuerySet):
 
     def filter_by_accounts(self, accounts):
         q = Q(accounts__contains=list(accounts)) | \
-            Q(accounts__contains=AssetPermission.SpecialAccount.ALL.value)
+            Q(accounts__contains=SpecialAccount.ALL.value)
         return self.filter(q)
 
 
@@ -89,9 +52,6 @@ class AssetPermissionManager(OrgManager):
 
 
 class AssetPermission(OrgModelMixin):
-    class SpecialAccount(models.TextChoices):
-        ALL = '@ALL', 'All'
-
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     users = models.ManyToManyField('users.User', blank=True, verbose_name=_("User"),

@@ -2,3 +2,4 @@
 #
 
 from .asset_permission import *
+from .const import *
