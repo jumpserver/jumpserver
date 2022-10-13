@@ -1,0 +1,7 @@
+id: gather_facts_windows
+name: Gather facts windows
+version: 1
+method: gather_facts
+category: host
+type:
+  - windows

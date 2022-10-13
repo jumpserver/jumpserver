@@ -77,6 +77,15 @@ class BaseAccount(OrgModelMixin):
         return bool(self.secret)
 
     @property
+    def password(self):
+        return self.secret
+
+    @password.setter
+    def password(self, value):
+        self.secret = value
+        self.secret_type = 'password'
+
+    @property
     def private_key(self):
         if self.secret_type == self.SecretType.ssh_key:
             return self.secret
@@ -90,15 +99,6 @@ class BaseAccount(OrgModelMixin):
     def private_key(self, value):
         self.secret = value
         self.secret_type = 'private_key'
-
-    @property
-    def password(self):
-        return self.secret
-
-    @password.setter
-    def password(self, value):
-        self.secret = value
-        self.secret_type = 'password'
 
     @property
     def ssh_key_fingerprint(self):
@@ -125,8 +125,8 @@ class BaseAccount(OrgModelMixin):
             return None
 
     @property
-    def private_key_file(self):
-        if not self.private_key_obj:
+    def private_key_path(self):
+        if not self.secret_type != 'ssh_key' or not self.secret:
             return None
         project_dir = settings.PROJECT_DIR
         tmp_dir = os.path.join(project_dir, 'tmp')

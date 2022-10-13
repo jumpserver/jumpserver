@@ -3,8 +3,9 @@
 from django.db.models import Q
 from rest_framework import filters
 from rest_framework.compat import coreapi, coreschema
+from django_filters import rest_framework as drf_filters
 
-from common.drf.filters import BaseFilterSet, UUIDInFilter
+from common.drf.filters import BaseFilterSet
 from assets.utils import is_query_node_all_assets, get_node_from_request
 from .models import Label, Node, Account
 
@@ -157,15 +158,16 @@ class IpInFilterBackend(filters.BaseFilterBackend):
 
 
 class AccountFilterSet(BaseFilterSet):
-    from django_filters import rest_framework as filters
-    ip = filters.CharFilter(field_name='address', lookup_expr='exact')
-    hostname = filters.CharFilter(field_name='name', lookup_expr='exact')
-    username = filters.CharFilter(field_name="username", lookup_expr='exact')
-    address = filters.CharFilter(field_name="asset__address", lookup_expr='exact')
-    assets = UUIDInFilter(field_name='asset_id', lookup_expr='in')
-    nodes = UUIDInFilter(method='filter_nodes')
+    ip = drf_filters.CharFilter(field_name='address', lookup_expr='exact')
+    hostname = drf_filters.CharFilter(field_name='name', lookup_expr='exact')
+    username = drf_filters.CharFilter(field_name="username", lookup_expr='exact')
+    address = drf_filters.CharFilter(field_name="asset__address", lookup_expr='exact')
+    asset = drf_filters.CharFilter(field_name="asset_id", lookup_expr='exact')
+    assets = drf_filters.CharFilter(field_name='asset_id', lookup_expr='in')
+    nodes = drf_filters.CharFilter(method='filter_nodes')
 
-    def filter_nodes(self, queryset, name, value):
+    @staticmethod
+    def filter_nodes(queryset, name, value):
         nodes = Node.objects.filter(id__in=value)
         if not nodes:
             return queryset
@@ -179,6 +181,4 @@ class AccountFilterSet(BaseFilterSet):
 
     class Meta:
         model = Account
-        fields = [
-            'asset', 'id'
-        ]
+        fields = ['id']

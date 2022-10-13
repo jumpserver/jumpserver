@@ -1,0 +1,7 @@
+id: change_secret_linux
+name: Change password for Linux
+category: host
+type:
+  - unix
+  - linux
+method: change_secret

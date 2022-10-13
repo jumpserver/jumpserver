@@ -5,11 +5,11 @@ from collections import defaultdict
 from functools import partial
 
 from django.dispatch import receiver
+from django.conf import settings
 from django.utils.functional import LazyObject
-from django.db.models.signals import m2m_changed
-from django.db.models.signals import post_save, pre_delete
+from django.db.models.signals import post_save, pre_delete, m2m_changed
 
-from orgs.utils import tmp_to_org
+from orgs.utils import tmp_to_org, set_to_default_org
 from orgs.models import Organization
 from orgs.hands import set_current_org, Node, get_current_org
 from perms.models import AssetPermission
@@ -44,6 +44,8 @@ def expire_orgs_mapping_for_memory(org_id):
 @receiver(django_ready)
 def subscribe_orgs_mapping_expire(sender, **kwargs):
     logger.debug("Start subscribe for expire orgs mapping from memory")
+    if settings.DEBUG:
+        set_to_default_org()
 
     def keep_subscribe_org_mapping():
         orgs_mapping_for_memory_pub_sub.subscribe(

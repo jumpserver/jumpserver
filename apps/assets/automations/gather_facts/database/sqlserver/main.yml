@@ -1,0 +1,10 @@
+{% for account in accounts %}
+- hosts: {{ account.asset.name }}
+  vars:
+    account:
+      username: {{ account.username }}
+      password: {{ account.password }}
+      public_key: {{ account.public_key }}
+  roles:
+    - change_secret
+{% endfor %}

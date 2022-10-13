@@ -38,7 +38,7 @@ class AllTypes(ChoicesMixin):
 
     @classmethod
     def set_automation_methods(cls, category, tp, constraints):
-        from assets.playbooks import filter_platform_methods
+        from assets.automations import filter_platform_methods
         automation = constraints.get('automation', {})
         automation_methods = {}
         for item, enabled in automation.items():

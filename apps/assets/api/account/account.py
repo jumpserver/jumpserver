@@ -18,7 +18,6 @@ __all__ = ['AccountViewSet', 'AccountSecretsViewSet', 'AccountTaskCreateAPI']
 
 class AccountViewSet(OrgBulkModelViewSet):
     model = Account
-    filterset_fields = ("username", "asset", 'name')
     search_fields = ('username', 'asset__address', 'name')
     filterset_class = AccountFilterSet
     serializer_classes = {
@@ -33,7 +32,7 @@ class AccountViewSet(OrgBulkModelViewSet):
     @action(methods=['post'], detail=True, url_path='verify')
     def verify_account(self, request, *args, **kwargs):
         account = super().get_object()
-        task = test_accounts_connectivity_manual.delay([account])
+        task = test_accounts_connectivity_manual.delay([account.id])
         return Response(data={'task': task.id})
 
 
@@ -54,7 +53,6 @@ class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
 
 class AccountTaskCreateAPI(CreateAPIView):
     serializer_class = serializers.AccountTaskSerializer
-    filterset_fields = AccountViewSet.filterset_fields
     search_fields = AccountViewSet.search_fields
     filterset_class = AccountViewSet.filterset_class
 
@@ -67,8 +65,8 @@ class AccountTaskCreateAPI(CreateAPIView):
         return queryset
 
     def perform_create(self, serializer):
-        accounts = self.get_accounts()
-        task = test_accounts_connectivity_manual.delay(accounts)
+        account_ids = self.get_accounts().values_list('id', flat=True)
+        task = test_accounts_connectivity_manual.delay(account_ids)
         data = getattr(serializer, '_data', {})
         data["task"] = task.id
         setattr(serializer, '_data', data)

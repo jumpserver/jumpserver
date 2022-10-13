@@ -1,0 +1,23 @@
+- hosts: postgre
+  gather_facts: no
+  vars:
+    ansible_python_interpreter: /usr/local/bin/python
+    jms_account:
+      username: postgre
+      secret: postgre
+    jms_asset:
+      address: 127.0.0.1
+      port: 5432
+      database: testdb
+    account:
+      username: test
+      secret: jumpserver
+
+  tasks:
+    - name: Test PostgreSQL connection
+      community.postgresql.postgresql_ping:
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        login_db: "{{ jms_asset.database }}"

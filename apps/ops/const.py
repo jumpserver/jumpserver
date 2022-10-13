@@ -6,7 +6,7 @@ class StrategyChoice(models.TextChoices):
     push = 'push', _('Push')
     verify = 'verify', _('Verify')
     collect = 'collect', _('Collect')
-    change_password = 'change_password', _('Change password')
+    change_secret = 'change_secret', _('Change password')
 
 
 class SSHKeyStrategy(models.TextChoices):

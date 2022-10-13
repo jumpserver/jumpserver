@@ -1,0 +1,30 @@
+- hosts: demo
+  gather_facts: no
+  tasks:
+    - name: Test privileged account
+      ping:
+
+    #- name: print variables
+    #  debug:
+    #    msg: "Username: {{ account.username }}, Secret: {{ account.secret }}, Secret type: {{ account.secret_type }}"
+
+    - name: Change password
+      user:
+        name: "{{ account.username }}"
+        password: "{{ account.secret | password_hash('sha512') }}"
+        update_password: always
+      when: account.secret_type == 'password'
+
+    - name: Change public key
+      authorized_key:
+        user: "{{ account.username }}"
+        key: "{{ account.public_key }}"
+        state: present
+      when: account.public_key
+
+    - name: Verify password
+      ping:
+      vars:
+        ansible_user: "{{ account.username }}"
+        ansible_pass: "{{ account.secret }}"
+        ansible_ssh_connection: paramiko

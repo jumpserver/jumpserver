@@ -1,6 +1,0 @@
-id: change_password_oracle
-name: Change password for Oracle
-method: change_password
-category: database
-type:
-  - oracle

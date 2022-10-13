@@ -14,12 +14,10 @@ from .celery.utils import (
 
 __all__ = [
     'PeriodTaskModelMixin', 'PeriodTaskSerializerMixin',
-    'PeriodTaskFormMixin',
 ]
 
 
 class PeriodTaskModelMixin(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(
         max_length=128, unique=False, verbose_name=_("Name")
     )
@@ -140,42 +138,3 @@ class PeriodTaskSerializerMixin(serializers.Serializer):
             msg = _("Require periodic or regularly perform setting")
             raise serializers.ValidationError(msg)
         return ok
-
-
-class PeriodTaskFormMixin(forms.Form):
-    is_periodic = forms.BooleanField(
-        initial=True, required=False, label=_('Periodic perform')
-    )
-    crontab = forms.CharField(
-        max_length=128, required=False, label=_('Regularly perform'),
-        help_text=_("eg: Every Sunday 03:05 run <5 3 * * 0> <br> "
-                    "Tips: "
-                    "Using 5 digits linux crontab expressions "
-                    "<min hour day month week> "
-                    "(<a href='https://tool.lu/crontab/' target='_blank'>Online tools</a>) <br>"
-                    "Note: "
-                    "If both Regularly perform and Cycle perform are set, "
-                    "give priority to Regularly perform"),
-    )
-    interval = forms.IntegerField(
-        required=False, initial=24,
-        help_text=_('Unit: hour'), label=_("Cycle perform"),
-    )
-
-    def get_initial_for_field(self, field, field_name):
-        """
-        Return initial data for field on form. Use initial data from the form
-        or the field, in that order. Evaluate callable values.
-        """
-        if field_name not in ['is_periodic', 'crontab', 'interval']:
-            return super().get_initial_for_field(field, field_name)
-        instance = getattr(self, 'instance', None)
-        if instance is None:
-            return super().get_initial_for_field(field, field_name)
-        init_attr_name = field_name + '_initial'
-        value = getattr(self, init_attr_name, None)
-        if value is None:
-            return super().get_initial_for_field(field, field_name)
-        return value
-
-

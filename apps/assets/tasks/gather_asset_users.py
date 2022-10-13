@@ -7,7 +7,7 @@ from celery import shared_task
 from django.utils.translation import gettext_noop
 from django.utils import timezone
 
-from orgs.utils import tmp_to_org, org_aware_func
+from orgs.utils import tmp_to_org, org_aware_func, tmp_to_root_org
 from common.utils import get_logger
 from ..models import GatheredUser, Node
 from .utils import clean_ansible_task_hosts
@@ -103,7 +103,6 @@ def add_asset_users(assets, results):
                 )
 
 
-@shared_task(queue="ansible")
 @org_aware_func("assets")
 def gather_asset_users(assets, task_name=None):
     from ops.utils import update_or_create_ansible_task

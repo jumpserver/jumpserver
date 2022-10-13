@@ -1,0 +1,6 @@
+id: gather_facts_mysql
+name: Gather facts from MySQL
+category: database
+type:
+  - mysql
+method: gather_facts

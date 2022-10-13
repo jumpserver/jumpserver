@@ -1,0 +1,6 @@
+id: mysql_ping
+name: Ping MySQL
+category: database
+type:
+  - mysql
+method: ping

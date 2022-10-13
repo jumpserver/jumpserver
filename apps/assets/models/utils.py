@@ -33,7 +33,7 @@ def update_internal_platforms(platform_model):
         {
             'name': 'AIX', 'category': 'host', 'type': 'unix',
             'create_account_method': 'create_account_aix',
-            'change_password_method': 'change_password_aix',
+            'change_secret_method': 'change_secret_aix',
         },
         {'name': 'Windows', 'category': 'host', 'type': 'windows'},
         {

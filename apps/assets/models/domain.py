@@ -40,6 +40,9 @@ class Domain(OrgModelMixin):
     def gateways(self):
         return self.gateway_set.filter(is_active=True)
 
+    def select_gateway(self):
+        return self.random_gateway()
+
     def random_gateway(self):
         gateways = [gw for gw in self.gateways if gw.is_connective]
         if gateways:

@@ -78,7 +78,9 @@ class Organization(OrgRoleMixin, models.Model):
     ROOT_ID = '00000000-0000-0000-0000-000000000000'
     ROOT_NAME = _('GLOBAL')
     DEFAULT_ID = '00000000-0000-0000-0000-000000000002'
-    DEFAULT_NAME = 'Default'
+    DEFAULT_NAME = _('DEFAULT')
+    SYSTEM_ID = '00000000-0000-0000-0000-000000000004'
+    SYSTEM_NAME = _('SYSTEM')
     orgs_mapping = None
 
     class Meta:

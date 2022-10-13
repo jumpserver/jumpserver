@@ -1,0 +1,6 @@
+id: gather_facts_postgresql
+name: Gather facts for PostgreSQL
+category: database
+type:
+  - postgresql
+method: gather_facts
