@@ -21,7 +21,6 @@ class ChangeSecretManager(BasePlaybookManager):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.method_hosts_mapper = defaultdict(list)
-        self.playbooks = []
         self.password_strategy = self.execution.automation.password_strategy
         self.ssh_key_strategy = self.execution.automation.ssh_key_strategy
         self._password_generated = None

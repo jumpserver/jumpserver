@@ -11,6 +11,15 @@ from ops.tasks import execute_automation_strategy
 from assets.models import Node, Asset
 
 
+class AutomationTypes(models.TextChoices):
+    ping = 'ping', _('Ping')
+    gather_facts = 'gather_facts', _('Gather facts')
+    create_account = 'create_account', _('Create account')
+    change_secret = 'change_secret', _('Change secret')
+    verify_account = 'verify_account', _('Verify account')
+    gather_accounts = 'gather_accounts', _('Gather accounts')
+
+
 class BaseAutomation(JMSOrgBaseModel, PeriodTaskModelMixin):
     accounts = models.JSONField(default=list, verbose_name=_("Accounts"))
     nodes = models.ManyToManyField(

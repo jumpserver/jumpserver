@@ -1,13 +1,13 @@
 from django.utils.translation import ugettext_lazy as _
 
-from ops.const import StrategyChoice
 from .base import BaseAutomation
 
 
-class VerifyAutomation(BaseAutomation):
+class GatherFactsAutomation(BaseAutomation):
     class Meta:
-        verbose_name = _("Verify strategy")
+        verbose_name = _("Gather asset facts")
 
     def save(self, *args, **kwargs):
-        self.type = 'verify'
+        self.type = 'gather_facts'
         super().save(*args, **kwargs)
+
