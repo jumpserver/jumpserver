@@ -1,7 +1,7 @@
 - hosts: demo
   tasks:
     - name: ping
-      ping:
+      ansible.builtin.ping:
 
     #- name: print variables
     #  debug:
@@ -22,7 +22,7 @@
       when: account.public_key
 
     - name: Verify password
-      ping:
+      ansible.builtin.ping:
       vars:
         ansible_user: "{{ account.username }}"
         ansible_pass: "{{ account.password }}"

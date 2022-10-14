@@ -7,7 +7,7 @@
 
   tasks:
     - name: 监测特权用户密码
-      ping:
+      ansible.builtin.ping:
 
     - name: 更改用户密码
       user:
@@ -19,5 +19,5 @@
       vars:
         - ansible_user: '{{ user1 }}'
           ansible_ssh_password: '{{ user1password }}'
-      ping:
+      ansible.builtin.ping:
 

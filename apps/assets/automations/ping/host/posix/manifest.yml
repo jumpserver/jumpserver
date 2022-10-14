@@ -3,6 +3,5 @@ name: Posix ping
 category: host
 type:
   - linux
-  - windows
   - unix
 method: ping
