@@ -918,21 +918,6 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
             return True
         return False
 
-    def get_groups(self, flat=False):
-        from users.models import UserGroup
-        usergroup_ids = self.groups.through.objects\
-            .filter(user_id=self.id)\
-            .distinct()\
-            .values_list('usergroup_id', flat=True)
-        usergroups = UserGroup.objects.filter(id__in=usergroup_ids)
-        if flat:
-            usergroup_ids = usergroups.values_list('id', flat=True)
-            return usergroup_ids
-        else:
-            return usergroups
-
-
-
 
 class UserPasswordHistory(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
