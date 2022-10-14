@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='permission',
-            options={'verbose_name': 'Permission'},
+            options={'verbose_name': 'Permissions'},
         ),
         migrations.AlterModelOptions(
             name='role',
