@@ -129,8 +129,19 @@ class AssetPermission(OrgModelMixin):
         return assets
 
     def get_all_accounts(self):
-        """ TODO: 获取所有账号 (Account 对象) """
-        pass
+        """
+         :return: 返回授权的所有账号对象 Account
+        """
+        asset_ids = self.get_all_assets(flat=True)
+        q = Q(asset_id__in=asset_ids)
+        if not self.is_perm_all_accounts:
+            q &= Q(username__in=self.accounts)
+        accounts = Account.objects.filter(q)
+        return accounts
+
+    @property
+    def is_perm_all_accounts(self):
+        return SpecialAccount.ALL in self.accounts
 
     @lazyproperty
     def users_amount(self):
