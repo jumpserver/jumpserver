@@ -128,7 +128,7 @@ class AssetPermission(OrgModelMixin):
         assets = Asset.objects.filter(id__in=asset_ids)
         return assets
 
-    def get_all_accounts(self):
+    def get_all_accounts(self, flat=False):
         """
          :return: 返回授权的所有账号对象 Account
         """
@@ -137,7 +137,9 @@ class AssetPermission(OrgModelMixin):
         if not self.is_perm_all_accounts:
             q &= Q(username__in=self.accounts)
         accounts = Account.objects.filter(q)
-        return accounts
+        if not flat:
+            return accounts
+        return accounts.values_list('id', flat=True)
 
     @property
     def is_perm_all_accounts(self):
@@ -175,12 +177,7 @@ class AssetPermission(OrgModelMixin):
         names = [node.full_value for node in self.nodes.all()]
         return names
 
-    # Related accounts
-    def get_asset_accounts(self):
-        asset_ids = self.get_all_assets(flat=True)
-        accounts = Account.filter(asset_ids, self.accounts)
-        return accounts
-
+    # Accounts
     @classmethod
     def get_perm_asset_accounts(cls, user=None, user_group=None, asset=None, with_actions=True):
         perms = cls.filter(user=user, user_group=user_group, asset=asset)

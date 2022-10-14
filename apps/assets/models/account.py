@@ -74,11 +74,6 @@ class Account(BaseAccount):
         """ @USER 动态用户的账号(self) """
         return cls(name=cls.InnerAccount.USER.value, username=username)
 
-    @classmethod
-    def filter(cls, asset_ids, account_usernames):
-        queries = Q(asset_id__in=asset_ids) & Q(username__in=account_usernames)
-        return cls.objects.filter(queries)
-
 
 class AccountTemplate(BaseAccount):
     class Meta:
