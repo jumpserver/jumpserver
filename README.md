@@ -22,9 +22,7 @@ JumpServer 使用 Python 开发，配备了业界领先的 Web Terminal 方案�
 
 JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向扩展，无资产数量及并发限制。
 
-改变世界，从一点点开始 ...
 
-> 如需进一步了解 JumpServer 开源项目，推荐阅读 [JumpServer 的初心和使命](https://mp.weixin.qq.com/s/S6q_2rP_9MwaVwyqLQnXzA)
 
 ### 特色优势
 

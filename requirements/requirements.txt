@@ -4,7 +4,7 @@ asn1crypto==0.24.0
 bcrypt==3.1.4
 billiard==3.6.4.0
 certifi==2018.1.18
-cffi==1.13.2
+cffi==1.15.1
 chardet==3.0.4
 configparser==3.5.0
 decorator==4.1.2
