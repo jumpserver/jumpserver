@@ -8,11 +8,11 @@ class Hasher:
     block_size = 64
     digest_size = 32
 
-    def __init__(self, key):
-        self.key = key
+    def __init__(self, data):
+        self.__data = data
 
     def hexdigest(self):
-        return sm3.sm3_hash(func.bytes_to_list(self.key))
+        return sm3.sm3_hash(func.bytes_to_list(self.__data))
 
     def digest(self):
         return bytes.fromhex(self.hexdigest())
@@ -21,11 +21,11 @@ class Hasher:
     def hash(msg=b''):
         return Hasher(msg)
 
-    def update(self, msg):
-        self.key += msg
+    def update(self, data):
+        self.__data += data
 
     def copy(self):
-        return Hasher(self.key)
+        return Hasher(self.__data)
 
 
 class PBKDF2SM3PasswordHasher(PBKDF2PasswordHasher):
