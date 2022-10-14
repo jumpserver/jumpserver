@@ -26,7 +26,7 @@ class UserResetPasswordSendCodeApi(CreateAPIView):
     def is_valid_user( **kwargs):
         user = get_object_or_none(User, **kwargs)
         if not user:
-            err_msg = _('User does not exist: {}').format(_("No assets matched"))
+            err_msg = _('User does not exist: {}').format(_("No user matched"))
             return None, err_msg
         if not user.is_local:
             err_msg = _(
