@@ -10,15 +10,15 @@ __all__ = ['JMSInventory']
 
 
 class JMSInventory:
-    def __init__(self, assets, account='', account_policy='smart', host_callback=None):
+    def __init__(self, assets, account_policy='smart', account_prefer='root,administrator', host_callback=None):
         """
         :param assets:
-        :param account: account username name if not set use account_policy
+        :param account_prefer: account username name if not set use account_policy
         :param account_policy:
         :param host_callback: after generate host, call this callback to modify host
         """
         self.assets = self.clean_assets(assets)
-        self.account_username = account
+        self.account_prefer = account_prefer
         self.account_policy = account_policy
         self.host_callback = host_callback
 
@@ -58,6 +58,46 @@ class JMSInventory:
         )
         return {"ansible_ssh_common_args": proxy_command}
 
+    @staticmethod
+    def make_account_ansible_vars(account):
+        var = {
+            'ansible_user': account.username,
+        }
+        if not account.secret:
+            return var
+        if account.secret_type == 'password':
+            var['ansible_password'] = account.secret
+        elif account.secret_type == 'ssh_key':
+            var['ansible_ssh_private_key_file'] = account.private_key_file
+        return var
+
+    def make_ssh_account_vars(self, host, asset, account, automation, protocols, platform, gateway):
+        if not account:
+            host['error'] = _("No account available")
+            return host
+
+        ssh_protocol_matched = list(filter(lambda x: x.name == 'ssh', protocols))
+        ssh_protocol = ssh_protocol_matched[0] if ssh_protocol_matched else None
+        host['ansible_host'] = asset.address
+        host['ansible_port'] = ssh_protocol.port if ssh_protocol else 22
+
+        su_from = account.su_from
+        if platform.su_enabled and su_from:
+            host.update(self.make_account_ansible_vars(su_from))
+            become_method = 'sudo' if platform.su_method != 'su' else 'su'
+            host['ansible_become'] = True
+            host['ansible_become_method'] = 'sudo'
+            host['ansible_become_user'] = account.username
+            if become_method == 'sudo':
+                host['ansible_become_password'] = su_from.secret
+            else:
+                host['ansible_become_password'] = account.secret
+        else:
+            host.update(self.make_account_ansible_vars(account))
+
+        if gateway:
+            host.update(self.make_proxy_command(gateway))
+
     def asset_to_host(self, asset, account, automation, protocols, platform):
         host = {
             'name': '{}'.format(asset.name),
@@ -73,14 +113,12 @@ class JMSInventory:
             } if account else None
         }
         ansible_config = dict(automation.ansible_config)
-        ansible_connection = ansible_config.pop('ansible_connection', 'ssh')
+        ansible_connection = ansible_config.get('ansible_connection', 'ssh')
         host.update(ansible_config)
         gateway = None
         if asset.domain:
             gateway = asset.domain.select_gateway()
 
-        ssh_protocol_matched = list(filter(lambda x: x.name == 'ssh', protocols))
-        ssh_protocol = ssh_protocol_matched[0] if ssh_protocol_matched else None
         if ansible_connection == 'local':
             if gateway:
                 host['ansible_host'] = gateway.address
@@ -91,29 +129,16 @@ class JMSInventory:
             else:
                 host['ansible_connection'] = 'local'
         else:
-            host['ansible_host'] = asset.address
-            host['ansible_port'] = ssh_protocol.port if ssh_protocol else 22
-            if account:
-                host['ansible_user'] = account.username
-
-                if account.secret_type == 'password' and account.secret:
-                    host['ansible_password'] = account.secret
-                elif account.secret_type == 'private_key' and account.secret:
-                    host['ssh_private_key'] = account.private_key_file
-            else:
-                host['error'] = _("No account found")
-
-            if gateway:
-                host.update(self.make_proxy_command(gateway))
+            self.make_ssh_account_vars(host, asset, account, automation, protocols, platform, gateway)
         return host
 
     def select_account(self, asset):
         accounts = list(asset.accounts.all())
         account_selected = None
-        account_username = self.account_username
+        account_username = self.account_prefer
 
-        if isinstance(self.account_username, str):
-            account_username = [self.account_username]
+        if isinstance(self.account_prefer, str):
+            account_username = self.account_prefer.split(',')
 
         if account_username:
             for username in account_username:

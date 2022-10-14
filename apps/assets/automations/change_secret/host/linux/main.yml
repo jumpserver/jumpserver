@@ -2,29 +2,33 @@
   gather_facts: no
   tasks:
     - name: Test privileged account
-      ping:
-
-    #- name: print variables
-    #  debug:
-    #    msg: "Username: {{ account.username }}, Secret: {{ account.secret }}, Secret type: {{ account.secret_type }}"
+      ansible.builtin.ping:
+#
+#    - name: print variables
+#      debug:
+#        msg: "Username: {{ account.username }}, Secret: {{ account.secret }}, Secret type: {{ account.secret_type }}"
 
     - name: Change password
-      user:
+      ansible.builtin.user:
         name: "{{ account.username }}"
         password: "{{ account.secret | password_hash('sha512') }}"
         update_password: always
-      when: account.secret_type == 'password'
+      when: account.secret_type == "password"
 
     - name: Change public key
-      authorized_key:
+      ansible.builtin.authorized_key:
         user: "{{ account.username }}"
         key: "{{ account.public_key }}"
         state: present
-      when: account.public_key
+      when: account.secret_type == "public_key"
+
+    - name: Refresh connection
+      ansible.builtin.meta: reset_connection
 
     - name: Verify password
-      ping:
+      ansible.builtin.ping:
+      become: no
       vars:
         ansible_user: "{{ account.username }}"
-        ansible_pass: "{{ account.secret }}"
-        ansible_ssh_connection: paramiko
+        ansible_password: "{{ account.secret }}"
+        ansible_become: no

@@ -1,11 +1,13 @@
-from copy import deepcopy
-from collections import defaultdict
 import random
 import string
+from copy import deepcopy
+from collections import defaultdict
+
+from django.utils import timezone
 
 from common.utils import lazyproperty, gen_key_pair
-from ..base.manager import BasePlaybookManager
 from assets.models import ChangeSecretRecord, SecretStrategy
+from ..base.manager import BasePlaybookManager
 
 string_punctuation = '!#$%&()*+,-.:;<=>?@[]^_~'
 DEFAULT_PASSWORD_LENGTH = 30
@@ -121,10 +123,26 @@ class ChangeSecretManager(BasePlaybookManager):
         ChangeSecretRecord.objects.bulk_create(records)
         return inventory_hosts
 
-    def on_runner_success(self, runner, cb):
-        summary = cb.summary
-        print("Summary: ")
-        print(summary)
+    def on_host_success(self, host, result):
+        recorder = self.name_recorder_mapper.get(host)
+        if not recorder:
+            return
+        recorder.status = 'succeed'
+        recorder.date_finished = timezone.now()
+        recorder.save()
+
+        account = recorder.account
+        account.secret = recorder.new_secret
+        account.save(update_fields=['secret'])
+
+    def on_host_error(self, host, error, result):
+        recorder = self.name_recorder_mapper.get(host)
+        if not recorder:
+            return
+        recorder.status = 'failed'
+        recorder.date_finished = timezone.now()
+        recorder.error = error
+        recorder.save()
 
     def on_runner_failed(self, runner, e):
         pass

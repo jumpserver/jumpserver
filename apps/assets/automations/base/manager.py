@@ -123,8 +123,22 @@ class BasePlaybookManager:
                 runners.append(runer)
         return runners
 
+    def on_host_success(self, host, result):
+        pass
+
+    def on_host_error(self, host, error, result):
+        pass
+
     def on_runner_success(self, runner, cb):
-        raise NotImplementedError
+        summary = cb.summary
+        for state, hosts in summary.items():
+            for host in hosts:
+                result = cb.result.get(host)
+                if state == 'ok':
+                    self.on_host_success(host, result)
+                else:
+                    error = hosts.get(host)
+                    self.on_host_error(host, error, result)
 
     def on_runner_failed(self, runner, e):
         print("Runner failed: {} {}".format(e, self))

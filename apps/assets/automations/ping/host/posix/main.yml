@@ -2,4 +2,4 @@
   gather_facts: no
   tasks:
     - name: Posix ping
-      ping:
+      ansible.builtin.ping:

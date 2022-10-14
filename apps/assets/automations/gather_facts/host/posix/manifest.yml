@@ -3,6 +3,5 @@ name: Gather posix facts
 category: host
 type:
   - linux
-  - windows
   - unix
 method: gather_facts

@@ -33,6 +33,9 @@ class HostTypes(BaseType):
         return {
             '*': {
                'choices': ['ssh', 'telnet', 'vnc', 'rdp']
+            },
+            cls.WINDOWS: {
+                'choices': ['rdp', 'ssh', 'vnc']
             }
         }
 
