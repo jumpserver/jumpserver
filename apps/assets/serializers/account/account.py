@@ -60,8 +60,8 @@ class AccountSerializer(AccountSerializerCreateMixin, BaseAccountSerializer):
     class Meta(BaseAccountSerializer.Meta):
         model = Account
         fields = BaseAccountSerializer.Meta.fields \
-            + ['su_from', 'version', 'asset'] \
-            + ['template', 'push_now']
+                 + ['su_from', 'version', 'asset'] \
+                 + ['template', 'push_now']
         extra_kwargs = {
             **BaseAccountSerializer.Meta.extra_kwargs,
             'name': {'required': False, 'allow_null': True},
@@ -71,6 +71,9 @@ class AccountSerializer(AccountSerializerCreateMixin, BaseAccountSerializer):
         super().__init__(*args, data=data, **kwargs)
         if data and 'name' not in data:
             data['name'] = data.get('username')
+        if hasattr(self, 'initial_data') and \
+                not getattr(self, 'initial_data', None):
+            delattr(self, 'initial_data')
 
     @classmethod
     def setup_eager_loading(cls, queryset):
