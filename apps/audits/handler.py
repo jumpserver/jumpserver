@@ -62,7 +62,7 @@ class OperatorLogHandler(metaclass=Singleton):
         for key, value in right_dict.items():
             pre_value = left_dict.get(key, '')
             pre_value, value = self._consistent_type_to_str(pre_value, value)
-            if value == pre_value:
+            if sorted(value) == sorted(pre_value):
                 continue
             if pre_value:
                 before[key] = pre_value

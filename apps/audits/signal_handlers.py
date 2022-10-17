@@ -70,36 +70,6 @@ class AuthBackendLabelMapping(LazyObject):
 
 AUTH_BACKEND_LABEL_MAPPING = AuthBackendLabelMapping()
 
-M2M_NEED_RECORD = {
-    User.groups.through._meta.object_name: _('User and Group'),
-    SystemUser.assets.through._meta.object_name: _('Asset and SystemUser'),
-    Asset.nodes.through._meta.object_name: _('Node and Asset'),
-    Asset.labels.through._meta.object_name: _('Label and Asset'),
-    AssetPermission.users.through._meta.object_name: _('User asset permissions'),
-    AssetPermission.user_groups.through._meta.object_name: _('User group asset permissions'),
-    AssetPermission.assets.through._meta.object_name: _('Asset permission'),
-    AssetPermission.nodes.through._meta.object_name: _('Node permission'),
-    AssetPermission.system_users.through._meta.object_name: _('Asset permission and SystemUser'),
-    ApplicationPermission.users.through._meta.object_name: _('User application permissions'),
-    ApplicationPermission.user_groups.through._meta.object_name: _('User group application permissions'),
-    ApplicationPermission.applications.through._meta.object_name: _('Application permission'),
-    ApplicationPermission.system_users.through._meta.object_name: _('Application permission and SystemUser'),
-    Role.permissions.through._meta.object_name: _('Role permission'),
-    CommandFilter.users.through._meta.object_name: _('Command filter and User'),
-    CommandFilter.user_groups.through._meta.object_name: _('Command filter and User group'),
-    CommandFilter.applications.through._meta.object_name: _('Command filter and Application'),
-    CommandFilter.assets.through._meta.object_name: _('Command filter and Asset'),
-    CommandFilter.system_users.through._meta.object_name: _('Command filter and SystemUser'),
-}
-
-if settings.XPACK_ENABLED:
-    from xpack.plugins.change_auth_plan.models import ApplicationChangeAuthPlan
-    M2M_NEED_RECORD_XPACK = {
-        ApplicationChangeAuthPlan.apps.through._meta.object_name: _('Change auth plan and Application'),
-        ApplicationChangeAuthPlan.system_users.through._meta.object_name: _('Change auth plan and SystemUser'),
-    }
-    M2M_NEED_RECORD.update(M2M_NEED_RECORD_XPACK)
-
 M2M_ACTION = {
     POST_ADD: OperateLog.ACTION_CREATE,
     POST_REMOVE: OperateLog.ACTION_DELETE,
@@ -111,38 +81,41 @@ M2M_ACTION = {
 def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
     if action not in M2M_ACTION:
         return
+    if not instance:
+        return
 
-    sender_name = sender._meta.object_name
-    if sender_name in M2M_NEED_RECORD:
-        current_instance = model_to_dict(instance, include_model_fields=False)
-        resource_type = M2M_NEED_RECORD[sender_name]
+    resource_type = instance._meta.verbose_name
+    current_instance = model_to_dict(instance, include_model_fields=False)
 
-        instance_id = current_instance.get('id')
-        log_id, before_instance = get_instance_dict_from_cache(instance_id)
+    instance_id = current_instance.get('id')
+    log_id, before_instance = get_instance_dict_from_cache(instance_id)
 
-        field_name = str(model._meta.verbose_name)
-        objs = model.objects.filter(pk__in=pk_set)
-        objs_display = [str(o) for o in objs]
-        action = M2M_ACTION[action]
-        changed_field = current_instance.get(field_name, [])
+    field_name = str(model._meta.verbose_name)
+    objs = model.objects.filter(pk__in=pk_set)
+    objs_display = [str(o) for o in objs]
+    action = M2M_ACTION[action]
+    changed_field = current_instance.get(field_name, [])
 
-        after, before, before_value = None, None, None
-        if action == OperateLog.ACTION_CREATE:
-            before_value = list(set(changed_field) - set(objs_display))
-        elif action == OperateLog.ACTION_DELETE:
-            before_value = list(
-                set(changed_field).symmetric_difference(set(objs_display))
-            )
-
-        if changed_field:
-            after = {field_name: changed_field}
-        if before_value:
-            before = {field_name: before_value}
-
-        create_or_update_operate_log(
-            OperateLog.ACTION_UPDATE, resource_type,
-            resource=instance, log_id=log_id, before=before, after=after
+    after, before, before_value = None, None, None
+    if action == OperateLog.ACTION_CREATE:
+        before_value = list(set(changed_field) - set(objs_display))
+    elif action == OperateLog.ACTION_DELETE:
+        before_value = list(
+            set(changed_field).symmetric_difference(set(objs_display))
         )
+
+    if changed_field:
+        after = {field_name: changed_field}
+    if before_value:
+        before = {field_name: before_value}
+
+    if sorted(str(before)) == sorted(str(after)):
+        return
+
+    create_or_update_operate_log(
+        OperateLog.ACTION_UPDATE, resource_type,
+        resource=instance, log_id=log_id, before=before, after=after
+    )
 
 
 def signal_of_operate_log_whether_continue(sender, instance, created, update_fields=None):
