@@ -18,6 +18,14 @@ class DefaultCallback:
         self.status = 'running'
         self.finished = False
 
+    @property
+    def host_results(self):
+        results = {}
+        for state, hosts in self.result.items():
+            for host, items in hosts.items():
+                results[host] = items
+        return results
+
     def is_success(self):
         return self.status != 'successful'
 

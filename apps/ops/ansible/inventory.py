@@ -181,13 +181,13 @@ class JMSInventory:
                 else:
                     hosts.append(host)
 
-        exclude_hosts = list(filter(lambda x: x.get('exclude'), hosts))
+        exclude_hosts = list(filter(lambda x: x.get('error'), hosts))
         if exclude_hosts:
             print(_("Skip hosts below:"))
             for i, host in enumerate(exclude_hosts, start=1):
                 print("{}: [{}] \t{}".format(i, host['name'], host['error']))
 
-        hosts = list(filter(lambda x: not x.get('exclude'), hosts))
+        hosts = list(filter(lambda x: not x.get('error'), hosts))
         data = {'all': {'hosts': {}}}
         for host in hosts:
             name = host.pop('name')

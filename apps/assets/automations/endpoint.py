@@ -2,11 +2,13 @@
 #
 #
 from .change_secret.manager import ChangeSecretManager
+from .gather_facts.manager import GatherFactsManager
 
 
 class ExecutionManager:
     manager_type_mapper = {
         'change_secret': ChangeSecretManager,
+        'gather_facts': GatherFactsManager,
     }
 
     def __init__(self, execution):

@@ -133,7 +133,7 @@ class BasePlaybookManager:
         summary = cb.summary
         for state, hosts in summary.items():
             for host in hosts:
-                result = cb.result.get(host)
+                result = cb.host_results.get(host)
                 if state == 'ok':
                     self.on_host_success(host, result)
                 else:

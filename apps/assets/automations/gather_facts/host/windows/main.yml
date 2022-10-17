@@ -1,12 +1,6 @@
 - hosts: windows
   gather_facts: yes
   tasks:
-#    - name: Gather facts windows
-#      setup:
-#      register: facts
-#
-#    - debug:
-#        var: facts
     - name: Get info
       set_fact:
         info:
@@ -19,6 +13,6 @@
           sn: "{{ ansible_product_serial }}"
           cpu_vcpus: "{{ ansible_processor_vcpus }}"
           memory: "{{ ansible_memtotal_mb }}"
-t
+
     - debug:
         var: info
