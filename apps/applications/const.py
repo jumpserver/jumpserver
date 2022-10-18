@@ -27,6 +27,7 @@ class AppType(models.TextChoices):
     sqlserver = 'sqlserver', 'SQLServer'
     redis = 'redis', 'Redis'
     mongodb = 'mongodb', 'MongoDB'
+    clickhouse = 'clickhouse', 'ClickHouse'
 
     # remote-app category
     chrome = 'chrome', 'Chrome'
@@ -42,7 +43,7 @@ class AppType(models.TextChoices):
         return {
             AppCategory.db: [
                 cls.mysql, cls.mariadb, cls.oracle, cls.pgsql,
-                cls.sqlserver, cls.redis, cls.mongodb
+                cls.sqlserver, cls.redis, cls.mongodb, cls.clickhouse
             ],
             AppCategory.remote_app: [
                 cls.chrome, cls.mysql_workbench,
@@ -82,4 +83,4 @@ class AppType(models.TextChoices):
 
         if AppCategory.is_xpack(category):
             return True
-        return tp in ['oracle', 'postgresql', 'sqlserver']
+        return tp in ['oracle', 'postgresql', 'sqlserver', 'clickhouse']
