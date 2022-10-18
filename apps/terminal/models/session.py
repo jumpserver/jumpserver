@@ -38,6 +38,7 @@ class Session(OrgModelMixin):
         POSTGRESQL = 'postgresql', 'postgresql'
         REDIS = 'redis', 'redis'
         MONGODB = 'mongodb', 'MongoDB'
+        CLICKHOUSE = 'clickhouse', 'ClickHouse'
         K8S = 'k8s', 'kubernetes'
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
@@ -150,7 +151,7 @@ class Session(OrgModelMixin):
     def db_protocols(self):
         _PROTOCOL = self.PROTOCOL
         return [_PROTOCOL.MYSQL, _PROTOCOL.MARIADB, _PROTOCOL.ORACLE,
-                _PROTOCOL.POSTGRESQL, _PROTOCOL.SQLSERVER,
+                _PROTOCOL.POSTGRESQL, _PROTOCOL.SQLSERVER, _PROTOCOL.CLICKHOUSE,
                 _PROTOCOL.REDIS, _PROTOCOL.MONGODB]
 
     @property

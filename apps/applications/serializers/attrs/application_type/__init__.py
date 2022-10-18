@@ -6,6 +6,7 @@ from .pgsql import *
 from .sqlserver import *
 from .redis import *
 from .mongodb import *
+from .clickhouse import *
 
 from .chrome import *
 from .mysql_workbench import *
