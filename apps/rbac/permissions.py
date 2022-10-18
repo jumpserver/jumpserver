@@ -121,8 +121,8 @@ class RBACPermission(permissions.DjangoModelPermissions):
         if request.user.is_anonymous and self.authenticated_users_only:
             return False
 
-        raw_action = getattr(view, 'raw_action', None)
-        if raw_action == 'metadata':
+        raw_action = getattr(view, 'raw_action', request.method)
+        if raw_action in ['metadata', 'OPTIONS']:
             return True
 
         perms = self.get_require_perms(request, view)
