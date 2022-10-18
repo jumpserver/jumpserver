@@ -8,7 +8,7 @@ from django.core.files.storage import default_storage
 
 import jms_storage
 
-from common.utils import get_logger
+from common.utils import get_logger, make_dirs
 from ..models import ReplayStorage
 
 
@@ -56,7 +56,7 @@ def download_session_replay(session):
     target_path = os.path.join(default_storage.base_location, local_path)
     target_dir = os.path.dirname(target_path)
     if not os.path.isdir(target_dir):
-        os.makedirs(target_dir, exist_ok=True)
+        make_dirs(target_dir, exist_ok=True)
 
     ok, err = storage.download(session_path, target_path)
     if not ok:

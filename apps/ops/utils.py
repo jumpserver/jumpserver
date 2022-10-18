@@ -4,7 +4,7 @@ import uuid
 
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import get_logger, get_object_or_none
+from common.utils import get_logger, get_object_or_none, make_dirs
 from common.tasks import send_mail_async
 from orgs.utils import org_aware_func
 from jumpserver.const import PROJECT_DIR
@@ -78,5 +78,5 @@ def get_task_log_path(base_path, task_id, level=2):
 
     rel_path = os.path.join(*task_id[:level], task_id + '.log')
     path = os.path.join(base_path, rel_path)
-    os.makedirs(os.path.dirname(path), exist_ok=True)
+    make_dirs(os.path.dirname(path), exist_ok=True)
     return path
