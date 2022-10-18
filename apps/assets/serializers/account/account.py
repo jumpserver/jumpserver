@@ -82,9 +82,7 @@ class AccountSerializer(AccountSerializerCreateMixin, BaseAccountSerializer):
 class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
     class Meta(AccountSerializer.Meta):
         extra_kwargs = {
-            'password': {'write_only': False},
-            'private_key': {'write_only': False},
-            'public_key': {'write_only': False},
+            'secret': {'write_only': False},
         }
 
 

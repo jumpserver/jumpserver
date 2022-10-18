@@ -17,6 +17,8 @@ class PlatformProtocol(models.Model):
         'sftp_enabled': True,
         'sftp_home': '/tmp'
     }
+    default = models.BooleanField(default=False, verbose_name=_('Default'))
+    required = models.BooleanField(default=False, verbose_name=_('Required'))
     name = models.CharField(max_length=32, verbose_name=_('Name'))
     port = models.IntegerField(verbose_name=_('Port'))
     setting = models.JSONField(verbose_name=_('Setting'), default=dict)
@@ -24,6 +26,13 @@ class PlatformProtocol(models.Model):
 
     def __str__(self):
         return '{}/{}'.format(self.name, self.port)
+
+    @property
+    def primary(self):
+        primary_protocol_name = AllTypes.get_primary_protocol_name(
+            self.platform.category, self.platform.type
+        )
+        return self.name == primary_protocol_name
 
     @property
     def secret_types(self):
@@ -83,9 +92,10 @@ class Platform(models.Model):
         )
         return linux.id
 
-    @staticmethod
-    def set_default_platforms_ops(platform_model):
-        pass
+    @property
+    def primary_protocol(self):
+        primary_protocol_name = AllTypes.get_primary_protocol_name(self.category, self.type)
+        return self.protocols.filter(name=primary_protocol_name).first()
 
     def __str__(self):
         return self.name

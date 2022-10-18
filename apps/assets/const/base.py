@@ -35,6 +35,7 @@ class BaseType(TextChoices):
         if choices == '__self__':
             choices = [tp]
         protocols = [{'name': name, **settings.get(name, {})} for name in choices]
+        protocols[0]['primary'] = True
         return protocols
 
     @classmethod

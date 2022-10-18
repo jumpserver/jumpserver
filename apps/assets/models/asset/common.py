@@ -135,7 +135,10 @@ class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
 
     @lazyproperty
     def primary_protocol(self):
-        return self.protocols.first()
+        from assets.const.types import AllTypes
+        primary_protocol_name = AllTypes.get_primary_protocol_name(self.category, self.type)
+        protocol = self.protocols.get(name=primary_protocol_name)
+        return protocol
 
     @lazyproperty
     def protocol(self):

@@ -50,9 +50,9 @@ class PlatformAutomationSerializer(serializers.ModelSerializer):
             'gather_facts_method': {'label': '收集信息方式'},
             'verify_account_enabled': {'label': '启用校验账号'},
             'verify_account_method': {'label': '校验账号方式'},
-            'create_account_enabled': {'label': '启用创建账号'},
-            'create_account_method': {'label': '创建账号方式'},
-            'change_secret_enabled': {'label': '启用账号创建改密'},
+            'create_account_enabled': {'label': '启用推送账号'},
+            'create_account_method': {'label': '推送账号方式'},
+            'change_secret_enabled': {'label': '启用账号改密'},
             'change_secret_method': {'label': '账号创建改密方式'},
             'gather_accounts_enabled': {'label': '启用账号收集'},
             'gather_accounts_method': {'label': '收集账号方式'},
@@ -61,10 +61,14 @@ class PlatformAutomationSerializer(serializers.ModelSerializer):
 
 class PlatformProtocolsSerializer(serializers.ModelSerializer):
     setting = ProtocolSettingSerializer(required=False, allow_null=True)
+    primary = serializers.BooleanField(read_only=True, label=_("Primary"))
 
     class Meta:
         model = PlatformProtocol
-        fields = ['id', 'name', 'port', 'secret_types', 'setting']
+        fields = [
+            'id', 'name', 'port', 'primary', 'default',
+            'required', 'secret_types', 'setting',
+        ]
 
 
 class PlatformSerializer(JMSWritableNestedModelSerializer):

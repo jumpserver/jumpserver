@@ -73,17 +73,12 @@ class BaseAccount(OrgModelMixin):
     created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
 
     @property
-    def has_secret(self):
-        return bool(self.secret)
-
-    @property
     def password(self):
         return self.secret
 
-    @password.setter
-    def password(self, value):
-        self.secret = value
-        self.secret_type = 'password'
+    @property
+    def has_secret(self):
+        return bool(self.secret)
 
     @property
     def private_key(self):

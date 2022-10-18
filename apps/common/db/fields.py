@@ -117,10 +117,10 @@ class EncryptMixin:
         return signer.unsign(value) or ''
 
     def from_db_value(self, value, expression, connection, context=None):
-        if value is None:
+        if not value:
             return value
-        value = force_text(value)
 
+        value = force_text(value)
         plain_value = crypto.decrypt(value)
 
         # 如果没有解开，使用原来的signer解密
@@ -134,7 +134,7 @@ class EncryptMixin:
         return plain_value
 
     def get_prep_value(self, value):
-        if value is None:
+        if not value:
             return value
 
         # 先 json 再解密

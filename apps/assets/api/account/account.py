@@ -34,6 +34,11 @@ class AccountViewSet(OrgBulkModelViewSet):
         account = super().get_object()
         task = test_accounts_connectivity_manual.delay([account.id])
         return Response(data={'task': task.id})
+    #
+    # @action(methods=['get'], detail=True, url_path='secret')
+    # def get_secret(self, request, *args, **kwargs):
+    #     account = super().get_object()
+    #     return Response(data={'secret': account.secret})
 
 
 class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):

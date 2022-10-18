@@ -37,6 +37,13 @@ class AllTypes(ChoicesMixin):
         return constraints
 
     @classmethod
+    def get_primary_protocol_name(cls, category, tp):
+        constraints = cls.get_constraints(category, tp)
+        if not constraints:
+            return None
+        return constraints.get('protocols')[0]['name']
+
+    @classmethod
     def set_automation_methods(cls, category, tp, constraints):
         from assets.automations import filter_platform_methods
         automation = constraints.get('automation', {})
@@ -189,7 +196,9 @@ class AllTypes(ChoicesMixin):
         automation.save()
 
         platform.protocols.all().delete()
-        [PlatformProtocol.objects.create(**p, platform=platform) for p in protocols_data]
+        for p in protocols_data:
+            p.pop('primary', None)
+            PlatformProtocol.objects.create(**p, platform=platform)
 
     @classmethod
     def create_or_update_internal_platforms(cls):

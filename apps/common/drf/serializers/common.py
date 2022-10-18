@@ -86,5 +86,5 @@ class GroupedChoiceSerializer(ChoiceSerializer):
     children = ChoiceSerializer(many=True, label=_("Children"))
 
 
-class JMSWritableNestedModelSerializer(WritableNestedModelSerializer):
+class JMSWritableNestedModelSerializer(ModelSerializer):
     pass

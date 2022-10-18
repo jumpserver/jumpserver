@@ -117,6 +117,34 @@ class AssetSerializer(JMSWritableNestedModelSerializer):
         if not node_id:
             return []
 
+    def validate_protocols(self, protocols_data):
+        if not protocols_data:
+            protocols_data = []
+        platform_id = self.initial_data.get('platform')
+        if isinstance(platform_id, dict):
+            platform_id = platform_id.get('id') or platform_id.get('pk')
+        platform = Platform.objects.filter(id=platform_id).first()
+        if not platform:
+            raise serializers.ValidationError({'platform': _("Platform not exist")})
+
+        protocols_data_map = {p['name']: p for p in protocols_data}
+        platform_protocols = platform.protocols.all()
+        protocols_default = [p for p in platform_protocols if p.default]
+        protocols_required = [p for p in platform_protocols if p.required or p.primary]
+
+        if not protocols_data_map:
+            protocols_data_map = {
+                p.name: {'name': p.name, 'port': p.port}
+                for p in protocols_required + protocols_default
+            }
+
+        protocols_not_found = [p.name for p in protocols_required if p.name not in protocols_data_map]
+        if protocols_not_found:
+            raise serializers.ValidationError({
+                'protocols': _("Protocol is required: {}").format(', '.join(protocols_not_found))
+            })
+        return protocols_data_map.values()
+
     @atomic
     def create(self, validated_data):
         nodes_display = validated_data.pop('nodes_display', '')
