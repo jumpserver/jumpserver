@@ -118,7 +118,7 @@ class NodesRelationMixin:
             _nodes = node.get_ancestors(with_self=True)
             nodes.extend(list(_nodes))
         if flat:
-            nodes = list(reduce(lambda x, y: set(x) | set(y), nodes))
+            nodes = list(set([node.id for node in nodes]))
         return nodes
 
 
