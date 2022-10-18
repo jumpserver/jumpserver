@@ -22,6 +22,13 @@ class AssetPermissionUtil(object):
         perms = AssetPermission.objects.filter(id__in=perm_ids)
         return perms
 
+    def get_permissions_for_user_group_asset(self, user_group, asset):
+        user_perm_ids = self.get_permissions_for_user_groups([user_group], flat=True)
+        asset_perm_ids = self.get_permissions_for_asset(asset, flat=True)
+        perm_ids = set(user_perm_ids) & set(asset_perm_ids)
+        perms = AssetPermission.objects.filter(id__in=perm_ids)
+        return perms
+
     def get_permissions_for_user(self, user, with_group=True, flat=False):
         """ 获取用户的授权规则 """
         perm_ids = set()
@@ -42,7 +49,10 @@ class AssetPermissionUtil(object):
     @staticmethod
     def get_permissions_for_user_groups(user_groups, flat=False):
         """ 获取用户组的授权规则 """
-        group_ids = user_groups.values_list('id', flat=True).distinct()
+        if isinstance(user_groups, list):
+            group_ids = [g.id for g in user_groups]
+        else:
+            group_ids = user_groups.values_list('id', flat=True).distinct()
         group_perm_ids = AssetPermission.user_groups.through.objects\
             .filter(usergroup_id__in=group_ids)\
             .values_list('assetpermission_id', flat=True).distinct()
