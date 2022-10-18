@@ -43,7 +43,8 @@ class AssetPermissionUtil(object):
     def get_permissions_for_user_groups(user_groups, flat=False):
         """ 获取用户组的授权规则 """
         group_ids = user_groups.values_list('id', flat=True).distinct()
-        group_perm_ids = AssetPermission.user_groups.through.objects.filter(usergroup_id__in=group_ids) \
+        group_perm_ids = AssetPermission.user_groups.through.objects\
+            .filter(usergroup_id__in=group_ids)\
             .values_list('assetpermission_id', flat=True).distinct()
         if flat:
             return group_perm_ids
@@ -66,9 +67,16 @@ class AssetPermissionUtil(object):
         return perms
 
     @staticmethod
-    def get_permissions_for_nodes(nodes, flat=False):
+    def get_permissions_for_nodes(nodes, with_ancestor=False, flat=False):
         """ 获取节点的授权规则 """
-        node_ids = nodes.values_list('id', flat=True).distinct()
+        if with_ancestor:
+            node_ids = set()
+            for node in nodes:
+                _nodes = node.get_ancestors(with_self=True)
+                _node_ids = _nodes.values_list('id', flat=True).distinct()
+                node_ids.update(_node_ids)
+        else:
+            node_ids = nodes.values_list('id', flat=True).distinct()
         node_perm_ids = AssetPermission.nodes.through.objects.filter(node_id__in=node_ids) \
             .values_list('assetpermission_id', flat=True).distinct()
         if flat:
