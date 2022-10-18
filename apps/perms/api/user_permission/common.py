@@ -22,6 +22,7 @@ from common.utils import get_logger, lazyproperty
 from perms.hands import User, Asset, Account
 from perms import serializers
 from perms.models import AssetPermission, Action
+from perms.utils import PermAccountUtil
 
 logger = get_logger(__name__)
 
@@ -118,7 +119,9 @@ class UserGrantedAssetAccountsApi(ListAPIView):
         return asset
 
     def get_queryset(self):
-        accounts = AssetPermission.get_perm_asset_accounts(user=self.user, asset=self.asset)
+        accounts = PermAccountUtil().get_perm_accounts_for_user_asset(
+            self.user, self.asset, with_actions=True
+        )
         return accounts
 
 

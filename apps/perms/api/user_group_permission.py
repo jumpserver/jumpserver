@@ -11,6 +11,7 @@ from perms.models import AssetPermission
 from assets.models import Asset, Node
 from . import user_permission as uapi
 from perms import serializers
+from perms.utils import PermAccountUtil
 from assets.api.mixin import SerializeToTreeNodeMixin
 from users.models import UserGroup
 
@@ -200,7 +201,7 @@ class UserGroupGrantedAssetAccountsApi(uapi.UserGrantedAssetAccountsApi):
         return UserGroup.objects.get(id=group_id)
 
     def get_queryset(self):
-        accounts = AssetPermission.get_perm_asset_accounts(
-            user_group=self.user_group, asset=self.asset
+        accounts = PermAccountUtil().get_perm_accounts_for_user_group_asset(
+            self.user_group, self.asset, with_actions=True
         )
         return accounts

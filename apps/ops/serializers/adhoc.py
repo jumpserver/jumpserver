@@ -15,11 +15,11 @@ class AdHocExecutionSerializer(serializers.ModelSerializer):
         model = AdHocExecution
         fields_mini = ['id']
         fields_small = fields_mini + [
-            'hosts_amount', 'timedelta', 'result', 'summary', 'short_id',
+            'timedelta', 'result', 'summary', 'short_id',
             'is_finished', 'is_success',
             'date_start', 'date_finished',
         ]
-        fields_fk = ['task', 'task_display', 'adhoc', 'adhoc_short_id',]
+        fields_fk = ['task', 'task_display']
         fields_custom = ['stat', 'last_success', 'last_failure']
         fields = fields_small + fields_fk + fields_custom
 
@@ -50,20 +50,16 @@ class AdHocExecutionExcludeResultSerializer(AdHocExecutionSerializer):
 
 
 class AdHocSerializer(serializers.ModelSerializer):
-    become_display = serializers.ReadOnlyField()
     tasks = serializers.ListField()
 
     class Meta:
         model = AdHoc
         fields_mini = ['id']
         fields_small = fields_mini + [
-            'tasks', "pattern", "options", "run_as",
-            "become", "become_display", "short_id",
-            "run_as_admin",
-            "date_created",
+            'tasks', "pattern", "args", "date_created",
         ]
-        fields_fk = ["task"]
-        fields_m2m = ["hosts"]
+        fields_fk = ["last_execution"]
+        fields_m2m = ["assets"]
         fields = fields_small + fields_fk + fields_m2m
         read_only_fields = [
             'date_created'
@@ -92,7 +88,7 @@ class AdHocDetailSerializer(AdHocSerializer):
 
     class Meta(AdHocSerializer.Meta):
         fields = AdHocSerializer.Meta.fields + [
-            'latest_execution', 'created_by', 'run_times', 'task_name'
+            'latest_execution', 'created_by', 'task_name'
         ]
 
 
