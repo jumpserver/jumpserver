@@ -45,6 +45,9 @@ class AdHocExecution(BaseAnsibleExecution):
         )
         return runner
 
+    def task_display(self):
+        return str(self.task)
+
     class Meta:
         db_table = "ops_adhoc_execution"
         get_latest_by = 'date_start'
