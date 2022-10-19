@@ -105,6 +105,14 @@ class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
     def __str__(self):
         return '{0.name}({0.address})'.format(self)
 
+    @property
+    def category_property(self):
+        if not hasattr(self, self.category):
+            return {}
+        instance = getattr(self, self.category)
+        private_fields = [i.name for i in instance._meta.local_fields if i.name != 'asset_ptr']
+        return {i: getattr(instance, i) for i in private_fields}
+
     def get_target_ip(self):
         return self.address
 

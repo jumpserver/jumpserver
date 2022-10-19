@@ -14,5 +14,11 @@ class Database(Asset):
     def ip(self):
         return self.address
 
+    @property
+    def category_property(self):
+        return {
+            'db_name': self.db_name,
+        }
+
     class Meta:
         verbose_name = _("Database")

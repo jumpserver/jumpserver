@@ -34,4 +34,11 @@ class HostSerializer(AssetSerializer):
     class Meta(AssetSerializer.Meta):
         model = Host
         fields = AssetSerializer.Meta.fields + ['info']
+        extra_kwargs = {
+            **AssetSerializer.Meta.extra_kwargs,
+            'address': {
+                'label': _("IP/Host")
+            },
+        }
+
 

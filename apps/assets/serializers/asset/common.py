@@ -77,7 +77,8 @@ class AssetSerializer(OrgResourceSerializerMixin, WritableNestedModelSerializer)
             'nodes', 'labels', 'accounts', 'protocols', 'nodes_display',
         ]
         read_only_fields = [
-            'category', 'type', 'connectivity', 'date_verified',
+            'category', 'type', 'category_property',
+            'connectivity', 'date_verified',
             'created_by', 'date_created',
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
@@ -85,6 +86,12 @@ class AssetSerializer(OrgResourceSerializerMixin, WritableNestedModelSerializer)
             'name': {'label': _("Name")},
             'address': {'label': _('Address')},
         }
+
+    def get_field_names(self, declared_fields, info):
+        names = super().get_field_names(declared_fields, info)
+        if self.__class__.__name__ != 'AssetSerializer':
+            names.remove('category_property')
+        return names
 
     @classmethod
     def setup_eager_loading(cls, queryset):
