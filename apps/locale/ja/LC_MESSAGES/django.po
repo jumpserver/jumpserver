@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-19 10:41+0800\n"
+"POT-Creation-Date: 2022-10-19 14:41+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -575,24 +575,6 @@ msgstr "ノードにアセットを追加する"
 msgid "Move asset to node"
 msgstr "アセットをノードに移動する"
 
-#: assets/models/automations/account_discovery.py:10
-#, fuzzy
-#| msgid "Approve strategy"
-msgid "Discovery strategy"
-msgstr "戦略を承認する"
-
-#: assets/models/automations/account_reconcile.py:9
-#, fuzzy
-#| msgid "Hostname strategy"
-msgid "Reconcile strategy"
-msgstr "ホスト名戦略"
-
-#: assets/models/automations/account_verify.py:9
-#, fuzzy
-#| msgid "SSH Key strategy"
-msgid "Verify strategy"
-msgstr "SSHキー戦略"
-
 #: assets/models/automations/base.py:15
 msgid "Ping"
 msgstr ""
@@ -618,14 +600,12 @@ msgstr "秘密を改める"
 
 #: assets/models/automations/base.py:19
 #, fuzzy
-#| msgid "Verify auth"
-msgid "Verify account"
-msgstr "パスワード/キーの確認"
+#| msgid "Verify code"
+msgid "Verify secret"
+msgstr "コードの確認"
 
-#: assets/models/automations/base.py:20
-#, fuzzy
-#| msgid "Gather account"
-msgid "Gather accounts"
+#: assets/models/automations/base.py:20 rbac/tree.py:53
+msgid "Gather account"
 msgstr "アカウントを集める"
 
 #: assets/models/automations/base.py:24 assets/models/cmd_filter.py:38
@@ -641,17 +621,11 @@ msgstr "アカウント"
 msgid "Assets"
 msgstr "資産"
 
-#: assets/models/automations/base.py:77
+#: assets/models/automations/base.py:77 assets/models/automations/base.py:84
 #, fuzzy
 #| msgid "Automatic managed"
-msgid "Automation plan"
+msgid "Automation task"
 msgstr "自動管理"
-
-#: assets/models/automations/base.py:84
-#, fuzzy
-#| msgid "Hostname strategy"
-msgid "Automation strategy"
-msgstr "ホスト名戦略"
 
 #: assets/models/automations/base.py:88 assets/models/backup.py:77
 #: audits/models.py:44 ops/models/base.py:54
@@ -685,7 +659,7 @@ msgstr "トリガーモード"
 #: assets/models/automations/base.py:99
 #, fuzzy
 #| msgid "Command execution"
-msgid "Automation strategy execution"
+msgid "Automation task execution"
 msgstr "コマンド実行"
 
 #: assets/models/automations/change_secret.py:13
@@ -765,9 +739,9 @@ msgstr "受信者"
 
 #: assets/models/automations/change_secret.py:42
 #, fuzzy
-#| msgid "Can change auth setting"
-msgid "Change auth strategy"
-msgstr "資格認定の設定"
+#| msgid "Change auth"
+msgid "Change secret automation"
+msgstr "秘密を改める"
 
 #: assets/models/automations/change_secret.py:48
 #, fuzzy
@@ -787,11 +761,27 @@ msgstr "開始日"
 msgid "Error"
 msgstr "企業微信エラー"
 
+#: assets/models/automations/discovery_account.py:8
+#, fuzzy
+#| msgid "Verify auth"
+msgid "Discovery account automation"
+msgstr "パスワード/キーの確認"
+
 #: assets/models/automations/gather_facts.py:11
 #, fuzzy
 #| msgid "Gather assets users"
 msgid "Gather asset facts"
 msgstr "資産ユーザーの収集"
+
+#: assets/models/automations/push_account.py:8
+#, fuzzy
+#| msgid "Automatic managed"
+msgid "Push automation"
+msgstr "自動管理"
+
+#: assets/models/automations/verify_secret.py:8
+msgid "Verify secret automation"
+msgstr ""
 
 #: assets/models/backup.py:38 assets/models/backup.py:96
 msgid "Account backup plan"
@@ -1063,13 +1053,13 @@ msgstr "資産ユーザーの収集"
 #: assets/models/platform.py:49
 #, fuzzy
 #| msgid "Create account successfully"
-msgid "Create account enabled"
+msgid "Push account enabled"
 msgstr "アカウントを正常に作成"
 
 #: assets/models/platform.py:50
 #, fuzzy
 #| msgid "Create account successfully"
-msgid "Create account method"
+msgid "Push account method"
 msgstr "アカウントを正常に作成"
 
 #: assets/models/platform.py:51
@@ -3395,10 +3385,6 @@ msgstr "クラウドインポート"
 #: rbac/tree.py:52
 msgid "Backup account"
 msgstr "バックアップアカウント"
-
-#: rbac/tree.py:53
-msgid "Gather account"
-msgstr "アカウントを集める"
 
 #: rbac/tree.py:54
 msgid "App change auth"
@@ -6863,6 +6849,41 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "コミュニティ版"
+
+#, fuzzy
+#~| msgid "Verify auth"
+#~ msgid "Verify account"
+#~ msgstr "パスワード/キーの確認"
+
+#, fuzzy
+#~| msgid "Gather account"
+#~ msgid "Gather accounts"
+#~ msgstr "アカウントを集める"
+
+#, fuzzy
+#~| msgid "Hostname strategy"
+#~ msgid "Automation strategy"
+#~ msgstr "ホスト名戦略"
+
+#, fuzzy
+#~| msgid "Approve strategy"
+#~ msgid "Discovery strategy"
+#~ msgstr "戦略を承認する"
+
+#, fuzzy
+#~| msgid "Hostname strategy"
+#~ msgid "Reconcile strategy"
+#~ msgstr "ホスト名戦略"
+
+#, fuzzy
+#~| msgid "SSH Key strategy"
+#~ msgid "Verify strategy"
+#~ msgstr "SSHキー戦略"
+
+#, fuzzy
+#~| msgid "Can change auth setting"
+#~ msgid "Change auth strategy"
+#~ msgstr "資格認定の設定"
 
 #~ msgid "System User"
 #~ msgstr "システムユーザー"

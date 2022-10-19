@@ -16,5 +16,14 @@ class WebSerializer(AssetSerializer):
             **AssetSerializer.Meta.extra_kwargs,
             'address': {
                 'label': 'URL'
+            },
+            'username_selector': {
+                'default': 'input[type=text]'
+            },
+            'password_selector': {
+                'default': 'input[type=password]'
+            },
+            'submit_selector': {
+                'default': 'button[type=submit]',
             }
         }

@@ -202,7 +202,7 @@ class AllTypes(ChoicesMixin):
 
     @classmethod
     def create_or_update_internal_platforms(cls):
-        print("Create internal platforms")
+        print("\n\tCreate internal platforms")
         for category, type_cls in cls.category_types():
             print("\t## Category: {}".format(category.label))
             data = type_cls.internal_platforms()

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-19 10:41+0800\n"
+"POT-Creation-Date: 2022-10-19 14:41+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -287,10 +287,8 @@ msgid "App assets"
 msgstr "资产管理"
 
 #: assets/automations/base/manager.py:74
-#, fuzzy
-#| msgid "Disabled"
 msgid "{} disabled"
-msgstr "禁用"
+msgstr "{} 已禁用"
 
 #: assets/const/category.py:11 settings/serializers/auth/radius.py:14
 #: settings/serializers/auth/sms.py:56 terminal/models/endpoint.py:11
@@ -560,33 +558,15 @@ msgstr "添加资产到节点"
 msgid "Move asset to node"
 msgstr "移动资产到节点"
 
-#: assets/models/automations/account_discovery.py:10
-msgid "Discovery strategy"
-msgstr "自动发现策略"
-
-#: assets/models/automations/account_reconcile.py:9
-msgid "Reconcile strategy"
-msgstr "主机名策略"
-
-#: assets/models/automations/account_verify.py:9
-#, fuzzy
-#| msgid "SSH Key strategy"
-msgid "Verify strategy"
-msgstr "SSH 密钥策略"
-
 #: assets/models/automations/base.py:15
 msgid "Ping"
 msgstr ""
 
 #: assets/models/automations/base.py:16
-#, fuzzy
-#| msgid "Gather account"
 msgid "Gather facts"
-msgstr "收集账号"
+msgstr "收集信息"
 
 #: assets/models/automations/base.py:17
-#, fuzzy
-#| msgid "Gather account"
 msgid "Create account"
 msgstr "收集账号"
 
@@ -599,14 +579,12 @@ msgstr "执行改密"
 
 #: assets/models/automations/base.py:19
 #, fuzzy
-#| msgid "Verify auth"
-msgid "Verify account"
-msgstr "验证密码/密钥"
+#| msgid "Verify code"
+msgid "Verify secret"
+msgstr "验证码"
 
-#: assets/models/automations/base.py:20
-#, fuzzy
-#| msgid "Gather account"
-msgid "Gather accounts"
+#: assets/models/automations/base.py:20 rbac/tree.py:53
+msgid "Gather account"
 msgstr "收集账号"
 
 #: assets/models/automations/base.py:24 assets/models/cmd_filter.py:38
@@ -622,17 +600,9 @@ msgstr "账号管理"
 msgid "Assets"
 msgstr "资产"
 
-#: assets/models/automations/base.py:77
-#, fuzzy
-#| msgid "Automatic managed"
-msgid "Automation plan"
-msgstr "托管密码"
-
-#: assets/models/automations/base.py:84
-#, fuzzy
-#| msgid "Hostname strategy"
-msgid "Automation strategy"
-msgstr "主机名策略"
+#: assets/models/automations/base.py:77 assets/models/automations/base.py:84
+msgid "Automation task"
+msgstr "自动化任务"
 
 #: assets/models/automations/base.py:88 assets/models/backup.py:77
 #: audits/models.py:44 ops/models/base.py:54
@@ -664,14 +634,12 @@ msgid "Trigger mode"
 msgstr "触发模式"
 
 #: assets/models/automations/base.py:99
-#, fuzzy
-#| msgid "Command execution"
-msgid "Automation strategy execution"
-msgstr "命令执行"
+msgid "Automation task execution"
+msgstr "自动化任务执行"
 
 #: assets/models/automations/change_secret.py:13
 msgid "Specific"
-msgstr ""
+msgstr "指定"
 
 #: assets/models/automations/change_secret.py:14 ops/const.py:20
 #: xpack/plugins/change_auth_plan/models/base.py:28
@@ -725,14 +693,10 @@ msgid "Password rules"
 msgstr "密码规则"
 
 #: assets/models/automations/change_secret.py:32 assets/models/base.py:60
-#, fuzzy
-#| msgid "SSH Key"
 msgid "SSH key"
 msgstr "SSH 密钥"
 
 #: assets/models/automations/change_secret.py:34
-#, fuzzy
-#| msgid "SSH Key strategy"
 msgid "SSH key strategy"
 msgstr "SSH 密钥策略"
 
@@ -745,34 +709,36 @@ msgid "Recipient"
 msgstr "收件人"
 
 #: assets/models/automations/change_secret.py:42
-#, fuzzy
-#| msgid "Can change auth setting"
-msgid "Change auth strategy"
-msgstr "认证设置"
+msgid "Change secret automation"
+msgstr "自动化改密"
 
 #: assets/models/automations/change_secret.py:48
-#, fuzzy
-#| msgid "Secret"
 msgid "Old secret"
-msgstr "密钥"
+msgstr "原来密码"
 
 #: assets/models/automations/change_secret.py:50
-#, fuzzy
-#| msgid "Date start"
 msgid "Date started"
 msgstr "开始日期"
 
 #: assets/models/automations/change_secret.py:53
-#, fuzzy
-#| msgid "WeCom Error"
 msgid "Error"
-msgstr "企业微信错误"
+msgstr "错误"
+
+#: assets/models/automations/discovery_account.py:8
+msgid "Discovery account automation"
+msgstr "自动化账号发现"
 
 #: assets/models/automations/gather_facts.py:11
-#, fuzzy
-#| msgid "Gather assets users"
 msgid "Gather asset facts"
-msgstr "收集资产上的用户"
+msgstr "收集资产信息"
+
+#: assets/models/automations/push_account.py:8
+msgid "Push automation"
+msgstr "自动化推送"
+
+#: assets/models/automations/verify_secret.py:8
+msgid "Verify secret automation"
+msgstr "自动化验证"
 
 #: assets/models/backup.py:38 assets/models/backup.py:96
 msgid "Account backup plan"
@@ -838,14 +804,12 @@ msgid "Access key"
 msgstr "Access key"
 
 #: assets/models/base.py:67
-#, fuzzy
-#| msgid "Secret key"
 msgid "Secret type"
-msgstr "Secret key"
+msgstr "密文类型"
 
 #: assets/models/base.py:69
 msgid "Privileged"
-msgstr ""
+msgstr "特权的"
 
 #: assets/models/cmd_filter.py:32 perms/models/asset_permission.py:61
 #: users/models/group.py:31 users/models/user.py:671
@@ -914,9 +878,8 @@ msgstr "测试网关"
 
 #: assets/models/domain.py:142
 #, fuzzy, python-brace-format
-#| msgid "Unable to connect to port {port} on {ip}"
 msgid "Unable to connect to port {port} on {address}"
-msgstr "无法连接到 {ip} 上的端口 {port}"
+msgstr "无法连接到 {address} 上的端口 {port}"
 
 #: assets/models/domain.py:145 authentication/middleware.py:75
 #: xpack/plugins/cloud/providers/fc.py:48
@@ -1002,10 +965,8 @@ msgid "Can match node"
 msgstr "可以匹配节点"
 
 #: assets/models/platform.py:21
-#, fuzzy
-#| msgid "MFA required"
 msgid "Required"
-msgstr "需要 MFA 认证"
+msgstr "必需的"
 
 #: assets/models/platform.py:24 users/templates/users/reset_password.html:29
 msgid "Setting"
@@ -1017,65 +978,47 @@ msgstr "启用"
 
 #: assets/models/platform.py:44
 msgid "Ansible config"
-msgstr ""
+msgstr "Ansible 配置"
 
 #: assets/models/platform.py:45
-#, fuzzy
-#| msgid "MFA enabled"
 msgid "Ping enabled"
-msgstr "MFA 已启用"
+msgstr "探测资产"
 
 #: assets/models/platform.py:46
 msgid "Ping method"
-msgstr ""
+msgstr "探测方式"
 
 #: assets/models/platform.py:47 assets/models/platform.py:55
-#, fuzzy
-#| msgid "Gather assets users"
 msgid "Gather facts enabled"
-msgstr "收集资产上的用户"
+msgstr "收集资产信息"
 
 #: assets/models/platform.py:48 assets/models/platform.py:56
-#, fuzzy
-#| msgid "Gather assets users"
 msgid "Gather facts method"
-msgstr "收集资产上的用户"
+msgstr "收集资产信息方式"
 
 #: assets/models/platform.py:49
-#, fuzzy
-#| msgid "Create account successfully"
-msgid "Create account enabled"
-msgstr "创建账号成功"
+msgid "Push account enabled"
+msgstr "推送账号"
 
 #: assets/models/platform.py:50
-#, fuzzy
-#| msgid "Create account successfully"
-msgid "Create account method"
-msgstr "创建账号成功"
+msgid "Push account method"
+msgstr "推送方式"
 
 #: assets/models/platform.py:51
-#, fuzzy
-#| msgid "Change Password"
 msgid "Change password enabled"
 msgstr "更改密码"
 
 #: assets/models/platform.py:52
-#, fuzzy
-#| msgid "Change Password"
 msgid "Change password method"
-msgstr "更改密码"
+msgstr "改密方式"
 
 #: assets/models/platform.py:53
-#, fuzzy
-#| msgid "Service account key"
 msgid "Verify account enabled"
-msgstr "服务账号密钥"
+msgstr "校验账号"
 
 #: assets/models/platform.py:54
-#, fuzzy
-#| msgid "Verify auth"
 msgid "Verify account method"
-msgstr "验证密码/密钥"
+msgstr "验证z"
 
 #: assets/models/platform.py:71 tickets/models/ticket/general.py:298
 msgid "Meta"
@@ -1313,30 +1256,24 @@ msgid "SFTP home"
 msgstr "SFTP根路径"
 
 #: assets/serializers/platform.py:28
-#, fuzzy
-#| msgid "Auto"
 msgid "Auto fill"
-msgstr "自动"
+msgstr "自动填充"
 
 #: assets/serializers/platform.py:29
-#, fuzzy
-#| msgid "Username attr"
 msgid "Username selector"
-msgstr "用户名属性"
+msgstr "用户名选择器"
 
 #: assets/serializers/platform.py:30
-#, fuzzy
-#| msgid "Password rules"
 msgid "Password selector"
-msgstr "密码规则"
+msgstr "密码选择器"
 
 #: assets/serializers/platform.py:31
 msgid "Submit selector"
-msgstr ""
+msgstr "提交按钮选择器"
 
 #: assets/serializers/platform.py:64
 msgid "Primary"
-msgstr ""
+msgstr "主要的"
 
 #: assets/serializers/utils.py:11
 msgid "Password can not contains `{{` "
@@ -2549,7 +2486,7 @@ msgstr "%s对象不存在"
 #: common/drf/fields.py:71
 #, python-brace-format
 msgid "Incorrect type. Expected pk value, received {data_type}."
-msgstr ""
+msgstr "不正确的类型。期望 pk 值，收到 {data_type} 类型。"
 
 #: common/drf/parsers/base.py:17
 msgid "The file content overflowed (The maximum length `{}` bytes)"
@@ -2674,10 +2611,8 @@ msgid "Invalid ip"
 msgstr "无效IP"
 
 #: common/utils/ip/utils.py:78
-#, fuzzy
-#| msgid "Invalid signature."
 msgid "Invalid address"
-msgstr "签名无效"
+msgstr "不合理的地址"
 
 #: common/validators.py:14
 msgid "Special char not allowed"
@@ -2748,20 +2683,16 @@ msgid "Site message"
 msgstr "站内信"
 
 #: ops/ansible/inventory.py:76
-#, fuzzy
-#| msgid "Account unavailable"
 msgid "No account available"
-msgstr "账号无效"
+msgstr "没有账号可以使用"
 
 #: ops/ansible/inventory.py:171
-#, fuzzy
-#| msgid "User disabled."
 msgid "Ansible disabled"
-msgstr "用户已禁用"
+msgstr "Ansible 已禁用"
 
 #: ops/ansible/inventory.py:186
 msgid "Skip hosts below:"
-msgstr ""
+msgstr "跳过一下主机："
 
 #: ops/api/celery.py:61 ops/api/celery.py:76
 msgid "Waiting task start"
@@ -2773,21 +2704,17 @@ msgstr "作业中心"
 
 #: ops/const.py:6
 msgid "Push"
-msgstr ""
+msgstr "推送"
 
 #: ops/const.py:7
-#, fuzzy
-#| msgid "Verified"
 msgid "Verify"
-msgstr "已校验"
+msgstr "校验"
 
 #: ops/const.py:8
 msgid "Collect"
 msgstr ""
 
 #: ops/const.py:9
-#, fuzzy
-#| msgid "Change Password"
 msgid "Change password"
 msgstr "更改密码"
 
@@ -2833,10 +2760,8 @@ msgid "Args"
 msgstr "参数"
 
 #: ops/models/adhoc.py:21 ops/models/base.py:20 ops/models/playbook.py:27
-#, fuzzy
-#| msgid "Command execution"
 msgid "Last execution"
-msgstr "命令执行"
+msgstr "最后执行"
 
 #: ops/models/adhoc.py:36
 msgid "Adhoc"
@@ -2851,16 +2776,12 @@ msgid "Creator"
 msgstr "创建者"
 
 #: ops/models/base.py:19
-#, fuzzy
-#| msgid "Account key"
 msgid "Account policy"
-msgstr "账号密钥"
+msgstr "账号策略"
 
 #: ops/models/base.py:21
-#, fuzzy
-#| msgid "Date last sync"
 msgid "Date last run"
-msgstr "最后同步日期"
+msgstr "最后执行日期"
 
 #: ops/models/base.py:50 xpack/plugins/cloud/models.py:169
 msgid "Result"
@@ -2868,7 +2789,7 @@ msgstr "结果"
 
 #: ops/models/base.py:51
 msgid "Summary"
-msgstr ""
+msgstr "汇总"
 
 #: ops/models/celery.py:16 terminal/models/task.py:18
 msgid "Kwargs"
@@ -2886,19 +2807,19 @@ msgstr "结束"
 
 #: ops/models/playbook.py:10
 msgid "Path"
-msgstr ""
+msgstr "路径"
 
 #: ops/models/playbook.py:18
 msgid "Playbook template"
-msgstr ""
+msgstr "Playbook 模版"
 
 #: ops/models/playbook.py:23
 msgid "Playbook"
-msgstr ""
+msgstr "Playbook"
 
 #: ops/models/playbook.py:24
 msgid "Owner"
-msgstr ""
+msgstr "Owner"
 
 #: ops/models/playbook.py:26 settings/serializers/auth/sms.py:64
 msgid "Template"
@@ -2910,10 +2831,8 @@ msgid "Task"
 msgstr "任务"
 
 #: ops/models/playbook.py:39
-#, fuzzy
-#| msgid "Run user"
 msgid "Run dir"
-msgstr "运行的用户"
+msgstr "运行目录"
 
 #: ops/notifications.py:17
 msgid "Server performance"
@@ -2944,16 +2863,12 @@ msgid "CPU load more than {max_threshold}: => {value}"
 msgstr "CPU 使用率超过 {max_threshold}: => {value}"
 
 #: ops/tasks.py:33
-#, fuzzy
-#| msgid "Run asset"
 msgid "Run ansible task"
-msgstr "运行的资产"
+msgstr "运行 ansible 任务"
 
 #: ops/tasks.py:57
-#, fuzzy
-#| msgid "Run command"
 msgid "Run ansible command"
-msgstr "运行的命令"
+msgstr "运行 ansible 命令"
 
 #: ops/tasks.py:79
 msgid "Clean task history period"
@@ -3340,10 +3255,6 @@ msgstr "云同步"
 #: rbac/tree.py:52
 msgid "Backup account"
 msgstr "备份账号"
-
-#: rbac/tree.py:53
-msgid "Gather account"
-msgstr "收集账号"
 
 #: rbac/tree.py:54
 msgid "App change auth"
@@ -5294,10 +5205,8 @@ msgid "Apply assets"
 msgstr "申请资产"
 
 #: tickets/models/ticket/apply_asset.py:17
-#, fuzzy
-#| msgid "Application account"
 msgid "Apply accounts"
-msgstr "应用账号"
+msgstr "申请账号"
 
 #: tickets/models/ticket/command_confirm.py:10
 msgid "Run user"
@@ -5308,8 +5217,6 @@ msgid "Run asset"
 msgstr "运行的资产"
 
 #: tickets/models/ticket/command_confirm.py:13
-#, fuzzy
-#| msgid "account"
 msgid "Run account"
 msgstr "账号"
 
@@ -5370,10 +5277,8 @@ msgid "Login asset"
 msgstr "登录资产"
 
 #: tickets/models/ticket/login_asset_confirm.py:19
-#, fuzzy
-#| msgid "Login acl"
 msgid "Login account"
-msgstr "登录访问控制"
+msgstr "登录账号"
 
 #: tickets/models/ticket/login_confirm.py:12
 msgid "Login datetime"
@@ -6753,6 +6658,31 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Verify account"
+#~ msgstr "验证密钥"
+
+#~ msgid "Gather accounts"
+#~ msgstr "收集账号"
+
+#, fuzzy
+#~| msgid "Hostname strategy"
+#~ msgid "Automation strategy"
+#~ msgstr "主机名策略"
+
+#~ msgid "Discovery strategy"
+#~ msgstr "自动发现策略"
+
+#~ msgid "Reconcile strategy"
+#~ msgstr "主机名策略"
+
+#~ msgid "Verify strategy"
+#~ msgstr "SSH 密钥策略"
+
+#, fuzzy
+#~| msgid "Can change auth setting"
+#~ msgid "Change auth strategy"
+#~ msgstr "认证设置"
 
 #~ msgid "System User"
 #~ msgstr "系统用户"

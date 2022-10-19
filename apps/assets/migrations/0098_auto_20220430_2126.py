@@ -27,6 +27,7 @@ def migrate_database_to_asset(apps, *args):
     applications = app_model.objects.filter(category='db')
     platforms = platform_model.objects.all().filter(internal=True)
     platforms_map = {p.type: p for p in platforms}
+    print()
 
     for app in applications:
         attrs = {'host': '', 'port': 0, 'database': ''}

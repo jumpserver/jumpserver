@@ -14,10 +14,10 @@ from assets.models import Node, Asset
 class AutomationTypes(models.TextChoices):
     ping = 'ping', _('Ping')
     gather_facts = 'gather_facts', _('Gather facts')
-    create_account = 'create_account', _('Create account')
+    push_account = 'push_account', _('Create account')
     change_secret = 'change_secret', _('Change secret')
     verify_account = 'verify_account', _('Verify account')
-    gather_accounts = 'gather_accounts', _('Gather accounts')
+    gather_account = 'gather_account', _('Gather account')
 
 
 class BaseAutomation(JMSOrgBaseModel, PeriodTaskModelMixin):
@@ -74,14 +74,14 @@ class BaseAutomation(JMSOrgBaseModel, PeriodTaskModelMixin):
 
     class Meta:
         unique_together = [('org_id', 'name')]
-        verbose_name = _("Automation plan")
+        verbose_name = _("Automation task")
 
 
 class AutomationExecution(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     automation = models.ForeignKey(
         'BaseAutomation', related_name='executions', on_delete=models.CASCADE,
-        verbose_name=_('Automation strategy')
+        verbose_name=_('Automation task')
     )
     status = models.CharField(max_length=16, default='pending')
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
@@ -96,7 +96,7 @@ class AutomationExecution(OrgModelMixin):
     )
 
     class Meta:
-        verbose_name = _('Automation strategy execution')
+        verbose_name = _('Automation task execution')
 
     @property
     def manager_type(self):
