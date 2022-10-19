@@ -3,8 +3,7 @@ import os
 import subprocess
 
 from django.conf import settings
-from celery import shared_task, subtask
-from celery import signals
+from celery import shared_task
 
 from celery.exceptions import SoftTimeLimitExceeded
 from django.utils import timezone
@@ -76,7 +75,7 @@ def run_playbook(pid, **kwargs):
 
 @shared_task
 @after_app_shutdown_clean_periodic
-@register_as_period_task(interval=3600*24, description=_("Clean task history period"))
+@register_as_period_task(interval=3600 * 24, description=_("Clean task history period"))
 def clean_tasks_adhoc_period():
     logger.debug("Start clean task adhoc and run history")
     tasks = Task.objects.all()
@@ -89,7 +88,7 @@ def clean_tasks_adhoc_period():
 
 @shared_task
 @after_app_shutdown_clean_periodic
-@register_as_period_task(interval=3600*24, description=_("Clean celery log period"))
+@register_as_period_task(interval=3600 * 24, description=_("Clean celery log period"))
 def clean_celery_tasks_period():
     logger.debug("Start clean celery task history")
     expire_days = get_log_keep_day('TASK_LOG_KEEP_DAYS')
@@ -159,17 +158,3 @@ def hello(name, callback=None):
 def hello_callback(result):
     print(result)
     print("Hello callback")
-
-
-@shared_task
-def execute_automation_strategy(pid, trigger):
-    from .models import AutomationStrategy
-    with tmp_to_root_org():
-        instance = get_object_or_none(AutomationStrategy, pk=pid)
-    if not instance:
-        logger.error("No automation plan found: {}".format(pid))
-        return
-    with tmp_to_org(instance.org):
-        instance.execute(trigger)
-
-

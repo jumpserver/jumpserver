@@ -5,7 +5,8 @@ from django.utils.translation import ugettext as _, gettext_noop
 
 from common.utils import get_logger
 from orgs.utils import org_aware_func
-from ..models import Connectivity, Account
+from assets.const import Connectivity
+from ..models import Account
 from . import const
 from .utils import check_asset_can_run_ansible
 

@@ -13,8 +13,8 @@ class ExecutionManager:
 
     def __init__(self, execution):
         self.execution = execution
-        self._runner = self.manager_type_mapper[execution.automation.type](execution)
+        self._runner = self.manager_type_mapper[execution.manager_type](execution)
 
-    def run(self, **kwargs):
-        return self._runner.run(**kwargs)
+    def run(self, *args, **kwargs):
+        return self._runner.run(*args, **kwargs)
 

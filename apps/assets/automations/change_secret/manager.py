@@ -6,15 +6,9 @@ from collections import defaultdict
 from django.utils import timezone
 
 from common.utils import lazyproperty, gen_key_pair
-from assets.models import ChangeSecretRecord, SecretStrategy
+from assets.models import ChangeSecretRecord
+from assets.const import SecretStrategy, DEFAULT_PASSWORD_RULES
 from ..base.manager import BasePlaybookManager
-
-string_punctuation = '!#$%&()*+,-.:;<=>?@[]^_~'
-DEFAULT_PASSWORD_LENGTH = 30
-DEFAULT_PASSWORD_RULES = {
-    'length': DEFAULT_PASSWORD_LENGTH,
-    'symbol_set': string_punctuation
-}
 
 
 class ChangeSecretManager(BasePlaybookManager):
@@ -145,5 +139,3 @@ class ChangeSecretManager(BasePlaybookManager):
 
     def on_runner_failed(self, runner, e):
         pass
-
-

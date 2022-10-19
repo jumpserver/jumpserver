@@ -9,8 +9,6 @@ from orgs.utils import org_aware_func
 from jumpserver.const import PROJECT_DIR
 
 from .models import AdHoc
-from .const import DEFAULT_PASSWORD_RULES
-
 logger = get_logger(__file__)
 
 DEFAULT_TASK_OPTIONS = {
@@ -80,15 +78,3 @@ def get_task_log_path(base_path, task_id, level=2):
     path = os.path.join(base_path, rel_path)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     return path
-
-
-def generate_random_password(**kwargs):
-    import random
-    import string
-    length = int(kwargs.get('length', DEFAULT_PASSWORD_RULES['length']))
-    symbol_set = kwargs.get('symbol_set')
-    if symbol_set is None:
-        symbol_set = DEFAULT_PASSWORD_RULES['symbol_set']
-    chars = string.ascii_letters + string.digits + symbol_set
-    password = ''.join([random.choice(chars) for _ in range(length)])
-    return password

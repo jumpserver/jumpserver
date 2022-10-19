@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 #
 import uuid
-from functools import reduce
 
 from celery import current_task
 from django.db import models
@@ -112,6 +111,6 @@ class AccountBackupPlanExecution(OrgModelMixin):
         return recipients.values()
 
     def start(self):
-        from ..task_handlers import ExecutionManager
+        from assets.automations import ExecutionManager
         manager = ExecutionManager(execution=self)
         return manager.run()
