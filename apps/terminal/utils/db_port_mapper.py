@@ -20,15 +20,20 @@ class DBPortManager(object):
     CACHE_KEY = 'PORT_DB_MAPPER'
 
     def __init__(self):
-        self.port_start = settings.MAGNUS_DB_PORTS_START
-        self.port_limit = settings.MAGNUS_DB_PORTS_LIMIT_COUNT
-        self.port_end = self.port_start + self.port_limit
+        try:
+            port_start, port_end = settings.MAGNUS_PORTS.split('-')
+            port_start, port_end = int(port_start), int(port_end)
+        except Exception as e:
+            logger.error('MAGNUS_PORTS config error: {}'.format(e))
+            port_start, port_end = 30000, 30100
+
+        self.port_start, self.port_end = port_start, port_end
         # 可以使用的端口列表
-        self.all_available_ports = list(range(self.port_start, self.port_end))
+        self.all_available_ports = list(range(self.port_start, self.port_end + 1))
 
     @property
     def magnus_listen_port_range(self):
-        return f'{self.port_start}-{self.port_end - 1}'
+        return settings.MAGNUS_PORTS
 
     def init(self):
         with tmp_to_root_org():

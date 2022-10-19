@@ -21,7 +21,7 @@ def init_db_port_mapper(sender, **kwargs):
     try:
         db_port_manager.init()
     except (ProgrammingError,) as e:
-        logger.error('Init db port mapper error: {}'.format(e))
+        pass
 
 
 @receiver(post_save, sender=Application)
