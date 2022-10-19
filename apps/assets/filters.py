@@ -163,7 +163,7 @@ class AccountFilterSet(BaseFilterSet):
     username = drf_filters.CharFilter(field_name="username", lookup_expr='exact')
     address = drf_filters.CharFilter(field_name="asset__address", lookup_expr='exact')
     asset = drf_filters.CharFilter(field_name="asset_id", lookup_expr='exact')
-    assets = drf_filters.CharFilter(field_name='asset_id', lookup_expr='in')
+    assets = drf_filters.CharFilter(field_name='asset_id', lookup_expr='exact')
     nodes = drf_filters.CharFilter(method='filter_nodes')
     has_secret = drf_filters.BooleanFilter(method='filter_has_secret')
 
@@ -177,7 +177,7 @@ class AccountFilterSet(BaseFilterSet):
 
     @staticmethod
     def filter_nodes(queryset, name, value):
-        nodes = Node.objects.filter(id__in=value)
+        nodes = Node.objects.filter(id=value)
         if not nodes:
             return queryset
 

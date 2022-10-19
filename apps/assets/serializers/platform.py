@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 
 from common.drf.fields import LabeledChoiceField
-from common.drf.serializers import JMSWritableNestedModelSerializer
+from common.drf.serializers import WritableNestedModelSerializer
 from ..models import Platform, PlatformProtocol, PlatformAutomation
 from ..const import Category, AllTypes
 
@@ -71,7 +71,7 @@ class PlatformProtocolsSerializer(serializers.ModelSerializer):
         ]
 
 
-class PlatformSerializer(JMSWritableNestedModelSerializer):
+class PlatformSerializer(WritableNestedModelSerializer):
     type = LabeledChoiceField(choices=AllTypes.choices(), label=_("Type"))
     category = LabeledChoiceField(choices=Category.choices, label=_("Category"))
     protocols = PlatformProtocolsSerializer(label=_('Protocols'), many=True, required=False)

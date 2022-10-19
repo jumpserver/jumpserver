@@ -34,11 +34,6 @@ class AccountViewSet(OrgBulkModelViewSet):
         account = super().get_object()
         task = test_accounts_connectivity_manual.delay([account.id])
         return Response(data={'task': task.id})
-    #
-    # @action(methods=['get'], detail=True, url_path='secret')
-    # def get_secret(self, request, *args, **kwargs):
-    #     account = super().get_object()
-    #     return Response(data={'secret': account.secret})
 
 
 class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
@@ -49,6 +44,7 @@ class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
         'default': serializers.AccountSecretSerializer
     }
     http_method_names = ['get']
+    # Todo: 记得打开
     # permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
     rbac_perms = {
         'list': 'assets.view_assetaccountsecret',

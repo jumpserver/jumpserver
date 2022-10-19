@@ -5,7 +5,7 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework_bulk.serializers import BulkListSerializer
 from django.utils.translation import gettext_lazy as _
 from django.utils.functional import cached_property
-from drf_writable_nested.serializers import WritableNestedModelSerializer
+from drf_writable_nested.serializers import WritableNestedModelSerializer as NestedModelSerializer
 
 from .mixin import BulkListSerializerMixin, BulkSerializerMixin
 
@@ -13,7 +13,7 @@ from .mixin import BulkListSerializerMixin, BulkSerializerMixin
 __all__ = [
     'MethodSerializer', 'EmptySerializer', 'BulkModelSerializer',
     'AdaptedBulkListSerializer', 'CeleryTaskSerializer',
-    'JMSWritableNestedModelSerializer',
+    'WritableNestedModelSerializer',
     'GroupedChoiceSerializer',
 ]
 
@@ -86,5 +86,5 @@ class GroupedChoiceSerializer(ChoiceSerializer):
     children = ChoiceSerializer(many=True, label=_("Children"))
 
 
-class JMSWritableNestedModelSerializer(ModelSerializer):
+class WritableNestedModelSerializer(NestedModelSerializer):
     pass
