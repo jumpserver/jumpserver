@@ -9,7 +9,7 @@ def migrate_command_filter_to_assets(apps, schema_editor):
 
     count = 0
     bulk_size = 1000
-    print("\nStart migrate command filters to assets")
+    print("\n\tStart migrate command filters to assets")
     while True:
         start = time.time()
         command_filters = command_filter_model.objects.all() \
@@ -23,7 +23,7 @@ def migrate_command_filter_to_assets(apps, schema_editor):
             updated.append(command_filter)
         command_filter_model.objects.bulk_update(updated, ['accounts'])
 
-        print("Create assets: {}-{} using: {:.2f}s".format(
+        print("\tCreate assets: {}-{} using: {:.2f}s".format(
             count - len(command_filters), count, time.time() - start
         ))
 

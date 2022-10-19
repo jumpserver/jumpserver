@@ -52,7 +52,7 @@ class HostTypes(BaseType):
                 'gather_accounts_enabled': True,
                 'verify_account_enabled': True,
                 'change_secret_enabled': True,
-                'create_account_enabled': True,
+                'push_account_enabled': True,
             },
             cls.WINDOWS: {
                 'ansible_config': {
@@ -73,8 +73,8 @@ class HostTypes(BaseType):
                 {'name': 'macOS'},
                 {'name': 'BSD'},
                 {'name': 'AIX', 'automation': {
-                    'create_account_method': 'create_account_aix',
-                    'change_secret_method': 'change_secret_aix'
+                    'push_account_method': 'push_account_aix',
+                    'change_secret_method': 'push_secret_aix'
                 }},
             ],
             cls.WINDOWS: [

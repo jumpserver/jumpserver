@@ -19,23 +19,13 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='HistoricalAccount',
             fields=[
-                ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
                 ('id', models.UUIDField(db_index=True, default=uuid.uuid4)),
-                ('name', models.CharField(max_length=128, verbose_name='Name')),
-                ('username', models.CharField(blank=True, db_index=True, max_length=128, verbose_name='Username')),
                 ('secret_type', models.CharField(choices=[('password', 'Password'), ('ssh_key', 'SSH key'), ('access_key', 'Access key'), ('token', 'Token')], default='password', max_length=16, verbose_name='Secret type')),
                 ('secret', common.db.fields.EncryptTextField(blank=True, null=True, verbose_name='Secret')),
-                ('comment', models.TextField(blank=True, verbose_name='Comment')),
-                ('date_created', models.DateTimeField(blank=True, editable=False, verbose_name='Date created')),
-                ('date_updated', models.DateTimeField(blank=True, editable=False, verbose_name='Date updated')),
-                ('created_by', models.CharField(max_length=128, null=True, verbose_name='Created by')),
-                ('privileged', models.BooleanField(default=False, verbose_name='Privileged')),
-                ('version', models.IntegerField(default=0, verbose_name='Version')),
                 ('history_id', models.AutoField(primary_key=True, serialize=False)),
                 ('history_date', models.DateTimeField(db_index=True)),
                 ('history_change_reason', models.CharField(max_length=100, null=True)),
                 ('history_type', models.CharField(choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')], max_length=1)),
-                ('asset', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='assets.asset', verbose_name='Asset')),
                 ('history_user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
             ],
             options={
@@ -73,11 +63,6 @@ class Migration(migrations.Migration):
             model_name='account',
             name='su_from',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='su_to', to='assets.account', verbose_name='Su from'),
-        ),
-        migrations.AddField(
-            model_name='historicalaccount',
-            name='su_from',
-            field=models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='assets.account', verbose_name='Su from'),
         ),
         migrations.CreateModel(
             name='AccountTemplate',

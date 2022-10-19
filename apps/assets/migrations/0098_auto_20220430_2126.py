@@ -41,7 +41,7 @@ def migrate_database_to_asset(apps, *args):
             org_id=app.org_id
         )
         try:
-            print("Create database: ", app.name)
+            print("\t- Create database: ", app.name)
             db.save()
         except:
             failed_apps.append(app)
@@ -59,7 +59,7 @@ def migrate_cloud_to_asset(apps, *args):
 
     for app in applications:
         attrs = app.attrs
-        print("Create cloud: {}".format(app.name))
+        print("\t- Create cloud: {}".format(app.name))
         cloud = cloud_model(
             id=app.id, name=app.name,
             address=attrs.get('cluster', ''),
@@ -115,7 +115,7 @@ def migrate_to_nodes(apps, *args):
         )
         if not node:
             continue
-        print("Set node asset: ", node)
+        print("\t- Set node asset: ", node)
         node.assets_amount = len(assets)
         node.save()
         node.assets.set(assets)

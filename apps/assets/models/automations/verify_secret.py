@@ -4,10 +4,10 @@ from ops.const import StrategyChoice
 from .base import BaseAutomation
 
 
-class VerifyAutomation(BaseAutomation):
+class VerifySecretAutomation(BaseAutomation):
     class Meta:
-        verbose_name = _("Verify strategy")
+        verbose_name = _("Verify secret automation")
 
     def save(self, *args, **kwargs):
-        self.type = 'verify'
+        self.type = 'verify_secret'
         super().save(*args, **kwargs)

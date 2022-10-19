@@ -11,7 +11,7 @@ def migrate_accounts(apps, schema_editor):
 
     count = 0
     bulk_size = 1000
-    print("\nStart migrate accounts")
+    print("\n\tStart migrate accounts")
     while True:
         start = time.time()
         auth_books = auth_book_model.objects \
@@ -71,7 +71,7 @@ def migrate_accounts(apps, schema_editor):
                 accounts.append(account)
 
         account_model.objects.bulk_create(accounts, ignore_conflicts=True)
-        print("Create accounts: {}-{} using: {:.2f}s".format(
+        print("\t  - Create accounts: {}-{} using: {:.2f}s".format(
             count - len(auth_books), count, time.time()-start
         ))
 

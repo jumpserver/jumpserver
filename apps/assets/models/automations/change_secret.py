@@ -39,7 +39,7 @@ class ChangeSecretAutomation(BaseAutomation):
         super().save(*args, **kwargs)
 
     class Meta:
-        verbose_name = _("Change auth strategy")
+        verbose_name = _("Change secret automation")
 
 
 class ChangeSecretRecord(JMSBaseModel):

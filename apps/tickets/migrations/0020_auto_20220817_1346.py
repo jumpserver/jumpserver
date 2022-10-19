@@ -15,7 +15,7 @@ def migrate_system_to_account(apps, schema_editor):
         (apply_login_asset_ticket_model, 'apply_login_system_user', 'apply_login_account', False),
     )
 
-    print("\nStart migrate system user to account")
+    print("\n    Start migrate system user to account")
     for model, old_field, new_field, m2m in model_system_user_account:
         print("  - migrate '{}'".format(model.__name__))
         count = 0

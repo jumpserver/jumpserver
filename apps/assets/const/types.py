@@ -204,18 +204,18 @@ class AllTypes(ChoicesMixin):
     def create_or_update_internal_platforms(cls):
         print("Create internal platforms")
         for category, type_cls in cls.category_types():
-            print("## Category: {}".format(category.label))
+            print("\t## Category: {}".format(category.label))
             data = type_cls.internal_platforms()
 
             for tp, platform_datas in data.items():
-                print("  >> Type: {}".format(tp.label))
+                print("\t  >> Type: {}".format(tp.label))
                 default_platform_data = cls.get_type_default_platform(category, tp)
                 default_automation = default_platform_data.pop('automation', {})
                 default_protocols = default_platform_data.pop('protocols', [])
 
                 for d in platform_datas:
                     name = d['name']
-                    print("    - Platform: {}".format(name))
+                    print("\t    - Platform: {}".format(name))
                     _automation = d.pop('automation', {})
                     _protocols = d.pop('_protocols', [])
                     _protocols_setting = d.pop('protocols_setting', {})
@@ -246,7 +246,7 @@ class AllTypes(ChoicesMixin):
         user_platforms.update(internal=False)
 
         for platform in user_platforms:
-            print("Update platform: {}".format(platform.name))
+            print("\t- Update platform: {}".format(platform.name))
             platform_data = cls.get_type_default_platform(platform.category, platform.type)
             cls.create_or_update_by_platform_data(platform.name, platform_data)
 

@@ -12,7 +12,7 @@ def fill_ticket_serial_number(apps, schema_editor):
     curr_day = '00000000'
     curr_num = 1
 
-    print(f'\nFill ticket serial number ... ', end='')
+    print(f'\n    Fill ticket serial number ... ')
     for ticket in tickets:
         # 跑这个脚本的时候，所有 ticket.serial_num == null
         date_created = as_current_tz(ticket.date_created)

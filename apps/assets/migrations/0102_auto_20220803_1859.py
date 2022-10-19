@@ -9,7 +9,7 @@ def migrate_asset_protocols(apps, schema_editor):
 
     count = 0
     bulk_size = 1000
-    print("\nStart migrate asset protocols")
+    print("\n\tStart migrate asset protocols")
     while True:
         start = time.time()
         assets = asset_model.objects.all()[count:count+bulk_size]
@@ -36,7 +36,7 @@ def migrate_asset_protocols(apps, schema_editor):
                 assets_protocols.append(protocol)
 
         protocol_model.objects.bulk_create(assets_protocols, ignore_conflicts=True)
-        print("Create asset protocols: {}-{} using: {:.2f}s".format(
+        print("\t - Create asset protocols: {}-{} using: {:.2f}s".format(
             count - len(assets), count, time.time()-start
         ))
 
