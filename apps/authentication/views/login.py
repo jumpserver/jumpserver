@@ -330,6 +330,8 @@ class UserLogoutView(TemplateView):
             return settings.CAS_LOGOUT_URL_NAME
         elif 'saml2' in backend:
             return settings.SAML2_LOGOUT_URL_NAME
+        elif 'oauth2' in backend:
+            return settings.AUTH_OAUTH2_LOGOUT_URL_NAME
         return None
 
     def get(self, request, *args, **kwargs):

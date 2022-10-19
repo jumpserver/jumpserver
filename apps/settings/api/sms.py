@@ -38,6 +38,7 @@ class SMSTestingAPI(GenericAPIView):
     backends_serializer = {
         'alibaba': serializers.AlibabaSMSSettingSerializer,
         'tencent': serializers.TencentSMSSettingSerializer,
+        'huawei': serializers.HuaweiSMSSettingSerializer,
         'cmpp2': serializers.CMPP2SMSSettingSerializer
     }
     rbac_perms = {
@@ -78,6 +79,22 @@ class SMSTestingAPI(GenericAPIView):
         send_sms_params = {
             'sign_name': data['TENCENT_VERIFY_SIGN_NAME'],
             'template_code': data['TENCENT_VERIFY_TEMPLATE_CODE'],
+            'template_param': OrderedDict(code='666666')
+        }
+        return init_params, send_sms_params
+
+    def get_huawei_params(self, data):
+        init_params = {
+            'app_key': data['HUAWEI_APP_KEY'],
+            'app_secret': self.get_or_from_setting(
+                'HUAWEI_APP_SECRET', data.get('HUAWEI_APP_SECRET')
+            ),
+            'url': data['HUAWEI_SMS_ENDPOINT'],
+            'sign_channel_num': data['HUAWEI_SIGN_CHANNEL_NUM'],
+        }
+        send_sms_params = {
+            'sign_name': data['HUAWEI_VERIFY_SIGN_NAME'],
+            'template_code': data['HUAWEI_VERIFY_TEMPLATE_CODE'],
             'template_param': OrderedDict(code='666666')
         }
         return init_params, send_sms_params

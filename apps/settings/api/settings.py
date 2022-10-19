@@ -40,6 +40,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'sms': serializers.SMSSettingSerializer,
         'alibaba': serializers.AlibabaSMSSettingSerializer,
         'tencent': serializers.TencentSMSSettingSerializer,
+        'huawei': serializers.HuaweiSMSSettingSerializer,
         'cmpp2': serializers.CMPP2SMSSettingSerializer,
     }
 

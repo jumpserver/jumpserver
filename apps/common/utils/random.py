@@ -35,7 +35,7 @@ def random_string(length, lower=True, upper=True, digit=True, special_char=False
 
     if special_char:
         spc = random.choice(string_punctuation)
-        i = random.choice(range(len(password)))
+        i = random.choice(range(1, len(password)))
         password[i] = spc
 
     password = ''.join(password)
