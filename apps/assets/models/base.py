@@ -18,16 +18,10 @@ from common.utils import (
     random_string, ssh_pubkey_gen,
 )
 from common.db import fields
+from assets.const import Connectivity
 from orgs.mixins.models import OrgModelMixin
 
-
 logger = get_logger(__file__)
-
-
-class Connectivity(models.TextChoices):
-    unknown = 'unknown', _('Unknown')
-    ok = 'ok', _('Ok')
-    failed = 'failed', _('Failed')
 
 
 class AbsConnectivity(models.Model):
@@ -64,7 +58,9 @@ class BaseAccount(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_("Name"))
     username = models.CharField(max_length=128, blank=True, verbose_name=_('Username'), db_index=True)
-    secret_type = models.CharField(max_length=16, choices=SecretType.choices, default='password', verbose_name=_('Secret type'))
+    secret_type = models.CharField(
+        max_length=16, choices=SecretType.choices, default=SecretType.password, verbose_name=_('Secret type')
+    )
     secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Secret'))
     privileged = models.BooleanField(verbose_name=_("Privileged"), default=False)
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
@@ -165,10 +161,7 @@ class BaseAccount(OrgModelMixin):
             'username': self.username,
             'password': self.password,
             'public_key': self.public_key,
-            'private_key': self.private_key_file,
-            'token': self.token
         }
 
     class Meta:
         abstract = True
-

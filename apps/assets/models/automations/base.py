@@ -4,23 +4,14 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from common.const.choices import Trigger
+from common.mixins.models import CommonModelMixin
 from common.db.fields import EncryptJsonDictTextField
-from orgs.mixins.models import OrgModelMixin, JMSOrgBaseModel
+from orgs.mixins.models import OrgModelMixin
 from ops.mixin import PeriodTaskModelMixin
-from ops.tasks import execute_automation_strategy
 from assets.models import Node, Asset
 
 
-class AutomationTypes(models.TextChoices):
-    ping = 'ping', _('Ping')
-    gather_facts = 'gather_facts', _('Gather facts')
-    push_account = 'push_account', _('Create account')
-    change_secret = 'change_secret', _('Change secret')
-    verify_account = 'verify_account', _('Verify account')
-    gather_account = 'gather_account', _('Gather account')
-
-
-class BaseAutomation(JMSOrgBaseModel, PeriodTaskModelMixin):
+class BaseAutomation(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
     accounts = models.JSONField(default=list, verbose_name=_("Accounts"))
     nodes = models.ManyToManyField(
         'assets.Node', blank=True, verbose_name=_("Nodes")
@@ -47,18 +38,17 @@ class BaseAutomation(JMSOrgBaseModel, PeriodTaskModelMixin):
         return assets.group_by_platform()
 
     def get_register_task(self):
-        name = "automation_strategy_period_{}".format(str(self.id)[:8])
-        task = execute_automation_strategy.name
-        args = (str(self.id), Trigger.timing)
-        kwargs = {}
-        return name, task, args, kwargs
+        raise NotImplementedError
 
     def to_attr_json(self):
         return {
             'name': self.name,
+            'type': self.type,
+            'org_id': self.org_id,
+            'comment': self.comment,
             'accounts': self.accounts,
+            'nodes': list(self.nodes.all().values_list('id', flat=True)),
             'assets': list(self.assets.all().values_list('id', flat=True)),
-            'nodes': list(self.assets.all().values_list('id', flat=True)),
         }
 
     def execute(self, trigger=Trigger.manual):
@@ -67,8 +57,9 @@ class BaseAutomation(JMSOrgBaseModel, PeriodTaskModelMixin):
         except AttributeError:
             eid = str(uuid.uuid4())
 
-        execution = self.executions.create(
-            id=eid, trigger=trigger,
+        execution = self.executions.model.objects.create(
+            id=eid, trigger=trigger, automation=self,
+            plan_snapshot=self.to_attr_json(),
         )
         return execution.start()
 

@@ -6,30 +6,26 @@ from collections import defaultdict
 from django.utils import timezone
 
 from common.utils import lazyproperty, gen_key_pair
-from assets.models import ChangeSecretRecord, SecretStrategy
+from assets.models import ChangeSecretRecord
+from assets.const import (
+    AutomationTypes, SecretType, SecretStrategy, DEFAULT_PASSWORD_RULES
+)
 from ..base.manager import BasePlaybookManager
-
-string_punctuation = '!#$%&()*+,-.:;<=>?@[]^_~'
-DEFAULT_PASSWORD_LENGTH = 30
-DEFAULT_PASSWORD_RULES = {
-    'length': DEFAULT_PASSWORD_LENGTH,
-    'symbol_set': string_punctuation
-}
 
 
 class ChangeSecretManager(BasePlaybookManager):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.method_hosts_mapper = defaultdict(list)
-        self.password_strategy = self.execution.automation.password_strategy
-        self.ssh_key_strategy = self.execution.automation.ssh_key_strategy
+        self.secret_strategy = self.execution.plan_snapshot['secret_strategy']
+        self.ssh_key_change_strategy = self.execution.plan_snapshot['ssh_key_change_strategy']
         self._password_generated = None
         self._ssh_key_generated = None
         self.name_recorder_mapper = {}  # 做个映射，方便后面处理
 
     @classmethod
     def method_type(cls):
-        return 'change_secret'
+        return AutomationTypes.change_secret
 
     @lazyproperty
     def related_accounts(self):
@@ -41,43 +37,52 @@ class ChangeSecretManager(BasePlaybookManager):
         return private_key
 
     def generate_password(self):
-        kwargs = self.automation.password_rules or {}
+        kwargs = self.automation.plan_snapshot['password_rules'] or {}
         length = int(kwargs.get('length', DEFAULT_PASSWORD_RULES['length']))
         symbol_set = kwargs.get('symbol_set')
         if symbol_set is None:
             symbol_set = DEFAULT_PASSWORD_RULES['symbol_set']
-        chars = string.ascii_letters + string.digits + symbol_set
-        password = ''.join([random.choice(chars) for _ in range(length)])
+
+        no_special_chars = string.ascii_letters + string.digits
+        chars = no_special_chars + symbol_set
+
+        first_char = random.choice(no_special_chars)
+        password = ''.join([random.choice(chars) for _ in range(length - 1)])
+        password = first_char + password
         return password
 
     def get_ssh_key(self):
-        if self.ssh_key_strategy == SecretStrategy.custom:
-            return self.automation.ssh_key
-        elif self.ssh_key_strategy == SecretStrategy.random_one:
+        if self.secret_strategy == SecretStrategy.custom:
+            ssh_key = self.automation.plan_snapshot['ssh_key']
+            if not ssh_key:
+                raise ValueError("Automation SSH key must be set")
+            return ssh_key
+        elif self.secret_strategy == SecretStrategy.random_one:
             if not self._ssh_key_generated:
                 self._ssh_key_generated = self.generate_ssh_key()
             return self._ssh_key_generated
         else:
-            self.generate_ssh_key()
+            return self.generate_ssh_key()
 
     def get_password(self):
-        if self.password_strategy == SecretStrategy.custom:
-            if not self.automation.password:
+        if self.secret_strategy == SecretStrategy.custom:
+            password = self.automation.plan_snapshot['password']
+            if not password:
                 raise ValueError("Automation Password must be set")
-            return self.automation.password
-        elif self.password_strategy == SecretStrategy.random_one:
+            return password
+        elif self.secret_strategy == SecretStrategy.random_one:
             if not self._password_generated:
                 self._password_generated = self.generate_password()
             return self._password_generated
         else:
-            self.generate_password()
+            return self.generate_password()
 
     def get_secret(self, account):
-        if account.secret_type == 'ssh-key':
+        if account.secret_type == SecretType.ssh_key:
             secret = self.get_ssh_key()
-        else:
+        elif account.secret_type == SecretType.password:
             secret = self.get_password()
-        if not secret:
+        else:
             raise ValueError("Secret must be set")
         return secret
 
@@ -145,5 +150,3 @@ class ChangeSecretManager(BasePlaybookManager):
 
     def on_runner_failed(self, runner, e):
         pass
-
-
