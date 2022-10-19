@@ -485,8 +485,7 @@ class Config(dict):
         'SECURITY_DATA_CRYPTO_ALGO': None,
         'GMSSL_ENABLED': False,
         # Magnus 组件需要监听的端口范围
-        'MAGNUS_DB_PORTS_START': 30000,
-        'MAGNUS_DB_PORTS_LIMIT_COUNT': 1000,
+        'MAGNUS_PORTS': '30000-30100',
 
         # 记录清理清理
         'LOGIN_LOG_KEEP_DAYS': 200,
