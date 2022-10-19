@@ -155,8 +155,14 @@ class OperatorLogHandler(metaclass=Singleton):
             'org_id': get_current_org_id(),
         }
         with transaction.atomic():
+            if self.log_client.ping(timeout=1):
+                client = self.log_client
+            else:
+                logger.info('Switch default operate log storage save.')
+                client = get_operate_log_storage(default=True)
+
             try:
-                self.log_client.save(**data)
+                client.save(**data)
             except Exception as e:
                 error_msg = 'An error occurred saving OperateLog.' \
                             'Error: %s, Data: %s' % (e, data)

@@ -12,6 +12,10 @@ class OperateLogStore(object):
             'The text content is too long. Use Elasticsearch to store operation logs'
         )
 
+    @staticmethod
+    def ping(timeout=None):
+        return True
+
     def save(self, **kwargs):
         log_id = kwargs.get('id', '')
         before = kwargs.get('before') or {}

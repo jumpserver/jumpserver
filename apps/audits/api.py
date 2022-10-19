@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
 
 from common.drf.api import JMSReadOnlyModelViewSet
+from common.plugins.es import QuerySet as ESQuerySet
 from common.drf.filters import DatetimeRangeFilter
 from common.api import CommonGenericViewSet
 from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet, OrgRelationMixin
@@ -92,13 +93,14 @@ class OperateLogViewSet(RetrieveModelMixin, ListModelMixin, OrgGenericViewSet):
         return super().get_serializer_class()
 
     def get_queryset(self):
+        qs = OperateLog.objects.all()
         es_config = settings.OPERATE_LOG_ELASTICSEARCH_CONFIG
         if es_config:
             engine_mod = import_module(TYPE_ENGINE_MAPPING['es'])
-            qs = engine_mod.QuerySet(es_config)
-            qs.model = OperateLog
-        else:
-            qs = OperateLog.objects.all()
+            store = engine_mod.OperateLogStore(es_config)
+            if store.ping(timeout=2):
+                qs = ESQuerySet(store)
+                qs.model = OperateLog
         return qs
 
 

@@ -9,11 +9,10 @@ TYPE_ENGINE_MAPPING = {
 }
 
 
-def get_operate_log_storage():
+def get_operate_log_storage(default=False):
+    engine_mod = import_module(TYPE_ENGINE_MAPPING['db'])
     es_config = settings.OPERATE_LOG_ELASTICSEARCH_CONFIG
-    if es_config:
+    if not default and es_config:
         engine_mod = import_module(TYPE_ENGINE_MAPPING['es'])
-    else:
-        engine_mod = import_module(TYPE_ENGINE_MAPPING['db'])
     storage = engine_mod.OperateLogStore(es_config)
     return storage
