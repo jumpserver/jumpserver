@@ -77,9 +77,9 @@ class BasePlaybookManager:
 
     def generate_inventory(self, platformed_assets, inventory_path):
         inventory = JMSInventory(
+            manager=self,
             assets=platformed_assets,
             account_policy=self.ansible_account_policy,
-            host_callback=self.host_callback
         )
         inventory.write_to_file(inventory_path)
 

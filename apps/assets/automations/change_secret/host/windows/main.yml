@@ -1,7 +1,7 @@
 - hosts: demo
   gather_facts: no
   tasks:
-    - name: ping
+    - name: Test privileged account
       ansible.windows.win_ping:
 
 #    - name: Print variables
@@ -13,7 +13,7 @@
         name: "{{ account.username }}"
         password: "{{ account.secret }}"
         update_password: always
-      when: account.secret_type == "password"
+      when: "{{ account.secret_type == 'password' }}"
 
     - name: Refresh connection
       ansible.builtin.meta: reset_connection
@@ -23,3 +23,4 @@
       vars:
         ansible_user: "{{ account.username }}"
         ansible_password: "{{ account.secret }}"
+      when: "{{ account.secret_type == 'password' }}"

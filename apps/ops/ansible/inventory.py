@@ -5,28 +5,26 @@ from collections import defaultdict
 
 from django.utils.translation import gettext as _
 
-
 __all__ = ['JMSInventory']
 
 
 class JMSInventory:
-    def __init__(self, assets, account_policy='smart', account_prefer='root,administrator', host_callback=None):
+    def __init__(self, manager, assets=None, account_policy='smart', account_prefer='root,administrator'):
         """
         :param assets:
         :param account_prefer: account username name if not set use account_policy
-        :param account_policy:
-        :param host_callback: after generate host, call this callback to modify host
+        :param account_policy: smart, privileged_must, privileged_first
         """
+        self.manager = manager
         self.assets = self.clean_assets(assets)
         self.account_prefer = account_prefer
         self.account_policy = account_policy
-        self.host_callback = host_callback
 
     @staticmethod
     def clean_assets(assets):
         from assets.models import Asset
         asset_ids = [asset.id for asset in assets]
-        assets = Asset.objects.filter(id__in=asset_ids, is_active=True)\
+        assets = Asset.objects.filter(id__in=asset_ids, is_active=True) \
             .prefetch_related('platform', 'domain', 'accounts')
         return assets
 
@@ -107,7 +105,7 @@ class JMSInventory:
                 'protocol': asset.protocol, 'port': asset.port,
                 'protocols': [{'name': p.name, 'port': p.port} for p in protocols],
             },
-            'jms_account':  {
+            'jms_account': {
                 'id': str(account.id), 'username': account.username,
                 'secret': account.secret, 'secret_type': account.secret_type
             } if account else None
@@ -156,7 +154,7 @@ class JMSInventory:
             account_selected = accounts[0] if accounts else None
         return account_selected
 
-    def generate(self):
+    def generate(self, path_dir):
         hosts = []
         platform_assets = self.group_by_platform(self.assets)
         for platform, assets in platform_assets.items():
@@ -170,10 +168,11 @@ class JMSInventory:
                 if not automation.ansible_enabled:
                     host['error'] = _('Ansible disabled')
 
-                if self.host_callback is not None:
-                    host = self.host_callback(
+                if self.manager.host_callback is not None:
+                    host = self.manager.host_callback(
                         host, asset=asset, account=account,
-                        platform=platform, automation=automation
+                        platform=platform, automation=automation,
+                        path_dir=path_dir
                     )
 
                 if isinstance(host, list):
@@ -195,8 +194,8 @@ class JMSInventory:
         return data
 
     def write_to_file(self, path):
-        data = self.generate()
         path_dir = os.path.dirname(path)
+        data = self.generate(path_dir)
         if not os.path.exists(path_dir):
             os.makedirs(path_dir, 0o700, True)
         with open(path, 'w') as f:
