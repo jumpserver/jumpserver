@@ -156,7 +156,7 @@ class JMSInventory:
             account_selected = accounts[0] if accounts else None
         return account_selected
 
-    def generate(self):
+    def generate(self, path_dir):
         hosts = []
         platform_assets = self.group_by_platform(self.assets)
         for platform, assets in platform_assets.items():
@@ -173,7 +173,8 @@ class JMSInventory:
                 if self.host_callback is not None:
                     host = self.host_callback(
                         host, asset=asset, account=account,
-                        platform=platform, automation=automation
+                        platform=platform, automation=automation,
+                        path_dir=path_dir
                     )
 
                 if isinstance(host, list):
@@ -195,8 +196,8 @@ class JMSInventory:
         return data
 
     def write_to_file(self, path):
-        data = self.generate()
         path_dir = os.path.dirname(path)
+        data = self.generate(path_dir)
         if not os.path.exists(path_dir):
             os.makedirs(path_dir, 0o700, True)
         with open(path, 'w') as f:
