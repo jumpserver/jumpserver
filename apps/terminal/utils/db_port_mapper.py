@@ -56,13 +56,17 @@ class DBPortManager(object):
         self.set_mapper(mapper)
 
     def get_port_by_db(self, db):
-        mapper = self.get_mapper()
-        for port, db_id in mapper.items():
-            if db_id == str(db.id):
-                return port
-        raise JMSException(
-            'Not matched db port, db id: {}, mapper length: {}'.format(db.id, len(mapper))
+        # mapper = self.get_mapper()
+        # for port, db_id in mapper.items():
+        #     if db_id == str(db.id):
+        #         return port
+        error = _(
+            'No available port is matched. '
+            'The number of databases may have exceeded the number of ports '
+            'open to the database agent service, '
+            'Contact the administrator to open more ports.'
         )
+        raise JMSException(error)
 
     def get_db_by_port(self, port):
         try:
