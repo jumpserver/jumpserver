@@ -60,8 +60,8 @@ class AccountSerializer(AccountSerializerCreateMixin, BaseAccountSerializer):
     class Meta(BaseAccountSerializer.Meta):
         model = Account
         fields = BaseAccountSerializer.Meta.fields \
-                 + ['su_from', 'version', 'asset'] \
-                 + ['template', 'push_now']
+            + ['su_from', 'version', 'asset'] \
+            + ['template', 'push_now']
         extra_kwargs = {
             **BaseAccountSerializer.Meta.extra_kwargs,
             'name': {'required': False, 'allow_null': True},
@@ -87,6 +87,13 @@ class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
         extra_kwargs = {
             'secret': {'write_only': False},
         }
+
+
+class AccountHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Account.history.model
+        fields = ['id', 'secret', 'secret_type', 'version', 'history_date', 'history_user']
+        read_only_fields = fields
 
 
 class AccountTaskSerializer(serializers.Serializer):

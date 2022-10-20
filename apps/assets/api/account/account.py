@@ -47,9 +47,17 @@ class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
     # Todo: 记得打开
     # permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
     rbac_perms = {
-        'list': 'assets.view_assetaccountsecret',
-        'retrieve': 'assets.view_assetaccountsecret',
+        'list': 'assets.view_accountsecret',
+        'retrieve': 'assets.view_accountsecret',
+        'histories': ['assets.view_accountsecret'],
     }
+
+    @action(methods=['get'], detail=True, url_path='histories', serializer_class=serializers.AccountHistorySerializer)
+    def histories(self, request, *args, **kwargs):
+        account = self.get_object()
+        histories = account.history.all()
+        serializer = serializers.AccountHistorySerializer(histories, many=True)
+        return Response(serializer.data)
 
 
 class AccountTaskCreateAPI(CreateAPIView):

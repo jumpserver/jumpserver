@@ -10,7 +10,8 @@ class WebSerializer(AssetSerializer):
         model = Web
         fields = AssetSerializer.Meta.fields + [
             'autofill', 'username_selector',
-            'password_selector', 'submit_selector'
+            'password_selector', 'submit_selector',
+            'script'
         ]
         extra_kwargs = {
             **AssetSerializer.Meta.extra_kwargs,
@@ -25,5 +26,5 @@ class WebSerializer(AssetSerializer):
             },
             'submit_selector': {
                 'default': 'button[type=submit]',
-            }
+            },
         }

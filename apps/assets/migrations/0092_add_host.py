@@ -92,7 +92,7 @@ class Migration(migrations.Migration):
             name='Web',
             fields=[
                 ('asset_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='assets.asset')),
-                ('autofill', models.CharField(default='basic', max_length=16)),
+                ('autofill', models.CharField(choices=[('no', 'Disabled'), ('basic', 'Basic'), ('script', 'Script')], default='basic', max_length=16, verbose_name='Autofill')),
                 ('password_selector', models.CharField(blank=True, default='', max_length=128, verbose_name='Password selector')),
                 ('submit_selector', models.CharField(blank=True, default='', max_length=128, verbose_name='Submit selector')),
                 ('username_selector', models.CharField(blank=True, default='', max_length=128, verbose_name='Username selector')),

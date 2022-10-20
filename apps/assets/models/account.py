@@ -41,7 +41,7 @@ class Account(BaseAccount):
     )
     version = models.IntegerField(default=0, verbose_name=_('Version'))
     history = AccountHistoricalRecords(
-        included_fields=['id', 'secret_type', 'secret']
+        included_fields=['id', 'secret_type', 'secret', 'version']
     )
 
     class Meta:

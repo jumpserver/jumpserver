@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                 ('trigger', models.CharField(choices=[('manual', 'Manual trigger'), ('timing', 'Timing trigger')], default='manual', max_length=128, verbose_name='Trigger mode')),
             ],
             options={
-                'verbose_name': 'Automation strategy execution',
+                'verbose_name': 'Automation task execution',
             },
         ),
         migrations.CreateModel(
@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
                 ('nodes', models.ManyToManyField(blank=True, to='assets.Node', verbose_name='Nodes')),
             ],
             options={
-                'verbose_name': 'Automation plan',
+                'verbose_name': 'Automation task',
                 'unique_together': {('org_id', 'name')},
             },
         ),
@@ -122,7 +122,7 @@ class Migration(migrations.Migration):
                 ('baseautomation_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='assets.baseautomation')),
             ],
             options={
-                'verbose_name': 'Verify secret automation',
+                'verbose_name': 'Verify account automation',
             },
             bases=('assets.baseautomation',),
         ),
@@ -150,7 +150,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='automationexecution',
             name='automation',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='executions', to='assets.baseautomation', verbose_name='Automation strategy'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='executions', to='assets.baseautomation', verbose_name='Automation task'),
         ),
         migrations.CreateModel(
             name='ChangeSecretAutomation',
