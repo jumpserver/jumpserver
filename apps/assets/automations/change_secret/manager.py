@@ -1,14 +1,17 @@
+import os
 import random
 import string
+from hashlib import md5
 from copy import deepcopy
+from socket import gethostname
 from collections import defaultdict
 
 from django.utils import timezone
 
-from common.utils import lazyproperty, gen_key_pair
+from common.utils import lazyproperty, gen_key_pair, ssh_pubkey_gen, ssh_key_string_to_obj
 from assets.models import ChangeSecretRecord
 from assets.const import (
-    AutomationTypes, SecretType, SecretStrategy, DEFAULT_PASSWORD_RULES
+    AutomationTypes, SecretType, SecretStrategy, SSHKeyStrategy, DEFAULT_PASSWORD_RULES
 )
 from ..base.manager import BasePlaybookManager
 
@@ -17,15 +20,15 @@ class ChangeSecretManager(BasePlaybookManager):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.method_hosts_mapper = defaultdict(list)
+        self.secret_type = self.execution.plan_snapshot.get('secret_type')
         self.secret_strategy = self.execution.plan_snapshot['secret_strategy']
-        self.ssh_key_change_strategy = self.execution.plan_snapshot['ssh_key_change_strategy']
         self._password_generated = None
         self._ssh_key_generated = None
         self.name_recorder_mapper = {}  # 做个映射，方便后面处理
 
     @classmethod
     def method_type(cls):
-        return AutomationTypes.change_secret
+        return AutomationTypes.method_id_meta_mapper
 
     @lazyproperty
     def related_accounts(self):
@@ -35,6 +38,19 @@ class ChangeSecretManager(BasePlaybookManager):
     def generate_ssh_key():
         private_key, public_key = gen_key_pair()
         return private_key
+
+    @staticmethod
+    def generate_public_key(private_key):
+        return ssh_pubkey_gen(private_key=private_key, hostname=gethostname())
+
+    @staticmethod
+    def generate_private_key_path(secret, path_dir):
+        key_name = '.' + md5(secret.encode('utf-8')).hexdigest()
+        key_path = os.path.join(path_dir, key_name)
+        if not os.path.exists(key_path):
+            ssh_key_string_to_obj(secret, password=None).write_private_key_file(key_path)
+            os.chmod(key_path, 0o400)
+        return key_path
 
     def generate_password(self):
         kwargs = self.automation.plan_snapshot['password_rules'] or {}
@@ -77,16 +93,29 @@ class ChangeSecretManager(BasePlaybookManager):
         else:
             return self.generate_password()
 
-    def get_secret(self, account):
-        if account.secret_type == SecretType.ssh_key:
+    def get_secret(self):
+        if self.secret_type == SecretType.ssh_key:
             secret = self.get_ssh_key()
-        elif account.secret_type == SecretType.password:
+        elif self.secret_type == SecretType.password:
             secret = self.get_password()
         else:
             raise ValueError("Secret must be set")
         return secret
 
-    def host_callback(self, host, asset=None, account=None, automation=None, **kwargs):
+    def get_kwargs(self, account, secret):
+        kwargs = {}
+        if self.secret_type != SecretType.ssh_key:
+            return kwargs
+        kwargs['strategy'] = self.automation.plan_snapshot['ssh_key_change_strategy']
+        kwargs['exclusive'] = 'yes' if kwargs['strategy'] == SSHKeyStrategy.set else 'no'
+
+        if kwargs['strategy'] == SSHKeyStrategy.set_jms:
+            kwargs['dest'] = '/home/{}/.ssh/authorized_keys'.format(account.username)
+            kwargs['regexp'] = '.*{}$'.format(secret.split()[2].strip())
+
+        return kwargs
+
+    def host_callback(self, host, asset=None, account=None, automation=None, path_dir=None, **kwargs):
         host = super().host_callback(host, asset=asset, account=account, automation=automation, **kwargs)
         if host.get('error'):
             return host
@@ -95,7 +124,9 @@ class ChangeSecretManager(BasePlaybookManager):
         if account:
             accounts = accounts.exclude(id=account.id)
         if '*' not in self.automation.accounts:
-            accounts = accounts.filter(username__in=self.automation.accounts)
+            accounts = accounts.filter(
+                username__in=self.automation.accounts, secret_type=self.secret_type
+            )
 
         method_attr = getattr(automation, self.method_type() + '_method')
         method_hosts = self.method_hosts_mapper[method_attr]
@@ -103,11 +134,12 @@ class ChangeSecretManager(BasePlaybookManager):
         inventory_hosts = []
         records = []
 
+        host['secret_type'] = self.secret_type
         for account in accounts:
             h = deepcopy(host)
             h['name'] += '_' + account.username
+            new_secret = self.get_secret()
 
-            new_secret = self.get_secret(account)
             recorder = ChangeSecretRecord(
                 account=account, execution=self.execution,
                 old_secret=account.secret, new_secret=new_secret,
@@ -115,11 +147,19 @@ class ChangeSecretManager(BasePlaybookManager):
             records.append(recorder)
             self.name_recorder_mapper[h['name']] = recorder
 
+            private_key_path = None
+            if self.secret_type == SecretType.ssh_key:
+                private_key_path = self.generate_private_key_path(new_secret, path_dir)
+                new_secret = self.generate_public_key(new_secret)
+
+            h['kwargs'] = self.get_kwargs(account, new_secret)
+
             h['account'] = {
                 'name': account.name,
                 'username': account.username,
                 'secret_type': account.secret_type,
                 'secret': new_secret,
+                'private_key_path': private_key_path
             }
             inventory_hosts.append(h)
             method_hosts.append(h['name'])
