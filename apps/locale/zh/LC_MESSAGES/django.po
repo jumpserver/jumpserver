@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-22 19:01+0800\n"
+"POT-Creation-Date: 2022-10-20 17:20+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -36,12 +36,12 @@ msgstr "访问控制"
 msgid "Name"
 msgstr "名称"
 
-#: acls/models/base.py:27 assets/models/cmd_filter.py:84
+#: acls/models/base.py:27 assets/models/cmd_filter.py:88
 #: assets/models/user.py:251 terminal/models/endpoint.py:90
 msgid "Priority"
 msgstr "优先级"
 
-#: acls/models/base.py:28 assets/models/cmd_filter.py:84
+#: acls/models/base.py:28 assets/models/cmd_filter.py:88
 #: assets/models/user.py:251 terminal/models/endpoint.py:91
 msgid "1-100, the lower the value will be match first"
 msgstr "优先级可选范围为 1-100 (数值越小越优先)"
@@ -55,8 +55,8 @@ msgstr "激活中"
 #: acls/models/base.py:32 applications/models/application.py:232
 #: assets/models/asset.py:143 assets/models/asset.py:231
 #: assets/models/backup.py:54 assets/models/base.py:180
-#: assets/models/cluster.py:29 assets/models/cmd_filter.py:48
-#: assets/models/cmd_filter.py:96 assets/models/domain.py:24
+#: assets/models/cluster.py:29 assets/models/cmd_filter.py:52
+#: assets/models/cmd_filter.py:100 assets/models/domain.py:24
 #: assets/models/domain.py:65 assets/models/group.py:23
 #: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:73
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:38
@@ -75,7 +75,7 @@ msgstr "备注"
 msgid "Reject"
 msgstr "拒绝"
 
-#: acls/models/login_acl.py:19 assets/models/cmd_filter.py:75
+#: acls/models/login_acl.py:19 assets/models/cmd_filter.py:79
 msgid "Allow"
 msgstr "允许"
 
@@ -104,13 +104,13 @@ msgstr "规则"
 
 #: acls/models/login_acl.py:31 acls/models/login_asset_acl.py:26
 #: acls/serializers/login_acl.py:17 acls/serializers/login_asset_acl.py:75
-#: assets/models/cmd_filter.py:89 audits/models.py:63 audits/serializers.py:51
+#: assets/models/cmd_filter.py:93 audits/models.py:63 audits/serializers.py:51
 #: authentication/templates/authentication/_access_key_modal.html:34
 msgid "Action"
 msgstr "动作"
 
 #: acls/models/login_acl.py:35 acls/models/login_asset_acl.py:32
-#: acls/serializers/login_acl.py:16 assets/models/cmd_filter.py:94
+#: acls/serializers/login_acl.py:16 assets/models/cmd_filter.py:98
 msgid "Reviewers"
 msgstr "审批人"
 
@@ -127,7 +127,7 @@ msgstr "系统用户"
 #: acls/models/login_asset_acl.py:22
 #: applications/serializers/attrs/application_category/remote_app.py:36
 #: assets/models/asset.py:386 assets/models/authbook.py:19
-#: assets/models/backup.py:31 assets/models/cmd_filter.py:38
+#: assets/models/backup.py:31 assets/models/cmd_filter.py:42
 #: assets/models/gathered_user.py:14 assets/serializers/label.py:30
 #: assets/serializers/system_user.py:268 audits/models.py:39
 #: authentication/models.py:66 authentication/models.py:90
@@ -256,14 +256,14 @@ msgid "Custom"
 msgstr "自定义"
 
 #: applications/models/account.py:12 applications/models/application.py:236
-#: assets/models/backup.py:32 assets/models/cmd_filter.py:45
+#: assets/models/backup.py:32 assets/models/cmd_filter.py:49
 #: authentication/models.py:67 authentication/models.py:95
 #: perms/models/application_permission.py:28
 msgid "Application"
 msgstr "应用程序"
 
 #: applications/models/account.py:15 assets/models/authbook.py:20
-#: assets/models/cmd_filter.py:42 assets/models/user.py:342 audits/models.py:40
+#: assets/models/cmd_filter.py:46 assets/models/user.py:342 audits/models.py:40
 #: authentication/models.py:83 perms/models/application_permission.py:33
 #: perms/models/asset_permission.py:25 terminal/backends/command/models.py:22
 #: terminal/backends/command/serializers.py:36 terminal/models/session.py:48
@@ -301,7 +301,7 @@ msgstr "类别"
 
 #: applications/models/application.py:224
 #: applications/serializers/application.py:103 assets/models/backup.py:49
-#: assets/models/cmd_filter.py:82 assets/models/user.py:250
+#: assets/models/cmd_filter.py:86 assets/models/user.py:250
 #: authentication/models.py:70 perms/models/application_permission.py:24
 #: perms/serializers/application/user_permission.py:34
 #: terminal/models/storage.py:58 terminal/models/storage.py:143
@@ -602,14 +602,14 @@ msgstr "主机名原始"
 msgid "Protocols"
 msgstr "协议组"
 
-#: assets/models/asset.py:218 assets/models/user.py:242
-#: perms/models/asset_permission.py:24
+#: assets/models/asset.py:218 assets/models/cmd_filter.py:38
+#: assets/models/user.py:242 perms/models/asset_permission.py:24
 #: xpack/plugins/change_auth_plan/models/asset.py:43
 #: xpack/plugins/gathered_user/models.py:24
 msgid "Nodes"
 msgstr "节点"
 
-#: assets/models/asset.py:219 assets/models/cmd_filter.py:47
+#: assets/models/asset.py:219 assets/models/cmd_filter.py:51
 #: assets/models/domain.py:66 assets/models/label.py:22
 #: users/serializers/user.py:147
 msgid "Is active"
@@ -633,8 +633,8 @@ msgid "Labels"
 msgstr "标签管理"
 
 #: assets/models/asset.py:229 assets/models/base.py:183
-#: assets/models/cluster.py:28 assets/models/cmd_filter.py:52
-#: assets/models/cmd_filter.py:99 assets/models/group.py:21
+#: assets/models/cluster.py:28 assets/models/cmd_filter.py:56
+#: assets/models/cmd_filter.py:103 assets/models/group.py:21
 #: common/db/models.py:112 common/mixins/models.py:49 orgs/models.py:71
 #: orgs/models.py:225 perms/models/base.py:91 users/models/user.py:714
 #: users/serializers/group.py:33
@@ -871,55 +871,55 @@ msgstr "默认Cluster"
 msgid "User group"
 msgstr "用户组"
 
-#: assets/models/cmd_filter.py:60 assets/serializers/system_user.py:59
+#: assets/models/cmd_filter.py:64 assets/serializers/system_user.py:59
 msgid "Command filter"
 msgstr "命令过滤器"
 
-#: assets/models/cmd_filter.py:67
+#: assets/models/cmd_filter.py:71
 msgid "Regex"
 msgstr "正则表达式"
 
-#: assets/models/cmd_filter.py:68 ops/models/command.py:26
+#: assets/models/cmd_filter.py:72 ops/models/command.py:26
 #: terminal/backends/command/serializers.py:15 terminal/models/session.py:55
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
 msgid "Command"
 msgstr "命令"
 
-#: assets/models/cmd_filter.py:74
+#: assets/models/cmd_filter.py:78
 msgid "Deny"
 msgstr "拒绝"
 
-#: assets/models/cmd_filter.py:76
+#: assets/models/cmd_filter.py:80
 msgid "Reconfirm"
 msgstr "复核"
 
-#: assets/models/cmd_filter.py:80
+#: assets/models/cmd_filter.py:84
 msgid "Filter"
 msgstr "过滤器"
 
-#: assets/models/cmd_filter.py:87 settings/serializers/basic.py:10
+#: assets/models/cmd_filter.py:91 settings/serializers/basic.py:10
 #: xpack/plugins/license/models.py:29
 msgid "Content"
 msgstr "内容"
 
-#: assets/models/cmd_filter.py:87
+#: assets/models/cmd_filter.py:91
 msgid "One line one command"
 msgstr "每行一个命令"
 
-#: assets/models/cmd_filter.py:88
+#: assets/models/cmd_filter.py:92
 msgid "Ignore case"
 msgstr "忽略大小写"
 
-#: assets/models/cmd_filter.py:103
+#: assets/models/cmd_filter.py:107
 msgid "Command filter rule"
 msgstr "命令过滤规则"
 
-#: assets/models/cmd_filter.py:147
+#: assets/models/cmd_filter.py:151
 msgid "The generated regular expression is incorrect: {}"
 msgstr "生成的正则表达式有误"
 
-#: assets/models/cmd_filter.py:173 tickets/const.py:13
+#: assets/models/cmd_filter.py:177 tickets/const.py:13
 msgid "Command confirm"
 msgstr "命令复核"
 
@@ -5223,13 +5223,22 @@ msgstr "没有发现"
 msgid "view"
 msgstr "查看"
 
-#: terminal/utils/db_port_mapper.py:77
+#: terminal/utils/db_port_mapper.py:64
+msgid ""
+"No available port is matched. The number of databases may have exceeded the "
+"number of ports open to the database agent service, Contact the "
+"administrator to open more ports."
+msgstr ""
+"未匹配到可用端口，数据库的数量可能已经超过数据库代理服务开放的端口数量，请联"
+"系管理员开放更多端口。"
+
+#: terminal/utils/db_port_mapper.py:90
 msgid ""
 "No ports can be used, check and modify the limit on the number of ports that "
 "Magnus listens on in the configuration file."
 msgstr "没有端口可以使用，检查并修改配置文件中 Magnus 监听的端口数量限制。"
 
-#: terminal/utils/db_port_mapper.py:79
+#: terminal/utils/db_port_mapper.py:92
 msgid "All available port count: {}, Already use port count: {}"
 msgstr "所有可用端口数量：{}，已使用端口数量：{}"
 
