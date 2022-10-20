@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-22 19:01+0800\n"
+"POT-Creation-Date: 2022-10-20 17:20+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,12 +37,12 @@ msgstr "Acls"
 msgid "Name"
 msgstr "名前"
 
-#: acls/models/base.py:27 assets/models/cmd_filter.py:84
+#: acls/models/base.py:27 assets/models/cmd_filter.py:88
 #: assets/models/user.py:251 terminal/models/endpoint.py:90
 msgid "Priority"
 msgstr "優先順位"
 
-#: acls/models/base.py:28 assets/models/cmd_filter.py:84
+#: acls/models/base.py:28 assets/models/cmd_filter.py:88
 #: assets/models/user.py:251 terminal/models/endpoint.py:91
 msgid "1-100, the lower the value will be match first"
 msgstr "1-100、低い値は最初に一致します"
@@ -56,8 +56,8 @@ msgstr "アクティブ"
 #: acls/models/base.py:32 applications/models/application.py:232
 #: assets/models/asset.py:143 assets/models/asset.py:231
 #: assets/models/backup.py:54 assets/models/base.py:180
-#: assets/models/cluster.py:29 assets/models/cmd_filter.py:48
-#: assets/models/cmd_filter.py:96 assets/models/domain.py:24
+#: assets/models/cluster.py:29 assets/models/cmd_filter.py:52
+#: assets/models/cmd_filter.py:100 assets/models/domain.py:24
 #: assets/models/domain.py:65 assets/models/group.py:23
 #: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:73
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:38
@@ -76,7 +76,7 @@ msgstr "コメント"
 msgid "Reject"
 msgstr "拒否"
 
-#: acls/models/login_acl.py:19 assets/models/cmd_filter.py:75
+#: acls/models/login_acl.py:19 assets/models/cmd_filter.py:79
 msgid "Allow"
 msgstr "許可"
 
@@ -105,13 +105,13 @@ msgstr "ルール"
 
 #: acls/models/login_acl.py:31 acls/models/login_asset_acl.py:26
 #: acls/serializers/login_acl.py:17 acls/serializers/login_asset_acl.py:75
-#: assets/models/cmd_filter.py:89 audits/models.py:63 audits/serializers.py:51
+#: assets/models/cmd_filter.py:93 audits/models.py:63 audits/serializers.py:51
 #: authentication/templates/authentication/_access_key_modal.html:34
 msgid "Action"
 msgstr "アクション"
 
 #: acls/models/login_acl.py:35 acls/models/login_asset_acl.py:32
-#: acls/serializers/login_acl.py:16 assets/models/cmd_filter.py:94
+#: acls/serializers/login_acl.py:16 assets/models/cmd_filter.py:98
 msgid "Reviewers"
 msgstr "レビュー担当者"
 
@@ -128,7 +128,7 @@ msgstr "システムユーザー"
 #: acls/models/login_asset_acl.py:22
 #: applications/serializers/attrs/application_category/remote_app.py:36
 #: assets/models/asset.py:386 assets/models/authbook.py:19
-#: assets/models/backup.py:31 assets/models/cmd_filter.py:38
+#: assets/models/backup.py:31 assets/models/cmd_filter.py:42
 #: assets/models/gathered_user.py:14 assets/serializers/label.py:30
 #: assets/serializers/system_user.py:268 audits/models.py:39
 #: authentication/models.py:66 authentication/models.py:90
@@ -261,14 +261,14 @@ msgid "Custom"
 msgstr "カスタム"
 
 #: applications/models/account.py:12 applications/models/application.py:236
-#: assets/models/backup.py:32 assets/models/cmd_filter.py:45
+#: assets/models/backup.py:32 assets/models/cmd_filter.py:49
 #: authentication/models.py:67 authentication/models.py:95
 #: perms/models/application_permission.py:28
 msgid "Application"
 msgstr "アプリケーション"
 
 #: applications/models/account.py:15 assets/models/authbook.py:20
-#: assets/models/cmd_filter.py:42 assets/models/user.py:342 audits/models.py:40
+#: assets/models/cmd_filter.py:46 assets/models/user.py:342 audits/models.py:40
 #: authentication/models.py:83 perms/models/application_permission.py:33
 #: perms/models/asset_permission.py:25 terminal/backends/command/models.py:22
 #: terminal/backends/command/serializers.py:36 terminal/models/session.py:48
@@ -306,7 +306,7 @@ msgstr "カテゴリ"
 
 #: applications/models/application.py:224
 #: applications/serializers/application.py:103 assets/models/backup.py:49
-#: assets/models/cmd_filter.py:82 assets/models/user.py:250
+#: assets/models/cmd_filter.py:86 assets/models/user.py:250
 #: authentication/models.py:70 perms/models/application_permission.py:24
 #: perms/serializers/application/user_permission.py:34
 #: terminal/models/storage.py:58 terminal/models/storage.py:143
@@ -607,14 +607,14 @@ msgstr "ホスト名生"
 msgid "Protocols"
 msgstr "プロトコル"
 
-#: assets/models/asset.py:218 assets/models/user.py:242
-#: perms/models/asset_permission.py:24
+#: assets/models/asset.py:218 assets/models/cmd_filter.py:38
+#: assets/models/user.py:242 perms/models/asset_permission.py:24
 #: xpack/plugins/change_auth_plan/models/asset.py:43
 #: xpack/plugins/gathered_user/models.py:24
 msgid "Nodes"
 msgstr "ノード"
 
-#: assets/models/asset.py:219 assets/models/cmd_filter.py:47
+#: assets/models/asset.py:219 assets/models/cmd_filter.py:51
 #: assets/models/domain.py:66 assets/models/label.py:22
 #: users/serializers/user.py:147
 msgid "Is active"
@@ -638,8 +638,8 @@ msgid "Labels"
 msgstr "ラベル"
 
 #: assets/models/asset.py:229 assets/models/base.py:183
-#: assets/models/cluster.py:28 assets/models/cmd_filter.py:52
-#: assets/models/cmd_filter.py:99 assets/models/group.py:21
+#: assets/models/cluster.py:28 assets/models/cmd_filter.py:56
+#: assets/models/cmd_filter.py:103 assets/models/group.py:21
 #: common/db/models.py:112 common/mixins/models.py:49 orgs/models.py:71
 #: orgs/models.py:225 perms/models/base.py:91 users/models/user.py:714
 #: users/serializers/group.py:33
@@ -876,55 +876,55 @@ msgstr "デフォルトクラスター"
 msgid "User group"
 msgstr "ユーザーグループ"
 
-#: assets/models/cmd_filter.py:60 assets/serializers/system_user.py:59
+#: assets/models/cmd_filter.py:64 assets/serializers/system_user.py:59
 msgid "Command filter"
 msgstr "コマンドフィルター"
 
-#: assets/models/cmd_filter.py:67
+#: assets/models/cmd_filter.py:71
 msgid "Regex"
 msgstr "正規情報"
 
-#: assets/models/cmd_filter.py:68 ops/models/command.py:26
+#: assets/models/cmd_filter.py:72 ops/models/command.py:26
 #: terminal/backends/command/serializers.py:15 terminal/models/session.py:55
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
 msgid "Command"
 msgstr "コマンド"
 
-#: assets/models/cmd_filter.py:74
+#: assets/models/cmd_filter.py:78
 msgid "Deny"
 msgstr "拒否"
 
-#: assets/models/cmd_filter.py:76
+#: assets/models/cmd_filter.py:80
 msgid "Reconfirm"
 msgstr "再確認"
 
-#: assets/models/cmd_filter.py:80
+#: assets/models/cmd_filter.py:84
 msgid "Filter"
 msgstr "フィルター"
 
-#: assets/models/cmd_filter.py:87 settings/serializers/basic.py:10
+#: assets/models/cmd_filter.py:91 settings/serializers/basic.py:10
 #: xpack/plugins/license/models.py:29
 msgid "Content"
 msgstr "コンテンツ"
 
-#: assets/models/cmd_filter.py:87
+#: assets/models/cmd_filter.py:91
 msgid "One line one command"
 msgstr "1行1コマンド"
 
-#: assets/models/cmd_filter.py:88
+#: assets/models/cmd_filter.py:92
 msgid "Ignore case"
 msgstr "家を無視する"
 
-#: assets/models/cmd_filter.py:103
+#: assets/models/cmd_filter.py:107
 msgid "Command filter rule"
 msgstr "コマンドフィルタルール"
 
-#: assets/models/cmd_filter.py:147
+#: assets/models/cmd_filter.py:151
 msgid "The generated regular expression is incorrect: {}"
 msgstr "生成された正規表現が正しくありません: {}"
 
-#: assets/models/cmd_filter.py:173 tickets/const.py:13
+#: assets/models/cmd_filter.py:177 tickets/const.py:13
 msgid "Command confirm"
 msgstr "コマンドの確認"
 
@@ -5302,13 +5302,25 @@ msgstr "見つかりません"
 msgid "view"
 msgstr "表示"
 
-#: terminal/utils/db_port_mapper.py:77
+#: terminal/utils/db_port_mapper.py:64
+msgid ""
+"No available port is matched. The number of databases may have exceeded the "
+"number of ports open to the database agent service, Contact the "
+"administrator to open more ports."
+msgstr ""
+"利用可能なポートと一致しません。データベースの数が、データベース プロキシ "
+"サービスによって開かれたポートの数を超えた可能性があります。さらにポートを開"
+"くには、管理者に連絡してください。"
+
+#: terminal/utils/db_port_mapper.py:90
 msgid ""
 "No ports can be used, check and modify the limit on the number of ports that "
 "Magnus listens on in the configuration file."
-msgstr "使用できるポートがありません。設定ファイルで Magnus がリッスンするポート数の制限を確認して変更してください. "
+msgstr ""
+"使用できるポートがありません。設定ファイルで Magnus がリッスンするポート数の"
+"制限を確認して変更してください. "
 
-#: terminal/utils/db_port_mapper.py:79
+#: terminal/utils/db_port_mapper.py:92
 msgid "All available port count: {}, Already use port count: {}"
 msgstr "使用可能なすべてのポート数: {}、すでに使用しているポート数: {}"
 
