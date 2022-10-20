@@ -13,16 +13,28 @@ class AccountHistoricalRecords(HistoricalRecords):
         self.included_fields = kwargs.pop('included_fields', None)
         super().__init__(*args, **kwargs)
 
+    def post_save(self, instance, created, using=None, **kwargs):
+        if not self.included_fields:
+            return super().post_save(instance, created, using=using, **kwargs)
+
+        check_fields = set(self.included_fields) - {'version'}
+        history_attrs = instance.history.all().values(*check_fields).first()
+        if history_attrs is None:
+            return super().post_save(instance, created, using=using, **kwargs)
+
+        attrs = {field: getattr(instance, field) for field in check_fields}
+        history_attrs = set(history_attrs.items())
+        attrs = set(attrs.items())
+        diff = attrs - history_attrs
+        if not diff:
+            return
+        super().post_save(instance, created, using=using, **kwargs)
+
     def fields_included(self, model):
-        fields = []
-        for field in model._meta.fields:
-            if self.included_fields is None:
-                if field.name not in self.excluded_fields:
-                    fields.append(field)
-            else:
-                if field.name in self.included_fields:
-                    fields.append(field)
-        return fields
+        if self.included_fields:
+            fields = [i for i in model._meta.fields if i.name in self.included_fields]
+            return fields
+        return super().fields_included(model)
 
 
 class Account(BaseAccount):
@@ -39,9 +51,7 @@ class Account(BaseAccount):
         on_delete=models.SET_NULL, verbose_name=_("Su from")
     )
     version = models.IntegerField(default=0, verbose_name=_('Version'))
-    history = AccountHistoricalRecords(
-        included_fields=['id', 'secret_type', 'secret', 'version']
-    )
+    history = AccountHistoricalRecords(included_fields=['id', 'secret', 'secret_type', 'version'])
 
     class Meta:
         verbose_name = _('Account')

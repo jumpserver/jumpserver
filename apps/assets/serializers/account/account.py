@@ -15,6 +15,7 @@ class AccountSerializerCreateMixin(serializers.ModelSerializer):
     push_now = serializers.BooleanField(
         default=False, label=_("Push now"), write_only=True
     )
+    has_secret = serializers.BooleanField(label=_("Has secret"), read_only=True)
 
     @staticmethod
     def validate_template(value):

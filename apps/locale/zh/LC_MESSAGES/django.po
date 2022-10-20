@@ -1086,7 +1086,7 @@ msgstr ""
 
 #: assets/serializers/account/account.py:16
 msgid "Push now"
-msgstr ""
+msgstr "立刻推送"
 
 #: assets/serializers/account/account.py:24
 msgid "Account template not found"
