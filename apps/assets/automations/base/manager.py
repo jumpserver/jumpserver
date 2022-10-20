@@ -148,7 +148,7 @@ class BasePlaybookManager:
         print("  inventory: {}".format(runner.inventory))
         print("  playbook: {}".format(runner.playbook))
 
-    def run(self, **kwargs):
+    def run(self,  *args, **kwargs):
         runners = self.get_runners()
         if len(runners) > 1:
             print("### 分批次执行开始任务, 总共 {}\n".format(len(runners)))

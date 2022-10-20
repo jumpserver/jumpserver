@@ -71,7 +71,7 @@ class PeriodTaskModelMixin(models.Model):
         }
         create_or_update_celery_periodic_tasks(tasks)
 
-    def save(self, **kwargs):
+    def save(self, *args, **kwargs):
         instance = super().save(**kwargs)
         self.set_period_schedule()
         return instance

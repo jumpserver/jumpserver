@@ -126,8 +126,8 @@ class NodeAssetsUtil:
         from assets.models import Node, Asset
 
         nodes = list(Node.objects.all())
-        nodes_assets = Asset.nodes.through.objects.all()\
-            .annotate(aid=output_as_string('asset_id'))\
+        nodes_assets = Asset.nodes.through.objects.all() \
+            .annotate(aid=output_as_string('asset_id')) \
             .values_list('node__key', 'aid')
 
         mapping = defaultdict(set)
