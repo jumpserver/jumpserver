@@ -13,26 +13,26 @@
         name: "{{ account.username }}"
         password: "{{ account.secret | password_hash('sha512') }}"
         update_password: always
-      when: "{{ secret_type == 'password' }}"
+      when: secret_type == "password"
 
     - name: create user If it already exists, no operation will be performed
       ansible.builtin.user:
         name: "{{ account.username }}"
-      when: "{{ secret_type == 'ssh_key' }}"
+      when: secret_type == "ssh_key"
 
     - name: remove jumpserver ssh key
       ansible.builtin.lineinfile:
         dest: "{{ kwargs.dest }}"
         regexp: "{{ kwargs.regexp }}"
         state: absent
-      when: "{{ secret_type == 'ssh_key' and kwargs.strategy == 'set_jms' }}"
+      when: secret_type == "ssh_key" and kwargs.strategy == "set_jms"
 
     - name: Change SSH key
       ansible.builtin.authorized_key:
         user: "{{ account.username }}"
         key: "{{ account.secret }}"
         exclusive: "{{ kwargs.exclusive }}"
-      when: "{{ secret_type == 'ssh_key' }}"
+      when: secret_type == "ssh_key"
 
     - name: Refresh connection
       ansible.builtin.meta: reset_connection
@@ -44,7 +44,7 @@
         ansible_user: "{{ account.username }}"
         ansible_password: "{{ account.secret }}"
         ansible_become: no
-      when: "{{ secret_type == 'password' }}"
+      when: secret_type == "password"
 
     - name: Verify SSH key
       ansible.builtin.ping:
@@ -53,4 +53,4 @@
         ansible_user: "{{ account.username }}"
         ansible_ssh_private_key_file: "{{ account.private_key_path }}"
         ansible_become: no
-      when: "{{ secret_type == 'ssh_key' }}"
+      when: secret_type == "ssh_key"

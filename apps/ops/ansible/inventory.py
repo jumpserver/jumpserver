@@ -61,6 +61,7 @@ class JMSInventory:
         var = {
             'ansible_user': account.username,
         }
+
         if not account.secret:
             return var
         if account.secret_type == 'password':
@@ -77,7 +78,10 @@ class JMSInventory:
         ssh_protocol_matched = list(filter(lambda x: x.name == 'ssh', protocols))
         ssh_protocol = ssh_protocol_matched[0] if ssh_protocol_matched else None
         host['ansible_host'] = asset.address
-        host['ansible_port'] = ssh_protocol.port if ssh_protocol else 22
+        if asset.port == 0:
+            host['ansible_port'] = ssh_protocol.port if ssh_protocol else 22
+        else:
+            host['ansible_port'] = asset.port
 
         su_from = account.su_from
         if platform.su_enabled and su_from:

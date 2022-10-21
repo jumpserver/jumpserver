@@ -18,7 +18,7 @@ class ChangeSecretAutomation(BaseAutomation):
     )
     secret_strategy = models.CharField(
         choices=SecretStrategy.choices, max_length=16,
-        default=SecretStrategy.random_one, verbose_name=_('Secret strategy')
+        default=SecretStrategy.custom, verbose_name=_('Secret strategy')
     )
     secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Secret'))
     password_rules = models.JSONField(default=dict, verbose_name=_('Password rules'))
