@@ -20,15 +20,15 @@ class ChangeSecretManager(BasePlaybookManager):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.method_hosts_mapper = defaultdict(list)
-        self.secret_type = self.execution.plan_snapshot.get('secret_type')
-        self.secret_strategy = self.execution.plan_snapshot['secret_strategy']
+        self.secret_type = self.execution.snapshot['secret_type']
+        self.secret_strategy = self.execution.snapshot['secret_strategy']
         self._password_generated = None
         self._ssh_key_generated = None
         self.name_recorder_mapper = {}  # 做个映射，方便后面处理
 
     @classmethod
     def method_type(cls):
-        return AutomationTypes.method_id_meta_mapper
+        return AutomationTypes.change_secret
 
     @lazyproperty
     def related_accounts(self):
@@ -53,7 +53,7 @@ class ChangeSecretManager(BasePlaybookManager):
         return key_path
 
     def generate_password(self):
-        kwargs = self.automation.plan_snapshot['password_rules'] or {}
+        kwargs = self.execution.snapshot['password_rules'] or {}
         length = int(kwargs.get('length', DEFAULT_PASSWORD_RULES['length']))
         symbol_set = kwargs.get('symbol_set')
         if symbol_set is None:
@@ -69,7 +69,7 @@ class ChangeSecretManager(BasePlaybookManager):
 
     def get_ssh_key(self):
         if self.secret_strategy == SecretStrategy.custom:
-            ssh_key = self.automation.plan_snapshot['ssh_key']
+            ssh_key = self.execution.snapshot['ssh_key']
             if not ssh_key:
                 raise ValueError("Automation SSH key must be set")
             return ssh_key
@@ -82,7 +82,7 @@ class ChangeSecretManager(BasePlaybookManager):
 
     def get_password(self):
         if self.secret_strategy == SecretStrategy.custom:
-            password = self.automation.plan_snapshot['password']
+            password = self.execution.snapshot['secret']
             if not password:
                 raise ValueError("Automation Password must be set")
             return password
@@ -106,7 +106,7 @@ class ChangeSecretManager(BasePlaybookManager):
         kwargs = {}
         if self.secret_type != SecretType.ssh_key:
             return kwargs
-        kwargs['strategy'] = self.automation.plan_snapshot['ssh_key_change_strategy']
+        kwargs['strategy'] = self.execution.snapshot['ssh_key_change_strategy']
         kwargs['exclusive'] = 'yes' if kwargs['strategy'] == SSHKeyStrategy.set else 'no'
 
         if kwargs['strategy'] == SSHKeyStrategy.set_jms:
@@ -123,11 +123,11 @@ class ChangeSecretManager(BasePlaybookManager):
         accounts = asset.accounts.all()
         if account:
             accounts = accounts.exclude(id=account.id)
-        if '*' not in self.automation.accounts:
-            accounts = accounts.filter(
-                username__in=self.automation.accounts, secret_type=self.secret_type
-            )
 
+        if '*' not in self.execution.snapshot['accounts']:
+            accounts = accounts.filter(username__in=self.execution.snapshot['accounts'])
+
+        accounts = accounts.filter(secret_type=self.secret_type)
         method_attr = getattr(automation, self.method_type() + '_method')
         method_hosts = self.method_hosts_mapper[method_attr]
         method_hosts = [h for h in method_hosts if h != host['name']]
@@ -153,7 +153,6 @@ class ChangeSecretManager(BasePlaybookManager):
                 new_secret = self.generate_public_key(new_secret)
 
             h['kwargs'] = self.get_kwargs(account, new_secret)
-
             h['account'] = {
                 'name': account.name,
                 'username': account.username,

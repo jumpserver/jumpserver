@@ -49,7 +49,7 @@ class BasePlaybookManager:
         ansible_dir = settings.ANSIBLE_DIR
         dir_name = '{}_{}'.format(self.automation.name.replace(' ', '_'), self.execution.id)
         path = os.path.join(
-            ansible_dir, 'automations', self.automation.type,
+            ansible_dir, 'automations', self.execution.snapshot['type'],
             dir_name, timezone.now().strftime('%Y%m%d_%H%M%S')
         )
         if not os.path.exists(path):
@@ -77,9 +77,9 @@ class BasePlaybookManager:
 
     def generate_inventory(self, platformed_assets, inventory_path):
         inventory = JMSInventory(
+            manager=self,
             assets=platformed_assets,
             account_policy=self.ansible_account_policy,
-            host_callback=self.host_callback
         )
         inventory.write_to_file(inventory_path)
 

@@ -40,15 +40,18 @@ class BaseAutomation(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
     def get_register_task(self):
         raise NotImplementedError
 
+    def get_many_to_many_ids(self, field: str):
+        return [str(i) for i in getattr(self, field).all().values_list('id', flat=True)]
+
     def to_attr_json(self):
         return {
             'name': self.name,
             'type': self.type,
-            'org_id': self.org_id,
+            'org_id': str(self.org_id),
             'comment': self.comment,
             'accounts': self.accounts,
-            'nodes': list(self.nodes.all().values_list('id', flat=True)),
-            'assets': list(self.assets.all().values_list('id', flat=True)),
+            'nodes': self.get_many_to_many_ids('nodes'),
+            'assets': self.get_many_to_many_ids('assets'),
         }
 
     def execute(self, trigger=Trigger.manual):
@@ -59,7 +62,7 @@ class BaseAutomation(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
 
         execution = self.executions.model.objects.create(
             id=eid, trigger=trigger, automation=self,
-            plan_snapshot=self.to_attr_json(),
+            snapshot=self.to_attr_json(),
         )
         return execution.start()
 

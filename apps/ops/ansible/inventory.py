@@ -5,28 +5,26 @@ from collections import defaultdict
 
 from django.utils.translation import gettext as _
 
-
 __all__ = ['JMSInventory']
 
 
 class JMSInventory:
-    def __init__(self, assets, account_policy='smart', account_prefer='root,administrator', host_callback=None):
+    def __init__(self, manager, assets=None, account_policy='smart', account_prefer='root,administrator'):
         """
         :param assets:
         :param account_prefer: account username name if not set use account_policy
-        :param account_policy:
-        :param host_callback: after generate host, call this callback to modify host
+        :param account_policy: smart, privileged_must, privileged_first
         """
+        self.manager = manager
         self.assets = self.clean_assets(assets)
         self.account_prefer = account_prefer
         self.account_policy = account_policy
-        self.host_callback = host_callback
 
     @staticmethod
     def clean_assets(assets):
         from assets.models import Asset
         asset_ids = [asset.id for asset in assets]
-        assets = Asset.objects.filter(id__in=asset_ids, is_active=True)\
+        assets = Asset.objects.filter(id__in=asset_ids, is_active=True) \
             .prefetch_related('platform', 'domain', 'accounts')
         return assets
 
@@ -63,6 +61,7 @@ class JMSInventory:
         var = {
             'ansible_user': account.username,
         }
+
         if not account.secret:
             return var
         if account.secret_type == 'password':
@@ -79,7 +78,10 @@ class JMSInventory:
         ssh_protocol_matched = list(filter(lambda x: x.name == 'ssh', protocols))
         ssh_protocol = ssh_protocol_matched[0] if ssh_protocol_matched else None
         host['ansible_host'] = asset.address
-        host['ansible_port'] = ssh_protocol.port if ssh_protocol else 22
+        if asset.port == 0:
+            host['ansible_port'] = ssh_protocol.port if ssh_protocol else 22
+        else:
+            host['ansible_port'] = asset.port
 
         su_from = account.su_from
         if platform.su_enabled and su_from:
@@ -107,7 +109,7 @@ class JMSInventory:
                 'protocol': asset.protocol, 'port': asset.port,
                 'protocols': [{'name': p.name, 'port': p.port} for p in protocols],
             },
-            'jms_account':  {
+            'jms_account': {
                 'id': str(account.id), 'username': account.username,
                 'secret': account.secret, 'secret_type': account.secret_type
             } if account else None
@@ -170,8 +172,8 @@ class JMSInventory:
                 if not automation.ansible_enabled:
                     host['error'] = _('Ansible disabled')
 
-                if self.host_callback is not None:
-                    host = self.host_callback(
+                if self.manager.host_callback is not None:
+                    host = self.manager.host_callback(
                         host, asset=asset, account=account,
                         platform=platform, automation=automation,
                         path_dir=path_dir
