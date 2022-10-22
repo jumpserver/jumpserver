@@ -15,4 +15,5 @@ class OpsConfig(AppConfig):
         from .celery import signal_handler
         from . import signal_handlers
         from . import notifications
+        from . import tasks
         super().ready()

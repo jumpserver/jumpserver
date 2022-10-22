@@ -86,7 +86,7 @@ class Protocol(models.Model):
         return '{}/{}'.format(self.name, self.port)
 
 
-class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
+class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     address = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
@@ -100,6 +100,7 @@ class Asset(AbsConnectivity, NodesRelationMixin, JMSOrgBaseModel):
     labels = models.ManyToManyField('assets.Label', blank=True, related_name='assets', verbose_name=_("Labels"))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
     info = models.JSONField(verbose_name='Info', default=dict, blank=True)
+
     objects = AssetManager.from_queryset(AssetQuerySet)()
 
     def __str__(self):

@@ -1,22 +1,21 @@
 from __future__ import unicode_literals
-
 import copy
 import os
-
 from importlib import import_module
 
 import jms_storage
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+
 from common.mixins import CommonModelMixin
 from common.utils import get_logger
 from common.db.fields import EncryptJsonDictTextField
 from common.utils.timezone import local_now_date_display
 from terminal.backends import TYPE_ENGINE_MAPPING
 from .terminal import Terminal
-from .command import Command
-from .. import const
+from ..session.command import Command
+from terminal import const
 
 
 logger = get_logger(__file__)

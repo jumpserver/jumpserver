@@ -87,10 +87,6 @@ class JMSBaseModel(BaseCreateUpdateModel):
         abstract = True
 
 
-def concated_display(name1, name2):
-    return Concat(F(name1), Value('('), F(name2), Value(')'))
-
-
 def output_as_string(field_name):
     return ExpressionWrapper(F(field_name), output_field=models.CharField())
 

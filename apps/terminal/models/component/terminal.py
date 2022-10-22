@@ -9,9 +9,9 @@ from common.utils import get_logger
 from users.models import User
 from orgs.utils import tmp_to_root_org
 from .status import Status
-from .. import const
-from ..const import ComponentStatusChoices as StatusChoice
-from .session import Session
+from terminal import const
+from terminal.const import ComponentStatusChoices as StatusChoice
+from ..session import Session
 
 
 logger = get_logger(__file__)

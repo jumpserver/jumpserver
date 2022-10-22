@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
 from common.utils import lazyproperty
-from .base import BaseAccount
+from .base import BaseAccount, AbsConnectivity
 
 __all__ = ['Account', 'AccountTemplate']
 
@@ -37,7 +37,7 @@ class AccountHistoricalRecords(HistoricalRecords):
         return super().fields_included(model)
 
 
-class Account(BaseAccount):
+class Account(AbsConnectivity, BaseAccount):
     class InnerAccount(models.TextChoices):
         INPUT = '@INPUT', '@INPUT'
         USER = '@USER', '@USER'

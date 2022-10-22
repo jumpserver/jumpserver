@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
+
 from common.db.models import JMSBaseModel
 from common.db.fields import PortField
 from common.utils.ip import contains_ip

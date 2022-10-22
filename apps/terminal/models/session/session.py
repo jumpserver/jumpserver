@@ -16,7 +16,7 @@ from users.models import User
 from orgs.mixins.models import OrgModelMixin
 from django.db.models import TextChoices
 from common.utils import get_object_or_none, lazyproperty
-from ..backends import get_multi_command_storage
+from terminal.backends import get_multi_command_storage
 
 
 class Session(OrgModelMixin):

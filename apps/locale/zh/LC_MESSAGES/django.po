@@ -1102,7 +1102,7 @@ msgstr "立刻推送"
 
 #: assets/serializers/account/account.py:18
 msgid "Has secret"
-msgstr "有密码"
+msgstr "存在密码"
 
 #: assets/serializers/account/account.py:25
 msgid "Account template not found"
