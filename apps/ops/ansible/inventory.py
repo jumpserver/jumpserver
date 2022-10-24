@@ -199,8 +199,8 @@ class JMSInventory:
 
     def write_to_file(self, path):
         path_dir = os.path.dirname(path)
-        data = self.generate(path_dir)
         if not os.path.exists(path_dir):
             os.makedirs(path_dir, 0o700, True)
+        data = self.generate(path_dir)
         with open(path, 'w') as f:
             f.write(json.dumps(data, indent=4))

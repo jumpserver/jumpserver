@@ -2,15 +2,6 @@
   gather_facts: no
   vars:
     ansible_python_interpreter: /usr/local/bin/python
-    jms_account:
-      username: root
-      secret: redhat
-    jms_asset:
-      address: 127.0.0.1
-      port: 3306
-    account:
-      username: web1
-      secret: jumpserver
 
   tasks:
     - name: Test MySQL connection
