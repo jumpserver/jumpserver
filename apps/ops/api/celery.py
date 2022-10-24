@@ -4,6 +4,7 @@
 import os
 import re
 
+from celery import current_app
 from django.utils.translation import ugettext as _
 from rest_framework import viewsets
 from celery.result import AsyncResult
@@ -12,20 +13,21 @@ from django_celery_beat.models import PeriodicTask
 
 from common.permissions import IsValidUser
 from common.api import LogTailApi
-from ..models import CeleryTask
+from ..models import CeleryTaskExecution, CeleryTask
 from ..serializers import CeleryResultSerializer, CeleryPeriodTaskSerializer
 from ..celery.utils import get_celery_task_log_path
 from ..ansible.utils import get_ansible_task_log_path
 from common.mixins.api import CommonApiMixin
 
-
 __all__ = [
-    'CeleryTaskLogApi', 'CeleryResultApi', 'CeleryPeriodTaskViewSet',
-    'AnsibleTaskLogApi',
+    'CeleryTaskExecutionLogApi', 'CeleryResultApi', 'CeleryPeriodTaskViewSet',
+    'AnsibleTaskLogApi', 'CeleryTaskViewSet', 'CeleryTaskExecutionViewSet'
 ]
 
+from ..serializers.celery import CeleryTaskSerializer, CeleryTaskExecutionSerializer
 
-class CeleryTaskLogApi(LogTailApi):
+
+class CeleryTaskExecutionLogApi(LogTailApi):
     permission_classes = (IsValidUser,)
     task = None
     task_id = ''
@@ -46,8 +48,8 @@ class CeleryTaskLogApi(LogTailApi):
         if new_path and os.path.isfile(new_path):
             return new_path
         try:
-            task = CeleryTask.objects.get(id=self.task_id)
-        except CeleryTask.DoesNotExist:
+            task = CeleryTaskExecution.objects.get(id=self.task_id)
+        except CeleryTaskExecution.DoesNotExist:
             return None
         return task.full_log_path
 
@@ -94,3 +96,15 @@ class CeleryPeriodTaskViewSet(CommonApiMixin, viewsets.ModelViewSet):
         queryset = super().get_queryset()
         queryset = queryset.exclude(description='')
         return queryset
+
+
+class CeleryTaskViewSet(CommonApiMixin, viewsets.ModelViewSet):
+    queryset = CeleryTask.objects.all()
+    serializer_class = CeleryTaskSerializer
+    http_method_names = ('get',)
+
+
+class CeleryTaskExecutionViewSet(CommonApiMixin, viewsets.ModelViewSet):
+    queryset = CeleryTaskExecution.objects.all()
+    serializer_class = CeleryTaskExecutionSerializer
+    http_method_names = ('get',)

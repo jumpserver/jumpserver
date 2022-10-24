@@ -1,17 +1,28 @@
 import ast
 
+from django.db import transaction
+from django.dispatch import receiver
 from django.utils import translation, timezone
 from django.core.cache import cache
-from celery import signals
+from celery import signals, current_app
 
 from common.db.utils import close_old_connections, get_logger
-from .models import CeleryTask
-
+from common.signals import django_ready
+from .celery import app
+from .models import CeleryTaskExecution, CeleryTask
 
 logger = get_logger(__name__)
 
 TASK_LANG_CACHE_KEY = 'TASK_LANG_{}'
 TASK_LANG_CACHE_TTL = 1800
+
+
+@receiver(django_ready)
+def sync_registered_tasks(*args, **kwargs):
+    with transaction.atomic():
+        CeleryTask.objects.all().delete()
+        for key in app.tasks:
+            CeleryTask(name=key).save()
 
 
 @signals.before_task_publish.connect
@@ -25,7 +36,7 @@ def before_task_publish(headers=None, **kwargs):
 @signals.task_prerun.connect
 def on_celery_task_pre_run(task_id='', **kwargs):
     # 更新状态
-    CeleryTask.objects.filter(id=task_id).update(state='RUNNING', date_start=timezone.now())
+    CeleryTaskExecution.objects.filter(id=task_id).update(state='RUNNING', date_start=timezone.now())
     # 关闭之前的数据库连接
     close_old_connections()
 
@@ -41,7 +52,7 @@ def on_celery_task_post_run(task_id='', state='', **kwargs):
     close_old_connections()
     print("Task post run: ", task_id, state)
 
-    CeleryTask.objects.filter(id=task_id).update(
+    CeleryTaskExecution.objects.filter(id=task_id).update(
         state=state, date_finished=timezone.now(), is_finished=True
     )
 
@@ -72,4 +83,4 @@ def task_sent_handler(headers=None, body=None, **kwargs):
         'args': args,
         'kwargs': kwargs
     }
-    CeleryTask.objects.create(**data)
+    CeleryTaskExecution.objects.create(**data)

@@ -5,9 +5,11 @@ from rest_framework import serializers
 from django_celery_beat.models import PeriodicTask
 
 __all__ = [
-    'CeleryResultSerializer', 'CeleryTaskSerializer',
-    'CeleryPeriodTaskSerializer'
+    'CeleryResultSerializer', 'CeleryTaskExecutionSerializer',
+    'CeleryPeriodTaskSerializer', 'CeleryTaskSerializer'
 ]
+
+from ops.models import CeleryTask, CeleryTaskExecution
 
 
 class CeleryResultSerializer(serializers.Serializer):
@@ -16,14 +18,26 @@ class CeleryResultSerializer(serializers.Serializer):
     state = serializers.CharField(max_length=16)
 
 
-class CeleryTaskSerializer(serializers.Serializer):
-    pass
-
-
 class CeleryPeriodTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = PeriodicTask
         fields = [
             'name', 'task', 'enabled', 'description',
             'last_run_at', 'total_run_count'
+        ]
+
+
+class CeleryTaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CeleryTask
+        fields = [
+            'name', 'verbose_name', 'description',
+        ]
+
+
+class CeleryTaskExecutionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CeleryTaskExecution
+        fields = [
+            "name", "args", "kwargs", "state", "is_finished", "date_published", "date_start", "date_finished"
         ]

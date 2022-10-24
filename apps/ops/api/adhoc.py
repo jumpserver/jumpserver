@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, generics
 from rest_framework.views import Response
 
-from common.drf.serializers import CeleryTaskSerializer
+from common.drf.serializers import CeleryTaskExecutionSerializer
 from ..models import AdHoc, AdHocExecution
 from ..serializers import (
     AdHocSerializer,
