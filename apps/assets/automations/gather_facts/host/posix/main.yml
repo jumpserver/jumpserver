@@ -2,7 +2,7 @@
   gather_facts: yes
   tasks:
     - name: Get info
-      set_fact:
+      ansible.builtin.set_fact:
         info:
           arch: "{{ ansible_architecture }}"
           distribution: "{{ ansible_distribution }}"

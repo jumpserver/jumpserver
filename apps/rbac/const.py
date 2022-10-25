@@ -39,6 +39,9 @@ exclude_permissions = (
     ('assets', 'assetuser', '*', '*'),
     ('assets', 'gathereduser', 'add,delete,change', 'gathereduser'),
     ('assets', 'accountbackupplanexecution', 'delete,change', 'accountbackupplanexecution'),
+    # TODO 暂时去掉历史账号的权限
+    ('assets', 'account', '*', 'assethistoryaccount'),
+    ('assets', 'account', '*', 'assethistoryaccountsecret'),
 
     ('perms', 'userassetgrantedtreenoderelation', '*', '*'),
     ('perms', 'usergrantedmappingnode', '*', '*'),
