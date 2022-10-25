@@ -9,6 +9,7 @@ from common.db.fields import EncryptJsonDictTextField
 from orgs.mixins.models import OrgModelMixin
 from ops.mixin import PeriodTaskModelMixin
 from assets.models import Node, Asset
+from assets.tasks import execute_automation
 
 
 class BaseAutomation(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
@@ -38,7 +39,11 @@ class BaseAutomation(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
         return assets.group_by_platform()
 
     def get_register_task(self):
-        raise NotImplementedError
+        name = f"automation_{self.type}_strategy_period_{str(self.id)[:8]}"
+        task = execute_automation.name
+        args = (str(self.id), Trigger.timing, self._meta.model)
+        kwargs = {}
+        return name, task, args, kwargs
 
     def get_many_to_many_ids(self, field: str):
         return [str(i) for i in getattr(self, field).all().values_list('id', flat=True)]

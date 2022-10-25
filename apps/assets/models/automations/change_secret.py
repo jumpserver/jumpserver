@@ -4,7 +4,6 @@ from django.utils.translation import ugettext_lazy as _
 from common.db import fields
 from common.const.choices import Trigger
 from common.db.models import JMSBaseModel
-from assets.tasks import execute_change_secret_automation
 from assets.const import AutomationTypes, SecretType, SecretStrategy, SSHKeyStrategy
 from .base import BaseAutomation
 
@@ -34,13 +33,6 @@ class ChangeSecretAutomation(BaseAutomation):
 
     class Meta:
         verbose_name = _("Change secret automation")
-
-    def get_register_task(self):
-        name = "automation_change_secret_strategy_period_{}".format(str(self.id)[:8])
-        task = execute_change_secret_automation.name
-        args = (str(self.id), Trigger.timing)
-        kwargs = {}
-        return name, task, args, kwargs
 
     def to_attr_json(self):
         attr_json = super().to_attr_json()
