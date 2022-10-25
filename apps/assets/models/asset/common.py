@@ -90,8 +90,7 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     address = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
-    platform = models.ForeignKey(Platform, default=Platform.default, on_delete=models.PROTECT,
-                                 verbose_name=_("Platform"), related_name='assets')
+    platform = models.ForeignKey(Platform, on_delete=models.PROTECT, verbose_name=_("Platform"), related_name='assets')
     domain = models.ForeignKey("assets.Domain", null=True, blank=True, related_name='assets',
                                verbose_name=_("Domain"), on_delete=models.SET_NULL)
     nodes = models.ManyToManyField('assets.Node', default=default_node, related_name='assets',

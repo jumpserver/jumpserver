@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='asset',
             name='platform',
-            field=models.ForeignKey(default=assets.models.platform.Platform.default, on_delete=django.db.models.deletion.PROTECT, related_name='assets', to='assets.platform', verbose_name='Platform'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='assets', to='assets.platform', verbose_name='Platform'),
         ),
         migrations.RemoveField(
             model_name='asset',
