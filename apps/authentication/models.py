@@ -63,13 +63,6 @@ def date_expired_default():
 
 
 class ConnectionToken(OrgModelMixin, JMSBaseModel):
-    class Type(models.TextChoices):
-        asset = 'asset', _('Asset')
-        application = 'application', _('Application')
-
-    type = models.CharField(
-        max_length=16, default=Type.asset, choices=Type.choices, verbose_name=_("Type")
-    )
     secret = models.CharField(max_length=64, default='', verbose_name=_("Secret"))
     date_expired = models.DateTimeField(
         default=date_expired_default, verbose_name=_("Date expired")
@@ -85,7 +78,11 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
         related_name='connection_tokens', null=True, blank=True
     )
     asset_display = models.CharField(max_length=128, default='', verbose_name=_("Asset display"))
-    account = models.CharField(max_length=128, default='', verbose_name=_("Account"))
+    account = models.ForeignKey(
+        'assets.Account', on_delete=models.SET_NULL, verbose_name=_('Account'),
+        related_name='connection_tokens', null=True, blank=True
+    )
+    account_display = models.CharField(max_length=128, default='', verbose_name=_("Account display"))
 
     class Meta:
         ordering = ('-date_expired',)

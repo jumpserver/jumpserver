@@ -24,15 +24,16 @@ from common.drf.renders import PassthroughRenderer
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import tmp_to_root_org, tmp_to_org
 from users.models import User
-from .. import utils
-from ..utils import find_session_replay_local, download_session_replay
-from ..models import Session
-from .. import serializers
-from terminal.utils import is_session_approver
+from terminal.utils import (
+    find_session_replay_local, download_session_replay,
+    is_session_approver, get_session_replay_url
+)
+from terminal.models import Session
+from terminal import serializers
 
 __all__ = [
-    'SessionViewSet', 'SessionReplayViewSet', 'SessionJoinValidateAPI',
-    'MySessionAPIView',
+    'SessionViewSet', 'SessionReplayViewSet',
+    'SessionJoinValidateAPI', 'MySessionAPIView',
 ]
 
 logger = get_logger(__name__)
@@ -93,7 +94,7 @@ class SessionViewSet(OrgBulkModelViewSet):
             url_name='replay-download')
     def download(self, request, *args, **kwargs):
         session = self.get_object()
-        local_path, url = utils.get_session_replay_url(session)
+        local_path, url = get_session_replay_url(session)
         if local_path is None:
             return Response({"error": url}, status=404)
         file = self.prepare_offline_file(session, local_path)

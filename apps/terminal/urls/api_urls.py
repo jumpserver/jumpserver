@@ -24,6 +24,11 @@ router.register(r'session-sharings', api.SessionSharingViewSet, 'session-sharing
 router.register(r'session-join-records', api.SessionJoinRecordsViewSet, 'session-sharing-record')
 router.register(r'endpoints', api.EndpointViewSet, 'endpoint')
 router.register(r'endpoint-rules', api.EndpointRuleViewSet, 'endpoint-rule')
+router.register(r'applets', api.AppletViewSet, 'applet')
+router.register(r'applet-hosts', api.AppletHostViewSet, 'applet-host')
+router.register(r'applet-publication', api.AppletPublicationViewSet, 'applet-publication')
+router.register(r'applet-host-deployment', api.AppletHostDeploymentViewSet, 'applet-host-deployment')
+
 
 urlpatterns = [
     path('my-sessions/', api.MySessionAPIView.as_view(), name='my-session'),

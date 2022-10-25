@@ -7,10 +7,10 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from common.utils import get_object_or_none
-from ..models import Session, Task
-from .. import serializers
-from terminal.utils import is_session_approver
 from orgs.utils import tmp_to_root_org
+from terminal.models import Session, Task
+from terminal import serializers
+from terminal.utils import is_session_approver
 
 __all__ = ['TaskViewSet', 'KillSessionAPI', 'KillSessionForTicketAPI']
 logger = logging.getLogger(__file__)

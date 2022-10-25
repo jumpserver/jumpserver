@@ -11,8 +11,8 @@ from django_filters import utils
 from terminal import const
 from common.const.http import GET
 from terminal.filters import CommandStorageFilter, CommandFilter, CommandFilterForStorageTree
-from ..models import CommandStorage, ReplayStorage
-from ..serializers import CommandStorageSerializer, ReplayStorageSerializer
+from terminal.models import CommandStorage, ReplayStorage
+from terminal.serializers import CommandStorageSerializer, ReplayStorageSerializer
 
 __all__ = [
     'CommandStorageViewSet', 'CommandStorageTestConnectiveApi',

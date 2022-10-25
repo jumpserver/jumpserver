@@ -9,9 +9,9 @@ from rest_framework import viewsets, generics
 from rest_framework.views import Response
 from rest_framework import status
 
-from ..models import Terminal, Status, Session
-from .. import serializers
-from ..utils import TypedComponentsStatusMetricsUtil
+from terminal.models import Terminal, Status, Session
+from terminal import serializers
+from terminal.utils import TypedComponentsStatusMetricsUtil
 
 logger = logging.getLogger(__file__)
 
