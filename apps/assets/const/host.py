@@ -67,6 +67,7 @@ class HostTypes(BaseType):
         return {
             cls.LINUX: [
                 {'name': 'Linux'},
+                {'name': 'Gateway'}
             ],
             cls.UNIX: [
                 {'name': 'Unix'},
@@ -75,16 +76,31 @@ class HostTypes(BaseType):
                 {'name': 'AIX', 'automation': {
                     'push_account_method': 'push_account_aix',
                     'change_secret_method': 'push_secret_aix'
-                }},
+                }}
             ],
             cls.WINDOWS: [
                 {'name': 'Windows'},
-                {'name': 'Windows-TLS', 'protocols_setting': {
-                    'rdp': {'security': 'tls'},
-                }},
-                {'name': 'Windows-RDP', 'protocols_setting': {
-                    'rdp': {'security': 'rdp'},
-                }}
+                {
+                    'name': 'Windows-TLS',
+                    'protocols_setting': {
+                        'rdp': {'security': 'tls'},
+                    }
+                },
+                {
+                    'name': 'Windows-RDP',
+                    'protocols_setting': {
+                        'rdp': {'security': 'rdp'},
+                    }
+                },
+                {
+                    'name': 'RemoteAppHost',
+                    '_protocols': ['rdp', 'ssh'],
+                    'protocols_setting':  {
+                        'ssh': {
+                            'required': True
+                        }
+                    }
+                }
             ],
             cls.OTHER_HOST: []
         }

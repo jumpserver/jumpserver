@@ -2,15 +2,15 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.request import Request
+
 from common.drf.api import JMSBulkModelViewSet
+from common.permissions import IsValidUserOrConnectionToken
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404
 from assets.models import Asset
 from orgs.utils import tmp_to_root_org
-from terminal.models import Session
-from ..models import Endpoint, EndpointRule
-from .. import serializers
-from common.permissions import IsValidUserOrConnectionToken
+from terminal.models import Session, Endpoint, EndpointRule
+from terminal import serializers
 
 
 __all__ = ['EndpointViewSet', 'EndpointRuleViewSet']

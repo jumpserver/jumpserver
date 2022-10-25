@@ -55,7 +55,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='changesecretautomation',
             name='secret_strategy',
-            field=models.CharField(choices=[('specific', 'Specific'), ('random_one', 'All assets use the same random password'), ('random_all', 'All assets use different random password')], default='random_one', max_length=16, verbose_name='Secret strategy'),
+            field=models.CharField(choices=[('specific', 'Specific'), ('random_one', 'All assets use the same random password'), ('random_all', 'All assets use different random password')], default='specific', max_length=16, verbose_name='Secret strategy'),
         ),
         migrations.AddField(
             model_name='changesecretautomation',

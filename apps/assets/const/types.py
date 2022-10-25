@@ -224,7 +224,10 @@ class AllTypes(ChoicesMixin):
                     if _protocols:
                         protocols_data = [p for p in protocols_data if p['name'] in _protocols]
                     for p in protocols_data:
-                        p['setting'] = {**_protocols_setting.get(p['name'], {}), **p.get('setting', {})}
+                        setting = _protocols_setting.get(p['name'], {})
+                        p['required'] = setting.pop('required', False)
+                        p['default'] = setting.pop('default', False)
+                        p['setting'] = {**setting, **p.get('setting', {})}
 
                     platform_data = {
                         **default_platform_data, **d,
