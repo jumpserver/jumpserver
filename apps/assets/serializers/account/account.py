@@ -55,7 +55,7 @@ class AccountSerializerCreateMixin(serializers.ModelSerializer):
 class AccountSerializer(AccountSerializerCreateMixin, BaseAccountSerializer):
     asset = ObjectRelatedField(
         required=False, queryset=Asset.objects,
-        label=_('Asset'), attrs=('id', 'name', 'address')
+        label=_('Asset'), attrs=('id', 'name', 'address', 'platform_id')
     )
 
     class Meta(BaseAccountSerializer.Meta):

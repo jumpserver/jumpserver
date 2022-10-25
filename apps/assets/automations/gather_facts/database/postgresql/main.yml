@@ -2,19 +2,9 @@
   gather_facts: no
   vars:
     ansible_python_interpreter: /usr/local/bin/python
-    jms_account:
-      username: postgre
-      secret: postgre
-    jms_asset:
-      address: 127.0.0.1
-      port: 5432
-      database: testdb
-    account:
-      username: test
-      secret: jumpserver
 
   tasks:
-    - name: Test PostgreSQL connection
+    - name: Get info
       community.postgresql.postgresql_info:
         login_user: "{{ jms_account.username }}"
         login_password: "{{ jms_account.secret }}"
@@ -23,6 +13,10 @@
         login_db: "{{ jms_asset.database }}"
       register: db_info
 
-    - name: Debug it
-      debug:
-        var: db_info
+    - name: Define Postgresql info by set_fact
+      set_fact:
+        info:
+          version: "{{ db_info.server_version.raw }}"
+
+    - debug:
+        var: info

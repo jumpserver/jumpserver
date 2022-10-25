@@ -2,27 +2,21 @@
   gather_facts: no
   vars:
     ansible_python_interpreter: /usr/local/bin/python
-    jms_account:
-      username: root
-      secret: redhat
-    jms_asset:
-      address: 127.0.0.1
-      port: 3306
 
   tasks:
-    - name: Gather facts info
+    - name: Get info
       community.mysql.mysql_info:
         login_user: "{{ jms_account.username }}"
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
+        filter: version
       register: db_info
 
-    - name: Get info
+    - name: Define Mysql info by set_fact
       set_fact:
         info:
           version: "{{ db_info.version.full }}"
 
     - debug:
-        var: db_info
-
+        var: info
