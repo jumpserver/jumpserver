@@ -88,6 +88,21 @@ def tmp_to_org(org):
         set_current_org(ori_org)
 
 
+@contextmanager
+def tmp_to_builtin_org(system=0, default=0):
+    if system:
+        org_id = Organization.SYSTEM_ID
+    elif default:
+        org_id = Organization.DEFAULT_ID
+    else:
+        raise ValueError("Must set system or default")
+    ori_org = get_current_org()
+    set_current_org(org_id)
+    yield
+    if ori_org is not None:
+        set_current_org(ori_org)
+
+
 def get_org_filters():
     kwargs = {}
 
