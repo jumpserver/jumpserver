@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0111_alter_changesecretautomation_secret_strategy'),
+        ('assets', '0110_auto_20221021_1506'),
         ('authentication', '0012_auto_20220816_1629'),
     ]
 
