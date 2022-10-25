@@ -1,18 +1,8 @@
 - hosts: postgre
   gather_facts: no
   vars:
-    ansible_python_interpreter: /usr/local/bin/python
-    jms_account:
-      username: postgre
-      secret: postgre
-    jms_asset:
-      address: 127.0.0.1
-      port: 5432
-      database: testdb
-    account:
-      username: test
-      secret: jumpserver
-
+#    ansible_python_interpreter: /usr/local/bin/python
+    ansible_python_interpreter: /Users/xiaofeng/Desktop/jumpserver/venv/bin/python
   tasks:
     - name: Test PostgreSQL connection
       community.postgresql.postgresql_ping:
@@ -25,7 +15,8 @@
 
     - name: Display PostgreSQL version
       debug:
-        var: db_info.version.full
+        var: db_info.server_version.full
+      when: db_info is succeeded
 
     - name: Change PostgreSQL password
       community.postgresql.postgresql_user:
@@ -37,6 +28,7 @@
         name: "{{ account.username }}"
         password: "{{ account.secret }}"
       when: db_info is succeeded
+      register: change_info
 
     - name: Verify password
       community.postgresql.postgresql_ping:
@@ -45,3 +37,4 @@
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         db: "{{ jms_asset.database }}"
+      when: db_info is succeeded and change_info is changed

@@ -69,10 +69,10 @@ class ChangeSecretManager(BasePlaybookManager):
 
     def get_ssh_key(self):
         if self.secret_strategy == SecretStrategy.custom:
-            ssh_key = self.execution.snapshot['ssh_key']
-            if not ssh_key:
+            secret = self.execution.snapshot['secret']
+            if not secret:
                 raise ValueError("Automation SSH key must be set")
-            return ssh_key
+            return secret
         elif self.secret_strategy == SecretStrategy.random_one:
             if not self._ssh_key_generated:
                 self._ssh_key_generated = self.generate_ssh_key()
