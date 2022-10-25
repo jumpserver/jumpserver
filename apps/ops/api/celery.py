@@ -4,7 +4,7 @@
 import os
 import re
 
-from celery import current_app
+from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
 from rest_framework import viewsets
 from celery.result import AsyncResult
@@ -98,13 +98,20 @@ class CeleryPeriodTaskViewSet(CommonApiMixin, viewsets.ModelViewSet):
         return queryset
 
 
-class CeleryTaskViewSet(CommonApiMixin, viewsets.ModelViewSet):
+class CeleryTaskViewSet(CommonApiMixin, viewsets.ReadOnlyModelViewSet):
     queryset = CeleryTask.objects.all()
     serializer_class = CeleryTaskSerializer
-    http_method_names = ('get',)
+    http_method_names = ('get', 'head', 'options',)
 
 
-class CeleryTaskExecutionViewSet(CommonApiMixin, viewsets.ModelViewSet):
-    queryset = CeleryTaskExecution.objects.all()
+class CeleryTaskExecutionViewSet(CommonApiMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = CeleryTaskExecutionSerializer
-    http_method_names = ('get',)
+    http_method_names = ('get', 'head', 'options',)
+
+    def get_queryset(self):
+        task_id = self.kwargs.get("task_pk")
+        if task_id:
+            task = CeleryTask.objects.get(pk=task_id)
+            return CeleryTaskExecution.objects.filter(name=task.name)
+        else:
+            return CeleryTaskExecution.objects.none()

@@ -31,7 +31,7 @@ class CeleryTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = CeleryTask
         fields = [
-            'name', 'verbose_name', 'description',
+            'id', 'name', 'verbose_name', 'description',
         ]
 
 
@@ -39,5 +39,5 @@ class CeleryTaskExecutionSerializer(serializers.ModelSerializer):
     class Meta:
         model = CeleryTaskExecution
         fields = [
-            "name", "args", "kwargs", "state", "is_finished", "date_published", "date_start", "date_finished"
+            "id", "name", "args", "kwargs", "state", "is_finished", "date_published", "date_start", "date_finished"
         ]
