@@ -25,11 +25,6 @@ class Migration(migrations.Migration):
                 ('date_finished', models.DateTimeField(null=True)),
             ],
         ),
-        migrations.RenameField(
-            model_name='celerytask',
-            old_name='date_finished',
-            new_name='date_last_published',
-        ),
         migrations.RemoveField(
             model_name='celerytask',
             name='args',
@@ -53,15 +48,5 @@ class Migration(migrations.Migration):
         migrations.RemoveField(
             model_name='celerytask',
             name='state',
-        ),
-        migrations.AddField(
-            model_name='celerytask',
-            name='description',
-            field=models.CharField(max_length=2048, null=True),
-        ),
-        migrations.AddField(
-            model_name='celerytask',
-            name='verbose_name',
-            field=models.CharField(max_length=1024, null=True),
         ),
     ]
