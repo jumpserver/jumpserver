@@ -11,6 +11,14 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.DeleteModel(name='CeleryTask'),
+        migrations.CreateModel(
+            name='CeleryTask',
+            fields=[
+                ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
+                ('name', models.CharField(max_length=1024)),
+            ]
+        ),
         migrations.CreateModel(
             name='CeleryTaskExecution',
             fields=[
@@ -24,29 +32,5 @@ class Migration(migrations.Migration):
                 ('date_start', models.DateTimeField(null=True)),
                 ('date_finished', models.DateTimeField(null=True)),
             ],
-        ),
-        migrations.RemoveField(
-            model_name='celerytask',
-            name='args',
-        ),
-        migrations.RemoveField(
-            model_name='celerytask',
-            name='date_published',
-        ),
-        migrations.RemoveField(
-            model_name='celerytask',
-            name='date_start',
-        ),
-        migrations.RemoveField(
-            model_name='celerytask',
-            name='is_finished',
-        ),
-        migrations.RemoveField(
-            model_name='celerytask',
-            name='kwargs',
-        ),
-        migrations.RemoveField(
-            model_name='celerytask',
-            name='state',
         ),
     ]

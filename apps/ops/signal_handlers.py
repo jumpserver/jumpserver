@@ -20,16 +20,17 @@ TASK_LANG_CACHE_TTL = 1800
 @receiver(django_ready)
 def sync_registered_tasks(*args, **kwargs):
     with transaction.atomic():
-        db_tasks = CeleryTask.objects.all()
+        try:
+            db_tasks = CeleryTask.objects.all()
+        except Exception as e:
+            return
         celery_task_names = [key for key in app.tasks]
-        db_task_names = [task.name for task in db_tasks]
+        db_task_names = db_tasks.values_list('name', flat=True)
 
-        for task in db_tasks:
-            if task.name not in celery_task_names:
-                task.delete()
-        for task in celery_task_names:
-            if task not in db_task_names:
-                CeleryTask(name=task).save()
+        db_tasks.exclude(name__in=celery_task_names).delete()
+        not_in_db_tasks = set(celery_task_names) - set(db_task_names)
+        tasks_to_create = [CeleryTask(name=name) for name in not_in_db_tasks]
+        CeleryTask.objects.bulk_create(tasks_to_create)
 
 
 @signals.before_task_publish.connect
