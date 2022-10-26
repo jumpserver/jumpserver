@@ -13,11 +13,11 @@ from common.drf.api import JMSBulkModelViewSet
 from common.utils import get_logger
 from terminal.backends.command.serializers import InsecureCommandAlertSerializer
 from terminal.exceptions import StorageInvalid
-from ..backends import (
+from terminal.backends import (
     get_command_storage, get_multi_command_storage,
     SessionCommandSerializer,
 )
-from ..notifications import CommandAlertMessage
+from terminal.notifications import CommandAlertMessage
 
 logger = get_logger(__name__)
 __all__ = ['CommandViewSet', 'InsecureCommandAlertAPI']

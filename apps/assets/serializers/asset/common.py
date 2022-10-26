@@ -107,6 +107,8 @@ class AssetSerializer(OrgResourceSerializerMixin, WritableNestedModelSerializer)
             return
         nodes_to_set = []
         for full_value in nodes_display:
+            if not full_value.startswith('/'):
+                full_value = '/' + instance.org.name + '/' + full_value
             node = Node.objects.filter(full_value=full_value).first()
             if node:
                 nodes_to_set.append(node)

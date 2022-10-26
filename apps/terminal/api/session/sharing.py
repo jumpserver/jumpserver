@@ -5,9 +5,8 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from common.const.http import PATCH
-from common.permissions import IsValidUser
 from orgs.mixins.api import OrgModelViewSet
-from .. import serializers, models
+from terminal import serializers, models
 
 __all__ = ['SessionSharingViewSet', 'SessionJoinRecordsViewSet']
 
