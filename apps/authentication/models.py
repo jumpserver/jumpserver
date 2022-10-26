@@ -78,11 +78,7 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
         related_name='connection_tokens', null=True, blank=True
     )
     asset_display = models.CharField(max_length=128, default='', verbose_name=_("Asset display"))
-    account = models.ForeignKey(
-        'assets.Account', on_delete=models.SET_NULL, verbose_name=_('Account'),
-        related_name='connection_tokens', null=True, blank=True
-    )
-    account_display = models.CharField(max_length=128, default='', verbose_name=_("Account display"))
+    account = models.CharField(max_length=128, default='', verbose_name=_("Account"))
 
     class Meta:
         ordering = ('-date_expired',)
@@ -127,7 +123,6 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
 
     def check_valid(self):
         from perms.utils.permission import validate_permission as asset_validate_permission
-        from perms.utils.application.permission import validate_permission as app_validate_permission
 
         if self.is_expired:
             is_valid = False
@@ -143,45 +138,30 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
             error = _('User invalid, disabled or expired')
             return is_valid, error
 
-        if not self.system_user:
+        if not self.account:
             is_valid = False
-            error = _('System user not exists')
+            error = _('Account not exists')
             return is_valid, error
 
-        if self.is_type(self.Type.asset):
-            if not self.asset:
-                is_valid = False
-                error = _('Asset not exists')
-                return is_valid, error
-            if not self.asset.is_active:
-                is_valid = False
-                error = _('Asset inactive')
-                return is_valid, error
-            has_perm, actions, expired_at = asset_validate_permission(
-                self.user, self.asset, self.system_user
-            )
-            if not has_perm:
-                is_valid = False
-                error = _('User has no permission to access asset or permission expired')
-                return is_valid, error
-            self.actions = actions
-            self.expired_at = expired_at
+        if not self.asset:
+            is_valid = False
+            error = _('Asset not exists')
+            return is_valid, error
 
-        elif self.is_type(self.Type.application):
-            if not self.application:
-                is_valid = False
-                error = _('Application not exists')
-                return is_valid, error
-            has_perm, actions, expired_at = app_validate_permission(
-                self.user, self.application, self.system_user
-            )
-            if not has_perm:
-                is_valid = False
-                error = _('User has no permission to access application or permission expired')
-                return is_valid, error
-            self.actions = actions
-            self.expired_at = expired_at
+        if not self.asset.is_active:
+            is_valid = False
+            error = _('Asset inactive')
+            return is_valid, error
 
+        has_perm, actions, expired_at = asset_validate_permission(
+            self.user, self.asset, self.account
+        )
+        if not has_perm:
+            is_valid = False
+            error = _('User has no permission to access asset or permission expired')
+            return is_valid, error
+        self.actions = actions
+        self.expired_at = expired_at
         return True, ''
 
     @lazyproperty
