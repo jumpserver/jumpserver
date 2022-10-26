@@ -23,7 +23,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
 
     class Meta:
         model = ConnectionToken
-        fields_mini = ['id', 'type']
+        fields_mini = ['id']
         fields_small = fields_mini + [
             'secret', 'date_expired', 'date_created', 'date_updated',
             'created_by', 'updated_by', 'org_id', 'org_name',

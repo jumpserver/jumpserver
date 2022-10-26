@@ -210,7 +210,7 @@ class ConnectionTokenMixin:
 
 class ConnectionTokenViewSet(ConnectionTokenMixin, RootOrgViewMixin, JMSModelViewSet):
     filterset_fields = (
-        'type', 'user_display', 'asset_display'
+        'user_display', 'asset_display'
     )
     search_fields = filterset_fields
     serializer_classes = {
