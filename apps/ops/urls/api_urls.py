@@ -4,8 +4,9 @@ from __future__ import unicode_literals
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 from rest_framework_bulk.routes import BulkRouter
-from .. import api
+from rest_framework_nested import routers
 
+from .. import api
 
 app_name = "ops"
 
@@ -16,12 +17,19 @@ router.register(r'adhoc', api.AdHocViewSet, 'adhoc')
 router.register(r'adhoc-executions', api.AdHocExecutionViewSet, 'execution')
 router.register(r'celery/period-tasks', api.CeleryPeriodTaskViewSet, 'celery-period-task')
 
-urlpatterns = [
-    path('celery/task/<uuid:pk>/log/', api.CeleryTaskLogApi.as_view(), name='celery-task-log'),
-    path('celery/task/<uuid:pk>/result/', api.CeleryResultApi.as_view(), name='celery-result'),
+router.register(r'tasks', api.CeleryTaskViewSet, 'task')
 
-    path('ansible/task/<uuid:pk>/log/', api.AnsibleTaskLogApi.as_view(), name='ansible-task-log'),
+task_router = routers.NestedDefaultRouter(router, r'tasks', lookup='task')
+task_router.register(r'executions', api.CeleryTaskExecutionViewSet, 'task-execution')
+
+urlpatterns = [
+
+    path('celery/task/<uuid:name>/task-execution/<uuid:pk>/log/', api.CeleryTaskExecutionLogApi.as_view(),
+         name='celery-task-execution-log'),
+    path('celery/task/<uuid:name>/task-execution/<uuid:pk>/result/', api.CeleryResultApi.as_view(),
+         name='celery-task-execution-result'),
+
+    path('ansible/task-execution/<uuid:pk>/log/', api.AnsibleTaskLogApi.as_view(), name='ansible-task-log'),
 ]
 
-urlpatterns += router.urls
-urlpatterns += bulk_router.urls
+urlpatterns += (router.urls + bulk_router.urls + task_router.urls)
