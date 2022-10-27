@@ -165,6 +165,6 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     class Meta:
         model = ConnectionToken
         fields = [
-            'id', 'secret', 'type', 'user', 'asset', 'application', 'system_user',
-            'remote_app', 'cmd_filter_rules', 'domain', 'gateway', 'actions', 'expired_at',
+            'id', 'secret', 'type', 'user', 'asset', 'account',
+            'cmd_filter_rules', 'domain', 'gateway', 'actions', 'expired_at',
         ]

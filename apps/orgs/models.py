@@ -140,7 +140,10 @@ class Organization(OrgRoleMixin, models.Model):
     @classmethod
     def default(cls):
         defaults = dict(id=cls.DEFAULT_ID, name=cls.DEFAULT_NAME)
-        obj, created = cls.objects.get_or_create(defaults=defaults, id=cls.DEFAULT_ID, builtin=True)
+        obj, created = cls.objects.get_or_create(defaults=defaults, id=cls.DEFAULT_ID)
+        if not obj.builtin:
+            obj.builtin = True
+            obj.save()
         return obj
 
     @classmethod

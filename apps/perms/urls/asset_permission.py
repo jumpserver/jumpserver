@@ -84,12 +84,6 @@ permission_urlpatterns = [
     # 授权规则中授权的资产
     path('<uuid:pk>/assets/all/', api.AssetPermissionAllAssetListApi.as_view(), name='asset-permission-all-assets'),
     path('<uuid:pk>/users/all/', api.AssetPermissionAllUserListApi.as_view(), name='asset-permission-all-users'),
-
-    # 验证用户是否有某个资产和系统用户的权限
-    # Todo: v3 先不动, 可能会修改连接资产时的逻辑, 直接获取认证信息，获取不到就时没有权限，就不需要校验了
-    path('user/validate/', api.ValidateUserAssetPermissionApi.as_view(), name='validate-user-asset-permission'),
-    path('user/actions/', api.GetUserAssetPermissionActionsApi.as_view(), name='get-user-asset-permission-actions'),
-
 ]
 
 asset_permission_urlpatterns = [
