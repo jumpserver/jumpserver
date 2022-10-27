@@ -30,7 +30,8 @@ class CeleryBaseService(BaseService):
             '-l', 'INFO',
             '-c', str(self.num),
             '-Q', self.queue,
-            '-n', f'{self.queue}@{server_hostname}'
+            '-n', f'{self.queue}@{server_hostname}',
+            '--without-mingle',
         ]
         return cmd
 

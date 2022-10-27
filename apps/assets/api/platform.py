@@ -22,6 +22,12 @@ class AssetPlatformViewSet(JMSModelViewSet):
         'ops_methods': 'assets.view_platform'
     }
 
+    def get_object(self):
+        pk = self.kwargs.get('pk', '')
+        if pk.isnumeric():
+            return super().get_object()
+        return self.get_queryset().get(name=pk)
+
     def check_object_permissions(self, request, obj):
         if request.method.lower() in ['delete', 'put', 'patch'] and obj.internal:
             self.permission_denied(
