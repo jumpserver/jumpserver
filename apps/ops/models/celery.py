@@ -7,8 +7,27 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.db import models
 
+from ops.celery import app
+
 
 class CeleryTask(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    name = models.CharField(max_length=1024)
+
+    @property
+    def verbose_name(self):
+        task = app.tasks.get(self.name, None)
+        if task:
+            return getattr(task, 'verbose_name', None)
+
+    @property
+    def description(self):
+        task = app.tasks.get(self.name, None)
+        if task:
+            return getattr(task, 'description', None)
+
+
+class CeleryTaskExecution(models.Model):
     LOG_DIR = os.path.join(settings.PROJECT_DIR, 'data', 'celery')
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=1024)

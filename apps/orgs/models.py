@@ -69,6 +69,7 @@ class Organization(OrgRoleMixin, models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, unique=True, verbose_name=_("Name"))
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
+    builtin = models.BooleanField(default=False, verbose_name=_('Builtin'))
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
     members = models.ManyToManyField(
@@ -139,13 +140,13 @@ class Organization(OrgRoleMixin, models.Model):
     @classmethod
     def default(cls):
         defaults = dict(id=cls.DEFAULT_ID, name=cls.DEFAULT_NAME)
-        obj, created = cls.objects.get_or_create(defaults=defaults, id=cls.DEFAULT_ID)
+        obj, created = cls.objects.get_or_create(defaults=defaults, id=cls.DEFAULT_ID, builtin=True)
         return obj
 
     @classmethod
     def root(cls):
         name = settings.GLOBAL_ORG_DISPLAY_NAME or cls.ROOT_NAME
-        return cls(id=cls.ROOT_ID, name=name)
+        return cls(id=cls.ROOT_ID, name=name, builtin=True)
 
     def is_root(self):
         return self.id == self.ROOT_ID

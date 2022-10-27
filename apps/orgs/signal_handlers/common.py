@@ -4,6 +4,7 @@ import threading
 from collections import defaultdict
 from functools import partial
 
+import django.db.utils
 from django.dispatch import receiver
 from django.conf import settings
 from django.utils.functional import LazyObject
@@ -45,7 +46,10 @@ def expire_orgs_mapping_for_memory(org_id):
 def subscribe_orgs_mapping_expire(sender, **kwargs):
     logger.debug("Start subscribe for expire orgs mapping from memory")
     if settings.DEBUG:
-        set_to_default_org()
+        try:
+            set_to_default_org()
+        except django.db.utils.OperationalError:
+            pass
 
     def keep_subscribe_org_mapping():
         orgs_mapping_for_memory_pub_sub.subscribe(

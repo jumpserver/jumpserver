@@ -49,5 +49,9 @@ class Migration(migrations.Migration):
         migrations.RemoveField(
             model_name='connectiontoken',
             name='system_user',
-        )
+        ),
+        migrations.RemoveField(
+            model_name='connectiontoken',
+            name='type',
+        ),
     ]

@@ -12,7 +12,7 @@ from .mixin import BulkListSerializerMixin, BulkSerializerMixin
 
 __all__ = [
     'MethodSerializer', 'EmptySerializer', 'BulkModelSerializer',
-    'AdaptedBulkListSerializer', 'CeleryTaskSerializer',
+    'AdaptedBulkListSerializer', 'CeleryTaskExecutionSerializer',
     'WritableNestedModelSerializer',
     'GroupedChoiceSerializer',
 ]
@@ -73,7 +73,7 @@ class AdaptedBulkListSerializer(BulkListSerializerMixin, BulkListSerializer):
     pass
 
 
-class CeleryTaskSerializer(serializers.Serializer):
+class CeleryTaskExecutionSerializer(serializers.Serializer):
     task = serializers.CharField(read_only=True)
 
 

@@ -20,7 +20,7 @@ from .celery.utils import (
     create_or_update_celery_periodic_tasks, get_celery_periodic_task,
     disable_celery_periodic_task, delete_celery_periodic_task
 )
-from .models import CeleryTask, AdHoc, Playbook
+from .models import CeleryTaskExecution, AdHoc, Playbook
 from .notifications import ServerPerformanceCheckUtil
 
 logger = get_logger(__file__)
@@ -94,9 +94,9 @@ def clean_celery_tasks_period():
     logger.debug("Start clean celery task history")
     expire_days = get_log_keep_day('TASK_LOG_KEEP_DAYS')
     days_ago = timezone.now() - timezone.timedelta(days=expire_days)
-    tasks = CeleryTask.objects.filter(date_start__lt=days_ago)
+    tasks = CeleryTaskExecution.objects.filter(date_start__lt=days_ago)
     tasks.delete()
-    tasks = CeleryTask.objects.filter(date_start__isnull=True)
+    tasks = CeleryTaskExecution.objects.filter(date_start__isnull=True)
     tasks.delete()
     command = "find %s -mtime +%s -name '*.log' -type f -exec rm -f {} \\;" % (
         settings.CELERY_LOG_DIR, expire_days
