@@ -106,7 +106,7 @@ class JMSInventory:
             'jms_asset': {
                 'id': str(asset.id), 'name': asset.name, 'address': asset.address,
                 'type': asset.type, 'category': asset.category,
-                'protocol': asset.protocol, 'port': asset.port,
+                'protocol': asset.protocol, 'port': asset.port,'database': '',
                 'protocols': [{'name': p.name, 'port': p.port} for p in protocols],
             },
             'jms_account': {
@@ -117,6 +117,10 @@ class JMSInventory:
         ansible_config = dict(automation.ansible_config)
         ansible_connection = ansible_config.get('ansible_connection', 'ssh')
         host.update(ansible_config)
+
+        if platform.category == 'database':
+            host['jms_asset']['database'] = asset.database.db_name
+
         gateway = None
         if asset.domain:
             gateway = asset.domain.select_gateway()

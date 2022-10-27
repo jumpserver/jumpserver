@@ -15,7 +15,7 @@ class AutomationTypes(TextChoices):
     push_account = 'push_account', _('Create account')
     change_secret = 'change_secret', _('Change secret')
     verify_account = 'verify_account', _('Verify account')
-    gather_account = 'gather_account', _('Gather account')
+    gather_accounts = 'gather_accounts', _('Gather accounts')
 
 
 class SecretStrategy(TextChoices):

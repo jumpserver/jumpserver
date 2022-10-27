@@ -10,6 +10,7 @@ from orgs.mixins.models import OrgModelMixin
 from ops.mixin import PeriodTaskModelMixin
 from assets.models import Node, Asset
 from assets.tasks import execute_automation
+from assets.const import AutomationTypes
 
 
 class BaseAutomation(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
@@ -20,7 +21,7 @@ class BaseAutomation(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
     assets = models.ManyToManyField(
         'assets.Asset', blank=True, verbose_name=_("Assets")
     )
-    type = models.CharField(max_length=16, verbose_name=_('Type'))
+    type = models.CharField(max_length=16, choices=AutomationTypes.choices, verbose_name=_('Type'))
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
 

@@ -11,12 +11,12 @@
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         login_db: "{{ jms_asset.database }}"
+        filter: "roles"
       register: db_info
 
     - name: Define info by set_fact
       set_fact:
-        info:
-          version: "{{ db_info.server_version.raw }}"
+        info: "{{ db_info.roles }}"
 
     - debug:
         var: info

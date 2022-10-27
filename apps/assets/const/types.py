@@ -166,6 +166,7 @@ class AllTypes(ChoicesMixin):
         data['protocols'] = protocols
 
         automation = constraints.get('automation', {})
+
         enable_fields = {k: v for k, v in automation.items() if k.endswith('_enabled')}
         for k, v in enable_fields.items():
             auto_item = k.replace('_enabled', '')

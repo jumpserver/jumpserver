@@ -13,18 +13,28 @@ from ops.celery import app
 class CeleryTask(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=1024)
+    last_published_time = models.DateTimeField(null=True)
 
     @property
-    def verbose_name(self):
+    def meta(self):
         task = app.tasks.get(self.name, None)
-        if task:
-            return getattr(task, 'verbose_name', None)
-
+        return {
+            "verbose_name": getattr(task, 'verbose_name', None),
+            "comment": getattr(task, 'comment', None),
+            "queue": getattr(task, 'queue', 'default')
+        }
     @property
-    def description(self):
-        task = app.tasks.get(self.name, None)
-        if task:
-            return getattr(task, 'description', None)
+    def state(self):
+        last_five_executions = CeleryTaskExecution.objects.filter(name=self.name).order_by('-date_published')[:5]
+
+        if len(last_five_executions) > 0:
+            if last_five_executions[0].state == 'FAILURE':
+                return "red"
+
+        for execution in last_five_executions:
+            if execution.state == 'FAILURE':
+                return "yellow"
+        return "green"
 
 
 class CeleryTaskExecution(models.Model):
