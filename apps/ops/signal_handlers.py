@@ -92,3 +92,4 @@ def task_sent_handler(headers=None, body=None, **kwargs):
         'kwargs': kwargs
     }
     CeleryTaskExecution.objects.create(**data)
+    CeleryTask.objects.filter(name=task).update(last_published_time=timezone.now())

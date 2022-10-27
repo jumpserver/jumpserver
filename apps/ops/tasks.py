@@ -1,5 +1,6 @@
 # coding: utf-8
 import os
+import random
 import subprocess
 
 from django.conf import settings
@@ -76,7 +77,7 @@ def run_playbook(pid, **kwargs):
 
 @shared_task
 @after_app_shutdown_clean_periodic
-@register_as_period_task(interval=3600*24, description=_("Clean task history period"))
+@register_as_period_task(interval=3600 * 24, description=_("Clean task history period"))
 def clean_tasks_adhoc_period():
     logger.debug("Start clean task adhoc and run history")
     tasks = Task.objects.all()
@@ -89,7 +90,7 @@ def clean_tasks_adhoc_period():
 
 @shared_task
 @after_app_shutdown_clean_periodic
-@register_as_period_task(interval=3600*24, description=_("Clean celery log period"))
+@register_as_period_task(interval=3600 * 24, description=_("Clean celery log period"))
 def clean_celery_tasks_period():
     logger.debug("Start clean celery task history")
     expire_days = get_log_keep_day('TASK_LOG_KEEP_DAYS')
@@ -143,7 +144,7 @@ def check_server_performance_period():
     ServerPerformanceCheckUtil().check_and_publish()
 
 
-@shared_task(queue="ansible", verbose_name=_("Hello"))
+@shared_task(queue="ansible", verbose_name=_("Hello"), comment="an test shared task")
 def hello(name, callback=None):
     from users.models import User
     import time
@@ -153,6 +154,18 @@ def hello(name, callback=None):
     print("Count: ", count)
     time.sleep(1)
     return gettext("Hello")
+
+
+@shared_task(verbose_name="Hello Error", comment="an test shared task error")
+def hello_error():
+    raise Exception("must be error")
+
+
+@shared_task(verbose_name="Hello Random", comment="some time error and some time success")
+def hello_random():
+    i = random.randint(0, 1)
+    if i == 1:
+        raise Exception("must be error")
 
 
 @shared_task
@@ -171,5 +184,3 @@ def execute_automation_strategy(pid, trigger):
         return
     with tmp_to_org(instance.org):
         instance.execute(trigger)
-
-

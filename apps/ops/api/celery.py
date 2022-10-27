@@ -99,7 +99,7 @@ class CeleryPeriodTaskViewSet(CommonApiMixin, viewsets.ModelViewSet):
 
 
 class CeleryTaskViewSet(CommonApiMixin, viewsets.ReadOnlyModelViewSet):
-    queryset = CeleryTask.objects.all()
+    queryset = CeleryTask.objects.filter(name__in=['ops.tasks.hello', 'ops.tasks.hello_error', 'ops.tasks.hello_random'])
     serializer_class = CeleryTaskSerializer
     http_method_names = ('get', 'head', 'options',)
 
