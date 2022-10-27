@@ -23,15 +23,6 @@ class CeleryTask(models.Model):
             "comment": getattr(task, 'comment', None),
             "queue": getattr(task, 'queue', 'default')
         }
-
-    @property
-    def success_count(self):
-        return CeleryTaskExecution.objects.filter(name=self.name, state='SUCCESS').count()
-
-    @property
-    def publish_count(self):
-        return CeleryTaskExecution.objects.filter(name=self.name).count()
-
     @property
     def state(self):
         last_five_executions = CeleryTaskExecution.objects.filter(name=self.name).order_by('-date_published')[:5]
