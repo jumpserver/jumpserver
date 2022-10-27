@@ -31,8 +31,7 @@ class OrgResourceSerializerMixin(CommonSerializerMixin, serializers.Serializer):
         validators = []
 
         for v in _validators:
-            if isinstance(v, UniqueTogetherValidator) \
-                    and "org_id" in v.fields:
+            if isinstance(v, UniqueTogetherValidator) and "org_id" in v.fields:
                 v = ProjectUniqueValidator(v.queryset, v.fields)
             validators.append(v)
         return validators

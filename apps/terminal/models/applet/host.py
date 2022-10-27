@@ -2,14 +2,13 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from common.db.models import JMSBaseModel
+from assets.models import Host
 
 
 __all__ = ['AppletHost', 'AppletHostDeployment']
 
 
-class AppletHost(JMSBaseModel):
-    host = models.ForeignKey('assets.Host', on_delete=models.PROTECT, verbose_name=_('Host'))
-    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
+class AppletHost(Host):
     account_automation = models.BooleanField(default=False, verbose_name=_('Account automation'))
     date_synced = models.DateTimeField(null=True, blank=True, verbose_name=_('Date synced'))
     status = models.CharField(max_length=16, verbose_name=_('Status'))
@@ -19,7 +18,7 @@ class AppletHost(JMSBaseModel):
     )
 
     def __str__(self):
-        return self.host.name
+        return self.name
 
 
 class AppletHostDeployment(JMSBaseModel):

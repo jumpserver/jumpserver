@@ -96,6 +96,7 @@ class Migration(migrations.Migration):
                 ('password_selector', models.CharField(blank=True, default='', max_length=128, verbose_name='Password selector')),
                 ('submit_selector', models.CharField(blank=True, default='', max_length=128, verbose_name='Submit selector')),
                 ('username_selector', models.CharField(blank=True, default='', max_length=128, verbose_name='Username selector')),
+                ('script', models.JSONField(blank=True, default=list, verbose_name='Script')),
             ],
             options={
                 'abstract': False,

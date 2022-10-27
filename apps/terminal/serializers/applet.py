@@ -2,9 +2,9 @@ from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 
 from common.drf.fields import ObjectRelatedField, LabeledChoiceField
-from assets.models import Host, Platform
+from common.validators import ProjectUniqueValidator
+from assets.models import Platform
 from assets.serializers import HostSerializer
-from orgs.utils import tmp_to_builtin_org
 from ..models import Applet, AppletPublication, AppletHost, AppletHostDeployment
 
 
@@ -48,41 +48,42 @@ class AppletPublicationSerializer(serializers.ModelSerializer):
         ] + read_only_fields
 
 
-class AppletHostSerializer(serializers.ModelSerializer):
-    host = HostSerializer(allow_null=True, required=False)
-
-    class Meta:
+class AppletHostSerializer(HostSerializer):
+    class Meta(HostSerializer.Meta):
         model = AppletHost
-        fields_mini = ['id', 'host']
-        read_only_fields = ['date_synced', 'status', 'date_created', 'date_updated']
-        fields = fields_mini + ['comment', 'account_automation'] + read_only_fields
+        fields = HostSerializer.Meta.fields + [
+            'account_automation', 'status', 'date_synced'
+        ]
+        extra_kwargs = {
+            'status': {'read_only': True},
+            'date_synced': {'read_only': True}
+        }
 
-    def __init__(self, *args, **kwargs):
-        self.host_data = kwargs.get('data', {}).pop('host', {})
-        super().__init__(*args, **kwargs)
+    def __init__(self, *args, data=None, **kwargs):
+        self.set_initial_data(data)
+        super().__init__(*args, data=data, **kwargs)
 
-    def _create_host(self):
+    @staticmethod
+    def set_initial_data(data):
+        if not data:
+            return
         platform = Platform.objects.get(name='RemoteAppHost')
-        data = {
-            **self.host_data,
+        data.update({
             'platform': platform.id,
             'nodes_display': [
                 'RemoteAppHosts'
             ]
-        }
-        serializer = HostSerializer(data=data)
-        try:
-            serializer.is_valid(raise_exception=True)
-        except serializers.ValidationError:
-            raise serializers.ValidationError({'host': serializer.errors})
-        host = serializer.save()
-        return host
+        })
 
-    def create(self, validated_data):
-        with tmp_to_builtin_org(system=1):
-            host = self._create_host()
-        instance = super().create({**validated_data, 'host': host})
-        return instance
+    def get_validators(self):
+        validators = super().get_validators()
+        # 不知道为啥没有继承过来
+        uniq_validator = ProjectUniqueValidator(
+            queryset=AppletHost.objects.all(),
+            fields=('org_id', 'name')
+        )
+        validators.append(uniq_validator)
+        return validators
 
 
 class AppletHostDeploymentSerializer(serializers.ModelSerializer):
