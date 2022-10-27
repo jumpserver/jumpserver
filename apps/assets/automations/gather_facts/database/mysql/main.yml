@@ -13,7 +13,7 @@
         filter: version
       register: db_info
 
-    - name: Define Mysql info by set_fact
+    - name: Define info by set_fact
       set_fact:
         info:
           version: "{{ db_info.version.full }}"

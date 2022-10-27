@@ -17,7 +17,6 @@ __all__ = [
 
 
 class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
-    type_display = serializers.ReadOnlyField(source='get_type_display', label=_("Type display"))
     is_valid = serializers.BooleanField(read_only=True, label=_('Validity'))
     expire_time = serializers.IntegerField(read_only=True, label=_('Expired time'))
 
@@ -29,13 +28,13 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
             'created_by', 'updated_by', 'org_id', 'org_name',
         ]
         fields_fk = [
-            'user', 'system_user', 'asset', 'application',
+            'user', 'system_user', 'asset',
         ]
         read_only_fields = [
             # 普通 Token 不支持指定 user
             'user', 'is_valid', 'expire_time',
-            'type_display', 'user_display', 'system_user_display',
-            'asset_display', 'application_display',
+            'user_display', 'system_user_display',
+            'asset_display',
         ]
         fields = fields_small + fields_fk + read_only_fields
 
@@ -54,28 +53,23 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         return self.request_user
 
     def construct_internal_fields_attrs(self, attrs):
-        user = self.get_user(attrs)
-        system_user = attrs.get('system_user') or ''
         asset = attrs.get('asset') or ''
-        application = attrs.get('application') or ''
+        asset_display = pretty_string(str(asset), max_length=128)
+        user = self.get_user(attrs)
+        user_display = pretty_string(str(user), max_length=128)
         secret = attrs.get('secret') or random_string(16)
         date_expired = attrs.get('date_expired') or ConnectionToken.get_default_date_expired()
-
-        if isinstance(asset, Asset):
-            tp = ConnectionToken.Type.asset
-            org_id = asset.org_id
-        else:
-            raise serializers.ValidationError(_('Asset or application required'))
+        org_id = asset.org_id
+        if not isinstance(asset, Asset):
+            error = ''
+            raise serializers.ValidationError(error)
 
         return {
-            'type': tp,
             'user': user,
             'secret': secret,
+            'user_display': user_display,
+            'asset_display': asset_display,
             'date_expired': date_expired,
-            'user_display': pretty_string(str(user), max_length=128),
-            'system_user_display': pretty_string(str(system_user), max_length=128),
-            'asset_display': pretty_string(str(asset), max_length=128),
-            'application_display': pretty_string(str(application), max_length=128),
             'org_id': org_id,
         }
 
@@ -155,7 +149,6 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     user = ConnectionTokenUserSerializer(read_only=True)
     asset = ConnectionTokenAssetSerializer(read_only=True)
     remote_app = ConnectionTokenRemoteAppSerializer(read_only=True)
-    account = serializers.CharField(read_only=True)
     gateway = ConnectionTokenGatewaySerializer(read_only=True)
     domain = ConnectionTokenDomainSerializer(read_only=True)
     cmd_filter_rules = ConnectionTokenCmdFilterRuleSerializer(many=True)
@@ -165,6 +158,6 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     class Meta:
         model = ConnectionToken
         fields = [
-            'id', 'secret', 'type', 'user', 'asset', 'account',
+            'id', 'secret', 'type', 'user', 'asset', 'account', 'protocol',
             'cmd_filter_rules', 'domain', 'gateway', 'actions', 'expired_at',
         ]

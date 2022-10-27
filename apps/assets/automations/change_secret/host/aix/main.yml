@@ -1,29 +1,58 @@
 - hosts: demo
+  gather_facts: no
   tasks:
-    - name: ping
+    - name: Test privileged account
       ansible.builtin.ping:
-
-    #- name: print variables
-    #  debug:
-    #    msg: "Username: {{ account.username }}, Password: {{ account.password }}"
+    #
+    #    - name: print variables
+    #      debug:
+    #        msg: "Username: {{ account.username }}, Secret: {{ account.secret }}, Secret type: {{ secret_type }}"
 
     - name: Change password
-      user:
+      ansible.builtin.user:
         name: "{{ account.username }}"
-        password: "{{ account.password | password_hash('des') }}"
+        password: "{{ account.secret | password_hash('sha512') }}"
         update_password: always
-      when: account.password
+      when: secret_type == "password"
 
-    - name: Change public key
-      authorized_key:
+    - name: create user If it already exists, no operation will be performed
+      ansible.builtin.user:
+        name: "{{ account.username }}"
+      when: secret_type == "ssh_key"
+
+    - name: remove jumpserver ssh key
+      ansible.builtin.lineinfile:
+        dest: "{{ kwargs.dest }}"
+        regexp: "{{ kwargs.regexp }}"
+        state: absent
+      when:
+      - secret_type == "ssh_key"
+      - kwargs.strategy == "set_jms"
+
+    - name: Change SSH key
+      ansible.builtin.authorized_key:
         user: "{{ account.username }}"
-        key: "{{ account.public_key }}"
-        state: present
-      when: account.public_key
+        key: "{{ account.secret }}"
+        exclusive: "{{ kwargs.exclusive }}"
+      when: secret_type == "ssh_key"
+
+    - name: Refresh connection
+      ansible.builtin.meta: reset_connection
 
     - name: Verify password
       ansible.builtin.ping:
+      become: no
       vars:
         ansible_user: "{{ account.username }}"
-        ansible_pass: "{{ account.password }}"
-        ansible_ssh_connection: paramiko
+        ansible_password: "{{ account.secret }}"
+        ansible_become: no
+      when: secret_type == "password"
+
+    - name: Verify SSH key
+      ansible.builtin.ping:
+      become: no
+      vars:
+        ansible_user: "{{ account.username }}"
+        ansible_ssh_private_key_file: "{{ account.private_key_path }}"
+        ansible_become: no
+      when: secret_type == "ssh_key"

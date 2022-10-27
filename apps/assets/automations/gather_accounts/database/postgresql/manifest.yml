@@ -1,0 +1,6 @@
+id: gather_accounts_postgresql
+name: Gather account for PostgreSQL
+category: database
+type:
+  - postgresql
+method: gather_accounts

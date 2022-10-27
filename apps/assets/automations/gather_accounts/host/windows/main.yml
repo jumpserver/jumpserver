@@ -1,10 +1,10 @@
-- hosts: demo
+- hosts: windows
   gather_facts: yes
   tasks:
     - name: Get info
-      ansible.builtin.set_fact:
+      set_fact:
         info:
-          arch: "{{ ansible_architecture }}"
+          arch: "{{ ansible_architecture2 }}"
           distribution: "{{ ansible_distribution }}"
           distribution_version: "{{ ansible_distribution_version }}"
           kernel: "{{ ansible_kernel }}"
@@ -13,7 +13,6 @@
           sn: "{{ ansible_product_serial }}"
           cpu_vcpus: "{{ ansible_processor_vcpus }}"
           memory: "{{ ansible_memtotal_mb }}"
-          disk_total: "{{ (ansible_mounts | map(attribute='size_total') | sum / 1024 / 1024 / 1024) | round(2) }}"
 
     - debug:
         var: info
