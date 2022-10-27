@@ -1,3 +1,4 @@
+import time
 import uuid
 from datetime import datetime, timedelta
 from django.utils import timezone
@@ -63,22 +64,20 @@ def date_expired_default():
 
 
 class ConnectionToken(OrgModelMixin, JMSBaseModel):
-    secret = models.CharField(max_length=64, default='', verbose_name=_("Secret"))
-    date_expired = models.DateTimeField(
-        default=date_expired_default, verbose_name=_("Date expired")
-    )
-
     user = models.ForeignKey(
-        'users.User', on_delete=models.SET_NULL, verbose_name=_('User'),
-        related_name='connection_tokens', null=True, blank=True
+        'users.User', on_delete=models.SET_NULL,  null=True, blank=True,
+        related_name='connection_tokens', verbose_name=_('User')
+    )
+    asset = models.ForeignKey(
+        'assets.Asset', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='connection_tokens', verbose_name=_('Asset'),
     )
     user_display = models.CharField(max_length=128, default='', verbose_name=_("User display"))
-    asset = models.ForeignKey(
-        'assets.Asset', on_delete=models.SET_NULL, verbose_name=_('Asset'),
-        related_name='connection_tokens', null=True, blank=True
-    )
     asset_display = models.CharField(max_length=128, default='', verbose_name=_("Asset display"))
+    protocol = ''
     account = models.CharField(max_length=128, default='', verbose_name=_("Account"))
+    secret = models.CharField(max_length=64, default='', verbose_name=_("Secret"))
+    date_expired = models.DateTimeField(default=date_expired_default, verbose_name=_("Date expired"))
 
     class Meta:
         ordering = ('-date_expired',)
@@ -86,10 +85,6 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
         permissions = [
             ('view_connectiontokensecret', _('Can view connection token secret'))
         ]
-
-    @classmethod
-    def get_default_date_expired(cls):
-        return date_expired_default()
 
     @property
     def is_expired(self):
@@ -103,32 +98,32 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
             seconds = 0
         return int(seconds)
 
-    def expire(self):
-        self.date_expired = timezone.now()
-        self.save()
-
     @property
     def is_valid(self):
         return not self.is_expired
 
-    def is_type(self, tp):
-        return self.type == tp
+    @classmethod
+    def get_default_date_expired(cls):
+        return date_expired_default()
+
+    def expire(self):
+        self.date_expired = timezone.now()
+        self.save()
 
     def renewal(self):
         """ 续期 Token，将来支持用户自定义创建 token 后，续期策略要修改 """
         self.date_expired = self.get_default_date_expired()
         self.save()
 
-    actions = expired_at = None  # actions 和 expired_at 在 check_valid() 中赋值
+    # actions 和 expired_at 在 check_valid() 中赋值
+    actions = expire_at = None
 
     def check_valid(self):
-        from perms.utils.permission import validate_permission as asset_validate_permission
-
+        from perms.utils.account import PermAccountUtil
         if self.is_expired:
             is_valid = False
             error = _('Connection token expired at: {}').format(as_current_tz(self.date_expired))
             return is_valid, error
-
         if not self.user:
             is_valid = False
             error = _('User not exists')
@@ -137,44 +132,33 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
             is_valid = False
             error = _('User invalid, disabled or expired')
             return is_valid, error
-
+        if not self.asset:
+            is_valid = False
+            error = _('Asset not exists')
+            return is_valid, error
+        if not self.asset.is_active:
+            is_valid = False
+            error = _('Asset inactive')
+            return is_valid, error
         if not self.account:
             is_valid = False
             error = _('Account not exists')
             return is_valid, error
 
-        if not self.asset:
-            is_valid = False
-            error = _('Asset not exists')
-            return is_valid, error
-
-        if not self.asset.is_active:
-            is_valid = False
-            error = _('Asset inactive')
-            return is_valid, error
-
-        has_perm, actions, expired_at = asset_validate_permission(
+        actions, expire_at = PermAccountUtil().validate_permission(
             self.user, self.asset, self.account
         )
-        if not has_perm:
+        if not actions or expire_at < time.time():
             is_valid = False
             error = _('User has no permission to access asset or permission expired')
             return is_valid, error
         self.actions = actions
-        self.expired_at = expired_at
+        self.expire_at = expire_at
         return True, ''
 
     @lazyproperty
     def domain(self):
-        if self.asset:
-            return self.asset.domain
-        if not self.application:
-            return
-        if self.application.category_remote_app:
-            asset = self.application.get_remote_app_asset()
-            domain = asset.domain if asset else None
-        else:
-            domain = self.application.domain
+        domain = self.asset.domain if self.asset else None
         return domain
 
     @lazyproperty
@@ -186,39 +170,16 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
         return self.domain.random_gateway()
 
     @lazyproperty
-    def remote_app(self):
-        if not self.application:
-            return {}
-        if not self.application.category_remote_app:
-            return {}
-        return self.application.get_rdp_remote_app_setting()
-
-    @lazyproperty
-    def asset_or_remote_app_asset(self):
-        if self.asset:
-            return self.asset
-        if self.application and self.application.category_remote_app:
-            return self.application.get_remote_app_asset()
-
-    @lazyproperty
     def cmd_filter_rules(self):
         from assets.models import CommandFilterRule
         kwargs = {
             'user_id': self.user.id,
-            'system_user_id': self.system_user.id,
+            'account': self.account,
         }
         if self.asset:
             kwargs['asset_id'] = self.asset.id
-        elif self.application:
-            kwargs['application_id'] = self.application_id
         rules = CommandFilterRule.get_queryset(**kwargs)
         return rules
-
-    def load_system_user_auth(self):
-        if self.asset:
-            self.system_user.load_asset_more_auth(self.asset.id, self.user.username, self.user.id)
-        elif self.application:
-            self.system_user.load_app_more_auth(self.application.id, self.user.username, self.user.id)
 
 
 class TempToken(JMSBaseModel):

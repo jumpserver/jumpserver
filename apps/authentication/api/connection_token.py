@@ -1,6 +1,7 @@
 import abc
 import os
 import json
+import time
 import base64
 import urllib.parse
 from django.http import HttpResponse
@@ -41,17 +42,25 @@ class ConnectionTokenMixin:
     def get_request_resources(self, serializer):
         user = self.get_request_resource_user(serializer)
         asset = serializer.validated_data.get('asset')
-        application = serializer.validated_data.get('application')
-        system_user = serializer.validated_data.get('system_user')
-        return user, asset, application, system_user
+        account = serializer.validated_data.get('account')
+        return user, asset, account
 
     @staticmethod
-    def check_user_has_resource_permission(user, asset, application, system_user):
-        from perms.utils.asset import has_asset_system_permission
+    def check_user_has_resource_permission(user, asset, account):
+        from perms.utils.account import PermAccountUtil
+        if not asset or not user:
+            error = ''
+            raise PermissionDenied(error)
 
-        if asset and not has_asset_system_permission(user, asset, system_user):
-            error = f'User not has this asset and system user permission: ' \
-                    f'user={user.id} system_user={system_user.id} asset={asset.id}'
+        actions, expire_at = PermAccountUtil().validate_permission(
+            user, asset, account_username=account
+        )
+        if not actions:
+            error = ''
+            raise PermissionDenied(error)
+
+        if expire_at < time.time():
+            error = ''
             raise PermissionDenied(error)
 
     def get_smart_endpoint(self, protocol, asset=None, application=None):
@@ -69,13 +78,12 @@ class ConnectionTokenMixin:
         return true_value if is_true(os.getenv(env_key, env_default)) else false_value
 
     def get_client_protocol_data(self, token: ConnectionToken):
-        from assets.models import SystemUser
-        protocol = token.system_user.protocol
+        protocol = token.protocol
         username = token.user.username
         rdp_config = ssh_token = ''
-        if protocol == SystemUser.Protocol.rdp:
+        if protocol == 'rdp':
             filename, rdp_config = self.get_rdp_file_info(token)
-        elif protocol == SystemUser.Protocol.ssh:
+        elif protocol == 'ssh':
             filename, ssh_token = self.get_ssh_token(token)
         else:
             raise ValueError('Protocol not support: {}'.format(protocol))
@@ -134,15 +142,12 @@ class ConnectionTokenMixin:
         rdp_options['screen mode id:i'] = '2' if full_screen else '1'
 
         # 设置 RDP Server 地址
-        endpoint = self.get_smart_endpoint(
-            protocol='rdp', asset=token.asset, application=token.application
-        )
+        endpoint = self.get_smart_endpoint(protocol='rdp', asset=token.asset)
         rdp_options['full address:s'] = f'{endpoint.host}:{endpoint.rdp_port}'
 
         # 设置用户名
         rdp_options['username:s'] = '{}|{}'.format(token.user.username, str(token.id))
-        if token.system_user.ad_domain:
-            rdp_options['domain:s'] = token.system_user.ad_domain
+        # rdp_options['domain:s'] = token.account_ad_domain
 
         # 设置宽高
         height = self.request.query_params.get('height')
@@ -158,13 +163,12 @@ class ConnectionTokenMixin:
 
         if token.asset:
             name = token.asset.name
-        elif token.application and token.application.category_remote_app:
-            app = '||jmservisor'
-            name = token.application.name
-            rdp_options['remoteapplicationmode:i'] = '1'
-            rdp_options['alternate shell:s'] = app
-            rdp_options['remoteapplicationprogram:s'] = app
-            rdp_options['remoteapplicationname:s'] = name
+            # remote-app
+            # app = '||jmservisor'
+            # rdp_options['remoteapplicationmode:i'] = '1'
+            # rdp_options['alternate shell:s'] = app
+            # rdp_options['remoteapplicationprogram:s'] = app
+            # rdp_options['remoteapplicationname:s'] = name
         else:
             name = '*'
         prefix_name = f'{token.user.username}-{name}'
@@ -188,16 +192,12 @@ class ConnectionTokenMixin:
     def get_ssh_token(self, token: ConnectionToken):
         if token.asset:
             name = token.asset.name
-        elif token.application:
-            name = token.application.name
         else:
             name = '*'
         prefix_name = f'{token.user.username}-{name}'
         filename = self.get_connect_filename(prefix_name)
 
-        endpoint = self.get_smart_endpoint(
-            protocol='ssh', asset=token.asset, application=token.application
-        )
+        endpoint = self.get_smart_endpoint(protocol='ssh', asset=token.asset)
         data = {
             'ip': endpoint.host,
             'port': str(endpoint.ssh_port),
@@ -251,8 +251,8 @@ class ConnectionTokenViewSet(ConnectionTokenMixin, RootOrgViewMixin, JMSModelVie
         return token
 
     def perform_create(self, serializer):
-        user, asset, application, system_user = self.get_request_resources(serializer)
-        self.check_user_has_resource_permission(user, asset, application, system_user)
+        user, asset, account = self.get_request_resources(serializer)
+        self.check_user_has_resource_permission(user, asset, account)
         return super(ConnectionTokenViewSet, self).perform_create(serializer)
 
     @action(methods=['POST'], detail=False, url_path='secret-info/detail')
@@ -264,7 +264,6 @@ class ConnectionTokenViewSet(ConnectionTokenMixin, RootOrgViewMixin, JMSModelVie
         token_id = request.data.get('token') or ''
         token = get_object_or_404(ConnectionToken, pk=token_id)
         self.check_token_valid(token)
-        token.load_system_user_auth()
         serializer = self.get_serializer(instance=token)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

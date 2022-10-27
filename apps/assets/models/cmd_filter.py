@@ -180,9 +180,10 @@ class CommandFilterRule(OrgModelMixin):
 
     @classmethod
     def get_queryset(
-            cls, user_id=None, user_group_id=None, system_user_id=None,
+            cls, user_id=None, user_group_id=None, account=None,
             asset_id=None, org_id=None
     ):
+        from perms.models.const import SpecialAccount
         user_groups = []
         user = get_object_or_none(User, pk=user_id)
         if user:
@@ -191,7 +192,7 @@ class CommandFilterRule(OrgModelMixin):
         if user_group:
             org_id = user_group.org_id
             user_groups.append(user_group)
-        account = get_object_or_none(Account, pk=system_user_id)
+
         asset = get_object_or_none(Asset, pk=asset_id)
         q = Q()
         if user:
@@ -200,7 +201,8 @@ class CommandFilterRule(OrgModelMixin):
             q |= Q(user_groups__in=set(user_groups))
         if account:
             org_id = account.org_id
-            q |= Q(accounts=account)
+            q |= Q(accounts__contains=list(account)) |\
+                 Q(accounts__contains=SpecialAccount.ALL.value)
         if asset:
             org_id = asset.org_id
             q |= Q(assets=asset)
