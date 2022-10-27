@@ -51,7 +51,6 @@ class PermAccountUtil(AssetPermissionUtil):
             user, asset, with_actions=True, with_perms=True
         )
         perm = perms.first()
-        # Todo: 后面可能需要加上 protocol 进行过滤, 因为同名的账号协议是不一样可能会存在多个
         account = accounts.filter(username=account_username).first()
         actions = account.actions if account else []
         expire_at = perm.date_expired if perm else time.time()

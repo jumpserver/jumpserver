@@ -9,6 +9,7 @@ from django.db import models
 from common.utils import lazyproperty
 from common.utils.timezone import as_current_tz
 from common.db.models import JMSBaseModel
+from assets.const import Protocol
 
 
 def date_expired_default():
@@ -26,10 +27,14 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
     )
     user_display = models.CharField(max_length=128, default='', verbose_name=_("User display"))
     asset_display = models.CharField(max_length=128, default='', verbose_name=_("Asset display"))
-    protocol = ''
     account = models.CharField(max_length=128, default='', verbose_name=_("Account"))
+    protocol = models.CharField(
+        choices=Protocol.choices, max_length=16, default=Protocol.ssh, verbose_name=_("Protocol")
+    )
     secret = models.CharField(max_length=64, default='', verbose_name=_("Secret"))
-    date_expired = models.DateTimeField(default=date_expired_default, verbose_name=_("Date expired"))
+    date_expired = models.DateTimeField(
+        default=date_expired_default, verbose_name=_("Date expired")
+    )
 
     class Meta:
         ordering = ('-date_expired',)
