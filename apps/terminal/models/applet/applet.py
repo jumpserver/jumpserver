@@ -17,11 +17,6 @@ class Applet(JMSBaseModel):
         general = 'general', _('General')
         web = 'web', _('Web')
 
-    class VCSType(models.TextChoices):
-        manual = 'manual', _('Manual')
-        git = 'git', _('Git')
-        archive = 'archive', _('Remote gzip')
-
     name = models.CharField(max_length=128, verbose_name=_('Name'), unique=True)
     display_name = models.CharField(max_length=128, verbose_name=_('Display name'))
     version = models.CharField(max_length=16, verbose_name=_('Version'))

@@ -658,8 +658,6 @@ msgid "Script"
 msgstr ""
 
 #: assets/models/asset/web.py:13
-#, fuzzy
-#| msgid "Auto fill"
 msgid "Autofill"
 msgstr "自动填充"
 
@@ -1990,10 +1988,8 @@ msgid "Asset display"
 msgstr "资产名称"
 
 #: authentication/models.py:85
-#, fuzzy
-#| msgid "Action display"
 msgid "Account display"
-msgstr "动作名称"
+msgstr "账号显示"
 
 #: authentication/models.py:89
 msgid "Connection token"
@@ -4698,52 +4694,38 @@ msgid "Storage is invalid"
 msgstr "存储无效"
 
 #: terminal/models/applet/applet.py:21
-#, fuzzy
-#| msgid "Manually input"
 msgid "Manual"
-msgstr "手动输入"
+msgstr "手动"
 
 #: terminal/models/applet/applet.py:22
 msgid "Git"
 msgstr ""
 
 #: terminal/models/applet/applet.py:23
-#, fuzzy
-#| msgid "Remote app"
 msgid "Remote gzip"
 msgstr "远程应用"
 
 #: terminal/models/applet/applet.py:28
-#, fuzzy
-#| msgid "Auth url"
 msgid "Author"
-msgstr "认证地址"
+msgstr "作者"
 
 #: terminal/models/applet/applet.py:32
 msgid "Tags"
-msgstr ""
+msgstr "标签"
 
 #: terminal/models/applet/applet.py:59 terminal/models/applet/host.py:17
-#, fuzzy
-#| msgid "Apply assets"
 msgid "Applet"
-msgstr "申请资产"
+msgstr "远程应用"
 
 #: terminal/models/applet/host.py:13
-#, fuzzy
-#| msgid "Verify account automation"
 msgid "Account automation"
-msgstr "账号校验自动化"
+msgstr "账号自动化"
 
 #: terminal/models/applet/host.py:14
-#, fuzzy
-#| msgid "Date sync"
 msgid "Date synced"
-msgstr "同步日期"
+msgstr "最后同步日期"
 
 #: terminal/models/applet/host.py:26
-#, fuzzy
-#| msgid "Host"
 msgid "Hosting"
 msgstr "主机"
 
