@@ -9,16 +9,17 @@ __all__ = ['JMSInventory']
 
 
 class JMSInventory:
-    def __init__(self, manager, assets=None, account_policy='smart', account_prefer='root,administrator'):
+    def __init__(self, manager, assets=None, account_policy='smart',
+                 account_prefer='root,administrator', host_callback=None):
         """
         :param assets:
         :param account_prefer: account username name if not set use account_policy
         :param account_policy: smart, privileged_must, privileged_first
         """
-        self.manager = manager
         self.assets = self.clean_assets(assets)
         self.account_prefer = account_prefer
         self.account_policy = account_policy
+        self.host_callback = host_callback
 
     @staticmethod
     def clean_assets(assets):
@@ -106,7 +107,8 @@ class JMSInventory:
             'jms_asset': {
                 'id': str(asset.id), 'name': asset.name, 'address': asset.address,
                 'type': asset.type, 'category': asset.category,
-                'protocol': asset.protocol, 'port': asset.port,'database': '',
+                'protocol': asset.protocol, 'port': asset.port,
+                'category_property': asset.category_property,
                 'protocols': [{'name': p.name, 'port': p.port} for p in protocols],
             },
             'jms_account': {
@@ -117,9 +119,6 @@ class JMSInventory:
         ansible_config = dict(automation.ansible_config)
         ansible_connection = ansible_config.get('ansible_connection', 'ssh')
         host.update(ansible_config)
-
-        if platform.category == 'database':
-            host['jms_asset']['database'] = asset.database.db_name
 
         gateway = None
         if asset.domain:
@@ -176,8 +175,8 @@ class JMSInventory:
                 if not automation.ansible_enabled:
                     host['error'] = _('Ansible disabled')
 
-                if self.manager.host_callback is not None:
-                    host = self.manager.host_callback(
+                if self.host_callback is not None:
+                    host = self.host_callback(
                         host, asset=asset, account=account,
                         platform=platform, automation=automation,
                         path_dir=path_dir
