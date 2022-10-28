@@ -63,7 +63,6 @@ class JMSInventory:
         var = {
             'ansible_user': account.username,
         }
-
         if not account.secret:
             return var
         if account.secret_type == 'password':
