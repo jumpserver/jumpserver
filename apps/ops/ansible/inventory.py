@@ -9,8 +9,10 @@ __all__ = ['JMSInventory']
 
 
 class JMSInventory:
-    def __init__(self, manager, assets=None, account_policy='smart',
-                 account_prefer='root,administrator', host_callback=None):
+    def __init__(
+            self, assets=None, account_policy='smart',
+            account_prefer='root,administrator', host_callback=None
+    ):
         """
         :param assets:
         :param account_prefer: account username name if not set use account_policy
@@ -79,10 +81,7 @@ class JMSInventory:
         ssh_protocol_matched = list(filter(lambda x: x.name == 'ssh', protocols))
         ssh_protocol = ssh_protocol_matched[0] if ssh_protocol_matched else None
         host['ansible_host'] = asset.address
-        if asset.port == 0:
-            host['ansible_port'] = ssh_protocol.port if ssh_protocol else 22
-        else:
-            host['ansible_port'] = asset.port
+        host['ansible_port'] = ssh_protocol.port if ssh_protocol else 22
 
         su_from = account.su_from
         if platform.su_enabled and su_from:
@@ -166,9 +165,9 @@ class JMSInventory:
         platform_assets = self.group_by_platform(self.assets)
         for platform, assets in platform_assets.items():
             automation = platform.automation
-            protocols = platform.protocols.all()
 
             for asset in assets:
+                protocols = asset.protocols.all()
                 account = self.select_account(asset)
                 host = self.asset_to_host(asset, account, automation, protocols, platform)
 

@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from common.db import fields
-from common.const.choices import Trigger
 from common.db.models import JMSBaseModel
 from assets.const import AutomationTypes, SecretType, SecretStrategy, SSHKeyStrategy
 from .base import BaseAutomation

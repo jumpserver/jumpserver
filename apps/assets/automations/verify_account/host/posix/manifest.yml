@@ -1,0 +1,7 @@
+id: verify_account_posix
+name: Verify posix account
+category: host
+type:
+  - linux
+  - unix
+method: verify_account
