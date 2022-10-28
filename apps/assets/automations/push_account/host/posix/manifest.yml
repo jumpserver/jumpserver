@@ -1,0 +1,7 @@
+id: push_account_posix
+name: Push posix account
+category: host
+type:
+  - linux
+  - unix
+method: push_account

@@ -163,9 +163,9 @@ class JMSInventory:
         platform_assets = self.group_by_platform(self.assets)
         for platform, assets in platform_assets.items():
             automation = platform.automation
-            protocols = platform.protocols.all()
 
             for asset in assets:
+                protocols = asset.protocols.all()
                 account = self.select_account(asset)
                 host = self.asset_to_host(asset, account, automation, protocols, platform)
 

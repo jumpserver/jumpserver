@@ -1,6 +1,8 @@
 from .change_secret.manager import ChangeSecretManager
 from .gather_facts.manager import GatherFactsManager
 from .gather_accounts.manager import GatherAccountsManager
+from .verify_account.manager import VerifyAccountManager
+from .push_account.manager import PushAccountManager
 from ..const import AutomationTypes
 
 
@@ -9,6 +11,8 @@ class ExecutionManager:
         AutomationTypes.change_secret: ChangeSecretManager,
         AutomationTypes.gather_facts: GatherFactsManager,
         AutomationTypes.gather_accounts: GatherAccountsManager,
+        AutomationTypes.verify_account: VerifyAccountManager,
+        AutomationTypes.push_account: PushAccountManager,
     }
 
     def __init__(self, execution):

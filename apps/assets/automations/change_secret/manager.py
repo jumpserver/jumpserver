@@ -1,14 +1,11 @@
-import os
 import random
 import string
-from hashlib import md5
 from copy import deepcopy
-from socket import gethostname
 from collections import defaultdict
 
 from django.utils import timezone
 
-from common.utils import lazyproperty, gen_key_pair, ssh_pubkey_gen, ssh_key_string_to_obj
+from common.utils import lazyproperty, gen_key_pair
 from assets.models import ChangeSecretRecord
 from assets.const import (
     AutomationTypes, SecretType, SecretStrategy, SSHKeyStrategy, DEFAULT_PASSWORD_RULES
@@ -38,19 +35,6 @@ class ChangeSecretManager(BasePlaybookManager):
     def generate_ssh_key():
         private_key, public_key = gen_key_pair()
         return private_key
-
-    @staticmethod
-    def generate_public_key(private_key):
-        return ssh_pubkey_gen(private_key=private_key, hostname=gethostname())
-
-    @staticmethod
-    def generate_private_key_path(secret, path_dir):
-        key_name = '.' + md5(secret.encode('utf-8')).hexdigest()
-        key_path = os.path.join(path_dir, key_name)
-        if not os.path.exists(key_path):
-            ssh_key_string_to_obj(secret, password=None).write_private_key_file(key_path)
-            os.chmod(key_path, 0o400)
-        return key_path
 
     def generate_password(self):
         kwargs = self.execution.snapshot['password_rules'] or {}

@@ -4,19 +4,13 @@
     ansible_python_interpreter: /usr/local/bin/python
 
   tasks:
-    - name: Get info
-      community.postgresql.postgresql_info:
+    - name: Add user account.username
+      community.postgresql.postgresql_user:
         login_user: "{{ jms_account.username }}"
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
-        login_db: "{{ jms_asset.category_property.db_name }}"
-        filter: "roles"
-      register: db_info
+        db: "{{ jms_asset.category_property.db_name }}"
+        name: "{{ account.username }}"
+        password: "{{ account.secret }}"
 
-    - name: Define info by set_fact
-      set_fact:
-        info: "{{ db_info.roles }}"
-
-    - debug:
-        var: info

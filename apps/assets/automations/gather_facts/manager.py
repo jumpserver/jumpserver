@@ -26,4 +26,4 @@ class GatherFactsManager(BasePlaybookManager):
             asset.info = info
             asset.save()
         else:
-            logger.error("Not found info, task name must be 'Get info': {}".format(host))
+            logger.error("Not found info: {}".format(host))

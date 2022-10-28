@@ -1,0 +1,6 @@
+id: push_account_mysql
+name: Push account from MySQL
+category: database
+type:
+  - mysql
+method: push_account
