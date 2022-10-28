@@ -26,6 +26,7 @@ class Applet(JMSBaseModel):
     protocols = models.JSONField(default=list, verbose_name=_('Protocol'))
     tags = models.JSONField(default=list, verbose_name=_('Tags'))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
+    hosts = models.ManyToManyField(through_fields=('applet', 'host'), through='AppletPublication', to='AppletHost', verbose_name=_('Hosts'))
 
     def __str__(self):
         return self.name
@@ -51,8 +52,8 @@ class Applet(JMSBaseModel):
 
 
 class AppletPublication(JMSBaseModel):
-    applet = models.ForeignKey('Applet', on_delete=models.PROTECT, verbose_name=_('Applet'))
-    host = models.ForeignKey('AppletHost', on_delete=models.PROTECT, verbose_name=_('Host'))
+    applet = models.ForeignKey('Applet', on_delete=models.PROTECT, related_name='publications', verbose_name=_('Applet'))
+    host = models.ForeignKey('AppletHost', on_delete=models.PROTECT, related_name='publications', verbose_name=_('Host'))
     status = models.CharField(max_length=16, verbose_name=_('Status'))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 

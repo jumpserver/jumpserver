@@ -1,6 +1,6 @@
 ---
 
-- hosts: windows
+- hosts: all
   vars:
     - DownloadHost: https://demo.jumpserver.org/download
     - RDS_Licensing: enabled

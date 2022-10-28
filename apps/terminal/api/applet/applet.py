@@ -1,7 +1,7 @@
-import os.path
 import shutil
 import zipfile
 import yaml
+import os.path
 
 from django.core.files.storage import default_storage
 from rest_framework import viewsets
@@ -9,12 +9,16 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
-from terminal import serializers, models
+from terminal import serializers
+from terminal.models import AppletPublication, Applet
 from terminal.serializers import AppletUploadSerializer
 
 
+__all__ = ['AppletViewSet', 'AppletPublicationViewSet']
+
+
 class AppletViewSet(viewsets.ModelViewSet):
-    queryset = models.Applet.objects.all()
+    queryset = Applet.objects.all()
     serializer_class = serializers.AppletSerializer
     rbac_perms = {
         'upload': 'terminal.add_applet',
@@ -67,7 +71,7 @@ class AppletViewSet(viewsets.ModelViewSet):
         name = manifest['name']
         update = request.query_params.get('update')
 
-        instance = models.Applet.objects.filter(name=name).first()
+        instance = Applet.objects.filter(name=name).first()
         if instance and not update:
             return Response({'error': 'Applet already exists: {}'.format(name)}, status=400)
 
@@ -82,5 +86,5 @@ class AppletViewSet(viewsets.ModelViewSet):
 
 
 class AppletPublicationViewSet(viewsets.ModelViewSet):
-    queryset = models.AppletPublication.objects.all()
+    queryset = AppletPublication.objects.all()
     serializer_class = serializers.AppletPublicationSerializer
