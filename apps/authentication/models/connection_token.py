@@ -25,12 +25,12 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
         'assets.Asset', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='connection_tokens', verbose_name=_('Asset'),
     )
-    user_display = models.CharField(max_length=128, default='', verbose_name=_("User display"))
-    asset_display = models.CharField(max_length=128, default='', verbose_name=_("Asset display"))
-    account = models.CharField(max_length=128, default='', verbose_name=_("Account"))
     protocol = models.CharField(
         choices=Protocol.choices, max_length=16, default=Protocol.ssh, verbose_name=_("Protocol")
     )
+    user_display = models.CharField(max_length=128, default='', verbose_name=_("User display"))
+    asset_display = models.CharField(max_length=128, default='', verbose_name=_("Asset display"))
+    account_username = models.CharField(max_length=128, default='', verbose_name=_("Account"))
     secret = models.CharField(max_length=64, default='', verbose_name=_("Secret"))
     date_expired = models.DateTimeField(
         default=date_expired_default, verbose_name=_("Date expired")
@@ -44,6 +44,10 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
         ]
 
     @property
+    def is_valid(self):
+        return not self.is_expired
+
+    @property
     def is_expired(self):
         return self.date_expired < timezone.now()
 
@@ -54,10 +58,6 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
         if seconds < 0:
             seconds = 0
         return int(seconds)
-
-    @property
-    def is_valid(self):
-        return not self.is_expired
 
     @classmethod
     def get_default_date_expired(cls):
@@ -75,35 +75,28 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
     # actions 和 expired_at 在 check_valid() 中赋值
     actions = expire_at = None
 
-    def check_valid(self):
+    def check_permission(self):
         from perms.utils.account import PermAccountUtil
         if self.is_expired:
             is_valid = False
             error = _('Connection token expired at: {}').format(as_current_tz(self.date_expired))
             return is_valid, error
-        if not self.user:
+        if not self.user or not self.user.is_valid:
             is_valid = False
-            error = _('User not exists')
+            error = _('No user or invalid user')
             return is_valid, error
-        if not self.user.is_valid:
+        if not self.asset or self.asset.is_active:
             is_valid = False
-            error = _('User invalid, disabled or expired')
+            error = _('No asset or inactive asset')
             return is_valid, error
-        if not self.asset:
+        if not self.account_username:
             is_valid = False
-            error = _('Asset not exists')
-            return is_valid, error
-        if not self.asset.is_active:
-            is_valid = False
-            error = _('Asset inactive')
-            return is_valid, error
-        if not self.account:
-            is_valid = False
-            error = _('Account not exists')
+            error = _('No account')
             return is_valid, error
 
-        actions, expire_at = PermAccountUtil().validate_permission(
-            self.user, self.asset, self.account
+        account_util = PermAccountUtil()
+        actions, expire_at = account_util.validate_permission(
+            self.user, self.asset, self.account_username
         )
         if not actions or expire_at < time.time():
             is_valid = False
@@ -112,6 +105,13 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
         self.actions = actions
         self.expire_at = expire_at
         return True, ''
+
+    @lazyproperty
+    def account(self):
+        if not self.asset:
+            return None
+        account = self.asset.accounts.filter(username=self.account_username).first()
+        return account
 
     @lazyproperty
     def domain(self):

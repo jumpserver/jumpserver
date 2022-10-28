@@ -16,9 +16,9 @@ def migrate_system_user_to_account(apps, schema_editor):
         count += len(connection_tokens)
         updated = []
         for connection_token in connection_tokens:
-            connection_token.account = connection_token.system_user.username
+            connection_token.account_username = connection_token.system_user.username
             updated.append(connection_token)
-        connection_token_model.objects.bulk_update(updated, ['account'])
+        connection_token_model.objects.bulk_update(updated, ['account_username'])
 
 
 class Migration(migrations.Migration):
@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='connectiontoken',
-            name='account',
+            name='account_username',
             field=models.CharField(default='', max_length=128, verbose_name='Account'),
         ),
         migrations.RunPython(migrate_system_user_to_account),
