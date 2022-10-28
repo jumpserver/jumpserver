@@ -75,7 +75,7 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
     # actions 和 expired_at 在 check_valid() 中赋值
     actions = expire_at = None
 
-    def check_valid(self):
+    def check_permission(self):
         from perms.utils.account import PermAccountUtil
         if self.is_expired:
             is_valid = False
@@ -89,13 +89,15 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
             is_valid = False
             error = _('No asset or inactive asset')
             return is_valid, error
-        if not self.account:
+        if not self.account_username:
             is_valid = False
             error = _('No account')
             return is_valid, error
 
         account_util = PermAccountUtil()
-        actions, expire_at = account_util.validate_permission(self.user, self.asset, self.account)
+        actions, expire_at = account_util.validate_permission(
+            self.user, self.asset, self.account_username
+        )
         if not actions or expire_at < time.time():
             is_valid = False
             error = _('User has no permission to access asset or permission expired')
@@ -103,6 +105,13 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
         self.actions = actions
         self.expire_at = expire_at
         return True, ''
+
+    @lazyproperty
+    def account(self):
+        if not self.asset:
+            return None
+        account = self.asset.accounts.filter(username=self.account_username).first()
+        return account
 
     @lazyproperty
     def domain(self):

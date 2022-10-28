@@ -5,7 +5,7 @@ from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from authentication.models import ConnectionToken
 from common.utils import pretty_string
 from common.utils.random import random_string
-from assets.models import Asset, Gateway, Domain, CommandFilterRule
+from assets.models import Asset, Gateway, Domain, CommandFilterRule, Account
 from users.models import User
 from perms.serializers.permission import ActionsField
 
@@ -24,33 +24,32 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         model = ConnectionToken
         fields_mini = ['id']
         fields_small = fields_mini + [
-            'secret', 'date_expired', 'date_created', 'date_updated',
+            'secret', 'account_username', 'date_expired',
+            'date_created', 'date_updated',
             'created_by', 'updated_by', 'org_id', 'org_name',
         ]
         fields_fk = [
-            'user', 'system_user', 'asset',
+            'user', 'asset',
         ]
         read_only_fields = [
             # 普通 Token 不支持指定 user
             'user', 'is_valid', 'expire_time',
-            'user_display', 'system_user_display',
-            'asset_display',
+            'user_display', 'asset_display',
         ]
         fields = fields_small + fields_fk + read_only_fields
+
+    def get_request_user(self):
+        request = self.context.get('request')
+        user = request.user if request else None
+        return user
+
+    def get_user(self, attrs):
+        return self.get_request_user()
 
     def validate(self, attrs):
         fields_attrs = self.construct_internal_fields_attrs(attrs)
         attrs.update(fields_attrs)
         return attrs
-
-    @property
-    def request_user(self):
-        request = self.context.get('request')
-        if request:
-            return request.user
-
-    def get_user(self, attrs):
-        return self.request_user
 
     def construct_internal_fields_attrs(self, attrs):
         asset = attrs.get('asset') or ''
@@ -63,8 +62,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         if not isinstance(asset, Asset):
             error = ''
             raise serializers.ValidationError(error)
-
-        return {
+        attrs = {
             'user': user,
             'secret': secret,
             'user_display': user_display,
@@ -72,6 +70,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
             'date_expired': date_expired,
             'org_id': org_id,
         }
+        return attrs
 
 
 class ConnectionTokenDisplaySerializer(ConnectionTokenSerializer):
@@ -95,7 +94,7 @@ class SuperConnectionTokenSerializer(ConnectionTokenSerializer):
         ]
 
     def get_user(self, attrs):
-        return attrs.get('user') or self.request_user
+        return attrs.get('user') or self.get_request_user()
 
 
 #
@@ -104,31 +103,37 @@ class SuperConnectionTokenSerializer(ConnectionTokenSerializer):
 
 
 class ConnectionTokenUserSerializer(serializers.ModelSerializer):
+    """ User """
     class Meta:
         model = User
         fields = ['id', 'name', 'username', 'email']
 
 
 class ConnectionTokenAssetSerializer(serializers.ModelSerializer):
-
+    """ Asset """
     class Meta:
         model = Asset
         fields = ['id', 'name', 'ip', 'protocols', 'org_id']
 
 
+class ConnectionTokenAccountSerializer(serializers.ModelSerializer):
+    """ Account """
+    class Meta:
+        model = Account
+        fields = [
+            'id', 'name', 'username', 'secret_type', 'secret', 'version'
+        ]
+
+
 class ConnectionTokenGatewaySerializer(serializers.ModelSerializer):
+    """ Gateway """
     class Meta:
         model = Gateway
         fields = ['id', 'ip', 'port', 'username', 'password', 'private_key']
 
 
-class ConnectionTokenRemoteAppSerializer(serializers.Serializer):
-    program = serializers.CharField(allow_null=True, allow_blank=True)
-    working_directory = serializers.CharField(allow_null=True, allow_blank=True)
-    parameters = serializers.CharField(allow_null=True, allow_blank=True)
-
-
 class ConnectionTokenDomainSerializer(serializers.ModelSerializer):
+    """ Domain """
     gateways = ConnectionTokenGatewaySerializer(many=True, read_only=True)
 
     class Meta:
@@ -137,6 +142,7 @@ class ConnectionTokenDomainSerializer(serializers.ModelSerializer):
 
 
 class ConnectionTokenCmdFilterRuleSerializer(serializers.ModelSerializer):
+    """ Command filter rule """
     class Meta:
         model = CommandFilterRule
         fields = [
@@ -148,7 +154,7 @@ class ConnectionTokenCmdFilterRuleSerializer(serializers.ModelSerializer):
 class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     user = ConnectionTokenUserSerializer(read_only=True)
     asset = ConnectionTokenAssetSerializer(read_only=True)
-    remote_app = ConnectionTokenRemoteAppSerializer(read_only=True)
+    account = ConnectionTokenAccountSerializer(read_only=True)
     gateway = ConnectionTokenGatewaySerializer(read_only=True)
     domain = ConnectionTokenDomainSerializer(read_only=True)
     cmd_filter_rules = ConnectionTokenCmdFilterRuleSerializer(many=True)
@@ -158,6 +164,8 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     class Meta:
         model = ConnectionToken
         fields = [
-            'id', 'secret', 'type', 'user', 'asset', 'account', 'protocol',
-            'cmd_filter_rules', 'domain', 'gateway', 'actions', 'expired_at',
+            'id', 'secret',
+            'user', 'asset', 'account_username', 'account', 'protocol',
+            'domain', 'gateway', 'cmd_filter_rules',
+            'actions', 'expired_at',
         ]
