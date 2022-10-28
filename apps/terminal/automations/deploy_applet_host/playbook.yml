@@ -25,11 +25,39 @@
       include_management_tools: yes
     register: rds_install
 
-  - name: Reboot if installing RDS feature requires it
+  - name: Download Jmservisor (jumpserver)
+    ansible.windows.win_get_url:
+        url: "{{ DownloadHost }}/Jmservisor.msi"
+        dest: "{{ ansible_env.TEMP }}\\Jmservisor.msi"
+
+  - name: Install the Jmservisor (jumpserver)
+    ansible.windows.win_package:
+      path: "{{ ansible_env.TEMP }}\\Jmservisor.msi"
+      state: present
+
+  - name: Download python-3.10.8
+    ansible.windows.win_get_url:
+      url: "{{ DownloadHost }}/python-3.10.8-amd64.exe"
+      dest: "{{ ansible_env.TEMP }}\\python-3.10.8-amd64.exe"
+
+  - name: Install the python-3.10.8
+    ansible.windows.win_package:
+      path: "{{ ansible_env.TEMP }}\\python-3.10.8-amd64.exe"
+      product_id: '{371d0d73-d418-4ffe-b280-58c3e7987525}'
+      arguments:
+      - /quiet
+      - InstallAllUsers=1
+      - PrependPath=1
+      - Include_test=0
+      - Include_launcher=0
+      state: present
+    register: win_install_python
+
+  - name: Reboot if installing requires it
     ansible.windows.win_reboot:
       post_reboot_delay: 10
       test_command: whoami
-    when: rds_install.reboot_required
+    when: rds_install.reboot_required or win_install_python.reboot_required
 
   - name: Set RDS LicenseServer (regedit)
     ansible.windows.win_regedit:
@@ -66,38 +94,6 @@
       name: RemoteAppLogoffTimeLimit
       data: "{{ RDS_RemoteAppLogoffTimeLimit }}"
       type: dword
-
-  - name: Download Jmservisor (jumpserver)
-    ansible.windows.win_get_url:
-      url: "{{ DownloadHost }}/Jmservisor.msi"
-      dest: "{{ ansible_env.TEMP }}\\Jmservisor.msi"
-
-  - name: Install the Jmservisor (jumpserver)
-    ansible.windows.win_package:
-      path: "{{ ansible_env.TEMP }}\\Jmservisor.msi"
-      state: present
-
-  - name: Download python-3.10.8
-    ansible.windows.win_get_url:
-      url: "{{ DownloadHost }}/python-3.10.8-amd64.exe"
-      dest: "{{ ansible_env.TEMP }}\\python-3.10.8-amd64.exe"
-
-  - name: Install the python-3.10.8
-    ansible.windows.win_package:
-      path: "{{ ansible_env.TEMP }}\\python-3.10.8-amd64.exe"
-      product_id: '{371d0d73-d418-4ffe-b280-58c3e7987525}'
-      arguments:
-      - /quiet
-      - InstallAllUsers=1
-      - PrependPath=1
-      - Include_test=0
-      - Include_launcher=0
-      state: present
-    register: win_install_python
-
-  - name: Reboot if installing Python package requires it
-    ansible.windows.win_reboot:
-    when: win_install_python.reboot_required
 
   - name: Download pip packages
     ansible.windows.win_get_url:
