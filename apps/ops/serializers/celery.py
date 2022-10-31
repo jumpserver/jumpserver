@@ -31,7 +31,7 @@ class CeleryTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = CeleryTask
         fields = [
-            'id', 'name', 'meta', 'publish_count', 'state', 'success_count', 'last_published_time',
+            'id', 'name', 'meta', 'state', 'last_published_time',
         ]
 
 
