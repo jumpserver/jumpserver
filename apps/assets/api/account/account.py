@@ -43,7 +43,7 @@ class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
     serializer_classes = {
         'default': serializers.AccountSecretSerializer
     }
-    http_method_names = ['get']
+    http_method_names = ['get', 'options']
     # Todo: 记得打开
     # permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
     rbac_perms = {
