@@ -21,7 +21,6 @@ logger = get_logger(__name__)
 
 
 class PushOrVerifyHostCallbackMixin:
-    execution: Model()
     host_account_mapper: dict
     ignore_account: bool
     generate_public_key: callable

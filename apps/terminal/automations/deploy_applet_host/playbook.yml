@@ -106,7 +106,9 @@
       dest: "{{ ansible_env.TEMP }}"
 
   - name: Install python requirements offline
-    ansible.windows.win_shell: pip install -r "{{ ansible_env.TEMP }}\pip_packages_v0.0.1\requirements.txt" --no-index --find-links="{{ ansible_env.TEMP }}\pip_packages_v0.0.1"
+    ansible.windows.win_shell: >
+        pip install -r '{{ ansible_env.TEMP }}\pip_packages_v0.0.1\requirements.txt'
+        --no-index --find-links='{{ ansible_env.TEMP }}\pip_packages_v0.0.1'
 
   - name: Download chromedriver (chrome)
     ansible.windows.win_get_url:
