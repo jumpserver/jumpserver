@@ -1,17 +1,66 @@
 import os
-import shutil
 import yaml
+import shutil
+from hashlib import md5
+from copy import deepcopy
+from socket import gethostname
 from collections import defaultdict
 
 from django.conf import settings
 from django.utils import timezone
+from django.db.models import Model
 from django.utils.translation import gettext as _
 
 from common.utils import get_logger
+from common.utils import ssh_pubkey_gen, ssh_key_string_to_obj
+from assets.const import SecretType
 from assets.automations.methods import platform_automation_methods
 from ops.ansible import JMSInventory, PlaybookRunner, DefaultCallback
 
 logger = get_logger(__name__)
+
+
+class PushOrVerifyHostCallbackMixin:
+    execution: callable
+    host_account_mapper: dict
+    ignore_account: bool
+    generate_public_key: callable
+    generate_private_key_path: callable
+
+    def host_callback(self, host, asset=None, account=None, automation=None, path_dir=None, **kwargs):
+        host = super().host_callback(host, asset=asset, account=account, automation=automation, **kwargs)
+        if host.get('error'):
+            return host
+
+        accounts = asset.accounts.all()
+        if self.ignore_account and account:
+            accounts = accounts.exclude(id=account.id)
+
+        if '*' not in self.execution.snapshot['accounts']:
+            accounts = accounts.filter(username__in=self.execution.snapshot['accounts'])
+
+        inventory_hosts = []
+        for account in accounts:
+            h = deepcopy(host)
+            h['name'] += '_' + account.username
+            self.host_account_mapper[h['name']] = account
+            secret = account.secret
+
+            private_key_path = None
+            if account.secret_type == SecretType.ssh_key:
+                private_key_path = self.generate_private_key_path(secret, path_dir)
+                secret = self.generate_public_key(secret)
+
+            h['secret_type'] = account.secret_type
+            h['account'] = {
+                'name': account.name,
+                'username': account.username,
+                'secret_type': account.secret_type,
+                'secret': secret,
+                'private_key_path': private_key_path
+            }
+            inventory_hosts.append(h)
+        return inventory_hosts
 
 
 class PlaybookCallback(DefaultCallback):
@@ -66,20 +115,33 @@ class BasePlaybookManager:
         method_attr = '{}_method'.format(self.__class__.method_type())
 
         method_enabled = automation and \
-            getattr(automation, enabled_attr) and \
-            getattr(automation, method_attr) and \
-            getattr(automation, method_attr) in self.method_id_meta_mapper
+                         getattr(automation, enabled_attr) and \
+                         getattr(automation, method_attr) and \
+                         getattr(automation, method_attr) in self.method_id_meta_mapper
 
         if not method_enabled:
             host['error'] = _('{} disabled'.format(self.__class__.method_type()))
             return host
         return host
 
+    @staticmethod
+    def generate_public_key(private_key):
+        return ssh_pubkey_gen(private_key=private_key, hostname=gethostname())
+
+    @staticmethod
+    def generate_private_key_path(secret, path_dir):
+        key_name = '.' + md5(secret.encode('utf-8')).hexdigest()
+        key_path = os.path.join(path_dir, key_name)
+        if not os.path.exists(key_path):
+            ssh_key_string_to_obj(secret, password=None).write_private_key_file(key_path)
+            os.chmod(key_path, 0o400)
+        return key_path
+
     def generate_inventory(self, platformed_assets, inventory_path):
         inventory = JMSInventory(
-            manager=self,
             assets=platformed_assets,
             account_policy=self.ansible_account_policy,
+            host_callback=self.host_callback,
         )
         inventory.write_to_file(inventory_path)
 
@@ -105,7 +167,7 @@ class BasePlaybookManager:
     def get_runners(self):
         runners = []
         for platform, assets in self.get_assets_group_by_platform().items():
-            assets_bulked = [assets[i:i+self.bulk_size] for i in range(0, len(assets), self.bulk_size)]
+            assets_bulked = [assets[i:i + self.bulk_size] for i in range(0, len(assets), self.bulk_size)]
 
             for i, _assets in enumerate(assets_bulked, start=1):
                 sub_dir = '{}_{}'.format(platform.name, i)
@@ -148,7 +210,7 @@ class BasePlaybookManager:
         print("  inventory: {}".format(runner.inventory))
         print("  playbook: {}".format(runner.playbook))
 
-    def run(self,  *args, **kwargs):
+    def run(self, *args, **kwargs):
         runners = self.get_runners()
         if len(runners) > 1:
             print("### 分批次执行开始任务, 总共 {}\n".format(len(runners)))

@@ -26,8 +26,7 @@ router.register(r'endpoints', api.EndpointViewSet, 'endpoint')
 router.register(r'endpoint-rules', api.EndpointRuleViewSet, 'endpoint-rule')
 router.register(r'applets', api.AppletViewSet, 'applet')
 router.register(r'applet-hosts', api.AppletHostViewSet, 'applet-host')
-router.register(r'applet-publication', api.AppletPublicationViewSet, 'applet-publication')
-router.register(r'applet-host-deployment', api.AppletHostDeploymentViewSet, 'applet-host-deployment')
+router.register(r'applet-publications', api.AppletPublicationViewSet, 'applet-publication')
 
 
 urlpatterns = [
@@ -46,10 +45,6 @@ urlpatterns = [
     path('command-storages/<uuid:pk>/test-connective/', api.CommandStorageTestConnectiveApi.as_view(), name='command-storage-test-connective'),
     # components
     path('components/metrics/', api.ComponentsMetricsAPIView.as_view(), name='components-metrics'),
-    # v2: get session's replay
-    # path('v2/sessions/<uuid:pk>/replay/',
-    #     api.SessionReplayV2ViewSet.as_view({'get': 'retrieve'}),
-    #     name='session-replay-v2'),
 ]
 
 old_version_urlpatterns = [

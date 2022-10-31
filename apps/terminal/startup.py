@@ -11,7 +11,7 @@ from common.utils import get_disk_usage, get_cpu_load, get_memory_usage, get_log
 
 from .serializers.terminal import TerminalRegistrationSerializer, StatusSerializer
 from .const import TerminalTypeChoices
-from .models.terminal import Terminal
+from .models import Terminal
 
 __all__ = ['CoreTerminal', 'CeleryTerminal']
 

@@ -5,12 +5,12 @@ from common.drf.fields import ObjectRelatedField, LabeledChoiceField
 from common.validators import ProjectUniqueValidator
 from assets.models import Platform
 from assets.serializers import HostSerializer
-from ..models import Applet, AppletPublication, AppletHost, AppletHostDeployment
+from ..models import Applet, AppletPublication, AppletHost
 
 
 __all__ = [
     'AppletSerializer', 'AppletPublicationSerializer',
-    'AppletHostSerializer', 'AppletHostDeploymentSerializer',
+    'AppletHostSerializer',
     'AppletUploadSerializer'
 ]
 
@@ -85,14 +85,3 @@ class AppletHostSerializer(HostSerializer):
         validators.append(uniq_validator)
         return validators
 
-
-class AppletHostDeploymentSerializer(serializers.ModelSerializer):
-    host = ObjectRelatedField(queryset=AppletHost.objects.all())
-
-    class Meta:
-        model = AppletHostDeployment
-        fields_mini = ['id', 'host']
-        read_only_fields = ['date_created', 'date_updated']
-        fields = fields_mini + [
-            'status', 'comment',
-        ] + read_only_fields

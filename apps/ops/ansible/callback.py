@@ -49,7 +49,7 @@ class DefaultCallback:
         }
         self.result['ok'][host][task] = detail
 
-    def runer_on_failed(self, event_data, host=None, task=None, res=None, **kwargs):
+    def runner_on_failed(self, event_data, host=None, task=None, res=None, **kwargs):
         detail = {
             'action': event_data.get('task_action', ''),
             'res': res,

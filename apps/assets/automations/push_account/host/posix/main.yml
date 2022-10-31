@@ -1,0 +1,19 @@
+- hosts: demo
+  gather_facts: no
+  tasks:
+    - name: Add user account.username
+        ansible.builtin.user:
+          name: "{{ account.username }}"
+
+    - name: Set account.username password
+      ansible.builtin.user:
+        name: "{{ account.username }}"
+        password: "{{ account.secret | password_hash('sha512') }}"
+        update_password: always
+      when: secret_type == "password"
+
+    - name: Set account.username SSH key
+      ansible.builtin.authorized_key:
+        user: "{{ account.username }}"
+        key: "{{ account.secret }}"
+      when: secret_type == "ssh_key"

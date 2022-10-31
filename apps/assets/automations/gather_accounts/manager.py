@@ -2,7 +2,7 @@ from common.utils import get_logger
 from assets.const import AutomationTypes
 from orgs.utils import tmp_to_org
 from .filter import GatherAccountsFilter
-from ...models import Account, GatheredUser
+from ...models import GatheredUser
 from ..base.manager import BasePlaybookManager
 
 logger = get_logger(__name__)
@@ -42,4 +42,4 @@ class GatherAccountsManager(BasePlaybookManager):
                         defaults['ip_last_login'] = data['address'][:32]
                     GatheredUser.objects.update_or_create(defaults=defaults, asset=asset, username=username)
         else:
-            logger.error("Not found info, task name must be 'Get info': {}".format(host))
+            logger.error("Not found info".format(host))

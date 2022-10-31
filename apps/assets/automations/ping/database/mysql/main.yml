@@ -2,12 +2,6 @@
   gather_facts: no
   vars:
     ansible_python_interpreter: /usr/local/bin/python
-    jms_account:
-      username: root
-      password: redhat
-    jms_asset:
-      address: 127.0.0.1
-      port: 3306
 
   tasks:
     - name: Test MySQL connection
@@ -17,4 +11,3 @@
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         filter: version
-      register: db_info

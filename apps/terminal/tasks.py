@@ -14,7 +14,7 @@ from common.utils import get_log_keep_day
 from ops.celery.decorator import (
     register_as_period_task, after_app_ready_start, after_app_shutdown_clean_periodic
 )
-from .models import Status, Session, Command, Task
+from .models import Status, Session, Command, Task, AppletHost
 from .backends import server_replay_storage
 from .utils import find_session_replay_local
 
@@ -99,3 +99,9 @@ def upload_session_replay_to_external_storage(session_id):
     except:
         pass
     return
+
+
+@shared_task
+def run_applet_host_deployment(did):
+    host = AppletHost.objects.get(id=did)
+    host.deploy()
