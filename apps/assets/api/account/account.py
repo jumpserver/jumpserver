@@ -26,7 +26,7 @@ class AccountViewSet(OrgBulkModelViewSet):
     }
     rbac_perms = {
         'verify': 'assets.test_account',
-        'partial_update': 'assets.change_assetaccountsecret',
+        'partial_update': 'assets.change_accountsecret',
     }
 
     @action(methods=['post'], detail=True, url_path='verify')
