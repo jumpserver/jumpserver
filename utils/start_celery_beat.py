@@ -33,15 +33,21 @@ if settings.REDIS_USE_SSL:
 
 REDIS_SENTINEL_SERVICE_NAME = settings.REDIS_SENTINEL_SERVICE_NAME
 REDIS_SENTINELS = settings.REDIS_SENTINELS
+REDIS_SENTINEL_PASSWORD = settings.REDIS_SENTINEL_PASSWORD
+REDIS_SENTINEL_SOCKET_TIMEOUT = settings.REDIS_SENTINEL_SOCKET_TIMEOUT
 if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
     connection_params['sentinels'] = REDIS_SENTINELS
-    sentinel_client = Sentinel(**connection_params)
+    sentinel_client = Sentinel(
+        **connection_params, sentinel_kwargs={
+            'password': REDIS_SENTINEL_PASSWORD,
+            'socket_timeout': REDIS_SENTINEL_SOCKET_TIMEOUT
+        }
+    )
     redis_client = sentinel_client.master_for(REDIS_SENTINEL_SERVICE_NAME)
 else:
     connection_params['host'] = settings.REDIS_HOST
     connection_params['port'] = settings.REDIS_PORT
     redis_client = Redis(**connection_params)
-print("Connection params: ", connection_params)
 
 scheduler = "django_celery_beat.schedulers:DatabaseScheduler"
 processes = []
