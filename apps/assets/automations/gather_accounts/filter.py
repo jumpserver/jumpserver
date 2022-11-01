@@ -39,8 +39,11 @@ class GatherAccountsFilter:
 
     @staticmethod
     def windows_filter(info):
-        # TODO
+        info = info[4:-2]
         result = {}
+        for i in info:
+            for username in i.split():
+                result[username] = {}
         return result
 
     def run(self, method_id_meta_mapper, info):

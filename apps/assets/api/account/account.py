@@ -1,6 +1,6 @@
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, get_object_or_404
 
 from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
@@ -26,7 +26,7 @@ class AccountViewSet(OrgBulkModelViewSet):
     }
     rbac_perms = {
         'verify': 'assets.test_account',
-        'partial_update': 'assets.change_assetaccountsecret',
+        'partial_update': 'assets.change_accountsecret',
     }
 
     @action(methods=['post'], detail=True, url_path='verify')
@@ -41,9 +41,10 @@ class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
     因为可能要导出所有账号，所以单独建立了一个 viewset
     """
     serializer_classes = {
-        'default': serializers.AccountSecretSerializer
+        'default': serializers.AccountSecretSerializer,
+        'histories': serializers.AccountHistorySerializer,
     }
-    http_method_names = ['get']
+    http_method_names = ['get', 'options']
     # Todo: 记得打开
     # permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
     rbac_perms = {
@@ -52,12 +53,11 @@ class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
         'histories': ['assets.view_accountsecret'],
     }
 
-    @action(methods=['get'], detail=True, url_path='histories', serializer_class=serializers.AccountHistorySerializer)
+    @action(methods=['get'], detail=True, url_path='histories')
     def histories(self, request, *args, **kwargs):
-        account = self.get_object()
-        histories = account.history.all()
-        serializer = serializers.AccountHistorySerializer(histories, many=True)
-        return Response(serializer.data)
+        account = get_object_or_404(self.get_queryset(), **kwargs)
+        self.queryset = account.history.all()
+        return super().list(request, *args, **kwargs)
 
 
 class AccountTaskCreateAPI(CreateAPIView):

@@ -64,7 +64,7 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
             Q(assets__hostname_group__contains=asset.name) |
             Q(assets__hostname_group__contains='*')
         )
-        ids = [q.id for q in queryset if contains_ip(asset.ip, q.assets.get('ip_group', []))]
+        ids = [q.id for q in queryset if contains_ip(asset.address, q.assets.get('ip_group', []))]
         queryset = cls.objects.filter(id__in=ids)
         return queryset
 

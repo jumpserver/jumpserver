@@ -142,7 +142,7 @@ class IpInFilterBackend(filters.BaseFilterBackend):
         if not ips:
             return queryset
         ip_list = [i.strip() for i in ips.split(',')]
-        queryset = queryset.filter(ip__in=ip_list)
+        queryset = queryset.filter(address__in=ip_list)
         return queryset
 
     def get_schema_fields(self, view):
