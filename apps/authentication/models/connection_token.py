@@ -93,9 +93,7 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
             is_valid = False
             error = _('No account')
             return is_valid, error
-
-        account_util = PermAccountUtil()
-        actions, expire_at = account_util.validate_permission(
+        actions, expire_at = PermAccountUtil().validate_permission(
             self.user, self.asset, self.account_username
         )
         if not actions or expire_at < time.time():
@@ -104,7 +102,8 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
             return is_valid, error
         self.actions = actions
         self.expire_at = expire_at
-        return True, ''
+        is_valid, error = True, ''
+        return is_valid, error
 
     @lazyproperty
     def account(self):
