@@ -9,13 +9,12 @@ __all__ = ['JMSInventory']
 
 
 class JMSInventory:
-    def __init__(self, assets, account_policy='smart',
-                 account_prefer='root,administrator',
-                 host_callback=None):
+    def __init__(self, assets, account_policy='privileged_first',
+                 account_prefer='root,Administrator', host_callback=None):
         """
         :param assets:
         :param account_prefer: account username name if not set use account_policy
-        :param account_policy: smart, privileged_must, privileged_first
+        :param account_policy: privileged_only, privileged_first, skip
         """
         self.assets = self.clean_assets(assets)
         self.account_prefer = account_prefer
@@ -105,7 +104,7 @@ class JMSInventory:
                 'id': str(asset.id), 'name': asset.name, 'address': asset.address,
                 'type': asset.type, 'category': asset.category,
                 'protocol': asset.protocol, 'port': asset.port,
-                'category_property': asset.category_property,
+                'specific': asset.specific,
                 'protocols': [{'name': p.name, 'port': p.port} for p in protocols],
             },
             'jms_account': {
@@ -137,24 +136,27 @@ class JMSInventory:
     def select_account(self, asset):
         accounts = list(asset.accounts.all())
         account_selected = None
-        account_username = self.account_prefer
+        account_usernames = self.account_prefer
 
         if isinstance(self.account_prefer, str):
-            account_username = self.account_prefer.split(',')
+            account_usernames = self.account_prefer.split(',')
 
-        if account_username:
-            for username in account_username:
-                account_matched = list(filter(lambda account: account.username == username, accounts))
-                if account_matched:
-                    account_selected = account_matched[0]
-                    break
+        # 优先使用提供的名称
+        if account_usernames:
+            account_matched = list(filter(lambda account: account.username in account_usernames, accounts))
+            account_selected = account_matched[0] if account_matched else None
 
-        if not account_selected:
-            if self.account_policy in ['privileged_must', 'privileged_first']:
-                account_matched = list(filter(lambda account: account.privileged, accounts))
-                account_selected = account_matched[0] if account_matched else None
+        if account_selected or self.account_policy == 'skip':
+            return account_selected
 
-        if not account_selected and self.account_policy == 'privileged_first':
+        if self.account_policy in ['privileged_only', 'privileged_first']:
+            account_matched = list(filter(lambda account: account.privileged, accounts))
+            account_selected = account_matched[0] if account_matched else None
+
+        if account_selected:
+            return account_selected
+
+        if self.account_policy == 'privileged_first':
             account_selected = accounts[0] if accounts else None
         return account_selected
 

@@ -27,6 +27,7 @@ router.register(r'endpoint-rules', api.EndpointRuleViewSet, 'endpoint-rule')
 router.register(r'applets', api.AppletViewSet, 'applet')
 router.register(r'applet-hosts', api.AppletHostViewSet, 'applet-host')
 router.register(r'applet-publications', api.AppletPublicationViewSet, 'applet-publication')
+router.register(r'applet-host-deployments', api.AppletHostDeploymentViewSet, 'applet-host-deployment')
 
 
 urlpatterns = [

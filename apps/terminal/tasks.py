@@ -12,9 +12,14 @@ from django.core.files.storage import default_storage
 
 from common.utils import get_log_keep_day
 from ops.celery.decorator import (
-    register_as_period_task, after_app_ready_start, after_app_shutdown_clean_periodic
+    register_as_period_task, after_app_ready_start,
+    after_app_shutdown_clean_periodic
 )
-from .models import Status, Session, Command, Task, AppletHost
+from .models import (
+    Status, Session, Command, Task, AppletHost,
+    AppletHostDeployment
+)
+from orgs.utils import tmp_to_builtin_org
 from .backends import server_replay_storage
 from .utils import find_session_replay_local
 
@@ -84,16 +89,19 @@ def upload_session_replay_to_external_storage(session_id):
     if not session:
         logger.error(f'Session db item not found: {session_id}')
         return
+
     local_path, foobar = find_session_replay_local(session)
     if not local_path:
         logger.error(f'Session replay not found, may be upload error: {local_path}')
         return
+
     abs_path = default_storage.path(local_path)
     remote_path = session.get_relative_path_by_local_path(abs_path)
     ok, err = server_replay_storage.upload(abs_path, remote_path)
     if not ok:
         logger.error(f'Session replay upload to external error: {err}')
         return
+
     try:
         default_storage.delete(local_path)
     except:
@@ -103,5 +111,6 @@ def upload_session_replay_to_external_storage(session_id):
 
 @shared_task
 def run_applet_host_deployment(did):
-    host = AppletHost.objects.get(id=did)
-    host.deploy()
+    with tmp_to_builtin_org(system=1):
+        deployment = AppletHostDeployment.objects.get(id=did)
+        deployment.start()

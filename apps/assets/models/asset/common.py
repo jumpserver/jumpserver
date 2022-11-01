@@ -106,7 +106,7 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
         return '{0.name}({0.address})'.format(self)
 
     @property
-    def category_property(self):
+    def specific(self):
         if not hasattr(self, self.category):
             return {}
         instance = getattr(self, self.category)

@@ -5,7 +5,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import get_logger
-from .base import BaseAnsibleTask, BaseAnsibleExecution
+from .base import BaseAnsibleJob, BaseAnsibleExecution
 from ..ansible import AdHocRunner
 
 __all__ = ["AdHoc", "AdHocExecution"]
@@ -14,7 +14,7 @@ __all__ = ["AdHoc", "AdHocExecution"]
 logger = get_logger(__file__)
 
 
-class AdHoc(BaseAnsibleTask):
+class AdHoc(BaseAnsibleJob):
     pattern = models.CharField(max_length=1024, verbose_name=_("Pattern"), default='all')
     module = models.CharField(max_length=128, default='shell', verbose_name=_('Module'))
     args = models.CharField(max_length=1024, default='', verbose_name=_('Args'))

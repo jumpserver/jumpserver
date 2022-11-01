@@ -9,3 +9,12 @@ AUDITOR = 'Auditor'
 class Trigger(models.TextChoices):
     manual = 'manual', _('Manual trigger')
     timing = 'timing', _('Timing trigger')
+
+
+class Status(models.TextChoices):
+    pending = 'pending', _("Pending")
+    running = 'running', _("Running")
+    success = 'success', _("Success")
+    failed = 'failed', _("Failed")
+    error = 'error', _("Error")
+    canceled = 'canceled', _("Canceled")

@@ -12,7 +12,7 @@ from ..ansible.inventory import JMSInventory
 from ..mixin import PeriodTaskModelMixin
 
 
-class BaseAnsibleTask(PeriodTaskModelMixin, JMSOrgBaseModel):
+class BaseAnsibleJob(PeriodTaskModelMixin, JMSOrgBaseModel):
     owner = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
     assets = models.ManyToManyField('assets.Asset', verbose_name=_("Assets"))
     account = models.CharField(max_length=128, default='root', verbose_name=_('Account'))
@@ -46,7 +46,7 @@ class BaseAnsibleTask(PeriodTaskModelMixin, JMSOrgBaseModel):
 class BaseAnsibleExecution(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     status = models.CharField(max_length=16, verbose_name=_('Status'), default='running')
-    task = models.ForeignKey(BaseAnsibleTask, on_delete=models.CASCADE, related_name='executions', null=True)
+    task = models.ForeignKey(BaseAnsibleJob, on_delete=models.CASCADE, related_name='executions', null=True)
     result = models.JSONField(blank=True, null=True, verbose_name=_('Result'))
     summary = models.JSONField(default=dict, verbose_name=_('Summary'))
     creator = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
@@ -86,7 +86,7 @@ class BaseAnsibleExecution(models.Model):
 
     def set_result(self, cb):
         status_mapper = {
-            'successful': 'succeeded',
+            'successful': 'success',
         }
         this = self.__class__.objects.get(id=self.id)
         this.status = status_mapper.get(cb.status, cb.status)
@@ -112,11 +112,11 @@ class BaseAnsibleExecution(models.Model):
 
     @property
     def is_finished(self):
-        return self.status in ['succeeded', 'failed']
+        return self.status in ['success', 'failed']
 
     @property
     def is_success(self):
-        return self.status == 'succeeded'
+        return self.status == 'success'
 
     @property
     def time_cost(self):

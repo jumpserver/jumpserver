@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from orgs.mixins.models import JMSOrgBaseModel
-from .base import BaseAnsibleExecution, BaseAnsibleTask
+from .base import BaseAnsibleExecution, BaseAnsibleJob
 
 
 class PlaybookTemplate(JMSOrgBaseModel):
@@ -19,7 +19,7 @@ class PlaybookTemplate(JMSOrgBaseModel):
         unique_together = [('org_id', 'name')]
 
 
-class Playbook(BaseAnsibleTask):
+class Playbook(BaseAnsibleJob):
     path = models.FilePathField(max_length=1024, verbose_name=_("Playbook"))
     owner = models.ForeignKey('users.User', verbose_name=_("Owner"), on_delete=models.SET_NULL, null=True)
     comment = models.TextField(blank=True, verbose_name=_("Comment"))

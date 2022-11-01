@@ -154,7 +154,7 @@ class ChangeSecretManager(BasePlaybookManager):
         recorder = self.name_recorder_mapper.get(host)
         if not recorder:
             return
-        recorder.status = 'succeed'
+        recorder.status = 'success'
         recorder.date_finished = timezone.now()
         recorder.save()
 
