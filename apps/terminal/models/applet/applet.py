@@ -54,8 +54,7 @@ class Applet(JMSBaseModel):
 class AppletPublication(JMSBaseModel):
     applet = models.ForeignKey('Applet', on_delete=models.PROTECT, related_name='publications', verbose_name=_('Applet'))
     host = models.ForeignKey('AppletHost', on_delete=models.PROTECT, related_name='publications', verbose_name=_('Host'))
-    status = models.CharField(max_length=16, verbose_name=_('Status'))
-    published = models.BooleanField(default=False, verbose_name=_('Published'))
+    status = models.CharField(max_length=16, default='', verbose_name=_('Status'))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
     class Meta:

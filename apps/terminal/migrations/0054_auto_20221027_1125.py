@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
                 ('date_created', models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date created')),
                 ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('status', models.CharField(max_length=16, verbose_name='Status')),
+                ('status', models.CharField(default='', max_length=16, verbose_name='Status')),
                 ('comment', models.TextField(blank=True, default='', verbose_name='Comment')),
                 ('applet', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='terminal.applet', verbose_name='Applet')),
                 ('host', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='terminal.applethost', verbose_name='Host')),

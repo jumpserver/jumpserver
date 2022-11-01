@@ -2,6 +2,7 @@ import os
 import datetime
 import shutil
 
+import yaml
 from django.utils import timezone
 from django.conf import settings
 
@@ -26,10 +27,20 @@ class DeployAppletHostManager:
 
     def generate_playbook(self):
         playbook_src = os.path.join(CURRENT_DIR, 'playbook.yml')
+        with open(playbook_src) as f:
+            plays = yaml.safe_load(f)
+        for play in plays:
+            play['vars'].update(self.deployment.host.deploy_options)
+            play['vars']['DownloadHost'] = settings.BASE_URL + '/download/'
+            play['vars']['CORE_HOST'] = settings.BASE_URL
+            play['vars']['BOOTSTRAP_TOKEN'] = settings.BOOSTRAP_TOKEN
+            play['vars']['HOST_NAME'] = self.deployment.host.name
+
         playbook_dir = os.path.join(self.run_dir, 'playbook')
         playbook_dst = os.path.join(playbook_dir, 'main.yml')
         os.makedirs(playbook_dir, exist_ok=True)
-        shutil.copy(playbook_src, playbook_dst)
+        with open(playbook_dst, 'w') as f:
+            yaml.safe_dump(plays, f)
         return playbook_dst
 
     def generate_inventory(self):

@@ -109,9 +109,7 @@ def filter_org_queryset(queryset):
 
     if locking_org:
         kwargs = {'org_id': locking_org}
-    elif org is None:
-        kwargs = {}
-    elif org.is_root():
+    elif org is None or org.is_root():
         kwargs = {}
     else:
         kwargs = {'org_id': org.id}

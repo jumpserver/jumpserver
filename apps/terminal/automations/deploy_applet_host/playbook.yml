@@ -2,13 +2,17 @@
 
 - hosts: all
   vars:
-    - DownloadHost: https://demo.jumpserver.org/download
-    - RDS_Licensing: enabled
-    - RDS_LicenseServer: 127.0.0.1
-    - RDS_LicensingMode: 4
-    - RDS_fSingleSessionPerUser: 1
-    - RDS_MaxDisconnectionTime: 60000
-    - RDS_RemoteAppLogoffTimeLimit: 0
+    DownloadHost: https://demo.jumpserver.org/download
+    Initial: 0
+    HOST_NAME: test
+    CORE_HOST: https://demo.jumpserver.org
+    BOOTSTRAP_TOKEN: PleaseChangeMe
+    RDS_Licensing: enabled
+    RDS_LicenseServer: 127.0.0.1
+    RDS_LicensingMode: 4
+    RDS_fSingleSessionPerUser: 1
+    RDS_MaxDisconnectionTime: 60000
+    RDS_RemoteAppLogoffTimeLimit: 0
 
   tasks:
   - name: Install RDS-Licensing (RDS)
@@ -136,3 +140,12 @@
       state: present
       arguments:
       - /quiet
+
+  - name: Generate component config
+    ansible.windows.win_shell: >
+      echo "Todo: Set config"
+
+  - name: Sync all remote applets
+    ansible.windows.win_shell: >
+        echo "TODO: Sync all remote applets"
+    when: Initial
