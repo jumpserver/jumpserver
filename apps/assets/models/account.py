@@ -71,7 +71,7 @@ class Account(AbsConnectivity, BaseAccount):
         return self.asset.platform
 
     def __str__(self):
-        return '{}@{}'.format(self.username, self.asset.name)
+        return '{}'.format(self.username)
 
     @classmethod
     def get_input_account(cls):
