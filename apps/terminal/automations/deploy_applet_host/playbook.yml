@@ -7,7 +7,7 @@
     HOST_NAME: test
     CORE_HOST: https://demo.jumpserver.org
     BOOTSTRAP_TOKEN: PleaseChangeMe
-    RDS_Licensing: enabled
+    RDS_Licensing: true
     RDS_LicenseServer: 127.0.0.1
     RDS_LicensingMode: 4
     RDS_fSingleSessionPerUser: 1
@@ -20,7 +20,7 @@
       name: RDS-Licensing
       state: present
       include_management_tools: yes
-    when: RDS_Licensing == "enabled"
+    when: RDS_Licensing
 
   - name: Install RDS-RD-Server (RDS)
     ansible.windows.win_feature:

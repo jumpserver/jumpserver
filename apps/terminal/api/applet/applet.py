@@ -5,6 +5,7 @@ import os.path
 
 from django.core.files.storage import default_storage
 from rest_framework import viewsets
+from django.http import HttpResponse
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
@@ -22,6 +23,7 @@ class AppletViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.AppletSerializer
     rbac_perms = {
         'upload': 'terminal.add_applet',
+        'download': 'terminal.view_applet',
     }
 
     def perform_destroy(self, instance):
@@ -83,6 +85,16 @@ class AppletViewSet(viewsets.ModelViewSet):
         shutil.move(tmp_dir, save_to)
         serializer.save()
         return Response(serializer.data, status=201)
+
+    @action(detail=True, methods=['get'])
+    def download(self, request, *args, **kwargs):
+        instance = super().get_object()
+        path = default_storage.path('applets/{}'.format(instance.name))
+        zip_path = shutil.make_archive(path, 'zip', path)
+        with open(zip_path, 'rb') as f:
+            response = HttpResponse(f.read(), status=200, content_type='application/octet-stream')
+            response['Content-Disposition'] = 'attachment; filename*=UTF-8\'\'{}.zip'.format(instance.name)
+        return response
 
 
 class AppletPublicationViewSet(viewsets.ModelViewSet):
