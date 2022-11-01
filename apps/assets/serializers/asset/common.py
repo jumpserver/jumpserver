@@ -77,7 +77,7 @@ class AssetSerializer(OrgResourceSerializerMixin, WritableNestedModelSerializer)
             'nodes', 'labels', 'accounts', 'protocols', 'nodes_display',
         ]
         read_only_fields = [
-            'category', 'type', 'category_property',
+            'category', 'type', 'specific',
             'connectivity', 'date_verified',
             'created_by', 'date_created',
         ]
@@ -90,7 +90,7 @@ class AssetSerializer(OrgResourceSerializerMixin, WritableNestedModelSerializer)
     def get_field_names(self, declared_fields, info):
         names = super().get_field_names(declared_fields, info)
         if self.__class__.__name__ != 'AssetSerializer':
-            names.remove('category_property')
+            names.remove('specific')
         return names
 
     @classmethod

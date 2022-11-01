@@ -8,7 +8,6 @@ from collections import defaultdict
 
 from django.conf import settings
 from django.utils import timezone
-from django.db.models import Model
 from django.utils.translation import gettext as _
 
 from common.utils import get_logger
@@ -115,9 +114,9 @@ class BasePlaybookManager:
         method_attr = '{}_method'.format(self.__class__.method_type())
 
         method_enabled = automation and \
-                         getattr(automation, enabled_attr) and \
-                         getattr(automation, method_attr) and \
-                         getattr(automation, method_attr) in self.method_id_meta_mapper
+            getattr(automation, enabled_attr) and \
+            getattr(automation, method_attr) and \
+            getattr(automation, method_attr) in self.method_id_meta_mapper
 
         if not method_enabled:
             host['error'] = _('{} disabled'.format(self.__class__.method_type()))
@@ -132,6 +131,7 @@ class BasePlaybookManager:
     def generate_private_key_path(secret, path_dir):
         key_name = '.' + md5(secret.encode('utf-8')).hexdigest()
         key_path = os.path.join(path_dir, key_name)
+
         if not os.path.exists(key_path):
             ssh_key_string_to_obj(secret, password=None).write_private_key_file(key_path)
             os.chmod(key_path, 0o400)

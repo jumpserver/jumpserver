@@ -2,6 +2,14 @@ from collections import defaultdict
 
 
 class DefaultCallback:
+    STATUS_MAPPER = {
+        'successful': 'success',
+        'failure': 'failed',
+        'running': 'running',
+        'pending': 'pending',
+        'unknown': 'unknown'
+    }
+
     def __init__(self):
         self.result = dict(
             ok=defaultdict(dict),
@@ -27,7 +35,7 @@ class DefaultCallback:
         return results
 
     def is_success(self):
-        return self.status != 'successful'
+        return self.status != 'success'
 
     def event_handler(self, data, **kwargs):
         event = data.get('event', None)
@@ -131,4 +139,5 @@ class DefaultCallback:
         pass
 
     def status_handler(self, data, **kwargs):
-        self.status = data.get('status', 'unknown')
+        status = data.get('status', '')
+        self.status = self.STATUS_MAPPER.get(status, 'unknown')

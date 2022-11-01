@@ -15,7 +15,7 @@ class Database(Asset):
         return self.address
 
     @property
-    def category_property(self):
+    def specific(self):
         return {
             'db_name': self.db_name,
         }
