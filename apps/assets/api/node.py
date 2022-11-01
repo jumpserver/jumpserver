@@ -4,11 +4,11 @@ from collections import namedtuple, defaultdict
 from django.core.exceptions import PermissionDenied
 
 from rest_framework import status
+from rest_framework.generics import get_object_or_404
 from rest_framework.serializers import ValidationError
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.utils.translation import ugettext_lazy as _
-from django.shortcuts import get_object_or_404, Http404
 from django.db.models.signals import m2m_changed
 
 from common.const.http import POST
@@ -16,7 +16,7 @@ from common.exceptions import SomeoneIsDoingThis
 from common.const.signals import PRE_REMOVE, POST_REMOVE
 from common.mixins.api import SuggestionMixin
 from assets.models import Asset
-from common.utils import get_logger, get_object_or_none
+from common.utils import get_logger
 from common.tree import TreeNodeSerializer
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
@@ -339,7 +339,7 @@ class NodeTaskCreateApi(generics.CreateAPIView):
 
     def get_object(self):
         node_id = self.kwargs.get('pk')
-        node = get_object_or_none(self.model, id=node_id)
+        node = get_object_or_404(self.model, id=node_id)
         return node
 
     @staticmethod
@@ -361,8 +361,6 @@ class NodeTaskCreateApi(generics.CreateAPIView):
             task = self.refresh_nodes_cache()
             self.set_serializer_data(serializer, task)
             return
-        if node is None:
-            raise Http404()
         if action == "refresh":
             task = update_node_assets_hardware_info_manual.delay(node)
         else:

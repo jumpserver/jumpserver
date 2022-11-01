@@ -60,7 +60,7 @@ class OrgModelMixin(models.Model):
     sep = '@'
 
     def save(self, *args, **kwargs):
-        locking_org = getattr(self, 'locking_org', None)
+        locking_org = getattr(self, 'LOCKING_ORG', None)
         if locking_org:
             org = Organization.get_instance(locking_org)
         else:

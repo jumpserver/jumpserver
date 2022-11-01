@@ -12,7 +12,8 @@ from orgs.mixins import generics
 from assets import serializers
 from assets.models import Asset, Gateway
 from assets.tasks import (
-    update_assets_hardware_info_manual, test_assets_connectivity_manual,
+    test_assets_connectivity_manual,
+    update_assets_hardware_info_manual,
 )
 from assets.filters import NodeFilterBackend, LabelFilterBackend, IpInFilterBackend
 from ..mixin import NodeFilterMixin
@@ -78,12 +79,10 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
 class AssetsTaskMixin:
     def perform_assets_task(self, serializer):
         data = serializer.validated_data
-        action = data['action']
         assets = data.get('assets', [])
-        if action == "refresh":
+        if data['action'] == "refresh":
             task = update_assets_hardware_info_manual.delay(assets)
         else:
-            # action == 'test':
             task = test_assets_connectivity_manual.delay(assets)
         return task
 

@@ -48,11 +48,30 @@ class AppletPublicationSerializer(serializers.ModelSerializer):
         ] + read_only_fields
 
 
+class DeployOptionsSerializer(serializers.Serializer):
+    LICENSE_MODE_CHOICES = (
+        (4, _('Per Session')),
+        (2, _('Per Device')),
+    )
+    SESSION_PER_USER = (
+        (1, _("Disabled")),
+        (0, _("Enabled")),
+    )
+    RDS_Licensing = serializers.BooleanField(default=False, label=_("RDS Licensing"))
+    RDS_LicenseServer = serializers.CharField(default='127.0.0.1', label=_('RDS License Server'), max_length=1024)
+    RDS_LicensingMode = serializers.ChoiceField(choices=LICENSE_MODE_CHOICES, default=4, label=_('RDS Licensing Mode'))
+    RDS_fSingleSessionPerUser = serializers.ChoiceField(choices=SESSION_PER_USER, default=1, label=_("RDS fSingleSessionPerUser"))
+    RDS_MaxDisconnectionTime = serializers.IntegerField(default=60000, label=_("RDS Max Disconnection Time"))
+    RDS_RemoteAppLogoffTimeLimit = serializers.IntegerField(default=0, label=_("RDS Remote App Logoff Time Limit"))
+
+
 class AppletHostSerializer(HostSerializer):
+    deploy_options = DeployOptionsSerializer(required=False, label=_("Deploy options"))
+
     class Meta(HostSerializer.Meta):
         model = AppletHost
         fields = HostSerializer.Meta.fields + [
-            'account_automation', 'status', 'date_synced'
+            'account_automation', 'status', 'date_synced', 'deploy_options'
         ]
         extra_kwargs = {
             'status': {'read_only': True},

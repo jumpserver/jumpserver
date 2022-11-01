@@ -1,6 +1,6 @@
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.generics import CreateAPIView, get_object_or_404
+from rest_framework.generics import CreateAPIView, ListAPIView
 
 from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
@@ -13,7 +13,7 @@ from assets.filters import AccountFilterSet
 from assets.tasks.account_connectivity import test_accounts_connectivity_manual
 from assets import serializers
 
-__all__ = ['AccountViewSet', 'AccountSecretsViewSet', 'AccountTaskCreateAPI']
+__all__ = ['AccountViewSet', 'AccountSecretsViewSet', 'AccountTaskCreateAPI', 'AccountHistoriesSecretAPI']
 
 
 class AccountViewSet(OrgBulkModelViewSet):
@@ -42,7 +42,6 @@ class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
     """
     serializer_classes = {
         'default': serializers.AccountSecretSerializer,
-        'histories': serializers.AccountHistorySerializer,
     }
     http_method_names = ['get', 'options']
     # Todo: 记得打开
@@ -50,14 +49,21 @@ class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
     rbac_perms = {
         'list': 'assets.view_accountsecret',
         'retrieve': 'assets.view_accountsecret',
-        'histories': ['assets.view_accountsecret'],
     }
 
-    @action(methods=['get'], detail=True, url_path='histories')
-    def histories(self, request, *args, **kwargs):
-        account = get_object_or_404(self.get_queryset(), **kwargs)
-        self.queryset = account.history.all()
-        return super().list(request, *args, **kwargs)
+
+class AccountHistoriesSecretAPI(RecordViewLogMixin, ListAPIView):
+    model = Account.history.model
+    serializer_class = serializers.AccountHistorySerializer
+    http_method_names = ['get', 'options']
+    # Todo: 记得打开
+    # permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
+    rbac_perms = {
+        'list': 'assets.view_accountsecret',
+    }
+
+    def get_queryset(self):
+        return self.model.objects.filter(id=self.kwargs.get('pk'))
 
 
 class AccountTaskCreateAPI(CreateAPIView):

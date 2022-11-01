@@ -26,4 +26,16 @@ class Migration(migrations.Migration):
             name='type',
             field=models.CharField(choices=[('ping', 'Ping'), ('gather_facts', 'Gather facts'), ('push_account', 'Create account'), ('change_secret', 'Change secret'), ('verify_account', 'Verify account'), ('gather_accounts', 'Gather accounts')], max_length=16, verbose_name='Type'),
         ),
+        migrations.CreateModel(
+            name='PingAutomation',
+            fields=[
+                ('baseautomation_ptr',
+                 models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True,
+                                      primary_key=True, serialize=False, to='assets.baseautomation')),
+            ],
+            options={
+                'verbose_name': 'Ping asset',
+            },
+            bases=('assets.baseautomation',),
+        ),
     ]

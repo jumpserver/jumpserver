@@ -105,14 +105,11 @@ def tmp_to_builtin_org(system=0, default=0):
 
 def filter_org_queryset(queryset):
     locking_org = getattr(queryset.model, 'LOCKING_ORG', None)
-    if locking_org:
-        org = Organization.get_instance(locking_org)
-    else:
-        org = get_current_org()
+    org = get_current_org()
 
-    if org is None:
-        kwargs = {}
-    elif org.is_root():
+    if locking_org:
+        kwargs = {'org_id': locking_org}
+    elif org is None or org.is_root():
         kwargs = {}
     else:
         kwargs = {'org_id': org.id}

@@ -19,14 +19,12 @@ logger = get_logger(__file__)
 
 def update_asset_hardware_info_on_created(asset):
     logger.debug("Update asset `{}` hardware info".format(asset))
-    # Todo:
-    # update_assets_hardware_info_util.delay([asset])
+    update_assets_hardware_info_util.delay([asset])
 
 
 def test_asset_conn_on_created(asset):
     logger.debug("Test asset `{}` connectivity".format(asset))
-    # Todo:
-    # test_asset_connectivity_util.delay([asset])
+    test_asset_connectivity_util.delay([asset])
 
 
 @receiver(pre_save, sender=Node)

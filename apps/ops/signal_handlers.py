@@ -3,6 +3,7 @@ import ast
 from django.db import transaction
 from django.dispatch import receiver
 from django.utils import translation, timezone
+from django.utils.translation import gettext as _
 from django.core.cache import cache
 from celery import signals, current_app
 
@@ -44,7 +45,8 @@ def before_task_publish(headers=None, **kwargs):
 @signals.task_prerun.connect
 def on_celery_task_pre_run(task_id='', **kwargs):
     # 更新状态
-    CeleryTaskExecution.objects.filter(id=task_id).update(state='RUNNING', date_start=timezone.now())
+    CeleryTaskExecution.objects.filter(id=task_id)\
+        .update(state='RUNNING', date_start=timezone.now())
     # 关闭之前的数据库连接
     close_old_connections()
 
@@ -58,7 +60,7 @@ def on_celery_task_pre_run(task_id='', **kwargs):
 @signals.task_postrun.connect
 def on_celery_task_post_run(task_id='', state='', **kwargs):
     close_old_connections()
-    print("Task post run: ", task_id, state)
+    print(_("Task") + ": {} {}".format(task_id, state))
 
     CeleryTaskExecution.objects.filter(id=task_id).update(
         state=state, date_finished=timezone.now(), is_finished=True

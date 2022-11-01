@@ -28,6 +28,15 @@ class BaseAutomation(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
     def __str__(self):
         return self.name + '@' + str(self.created_by)
 
+    @classmethod
+    def generate_unique_name(cls, name):
+        while True:
+            name = name + str(uuid.uuid4())[:8]
+            try:
+                cls.objects.get(name=name)
+            except cls.DoesNotExist:
+                return name
+
     def get_all_assets(self):
         nodes = self.nodes.all()
         node_asset_ids = Node.get_nodes_all_assets(*nodes).values_list('id', flat=True)
