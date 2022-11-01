@@ -46,7 +46,7 @@ class DownloadUploadMixin:
             zp.extractall(extract_to)
 
         tmp_dir = os.path.join(extract_to, file.name.replace('.zip', ''))
-        files = ['manifest.yml', 'icon.png', 'i18n.yml']
+        files = ['manifest.yml', 'icon.png', 'i18n.yml', 'setup.yml']
         for name in files:
             path = os.path.join(tmp_dir, name)
             if not os.path.exists(path):

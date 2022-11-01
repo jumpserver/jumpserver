@@ -3,9 +3,7 @@
 from rest_framework import serializers
 
 from common.drf.serializers import BulkSerializerMixin
-from assets.models import Asset, Node
 from perms.models import AssetPermission
-from users.models import User
 
 __all__ = [
     'AssetPermissionUserRelationSerializer',

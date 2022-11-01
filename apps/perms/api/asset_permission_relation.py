@@ -10,11 +10,13 @@ from orgs.utils import current_org
 from perms import serializers
 from perms import models
 from perms.utils.user_permission import UserGrantedAssetsQueryUtils
+from assets.serializers import AccountSerializer
 
 __all__ = [
     'AssetPermissionUserRelationViewSet', 'AssetPermissionUserGroupRelationViewSet',
     'AssetPermissionAssetRelationViewSet', 'AssetPermissionNodeRelationViewSet',
     'AssetPermissionAllAssetListApi', 'AssetPermissionAllUserListApi',
+    'AssetPermissionAccountListApi',
 ]
 
 
@@ -110,4 +112,17 @@ class AssetPermissionNodeRelationViewSet(RelationMixin):
         queryset = super().get_queryset()
         queryset = queryset.annotate(node_key=F('node__key'))
         return queryset
+
+
+class AssetPermissionAccountListApi(generics.ListAPIView):
+    serializer_class = AccountSerializer
+    filterset_fields = ("name", "username", "privileged", "version")
+    search_fields = filterset_fields
+
+    def get_queryset(self):
+        pk = self.kwargs.get("pk")
+        perm = get_object_or_404(models.AssetPermission, pk=pk)
+        accounts = perm.get_all_accounts()
+        return accounts
+
 

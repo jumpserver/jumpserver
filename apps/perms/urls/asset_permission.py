@@ -84,6 +84,7 @@ permission_urlpatterns = [
     # 授权规则中授权的资产
     path('<uuid:pk>/assets/all/', api.AssetPermissionAllAssetListApi.as_view(), name='asset-permission-all-assets'),
     path('<uuid:pk>/users/all/', api.AssetPermissionAllUserListApi.as_view(), name='asset-permission-all-users'),
+    path('<uuid:pk>/accounts/', api.AssetPermissionAccountListApi.as_view(), name='asset-permission-accounts'),
 ]
 
 asset_permission_urlpatterns = [

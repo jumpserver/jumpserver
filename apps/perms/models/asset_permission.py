@@ -136,7 +136,7 @@ class AssetPermission(OrgModelMixin):
         q = Q(asset_id__in=asset_ids)
         if not self.is_perm_all_accounts:
             q &= Q(username__in=self.accounts)
-        accounts = Account.objects.filter(q)
+        accounts = Account.objects.filter(q).order_by('asset__name', 'name', 'username')
         if not flat:
             return accounts
         return accounts.values_list('id', flat=True)
