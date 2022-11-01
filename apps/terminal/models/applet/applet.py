@@ -6,6 +6,7 @@ from django.core.files.storage import default_storage
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from common.utils import lazyproperty
 from common.db.models import JMSBaseModel
 
 
@@ -26,7 +27,10 @@ class Applet(JMSBaseModel):
     protocols = models.JSONField(default=list, verbose_name=_('Protocol'))
     tags = models.JSONField(default=list, verbose_name=_('Tags'))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
-    hosts = models.ManyToManyField(through_fields=('applet', 'host'), through='AppletPublication', to='AppletHost', verbose_name=_('Hosts'))
+    hosts = models.ManyToManyField(
+        through_fields=('applet', 'host'), through='AppletPublication',
+        to='AppletHost', verbose_name=_('Hosts')
+    )
 
     def __str__(self):
         return self.name
@@ -49,6 +53,10 @@ class Applet(JMSBaseModel):
         if not os.path.exists(path):
             return None
         return os.path.join(settings.MEDIA_URL, 'applets', self.name, 'icon.png')
+
+    @lazyproperty
+    def publication(self):
+        return None
 
 
 class AppletPublication(JMSBaseModel):

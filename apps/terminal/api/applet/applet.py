@@ -1,5 +1,7 @@
 import shutil
 import zipfile
+from typing import Callable
+
 import yaml
 import os.path
 
@@ -7,6 +9,7 @@ from django.core.files.storage import default_storage
 from rest_framework import viewsets
 from django.http import HttpResponse
 from rest_framework.decorators import action
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
@@ -18,21 +21,10 @@ from terminal.serializers import AppletUploadSerializer
 __all__ = ['AppletViewSet', 'AppletPublicationViewSet']
 
 
-class AppletViewSet(viewsets.ModelViewSet):
-    queryset = Applet.objects.all()
-    serializer_class = serializers.AppletSerializer
-    rbac_perms = {
-        'upload': 'terminal.add_applet',
-        'download': 'terminal.view_applet',
-    }
-
-    def perform_destroy(self, instance):
-        if not instance.name:
-            raise ValidationError('Applet is not null')
-        path = default_storage.path('applets/{}'.format(instance.name))
-        if os.path.exists(path):
-            shutil.rmtree(path)
-        instance.delete()
+class DownloadUploadMixin:
+    get_serializer: Callable
+    request: Request
+    get_object: Callable
 
     def extract_and_check_file(self, request):
         serializer = self.get_serializer(data=self.request.data)
@@ -88,13 +80,41 @@ class AppletViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'])
     def download(self, request, *args, **kwargs):
-        instance = super().get_object()
+        instance = self.get_object()
         path = default_storage.path('applets/{}'.format(instance.name))
         zip_path = shutil.make_archive(path, 'zip', path)
         with open(zip_path, 'rb') as f:
             response = HttpResponse(f.read(), status=200, content_type='application/octet-stream')
             response['Content-Disposition'] = 'attachment; filename*=UTF-8\'\'{}.zip'.format(instance.name)
         return response
+
+
+class AppletViewSet(DownloadUploadMixin, viewsets.ModelViewSet):
+    queryset = Applet.objects.all()
+    serializer_class = serializers.AppletSerializer
+    rbac_perms = {
+        'upload': 'terminal.add_applet',
+        'download': 'terminal.view_applet',
+    }
+
+    def filter_queryset(self, queryset):
+        queryset = list(super().filter_queryset(queryset))
+        host = self.request.query_params.get('host')
+        if not host:
+            return queryset
+
+        publication_mapper = {p.applet: p for p in AppletPublication.objects.filter(host_id=host)}
+        for applet in queryset:
+            applet.publication = publication_mapper.get(applet)
+        return queryset
+
+    def perform_destroy(self, instance):
+        if not instance.name:
+            raise ValidationError('Applet is not null')
+        path = default_storage.path('applets/{}'.format(instance.name))
+        if os.path.exists(path):
+            shutil.rmtree(path)
+        instance.delete()
 
 
 class AppletPublicationViewSet(viewsets.ModelViewSet):

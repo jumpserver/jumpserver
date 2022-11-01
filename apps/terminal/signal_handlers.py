@@ -10,9 +10,15 @@ from .models import Applet, AppletHost
 
 @receiver(post_save, sender=AppletHost)
 def on_applet_host_create(sender, instance, created=False, **kwargs):
-    pass
+    if not created:
+        return
+    applets = Applet.objects.all()
+    instance.applets.set(applets)
 
 
 @receiver(post_save, sender=Applet)
 def on_applet_create(sender, instance, created=False, **kwargs):
-    pass
+    if not created:
+        return
+    hosts = AppletHost.objects.all()
+    instance.hosts.set(hosts)

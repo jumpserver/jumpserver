@@ -14,13 +14,6 @@ class AppletHostViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.AppletHostSerializer
     queryset = AppletHost.objects.all()
 
-    @action(methods=['get'], detail=True, url_path='')
-    def not_published_applets(self, request, *args, **kwargs):
-        instance = self.get_object()
-        applets = Applet.objects.exclude(id__in=instance.applets.all())
-        serializer = serializers.AppletSerializer(applets, many=True)
-        return Response(serializer.data)
-
 
 class AppletHostDeploymentViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.AppletHostDeploymentSerializer
