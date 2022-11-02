@@ -206,3 +206,6 @@ class AssetTaskSerializer(AssetsTaskSerializer):
     asset = serializers.PrimaryKeyRelatedField(
         queryset=Asset.objects, required=False, allow_empty=True, many=False
     )
+    accounts = serializers.PrimaryKeyRelatedField(
+        queryset=Account.objects, required=False, allow_empty=True, many=True
+    )
