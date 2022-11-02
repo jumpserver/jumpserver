@@ -3,22 +3,21 @@
 import io
 import os
 import uuid
+import sshpubkeys
 from hashlib import md5
 
-import sshpubkeys
-from django.core.cache import cache
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.db.models import QuerySet
 
+from common.db import fields
 from common.utils import (
     ssh_key_string_to_obj, ssh_key_gen, get_logger,
     random_string, ssh_pubkey_gen,
 )
-from common.db import fields
-from assets.const import Connectivity
+from assets.const import Connectivity, SecretType
 from orgs.mixins.models import OrgModelMixin
 
 logger = get_logger(__file__)
@@ -49,12 +48,6 @@ class AbsConnectivity(models.Model):
 
 
 class BaseAccount(OrgModelMixin):
-    class SecretType(models.TextChoices):
-        password = 'password', _('Password')
-        ssh_key = 'ssh_key', _('SSH key')
-        access_key = 'access_key', _('Access key')
-        token = 'token', _('Token')
-
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_("Name"))
     username = models.CharField(max_length=128, blank=True, verbose_name=_('Username'), db_index=True)
@@ -78,7 +71,7 @@ class BaseAccount(OrgModelMixin):
 
     @property
     def private_key(self):
-        if self.secret_type == self.SecretType.ssh_key:
+        if self.secret_type == SecretType.ssh_key:
             return self.secret
         return None
 
@@ -89,7 +82,7 @@ class BaseAccount(OrgModelMixin):
     @private_key.setter
     def private_key(self, value):
         self.secret = value
-        self.secret_type = 'private_key'
+        self.secret_type = SecretType.ssh_key
 
     @property
     def ssh_key_fingerprint(self):
