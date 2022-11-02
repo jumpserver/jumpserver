@@ -56,7 +56,7 @@ class Applet(JMSBaseModel):
 
     @lazyproperty
     def publication(self):
-        return None
+        return self.publications.latest()
 
 
 class AppletPublication(JMSBaseModel):
@@ -67,3 +67,4 @@ class AppletPublication(JMSBaseModel):
 
     class Meta:
         unique_together = ('applet', 'host')
+        get_latest_by = 'date_created'

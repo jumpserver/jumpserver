@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 
 from common.drf.fields import ObjectRelatedField, LabeledChoiceField
+from common.const.choices import Status
 from ..models import Applet, AppletPublication, AppletHost
 
 
@@ -18,14 +19,13 @@ class AppletUploadSerializer(serializers.Serializer):
 class AppletPublicationSerializer(serializers.ModelSerializer):
     applet = ObjectRelatedField(queryset=Applet.objects.all())
     host = ObjectRelatedField(queryset=AppletHost.objects.all())
+    status = LabeledChoiceField(choices=Status.choices, label=_("Status"))
 
     class Meta:
         model = AppletPublication
         fields_mini = ['id', 'applet', 'host']
         read_only_fields = ['date_created', 'date_updated']
-        fields = fields_mini + [
-            'status', 'comment',
-        ] + read_only_fields
+        fields = fields_mini + ['status', 'comment'] + read_only_fields
 
 
 class AppletSerializer(serializers.ModelSerializer):

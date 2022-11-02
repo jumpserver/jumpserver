@@ -5,9 +5,10 @@ from typing import Callable
 import yaml
 import os.path
 
-from django.core.files.storage import default_storage
 from rest_framework import viewsets
 from django.http import HttpResponse
+from django.core.files.storage import default_storage
+from django.db.models import Prefetch
 from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -97,16 +98,15 @@ class AppletViewSet(DownloadUploadMixin, viewsets.ModelViewSet):
         'download': 'terminal.view_applet',
     }
 
-    def filter_queryset(self, queryset):
-        queryset = list(super().filter_queryset(queryset))
+    def get_queryset(self):
+        queryset = super().get_queryset()
         host = self.request.query_params.get('host')
-        if not host:
-            return queryset
 
-        publication_mapper = {p.applet: p for p in AppletPublication.objects.filter(host_id=host)}
-        for applet in queryset:
-            applet.publication = publication_mapper.get(applet)
-        return queryset
+        if not host:
+            return queryset.prefetch_related('publications')
+        else:
+            publications = AppletPublication.objects.filter(host_id=host)
+            return queryset.prefetch_related(Prefetch('publications', queryset=publications))
 
     def perform_destroy(self, instance):
         if not instance.name:
