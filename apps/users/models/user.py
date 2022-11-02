@@ -707,7 +707,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     comment = models.TextField(
         blank=True, null=True, verbose_name=_('Comment')
     )
-    is_first_login = models.BooleanField(default=True)
+    is_first_login = models.BooleanField(default=True, verbose_name=_('Is first login'))
     date_expired = models.DateTimeField(
         default=date_expired_default, blank=True, null=True,
         db_index=True, verbose_name=_('Date expired')

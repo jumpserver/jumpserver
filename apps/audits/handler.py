@@ -2,10 +2,12 @@ from datetime import datetime
 
 from django.db import transaction
 from django.core.cache import cache
+from django.utils.translation import ugettext_lazy as _
 
 from common.utils import get_request_ip, get_logger
 from common.utils.timezone import as_current_tz
 from common.utils.encode import Singleton
+from common.local import encrypted_field_set
 from settings.serializers import SettingsSerializer
 from jumpserver.utils import current_request
 from audits.models import OperateLog
@@ -53,7 +55,6 @@ class OperatorLogHandler(metaclass=Singleton):
             value1 = as_current_tz(value1).strftime('%Y-%m-%d %H:%M:%S')
         if isinstance(value2, datetime):
             value2 = as_current_tz(value2).strftime('%Y-%m-%d %H:%M:%S')
-        value1, value2 = str(value1), str(value2)
         return value1, value2
 
     def _look_for_two_dict_change(self, left_dict, right_dict):
@@ -62,7 +63,7 @@ class OperatorLogHandler(metaclass=Singleton):
         for key, value in right_dict.items():
             pre_value = left_dict.get(key, '')
             pre_value, value = self._consistent_type_to_str(pre_value, value)
-            if sorted(value) == sorted(pre_value):
+            if sorted(str(value)) == sorted(str(pre_value)):
                 continue
             if pre_value:
                 before[key] = pre_value
@@ -118,19 +119,25 @@ class OperatorLogHandler(metaclass=Singleton):
             resource_display = return_value
         return resource_display
 
-    @staticmethod
-    def __data_desensitization_dict_handle(dict_item):
+    def __data_processing(self, dict_item, loop=True):
         encrypt_value = '******'
         for key, value in dict_item.items():
-            if str(value).startswith('encrypt|'):
-                dict_item[key] = encrypt_value
+            if isinstance(value, bool):
+                value = _('Yes') if value else _('No')
+            elif isinstance(value, (list, tuple)):
+                value = ','.join(value)
+            elif isinstance(value, dict) and loop:
+                self.__data_processing(value, loop=False)
+            if key in encrypted_field_set:
+                value = encrypt_value
+            dict_item[key] = value
         return dict_item
 
-    def data_desensitization(self, before, after):
+    def data_processing(self, before, after):
         if before:
-            before = self.__data_desensitization_dict_handle(before)
+            before = self.__data_processing(before)
         if after:
-            after = self.__data_desensitization_dict_handle(after)
+            after = self.__data_processing(after)
         return before, after
 
     def create_or_update_operate_log(
@@ -143,7 +150,7 @@ class OperatorLogHandler(metaclass=Singleton):
 
         remote_addr = get_request_ip(current_request)
         resource_display = self.get_resource_display(resource)
-        before, after = self.data_desensitization(before, after)
+        before, after = self.data_processing(before, after)
         if not force and not any([before, after]):
             # 前后都没变化，没必要生成日志，除非手动强制保存
             return

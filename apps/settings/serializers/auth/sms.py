@@ -40,7 +40,7 @@ class BaseSMSSettingSerializer(serializers.Serializer):
 class AlibabaSMSSettingSerializer(BaseSMSSettingSerializer):
     ALIBABA_ACCESS_KEY_ID = serializers.CharField(max_length=256, required=True, label='AccessKeyId')
     ALIBABA_ACCESS_KEY_SECRET = EncryptedField(
-        max_length=256, required=False, label='AccessKeySecret',
+        max_length=256, required=False, label='access_key_secret',
     )
     ALIBABA_VERIFY_SIGN_NAME = serializers.CharField(max_length=256, required=True, label=_('Signature'))
     ALIBABA_VERIFY_TEMPLATE_CODE = serializers.CharField(max_length=256, required=True, label=_('Template code'))

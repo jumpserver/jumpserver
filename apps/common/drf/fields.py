@@ -4,6 +4,7 @@
 from rest_framework import serializers
 
 from common.utils import decrypt_password
+from common.local import add_encrypted_field_set
 
 __all__ = [
     'ReadableHiddenField', 'EncryptedField'
@@ -32,6 +33,7 @@ class EncryptedField(serializers.CharField):
             write_only = True
         kwargs['write_only'] = write_only
         super().__init__(**kwargs)
+        add_encrypted_field_set(self.label)
 
     def to_internal_value(self, value):
         value = super().to_internal_value(value)

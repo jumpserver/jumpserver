@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-11 16:55+0800\n"
+"POT-Creation-Date: 2022-11-02 10:13+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -29,7 +29,7 @@ msgstr "访问控制"
 #: orgs/models.py:70 perms/models/base.py:83 rbac/models/role.py:29
 #: settings/models.py:33 settings/serializers/sms.py:6
 #: terminal/models/endpoint.py:14 terminal/models/endpoint.py:87
-#: terminal/models/storage.py:26 terminal/models/task.py:16
+#: terminal/models/storage.py:27 terminal/models/task.py:16
 #: terminal/models/terminal.py:101 users/forms/profile.py:33
 #: users/models/group.py:15 users/models/user.py:669
 #: xpack/plugins/cloud/models.py:28
@@ -61,7 +61,7 @@ msgstr "激活中"
 #: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:73
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:38
 #: terminal/models/endpoint.py:22 terminal/models/endpoint.py:97
-#: terminal/models/storage.py:29 terminal/models/terminal.py:115
+#: terminal/models/storage.py:30 terminal/models/terminal.py:115
 #: tickets/models/comment.py:32 tickets/models/ticket/general.py:288
 #: users/models/group.py:16 users/models/user.py:708
 #: xpack/plugins/change_auth_plan/models/base.py:44
@@ -304,7 +304,7 @@ msgstr "类别"
 #: assets/models/cmd_filter.py:86 assets/models/user.py:250
 #: authentication/models.py:70 perms/models/application_permission.py:24
 #: perms/serializers/application/user_permission.py:34
-#: terminal/models/storage.py:58 terminal/models/storage.py:143
+#: terminal/models/storage.py:59 terminal/models/storage.py:145
 #: tickets/models/comment.py:26 tickets/models/flow.py:57
 #: tickets/models/ticket/apply_application.py:18
 #: tickets/models/ticket/general.py:273
@@ -1417,17 +1417,17 @@ msgstr "日志审计"
 msgid "The text content is too long. Use Elasticsearch to store operation logs"
 msgstr "文字内容太长。请使用 Elasticsearch 存储操作日志"
 
-#: audits/backends/db.py:20 audits/backends/db.py:22
+#: audits/backends/db.py:24 audits/backends/db.py:26
 msgid "Tips"
 msgstr "提示"
 
-#: audits/backends/es.py:29 terminal/backends/command/es.py:28
-msgid "Invalid elasticsearch config"
-msgstr "无效的 Elasticsearch 配置"
+#: audits/handler.py:127
+msgid "Yes"
+msgstr "是"
 
-#: audits/backends/es.py:34 terminal/backends/command/es.py:33
-msgid "Not Support Elasticsearch8"
-msgstr "不支持 Elasticsearch8"
+#: audits/handler.py:127
+msgid "No"
+msgstr "否"
 
 #: audits/models.py:28 audits/models.py:60
 #: authentication/templates/authentication/_access_key_modal.html:65
@@ -1654,90 +1654,6 @@ msgstr "钉钉"
 #: audits/signal_handlers.py:64 authentication/models.py:267
 msgid "Temporary token"
 msgstr "临时密码"
-
-#: audits/signal_handlers.py:74
-msgid "User and Group"
-msgstr "用户与用户组"
-
-#: audits/signal_handlers.py:75
-msgid "Asset and SystemUser"
-msgstr "资产与系统用户"
-
-#: audits/signal_handlers.py:76
-msgid "Node and Asset"
-msgstr "节点与资产"
-
-#: audits/signal_handlers.py:77
-msgid "Label and Asset"
-msgstr "标签与资产"
-
-#: audits/signal_handlers.py:78
-msgid "User asset permissions"
-msgstr "用户资产授权"
-
-#: audits/signal_handlers.py:79
-msgid "User group asset permissions"
-msgstr "用户组资产授权"
-
-#: audits/signal_handlers.py:80 perms/models/asset_permission.py:29
-msgid "Asset permission"
-msgstr "资产授权"
-
-#: audits/signal_handlers.py:81
-msgid "Node permission"
-msgstr "节点授权"
-
-#: audits/signal_handlers.py:82
-msgid "Asset permission and SystemUser"
-msgstr "资产授权与系统用户"
-
-#: audits/signal_handlers.py:83
-msgid "User application permissions"
-msgstr "用户应用授权"
-
-#: audits/signal_handlers.py:84
-msgid "User group application permissions"
-msgstr "用户组应用授权"
-
-#: audits/signal_handlers.py:85 perms/models/application_permission.py:38
-msgid "Application permission"
-msgstr "应用授权"
-
-#: audits/signal_handlers.py:86
-msgid "Application permission and SystemUser"
-msgstr "应用授权与系统用户"
-
-#: audits/signal_handlers.py:87
-msgid "Role permission"
-msgstr "角色授权"
-
-#: audits/signal_handlers.py:88
-msgid "Command filter and User"
-msgstr "命令过滤规则与用户"
-
-#: audits/signal_handlers.py:89
-msgid "Command filter and User group"
-msgstr "命令过滤规则与用户组"
-
-#: audits/signal_handlers.py:90
-msgid "Command filter and Application"
-msgstr "命令过滤规则与应用"
-
-#: audits/signal_handlers.py:91
-msgid "Command filter and Asset"
-msgstr "命令过滤规则与资产"
-
-#: audits/signal_handlers.py:92
-msgid "Command filter and SystemUser"
-msgstr "命令过滤规则与系统用户"
-
-#: audits/signal_handlers.py:98
-msgid "Change auth plan and Application"
-msgstr "改密计划与应用"
-
-#: audits/signal_handlers.py:99
-msgid "Change auth plan and SystemUser"
-msgstr "改密计划与系统用户"
 
 #: authentication/api/confirm.py:40
 msgid "This action require verify your MFA"
@@ -2638,6 +2554,14 @@ msgstr "仅导出选择项"
 msgid "Export filtered: %s"
 msgstr "导出搜素: %s"
 
+#: common/plugins/es.py:28
+msgid "Invalid elasticsearch config"
+msgstr "无效的 Elasticsearch 配置"
+
+#: common/plugins/es.py:33
+msgid "Not Support Elasticsearch8"
+msgstr "不支持 Elasticsearch8"
+
 #: common/sdk/im/exceptions.py:23
 msgid "Network error, please contact system administrator"
 msgstr "网络错误，请联系系统管理员"
@@ -2769,7 +2693,7 @@ msgstr "消息后端"
 
 #: notifications/models/notification.py:14
 msgid "User message"
-msgstr "用户页面"
+msgstr "用户消息"
 
 #: notifications/models/notification.py:17
 msgid "{} subscription"
@@ -3020,6 +2944,10 @@ msgstr "管理员正在修改授权，请稍等"
 msgid "The authorization cannot be revoked for the time being"
 msgstr "该授权暂时不能撤销"
 
+#: perms/models/application_permission.py:38
+msgid "Application permission"
+msgstr "应用授权"
+
 #: perms/models/application_permission.py:111
 msgid "Permed application"
 msgstr "授权的应用"
@@ -3035,6 +2963,10 @@ msgstr "可以查看用户授权的应用"
 #: perms/models/application_permission.py:116
 msgid "Can view usergroup apps"
 msgstr "可以查看用户组授权的应用"
+
+#: perms/models/asset_permission.py:29
+msgid "Asset permission"
+msgstr "资产授权"
 
 #: perms/models/asset_permission.py:134
 msgid "Ungrouped"
@@ -5032,15 +4964,15 @@ msgstr "线程数"
 msgid "Boot Time"
 msgstr "运行时间"
 
-#: terminal/models/storage.py:28
+#: terminal/models/storage.py:29
 msgid "Default storage"
 msgstr "默认存储"
 
-#: terminal/models/storage.py:137 terminal/models/terminal.py:109
+#: terminal/models/storage.py:139 terminal/models/terminal.py:109
 msgid "Command storage"
 msgstr "命令存储"
 
-#: terminal/models/storage.py:197 terminal/models/terminal.py:110
+#: terminal/models/storage.py:199 terminal/models/terminal.py:110
 msgid "Replay storage"
 msgstr "录像存储"
 
@@ -5736,6 +5668,11 @@ msgstr "OTP 秘钥"
 msgid "Secret key"
 msgstr "Secret key"
 
+#: users/models/user.py:710 users/serializers/profile.py:149
+#: users/serializers/user.py:146
+msgid "Is first login"
+msgstr "首次登录"
+
 #: users/models/user.py:721
 msgid "Source"
 msgstr "来源"
@@ -5818,10 +5755,6 @@ msgstr "新密码不能是最近 {} 次的密码"
 #: users/serializers/profile.py:49 users/serializers/profile.py:71
 msgid "The newly set password is inconsistent"
 msgstr "两次密码不一致"
-
-#: users/serializers/profile.py:149 users/serializers/user.py:146
-msgid "Is first login"
-msgstr "首次登录"
 
 #: users/serializers/user.py:28
 msgid "System roles"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-11 16:55+0800\n"
+"POT-Creation-Date: 2022-11-02 14:53+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,7 +30,7 @@ msgstr "Acls"
 #: orgs/models.py:70 perms/models/base.py:83 rbac/models/role.py:29
 #: settings/models.py:33 settings/serializers/sms.py:6
 #: terminal/models/endpoint.py:14 terminal/models/endpoint.py:87
-#: terminal/models/storage.py:26 terminal/models/task.py:16
+#: terminal/models/storage.py:27 terminal/models/task.py:16
 #: terminal/models/terminal.py:101 users/forms/profile.py:33
 #: users/models/group.py:15 users/models/user.py:669
 #: xpack/plugins/cloud/models.py:28
@@ -62,7 +62,7 @@ msgstr "アクティブ"
 #: assets/models/label.py:23 ops/models/adhoc.py:38 orgs/models.py:73
 #: perms/models/base.py:93 rbac/models/role.py:37 settings/models.py:38
 #: terminal/models/endpoint.py:22 terminal/models/endpoint.py:97
-#: terminal/models/storage.py:29 terminal/models/terminal.py:115
+#: terminal/models/storage.py:30 terminal/models/terminal.py:115
 #: tickets/models/comment.py:32 tickets/models/ticket/general.py:288
 #: users/models/group.py:16 users/models/user.py:708
 #: xpack/plugins/change_auth_plan/models/base.py:44
@@ -88,9 +88,10 @@ msgstr "ログイン確認"
 #: acls/models/login_acl.py:24 acls/models/login_asset_acl.py:20
 #: assets/models/cmd_filter.py:30 assets/models/label.py:15 audits/models.py:38
 #: audits/models.py:63 audits/models.py:105 audits/serializers.py:106
-#: authentication/models.py:54 authentication/models.py:78 orgs/models.py:220
-#: perms/models/base.py:84 rbac/builtin.py:120 rbac/models/rolebinding.py:41
-#: terminal/backends/command/models.py:20
+#: authentication/models.py:19 authentication/models.py:54
+#: authentication/models.py:78 notifications/models/notification.py:12
+#: orgs/models.py:220 perms/models/base.py:84 rbac/builtin.py:120
+#: rbac/models/rolebinding.py:41 terminal/backends/command/models.py:20
 #: terminal/backends/command/serializers.py:13 terminal/models/session.py:44
 #: terminal/models/sharing.py:33 terminal/notifications.py:94
 #: terminal/notifications.py:142 tickets/models/comment.py:21 users/const.py:14
@@ -309,7 +310,7 @@ msgstr "カテゴリ"
 #: assets/models/cmd_filter.py:86 assets/models/user.py:250
 #: authentication/models.py:70 perms/models/application_permission.py:24
 #: perms/serializers/application/user_permission.py:34
-#: terminal/models/storage.py:58 terminal/models/storage.py:143
+#: terminal/models/storage.py:59 terminal/models/storage.py:145
 #: tickets/models/comment.py:26 tickets/models/flow.py:57
 #: tickets/models/ticket/apply_application.py:18
 #: tickets/models/ticket/general.py:273
@@ -357,9 +358,10 @@ msgstr "タイプ表示"
 #: assets/models/gathered_user.py:19 assets/models/group.py:22
 #: assets/models/label.py:25 assets/serializers/account.py:18
 #: assets/serializers/cmd_filter.py:28 assets/serializers/cmd_filter.py:48
-#: common/db/models.py:116 common/mixins/models.py:50 ops/models/adhoc.py:39
-#: ops/models/command.py:30 orgs/models.py:72 orgs/models.py:223
-#: perms/models/base.py:92 users/models/group.py:18 users/models/user.py:933
+#: authentication/models.py:22 common/db/models.py:116
+#: common/mixins/models.py:50 ops/models/adhoc.py:39 ops/models/command.py:30
+#: orgs/models.py:72 orgs/models.py:223 perms/models/base.py:92
+#: users/models/group.py:18 users/models/user.py:933
 #: xpack/plugins/change_auth_plan/models/base.py:45
 #: xpack/plugins/cloud/models.py:125
 msgid "Date created"
@@ -1429,17 +1431,17 @@ msgstr "監査"
 msgid "The text content is too long. Use Elasticsearch to store operation logs"
 msgstr "文章の内容が長すぎる。Elasticsearchで操作履歴を保存する"
 
-#: audits/backends/db.py:20 audits/backends/db.py:22
+#: audits/backends/db.py:24 audits/backends/db.py:26
 msgid "Tips"
 msgstr "謎々"
 
-#: audits/backends/es.py:29 terminal/backends/command/es.py:28
-msgid "Invalid elasticsearch config"
-msgstr "無効なElasticsearch構成"
+#: audits/handler.py:128
+msgid "Yes"
+msgstr "是"
 
-#: audits/backends/es.py:34 terminal/backends/command/es.py:33
-msgid "Not Support Elasticsearch8"
-msgstr "サポートされていません Elasticsearch8"
+#: audits/handler.py:128
+msgid "No"
+msgstr "否"
 
 #: audits/models.py:28 audits/models.py:60
 #: authentication/templates/authentication/_access_key_modal.html:65
@@ -1666,90 +1668,6 @@ msgstr "DingTalk"
 #: audits/signal_handlers.py:64 authentication/models.py:267
 msgid "Temporary token"
 msgstr "仮パスワード"
-
-#: audits/signal_handlers.py:74
-msgid "User and Group"
-msgstr "ユーザーとグループ"
-
-#: audits/signal_handlers.py:75
-msgid "Asset and SystemUser"
-msgstr "資産およびシステム・ユーザー"
-
-#: audits/signal_handlers.py:76
-msgid "Node and Asset"
-msgstr "ノードと資産"
-
-#: audits/signal_handlers.py:77
-msgid "Label and Asset"
-msgstr "ラベルとアセット"
-
-#: audits/signal_handlers.py:78
-msgid "User asset permissions"
-msgstr "ユーザー資産の権限"
-
-#: audits/signal_handlers.py:79
-msgid "User group asset permissions"
-msgstr "ユーザーグループの資産権限"
-
-#: audits/signal_handlers.py:80 perms/models/asset_permission.py:29
-msgid "Asset permission"
-msgstr "資産権限"
-
-#: audits/signal_handlers.py:81
-msgid "Node permission"
-msgstr "ノード権限"
-
-#: audits/signal_handlers.py:82
-msgid "Asset permission and SystemUser"
-msgstr "資産権限とSystemUser"
-
-#: audits/signal_handlers.py:83
-msgid "User application permissions"
-msgstr "ユーザーアプリケーションの権限"
-
-#: audits/signal_handlers.py:84
-msgid "User group application permissions"
-msgstr "ユーザーグループアプリケーションの権限"
-
-#: audits/signal_handlers.py:85 perms/models/application_permission.py:38
-msgid "Application permission"
-msgstr "申請許可"
-
-#: audits/signal_handlers.py:86
-msgid "Application permission and SystemUser"
-msgstr "アプリケーション権限とSystemUser"
-
-#: audits/signal_handlers.py:87
-msgid "Role permission"
-msgstr "キャスティング・ライセンス"
-
-#: audits/signal_handlers.py:88
-msgid "Command filter and User"
-msgstr "コマンドフィルタリングルールとユーザー"
-
-#: audits/signal_handlers.py:89
-msgid "Command filter and User group"
-msgstr "コマンドフィルタリングルールとユーザ群"
-
-#: audits/signal_handlers.py:90
-msgid "Command filter and Application"
-msgstr "コマンドフィルタリングルールと適用"
-
-#: audits/signal_handlers.py:91
-msgid "Command filter and Asset"
-msgstr "ルールと資産のフィルタリングを命令する"
-
-#: audits/signal_handlers.py:92
-msgid "Command filter and SystemUser"
-msgstr "コマンドフィルタリングルールとシステムユーザ"
-
-#: audits/signal_handlers.py:98
-msgid "Change auth plan and Application"
-msgstr "改密計画と応用"
-
-#: audits/signal_handlers.py:99
-msgid "Change auth plan and SystemUser"
-msgstr "改密計画とシステム利用者"
 
 #: authentication/api/confirm.py:40
 msgid "This action require verify your MFA"
@@ -2574,31 +2492,31 @@ msgstr "%(name)s は正常に更新されました"
 msgid "ugettext_lazy"
 msgstr "ugettext_lazy"
 
-#: common/db/fields.py:80
+#: common/db/fields.py:81
 msgid "Marshal dict data to char field"
 msgstr "チャーフィールドへのマーシャルディクトデータ"
 
-#: common/db/fields.py:84
+#: common/db/fields.py:85
 msgid "Marshal dict data to text field"
 msgstr "テキストフィールドへのマーシャルディクトデータ"
 
-#: common/db/fields.py:96
+#: common/db/fields.py:97
 msgid "Marshal list data to char field"
 msgstr "元帥リストデータをチャーフィールドに"
 
-#: common/db/fields.py:100
+#: common/db/fields.py:101
 msgid "Marshal list data to text field"
 msgstr "マーシャルリストデータをテキストフィールドに"
 
-#: common/db/fields.py:104
+#: common/db/fields.py:105
 msgid "Marshal data to char field"
 msgstr "チャーフィールドへのマーシャルデータ"
 
-#: common/db/fields.py:108
+#: common/db/fields.py:109
 msgid "Marshal data to text field"
 msgstr "テキストフィールドへのマーシャルデータ"
 
-#: common/db/fields.py:150
+#: common/db/fields.py:151
 msgid "Encrypt field using Secret Key"
 msgstr "Secret Keyを使用したフィールドの暗号化"
 
@@ -2671,6 +2589,14 @@ msgstr "選択項目のみエクスポート"
 #, python-format
 msgid "Export filtered: %s"
 msgstr "検索のエクスポート: %s"
+
+#: common/plugins/es.py:28
+msgid "Invalid elasticsearch config"
+msgstr "無効なElasticsearch構成"
+
+#: common/plugins/es.py:33
+msgid "Not Support Elasticsearch8"
+msgstr "サポートされていません Elasticsearch8"
 
 #: common/sdk/im/exceptions.py:23
 msgid "Network error, please contact system administrator"
@@ -2802,19 +2728,19 @@ msgstr "メール"
 msgid "Site message"
 msgstr "サイトメッセージ"
 
-#: notifications/models/notification.py:11
+#: notifications/models/notification.py:14
 msgid "receive backend"
 msgstr "メッセージのバックエンド"
 
-#: notifications/models/notification.py:14
-msgid "User message"
-msgstr "ユーザーページ"
-
 #: notifications/models/notification.py:17
+msgid "User message"
+msgstr "ユーザメッセージ"
+
+#: notifications/models/notification.py:20
 msgid "{} subscription"
 msgstr "{} 購読"
 
-#: notifications/models/notification.py:29
+#: notifications/models/notification.py:32
 msgid "System message"
 msgstr "システムメッセージ"
 
@@ -3060,6 +2986,10 @@ msgstr "管理者は権限を変更しています。お待ちください"
 msgid "The authorization cannot be revoked for the time being"
 msgstr "当分の間、承認を取り消すことはできません。"
 
+#: perms/models/application_permission.py:38
+msgid "Application permission"
+msgstr "申請許可"
+
 #: perms/models/application_permission.py:111
 msgid "Permed application"
 msgstr "許可されたアプリケーション"
@@ -3075,6 +3005,10 @@ msgstr "ユーザーアプリを表示できます"
 #: perms/models/application_permission.py:116
 msgid "Can view usergroup apps"
 msgstr "ユーザー・グループ認可の適用を表示できます"
+
+#: perms/models/asset_permission.py:29
+msgid "Asset permission"
+msgstr "資産権限"
 
 #: perms/models/asset_permission.py:134
 msgid "Ungrouped"
@@ -5109,15 +5043,15 @@ msgstr "スレッド"
 msgid "Boot Time"
 msgstr "ブート時間"
 
-#: terminal/models/storage.py:28
+#: terminal/models/storage.py:29
 msgid "Default storage"
 msgstr "デフォルトのストレージ"
 
-#: terminal/models/storage.py:137 terminal/models/terminal.py:109
+#: terminal/models/storage.py:139 terminal/models/terminal.py:109
 msgid "Command storage"
 msgstr "コマンドストレージ"
 
-#: terminal/models/storage.py:197 terminal/models/terminal.py:110
+#: terminal/models/storage.py:199 terminal/models/terminal.py:110
 msgid "Replay storage"
 msgstr "再生ストレージ"
 
@@ -5308,7 +5242,9 @@ msgstr "表示"
 msgid ""
 "No ports can be used, check and modify the limit on the number of ports that "
 "Magnus listens on in the configuration file."
-msgstr "使用できるポートがありません。設定ファイルで Magnus がリッスンするポート数の制限を確認して変更してください. "
+msgstr ""
+"使用できるポートがありません。設定ファイルで Magnus がリッスンするポート数の"
+"制限を確認して変更してください. "
 
 #: terminal/utils/db_port_mapper.py:83
 msgid "All available port count: {}, Already use port count: {}"
@@ -5819,6 +5755,11 @@ msgstr "OTP 秘密"
 msgid "Secret key"
 msgstr "秘密キー"
 
+#: users/models/user.py:710 users/serializers/profile.py:149
+#: users/serializers/user.py:146
+msgid "Is first login"
+msgstr "最初のログインです"
+
 #: users/models/user.py:721
 msgid "Source"
 msgstr "ソース"
@@ -5901,10 +5842,6 @@ msgstr "新しいパスワードを最後の {} 個のパスワードにする�
 #: users/serializers/profile.py:49 users/serializers/profile.py:71
 msgid "The newly set password is inconsistent"
 msgstr "新しく設定されたパスワードが一致しない"
-
-#: users/serializers/profile.py:149 users/serializers/user.py:146
-msgid "Is first login"
-msgstr "最初のログインです"
 
 #: users/serializers/user.py:28
 msgid "System roles"

@@ -4,15 +4,12 @@ import codecs
 from itertools import chain
 
 from django.http import HttpResponse
-from django.db import transaction, models
-from django.utils import translation
+from django.db import models
 
-from audits.models import OperateLog
 from settings.serializers import SettingsSerializer
-from common.utils import validate_ip, get_ip_city, get_request_ip, get_logger
-from jumpserver.utils import current_request
+from common.utils import validate_ip, get_ip_city, get_logger
 from common.db import fields
-from .const import DEFAULT_CITY, MODELS_NEED_RECORD
+from .const import DEFAULT_CITY
 
 
 logger = get_logger(__name__)

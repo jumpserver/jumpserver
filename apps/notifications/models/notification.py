@@ -7,7 +7,10 @@ __all__ = ('SystemMsgSubscription', 'UserMsgSubscription')
 
 
 class UserMsgSubscription(JMSModel):
-    user = models.OneToOneField('users.User', related_name='user_msg_subscription', on_delete=CASCADE_SIGNAL_SKIP)
+    user = models.OneToOneField(
+        'users.User', related_name='user_msg_subscription', on_delete=CASCADE_SIGNAL_SKIP,
+        verbose_name=_('User')
+    )
     receive_backends = models.JSONField(default=list, verbose_name=_('receive backend'))
 
     class Meta:
