@@ -6,7 +6,6 @@ from django.core.files.storage import default_storage
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from common.utils import lazyproperty
 from common.db.models import JMSBaseModel
 
 
@@ -18,7 +17,7 @@ class Applet(JMSBaseModel):
         general = 'general', _('General')
         web = 'web', _('Web')
 
-    name = models.CharField(max_length=128, verbose_name=_('Name'), unique=True)
+    name = models.SlugField(max_length=128, verbose_name=_('Name'), unique=True)
     display_name = models.CharField(max_length=128, verbose_name=_('Display name'))
     version = models.CharField(max_length=16, verbose_name=_('Version'))
     author = models.CharField(max_length=128, verbose_name=_('Author'))

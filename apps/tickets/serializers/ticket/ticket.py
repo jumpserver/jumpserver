@@ -68,7 +68,8 @@ class TicketApproveSerializer(TicketSerializer):
 
 class TicketApplySerializer(TicketSerializer):
     org_id = serializers.CharField(
-        required=True, max_length=36, allow_blank=True, label=_("Organization")
+        required=True, max_length=36,
+        allow_blank=True, label=_("Organization")
     )
 
     class Meta:
@@ -92,7 +93,8 @@ class TicketApplySerializer(TicketSerializer):
 
         ticket_type = attrs.get('type')
         org_id = attrs.get('org_id')
-        flow = TicketFlow.get_org_related_flows(org_id=org_id).filter(type=ticket_type).first()
+        flow = TicketFlow.get_org_related_flows(org_id=org_id)\
+            .filter(type=ticket_type).first()
         if flow:
             attrs['flow'] = flow
         else:

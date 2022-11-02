@@ -1,19 +1,18 @@
 import shutil
 import zipfile
-from typing import Callable
-
 import yaml
 import os.path
+from typing import Callable
 
-from rest_framework import viewsets
 from django.http import HttpResponse
 from django.core.files.storage import default_storage
-from django.db.models import Prefetch
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
+from common.utils import is_uuid
 from terminal import serializers
 from terminal.models import AppletPublication, Applet
 from terminal.serializers import AppletUploadSerializer
@@ -97,6 +96,13 @@ class AppletViewSet(DownloadUploadMixin, viewsets.ModelViewSet):
         'upload': 'terminal.add_applet',
         'download': 'terminal.view_applet',
     }
+
+    def get_object(self):
+        pk = self.kwargs.get('pk')
+        if not is_uuid(pk):
+            return self.queryset.get(name=pk)
+        else:
+            return self.queryset.get(pk=pk)
 
     def perform_destroy(self, instance):
         if not instance.name:

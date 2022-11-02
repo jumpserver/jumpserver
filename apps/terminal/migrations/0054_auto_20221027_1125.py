@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('date_created', models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date created')),
                 ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=128, unique=True, verbose_name='Name')),
+                ('name', models.SlugField(max_length=128, unique=True, verbose_name='Name')),
                 ('display_name', models.CharField(max_length=128, verbose_name='Display name')),
                 ('version', models.CharField(max_length=16, verbose_name='Version')),
                 ('author', models.CharField(max_length=128, verbose_name='Author')),
