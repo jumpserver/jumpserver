@@ -54,10 +54,6 @@ class Applet(JMSBaseModel):
             return None
         return os.path.join(settings.MEDIA_URL, 'applets', self.name, 'icon.png')
 
-    @lazyproperty
-    def publication(self):
-        return self.publications.latest()
-
 
 class AppletPublication(JMSBaseModel):
     applet = models.ForeignKey('Applet', on_delete=models.PROTECT, related_name='publications', verbose_name=_('Applet'))
@@ -67,4 +63,3 @@ class AppletPublication(JMSBaseModel):
 
     class Meta:
         unique_together = ('applet', 'host')
-        get_latest_by = 'date_created'

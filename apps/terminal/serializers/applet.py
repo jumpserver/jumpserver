@@ -17,7 +17,7 @@ class AppletUploadSerializer(serializers.Serializer):
 
 
 class AppletPublicationSerializer(serializers.ModelSerializer):
-    applet = ObjectRelatedField(queryset=Applet.objects.all())
+    applet = ObjectRelatedField(attrs=('id', 'display_name', 'icon'), queryset=Applet.objects.all())
     host = ObjectRelatedField(queryset=AppletHost.objects.all())
     status = LabeledChoiceField(choices=Status.choices, label=_("Status"))
 
@@ -31,13 +31,12 @@ class AppletPublicationSerializer(serializers.ModelSerializer):
 class AppletSerializer(serializers.ModelSerializer):
     icon = serializers.ReadOnlyField(label=_("Icon"))
     type = LabeledChoiceField(choices=Applet.Type.choices, label=_("Type"))
-    publication = AppletPublicationSerializer(allow_null=True, label=_("Publication"))
 
     class Meta:
         model = Applet
         fields_mini = ['id', 'name', 'display_name']
         read_only_fields = [
-            'publication', 'icon', 'date_created', 'date_updated',
+            'icon', 'date_created', 'date_updated',
         ]
         fields = fields_mini + [
             'version', 'author', 'type', 'protocols',

@@ -98,16 +98,6 @@ class AppletViewSet(DownloadUploadMixin, viewsets.ModelViewSet):
         'download': 'terminal.view_applet',
     }
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        host = self.request.query_params.get('host')
-
-        if not host:
-            return queryset.prefetch_related('publications')
-        else:
-            publications = AppletPublication.objects.filter(host_id=host)
-            return queryset.prefetch_related(Prefetch('publications', queryset=publications))
-
     def perform_destroy(self, instance):
         if not instance.name:
             raise ValidationError('Applet is not null')
@@ -120,3 +110,4 @@ class AppletViewSet(DownloadUploadMixin, viewsets.ModelViewSet):
 class AppletPublicationViewSet(viewsets.ModelViewSet):
     queryset = AppletPublication.objects.all()
     serializer_class = serializers.AppletPublicationSerializer
+    filterset_fields = ['host', 'applet']
