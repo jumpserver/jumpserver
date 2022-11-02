@@ -172,15 +172,3 @@ def hello_random():
 def hello_callback(result):
     print(result)
     print("Hello callback")
-
-
-@shared_task
-def execute_automation_strategy(pid, trigger):
-    from .models import AutomationStrategy
-    with tmp_to_root_org():
-        instance = get_object_or_none(AutomationStrategy, pk=pid)
-    if not instance:
-        logger.error("No automation plan found: {}".format(pid))
-        return
-    with tmp_to_org(instance.org):
-        instance.execute(trigger)

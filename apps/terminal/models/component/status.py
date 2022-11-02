@@ -42,7 +42,7 @@ class Status(models.Model):
 
     @classmethod
     def get_terminal_latest_status(cls, terminal):
-        from ..utils import ComputeStatUtil
+        from ...utils import ComputeStatUtil
         stat = cls.get_terminal_latest_stat(terminal)
         return ComputeStatUtil.compute_component_status(stat)
 
