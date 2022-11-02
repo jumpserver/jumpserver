@@ -5,13 +5,12 @@ from itertools import groupby, chain
 
 from django.conf import settings
 from django.core.files.storage import default_storage
-
 import jms_storage
 
 from common.utils import get_logger
+from tickets.models import TicketSession
 from . import const
 from .models import ReplayStorage
-from tickets.models import TicketSession
 
 
 logger = get_logger(__name__)

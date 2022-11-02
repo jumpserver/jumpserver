@@ -14,6 +14,23 @@ class AppletHostViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.AppletHostSerializer
     queryset = AppletHost.objects.all()
 
+    @action(methods=['post'], detail=True)
+    def report(self, request, *args, **kwargs):
+        # TODO:
+        # 1. 上报 安装的 Applets 每小时
+        # 2. Host 和 Terminal 关联
+        instance = self.get_object()
+        instance.sync()
+        return Response({'msg': 'ok'})
+
+    @action(methods=['get'], detail=True)
+    def accounts(self, request, *args, **kwargs):
+        # TODO:
+        # 1. 返回 host 上的所有用户, host 可以去创建和更新 每小时
+        # 2. 密码长度最少 8 位，包含大小写字母和数字和特殊字符
+        instance = self.get_object()
+        return Response(instance.get_accounts())
+
 
 class AppletHostDeploymentViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.AppletHostDeploymentSerializer

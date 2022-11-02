@@ -6,7 +6,6 @@ import uuid
 from hashlib import md5
 
 import sshpubkeys
-from django.core.cache import cache
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -19,7 +18,7 @@ from common.utils import (
 )
 from common.db import fields
 from assets.const import Connectivity
-from orgs.mixins.models import OrgModelMixin
+from orgs.mixins.models import JMSOrgBaseModel
 
 logger = get_logger(__file__)
 
@@ -48,14 +47,13 @@ class AbsConnectivity(models.Model):
         abstract = True
 
 
-class BaseAccount(OrgModelMixin):
+class BaseAccount(JMSOrgBaseModel):
     class SecretType(models.TextChoices):
         password = 'password', _('Password')
         ssh_key = 'ssh_key', _('SSH key')
         access_key = 'access_key', _('Access key')
         token = 'token', _('Token')
 
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_("Name"))
     username = models.CharField(max_length=128, blank=True, verbose_name=_('Username'), db_index=True)
     secret_type = models.CharField(
@@ -63,9 +61,8 @@ class BaseAccount(OrgModelMixin):
     )
     secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Secret'))
     privileged = models.BooleanField(verbose_name=_("Privileged"), default=False)
+    is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
-    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
-    date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
     created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
 
     @property

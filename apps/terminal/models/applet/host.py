@@ -17,6 +17,10 @@ class AppletHost(Host):
     date_inited = models.DateTimeField(null=True, blank=True, verbose_name=_('Date inited'))
     date_synced = models.DateTimeField(null=True, blank=True, verbose_name=_('Date synced'))
     status = models.CharField(max_length=16, verbose_name=_('Status'))
+    terminal = models.OneToOneField(
+        'terminal.Terminal', on_delete=models.PROTECT, null=True, blank=True,
+        related_name='applet_host', verbose_name=_('Terminal')
+    )
     applets = models.ManyToManyField(
         'Applet', verbose_name=_('Applet'),
         through='AppletPublication',  through_fields=('host', 'applet'),
