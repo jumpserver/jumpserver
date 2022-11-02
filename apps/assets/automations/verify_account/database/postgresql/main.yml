@@ -10,4 +10,4 @@
         login_password: "{{ account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
-        db: "{{ jms_asset.category_property.db_name }}"
+        db: "{{ jms_asset.specific.db_name }}"
