@@ -12,6 +12,7 @@ class Trigger(models.TextChoices):
 
 
 class Status(models.TextChoices):
+    ready = 'ready', _('Ready')
     pending = 'pending', _("Pending")
     running = 'running', _("Running")
     success = 'success', _("Success")

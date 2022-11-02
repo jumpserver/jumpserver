@@ -51,7 +51,7 @@ class LabeledChoiceField(ChoiceField):
         }
 
     def to_representation(self, value):
-        if value in ('', None):
+        if value is None:
             return value
         return {
             'value': value,

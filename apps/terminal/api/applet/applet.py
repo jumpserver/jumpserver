@@ -116,4 +116,5 @@ class AppletViewSet(DownloadUploadMixin, viewsets.ModelViewSet):
 class AppletPublicationViewSet(viewsets.ModelViewSet):
     queryset = AppletPublication.objects.all()
     serializer_class = serializers.AppletPublicationSerializer
-    filterset_fields = ['host', 'applet']
+    filterset_fields = ['host', 'applet', 'status']
+    search_fields = ['applet__name', 'applet__display_name', 'host__name']

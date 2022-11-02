@@ -17,7 +17,7 @@ class AppletUploadSerializer(serializers.Serializer):
 
 
 class AppletPublicationSerializer(serializers.ModelSerializer):
-    applet = ObjectRelatedField(attrs=('id', 'display_name', 'icon'), queryset=Applet.objects.all())
+    applet = ObjectRelatedField(attrs=('id', 'display_name', 'icon', 'version'), queryset=Applet.objects.all())
     host = ObjectRelatedField(queryset=AppletHost.objects.all())
     status = LabeledChoiceField(choices=Status.choices, label=_("Status"))
 

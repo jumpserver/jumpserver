@@ -11,8 +11,7 @@ import jms_storage
 from common.utils import get_logger
 from . import const
 from .models import ReplayStorage
-from tickets.models import TicketSession, TicketStep, TicketAssignee
-from tickets.const import StepState
+from tickets.models import TicketSession
 
 
 logger = get_logger(__name__)
