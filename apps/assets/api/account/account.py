@@ -10,7 +10,7 @@ from common.permissions import UserConfirmation
 from authentication.const import ConfirmType
 from assets.models import Account
 from assets.filters import AccountFilterSet
-from assets.tasks.account_connectivity import test_accounts_connectivity_manual
+from assets.tasks import verify_accounts_connectivity
 from assets import serializers
 
 __all__ = ['AccountViewSet', 'AccountSecretsViewSet', 'AccountTaskCreateAPI', 'AccountHistoriesSecretAPI']
@@ -32,7 +32,9 @@ class AccountViewSet(OrgBulkModelViewSet):
     @action(methods=['post'], detail=True, url_path='verify')
     def verify_account(self, request, *args, **kwargs):
         account = super().get_object()
-        task = test_accounts_connectivity_manual.delay([account.id])
+        account_ids = [account.id]
+        asset_ids = [account.asset_id]
+        task = verify_accounts_connectivity.delay(account_ids, asset_ids)
         return Response(data={'task': task.id})
 
 
@@ -80,8 +82,10 @@ class AccountTaskCreateAPI(CreateAPIView):
         return queryset
 
     def perform_create(self, serializer):
-        account_ids = self.get_accounts().values_list('id', flat=True)
-        task = test_accounts_connectivity_manual.delay(account_ids)
+        accounts = self.get_accounts()
+        account_ids = accounts.values_list('id', flat=True)
+        asset_ids = [account.asset_id for account in accounts]
+        task = verify_accounts_connectivity.delay(account_ids, asset_ids)
         data = getattr(serializer, '_data', {})
         data["task"] = task.id
         setattr(serializer, '_data', data)

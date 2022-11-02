@@ -12,6 +12,8 @@ from orgs.mixins import generics
 from assets import serializers
 from assets.models import Asset, Gateway
 from assets.tasks import (
+    push_accounts_to_assets,
+    verify_accounts_connectivity,
     test_assets_connectivity_manual,
     update_assets_hardware_info_manual,
 )
@@ -110,9 +112,9 @@ class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
         action = request.data.get('action')
         action_perm_require = {
             'refresh': 'assets.refresh_assethardwareinfo',
-            'push_system_user': 'assets.push_assetsystemuser',
+            'push_account': 'assets.push_assetsystemuser',
             'test': 'assets.test_assetconnectivity',
-            'test_system_user': 'assets.test_assetconnectivity'
+            'test_account': 'assets.test_assetconnectivity'
         }
         perm_required = action_perm_require.get(action)
         has = self.request.user.has_perm(perm_required)
@@ -120,20 +122,23 @@ class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
         if not has:
             self.permission_denied(request)
 
-    def perform_asset_task(self, serializer):
+    @staticmethod
+    def perform_asset_task(serializer):
         data = serializer.validated_data
-        action = data['action']
-        if action not in ['push_system_user', 'test_system_user']:
+        if data['action'] not in ['push_system_user', 'test_system_user']:
             return
 
         asset = data['asset']
-        system_users = data.get('system_users')
-        if not system_users:
-            system_users = asset.get_all_system_users()
-        if action == 'push_system_user':
-            task = push_system_users_a_asset.delay(system_users, asset=asset)
-        elif action == 'test_system_user':
-            task = test_system_users_connectivity_a_asset.delay(system_users, asset=asset)
+        accounts = data.get('accounts')
+        if not accounts:
+            accounts = asset.accounts.all()
+
+        asset_ids = [asset.id]
+        account_ids = accounts.values_list('id', flat=True)
+        if action == 'push_account':
+            task = push_accounts_to_assets.delay(account_ids, asset_ids)
+        elif action == 'test_account':
+            task = verify_accounts_connectivity.delay(account_ids, asset_ids)
         else:
             task = None
         return task

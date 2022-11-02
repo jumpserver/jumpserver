@@ -229,7 +229,7 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
         permissions = [
             ('refresh_assethardwareinfo', _('Can refresh asset hardware info')),
             ('test_assetconnectivity', _('Can test asset connectivity')),
-            ('push_assetsystemuser', _('Can push system user to asset')),
+            ('push_assetaccount', _('Can push account to asset')),
             ('match_asset', _('Can match asset')),
             ('add_assettonode', _('Add asset to node')),
             ('move_assettonode', _('Move asset to node')),
