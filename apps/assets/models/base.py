@@ -158,7 +158,6 @@ class BaseAccount(OrgModelMixin):
         return {
             'name': self.name,
             'username': self.username,
-            'password': self.password,
             'public_key': self.public_key,
         }
 
