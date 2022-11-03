@@ -51,6 +51,7 @@ class ChangeSecretAutomation(BaseAutomation):
 
 class ChangeSecretRecord(JMSBaseModel):
     execution = models.ForeignKey('assets.AutomationExecution', on_delete=models.CASCADE)
+    asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, null=True)
     account = models.ForeignKey('assets.Account', on_delete=models.CASCADE, null=True)
     old_secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Old secret'))
     new_secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Secret'))

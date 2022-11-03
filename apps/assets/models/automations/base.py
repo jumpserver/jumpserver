@@ -111,6 +111,13 @@ class AutomationExecution(OrgModelMixin):
     def manager_type(self):
         return self.snapshot['type']
 
+    @property
+    def recipients(self):
+        recipients = self.snapshot.get('recipients')
+        if not recipients:
+            return []
+        return recipients.values()
+
     def start(self):
         from assets.automations.endpoint import ExecutionManager
         manager = ExecutionManager(execution=self)
