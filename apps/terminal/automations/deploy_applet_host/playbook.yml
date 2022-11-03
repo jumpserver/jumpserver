@@ -5,6 +5,7 @@
     DownloadHost: https://demo.jumpserver.org/download
     Initial: 0
     HOST_NAME: test
+    HOST_ID: 00000000-0000-0000-0000-000000000000
     CORE_HOST: https://demo.jumpserver.org
     BOOTSTRAP_TOKEN: PleaseChangeMe
     RDS_Licensing: true
@@ -38,7 +39,7 @@
   - name: Install JumpServer Remoteapp agent (jumpserver)
     ansible.windows.win_package:
       path: "{{ ansible_env.TEMP }}\\{{ TinkerInstaller }}"
-      args:
+      arguments:
         - /VERYSILENT
         - /SUPPRESSMSGBOXES
         - /NORESTART
@@ -154,7 +155,8 @@
 
   - name: Generate component config
     ansible.windows.win_shell:
-      "remoteapp-server config --core_host {{ CORE_HOST }} --token {{ BOOTSTRAP_TOKEN }} --host_id {{ HOST_ID }}"
+      "remoteapp-server config --hostname {{ HOST_NAME }} --core_host {{ CORE_HOST }} 
+      --token {{ BOOTSTRAP_TOKEN }} --host_id {{ HOST_ID }}"
 
   - name: Install remoteapp-server service
     ansible.windows.win_shell:
