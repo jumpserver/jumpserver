@@ -15,7 +15,7 @@ from django.db.models import QuerySet
 from common.db import fields
 from common.utils import (
     ssh_key_string_to_obj, ssh_key_gen, get_logger,
-    random_string, ssh_pubkey_gen,
+    random_string, ssh_pubkey_gen, lazyproperty
 )
 from assets.const import Connectivity, SecretType
 from orgs.mixins.models import OrgModelMixin
@@ -62,12 +62,16 @@ class BaseAccount(OrgModelMixin):
     created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
 
     @property
-    def password(self):
-        return self.secret
-
-    @property
     def has_secret(self):
         return bool(self.secret)
+
+    @property
+    def specific(self):
+        data = {}
+        if self.secret_type != SecretType.ssh_key:
+            return data
+        data['ssh_key_fingerprint'] = self.ssh_key_fingerprint
+        return data
 
     @property
     def private_key(self):
@@ -75,14 +79,16 @@ class BaseAccount(OrgModelMixin):
             return self.secret
         return None
 
-    @property
-    def public_key(self):
-        return ''
-
     @private_key.setter
     def private_key(self, value):
         self.secret = value
         self.secret_type = SecretType.ssh_key
+
+    @lazyproperty
+    def public_key(self):
+        if self.secret_type == SecretType.ssh_key:
+            return ssh_pubkey_gen(private_key=self.private_key)
+        return None
 
     @property
     def ssh_key_fingerprint(self):
@@ -90,7 +96,7 @@ class BaseAccount(OrgModelMixin):
             public_key = self.public_key
         elif self.private_key:
             try:
-                public_key = ssh_pubkey_gen(private_key=self.private_key, password=self.password)
+                public_key = ssh_pubkey_gen(private_key=self.private_key)
             except IOError as e:
                 return str(e)
         else:
@@ -103,7 +109,7 @@ class BaseAccount(OrgModelMixin):
     @property
     def private_key_obj(self):
         if self.private_key:
-            key_obj = ssh_key_string_to_obj(self.private_key, password=self.password)
+            key_obj = ssh_key_string_to_obj(self.private_key)
             return key_obj
         else:
             return None
