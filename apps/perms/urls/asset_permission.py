@@ -58,9 +58,12 @@ user_permission_urlpatterns = [
     # 收藏的资产
     path('<uuid:pk>/nodes/favorite/assets/', api.UserFavoriteGrantedAssetsApi.as_view(), name='user-ungrouped-assets'),
     path('nodes/favorite/assets/', api.MyFavoriteGrantedAssetsApi.as_view(), name='my-ungrouped-assets'),
-    # v3 中上面的 API 基本不用动
 
-    # 获取所有和资产-用户关联的账号列表
+    # 获取授权给用户的所有账号
+    path('<uuid:pk>/accounts/', api.UserAllGrantedAccountsApi.as_view(), name='user-accounts'),
+    path('accounts/', api.MyAllGrantedAccountsApi.as_view(), name='my-accounts'),
+
+    # 获取授权给用户某个资产的所有账号
     path('<uuid:pk>/assets/<uuid:asset_id>/accounts/', api.UserGrantedAssetAccountsApi.as_view(), name='user-asset-accounts'),
     path('assets/<uuid:asset_id>/accounts/', api.MyGrantedAssetAccountsApi.as_view(), name='my-asset-accounts'),
     # 用户登录资产的特殊账号, @INPUT, @USER 等
