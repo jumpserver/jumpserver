@@ -30,11 +30,13 @@ class AccountHistoricalRecords(HistoricalRecords):
             return
         super().post_save(instance, created, using=using, **kwargs)
 
-    def fields_included(self, model):
-        if self.included_fields:
-            fields = [i for i in model._meta.fields if i.name in self.included_fields]
-            return fields
-        return super().fields_included(model)
+    def create_history_model(self, model, inherited):
+        if self.included_fields and not self.excluded_fields:
+            self.excluded_fields = [
+                field.name for field in model._meta.fields
+                if field.name not in self.included_fields
+            ]
+        return super().create_history_model(model, inherited)
 
 
 class Account(AbsConnectivity, BaseAccount):

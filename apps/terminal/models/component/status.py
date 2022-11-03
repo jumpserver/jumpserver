@@ -22,7 +22,7 @@ class Status(models.Model):
     connections = models.IntegerField(verbose_name=_("Connections"), default=0)
     threads = models.IntegerField(verbose_name=_("Threads"), default=0)
     boot_time = models.FloatField(verbose_name=_("Boot Time"), default=0)
-    terminal = models.ForeignKey('terminal.Terminal', null=True, on_delete=models.CASCADE)
+    terminal = models.ForeignKey('terminal.Terminal', null=True, on_delete=models.CASCADE, related_name='status')
     date_created = models.DateTimeField(auto_now_add=True)
 
     CACHE_KEY = 'TERMINAL_STATUS_{}'

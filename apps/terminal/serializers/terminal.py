@@ -3,8 +3,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.drf.serializers import BulkModelSerializer
 from common.utils import is_uuid
-from users.serializers import ServiceAccountSerializer
 from common.utils import get_request_ip, pretty_string
+from users.serializers import ServiceAccountSerializer
 from .. import const
 
 from ..models import (

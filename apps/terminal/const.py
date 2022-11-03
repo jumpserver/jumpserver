@@ -50,6 +50,7 @@ class TerminalTypeChoices(TextChoices):
     celery = 'celery', 'Celery'
     magnus = 'magnus',  'Magnus'
     razor = 'razor',  'Razor'
+    tinker = 'tinker', 'Tinker'
 
     @classmethod
     def types(cls):

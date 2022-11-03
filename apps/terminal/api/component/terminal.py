@@ -42,37 +42,6 @@ class TerminalViewSet(JMSBulkModelViewSet):
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def create(self, request, *args, **kwargs):
-        if isinstance(request.data, list):
-            raise exceptions.BulkCreateNotSupport()
-
-        name = request.data.get('name')
-        remote_ip = request.META.get('REMOTE_ADDR')
-        x_real_ip = request.META.get('X-Real-IP')
-        remote_addr = x_real_ip or remote_ip
-
-        terminal = get_object_or_none(Terminal, name=name, is_deleted=False)
-        if terminal:
-            msg = 'Terminal name %s already used' % name
-            return Response({'msg': msg}, status=409)
-
-        serializer = self.serializer_class(data={
-            'name': name, 'remote_addr': remote_addr
-        })
-
-        if serializer.is_valid():
-            terminal = serializer.save()
-
-            # App should use id, token get access key, if accepted
-            token = uuid.uuid4().hex
-            cache.set(token, str(terminal.id), 3600)
-            data = {"id": str(terminal.id), "token": token, "msg": "Need accept"}
-            return Response(data, status=201)
-        else:
-            data = serializer.errors
-            logger.error("Register terminal error: {}".format(data))
-            return Response(data, status=400)
-
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
         s = self.request.query_params.get('status')

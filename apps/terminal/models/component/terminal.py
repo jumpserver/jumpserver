@@ -9,7 +9,7 @@ from common.utils import get_logger
 from users.models import User
 from orgs.utils import tmp_to_root_org
 from .status import Status
-from terminal import const
+from terminal.const import TerminalTypeChoices as TypeChoices
 from terminal.const import ComponentStatusChoices as StatusChoice
 from ..session import Session
 
@@ -99,16 +99,13 @@ class Terminal(StorageMixin, TerminalStatusMixin, models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     type = models.CharField(
-        choices=const.TerminalTypeChoices.choices, default=const.TerminalTypeChoices.koko.value,
+        choices=TypeChoices.choices, default=TypeChoices.koko,
         max_length=64, verbose_name=_('type')
     )
     remote_addr = models.CharField(max_length=128, blank=True, verbose_name=_('Remote Address'))
-    ssh_port = models.IntegerField(verbose_name=_('SSH Port'), default=2222)
-    http_port = models.IntegerField(verbose_name=_('HTTP Port'), default=5000)
     command_storage = models.CharField(max_length=128, verbose_name=_("Command storage"), default='default')
     replay_storage = models.CharField(max_length=128, verbose_name=_("Replay storage"), default='default')
     user = models.OneToOneField(User, related_name='terminal', verbose_name='Application User', null=True, on_delete=models.CASCADE)
-    is_accepted = models.BooleanField(default=False, verbose_name='Is Accepted')
     is_deleted = models.BooleanField(default=False)
     date_created = models.DateTimeField(auto_now_add=True)
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
@@ -167,9 +164,7 @@ class Terminal(StorageMixin, TerminalStatusMixin, models.Model):
 
     def __str__(self):
         status = "Active"
-        if not self.is_accepted:
-            status = "NotAccept"
-        elif self.is_deleted:
+        if self.is_deleted:
             status = "Deleted"
         elif not self.is_active:
             status = "Disable"
@@ -178,7 +173,6 @@ class Terminal(StorageMixin, TerminalStatusMixin, models.Model):
         return '%s: %s' % (self.name, status)
 
     class Meta:
-        ordering = ('is_accepted',)
         db_table = "terminal"
         verbose_name = _("Terminal")
         permissions = (
