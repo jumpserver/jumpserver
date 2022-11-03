@@ -4,6 +4,7 @@ from rest_framework import status, viewsets
 from rest_framework.response import Response
 
 from orgs.mixins.api import OrgBulkModelViewSet
+from common.const.choices import Trigger
 from assets import serializers
 from assets.tasks import execute_account_backup_plan
 from assets.models import (
@@ -38,9 +39,7 @@ class AccountBackupPlanExecutionViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         pid = serializer.data.get('plan')
-        task = execute_account_backup_plan.delay(
-            pid=pid, trigger=AccountBackupPlanExecution.Trigger.manual
-        )
+        task = execute_account_backup_plan.delay(pid=pid, trigger=Trigger.manual)
         return Response({'task': task.id}, status=status.HTTP_201_CREATED)
 
     def filter_queryset(self, queryset):

@@ -12,7 +12,7 @@ from .handlers import AccountBackupHandler
 logger = get_logger(__name__)
 
 
-class AccountBackupExecutionManager:
+class AccountBackupManager:
     def __init__(self, execution):
         self.execution = execution
         self.date_start = timezone.now()
