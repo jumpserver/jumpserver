@@ -82,15 +82,16 @@ class AssetAccountHandler(BaseAccountHandler):
 
         # TODO 可以优化一下查询 在账号上做 category 的缓存 避免数据量大时连表操作
         qs = Account.objects.filter(
-            asset__platform__category__in=categories
-        ).annotate(category=F('asset__platform__category'))
+            asset__platform__type__in=categories
+        ).annotate(category=F('asset__platform__type'))
+        print(qs, categories)
         if not qs.exists():
             return data_map
 
         category_dict = {}
         for i in AllTypes.grouped_choices_to_objs():
             for j in i['children']:
-                category_dict[j['value']] = j['label']
+                category_dict[j['value']] = j['display_name']
 
         header_fields = cls.get_header_fields(AccountSecretSerializer(qs.first()))
         account_category_map = defaultdict(list)
