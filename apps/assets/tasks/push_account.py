@@ -11,8 +11,9 @@ __all__ = [
 
 
 @org_aware_func("assets")
-def push_accounts_to_assets_util(accounts, assets, task_name):
+def push_accounts_to_assets_util(accounts, assets):
     from assets.models import PushAccountAutomation
+    task_name = gettext_noop("Push accounts to assets")
     task_name = PushAccountAutomation.generate_unique_name(task_name)
     account_usernames = list(accounts.values_list('username', flat=True))
 
@@ -33,5 +34,4 @@ def push_accounts_to_assets(account_ids, asset_ids):
         assets = Asset.objects.get(id=asset_ids)
         accounts = Account.objects.get(id=account_ids)
 
-    task_name = gettext_noop("Push accounts to assets")
-    return push_accounts_to_assets_util(accounts, assets, task_name)
+    return push_accounts_to_assets_util(accounts, assets)

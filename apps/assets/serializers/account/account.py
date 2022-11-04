@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from common.drf.serializers import SecretReadableMixin
 from common.drf.fields import ObjectRelatedField
+from assets.tasks import push_accounts_to_assets
 from assets.models import Account, AccountTemplate, Asset
 from .base import BaseAccountSerializer
 
@@ -47,8 +48,7 @@ class AccountSerializerCreateMixin(serializers.ModelSerializer):
     def create(self, validated_data):
         instance = super().create(validated_data)
         if self.push_now:
-            # Todo: push it
-            print("Start push account to asset")
+            push_accounts_to_assets.delay([instance.id], [instance.asset_id])
         return instance
 
 
