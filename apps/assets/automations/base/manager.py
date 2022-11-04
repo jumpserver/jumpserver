@@ -23,6 +23,7 @@ class PushOrVerifyHostCallbackMixin:
     execution: callable
     host_account_mapper: dict
     ignore_account: bool
+    need_privilege_account: bool
     generate_public_key: callable
     generate_private_key_path: callable
 
@@ -32,7 +33,7 @@ class PushOrVerifyHostCallbackMixin:
             return host
 
         accounts = asset.accounts.all()
-        if self.ignore_account and account:
+        if self.need_privilege_account and accounts.count() > 1 and account:
             accounts = accounts.exclude(id=account.id)
 
         if '*' not in self.execution.snapshot['accounts']:
@@ -114,9 +115,9 @@ class BasePlaybookManager:
         method_attr = '{}_method'.format(self.__class__.method_type())
 
         method_enabled = automation and \
-            getattr(automation, enabled_attr) and \
-            getattr(automation, method_attr) and \
-            getattr(automation, method_attr) in self.method_id_meta_mapper
+                         getattr(automation, enabled_attr) and \
+                         getattr(automation, method_attr) and \
+                         getattr(automation, method_attr) in self.method_id_meta_mapper
 
         if not method_enabled:
             host['error'] = _('{} disabled'.format(self.__class__.method_type()))
@@ -198,6 +199,9 @@ class BasePlaybookManager:
                 result = cb.host_results.get(host)
                 if state == 'ok':
                     self.on_host_success(host, result)
+                elif state == 'skipped':
+                    # TODO
+                    print('skipped: ', hosts)
                 else:
                     error = hosts.get(host)
                     self.on_host_error(host, error, result)
