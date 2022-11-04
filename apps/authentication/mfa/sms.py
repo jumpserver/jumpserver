@@ -2,7 +2,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 from .base import BaseMFA
-from common.sdk.sms import SendAndVerifySMSUtil
+from common.utils.verify_code import SendAndVerifyCodeUtil
 
 sms_failed_msg = _("SMS verify code invalid")
 
@@ -15,7 +15,7 @@ class MFASms(BaseMFA):
     def __init__(self, user):
         super().__init__(user)
         phone = user.phone if self.is_authenticated() else ''
-        self.sms = SendAndVerifySMSUtil(phone)
+        self.sms = SendAndVerifyCodeUtil(phone, backend=self.name)
 
     def check_code(self, code):
         assert self.is_authenticated()
@@ -37,7 +37,7 @@ class MFASms(BaseMFA):
         return True
 
     def send_challenge(self):
-        self.sms.gen_and_send()
+        self.sms.gen_and_send_async()
 
     @staticmethod
     def global_enabled():

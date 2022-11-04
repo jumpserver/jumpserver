@@ -209,7 +209,6 @@ class SystemUserTaskApi(generics.CreateAPIView):
 class SystemUserCommandFilterRuleListApi(generics.ListAPIView):
     rbac_perms = {
         'list': 'assets.view_commandfilterule',
-        'GET': 'assets.view_commandfilterule',
     }
 
     def get_serializer_class(self):

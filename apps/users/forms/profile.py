@@ -99,8 +99,11 @@ class UserTokenResetPasswordForm(forms.Form):
 
 
 class UserForgotPasswordForm(forms.Form):
-    email = forms.EmailField(label=_("Email"))
-    captcha = CaptchaField(label=_("Captcha"))
+    username = forms.CharField(label=_("Username"))
+    email = forms.CharField(label=_("Email"), required=False)
+    phone = forms.CharField(label=_('Phone'), required=False, max_length=11)
+    code = forms.CharField(label=_('Verify code'), max_length=6, required=False)
+    form_type = forms.CharField(widget=forms.HiddenInput({'value': 'email'}))
 
 
 class UserPasswordForm(UserTokenResetPasswordForm):

@@ -34,6 +34,7 @@ class ProtocolMixin:
         sqlserver = 'sqlserver', 'SQLServer'
         redis = 'redis', 'Redis'
         mongodb = 'mongodb', 'MongoDB'
+        clickhouse = 'clickhouse', 'ClickHouse'
         k8s = 'k8s', 'K8S'
 
     SUPPORT_PUSH_PROTOCOLS = [Protocol.ssh, Protocol.rdp]
@@ -46,7 +47,7 @@ class ProtocolMixin:
     ]
     APPLICATION_CATEGORY_DB_PROTOCOLS = [
         Protocol.mysql, Protocol.mariadb, Protocol.oracle,
-        Protocol.postgresql, Protocol.sqlserver,
+        Protocol.postgresql, Protocol.sqlserver, Protocol.clickhouse,
         Protocol.redis, Protocol.mongodb
     ]
     APPLICATION_CATEGORY_CLOUD_PROTOCOLS = [
