@@ -133,13 +133,7 @@ class SessionCookieMiddleware(MiddlewareMixin):
         response.set_cookie('jms_session_expire', value, max_age=age)
         request.session.pop('auth_session_expiration_required', None)
 
-    def process_request(self, request):
-        print("call process request")
-        time.sleep(0.8)
-
     def process_response(self, request, response: HttpResponse):
-        import time
-        time.sleep(2)
         self.set_cookie_session_prefix(request, response)
         self.set_cookie_public_key(request, response)
         self.set_cookie_session_expire(request, response)

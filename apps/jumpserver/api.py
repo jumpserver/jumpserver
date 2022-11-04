@@ -336,7 +336,6 @@ class HealthCheckView(HealthApiMixin):
         redis_status, redis_time = self.get_redis_status()
         db_status, db_time = self.get_db_status()
         status = all([redis_status, db_status])
-        time.sleep(1)
         data = {
             'status': status,
             'db_status': db_status,
