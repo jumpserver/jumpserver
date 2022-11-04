@@ -22,7 +22,7 @@ class AccountBackupExecutionTaskMsg(object):
             name)
 
     def publish(self, attachment_list=None):
-        send_mail_attachment_async.delay(
+        send_mail_attachment_async(
             self.subject, self.message, [self.user.email], attachment_list
         )
 
@@ -44,6 +44,6 @@ class ChangeSecretExecutionTaskMsg(object):
             name)
 
     def publish(self, attachments=None):
-        send_mail_attachment_async.delay(
+        send_mail_attachment_async(
             self.subject, self.message, [self.user.email], attachments
         )
