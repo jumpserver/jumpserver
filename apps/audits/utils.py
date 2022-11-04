@@ -1,14 +1,15 @@
 import csv
 import codecs
 
-from django.http import HttpResponse
-from django.db import transaction
-from django.utils import translation
+from itertools import chain
 
-from audits.models import OperateLog
-from common.utils import validate_ip, get_ip_city, get_request_ip, get_logger
-from jumpserver.utils import current_request
-from .const import DEFAULT_CITY, MODELS_NEED_RECORD
+from django.http import HttpResponse
+from django.db import models
+
+from settings.serializers import SettingsSerializer
+from common.utils import validate_ip, get_ip_city, get_logger
+from common.db import fields
+from .const import DEFAULT_CITY
 
 
 logger = get_logger(__name__)
@@ -46,23 +47,60 @@ def write_login_log(*args, **kwargs):
     UserLoginLog.objects.create(**kwargs)
 
 
-def create_operate_log(action, sender, resource):
-    user = current_request.user if current_request else None
-    if not user or not user.is_authenticated:
-        return
-    model_name = sender._meta.object_name
-    if model_name not in MODELS_NEED_RECORD:
-        return
-    with translation.override('en'):
-        resource_type = sender._meta.verbose_name
-    remote_addr = get_request_ip(current_request)
+def get_resource_display(resource):
+    resource_display = str(resource)
+    setting_serializer = SettingsSerializer()
+    label = setting_serializer.get_field_label(resource_display)
+    if label is not None:
+        resource_display = label
+    return resource_display
 
-    data = {
-        "user": str(user), 'action': action, 'resource_type': resource_type,
-        'resource': str(resource), 'remote_addr': remote_addr,
-    }
-    with transaction.atomic():
-        try:
-            OperateLog.objects.create(**data)
-        except Exception as e:
-            logger.error("Create operate log error: {}".format(e))
+
+def model_to_dict_for_operate_log(
+        instance, include_model_fields=True, include_related_fields=True
+):
+    need_continue_fields = ['date_updated']
+    opts = instance._meta
+    data = {}
+    for f in chain(opts.concrete_fields, opts.private_fields):
+        if isinstance(f, (models.FileField, models.ImageField)):
+            continue
+
+        if getattr(f, 'attname', None) in need_continue_fields:
+            continue
+
+        value = getattr(instance, f.name) or getattr(instance, f.attname)
+        if not isinstance(value, bool) and not value:
+            continue
+
+        if getattr(f, 'primary_key', False):
+            f.verbose_name = 'id'
+        elif isinstance(f, (
+            fields.EncryptCharField, fields.EncryptTextField,
+            fields.EncryptJsonDictCharField, fields.EncryptJsonDictTextField
+        )) or getattr(f, 'attname', '') == 'password':
+            value = 'encrypt|%s' % value
+        elif isinstance(value, list):
+            value = [str(v) for v in value]
+
+        if include_model_fields or getattr(f, 'primary_key', False):
+            data[str(f.verbose_name)] = value
+
+    if include_related_fields:
+        for f in chain(opts.many_to_many, opts.related_objects):
+            value = []
+            if instance.pk is not None:
+                related_name = getattr(f, 'attname', '') or getattr(f, 'related_name', '')
+                if related_name:
+                    try:
+                        value = [str(i) for i in getattr(instance, related_name).all()]
+                    except:
+                        pass
+            if not value:
+                continue
+            try:
+                field_key = getattr(f, 'verbose_name', None) or f.related_model._meta.verbose_name
+                data[str(field_key)] = value
+            except:
+                pass
+    return data

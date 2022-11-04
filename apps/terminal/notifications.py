@@ -70,6 +70,9 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
     def __init__(self, command):
         self.command = command
 
+    def __str__(self):
+        return str(self.message_type_label)
+
     @classmethod
     def gen_test_msg(cls):
         command = Command.objects.first().to_dict()

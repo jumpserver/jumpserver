@@ -7,6 +7,8 @@ __all__ = [
 
 
 class SSOSettingSerializer(serializers.Serializer):
+    PREFIX_TITLE = '%s-%s' % (_('Authentication'), _('SSO'))
+
     AUTH_SSO = serializers.BooleanField(
         required=False, label=_('Enable SSO auth'),
         help_text=_("Other service can using SSO token login to JumpServer without password")

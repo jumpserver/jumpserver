@@ -36,6 +36,7 @@ class LDAPUserSerializer(serializers.Serializer):
 
 class LDAPSettingSerializer(serializers.Serializer):
     # encrypt_fields 现在使用 write_only 来判断了
+    PREFIX_TITLE = '%s-%s' % (_('Authentication'), _('LDAP'))
 
     AUTH_LDAP_SERVER_URI = serializers.CharField(
         required=True, max_length=1024, label=_('LDAP server'),

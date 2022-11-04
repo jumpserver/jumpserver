@@ -5,6 +5,8 @@ __all__ = ['CleaningSerializer']
 
 
 class CleaningSerializer(serializers.Serializer):
+    PREFIX_TITLE = _('Period clean')
+
     LOGIN_LOG_KEEP_DAYS = serializers.IntegerField(
         min_value=1, max_value=9999,
         label=_("Login log keep days"), help_text=_("Unit: day")

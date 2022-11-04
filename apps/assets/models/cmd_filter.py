@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from users.models import User, UserGroup
 from applications.models import Application
-from ..models import SystemUser, Asset
+from ..models import SystemUser, Asset, Node
 
 from common.utils import lazyproperty, get_logger, get_object_or_none
 from orgs.mixins.models import OrgModelMixin
@@ -33,6 +33,10 @@ class CommandFilter(OrgModelMixin):
         'users.UserGroup', related_name='cmd_filters', blank=True,
         verbose_name=_("User group"),
     )
+    nodes = models.ManyToManyField(
+        'assets.Node', related_name='cmd_filters', blank=True,
+        verbose_name=_("Nodes")
+    )
     assets = models.ManyToManyField(
         'assets.Asset', related_name='cmd_filters', blank=True,
         verbose_name=_("Asset")
@@ -46,8 +50,8 @@ class CommandFilter(OrgModelMixin):
     )
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     comment = models.TextField(blank=True, default='', verbose_name=_("Comment"))
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
+    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
+    date_updated = models.DateTimeField(auto_now=True, verbose_name=_('Date updated'))
     created_by = models.CharField(
         max_length=128, blank=True, default='', verbose_name=_('Created by')
     )
@@ -189,7 +193,8 @@ class CommandFilterRule(OrgModelMixin):
 
     @classmethod
     def get_queryset(cls, user_id=None, user_group_id=None, system_user_id=None,
-                     asset_id=None, application_id=None, org_id=None):
+                     asset_id=None, node_id=None, application_id=None, org_id=None):
+        # user & user_group
         user_groups = []
         user = get_object_or_none(User, pk=user_id)
         if user:
@@ -198,8 +203,18 @@ class CommandFilterRule(OrgModelMixin):
         if user_group:
             org_id = user_group.org_id
             user_groups.append(user_group)
-        system_user = get_object_or_none(SystemUser, pk=system_user_id)
+
+        # asset & node
+        nodes = []
         asset = get_object_or_none(Asset, pk=asset_id)
+        if asset:
+            nodes.extend(asset.get_all_nodes())
+        node = get_object_or_none(Node, pk=node_id)
+        if node:
+            org_id = node.org_id
+            nodes.extend(list(node.get_ancestors(with_self=True)))
+
+        system_user = get_object_or_none(SystemUser, pk=system_user_id)
         application = get_object_or_none(Application, pk=application_id)
         q = Q()
         if user:
@@ -212,6 +227,8 @@ class CommandFilterRule(OrgModelMixin):
         if asset:
             org_id = asset.org_id
             q |= Q(assets=asset)
+        if nodes:
+            q |= Q(nodes__in=set(nodes))
         if application:
             org_id = application.org_id
             q |= Q(applications=application)

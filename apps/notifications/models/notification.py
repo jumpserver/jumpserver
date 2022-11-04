@@ -1,16 +1,23 @@
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
-from common.db.models import JMSModel
+from common.db.models import JMSModel, CASCADE_SIGNAL_SKIP
 
 __all__ = ('SystemMsgSubscription', 'UserMsgSubscription')
 
 
 class UserMsgSubscription(JMSModel):
-    user = models.OneToOneField('users.User', related_name='user_msg_subscription', on_delete=models.CASCADE)
-    receive_backends = models.JSONField(default=list)
+    user = models.OneToOneField(
+        'users.User', related_name='user_msg_subscription', on_delete=CASCADE_SIGNAL_SKIP,
+        verbose_name=_('User')
+    )
+    receive_backends = models.JSONField(default=list, verbose_name=_('receive backend'))
+
+    class Meta:
+        verbose_name = _('User message')
 
     def __str__(self):
-        return f'{self.user} subscription: {self.receive_backends}'
+        return _('{} subscription').format(self.user)
 
 
 class SystemMsgSubscription(JMSModel):
@@ -21,11 +28,19 @@ class SystemMsgSubscription(JMSModel):
 
     message_type_label = ''
 
-    def __str__(self):
-        return f'{self.message_type}'
+    class Meta:
+        verbose_name = _('System message')
 
-    def __repr__(self):
-        return self.__str__()
+    def set_message_type_label(self):
+        # 采用手动调用，没设置成 property 的方式
+        # 因为目前只有界面修改时会用到这个属性，避免实例化时占用资源计算
+        from ..notifications import system_msgs
+        msg_label = ''
+        for msg in system_msgs:
+            if msg.get('message_type') == self.message_type:
+                msg_label = msg.get('message_type_label', '')
+                break
+        self.message_type_label = msg_label
 
     @property
     def receivers(self):
@@ -47,3 +62,9 @@ class SystemMsgSubscription(JMSModel):
             receviers.append(recevier)
 
         return receviers
+
+    def __str__(self):
+        return f'{self.message_type_label}' or f'{self.message_type}'
+
+    def __repr__(self):
+        return self.__str__()

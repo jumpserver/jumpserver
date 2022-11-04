@@ -11,7 +11,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import get_logger, lazyproperty
+from common.utils import get_logger, lazyproperty, make_dirs
 from common.utils.translate import translate_value
 from common.db.fields import (
     JsonListTextField, JsonDictCharField, EncryptJsonDictCharField,
@@ -274,7 +274,7 @@ class AdHocExecution(OrgModelMixin):
         dt = datetime.datetime.now().strftime('%Y-%m-%d')
         log_dir = os.path.join(settings.PROJECT_DIR, 'data', 'ansible', dt)
         if not os.path.exists(log_dir):
-            os.makedirs(log_dir)
+            make_dirs(log_dir)
         return os.path.join(log_dir, str(self.id) + '.log')
 
     def start_runner(self):

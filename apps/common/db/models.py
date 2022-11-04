@@ -19,6 +19,8 @@ from django.db.models import QuerySet
 from django.db.models.functions import Concat
 from django.utils.translation import ugettext_lazy as _
 
+from ..const.signals import SKIP_SIGNAL
+
 
 class Choice(str):
     def __new__(cls, value, label=''):  # `deepcopy` 的时候不会传 `label`
@@ -123,6 +125,9 @@ class JMSModel(JMSBaseModel):
 
     class Meta:
         abstract = True
+
+    def __str__(self):
+        return str(self.id)
 
 
 def concated_display(name1, name2):
@@ -238,3 +243,14 @@ class MultiTableChildQueryset(QuerySet):
             self._batched_insert(objs, self.model._meta.local_fields, batch_size)
 
         return objs
+
+
+def CASCADE_SIGNAL_SKIP(collector, field, sub_objs, using):
+    # 级联删除时，操作日志标记不保存，以免用户混淆
+    try:
+        for obj in sub_objs:
+            setattr(obj, SKIP_SIGNAL, True)
+    except:
+        pass
+
+    CASCADE(collector, field, sub_objs, using)

@@ -43,11 +43,11 @@ class Migration(migrations.Migration):
                 ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('message_type', models.CharField(max_length=128)),
-                ('receive_backends', models.JSONField(default=list)),
+                ('receive_backends', models.JSONField(default=list, verbose_name='receive backend')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='user_msg_subscription', to=settings.AUTH_USER_MODEL)),
             ],
             options={
-                'abstract': False,
+                'abstract': False, 'verbose_name': 'User message'
             },
         ),
         migrations.CreateModel(
@@ -64,7 +64,7 @@ class Migration(migrations.Migration):
                 ('users', models.ManyToManyField(related_name='system_msg_subscriptions', to=settings.AUTH_USER_MODEL)),
             ],
             options={
-                'abstract': False,
+                'abstract': False, 'verbose_name': 'System message'
             },
         ),
         migrations.CreateModel(

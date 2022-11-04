@@ -31,6 +31,7 @@ type_serializer_classes_mapping = {
     const.AppType.sqlserver.value: application_type.SQLServerSerializer,
     const.AppType.redis.value: application_type.RedisSerializer,
     const.AppType.mongodb.value: application_type.MongoDBSerializer,
+    const.AppType.clickhouse.value: application_type.ClickHouseSerializer,
     # cloud
     const.AppType.k8s.value: application_type.K8SSerializer
 }

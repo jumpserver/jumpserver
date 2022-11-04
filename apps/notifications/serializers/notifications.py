@@ -22,6 +22,10 @@ class SystemMsgSubscriptionSerializer(BulkModelSerializer):
             'receive_backends': {'required': True}
         }
 
+    def update(self, instance, validated_data):
+        instance.set_message_type_label()
+        return super().update(instance, validated_data)
+
 
 class SystemMsgSubscriptionByCategorySerializer(serializers.Serializer):
     category = serializers.CharField()

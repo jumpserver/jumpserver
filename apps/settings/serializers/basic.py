@@ -24,6 +24,8 @@ class AnnouncementSerializer(serializers.Serializer):
 
 
 class BasicSettingSerializer(serializers.Serializer):
+    PREFIX_TITLE = _('Basic')
+
     SITE_URL = serializers.URLField(
         required=True, label=_("Site url"),
         help_text=_('eg: http://dev.jumpserver.org:8080')
