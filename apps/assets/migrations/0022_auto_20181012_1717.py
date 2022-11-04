@@ -21,8 +21,8 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=64, verbose_name='Name')),
                 ('is_active', models.BooleanField(default=True, verbose_name='Is active')),
                 ('comment', models.TextField(blank=True, default='', verbose_name='Comment')),
-                ('date_created', models.DateTimeField(auto_now_add=True)),
-                ('date_updated', models.DateTimeField(auto_now=True)),
+                ('date_created', models.DateTimeField(auto_now_add=True, verbose_name='Date created')),
+                ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
                 ('created_by', models.CharField(blank=True, default='', max_length=128, verbose_name='Created by')),
             ],
             options={

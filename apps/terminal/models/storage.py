@@ -10,6 +10,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from common.mixins import CommonModelMixin
+from common.plugins.es import QuerySet as ESQuerySet
 from common.utils import get_logger
 from common.db.fields import EncryptJsonDictTextField
 from common.utils.timezone import local_now_date_display
@@ -117,7 +118,8 @@ class CommandStorage(CommonStorageModelMixin, CommonModelMixin):
 
         if self.type in TYPE_ENGINE_MAPPING:
             engine_mod = import_module(TYPE_ENGINE_MAPPING[self.type])
-            qs = engine_mod.QuerySet(self.config)
+            store = engine_mod.CommandStore(self.config)
+            qs = ESQuerySet(store)
             qs.model = Command
             return qs
 

@@ -50,8 +50,8 @@ class CommandFilter(OrgModelMixin):
     )
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     comment = models.TextField(blank=True, default='', verbose_name=_("Comment"))
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
+    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
+    date_updated = models.DateTimeField(auto_now=True, verbose_name=_('Date updated'))
     created_by = models.CharField(
         max_length=128, blank=True, default='', verbose_name=_('Created by')
     )

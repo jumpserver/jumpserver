@@ -9,6 +9,7 @@ __all__ = [
 
 
 class CommonSettingSerializer(serializers.Serializer):
+    PREFIX_TITLE = '%s-%s' % (_('Authentication'), _('OIDC'))
     # OpenID 公有配置参数 (version <= 1.5.8 或 version >= 1.5.8)
     BASE_SITE_URL = serializers.CharField(
         required=False, allow_null=True, allow_blank=True,
