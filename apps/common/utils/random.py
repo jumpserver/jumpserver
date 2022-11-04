@@ -19,18 +19,24 @@ def random_ip():
 
 
 def random_string(length, lower=True, upper=True, digit=True, special_char=False):
-    chars, no_punctuation_chars = '', ''
-    if lower:
-        chars += string.ascii_lowercase
-    if upper:
-        chars += string.ascii_uppercase
+    chars = string.ascii_letters
     if digit:
         chars += string.digits
 
-    no_punctuation_chars = chars
-    if special_char:
-        chars += string_punctuation
+    while True:
+        password = list(random.choice(chars) for i in range(length))
+        if upper and not any(c.upper() for c in password):
+            continue
+        if lower and not any(c.lower() for c in password):
+            continue
+        if digit and not any(c.isdigit() for c in password):
+            continue
+        break
 
-    random_str = ''.join(random.sample(chars, length - 1))
-    random_prefix = random.choice(no_punctuation_chars)
-    return random_prefix + random_str
+    if special_char:
+        spc = random.choice(string_punctuation)
+        i = random.choice(range(1, len(password)))
+        password[i] = spc
+
+    password = ''.join(password)
+    return password
