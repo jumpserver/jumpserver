@@ -2,8 +2,8 @@
   gather_facts: no
   tasks:
     - name: Add user account.username
-        ansible.builtin.user:
-          name: "{{ account.username }}"
+      ansible.builtin.user:
+        name: "{{ account.username }}"
 
     - name: Set account.username password
       ansible.builtin.user:
