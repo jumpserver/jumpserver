@@ -65,8 +65,8 @@ class AssetSerializer(OrgResourceSerializerMixin, WritableNestedModelSerializer)
     platform = ObjectRelatedField(required=False, queryset=Platform.objects, label=_('Platform'))
     nodes = ObjectRelatedField(many=True, required=False, queryset=Node.objects, label=_('Nodes'))
     labels = AssetLabelSerializer(many=True, required=False, label=_('Labels'))
-    accounts = AssetAccountSerializer(many=True, required=False, label=_('Accounts'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
+    accounts = AssetAccountSerializer(many=True, required=False, label=_('Accounts'))
 
     class Meta:
         model = Asset
@@ -74,7 +74,7 @@ class AssetSerializer(OrgResourceSerializerMixin, WritableNestedModelSerializer)
         fields_small = fields_mini + ['is_active', 'comment']
         fields_fk = ['domain', 'platform', 'platform']
         fields_m2m = [
-            'nodes', 'labels', 'accounts', 'protocols', 'nodes_display',
+            'nodes', 'labels', 'protocols', 'accounts', 'nodes_display',
         ]
         read_only_fields = [
             'category', 'type', 'specific',

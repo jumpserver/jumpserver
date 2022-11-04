@@ -9,7 +9,7 @@ __all__ = ['PushAccountAutomation']
 class PushAccountAutomation(BaseAutomation):
 
     def save(self, *args, **kwargs):
-        self.type = AutomationTypes.verify_account
+        self.type = AutomationTypes.push_account
         super().save(*args, **kwargs)
 
     class Meta:

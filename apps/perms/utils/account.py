@@ -39,7 +39,9 @@ class PermAccountUtil(AssetPermissionUtil):
             for aid in account_ids:
                 aid_actions_map[str(aid)] |= actions
         account_ids = list(aid_actions_map.keys())
-        accounts = Account.objects.filter(id__in=account_ids)
+        accounts = Account.objects.filter(id__in=account_ids).order_by(
+            'asset__name', 'name', 'username'
+        )
         if with_actions:
             for account in accounts:
                 account.actions = aid_actions_map.get(str(account.id))

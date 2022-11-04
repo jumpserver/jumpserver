@@ -52,7 +52,7 @@ class AssetPermissionUtil(object):
             .values_list('assetpermission_id', flat=True).distinct()
         perm_ids.update(asset_perm_ids)
         if with_node:
-            nodes = asset.get_all_nodes(flat=True)
+            nodes = asset.get_all_nodes()
             node_perm_ids = self.get_permissions_for_nodes(nodes, flat=True)
             perm_ids.update(node_perm_ids)
         if flat:

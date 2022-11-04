@@ -6,7 +6,7 @@ logger = get_logger(__name__)
 
 
 class VerifyAccountManager(PushOrVerifyHostCallbackMixin, BasePlaybookManager):
-    ignore_account = False
+    need_privilege_account = False
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
