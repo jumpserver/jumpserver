@@ -118,13 +118,13 @@ class ReplayStorageTypeAzureSerializer(serializers.Serializer):
 
 # mapping
 replay_storage_type_serializer_classes_mapping = {
-    const.ReplayStorageTypeChoices.s3.value: ReplayStorageTypeS3Serializer,
-    const.ReplayStorageTypeChoices.ceph.value: ReplayStorageTypeCephSerializer,
-    const.ReplayStorageTypeChoices.swift.value: ReplayStorageTypeSwiftSerializer,
-    const.ReplayStorageTypeChoices.oss.value: ReplayStorageTypeOSSSerializer,
-    const.ReplayStorageTypeChoices.azure.value: ReplayStorageTypeAzureSerializer,
-    const.ReplayStorageTypeChoices.obs.value: ReplayStorageTypeOBSSerializer,
-    const.ReplayStorageTypeChoices.cos.value: ReplayStorageTypeCOSSerializer
+    const.ReplayStorageType.s3.value: ReplayStorageTypeS3Serializer,
+    const.ReplayStorageType.ceph.value: ReplayStorageTypeCephSerializer,
+    const.ReplayStorageType.swift.value: ReplayStorageTypeSwiftSerializer,
+    const.ReplayStorageType.oss.value: ReplayStorageTypeOSSSerializer,
+    const.ReplayStorageType.azure.value: ReplayStorageTypeAzureSerializer,
+    const.ReplayStorageType.obs.value: ReplayStorageTypeOBSSerializer,
+    const.ReplayStorageType.cos.value: ReplayStorageTypeCOSSerializer
 }
 
 
@@ -172,7 +172,7 @@ class CommandStorageTypeESSerializer(serializers.Serializer):
 
 # mapping
 command_storage_type_serializer_classes_mapping = {
-    const.CommandStorageTypeChoices.es.value: CommandStorageTypeESSerializer
+    const.CommandStorageType.es.value: CommandStorageTypeESSerializer
 }
 
 

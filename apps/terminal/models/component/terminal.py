@@ -1,16 +1,15 @@
 import uuid
 
+from django.utils import timezone
 from django.db import models
 from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from common.utils import get_logger
+from common.utils import get_logger, lazyproperty
 from users.models import User
 from orgs.utils import tmp_to_root_org
-from .status import Status
-from terminal.const import TerminalTypeChoices as TypeChoices
-from terminal.const import ComponentStatusChoices as StatusChoice
+from terminal.const import TerminalType as TypeChoices, ComponentLoad as StatusChoice
 from ..session import Session
 
 
@@ -18,42 +17,24 @@ logger = get_logger(__file__)
 
 
 class TerminalStatusMixin:
-    ALIVE_KEY = 'TERMINAL_ALIVE_{}'
     id: str
+    ALIVE_KEY = 'TERMINAL_ALIVE_{}'
+    status_set: models.Manager
 
-    @property
-    def latest_status(self):
-        return Status.get_terminal_latest_status(self)
+    @lazyproperty
+    def last_stat(self):
+        return self.status_set.order_by('date_created').last()
 
-    @property
-    def latest_status_display(self):
-        return self.latest_status.label
-
-    @property
-    def latest_stat(self):
-        return Status.get_terminal_latest_stat(self)
-
-    @property
-    def is_normal(self):
-        return self.latest_status == StatusChoice.normal
-
-    @property
-    def is_high(self):
-        return self.latest_status == StatusChoice.high
-
-    @property
-    def is_critical(self):
-        return self.latest_status == StatusChoice.critical
+    @lazyproperty
+    def load(self):
+        from ...utils import ComputeLoadUtil
+        return ComputeLoadUtil.compute_load(self.last_stat)
 
     @property
     def is_alive(self):
-        key = self.ALIVE_KEY.format(self.id)
-        # return self.latest_status != StatusChoice.offline
-        return cache.get(key, False)
-
-    def set_alive(self, ttl=120):
-        key = self.ALIVE_KEY.format(self.id)
-        cache.set(key, True, ttl)
+        if not self.last_stat:
+            return False
+        return self.last_stat.date_created > timezone.now() - timezone.timedelta(seconds=120)
 
 
 class StorageMixin:

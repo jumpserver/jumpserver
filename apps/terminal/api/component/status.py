@@ -21,7 +21,7 @@ __all__ = ['StatusViewSet', 'ComponentsMetricsAPIView']
 
 class StatusViewSet(viewsets.ModelViewSet):
     queryset = Status.objects.all()
-    serializer_class = serializers.StatusSerializer
+    serializer_class = serializers.StatSerializer
     session_serializer_class = serializers.SessionSerializer
     task_serializer_class = serializers.TaskSerializer
 
@@ -52,7 +52,7 @@ class StatusViewSet(viewsets.ModelViewSet):
         terminal_id = self.kwargs.get("terminal", None)
         if terminal_id:
             terminal = get_object_or_404(Terminal, id=terminal_id)
-            return terminal.status.all()
+            return terminal.status_set.all()
         return super().get_queryset()
 
 

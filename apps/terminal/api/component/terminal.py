@@ -47,7 +47,7 @@ class TerminalViewSet(JMSBulkModelViewSet):
         s = self.request.query_params.get('status')
         if not s:
             return queryset
-        filtered_queryset_id = [str(q.id) for q in queryset if q.latest_status == s]
+        filtered_queryset_id = [str(q.id) for q in queryset if q.load == s]
         queryset = queryset.filter(id__in=filtered_queryset_id)
         return queryset
 
