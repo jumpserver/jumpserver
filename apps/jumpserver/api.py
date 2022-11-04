@@ -308,14 +308,14 @@ class HealthCheckView(HealthApiMixin):
     def get_db_status():
         t1 = time.time()
         try:
-            User.objects.first()
+            ok = User.objects.first() is not None
             t2 = time.time()
-            return True, t2 - t1
-        except:
-            t2 = time.time()
-            return False, t2 - t1
+            return ok, t2 - t1
+        except Exception as e:
+            return False, str(e)
 
-    def get_redis_status(self):
+    @staticmethod
+    def get_redis_status():
         key = 'HEALTH_CHECK'
 
         t1 = time.time()
@@ -324,24 +324,26 @@ class HealthCheckView(HealthApiMixin):
             cache.set(key, '1', 10)
             got = cache.get(key)
             t2 = time.time()
+
             if value == got:
-                return True, t2 -t1
-            return False, t2 -t1
-        except:
-            t2 = time.time()
-            return False, t2 - t1
+                return True, t2 - t1
+            return False, 'Value not match'
+        except Exception as e:
+            return False, str(e)
 
     def get(self, request):
+        start = time.time()
         redis_status, redis_time = self.get_redis_status()
         db_status, db_time = self.get_db_status()
         status = all([redis_status, db_status])
+        time.sleep(1)
         data = {
             'status': status,
             'db_status': db_status,
             'db_time': db_time,
             'redis_status': redis_status,
             'redis_time': redis_time,
-            'time': int(time.time())
+            'time': int(time.time()),
         }
         return Response(data)
 

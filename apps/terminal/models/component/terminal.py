@@ -1,4 +1,5 @@
 import uuid
+import time
 
 from django.utils import timezone
 from django.db import models
@@ -34,7 +35,7 @@ class TerminalStatusMixin:
     def is_alive(self):
         if not self.last_stat:
             return False
-        return self.last_stat.date_created > timezone.now() - timezone.timedelta(seconds=120)
+        return time.time() - self.last_stat.date_created.timestamp() < 150
 
 
 class StorageMixin:

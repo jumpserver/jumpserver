@@ -31,6 +31,7 @@ class BaseAccountSerializer(BulkOrgResourceModelSerializer):
         extra_kwargs = {
             'secret': {'write_only': True},
             'passphrase': {'write_only': True},
+            'specific': {'label': _('Specific')},
         }
 
     def validate_private_key(self, private_key):
