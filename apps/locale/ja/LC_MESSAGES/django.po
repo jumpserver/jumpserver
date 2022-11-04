@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-28 09:17+0800\n"
+"POT-Creation-Date: 2022-11-04 11:37+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -157,11 +157,13 @@ msgstr "コンマ区切り文字列の形式。* はすべて一致すること�
 #: acls/serializers/login_asset_acl.py:51 assets/models/base.py:176
 #: assets/models/gathered_user.py:15 audits/models.py:121
 #: authentication/forms.py:25 authentication/forms.py:27
-#: authentication/models.py:260
+#: authentication/models.py:260 authentication/serializers/password_mfa.py:25
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
-#: ops/models/adhoc.py:159 users/forms/profile.py:32 users/models/user.py:667
-#: users/templates/users/_msg_user_created.html:12
+#: ops/models/adhoc.py:159 users/forms/profile.py:32 users/forms/profile.py:102
+#: users/models/user.py:667 users/templates/users/_msg_user_created.html:12
+#: users/templates/users/forgot_password.html:51
+#: users/templates/users/forgot_password.html:98
 #: xpack/plugins/change_auth_plan/models/asset.py:34
 #: xpack/plugins/change_auth_plan/models/asset.py:195
 #: xpack/plugins/cloud/serializers/account_attrs.py:26
@@ -837,7 +839,10 @@ msgstr "帯域幅"
 msgid "Contact"
 msgstr "連絡先"
 
-#: assets/models/cluster.py:22 users/models/user.py:689
+#: assets/models/cluster.py:22 authentication/serializers/password_mfa.py:29
+#: users/forms/profile.py:104 users/models/user.py:689
+#: users/templates/users/forgot_password.html:59
+#: users/templates/users/forgot_password.html:103
 msgid "Phone"
 msgstr "電話"
 
@@ -1824,6 +1829,30 @@ msgstr "この操作には、MFAを検証する必要があります"
 msgid "Current user not support mfa type: {}"
 msgstr "現在のユーザーはmfaタイプをサポートしていません: {}"
 
+#: authentication/api/password.py:29 terminal/api/session.py:224
+#: users/views/profile/reset.py:74
+msgid "User does not exist: {}"
+msgstr "ユーザーが存在しない: {}"
+
+#: authentication/api/password.py:29
+msgid "No user matched"
+msgstr "ユーザーにマッチしなかった"
+
+#: authentication/api/password.py:33
+msgid ""
+"The user is from {}, please go to the corresponding system to change the "
+"password"
+msgstr ""
+"ユーザーは {}からです。対応するシステムにアクセスしてパスワードを変更してくだ"
+"さい。"
+
+#: authentication/api/password.py:59
+#: authentication/templates/authentication/login.html:256
+#: users/templates/users/forgot_password.html:33
+#: users/templates/users/forgot_password.html:34
+msgid "Forgot password"
+msgstr "パスワードを忘れた"
+
 #: authentication/apps.py:7
 msgid "Authentication"
 msgstr "認証"
@@ -2246,6 +2275,20 @@ msgstr "期限切れ時間"
 msgid "Asset or application required"
 msgstr "アセットまたはアプリが必要"
 
+#: authentication/serializers/password_mfa.py:25
+#: authentication/serializers/password_mfa.py:29
+#: authentication/serializers/password_mfa.py:33
+#: users/templates/users/forgot_password.html:95
+msgid "The {} cannot be empty"
+msgstr "{} 空にしてはならない"
+
+#: authentication/serializers/password_mfa.py:33
+#: notifications/backends/__init__.py:10 users/forms/profile.py:103
+#: users/models/user.py:671 users/templates/users/forgot_password.html:55
+#: users/templates/users/forgot_password.html:108
+msgid "Email"
+msgstr "メール"
+
 #: authentication/serializers/token.py:79
 #: perms/serializers/application/permission.py:20
 #: perms/serializers/application/permission.py:41
@@ -2309,7 +2352,6 @@ msgid "Play CAPTCHA as audio file"
 msgstr "CAPTCHAをオーディオファイルとして再生する"
 
 #: authentication/templates/authentication/_captcha_field.html:15
-#: users/forms/profile.py:103
 msgid "Captcha"
 msgstr "キャプチャ"
 
@@ -2335,6 +2377,7 @@ msgstr "コードエラー"
 #: authentication/templates/authentication/_msg_different_city.html:3
 #: authentication/templates/authentication/_msg_oauth_bind.html:3
 #: authentication/templates/authentication/_msg_reset_password.html:3
+#: authentication/templates/authentication/_msg_reset_password_code.html:9
 #: authentication/templates/authentication/_msg_rest_password_success.html:2
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:2
 #: jumpserver/conf.py:402 ops/tasks.py:145 ops/tasks.py:148
@@ -2394,6 +2437,21 @@ msgstr "このリンクは1時間有効です。有効期限が切れた後"
 msgid "request new one"
 msgstr "新しいものを要求する"
 
+#: authentication/templates/authentication/_msg_reset_password_code.html:12
+#: terminal/models/sharing.py:26 terminal/models/sharing.py:80
+#: users/forms/profile.py:105 users/templates/users/forgot_password.html:63
+msgid "Verify code"
+msgstr "コードの確認"
+
+#: authentication/templates/authentication/_msg_reset_password_code.html:15
+msgid ""
+"Copy the verification code to the Reset Password page to reset the password."
+msgstr "パスワードリセットページにcaptchaをコピーし、パスワードをリセットする"
+
+#: authentication/templates/authentication/_msg_reset_password_code.html:18
+msgid "The validity period of the verification code is one minute"
+msgstr "認証コードの有効時間は 1 分"
+
 #: authentication/templates/authentication/_msg_rest_password_success.html:5
 msgid "Your password has just been successfully updated"
 msgstr "パスワードが正常に更新されました"
@@ -2437,12 +2495,6 @@ msgstr "キャンセル"
 msgid "Welcome back, please enter username and password to login"
 msgstr ""
 "おかえりなさい、ログインするためにユーザー名とパスワードを入力してください"
-
-#: authentication/templates/authentication/login.html:256
-#: users/templates/users/forgot_password.html:16
-#: users/templates/users/forgot_password.html:17
-msgid "Forgot password"
-msgstr "パスワードを忘れた"
 
 #: authentication/templates/authentication/login.html:264
 #: templates/_header_bar.html:89
@@ -2776,15 +2828,15 @@ msgstr "SMSプロバイダーはサポートしていません: {}"
 msgid "SMS verification code signature or template invalid"
 msgstr "SMS検証コードの署名またはテンプレートが無効"
 
-#: common/sdk/sms/utils.py:15
+#: common/sdk/sms/exceptions.py:8
 msgid "The verification code has expired. Please resend it"
 msgstr "確認コードの有効期限が切れています。再送信してください"
 
-#: common/sdk/sms/utils.py:20
+#: common/sdk/sms/exceptions.py:13
 msgid "The verification code is incorrect"
 msgstr "確認コードが正しくありません"
 
-#: common/sdk/sms/utils.py:25
+#: common/sdk/sms/exceptions.py:18
 msgid "Please wait {} seconds before sending"
 msgstr "{} 秒待ってから送信してください"
 
@@ -2851,11 +2903,6 @@ msgstr ""
 #: notifications/apps.py:7
 msgid "Notifications"
 msgstr "通知"
-
-#: notifications/backends/__init__.py:10 users/forms/profile.py:102
-#: users/models/user.py:671
-msgid "Email"
-msgstr "メール"
 
 #: notifications/backends/__init__.py:13
 msgid "Site message"
@@ -4750,14 +4797,17 @@ msgstr ""
 "        "
 
 #: templates/_mfa_login_field.html:28
+#: users/templates/users/forgot_password.html:65
 msgid "Send verification code"
 msgstr "確認コードを送信"
 
 #: templates/_mfa_login_field.html:106
+#: users/templates/users/forgot_password.html:122
 msgid "Wait: "
 msgstr "待つ:"
 
 #: templates/_mfa_login_field.html:116
+#: users/templates/users/forgot_password.html:138
 msgid "The verification code has been sent"
 msgstr "確認コードが送信されました"
 
@@ -4821,10 +4871,6 @@ msgstr "セッションが存在しません: {}"
 #: terminal/api/session.py:219
 msgid "Session is finished or the protocol not supported"
 msgstr "セッションが終了したか、プロトコルがサポートされていません"
-
-#: terminal/api/session.py:224
-msgid "User does not exist: {}"
-msgstr "ユーザーが存在しない: {}"
 
 #: terminal/api/session.py:232
 msgid "User does not have permission"
@@ -5029,10 +5075,6 @@ msgstr "セッションアクションのパーマを検証できます"
 #: terminal/models/sharing.py:24
 msgid "Creator"
 msgstr "作成者"
-
-#: terminal/models/sharing.py:26 terminal/models/sharing.py:80
-msgid "Verify code"
-msgstr "コードの確認"
 
 #: terminal/models/sharing.py:31
 msgid "Expired time (min)"
@@ -5320,7 +5362,7 @@ msgstr ""
 "使用できるポートがありません。設定ファイルで Magnus がリッスンするポート数の"
 "制限を確認して変更してください. "
 
-#: terminal/utils/db_port_mapper.py:92
+#: terminal/utils/db_port_mapper.py:83
 msgid "All available port count: {}, Already use port count: {}"
 msgstr "使用可能なすべてのポート数: {}、すでに使用しているポート数: {}"
 
@@ -5764,40 +5806,40 @@ msgstr "パスワードの確認"
 msgid "Password does not match"
 msgstr "パスワードが一致しない"
 
-#: users/forms/profile.py:109
+#: users/forms/profile.py:112
 msgid "Old password"
 msgstr "古いパスワード"
 
-#: users/forms/profile.py:119
+#: users/forms/profile.py:122
 msgid "Old password error"
 msgstr "古いパスワードエラー"
 
-#: users/forms/profile.py:129
+#: users/forms/profile.py:132
 msgid "Automatically configure and download the SSH key"
 msgstr "SSHキーの自動設定とダウンロード"
 
-#: users/forms/profile.py:131
+#: users/forms/profile.py:134
 msgid "ssh public key"
 msgstr "ssh公開キー"
 
-#: users/forms/profile.py:132
+#: users/forms/profile.py:135
 msgid "ssh-rsa AAAA..."
 msgstr "ssh-rsa AAAA.."
 
-#: users/forms/profile.py:133
+#: users/forms/profile.py:136
 msgid "Paste your id_rsa.pub here."
 msgstr "ここにid_rsa.pubを貼り付けます。"
 
-#: users/forms/profile.py:146
+#: users/forms/profile.py:149
 msgid "Public key should not be the same as your old one."
 msgstr "公開鍵は古いものと同じであってはなりません。"
 
-#: users/forms/profile.py:150 users/serializers/profile.py:100
+#: users/forms/profile.py:153 users/serializers/profile.py:100
 #: users/serializers/profile.py:183 users/serializers/profile.py:210
 msgid "Not a valid ssh public key"
 msgstr "有効なssh公開鍵ではありません"
 
-#: users/forms/profile.py:161 users/models/user.py:700
+#: users/forms/profile.py:164 users/models/user.py:700
 msgid "Public key"
 msgstr "公開キー"
 
@@ -5868,7 +5910,7 @@ msgstr "ユーザーパスワード履歴"
 msgid "Reset password"
 msgstr "パスワードのリセット"
 
-#: users/notifications.py:85 users/views/profile/reset.py:127
+#: users/notifications.py:85 users/views/profile/reset.py:139
 msgid "Reset password success"
 msgstr "パスワードのリセット成功"
 
@@ -6064,13 +6106,21 @@ msgstr "あなたのssh公開鍵はサイト管理者によってリセットさ
 msgid "click here to set your password"
 msgstr "ここをクリックしてパスワードを設定してください"
 
-#: users/templates/users/forgot_password.html:24
+#: users/templates/users/forgot_password.html:38
 msgid "Input your email, that will send a mail to your"
 msgstr "あなたのメールを入力し、それはあなたにメールを送信します"
 
-#: users/templates/users/forgot_password.html:33
+#: users/templates/users/forgot_password.html:68
 msgid "Submit"
 msgstr "送信"
+
+#: users/templates/users/forgot_password.html:71
+msgid "Use the phone number to retrieve the password"
+msgstr "携帯電話番号を使ってパスワードを探す"
+
+#: users/templates/users/forgot_password.html:72
+msgid "Use email to retrieve the password"
+msgstr "メールアドレスを使ってパスワードを取り戻す"
 
 #: users/templates/users/mfa_setting.html:24
 msgid "Enable MFA"
@@ -6218,45 +6268,23 @@ msgstr "OTP無効化成功、ログインページを返す"
 msgid "Password invalid"
 msgstr "パスワード無効"
 
-#: users/views/profile/reset.py:40
-msgid "Send reset password message"
-msgstr "リセットパスワードメッセージを送信"
-
-#: users/views/profile/reset.py:41
-msgid "Send reset password mail success, login your mail box and follow it "
-msgstr ""
-"リセットパスワードメールの成功を送信し、メールボックスにログインしてそれに従"
-"う"
-
-#: users/views/profile/reset.py:52
-msgid "Email address invalid, please input again"
-msgstr "メールアドレスが無効です。再度入力してください"
-
-#: users/views/profile/reset.py:58
-msgid ""
-"The user is from {}, please go to the corresponding system to change the "
-"password"
-msgstr ""
-"ユーザーは {}からです。対応するシステムにアクセスしてパスワードを変更してくだ"
-"さい。"
-
-#: users/views/profile/reset.py:84 users/views/profile/reset.py:95
+#: users/views/profile/reset.py:96 users/views/profile/reset.py:107
 msgid "Token invalid or expired"
 msgstr "トークンが無効または期限切れ"
 
-#: users/views/profile/reset.py:100
+#: users/views/profile/reset.py:112
 msgid "User auth from {}, go there change password"
 msgstr "ユーザー認証ソース {}, 対応するシステムにパスワードを変更してください"
 
-#: users/views/profile/reset.py:107
+#: users/views/profile/reset.py:119
 msgid "* Your password does not meet the requirements"
 msgstr "* パスワードが要件を満たしていない"
 
-#: users/views/profile/reset.py:113
+#: users/views/profile/reset.py:125
 msgid "* The new password cannot be the last {} passwords"
 msgstr "* 新しいパスワードを最後の {} パスワードにすることはできません"
 
-#: users/views/profile/reset.py:128
+#: users/views/profile/reset.py:140
 msgid "Reset password success, return to login page"
 msgstr "パスワードの成功をリセットし、ログインページに戻る"
 
