@@ -5,6 +5,7 @@
     DownloadHost: https://demo.jumpserver.org/download
     Initial: 0
     HOST_NAME: test
+    HOST_ID: 00000000-0000-0000-0000-000000000000
     CORE_HOST: https://demo.jumpserver.org
     BOOTSTRAP_TOKEN: PleaseChangeMe
     RDS_Licensing: true
@@ -13,6 +14,7 @@
     RDS_fSingleSessionPerUser: 1
     RDS_MaxDisconnectionTime: 60000
     RDS_RemoteAppLogoffTimeLimit: 0
+    TinkerInstaller: JumpServer-Remoteapp_v0.0.1.exe
 
   tasks:
   - name: Install RDS-Licensing (RDS)
@@ -29,15 +31,25 @@
       include_management_tools: yes
     register: rds_install
 
-  - name: Download Jmservisor (jumpserver)
+  - name: Download JumpServer Remoteapp installer (jumpserver)
     ansible.windows.win_get_url:
-        url: "{{ DownloadHost }}/Jmservisor.msi"
-        dest: "{{ ansible_env.TEMP }}\\Jmservisor.msi"
+        url: "{{ DownloadHost }}/{{ TinkerInstaller }}"
+        dest: "{{ ansible_env.TEMP }}\\{{ TinkerInstaller }}"
 
-  - name: Install the Jmservisor (jumpserver)
+  - name: Install JumpServer Remoteapp agent (jumpserver)
     ansible.windows.win_package:
-      path: "{{ ansible_env.TEMP }}\\Jmservisor.msi"
+      path: "{{ ansible_env.TEMP }}\\{{ TinkerInstaller }}"
+      arguments:
+        - /VERYSILENT
+        - /SUPPRESSMSGBOXES
+        - /NORESTART
       state: present
+
+  - name: Set remote-server on the global system path (remote-server)
+    ansible.windows.win_path:
+      elements:
+        - '%USERPROFILE%\AppData\Local\Programs\JumpServer-Remoteapp\'
+      scope: user
 
   - name: Download python-3.10.8
     ansible.windows.win_get_url:
@@ -116,12 +128,12 @@
 
   - name: Download chromedriver (chrome)
     ansible.windows.win_get_url:
-      url: "{{ DownloadHost }}/chromedriver_win32.106.zip"
-      dest: "{{ ansible_env.TEMP }}\\chromedriver_win32.106.zip"
+      url: "{{ DownloadHost }}/chromedriver_win32.107.zip"
+      dest: "{{ ansible_env.TEMP }}\\chromedriver_win32.107.zip"
 
   - name: Unzip chromedriver (chrome)
     community.windows.win_unzip:
-      src: "{{ ansible_env.TEMP }}\\chromedriver_win32.106.zip"
+      src: "{{ ansible_env.TEMP }}\\chromedriver_win32.107.zip"
       dest: C:\Program Files\JumpServer\drivers
 
   - name: Set chromedriver on the global system path (chrome)
@@ -142,8 +154,27 @@
       - /quiet
 
   - name: Generate component config
-    ansible.windows.win_shell: >
-      echo "Todo: Set config"
+    ansible.windows.win_shell:
+      "remoteapp-server config --hostname {{ HOST_NAME }} --core_host {{ CORE_HOST }} 
+      --token {{ BOOTSTRAP_TOKEN }} --host_id {{ HOST_ID }}"
+
+  - name: Install remoteapp-server service
+    ansible.windows.win_shell:
+      "remoteapp-server service install"
+
+  - name: Start remoteapp-server service
+    ansible.windows.win_shell:
+      "remoteapp-server  service start"
+
+  - name: Wait Tinker api health
+    ansible.windows.win_uri:
+      url: http://localhost:6068/api/health/
+      status_code: 200
+      method: GET
+    register: _result
+    until: _result.status_code == 200
+    retries: 30
+    delay: 5
 
   - name: Sync all remote applets
     ansible.windows.win_shell: >

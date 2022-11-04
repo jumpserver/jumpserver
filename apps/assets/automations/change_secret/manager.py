@@ -1,16 +1,27 @@
+import os
+import time
 import random
 import string
 from copy import deepcopy
+from openpyxl import Workbook
 from collections import defaultdict
 
 from django.utils import timezone
+from django.conf import settings
 
-from common.utils import lazyproperty, gen_key_pair
+from common.utils.timezone import local_now_display
+from common.utils.file import encrypt_and_compress_zip_file
+from common.utils import get_logger, lazyproperty, gen_key_pair
+from users.models import User
 from assets.models import ChangeSecretRecord
+from assets.notifications import ChangeSecretExecutionTaskMsg
+from assets.serializers import ChangeSecretRecordBackUpSerializer
 from assets.const import (
     AutomationTypes, SecretType, SecretStrategy, SSHKeyStrategy, DEFAULT_PASSWORD_RULES
 )
 from ..base.manager import BasePlaybookManager
+
+logger = get_logger(__name__)
 
 
 class ChangeSecretManager(BasePlaybookManager):
@@ -125,7 +136,7 @@ class ChangeSecretManager(BasePlaybookManager):
             new_secret = self.get_secret()
 
             recorder = ChangeSecretRecord(
-                account=account, execution=self.execution,
+                asset=asset, account=account, execution=self.execution,
                 old_secret=account.secret, new_secret=new_secret,
             )
             records.append(recorder)
@@ -172,4 +183,49 @@ class ChangeSecretManager(BasePlaybookManager):
         recorder.save()
 
     def on_runner_failed(self, runner, e):
-        pass
+        logger.error("Change secret error: ", e)
+
+    def run(self, *args, **kwargs):
+        super().run(*args, **kwargs)
+        recorders = self.name_recorder_mapper.values()
+        recorders = list(recorders)
+        self.send_recorder_mail(recorders)
+
+    def send_recorder_mail(self, recorders):
+        recipients = self.execution.recipients
+        if not recorders or not recipients:
+            return
+        recipients = User.objects.filter(id__in=list(recipients))
+
+        name = self.execution.snapshot['name']
+        path = os.path.join(os.path.dirname(settings.BASE_DIR), 'tmp')
+        filename = os.path.join(path, f'{name}-{local_now_display()}-{time.time()}.xlsx')
+        if not self.create_file(recorders, filename):
+            return
+
+        for user in recipients:
+            attachments = []
+            if user.secret_key:
+                password = user.secret_key.encode('utf8')
+                attachment = os.path.join(path, f'{name}-{local_now_display()}-{time.time()}.zip')
+                encrypt_and_compress_zip_file(attachment, password, [filename])
+                attachments = [attachment]
+            ChangeSecretExecutionTaskMsg(name, user).publish(attachments)
+        os.remove(filename)
+
+    @staticmethod
+    def create_file(recorders, filename):
+        serializer_cls = ChangeSecretRecordBackUpSerializer
+        serializer = serializer_cls(recorders, many=True)
+        header = [v.label for v in serializer.child.fields.values()]
+        rows = [list(row.values()) for row in serializer.data]
+        if not rows:
+            return False
+
+        rows.insert(0, header)
+        wb = Workbook(filename)
+        ws = wb.create_sheet('Sheet1')
+        for row in rows:
+            ws.append(row)
+        wb.save(filename)
+        return True

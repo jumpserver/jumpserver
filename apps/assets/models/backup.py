@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 #
 import uuid
-from functools import reduce
 
 from celery import current_task
 from django.db import models
@@ -11,9 +10,9 @@ from django.utils.translation import ugettext_lazy as _
 from orgs.mixins.models import OrgModelMixin
 from ops.mixin import PeriodTaskModelMixin
 from common.utils import get_logger
+from common.const.choices import Trigger
 from common.db.encoder import ModelJSONFieldEncoder
 from common.mixins.models import CommonModelMixin
-from common.const.choices import Trigger
 
 __all__ = ['AccountBackupPlan', 'AccountBackupPlanExecution']
 
@@ -22,7 +21,7 @@ logger = get_logger(__file__)
 
 class AccountBackupPlan(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    categories = models.JSONField(default=list)
+    types = models.JSONField(default=list)
     recipients = models.ManyToManyField(
         'users.User', related_name='recipient_escape_route_plans', blank=True,
         verbose_name=_("Recipient")
@@ -53,7 +52,7 @@ class AccountBackupPlan(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
             'crontab': self.crontab,
             'org_id': self.org_id,
             'created_by': self.created_by,
-            'categories': self.categories,
+            'types': self.types,
             'recipients': {
                 str(recipient.id): (str(recipient), bool(recipient.secret_key))
                 for recipient in self.recipients.all()
@@ -100,9 +99,9 @@ class AccountBackupPlanExecution(OrgModelMixin):
         verbose_name = _('Account backup execution')
 
     @property
-    def categories(self):
-        categories = self.plan_snapshot.get('categories')
-        return categories
+    def types(self):
+        types = self.plan_snapshot.get('types')
+        return types
 
     @property
     def recipients(self):
@@ -111,7 +110,11 @@ class AccountBackupPlanExecution(OrgModelMixin):
             return []
         return recipients.values()
 
+    @property
+    def manager_type(self):
+        return 'backup_account'
+
     def start(self):
-        from ..task_handlers import ExecutionManager
+        from assets.automations.endpoint import ExecutionManager
         manager = ExecutionManager(execution=self)
         return manager.run()

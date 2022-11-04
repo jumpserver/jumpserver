@@ -2,10 +2,9 @@
 #
 import io
 import os
-import uuid
+import sshpubkeys
 from hashlib import md5
 
-import sshpubkeys
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -14,11 +13,11 @@ from django.db.models import QuerySet
 
 from common.utils import (
     ssh_key_string_to_obj, ssh_key_gen, get_logger,
-    random_string, ssh_pubkey_gen,
+    random_string, ssh_pubkey_gen, lazyproperty
 )
 from common.db import fields
-from assets.const import Connectivity
 from orgs.mixins.models import JMSOrgBaseModel
+from assets.const import Connectivity, SecretType
 
 logger = get_logger(__file__)
 
@@ -48,12 +47,6 @@ class AbsConnectivity(models.Model):
 
 
 class BaseAccount(JMSOrgBaseModel):
-    class SecretType(models.TextChoices):
-        password = 'password', _('Password')
-        ssh_key = 'ssh_key', _('SSH key')
-        access_key = 'access_key', _('Access key')
-        token = 'token', _('Token')
-
     name = models.CharField(max_length=128, verbose_name=_("Name"))
     username = models.CharField(max_length=128, blank=True, verbose_name=_('Username'), db_index=True)
     secret_type = models.CharField(
@@ -66,27 +59,33 @@ class BaseAccount(JMSOrgBaseModel):
     created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
 
     @property
-    def password(self):
-        return self.secret
-
-    @property
     def has_secret(self):
         return bool(self.secret)
 
     @property
-    def private_key(self):
-        if self.secret_type == self.SecretType.ssh_key:
-            return self.secret
-        return None
+    def specific(self):
+        data = {}
+        if self.secret_type != SecretType.ssh_key:
+            return data
+        data['ssh_key_fingerprint'] = self.ssh_key_fingerprint
+        return data
 
     @property
-    def public_key(self):
-        return ''
+    def private_key(self):
+        if self.secret_type == SecretType.ssh_key:
+            return self.secret
+        return None
 
     @private_key.setter
     def private_key(self, value):
         self.secret = value
-        self.secret_type = 'private_key'
+        self.secret_type = SecretType.ssh_key
+
+    @lazyproperty
+    def public_key(self):
+        if self.secret_type == SecretType.ssh_key:
+            return ssh_pubkey_gen(private_key=self.private_key)
+        return None
 
     @property
     def ssh_key_fingerprint(self):
@@ -94,7 +93,7 @@ class BaseAccount(JMSOrgBaseModel):
             public_key = self.public_key
         elif self.private_key:
             try:
-                public_key = ssh_pubkey_gen(private_key=self.private_key, password=self.password)
+                public_key = ssh_pubkey_gen(private_key=self.private_key)
             except IOError as e:
                 return str(e)
         else:
@@ -107,14 +106,14 @@ class BaseAccount(JMSOrgBaseModel):
     @property
     def private_key_obj(self):
         if self.private_key:
-            key_obj = ssh_key_string_to_obj(self.private_key, password=self.password)
+            key_obj = ssh_key_string_to_obj(self.private_key)
             return key_obj
         else:
             return None
 
     @property
     def private_key_path(self):
-        if not self.secret_type != 'ssh_key' or not self.secret:
+        if not self.secret_type != SecretType.ssh_key or not self.secret:
             return None
         project_dir = settings.PROJECT_DIR
         tmp_dir = os.path.join(project_dir, 'tmp')
@@ -156,7 +155,6 @@ class BaseAccount(JMSOrgBaseModel):
         return {
             'name': self.name,
             'username': self.username,
-            'password': self.password,
             'public_key': self.public_key,
         }
 
