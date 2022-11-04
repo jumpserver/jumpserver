@@ -192,10 +192,8 @@ class ChangeSecretManager(BasePlaybookManager):
         self.send_recorder_mail(recorders)
 
     def send_recorder_mail(self, recorders):
-        if not recorders:
-            return
         recipients = self.execution.recipients
-        if not recipients:
+        if not recorders or not recipients:
             return
         recipients = User.objects.filter(id__in=list(recipients))
 

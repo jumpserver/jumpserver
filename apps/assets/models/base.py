@@ -116,7 +116,7 @@ class BaseAccount(OrgModelMixin):
 
     @property
     def private_key_path(self):
-        if not self.secret_type != 'ssh_key' or not self.secret:
+        if not self.secret_type != SecretType.ssh_key or not self.secret:
             return None
         project_dir = settings.PROJECT_DIR
         tmp_dir = os.path.join(project_dir, 'tmp')
