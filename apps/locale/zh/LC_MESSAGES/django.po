@@ -321,7 +321,7 @@ msgid "Domain"
 msgstr "网域"
 
 #: applications/models/application.py:230 xpack/plugins/cloud/models.py:33
-#: xpack/plugins/cloud/serializers/account.py:63
+#: xpack/plugins/cloud/serializers/account.py:64
 msgid "Attrs"
 msgstr "属性"
 
@@ -783,7 +783,7 @@ msgstr "成功"
 #: assets/models/base.py:32 audits/models.py:118
 #: xpack/plugins/change_auth_plan/serializers/app.py:88
 #: xpack/plugins/change_auth_plan/serializers/asset.py:199
-#: xpack/plugins/cloud/const.py:35
+#: xpack/plugins/cloud/const.py:36
 msgid "Failed"
 msgstr "失败"
 
@@ -2502,7 +2502,7 @@ msgid "Copy success"
 msgstr "复制成功"
 
 #: authentication/utils.py:28 common/utils/ip/geoip/utils.py:24
-#: xpack/plugins/cloud/const.py:26
+#: xpack/plugins/cloud/const.py:27
 msgid "LAN"
 msgstr "局域网"
 
@@ -5263,13 +5263,22 @@ msgstr "没有发现"
 msgid "view"
 msgstr "查看"
 
-#: terminal/utils/db_port_mapper.py:81
+#: terminal/utils/db_port_mapper.py:64
+msgid ""
+"No available port is matched. The number of databases may have exceeded the "
+"number of ports open to the database agent service, Contact the "
+"administrator to open more ports."
+msgstr ""
+"未匹配到可用端口，数据库的数量可能已经超过数据库代理服务开放的端口数量，请联"
+"系管理员开放更多端口。"
+
+#: terminal/utils/db_port_mapper.py:90
 msgid ""
 "No ports can be used, check and modify the limit on the number of ports that "
 "Magnus listens on in the configuration file."
 msgstr "没有端口可以使用，检查并修改配置文件中 Magnus 监听的端口数量限制。"
 
-#: terminal/utils/db_port_mapper.py:83
+#: terminal/utils/db_port_mapper.py:92
 msgid "All available port count: {}, Already use port count: {}"
 msgstr "所有可用端口数量：{}，已使用端口数量：{}"
 
@@ -6397,70 +6406,74 @@ msgid "JD Cloud"
 msgstr "京东云"
 
 #: xpack/plugins/cloud/const.py:16
+msgid "KingSoft Cloud"
+msgstr "金山云"
+
+#: xpack/plugins/cloud/const.py:17
 msgid "Tencent Cloud"
 msgstr "腾讯云"
 
-#: xpack/plugins/cloud/const.py:17
+#: xpack/plugins/cloud/const.py:18
 msgid "Tencent Cloud (Lighthouse)"
 msgstr "腾讯云(轻量服务器应用)"
 
-#: xpack/plugins/cloud/const.py:18
+#: xpack/plugins/cloud/const.py:19
 msgid "VMware"
 msgstr "VMware"
 
-#: xpack/plugins/cloud/const.py:19 xpack/plugins/cloud/providers/nutanix.py:13
+#: xpack/plugins/cloud/const.py:20 xpack/plugins/cloud/providers/nutanix.py:13
 msgid "Nutanix"
 msgstr "Nutanix"
 
-#: xpack/plugins/cloud/const.py:20
+#: xpack/plugins/cloud/const.py:21
 msgid "Huawei Private Cloud"
 msgstr "华为私有云"
 
-#: xpack/plugins/cloud/const.py:21
+#: xpack/plugins/cloud/const.py:22
 msgid "Qingyun Private Cloud"
 msgstr "青云私有云"
 
-#: xpack/plugins/cloud/const.py:22
+#: xpack/plugins/cloud/const.py:23
 msgid "CTYun Private Cloud"
 msgstr "天翼私有云"
 
-#: xpack/plugins/cloud/const.py:23
+#: xpack/plugins/cloud/const.py:24
 msgid "OpenStack"
 msgstr "OpenStack"
 
-#: xpack/plugins/cloud/const.py:24
+#: xpack/plugins/cloud/const.py:25
 msgid "Google Cloud Platform"
 msgstr "谷歌云"
 
-#: xpack/plugins/cloud/const.py:25
+#: xpack/plugins/cloud/const.py:26
 msgid "Fusion Compute"
 msgstr ""
 
-#: xpack/plugins/cloud/const.py:30
+#: xpack/plugins/cloud/const.py:31
 msgid "Instance name"
 msgstr "实例名称"
 
-#: xpack/plugins/cloud/const.py:31
+#: xpack/plugins/cloud/const.py:32
 msgid "Instance name and Partial IP"
 msgstr "实例名称和部分IP"
 
-#: xpack/plugins/cloud/const.py:36
+#: xpack/plugins/cloud/const.py:37
 msgid "Succeed"
 msgstr "成功"
 
-#: xpack/plugins/cloud/const.py:40
+#: xpack/plugins/cloud/const.py:41
 msgid "Unsync"
 msgstr "未同步"
 
-#: xpack/plugins/cloud/const.py:41
+#: xpack/plugins/cloud/const.py:42
 msgid "New Sync"
 msgstr "新同步"
 
-#: xpack/plugins/cloud/const.py:42
+#: xpack/plugins/cloud/const.py:43
 msgid "Synced"
 msgstr "已同步"
 
-#: xpack/plugins/cloud/const.py:43
+#: xpack/plugins/cloud/const.py:44
 msgid "Released"
 msgstr "已释放"
 
@@ -6730,11 +6743,11 @@ msgstr "华南-广州-友好用户环境"
 msgid "CN East-Suqian"
 msgstr "华东-宿迁"
 
-#: xpack/plugins/cloud/serializers/account.py:64
+#: xpack/plugins/cloud/serializers/account.py:65
 msgid "Validity display"
 msgstr "有效性显示"
 
-#: xpack/plugins/cloud/serializers/account.py:65
+#: xpack/plugins/cloud/serializers/account.py:66
 msgid "Provider display"
 msgstr "服务商显示"
 
