@@ -31,7 +31,7 @@ def push_accounts_to_assets_util(accounts, assets):
 def push_accounts_to_assets(account_ids, asset_ids):
     from assets.models import Asset, Account
     with tmp_to_root_org():
-        assets = Asset.objects.get(id=asset_ids)
-        accounts = Account.objects.get(id=account_ids)
+        assets = Asset.objects.filter(id__in=asset_ids)
+        accounts = Account.objects.filter(id__in=account_ids)
 
     return push_accounts_to_assets_util(accounts, assets)

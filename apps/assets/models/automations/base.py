@@ -79,6 +79,7 @@ class BaseAutomation(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
             id=eid, trigger=trigger, automation=self,
             snapshot=self.to_attr_json(),
         )
+        print(execution.id)
         return execution.start()
 
     class Meta:

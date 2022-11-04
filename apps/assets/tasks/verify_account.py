@@ -30,8 +30,8 @@ def verify_accounts_connectivity_util(accounts, assets, task_name):
 def verify_accounts_connectivity(account_ids, asset_ids):
     from assets.models import Asset, Account
     with tmp_to_root_org():
-        assets = Asset.objects.get(id=asset_ids)
-        accounts = Account.objects.get(id=account_ids)
+        assets = Asset.objects.filter(id__in=asset_ids)
+        accounts = Account.objects.filter(id__in=account_ids)
 
     task_name = gettext_noop("Verify accounts connectivity")
     return verify_accounts_connectivity_util(accounts, assets, task_name)
