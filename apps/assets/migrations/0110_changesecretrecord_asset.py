@@ -7,10 +7,15 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0109_rename_categories_to_types'),
+        ('assets', '0109_auto_20221102_2017'),
     ]
 
     operations = [
+        migrations.RenameField(
+            model_name='accountbackupplan',
+            old_name='categories',
+            new_name='types',
+        ),
         migrations.AddField(
             model_name='changesecretrecord',
             name='asset',
