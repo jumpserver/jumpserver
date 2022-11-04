@@ -27,13 +27,19 @@ class DeployAppletHostManager:
 
     def generate_playbook(self):
         playbook_src = os.path.join(CURRENT_DIR, 'playbook.yml')
+        base_site_url = settings.BASE_SITE_URL
+        bootstrap_token = settings.BOOTSTRAP_TOKEN
+        host_id = str(self.deployment.host.id)
+        if not base_site_url:
+            base_site_url = "localhost:8080"
         with open(playbook_src) as f:
             plays = yaml.safe_load(f)
         for play in plays:
             play['vars'].update(self.deployment.host.deploy_options)
-            play['vars']['DownloadHost'] = settings.BASE_URL + '/download/'
-            play['vars']['CORE_HOST'] = settings.BASE_URL
-            play['vars']['BOOTSTRAP_TOKEN'] = settings.BOOSTRAP_TOKEN
+            play['vars']['DownloadHost'] = base_site_url + '/download/'
+            play['vars']['CORE_HOST'] = base_site_url
+            play['vars']['BOOTSTRAP_TOKEN'] = bootstrap_token
+            play['vars']['HOST_ID'] = host_id
             play['vars']['HOST_NAME'] = self.deployment.host.name
 
         playbook_dir = os.path.join(self.run_dir, 'playbook')
@@ -70,6 +76,3 @@ class DeployAppletHostManager:
             self.deployment.date_finished = timezone.now()
             with safe_db_connection():
                 self.deployment.save()
-
-
-

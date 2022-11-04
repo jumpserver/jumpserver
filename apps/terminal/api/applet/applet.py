@@ -13,9 +13,9 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
 from common.utils import is_uuid
+from common.drf.serializers import FileSerializer
 from terminal import serializers
 from terminal.models import AppletPublication, Applet
-from terminal.serializers import AppletUploadSerializer
 
 
 __all__ = ['AppletViewSet', 'AppletPublicationViewSet']
@@ -59,7 +59,7 @@ class DownloadUploadMixin:
             raise ValidationError({'error': 'Missing name in manifest.yml'})
         return manifest, tmp_dir
 
-    @action(detail=False, methods=['post'], serializer_class=AppletUploadSerializer)
+    @action(detail=False, methods=['post'], serializer_class=FileSerializer)
     def upload(self, request, *args, **kwargs):
         manifest, tmp_dir = self.extract_and_check_file(request)
         name = manifest['name']

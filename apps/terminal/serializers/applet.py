@@ -1,22 +1,22 @@
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
+from django.db import models
 
 from common.drf.fields import ObjectRelatedField, LabeledChoiceField
-from common.const.choices import Status
 from ..models import Applet, AppletPublication, AppletHost
 
 
 __all__ = [
     'AppletSerializer', 'AppletPublicationSerializer',
-    'AppletUploadSerializer',
 ]
 
 
-class AppletUploadSerializer(serializers.Serializer):
-    file = serializers.FileField()
-
-
 class AppletPublicationSerializer(serializers.ModelSerializer):
+    class Status(models.TextChoices):
+        PUBLISHED = 'published', _('Published')
+        UNPUBLISHED = 'unpublished', _('Unpublished')
+        NOT_MATCH = 'not_match', _('Not match')
+
     applet = ObjectRelatedField(attrs=('id', 'display_name', 'icon', 'version'), queryset=Applet.objects.all())
     host = ObjectRelatedField(queryset=AppletHost.objects.all())
     status = LabeledChoiceField(choices=Status.choices, label=_("Status"))

@@ -1,10 +1,6 @@
-from __future__ import unicode_literals
-
 import uuid
 
 from django.db import models
-from django.forms.models import model_to_dict
-from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import get_logger
@@ -25,53 +21,9 @@ class Status(models.Model):
     terminal = models.ForeignKey('terminal.Terminal', null=True, on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True)
 
-    CACHE_KEY = 'TERMINAL_STATUS_{}'
-
     class Meta:
         db_table = 'terminal_status'
         get_latest_by = 'date_created'
         verbose_name = _("Status")
-
-    def save_to_cache(self):
-        if not self.terminal:
-            return
-        key = self.CACHE_KEY.format(self.terminal.id)
-        data = model_to_dict(self)
-        cache.set(key, data, 60*3)
-        return data
-
-    @classmethod
-    def get_terminal_latest_status(cls, terminal):
-        from ...utils import ComputeStatUtil
-        stat = cls.get_terminal_latest_stat(terminal)
-        return ComputeStatUtil.compute_component_status(stat)
-
-    @classmethod
-    def get_terminal_latest_stat(cls, terminal):
-        key = cls.CACHE_KEY.format(terminal.id)
-        data = cache.get(key)
-        if not data:
-            return None
-        data.pop('terminal', None)
-        stat = cls(**data)
-        stat.terminal = terminal
-        stat.is_alive = terminal.is_alive
-        stat.keep_one_decimal_place()
-        return stat
-
-    def keep_one_decimal_place(self):
-        keys = ['cpu_load', 'memory_used', 'disk_used']
-        for key in keys:
-            value = getattr(self, key, 0)
-            if not isinstance(value, (int, float)):
-                continue
-            value = '%.1f' % value
-            setattr(self, key, float(value))
-
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
-        self.terminal.set_alive(ttl=120)
-        return self.save_to_cache()
-        # return super().save()
 
 

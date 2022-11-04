@@ -53,21 +53,21 @@ class CommonStorageModelMixin(models.Model):
 
 class CommandStorage(CommonStorageModelMixin, CommonModelMixin):
     type = models.CharField(
-        max_length=16, choices=const.CommandStorageTypeChoices.choices,
-        default=const.CommandStorageTypeChoices.server.value, verbose_name=_('Type'),
+        max_length=16, choices=const.CommandStorageType.choices,
+        default=const.CommandStorageType.server.value, verbose_name=_('Type'),
     )
 
     @property
     def type_null(self):
-        return self.type == const.CommandStorageTypeChoices.null.value
+        return self.type == const.CommandStorageType.null.value
 
     @property
     def type_server(self):
-        return self.type == const.CommandStorageTypeChoices.server.value
+        return self.type == const.CommandStorageType.server.value
 
     @property
     def type_es(self):
-        return self.type == const.CommandStorageTypeChoices.es.value
+        return self.type == const.CommandStorageType.es.value
 
     @property
     def type_null_or_server(self):
@@ -138,17 +138,17 @@ class CommandStorage(CommonStorageModelMixin, CommonModelMixin):
 
 class ReplayStorage(CommonStorageModelMixin, CommonModelMixin):
     type = models.CharField(
-        max_length=16, choices=const.ReplayStorageTypeChoices.choices,
-        default=const.ReplayStorageTypeChoices.server.value, verbose_name=_('Type')
+        max_length=16, choices=const.ReplayStorageType.choices,
+        default=const.ReplayStorageType.server.value, verbose_name=_('Type')
     )
 
     @property
     def type_null(self):
-        return self.type == const.ReplayStorageTypeChoices.null.value
+        return self.type == const.ReplayStorageType.null.value
 
     @property
     def type_server(self):
-        return self.type == const.ReplayStorageTypeChoices.server.value
+        return self.type == const.ReplayStorageType.server.value
 
     @property
     def type_null_or_server(self):
@@ -156,11 +156,11 @@ class ReplayStorage(CommonStorageModelMixin, CommonModelMixin):
 
     @property
     def type_swift(self):
-        return self.type == const.ReplayStorageTypeChoices.swift.value
+        return self.type == const.ReplayStorageType.swift.value
 
     @property
     def type_ceph(self):
-        return self.type == const.ReplayStorageTypeChoices.ceph.value
+        return self.type == const.ReplayStorageType.ceph.value
 
     @property
     def config(self):
@@ -168,7 +168,7 @@ class ReplayStorage(CommonStorageModelMixin, CommonModelMixin):
 
         # add type config
         if self.type_ceph:
-            _type = const.ReplayStorageTypeChoices.s3.value
+            _type = const.ReplayStorageType.s3.value
         else:
             _type = self.type
         _config.update({'TYPE': _type})

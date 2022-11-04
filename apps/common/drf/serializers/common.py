@@ -13,8 +13,8 @@ from .mixin import BulkListSerializerMixin, BulkSerializerMixin
 __all__ = [
     'MethodSerializer', 'EmptySerializer', 'BulkModelSerializer',
     'AdaptedBulkListSerializer', 'CeleryTaskExecutionSerializer',
-    'WritableNestedModelSerializer',
-    'GroupedChoiceSerializer',
+    'WritableNestedModelSerializer', 'GroupedChoiceSerializer',
+    'FileSerializer'
 ]
 
 
@@ -88,3 +88,7 @@ class GroupedChoiceSerializer(ChoiceSerializer):
 
 class WritableNestedModelSerializer(NestedModelSerializer):
     pass
+
+
+class FileSerializer(serializers.Serializer):
+    file = serializers.FileField(label=_("File"))

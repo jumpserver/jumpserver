@@ -11,3 +11,4 @@ from .account import *
 from assets.serializers.account.backup import *
 from .platform import *
 from .cagegory import *
+from .automation import *

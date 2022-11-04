@@ -2,7 +2,6 @@
 #
 import io
 import os
-import uuid
 import sshpubkeys
 from hashlib import md5
 
@@ -12,13 +11,13 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.db.models import QuerySet
 
-from common.db import fields
 from common.utils import (
     ssh_key_string_to_obj, ssh_key_gen, get_logger,
     random_string, ssh_pubkey_gen, lazyproperty
 )
+from common.db import fields
+from orgs.mixins.models import JMSOrgBaseModel
 from assets.const import Connectivity, SecretType
-from orgs.mixins.models import OrgModelMixin
 
 logger = get_logger(__file__)
 
@@ -47,8 +46,7 @@ class AbsConnectivity(models.Model):
         abstract = True
 
 
-class BaseAccount(OrgModelMixin):
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+class BaseAccount(JMSOrgBaseModel):
     name = models.CharField(max_length=128, verbose_name=_("Name"))
     username = models.CharField(max_length=128, blank=True, verbose_name=_('Username'), db_index=True)
     secret_type = models.CharField(
@@ -56,9 +54,8 @@ class BaseAccount(OrgModelMixin):
     )
     secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Secret'))
     privileged = models.BooleanField(verbose_name=_("Privileged"), default=False)
+    is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
-    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
-    date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
     created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
 
     @property
@@ -116,7 +113,7 @@ class BaseAccount(OrgModelMixin):
 
     @property
     def private_key_path(self):
-        if not self.secret_type != 'ssh_key' or not self.secret:
+        if not self.secret_type != SecretType.ssh_key or not self.secret:
             return None
         project_dir = settings.PROJECT_DIR
         tmp_dir = os.path.join(project_dir, 'tmp')
@@ -158,7 +155,6 @@ class BaseAccount(OrgModelMixin):
         return {
             'name': self.name,
             'username': self.username,
-            'password': self.password,
             'public_key': self.public_key,
         }
 

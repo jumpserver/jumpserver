@@ -21,7 +21,7 @@ __all__ = ['StatusViewSet', 'ComponentsMetricsAPIView']
 
 class StatusViewSet(viewsets.ModelViewSet):
     queryset = Status.objects.all()
-    serializer_class = serializers.StatusSerializer
+    serializer_class = serializers.StatSerializer
     session_serializer_class = serializers.SessionSerializer
     task_serializer_class = serializers.TaskSerializer
 

@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 #
 import os
+import time
 from itertools import groupby, chain
+from collections import defaultdict
 
+from django.utils import timezone
 from django.conf import settings
 from django.core.files.storage import default_storage
-
 import jms_storage
 
 from common.utils import get_logger
+from tickets.models import TicketSession
 from . import const
 from .models import ReplayStorage
-from tickets.models import TicketSession
 
 
 logger = get_logger(__name__)
@@ -76,16 +78,16 @@ def get_session_replay_url(session):
     return local_path, url
 
 
-class ComputeStatUtil:
+class ComputeLoadUtil:
     # system status
     @staticmethod
     def _common_compute_system_status(value, thresholds):
         if thresholds[0] <= value <= thresholds[1]:
-            return const.ComponentStatusChoices.normal.value
+            return const.ComponentLoad.normal.value
         elif thresholds[1] < value <= thresholds[2]:
-            return const.ComponentStatusChoices.high.value
+            return const.ComponentLoad.high.value
         else:
-            return const.ComponentStatusChoices.critical.value
+            return const.ComponentLoad.critical.value
 
     @classmethod
     def _compute_system_stat_status(cls, stat):
@@ -106,16 +108,16 @@ class ComputeStatUtil:
         return system_status
 
     @classmethod
-    def compute_component_status(cls, stat):
-        if not stat:
-            return const.ComponentStatusChoices.offline
+    def compute_load(cls, stat):
+        if not stat or time.time() - stat.date_created.timestamp() > 150:
+            return const.ComponentLoad.offline
         system_status_values = cls._compute_system_stat_status(stat).values()
-        if const.ComponentStatusChoices.critical in system_status_values:
-            return const.ComponentStatusChoices.critical
-        elif const.ComponentStatusChoices.high in system_status_values:
-            return const.ComponentStatusChoices.high
+        if const.ComponentLoad.critical in system_status_values:
+            return const.ComponentLoad.critical
+        elif const.ComponentLoad.high in system_status_values:
+            return const.ComponentLoad.high
         else:
-            return const.ComponentStatusChoices.normal
+            return const.ComponentLoad.normal
 
 
 class TypedComponentsStatusMetricsUtil(object):
@@ -135,31 +137,15 @@ class TypedComponentsStatusMetricsUtil(object):
     def get_metrics(self):
         metrics = []
         for _tp, components in self.grouped_components:
-            normal_count = high_count = critical_count = 0
-            total_count = offline_count = session_online_total = 0
-
+            metric = {
+                'normal': 0, 'high': 0, 'critical': 0, 'offline': 0,
+                'total': 0, 'session_active': 0, 'type': _tp
+            }
             for component in components:
-                total_count += 1
-                if not component.is_alive:
-                    offline_count += 1
-                    continue
-                if component.is_normal:
-                    normal_count += 1
-                elif component.is_high:
-                    high_count += 1
-                else:
-                    # critical
-                    critical_count += 1
-                session_online_total += component.get_online_session_count()
-            metrics.append({
-                'total': total_count,
-                'normal': normal_count,
-                'high': high_count,
-                'critical': critical_count,
-                'offline': offline_count,
-                'session_active': session_online_total,
-                'type': _tp,
-            })
+                metric[component.load] += 1
+                metric['total'] += 1
+                metric['session_active'] += component.get_online_session_count()
+            metrics.append(metric)
         return metrics
 
 

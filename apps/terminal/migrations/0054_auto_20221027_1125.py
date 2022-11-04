@@ -39,7 +39,6 @@ class Migration(migrations.Migration):
             name='AppletHost',
             fields=[
                 ('host_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='assets.host')),
-                ('account_automation', models.BooleanField(default=False, verbose_name='Account automation')),
                 ('date_synced', models.DateTimeField(blank=True, null=True, verbose_name='Date synced')),
                 ('status', models.CharField(max_length=16, verbose_name='Status')),
             ],

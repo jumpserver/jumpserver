@@ -2,7 +2,8 @@ from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 
 from common.validators import ProjectUniqueValidator
-from assets.models import Platform
+from common.drf.fields import ObjectRelatedField
+from assets.models import Platform, Account
 from assets.serializers import HostSerializer
 from ..models import AppletHost, AppletHostDeployment, Applet
 from .applet import AppletSerializer
@@ -10,6 +11,7 @@ from .applet import AppletSerializer
 
 __all__ = [
     'AppletHostSerializer', 'AppletHostDeploymentSerializer',
+    'AppletHostAccountSerializer', 'AppletHostReportSerializer'
 ]
 
 
@@ -36,7 +38,7 @@ class AppletHostSerializer(HostSerializer):
     class Meta(HostSerializer.Meta):
         model = AppletHost
         fields = HostSerializer.Meta.fields + [
-            'account_automation', 'status', 'date_synced', 'deploy_options'
+            'status', 'date_synced', 'deploy_options'
         ]
         extra_kwargs = {
             'status': {'read_only': True},
@@ -86,3 +88,13 @@ class AppletHostDeploymentSerializer(serializers.ModelSerializer):
             'date_start', 'date_finished'
         ]
         fields = fields_mini + ['comment'] + read_only_fields
+
+
+class AppletHostAccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Account
+        fields = ['id', 'username', 'secret', 'date_updated']
+
+
+class AppletHostReportSerializer(serializers.Serializer):
+    applets = ObjectRelatedField(attrs=('id', 'name', 'version'), queryset=Applet.objects.all(), many=True)

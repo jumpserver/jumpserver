@@ -61,7 +61,7 @@ class CommandStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
             if not filterset.is_valid():
                 raise utils.translate_validation(filterset.errors)
             command_qs = filterset.qs
-            if storage.type == const.CommandStorageTypeChoices.es:
+            if storage.type == const.CommandStorageType.es:
                 command_count = command_qs.count(limit_to_max_result_window=False)
             else:
                 command_count = command_qs.count()
