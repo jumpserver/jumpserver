@@ -49,7 +49,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='usermsgsubscription',
             name='user',
-            field=models.OneToOneField(on_delete=common.db.models.CASCADE_SIGNAL_SKIP, related_name='user_msg_subscription', to=settings.AUTH_USER_MODEL),
+            field=models.OneToOneField(on_delete=common.db.models.CASCADE_SIGNAL_SKIP, related_name='user_msg_subscription', to=settings.AUTH_USER_MODEL, verbose_name='User'),
         ),
         migrations.RunPython(init_user_msg_subscription)
     ]

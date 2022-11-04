@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='accesskey',
             name='date_created',
-            field=models.DateTimeField(auto_now_add=True, default=datetime.datetime(2019, 7, 29, 6, 23, 54, 115123, tzinfo=utc)),
+            field=models.DateTimeField(auto_now_add=True, default=datetime.datetime(2019, 7, 29, 6, 23, 54, 115123, tzinfo=utc), verbose_name='Date created'),
             preserve_default=False,
         ),
         migrations.AddField(
