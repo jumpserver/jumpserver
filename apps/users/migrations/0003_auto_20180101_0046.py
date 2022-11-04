@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='user',
             name='is_first_login',
-            field=models.BooleanField(default=True),
+            field=models.BooleanField(default=True, verbose_name='Is first login'),
         ),
     ]
