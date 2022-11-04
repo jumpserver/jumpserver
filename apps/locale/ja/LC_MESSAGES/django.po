@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-14 09:57+0800\n"
+"POT-Creation-Date: 2022-11-04 11:37+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -6103,6 +6103,14 @@ msgstr "あなたのメールを入力し、それはあなたにメールを送
 #: users/templates/users/forgot_password.html:68
 msgid "Submit"
 msgstr "送信"
+
+#: users/templates/users/forgot_password.html:71
+msgid "Use the phone number to retrieve the password"
+msgstr "携帯電話番号を使ってパスワードを探す"
+
+#: users/templates/users/forgot_password.html:72
+msgid "Use email to retrieve the password"
+msgstr "メールアドレスを使ってパスワードを取り戻す"
 
 #: users/templates/users/mfa_setting.html:24
 msgid "Enable MFA"

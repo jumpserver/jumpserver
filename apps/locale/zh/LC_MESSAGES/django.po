@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-14 09:57+0800\n"
+"POT-Creation-Date: 2022-11-04 11:37+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -6014,6 +6014,14 @@ msgstr "输入您的邮箱, 将会发一封重置邮件到您的邮箱中"
 #: users/templates/users/forgot_password.html:68
 msgid "Submit"
 msgstr "提交"
+
+#: users/templates/users/forgot_password.html:71
+msgid "Use the phone number to retrieve the password"
+msgstr "使用手机号找回密码"
+
+#: users/templates/users/forgot_password.html:72
+msgid "Use email to retrieve the password"
+msgstr "使用邮箱找回密码"
 
 #: users/templates/users/mfa_setting.html:24
 msgid "Enable MFA"
