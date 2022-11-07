@@ -76,7 +76,6 @@ class ServicesUtil(object):
     def clean_up(self):
         if not self.EXIT_EVENT.is_set():
             self.EXIT_EVENT.set()
-
         self.stop()
 
     def show_status(self):

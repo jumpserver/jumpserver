@@ -332,7 +332,6 @@ class HealthCheckView(HealthApiMixin):
             return False, str(e)
 
     def get(self, request):
-        start = time.time()
         redis_status, redis_time = self.get_redis_status()
         db_status, db_time = self.get_db_status()
         status = all([redis_status, db_status])

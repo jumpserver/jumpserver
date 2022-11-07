@@ -59,7 +59,6 @@ class BaseTerminal(object):
 
             try:
                 status = status_serializer.save()
-                print("Save status ok: ", status)
                 time.sleep(self.interval)
             except OperationalError:
                 print("Save status error, close old connections")
