@@ -34,10 +34,10 @@ class AppletHost(Host):
         return self.name
 
     @property
-    def status(self):
-        if self.terminal:
-            return 'online'
-        return self.terminal.status
+    def load(self):
+        if not self.terminal:
+            return 'offline'
+        return self.terminal.load
 
     def check_terminal_binding(self, request):
         request_terminal = getattr(request.user, 'terminal', None)

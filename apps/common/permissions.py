@@ -16,14 +16,13 @@ class IsValidUser(permissions.IsAuthenticated, permissions.BasePermission):
     """Allows access to valid user, is active and not expired"""
 
     def has_permission(self, request, view):
-        return super(IsValidUser, self).has_permission(request, view) \
+        return super().has_permission(request, view) \
                and request.user.is_valid
 
 
 class IsValidUserOrConnectionToken(IsValidUser):
-
     def has_permission(self, request, view):
-        return super(IsValidUserOrConnectionToken, self).has_permission(request, view) \
+        return super().has_permission(request, view) \
                or self.is_valid_connection_token(request)
 
     @staticmethod
@@ -40,6 +39,12 @@ class OnlySuperUser(IsValidUser):
     def has_permission(self, request, view):
         return super().has_permission(request, view) \
                and request.user.is_superuser
+
+
+class IsServiceAccount(IsValidUser):
+    def has_permission(self, request, view):
+        return super().has_permission(request, view) \
+               and request.user.is_service_account
 
 
 class WithBootstrapToken(permissions.BasePermission):
