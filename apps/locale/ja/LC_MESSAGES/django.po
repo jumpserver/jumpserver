@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-04 15:47+0800\n"
+"POT-Creation-Date: 2022-11-07 18:16+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4510,6 +4510,15 @@ msgstr "Razor の有効化"
 #: settings/serializers/terminal.py:40
 msgid "Enable SSH Client"
 msgstr "SSH Clientの有効化"
+
+#: settings/serializers/terminal.py:51
+msgid "Default graphics resolution"
+msgstr "デフォルトのグラフィック解像度"
+
+#: settings/serializers/terminal.py:52
+msgid ""
+"Tip: Default resolution to use when connecting graphical assets in Luna pages"
+msgstr "ヒント: Luna ページでグラフィック アセットを接続するときに使用するデフォルトの解像度"
 
 #: settings/utils/ldap.py:467
 msgid "ldap:// or ldaps:// protocol is used."
