@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-04 15:47+0800\n"
+"POT-Creation-Date: 2022-11-07 18:16+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -4440,6 +4440,15 @@ msgstr "启用 Razor 服务"
 #: settings/serializers/terminal.py:40
 msgid "Enable SSH Client"
 msgstr "启用 SSH Client"
+
+#: settings/serializers/terminal.py:51
+msgid "Default graphics resolution"
+msgstr "默认图形化分辨率"
+
+#: settings/serializers/terminal.py:52
+msgid ""
+"Tip: Default resolution to use when connecting graphical assets in Luna pages"
+msgstr "提示：在Luna 页面中连接图形化资产时默认使用的分辨率"
 
 #: settings/utils/ldap.py:467
 msgid "ldap:// or ldaps:// protocol is used."
