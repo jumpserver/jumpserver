@@ -6,7 +6,6 @@ from common.db.fields import JsonDictTextField
 
 from assets.const import Protocol
 
-
 __all__ = ['Platform', 'PlatformProtocol', 'PlatformAutomation']
 
 
@@ -49,11 +48,15 @@ class PlatformAutomation(models.Model):
     push_account_enabled = models.BooleanField(default=False, verbose_name=_("Push account enabled"))
     push_account_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Push account method"))
     change_secret_enabled = models.BooleanField(default=False, verbose_name=_("Change password enabled"))
-    change_secret_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Change password method"))
+    change_secret_method = models.TextField(
+        max_length=32, blank=True, null=True, verbose_name=_("Change password method"))
     verify_account_enabled = models.BooleanField(default=False, verbose_name=_("Verify account enabled"))
-    verify_account_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Verify account method"))
+    verify_account_method = models.TextField(
+        max_length=32, blank=True, null=True, verbose_name=_("Verify account method"))
     gather_accounts_enabled = models.BooleanField(default=False, verbose_name=_("Gather facts enabled"))
-    gather_accounts_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Gather facts method"))
+    gather_accounts_method = models.TextField(
+        max_length=32, blank=True, null=True, verbose_name=_("Gather facts method")
+    )
 
 
 class Platform(models.Model):
@@ -61,10 +64,11 @@ class Platform(models.Model):
     对资产提供 约束和默认值
     对资产进行抽象
     """
-    CHARSET_CHOICES = (
-        ('utf8', 'UTF-8'),
-        ('gbk', 'GBK'),
-    )
+
+    class CharsetChoices(models.TextChoices):
+        utf8 = 'utf8', 'UTF-8'
+        gbk = 'gbk', 'GBK'
+
     name = models.SlugField(verbose_name=_("Name"), unique=True, allow_unicode=True)
     category = models.CharField(default='host', max_length=32, verbose_name=_("Category"))
     type = models.CharField(max_length=32, default='linux', verbose_name=_("Type"))
@@ -72,7 +76,9 @@ class Platform(models.Model):
     internal = models.BooleanField(default=False, verbose_name=_("Internal"))
     comment = models.TextField(blank=True, null=True, verbose_name=_("Comment"))
     # 资产有关的
-    charset = models.CharField(default='utf8', choices=CHARSET_CHOICES, max_length=8, verbose_name=_("Charset"))
+    charset = models.CharField(
+        default=CharsetChoices.utf8, choices=CharsetChoices.choices, max_length=8, verbose_name=_("Charset")
+    )
     domain_enabled = models.BooleanField(default=True, verbose_name=_("Domain enabled"))
     protocols_enabled = models.BooleanField(default=True, verbose_name=_("Protocols enabled"))
     # 账号有关的
@@ -103,4 +109,3 @@ class Platform(models.Model):
     class Meta:
         verbose_name = _("Platform")
         # ordering = ('name',)
-
