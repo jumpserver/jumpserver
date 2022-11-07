@@ -20,7 +20,7 @@ class AccountBackupPlanSerializer(PeriodTaskSerializerMixin, BulkOrgResourceMode
         fields = [
             'id', 'name', 'is_periodic', 'interval', 'crontab', 'date_created',
             'date_updated', 'created_by', 'periodic_display', 'comment',
-            'recipients', 'categories'
+            'recipients', 'types'
         ]
         extra_kwargs = {
             'name': {'required': True},
