@@ -82,10 +82,11 @@ class AssetsTaskMixin:
     def perform_assets_task(self, serializer):
         data = serializer.validated_data
         assets = data.get('assets', [])
+        asset_ids = [asset.id for asset in assets]
         if data['action'] == "refresh":
-            task = update_assets_hardware_info_manual.delay(assets)
+            task = update_assets_hardware_info_manual.delay(asset_ids)
         else:
-            task = test_assets_connectivity_manual.delay(assets)
+            task = test_assets_connectivity_manual.delay(asset_ids)
         return task
 
     def perform_create(self, serializer):
