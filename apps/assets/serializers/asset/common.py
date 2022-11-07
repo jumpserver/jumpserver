@@ -77,7 +77,7 @@ class AssetSerializer(OrgResourceSerializerMixin, WritableNestedModelSerializer)
             'nodes', 'labels', 'protocols', 'accounts', 'nodes_display',
         ]
         read_only_fields = [
-            'category', 'type', 'specific',
+            'category', 'type', 'specific', 'info',
             'connectivity', 'date_verified',
             'created_by', 'date_created',
         ]
