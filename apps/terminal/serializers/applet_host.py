@@ -97,7 +97,7 @@ class AppletHostDeploymentSerializer(serializers.ModelSerializer):
 class AppletHostAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
-        fields = ['id', 'username', 'secret', 'date_updated']
+        fields = ['id', 'username', 'secret', 'is_active', 'date_updated']
 
 
 class AppletHostAppletReportSerializer(serializers.Serializer):
