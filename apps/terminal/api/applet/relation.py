@@ -1,6 +1,7 @@
 from typing import Callable
 
 from django.shortcuts import get_object_or_404
+from django.conf import settings
 from rest_framework.request import Request
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -27,7 +28,7 @@ class HostMixin:
     )
 
     def get_permissions(self):
-        if self.kwargs.get('host'):
+        if self.kwargs.get('host') and settings.DEBUG:
             return [RBACPermission()]
         else:
             return [IsServiceAccount()]

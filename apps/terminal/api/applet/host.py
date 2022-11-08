@@ -4,6 +4,7 @@ from rest_framework.response import Response
 
 from common.permissions import IsServiceAccount
 from common.drf.api import JMSModelViewSet
+from orgs.utils import tmp_to_builtin_org
 from terminal.serializers import (
     AppletHostSerializer, AppletHostDeploymentSerializer,
     AppletHostStartupSerializer
@@ -18,6 +19,10 @@ __all__ = ['AppletHostViewSet', 'AppletHostDeploymentViewSet']
 class AppletHostViewSet(JMSModelViewSet):
     serializer_class = AppletHostSerializer
     queryset = AppletHost.objects.all()
+
+    def dispatch(self, request, *args, **kwargs):
+        with tmp_to_builtin_org(system=1):
+            return super().dispatch(request, *args, **kwargs)
 
     def get_permissions(self):
         if self.action == 'startup':
