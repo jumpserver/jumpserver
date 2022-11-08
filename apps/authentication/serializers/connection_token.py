@@ -159,7 +159,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     domain = ConnectionTokenDomainSerializer(read_only=True)
     cmd_filter_rules = ConnectionTokenCmdFilterRuleSerializer(many=True)
     actions = ActionsField()
-    expired_at = serializers.IntegerField()
+    expire_at = serializers.IntegerField()
 
     class Meta:
         model = ConnectionToken
@@ -167,5 +167,5 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
             'id', 'secret',
             'user', 'asset', 'account_username', 'account', 'protocol',
             'domain', 'gateway', 'cmd_filter_rules',
-            'actions', 'expired_at',
+            'actions', 'expire_at',
         ]
