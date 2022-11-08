@@ -21,7 +21,10 @@ class BaseAccountSerializer(BulkOrgResourceModelSerializer):
     class Meta:
         model = BaseAccount
         fields_mini = ['id', 'name', 'username']
-        fields_small = fields_mini + ['privileged', 'secret_type', 'secret', 'has_secret', 'specific']
+        fields_small = fields_mini + [
+            'secret_type', 'secret', 'has_secret',
+            'privileged', 'is_active', 'specific',
+        ]
         fields_other = ['created_by', 'date_created', 'date_updated', 'comment']
         fields = fields_small + fields_other
         read_only_fields = [

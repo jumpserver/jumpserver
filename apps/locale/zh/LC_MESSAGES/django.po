@@ -858,7 +858,7 @@ msgstr "校验日期"
 
 #: assets/models/base.py:63
 msgid "Privileged"
-msgstr "特权的"
+msgstr "特权账号"
 
 #: assets/models/cmd_filter.py:32 perms/models/asset_permission.py:61
 #: users/models/group.py:31 users/models/user.py:671
