@@ -3,7 +3,7 @@ from celery import current_task
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from common.const.choices import Trigger, Status
+from common.const.choices import Trigger
 from common.mixins.models import CommonModelMixin
 from common.db.fields import EncryptJsonDictTextField
 from orgs.mixins.models import OrgModelMixin

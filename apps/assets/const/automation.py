@@ -17,6 +17,22 @@ class AutomationTypes(TextChoices):
     verify_account = 'verify_account', _('Verify account')
     gather_accounts = 'gather_accounts', _('Gather accounts')
 
+    @classmethod
+    def get_type_model(cls, tp):
+        from assets.models import (
+            PingAutomation, GatherFactsAutomation, PushAccountAutomation,
+            ChangeSecretAutomation, VerifyAccountAutomation, GatherAccountsAutomation,
+        )
+        type_model_dict = {
+            cls.ping: PingAutomation,
+            cls.gather_facts: GatherFactsAutomation,
+            cls.push_account: PushAccountAutomation,
+            cls.change_secret: ChangeSecretAutomation,
+            cls.verify_account: VerifyAccountAutomation,
+            cls.gather_accounts: GatherAccountsAutomation,
+        }
+        return type_model_dict.get(tp)
+
 
 class SecretStrategy(TextChoices):
     custom = 'specific', _('Specific')

@@ -24,7 +24,7 @@ logger = get_logger(__file__)
 
 class AbsConnectivity(models.Model):
     connectivity = models.CharField(
-        choices=Connectivity.choices, default=Connectivity.unknown,
+        choices=Connectivity.choices, default=Connectivity.UNKNOWN,
         max_length=16, verbose_name=_('Connectivity')
     )
     date_verified = models.DateTimeField(null=True, verbose_name=_("Date verified"))
@@ -50,7 +50,7 @@ class BaseAccount(JMSOrgBaseModel):
     name = models.CharField(max_length=128, verbose_name=_("Name"))
     username = models.CharField(max_length=128, blank=True, verbose_name=_('Username'), db_index=True)
     secret_type = models.CharField(
-        max_length=16, choices=SecretType.choices, default=SecretType.password, verbose_name=_('Secret type')
+        max_length=16, choices=SecretType.choices, default=SecretType.PASSWORD, verbose_name=_('Secret type')
     )
     secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Secret'))
     privileged = models.BooleanField(verbose_name=_("Privileged"), default=False)
@@ -65,25 +65,25 @@ class BaseAccount(JMSOrgBaseModel):
     @property
     def specific(self):
         data = {}
-        if self.secret_type != SecretType.ssh_key:
+        if self.secret_type != SecretType.SSH_KEY:
             return data
         data['ssh_key_fingerprint'] = self.ssh_key_fingerprint
         return data
 
     @property
     def private_key(self):
-        if self.secret_type == SecretType.ssh_key:
+        if self.secret_type == SecretType.SSH_KEY:
             return self.secret
         return None
 
     @private_key.setter
     def private_key(self, value):
         self.secret = value
-        self.secret_type = SecretType.ssh_key
+        self.secret_type = SecretType.SSH_KEY
 
     @lazyproperty
     def public_key(self):
-        if self.secret_type == SecretType.ssh_key:
+        if self.secret_type == SecretType.SSH_KEY:
             return ssh_pubkey_gen(private_key=self.private_key)
         return None
 
@@ -113,7 +113,7 @@ class BaseAccount(JMSOrgBaseModel):
 
     @property
     def private_key_path(self):
-        if not self.secret_type != SecretType.ssh_key or not self.secret:
+        if not self.secret_type != SecretType.SSH_KEY or not self.secret:
             return None
         project_dir = settings.PROJECT_DIR
         tmp_dir = os.path.join(project_dir, 'tmp')

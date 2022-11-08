@@ -18,8 +18,8 @@ class VerifyAccountManager(PushOrVerifyHostCallbackMixin, BasePlaybookManager):
 
     def on_host_success(self, host, result):
         account = self.host_account_mapper.get(host)
-        account.set_connectivity(Connectivity.ok)
+        account.set_connectivity(Connectivity.OK)
 
     def on_host_error(self, host, error, result):
         account = self.host_account_mapper.get(host)
-        account.set_connectivity(Connectivity.failed)
+        account.set_connectivity(Connectivity.FAILED)

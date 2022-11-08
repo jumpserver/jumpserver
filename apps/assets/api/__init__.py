@@ -6,5 +6,6 @@ from .label import *
 from .account import *
 from .node import *
 from .domain import *
+from .automations import *
 from .gathered_user import *
 from .favorite_asset import *
