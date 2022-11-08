@@ -47,7 +47,7 @@ class PushOrVerifyHostCallbackMixin:
             secret = account.secret
 
             private_key_path = None
-            if account.secret_type == SecretType.ssh_key:
+            if account.secret_type == SecretType.SSH_KEY:
                 private_key_path = self.generate_private_key_path(secret, path_dir)
                 secret = self.generate_public_key(secret)
 
