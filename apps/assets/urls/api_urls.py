@@ -27,9 +27,10 @@ router.register(r'favorite-assets', api.FavoriteAssetViewSet, 'favorite-asset')
 router.register(r'account-backup-plans', api.AccountBackupPlanViewSet, 'account-backup')
 router.register(r'account-backup-plan-executions', api.AccountBackupPlanExecutionViewSet, 'account-backup-execution')
 
-router.register(r'change-secret-automations', api.ChangeSecretAutomationViewSet, 'change-secret-automations')
+router.register(r'change-secret-automations', api.ChangeSecretAutomationViewSet, 'change-secret-automation')
 router.register(r'automation-executions', api.AutomationExecutionViewSet, 'automation-execution')
-router.register(r'change-secret-records', api.ChangeSecretRecordViewSet, 'change-secret-records')
+router.register(r'change-secret-records', api.ChangeSecretRecordViewSet, 'change-secret-record')
+router.register(r'gather-account-automations', api.GatherAccountsAutomationViewSet, 'gather-account-automation')
 
 urlpatterns = [
     # path('assets/<uuid:pk>/gateways/', api.AssetGatewayListApi.as_view(), name='asset-gateway-list'),
