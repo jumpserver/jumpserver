@@ -201,7 +201,7 @@ class CommandFilterRule(OrgModelMixin):
             q |= Q(user_groups__in=set(user_groups))
         if account:
             org_id = account.org_id
-            q |= Q(accounts__contains=list(account)) |\
+            q |= Q(accounts__contains=account.username) | \
                  Q(accounts__contains=SpecialAccount.ALL.value)
         if asset:
             org_id = asset.org_id

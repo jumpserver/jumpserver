@@ -27,17 +27,25 @@ router.register(r'favorite-assets', api.FavoriteAssetViewSet, 'favorite-asset')
 router.register(r'account-backup-plans', api.AccountBackupPlanViewSet, 'account-backup')
 router.register(r'account-backup-plan-executions', api.AccountBackupPlanExecutionViewSet, 'account-backup-execution')
 
+router.register(r'change-secret-automations', api.ChangeSecretAutomationViewSet, 'change-secret-automations')
+router.register(r'automation-executions', api.AutomationExecutionViewSet, 'automation-execution')
+router.register(r'change-secret-records', api.ChangeSecretRecordViewSet, 'change-secret-records')
+
 urlpatterns = [
     # path('assets/<uuid:pk>/gateways/', api.AssetGatewayListApi.as_view(), name='asset-gateway-list'),
     path('assets/<uuid:pk>/tasks/', api.AssetTaskCreateApi.as_view(), name='asset-task-create'),
     path('assets/tasks/', api.AssetsTaskCreateApi.as_view(), name='assets-task-create'),
     path('assets/<uuid:pk>/perm-users/', api.AssetPermUserListApi.as_view(), name='asset-perm-user-list'),
-    path('assets/<uuid:pk>/perm-users/<uuid:perm_user_id>/permissions/', api.AssetPermUserPermissionsListApi.as_view(), name='asset-perm-user-permission-list'),
-    path('assets/<uuid:pk>/perm-user-groups/', api.AssetPermUserGroupListApi.as_view(), name='asset-perm-user-group-list'),
-    path('assets/<uuid:pk>/perm-user-groups/<uuid:perm_user_group_id>/permissions/', api.AssetPermUserGroupPermissionsListApi.as_view(), name='asset-perm-user-group-permission-list'),
+    path('assets/<uuid:pk>/perm-users/<uuid:perm_user_id>/permissions/', api.AssetPermUserPermissionsListApi.as_view(),
+         name='asset-perm-user-permission-list'),
+    path('assets/<uuid:pk>/perm-user-groups/', api.AssetPermUserGroupListApi.as_view(),
+         name='asset-perm-user-group-list'),
+    path('assets/<uuid:pk>/perm-user-groups/<uuid:perm_user_group_id>/permissions/',
+         api.AssetPermUserGroupPermissionsListApi.as_view(), name='asset-perm-user-group-permission-list'),
 
     path('accounts/tasks/', api.AccountTaskCreateAPI.as_view(), name='account-task-create'),
-    path('account-secrets/<uuid:pk>/histories/', api.AccountHistoriesSecretAPI.as_view(), name='account-secret-history'),
+    path('account-secrets/<uuid:pk>/histories/', api.AccountHistoriesSecretAPI.as_view(),
+         name='account-secret-history'),
 
     path('nodes/category/tree/', api.CategoryTreeApi.as_view(), name='asset-category-tree'),
     path('nodes/tree/', api.NodeListAsTreeApi.as_view(), name='node-tree'),
@@ -52,7 +60,11 @@ urlpatterns = [
     path('nodes/<uuid:pk>/tasks/', api.NodeTaskCreateApi.as_view(), name='node-task-create'),
 
     path('gateways/<uuid:pk>/test-connective/', api.GatewayTestConnectionApi.as_view(), name='test-gateway-connective'),
+
+    path('automation/<uuid:pk>/asset/remove/', api.AutomationRemoveAssetApi.as_view(), name='automation-remove-asset'),
+    path('automation/<uuid:pk>/asset/add/', api.AutomationAddAssetApi.as_view(), name='automation-add-asset'),
+    path('automation/<uuid:pk>/nodes/', api.AutomationNodeAddRemoveApi.as_view(), name='automation-add-or-remove-node'),
+    path('automation/<uuid:pk>/assets/', api.AutomationAssetsListApi.as_view(), name='automation-assets'),
 ]
 
 urlpatterns += router.urls
-

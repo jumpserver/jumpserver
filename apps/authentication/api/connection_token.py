@@ -178,8 +178,6 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
     get_object: callable
     get_serializer: callable
     perform_create: callable
-    check_token_permission: callable
-    create_connection_token: callable
 
     @action(methods=['POST'], detail=False, url_path='secret-info/detail')
     def get_secret_detail(self, request, *args, **kwargs):
@@ -277,10 +275,10 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         from perms.utils.account import PermAccountUtil
         actions, expire_at = PermAccountUtil().validate_permission(user, asset, account_username)
         if not actions:
-            error = ''
+            error = 'No actions'
             raise PermissionDenied(error)
         if expire_at < time.time():
-            error = ''
+            error = 'Expired'
             raise PermissionDenied(error)
 
 
