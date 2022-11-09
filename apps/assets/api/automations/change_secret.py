@@ -24,8 +24,8 @@ class ChangeSecretAutomationViewSet(OrgBulkModelViewSet):
 
 class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
     serializer_class = serializers.ChangeSecretRecordSerializer
-    filter_fields = ['username', 'asset', 'reason', 'execution']
-    search_fields = ['username', 'reason', 'asset__hostname']
+    filter_fields = ['asset', 'execution_id']
+    search_fields = ['asset__hostname']
 
     def get_queryset(self):
         return ChangeSecretRecord.objects.all()
