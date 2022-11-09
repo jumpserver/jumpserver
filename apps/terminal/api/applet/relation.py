@@ -8,6 +8,7 @@ from rest_framework.response import Response
 
 from common.drf.api import JMSModelViewSet
 from common.permissions import IsServiceAccount
+from common.utils import is_uuid
 from orgs.utils import tmp_to_builtin_org
 from rbac.permissions import RBACPermission
 from terminal.models import AppletHost
@@ -62,6 +63,13 @@ class AppletHostAccountsViewSet(HostMixin, JMSModelViewSet):
 class AppletHostAppletViewSet(HostMixin, JMSModelViewSet):
     host: AppletHost
     serializer_class = AppletPublicationSerializer
+
+    def get_object(self):
+        pk = self.kwargs.get('pk')
+        if not is_uuid(pk):
+            return self.host.publications.get(applet__name=pk)
+        else:
+            return self.host.publications.get(pk=pk)
 
     def get_queryset(self):
         queryset = self.host.publications.all()
