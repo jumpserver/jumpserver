@@ -6,10 +6,11 @@ from rest_framework.fields import empty
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
 
+from common.drf.fields import ObjectRelatedField
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from assets.models import Asset, Node
 from users.models import User, UserGroup
 from perms.models import AssetPermission, Action
-from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 __all__ = ['AssetPermissionSerializer', 'ActionsField']
 
@@ -44,18 +45,10 @@ class ActionsDisplayField(ActionsField):
 
 
 class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
-    users_display = serializers.ListField(
-        child=serializers.CharField(), label=_('Users display'), required=False
-    )
-    user_groups_display = serializers.ListField(
-        child=serializers.CharField(), label=_('User groups display'), required=False
-    )
-    assets_display = serializers.ListField(
-        child=serializers.CharField(), label=_('Assets display'), required=False
-    )
-    nodes_display = serializers.ListField(
-        child=serializers.CharField(), label=_('Nodes display'), required=False
-    )
+    users = ObjectRelatedField(queryset=User.objects, many=True, required=False)
+    user_groups = ObjectRelatedField(queryset=UserGroup.objects, many=True, required=False)
+    assets = ObjectRelatedField(queryset=Asset.objects, many=True, required=False)
+    nodes = ObjectRelatedField(queryset=Node.objects, many=True, required=False)
     actions = ActionsField(required=False, allow_null=True, label=_("Actions"))
     is_valid = serializers.BooleanField(read_only=True, label=_("Is valid"))
     is_expired = serializers.BooleanField(read_only=True, label=_('Is expired'))
@@ -64,24 +57,16 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
         model = AssetPermission
         fields_mini = ['id', 'name']
         fields_small = fields_mini + [
-            'is_active', 'is_expired', 'is_valid', 'actions',
-            'accounts',
-            'created_by', 'date_created', 'date_expired',
+            'accounts', 'is_active', 'is_expired', 'is_valid',
+            'actions', 'created_by', 'date_created', 'date_expired',
             'date_start', 'comment', 'from_ticket'
         ]
         fields_m2m = [
-            'users', 'users_display', 'user_groups', 'user_groups_display', 'assets',
-            'assets_display', 'nodes', 'nodes_display',
-            'users_amount', 'user_groups_amount', 'assets_amount',
-            'nodes_amount',
+            'users', 'user_groups',  'assets', 'nodes',
         ]
         fields = fields_small + fields_m2m
         read_only_fields = ['created_by', 'date_created', 'from_ticket']
         extra_kwargs = {
-            'users_amount': {'label': _('Users amount')},
-            'user_groups_amount': {'label': _('User groups amount')},
-            'assets_amount': {'label': _('Assets amount')},
-            'nodes_amount': {'label': _('Nodes amount')},
             'actions': {'label': _('Actions')},
             'is_expired': {'label': _('Is expired')},
             'is_valid': {'label': _('Is valid')},

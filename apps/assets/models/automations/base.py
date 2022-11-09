@@ -3,7 +3,7 @@ from celery import current_task
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from common.const.choices import Trigger, Status
+from common.const.choices import Trigger
 from common.mixins.models import CommonModelMixin
 from common.db.fields import EncryptJsonDictTextField
 from orgs.mixins.models import OrgModelMixin
@@ -15,12 +15,8 @@ from assets.const import AutomationTypes
 
 class BaseAutomation(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
     accounts = models.JSONField(default=list, verbose_name=_("Accounts"))
-    nodes = models.ManyToManyField(
-        'assets.Node', blank=True, verbose_name=_("Nodes")
-    )
-    assets = models.ManyToManyField(
-        'assets.Asset', blank=True, verbose_name=_("Assets")
-    )
+    nodes = models.ManyToManyField('assets.Node', blank=True, verbose_name=_("Nodes"))
+    assets = models.ManyToManyField('assets.Asset', blank=True, verbose_name=_("Assets"))
     type = models.CharField(max_length=16, choices=AutomationTypes.choices, verbose_name=_('Type'))
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
@@ -92,7 +88,7 @@ class AutomationExecution(OrgModelMixin):
         'BaseAutomation', related_name='executions', on_delete=models.CASCADE,
         verbose_name=_('Automation task')
     )
-    status = models.CharField(max_length=16, default='pending')
+    status = models.CharField(max_length=16, default='pending', verbose_name=_('Status'))
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
     date_start = models.DateTimeField(null=True, verbose_name=_('Date start'), db_index=True)
     date_finished = models.DateTimeField(null=True, verbose_name=_("Date finished"))

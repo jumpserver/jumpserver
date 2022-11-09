@@ -4,6 +4,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from orgs.utils import tmp_to_builtin_org
 from .models import Applet, AppletHost
 
 
@@ -13,7 +14,8 @@ def on_applet_host_create(sender, instance, created=False, **kwargs):
         return
     applets = Applet.objects.all()
     instance.applets.set(applets)
-    instance.generate_accounts()
+    with tmp_to_builtin_org(system=1):
+        instance.generate_accounts()
 
 
 @receiver(post_save, sender=Applet)

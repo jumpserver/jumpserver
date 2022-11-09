@@ -144,7 +144,7 @@ def check_server_performance_period():
     ServerPerformanceCheckUtil().check_and_publish()
 
 
-@shared_task(queue="ansible", verbose_name=_("Hello"), comment="an test shared task")
+@shared_task(verbose_name=_("Hello"), comment="an test shared task")
 def hello(name, callback=None):
     from users.models import User
     import time

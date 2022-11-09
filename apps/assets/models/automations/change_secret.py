@@ -12,7 +12,7 @@ __all__ = ['ChangeSecretAutomation', 'ChangeSecretRecord']
 class ChangeSecretAutomation(BaseAutomation):
     secret_type = models.CharField(
         choices=SecretType.choices, max_length=16,
-        default=SecretType.password, verbose_name=_('Secret type')
+        default=SecretType.PASSWORD, verbose_name=_('Secret type')
     )
     secret_strategy = models.CharField(
         choices=SecretStrategy.choices, max_length=16,
@@ -24,7 +24,7 @@ class ChangeSecretAutomation(BaseAutomation):
         choices=SSHKeyStrategy.choices, max_length=16,
         default=SSHKeyStrategy.add, verbose_name=_('SSH key change strategy')
     )
-    recipients = models.ManyToManyField('users.User', blank=True, verbose_name=_("Recipient"))
+    recipients = models.ManyToManyField('users.User', verbose_name=_("Recipient"), blank=True)
 
     def save(self, *args, **kwargs):
         self.type = AutomationTypes.change_secret

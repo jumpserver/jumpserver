@@ -14,7 +14,7 @@
     RDS_fSingleSessionPerUser: 1
     RDS_MaxDisconnectionTime: 60000
     RDS_RemoteAppLogoffTimeLimit: 0
-    TinkerInstaller: JumpServer-Remoteapp_v0.0.1.exe
+    TinkerInstaller: Tinker_Installer_v0.0.1.exe
 
   tasks:
   - name: Install RDS-Licensing (RDS)
@@ -31,12 +31,12 @@
       include_management_tools: yes
     register: rds_install
 
-  - name: Download JumpServer Remoteapp installer (jumpserver)
+  - name: Download JumpServer Tinker installer (jumpserver)
     ansible.windows.win_get_url:
         url: "{{ DownloadHost }}/{{ TinkerInstaller }}"
         dest: "{{ ansible_env.TEMP }}\\{{ TinkerInstaller }}"
 
-  - name: Install JumpServer Remoteapp agent (jumpserver)
+  - name: Install JumpServer Tinker (jumpserver)
     ansible.windows.win_package:
       path: "{{ ansible_env.TEMP }}\\{{ TinkerInstaller }}"
       arguments:
@@ -48,7 +48,7 @@
   - name: Set remote-server on the global system path (remote-server)
     ansible.windows.win_path:
       elements:
-        - '%USERPROFILE%\AppData\Local\Programs\JumpServer-Remoteapp\'
+        - '%USERPROFILE%\AppData\Local\Programs\Tinker\'
       scope: user
 
   - name: Download python-3.10.8
@@ -153,18 +153,18 @@
       arguments:
       - /quiet
 
-  - name: Generate component config
+  - name: Generate tinkerd component config
     ansible.windows.win_shell:
-      "remoteapp-server config --hostname {{ HOST_NAME }} --core_host {{ CORE_HOST }} 
+      "tinkerd config --hostname {{ HOST_NAME }} --core_host {{ CORE_HOST }} 
       --token {{ BOOTSTRAP_TOKEN }} --host_id {{ HOST_ID }}"
 
-  - name: Install remoteapp-server service
+  - name: Install tinkerd service
     ansible.windows.win_shell:
-      "remoteapp-server service install"
+      "tinkerd service install"
 
-  - name: Start remoteapp-server service
+  - name: Start tinkerd service
     ansible.windows.win_shell:
-      "remoteapp-server  service start"
+      "tinkerd service start"
 
   - name: Wait Tinker api health
     ansible.windows.win_uri:

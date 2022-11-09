@@ -47,7 +47,7 @@ class PushOrVerifyHostCallbackMixin:
             secret = account.secret
 
             private_key_path = None
-            if account.secret_type == SecretType.ssh_key:
+            if account.secret_type == SecretType.SSH_KEY:
                 private_key_path = self.generate_private_key_path(secret, path_dir)
                 secret = self.generate_public_key(secret)
 
@@ -221,6 +221,7 @@ class BasePlaybookManager:
         else:
             print(">>> 开始执行任务\n")
 
+        self.execution.date_start = timezone.now()
         for i, runner in enumerate(runners, start=1):
             if len(runners) > 1:
                 print(">>> 开始执行第 {} 批任务".format(i))
@@ -231,3 +232,6 @@ class BasePlaybookManager:
             except Exception as e:
                 self.on_runner_failed(runner, e)
             print('\n')
+        self.execution.status = 'success'
+        self.execution.date_finished = timezone.now()
+        self.execution.save()

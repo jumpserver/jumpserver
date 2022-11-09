@@ -53,7 +53,9 @@ class PermAccountUtil(AssetPermissionUtil):
             user, asset, with_actions=True, with_perms=True
         )
         perm = perms.first()
-        account = accounts.filter(username=account_username).first()
-        actions = account.actions if account else []
-        expire_at = perm.date_expired if perm else time.time()
+        actions = []
+        for account in accounts:
+            if account.username == account_username:
+                actions = account.actions
+        expire_at = perm.date_expired.timestamp() if perm else time.time()
         return actions, expire_at

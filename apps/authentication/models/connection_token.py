@@ -85,7 +85,7 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
             is_valid = False
             error = _('No user or invalid user')
             return is_valid, error
-        if not self.asset or self.asset.is_active:
+        if not self.asset or not self.asset.is_active:
             is_valid = False
             error = _('No asset or inactive asset')
             return is_valid, error

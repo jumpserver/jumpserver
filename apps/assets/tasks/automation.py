@@ -7,9 +7,9 @@ logger = get_logger(__file__)
 
 
 @shared_task(queue='ansible')
-def execute_automation(pid, trigger, mode):
+def execute_automation(pid, trigger, model):
     with tmp_to_root_org():
-        instance = get_object_or_none(mode, pk=pid)
+        instance = get_object_or_none(model, pk=pid)
     if not instance:
         logger.error("No automation task found: {}".format(pid))
         return

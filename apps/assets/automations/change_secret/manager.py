@@ -89,9 +89,9 @@ class ChangeSecretManager(BasePlaybookManager):
             return self.generate_password()
 
     def get_secret(self):
-        if self.secret_type == SecretType.ssh_key:
+        if self.secret_type == SecretType.SSH_KEY:
             secret = self.get_ssh_key()
-        elif self.secret_type == SecretType.password:
+        elif self.secret_type == SecretType.PASSWORD:
             secret = self.get_password()
         else:
             raise ValueError("Secret must be set")
@@ -99,7 +99,7 @@ class ChangeSecretManager(BasePlaybookManager):
 
     def get_kwargs(self, account, secret):
         kwargs = {}
-        if self.secret_type != SecretType.ssh_key:
+        if self.secret_type != SecretType.SSH_KEY:
             return kwargs
         kwargs['strategy'] = self.execution.snapshot['ssh_key_change_strategy']
         kwargs['exclusive'] = 'yes' if kwargs['strategy'] == SSHKeyStrategy.set else 'no'
@@ -143,7 +143,7 @@ class ChangeSecretManager(BasePlaybookManager):
             self.name_recorder_mapper[h['name']] = recorder
 
             private_key_path = None
-            if self.secret_type == SecretType.ssh_key:
+            if self.secret_type == SecretType.SSH_KEY:
                 private_key_path = self.generate_private_key_path(new_secret, path_dir)
                 new_secret = self.generate_public_key(new_secret)
 

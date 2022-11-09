@@ -21,14 +21,14 @@ class PingManager(BasePlaybookManager):
 
     def on_host_success(self, host, result):
         asset, account = self.host_asset_and_account_mapper.get(host)
-        asset.set_connectivity(Connectivity.ok)
+        asset.set_connectivity(Connectivity.OK)
         if not account:
             return
-        account.set_connectivity(Connectivity.ok)
+        account.set_connectivity(Connectivity.OK)
 
     def on_host_error(self, host, error, result):
         asset, account = self.host_asset_and_account_mapper.get(host)
-        asset.set_connectivity(Connectivity.failed)
+        asset.set_connectivity(Connectivity.FAILED)
         if not account:
             return
-        account.set_connectivity(Connectivity.failed)
+        account.set_connectivity(Connectivity.FAILED)

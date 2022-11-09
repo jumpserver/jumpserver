@@ -2,10 +2,11 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from common.drf.serializers import SecretReadableMixin
-from common.drf.fields import ObjectRelatedField
+from common.drf.fields import ObjectRelatedField, LabeledChoiceField
 from assets.tasks import push_accounts_to_assets
 from assets.models import Account, AccountTemplate, Asset
 from .base import BaseAccountSerializer
+from assets.const import SecretType
 
 
 class AccountSerializerCreateMixin(serializers.ModelSerializer):
@@ -91,6 +92,8 @@ class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
 
 
 class AccountHistorySerializer(serializers.ModelSerializer):
+    secret_type = LabeledChoiceField(choices=SecretType.choices, label=_('Secret type'))
+
     class Meta:
         model = Account.history.model
         fields = ['id', 'secret', 'secret_type', 'version', 'history_date', 'history_user']

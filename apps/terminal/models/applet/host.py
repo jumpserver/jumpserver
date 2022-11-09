@@ -11,7 +11,6 @@ from common.db.models import JMSBaseModel
 from common.utils import random_string
 from assets.models import Host
 
-
 __all__ = ['AppletHost', 'AppletHostDeployment']
 
 
@@ -26,7 +25,7 @@ class AppletHost(Host):
     )
     applets = models.ManyToManyField(
         'Applet', verbose_name=_('Applet'),
-        through='AppletPublication',  through_fields=('host', 'applet'),
+        through='AppletPublication', through_fields=('host', 'applet'),
     )
     LOCKING_ORG = '00000000-0000-0000-0000-000000000004'
 
@@ -34,10 +33,10 @@ class AppletHost(Host):
         return self.name
 
     @property
-    def status(self):
-        if self.terminal:
-            return 'online'
-        return self.terminal.status
+    def load(self):
+        if not self.terminal:
+            return 'offline'
+        return self.terminal.load
 
     def check_terminal_binding(self, request):
         request_terminal = getattr(request.user, 'terminal', None)
@@ -70,8 +69,8 @@ class AppletHost(Host):
                 status_applets['published'].append(applet)
 
         for status, applets in status_applets.items():
-            self.publications.filter(applet__in=applets)\
-                .exclude(status=status)\
+            self.publications.filter(applet__in=applets) \
+                .exclude(status=status) \
                 .update(status=status)
 
     @staticmethod
@@ -95,7 +94,7 @@ class AppletHost(Host):
             account = account_model(
                 username=username, secret=password, name=username,
                 asset_id=self.id, secret_type='password', version=1,
-                org_id=self.LOCKING_ORG
+                org_id=self.LOCKING_ORG, is_active=False,
             )
             accounts.append(account)
         bulk_create_with_history(accounts, account_model, batch_size=20)
