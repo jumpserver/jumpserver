@@ -36,5 +36,5 @@ class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
         execution = get_object_or_none(AutomationExecution, pk=eid)
         if execution:
             queryset = queryset.filter(execution=execution)
-        queryset = queryset.order_by('is_success', '-date_start')
+        queryset = queryset.order_by('-date_start')
         return queryset
