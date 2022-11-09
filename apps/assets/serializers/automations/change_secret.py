@@ -3,10 +3,11 @@
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
-from assets.serializers.base import AuthValidateMixin
-from assets.models import ChangeSecretAutomation, ChangeSecretRecord
-from assets.const import DEFAULT_PASSWORD_RULES, SecretType, SecretStrategy
 from common.utils import get_logger
+from common.drf.fields import LabeledChoiceField, ObjectRelatedField
+from assets.serializers.base import AuthValidateMixin
+from assets.const import DEFAULT_PASSWORD_RULES, SecretType, SecretStrategy, SSHKeyStrategy
+from assets.models import Asset, Account, ChangeSecretAutomation, ChangeSecretRecord, AutomationExecution
 
 from .base import BaseAutomationSerializer
 
@@ -20,19 +21,17 @@ __all__ = [
 
 
 class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializer):
+    secret_strategy = LabeledChoiceField(
+        choices=SecretStrategy.choices, required=True, label=_('Secret strategy')
+    )
+    ssh_key_change_strategy = LabeledChoiceField(
+        choices=SSHKeyStrategy.choices, required=False, label=_('SSH Key strategy')
+    )
     password_rules = serializers.DictField(default=DEFAULT_PASSWORD_RULES)
-    secret_strategy_display = serializers.ReadOnlyField(
-        source='get_secret_strategy_display', label=_('Secret strategy')
-    )
-    ssh_key_change_strategy_display = serializers.ReadOnlyField(
-        source='get_ssh_key_strategy_display', label=_('SSH Key strategy')
-    )
 
     class Meta:
         model = ChangeSecretAutomation
-        read_only_fields = BaseAutomationSerializer.Meta.read_only_fields + [
-            'secret_strategy_display', 'ssh_key_change_strategy_display'
-        ]
+        read_only_fields = BaseAutomationSerializer.Meta.read_only_fields
         fields = BaseAutomationSerializer.Meta.fields + read_only_fields + [
             'secret_type', 'secret_strategy', 'secret', 'password_rules',
             'ssh_key_change_strategy', 'passphrase', 'recipients',
@@ -84,25 +83,20 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
 
 
 class ChangeSecretRecordSerializer(serializers.ModelSerializer):
-    asset_display = serializers.SerializerMethodField(label=_('Asset display'))
-    account_display = serializers.SerializerMethodField(label=_('Account display'))
     is_success = serializers.SerializerMethodField(label=_('Is success'))
+    asset = ObjectRelatedField(queryset=Asset.objects, label=_('Asset'))
+    account = ObjectRelatedField(queryset=Account.objects, label=_('Account'))
+    execution = ObjectRelatedField(
+        queryset=AutomationExecution.objects, label=_('Automation task execution')
+    )
 
     class Meta:
         model = ChangeSecretRecord
         fields = [
-            'id', 'asset', 'account', 'date_started', 'date_finished',
-            'is_success', 'error', 'execution', 'asset_display', 'account_display'
+            'id', 'asset', 'account', 'date_started',
+            'date_finished', 'is_success', 'error', 'execution',
         ]
         read_only_fields = fields
-
-    @staticmethod
-    def get_asset_display(instance):
-        return str(instance.asset)
-
-    @staticmethod
-    def get_account_display(instance):
-        return str(instance.account)
 
     @staticmethod
     def get_is_success(obj):
