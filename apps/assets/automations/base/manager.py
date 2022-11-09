@@ -232,5 +232,6 @@ class BasePlaybookManager:
             except Exception as e:
                 self.on_runner_failed(runner, e)
             print('\n')
+        self.execution.status = 'success'
         self.execution.date_finished = timezone.now()
         self.execution.save()

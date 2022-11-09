@@ -3,9 +3,10 @@ from rest_framework import serializers
 
 from ops.mixin import PeriodTaskSerializerMixin
 from assets.const import AutomationTypes
-from assets.models import Asset, BaseAutomation, AutomationExecution
+from assets.models import Asset, Node, BaseAutomation, AutomationExecution
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.utils import get_logger
+from common.drf.fields import ObjectRelatedField
 
 logger = get_logger(__file__)
 
@@ -16,6 +17,9 @@ __all__ = [
 
 
 class BaseAutomationSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSerializer):
+    assets = ObjectRelatedField(many=True, required=False, queryset=Asset.objects, label=_('Assets'))
+    nodes = ObjectRelatedField(many=True, required=False, queryset=Node.objects, label=_('Nodes'))
+
     class Meta:
         read_only_fields = [
             'date_created', 'date_updated', 'created_by', 'periodic_display'
@@ -26,6 +30,7 @@ class BaseAutomationSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSe
         ]
         extra_kwargs = {
             'name': {'required': True},
+            'type': {'read_only': True},
             'periodic_display': {'label': _('Periodic perform')},
         }
 
@@ -37,10 +42,10 @@ class AutomationExecutionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AutomationExecution
-        fields = [
-            'id', 'automation', 'trigger', 'trigger_display',
-            'date_start', 'date_finished', 'snapshot', 'type'
+        read_only_fields = [
+            'trigger_display', 'date_start', 'date_finished', 'snapshot', 'status'
         ]
+        fields = ['id', 'automation', 'trigger', 'type'] + read_only_fields
 
     @staticmethod
     def get_snapshot(obj):
