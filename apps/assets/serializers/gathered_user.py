@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 #
-
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
-from ..models import GatheredUser
+from common.drf.fields import ObjectRelatedField
+from ..models import GatheredUser, Asset
 
 
 class GatheredUserSerializer(OrgResourceModelSerializerMixin):
+    asset = ObjectRelatedField(queryset=Asset.objects, label=_('Asset'))
+
     class Meta:
         model = GatheredUser
         fields_mini = ['id']
