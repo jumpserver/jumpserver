@@ -6,6 +6,8 @@ from rest_framework import serializers
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ops.mixin import PeriodTaskSerializerMixin
 from common.utils import get_logger
+from common.const.choices import Trigger
+from common.drf.fields import LabeledChoiceField
 
 from assets.models import AccountBackupPlan, AccountBackupPlanExecution
 
@@ -32,17 +34,12 @@ class AccountBackupPlanSerializer(PeriodTaskSerializerMixin, BulkOrgResourceMode
 
 
 class AccountBackupPlanExecutionSerializer(serializers.ModelSerializer):
-    trigger_display = serializers.ReadOnlyField(
-        source='get_trigger_display', label=_('Trigger mode')
-    )
+    trigger = LabeledChoiceField(choices=Trigger.choices, label=_('Trigger mode'))
 
     class Meta:
         model = AccountBackupPlanExecution
-        fields = [
-            'id', 'date_start', 'timedelta', 'plan_snapshot', 'trigger', 'reason',
-            'is_success', 'plan', 'org_id', 'recipients', 'trigger_display'
-        ]
-        read_only_fields = (
+        read_only_fields = [
             'id', 'date_start', 'timedelta', 'plan_snapshot', 'trigger', 'reason',
             'is_success', 'org_id', 'recipients'
-        )
+        ]
+        fields = read_only_fields + ['plan']

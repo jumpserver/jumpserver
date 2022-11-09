@@ -2,7 +2,9 @@ from django.utils.translation import ugettext as _
 from rest_framework import serializers
 from common.drf.serializers import BulkModelSerializer
 from common.drf.serializers import MethodSerializer
+from common.drf.fields import ObjectRelatedField
 from jumpserver.utils import has_valid_xpack_license
+from users.models import User
 from ..models import LoginACL
 from .rules import RuleSerializer
 
@@ -12,8 +14,10 @@ common_help_text = _('Format for comma-delimited string, with * indicating a mat
 
 
 class LoginACLSerializer(BulkModelSerializer):
-    user_display = serializers.ReadOnlyField(source='user.username', label=_('Username'))
-    reviewers_display = serializers.SerializerMethodField(label=_('Reviewers'))
+    user = ObjectRelatedField(queryset=User.objects, label=_('User'))
+    reviewers = ObjectRelatedField(
+        queryset=User.objects, label=_('Reviewers'), many=True, required=False
+    )
     action_display = serializers.ReadOnlyField(source='get_action_display', label=_('Action'))
     reviewers_amount = serializers.IntegerField(read_only=True, source='reviewers.count')
     rules = MethodSerializer()
@@ -22,13 +26,11 @@ class LoginACLSerializer(BulkModelSerializer):
         model = LoginACL
         fields_mini = ['id', 'name']
         fields_small = fields_mini + [
-            'priority', 'rules', 'action', 'action_display',
-            'is_active', 'user', 'user_display',
-            'date_created', 'date_updated', 'reviewers_amount',
-            'comment', 'created_by'
+            'priority', 'rules', 'action', 'action_display', 'is_active', 'user',
+            'date_created', 'date_updated', 'reviewers_amount', 'comment', 'created_by',
         ]
-        fields_fk = ['user', 'user_display']
-        fields_m2m = ['reviewers', 'reviewers_display']
+        fields_fk = ['user']
+        fields_m2m = ['reviewers']
         fields = fields_small + fields_fk + fields_m2m
         extra_kwargs = {
             'priority': {'default': 50},

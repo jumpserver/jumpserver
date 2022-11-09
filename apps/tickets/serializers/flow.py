@@ -5,21 +5,24 @@ from rest_framework import serializers
 from orgs.models import Organization
 from orgs.utils import get_current_org_id
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
+from common.drf.fields import LabeledChoiceField
 from tickets.models import TicketFlow, ApprovalRule
-from tickets.const import TicketApprovalStrategy
+from tickets.const import TicketApprovalStrategy, TicketType
 
 __all__ = ['TicketFlowSerializer']
 
 
 class TicketFlowApproveSerializer(serializers.ModelSerializer):
-    strategy_display = serializers.ReadOnlyField(source='get_strategy_display', label=_('Approve strategy'))
+    strategy = LabeledChoiceField(
+        choices=TicketApprovalStrategy.choices, required=True, label=_('Approve strategy')
+    )
     assignees_read_only = serializers.SerializerMethodField(label=_('Assignees'))
     assignees_display = serializers.SerializerMethodField(label=_('Assignees display'))
 
     class Meta:
         model = ApprovalRule
         fields_small = [
-            'level', 'strategy', 'assignees_read_only', 'assignees_display', 'strategy_display'
+            'level', 'strategy', 'assignees_read_only', 'assignees_display',
         ]
         fields_m2m = ['assignees', ]
         fields = fields_small + fields_m2m
@@ -46,14 +49,16 @@ class TicketFlowApproveSerializer(serializers.ModelSerializer):
 
 
 class TicketFlowSerializer(OrgResourceModelSerializerMixin):
-    type_display = serializers.ReadOnlyField(source='get_type_display', label=_('Type display'))
+    type = LabeledChoiceField(
+        choices=TicketType.choices, required=True, label=_('Type')
+    )
     rules = TicketFlowApproveSerializer(many=True, required=True)
 
     class Meta:
         model = TicketFlow
         fields_mini = ['id', ]
         fields_small = fields_mini + [
-            'type', 'type_display', 'approval_level', 'created_by', 'date_created', 'date_updated',
+            'type', 'approval_level', 'created_by', 'date_created', 'date_updated',
             'org_id', 'org_name'
         ]
         fields = fields_small + ['rules', ]

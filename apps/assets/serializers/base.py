@@ -3,15 +3,17 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.drf.fields import EncryptedField
 from assets.const import SecretType
+from common.drf.fields import EncryptedField, LabeledChoiceField
 from .utils import validate_password_for_ansible, validate_ssh_key
 
 
 class AuthValidateMixin(serializers.Serializer):
-    secret_type = serializers.CharField(label=_('Secret type'), max_length=16, required=True)
+    secret_type = LabeledChoiceField(
+        choices=SecretType.choices, required=True, label=_('Secret type')
+    )
     secret = EncryptedField(
-        label=_('Secret'), required=False, max_length=16384, allow_blank=True,
+        label=_('Secret'), required=False, max_length=40960, allow_blank=True,
         allow_null=True, write_only=True,
     )
     passphrase = serializers.CharField(

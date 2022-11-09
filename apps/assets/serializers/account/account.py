@@ -58,7 +58,6 @@ class AccountSerializer(AccountSerializerCreateMixin, BaseAccountSerializer):
         required=False, queryset=Asset.objects,
         label=_('Asset'), attrs=('id', 'name', 'address', 'platform_id')
     )
-    secret_type = LabeledChoiceField(choices=SecretType.choices, label=_('Secret type'))
 
     class Meta(BaseAccountSerializer.Meta):
         model = Account
