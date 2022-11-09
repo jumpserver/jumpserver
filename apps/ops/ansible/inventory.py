@@ -112,6 +112,9 @@ class JMSInventory:
                 'secret': account.secret, 'secret_type': account.secret_type
             } if account else None
         }
+        if host['jms_account'] and asset.platform.type == 'oracle':
+            host['jms_account']['mode'] = 'sysdba' if account.privileged else None
+
         ansible_config = dict(automation.ansible_config)
         ansible_connection = ansible_config.get('ansible_connection', 'ssh')
         host.update(ansible_config)

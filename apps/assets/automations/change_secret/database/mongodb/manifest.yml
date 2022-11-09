@@ -1,0 +1,6 @@
+id: change_secret_mongodb
+name: Change password for MongoDB
+category: database
+type:
+  - mongodb
+method: change_secret

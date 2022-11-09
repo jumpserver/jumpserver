@@ -155,6 +155,8 @@ class ChangeSecretManager(BasePlaybookManager):
                 'secret': new_secret,
                 'private_key_path': private_key_path
             }
+            if asset.platform.type == 'oracle':
+                h['account']['mode'] = 'sysdba' if account.privileged else None
             inventory_hosts.append(h)
             method_hosts.append(h['name'])
         self.method_hosts_mapper[method_attr] = method_hosts

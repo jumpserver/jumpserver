@@ -76,7 +76,7 @@ RUN pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel==0.34.2 -i ${PIP_
 
 ARG VERSION
 ENV VERSION=$VERSION
-
+ENV ANSIBLE_LIBRARY=/opt/jumpserver/apps/ops/ansible/modules
 ADD . .
 RUN cd utils \
     && bash -ixeu build.sh \
