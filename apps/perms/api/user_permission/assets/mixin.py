@@ -1,11 +1,11 @@
 from rest_framework.response import Response
 from rest_framework.request import Request
 
+from common.utils import get_logger
 from users.models import User
 from assets.api.mixin import SerializeToTreeNodeMixin
-from common.utils import get_logger
-from perms.pagination import NodeGrantedAssetPagination, AllGrantedAssetPagination
 from assets.models import Asset, Node
+from perms.pagination import NodeGrantedAssetPagination, AllGrantedAssetPagination
 from perms import serializers
 from perms.utils.user_permission import UserGrantedAssetsQueryUtils
 
@@ -21,8 +21,7 @@ class UserDirectGrantedAssetsQuerysetMixin:
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return Asset.objects.none()
-        user = self.user
-        assets = UserGrantedAssetsQueryUtils(user) \
+        assets = UserGrantedAssetsQueryUtils(self.user) \
             .get_direct_granted_assets() \
             .prefetch_related('platform') \
             .only(*self.only_fields)
@@ -32,7 +31,7 @@ class UserDirectGrantedAssetsQuerysetMixin:
 class UserAllGrantedAssetsQuerysetMixin:
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
     pagination_class = AllGrantedAssetPagination
-    ordering_fields = ("name", "address", "port", "cpu_cores")
+    ordering_fields = ("name", "address")
     ordering = ('name', )
 
     user: User

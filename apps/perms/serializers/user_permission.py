@@ -4,14 +4,14 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
+from common.drf.fields import ObjectRelatedField, LabeledChoiceField
 from assets.models import Node, Asset, Platform, Account
+from assets.const import Category, AllTypes
 from perms.serializers.permission import ActionsField
 
 __all__ = [
-    'NodeGrantedSerializer',
-    'AssetGrantedSerializer',
-    'ActionsSerializer',
-    'AccountsGrantedSerializer'
+    'NodeGrantedSerializer', 'AssetGrantedSerializer',
+    'ActionsSerializer', 'AccountsGrantedSerializer'
 ]
 
 
@@ -20,14 +20,18 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
     platform = serializers.SlugRelatedField(
         slug_field='name', queryset=Platform.objects.all(), label=_("Platform")
     )
+    protocols = ObjectRelatedField(read_only=True, many=True)
+    category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
+    type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
 
     class Meta:
         model = Asset
         only_fields = [
-            "id", "name", "address", "protocols", 'domain',
-            "platform", "comment", "org_id", "is_active"
+            "id", "name", "address", "protocols",
+            'domain', 'platform',
+            "comment", "org_id", "is_active",
         ]
-        fields = only_fields + ['org_name']
+        fields = only_fields + ['category', 'type'] + ['org_name']
         read_only_fields = fields
 
 

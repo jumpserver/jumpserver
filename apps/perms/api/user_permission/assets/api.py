@@ -14,16 +14,15 @@ __all__ = [
     'MyFavoriteGrantedAssetsApi', 'UserDirectGrantedAssetsAsTreeApi',
     'MyUngroupAssetsAsTreeApi',
     'UserAllGrantedAssetsApi', 'MyAllGrantedAssetsApi', 'MyAllAssetsAsTreeApi',
-    'UserGrantedNodeAssetsApi',
-    'MyGrantedNodeAssetsApi',
+    'UserGrantedNodeAssetsApi', 'MyGrantedNodeAssetsApi',
 ]
 
 logger = get_logger(__name__)
 
 
 class UserDirectGrantedAssetsApi(
-    AssetRoleAdminMixin,
-    UserDirectGrantedAssetsQuerysetMixin, AssetsSerializerFormatMixin, ListAPIView
+    AssetRoleAdminMixin, UserDirectGrantedAssetsQuerysetMixin,
+    AssetsSerializerFormatMixin, ListAPIView
 ):
     """ 直接授权给用户的资产 """
     pass
@@ -35,8 +34,8 @@ class MyDirectGrantedAssetsApi(AssetRoleUserMixin, UserDirectGrantedAssetsApi):
 
 
 class UserFavoriteGrantedAssetsApi(
-    AssetRoleAdminMixin,
-    UserFavoriteGrantedAssetsMixin, AssetsSerializerFormatMixin, ListAPIView
+    AssetRoleAdminMixin, UserFavoriteGrantedAssetsMixin,
+    AssetsSerializerFormatMixin, ListAPIView
 ):
     """ 用户收藏的授权资产 """
     pass
@@ -63,8 +62,8 @@ class MyUngroupAssetsAsTreeApi(AssetRoleUserMixin, UserDirectGrantedAssetsAsTree
 
 
 class UserAllGrantedAssetsApi(
-    AssetRoleAdminMixin,
-    UserAllGrantedAssetsQuerysetMixin, AssetsSerializerFormatMixin, ListAPIView
+    AssetRoleAdminMixin, UserAllGrantedAssetsQuerysetMixin,
+    AssetsSerializerFormatMixin, ListAPIView
 ):
     """ 授权给用户的所有资产 """
     pass
@@ -81,7 +80,8 @@ class MyAllAssetsAsTreeApi(AssetsTreeFormatMixin, MyAllGrantedAssetsApi):
 
 
 class UserGrantedNodeAssetsApi(
-    AssetRoleAdminMixin, UserGrantedNodeAssetsMixin, AssetsSerializerFormatMixin, ListAPIView
+    AssetRoleAdminMixin, UserGrantedNodeAssetsMixin,
+    AssetsSerializerFormatMixin, ListAPIView
 ):
     """ 授权给用户的节点资产 """
     pass
