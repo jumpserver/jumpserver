@@ -18,6 +18,7 @@ urlpatterns = [
     path('logout/', views.UserLogoutView.as_view(), name='logout'),
 
     # 原来在users中的
+    path('password/forget/previewing/', users_view.UserForgotPasswordPreviewingView.as_view(), name='forgot-previewing'),
     path('password/forgot/', users_view.UserForgotPasswordView.as_view(), name='forgot-password'),
     path('password/reset/', users_view.UserResetPasswordView.as_view(), name='reset-password'),
     path('password/verify/', users_view.UserVerifyPasswordView.as_view(), name='user-verify-password'),

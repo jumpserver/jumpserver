@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from django.utils.translation import ugettext as _
 from django.template.loader import render_to_string
+from django.core.cache import cache
 
 from common.utils.verify_code import SendAndVerifyCodeUtil
 from common.permissions import IsValidUser
@@ -23,7 +24,7 @@ class UserResetPasswordSendCodeApi(CreateAPIView):
     serializer_class = ResetPasswordCodeSerializer
 
     @staticmethod
-    def is_valid_user( **kwargs):
+    def is_valid_user(**kwargs):
         user = get_object_or_none(User, **kwargs)
         if not user:
             err_msg = _('User does not exist: {}').format(_("No user matched"))
@@ -38,8 +39,9 @@ class UserResetPasswordSendCodeApi(CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        token = request.GET.get('token')
+        username = cache.get(token)
         form_type = serializer.validated_data['form_type']
-        username = serializer.validated_data['username']
         code = random_string(6, lower=False, upper=False)
         other_args = {}
 
