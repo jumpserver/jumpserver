@@ -31,12 +31,12 @@ class DeployAppletHostManager:
         bootstrap_token = settings.BOOTSTRAP_TOKEN
         host_id = str(self.deployment.host.id)
         if not base_site_url:
-            base_site_url = "localhost:8080"
+            base_site_url = "http://localhost:8080"
         with open(playbook_src) as f:
             plays = yaml.safe_load(f)
         for play in plays:
             play['vars'].update(self.deployment.host.deploy_options)
-            play['vars']['DownloadHost'] = base_site_url + '/download/'
+            play['vars']['DownloadHost'] = base_site_url + '/download'
             play['vars']['CORE_HOST'] = base_site_url
             play['vars']['BOOTSTRAP_TOKEN'] = bootstrap_token
             play['vars']['HOST_ID'] = host_id
