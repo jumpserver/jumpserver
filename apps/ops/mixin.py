@@ -23,7 +23,7 @@ class PeriodTaskModelMixin(models.Model):
     name = models.CharField(
         max_length=128, unique=False, verbose_name=_("Name")
     )
-    is_periodic = models.BooleanField(default=False)
+    is_periodic = models.BooleanField(default=False, verbose_name=_("Periodic perform"))
     interval = models.IntegerField(
         default=24, null=True, blank=True,
         verbose_name=_("Cycle perform"),
