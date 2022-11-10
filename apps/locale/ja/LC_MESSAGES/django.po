@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-07 18:16+0800\n"
+"POT-Creation-Date: 2022-11-10 10:55+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,7 +33,7 @@ msgstr "Acls"
 #: terminal/models/storage.py:27 terminal/models/task.py:16
 #: terminal/models/terminal.py:101 users/forms/profile.py:33
 #: users/models/group.py:15 users/models/user.py:673
-#: xpack/plugins/cloud/models.py:28
+#: xpack/plugins/cloud/models.py:27
 msgid "Name"
 msgstr "名前"
 
@@ -66,7 +66,7 @@ msgstr "アクティブ"
 #: tickets/models/comment.py:32 tickets/models/ticket/general.py:288
 #: users/models/group.py:16 users/models/user.py:712
 #: xpack/plugins/change_auth_plan/models/base.py:44
-#: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:116
+#: xpack/plugins/cloud/models.py:34 xpack/plugins/cloud/models.py:118
 #: xpack/plugins/gathered_user/models.py:26
 msgid "Comment"
 msgstr "コメント"
@@ -138,7 +138,7 @@ msgstr "システムユーザー"
 #: terminal/notifications.py:93
 #: xpack/plugins/change_auth_plan/models/asset.py:199
 #: xpack/plugins/change_auth_plan/serializers/asset.py:181
-#: xpack/plugins/cloud/models.py:223
+#: xpack/plugins/cloud/models.py:225
 msgid "Asset"
 msgstr "資産"
 
@@ -226,7 +226,7 @@ msgid "None of the reviewers belong to Organization `{}`"
 msgstr "いずれのレビューアも組織 '{}' に属していません"
 
 #: acls/serializers/rules/rules.py:20
-#: xpack/plugins/cloud/serializers/task.py:23
+#: xpack/plugins/cloud/serializers/task.py:24
 msgid "IP address invalid: `{}`"
 msgstr "IPアドレスが無効: '{}'"
 
@@ -326,7 +326,7 @@ msgstr "タイプ"
 msgid "Domain"
 msgstr "ドメイン"
 
-#: applications/models/application.py:230 xpack/plugins/cloud/models.py:33
+#: applications/models/application.py:230 xpack/plugins/cloud/models.py:32
 #: xpack/plugins/cloud/serializers/account.py:64
 msgid "Attrs"
 msgstr "ツールバーの"
@@ -365,7 +365,7 @@ msgstr "タイプ表示"
 #: orgs/models.py:72 orgs/models.py:223 perms/models/base.py:92
 #: users/models/group.py:18 users/models/user.py:937
 #: xpack/plugins/change_auth_plan/models/base.py:45
-#: xpack/plugins/cloud/models.py:125
+#: xpack/plugins/cloud/models.py:127
 msgid "Date created"
 msgstr "作成された日付"
 
@@ -610,7 +610,7 @@ msgstr "ホスト名生"
 
 #: assets/models/asset.py:215 assets/serializers/account.py:16
 #: assets/serializers/asset.py:65 perms/serializers/asset/user_permission.py:41
-#: xpack/plugins/cloud/models.py:107 xpack/plugins/cloud/serializers/task.py:43
+#: xpack/plugins/cloud/models.py:106 xpack/plugins/cloud/serializers/task.py:44
 msgid "Protocols"
 msgstr "プロトコル"
 
@@ -632,7 +632,7 @@ msgstr "アクティブです。"
 msgid "Admin user"
 msgstr "管理ユーザー"
 
-#: assets/models/asset.py:225
+#: assets/models/asset.py:225 xpack/plugins/cloud/const.py:32
 msgid "Public IP"
 msgstr "パブリックIP"
 
@@ -651,7 +651,7 @@ msgstr "ラベル"
 #: orgs/models.py:225 perms/models/base.py:91 users/models/user.py:720
 #: users/serializers/group.py:33
 #: xpack/plugins/change_auth_plan/models/base.py:48
-#: xpack/plugins/cloud/models.py:122 xpack/plugins/gathered_user/models.py:30
+#: xpack/plugins/cloud/models.py:124 xpack/plugins/gathered_user/models.py:30
 msgid "Created by"
 msgstr "によって作成された"
 
@@ -763,7 +763,7 @@ msgstr "トリガーモード"
 #: xpack/plugins/change_auth_plan/models/base.py:201
 #: xpack/plugins/change_auth_plan/serializers/app.py:66
 #: xpack/plugins/change_auth_plan/serializers/asset.py:180
-#: xpack/plugins/cloud/models.py:179
+#: xpack/plugins/cloud/models.py:181
 msgid "Reason"
 msgstr "理由"
 
@@ -793,7 +793,7 @@ msgstr "OK"
 #: assets/models/base.py:32 audits/models.py:136
 #: xpack/plugins/change_auth_plan/serializers/app.py:88
 #: xpack/plugins/change_auth_plan/serializers/asset.py:199
-#: xpack/plugins/cloud/const.py:36
+#: xpack/plugins/cloud/const.py:41
 msgid "Failed"
 msgstr "失敗しました"
 
@@ -1013,7 +1013,7 @@ msgid "Parent key"
 msgstr "親キー"
 
 #: assets/models/node.py:566 assets/serializers/system_user.py:267
-#: xpack/plugins/cloud/models.py:96 xpack/plugins/cloud/serializers/task.py:70
+#: xpack/plugins/cloud/models.py:95 xpack/plugins/cloud/serializers/task.py:72
 msgid "Node"
 msgstr "ノード"
 
@@ -1170,8 +1170,8 @@ msgstr "CPU情報"
 msgid "Actions"
 msgstr "アクション"
 
-#: assets/serializers/backup.py:31 ops/mixin.py:106 ops/mixin.py:147
-#: settings/serializers/auth/ldap.py:66
+#: assets/serializers/backup.py:31 ops/mixin.py:26 ops/mixin.py:106
+#: ops/mixin.py:147 settings/serializers/auth/ldap.py:66
 #: xpack/plugins/change_auth_plan/serializers/base.py:43
 msgid "Periodic perform"
 msgstr "定期的なパフォーマンス"
@@ -1581,8 +1581,8 @@ msgid "MFA"
 msgstr "MFA"
 
 #: audits/models.py:146 terminal/models/status.py:33
-#: tickets/models/ticket/general.py:281 xpack/plugins/cloud/models.py:175
-#: xpack/plugins/cloud/models.py:227
+#: tickets/models/ticket/general.py:281 xpack/plugins/cloud/models.py:177
+#: xpack/plugins/cloud/models.py:229
 msgid "Status"
 msgstr "ステータス"
 
@@ -1619,7 +1619,7 @@ msgid "Hosts display"
 msgstr "ホスト表示"
 
 #: audits/serializers.py:102 ops/models/command.py:27
-#: xpack/plugins/cloud/models.py:173
+#: xpack/plugins/cloud/models.py:175
 msgid "Result"
 msgstr "結果"
 
@@ -2135,7 +2135,7 @@ msgid "binding reminder"
 msgstr "バインディングリマインダー"
 
 #: authentication/serializers/connection_token.py:23
-#: xpack/plugins/cloud/models.py:34
+#: xpack/plugins/cloud/models.py:33
 msgid "Validity"
 msgstr "有効性"
 
@@ -5247,7 +5247,7 @@ msgstr "アクセスキー"
 msgid "Access key secret"
 msgstr "アクセスキーシークレット"
 
-#: terminal/serializers/storage.py:65 xpack/plugins/cloud/models.py:220
+#: terminal/serializers/storage.py:65 xpack/plugins/cloud/models.py:222
 msgid "Region"
 msgstr "リージョン"
 
@@ -6516,30 +6516,34 @@ msgid "Fusion Compute"
 msgstr ""
 
 #: xpack/plugins/cloud/const.py:31
+msgid "Private IP"
+msgstr "プライベートIP"
+
+#: xpack/plugins/cloud/const.py:36
 msgid "Instance name"
 msgstr "インスタンス名"
 
-#: xpack/plugins/cloud/const.py:32
+#: xpack/plugins/cloud/const.py:37
 msgid "Instance name and Partial IP"
 msgstr "インスタンス名と部分IP"
 
-#: xpack/plugins/cloud/const.py:37
+#: xpack/plugins/cloud/const.py:42
 msgid "Succeed"
 msgstr "成功"
 
-#: xpack/plugins/cloud/const.py:41
+#: xpack/plugins/cloud/const.py:46
 msgid "Unsync"
 msgstr "同期していません"
 
-#: xpack/plugins/cloud/const.py:42
+#: xpack/plugins/cloud/const.py:47
 msgid "New Sync"
 msgstr "新しい同期"
 
-#: xpack/plugins/cloud/const.py:43
+#: xpack/plugins/cloud/const.py:48
 msgid "Synced"
 msgstr "同期済み"
 
-#: xpack/plugins/cloud/const.py:44
+#: xpack/plugins/cloud/const.py:49
 msgid "Released"
 msgstr "リリース済み"
 
@@ -6547,75 +6551,79 @@ msgstr "リリース済み"
 msgid "Cloud center"
 msgstr "クラウドセンター"
 
-#: xpack/plugins/cloud/models.py:30
+#: xpack/plugins/cloud/models.py:29
 msgid "Provider"
 msgstr "プロバイダー"
 
-#: xpack/plugins/cloud/models.py:39
+#: xpack/plugins/cloud/models.py:38
 msgid "Cloud account"
 msgstr "クラウドアカウント"
 
-#: xpack/plugins/cloud/models.py:41
+#: xpack/plugins/cloud/models.py:40
 msgid "Test cloud account"
 msgstr "クラウドアカウントのテスト"
 
-#: xpack/plugins/cloud/models.py:85 xpack/plugins/cloud/serializers/task.py:67
+#: xpack/plugins/cloud/models.py:84 xpack/plugins/cloud/serializers/task.py:69
 msgid "Account"
 msgstr "アカウント"
 
-#: xpack/plugins/cloud/models.py:88 xpack/plugins/cloud/serializers/task.py:38
+#: xpack/plugins/cloud/models.py:87 xpack/plugins/cloud/serializers/task.py:39
 msgid "Regions"
 msgstr "リージョン"
 
-#: xpack/plugins/cloud/models.py:91
+#: xpack/plugins/cloud/models.py:90
 msgid "Hostname strategy"
 msgstr "ホスト名戦略"
 
-#: xpack/plugins/cloud/models.py:100 xpack/plugins/cloud/serializers/task.py:68
+#: xpack/plugins/cloud/models.py:99 xpack/plugins/cloud/serializers/task.py:70
 msgid "Unix admin user"
 msgstr "Unix adminユーザー"
 
-#: xpack/plugins/cloud/models.py:104 xpack/plugins/cloud/serializers/task.py:69
+#: xpack/plugins/cloud/models.py:103 xpack/plugins/cloud/serializers/task.py:71
 msgid "Windows admin user"
 msgstr "Windows管理者"
 
-#: xpack/plugins/cloud/models.py:110 xpack/plugins/cloud/serializers/task.py:46
+#: xpack/plugins/cloud/models.py:109 xpack/plugins/cloud/serializers/task.py:47
 msgid "IP network segment group"
 msgstr "IPネットワークセグメントグループ"
 
-#: xpack/plugins/cloud/models.py:113 xpack/plugins/cloud/serializers/task.py:72
+#: xpack/plugins/cloud/models.py:112
+msgid "Sync IP type"
+msgstr "同期IPタイプ"
+
+#: xpack/plugins/cloud/models.py:115 xpack/plugins/cloud/serializers/task.py:74
 msgid "Always update"
 msgstr "常に更新"
 
-#: xpack/plugins/cloud/models.py:119
+#: xpack/plugins/cloud/models.py:121
 msgid "Date last sync"
 msgstr "最終同期日"
 
-#: xpack/plugins/cloud/models.py:130 xpack/plugins/cloud/models.py:171
+#: xpack/plugins/cloud/models.py:132 xpack/plugins/cloud/models.py:173
 msgid "Sync instance task"
 msgstr "インスタンスの同期タスク"
 
-#: xpack/plugins/cloud/models.py:182 xpack/plugins/cloud/models.py:230
+#: xpack/plugins/cloud/models.py:184 xpack/plugins/cloud/models.py:232
 msgid "Date sync"
 msgstr "日付の同期"
 
-#: xpack/plugins/cloud/models.py:186
+#: xpack/plugins/cloud/models.py:188
 msgid "Sync instance task execution"
 msgstr "インスタンスタスクの同期実行"
 
-#: xpack/plugins/cloud/models.py:210
+#: xpack/plugins/cloud/models.py:212
 msgid "Sync task"
 msgstr "同期タスク"
 
-#: xpack/plugins/cloud/models.py:214
+#: xpack/plugins/cloud/models.py:216
 msgid "Sync instance task history"
 msgstr "インスタンスタスク履歴の同期"
 
-#: xpack/plugins/cloud/models.py:217
+#: xpack/plugins/cloud/models.py:219
 msgid "Instance"
 msgstr "インスタンス"
 
-#: xpack/plugins/cloud/models.py:234
+#: xpack/plugins/cloud/models.py:236
 msgid "Sync instance detail"
 msgstr "同期インスタンスの詳細"
 
@@ -6900,7 +6908,7 @@ msgstr "テストポート"
 msgid "Test timeout"
 msgstr "テストタイムアウト"
 
-#: xpack/plugins/cloud/serializers/task.py:29
+#: xpack/plugins/cloud/serializers/task.py:30
 msgid ""
 "Only instances matching the IP range will be synced. <br>If the instance "
 "contains multiple IP addresses, the first IP address that matches will be "
@@ -6914,19 +6922,19 @@ msgstr ""
 "ドレスをランダムに一致させることを意味します。 <br>形式はコンマ区切りの文字列"
 "です。例：192.168.1.0/24,10.1.1.1-10.1.1.20"
 
-#: xpack/plugins/cloud/serializers/task.py:36
+#: xpack/plugins/cloud/serializers/task.py:37
 msgid "History count"
 msgstr "実行回数"
 
-#: xpack/plugins/cloud/serializers/task.py:37
+#: xpack/plugins/cloud/serializers/task.py:38
 msgid "Instance count"
 msgstr "インスタンス数"
 
-#: xpack/plugins/cloud/serializers/task.py:66
+#: xpack/plugins/cloud/serializers/task.py:68
 msgid "Linux admin user"
 msgstr "Linux管理者"
 
-#: xpack/plugins/cloud/serializers/task.py:71
+#: xpack/plugins/cloud/serializers/task.py:73
 #: xpack/plugins/gathered_user/serializers.py:20
 msgid "Periodic display"
 msgstr "定期的な表示"
