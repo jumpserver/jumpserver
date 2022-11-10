@@ -53,6 +53,3 @@ class LoginACLSerializer(BulkModelSerializer):
 
     def get_rules_serializer(self):
         return RuleSerializer()
-
-    def get_reviewers_display(self, obj):
-        return ','.join([str(user) for user in obj.reviewers.all()])
