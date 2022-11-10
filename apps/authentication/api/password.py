@@ -45,28 +45,19 @@ class UserResetPasswordSendCodeApi(CreateAPIView):
         code = random_string(6, lower=False, upper=False)
         other_args = {}
 
-        if form_type == 'phone':
-            backend = 'sms'
-            target = serializer.validated_data['phone']
-            user, err = self.is_valid_user(username=username, phone=target)
-            if not user:
-                return Response({'error': err}, status=400)
-        else:
-            backend = 'email'
-            target = serializer.validated_data['email']
-            user, err = self.is_valid_user(username=username, email=target)
-            if not user:
-                return Response({'error': err}, status=400)
+        target = serializer.validated_data[form_type]
+        query_key = 'phone' if form_type == 'sms' else form_type
+        user, err = self.is_valid_user(username=username, **{query_key: target})
+        if not user:
+            return Response({'error': err}, status=400)
 
-            subject = '%s: %s' % (get_login_title(), _('Forgot password'))
-            context = {
-                'user': user, 'title': subject, 'code': code,
-            }
-            message = render_to_string('authentication/_msg_reset_password_code.html', context)
-            other_args['subject'] = subject
-            other_args['message'] = message
-
-        SendAndVerifyCodeUtil(target, code, backend=backend, **other_args).gen_and_send_async()
+        subject = '%s: %s' % (get_login_title(), _('Forgot password'))
+        context = {
+            'user': user, 'title': subject, 'code': code,
+        }
+        message = render_to_string('authentication/_msg_reset_password_code.html', context)
+        other_args['subject'], other_args['message'] = subject, message
+        SendAndVerifyCodeUtil(target, code, backend=form_type, **other_args).gen_and_send_async()
         return Response({'data': 'ok'}, status=200)
 
 

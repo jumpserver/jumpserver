@@ -62,6 +62,20 @@ class UserForgotPasswordView(FormView):
         else:
             return super().get(request, *args, **kwargs)
 
+    @staticmethod
+    def get_validate_backends_context():
+        validate_backends = [
+            {'name': _('Email'), 'is_active': True, 'value': 'email'}
+        ]
+        if settings.XPACK_ENABLED:
+            if settings.SMS_ENABLED:
+                is_active = True
+            else:
+                is_active = False
+            sms_backend = {'name': _('SMS'), 'is_active': is_active, 'value': 'sms'}
+            validate_backends.append(sms_backend)
+        return {'validate_backends': validate_backends}
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         form = context['form']
@@ -74,6 +88,8 @@ class UserForgotPasswordView(FormView):
         for k, v in cleaned_data.items():
             if v:
                 context[k] = v
+        validate_backends = self.get_validate_backends_context()
+        context.update(validate_backends)
         return context
 
     @staticmethod
@@ -89,20 +105,16 @@ class UserForgotPasswordView(FormView):
         username = cache.get(token)
         form_type = form.cleaned_data['form_type']
         code = form.cleaned_data['code']
-        if settings.XPACK_ENABLED and form_type == 'phone':
-            backend = 'sms'
-            target = form.cleaned_data['phone']
-        else:
-            backend = 'email'
-            target = form.cleaned_data['email']
+        target = form.cleaned_data[form_type]
         try:
-            sender_util = SendAndVerifyCodeUtil(target, backend=backend)
+            sender_util = SendAndVerifyCodeUtil(target, backend=form_type)
             sender_util.verify(code)
         except Exception as e:
             form.add_error('code', str(e))
             return super().form_invalid(form)
 
-        user = get_object_or_none(User, **{'username': username, form_type: target})
+        query_key = 'phone' if form_type == 'sms' else form_type
+        user = get_object_or_none(User, **{'username': username, query_key: target})
         if not user:
             form.add_error('username', _('User does not exist: {}').format(username))
             return super().form_invalid(form)
