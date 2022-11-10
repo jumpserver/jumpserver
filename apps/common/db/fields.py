@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_text
 from django.core.validators import MinValueValidator, MaxValueValidator
 from common.utils import signer, crypto
+from common.local import add_encrypted_field_set
 
 
 __all__ = [
@@ -149,6 +150,10 @@ class EncryptMixin:
 class EncryptTextField(EncryptMixin, models.TextField):
     description = _("Encrypt field using Secret Key")
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        add_encrypted_field_set(self.verbose_name)
+
 
 class EncryptCharField(EncryptMixin, models.CharField):
     @staticmethod
@@ -163,6 +168,7 @@ class EncryptCharField(EncryptMixin, models.CharField):
     def __init__(self, *args, **kwargs):
         self.change_max_length(kwargs)
         super().__init__(*args, **kwargs)
+        add_encrypted_field_set(self.verbose_name)
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
@@ -174,11 +180,15 @@ class EncryptCharField(EncryptMixin, models.CharField):
 
 
 class EncryptJsonDictTextField(EncryptMixin, JsonDictTextField):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        add_encrypted_field_set(self.verbose_name)
 
 
 class EncryptJsonDictCharField(EncryptMixin, JsonDictCharField):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        add_encrypted_field_set(self.verbose_name)
 
 
 class PortField(models.IntegerField):

@@ -8,6 +8,8 @@ __all__ = [
 
 
 class SAML2SettingSerializer(serializers.Serializer):
+    PREFIX_TITLE = '%s-%s' % (_('Authentication'), _('SAML2'))
+
     AUTH_SAML2 = serializers.BooleanField(
         default=False, required=False, label=_('Enable SAML2 Auth')
     )

@@ -6,11 +6,11 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
-from orgs.mixins.models import OrgModelMixin
 
+from orgs.mixins.models import OrgModelMixin, OrgManager
 from common.db.models import UnionQuerySet, BitOperationChoice
 from common.utils import date_expired_default, lazyproperty
-from orgs.mixins.models import OrgManager
+
 
 __all__ = [
     'BasePermission', 'BasePermissionQuerySet', 'Action'

@@ -4,8 +4,9 @@ import os
 import ssl
 
 from .base import (
-    REDIS_SSL_CA, REDIS_SSL_CERT, REDIS_SSL_KEY,
-    REDIS_SSL_REQUIRED, REDIS_USE_SSL
+    REDIS_SSL_CA, REDIS_SSL_CERT, REDIS_SSL_KEY, REDIS_SSL_REQUIRED, REDIS_USE_SSL,
+    REDIS_SENTINEL_SERVICE_NAME, REDIS_SENTINELS, REDIS_SENTINEL_PASSWORD,
+    REDIS_SENTINEL_SOCKET_TIMEOUT
 )
 from ..const import CONFIG, PROJECT_DIR
 
@@ -46,7 +47,7 @@ REST_FRAMEWORK = {
     'SEARCH_PARAM': "search",
     'DATETIME_FORMAT': '%Y/%m/%d %H:%M:%S %z',
     'DATETIME_INPUT_FORMATS': ['%Y/%m/%d %H:%M:%S %z', 'iso-8601', '%Y-%m-%d %H:%M:%S %z'],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'DEFAULT_PAGINATION_CLASS': 'jumpserver.rewriting.pagination.MaxLimitOffsetPagination',
     'EXCEPTION_HANDLER': 'common.drf.exc_handlers.common_exception_handler',
 }
 
@@ -90,16 +91,28 @@ else:
     if REDIS_SSL_CERT and REDIS_SSL_KEY:
         redis_ssl.load_cert_chain(REDIS_SSL_CERT, REDIS_SSL_KEY)
 
+REDIS_HOST = {
+    'db': CONFIG.REDIS_DB_WS,
+    'password': CONFIG.REDIS_PASSWORD or None,
+    'ssl': redis_ssl,
+}
+
+if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
+    REDIS_HOST['sentinels'] = REDIS_SENTINELS
+    REDIS_HOST['master_name'] = REDIS_SENTINEL_SERVICE_NAME
+    REDIS_HOST['sentinel_kwargs'] = {
+        'password': REDIS_SENTINEL_PASSWORD,
+        'socket_timeout': REDIS_SENTINEL_SOCKET_TIMEOUT
+    }
+else:
+    REDIS_HOST['address'] = (CONFIG.REDIS_HOST, CONFIG.REDIS_PORT)
+
+
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'common.cache.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [{
-                'address': (CONFIG.REDIS_HOST, CONFIG.REDIS_PORT),
-                'db': CONFIG.REDIS_DB_WS,
-                'password': CONFIG.REDIS_PASSWORD or None,
-                'ssl': redis_ssl
-            }],
+            "hosts": [REDIS_HOST],
         },
     },
 }
@@ -109,13 +122,28 @@ ASGI_APPLICATION = 'jumpserver.routing.application'
 CELERY_LOG_DIR = os.path.join(PROJECT_DIR, 'data', 'celery')
 
 # Celery using redis as broker
-CELERY_BROKER_URL = '%(protocol)s://:%(password)s@%(host)s:%(port)s/%(db)s' % {
-    'protocol': 'rediss' if REDIS_USE_SSL else 'redis',
-    'password': CONFIG.REDIS_PASSWORD,
-    'host': CONFIG.REDIS_HOST,
-    'port': CONFIG.REDIS_PORT,
-    'db': CONFIG.REDIS_DB_CELERY,
-}
+CELERY_BROKER_URL_FORMAT = '%(protocol)s://:%(password)s@%(host)s:%(port)s/%(db)s'
+if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
+    CELERY_BROKER_URL = ';'.join([CELERY_BROKER_URL_FORMAT % {
+        'protocol': 'sentinel', 'password': CONFIG.REDIS_PASSWORD,
+        'host': item[0], 'port': item[1], 'db': CONFIG.REDIS_DB_CELERY
+    } for item in REDIS_SENTINELS])
+    SENTINEL_OPTIONS = {
+        'master_name': REDIS_SENTINEL_SERVICE_NAME,
+        'sentinel_kwargs': {
+            'password': REDIS_SENTINEL_PASSWORD,
+            'socket_timeout': REDIS_SENTINEL_SOCKET_TIMEOUT
+        }
+    }
+    CELERY_BROKER_TRANSPORT_OPTIONS = CELERY_RESULT_BACKEND_TRANSPORT_OPTIONS = SENTINEL_OPTIONS
+else:
+    CELERY_BROKER_URL = CELERY_BROKER_URL_FORMAT % {
+        'protocol': 'rediss' if REDIS_USE_SSL else 'redis',
+        'password': CONFIG.REDIS_PASSWORD,
+        'host': CONFIG.REDIS_HOST,
+        'port': CONFIG.REDIS_PORT,
+        'db': CONFIG.REDIS_DB_CELERY,
+    }
 CELERY_TASK_SERIALIZER = 'pickle'
 CELERY_RESULT_SERIALIZER = 'pickle'
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL

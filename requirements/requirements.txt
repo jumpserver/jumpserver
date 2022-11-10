@@ -37,6 +37,7 @@ jms-storage==0.0.44
 simplejson==3.17.6
 six==1.16.0
 sshpubkeys==3.3.1
+sshtunnel==0.4.0
 uritemplate==4.1.1
 urllib3==1.26.9
 vine==5.0.0
@@ -62,7 +63,7 @@ jsonfield2==4.0.0.post0
 geoip2==4.5.0
 ipip-ipdb==1.6.1
 # Django environment
-Django==3.2.15
+Django==3.2.16
 django-bootstrap3==14.2.0
 django-filter==2.4.0
 django-formtools==2.2
@@ -83,7 +84,7 @@ Pillow==9.1.1
 pytz==2022.1
 # Runtime
 django-proxy==1.2.1
-channels-redis==3.4.0
+channels-redis==4.0.0
 channels==3.0.4
 daphne==3.0.2
 python-daemon==2.3.0

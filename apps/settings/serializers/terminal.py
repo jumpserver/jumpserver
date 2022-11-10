@@ -3,6 +3,8 @@ from rest_framework import serializers
 
 
 class TerminalSettingSerializer(serializers.Serializer):
+    PREFIX_TITLE = _('Terminal')
+
     SORT_BY_CHOICES = (
         ('hostname', _('Hostname')),
         ('ip', _('IP'))
@@ -36,3 +38,16 @@ class TerminalSettingSerializer(serializers.Serializer):
     TERMINAL_MAGNUS_ENABLED = serializers.BooleanField(label=_("Enable database proxy"))
     TERMINAL_RAZOR_ENABLED = serializers.BooleanField(label=_("Enable Razor"))
     TERMINAL_KOKO_SSH_ENABLED = serializers.BooleanField(label=_("Enable SSH Client"))
+
+    RESOLUTION_CHOICES = (
+        ('Auto', 'Auto'),
+        ('1024x768', '1024x768'),
+        ('1366x768', '1366x768'),
+        ('1600x900', '1600x900'),
+        ('1920x1080', '1920x1080')
+    )
+    TERMINAL_GRAPHICAL_RESOLUTION = serializers.ChoiceField(
+        default='Auto', choices=RESOLUTION_CHOICES, required=False,
+        label=_('Default graphics resolution'),
+        help_text=_('Tip: Default resolution to use when connecting graphical assets in Luna pages')
+    )

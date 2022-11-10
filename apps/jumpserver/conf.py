@@ -227,6 +227,10 @@ class Config(dict):
         'AUTH_CUSTOM': False,
         'AUTH_CUSTOM_FILE_MD5': '',
 
+        # Custom Config
+        'MFA_CUSTOM': False,
+        'MFA_CUSTOM_FILE_MD5': '',
+
         # Auth LDAP settings
         'AUTH_LDAP': False,
         'AUTH_LDAP_SERVER_URI': 'ldap://localhost:389',
@@ -416,6 +420,9 @@ class Config(dict):
         'TERMINAL_HOST_KEY': '',
         'TERMINAL_TELNET_REGEX': '',
         'TERMINAL_COMMAND_STORAGE': {},
+        # Luna 页面
+        # 默认图形化分辨率
+        'TERMINAL_GRAPHICAL_RESOLUTION': 'Auto',
         # 未来废弃(目前迁移会用)
         'TERMINAL_RDP_ADDR': '',
         # 保留(Luna还在用)

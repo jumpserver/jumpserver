@@ -88,7 +88,7 @@ class ConnectionTokenMixin:
             filename, ssh_token = self.get_ssh_token(token)
         else:
             raise ValueError('Protocol not support: {}'.format(protocol))
-
+        filename = urllib.parse.unquote(filename)
         return {
             "filename": filename,
             "protocol": protocol,

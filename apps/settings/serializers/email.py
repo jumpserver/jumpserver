@@ -16,6 +16,7 @@ class MailTestSerializer(serializers.Serializer):
 
 class EmailSettingSerializer(serializers.Serializer):
     # encrypt_fields 现在使用 write_only 来判断了
+    PREFIX_TITLE = _('Email')
 
     EMAIL_HOST = serializers.CharField(max_length=1024, required=True, label=_("SMTP host"))
     EMAIL_PORT = serializers.CharField(max_length=5, required=True, label=_("SMTP port"))
@@ -46,6 +47,8 @@ class EmailSettingSerializer(serializers.Serializer):
 
 
 class EmailContentSettingSerializer(serializers.Serializer):
+    PREFIX_TITLE = _('Email')
+
     EMAIL_CUSTOM_USER_CREATED_SUBJECT = serializers.CharField(
         max_length=1024, allow_blank=True, required=False,
         label=_('Create user email subject'),

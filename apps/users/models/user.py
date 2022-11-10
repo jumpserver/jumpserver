@@ -16,11 +16,12 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.hashers import check_password
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import reverse
+from django.utils.module_loading import import_string
 
 from orgs.utils import current_org
 from orgs.models import Organization
 from rbac.const import Scope
-from common.db import fields
+from common.db import fields, models as jms_models
 from common.utils import (
     date_expired_default, get_logger, lazyproperty, random_string, bulk_create_with_signal
 )
@@ -602,8 +603,11 @@ class MFAMixin:
 
     @staticmethod
     def get_user_mfa_backends(user):
-        from authentication.mfa import MFA_BACKENDS
-        backends = [cls(user) for cls in MFA_BACKENDS if cls.global_enabled()]
+        backends = []
+        for cls in settings.MFA_BACKENDS:
+            cls = import_string(cls)
+            if cls.global_enabled():
+                backends.append(cls(user))
         return backends
 
     def get_active_mfa_backend_by_type(self, mfa_type):
@@ -691,7 +695,9 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     mfa_level = models.SmallIntegerField(
         default=0, choices=MFAMixin.MFA_LEVEL_CHOICES, verbose_name=_('MFA')
     )
-    otp_secret_key = fields.EncryptCharField(max_length=128, blank=True, null=True)
+    otp_secret_key = fields.EncryptCharField(
+        max_length=128, blank=True, null=True, verbose_name=_('OTP secret key')
+    )
     # Todo: Auto generate key, let user download
     private_key = fields.EncryptTextField(
         blank=True, null=True, verbose_name=_('Private key')
@@ -705,7 +711,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     comment = models.TextField(
         blank=True, null=True, verbose_name=_('Comment')
     )
-    is_first_login = models.BooleanField(default=True)
+    is_first_login = models.BooleanField(default=True, verbose_name=_('Is first login'))
     date_expired = models.DateTimeField(
         default=date_expired_default, blank=True, null=True,
         db_index=True, verbose_name=_('Date expired')
@@ -927,7 +933,7 @@ class UserPasswordHistory(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     password = models.CharField(max_length=128)
     user = models.ForeignKey("users.User", related_name='history_passwords',
-                             on_delete=models.CASCADE, verbose_name=_('User'))
+                             on_delete=jms_models.CASCADE_SIGNAL_SKIP, verbose_name=_('User'))
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
 
     def __str__(self):

@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='user',
             name='_otp_secret_key',
-            field=common.db.fields.EncryptCharField(blank=True, max_length=128, null=True),
+            field=common.db.fields.EncryptCharField(blank=True, max_length=128, null=True, verbose_name='OTP secret key'),
         ),
         migrations.AlterField(
             model_name='user',

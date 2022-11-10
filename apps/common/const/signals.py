@@ -15,3 +15,5 @@ POST_CLEAR = 'post_clear'
 
 POST_PREFIX = 'post'
 PRE_PREFIX = 'pre'
+
+SKIP_SIGNAL = 'skip_signal'

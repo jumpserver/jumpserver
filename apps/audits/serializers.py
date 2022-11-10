@@ -47,6 +47,12 @@ class UserLoginLogSerializer(serializers.ModelSerializer):
         }
 
 
+class OperateLogActionDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.OperateLog
+        fields = ('before', 'after')
+
+
 class OperateLogSerializer(serializers.ModelSerializer):
     action_display = serializers.CharField(source='get_action_display', label=_('Action'))
 

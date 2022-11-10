@@ -143,6 +143,8 @@ class SecurityAuthSerializer(serializers.Serializer):
 
 
 class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSerializer):
+    PREFIX_TITLE = _('Security')
+
     SECURITY_SERVICE_ACCOUNT_REGISTRATION = serializers.BooleanField(
         required=True, label=_('Enable terminal register'),
         help_text=_(

@@ -19,6 +19,16 @@ def exist_or_default(path, default):
     return path
 
 
+def parse_sentinels_host(sentinels_host):
+    service_name, sentinels = None, None
+    try:
+        service_name, hosts = sentinels_host.split('/', 1)
+        sentinels = [tuple(h.split(':', 1)) for h in hosts.split(',')]
+    except Exception:
+        pass
+    return service_name, sentinels
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 VERSION = const.VERSION
 BASE_DIR = const.BASE_DIR
@@ -276,26 +286,53 @@ REDIS_SSL_CA = exist_or_default(os.path.join(CERTS_DIR, 'redis_ca.pem'), None)
 REDIS_SSL_CA = exist_or_default(os.path.join(CERTS_DIR, 'redis_ca.crt'), REDIS_SSL_CA)
 REDIS_SSL_REQUIRED = 'none'
 REDIS_USE_SSL = CONFIG.REDIS_USE_SSL
+REDIS_PROTOCOL = 'rediss' if REDIS_USE_SSL else 'redis'
+# Cache use sentinel
+REDIS_SENTINEL_HOSTS = CONFIG.REDIS_SENTINEL_HOSTS
+REDIS_SENTINEL_SERVICE_NAME, REDIS_SENTINELS = parse_sentinels_host(REDIS_SENTINEL_HOSTS)
+REDIS_SENTINEL_PASSWORD = CONFIG.REDIS_SENTINEL_PASSWORD
+if CONFIG.REDIS_SENTINEL_SOCKET_TIMEOUT:
+    REDIS_SENTINEL_SOCKET_TIMEOUT = float(CONFIG.REDIS_SENTINEL_SOCKET_TIMEOUT)
+else:
+    REDIS_SENTINEL_SOCKET_TIMEOUT = None
 
-REDIS_LOCATION_NO_DB = '%(protocol)s://:%(password)s@%(host)s:%(port)s/{}' % {
-    'protocol': 'rediss' if REDIS_USE_SSL else 'redis',
-    'password': CONFIG.REDIS_PASSWORD,
-    'host': CONFIG.REDIS_HOST,
-    'port': CONFIG.REDIS_PORT,
+# Cache config
+REDIS_OPTIONS = {
+    "REDIS_CLIENT_KWARGS": {
+        "health_check_interval": 30
+    },
+    "CONNECTION_POOL_KWARGS": {
+        'ssl_cert_reqs': REDIS_SSL_REQUIRED,
+        "ssl_keyfile": REDIS_SSL_KEY,
+        "ssl_certfile": REDIS_SSL_CERT,
+        "ssl_ca_certs": REDIS_SSL_CA
+    } if REDIS_USE_SSL else {}
 }
+
+if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
+    REDIS_LOCATION_NO_DB = "%(protocol)s://%(service_name)s/{}" % {
+        'protocol': REDIS_PROTOCOL, 'service_name': REDIS_SENTINEL_SERVICE_NAME,
+    }
+    REDIS_OPTIONS.update({
+        'CLIENT_CLASS': 'django_redis.client.SentinelClient',
+        'SENTINELS': REDIS_SENTINELS, 'PASSWORD': CONFIG.REDIS_PASSWORD,
+        'SENTINEL_KWARGS': {
+            'password': REDIS_SENTINEL_PASSWORD,
+            'socket_timeout': REDIS_SENTINEL_SOCKET_TIMEOUT
+        }
+    })
+    DJANGO_REDIS_CONNECTION_FACTORY = 'django_redis.pool.SentinelConnectionFactory'
+else:
+    REDIS_LOCATION_NO_DB = '%(protocol)s://:%(password)s@%(host)s:%(port)s/{}' % {
+        'protocol': REDIS_PROTOCOL, 'password': CONFIG.REDIS_PASSWORD,
+        'host': CONFIG.REDIS_HOST, 'port': CONFIG.REDIS_PORT,
+    }
+
 
 REDIS_CACHE_DEFAULT = {
     'BACKEND': 'redis_lock.django_cache.RedisCache',
     'LOCATION': REDIS_LOCATION_NO_DB.format(CONFIG.REDIS_DB_CACHE),
-    'OPTIONS': {
-        "REDIS_CLIENT_KWARGS": {"health_check_interval": 30},
-        "CONNECTION_POOL_KWARGS": {
-            'ssl_cert_reqs': REDIS_SSL_REQUIRED,
-            "ssl_keyfile": REDIS_SSL_KEY,
-            "ssl_certfile": REDIS_SSL_CERT,
-            "ssl_ca_certs": REDIS_SSL_CA
-        } if REDIS_USE_SSL else {}
-    }
+    'OPTIONS': REDIS_OPTIONS
 }
 REDIS_CACHE_SESSION = dict(REDIS_CACHE_DEFAULT)
 REDIS_CACHE_SESSION['LOCATION'] = REDIS_LOCATION_NO_DB.format(CONFIG.REDIS_DB_SESSION)

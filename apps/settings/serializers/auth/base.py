@@ -7,6 +7,8 @@ __all__ = [
 
 
 class AuthSettingSerializer(serializers.Serializer):
+    PREFIX_TITLE = '%s-%s' % (_('Authentication'), _('Basic'))
+
     AUTH_CAS = serializers.BooleanField(required=False, label=_('CAS Auth'))
     AUTH_OPENID = serializers.BooleanField(required=False, label=_('OPENID Auth'))
     AUTH_RADIUS = serializers.BooleanField(required=False, label=_('RADIUS Auth'))

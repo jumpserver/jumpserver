@@ -16,6 +16,8 @@ class SettingImageField(serializers.ImageField):
 
 
 class OAuth2SettingSerializer(serializers.Serializer):
+    PREFIX_TITLE = '%s-%s' % (_('Authentication'), _('OAuth2'))
+
     AUTH_OAUTH2 = serializers.BooleanField(
         default=False, label=_('Enable OAuth2 Auth')
     )
