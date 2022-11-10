@@ -33,7 +33,7 @@ msgstr "Acls"
 #: terminal/models/storage.py:27 terminal/models/task.py:16
 #: terminal/models/terminal.py:101 users/forms/profile.py:33
 #: users/models/group.py:15 users/models/user.py:673
-#: xpack/plugins/cloud/models.py:28
+#: xpack/plugins/cloud/models.py:27
 msgid "Name"
 msgstr "名前"
 
@@ -66,7 +66,7 @@ msgstr "アクティブ"
 #: tickets/models/comment.py:32 tickets/models/ticket/general.py:288
 #: users/models/group.py:16 users/models/user.py:712
 #: xpack/plugins/change_auth_plan/models/base.py:44
-#: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:116
+#: xpack/plugins/cloud/models.py:34 xpack/plugins/cloud/models.py:118
 #: xpack/plugins/gathered_user/models.py:26
 msgid "Comment"
 msgstr "コメント"
@@ -138,7 +138,7 @@ msgstr "システムユーザー"
 #: terminal/notifications.py:93
 #: xpack/plugins/change_auth_plan/models/asset.py:199
 #: xpack/plugins/change_auth_plan/serializers/asset.py:181
-#: xpack/plugins/cloud/models.py:223
+#: xpack/plugins/cloud/models.py:225
 msgid "Asset"
 msgstr "資産"
 
@@ -6234,7 +6234,7 @@ msgstr "OTP無効化成功、ログインページを返す"
 msgid "Password invalid"
 msgstr "パスワード無効"
 
-#: users/views/profile/reset.py:129 users/views/profile/reset.py:140
+#: users/views/profile/reset.py:96 users/views/profile/reset.py:107
 msgid "Token invalid or expired"
 msgstr "トークンが無効または期限切れ"
 
@@ -6514,6 +6514,10 @@ msgid "Fusion Compute"
 msgstr ""
 
 #: xpack/plugins/cloud/const.py:31
+msgid "Private IP"
+msgstr "プライベートIP"
+
+#: xpack/plugins/cloud/const.py:36
 msgid "Instance name"
 msgstr "インスタンス名"
 
@@ -6561,59 +6565,63 @@ msgstr "クラウドアカウントのテスト"
 msgid "Account"
 msgstr "アカウント"
 
-#: xpack/plugins/cloud/models.py:88 xpack/plugins/cloud/serializers/task.py:38
+#: xpack/plugins/cloud/models.py:87 xpack/plugins/cloud/serializers/task.py:39
 msgid "Regions"
 msgstr "リージョン"
 
-#: xpack/plugins/cloud/models.py:91
+#: xpack/plugins/cloud/models.py:90
 msgid "Hostname strategy"
 msgstr "ホスト名戦略"
 
-#: xpack/plugins/cloud/models.py:100 xpack/plugins/cloud/serializers/task.py:68
+#: xpack/plugins/cloud/models.py:99 xpack/plugins/cloud/serializers/task.py:70
 msgid "Unix admin user"
 msgstr "Unix adminユーザー"
 
-#: xpack/plugins/cloud/models.py:104 xpack/plugins/cloud/serializers/task.py:69
+#: xpack/plugins/cloud/models.py:103 xpack/plugins/cloud/serializers/task.py:71
 msgid "Windows admin user"
 msgstr "Windows管理者"
 
-#: xpack/plugins/cloud/models.py:110 xpack/plugins/cloud/serializers/task.py:46
+#: xpack/plugins/cloud/models.py:109 xpack/plugins/cloud/serializers/task.py:47
 msgid "IP network segment group"
 msgstr "IPネットワークセグメントグループ"
 
-#: xpack/plugins/cloud/models.py:113 xpack/plugins/cloud/serializers/task.py:72
+#: xpack/plugins/cloud/models.py:112
+msgid "Sync IP type"
+msgstr "同期IPタイプ"
+
+#: xpack/plugins/cloud/models.py:115 xpack/plugins/cloud/serializers/task.py:74
 msgid "Always update"
 msgstr "常に更新"
 
-#: xpack/plugins/cloud/models.py:119
+#: xpack/plugins/cloud/models.py:121
 msgid "Date last sync"
 msgstr "最終同期日"
 
-#: xpack/plugins/cloud/models.py:130 xpack/plugins/cloud/models.py:171
+#: xpack/plugins/cloud/models.py:132 xpack/plugins/cloud/models.py:173
 msgid "Sync instance task"
 msgstr "インスタンスの同期タスク"
 
-#: xpack/plugins/cloud/models.py:182 xpack/plugins/cloud/models.py:230
+#: xpack/plugins/cloud/models.py:184 xpack/plugins/cloud/models.py:232
 msgid "Date sync"
 msgstr "日付の同期"
 
-#: xpack/plugins/cloud/models.py:186
+#: xpack/plugins/cloud/models.py:188
 msgid "Sync instance task execution"
 msgstr "インスタンスタスクの同期実行"
 
-#: xpack/plugins/cloud/models.py:210
+#: xpack/plugins/cloud/models.py:212
 msgid "Sync task"
 msgstr "同期タスク"
 
-#: xpack/plugins/cloud/models.py:214
+#: xpack/plugins/cloud/models.py:216
 msgid "Sync instance task history"
 msgstr "インスタンスタスク履歴の同期"
 
-#: xpack/plugins/cloud/models.py:217
+#: xpack/plugins/cloud/models.py:219
 msgid "Instance"
 msgstr "インスタンス"
 
-#: xpack/plugins/cloud/models.py:234
+#: xpack/plugins/cloud/models.py:236
 msgid "Sync instance detail"
 msgstr "同期インスタンスの詳細"
 
@@ -6898,7 +6906,7 @@ msgstr "テストポート"
 msgid "Test timeout"
 msgstr "テストタイムアウト"
 
-#: xpack/plugins/cloud/serializers/task.py:29
+#: xpack/plugins/cloud/serializers/task.py:30
 msgid ""
 "Only instances matching the IP range will be synced. <br>If the instance "
 "contains multiple IP addresses, the first IP address that matches will be "
@@ -6912,19 +6920,19 @@ msgstr ""
 "ドレスをランダムに一致させることを意味します。 <br>形式はコンマ区切りの文字列"
 "です。例：192.168.1.0/24,10.1.1.1-10.1.1.20"
 
-#: xpack/plugins/cloud/serializers/task.py:36
+#: xpack/plugins/cloud/serializers/task.py:37
 msgid "History count"
 msgstr "実行回数"
 
-#: xpack/plugins/cloud/serializers/task.py:37
+#: xpack/plugins/cloud/serializers/task.py:38
 msgid "Instance count"
 msgstr "インスタンス数"
 
-#: xpack/plugins/cloud/serializers/task.py:66
+#: xpack/plugins/cloud/serializers/task.py:68
 msgid "Linux admin user"
 msgstr "Linux管理者"
 
-#: xpack/plugins/cloud/serializers/task.py:71
+#: xpack/plugins/cloud/serializers/task.py:73
 #: xpack/plugins/gathered_user/serializers.py:20
 msgid "Periodic display"
 msgstr "定期的な表示"

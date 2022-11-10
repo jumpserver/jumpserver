@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
                 ('name', models.CharField(max_length=128, verbose_name='Name')),
-                ('is_periodic', models.BooleanField(default=False)),
+                ('is_periodic', models.BooleanField(default=False, verbose_name='Periodic perform')),
                 ('interval', models.IntegerField(blank=True, default=24, null=True, verbose_name='Cycle perform')),
                 ('crontab', models.CharField(blank=True, max_length=128, null=True, verbose_name='Regularly perform')),
                 ('created_by', models.CharField(blank=True, max_length=32, null=True, verbose_name='Created by')),
