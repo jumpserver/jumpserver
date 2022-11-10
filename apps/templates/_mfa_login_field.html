@@ -16,17 +16,17 @@
     {% for backend in mfa_backends %}
         <div id="mfa-{{ backend.name }}" class="mfa-field
             {% if backend.challenge_required %}challenge-required{% endif %}"
-            style="display: none"
+             style="display: none"
         >
             <input type="text" class="form-control input-style"
                    placeholder="{{ backend.placeholder }}"
             >
             {% if backend.challenge_required %}
-            <button class="btn btn-primary full-width btn-challenge"
-                    type='button' onclick="sendChallengeCode(this)"
-            >
-                {% trans 'Send verification code' %}
-            </button>
+                <button class="btn btn-primary full-width btn-challenge"
+                        type='button' onclick="sendChallengeCode(this)"
+                >
+                    {% trans 'Send verification code' %}
+                </button>
             {% endif %}
         </div>
     {% endfor %}
@@ -39,12 +39,12 @@
     }
 
     .challenge-required .input-style {
-        width: calc(100% - 114px);
+        width: calc(100% - 160px);
         display: inline-block;
     }
 
     .btn-challenge {
-        width: 110px !important;
+        width: 156px !important;
         height: 100%;
         vertical-align: top;
     }
@@ -74,7 +74,7 @@
             localStorage.setItem(preferMFAKey, name)
         }
 
-        $('.input-style').each(function (i, ele){
+        $('.input-style').each(function (i, ele) {
             $(ele).attr('name', 'code-test')
         })
 
@@ -112,7 +112,7 @@
                     clearInterval(interval)
                 }
             }, 1000)
-            setTimeout(function (){
+            setTimeout(function () {
                 toastr.success("{% trans 'The verification code has been sent' %}");
             })
         }
