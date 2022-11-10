@@ -4813,13 +4813,21 @@ msgstr "Windowsリモートアプリケーション発行者ツール"
 
 #: templates/resource_download.html:43
 msgid ""
+"OpenSSH is a program used to connect remote applications in the Windows "
+"Remote Application Publisher"
+msgstr ""
+"OpenSSHはリモートアプリケーションをWindowsリモートアプリケーションで接続する"
+"プログラムです"
+
+#: templates/resource_download.html:48
+msgid ""
 "Jmservisor is the program used to pull up remote applications in Windows "
 "Remote Application publisher"
 msgstr ""
 "Jmservisorはwindowsリモートアプリケーションパブリケーションサーバでリモートア"
 "プリケーションを引き出すためのプログラムです"
 
-#: templates/resource_download.html:51
+#: templates/resource_download.html:57
 msgid "Offline video player"
 msgstr "オフラインビデオプレーヤー"
 

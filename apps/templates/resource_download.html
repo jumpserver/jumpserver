@@ -37,15 +37,21 @@ p {
         </ul>
     </div>
 
-    {% if XPACK_ENABLED  %}
+
         <div class="group">
-            <h2>{% trans 'Windows Remote application publisher tools' %} v2.0</h2>
-            <p>{% trans 'Jmservisor is the program used to pull up remote applications in Windows Remote Application publisher' %}</p>
-            <ul>
-                <li><a href="/download/Jmservisor.msi">jmservisor.msi</a></li>
-            </ul>
+            <h2>{% trans 'Windows Remote application publisher tools' %}</h2>
+                <p>{% trans 'OpenSSH is a program used to connect remote applications in the Windows Remote Application Publisher' %}</p>
+                <ul>
+                    <li><a href="/download/OpenSSH-Win64.msi">openSSH-win64.msi</a></li>
+                </ul>
+            {% if XPACK_ENABLED  %}
+                <p>{% trans 'Jmservisor is the program used to pull up remote applications in Windows Remote Application publisher' %}</p>
+                <ul>
+                    <li><a href="/download/Jmservisor.msi">jmservisor.msi</a></li>
+                </ul>
+            {% endif %}
         </div>
-    {% endif %}
+
 
     <div class="group">
         <h2>JumpServer {% trans 'Offline video player' %} v0.1.5</h2>
