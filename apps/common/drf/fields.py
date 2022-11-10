@@ -21,6 +21,7 @@ __all__ = [
 
 class ReadableHiddenField(serializers.HiddenField):
     """ 可读的 HiddenField """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.write_only = False

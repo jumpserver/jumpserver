@@ -8,6 +8,9 @@ from common.utils import lazyproperty
 
 from orgs.mixins.models import OrgModelMixin, Organization
 from orgs.utils import current_org
+from .const import (
+    OperateChoices, ActionChoices, LoginTypeChoices, MFAChoices, LoginStatusChoices
+)
 
 __all__ = [
     'FTPLog', 'OperateLog', 'PasswordChangeLog', 'UserLoginLog',
@@ -15,30 +18,12 @@ __all__ = [
 
 
 class FTPLog(OrgModelMixin):
-    OPERATE_DELETE = 'Delete'
-    OPERATE_UPLOAD = 'Upload'
-    OPERATE_DOWNLOAD = 'Download'
-    OPERATE_RMDIR = 'Rmdir'
-    OPERATE_RENAME = 'Rename'
-    OPERATE_MKDIR = 'Mkdir'
-    OPERATE_SYMLINK = 'Symlink'
-
-    OPERATE_CHOICES = (
-        (OPERATE_DELETE, _('Delete')),
-        (OPERATE_UPLOAD, _('Upload')),
-        (OPERATE_DOWNLOAD, _('Download')),
-        (OPERATE_RMDIR, _('Rmdir')),
-        (OPERATE_RENAME, _('Rename')),
-        (OPERATE_MKDIR, _('Mkdir')),
-        (OPERATE_SYMLINK, _('Symlink'))
-    )
-
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=128, verbose_name=_('User'))
     remote_addr = models.CharField(max_length=128, verbose_name=_("Remote addr"), blank=True, null=True)
     asset = models.CharField(max_length=1024, verbose_name=_("Asset"))
     system_user = models.CharField(max_length=128, verbose_name=_("System user"))
-    operate = models.CharField(max_length=16, verbose_name=_("Operate"), choices=OPERATE_CHOICES)
+    operate = models.CharField(max_length=16, verbose_name=_("Operate"), choices=OperateChoices.choices)
     filename = models.CharField(max_length=1024, verbose_name=_("Filename"))
     is_success = models.BooleanField(default=True, verbose_name=_("Success"))
     date_start = models.DateTimeField(auto_now_add=True, verbose_name=_('Date start'))
@@ -48,19 +33,9 @@ class FTPLog(OrgModelMixin):
 
 
 class OperateLog(OrgModelMixin):
-    ACTION_CREATE = 'create'
-    ACTION_VIEW = 'view'
-    ACTION_UPDATE = 'update'
-    ACTION_DELETE = 'delete'
-    ACTION_CHOICES = (
-        (ACTION_CREATE, _("Create")),
-        (ACTION_VIEW, _("View")),
-        (ACTION_UPDATE, _("Update")),
-        (ACTION_DELETE, _("Delete"))
-    )
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=128, verbose_name=_('User'))
-    action = models.CharField(max_length=16, choices=ACTION_CHOICES, verbose_name=_("Action"))
+    action = models.CharField(max_length=16, choices=ActionChoices.choices, verbose_name=_("Action"))
     resource_type = models.CharField(max_length=64, verbose_name=_("Resource Type"))
     resource = models.CharField(max_length=128, verbose_name=_("Resource"))
     remote_addr = models.CharField(max_length=128, verbose_name=_("Remote addr"), blank=True, null=True)
@@ -97,35 +72,17 @@ class PasswordChangeLog(models.Model):
 
 
 class UserLoginLog(models.Model):
-    LOGIN_TYPE_CHOICE = (
-        ('W', 'Web'),
-        ('T', 'Terminal'),
-        ('U', 'Unknown'),
-    )
-
-    MFA_DISABLED = 0
-    MFA_ENABLED = 1
-    MFA_UNKNOWN = 2
-
-    MFA_CHOICE = (
-        (MFA_DISABLED, _('Disabled')),
-        (MFA_ENABLED, _('Enabled')),
-        (MFA_UNKNOWN, _('-')),
-    )
-
-    STATUS_CHOICE = (
-        (True, _('Success')),
-        (False, _('Failed'))
-    )
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     username = models.CharField(max_length=128, verbose_name=_('Username'))
-    type = models.CharField(choices=LOGIN_TYPE_CHOICE, max_length=2, verbose_name=_('Login type'))
+    type = models.CharField(choices=LoginTypeChoices.choices, max_length=2, verbose_name=_('Login type'))
     ip = models.GenericIPAddressField(verbose_name=_('Login ip'))
     city = models.CharField(max_length=254, blank=True, null=True, verbose_name=_('Login city'))
     user_agent = models.CharField(max_length=254, blank=True, null=True, verbose_name=_('User agent'))
-    mfa = models.SmallIntegerField(default=MFA_UNKNOWN, choices=MFA_CHOICE, verbose_name=_('MFA'))
+    mfa = models.SmallIntegerField(default=MFAChoices.unknown, choices=MFAChoices.choices, verbose_name=_('MFA'))
     reason = models.CharField(default='', max_length=128, blank=True, verbose_name=_('Reason'))
-    status = models.BooleanField(max_length=2, default=True, choices=STATUS_CHOICE, verbose_name=_('Status'))
+    status = models.BooleanField(
+        default=LoginStatusChoices.success, choices=LoginStatusChoices.choices, verbose_name=_('Status')
+    )
     datetime = models.DateTimeField(default=timezone.now, verbose_name=_('Date login'))
     backend = models.CharField(max_length=32, default='', verbose_name=_('Authentication backend'))
 

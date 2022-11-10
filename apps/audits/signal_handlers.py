@@ -1,38 +1,34 @@
 # -*- coding: utf-8 -*-
 #
-import time
-
-from django.db.models.signals import (
-    post_save, m2m_changed, pre_delete
-)
-from django.dispatch import receiver
 from django.conf import settings
 from django.db import transaction
-from django.utils import timezone
+from django.dispatch import receiver
+from django.utils import timezone, translation
 from django.utils.functional import LazyObject
 from django.contrib.auth import BACKEND_SESSION_KEY
 from django.utils.translation import ugettext_lazy as _
-from django.utils import translation
-from rest_framework.renderers import JSONRenderer
+from django.db.models.signals import post_save, m2m_changed, pre_delete
 from rest_framework.request import Request
+from rest_framework.renderers import JSONRenderer
 
-from assets.models import Asset
-from authentication.signals import post_auth_failed, post_auth_success
-from authentication.utils import check_different_city_login_if_need
-from jumpserver.utils import current_request
-from users.models import User
-from users.signals import post_user_change_password
-from terminal.models import Session, Command
-from .utils import write_login_log, create_operate_log
-from . import models, serializers
-from .models import OperateLog
 from orgs.utils import current_org
 from perms.models import AssetPermission
-from terminal.backends.command.serializers import SessionCommandSerializer
+from users.models import User
+from users.signals import post_user_change_password
+from assets.models import Asset
+from jumpserver.utils import current_request
+from authentication.signals import post_auth_failed, post_auth_success
+from authentication.utils import check_different_city_login_if_need
+from terminal.models import Session, Command
 from terminal.serializers import SessionSerializer
+from terminal.backends.command.serializers import SessionCommandSerializer
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR
 from common.utils import get_request_ip, get_logger, get_syslogger
 from common.utils.encode import data_to_json
+from . import models, serializers
+from .const import ActionChoices
+from .utils import write_login_log, create_operate_log
+
 
 logger = get_logger(__name__)
 sys_logger = get_syslogger(__name__)
@@ -97,9 +93,9 @@ M2M_NEED_RECORD = {
 }
 
 M2M_ACTION_MAPER = {
-    POST_ADD: OperateLog.ACTION_CREATE,
-    POST_REMOVE: OperateLog.ACTION_DELETE,
-    POST_CLEAR: OperateLog.ACTION_DELETE,
+    POST_ADD: ActionChoices.create,
+    POST_REMOVE: ActionChoices.delete,
+    POST_CLEAR: ActionChoices.delete,
 }
 
 
@@ -120,9 +116,9 @@ def on_m2m_changed(sender, action, instance, model, pk_set, **kwargs):
         resource_type, resource_tmpl_add, resource_tmpl_remove = M2M_NEED_RECORD[sender_name]
 
         action = M2M_ACTION_MAPER[action]
-        if action == OperateLog.ACTION_CREATE:
+        if action == ActionChoices.create:
             resource_tmpl = resource_tmpl_add
-        elif action == OperateLog.ACTION_DELETE:
+        elif action == ActionChoices.delete:
             resource_tmpl = resource_tmpl_remove
         else:
             return
@@ -144,11 +140,11 @@ def on_m2m_changed(sender, action, instance, model, pk_set, **kwargs):
                 model_name: str(obj)
             })[:128]  # `resource` 字段只有 128 个字符长 😔
 
-            to_create.append(OperateLog(
+            to_create.append(models.OperateLog(
                 user=user, action=action, resource_type=resource_type,
                 resource=resource, remote_addr=remote_addr, org_id=org_id
             ))
-        OperateLog.objects.bulk_create(to_create)
+        models.OperateLog.objects.bulk_create(to_create)
 
 
 @receiver(post_save)
@@ -158,15 +154,15 @@ def on_object_created_or_update(sender, instance=None, created=False, update_fie
             update_fields and 'last_login' in update_fields:
         return
     if created:
-        action = models.OperateLog.ACTION_CREATE
+        action = ActionChoices.create
     else:
-        action = models.OperateLog.ACTION_UPDATE
+        action = ActionChoices.update
     create_operate_log(action, sender, instance)
 
 
 @receiver(pre_delete)
 def on_object_delete(sender, instance=None, **kwargs):
-    create_operate_log(models.OperateLog.ACTION_DELETE, sender, instance)
+    create_operate_log(ActionChoices.delete, sender, instance)
 
 
 @receiver(post_user_change_password, sender=User)

@@ -7,7 +7,6 @@ from django.utils.encoding import force_text
 from django.core.validators import MinValueValidator, MaxValueValidator
 from common.utils import signer, crypto
 
-
 __all__ = [
     'JsonMixin', 'JsonDictMixin', 'JsonListMixin', 'JsonTypeMixin',
     'JsonCharField', 'JsonTextField', 'JsonListCharField', 'JsonListTextField',
@@ -189,4 +188,3 @@ class PortField(models.IntegerField):
             'validators': [MinValueValidator(0), MaxValueValidator(65535)]
         })
         super().__init__(*args, **kwargs)
-

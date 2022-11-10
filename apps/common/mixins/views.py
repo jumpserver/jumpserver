@@ -9,6 +9,7 @@ from rest_framework.request import Request
 from common.exceptions import UserConfirmRequired
 from audits.utils import create_operate_log
 from audits.models import OperateLog
+from audits.const import ActionChoices
 
 __all__ = ["PermissionsMixin", "RecordViewLogMixin", "UserConfirmRequiredExceptionMixin"]
 
@@ -40,7 +41,7 @@ class PermissionsMixin(UserPassesTestMixin):
 
 
 class RecordViewLogMixin:
-    ACTION = OperateLog.ACTION_VIEW
+    ACTION = ActionChoices.view
 
     @staticmethod
     def get_resource_display(request):

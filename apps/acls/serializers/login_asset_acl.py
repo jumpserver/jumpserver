@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from orgs.models import Organization
-from assets.const import Protocol
+from common.drf.fields import LabeledChoiceField
 from acls import models
 
 
@@ -59,7 +59,7 @@ class LoginAssetACLSerializer(BulkOrgResourceModelSerializer):
     assets = LoginAssetACLAssestsSerializer()
     accounts = LoginAssetACLAccountsSerializer()
     reviewers_amount = serializers.IntegerField(read_only=True, source='reviewers.count')
-    action_display = serializers.ReadOnlyField(source='get_action_display', label=_('Action'))
+    action = LabeledChoiceField(choices=models.LoginAssetACL.ActionChoices.choices, label=_('Action'))
 
     class Meta:
         model = models.LoginAssetACL
@@ -67,7 +67,7 @@ class LoginAssetACLSerializer(BulkOrgResourceModelSerializer):
         fields_small = fields_mini + [
             'users', 'accounts', 'assets',
             'is_active', 'date_created', 'date_updated',
-            'priority', 'action', 'action_display', 'comment', 'created_by', 'org_id'
+            'priority', 'action', 'comment', 'created_by', 'org_id'
         ]
         fields_m2m = ['reviewers', 'reviewers_amount']
         fields = fields_small + fields_m2m
