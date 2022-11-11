@@ -17,7 +17,8 @@ class BaseAnsibleJob(PeriodTaskModelMixin, JMSOrgBaseModel):
     assets = models.ManyToManyField('assets.Asset', verbose_name=_("Assets"))
     account = models.CharField(max_length=128, default='root', verbose_name=_('Account'))
     account_policy = models.CharField(max_length=128, default='root', verbose_name=_('Account policy'))
-    last_execution = models.ForeignKey('BaseAnsibleExecution', verbose_name=_("Last execution"), on_delete=models.SET_NULL, null=True)
+    last_execution = models.ForeignKey('BaseAnsibleExecution', verbose_name=_("Last execution"),
+                                       on_delete=models.SET_NULL, null=True)
     date_last_run = models.DateTimeField(null=True, verbose_name=_('Date last run'))
 
     class Meta:
@@ -119,12 +120,6 @@ class BaseAnsibleExecution(models.Model):
         return self.status == 'success'
 
     @property
-    def time_cost(self):
-        if self.date_finished and self.date_start:
-            return (self.date_finished - self.date_start).total_seconds()
-        return None
-
-    @property
     def short_id(self):
         return str(self.id).split('-')[-1]
 
@@ -134,4 +129,8 @@ class BaseAnsibleExecution(models.Model):
             return self.date_finished - self.date_start
         return None
 
-
+    @property
+    def time_cost(self):
+        if self.date_finished and self.date_start:
+            return (self.date_finished - self.date_start).total_seconds()
+        return None

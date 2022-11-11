@@ -2,6 +2,7 @@
 import os
 import random
 import subprocess
+import time
 
 from django.conf import settings
 from celery import shared_task, subtask
@@ -21,7 +22,7 @@ from .celery.utils import (
     create_or_update_celery_periodic_tasks, get_celery_periodic_task,
     disable_celery_periodic_task, delete_celery_periodic_task
 )
-from .models import CeleryTaskExecution, AdHoc, Playbook
+from .models import CeleryTaskExecution, Playbook, Job, JobExecution
 from .notifications import ServerPerformanceCheckUtil
 
 logger = get_logger(__file__)
@@ -29,6 +30,33 @@ logger = get_logger(__file__)
 
 def rerun_task():
     pass
+
+
+@shared_task(soft_time_limit=60, queue="ansible", verbose_name=_("Run ansible task"))
+def run_ops_job(job_id, **kwargs):
+    job = get_object_or_none(Job, id=job_id)
+    execution = job.create_execution()
+    try:
+        execution.start()
+    except SoftTimeLimitExceeded:
+        execution.set_error('Run timeout')
+        logger.error("Run adhoc timeout")
+    except Exception as e:
+        execution.set_error(e)
+        logger.error("Start adhoc execution error: {}".format(e))
+
+
+@shared_task(soft_time_limit=60, queue="ansible", verbose_name=_("Run ansible task execution"))
+def run_ops_job_executions(execution_id, **kwargs):
+    execution = get_object_or_none(JobExecution, id=execution_id)
+    try:
+        execution.start()
+    except SoftTimeLimitExceeded:
+        execution.set_error('Run timeout')
+        logger.error("Run adhoc timeout")
+    except Exception as e:
+        execution.set_error(e)
+        logger.error("Start adhoc execution error: {}".format(e))
 
 
 @shared_task(soft_time_limit=60, queue="ansible", verbose_name=_("Run ansible task"))
@@ -156,16 +184,21 @@ def hello(name, callback=None):
     return gettext("Hello")
 
 
-@shared_task(verbose_name="Hello Error", comment="an test shared task error")
+@shared_task(verbose_name=_("Hello Error"), comment="an test shared task error")
 def hello_error():
     raise Exception("must be error")
 
 
-@shared_task(verbose_name="Hello Random", comment="some time error and some time success")
+@shared_task(verbose_name=_("Hello Random"), comment="some time error and some time success")
 def hello_random():
     i = random.randint(0, 1)
     if i == 1:
         raise Exception("must be error")
+
+
+@shared_task(verbose_name="Hello Running", comment="an task running 1m")
+def hello_running(sec=60):
+    time.sleep(sec)
 
 
 @shared_task

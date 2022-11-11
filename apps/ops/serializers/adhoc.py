@@ -1,9 +1,31 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import unicode_literals
-from rest_framework import serializers
-from django.shortcuts import reverse
 
+import datetime
+
+from rest_framework import serializers
+
+from common.drf.fields import ReadableHiddenField
 from ..models import AdHoc, AdHocExecution
+
+
+class AdHocSerializer(serializers.ModelSerializer):
+    owner = ReadableHiddenField(default=serializers.CurrentUserDefault())
+    row_count = serializers.IntegerField(read_only=True)
+    size = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = AdHoc
+        fields = ["id", "name", "module", "owner", "row_count", "size", "date_created", "date_updated"]
+
+
+class AdhocListSerializer(AdHocSerializer):
+    row_count = serializers.IntegerField(read_only=True)
+    size = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = AdHoc
+        fields = ["id", "name", "module", "row_count", "size", "args", "owner", "date_created", "date_updated"]
 
 
 class AdHocExecutionSerializer(serializers.ModelSerializer):
@@ -49,26 +71,6 @@ class AdHocExecutionExcludeResultSerializer(AdHocExecutionSerializer):
         ]
 
 
-class AdHocSerializer(serializers.ModelSerializer):
-    tasks = serializers.ListField()
-
-    class Meta:
-        model = AdHoc
-        fields_mini = ['id']
-        fields_small = fields_mini + [
-            'tasks', "pattern", "args", "date_created",
-        ]
-        fields_fk = ["last_execution"]
-        fields_m2m = ["assets"]
-        fields = fields_small + fields_fk + fields_m2m
-        read_only_fields = [
-            'date_created'
-        ]
-        extra_kwargs = {
-            "become": {'write_only': True}
-        }
-
-
 class AdHocExecutionNestSerializer(serializers.ModelSerializer):
     last_success = serializers.ListField(source='success_hosts')
     last_failure = serializers.DictField(source='failed_hosts')
@@ -80,38 +82,3 @@ class AdHocExecutionNestSerializer(serializers.ModelSerializer):
             'last_success', 'last_failure', 'last_run', 'timedelta',
             'is_finished', 'is_success'
         )
-
-
-class AdHocDetailSerializer(AdHocSerializer):
-    latest_execution = AdHocExecutionNestSerializer(allow_null=True)
-    task_name = serializers.CharField(source='task.name')
-
-    class Meta(AdHocSerializer.Meta):
-        fields = AdHocSerializer.Meta.fields + [
-            'latest_execution', 'created_by', 'task_name'
-        ]
-
-
-# class CommandExecutionSerializer(serializers.ModelSerializer):
-#     result = serializers.JSONField(read_only=True)
-#     log_url = serializers.SerializerMethodField()
-#
-#     class Meta:
-#         model = CommandExecution
-#         fields_mini = ['id']
-#         fields_small = fields_mini + [
-#             'command', 'result', 'log_url',
-#             'is_finished', 'date_created', 'date_finished'
-#         ]
-#         fields_m2m = ['hosts']
-#         fields = fields_small + fields_m2m
-#         read_only_fields = [
-#             'result', 'is_finished', 'log_url', 'date_created',
-#             'date_finished'
-#         ]
-#         ref_name = 'OpsCommandExecution'
-#
-#     @staticmethod
-#     def get_log_url(obj):
-#         return reverse('api-ops:celery-task-log', kwargs={'pk': obj.id})
-

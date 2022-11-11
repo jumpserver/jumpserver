@@ -19,7 +19,7 @@ class CeleryTask(models.Model):
     def meta(self):
         task = app.tasks.get(self.name, None)
         return {
-            "verbose_name": getattr(task, 'verbose_name', None),
+            "display_name": getattr(task, 'verbose_name', None),
             "comment": getattr(task, 'comment', None),
             "queue": getattr(task, 'queue', 'default')
         }

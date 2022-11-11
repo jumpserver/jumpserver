@@ -98,6 +98,11 @@ class CeleryPeriodTaskViewSet(CommonApiMixin, viewsets.ModelViewSet):
         return queryset
 
 
+class CelerySummaryAPIView(generics.RetrieveAPIView):
+    def get(self, request, *args, **kwargs):
+        pass
+
+
 class CeleryTaskViewSet(CommonApiMixin, viewsets.ReadOnlyModelViewSet):
     queryset = CeleryTask.objects.all()
     serializer_class = CeleryTaskSerializer
@@ -107,11 +112,11 @@ class CeleryTaskViewSet(CommonApiMixin, viewsets.ReadOnlyModelViewSet):
 class CeleryTaskExecutionViewSet(CommonApiMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = CeleryTaskExecutionSerializer
     http_method_names = ('get', 'head', 'options',)
+    queryset = CeleryTaskExecution.objects.all()
 
     def get_queryset(self):
-        task_id = self.kwargs.get("task_pk")
+        task_id = self.request.query_params.get('task_id')
         if task_id:
-            task = CeleryTask.objects.get(pk=task_id)
-            return CeleryTaskExecution.objects.filter(name=task.name)
-        else:
-            return CeleryTaskExecution.objects.none()
+            task = get_object_or_404(CeleryTask, id=task_id)
+            self.queryset = self.queryset.filter(name=task.name)
+        return self.queryset
