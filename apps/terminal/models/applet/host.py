@@ -2,14 +2,14 @@ import os
 from collections import defaultdict
 
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ValidationError
 from simple_history.utils import bulk_create_with_history
 
+from assets.models import Host
 from common.db.models import JMSBaseModel
 from common.utils import random_string
-from assets.models import Host
 
 __all__ = ['AppletHost', 'AppletHostDeployment']
 
@@ -44,13 +44,11 @@ class AppletHost(Host):
             raise ValidationError('Request user has no terminal')
 
         self.date_synced = timezone.now()
-        if not self.terminal:
+        if self.terminal == request_terminal:
+            self.save(update_fields=['date_synced'])
+        else:
             self.terminal = request_terminal
             self.save(update_fields=['terminal', 'date_synced'])
-        elif self.terminal and self.terminal != request_terminal:
-            raise ValidationError('Terminal has been set')
-        else:
-            self.save(update_fields=['date_synced'])
 
     def check_applets_state(self, applets_value_list):
         applets = self.applets.all()
