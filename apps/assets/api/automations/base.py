@@ -5,7 +5,6 @@ from rest_framework import status, mixins, viewsets
 
 from orgs.mixins import generics
 from assets import serializers
-from assets.const import AutomationTypes
 from assets.tasks import execute_automation
 from assets.models import BaseAutomation, AutomationExecution
 from common.const.choices import Trigger
@@ -111,8 +110,7 @@ class AutomationExecutionViewSet(
         serializer.is_valid(raise_exception=True)
         automation = serializer.validated_data.get('automation')
         tp = serializer.validated_data.get('type')
-        model = AutomationTypes.get_type_model(tp)
         task = execute_automation.delay(
-            pid=automation.pk, trigger=Trigger.manual, model=model
+            pid=automation.pk, trigger=Trigger.manual, tp=tp
         )
         return Response({'task': task.id}, status=status.HTTP_201_CREATED)
