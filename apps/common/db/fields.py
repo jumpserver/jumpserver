@@ -9,13 +9,24 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 from common.utils import signer, crypto
 
-
 __all__ = [
-    'JsonMixin', 'JsonDictMixin', 'JsonListMixin', 'JsonTypeMixin',
-    'JsonCharField', 'JsonTextField', 'JsonListCharField', 'JsonListTextField',
-    'JsonDictCharField', 'JsonDictTextField', 'EncryptCharField',
-    'EncryptTextField', 'EncryptMixin', 'EncryptJsonDictTextField',
-    'EncryptJsonDictCharField', 'PortField', 'BitChoices',
+    "JsonMixin",
+    "JsonDictMixin",
+    "JsonListMixin",
+    "JsonTypeMixin",
+    "JsonCharField",
+    "JsonTextField",
+    "JsonListCharField",
+    "JsonListTextField",
+    "JsonDictCharField",
+    "JsonDictTextField",
+    "EncryptCharField",
+    "EncryptTextField",
+    "EncryptMixin",
+    "EncryptJsonDictTextField",
+    "EncryptJsonDictCharField",
+    "PortField",
+    "BitChoices",
 ]
 
 
@@ -116,7 +127,7 @@ class EncryptMixin:
     """
 
     def decrypt_from_signer(self, value):
-        return signer.unsign(value) or ''
+        return signer.unsign(value) or ""
 
     def from_db_value(self, value, expression, connection, context=None):
         if not value:
@@ -131,7 +142,7 @@ class EncryptMixin:
 
         # 可能和Json mix，所以要先解密，再json
         sp = super()
-        if hasattr(sp, 'from_db_value'):
+        if hasattr(sp, "from_db_value"):
             plain_value = sp.from_db_value(plain_value, expression, connection, context)
         return plain_value
 
@@ -141,7 +152,7 @@ class EncryptMixin:
 
         # 先 json 再解密
         sp = super()
-        if hasattr(sp, 'get_prep_value'):
+        if hasattr(sp, "get_prep_value"):
             value = sp.get_prep_value(value)
         value = force_text(value)
         # 替换新的加密方式
@@ -155,12 +166,12 @@ class EncryptTextField(EncryptMixin, models.TextField):
 class EncryptCharField(EncryptMixin, models.CharField):
     @staticmethod
     def change_max_length(kwargs):
-        kwargs.setdefault('max_length', 1024)
-        max_length = kwargs.get('max_length')
+        kwargs.setdefault("max_length", 1024)
+        max_length = kwargs.get("max_length")
         if max_length < 129:
             max_length = 128
         max_length = max_length * 2
-        kwargs['max_length'] = max_length
+        kwargs["max_length"] = max_length
 
     def __init__(self, *args, **kwargs):
         self.change_max_length(kwargs)
@@ -168,10 +179,10 @@ class EncryptCharField(EncryptMixin, models.CharField):
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
-        max_length = kwargs.pop('max_length')
+        max_length = kwargs.pop("max_length")
         if max_length > 255:
             max_length = max_length // 2
-        kwargs['max_length'] = max_length
+        kwargs["max_length"] = max_length
         return name, path, args, kwargs
 
 
@@ -185,11 +196,13 @@ class EncryptJsonDictCharField(EncryptMixin, JsonDictCharField):
 
 class PortField(models.IntegerField):
     def __init__(self, *args, **kwargs):
-        kwargs.update({
-            'blank': False,
-            'null': False,
-            'validators': [MinValueValidator(0), MaxValueValidator(65535)]
-        })
+        kwargs.update(
+            {
+                "blank": False,
+                "null": False,
+                "validators": [MinValueValidator(0), MaxValueValidator(65535)],
+            }
+        )
         super().__init__(*args, **kwargs)
 
 
@@ -200,22 +213,22 @@ class BitChoices(models.IntegerChoices):
 
     @classmethod
     def tree(cls):
-        root = [_('All'), cls.branches()]
+        root = [_("All"), cls.branches()]
         return cls.render_node(root)
 
     @classmethod
     def render_node(cls, node):
         if isinstance(node, BitChoices):
             return {
-                'id': node.name,
-                'label': node.label,
+                "id": node.name,
+                "label": node.label,
             }
         else:
             name, children = node
             return {
-                'id': name,
-                'label': name,
-                'children': [cls.render_node(child) for child in children]
+                "id": name,
+                "label": name,
+                "children": [cls.render_node(child) for child in children],
             }
 
     @classmethod
@@ -224,5 +237,3 @@ class BitChoices(models.IntegerChoices):
         for c in cls:
             value |= c.value
         return value
-
-
