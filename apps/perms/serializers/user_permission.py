@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from common.drf.fields import ObjectRelatedField, LabeledChoiceField
 from assets.models import Node, Asset, Platform, Account
 from assets.const import Category, AllTypes
-from perms.serializers.permission import ActionsField
+from perms.serializers.permission import ActionChoicesField
 
 __all__ = [
     'NodeGrantedSerializer', 'AssetGrantedSerializer',
@@ -45,7 +45,7 @@ class NodeGrantedSerializer(serializers.ModelSerializer):
 
 
 class ActionsSerializer(serializers.Serializer):
-    actions = ActionsField(read_only=True)
+    actions = ActionChoicesField(read_only=True)
 
 
 class AccountsGrantedSerializer(serializers.ModelSerializer):
@@ -53,7 +53,7 @@ class AccountsGrantedSerializer(serializers.ModelSerializer):
 
     # Todo: 添加前端登录逻辑中需要的一些字段，比如：是否需要手动输入密码
     # need_manual = serializers.BooleanField(label=_('Need manual input'))
-    actions = ActionsField(read_only=True)
+    actions = ActionChoicesField(read_only=True)
 
     class Meta:
         model = Account

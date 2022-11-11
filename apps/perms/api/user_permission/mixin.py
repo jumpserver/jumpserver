@@ -3,11 +3,9 @@
 from rest_framework.request import Request
 
 from common.http import is_true
-from common.mixins.api import RoleAdminMixin
-from common.mixins.api import RoleUserMixin
-from orgs.utils import tmp_to_root_org
-from users.models import User
+from common.mixins.api import RoleAdminMixin, RoleUserMixin
 from perms.utils.user_permission import UserGrantedTreeRefreshController
+from users.models import User
 
 
 class RebuildTreeMixin:

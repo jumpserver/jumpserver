@@ -1,26 +1,27 @@
+from urllib.parse import urlencode
+
+from django.conf import settings
+from django.db.utils import IntegrityError
+from django.http.request import HttpRequest
 from django.http.response import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
-from urllib.parse import urlencode
 from django.views import View
-from django.conf import settings
-from django.http.request import HttpRequest
-from django.db.utils import IntegrityError
-from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.exceptions import APIException
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from users.models import User
-from users.views import UserVerifyPasswordView
-from common.utils import get_logger, FlashMessageUtil
-from common.utils.random import random_string
-from common.utils.django import reverse, get_object_or_none
-from common.mixins.views import UserConfirmRequiredExceptionMixin, PermissionsMixin
-from common.permissions import UserConfirmation
-from common.sdk.im.feishu import FeiShu, URL
-from common.utils.common import get_request_ip
 from authentication import errors
 from authentication.const import ConfirmType
 from authentication.mixins import AuthMixin
 from authentication.notifications import OAuthBindMessage
+from common.mixins.views import PermissionsMixin, UserConfirmRequiredExceptionMixin
+from common.permissions import UserConfirmation
+from common.sdk.im.feishu import URL, FeiShu
+from common.utils import FlashMessageUtil, get_logger
+from common.utils.common import get_request_ip
+from common.utils.django import get_object_or_none, reverse
+from common.utils.random import random_string
+from users.models import User
+from users.views import UserVerifyPasswordView
 
 logger = get_logger(__file__)
 

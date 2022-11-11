@@ -16,7 +16,7 @@ from rest_framework.request import Request
 from common.drf.api import JMSModelViewSet
 from common.http import is_true
 from orgs.mixins.api import RootOrgViewMixin
-from perms.models import Action
+from perms.models import ActionChoices
 from terminal.models import EndpointRule
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
@@ -70,8 +70,8 @@ class RDPFileClientProtocolURLMixin:
         # 设置磁盘挂载
         drives_redirect = is_true(self.request.query_params.get('drives_redirect'))
         if drives_redirect:
-            actions = Action.choices_to_value(token.actions)
-            if actions & Action.UPDOWNLOAD == Action.UPDOWNLOAD:
+            actions = ActionChoices.choices_to_value(token.actions)
+            if actions & Action.TRANSFER == Action.TRANSFER:
                 rdp_options['drivestoredirect:s'] = '*'
 
         # 设置全屏

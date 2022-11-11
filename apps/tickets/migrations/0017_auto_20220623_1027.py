@@ -7,7 +7,6 @@ from collections import defaultdict
 from django.utils import timezone as dj_timezone
 from django.db import migrations
 
-from perms.models import Action
 from tickets.const import TicketType
 
 pt = re.compile(r'(\w+)\((\w+)\)')

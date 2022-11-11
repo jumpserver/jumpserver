@@ -7,7 +7,7 @@ from common.utils import pretty_string
 from common.utils.random import random_string
 from assets.models import Asset, Gateway, Domain, CommandFilterRule, Account
 from users.models import User
-from perms.serializers.permission import ActionsField
+from perms.serializers.permission import ActionChoicesField
 
 
 __all__ = [
@@ -158,14 +158,13 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     gateway = ConnectionTokenGatewaySerializer(read_only=True)
     domain = ConnectionTokenDomainSerializer(read_only=True)
     cmd_filter_rules = ConnectionTokenCmdFilterRuleSerializer(many=True)
-    actions = ActionsField()
+    actions = ActionChoicesField()
     expire_at = serializers.IntegerField()
 
     class Meta:
         model = ConnectionToken
         fields = [
-            'id', 'secret',
-            'user', 'asset', 'account_username', 'account', 'protocol',
-            'domain', 'gateway', 'cmd_filter_rules',
-            'actions', 'expire_at',
+            'id', 'secret', 'user', 'asset', 'account_username',
+            'account', 'protocol', 'domain', 'gateway',
+            'cmd_filter_rules', 'actions', 'expire_at',
         ]

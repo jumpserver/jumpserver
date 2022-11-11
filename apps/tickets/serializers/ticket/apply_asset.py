@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from perms.serializers.permission import ActionsField
+from perms.serializers.permission import ActionChoicesField
 from perms.models import AssetPermission
 from orgs.utils import tmp_to_org
 from assets.models import Asset, Node
@@ -16,7 +16,7 @@ asset_or_node_help_text = _("Select at least one asset or node")
 
 
 class ApplyAssetSerializer(BaseApplyAssetApplicationSerializer, TicketApplySerializer):
-    apply_actions = ActionsField(required=True, allow_empty=False)
+    apply_actions = ActionChoicesField(required=True, allow_empty=False)
     permission_model = AssetPermission
 
     class Meta:

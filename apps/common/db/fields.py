@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 #
 import json
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_text
 from django.core.validators import MinValueValidator, MaxValueValidator
+
 from common.utils import signer, crypto
 
 
@@ -13,7 +15,7 @@ __all__ = [
     'JsonCharField', 'JsonTextField', 'JsonListCharField', 'JsonListTextField',
     'JsonDictCharField', 'JsonDictTextField', 'EncryptCharField',
     'EncryptTextField', 'EncryptMixin', 'EncryptJsonDictTextField',
-    'EncryptJsonDictCharField', 'PortField'
+    'EncryptJsonDictCharField', 'PortField', 'BitChoices',
 ]
 
 
@@ -189,4 +191,38 @@ class PortField(models.IntegerField):
             'validators': [MinValueValidator(0), MaxValueValidator(65535)]
         })
         super().__init__(*args, **kwargs)
+
+
+class BitChoices(models.IntegerChoices):
+    @classmethod
+    def branches(cls):
+        return [i for i in cls]
+
+    @classmethod
+    def tree(cls):
+        root = [_('All'), cls.branches()]
+        return cls.render_node(root)
+
+    @classmethod
+    def render_node(cls, node):
+        if isinstance(node, BitChoices):
+            return {
+                'id': node.name,
+                'label': node.label,
+            }
+        else:
+            name, children = node
+            return {
+                'id': name,
+                'label': name,
+                'children': [cls.render_node(child) for child in children]
+            }
+
+    @classmethod
+    def all(cls):
+        value = 0
+        for c in cls:
+            value |= c.value
+        return value
+
 

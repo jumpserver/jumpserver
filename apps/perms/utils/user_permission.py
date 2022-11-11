@@ -19,13 +19,12 @@ from orgs.utils import (
 from assets.models import (
     Asset, FavoriteAsset, AssetQuerySet, NodeQuerySet
 )
-from orgs.models import Organization
-from perms.models import (
-    AssetPermission, PermNode, UserAssetGrantedTreeNodeRelation,
-)
 from users.models import User
+from orgs.models import Organization
 from perms.locks import UserGrantedTreeRebuildLock
-
+from perms.models import (
+    AssetPermission, PermNode, UserAssetGrantedTreeNodeRelation
+)
 NodeFrom = UserAssetGrantedTreeNodeRelation.NodeFrom
 NODE_ONLY_FIELDS = ('id', 'key', 'parent_key', 'org_id')
 

@@ -6,7 +6,6 @@ from common.utils import get_logger, lazyproperty
 from assets.serializers import AccountSerializer
 from perms.hands import User, Asset, Account
 from perms import serializers
-from perms.models import Action
 from perms.utils import PermAccountUtil
 from .mixin import RoleAdminMixin, RoleUserMixin
 
@@ -80,7 +79,7 @@ class UserGrantedAssetSpecialAccountsApi(ListAPIView):
     def get_queryset(self):
         # 构造默认包含的账号，如: @INPUT @USER
         accounts = [
-            Account.get_input_account(),
+            Account.get_manual_account(),
             Account.get_user_account(self.user.username)
         ]
         for account in accounts:

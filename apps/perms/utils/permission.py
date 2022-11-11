@@ -1,12 +1,6 @@
-import time
-from collections import defaultdict
-
-from django.db.models import Q
 
 from common.utils import get_logger
-from perms.models import AssetPermission, Action
-from perms.hands import Asset, User, UserGroup, Node
-from perms.utils.user_permission import get_user_all_asset_perm_ids
+from perms.models import AssetPermission
 
 logger = get_logger(__file__)
 
