@@ -13,6 +13,8 @@ from rest_framework.fields import empty
 from rest_framework.metadata import SimpleMetadata
 from rest_framework.request import clone_request
 
+from common.drf.fields import TreeChoicesMixin
+
 
 class SimpleMetadataWithFilters(SimpleMetadata):
     """Override SimpleMetadata, adding info about filters"""
@@ -59,13 +61,45 @@ class SimpleMetadataWithFilters(SimpleMetadata):
                 view.request = request
         return actions
 
+    def get_field_type(self, field):
+        """
+        Given a field, return a string representing the type of the field.
+        """
+        tp = self.label_lookup[field]
+
+        class_name = field.__class__.__name__
+        if class_name == "LabeledChoiceField":
+            tp = "labeled_choice"
+        elif class_name == "ObjectRelatedField":
+            tp = "object_related_field"
+        elif class_name == "ManyRelatedField":
+            child_relation_class_name = field.child_relation.__class__.__name__
+            if child_relation_class_name == "ObjectRelatedField":
+                tp = "m2m_related_field"
+        return tp
+
+    @staticmethod
+    def set_choices_field(field, field_info):
+        field_info["choices"] = [
+            {
+                "value": choice_value,
+                "label": force_text(choice_label, strings_only=True),
+            }
+            for choice_value, choice_label in dict(field.choices).items()
+        ]
+
+    @staticmethod
+    def set_tree_field(field, field_info):
+        field_info["tree"] = field.tree
+        field_info["type"] = "tree"
+
     def get_field_info(self, field):
         """
         Given an instance of a serializer field, return a dictionary
         of metadata about it.
         """
         field_info = OrderedDict()
-        field_info["type"] = self.label_lookup[field]
+        field_info["type"] = self.get_field_type(field)
         field_info["required"] = getattr(field, "required", False)
 
         # Default value
@@ -84,25 +118,10 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         elif getattr(field, "fields", None):
             field_info["children"] = self.get_serializer_info(field)
 
-        is_choice_field = isinstance(field, (serializers.ChoiceField,))
-        if is_choice_field and hasattr(field, "choices"):
-            field_info["choices"] = [
-                {
-                    "value": choice_value,
-                    "label": force_text(choice_label, strings_only=True),
-                }
-                for choice_value, choice_label in dict(field.choices).items()
-            ]
-
-        class_name = field.__class__.__name__
-        if class_name == "LabeledChoiceField":
-            field_info["type"] = "labeled_choice"
-        elif class_name == "ObjectRelatedField":
-            field_info["type"] = "object_related_field"
-        elif class_name == "ManyRelatedField":
-            child_relation_class_name = field.child_relation.__class__.__name__
-            if child_relation_class_name == "ObjectRelatedField":
-                field_info["type"] = "m2m_related_field"
+        if isinstance(field, TreeChoicesMixin):
+            self.set_tree_field(field, field_info)
+        elif isinstance(field, serializers.ChoiceField):
+            self.set_choices_field(field, field_info)
         return field_info
 
     @staticmethod
@@ -130,7 +149,8 @@ class SimpleMetadataWithFilters(SimpleMetadata):
             fields = list(fields.keys())
         return fields
 
-    def get_ordering_fields(self, request, view):
+    @staticmethod
+    def get_ordering_fields(request, view):
         fields = []
         if hasattr(view, "get_ordering_fields"):
             fields = view.get_ordering_fields(request)

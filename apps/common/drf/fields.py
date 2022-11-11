@@ -2,11 +2,11 @@
 #
 import six
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import IntegerChoices
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.fields import ChoiceField
 
+from common.db.fields import BitChoices
 from common.utils import decrypt_password
 
 __all__ = [
@@ -15,6 +15,7 @@ __all__ = [
     "LabeledChoiceField",
     "ObjectRelatedField",
     "BitChoicesField",
+    "TreeChoicesMixin"
 ]
 
 
@@ -102,14 +103,19 @@ class ObjectRelatedField(serializers.RelatedField):
             self.fail("incorrect_type", data_type=type(pk).__name__)
 
 
-class BitChoicesField(serializers.MultipleChoiceField):
+class TreeChoicesMixin:
+    tree = []
+
+
+class BitChoicesField(TreeChoicesMixin, serializers.MultipleChoiceField):
     """
     位字段
     """
 
     def __init__(self, choice_cls, **kwargs):
-        assert issubclass(choice_cls, IntegerChoices)
+        assert issubclass(choice_cls, BitChoices)
         choices = [(c.name, c.label) for c in choice_cls]
+        self.tree = choice_cls.tree()
         self._choice_cls = choice_cls
         super().__init__(choices=choices, **kwargs)
 
