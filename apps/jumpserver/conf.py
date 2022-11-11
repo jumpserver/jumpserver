@@ -498,6 +498,8 @@ class Config(dict):
         'SERVER_REPLAY_STORAGE': {},
         'SECURITY_DATA_CRYPTO_ALGO': None,
         'GMSSL_ENABLED': False,
+        # 操作日志变更字段的存储ES配置
+        'OPERATE_LOG_ELASTICSEARCH_CONFIG': {},
         # Magnus 组件需要监听的端口范围
         'MAGNUS_PORTS': '30000-30100',
 
