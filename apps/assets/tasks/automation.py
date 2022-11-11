@@ -9,7 +9,7 @@ logger = get_logger(__file__)
 
 @shared_task(queue='ansible')
 def execute_automation(pid, trigger, tp):
-    model = AutomationTypes.get_model(tp)
+    model = AutomationTypes.get_type_model(tp)
     with tmp_to_root_org():
         instance = get_object_or_none(model, pk=pid)
     if not instance:
