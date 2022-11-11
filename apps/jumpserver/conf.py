@@ -199,6 +199,9 @@ class Config(dict):
         'REDIS_PORT': 6379,
         'REDIS_PASSWORD': '',
         'REDIS_USE_SSL': False,
+        'REDIS_SSL_KEY': None,
+        'REDIS_SSL_CERT': None,
+        'REDIS_SSL_CA': None,
         # Redis Sentinel
         'REDIS_SENTINEL_HOSTS': '',
         'REDIS_SENTINEL_PASSWORD': '',
