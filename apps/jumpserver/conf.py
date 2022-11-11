@@ -199,6 +199,10 @@ class Config(dict):
         'REDIS_PORT': 6379,
         'REDIS_PASSWORD': '',
         'REDIS_USE_SSL': False,
+        # Redis Sentinel
+        'REDIS_SENTINEL_HOSTS': '',
+        'REDIS_SENTINEL_PASSWORD': '',
+        'REDIS_SENTINEL_SOCKET_TIMEOUT': None,
         # Default value
         'REDIS_DB_CELERY': 3,
         'REDIS_DB_CACHE': 4,
