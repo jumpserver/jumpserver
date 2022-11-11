@@ -2,12 +2,14 @@ from celery import shared_task
 
 from orgs.utils import tmp_to_root_org, tmp_to_org
 from common.utils import get_logger, get_object_or_none
+from assets.const import AutomationTypes
 
 logger = get_logger(__file__)
 
 
 @shared_task(queue='ansible')
-def execute_automation(pid, trigger, model):
+def execute_automation(pid, trigger, tp):
+    model = AutomationTypes.get_model(tp)
     with tmp_to_root_org():
         instance = get_object_or_none(model, pk=pid)
     if not instance:

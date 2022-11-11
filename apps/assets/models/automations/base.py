@@ -47,7 +47,7 @@ class BaseAutomation(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
     def get_register_task(self):
         name = f"automation_{self.type}_strategy_period_{str(self.id)[:8]}"
         task = execute_automation.name
-        args = (str(self.id), Trigger.timing, self._meta.model)
+        args = (str(self.id), Trigger.timing, self.type)
         kwargs = {}
         return name, task, args, kwargs
 
