@@ -119,13 +119,21 @@ class OperatorLogHandler(metaclass=Singleton):
             resource_display = return_value
         return resource_display
 
+    @staticmethod
+    def serialized_value(value: (list, tuple)):
+        if len(value) == 0:
+            return ''
+        if isinstance(value[0], str):
+            return ','.join(value)
+        return ','.join([i['value'] for i in value if i.get('value')])
+
     def __data_processing(self, dict_item, loop=True):
         encrypt_value = '******'
         for key, value in dict_item.items():
             if isinstance(value, bool):
                 value = _('Yes') if value else _('No')
             elif isinstance(value, (list, tuple)):
-                value = ','.join(value)
+                value = self.serialized_value(value)
             elif isinstance(value, dict) and loop:
                 self.__data_processing(value, loop=False)
             if key in encrypted_field_set:
