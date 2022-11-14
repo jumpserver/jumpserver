@@ -1,27 +1,26 @@
 # ~*~ coding: utf-8 ~*~
 
 from __future__ import unicode_literals
-from django.views.generic import RedirectView
-from django.shortcuts import reverse, redirect
-from django.utils.translation import ugettext as _
-from django.conf import settings
-from django.urls import reverse_lazy
-from django.views.generic import FormView
-from django.core.cache import cache
 
-from users.notifications import ResetPasswordSuccessMsg
-from common.utils import get_object_or_none, FlashMessageUtil, random_string
+from common.utils import FlashMessageUtil, get_object_or_none, random_string
 from common.utils.verify_code import SendAndVerifyCodeUtil
-from ...models import User
-from ...utils import (
-    get_password_check_rules, check_password_rules,
-)
-from ... import forms
+from django.conf import settings
+from django.core.cache import cache
+from django.shortcuts import redirect, reverse
+from django.urls import reverse_lazy
+from django.utils.translation import ugettext as _
+from django.views.generic import FormView, RedirectView
+from users.notifications import ResetPasswordSuccessMsg
 
+from ... import forms
+from ...models import User
+from ...utils import check_password_rules, get_password_check_rules
 
 __all__ = [
-    'UserLoginView', 'UserResetPasswordView', 'UserForgotPasswordView',
-    'UserForgotPasswordPreviewingView'
+    'UserLoginView',
+    'UserResetPasswordView',
+    'UserForgotPasswordView',
+    'UserForgotPasswordPreviewingView',
 ]
 
 
@@ -46,7 +45,8 @@ class UserForgotPasswordPreviewingView(FormView):
             return super().form_invalid(form)
 
         token = random_string(36)
-        cache.set(token, username, 5 * 60)
+        user_map = {'username': user.username, 'phone': user.phone, 'email': user.email}
+        cache.set(token, user_map, 5 * 60)
         return redirect(self.get_redirect_url(token))
 
 
@@ -56,19 +56,18 @@ class UserForgotPasswordView(FormView):
 
     def get(self, request, *args, **kwargs):
         token = self.request.GET.get('token')
-        username = cache.get(token)
-        if not username:
+        userinfo = cache.get(token)
+        if not userinfo:
             return redirect(self.get_redirect_url(return_previewing=True))
         else:
-            return super().get(request, *args, **kwargs)
+            context = self.get_context_data(has_phone=bool(userinfo['phone']))
+            return self.render_to_response(context)
 
     @staticmethod
-    def get_validate_backends_context():
-        validate_backends = [
-            {'name': _('Email'), 'is_active': True, 'value': 'email'}
-        ]
+    def get_validate_backends_context(has_phone):
+        validate_backends = [{'name': _('Email'), 'is_active': True, 'value': 'email'}]
         if settings.XPACK_ENABLED:
-            if settings.SMS_ENABLED:
+            if settings.SMS_ENABLED and has_phone:
                 is_active = True
             else:
                 is_active = False
@@ -76,19 +75,18 @@ class UserForgotPasswordView(FormView):
             validate_backends.append(sms_backend)
         return {'validate_backends': validate_backends}
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, has_phone=False, **kwargs):
         context = super().get_context_data(**kwargs)
         form = context['form']
-        if getattr(form, 'errors', None):
-            e = getattr(form, 'errors')
-            context['errors'] = e
-        context['form_type'] = 'email'
-        context['XPACK_ENABLED'] = settings.XPACK_ENABLED
+
         cleaned_data = getattr(form, 'cleaned_data', {})
         for k, v in cleaned_data.items():
             if v:
                 context[k] = v
-        validate_backends = self.get_validate_backends_context()
+
+        context['form_type'] = 'email'
+        context['XPACK_ENABLED'] = settings.XPACK_ENABLED
+        validate_backends = self.get_validate_backends_context(has_phone)
         context.update(validate_backends)
         return context
 
@@ -102,10 +100,15 @@ class UserForgotPasswordView(FormView):
 
     def form_valid(self, form):
         token = self.request.GET.get('token')
-        username = cache.get(token)
+        userinfo = cache.get(token)
+        if not userinfo:
+            return redirect(self.get_redirect_url(return_previewing=True))
+
+        username = userinfo.get('username')
         form_type = form.cleaned_data['form_type']
-        code = form.cleaned_data['code']
         target = form.cleaned_data[form_type]
+        code = form.cleaned_data['code']
+
         try:
             sender_util = SendAndVerifyCodeUtil(target, backend=form_type)
             sender_util.verify(code)
@@ -116,7 +119,7 @@ class UserForgotPasswordView(FormView):
         query_key = 'phone' if form_type == 'sms' else form_type
         user = get_object_or_none(User, **{'username': username, query_key: target})
         if not user:
-            form.add_error('username', _('User does not exist: {}').format(username))
+            form.add_error('code', _('No user matched'))
             return super().form_invalid(form)
 
         return redirect(self.get_redirect_url(user))
@@ -167,7 +170,9 @@ class UserResetPasswordView(FormView):
 
         if user.is_history_password(password):
             limit_count = settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT
-            error = _('* The new password cannot be the last {} passwords').format(limit_count)
+            error = _('* The new password cannot be the last {} passwords').format(
+                limit_count
+            )
             form.add_error('new_password', error)
             return self.form_invalid(form)
 

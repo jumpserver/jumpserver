@@ -4,6 +4,7 @@ from rest_framework.permissions import AllowAny
 from django.utils.translation import ugettext as _
 from django.template.loader import render_to_string
 from django.core.cache import cache
+from django.shortcuts import reverse
 
 from common.utils.verify_code import SendAndVerifyCodeUtil
 from common.permissions import IsValidUser
@@ -37,10 +38,14 @@ class UserResetPasswordSendCodeApi(CreateAPIView):
         return user, None
 
     def create(self, request, *args, **kwargs):
+        token = request.GET.get('token')
+        userinfo = cache.get(token)
+        if not userinfo:
+            return reverse('authentication:forgot-previewing')
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        token = request.GET.get('token')
-        username = cache.get(token)
+        username = userinfo.get('username')
         form_type = serializer.validated_data['form_type']
         code = random_string(6, lower=False, upper=False)
         other_args = {}
