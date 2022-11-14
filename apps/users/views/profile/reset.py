@@ -7,9 +7,10 @@ from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.urls import reverse_lazy
 from django.views.generic import FormView
+from django.core.cache import cache
 
 from users.notifications import ResetPasswordSuccessMsg
-from common.utils import get_object_or_none, FlashMessageUtil
+from common.utils import get_object_or_none, FlashMessageUtil, random_string
 from common.utils.verify_code import SendAndVerifyCodeUtil
 from ...models import User
 from ...utils import (
@@ -20,6 +21,7 @@ from ... import forms
 
 __all__ = [
     'UserLoginView', 'UserResetPasswordView', 'UserForgotPasswordView',
+    'UserForgotPasswordPreviewingView'
 ]
 
 
@@ -28,9 +30,51 @@ class UserLoginView(RedirectView):
     query_string = True
 
 
+class UserForgotPasswordPreviewingView(FormView):
+    template_name = 'users/forgot_password_previewing.html'
+    form_class = forms.UserForgotPasswordPreviewingForm
+
+    @staticmethod
+    def get_redirect_url(token):
+        return reverse('authentication:forgot-password') + '?token=%s' % token
+
+    def form_valid(self, form):
+        username = form.cleaned_data['username']
+        user = get_object_or_none(User, username=username)
+        if not user:
+            form.add_error('username', _('User does not exist: {}').format(username))
+            return super().form_invalid(form)
+
+        token = random_string(36)
+        cache.set(token, username, 5 * 60)
+        return redirect(self.get_redirect_url(token))
+
+
 class UserForgotPasswordView(FormView):
     template_name = 'users/forgot_password.html'
     form_class = forms.UserForgotPasswordForm
+
+    def get(self, request, *args, **kwargs):
+        token = self.request.GET.get('token')
+        username = cache.get(token)
+        if not username:
+            return redirect(self.get_redirect_url(return_previewing=True))
+        else:
+            return super().get(request, *args, **kwargs)
+
+    @staticmethod
+    def get_validate_backends_context():
+        validate_backends = [
+            {'name': _('Email'), 'is_active': True, 'value': 'email'}
+        ]
+        if settings.XPACK_ENABLED:
+            if settings.SMS_ENABLED:
+                is_active = True
+            else:
+                is_active = False
+            sms_backend = {'name': _('SMS'), 'is_active': is_active, 'value': 'sms'}
+            validate_backends.append(sms_backend)
+        return {'validate_backends': validate_backends}
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -44,32 +88,33 @@ class UserForgotPasswordView(FormView):
         for k, v in cleaned_data.items():
             if v:
                 context[k] = v
+        validate_backends = self.get_validate_backends_context()
+        context.update(validate_backends)
         return context
 
     @staticmethod
-    def get_redirect_url(user):
+    def get_redirect_url(user=None, return_previewing=False):
+        if not user and return_previewing:
+            return reverse('authentication:forgot-previewing')
         query_params = '?token=%s' % user.generate_reset_token()
         reset_password_url = reverse('authentication:reset-password')
         return reset_password_url + query_params
 
     def form_valid(self, form):
+        token = self.request.GET.get('token')
+        username = cache.get(token)
         form_type = form.cleaned_data['form_type']
         code = form.cleaned_data['code']
-        username = form.cleaned_data['username']
-        if settings.XPACK_ENABLED and form_type == 'phone':
-            backend = 'sms'
-            target = form.cleaned_data['phone']
-        else:
-            backend = 'email'
-            target = form.cleaned_data['email']
+        target = form.cleaned_data[form_type]
         try:
-            sender_util = SendAndVerifyCodeUtil(target, backend=backend)
+            sender_util = SendAndVerifyCodeUtil(target, backend=form_type)
             sender_util.verify(code)
         except Exception as e:
             form.add_error('code', str(e))
             return super().form_invalid(form)
 
-        user = get_object_or_none(User, **{'username': username, form_type: target})
+        query_key = 'phone' if form_type == 'sms' else form_type
+        user = get_object_or_none(User, **{'username': username, query_key: target})
         if not user:
             form.add_error('username', _('User does not exist: {}').format(username))
             return super().form_invalid(form)

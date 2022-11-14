@@ -32,8 +32,9 @@ class EncryptedField(serializers.CharField):
         if write_only is None:
             write_only = True
         kwargs['write_only'] = write_only
+        encrypted_key = kwargs.pop('encrypted_key', None)
         super().__init__(**kwargs)
-        add_encrypted_field_set(self.label)
+        add_encrypted_field_set(encrypted_key or self.label)
 
     def to_internal_value(self, value):
         value = super().to_internal_value(value)
