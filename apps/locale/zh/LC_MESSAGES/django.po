@@ -157,13 +157,11 @@ msgstr "格式为逗号分隔的字符串, * 表示匹配所有. "
 #: acls/serializers/login_asset_acl.py:51 assets/models/base.py:176
 #: assets/models/gathered_user.py:15 audits/models.py:139
 #: authentication/forms.py:25 authentication/forms.py:27
-#: authentication/models.py:260 authentication/serializers/password_mfa.py:25
+#: authentication/models.py:260
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
-#: ops/models/adhoc.py:159 users/forms/profile.py:32 users/forms/profile.py:102
+#: ops/models/adhoc.py:159 users/forms/profile.py:32 users/forms/profile.py:109
 #: users/models/user.py:671 users/templates/users/_msg_user_created.html:12
-#: users/templates/users/forgot_password.html:51
-#: users/templates/users/forgot_password.html:98
 #: xpack/plugins/change_auth_plan/models/asset.py:34
 #: xpack/plugins/change_auth_plan/models/asset.py:195
 #: xpack/plugins/cloud/serializers/account_attrs.py:26
@@ -839,10 +837,10 @@ msgstr "带宽"
 msgid "Contact"
 msgstr "联系人"
 
-#: assets/models/cluster.py:22 authentication/serializers/password_mfa.py:29
-#: users/forms/profile.py:104 users/models/user.py:693
-#: users/templates/users/forgot_password.html:59
-#: users/templates/users/forgot_password.html:103
+#: assets/models/cluster.py:22 authentication/serializers/password_mfa.py:25
+#: users/forms/profile.py:103 users/models/user.py:693
+#: users/templates/users/forgot_password.html:55
+#: users/templates/users/forgot_password.html:121
 msgid "Phone"
 msgstr "手机"
 
@@ -1671,25 +1669,27 @@ msgstr "此操作需要验证您的 MFA"
 msgid "Current user not support mfa type: {}"
 msgstr "当前用户不支持 MFA 类型: {}"
 
-#: authentication/api/password.py:29 terminal/api/session.py:224
-#: users/views/profile/reset.py:74
+#: authentication/api/password.py:30 terminal/api/session.py:224
+#: users/views/profile/reset.py:45 users/views/profile/reset.py:107
 msgid "User does not exist: {}"
 msgstr "用户不存在: {}"
 
-#: authentication/api/password.py:29
+#: authentication/api/password.py:30
 msgid "No user matched"
 msgstr "没有匹配到用户"
 
-#: authentication/api/password.py:33
+#: authentication/api/password.py:34
 msgid ""
 "The user is from {}, please go to the corresponding system to change the "
 "password"
 msgstr "用户来自 {} 请去相应系统修改密码"
 
-#: authentication/api/password.py:59
+#: authentication/api/password.py:61
 #: authentication/templates/authentication/login.html:256
 #: users/templates/users/forgot_password.html:33
 #: users/templates/users/forgot_password.html:34
+#: users/templates/users/forgot_password_previewing.html:13
+#: users/templates/users/forgot_password_previewing.html:14
 msgid "Forgot password"
 msgstr "忘记密码"
 
@@ -1991,6 +1991,7 @@ msgid "SMS verify code invalid"
 msgstr "短信验证码校验失败"
 
 #: authentication/mfa/sms.py:12 settings/serializers/auth/sms.py:27
+#: users/templates/users/forgot_password.html:74
 msgid "SMS"
 msgstr "短信"
 
@@ -2121,16 +2122,16 @@ msgstr "资产或应用必填"
 
 #: authentication/serializers/password_mfa.py:25
 #: authentication/serializers/password_mfa.py:29
-#: authentication/serializers/password_mfa.py:33
-#: users/templates/users/forgot_password.html:95
+#: users/templates/users/forgot_password.html:117
 msgid "The {} cannot be empty"
 msgstr "{} 不能为空"
 
-#: authentication/serializers/password_mfa.py:33
+#: authentication/serializers/password_mfa.py:29
 #: notifications/backends/__init__.py:10 settings/serializers/email.py:19
-#: settings/serializers/email.py:50 users/forms/profile.py:103
-#: users/models/user.py:675 users/templates/users/forgot_password.html:55
-#: users/templates/users/forgot_password.html:108
+#: settings/serializers/email.py:50 users/forms/profile.py:102
+#: users/models/user.py:675 users/templates/users/forgot_password.html:51
+#: users/templates/users/forgot_password.html:70
+#: users/templates/users/forgot_password.html:126
 msgid "Email"
 msgstr "邮件"
 
@@ -2280,7 +2281,7 @@ msgstr "重新申请"
 
 #: authentication/templates/authentication/_msg_reset_password_code.html:12
 #: terminal/models/sharing.py:26 terminal/models/sharing.py:80
-#: users/forms/profile.py:105 users/templates/users/forgot_password.html:63
+#: users/forms/profile.py:104 users/templates/users/forgot_password.html:59
 msgid "Verify code"
 msgstr "验证码"
 
@@ -4685,17 +4686,17 @@ msgstr ""
 "        "
 
 #: templates/_mfa_login_field.html:28
-#: users/templates/users/forgot_password.html:65
+#: users/templates/users/forgot_password.html:61
 msgid "Send verification code"
 msgstr "发送验证码"
 
 #: templates/_mfa_login_field.html:106
-#: users/templates/users/forgot_password.html:122
+#: users/templates/users/forgot_password.html:139
 msgid "Wait: "
 msgstr "等待："
 
 #: templates/_mfa_login_field.html:116
-#: users/templates/users/forgot_password.html:138
+#: users/templates/users/forgot_password.html:155
 msgid "The verification code has been sent"
 msgstr "验证码已发送"
 
@@ -5682,40 +5683,40 @@ msgstr "确认密码"
 msgid "Password does not match"
 msgstr "密码不一致"
 
-#: users/forms/profile.py:112
+#: users/forms/profile.py:115
 msgid "Old password"
 msgstr "原来密码"
 
-#: users/forms/profile.py:122
+#: users/forms/profile.py:125
 msgid "Old password error"
 msgstr "原来密码错误"
 
-#: users/forms/profile.py:132
+#: users/forms/profile.py:135
 msgid "Automatically configure and download the SSH key"
 msgstr "自动配置并下载SSH密钥"
 
-#: users/forms/profile.py:134
+#: users/forms/profile.py:137
 msgid "ssh public key"
 msgstr "SSH公钥"
 
-#: users/forms/profile.py:135
+#: users/forms/profile.py:138
 msgid "ssh-rsa AAAA..."
 msgstr "ssh-rsa AAAA..."
 
-#: users/forms/profile.py:136
+#: users/forms/profile.py:139
 msgid "Paste your id_rsa.pub here."
 msgstr "复制你的公钥到这里"
 
-#: users/forms/profile.py:149
+#: users/forms/profile.py:152
 msgid "Public key should not be the same as your old one."
 msgstr "不能和原来的密钥相同"
 
-#: users/forms/profile.py:153 users/serializers/profile.py:100
+#: users/forms/profile.py:156 users/serializers/profile.py:100
 #: users/serializers/profile.py:183 users/serializers/profile.py:210
 msgid "Not a valid ssh public key"
 msgstr "SSH密钥不合法"
 
-#: users/forms/profile.py:164 users/models/user.py:706
+#: users/forms/profile.py:167 users/models/user.py:706
 msgid "Public key"
 msgstr "SSH公钥"
 
@@ -5795,7 +5796,7 @@ msgstr "用户密码历史"
 msgid "Reset password"
 msgstr "重置密码"
 
-#: users/notifications.py:85 users/views/profile/reset.py:139
+#: users/notifications.py:85 users/views/profile/reset.py:172
 msgid "Reset password success"
 msgstr "重置密码成功"
 
@@ -5989,17 +5990,14 @@ msgstr "点击这里设置密码"
 msgid "Input your email, that will send a mail to your"
 msgstr "输入您的邮箱, 将会发一封重置邮件到您的邮箱中"
 
-#: users/templates/users/forgot_password.html:68
+#: users/templates/users/forgot_password.html:64
+#: users/templates/users/forgot_password_previewing.html:30
 msgid "Submit"
 msgstr "提交"
 
-#: users/templates/users/forgot_password.html:71
-msgid "Use the phone number to retrieve the password"
-msgstr "使用手机号找回密码"
-
-#: users/templates/users/forgot_password.html:72
-msgid "Use email to retrieve the password"
-msgstr "使用邮箱找回密码"
+#: users/templates/users/forgot_password_previewing.html:21
+msgid "Please enter the username for which you want to retrieve the password"
+msgstr "请输入您需要找回密码的用户名"
 
 #: users/templates/users/mfa_setting.html:24
 msgid "Enable MFA"
@@ -6135,23 +6133,23 @@ msgstr "MFA(OTP) 禁用成功，返回登录页面"
 msgid "Password invalid"
 msgstr "用户名或密码无效"
 
-#: users/views/profile/reset.py:96 users/views/profile/reset.py:107
+#: users/views/profile/reset.py:129 users/views/profile/reset.py:140
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
-#: users/views/profile/reset.py:112
+#: users/views/profile/reset.py:145
 msgid "User auth from {}, go there change password"
 msgstr "用户认证源来自 {}, 请去相应系统修改密码"
 
-#: users/views/profile/reset.py:119
+#: users/views/profile/reset.py:152
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
-#: users/views/profile/reset.py:125
+#: users/views/profile/reset.py:158
 msgid "* The new password cannot be the last {} passwords"
 msgstr "* 新密码不能是最近 {} 次的密码"
 
-#: users/views/profile/reset.py:140
+#: users/views/profile/reset.py:173
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 

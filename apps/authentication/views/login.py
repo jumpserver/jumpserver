@@ -115,7 +115,7 @@ class UserLoginContextMixin:
 
     @staticmethod
     def get_forgot_password_url():
-        forgot_password_url = reverse('authentication:forgot-password')
+        forgot_password_url = reverse('authentication:forgot-previewing')
         forgot_password_url = settings.FORGOT_PASSWORD_URL or forgot_password_url
         return forgot_password_url
 
