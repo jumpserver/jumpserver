@@ -199,6 +199,13 @@ class Config(dict):
         'REDIS_PORT': 6379,
         'REDIS_PASSWORD': '',
         'REDIS_USE_SSL': False,
+        'REDIS_SSL_KEY': None,
+        'REDIS_SSL_CERT': None,
+        'REDIS_SSL_CA': None,
+        # Redis Sentinel
+        'REDIS_SENTINEL_HOSTS': '',
+        'REDIS_SENTINEL_PASSWORD': '',
+        'REDIS_SENTINEL_SOCKET_TIMEOUT': None,
         # Default value
         'REDIS_DB_CELERY': 3,
         'REDIS_DB_CACHE': 4,
@@ -491,6 +498,8 @@ class Config(dict):
         'SERVER_REPLAY_STORAGE': {},
         'SECURITY_DATA_CRYPTO_ALGO': None,
         'GMSSL_ENABLED': False,
+        # 操作日志变更字段的存储ES配置
+        'OPERATE_LOG_ELASTICSEARCH_CONFIG': {},
         # Magnus 组件需要监听的端口范围
         'MAGNUS_PORTS': '30000-30100',
 

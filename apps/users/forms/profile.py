@@ -2,10 +2,9 @@
 #
 from django import forms
 from django.utils.translation import gettext_lazy as _
-from captcha.fields import CaptchaField
 
 from common.utils import validate_ssh_public_key
-from authentication.forms import EncryptedField
+from authentication.forms import EncryptedField, CaptchaMixin
 from ..models import User
 
 
@@ -13,7 +12,8 @@ __all__ = [
     'UserProfileForm', 'UserMFAForm', 'UserFirstLoginFinishForm',
     'UserPasswordForm', 'UserPublicKeyForm', 'FileForm',
     'UserTokenResetPasswordForm', 'UserForgotPasswordForm',
-    'UserCheckPasswordForm', 'UserCheckOtpCodeForm'
+    'UserCheckPasswordForm', 'UserCheckOtpCodeForm',
+    'UserForgotPasswordPreviewingForm'
 ]
 
 
@@ -99,11 +99,17 @@ class UserTokenResetPasswordForm(forms.Form):
 
 
 class UserForgotPasswordForm(forms.Form):
-    username = forms.CharField(label=_("Username"))
     email = forms.CharField(label=_("Email"), required=False)
-    phone = forms.CharField(label=_('Phone'), required=False, max_length=11)
+    sms = forms.CharField(label=_('SMS'), required=False, max_length=11)
     code = forms.CharField(label=_('Verify code'), max_length=6, required=False)
-    form_type = forms.CharField(widget=forms.HiddenInput({'value': 'email'}))
+    form_type = forms.ChoiceField(
+        choices=[('sms', _('SMS')), ('email', _('Email'))],
+        widget=forms.HiddenInput({'value': 'email'})
+    )
+
+
+class UserForgotPasswordPreviewingForm(CaptchaMixin):
+    username = forms.CharField(label=_("Username"))
 
 
 class UserPasswordForm(UserTokenResetPasswordForm):
