@@ -62,7 +62,7 @@ class CustomCaptchaTextInput(CaptchaTextInput):
 
 
 class CaptchaMixin(forms.Form):
-    captcha = CaptchaField(widget=CustomCaptchaTextInput)
+    captcha = CaptchaField(widget=CustomCaptchaTextInput, label=_('Captcha'))
 
 
 class ChallengeMixin(forms.Form):
