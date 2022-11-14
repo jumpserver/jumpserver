@@ -10,8 +10,8 @@ __all__ = ['MailTestSerializer', 'EmailSettingSerializer', 'EmailContentSettingS
 
 
 class MailTestSerializer(serializers.Serializer):
-    EMAIL_FROM = serializers.CharField(required=False, allow_blank=True)
-    EMAIL_RECIPIENT = serializers.CharField(required=False, allow_blank=True)
+    EMAIL_FROM = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    EMAIL_RECIPIENT = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
 
 class EmailSettingSerializer(serializers.Serializer):
