@@ -1,5 +1,6 @@
 # coding: utf-8
 #
 
-from .permed_node import *
 from .asset_permission import *
+from .perm_node import *
+from .perm_token import *
