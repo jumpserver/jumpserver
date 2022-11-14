@@ -23,7 +23,7 @@ class ChromeSerializer(RemoteAppSerializer):
     )
     chrome_password = EncryptedField(
         max_length=128, allow_blank=True, required=False,
-        label=_('Chrome password'), allow_null=True
+        label=_('Chrome password'), allow_null=True, encrypted_key='chrome_password'
     )
 
 

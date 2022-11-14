@@ -16,6 +16,8 @@ MODELS_NEED_RECORD = (
     'CommandFilter', 'Platform', 'Label',
     # applications
     'Application',
+    # account
+    'AuthBook',
     # orgs
     'Organization',
     # settings

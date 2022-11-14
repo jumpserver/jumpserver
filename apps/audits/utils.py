@@ -59,14 +59,15 @@ def get_resource_display(resource):
 def model_to_dict_for_operate_log(
         instance, include_model_fields=True, include_related_fields=True
 ):
-    need_continue_fields = ['date_updated']
+    model_need_continue_fields = ['date_updated']
+    m2m_need_continue_fields = ['history_passwords']
     opts = instance._meta
     data = {}
     for f in chain(opts.concrete_fields, opts.private_fields):
         if isinstance(f, (models.FileField, models.ImageField)):
             continue
 
-        if getattr(f, 'attname', None) in need_continue_fields:
+        if getattr(f, 'attname', None) in model_need_continue_fields:
             continue
 
         value = getattr(instance, f.name) or getattr(instance, f.attname)
@@ -75,11 +76,6 @@ def model_to_dict_for_operate_log(
 
         if getattr(f, 'primary_key', False):
             f.verbose_name = 'id'
-        elif isinstance(f, (
-            fields.EncryptCharField, fields.EncryptTextField,
-            fields.EncryptJsonDictCharField, fields.EncryptJsonDictTextField
-        )) or getattr(f, 'attname', '') == 'password':
-            value = 'encrypt|%s' % value
         elif isinstance(value, list):
             value = [str(v) for v in value]
 
@@ -91,11 +87,12 @@ def model_to_dict_for_operate_log(
             value = []
             if instance.pk is not None:
                 related_name = getattr(f, 'attname', '') or getattr(f, 'related_name', '')
-                if related_name:
-                    try:
-                        value = [str(i) for i in getattr(instance, related_name).all()]
-                    except:
-                        pass
+                if not related_name or related_name in m2m_need_continue_fields:
+                    continue
+                try:
+                    value = [str(i) for i in getattr(instance, related_name).all()]
+                except:
+                    pass
             if not value:
                 continue
             try:
