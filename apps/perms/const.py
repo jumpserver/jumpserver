@@ -10,11 +10,11 @@ __all__ = ["SpecialAccount", "ActionChoices"]
 
 
 class ActionChoices(BitChoices):
-    connect = bit(0), _("Connect")
-    upload = bit(1), _("Upload")
-    download = bit(2), _("Download")
-    copy = bit(3), _("Copy")
-    paste = bit(4), _("Paste")
+    connect = bit(1), _("Connect")
+    upload = bit(2), _("Upload")
+    download = bit(3), _("Download")
+    copy = bit(4), _("Copy")
+    paste = bit(5), _("Paste")
 
     @classmethod
     def is_tree(cls):
