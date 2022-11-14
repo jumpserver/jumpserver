@@ -282,9 +282,6 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
             raise PermissionDenied(error)
 
 
-# SuperConnectionToken
-
-
 class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
     serializer_classes = {
         'default': SuperConnectionTokenSerializer,

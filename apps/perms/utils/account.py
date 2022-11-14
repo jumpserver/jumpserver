@@ -1,4 +1,3 @@
-import time
 from collections import defaultdict
 
 from assets.models import Account
@@ -9,6 +8,7 @@ __all__ = ['PermAccountUtil']
 
 class PermAccountUtil(AssetPermissionUtil):
     """ 资产授权账号相关的工具 """
+
     @staticmethod
     def get_permed_accounts_from_perms(perms, user, asset):
         alias_action_bit_mapper = defaultdict(int)
@@ -75,7 +75,9 @@ class PermAccountUtil(AssetPermissionUtil):
         return accounts
 
     def validate_permission(self, user, asset, account_username):
-        """ 校验用户有某个资产下某个账号名的权限 """
+        """ 校验用户有某个资产下某个账号名的权限
+        :param account_username: 可能是 @USER @INPUT 的
+        """
         permed_accounts = self.get_permed_accounts_for_user(user, asset)
         accounts_mapper = {account.username: account for account in permed_accounts}
 

@@ -27,6 +27,11 @@ class ActionChoices(BitChoices):
             (_("Clipboard"), [cls.copy, cls.paste]),
         )
 
+    @classmethod
+    def has_perm(cls, action_name, total):
+        action_value = getattr(cls, action_name)
+        return action_value & total == action_value
+
 
 class SpecialAccount(models.TextChoices):
     ALL = "@ALL", "All"

@@ -1,14 +1,13 @@
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from django.utils.translation import ugettext_lazy as _
-from orgs.mixins.serializers import OrgResourceModelSerializerMixin
+from assets.models import Asset, Gateway, Domain, CommandFilterRule, Account, Platform
 from authentication.models import ConnectionToken
 from common.utils import pretty_string
 from common.utils.random import random_string
-from assets.models import Asset, Gateway, Domain, CommandFilterRule, Account
-from users.models import User
+from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from perms.serializers.permission import ActionChoicesField
-
+from users.models import User
 
 __all__ = [
     'ConnectionTokenSerializer', 'ConnectionTokenSecretSerializer',
@@ -86,7 +85,6 @@ class ConnectionTokenDisplaySerializer(ConnectionTokenSerializer):
 
 
 class SuperConnectionTokenSerializer(ConnectionTokenSerializer):
-
     class Meta(ConnectionTokenSerializer.Meta):
         read_only_fields = [
             'validity', 'user_display', 'system_user_display',
@@ -104,6 +102,7 @@ class SuperConnectionTokenSerializer(ConnectionTokenSerializer):
 
 class ConnectionTokenUserSerializer(serializers.ModelSerializer):
     """ User """
+
     class Meta:
         model = User
         fields = ['id', 'name', 'username', 'email']
@@ -111,6 +110,7 @@ class ConnectionTokenUserSerializer(serializers.ModelSerializer):
 
 class ConnectionTokenAssetSerializer(serializers.ModelSerializer):
     """ Asset """
+
     class Meta:
         model = Asset
         fields = ['id', 'name', 'address', 'protocols', 'org_id']
@@ -118,6 +118,7 @@ class ConnectionTokenAssetSerializer(serializers.ModelSerializer):
 
 class ConnectionTokenAccountSerializer(serializers.ModelSerializer):
     """ Account """
+
     class Meta:
         model = Account
         fields = [
@@ -127,6 +128,7 @@ class ConnectionTokenAccountSerializer(serializers.ModelSerializer):
 
 class ConnectionTokenGatewaySerializer(serializers.ModelSerializer):
     """ Gateway """
+
     class Meta:
         model = Gateway
         fields = ['id', 'ip', 'port', 'username', 'password', 'private_key']
@@ -143,6 +145,7 @@ class ConnectionTokenDomainSerializer(serializers.ModelSerializer):
 
 class ConnectionTokenCmdFilterRuleSerializer(serializers.ModelSerializer):
     """ Command filter rule """
+
     class Meta:
         model = CommandFilterRule
         fields = [
@@ -151,12 +154,18 @@ class ConnectionTokenCmdFilterRuleSerializer(serializers.ModelSerializer):
         ]
 
 
+class ConnectionTokenPlatform(serializers.ModelSerializer):
+    class Meta:
+        model = Platform
+        fields = ['id', 'name', 'org_id']
+
+
 class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     user = ConnectionTokenUserSerializer(read_only=True)
     asset = ConnectionTokenAssetSerializer(read_only=True)
+    platform = ConnectionTokenPlatform(read_only=True)
     account = ConnectionTokenAccountSerializer(read_only=True)
     gateway = ConnectionTokenGatewaySerializer(read_only=True)
-    domain = ConnectionTokenDomainSerializer(read_only=True)
     cmd_filter_rules = ConnectionTokenCmdFilterRuleSerializer(many=True)
     actions = ActionChoicesField()
     expire_at = serializers.IntegerField()
