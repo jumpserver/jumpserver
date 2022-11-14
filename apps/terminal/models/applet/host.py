@@ -110,3 +110,13 @@ class AppletHostDeployment(JMSBaseModel):
         from ...automations.deploy_applet_host import DeployAppletHostManager
         manager = DeployAppletHostManager(self)
         manager.run(**kwargs)
+
+    def install_applet(self, applet_id, **kwargs):
+        from ...automations.deploy_applet_host import DeployAppletHostManager
+        from .applet import Applet
+        if applet_id:
+            applet = Applet.objects.get(id=applet_id)
+        else:
+            applet = None
+        manager = DeployAppletHostManager(self, applet=applet)
+        manager.install_applet(**kwargs)
