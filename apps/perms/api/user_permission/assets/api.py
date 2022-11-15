@@ -1,12 +1,12 @@
-from rest_framework.generics import ListAPIView
 from django.conf import settings
+from rest_framework.generics import ListAPIView
 
 from common.utils import get_logger
-from ..mixin import AssetRoleAdminMixin, AssetRoleUserMixin
 from .mixin import (
     UserAllGrantedAssetsQuerysetMixin, UserDirectGrantedAssetsQuerysetMixin, UserFavoriteGrantedAssetsMixin,
     UserGrantedNodeAssetsMixin, AssetsSerializerFormatMixin, AssetsTreeFormatMixin,
 )
+from ..mixin import AssetRoleAdminMixin, AssetRoleUserMixin
 
 __all__ = [
     'UserDirectGrantedAssetsApi', 'MyDirectGrantedAssetsApi',
@@ -14,7 +14,8 @@ __all__ = [
     'MyFavoriteGrantedAssetsApi', 'UserDirectGrantedAssetsAsTreeApi',
     'MyUngroupAssetsAsTreeApi',
     'UserAllGrantedAssetsApi', 'MyAllGrantedAssetsApi', 'MyAllAssetsAsTreeApi',
-    'UserGrantedNodeAssetsApi', 'MyGrantedNodeAssetsApi',
+    'UserGrantedNodeAssetsApi',
+    'MyGrantedNodeAssetsApi',
 ]
 
 logger = get_logger(__name__)

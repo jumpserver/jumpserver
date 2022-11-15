@@ -2,16 +2,15 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from common.permissions import IsServiceAccount
 from common.drf.api import JMSModelViewSet
+from common.permissions import IsServiceAccount
 from orgs.utils import tmp_to_builtin_org
+from terminal.models import AppletHost, AppletHostDeployment
 from terminal.serializers import (
     AppletHostSerializer, AppletHostDeploymentSerializer,
-    AppletHostStartupSerializer
+    AppletHostStartupSerializer, AppletHostDeployAppletSerializer
 )
-from terminal.models import AppletHost, AppletHostDeployment
-from terminal.tasks import run_applet_host_deployment
-
+from terminal.tasks import run_applet_host_deployment, run_applet_host_deployment_install_applet
 
 __all__ = ['AppletHostViewSet', 'AppletHostDeploymentViewSet']
 
@@ -41,11 +40,24 @@ class AppletHostViewSet(JMSModelViewSet):
 class AppletHostDeploymentViewSet(viewsets.ModelViewSet):
     serializer_class = AppletHostDeploymentSerializer
     queryset = AppletHostDeployment.objects.all()
+    rbac_perms = (
+        ('applets', 'terminal.view_AppletHostDeployment'),
+    )
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
         task = run_applet_host_deployment.delay(instance.id)
+        instance.save_task(task.id)
         return Response({'task': str(task.id)}, status=201)
 
+    @action(methods=['post'], detail=False, serializer_class=AppletHostDeployAppletSerializer)
+    def applets(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        applet_id = serializer.validated_data.get('applet_id')
+        instance = serializer.save()
+        task = run_applet_host_deployment_install_applet.delay(instance.id, applet_id)
+        instance.save_task(task.id)
+        return Response({'task': str(task.id)}, status=201)

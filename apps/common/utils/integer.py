@@ -1,3 +1,5 @@
-
 def bit(x):
-    return 2 ** (x - 1)
+    if x == 0:
+        return 0
+    else:
+        return 2 ** (x - 1)

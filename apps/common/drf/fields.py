@@ -120,6 +120,13 @@ class BitChoicesField(TreeChoicesMixin, serializers.MultipleChoiceField):
         super().__init__(choices=choices, **kwargs)
 
     def to_representation(self, value):
+        if isinstance(value, list) and len(value) == 1:
+            # Swagger 会使用 field.choices.keys() 迭代传递进来
+            return [
+                {"value": c.name, "label": c.label}
+                for c in self._choice_cls
+                if c.name == value[0]
+            ]
         return [
             {"value": c.name, "label": c.label}
             for c in self._choice_cls
