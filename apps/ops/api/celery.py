@@ -104,9 +104,11 @@ class CelerySummaryAPIView(generics.RetrieveAPIView):
 
 
 class CeleryTaskViewSet(CommonApiMixin, viewsets.ReadOnlyModelViewSet):
-    queryset = CeleryTask.objects.all()
     serializer_class = CeleryTaskSerializer
     http_method_names = ('get', 'head', 'options',)
+
+    def get_queryset(self):
+        return CeleryTask.objects.exclude(name__startswith='celery')
 
 
 class CeleryTaskExecutionViewSet(CommonApiMixin, viewsets.ReadOnlyModelViewSet):
