@@ -86,7 +86,7 @@ class HostAppletSerializer(AppletSerializer):
 class AppletHostDeploymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppletHostDeployment
-        fields_mini = ['id', 'host', 'status']
+        fields_mini = ['id', 'host', 'status', 'task']
         read_only_fields = [
             'status', 'date_created', 'date_updated',
             'date_start', 'date_finished'
