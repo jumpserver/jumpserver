@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-15 16:44+0800\n"
+"POT-Creation-Date: 2022-11-15 18:06+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1666,8 +1666,8 @@ msgstr "此操作需要验证您的 MFA"
 msgid "Current user not support mfa type: {}"
 msgstr "当前用户不支持 MFA 类型: {}"
 
-#: authentication/api/password.py:30 terminal/api/session.py:224
-#: users/views/profile/reset.py:45 users/views/profile/reset.py:119
+#: authentication/api/password.py:31 terminal/api/session.py:224
+#: users/views/profile/reset.py:44
 msgid "User does not exist: {}"
 msgstr "用户不存在: {}"
 
@@ -1681,7 +1681,7 @@ msgid ""
 "password"
 msgstr "用户来自 {} 请去相应系统修改密码"
 
-#: authentication/api/password.py:54
+#: authentication/api/password.py:59
 #: authentication/templates/authentication/login.html:256
 #: users/templates/users/forgot_password.html:27
 #: users/templates/users/forgot_password.html:28
@@ -1995,9 +1995,8 @@ msgstr "短信验证码校验失败"
 #: authentication/mfa/sms.py:12 authentication/serializers/password_mfa.py:16
 #: authentication/serializers/password_mfa.py:24
 #: settings/serializers/auth/sms.py:27 users/forms/profile.py:103
-#: users/forms/profile.py:106 users/templates/users/forgot_password.html:61
-#: users/templates/users/forgot_password.html:111
-#: users/views/profile/reset.py:75
+#: users/forms/profile.py:106 users/templates/users/forgot_password.html:111
+#: users/views/profile/reset.py:74
 msgid "SMS"
 msgstr "短信"
 
@@ -2131,16 +2130,10 @@ msgstr "资产或应用必填"
 #: notifications/backends/__init__.py:10 settings/serializers/email.py:19
 #: settings/serializers/email.py:50 users/forms/profile.py:102
 #: users/forms/profile.py:106 users/models/user.py:675
-#: users/templates/users/forgot_password.html:57
 #: users/templates/users/forgot_password.html:116
 #: users/views/profile/reset.py:68
 msgid "Email"
 msgstr "邮箱"
-
-#: authentication/serializers/password_mfa.py:29
-#: users/templates/users/forgot_password.html:107
-msgid "The {} cannot be empty"
-msgstr "{} 不能为空"
 
 #: authentication/serializers/password_mfa.py:29
 #: users/templates/users/forgot_password.html:107
@@ -4706,7 +4699,6 @@ msgstr ""
 "        "
 
 #: templates/_mfa_login_field.html:28
-#: users/templates/users/forgot_password.html:68
 msgid "Send verification code"
 msgstr "发送验证码"
 
@@ -5816,7 +5808,7 @@ msgstr "用户密码历史"
 msgid "Reset password"
 msgstr "重置密码"
 
-#: users/notifications.py:85 users/views/profile/reset.py:184
+#: users/notifications.py:85 users/views/profile/reset.py:189
 msgid "Reset password success"
 msgstr "重置密码成功"
 
@@ -6007,8 +5999,25 @@ msgid "click here to set your password"
 msgstr "点击这里设置密码"
 
 #: users/templates/users/forgot_password.html:32
-msgid "Input your email, that will send a mail to your"
+msgid "Input your email account, that will send a email to your"
 msgstr "输入您的邮箱, 将会发一封重置邮件到您的邮箱中"
+
+#: users/templates/users/forgot_password.html:35
+msgid ""
+"Enter your mobile number and a verification code will be sent to your phone"
+msgstr ""
+
+#: users/templates/users/forgot_password.html:57
+msgid "Email account"
+msgstr "账号"
+
+#: users/templates/users/forgot_password.html:61
+msgid "Mobile number"
+msgstr "序列号"
+
+#: users/templates/users/forgot_password.html:68
+msgid "Send"
+msgstr "发件人"
 
 #: users/templates/users/forgot_password.html:72
 #: users/templates/users/forgot_password_previewing.html:30
@@ -6153,23 +6162,23 @@ msgstr "MFA(OTP) 禁用成功，返回登录页面"
 msgid "Password invalid"
 msgstr "用户名或密码无效"
 
-#: users/views/profile/reset.py:141 users/views/profile/reset.py:152
+#: users/views/profile/reset.py:144 users/views/profile/reset.py:155
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
-#: users/views/profile/reset.py:157
+#: users/views/profile/reset.py:160
 msgid "User auth from {}, go there change password"
 msgstr "用户认证源来自 {}, 请去相应系统修改密码"
 
-#: users/views/profile/reset.py:164
+#: users/views/profile/reset.py:167
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
-#: users/views/profile/reset.py:170
+#: users/views/profile/reset.py:173
 msgid "* The new password cannot be the last {} passwords"
 msgstr "* 新密码不能是最近 {} 次的密码"
 
-#: users/views/profile/reset.py:185
+#: users/views/profile/reset.py:190
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-15 16:44+0800\n"
+"POT-Creation-Date: 2022-11-15 18:06+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1678,8 +1678,8 @@ msgstr "この操作には、MFAを検証する必要があります"
 msgid "Current user not support mfa type: {}"
 msgstr "現在のユーザーはmfaタイプをサポートしていません: {}"
 
-#: authentication/api/password.py:30 terminal/api/session.py:224
-#: users/views/profile/reset.py:45 users/views/profile/reset.py:119
+#: authentication/api/password.py:31 terminal/api/session.py:224
+#: users/views/profile/reset.py:44
 msgid "User does not exist: {}"
 msgstr "ユーザーが存在しない: {}"
 
@@ -1695,7 +1695,7 @@ msgstr ""
 "ユーザーは {}からです。対応するシステムにアクセスしてパスワードを変更してくだ"
 "さい。"
 
-#: authentication/api/password.py:54
+#: authentication/api/password.py:59
 #: authentication/templates/authentication/login.html:256
 #: users/templates/users/forgot_password.html:27
 #: users/templates/users/forgot_password.html:28
@@ -2019,9 +2019,8 @@ msgstr "メッセージ検証コードが無効"
 #: authentication/mfa/sms.py:12 authentication/serializers/password_mfa.py:16
 #: authentication/serializers/password_mfa.py:24
 #: settings/serializers/auth/sms.py:27 users/forms/profile.py:103
-#: users/forms/profile.py:106 users/templates/users/forgot_password.html:61
-#: users/templates/users/forgot_password.html:111
-#: users/views/profile/reset.py:75
+#: users/forms/profile.py:106 users/templates/users/forgot_password.html:111
+#: users/views/profile/reset.py:74
 msgid "SMS"
 msgstr "メッセージ"
 
@@ -2159,7 +2158,6 @@ msgstr "アセットまたはアプリが必要"
 #: notifications/backends/__init__.py:10 settings/serializers/email.py:19
 #: settings/serializers/email.py:50 users/forms/profile.py:102
 #: users/forms/profile.py:106 users/models/user.py:675
-#: users/templates/users/forgot_password.html:57
 #: users/templates/users/forgot_password.html:116
 #: users/views/profile/reset.py:68
 msgid "Email"
@@ -4778,7 +4776,6 @@ msgstr ""
 "        "
 
 #: templates/_mfa_login_field.html:28
-#: users/templates/users/forgot_password.html:68
 msgid "Send verification code"
 msgstr "確認コードを送信"
 
@@ -5904,7 +5901,7 @@ msgstr "ユーザーパスワード履歴"
 msgid "Reset password"
 msgstr "パスワードのリセット"
 
-#: users/notifications.py:85 users/views/profile/reset.py:184
+#: users/notifications.py:85 users/views/profile/reset.py:189
 msgid "Reset password success"
 msgstr "パスワードのリセット成功"
 
@@ -6097,8 +6094,25 @@ msgid "click here to set your password"
 msgstr "ここをクリックしてパスワードを設定してください"
 
 #: users/templates/users/forgot_password.html:32
-msgid "Input your email, that will send a mail to your"
+msgid "Input your email account, that will send a email to your"
 msgstr "あなたのメールを入力し、それはあなたにメールを送信します"
+
+#: users/templates/users/forgot_password.html:35
+msgid ""
+"Enter your mobile number and a verification code will be sent to your phone"
+msgstr ""
+
+#: users/templates/users/forgot_password.html:57
+msgid "Email account"
+msgstr "アカウント"
+
+#: users/templates/users/forgot_password.html:61
+msgid "Mobile number"
+msgstr "シリアル番号"
+
+#: users/templates/users/forgot_password.html:68
+msgid "Send"
+msgstr "ユーザーを送信"
 
 #: users/templates/users/forgot_password.html:72
 #: users/templates/users/forgot_password_previewing.html:30
@@ -6251,23 +6265,23 @@ msgstr "OTP無効化成功、ログインページを返す"
 msgid "Password invalid"
 msgstr "パスワード無効"
 
-#: users/views/profile/reset.py:141 users/views/profile/reset.py:152
+#: users/views/profile/reset.py:144 users/views/profile/reset.py:155
 msgid "Token invalid or expired"
 msgstr "トークンが無効または期限切れ"
 
-#: users/views/profile/reset.py:157
+#: users/views/profile/reset.py:160
 msgid "User auth from {}, go there change password"
 msgstr "ユーザー認証ソース {}, 対応するシステムにパスワードを変更してください"
 
-#: users/views/profile/reset.py:164
+#: users/views/profile/reset.py:167
 msgid "* Your password does not meet the requirements"
 msgstr "* パスワードが要件を満たしていない"
 
-#: users/views/profile/reset.py:170
+#: users/views/profile/reset.py:173
 msgid "* The new password cannot be the last {} passwords"
 msgstr "* 新しいパスワードを最後の {} パスワードにすることはできません"
 
-#: users/views/profile/reset.py:185
+#: users/views/profile/reset.py:190
 msgid "Reset password success, return to login page"
 msgstr "パスワードの成功をリセットし、ログインページに戻る"
 
