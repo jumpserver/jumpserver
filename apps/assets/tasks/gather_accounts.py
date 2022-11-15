@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 from celery import shared_task
 from django.utils.translation import gettext_noop
+from django.utils.translation import gettext_lazy as _
 
 from orgs.utils import tmp_to_root_org, org_aware_func
 from common.utils import get_logger
@@ -24,7 +25,7 @@ def gather_asset_accounts_util(nodes, task_name):
     instance.execute()
 
 
-@shared_task(queue="ansible")
+@shared_task(queue="ansible", verbose_name=_('Gather asset accounts'))
 def gather_asset_accounts(node_ids, task_name=None):
     if task_name is None:
         task_name = gettext_noop("Gather assets accounts")

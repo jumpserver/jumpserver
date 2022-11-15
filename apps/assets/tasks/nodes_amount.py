@@ -10,11 +10,10 @@ from common.utils.lock import AcquireFailed
 from common.utils import get_logger
 from common.const.crontab import CRONTAB_AT_AM_TWO
 
-
 logger = get_logger(__file__)
 
 
-@shared_task
+@shared_task(verbose_name=_('Check the amount of assets under the node'))
 def check_node_assets_amount_task(org_id=None):
     if org_id is None:
         orgs = Organization.objects.all()
@@ -32,6 +31,6 @@ def check_node_assets_amount_task(org_id=None):
 
 
 @register_as_period_task(crontab=CRONTAB_AT_AM_TWO)
-@shared_task
+@shared_task(verbose_name=_('Periodic check the amount of assets under the node'))
 def check_node_assets_amount_period_task():
     check_node_assets_amount_task()
