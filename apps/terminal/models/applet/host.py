@@ -105,6 +105,7 @@ class AppletHostDeployment(JMSBaseModel):
     date_start = models.DateTimeField(null=True, verbose_name=_('Date start'), db_index=True)
     date_finished = models.DateTimeField(null=True, verbose_name=_("Date finished"))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
+    task = models.UUIDField(null=True, verbose_name=_('Task'))
 
     def start(self, **kwargs):
         from ...automations.deploy_applet_host import DeployAppletHostManager
@@ -120,3 +121,7 @@ class AppletHostDeployment(JMSBaseModel):
             applet = None
         manager = DeployAppletHostManager(self, applet=applet)
         manager.install_applet(**kwargs)
+
+    def save_task(self, task):
+        self.task = task
+        self.save(update_fields=['task'])
