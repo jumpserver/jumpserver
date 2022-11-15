@@ -16,7 +16,6 @@ from .models import SystemMsgSubscription, UserMsgSubscription
 
 __all__ = ('SystemMessage', 'UserMessage', 'system_msgs', 'Message')
 
-
 system_msgs = []
 user_msgs = []
 
@@ -44,7 +43,7 @@ class MessageType(type):
         return clz
 
 
-@shared_task
+@shared_task(verbose_name=_('Publish the station message'))
 def publish_task(msg):
     msg.publish()
 

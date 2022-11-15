@@ -37,6 +37,9 @@ class CeleryTask(models.Model):
                 return "yellow"
         return "green"
 
+    class Meta:
+        ordering = ('name',)
+
 
 class CeleryTaskExecution(models.Model):
     LOG_DIR = os.path.join(settings.PROJECT_DIR, 'data', 'celery')

@@ -16,4 +16,4 @@ class Playbook(BaseCreateUpdateModel):
 
     @property
     def work_path(self):
-        return os.path.join(settings.DATA_DIR, "ops", "playbook", self.id.__str__())
+        return os.path.join(settings.DATA_DIR, "ops", "playbook", self.id.__str__(), "main.yaml")
