@@ -9,6 +9,12 @@ __all__ = ['PermAccountUtil']
 class PermAccountUtil(AssetPermissionUtil):
     """ 资产授权账号相关的工具 """
 
+    def get_permed_accounts_for_user(self, user, asset):
+        """ 获取授权给用户某个资产的账号 """
+        perms = self.get_permissions_for_user_asset(user, asset)
+        permed_accounts = self.get_permed_accounts_from_perms(perms, user, asset)
+        return permed_accounts
+
     @staticmethod
     def get_permed_accounts_from_perms(perms, user, asset):
         alias_action_bit_mapper = defaultdict(int)
@@ -54,12 +60,6 @@ class PermAccountUtil(AssetPermissionUtil):
             account.date_expired = max(cleaned_accounts_expired[account])
             accounts.append(account)
         return accounts
-
-    def get_permed_accounts_for_user(self, user, asset):
-        """ 获取授权给用户某个资产的账号 """
-        perms = self.get_permissions_for_user_asset(user, asset)
-        permed_accounts = self.get_permed_accounts_from_perms(perms, user, asset)
-        return permed_accounts
 
     @staticmethod
     def get_accounts_for_permission(perm, with_actions=False):

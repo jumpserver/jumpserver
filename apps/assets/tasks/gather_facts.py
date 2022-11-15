@@ -2,6 +2,7 @@
 #
 from celery import shared_task
 from django.utils.translation import gettext_noop
+from django.utils.translation import gettext_lazy as _
 
 from common.utils import get_logger
 from orgs.utils import org_aware_func, tmp_to_root_org
@@ -40,7 +41,7 @@ def update_assets_hardware_info_util(assets=None, nodes=None, task_name=None):
     instance.execute()
 
 
-@shared_task(queue="ansible")
+@shared_task(queue="ansible", verbose_name=_('Manually update the hardware information of assets'))
 def update_assets_hardware_info_manual(asset_ids):
     from assets.models import Asset
     with tmp_to_root_org():
@@ -49,7 +50,7 @@ def update_assets_hardware_info_manual(asset_ids):
     update_assets_hardware_info_util(assets=assets, task_name=task_name)
 
 
-@shared_task(queue="ansible")
+@shared_task(queue="ansible", verbose_name=_('Manually update the hardware information of assets under a node'))
 def update_node_assets_hardware_info_manual(node_id):
     from assets.models import Node
     with tmp_to_root_org():
