@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListAPIView, get_object_or_404
 
-from common.permissions import IsValidUser
-from common.utils import get_logger, lazyproperty
+from common.exceptions import JMSObjectDoesNotExist
+from common.utils import get_logger, lazyproperty, is_uuid
 from perms import serializers
 from perms.hands import User, Asset
 from perms.utils import PermAccountUtil
@@ -11,20 +11,26 @@ logger = get_logger(__name__)
 
 __all__ = [
     'UserGrantedAssetAccountsApi',
-    'MyGrantedAssetAccountsApi',
 ]
 
 
 class UserGrantedAssetAccountsApi(ListAPIView):
     serializer_class = serializers.AccountsGrantedSerializer
     rbac_perms = (
+        ('GET', 'perms.view_userassets'),
         ('list', 'perms.view_userassets'),
     )
 
     @lazyproperty
     def user(self) -> User:
-        user_id = self.kwargs.get('pk')
-        return User.objects.get(id=user_id)
+        query_user = self.kwargs.get('user')
+        if is_uuid(query_user):
+            user = User.objects.get(id=query_user)
+        elif query_user == 'my':
+            user = self.request.user
+        else:
+            raise JMSObjectDoesNotExist(object_name=_('User'))
+        return user
 
     @lazyproperty
     def asset(self):
@@ -37,11 +43,3 @@ class UserGrantedAssetAccountsApi(ListAPIView):
         util = PermAccountUtil()
         accounts = util.get_permed_accounts_for_user(self.user, self.asset)
         return accounts
-
-
-class MyGrantedAssetAccountsApi(UserGrantedAssetAccountsApi):
-    permission_classes = (IsValidUser,)
-
-    @lazyproperty
-    def user(self):
-        return self.request.user

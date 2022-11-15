@@ -70,7 +70,7 @@ user_permission_urlpatterns = [
 
     # 获取授权给用户某个资产的所有账号
     path('<str:user>/assets/<uuid:asset_id>/accounts/', api.UserGrantedAssetAccountsApi.as_view(),
-         name='user-asset-accounts'),
+         name='user-granted-asset-accounts'),
 ]
 
 user_group_permission_urlpatterns = [
