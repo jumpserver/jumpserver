@@ -68,7 +68,6 @@ class SelfOrPKUserMixin:
             return self.admin_rbac_perms
 
     def request_user_is_self(self):
-        print("user is: ", self.kwargs)
         return self.kwargs.get('user') in ['my', 'self']
 
     @property
