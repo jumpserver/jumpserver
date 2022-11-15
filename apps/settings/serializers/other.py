@@ -33,10 +33,13 @@ class OtherSettingSerializer(serializers.Serializer):
     )
 
     TICKET_AUTHORIZE_DEFAULT_TIME = serializers.IntegerField(
-        min_value=7, max_value=9999, required=False,
-        label=_("Ticket authorize default time"), help_text=_("Unit: day")
+        min_value=1, max_value=999999, required=False,
+        label=_("Ticket authorize default time")
     )
-
+    TICKET_AUTHORIZE_DEFAULT_TIME_UNIT = serializers.ChoiceField(
+        choices=[('day', _("day")), ('hour', _("hour"))],
+        label=_("Ticket authorize default time unit"), required=False,
+    )
     HELP_DOCUMENT_URL = serializers.URLField(
         required=False, allow_blank=True, allow_null=True, label=_("Help Docs URL"),
         help_text=_('default: http://docs.jumpserver.org')
@@ -51,4 +54,3 @@ class OtherSettingSerializer(serializers.Serializer):
     # PERIOD_TASK_ENABLED = serializers.BooleanField(
     #     required=False, label=_("Enable period task")
     # )
-

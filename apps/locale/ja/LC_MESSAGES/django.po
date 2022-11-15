@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-14 17:07+0800\n"
+"POT-Creation-Date: 2022-11-15 17:05+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1436,11 +1436,11 @@ msgstr "文章の内容が長すぎる。Elasticsearchで操作履歴を保存�
 msgid "Tips"
 msgstr "謎々"
 
-#: audits/handler.py:126
+#: audits/handler.py:134
 msgid "Yes"
 msgstr "是"
 
-#: audits/handler.py:126
+#: audits/handler.py:134
 msgid "No"
 msgstr "否"
 
@@ -4007,7 +4007,7 @@ msgstr "ログインログは日数を保持します"
 
 #: settings/serializers/cleaning.py:12 settings/serializers/cleaning.py:16
 #: settings/serializers/cleaning.py:20 settings/serializers/cleaning.py:24
-#: settings/serializers/cleaning.py:28 settings/serializers/other.py:37
+#: settings/serializers/cleaning.py:28
 msgid "Unit: day"
 msgstr "単位: 日"
 
@@ -4184,19 +4184,31 @@ msgstr ""
 msgid "Ticket authorize default time"
 msgstr "デフォルト製造オーダ承認時間"
 
+#: settings/serializers/other.py:40
+msgid "day"
+msgstr "日"
+
+#: settings/serializers/other.py:40
+msgid "hour"
+msgstr "時"
+
 #: settings/serializers/other.py:41
+msgid "Ticket authorize default time unit"
+msgstr "デフォルト製造オーダ承認時間単位"
+
+#: settings/serializers/other.py:44
 msgid "Help Docs URL"
 msgstr "ドキュメントリンク"
 
-#: settings/serializers/other.py:42
+#: settings/serializers/other.py:45
 msgid "default: http://docs.jumpserver.org"
 msgstr "デフォルト: http://docs.jumpserver.org"
 
-#: settings/serializers/other.py:46
+#: settings/serializers/other.py:49
 msgid "Help Support URL"
 msgstr "サポートリンク"
 
-#: settings/serializers/other.py:47
+#: settings/serializers/other.py:50
 msgid "default: http://www.jumpserver.org/support/"
 msgstr "デフォルト: http://www.jumpserver.org/support/"
 
@@ -4520,7 +4532,9 @@ msgstr "デフォルトのグラフィック解像度"
 #: settings/serializers/terminal.py:52
 msgid ""
 "Tip: Default resolution to use when connecting graphical assets in Luna pages"
-msgstr "ヒント: Luna ページでグラフィック アセットを接続するときに使用するデフォルトの解像度"
+msgstr ""
+"ヒント: Luna ページでグラフィック アセットを接続するときに使用するデフォルト"
+"の解像度"
 
 #: settings/utils/ldap.py:467
 msgid "ldap:// or ldaps:// protocol is used."
@@ -4709,8 +4723,8 @@ msgstr "期限切れです。"
 #, python-format
 msgid ""
 "\n"
-"                Your password has expired, please click <a href="
-"\"%(user_password_update_url)s\"> this link </a> update password.\n"
+"                Your password has expired, please click <a "
+"href=\"%(user_password_update_url)s\"> this link </a> update password.\n"
 "            "
 msgstr ""
 "\n"
@@ -4731,34 +4745,34 @@ msgid ""
 "            "
 msgstr ""
 "\n"
-"                クリックしてください <a href=\"%(user_password_update_url)s"
-"\"> リンク </a> パスワードの更新\n"
+"                クリックしてください <a "
+"href=\"%(user_password_update_url)s\"> リンク </a> パスワードの更新\n"
 "        "
 
 #: templates/_message.html:43
 #, python-format
 msgid ""
 "\n"
-"        Your information was incomplete. Please click <a href="
-"\"%(first_login_url)s\"> this link </a>to complete your information.\n"
+"        Your information was incomplete. Please click <a "
+"href=\"%(first_login_url)s\"> this link </a>to complete your information.\n"
 "        "
 msgstr ""
 "\n"
-"                あなたの情報が不完全なので、クリックしてください。 <a href="
-"\"%(first_login_url)s\"> リンク </a> 補完\n"
+"                あなたの情報が不完全なので、クリックしてください。 <a "
+"href=\"%(first_login_url)s\"> リンク </a> 補完\n"
 "                "
 
 #: templates/_message.html:56
 #, python-format
 msgid ""
 "\n"
-"        Your ssh public key not set or expired. Please click <a href="
-"\"%(user_pubkey_update)s\"> this link </a>to update\n"
+"        Your ssh public key not set or expired. Please click <a "
+"href=\"%(user_pubkey_update)s\"> this link </a>to update\n"
 "        "
 msgstr ""
 "\n"
-"                SSHキーが設定されていないか無効になっている場合は、 <a href="
-"\"%(user_pubkey_update)s\"> リンク </a> 更新\n"
+"                SSHキーが設定されていないか無効になっている場合は、 <a "
+"href=\"%(user_pubkey_update)s\"> リンク </a> 更新\n"
 "        "
 
 #: templates/_mfa_login_field.html:28
@@ -6080,25 +6094,33 @@ msgid "click here to set your password"
 msgstr "ここをクリックしてパスワードを設定してください"
 
 #: users/templates/users/forgot_password.html:32
+#, fuzzy
+#| msgid "Input your email, that will send a mail to your"
 msgid "Input your email account, that will send a email to your"
-msgstr "電子メールアカウントを入力し、メールをメールアドレスに送信します"
+msgstr "あなたのメールを入力し、それはあなたにメールを送信します"
 
 #: users/templates/users/forgot_password.html:35
 msgid ""
 "Enter your mobile number and a verification code will be sent to your phone"
-msgstr "携帯電話番号を入力すると認証コードが送信されます"
+msgstr ""
 
 #: users/templates/users/forgot_password.html:57
+#, fuzzy
+#| msgid "account"
 msgid "Email account"
-msgstr "メールアドレスアカウント"
+msgstr "アカウント"
 
 #: users/templates/users/forgot_password.html:61
+#, fuzzy
+#| msgid "Serial number"
 msgid "Mobile number"
-msgstr "携帯番号"
+msgstr "シリアル番号"
 
 #: users/templates/users/forgot_password.html:68
+#, fuzzy
+#| msgid "Send user"
 msgid "Send"
-msgstr "送信"
+msgstr "ユーザーを送信"
 
 #: users/templates/users/forgot_password.html:72
 #: users/templates/users/forgot_password_previewing.html:30
