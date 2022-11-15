@@ -1,30 +1,24 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListAPIView, get_object_or_404
 
-from common.permissions import IsValidUser
 from common.utils import get_logger, lazyproperty
 from perms import serializers
-from perms.hands import User, Asset
+from perms.hands import Asset
 from perms.utils import PermAccountUtil
+from .mixin import SelfOrPKUserMixin
 
 logger = get_logger(__name__)
 
 __all__ = [
     'UserGrantedAssetAccountsApi',
-    'MyGrantedAssetAccountsApi',
 ]
 
 
-class UserGrantedAssetAccountsApi(ListAPIView):
+class UserGrantedAssetAccountsApi(SelfOrPKUserMixin, ListAPIView):
     serializer_class = serializers.AccountsGrantedSerializer
     rbac_perms = (
         ('list', 'perms.view_userassets'),
     )
-
-    @lazyproperty
-    def user(self) -> User:
-        user_id = self.kwargs.get('pk')
-        return User.objects.get(id=user_id)
 
     @lazyproperty
     def asset(self):
@@ -37,11 +31,3 @@ class UserGrantedAssetAccountsApi(ListAPIView):
         util = PermAccountUtil()
         accounts = util.get_permed_accounts_for_user(self.user, self.asset)
         return accounts
-
-
-class MyGrantedAssetAccountsApi(UserGrantedAssetAccountsApi):
-    permission_classes = (IsValidUser,)
-
-    @lazyproperty
-    def user(self):
-        return self.request.user
