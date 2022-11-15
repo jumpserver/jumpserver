@@ -65,12 +65,15 @@ user_permission_urlpatterns = [
 
     # 收藏的资产
     path('<uuid:pk>/nodes/favorite/assets/', api.UserFavoriteGrantedAssetsApi.as_view(), name='user-ungrouped-assets'),
-    path('nodes/favorite/assets/', api.MyFavoriteGrantedAssetsApi.as_view(), name='my-ungrouped-assets'),
+    path('nodes/favorite/assets/', api.MyFavoriteGrantedAssetsApi.as_view(),
+         name='my-ungrouped-assets'),
 
     # 获取授权给用户某个资产的所有账号
     path('<uuid:pk>/assets/<uuid:asset_id>/accounts/', api.UserGrantedAssetAccountsApi.as_view(),
          name='user-asset-accounts'),
-    path('assets/<uuid:asset_id>/accounts/', api.MyGrantedAssetAccountsApi.as_view(), name='my-asset-accounts'),
+    path('/((?P<user>[^/.]+)/)?assets/<uuid:asset_id>/accounts/',
+         api.UserGrantedAssetAccountsApi.as_view(),
+         name='my-asset-accounts'),
 ]
 
 user_group_permission_urlpatterns = [

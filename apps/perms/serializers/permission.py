@@ -16,7 +16,7 @@ __all__ = ["AssetPermissionSerializer", "ActionChoicesField"]
 
 class ActionChoicesField(BitChoicesField):
     def __init__(self, **kwargs):
-        super().__init__(ActionChoices, **kwargs)
+        super().__init__(choice_cls=ActionChoices, **kwargs)
 
 
 class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
