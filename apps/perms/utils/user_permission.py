@@ -1,30 +1,31 @@
+import time
 from collections import defaultdict
 from typing import List, Tuple
-import time
 
-from django.core.cache import cache
 from django.conf import settings
+from django.core.cache import cache
 from django.db.models import Q, QuerySet
 from django.utils.translation import gettext as _
 
-from common.db.models import output_as_string, UnionQuerySet
-from common.utils.common import lazyproperty, timeit
+from assets.models import (
+    Asset, FavoriteAsset, AssetQuerySet, NodeQuerySet
+)
 from assets.utils import NodeAssetsUtil
-from common.utils import get_logger
+from common.db.models import output_as_string, UnionQuerySet
 from common.decorator import on_transaction_commit
+from common.utils import get_logger
+from common.utils.common import lazyproperty, timeit
+from orgs.models import Organization
 from orgs.utils import (
     tmp_to_org, current_org,
     ensure_in_real_or_default_org, tmp_to_root_org
 )
-from assets.models import (
-    Asset, FavoriteAsset, AssetQuerySet, NodeQuerySet
-)
-from users.models import User
-from orgs.models import Organization
 from perms.locks import UserGrantedTreeRebuildLock
 from perms.models import (
     AssetPermission, PermNode, UserAssetGrantedTreeNodeRelation
 )
+from users.models import User
+
 NodeFrom = UserAssetGrantedTreeNodeRelation.NodeFrom
 NODE_ONLY_FIELDS = ('id', 'key', 'parent_key', 'org_id')
 
@@ -119,8 +120,7 @@ class UserGrantedTreeRefreshController:
                 key = cls.key_template.format(user_id=user_id)
                 p.srem(key, *org_ids)
             p.execute()
-        logger.info(f'Remove orgs from users built tree: users:{user_ids} '
-                    f'orgs:{org_ids}')
+        logger.info(f'Remove orgs from users built tree: users:{user_ids} orgs:{org_ids}')
 
     @classmethod
     def add_need_refresh_orgs_for_users(cls, org_ids, user_ids):
@@ -205,28 +205,30 @@ class UserGrantedTreeRefreshController:
         user = self.user
 
         with tmp_to_root_org():
-            UserAssetGrantedTreeNodeRelation.objects.filter(user=user)\
-                .exclude(org_id__in=self.org_ids)\
+            UserAssetGrantedTreeNodeRelation.objects.filter(user=user) \
+                .exclude(org_id__in=self.org_ids) \
                 .delete()
 
-        if force or self.have_need_refresh_orgs():
-            with UserGrantedTreeRebuildLock(user_id=user.id):
-                if force:
-                    orgs = self.orgs
-                    self.set_all_orgs_as_built()
-                else:
-                    orgs = self.get_need_refresh_orgs_and_fill_up()
+        if not force and not self.have_need_refresh_orgs():
+            return
 
-                for org in orgs:
-                    with tmp_to_org(org):
-                        t_start = time.time()
-                        logger.info(f'Rebuild user tree: user={self.user} org={current_org}')
-                        utils = UserGrantedTreeBuildUtils(user)
-                        utils.rebuild_user_granted_tree()
-                        logger.info(
-                            f'Rebuild user tree ok: cost={time.time() - t_start} '
-                            f'user={self.user} org={current_org}'
-                        )
+        with UserGrantedTreeRebuildLock(user_id=user.id):
+            if force:
+                orgs = self.orgs
+                self.set_all_orgs_as_built()
+            else:
+                orgs = self.get_need_refresh_orgs_and_fill_up()
+
+            for org in orgs:
+                with tmp_to_org(org):
+                    t_start = time.time()
+                    logger.info(f'Rebuild user tree: user={self.user} org={current_org}')
+                    utils = UserGrantedTreeBuildUtils(user)
+                    utils.rebuild_user_granted_tree()
+                    logger.info(
+                        f'Rebuild user tree ok: cost={time.time() - t_start} '
+                        f'user={self.user} org={current_org}'
+                    )
 
 
 class UserGrantedUtilsBase:
@@ -427,8 +429,8 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         for node_id, asset_id in node_asset_pairs:
             if node_id not in node_id_key_mapper:
                 continue
-            nkey = node_id_key_mapper[node_id]
-            nodekey_assetsid_mapper[nkey].add(asset_id)
+            node_key = node_id_key_mapper[node_id]
+            nodekey_assetsid_mapper[node_key].add(asset_id)
 
         util = NodeAssetsUtil(nodes, nodekey_assetsid_mapper)
         util.generate()
@@ -604,7 +606,10 @@ class UserGrantedNodesQueryUtils(UserGrantedUtilsBase):
     def get_top_level_nodes(self):
         nodes = self.get_special_nodes()
         real_nodes = self.get_indirect_granted_node_children('')
-        nodes.extend(self.sort(real_nodes))
+        nodes.extend(real_nodes)
+        if len(real_nodes) == 1:
+            children = self.get_node_children(real_nodes[0].key)
+            nodes.extend(children)
         return nodes
 
     def get_ungrouped_node(self):
@@ -649,11 +654,9 @@ class UserGrantedNodesQueryUtils(UserGrantedUtilsBase):
         :param with_special:
         :return:
         """
-        nodes = PermNode.objects.filter(
-            granted_node_rels__user=self.user
-        ).annotate(
-            **PermNode.annotate_granted_node_rel_fields
-        ).distinct()
+        nodes = PermNode.objects.filter(granted_node_rels__user=self.user) \
+            .annotate(**PermNode.annotate_granted_node_rel_fields) \
+            .distinct()
 
         key_to_node_mapper = {}
         nodes_descendant_q = Q()

@@ -17,6 +17,9 @@ __all__ = [
 
 class UserGrantedAssetAccountsApi(ListAPIView):
     serializer_class = serializers.AccountsGrantedSerializer
+    rbac_perms = (
+        ('list', 'perms.view_userassets'),
+    )
 
     @lazyproperty
     def user(self) -> User:
