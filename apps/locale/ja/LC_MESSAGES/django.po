@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-10 16:37+0800\n"
+"POT-Creation-Date: 2022-11-14 17:07+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -161,7 +161,7 @@ msgstr "コンマ区切り文字列の形式。* はすべて一致すること�
 #: authentication/models.py:260
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
-#: ops/models/adhoc.py:159 users/forms/profile.py:32 users/forms/profile.py:109
+#: ops/models/adhoc.py:159 users/forms/profile.py:32 users/forms/profile.py:112
 #: users/models/user.py:671 users/templates/users/_msg_user_created.html:12
 #: xpack/plugins/change_auth_plan/models/asset.py:34
 #: xpack/plugins/change_auth_plan/models/asset.py:195
@@ -224,7 +224,7 @@ msgid "None of the reviewers belong to Organization `{}`"
 msgstr "いずれのレビューアも組織 '{}' に属していません"
 
 #: acls/serializers/rules/rules.py:20
-#: xpack/plugins/cloud/serializers/task.py:23
+#: xpack/plugins/cloud/serializers/task.py:24
 msgid "IP address invalid: `{}`"
 msgstr "IPアドレスが無効: '{}'"
 
@@ -324,7 +324,7 @@ msgstr "タイプ"
 msgid "Domain"
 msgstr "ドメイン"
 
-#: applications/models/application.py:230 xpack/plugins/cloud/models.py:33
+#: applications/models/application.py:230 xpack/plugins/cloud/models.py:32
 #: xpack/plugins/cloud/serializers/account.py:64
 msgid "Attrs"
 msgstr "ツールバーの"
@@ -363,7 +363,7 @@ msgstr "タイプ表示"
 #: orgs/models.py:72 orgs/models.py:223 perms/models/base.py:92
 #: users/models/group.py:18 users/models/user.py:937
 #: xpack/plugins/change_auth_plan/models/base.py:45
-#: xpack/plugins/cloud/models.py:125
+#: xpack/plugins/cloud/models.py:127
 msgid "Date created"
 msgstr "作成された日付"
 
@@ -608,7 +608,7 @@ msgstr "ホスト名生"
 
 #: assets/models/asset.py:215 assets/serializers/account.py:16
 #: assets/serializers/asset.py:65 perms/serializers/asset/user_permission.py:41
-#: xpack/plugins/cloud/models.py:107 xpack/plugins/cloud/serializers/task.py:43
+#: xpack/plugins/cloud/models.py:106 xpack/plugins/cloud/serializers/task.py:44
 msgid "Protocols"
 msgstr "プロトコル"
 
@@ -630,7 +630,7 @@ msgstr "アクティブです。"
 msgid "Admin user"
 msgstr "管理ユーザー"
 
-#: assets/models/asset.py:225
+#: assets/models/asset.py:225 xpack/plugins/cloud/const.py:32
 msgid "Public IP"
 msgstr "パブリックIP"
 
@@ -649,7 +649,7 @@ msgstr "ラベル"
 #: orgs/models.py:225 perms/models/base.py:91 users/models/user.py:720
 #: users/serializers/group.py:33
 #: xpack/plugins/change_auth_plan/models/base.py:48
-#: xpack/plugins/cloud/models.py:122 xpack/plugins/gathered_user/models.py:30
+#: xpack/plugins/cloud/models.py:124 xpack/plugins/gathered_user/models.py:30
 msgid "Created by"
 msgstr "によって作成された"
 
@@ -761,7 +761,7 @@ msgstr "トリガーモード"
 #: xpack/plugins/change_auth_plan/models/base.py:201
 #: xpack/plugins/change_auth_plan/serializers/app.py:66
 #: xpack/plugins/change_auth_plan/serializers/asset.py:180
-#: xpack/plugins/cloud/models.py:179
+#: xpack/plugins/cloud/models.py:181
 msgid "Reason"
 msgstr "理由"
 
@@ -791,7 +791,7 @@ msgstr "OK"
 #: assets/models/base.py:32 audits/models.py:136
 #: xpack/plugins/change_auth_plan/serializers/app.py:88
 #: xpack/plugins/change_auth_plan/serializers/asset.py:199
-#: xpack/plugins/cloud/const.py:36
+#: xpack/plugins/cloud/const.py:41
 msgid "Failed"
 msgstr "失敗しました"
 
@@ -842,10 +842,7 @@ msgstr "帯域幅"
 msgid "Contact"
 msgstr "連絡先"
 
-#: assets/models/cluster.py:22 authentication/serializers/password_mfa.py:25
-#: users/forms/profile.py:103 users/models/user.py:693
-#: users/templates/users/forgot_password.html:55
-#: users/templates/users/forgot_password.html:121
+#: assets/models/cluster.py:22 users/models/user.py:693
 msgid "Phone"
 msgstr "電話"
 
@@ -1011,7 +1008,7 @@ msgid "Parent key"
 msgstr "親キー"
 
 #: assets/models/node.py:566 assets/serializers/system_user.py:267
-#: xpack/plugins/cloud/models.py:96 xpack/plugins/cloud/serializers/task.py:70
+#: xpack/plugins/cloud/models.py:95 xpack/plugins/cloud/serializers/task.py:72
 msgid "Node"
 msgstr "ノード"
 
@@ -1168,8 +1165,8 @@ msgstr "CPU情報"
 msgid "Actions"
 msgstr "アクション"
 
-#: assets/serializers/backup.py:31 ops/mixin.py:106 ops/mixin.py:147
-#: settings/serializers/auth/ldap.py:66
+#: assets/serializers/backup.py:31 ops/mixin.py:26 ops/mixin.py:106
+#: ops/mixin.py:147 settings/serializers/auth/ldap.py:66
 #: xpack/plugins/change_auth_plan/serializers/base.py:43
 msgid "Periodic perform"
 msgstr "定期的なパフォーマンス"
@@ -1579,8 +1576,8 @@ msgid "MFA"
 msgstr "MFA"
 
 #: audits/models.py:146 terminal/models/status.py:33
-#: tickets/models/ticket/general.py:281 xpack/plugins/cloud/models.py:175
-#: xpack/plugins/cloud/models.py:227
+#: tickets/models/ticket/general.py:281 xpack/plugins/cloud/models.py:177
+#: xpack/plugins/cloud/models.py:229
 msgid "Status"
 msgstr "ステータス"
 
@@ -1617,7 +1614,7 @@ msgid "Hosts display"
 msgstr "ホスト表示"
 
 #: audits/serializers.py:102 ops/models/command.py:27
-#: xpack/plugins/cloud/models.py:173
+#: xpack/plugins/cloud/models.py:175
 msgid "Result"
 msgstr "結果"
 
@@ -1681,16 +1678,16 @@ msgstr "この操作には、MFAを検証する必要があります"
 msgid "Current user not support mfa type: {}"
 msgstr "現在のユーザーはmfaタイプをサポートしていません: {}"
 
-#: authentication/api/password.py:30 terminal/api/session.py:224
-#: users/views/profile/reset.py:45 users/views/profile/reset.py:107
+#: authentication/api/password.py:31 terminal/api/session.py:224
+#: users/views/profile/reset.py:44
 msgid "User does not exist: {}"
 msgstr "ユーザーが存在しない: {}"
 
-#: authentication/api/password.py:30
+#: authentication/api/password.py:31 users/views/profile/reset.py:122
 msgid "No user matched"
 msgstr "ユーザーにマッチしなかった"
 
-#: authentication/api/password.py:34
+#: authentication/api/password.py:35
 msgid ""
 "The user is from {}, please go to the corresponding system to change the "
 "password"
@@ -1698,10 +1695,10 @@ msgstr ""
 "ユーザーは {}からです。対応するシステムにアクセスしてパスワードを変更してくだ"
 "さい。"
 
-#: authentication/api/password.py:61
+#: authentication/api/password.py:59
 #: authentication/templates/authentication/login.html:256
-#: users/templates/users/forgot_password.html:33
-#: users/templates/users/forgot_password.html:34
+#: users/templates/users/forgot_password.html:27
+#: users/templates/users/forgot_password.html:28
 #: users/templates/users/forgot_password_previewing.html:13
 #: users/templates/users/forgot_password_previewing.html:14
 msgid "Forgot password"
@@ -1957,6 +1954,11 @@ msgstr "MFAコード"
 msgid "MFA type"
 msgstr "MFAタイプ"
 
+#: authentication/forms.py:65
+#: authentication/templates/authentication/_captcha_field.html:15
+msgid "Captcha"
+msgstr "キャプチャ"
+
 #: authentication/forms.py:70 users/forms/profile.py:28
 msgid "MFA code"
 msgstr "MFAコード"
@@ -2012,12 +2014,15 @@ msgstr "Radius globalが有効になり、無効にできません"
 
 #: authentication/mfa/sms.py:7
 msgid "SMS verify code invalid"
-msgstr "SMS検証コードが無効"
+msgstr "メッセージ検証コードが無効"
 
-#: authentication/mfa/sms.py:12 settings/serializers/auth/sms.py:27
-#: users/templates/users/forgot_password.html:74
+#: authentication/mfa/sms.py:12 authentication/serializers/password_mfa.py:16
+#: authentication/serializers/password_mfa.py:24
+#: settings/serializers/auth/sms.py:27 users/forms/profile.py:103
+#: users/forms/profile.py:106 users/templates/users/forgot_password.html:111
+#: users/views/profile/reset.py:74
 msgid "SMS"
-msgstr "SMS"
+msgstr "メッセージ"
 
 #: authentication/mfa/sms.py:13
 msgid "SMS verification code"
@@ -2136,7 +2141,7 @@ msgid "binding reminder"
 msgstr "バインディングリマインダー"
 
 #: authentication/serializers/connection_token.py:23
-#: xpack/plugins/cloud/models.py:34
+#: xpack/plugins/cloud/models.py:33
 msgid "Validity"
 msgstr "有効性"
 
@@ -2148,20 +2153,20 @@ msgstr "期限切れ時間"
 msgid "Asset or application required"
 msgstr "アセットまたはアプリが必要"
 
-#: authentication/serializers/password_mfa.py:25
-#: authentication/serializers/password_mfa.py:29
-#: users/templates/users/forgot_password.html:117
-msgid "The {} cannot be empty"
-msgstr "{} 空にしてはならない"
-
-#: authentication/serializers/password_mfa.py:29
+#: authentication/serializers/password_mfa.py:16
+#: authentication/serializers/password_mfa.py:24
 #: notifications/backends/__init__.py:10 settings/serializers/email.py:19
 #: settings/serializers/email.py:50 users/forms/profile.py:102
-#: users/models/user.py:675 users/templates/users/forgot_password.html:51
-#: users/templates/users/forgot_password.html:70
-#: users/templates/users/forgot_password.html:126
+#: users/forms/profile.py:106 users/models/user.py:675
+#: users/templates/users/forgot_password.html:116
+#: users/views/profile/reset.py:68
 msgid "Email"
 msgstr "メール"
+
+#: authentication/serializers/password_mfa.py:29
+#: users/templates/users/forgot_password.html:107
+msgid "The {} cannot be empty"
+msgstr "{} 空にしてはならない"
 
 #: authentication/serializers/token.py:79
 #: perms/serializers/application/permission.py:20
@@ -2225,10 +2230,6 @@ msgstr "閉じる"
 msgid "Play CAPTCHA as audio file"
 msgstr "CAPTCHAをオーディオファイルとして再生する"
 
-#: authentication/templates/authentication/_captcha_field.html:15
-msgid "Captcha"
-msgstr "キャプチャ"
-
 #: authentication/templates/authentication/_mfa_confirm_modal.html:5
 msgid "MFA confirm"
 msgstr "MFA確認"
@@ -2254,7 +2255,7 @@ msgstr "コードエラー"
 #: authentication/templates/authentication/_msg_reset_password_code.html:9
 #: authentication/templates/authentication/_msg_rest_password_success.html:2
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:2
-#: jumpserver/conf.py:406 ops/tasks.py:145 ops/tasks.py:148
+#: jumpserver/conf.py:413 ops/tasks.py:145 ops/tasks.py:148
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: perms/templates/perms/_msg_permed_items_expire.html:3
 #: tickets/templates/tickets/approve_check_password.html:33
@@ -2313,7 +2314,7 @@ msgstr "新しいものを要求する"
 
 #: authentication/templates/authentication/_msg_reset_password_code.html:12
 #: terminal/models/sharing.py:26 terminal/models/sharing.py:80
-#: users/forms/profile.py:104 users/templates/users/forgot_password.html:59
+#: users/forms/profile.py:104 users/templates/users/forgot_password.html:65
 msgid "Verify code"
 msgstr "コードの確認"
 
@@ -2738,11 +2739,11 @@ msgstr "特殊文字を含むべきではない"
 msgid "The mobile phone number format is incorrect"
 msgstr "携帯電話番号の形式が正しくありません"
 
-#: jumpserver/conf.py:405
+#: jumpserver/conf.py:412
 msgid "Create account successfully"
 msgstr "アカウントを正常に作成"
 
-#: jumpserver/conf.py:407
+#: jumpserver/conf.py:414
 msgid "Your account has been created successfully"
 msgstr "アカウントが正常に作成されました"
 
@@ -4761,17 +4762,16 @@ msgstr ""
 "        "
 
 #: templates/_mfa_login_field.html:28
-#: users/templates/users/forgot_password.html:61
 msgid "Send verification code"
 msgstr "確認コードを送信"
 
 #: templates/_mfa_login_field.html:106
-#: users/templates/users/forgot_password.html:139
+#: users/templates/users/forgot_password.html:129
 msgid "Wait: "
 msgstr "待つ:"
 
 #: templates/_mfa_login_field.html:116
-#: users/templates/users/forgot_password.html:155
+#: users/templates/users/forgot_password.html:145
 msgid "The verification code has been sent"
 msgstr "確認コードが送信されました"
 
@@ -5248,7 +5248,7 @@ msgstr "アクセスキー"
 msgid "Access key secret"
 msgstr "アクセスキーシークレット"
 
-#: terminal/serializers/storage.py:65 xpack/plugins/cloud/models.py:220
+#: terminal/serializers/storage.py:65 xpack/plugins/cloud/models.py:222
 msgid "Region"
 msgstr "リージョン"
 
@@ -5774,40 +5774,40 @@ msgstr "パスワードの確認"
 msgid "Password does not match"
 msgstr "パスワードが一致しない"
 
-#: users/forms/profile.py:115
+#: users/forms/profile.py:118
 msgid "Old password"
 msgstr "古いパスワード"
 
-#: users/forms/profile.py:125
+#: users/forms/profile.py:128
 msgid "Old password error"
 msgstr "古いパスワードエラー"
 
-#: users/forms/profile.py:135
+#: users/forms/profile.py:138
 msgid "Automatically configure and download the SSH key"
 msgstr "SSHキーの自動設定とダウンロード"
 
-#: users/forms/profile.py:137
+#: users/forms/profile.py:140
 msgid "ssh public key"
 msgstr "ssh公開キー"
 
-#: users/forms/profile.py:138
+#: users/forms/profile.py:141
 msgid "ssh-rsa AAAA..."
 msgstr "ssh-rsa AAAA.."
 
-#: users/forms/profile.py:139
+#: users/forms/profile.py:142
 msgid "Paste your id_rsa.pub here."
 msgstr "ここにid_rsa.pubを貼り付けます。"
 
-#: users/forms/profile.py:152
+#: users/forms/profile.py:155
 msgid "Public key should not be the same as your old one."
 msgstr "公開鍵は古いものと同じであってはなりません。"
 
-#: users/forms/profile.py:156 users/serializers/profile.py:100
+#: users/forms/profile.py:159 users/serializers/profile.py:100
 #: users/serializers/profile.py:183 users/serializers/profile.py:210
 msgid "Not a valid ssh public key"
 msgstr "有効なssh公開鍵ではありません"
 
-#: users/forms/profile.py:167 users/models/user.py:706
+#: users/forms/profile.py:170 users/models/user.py:706
 msgid "Public key"
 msgstr "公開キー"
 
@@ -5887,7 +5887,7 @@ msgstr "ユーザーパスワード履歴"
 msgid "Reset password"
 msgstr "パスワードのリセット"
 
-#: users/notifications.py:85 users/views/profile/reset.py:172
+#: users/notifications.py:85 users/views/profile/reset.py:189
 msgid "Reset password success"
 msgstr "パスワードのリセット成功"
 
@@ -6079,11 +6079,28 @@ msgstr "あなたのssh公開鍵はサイト管理者によってリセットさ
 msgid "click here to set your password"
 msgstr "ここをクリックしてパスワードを設定してください"
 
-#: users/templates/users/forgot_password.html:38
-msgid "Input your email, that will send a mail to your"
-msgstr "あなたのメールを入力し、それはあなたにメールを送信します"
+#: users/templates/users/forgot_password.html:32
+msgid "Input your email account, that will send a email to your"
+msgstr "電子メールアカウントを入力し、メールをメールアドレスに送信します"
 
-#: users/templates/users/forgot_password.html:64
+#: users/templates/users/forgot_password.html:35
+msgid ""
+"Enter your mobile number and a verification code will be sent to your phone"
+msgstr "携帯電話番号を入力すると認証コードが送信されます"
+
+#: users/templates/users/forgot_password.html:57
+msgid "Email account"
+msgstr "メールアドレスアカウント"
+
+#: users/templates/users/forgot_password.html:61
+msgid "Mobile number"
+msgstr "携帯番号"
+
+#: users/templates/users/forgot_password.html:68
+msgid "Send"
+msgstr "送信"
+
+#: users/templates/users/forgot_password.html:72
 #: users/templates/users/forgot_password_previewing.html:30
 msgid "Submit"
 msgstr "送信"
@@ -6234,23 +6251,23 @@ msgstr "OTP無効化成功、ログインページを返す"
 msgid "Password invalid"
 msgstr "パスワード無効"
 
-#: users/views/profile/reset.py:96 users/views/profile/reset.py:107
+#: users/views/profile/reset.py:144 users/views/profile/reset.py:155
 msgid "Token invalid or expired"
 msgstr "トークンが無効または期限切れ"
 
-#: users/views/profile/reset.py:145
+#: users/views/profile/reset.py:160
 msgid "User auth from {}, go there change password"
 msgstr "ユーザー認証ソース {}, 対応するシステムにパスワードを変更してください"
 
-#: users/views/profile/reset.py:152
+#: users/views/profile/reset.py:167
 msgid "* Your password does not meet the requirements"
 msgstr "* パスワードが要件を満たしていない"
 
-#: users/views/profile/reset.py:158
+#: users/views/profile/reset.py:173
 msgid "* The new password cannot be the last {} passwords"
 msgstr "* 新しいパスワードを最後の {} パスワードにすることはできません"
 
-#: users/views/profile/reset.py:173
+#: users/views/profile/reset.py:190
 msgid "Reset password success, return to login page"
 msgstr "パスワードの成功をリセットし、ログインページに戻る"
 
@@ -6521,27 +6538,27 @@ msgstr "プライベートIP"
 msgid "Instance name"
 msgstr "インスタンス名"
 
-#: xpack/plugins/cloud/const.py:32
+#: xpack/plugins/cloud/const.py:37
 msgid "Instance name and Partial IP"
 msgstr "インスタンス名と部分IP"
 
-#: xpack/plugins/cloud/const.py:37
+#: xpack/plugins/cloud/const.py:42
 msgid "Succeed"
 msgstr "成功"
 
-#: xpack/plugins/cloud/const.py:41
+#: xpack/plugins/cloud/const.py:46
 msgid "Unsync"
 msgstr "同期していません"
 
-#: xpack/plugins/cloud/const.py:42
+#: xpack/plugins/cloud/const.py:47
 msgid "New Sync"
 msgstr "新しい同期"
 
-#: xpack/plugins/cloud/const.py:43
+#: xpack/plugins/cloud/const.py:48
 msgid "Synced"
 msgstr "同期済み"
 
-#: xpack/plugins/cloud/const.py:44
+#: xpack/plugins/cloud/const.py:49
 msgid "Released"
 msgstr "リリース済み"
 
@@ -6549,19 +6566,19 @@ msgstr "リリース済み"
 msgid "Cloud center"
 msgstr "クラウドセンター"
 
-#: xpack/plugins/cloud/models.py:30
+#: xpack/plugins/cloud/models.py:29
 msgid "Provider"
 msgstr "プロバイダー"
 
-#: xpack/plugins/cloud/models.py:39
+#: xpack/plugins/cloud/models.py:38
 msgid "Cloud account"
 msgstr "クラウドアカウント"
 
-#: xpack/plugins/cloud/models.py:41
+#: xpack/plugins/cloud/models.py:40
 msgid "Test cloud account"
 msgstr "クラウドアカウントのテスト"
 
-#: xpack/plugins/cloud/models.py:85 xpack/plugins/cloud/serializers/task.py:67
+#: xpack/plugins/cloud/models.py:84 xpack/plugins/cloud/serializers/task.py:69
 msgid "Account"
 msgstr "アカウント"
 
