@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-14 17:07+0800\n"
+"POT-Creation-Date: 2022-11-15 16:44+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1424,11 +1424,11 @@ msgstr "文字内容太长。请使用 Elasticsearch 存储操作日志"
 msgid "Tips"
 msgstr "提示"
 
-#: audits/handler.py:126
+#: audits/handler.py:134
 msgid "Yes"
 msgstr "是"
 
-#: audits/handler.py:126
+#: audits/handler.py:134
 msgid "No"
 msgstr "否"
 
@@ -1666,8 +1666,8 @@ msgstr "此操作需要验证您的 MFA"
 msgid "Current user not support mfa type: {}"
 msgstr "当前用户不支持 MFA 类型: {}"
 
-#: authentication/api/password.py:31 terminal/api/session.py:224
-#: users/views/profile/reset.py:44
+#: authentication/api/password.py:30 terminal/api/session.py:224
+#: users/views/profile/reset.py:45 users/views/profile/reset.py:119
 msgid "User does not exist: {}"
 msgstr "用户不存在: {}"
 
@@ -1681,7 +1681,7 @@ msgid ""
 "password"
 msgstr "用户来自 {} 请去相应系统修改密码"
 
-#: authentication/api/password.py:59
+#: authentication/api/password.py:54
 #: authentication/templates/authentication/login.html:256
 #: users/templates/users/forgot_password.html:27
 #: users/templates/users/forgot_password.html:28
@@ -1995,8 +1995,9 @@ msgstr "短信验证码校验失败"
 #: authentication/mfa/sms.py:12 authentication/serializers/password_mfa.py:16
 #: authentication/serializers/password_mfa.py:24
 #: settings/serializers/auth/sms.py:27 users/forms/profile.py:103
-#: users/forms/profile.py:106 users/templates/users/forgot_password.html:111
-#: users/views/profile/reset.py:74
+#: users/forms/profile.py:106 users/templates/users/forgot_password.html:61
+#: users/templates/users/forgot_password.html:111
+#: users/views/profile/reset.py:75
 msgid "SMS"
 msgstr "短信"
 
@@ -2130,10 +2131,16 @@ msgstr "资产或应用必填"
 #: notifications/backends/__init__.py:10 settings/serializers/email.py:19
 #: settings/serializers/email.py:50 users/forms/profile.py:102
 #: users/forms/profile.py:106 users/models/user.py:675
+#: users/templates/users/forgot_password.html:57
 #: users/templates/users/forgot_password.html:116
 #: users/views/profile/reset.py:68
 msgid "Email"
 msgstr "邮箱"
+
+#: authentication/serializers/password_mfa.py:29
+#: users/templates/users/forgot_password.html:107
+msgid "The {} cannot be empty"
+msgstr "{} 不能为空"
 
 #: authentication/serializers/password_mfa.py:29
 #: users/templates/users/forgot_password.html:107
@@ -3959,7 +3966,7 @@ msgstr "登录日志"
 
 #: settings/serializers/cleaning.py:12 settings/serializers/cleaning.py:16
 #: settings/serializers/cleaning.py:20 settings/serializers/cleaning.py:24
-#: settings/serializers/cleaning.py:28 settings/serializers/other.py:37
+#: settings/serializers/cleaning.py:28
 msgid "Unit: day"
 msgstr "单位: 天"
 
@@ -4128,19 +4135,31 @@ msgstr ""
 msgid "Ticket authorize default time"
 msgstr "默认工单授权时间"
 
+#: settings/serializers/other.py:40
+msgid "day"
+msgstr "天"
+
+#: settings/serializers/other.py:40
+msgid "hour"
+msgstr "时"
+
 #: settings/serializers/other.py:41
+msgid "Ticket authorize default time unit"
+msgstr "默认工单授权时间单位"
+
+#: settings/serializers/other.py:44
 msgid "Help Docs URL"
 msgstr "文档链接"
 
-#: settings/serializers/other.py:42
+#: settings/serializers/other.py:45
 msgid "default: http://docs.jumpserver.org"
 msgstr "默认: http://dev.jumpserver.org:8080"
 
-#: settings/serializers/other.py:46
+#: settings/serializers/other.py:49
 msgid "Help Support URL"
 msgstr "支持链接"
 
-#: settings/serializers/other.py:47
+#: settings/serializers/other.py:50
 msgid "default: http://www.jumpserver.org/support/"
 msgstr "默认: http://www.jumpserver.org/support/"
 
@@ -4634,13 +4653,13 @@ msgstr "过期。"
 #, python-format
 msgid ""
 "\n"
-"                Your password has expired, please click <a href="
-"\"%(user_password_update_url)s\"> this link </a> update password.\n"
+"                Your password has expired, please click <a "
+"href=\"%(user_password_update_url)s\"> this link </a> update password.\n"
 "            "
 msgstr ""
 "\n"
-"                您的密码已经过期，请点击 <a href="
-"\"%(user_password_update_url)s\"> 链接 </a> 更新密码\n"
+"                您的密码已经过期，请点击 <a "
+"href=\"%(user_password_update_url)s\"> 链接 </a> 更新密码\n"
 "        "
 
 #: templates/_message.html:30
@@ -4664,8 +4683,8 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"        Your information was incomplete. Please click <a href="
-"\"%(first_login_url)s\"> this link </a>to complete your information.\n"
+"        Your information was incomplete. Please click <a "
+"href=\"%(first_login_url)s\"> this link </a>to complete your information.\n"
 "        "
 msgstr ""
 "\n"
@@ -4677,16 +4696,17 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"        Your ssh public key not set or expired. Please click <a href="
-"\"%(user_pubkey_update)s\"> this link </a>to update\n"
+"        Your ssh public key not set or expired. Please click <a "
+"href=\"%(user_pubkey_update)s\"> this link </a>to update\n"
 "        "
 msgstr ""
 "\n"
-"                您的SSH密钥没有设置或已失效，请点击 <a href="
-"\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
+"                您的SSH密钥没有设置或已失效，请点击 <a "
+"href=\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
 "        "
 
 #: templates/_mfa_login_field.html:28
+#: users/templates/users/forgot_password.html:68
 msgid "Send verification code"
 msgstr "发送验证码"
 
@@ -5796,7 +5816,7 @@ msgstr "用户密码历史"
 msgid "Reset password"
 msgstr "重置密码"
 
-#: users/notifications.py:85 users/views/profile/reset.py:189
+#: users/notifications.py:85 users/views/profile/reset.py:184
 msgid "Reset password success"
 msgstr "重置密码成功"
 
@@ -5987,25 +6007,8 @@ msgid "click here to set your password"
 msgstr "点击这里设置密码"
 
 #: users/templates/users/forgot_password.html:32
-msgid "Input your email account, that will send a email to your"
-msgstr "输入您的邮箱账号, 将会发一封重置邮件到您的邮箱中"
-
-#: users/templates/users/forgot_password.html:35
-msgid ""
-"Enter your mobile number and a verification code will be sent to your phone"
-msgstr "输入您的手机号码，验证码将发送到您的手机"
-
-#: users/templates/users/forgot_password.html:57
-msgid "Email account"
-msgstr "邮箱账号"
-
-#: users/templates/users/forgot_password.html:61
-msgid "Mobile number"
-msgstr "手机号码"
-
-#: users/templates/users/forgot_password.html:68
-msgid "Send"
-msgstr "发送"
+msgid "Input your email, that will send a mail to your"
+msgstr "输入您的邮箱, 将会发一封重置邮件到您的邮箱中"
 
 #: users/templates/users/forgot_password.html:72
 #: users/templates/users/forgot_password_previewing.html:30
@@ -6150,23 +6153,23 @@ msgstr "MFA(OTP) 禁用成功，返回登录页面"
 msgid "Password invalid"
 msgstr "用户名或密码无效"
 
-#: users/views/profile/reset.py:144 users/views/profile/reset.py:155
+#: users/views/profile/reset.py:141 users/views/profile/reset.py:152
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
-#: users/views/profile/reset.py:160
+#: users/views/profile/reset.py:157
 msgid "User auth from {}, go there change password"
 msgstr "用户认证源来自 {}, 请去相应系统修改密码"
 
-#: users/views/profile/reset.py:167
+#: users/views/profile/reset.py:164
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
-#: users/views/profile/reset.py:173
+#: users/views/profile/reset.py:170
 msgid "* The new password cannot be the last {} passwords"
 msgstr "* 新密码不能是最近 {} 次的密码"
 
-#: users/views/profile/reset.py:190
+#: users/views/profile/reset.py:185
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
