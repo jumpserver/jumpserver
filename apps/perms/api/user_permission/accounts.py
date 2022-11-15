@@ -16,11 +16,8 @@ __all__ = [
 
 class UserGrantedAssetAccountsApi(SelfOrPKUserMixin, ListAPIView):
     serializer_class = serializers.AccountsGrantedSerializer
-    rbac_perms = (
-        ('GET', 'perms.view_userassets'),
-        ('list', 'perms.view_userassets'),
-    )
 
+    @property
     def asset(self):
         asset_id = self.kwargs.get('asset_id')
         kwargs = {'id': asset_id, 'is_active': True}
