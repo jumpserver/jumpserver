@@ -61,18 +61,15 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
     && echo "zh_CN.UTF-8" | dpkg-reconfigure locales \
     && rm -rf /var/lib/apt/lists/*
 
-ARG ORACLE_LIB_MAJOR=19
-ARG ORACLE_LIB_MINOR=10
-ENV ORACLE_FILE="instantclient-basiclite-linux.${TARGETARCH:-amd64}-${ORACLE_LIB_MAJOR}.${ORACLE_LIB_MINOR}.0.0.0dbru.zip"
+ARG DOWNLOAD_URL=https://download.jumpserver.org
 
 RUN mkdir -p /opt/oracle/ \
     && cd /opt/oracle/ \
-    && wget https://download.jumpserver.org/files/oracle/${ORACLE_FILE} \
-    && unzip instantclient-basiclite-linux.${TARGETARCH-amd64}-19.10.0.0.0dbru.zip \
-    && mv instantclient_${ORACLE_LIB_MAJOR}_${ORACLE_LIB_MINOR} instantclient \
-    && echo "/opt/oracle/instantclient" > /etc/ld.so.conf.d/oracle-instantclient.conf \
+    && wget ${DOWNLOAD_URL}/public/instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip \
+    && unzip instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip \
+    && sh -c "echo /opt/oracle/instantclient_19_10 > /etc/ld.so.conf.d/oracle-instantclient.conf" \
     && ldconfig \
-    && rm -f ${ORACLE_FILE}
+    && rm -f instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip
 
 WORKDIR /tmp/build
 COPY ./requirements ./requirements
