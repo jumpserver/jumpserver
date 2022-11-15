@@ -2,8 +2,11 @@
 #
 from django.shortcuts import get_object_or_404
 from rest_framework.request import Request
+from django.utils.translation import ugettext_lazy as _
 
 from common.http import is_true
+from common.utils import is_uuid
+from common.exceptions import JMSObjectDoesNotExist
 from common.mixins.api import RoleAdminMixin, RoleUserMixin
 from perms.utils.user_permission import UserGrantedTreeRefreshController
 from rbac.permissions import RBACPermission
@@ -43,6 +46,12 @@ class SelfOrPKUserMixin:
     request: Request
     permission_classes = (RBACPermission,)
 
+    def get_rbac_perms(self):
+        if self.request_user_is_self():
+            return self.self_rbac_perms
+        else:
+            return self.admin_rbac_perms
+
     @property
     def self_rbac_perms(self):
         return (
@@ -61,18 +70,15 @@ class SelfOrPKUserMixin:
             ('GET', 'perms.view_userassets'),
         )
 
-    def get_rbac_perms(self):
-        if self.request_user_is_self():
-            return self.self_rbac_perms
-        else:
-            return self.admin_rbac_perms
-
-    def request_user_is_self(self):
-        return self.kwargs.get('user') in ['my', 'self']
-
     @property
     def user(self):
         if self.request_user_is_self():
-            return self.request.user
+            user = self.request.user
+        elif is_uuid(self.kwargs.get('user')):
+            user = get_object_or_404(User, pk=self.kwargs.get('user'))
         else:
-            return get_object_or_404(User, pk=self.kwargs.get('user'))
+            raise JMSObjectDoesNotExist(object_name=_('User'))
+        return user
+
+    def request_user_is_self(self):
+        return self.kwargs.get('user') in ['my', 'self']
