@@ -1,12 +1,12 @@
-from django.db.transaction import atomic
 from django.db.models import Model
+from django.db.transaction import atomic
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 from orgs.utils import tmp_to_org
 from tickets.models import Ticket
 
-__all__ = ['DefaultPermissionName', 'get_default_permission_name', 'BaseApplyAssetApplicationSerializer']
+__all__ = ['DefaultPermissionName', 'get_default_permission_name', 'BaseApplyAssetSerializer']
 
 
 def get_default_permission_name(ticket):
@@ -34,7 +34,7 @@ class DefaultPermissionName(object):
         return self.default
 
 
-class BaseApplyAssetApplicationSerializer(serializers.Serializer):
+class BaseApplyAssetSerializer(serializers.Serializer):
     permission_model: Model
 
     @property

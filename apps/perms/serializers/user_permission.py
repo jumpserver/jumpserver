@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 #
 
-from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
+from rest_framework import serializers
 
-from common.drf.fields import ObjectRelatedField, LabeledChoiceField
-from assets.models import Node, Asset, Platform, Account
 from assets.const import Category, AllTypes
+from assets.models import Node, Asset, Platform, Account
+from common.drf.fields import ObjectRelatedField, LabeledChoiceField
 from perms.serializers.permission import ActionChoicesField
 
 __all__ = [
@@ -49,13 +49,9 @@ class ActionsSerializer(serializers.Serializer):
 
 
 class AccountsGrantedSerializer(serializers.ModelSerializer):
-    """ 授权的账号序列类 """
-
-    # Todo: 添加前端登录逻辑中需要的一些字段，比如：是否需要手动输入密码
-    # need_manual = serializers.BooleanField(label=_('Need manual input'))
     actions = ActionChoicesField(read_only=True)
 
     class Meta:
         model = Account
-        fields = ['id', 'name', 'username', 'actions']
+        fields = ['id', 'name', 'username', 'secret_type', 'has_secret', 'actions']
         read_only_fields = fields
