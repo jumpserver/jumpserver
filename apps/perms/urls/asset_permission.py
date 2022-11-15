@@ -69,11 +69,8 @@ user_permission_urlpatterns = [
          name='my-ungrouped-assets'),
 
     # 获取授权给用户某个资产的所有账号
-    path('<uuid:pk>/assets/<uuid:asset_id>/accounts/', api.UserGrantedAssetAccountsApi.as_view(),
+    path('<str:user>/assets/<uuid:asset_id>/accounts/', api.UserGrantedAssetAccountsApi.as_view(),
          name='user-asset-accounts'),
-    path('/((?P<user>[^/.]+)/)?assets/<uuid:asset_id>/accounts/',
-         api.UserGrantedAssetAccountsApi.as_view(),
-         name='my-asset-accounts'),
 ]
 
 user_group_permission_urlpatterns = [
