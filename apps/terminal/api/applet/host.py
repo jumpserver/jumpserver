@@ -49,6 +49,7 @@ class AppletHostDeploymentViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
         task = run_applet_host_deployment.delay(instance.id)
+        instance.save_task(task.id)
         return Response({'task': str(task.id)}, status=201)
 
     @action(methods=['post'], detail=False, serializer_class=AppletHostDeployAppletSerializer)
@@ -58,4 +59,5 @@ class AppletHostDeploymentViewSet(viewsets.ModelViewSet):
         applet_id = serializer.validated_data.get('applet_id')
         instance = serializer.save()
         task = run_applet_host_deployment_install_applet.delay(instance.id, applet_id)
+        instance.save_task(task.id)
         return Response({'task': str(task.id)}, status=201)
