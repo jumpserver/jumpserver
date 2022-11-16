@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-15 18:06+0800\n"
+"POT-Creation-Date: 2022-11-16 09:32+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -393,7 +393,7 @@ msgid "Host"
 msgstr "主机"
 
 #: applications/serializers/attrs/application_category/db.py:12
-#: applications/serializers/attrs/application_type/clickhouse.py:10
+#: applications/serializers/attrs/application_type/clickhouse.py:11
 #: applications/serializers/attrs/application_type/mongodb.py:10
 #: applications/serializers/attrs/application_type/mysql.py:10
 #: applications/serializers/attrs/application_type/mysql_workbench.py:22
@@ -464,6 +464,12 @@ msgstr "Chrome 用户名"
 #: applications/serializers/attrs/application_type/chrome.py:33
 msgid "Chrome password"
 msgstr "Chrome 密码"
+
+#: applications/serializers/attrs/application_type/clickhouse.py:13
+msgid ""
+"Typically, the port is 9000，the HTTP interface and the native interface use "
+"different ports"
+msgstr "默认端口为9000, HTTP接口和本机接口使用不同的端口"
 
 #: applications/serializers/attrs/application_type/custom.py:12
 msgid "Operating parameter"
@@ -6005,19 +6011,19 @@ msgstr "输入您的邮箱, 将会发一封重置邮件到您的邮箱中"
 #: users/templates/users/forgot_password.html:35
 msgid ""
 "Enter your mobile number and a verification code will be sent to your phone"
-msgstr ""
+msgstr "输入您的手机号码，验证码将发送到您的手机"
 
 #: users/templates/users/forgot_password.html:57
 msgid "Email account"
-msgstr "账号"
+msgstr "邮箱账号"
 
 #: users/templates/users/forgot_password.html:61
 msgid "Mobile number"
-msgstr "序列号"
+msgstr "手机号码"
 
 #: users/templates/users/forgot_password.html:68
 msgid "Send"
-msgstr "发件人"
+msgstr "发送"
 
 #: users/templates/users/forgot_password.html:72
 #: users/templates/users/forgot_password_previewing.html:30
