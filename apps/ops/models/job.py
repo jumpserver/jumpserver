@@ -85,6 +85,12 @@ class JobExecution(BaseCreateUpdateModel):
         return str(self.id).split('-')[-1]
 
     @property
+    def time_cost(self):
+        if self.date_finished and self.date_start:
+            return (self.date_finished - self.date_start).total_seconds()
+        return None
+
+    @property
     def timedelta(self):
         if self.date_start and self.date_finished:
             return self.date_finished - self.date_start
@@ -97,12 +103,6 @@ class JobExecution(BaseCreateUpdateModel):
     @property
     def is_success(self):
         return self.status == 'success'
-
-    @property
-    def time_cost(self):
-        if self.date_finished and self.date_start:
-            return (self.date_finished - self.date_start).total_seconds()
-        return None
 
     @property
     def inventory_path(self):

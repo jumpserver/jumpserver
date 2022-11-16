@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-15 15:52+0800\n"
+"POT-Creation-Date: 2022-11-15 20:31+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,8 +30,8 @@ msgstr "Acls"
 #: assets/models/label.py:17 assets/models/platform.py:21
 #: assets/models/platform.py:72 assets/serializers/asset/common.py:86
 #: assets/serializers/platform.py:138 ops/mixin.py:20 ops/models/adhoc.py:24
-#: ops/models/job.py:33 ops/models/playbook.py:13 orgs/models.py:70
-#: perms/models/asset_permission.py:51 rbac/models/role.py:29
+#: ops/models/celery.py:15 ops/models/job.py:33 ops/models/playbook.py:13
+#: orgs/models.py:70 perms/models/asset_permission.py:51 rbac/models/role.py:29
 #: settings/models.py:33 settings/serializers/sms.py:6
 #: terminal/models/applet/applet.py:20 terminal/models/component/endpoint.py:11
 #: terminal/models/component/endpoint.py:87
@@ -216,7 +216,7 @@ msgstr ""
 "ション: {}"
 
 #: acls/serializers/login_asset_acl.py:108
-#: tickets/serializers/ticket/ticket.py:86
+#: tickets/serializers/ticket/ticket.py:67
 msgid "The organization `{}` does not exist"
 msgstr "組織 '{}'は存在しません"
 
@@ -267,6 +267,7 @@ msgstr "カテゴリ"
 #: tickets/models/comment.py:26 tickets/models/flow.py:57
 #: tickets/models/ticket/apply_application.py:17
 #: tickets/models/ticket/general.py:273 tickets/serializers/flow.py:53
+#: tickets/serializers/ticket/ticket.py:18
 #: xpack/plugins/change_auth_plan/models/app.py:27
 #: xpack/plugins/change_auth_plan/models/app.py:152
 msgid "Type"
@@ -711,7 +712,7 @@ msgid "Move asset to node"
 msgstr "アセットをノードに移動する"
 
 #: assets/models/asset/web.py:9 audits/const.py:67
-#: terminal/serializers/applet_host.py:26
+#: terminal/serializers/applet_host.py:25
 msgid "Disabled"
 msgstr "無効"
 
@@ -769,17 +770,17 @@ msgstr "自動管理"
 #: audits/serializers.py:41 ops/models/base.py:49 ops/models/job.py:57
 #: terminal/models/applet/applet.py:60 terminal/models/applet/host.py:104
 #: terminal/models/component/status.py:27 terminal/serializers/applet.py:22
-#: tickets/models/ticket/general.py:281 xpack/plugins/cloud/models.py:171
-#: xpack/plugins/cloud/models.py:223
+#: tickets/models/ticket/general.py:281 tickets/serializers/ticket/ticket.py:19
+#: xpack/plugins/cloud/models.py:171 xpack/plugins/cloud/models.py:223
 msgid "Status"
 msgstr "ステータス"
 
 #: assets/models/automations/base.py:93 assets/models/backup.py:76
-#: audits/models.py:40 ops/models/base.py:55 ops/models/job.py:63
-#: perms/models/asset_permission.py:69 terminal/models/applet/host.py:105
-#: terminal/models/session/session.py:43
+#: audits/models.py:40 ops/models/base.py:55 ops/models/celery.py:59
+#: ops/models/job.py:63 perms/models/asset_permission.py:69
+#: terminal/models/applet/host.py:105 terminal/models/session/session.py:43
 #: tickets/models/ticket/apply_application.py:28
-#: tickets/models/ticket/apply_asset.py:18
+#: tickets/models/ticket/apply_asset.py:19
 #: xpack/plugins/change_auth_plan/models/base.py:108
 #: xpack/plugins/change_auth_plan/models/base.py:199
 #: xpack/plugins/gathered_user/models.py:71
@@ -788,7 +789,8 @@ msgstr "開始日"
 
 #: assets/models/automations/base.py:94
 #: assets/models/automations/change_secret.py:59 ops/models/base.py:56
-#: ops/models/job.py:64 terminal/models/applet/host.py:106
+#: ops/models/celery.py:60 ops/models/job.py:64
+#: terminal/models/applet/host.py:106
 msgid "Date finished"
 msgstr "終了日"
 
@@ -1139,7 +1141,7 @@ msgid "Setting"
 msgstr "設定"
 
 #: assets/models/platform.py:42 audits/const.py:68 settings/models.py:37
-#: terminal/serializers/applet_host.py:27
+#: terminal/serializers/applet_host.py:26
 msgid "Enabled"
 msgstr "有効化"
 
@@ -2223,7 +2225,7 @@ msgstr "アセット名"
 #: authentication/models/connection_token.py:36
 #: authentication/models/temp_token.py:13 perms/models/asset_permission.py:72
 #: tickets/models/ticket/apply_application.py:29
-#: tickets/models/ticket/apply_asset.py:19 users/models/user.py:707
+#: tickets/models/ticket/apply_asset.py:20 users/models/user.py:707
 msgid "Date expired"
 msgstr "期限切れの日付"
 
@@ -2765,11 +2767,11 @@ msgstr "%s オブジェクトは存在しません。"
 msgid "Incorrect type. Expected pk value, received {data_type}."
 msgstr ""
 
-#: common/drf/fields.py:131
+#: common/drf/fields.py:138
 msgid "Invalid data type, should be list"
 msgstr ""
 
-#: common/drf/fields.py:146
+#: common/drf/fields.py:153
 #, fuzzy
 #| msgid "Invalid ip"
 msgid "Invalid choice: {}"
@@ -3083,7 +3085,7 @@ msgstr "パターン"
 msgid "Module"
 msgstr ""
 
-#: ops/models/adhoc.py:28 ops/models/celery.py:48 ops/models/job.py:35
+#: ops/models/adhoc.py:28 ops/models/celery.py:54 ops/models/job.py:35
 #: terminal/models/component/task.py:17
 msgid "Args"
 msgstr "アルグ"
@@ -3128,19 +3130,26 @@ msgstr "結果"
 msgid "Summary"
 msgstr ""
 
-#: ops/models/celery.py:49 terminal/models/component/task.py:18
+#: ops/models/celery.py:55 terminal/models/component/task.py:18
 msgid "Kwargs"
 msgstr "クワーグ"
 
-#: ops/models/celery.py:50 tickets/models/comment.py:13
+#: ops/models/celery.py:56 tickets/models/comment.py:13
 #: tickets/models/ticket/general.py:41 tickets/models/ticket/general.py:277
+#: tickets/serializers/ticket/ticket.py:20
 msgid "State"
 msgstr "状態"
 
-#: ops/models/celery.py:51 terminal/models/session/sharing.py:111
+#: ops/models/celery.py:57 terminal/models/session/sharing.py:111
 #: tickets/const.py:25 xpack/plugins/change_auth_plan/models/base.py:188
 msgid "Finished"
 msgstr "終了"
+
+#: ops/models/celery.py:58
+#, fuzzy
+#| msgid "Date finished"
+msgid "Date published"
+msgstr "終了日"
 
 #: ops/models/job.py:21 ops/models/job.py:38
 msgid "Playbook"
@@ -3200,7 +3209,8 @@ msgstr "{max_threshold}%: => {value} を超える使用メモリ"
 msgid "CPU load more than {max_threshold}: => {value}"
 msgstr "{max_threshold} を超えるCPUロード: => {value}"
 
-#: ops/signal_handlers.py:63 terminal/models/component/task.py:26
+#: ops/signal_handlers.py:63 terminal/models/applet/host.py:108
+#: terminal/models/component/task.py:26
 #: xpack/plugins/gathered_user/models.py:68
 msgid "Task"
 msgstr "タスク"
@@ -3271,7 +3281,7 @@ msgstr "アプリ組織"
 #: orgs/mixins/models.py:57 orgs/mixins/serializers.py:25 orgs/models.py:88
 #: rbac/const.py:7 rbac/models/rolebinding.py:48
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:62
-#: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:72
+#: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:61
 msgid "Organization"
 msgstr "組織"
 
@@ -3342,7 +3352,7 @@ msgstr "クリップボードのコピー"
 #: perms/models/asset_permission.py:66 perms/models/perm_token.py:18
 #: perms/serializers/permission.py:29 perms/serializers/permission.py:59
 #: tickets/models/ticket/apply_application.py:26
-#: tickets/models/ticket/apply_asset.py:17
+#: tickets/models/ticket/apply_asset.py:18
 msgid "Actions"
 msgstr "アクション"
 
@@ -3427,7 +3437,7 @@ msgstr ""
 msgid "If you have any question, please contact the administrator"
 msgstr "質問があったら、管理者に連絡して下さい"
 
-#: perms/utils/user_permission.py:622 rbac/tree.py:57
+#: perms/utils/user_permission.py:627 rbac/tree.py:57
 msgid "My assets"
 msgstr "私の資産"
 
@@ -5379,27 +5389,27 @@ msgstr "電話が設定されていない"
 msgid "Icon"
 msgstr ""
 
-#: terminal/serializers/applet_host.py:22
+#: terminal/serializers/applet_host.py:21
 #, fuzzy
 #| msgid "Session"
 msgid "Per Session"
 msgstr "セッション"
 
-#: terminal/serializers/applet_host.py:23
+#: terminal/serializers/applet_host.py:22
 msgid "Per Device"
 msgstr ""
 
-#: terminal/serializers/applet_host.py:29
+#: terminal/serializers/applet_host.py:28
 #, fuzzy
 #| msgid "License"
 msgid "RDS Licensing"
 msgstr "ライセンス"
 
-#: terminal/serializers/applet_host.py:30
+#: terminal/serializers/applet_host.py:29
 msgid "RDS License Server"
 msgstr ""
 
-#: terminal/serializers/applet_host.py:31
+#: terminal/serializers/applet_host.py:30
 msgid "RDS Licensing Mode"
 msgstr ""
 
@@ -5682,7 +5692,7 @@ msgid "Ticket session relation"
 msgstr "チケットセッションの関係"
 
 #: tickets/models/ticket/apply_application.py:11
-#: tickets/models/ticket/apply_asset.py:12
+#: tickets/models/ticket/apply_asset.py:13
 msgid "Permission name"
 msgstr "認可ルール名"
 
@@ -5694,20 +5704,22 @@ msgstr "アプリケーションの適用"
 msgid "Apply system users"
 msgstr "システムユーザーの適用"
 
-#: tickets/models/ticket/apply_asset.py:8
-#: tickets/serializers/ticket/apply_asset.py:15
+#: tickets/models/ticket/apply_asset.py:9
+#: tickets/serializers/ticket/apply_asset.py:14
 msgid "Select at least one asset or node"
 msgstr "少なくとも1つのアセットまたはノードを選択します。"
 
-#: tickets/models/ticket/apply_asset.py:13
+#: tickets/models/ticket/apply_asset.py:14
+#: tickets/serializers/ticket/apply_asset.py:19
 msgid "Apply nodes"
 msgstr "ノードの適用"
 
-#: tickets/models/ticket/apply_asset.py:15
+#: tickets/models/ticket/apply_asset.py:16
+#: tickets/serializers/ticket/apply_asset.py:18
 msgid "Apply assets"
 msgstr "資産の適用"
 
-#: tickets/models/ticket/apply_asset.py:16
+#: tickets/models/ticket/apply_asset.py:17
 #, fuzzy
 #| msgid "Application account"
 msgid "Apply accounts"
@@ -5833,6 +5845,12 @@ msgstr "現在の組織タイプは既に存在します。"
 msgid "Processor"
 msgstr "プロセッサ"
 
+#: tickets/serializers/ticket/apply_asset.py:20
+#, fuzzy
+#| msgid "Apply applications"
+msgid "Apply actions"
+msgstr "アプリケーションの適用"
+
 #: tickets/serializers/ticket/common.py:15
 #: tickets/serializers/ticket/common.py:77
 msgid "Created by ticket ({}-{})"
@@ -5846,15 +5864,7 @@ msgstr "有効期限は開始日より大きくする必要があります"
 msgid "Permission named `{}` already exists"
 msgstr "'{}'という名前の権限は既に存在します"
 
-#: tickets/serializers/ticket/ticket.py:17
-msgid "Type display"
-msgstr "タイプ表示"
-
-#: tickets/serializers/ticket/ticket.py:18
-msgid "Status display"
-msgstr "ステータス表示"
-
-#: tickets/serializers/ticket/ticket.py:101
+#: tickets/serializers/ticket/ticket.py:85
 msgid "The ticket flow `{}` does not exist"
 msgstr "チケットフロー '{}'が存在しない"
 
@@ -7175,6 +7185,12 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "コミュニティ版"
+
+#~ msgid "Type display"
+#~ msgstr "タイプ表示"
+
+#~ msgid "Status display"
+#~ msgstr "ステータス表示"
 
 #, fuzzy
 #~| msgid "Run command"
