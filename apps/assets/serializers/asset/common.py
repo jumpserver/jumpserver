@@ -15,7 +15,7 @@ from ...const import Category, AllTypes
 
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
-    'AssetTaskSerializer', 'AssetsTaskSerializer',
+    'AssetTaskSerializer', 'AssetsTaskSerializer', 'AssetProtocolsSerializer',
 ]
 
 
