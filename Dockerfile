@@ -45,8 +45,10 @@ ARG TOOLS="                           \
         unzip                         \
         wget"
 
+ARG APT_MIRROR=http://mirrors.ustc.edu.cn
+
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
-    sed -i 's@http://.*.debian.org@http://mirrors.ustc.edu.cn@g' /etc/apt/sources.list \
+    sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
     && rm -f /etc/apt/apt.conf.d/docker-clean \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && apt-get update \
