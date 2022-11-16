@@ -4,7 +4,7 @@ import six
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
-from rest_framework.fields import ChoiceField
+from rest_framework.fields import ChoiceField, empty
 
 from common.db.fields import BitChoices
 from common.utils import decrypt_password
@@ -152,4 +152,16 @@ class BitChoicesField(TreeChoicesMixin, serializers.MultipleChoiceField):
             if name not in name_value_map:
                 raise serializers.ValidationError(_("Invalid choice: {}").format(name))
             value |= name_value_map[name]
+        return value
+
+    def run_validation(self, data=empty):
+        """
+        备注:
+        创建授权规则不包含 actions 字段时, 会使用默认值(AssetPermission 中设置),
+        会直接使用 ['connect', '...'] 等字段保存到数据库，导致类型错误
+        这里将获取到的值再执行一下 to_internal_value 方法, 转化为内部值
+        """
+        data = super().run_validation(data)
+        value = self.to_internal_value(data)
+        self.run_validators(value)
         return value
