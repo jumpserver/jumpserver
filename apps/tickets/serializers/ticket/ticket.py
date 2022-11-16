@@ -3,6 +3,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
+from users.models import User
 from orgs.models import Organization
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from tickets.models import Ticket, TicketFlow
@@ -70,6 +71,7 @@ class TicketApplySerializer(TicketSerializer):
     org_id = serializers.CharField(
         required=True, max_length=36, allow_blank=True, label=_("Organization")
     )
+    applicant = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = Ticket
@@ -77,6 +79,15 @@ class TicketApplySerializer(TicketSerializer):
         extra_kwargs = {
             'type': {'required': True}
         }
+
+    def get_applicant(self, applicant_id):
+        current_user = self.context['request'].user
+        want_applicant = User.objects.filter(id=applicant_id).first()
+        if want_applicant and current_user.has_perm('tickets.add_superticket'):
+            applicant = want_applicant
+        else:
+            applicant = current_user
+        return applicant
 
     @staticmethod
     def validate_org_id(org_id):
@@ -98,4 +109,6 @@ class TicketApplySerializer(TicketSerializer):
         else:
             error = _('The ticket flow `{}` does not exist'.format(ticket_type))
             raise serializers.ValidationError(error)
+
+        attrs['applicant'] = self.get_applicant(attrs.get('applicant'))
         return attrs
