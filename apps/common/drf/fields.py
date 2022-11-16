@@ -162,6 +162,8 @@ class BitChoicesField(TreeChoicesMixin, serializers.MultipleChoiceField):
         这里将获取到的值再执行一下 to_internal_value 方法, 转化为内部值
         """
         data = super().run_validation(data)
+        if isinstance(data, int):
+            return data
         value = self.to_internal_value(data)
         self.run_validators(value)
         return value

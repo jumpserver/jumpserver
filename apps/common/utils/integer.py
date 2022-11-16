@@ -1,5 +1,4 @@
 def bit(x):
-    if x == 0:
-        return 0
-    else:
-        return 2 ** (x - 1)
+    if x < 1:
+        raise ValueError("x must be greater than 1")
+    return 2 ** (x - 1)
