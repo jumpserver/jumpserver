@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-15 15:52+0800\n"
+"POT-Creation-Date: 2022-11-15 20:31+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -29,8 +29,8 @@ msgstr "访问控制"
 #: assets/models/label.py:17 assets/models/platform.py:21
 #: assets/models/platform.py:72 assets/serializers/asset/common.py:86
 #: assets/serializers/platform.py:138 ops/mixin.py:20 ops/models/adhoc.py:24
-#: ops/models/job.py:33 ops/models/playbook.py:13 orgs/models.py:70
-#: perms/models/asset_permission.py:51 rbac/models/role.py:29
+#: ops/models/celery.py:15 ops/models/job.py:33 ops/models/playbook.py:13
+#: orgs/models.py:70 perms/models/asset_permission.py:51 rbac/models/role.py:29
 #: settings/models.py:33 settings/serializers/sms.py:6
 #: terminal/models/applet/applet.py:20 terminal/models/component/endpoint.py:11
 #: terminal/models/component/endpoint.py:87
@@ -212,7 +212,7 @@ msgid ""
 msgstr "格式为逗号分隔的字符串, * 表示匹配所有. 可选的协议有： {}"
 
 #: acls/serializers/login_asset_acl.py:108
-#: tickets/serializers/ticket/ticket.py:86
+#: tickets/serializers/ticket/ticket.py:67
 msgid "The organization `{}` does not exist"
 msgstr "组织 `{}` 不存在"
 
@@ -262,6 +262,7 @@ msgstr "类别"
 #: tickets/models/comment.py:26 tickets/models/flow.py:57
 #: tickets/models/ticket/apply_application.py:17
 #: tickets/models/ticket/general.py:273 tickets/serializers/flow.py:53
+#: tickets/serializers/ticket/ticket.py:18
 #: xpack/plugins/change_auth_plan/models/app.py:27
 #: xpack/plugins/change_auth_plan/models/app.py:152
 msgid "Type"
@@ -682,7 +683,7 @@ msgid "Move asset to node"
 msgstr "移动资产到节点"
 
 #: assets/models/asset/web.py:9 audits/const.py:67
-#: terminal/serializers/applet_host.py:26
+#: terminal/serializers/applet_host.py:25
 msgid "Disabled"
 msgstr "禁用"
 
@@ -732,17 +733,17 @@ msgstr "自动化任务"
 #: audits/serializers.py:41 ops/models/base.py:49 ops/models/job.py:57
 #: terminal/models/applet/applet.py:60 terminal/models/applet/host.py:104
 #: terminal/models/component/status.py:27 terminal/serializers/applet.py:22
-#: tickets/models/ticket/general.py:281 xpack/plugins/cloud/models.py:171
-#: xpack/plugins/cloud/models.py:223
+#: tickets/models/ticket/general.py:281 tickets/serializers/ticket/ticket.py:19
+#: xpack/plugins/cloud/models.py:171 xpack/plugins/cloud/models.py:223
 msgid "Status"
 msgstr "状态"
 
 #: assets/models/automations/base.py:93 assets/models/backup.py:76
-#: audits/models.py:40 ops/models/base.py:55 ops/models/job.py:63
-#: perms/models/asset_permission.py:69 terminal/models/applet/host.py:105
-#: terminal/models/session/session.py:43
+#: audits/models.py:40 ops/models/base.py:55 ops/models/celery.py:59
+#: ops/models/job.py:63 perms/models/asset_permission.py:69
+#: terminal/models/applet/host.py:105 terminal/models/session/session.py:43
 #: tickets/models/ticket/apply_application.py:28
-#: tickets/models/ticket/apply_asset.py:18
+#: tickets/models/ticket/apply_asset.py:19
 #: xpack/plugins/change_auth_plan/models/base.py:108
 #: xpack/plugins/change_auth_plan/models/base.py:199
 #: xpack/plugins/gathered_user/models.py:71
@@ -751,7 +752,8 @@ msgstr "开始日期"
 
 #: assets/models/automations/base.py:94
 #: assets/models/automations/change_secret.py:59 ops/models/base.py:56
-#: ops/models/job.py:64 terminal/models/applet/host.py:106
+#: ops/models/celery.py:60 ops/models/job.py:64
+#: terminal/models/applet/host.py:106
 msgid "Date finished"
 msgstr "结束日期"
 
@@ -1073,7 +1075,7 @@ msgid "Setting"
 msgstr "设置"
 
 #: assets/models/platform.py:42 audits/const.py:68 settings/models.py:37
-#: terminal/serializers/applet_host.py:27
+#: terminal/serializers/applet_host.py:26
 msgid "Enabled"
 msgstr "启用"
 
@@ -1431,7 +1433,9 @@ msgid "Manually update the hardware information of assets under a node"
 msgstr "手动更新节点下的资产硬件信息"
 
 #: assets/tasks/gather_facts.py:59
-msgid "Update node asset hardware information"
+#, fuzzy
+#| msgid "Update node asset hardware information"
+msgid "Update node asset hardware information: "
 msgstr "更新节点资产硬件信息"
 
 #: assets/tasks/nodes_amount.py:16
@@ -2077,7 +2081,7 @@ msgstr "资产名称"
 #: authentication/models/connection_token.py:36
 #: authentication/models/temp_token.py:13 perms/models/asset_permission.py:72
 #: tickets/models/ticket/apply_application.py:29
-#: tickets/models/ticket/apply_asset.py:19 users/models/user.py:707
+#: tickets/models/ticket/apply_asset.py:20 users/models/user.py:707
 msgid "Date expired"
 msgstr "失效日期"
 
@@ -2607,11 +2611,11 @@ msgstr "{pk_value} 对象不存在"
 msgid "Incorrect type. Expected pk value, received {data_type}."
 msgstr "不正确的类型。期望 pk 值，收到 {data_type} 类型。"
 
-#: common/drf/fields.py:131
+#: common/drf/fields.py:138
 msgid "Invalid data type, should be list"
 msgstr ""
 
-#: common/drf/fields.py:146
+#: common/drf/fields.py:153
 #, fuzzy
 #| msgid "Invalid ip"
 msgid "Invalid choice: {}"
@@ -2908,7 +2912,7 @@ msgstr "模式"
 msgid "Module"
 msgstr ""
 
-#: ops/models/adhoc.py:28 ops/models/celery.py:48 ops/models/job.py:35
+#: ops/models/adhoc.py:28 ops/models/celery.py:54 ops/models/job.py:35
 #: terminal/models/component/task.py:17
 msgid "Args"
 msgstr "参数"
@@ -2947,19 +2951,24 @@ msgstr "结果"
 msgid "Summary"
 msgstr "汇总"
 
-#: ops/models/celery.py:49 terminal/models/component/task.py:18
+#: ops/models/celery.py:55 terminal/models/component/task.py:18
 msgid "Kwargs"
 msgstr "其它参数"
 
-#: ops/models/celery.py:50 tickets/models/comment.py:13
+#: ops/models/celery.py:56 tickets/models/comment.py:13
 #: tickets/models/ticket/general.py:41 tickets/models/ticket/general.py:277
+#: tickets/serializers/ticket/ticket.py:20
 msgid "State"
 msgstr "状态"
 
-#: ops/models/celery.py:51 terminal/models/session/sharing.py:111
+#: ops/models/celery.py:57 terminal/models/session/sharing.py:111
 #: tickets/const.py:25 xpack/plugins/change_auth_plan/models/base.py:188
 msgid "Finished"
 msgstr "结束"
+
+#: ops/models/celery.py:58
+msgid "Date published"
+msgstr "发布日期"
 
 #: ops/models/job.py:21 ops/models/job.py:38
 msgid "Playbook"
@@ -3023,7 +3032,8 @@ msgstr "内存使用率超过 {max_threshold}%: => {value}"
 msgid "CPU load more than {max_threshold}: => {value}"
 msgstr "CPU 使用率超过 {max_threshold}: => {value}"
 
-#: ops/signal_handlers.py:63 terminal/models/component/task.py:26
+#: ops/signal_handlers.py:63 terminal/models/applet/host.py:108
+#: terminal/models/component/task.py:26
 #: xpack/plugins/gathered_user/models.py:68
 msgid "Task"
 msgstr "任务"
@@ -3085,7 +3095,7 @@ msgstr "组织管理"
 #: orgs/mixins/models.py:57 orgs/mixins/serializers.py:25 orgs/models.py:88
 #: rbac/const.py:7 rbac/models/rolebinding.py:48
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:62
-#: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:72
+#: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:61
 msgid "Organization"
 msgstr "组织"
 
@@ -3154,7 +3164,7 @@ msgstr "剪贴板复制"
 #: perms/models/asset_permission.py:66 perms/models/perm_token.py:18
 #: perms/serializers/permission.py:29 perms/serializers/permission.py:59
 #: tickets/models/ticket/apply_application.py:26
-#: tickets/models/ticket/apply_asset.py:17
+#: tickets/models/ticket/apply_asset.py:18
 msgid "Actions"
 msgstr "动作"
 
@@ -3239,7 +3249,7 @@ msgstr ""
 msgid "If you have any question, please contact the administrator"
 msgstr "如果有疑问或需求，请联系系统管理员"
 
-#: perms/utils/user_permission.py:622 rbac/tree.py:57
+#: perms/utils/user_permission.py:627 rbac/tree.py:57
 msgid "My assets"
 msgstr "我的资产"
 
@@ -5142,23 +5152,23 @@ msgstr "不匹配"
 msgid "Icon"
 msgstr "图标"
 
-#: terminal/serializers/applet_host.py:22
+#: terminal/serializers/applet_host.py:21
 msgid "Per Session"
 msgstr "按会话"
 
-#: terminal/serializers/applet_host.py:23
+#: terminal/serializers/applet_host.py:22
 msgid "Per Device"
 msgstr "按设备"
 
-#: terminal/serializers/applet_host.py:29
+#: terminal/serializers/applet_host.py:28
 msgid "RDS Licensing"
 msgstr "部署 RDS 许可服务"
 
-#: terminal/serializers/applet_host.py:30
+#: terminal/serializers/applet_host.py:29
 msgid "RDS License Server"
 msgstr "RDS 许可服务主机"
 
-#: terminal/serializers/applet_host.py:31
+#: terminal/serializers/applet_host.py:30
 msgid "RDS Licensing Mode"
 msgstr "RDS 许可模式"
 
@@ -5438,7 +5448,7 @@ msgid "Ticket session relation"
 msgstr "工单会话"
 
 #: tickets/models/ticket/apply_application.py:11
-#: tickets/models/ticket/apply_asset.py:12
+#: tickets/models/ticket/apply_asset.py:13
 msgid "Permission name"
 msgstr "授权规则名称"
 
@@ -5450,20 +5460,22 @@ msgstr "申请应用"
 msgid "Apply system users"
 msgstr "申请的系统用户"
 
-#: tickets/models/ticket/apply_asset.py:8
-#: tickets/serializers/ticket/apply_asset.py:15
+#: tickets/models/ticket/apply_asset.py:9
+#: tickets/serializers/ticket/apply_asset.py:14
 msgid "Select at least one asset or node"
 msgstr "资产或者节点至少选择一项"
 
-#: tickets/models/ticket/apply_asset.py:13
+#: tickets/models/ticket/apply_asset.py:14
+#: tickets/serializers/ticket/apply_asset.py:19
 msgid "Apply nodes"
 msgstr "申请节点"
 
-#: tickets/models/ticket/apply_asset.py:15
+#: tickets/models/ticket/apply_asset.py:16
+#: tickets/serializers/ticket/apply_asset.py:18
 msgid "Apply assets"
 msgstr "申请资产"
 
-#: tickets/models/ticket/apply_asset.py:16
+#: tickets/models/ticket/apply_asset.py:17
 msgid "Apply accounts"
 msgstr "申请账号"
 
@@ -5583,6 +5595,12 @@ msgstr "当前组织已存在该类型"
 msgid "Processor"
 msgstr "处理人"
 
+#: tickets/serializers/ticket/apply_asset.py:20
+#, fuzzy
+#| msgid "Apply applications"
+msgid "Apply actions"
+msgstr "申请应用"
+
 #: tickets/serializers/ticket/common.py:15
 #: tickets/serializers/ticket/common.py:77
 msgid "Created by ticket ({}-{})"
@@ -5596,15 +5614,7 @@ msgstr "过期时间要大于开始时间"
 msgid "Permission named `{}` already exists"
 msgstr "授权名称 `{}` 已存在"
 
-#: tickets/serializers/ticket/ticket.py:17
-msgid "Type display"
-msgstr "类型名称"
-
-#: tickets/serializers/ticket/ticket.py:18
-msgid "Status display"
-msgstr "状态名称"
-
-#: tickets/serializers/ticket/ticket.py:101
+#: tickets/serializers/ticket/ticket.py:85
 msgid "The ticket flow `{}` does not exist"
 msgstr "工单流程 `{}` 不存在"
 
@@ -6903,6 +6913,12 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Type display"
+#~ msgstr "类型名称"
+
+#~ msgid "Status display"
+#~ msgstr "状态名称"
 
 #~ msgid "Run ansible command"
 #~ msgstr "运行 ansible 命令"
