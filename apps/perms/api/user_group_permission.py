@@ -19,7 +19,6 @@ __all__ = [
     'UserGroupGrantedAssetsApi', 'UserGroupGrantedNodesApi',
     'UserGroupGrantedNodeAssetsApi',
     'UserGroupGrantedNodeChildrenAsTreeApi',
-    'UserGroupGrantedAssetAccountsApi',
 ]
 
 
@@ -191,17 +190,3 @@ class UserGroupGrantedNodeChildrenAsTreeApi(SerializeToTreeNodeMixin, ListAPIVie
         nodes = self.get_nodes()
         nodes = self.serialize_nodes(nodes)
         return Response(data=nodes)
-
-
-class UserGroupGrantedAssetAccountsApi(uapi.UserGrantedAssetAccountsApi):
-
-    @lazyproperty
-    def user_group(self):
-        group_id = self.kwargs.get('pk')
-        return UserGroup.objects.get(id=group_id)
-
-    def get_queryset(self):
-        accounts = PermAccountUtil().get_perm_accounts_for_user_group_asset(
-            self.user_group, self.asset, with_actions=True
-        )
-        return accounts

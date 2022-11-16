@@ -10,12 +10,12 @@ from .mixin import SelfOrPKUserMixin
 logger = get_logger(__name__)
 
 __all__ = [
-    'UserGrantedAssetAccountsApi',
+    'UserPermedAssetAccountsApi',
 ]
 
 
-class UserGrantedAssetAccountsApi(SelfOrPKUserMixin, ListAPIView):
-    serializer_class = serializers.AccountsGrantedSerializer
+class UserPermedAssetAccountsApi(SelfOrPKUserMixin, ListAPIView):
+    serializer_class = serializers.AccountsPermedSerializer
 
     @lazyproperty
     def asset(self):

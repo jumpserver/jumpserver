@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from common.db.fields import BitChoices
 from common.utils.integer import bit
 
-__all__ = ["SpecialAccount", "ActionChoices"]
+__all__ = ["ActionChoices"]
 
 
 class ActionChoices(BitChoices):
@@ -31,7 +31,3 @@ class ActionChoices(BitChoices):
     def has_perm(cls, action_name, total):
         action_value = getattr(cls, action_name)
         return action_value & total == action_value
-
-
-class SpecialAccount(models.TextChoices):
-    ALL = "@ALL", "All"

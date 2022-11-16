@@ -55,8 +55,9 @@ user_permission_urlpatterns = [
          name='my-ungrouped-assets'),
 
     # 获取授权给用户某个资产的所有账号
-    path('<str:user>/assets/<uuid:asset_id>/accounts/', api.UserGrantedAssetAccountsApi.as_view(),
-         name='user-asset-accounts'),
+    # user params: ['my', 'self'] or user.id
+    path('<str:user>/assets/<uuid:asset_id>/accounts/', api.UserPermedAssetAccountsApi.as_view(),
+         name='user-permed-asset-accounts'),
 ]
 
 user_group_permission_urlpatterns = [
@@ -68,10 +69,6 @@ user_group_permission_urlpatterns = [
          name='user-group-nodes-children-as-tree'),
     path('<uuid:pk>/nodes/<uuid:node_id>/assets/', api.UserGroupGrantedNodeAssetsApi.as_view(),
          name='user-group-node-assets'),
-
-    # 获取所有和资产-用户组关联的账号列表
-    path('<uuid:pk>/assets/<uuid:asset_id>/accounts/', api.UserGroupGrantedAssetAccountsApi.as_view(),
-         name='user-group-asset-accounts'),
 ]
 
 user_permission_urlpatterns = [
