@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-15 18:06+0800\n"
+"POT-Creation-Date: 2022-11-16 09:29+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -398,7 +398,7 @@ msgid "Host"
 msgstr "ホスト"
 
 #: applications/serializers/attrs/application_category/db.py:12
-#: applications/serializers/attrs/application_type/clickhouse.py:10
+#: applications/serializers/attrs/application_type/clickhouse.py:11
 #: applications/serializers/attrs/application_type/mongodb.py:10
 #: applications/serializers/attrs/application_type/mysql.py:10
 #: applications/serializers/attrs/application_type/mysql_workbench.py:22
@@ -469,6 +469,12 @@ msgstr "Chromeユーザー名"
 #: applications/serializers/attrs/application_type/chrome.py:33
 msgid "Chrome password"
 msgstr "Chromeパスワード"
+
+#: applications/serializers/attrs/application_type/clickhouse.py:13
+msgid ""
+"Typically, the port is 9000，the HTTP interface and the native interface use "
+"different ports"
+msgstr "デフォルトポートは9000で、HTTPインタフェースとネイティブインタフェースは異なるポートを使用する"
 
 #: applications/serializers/attrs/application_type/custom.py:12
 msgid "Operating parameter"
@@ -6100,19 +6106,19 @@ msgstr "あなたのメールを入力し、それはあなたにメールを送
 #: users/templates/users/forgot_password.html:35
 msgid ""
 "Enter your mobile number and a verification code will be sent to your phone"
-msgstr ""
+msgstr "携帯電話番号を入力すると、認証コードが携帯電話に送信されます"
 
 #: users/templates/users/forgot_password.html:57
 msgid "Email account"
-msgstr "アカウント"
+msgstr "メールアドレス"
 
 #: users/templates/users/forgot_password.html:61
 msgid "Mobile number"
-msgstr "シリアル番号"
+msgstr "携帯番号"
 
 #: users/templates/users/forgot_password.html:68
 msgid "Send"
-msgstr "ユーザーを送信"
+msgstr "送信"
 
 #: users/templates/users/forgot_password.html:72
 #: users/templates/users/forgot_password_previewing.html:30
