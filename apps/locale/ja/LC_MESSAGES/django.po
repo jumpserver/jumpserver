@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-14 17:07+0800\n"
+"POT-Creation-Date: 2022-11-16 20:24+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -398,7 +398,7 @@ msgid "Host"
 msgstr "ホスト"
 
 #: applications/serializers/attrs/application_category/db.py:12
-#: applications/serializers/attrs/application_type/clickhouse.py:10
+#: applications/serializers/attrs/application_type/clickhouse.py:11
 #: applications/serializers/attrs/application_type/mongodb.py:10
 #: applications/serializers/attrs/application_type/mysql.py:10
 #: applications/serializers/attrs/application_type/mysql_workbench.py:22
@@ -469,6 +469,14 @@ msgstr "Chromeユーザー名"
 #: applications/serializers/attrs/application_type/chrome.py:33
 msgid "Chrome password"
 msgstr "Chromeパスワード"
+
+#: applications/serializers/attrs/application_type/clickhouse.py:13
+msgid ""
+"Typically, the port is 9000，the HTTP interface and the native interface use "
+"different ports"
+msgstr ""
+"デフォルトポートは9000で、HTTPインタフェースとネイティブインタフェースは異な"
+"るポートを使用する"
 
 #: applications/serializers/attrs/application_type/custom.py:12
 msgid "Operating parameter"
@@ -1436,11 +1444,11 @@ msgstr "文章の内容が長すぎる。Elasticsearchで操作履歴を保存�
 msgid "Tips"
 msgstr "謎々"
 
-#: audits/handler.py:126
+#: audits/handler.py:134
 msgid "Yes"
 msgstr "是"
 
-#: audits/handler.py:126
+#: audits/handler.py:134
 msgid "No"
 msgstr "否"
 
@@ -1683,7 +1691,7 @@ msgstr "現在のユーザーはmfaタイプをサポートしていません: {
 msgid "User does not exist: {}"
 msgstr "ユーザーが存在しない: {}"
 
-#: authentication/api/password.py:31 users/views/profile/reset.py:122
+#: authentication/api/password.py:31 users/views/profile/reset.py:127
 msgid "No user matched"
 msgstr "ユーザーにマッチしなかった"
 
@@ -2020,7 +2028,7 @@ msgstr "メッセージ検証コードが無効"
 #: authentication/serializers/password_mfa.py:24
 #: settings/serializers/auth/sms.py:27 users/forms/profile.py:103
 #: users/forms/profile.py:106 users/templates/users/forgot_password.html:111
-#: users/views/profile/reset.py:74
+#: users/views/profile/reset.py:79
 msgid "SMS"
 msgstr "メッセージ"
 
@@ -2159,7 +2167,7 @@ msgstr "アセットまたはアプリが必要"
 #: settings/serializers/email.py:50 users/forms/profile.py:102
 #: users/forms/profile.py:106 users/models/user.py:675
 #: users/templates/users/forgot_password.html:116
-#: users/views/profile/reset.py:68
+#: users/views/profile/reset.py:73
 msgid "Email"
 msgstr "メール"
 
@@ -4007,7 +4015,7 @@ msgstr "ログインログは日数を保持します"
 
 #: settings/serializers/cleaning.py:12 settings/serializers/cleaning.py:16
 #: settings/serializers/cleaning.py:20 settings/serializers/cleaning.py:24
-#: settings/serializers/cleaning.py:28 settings/serializers/other.py:37
+#: settings/serializers/cleaning.py:28
 msgid "Unit: day"
 msgstr "単位: 日"
 
@@ -4184,19 +4192,31 @@ msgstr ""
 msgid "Ticket authorize default time"
 msgstr "デフォルト製造オーダ承認時間"
 
+#: settings/serializers/other.py:40
+msgid "day"
+msgstr "日"
+
+#: settings/serializers/other.py:40
+msgid "hour"
+msgstr "時"
+
 #: settings/serializers/other.py:41
+msgid "Ticket authorize default time unit"
+msgstr "デフォルト製造オーダ承認時間単位"
+
+#: settings/serializers/other.py:44
 msgid "Help Docs URL"
 msgstr "ドキュメントリンク"
 
-#: settings/serializers/other.py:42
+#: settings/serializers/other.py:45
 msgid "default: http://docs.jumpserver.org"
 msgstr "デフォルト: http://docs.jumpserver.org"
 
-#: settings/serializers/other.py:46
+#: settings/serializers/other.py:49
 msgid "Help Support URL"
 msgstr "サポートリンク"
 
-#: settings/serializers/other.py:47
+#: settings/serializers/other.py:50
 msgid "default: http://www.jumpserver.org/support/"
 msgstr "デフォルト: http://www.jumpserver.org/support/"
 
@@ -4520,7 +4540,9 @@ msgstr "デフォルトのグラフィック解像度"
 #: settings/serializers/terminal.py:52
 msgid ""
 "Tip: Default resolution to use when connecting graphical assets in Luna pages"
-msgstr "ヒント: Luna ページでグラフィック アセットを接続するときに使用するデフォルトの解像度"
+msgstr ""
+"ヒント: Luna ページでグラフィック アセットを接続するときに使用するデフォルト"
+"の解像度"
 
 #: settings/utils/ldap.py:467
 msgid "ldap:// or ldaps:// protocol is used."
@@ -5887,7 +5909,7 @@ msgstr "ユーザーパスワード履歴"
 msgid "Reset password"
 msgstr "パスワードのリセット"
 
-#: users/notifications.py:85 users/views/profile/reset.py:189
+#: users/notifications.py:85 users/views/profile/reset.py:194
 msgid "Reset password success"
 msgstr "パスワードのリセット成功"
 
@@ -6081,16 +6103,16 @@ msgstr "ここをクリックしてパスワードを設定してください"
 
 #: users/templates/users/forgot_password.html:32
 msgid "Input your email account, that will send a email to your"
-msgstr "電子メールアカウントを入力し、メールをメールアドレスに送信します"
+msgstr "あなたのメールを入力し、それはあなたにメールを送信します"
 
 #: users/templates/users/forgot_password.html:35
 msgid ""
 "Enter your mobile number and a verification code will be sent to your phone"
-msgstr "携帯電話番号を入力すると認証コードが送信されます"
+msgstr "携帯電話番号を入力すると、認証コードが携帯電話に送信されます"
 
 #: users/templates/users/forgot_password.html:57
 msgid "Email account"
-msgstr "メールアドレスアカウント"
+msgstr "メールアドレス"
 
 #: users/templates/users/forgot_password.html:61
 msgid "Mobile number"
@@ -6251,23 +6273,30 @@ msgstr "OTP無効化成功、ログインページを返す"
 msgid "Password invalid"
 msgstr "パスワード無効"
 
-#: users/views/profile/reset.py:144 users/views/profile/reset.py:155
+#: users/views/profile/reset.py:47
+msgid ""
+"Non-local users can log in only from third-party platforms and cannot change "
+"their passwords: {}"
+msgstr "ローカル以外のユーザーは、サードパーティ プラットフォームからのログインのみが許可され、"
+"パスワードの変更はサポートされていません: {}"
+
+#: users/views/profile/reset.py:149 users/views/profile/reset.py:160
 msgid "Token invalid or expired"
 msgstr "トークンが無効または期限切れ"
 
-#: users/views/profile/reset.py:160
+#: users/views/profile/reset.py:165
 msgid "User auth from {}, go there change password"
 msgstr "ユーザー認証ソース {}, 対応するシステムにパスワードを変更してください"
 
-#: users/views/profile/reset.py:167
+#: users/views/profile/reset.py:172
 msgid "* Your password does not meet the requirements"
 msgstr "* パスワードが要件を満たしていない"
 
-#: users/views/profile/reset.py:173
+#: users/views/profile/reset.py:178
 msgid "* The new password cannot be the last {} passwords"
 msgstr "* 新しいパスワードを最後の {} パスワードにすることはできません"
 
-#: users/views/profile/reset.py:190
+#: users/views/profile/reset.py:195
 msgid "Reset password success, return to login page"
 msgstr "パスワードの成功をリセットし、ログインページに戻る"
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-14 17:07+0800\n"
+"POT-Creation-Date: 2022-11-16 20:24+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -393,7 +393,7 @@ msgid "Host"
 msgstr "主机"
 
 #: applications/serializers/attrs/application_category/db.py:12
-#: applications/serializers/attrs/application_type/clickhouse.py:10
+#: applications/serializers/attrs/application_type/clickhouse.py:11
 #: applications/serializers/attrs/application_type/mongodb.py:10
 #: applications/serializers/attrs/application_type/mysql.py:10
 #: applications/serializers/attrs/application_type/mysql_workbench.py:22
@@ -464,6 +464,12 @@ msgstr "Chrome 用户名"
 #: applications/serializers/attrs/application_type/chrome.py:33
 msgid "Chrome password"
 msgstr "Chrome 密码"
+
+#: applications/serializers/attrs/application_type/clickhouse.py:13
+msgid ""
+"Typically, the port is 9000，the HTTP interface and the native interface use "
+"different ports"
+msgstr "默认端口为9000, HTTP接口和本机接口使用不同的端口"
 
 #: applications/serializers/attrs/application_type/custom.py:12
 msgid "Operating parameter"
@@ -1424,11 +1430,11 @@ msgstr "文字内容太长。请使用 Elasticsearch 存储操作日志"
 msgid "Tips"
 msgstr "提示"
 
-#: audits/handler.py:126
+#: audits/handler.py:134
 msgid "Yes"
 msgstr "是"
 
-#: audits/handler.py:126
+#: audits/handler.py:134
 msgid "No"
 msgstr "否"
 
@@ -1671,7 +1677,7 @@ msgstr "当前用户不支持 MFA 类型: {}"
 msgid "User does not exist: {}"
 msgstr "用户不存在: {}"
 
-#: authentication/api/password.py:31 users/views/profile/reset.py:122
+#: authentication/api/password.py:31 users/views/profile/reset.py:127
 msgid "No user matched"
 msgstr "没有匹配到用户"
 
@@ -1996,7 +2002,7 @@ msgstr "短信验证码校验失败"
 #: authentication/serializers/password_mfa.py:24
 #: settings/serializers/auth/sms.py:27 users/forms/profile.py:103
 #: users/forms/profile.py:106 users/templates/users/forgot_password.html:111
-#: users/views/profile/reset.py:74
+#: users/views/profile/reset.py:79
 msgid "SMS"
 msgstr "短信"
 
@@ -2131,7 +2137,7 @@ msgstr "资产或应用必填"
 #: settings/serializers/email.py:50 users/forms/profile.py:102
 #: users/forms/profile.py:106 users/models/user.py:675
 #: users/templates/users/forgot_password.html:116
-#: users/views/profile/reset.py:68
+#: users/views/profile/reset.py:73
 msgid "Email"
 msgstr "邮箱"
 
@@ -3959,7 +3965,7 @@ msgstr "登录日志"
 
 #: settings/serializers/cleaning.py:12 settings/serializers/cleaning.py:16
 #: settings/serializers/cleaning.py:20 settings/serializers/cleaning.py:24
-#: settings/serializers/cleaning.py:28 settings/serializers/other.py:37
+#: settings/serializers/cleaning.py:28
 msgid "Unit: day"
 msgstr "单位: 天"
 
@@ -4128,19 +4134,31 @@ msgstr ""
 msgid "Ticket authorize default time"
 msgstr "默认工单授权时间"
 
+#: settings/serializers/other.py:40
+msgid "day"
+msgstr "天"
+
+#: settings/serializers/other.py:40
+msgid "hour"
+msgstr "时"
+
 #: settings/serializers/other.py:41
+msgid "Ticket authorize default time unit"
+msgstr "默认工单授权时间单位"
+
+#: settings/serializers/other.py:44
 msgid "Help Docs URL"
 msgstr "文档链接"
 
-#: settings/serializers/other.py:42
+#: settings/serializers/other.py:45
 msgid "default: http://docs.jumpserver.org"
 msgstr "默认: http://dev.jumpserver.org:8080"
 
-#: settings/serializers/other.py:46
+#: settings/serializers/other.py:49
 msgid "Help Support URL"
 msgstr "支持链接"
 
-#: settings/serializers/other.py:47
+#: settings/serializers/other.py:50
 msgid "default: http://www.jumpserver.org/support/"
 msgstr "默认: http://www.jumpserver.org/support/"
 
@@ -5796,7 +5814,7 @@ msgstr "用户密码历史"
 msgid "Reset password"
 msgstr "重置密码"
 
-#: users/notifications.py:85 users/views/profile/reset.py:189
+#: users/notifications.py:85 users/views/profile/reset.py:194
 msgid "Reset password success"
 msgstr "重置密码成功"
 
@@ -5988,7 +6006,7 @@ msgstr "点击这里设置密码"
 
 #: users/templates/users/forgot_password.html:32
 msgid "Input your email account, that will send a email to your"
-msgstr "输入您的邮箱账号, 将会发一封重置邮件到您的邮箱中"
+msgstr "输入您的邮箱, 将会发一封重置邮件到您的邮箱中"
 
 #: users/templates/users/forgot_password.html:35
 msgid ""
@@ -6150,23 +6168,29 @@ msgstr "MFA(OTP) 禁用成功，返回登录页面"
 msgid "Password invalid"
 msgstr "用户名或密码无效"
 
-#: users/views/profile/reset.py:144 users/views/profile/reset.py:155
+#: users/views/profile/reset.py:47
+msgid ""
+"Non-local users can log in only from third-party platforms and cannot change "
+"their passwords: {}"
+msgstr "非本地用户仅允许从第三方平台登录，不支持修改密码: {}"
+
+#: users/views/profile/reset.py:149 users/views/profile/reset.py:160
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
-#: users/views/profile/reset.py:160
+#: users/views/profile/reset.py:165
 msgid "User auth from {}, go there change password"
 msgstr "用户认证源来自 {}, 请去相应系统修改密码"
 
-#: users/views/profile/reset.py:167
+#: users/views/profile/reset.py:172
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
-#: users/views/profile/reset.py:173
+#: users/views/profile/reset.py:178
 msgid "* The new password cannot be the last {} passwords"
 msgstr "* 新密码不能是最近 {} 次的密码"
 
-#: users/views/profile/reset.py:190
+#: users/views/profile/reset.py:195
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
