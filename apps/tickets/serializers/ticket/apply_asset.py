@@ -22,18 +22,14 @@ class ApplyAssetSerializer(BaseApplyAssetSerializer, TicketApplySerializer):
 
     class Meta(TicketApplySerializer.Meta):
         model = ApplyAssetTicket
-        fields_mini = ['id', 'title']
         writeable_fields = [
-            'id', 'title', 'apply_nodes', 'apply_assets',
-            'apply_accounts', 'apply_actions', 'org_id', 'comment',
-            'apply_date_start', 'apply_date_expired'
+            'apply_nodes', 'apply_assets', 'apply_accounts',
+            'apply_actions', 'apply_date_start', 'apply_date_expired'
         ]
-        fields = TicketApplySerializer.Meta.fields + writeable_fields + ['apply_permission_name', ]
-        read_only_fields = list(set(fields) - set(writeable_fields))
+        read_only_fields = TicketApplySerializer.Meta.read_only_fields + ['apply_permission_name', ]
+        fields = TicketApplySerializer.Meta.fields_small + writeable_fields + read_only_fields
         ticket_extra_kwargs = TicketApplySerializer.Meta.extra_kwargs
         extra_kwargs = {
-            'apply_nodes': {'required': False},
-            'apply_assets': {'required': False},
             'apply_accounts': {'required': False},
         }
         extra_kwargs.update(ticket_extra_kwargs)
