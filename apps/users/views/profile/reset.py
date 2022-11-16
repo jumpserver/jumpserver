@@ -43,6 +43,11 @@ class UserForgotPasswordPreviewingView(FormView):
         if not user:
             form.add_error('username', _('User does not exist: {}').format(username))
             return super().form_invalid(form)
+        if settings.ONLY_ALLOW_AUTH_FROM_SOURCE and not user.is_local:
+            error = _('Non-local users can log in only from third-party platforms '
+                      'and cannot change their passwords: {}').format(username)
+            form.add_error('username', error)
+            return super().form_invalid(form)
 
         token = random_string(36)
         user_map = {'username': user.username, 'phone': user.phone, 'email': user.email}
