@@ -43,8 +43,7 @@ def expire_orgs_mapping_for_memory(org_id):
     orgs_mapping_for_memory_pub_sub.publish(str(org_id))
 
 
-@receiver(django_ready)
-def subscribe_orgs_mapping_expire(sender, **kwargs):
+def subscribe_orgs_mapping_expire(**kwargs):
     logger.debug("Start subscribe for expire orgs mapping from memory")
 
     def keep_subscribe_org_mapping():
@@ -55,6 +54,7 @@ def subscribe_orgs_mapping_expire(sender, **kwargs):
     t = threading.Thread(target=keep_subscribe_org_mapping)
     t.daemon = True
     t.start()
+    return t
 
 
 # 创建对应的root

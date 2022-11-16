@@ -77,8 +77,7 @@ def on_create_set_created_by(sender, instance=None, **kwargs):
         instance.created_by = user_name
 
 
-@receiver(django_ready)
-def subscribe_settings_change(sender, **kwargs):
+def subscribe_settings_change(**kwargs):
     logger.debug("Start subscribe setting change")
 
     def keep_subscribe_settings_change():
@@ -87,6 +86,7 @@ def subscribe_settings_change(sender, **kwargs):
     t = threading.Thread(target=keep_subscribe_settings_change)
     t.daemon = True
     t.start()
+    return t
 
 
 @receiver(django_ready)

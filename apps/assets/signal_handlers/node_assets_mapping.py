@@ -69,8 +69,7 @@ def on_node_asset_change(sender, instance, **kwargs):
     expire_node_assets_mapping_for_memory(instance.org_id)
 
 
-@receiver(django_ready)
-def subscribe_node_assets_mapping_expire(sender, **kwargs):
+def subscribe_node_assets_mapping_expire(**kwargs):
     logger.debug("Start subscribe for expire node assets id mapping from memory")
 
     def handle_node_relation_change(org_id):
@@ -84,3 +83,4 @@ def subscribe_node_assets_mapping_expire(sender, **kwargs):
     t = threading.Thread(target=keep_subscribe_node_assets_relation)
     t.daemon = True
     t.start()
+    return t
