@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListAPIView, get_object_or_404
 
-from common.utils import get_logger
+from common.utils import get_logger, lazyproperty
 from perms import serializers
 from perms.hands import Asset
 from perms.utils import PermAccountUtil
@@ -10,14 +10,14 @@ from .mixin import SelfOrPKUserMixin
 logger = get_logger(__name__)
 
 __all__ = [
-    'UserGrantedAssetAccountsApi',
+    'UserPermedAssetAccountsApi',
 ]
 
 
-class UserGrantedAssetAccountsApi(SelfOrPKUserMixin, ListAPIView):
-    serializer_class = serializers.AccountsGrantedSerializer
+class UserPermedAssetAccountsApi(SelfOrPKUserMixin, ListAPIView):
+    serializer_class = serializers.AccountsPermedSerializer
 
-    @property
+    @lazyproperty
     def asset(self):
         asset_id = self.kwargs.get('asset_id')
         kwargs = {'id': asset_id, 'is_active': True}

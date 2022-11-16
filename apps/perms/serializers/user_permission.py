@@ -11,7 +11,7 @@ from perms.serializers.permission import ActionChoicesField
 
 __all__ = [
     'NodeGrantedSerializer', 'AssetGrantedSerializer',
-    'ActionsSerializer', 'AccountsGrantedSerializer'
+    'ActionsSerializer', 'AccountsPermedSerializer'
 ]
 
 
@@ -48,7 +48,7 @@ class ActionsSerializer(serializers.Serializer):
     actions = ActionChoicesField(read_only=True)
 
 
-class AccountsGrantedSerializer(serializers.ModelSerializer):
+class AccountsPermedSerializer(serializers.ModelSerializer):
     actions = ActionChoicesField(read_only=True)
 
     class Meta:

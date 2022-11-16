@@ -11,7 +11,7 @@ from common.db.models import UnionQuerySet
 from common.utils import date_expired_default
 from orgs.mixins.models import OrgManager
 from orgs.mixins.models import OrgModelMixin
-from perms.const import ActionChoices, SpecialAccount
+from perms.const import ActionChoices
 
 __all__ = ['AssetPermission', 'ActionChoices']
 
@@ -37,7 +37,7 @@ class AssetPermissionQuerySet(models.QuerySet):
 
     def filter_by_accounts(self, accounts):
         q = Q(accounts__contains=list(accounts)) | \
-            Q(accounts__contains=SpecialAccount.ALL.value)
+            Q(accounts__contains=Account.AliasAccount.ALL.value)
         return self.filter(q)
 
 
@@ -127,7 +127,7 @@ class AssetPermission(OrgModelMixin):
         """
         asset_ids = self.get_all_assets(flat=True)
         q = Q(asset_id__in=asset_ids)
-        if SpecialAccount.ALL in self.accounts:
+        if Account.AliasAccount.ALL in self.accounts:
             q &= Q(username__in=self.accounts)
         accounts = Account.objects.filter(q).order_by('asset__name', 'name', 'username')
         if not flat:
