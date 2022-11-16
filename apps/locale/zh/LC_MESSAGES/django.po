@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-16 09:32+0800\n"
+"POT-Creation-Date: 2022-11-16 20:24+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1677,7 +1677,7 @@ msgstr "当前用户不支持 MFA 类型: {}"
 msgid "User does not exist: {}"
 msgstr "用户不存在: {}"
 
-#: authentication/api/password.py:31 users/views/profile/reset.py:122
+#: authentication/api/password.py:31 users/views/profile/reset.py:127
 msgid "No user matched"
 msgstr "没有匹配到用户"
 
@@ -2002,7 +2002,7 @@ msgstr "短信验证码校验失败"
 #: authentication/serializers/password_mfa.py:24
 #: settings/serializers/auth/sms.py:27 users/forms/profile.py:103
 #: users/forms/profile.py:106 users/templates/users/forgot_password.html:111
-#: users/views/profile/reset.py:74
+#: users/views/profile/reset.py:79
 msgid "SMS"
 msgstr "短信"
 
@@ -2137,7 +2137,7 @@ msgstr "资产或应用必填"
 #: settings/serializers/email.py:50 users/forms/profile.py:102
 #: users/forms/profile.py:106 users/models/user.py:675
 #: users/templates/users/forgot_password.html:116
-#: users/views/profile/reset.py:68
+#: users/views/profile/reset.py:73
 msgid "Email"
 msgstr "邮箱"
 
@@ -4652,13 +4652,13 @@ msgstr "过期。"
 #, python-format
 msgid ""
 "\n"
-"                Your password has expired, please click <a "
-"href=\"%(user_password_update_url)s\"> this link </a> update password.\n"
+"                Your password has expired, please click <a href="
+"\"%(user_password_update_url)s\"> this link </a> update password.\n"
 "            "
 msgstr ""
 "\n"
-"                您的密码已经过期，请点击 <a "
-"href=\"%(user_password_update_url)s\"> 链接 </a> 更新密码\n"
+"                您的密码已经过期，请点击 <a href="
+"\"%(user_password_update_url)s\"> 链接 </a> 更新密码\n"
 "        "
 
 #: templates/_message.html:30
@@ -4682,8 +4682,8 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"        Your information was incomplete. Please click <a "
-"href=\"%(first_login_url)s\"> this link </a>to complete your information.\n"
+"        Your information was incomplete. Please click <a href="
+"\"%(first_login_url)s\"> this link </a>to complete your information.\n"
 "        "
 msgstr ""
 "\n"
@@ -4695,13 +4695,13 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"        Your ssh public key not set or expired. Please click <a "
-"href=\"%(user_pubkey_update)s\"> this link </a>to update\n"
+"        Your ssh public key not set or expired. Please click <a href="
+"\"%(user_pubkey_update)s\"> this link </a>to update\n"
 "        "
 msgstr ""
 "\n"
-"                您的SSH密钥没有设置或已失效，请点击 <a "
-"href=\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
+"                您的SSH密钥没有设置或已失效，请点击 <a href="
+"\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
 "        "
 
 #: templates/_mfa_login_field.html:28
@@ -5814,7 +5814,7 @@ msgstr "用户密码历史"
 msgid "Reset password"
 msgstr "重置密码"
 
-#: users/notifications.py:85 users/views/profile/reset.py:189
+#: users/notifications.py:85 users/views/profile/reset.py:194
 msgid "Reset password success"
 msgstr "重置密码成功"
 
@@ -6168,23 +6168,29 @@ msgstr "MFA(OTP) 禁用成功，返回登录页面"
 msgid "Password invalid"
 msgstr "用户名或密码无效"
 
-#: users/views/profile/reset.py:144 users/views/profile/reset.py:155
+#: users/views/profile/reset.py:47
+msgid ""
+"Non-local users can log in only from third-party platforms and cannot change "
+"their passwords: {}"
+msgstr "非本地用户仅允许从第三方平台登录，不支持修改密码: {}"
+
+#: users/views/profile/reset.py:149 users/views/profile/reset.py:160
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
-#: users/views/profile/reset.py:160
+#: users/views/profile/reset.py:165
 msgid "User auth from {}, go there change password"
 msgstr "用户认证源来自 {}, 请去相应系统修改密码"
 
-#: users/views/profile/reset.py:167
+#: users/views/profile/reset.py:172
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
-#: users/views/profile/reset.py:173
+#: users/views/profile/reset.py:178
 msgid "* The new password cannot be the last {} passwords"
 msgstr "* 新密码不能是最近 {} 次的密码"
 
-#: users/views/profile/reset.py:190
+#: users/views/profile/reset.py:195
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 

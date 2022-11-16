@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-16 09:29+0800\n"
+"POT-Creation-Date: 2022-11-16 20:24+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -474,7 +474,9 @@ msgstr "Chromeパスワード"
 msgid ""
 "Typically, the port is 9000，the HTTP interface and the native interface use "
 "different ports"
-msgstr "デフォルトポートは9000で、HTTPインタフェースとネイティブインタフェースは異なるポートを使用する"
+msgstr ""
+"デフォルトポートは9000で、HTTPインタフェースとネイティブインタフェースは異な"
+"るポートを使用する"
 
 #: applications/serializers/attrs/application_type/custom.py:12
 msgid "Operating parameter"
@@ -1689,7 +1691,7 @@ msgstr "現在のユーザーはmfaタイプをサポートしていません: {
 msgid "User does not exist: {}"
 msgstr "ユーザーが存在しない: {}"
 
-#: authentication/api/password.py:31 users/views/profile/reset.py:122
+#: authentication/api/password.py:31 users/views/profile/reset.py:127
 msgid "No user matched"
 msgstr "ユーザーにマッチしなかった"
 
@@ -2026,7 +2028,7 @@ msgstr "メッセージ検証コードが無効"
 #: authentication/serializers/password_mfa.py:24
 #: settings/serializers/auth/sms.py:27 users/forms/profile.py:103
 #: users/forms/profile.py:106 users/templates/users/forgot_password.html:111
-#: users/views/profile/reset.py:74
+#: users/views/profile/reset.py:79
 msgid "SMS"
 msgstr "メッセージ"
 
@@ -2165,7 +2167,7 @@ msgstr "アセットまたはアプリが必要"
 #: settings/serializers/email.py:50 users/forms/profile.py:102
 #: users/forms/profile.py:106 users/models/user.py:675
 #: users/templates/users/forgot_password.html:116
-#: users/views/profile/reset.py:68
+#: users/views/profile/reset.py:73
 msgid "Email"
 msgstr "メール"
 
@@ -4729,8 +4731,8 @@ msgstr "期限切れです。"
 #, python-format
 msgid ""
 "\n"
-"                Your password has expired, please click <a "
-"href=\"%(user_password_update_url)s\"> this link </a> update password.\n"
+"                Your password has expired, please click <a href="
+"\"%(user_password_update_url)s\"> this link </a> update password.\n"
 "            "
 msgstr ""
 "\n"
@@ -4751,34 +4753,34 @@ msgid ""
 "            "
 msgstr ""
 "\n"
-"                クリックしてください <a "
-"href=\"%(user_password_update_url)s\"> リンク </a> パスワードの更新\n"
+"                クリックしてください <a href=\"%(user_password_update_url)s"
+"\"> リンク </a> パスワードの更新\n"
 "        "
 
 #: templates/_message.html:43
 #, python-format
 msgid ""
 "\n"
-"        Your information was incomplete. Please click <a "
-"href=\"%(first_login_url)s\"> this link </a>to complete your information.\n"
+"        Your information was incomplete. Please click <a href="
+"\"%(first_login_url)s\"> this link </a>to complete your information.\n"
 "        "
 msgstr ""
 "\n"
-"                あなたの情報が不完全なので、クリックしてください。 <a "
-"href=\"%(first_login_url)s\"> リンク </a> 補完\n"
+"                あなたの情報が不完全なので、クリックしてください。 <a href="
+"\"%(first_login_url)s\"> リンク </a> 補完\n"
 "                "
 
 #: templates/_message.html:56
 #, python-format
 msgid ""
 "\n"
-"        Your ssh public key not set or expired. Please click <a "
-"href=\"%(user_pubkey_update)s\"> this link </a>to update\n"
+"        Your ssh public key not set or expired. Please click <a href="
+"\"%(user_pubkey_update)s\"> this link </a>to update\n"
 "        "
 msgstr ""
 "\n"
-"                SSHキーが設定されていないか無効になっている場合は、 <a "
-"href=\"%(user_pubkey_update)s\"> リンク </a> 更新\n"
+"                SSHキーが設定されていないか無効になっている場合は、 <a href="
+"\"%(user_pubkey_update)s\"> リンク </a> 更新\n"
 "        "
 
 #: templates/_mfa_login_field.html:28
@@ -5907,7 +5909,7 @@ msgstr "ユーザーパスワード履歴"
 msgid "Reset password"
 msgstr "パスワードのリセット"
 
-#: users/notifications.py:85 users/views/profile/reset.py:189
+#: users/notifications.py:85 users/views/profile/reset.py:194
 msgid "Reset password success"
 msgstr "パスワードのリセット成功"
 
@@ -6271,23 +6273,30 @@ msgstr "OTP無効化成功、ログインページを返す"
 msgid "Password invalid"
 msgstr "パスワード無効"
 
-#: users/views/profile/reset.py:144 users/views/profile/reset.py:155
+#: users/views/profile/reset.py:47
+msgid ""
+"Non-local users can log in only from third-party platforms and cannot change "
+"their passwords: {}"
+msgstr "ローカル以外のユーザーは、サードパーティ プラットフォームからのログインのみが許可され、"
+"パスワードの変更はサポートされていません: {}"
+
+#: users/views/profile/reset.py:149 users/views/profile/reset.py:160
 msgid "Token invalid or expired"
 msgstr "トークンが無効または期限切れ"
 
-#: users/views/profile/reset.py:160
+#: users/views/profile/reset.py:165
 msgid "User auth from {}, go there change password"
 msgstr "ユーザー認証ソース {}, 対応するシステムにパスワードを変更してください"
 
-#: users/views/profile/reset.py:167
+#: users/views/profile/reset.py:172
 msgid "* Your password does not meet the requirements"
 msgstr "* パスワードが要件を満たしていない"
 
-#: users/views/profile/reset.py:173
+#: users/views/profile/reset.py:178
 msgid "* The new password cannot be the last {} passwords"
 msgstr "* 新しいパスワードを最後の {} パスワードにすることはできません"
 
-#: users/views/profile/reset.py:190
+#: users/views/profile/reset.py:195
 msgid "Reset password success, return to login page"
 msgstr "パスワードの成功をリセットし、ログインページに戻る"
 
