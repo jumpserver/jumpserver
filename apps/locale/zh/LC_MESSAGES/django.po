@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-15 20:31+0800\n"
+"POT-Creation-Date: 2022-11-16 20:11+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -29,7 +29,7 @@ msgstr "访问控制"
 #: assets/models/label.py:17 assets/models/platform.py:21
 #: assets/models/platform.py:72 assets/serializers/asset/common.py:86
 #: assets/serializers/platform.py:138 ops/mixin.py:20 ops/models/adhoc.py:24
-#: ops/models/celery.py:15 ops/models/job.py:33 ops/models/playbook.py:13
+#: ops/models/celery.py:15 ops/models/job.py:34 ops/models/playbook.py:13
 #: orgs/models.py:70 perms/models/asset_permission.py:51 rbac/models/role.py:29
 #: settings/models.py:33 settings/serializers/sms.py:6
 #: terminal/models/applet/applet.py:20 terminal/models/component/endpoint.py:11
@@ -97,9 +97,10 @@ msgstr "登录复核"
 #: acls/serializers/login_acl.py:21 assets/models/cmd_filter.py:28
 #: assets/models/label.py:15 audits/models.py:29 audits/models.py:48
 #: audits/models.py:79 authentication/models/connection_token.py:22
-#: authentication/models/sso_token.py:15 perms/models/asset_permission.py:53
-#: perms/models/perm_token.py:12 rbac/builtin.py:120
-#: rbac/models/rolebinding.py:41 terminal/backends/command/models.py:20
+#: authentication/models/sso_token.py:15 perms/api/user_permission/mixin.py:80
+#: perms/models/asset_permission.py:53 perms/models/perm_token.py:12
+#: rbac/builtin.py:120 rbac/models/rolebinding.py:41
+#: terminal/backends/command/models.py:20
 #: terminal/backends/command/serializers.py:13
 #: terminal/models/session/session.py:30 terminal/models/session/sharing.py:33
 #: terminal/notifications.py:91 terminal/notifications.py:139
@@ -245,7 +246,7 @@ msgstr "应用管理"
 #: applications/models.py:12 assets/models/label.py:20
 #: assets/models/platform.py:73 assets/serializers/asset/common.py:62
 #: assets/serializers/cagegory.py:8 assets/serializers/platform.py:99
-#: assets/serializers/platform.py:139 perms/serializers/user_permission.py:24
+#: assets/serializers/platform.py:139 perms/serializers/user_permission.py:23
 #: tickets/models/ticket/apply_application.py:14
 #: xpack/plugins/change_auth_plan/models/app.py:24
 msgid "Category"
@@ -255,8 +256,8 @@ msgstr "类别"
 #: assets/models/automations/base.py:20 assets/models/cmd_filter.py:74
 #: assets/models/platform.py:74 assets/serializers/asset/common.py:63
 #: assets/serializers/automations/base.py:40 assets/serializers/platform.py:98
-#: audits/serializers.py:40 ops/models/job.py:39
-#: perms/serializers/user_permission.py:25 terminal/models/applet/applet.py:24
+#: audits/serializers.py:40 ops/models/job.py:42
+#: perms/serializers/user_permission.py:24 terminal/models/applet/applet.py:24
 #: terminal/models/component/storage.py:57
 #: terminal/models/component/storage.py:142 terminal/serializers/applet.py:33
 #: tickets/models/comment.py:26 tickets/models/flow.py:57
@@ -492,7 +493,7 @@ msgstr "SSH 公钥"
 #: assets/models/_user.py:41 assets/models/automations/base.py:92
 #: assets/models/domain.py:26 assets/models/gathered_user.py:19
 #: assets/models/group.py:22 common/db/models.py:76 common/mixins/models.py:50
-#: ops/models/base.py:54 ops/models/job.py:62 orgs/models.py:73
+#: ops/models/base.py:54 ops/models/job.py:69 orgs/models.py:73
 #: perms/models/asset_permission.py:75 users/models/group.py:18
 #: users/models/user.py:927
 msgid "Date created"
@@ -531,7 +532,7 @@ msgstr "自动推送"
 msgid "Sudo"
 msgstr "Sudo"
 
-#: assets/models/_user.py:51 ops/models/adhoc.py:20 ops/models/job.py:29
+#: assets/models/_user.py:51 ops/models/adhoc.py:20 ops/models/job.py:30
 msgid "Shell"
 msgstr "Shell"
 
@@ -719,7 +720,7 @@ msgstr "账号管理"
 
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20 assets/serializers/domain.py:29
-#: ops/models/base.py:17 ops/models/job.py:41
+#: ops/models/base.py:17 ops/models/job.py:44
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 #: xpack/plugins/change_auth_plan/models/asset.py:40
 msgid "Assets"
@@ -730,7 +731,7 @@ msgid "Automation task"
 msgstr "自动化任务"
 
 #: assets/models/automations/base.py:91 audits/models.py:115
-#: audits/serializers.py:41 ops/models/base.py:49 ops/models/job.py:57
+#: audits/serializers.py:41 ops/models/base.py:49 ops/models/job.py:64
 #: terminal/models/applet/applet.py:60 terminal/models/applet/host.py:104
 #: terminal/models/component/status.py:27 terminal/serializers/applet.py:22
 #: tickets/models/ticket/general.py:281 tickets/serializers/ticket/ticket.py:19
@@ -740,7 +741,7 @@ msgstr "状态"
 
 #: assets/models/automations/base.py:93 assets/models/backup.py:76
 #: audits/models.py:40 ops/models/base.py:55 ops/models/celery.py:59
-#: ops/models/job.py:63 perms/models/asset_permission.py:69
+#: ops/models/job.py:70 perms/models/asset_permission.py:69
 #: terminal/models/applet/host.py:105 terminal/models/session/session.py:43
 #: tickets/models/ticket/apply_application.py:28
 #: tickets/models/ticket/apply_asset.py:19
@@ -752,7 +753,7 @@ msgstr "开始日期"
 
 #: assets/models/automations/base.py:94
 #: assets/models/automations/change_secret.py:59 ops/models/base.py:56
-#: ops/models/celery.py:60 ops/models/job.py:64
+#: ops/models/celery.py:60 ops/models/job.py:71
 #: terminal/models/applet/host.py:106
 msgid "Date finished"
 msgstr "结束日期"
@@ -1226,7 +1227,7 @@ msgid "Currently only mail sending is supported"
 msgstr "当前只支持邮件发送"
 
 #: assets/serializers/asset/common.py:68 assets/serializers/platform.py:101
-#: xpack/plugins/cloud/models.py:109
+#: perms/serializers/user_permission.py:22 xpack/plugins/cloud/models.py:109
 msgid "Protocols"
 msgstr "协议组"
 
@@ -2898,7 +2899,7 @@ msgstr "输入在 {} - {} 范围之间"
 msgid "Require periodic or regularly perform setting"
 msgstr "需要周期或定期设置"
 
-#: ops/models/adhoc.py:21 ops/models/job.py:30
+#: ops/models/adhoc.py:21 ops/models/job.py:31
 #, fuzzy
 #| msgid "PowerShell"
 msgid "Powershell"
@@ -2908,22 +2909,22 @@ msgstr "PowerShell"
 msgid "Pattern"
 msgstr "模式"
 
-#: ops/models/adhoc.py:27 ops/models/job.py:37
+#: ops/models/adhoc.py:27 ops/models/job.py:38
 msgid "Module"
 msgstr ""
 
-#: ops/models/adhoc.py:28 ops/models/celery.py:54 ops/models/job.py:35
+#: ops/models/adhoc.py:28 ops/models/celery.py:54 ops/models/job.py:36
 #: terminal/models/component/task.py:17
 msgid "Args"
 msgstr "参数"
 
 #: ops/models/adhoc.py:29 ops/models/base.py:16 ops/models/base.py:53
-#: ops/models/job.py:40 ops/models/job.py:61
+#: ops/models/job.py:43 ops/models/job.py:68
 #: terminal/models/session/sharing.py:24
 msgid "Creator"
 msgstr "创建者"
 
-#: ops/models/adhoc.py:50 ops/models/job.py:20
+#: ops/models/adhoc.py:50 ops/models/job.py:21
 msgid "Adhoc"
 msgstr ""
 
@@ -2943,11 +2944,11 @@ msgstr "最后执行"
 msgid "Date last run"
 msgstr "最后执行日期"
 
-#: ops/models/base.py:51 ops/models/job.py:59 xpack/plugins/cloud/models.py:169
+#: ops/models/base.py:51 ops/models/job.py:66 xpack/plugins/cloud/models.py:169
 msgid "Result"
 msgstr "结果"
 
-#: ops/models/base.py:52 ops/models/job.py:60
+#: ops/models/base.py:52 ops/models/job.py:67
 msgid "Summary"
 msgstr "汇总"
 
@@ -2970,35 +2971,49 @@ msgstr "结束"
 msgid "Date published"
 msgstr "发布日期"
 
-#: ops/models/job.py:21 ops/models/job.py:38
+#: ops/models/job.py:22 ops/models/job.py:41
 msgid "Playbook"
 msgstr "Playbook"
 
-#: ops/models/job.py:24
+#: ops/models/job.py:25
 #, fuzzy
 #| msgid "Privileged"
 msgid "Privileged Only"
 msgstr "特权账号"
 
-#: ops/models/job.py:25
+#: ops/models/job.py:26
 #, fuzzy
 #| msgid "Privileged"
 msgid "Privileged First"
 msgstr "特权账号"
 
-#: ops/models/job.py:26
+#: ops/models/job.py:27
 msgid "Skip"
 msgstr ""
 
-#: ops/models/job.py:42
+#: ops/models/job.py:39
+msgid "Chdir"
+msgstr "执行路径"
+
+#: ops/models/job.py:40
+msgid "Timeout (Seconds)"
+msgstr "超时时间（秒）"
+
+#: ops/models/job.py:45
 msgid "Runas"
 msgstr ""
 
-#: ops/models/job.py:44
+#: ops/models/job.py:47
 #, fuzzy
 #| msgid "Account policy"
 msgid "Runas policy"
 msgstr "账号策略"
+
+#: ops/models/job.py:48
+#, fuzzy
+#| msgid "Disable"
+msgid "Variables"
+msgstr "禁用"
 
 #: ops/models/playbook.py:15
 msgid "Owner"
@@ -3151,11 +3166,11 @@ msgstr "复制链接"
 msgid "Paste"
 msgstr ""
 
-#: perms/const.py:26
+#: perms/const.py:27
 msgid "Transfer"
 msgstr ""
 
-#: perms/const.py:27
+#: perms/const.py:28
 #, fuzzy
 #| msgid "Clipboard copy"
 msgid "Clipboard"

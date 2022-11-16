@@ -14,6 +14,10 @@ class JobSerializer(serializers.ModelSerializer):
         model = Job
         fields = [
             "id", "name", "instant", "type", "module", "args", "playbook", "assets", "runas_policy", "runas", "owner",
+            "variables",
+            "timeout",
+            "chdir",
+            "comment",
             "date_created",
             "date_updated"
         ]

@@ -5,6 +5,7 @@ class DefaultCallback:
     STATUS_MAPPER = {
         'successful': 'success',
         'failure': 'failed',
+        'failed': 'failed',
         'running': 'running',
         'pending': 'pending',
         'unknown': 'unknown'

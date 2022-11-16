@@ -1,3 +1,4 @@
+import json
 import os
 import uuid
 import logging
@@ -35,6 +36,8 @@ class Job(BaseCreateUpdateModel):
     args = models.CharField(max_length=1024, default='', verbose_name=_('Args'), null=True, blank=True)
     module = models.CharField(max_length=128, choices=Modules.choices, default=Modules.shell,
                               verbose_name=_('Module'), null=True)
+    chdir = models.CharField(default="", max_length=1024, verbose_name=_('Chdir'), null=True, blank=True)
+    timeout = models.IntegerField(default=60, verbose_name=_('Timeout (Seconds)'))
     playbook = models.ForeignKey('ops.Playbook', verbose_name=_("Playbook"), null=True, on_delete=models.SET_NULL)
     type = models.CharField(max_length=128, choices=Types.choices, default=Types.adhoc, verbose_name=_("Type"))
     owner = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
@@ -42,6 +45,8 @@ class Job(BaseCreateUpdateModel):
     runas = models.CharField(max_length=128, default='root', verbose_name=_('Runas'))
     runas_policy = models.CharField(max_length=128, choices=RunasPolicies.choices, default=RunasPolicies.skip,
                                     verbose_name=_('Runas policy'))
+    variables = models.JSONField(default=dict, verbose_name=_('Variables'))
+    comment = models.CharField(max_length=1024, default='', verbose_name=_('Comment'), null=True, blank=True)
 
     @property
     def inventory(self):
@@ -49,6 +54,9 @@ class Job(BaseCreateUpdateModel):
 
     def create_execution(self):
         return self.executions.create()
+
+    def get_variables(self):
+        return json.loads(self.variables)
 
 
 class JobExecution(BaseCreateUpdateModel):
@@ -70,7 +78,7 @@ class JobExecution(BaseCreateUpdateModel):
         if self.job.type == 'adhoc':
             runner = AdHocRunner(
                 self.inventory_path, self.job.module, module_args=self.job.args,
-                pattern="all", project_dir=self.private_dir
+                pattern="all", project_dir=self.private_dir, extra_vars=self.job.get_variables()
             )
         elif self.job.type == 'playbook':
             runner = PlaybookRunner(
