@@ -3,7 +3,6 @@ import time
 import socket
 import threading
 from django.conf import settings
-from django.db.utils import OperationalError
 
 from common.db.utils import close_old_connections
 from common.decorator import Singleton
@@ -45,23 +44,23 @@ class BaseTerminal(object):
 
     def start_heartbeat(self):
         while True:
-            heartbeat_data = {
-                'cpu_load': get_cpu_load(),
-                'memory_used': get_memory_usage(),
-                'disk_used': get_disk_usage(path=settings.BASE_DIR),
-                'sessions': [],
-            }
-            status_serializer = StatusSerializer(data=heartbeat_data)
-            status_serializer.is_valid()
-            status_serializer.validated_data.pop('sessions', None)
-            terminal = self.get_or_register_terminal()
-            status_serializer.validated_data['terminal'] = terminal
-
             try:
+                heartbeat_data = {
+                    'cpu_load': get_cpu_load(),
+                    'memory_used': get_memory_usage(),
+                    'disk_used': get_disk_usage(path=settings.BASE_DIR),
+                    'sessions': [],
+                }
+                status_serializer = StatusSerializer(data=heartbeat_data)
+                status_serializer.is_valid()
+                status_serializer.validated_data.pop('sessions', None)
+                terminal = self.get_or_register_terminal()
+                status_serializer.validated_data['terminal'] = terminal
                 status_serializer.save()
-                time.sleep(self.interval)
-            except OperationalError:
+            except Exception:
                 close_old_connections()
+            finally:
+                time.sleep(self.interval)
 
     def get_or_register_terminal(self):
         terminal = Terminal.objects.filter(
