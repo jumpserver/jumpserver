@@ -1,17 +1,18 @@
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.request import Request
-
-from common.drf.api import JMSBulkModelViewSet
-from common.permissions import IsValidUserOrConnectionToken
-from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404
-from assets.models import Asset
-from orgs.utils import tmp_to_root_org
-from terminal.models import Session, Endpoint, EndpointRule
-from terminal import serializers
+from django.utils.translation import ugettext_lazy as _
+from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.generics import ListAPIView
+from rest_framework.request import Request
+from rest_framework.response import Response
 
+from assets.models import Asset
+from common.drf.api import JMSBulkModelViewSet
+from common.permissions import IsValidUser
+from common.permissions import IsValidUserOrConnectionToken
+from orgs.utils import tmp_to_root_org
+from terminal import serializers
+from terminal.models import Session, Endpoint, EndpointRule
 
 __all__ = ['EndpointViewSet', 'EndpointRuleViewSet']
 
@@ -97,3 +98,14 @@ class EndpointRuleViewSet(JMSBulkModelViewSet):
     search_fields = filterset_fields
     serializer_class = serializers.EndpointRuleSerializer
     queryset = EndpointRule.objects.all()
+
+
+class ConnectMethodListApi(ListAPIView):
+    permission_classes = (IsValidUser,)
+    serializer_class = serializers.ProtocolConnectMethodsSerializer
+
+    def get_queryset(self):
+        protocol = self.request.query_params.get('protocol')
+        if not protocol:
+            return []
+        return Protocol.objects.filter(name=protocol)
