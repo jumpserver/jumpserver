@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-import os
-import threading
 
 from django.db.models.signals import (
     m2m_changed, post_save, post_delete
@@ -9,14 +7,14 @@ from django.db.models.signals import (
 from django.dispatch import receiver
 from django.utils.functional import LazyObject
 
-from common.signals import django_ready
-from common.utils.connection import RedisPubSub
-from common.utils import get_logger
 from assets.models import Asset, Node
+from common.signals import django_ready
+from common.utils import get_logger
+from common.utils.connection import RedisPubSub
 from orgs.models import Organization
 
-
 logger = get_logger(__file__)
+
 
 # clear node assets mapping for memory
 # ------------------------------------
@@ -78,9 +76,4 @@ def subscribe_node_assets_mapping_expire(sender, **kwargs):
         Node.expire_node_all_asset_ids_mapping_from_memory(org_id)
         Node.expire_node_all_asset_ids_mapping_from_memory(root_org_id)
 
-    def keep_subscribe_node_assets_relation():
-        node_assets_mapping_for_memory_pub_sub.subscribe(handle_node_relation_change)
-
-    t = threading.Thread(target=keep_subscribe_node_assets_relation)
-    t.daemon = True
-    t.start()
+    node_assets_mapping_for_memory_pub_sub.subscribe(handle_node_relation_change)
