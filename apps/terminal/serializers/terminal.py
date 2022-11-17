@@ -136,4 +136,6 @@ class TerminalRegistrationSerializer(serializers.ModelSerializer):
 
 
 class ConnectMethodSerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=128)
+    value = serializers.CharField(max_length=128)
+    label = serializers.CharField(max_length=128)
+    group = serializers.CharField(max_length=128)

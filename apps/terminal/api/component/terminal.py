@@ -1,26 +1,24 @@
 # -*- coding: utf-8 -*-
 #
 import logging
-import uuid
 
-from django.core.cache import cache
-from rest_framework import generics
-from rest_framework.views import APIView, Response
-from rest_framework import status
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from rest_framework import generics
+from rest_framework import status
+from rest_framework.views import APIView, Response
 
-from common.exceptions import JMSException
 from common.drf.api import JMSBulkModelViewSet
-from common.utils import get_object_or_none, get_request_ip
+from common.exceptions import JMSException
+from common.permissions import IsValidUser
 from common.permissions import WithBootstrapToken
-from terminal.models import Terminal
 from terminal import serializers
-from terminal import exceptions
+from terminal.const import TerminalType
+from terminal.models import Terminal
 
 __all__ = [
-    'TerminalViewSet',  'TerminalConfig',
-    'TerminalRegistrationApi',
+    'TerminalViewSet', 'TerminalConfig',
+    'TerminalRegistrationApi', 'ConnectMethodListApi'
 ]
 logger = logging.getLogger(__file__)
 
@@ -72,3 +70,22 @@ class TerminalRegistrationApi(generics.CreateAPIView):
             data = {"error": "service account registration disabled"}
             return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
         return super().create(request, *args, **kwargs)
+
+
+class ConnectMethodListApi(generics.ListAPIView):
+    serializer_class = serializers.ConnectMethodSerializer
+    permission_classes = [IsValidUser]
+
+    def get_queryset(self):
+        user_agent = self.request.META['HTTP_USER_AGENT'].lower()
+        if 'macintosh' in user_agent:
+            os = 'macos'
+        elif 'windows' in user_agent:
+            os = 'windows'
+        else:
+            os = 'linux'
+        return TerminalType.get_protocols_connect_methods(os)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        return Response(queryset)
