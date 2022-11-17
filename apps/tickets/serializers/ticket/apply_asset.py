@@ -44,8 +44,7 @@ class ApplyAssetSerializer(BaseApplyAssetSerializer, TicketApplySerializer):
         attrs['type'] = 'apply_asset'
         attrs = super().validate(attrs)
         if self.is_final_approval and (
-                not attrs.get('apply_nodes')
-                and not attrs.get('apply_assets')
+                not attrs.get('apply_nodes') and not attrs.get('apply_assets')
         ):
             raise serializers.ValidationError({
                 'apply_nodes': asset_or_node_help_text,

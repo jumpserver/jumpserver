@@ -32,3 +32,7 @@ class ActionChoices(BitChoices):
     def has_perm(cls, action_name, total):
         action_value = getattr(cls, action_name)
         return action_value & total == action_value
+
+    @classmethod
+    def display(cls, value):
+        return ', '.join([c.label for c in cls if c.value & value == c.value])
