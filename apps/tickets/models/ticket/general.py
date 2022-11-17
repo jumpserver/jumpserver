@@ -24,7 +24,9 @@ from tickets.handlers import get_ticket_handler
 from tickets.errors import AlreadyClosed
 from ..flow import TicketFlow
 
-__all__ = ['Ticket', 'TicketStep', 'TicketAssignee', 'SuperTicket', 'SubTicketManager']
+__all__ = [
+    'Ticket', 'TicketStep', 'TicketAssignee', 'SuperTicket', 'SubTicketManager'
+]
 
 
 class TicketStep(CommonModelMixin):
@@ -282,19 +284,19 @@ class Ticket(StatusMixin, CommonModelMixin):
     )
     # 申请人
     applicant = models.ForeignKey(
-        'users.User', related_name='applied_tickets', on_delete=models.SET_NULL,
-        null=True, verbose_name=_("Applicant")
+        'users.User', related_name='applied_tickets', null=True,
+        on_delete=models.SET_NULL, verbose_name=_("Applicant")
     )
-    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
     flow = models.ForeignKey(
-        'TicketFlow', related_name='tickets', on_delete=models.SET_NULL,
-        null=True, verbose_name=_('TicketFlow')
+        'TicketFlow', related_name='tickets', null=True,
+        on_delete=models.SET_NULL, verbose_name=_('TicketFlow')
     )
     approval_step = models.SmallIntegerField(
         default=TicketLevel.one, choices=TicketLevel.choices, verbose_name=_('Approval step')
     )
-    serial_num = models.CharField(_('Serial number'), max_length=128, unique=True, null=True)
+    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
     rel_snapshot = models.JSONField(verbose_name=_('Relation snapshot'), default=dict)
+    serial_num = models.CharField(_('Serial number'), max_length=128, unique=True, null=True)
     meta = models.JSONField(encoder=ModelJSONFieldEncoder, default=dict, verbose_name=_("Meta"))
     org_id = models.CharField(
         max_length=36, blank=True, default='', verbose_name=_('Organization'), db_index=True
