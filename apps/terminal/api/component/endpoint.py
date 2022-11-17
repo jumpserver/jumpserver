@@ -102,7 +102,8 @@ class EndpointRuleViewSet(JMSBulkModelViewSet):
 
 class ConnectMethodListApi(ListAPIView):
     permission_classes = (IsValidUser,)
-    serializer_class = serializers.ProtocolConnectMethodsSerializer
+
+    # serializer_class = serializers.ProtocolConnectMethodsSerializer
 
     def get_queryset(self):
         protocol = self.request.query_params.get('protocol')
