@@ -20,6 +20,6 @@ class AccountBackupExecutionTaskMsg(object):
                  "please go to personal information -> file encryption password to set the encryption password").format(name)
 
     def publish(self, attachment_list=None):
-        send_mail_attachment_async.delay(
+        send_mail_attachment_async(
             self.subject, self.message, [self.user.email], attachment_list
         )
