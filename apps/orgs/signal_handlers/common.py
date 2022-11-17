@@ -1,28 +1,26 @@
 # -*- coding: utf-8 -*-
 #
-import threading
 from collections import defaultdict
 from functools import partial
 
-from django.dispatch import receiver
-from django.utils.functional import LazyObject
 from django.db.models.signals import m2m_changed
 from django.db.models.signals import post_save, pre_delete
+from django.dispatch import receiver
+from django.utils.functional import LazyObject
 
-from orgs.utils import tmp_to_org
-from orgs.models import Organization
-from orgs.hands import set_current_org, Node, get_current_org
-from perms.models import (AssetPermission, ApplicationPermission)
-from users.models import UserGroup, User
+from assets.models import CommandFilterRule
 from assets.models import SystemUser
 from common.const.signals import PRE_REMOVE, POST_REMOVE
 from common.decorator import on_transaction_commit
 from common.signals import django_ready
 from common.utils import get_logger
 from common.utils.connection import RedisPubSub
-from assets.models import CommandFilterRule
+from orgs.hands import set_current_org, Node, get_current_org
+from orgs.models import Organization
+from orgs.utils import tmp_to_org
+from perms.models import (AssetPermission, ApplicationPermission)
+from users.models import UserGroup, User
 from users.signals import post_user_leave_org
-
 
 logger = get_logger(__file__)
 
@@ -47,14 +45,9 @@ def expire_orgs_mapping_for_memory(org_id):
 def subscribe_orgs_mapping_expire(sender, **kwargs):
     logger.debug("Start subscribe for expire orgs mapping from memory")
 
-    def keep_subscribe_org_mapping():
-        orgs_mapping_for_memory_pub_sub.subscribe(
-            lambda org_id: Organization.expire_orgs_mapping()
-        )
-
-    t = threading.Thread(target=keep_subscribe_org_mapping)
-    t.daemon = True
-    t.start()
+    orgs_mapping_for_memory_pub_sub.subscribe(
+        lambda org_id: Organization.expire_orgs_mapping()
+    )
 
 
 # 创建对应的root
@@ -85,7 +78,7 @@ def on_org_delete(sender, instance, **kwargs):
 def _remove_users(model, users, org, user_field_name='users'):
     with tmp_to_org(org):
         if not isinstance(users, (tuple, list, set)):
-            users = (users, )
+            users = (users,)
 
         user_field = getattr(model, user_field_name)
         m2m_model = user_field.through
