@@ -76,8 +76,14 @@ class NativeClient:
     mstsc = 'mstsc', 'Remote Desktop'
 
     @classmethod
-    def commands(cls, name, os):
-        return {
+    def get_native_clients(cls, p, os='windows'):
+        clients = {
+            ''
+        }
+
+    @classmethod
+    def get_launch_command(cls, name, os='windows'):
+        commands = {
             'ssh': 'ssh {username}@{hostname} -p {port}',
             'putty': 'putty -ssh {username}@{hostname} -P {port}',
             'xshell': '-url ssh://root:passwd@192.168.10.100',
@@ -90,12 +96,25 @@ class NativeClient:
             'redis': 'redis-cli -h {hostname} -p {port} -a {password}',
             'mstsc': 'mstsc /v:{hostname}:{port}',
         }
+        command = commands.get(name)
+        if isinstance(command, dict):
+            command = command.get(os, command.get('default'))
+        return command
+
+
+class RemoteAppMethod:
+    @classmethod
+    def get_remote_app_methods(cls, protocol):
+        from .models import Applet
+        applets = Applet.objects.filter(protocol=protocol)
+        return applets
 
 
 class ConnectMethod(TextChoices):
     web_cli = 'web_cli', _('Web CLI')
     web_gui = 'web_gui', _('Web GUI')
     native_client = 'native_client', _('Native Client')
+    remote_app = 'remote_app', _('Remote App')
 
     @classmethod
     def methods(cls):
@@ -104,6 +123,14 @@ class ConnectMethod(TextChoices):
             Protocol.rdp: ([cls.web_gui], [cls.native_client]),
             Protocol.vnc: [cls.web_gui],
             Protocol.telnet: [cls.web_cli, cls.native_client],
+
             Protocol.mysql: [cls.web_cli, cls.web_gui, cls.native_client],
             Protocol.sqlserver: [cls.web_cli, cls.web_gui],
+            Protocol.oracle: [cls.web_cli, cls.web_gui],
+            Protocol.postgresql: [cls.web_cli, cls.web_gui],
+            Protocol.redis: [cls.web_cli, cls.web_gui, cls.native_client],
+            Protocol.mongodb: [cls.web_cli, cls.web_gui],
+
+            Protocol.k8s: [cls.web_cli],
+            Protocol.http: [],
         }
