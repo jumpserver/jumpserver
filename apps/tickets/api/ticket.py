@@ -97,6 +97,10 @@ class ApplyAssetTicketViewSet(TicketViewSet):
     serializer_class = serializers.ApplyAssetSerializer
     model = ApplyAssetTicket
     filterset_class = filters.ApplyAssetTicketFilter
+    serializer_classes = {
+        'open': serializers.ApplyAssetSerializer,
+        'approve': serializers.ApproveAssetSerializer
+    }
 
 
 class ApplyLoginTicketViewSet(TicketViewSet):

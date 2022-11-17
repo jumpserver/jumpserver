@@ -9,7 +9,7 @@ from tickets.models import ApplyAssetTicket
 from .common import BaseApplyAssetSerializer
 from .ticket import TicketApplySerializer
 
-__all__ = ['ApplyAssetSerializer']
+__all__ = ['ApplyAssetSerializer', 'ApproveAssetSerializer']
 
 asset_or_node_help_text = _("Select at least one asset or node")
 
@@ -57,3 +57,9 @@ class ApplyAssetSerializer(BaseApplyAssetSerializer, TicketApplySerializer):
     def setup_eager_loading(cls, queryset):
         queryset = queryset.prefetch_related('apply_nodes', 'apply_assets')
         return queryset
+
+
+class ApproveAssetSerializer(ApplyAssetSerializer):
+    class Meta(ApplyAssetSerializer.Meta):
+        read_only_fields = TicketApplySerializer.Meta.fields_small + \
+                           ApplyAssetSerializer.Meta.read_only_fields
