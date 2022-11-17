@@ -45,20 +45,26 @@ class DeployAppletHostManager:
 
     def generate_initial_playbook(self):
         site_url = settings.SITE_URL
+        download_host = settings.APPLET_DOWNLOAD_HOST
         bootstrap_token = settings.BOOTSTRAP_TOKEN
         host_id = str(self.deployment.host.id)
         if not site_url:
             site_url = "http://localhost:8080"
+        if not download_host:
+            download_host = site_url
         options = self.deployment.host.deploy_options
+        site_url = site_url.rstrip("/")
+        download_host = download_host.rstrip("/")
 
         def handler(plays):
             for play in plays:
                 play["vars"].update(options)
-                play["vars"]["DownloadHost"] = site_url + "/download"
+                play["vars"]["APPLET_DOWNLOAD_HOST"] = download_host
                 play["vars"]["CORE_HOST"] = site_url
                 play["vars"]["BOOTSTRAP_TOKEN"] = bootstrap_token
                 play["vars"]["HOST_ID"] = host_id
                 play["vars"]["HOST_NAME"] = self.deployment.host.name
+            return plays
 
         return self._generate_playbook("playbook.yml", handler)
 

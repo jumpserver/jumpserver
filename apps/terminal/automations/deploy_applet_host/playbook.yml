@@ -2,7 +2,7 @@
 
 - hosts: all
   vars:
-    DownloadHost: https://demo.jumpserver.org/download
+    APPLET_DOWNLOAD_HOST: https://demo.jumpserver.org
     HOST_NAME: test
     HOST_ID: 00000000-0000-0000-0000-000000000000
     CORE_HOST: https://demo.jumpserver.org
@@ -32,7 +32,7 @@
 
     - name: Download JumpServer Tinker installer (jumpserver)
       ansible.windows.win_get_url:
-        url: "{{ DownloadHost }}/{{ TinkerInstaller }}"
+        url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/{{ TinkerInstaller }}"
         dest: "{{ ansible_env.TEMP }}\\{{ TinkerInstaller }}"
 
     - name: Install JumpServer Tinker (jumpserver)
@@ -52,7 +52,7 @@
 
     - name: Download python-3.10.8
       ansible.windows.win_get_url:
-        url: "{{ DownloadHost }}/python-3.10.8-amd64.exe"
+        url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/python-3.10.8-amd64.exe"
         dest: "{{ ansible_env.TEMP }}\\python-3.10.8-amd64.exe"
 
     - name: Install the python-3.10.8
@@ -112,27 +112,27 @@
 
     - name: Download pip packages
       ansible.windows.win_get_url:
-        url: "{{ DownloadHost }}/pip_packages_v0.0.1.zip"
-        dest: "{{ ansible_env.TEMP }}\\pip_packages_v0.0.1.zip"
+        url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/pip_packages.zip"
+        dest: "{{ ansible_env.TEMP }}\\pip_packages.zip"
 
     - name: Unzip pip_packages
       community.windows.win_unzip:
-        src: "{{ ansible_env.TEMP }}\\pip_packages_v0.0.1.zip"
-        dest: "{{ ansible_env.TEMP }}"
+        src: "{{ ansible_env.TEMP }}\\pip_packages.zip"
+        dest: "{{ ansible_env.TEMP }}\\pip_packages"
 
     - name: Install python requirements offline
       ansible.windows.win_shell: >
-        pip install -r '{{ ansible_env.TEMP }}\pip_packages_v0.0.1\requirements.txt'
-        --no-index --find-links='{{ ansible_env.TEMP }}\pip_packages_v0.0.1'
+        pip install -r '{{ ansible_env.TEMP }}\pip_packages\requirements.txt'
+        --no-index --find-links='{{ ansible_env.TEMP }}\pip_packages'
 
     - name: Download chromedriver (chrome)
       ansible.windows.win_get_url:
-        url: "{{ DownloadHost }}/chromedriver_win32.107.zip"
-        dest: "{{ ansible_env.TEMP }}\\chromedriver_win32.107.zip"
+        url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/chromedriver_win32.zip"
+        dest: "{{ ansible_env.TEMP }}\\chromedriver_win32.zip"
 
     - name: Unzip chromedriver (chrome)
       community.windows.win_unzip:
-        src: "{{ ansible_env.TEMP }}\\chromedriver_win32.107.zip"
+        src: "{{ ansible_env.TEMP }}\\chromedriver_win32.zip"
         dest: C:\Program Files\JumpServer\drivers
 
     - name: Set chromedriver on the global system path (chrome)
@@ -142,7 +142,7 @@
 
     - name: Download chrome msi package (chrome)
       ansible.windows.win_get_url:
-        url: "{{ DownloadHost }}/googlechromestandaloneenterprise64.msi"
+        url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/googlechromestandaloneenterprise64.msi"
         dest: "{{ ansible_env.TEMP }}\\googlechromestandaloneenterprise64.msi"
 
     - name: Install chrome (chrome)

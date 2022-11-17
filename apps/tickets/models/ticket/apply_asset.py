@@ -18,3 +18,6 @@ class ApplyAssetTicket(Ticket):
     apply_actions = models.IntegerField(verbose_name=_('Actions'), default=ActionChoices.all())
     apply_date_start = models.DateTimeField(verbose_name=_('Date start'), null=True)
     apply_date_expired = models.DateTimeField(verbose_name=_('Date expired'), null=True)
+
+    def get_apply_actions_display(self):
+        return ActionChoices.display(self.apply_actions)

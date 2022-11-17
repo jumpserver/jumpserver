@@ -107,6 +107,9 @@ class AppletHostDeployment(JMSBaseModel):
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
     task = models.UUIDField(null=True, verbose_name=_('Task'))
 
+    class Meta:
+        ordering = ('-date_start',)
+
     def start(self, **kwargs):
         from ...automations.deploy_applet_host import DeployAppletHostManager
         manager = DeployAppletHostManager(self)

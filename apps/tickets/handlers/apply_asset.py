@@ -14,7 +14,6 @@ class Handler(BaseHandler):
         if is_finished:
             self._create_asset_permission()
 
-    # permission
     def _create_asset_permission(self):
         org_id = self.ticket.org_id
         with tmp_to_org(org_id):
@@ -27,6 +26,7 @@ class Handler(BaseHandler):
 
         apply_permission_name = self.ticket.apply_permission_name
         apply_actions = self.ticket.apply_actions
+        apply_accounts = self.ticket.apply_accounts
         apply_date_start = self.ticket.apply_date_start
         apply_date_expired = self.ticket.apply_date_expired
         permission_created_by = '{}:{}'.format(
@@ -46,19 +46,20 @@ class Handler(BaseHandler):
         )
 
         permission_data = {
-            'id': self.ticket.id,
-            'name': apply_permission_name,
             'from_ticket': True,
-            'comment': str(permission_comment),
-            'created_by': permission_created_by,
+            'id': self.ticket.id,
             'actions': apply_actions,
+            'accounts': apply_accounts,
+            'name': apply_permission_name,
             'date_start': apply_date_start,
             'date_expired': apply_date_expired,
+            'comment': str(permission_comment),
+            'created_by': permission_created_by,
         }
         with tmp_to_org(self.ticket.org_id):
             asset_permission = AssetPermission.objects.create(**permission_data)
-            asset_permission.users.add(self.ticket.applicant)
             asset_permission.nodes.set(apply_nodes)
             asset_permission.assets.set(apply_assets)
+            asset_permission.users.add(self.ticket.applicant)
 
         return asset_permission

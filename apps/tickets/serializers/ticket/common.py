@@ -75,10 +75,11 @@ class BaseApplyAssetSerializer(serializers.Serializer):
     def create(self, validated_data):
         instance = super().create(validated_data)
         name = _('Created by ticket ({}-{})').format(instance.title, str(instance.id)[:4])
-        with tmp_to_org(instance.org_id):
+        org_id = instance.org_id
+        with tmp_to_org(org_id):
             if not self.permission_model.objects.filter(name=name).exists():
                 instance.apply_permission_name = name
-                instance.save()
+                instance.save(update_fields=['apply_permission_name'])
                 return instance
         raise serializers.ValidationError(_('Permission named `{}` already exists'.format(name)))
 

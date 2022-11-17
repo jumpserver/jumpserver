@@ -22,13 +22,12 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
     class Meta:
         model = Ticket
         fields_mini = ['id', 'title']
-        fields_small = fields_mini + [
-            'type', 'status', 'state', 'approval_step', 'comment',
-            'date_created', 'date_updated', 'org_id', 'rel_snapshot',
-            'process_map', 'org_name', 'serial_num'
+        fields_small = fields_mini + ['org_id', 'comment']
+        read_only_fields = [
+            'serial_num', 'process_map', 'approval_step', 'type', 'state', 'applicant',
+            'status', 'date_created', 'date_updated', 'org_name', 'rel_snapshot'
         ]
-        fields_fk = ['applicant', ]
-        fields = fields_small + fields_fk
+        fields = fields_small + read_only_fields
         extra_kwargs = {
             'type': {'required': True}
         }
@@ -72,8 +71,6 @@ class TicketApplySerializer(TicketSerializer):
         if self.instance:
             return attrs
 
-        print("Attrs: ", attrs)
-
         ticket_type = attrs.get('type')
         org_id = attrs.get('org_id')
         flow = TicketFlow.get_org_related_flows(org_id=org_id) \
@@ -81,7 +78,7 @@ class TicketApplySerializer(TicketSerializer):
 
         if flow:
             attrs['flow'] = flow
+            return attrs
         else:
             error = _('The ticket flow `{}` does not exist'.format(ticket_type))
             raise serializers.ValidationError(error)
-        return attrs

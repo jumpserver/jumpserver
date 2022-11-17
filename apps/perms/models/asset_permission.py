@@ -64,17 +64,15 @@ class AssetPermission(OrgModelMixin):
     # 特殊的账号: @ALL, @INPUT @USER 默认包含，将来在全局设置中进行控制.
     accounts = models.JSONField(default=list, verbose_name=_("Accounts"))
     actions = models.IntegerField(default=ActionChoices.connect, verbose_name=_("Actions"))
-    is_active = models.BooleanField(default=True, verbose_name=_('Active'))
-    date_start = models.DateTimeField(
-        default=timezone.now, db_index=True, verbose_name=_("Date start")
-    )
+    date_start = models.DateTimeField(default=timezone.now, db_index=True, verbose_name=_("Date start"))
     date_expired = models.DateTimeField(
         default=date_expired_default, db_index=True, verbose_name=_('Date expired')
     )
-    created_by = models.CharField(max_length=128, blank=True, verbose_name=_('Created by'))
-    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
-    from_ticket = models.BooleanField(default=False, verbose_name=_('From ticket'))
     comment = models.TextField(verbose_name=_('Comment'), blank=True)
+    is_active = models.BooleanField(default=True, verbose_name=_('Active'))
+    from_ticket = models.BooleanField(default=False, verbose_name=_('From ticket'))
+    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
+    created_by = models.CharField(max_length=128, blank=True, verbose_name=_('Created by'))
 
     objects = AssetPermissionManager.from_queryset(AssetPermissionQuerySet)()
 

@@ -9,7 +9,7 @@ from tickets.models import ApplyAssetTicket
 from .common import BaseApplyAssetSerializer
 from .ticket import TicketApplySerializer
 
-__all__ = ['ApplyAssetSerializer']
+__all__ = ['ApplyAssetSerializer', 'ApproveAssetSerializer']
 
 asset_or_node_help_text = _("Select at least one asset or node")
 
@@ -22,18 +22,14 @@ class ApplyAssetSerializer(BaseApplyAssetSerializer, TicketApplySerializer):
 
     class Meta(TicketApplySerializer.Meta):
         model = ApplyAssetTicket
-        fields_mini = ['id', 'title']
         writeable_fields = [
-            'id', 'title', 'apply_nodes', 'apply_assets',
-            'apply_accounts', 'apply_actions', 'org_id', 'comment',
-            'apply_date_start', 'apply_date_expired'
+            'apply_nodes', 'apply_assets', 'apply_accounts',
+            'apply_actions', 'apply_date_start', 'apply_date_expired'
         ]
-        fields = TicketApplySerializer.Meta.fields + writeable_fields + ['apply_permission_name', ]
-        read_only_fields = list(set(fields) - set(writeable_fields))
+        read_only_fields = TicketApplySerializer.Meta.read_only_fields + ['apply_permission_name', ]
+        fields = TicketApplySerializer.Meta.fields_small + writeable_fields + read_only_fields
         ticket_extra_kwargs = TicketApplySerializer.Meta.extra_kwargs
         extra_kwargs = {
-            'apply_nodes': {'required': False},
-            'apply_assets': {'required': False},
             'apply_accounts': {'required': False},
         }
         extra_kwargs.update(ticket_extra_kwargs)
@@ -48,8 +44,7 @@ class ApplyAssetSerializer(BaseApplyAssetSerializer, TicketApplySerializer):
         attrs['type'] = 'apply_asset'
         attrs = super().validate(attrs)
         if self.is_final_approval and (
-                not attrs.get('apply_nodes')
-                and not attrs.get('apply_assets')
+                not attrs.get('apply_nodes') and not attrs.get('apply_assets')
         ):
             raise serializers.ValidationError({
                 'apply_nodes': asset_or_node_help_text,
@@ -62,3 +57,9 @@ class ApplyAssetSerializer(BaseApplyAssetSerializer, TicketApplySerializer):
     def setup_eager_loading(cls, queryset):
         queryset = queryset.prefetch_related('apply_nodes', 'apply_assets')
         return queryset
+
+
+class ApproveAssetSerializer(ApplyAssetSerializer):
+    class Meta(ApplyAssetSerializer.Meta):
+        read_only_fields = TicketApplySerializer.Meta.fields_small + \
+                           ApplyAssetSerializer.Meta.read_only_fields

@@ -14,7 +14,7 @@ class JobSerializer(serializers.ModelSerializer):
         model = Job
         fields = [
             "id", "name", "instant", "type", "module", "args", "playbook", "assets", "runas_policy", "runas", "owner",
-            "variables",
+            "parameters_define",
             "timeout",
             "chdir",
             "comment",
@@ -29,5 +29,5 @@ class JobExecutionSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "task_id", "timedelta", "time_cost", 'is_finished', 'date_start', 'date_created',
                             'is_success', 'task_id', 'short_id']
         fields = read_only_fields + [
-            "job"
+            "job", "parameters"
         ]
