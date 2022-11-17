@@ -1,8 +1,10 @@
 import json
 import threading
-import redis
+import time
 
+import redis
 from django.core.cache import cache
+from redis.client import PubSub
 
 from common.db.utils import safe_db_connection
 from common.utils import get_logger
@@ -16,15 +18,39 @@ def get_redis_client(db=0):
     return client
 
 
-class Subscription:
-    def __init__(self, ch, sub, ):
+class RedisPubSub:
+    def __init__(self, ch, db=10):
         self.ch = ch
+        self.db = db
+        self.redis = get_redis_client(db)
+
+    def subscribe(self, _next, error=None, complete=None):
+        ps = self.redis.pubsub()
+        ps.subscribe(self.ch)
+        sub = Subscription(self, ps)
+        sub.keep_handle_msg(_next, error, complete)
+        return sub
+
+    def resubscribe(self, _next, error=None, complete=None):
+        self.redis = get_redis_client(self.db)
+        self.subscribe(_next, error, complete)
+
+    def publish(self, data):
+        data_json = json.dumps(data)
+        self.redis.publish(self.ch, data_json)
+        return True
+
+
+class Subscription:
+    def __init__(self, pb: RedisPubSub, sub: PubSub):
+        self.pb = pb
+        self.ch = pb.ch
         self.sub = sub
+        self.unsubscribed = False
 
     def _handle_msg(self, _next, error, complete):
         """
         handle arg is the pub published
-
         :param _next: next msg handler
         :param error: error msg handler
         :param complete: complete msg handler
@@ -53,9 +79,12 @@ class Subscription:
                     error(msg, item)
                     logger.error('Subscribe handler handle msg error: {}'.format(e))
         except Exception as e:
-            # 正常的 websocket 断开时, redis 会断开连接，避免日志太多
-            # logger.error('Consume msg error: {}'.format(e))
-            pass
+            if self.unsubscribed:
+                logger.debug('Subscription unsubscribed')
+            else:
+                logger.error('Consume msg error: {}'.format(e))
+                self.retry(_next, error, complete)
+                return
 
         try:
             complete()
@@ -75,25 +104,22 @@ class Subscription:
         return t
 
     def unsubscribe(self):
+        self.unsubscribed = True
         try:
             self.sub.close()
         except Exception as e:
             logger.error('Unsubscribe msg error: {}'.format(e))
 
+    def retry(self, _next, error, complete):
+        logger.info('Retry subscribe channel: {}'.format(self.ch))
+        times = 0
 
-class RedisPubSub:
-    def __init__(self, ch, db=10):
-        self.ch = ch
-        self.redis = get_redis_client(db)
-
-    def subscribe(self, _next, error=None, complete=None):
-        ps = self.redis.pubsub()
-        ps.subscribe(self.ch)
-        sub = Subscription(self.ch, ps)
-        sub.keep_handle_msg(_next, error, complete)
-        return sub
-
-    def publish(self, data):
-        data_json = json.dumps(data)
-        self.redis.publish(self.ch, data_json)
-        return True
+        while True:
+            try:
+                self.unsubscribe()
+                self.pb.resubscribe(_next, error, complete)
+                break
+            except Exception as e:
+                logger.error('Retry #{} {} subscribe channel error: {}'.format(times, self.ch, e))
+                times += 1
+                time.sleep(times * 2)

@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
 #
 import json
-import threading
 
 from django.conf import LazySettings
+from django.db.models.signals import post_save, pre_save
 from django.db.utils import ProgrammingError, OperationalError
 from django.dispatch import receiver
-from django.db.models.signals import post_save, pre_save
 from django.utils.functional import LazyObject
 
-from jumpserver.utils import current_request
 from common.decorator import on_transaction_commit
+from common.signals import django_ready
 from common.utils import get_logger, ssh_key_gen
 from common.utils.connection import RedisPubSub
-from common.signals import django_ready
+from jumpserver.utils import current_request
 from .models import Setting
 
 logger = get_logger(__file__)
@@ -81,12 +80,7 @@ def on_create_set_created_by(sender, instance=None, **kwargs):
 def subscribe_settings_change(sender, **kwargs):
     logger.debug("Start subscribe setting change")
 
-    def keep_subscribe_settings_change():
-        setting_pub_sub.subscribe(lambda name: Setting.refresh_item(name))
-
-    t = threading.Thread(target=keep_subscribe_settings_change)
-    t.daemon = True
-    t.start()
+    setting_pub_sub.subscribe(lambda name: Setting.refresh_item(name))
 
 
 @receiver(django_ready)
