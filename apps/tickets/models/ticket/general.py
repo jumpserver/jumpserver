@@ -398,6 +398,8 @@ class Ticket(StatusMixin, CommonModelMixin):
             value = self.rel_snapshot[name]
         elif isinstance(field, related.ManyToManyField):
             value = ', '.join(self.rel_snapshot[name])
+        elif isinstance(value, list):
+            value = ', '.join(value)
         return value
 
     def get_local_snapshot(self):
