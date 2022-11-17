@@ -45,7 +45,7 @@ class Job(BaseCreateUpdateModel):
     runas = models.CharField(max_length=128, default='root', verbose_name=_('Runas'))
     runas_policy = models.CharField(max_length=128, choices=RunasPolicies.choices, default=RunasPolicies.skip,
                                     verbose_name=_('Runas policy'))
-    variables = models.JSONField(default=dict, verbose_name=_('Variables'))
+    parameters_define = models.JSONField(default=dict, verbose_name=_('Parameters define'))
     comment = models.CharField(max_length=1024, default='', verbose_name=_('Comment'), null=True, blank=True)
 
     @property
@@ -55,15 +55,13 @@ class Job(BaseCreateUpdateModel):
     def create_execution(self):
         return self.executions.create()
 
-    def get_variables(self):
-        return json.loads(self.variables)
-
 
 class JobExecution(BaseCreateUpdateModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     task_id = models.UUIDField(null=True)
     status = models.CharField(max_length=16, verbose_name=_('Status'), default='running')
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='executions', null=True)
+    parameters = models.JSONField(default=dict, verbose_name=_('Parameters'))
     result = models.JSONField(blank=True, null=True, verbose_name=_('Result'))
     summary = models.JSONField(default=dict, verbose_name=_('Summary'))
     creator = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
@@ -74,11 +72,12 @@ class JobExecution(BaseCreateUpdateModel):
     def get_runner(self):
         inv = self.job.inventory
         inv.write_to_file(self.inventory_path)
+        extra_vars = json.loads(self.parameters)
 
         if self.job.type == 'adhoc':
             runner = AdHocRunner(
                 self.inventory_path, self.job.module, module_args=self.job.args,
-                pattern="all", project_dir=self.private_dir, extra_vars=self.job.get_variables()
+                pattern="all", project_dir=self.private_dir, extra_vars=extra_vars,
             )
         elif self.job.type == 'playbook':
             runner = PlaybookRunner(

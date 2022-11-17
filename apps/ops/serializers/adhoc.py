@@ -16,15 +16,6 @@ class AdHocSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AdHoc
-        fields = ["id", "name", "module", "owner", "row_count", "size", "date_created", "date_updated"]
-
-
-class AdhocListSerializer(AdHocSerializer):
-    row_count = serializers.IntegerField(read_only=True)
-    size = serializers.IntegerField(read_only=True)
-
-    class Meta:
-        model = AdHoc
         fields = ["id", "name", "module", "row_count", "size", "args", "owner", "date_created", "date_updated"]
 
 

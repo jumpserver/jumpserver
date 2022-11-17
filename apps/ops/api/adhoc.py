@@ -4,7 +4,7 @@
 from rest_framework import viewsets
 from ..models import AdHoc
 from ..serializers import (
-    AdHocSerializer, AdhocListSerializer,
+    AdHocSerializer
 )
 
 __all__ = [
@@ -14,9 +14,4 @@ __all__ = [
 
 class AdHocViewSet(viewsets.ModelViewSet):
     queryset = AdHoc.objects.all()
-
-    def get_serializer_class(self):
-        if self.action != 'list':
-            return AdhocListSerializer
-        return AdHocSerializer
-
+    serializer_class = AdHocSerializer
