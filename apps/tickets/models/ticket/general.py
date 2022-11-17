@@ -206,11 +206,11 @@ class StatusMixin:
 
             step_info = {
                 'state': state,
-                'approval_level': step.level,
                 'assignees': assignee_ids,
+                'processor': processor_id,
+                'approval_level': step.level,
                 'assignees_display': assignees_display,
                 'approval_date': str(step.date_updated),
-                'processor': processor_id,
                 'processor_display': processor_display
             }
             process_map.append(step_info)
@@ -226,15 +226,15 @@ class StatusMixin:
         org_id = self.flow.org_id
         flow_rules = self.flow.rules.order_by('level')
         for rule in flow_rules:
-            step = TicketStep.objects.create(ticket=self, level=rule.level)
             assignees = rule.get_assignees(org_id=org_id)
             assignees = self.exclude_applicant(assignees, self.applicant)
+            step = TicketStep.objects.create(ticket=self, level=rule.level)
             step_assignees = [TicketAssignee(step=step, assignee=user) for user in assignees]
             TicketAssignee.objects.bulk_create(step_assignees)
 
     def create_process_steps_by_assignees(self, assignees):
-        assignees = self.exclude_applicant(assignees, self.applicant)
         step = TicketStep.objects.create(ticket=self, level=1)
+        assignees = self.exclude_applicant(assignees, self.applicant)
         ticket_assignees = [TicketAssignee(step=step, assignee=user) for user in assignees]
         TicketAssignee.objects.bulk_create(ticket_assignees)
 
@@ -250,14 +250,13 @@ class StatusMixin:
     @property
     def processor(self):
         processor = self.current_step.ticket_assignees \
-            .exclude(state=StepState.pending) \
-            .first()
+            .exclude(state=StepState.pending).first()
         return processor.assignee if processor else None
 
     def has_current_assignee(self, assignee):
         return self.ticket_steps.filter(
+            level=self.approval_step,
             ticket_assignees__assignee=assignee,
-            level=self.approval_step
         ).exists()
 
     def has_all_assignee(self, assignee):
@@ -326,7 +325,7 @@ class Ticket(StatusMixin, CommonModelMixin):
     @classmethod
     def get_user_related_tickets(cls, user):
         queries = Q(applicant=user) | Q(ticket_steps__ticket_assignees__assignee=user)
-        tickets = cls.objects.all().filter(queries).distinct()
+        tickets = cls.objects.filter(queries).distinct()
         return tickets
 
     def get_current_ticket_flow_approve(self):
@@ -405,12 +404,12 @@ class Ticket(StatusMixin, CommonModelMixin):
         return value
 
     def get_local_snapshot(self):
+        snapshot = {}
+        excludes = ['ticket_ptr']
         fields = self._meta._forward_fields_map
         json_data = json.dumps(model_to_dict(self), cls=ModelJSONFieldEncoder)
         data = json.loads(json_data)
-        snapshot = {}
         local_fields = self._meta.local_fields + self._meta.local_many_to_many
-        excludes = ['ticket_ptr']
         item_names = [field.name for field in local_fields if field.name not in excludes]
         for name in item_names:
             field = fields[name]

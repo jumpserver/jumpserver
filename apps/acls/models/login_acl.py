@@ -53,12 +53,13 @@ class LoginACL(BaseACL):
 
     @staticmethod
     def match(user, ip):
-        acls = LoginACL.filter_acl(user)
-        if not acls:
+        acl_qs = LoginACL.filter_acl(user)
+        if not acl_qs:
             return
 
-        for acl in acls:
-            if acl.is_action(LoginACL.ActionChoices.confirm) and not acl.reviewers.exists():
+        for acl in acl_qs:
+            if acl.is_action(LoginACL.ActionChoices.confirm) and \
+                    not acl.reviewers.exists():
                 continue
             ip_group = acl.rules.get('ip_group')
             time_periods = acl.rules.get('time_period')
@@ -79,12 +80,12 @@ class LoginACL(BaseACL):
         login_datetime = local_now_display()
         data = {
             'title': title,
-            'type': const.TicketType.login_confirm,
             'applicant': self.user,
-            'apply_login_city': login_city,
             'apply_login_ip': login_ip,
-            'apply_login_datetime': login_datetime,
             'org_id': Organization.ROOT_ID,
+            'apply_login_city': login_city,
+            'apply_login_datetime': login_datetime,
+            'type': const.TicketType.login_confirm,
         }
         ticket = ApplyLoginTicket.objects.create(**data)
         assignees = self.reviewers.all()

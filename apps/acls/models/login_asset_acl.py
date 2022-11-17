@@ -86,12 +86,12 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
         title = _('Login asset confirm') + ' ({})'.format(user)
         data = {
             'title': title,
-            'type': TicketType.login_asset_confirm,
+            'org_id': org_id,
             'applicant': user,
             'apply_login_user': user,
             'apply_login_asset': asset,
             'apply_login_account': str(account),
-            'org_id': org_id,
+            'type': TicketType.login_asset_confirm,
         }
         ticket = ApplyLoginAssetTicket.objects.create(**data)
         ticket.open_by_system(assignees)
