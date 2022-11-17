@@ -35,4 +35,4 @@ class ActionChoices(BitChoices):
 
     @classmethod
     def display(cls, value):
-        return ', '.join([c.label for c in cls if c.value & value == c.value])
+        return ', '.join([str(c.label) for c in cls if c.value & value == c.value])
