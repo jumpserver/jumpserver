@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-16 20:24+0800\n"
+"POT-Creation-Date: 2022-11-17 17:34+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -211,7 +211,7 @@ msgid "Unsupported protocols: {}"
 msgstr "不支持的协议: {}"
 
 #: acls/serializers/login_asset_acl.py:98
-#: tickets/serializers/ticket/ticket.py:85
+#: tickets/serializers/ticket/ticket.py:96
 msgid "The organization `{}` does not exist"
 msgstr "组织 `{}` 不存在"
 
@@ -343,7 +343,7 @@ msgstr "类别名称"
 #: assets/serializers/cmd_filter.py:34 assets/serializers/system_user.py:34
 #: audits/serializers.py:29 authentication/serializers/connection_token.py:22
 #: perms/serializers/application/permission.py:19
-#: tickets/serializers/flow.py:49 tickets/serializers/ticket/ticket.py:17
+#: tickets/serializers/flow.py:49 tickets/serializers/ticket/ticket.py:18
 msgid "Type display"
 msgstr "类型名称"
 
@@ -1009,7 +1009,7 @@ msgid "Parent key"
 msgstr "ssh私钥"
 
 #: assets/models/node.py:566 assets/serializers/system_user.py:267
-#: xpack/plugins/cloud/models.py:95 xpack/plugins/cloud/serializers/task.py:72
+#: xpack/plugins/cloud/models.py:95 xpack/plugins/cloud/serializers/task.py:75
 msgid "Node"
 msgstr "节点"
 
@@ -1591,7 +1591,7 @@ msgstr "用户登录日志"
 msgid "Operate display"
 msgstr "操作名称"
 
-#: audits/serializers.py:30 tickets/serializers/ticket/ticket.py:18
+#: audits/serializers.py:30 tickets/serializers/ticket/ticket.py:19
 msgid "Status display"
 msgstr "状态名称"
 
@@ -2979,7 +2979,7 @@ msgstr "组织管理"
 #: orgs/mixins/models.py:56 orgs/mixins/serializers.py:25 orgs/models.py:85
 #: orgs/models.py:217 rbac/const.py:7 rbac/models/rolebinding.py:48
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:63
-#: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:71
+#: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:72
 msgid "Organization"
 msgstr "组织"
 
@@ -5246,7 +5246,7 @@ msgstr "没有发现"
 msgid "view"
 msgstr "查看"
 
-#: terminal/utils/db_port_mapper.py:64
+#: terminal/utils/db_port_mapper.py:65
 msgid ""
 "No available port is matched. The number of databases may have exceeded the "
 "number of ports open to the database agent service, Contact the "
@@ -5255,13 +5255,13 @@ msgstr ""
 "未匹配到可用端口，数据库的数量可能已经超过数据库代理服务开放的端口数量，请联"
 "系管理员开放更多端口。"
 
-#: terminal/utils/db_port_mapper.py:90
+#: terminal/utils/db_port_mapper.py:91
 msgid ""
 "No ports can be used, check and modify the limit on the number of ports that "
 "Magnus listens on in the configuration file."
 msgstr "没有端口可以使用，检查并修改配置文件中 Magnus 监听的端口数量限制。"
 
-#: terminal/utils/db_port_mapper.py:92
+#: terminal/utils/db_port_mapper.py:93
 msgid "All available port count: {}, Already use port count: {}"
 msgstr "所有可用端口数量：{}，已使用端口数量：{}"
 
@@ -5577,7 +5577,7 @@ msgstr "过期时间要大于开始时间"
 msgid "Permission named `{}` already exists"
 msgstr "授权名称 `{}` 已存在"
 
-#: tickets/serializers/ticket/ticket.py:99
+#: tickets/serializers/ticket/ticket.py:110
 msgid "The ticket flow `{}` does not exist"
 msgstr "工单流程 `{}` 不存在"
 
@@ -6501,7 +6501,7 @@ msgstr "云账号"
 msgid "Test cloud account"
 msgstr "测试云账号"
 
-#: xpack/plugins/cloud/models.py:84 xpack/plugins/cloud/serializers/task.py:69
+#: xpack/plugins/cloud/models.py:84 xpack/plugins/cloud/serializers/task.py:72
 msgid "Account"
 msgstr "账号"
 
@@ -6513,11 +6513,11 @@ msgstr "地域"
 msgid "Hostname strategy"
 msgstr "主机名策略"
 
-#: xpack/plugins/cloud/models.py:99 xpack/plugins/cloud/serializers/task.py:70
+#: xpack/plugins/cloud/models.py:99 xpack/plugins/cloud/serializers/task.py:73
 msgid "Unix admin user"
 msgstr "Unix 管理员"
 
-#: xpack/plugins/cloud/models.py:103 xpack/plugins/cloud/serializers/task.py:71
+#: xpack/plugins/cloud/models.py:103 xpack/plugins/cloud/serializers/task.py:74
 msgid "Windows admin user"
 msgstr "Windows 管理员"
 
@@ -6525,11 +6525,11 @@ msgstr "Windows 管理员"
 msgid "IP network segment group"
 msgstr "IP网段组"
 
-#: xpack/plugins/cloud/models.py:112
+#: xpack/plugins/cloud/models.py:112 xpack/plugins/cloud/serializers/task.py:52
 msgid "Sync IP type"
 msgstr "同步IP类型"
 
-#: xpack/plugins/cloud/models.py:115 xpack/plugins/cloud/serializers/task.py:74
+#: xpack/plugins/cloud/models.py:115 xpack/plugins/cloud/serializers/task.py:77
 msgid "Always update"
 msgstr "总是更新"
 
@@ -6865,11 +6865,11 @@ msgstr "执行次数"
 msgid "Instance count"
 msgstr "实例个数"
 
-#: xpack/plugins/cloud/serializers/task.py:68
+#: xpack/plugins/cloud/serializers/task.py:71
 msgid "Linux admin user"
 msgstr "Linux 管理员"
 
-#: xpack/plugins/cloud/serializers/task.py:73
+#: xpack/plugins/cloud/serializers/task.py:76
 #: xpack/plugins/gathered_user/serializers.py:20
 msgid "Periodic display"
 msgstr "定时执行"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-16 20:24+0800\n"
+"POT-Creation-Date: 2022-11-17 17:34+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -215,7 +215,7 @@ msgid "Unsupported protocols: {}"
 msgstr "サポートされていないプロトコル: {}"
 
 #: acls/serializers/login_asset_acl.py:98
-#: tickets/serializers/ticket/ticket.py:85
+#: tickets/serializers/ticket/ticket.py:96
 msgid "The organization `{}` does not exist"
 msgstr "組織 '{}'は存在しません"
 
@@ -348,7 +348,7 @@ msgstr "カテゴリ表示"
 #: assets/serializers/cmd_filter.py:34 assets/serializers/system_user.py:34
 #: audits/serializers.py:29 authentication/serializers/connection_token.py:22
 #: perms/serializers/application/permission.py:19
-#: tickets/serializers/flow.py:49 tickets/serializers/ticket/ticket.py:17
+#: tickets/serializers/flow.py:49 tickets/serializers/ticket/ticket.py:18
 msgid "Type display"
 msgstr "タイプ表示"
 
@@ -1016,7 +1016,7 @@ msgid "Parent key"
 msgstr "親キー"
 
 #: assets/models/node.py:566 assets/serializers/system_user.py:267
-#: xpack/plugins/cloud/models.py:95 xpack/plugins/cloud/serializers/task.py:72
+#: xpack/plugins/cloud/models.py:95 xpack/plugins/cloud/serializers/task.py:75
 msgid "Node"
 msgstr "ノード"
 
@@ -1605,7 +1605,7 @@ msgstr "ユーザーログインログ"
 msgid "Operate display"
 msgstr "ディスプレイを操作する"
 
-#: audits/serializers.py:30 tickets/serializers/ticket/ticket.py:18
+#: audits/serializers.py:30 tickets/serializers/ticket/ticket.py:19
 msgid "Status display"
 msgstr "ステータス表示"
 
@@ -3024,7 +3024,7 @@ msgstr "アプリ組織"
 #: orgs/mixins/models.py:56 orgs/mixins/serializers.py:25 orgs/models.py:85
 #: orgs/models.py:217 rbac/const.py:7 rbac/models/rolebinding.py:48
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:63
-#: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:71
+#: tickets/models/ticket/general.py:300 tickets/serializers/ticket/ticket.py:72
 msgid "Organization"
 msgstr "組織"
 
@@ -5334,7 +5334,7 @@ msgstr "見つかりません"
 msgid "view"
 msgstr "表示"
 
-#: terminal/utils/db_port_mapper.py:64
+#: terminal/utils/db_port_mapper.py:65
 msgid ""
 "No available port is matched. The number of databases may have exceeded the "
 "number of ports open to the database agent service, Contact the "
@@ -5344,7 +5344,7 @@ msgstr ""
 "サービスによって開かれたポートの数を超えた可能性があります。さらにポートを開"
 "くには、管理者に連絡してください。"
 
-#: terminal/utils/db_port_mapper.py:90
+#: terminal/utils/db_port_mapper.py:91
 msgid ""
 "No ports can be used, check and modify the limit on the number of ports that "
 "Magnus listens on in the configuration file."
@@ -5352,7 +5352,7 @@ msgstr ""
 "使用できるポートがありません。設定ファイルで Magnus がリッスンするポート数の"
 "制限を確認して変更してください. "
 
-#: terminal/utils/db_port_mapper.py:92
+#: terminal/utils/db_port_mapper.py:93
 msgid "All available port count: {}, Already use port count: {}"
 msgstr "使用可能なすべてのポート数: {}、すでに使用しているポート数: {}"
 
@@ -5670,7 +5670,7 @@ msgstr "有効期限は開始日より大きくする必要があります"
 msgid "Permission named `{}` already exists"
 msgstr "'{}'という名前の権限は既に存在します"
 
-#: tickets/serializers/ticket/ticket.py:99
+#: tickets/serializers/ticket/ticket.py:110
 msgid "The ticket flow `{}` does not exist"
 msgstr "チケットフロー '{}'が存在しない"
 
@@ -6277,8 +6277,9 @@ msgstr "パスワード無効"
 msgid ""
 "Non-local users can log in only from third-party platforms and cannot change "
 "their passwords: {}"
-msgstr "ローカル以外のユーザーは、サードパーティ プラットフォームからのログインのみが許可され、"
-"パスワードの変更はサポートされていません: {}"
+msgstr ""
+"ローカル以外のユーザーは、サードパーティ プラットフォームからのログインのみが"
+"許可され、パスワードの変更はサポートされていません: {}"
 
 #: users/views/profile/reset.py:149 users/views/profile/reset.py:160
 msgid "Token invalid or expired"
@@ -6607,7 +6608,7 @@ msgstr "クラウドアカウント"
 msgid "Test cloud account"
 msgstr "クラウドアカウントのテスト"
 
-#: xpack/plugins/cloud/models.py:84 xpack/plugins/cloud/serializers/task.py:69
+#: xpack/plugins/cloud/models.py:84 xpack/plugins/cloud/serializers/task.py:72
 msgid "Account"
 msgstr "アカウント"
 
@@ -6619,11 +6620,11 @@ msgstr "リージョン"
 msgid "Hostname strategy"
 msgstr "ホスト名戦略"
 
-#: xpack/plugins/cloud/models.py:99 xpack/plugins/cloud/serializers/task.py:70
+#: xpack/plugins/cloud/models.py:99 xpack/plugins/cloud/serializers/task.py:73
 msgid "Unix admin user"
 msgstr "Unix adminユーザー"
 
-#: xpack/plugins/cloud/models.py:103 xpack/plugins/cloud/serializers/task.py:71
+#: xpack/plugins/cloud/models.py:103 xpack/plugins/cloud/serializers/task.py:74
 msgid "Windows admin user"
 msgstr "Windows管理者"
 
@@ -6631,11 +6632,11 @@ msgstr "Windows管理者"
 msgid "IP network segment group"
 msgstr "IPネットワークセグメントグループ"
 
-#: xpack/plugins/cloud/models.py:112
+#: xpack/plugins/cloud/models.py:112 xpack/plugins/cloud/serializers/task.py:52
 msgid "Sync IP type"
 msgstr "同期IPタイプ"
 
-#: xpack/plugins/cloud/models.py:115 xpack/plugins/cloud/serializers/task.py:74
+#: xpack/plugins/cloud/models.py:115 xpack/plugins/cloud/serializers/task.py:77
 msgid "Always update"
 msgstr "常に更新"
 
@@ -6974,11 +6975,11 @@ msgstr "実行回数"
 msgid "Instance count"
 msgstr "インスタンス数"
 
-#: xpack/plugins/cloud/serializers/task.py:68
+#: xpack/plugins/cloud/serializers/task.py:71
 msgid "Linux admin user"
 msgstr "Linux管理者"
 
-#: xpack/plugins/cloud/serializers/task.py:73
+#: xpack/plugins/cloud/serializers/task.py:76
 #: xpack/plugins/gathered_user/serializers.py:20
 msgid "Periodic display"
 msgstr "定期的な表示"
