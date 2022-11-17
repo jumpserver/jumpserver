@@ -7,23 +7,22 @@
 2. 程序需要, 用户不需要更改的写到settings中
 3. 程序需要, 用户需要更改的写到本config中
 """
+import base64
+import copy
+import errno
+import json
+import logging
 import os
 import re
 import sys
 import types
-import errno
-import json
-import yaml
-import copy
-import base64
-import logging
 from importlib import import_module
 from urllib.parse import urljoin, urlparse
-from gmssl.sm4 import CryptSM4, SM4_ENCRYPT, SM4_DECRYPT
 
+import yaml
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
-
+from gmssl.sm4 import CryptSM4, SM4_ENCRYPT, SM4_DECRYPT
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
@@ -499,6 +498,9 @@ class Config(dict):
 
         'FORGOT_PASSWORD_URL': '',
         'HEALTH_CHECK_TOKEN': '',
+
+        # Applet 等软件的下载地址
+        'APPLET_DOWNLOAD_HOST': '',
     }
 
     def __init__(self, *args):

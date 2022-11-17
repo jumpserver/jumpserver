@@ -1,4 +1,5 @@
 import os
+
 from django.urls import reverse_lazy
 
 from .. import const
@@ -35,6 +36,9 @@ DEBUG_DEV = CONFIG.DEBUG_DEV
 
 # Absolute url for some case, for example email link
 SITE_URL = CONFIG.SITE_URL
+
+# Absolute url for downloading applet
+APPLET_DOWNLOAD_HOST = CONFIG.APPLET_DOWNLOAD_HOST
 
 # https://docs.djangoproject.com/en/4.1/ref/settings/
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -313,7 +317,6 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
 ]
 
-
 GMSSL_ENABLED = CONFIG.GMSSL_ENABLED
 GM_HASHER = 'common.hashers.PBKDF2SM3PasswordHasher'
 if GMSSL_ENABLED:
@@ -329,4 +332,3 @@ if os.environ.get('DEBUG_TOOLBAR', False):
     DEBUG_TOOLBAR_PANELS = [
         'debug_toolbar.panels.profiling.ProfilingPanel',
     ]
-
