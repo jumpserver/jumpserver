@@ -10,6 +10,10 @@ class FlowerService(BaseService):
         super().__init__(**kwargs)
 
     @property
+    def db_file(self):
+        return os.path.join(BASE_DIR, 'data', 'flower')
+
+    @property
     def cmd(self):
         print("\n- Start Flower as Task Monitor")
 
@@ -20,11 +24,11 @@ class FlowerService(BaseService):
             '-A', 'ops',
             'flower',
             '-logging=info',
+            '-db={}'.format(self.db_file),
             '--url_prefix=/core/flower',
             '--auto_refresh=False',
             '--max_tasks=1000',
             '--persistent=True',
-            '-db=/opt/jumpserver/data/flower.db',
             '--state_save_interval=600000'
         ]
         return cmd
