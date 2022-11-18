@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 #
-from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
+from django.utils.translation import ugettext_lazy as _
 
 from common.drf.fields import LabeledChoiceField
-from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from orgs.models import Organization
-from tickets.const import TicketType, TicketStatus, TicketState
+from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from tickets.models import Ticket, TicketFlow
+from tickets.const import TicketType, TicketStatus, TicketState
 
 __all__ = [
     'TicketApplySerializer', 'TicketApproveSerializer', 'TicketSerializer',
