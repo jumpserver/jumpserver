@@ -1,24 +1,24 @@
 # -*- coding: utf-8 -*-
 #
-from io import StringIO
 
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.utils import ssh_pubkey_gen, ssh_private_key_gen, validate_ssh_private_key
-from common.drf.fields import EncryptedField
 from assets.models import Type
+from common.drf.fields import EncryptedField
+from common.utils import validate_ssh_private_key, parse_ssh_private_key_str, parse_ssh_public_key_str
 from .utils import validate_password_for_ansible
 
 
 class AuthSerializer(serializers.ModelSerializer):
     password = EncryptedField(required=False, allow_blank=True, allow_null=True, max_length=1024, label=_('Password'))
-    private_key = EncryptedField(required=False, allow_blank=True, allow_null=True, max_length=16384, label=_('Private key'))
+    private_key = EncryptedField(required=False, allow_blank=True, allow_null=True, max_length=16384,
+                                 label=_('Private key'))
 
     def gen_keys(self, private_key=None, password=None):
         if private_key is None:
             return None, None
-        public_key = ssh_pubkey_gen(private_key=private_key, password=password)
+        public_key = parse_ssh_public_key_str(text=private_key, password=password)
         return private_key, public_key
 
     def save(self, **kwargs):
@@ -57,10 +57,7 @@ class AuthSerializerMixin(serializers.ModelSerializer):
         if not valid:
             raise serializers.ValidationError(_("private key invalid or passphrase error"))
 
-        private_key = ssh_private_key_gen(private_key, password=passphrase)
-        string_io = StringIO()
-        private_key.write_private_key(string_io)
-        private_key = string_io.getvalue()
+        private_key = parse_ssh_private_key_str(private_key, password=passphrase)
         return private_key
 
     def validate_public_key(self, public_key):
