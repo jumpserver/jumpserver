@@ -23,8 +23,7 @@ class SmartEndpointViewMixin:
     target_instance: None
     target_protocol: None
 
-    @action(methods=['get'], detail=False, permission_classes=[IsValidUserOrConnectionToken],
-            url_path='smart')
+    @action(methods=['get'], detail=False, permission_classes=[IsValidUserOrConnectionToken])
     def smart(self, request, *args, **kwargs):
         self.target_instance = self.get_target_instance()
         self.target_protocol = self.get_target_protocol()
@@ -57,12 +56,12 @@ class SmartEndpointViewMixin:
         asset_id = request.GET.get('asset_id')
         session_id = request.GET.get('session_id')
         token_id = request.GET.get('token')
+
         if token_id:
             from authentication.models import ConnectionToken
             token = ConnectionToken.objects.filter(id=token_id).first()
             if token and token.asset:
                 asset_id = token.asset.id
-
         if asset_id:
             pk, model = asset_id, Asset
         elif session_id:
@@ -77,8 +76,6 @@ class SmartEndpointViewMixin:
 
     def get_target_protocol(self):
         protocol = None
-        if isinstance(self.target_instance, Application) and self.target_instance.is_type(Application.APP_TYPE.oracle):
-            protocol = self.target_instance.get_target_protocol_for_oracle()
         if not protocol:
             protocol = self.request.GET.get('protocol')
         return protocol

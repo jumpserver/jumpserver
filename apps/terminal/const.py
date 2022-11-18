@@ -51,12 +51,12 @@ class HttpMethod(TextChoices):
 
 class NativeClient(TextChoices):
     # Koko
-    ssh = 'ssh', 'ssh'
+    ssh = 'ssh', 'SSH'
     putty = 'putty', 'PuTTY'
     xshell = 'xshell', 'Xshell'
 
     # Magnus
-    mysql = 'mysql', 'MySQL Client'
+    mysql = 'mysql', 'mysql'
     psql = 'psql', 'psql'
     sqlplus = 'sqlplus', 'sqlplus'
     redis = 'redis-cli', 'redis-cli'
@@ -82,7 +82,7 @@ class NativeClient(TextChoices):
         return clients
 
     @classmethod
-    def get_native_methods(cls, os='windows'):
+    def get_methods(cls, os='windows'):
         clients_map = cls.get_native_clients()
         methods = defaultdict(list)
 
@@ -118,9 +118,9 @@ class NativeClient(TextChoices):
         return command
 
 
-class RemoteAppMethod:
+class AppletMethod:
     @classmethod
-    def get_remote_app_methods(cls):
+    def get_methods(cls):
         from .models import Applet
         applets = Applet.objects.all()
         methods = defaultdict(list)
@@ -130,7 +130,6 @@ class RemoteAppMethod:
                     'value': applet.name,
                     'label': applet.display_name,
                     'icon': applet.icon,
-                    'type': 'remote_app',
                 })
         return methods
 
@@ -153,21 +152,21 @@ class TerminalType(TextChoices):
 
     @classmethod
     def protocols(cls):
-        return {
+        protocols = {
             cls.koko: {
-                'http_method': HttpMethod.web_cli,
+                'web_method': HttpMethod.web_cli,
                 'listen': [Protocol.ssh, Protocol.http],
                 'support': [
                     Protocol.ssh, Protocol.telnet,
                     Protocol.mysql, Protocol.postgresql,
                     Protocol.oracle, Protocol.sqlserver,
                     Protocol.mariadb, Protocol.redis,
-                    Protocol.mongodb,
+                    Protocol.mongodb, Protocol.k8s,
                 ],
                 'match': 'm2m'
             },
             cls.omnidb: {
-                'http_method': HttpMethod.web_gui,
+                'web_method': HttpMethod.web_gui,
                 'listen': [Protocol.http],
                 'support': [
                     Protocol.mysql, Protocol.postgresql, Protocol.oracle,
@@ -176,7 +175,7 @@ class TerminalType(TextChoices):
                 'match': 'm2m'
             },
             cls.lion: {
-                'http_method': HttpMethod.web_gui,
+                'web_method': HttpMethod.web_gui,
                 'listen': [Protocol.http],
                 'support': [Protocol.rdp, Protocol.vnc],
                 'match': 'm2m'
@@ -193,17 +192,17 @@ class TerminalType(TextChoices):
                 'listen': [Protocol.rdp],
                 'support': [Protocol.rdp],
                 'match': 'map'
-            }
+            },
         }
+        return protocols
 
     @classmethod
     def get_protocols_connect_methods(cls, os):
         methods = defaultdict(list)
-        native_methods = NativeClient.get_native_methods(os)
-        remote_app_methods = RemoteAppMethod.get_remote_app_methods()
+        native_methods = NativeClient.get_methods(os)
+        applet_methods = AppletMethod.get_methods()
 
         for component, component_protocol in cls.protocols().items():
-            component_methods = defaultdict(list)
             support = component_protocol['support']
 
             for protocol in support:
@@ -214,19 +213,23 @@ class TerminalType(TextChoices):
 
                 for listen_protocol in listen:
                     if listen_protocol == Protocol.http:
-                        web_protocol = component_protocol['http_method']
-                        component_methods[protocol.value].append({
+                        web_protocol = component_protocol['web_method']
+                        methods[protocol.value].append({
                             'value': web_protocol.value,
                             'label': web_protocol.label,
                             'type': 'web',
+                            'component': component.value,
                         })
 
                     # Native method
-                    component_methods[protocol.value].extend(native_methods[listen_protocol])
-                    component_methods[protocol.value].extend(remote_app_methods[listen_protocol])
+                    methods[protocol.value].extend([
+                        {'component': component.value, 'type': 'native', **method}
+                        for method in native_methods[listen_protocol]
+                    ])
 
-            for protocol, _methods in component_methods.items():
-                for method in _methods:
-                    method['component'] = component.value
-                methods[protocol].extend(_methods)
+        for protocol, applet_methods in applet_methods.items():
+            for method in applet_methods:
+                method['type'] = 'applet'
+                method['component'] = cls.tinker.value
+            methods[protocol].extend(applet_methods)
         return methods
