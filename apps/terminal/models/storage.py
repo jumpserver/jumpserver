@@ -19,7 +19,6 @@ from .terminal import Terminal
 from .command import Command
 from .. import const
 
-
 logger = get_logger(__file__)
 
 
@@ -37,10 +36,10 @@ class CommonStorageModelMixin(models.Model):
 
     def set_to_default(self):
         self.is_default = True
-        self.save()
-        self.__class__.objects.select_for_update()\
-            .filter(is_default=True)\
-            .exclude(id=self.id)\
+        self.save(update_fields=['is_default'])
+        self.__class__.objects.select_for_update() \
+            .filter(is_default=True) \
+            .exclude(id=self.id) \
             .update(is_default=False)
 
     @classmethod
@@ -128,7 +127,10 @@ class CommandStorage(CommonStorageModelMixin, CommonModelMixin):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
-        super().save()
+        super().save(
+            force_insert=force_insert, force_update=force_update,
+            using=using, update_fields=update_fields
+        )
 
         if self.type in TYPE_ENGINE_MAPPING:
             engine_mod = import_module(TYPE_ENGINE_MAPPING[self.type])
