@@ -181,7 +181,7 @@ def _parse_ssh_private_key(text, password=None):
     try:
         private_key = serialization.load_ssh_private_key(text, password=password)
         return private_key
-    except (ValueError, TypeError) as e:
+    except (ValueError, TypeError):
         pass
     return None
 
