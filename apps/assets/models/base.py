@@ -6,22 +6,20 @@ import uuid
 from hashlib import md5
 
 import sshpubkeys
+from django.conf import settings
 from django.core.cache import cache
 from django.db import models
+from django.db.models import QuerySet
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
-from django.db.models import QuerySet
 
-from common.utils import random_string, signer
+from common.db import fields
+from common.utils import random_string
 from common.utils import (
     ssh_key_string_to_obj, ssh_key_gen, get_logger, lazyproperty
 )
-from common.utils.encode import ssh_pubkey_gen
-from common.validators import alphanumeric
-from common.db import fields
+from common.utils.encode import parse_ssh_public_key_str
 from orgs.mixins.models import OrgModelMixin
-
 
 logger = get_logger(__file__)
 
@@ -68,7 +66,7 @@ class AuthMixin:
             public_key = self.public_key
         elif self.private_key:
             try:
-                public_key = ssh_pubkey_gen(private_key=self.private_key, password=self.password)
+                public_key = parse_ssh_public_key_str(private_key=self.private_key, password=self.password)
             except IOError as e:
                 return str(e)
         else:
@@ -234,4 +232,3 @@ class BaseUser(OrgModelMixin, AuthMixin):
 
     class Meta:
         abstract = True
-
