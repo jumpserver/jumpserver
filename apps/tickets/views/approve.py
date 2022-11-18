@@ -2,18 +2,18 @@
 #
 
 from __future__ import unicode_literals
-from django.views.generic.base import TemplateView
-from django.shortcuts import redirect, reverse
 from django.core.cache import cache
+from django.shortcuts import redirect, reverse
+from django.views.generic.base import TemplateView
 from django.utils.translation import ugettext as _
 
 from orgs.utils import tmp_to_root_org
+from tickets.const import TicketType
+from tickets.errors import AlreadyClosed
 from tickets.models import (
     Ticket, ApplyAssetTicket,
     ApplyLoginTicket, ApplyLoginAssetTicket, ApplyCommandTicket
 )
-from tickets.const import TicketType
-from tickets.errors import AlreadyClosed
 from common.utils import get_logger, FlashMessageUtil
 
 logger = get_logger(__name__)

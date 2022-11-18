@@ -9,14 +9,16 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from celery import current_task
 
+from common.const.choices import Trigger
 from common.db.models import BaseCreateUpdateModel
 
 __all__ = ["Job", "JobExecution"]
 
 from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner
+from ops.mixin import PeriodTaskModelMixin
 
 
-class Job(BaseCreateUpdateModel):
+class Job(BaseCreateUpdateModel, PeriodTaskModelMixin):
     class Types(models.TextChoices):
         adhoc = 'adhoc', _('Adhoc')
         playbook = 'playbook', _('Playbook')
@@ -49,6 +51,42 @@ class Job(BaseCreateUpdateModel):
     comment = models.CharField(max_length=1024, default='', verbose_name=_('Comment'), null=True, blank=True)
 
     @property
+    def last_execution(self):
+        return self.executions.last()
+
+    @property
+    def date_last_run(self):
+        return self.last_execution.date_created if self.last_execution else None
+
+    @property
+    def summary(self):
+        summary = {
+            "total": 0,
+            "success": 0,
+        }
+        for execution in self.executions.all():
+            summary["total"] += 1
+            if execution.is_success:
+                summary["success"] += 1
+        return summary
+
+    @property
+    def average_time_cost(self):
+        total_cost = 0
+        finished_count = self.executions.filter(status__in=['success', 'failed']).count()
+        for execution in self.executions.filter(status__in=['success', 'failed']).all():
+            total_cost += execution.time_cost
+        return total_cost / finished_count if finished_count else 0
+
+    def get_register_task(self):
+        from ..tasks import run_ops_job
+        name = "run_ops_job_period_{}".format(str(self.id)[:8])
+        task = run_ops_job.name
+        args = (str(self.id),)
+        kwargs = {}
+        return name, task, args, kwargs
+
+    @property
     def inventory(self):
         return JMSInventory(self.assets.all(), self.runas_policy, self.runas)
 
@@ -72,7 +110,10 @@ class JobExecution(BaseCreateUpdateModel):
     def get_runner(self):
         inv = self.job.inventory
         inv.write_to_file(self.inventory_path)
-        extra_vars = json.loads(self.parameters)
+        if isinstance(self.parameters, str):
+            extra_vars = json.loads(self.parameters)
+        else:
+            extra_vars = {}
 
         if self.job.type == 'adhoc':
             runner = AdHocRunner(

@@ -25,7 +25,7 @@ logger = get_logger(__file__)
 
 
 @shared_task(soft_time_limit=60, queue="ansible", verbose_name=_("Run ansible task"))
-def run_ops_job(job_id, **kwargs):
+def run_ops_job(job_id):
     job = get_object_or_none(Job, id=job_id)
     execution = job.create_execution()
     try:

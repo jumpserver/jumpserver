@@ -1,6 +1,7 @@
+from rest_framework import serializers
 from django.db.transaction import atomic
 from django.utils.translation import ugettext_lazy as _
-from rest_framework import serializers
+
 
 from orgs.models import Organization
 from orgs.utils import get_current_org_id

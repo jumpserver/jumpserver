@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext as _
 
-from perms.models import AssetPermission
 from orgs.utils import tmp_to_org
+from perms.models import AssetPermission
 from tickets.models import ApplyAssetTicket
 from .base import BaseHandler
 

@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from perms.models import Action
 from .general import Ticket
 
 __all__ = ['ApplyApplicationTicket']
@@ -23,14 +22,10 @@ class ApplyApplicationTicket(Ticket):
         'assets.SystemUser', verbose_name=_('Apply system users'),
     )
     apply_actions = models.IntegerField(
-        choices=Action.DB_CHOICES, default=Action.ALL, verbose_name=_('Actions')
+        choices=[
+            (255, 'All'), (1, 'Connect'), (2, 'Upload file'), (4, 'Download file'), (6, 'Upload download'),
+            (8, 'Clipboard copy'), (16, 'Clipboard paste'), (24, 'Clipboard copy paste')
+        ], default=255, verbose_name=_('Actions')
     )
     apply_date_start = models.DateTimeField(verbose_name=_('Date start'), null=True)
     apply_date_expired = models.DateTimeField(verbose_name=_('Date expired'), null=True)
-
-    @property
-    def apply_actions_display(self):
-        return Action.value_to_choices_display(self.apply_actions)
-
-    def get_apply_actions_display(self):
-        return ', '.join(self.apply_actions_display)
