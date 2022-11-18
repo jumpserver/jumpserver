@@ -1,9 +1,8 @@
 from rest_framework.generics import RetrieveDestroyAPIView
 
 from orgs.utils import tmp_to_root_org
-from ..serializers import SuperTicketSerializer
 from ..models import Ticket
-
+from ..serializers import SuperTicketSerializer
 
 __all__ = ['SuperTicketStatusAPI']
 
