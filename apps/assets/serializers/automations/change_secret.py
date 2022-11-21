@@ -42,6 +42,19 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
             )},
         }}
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_secret_type_choices()
+
+    def set_secret_type_choices(self):
+        secret_type = self.fields.get('secret_type')
+        if not secret_type:
+            return
+        choices = secret_type._choices
+        choices.pop(SecretType.ACCESS_KEY, None)
+        choices.pop(SecretType.TOKEN, None)
+        secret_type._choices = choices
+
     def validate_password_rules(self, password_rules):
         secret_type = self.initial_secret_type
         if secret_type != SecretType.PASSWORD:
