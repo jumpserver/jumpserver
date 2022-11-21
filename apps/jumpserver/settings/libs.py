@@ -102,7 +102,12 @@ if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
     REDIS_LAYERS_HOST['master_name'] = REDIS_SENTINEL_SERVICE_NAME
     REDIS_LAYERS_HOST['sentinel_kwargs'] = {
         'password': REDIS_SENTINEL_PASSWORD,
-        'socket_timeout': REDIS_SENTINEL_SOCKET_TIMEOUT
+        'socket_timeout': REDIS_SENTINEL_SOCKET_TIMEOUT,
+        'ssl': REDIS_USE_SSL,
+        'ssl_cert_reqs': REDIS_SSL_REQUIRED,
+        "ssl_keyfile": REDIS_SSL_KEY,
+        "ssl_certfile": REDIS_SSL_CERT,
+        "ssl_ca_certs": REDIS_SSL_CA
     }
 else:
     # More info see: https://github.com/django/channels_redis/issues/334
@@ -140,7 +145,12 @@ if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
         'master_name': REDIS_SENTINEL_SERVICE_NAME,
         'sentinel_kwargs': {
             'password': REDIS_SENTINEL_PASSWORD,
-            'socket_timeout': REDIS_SENTINEL_SOCKET_TIMEOUT
+            'socket_timeout': REDIS_SENTINEL_SOCKET_TIMEOUT,
+            'ssl': REDIS_USE_SSL,
+            'ssl_cert_reqs': REDIS_SSL_REQUIRED,
+            "ssl_keyfile": REDIS_SSL_KEY,
+            "ssl_certfile": REDIS_SSL_CERT,
+            "ssl_ca_certs": REDIS_SSL_CA
         }
     }
     CELERY_BROKER_TRANSPORT_OPTIONS = CELERY_RESULT_BACKEND_TRANSPORT_OPTIONS = SENTINEL_OPTIONS
