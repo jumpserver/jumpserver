@@ -65,3 +65,9 @@ class ChangeSecretRecord(JMSBaseModel):
 
     def __str__(self):
         return self.account.__str__()
+
+    @property
+    def timedelta(self):
+        if self.date_started and self.date_finished:
+            return self.date_finished - self.date_started
+        return None
