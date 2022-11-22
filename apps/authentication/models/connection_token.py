@@ -2,13 +2,15 @@ import time
 from datetime import timedelta
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
-from orgs.mixins.models import OrgModelMixin
-
 from django.db import models
-from common.utils import lazyproperty
+from django.conf import settings
+from rest_framework.exceptions import PermissionDenied
+
+from orgs.mixins.models import OrgModelMixin
+from common.utils import lazyproperty, pretty_string
 from common.utils.timezone import as_current_tz
 from common.db.models import JMSBaseModel
+from common.db.fields import EncryptCharField
 from assets.const import Protocol
 
 
@@ -25,13 +27,14 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
         'assets.Asset', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='connection_tokens', verbose_name=_('Asset'),
     )
+    login = models.CharField(max_length=128, verbose_name=_("Login account"))
+    username = models.CharField(max_length=128, default='', verbose_name=_("Username"))
+    secret = EncryptCharField(max_length=64, default='', verbose_name=_("Secret"))
     protocol = models.CharField(
         choices=Protocol.choices, max_length=16, default=Protocol.ssh, verbose_name=_("Protocol")
     )
     user_display = models.CharField(max_length=128, default='', verbose_name=_("User display"))
     asset_display = models.CharField(max_length=128, default='', verbose_name=_("Asset display"))
-    account_username = models.CharField(max_length=128, default='', verbose_name=_("Account"))
-    secret = models.CharField(max_length=64, default='', verbose_name=_("Secret"))
     date_expired = models.DateTimeField(
         default=date_expired_default, verbose_name=_("Date expired")
     )
@@ -59,9 +62,10 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
             seconds = 0
         return int(seconds)
 
-    @classmethod
-    def get_default_date_expired(cls):
-        return date_expired_default()
+    def save(self, *args, **kwargs):
+        self.asset_display = pretty_string(self.asset, max_length=128)
+        self.user_display = pretty_string(self.user, max_length=128)
+        return super().save(*args, **kwargs)
 
     def expire(self):
         self.date_expired = timezone.now()
@@ -69,7 +73,7 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
 
     def renewal(self):
         """ 续期 Token，将来支持用户自定义创建 token 后，续期策略要修改 """
-        self.date_expired = self.get_default_date_expired()
+        self.date_expired = date_expired_default()
         self.save()
 
     # actions 和 expired_at 在 check_valid() 中赋值
@@ -89,28 +93,52 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
             is_valid = False
             error = _('No asset or inactive asset')
             return is_valid, error
-        if not self.account_username:
+        if not self.login:
             is_valid = False
             error = _('No account')
             return is_valid, error
-        actions, expire_at = PermAccountUtil().validate_permission(
-            self.user, self.asset, self.account_username
+
+        permed_account = PermAccountUtil().validate_permission(
+            self.user, self.asset, self.login
         )
-        if not actions or expire_at < time.time():
-            is_valid = False
-            error = _('User has no permission to access asset or permission expired')
-            return is_valid, error
-        self.actions = actions
-        self.expire_at = expire_at
+        if not permed_account or not permed_account.actions:
+            msg = 'user `{}` not has asset `{}` permission for login `{}`'.format(
+                self.user, self.asset, self.login
+            )
+            raise PermissionDenied(msg)
+
+        if permed_account.date_expired < timezone.now():
+            raise PermissionDenied('Expired')
+
         is_valid, error = True, ''
         return is_valid, error
 
     @lazyproperty
-    def account(self):
+    def platform(self):
+        return self.asset.platform
+
+    @lazyproperty
+    def accounts(self):
         if not self.asset:
             return None
-        account = self.asset.accounts.filter(username=self.account_username).first()
-        return account
+
+        data = []
+        if self.login == '@INPUT':
+            data.append({
+                'name': self.login,
+                'username': self.username,
+                'secret_type': 'password',
+                'secret': self.secret
+            })
+        else:
+            accounts = self.asset.accounts.filter(username=self.login)
+            for account in accounts:
+                data.append({
+                    'username': account.uesrname,
+                    'secret_type': account.secret_type,
+                    'secret': account.secret if account.secret else self.secret
+                })
+        return data
 
     @lazyproperty
     def domain(self):

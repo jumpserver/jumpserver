@@ -17,10 +17,8 @@ class PermAccountUtil(AssetPermissionUtil):
         """
         permed_accounts = self.get_permed_accounts_for_user(user, asset)
         accounts_mapper = {account.username: account for account in permed_accounts}
-
         account = accounts_mapper.get(account_username)
-        actions, date_expired = (account.actions, account.date_expired) if account else (False, None)
-        return actions, date_expired
+        return account
 
     def get_permed_accounts_for_user(self, user, asset):
         """ 获取授权给用户某个资产的账号 """

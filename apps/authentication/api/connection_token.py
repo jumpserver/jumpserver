@@ -6,6 +6,7 @@ import urllib.parse
 
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
@@ -15,6 +16,7 @@ from rest_framework.response import Response
 from common.drf.api import JMSModelViewSet
 from common.http import is_true
 from orgs.mixins.api import RootOrgViewMixin
+from orgs.utils import tmp_to_root_org
 from perms.models import ActionChoices
 from terminal.models import EndpointRule
 from ..models import ConnectionToken
@@ -257,6 +259,10 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         'get_client_protocol_url': 'authentication.add_connectiontoken',
     }
 
+    def dispatch(self, request, *args, **kwargs):
+        with tmp_to_root_org():
+            return super().dispatch(request, *args, **kwargs)
+
     def get_queryset(self):
         return ConnectionToken.objects.filter(user=self.request.user)
 
@@ -264,22 +270,36 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         return self.request.user
 
     def perform_create(self, serializer):
-        user = self.get_user(serializer)
-        asset = serializer.validated_data.get('asset')
-        account_username = serializer.validated_data.get('account_username')
-        self.validate_asset_permission(user, asset, account_username)
-        return super(ConnectionTokenViewSet, self).perform_create(serializer)
+        self.validate_serializer(serializer)
+        return super().perform_create(serializer)
 
-    @staticmethod
-    def validate_asset_permission(user, asset, account_username):
+    def validate_serializer(self, serializer):
         from perms.utils.account import PermAccountUtil
-        actions, expire_at = PermAccountUtil().validate_permission(user, asset, account_username)
-        if not actions:
-            error = 'No actions'
-            raise PermissionDenied(error)
-        if expire_at < time.time():
-            error = 'Expired'
-            raise PermissionDenied(error)
+
+        data = serializer.validated_data
+        user = self.get_user(serializer)
+        asset = data.get('asset')
+        login = data.get('login')
+        data['org_id'] = asset.org_id
+        data['user'] = user
+
+        util = PermAccountUtil()
+        permed_account = util.validate_permission(user, asset, login)
+
+        if not permed_account or not permed_account.actions:
+            msg = 'user `{}` not has asset `{}` permission for login `{}`'.format(
+                user, asset, login
+            )
+            raise PermissionDenied(msg)
+
+        if permed_account.date_expired < timezone.now():
+            raise PermissionDenied('Expired')
+
+        if permed_account.has_secret:
+            serializer.validated_data['secret'] = ''
+        if permed_account.username != '@INPUT':
+            serializer.validated_data['username'] = ''
+        return permed_account
 
 
 class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
