@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from assets.models import Asset, Gateway, Domain, CommandFilterRule, Account, Platform
+from assets.models import Asset, Domain, CommandFilterRule, Account, Platform
 from authentication.models import ConnectionToken
 from common.utils import pretty_string
 from common.utils.random import random_string
@@ -130,8 +130,8 @@ class ConnectionTokenGatewaySerializer(serializers.ModelSerializer):
     """ Gateway """
 
     class Meta:
-        model = Gateway
-        fields = ['id', 'ip', 'port', 'username', 'password', 'private_key']
+        model = Asset
+        fields = ['id', 'address', 'port', 'username', 'password', 'private_key']
 
 
 class ConnectionTokenDomainSerializer(serializers.ModelSerializer):
