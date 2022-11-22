@@ -38,18 +38,15 @@ ARG TOOLS="                           \
         default-mysql-client          \
         iputils-ping                  \
         locales                       \
-        procps                        \
-        redis-tools                   \
+        netcat                        \
+        redis-server                  \
         telnet                        \
         vim                           \
         unzip                         \
         wget"
 
-ARG APT_MIRROR=http://mirrors.ustc.edu.cn
-
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
-    sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
-    && rm -f /etc/apt/apt.conf.d/docker-clean \
+    set -ex \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && apt-get update \
     && apt-get -y install --no-install-recommends ${BUILD_DEPENDENCIES} \
@@ -64,16 +61,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
     && sed -i "s@# alias @alias @g" ~/.bashrc \
     && rm -rf /var/lib/apt/lists/*
 
-ARG DOWNLOAD_URL=https://download.jumpserver.org
-
-RUN mkdir -p /opt/oracle/ \
-    && cd /opt/oracle/ \
-    && wget ${DOWNLOAD_URL}/public/instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip \
-    && unzip instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip \
-    && sh -c "echo /opt/oracle/instantclient_19_10 > /etc/ld.so.conf.d/oracle-instantclient.conf" \
-    && ldconfig \
-    && rm -f instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip
-
 WORKDIR /tmp/build
 COPY ./requirements ./requirements
 
@@ -87,6 +74,10 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     && pip config set global.index-url ${PIP_MIRROR} \
     && pip install --upgrade pip \
     && pip install --upgrade setuptools wheel \
+    && pip install https://download.jumpserver.org/pypi/simple/cryptography/cryptography-36.0.1-cp38-cp38-linux_loongarch64.whl \
+    && pip install https://download.jumpserver.org/pypi/simple/greenlet/greenlet-1.1.2-cp38-cp38-linux_loongarch64.whl \
+    && pip install $(grep 'PyNaCl' requirements/requirements.txt) \
+    && GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=true pip install grpcio \
     && pip install $(grep -E 'jms|jumpserver' requirements/requirements.txt) -i ${PIP_JMS_MIRROR} \
     && pip install -r requirements/requirements.txt
 

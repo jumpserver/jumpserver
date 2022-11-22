@@ -1,4 +1,3 @@
-
 from assets.models import Host
 from assets.serializers import HostSerializer
 from .asset import AssetViewSet

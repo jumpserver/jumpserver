@@ -3,11 +3,9 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
-from common.validators import alphanumeric
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.drf.serializers import SecretReadableMixin
-from ..models import Domain, Gateway
-from .base import AuthValidateMixin
+from ..models import Domain, Asset
 
 
 class DomainSerializer(BulkOrgResourceModelSerializer):
@@ -35,32 +33,23 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
 
     @staticmethod
     def get_gateway_count(obj):
-        return obj.gateway_set.all().count()
+        return obj.gateways.count()
 
 
-class GatewaySerializer(AuthValidateMixin, BulkOrgResourceModelSerializer):
+class GatewaySerializer(BulkOrgResourceModelSerializer):
     is_connective = serializers.BooleanField(required=False, label=_('Connectivity'))
 
     class Meta:
-        model = Gateway
-        fields_mini = ['id', 'username']
-        fields_write_only = [
-            'password', 'private_key', 'public_key', 'passphrase'
-        ]
-        fields_small = fields_mini + fields_write_only + [
-            'ip', 'port', 'protocol',
+        model = Asset
+        fields_mini = ['id']
+        fields_small = fields_mini + [
+            'address', 'port', 'protocol',
             'is_active', 'is_connective',
             'date_created', 'date_updated',
             'created_by', 'comment',
         ]
         fields_fk = ['domain']
         fields = fields_small + fields_fk
-        extra_kwargs = {
-            'username': {"validators": [alphanumeric]},
-            'password': {'write_only': True},
-            'private_key': {"write_only": True},
-            'public_key': {"write_only": True},
-        }
 
 
 class GatewayWithAuthSerializer(SecretReadableMixin, GatewaySerializer):
