@@ -28,8 +28,16 @@ class ActionChoices(BitChoices):
         )
 
     @classmethod
-    def has_perm(cls, action_name, total):
-        action_value = getattr(cls, action_name)
+    def transfer(cls):
+        return cls.upload | cls.download
+
+    @classmethod
+    def clipboard(cls):
+        return cls.copy | cls.paste
+
+    @classmethod
+    def contains(cls, total, action):
+        action_value = getattr(cls, action)
         return action_value & total == action_value
 
     @classmethod

@@ -16,6 +16,11 @@ class Migration(migrations.Migration):
             old_name='account_username',
             new_name='login'
         ),
+        migrations.AlterField(
+            model_name='connectiontoken',
+            name='login',
+            field=models.CharField(max_length=128, verbose_name='Login account'),
+        ),
         migrations.AddField(
             model_name='connectiontoken',
             name='username',

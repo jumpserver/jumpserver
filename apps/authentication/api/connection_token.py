@@ -28,9 +28,6 @@ from ..serializers import (
 __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
 
 
-# ExtraActionApiMixin
-
-
 class RDPFileClientProtocolURLMixin:
     request: Request
     get_serializer: callable
@@ -72,8 +69,7 @@ class RDPFileClientProtocolURLMixin:
         # 设置磁盘挂载
         drives_redirect = is_true(self.request.query_params.get('drives_redirect'))
         if drives_redirect:
-            actions = ActionChoices.choices_to_value(token.actions)
-            if actions & Action.TRANSFER == Action.TRANSFER:
+            if ActionChoices.contains(token.actions, ActionChoices.transfer()):
                 rdp_options['drivestoredirect:s'] = '*'
 
         # 设置全屏
@@ -181,22 +177,10 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
     get_serializer: callable
     perform_create: callable
 
-    @action(methods=['POST'], detail=False, url_path='secret-info/detail')
-    def get_secret_detail(self, request, *args, **kwargs):
-        """ 非常重要的 api, 在逻辑层再判断一下 rbac 权限, 双重保险 """
-        rbac_perm = 'authentication.view_connectiontokensecret'
-        if not request.user.has_perm(rbac_perm):
-            raise PermissionDenied('Not allow to view secret')
-        token_id = request.data.get('token') or ''
-        token = get_object_or_404(ConnectionToken, pk=token_id)
-        self.check_token_permission(token)
-        serializer = self.get_serializer(instance=token)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
     @action(methods=['POST', 'GET'], detail=False, url_path='rdp/file')
     def get_rdp_file(self, request, *args, **kwargs):
         token = self.create_connection_token()
-        self.check_token_permission(token)
+        token.is_valid()
         filename, content = self.get_rdp_file_info(token)
         filename = '{}.rdp'.format(filename)
         response = HttpResponse(content, content_type='application/octet-stream')
@@ -206,7 +190,7 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
     @action(methods=['POST', 'GET'], detail=False, url_path='client-url')
     def get_client_protocol_url(self, request, *args, **kwargs):
         token = self.create_connection_token()
-        self.check_token_permission(token)
+        token.is_valid()
         try:
             protocol_data = self.get_client_protocol_data(token)
         except ValueError as e:
@@ -223,12 +207,6 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
         instance = self.get_object()
         instance.expire()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-    @staticmethod
-    def check_token_permission(token: ConnectionToken):
-        is_valid, error = token.check_permission()
-        if not is_valid:
-            raise PermissionDenied(error)
 
     def create_connection_token(self):
         data = self.request.query_params if self.request.method == 'GET' else self.request.data
@@ -258,6 +236,18 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         'get_rdp_file': 'authentication.add_connectiontoken',
         'get_client_protocol_url': 'authentication.add_connectiontoken',
     }
+
+    @action(methods=['POST'], detail=False, url_path='secret')
+    def get_secret_detail(self, request, *args, **kwargs):
+        """ 非常重要的 api, 在逻辑层再判断一下 rbac 权限, 双重保险 """
+        rbac_perm = 'authentication.view_connectiontokensecret'
+        if not request.user.has_perm(rbac_perm):
+            raise PermissionDenied('Not allow to view secret')
+        token_id = request.data.get('token') or ''
+        token = get_object_or_404(ConnectionToken, pk=token_id)
+        token.is_valid()
+        serializer = self.get_serializer(instance=token)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def dispatch(self, request, *args, **kwargs):
         with tmp_to_root_org():
@@ -296,9 +286,9 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
             raise PermissionDenied('Expired')
 
         if permed_account.has_secret:
-            serializer.validated_data['secret'] = ''
+            data['secret'] = ''
         if permed_account.username != '@INPUT':
-            serializer.validated_data['username'] = ''
+            data['username'] = ''
         return permed_account
 
 

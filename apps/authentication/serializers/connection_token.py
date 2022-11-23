@@ -17,7 +17,6 @@ __all__ = [
 class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
     username = serializers.CharField(max_length=128, label=_("Input username"),
                                      allow_null=True, allow_blank=True)
-    is_valid = serializers.BooleanField(read_only=True, label=_('Validity'))
     expire_time = serializers.IntegerField(read_only=True, label=_('Expired time'))
 
     class Meta:
@@ -25,7 +24,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         fields_mini = ['id']
         fields_small = fields_mini + [
             'protocol', 'login', 'secret', 'username',
-            'date_expired', 'date_created',
+            'actions', 'date_expired', 'date_created',
             'date_updated', 'created_by',
             'updated_by', 'org_id', 'org_name',
         ]
@@ -34,7 +33,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         ]
         read_only_fields = [
             # 普通 Token 不支持指定 user
-            'user', 'is_valid', 'expire_time',
+            'user', 'expire_time',
             'user_display', 'asset_display',
         ]
         fields = fields_small + fields_fk + read_only_fields
@@ -98,7 +97,7 @@ class ConnectionTokenAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
         fields = [
-           'username', 'secret_type', 'secret',
+           'name', 'username', 'secret_type', 'secret',
         ]
 
 
@@ -144,7 +143,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     user = ConnectionTokenUserSerializer(read_only=True)
     asset = ConnectionTokenAssetSerializer(read_only=True)
     platform = ConnectionTokenPlatform(read_only=True)
-    accounts = ConnectionTokenAccountSerializer(read_only=True, many=True)
+    account = ConnectionTokenAccountSerializer(read_only=True)
     gateway = ConnectionTokenGatewaySerializer(read_only=True)
     # cmd_filter_rules = ConnectionTokenCmdFilterRuleSerializer(many=True)
     actions = ActionChoicesField()
@@ -153,8 +152,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     class Meta:
         model = ConnectionToken
         fields = [
-            'id', 'secret', 'user', 'asset', 'login',
-            'accounts', 'protocol', 'domain', 'gateway',
-            'actions', 'expire_at',
-            'platform',
+            'id', 'secret', 'user', 'asset', 'account',
+            'protocol', 'domain', 'gateway',
+            'actions', 'expire_at', 'platform',
         ]
