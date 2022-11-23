@@ -3,7 +3,6 @@ from .common import Asset
 
 
 class Host(Asset):
-    pass
 
     @classmethod
     def get_gateway_queryset(cls):
