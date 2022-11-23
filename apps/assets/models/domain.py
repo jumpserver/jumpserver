@@ -13,8 +13,9 @@ from django.utils.translation import ugettext_lazy as _
 from common.db import fields
 from common.utils import get_logger, lazyproperty
 from orgs.mixins.models import OrgModelMixin
+from assets.models import Host
 from .base import BaseAccount
-from ..const import SecretType, GATEWAY_NAME
+from ..const import SecretType
 
 logger = get_logger(__file__)
 
@@ -37,7 +38,7 @@ class Domain(OrgModelMixin):
 
     @lazyproperty
     def gateways(self):
-        return self.assets.filter(platform__name=GATEWAY_NAME, is_active=True)
+        return Host.get_gateway_queryset().filter(domain=self, is_active=True)
 
     def select_gateway(self):
         return self.random_gateway()
