@@ -47,10 +47,6 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
         ]
 
     @property
-    def is_valid(self):
-        return not self.is_expired
-
-    @property
     def is_expired(self):
         return self.date_expired < timezone.now()
 
@@ -76,69 +72,71 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
         self.date_expired = date_expired_default()
         self.save()
 
-    # actions 和 expired_at 在 check_valid() 中赋值
-    actions = expire_at = None
+    @lazyproperty
+    def permed_account(self):
+        from perms.utils import PermAccountUtil
+        permed_account = PermAccountUtil().validate_permission(
+            self.user, self.asset, self.login
+        )
+        return permed_account
 
-    def check_permission(self):
-        from perms.utils.account import PermAccountUtil
+    @lazyproperty
+    def actions(self):
+        return self.permed_account.actions
+
+    @lazyproperty
+    def expire_at(self):
+        return self.permed_account.date_expired.timestamp()
+
+    def is_valid(self):
         if self.is_expired:
-            is_valid = False
             error = _('Connection token expired at: {}').format(as_current_tz(self.date_expired))
-            return is_valid, error
+            raise PermissionDenied(error)
         if not self.user or not self.user.is_valid:
-            is_valid = False
             error = _('No user or invalid user')
-            return is_valid, error
+            raise PermissionDenied(error)
         if not self.asset or not self.asset.is_active:
             is_valid = False
             error = _('No asset or inactive asset')
             return is_valid, error
         if not self.login:
-            is_valid = False
             error = _('No account')
-            return is_valid, error
+            raise PermissionDenied(error)
 
-        permed_account = PermAccountUtil().validate_permission(
-            self.user, self.asset, self.login
-        )
-        if not permed_account or not permed_account.actions:
+        if not self.permed_account or not self.permed_account.actions:
             msg = 'user `{}` not has asset `{}` permission for login `{}`'.format(
                 self.user, self.asset, self.login
             )
             raise PermissionDenied(msg)
 
-        if permed_account.date_expired < timezone.now():
+        if self.permed_account.date_expired < timezone.now():
             raise PermissionDenied('Expired')
-
-        is_valid, error = True, ''
-        return is_valid, error
+        return True
 
     @lazyproperty
     def platform(self):
         return self.asset.platform
 
     @lazyproperty
-    def accounts(self):
+    def account(self):
         if not self.asset:
             return None
 
-        data = []
-        if self.login == '@INPUT':
-            data.append({
+        account = self.asset.accounts.filter(name=self.login).first()
+        if self.login == '@INPUT' or not account:
+            return {
                 'name': self.login,
                 'username': self.username,
                 'secret_type': 'password',
                 'secret': self.secret
-            })
+            }
         else:
-            accounts = self.asset.accounts.filter(username=self.login)
-            for account in accounts:
-                data.append({
-                    'username': account.uesrname,
-                    'secret_type': account.secret_type,
-                    'secret': account.secret if account.secret else self.secret
-                })
-        return data
+            return {
+                'name': account.name,
+                'username': account.username,
+                'secret_type': account.secret_type,
+                'secret': account.secret_type or self.secret
+            }
 
     @lazyproperty
     def domain(self):
