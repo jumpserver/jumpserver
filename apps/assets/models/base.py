@@ -63,6 +63,10 @@ class BaseAccount(JMSOrgBaseModel):
         return bool(self.secret)
 
     @property
+    def has_username(self):
+        return bool(self.username)
+
+    @property
     def specific(self):
         data = {}
         if self.secret_type != SecretType.SSH_KEY:
