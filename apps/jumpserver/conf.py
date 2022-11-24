@@ -195,6 +195,7 @@ class Config(dict):
         'DB_PORT': 3306,
         'DB_USER': 'root',
         'DB_PASSWORD': '',
+        'DB_USE_SSL': False,
         'REDIS_HOST': '127.0.0.1',
         'REDIS_PORT': 6379,
         'REDIS_PASSWORD': '',
