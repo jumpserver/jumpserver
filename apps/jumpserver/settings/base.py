@@ -198,13 +198,12 @@ DATABASES = {
     }
 }
 
-DB_CA_PATH = os.path.join(CERTS_DIR, 'db_ca.pem')
-DB_USE_SSL = False
+DB_USE_SSL = CONFIG.DB_USE_SSL
 if CONFIG.DB_ENGINE.lower() == 'mysql':
     DB_OPTIONS['init_command'] = "SET sql_mode='STRICT_TRANS_TABLES'"
-    if os.path.isfile(DB_CA_PATH):
+    if DB_USE_SSL:
+        DB_CA_PATH = exist_or_default(os.path.join(CERTS_DIR, 'db_ca.pem'), None)
         DB_OPTIONS['ssl'] = {'ca': DB_CA_PATH}
-        DB_USE_SSL = True
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
