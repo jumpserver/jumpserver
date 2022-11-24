@@ -1,6 +1,9 @@
 import os
 import platform
 
+from redis.sentinel import SentinelManagedSSLConnection
+
+
 if platform.system() == 'Darwin' and platform.machine() == 'arm64':
     import pymysql
 
@@ -195,7 +198,7 @@ DATABASES = {
     }
 }
 
-DB_CA_PATH = os.path.join(PROJECT_DIR, 'data', 'certs', 'db_ca.pem')
+DB_CA_PATH = os.path.join(CERTS_DIR, 'db_ca.pem')
 DB_USE_SSL = False
 if CONFIG.DB_ENGINE.lower() == 'mysql':
     DB_OPTIONS['init_command'] = "SET sql_mode='STRICT_TRANS_TABLES'"
@@ -317,10 +320,19 @@ if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
         'CLIENT_CLASS': 'django_redis.client.SentinelClient',
         'SENTINELS': REDIS_SENTINELS, 'PASSWORD': CONFIG.REDIS_PASSWORD,
         'SENTINEL_KWARGS': {
+            'ssl': REDIS_USE_SSL,
+            'ssl_cert_reqs': REDIS_SSL_REQUIRED,
+            "ssl_keyfile": REDIS_SSL_KEY,
+            "ssl_certfile": REDIS_SSL_CERT,
+            "ssl_ca_certs": REDIS_SSL_CA,
             'password': REDIS_SENTINEL_PASSWORD,
             'socket_timeout': REDIS_SENTINEL_SOCKET_TIMEOUT
         }
     })
+    if REDIS_USE_SSL:
+        REDIS_OPTIONS['CONNECTION_POOL_KWARGS'].update({
+            'connection_class': SentinelManagedSSLConnection
+        })
     DJANGO_REDIS_CONNECTION_FACTORY = 'django_redis.pool.SentinelConnectionFactory'
 else:
     REDIS_LOCATION_NO_DB = '%(protocol)s://:%(password)s@%(host)s:%(port)s/{}' % {
