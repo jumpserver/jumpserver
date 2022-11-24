@@ -211,17 +211,6 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
         tree_node = TreeNode(**data)
         return tree_node
 
-    def filter_accounts(self, account_names=None):
-        from perms.models import AssetPermission
-        if account_names is None:
-            return self.accounts.all()
-        if AssetPermission.SpecialAccount.ALL in account_names:
-            return self.accounts.all()
-        # queries = Q(name__in=account_names) | Q(username__in=account_names)
-        queries = Q(username__in=account_names)
-        accounts = self.accounts.filter(queries)
-        return accounts
-
     class Meta:
         unique_together = [('org_id', 'name')]
         verbose_name = _("Asset")

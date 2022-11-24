@@ -5,5 +5,4 @@ from .user_permission import user_permission_urlpatterns
 
 app_name = 'perms'
 
-urlpatterns = asset_permission_urlpatterns \
-              + user_permission_urlpatterns
+urlpatterns = asset_permission_urlpatterns + user_permission_urlpatterns
