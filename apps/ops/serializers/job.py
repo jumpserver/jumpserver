@@ -1,14 +1,13 @@
-from django.db import transaction
 from rest_framework import serializers
-
 from common.drf.fields import ReadableHiddenField
 from ops.mixin import PeriodTaskSerializerMixin
 from ops.models import Job, JobExecution
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 _all_ = []
 
 
-class JobSerializer(serializers.ModelSerializer, PeriodTaskSerializerMixin):
+class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
     owner = ReadableHiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
