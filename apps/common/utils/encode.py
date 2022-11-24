@@ -178,6 +178,13 @@ def _parse_ssh_private_key(text, password=None):
             text = text.encode("utf-8")
         except UnicodeDecodeError:
             return None
+    if password is not None:
+        if isinstance(password, str):
+            try:
+                password = password.encode("utf-8")
+            except UnicodeDecodeError:
+                return None
+
     try:
         private_key = serialization.load_ssh_private_key(text, password=password)
         return private_key
