@@ -16,7 +16,9 @@ class JobViewSet(OrgBulkModelViewSet):
 
     def get_queryset(self):
         query_set = super().get_queryset()
-        return query_set.filter(instant=False)
+        if self.action != 'retrieve':
+            return query_set.filter(instant=False)
+        return query_set
 
     def perform_create(self, serializer):
         instance = serializer.save()

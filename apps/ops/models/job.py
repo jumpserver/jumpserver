@@ -91,6 +91,9 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     def create_execution(self):
         return self.executions.create()
 
+    class Meta:
+        ordering = ['date_created']
+
 
 class JobExecution(JMSOrgBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
@@ -198,3 +201,6 @@ class JobExecution(JMSOrgBaseModel):
         except Exception as e:
             logging.error(e, exc_info=True)
             self.set_error(e)
+
+    class Meta:
+        ordering = ['-date_created']
