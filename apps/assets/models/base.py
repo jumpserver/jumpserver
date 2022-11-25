@@ -1,23 +1,22 @@
 # -*- coding: utf-8 -*-
 #
-import io
 import os
-import sshpubkeys
 from hashlib import md5
 
-from django.db import models
+import sshpubkeys
 from django.conf import settings
-from django.utils import timezone
+from django.db import models
 from django.db.models import QuerySet
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
+from assets.const import Connectivity, SecretType
+from common.db import fields
 from common.utils import (
     ssh_key_string_to_obj, ssh_key_gen, get_logger,
-    random_string, ssh_pubkey_gen, lazyproperty
+    random_string, lazyproperty, parse_ssh_public_key_str
 )
-from common.db import fields
 from orgs.mixins.models import JMSOrgBaseModel
-from assets.const import Connectivity, SecretType
 
 logger = get_logger(__file__)
 
@@ -63,6 +62,10 @@ class BaseAccount(JMSOrgBaseModel):
         return bool(self.secret)
 
     @property
+    def has_username(self):
+        return bool(self.username)
+
+    @property
     def specific(self):
         data = {}
         if self.secret_type != SecretType.SSH_KEY:
@@ -84,7 +87,7 @@ class BaseAccount(JMSOrgBaseModel):
     @lazyproperty
     def public_key(self):
         if self.secret_type == SecretType.SSH_KEY:
-            return ssh_pubkey_gen(private_key=self.private_key)
+            return parse_ssh_public_key_str(self.private_key)
         return None
 
     @property
@@ -93,7 +96,7 @@ class BaseAccount(JMSOrgBaseModel):
             public_key = self.public_key
         elif self.private_key:
             try:
-                public_key = ssh_pubkey_gen(private_key=self.private_key)
+                public_key = parse_ssh_public_key_str(self.private_key)
             except IOError as e:
                 return str(e)
         else:
@@ -125,12 +128,9 @@ class BaseAccount(JMSOrgBaseModel):
         return key_path
 
     def get_private_key(self):
-        if not self.private_key_obj:
+        if not self.private_key:
             return None
-        string_io = io.StringIO()
-        self.private_key_obj.write_private_key(string_io)
-        private_key = string_io.getvalue()
-        return private_key
+        return self.private_key
 
     @property
     def public_key_obj(self):

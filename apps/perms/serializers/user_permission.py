@@ -12,7 +12,7 @@ from perms.serializers.permission import ActionChoicesField
 
 __all__ = [
     'NodeGrantedSerializer', 'AssetGrantedSerializer',
-    'ActionsSerializer', 'AccountsPermedSerializer'
+    'AccountsPermedSerializer'
 ]
 
 
@@ -43,14 +43,10 @@ class NodeGrantedSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
-class ActionsSerializer(serializers.Serializer):
-    actions = ActionChoicesField(read_only=True)
-
-
 class AccountsPermedSerializer(serializers.ModelSerializer):
     actions = ActionChoicesField(read_only=True)
 
     class Meta:
         model = Account
-        fields = ['id', 'name', 'username', 'secret_type', 'has_secret', 'actions']
+        fields = ['id', 'name', 'has_username',  'username', 'has_secret', 'secret_type', 'actions']
         read_only_fields = fields

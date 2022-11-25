@@ -9,16 +9,14 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from celery import current_task
 
-from common.const.choices import Trigger
-from common.db.models import BaseCreateUpdateModel
-
 __all__ = ["Job", "JobExecution"]
 
 from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner
 from ops.mixin import PeriodTaskModelMixin
+from orgs.mixins.models import JMSOrgBaseModel
 
 
-class Job(BaseCreateUpdateModel, PeriodTaskModelMixin):
+class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     class Types(models.TextChoices):
         adhoc = 'adhoc', _('Adhoc')
         playbook = 'playbook', _('Playbook')
@@ -94,7 +92,7 @@ class Job(BaseCreateUpdateModel, PeriodTaskModelMixin):
         return self.executions.create()
 
 
-class JobExecution(BaseCreateUpdateModel):
+class JobExecution(JMSOrgBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     task_id = models.UUIDField(null=True)
     status = models.CharField(max_length=16, verbose_name=_('Status'), default='running')
