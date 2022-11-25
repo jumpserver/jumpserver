@@ -15,8 +15,8 @@ from rest_framework.response import Response
 
 from common.drf.api import JMSModelViewSet
 from common.http import is_true
+from common.utils import random_string
 from orgs.mixins.api import RootOrgViewMixin
-from orgs.utils import tmp_to_root_org
 from perms.models import ActionChoices
 from terminal.models import EndpointRule
 from ..models import ConnectionToken
@@ -249,10 +249,6 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         serializer = self.get_serializer(instance=token)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def dispatch(self, request, *args, **kwargs):
-        with tmp_to_root_org():
-            return super().dispatch(request, *args, **kwargs)
-
     def get_queryset(self):
         return ConnectionToken.objects.filter(user=self.request.user)
 
@@ -269,16 +265,17 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         data = serializer.validated_data
         user = self.get_user(serializer)
         asset = data.get('asset')
-        login = data.get('login')
+        account_name = data.get('account_name')
         data['org_id'] = asset.org_id
         data['user'] = user
+        data['value'] = random_string(16)
 
         util = PermAccountUtil()
-        permed_account = util.validate_permission(user, asset, login)
+        permed_account = util.validate_permission(user, asset, account_name)
 
         if not permed_account or not permed_account.actions:
             msg = 'user `{}` not has asset `{}` permission for login `{}`'.format(
-                user, asset, login
+                user, asset, account_name
             )
             raise PermissionDenied(msg)
 
@@ -286,9 +283,9 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
             raise PermissionDenied('Expired')
 
         if permed_account.has_secret:
-            data['secret'] = ''
+            data['input_secret'] = ''
         if permed_account.username != '@INPUT':
-            data['username'] = ''
+            data['input_username'] = ''
         return permed_account
 
 

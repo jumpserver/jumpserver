@@ -68,9 +68,6 @@ class SerializeToTreeNodeMixin:
                     'data': {
                         'id': asset.id,
                         'name': asset.name,
-                        'address': asset.address,
-                        'protocols': asset.protocols_as_list,
-                        'platform': asset.platform.id,
                         'org_name': asset.org_name
                     },
                 }

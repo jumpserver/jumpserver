@@ -160,10 +160,6 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
             return 0
         return self.primary_protocol.port
 
-    @property
-    def protocols_as_list(self):
-        return [{'name': p.name, 'port': p.port} for p in self.protocols.all()]
-
     @lazyproperty
     def type(self):
         return self.platform.type

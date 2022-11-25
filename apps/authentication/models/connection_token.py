@@ -19,6 +19,7 @@ def date_expired_default():
 
 
 class ConnectionToken(OrgModelMixin, JMSBaseModel):
+    value = models.CharField(max_length=64, default='', verbose_name=_("Value"))
     user = models.ForeignKey(
         'users.User', on_delete=models.SET_NULL,  null=True, blank=True,
         related_name='connection_tokens', verbose_name=_('User')
@@ -27,9 +28,9 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
         'assets.Asset', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='connection_tokens', verbose_name=_('Asset'),
     )
-    login = models.CharField(max_length=128, verbose_name=_("Login account"))
-    username = models.CharField(max_length=128, default='', verbose_name=_("Username"))
-    secret = EncryptCharField(max_length=64, default='', verbose_name=_("Secret"))
+    account_name = models.CharField(max_length=128, verbose_name=_("Account name"))  # 登录账号Name
+    input_username = models.CharField(max_length=128, default='', verbose_name=_("Input Username"))
+    input_secret = EncryptCharField(max_length=64, default='', verbose_name=_("Input Secret"))
     protocol = models.CharField(
         choices=Protocol.choices, max_length=16, default=Protocol.ssh, verbose_name=_("Protocol")
     )

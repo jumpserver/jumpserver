@@ -15,15 +15,14 @@ __all__ = [
 
 
 class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
-    username = serializers.CharField(max_length=128, label=_("Input username"),
-                                     allow_null=True, allow_blank=True)
     expire_time = serializers.IntegerField(read_only=True, label=_('Expired time'))
 
     class Meta:
         model = ConnectionToken
-        fields_mini = ['id']
+        fields_mini = ['id', 'value']
         fields_small = fields_mini + [
-            'protocol', 'login', 'secret', 'username',
+            'protocol', 'account_name',
+            'input_username', 'input_secret',
             'actions', 'date_expired', 'date_created',
             'date_updated', 'created_by',
             'updated_by', 'org_id', 'org_name',
@@ -37,6 +36,9 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
             'user_display', 'asset_display',
         ]
         fields = fields_small + fields_fk + read_only_fields
+        extra_kwargs = {
+            'value': {'read_only': True},
+        }
 
     def get_request_user(self):
         request = self.context.get('request')
