@@ -17,9 +17,9 @@ class GunicornService(BaseService):
         log_format = '%(h)s %(t)s %(L)ss "%(r)s" %(s)s %(b)s '
         bind = f'{HTTP_HOST}:{HTTP_PORT}'
         cmd = [
-            'gunicorn', 'jumpserver.wsgi',
+            'gunicorn', 'jumpserver.asgi:application',
             '-b', bind,
-            '-k', 'gthread',
+            '-k', 'uvicorn.workers.UvicornWorker',
             '--threads', '10',
             '-w', str(self.worker),
             '--max-requests', '4096',
