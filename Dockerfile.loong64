@@ -54,10 +54,11 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
     && apt-get -y install --no-install-recommends ${TOOLS} \
     && mkdir -p /root/.ssh/ \
     && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > /root/.ssh/config \
-    && sed -i "s@# alias l@alias l@g" ~/.bashrc \
     && echo "set mouse-=a" > ~/.vimrc \
     && echo "no" | dpkg-reconfigure dash \
     && echo "zh_CN.UTF-8" | dpkg-reconfigure locales \
+    && sed -i "s@# export @export @g" ~/.bashrc \
+    && sed -i "s@# alias @alias @g" ~/.bashrc \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /tmp/build
@@ -90,6 +91,6 @@ VOLUME /opt/jumpserver/logs
 
 ENV LANG=zh_CN.UTF-8
 
-EXPOSE 8070
-EXPOSE 8080
+EXPOSE 8070 8080
+
 ENTRYPOINT ["./entrypoint.sh"]

@@ -45,8 +45,10 @@ ARG TOOLS="                           \
         unzip                         \
         wget"
 
+ARG APT_MIRROR=http://mirrors.ustc.edu.cn
+
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
-    sed -i 's@http://.*.debian.org@http://mirrors.ustc.edu.cn@g' /etc/apt/sources.list \
+    sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
     && rm -f /etc/apt/apt.conf.d/docker-clean \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && apt-get update \
@@ -55,24 +57,22 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
     && apt-get -y install --no-install-recommends ${TOOLS} \
     && mkdir -p /root/.ssh/ \
     && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > /root/.ssh/config \
-    && sed -i "s@# alias l@alias l@g" ~/.bashrc \
     && echo "set mouse-=a" > ~/.vimrc \
     && echo "no" | dpkg-reconfigure dash \
     && echo "zh_CN.UTF-8" | dpkg-reconfigure locales \
+    && sed -i "s@# export @export @g" ~/.bashrc \
+    && sed -i "s@# alias @alias @g" ~/.bashrc \
     && rm -rf /var/lib/apt/lists/*
 
-ARG ORACLE_LIB_MAJOR=19
-ARG ORACLE_LIB_MINOR=10
-ENV ORACLE_FILE="instantclient-basiclite-linux.${TARGETARCH:-amd64}-${ORACLE_LIB_MAJOR}.${ORACLE_LIB_MINOR}.0.0.0dbru.zip"
+ARG DOWNLOAD_URL=https://download.jumpserver.org
 
 RUN mkdir -p /opt/oracle/ \
     && cd /opt/oracle/ \
-    && wget https://download.jumpserver.org/files/oracle/${ORACLE_FILE} \
-    && unzip instantclient-basiclite-linux.${TARGETARCH-amd64}-19.10.0.0.0dbru.zip \
-    && mv instantclient_${ORACLE_LIB_MAJOR}_${ORACLE_LIB_MINOR} instantclient \
-    && echo "/opt/oracle/instantclient" > /etc/ld.so.conf.d/oracle-instantclient.conf \
+    && wget ${DOWNLOAD_URL}/public/instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip \
+    && unzip instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip \
+    && sh -c "echo /opt/oracle/instantclient_19_10 > /etc/ld.so.conf.d/oracle-instantclient.conf" \
     && ldconfig \
-    && rm -f ${ORACLE_FILE}
+    && rm -f instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip
 
 WORKDIR /tmp/build
 COPY ./requirements ./requirements
@@ -100,6 +100,6 @@ VOLUME /opt/jumpserver/logs
 
 ENV LANG=zh_CN.UTF-8
 
-EXPOSE 8070
-EXPOSE 8080
+EXPOSE 8070 8080
+
 ENTRYPOINT ["./entrypoint.sh"]
