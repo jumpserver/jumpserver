@@ -113,12 +113,15 @@ class OrgResourceStatisticsCache(OrgRelatedCache):
     def compute_total_count_online_sessions():
         return Session.objects.filter(is_finished=False).count()
 
-    @staticmethod
-    def compute_total_count_today_login_users():
+    def compute_total_count_today_login_users(self):
         t = local_zero_hour()
-        return UserLoginLog.objects.filter(
+        user_login_logs = UserLoginLog.objects.filter(
             datetime__gte=t, status=LoginStatusChoices.success
-        ).values('username').distinct().count()
+        )
+        if not self.org.is_root():
+            usernames = self.org.get_members().values('username')
+            user_login_logs = user_login_logs.filter(username__in=usernames)
+        return user_login_logs.values('username').distinct().count()
 
     @staticmethod
     def compute_total_count_today_active_assets():

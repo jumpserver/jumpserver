@@ -79,7 +79,6 @@ class OrgResourceStatisticsRefreshUtil:
         Domain: ['domains_amount'],
         UserGroup: ['groups_amount'],
         Account: ['accounts_amount'],
-        UserLoginLog: ['total_count_today_login_users'],
         RoleBinding: ['users_amount', 'new_users_amount_this_week'],
         Asset: ['assets_amount', 'new_assets_amount_this_week'],
         AssetPermission: ['asset_perms_amount'],
