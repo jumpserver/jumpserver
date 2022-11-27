@@ -1,7 +1,6 @@
 import base64
 import json
 import os
-import time
 import urllib.parse
 
 from django.http import HttpResponse

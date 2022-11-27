@@ -77,7 +77,7 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
     def permed_account(self):
         from perms.utils import PermAccountUtil
         permed_account = PermAccountUtil().validate_permission(
-            self.user, self.asset, self.login
+            self.user, self.asset, self.account_name
         )
         return permed_account
 
@@ -100,13 +100,13 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
             is_valid = False
             error = _('No asset or inactive asset')
             return is_valid, error
-        if not self.login:
+        if not self.account_name:
             error = _('No account')
             raise PermissionDenied(error)
 
         if not self.permed_account or not self.permed_account.actions:
             msg = 'user `{}` not has asset `{}` permission for login `{}`'.format(
-                self.user, self.asset, self.login
+                self.user, self.asset, self.account_name
             )
             raise PermissionDenied(msg)
 
@@ -123,10 +123,10 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
         if not self.asset:
             return None
 
-        account = self.asset.accounts.filter(name=self.login).first()
-        if self.login == '@INPUT' or not account:
+        account = self.asset.accounts.filter(name=self.account_name).first()
+        if self.account_name == '@INPUT' or not account:
             return {
-                'name': self.login,
+                'name': self.account_name,
                 'username': self.username,
                 'secret_type': 'password',
                 'secret': self.secret
