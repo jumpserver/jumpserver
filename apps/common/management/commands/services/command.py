@@ -6,7 +6,6 @@ from .hands import *
 
 class Services(TextChoices):
     gunicorn = 'gunicorn', 'gunicorn'
-    daphne = 'daphne', 'daphne'
     celery_ansible = 'celery_ansible', 'celery_ansible'
     celery_default = 'celery_default', 'celery_default'
     beat = 'beat', 'beat'
@@ -22,7 +21,6 @@ class Services(TextChoices):
         from . import services
         services_map = {
             cls.gunicorn.value: services.GunicornService,
-            cls.daphne: services.DaphneService,
             cls.flower: services.FlowerService,
             cls.celery_default: services.CeleryDefaultService,
             cls.celery_ansible: services.CeleryAnsibleService,
@@ -31,12 +29,8 @@ class Services(TextChoices):
         return services_map.get(name)
 
     @classmethod
-    def ws_services(cls):
-        return [cls.daphne]
-
-    @classmethod
     def web_services(cls):
-        return [cls.gunicorn, cls.daphne, cls.flower]
+        return [cls.gunicorn, cls.flower]
 
     @classmethod
     def celery_services(cls):
