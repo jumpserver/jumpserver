@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0014_auto_20221122_2152'),
+        ('authentication', '0015_alter_connectiontoken_login'),
     ]
 
     operations = [

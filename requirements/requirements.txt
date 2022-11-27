@@ -86,8 +86,6 @@ pytz==2022.1
 # Runtime
 django-proxy==1.2.1
 channels-redis==3.4.0
-channels==3.0.4
-daphne==3.0.2
 python-daemon==2.3.0
 eventlet==0.33.1
 greenlet==1.1.2
@@ -96,6 +94,8 @@ celery==5.2.7
 flower==1.0.0
 django-celery-beat==2.3.0
 kombu==5.2.4
+uvicorn==0.20.0
+websockets==10.4
 # Auth
 python-ldap==3.4.0
 ldap3==2.9.1
