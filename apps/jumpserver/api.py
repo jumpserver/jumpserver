@@ -31,7 +31,8 @@ class DatesLoginMetricMixin:
         query_params = self.request.query_params
         # monthly
         count = query_params.get('days')
-        return count if count else 0
+        count = int(count) if count else 0
+        return count
 
     @lazyproperty
     def sessions_queryset(self):
