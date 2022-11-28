@@ -134,47 +134,6 @@ class DatesLoginMetricMixin:
         return data
 
     @lazyproperty
-    def dates_total_count_active_users(self):
-        count = len(set(self.sessions_queryset.values_list('user_id', flat=True)))
-        return count
-
-    @lazyproperty
-    def dates_total_count_inactive_users(self):
-        total = current_org.get_members().count()
-        active = self.dates_total_count_active_users
-        count = total - active
-        if count < 0:
-            count = 0
-        return count
-
-    @lazyproperty
-    def dates_total_count_disabled_users(self):
-        return current_org.get_members().filter(is_active=False).count()
-
-    @lazyproperty
-    def dates_total_count_active_assets(self):
-        return len(set(self.sessions_queryset.values_list('asset', flat=True)))
-
-    @lazyproperty
-    def dates_total_count_inactive_assets(self):
-        total = Asset.objects.all().count()
-        active = self.dates_total_count_active_assets
-        count = total - active
-        if count < 0:
-            count = 0
-        return count
-
-    @lazyproperty
-    def dates_total_count_disabled_assets(self):
-        return Asset.objects.filter(is_active=False).count()
-
-    def get_dates_total_count_login_users(self):
-        return len(set(self.sessions_queryset.values_list('user_id', flat=True)))
-
-    def get_dates_total_count_login_times(self):
-        return self.sessions_queryset.count()
-
-    @lazyproperty
     def get_type_to_assets(self):
         result = Asset.objects.annotate(type=F('platform__type')). \
             values('type').order_by('type').annotate(total=Count(1))
@@ -240,13 +199,31 @@ class IndexApi(DatesLoginMetricMixin, APIView):
         if _all or query_params.get('total_count') or query_params.get('total_count_users'):
             data.update({
                 'total_count_users': caches.users_amount,
-                'total_count_users_this_week': caches.new_users_amount_this_week,
             })
 
         if _all or query_params.get('total_count') or query_params.get('total_count_assets'):
             data.update({
                 'total_count_assets': caches.assets_amount,
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_users_this_week'):
+            data.update({
+                'total_count_users_this_week': caches.new_users_amount_this_week,
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_assets_this_week'):
+            data.update({
                 'total_count_assets_this_week': caches.new_assets_amount_this_week,
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_today_login_users'):
+            data.update({
+                'total_count_today_login_users': caches.total_count_today_login_users,
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_today_active_assets'):
+            data.update({
+                'total_count_today_active_assets': caches.total_count_today_active_assets,
             })
 
         if _all or query_params.get('total_count') or query_params.get('total_count_online_users'):
@@ -263,14 +240,7 @@ class IndexApi(DatesLoginMetricMixin, APIView):
             data.update({
                 'total_count_today_failed_sessions': caches.total_count_today_failed_sessions,
             })
-        if _all or query_params.get('total_count') or query_params.get('total_count_today_login_users'):
-            data.update({
-                'total_count_today_login_users': caches.total_count_today_login_users,
-            })
-        if _all or query_params.get('total_count') or query_params.get('total_count_today_active_assets'):
-            data.update({
-                'total_count_today_active_assets': caches.total_count_today_active_assets,
-            })
+
         if _all or query_params.get('total_count') or query_params.get('total_count_type_to_assets_amount'):
             data.update({
                 'total_count_type_to_assets_amount': self.get_type_to_assets,
@@ -282,26 +252,6 @@ class IndexApi(DatesLoginMetricMixin, APIView):
                 'dates_metrics_total_count_login': self.get_dates_metrics_total_count_login(),
                 'dates_metrics_total_count_active_users': self.get_dates_metrics_total_count_active_users(),
                 'dates_metrics_total_count_active_assets': self.get_dates_metrics_total_count_active_assets(),
-            })
-
-        if _all or query_params.get('dates_total_count_users'):
-            data.update({
-                'dates_total_count_active_users': self.dates_total_count_active_users,
-                'dates_total_count_inactive_users': self.dates_total_count_inactive_users,
-                'dates_total_count_disabled_users': self.dates_total_count_disabled_users,
-            })
-
-        if _all or query_params.get('dates_total_count_assets'):
-            data.update({
-                'dates_total_count_active_assets': self.dates_total_count_active_assets,
-                'dates_total_count_inactive_assets': self.dates_total_count_inactive_assets,
-                'dates_total_count_disabled_assets': self.dates_total_count_disabled_assets,
-            })
-
-        if _all or query_params.get('dates_total_count'):
-            data.update({
-                'dates_total_count_login_users': self.get_dates_total_count_login_users(),
-                'dates_total_count_login_times': self.get_dates_total_count_login_times(),
             })
 
         if _all or query_params.get('dates_login_times_top10_assets'):
