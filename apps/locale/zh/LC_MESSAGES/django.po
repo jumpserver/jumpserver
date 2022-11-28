@@ -578,16 +578,12 @@ msgid "All"
 msgstr "全部"
 
 #: assets/models/account.py:46
-#, fuzzy
-#| msgid "Manually input"
 msgid "Manual input"
 msgstr "手动输入"
 
 #: assets/models/account.py:47
-#, fuzzy
-#| msgid "Dynamic code"
 msgid "Dynamic user"
-msgstr "动态码"
+msgstr "动态用户"
 
 #: assets/models/account.py:55
 msgid "Su from"

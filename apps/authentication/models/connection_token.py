@@ -1,17 +1,17 @@
-import time
 from datetime import timedelta
+
+from django.conf import settings
+from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django.db import models
-from django.conf import settings
 from rest_framework.exceptions import PermissionDenied
 
-from orgs.mixins.models import OrgModelMixin
+from assets.const import Protocol
+from common.db.fields import EncryptCharField
+from common.db.models import JMSBaseModel
 from common.utils import lazyproperty, pretty_string
 from common.utils.timezone import as_current_tz
-from common.db.models import JMSBaseModel
-from common.db.fields import EncryptCharField
-from assets.const import Protocol
+from orgs.mixins.models import OrgModelMixin
 
 
 def date_expired_default():
@@ -21,7 +21,7 @@ def date_expired_default():
 class ConnectionToken(OrgModelMixin, JMSBaseModel):
     value = models.CharField(max_length=64, default='', verbose_name=_("Value"))
     user = models.ForeignKey(
-        'users.User', on_delete=models.SET_NULL,  null=True, blank=True,
+        'users.User', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='connection_tokens', verbose_name=_('User')
     )
     asset = models.ForeignKey(
@@ -29,8 +29,8 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
         related_name='connection_tokens', verbose_name=_('Asset'),
     )
     account_name = models.CharField(max_length=128, verbose_name=_("Account name"))  # 登录账号Name
-    input_username = models.CharField(max_length=128, default='', verbose_name=_("Input Username"))
-    input_secret = EncryptCharField(max_length=64, default='', verbose_name=_("Input Secret"))
+    input_username = models.CharField(max_length=128, default='', blank=True, verbose_name=_("Input Username"))
+    input_secret = EncryptCharField(max_length=64, default='', blank=True, verbose_name=_("Input Secret"))
     protocol = models.CharField(
         choices=Protocol.choices, max_length=16, default=Protocol.ssh, verbose_name=_("Protocol")
     )

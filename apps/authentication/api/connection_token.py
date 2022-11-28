@@ -159,7 +159,7 @@ class RDPFileClientProtocolURLMixin:
             'ip': endpoint.host,
             'port': str(endpoint.ssh_port),
             'username': 'JMS-{}'.format(str(token.id)),
-            'password': token.secret
+            'password': token.value
         }
         token = json.dumps(data)
         return filename, token
@@ -176,9 +176,9 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
     get_serializer: callable
     perform_create: callable
 
-    @action(methods=['POST', 'GET'], detail=False, url_path='rdp/file')
-    def get_rdp_file(self, request, *args, **kwargs):
-        token = self.create_connection_token()
+    @action(methods=['POST', 'GET'], detail=True, url_path='rdp-file')
+    def get_rdp_file(self, *args, **kwargs):
+        token = self.get_object()
         token.is_valid()
         filename, content = self.get_rdp_file_info(token)
         filename = '{}.rdp'.format(filename)
@@ -186,9 +186,9 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
         response['Content-Disposition'] = 'attachment; filename*=UTF-8\'\'%s' % filename
         return response
 
-    @action(methods=['POST', 'GET'], detail=False, url_path='client-url')
-    def get_client_protocol_url(self, request, *args, **kwargs):
-        token = self.create_connection_token()
+    @action(methods=['POST', 'GET'], detail=True, url_path='client-url')
+    def get_client_protocol_url(self, *args, **kwargs):
+        token = self.get_object()
         token.is_valid()
         try:
             protocol_data = self.get_client_protocol_data(token)
@@ -206,14 +206,6 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
         instance = self.get_object()
         instance.expire()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-    def create_connection_token(self):
-        data = self.request.query_params if self.request.method == 'GET' else self.request.data
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        token: ConnectionToken = serializer.instance
-        return token
 
 
 class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelViewSet):
