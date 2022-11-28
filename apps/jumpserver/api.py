@@ -199,13 +199,31 @@ class IndexApi(DatesLoginMetricMixin, APIView):
         if _all or query_params.get('total_count') or query_params.get('total_count_users'):
             data.update({
                 'total_count_users': caches.users_amount,
-                'total_count_users_this_week': caches.new_users_amount_this_week,
             })
 
         if _all or query_params.get('total_count') or query_params.get('total_count_assets'):
             data.update({
                 'total_count_assets': caches.assets_amount,
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_users_this_week'):
+            data.update({
+                'total_count_users_this_week': caches.new_users_amount_this_week,
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_assets_this_week'):
+            data.update({
                 'total_count_assets_this_week': caches.new_assets_amount_this_week,
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_today_login_users'):
+            data.update({
+                'total_count_today_login_users': caches.total_count_today_login_users,
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_today_active_assets'):
+            data.update({
+                'total_count_today_active_assets': caches.total_count_today_active_assets,
             })
 
         if _all or query_params.get('total_count') or query_params.get('total_count_online_users'):
@@ -222,14 +240,7 @@ class IndexApi(DatesLoginMetricMixin, APIView):
             data.update({
                 'total_count_today_failed_sessions': caches.total_count_today_failed_sessions,
             })
-        if _all or query_params.get('total_count') or query_params.get('total_count_today_login_users'):
-            data.update({
-                'total_count_today_login_users': caches.total_count_today_login_users,
-            })
-        if _all or query_params.get('total_count') or query_params.get('total_count_today_active_assets'):
-            data.update({
-                'total_count_today_active_assets': caches.total_count_today_active_assets,
-            })
+
         if _all or query_params.get('total_count') or query_params.get('total_count_type_to_assets_amount'):
             data.update({
                 'total_count_type_to_assets_amount': self.get_type_to_assets,
