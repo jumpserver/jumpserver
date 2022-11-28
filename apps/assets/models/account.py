@@ -94,6 +94,10 @@ class AccountTemplate(BaseAccount):
         unique_together = (
             ('name', 'org_id'),
         )
+        permissions = [
+            ('view_accounttemplatesecret', _('Can view asset account template secret')),
+            ('change_accounttemplatesecret', _('Can change asset account template secret')),
+        ]
 
     def __str__(self):
         return self.username
