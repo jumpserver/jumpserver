@@ -43,11 +43,11 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
         return self.name
 
     @classmethod
-    def filter(cls, user, asset, account, action):
+    def filter(cls, user, asset, account_username, action):
         queryset = cls.objects.filter(action=action)
         queryset = cls.filter_user(user, queryset)
         queryset = cls.filter_asset(asset, queryset)
-        queryset = cls.filter_account(account, queryset)
+        queryset = cls.filter_account(account_username, queryset)
         return queryset
 
     @classmethod
@@ -69,18 +69,18 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
         return queryset
 
     @classmethod
-    def filter_account(cls, account, queryset):
+    def filter_account(cls, account_username, queryset):
         queryset = queryset.filter(
-            Q(accounts__name_group__contains=account.name) |
+            Q(accounts__name_group__contains=account_username) |
             Q(accounts__name_group__contains='*')
         ).filter(
-            Q(accounts__username_group__contains=account.username) |
+            Q(accounts__username_group__contains=account_username) |
             Q(accounts__username_group__contains='*')
         )
         return queryset
 
     @classmethod
-    def create_login_asset_confirm_ticket(cls, user, asset, account, assignees, org_id):
+    def create_login_asset_confirm_ticket(cls, user, asset, account_username, assignees, org_id):
         from tickets.const import TicketType
         from tickets.models import ApplyLoginAssetTicket
         title = _('Login asset confirm') + ' ({})'.format(user)
@@ -90,7 +90,7 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
             'applicant': user,
             'apply_login_user': user,
             'apply_login_asset': asset,
-            'apply_login_account': str(account),
+            'apply_login_account': account_username,
             'type': TicketType.login_asset_confirm,
         }
         ticket = ApplyLoginAssetTicket.objects.create(**data)
