@@ -11,6 +11,7 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.serializers import ValidationError
 
 from common.drf.api import JMSModelViewSet
 from common.http import is_true
@@ -18,6 +19,7 @@ from common.utils import random_string
 from orgs.mixins.api import RootOrgViewMixin
 from perms.models import ActionChoices
 from terminal.models import EndpointRule
+from terminal.const import NativeClient
 from ..models import ConnectionToken
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
@@ -128,19 +130,20 @@ class RDPFileClientProtocolURLMixin:
         return true_value if is_true(os.getenv(env_key, env_default)) else false_value
 
     def get_client_protocol_data(self, token: ConnectionToken):
-        protocol = token.protocol
         username = token.user.username
         rdp_config = ssh_token = ''
-        if protocol == 'rdp':
-            filename, rdp_config = self.get_rdp_file_info(token)
-        elif protocol == 'ssh':
+        connect_method = token.connect_method
+
+        if connect_method == NativeClient.ssh:
             filename, ssh_token = self.get_ssh_token(token)
+        elif connect_method == NativeClient.mstsc:
+            filename, rdp_config = self.get_rdp_file_info(token)
         else:
-            raise ValueError('Protocol not support: {}'.format(protocol))
+            raise ValueError('Protocol not support: {}'.format(connect_method))
 
         return {
             "filename": filename,
-            "protocol": protocol,
+            "protocol": token.protocol,
             "username": username,
             "token": ssh_token,
             "config": rdp_config
@@ -234,14 +237,25 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         rbac_perm = 'authentication.view_connectiontokensecret'
         if not request.user.has_perm(rbac_perm):
             raise PermissionDenied('Not allow to view secret')
-        token_id = request.data.get('token') or ''
+
+        token_id = request.data.get('id') or ''
         token = get_object_or_404(ConnectionToken, pk=token_id)
+        if token.is_expired:
+            raise ValidationError({'id': 'Token is expired'})
+
         token.is_valid()
         serializer = self.get_serializer(instance=token)
+        expire_now = request.data.get('expire_now', True)
+        if expire_now:
+            token.expire()
+
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def get_queryset(self):
-        return ConnectionToken.objects.filter(user=self.request.user)
+        queryset = ConnectionToken.objects\
+            .filter(user=self.request.user)\
+            .filter(date_expired__lt=timezone.now())
+        return queryset
 
     def get_user(self, serializer):
         return self.request.user
@@ -299,7 +313,7 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
     def renewal(self, request, *args, **kwargs):
         from common.utils.timezone import as_current_tz
 
-        token_id = request.data.get('token') or ''
+        token_id = request.data.get('id') or ''
         token = get_object_or_404(ConnectionToken, pk=token_id)
         date_expired = as_current_tz(token.date_expired)
         if token.is_expired:

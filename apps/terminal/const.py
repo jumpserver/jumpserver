@@ -96,17 +96,21 @@ class NativeClient(TextChoices):
     @classmethod
     def get_launch_command(cls, name, os='windows'):
         commands = {
-            'ssh': 'ssh {username}@{hostname} -p {port}',
-            'putty': 'putty -ssh {username}@{hostname} -P {port}',
-            'xshell': '-url ssh://root:passwd@192.168.10.100',
-            'mysql': 'mysql -h {hostname} -P {port} -u {username} -p',
-            'psql': {
-                'default': 'psql -h {hostname} -p {port} -U {username} -W',
-                'windows': 'psql /h {hostname} /p {port} /U {username} -W',
+            cls.ssh: 'ssh {token.id}@{endpoint.ip} -p {endpoint.port}',
+            cls.putty: 'putty-ssh {token.id}@{endpoint.ip} -P {endpoint.port}',
+            cls.xshell: 'xshell -url ssh://{token.id}:{token.value}@{endpoint.ip}:{endpoint.port}',
+            # 'mysql': 'mysql -h {hostname} -P {port} -u {username} -p',
+            # 'psql': {
+            #     'default': 'psql -h {hostname} -p {port} -U {username} -W',
+            #     'windows': 'psql /h {hostname} /p {port} /U {username} -W',
+            # },
+            # 'sqlplus': 'sqlplus {username}/{password}@{hostname}:{port}',
+            # 'redis': 'redis-cli -h {hostname} -p {port} -a {password}',
+            cls.mstsc: {
+                'command': "$open_file$",
+                'file': {
+                }
             },
-            'sqlplus': 'sqlplus {username}/{password}@{hostname}:{port}',
-            'redis': 'redis-cli -h {hostname} -p {port} -a {password}',
-            'mstsc': 'mstsc /v:{hostname}:{port}',
         }
         command = commands.get(name)
         if isinstance(command, dict):

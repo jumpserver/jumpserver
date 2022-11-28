@@ -34,6 +34,7 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
     protocol = models.CharField(
         choices=Protocol.choices, max_length=16, default=Protocol.ssh, verbose_name=_("Protocol")
     )
+    connect_method = models.CharField(max_length=32, verbose_name=_("Connect method"))
     user_display = models.CharField(max_length=128, default='', verbose_name=_("User display"))
     asset_display = models.CharField(max_length=128, default='', verbose_name=_("Asset display"))
     date_expired = models.DateTimeField(

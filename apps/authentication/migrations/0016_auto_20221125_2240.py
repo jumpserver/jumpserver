@@ -26,11 +26,6 @@ class Migration(migrations.Migration):
             old_name='username',
             new_name='input_username',
         ),
-        migrations.AddField(
-            model_name='connectiontoken',
-            name='input_secret',
-            field=common.db.fields.EncryptCharField(default='', max_length=128, verbose_name='Input Secret'),
-        ),
         migrations.AlterField(
             model_name='connectiontoken',
             name='account_name',
@@ -38,8 +33,13 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name='connectiontoken',
+            name='input_secret',
+            field=common.db.fields.EncryptCharField(blank=True, default='', max_length=128, verbose_name='Input Secret'),
+        ),
+        migrations.AlterField(
+            model_name='connectiontoken',
             name='input_username',
-            field=models.CharField(default='', max_length=128, verbose_name='Input Username'),
+            field=models.CharField(blank=True, default='', max_length=128, verbose_name='Input Username'),
         ),
         migrations.AlterField(
             model_name='connectiontoken',

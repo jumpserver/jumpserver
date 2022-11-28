@@ -109,16 +109,10 @@ class ConnectionTokenGatewaySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Asset
-        fields = ['id', 'address', 'port', 'username', 'password', 'private_key']
-
-
-class ConnectionTokenDomainSerializer(serializers.ModelSerializer):
-    """ Domain """
-    gateways = ConnectionTokenGatewaySerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Domain
-        fields = ['id', 'name', 'gateways']
+        fields = [
+            'id', 'address', 'port', 'username',
+            'password', 'private_key'
+        ]
 
 
 class ConnectionTokenCmdFilterRuleSerializer(serializers.ModelSerializer):
@@ -143,6 +137,7 @@ class ConnectionTokenPlatform(PlatformSerializer):
 
 
 class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
+    expire_now = serializers.BooleanField(label=_('Expired now'), default=True)
     user = ConnectionTokenUserSerializer(read_only=True)
     asset = ConnectionTokenAssetSerializer(read_only=True)
     platform = ConnectionTokenPlatform(read_only=True)
@@ -155,7 +150,10 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     class Meta:
         model = ConnectionToken
         fields = [
-            'id', 'value', 'user', 'asset', 'account',
-            'protocol', 'domain', 'gateway',
-            'actions', 'expire_at', 'platform',
+            'id', 'value', 'user', 'asset', 'platform', 'account',
+            'protocol', 'gateway', 'actions', 'expire_at', 'expire_now',
         ]
+        extra_kwargs = {
+            'value': {'read_only': True},
+            'expire_now': {'write_only': True},
+        }
