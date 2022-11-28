@@ -1,8 +1,8 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from assets.serializers import PlatformSerializer
 from assets.models import Asset, Domain, CommandFilterRule, Account, Platform
+from assets.serializers import PlatformSerializer, AssetProtocolsSerializer
 from authentication.models import ConnectionToken
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from perms.serializers.permission import ActionChoicesField
@@ -87,6 +87,7 @@ class ConnectionTokenUserSerializer(serializers.ModelSerializer):
 
 class ConnectionTokenAssetSerializer(serializers.ModelSerializer):
     """ Asset """
+    protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
 
     class Meta:
         model = Asset
@@ -99,7 +100,7 @@ class ConnectionTokenAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
         fields = [
-           'name', 'username', 'secret_type', 'secret',
+            'name', 'username', 'secret_type', 'secret',
         ]
 
 

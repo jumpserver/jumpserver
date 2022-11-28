@@ -136,7 +136,7 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
                 'name': account.name,
                 'username': account.username,
                 'secret_type': account.secret_type,
-                'secret': account.secret_type or self.secret
+                'secret': account.secret or self.secret
             }
 
     @lazyproperty
