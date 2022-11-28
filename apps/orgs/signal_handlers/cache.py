@@ -91,7 +91,7 @@ class OrgResourceStatisticsRefreshUtil:
         if not cache_field_name:
             return
         OrgResourceStatisticsCache(Organization.root()).expire(*cache_field_name)
-        if instance.org:
+        if getattr(instance, 'org', None):
             OrgResourceStatisticsCache(instance.org).expire(*cache_field_name)
 
 
