@@ -56,11 +56,7 @@ class NativeClient(TextChoices):
     xshell = 'xshell', 'Xshell'
 
     # Magnus
-    mysql = 'mysql', 'mysql'
-    psql = 'psql', 'psql'
-    sqlplus = 'sqlplus', 'sqlplus'
-    redis = 'redis-cli', 'redis-cli'
-    mongodb = 'mongo', 'mongo'
+    db_client = 'db_client', _('DB Client')
 
     # Razor
     mstsc = 'mstsc', 'Remote Desktop'
@@ -73,11 +69,11 @@ class NativeClient(TextChoices):
                 'windows': [cls.putty],
             },
             Protocol.rdp: [cls.mstsc],
-            Protocol.mysql: [cls.mysql],
-            Protocol.oracle: [cls.sqlplus],
-            Protocol.postgresql: [cls.psql],
-            Protocol.redis: [cls.redis],
-            Protocol.mongodb: [cls.mongodb],
+            Protocol.mysql: [cls.db_client],
+            Protocol.oracle: [cls.db_client],
+            Protocol.postgresql: [cls.db_client],
+            Protocol.redis: [cls.db_client],
+            Protocol.mongodb: [cls.db_client],
         }
         return clients
 
@@ -183,8 +179,8 @@ class TerminalType(TextChoices):
             cls.magnus: {
                 'listen': [],
                 'support': [
-                    Protocol.mysql, Protocol.postgresql, Protocol.oracle,
-                    Protocol.mariadb
+                    Protocol.mysql, Protocol.postgresql,
+                    Protocol.oracle, Protocol.mariadb
                 ],
                 'match': 'map'
             },
