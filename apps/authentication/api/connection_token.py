@@ -24,8 +24,7 @@ from terminal.models import EndpointRule
 from ..models import ConnectionToken
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
-    SuperConnectionTokenSerializer, ConnectionTokenDisplaySerializer,
-)
+    SuperConnectionTokenSerializer, )
 
 __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
 
@@ -209,8 +208,6 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
     search_fields = filterset_fields
     serializer_classes = {
         'default': ConnectionTokenSerializer,
-        'list': ConnectionTokenDisplaySerializer,
-        'retrieve': ConnectionTokenDisplaySerializer,
         'get_secret_detail': ConnectionTokenSecretSerializer,
     }
     rbac_perms = {
