@@ -4,19 +4,22 @@ from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 
-from orgs.mixins.serializers import BulkOrgResourceModelSerializer, OrgResourceSerializerMixin
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.drf.serializers import SecretReadableMixin, WritableNestedModelSerializer
 from common.drf.fields import ObjectRelatedField, EncryptedField
-from assets.models import Platform, Node
 from assets.const import SecretType, GATEWAY_NAME
 from ..serializers import AssetProtocolsSerializer
-from ..models import Domain, Asset, Account, Host
+from ..models import Platform, Domain, Node, Asset, Account, Host
 from .utils import validate_password_for_ansible, validate_ssh_key
 
 
 class DomainSerializer(BulkOrgResourceModelSerializer):
+    node_count = serializers.SerializerMethodField(label=_('Nodes amount'))
     asset_count = serializers.SerializerMethodField(label=_('Assets amount'))
     gateway_count = serializers.SerializerMethodField(label=_('Gateways count'))
+    nodes = ObjectRelatedField(
+        many=True, required=False, queryset=Node.objects, label=_('Node')
+    )
     assets = ObjectRelatedField(
         many=True, required=False, queryset=Asset.objects, label=_('Asset')
     )
@@ -25,13 +28,17 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
         model = Domain
         fields_mini = ['id', 'name']
         fields_small = fields_mini + ['comment']
-        fields_m2m = ['assets']
-        read_only_fields = ['asset_count', 'gateway_count', 'date_created']
+        fields_m2m = ['nodes', 'assets']
+        read_only_fields = ['node_count', 'asset_count', 'gateway_count', 'date_created']
         fields = fields_small + fields_m2m + read_only_fields
 
         extra_kwargs = {
             'assets': {'required': False, 'label': _('Assets')},
         }
+
+    @staticmethod
+    def get_node_count(obj):
+        return obj.nodes.count()
 
     @staticmethod
     def get_asset_count(obj):
