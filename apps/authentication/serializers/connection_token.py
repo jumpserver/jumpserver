@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from assets.models import Asset, Domain, CommandFilterRule, Account, Platform
+from assets.models import Asset, CommandFilterRule, Account, Platform
 from assets.serializers import PlatformSerializer, AssetProtocolsSerializer
 from authentication.models import ConnectionToken
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
@@ -21,21 +21,19 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         model = ConnectionToken
         fields_mini = ['id', 'value']
         fields_small = fields_mini + [
-            'protocol', 'account_name',
+            'user', 'asset', 'account_name',
             'input_username', 'input_secret',
+            'connect_method', 'endpoint_protocol', 'protocol',
             'actions', 'date_expired', 'date_created',
             'date_updated', 'created_by',
             'updated_by', 'org_id', 'org_name',
-        ]
-        fields_fk = [
-            'user', 'asset',
         ]
         read_only_fields = [
             # 普通 Token 不支持指定 user
             'user', 'expire_time',
             'user_display', 'asset_display',
         ]
-        fields = fields_small + fields_fk + read_only_fields
+        fields = fields_small + read_only_fields
         extra_kwargs = {
             'value': {'read_only': True},
         }

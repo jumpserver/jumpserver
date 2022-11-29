@@ -56,7 +56,11 @@ class NativeClient(TextChoices):
     xshell = 'xshell', 'Xshell'
 
     # Magnus
-    db_client = 'db_client', _('DB Client')
+    mysql = 'db_client_mysql', _('DB Client')
+    psql = 'db_client_psql', _('DB Client')
+    sqlplus = 'db_client_sqlplus', _('DB Client')
+    redis = 'db_client_redis', _('DB Client')
+    mongodb = 'db_client_mongodb', _('DB Client')
 
     # Razor
     mstsc = 'mstsc', 'Remote Desktop'
@@ -69,13 +73,22 @@ class NativeClient(TextChoices):
                 'windows': [cls.putty],
             },
             Protocol.rdp: [cls.mstsc],
-            Protocol.mysql: [cls.db_client],
-            Protocol.oracle: [cls.db_client],
-            Protocol.postgresql: [cls.db_client],
-            Protocol.redis: [cls.db_client],
-            Protocol.mongodb: [cls.db_client],
+            Protocol.mysql: [cls.mysql],
+            Protocol.oracle: [cls.sqlplus],
+            Protocol.postgresql: [cls.psql],
+            Protocol.redis: [cls.redis],
+            Protocol.mongodb: [cls.mongodb],
         }
         return clients
+
+    @classmethod
+    def get_target_protocol(cls, name, os):
+        for protocol, clients in cls.get_native_clients().items():
+            if isinstance(clients, dict):
+                clients = clients.get(os) or clients.get('default')
+            if name in clients:
+                return protocol
+        return None
 
     @classmethod
     def get_methods(cls, os='windows'):
@@ -94,23 +107,18 @@ class NativeClient(TextChoices):
         return methods
 
     @classmethod
-    def get_launch_command(cls, name, os='windows'):
+    def get_launch_command(cls, name, token, endpoint, os='windows'):
         commands = {
-            cls.ssh: 'ssh {token.id}@{endpoint.ip} -p {endpoint.port}',
-            cls.putty: 'putty-ssh {token.id}@{endpoint.ip} -P {endpoint.port}',
-            cls.xshell: 'xshell -url ssh://{token.id}:{token.value}@{endpoint.ip}:{endpoint.port}',
-            # 'mysql': 'mysql -h {hostname} -P {port} -u {username} -p',
-            # 'psql': {
+            cls.ssh: f'ssh {token.id}@{endpoint.host} -p {endpoint.ssh_port}',
+            cls.putty: f'putty -ssh {token.id}@{endpoint.host} -P {endpoint.ssh_port}',
+            cls.xshell: f'xshell -url ssh://{token.id}:{token.value}@{endpoint.host}:{endpoint.ssh_port}',
+            # cls.mysql: 'mysql -h {hostname} -P {port} -u {username} -p',
+            # cls.psql: {
             #     'default': 'psql -h {hostname} -p {port} -U {username} -W',
             #     'windows': 'psql /h {hostname} /p {port} /U {username} -W',
             # },
-            # 'sqlplus': 'sqlplus {username}/{password}@{hostname}:{port}',
-            # 'redis': 'redis-cli -h {hostname} -p {port} -a {password}',
-            cls.mstsc: {
-                'command': "$open_file$",
-                'file': {
-                }
-            },
+            # cls.sqlplus: 'sqlplus {username}/{password}@{hostname}:{port}',
+            # cls.redis: 'redis-cli -h {hostname} -p {port} -a {password}',
         }
         command = commands.get(name)
         if isinstance(command, dict):
@@ -217,19 +225,26 @@ class TerminalType(TextChoices):
                         methods[protocol.value].append({
                             'value': web_protocol.value,
                             'label': web_protocol.label,
+                            'endpoint_protocol': 'http',
                             'type': 'web',
                             'component': component.value,
                         })
 
                     # Native method
                     methods[protocol.value].extend([
-                        {'component': component.value, 'type': 'native', **method}
+                        {
+                            'component': component.value,
+                            'type': 'native',
+                            'endpoint_protocol': listen_protocol,
+                            **method
+                        }
                         for method in native_methods[listen_protocol]
                     ])
 
         for protocol, applet_methods in applet_methods.items():
             for method in applet_methods:
                 method['type'] = 'applet'
+                method['listen'] = 'rdp'
                 method['component'] = cls.tinker.value
             methods[protocol].extend(applet_methods)
         return methods

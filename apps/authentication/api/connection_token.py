@@ -16,10 +16,11 @@ from rest_framework.serializers import ValidationError
 from common.drf.api import JMSModelViewSet
 from common.http import is_true
 from common.utils import random_string
+from common.utils.django import get_request_os
 from orgs.mixins.api import RootOrgViewMixin
 from perms.models import ActionChoices
-from terminal.models import EndpointRule
 from terminal.const import NativeClient
+from terminal.models import EndpointRule
 from ..models import ConnectionToken
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
@@ -130,42 +131,32 @@ class RDPFileClientProtocolURLMixin:
         return true_value if is_true(os.getenv(env_key, env_default)) else false_value
 
     def get_client_protocol_data(self, token: ConnectionToken):
-        username = token.user.username
-        rdp_config = ssh_token = ''
-        connect_method = token.connect_method
+        _os = get_request_os(self.request)
 
-        if connect_method == NativeClient.ssh:
-            filename, ssh_token = self.get_ssh_token(token)
-        elif connect_method == NativeClient.mstsc:
-            filename, rdp_config = self.get_rdp_file_info(token)
-        else:
-            raise ValueError('Protocol not support: {}'.format(connect_method))
+        connect_method = getattr(NativeClient, token.connect_method, None)
+        if connect_method is None:
+            raise ValueError('Connect method not support: {}'.format(token.connect_method))
 
-        return {
-            "filename": filename,
-            "protocol": token.protocol,
-            "username": username,
-            "token": ssh_token,
-            "config": rdp_config
-        }
-
-    def get_ssh_token(self, token: ConnectionToken):
-        if token.asset:
-            name = token.asset.name
-        else:
-            name = '*'
-        prefix_name = f'{token.user.username}-{name}'
-        filename = self.get_connect_filename(prefix_name)
-
-        endpoint = self.get_smart_endpoint(protocol='ssh', asset=token.asset)
         data = {
-            'ip': endpoint.host,
-            'port': str(endpoint.ssh_port),
-            'username': 'JMS-{}'.format(str(token.id)),
-            'password': token.value
+            'id': str(token.id),
+            'value': token.value,
+            'cmd': '',
+            'file': {}
         }
-        token = json.dumps(data)
-        return filename, token
+
+        if connect_method == NativeClient.mstsc:
+            filename, content = self.get_rdp_file_info(token)
+            data.update({
+                'file': {
+                    'filename': filename,
+                    'content': content,
+                }
+            })
+        else:
+            endpoint = self.get_smart_endpoint(protocol=token.endpoint_protocol, asset=token.asset)
+            cmd = NativeClient.get_launch_command(connect_method, token, endpoint)
+            data.update({'cmd': cmd})
+        return data
 
     def get_smart_endpoint(self, protocol, asset=None):
         target_ip = asset.get_target_ip() if asset else ''
@@ -223,6 +214,7 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         'get_secret_detail': ConnectionTokenSecretSerializer,
     }
     rbac_perms = {
+        'list': 'authentication.view_connectiontoken',
         'retrieve': 'authentication.view_connectiontoken',
         'create': 'authentication.add_connectiontoken',
         'expire': 'authentication.add_connectiontoken',
@@ -252,9 +244,9 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def get_queryset(self):
-        queryset = ConnectionToken.objects\
-            .filter(user=self.request.user)\
-            .filter(date_expired__lt=timezone.now())
+        queryset = ConnectionToken.objects \
+            .filter(user=self.request.user) \
+            .filter(date_expired__gt=timezone.now())
         return queryset
 
     def get_user(self, serializer):
