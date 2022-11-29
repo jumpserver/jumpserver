@@ -105,14 +105,6 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
     def __str__(self):
         return '{0.name}({0.address})'.format(self)
 
-    def get_domains(self):
-        from ..domain import Domain
-        node_ids = self.get_all_nodes(flat=True)
-        domains = Domain.objects.filter(
-            Q(nodes__id__in=node_ids) | Q(id=self.domain_id)
-        ).distinct()
-        return domains
-
     @property
     def specific(self):
         if not hasattr(self, self.category):

@@ -4,18 +4,11 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
+# TODO 最后去掉这个迁移
 class Migration(migrations.Migration):
     dependencies = [
         ('assets', '0113_alter_accounttemplate_options'),
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='node',
-            name='domain',
-            field=models.ForeignKey(
-                blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL,
-                related_name='nodes', to='assets.domain', verbose_name='Domain'
-            ),
-        ),
     ]

@@ -558,10 +558,6 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
         max_length=64, verbose_name=_("Parent key"), db_index=True, default=''
     )
     assets_amount = models.IntegerField(default=0)
-    domain = models.ForeignKey(
-        "assets.Domain", null=True, blank=True, related_name='nodes',
-        verbose_name=_("Domain"), on_delete=models.SET_NULL
-    )
 
     objects = OrgManager.from_queryset(NodeQuerySet)()
     is_node = True

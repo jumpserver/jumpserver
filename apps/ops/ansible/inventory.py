@@ -1,7 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 import json
 import os
-import random
 from collections import defaultdict
 
 from django.utils.translation import gettext as _
@@ -118,10 +117,8 @@ class JMSInventory:
         host.update(ansible_config)
 
         gateway = None
-        domains = asset.get_domains()
-        if domains:
-            gateways = [i.select_gateway() for i in domains if i.select_gateway()]
-            gateway = random.choice(gateways) if gateways else None
+        if asset.domain:
+            gateway = asset.domain.select_gateway()
 
         if ansible_connection == 'local':
             if gateway:
