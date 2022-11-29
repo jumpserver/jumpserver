@@ -11,10 +11,17 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
+        migrations.AddField(
+            model_name='connectiontoken',
+            name='connect_method',
+            field=models.CharField(default='web_ui', max_length=32, verbose_name='Connect method'),
+            preserve_default=False,
+        ),
+        migrations.AddField(
             model_name='connectiontoken',
             name='input_secret',
-            field=common.db.fields.EncryptCharField(blank=True, default='', max_length=128, verbose_name='Input Secret'),
+            field=common.db.fields.EncryptCharField(blank=True, default='', max_length=128,
+                                                    verbose_name='Input Secret'),
         ),
         migrations.AlterField(
             model_name='connectiontoken',

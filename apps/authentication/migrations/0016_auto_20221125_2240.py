@@ -33,16 +33,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name='connectiontoken',
-            name='input_secret',
-            field=common.db.fields.EncryptCharField(blank=True, default='', max_length=128, verbose_name='Input Secret'),
-        ),
-        migrations.AlterField(
-            model_name='connectiontoken',
-            name='input_username',
-            field=models.CharField(blank=True, default='', max_length=128, verbose_name='Input Username'),
-        ),
-        migrations.AlterField(
-            model_name='connectiontoken',
             name='value',
             field=models.CharField(default='', max_length=64, verbose_name='Value'),
         ),
