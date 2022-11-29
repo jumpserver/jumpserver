@@ -205,6 +205,15 @@ class TerminalType(TextChoices):
         return protocols
 
     @classmethod
+    def get_connect_method(cls, name, protocol, os):
+        methods = cls.get_protocols_connect_methods(os)
+        protocol_methods = methods.get(protocol, [])
+        for method in protocol_methods:
+            if method['value'] == name:
+                return method
+        return None
+
+    @classmethod
     def get_protocols_connect_methods(cls, os):
         methods = defaultdict(list)
         native_methods = NativeClient.get_methods(os)

@@ -19,12 +19,13 @@ from common.utils import random_string
 from common.utils.django import get_request_os
 from orgs.mixins.api import RootOrgViewMixin
 from perms.models import ActionChoices
-from terminal.const import NativeClient
+from terminal.const import NativeClient, TerminalType
 from terminal.models import EndpointRule, Applet
 from ..models import ConnectionToken
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
-    SuperConnectionTokenSerializer, )
+    SuperConnectionTokenSerializer,
+)
 
 __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
 
@@ -143,9 +144,12 @@ class RDPFileClientProtocolURLMixin:
     def get_client_protocol_data(self, token: ConnectionToken):
         _os = get_request_os(self.request)
 
-        connect_method = getattr(NativeClient, token.connect_method, None)
-        if connect_method is None:
-            raise ValueError('Connect method not support: {}'.format(token.connect_method))
+        connect_method_name = token.connect_method
+        connect_method_dict = TerminalType.get_connect_method(
+            token.connect_method, token.protocol, _os
+        )
+        if connect_method_dict is None:
+            raise ValueError('Connect method not support: {}'.format(connect_method_name))
 
         data = {
             'id': str(token.id),
@@ -154,7 +158,7 @@ class RDPFileClientProtocolURLMixin:
             'file': {}
         }
 
-        if connect_method == NativeClient.mstsc:
+        if connect_method_name == NativeClient.mstsc:
             filename, content = self.get_rdp_file_info(token)
             data.update({
                 'file': {
@@ -163,8 +167,11 @@ class RDPFileClientProtocolURLMixin:
                 }
             })
         else:
-            endpoint = self.get_smart_endpoint(protocol=token.endpoint_protocol, asset=token.asset)
-            cmd = NativeClient.get_launch_command(connect_method, token, endpoint)
+            endpoint = self.get_smart_endpoint(
+                protocol=connect_method_dict['endpoint_protocol'],
+                asset=token.asset
+            )
+            cmd = NativeClient.get_launch_command(connect_method_name, token, endpoint)
             data.update({'command': cmd})
         return data
 
