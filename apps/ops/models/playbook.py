@@ -5,14 +5,14 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from common.db.models import BaseCreateUpdateModel
+from orgs.mixins.models import JMSOrgBaseModel
 
 
-class Playbook(BaseCreateUpdateModel):
+class Playbook(JMSOrgBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'), null=True)
     path = models.FileField(upload_to='playbooks/')
-    owner = models.ForeignKey('users.User', verbose_name=_("Owner"), on_delete=models.SET_NULL, null=True)
+    creator = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
 
     @property
     def work_path(self):

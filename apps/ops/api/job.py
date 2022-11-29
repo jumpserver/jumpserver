@@ -5,8 +5,14 @@ from ops.serializers.job import JobSerializer, JobExecutionSerializer
 
 __all__ = ['JobViewSet', 'JobExecutionViewSet']
 
-from ops.tasks import run_ops_job, run_ops_job_executions
+from ops.tasks import run_ops_job_execution
 from orgs.mixins.api import OrgBulkModelViewSet
+
+
+def set_task_to_serializer_data(serializer, task):
+    data = getattr(serializer, "_data", {})
+    data["task_id"] = task.id
+    setattr(serializer, "_data", data)
 
 
 class JobViewSet(OrgBulkModelViewSet):
@@ -23,23 +29,25 @@ class JobViewSet(OrgBulkModelViewSet):
     def perform_create(self, serializer):
         instance = serializer.save()
         if instance.instant:
-            run_ops_job.delay(instance.id)
+            execution = instance.create_execution()
+            task = run_ops_job_execution.delay(execution.id)
+            set_task_to_serializer_data(serializer, task)
 
 
 class JobExecutionViewSet(OrgBulkModelViewSet):
     serializer_class = JobExecutionSerializer
     http_method_names = ('get', 'post', 'head', 'options',)
-    # filter_fields = ('type',)
     permission_classes = ()
     model = JobExecution
 
     def perform_create(self, serializer):
         instance = serializer.save()
-        run_ops_job_executions.delay(instance.id)
+        task = run_ops_job_execution.delay(instance.id)
+        set_task_to_serializer_data(serializer, task)
 
     def get_queryset(self):
         query_set = super().get_queryset()
         job_id = self.request.query_params.get('job_id')
         if job_id:
-            self.queryset = query_set.filter(job_id=job_id)
+            query_set = query_set.filter(job_id=job_id)
         return query_set

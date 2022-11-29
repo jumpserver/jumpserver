@@ -45,6 +45,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     runas = models.CharField(max_length=128, default='root', verbose_name=_('Runas'))
     runas_policy = models.CharField(max_length=128, choices=RunasPolicies.choices, default=RunasPolicies.skip,
                                     verbose_name=_('Runas policy'))
+    use_parameter_define = models.BooleanField(default=False, verbose_name=(_('Use Parameter Define')))
     parameters_define = models.JSONField(default=dict, verbose_name=_('Parameters define'))
     comment = models.CharField(max_length=1024, default='', verbose_name=_('Comment'), null=True, blank=True)
 
@@ -77,9 +78,9 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
         return total_cost / finished_count if finished_count else 0
 
     def get_register_task(self):
-        from ..tasks import run_ops_job
+        from ..tasks import run_ops_job_execution
         name = "run_ops_job_period_{}".format(str(self.id)[:8])
-        task = run_ops_job.name
+        task = run_ops_job_execution.name
         args = (str(self.id),)
         kwargs = {}
         return name, task, args, kwargs
@@ -107,6 +108,10 @@ class JobExecution(JMSOrgBaseModel):
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
     date_start = models.DateTimeField(null=True, verbose_name=_('Date start'), db_index=True)
     date_finished = models.DateTimeField(null=True, verbose_name=_("Date finished"))
+
+    @property
+    def job_type(self):
+        return self.job.type
 
     def get_runner(self):
         inv = self.job.inventory

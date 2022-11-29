@@ -15,6 +15,7 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
         read_only_fields = ["id", "date_last_run", "date_created", "date_updated", "average_time_cost"]
         fields = read_only_fields + [
             "name", "instant", "type", "module", "args", "playbook", "assets", "runas_policy", "runas", "owner",
+            "use_parameter_define",
             "parameters_define",
             "timeout",
             "chdir",
@@ -28,7 +29,7 @@ class JobExecutionSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobExecution
         read_only_fields = ["id", "task_id", "timedelta", "time_cost", 'is_finished', 'date_start', 'date_created',
-                            'is_success', 'task_id', 'short_id']
+                            'is_success', 'task_id', 'short_id', 'job_type']
         fields = read_only_fields + [
             "job", "parameters"
         ]
