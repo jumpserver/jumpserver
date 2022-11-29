@@ -45,7 +45,7 @@ class RDPFileClientProtocolURLMixin:
             'app_name': applet.name,
             'user_id': str(token.user.id),
             'asset_id': str(token.asset.id),
-            'token_id': token.id
+            'token_id': str(token.id)
         }
 
         app = '||tinker'
