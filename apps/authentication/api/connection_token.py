@@ -140,7 +140,7 @@ class RDPFileClientProtocolURLMixin:
         data = {
             'id': str(token.id),
             'value': token.value,
-            'cmd': '',
+            'command': '',
             'file': {}
         }
 
@@ -148,14 +148,14 @@ class RDPFileClientProtocolURLMixin:
             filename, content = self.get_rdp_file_info(token)
             data.update({
                 'file': {
-                    'filename': filename,
+                    'name': filename,
                     'content': content,
                 }
             })
         else:
             endpoint = self.get_smart_endpoint(protocol=token.endpoint_protocol, asset=token.asset)
             cmd = NativeClient.get_launch_command(connect_method, token, endpoint)
-            data.update({'cmd': cmd})
+            data.update({'command': cmd})
         return data
 
     def get_smart_endpoint(self, protocol, asset=None):
