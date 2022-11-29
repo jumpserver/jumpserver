@@ -25,5 +25,5 @@ class PlaybookSerializer(BulkOrgResourceModelSerializer, serializers.ModelSerial
     class Meta:
         model = Playbook
         fields = [
-            "id", "name", "path", "date_created", "owner", "date_updated"
+            "id", "name", "path", "comment", "date_created", "creator", "date_updated"
         ]

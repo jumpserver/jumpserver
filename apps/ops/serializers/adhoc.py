@@ -17,4 +17,5 @@ class AdHocSerializer(BulkOrgResourceModelSerializer, serializers.ModelSerialize
 
     class Meta:
         model = AdHoc
-        fields = ["id", "name", "module", "row_count", "size", "args", "creator", "date_created", "date_updated"]
+        fields = ["id", "name", "module", "row_count", "size", "args", "creator", "comment", "date_created",
+                  "date_updated"]

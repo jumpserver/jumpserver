@@ -24,6 +24,8 @@ class AdHoc(JMSOrgBaseModel):
                               verbose_name=_('Module'))
     args = models.CharField(max_length=1024, default='', verbose_name=_('Args'))
     creator = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
+    comment = models.CharField(max_length=1024, default='', verbose_name=_('Comment'), null=True, blank=True)
+
 
     @property
     def row_count(self):

@@ -13,6 +13,7 @@ class Playbook(JMSOrgBaseModel):
     name = models.CharField(max_length=128, verbose_name=_('Name'), null=True)
     path = models.FileField(upload_to='playbooks/')
     creator = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
+    comment = models.CharField(max_length=1024, default='', verbose_name=_('Comment'), null=True, blank=True)
 
     @property
     def work_path(self):
