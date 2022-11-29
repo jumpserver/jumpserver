@@ -89,7 +89,8 @@ class ConnectionTokenAssetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Asset
-        fields = ['id', 'name', 'address', 'protocols', 'org_id']
+        fields = ['id', 'name', 'address', 'protocols',
+                  'org_id', 'specific']
 
 
 class ConnectionTokenAccountSerializer(serializers.ModelSerializer):
