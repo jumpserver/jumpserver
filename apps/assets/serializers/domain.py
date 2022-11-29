@@ -24,7 +24,7 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
         model = Domain
         fields_mini = ['id', 'name']
         fields_small = fields_mini + ['comment']
-        fields_m2m = ['nodes', 'assets']
+        fields_m2m = ['assets']
         read_only_fields = ['asset_count', 'gateway_count', 'date_created']
         fields = fields_small + fields_m2m + read_only_fields
 
