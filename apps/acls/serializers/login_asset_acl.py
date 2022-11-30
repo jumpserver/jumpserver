@@ -1,9 +1,11 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
+from common.drf.fields import LabeledChoiceField
+from common.drf.fields import ObjectRelatedField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from orgs.models import Organization
-from common.drf.fields import LabeledChoiceField
+from users.models import User
 from acls import models
 
 
@@ -59,6 +61,9 @@ class LoginAssetACLSerializer(BulkOrgResourceModelSerializer):
     users = LoginAssetACLUsersSerializer()
     assets = LoginAssetACLAssestsSerializer()
     accounts = LoginAssetACLAccountsSerializer()
+    reviewers = ObjectRelatedField(
+        queryset=User.objects, many=True, required=False, label=_('Reviewers')
+    )
     reviewers_amount = serializers.IntegerField(read_only=True, source="reviewers.count")
     action = LabeledChoiceField(
         choices=models.LoginAssetACL.ActionChoices.choices, label=_("Action")
