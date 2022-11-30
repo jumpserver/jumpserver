@@ -7,8 +7,6 @@ from common.cache import Cache, IntegerField
 from common.utils import get_logger
 from common.utils.timezone import local_zero_hour, local_monday
 from users.models import UserGroup, User
-from audits.models import UserLoginLog
-from audits.const import LoginStatusChoices
 from assets.models import Node, Domain, Asset, Account
 from terminal.models import Session
 from perms.models import AssetPermission
@@ -64,7 +62,6 @@ class OrgResourceStatisticsCache(OrgRelatedCache):
     asset_perms_amount = IntegerField(queryset=AssetPermission.objects)
     total_count_online_users = IntegerField()
     total_count_online_sessions = IntegerField()
-    total_count_today_login_users = IntegerField()
     total_count_today_active_assets = IntegerField()
     total_count_today_failed_sessions = IntegerField()
 
@@ -112,16 +109,6 @@ class OrgResourceStatisticsCache(OrgRelatedCache):
     @staticmethod
     def compute_total_count_online_sessions():
         return Session.objects.filter(is_finished=False).count()
-
-    def compute_total_count_today_login_users(self):
-        t = local_zero_hour()
-        user_login_logs = UserLoginLog.objects.filter(
-            datetime__gte=t, status=LoginStatusChoices.success
-        )
-        if not self.org.is_root():
-            usernames = self.org.get_members().values('username')
-            user_login_logs = user_login_logs.filter(username__in=usernames)
-        return user_login_logs.values('username').distinct().count()
 
     @staticmethod
     def compute_total_count_today_active_assets():
