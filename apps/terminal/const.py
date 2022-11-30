@@ -44,9 +44,30 @@ class ComponentLoad(TextChoices):
         return set(dict(cls.choices).keys())
 
 
-class HttpMethod(TextChoices):
+class WebMethod(TextChoices):
     web_gui = 'web_gui', 'Web GUI'
     web_cli = 'web_cli', 'Web CLI'
+    web_sftp = 'web_sftp', 'Web SFTP'
+
+    @classmethod
+    def get_methods(cls):
+        return {
+            Protocol.ssh: [cls.web_cli, cls.web_sftp],
+            Protocol.telnet: [cls.web_cli],
+            Protocol.rdp: [cls.web_gui],
+            Protocol.vnc: [cls.web_gui],
+
+            Protocol.mysql: [cls.web_cli, cls.web_gui],
+            Protocol.mariadb: [cls.web_cli, cls.web_gui],
+            Protocol.oracle: [cls.web_cli, cls.web_gui],
+            Protocol.postgresql: [cls.web_cli, cls.web_gui],
+            Protocol.sqlserver: [cls.web_cli, cls.web_gui],
+            Protocol.redis: [cls.web_cli],
+            Protocol.mongodb: [cls.web_cli],
+
+            Protocol.k8s: [cls.web_gui],
+            Protocol.http: []
+        }
 
 
 class NativeClient(TextChoices):
@@ -67,6 +88,8 @@ class NativeClient(TextChoices):
 
     @classmethod
     def get_native_clients(cls):
+        # native client 关注的是 endpoint 的 protocol,
+        # 比如 telnet mysql, koko 都支持，到那时暴露的是 ssh 协议
         clients = {
             Protocol.ssh: {
                 'default': [cls.ssh],
@@ -162,7 +185,7 @@ class TerminalType(TextChoices):
     def protocols(cls):
         protocols = {
             cls.koko: {
-                'web_method': HttpMethod.web_cli,
+                'web_methods': [WebMethod.web_cli, WebMethod.web_sftp],
                 'listen': [Protocol.ssh, Protocol.http],
                 'support': [
                     Protocol.ssh, Protocol.telnet,
@@ -174,7 +197,7 @@ class TerminalType(TextChoices):
                 'match': 'm2m'
             },
             cls.omnidb: {
-                'web_method': HttpMethod.web_gui,
+                'web_methods': [WebMethod.web_gui],
                 'listen': [Protocol.http],
                 'support': [
                     Protocol.mysql, Protocol.postgresql, Protocol.oracle,
@@ -183,7 +206,7 @@ class TerminalType(TextChoices):
                 'match': 'm2m'
             },
             cls.lion: {
-                'web_method': HttpMethod.web_gui,
+                'web_methods': [WebMethod.web_gui],
                 'listen': [Protocol.http],
                 'support': [Protocol.rdp, Protocol.vnc],
                 'match': 'm2m'
@@ -216,6 +239,7 @@ class TerminalType(TextChoices):
     @classmethod
     def get_protocols_connect_methods(cls, os):
         methods = defaultdict(list)
+        web_methods = WebMethod.get_methods()
         native_methods = NativeClient.get_methods(os)
         applet_methods = AppletMethod.get_methods()
 
@@ -229,16 +253,6 @@ class TerminalType(TextChoices):
                     listen = component_protocol['listen']
 
                 for listen_protocol in listen:
-                    if listen_protocol == Protocol.http:
-                        web_protocol = component_protocol['web_method']
-                        methods[protocol.value].append({
-                            'value': web_protocol.value,
-                            'label': web_protocol.label,
-                            'endpoint_protocol': 'http',
-                            'type': 'web',
-                            'component': component.value,
-                        })
-
                     # Native method
                     methods[protocol.value].extend([
                         {
@@ -249,6 +263,20 @@ class TerminalType(TextChoices):
                         }
                         for method in native_methods[listen_protocol]
                     ])
+
+                protocol_web_methods = set(web_methods.get(protocol, [])) \
+                                       & set(component_protocol.get('web_methods', []))
+                print("protocol_web_methods", protocol, protocol_web_methods)
+                methods[protocol.value].extend([
+                    {
+                        'component': component.value,
+                        'type': 'web',
+                        'endpoint_protocol': 'http',
+                        'value': method.value,
+                        'label': method.label,
+                    }
+                    for method in protocol_web_methods
+                ])
 
         for protocol, applet_methods in applet_methods.items():
             for method in applet_methods:
