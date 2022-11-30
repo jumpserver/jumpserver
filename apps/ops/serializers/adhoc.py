@@ -1,8 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import unicode_literals
 
-import datetime
-
 from rest_framework import serializers
 
 from common.drf.fields import ReadableHiddenField
@@ -17,5 +15,5 @@ class AdHocSerializer(BulkOrgResourceModelSerializer, serializers.ModelSerialize
 
     class Meta:
         model = AdHoc
-        fields = ["id", "name", "module", "row_count", "size", "args", "creator", "comment", "date_created",
-                  "date_updated"]
+        read_only_field = ["id", "row_count", "size", "creator", "date_created", "date_updated"]
+        fields = read_only_field + ["id", "name", "module", "args", "comment"]
