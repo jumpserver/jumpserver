@@ -61,19 +61,18 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
     @classmethod
     def filter_asset(cls, asset, queryset):
         queryset = queryset.filter(
-            Q(assets__hostname_group__contains=asset.name) |
-            Q(assets__hostname_group__contains='*')
+            Q(assets__name_group__contains=asset.name) |
+            Q(assets__name_group__contains='*')
         )
-        ids = [q.id for q in queryset if contains_ip(asset.address, q.assets.get('ip_group', []))]
+        ids = [
+            q.id for q in queryset if contains_ip(asset.address, q.assets.get('address_group', []))
+        ]
         queryset = cls.objects.filter(id__in=ids)
         return queryset
 
     @classmethod
     def filter_account(cls, account_username, queryset):
         queryset = queryset.filter(
-            Q(accounts__name_group__contains=account_username) |
-            Q(accounts__name_group__contains='*')
-        ).filter(
             Q(accounts__username_group__contains=account_username) |
             Q(accounts__username_group__contains='*')
         )

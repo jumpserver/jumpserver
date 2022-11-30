@@ -37,9 +37,7 @@ class LoginAssetCheckSerializer(serializers.Serializer):
 
     def validate_account_username(self, account_username):
         asset_id = self.initial_data.get('asset_id')
-        account = Account.objects.filter(
-            username=account_username, asset_id=asset_id
-        ).first()
+        account = Account.objects.filter(username=account_username, asset_id=asset_id).first()
         if not account:
             error = 'Account username does not exist'
             raise serializers.ValidationError(error)

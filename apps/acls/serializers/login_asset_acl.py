@@ -25,34 +25,28 @@ class LoginAssetACLUsersSerializer(serializers.Serializer):
 
 
 class LoginAssetACLAssestsSerializer(serializers.Serializer):
-    ip_group_help_text = _(
+    address_group_help_text = _(
         "Format for comma-delimited string, with * indicating a match all. "
         "Such as: "
         "192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64"
         " (Domain name support)"
     )
 
-    ip_group = serializers.ListField(
-        default=["*"],
-        child=serializers.CharField(max_length=1024),
-        label=_("IP/Host"),
-        help_text=ip_group_help_text,
-    )
-    hostname_group = serializers.ListField(
-        default=["*"],
-        child=serializers.CharField(max_length=128),
-        label=_("Name"),
-        help_text=common_help_text,
-    )
-
-
-class LoginAssetACLAccountsSerializer(serializers.Serializer):
     name_group = serializers.ListField(
         default=["*"],
         child=serializers.CharField(max_length=128),
         label=_("Name"),
         help_text=common_help_text,
     )
+    address_group = serializers.ListField(
+        default=["*"],
+        child=serializers.CharField(max_length=1024),
+        label=_("IP/Host"),
+        help_text=address_group_help_text,
+    )
+
+
+class LoginAssetACLAccountsSerializer(serializers.Serializer):
     username_group = serializers.ListField(
         default=["*"],
         child=serializers.CharField(max_length=128),
