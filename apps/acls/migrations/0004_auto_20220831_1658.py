@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='loginassetacl',
             name='accounts',
-            field=models.JSONField(default=dict, verbose_name='Account'),
+            field=models.JSONField(verbose_name='Account'),
         ),
         migrations.RunPython(migrate_system_users_to_accounts),
         migrations.RemoveField(
