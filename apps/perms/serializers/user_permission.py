@@ -5,8 +5,8 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from assets.const import Category, AllTypes
-from assets.serializers.asset.common import AssetProtocolsSerializer
 from assets.models import Node, Asset, Platform, Account
+from assets.serializers.asset.common import AssetProtocolsSerializer
 from common.drf.fields import ObjectRelatedField, LabeledChoiceField
 from perms.serializers.permission import ActionChoicesField
 
@@ -48,5 +48,6 @@ class AccountsPermedSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ['id', 'name', 'has_username',  'username', 'has_secret', 'secret_type', 'actions']
+        fields = ['id', 'name', 'has_username', 'username',
+                  'has_secret', 'secret_type', 'actions']
         read_only_fields = fields

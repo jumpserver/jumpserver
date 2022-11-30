@@ -88,6 +88,9 @@ class AssetsSerializerFormatMixin:
     serializer_class = serializers.AssetGrantedSerializer
     filterset_fields = ['name', 'address', 'id', 'comment']
     search_fields = ['name', 'address', 'comment']
+    filterset_class = AssetFilterSet
+    ordering_fields = ("name", "address")
+    ordering = ('name',)
 
 
 class AssetsTreeFormatMixin(SerializeToTreeNodeMixin):
