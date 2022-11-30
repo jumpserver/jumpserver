@@ -2,7 +2,7 @@ from typing import List
 
 from rest_framework.request import Request
 
-from assets.models import Node
+from assets.models import Node, PlatformProtocol
 from assets.utils import get_node_from_request, is_query_node_all_assets
 from common.utils import lazyproperty, timeit
 
@@ -40,6 +40,9 @@ class SerializeToTreeNodeMixin:
 
     @timeit
     def serialize_assets(self, assets, node_key=None):
+        sftp_enabled_platform = PlatformProtocol.objects \
+            .filter(name='ssh', setting__sftp_enabled=True) \
+            .values_list('platform', flat=True).distinct()
         if node_key is None:
             get_pid = lambda asset: getattr(asset, 'parent_key', '')
         else:
@@ -58,7 +61,8 @@ class SerializeToTreeNodeMixin:
                 'meta': {
                     'type': 'asset',
                     'data': {
-                        'org_name': asset.org_name
+                        'org_name': asset.org_name,
+                        'sftp': asset.platform_id in sftp_enabled_platform,
                     },
                 }
             }
