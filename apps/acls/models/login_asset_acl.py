@@ -6,6 +6,32 @@ from .base import BaseACL, BaseACLQuerySet
 from common.utils.ip import contains_ip
 
 
+class ACLQuerySet(BaseACLQuerySet):
+    def filter_user(self, user):
+        return self.filter(
+            Q(users__username_group__contains=user.username) |
+            Q(users__username_group__contains='*')
+        )
+
+    def filter_asset(self, asset):
+        queryset = self.filter(
+            Q(assets__name_group__contains=asset.name) |
+            Q(assets__name_group__contains='*')
+        )
+        ids = [
+            q.id for q in queryset
+            if contains_ip(asset.address, q.assets.get('address_group', []))
+        ]
+        queryset = LoginAssetACL.objects.filter(id__in=ids)
+        return queryset
+
+    def filter_account(self, account_username):
+        return self.filter(
+            Q(accounts__username_group__contains=account_username) |
+            Q(accounts__username_group__contains='*')
+        )
+
+
 class ACLManager(OrgManager):
 
     def valid(self):
@@ -32,7 +58,7 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
         verbose_name=_("Reviewers")
     )
 
-    objects = ACLManager.from_queryset(BaseACLQuerySet)()
+    objects = ACLManager.from_queryset(ACLQuerySet)()
 
     class Meta:
         unique_together = ('name', 'org_id')
@@ -41,42 +67,6 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
 
     def __str__(self):
         return self.name
-
-    @classmethod
-    def filter(cls, user, asset, account_username, action):
-        queryset = cls.objects.filter(action=action)
-        queryset = cls.filter_user(user, queryset)
-        queryset = cls.filter_asset(asset, queryset)
-        queryset = cls.filter_account(account_username, queryset)
-        return queryset
-
-    @classmethod
-    def filter_user(cls, user, queryset):
-        queryset = queryset.filter(
-            Q(users__username_group__contains=user.username) |
-            Q(users__username_group__contains='*')
-        )
-        return queryset
-
-    @classmethod
-    def filter_asset(cls, asset, queryset):
-        queryset = queryset.filter(
-            Q(assets__name_group__contains=asset.name) |
-            Q(assets__name_group__contains='*')
-        )
-        ids = [
-            q.id for q in queryset if contains_ip(asset.address, q.assets.get('address_group', []))
-        ]
-        queryset = cls.objects.filter(id__in=ids)
-        return queryset
-
-    @classmethod
-    def filter_account(cls, account_username, queryset):
-        queryset = queryset.filter(
-            Q(accounts__username_group__contains=account_username) |
-            Q(accounts__username_group__contains='*')
-        )
-        return queryset
 
     @classmethod
     def create_login_asset_confirm_ticket(cls, user, asset, account_username, assignees, org_id):

@@ -66,7 +66,7 @@ def contains_ip(ip, ip_group):
             if in_ip_segment(ip, _ip):
                 return True
         else:
-            # is domain name
+            # address / host
             if ip == _ip:
                 return True
 

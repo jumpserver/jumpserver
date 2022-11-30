@@ -30,15 +30,14 @@ class LoginAssetCheckAPI(CreateAPIView):
         return serializer
 
     def check_confirm(self):
-        queries = {
-            'user': self.serializer.user,
-            'asset': self.serializer.asset,
-            'account_username': self.serializer.account_username,
-            'action': LoginAssetACL.ActionChoices.login_confirm
-        }
         with tmp_to_org(self.serializer.asset.org):
-            acl = LoginAssetACL.filter(**queries).valid().first()
-
+            acl = LoginAssetACL.objects\
+                .filter(action=LoginAssetACL.ActionChoices.login_confirm)\
+                .filter_user(self.serializer.user)\
+                .filter_asset(self.serializer.asset)\
+                .filter_account(self.serializer.account_username)\
+                .valid()\
+                .first()
         if acl:
             need_confirm = True
             response_data = self._get_response_data_of_need_confirm(acl)
