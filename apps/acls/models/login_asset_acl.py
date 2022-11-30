@@ -18,7 +18,7 @@ class LoginAssetACL(BaseACL, OrgModelMixin):
 
     # 条件
     users = models.JSONField(verbose_name=_('User'))
-    accounts = models.JSONField(verbose_name=_('Account'), default=dict)
+    accounts = models.JSONField(verbose_name=_('Account'))
     assets = models.JSONField(verbose_name=_('Asset'))
     # 动作
     action = models.CharField(

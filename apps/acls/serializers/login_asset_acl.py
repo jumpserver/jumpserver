@@ -28,30 +28,25 @@ class LoginAssetACLAssestsSerializer(serializers.Serializer):
     ip_group_help_text = _(
         "Format for comma-delimited string, with * indicating a match all. "
         "Such as: "
-        "192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 "
-        "(Domain name support)"
+        "192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64"
+        " (Domain name support)"
     )
 
     ip_group = serializers.ListField(
         default=["*"],
         child=serializers.CharField(max_length=1024),
-        label=_("IP"),
+        label=_("IP/Host"),
         help_text=ip_group_help_text,
     )
     hostname_group = serializers.ListField(
         default=["*"],
         child=serializers.CharField(max_length=128),
-        label=_("Hostname"),
+        label=_("Name"),
         help_text=common_help_text,
     )
 
 
 class LoginAssetACLAccountsSerializer(serializers.Serializer):
-    protocol_group_help_text = _(
-        "Format for comma-delimited string, with * indicating a match all. "
-        "Protocol options: {}"
-    )
-
     name_group = serializers.ListField(
         default=["*"],
         child=serializers.CharField(max_length=128),
@@ -70,9 +65,7 @@ class LoginAssetACLSerializer(BulkOrgResourceModelSerializer):
     users = LoginAssetACLUsersSerializer()
     assets = LoginAssetACLAssestsSerializer()
     accounts = LoginAssetACLAccountsSerializer()
-    reviewers_amount = serializers.IntegerField(
-        read_only=True, source="reviewers.count"
-    )
+    reviewers_amount = serializers.IntegerField(read_only=True, source="reviewers.count")
     action = LabeledChoiceField(
         choices=models.LoginAssetACL.ActionChoices.choices, label=_("Action")
     )
