@@ -1,13 +1,14 @@
-from rest_framework.response import Response
 from rest_framework.request import Request
+from rest_framework.response import Response
 
-from common.utils import get_logger
-from users.models import User
+from assets.api.asset.asset import AssetFilterSet
 from assets.api.mixin import SerializeToTreeNodeMixin
 from assets.models import Asset, Node
-from perms.pagination import NodeGrantedAssetPagination, AllGrantedAssetPagination
+from common.utils import get_logger
 from perms import serializers
+from perms.pagination import NodeGrantedAssetPagination, AllGrantedAssetPagination
 from perms.utils.user_permission import UserGrantedAssetsQueryUtils
+from users.models import User
 
 logger = get_logger(__name__)
 
@@ -32,7 +33,8 @@ class UserAllGrantedAssetsQuerysetMixin:
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
     pagination_class = AllGrantedAssetPagination
     ordering_fields = ("name", "address")
-    ordering = ('name', )
+    filterset_class = AssetFilterSet
+    ordering = ('name',)
 
     user: User
 

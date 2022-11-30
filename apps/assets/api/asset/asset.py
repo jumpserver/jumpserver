@@ -6,8 +6,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from assets import serializers
-from assets.models import Asset
 from assets.filters import IpInFilterBackend, LabelFilterBackend, NodeFilterBackend
+from assets.models import Asset
 from assets.tasks import (
     push_accounts_to_assets, test_assets_connectivity_manual,
     update_assets_hardware_info_manual, verify_accounts_connectivity,
@@ -24,6 +24,7 @@ __all__ = [
     "AssetViewSet",
     "AssetTaskCreateApi",
     "AssetsTaskCreateApi",
+    'AssetFilterSet'
 ]
 
 
