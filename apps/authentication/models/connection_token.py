@@ -128,16 +128,18 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
         if self.account_name == '@INPUT' or not account:
             return {
                 'name': self.account_name,
-                'username': self.username,
+                'username': self.input_username,
                 'secret_type': 'password',
-                'secret': self.secret
+                'secret': self.input_secret,
+                'su_from': None
             }
         else:
             return {
                 'name': account.name,
                 'username': account.username,
                 'secret_type': account.secret_type,
-                'secret': account.secret or self.secret
+                'secret': account.secret or self.input_secret,
+                'su_from': account.su_from,
             }
 
     @lazyproperty

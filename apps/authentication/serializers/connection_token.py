@@ -93,13 +93,22 @@ class ConnectionTokenAssetSerializer(serializers.ModelSerializer):
                   'org_id', 'specific']
 
 
-class ConnectionTokenAccountSerializer(serializers.ModelSerializer):
+class SimpleAccountSerializer(serializers.ModelSerializer):
     """ Account """
 
     class Meta:
         model = Account
+        fields = ['name', 'username', 'secret_type', 'secret']
+
+
+class ConnectionTokenAccountSerializer(serializers.ModelSerializer):
+    """ Account """
+    su_from = SimpleAccountSerializer(required=False, label=_('Su from'))
+
+    class Meta:
+        model = Account
         fields = [
-            'name', 'username', 'secret_type', 'secret',
+            'name', 'username', 'secret_type', 'secret', 'su_from',
         ]
 
 
