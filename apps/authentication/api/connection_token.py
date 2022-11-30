@@ -154,6 +154,7 @@ class RDPFileClientProtocolURLMixin:
         data = {
             'id': str(token.id),
             'value': token.value,
+            'protocol': token.protocol,
             'command': '',
             'file': {}
         }
