@@ -133,8 +133,8 @@ class NativeClient(TextChoices):
     def get_launch_command(cls, name, token, endpoint, os='windows'):
         commands = {
             cls.ssh: f'ssh {token.id}@{endpoint.host} -p {endpoint.ssh_port}',
-            cls.putty: f'putty -ssh {token.id}@{endpoint.host} -P {endpoint.ssh_port}',
-            cls.xshell: f'xshell -url ssh://{token.id}:{token.value}@{endpoint.host}:{endpoint.ssh_port}',
+            cls.putty: f'putty.exe -ssh {token.id}@{endpoint.host} -P {endpoint.ssh_port}',
+            cls.xshell: f'xshell.exe -url ssh://{token.id}:{token.value}@{endpoint.host}:{endpoint.ssh_port}',
             # cls.mysql: 'mysql -h {hostname} -P {port} -u {username} -p',
             # cls.psql: {
             #     'default': 'psql -h {hostname} -p {port} -U {username} -W',
