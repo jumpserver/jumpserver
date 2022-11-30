@@ -13,47 +13,120 @@ from rest_framework.response import Response
 from users.models import User
 from assets.models import Asset
 from assets.const import AllTypes
-from terminal.models import Session
+from terminal.models import Session, Command
 from terminal.utils import ComponentsPrometheusMetricsUtil
 from orgs.utils import current_org
 from common.utils import lazyproperty
+from audits.models import UserLoginLog, PasswordChangeLog, OperateLog
+from audits.const import LoginStatusChoices
 from common.utils.timezone import local_now, local_zero_hour
 from orgs.caches import OrgResourceStatisticsCache
 
 __all__ = ['IndexApi']
 
 
-class DatesLoginMetricMixin:
+class DateTimeMixin:
     request: Request
+
+    @property
+    def org(self):
+        return current_org
 
     @lazyproperty
     def days(self):
         query_params = self.request.query_params
-        # monthly
         count = query_params.get('days')
         count = int(count) if count else 0
         return count
 
-    @lazyproperty
-    def sessions_queryset(self):
+    @property
+    def days_to_datetime(self):
         days = self.days
         if days == 0:
             t = local_zero_hour()
         else:
             t = local_now() - timezone.timedelta(days=days)
-        sessions_queryset = Session.objects.filter(date_start__gte=t)
-        return sessions_queryset
+        return t
 
     @lazyproperty
-    def session_dates_list(self):
+    def dates_list(self):
         now = local_now()
         dates = [(now - timezone.timedelta(days=i)).date() for i in range(self.days)]
         dates.reverse()
         return dates
 
     def get_dates_metrics_date(self):
-        dates_metrics_date = [d.strftime('%m-%d') for d in self.session_dates_list] or ['0']
+        dates_metrics_date = [d.strftime('%m-%d') for d in self.dates_list] or ['0']
         return dates_metrics_date
+
+    @lazyproperty
+    def users(self):
+        return self.org.get_members()
+
+    @lazyproperty
+    def sessions_queryset(self):
+        t = self.days_to_datetime
+        sessions_queryset = Session.objects.filter(date_start__gte=t)
+        return sessions_queryset
+
+    def get_logs_queryset(self, queryset, query_params):
+        query = {}
+        if not self.org.is_root():
+            if query_params == 'username':
+                query = {
+                    f'{query_params}__in': self.users.values_list('username', flat=True)
+                }
+            else:
+                query = {
+                    f'{query_params}__in': [str(user) for user in self.users]
+                }
+        queryset = queryset.filter(**query)
+        return queryset
+
+    @lazyproperty
+    def login_logs_queryset(self):
+        t = self.days_to_datetime
+        queryset = UserLoginLog.objects.filter(datetime__gte=t)
+        queryset = self.get_logs_queryset(queryset, 'username')
+        return queryset
+
+    @lazyproperty
+    def password_change_logs_queryset(self):
+        t = self.days_to_datetime
+        queryset = PasswordChangeLog.objects.filter(datetime__gte=t)
+        queryset = self.get_logs_queryset(queryset, 'user')
+        return queryset
+
+    @lazyproperty
+    def operate_logs_queryset(self):
+        t = self.days_to_datetime
+        queryset = OperateLog.objects.filter(datetime__gte=t)
+        queryset = self.get_logs_queryset(queryset, 'user')
+        return queryset
+
+    @lazyproperty
+    def ftp_logs_queryset(self):
+        t = self.days_to_datetime
+        queryset = OperateLog.objects.filter(datetime__gte=t)
+        queryset = self.get_logs_queryset(queryset, 'user')
+        return queryset
+
+    @lazyproperty
+    def command_queryset(self):
+        t = self.days_to_datetime
+        t = t.timestamp()
+        queryset = Command.objects.filter(timestamp__gte=t)
+        return queryset
+
+
+class DatesLoginMetricMixin:
+    dates_list: list
+    command_queryset: Command.objects
+    sessions_queryset: Session.objects
+    ftp_logs_queryset: OperateLog.objects
+    login_logs_queryset: UserLoginLog.objects
+    operate_logs_queryset: OperateLog.objects
+    password_change_logs_queryset: PasswordChangeLog.objects
 
     @staticmethod
     def get_cache_key(date, tp):
@@ -93,7 +166,7 @@ class DatesLoginMetricMixin:
 
     def get_dates_metrics_total_count_login(self):
         data = []
-        for d in self.session_dates_list:
+        for d in self.dates_list:
             count = self.get_date_login_count(d)
             data.append(count)
         if len(data) == 0:
@@ -112,7 +185,7 @@ class DatesLoginMetricMixin:
 
     def get_dates_metrics_total_count_active_users(self):
         data = []
-        for d in self.session_dates_list:
+        for d in self.dates_list:
             count = self.get_date_user_count(d)
             data.append(count)
         return data
@@ -129,8 +202,25 @@ class DatesLoginMetricMixin:
 
     def get_dates_metrics_total_count_active_assets(self):
         data = []
-        for d in self.session_dates_list:
+        for d in self.dates_list:
             count = self.get_date_asset_count(d)
+            data.append(count)
+        return data
+
+    def get_date_session_count(self, date):
+        tp = "SESSION"
+        count = self.__get_data_from_cache(date, tp)
+        if count is not None:
+            return count
+        ds, de = self.get_date_start_2_end(date)
+        count = Session.objects.filter(date_start__range=(ds, de)).count()
+        self.__set_data_to_cache(date, tp, count)
+        return count
+
+    def get_dates_metrics_total_count_sessions(self):
+        data = []
+        for d in self.dates_list:
+            count = self.get_date_session_count(d)
             data.append(count)
         return data
 
@@ -181,8 +271,44 @@ class DatesLoginMetricMixin:
         ]
         return sessions
 
+    @lazyproperty
+    def user_login_logs_amount(self):
+        return self.login_logs_queryset.count()
 
-class IndexApi(DatesLoginMetricMixin, APIView):
+    @lazyproperty
+    def user_login_success_logs_amount(self):
+        return self.login_logs_queryset.filter(status=LoginStatusChoices.success).count()
+
+    @lazyproperty
+    def user_login_amount(self):
+        return self.login_logs_queryset.values('username').distinct().count()
+
+    @lazyproperty
+    def operate_logs_amount(self):
+        return self.operate_logs_queryset.count()
+
+    @lazyproperty
+    def change_password_logs_amount(self):
+        return self.password_change_logs_queryset.count()
+
+    @lazyproperty
+    def commands_amount(self):
+        return self.command_queryset.count()
+
+    @lazyproperty
+    def commands_danger_amount(self):
+        return self.command_queryset.filter(risk_level=Command.RISK_LEVEL_DANGEROUS).count()
+
+    @lazyproperty
+    def sessions_amount(self):
+        return self.sessions_queryset.count()
+
+    @lazyproperty
+    def ftp_logs_amount(self):
+        return self.ftp_logs_queryset.count()
+
+
+class IndexApi(DateTimeMixin, DatesLoginMetricMixin, APIView):
     http_method_names = ['get']
 
     def check_permissions(self, request):
@@ -193,7 +319,7 @@ class IndexApi(DatesLoginMetricMixin, APIView):
 
         query_params = self.request.query_params
 
-        caches = OrgResourceStatisticsCache(current_org)
+        caches = OrgResourceStatisticsCache(self.org)
 
         _all = query_params.get('all')
 
@@ -217,9 +343,9 @@ class IndexApi(DatesLoginMetricMixin, APIView):
                 'total_count_assets_this_week': caches.new_assets_amount_this_week,
             })
 
-        if _all or query_params.get('total_count') or query_params.get('total_count_today_login_users'):
+        if _all or query_params.get('total_count') or query_params.get('total_count_login_users'):
             data.update({
-                'total_count_today_login_users': caches.total_count_today_login_users,
+                'total_count_login_users': self.user_login_amount
             })
 
         if _all or query_params.get('total_count') or query_params.get('total_count_today_active_assets'):
@@ -242,9 +368,50 @@ class IndexApi(DatesLoginMetricMixin, APIView):
                 'total_count_today_failed_sessions': caches.total_count_today_failed_sessions,
             })
 
-        if _all or query_params.get('total_count') or query_params.get('total_count_type_to_assets_amount'):
+        if _all or query_params.get('total_count') or query_params.get('total_count_user_login_logs'):
             data.update({
-                'total_count_type_to_assets_amount': self.get_type_to_assets,
+                'total_count_user_login_logs': self.user_login_logs_amount,
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_user_login_success_logs'):
+            data.update({
+                'total_count_user_login_success_logs': self.user_login_success_logs_amount,
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_operate_logs'):
+            data.update({
+                'total_count_operate_logs': self.operate_logs_amount,
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_change_password_logs'):
+            data.update({
+                'total_count_change_password_logs': self.change_password_logs_amount,
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_commands'):
+            data.update({
+                'total_count_commands': self.commands_amount,
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_commands_danger'):
+            data.update({
+                'total_count_commands_danger': self.commands_danger_amount,
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_history_sessions'):
+            data.update({
+                'total_count_history_sessions': self.sessions_amount - caches.total_count_online_sessions,
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_ftp_logs'):
+            data.update({
+                'total_count_ftp_logs': self.ftp_logs_amount,
+            })
+
+        if _all or query_params.get('session_dates_metrics'):
+            data.update({
+                'dates_metrics_date': self.get_dates_metrics_date(),
+                'dates_metrics_total_count_session': self.get_dates_metrics_total_count_sessions(),
             })
 
         if _all or query_params.get('dates_metrics'):
