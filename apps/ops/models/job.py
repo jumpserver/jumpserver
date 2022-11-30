@@ -113,6 +113,13 @@ class JobExecution(JMSOrgBaseModel):
     def job_type(self):
         return self.job.type
 
+    def compile_shell(self):
+        if self.job.type != 'adhoc':
+            return
+        result = "{}{}{} ".format('\'', self.job.args, '\'')
+        result += "chdir={}".format(self.job.chdir)
+        return result
+
     def get_runner(self):
         inv = self.job.inventory
         inv.write_to_file(self.inventory_path)
@@ -122,8 +129,9 @@ class JobExecution(JMSOrgBaseModel):
             extra_vars = {}
 
         if self.job.type == 'adhoc':
+            args = self.compile_shell()
             runner = AdHocRunner(
-                self.inventory_path, self.job.module, module_args=self.job.args,
+                self.inventory_path, self.job.module, module_args=args,
                 pattern="all", project_dir=self.private_dir, extra_vars=extra_vars,
             )
         elif self.job.type == 'playbook':
