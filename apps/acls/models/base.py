@@ -4,7 +4,13 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from common.mixins import CommonModelMixin
 
 
-__all__ = ['BaseACL', 'BaseACLQuerySet']
+__all__ = ['BaseACL', 'BaseACLQuerySet', 'ACLManager']
+
+
+class ActionChoices(models.TextChoices):
+    reject = 'reject', _('Reject')
+    allow = 'allow', _('Allow')
+    confirm = 'confirm', _('Confirm')
 
 
 class BaseACLQuerySet(models.QuerySet):
@@ -21,6 +27,11 @@ class BaseACLQuerySet(models.QuerySet):
         return self.inactive()
 
 
+class ACLManager(models.Manager):
+    def valid(self):
+        return self.get_queryset().valid()
+
+
 class BaseACL(CommonModelMixin):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     priority = models.IntegerField(
@@ -28,8 +39,16 @@ class BaseACL(CommonModelMixin):
         help_text=_("1-100, the lower the value will be match first"),
         validators=[MinValueValidator(1), MaxValueValidator(100)]
     )
+    action = models.CharField(
+        max_length=64, verbose_name=_('Action'),
+        choices=ActionChoices.choices, default=ActionChoices.reject
+    )
+    reviewers = models.ManyToManyField('users.User', blank=True, verbose_name=_("Reviewers"))
     is_active = models.BooleanField(default=True, verbose_name=_("Active"))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
+
+    objects = ACLManager.from_queryset(BaseACLQuerySet)()
+    ActionChoices = ActionChoices
 
     class Meta:
         abstract = True
