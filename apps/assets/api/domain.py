@@ -35,7 +35,7 @@ class GatewayViewSet(OrgBulkModelViewSet):
     serializer_class = serializers.GatewaySerializer
 
     def get_queryset(self):
-        queryset = Host.get_gateway_queryset()
+        queryset = Domain.get_gateway_queryset()
         return queryset
 
 
@@ -45,17 +45,17 @@ class GatewayTestConnectionApi(SingleObjectMixin, APIView):
     }
 
     def get_queryset(self):
-        queryset = Host.get_gateway_queryset()
+        queryset = Domain.get_gateway_queryset()
         return queryset
 
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        local_port = self.request.data.get('port') or self.object.port
+        gateway = self.get_object()
+        local_port = self.request.data.get('port') or gateway.port
         try:
             local_port = int(local_port)
         except ValueError:
             raise ValidationError({'port': _('Number required')})
-        ok, e = self.object.test_connective(local_port=local_port)
+        ok, e = gateway.test_connective(local_port=local_port)
         if ok:
             return Response("ok")
         else:
