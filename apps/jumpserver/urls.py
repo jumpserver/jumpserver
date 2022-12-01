@@ -33,7 +33,6 @@ app_view_patterns = [
     path('ops/', include('ops.urls.view_urls'), name='ops'),
     path('tickets/', include('tickets.urls.view_urls'), name='tickets'),
     path('common/', include('common.urls.view_urls'), name='common'),
-    re_path(r'flower/(?P<path>.*)', views.celery_flower_view, name='flower-view'),
     path('download/', views.ResourceDownload.as_view(), name='download'),
     path('i18n/<str:lang>/', views.I18NView.as_view(), name='i18n-switch'),
 ]

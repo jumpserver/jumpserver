@@ -9,7 +9,6 @@ class Services(TextChoices):
     celery_ansible = 'celery_ansible', 'celery_ansible'
     celery_default = 'celery_default', 'celery_default'
     beat = 'beat', 'beat'
-    flower = 'flower', 'flower'
     ws = 'ws', 'ws'
     web = 'web', 'web'
     celery = 'celery', 'celery'
@@ -21,7 +20,6 @@ class Services(TextChoices):
         from . import services
         services_map = {
             cls.gunicorn.value: services.GunicornService,
-            cls.flower: services.FlowerService,
             cls.celery_default: services.CeleryDefaultService,
             cls.celery_ansible: services.CeleryAnsibleService,
             cls.beat: services.BeatService
@@ -30,7 +28,7 @@ class Services(TextChoices):
 
     @classmethod
     def web_services(cls):
-        return [cls.gunicorn, cls.flower]
+        return [cls.gunicorn]
 
     @classmethod
     def celery_services(cls):

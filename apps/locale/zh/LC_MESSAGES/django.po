@@ -2786,10 +2786,6 @@ msgstr "你的账号已创建成功"
 msgid "JumpServer Open Source Bastion Host"
 msgstr "JumpServer 开源堡垒机"
 
-#: jumpserver/views/celery_flower.py:23
-msgid "<h1>Flower service unavailable, check it</h1>"
-msgstr "Flower 服务不可用，请检查"
-
 #: jumpserver/views/other.py:26
 msgid ""
 "<div>Luna is a separately deployed program, you need to deploy Luna, koko, "
