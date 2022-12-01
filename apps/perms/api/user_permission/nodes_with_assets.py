@@ -1,24 +1,25 @@
 # -*- coding: utf-8 -*-
 #
+from django.conf import settings
+from django.db.models import F, Value, CharField
 from rest_framework.generics import ListAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
-from django.db.models import F, Value, CharField
-from django.conf import settings
 
-from common.utils.common import timeit
-from orgs.utils import tmp_to_root_org
-from common.permissions import IsValidUser
 from common.utils import get_logger, get_object_or_none
-from .mixin import AssetRoleUserMixin, AssetRoleAdminMixin
+from common.utils.common import timeit
+from common.permissions import IsValidUser
+
+from assets.models import Asset
+from assets.api import SerializeToTreeNodeMixin
+from perms.hands import Node
+from perms.models import AssetPermission, PermNode
 from perms.utils.user_permission import (
     UserGrantedTreeBuildUtils, get_user_all_asset_perm_ids,
     UserGrantedNodesQueryUtils, UserGrantedAssetsQueryUtils,
 )
-from perms.models import AssetPermission, PermNode
-from assets.models import Asset
-from assets.api import SerializeToTreeNodeMixin
-from perms.hands import Node
+
+from .mixin import SelfOrPKUserMixin, RebuildTreeMixin
 
 logger = get_logger(__name__)
 
@@ -148,9 +149,10 @@ class GrantedNodeChildrenWithAssetsAsTreeApiMixin(SerializeToTreeNodeMixin,
         return Response(data=all_tree_nodes)
 
 
-class UserGrantedNodeChildrenWithAssetsAsTreeApi(AssetRoleAdminMixin, GrantedNodeChildrenWithAssetsAsTreeApiMixin):
-    pass
-
-
-class MyGrantedNodeChildrenWithAssetsAsTreeApi(AssetRoleUserMixin, GrantedNodeChildrenWithAssetsAsTreeApiMixin):
+class UserGrantedNodeChildrenWithAssetsAsTreeApi(
+    SelfOrPKUserMixin,
+    RebuildTreeMixin,
+    GrantedNodeChildrenWithAssetsAsTreeApiMixin
+):
+    """ 用户授权的节点的子节点与资产树 """
     pass

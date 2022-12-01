@@ -1,19 +1,17 @@
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from common.utils import get_logger
+from users.models import User
 from assets.api.asset.asset import AssetFilterSet
 from assets.api.mixin import SerializeToTreeNodeMixin
 from assets.models import Asset, Node
-from common.utils import get_logger
 from perms import serializers
 from perms.pagination import NodeGrantedAssetPagination, AllGrantedAssetPagination
 from perms.utils.user_permission import UserGrantedAssetsQueryUtils
-from users.models import User
 
 logger = get_logger(__name__)
 
-
-# 获取数据的 ------------------------------------------------------------
 
 class UserDirectGrantedAssetsQuerysetMixin:
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
@@ -73,18 +71,13 @@ class UserGrantedNodeAssetsMixin:
             return Asset.objects.none()
         node_id = self.kwargs.get("node_id")
 
-        node, assets = UserGrantedAssetsQueryUtils(self.user).get_node_all_assets(
-            node_id
-        )
+        node, assets = UserGrantedAssetsQueryUtils(self.user).get_node_all_assets(node_id)
         assets = assets.prefetch_related('platform').only(*self.only_fields)
         self.pagination_node = node
         return assets
 
 
-# 控制格式的 ----------------------------------------------------
-
-
-class AssetsSerializerFormatMixin:
+class AssetSerializerFormatMixin:
     serializer_class = serializers.AssetGrantedSerializer
     filterset_fields = ['name', 'address', 'id', 'comment']
     search_fields = ['name', 'address', 'comment']

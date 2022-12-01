@@ -1,31 +1,25 @@
 # -*- coding: utf-8 -*-
 #
 import abc
-from rest_framework.generics import (
-    ListAPIView
-)
-from rest_framework.response import Response
 from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.generics import ListAPIView
 
-from assets.api.mixin import SerializeToTreeNodeMixin
 from common.utils import get_logger
-from .mixin import AssetRoleAdminMixin, AssetRoleUserMixin
-from perms.hands import User
+from assets.api.mixin import SerializeToTreeNodeMixin
 from perms import serializers
-
+from perms.hands import User
 from perms.utils.user_permission import UserGrantedNodesQueryUtils
 
+from .mixin import SelfOrPKUserMixin, RebuildTreeMixin
 
 logger = get_logger(__name__)
 
 __all__ = [
     'UserGrantedNodesApi',
-    'MyGrantedNodesApi',
-    'MyGrantedNodesAsTreeApi',
-    'UserGrantedNodeChildrenForAdminApi',
-    'MyGrantedNodeChildrenApi',
-    'UserGrantedNodeChildrenAsTreeForAdminApi',
-    'MyGrantedNodeChildrenAsTreeApi',
+    'UserGrantedNodesAsTreeApi',
+    'UserGrantedNodeChildrenApi',
+    'UserGrantedNodeChildrenAsTreeApi',
     'BaseGrantedNodeAsTreeApi',
     'UserGrantedNodesMixin',
 ]
@@ -98,35 +92,42 @@ class UserGrantedNodesMixin:
         return nodes
 
 
-# ------------------------------------------
-# 最终的 api
-class UserGrantedNodeChildrenForAdminApi(AssetRoleAdminMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenApi):
+# API
+
+
+class UserGrantedNodeChildrenApi(
+    SelfOrPKUserMixin,
+    UserGrantedNodeChildrenMixin,
+    BaseNodeChildrenApi
+):
+    """ 用户授权的节点下的子节点"""
     pass
 
 
-class MyGrantedNodeChildrenApi(AssetRoleUserMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenApi):
+class UserGrantedNodeChildrenAsTreeApi(
+    SelfOrPKUserMixin,
+    RebuildTreeMixin,
+    UserGrantedNodeChildrenMixin,
+    BaseNodeChildrenAsTreeApi
+):
+    """ 用户授权的节点下的子节点树"""
     pass
 
 
-class UserGrantedNodeChildrenAsTreeForAdminApi(AssetRoleAdminMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenAsTreeApi):
+class UserGrantedNodesApi(
+    SelfOrPKUserMixin,
+    UserGrantedNodesMixin,
+    BaseGrantedNodeApi
+):
+    """ 用户授权的节点 """
     pass
 
 
-class MyGrantedNodeChildrenAsTreeApi(AssetRoleUserMixin, UserGrantedNodeChildrenMixin, BaseNodeChildrenAsTreeApi):
-    def get_permissions(self):
-        permissions = super().get_permissions()
-        return permissions
-
-
-class UserGrantedNodesApi(AssetRoleAdminMixin, UserGrantedNodesMixin, BaseGrantedNodeApi):
+class UserGrantedNodesAsTreeApi(
+    SelfOrPKUserMixin,
+    RebuildTreeMixin,
+    UserGrantedNodesMixin,
+    BaseGrantedNodeAsTreeApi
+):
+    """ 用户授权的节点树 """
     pass
-
-
-class MyGrantedNodesApi(AssetRoleUserMixin, UserGrantedNodesApi):
-    pass
-
-
-class MyGrantedNodesAsTreeApi(AssetRoleUserMixin, UserGrantedNodesMixin, BaseGrantedNodeAsTreeApi):
-    pass
-
-# ------------------------------------------
