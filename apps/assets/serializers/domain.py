@@ -94,15 +94,6 @@ class GatewaySerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeria
         return username, password, private_key
 
     @staticmethod
-    def generate_default_data():
-        platform = Platform.objects.get(name=GATEWAY_NAME, internal=True)
-        # node = Node.objects.all().order_by('date_created').first()
-        data = {
-            'platform': platform,
-        }
-        return data
-
-    @staticmethod
     def create_accounts(instance, username, password, private_key):
         account_name = f'{instance.name}-{_("Gateway")}'
         account_data = {
@@ -135,7 +126,6 @@ class GatewaySerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeria
 
     def create(self, validated_data):
         auth_fields = self.clean_auth_fields(validated_data)
-        validated_data.update(self.generate_default_data())
         instance = super().create(validated_data)
         self.create_accounts(instance, *auth_fields)
         return instance
