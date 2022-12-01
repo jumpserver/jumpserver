@@ -35,7 +35,7 @@ class LoginAssetCheckAPI(CreateAPIView):
                 .filter(action=LoginAssetACL.ActionChoices.login_confirm)\
                 .filter_user(self.serializer.user)\
                 .filter_asset(self.serializer.asset)\
-                .filter_account(self.serializer.account_username)\
+                .filter_account(self.serializer.validated_data.get('account_username'))\
                 .valid()\
                 .first()
         if acl:
@@ -51,7 +51,7 @@ class LoginAssetCheckAPI(CreateAPIView):
         ticket = LoginAssetACL.create_login_asset_confirm_ticket(
             user=self.serializer.user,
             asset=self.serializer.asset,
-            account_username=self.serializer.account_username,
+            account_username=self.serializer.validated_data.get('account_username'),
             assignees=acl.reviewers.all(),
             org_id=self.serializer.asset.org.id,
         )
