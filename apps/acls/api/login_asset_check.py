@@ -1,10 +1,10 @@
-from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView
+from rest_framework.response import Response
 
 from common.utils import reverse, lazyproperty
 from orgs.utils import tmp_to_org
-from ..models import LoginAssetACL
 from .. import serializers
+from ..models import LoginAssetACL
 
 __all__ = ['LoginAssetCheckAPI']
 
@@ -31,12 +31,12 @@ class LoginAssetCheckAPI(CreateAPIView):
 
     def check_confirm(self):
         with tmp_to_org(self.serializer.asset.org):
-            acl = LoginAssetACL.objects\
-                .filter(action=LoginAssetACL.ActionChoices.login_confirm)\
-                .filter_user(self.serializer.user)\
-                .filter_asset(self.serializer.asset)\
-                .filter_account(self.serializer.validated_data.get('account_username'))\
-                .valid()\
+            acl = LoginAssetACL.objects \
+                .filter(action=LoginAssetACL.ActionChoices.confirm) \
+                .filter_user(self.serializer.user) \
+                .filter_asset(self.serializer.asset) \
+                .filter_account(self.serializer.validated_data.get('account_username')) \
+                .valid() \
                 .first()
         if acl:
             need_confirm = True
