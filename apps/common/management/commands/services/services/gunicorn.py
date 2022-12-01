@@ -1,3 +1,4 @@
+import multiprocessing
 from ..hands import *
 from .base import BaseService
 
@@ -16,11 +17,15 @@ class GunicornService(BaseService):
 
         log_format = '%(h)s %(t)s %(L)ss "%(r)s" %(s)s %(b)s '
         bind = f'{HTTP_HOST}:{HTTP_PORT}'
+        cores = 10
+        if (multiprocessing.cpu_count() * 2 + 1) < cores:
+            cores = multiprocessing.cpu_count() * 2 + 1
+
         cmd = [
             'gunicorn', 'jumpserver.asgi:application',
             '-b', bind,
             '-k', 'uvicorn.workers.UvicornWorker',
-            '--threads', '10',
+            '--threads', str(cores),
             '-w', str(self.worker),
             '--max-requests', '4096',
             '--access-logformat', log_format,
