@@ -408,6 +408,11 @@ class IndexApi(DateTimeMixin, DatesLoginMetricMixin, APIView):
                 'total_count_ftp_logs': self.ftp_logs_amount,
             })
 
+        if _all or query_params.get('total_count') or query_params.get('total_count_type_to_assets_amount'):
+            data.update({
+                'total_count_type_to_assets_amount': self.get_type_to_assets,
+            })
+
         if _all or query_params.get('session_dates_metrics'):
             data.update({
                 'dates_metrics_date': self.get_dates_metrics_date(),
