@@ -1,12 +1,12 @@
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
-from common.drf.serializers import BulkModelSerializer
-from common.drf.serializers import MethodSerializer
-from common.drf.fields import ObjectRelatedField
+
+from common.drf.fields import ObjectRelatedField, LabeledChoiceField
+from common.drf.serializers import BulkModelSerializer, MethodSerializer
 from jumpserver.utils import has_valid_xpack_license
 from users.models import User
-from ..models import LoginACL
 from .rules import RuleSerializer
+from ..models import LoginACL
 
 __all__ = [
     "LoginACLSerializer",
@@ -22,9 +22,7 @@ class LoginACLSerializer(BulkModelSerializer):
     reviewers = ObjectRelatedField(
         queryset=User.objects, label=_("Reviewers"), many=True, required=False
     )
-    action_display = serializers.ReadOnlyField(
-        source="get_action_display", label=_("Action")
-    )
+    action = LabeledChoiceField(choices=LoginACL.ActionChoices.choices)
     reviewers_amount = serializers.IntegerField(
         read_only=True, source="reviewers.count"
     )
@@ -34,17 +32,9 @@ class LoginACLSerializer(BulkModelSerializer):
         model = LoginACL
         fields_mini = ["id", "name"]
         fields_small = fields_mini + [
-            "priority",
-            "rules",
-            "action",
-            "action_display",
-            "is_active",
-            "user",
-            "date_created",
-            "date_updated",
-            "reviewers_amount",
-            "comment",
-            "created_by",
+            "priority", "user", "rules", "action",
+            "is_active", "date_created", "date_updated",
+            "reviewers_amount", "comment", "created_by",
         ]
         fields_fk = ["user"]
         fields_m2m = ["reviewers"]
@@ -65,7 +55,7 @@ class LoginACLSerializer(BulkModelSerializer):
             return
         choices = action._choices
         if not has_valid_xpack_license():
-            choices.pop(LoginACL.ActionChoices.confirm, None)
+            choices.pop(LoginACL.ActionChoices.review, None)
         action._choices = choices
 
     def get_rules_serializer(self):

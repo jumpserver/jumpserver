@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('acls', '0004_auto_20220831_1658'),
@@ -15,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='loginacl',
             name='action',
-            field=models.CharField(choices=[('reject', 'Reject'), ('allow', 'Allow'), ('confirm', 'Confirm')], default='reject', max_length=64, verbose_name='Action'),
+            field=models.CharField(default='reject', max_length=64, verbose_name='Action'),
         ),
         migrations.AlterField(
             model_name='loginacl',
@@ -25,7 +24,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='loginassetacl',
             name='action',
-            field=models.CharField(choices=[('reject', 'Reject'), ('allow', 'Allow'), ('confirm', 'Confirm')], default='reject', max_length=64, verbose_name='Action'),
+            field=models.CharField(default='reject', max_length=64, verbose_name='Action'),
         ),
         migrations.AlterField(
             model_name='loginassetacl',

@@ -28,7 +28,7 @@ class AuthValidateMixin(serializers.Serializer):
 
     def validate_secret(self, secret):
         if not secret:
-            return
+            return ''
         secret_type = self.initial_secret_type
         if secret_type == SecretType.PASSWORD:
             validate_password_for_ansible(secret)
@@ -44,7 +44,7 @@ class AuthValidateMixin(serializers.Serializer):
     def clean_auth_fields(validated_data):
         for field in ('secret',):
             value = validated_data.get(field)
-            if not value:
+            if value is None:
                 validated_data.pop(field, None)
         validated_data.pop('passphrase', None)
 
