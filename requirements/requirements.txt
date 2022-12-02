@@ -1,3 +1,4 @@
+aiofiles==22.1.0
 amqp==5.0.9
 ansible==6.4.0
 ansible-runner==2.2.1
