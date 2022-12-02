@@ -14,6 +14,7 @@ def parse_playbook_name(path):
 
 class PlaybookSerializer(BulkOrgResourceModelSerializer, serializers.ModelSerializer):
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
+    path = serializers.FileField(required=False)
 
     def create(self, validated_data):
         name = validated_data.get('name')
@@ -26,5 +27,5 @@ class PlaybookSerializer(BulkOrgResourceModelSerializer, serializers.ModelSerial
         model = Playbook
         read_only_fields = ["id", "date_created", "date_updated"]
         fields = read_only_fields + [
-            "id", "name", "comment", "creator",
+            "id", 'path', "name", "comment", "creator",
         ]

@@ -5,6 +5,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from ops.exception import PlaybookNoValidEntry
 from orgs.mixins.models import JMSOrgBaseModel
 
 
@@ -16,5 +17,10 @@ class Playbook(JMSOrgBaseModel):
     comment = models.CharField(max_length=1024, default='', verbose_name=_('Comment'), null=True, blank=True)
 
     @property
-    def work_path(self):
-        return os.path.join(settings.DATA_DIR, "ops", "playbook", self.id.__str__(), "main.yaml")
+    def entry(self):
+        work_dir = os.path.join(settings.DATA_DIR, "ops", "playbook", self.id.__str__())
+        valid_entry = ('main.yml', 'main.yaml', 'main')
+        for f in os.listdir(work_dir):
+            if f in valid_entry:
+                return os.path.join(work_dir, f)
+        raise PlaybookNoValidEntry

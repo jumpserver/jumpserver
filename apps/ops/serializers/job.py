@@ -1,14 +1,14 @@
+from django.utils.translation import ugettext as _
 from rest_framework import serializers
 from common.drf.fields import ReadableHiddenField
 from ops.mixin import PeriodTaskSerializerMixin
 from ops.models import Job, JobExecution
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
-_all_ = []
-
 
 class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
     owner = ReadableHiddenField(default=serializers.CurrentUserDefault())
+    run_after_save = serializers.BooleanField(label=_("Run after save"), default=False, required=False)
 
     class Meta:
         model = Job
@@ -21,7 +21,7 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
             "chdir",
             "comment",
             "summary",
-            "is_periodic", "interval", "crontab"
+            "is_periodic", "interval", "crontab", "run_after_save"
         ]
 
 
