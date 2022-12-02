@@ -11,7 +11,7 @@ __all__ = ['BaseACL', 'BaseACLQuerySet', 'ACLManager', 'AssetAccountUserACLQuery
 
 class ActionChoices(models.TextChoices):
     reject = 'reject', _('Reject')
-    accept = 'allow', _('Allow')
+    accept = 'accept', _('Accept')
     review = 'review', _('Review')
 
 
