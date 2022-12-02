@@ -8,11 +8,12 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
     owner = ReadableHiddenField(default=serializers.CurrentUserDefault())
-    run_after_save = serializers.BooleanField(label=_("Run after save"), default=False, required=False)
+    run_after_save = serializers.BooleanField(label=_("Run after save"), read_only=True, default=False, required=False)
 
     class Meta:
         model = Job
-        read_only_fields = ["id", "date_last_run", "date_created", "date_updated", "average_time_cost"]
+        read_only_fields = ["id", "date_last_run", "date_created", "date_updated", "average_time_cost",
+                            "run_after_save"]
         fields = read_only_fields + [
             "name", "instant", "type", "module", "args", "playbook", "assets", "runas_policy", "runas", "owner",
             "use_parameter_define",
@@ -21,7 +22,7 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
             "chdir",
             "comment",
             "summary",
-            "is_periodic", "interval", "crontab", "run_after_save"
+            "is_periodic", "interval", "crontab"
         ]
 
 
