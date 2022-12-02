@@ -91,6 +91,8 @@ class BaseAccount(JMSOrgBaseModel):
 
     @property
     def ssh_key_fingerprint(self):
+        # Todo: 等待修复
+        return '等待修复'
         if self.public_key:
             public_key = self.public_key
         elif self.private_key:

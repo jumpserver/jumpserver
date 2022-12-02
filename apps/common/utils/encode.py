@@ -165,8 +165,10 @@ def parse_ssh_public_key_str(text: bytes = "", password=None) -> str:
     private_key = _parse_ssh_private_key(text, password=password)
     if private_key is None:
         return ""
-    public_key_bytes = private_key.public_key().public_bytes(serialization.Encoding.OpenSSH,
-                                                             serialization.PublicFormat.OpenSSH)
+    public_key_bytes = private_key.public_key().public_bytes(
+        serialization.Encoding.OpenSSH,
+        serialization.PublicFormat.OpenSSH,
+    )
     return public_key_bytes.decode('utf-8')
 
 
@@ -185,12 +187,11 @@ def _parse_ssh_private_key(text, password=None):
             text = text.encode("utf-8")
         except UnicodeDecodeError:
             return None
-    if password is not None:
-        if isinstance(password, str):
-            try:
-                password = password.encode("utf-8")
-            except UnicodeDecodeError:
-                return None
+    if isinstance(password, str):
+        try:
+            password = password.encode("utf-8")
+        except UnicodeDecodeError:
+            return None
 
     try:
         private_key = serialization.load_ssh_private_key(text, password=password)
