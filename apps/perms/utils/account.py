@@ -9,15 +9,15 @@ __all__ = ['PermAccountUtil']
 class PermAccountUtil(AssetPermissionUtil):
     """ 资产授权账号相关的工具 """
 
-    def validate_permission(self, user, asset, account_username):
+    def validate_permission(self, user, asset, account_name):
         """ 校验用户有某个资产下某个账号名的权限
         :param user: User
         :param asset: Asset
-        :param account_username: 可能是 @USER @INPUT 字符串
+        :param account_name: 可能是 @USER @INPUT 字符串
         """
         permed_accounts = self.get_permed_accounts_for_user(user, asset)
-        accounts_mapper = {account.username: account for account in permed_accounts}
-        account = accounts_mapper.get(account_username)
+        accounts_mapper = {account.name: account for account in permed_accounts}
+        account = accounts_mapper.get(account_name)
         return account
 
     def get_permed_accounts_for_user(self, user, asset):
