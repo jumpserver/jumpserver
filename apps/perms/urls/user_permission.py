@@ -6,9 +6,9 @@ user_permission_urlpatterns = [
     # <str:user> such as: my | self | user.id
 
     # assets
-    path('<str:user>/assets/', api.UserAllGrantedAssetsApi.as_view(),
+    path('<str:user>/assets/', api.UserAllPermedAssetsApi.as_view(),
          name='user-assets'),
-    path('<str:user>/assets/tree/', api.UserDirectGrantedAssetsAsTreeApi.as_view(),
+    path('<str:user>/assets/tree/', api.UserDirectPermedAssetsAsTreeApi.as_view(),
          name='user-assets-as-tree'),
     path('<str:user>/ungroup/assets/tree/', api.UserUngroupAssetsAsTreeApi.as_view(),
          name='user-ungroup-assets-as-tree'),
@@ -24,11 +24,11 @@ user_permission_urlpatterns = [
          name='user-nodes-children-as-tree'),
 
     # node-assets
-    path('<str:user>/nodes/<uuid:node_id>/assets/', api.UserGrantedNodeAssetsApi.as_view(),
+    path('<str:user>/nodes/<uuid:node_id>/assets/', api.UserPermedNodeAssetsApi.as_view(),
          name='user-node-assets'),
-    path('<str:user>/nodes/ungrouped/assets/', api.UserDirectGrantedAssetsApi.as_view(),
+    path('<str:user>/nodes/ungrouped/assets/', api.UserDirectPermedAssetsApi.as_view(),
          name='user-ungrouped-assets'),
-    path('<str:user>/nodes/favorite/assets/', api.UserFavoriteGrantedAssetsApi.as_view(),
+    path('<str:user>/nodes/favorite/assets/', api.UserFavoriteAssetsApi.as_view(),
          name='user-ungrouped-assets'),
 
     path('<str:user>/nodes/children-with-assets/tree/',
