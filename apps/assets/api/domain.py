@@ -1,5 +1,4 @@
 # ~*~ coding: utf-8 ~*~
-from django.db.models import F
 from django.views.generic.detail import SingleObjectMixin
 from django.utils.translation import ugettext as _
 from rest_framework.views import APIView, Response
@@ -7,7 +6,7 @@ from rest_framework.serializers import ValidationError
 
 from common.utils import get_logger
 from orgs.mixins.api import OrgBulkModelViewSet
-from ..models import Domain, Host
+from ..models import Domain, Gateway
 from .. import serializers
 
 logger = get_logger(__file__)
@@ -29,7 +28,7 @@ class DomainViewSet(OrgBulkModelViewSet):
 
 
 class GatewayViewSet(OrgBulkModelViewSet):
-    perm_model = Host
+    perm_model = Gateway
     filterset_fields = ("domain__name", "name", "domain")
     search_fields = ("domain__name",)
     serializer_class = serializers.GatewaySerializer
