@@ -21,7 +21,6 @@ class GunicornService(BaseService):
             'gunicorn', 'jumpserver.asgi:application',
             '-b', bind,
             '-k', 'uvicorn.workers.UvicornWorker',
-            '--threads', str(self.worker * 2),
             '-w', str(self.worker),
             '--max-requests', '4096',
             '--access-logformat', log_format,
