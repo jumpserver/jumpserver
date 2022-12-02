@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from common.utils import get_logger, lazyproperty
 from orgs.mixins.models import OrgModelMixin
 from assets.models import Host, Platform
-from assets.const import GATEWAY_NAME
+from assets.const import GATEWAY_NAME, SecretType
 from orgs.mixins.models import OrgManager
 
 logger = get_logger(__file__)
@@ -80,3 +80,40 @@ class Gateway(Host):
         platform = self.default_platform
         self.platform_id = platform.id
         return super().save(*args, **kwargs)
+
+    @lazyproperty
+    def select_accounts(self) -> dict:
+        account_dict = {}
+        accounts = self.accounts.filter(is_active=True).order_by('-privileged', '-date_updated')
+        password_account = accounts.filter(secret_type=SecretType.PASSWORD).first()
+        if password_account:
+            account_dict[SecretType.PASSWORD] = password_account
+
+        ssh_key_account = accounts.filter(secret_type=SecretType.SSH_KEY).first()
+        if ssh_key_account:
+            account_dict[SecretType.SSH_KEY] = ssh_key_account
+        return account_dict
+
+    @property
+    def password(self):
+        account = self.select_accounts.get(SecretType.PASSWORD)
+        return account.secret if account else None
+
+    @property
+    def private_key(self):
+        account = self.select_accounts.get(SecretType.SSH_KEY)
+        return account.secret if account else None
+
+    def private_key_path(self):
+        account = self.select_accounts.get(SecretType.SSH_KEY)
+        return account.private_key_path if account else None
+
+    @lazyproperty
+    def username(self):
+        accounts = self.select_accounts.values()
+        if len(accounts) == 0:
+            return None
+        accounts = sorted(
+            accounts, key=lambda x: x['privileged'], reverse=True
+        )
+        return accounts[0].username

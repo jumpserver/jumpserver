@@ -39,21 +39,26 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
 
 
 class GatewaySerializer(HostSerializer):
+    effective_accounts = serializers.SerializerMethodField()
+
     class Meta(HostSerializer.Meta):
         model = Gateway
+        fields = HostSerializer.Meta.fields + ['effective_accounts']
 
-
-class GatewayWithAuthSerializer(SecretReadableMixin, GatewaySerializer):
-    class Meta(GatewaySerializer.Meta):
-        extra_kwargs = {
-            'password': {'write_only': False},
-            'private_key': {"write_only": False},
-            'public_key': {"write_only": False},
-        }
+    @staticmethod
+    def get_effective_accounts(obj):
+        accounts = obj.select_accounts.values()
+        return [
+            {
+                'id': account.id,
+                'username': account.username,
+                'secret_type': account.secret_type,
+            } for account in accounts
+        ]
 
 
 class DomainWithGatewaySerializer(BulkOrgResourceModelSerializer):
-    gateways = GatewayWithAuthSerializer(many=True, read_only=True)
+    gateways = GatewaySerializer(many=True, read_only=True)
 
     class Meta:
         model = Domain
