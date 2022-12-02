@@ -156,16 +156,16 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
         return self.domain.random_gateway()
 
     @lazyproperty
-    def cmd_filter_rules(self):
-        from assets.models import CommandFilterRule
+    def acl_command_groups(self):
+        from acls.models import CommandFilterACL
         kwargs = {
             'user_id': self.user.id,
             'account': self.account,
         }
         if self.asset:
             kwargs['asset_id'] = self.asset.id
-        rules = CommandFilterRule.get_queryset(**kwargs)
-        return rules
+        cmd_groups = CommandFilterACL.get_command_groups(**kwargs)
+        return cmd_groups
 
 
 class SuperConnectionToken(ConnectionToken):

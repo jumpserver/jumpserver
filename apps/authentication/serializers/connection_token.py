@@ -2,6 +2,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from assets.models import Asset, CommandFilterRule, Account, Platform
+from acls.models import CommandGroup
 from assets.serializers import PlatformSerializer, AssetProtocolsSerializer
 from authentication.models import ConnectionToken
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
@@ -89,8 +90,9 @@ class ConnectionTokenAssetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Asset
-        fields = ['id', 'name', 'address', 'protocols',
-                  'org_id', 'specific']
+        fields = [
+            'id', 'name', 'address', 'protocols', 'category', 'type', 'org_id', 'specific'
+        ]
 
 
 class SimpleAccountSerializer(serializers.ModelSerializer):
@@ -123,14 +125,14 @@ class ConnectionTokenGatewaySerializer(serializers.ModelSerializer):
         ]
 
 
-class ConnectionTokenCmdFilterRuleSerializer(serializers.ModelSerializer):
-    """ Command filter rule """
+class ConnectionTokenACLCmdGroupSerializer(serializers.ModelSerializer):
+    """ ACL command group"""
 
     class Meta:
-        model = CommandFilterRule
+        model = CommandGroup
         fields = [
             'id', 'type', 'content', 'ignore_case', 'pattern',
-            'priority', 'action', 'date_created',
+            'action', 'date_created',
         ]
 
 
@@ -145,23 +147,23 @@ class ConnectionTokenPlatform(PlatformSerializer):
 
 
 class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
-    expire_now = serializers.BooleanField(label=_('Expired now'), default=True)
     user = ConnectionTokenUserSerializer(read_only=True)
     asset = ConnectionTokenAssetSerializer(read_only=True)
     account = ConnectionTokenAccountSerializer(read_only=True)
     gateway = ConnectionTokenGatewaySerializer(read_only=True)
     platform = ConnectionTokenPlatform(read_only=True)
-    # cmd_filter_rules = ConnectionTokenCmdFilterRuleSerializer(many=True)
+    acl_command_groups = ConnectionTokenACLCmdGroupSerializer(read_only=True, many=True)
     actions = ActionChoicesField()
     expire_at = serializers.IntegerField()
+    expire_now = serializers.BooleanField(label=_('Expired now'), write_only=True, default=True)
 
     class Meta:
         model = ConnectionToken
         fields = [
             'id', 'value', 'user', 'asset', 'account', 'platform',
+            'acl_command_groups',
             'protocol', 'gateway', 'actions', 'expire_at', 'expire_now',
         ]
         extra_kwargs = {
             'value': {'read_only': True},
-            'expire_now': {'write_only': True},
         }

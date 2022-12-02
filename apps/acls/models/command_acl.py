@@ -124,11 +124,9 @@ class CommandFilterACL(OrgModelMixin, BaseACL):
         return ticket
 
     @classmethod
-    def get_queryset(
-            cls, user_id=None, user_group_id=None, account=None,
-            asset_id=None, org_id=None
-    ):
-        from assets.models import Account
+    def get_command_groups(cls, user_id=None, user_group_id=None, account=None, asset_id=None, org_id=None):
+
+        from assets.models import Account, Asset
         user_groups = []
         user = get_object_or_none(User, pk=user_id)
         if user:
@@ -152,11 +150,14 @@ class CommandFilterACL(OrgModelMixin, BaseACL):
             org_id = asset.org_id
             q |= Q(assets=asset)
         if q:
-            cmd_filters = CommandFilter.objects.filter(q).filter(is_active=True)
+            cmd_filters = cls.objects.filter(q).filter(is_active=True)
             if org_id:
                 cmd_filters = cmd_filters.filter(org_id=org_id)
-            rule_ids = cmd_filters.values_list('rules', flat=True)
-            rules = cls.objects.filter(id__in=rule_ids)
+            filter_ids = cmd_filters.values_list('id', flat=True)
+            command_group_ids = cls.commands.through.objects\
+                .filter(commandfilteracl_id__in=filter_ids)\
+                .values_list('commandgroup_id', flat=True)
+            cmd_groups = CommandGroup.objects.filter(id__in=command_group_ids)
         else:
-            rules = cls.objects.none()
-        return rules
+            cmd_groups = CommandGroup.objects.none()
+        return cmd_groups
