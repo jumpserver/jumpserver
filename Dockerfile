@@ -100,6 +100,6 @@ VOLUME /opt/jumpserver/logs
 
 ENV LANG=zh_CN.UTF-8
 
-EXPOSE 8070
 EXPOSE 8080
+
 ENTRYPOINT ["./entrypoint.sh"]

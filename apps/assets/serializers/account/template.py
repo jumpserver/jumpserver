@@ -1,3 +1,4 @@
+from common.drf.serializers import SecretReadableMixin
 from assets.models import AccountTemplate
 from .base import BaseAccountSerializer
 
@@ -17,3 +18,10 @@ class AccountTemplateSerializer(BaseAccountSerializer):
     #     if not required_field_dict:
     #         return
     #     raise serializers.ValidationError(required_field_dict)
+
+
+class AccountTemplateSecretSerializer(SecretReadableMixin, AccountTemplateSerializer):
+    class Meta(AccountTemplateSerializer.Meta):
+        extra_kwargs = {
+            'secret': {'write_only': False},
+        }

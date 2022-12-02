@@ -183,7 +183,7 @@ class CommandFilterRule(OrgModelMixin):
             cls, user_id=None, user_group_id=None, account=None,
             asset_id=None, org_id=None
     ):
-        from perms.models.const import SpecialAccount
+        from assets.models import Account
         user_groups = []
         user = get_object_or_none(User, pk=user_id)
         if user:
@@ -202,7 +202,7 @@ class CommandFilterRule(OrgModelMixin):
         if account:
             org_id = account.org_id
             q |= Q(accounts__contains=account.username) | \
-                 Q(accounts__contains=SpecialAccount.ALL.value)
+                 Q(accounts__contains=Account.AliasAccount.ALL)
         if asset:
             org_id = asset.org_id
             q |= Q(assets=asset)

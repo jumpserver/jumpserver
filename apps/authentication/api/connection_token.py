@@ -1,7 +1,6 @@
 import base64
 import json
 import os
-import time
 import urllib.parse
 
 from django.http import HttpResponse
@@ -12,17 +11,20 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.serializers import ValidationError
 
 from common.drf.api import JMSModelViewSet
 from common.http import is_true
+from common.utils import random_string
+from common.utils.django import get_request_os
 from orgs.mixins.api import RootOrgViewMixin
-from orgs.utils import tmp_to_root_org
 from perms.models import ActionChoices
-from terminal.models import EndpointRule
+from terminal.const import NativeClient, TerminalType
+from terminal.models import EndpointRule, Applet
 from ..models import ConnectionToken
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
-    SuperConnectionTokenSerializer, ConnectionTokenDisplaySerializer,
+    SuperConnectionTokenSerializer,
 )
 
 __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
@@ -32,13 +34,34 @@ class RDPFileClientProtocolURLMixin:
     request: Request
     get_serializer: callable
 
+    @staticmethod
+    def set_applet_info(token, rdp_options):
+        # remote-app
+        applet = Applet.objects.filter(name=token.connect_method).first()
+        if not applet:
+            return rdp_options
+
+        cmdline = {
+            'app_name': applet.name,
+            'user_id': str(token.user.id),
+            'asset_id': str(token.asset.id),
+            'token_id': str(token.id)
+        }
+
+        app = '||tinker'
+        rdp_options['remoteapplicationmode:i'] = '1'
+        rdp_options['alternate shell:s'] = app
+        rdp_options['remoteapplicationprogram:s'] = app
+        rdp_options['remoteapplicationname:s'] = app
+
+        cmdline_b64 = base64.b64encode(json.dumps(cmdline).encode()).decode()
+        rdp_options['remoteapplicationcmdline:s'] = cmdline_b64
+        return rdp_options
+
     def get_rdp_file_info(self, token: ConnectionToken):
         rdp_options = {
             'full address:s': '',
             'username:s': '',
-            # 'screen mode id:i': '1',
-            # 'desktopwidth:i': '1280',
-            # 'desktopheight:i': '800',
             'use multimon:i': '0',
             'session bpp:i': '32',
             'audiomode:i': '0',
@@ -59,11 +82,6 @@ class RDPFileClientProtocolURLMixin:
             'bookmarktype:i': '3',
             'use redirection server name:i': '0',
             'smart sizing:i': '1',
-            # 'drivestoredirect:s': '*',
-            # 'domain:s': ''
-            # 'alternate shell:s:': '||MySQLWorkbench',
-            # 'remoteapplicationname:s': 'Firefox',
-            # 'remoteapplicationcmdline:s': '',
         }
 
         # 设置磁盘挂载
@@ -96,16 +114,11 @@ class RDPFileClientProtocolURLMixin:
         rdp_options['session bpp:i'] = os.getenv('JUMPSERVER_COLOR_DEPTH', '32')
         rdp_options['audiomode:i'] = self.parse_env_bool('JUMPSERVER_DISABLE_AUDIO', 'false', '2', '0')
 
-        if token.asset:
-            name = token.asset.name
-            # remote-app
-            # app = '||jmservisor'
-            # rdp_options['remoteapplicationmode:i'] = '1'
-            # rdp_options['alternate shell:s'] = app
-            # rdp_options['remoteapplicationprogram:s'] = app
-            # rdp_options['remoteapplicationname:s'] = name
-        else:
-            name = '*'
+        # 设置远程应用
+        self.set_applet_info(token, rdp_options)
+
+        # 文件名
+        name = token.asset.name
         prefix_name = f'{token.user.username}-{name}'
         filename = self.get_connect_filename(prefix_name)
 
@@ -129,41 +142,39 @@ class RDPFileClientProtocolURLMixin:
         return true_value if is_true(os.getenv(env_key, env_default)) else false_value
 
     def get_client_protocol_data(self, token: ConnectionToken):
-        protocol = token.protocol
-        username = token.user.username
-        rdp_config = ssh_token = ''
-        if protocol == 'rdp':
-            filename, rdp_config = self.get_rdp_file_info(token)
-        elif protocol == 'ssh':
-            filename, ssh_token = self.get_ssh_token(token)
-        else:
-            raise ValueError('Protocol not support: {}'.format(protocol))
+        _os = get_request_os(self.request)
 
-        return {
-            "filename": filename,
-            "protocol": protocol,
-            "username": username,
-            "token": ssh_token,
-            "config": rdp_config
-        }
+        connect_method_name = token.connect_method
+        connect_method_dict = TerminalType.get_connect_method(
+            token.connect_method, token.protocol, _os
+        )
+        if connect_method_dict is None:
+            raise ValueError('Connect method not support: {}'.format(connect_method_name))
 
-    def get_ssh_token(self, token: ConnectionToken):
-        if token.asset:
-            name = token.asset.name
-        else:
-            name = '*'
-        prefix_name = f'{token.user.username}-{name}'
-        filename = self.get_connect_filename(prefix_name)
-
-        endpoint = self.get_smart_endpoint(protocol='ssh', asset=token.asset)
         data = {
-            'ip': endpoint.host,
-            'port': str(endpoint.ssh_port),
-            'username': 'JMS-{}'.format(str(token.id)),
-            'password': token.secret
+            'id': str(token.id),
+            'value': token.value,
+            'protocol': token.protocol,
+            'command': '',
+            'file': {}
         }
-        token = json.dumps(data)
-        return filename, token
+
+        if connect_method_name == NativeClient.mstsc:
+            filename, content = self.get_rdp_file_info(token)
+            data.update({
+                'file': {
+                    'name': filename,
+                    'content': content,
+                }
+            })
+        else:
+            endpoint = self.get_smart_endpoint(
+                protocol=connect_method_dict['endpoint_protocol'],
+                asset=token.asset
+            )
+            cmd = NativeClient.get_launch_command(connect_method_name, token, endpoint)
+            data.update({'command': cmd})
+        return data
 
     def get_smart_endpoint(self, protocol, asset=None):
         target_ip = asset.get_target_ip() if asset else ''
@@ -177,9 +188,9 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
     get_serializer: callable
     perform_create: callable
 
-    @action(methods=['POST', 'GET'], detail=False, url_path='rdp/file')
-    def get_rdp_file(self, request, *args, **kwargs):
-        token = self.create_connection_token()
+    @action(methods=['POST', 'GET'], detail=True, url_path='rdp-file')
+    def get_rdp_file(self, *args, **kwargs):
+        token = self.get_object()
         token.is_valid()
         filename, content = self.get_rdp_file_info(token)
         filename = '{}.rdp'.format(filename)
@@ -187,9 +198,9 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
         response['Content-Disposition'] = 'attachment; filename*=UTF-8\'\'%s' % filename
         return response
 
-    @action(methods=['POST', 'GET'], detail=False, url_path='client-url')
-    def get_client_protocol_url(self, request, *args, **kwargs):
-        token = self.create_connection_token()
+    @action(methods=['POST', 'GET'], detail=True, url_path='client-url')
+    def get_client_protocol_url(self, *args, **kwargs):
+        token = self.get_object()
         token.is_valid()
         try:
             protocol_data = self.get_client_protocol_data(token)
@@ -208,14 +219,6 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
         instance.expire()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def create_connection_token(self):
-        data = self.request.query_params if self.request.method == 'GET' else self.request.data
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        token: ConnectionToken = serializer.instance
-        return token
-
 
 class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelViewSet):
     filterset_fields = (
@@ -224,11 +227,10 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
     search_fields = filterset_fields
     serializer_classes = {
         'default': ConnectionTokenSerializer,
-        'list': ConnectionTokenDisplaySerializer,
-        'retrieve': ConnectionTokenDisplaySerializer,
         'get_secret_detail': ConnectionTokenSecretSerializer,
     }
     rbac_perms = {
+        'list': 'authentication.view_connectiontoken',
         'retrieve': 'authentication.view_connectiontoken',
         'create': 'authentication.add_connectiontoken',
         'expire': 'authentication.add_connectiontoken',
@@ -243,18 +245,25 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         rbac_perm = 'authentication.view_connectiontokensecret'
         if not request.user.has_perm(rbac_perm):
             raise PermissionDenied('Not allow to view secret')
-        token_id = request.data.get('token') or ''
+
+        token_id = request.data.get('id') or ''
         token = get_object_or_404(ConnectionToken, pk=token_id)
+        if token.is_expired:
+            raise ValidationError({'id': 'Token is expired'})
+
         token.is_valid()
         serializer = self.get_serializer(instance=token)
+        expire_now = request.data.get('expire_now', True)
+        if expire_now:
+            token.expire()
+
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def dispatch(self, request, *args, **kwargs):
-        with tmp_to_root_org():
-            return super().dispatch(request, *args, **kwargs)
-
     def get_queryset(self):
-        return ConnectionToken.objects.filter(user=self.request.user)
+        queryset = ConnectionToken.objects \
+            .filter(user=self.request.user) \
+            .filter(date_expired__gt=timezone.now())
+        return queryset
 
     def get_user(self, serializer):
         return self.request.user
@@ -269,16 +278,17 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         data = serializer.validated_data
         user = self.get_user(serializer)
         asset = data.get('asset')
-        login = data.get('login')
+        account_name = data.get('account_name')
         data['org_id'] = asset.org_id
         data['user'] = user
+        data['value'] = random_string(16)
 
         util = PermAccountUtil()
-        permed_account = util.validate_permission(user, asset, login)
+        permed_account = util.validate_permission(user, asset, account_name)
 
         if not permed_account or not permed_account.actions:
             msg = 'user `{}` not has asset `{}` permission for login `{}`'.format(
-                user, asset, login
+                user, asset, account_name
             )
             raise PermissionDenied(msg)
 
@@ -286,9 +296,9 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
             raise PermissionDenied('Expired')
 
         if permed_account.has_secret:
-            data['secret'] = ''
+            data['input_secret'] = ''
         if permed_account.username != '@INPUT':
-            data['username'] = ''
+            data['input_username'] = ''
         return permed_account
 
 
@@ -311,7 +321,7 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
     def renewal(self, request, *args, **kwargs):
         from common.utils.timezone import as_current_tz
 
-        token_id = request.data.get('token') or ''
+        token_id = request.data.get('id') or ''
         token = get_object_or_404(ConnectionToken, pk=token_id)
         date_expired = as_current_tz(token.date_expired)
         if token.is_expired:

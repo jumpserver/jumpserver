@@ -2,7 +2,8 @@ import os
 import zipfile
 
 from django.conf import settings
-from rest_framework import viewsets
+
+from orgs.mixins.api import OrgBulkModelViewSet
 from ..models import Playbook
 from ..serializers.playbook import PlaybookSerializer
 
@@ -15,9 +16,10 @@ def unzip_playbook(src, dist):
         fz.extract(file, dist)
 
 
-class PlaybookViewSet(viewsets.ModelViewSet):
-    queryset = Playbook.objects.all()
+class PlaybookViewSet(OrgBulkModelViewSet):
     serializer_class = PlaybookSerializer
+    permission_classes = ()
+    model = Playbook
 
     def perform_create(self, serializer):
         instance = serializer.save()

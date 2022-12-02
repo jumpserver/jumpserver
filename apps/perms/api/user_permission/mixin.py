@@ -7,7 +7,6 @@ from django.utils.translation import ugettext_lazy as _
 from common.http import is_true
 from common.utils import is_uuid
 from common.exceptions import JMSObjectDoesNotExist
-from common.mixins.api import RoleAdminMixin, RoleUserMixin
 from perms.utils.user_permission import UserGrantedTreeRefreshController
 from rbac.permissions import RBACPermission
 from users.models import User
@@ -21,24 +20,6 @@ class RebuildTreeMixin:
         controller = UserGrantedTreeRefreshController(self.user)
         controller.refresh_if_need(force)
         return super().get(request, *args, **kwargs)
-
-
-class AssetRoleAdminMixin(RebuildTreeMixin, RoleAdminMixin):
-    rbac_perms = (
-        ('list', 'perms.view_userassets'),
-        ('retrieve', 'perms.view_userassets'),
-        ('get_tree', 'perms.view_userassets'),
-        ('GET', 'perms.view_userassets'),
-    )
-
-
-class AssetRoleUserMixin(RebuildTreeMixin, RoleUserMixin):
-    rbac_perms = (
-        ('list', 'perms.view_myassets'),
-        ('retrieve', 'perms.view_myassets'),
-        ('get_tree', 'perms.view_myassets'),
-        ('GET', 'perms.view_myassets'),
-    )
 
 
 class SelfOrPKUserMixin:
@@ -59,6 +40,7 @@ class SelfOrPKUserMixin:
             ('retrieve', 'perms.view_myassets'),
             ('get_tree', 'perms.view_myassets'),
             ('GET', 'perms.view_myassets'),
+            ('OPTIONS', 'perms.view_myassets'),
         )
 
     @property
@@ -68,6 +50,7 @@ class SelfOrPKUserMixin:
             ('retrieve', 'perms.view_userassets'),
             ('get_tree', 'perms.view_userassets'),
             ('GET', 'perms.view_userassets'),
+            ('OPTIONS', 'perms.view_userassets'),
         )
 
     @property
@@ -76,6 +59,8 @@ class SelfOrPKUserMixin:
             user = self.request.user
         elif is_uuid(self.kwargs.get('user')):
             user = get_object_or_404(User, pk=self.kwargs.get('user'))
+        elif hasattr(self, 'swagger_fake_view'):
+            user = self.request.user
         else:
             raise JMSObjectDoesNotExist(object_name=_('User'))
         return user

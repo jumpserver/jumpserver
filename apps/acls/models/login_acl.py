@@ -1,24 +1,14 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from .base import BaseACL, BaseACLQuerySet
+
 from common.utils import get_request_ip, get_ip_city
 from common.utils.ip import contains_ip
 from common.utils.time_period import contains_time_period
 from common.utils.timezone import local_now_display
-
-
-class ACLManager(models.Manager):
-
-    def valid(self):
-        return self.get_queryset().valid()
+from .base import BaseACL
 
 
 class LoginACL(BaseACL):
-    class ActionChoices(models.TextChoices):
-        reject = 'reject', _('Reject')
-        allow = 'allow', _('Allow')
-        confirm = 'confirm', _('Login confirm')
-
     # 用户
     user = models.ForeignKey(
         'users.User', on_delete=models.CASCADE, verbose_name=_('User'),
@@ -26,16 +16,6 @@ class LoginACL(BaseACL):
     )
     # 规则
     rules = models.JSONField(default=dict, verbose_name=_('Rule'))
-    # 动作
-    action = models.CharField(
-        max_length=64, verbose_name=_('Action'),
-        choices=ActionChoices.choices, default=ActionChoices.reject
-    )
-    reviewers = models.ManyToManyField(
-        'users.User', verbose_name=_("Reviewers"),
-        related_name="login_confirm_acls", blank=True
-    )
-    objects = ACLManager.from_queryset(BaseACLQuerySet)()
 
     class Meta:
         ordering = ('priority', '-date_updated', 'name')

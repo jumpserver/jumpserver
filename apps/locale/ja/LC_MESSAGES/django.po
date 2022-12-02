@@ -603,14 +603,10 @@ msgid "All"
 msgstr "すべて"
 
 #: assets/models/account.py:46
-#, fuzzy
-#| msgid "Manually input"
 msgid "Manual input"
 msgstr "手動入力"
 
 #: assets/models/account.py:47
-#, fuzzy
-#| msgid "Dynamic code"
 msgid "Dynamic user"
 msgstr "動的コード"
 

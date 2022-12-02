@@ -5,14 +5,14 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from assets.const import Category, AllTypes
-from assets.serializers.asset.common import AssetProtocolsSerializer
 from assets.models import Node, Asset, Platform, Account
+from assets.serializers.asset.common import AssetProtocolsSerializer
 from common.drf.fields import ObjectRelatedField, LabeledChoiceField
 from perms.serializers.permission import ActionChoicesField
 
 __all__ = [
     'NodeGrantedSerializer', 'AssetGrantedSerializer',
-    'ActionsSerializer', 'AccountsPermedSerializer'
+    'AccountsPermedSerializer'
 ]
 
 
@@ -30,7 +30,7 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
             'domain', 'platform',
             "comment", "org_id", "is_active",
         ]
-        fields = only_fields + ['protocols', 'category', 'type'] + ['org_name']
+        fields = only_fields + ['protocols', 'category', 'type', 'specific'] + ['org_name']
         read_only_fields = fields
 
 
@@ -43,14 +43,11 @@ class NodeGrantedSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
-class ActionsSerializer(serializers.Serializer):
-    actions = ActionChoicesField(read_only=True)
-
-
 class AccountsPermedSerializer(serializers.ModelSerializer):
     actions = ActionChoicesField(read_only=True)
 
     class Meta:
         model = Account
-        fields = ['id', 'name', 'username', 'secret_type', 'has_secret', 'actions']
+        fields = ['id', 'name', 'has_username', 'username',
+                  'has_secret', 'secret_type', 'actions']
         read_only_fields = fields

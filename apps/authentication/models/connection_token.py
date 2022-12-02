@@ -1,17 +1,17 @@
-import time
 from datetime import timedelta
+
+from django.conf import settings
+from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django.db import models
-from django.conf import settings
 from rest_framework.exceptions import PermissionDenied
 
-from orgs.mixins.models import OrgModelMixin
+from assets.const import Protocol
+from common.db.fields import EncryptCharField
+from common.db.models import JMSBaseModel
 from common.utils import lazyproperty, pretty_string
 from common.utils.timezone import as_current_tz
-from common.db.models import JMSBaseModel
-from common.db.fields import EncryptCharField
-from assets.const import Protocol
+from orgs.mixins.models import OrgModelMixin
 
 
 def date_expired_default():
@@ -19,20 +19,22 @@ def date_expired_default():
 
 
 class ConnectionToken(OrgModelMixin, JMSBaseModel):
+    value = models.CharField(max_length=64, default='', verbose_name=_("Value"))
     user = models.ForeignKey(
-        'users.User', on_delete=models.SET_NULL,  null=True, blank=True,
+        'users.User', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='connection_tokens', verbose_name=_('User')
     )
     asset = models.ForeignKey(
         'assets.Asset', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='connection_tokens', verbose_name=_('Asset'),
     )
-    login = models.CharField(max_length=128, verbose_name=_("Login account"))
-    username = models.CharField(max_length=128, default='', verbose_name=_("Username"))
-    secret = EncryptCharField(max_length=64, default='', verbose_name=_("Secret"))
+    account_name = models.CharField(max_length=128, verbose_name=_("Account name"))  # 登录账号Name
+    input_username = models.CharField(max_length=128, default='', blank=True, verbose_name=_("Input Username"))
+    input_secret = EncryptCharField(max_length=64, default='', blank=True, verbose_name=_("Input Secret"))
     protocol = models.CharField(
         choices=Protocol.choices, max_length=16, default=Protocol.ssh, verbose_name=_("Protocol")
     )
+    connect_method = models.CharField(max_length=32, verbose_name=_("Connect method"))
     user_display = models.CharField(max_length=128, default='', verbose_name=_("User display"))
     asset_display = models.CharField(max_length=128, default='', verbose_name=_("Asset display"))
     date_expired = models.DateTimeField(
@@ -76,7 +78,7 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
     def permed_account(self):
         from perms.utils import PermAccountUtil
         permed_account = PermAccountUtil().validate_permission(
-            self.user, self.asset, self.login
+            self.user, self.asset, self.account_name
         )
         return permed_account
 
@@ -99,13 +101,13 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
             is_valid = False
             error = _('No asset or inactive asset')
             return is_valid, error
-        if not self.login:
+        if not self.account_name:
             error = _('No account')
             raise PermissionDenied(error)
 
         if not self.permed_account or not self.permed_account.actions:
             msg = 'user `{}` not has asset `{}` permission for login `{}`'.format(
-                self.user, self.asset, self.login
+                self.user, self.asset, self.account_name
             )
             raise PermissionDenied(msg)
 
@@ -122,20 +124,22 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
         if not self.asset:
             return None
 
-        account = self.asset.accounts.filter(name=self.login).first()
-        if self.login == '@INPUT' or not account:
+        account = self.asset.accounts.filter(name=self.account_name).first()
+        if self.account_name == '@INPUT' or not account:
             return {
-                'name': self.login,
-                'username': self.username,
+                'name': self.account_name,
+                'username': self.input_username,
                 'secret_type': 'password',
-                'secret': self.secret
+                'secret': self.input_secret,
+                'su_from': None
             }
         else:
             return {
                 'name': account.name,
                 'username': account.username,
                 'secret_type': account.secret_type,
-                'secret': account.secret_type or self.secret
+                'secret': account.secret or self.input_secret,
+                'su_from': account.su_from,
             }
 
     @lazyproperty

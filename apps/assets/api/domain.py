@@ -1,5 +1,5 @@
 # ~*~ coding: utf-8 ~*~
-
+from django.db.models import F
 from django.views.generic.detail import SingleObjectMixin
 from django.utils.translation import ugettext as _
 from rest_framework.views import APIView, Response
@@ -29,12 +29,13 @@ class DomainViewSet(OrgBulkModelViewSet):
 
 
 class GatewayViewSet(OrgBulkModelViewSet):
+    perm_model = Host
     filterset_fields = ("domain__name", "name", "domain")
     search_fields = ("domain__name",)
     serializer_class = serializers.GatewaySerializer
 
     def get_queryset(self):
-        queryset = Host.get_gateway_queryset()
+        queryset = Domain.get_gateway_queryset()
         return queryset
 
 
@@ -44,17 +45,17 @@ class GatewayTestConnectionApi(SingleObjectMixin, APIView):
     }
 
     def get_queryset(self):
-        queryset = Host.get_gateway_queryset()
+        queryset = Domain.get_gateway_queryset()
         return queryset
 
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        local_port = self.request.data.get('port') or self.object.port
+        gateway = self.get_object()
+        local_port = self.request.data.get('port') or gateway.port
         try:
             local_port = int(local_port)
         except ValueError:
             raise ValidationError({'port': _('Number required')})
-        ok, e = self.object.test_connective(local_port=local_port)
+        ok, e = gateway.test_connective(local_port=local_port)
         if ok:
             return Response("ok")
         else:

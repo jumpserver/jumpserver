@@ -1,8 +1,8 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from assets.serializers import PlatformSerializer
-from assets.models import Asset, Domain, CommandFilterRule, Account, Platform
+from assets.models import Asset, CommandFilterRule, Account, Platform
+from assets.serializers import PlatformSerializer, AssetProtocolsSerializer
 from authentication.models import ConnectionToken
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from perms.serializers.permission import ActionChoicesField
@@ -15,28 +15,28 @@ __all__ = [
 
 
 class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
-    username = serializers.CharField(max_length=128, label=_("Input username"),
-                                     allow_null=True, allow_blank=True)
     expire_time = serializers.IntegerField(read_only=True, label=_('Expired time'))
 
     class Meta:
         model = ConnectionToken
-        fields_mini = ['id']
+        fields_mini = ['id', 'value']
         fields_small = fields_mini + [
-            'protocol', 'login', 'secret', 'username',
+            'user', 'asset', 'account_name',
+            'input_username', 'input_secret',
+            'connect_method', 'protocol',
             'actions', 'date_expired', 'date_created',
             'date_updated', 'created_by',
             'updated_by', 'org_id', 'org_name',
-        ]
-        fields_fk = [
-            'user', 'asset',
         ]
         read_only_fields = [
             # 普通 Token 不支持指定 user
             'user', 'expire_time',
             'user_display', 'asset_display',
         ]
-        fields = fields_small + fields_fk + read_only_fields
+        fields = fields_small + read_only_fields
+        extra_kwargs = {
+            'value': {'read_only': True},
+        }
 
     def get_request_user(self):
         request = self.context.get('request')
@@ -85,19 +85,30 @@ class ConnectionTokenUserSerializer(serializers.ModelSerializer):
 
 class ConnectionTokenAssetSerializer(serializers.ModelSerializer):
     """ Asset """
+    protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
 
     class Meta:
         model = Asset
-        fields = ['id', 'name', 'address', 'protocols', 'org_id']
+        fields = ['id', 'name', 'address', 'protocols',
+                  'org_id', 'specific']
 
 
-class ConnectionTokenAccountSerializer(serializers.ModelSerializer):
+class SimpleAccountSerializer(serializers.ModelSerializer):
     """ Account """
 
     class Meta:
         model = Account
+        fields = ['name', 'username', 'secret_type', 'secret']
+
+
+class ConnectionTokenAccountSerializer(serializers.ModelSerializer):
+    """ Account """
+    su_from = SimpleAccountSerializer(required=False, label=_('Su from'))
+
+    class Meta:
+        model = Account
         fields = [
-           'name', 'username', 'secret_type', 'secret',
+            'name', 'username', 'secret_type', 'secret', 'su_from',
         ]
 
 
@@ -106,16 +117,10 @@ class ConnectionTokenGatewaySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Asset
-        fields = ['id', 'address', 'port', 'username', 'password', 'private_key']
-
-
-class ConnectionTokenDomainSerializer(serializers.ModelSerializer):
-    """ Domain """
-    gateways = ConnectionTokenGatewaySerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Domain
-        fields = ['id', 'name', 'gateways']
+        fields = [
+            'id', 'address', 'port', 'username',
+            'password', 'private_key'
+        ]
 
 
 class ConnectionTokenCmdFilterRuleSerializer(serializers.ModelSerializer):
@@ -140,11 +145,12 @@ class ConnectionTokenPlatform(PlatformSerializer):
 
 
 class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
+    expire_now = serializers.BooleanField(label=_('Expired now'), default=True)
     user = ConnectionTokenUserSerializer(read_only=True)
     asset = ConnectionTokenAssetSerializer(read_only=True)
-    platform = ConnectionTokenPlatform(read_only=True)
     account = ConnectionTokenAccountSerializer(read_only=True)
     gateway = ConnectionTokenGatewaySerializer(read_only=True)
+    platform = ConnectionTokenPlatform(read_only=True)
     # cmd_filter_rules = ConnectionTokenCmdFilterRuleSerializer(many=True)
     actions = ActionChoicesField()
     expire_at = serializers.IntegerField()
@@ -152,7 +158,10 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     class Meta:
         model = ConnectionToken
         fields = [
-            'id', 'secret', 'user', 'asset', 'account',
-            'protocol', 'domain', 'gateway',
-            'actions', 'expire_at', 'platform',
+            'id', 'value', 'user', 'asset', 'account', 'platform',
+            'protocol', 'gateway', 'actions', 'expire_at', 'expire_now',
         ]
+        extra_kwargs = {
+            'value': {'read_only': True},
+            'expire_now': {'write_only': True},
+        }

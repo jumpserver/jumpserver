@@ -554,8 +554,9 @@ class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
     full_value = models.CharField(max_length=4096, verbose_name=_('Full value'), default='')
     child_mark = models.IntegerField(default=0)
     date_create = models.DateTimeField(auto_now_add=True)
-    parent_key = models.CharField(max_length=64, verbose_name=_("Parent key"),
-                                  db_index=True, default='')
+    parent_key = models.CharField(
+        max_length=64, verbose_name=_("Parent key"), db_index=True, default=''
+    )
     assets_amount = models.IntegerField(default=0)
 
     objects = OrgManager.from_queryset(NodeQuerySet)()

@@ -125,7 +125,7 @@ class AssetPermission(OrgModelMixin):
         """
         asset_ids = self.get_all_assets(flat=True)
         q = Q(asset_id__in=asset_ids)
-        if Account.AliasAccount.ALL in self.accounts:
+        if Account.AliasAccount.ALL not in self.accounts:
             q &= Q(username__in=self.accounts)
         accounts = Account.objects.filter(q).order_by('asset__name', 'name', 'username')
         if not flat:

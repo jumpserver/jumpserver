@@ -12,6 +12,7 @@ from common.drf.api import JMSBulkModelViewSet
 from common.exceptions import JMSException
 from common.permissions import IsValidUser
 from common.permissions import WithBootstrapToken
+from common.utils import get_request_os
 from terminal import serializers
 from terminal.const import TerminalType
 from terminal.models import Terminal
@@ -77,13 +78,7 @@ class ConnectMethodListApi(generics.ListAPIView):
     permission_classes = [IsValidUser]
 
     def get_queryset(self):
-        user_agent = self.request.META['HTTP_USER_AGENT'].lower()
-        if 'macintosh' in user_agent:
-            os = 'macos'
-        elif 'windows' in user_agent:
-            os = 'windows'
-        else:
-            os = 'linux'
+        os = get_request_os(self.request)
         return TerminalType.get_protocols_connect_methods(os)
 
     def list(self, request, *args, **kwargs):

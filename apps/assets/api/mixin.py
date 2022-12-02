@@ -1,10 +1,10 @@
 from typing import List
+
 from rest_framework.request import Request
 
-from common.utils import lazyproperty, timeit
-from assets.models import Node, Asset
-from assets.pagination import NodeAssetTreePagination
+from assets.models import Node, PlatformProtocol
 from assets.utils import get_node_from_request, is_query_node_all_assets
+from common.utils import lazyproperty, timeit
 
 
 class SerializeToTreeNodeMixin:
@@ -38,16 +38,11 @@ class SerializeToTreeNodeMixin:
         ]
         return data
 
-    def get_platform(self, asset: Asset):
-        default = 'file'
-        icon = {'windows', 'linux'}
-        platform = asset.platform.type.lower()
-        if platform in icon:
-            return platform
-        return default
-
     @timeit
     def serialize_assets(self, assets, node_key=None):
+        sftp_enabled_platform = PlatformProtocol.objects \
+            .filter(name='ssh', setting__sftp_enabled=True) \
+            .values_list('platform', flat=True).distinct()
         if node_key is None:
             get_pid = lambda asset: getattr(asset, 'parent_key', '')
         else:
@@ -61,17 +56,13 @@ class SerializeToTreeNodeMixin:
                 'pId': get_pid(asset),
                 'isParent': False,
                 'open': False,
-                'iconSkin': self.get_platform(asset),
+                'iconSkin': asset.type,
                 'chkDisabled': not asset.is_active,
                 'meta': {
                     'type': 'asset',
                     'data': {
-                        'id': asset.id,
-                        'name': asset.name,
-                        'address': asset.address,
-                        'protocols': asset.protocols_as_list,
-                        'platform': asset.platform.id,
-                        'org_name': asset.org_name
+                        'org_name': asset.org_name,
+                        'sftp': asset.platform_id in sftp_enabled_platform,
                     },
                 }
             }
@@ -81,7 +72,6 @@ class SerializeToTreeNodeMixin:
 
 
 class NodeFilterMixin:
-    # pagination_class = NodeAssetTreePagination
     request: Request
 
     @lazyproperty

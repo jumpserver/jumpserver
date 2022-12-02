@@ -138,4 +138,6 @@ class TerminalRegistrationSerializer(serializers.ModelSerializer):
 class ConnectMethodSerializer(serializers.Serializer):
     value = serializers.CharField(max_length=128)
     label = serializers.CharField(max_length=128)
-    group = serializers.CharField(max_length=128)
+    type = serializers.CharField(max_length=128)
+    listen = serializers.CharField(max_length=128)
+    component = serializers.CharField(max_length=128)
