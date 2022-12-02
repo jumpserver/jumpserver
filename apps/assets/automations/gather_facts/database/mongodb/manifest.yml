@@ -1,0 +1,6 @@
+id: gather_facts_mongodb
+name: Gather facts from MongoDB
+category: database
+type:
+  - mongodb
+method: gather_facts

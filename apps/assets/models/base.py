@@ -86,8 +86,8 @@ class BaseAccount(JMSOrgBaseModel):
 
     @lazyproperty
     def public_key(self):
-        if self.secret_type == SecretType.SSH_KEY:
-            return parse_ssh_public_key_str(self.private_key)
+        if self.secret_type == SecretType.SSH_KEY and self.private_key:
+            return parse_ssh_public_key_str(private_key=self.private_key)
         return None
 
     @property
