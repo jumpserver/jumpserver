@@ -37,7 +37,7 @@ class AssetFilterSet(BaseFilterSet):
 
     class Meta:
         model = Asset
-        fields = ["name", "address", "is_active", "type", "category", "hostname"]
+        fields = ["id", "name", "address", "is_active", "type", "category", "hostname"]
 
 
 class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
