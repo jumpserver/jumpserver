@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 #
-from perms.filters import AssetPermissionFilter
-from perms.models import AssetPermission
 from orgs.mixins.api import OrgBulkModelViewSet
 from perms import serializers
-
+from perms.filters import AssetPermissionFilter
+from perms.models import AssetPermission
 
 __all__ = ['AssetPermissionViewSet']
 
@@ -18,4 +17,4 @@ class AssetPermissionViewSet(OrgBulkModelViewSet):
     filterset_class = AssetPermissionFilter
     search_fields = ('name',)
     ordering_fields = ('name',)
-    ordering = ('name', )
+    ordering = ('name',)

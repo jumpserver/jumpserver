@@ -2,4 +2,5 @@
 #
 
 from .asset_permission import *
-from .const import *
+from .perm_node import *
+from .perm_token import *

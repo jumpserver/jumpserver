@@ -12,17 +12,23 @@ from ops.celery import app
 
 class CeleryTask(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    name = models.CharField(max_length=1024)
+    name = models.CharField(max_length=1024, verbose_name=_('Name'))
     last_published_time = models.DateTimeField(null=True)
 
     @property
     def meta(self):
         task = app.tasks.get(self.name, None)
         return {
-            "verbose_name": getattr(task, 'verbose_name', None),
-            "comment": getattr(task, 'comment', None),
+            "comment": getattr(task, 'verbose_name', None),
             "queue": getattr(task, 'queue', 'default')
         }
+
+    @property
+    def summary(self):
+        executions = CeleryTaskExecution.objects.filter(name=self.name)
+        total = executions.count()
+        success = executions.filter(state='SUCCESS').count()
+        return {'total': total, 'success': success}
 
     @property
     def state(self):
@@ -37,6 +43,9 @@ class CeleryTask(models.Model):
                 return "yellow"
         return "green"
 
+    class Meta:
+        ordering = ('name',)
+
 
 class CeleryTaskExecution(models.Model):
     LOG_DIR = os.path.join(settings.PROJECT_DIR, 'data', 'celery')
@@ -46,9 +55,21 @@ class CeleryTaskExecution(models.Model):
     kwargs = models.JSONField(verbose_name=_("Kwargs"))
     state = models.CharField(max_length=16, verbose_name=_("State"))
     is_finished = models.BooleanField(default=False, verbose_name=_("Finished"))
-    date_published = models.DateTimeField(auto_now_add=True)
-    date_start = models.DateTimeField(null=True)
-    date_finished = models.DateTimeField(null=True)
+    date_published = models.DateTimeField(auto_now_add=True, verbose_name=_('Date published'))
+    date_start = models.DateTimeField(null=True, verbose_name=_('Date start'))
+    date_finished = models.DateTimeField(null=True, verbose_name=_('Date finished'))
+
+    @property
+    def time_cost(self):
+        if self.date_finished and self.date_start:
+            return (self.date_finished - self.date_start).total_seconds()
+        return None
+
+    @property
+    def timedelta(self):
+        if self.date_start and self.date_finished:
+            return self.date_finished - self.date_start
+        return None
 
     def __str__(self):
         return "{}: {}".format(self.name, self.id)

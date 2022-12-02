@@ -3,6 +3,7 @@ from django.utils.translation import gettext_noop
 
 from common.utils import get_logger
 from orgs.utils import org_aware_func, tmp_to_root_org
+from django.utils.translation import ugettext_lazy as _
 
 logger = get_logger(__file__)
 __all__ = [
@@ -27,7 +28,7 @@ def push_accounts_to_assets_util(accounts, assets):
     instance.execute()
 
 
-@shared_task(queue="ansible")
+@shared_task(queue="ansible", verbose_name=_('Push accounts to assets'))
 def push_accounts_to_assets(account_ids, asset_ids):
     from assets.models import Asset, Account
     with tmp_to_root_org():

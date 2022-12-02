@@ -30,14 +30,15 @@ class CeleryPeriodTaskSerializer(serializers.ModelSerializer):
 class CeleryTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = CeleryTask
-        fields = [
-            'id', 'name', 'meta', 'state', 'last_published_time',
-        ]
+        read_only_fields = ['id', 'name', 'meta', 'summary', 'state', 'last_published_time']
+        fields = read_only_fields
 
 
 class CeleryTaskExecutionSerializer(serializers.ModelSerializer):
     class Meta:
         model = CeleryTaskExecution
         fields = [
-            "id", "name", "args", "kwargs", "state", "is_finished", "date_published", "date_start", "date_finished"
+            "id", "name", "args", "kwargs", "time_cost", "timedelta", "state", "is_finished", "date_published",
+            "date_start",
+            "date_finished"
         ]

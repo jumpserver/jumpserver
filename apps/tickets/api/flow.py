@@ -9,7 +9,6 @@ __all__ = ['TicketFlowViewSet']
 
 class TicketFlowViewSet(JMSBulkModelViewSet):
     serializer_class = serializers.TicketFlowSerializer
-
     filterset_fields = ['id', 'type']
     search_fields = ['id', 'type']
 

@@ -14,7 +14,7 @@ from .serializers import (
 )
 from users.models import User, UserGroup
 from assets.models import (
-    Asset, Domain, Label, Node, Gateway,
+    Asset, Domain, Label, Node,
     CommandFilter, CommandFilterRule, GatheredUser
 )
 from perms.models import AssetPermission
@@ -27,7 +27,7 @@ logger = get_logger(__file__)
 
 # 部分 org 相关的 model，需要清空这些数据之后才能删除该组织
 org_related_models = [
-    User, UserGroup, Asset, Label, Domain, Gateway, Node, Label,
+    User, UserGroup, Asset, Label, Domain, Node, Label,
     CommandFilter, CommandFilterRule, GatheredUser,
     AssetPermission,
 ]

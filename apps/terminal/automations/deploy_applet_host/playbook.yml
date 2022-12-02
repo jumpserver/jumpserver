@@ -2,8 +2,7 @@
 
 - hosts: all
   vars:
-    DownloadHost: https://demo.jumpserver.org/download
-    Initial: 0
+    APPLET_DOWNLOAD_HOST: https://demo.jumpserver.org
     HOST_NAME: test
     HOST_ID: 00000000-0000-0000-0000-000000000000
     CORE_HOST: https://demo.jumpserver.org
@@ -17,166 +16,166 @@
     TinkerInstaller: Tinker_Installer_v0.0.1.exe
 
   tasks:
-  - name: Install RDS-Licensing (RDS)
-    ansible.windows.win_feature:
-      name: RDS-Licensing
-      state: present
-      include_management_tools: yes
-    when: RDS_Licensing
+    - name: Install RDS-Licensing (RDS)
+      ansible.windows.win_feature:
+        name: RDS-Licensing
+        state: present
+        include_management_tools: yes
+      when: RDS_Licensing
 
-  - name: Install RDS-RD-Server (RDS)
-    ansible.windows.win_feature:
-      name: RDS-RD-Server
-      state: present
-      include_management_tools: yes
-    register: rds_install
+    - name: Install RDS-RD-Server (RDS)
+      ansible.windows.win_feature:
+        name: RDS-RD-Server
+        state: present
+        include_management_tools: yes
+      register: rds_install
 
-  - name: Download JumpServer Tinker installer (jumpserver)
-    ansible.windows.win_get_url:
-        url: "{{ DownloadHost }}/{{ TinkerInstaller }}"
+    - name: Download JumpServer Tinker installer (jumpserver)
+      ansible.windows.win_get_url:
+        url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/{{ TinkerInstaller }}"
         dest: "{{ ansible_env.TEMP }}\\{{ TinkerInstaller }}"
 
-  - name: Install JumpServer Tinker (jumpserver)
-    ansible.windows.win_package:
-      path: "{{ ansible_env.TEMP }}\\{{ TinkerInstaller }}"
-      arguments:
-        - /VERYSILENT
-        - /SUPPRESSMSGBOXES
-        - /NORESTART
-      state: present
+    - name: Install JumpServer Tinker (jumpserver)
+      ansible.windows.win_package:
+        path: "{{ ansible_env.TEMP }}\\{{ TinkerInstaller }}"
+        arguments:
+          - /VERYSILENT
+          - /SUPPRESSMSGBOXES
+          - /NORESTART
+        state: present
 
-  - name: Set remote-server on the global system path (remote-server)
-    ansible.windows.win_path:
-      elements:
-        - '%USERPROFILE%\AppData\Local\Programs\Tinker\'
-      scope: user
+    - name: Set remote-server on the global system path (remote-server)
+      ansible.windows.win_path:
+        elements:
+          - '%USERPROFILE%\AppData\Local\Programs\Tinker\'
+        scope: user
 
-  - name: Download python-3.10.8
-    ansible.windows.win_get_url:
-      url: "{{ DownloadHost }}/python-3.10.8-amd64.exe"
-      dest: "{{ ansible_env.TEMP }}\\python-3.10.8-amd64.exe"
+    - name: Download python-3.10.8
+      ansible.windows.win_get_url:
+        url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/python-3.10.8-amd64.exe"
+        dest: "{{ ansible_env.TEMP }}\\python-3.10.8-amd64.exe"
 
-  - name: Install the python-3.10.8
-    ansible.windows.win_package:
-      path: "{{ ansible_env.TEMP }}\\python-3.10.8-amd64.exe"
-      product_id: '{371d0d73-d418-4ffe-b280-58c3e7987525}'
-      arguments:
-      - /quiet
-      - InstallAllUsers=1
-      - PrependPath=1
-      - Include_test=0
-      - Include_launcher=0
-      state: present
-    register: win_install_python
+    - name: Install the python-3.10.8
+      ansible.windows.win_package:
+        path: "{{ ansible_env.TEMP }}\\python-3.10.8-amd64.exe"
+        product_id: '{371d0d73-d418-4ffe-b280-58c3e7987525}'
+        arguments:
+          - /quiet
+          - InstallAllUsers=1
+          - PrependPath=1
+          - Include_test=0
+          - Include_launcher=0
+        state: present
+      register: win_install_python
 
-  - name: Reboot if installing requires it
-    ansible.windows.win_reboot:
-      post_reboot_delay: 10
-      test_command: whoami
-    when: rds_install.reboot_required or win_install_python.reboot_required
+    - name: Reboot if installing requires it
+      ansible.windows.win_reboot:
+        post_reboot_delay: 10
+        test_command: whoami
+      when: rds_install.reboot_required or win_install_python.reboot_required
 
-  - name: Set RDS LicenseServer (regedit)
-    ansible.windows.win_regedit:
-      path: HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services
-      name: LicenseServers
-      data: "{{ RDS_LicenseServer }}"
-      type: string
+    - name: Set RDS LicenseServer (regedit)
+      ansible.windows.win_regedit:
+        path: HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services
+        name: LicenseServers
+        data: "{{ RDS_LicenseServer }}"
+        type: string
 
-  - name: Set RDS LicensingMode (regedit)
-    ansible.windows.win_regedit:
-      path: HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services
-      name: LicensingMode
-      data: "{{ RDS_LicensingMode }}"
-      type: dword
+    - name: Set RDS LicensingMode (regedit)
+      ansible.windows.win_regedit:
+        path: HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services
+        name: LicensingMode
+        data: "{{ RDS_LicensingMode }}"
+        type: dword
 
-  - name: Set RDS fSingleSessionPerUser (regedit)
-    ansible.windows.win_regedit:
-      path: HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services
-      name: fSingleSessionPerUser
-      data: "{{ RDS_fSingleSessionPerUser }}"
-      type: dword
+    - name: Set RDS fSingleSessionPerUser (regedit)
+      ansible.windows.win_regedit:
+        path: HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services
+        name: fSingleSessionPerUser
+        data: "{{ RDS_fSingleSessionPerUser }}"
+        type: dword
 
-  - name: Set RDS MaxDisconnectionTime (regedit)
-    ansible.windows.win_regedit:
-      path: HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services
-      name: MaxDisconnectionTime
-      data: "{{ RDS_MaxDisconnectionTime }}"
-      type: dword
-    when: RDS_MaxDisconnectionTime >= 60000
+    - name: Set RDS MaxDisconnectionTime (regedit)
+      ansible.windows.win_regedit:
+        path: HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services
+        name: MaxDisconnectionTime
+        data: "{{ RDS_MaxDisconnectionTime }}"
+        type: dword
+      when: RDS_MaxDisconnectionTime >= 60000
 
-  - name: Set RDS RemoteAppLogoffTimeLimit (regedit)
-    ansible.windows.win_regedit:
-      path: HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services
-      name: RemoteAppLogoffTimeLimit
-      data: "{{ RDS_RemoteAppLogoffTimeLimit }}"
-      type: dword
+    - name: Set RDS RemoteAppLogoffTimeLimit (regedit)
+      ansible.windows.win_regedit:
+        path: HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services
+        name: RemoteAppLogoffTimeLimit
+        data: "{{ RDS_RemoteAppLogoffTimeLimit }}"
+        type: dword
 
-  - name: Download pip packages
-    ansible.windows.win_get_url:
-      url: "{{ DownloadHost }}/pip_packages_v0.0.1.zip"
-      dest: "{{ ansible_env.TEMP }}\\pip_packages_v0.0.1.zip"
+    - name: Download pip packages
+      ansible.windows.win_get_url:
+        url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/pip_packages.zip"
+        dest: "{{ ansible_env.TEMP }}\\pip_packages.zip"
 
-  - name: Unzip pip_packages
-    community.windows.win_unzip:
-      src: "{{ ansible_env.TEMP }}\\pip_packages_v0.0.1.zip"
-      dest: "{{ ansible_env.TEMP }}"
+    - name: Unzip pip_packages
+      community.windows.win_unzip:
+        src: "{{ ansible_env.TEMP }}\\pip_packages.zip"
+        dest: "{{ ansible_env.TEMP }}\\pip_packages"
 
-  - name: Install python requirements offline
-    ansible.windows.win_shell: >
-        pip install -r '{{ ansible_env.TEMP }}\pip_packages_v0.0.1\requirements.txt'
-        --no-index --find-links='{{ ansible_env.TEMP }}\pip_packages_v0.0.1'
+    - name: Install python requirements offline
+      ansible.windows.win_shell: >
+        pip install -r '{{ ansible_env.TEMP }}\pip_packages\requirements.txt'
+        --no-index --find-links='{{ ansible_env.TEMP }}\pip_packages'
 
-  - name: Download chromedriver (chrome)
-    ansible.windows.win_get_url:
-      url: "{{ DownloadHost }}/chromedriver_win32.107.zip"
-      dest: "{{ ansible_env.TEMP }}\\chromedriver_win32.107.zip"
+    - name: Download chromedriver (chrome)
+      ansible.windows.win_get_url:
+        url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/chromedriver_win32.zip"
+        dest: "{{ ansible_env.TEMP }}\\chromedriver_win32.zip"
 
-  - name: Unzip chromedriver (chrome)
-    community.windows.win_unzip:
-      src: "{{ ansible_env.TEMP }}\\chromedriver_win32.107.zip"
-      dest: C:\Program Files\JumpServer\drivers
+    - name: Unzip chromedriver (chrome)
+      community.windows.win_unzip:
+        src: "{{ ansible_env.TEMP }}\\chromedriver_win32.zip"
+        dest: C:\Program Files\JumpServer\drivers
 
-  - name: Set chromedriver on the global system path (chrome)
-    ansible.windows.win_path:
-      elements:
-      - 'C:\Program Files\JumpServer\drivers'
+    - name: Set chromedriver on the global system path (chrome)
+      ansible.windows.win_path:
+        elements:
+          - 'C:\Program Files\JumpServer\drivers'
 
-  - name: Download chrome msi package (chrome)
-    ansible.windows.win_get_url:
-      url: "{{ DownloadHost }}/googlechromestandaloneenterprise64.msi"
-      dest: "{{ ansible_env.TEMP }}\\googlechromestandaloneenterprise64.msi"
+    - name: Download chrome msi package (chrome)
+      ansible.windows.win_get_url:
+        url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/googlechromestandaloneenterprise64.msi"
+        dest: "{{ ansible_env.TEMP }}\\googlechromestandaloneenterprise64.msi"
 
-  - name: Install chrome (chrome)
-    ansible.windows.win_package:
-      path: "{{ ansible_env.TEMP }}\\googlechromestandaloneenterprise64.msi"
-      state: present
-      arguments:
-      - /quiet
+    - name: Install chrome (chrome)
+      ansible.windows.win_package:
+        path: "{{ ansible_env.TEMP }}\\googlechromestandaloneenterprise64.msi"
+        state: present
+        arguments:
+          - /quiet
 
-  - name: Generate tinkerd component config
-    ansible.windows.win_shell:
-      "tinkerd config --hostname {{ HOST_NAME }} --core_host {{ CORE_HOST }} 
+    - name: Generate tinkerd component config
+      ansible.windows.win_shell:
+        "tinkerd config --hostname {{ HOST_NAME }} --core_host {{ CORE_HOST }} 
       --token {{ BOOTSTRAP_TOKEN }} --host_id {{ HOST_ID }}"
 
-  - name: Install tinkerd service
-    ansible.windows.win_shell:
-      "tinkerd service install"
+    - name: Install tinkerd service
+      ansible.windows.win_shell:
+        "tinkerd service install"
 
-  - name: Start tinkerd service
-    ansible.windows.win_shell:
-      "tinkerd service start"
+    - name: Start tinkerd service
+      ansible.windows.win_shell:
+        "tinkerd service start"
 
-  - name: Wait Tinker api health
-    ansible.windows.win_uri:
-      url: http://localhost:6068/api/health/
-      status_code: 200
-      method: GET
-    register: _result
-    until: _result.status_code == 200
-    retries: 30
-    delay: 5
+    - name: Wait Tinker api health
+      ansible.windows.win_uri:
+        url: http://localhost:6068/api/health/
+        status_code: 200
+        method: GET
+      register: _result
+      until: _result.status_code == 200
+      retries: 30
+      delay: 5
 
-  - name: Sync all remote applets
-    ansible.windows.win_shell: >
-        echo "TODO: Sync all remote applets"
-    when: Initial
+    - name: Sync all remote applets
+      ansible.windows.win_shell:
+        "tinkerd install all"
+

@@ -7,8 +7,7 @@ __all__ = [
 
 
 class LoginConfirmSerializer(TicketApplySerializer):
-    class Meta:
+    class Meta(TicketApplySerializer.Meta):
         model = ApplyLoginTicket
-        fields = TicketApplySerializer.Meta.fields + [
-            'apply_login_ip', 'apply_login_city', 'apply_login_datetime'
-        ]
+        writeable_fields = ['apply_login_ip', 'apply_login_city', 'apply_login_datetime']
+        fields = TicketApplySerializer.Meta.fields + writeable_fields

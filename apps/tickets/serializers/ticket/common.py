@@ -1,12 +1,12 @@
-from django.db.transaction import atomic
 from django.db.models import Model
+from django.db.transaction import atomic
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 from orgs.utils import tmp_to_org
 from tickets.models import Ticket
 
-__all__ = ['DefaultPermissionName', 'get_default_permission_name', 'BaseApplyAssetApplicationSerializer']
+__all__ = ['DefaultPermissionName', 'get_default_permission_name', 'BaseApplyAssetSerializer']
 
 
 def get_default_permission_name(ticket):
@@ -34,7 +34,7 @@ class DefaultPermissionName(object):
         return self.default
 
 
-class BaseApplyAssetApplicationSerializer(serializers.Serializer):
+class BaseApplyAssetSerializer(serializers.Serializer):
     permission_model: Model
 
     @property
@@ -75,10 +75,11 @@ class BaseApplyAssetApplicationSerializer(serializers.Serializer):
     def create(self, validated_data):
         instance = super().create(validated_data)
         name = _('Created by ticket ({}-{})').format(instance.title, str(instance.id)[:4])
-        with tmp_to_org(instance.org_id):
+        org_id = instance.org_id
+        with tmp_to_org(org_id):
             if not self.permission_model.objects.filter(name=name).exists():
                 instance.apply_permission_name = name
-                instance.save()
+                instance.save(update_fields=['apply_permission_name'])
                 return instance
         raise serializers.ValidationError(_('Permission named `{}` already exists'.format(name)))
 

@@ -1,32 +1,31 @@
-import os
-import abc
-import json
-import time
 import base64
+import json
+import os
+import time
 import urllib.parse
+
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from rest_framework.request import Request
+from django.utils import timezone
 from rest_framework import status
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.decorators import action
-from rest_framework.response import Response
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.request import Request
+from rest_framework.response import Response
 
 from common.drf.api import JMSModelViewSet
 from common.http import is_true
 from orgs.mixins.api import RootOrgViewMixin
-from perms.models import Action
+from orgs.utils import tmp_to_root_org
+from perms.models import ActionChoices
 from terminal.models import EndpointRule
+from ..models import ConnectionToken
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
     SuperConnectionTokenSerializer, ConnectionTokenDisplaySerializer,
 )
-from ..models import ConnectionToken
 
 __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
-
-# ExtraActionApiMixin
 
 
 class RDPFileClientProtocolURLMixin:
@@ -70,8 +69,7 @@ class RDPFileClientProtocolURLMixin:
         # 设置磁盘挂载
         drives_redirect = is_true(self.request.query_params.get('drives_redirect'))
         if drives_redirect:
-            actions = Action.choices_to_value(token.actions)
-            if actions & Action.UPDOWNLOAD == Action.UPDOWNLOAD:
+            if ActionChoices.contains(token.actions, ActionChoices.transfer()):
                 rdp_options['drivestoredirect:s'] = '*'
 
         # 设置全屏
@@ -179,22 +177,10 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
     get_serializer: callable
     perform_create: callable
 
-    @action(methods=['POST'], detail=False, url_path='secret-info/detail')
-    def get_secret_detail(self, request, *args, **kwargs):
-        """ 非常重要的 api, 在逻辑层再判断一下 rbac 权限, 双重保险 """
-        rbac_perm = 'authentication.view_connectiontokensecret'
-        if not request.user.has_perm(rbac_perm):
-            raise PermissionDenied('Not allow to view secret')
-        token_id = request.data.get('token') or ''
-        token = get_object_or_404(ConnectionToken, pk=token_id)
-        self.check_token_permission(token)
-        serializer = self.get_serializer(instance=token)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
     @action(methods=['POST', 'GET'], detail=False, url_path='rdp/file')
     def get_rdp_file(self, request, *args, **kwargs):
         token = self.create_connection_token()
-        self.check_token_permission(token)
+        token.is_valid()
         filename, content = self.get_rdp_file_info(token)
         filename = '{}.rdp'.format(filename)
         response = HttpResponse(content, content_type='application/octet-stream')
@@ -204,7 +190,7 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
     @action(methods=['POST', 'GET'], detail=False, url_path='client-url')
     def get_client_protocol_url(self, request, *args, **kwargs):
         token = self.create_connection_token()
-        self.check_token_permission(token)
+        token.is_valid()
         try:
             protocol_data = self.get_client_protocol_data(token)
         except ValueError as e:
@@ -221,12 +207,6 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
         instance = self.get_object()
         instance.expire()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-    @staticmethod
-    def check_token_permission(token: ConnectionToken):
-        is_valid, error = token.check_permission()
-        if not is_valid:
-            raise PermissionDenied(error)
 
     def create_connection_token(self):
         data = self.request.query_params if self.request.method == 'GET' else self.request.data
@@ -257,6 +237,22 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         'get_client_protocol_url': 'authentication.add_connectiontoken',
     }
 
+    @action(methods=['POST'], detail=False, url_path='secret')
+    def get_secret_detail(self, request, *args, **kwargs):
+        """ 非常重要的 api, 在逻辑层再判断一下 rbac 权限, 双重保险 """
+        rbac_perm = 'authentication.view_connectiontokensecret'
+        if not request.user.has_perm(rbac_perm):
+            raise PermissionDenied('Not allow to view secret')
+        token_id = request.data.get('token') or ''
+        token = get_object_or_404(ConnectionToken, pk=token_id)
+        token.is_valid()
+        serializer = self.get_serializer(instance=token)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def dispatch(self, request, *args, **kwargs):
+        with tmp_to_root_org():
+            return super().dispatch(request, *args, **kwargs)
+
     def get_queryset(self):
         return ConnectionToken.objects.filter(user=self.request.user)
 
@@ -264,25 +260,36 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         return self.request.user
 
     def perform_create(self, serializer):
-        user = self.get_user(serializer)
-        asset = serializer.validated_data.get('asset')
-        account_username = serializer.validated_data.get('account_username')
-        self.validate_asset_permission(user, asset, account_username)
-        return super(ConnectionTokenViewSet, self).perform_create(serializer)
+        self.validate_serializer(serializer)
+        return super().perform_create(serializer)
 
-    @staticmethod
-    def validate_asset_permission(user, asset, account_username):
+    def validate_serializer(self, serializer):
         from perms.utils.account import PermAccountUtil
-        actions, expire_at = PermAccountUtil().validate_permission(user, asset, account_username)
-        if not actions:
-            error = 'No actions'
-            raise PermissionDenied(error)
-        if expire_at < time.time():
-            error = 'Expired'
-            raise PermissionDenied(error)
 
+        data = serializer.validated_data
+        user = self.get_user(serializer)
+        asset = data.get('asset')
+        login = data.get('login')
+        data['org_id'] = asset.org_id
+        data['user'] = user
 
-# SuperConnectionToken
+        util = PermAccountUtil()
+        permed_account = util.validate_permission(user, asset, login)
+
+        if not permed_account or not permed_account.actions:
+            msg = 'user `{}` not has asset `{}` permission for login `{}`'.format(
+                user, asset, login
+            )
+            raise PermissionDenied(msg)
+
+        if permed_account.date_expired < timezone.now():
+            raise PermissionDenied('Expired')
+
+        if permed_account.has_secret:
+            data['secret'] = ''
+        if permed_account.username != '@INPUT':
+            data['username'] = ''
+        return permed_account
 
 
 class SuperConnectionTokenViewSet(ConnectionTokenViewSet):

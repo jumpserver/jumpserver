@@ -1,33 +1,36 @@
 # -*- coding: utf-8 -*-
 #
 
-from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
+from rest_framework import serializers
 
+from assets.const import Category, AllTypes
+from assets.serializers.asset.common import AssetProtocolsSerializer
 from assets.models import Node, Asset, Platform, Account
-from perms.serializers.permission import ActionsField
+from common.drf.fields import ObjectRelatedField, LabeledChoiceField
+from perms.serializers.permission import ActionChoicesField
 
 __all__ = [
-    'NodeGrantedSerializer',
-    'AssetGrantedSerializer',
-    'ActionsSerializer',
-    'AccountsGrantedSerializer'
+    'NodeGrantedSerializer', 'AssetGrantedSerializer',
+    'ActionsSerializer', 'AccountsPermedSerializer'
 ]
 
 
 class AssetGrantedSerializer(serializers.ModelSerializer):
     """ 被授权资产的数据结构 """
-    platform = serializers.SlugRelatedField(
-        slug_field='name', queryset=Platform.objects.all(), label=_("Platform")
-    )
+    platform = ObjectRelatedField(required=False, queryset=Platform.objects, label=_('Platform'))
+    protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
+    category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
+    type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
 
     class Meta:
         model = Asset
         only_fields = [
-            "id", "name", "address", "protocols", 'domain',
-            "platform", "comment", "org_id", "is_active"
+            "id", "name", "address",
+            'domain', 'platform',
+            "comment", "org_id", "is_active",
         ]
-        fields = only_fields + ['org_name']
+        fields = only_fields + ['protocols', 'category', 'type'] + ['org_name']
         read_only_fields = fields
 
 
@@ -41,17 +44,13 @@ class NodeGrantedSerializer(serializers.ModelSerializer):
 
 
 class ActionsSerializer(serializers.Serializer):
-    actions = ActionsField(read_only=True)
+    actions = ActionChoicesField(read_only=True)
 
 
-class AccountsGrantedSerializer(serializers.ModelSerializer):
-    """ 授权的账号序列类 """
-
-    # Todo: 添加前端登录逻辑中需要的一些字段，比如：是否需要手动输入密码
-    # need_manual = serializers.BooleanField(label=_('Need manual input'))
-    actions = ActionsField(read_only=True)
+class AccountsPermedSerializer(serializers.ModelSerializer):
+    actions = ActionChoicesField(read_only=True)
 
     class Meta:
         model = Account
-        fields = ['id', 'name', 'username', 'actions']
+        fields = ['id', 'name', 'username', 'secret_type', 'has_secret', 'actions']
         read_only_fields = fields

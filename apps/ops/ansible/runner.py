@@ -13,7 +13,7 @@ class AdHocRunner:
         "reboot", 'shutdown', 'poweroff', 'halt', 'dd', 'half', 'top'
     ]
 
-    def __init__(self, inventory, module, module_args='', pattern='*', project_dir='/tmp/'):
+    def __init__(self, inventory, module, module_args='', pattern='*', project_dir='/tmp/', extra_vars={}):
         self.id = uuid.uuid4()
         self.inventory = inventory
         self.pattern = pattern
@@ -22,6 +22,7 @@ class AdHocRunner:
         self.project_dir = project_dir
         self.cb = DefaultCallback()
         self.runner = None
+        self.extra_vars = extra_vars
 
     def check_module(self):
         if self.module not in self.cmd_modules_choices:
@@ -38,6 +39,7 @@ class AdHocRunner:
             os.mkdir(self.project_dir, 0o755)
 
         ansible_runner.run(
+            extravars=self.extra_vars,
             host_pattern=self.pattern,
             private_data_dir=self.project_dir,
             inventory=self.inventory,

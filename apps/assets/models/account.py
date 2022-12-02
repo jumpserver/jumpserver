@@ -3,7 +3,8 @@ from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
 from common.utils import lazyproperty
-from .base import BaseAccount, AbsConnectivity
+
+from .base import AbsConnectivity, BaseAccount
 
 __all__ = ['Account', 'AccountTemplate']
 
@@ -40,9 +41,10 @@ class AccountHistoricalRecords(HistoricalRecords):
 
 
 class Account(AbsConnectivity, BaseAccount):
-    class InnerAccount(models.TextChoices):
-        INPUT = '@INPUT', '@INPUT'
-        USER = '@USER', '@USER'
+    class AliasAccount(models.TextChoices):
+        ALL = '@ALL', _('All')
+        INPUT = '@INPUT', _('Manual input')
+        USER = '@USER', _('Dynamic user')
 
     asset = models.ForeignKey(
         'assets.Asset', related_name='accounts',
@@ -76,14 +78,14 @@ class Account(AbsConnectivity, BaseAccount):
         return '{}'.format(self.username)
 
     @classmethod
-    def get_input_account(cls):
+    def get_manual_account(cls):
         """ @INPUT 手动登录的账号(any) """
-        return cls(name=cls.InnerAccount.INPUT.value, username='')
+        return cls(name=cls.AliasAccount.INPUT.label, username=cls.AliasAccount.INPUT.value, secret=None)
 
     @classmethod
     def get_user_account(cls, username):
         """ @USER 动态用户的账号(self) """
-        return cls(name=cls.InnerAccount.USER.value, username=username)
+        return cls(name=cls.AliasAccount.USER.label, username=cls.AliasAccount.USER.value)
 
 
 class AccountTemplate(BaseAccount):

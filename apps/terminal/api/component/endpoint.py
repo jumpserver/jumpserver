@@ -1,17 +1,16 @@
-from rest_framework.decorators import action
-from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.request import Request
+from rest_framework.response import Response
 
+from assets.models import Asset
 from common.drf.api import JMSBulkModelViewSet
 from common.permissions import IsValidUserOrConnectionToken
-from django.utils.translation import ugettext_lazy as _
-from django.shortcuts import get_object_or_404
-from assets.models import Asset
 from orgs.utils import tmp_to_root_org
-from terminal.models import Session, Endpoint, EndpointRule
 from terminal import serializers
-
+from terminal.models import Session, Endpoint, EndpointRule
 
 __all__ = ['EndpointViewSet', 'EndpointRuleViewSet']
 
@@ -24,8 +23,7 @@ class SmartEndpointViewMixin:
     target_instance: None
     target_protocol: None
 
-    @action(methods=['get'], detail=False, permission_classes=[IsValidUserOrConnectionToken],
-            url_path='smart')
+    @action(methods=['get'], detail=False, permission_classes=[IsValidUserOrConnectionToken])
     def smart(self, request, *args, **kwargs):
         self.target_instance = self.get_target_instance()
         self.target_protocol = self.get_target_protocol()
@@ -58,12 +56,12 @@ class SmartEndpointViewMixin:
         asset_id = request.GET.get('asset_id')
         session_id = request.GET.get('session_id')
         token_id = request.GET.get('token')
+
         if token_id:
             from authentication.models import ConnectionToken
             token = ConnectionToken.objects.filter(id=token_id).first()
             if token and token.asset:
                 asset_id = token.asset.id
-
         if asset_id:
             pk, model = asset_id, Asset
         elif session_id:
@@ -78,8 +76,6 @@ class SmartEndpointViewMixin:
 
     def get_target_protocol(self):
         protocol = None
-        if isinstance(self.target_instance, Application) and self.target_instance.is_type(Application.APP_TYPE.oracle):
-            protocol = self.target_instance.get_target_protocol_for_oracle()
         if not protocol:
             protocol = self.request.GET.get('protocol')
         return protocol

@@ -31,7 +31,6 @@ router.register(r'applet-hosts', api.AppletHostViewSet, 'applet-host')
 router.register(r'applet-publications', api.AppletPublicationViewSet, 'applet-publication')
 router.register(r'applet-host-deployments', api.AppletHostDeploymentViewSet, 'applet-host-deployment')
 
-
 urlpatterns = [
     path('my-sessions/', api.MySessionAPIView.as_view(), name='my-session'),
     path('terminal-registrations/', api.TerminalRegistrationApi.as_view(), name='terminal-registration'),
@@ -44,10 +43,13 @@ urlpatterns = [
     path('tasks/kill-session-for-ticket/', api.KillSessionForTicketAPI.as_view(), name='kill-session-for-ticket'),
     path('terminals/config/', api.TerminalConfig.as_view(), name='terminal-config'),
     path('commands/insecure-command/', api.InsecureCommandAlertAPI.as_view(), name="command-alert"),
-    path('replay-storages/<uuid:pk>/test-connective/', api.ReplayStorageTestConnectiveApi.as_view(), name='replay-storage-test-connective'),
-    path('command-storages/<uuid:pk>/test-connective/', api.CommandStorageTestConnectiveApi.as_view(), name='command-storage-test-connective'),
+    path('replay-storages/<uuid:pk>/test-connective/', api.ReplayStorageTestConnectiveApi.as_view(),
+         name='replay-storage-test-connective'),
+    path('command-storages/<uuid:pk>/test-connective/', api.CommandStorageTestConnectiveApi.as_view(),
+         name='command-storage-test-connective'),
     # components
     path('components/metrics/', api.ComponentsMetricsAPIView.as_view(), name='components-metrics'),
+    path('components/connect-methods/', api.ConnectMethodListApi.as_view(), name='connect-methods'),
 ]
 
 old_version_urlpatterns = [
@@ -55,6 +57,3 @@ old_version_urlpatterns = [
 ]
 
 urlpatterns += router.urls + old_version_urlpatterns
-
-
-

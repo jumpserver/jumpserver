@@ -6,10 +6,10 @@ import sshpubkeys
 from hashlib import md5
 
 from django.db import models
-from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.utils import timezone
 from django.db.models import QuerySet
+from django.utils.translation import ugettext_lazy as _
 
 from common.utils import (
     ssh_key_string_to_obj, ssh_key_gen, get_logger,

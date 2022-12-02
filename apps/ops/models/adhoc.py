@@ -1,29 +1,43 @@
 # ~*~ coding: utf-8 ~*~
 import os.path
+import uuid
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from common.db.models import BaseCreateUpdateModel
 from common.utils import get_logger
 from .base import BaseAnsibleJob, BaseAnsibleExecution
 from ..ansible import AdHocRunner
 
 __all__ = ["AdHoc", "AdHocExecution"]
 
-
 logger = get_logger(__file__)
 
 
-class AdHoc(BaseAnsibleJob):
-    pattern = models.CharField(max_length=1024, verbose_name=_("Pattern"), default='all')
-    module = models.CharField(max_length=128, default='shell', verbose_name=_('Module'))
-    args = models.CharField(max_length=1024, default='', verbose_name=_('Args'))
-    last_execution = models.ForeignKey('AdHocExecution', verbose_name=_("Last execution"),
-                                       on_delete=models.SET_NULL, null=True, blank=True)
+class AdHoc(BaseCreateUpdateModel):
+    class Modules(models.TextChoices):
+        shell = 'shell', _('Shell')
+        winshell = 'win_shell', _('Powershell')
 
-    def get_register_task(self):
-        from ops.tasks import run_adhoc
-        return "run_adhoc_{}".format(self.id), run_adhoc, (str(self.id),), {}
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    name = models.CharField(max_length=128, verbose_name=_('Name'))
+    pattern = models.CharField(max_length=1024, verbose_name=_("Pattern"), default='all')
+    module = models.CharField(max_length=128, choices=Modules.choices, default=Modules.shell,
+                              verbose_name=_('Module'))
+    args = models.CharField(max_length=1024, default='', verbose_name=_('Args'))
+    owner = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
+
+    @property
+    def row_count(self):
+        if len(self.args) == 0:
+            return 0
+        count = str(self.args).count('\n')
+        return count + 1
+
+    @property
+    def size(self):
+        return len(self.args)
 
     def __str__(self):
         return "{}: {}".format(self.module, self.args)

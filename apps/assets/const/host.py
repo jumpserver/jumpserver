@@ -1,5 +1,7 @@
 from .base import BaseType
 
+GATEWAY_NAME = 'Gateway'
+
 
 class HostTypes(BaseType):
     LINUX = 'linux', 'Linux'
@@ -67,7 +69,7 @@ class HostTypes(BaseType):
         return {
             cls.LINUX: [
                 {'name': 'Linux'},
-                {'name': 'Gateway'}
+                {'name': GATEWAY_NAME}
             ],
             cls.UNIX: [
                 {'name': 'Unix'},

@@ -7,6 +7,7 @@ from functools import partial
 import django.db.utils
 from django.dispatch import receiver
 from django.conf import settings
+from django.db.utils import ProgrammingError, OperationalError
 from django.utils.functional import LazyObject
 from django.db.models.signals import post_save, pre_delete, m2m_changed
 
@@ -48,7 +49,7 @@ def subscribe_orgs_mapping_expire(sender, **kwargs):
     if settings.DEBUG:
         try:
             set_to_default_org()
-        except django.db.utils.OperationalError:
+        except (ProgrammingError, OperationalError):
             pass
 
     def keep_subscribe_org_mapping():

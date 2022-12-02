@@ -1,23 +1,19 @@
-import uuid
 import logging
+import uuid
 
+from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django.db import models
-from django.db.models import F, Q, TextChoices
 
-from common.utils import lazyproperty, date_expired_default
-from common.db.models import BaseCreateUpdateModel, UnionQuerySet
-from assets.models import Asset, Node, FamilyMixin, Account
-from orgs.mixins.models import OrgModelMixin
+from assets.models import Asset, Account
+from common.db.models import UnionQuerySet
+from common.utils import date_expired_default
 from orgs.mixins.models import OrgManager
-from .const import Action, SpecialAccount
+from orgs.mixins.models import OrgModelMixin
+from perms.const import ActionChoices
 
-__all__ = [
-    'AssetPermission', 'PermNode',
-    'UserAssetGrantedTreeNodeRelation',
-    'Action'
-]
+__all__ = ['AssetPermission', 'ActionChoices']
 
 # 使用场景
 logger = logging.getLogger(__name__)
@@ -41,7 +37,7 @@ class AssetPermissionQuerySet(models.QuerySet):
 
     def filter_by_accounts(self, accounts):
         q = Q(accounts__contains=list(accounts)) | \
-            Q(accounts__contains=SpecialAccount.ALL.value)
+            Q(accounts__contains=Account.AliasAccount.ALL.value)
         return self.filter(q)
 
 
@@ -67,20 +63,16 @@ class AssetPermission(OrgModelMixin):
     )
     # 特殊的账号: @ALL, @INPUT @USER 默认包含，将来在全局设置中进行控制.
     accounts = models.JSONField(default=list, verbose_name=_("Accounts"))
-    actions = models.IntegerField(
-        choices=Action.DB_CHOICES, default=Action.ALL, verbose_name=_("Actions")
-    )
-    is_active = models.BooleanField(default=True, verbose_name=_('Active'))
-    date_start = models.DateTimeField(
-        default=timezone.now, db_index=True, verbose_name=_("Date start")
-    )
+    actions = models.IntegerField(default=ActionChoices.connect, verbose_name=_("Actions"))
+    date_start = models.DateTimeField(default=timezone.now, db_index=True, verbose_name=_("Date start"))
     date_expired = models.DateTimeField(
         default=date_expired_default, db_index=True, verbose_name=_('Date expired')
     )
-    created_by = models.CharField(max_length=128, blank=True, verbose_name=_('Created by'))
-    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
-    from_ticket = models.BooleanField(default=False, verbose_name=_('From ticket'))
     comment = models.TextField(verbose_name=_('Comment'), blank=True)
+    is_active = models.BooleanField(default=True, verbose_name=_('Active'))
+    from_ticket = models.BooleanField(default=False, verbose_name=_('From ticket'))
+    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
+    created_by = models.CharField(max_length=128, blank=True, verbose_name=_('Created by'))
 
     objects = AssetPermissionManager.from_queryset(AssetPermissionQuerySet)()
 
@@ -133,145 +125,9 @@ class AssetPermission(OrgModelMixin):
         """
         asset_ids = self.get_all_assets(flat=True)
         q = Q(asset_id__in=asset_ids)
-        if not self.is_perm_all_accounts:
+        if Account.AliasAccount.ALL in self.accounts:
             q &= Q(username__in=self.accounts)
         accounts = Account.objects.filter(q).order_by('asset__name', 'name', 'username')
         if not flat:
             return accounts
         return accounts.values_list('id', flat=True)
-
-    @property
-    def is_perm_all_accounts(self):
-        return SpecialAccount.ALL in self.accounts
-
-    @lazyproperty
-    def users_amount(self):
-        return self.users.count()
-
-    @lazyproperty
-    def user_groups_amount(self):
-        return self.user_groups.count()
-
-    @lazyproperty
-    def assets_amount(self):
-        return self.assets.count()
-
-    @lazyproperty
-    def nodes_amount(self):
-        return self.nodes.count()
-
-    def users_display(self):
-        names = [user.username for user in self.users.all()]
-        return names
-
-    def user_groups_display(self):
-        names = [group.name for group in self.user_groups.all()]
-        return names
-
-    def assets_display(self):
-        names = [asset.name for asset in self.assets.all()]
-        return names
-
-    def nodes_display(self):
-        names = [node.full_value for node in self.nodes.all()]
-        return names
-
-
-class UserAssetGrantedTreeNodeRelation(OrgModelMixin, FamilyMixin, BaseCreateUpdateModel):
-    class NodeFrom(TextChoices):
-        granted = 'granted', 'Direct node granted'
-        child = 'child', 'Have children node'
-        asset = 'asset', 'Direct asset granted'
-
-    user = models.ForeignKey('users.User', db_constraint=False, on_delete=models.CASCADE)
-    node = models.ForeignKey('assets.Node', default=None, on_delete=models.CASCADE,
-                             db_constraint=False, null=False, related_name='granted_node_rels')
-    node_key = models.CharField(max_length=64, verbose_name=_("Key"), db_index=True)
-    node_parent_key = models.CharField(max_length=64, default='', verbose_name=_('Parent key'),
-                                       db_index=True)
-    node_from = models.CharField(choices=NodeFrom.choices, max_length=16, db_index=True)
-    node_assets_amount = models.IntegerField(default=0)
-
-    @property
-    def key(self):
-        return self.node_key
-
-    @property
-    def parent_key(self):
-        return self.node_parent_key
-
-    @classmethod
-    def get_node_granted_status(cls, user, key):
-        ancestor_keys = set(cls.get_node_ancestor_keys(key, with_self=True))
-        ancestor_rel_nodes = cls.objects.filter(user=user, node_key__in=ancestor_keys)
-
-        for rel_node in ancestor_rel_nodes:
-            if rel_node.key == key:
-                return rel_node.node_from, rel_node
-            if rel_node.node_from == cls.NodeFrom.granted:
-                return cls.NodeFrom.granted, None
-        return '', None
-
-
-class PermNode(Node):
-    class Meta:
-        proxy = True
-        ordering = []
-
-    # 特殊节点
-    UNGROUPED_NODE_KEY = 'ungrouped'
-    UNGROUPED_NODE_VALUE = _('Ungrouped')
-    FAVORITE_NODE_KEY = 'favorite'
-    FAVORITE_NODE_VALUE = _('Favorite')
-
-    node_from = ''
-    granted_assets_amount = 0
-
-    annotate_granted_node_rel_fields = {
-        'granted_assets_amount': F('granted_node_rels__node_assets_amount'),
-        'node_from': F('granted_node_rels__node_from')
-    }
-
-    def use_granted_assets_amount(self):
-        self.assets_amount = self.granted_assets_amount
-
-    @classmethod
-    def get_ungrouped_node(cls, assets_amount):
-        return cls(
-            id=cls.UNGROUPED_NODE_KEY,
-            key=cls.UNGROUPED_NODE_KEY,
-            value=cls.UNGROUPED_NODE_VALUE,
-            assets_amount=assets_amount
-        )
-
-    @classmethod
-    def get_favorite_node(cls, assets_amount):
-        node = cls(
-            id=cls.FAVORITE_NODE_KEY,
-            key=cls.FAVORITE_NODE_KEY,
-            value=cls.FAVORITE_NODE_VALUE,
-        )
-        node.assets_amount = assets_amount
-        return node
-
-    def get_granted_status(self, user):
-        status, rel_node = UserAssetGrantedTreeNodeRelation.get_node_granted_status(user, self.key)
-        self.node_from = status
-        if rel_node:
-            self.granted_assets_amount = rel_node.node_assets_amount
-        return status
-
-    def save(self):
-        # 这是个只读 Model
-        raise NotImplementedError
-
-
-class PermedAsset(Asset):
-    class Meta:
-        proxy = True
-        verbose_name = _('Permed asset')
-        permissions = [
-            ('view_myassets', _('Can view my assets')),
-            ('view_userassets', _('Can view user assets')),
-            ('view_usergroupassets', _('Can view usergroup assets')),
-        ]

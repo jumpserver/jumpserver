@@ -1,5 +1,6 @@
 from celery import shared_task
 from django.utils.translation import gettext_noop
+from django.utils.translation import ugettext as _
 
 from common.utils import get_logger
 from orgs.utils import org_aware_func, tmp_to_root_org
@@ -26,7 +27,7 @@ def verify_accounts_connectivity_util(accounts, assets, task_name):
     instance.execute()
 
 
-@shared_task(queue="ansible")
+@shared_task(queue="ansible", verbose_name=_('Verify asset account availability'))
 def verify_accounts_connectivity(account_ids, asset_ids):
     from assets.models import Asset, Account
     with tmp_to_root_org():

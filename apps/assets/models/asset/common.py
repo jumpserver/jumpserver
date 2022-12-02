@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 #
 
-import logging
 import uuid
+import logging
 from collections import defaultdict
 
 from django.db import models

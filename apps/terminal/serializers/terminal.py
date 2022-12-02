@@ -1,8 +1,8 @@
-from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
+from rest_framework import serializers
 
-from common.drf.serializers import BulkModelSerializer
 from common.drf.fields import LabeledChoiceField
+from common.drf.serializers import BulkModelSerializer
 from common.utils import get_request_ip, pretty_string, is_uuid
 from users.serializers import ServiceAccountSerializer
 from .. import const
@@ -133,3 +133,9 @@ class TerminalRegistrationSerializer(serializers.ModelSerializer):
         instance.replay_storage = ReplayStorage.default().name
         instance.save()
         return instance
+
+
+class ConnectMethodSerializer(serializers.Serializer):
+    value = serializers.CharField(max_length=128)
+    label = serializers.CharField(max_length=128)
+    group = serializers.CharField(max_length=128)
