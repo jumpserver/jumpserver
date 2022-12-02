@@ -6,7 +6,6 @@ from hashlib import md5
 import sshpubkeys
 from django.conf import settings
 from django.db import models
-from django.db.models import QuerySet
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
@@ -35,7 +34,7 @@ class AbsConnectivity(models.Model):
 
     @classmethod
     def bulk_set_connectivity(cls, queryset_or_id, connectivity):
-        if not isinstance(queryset_or_id, QuerySet):
+        if not isinstance(queryset_or_id, models.QuerySet):
             queryset = cls.objects.filter(id__in=queryset_or_id)
         else:
             queryset = queryset_or_id
@@ -87,7 +86,7 @@ class BaseAccount(JMSOrgBaseModel):
     @lazyproperty
     def public_key(self):
         if self.secret_type == SecretType.SSH_KEY and self.private_key:
-            return parse_ssh_public_key_str(private_key=self.private_key)
+            return parse_ssh_public_key_str(self.private_key)
         return None
 
     @property

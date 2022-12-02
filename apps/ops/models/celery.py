@@ -71,5 +71,9 @@ class CeleryTaskExecution(models.Model):
             return self.date_finished - self.date_start
         return None
 
+    @property
+    def is_success(self):
+        return self.state == 'SUCCESS'
+
     def __str__(self):
         return "{}: {}".format(self.name, self.id)

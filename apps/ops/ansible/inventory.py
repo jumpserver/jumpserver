@@ -50,7 +50,7 @@ class JMSInventory:
                 0, "sshpass -p '{}'".format(gateway.password)
             )
         if gateway.private_key:
-            proxy_command_list.append("-i {}".format(gateway.private_key_file))
+            proxy_command_list.append("-i {}".format(gateway.private_key_path))
 
         proxy_command = "'-o ProxyCommand={}'".format(
             " ".join(proxy_command_list)
@@ -67,7 +67,7 @@ class JMSInventory:
         if account.secret_type == 'password':
             var['ansible_password'] = account.secret
         elif account.secret_type == 'ssh_key':
-            var['ansible_ssh_private_key_file'] = account.private_key_file
+            var['ansible_ssh_private_key_file'] = account.private_key_path
         return var
 
     def make_ssh_account_vars(self, host, asset, account, automation, protocols, platform, gateway):

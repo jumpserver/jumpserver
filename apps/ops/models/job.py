@@ -136,7 +136,7 @@ class JobExecution(JMSOrgBaseModel):
             )
         elif self.job.type == 'playbook':
             runner = PlaybookRunner(
-                self.inventory_path, self.job.playbook.work_path
+                self.inventory_path, self.job.playbook.entry
             )
         else:
             raise Exception("unsupported job type")

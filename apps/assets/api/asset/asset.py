@@ -7,7 +7,7 @@ from rest_framework.response import Response
 
 from assets import serializers
 from assets.filters import IpInFilterBackend, LabelFilterBackend, NodeFilterBackend
-from assets.models import Asset
+from assets.models import Asset, Gateway
 from assets.tasks import (
     push_accounts_to_assets, test_assets_connectivity_manual,
     update_assets_hardware_info_manual, verify_accounts_connectivity,
@@ -57,7 +57,7 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
         ("default", serializers.AssetSerializer),
         ("suggestion", serializers.MiniAssetSerializer),
         ("platform", serializers.PlatformSerializer),
-        ("gateways", serializers.GatewayWithAuthSerializer),
+        ("gateways", serializers.GatewaySerializer),
     )
     rbac_perms = (
         ("match", "assets.match_asset"),
@@ -76,9 +76,9 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
     def gateways(self, *args, **kwargs):
         asset = self.get_object()
         if not asset.domain:
-            gateways = Asset.objects.none()
+            gateways = Gateway.objects.none()
         else:
-            gateways = asset.domain.gateways.filter(protocol="ssh")
+            gateways = asset.domain.gateways
         return self.get_paginated_response_from_queryset(gateways)
 
 

@@ -28,10 +28,21 @@ class JobViewSet(OrgBulkModelViewSet):
 
     def perform_create(self, serializer):
         instance = serializer.save()
-        if instance.instant:
-            execution = instance.create_execution()
-            task = run_ops_job_execution.delay(execution.id)
-            set_task_to_serializer_data(serializer, task)
+        run_after_save = serializer.validated_data.get('run_after_save', False)
+        if instance.instant or run_after_save:
+            self.run_job(instance, serializer)
+
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        run_after_save = serializer.validated_data.get('run_after_save', False)
+        if run_after_save:
+            self.run_job(instance, serializer)
+
+    @staticmethod
+    def run_job(job, serializer):
+        execution = job.create_execution()
+        task = run_ops_job_execution.delay(execution.id)
+        set_task_to_serializer_data(serializer, task)
 
 
 class JobExecutionViewSet(OrgBulkModelViewSet):

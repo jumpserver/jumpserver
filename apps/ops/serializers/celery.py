@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import unicode_literals
 from rest_framework import serializers
+from django.utils.translation import gettext_lazy as _
 
 from django_celery_beat.models import PeriodicTask
 
@@ -35,10 +36,12 @@ class CeleryTaskSerializer(serializers.ModelSerializer):
 
 
 class CeleryTaskExecutionSerializer(serializers.ModelSerializer):
+    is_success = serializers.BooleanField(required=False, read_only=True, label=_('Success'))
+
     class Meta:
         model = CeleryTaskExecution
         fields = [
-            "id", "name", "args", "kwargs", "time_cost", "timedelta", "state", "is_finished", "date_published",
+            "id", "name", "args", "kwargs", "time_cost", "timedelta", "is_success", "is_finished", "date_published",
             "date_start",
             "date_finished"
         ]
