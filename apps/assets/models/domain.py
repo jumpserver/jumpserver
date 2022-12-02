@@ -2,15 +2,16 @@
 #
 import uuid
 import random
-
+import socket
 import paramiko
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import get_logger, lazyproperty
 from orgs.mixins.models import OrgModelMixin
 from assets.models import Host, Platform
-from assets.const import GATEWAY_NAME, SecretType
+from assets.const import GATEWAY_NAME, SecretType, Connectivity
 from orgs.mixins.models import OrgManager
 
 logger = get_logger(__file__)
@@ -102,8 +103,14 @@ class Gateway(Host):
     @property
     def private_key(self):
         account = self.select_accounts.get(SecretType.SSH_KEY)
-        return account.secret if account else None
+        return account.private_key if account else None
 
+    @property
+    def private_key_obj(self):
+        account = self.select_accounts.get(SecretType.SSH_KEY)
+        return account.private_key_obj if account else None
+
+    @property
     def private_key_path(self):
         account = self.select_accounts.get(SecretType.SSH_KEY)
         return account.private_key_path if account else None
@@ -117,3 +124,68 @@ class Gateway(Host):
             accounts, key=lambda x: x['privileged'], reverse=True
         )
         return accounts[0].username
+
+    def test_connective(self, local_port=None):
+        local_port = self.port if local_port is None else local_port
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        proxy = paramiko.SSHClient()
+        proxy.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+        try:
+            proxy.connect(
+                self.address,
+                port=self.port,
+                username=self.username,
+                password=self.password,
+                pkey=self.private_key_obj
+            )
+        except(
+                paramiko.AuthenticationException,
+                paramiko.BadAuthenticationType,
+                paramiko.SSHException,
+                paramiko.ChannelException,
+                paramiko.ssh_exception.NoValidConnectionsError,
+                socket.gaierror
+        ) as e:
+            err = str(e)
+            if err.startswith('[Errno None] Unable to connect to port'):
+                err = _('Unable to connect to port {port} on {address}')
+                err = err.format(port=self.port, address=self.address)
+            elif err == 'Authentication failed.':
+                err = _('Authentication failed')
+            elif err == 'Connect failed':
+                err = _('Connect failed')
+            self.set_connectivity(Connectivity.FAILED)
+            return False, err
+
+        try:
+            sock = proxy.get_transport().open_channel(
+                'direct-tcpip', ('127.0.0.1', local_port), ('127.0.0.1', 0)
+            )
+            client.connect(
+                '127.0.0.1',
+                sock=sock,
+                timeout=5,
+                port=local_port,
+                username=self.username,
+                password=self.password,
+                key_filename=self.private_key_path,
+            )
+        except (
+                paramiko.SSHException,
+                paramiko.ssh_exception.SSHException,
+                paramiko.ChannelException,
+                paramiko.AuthenticationException,
+                TimeoutError
+        ) as e:
+
+            err = getattr(e, 'text', str(e))
+            if err == 'Connect failed':
+                err = _('Connect failed')
+            self.set_connectivity(Connectivity.FAILED)
+            return False, err
+        finally:
+            client.close()
+        self.set_connectivity(Connectivity.OK)
+        return True, None
