@@ -72,7 +72,9 @@ class AccountSerializer(AccountSerializerCreateMixin, BaseAccountSerializer):
     def __init__(self, *args, data=None, **kwargs):
         super().__init__(*args, data=data, **kwargs)
         if data and 'name' not in data:
-            data['name'] = data.get('username')
+            username = data.get('username')
+            if username is not None:
+                data['name'] = username
         if hasattr(self, 'initial_data') and \
                 not getattr(self, 'initial_data', None):
             delattr(self, 'initial_data')
