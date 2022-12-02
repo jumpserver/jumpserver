@@ -121,26 +121,31 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
 
     @lazyproperty
     def account(self):
+        from assets.models import Account
         if not self.asset:
             return None
 
         account = self.asset.accounts.filter(name=self.account_name).first()
         if self.account_name == '@INPUT' or not account:
-            return {
+            data = {
                 'name': self.account_name,
                 'username': self.input_username,
                 'secret_type': 'password',
                 'secret': self.input_secret,
-                'su_from': None
+                'su_from': None,
+                'org_id': self.asset.org_id
             }
+            Account(**data)
         else:
-            return {
+            data = {
                 'name': account.name,
                 'username': account.username,
                 'secret_type': account.secret_type,
                 'secret': account.secret or self.input_secret,
                 'su_from': account.su_from,
+                'org_id': account.org_id
             }
+        return Account(**data)
 
     @lazyproperty
     def domain(self):

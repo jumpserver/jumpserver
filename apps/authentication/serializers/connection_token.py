@@ -120,8 +120,8 @@ class ConnectionTokenGatewaySerializer(serializers.ModelSerializer):
     class Meta:
         model = Asset
         fields = [
-            'id', 'address', 'port', 'username',
-            'password', 'private_key'
+            'id', 'address', 'port',
+            # 'username', 'password', 'private_key'
         ]
 
 
@@ -131,8 +131,7 @@ class ConnectionTokenACLCmdGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommandGroup
         fields = [
-            'id', 'type', 'content', 'ignore_case', 'pattern',
-            'action', 'date_created',
+            'id', 'type', 'content', 'ignore_case', 'pattern'
         ]
 
 

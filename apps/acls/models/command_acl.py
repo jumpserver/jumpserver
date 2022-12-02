@@ -125,6 +125,8 @@ class CommandFilterACL(OrgModelMixin, BaseACL):
 
     @classmethod
     def get_command_groups(cls, user_id=None, user_group_id=None, account=None, asset_id=None, org_id=None):
+        # Todo: Do
+        return CommandGroup.objects.all()
 
         from assets.models import Account, Asset
         user_groups = []
