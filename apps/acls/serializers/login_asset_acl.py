@@ -1,11 +1,11 @@
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
-from .base import BaseUserAssetAccountACLSerializerMixin
+from .base import BaseUserAssetAccountACLSerializerMixin as BaseSerializer
 from ..models import LoginAssetACL
 
 __all__ = ["LoginAssetACLSerializer"]
 
 
-class LoginAssetACLSerializer(BaseUserAssetAccountACLSerializerMixin, BulkOrgResourceModelSerializer):
-    class Meta(BaseUserAssetAccountACLSerializerMixin.Meta):
+class LoginAssetACLSerializer(BaseSerializer, BulkOrgResourceModelSerializer):
+    class Meta(BaseSerializer.Meta):
         model = LoginAssetACL
