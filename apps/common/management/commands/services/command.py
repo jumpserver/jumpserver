@@ -93,8 +93,8 @@ class BaseActionCommand(BaseCommand):
 
     def add_arguments(self, parser):
         cores = 10
-        if (multiprocessing.cpu_count() + 1) < cores:
-            cores = multiprocessing.cpu_count() + 1
+        if (multiprocessing.cpu_count() * 2 + 1) < cores:
+            cores = multiprocessing.cpu_count() * 2 + 1
 
         parser.add_argument(
             'services',  nargs='+', choices=Services.export_services_values(), help='Service',
