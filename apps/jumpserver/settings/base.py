@@ -59,6 +59,9 @@ SITE_URL = CONFIG.SITE_URL
 # https://docs.djangoproject.com/en/4.1/ref/settings/
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+# https://docs.djangoproject.com/en/4.1/ref/settings/#std-setting-CSRF_TRUSTED_ORIGINS
+CSRF_TRUSTED_ORIGINS = CONFIG.CSRF_TRUSTED_ORIGINS.split(',') if CONFIG.CSRF_TRUSTED_ORIGINS else []
+
 # LOG LEVEL
 LOG_LEVEL = CONFIG.LOG_LEVEL
 

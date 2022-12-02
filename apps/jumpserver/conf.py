@@ -494,6 +494,7 @@ class Config(dict):
         'SESSION_COOKIE_SECURE': False,
         'CSRF_COOKIE_SECURE': False,
         'REFERER_CHECK_ENABLED': False,
+        'CSRF_TRUSTED_ORIGINS': '',
         'SESSION_ENGINE': 'cache',
         'SESSION_SAVE_EVERY_REQUEST': True,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE': False,
