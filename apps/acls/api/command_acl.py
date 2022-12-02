@@ -1,7 +1,7 @@
 from orgs.mixins.api import OrgBulkModelViewSet
 from .. import models, serializers
 
-__all__ = ['CommandFilterACLViewSet']
+__all__ = ['CommandFilterACLViewSet', 'CommandGroupViewSet']
 
 
 class CommandGroupViewSet(OrgBulkModelViewSet):

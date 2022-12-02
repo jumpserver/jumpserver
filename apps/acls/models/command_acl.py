@@ -24,6 +24,7 @@ class CommandGroup(JMSOrgBaseModel):
     type = models.CharField(max_length=16, default=Type.command, choices=Type.choices, verbose_name=_("Type"))
     content = models.TextField(verbose_name=_("Content"), help_text=_("One line one command"))
     ignore_case = models.BooleanField(default=True, verbose_name=_('Ignore case'))
+    comment = models.TextField(blank=True, verbose_name=_("Comment"))
 
     class Meta:
         unique_together = [('org_id', 'name')]
