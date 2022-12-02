@@ -6,11 +6,11 @@ from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
-from users.models import User, UserGroup
-from orgs.mixins.models import JMSOrgBaseModel
 from common.utils import lazyproperty, get_logger, get_object_or_none
+from orgs.mixins.models import JMSOrgBaseModel
 from orgs.mixins.models import OrgModelMixin
-from .base import BaseACL
+from users.models import User, UserGroup
+from .base import BaseACL, AssetAccountUserACLQuerySet, ACLManager
 
 logger = get_logger(__file__)
 
@@ -50,7 +50,6 @@ class CommandGroup(JMSOrgBaseModel):
             if ' ' in _cmd:
                 regex.append(cmd)
                 continue
-
             if not cmd:
                 continue
 
@@ -88,6 +87,19 @@ class CommandGroup(JMSOrgBaseModel):
 
     def __str__(self):
         return '{} % {}'.format(self.type, self.content)
+
+
+class CommandFilterACL(OrgModelMixin, BaseACL):
+    users = models.JSONField(verbose_name=_('User'))
+    assets = models.JSONField(verbose_name=_('Asset'))
+    accounts = models.JSONField(verbose_name=_('Account'))
+    commands = models.ManyToManyField(CommandGroup, verbose_name=_('Commands'))
+    objects = ACLManager.from_queryset(AssetAccountUserACLQuerySet)()
+
+    class Meta:
+        unique_together = ('name', 'org_id')
+        ordering = ('priority', '-date_updated', 'name')
+        verbose_name = _('Command acl')
 
     def create_command_confirm_ticket(self, run_command, session, cmd_filter_rule, org_id):
         from tickets.const import TicketType
@@ -147,16 +159,3 @@ class CommandGroup(JMSOrgBaseModel):
         else:
             rules = cls.objects.none()
         return rules
-
-
-class CommandFilterACL(OrgModelMixin, BaseACL):
-    # 条件
-    users = models.JSONField(verbose_name=_('User'))
-    accounts = models.JSONField(verbose_name=_('Account'))
-    assets = models.JSONField(verbose_name=_('Asset'))
-    commands = models.ManyToManyField(CommandGroup, verbose_name=_('Commands'))
-
-    class Meta:
-        unique_together = ('name', 'org_id')
-        ordering = ('priority', '-date_updated', 'name')
-        verbose_name = _('Command acl')
