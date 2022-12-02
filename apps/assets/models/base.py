@@ -32,6 +32,12 @@ class AbsConnectivity(models.Model):
         self.date_verified = timezone.now()
         self.save(update_fields=['connectivity', 'date_verified'])
 
+    @property
+    def is_connective(self):
+        if self.connectivity == Connectivity.OK:
+            return True
+        return False
+
     @classmethod
     def bulk_set_connectivity(cls, queryset_or_id, connectivity):
         if not isinstance(queryset_or_id, models.QuerySet):
