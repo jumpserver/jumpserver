@@ -135,7 +135,6 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
                 'su_from': None,
                 'org_id': self.asset.org_id
             }
-            Account(**data)
         else:
             data = {
                 'name': account.name,
@@ -164,13 +163,12 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
     def acl_command_groups(self):
         from acls.models import CommandFilterACL
         kwargs = {
-            'user_id': self.user.id,
+            'user': self.user,
+            'asset': self.asset,
             'account': self.account,
         }
-        if self.asset:
-            kwargs['asset_id'] = self.asset.id
-        cmd_groups = CommandFilterACL.get_command_groups(**kwargs)
-        return cmd_groups
+        command_groups = CommandFilterACL.filter_queryset(**kwargs).get_command_groups()
+        return command_groups
 
 
 class SuperConnectionToken(ConnectionToken):

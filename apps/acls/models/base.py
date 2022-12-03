@@ -5,8 +5,15 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.mixins import CommonModelMixin
 from common.utils import contains_ip
+from orgs.mixins.models import OrgModelMixin
 
-__all__ = ['BaseACL', 'BaseACLQuerySet', 'ACLManager', 'AssetAccountUserACLQuerySet']
+__all__ = [
+    'ACLManager',
+    'BaseACL',
+    'BaseACLQuerySet',
+    'UserAssetAccountBaseACL',
+    'UserAssetAccountACLQuerySet'
+]
 
 
 class ActionChoices(models.TextChoices):
@@ -29,30 +36,35 @@ class BaseACLQuerySet(models.QuerySet):
         return self.inactive()
 
 
-class AssetAccountUserACLQuerySet(BaseACLQuerySet):
-    def filter_user(self, user):
-        return self.filter(
-            Q(users__username_group__contains=user.username) |
+class UserAssetAccountACLQuerySet(BaseACLQuerySet):
+    def filter_user(self, username):
+        q = Q(users__username_group__contains=username) | \
             Q(users__username_group__contains='*')
-        )
+        return self.filter(q)
 
-    def filter_asset(self, asset):
-        queryset = self.filter(
-            Q(assets__name_group__contains=asset.name) |
-            Q(assets__name_group__contains='*')
-        )
-        ids = [
-            q.id for q in queryset
-            if contains_ip(asset.address, q.assets.get('address_group', []))
-        ]
-        queryset = self.filter(id__in=ids)
+    def filter_asset(self, name=None, address=None):
+        queryset = self.filter()
+        if name:
+            q = Q(assets__name_group__contains=name) | \
+                Q(assets__name_group__contains='*')
+            queryset = queryset.filter(q)
+        if address:
+            ids = [
+                q.id for q in queryset
+                if contains_ip(address, q.assets.get('address_group', []))
+            ]
+            queryset = queryset.filter(id__in=ids)
         return queryset
 
-    def filter_account(self, account_username):
-        return self.filter(
-            Q(accounts__username_group__contains=account_username) |
-            Q(accounts__username_group__contains='*')
-        )
+    def filter_account(self, name=None, username=None):
+        q = Q()
+        if name:
+            q &= Q(accounts__name_group__contains=name) | \
+                 Q(accounts__name_group__contains='*')
+        if username:
+            q &= Q(accounts__username_group__contains=username) | \
+                 Q(accounts__username_group__contains='*')
+        return self.filter(q)
 
 
 class ACLManager(models.Manager):
@@ -72,8 +84,43 @@ class BaseACL(CommonModelMixin):
     is_active = models.BooleanField(default=True, verbose_name=_("Active"))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
-    objects = ACLManager.from_queryset(BaseACLQuerySet)()
     ActionChoices = ActionChoices
+    objects = ACLManager.from_queryset(BaseACLQuerySet)()
 
     class Meta:
         abstract = True
+
+
+class UserAssetAccountBaseACL(BaseACL, OrgModelMixin):
+    # username_group
+    users = models.JSONField(verbose_name=_('User'))
+    # name_group, address_group
+    assets = models.JSONField(verbose_name=_('Asset'))
+    # name_group, username_group
+    accounts = models.JSONField(verbose_name=_('Account'))
+
+    objects = ACLManager.from_queryset(UserAssetAccountACLQuerySet)()
+
+    class Meta:
+        abstract = True
+
+    @classmethod
+    def filter_queryset(cls, user=None, asset=None, account=None, account_username=None, **kwargs):
+        queryset = cls.objects.all()
+        org_id = None
+        if user:
+            queryset = queryset.filter_user(user.username)
+        if asset:
+            org_id = asset.org_id
+            queryset = queryset.filter_asset(asset.name, asset.address)
+        if account:
+            org_id = account.org_id
+            queryset = queryset.filter_account(account.name, account.username)
+        if account_username:
+            queryset = queryset.filter_account(username=account_username)
+        if org_id:
+            kwargs['org_id'] = org_id
+        if kwargs:
+            queryset = queryset.filter(**kwargs)
+        return queryset
+

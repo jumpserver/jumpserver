@@ -1,17 +1,10 @@
-from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from orgs.mixins.models import OrgModelMixin
-from .base import BaseACL, ACLManager, AssetAccountUserACLQuerySet
+
+from .base import UserAssetAccountBaseACL
 
 
-class LoginAssetACL(BaseACL, OrgModelMixin):
-    # 条件
-    users = models.JSONField(verbose_name=_('User'))
-    accounts = models.JSONField(verbose_name=_('Account'))
-    assets = models.JSONField(verbose_name=_('Asset'))
-
-    objects = ACLManager.from_queryset(AssetAccountUserACLQuerySet)()
+class LoginAssetACL(UserAssetAccountBaseACL):
 
     class Meta:
         unique_together = ('name', 'org_id')

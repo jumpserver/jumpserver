@@ -9,12 +9,10 @@ from .base import BaseACL
 
 
 class LoginACL(BaseACL):
-    # 用户
     user = models.ForeignKey(
-        'users.User', on_delete=models.CASCADE, verbose_name=_('User'),
-        related_name='login_acls'
+        'users.User', on_delete=models.CASCADE, related_name='login_acls', verbose_name=_('User')
     )
-    # 规则
+    # 规则, ip_group, time_period
     rules = models.JSONField(default=dict, verbose_name=_('Rule'))
 
     class Meta:

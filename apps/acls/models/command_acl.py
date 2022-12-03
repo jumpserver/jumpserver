@@ -3,37 +3,41 @@
 import re
 
 from django.db import models
-from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import lazyproperty, get_logger, get_object_or_none
+from common.utils import lazyproperty, get_logger
 from orgs.mixins.models import JMSOrgBaseModel
-from orgs.mixins.models import OrgModelMixin
-from users.models import User, UserGroup
-from .base import BaseACL, AssetAccountUserACLQuerySet, ACLManager
+
+from .base import UserAssetAccountBaseACL, UserAssetAccountACLQuerySet, ACLManager
 
 logger = get_logger(__file__)
 
 
-class CommandGroup(JMSOrgBaseModel):
-    class Type(models.TextChoices):
-        command = 'command', _('Command')
-        regex = 'regex', _('Regex')
+class TypeChoices(models.TextChoices):
+    command = 'command', _('Command')
+    regex = 'regex', _('Regex')
 
+
+class CommandGroup(JMSOrgBaseModel):
     name = models.CharField(max_length=128, verbose_name=_("Name"))
-    type = models.CharField(max_length=16, default=Type.command, choices=Type.choices, verbose_name=_("Type"))
+    type = models.CharField(
+        max_length=16, default=TypeChoices.command, choices=TypeChoices.choices,
+        verbose_name=_("Type")
+    )
     content = models.TextField(verbose_name=_("Content"), help_text=_("One line one command"))
     ignore_case = models.BooleanField(default=True, verbose_name=_('Ignore case'))
     comment = models.TextField(blank=True, verbose_name=_("Comment"))
 
+    TypeChoices = TypeChoices
+
     class Meta:
         unique_together = [('org_id', 'name')]
-        verbose_name = _("Command filter rule")
+        verbose_name = _("Command group")
 
     @lazyproperty
     def pattern(self):
         if self.type == 'command':
-            s = self.construct_command_regex(content=self.content)
+            s = self.construct_command_regex(self.content)
         else:
             s = r'{0}'.format(self.content)
         return s
@@ -62,6 +66,17 @@ class CommandGroup(JMSOrgBaseModel):
         s = r'{}'.format('|'.join(regex))
         return s
 
+    def match(self, data):
+        succeed, error, pattern = self.compile_regex(self.pattern, self.ignore_case)
+        if not succeed:
+            return False, ''
+
+        found = pattern.search(data)
+        if not found:
+            return False, ''
+        else:
+            return True, found.group()
+
     @staticmethod
     def compile_regex(regex, ignore_case):
         args = []
@@ -75,27 +90,23 @@ class CommandGroup(JMSOrgBaseModel):
             return False, error, None
         return True, '', pattern
 
-    def match(self, data):
-        succeed, error, pattern = self.compile_regex(self.pattern, self.ignore_case)
-        if not succeed:
-            return False, ''
-
-        found = pattern.search(data)
-        if not found:
-            return False, ''
-        else:
-            return True, found.group()
-
     def __str__(self):
         return '{} % {}'.format(self.type, self.content)
 
 
-class CommandFilterACL(OrgModelMixin, BaseACL):
-    users = models.JSONField(verbose_name=_('User'))
-    assets = models.JSONField(verbose_name=_('Asset'))
-    accounts = models.JSONField(verbose_name=_('Account'))
-    commands = models.ManyToManyField(CommandGroup, verbose_name=_('Commands'))
-    objects = ACLManager.from_queryset(AssetAccountUserACLQuerySet)()
+class CommandFilterACLQuerySet(UserAssetAccountACLQuerySet):
+    def get_command_groups(self):
+        ids = self.values_list('id', flat=True)
+        queryset = CommandFilterACL.command_groups.through.objects.filter(commandfilteracl_id__in=ids)
+        cmd_group_ids = queryset.values_list('commandgroup_id', flat=True)
+        command_groups = CommandGroup.objects.filter(id__in=cmd_group_ids)
+        return command_groups
+
+
+class CommandFilterACL(UserAssetAccountBaseACL):
+    command_groups = models.ManyToManyField(CommandGroup, verbose_name=_('Commands'))
+
+    objects = ACLManager.from_queryset(CommandFilterACLQuerySet)()
 
     class Meta:
         unique_together = ('name', 'org_id')
@@ -122,44 +133,3 @@ class CommandFilterACL(OrgModelMixin, BaseACL):
         assignees = self.reviewers.all()
         ticket.open_by_system(assignees)
         return ticket
-
-    @classmethod
-    def get_command_groups(cls, user_id=None, user_group_id=None, account=None, asset_id=None, org_id=None):
-        # Todo: Do
-        return CommandGroup.objects.all()
-
-        from assets.models import Account, Asset
-        user_groups = []
-        user = get_object_or_none(User, pk=user_id)
-        if user:
-            user_groups.extend(list(user.groups.all()))
-        user_group = get_object_or_none(UserGroup, pk=user_group_id)
-        if user_group:
-            org_id = user_group.org_id
-            user_groups.append(user_group)
-
-        asset = get_object_or_none(Asset, pk=asset_id)
-        q = Q()
-        if user:
-            q |= Q(users=user)
-        if user_groups:
-            q |= Q(user_groups__in=set(user_groups))
-        if account:
-            org_id = account.org_id
-            q |= Q(accounts__contains=account.username) | \
-                 Q(accounts__contains=Account.AliasAccount.ALL)
-        if asset:
-            org_id = asset.org_id
-            q |= Q(assets=asset)
-        if q:
-            cmd_filters = cls.objects.filter(q).filter(is_active=True)
-            if org_id:
-                cmd_filters = cmd_filters.filter(org_id=org_id)
-            filter_ids = cmd_filters.values_list('id', flat=True)
-            command_group_ids = cls.commands.through.objects\
-                .filter(commandfilteracl_id__in=filter_ids)\
-                .values_list('commandgroup_id', flat=True)
-            cmd_groups = CommandGroup.objects.filter(id__in=command_group_ids)
-        else:
-            cmd_groups = CommandGroup.objects.none()
-        return cmd_groups

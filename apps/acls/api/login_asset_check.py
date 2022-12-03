@@ -31,13 +31,13 @@ class LoginAssetCheckAPI(CreateAPIView):
 
     def check_confirm(self):
         with tmp_to_org(self.serializer.asset.org):
-            acl = LoginAssetACL.objects \
-                .filter(action=LoginAssetACL.ActionChoices.review) \
-                .filter_user(self.serializer.user) \
-                .filter_asset(self.serializer.asset) \
-                .filter_account(self.serializer.validated_data.get('account_username')) \
-                .valid() \
-                .first()
+            kwargs = {
+                'user': self.serializer.user,
+                'asset': self.serializer.asset,
+                'account_username': self.serializer.validated_data.get('account_username'),
+                'action': LoginAssetACL.ActionChoices.review
+            }
+            acl = LoginAssetACL.filter_queryset(**kwargs).valid().first()
         if acl:
             need_confirm = True
             response_data = self._get_response_data_of_need_confirm(acl)
