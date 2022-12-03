@@ -68,7 +68,12 @@ class Signer(metaclass=Singleton):
             return None
 
 
-_supported_paramiko_ssh_key_types = (paramiko.RSAKey, paramiko.DSSKey, paramiko.Ed25519Key)
+_supported_paramiko_ssh_key_types = (
+    paramiko.RSAKey,
+    paramiko.DSSKey,
+    paramiko.Ed25519Key,
+    paramiko.ECDSAKey,
+)
 
 
 def ssh_key_string_to_obj(text, password=None):
@@ -134,12 +139,6 @@ def ssh_key_gen(length=2048, type='rsa', password=None, username='jumpserver', h
 
 
 def validate_ssh_private_key(text, password=None):
-    if isinstance(text, str):
-        try:
-            text = text.encode("utf-8")
-        except UnicodeDecodeError:
-            return False
-
     key = parse_ssh_private_key_str(text, password=password)
     return bool(key)
 
@@ -158,8 +157,9 @@ def parse_ssh_public_key_str(text: bytes = "", password=None) -> str:
     private_key = _parse_ssh_private_key(text, password=password)
     if private_key is None:
         return ""
-    public_key_bytes = private_key.public_key().public_bytes(serialization.Encoding.OpenSSH,
-                                                             serialization.PublicFormat.OpenSSH)
+    public_key_bytes = private_key.public_key().public_bytes(
+        serialization.Encoding.OpenSSH,
+        serialization.PublicFormat.OpenSSH)
     return public_key_bytes.decode('utf-8')
 
 
@@ -186,11 +186,16 @@ def _parse_ssh_private_key(text, password=None):
                 return None
 
     try:
-        private_key = serialization.load_ssh_private_key(text, password=password)
-        return private_key
+        if is_openssh_format_key(text):
+            return serialization.load_ssh_private_key(text, password=password)
+        return serialization.load_pem_private_key(text, password=password)
     except (ValueError, TypeError):
         pass
     return None
+
+
+def is_openssh_format_key(text: bytes):
+    return text.startswith(b"-----BEGIN OPENSSH PRIVATE KEY-----")
 
 
 def validate_ssh_public_key(text):
