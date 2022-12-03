@@ -7,7 +7,6 @@ import os
 import re
 import time
 from io import StringIO
-import logging
 
 import paramiko
 import sshpubkeys
@@ -69,7 +68,11 @@ class Signer(metaclass=Singleton):
             return None
 
 
-_supported_paramiko_ssh_key_types = (paramiko.RSAKey, paramiko.DSSKey, paramiko.Ed25519Key)
+_supported_paramiko_ssh_key_types = (
+    paramiko.RSAKey,
+    paramiko.DSSKey,
+    paramiko.Ed25519Key,
+    paramiko.ECDSAKey,)
 
 
 def ssh_key_string_to_obj(text, password=None):
@@ -134,17 +137,6 @@ def ssh_key_gen(length=2048, type='rsa', password=None, username='jumpserver', h
 
 
 def validate_ssh_private_key(text, password=None):
-    if isinstance(text, str):
-        try:
-            text = text.encode("utf-8")
-        except UnicodeDecodeError:
-            return False
-    if isinstance(password, str):
-        try:
-            password = password.encode("utf-8")
-        except UnicodeDecodeError:
-            return False
-
     key = parse_ssh_private_key_str(text, password=password)
     return bool(key)
 
@@ -153,6 +145,7 @@ def parse_ssh_private_key_str(text: bytes, password=None) -> str:
     private_key = _parse_ssh_private_key(text, password=password)
     if private_key is None:
         return ""
+    # 解析之后，转换成 openssh 格式的私钥
     private_key_bytes = private_key.private_bytes(
         serialization.Encoding.PEM,
         serialization.PrivateFormat.OpenSSH,
@@ -194,12 +187,15 @@ def _parse_ssh_private_key(text, password=None):
             return None
 
     try:
-        private_key = serialization.load_ssh_private_key(text, password=password)
-        return private_key
-    except (ValueError, TypeError):
-        logging.error("Invalid private key")
-        pass
-    return None
+        if is_openssh_format_key(text):
+            return serialization.load_ssh_private_key(text, password=password)
+        return serialization.load_pem_private_key(text, password=password)
+    except (ValueError, TypeError) as e:
+        raise e
+
+
+def is_openssh_format_key(text: bytes):
+    return text.startswith(b"-----BEGIN OPENSSH PRIVATE KEY-----")
 
 
 def validate_ssh_public_key(text):
