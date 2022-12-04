@@ -91,7 +91,7 @@ class CommandGroup(JMSOrgBaseModel):
         return True, '', pattern
 
     def __str__(self):
-        return '{} % {}'.format(self.type, self.content)
+        return '{} % {}'.format(self.name, self.type)
 
 
 class CommandFilterACLQuerySet(UserAssetAccountACLQuerySet):
@@ -112,6 +112,9 @@ class CommandFilterACL(UserAssetAccountBaseACL):
         unique_together = ('name', 'org_id')
         ordering = ('priority', '-date_updated', 'name')
         verbose_name = _('Command acl')
+
+    def __str__(self):
+        return self.name
 
     def create_command_confirm_ticket(self, run_command, session, cmd_filter_rule, org_id):
         from tickets.const import TicketType
