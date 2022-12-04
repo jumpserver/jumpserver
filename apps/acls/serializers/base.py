@@ -79,6 +79,11 @@ class BaseUserAssetAccountACLSerializerMixin(serializers.Serializer):
         }
 
     def validate_reviewers(self, reviewers):
+        action = self.initial_data.get('action')
+        if not action and self.instance:
+            action = self.instance.action
+        if action != ActionChoices.review:
+            return reviewers
         org_id = self.fields["org_id"].default()
         org = Organization.get_instance(org_id)
         if not org:
