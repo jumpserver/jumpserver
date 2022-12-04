@@ -3,33 +3,33 @@
 import os
 import tarfile
 
-from django.db.models import F
-from django.shortcuts import get_object_or_404, reverse
-from django.utils.translation import ugettext as _
-from django.utils.encoding import escape_uri_path
-from django.http import FileResponse
 from django.core.files.storage import default_storage
+from django.db.models import F
+from django.http import FileResponse
+from django.shortcuts import get_object_or_404, reverse
+from django.utils.encoding import escape_uri_path
+from django.utils.translation import ugettext as _
+from rest_framework import generics
 from rest_framework import viewsets, views
-from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import generics
+from rest_framework.response import Response
 
-from common.utils import data_to_json
 from common.const.http import GET
-from common.utils import get_logger, get_object_or_none
-from common.mixins.api import AsyncApiMixin
 from common.drf.filters import DatetimeRangeFilter
 from common.drf.renders import PassthroughRenderer
+from common.mixins.api import AsyncApiMixin
+from common.utils import data_to_json
+from common.utils import get_logger, get_object_or_none
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import tmp_to_root_org, tmp_to_org
-from users.models import User
+from terminal import serializers
+from terminal.models import Session
 from terminal.utils import (
     find_session_replay_local, download_session_replay,
     is_session_approver, get_session_replay_url
 )
-from terminal.models import Session
-from terminal import serializers
+from users.models import User
 
 __all__ = [
     'SessionViewSet', 'SessionReplayViewSet',
@@ -40,7 +40,7 @@ logger = get_logger(__name__)
 
 
 class MySessionAPIView(generics.ListAPIView):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
     serializer_class = serializers.SessionSerializer
 
     def get_queryset(self):
@@ -109,7 +109,7 @@ class SessionViewSet(OrgBulkModelViewSet):
         return response
 
     def get_queryset(self):
-        queryset = super().get_queryset().prefetch_related('terminal')\
+        queryset = super().get_queryset().prefetch_related('terminal') \
             .annotate(terminal_display=F('terminal__name'))
         return queryset
 
@@ -169,7 +169,7 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
         data = {
             'type': tp, 'src': url,
             'user': session.user, 'asset': session.asset,
-            'system_user': session.system_user,
+            'system_user': session.account,
             'date_start': session.date_start,
             'date_end': session.date_end,
             'download_url': download_url,
