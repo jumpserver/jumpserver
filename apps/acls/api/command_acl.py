@@ -15,4 +15,4 @@ class CommandFilterACLViewSet(OrgBulkModelViewSet):
     model = models.CommandFilterACL
     filterset_fields = ('name',)
     search_fields = filterset_fields
-    serializer_class = serializers.LoginAssetACLSerializer
+    serializer_class = serializers.CommandFilterACLSerializer

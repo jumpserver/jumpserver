@@ -52,15 +52,15 @@ class ACLAccountsSerializer(serializers.Serializer):
 
 
 class BaseUserAssetAccountACLSerializerMixin(serializers.Serializer):
-    users = ACLUsersSerializer()
-    assets = ACLAssestsSerializer()
-    accounts = ACLAccountsSerializer()
+    users = ACLUsersSerializer(label=_('User'))
+    assets = ACLAssestsSerializer(label=_('Asset'))
+    accounts = ACLAccountsSerializer(label=_('Account'))
     reviewers = ObjectRelatedField(
         queryset=User.objects, many=True, required=False, label=_('Reviewers')
     )
     reviewers_amount = serializers.IntegerField(read_only=True, source="reviewers.count")
     action = LabeledChoiceField(
-        choices=ActionChoices.choices, label=_("Action")
+        choices=ActionChoices.choices, default=ActionChoices.reject, label=_("Action")
     )
 
     class Meta:
