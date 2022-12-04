@@ -1,8 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
-from rest_framework import serializers
 
 from acls.models import CommandGroup, CommandFilterACL
-from common.drf.fields import ObjectRelatedField
+from common.drf.fields import ObjectRelatedField, LabeledChoiceField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .base import BaseUserAssetAccountACLSerializerMixin as BaseSerializer
 
@@ -10,7 +9,7 @@ __all__ = ["CommandFilterACLSerializer", "CommandGroupSerializer"]
 
 
 class CommandGroupSerializer(BulkOrgResourceModelSerializer):
-    type = serializers.ChoiceField(
+    type = LabeledChoiceField(
         choices=CommandGroup.TypeChoices.choices, default=CommandGroup.TypeChoices.command,
         label=_('Type')
     )
