@@ -333,13 +333,13 @@ class AuthACLMixin:
             return
 
         acl: LoginACL
-        if acl.is_action(acl.ActionChoices.allow):
+        if acl.is_action(acl.ActionChoices.accept):
             return
 
         if acl.is_action(acl.ActionChoices.reject):
             raise errors.LoginACLIPAndTimePeriodNotAllowed(user.username, request=self.request)
 
-        if acl.is_action(acl.ActionChoices.confirm):
+        if acl.is_action(acl.ActionChoices.review):
             self.request.session['auth_confirm_required'] = '1'
             self.request.session['auth_acl_id'] = str(acl.id)
             return
@@ -354,7 +354,7 @@ class AuthACLMixin:
         acl = LoginACL.filter_acl(user).filter(id=acl_id).first()
         if not acl:
             return
-        if not acl.is_action(acl.ActionChoices.confirm):
+        if not acl.is_action(acl.ActionChoices.review):
             return
         self.get_ticket_or_create(acl)
         self.check_user_login_confirm()

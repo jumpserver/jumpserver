@@ -36,7 +36,7 @@ class LoginACL(BaseACL):
             return
 
         for acl in acl_qs:
-            if acl.is_action(LoginACL.ActionChoices.confirm) and \
+            if acl.is_action(LoginACL.ActionChoices.review) and \
                     not acl.reviewers.exists():
                 continue
             ip_group = acl.rules.get('ip_group')
