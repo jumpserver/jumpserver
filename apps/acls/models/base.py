@@ -56,14 +56,9 @@ class UserAssetAccountACLQuerySet(BaseACLQuerySet):
             queryset = queryset.filter(id__in=ids)
         return queryset
 
-    def filter_account(self, name=None, username=None):
-        q = Q()
-        if name:
-            q &= Q(accounts__name_group__contains=name) | \
-                 Q(accounts__name_group__contains='*')
-        if username:
-            q &= Q(accounts__username_group__contains=username) | \
-                 Q(accounts__username_group__contains='*')
+    def filter_account(self, username):
+        q = Q(accounts__username_group__contains=username) | \
+             Q(accounts__username_group__contains='*')
         return self.filter(q)
 
 
@@ -96,7 +91,7 @@ class UserAssetAccountBaseACL(BaseACL, OrgModelMixin):
     users = models.JSONField(verbose_name=_('User'))
     # name_group, address_group
     assets = models.JSONField(verbose_name=_('Asset'))
-    # name_group, username_group
+    # username_group
     accounts = models.JSONField(verbose_name=_('Account'))
 
     objects = ACLManager.from_queryset(UserAssetAccountACLQuerySet)()
@@ -115,7 +110,7 @@ class UserAssetAccountBaseACL(BaseACL, OrgModelMixin):
             queryset = queryset.filter_asset(asset.name, asset.address)
         if account:
             org_id = account.org_id
-            queryset = queryset.filter_account(account.name, account.username)
+            queryset = queryset.filter_account(account.username)
         if account_username:
             queryset = queryset.filter_account(username=account_username)
         if org_id:

@@ -11,12 +11,14 @@ __all__ = ["CommandFilterACLSerializer", "CommandGroupSerializer"]
 class CommandGroupSerializer(BulkOrgResourceModelSerializer):
     class Meta:
         model = CommandGroup
-        fields = ['id', 'name', 'type', 'content', 'comment']
+        fields = ['id', 'name', 'type', 'content', 'ignore_case', 'comment']
 
 
 class CommandFilterACLSerializer(BaseSerializer, BulkOrgResourceModelSerializer):
-    commands = ObjectRelatedField(queryset=CommandGroup.objects, many=True, required=False, label=_('Commands'))
+    command_groups = ObjectRelatedField(
+        queryset=CommandGroup.objects, many=True, required=False, label=_('Commands')
+    )
 
     class Meta(BaseSerializer.Meta):
         model = CommandFilterACL
-        fields = BaseSerializer.Meta.fields + ['commands']
+        fields = BaseSerializer.Meta.fields + ['command_groups']
