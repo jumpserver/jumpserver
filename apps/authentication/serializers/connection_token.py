@@ -1,8 +1,9 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from authentication.models import ConnectionToken
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
+
+from ..models import ConnectionToken
 
 __all__ = [
     'ConnectionTokenSerializer', 'SuperConnectionTokenSerializer',
@@ -16,7 +17,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         model = ConnectionToken
         fields_mini = ['id', 'value']
         fields_small = fields_mini + [
-            'user', 'asset', 'account_name', 'input_username',
+            'user', 'asset', 'account', 'input_username',
             'input_secret', 'connect_method', 'protocol', 'actions',
             'date_expired', 'date_created', 'date_updated', 'created_by',
             'updated_by', 'org_id', 'org_name',
@@ -31,18 +32,15 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
             'value': {'read_only': True},
         }
 
-    def get_request_user(self):
+    def get_user(self, attrs):
         request = self.context.get('request')
         user = request.user if request else None
         return user
 
-    def get_user(self, attrs):
-        return self.get_request_user()
-
 
 class SuperConnectionTokenSerializer(ConnectionTokenSerializer):
     class Meta(ConnectionTokenSerializer.Meta):
-        pass
+        read_only_fields = list(set(ConnectionTokenSerializer.Meta.read_only_fields) - {'user'})
 
     def get_user(self, attrs):
-        return attrs.get('user') or self.get_request_user()
+        return attrs.get('user')

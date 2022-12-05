@@ -33,7 +33,7 @@ class Command(AbstractSessionCommand):
             cls(**{
                 'user': random_string(6),
                 'asset': random_string(10),
-                'system_user': random_string(6),
+                'account': random_string(6),
                 'session': str(uuid.uuid4()),
                 'input': random_string(16),
                 'output': random_string(64),

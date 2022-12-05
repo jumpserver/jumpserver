@@ -229,7 +229,7 @@ class TerminalType(TextChoices):
         return protocols
 
     @classmethod
-    def get_connect_method(cls, name, protocol, os):
+    def get_connect_method(cls, name, protocol, os='linux'):
         methods = cls.get_protocols_connect_methods(os)
         protocol_methods = methods.get(protocol, [])
         for method in protocol_methods:
@@ -267,7 +267,6 @@ class TerminalType(TextChoices):
 
                 protocol_web_methods = set(web_methods.get(protocol, [])) \
                                        & set(component_protocol.get('web_methods', []))
-                print("protocol_web_methods", protocol, protocol_web_methods)
                 methods[protocol.value].extend([
                     {
                         'component': component.value,
