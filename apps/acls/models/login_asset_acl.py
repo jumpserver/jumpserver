@@ -6,10 +6,9 @@ from .base import UserAssetAccountBaseACL
 
 class LoginAssetACL(UserAssetAccountBaseACL):
 
-    class Meta:
-        unique_together = ('name', 'org_id')
-        ordering = ('priority', '-date_updated', 'name')
+    class Meta(UserAssetAccountBaseACL.Meta):
         verbose_name = _('Login asset acl')
+        abstract = False
 
     def __str__(self):
         return self.name

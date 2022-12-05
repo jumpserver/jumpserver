@@ -19,7 +19,7 @@ class AbstractSessionCommand(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=64, db_index=True, verbose_name=_("User"))
     asset = models.CharField(max_length=128, db_index=True, verbose_name=_("Asset"))
-    system_user = models.CharField(max_length=64, db_index=True, verbose_name=_("System user"))
+    account = models.CharField(max_length=64, db_index=True, verbose_name=_("Account"))
     input = models.CharField(max_length=128, db_index=True, verbose_name=_("Input"))
     output = models.CharField(max_length=1024, blank=True, verbose_name=_("Output"))
     session = models.CharField(max_length=36, db_index=True, verbose_name=_("Session"))
