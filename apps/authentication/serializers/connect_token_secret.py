@@ -84,14 +84,14 @@ class _ConnectionTokenPlatformSerializer(PlatformSerializer):
 class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     user = _ConnectionTokenUserSerializer(read_only=True)
     asset = _ConnectionTokenAssetSerializer(read_only=True)
-    account = _ConnectionTokenAccountSerializer(read_only=True)
+    account = _ConnectionTokenAccountSerializer(read_only=True, source='account_object')
     gateway = _ConnectionTokenGatewaySerializer(read_only=True)
     platform = _ConnectionTokenPlatformSerializer(read_only=True)
     acl_command_groups = _ConnectionTokenACLCmdGroupSerializer(read_only=True, many=True)
     actions = ActionChoicesField()
     expire_at = serializers.IntegerField()
     expire_now = serializers.BooleanField(label=_('Expired now'), write_only=True, default=True)
-    connect_method = serializers.CharField(label=_('Connect method'), write_only=True, default='ssh')
+    connect_method = serializers.SerializerMethodField(label=_('Connect method'))
 
     class Meta:
         model = ConnectionToken
@@ -99,7 +99,19 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
             'id', 'value', 'user', 'asset', 'account',
             'platform', 'acl_command_groups', 'protocol',
             'gateway', 'actions', 'expire_at', 'expire_now',
+            'connect_method'
         ]
         extra_kwargs = {
             'value': {'read_only': True},
         }
+
+    def get_connect_method(self, obj):
+        from terminal.const import TerminalType
+        from common.utils import get_request_os
+        request = self.context.get('request')
+        if request:
+            os = get_request_os(request)
+        else:
+            os = 'windows'
+        method = TerminalType.get_connect_method(obj.connect_method, protocol=obj.protocol, os=os)
+        return method

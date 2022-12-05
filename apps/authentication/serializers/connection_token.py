@@ -16,7 +16,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         model = ConnectionToken
         fields_mini = ['id', 'value']
         fields_small = fields_mini + [
-            'user', 'asset', 'account_name', 'input_username',
+            'user', 'asset', 'account', 'input_username',
             'input_secret', 'connect_method', 'protocol', 'actions',
             'date_expired', 'date_created', 'date_updated', 'created_by',
             'updated_by', 'org_id', 'org_name',

@@ -278,7 +278,7 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         data = serializer.validated_data
         user = self.get_user(serializer)
         asset = data.get('asset')
-        account_name = data.get('account_name')
+        account_name = data.get('account')
         data['org_id'] = asset.org_id
         data['user'] = user
         data['value'] = random_string(16)
