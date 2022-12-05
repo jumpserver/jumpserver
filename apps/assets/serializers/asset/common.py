@@ -53,7 +53,7 @@ class AssetAccountSerializer(AccountSerializer):
             'version', 'secret_type',
         ]
         fields_write_only = [
-            'secret',  'push_now'
+            'secret', 'push_now'
         ]
         fields = fields_mini + fields_write_only
 
@@ -67,6 +67,7 @@ class AssetSerializer(OrgResourceSerializerMixin, WritableNestedModelSerializer)
     labels = AssetLabelSerializer(many=True, required=False, label=_('Labels'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
     accounts = AssetAccountSerializer(many=True, required=False, label=_('Accounts'))
+    automation_enabled_info = serializers.SerializerMethodField()
 
     class Meta:
         model = Asset
@@ -78,8 +79,8 @@ class AssetSerializer(OrgResourceSerializerMixin, WritableNestedModelSerializer)
         ]
         read_only_fields = [
             'category', 'type', 'specific', 'info',
-            'connectivity', 'date_verified',
-            'created_by', 'date_created',
+            'connectivity', 'date_verified', 'created_by',
+            'date_created', 'automation_enabled_info'
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
         extra_kwargs = {
@@ -92,6 +93,19 @@ class AssetSerializer(OrgResourceSerializerMixin, WritableNestedModelSerializer)
         if self.__class__.__name__ != 'AssetSerializer':
             names.remove('specific')
         return names
+
+    @staticmethod
+    def get_automation_enabled_info(obj):
+        automation = obj.platform.automation
+        return {
+            'ping_enabled': automation.ping_enabled,
+            'ansible_enabled': automation.ansible_enabled,
+            'gather_facts_enabled': automation.gather_facts_enabled,
+            'push_account_enabled': automation.push_account_enabled,
+            'change_secret_enabled': automation.change_secret_enabled,
+            'verify_account_enabled': automation.verify_account_enabled,
+            'gather_accounts_enabled': automation.gather_accounts_enabled,
+        }
 
     @classmethod
     def setup_eager_loading(cls, queryset):
