@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from common.drf.fields import ObjectRelatedField
 from acls.models import CommandGroup, CommandFilterACL
-from assets.models import Asset, Account, Platform, Gateway
+from assets.models import Asset, Account, Platform, Gateway, Domain
 from assets.serializers import PlatformSerializer, AssetProtocolsSerializer
 from users.models import User
 from perms.serializers.permission import ActionChoicesField
@@ -102,6 +102,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     account = _ConnectionTokenAccountSerializer(read_only=True, source='account_object')
     gateway = _ConnectionTokenGatewaySerializer(read_only=True)
     platform = _ConnectionTokenPlatformSerializer(read_only=True)
+    domain = ObjectRelatedField(queryset=Domain.objects, required=False, label=_('Domain'))
     command_filter_acls = _ConnectionTokenCommandFilterACLSerializer(read_only=True, many=True)
     actions = ActionChoicesField()
     expire_at = serializers.IntegerField()
@@ -113,7 +114,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
         fields = [
             'id', 'value', 'user', 'asset', 'account',
             'platform', 'command_filter_acls', 'protocol',
-            'gateway', 'actions', 'expire_at', 'expire_now',
+            'domain', 'gateway', 'actions', 'expire_at', 'expire_now',
             'connect_method'
         ]
         extra_kwargs = {
