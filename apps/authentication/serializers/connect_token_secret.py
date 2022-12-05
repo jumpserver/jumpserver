@@ -56,11 +56,16 @@ class _ConnectionTokenAccountSerializer(serializers.ModelSerializer):
 class _ConnectionTokenGatewaySerializer(serializers.ModelSerializer):
     """ Gateway """
 
+    account = ObjectRelatedField(
+        required=False, source='select_account', queryset=Account.objects,
+        attrs=('id', 'name', 'username', 'secret', 'secret_type')
+    )
+    protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
+
     class Meta:
         model = Gateway
         fields = [
-            'id', 'address', 'port',
-            'username', 'password', 'private_key'
+            'id', 'name', 'address', 'protocols', 'account'
         ]
 
 

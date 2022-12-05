@@ -50,6 +50,16 @@ class AbsConnectivity(models.Model):
         abstract = True
 
 
+class BaseAccountQuerySet(models.QuerySet):
+    def active(self):
+        return self.filter(is_active=True)
+
+
+class BaseAccountManager(models.Manager):
+    def active(self):
+        return self.get_queryset().active()
+
+
 class BaseAccount(JMSOrgBaseModel):
     name = models.CharField(max_length=128, verbose_name=_("Name"))
     username = models.CharField(max_length=128, blank=True, verbose_name=_('Username'), db_index=True)
@@ -61,6 +71,8 @@ class BaseAccount(JMSOrgBaseModel):
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
     created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
+
+    objects = BaseAccountManager.from_queryset(BaseAccountQuerySet)()
 
     @property
     def has_secret(self):

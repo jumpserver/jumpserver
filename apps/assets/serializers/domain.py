@@ -11,8 +11,9 @@ from ..models import Domain, Gateway, Asset
 
 
 class DomainSerializer(BulkOrgResourceModelSerializer):
-    asset_count = serializers.SerializerMethodField(label=_('Assets amount'))
-    gateway_count = serializers.SerializerMethodField(label=_('Gateways count'))
+    gateways = ObjectRelatedField(
+        many=True, required=False, queryset=Asset.objects, label=_('Gateway')
+    )
     assets = ObjectRelatedField(
         many=True, required=False, queryset=Asset.objects, label=_('Asset')
     )
@@ -21,21 +22,10 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
         model = Domain
         fields_mini = ['id', 'name']
         fields_small = fields_mini + ['comment']
-        fields_m2m = ['assets']
-        read_only_fields = ['asset_count', 'gateway_count', 'date_created']
+        fields_m2m = ['assets', 'gateways']
+        read_only_fields = ['date_created']
         fields = fields_small + fields_m2m + read_only_fields
-
-        extra_kwargs = {
-            'assets': {'required': False, 'label': _('Assets')},
-        }
-
-    @staticmethod
-    def get_asset_count(obj):
-        return obj.assets.count()
-
-    @staticmethod
-    def get_gateway_count(obj):
-        return obj.gateways.count()
+        extra_kwargs = {}
 
 
 class GatewaySerializer(HostSerializer):
@@ -47,7 +37,7 @@ class GatewaySerializer(HostSerializer):
 
     @staticmethod
     def get_effective_accounts(obj):
-        accounts = obj.select_accounts.values()
+        accounts = obj.accounts.all()
         return [
             {
                 'id': account.id,

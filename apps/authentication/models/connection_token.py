@@ -153,7 +153,7 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
         if not self.domain:
             return
         self.domain: Domain
-        return self.domain.random_gateway()
+        return self.domain.select_gateway()
 
     @lazyproperty
     def command_filter_acls(self):

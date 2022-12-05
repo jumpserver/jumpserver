@@ -9,10 +9,11 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import get_logger, lazyproperty
-from orgs.mixins.models import OrgModelMixin
-from assets.models import Host, Platform
-from assets.const import GATEWAY_NAME, SecretType, Connectivity
 from orgs.mixins.models import OrgManager
+from orgs.mixins.models import OrgModelMixin
+
+from ..models import Host, Platform
+from ..const import GATEWAY_NAME, Connectivity
 
 logger = get_logger(__file__)
 
@@ -33,25 +34,27 @@ class Domain(OrgModelMixin):
     def __str__(self):
         return self.name
 
-    @classmethod
-    def get_gateway_queryset(cls):
-        return Gateway.objects.all()
-
-    @lazyproperty
-    def gateways(self):
-        return self.get_gateway_queryset().filter(domain=self, is_active=True)
-
     def select_gateway(self):
         return self.random_gateway()
 
     def random_gateway(self):
-        gateways = [gw for gw in self.gateways if gw.is_connective]
-        if gateways:
-            return random.choice(gateways)
+        gateways = [gw for gw in self.active_gateways if gw.is_connective]
+        if not gateways:
+            gateways = self.active_gateways
+            logger.warn(f'Gateway all bad. domain={self}, gateway_num={len(gateways)}.')
+        return random.choice(gateways)
 
-        logger.warn(f'Gateway all bad. domain={self}, gateway_num={len(self.gateways)}.')
-        if self.gateways:
-            return random.choice(self.gateways)
+    @lazyproperty
+    def active_gateways(self):
+        return self.gateways.filter(is_active=True)
+
+    @lazyproperty
+    def gateways(self):
+        return self.get_gateway_queryset().filter(domain=self)
+
+    @classmethod
+    def get_gateway_queryset(cls):
+        return Gateway.objects.all()
 
 
 class GatewayManager(OrgManager):
@@ -61,9 +64,9 @@ class GatewayManager(OrgManager):
         return queryset
 
     def bulk_create(self, objs, batch_size=None, ignore_conflicts=False):
-        platform = Gateway().default_platform
+        default_platform = Gateway.default_platform()
         for obj in objs:
-            obj.platform_id = platform.id
+            obj.platform = default_platform
         return super().bulk_create(objs, batch_size, ignore_conflicts)
 
 
@@ -73,72 +76,39 @@ class Gateway(Host):
     class Meta:
         proxy = True
 
-    @lazyproperty
-    def default_platform(self):
-        return Platform.objects.get(name=GATEWAY_NAME, internal=True)
-
     def save(self, *args, **kwargs):
-        platform = self.default_platform
-        self.platform_id = platform.id
+        self.platform = self.default_platform()
         return super().save(*args, **kwargs)
 
-    @lazyproperty
-    def select_accounts(self) -> dict:
-        account_dict = {}
-        accounts = self.accounts.filter(is_active=True).order_by('-privileged', '-date_updated')
-        password_account = accounts.filter(secret_type=SecretType.PASSWORD).first()
-        if password_account:
-            account_dict[SecretType.PASSWORD] = password_account
-
-        ssh_key_account = accounts.filter(secret_type=SecretType.SSH_KEY).first()
-        if ssh_key_account:
-            account_dict[SecretType.SSH_KEY] = ssh_key_account
-        return account_dict
-
-    @property
-    def password(self):
-        account = self.select_accounts.get(SecretType.PASSWORD)
-        return account.secret if account else None
-
-    @property
-    def private_key(self):
-        account = self.select_accounts.get(SecretType.SSH_KEY)
-        return account.private_key if account else None
-
-    @property
-    def private_key_obj(self):
-        account = self.select_accounts.get(SecretType.SSH_KEY)
-        return account.private_key_obj if account else None
-
-    @property
-    def private_key_path(self):
-        account = self.select_accounts.get(SecretType.SSH_KEY)
-        return account.private_key_path if account else None
+    @classmethod
+    def default_platform(cls):
+        return Platform.objects.get(name=GATEWAY_NAME, internal=True)
 
     @lazyproperty
-    def username(self):
-        accounts = self.select_accounts.values()
-        if len(accounts) == 0:
-            return None
-        accounts = sorted(
-            accounts, key=lambda x: x['privileged'], reverse=True
-        )
-        return accounts[0].username
+    def select_account(self):
+        account = self.accounts.active().order_by('-privileged', '-date_updated').first()
+        return account
 
     def test_connective(self, local_port=None):
+        from ..models import Account
+
         local_port = self.port if local_port is None else local_port
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         proxy = paramiko.SSHClient()
         proxy.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        if not isinstance(self.select_account, Account):
+            err = _('No account')
+            return False, err
 
+        logger.debug('Test account: {}'.format(self.select_account))
         try:
             proxy.connect(
                 self.address,
                 port=self.port,
-                username=self.username,
-                password=self.password,
-                pkey=self.private_key_obj
+                username=self.select_account.username,
+                password=self.select_account.secret,
+                pkey=self.select_account.private_key_obj
             )
         except(
                 paramiko.AuthenticationException,
