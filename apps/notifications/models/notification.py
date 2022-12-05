@@ -13,6 +13,9 @@ class UserMsgSubscription(JMSBaseModel):
     )
     receive_backends = models.JSONField(default=list, verbose_name=_('receive backend'))
 
+    class Meta:
+        verbose_name = _('User message')
+
     def __str__(self):
         return _('{} subscription').format(self.user)
 

@@ -1,8 +1,9 @@
 import uuid
-from django.utils.translation import ugettext_lazy as _
 
 from django.db import models
-from common.db.models import BaseCreateUpdateModel
+from django.utils.translation import ugettext_lazy as _
+
+from common.db.models import BaseCreateUpdateModel, CASCADE_SIGNAL_SKIP
 
 
 class SSOToken(BaseCreateUpdateModel):
@@ -12,7 +13,8 @@ class SSOToken(BaseCreateUpdateModel):
     """
     authkey = models.UUIDField(primary_key=True, default=uuid.uuid4, verbose_name=_('Token'))
     expired = models.BooleanField(default=False, verbose_name=_('Expired'))
-    user = models.ForeignKey('users.User', on_delete=models.CASCADE, verbose_name=_('User'), db_constraint=False)
+    user = models.ForeignKey('users.User', on_delete=CASCADE_SIGNAL_SKIP, verbose_name=_('User'),
+                             db_constraint=False)
 
     class Meta:
         verbose_name = _('SSO token')

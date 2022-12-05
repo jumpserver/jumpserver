@@ -7,8 +7,8 @@ from django.db import models
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import signer, crypto
 from common.local import add_encrypted_field_set
+from common.utils import signer, crypto
 
 __all__ = [
     "JsonMixin",
@@ -131,7 +131,7 @@ class EncryptMixin:
         return signer.unsign(value) or ""
 
     def from_db_value(self, value, expression, connection, context=None):
-        if not value:
+        if value is None:
             return value
 
         value = force_text(value)
@@ -148,7 +148,7 @@ class EncryptMixin:
         return plain_value
 
     def get_prep_value(self, value):
-        if not value:
+        if value is None:
             return value
 
         # 先 json 再解密

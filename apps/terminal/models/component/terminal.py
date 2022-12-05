@@ -87,7 +87,7 @@ class Terminal(StorageMixin, TerminalStatusMixin, models.Model):
     replay_storage = models.CharField(max_length=128, verbose_name=_("Replay storage"), default='default')
     user = models.OneToOneField(User, related_name='terminal', verbose_name=_('Application User'), null=True,
                                 on_delete=models.CASCADE)
-    is_deleted = models.BooleanField(default=False, verbose_name=_('Is deleted'))
+    is_deleted = models.BooleanField(default=False)
     date_created = models.DateTimeField(auto_now_add=True)
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
 

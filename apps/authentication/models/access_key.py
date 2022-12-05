@@ -1,8 +1,10 @@
 import uuid
-from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
 
+from django.conf import settings
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
+
+import common.db.models
 
 
 class AccessKey(models.Model):
@@ -11,7 +13,7 @@ class AccessKey(models.Model):
     secret = models.UUIDField(verbose_name='AccessKeySecret',
                               default=uuid.uuid4, editable=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='User',
-                             on_delete=models.CASCADE, related_name='access_keys')
+                             on_delete=common.db.models.CASCADE_SIGNAL_SKIP, related_name='access_keys')
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
     date_created = models.DateTimeField(auto_now_add=True)
 
