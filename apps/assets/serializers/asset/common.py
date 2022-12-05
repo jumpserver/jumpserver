@@ -67,11 +67,11 @@ class AssetSerializer(OrgResourceSerializerMixin, WritableNestedModelSerializer)
     labels = AssetLabelSerializer(many=True, required=False, label=_('Labels'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
     accounts = AssetAccountSerializer(many=True, required=False, label=_('Accounts'))
-    automation_enabled_info = serializers.SerializerMethodField()
+    enabled_info = serializers.SerializerMethodField()
 
     class Meta:
         model = Asset
-        fields_mini = ['id', 'name', 'address', 'automation_enabled_info']
+        fields_mini = ['id', 'name', 'address', 'enabled_info']
         fields_small = fields_mini + ['is_active', 'comment']
         fields_fk = ['domain', 'platform', 'platform']
         fields_m2m = [
@@ -95,11 +95,15 @@ class AssetSerializer(OrgResourceSerializerMixin, WritableNestedModelSerializer)
         return names
 
     @staticmethod
-    def get_automation_enabled_info(obj):
-        automation = obj.platform.automation
+    def get_enabled_info(obj):
+        platform = obj.platform
+        automation = platform.automation
         return {
+            'su_enabled': platform.su_enabled,
             'ping_enabled': automation.ping_enabled,
+            'domain_enabled': platform.domain_enabled,
             'ansible_enabled': automation.ansible_enabled,
+            'protocols_enabled': platform.protocols_enabled,
             'gather_facts_enabled': automation.gather_facts_enabled,
             'push_account_enabled': automation.push_account_enabled,
             'change_secret_enabled': automation.change_secret_enabled,
