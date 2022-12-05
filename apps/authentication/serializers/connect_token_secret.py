@@ -2,7 +2,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from acls.models import CommandGroup
-from assets.models import Asset, Account, Platform
+from assets.models import Asset, Account, Platform, Gateway
 from assets.serializers import PlatformSerializer, AssetProtocolsSerializer
 from authentication.models import ConnectionToken
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
@@ -54,10 +54,10 @@ class _ConnectionTokenGatewaySerializer(serializers.ModelSerializer):
     """ Gateway """
 
     class Meta:
-        model = Asset
+        model = Gateway
         fields = [
             'id', 'address', 'port',
-            # 'username', 'password', 'private_key'
+            'username', 'password', 'private_key'
         ]
 
 
