@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from common.drf.fields import ObjectRelatedField
 from acls.models import CommandGroup, CommandFilterACL
-from assets.models import Asset, Account, Platform
+from assets.models import Asset, Account, Platform, Gateway
 from assets.serializers import PlatformSerializer, AssetProtocolsSerializer
 from users.models import User
 from perms.serializers.permission import ActionChoicesField
@@ -57,10 +57,10 @@ class _ConnectionTokenGatewaySerializer(serializers.ModelSerializer):
     """ Gateway """
 
     class Meta:
-        model = Asset
+        model = Gateway
         fields = [
             'id', 'address', 'port',
-            # 'username', 'password', 'private_key'
+            'username', 'password', 'private_key'
         ]
 
 
