@@ -71,6 +71,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Account',
                 'unique_together': {('username', 'app', 'systemuser')},
             },
-            bases=(models.Model, assets.models.base.AuthMixin),
+            bases=(models.Model,),
         ),
     ]

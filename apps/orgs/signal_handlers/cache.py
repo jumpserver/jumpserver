@@ -1,16 +1,15 @@
-from functools import wraps
 from django.db.models.signals import post_save, pre_delete, pre_save, post_delete
 from django.dispatch import receiver
 
 from orgs.models import Organization
-from assets.models import Node
-from perms.models import AssetPermission, ApplicationPermission
+from assets.models import Node, Account
+from perms.models import AssetPermission
+from audits.models import UserLoginLog
 from users.models import UserGroup, User
 from users.signals import pre_user_leave_org
-from applications.models import Application
 from terminal.models import Session
 from rbac.models import OrgRoleBinding, SystemRoleBinding, RoleBinding
-from assets.models import Asset, SystemUser, Domain, Gateway
+from assets.models import Asset, Domain
 from orgs.caches import OrgResourceStatisticsCache
 from orgs.utils import current_org
 from common.utils import get_logger
@@ -76,16 +75,14 @@ def on_user_delete_refresh_cache(sender, instance, **kwargs):
 
 class OrgResourceStatisticsRefreshUtil:
     model_cache_field_mapper = {
-        ApplicationPermission: ['app_perms_amount'],
-        AssetPermission: ['asset_perms_amount'],
-        Application: ['applications_amount'],
-        Gateway: ['gateways_amount'],
-        Domain: ['domains_amount'],
-        SystemUser: ['system_users_amount', 'admin_users_amount'],
         Node: ['nodes_amount'],
-        Asset: ['assets_amount'],
+        Domain: ['domains_amount'],
         UserGroup: ['groups_amount'],
-        RoleBinding: ['users_amount']
+        Account: ['accounts_amount'],
+        RoleBinding: ['users_amount', 'new_users_amount_this_week'],
+        Asset: ['assets_amount', 'new_assets_amount_this_week'],
+        AssetPermission: ['asset_perms_amount'],
+
     }
 
     @classmethod
@@ -94,7 +91,7 @@ class OrgResourceStatisticsRefreshUtil:
         if not cache_field_name:
             return
         OrgResourceStatisticsCache(Organization.root()).expire(*cache_field_name)
-        if instance.org:
+        if getattr(instance, 'org', None):
             OrgResourceStatisticsCache(instance.org).expire(*cache_field_name)
 
 

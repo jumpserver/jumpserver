@@ -42,7 +42,7 @@ def migrate_system_role_binding(apps, schema_editor):
             role_bindings.append(role_binding)
 
         role_binding_model.objects.bulk_create(role_bindings, ignore_conflicts=True)
-        print("Create role binding: {}-{} using: {:.2f}s".format(
+        print("\tCreate role binding: {}-{} using: {:.2f}s".format(
             count, count + len(users), time.time()-start
         ))
         count += len(users)

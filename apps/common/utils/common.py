@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 import re
-import socket
 from django.templatetags.static import static
 from collections import OrderedDict
 from itertools import chain
@@ -14,6 +13,7 @@ import ipaddress
 import psutil
 import platform
 import os
+import socket
 
 from django.conf import settings
 
@@ -344,7 +344,7 @@ def get_file_by_arch(dir, filename):
     return file_path
 
 
-def pretty_string(data: str, max_length=128, ellipsis_str='...'):
+def pretty_string(data, max_length=128, ellipsis_str='...'):
     """
     params:
        data: abcdefgh
@@ -353,6 +353,7 @@ def pretty_string(data: str, max_length=128, ellipsis_str='...'):
    return:
        ab...gh
     """
+    data = str(data)
     if len(data) < max_length:
         return data
     remain_length = max_length - len(ellipsis_str)

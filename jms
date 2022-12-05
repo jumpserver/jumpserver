@@ -178,7 +178,7 @@ if __name__ == '__main__':
         help="The service to start",
     )
     parser.add_argument('-d', '--daemon', nargs="?", const=True)
-    parser.add_argument('-w', '--worker', type=int, nargs="?", default=4)
+    parser.add_argument('-w', '--worker', type=int, nargs="?")
     parser.add_argument('-f', '--force', nargs="?", const=True)
 
     args = parser.parse_args()

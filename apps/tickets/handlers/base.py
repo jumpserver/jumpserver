@@ -65,7 +65,7 @@ class BaseHandler:
         if state != TicketState.approved:
             return diff_context
 
-        if self.ticket.type not in [TicketType.apply_asset, TicketType.apply_application]:
+        if self.ticket.type == TicketType.apply_asset:
             return diff_context
 
         # 企业微信，钉钉审批不做diff

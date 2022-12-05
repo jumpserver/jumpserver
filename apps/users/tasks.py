@@ -15,6 +15,7 @@ from orgs.models import Organization
 from .models import User
 from users.notifications import UserExpirationReminderMsg
 from settings.utils import LDAPServerUtil, LDAPImportUtil
+from common.const.crontab import CRONTAB_AT_AM_TEN, CRONTAB_AT_PM_TWO
 
 
 logger = get_logger(__file__)
@@ -41,7 +42,7 @@ def check_password_expired_periodic():
         'check_password_expired_periodic': {
             'task': check_password_expired.name,
             'interval': None,
-            'crontab': '0 10 * * *',
+            'crontab': CRONTAB_AT_AM_TEN,
             'enabled': True,
         }
     }
@@ -72,7 +73,7 @@ def check_user_expired_periodic():
         'check_user_expired_periodic': {
             'task': check_user_expired.name,
             'interval': None,
-            'crontab': '0 14 * * *',
+            'crontab': CRONTAB_AT_PM_TWO,
             'enabled': True,
         }
     }

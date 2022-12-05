@@ -2,45 +2,36 @@
 #
 import uuid
 
-from django.db.models.signals import (
-    post_save, m2m_changed, pre_delete, pre_save
-)
-from django.dispatch import receiver
 from django.conf import settings
-from django.db import transaction
-from django.utils import timezone
-from django.utils.functional import LazyObject
 from django.contrib.auth import BACKEND_SESSION_KEY
+from django.db import transaction
+from django.db.models.signals import post_save, pre_save, m2m_changed, pre_delete
+from django.dispatch import receiver
+from django.utils import timezone, translation
+from django.utils.functional import LazyObject
 from django.utils.translation import ugettext_lazy as _
-from django.utils import translation
 from rest_framework.renderers import JSONRenderer
 from rest_framework.request import Request
 
-from users.models import User
-from assets.models import Asset, SystemUser, CommandFilter
-from terminal.models import Session, Command
-from perms.models import AssetPermission, ApplicationPermission
-from rbac.models import Role
-
-from audits.utils import model_to_dict_for_operate_log as model_to_dict
 from audits.handler import (
     get_instance_current_with_cache_diff, cache_instance_before_data,
     create_or_update_operate_log, get_instance_dict_from_cache
 )
+from audits.utils import model_to_dict_for_operate_log as model_to_dict
 from authentication.signals import post_auth_failed, post_auth_success
 from authentication.utils import check_different_city_login_if_need
-from jumpserver.utils import current_request
-from users.signals import post_user_change_password
-from .utils import write_login_log
-from . import models, serializers
-from .models import OperateLog
-from .const import MODELS_NEED_RECORD
-from terminal.backends.command.serializers import SessionCommandSerializer
-from terminal.serializers import SessionSerializer
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR, SKIP_SIGNAL
 from common.utils import get_request_ip, get_logger, get_syslogger
 from common.utils.encode import data_to_json
-
+from jumpserver.utils import current_request
+from terminal.backends.command.serializers import SessionCommandSerializer
+from terminal.models import Session, Command
+from terminal.serializers import SessionSerializer
+from users.models import User
+from users.signals import post_user_change_password
+from . import models, serializers
+from .const import MODELS_NEED_RECORD, ActionChoices
+from .utils import write_login_log
 
 logger = get_logger(__name__)
 sys_logger = get_syslogger(__name__)
@@ -54,14 +45,14 @@ class AuthBackendLabelMapping(LazyObject):
         for source, backends in User.SOURCE_BACKEND_MAPPING.items():
             for backend in backends:
                 backend_label_mapping[backend] = source.label
-        backend_label_mapping[settings.AUTH_BACKEND_PUBKEY] = _('SSH Key')
-        backend_label_mapping[settings.AUTH_BACKEND_MODEL] = _('Password')
-        backend_label_mapping[settings.AUTH_BACKEND_SSO] = _('SSO')
-        backend_label_mapping[settings.AUTH_BACKEND_AUTH_TOKEN] = _('Auth Token')
-        backend_label_mapping[settings.AUTH_BACKEND_WECOM] = _('WeCom')
-        backend_label_mapping[settings.AUTH_BACKEND_FEISHU] = _('FeiShu')
-        backend_label_mapping[settings.AUTH_BACKEND_DINGTALK] = _('DingTalk')
-        backend_label_mapping[settings.AUTH_BACKEND_TEMP_TOKEN] = _('Temporary token')
+        backend_label_mapping[settings.AUTH_BACKEND_PUBKEY] = _("SSH Key")
+        backend_label_mapping[settings.AUTH_BACKEND_MODEL] = _("Password")
+        backend_label_mapping[settings.AUTH_BACKEND_SSO] = _("SSO")
+        backend_label_mapping[settings.AUTH_BACKEND_AUTH_TOKEN] = _("Auth Token")
+        backend_label_mapping[settings.AUTH_BACKEND_WECOM] = _("WeCom")
+        backend_label_mapping[settings.AUTH_BACKEND_FEISHU] = _("FeiShu")
+        backend_label_mapping[settings.AUTH_BACKEND_DINGTALK] = _("DingTalk")
+        backend_label_mapping[settings.AUTH_BACKEND_TEMP_TOKEN] = _("Temporary token")
         return backend_label_mapping
 
     def _setup(self):
@@ -71,9 +62,9 @@ class AuthBackendLabelMapping(LazyObject):
 AUTH_BACKEND_LABEL_MAPPING = AuthBackendLabelMapping()
 
 M2M_ACTION = {
-    POST_ADD: OperateLog.ACTION_CREATE,
-    POST_REMOVE: OperateLog.ACTION_DELETE,
-    POST_CLEAR: OperateLog.ACTION_DELETE,
+    POST_ADD: ActionChoices.create,
+    POST_REMOVE: ActionChoices.delete,
+    POST_CLEAR: ActionChoices.delete,
 }
 
 
@@ -97,9 +88,9 @@ def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
     changed_field = current_instance.get(field_name, [])
 
     after, before, before_value = None, None, None
-    if action == OperateLog.ACTION_CREATE:
+    if action == ActionChoices.create:
         before_value = list(set(changed_field) - set(objs_display))
-    elif action == OperateLog.ACTION_DELETE:
+    elif action == ActionChoices.delete:
         before_value = list(
             set(changed_field).symmetric_difference(set(objs_display))
         )
@@ -113,7 +104,7 @@ def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
         return
 
     create_or_update_operate_log(
-        OperateLog.ACTION_UPDATE, resource_type,
+        ActionChoices.update, resource_type,
         resource=instance, log_id=log_id, before=before, after=after
     )
 
@@ -164,11 +155,11 @@ def on_object_created_or_update(sender, instance=None, created=False, update_fie
 
     log_id, before, after = None, None, None
     if created:
-        action = models.OperateLog.ACTION_CREATE
+        action = models.ActionChoices.create
         after = model_to_dict(instance)
         log_id = getattr(instance, 'operate_log_id', None)
     else:
-        action = models.OperateLog.ACTION_UPDATE
+        action = ActionChoices.update
         current_instance = model_to_dict(instance)
         log_id, before, after = get_instance_current_with_cache_diff(current_instance)
 
@@ -187,7 +178,7 @@ def on_object_delete(sender, instance=None, **kwargs):
 
     resource_type = sender._meta.verbose_name
     create_or_update_operate_log(
-        models.OperateLog.ACTION_DELETE, resource_type,
+        ActionChoices.delete, resource_type,
         resource=instance, before=model_to_dict(instance)
     )
 

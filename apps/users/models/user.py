@@ -1,31 +1,33 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-import uuid
 import base64
-import string
-import random
 import datetime
+import random
+import string
+import uuid
 from typing import Callable
 
-from django.db import models
 from django.conf import settings
-from django.utils import timezone
-from django.core.cache import cache
-from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.hashers import check_password
-from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth.models import AbstractUser
+from django.core.cache import cache
+from django.db import models
 from django.shortcuts import reverse
+from django.utils import timezone
 from django.utils.module_loading import import_string
+from django.utils.translation import ugettext_lazy as _
 
-from orgs.utils import current_org
-from orgs.models import Organization
-from rbac.const import Scope
 from common.db import fields, models as jms_models
 from common.utils import (
-    date_expired_default, get_logger, lazyproperty, random_string, bulk_create_with_signal
+    date_expired_default, get_logger, lazyproperty,
+    random_string, bulk_create_with_signal
 )
-from ..signals import post_user_change_password, post_user_leave_org, pre_user_leave_org
+from orgs.utils import current_org
+from rbac.const import Scope
+from ..signals import (
+    post_user_change_password, post_user_leave_org, pre_user_leave_org
+)
 
 __all__ = ['User', 'UserPasswordHistory']
 
@@ -255,7 +257,7 @@ class RoleManager(models.Manager):
             self.user.expire_users_rbac_perms_cache()
             return result
         except Exception as e:
-            logger.error('Create role binding error: {}'.format(e))
+            logger.error('\tCreate role binding error: {}'.format(e))
 
     def set(self, roles, clear=False):
         if clear:

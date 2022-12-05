@@ -13,7 +13,6 @@ def migrate_db_oracle_version_to_attrs(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('applications', '0021_auto_20220629_1826'),
     ]

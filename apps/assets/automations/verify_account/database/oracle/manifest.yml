@@ -1,0 +1,6 @@
+id: verify_account_oracle
+name: Verify account from Oracle
+category: database
+type:
+  - oracle
+method: verify_account

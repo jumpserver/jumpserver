@@ -1,0 +1,6 @@
+id: sqlserver_ping
+name: Ping SQLServer
+category: database
+type:
+  - sqlserver
+method: ping

@@ -1,10 +1,10 @@
-from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView
+from rest_framework.response import Response
 
 from common.utils import reverse, lazyproperty
 from orgs.utils import tmp_to_org
-from ..models import LoginAssetACL
 from .. import serializers
+from ..models import LoginAssetACL
 
 __all__ = ['LoginAssetCheckAPI']
 
@@ -20,34 +20,40 @@ class LoginAssetCheckAPI(CreateAPIView):
         return LoginAssetACL.objects.all()
 
     def create(self, request, *args, **kwargs):
-        is_need_confirm, response_data = self.check_if_need_confirm()
-        return Response(data=response_data, status=200)
+        data = self.check_confirm()
+        return Response(data=data, status=200)
 
-    def check_if_need_confirm(self):
-        queries = {
-            'user': self.serializer.user, 'asset': self.serializer.asset,
-            'system_user': self.serializer.system_user,
-            'action': LoginAssetACL.ActionChoices.login_confirm
-        }
-        with tmp_to_org(self.serializer.org):
-            acl = LoginAssetACL.filter(**queries).valid().first()
+    @lazyproperty
+    def serializer(self):
+        serializer = self.get_serializer(data=self.request.data)
+        serializer.is_valid(raise_exception=True)
+        return serializer
 
-        if not acl:
-            is_need_confirm = False
-            response_data = {}
-        else:
-            is_need_confirm = True
+    def check_confirm(self):
+        with tmp_to_org(self.serializer.asset.org):
+            kwargs = {
+                'user': self.serializer.user,
+                'asset': self.serializer.asset,
+                'account_username': self.serializer.validated_data.get('account_username'),
+                'action': LoginAssetACL.ActionChoices.review
+            }
+            acl = LoginAssetACL.filter_queryset(**kwargs).valid().first()
+        if acl:
+            need_confirm = True
             response_data = self._get_response_data_of_need_confirm(acl)
-        response_data['need_confirm'] = is_need_confirm
-        return is_need_confirm, response_data
+        else:
+            need_confirm = False
+            response_data = {}
+        response_data['need_confirm'] = need_confirm
+        return response_data
 
-    def _get_response_data_of_need_confirm(self, acl):
+    def _get_response_data_of_need_confirm(self, acl) -> dict:
         ticket = LoginAssetACL.create_login_asset_confirm_ticket(
             user=self.serializer.user,
             asset=self.serializer.asset,
-            system_user=self.serializer.system_user,
+            account_username=self.serializer.validated_data.get('account_username'),
             assignees=acl.reviewers.all(),
-            org_id=self.serializer.org.id,
+            org_id=self.serializer.asset.org.id,
         )
         confirm_status_url = reverse(
             view_name='api-tickets:super-ticket-status',
@@ -68,10 +74,3 @@ class LoginAssetCheckAPI(CreateAPIView):
             'ticket_id': str(ticket.id)
         }
         return data
-
-    @lazyproperty
-    def serializer(self):
-        serializer = self.get_serializer(data=self.request.data)
-        serializer.is_valid(raise_exception=True)
-        return serializer
-

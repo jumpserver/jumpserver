@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 
 from common.utils import get_logger
+from common.db.models import JMSBaseModel
 from ..utils import (
     set_current_org, get_current_org, current_org, filter_org_queryset
 )
@@ -14,21 +15,20 @@ from ..models import Organization
 logger = get_logger(__file__)
 
 __all__ = [
-    'OrgManager', 'OrgModelMixin', 'Organization'
+    'OrgManager', 'OrgModelMixin', 'JMSOrgBaseModel'
 ]
 
 
 class OrgManager(models.Manager):
-
     def all_group_by_org(self):
         from ..models import Organization
         orgs = list(Organization.objects.all())
-        querysets = {}
+        org_queryset = {}
         for org in orgs:
             org_id = org.id
             queryset = super(OrgManager, self).get_queryset().filter(org_id=org_id)
-            querysets[org] = queryset
-        return querysets
+            org_queryset[org] = queryset
+        return org_queryset
 
     def get_queryset(self):
         queryset = super(OrgManager, self).get_queryset()
@@ -45,7 +45,7 @@ class OrgManager(models.Manager):
         for obj in objs:
             if org.is_root():
                 if not obj.org_id:
-                    raise ValidationError('Please save in a organization')
+                    raise ValidationError('Please save in a org')
             else:
                 obj.org_id = org.id
         return super().bulk_create(objs, batch_size, ignore_conflicts)
@@ -53,20 +53,24 @@ class OrgManager(models.Manager):
 
 class OrgModelMixin(models.Model):
     org_id = models.CharField(
-        max_length=36, blank=True, default='', verbose_name=_("Organization"), db_index=True
+        max_length=36, blank=True, default='',
+        verbose_name=_("Organization"), db_index=True
     )
     objects = OrgManager()
-
     sep = '@'
 
     def save(self, *args, **kwargs):
-        org = get_current_org()
+        locking_org = getattr(self, 'LOCKING_ORG', None)
+        if locking_org:
+            org = Organization.get_instance(locking_org)
+        else:
+            org = get_current_org()
         # 这里不可以优化成, 因为 root 组织下可以设置组织 id 来保存
         # if org.is_root() and not self.org_id:
         #     raise ...
         if org.is_root():
             if not self.org_id:
-                raise ValidationError('Please save in a organization')
+                raise ValidationError('Please save in a org')
         else:
             self.org_id = org.id
         return super().save(*args, **kwargs)
@@ -86,8 +90,6 @@ class OrgModelMixin(models.Model):
             name = getattr(self, attr)
         elif hasattr(self, 'name'):
             name = self.name
-        elif hasattr(self, 'hostname'):
-            name = self.hostname
         return name + self.sep + self.org_name
 
     def validate_unique(self, exclude=None):
@@ -110,5 +112,10 @@ class OrgModelMixin(models.Model):
         if errors:
             raise ValidationError(errors)
 
+    class Meta:
+        abstract = True
+
+
+class JMSOrgBaseModel(JMSBaseModel, OrgModelMixin):
     class Meta:
         abstract = True

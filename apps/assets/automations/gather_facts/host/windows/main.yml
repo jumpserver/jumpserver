@@ -1,0 +1,18 @@
+- hosts: windows
+  gather_facts: yes
+  tasks:
+    - name: Get info
+      set_fact:
+        info:
+          arch: "{{ ansible_architecture2 }}"
+          distribution: "{{ ansible_distribution }}"
+          distribution_version: "{{ ansible_distribution_version }}"
+          kernel: "{{ ansible_kernel }}"
+          vendor: "{{ ansible_system_vendor }}"
+          model: "{{ ansible_product_name }}"
+          sn: "{{ ansible_product_serial }}"
+          cpu_vcpus: "{{ ansible_processor_vcpus }}"
+          memory: "{{ ansible_memtotal_mb }}"
+
+    - debug:
+        var: info

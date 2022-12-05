@@ -1,0 +1,7 @@
+id: verify_account_windows
+name: Verify account windows
+version: 1
+method: verify_account
+category: host
+type:
+  - windows

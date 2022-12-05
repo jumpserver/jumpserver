@@ -1,3 +1,4 @@
+import multiprocessing
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import TextChoices
 from .utils import ServicesUtil
@@ -6,7 +7,6 @@ from .hands import *
 
 class Services(TextChoices):
     gunicorn = 'gunicorn', 'gunicorn'
-    daphne = 'daphne', 'daphne'
     celery_ansible = 'celery_ansible', 'celery_ansible'
     celery_default = 'celery_default', 'celery_default'
     beat = 'beat', 'beat'
@@ -22,7 +22,6 @@ class Services(TextChoices):
         from . import services
         services_map = {
             cls.gunicorn.value: services.GunicornService,
-            cls.daphne: services.DaphneService,
             cls.flower: services.FlowerService,
             cls.celery_default: services.CeleryDefaultService,
             cls.celery_ansible: services.CeleryAnsibleService,
@@ -31,12 +30,8 @@ class Services(TextChoices):
         return services_map.get(name)
 
     @classmethod
-    def ws_services(cls):
-        return [cls.daphne]
-
-    @classmethod
     def web_services(cls):
-        return [cls.gunicorn, cls.daphne, cls.flower]
+        return [cls.gunicorn, cls.flower]
 
     @classmethod
     def celery_services(cls):
@@ -97,11 +92,15 @@ class BaseActionCommand(BaseCommand):
         super().__init__(*args, **kwargs)
 
     def add_arguments(self, parser):
+        cores = 10
+        if (multiprocessing.cpu_count() * 2 + 1) < cores:
+            cores = multiprocessing.cpu_count() * 2 + 1
+
         parser.add_argument(
             'services',  nargs='+', choices=Services.export_services_values(), help='Service',
         )
         parser.add_argument('-d', '--daemon', nargs="?", const=True)
-        parser.add_argument('-w', '--worker', type=int, nargs="?", default=4)
+        parser.add_argument('-w', '--worker', type=int, nargs="?", default=cores)
         parser.add_argument('-f', '--force', nargs="?", const=True)
 
     def initial_util(self, *args, **options):

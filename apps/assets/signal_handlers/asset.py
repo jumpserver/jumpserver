@@ -8,11 +8,10 @@ from django.dispatch import receiver
 from common.const.signals import POST_ADD, POST_REMOVE, PRE_REMOVE
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
-from assets.models import Asset, SystemUser, Node
+from assets.models import Asset, Node
 from assets.tasks import (
     update_assets_hardware_info_util,
     test_asset_connectivity_util,
-    push_system_user_to_assets,
 )
 
 logger = get_logger(__file__)
@@ -52,8 +51,6 @@ def on_asset_created_or_update(sender, instance=None, created=False, **kwargs):
         if not has_node:
             instance.nodes.add(Node.org_root())
 
-    instance.set_admin_user_relation()
-
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
 def on_asset_nodes_add(instance, action, reverse, pk_set, **kwargs):
@@ -79,32 +76,32 @@ def on_asset_nodes_add(instance, action, reverse, pk_set, **kwargs):
         nodes_ancestors_keys.update(Node.get_node_ancestor_keys(node, with_self=True))
 
     # 查询所有祖先节点关联的系统用户，都是要跟资产建立关系的
-    system_user_ids = SystemUser.objects.filter(
-        nodes__key__in=nodes_ancestors_keys
-    ).distinct().values_list('id', flat=True)
+    # system_user_ids = SystemUser.objects.filter(
+    #     nodes__key__in=nodes_ancestors_keys
+    # ).distinct().values_list('id', flat=True)
 
     # 查询所有已存在的关系
-    m2m_model = SystemUser.assets.through
-    exist = set(m2m_model.objects.filter(
-        systemuser_id__in=system_user_ids, asset_id__in=asset_ids
-    ).values_list('systemuser_id', 'asset_id'))
+    # m2m_model = SystemUser.assets.through
+    # exist = set(m2m_model.objects.filter(
+    #     systemuser_id__in=system_user_ids, asset_id__in=asset_ids
+    # ).values_list('systemuser_id', 'asset_id'))
     # TODO 优化
-    to_create = []
-    for system_user_id in system_user_ids:
-        asset_ids_to_push = []
-        for asset_id in asset_ids:
-            if (system_user_id, asset_id) in exist:
-                continue
-            asset_ids_to_push.append(asset_id)
-            to_create.append(m2m_model(
-                systemuser_id=system_user_id,
-                asset_id=asset_id,
-                org_id=instance.org_id
-            ))
-        if asset_ids_to_push:
-            push_system_user_to_assets.delay(system_user_id, asset_ids_to_push)
-    m2m_model.objects.bulk_create(to_create)
-
+    # to_create = []
+    # for system_user_id in system_user_ids:
+    #     asset_ids_to_push = []
+    #     for asset_id in asset_ids:
+    #         if (system_user_id, asset_id) in exist:
+    #             continue
+    #         asset_ids_to_push.append(asset_id)
+    #         to_create.append(m2m_model(
+    #             systemuser_id=system_user_id,
+    #             asset_id=asset_id,
+    #             org_id=instance.org_id
+    #         ))
+    #     if asset_ids_to_push:
+    #         push_system_user_to_assets.delay(system_user_id, asset_ids_to_push)
+    # m2m_model.objects.bulk_create(to_create)
+    #
 
 RELATED_NODE_IDS = '_related_node_ids'
 

@@ -1,13 +1,14 @@
 # ~*~ coding: utf-8 ~*~
 from functools import partial
 from collections import namedtuple, defaultdict
+from django.core.exceptions import PermissionDenied
 
 from rest_framework import status
+from rest_framework.generics import get_object_or_404
 from rest_framework.serializers import ValidationError
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.utils.translation import ugettext_lazy as _
-from django.shortcuts import get_object_or_404, Http404
 from django.db.models.signals import m2m_changed
 
 from common.const.http import POST
@@ -15,7 +16,7 @@ from common.exceptions import SomeoneIsDoingThis
 from common.const.signals import PRE_REMOVE, POST_REMOVE
 from common.mixins.api import SuggestionMixin
 from assets.models import Asset
-from common.utils import get_logger, get_object_or_none
+from common.utils import get_logger
 from common.tree import TreeNodeSerializer
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
@@ -27,6 +28,7 @@ from ..tasks import (
     check_node_assets_amount_task
 )
 from .. import serializers
+from ..const import AllTypes
 from .mixin import SerializeToTreeNodeMixin
 from assets.locks import NodeAddChildrenLock
 
@@ -34,9 +36,8 @@ logger = get_logger(__file__)
 __all__ = [
     'NodeViewSet', 'NodeChildrenApi', 'NodeAssetsApi',
     'NodeAddAssetsApi', 'NodeRemoveAssetsApi', 'MoveAssetsToNodeApi',
-    'NodeAddChildrenApi', 'NodeListAsTreeApi',
-    'NodeChildrenAsTreeApi',
-    'NodeTaskCreateApi',
+    'NodeAddChildrenApi', 'NodeListAsTreeApi', 'NodeChildrenAsTreeApi',
+    'NodeTaskCreateApi', 'CategoryTreeApi',
 ]
 
 
@@ -200,10 +201,24 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
         if not self.instance or not include_assets:
             return []
         assets = self.instance.get_assets().only(
-            "id", "hostname", "ip", "os", "platform_id",
-            "org_id", "protocols", "is_active",
+            "id", "name", "address", "platform_id",
+            "org_id", "is_active",
         ).prefetch_related('platform')
         return self.serialize_assets(assets, self.instance.key)
+
+
+class CategoryTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
+    serializer_class = TreeNodeSerializer
+
+    def check_permissions(self, request):
+        if not request.user.has_perm('assets.view_asset'):
+            raise PermissionDenied
+        return True
+
+    def list(self, request, *args, **kwargs):
+        nodes = AllTypes.to_tree_nodes()
+        serializer = self.get_serializer(nodes, many=True)
+        return Response(data=serializer.data)
 
 
 class NodeAssetsApi(generics.ListAPIView):
@@ -324,7 +339,7 @@ class NodeTaskCreateApi(generics.CreateAPIView):
 
     def get_object(self):
         node_id = self.kwargs.get('pk')
-        node = get_object_or_none(self.model, id=node_id)
+        node = get_object_or_404(self.model, id=node_id)
         return node
 
     @staticmethod
@@ -346,8 +361,6 @@ class NodeTaskCreateApi(generics.CreateAPIView):
             task = self.refresh_nodes_cache()
             self.set_serializer_data(serializer, task)
             return
-        if node is None:
-            raise Http404()
         if action == "refresh":
             task = update_node_assets_hardware_info_manual.delay(node)
         else:

@@ -1,0 +1,7 @@
+id: gather_accounts_posix
+name: Gather posix account
+category: host
+type:
+  - linux
+  - unix
+method: gather_accounts

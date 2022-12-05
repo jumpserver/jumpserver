@@ -2,18 +2,18 @@
 #
 
 from __future__ import unicode_literals
-from django.views.generic.base import TemplateView
-from django.shortcuts import redirect, reverse
 from django.core.cache import cache
+from django.shortcuts import redirect, reverse
+from django.views.generic.base import TemplateView
 from django.utils.translation import ugettext as _
 
 from orgs.utils import tmp_to_root_org
-from tickets.models import (
-    Ticket, ApplyAssetTicket, ApplyApplicationTicket,
-    ApplyLoginTicket, ApplyLoginAssetTicket, ApplyCommandTicket
-)
 from tickets.const import TicketType
 from tickets.errors import AlreadyClosed
+from tickets.models import (
+    Ticket, ApplyAssetTicket,
+    ApplyLoginTicket, ApplyLoginAssetTicket, ApplyCommandTicket
+)
 from common.utils import get_logger, FlashMessageUtil
 
 logger = get_logger(__name__)
@@ -27,7 +27,6 @@ class TicketDirectApproveView(TemplateView):
 
     TICKET_SUB_MODEL_MAP = {
         TicketType.apply_asset: ApplyAssetTicket,
-        TicketType.apply_application: ApplyApplicationTicket,
         TicketType.login_confirm: ApplyLoginTicket,
         TicketType.login_asset_confirm: ApplyLoginAssetTicket,
         TicketType.command_confirm: ApplyCommandTicket,

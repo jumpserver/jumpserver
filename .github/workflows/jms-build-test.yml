@@ -1,0 +1,32 @@
+name: "Run Build Test"
+on:
+  push:
+    branches:
+      - pr@*
+      - repr@*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: docker/setup-qemu-action@v2
+
+    - uses: docker/setup-buildx-action@v2
+
+    - uses: docker/build-push-action@v3
+      with:
+        context: .
+        push: false
+        tags: jumpserver/core:test
+        file: Dockerfile
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - uses: LouisBrunner/checks-action@v1.5.0
+      if: always()
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        name: Check Build
+        conclusion: ${{ job.status }}

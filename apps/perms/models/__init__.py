@@ -2,5 +2,5 @@
 #
 
 from .asset_permission import *
-from .application_permission import *
-from .base import *
+from .perm_node import *
+from .perm_token import *

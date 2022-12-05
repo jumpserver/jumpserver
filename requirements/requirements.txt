@@ -1,5 +1,7 @@
+aiofiles==22.1.0
 amqp==5.0.9
-ansible==2.10.7
+ansible==6.4.0
+ansible-runner==2.2.1
 asn1crypto==0.24.0
 bcrypt==3.1.4
 billiard==3.6.4.0
@@ -23,7 +25,7 @@ paramiko==2.11.0
 passlib==1.7.4
 pyasn1==0.4.8
 pycparser==2.21
-cryptography==36.0.1
+cryptography==37.0.4
 pycryptodome==3.15.0
 pycryptodomex==3.15.0
 gmssl==3.2.1
@@ -75,6 +77,7 @@ djangorestframework==3.13.1
 djangorestframework-bulk==0.2.1
 django-simple-history==3.1.1
 drf-nested-routers==0.93.4
+drf-writable-nested==0.6.4
 rest_condition==1.0.3
 drf-yasg==1.20.0
 coreapi==2.3.3
@@ -84,9 +87,8 @@ Pillow==9.3.0
 pytz==2022.1
 # Runtime
 django-proxy==1.2.1
-channels-redis==4.0.0
+channels-redis==3.4.0
 channels==3.0.4
-daphne==3.0.2
 python-daemon==2.3.0
 eventlet==0.33.1
 greenlet==1.1.2
@@ -95,6 +97,8 @@ celery==5.2.7
 flower==1.2.0
 django-celery-beat==2.3.0
 kombu==5.2.4
+uvicorn==0.20.0
+websockets==10.4
 # Auth
 python-ldap==3.4.0
 ldap3==2.9.1
@@ -130,12 +134,13 @@ mysqlclient==2.1.0
 PyMySQL==1.0.2
 oracledb==1.0.1
 psycopg2-binary==2.9.1
-pymssql==2.1.5
+pymssql==2.2.5
 django-mysql==3.9.0
 django-redis==5.2.0
 python-redis-lock==3.7.0
 pyOpenSSL==22.0.0
 redis==4.3.3
+pyOpenSSL==22.0.0
 pymongo==4.2.0
 # Debug
 ipython==8.4.0
@@ -143,3 +148,4 @@ ForgeryPy3==0.3.1
 django-debug-toolbar==3.5
 Pympler==1.0.1
 IPy==1.1
+psycopg2==2.9.4

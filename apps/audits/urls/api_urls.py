@@ -15,8 +15,8 @@ router.register(r'ftp-logs', api.FTPLogViewSet, 'ftp-log')
 router.register(r'login-logs', api.UserLoginLogViewSet, 'login-log')
 router.register(r'operate-logs', api.OperateLogViewSet, 'operate-log')
 router.register(r'password-change-logs', api.PasswordChangeLogViewSet, 'password-change-log')
-router.register(r'command-execution-logs', api.CommandExecutionViewSet, 'command-execution-log')
-router.register(r'command-executions-hosts-relations', api.CommandExecutionHostRelationViewSet, 'command-executions-hosts-relation')
+# router.register(r'command-execution-logs', api.CommandExecutionViewSet, 'command-execution-log')
+# router.register(r'command-executions-hosts-relations', api.CommandExecutionHostRelationViewSet, 'command-executions-hosts-relation')
 
 
 urlpatterns = [

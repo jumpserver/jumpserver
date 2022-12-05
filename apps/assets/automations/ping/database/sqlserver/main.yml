@@ -1,0 +1,15 @@
+- hosts: sqlserver
+  gather_facts: no
+  vars:
+    ansible_python_interpreter: /usr/local/bin/python
+
+  tasks:
+    - name: Test SQLServer connection
+      community.general.mssql_script:
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        name: '{{ jms_asset.specific.db_name }}'
+        script: |
+          SELECT @@version

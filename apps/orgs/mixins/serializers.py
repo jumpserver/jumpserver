@@ -5,7 +5,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from common.validators import ProjectUniqueValidator
-from common.mixins import BulkSerializerMixin, CommonSerializerMixin
+from common.drf.serializers import BulkSerializerMixin, CommonSerializerMixin
 from ..utils import get_current_org_id_for_serializer
 
 
@@ -24,21 +24,22 @@ class OrgResourceSerializerMixin(CommonSerializerMixin, serializers.Serializer):
     """
     org_id = serializers.ReadOnlyField(default=get_current_org_id_for_serializer, label=_("Organization"))
     org_name = serializers.ReadOnlyField(label=_("Org name"))
+    add_org_fields = True
 
     def get_validators(self):
         _validators = super().get_validators()
         validators = []
 
         for v in _validators:
-            if isinstance(v, UniqueTogetherValidator) \
-                    and "org_id" in v.fields:
+            if isinstance(v, UniqueTogetherValidator) and "org_id" in v.fields:
                 v = ProjectUniqueValidator(v.queryset, v.fields)
             validators.append(v)
         return validators
 
     def get_field_names(self, declared_fields, info):
         fields = super().get_field_names(declared_fields, info)
-        fields.extend(["org_id", "org_name"])
+        if self.add_org_fields:
+            fields.extend(["org_id", "org_name"])
         return fields
 
 

@@ -1,0 +1,6 @@
+id: gather_accounts_oracle
+name: Gather account from Oracle
+category: database
+type:
+  - oracle
+method: gather_accounts

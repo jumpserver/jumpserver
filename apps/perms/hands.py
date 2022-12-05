@@ -2,12 +2,12 @@
 #
 
 from users.models import User, UserGroup
-from assets.models import Asset, SystemUser, Node, Label, FavoriteAsset
+from assets.models import Asset, Node, Label, FavoriteAsset, Account
 from assets.serializers import NodeSerializer
 
 __all__ = [
     'User', 'UserGroup',
-    'Asset', 'SystemUser', 'Node', 'Label', 'FavoriteAsset',
-    'NodeSerializer',
+    'Asset', 'Node', 'Label', 'FavoriteAsset',
+    'NodeSerializer', 'Account'
 ]
 

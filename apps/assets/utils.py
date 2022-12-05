@@ -53,7 +53,7 @@ def is_query_node_all_assets(request):
     return is_true(query_all_arg)
 
 
-def get_node(request):
+def get_node_from_request(request):
     node_id = dict_get_any(request.query_params, ['node', 'node_id'])
     if not node_id:
         return None
@@ -126,8 +126,8 @@ class NodeAssetsUtil:
         from assets.models import Node, Asset
 
         nodes = list(Node.objects.all())
-        nodes_assets = Asset.nodes.through.objects.all()\
-            .annotate(aid=output_as_string('asset_id'))\
+        nodes_assets = Asset.nodes.through.objects.all() \
+            .annotate(aid=output_as_string('asset_id')) \
             .values_list('node__key', 'aid')
 
         mapping = defaultdict(set)

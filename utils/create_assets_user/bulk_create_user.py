@@ -113,7 +113,7 @@ class UserCreation:
                 "username": username,
                 "password": password,
                 "protocol": protocol,
-                "auto_push": bool(int(auto_push)),
+                "auto_push_account": bool(int(auto_push)),
                 "login_mode": "auto"
             }
             users.append(info)

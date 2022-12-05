@@ -8,9 +8,9 @@ from common.db.utils import close_old_connections
 from common.decorator import Singleton
 from common.utils import get_disk_usage, get_cpu_load, get_memory_usage, get_logger
 
-from .serializers.terminal import TerminalRegistrationSerializer, StatusSerializer
-from .const import TerminalTypeChoices
-from .models.terminal import Terminal
+from .serializers.terminal import TerminalRegistrationSerializer, StatSerializer
+from .const import TerminalType
+from .models import Terminal
 
 __all__ = ['CoreTerminal', 'CeleryTerminal']
 
@@ -44,20 +44,23 @@ class BaseTerminal(object):
 
     def start_heartbeat(self):
         while True:
+            heartbeat_data = {
+                'cpu_load': get_cpu_load(),
+                'memory_used': get_memory_usage(),
+                'disk_used': get_disk_usage(path=settings.BASE_DIR),
+                'sessions': [],
+            }
+            status_serializer = StatSerializer(data=heartbeat_data)
+            status_serializer.is_valid()
+            status_serializer.validated_data.pop('sessions', None)
+            terminal = self.get_or_register_terminal()
+            status_serializer.validated_data['terminal'] = terminal
+
             try:
-                heartbeat_data = {
-                    'cpu_load': get_cpu_load(),
-                    'memory_used': get_memory_usage(),
-                    'disk_used': get_disk_usage(path=settings.BASE_DIR),
-                    'sessions': [],
-                }
-                status_serializer = StatusSerializer(data=heartbeat_data)
-                status_serializer.is_valid()
-                status_serializer.validated_data.pop('sessions', None)
-                terminal = self.get_or_register_terminal()
-                status_serializer.validated_data['terminal'] = terminal
                 status_serializer.save()
+                time.sleep(self.interval)
             except Exception:
+                print("Save status error, close old connections")
                 close_old_connections()
             finally:
                 time.sleep(self.interval)
@@ -89,8 +92,8 @@ class CoreTerminal(BaseTerminal):
 
     def __init__(self):
         super().__init__(
-            suffix_name=TerminalTypeChoices.core.label,
-            _type=TerminalTypeChoices.core.value
+            suffix_name=TerminalType.core.label,
+            _type=TerminalType.core.value
         )
 
 
@@ -98,6 +101,6 @@ class CoreTerminal(BaseTerminal):
 class CeleryTerminal(BaseTerminal):
     def __init__(self):
         super().__init__(
-            suffix_name=TerminalTypeChoices.celery.label,
-            _type=TerminalTypeChoices.celery.value
+            suffix_name=TerminalType.celery.label,
+            _type=TerminalType.celery.value
         )

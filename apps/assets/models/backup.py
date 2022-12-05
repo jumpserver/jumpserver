@@ -10,43 +10,18 @@ from django.utils.translation import ugettext_lazy as _
 from orgs.mixins.models import OrgModelMixin
 from ops.mixin import PeriodTaskModelMixin
 from common.utils import get_logger
+from common.const.choices import Trigger
 from common.db.encoder import ModelJSONFieldEncoder
-from common.db.models import BitOperationChoice
 from common.mixins.models import CommonModelMixin
 
-__all__ = ['AccountBackupPlan', 'AccountBackupPlanExecution', 'Type']
+__all__ = ['AccountBackupPlan', 'AccountBackupPlanExecution']
 
 logger = get_logger(__file__)
 
 
-class Type(BitOperationChoice):
-    NONE = 0
-    ALL = 0xff
-
-    Asset = 0b1
-    App = 0b1 << 1
-
-    DB_CHOICES = (
-        (ALL, _('All')),
-        (Asset, _('Asset')),
-        (App, _('Application'))
-    )
-
-    NAME_MAP = {
-        ALL: "all",
-        Asset: "asset",
-        App: "application"
-    }
-
-    NAME_MAP_REVERSE = {v: k for k, v in NAME_MAP.items()}
-    CHOICES = []
-    for i, j in DB_CHOICES:
-        CHOICES.append((NAME_MAP[i], j))
-
-
 class AccountBackupPlan(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    types = models.IntegerField(choices=Type.DB_CHOICES, default=Type.ALL, verbose_name=_('Type'))
+    types = models.JSONField(default=list)
     recipients = models.ManyToManyField(
         'users.User', related_name='recipient_escape_route_plans', blank=True,
         verbose_name=_("Recipient")
@@ -65,7 +40,7 @@ class AccountBackupPlan(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
         from ..tasks import execute_account_backup_plan
         name = "account_backup_plan_period_{}".format(str(self.id)[:8])
         task = execute_account_backup_plan.name
-        args = (str(self.id), AccountBackupPlanExecution.Trigger.timing)
+        args = (str(self.id), Trigger.timing)
         kwargs = {}
         return name, task, args, kwargs
 
@@ -77,7 +52,7 @@ class AccountBackupPlan(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
             'crontab': self.crontab,
             'org_id': self.org_id,
             'created_by': self.created_by,
-            'types': Type.value_to_choices(self.types),
+            'types': self.types,
             'recipients': {
                 str(recipient.id): (str(recipient), bool(recipient.secret_key))
                 for recipient in self.recipients.all()
@@ -96,10 +71,6 @@ class AccountBackupPlan(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
 
 
 class AccountBackupPlanExecution(OrgModelMixin):
-    class Trigger(models.TextChoices):
-        manual = 'manual', _('Manual trigger')
-        timing = 'timing', _('Timing trigger')
-
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     date_start = models.DateTimeField(
         auto_now_add=True, verbose_name=_('Date start')
@@ -139,7 +110,11 @@ class AccountBackupPlanExecution(OrgModelMixin):
             return []
         return recipients.values()
 
+    @property
+    def manager_type(self):
+        return 'backup_account'
+
     def start(self):
-        from ..task_handlers import ExecutionManager
+        from assets.automations.endpoint import ExecutionManager
         manager = ExecutionManager(execution=self)
         return manager.run()

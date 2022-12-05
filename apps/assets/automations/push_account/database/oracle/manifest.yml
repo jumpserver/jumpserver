@@ -1,0 +1,6 @@
+id: push_account_oracle
+name: Push account from Oracle
+category: database
+type:
+  - oracle
+method: push_account

@@ -1,20 +1,33 @@
 # -*- coding: utf-8 -*-
 #
 import json
-from django.db import models
-from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import force_text
-from django.core.validators import MinValueValidator, MaxValueValidator
-from common.utils import signer, crypto
-from common.local import add_encrypted_field_set
 
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db import models
+from django.utils.encoding import force_text
+from django.utils.translation import ugettext_lazy as _
+
+from common.local import add_encrypted_field_set
+from common.utils import signer, crypto
 
 __all__ = [
-    'JsonMixin', 'JsonDictMixin', 'JsonListMixin', 'JsonTypeMixin',
-    'JsonCharField', 'JsonTextField', 'JsonListCharField', 'JsonListTextField',
-    'JsonDictCharField', 'JsonDictTextField', 'EncryptCharField',
-    'EncryptTextField', 'EncryptMixin', 'EncryptJsonDictTextField',
-    'EncryptJsonDictCharField', 'PortField'
+    "JsonMixin",
+    "JsonDictMixin",
+    "JsonListMixin",
+    "JsonTypeMixin",
+    "JsonCharField",
+    "JsonTextField",
+    "JsonListCharField",
+    "JsonListTextField",
+    "JsonDictCharField",
+    "JsonDictTextField",
+    "EncryptCharField",
+    "EncryptTextField",
+    "EncryptMixin",
+    "EncryptJsonDictTextField",
+    "EncryptJsonDictCharField",
+    "PortField",
+    "BitChoices",
 ]
 
 
@@ -115,13 +128,13 @@ class EncryptMixin:
     """
 
     def decrypt_from_signer(self, value):
-        return signer.unsign(value) or ''
+        return signer.unsign(value) or ""
 
     def from_db_value(self, value, expression, connection, context=None):
         if value is None:
             return value
-        value = force_text(value)
 
+        value = force_text(value)
         plain_value = crypto.decrypt(value)
 
         # 如果没有解开，使用原来的signer解密
@@ -130,7 +143,7 @@ class EncryptMixin:
 
         # 可能和Json mix，所以要先解密，再json
         sp = super()
-        if hasattr(sp, 'from_db_value'):
+        if hasattr(sp, "from_db_value"):
             plain_value = sp.from_db_value(plain_value, expression, connection, context)
         return plain_value
 
@@ -140,7 +153,7 @@ class EncryptMixin:
 
         # 先 json 再解密
         sp = super()
-        if hasattr(sp, 'get_prep_value'):
+        if hasattr(sp, "get_prep_value"):
             value = sp.get_prep_value(value)
         value = force_text(value)
         # 替换新的加密方式
@@ -158,12 +171,12 @@ class EncryptTextField(EncryptMixin, models.TextField):
 class EncryptCharField(EncryptMixin, models.CharField):
     @staticmethod
     def change_max_length(kwargs):
-        kwargs.setdefault('max_length', 1024)
-        max_length = kwargs.get('max_length')
+        kwargs.setdefault("max_length", 1024)
+        max_length = kwargs.get("max_length")
         if max_length < 129:
             max_length = 128
         max_length = max_length * 2
-        kwargs['max_length'] = max_length
+        kwargs["max_length"] = max_length
 
     def __init__(self, *args, **kwargs):
         self.change_max_length(kwargs)
@@ -172,10 +185,10 @@ class EncryptCharField(EncryptMixin, models.CharField):
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
-        max_length = kwargs.pop('max_length')
+        max_length = kwargs.pop("max_length")
         if max_length > 255:
             max_length = max_length // 2
-        kwargs['max_length'] = max_length
+        kwargs["max_length"] = max_length
         return name, path, args, kwargs
 
 
@@ -193,10 +206,50 @@ class EncryptJsonDictCharField(EncryptMixin, JsonDictCharField):
 
 class PortField(models.IntegerField):
     def __init__(self, *args, **kwargs):
-        kwargs.update({
-            'blank': False,
-            'null': False,
-            'validators': [MinValueValidator(0), MaxValueValidator(65535)]
-        })
+        kwargs.update(
+            {
+                "blank": False,
+                "null": False,
+                "validators": [MinValueValidator(0), MaxValueValidator(65535)],
+            }
+        )
         super().__init__(*args, **kwargs)
 
+
+class BitChoices(models.IntegerChoices):
+    @classmethod
+    def branches(cls):
+        return [i for i in cls]
+
+    @classmethod
+    def is_tree(cls):
+        return False
+
+    @classmethod
+    def tree(cls):
+        if not cls.is_tree():
+            return []
+        root = [_("All"), cls.branches()]
+        return [cls.render_node(root)]
+
+    @classmethod
+    def render_node(cls, node):
+        if isinstance(node, BitChoices):
+            return {
+                "value": node.name,
+                "label": node.label,
+            }
+        else:
+            name, children = node
+            return {
+                "value": name,
+                "label": name,
+                "children": [cls.render_node(child) for child in children],
+            }
+
+    @classmethod
+    def all(cls):
+        value = 0
+        for c in cls:
+            value |= c.value
+        return value

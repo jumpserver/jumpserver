@@ -3,6 +3,9 @@
 import os
 import re
 import pytz
+import time
+import json
+
 from django.utils import timezone
 from django.shortcuts import HttpResponse
 from django.conf import settings
@@ -91,4 +94,38 @@ class RefererCheckMiddleware:
         if not match:
             return HttpResponseForbidden('CSRF CHECK ERROR')
         response = self.get_response(request)
+        return response
+
+
+class StartMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+        if not settings.DEBUG_DEV:
+            raise MiddlewareNotUsed
+
+    def __call__(self, request):
+        request._s_time_start = time.time()
+        response = self.get_response(request)
+        request._s_time_end = time.time()
+        if request.path == '/api/health/':
+            data = response.data
+            data['pre_middleware_time'] = request._e_time_start - request._s_time_start
+            data['api_time'] = request._e_time_end - request._e_time_start
+            data['post_middleware_time'] = request._s_time_end - request._e_time_end
+            response.content = json.dumps(data)
+            response.headers['Content-Length'] = str(len(response.content))
+            return response
+        return response
+
+
+class EndMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+        if not settings.DEBUG_DEV:
+            raise MiddlewareNotUsed
+
+    def __call__(self, request):
+        request._e_time_start = time.time()
+        response = self.get_response(request)
+        request._e_time_end = time.time()
         return response

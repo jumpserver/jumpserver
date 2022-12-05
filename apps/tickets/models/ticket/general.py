@@ -5,26 +5,28 @@ from typing import Callable
 
 from django.db import models
 from django.db.models import Q
-from django.utils.translation import ugettext_lazy as _
+from django.forms import model_to_dict
 from django.db.utils import IntegrityError
 from django.db.models.fields import related
-from django.forms import model_to_dict
+from django.utils.translation import ugettext_lazy as _
 
+from orgs.utils import tmp_to_org
+from orgs.models import Organization
 from common.exceptions import JMSException
 from common.utils.timezone import as_current_tz
 from common.mixins.models import CommonModelMixin
 from common.db.encoder import ModelJSONFieldEncoder
-from orgs.models import Organization
-from orgs.utils import tmp_to_org
 from tickets.const import (
     TicketType, TicketStatus, TicketState,
     TicketLevel, StepState, StepStatus
 )
-from tickets.handlers import get_ticket_handler
 from tickets.errors import AlreadyClosed
+from tickets.handlers import get_ticket_handler
 from ..flow import TicketFlow
 
-__all__ = ['Ticket', 'TicketStep', 'TicketAssignee', 'SuperTicket', 'SubTicketManager']
+__all__ = [
+    'Ticket', 'TicketStep', 'TicketAssignee', 'SuperTicket', 'SubTicketManager'
+]
 
 
 class TicketStep(CommonModelMixin):
@@ -204,11 +206,11 @@ class StatusMixin:
 
             step_info = {
                 'state': state,
-                'approval_level': step.level,
                 'assignees': assignee_ids,
+                'processor': processor_id,
+                'approval_level': step.level,
                 'assignees_display': assignees_display,
                 'approval_date': str(step.date_updated),
-                'processor': processor_id,
                 'processor_display': processor_display
             }
             process_map.append(step_info)
@@ -224,15 +226,15 @@ class StatusMixin:
         org_id = self.flow.org_id
         flow_rules = self.flow.rules.order_by('level')
         for rule in flow_rules:
-            step = TicketStep.objects.create(ticket=self, level=rule.level)
             assignees = rule.get_assignees(org_id=org_id)
             assignees = self.exclude_applicant(assignees, self.applicant)
+            step = TicketStep.objects.create(ticket=self, level=rule.level)
             step_assignees = [TicketAssignee(step=step, assignee=user) for user in assignees]
             TicketAssignee.objects.bulk_create(step_assignees)
 
     def create_process_steps_by_assignees(self, assignees):
-        assignees = self.exclude_applicant(assignees, self.applicant)
         step = TicketStep.objects.create(ticket=self, level=1)
+        assignees = self.exclude_applicant(assignees, self.applicant)
         ticket_assignees = [TicketAssignee(step=step, assignee=user) for user in assignees]
         TicketAssignee.objects.bulk_create(ticket_assignees)
 
@@ -248,14 +250,13 @@ class StatusMixin:
     @property
     def processor(self):
         processor = self.current_step.ticket_assignees \
-            .exclude(state=StepState.pending) \
-            .first()
+            .exclude(state=StepState.pending).first()
         return processor.assignee if processor else None
 
     def has_current_assignee(self, assignee):
         return self.ticket_steps.filter(
+            level=self.approval_step,
             ticket_assignees__assignee=assignee,
-            level=self.approval_step
         ).exists()
 
     def has_all_assignee(self, assignee):
@@ -282,19 +283,19 @@ class Ticket(StatusMixin, CommonModelMixin):
     )
     # 申请人
     applicant = models.ForeignKey(
-        'users.User', related_name='applied_tickets', on_delete=models.SET_NULL,
-        null=True, verbose_name=_("Applicant")
+        'users.User', related_name='applied_tickets', null=True,
+        on_delete=models.SET_NULL, verbose_name=_("Applicant")
     )
-    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
     flow = models.ForeignKey(
-        'TicketFlow', related_name='tickets', on_delete=models.SET_NULL,
-        null=True, verbose_name=_('TicketFlow')
+        'TicketFlow', related_name='tickets', null=True,
+        on_delete=models.SET_NULL, verbose_name=_('TicketFlow')
     )
     approval_step = models.SmallIntegerField(
         default=TicketLevel.one, choices=TicketLevel.choices, verbose_name=_('Approval step')
     )
-    serial_num = models.CharField(_('Serial number'), max_length=128, unique=True, null=True)
+    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
     rel_snapshot = models.JSONField(verbose_name=_('Relation snapshot'), default=dict)
+    serial_num = models.CharField(_('Serial number'), max_length=128, unique=True, null=True)
     meta = models.JSONField(encoder=ModelJSONFieldEncoder, default=dict, verbose_name=_("Meta"))
     org_id = models.CharField(
         max_length=36, blank=True, default='', verbose_name=_('Organization'), db_index=True
@@ -324,7 +325,7 @@ class Ticket(StatusMixin, CommonModelMixin):
     @classmethod
     def get_user_related_tickets(cls, user):
         queries = Q(applicant=user) | Q(ticket_steps__ticket_assignees__assignee=user)
-        tickets = cls.objects.all().filter(queries).distinct()
+        tickets = cls.objects.filter(queries).distinct()
         return tickets
 
     def get_current_ticket_flow_approve(self):
@@ -398,15 +399,17 @@ class Ticket(StatusMixin, CommonModelMixin):
             value = self.rel_snapshot[name]
         elif isinstance(field, related.ManyToManyField):
             value = ', '.join(self.rel_snapshot[name])
+        elif isinstance(value, list):
+            value = ', '.join(value)
         return value
 
     def get_local_snapshot(self):
+        snapshot = {}
+        excludes = ['ticket_ptr']
         fields = self._meta._forward_fields_map
         json_data = json.dumps(model_to_dict(self), cls=ModelJSONFieldEncoder)
         data = json.loads(json_data)
-        snapshot = {}
         local_fields = self._meta.local_fields + self._meta.local_many_to_many
-        excludes = ['ticket_ptr']
         item_names = [field.name for field in local_fields if field.name not in excludes]
         for name in item_names:
             field = fields[name]

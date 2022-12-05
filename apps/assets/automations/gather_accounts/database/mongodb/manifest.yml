@@ -1,0 +1,6 @@
+id: gather_accounts_mongodb
+name: Gather account from MongoDB
+category: database
+type:
+  - mongodb
+method: gather_accounts
