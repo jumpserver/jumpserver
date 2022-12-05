@@ -86,12 +86,6 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
     def expire_at(self):
         return self.permed_account.date_expired.timestamp()
 
-    @lazyproperty
-    def connect_method_object(self):
-        from terminal.const import TerminalType
-        method = TerminalType.get_connect_method(self.connect_method, protocol=self.protocol)
-        return method
-
     def is_valid(self):
         if self.is_expired:
             error = _('Connection token expired at: {}').format(as_current_tz(self.date_expired))
