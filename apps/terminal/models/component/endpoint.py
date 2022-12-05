@@ -1,13 +1,11 @@
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.core.validators import MinValueValidator, MaxValueValidator
 
-from common.db.models import JMSBaseModel
+from assets.models import Asset
 from common.db.fields import PortField
+from common.db.models import JMSBaseModel
 from common.utils.ip import contains_ip
-from ..utils import db_port_manager, DBPortManager
-
-db_port_manager: DBPortManager
 
 
 class Endpoint(JMSBaseModel):
@@ -31,9 +29,10 @@ class Endpoint(JMSBaseModel):
         return self.name
 
     def get_port(self, target_instance, protocol):
+        from terminal.utils import db_port_manager
         if protocol in ['https', 'http', 'ssh', 'rdp']:
             port = getattr(self, f'{protocol}_port', 0)
-        elif isinstance(target_instance, Application) and target_instance.category_db:
+        elif isinstance(target_instance, Asset) and target_instance.category == 'dabase':
             port = db_port_manager.get_port_by_db(target_instance)
         else:
             port = 0

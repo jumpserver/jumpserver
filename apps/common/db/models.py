@@ -9,15 +9,14 @@
     - 此文件中添加代码的时候，注意不要跟 `django.db.models` 中的命名冲突
 """
 
+import inspect
 import uuid
 from functools import reduce, partial
-import inspect
 
 from django.db import models
-from django.db.models import F, Value, ExpressionWrapper
 from django.db import transaction
+from django.db.models import F, ExpressionWrapper, CASCADE
 from django.db.models import QuerySet
-from django.db.models.functions import Concat
 from django.utils.translation import ugettext_lazy as _
 
 from ..const.signals import SKIP_SIGNAL

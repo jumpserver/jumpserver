@@ -4,21 +4,25 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('audits', '0014_auto_20220505_1902'),
+        ('audits', '0015_auto_20221011_1745'),
     ]
 
     operations = [
         migrations.AlterField(
             model_name='ftplog',
             name='operate',
-            field=models.CharField(choices=[('mkdir', 'Mkdir'), ('rmdir', 'Rmdir'), ('delete', 'Delete'), ('upload', 'Upload'), ('rename', 'Rename'), ('symlink', 'Symlink'), ('download', 'Download')], max_length=16, verbose_name='Operate'),
+            field=models.CharField(
+                choices=[('mkdir', 'Mkdir'), ('rmdir', 'Rmdir'), ('delete', 'Delete'), ('upload', 'Upload'),
+                         ('rename', 'Rename'), ('symlink', 'Symlink'), ('download', 'Download')], max_length=16,
+                verbose_name='Operate'),
         ),
         migrations.AlterField(
             model_name='operatelog',
             name='action',
-            field=models.CharField(choices=[('view', 'View'), ('update', 'Update'), ('delete', 'Delete'), ('create', 'Create')], max_length=16, verbose_name='Action'),
+            field=models.CharField(
+                choices=[('view', 'View'), ('update', 'Update'), ('delete', 'Delete'), ('create', 'Create')],
+                max_length=16, verbose_name='Action'),
         ),
         migrations.AlterField(
             model_name='userloginlog',

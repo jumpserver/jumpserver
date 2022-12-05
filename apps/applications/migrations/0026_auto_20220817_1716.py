@@ -39,7 +39,7 @@ def migrate_account_dirty_data(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('applications', '0022_auto_20220817_1346'),
+        ('applications', '0025_auto_20220817_1346'),
         ('perms', '0031_auto_20220816_1600'),
         ('ops', '0022_auto_20220817_1346'),
         ('assets', '0105_auto_20220817_1544'),

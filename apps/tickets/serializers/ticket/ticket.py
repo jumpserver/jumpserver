@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 #
-from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
+from rest_framework import serializers
 
 from common.drf.fields import LabeledChoiceField
-from users.models import User
-from orgs.models import Organization
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
-from tickets.models import Ticket, TicketFlow
+from orgs.models import Organization
 from tickets.const import TicketType, TicketStatus, TicketState
+from tickets.models import Ticket, TicketFlow
+from users.models import User
 
 __all__ = [
     'TicketApplySerializer', 'TicketApproveSerializer', 'TicketSerializer',
@@ -62,13 +62,6 @@ class TicketApplySerializer(TicketSerializer):
         required=True, max_length=36, allow_blank=True, label=_("Organization")
     )
     applicant = serializers.CharField(required=False, allow_blank=True)
-
-    class Meta:
-        model = Ticket
-        fields = TicketSerializer.Meta.fields
-        extra_kwargs = {
-            'type': {'required': True}
-        }
 
     def get_applicant(self, applicant_id):
         current_user = self.context['request'].user

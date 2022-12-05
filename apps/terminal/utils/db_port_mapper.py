@@ -1,14 +1,13 @@
-from django.utils.translation import ugettext_lazy as _
-from django.core.cache import cache
 from django.conf import settings
+from django.core.cache import cache
+from django.utils.translation import ugettext_lazy as _
 
+from assets.const import Category
+from assets.models import Asset
 from common.decorator import Singleton
-from common.utils import get_logger, get_object_or_none
 from common.exceptions import JMSException
-from applications.const import AppCategory
-from applications.models import Application
+from common.utils import get_logger, get_object_or_none
 from orgs.utils import tmp_to_root_org
-
 
 logger = get_logger(__file__)
 
@@ -37,19 +36,19 @@ class DBPortManager(object):
 
     def init(self):
         with tmp_to_root_org():
-            db_ids = Application.objects.filter(category=AppCategory.db).values_list('id', flat=True)
+            db_ids = Asset.objects.filter(platform__category=Category.DATABASE).values_list('id', flat=True)
         db_ids = [str(i) for i in db_ids]
         mapper = dict(zip(self.all_available_ports, list(db_ids)))
         self.set_mapper(mapper)
 
-    def add(self, db: Application):
+    def add(self, db: Asset):
         mapper = self.get_mapper()
         available_port = self.get_next_available_port()
         mapper.update({available_port: str(db.id)})
         self.set_mapper(mapper)
         return True
 
-    def pop(self, db: Application):
+    def pop(self, db: Asset):
         mapper = self.get_mapper()
         to_delete_port = self.get_port_by_db(db, raise_exception=False)
         mapper.pop(to_delete_port, None)
@@ -79,7 +78,7 @@ class DBPortManager(object):
         if not db_id:
             raise JMSException('Database not in port-db mapper, port: {}'.format(port))
         with tmp_to_root_org():
-            db = get_object_or_none(Application, id=db_id)
+            db = get_object_or_none(Asset, id=db_id)
         if not db:
             raise JMSException('Database not exists, db id: {}'.format(db_id))
         return db

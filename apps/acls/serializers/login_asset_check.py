@@ -1,8 +1,8 @@
 from rest_framework import serializers
+
+from common.utils import get_object_or_none
 from orgs.utils import tmp_to_root_org
-from common.utils import get_object_or_none, lazyproperty
 from users.models import User
-from assets.models import Asset, Account
 
 __all__ = ['LoginAssetCheckSerializer']
 
@@ -22,6 +22,7 @@ class LoginAssetCheckSerializer(serializers.Serializer):
         return user_id
 
     def validate_asset_id(self, asset_id):
+        from assets.models import Asset
         self.asset = self.get_object(Asset, asset_id)
         return asset_id
 

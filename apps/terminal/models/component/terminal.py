@@ -5,8 +5,8 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import get_logger, lazyproperty
 from common.const.signals import SKIP_SIGNAL
+from common.utils import get_logger, lazyproperty
 from orgs.utils import tmp_to_root_org
 from terminal.const import TerminalType as TypeChoices
 from users.models import User
@@ -85,8 +85,9 @@ class Terminal(StorageMixin, TerminalStatusMixin, models.Model):
     remote_addr = models.CharField(max_length=128, blank=True, verbose_name=_('Remote Address'))
     command_storage = models.CharField(max_length=128, verbose_name=_("Command storage"), default='default')
     replay_storage = models.CharField(max_length=128, verbose_name=_("Replay storage"), default='default')
-    user = models.OneToOneField(User, related_name='terminal', verbose_name=_('Application User'), null=True, on_delete=models.CASCADE)
-    is_accepted = models.BooleanField(default=False, verbose_name=_('Is Accepted'))
+    user = models.OneToOneField(User, related_name='terminal', verbose_name=_('Application User'), null=True,
+                                on_delete=models.CASCADE)
+    is_deleted = models.BooleanField(default=False, verbose_name=_('Is deleted'))
     date_created = models.DateTimeField(auto_now_add=True)
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
 
