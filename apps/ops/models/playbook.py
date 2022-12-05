@@ -5,11 +5,11 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from common.db.models import JMSBaseModel
 from ops.exception import PlaybookNoValidEntry
-from orgs.mixins.models import JMSOrgBaseModel
 
 
-class Playbook(JMSOrgBaseModel):
+class Playbook(JMSBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'), null=True)
     path = models.FileField(upload_to='playbooks/')

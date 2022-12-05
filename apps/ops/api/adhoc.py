@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 #
 
-from rest_framework import viewsets
+from rest_framework_bulk import BulkModelViewSet
 
-from orgs.mixins.api import OrgBulkModelViewSet
+from common.mixins import CommonApiMixin
 from ..models import AdHoc
 from ..serializers import (
     AdHocSerializer
@@ -14,7 +14,9 @@ __all__ = [
 ]
 
 
-class AdHocViewSet(OrgBulkModelViewSet):
+class AdHocViewSet(CommonApiMixin, BulkModelViewSet):
     serializer_class = AdHocSerializer
     permission_classes = ()
-    model = AdHoc
+
+    def get_queryset(self):
+        return AdHoc.objects.filter(creator=self.request.user)

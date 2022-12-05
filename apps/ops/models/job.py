@@ -11,12 +11,12 @@ from celery import current_task
 
 __all__ = ["Job", "JobExecution"]
 
+from common.db.models import JMSBaseModel
 from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner
 from ops.mixin import PeriodTaskModelMixin
-from orgs.mixins.models import JMSOrgBaseModel
 
 
-class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
+class Job(JMSBaseModel, PeriodTaskModelMixin):
     class Types(models.TextChoices):
         adhoc = 'adhoc', _('Adhoc')
         playbook = 'playbook', _('Playbook')
@@ -40,7 +40,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     timeout = models.IntegerField(default=60, verbose_name=_('Timeout (Seconds)'))
     playbook = models.ForeignKey('ops.Playbook', verbose_name=_("Playbook"), null=True, on_delete=models.SET_NULL)
     type = models.CharField(max_length=128, choices=Types.choices, default=Types.adhoc, verbose_name=_("Type"))
-    owner = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
+    creator = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
     assets = models.ManyToManyField('assets.Asset', verbose_name=_("Assets"))
     runas = models.CharField(max_length=128, default='root', verbose_name=_('Runas'))
     runas_policy = models.CharField(max_length=128, choices=RunasPolicies.choices, default=RunasPolicies.skip,
@@ -96,7 +96,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
         ordering = ['date_created']
 
 
-class JobExecution(JMSOrgBaseModel):
+class JobExecution(JMSBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     task_id = models.UUIDField(null=True)
     status = models.CharField(max_length=16, verbose_name=_('Status'), default='running')
