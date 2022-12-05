@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 #
-from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from common.drf.serializers import SecretReadableMixin
 from common.drf.fields import ObjectRelatedField
-from ..serializers import HostSerializer
-from ..models import Domain, Gateway, Asset
+from ..serializers import GatewaySerializer
+from ..models import Domain, Asset
+
+
+__all__ = ['DomainSerializer', 'DomainWithGatewaySerializer']
 
 
 class DomainSerializer(BulkOrgResourceModelSerializer):
@@ -26,25 +27,6 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
         read_only_fields = ['date_created']
         fields = fields_small + fields_m2m + read_only_fields
         extra_kwargs = {}
-
-
-class GatewaySerializer(HostSerializer):
-    effective_accounts = serializers.SerializerMethodField()
-
-    class Meta(HostSerializer.Meta):
-        model = Gateway
-        fields = HostSerializer.Meta.fields + ['effective_accounts']
-
-    @staticmethod
-    def get_effective_accounts(obj):
-        accounts = obj.accounts.all()
-        return [
-            {
-                'id': account.id,
-                'username': account.username,
-                'secret_type': account.secret_type,
-            } for account in accounts
-        ]
 
 
 class DomainWithGatewaySerializer(BulkOrgResourceModelSerializer):
