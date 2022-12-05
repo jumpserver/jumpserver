@@ -38,6 +38,7 @@ class ProtocolSettingSerializer(serializers.Serializer):
 
 
 class PlatformAutomationSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = PlatformAutomation
         fields = [
