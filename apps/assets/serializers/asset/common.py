@@ -71,7 +71,7 @@ class AssetSerializer(OrgResourceSerializerMixin, WritableNestedModelSerializer)
 
     class Meta:
         model = Asset
-        fields_mini = ['id', 'name', 'address']
+        fields_mini = ['id', 'name', 'address', 'automation_enabled_info']
         fields_small = fields_mini + ['is_active', 'comment']
         fields_fk = ['domain', 'platform', 'platform']
         fields_m2m = [
@@ -80,7 +80,7 @@ class AssetSerializer(OrgResourceSerializerMixin, WritableNestedModelSerializer)
         read_only_fields = [
             'category', 'type', 'specific', 'info',
             'connectivity', 'date_verified', 'created_by',
-            'date_created', 'automation_enabled_info'
+            'date_created'
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
         extra_kwargs = {
