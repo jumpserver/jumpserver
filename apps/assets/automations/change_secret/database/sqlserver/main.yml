@@ -1,0 +1,47 @@
+- hosts: sqlserver
+  gather_facts: no
+  vars:
+    ansible_python_interpreter: /usr/local/bin/python
+
+  tasks:
+    - name: Test SQLServer connection
+      community.general.mssql_script:
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        name: '{{ jms_asset.specific.db_name }}'
+        script: |
+          SELECT @@version
+      register: db_info
+
+  - name: SQLServer version
+    set_fact:
+      info:
+        version: "{{ db_info.query_results[0][0][0][0].splitlines()[0] }}"
+  - debug:
+      var: info
+
+    - name: Change SQLServer password
+      community.general.mssql_script:
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        name: '{{ jms_asset.specific.db_name }}'
+        script: "ALTER LOGIN {{ account.username }} WITH PASSWORD = '{{ account.secret }}'; select @@version"
+      when: db_info is succeeded
+      register: change_info
+
+    - name: Verify password
+      community.general.mssql_script:
+        login_user: "{{ account.username }}"
+        login_password: "{{ account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        name: '{{ jms_asset.specific.db_name }}'
+        script: |
+          SELECT @@version
+      when:
+      - db_info is succeeded
+      - change_info is succeeded

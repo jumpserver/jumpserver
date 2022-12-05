@@ -16,5 +16,5 @@ class GatheredUserViewSet(OrgModelViewSet):
     serializer_class = GatheredUserSerializer
     extra_filter_backends = [AssetRelatedByNodeFilterBackend]
 
-    filterset_fields = ['asset', 'username', 'present', 'asset__ip', 'asset__hostname', 'asset_id']
-    search_fields = ['username', 'asset__ip', 'asset__hostname']
+    filterset_fields = ['asset', 'username', 'present', 'asset__address', 'asset__name', 'asset_id']
+    search_fields = ['username', 'asset__address', 'asset__name']

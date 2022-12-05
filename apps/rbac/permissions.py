@@ -93,7 +93,8 @@ class RBACPermission(permissions.DjangoModelPermissions):
         try:
             queryset = self._queryset(view)
             model_cls = queryset.model
-        except:
+        except Exception as e:
+            logger.error(e)
             model_cls = None
         return model_cls
 

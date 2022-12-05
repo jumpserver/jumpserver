@@ -1,0 +1,16 @@
+- hosts: oracle
+  gather_facts: no
+  vars:
+    ansible_python_interpreter: /usr/local/bin/python
+
+  tasks:
+    - name: Add user account.username
+      oracle_user:
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        login_database: "{{ jms_asset.specific.db_name }}"
+        mode: "{{ jms_account.mode }}"
+        name: "{{ account.username }}"
+        password: "{{ account.secret }}"

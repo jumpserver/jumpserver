@@ -1,11 +1,124 @@
 # -*- coding: utf-8 -*-
 #
+import os
+import time
+from itertools import groupby, chain
+from collections import defaultdict
+
+from django.utils import timezone
+from django.conf import settings
+from django.core.files.storage import default_storage
+import jms_storage
 from itertools import groupby
 
 from common.utils import get_logger
+from tickets.models import TicketSession
+from . import const
+from ..models import ReplayStorage
 
 
 logger = get_logger(__name__)
+
+
+def find_session_replay_local(session):
+    # 存在外部存储上，所有可能的路径名
+    session_paths = session.get_all_possible_relative_path()
+
+    # 存在本地存储上，所有可能的路径名
+    local_paths = session.get_all_possible_local_path()
+
+    for _local_path in chain(session_paths, local_paths):
+        if default_storage.exists(_local_path):
+            url = default_storage.url(_local_path)
+            return _local_path, url
+    return None, None
+
+
+def download_session_replay(session):
+    replay_storages = ReplayStorage.objects.all()
+    configs = {
+        storage.name: storage.config
+        for storage in replay_storages
+        if not storage.type_null_or_server
+    }
+    if settings.SERVER_REPLAY_STORAGE:
+        configs['SERVER_REPLAY_STORAGE'] = settings.SERVER_REPLAY_STORAGE
+    if not configs:
+        msg = "Not found replay file, and not remote storage set"
+        return None, msg
+    storage = jms_storage.get_multi_object_storage(configs)
+
+    # 获取外部存储路径名
+    session_path = session.find_ok_relative_path_in_storage(storage)
+    if not session_path:
+        msg = "Not found session replay file"
+        return None, msg
+
+    # 通过外部存储路径名后缀，构造真实的本地存储路径
+    local_path = session.get_local_path_by_relative_path(session_path)
+
+    # 保存到storage的路径
+    target_path = os.path.join(default_storage.base_location, local_path)
+    target_dir = os.path.dirname(target_path)
+    if not os.path.isdir(target_dir):
+        os.makedirs(target_dir, exist_ok=True)
+
+    ok, err = storage.download(session_path, target_path)
+    if not ok:
+        msg = "Failed download replay file: {}".format(err)
+        logger.error(msg)
+        return None, msg
+    url = default_storage.url(local_path)
+    return local_path, url
+
+
+def get_session_replay_url(session):
+    local_path, url = find_session_replay_local(session)
+    if local_path is None:
+        local_path, url = download_session_replay(session)
+    return local_path, url
+
+
+class ComputeLoadUtil:
+    # system status
+    @staticmethod
+    def _common_compute_system_status(value, thresholds):
+        if thresholds[0] <= value <= thresholds[1]:
+            return const.ComponentLoad.normal.value
+        elif thresholds[1] < value <= thresholds[2]:
+            return const.ComponentLoad.high.value
+        else:
+            return const.ComponentLoad.critical.value
+
+    @classmethod
+    def _compute_system_stat_status(cls, stat):
+        system_stat_thresholds_mapper = {
+            'cpu_load': [0, 5, 20],
+            'memory_used': [0, 85, 95],
+            'disk_used': [0, 80, 99]
+        }
+        system_status = {}
+        for stat_key, thresholds in system_stat_thresholds_mapper.items():
+            stat_value = getattr(stat, stat_key)
+            if stat_value is None:
+                msg = 'stat: {}, stat_key: {}, stat_value: {}'
+                logger.debug(msg.format(stat, stat_key, stat_value))
+                stat_value = 0
+            status = cls._common_compute_system_status(stat_value, thresholds)
+            system_status[stat_key] = status
+        return system_status
+
+    @classmethod
+    def compute_load(cls, stat):
+        if not stat or time.time() - stat.date_created.timestamp() > 150:
+            return const.ComponentLoad.offline
+        system_status_values = cls._compute_system_stat_status(stat).values()
+        if const.ComponentLoad.critical in system_status_values:
+            return const.ComponentLoad.critical
+        elif const.ComponentLoad.high in system_status_values:
+            return const.ComponentLoad.high
+        else:
+            return const.ComponentLoad.normal
 
 
 class TypedComponentsStatusMetricsUtil(object):
@@ -25,31 +138,15 @@ class TypedComponentsStatusMetricsUtil(object):
     def get_metrics(self):
         metrics = []
         for _tp, components in self.grouped_components:
-            normal_count = high_count = critical_count = 0
-            total_count = offline_count = session_online_total = 0
-
+            metric = {
+                'normal': 0, 'high': 0, 'critical': 0, 'offline': 0,
+                'total': 0, 'session_active': 0, 'type': _tp
+            }
             for component in components:
-                total_count += 1
-                if not component.is_alive:
-                    offline_count += 1
-                    continue
-                if component.is_normal:
-                    normal_count += 1
-                elif component.is_high:
-                    high_count += 1
-                else:
-                    # critical
-                    critical_count += 1
-                session_online_total += component.get_online_session_count()
-            metrics.append({
-                'total': total_count,
-                'normal': normal_count,
-                'high': high_count,
-                'critical': critical_count,
-                'offline': offline_count,
-                'session_active': session_online_total,
-                'type': _tp,
-            })
+                metric[component.load] += 1
+                metric['total'] += 1
+                metric['session_active'] += component.get_online_session_count()
+            metrics.append(metric)
         return metrics
 
 

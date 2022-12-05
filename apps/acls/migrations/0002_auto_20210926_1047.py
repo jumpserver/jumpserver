@@ -30,10 +30,11 @@ def migrate_login_confirm(apps, schema_editor):
             if reviewers.count() == 0:
                 continue
             data = {
+
                 'user': user,
                 'name': f'{user.name}-{login_confirm} ({date_created})',
                 'created_by': instance.created_by,
-                'action': LoginACL.ActionChoices.confirm,
+                'action': 'confirm',
                 'rules': {'ip_group': ['*'], 'time_period': DEFAULT_TIME_PERIODS}
             }
             instance = login_acl_model.objects.create(**data)
@@ -44,7 +45,7 @@ def migrate_ip_group(apps, schema_editor):
     login_acl_model = apps.get_model("acls", "LoginACL")
     updates = list()
     with transaction.atomic():
-        for instance in login_acl_model.objects.exclude(action=LoginACL.ActionChoices.confirm):
+        for instance in login_acl_model.objects.exclude(action='confirm'):
             instance.rules = {'ip_group': instance.ip_group, 'time_period': DEFAULT_TIME_PERIODS}
             updates.append(instance)
         login_acl_model.objects.bulk_update(updates, ['rules', ])

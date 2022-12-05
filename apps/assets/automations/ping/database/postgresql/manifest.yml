@@ -1,0 +1,6 @@
+id: ping_postgresql
+name: Ping PostgreSQL
+category: database
+type:
+  - postgresql
+method: ping

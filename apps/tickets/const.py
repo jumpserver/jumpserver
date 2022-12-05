@@ -6,19 +6,18 @@ TICKET_DETAIL_URL = '/ui/#/tickets/tickets/{id}?type={type}'
 
 class TicketType(TextChoices):
     general = 'general', _("General")
-    login_confirm = 'login_confirm', _("Login confirm")
     apply_asset = 'apply_asset', _('Apply for asset')
-    apply_application = 'apply_application', _('Apply for application')
-    login_asset_confirm = 'login_asset_confirm', _('Login asset confirm')
+    login_confirm = 'login_confirm', _("Login confirm")
     command_confirm = 'command_confirm', _('Command confirm')
+    login_asset_confirm = 'login_asset_confirm', _('Login asset confirm')
 
 
 class TicketState(TextChoices):
     pending = 'pending', _('Open')
-    approved = 'approved', _('Approved')
-    rejected = 'rejected', _('Rejected')
     closed = 'closed', _("Cancel")
     reopen = 'reopen', _("Reopen")
+    approved = 'approved', _('Approved')
+    rejected = 'rejected', _('Rejected')
 
 
 class TicketStatus(TextChoices):
@@ -28,23 +27,23 @@ class TicketStatus(TextChoices):
 
 class StepState(TextChoices):
     pending = 'pending', _('Pending')
-    approved = 'approved', _('Approved')
-    rejected = 'rejected', _('Rejected')
     closed = 'closed', _("Closed")
     reopen = 'reopen', _("Reopen")
+    approved = 'approved', _('Approved')
+    rejected = 'rejected', _('Rejected')
 
 
 class StepStatus(TextChoices):
-    pending = 'pending', _('Pending')
     active = 'active', _('Active')
     closed = 'closed', _("Closed")
+    pending = 'pending', _('Pending')
 
 
 class TicketAction(TextChoices):
     open = 'open', _("Open")
     close = 'close', _("Close")
-    approve = 'approve', _('Approve')
     reject = 'reject', _('Reject')
+    approve = 'approve', _('Approve')
 
 
 class TicketLevel(IntegerChoices):
@@ -53,7 +52,7 @@ class TicketLevel(IntegerChoices):
 
 
 class TicketApprovalStrategy(TextChoices):
-    super_admin = 'super_admin', _("Super admin")
     org_admin = 'org_admin', _("Org admin")
-    super_org_admin = 'super_org_admin', _("Super admin and org admin")
     custom_user = 'custom_user', _("Custom user")
+    super_admin = 'super_admin', _("Super admin")
+    super_org_admin = 'super_org_admin', _("Super admin and org admin")

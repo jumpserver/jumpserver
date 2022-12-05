@@ -1,0 +1,6 @@
+id: verify_account_postgresql
+name: Verify account for PostgreSQL
+category: database
+type:
+  - postgresql
+method: verify_account

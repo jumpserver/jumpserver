@@ -10,6 +10,8 @@ class CommonConfig(AppConfig):
     def ready(self):
         from . import signal_handlers
         from .signals import django_ready
-        if 'migrate' in sys.argv or 'compilemessages' in sys.argv:
-            return
+        excludes = ['migrate', 'compilemessages', 'makemigrations']
+        for i in excludes:
+            if i in sys.argv:
+                return
         django_ready.send(CommonConfig)

@@ -48,7 +48,7 @@ block_user_login_msg = _(
     "(please contact admin to unlock it or try again after {} minutes)"
 )
 block_ip_login_msg = _(
-    "The ip has been locked "
+    "The address has been locked "
     "(please contact admin to unlock it or try again after {} minutes)"
 )
 block_mfa_msg = _(

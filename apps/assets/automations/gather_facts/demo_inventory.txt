@@ -1,0 +1,2 @@
+# all base inventory in base/base_inventory.txt
+asset_name ...base_inventory_vars

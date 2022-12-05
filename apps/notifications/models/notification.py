@@ -1,26 +1,23 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from common.db.models import JMSModel, CASCADE_SIGNAL_SKIP
+from common.db.models import JMSBaseModel, CASCADE_SIGNAL_SKIP
 
 __all__ = ('SystemMsgSubscription', 'UserMsgSubscription')
 
 
-class UserMsgSubscription(JMSModel):
+class UserMsgSubscription(JMSBaseModel):
     user = models.OneToOneField(
         'users.User', related_name='user_msg_subscription', on_delete=CASCADE_SIGNAL_SKIP,
         verbose_name=_('User')
     )
     receive_backends = models.JSONField(default=list, verbose_name=_('receive backend'))
 
-    class Meta:
-        verbose_name = _('User message')
-
     def __str__(self):
         return _('{} subscription').format(self.user)
 
 
-class SystemMsgSubscription(JMSModel):
+class SystemMsgSubscription(JMSBaseModel):
     message_type = models.CharField(max_length=128, unique=True)
     users = models.ManyToManyField('users.User', related_name='system_msg_subscriptions')
     groups = models.ManyToManyField('users.UserGroup', related_name='system_msg_subscriptions')

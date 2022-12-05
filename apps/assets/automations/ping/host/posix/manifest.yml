@@ -1,0 +1,7 @@
+id: posix_ping
+name: Posix ping
+category: host
+type:
+  - linux
+  - unix
+method: ping

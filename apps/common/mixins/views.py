@@ -9,14 +9,20 @@ from rest_framework.request import Request
 from common.exceptions import UserConfirmRequired
 from audits.handler import create_or_update_operate_log
 from audits.models import OperateLog
+from audits.const import ActionChoices
 
-__all__ = ["PermissionsMixin", "RecordViewLogMixin", "UserConfirmRequiredExceptionMixin"]
+__all__ = [
+    "PermissionsMixin",
+    "RecordViewLogMixin",
+    "UserConfirmRequiredExceptionMixin",
+]
 
 
 class UserConfirmRequiredExceptionMixin:
     """
     异常处理
     """
+
     def dispatch(self, request, *args, **kwargs):
         try:
             return super().dispatch(request, *args, **kwargs)
@@ -40,23 +46,23 @@ class PermissionsMixin(UserPassesTestMixin):
 
 
 class RecordViewLogMixin:
-    ACTION = OperateLog.ACTION_VIEW
+    ACTION = ActionChoices.view
 
     @staticmethod
     def get_resource_display(request):
         query_params = dict(request.query_params)
-        if query_params.get('format'):
-            query_params.pop('format')
-        spm_filter = query_params.pop('spm') if query_params.get('spm') else None
+        if query_params.get("format"):
+            query_params.pop("format")
+        spm_filter = query_params.pop("spm") if query_params.get("spm") else None
         if not query_params and not spm_filter:
-            display_message = _('Export all')
+            display_message = _("Export all")
         elif spm_filter:
-            display_message = _('Export only selected items')
+            display_message = _("Export only selected items")
         else:
-            query = ','.join(
-                ['%s=%s' % (key, value) for key, value in query_params.items()]
+            query = ",".join(
+                ["%s=%s" % (key, value) for key, value in query_params.items()]
             )
-            display_message = _('Export filtered: %s') % query
+            display_message = _("Export filtered: %s") % query
         return display_message
 
     def list(self, request, *args, **kwargs):

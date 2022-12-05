@@ -13,7 +13,7 @@ from .queryset import QuerySetMixin
 
 
 __all__ = [
-    'CommonApiMixin', 'PaginatedResponseMixin', 'RelationMixin', 'CommonMixin'
+    'CommonApiMixin', 'PaginatedResponseMixin', 'RelationMixin',
 ]
 
 
@@ -82,15 +82,11 @@ class RelationMixin:
         self.send_m2m_changed_signal(instance, 'post_remove')
 
 
-class CommonApiMixin(SerializerMixin, ExtraFilterFieldsMixin, RenderToJsonMixin):
+class CommonApiMixin(SerializerMixin, ExtraFilterFieldsMixin,
+                     QuerySetMixin, RenderToJsonMixin,
+                     PaginatedResponseMixin):
     pass
 
-
-class CommonMixin(SerializerMixin,
-                  QuerySetMixin,
-                  ExtraFilterFieldsMixin,
-                  RenderToJsonMixin):
-    pass
 
 
 

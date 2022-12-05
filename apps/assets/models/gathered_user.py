@@ -20,19 +20,19 @@ class GatheredUser(OrgModelMixin):
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
 
     @property
-    def hostname(self):
-        return self.asset.hostname
+    def name(self):
+        return self.asset.name
 
     @property
     def ip(self):
-        return self.asset.ip
+        return self.asset.address
 
     class Meta:
         verbose_name = _('GatherUser')
         ordering = ['asset']
 
     def __str__(self):
-        return '{}: {}'.format(self.asset.hostname, self.username)
+        return '{}: {}'.format(self.asset.name, self.username)
 
 
 

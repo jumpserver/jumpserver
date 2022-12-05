@@ -1,0 +1,5 @@
+- hosts: windows
+  gather_facts: no
+  tasks:
+    - name: Windows ping
+      ansible.builtin.win_ping:

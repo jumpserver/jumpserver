@@ -37,6 +37,7 @@ VERSION = const.VERSION
 BASE_DIR = const.BASE_DIR
 PROJECT_DIR = const.PROJECT_DIR
 DATA_DIR = os.path.join(PROJECT_DIR, 'data')
+ANSIBLE_DIR = os.path.join(DATA_DIR, 'ansible')
 CERTS_DIR = os.path.join(DATA_DIR, 'certs')
 
 # Quick-start development settings - unsuitable for production
@@ -55,6 +56,9 @@ DEBUG_DEV = CONFIG.DEBUG_DEV
 
 # Absolute url for some case, for example email link
 SITE_URL = CONFIG.SITE_URL
+
+# Absolute url for downloading applet
+APPLET_DOWNLOAD_HOST = CONFIG.APPLET_DOWNLOAD_HOST
 
 # https://docs.djangoproject.com/en/4.1/ref/settings/
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -109,6 +113,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'jumpserver.middleware.StartMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -128,6 +133,7 @@ MIDDLEWARE = [
     'authentication.middleware.ThirdPartyLoginMiddleware',
     'authentication.middleware.SessionCookieMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
+    'jumpserver.middleware.EndMiddleware',
 ]
 
 ROOT_URLCONF = 'jumpserver.urls'
@@ -370,7 +376,6 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
 ]
 
-
 GMSSL_ENABLED = CONFIG.GMSSL_ENABLED
 GM_HASHER = 'common.hashers.PBKDF2SM3PasswordHasher'
 if GMSSL_ENABLED:
@@ -386,4 +391,3 @@ if os.environ.get('DEBUG_TOOLBAR', False):
     DEBUG_TOOLBAR_PANELS = [
         'debug_toolbar.panels.profiling.ProfilingPanel',
     ]
-

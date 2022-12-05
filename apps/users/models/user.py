@@ -255,7 +255,7 @@ class RoleManager(models.Manager):
             self.user.expire_users_rbac_perms_cache()
             return result
         except Exception as e:
-            logger.error('Create role binding error: {}'.format(e))
+            logger.error('\tCreate role binding error: {}'.format(e))
 
     def set(self, roles, clear=False):
         if clear:

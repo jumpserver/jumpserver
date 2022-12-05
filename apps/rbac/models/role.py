@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext_lazy as _, gettext
 from django.db import models
 
-from common.db.models import JMSModel
+from common.db.models import JMSBaseModel
 from common.utils import lazyproperty
 from .permission import Permission
 from ..builtin import BuiltinRole
@@ -22,7 +22,7 @@ class OrgRoleManager(models.Manager):
         return queryset.filter(scope=const.Scope.org)
 
 
-class Role(JMSModel):
+class Role(JMSBaseModel):
     """ 定义 角色 ｜ 角色-权限 关系 """
     Scope = const.Scope
 

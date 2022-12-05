@@ -28,7 +28,7 @@ def sync_node(src, target, cut=False):
             asset.save()
             new_asset = asset
         else:
-            new_asset = get_object_or_none(Asset, hostname=asset.hostname, org_id=target.org_id)
+            new_asset = get_object_or_none(Asset, hostname=asset.name, org_id=target.org_id)
             if new_asset is None:
                 asset.id = None
                 asset.org_id = target.org_id

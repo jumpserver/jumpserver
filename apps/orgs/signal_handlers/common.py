@@ -3,23 +3,23 @@
 from collections import defaultdict
 from functools import partial
 
-from django.db.models.signals import m2m_changed
-from django.db.models.signals import post_save, pre_delete
+import django.db.utils
 from django.dispatch import receiver
+from django.conf import settings
+from django.db.utils import ProgrammingError, OperationalError
 from django.utils.functional import LazyObject
+from django.db.models.signals import post_save, pre_delete, m2m_changed
 
-from assets.models import CommandFilterRule
-from assets.models import SystemUser
+from orgs.utils import tmp_to_org, set_to_default_org
+from orgs.models import Organization
+from orgs.hands import set_current_org, Node, get_current_org
+from perms.models import AssetPermission
+from users.models import UserGroup, User
 from common.const.signals import PRE_REMOVE, POST_REMOVE
 from common.decorator import on_transaction_commit
 from common.signals import django_ready
 from common.utils import get_logger
 from common.utils.connection import RedisPubSub
-from orgs.hands import set_current_org, Node, get_current_org
-from orgs.models import Organization
-from orgs.utils import tmp_to_org
-from perms.models import (AssetPermission, ApplicationPermission)
-from users.models import UserGroup, User
 from users.signals import post_user_leave_org
 
 logger = get_logger(__file__)
@@ -44,6 +44,12 @@ def expire_orgs_mapping_for_memory(org_id):
 @receiver(django_ready)
 def subscribe_orgs_mapping_expire(sender, **kwargs):
     logger.debug("Start subscribe for expire orgs mapping from memory")
+
+    if settings.DEBUG:
+        try:
+            set_to_default_org()
+        except (ProgrammingError, OperationalError):
+            pass
 
     orgs_mapping_for_memory_pub_sub.subscribe(
         lambda org_id: Organization.expire_orgs_mapping()
@@ -129,12 +135,12 @@ def _clear_users_from_org(org, users):
     if not users:
         return
 
-    models = (AssetPermission, ApplicationPermission, UserGroup, SystemUser)
+    models = (AssetPermission, UserGroup)
 
     for m in models:
         _remove_users(m, users, org)
 
-    _remove_users(CommandFilterRule, users, org, user_field_name='reviewers')
+    # _remove_users(CommandFilterRule, users, org, user_field_name='reviewers')
 
 
 @receiver(post_save, sender=User)

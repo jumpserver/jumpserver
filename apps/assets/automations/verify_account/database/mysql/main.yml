@@ -1,0 +1,13 @@
+- hosts: mysql
+  gather_facts: no
+  vars:
+    ansible_python_interpreter: /usr/local/bin/python
+
+  tasks:
+    - name: Verify account
+      community.mysql.mysql_info:
+        login_user: "{{ account.username }}"
+        login_password: "{{ account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        filter: version

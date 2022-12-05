@@ -1,0 +1,7 @@
+id: change_secret_local_windows
+name: Change password local account for Windows
+version: 1
+method: change_secret
+category: host
+type:
+  - windows

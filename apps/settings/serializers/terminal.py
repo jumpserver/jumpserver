@@ -6,7 +6,7 @@ class TerminalSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Terminal')
 
     SORT_BY_CHOICES = (
-        ('hostname', _('Hostname')),
+        ('name', _('Hostname')),
         ('ip', _('IP'))
     )
 

@@ -13,6 +13,7 @@ def migrate_system_role_binding(apps, schema_editor):
 
     count = 0
     bulk_size = 1000
+    print('')
     while True:
         users = user_model.objects.using(db_alias) \
             .only('role', 'id') \
@@ -28,7 +29,7 @@ def migrate_system_role_binding(apps, schema_editor):
             role_bindings.append(role_binding)
 
         role_binding_model.objects.bulk_create(role_bindings, ignore_conflicts=True)
-        print("Create role binding: {}-{} using: {:.2f}s".format(
+        print("\tCreate role binding: {}-{} using: {:.2f}s".format(
             count, count + len(users), time.time()-start
         ))
         count += len(users)
@@ -61,7 +62,7 @@ def migrate_org_role_binding(apps, schema_editor):
             )
             role_bindings.append(role_binding)
         role_binding_model.objects.bulk_create(role_bindings, ignore_conflicts=True)
-        print("Create role binding: {}-{} using: {:.2f}s".format(
+        print("\tCreate role binding: {}-{} using: {:.2f}s".format(
             count, count + len(members), time.time()-start
         ))
         count += len(members)

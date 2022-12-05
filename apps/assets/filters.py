@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 #
-
-from rest_framework.compat import coreapi, coreschema
-from rest_framework import filters
 from django.db.models import Q
+from django_filters import rest_framework as drf_filters
+from rest_framework import filters
+from rest_framework.compat import coreapi, coreschema
 
-from .models import Label
-from assets.utils import is_query_node_all_assets, get_node
+from assets.utils import get_node_from_request, is_query_node_all_assets
+from common.drf.filters import BaseFilterSet
+
+from .models import Account, Label, Node
 
 
 class AssetByNodeFilterBackend(filters.BaseFilterBackend):
@@ -31,7 +33,7 @@ class AssetByNodeFilterBackend(filters.BaseFilterBackend):
         return queryset.filter(nodes__key=node.key).distinct()
 
     def filter_queryset(self, request, queryset, view):
-        node = get_node(request)
+        node = get_node_from_request(request)
         if node is None:
             return queryset
 
@@ -42,9 +44,9 @@ class AssetByNodeFilterBackend(filters.BaseFilterBackend):
             return self.filter_node_related_direct(queryset, node)
 
 
-class FilterAssetByNodeFilterBackend(filters.BaseFilterBackend):
+class NodeFilterBackend(filters.BaseFilterBackend):
     """
-    需要与 `assets.api.mixin.FilterAssetByNodeMixin` 配合使用
+    需要与 `assets.api.mixin.NodeFilterMixin` 配合使用
     """
     fields = ['node', 'all']
 
@@ -58,16 +60,18 @@ class FilterAssetByNodeFilterBackend(filters.BaseFilterBackend):
         ]
 
     def filter_queryset(self, request, queryset, view):
-        node = view.node
+        node = get_node_from_request(request)
         if node is None:
             return queryset
-        query_all = view.is_query_node_all_assets
+
+        query_all = is_query_node_all_assets(request)
         if query_all:
             return queryset.filter(
                 Q(nodes__key__istartswith=f'{node.key}:') |
                 Q(nodes__key=node.key)
             ).distinct()
         else:
+            print("Query query origin: ", queryset.count())
             return queryset.filter(nodes__key=node.key).distinct()
 
 
@@ -93,6 +97,9 @@ class LabelFilterBackend(filters.BaseFilterBackend):
         for kv in labels_query:
             if '#' in kv:
                 self.sep = '#'
+                break
+
+        for kv in labels_query:
             if self.sep not in kv:
                 continue
             key, value = kv.strip().split(self.sep)[:2]
@@ -104,7 +111,7 @@ class LabelFilterBackend(filters.BaseFilterBackend):
                 q = Q(name=key, value=value)
         if not q:
             return []
-        labels = Label.objects.filter(q, is_active=True)\
+        labels = Label.objects.filter(q, is_active=True) \
             .values_list('id', flat=True)
         return labels
 
@@ -136,7 +143,7 @@ class IpInFilterBackend(filters.BaseFilterBackend):
         if not ips:
             return queryset
         ip_list = [i.strip() for i in ips.split(',')]
-        queryset = queryset.filter(ip__in=ip_list)
+        queryset = queryset.filter(address__in=ip_list)
         return queryset
 
     def get_schema_fields(self, view):
@@ -145,7 +152,43 @@ class IpInFilterBackend(filters.BaseFilterBackend):
                 name='ips', location='query', required=False, type='string',
                 schema=coreschema.String(
                     title='ips',
-                    description='ip in filter'
+                    description='address in filter'
                 )
             )
         ]
+
+
+class AccountFilterSet(BaseFilterSet):
+    ip = drf_filters.CharFilter(field_name='address', lookup_expr='exact')
+    hostname = drf_filters.CharFilter(field_name='name', lookup_expr='exact')
+    username = drf_filters.CharFilter(field_name="username", lookup_expr='exact')
+    address = drf_filters.CharFilter(field_name="asset__address", lookup_expr='exact')
+    asset = drf_filters.CharFilter(field_name="asset_id", lookup_expr='exact')
+    assets = drf_filters.CharFilter(field_name='asset_id', lookup_expr='exact')
+    nodes = drf_filters.CharFilter(method='filter_nodes')
+    has_secret = drf_filters.BooleanFilter(method='filter_has_secret')
+
+    @staticmethod
+    def filter_has_secret(queryset, name, has_secret):
+        q = Q(secret__isnull=True) | Q(secret='')
+        if has_secret:
+            return queryset.exclude(q)
+        else:
+            return queryset.filter(q)
+
+    @staticmethod
+    def filter_nodes(queryset, name, value):
+        nodes = Node.objects.filter(id=value)
+        if not nodes:
+            return queryset
+
+        node_qs = Node.objects.none()
+        for node in nodes:
+            node_qs |= node.get_all_children(with_self=True)
+        node_ids = list(node_qs.values_list('id', flat=True))
+        queryset = queryset.filter(asset__nodes__in=node_ids)
+        return queryset
+
+    class Meta:
+        model = Account
+        fields = ['id']

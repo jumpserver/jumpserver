@@ -69,6 +69,7 @@ class Organization(OrgRoleMixin, models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, unique=True, verbose_name=_("Name"))
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
+    builtin = models.BooleanField(default=False, verbose_name=_('Builtin'))
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
     members = models.ManyToManyField(
@@ -78,7 +79,9 @@ class Organization(OrgRoleMixin, models.Model):
     ROOT_ID = '00000000-0000-0000-0000-000000000000'
     ROOT_NAME = _('GLOBAL')
     DEFAULT_ID = '00000000-0000-0000-0000-000000000002'
-    DEFAULT_NAME = 'Default'
+    DEFAULT_NAME = _('DEFAULT')
+    SYSTEM_ID = '00000000-0000-0000-0000-000000000004'
+    SYSTEM_NAME = _('SYSTEM')
     orgs_mapping = None
 
     class Meta:
@@ -138,12 +141,15 @@ class Organization(OrgRoleMixin, models.Model):
     def default(cls):
         defaults = dict(id=cls.DEFAULT_ID, name=cls.DEFAULT_NAME)
         obj, created = cls.objects.get_or_create(defaults=defaults, id=cls.DEFAULT_ID)
+        if not obj.builtin:
+            obj.builtin = True
+            obj.save()
         return obj
 
     @classmethod
     def root(cls):
         name = settings.GLOBAL_ORG_DISPLAY_NAME or cls.ROOT_NAME
-        return cls(id=cls.ROOT_ID, name=name)
+        return cls(id=cls.ROOT_ID, name=name, builtin=True)
 
     def is_root(self):
         return self.id == self.ROOT_ID
@@ -205,30 +211,3 @@ class Organization(OrgRoleMixin, models.Model):
     def delete(self, *args, **kwargs):
         self.delete_related_models()
         return super().delete(*args, **kwargs)
-
-
-class OrganizationMember(models.Model):
-    """
-    注意：直接调用该 `Model.delete` `Model.objects.delete` 不会触发清理该用户的信号
-    """
-
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    org = models.ForeignKey(
-        Organization, related_name='m2m_org_members', on_delete=models.CASCADE, verbose_name=_('Organization')
-    )
-    user = models.ForeignKey(
-        'users.User', related_name='m2m_org_members', on_delete=models.CASCADE, verbose_name=_('User')
-    )
-    role = models.CharField(max_length=16, default='User', verbose_name=_("Role"))
-    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
-    date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
-    created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
-
-    # objects = OrgMemberManager()
-
-    class Meta:
-        unique_together = [('org', 'user', 'role')]
-        db_table = 'orgs_organization_members'
-
-    def __str__(self):
-        return '{} | {}'.format(self.user, self.org)

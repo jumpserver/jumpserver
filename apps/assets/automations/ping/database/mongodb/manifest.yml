@@ -1,0 +1,6 @@
+id: mongodb_ping
+name: Ping MongoDB
+category: database
+type:
+  - mongodb
+method: ping

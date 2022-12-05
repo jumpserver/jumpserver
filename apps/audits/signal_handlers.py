@@ -2,26 +2,19 @@
 #
 import uuid
 
-from django.db.models.signals import (
-    post_save, m2m_changed, pre_delete, pre_save
-)
 from django.dispatch import receiver
 from django.conf import settings
 from django.db import transaction
-from django.utils import timezone
+from django.utils import timezone, translation
 from django.utils.functional import LazyObject
 from django.contrib.auth import BACKEND_SESSION_KEY
 from django.utils.translation import ugettext_lazy as _
-from django.utils import translation
-from rest_framework.renderers import JSONRenderer
+from django.db.models.signals import post_save, pre_save, m2m_changed, pre_delete
 from rest_framework.request import Request
+from rest_framework.renderers import JSONRenderer
+
 
 from users.models import User
-from assets.models import Asset, SystemUser, CommandFilter
-from terminal.models import Session, Command
-from perms.models import AssetPermission, ApplicationPermission
-from rbac.models import Role
-
 from audits.utils import model_to_dict_for_operate_log as model_to_dict
 from audits.handler import (
     get_instance_current_with_cache_diff, cache_instance_before_data,
@@ -29,17 +22,19 @@ from audits.handler import (
 )
 from authentication.signals import post_auth_failed, post_auth_success
 from authentication.utils import check_different_city_login_if_need
+from terminal.models import Session, Command
 from jumpserver.utils import current_request
 from users.signals import post_user_change_password
-from .utils import write_login_log
-from . import models, serializers
 from .models import OperateLog
 from .const import MODELS_NEED_RECORD
-from terminal.backends.command.serializers import SessionCommandSerializer
 from terminal.serializers import SessionSerializer
+from terminal.backends.command.serializers import SessionCommandSerializer
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR, SKIP_SIGNAL
 from common.utils import get_request_ip, get_logger, get_syslogger
 from common.utils.encode import data_to_json
+from . import models, serializers
+from .utils import write_login_log
+
 
 
 logger = get_logger(__name__)
@@ -54,14 +49,14 @@ class AuthBackendLabelMapping(LazyObject):
         for source, backends in User.SOURCE_BACKEND_MAPPING.items():
             for backend in backends:
                 backend_label_mapping[backend] = source.label
-        backend_label_mapping[settings.AUTH_BACKEND_PUBKEY] = _('SSH Key')
-        backend_label_mapping[settings.AUTH_BACKEND_MODEL] = _('Password')
-        backend_label_mapping[settings.AUTH_BACKEND_SSO] = _('SSO')
-        backend_label_mapping[settings.AUTH_BACKEND_AUTH_TOKEN] = _('Auth Token')
-        backend_label_mapping[settings.AUTH_BACKEND_WECOM] = _('WeCom')
-        backend_label_mapping[settings.AUTH_BACKEND_FEISHU] = _('FeiShu')
-        backend_label_mapping[settings.AUTH_BACKEND_DINGTALK] = _('DingTalk')
-        backend_label_mapping[settings.AUTH_BACKEND_TEMP_TOKEN] = _('Temporary token')
+        backend_label_mapping[settings.AUTH_BACKEND_PUBKEY] = _("SSH Key")
+        backend_label_mapping[settings.AUTH_BACKEND_MODEL] = _("Password")
+        backend_label_mapping[settings.AUTH_BACKEND_SSO] = _("SSO")
+        backend_label_mapping[settings.AUTH_BACKEND_AUTH_TOKEN] = _("Auth Token")
+        backend_label_mapping[settings.AUTH_BACKEND_WECOM] = _("WeCom")
+        backend_label_mapping[settings.AUTH_BACKEND_FEISHU] = _("FeiShu")
+        backend_label_mapping[settings.AUTH_BACKEND_DINGTALK] = _("DingTalk")
+        backend_label_mapping[settings.AUTH_BACKEND_TEMP_TOKEN] = _("Temporary token")
         return backend_label_mapping
 
     def _setup(self):

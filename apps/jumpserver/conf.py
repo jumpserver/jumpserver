@@ -7,23 +7,22 @@
 2. 程序需要, 用户不需要更改的写到settings中
 3. 程序需要, 用户需要更改的写到本config中
 """
+import base64
+import copy
+import errno
+import json
+import logging
 import os
 import re
 import sys
 import types
-import errno
-import json
-import yaml
-import copy
-import base64
-import logging
 from importlib import import_module
 from urllib.parse import urljoin, urlparse
-from gmssl.sm4 import CryptSM4, SM4_ENCRYPT, SM4_DECRYPT
 
+import yaml
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
-
+from gmssl.sm4 import CryptSM4, SM4_ENCRYPT, SM4_DECRYPT
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
@@ -124,7 +123,7 @@ class ConfigCrypto:
             if plaintext:
                 value = plaintext
         except Exception as e:
-            logger.error('decrypt %s error: %s', item, e)
+            pass
         return value
 
     @classmethod
@@ -134,7 +133,7 @@ class ConfigCrypto:
         secret_encrypt_key = os.environ.get('SECRET_ENCRYPT_KEY', '')
         if not secret_encrypt_key:
             return None
-        print('Info: Using SM4 to encrypt config secret value')
+        print('Info: try using SM4 to decrypt config secret value')
         return cls(secret_encrypt_key)
 
 
@@ -423,7 +422,7 @@ class Config(dict):
         'TERMINAL_PASSWORD_AUTH': True,
         'TERMINAL_PUBLIC_KEY_AUTH': True,
         'TERMINAL_HEARTBEAT_INTERVAL': 20,
-        'TERMINAL_ASSET_LIST_SORT_BY': 'hostname',
+        'TERMINAL_ASSET_LIST_SORT_BY': 'name',
         'TERMINAL_ASSET_LIST_PAGE_SIZE': 'auto',
         'TERMINAL_SESSION_KEEP_DURATION': 200,
         'TERMINAL_HOST_KEY': '',
@@ -533,6 +532,9 @@ class Config(dict):
 
         'FORGOT_PASSWORD_URL': '',
         'HEALTH_CHECK_TOKEN': '',
+
+        # Applet 等软件的下载地址
+        'APPLET_DOWNLOAD_HOST': '',
     }
 
     def __init__(self, *args):
