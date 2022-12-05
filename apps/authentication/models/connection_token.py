@@ -29,17 +29,13 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
         related_name='connection_tokens', verbose_name=_('Asset'),
     )
     account_name = models.CharField(max_length=128, verbose_name=_("Account name"))  # 登录账号Name
-    input_username = models.CharField(max_length=128, default='', blank=True, verbose_name=_("Input Username"))
-    input_secret = EncryptCharField(max_length=64, default='', blank=True, verbose_name=_("Input Secret"))
-    protocol = models.CharField(
-        choices=Protocol.choices, max_length=16, default=Protocol.ssh, verbose_name=_("Protocol")
-    )
+    input_username = models.CharField(max_length=128, default='', blank=True, verbose_name=_("Input username"))
+    input_secret = EncryptCharField(max_length=64, default='', blank=True, verbose_name=_("Input secret"))
+    protocol = models.CharField(max_length=16, default=Protocol.ssh, verbose_name=_("Protocol"))
     connect_method = models.CharField(max_length=32, verbose_name=_("Connect method"))
     user_display = models.CharField(max_length=128, default='', verbose_name=_("User display"))
     asset_display = models.CharField(max_length=128, default='', verbose_name=_("Asset display"))
-    date_expired = models.DateTimeField(
-        default=date_expired_default, verbose_name=_("Date expired")
-    )
+    date_expired = models.DateTimeField(default=date_expired_default, verbose_name=_("Date expired"))
 
     class Meta:
         ordering = ('-date_expired',)
