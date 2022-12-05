@@ -1,13 +1,16 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from acls.models import CommandGroup
+from common.drf.fields import ObjectRelatedField
+from acls.models import CommandGroup, CommandFilterACL
 from assets.models import Asset, Account, Platform
 from assets.serializers import PlatformSerializer, AssetProtocolsSerializer
-from authentication.models import ConnectionToken
-from orgs.mixins.serializers import OrgResourceModelSerializerMixin
-from perms.serializers.permission import ActionChoicesField
 from users.models import User
+from perms.serializers.permission import ActionChoicesField
+from orgs.mixins.serializers import OrgResourceModelSerializerMixin
+
+from ..models import ConnectionToken
+
 
 __all__ = [
     'ConnectionTokenSecretSerializer',
@@ -61,13 +64,20 @@ class _ConnectionTokenGatewaySerializer(serializers.ModelSerializer):
         ]
 
 
-class _ConnectionTokenACLCmdGroupSerializer(serializers.ModelSerializer):
-    """ ACL command group"""
+class _ConnectionTokenCommandFilterACLSerializer(serializers.ModelSerializer):
+    command_groups = ObjectRelatedField(
+        many=True, required=False, queryset=CommandGroup.objects,
+        attrs=('id', 'name', 'type', 'content', 'ignore_case', 'pattern'),
+        label=_('Command group')
+    )
+    reviewers = ObjectRelatedField(
+        many=True, queryset=User.objects, label=_("Reviewers"), required=False
+    )
 
     class Meta:
-        model = CommandGroup
+        model = CommandFilterACL
         fields = [
-            'id', 'type', 'content', 'ignore_case', 'pattern'
+            'id', 'name', 'command_groups', 'action', 'reviewers', 'priority', 'is_active'
         ]
 
 
@@ -87,7 +97,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     account = _ConnectionTokenAccountSerializer(read_only=True, source='account_object')
     gateway = _ConnectionTokenGatewaySerializer(read_only=True)
     platform = _ConnectionTokenPlatformSerializer(read_only=True)
-    acl_command_groups = _ConnectionTokenACLCmdGroupSerializer(read_only=True, many=True)
+    command_filter_acls = _ConnectionTokenCommandFilterACLSerializer(read_only=True, many=True)
     actions = ActionChoicesField()
     expire_at = serializers.IntegerField()
     expire_now = serializers.BooleanField(label=_('Expired now'), write_only=True, default=True)
@@ -97,7 +107,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
         model = ConnectionToken
         fields = [
             'id', 'value', 'user', 'asset', 'account',
-            'platform', 'acl_command_groups', 'protocol',
+            'platform', 'command_filter_acls', 'protocol',
             'gateway', 'actions', 'expire_at', 'expire_now',
             'connect_method'
         ]

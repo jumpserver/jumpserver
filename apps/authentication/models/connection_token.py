@@ -161,7 +161,7 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
         kwargs = {
             'user': self.user,
             'asset': self.asset,
-            'account': self.account,
+            'account': self.account_object,
         }
         acls = CommandFilterACL.filter_queryset(**kwargs).valid()
         return acls
