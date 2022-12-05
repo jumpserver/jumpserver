@@ -28,18 +28,14 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
         'assets.Asset', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='connection_tokens', verbose_name=_('Asset'),
     )
-    account_name = models.CharField(max_length=128, verbose_name=_("Account name"))  # 登录账号Name
-    input_username = models.CharField(max_length=128, default='', blank=True, verbose_name=_("Input Username"))
-    input_secret = EncryptCharField(max_length=64, default='', blank=True, verbose_name=_("Input Secret"))
-    protocol = models.CharField(
-        choices=Protocol.choices, max_length=16, default=Protocol.ssh, verbose_name=_("Protocol")
-    )
+    account = models.CharField(max_length=128, verbose_name=_("Account name"))  # 登录账号Name
+    input_username = models.CharField(max_length=128, default='', blank=True, verbose_name=_("Input username"))
+    input_secret = EncryptCharField(max_length=64, default='', blank=True, verbose_name=_("Input secret"))
+    protocol = models.CharField(max_length=16, default=Protocol.ssh, verbose_name=_("Protocol"))
     connect_method = models.CharField(max_length=32, verbose_name=_("Connect method"))
     user_display = models.CharField(max_length=128, default='', verbose_name=_("User display"))
     asset_display = models.CharField(max_length=128, default='', verbose_name=_("Asset display"))
-    date_expired = models.DateTimeField(
-        default=date_expired_default, verbose_name=_("Date expired")
-    )
+    date_expired = models.DateTimeField(default=date_expired_default, verbose_name=_("Date expired"))
 
     class Meta:
         ordering = ('-date_expired',)
@@ -78,7 +74,7 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
     def permed_account(self):
         from perms.utils import PermAccountUtil
         permed_account = PermAccountUtil().validate_permission(
-            self.user, self.asset, self.account_name
+            self.user, self.asset, self.account
         )
         return permed_account
 
@@ -101,13 +97,13 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
             is_valid = False
             error = _('No asset or inactive asset')
             return is_valid, error
-        if not self.account_name:
+        if not self.account:
             error = _('No account')
             raise PermissionDenied(error)
 
         if not self.permed_account or not self.permed_account.actions:
             msg = 'user `{}` not has asset `{}` permission for login `{}`'.format(
-                self.user, self.asset, self.account_name
+                self.user, self.asset, self.account
             )
             raise PermissionDenied(msg)
 
@@ -120,15 +116,15 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
         return self.asset.platform
 
     @lazyproperty
-    def account(self):
+    def account_object(self):
         from assets.models import Account
         if not self.asset:
             return None
 
-        account = self.asset.accounts.filter(name=self.account_name).first()
-        if self.account_name == '@INPUT' or not account:
+        account = self.asset.accounts.filter(name=self.account).first()
+        if self.account == '@INPUT' or not account:
             data = {
-                'name': self.account_name,
+                'name': self.account,
                 'username': self.input_username,
                 'secret_type': 'password',
                 'secret': self.input_secret,

@@ -12,8 +12,7 @@ from common.drf.fields import ObjectRelatedField
 from ..models import ConnectionToken
 
 __all__ = [
-    'ConnectionTokenSerializer', 'ConnectionTokenSecretSerializer',
-    'SuperConnectionTokenSerializer', 'ConnectionTokenDisplaySerializer'
+    'ConnectionTokenSerializer', 'SuperConnectionTokenSerializer',
 ]
 
 
@@ -24,11 +23,9 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         model = ConnectionToken
         fields_mini = ['id', 'value']
         fields_small = fields_mini + [
-            'user', 'asset', 'account_name',
-            'input_username', 'input_secret',
-            'connect_method', 'protocol',
-            'actions', 'date_expired', 'date_created',
-            'date_updated', 'created_by',
+            'user', 'asset', 'account', 'input_username',
+            'input_secret', 'connect_method', 'protocol', 'actions',
+            'date_expired', 'date_created', 'date_updated', 'created_by',
             'updated_by', 'org_id', 'org_name',
         ]
         read_only_fields = [
@@ -50,32 +47,15 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         return self.get_request_user()
 
 
-class ConnectionTokenDisplaySerializer(ConnectionTokenSerializer):
-    class Meta(ConnectionTokenSerializer.Meta):
-        extra_kwargs = {
-            'secret': {'write_only': True},
-        }
-
-
-#
-# SuperConnectionTokenSerializer
-#
-
-
 class SuperConnectionTokenSerializer(ConnectionTokenSerializer):
     class Meta(ConnectionTokenSerializer.Meta):
-        read_only_fields = [
-            'validity', 'user_display', 'system_user_display',
-            'asset_display', 'application_display',
-        ]
+        pass
 
     def get_user(self, attrs):
         return attrs.get('user') or self.get_request_user()
 
 
-#
 # Connection Token Secret
-#
 
 
 class ConnectionTokenUserSerializer(serializers.ModelSerializer):
