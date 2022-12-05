@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from common.utils import lazyproperty, get_logger
 from orgs.mixins.models import JMSOrgBaseModel
 
-from .base import UserAssetAccountBaseACL, UserAssetAccountACLQuerySet, ACLManager
+from .base import UserAssetAccountBaseACL
 
 logger = get_logger(__file__)
 
@@ -94,23 +94,11 @@ class CommandGroup(JMSOrgBaseModel):
         return '{} % {}'.format(self.name, self.type)
 
 
-class CommandFilterACLQuerySet(UserAssetAccountACLQuerySet):
-    def get_command_groups(self):
-        ids = self.values_list('id', flat=True)
-        queryset = CommandFilterACL.command_groups.through.objects.filter(commandfilteracl_id__in=ids)
-        cmd_group_ids = queryset.values_list('commandgroup_id', flat=True)
-        command_groups = CommandGroup.objects.filter(id__in=cmd_group_ids)
-        return command_groups
-
-
 class CommandFilterACL(UserAssetAccountBaseACL):
     command_groups = models.ManyToManyField(CommandGroup, verbose_name=_('Commands'))
 
-    objects = ACLManager.from_queryset(CommandFilterACLQuerySet)()
-
-    class Meta:
-        unique_together = ('name', 'org_id')
-        ordering = ('priority', '-date_updated', 'name')
+    class Meta(UserAssetAccountBaseACL.Meta):
+        abstract = False
         verbose_name = _('Command acl')
 
     def __str__(self):

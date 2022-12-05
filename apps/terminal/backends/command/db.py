@@ -21,7 +21,7 @@ class CommandStore(CommandBase):
         """
         self.model.objects.create(
             user=command["user"], asset=command["asset"],
-            system_user=command["system_user"], input=command["input"],
+            account=command["account"], input=command["input"],
             output=command["output"], session=command["session"],
             risk_level=command.get("risk_level", 0), org_id=command["org_id"],
             timestamp=command["timestamp"]
@@ -36,7 +36,7 @@ class CommandStore(CommandBase):
             cmd_input = pretty_string(c['input'])
             cmd_output = pretty_string(c['output'], max_length=1024)
             _commands.append(self.model(
-                user=c["user"], asset=c["asset"], system_user=c["system_user"],
+                user=c["user"], asset=c["asset"], account=c["account"],
                 input=cmd_input, output=cmd_output, session=c["session"],
                 risk_level=c.get("risk_level", 0), org_id=c["org_id"],
                 timestamp=c["timestamp"]
@@ -64,7 +64,7 @@ class CommandStore(CommandBase):
     @staticmethod
     def make_filter_kwargs(
             date_from=None, date_to=None,
-            user=None, asset=None, system_user=None,
+            user=None, asset=None, account=None,
             input=None, session=None, risk_level=None, org_id=None):
         filter_kwargs = {}
         date_from_default = timezone.now() - datetime.timedelta(days=7)
@@ -87,8 +87,8 @@ class CommandStore(CommandBase):
             filter_kwargs["user__startswith"] = user
         if asset:
             filter_kwargs['asset'] = asset
-        if system_user:
-            filter_kwargs['system_user'] = system_user
+        if account:
+            filter_kwargs['account'] = account
         if input:
             filter_kwargs['input__icontains'] = input
         if session:
@@ -100,22 +100,22 @@ class CommandStore(CommandBase):
         return filter_kwargs
 
     def filter(self, date_from=None, date_to=None,
-               user=None, asset=None, system_user=None,
+               user=None, asset=None, account=None,
                input=None, session=None, risk_level=None, org_id=None):
         filter_kwargs = self.make_filter_kwargs(
             date_from=date_from, date_to=date_to, user=user,
-            asset=asset, system_user=system_user, input=input,
+            asset=asset, account=account, input=input,
             session=session, risk_level=risk_level, org_id=org_id,
         )
         queryset = self.model.objects.filter(**filter_kwargs)
         return queryset
 
     def count(self, date_from=None, date_to=None,
-              user=None, asset=None, system_user=None,
+              user=None, asset=None, account=None,
               input=None, session=None):
         filter_kwargs = self.make_filter_kwargs(
             date_from=date_from, date_to=date_to, user=user,
-            asset=asset, system_user=system_user, input=input,
+            asset=asset, account=account, input=input,
             session=session,
         )
         count = self.model.objects.filter(**filter_kwargs).count()

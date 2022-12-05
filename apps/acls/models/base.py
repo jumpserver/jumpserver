@@ -83,6 +83,7 @@ class BaseACL(CommonModelMixin):
     objects = ACLManager.from_queryset(BaseACLQuerySet)()
 
     class Meta:
+        ordering = ('priority', 'name')
         abstract = True
 
 
@@ -96,7 +97,8 @@ class UserAssetAccountBaseACL(BaseACL, OrgModelMixin):
 
     objects = ACLManager.from_queryset(UserAssetAccountACLQuerySet)()
 
-    class Meta:
+    class Meta(BaseACL.Meta):
+        unique_together = ('name', 'org_id')
         abstract = True
 
     @classmethod
@@ -118,4 +120,3 @@ class UserAssetAccountBaseACL(BaseACL, OrgModelMixin):
         if kwargs:
             queryset = queryset.filter(**kwargs)
         return queryset
-

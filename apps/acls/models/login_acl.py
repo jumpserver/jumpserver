@@ -15,9 +15,9 @@ class LoginACL(BaseACL):
     # 规则, ip_group, time_period
     rules = models.JSONField(default=dict, verbose_name=_('Rule'))
 
-    class Meta:
-        ordering = ('priority', '-date_updated', 'name')
+    class Meta(BaseACL.Meta):
         verbose_name = _('Login acl')
+        abstract = False
 
     def __str__(self):
         return self.name

@@ -49,7 +49,7 @@ class CommandStore(object):
         self.es = Elasticsearch(hosts=hosts, max_retries=0, **kwargs)
 
         self.exact_fields = set()
-        self.match_fields = {'input', 'risk_level', 'user', 'asset', 'system_user'}
+        self.match_fields = {'input', 'risk_level', 'user', 'asset', 'account'}
         may_exact_fields = {'session', 'org_id'}
 
         if self.is_new_index_type():
@@ -142,7 +142,7 @@ class CommandStore(object):
     def make_data(command):
         data = dict(
             user=command["user"], asset=command["asset"],
-            system_user=command["system_user"], input=command["input"],
+            account=command["account"], input=command["input"],
             output=command["output"], risk_level=command["risk_level"],
             session=command["session"], timestamp=command["timestamp"],
             org_id=command["org_id"]

@@ -26,7 +26,7 @@ __all__ = ['CommandViewSet', 'InsecureCommandAlertAPI']
 class CommandQueryMixin:
     command_store = get_command_storage()
     filterset_fields = [
-        "asset", "system_user", "user", "session",
+        "asset", "account", "user", "session",
         "risk_level", "input"
     ]
     default_days_ago = 5
@@ -56,7 +56,7 @@ class CommandQueryMixin:
         multi_command_storage = get_multi_command_storage()
         queryset = multi_command_storage.filter(
             date_from=date_from, date_to=date_to,
-            user=q.get("user"), asset=q.get("asset"), system_user=q.get("system_user"),
+            user=q.get("user"), asset=q.get("asset"), account=q.get("account"),
             input=q.get("input"), session=q.get("session_id", q.get('session')),
             risk_level=self.get_query_risk_level(), org_id=self.get_org_id(),
         )
@@ -91,7 +91,7 @@ class CommandViewSet(JMSBulkModelViewSet):
     {
         "user": "admin",
         "asset": "localhost",
-        "system_user": "web",
+        "account": "web",
         "session": "xxxxxx",
         "input": "whoami",
         "output": "d2hvbWFp",  # base64.b64encode(s)
