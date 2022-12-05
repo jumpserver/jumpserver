@@ -1,4 +1,4 @@
-from ..common import Asset
+from .common import Asset
 
 __all__ = ['Host']
 

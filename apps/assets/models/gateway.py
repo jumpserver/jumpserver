@@ -12,7 +12,7 @@ from assets.const import GATEWAY_NAME, Connectivity
 from assets.models.platform import Platform
 from assets.models.account import Account
 
-from .host import Host
+from .asset.host import Host
 
 logger = get_logger(__file__)
 

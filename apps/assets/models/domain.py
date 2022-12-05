@@ -9,7 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from common.utils import get_logger, lazyproperty
 from orgs.mixins.models import OrgModelMixin
 
-from .asset.host.gateway import Gateway
+from .gateway import Gateway
 
 logger = get_logger(__file__)
 
