@@ -15,6 +15,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
     oracle = 'oracle', 'Oracle'
     postgresql = 'postgresql', 'PostgreSQL'
     sqlserver = 'sqlserver', 'SQLServer'
+    clickhouse = 'clickhouse', 'ClickHouse'
     redis = 'redis', 'Redis'
     mongodb = 'mongodb', 'MongoDB'
 
@@ -74,6 +75,10 @@ class Protocol(ChoicesMixin, models.TextChoices):
             },
             cls.sqlserver: {
                 'port': 1433,
+                'secret_types': ['password'],
+            },
+            cls.clickhouse: {
+                'port': 9000,
                 'secret_types': ['password'],
             },
             cls.mongodb: {

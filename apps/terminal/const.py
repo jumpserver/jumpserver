@@ -62,6 +62,7 @@ class WebMethod(TextChoices):
             Protocol.oracle: [cls.web_cli, cls.web_gui],
             Protocol.postgresql: [cls.web_cli, cls.web_gui],
             Protocol.sqlserver: [cls.web_cli, cls.web_gui],
+            Protocol.clickhouse: [cls.web_cli],
             Protocol.redis: [cls.web_cli],
             Protocol.mongodb: [cls.web_cli],
 
@@ -192,8 +193,8 @@ class TerminalType(TextChoices):
                     Protocol.ssh, Protocol.telnet,
                     Protocol.mysql, Protocol.postgresql,
                     Protocol.oracle, Protocol.sqlserver,
-                    Protocol.mariadb, Protocol.redis,
-                    Protocol.mongodb, Protocol.k8s,
+                    Protocol.mariadb, Protocol.clickhouse,
+                    Protocol.redis, Protocol.mongodb, Protocol.k8s,
                 ],
                 'match': 'm2m'
             },
