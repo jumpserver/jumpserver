@@ -78,10 +78,7 @@ class StorageMixin:
 class Terminal(StorageMixin, TerminalStatusMixin, models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
-    type = models.CharField(
-        choices=TypeChoices.choices, default=TypeChoices.koko,
-        max_length=64, verbose_name=_('type')
-    )
+    type = models.CharField(default=TypeChoices.koko, max_length=64, verbose_name=_('type'))
     remote_addr = models.CharField(max_length=128, blank=True, verbose_name=_('Remote Address'))
     command_storage = models.CharField(max_length=128, verbose_name=_("Command storage"), default='default')
     replay_storage = models.CharField(max_length=128, verbose_name=_("Replay storage"), default='default')

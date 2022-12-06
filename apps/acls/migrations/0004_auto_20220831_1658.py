@@ -15,7 +15,7 @@ def migrate_system_users_to_accounts(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('acls', '0003_auto_20211130_1037'),
+        ('acls', '0002_auto_20210926_1047'),
     ]
 
     operations = [

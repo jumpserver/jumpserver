@@ -128,7 +128,7 @@ def migrate_to_nodes(apps, *args):
 class Migration(migrations.Migration):
     dependencies = [
         ('assets', '0097_auto_20220426_1558'),
-        ('applications', '0020_auto_20220316_2028')
+        ('applications', '0003_auto_20191210_1659')
     ]
 
     operations = [

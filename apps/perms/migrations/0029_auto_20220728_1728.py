@@ -60,9 +60,8 @@ def migrate_relations(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('perms', '0028_auto_20220316_2028'),
+        ('perms', '0002_auto_20171228_0025'),
     ]
 
     operations = [

@@ -15,9 +15,8 @@ def update_builtin_org(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('orgs', '0013_alter_organization_options'),
+        ('orgs', '0003_auto_20190916_1057'),
     ]
 
     operations = [

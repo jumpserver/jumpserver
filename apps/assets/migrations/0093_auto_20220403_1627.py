@@ -50,7 +50,8 @@ def migrate_hardware_info(apps, *args):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('assets', '0092_commandfilter_nodes'),
+        ('assets', '0003_auto_20180109_2331'),
+        ('orgs', '0001_initial'),
     ]
 
     operations = [

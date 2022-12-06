@@ -24,9 +24,8 @@ def migrate_run_system_user_to_account(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('ops', '0021_auto_20211130_1037'),
+        ('ops', '0002_celerytask'),
     ]
 
     operations = [

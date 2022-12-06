@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('audits', '0015_auto_20221011_1745'),
+        ('audits', '0001_initial'),
     ]
 
     operations = [
