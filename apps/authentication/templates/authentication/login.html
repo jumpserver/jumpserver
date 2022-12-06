@@ -18,7 +18,6 @@
 
     <style>
         .login-content {
-            box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.15), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
         }
 
         .help-block {
@@ -61,7 +60,7 @@
         }
 
         body {
-            background-color: #f2f2f2;
+            background-color: #ffffff;
             height: calc(100vh - (100vh - 470px) / 3);
         }
 
@@ -71,7 +70,7 @@
 
         .right-image-box {
             height: 100%;
-            width: 50%;
+            width: 56%;
             float: right;
         }
 
@@ -79,7 +78,8 @@
             text-align: center;
             background-color: white;
             height: 100%;
-            width: 50%;
+            width: 44%;
+            border-right: 1px solid #EFF0F1;
         }
 
         .red-fonts {
@@ -95,7 +95,7 @@
         }
 
         .jms-title {
-            padding: 60px 10px 10px;
+            padding: 22px 10px 10px;
         }
 
         .more-login-items {
@@ -121,11 +121,11 @@
 
         .login-page-language {
             font-size: 12px!important;
-            margin-right: -11px !important;
+            margin-right: -32px !important;
             padding-top: 12px !important;
             padding-left: 0 !important;
             padding-bottom: 8px !important;
-            color: #666 !important;
+            color:#8F959E !important;
             font-weight: 350 !important;
             min-height: auto !important;
         }
@@ -176,6 +176,34 @@
         .has-error .more-login {
             margin-top: 0;
         }
+        .welcome-message {
+            color: #646A73;
+        }
+        .navbar-right .dropdown-menu {
+            right: -24px!important;
+            left: auto;
+        }
+        .auto_login_box {
+            display: inline-block;
+        }
+        .auto-login input[type=checkbox] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            position: relative;
+            display: inline-block;
+            margin-top: -1px;
+            vertical-align: middle;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            border: 1px solid var(--primary-color);
+            outline: none;
+            cursor: pointer;
+        }
+        .auto-login input[type=checkbox]:checked {
+            border: 4px solid var(--primary-color);
+        }
     </style>
 </head>
 
@@ -188,25 +216,8 @@
     </div>
     <div class="left-form-box {% if not form.challenge and not form.captcha %} no-captcha-challenge {% endif %}">
         <div style="background-color: white">
-            <ul class="nav navbar-top-links navbar-right">
-                <li class="dropdown">
-                    <a class="dropdown-toggle login-page-language" data-toggle="dropdown" href="#" target="_blank">
-                        <i class="fa fa-globe fa-lg" style="margin-right: 2px"></i>
-                        <span>{{ current_lang.title }}<b class="caret"></b></span>
-                    </a>
-                    <ul class="dropdown-menu profile-dropdown dropdown-menu-right">
-                        {% for lang in langs %}
-                        <li>
-                            <a href="{% url 'i18n-switch' lang=lang.code %}">
-                                <span>{{ lang.title }}</span>
-                            </a>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </li>
-            </ul>
             <div class="jms-title">
-                <span style="">{{ INTERFACE.login_title }}</span>
+                <img src="{{ INTERFACE.logo_text_green }}" class="jms-title-img" />
             </div>
             <div class="contact-form col-md-10 col-md-offset-1">
                 <form id="login-form" action="" method="post" role="form" novalidate="novalidate">
@@ -222,6 +233,24 @@
                         </p>
                     {% endif %}
                     </div>
+
+                    <ul class="nav navbar-top-links navbar-right">
+                        <li class="dropdown">
+                            <a class="dropdown-toggle login-page-language" data-toggle="dropdown" href="#" target="_blank">
+                                <i class="fa fa-globe fa-lg" style="margin-right: 2px"></i>
+                                <span>{{ current_lang.title }}<b class="caret"></b></span>
+                            </a>
+                            <ul class="dropdown-menu profile-dropdown dropdown-menu-right">
+                                {% for lang in langs %}
+                                <li>
+                                    <a href="{% url 'i18n-switch' lang=lang.code %}">
+                                        <span>{{ lang.title }}</span>
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    </ul>
 
                     {% bootstrap_field form.username show_label=False %}
                     <div class="form-group {% if form.password.errors %} has-error {% endif %}">
@@ -248,9 +277,10 @@
                         <div class="row">
                             <div class="col-md-6" style="text-align: left">
                                 {% if form.auto_login %}
-                                    {% bootstrap_field form.auto_login form_group_class='' %}
+                                    {% bootstrap_field form.auto_login form_group_class='auto_login_box' %}
                                 {% endif %}
                             </div>
+
                             <div class="col-md-6" style="line-height: 25px">
                                 <a id="forgot_password" href="{{ forgot_password_url }}" style="float: right">
                                     <small>{% trans 'Forgot password' %}?</small>
