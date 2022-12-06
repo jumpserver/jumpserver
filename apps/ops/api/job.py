@@ -1,14 +1,15 @@
-from rest_framework import viewsets
-from rest_framework_bulk import BulkModelViewSet
+from rest_framework.views import APIView
 
-from common.mixins import CommonApiMixin
+from rest_framework.response import Response
+
 from ops.api.base import SelfBulkModelViewSet
 from ops.models import Job, JobExecution
 from ops.serializers.job import JobSerializer, JobExecutionSerializer
 
-__all__ = ['JobViewSet', 'JobExecutionViewSet']
+__all__ = ['JobViewSet', 'JobExecutionViewSet', 'JobRunVariableHelpAPIView']
 
 from ops.tasks import run_ops_job_execution
+from ops.variables import JMS_JOB_VARIABLE_HELP
 
 
 def set_task_to_serializer_data(serializer, task):
@@ -64,3 +65,11 @@ class JobExecutionViewSet(SelfBulkModelViewSet):
         if job_id:
             query_set = query_set.filter(job_id=job_id)
         return query_set
+
+
+class JobRunVariableHelpAPIView(APIView):
+    rbac_perms = ()
+    permission_classes = ()
+
+    def get(self, request, **kwargs):
+        return Response(data=JMS_JOB_VARIABLE_HELP)

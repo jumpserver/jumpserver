@@ -27,6 +27,7 @@ class JobSerializer(serializers.ModelSerializer, PeriodTaskSerializerMixin):
 
 class JobExecutionSerializer(serializers.ModelSerializer):
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
+    job_type = serializers.ReadOnlyField(label=_("Job type"))
 
     class Meta:
         model = JobExecution
