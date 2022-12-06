@@ -27,7 +27,15 @@ class AccountViewSet(OrgBulkModelViewSet):
     rbac_perms = {
         'verify': 'assets.test_account',
         'partial_update': 'assets.change_accountsecret',
+        'su_from_accounts': 'assets.view_account',
     }
+
+    @action(methods=['get'], detail=True, url_path='su-from-accounts')
+    def su_from_accounts(self, request, *args, **kwargs):
+        account = super().get_object()
+        accounts = account.get_su_from_accounts()
+        serializer = serializers.AccountSerializer(accounts, many=True)
+        return Response(data=serializer.data)
 
     @action(methods=['post'], detail=True, url_path='verify')
     def verify_account(self, request, *args, **kwargs):

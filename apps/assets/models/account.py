@@ -87,6 +87,9 @@ class Account(AbsConnectivity, BaseAccount):
         """ @USER 动态用户的账号(self) """
         return cls(name=cls.AliasAccount.USER.label, username=cls.AliasAccount.USER.value)
 
+    def get_su_from_accounts(self):
+        return self.asset.accounts.exclude(id=self.id)
+
 
 class AccountTemplate(BaseAccount):
     class Meta:
