@@ -2,7 +2,9 @@ import os
 import zipfile
 
 from django.conf import settings
+from rest_framework_bulk import BulkModelViewSet
 
+from common.mixins import CommonApiMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from ..exception import PlaybookNoValidEntry
 from ..models import Playbook
@@ -17,7 +19,7 @@ def unzip_playbook(src, dist):
         fz.extract(file, dist)
 
 
-class PlaybookViewSet(OrgBulkModelViewSet):
+class PlaybookViewSet(CommonApiMixin, BulkModelViewSet):
     serializer_class = PlaybookSerializer
     permission_classes = ()
     model = Playbook

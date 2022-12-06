@@ -1,8 +1,9 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from authentication.models import ConnectionToken
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
+
+from ..models import ConnectionToken
 
 __all__ = [
     'ConnectionTokenSerializer', 'SuperConnectionTokenSerializer',

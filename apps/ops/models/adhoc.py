@@ -4,15 +4,15 @@ import uuid
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from common.db.models import JMSBaseModel
 from common.utils import get_logger
-from orgs.mixins.models import JMSOrgBaseModel
 
 __all__ = ["AdHoc"]
 
 logger = get_logger(__file__)
 
 
-class AdHoc(JMSOrgBaseModel):
+class AdHoc(JMSBaseModel):
     class Modules(models.TextChoices):
         shell = 'shell', _('Shell')
         winshell = 'win_shell', _('Powershell')
@@ -25,7 +25,6 @@ class AdHoc(JMSOrgBaseModel):
     args = models.CharField(max_length=1024, default='', verbose_name=_('Args'))
     creator = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
     comment = models.CharField(max_length=1024, default='', verbose_name=_('Comment'), null=True, blank=True)
-
 
     @property
     def row_count(self):

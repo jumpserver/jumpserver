@@ -3,6 +3,7 @@ from .platform import *
 from .asset import *
 from .label import Label
 from .group import *
+from .gateway import *
 from .domain import *
 from .node import *
 from .utils import *
