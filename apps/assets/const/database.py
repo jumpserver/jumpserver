@@ -8,6 +8,7 @@ class DatabaseTypes(BaseType):
     POSTGRESQL = 'postgresql', 'PostgreSQL'
     ORACLE = 'oracle', 'Oracle'
     SQLSERVER = 'sqlserver', 'SQLServer'
+    CLICKHOUSE = 'clickhouse', 'ClickHouse'
     MONGODB = 'mongodb', 'MongoDB'
     REDIS = 'redis', 'Redis'
 
@@ -54,6 +55,9 @@ class DatabaseTypes(BaseType):
             cls.POSTGRESQL: [{'name': 'PostgreSQL'}],
             cls.ORACLE: [{'name': 'Oracle'}],
             cls.SQLSERVER: [{'name': 'SQLServer'}],
+            cls.CLICKHOUSE: [
+                {'name': 'ClickHouse', 'automation': {'ansible_enabled': False}}
+            ],
             cls.MONGODB: [{'name': 'MongoDB'}],
             cls.REDIS: [{'name': 'Redis'}],
         }
