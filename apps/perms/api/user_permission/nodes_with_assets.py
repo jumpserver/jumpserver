@@ -1,18 +1,23 @@
 # -*- coding: utf-8 -*-
 #
+from urllib.parse import parse_qsl
+
 from django.conf import settings
 from django.db.models import F, Value, CharField
 from rest_framework.generics import ListAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.generics import get_object_or_404
 
-from common.utils import get_logger, get_object_or_none
 from common.utils.common import timeit
 from common.permissions import IsValidUser
+from common.utils import get_logger, get_object_or_none
 
 from assets.models import Asset
+from assets.utils import KubernetesTree
 from assets.api import SerializeToTreeNodeMixin
 from perms.hands import Node
+from perms.utils import PermAccountUtil
 from perms.models import AssetPermission, PermNode
 from perms.utils.user_permission import (
     UserGrantedTreeBuildUtils, get_user_all_asset_perm_ids,
@@ -156,3 +161,39 @@ class UserGrantedNodeChildrenWithAssetsAsTreeApi(
 ):
     """ 用户授权的节点的子节点与资产树 """
     pass
+
+
+class UserGrantedK8sAsTreeApi(
+    SelfOrPKUserMixin,
+    RebuildTreeMixin,
+    ListAPIView
+):
+    """ 用户授权的K8s树 """
+
+    @staticmethod
+    def asset(asset_id):
+        kwargs = {'id': asset_id, 'is_active': True}
+        asset = get_object_or_404(Asset, **kwargs)
+        return asset
+
+    def list(self, request: Request, *args, **kwargs):
+        asset_id = request.query_params.get('asset_id', None)
+        parent_info = request.query_params.get('parentInfo', None)
+
+        tree = []
+        util = PermAccountUtil()
+        parent_info = dict(parse_qsl(parent_info))
+        pod_name = parent_info.get('pod')
+        namespace = parent_info.get('namespace')
+        account_id = parent_info.get('account_id')
+
+        if asset_id and not any([pod_name, namespace, account_id]):
+            accounts = util.get_permed_accounts_for_user(self.user, self.asset)
+            for account in accounts:
+                account_node = KubernetesTree(asset_id).as_account_tree_node(
+                    account, parent_info
+                )
+                tree.append(account_node)
+            return tree
+        tree = KubernetesTree(asset_id).async_tree_node(parent_info)
+        return Response(data=tree)

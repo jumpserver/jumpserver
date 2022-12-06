@@ -35,6 +35,10 @@ user_permission_urlpatterns = [
          api.UserGrantedNodeChildrenWithAssetsAsTreeApi.as_view(),
          name='user-nodes-children-with-assets-as-tree'),
 
+    path('<str:user>/nodes/children-with-k8s/tree/',
+         api.UserGrantedK8sAsTreeApi.as_view(),
+         name='user-nodes-children-with-k8s-as-tree'),
+
     path('nodes-with-assets/tree/', api.MyGrantedNodesWithAssetsAsTreeApi.as_view(),
          name='my-nodes-with-assets-as-tree'),
 
