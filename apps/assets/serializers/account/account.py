@@ -59,7 +59,7 @@ class AccountSerializer(AccountSerializerCreateMixin, BaseAccountSerializer):
         label=_('Asset'), attrs=('id', 'name', 'address', 'platform_id')
     )
     su_from = ObjectRelatedField(
-        required=False, queryset=Account.objects,
+        required=False, queryset=Account.objects, allow_null=True, allow_empty=True,
         label=_('Account'), attrs=('id', 'name', 'username')
     )
 
