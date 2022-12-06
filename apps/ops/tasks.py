@@ -28,23 +28,21 @@ logger = get_logger(__file__)
 @shared_task(soft_time_limit=60, queue="ansible", verbose_name=_("Run ansible task"))
 def run_ops_job(job_id):
     job = get_object_or_none(Job, id=job_id)
-    with tmp_to_org(job.org):
-        execution = job.create_execution()
-        run_ops_job_execution(execution)
+    execution = job.create_execution()
+    run_ops_job_execution(execution)
 
 
 @shared_task(soft_time_limit=60, queue="ansible", verbose_name=_("Run ansible task execution"))
 def run_ops_job_execution(execution_id, **kwargs):
     execution = get_object_or_none(JobExecution, id=execution_id)
-    with tmp_to_org(execution.org):
-        try:
-            execution.start()
-        except SoftTimeLimitExceeded:
-            execution.set_error('Run timeout')
-            logger.error("Run adhoc timeout")
-        except Exception as e:
-            execution.set_error(e)
-            logger.error("Start adhoc execution error: {}".format(e))
+    try:
+        execution.start()
+    except SoftTimeLimitExceeded:
+        execution.set_error('Run timeout')
+        logger.error("Run adhoc timeout")
+    except Exception as e:
+        execution.set_error(e)
+        logger.error("Start adhoc execution error: {}".format(e))
 
 
 @shared_task(verbose_name=_('Periodic clear celery tasks'))

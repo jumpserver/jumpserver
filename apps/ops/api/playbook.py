@@ -6,6 +6,7 @@ from rest_framework_bulk import BulkModelViewSet
 
 from common.mixins import CommonApiMixin
 from orgs.mixins.api import OrgBulkModelViewSet
+from .base import SelfBulkModelViewSet
 from ..exception import PlaybookNoValidEntry
 from ..models import Playbook
 from ..serializers.playbook import PlaybookSerializer
@@ -19,7 +20,7 @@ def unzip_playbook(src, dist):
         fz.extract(file, dist)
 
 
-class PlaybookViewSet(CommonApiMixin, BulkModelViewSet):
+class PlaybookViewSet(SelfBulkModelViewSet):
     serializer_class = PlaybookSerializer
     permission_classes = ()
     model = Playbook
