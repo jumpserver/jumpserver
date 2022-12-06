@@ -14,13 +14,13 @@ user_permission_urlpatterns = [
          name='user-ungroup-assets-as-tree'),
 
     # nodes
-    path('<str:user>/nodes/', api.UserGrantedNodesApi.as_view(),
+    path('<str:user>/nodes/', api.UserPermedNodesApi.as_view(),
          name='user-nodes'),
-    path('<str:user>/nodes/tree/', api.UserGrantedNodesAsTreeApi.as_view(),
+    path('<str:user>/nodes/tree/', api.UserPermedNodesAsTreeApi.as_view(),
          name='user-nodes-as-tree'),
-    path('<str:user>/nodes/children/', api.UserGrantedNodeChildrenApi.as_view(),
+    path('<str:user>/nodes/children/', api.UserPermedNodeChildrenApi.as_view(),
          name='user-nodes-children'),
-    path('<str:user>/nodes/children/tree/', api.UserGrantedNodeChildrenAsTreeApi.as_view(),
+    path('<str:user>/nodes/children/tree/', api.UserPermedNodeChildrenAsTreeApi.as_view(),
          name='user-nodes-children-as-tree'),
 
     # node-assets

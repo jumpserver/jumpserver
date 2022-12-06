@@ -16,10 +16,10 @@ from .mixin import SelfOrPKUserMixin, RebuildTreeMixin
 logger = get_logger(__name__)
 
 __all__ = [
-    'UserGrantedNodesApi',
-    'UserGrantedNodesAsTreeApi',
-    'UserGrantedNodeChildrenApi',
-    'UserGrantedNodeChildrenAsTreeApi',
+    'UserPermedNodesApi',
+    'UserPermedNodesAsTreeApi',
+    'UserPermedNodeChildrenApi',
+    'UserPermedNodeChildrenAsTreeApi',
     'BaseGrantedNodeAsTreeApi',
     'UserGrantedNodesMixin',
 ]
@@ -95,7 +95,7 @@ class UserGrantedNodesMixin:
 # API
 
 
-class UserGrantedNodeChildrenApi(
+class UserPermedNodeChildrenApi(
     SelfOrPKUserMixin,
     UserGrantedNodeChildrenMixin,
     BaseNodeChildrenApi
@@ -104,7 +104,7 @@ class UserGrantedNodeChildrenApi(
     pass
 
 
-class UserGrantedNodeChildrenAsTreeApi(
+class UserPermedNodeChildrenAsTreeApi(
     SelfOrPKUserMixin,
     RebuildTreeMixin,
     UserGrantedNodeChildrenMixin,
@@ -114,7 +114,7 @@ class UserGrantedNodeChildrenAsTreeApi(
     pass
 
 
-class UserGrantedNodesApi(
+class UserPermedNodesApi(
     SelfOrPKUserMixin,
     UserGrantedNodesMixin,
     BaseGrantedNodeApi
@@ -123,7 +123,7 @@ class UserGrantedNodesApi(
     pass
 
 
-class UserGrantedNodesAsTreeApi(
+class UserPermedNodesAsTreeApi(
     SelfOrPKUserMixin,
     RebuildTreeMixin,
     UserGrantedNodesMixin,
