@@ -20,7 +20,7 @@ class LoginAssetCheckAPI(CreateAPIView):
         return LoginAssetACL.objects.all()
 
     def create(self, request, *args, **kwargs):
-        data = self.check_confirm()
+        data = self.check_review()
         return Response(data=data, status=200)
 
     @lazyproperty
@@ -29,7 +29,7 @@ class LoginAssetCheckAPI(CreateAPIView):
         serializer.is_valid(raise_exception=True)
         return serializer
 
-    def check_confirm(self):
+    def check_review(self):
         with tmp_to_org(self.serializer.asset.org):
             kwargs = {
                 'user': self.serializer.user,
@@ -39,15 +39,15 @@ class LoginAssetCheckAPI(CreateAPIView):
             }
             acl = LoginAssetACL.filter_queryset(**kwargs).valid().first()
         if acl:
-            need_confirm = True
-            response_data = self._get_response_data_of_need_confirm(acl)
+            need_review = True
+            response_data = self._get_response_data_of_need_review(acl)
         else:
-            need_confirm = False
+            need_review = False
             response_data = {}
-        response_data['need_confirm'] = need_confirm
+        response_data['need_review'] = need_review
         return response_data
 
-    def _get_response_data_of_need_confirm(self, acl) -> dict:
+    def _get_response_data_of_need_review(self, acl) -> dict:
         ticket = LoginAssetACL.create_login_asset_confirm_ticket(
             user=self.serializer.user,
             asset=self.serializer.asset,
@@ -55,7 +55,7 @@ class LoginAssetCheckAPI(CreateAPIView):
             assignees=acl.reviewers.all(),
             org_id=self.serializer.asset.org.id,
         )
-        confirm_status_url = reverse(
+        review_status_url = reverse(
             view_name='api-tickets:super-ticket-status',
             kwargs={'pk': str(ticket.id)}
         )
@@ -67,8 +67,8 @@ class LoginAssetCheckAPI(CreateAPIView):
         ticket_detail_url = '{url}?type={type}'.format(url=ticket_detail_url, type=ticket.type)
         ticket_assignees = ticket.current_step.ticket_assignees.all()
         data = {
-            'check_confirm_status': {'method': 'GET', 'url': confirm_status_url},
-            'close_confirm': {'method': 'DELETE', 'url': confirm_status_url},
+            'check_review_status': {'method': 'GET', 'url': review_status_url},
+            'close_review': {'method': 'DELETE', 'url': review_status_url},
             'ticket_detail_url': ticket_detail_url,
             'reviewers': [str(ticket_assignee.assignee) for ticket_assignee in ticket_assignees],
             'ticket_id': str(ticket.id)

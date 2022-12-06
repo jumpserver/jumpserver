@@ -104,7 +104,7 @@ class CommandFilterACL(UserAssetAccountBaseACL):
     def __str__(self):
         return self.name
 
-    def create_command_confirm_ticket(self, run_command, session, cmd_filter_rule, org_id):
+    def create_command_review_ticket(self, run_command, session, cmd_filter_acl, org_id):
         from tickets.const import TicketType
         from tickets.models import ApplyCommandTicket
         data = {
@@ -116,8 +116,7 @@ class CommandFilterACL(UserAssetAccountBaseACL):
             'apply_run_account': str(session.account),
             'apply_run_command': run_command[:4090],
             'apply_from_session_id': str(session.id),
-            'apply_from_cmd_filter_rule_id': str(cmd_filter_rule.id),
-            'apply_from_cmd_filter_id': str(cmd_filter_rule.filter.id),
+            'apply_from_cmd_filter_acl_id': str(cmd_filter_acl.id),
             'org_id': org_id,
         }
         ticket = ApplyCommandTicket.objects.create(**data)

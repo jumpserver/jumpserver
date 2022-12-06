@@ -104,16 +104,16 @@ class ApplyAssetTicketViewSet(TicketViewSet):
 class ApplyLoginTicketViewSet(TicketViewSet):
     model = ApplyLoginTicket
     filterset_class = filters.ApplyLoginTicketFilter
-    serializer_class = serializers.LoginConfirmSerializer
+    serializer_class = serializers.LoginReviewSerializer
 
 
 class ApplyLoginAssetTicketViewSet(TicketViewSet):
     model = ApplyLoginAssetTicket
     filterset_class = filters.ApplyLoginAssetTicketFilter
-    serializer_class = serializers.LoginAssetConfirmSerializer
+    serializer_class = serializers.LoginAssetReviewSerializer
 
 
 class ApplyCommandTicketViewSet(TicketViewSet):
     model = ApplyCommandTicket
     filterset_class = filters.ApplyCommandTicketFilter
-    serializer_class = serializers.ApplyCommandConfirmSerializer
+    serializer_class = serializers.ApplyCommandReviewSerializer

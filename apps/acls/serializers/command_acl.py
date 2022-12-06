@@ -1,11 +1,16 @@
 from django.utils.translation import ugettext_lazy as _
+from rest_framework import serializers
 
+
+from terminal.models import Session
 from acls.models import CommandGroup, CommandFilterACL
+from common.utils import lazyproperty, get_object_or_none
 from common.drf.fields import ObjectRelatedField, LabeledChoiceField
+from orgs.utils import tmp_to_root_org
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .base import BaseUserAssetAccountACLSerializerMixin as BaseSerializer
 
-__all__ = ["CommandFilterACLSerializer", "CommandGroupSerializer"]
+__all__ = ["CommandFilterACLSerializer", "CommandGroupSerializer", "CommandReviewSerializer"]
 
 
 class CommandGroupSerializer(BulkOrgResourceModelSerializer):
@@ -27,3 +32,35 @@ class CommandFilterACLSerializer(BaseSerializer, BulkOrgResourceModelSerializer)
     class Meta(BaseSerializer.Meta):
         model = CommandFilterACL
         fields = BaseSerializer.Meta.fields + ['command_groups']
+
+
+class CommandReviewSerializer(serializers.Serializer):
+    session_id = serializers.UUIDField(required=True, allow_null=False)
+    cmd_filter_acl_id = serializers.UUIDField(required=True, allow_null=False)
+    run_command = serializers.CharField(required=True, allow_null=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.session = None
+        self.cmd_filter_acl = None
+
+    def validate_session_id(self, pk):
+        self.session = self.validate_object(Session, pk)
+        return pk
+
+    def validate_cmd_filter_acl_id(self, pk):
+        self.cmd_filter_acl = self.validate_object(CommandFilterACL, pk)
+        return pk
+
+    @lazyproperty
+    def org(self):
+        return self.session.org
+
+    @staticmethod
+    def validate_object(model, pk):
+        with tmp_to_root_org():
+            obj = get_object_or_none(model, id=pk)
+        if obj:
+            return obj
+        error = '{} Model object does not exist'.format(model.__name__)
+        raise serializers.ValidationError(error)
