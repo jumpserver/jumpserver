@@ -23,6 +23,7 @@ router.register(r'tasks', api.CeleryTaskViewSet, 'task')
 router.register(r'task-executions', api.CeleryTaskExecutionViewSet, 'task-executions')
 
 urlpatterns = [
+    path('variables/help/', api.JobRunVariableHelpAPIView.as_view(), name='variable-help'),
 
     path('ansible/job-execution/<uuid:pk>/log/', api.AnsibleTaskLogApi.as_view(), name='job-execution-log'),
 

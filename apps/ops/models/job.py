@@ -14,6 +14,7 @@ __all__ = ["Job", "JobExecution"]
 from common.db.models import JMSBaseModel
 from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner
 from ops.mixin import PeriodTaskModelMixin
+from ops.variables import *
 
 
 class Job(JMSBaseModel, PeriodTaskModelMixin):
@@ -128,6 +129,9 @@ class JobExecution(JMSBaseModel):
         else:
             extra_vars = {}
 
+        static_variables = self.gather_static_variables()
+        extra_vars.update(static_variables)
+
         if self.job.type == 'adhoc':
             args = self.compile_shell()
             runner = AdHocRunner(
@@ -141,6 +145,14 @@ class JobExecution(JMSBaseModel):
         else:
             raise Exception("unsupported job type")
         return runner
+
+    def gather_static_variables(self):
+        default = {
+            JMS_USERNAME: self.creator.username,
+            JMS_JOB_ID: self.job.id,
+            JMS_JOB_NAME: self.job.name,
+        }
+        return default
 
     @property
     def short_id(self):

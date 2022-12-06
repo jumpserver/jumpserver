@@ -4,7 +4,7 @@ import uuid
 
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import get_logger, get_object_or_none
+from common.utils import get_logger, get_object_or_none, make_dirs
 from orgs.utils import org_aware_func
 from jumpserver.const import PROJECT_DIR
 
