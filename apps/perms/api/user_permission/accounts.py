@@ -25,6 +25,5 @@ class UserPermedAssetAccountsApi(SelfOrPKUserMixin, ListAPIView):
         return asset
 
     def get_queryset(self):
-        util = PermAccountUtil()
-        accounts = util.get_permed_accounts_for_user(self.user, self.asset)
+        accounts = PermAccountUtil().get_permed_accounts_for_user(self.user, self.asset)
         return accounts

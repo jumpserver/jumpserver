@@ -11,12 +11,12 @@ from common.drf.fields import ObjectRelatedField, LabeledChoiceField
 from perms.serializers.permission import ActionChoicesField
 
 __all__ = [
-    'NodeGrantedSerializer', 'AssetGrantedSerializer',
+    'NodeGrantedSerializer', 'AssetPermedSerializer',
     'AccountsPermedSerializer'
 ]
 
 
-class AssetGrantedSerializer(serializers.ModelSerializer):
+class AssetPermedSerializer(serializers.ModelSerializer):
     """ 被授权资产的数据结构 """
     platform = ObjectRelatedField(required=False, queryset=Platform.objects, label=_('Platform'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))

@@ -4,39 +4,38 @@ from .. import api
 
 user_permission_urlpatterns = [
     # <str:user> such as: my | self | user.id
-
     # assets
     path('<str:user>/assets/', api.UserAllPermedAssetsApi.as_view(),
-         name='user-assets'),
-    path('<str:user>/assets/tree/', api.UserDirectPermedAssetsAsTreeApi.as_view(),
-         name='user-assets-as-tree'),
-    path('<str:user>/ungroup/assets/tree/', api.UserUngroupAssetsAsTreeApi.as_view(),
-         name='user-ungroup-assets-as-tree'),
-
-    # nodes
-    path('<str:user>/nodes/', api.UserPermedNodesApi.as_view(),
-         name='user-nodes'),
-    path('<str:user>/nodes/tree/', api.UserPermedNodesAsTreeApi.as_view(),
-         name='user-nodes-as-tree'),
-    path('<str:user>/nodes/children/', api.UserPermedNodeChildrenApi.as_view(),
-         name='user-nodes-children'),
-    path('<str:user>/nodes/children/tree/', api.UserPermedNodeChildrenAsTreeApi.as_view(),
-         name='user-nodes-children-as-tree'),
-
-    # node-assets
+         name='user-all-assets'),
+    path('<str:user>/nodes/ungrouped/assets/', api.UserDirectPermedAssetsApi.as_view(),
+         name='user-direct-assets'),
+    path('<str:user>/nodes/favorite/assets/', api.UserFavoriteAssetsApi.as_view(),
+         name='user-favorite-assets'),
     path('<str:user>/nodes/<uuid:node_id>/assets/', api.UserPermedNodeAssetsApi.as_view(),
          name='user-node-assets'),
-    path('<str:user>/nodes/ungrouped/assets/', api.UserDirectPermedAssetsApi.as_view(),
-         name='user-ungrouped-assets'),
-    path('<str:user>/nodes/favorite/assets/', api.UserFavoriteAssetsApi.as_view(),
-         name='user-ungrouped-assets'),
 
+    # nodes
+    path('<str:user>/nodes/', api.UserAllPermedNodesApi.as_view(),
+         name='user-all-nodes'),
+    path('<str:user>/nodes/children/', api.UserPermedNodeChildrenApi.as_view(),
+         name='user-node-children'),
+
+    # tree-asset
+    path('<str:user>/assets/tree/', api.UserDirectPermedAssetsAsTreeApi.as_view(),
+         name='user-direct-assets-as-tree'),
+    path('<str:user>/ungroup/assets/tree/', api.UserUngroupAssetsAsTreeApi.as_view(),
+         name='user-ungroup-assets-as-tree'),
+    # tree-node
+    path('<str:user>/nodes/tree/', api.UserAllPermedNodesAsTreeApi.as_view(),
+         name='user-all-nodes-as-tree'),
+    path('<str:user>/nodes/children/tree/', api.UserPermedNodeChildrenAsTreeApi.as_view(),
+         name='user-node-children-as-tree'),
+    # tree-node-with-asset
     path('<str:user>/nodes/children-with-assets/tree/',
-         api.UserGrantedNodeChildrenWithAssetsAsTreeApi.as_view(),
-         name='user-nodes-children-with-assets-as-tree'),
-
-    path('nodes-with-assets/tree/', api.MyGrantedNodesWithAssetsAsTreeApi.as_view(),
-         name='my-nodes-with-assets-as-tree'),
+         api.UserPermedNodeChildrenWithAssetsAsTreeApi.as_view(),
+         name='user-node-children-with-assets-as-tree'),
+    path('<str:user>/nodes-with-assets/tree/', api.UserPermedNodesWithAssetsAsTreeApi.as_view(),
+         name='user-nodes-with-assets-as-tree'),
 
     # accounts
     path('<str:user>/assets/<uuid:asset_id>/accounts/', api.UserPermedAssetAccountsApi.as_view(),
