@@ -56,6 +56,7 @@ def subscribe_orgs_mapping_expire(sender, **kwargs):
 def on_org_create_or_update(sender, instance, created=False, **kwargs):
     # 必须放到最开始, 因为下面调用Node.save方法时会获取当前组织的org_id(即instance.org_id), 如果不过期会找不到
     expire_orgs_mapping_for_memory(instance.id)
+
     old_org = get_current_org()
     set_current_org(instance)
     node_root = Node.org_root()

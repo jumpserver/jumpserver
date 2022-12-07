@@ -656,18 +656,15 @@ msgid "All"
 msgstr "すべて"
 
 #: assets/models/account.py:46
-#, fuzzy
 msgid "Manual input"
 msgstr "手動入力"
 
 #: assets/models/account.py:47
-#, fuzzy
 msgid "Dynamic user"
 msgstr "動的コード"
 
 #: assets/models/account.py:55
 #: authentication/serializers/connect_token_secret.py:47
-#, fuzzy
 msgid "Su from"
 msgstr "から切り替え"
 

@@ -25,7 +25,7 @@ class ProtocolSettingSerializer(serializers.Serializer):
     sftp_home = serializers.CharField(default="/tmp", label=_("SFTP home"))
 
     # HTTP
-    auto_fill = serializers.BooleanField(default=False, label=_("Auto fill"))
+    autofile = serializers.BooleanField(default=False, label=_("Autofill"))
     username_selector = serializers.CharField(
         default="", allow_blank=True, label=_("Username selector")
     )
@@ -38,7 +38,6 @@ class ProtocolSettingSerializer(serializers.Serializer):
 
 
 class PlatformAutomationSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = PlatformAutomation
         fields = [
