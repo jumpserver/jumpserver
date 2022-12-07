@@ -4,6 +4,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from common.utils import lazyproperty
 from orgs.mixins.models import JMSOrgBaseModel
 
 
@@ -26,6 +27,10 @@ class Label(JMSOrgBaseModel):
         names = cls.objects.values_list('name', flat=True)
         for name in names:
             yield name, cls.objects.filter(name=name)
+
+    @lazyproperty
+    def asset_count(self):
+        return self.assets.count()
 
     def __str__(self):
         return "{}:{}".format(self.name, self.value)

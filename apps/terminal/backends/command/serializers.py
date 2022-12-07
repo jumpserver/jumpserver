@@ -36,15 +36,9 @@ class SessionCommandSerializer(SimpleSessionCommandSerializer):
     # 限制 64 字符，不能直接迁移成 128 字符，命令表数据量会比较大
     account = serializers.CharField(label=_("Account "))
     output = serializers.CharField(max_length=2048, allow_blank=True, label=_("Output"))
-    risk_level_display = serializers.SerializerMethodField(label=_('Risk level display'))
     timestamp = serializers.IntegerField(label=_('Timestamp'))
     timestamp_display = serializers.DateTimeField(read_only=True, label=_('Datetime'))
     remote_addr = serializers.CharField(read_only=True, label=_('Remote Address'))
-
-    @staticmethod
-    def get_risk_level_display(obj):
-        risk_mapper = dict(AbstractSessionCommand.RISK_LEVEL_CHOICES)
-        return risk_mapper.get(obj.risk_level)
 
     def validate_account(self, value):
         if len(value) > 64:
