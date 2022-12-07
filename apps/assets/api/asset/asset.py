@@ -30,16 +30,13 @@ __all__ = [
 
 class AssetFilterSet(BaseFilterSet):
     type = django_filters.CharFilter(field_name="platform__type", lookup_expr="exact")
-    category = django_filters.CharFilter(
-        field_name="platform__category", lookup_expr="exact"
-    )
-    hostname = django_filters.CharFilter(field_name="name", lookup_expr="exact")
+    category = django_filters.CharFilter(field_name="platform__category", lookup_expr="exact")
 
     class Meta:
         model = Asset
         fields = [
             "id", "name", "address", "is_active",
-            "type", "category", "hostname"
+            "type", "category"
         ]
 
 

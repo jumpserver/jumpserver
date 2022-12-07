@@ -16,7 +16,7 @@ class GrantedAssetPaginationBase(AssetPaginationBase):
         self._user = view.user
 
 
-class NodeGrantedAssetPagination(GrantedAssetPaginationBase):
+class NodePermedAssetPagination(GrantedAssetPaginationBase):
     def get_count_from_nodes(self, queryset):
         node = getattr(self._view, 'pagination_node', None)
         if node:
@@ -29,7 +29,7 @@ class NodeGrantedAssetPagination(GrantedAssetPaginationBase):
             return None
 
 
-class AllGrantedAssetPagination(GrantedAssetPaginationBase):
+class AllPermedAssetPagination(GrantedAssetPaginationBase):
     def get_count_from_nodes(self, queryset):
         if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
             return None

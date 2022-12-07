@@ -23,8 +23,8 @@ __all__ = [
 
 
 class UserGroupGrantedAssetsApi(ListAPIView):
-    serializer_class = serializers.AssetGrantedSerializer
-    only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
+    serializer_class = serializers.AssetPermedSerializer
+    only_fields = serializers.AssetPermedSerializer.Meta.only_fields
     filterset_fields = ['name', 'address', 'id', 'comment']
     search_fields = ['name', 'address', 'comment']
     rbac_perms = {
@@ -60,8 +60,8 @@ class UserGroupGrantedAssetsApi(ListAPIView):
 
 
 class UserGroupGrantedNodeAssetsApi(ListAPIView):
-    serializer_class = serializers.AssetGrantedSerializer
-    only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
+    serializer_class = serializers.AssetPermedSerializer
+    only_fields = serializers.AssetPermedSerializer.Meta.only_fields
     filterset_fields = ['name', 'address', 'id', 'comment']
     search_fields = ['name', 'address', 'comment']
     rbac_perms = {

@@ -4,6 +4,8 @@ from perms.models import AssetPermission
 
 logger = get_logger(__file__)
 
+__all__ = ['AssetPermissionUtil']
+
 
 class AssetPermissionUtil(object):
     """ 资产授权相关的方法工具 """
