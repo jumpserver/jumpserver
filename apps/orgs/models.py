@@ -3,8 +3,8 @@ import uuid
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import lazyproperty, settings
 from common.tree import TreeNode
+from common.utils import lazyproperty, settings
 
 
 class OrgRoleMixin:
@@ -33,7 +33,6 @@ class OrgRoleMixin:
 
     def get_origin_role_members(self, role_name):
         from rbac.models import OrgRoleBinding
-        from users.models import User
         from rbac.builtin import BuiltinRole
         from .utils import tmp_to_org
 
@@ -132,6 +131,7 @@ class Organization(OrgRoleMixin, models.Model):
 
     @classmethod
     def expire_orgs_mapping(cls):
+        print("Expire orgs mapping: ")
         cls.orgs_mapping = None
 
     def org_id(self):

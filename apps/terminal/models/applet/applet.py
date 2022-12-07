@@ -1,13 +1,14 @@
-import yaml
 import os.path
+import random
 
+import yaml
 from django.conf import settings
+from django.core.cache import cache
 from django.core.files.storage import default_storage
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from common.db.models import JMSBaseModel
-
 
 __all__ = ['Applet', 'AppletPublication']
 
@@ -53,10 +54,43 @@ class Applet(JMSBaseModel):
             return None
         return os.path.join(settings.MEDIA_URL, 'applets', self.name, 'icon.png')
 
+    def select_host_account(self):
+        hosts = list(self.hosts.all())
+        if not hosts:
+            return None
+
+        host = random.choice(hosts)
+        using_keys = cache.keys('host_accounts_{}_*'.format(host.id)) or []
+        accounts_used = cache.get_many(using_keys)
+        accounts = host.accounts.all().exclude(username__in=accounts_used)
+
+        if not accounts:
+            accounts = host.accounts.all()
+        if not accounts:
+            return None
+
+        account = random.choice(accounts)
+        ttl = 60 * 60 * 24
+        lock_key = 'applet_host_accounts_{}_{}'.format(host.id, account.username)
+        cache.set(lock_key, account.username, ttl)
+        return {
+            'host': host,
+            'account': account,
+            'lock_key': lock_key,
+            'ttl': ttl
+        }
+
+    @staticmethod
+    def release_host_and_account(host_id, username):
+        key = 'applet_host_accounts_{}_{}'.format(host_id, username)
+        cache.delete(key)
+
 
 class AppletPublication(JMSBaseModel):
-    applet = models.ForeignKey('Applet', on_delete=models.PROTECT, related_name='publications', verbose_name=_('Applet'))
-    host = models.ForeignKey('AppletHost', on_delete=models.PROTECT, related_name='publications', verbose_name=_('Host'))
+    applet = models.ForeignKey('Applet', on_delete=models.PROTECT, related_name='publications',
+                               verbose_name=_('Applet'))
+    host = models.ForeignKey('AppletHost', on_delete=models.PROTECT, related_name='publications',
+                             verbose_name=_('Host'))
     status = models.CharField(max_length=16, default='ready', verbose_name=_('Status'))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 

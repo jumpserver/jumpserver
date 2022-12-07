@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 #
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.core.exceptions import ValidationError
 
-from common.utils import get_logger
 from common.db.models import JMSBaseModel
+from common.utils import get_logger, lazyproperty
+from ..models import Organization
 from ..utils import (
     set_current_org, get_current_org, current_org, filter_org_queryset
 )
-from ..models import Organization
 
 logger = get_logger(__file__)
 
@@ -75,7 +75,7 @@ class OrgModelMixin(models.Model):
             self.org_id = org.id
         return super().save(*args, **kwargs)
 
-    @property
+    @lazyproperty
     def org(self):
         return Organization.get_instance(self.org_id)
 

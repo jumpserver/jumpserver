@@ -19,12 +19,12 @@ from common.utils import random_string
 from common.utils.django import get_request_os
 from orgs.mixins.api import RootOrgViewMixin
 from perms.models import ActionChoices
-from terminal.const import NativeClient, TerminalType
+from terminal.connect_methods import NativeClient, ConnectMethodUtil
 from terminal.models import EndpointRule, Applet
 from ..models import ConnectionToken
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
-    SuperConnectionTokenSerializer,
+    SuperConnectionTokenSerializer, ConnectTokenAppletOptionSerializer
 )
 
 __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
@@ -115,7 +115,8 @@ class RDPFileClientProtocolURLMixin:
         rdp_options['audiomode:i'] = self.parse_env_bool('JUMPSERVER_DISABLE_AUDIO', 'false', '2', '0')
 
         # 设置远程应用
-        self.set_applet_info(token, rdp_options)
+        remote_app_options = token.get_remote_app_option()
+        rdp_options.update(remote_app_options)
 
         # 文件名
         name = token.asset.name
@@ -145,7 +146,7 @@ class RDPFileClientProtocolURLMixin:
         _os = get_request_os(self.request)
 
         connect_method_name = token.connect_method
-        connect_method_dict = TerminalType.get_connect_method(
+        connect_method_dict = ConnectMethodUtil.get_connect_method(
             token.connect_method, token.protocol, _os
         )
         if connect_method_dict is None:
@@ -227,37 +228,15 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
     search_fields = filterset_fields
     serializer_classes = {
         'default': ConnectionTokenSerializer,
-        'get_secret_detail': ConnectionTokenSecretSerializer,
     }
     rbac_perms = {
         'list': 'authentication.view_connectiontoken',
         'retrieve': 'authentication.view_connectiontoken',
         'create': 'authentication.add_connectiontoken',
         'expire': 'authentication.add_connectiontoken',
-        'get_secret_detail': 'authentication.view_connectiontokensecret',
         'get_rdp_file': 'authentication.add_connectiontoken',
         'get_client_protocol_url': 'authentication.add_connectiontoken',
     }
-
-    @action(methods=['POST'], detail=False, url_path='secret')
-    def get_secret_detail(self, request, *args, **kwargs):
-        """ 非常重要的 api, 在逻辑层再判断一下 rbac 权限, 双重保险 """
-        rbac_perm = 'authentication.view_connectiontokensecret'
-        if not request.user.has_perm(rbac_perm):
-            raise PermissionDenied('Not allow to view secret')
-
-        token_id = request.data.get('id') or ''
-        token = get_object_or_404(ConnectionToken, pk=token_id)
-        if token.is_expired:
-            raise ValidationError({'id': 'Token is expired'})
-
-        token.is_valid()
-        serializer = self.get_serializer(instance=token)
-        expire_now = request.data.get('expire_now', True)
-        if expire_now:
-            token.expire()
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def get_queryset(self):
         queryset = ConnectionToken.objects \
@@ -305,10 +284,14 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
 class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
     serializer_classes = {
         'default': SuperConnectionTokenSerializer,
+        'get_secret_detail': ConnectionTokenSecretSerializer,
     }
     rbac_perms = {
         'create': 'authentication.add_superconnectiontoken',
-        'renewal': 'authentication.add_superconnectiontoken'
+        'renewal': 'authentication.add_superconnectiontoken',
+        'get_secret_detail': 'authentication.view_connectiontokensecret',
+        'get_applet_info': 'authentication.view_superconnectiontoken',
+        'release_applet_account': 'authentication.view_superconnectiontoken',
     }
 
     def get_queryset(self):
@@ -332,3 +315,38 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
             'msg': f'Token is renewed, date expired: {date_expired}'
         }
         return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(methods=['POST'], detail=False, url_path='secret')
+    def get_secret_detail(self, request, *args, **kwargs):
+        """ 非常重要的 api, 在逻辑层再判断一下 rbac 权限, 双重保险 """
+        rbac_perm = 'authentication.view_connectiontokensecret'
+        if not request.user.has_perm(rbac_perm):
+            raise PermissionDenied('Not allow to view secret')
+
+        token_id = request.data.get('id') or ''
+        token = get_object_or_404(ConnectionToken, pk=token_id)
+        if token.is_expired:
+            raise ValidationError({'id': 'Token is expired'})
+
+        token.is_valid()
+        serializer = self.get_serializer(instance=token)
+        expire_now = request.data.get('expire_now', True)
+        if expire_now:
+            token.expire()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(methods=['POST'], detail=False, url_path='applet-option')
+    def get_applet_info(self, *args, **kwargs):
+        token_id = self.request.data.get('id')
+        token = get_object_or_404(ConnectionToken, pk=token_id)
+        if token.is_expired:
+            return Response({'error': 'Token expired'}, status=status.HTTP_400_BAD_REQUEST)
+        data = token.get_applet_option()
+        serializer = ConnectTokenAppletOptionSerializer(data)
+        return Response(serializer.data)
+
+    @action(methods=['DELETE', 'POST'], detail=False, url_path='applet-account/release')
+    def release_applet_account(self, *args, **kwargs):
+        account_id = self.request.data.get('id')
+        msg = ConnectionToken.release_applet_account(account_id)
+        return Response({'msg': msg})
