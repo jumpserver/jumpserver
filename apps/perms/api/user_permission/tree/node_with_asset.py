@@ -1,26 +1,31 @@
 import abc
+from urllib.parse import parse_qsl
 
 from django.conf import settings
 from django.db.models import F, Value, CharField
 from rest_framework.generics import ListAPIView
+from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.generics import get_object_or_404
 
 from assets.models import Asset
+from assets.utils import KubernetesTree
 from assets.api import SerializeToTreeNodeMixin
 from perms.hands import Node
 from perms.models import PermNode
 from perms.utils.user_permission import (
     UserGrantedNodesQueryUtils, UserGrantedAssetsQueryUtils,
 )
+from perms.utils import PermAccountUtil
 from perms.utils.permission import AssetPermissionUtil
 from common.utils import get_object_or_none, lazyproperty
 from common.utils.common import timeit
-
 
 from ..mixin import SelfOrPKUserMixin
 from .mixin import RebuildTreeMixin
 
 __all__ = [
+    'UserGrantedK8sAsTreeApi',
     'UserPermedNodesWithAssetsAsTreeApi',
     'UserPermedNodeChildrenWithAssetsAsTreeApi'
 ]
@@ -123,3 +128,41 @@ class UserPermedNodeChildrenWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
     def node_key_for_serializer_assets(self):
         return self.query_node_key
 
+
+class UserGrantedK8sAsTreeApi(
+    SelfOrPKUserMixin,
+    ListAPIView
+):
+    """ 用户授权的K8s树 """
+
+    @staticmethod
+    def asset(asset_id):
+        kwargs = {'id': asset_id, 'is_active': True}
+        asset = get_object_or_404(Asset, **kwargs)
+        return asset
+
+    def list(self, request: Request, *args, **kwargs):
+        tree_id = request.query_params.get('tree_id')
+        key = request.query_params.get('key', {})
+
+        tree = []
+        util = PermAccountUtil()
+        parent_info = dict(parse_qsl(key))
+        account_username = parent_info.get('account')
+
+        asset_id = parent_info.get('asset_id')
+        asset_id = tree_id if not asset_id else asset_id
+
+        if tree_id and not account_username:
+            asset = self.asset(asset_id)
+            accounts = util.get_permed_accounts_for_user(self.user, asset)
+            asset_node = KubernetesTree(tree_id).as_asset_tree_node(asset)
+            tree.append(asset_node)
+            for account in accounts:
+                account_node = KubernetesTree(tree_id).as_account_tree_node(
+                    account, parent_info,
+                )
+                tree.append(account_node)
+        else:
+            tree = KubernetesTree(key).async_tree_node(parent_info)
+        return Response(data=tree)

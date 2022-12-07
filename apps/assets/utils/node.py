@@ -7,8 +7,8 @@ from common.struct import Stack
 from common.db.models import output_as_string
 from orgs.utils import ensure_in_real_or_default_org, current_org
 
-from .locks import NodeTreeUpdateLock
-from .models import Node, Asset
+from ..locks import NodeTreeUpdateLock
+from ..models import Node, Asset
 
 logger = get_logger(__file__)
 
