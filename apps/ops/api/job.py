@@ -1,12 +1,12 @@
 from rest_framework.views import APIView
-
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 
 from ops.api.base import SelfBulkModelViewSet
 from ops.models import Job, JobExecution
 from ops.serializers.job import JobSerializer, JobExecutionSerializer
 
-__all__ = ['JobViewSet', 'JobExecutionViewSet', 'JobRunVariableHelpAPIView']
+__all__ = ['JobViewSet', 'JobExecutionViewSet', 'JobRunVariableHelpAPIView', 'JobAssetDetail']
 
 from ops.tasks import run_ops_job_execution
 from ops.variables import JMS_JOB_VARIABLE_HELP
@@ -73,3 +73,14 @@ class JobRunVariableHelpAPIView(APIView):
 
     def get(self, request, **kwargs):
         return Response(data=JMS_JOB_VARIABLE_HELP)
+
+
+class JobAssetDetail(APIView):
+    rbac_perms = ()
+    permission_classes = ()
+
+    def get(self, request, **kwargs):
+        execution_id = request.query_params.get('execution_id')
+        if execution_id:
+            execution = get_object_or_404(JobExecution, id=execution_id)
+            return Response(data=execution.assent_result_detail)

@@ -88,7 +88,7 @@ class Job(JMSBaseModel, PeriodTaskModelMixin):
 
     @property
     def inventory(self):
-        return JMSInventory(self.assets.all(), self.runas_policy, self.runas)
+        return JMSInventory(self.assets.all(), self.runas_policy, self.runas, unique_host_name=True)
 
     def create_execution(self):
         return self.executions.create()
@@ -111,6 +111,55 @@ class JobExecution(JMSBaseModel):
     date_finished = models.DateTimeField(null=True, verbose_name=_("Date finished"))
 
     @property
+    def count(self):
+        if self.is_finished and not self.summary.get('error', None):
+            return {
+                "ok": len(self.summary['ok']),
+                "failed": len(self.summary['failures']) + len(self.summary['dark']),
+                "excludes": len(self.summary['excludes']),
+                "total": self.job.assets.count()
+            }
+
+    @property
+    def assent_result_detail(self):
+        if self.is_finished and not self.summary.get('error', None):
+            result = {
+                "summary": self.count,
+                "detail": [],
+            }
+            for asset in self.job.assets.all():
+                asset_detail = {
+                    "name": asset.name,
+                    "status": "ok",
+                    "tasks": [],
+                }
+                host_name = "{}({})".format(asset.name, asset.id)
+                if self.summary["excludes"].get(host_name, None):
+                    asset_detail.update({"status": "excludes"})
+                    result["detail"].append(asset_detail)
+                    break
+                if self.result["dark"].get(host_name, None):
+                    asset_detail.update({"status": "failed"})
+                    for key, task in self.result["dark"][host_name].items():
+                        task_detail = {"name": key,
+                                       "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
+                        asset_detail["tasks"].append(task_detail)
+                if self.result["failures"].get(host_name, None):
+                    asset_detail.update({"status": "failed"})
+                    for key, task in self.result["failures"][host_name].items():
+                        task_detail = {"name": key,
+                                       "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
+                        asset_detail["tasks"].append(task_detail)
+
+                if self.result["ok"].get(host_name, None):
+                    for key, task in self.result["ok"][host_name].items():
+                        task_detail = {"name": key,
+                                       "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
+                        asset_detail["tasks"].append(task_detail)
+                result["detail"].append(asset_detail)
+            return result
+
+    @property
     def job_type(self):
         return self.job.type
 
@@ -124,6 +173,11 @@ class JobExecution(JMSBaseModel):
     def get_runner(self):
         inv = self.job.inventory
         inv.write_to_file(self.inventory_path)
+        if len(inv.exclude_hosts) > 0:
+            self.summary['excludes'] = inv.exclude_hosts
+            self.result['excludes'] = inv.exclude_hosts
+            self.save()
+
         if isinstance(self.parameters, str):
             extra_vars = json.loads(self.parameters)
         else:
@@ -191,7 +245,7 @@ class JobExecution(JMSBaseModel):
     def set_error(self, error):
         this = self.__class__.objects.get(id=self.id)  # 重新获取一次，避免数据库超时连接超时
         this.status = 'failed'
-        this.summary['error'] = str(error)
+        this.summary.update({'error': str(error)})
         this.finish_task()
 
     def set_result(self, cb):
@@ -200,8 +254,8 @@ class JobExecution(JMSBaseModel):
         }
         this = self.__class__.objects.get(id=self.id)
         this.status = status_mapper.get(cb.status, cb.status)
-        this.summary = cb.summary
-        this.result = cb.result
+        this.summary.update(cb.summary)
+        this.result.update(cb.result)
         this.finish_task()
 
     def finish_task(self):
