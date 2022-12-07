@@ -42,20 +42,13 @@ class PlatformAutomationSerializer(serializers.ModelSerializer):
         model = PlatformAutomation
         fields = [
             "id",
-            "ansible_enabled",
-            "ansible_config",
-            "ping_enabled",
-            "ping_method",
-            "gather_facts_enabled",
-            "gather_facts_method",
-            "push_account_enabled",
-            "push_account_method",
-            "change_secret_enabled",
-            "change_secret_method",
-            "verify_account_enabled",
-            "verify_account_method",
-            "gather_accounts_enabled",
-            "gather_accounts_method",
+            "ansible_enabled", "ansible_config",
+            "ping_enabled", "ping_method",
+            "gather_facts_enabled", "gather_facts_method",
+            "push_account_enabled", "push_account_method",
+            "change_secret_enabled", "change_secret_method",
+            "verify_account_enabled", "verify_account_method",
+            "gather_accounts_enabled", "gather_accounts_method",
         ]
         extra_kwargs = {
             "ping_enabled": {"label": "启用资产探测"},
@@ -80,13 +73,8 @@ class PlatformProtocolsSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlatformProtocol
         fields = [
-            "id",
-            "name",
-            "port",
-            "primary",
-            "default",
-            "required",
-            "secret_types",
+            "id", "name", "port", "primary",
+            "default", "required", "secret_types",
             "setting",
         ]
 
@@ -112,17 +100,12 @@ class PlatformSerializer(WritableNestedModelSerializer):
         model = Platform
         fields_mini = ["id", "name", "internal"]
         fields_small = fields_mini + [
-            "category",
-            "type",
-            "charset",
+            "category", "type", "charset",
         ]
         fields = fields_small + [
-            "protocols_enabled",
-            "protocols",
-            "domain_enabled",
-            "su_enabled",
-            "su_method",
-            "automation",
+            "protocols_enabled", "protocols",
+            "domain_enabled", "su_enabled",
+            "su_method", "automation",
             "comment",
         ]
         extra_kwargs = {

@@ -11,7 +11,9 @@ from assets.filters import AccountFilterSet
 from assets.tasks import verify_accounts_connectivity
 from assets import serializers
 
-__all__ = ['AccountViewSet', 'AccountSecretsViewSet', 'AccountTaskCreateAPI', 'AccountHistoriesSecretAPI']
+__all__ = [
+    'AccountViewSet', 'AccountSecretsViewSet', 'AccountTaskCreateAPI', 'AccountHistoriesSecretAPI'
+]
 
 
 class AccountViewSet(OrgBulkModelViewSet):

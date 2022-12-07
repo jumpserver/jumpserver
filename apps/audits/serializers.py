@@ -44,18 +44,11 @@ class UserLoginLogSerializer(serializers.ModelSerializer):
         model = models.UserLoginLog
         fields_mini = ["id"]
         fields_small = fields_mini + [
-            "username",
-            "type",
-            "ip",
-            "city",
-            "user_agent",
-            "mfa",
-            "reason",
-            "reason_display",
-            "backend",
-            "backend_display",
-            "status",
-            "datetime",
+            "username", "type", "ip",
+            "city", "user_agent", "mfa",
+            "reason", "reason_display",
+            "backend", "backend_display",
+            "status", "datetime",
         ]
         fields = fields_small
         extra_kwargs = {
@@ -78,14 +71,9 @@ class OperateLogSerializer(serializers.ModelSerializer):
         model = models.OperateLog
         fields_mini = ["id"]
         fields_small = fields_mini + [
-            "user",
-            "action",
-            "resource_type",
-            "resource_type_display",
-            "resource",
-            "remote_addr",
-            "datetime",
-            "org_id",
+            "user", "action", "resource_type",
+            "resource_type_display", "resource",
+            "remote_addr", "datetime", "org_id",
         ]
         fields = fields_small
         extra_kwargs = {"resource_type_display": {"label": _("Resource Type")}}
@@ -101,44 +89,3 @@ class SessionAuditSerializer(serializers.ModelSerializer):
     class Meta:
         model = Session
         fields = "__all__"
-
-
-#
-# class CommandExecutionSerializer(serializers.ModelSerializer):
-#     is_success = serializers.BooleanField(read_only=True, label=_('Is success'))
-#     hosts_display = serializers.ListSerializer(
-#         child=serializers.CharField(), source='hosts', read_only=True, label=_('Hosts display')
-#     )
-#
-#     class Meta:
-#         model = CommandExecution
-#         fields_mini = ['id']
-#         fields_small = fields_mini + [
-#             'command', 'is_finished', 'user',
-#             'date_start', 'result', 'is_success', 'org_id'
-#         ]
-#         fields = fields_small + ['hosts', 'hosts_display', 'user_display']
-#         extra_kwargs = {
-#             'result': {'label': _('Result')},  # model 上的方法，只能在这修改
-#             'is_success': {'label': _('Is success')},
-#             'hosts': {'label': _('Hosts')},  # 外键，会生成 sql。不在 model 上修改
-#             'user': {'label': _('User')},
-#             'user_display': {'label': _('User display')},
-#         }
-#
-#     @classmethod
-#     def setup_eager_loading(cls, queryset):
-#         """ Perform necessary eager loading of data. """
-#         queryset = queryset.prefetch_related('user', 'hosts')
-#         return queryset
-#
-#
-# class CommandExecutionHostsRelationSerializer(BulkSerializerMixin, serializers.ModelSerializer):
-#     asset_display = serializers.ReadOnlyField()
-#     commandexecution_display = serializers.ReadOnlyField()
-#
-#     class Meta:
-#         model = CommandExecution.hosts.through
-#         fields = [
-#             'id', 'asset', 'asset_display', 'commandexecution', 'commandexecution_display'
-#         ]
