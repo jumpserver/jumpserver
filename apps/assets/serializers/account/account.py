@@ -60,7 +60,7 @@ class AccountSerializer(AccountSerializerCreateMixin, BaseAccountSerializer):
     )
     su_from = ObjectRelatedField(
         required=False, queryset=Account.objects, allow_null=True, allow_empty=True,
-        label=_('Account'), attrs=('id', 'name', 'username')
+        label=_('Su from'), attrs=('id', 'name', 'username')
     )
 
     class Meta(BaseAccountSerializer.Meta):

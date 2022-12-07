@@ -1,13 +1,11 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView, ListAPIView
 
 from orgs.mixins.api import OrgBulkModelViewSet
-from rbac.permissions import RBACPermission
 
 from common.mixins import RecordViewLogMixin
-from common.permissions import UserConfirmation
-from authentication.const import ConfirmType
 from assets.models import Account
 from assets.filters import AccountFilterSet
 from assets.tasks import verify_accounts_connectivity
@@ -32,7 +30,7 @@ class AccountViewSet(OrgBulkModelViewSet):
 
     @action(methods=['get'], detail=True, url_path='su-from-accounts')
     def su_from_accounts(self, request, *args, **kwargs):
-        account = super().get_object()
+        account = get_object_or_404(Account, pk=self.kwargs['pk'])
         accounts = account.get_su_from_accounts()
         serializer = serializers.AccountSerializer(accounts, many=True)
         return Response(data=serializer.data)
