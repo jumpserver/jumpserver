@@ -2,7 +2,6 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
-
 from ..models import ConnectionToken
 
 __all__ = [
