@@ -1,19 +1,17 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.drf.fields import ObjectRelatedField
 from acls.models import CommandGroup, CommandFilterACL
 from assets.models import Asset, Account, Platform, Gateway, Domain
 from assets.serializers import PlatformSerializer, AssetProtocolsSerializer
-from users.models import User
-from perms.serializers.permission import ActionChoicesField
+from common.drf.fields import ObjectRelatedField
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
-
+from perms.serializers.permission import ActionChoicesField
+from users.models import User
 from ..models import ConnectionToken
 
-
 __all__ = [
-    'ConnectionTokenSecretSerializer',
+    'ConnectionTokenSecretSerializer', 'ConnectTokenAppletOptionSerializer'
 ]
 
 
@@ -96,6 +94,24 @@ class _ConnectionTokenPlatformSerializer(PlatformSerializer):
         return names
 
 
+class _ConnectionTokenConnectMethodSerializer(serializers.Serializer):
+    name = serializers.CharField(label=_('Name'))
+    protocol = serializers.CharField(label=_('Protocol'))
+    os = serializers.CharField(label=_('OS'))
+    is_builtin = serializers.BooleanField(label=_('Is builtin'))
+    is_active = serializers.BooleanField(label=_('Is active'))
+    platform = _ConnectionTokenPlatformSerializer(label=_('Platform'))
+    action = ActionChoicesField(label=_('Action'))
+    options = serializers.JSONField(label=_('Options'))
+
+
+class _ConnectTokenConnectMethodSerializer(serializers.Serializer):
+    label = serializers.CharField(label=_('Label'))
+    value = serializers.CharField(label=_('Value'))
+    type = serializers.CharField(label=_('Type'))
+    component = serializers.CharField(label=_('Component'))
+
+
 class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     user = _ConnectionTokenUserSerializer(read_only=True)
     asset = _ConnectionTokenAssetSerializer(read_only=True)
@@ -104,30 +120,28 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     platform = _ConnectionTokenPlatformSerializer(read_only=True)
     domain = ObjectRelatedField(queryset=Domain.objects, required=False, label=_('Domain'))
     command_filter_acls = _ConnectionTokenCommandFilterACLSerializer(read_only=True, many=True)
+    expire_now = serializers.BooleanField(label=_('Expired now'), write_only=True, default=True)
+    connect_method = _ConnectTokenConnectMethodSerializer(read_only=True, source='connect_method_object')
     actions = ActionChoicesField()
     expire_at = serializers.IntegerField()
-    expire_now = serializers.BooleanField(label=_('Expired now'), write_only=True, default=True)
-    connect_method = serializers.SerializerMethodField(label=_('Connect method'))
 
     class Meta:
         model = ConnectionToken
         fields = [
             'id', 'value', 'user', 'asset', 'account',
             'platform', 'command_filter_acls', 'protocol',
-            'domain', 'gateway', 'actions', 'expire_at', 'expire_now',
-            'connect_method'
+            'domain', 'gateway', 'actions', 'expire_at',
+            'expire_now', 'connect_method',
         ]
         extra_kwargs = {
             'value': {'read_only': True},
         }
 
-    def get_connect_method(self, obj):
-        from terminal.const import TerminalType
-        from common.utils import get_request_os
-        request = self.context.get('request')
-        if request:
-            os = get_request_os(request)
-        else:
-            os = 'windows'
-        method = TerminalType.get_connect_method(obj.connect_method, protocol=obj.protocol, os=os)
-        return method
+
+class ConnectTokenAppletOptionSerializer(serializers.Serializer):
+    id = serializers.CharField(label=_('ID'))
+    applet = ObjectRelatedField(read_only=True)
+    host = _ConnectionTokenAssetSerializer(read_only=True)
+    account = _ConnectionTokenAccountSerializer(read_only=True)
+    gateway = _ConnectionTokenGatewaySerializer(read_only=True)
+    remote_app_option = serializers.JSONField(read_only=True)

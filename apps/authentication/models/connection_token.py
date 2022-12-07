@@ -1,6 +1,9 @@
+import base64
+import json
 from datetime import timedelta
 
 from django.conf import settings
+from django.core.cache import cache
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -9,9 +12,10 @@ from rest_framework.exceptions import PermissionDenied
 from assets.const import Protocol
 from common.db.fields import EncryptCharField
 from common.db.models import JMSBaseModel
-from common.utils import lazyproperty, pretty_string
+from common.utils import lazyproperty, pretty_string, bulk_get
 from common.utils.timezone import as_current_tz
 from orgs.mixins.models import OrgModelMixin
+from terminal.models import Applet
 
 
 def date_expired_default():
@@ -101,6 +105,9 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
             error = _('No account')
             raise PermissionDenied(error)
 
+        if timezone.now() - self.date_created < timedelta(seconds=60):
+            return True, None
+
         if not self.permed_account or not self.permed_account.actions:
             msg = 'user `{}` not has asset `{}` permission for login `{}`'.format(
                 self.user, self.asset, self.account
@@ -114,6 +121,75 @@ class ConnectionToken(OrgModelMixin, JMSBaseModel):
     @lazyproperty
     def platform(self):
         return self.asset.platform
+
+    @lazyproperty
+    def connect_method_object(self):
+        from common.utils import get_request_os
+        from jumpserver.utils import get_current_request
+        from terminal.connect_methods import ConnectMethodUtil
+
+        request = get_current_request()
+        os = get_request_os(request) if request else 'windows'
+        method = ConnectMethodUtil.get_connect_method(
+            self.connect_method, protocol=self.protocol, os=os
+        )
+        return method
+
+    def get_remote_app_option(self):
+        cmdline = {
+            'app_name': self.connect_method,
+            'user_id': str(self.user.id),
+            'asset_id': str(self.asset.id),
+            'token_id': str(self.id)
+        }
+        cmdline_b64 = base64.b64encode(json.dumps(cmdline).encode()).decode()
+        app = '||tinker'
+        options = {
+            'remoteapplicationmode:i': '1',
+            'remoteapplicationprogram:s': app,
+            'remoteapplicationname:s': app,
+            'alternate shell:s': app,
+            'remoteapplicationcmdline:s': cmdline_b64,
+        }
+        return options
+
+    def get_applet_option(self):
+        method = self.connect_method_object
+        if not method or method.get('type') != 'applet' or method.get('disabled', False):
+            return None
+
+        applet = Applet.objects.filter(name=method.get('value')).first()
+        if not applet:
+            return None
+
+        host_account = applet.select_host_account()
+        if not host_account:
+            return None
+
+        host, account, lock_key, ttl = bulk_get(host_account, ('host', 'account', 'lock_key', 'ttl'))
+        gateway = host.gateway.select_gateway() if host.domain else None
+
+        data = {
+            'id': account.id,
+            'applet': applet,
+            'host': host,
+            'gateway': gateway,
+            'account': account,
+            'remote_app_option': self.get_remote_app_option()
+        }
+        token_account_relate_key = f'token_account_relate_{account.id}'
+        cache.set(token_account_relate_key, lock_key, ttl)
+        return data
+
+    @staticmethod
+    def release_applet_account(account_id):
+        token_account_relate_key = f'token_account_relate_{account_id}'
+        lock_key = cache.get(token_account_relate_key)
+        if lock_key:
+            cache.delete(lock_key)
+            cache.delete(token_account_relate_key)
+            return 'released'
+        return 'not found or expired'
 
     @lazyproperty
     def account_object(self):

@@ -18,13 +18,9 @@ from .models import Setting
 logger = get_logger(__file__)
 
 
-def get_settings_pub_sub():
-    return RedisPubSub('settings')
-
-
 class SettingSubPub(LazyObject):
     def _setup(self):
-        self._wrapped = get_settings_pub_sub()
+        self._wrapped = RedisPubSub('settings')
 
 
 setting_pub_sub = SettingSubPub()

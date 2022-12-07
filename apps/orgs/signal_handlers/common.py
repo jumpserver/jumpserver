@@ -3,35 +3,30 @@
 from collections import defaultdict
 from functools import partial
 
-import django.db.utils
-from django.dispatch import receiver
 from django.conf import settings
-from django.db.utils import ProgrammingError, OperationalError
-from django.utils.functional import LazyObject
 from django.db.models.signals import post_save, pre_delete, m2m_changed
+from django.db.utils import ProgrammingError, OperationalError
+from django.dispatch import receiver
+from django.utils.functional import LazyObject
 
-from orgs.utils import tmp_to_org, set_to_default_org
-from orgs.models import Organization
-from orgs.hands import set_current_org, Node, get_current_org
-from perms.models import AssetPermission
-from users.models import UserGroup, User
 from common.const.signals import PRE_REMOVE, POST_REMOVE
 from common.decorator import on_transaction_commit
 from common.signals import django_ready
 from common.utils import get_logger
 from common.utils.connection import RedisPubSub
+from orgs.hands import set_current_org, Node, get_current_org
+from orgs.models import Organization
+from orgs.utils import tmp_to_org, set_to_default_org
+from perms.models import AssetPermission
+from users.models import UserGroup, User
 from users.signals import post_user_leave_org
 
 logger = get_logger(__file__)
 
 
-def get_orgs_mapping_for_memory_pub_sub():
-    return RedisPubSub('fm.orgs_mapping')
-
-
 class OrgsMappingForMemoryPubSub(LazyObject):
     def _setup(self):
-        self._wrapped = get_orgs_mapping_for_memory_pub_sub()
+        self._wrapped = RedisPubSub('fm.orgs_mapping')
 
 
 orgs_mapping_for_memory_pub_sub = OrgsMappingForMemoryPubSub()
