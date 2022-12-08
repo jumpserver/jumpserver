@@ -69,17 +69,20 @@ ENV PIP_MIRROR=$PIP_MIRROR
 ARG PIP_JMS_MIRROR=https://pypi.douban.com/simple
 ENV PIP_JMS_MIRROR=$PIP_JMS_MIRROR
 
+ARG DEBUG
+
 RUN --mount=type=cache,target=/root/.cache/pip \
     set -ex \
     && pip config set global.index-url ${PIP_MIRROR} \
     && pip install --upgrade pip \
     && pip install --upgrade setuptools wheel \
-    && pip install https://download.jumpserver.org/pypi/simple/cryptography/cryptography-36.0.1-cp38-cp38-linux_loongarch64.whl \
+    && pip install https://download.jumpserver.org/pypi/simple/cryptography/cryptography-36.0.2-cp38-cp38-linux_loongarch64.whl \
     && pip install https://download.jumpserver.org/pypi/simple/greenlet/greenlet-1.1.2-cp38-cp38-linux_loongarch64.whl \
     && pip install $(grep 'PyNaCl' requirements/requirements.txt) \
     && GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=true pip install grpcio \
     && pip install $(grep -E 'jms|jumpserver' requirements/requirements.txt) -i ${PIP_JMS_MIRROR} \
-    && pip install -r requirements/requirements.txt
+    && pip install -r requirements/requirements.txt \
+    && [ -n "${DEBUG}" ] && pip install -r requirements/requirements_debug.txt
 
 COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
 RUN echo > /opt/jumpserver/config.yml \

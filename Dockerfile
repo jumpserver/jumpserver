@@ -18,7 +18,6 @@ ARG BUILD_DEPENDENCIES="              \
         pkg-config"
 
 ARG DEPENDENCIES="                    \
-        default-libmysqlclient-dev    \
         freetds-dev                   \
         libpq-dev                     \
         libffi-dev                    \
@@ -28,18 +27,14 @@ ARG DEPENDENCIES="                    \
         libxml2-dev                   \
         libxmlsec1-dev                \
         libxmlsec1-openssl            \
-        libaio-dev                    \
-        openssh-client                \
-        sshpass"
+        libaio-dev"
 
 ARG TOOLS="                           \
         ca-certificates               \
-        curl                          \
-        default-mysql-client          \
-        iputils-ping                  \
+        default-libmysqlclient-dev    \
         locales                       \
-        procps                        \
-        redis-tools                   \
+        openssh-client                \
+        sshpass                       \
         telnet                        \
         vim                           \
         unzip                         \
@@ -82,13 +77,16 @@ ENV PIP_MIRROR=$PIP_MIRROR
 ARG PIP_JMS_MIRROR=https://pypi.douban.com/simple
 ENV PIP_JMS_MIRROR=$PIP_JMS_MIRROR
 
+ARG DEBUG
+
 RUN --mount=type=cache,target=/root/.cache/pip \
     set -ex \
     && pip config set global.index-url ${PIP_MIRROR} \
     && pip install --upgrade pip \
     && pip install --upgrade setuptools wheel \
     && pip install $(grep -E 'jms|jumpserver' requirements/requirements.txt) -i ${PIP_JMS_MIRROR} \
-    && pip install -r requirements/requirements.txt
+    && pip install -r requirements/requirements.txt \
+    && [ -n "${DEBUG}" ] && pip install -r requirements/requirements_debug.txt
 
 COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
 RUN echo > /opt/jumpserver/config.yml \
