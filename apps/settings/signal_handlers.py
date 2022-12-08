@@ -38,8 +38,8 @@ def refresh_settings_on_changed(sender, instance=None, **kwargs):
     if instance.name == 'PERM_SINGLE_ASSET_TO_UNGROUP_NODE':
         # 清除所有用户授权树已构建的标记，下次访问重新生成
         logger.debug('Clean ALL User perm tree built mark')
-        from perms.utils.asset import UserGrantedTreeRefreshController
-        UserGrantedTreeRefreshController.clean_all_user_tree_built_mark()
+        from perms.utils.user_permission import UserPermTreeUtil
+        UserPermTreeUtil.clean_all_user_tree_built_mark()
 
 
 @receiver(django_ready)

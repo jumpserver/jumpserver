@@ -25,6 +25,7 @@ from perms.models import (
     AssetPermission, PermNode, UserAssetGrantedTreeNodeRelation
 )
 from users.models import User
+from .permission import AssetPermissionUtil
 
 NodeFrom = UserAssetGrantedTreeNodeRelation.NodeFrom
 NODE_ONLY_FIELDS = ('id', 'key', 'parent_key', 'org_id')
@@ -32,32 +33,92 @@ NODE_ONLY_FIELDS = ('id', 'key', 'parent_key', 'org_id')
 logger = get_logger(__name__)
 
 
-def get_user_all_asset_perm_ids(user) -> set:
-    asset_perm_ids = set()
-    user_perm_id = AssetPermission.users.through.objects \
-        .filter(user_id=user.id) \
-        .values_list('assetpermission_id', flat=True) \
-        .distinct()
-    asset_perm_ids.update(user_perm_id)
+class UserPermTreeUtil2:
+    cache_key_template = 'perms.user.node_tree.built_orgs.user_id:{user_id}'
 
-    group_ids = user.groups.through.objects \
-        .filter(user_id=user.id) \
-        .values_list('usergroup_id', flat=True) \
-        .distinct()
-    group_ids = list(group_ids)
-    groups_perm_id = AssetPermission.user_groups.through.objects \
-        .filter(usergroup_id__in=group_ids) \
-        .values_list('assetpermission_id', flat=True) \
-        .distinct()
-    asset_perm_ids.update(groups_perm_id)
+    def __init__(self, user):
+        self.user = user
+        self.orgs = self.user.orgs.distinct()
+        self.org_ids = [str(o.id) for o in self.orgs]
 
-    asset_perm_ids = AssetPermission.objects.filter(
-        id__in=asset_perm_ids).valid().values_list('id', flat=True)
-    asset_perm_ids = set(asset_perm_ids)
-    return asset_perm_ids
+    def get_cache_key(self, user_id):
+        return self.cache_key_template.format(user_id=user_id)
+
+    @lazyproperty
+    def cache_key_user(self):
+        return self.get_cache_key(self.user.id)
+
+    @lazyproperty
+    def cache_key_all_user(self):
+        return self.get_cache_key('*')
+
+    @lazyproperty
+    def client(self):
+        return cache.client.get_client(write=True)
+
+    @timeit
+    def refresh_if_need(self, force=False):
+        self.clean_user_perm_tree_nodes_for_legacy_org()
+
+        to_refresh_orgs = self.orgs if force else self.get_user_need_refresh_orgs()
+        if not to_refresh_orgs:
+            logger.info('Not have to refresh orgs')
+            return
+
+        with UserGrantedTreeRebuildLock(self.user.id):
+            for org in to_refresh_orgs:
+                with tmp_to_org(org):
+                    start = time.time()
+                    UserGrantedTreeBuildUtils(self.user).rebuild_user_granted_tree()
+                    end = time.time()
+                    logger.info(
+                        'Refresh user [{user}] org [{org}] perm tree, user {use_time:.2f}s'
+                        ''.format(user=self.user, org=org, use_time=end-start)
+                    )
+        self.mark_user_orgs_refresh_finished(to_refresh_orgs)
+
+    def clean_user_perm_tree_nodes_for_legacy_org(self):
+        with tmp_to_root_org():
+            """ Clean user legacy org node relations """
+            user_relations = UserAssetGrantedTreeNodeRelation.objects.filter(user=self.user)
+            user_legacy_org_relations = user_relations.exclude(org_id__in=self.org_ids)
+            user_legacy_org_relations.delete()
+
+    def get_user_need_refresh_orgs(self):
+        cached_org_ids = self.client.smembers(self.cache_key_user)
+        cached_org_ids = {oid.decode() for oid in cached_org_ids}
+        to_refresh_org_ids = set(self.org_ids) - cached_org_ids
+        to_refresh_orgs = Organization.objects.filter(id__in=to_refresh_org_ids)
+        logger.info(f'Need to refresh orgs: {to_refresh_orgs}')
+        return to_refresh_orgs
+
+    def mark_user_orgs_refresh_finished(self, org_ids):
+        self.client.sadd(self.cache_key_user, *org_ids)
+
+    # cls
+    def expire_perm_tree_for_all_user(self):
+        keys = self.client.keys(self.cache_key_all_user)
+        with self.client.pipline() as p:
+            for k in keys:
+                p.delete(k)
+            p.execute()
+
+    def expire_perm_tree_for_users_orgs(self, user_ids, org_ids):
+        org_ids = [str(oid) for oid in org_ids]
+        with self.client.pipline() as p:
+            for uid in user_ids:
+                cache_key = self.get_cache_key(uid)
+                p.srem(cache_key, *org_ids)
+            p.execute()
+        logger.info('Expire perm tree for users: [{}], orgs: [{}]'.format(user_ids, org_ids))
+
+    def expire_perm_tree_for_nodes_assets(self, node_ids, asset_ids):
+        node_perm_ids = AssetPermissionUtil().get_permissions_for_nodes(node_ids, flat=True)
+        asset_perm_ids = AssetPermissionUtil().get_permissions_for_assets(asset_ids, flat=True)
+        perm_ids = set(node_perm_ids) | set(asset_perm_ids)
 
 
-class UserGrantedTreeRefreshController:
+class UserPermTreeUtil:
     key_template = 'perms.user.node_tree.built_orgs.user_id:{user_id}'
 
     def __init__(self, user):
@@ -65,24 +126,49 @@ class UserGrantedTreeRefreshController:
         self.key = self.key_template.format(user_id=user.id)
         self.client = self.get_redis_client()
 
-    @classmethod
-    def clean_all_user_tree_built_mark(cls):
-        """ 清除所有用户已构建树的标记 """
-        client = cls.get_redis_client()
-        key_match = cls.key_template.format(user_id='*')
-        keys = client.keys(key_match)
-        with client.pipeline() as p:
-            for key in keys:
-                p.delete(key)
-            p.execute()
+    @timeit
+    def refresh_if_need(self, force=False):
+        user = self.user
+        orgs = user.orgs.all().distinct()
+        org_ids = [str(o.id) for o in orgs]
 
-    @classmethod
-    def get_redis_client(cls):
-        return cache.client.get_client(write=True)
+        with tmp_to_root_org():
+            user_relations = UserAssetGrantedTreeNodeRelation.objects.filter(user=user)
+            user_legacy_org_relations = user_relations.exclude(org_id__in=org_ids)
+            user_legacy_org_relations.delete()
 
-    def get_need_refresh_org_ids(self):
-        org_ids = self.client.smembers(self.key)
-        return {org_id.decode() for org_id in org_ids}
+        need_refresh_orgs = []
+
+        if not force and not self.have_need_refresh_orgs():
+            return
+
+        with UserGrantedTreeRebuildLock(user_id=user.id):
+            if force:
+                orgs = self.orgs
+                self.set_all_orgs_as_built()
+            else:
+                orgs = self.get_need_refresh_orgs_and_fill_up()
+
+            for org in orgs:
+                with tmp_to_org(org):
+                    t_start = time.time()
+                    logger.info(f'Rebuild user tree: user={self.user} org={current_org}')
+                    utils = UserGrantedTreeBuildUtils(user)
+                    utils.rebuild_user_granted_tree()
+                    logger.info(
+                        f'Rebuild user tree ok: cost={time.time() - t_start} '
+                        f'user={self.user} org={current_org}'
+                    )
+
+    @lazyproperty
+    def org_ids(self):
+        ret = {str(org.id) for org in self.orgs}
+        return ret
+
+    @lazyproperty
+    def orgs(self):
+        orgs = {*self.user.orgs.all().distinct()}
+        return orgs
 
     def set_all_orgs_as_built(self):
         self.client.sadd(self.key, *self.org_ids)
@@ -99,15 +185,28 @@ class UserGrantedTreeRefreshController:
         with self.client.pipeline() as p:
             p.smembers(self.key)
             p.sadd(self.key, *org_ids)
-            ret = p.execute()
-            built_org_ids = {org_id.decode() for org_id in ret[0]}
-            ids = org_ids - built_org_ids
-            orgs = {*Organization.objects.filter(id__in=ids)}
-            logger.info(
-                f'Need rebuild orgs are {orgs}, built orgs are {ret[0]}, '
-                f'all orgs are {org_ids}'
-            )
-            return orgs
+            old_org_ids, new_orgs_count = p.execute()
+            old_org_ids = {oid.decode() for oid in old_org_ids}
+            need_refresh_org_ids = org_ids - old_org_ids
+            need_refresh_orgs = Organization.objects.filter(id__in=need_refresh_org_ids)
+            logger.info(f'Need refresh orgs: {need_refresh_orgs}')
+            return need_refresh_orgs
+
+    # cls
+    @classmethod
+    def get_redis_client(cls):
+        return cache.client.get_client(write=True)
+
+    @classmethod
+    def clean_all_user_tree_built_mark(cls):
+        """ 清除所有用户已构建树的标记 """
+        client = cls.get_redis_client()
+        key_match = cls.key_template.format(user_id='*')
+        keys = client.keys(key_match)
+        with client.pipeline() as p:
+            for key in keys:
+                p.delete(key)
+            p.execute()
 
     @classmethod
     @on_transaction_commit
@@ -190,46 +289,6 @@ class UserGrantedTreeRefreshController:
             [current_org.id], user_ids
         )
 
-    @lazyproperty
-    def org_ids(self):
-        ret = {str(org.id) for org in self.orgs}
-        return ret
-
-    @lazyproperty
-    def orgs(self):
-        orgs = {*self.user.orgs.all().distinct()}
-        return orgs
-
-    @timeit
-    def refresh_if_need(self, force=False):
-        user = self.user
-
-        with tmp_to_root_org():
-            UserAssetGrantedTreeNodeRelation.objects.filter(user=user) \
-                .exclude(org_id__in=self.org_ids) \
-                .delete()
-
-        if not force and not self.have_need_refresh_orgs():
-            return
-
-        with UserGrantedTreeRebuildLock(user_id=user.id):
-            if force:
-                orgs = self.orgs
-                self.set_all_orgs_as_built()
-            else:
-                orgs = self.get_need_refresh_orgs_and_fill_up()
-
-            for org in orgs:
-                with tmp_to_org(org):
-                    t_start = time.time()
-                    logger.info(f'Rebuild user tree: user={self.user} org={current_org}')
-                    utils = UserGrantedTreeBuildUtils(user)
-                    utils.rebuild_user_granted_tree()
-                    logger.info(
-                        f'Rebuild user tree ok: cost={time.time() - t_start} '
-                        f'user={self.user} org={current_org}'
-                    )
-
 
 class UserGrantedUtilsBase:
     user: User
@@ -243,7 +302,7 @@ class UserGrantedUtilsBase:
         if self._asset_perm_ids:
             return self._asset_perm_ids
 
-        asset_perm_ids = get_user_all_asset_perm_ids(self.user)
+        asset_perm_ids = AssetPermissionUtil().get_permissions_for_user(self.user, flat=True)
         return asset_perm_ids
 
 
