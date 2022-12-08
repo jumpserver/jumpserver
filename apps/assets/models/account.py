@@ -88,7 +88,8 @@ class Account(AbsConnectivity, BaseAccount):
         return cls(name=cls.AliasAccount.USER.label, username=cls.AliasAccount.USER.value)
 
     def get_su_from_accounts(self):
-        return self.asset.accounts.exclude(id=self.id)
+        """ 排除自己和以自己为 su-from 的账号 """
+        return self.asset.accounts.exclude(id=self.id).exclude(su_from=self)
 
 
 class AccountTemplate(BaseAccount):
