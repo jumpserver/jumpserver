@@ -10,7 +10,7 @@ from common.utils import get_logger
 from common.exceptions import M2MReverseNotAllowed
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR
 from perms.models import AssetPermission
-from perms.utils.user_permission import UserGrantedTreeRefreshController
+from perms.utils.user_permission import UserPermTreeUtil
 
 
 logger = get_logger(__file__)
@@ -24,7 +24,7 @@ def on_user_group_delete(sender, instance: UserGroup, using, **kwargs):
 
     org_id = instance.org_id
     user_ids = UserGroup.users.through.objects.filter(usergroup_id=instance.id).values_list('user_id', flat=True)
-    UserGrantedTreeRefreshController.add_need_refresh_orgs_for_users([org_id], list(user_ids))
+    UserPermTreeUtil.add_need_refresh_orgs_for_users([org_id], list(user_ids))
 
 
 @receiver(m2m_changed, sender=User.groups.through)
@@ -46,14 +46,14 @@ def on_user_groups_change(sender, instance, action, reverse, pk_set, **kwargs):
         return
 
     org_ids = [org_id]
-    UserGrantedTreeRefreshController.add_need_refresh_orgs_for_users(org_ids, user_ids)
+    UserPermTreeUtil.add_need_refresh_orgs_for_users(org_ids, user_ids)
 
 
 @receiver([pre_delete], sender=AssetPermission)
 def on_asset_perm_pre_delete(sender, instance, **kwargs):
     # 授权删除之前，查出所有相关用户
     with tmp_to_org(instance.org):
-        UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids([instance.id])
+        UserPermTreeUtil.add_need_refresh_by_asset_perm_ids([instance.id])
 
 
 @receiver([pre_save], sender=AssetPermission)
@@ -63,7 +63,7 @@ def on_asset_perm_pre_save(sender, instance, **kwargs):
 
         if old.is_valid != instance.is_valid:
             with tmp_to_org(instance.org):
-                UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids([instance.id])
+                UserPermTreeUtil.add_need_refresh_by_asset_perm_ids([instance.id])
     except AssetPermission.DoesNotExist:
         pass
 
@@ -73,7 +73,7 @@ def on_asset_perm_post_save(sender, instance, created, **kwargs):
     if not created:
         return
     with tmp_to_org(instance.org):
-        UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids([instance.id])
+        UserPermTreeUtil.add_need_refresh_by_asset_perm_ids([instance.id])
 
 
 def need_rebuild_mapping_node(action):
@@ -89,7 +89,7 @@ def on_permission_nodes_changed(sender, instance, action, reverse, **kwargs):
         return
 
     with tmp_to_org(instance.org):
-        UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids([instance.id])
+        UserPermTreeUtil.add_need_refresh_by_asset_perm_ids([instance.id])
 
 
 @receiver(m2m_changed, sender=AssetPermission.assets.through)
@@ -100,7 +100,7 @@ def on_permission_assets_changed(sender, instance, action, reverse, pk_set, mode
     if not need_rebuild_mapping_node(action):
         return
     with tmp_to_org(instance.org):
-        UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids([instance.id])
+        UserPermTreeUtil.add_need_refresh_by_asset_perm_ids([instance.id])
 
 
 @receiver(m2m_changed, sender=AssetPermission.users.through)
@@ -112,7 +112,7 @@ def on_asset_permission_users_changed(sender, action, reverse, instance, pk_set,
         return
 
     with tmp_to_org(instance.org):
-        UserGrantedTreeRefreshController.add_need_refresh_orgs_for_users(
+        UserPermTreeUtil.add_need_refresh_orgs_for_users(
             [current_org.id], pk_set
         )
 
@@ -129,7 +129,7 @@ def on_asset_permission_user_groups_changed(sender, instance, action, pk_set, re
         .values_list('user_id', flat=True) \
         .distinct()
     with tmp_to_org(instance.org):
-        UserGrantedTreeRefreshController.add_need_refresh_orgs_for_users(
+        UserPermTreeUtil.add_need_refresh_orgs_for_users(
             [current_org.id], user_ids
         )
 
@@ -147,4 +147,4 @@ def on_node_asset_change(action, instance, reverse, pk_set, **kwargs):
         node_pk_set = pk_set
 
     with tmp_to_org(instance.org):
-        UserGrantedTreeRefreshController.add_need_refresh_on_nodes_assets_relate_change(node_pk_set, asset_pk_set)
+        UserPermTreeUtil.add_need_refresh_on_nodes_assets_relate_change(node_pk_set, asset_pk_set)

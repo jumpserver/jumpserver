@@ -63,18 +63,29 @@ class NodesRelationMixin:
             nodes = Node.objects.filter(id=Node.org_root().id)
         return nodes
 
-    def get_all_nodes(self, flat=False):
+    def get_all_nodes(self, flat=False, only_keys=False):
         from ..node import Node
         node_keys = set()
         for node in self.get_nodes():
             ancestor_keys = node.get_ancestor_keys(with_self=True)
             node_keys.update(ancestor_keys)
+        if only_keys:
+            return node_keys
         nodes = Node.objects.filter(key__in=node_keys).distinct()
-        if flat:
-            node_ids = set(nodes.values_list('id', flat=True))
-            return node_ids
-        else:
+        if not flat:
             return nodes
+        node_ids = set(nodes.values_list('id', flat=True))
+        return node_ids
+
+    @classmethod
+    def get_all_nodes_for_assets(cls, assets):
+        from ..node import Node
+        node_keys = set()
+        for asset in assets:
+            asset_node_keys = asset.get_all_nodes(only_keys=True)
+            node_keys.update(asset_node_keys)
+        nodes = Node.objects.filter(key__in=node_keys)
+        return nodes
 
 
 class Protocol(models.Model):

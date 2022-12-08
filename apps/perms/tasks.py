@@ -16,7 +16,7 @@ from perms.notifications import (
     PermedAssetsWillExpireUserMsg, AssetPermsWillExpireForOrgAdminMsg,
 )
 from perms.models import AssetPermission
-from perms.utils.user_permission import UserGrantedTreeRefreshController
+from perms.utils.user_permission import UserPermTreeUtil
 
 logger = get_logger(__file__)
 
@@ -52,7 +52,7 @@ def check_asset_permission_expired():
     ).distinct().values_list('id', flat=True)
     asset_perm_ids = list(asset_perm_ids)
     logger.info(f'>>> checking {start} to {end} have {asset_perm_ids} expired')
-    UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids_cross_orgs(asset_perm_ids)
+    UserPermTreeUtil.add_need_refresh_by_asset_perm_ids_cross_orgs(asset_perm_ids)
 
 
 @register_as_period_task(crontab=CRONTAB_AT_AM_TEN)
