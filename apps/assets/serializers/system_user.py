@@ -1,16 +1,16 @@
-from rest_framework import serializers
-from django.utils.translation import ugettext_lazy as _
 from django.db.models import Count
+from django.utils.translation import ugettext_lazy as _
+from rest_framework import serializers
 
-from common.mixins.serializers import BulkSerializerMixin
-from common.utils import ssh_pubkey_gen
 from common.drf.fields import EncryptedField
 from common.drf.serializers import SecretReadableMixin
+from common.mixins.serializers import BulkSerializerMixin
+from common.utils import parse_ssh_public_key_str
 from common.validators import alphanumeric_re, alphanumeric_cn_re, alphanumeric_win_re
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from ..models import SystemUser, Asset
-from .utils import validate_password_for_ansible
 from .base import AuthSerializerMixin
+from .utils import validate_password_for_ansible
+from ..models import SystemUser, Asset
 
 __all__ = [
     'SystemUserSerializer', 'MiniSystemUserSerializer',
@@ -214,7 +214,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         elif attrs.get('private_key'):
             private_key = attrs['private_key']
             password = attrs.get('password')
-            public_key = ssh_pubkey_gen(private_key, password=password, username=username)
+            public_key = parse_ssh_public_key_str(private_key, password=password)
             attrs['public_key'] = public_key
         return attrs
 
