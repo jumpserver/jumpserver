@@ -86,7 +86,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     && pip install --upgrade setuptools wheel \
     && pip install $(grep -E 'jms|jumpserver' requirements/requirements.txt) -i ${PIP_JMS_MIRROR} \
     && pip install -r requirements/requirements.txt \
-    && [ -n "${DEBUG}" ] && pip install -r requirements/requirements_debug.txt
+    && if [ -n "${DEBUG}" ]; then pip install -r requirements/requirements_debug.txt; fi
 
 COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
 RUN echo > /opt/jumpserver/config.yml \
