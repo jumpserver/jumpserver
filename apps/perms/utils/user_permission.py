@@ -114,13 +114,6 @@ class UserPermTreeExpireUtil(UserPermTreeCacheMixin):
     def cache_key_all_user(self):
         return self.get_cache_key('*')
 
-    def expire_perm_tree_for_all_user(self):
-        keys = self.client.keys(self.cache_key_all_user)
-        with self.client.pipline() as p:
-            for k in keys:
-                p.delete(k)
-            p.execute()
-
     def expire_perm_tree_for_nodes_assets(self, node_ids, asset_ids):
         node_perm_ids = AssetPermissionUtil().get_permissions_for_nodes(node_ids, flat=True)
         asset_perm_ids = AssetPermissionUtil().get_permissions_for_assets(asset_ids, flat=True)
@@ -157,6 +150,14 @@ class UserPermTreeExpireUtil(UserPermTreeCacheMixin):
                 p.srem(cache_key, *org_ids)
             p.execute()
         logger.info('Expire perm tree for users: [{}], orgs: [{}]'.format(user_ids, org_ids))
+
+    def expire_perm_tree_for_all_user(self):
+        keys = self.client.keys(self.cache_key_all_user)
+        with self.client.pipline() as p:
+            for k in keys:
+                p.delete(k)
+            p.execute()
+        logger.info('Expire all user perm tree')
 
 
 class UserGrantedUtilsBase:
