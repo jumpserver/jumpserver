@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 import uuid
 
-from django.db import models, IntegrityError
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import lazyproperty
 from orgs.mixins.models import OrgModelMixin
+from common.utils import lazyproperty
 
 __all__ = ['UserGroup']
 
