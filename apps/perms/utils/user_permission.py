@@ -53,6 +53,24 @@ class UserGrantedUtilsBase:
 
 class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
 
+    @ensure_in_real_or_default_org
+    def rebuild_user_granted_tree(self):
+        """ 注意：调用该方法一定要被 `UserGrantedTreeRebuildLock` 锁住 """
+        user = self.user
+
+        # 先删除旧的授权树🌲
+        UserAssetGrantedTreeNodeRelation.objects.filter(user=user).delete()
+
+        if not self.asset_perm_ids:
+            # 没有授权直接返回
+            return
+
+        nodes = self.compute_perm_nodes_tree()
+        self.compute_node_assets_amount(nodes)
+        if not nodes:
+            return
+        self.create_mapping_nodes(nodes)
+
     def get_direct_granted_nodes(self) -> NodeQuerySet:
         # 查询直接授权节点
         nodes = PermNode.objects.filter(
@@ -74,26 +92,6 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         asset_ids = list(asset_ids)
         return asset_ids
 
-    @ensure_in_real_or_default_org
-    def rebuild_user_granted_tree(self):
-        """
-        注意：调用该方法一定要被 `UserGrantedTreeRebuildLock` 锁住
-        """
-        user = self.user
-
-        # 先删除旧的授权树🌲
-        UserAssetGrantedTreeNodeRelation.objects.filter(user=user).delete()
-
-        if not self.asset_perm_ids:
-            # 没有授权直接返回
-            return
-
-        nodes = self.compute_perm_nodes_tree()
-        self.compute_node_assets_amount(nodes)
-        if not nodes:
-            return
-        self.create_mapping_nodes(nodes)
-
     @timeit
     def compute_perm_nodes_tree(self, node_only_fields=NODE_ONLY_FIELDS) -> list:
 
@@ -105,9 +103,7 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
         granted_key_set = {_node.key for _node in nodes}
 
         def _has_ancestor_granted(node: PermNode):
-            """
-            判断一个节点是否有授权过的祖先节点
-            """
+            """ 判断一个节点是否有授权过的祖先节点 """
             ancestor_keys = set(node.get_ancestor_keys())
             return ancestor_keys & granted_key_set
 
