@@ -36,7 +36,6 @@ ARG TOOLS="                           \
         openssh-client                \
         sshpass                       \
         telnet                        \
-        vim                           \
         unzip                         \
         wget"
 
