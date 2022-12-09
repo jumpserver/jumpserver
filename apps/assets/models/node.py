@@ -178,9 +178,7 @@ class FamilyMixin:
         return parent_keys
 
     def get_ancestor_keys(self, with_self=False):
-        return self.get_node_ancestor_keys(
-            self.key, with_self=with_self
-        )
+        return self.get_node_ancestor_keys(self.key, with_self=with_self)
 
     @property
     def ancestors(self):
