@@ -10,7 +10,7 @@ from common.exceptions import M2MReverseNotAllowed
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR
 
 from perms.models import AssetPermission
-from perms.utils.user_permission import UserPermTreeExpireUtil
+from perms.utils import UserPermTreeExpireUtil
 
 
 logger = get_logger(__file__)

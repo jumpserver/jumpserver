@@ -14,7 +14,7 @@ from common.utils.timezone import local_now, dt_parser
 from common.const.crontab import CRONTAB_AT_AM_TEN
 
 from perms.models import AssetPermission
-from perms.utils.user_permission import UserPermTreeExpireUtil
+from perms.utils import UserPermTreeExpireUtil
 from perms.notifications import (
     PermedAssetsWillExpireUserMsg,
     AssetPermsWillExpireForOrgAdminMsg,

@@ -37,7 +37,7 @@ def refresh_settings_on_changed(sender, instance=None, **kwargs):
     if instance.is_name('PERM_SINGLE_ASSET_TO_UNGROUP_NODE'):
         """ 过期所有用户授权树 """
         logger.debug('Expire all user perm tree')
-        from perms.utils.user_permission import UserPermTreeExpireUtil
+        from perms.utils import UserPermTreeExpireUtil
         UserPermTreeExpireUtil().expire_perm_tree_for_all_user()
 
 
