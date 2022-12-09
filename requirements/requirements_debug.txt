@@ -1,6 +1,0 @@
-# Debug
-ipython==8.4.0
-ForgeryPy3==0.3.1
-django-debug-toolbar==3.5
-Pympler==1.0.1
-psycopg2==2.9.4

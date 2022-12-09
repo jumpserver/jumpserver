@@ -21,3 +21,4 @@ oracledb==1.0.1
 psycopg2-binary==2.9.1
 pymssql==2.2.5
 IPy==1.1
+psycopg2==2.9.4
