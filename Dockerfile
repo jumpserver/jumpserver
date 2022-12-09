@@ -31,6 +31,7 @@ ARG DEPENDENCIES="                    \
 
 ARG TOOLS="                           \
         ca-certificates               \
+        curl                          \
         default-libmysqlclient-dev    \
         locales                       \
         openssh-client                \
