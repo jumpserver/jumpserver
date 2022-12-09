@@ -66,7 +66,7 @@ class AuthMixin:
             public_key = self.public_key
         elif self.private_key:
             try:
-                public_key = parse_ssh_public_key_str(private_key=self.private_key, password=self.password)
+                public_key = parse_ssh_public_key_str(self.private_key, password=self.password)
             except IOError as e:
                 return str(e)
         else:
