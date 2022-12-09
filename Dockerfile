@@ -1,4 +1,4 @@
-FROM python:3.8-slim as stage-build
+FROM python:3.9-slim as stage-build
 ARG TARGETARCH
 
 ARG VERSION
@@ -8,7 +8,7 @@ WORKDIR /opt/jumpserver
 ADD . .
 RUN cd utils && bash -ixeu build.sh
 
-FROM python:3.8-slim
+FROM python:3.9-slim
 ARG TARGETARCH
 MAINTAINER JumpServer Team <ibuler@qq.com>
 
