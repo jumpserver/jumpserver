@@ -25,7 +25,7 @@ paramiko==2.11.0
 passlib==1.7.4
 pyasn1==0.4.8
 pycparser==2.21
-cryptography==37.0.4
+cryptography==36.0.2
 pycryptodome==3.15.0
 pycryptodomex==3.15.0
 gmssl==3.2.1
@@ -87,7 +87,6 @@ pytz==2022.1
 # Runtime
 django-proxy==1.2.1
 channels-redis==3.4.0
-channels==3.0.4
 python-daemon==2.3.0
 eventlet==0.33.1
 greenlet==1.1.2
@@ -107,23 +106,6 @@ django-cas-ng==4.0.1
 python-cas==1.5.0
 django-auth-ldap==2.2.0
 # Cloud req
-qingcloud-sdk==1.2.12
-azure-mgmt-subscription==1.0.0
-azure-identity==1.5.0
-azure-mgmt-compute==4.6.2
-azure-mgmt-network==2.7.0
-google-cloud-compute==0.5.0
-alibabacloud_dysmsapi20170525==2.0.2
-python-novaclient==11.0.1
-python-keystoneclient==4.3.0
-bce-python-sdk==0.8.64
-tencentcloud-sdk-python==3.0.662
-aliyun-python-sdk-core-v3==2.9.1
-aliyun-python-sdk-ecs==4.10.1
-huaweicloud-sdk-python==1.0.21
-# python-keystoneclient need keystoneauth1>=3.4.0
-# huaweicloud-sdk-python need keystoneauth1<=3.4.0
-keystoneauth1==3.4.0
 boto3==1.24.12
 botocore==1.27.12
 s3transfer==0.6.0
@@ -131,8 +113,6 @@ kubernetes==21.7.0
 # DB requirements
 mysqlclient==2.1.0
 PyMySQL==1.0.2
-oracledb==1.0.1
-psycopg2-binary==2.9.1
 pymssql==2.2.5
 django-mysql==3.9.0
 django-redis==5.2.0
@@ -146,5 +126,3 @@ ipython==8.4.0
 ForgeryPy3==0.3.1
 django-debug-toolbar==3.5
 Pympler==1.0.1
-IPy==1.1
-psycopg2==2.9.4
