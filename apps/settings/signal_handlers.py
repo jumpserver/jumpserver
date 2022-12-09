@@ -8,11 +8,13 @@ from django.db.utils import ProgrammingError, OperationalError
 from django.dispatch import receiver
 from django.utils.functional import LazyObject
 
+from jumpserver.utils import current_request
+
 from common.decorator import on_transaction_commit
 from common.signals import django_ready
 from common.utils import get_logger, ssh_key_gen
 from common.utils.connection import RedisPubSub
-from jumpserver.utils import current_request
+
 from .models import Setting
 
 logger = get_logger(__file__)
@@ -31,15 +33,12 @@ setting_pub_sub = SettingSubPub()
 def refresh_settings_on_changed(sender, instance=None, **kwargs):
     if not instance:
         return
-
     setting_pub_sub.publish(instance.name)
-
-    # 配置变化: PERM_SINGLE_ASSET_TO_UNGROUP_NODE
-    if instance.name == 'PERM_SINGLE_ASSET_TO_UNGROUP_NODE':
-        # 清除所有用户授权树已构建的标记，下次访问重新生成
-        logger.debug('Clean ALL User perm tree built mark')
-        from perms.utils.user_permission import UserPermTreeUtil
-        UserPermTreeUtil.clean_all_user_tree_built_mark()
+    if instance.is_name('PERM_SINGLE_ASSET_TO_UNGROUP_NODE'):
+        """ 过期所有用户授权树 """
+        logger.debug('Expire all user perm tree')
+        from perms.utils.user_permission import UserPermTreeExpireUtil
+        UserPermTreeExpireUtil().expire_perm_tree_for_all_user()
 
 
 @receiver(django_ready)

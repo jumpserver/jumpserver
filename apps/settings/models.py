@@ -43,6 +43,9 @@ class Setting(models.Model):
     def __str__(self):
         return self.name
 
+    def is_name(self, name):
+        return self.name == name
+
     @property
     def cleaned_value(self):
         try:

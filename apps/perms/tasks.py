@@ -7,16 +7,18 @@ from django.db.transaction import atomic
 from django.conf import settings
 from celery import shared_task
 
+from ops.celery.decorator import register_as_period_task
 from orgs.utils import tmp_to_root_org
 from common.utils import get_logger
-from common.utils.timezone import local_now, dt_formatter, dt_parser
+from common.utils.timezone import local_now, dt_parser
 from common.const.crontab import CRONTAB_AT_AM_TEN
-from ops.celery.decorator import register_as_period_task
-from perms.notifications import (
-    PermedAssetsWillExpireUserMsg, AssetPermsWillExpireForOrgAdminMsg,
-)
+
 from perms.models import AssetPermission
-from perms.utils.user_permission import UserPermTreeUtil
+from perms.utils.user_permission import UserPermTreeExpireUtil
+from perms.notifications import (
+    PermedAssetsWillExpireUserMsg,
+    AssetPermsWillExpireForOrgAdminMsg,
+)
 
 logger = get_logger(__file__)
 
@@ -26,33 +28,11 @@ logger = get_logger(__file__)
 @atomic()
 @tmp_to_root_org()
 def check_asset_permission_expired():
-    """
-    这里的任务要足够短，不要影响周期任务
-    """
-    from settings.models import Setting
-
-    setting_name = 'last_asset_perm_expired_check'
-
-    end = local_now()
-    default_start = end - timedelta(days=36000)  # Long long ago in china
-
-    defaults = {'value': dt_formatter(default_start)}
-    setting, created = Setting.objects.get_or_create(
-        name=setting_name, defaults=defaults
-    )
-    if created:
-        start = default_start
-    else:
-        start = dt_parser(setting.value)
-    setting.value = dt_formatter(end)
-    setting.save()
-
-    asset_perm_ids = AssetPermission.objects.filter(
-        date_expired__gte=start, date_expired__lte=end
-    ).distinct().values_list('id', flat=True)
-    asset_perm_ids = list(asset_perm_ids)
-    logger.info(f'>>> checking {start} to {end} have {asset_perm_ids} expired')
-    UserPermTreeUtil.add_need_refresh_by_asset_perm_ids_cross_orgs(asset_perm_ids)
+    """ 这里的任务要足够短，不要影响周期任务 """
+    perms = AssetPermission.get_expired_permissions()
+    perm_ids = list(perms.distinct().values_list('id', flat=True))
+    logger.info(f'Checking expired permissions: {perm_ids}')
+    UserPermTreeExpireUtil().expire_perm_tree_for_perms(perm_ids)
 
 
 @register_as_period_task(crontab=CRONTAB_AT_AM_TEN)
