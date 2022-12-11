@@ -196,9 +196,7 @@ class UserGrantedTreeBuildUtils(UserGrantedUtilsBase):
 
     @timeit
     def compute_node_assets_amount(self, nodes: List[PermNode]):
-        """
-        这里计算的是一个组织的
-        """
+        """ 这里计算的是一个组织的 """
         # 直接授权了根节点，直接计算
         if len(nodes) == 1:
             node = nodes[0]
