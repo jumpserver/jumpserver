@@ -2,10 +2,15 @@
 #
 import os
 import tarfile
+import zipfile
+
+from six import BytesIO
 
 from django.core.files.storage import default_storage
+from django.core.cache import cache
+from django.conf import settings
 from django.db.models import F
-from django.http import FileResponse
+from django.http.response import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404, reverse
 from django.utils.encoding import escape_uri_path
 from django.utils.translation import ugettext as _
@@ -13,21 +18,21 @@ from rest_framework import generics
 from rest_framework import viewsets, views
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 
 from common.const.http import GET
+from common import const
 from common.drf.filters import DatetimeRangeFilter
 from common.drf.renders import PassthroughRenderer
 from common.mixins.api import AsyncApiMixin
-from common.utils import data_to_json
-from common.utils import get_logger, get_object_or_none
+from common.utils import get_logger, get_object_or_none, data_to_json
+from common.utils.timezone import local_now_display
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import tmp_to_root_org, tmp_to_org
 from terminal import serializers
 from terminal.models import Session
 from terminal.utils import (
     find_session_replay_local, download_session_replay,
-    is_session_approver, get_session_replay_url
+    is_session_approver, get_sessions_replay_url
 )
 from users.models import User
 
@@ -69,43 +74,81 @@ class SessionViewSet(OrgBulkModelViewSet):
     }
 
     @staticmethod
-    def prepare_offline_file(session, local_path):
-        replay_path = default_storage.path(local_path)
+    def _gen_replay_file(sessions):
+        file_total_size = 0
+        file_path = []
+        for session in sessions:
+            local_path = session.pop('local_path')
+            replay_path = default_storage.path(local_path)
+            dir_path = os.path.dirname(replay_path)
+            replay_filename = os.path.basename(replay_path)
+            meta_filename = '{}.json'.format(session['id'])
+            offline_filename = '{}.tar'.format(session['id'])
+            os.chdir(dir_path)
+
+            with open(meta_filename, 'wt') as f:
+                f.write(data_to_json(session))
+
+            with tarfile.open(offline_filename, 'w') as f:
+                f.add(replay_filename)
+                f.add(meta_filename)
+            file_total_size += os.path.getsize(offline_filename)
+            file_path.append(os.path.join(dir_path, offline_filename))
+        return file_total_size, file_path
+
+    def prepare_offline_file(self, sessions):
+        file_obj = {'error': None, 'file': None, 'file_num': 0}
         current_dir = os.getcwd()
-        dir_path = os.path.dirname(replay_path)
-        replay_filename = os.path.basename(replay_path)
-        meta_filename = '{}.json'.format(session.id)
-        offline_filename = '{}.tar'.format(session.id)
-        os.chdir(dir_path)
 
-        with open(meta_filename, 'wt') as f:
-            serializer = serializers.SessionDisplaySerializer(session)
-            data = data_to_json(serializer.data)
-            f.write(data)
-
-        with tarfile.open(offline_filename, 'w') as f:
-            f.add(replay_filename)
-            f.add(meta_filename)
-        file = open(offline_filename, 'rb')
+        file_total_size, file_path_list = self._gen_replay_file(sessions)
+        if (file_total_size / 1024 ** 2) > settings.DOWNLOAD_MEMORY_LIMIT:
+            file_obj['error'] = _(
+                'The selected resources exceeded the system limit. '
+                'Procedure Adjust resources or contact the Administrator'
+            )
+        else:
+            zip_file_io = BytesIO()
+            zf = zipfile.ZipFile(
+                zip_file_io, 'a', zipfile.ZIP_DEFLATED, False
+            )
+            for f in file_path_list:
+                zf.write(f, os.path.basename(f))
+            zf.close()
+            zip_file_io.seek(0)
+            file_obj['file'] = zip_file_io.read()
+            file_obj['file_num'] = len(sessions)
         os.chdir(current_dir)
-        return file
+        return file_obj
+
+    def get_objects(self):
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        pk = self.kwargs.get(lookup_url_kwarg)
+        ids = cache.get(const.KEY_CACHE_RESOURCE_IDS.format(pk)) if pk else None
+        if not ids:
+            ids = [pk]
+
+        sessions = self.model.objects.filter(id__in=ids)
+        return sessions
 
     @action(methods=[GET], detail=True, renderer_classes=(PassthroughRenderer,), url_path='replay/download',
             url_name='replay-download')
     def download(self, request, *args, **kwargs):
-        session = self.get_object()
-        local_path, url = get_session_replay_url(session)
-        if local_path is None:
-            return Response({"error": url}, status=404)
-        file = self.prepare_offline_file(session, local_path)
+        sessions = self.get_objects()
+        sessions_info = get_sessions_replay_url(sessions)
+        if sessions_info['error']:
+            return JsonResponse({"error": ','.join(sessions_info['error'])}, status=404)
 
-        response = FileResponse(file)
-        response['Content-Type'] = 'application/octet-stream'
-        # 这里要注意哦，网上查到的方法都是response['Content-Disposition']='attachment;filename="filename.py"',
-        # 但是如果文件名是英文名没问题，如果文件名包含中文，下载下来的文件名会被改为url中的path。
-        filename = escape_uri_path('{}.tar'.format(session.id))
-        disposition = "attachment; filename*=UTF-8''{}".format(filename)
-        response["Content-Disposition"] = disposition
+        file_obj = self.prepare_offline_file(sessions_info['data'])
+        if file_obj['error']:
+            return JsonResponse({"error": file_obj['error']}, status=403)
+
+        file, file_num = file_obj['file'], file_obj['file_num']
+        filename_prefix = 'REPLAY-SET-{}'.format(local_now_display('%Y-%m-%d-%H-%M-%S'))
+        filename = escape_uri_path('{}-[{}-ITEMS]'.format(filename_prefix, file_num))
+
+        response = HttpResponse(file, content_type='application/zip', charset='utf-8')
+        disposition = 'attachment;filename={filename}.zip'.format(filename=filename)
+        response['Content-Disposition'] = disposition
         return response
 
     def get_queryset(self):

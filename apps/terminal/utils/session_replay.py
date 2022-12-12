@@ -67,9 +67,22 @@ def download_session_replay(session):
     return local_path, url
 
 
-def get_session_replay_url(session):
-    local_path, url = find_session_replay_local(session)
-    if local_path is None:
-        local_path, url = download_session_replay(session)
-    return local_path, url
+def get_sessions_replay_url(sessions):
+    sessions_info = {
+        'data': [], 'error': []
+    }
+    for s in sessions:
+        local_path, url = find_session_replay_local(s)
+        if local_path is None:
+            local_path, url = download_session_replay(s)
+
+        if local_path is None:
+            sessions_info['error'].append(url)
+        else:
+            from terminal.serializers import SessionDisplaySerializer
+            serializer = SessionDisplaySerializer(s)
+            item = serializer.data
+            item['local_path'] = local_path
+            sessions_info['data'].append(item)
+    return sessions_info
 

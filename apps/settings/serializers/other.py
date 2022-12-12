@@ -49,6 +49,11 @@ class OtherSettingSerializer(serializers.Serializer):
         required=False, allow_blank=True, allow_null=True, label=_("Help Support URL"),
         help_text=_('default: http://www.jumpserver.org/support/')
     )
+    DOWNLOAD_MEMORY_LIMIT = serializers.IntegerField(
+        min_value=1, max_value=99999, required=False, default=1024,
+        label=_('Download Memory limit'),
+        help_text=_("Maximum memory usage of download resources (Unit MB).")
+    )
 
     # 准备废弃
     # PERIOD_TASK_ENABLED = serializers.BooleanField(
