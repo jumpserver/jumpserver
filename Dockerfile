@@ -1,4 +1,4 @@
-FROM python:3.8-slim as stage-build
+FROM python:3.9-slim as stage-build
 ARG TARGETARCH
 
 ARG VERSION
@@ -8,7 +8,7 @@ WORKDIR /opt/jumpserver
 ADD . .
 RUN cd utils && bash -ixeu build.sh
 
-FROM python:3.8-slim
+FROM python:3.9-slim
 ARG TARGETARCH
 MAINTAINER JumpServer Team <ibuler@qq.com>
 
@@ -18,7 +18,6 @@ ARG BUILD_DEPENDENCIES="              \
         pkg-config"
 
 ARG DEPENDENCIES="                    \
-        default-libmysqlclient-dev    \
         freetds-dev                   \
         libpq-dev                     \
         libffi-dev                    \
@@ -28,20 +27,16 @@ ARG DEPENDENCIES="                    \
         libxml2-dev                   \
         libxmlsec1-dev                \
         libxmlsec1-openssl            \
-        libaio-dev                    \
-        openssh-client                \
-        sshpass"
+        libaio-dev"
 
 ARG TOOLS="                           \
         ca-certificates               \
         curl                          \
-        default-mysql-client          \
-        iputils-ping                  \
+        default-libmysqlclient-dev    \
         locales                       \
-        procps                        \
-        redis-tools                   \
+        openssh-client                \
+        sshpass                       \
         telnet                        \
-        vim                           \
         unzip                         \
         wget"
 
@@ -81,6 +76,8 @@ ARG PIP_MIRROR=https://pypi.douban.com/simple
 ENV PIP_MIRROR=$PIP_MIRROR
 ARG PIP_JMS_MIRROR=https://pypi.douban.com/simple
 ENV PIP_JMS_MIRROR=$PIP_JMS_MIRROR
+
+ARG DEBUG
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     set -ex \

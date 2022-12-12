@@ -49,23 +49,6 @@ class BaseAccountHandler:
                 header_fields[field] = str(v.label)
         return header_fields
 
-    @staticmethod
-    def load_auth(tp, value, system_user):
-        if value:
-            return value
-        if system_user:
-            return getattr(system_user, tp, '')
-        return ''
-
-    @classmethod
-    def replace_auth(cls, account, system_user_dict):
-        system_user = system_user_dict.get(account.systemuser_id)
-        account.username = cls.load_auth('username', account.username, system_user)
-        account.password = cls.load_auth('password', account.password, system_user)
-        account.private_key = cls.load_auth('private_key', account.private_key, system_user)
-        account.public_key = cls.load_auth('public_key', account.public_key, system_user)
-        return account
-
     @classmethod
     def create_row(cls, data, header_fields):
         data = cls.unpack_data(data)
@@ -94,30 +77,30 @@ class AssetAccountHandler(BaseAccountHandler):
         return filename
 
     @classmethod
-    def create_data_map(cls, categories: list):
+    def create_data_map(cls, types: list):
         data_map = defaultdict(list)
 
         # TODO 可以优化一下查询 在账号上做 category 的缓存 避免数据量大时连表操作
         qs = Account.objects.filter(
-            asset__platform__type__in=categories
-        ).annotate(category=F('asset__platform__type'))
-        print(qs, categories)
+            asset__platform__type__in=types
+        ).annotate(type=F('asset__platform__type'))
+
         if not qs.exists():
             return data_map
 
-        category_dict = {}
+        type_dict = {}
         for i in AllTypes.grouped_choices_to_objs():
             for j in i['children']:
-                category_dict[j['value']] = j['display_name']
+                type_dict[j['value']] = j['display_name']
 
         header_fields = cls.get_header_fields(AccountSecretSerializer(qs.first()))
-        account_category_map = defaultdict(list)
+        account_type_map = defaultdict(list)
         for account in qs:
-            account_category_map[account.category].append(account)
+            account_type_map[account.type].append(account)
 
         data_map = {}
-        for category, accounts in account_category_map.items():
-            sheet_name = category_dict.get(category, category)
+        for tp, accounts in account_type_map.items():
+            sheet_name = type_dict.get(tp, tp)
             data = AccountSecretSerializer(accounts, many=True).data
             data_map.update(cls.add_rows(data, header_fields, sheet_name))
 
@@ -140,9 +123,9 @@ class AccountBackupHandler:
         # Print task start date
         time_start = time.time()
         files = []
-        categories = self.execution.categories
+        types = self.execution.types
 
-        data_map = AssetAccountHandler.create_data_map(categories)
+        data_map = AssetAccountHandler.create_data_map(types)
         if not data_map:
             return files
 

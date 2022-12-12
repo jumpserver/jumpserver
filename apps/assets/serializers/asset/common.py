@@ -8,7 +8,7 @@ from django.db.models import F
 
 from common.drf.serializers import WritableNestedModelSerializer
 from common.drf.fields import LabeledChoiceField, ObjectRelatedField
-from orgs.mixins.serializers import OrgResourceSerializerMixin
+from orgs.mixins.serializers import BulkOrgResourceSerializerMixin
 from ..account import AccountSerializer
 from ...models import Asset, Node, Platform, Label, Domain, Account, Protocol
 from ...const import Category, AllTypes
@@ -58,7 +58,7 @@ class AssetAccountSerializer(AccountSerializer):
         fields = fields_mini + fields_write_only
 
 
-class AssetSerializer(OrgResourceSerializerMixin, WritableNestedModelSerializer):
+class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSerializer):
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
     domain = ObjectRelatedField(required=False, queryset=Domain.objects, label=_('Domain'), allow_null=True)

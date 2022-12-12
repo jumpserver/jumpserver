@@ -1,16 +1,19 @@
-import logging
 import uuid
+import logging
 
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
+from users.models import User
 from assets.models import Asset, Account
-from common.db.models import UnionQuerySet
-from common.utils import date_expired_default
 from orgs.mixins.models import OrgManager
 from orgs.mixins.models import OrgModelMixin
+from common.utils.timezone import local_now
+from common.db.models import UnionQuerySet
+from common.utils import date_expired_default
+
 from perms.const import ActionChoices
 
 __all__ = ['AssetPermission', 'ActionChoices']
@@ -131,3 +134,23 @@ class AssetPermission(OrgModelMixin):
         if not flat:
             return accounts
         return accounts.values_list('id', flat=True)
+
+    @classmethod
+    def get_all_users_for_perms(cls, perm_ids, flat=False):
+        user_ids = cls.users.through.objects.filter(assetpermission_id__in=perm_ids)\
+            .values_list('user_id', flat=True).distinct()
+        group_ids = cls.user_groups.through.objects.filter(assetpermission_id__in=perm_ids)\
+            .values_list('usergroup_id', flat=True).distinct()
+        group_user_ids = User.groups.through.objects.filter(usergroup_id__in=group_ids)\
+            .values_list('user_id', flat=True).distinct()
+        user_ids = set(user_ids) | set(group_user_ids)
+        if flat:
+            return user_ids
+        return User.objects.filter(id__in=user_ids)
+
+    @classmethod
+    def get_expired_permissions(cls):
+        now = local_now()
+        return cls.objects.filter(Q(date_start__lte=now) | Q(date_expired__gte=now))
+
+

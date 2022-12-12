@@ -118,7 +118,7 @@ class KubernetesTree:
 
     def as_account_tree_node(self, account, parent_info):
         username = account.username
-        name = f'{account.name}({account.username})'
+        name = str(account)
         pid = urlencode({'asset_id': self.tree_id})
         i = self.create_tree_id(pid, 'account', username)
         parent_info.update({'account': username})

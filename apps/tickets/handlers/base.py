@@ -1,3 +1,5 @@
+from html import escape
+
 from django.utils.translation import ugettext as _
 from django.template.loader import render_to_string
 
@@ -96,11 +98,19 @@ class BaseHandler:
         approve_info = _('{} {} the ticket').format(user_display, state_display)
         context = self._diff_prev_approve_context(state)
         context.update({'approve_info': approve_info})
+        body = self.reject_html_script(
+            render_to_string('tickets/ticket_approve_diff.html', context)
+        )
         data = {
-            'body': render_to_string('tickets/ticket_approve_diff.html', context),
+            'body': body,
             'user': user,
             'user_display': str(user),
             'type': 'state',
             'state': state
         }
         return self.ticket.comments.create(**data)
+
+    @staticmethod
+    def reject_html_script(unsafe_html):
+        safe_html = escape(unsafe_html)
+        return safe_html
