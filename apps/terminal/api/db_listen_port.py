@@ -7,6 +7,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from ..utils import db_port_manager, DBPortManager
 from applications import serializers
+from assets.serializers.asset.database import DatabaseSerializer
 
 
 db_port_manager: DBPortManager
@@ -32,5 +33,5 @@ class DBListenPortViewSet(GenericViewSet):
     def db_info(self, request, *args, **kwargs):
         port = request.query_params.get("port")
         db = db_port_manager.get_db_by_port(port)
-        serializer = serializers.AppSerializer(instance=db)
+        serializer = DatabaseSerializer(instance=db)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
