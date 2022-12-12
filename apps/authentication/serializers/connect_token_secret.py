@@ -2,8 +2,10 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from acls.models import CommandGroup, CommandFilterACL
+from assets.const import SecretType
 from assets.models import Asset, Account, Platform, Gateway, Domain
 from assets.serializers import PlatformSerializer, AssetProtocolsSerializer
+from common.drf.fields import LabeledChoiceField
 from common.drf.fields import ObjectRelatedField
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from perms.serializers.permission import ActionChoicesField
@@ -34,6 +36,7 @@ class _ConnectionTokenAssetSerializer(serializers.ModelSerializer):
 
 class _SimpleAccountSerializer(serializers.ModelSerializer):
     """ Account """
+    secret_type = LabeledChoiceField(choices=SecretType.choices, required=False, label=_('Secret type'))
 
     class Meta:
         model = Account
@@ -43,6 +46,7 @@ class _SimpleAccountSerializer(serializers.ModelSerializer):
 class _ConnectionTokenAccountSerializer(serializers.ModelSerializer):
     """ Account """
     su_from = _SimpleAccountSerializer(required=False, label=_('Su from'))
+    secret_type = LabeledChoiceField(choices=SecretType.choices, required=False, label=_('Secret type'))
 
     class Meta:
         model = Account
