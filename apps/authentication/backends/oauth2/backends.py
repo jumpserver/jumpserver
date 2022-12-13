@@ -90,8 +90,12 @@ class OAuth2Backend(JMSModelBackend):
                 request, path=reverse(settings.AUTH_OAUTH2_AUTH_LOGIN_CALLBACK_URL_NAME)
             )
         }
-        access_token_url = '{url}?{query}'.format(
-            url=settings.AUTH_OAUTH2_ACCESS_TOKEN_ENDPOINT, query=urlencode(query_dict)
+        if '?' in settings.AUTH_OAUTH2_ACCESS_TOKEN_ENDPOINT:
+            separator = '&'
+        else:
+            separator = '?'
+        access_token_url = '{url}{separator}{query}'.format(
+            url=settings.AUTH_OAUTH2_ACCESS_TOKEN_ENDPOINT, separator=separator, query=urlencode(query_dict)
         )
         token_method = settings.AUTH_OAUTH2_ACCESS_TOKEN_METHOD.lower()
         requests_func = getattr(requests, token_method, requests.get)
@@ -118,8 +122,12 @@ class OAuth2Backend(JMSModelBackend):
         }
 
         logger.debug(log_prompt.format('Get userinfo endpoint'))
-        userinfo_url = '{url}?{query}'.format(
-            url=settings.AUTH_OAUTH2_PROVIDER_USERINFO_ENDPOINT,
+        if '?' in settings.AUTH_OAUTH2_PROVIDER_USERINFO_ENDPOINT:
+            separator = '&'
+        else:
+            separator = '?'
+        userinfo_url = '{url}{separator}{query}'.format(
+            url=settings.AUTH_OAUTH2_PROVIDER_USERINFO_ENDPOINT, separator=separator,
             query=urlencode(query_dict)
         )
         userinfo_response = requests.get(userinfo_url, headers=headers)
