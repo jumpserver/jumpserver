@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-import io
 import os
 import uuid
 from hashlib import md5
@@ -18,7 +17,9 @@ from common.utils import random_string
 from common.utils import (
     ssh_key_string_to_obj, ssh_key_gen, get_logger, lazyproperty
 )
-from common.utils.encode import parse_ssh_public_key_str
+from common.utils.encode import (
+    parse_ssh_public_key_str, parse_ssh_private_key_str
+)
 from orgs.mixins.models import OrgModelMixin
 
 logger = get_logger(__file__)
@@ -86,24 +87,27 @@ class AuthMixin:
 
     @property
     def private_key_file(self):
-        if not self.private_key_obj:
+        if not self.private_key:
+            return None
+        private_key_str = parse_ssh_private_key_str(self.private_key,
+                                                    password=self.password)
+        if not private_key_str:
             return None
         project_dir = settings.PROJECT_DIR
         tmp_dir = os.path.join(project_dir, 'tmp')
         key_name = '.' + md5(self.private_key.encode('utf-8')).hexdigest()
         key_path = os.path.join(tmp_dir, key_name)
         if not os.path.exists(key_path):
-            self.private_key_obj.write_private_key_file(key_path)
+            with open(key_path, 'w') as f:
+                f.write(private_key_str)
             os.chmod(key_path, 0o400)
         return key_path
 
     def get_private_key(self):
-        if not self.private_key_obj:
+        if not self.private_key:
             return None
-        string_io = io.StringIO()
-        self.private_key_obj.write_private_key(string_io)
-        private_key = string_io.getvalue()
-        return private_key
+        return parse_ssh_private_key_str(self.private_key,
+                                         password=self.password)
 
     @property
     def public_key_obj(self):

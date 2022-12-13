@@ -79,7 +79,7 @@ _supported_paramiko_ssh_key_types = (
 def ssh_key_string_to_obj(text, password=None):
     key = None
     for ssh_key_type in _supported_paramiko_ssh_key_types:
-        if not isinstance(ssh_key_type, paramiko.PKey):
+        if not issubclass(ssh_key_type, paramiko.PKey):
             continue
         try:
             key = ssh_key_type.from_private_key(StringIO(text), password=password)
