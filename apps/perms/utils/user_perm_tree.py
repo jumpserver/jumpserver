@@ -3,23 +3,22 @@ from collections import defaultdict
 
 from django.core.cache import cache
 
-from users.models import User
+from common.decorator import on_transaction_commit
+from common.utils import get_logger
+from common.utils.common import lazyproperty, timeit
 from orgs.models import Organization
 from orgs.utils import (
     tmp_to_org,
     tmp_to_root_org
 )
-from common.decorator import on_transaction_commit
-from common.utils import get_logger
-from common.utils.common import lazyproperty, timeit
-
 from perms.locks import UserGrantedTreeRebuildLock
 from perms.models import (
     AssetPermission,
     UserAssetGrantedTreeNodeRelation
 )
+from perms.utils.user_permission import UserGrantedTreeBuildUtils
+from users.models import User
 from .permission import AssetPermissionUtil
-
 
 logger = get_logger(__name__)
 
@@ -69,7 +68,7 @@ class UserPermTreeRefreshUtil(_UserPermTreeCacheMixin):
             end = time.time()
             logger.info(
                 'Refresh user [{user}] org [{org}] perm tree, user {use_time:.2f}s'
-                ''.format(user=self.user, org=org, use_time=end-start)
+                ''.format(user=self.user, org=org, use_time=end - start)
             )
 
     def clean_user_perm_tree_nodes_for_legacy_org(self):
@@ -142,4 +141,3 @@ class UserPermTreeExpireUtil(_UserPermTreeCacheMixin):
                 p.delete(k)
             p.execute()
         logger.info('Expire all user perm tree')
-
