@@ -1,4 +1,5 @@
 from django.db import models
+
 from common.db.models import ChoicesMixin
 
 __all__ = ['Protocol']
@@ -102,9 +103,9 @@ class Protocol(ChoicesMixin, models.TextChoices):
                 'port': 80,
                 'secret_types': ['password'],
                 'setting': {
-                    'username_selector': 'input[type=text]',
-                    'password_selector': 'input[type=password]',
-                    'submit_selector': 'button[type=submit]',
+                    'username_selector': 'name=username',
+                    'password_selector': 'name=password',
+                    'submit_selector': 'id=longin_button',
                 }
             },
         }
@@ -112,7 +113,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
     @classmethod
     def settings(cls):
         return {
-             **cls.device_protocols(),
-             **cls.database_protocols(),
-             **cls.cloud_protocols()
+            **cls.device_protocols(),
+            **cls.database_protocols(),
+            **cls.cloud_protocols()
         }
