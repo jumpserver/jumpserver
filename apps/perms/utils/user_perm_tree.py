@@ -59,7 +59,7 @@ class UserPermTreeRefreshUtil(_UserPermTreeCacheMixin):
         with UserGrantedTreeRebuildLock(self.user.id):
             for org in to_refresh_orgs:
                 self.rebuild_user_perm_tree_for_org(org)
-        self.mark_user_orgs_refresh_finished(to_refresh_orgs)
+        self.mark_user_orgs_refresh_finished([str(org.id) for org in to_refresh_orgs])
 
     def rebuild_user_perm_tree_for_org(self, org):
         with tmp_to_org(org):

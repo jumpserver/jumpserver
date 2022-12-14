@@ -1,10 +1,8 @@
 from rest_framework.request import Request
 
-from users.models import User
 from common.http import is_true
-
 from perms.utils import UserPermTreeRefreshUtil
-
+from users.models import User
 
 __all__ = ['RebuildTreeMixin']
 
