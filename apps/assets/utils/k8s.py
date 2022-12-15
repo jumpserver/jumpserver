@@ -10,7 +10,6 @@ from kubernetes.client.exceptions import ApiException
 from rest_framework.generics import get_object_or_404
 
 from common.utils import get_logger
-from common.tree import TreeNode
 from assets.models import Account, Asset
 
 from ..const import CloudTypes, Category
