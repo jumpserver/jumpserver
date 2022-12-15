@@ -12,7 +12,7 @@ def parse_playbook_name(path):
     return file_name.split(".")[-2]
 
 
-class PlaybookSerializer(serializers.ModelSerializer):
+class PlaybookSerializer(BulkOrgResourceModelSerializer):
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
     path = serializers.FileField(required=False)
 

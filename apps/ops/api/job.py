@@ -2,7 +2,6 @@ from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 
-from ops.api.base import SelfBulkModelViewSet
 from ops.models import Job, JobExecution
 from ops.serializers.job import JobSerializer, JobExecutionSerializer
 
@@ -10,6 +9,7 @@ __all__ = ['JobViewSet', 'JobExecutionViewSet', 'JobRunVariableHelpAPIView', 'Jo
 
 from ops.tasks import run_ops_job_execution
 from ops.variables import JMS_JOB_VARIABLE_HELP
+from orgs.mixins.api import OrgBulkModelViewSet
 
 
 def set_task_to_serializer_data(serializer, task):
@@ -18,16 +18,17 @@ def set_task_to_serializer_data(serializer, task):
     setattr(serializer, "_data", data)
 
 
-class JobViewSet(SelfBulkModelViewSet):
+class JobViewSet(OrgBulkModelViewSet):
     serializer_class = JobSerializer
     permission_classes = ()
     model = Job
 
     def get_queryset(self):
-        query_set = super().get_queryset()
+        queryset = super().get_queryset()
+        queryset = queryset.filter(creator=self.request.user)
         if self.action != 'retrieve':
-            return query_set.filter(instant=False)
-        return query_set
+            return queryset.filter(instant=False)
+        return queryset
 
     def perform_create(self, serializer):
         instance = serializer.save()
@@ -48,7 +49,7 @@ class JobViewSet(SelfBulkModelViewSet):
         set_task_to_serializer_data(serializer, task)
 
 
-class JobExecutionViewSet(SelfBulkModelViewSet):
+class JobExecutionViewSet(OrgBulkModelViewSet):
     serializer_class = JobExecutionSerializer
     http_method_names = ('get', 'post', 'head', 'options',)
     permission_classes = ()
@@ -60,11 +61,12 @@ class JobExecutionViewSet(SelfBulkModelViewSet):
         set_task_to_serializer_data(serializer, task)
 
     def get_queryset(self):
-        query_set = super().get_queryset()
+        queryset = super().get_queryset()
+        queryset = queryset.filter(creator=self.request.user)
         job_id = self.request.query_params.get('job_id')
         if job_id:
-            query_set = query_set.filter(job_id=job_id)
-        return query_set
+            queryset = queryset.filter(job_id=job_id)
+        return queryset
 
 
 class JobRunVariableHelpAPIView(APIView):

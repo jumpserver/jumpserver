@@ -11,13 +11,13 @@ from celery import current_task
 
 __all__ = ["Job", "JobExecution"]
 
-from common.db.models import JMSBaseModel
 from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner
 from ops.mixin import PeriodTaskModelMixin
 from ops.variables import *
+from orgs.mixins.models import JMSOrgBaseModel
 
 
-class Job(JMSBaseModel, PeriodTaskModelMixin):
+class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     class Types(models.TextChoices):
         adhoc = 'adhoc', _('Adhoc')
         playbook = 'playbook', _('Playbook')
@@ -97,7 +97,7 @@ class Job(JMSBaseModel, PeriodTaskModelMixin):
         ordering = ['date_created']
 
 
-class JobExecution(JMSBaseModel):
+class JobExecution(JMSOrgBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     task_id = models.UUIDField(null=True)
     status = models.CharField(max_length=16, verbose_name=_('Status'), default='running')
@@ -202,10 +202,11 @@ class JobExecution(JMSBaseModel):
 
     def gather_static_variables(self):
         default = {
-            JMS_USERNAME: self.creator.username,
-            JMS_JOB_ID: self.job.id,
+            JMS_JOB_ID: str(self.job.id),
             JMS_JOB_NAME: self.job.name,
         }
+        if self.creator:
+            default.update({JMS_USERNAME: self.creator.username})
         return default
 
     @property
@@ -255,7 +256,10 @@ class JobExecution(JMSBaseModel):
         this = self.__class__.objects.get(id=self.id)
         this.status = status_mapper.get(cb.status, cb.status)
         this.summary.update(cb.summary)
-        this.result.update(cb.result)
+        if this.result:
+            this.result.update(cb.result)
+        else:
+            this.result = cb.result
         this.finish_task()
 
     def finish_task(self):

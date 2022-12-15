@@ -36,7 +36,8 @@ def run_ops_job(job_id):
 def run_ops_job_execution(execution_id, **kwargs):
     execution = get_object_or_none(JobExecution, id=execution_id)
     try:
-        execution.start()
+        with tmp_to_org(execution.org):
+            execution.start()
     except SoftTimeLimitExceeded:
         execution.set_error('Run timeout')
         logger.error("Run adhoc timeout")
