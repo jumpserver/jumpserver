@@ -13,10 +13,18 @@ __all__ = ['ApplyAssetSerializer', 'ApproveAssetSerializer']
 
 asset_or_node_help_text = _("Select at least one asset or node")
 
+apply_help_text = _('Support fuzzy search, and display up to 10 items')
+
 
 class ApplyAssetSerializer(BaseApplyAssetSerializer, TicketApplySerializer):
-    apply_assets = ObjectRelatedField(queryset=Asset.objects, many=True, required=False, label=_('Apply assets'))
-    apply_nodes = ObjectRelatedField(queryset=Node.objects, many=True, required=False, label=_('Apply nodes'))
+    apply_assets = ObjectRelatedField(
+        queryset=Asset.objects, many=True, required=False,
+        label=_('Apply assets'), help_text=apply_help_text
+    )
+    apply_nodes = ObjectRelatedField(
+        queryset=Node.objects, many=True, required=False,
+        label=_('Apply nodes'), help_text=apply_help_text
+    )
     apply_actions = ActionChoicesField(required=False, allow_null=True, label=_("Apply actions"))
     permission_model = AssetPermission
 
