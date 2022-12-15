@@ -112,7 +112,7 @@ class KubernetesTree:
     def as_asset_tree_node(self, asset):
         i = urlencode({'asset_id': self.tree_id})
         node = self.create_tree_node(
-            i, str(asset.id), str(asset), 'asset',
+            i, str(asset.id), str(asset), 'asset', is_open=True,
         )
         return node
 
@@ -136,14 +136,14 @@ class KubernetesTree:
         return node
 
     @staticmethod
-    def create_tree_node(id_, pid, name, identity, icon='', is_container=False):
+    def create_tree_node(id_, pid, name, identity, icon='', is_container=False, is_open=False):
         node = {
             'id': id_,
             'name': name,
             'title': name,
             'pId': pid,
             'isParent': not is_container,
-            'open': False,
+            'open': is_open,
             'iconSkin': icon,
             'meta': {
                 'type': 'k8s',
