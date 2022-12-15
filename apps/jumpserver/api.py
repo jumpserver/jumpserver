@@ -232,7 +232,7 @@ class DatesLoginMetricMixin:
         result = list(result)
         for i in result:
             tp = i['type']
-            i['label'] = all_types_dict[tp]
+            i['label'] = all_types_dict.get(tp, tp)
         return result
 
     def get_dates_login_times_assets(self):
