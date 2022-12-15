@@ -63,6 +63,7 @@ class AuthMixin:
 
     @property
     def ssh_key_fingerprint(self):
+        public_key = None
         if self.public_key:
             public_key = self.public_key
         elif self.private_key:
@@ -70,9 +71,8 @@ class AuthMixin:
                 public_key = parse_ssh_public_key_str(self.private_key, password=self.password)
             except IOError as e:
                 return str(e)
-        else:
+        if not public_key:
             return ''
-
         public_key_obj = sshpubkeys.SSHKey(public_key)
         fingerprint = public_key_obj.hash_md5()
         return fingerprint
