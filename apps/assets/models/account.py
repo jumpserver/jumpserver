@@ -3,7 +3,6 @@ from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
 from common.utils import lazyproperty
-
 from .base import AbsConnectivity, BaseAccount
 
 __all__ = ['Account', 'AccountTemplate']
@@ -73,6 +72,12 @@ class Account(AbsConnectivity, BaseAccount):
     @lazyproperty
     def platform(self):
         return self.asset.platform
+
+    @lazyproperty
+    def alias(self):
+        if self.username.startswith('@'):
+            return self.username
+        return self.name
 
     def __str__(self):
         return '{}'.format(self.username)
