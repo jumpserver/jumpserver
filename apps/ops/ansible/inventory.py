@@ -10,7 +10,7 @@ __all__ = ['JMSInventory']
 
 class JMSInventory:
     def __init__(self, assets, account_policy='privileged_first',
-                 account_prefer='root,Administrator', host_callback=None, unique_host_name=False):
+                 account_prefer='root,Administrator', host_callback=None):
         """
         :param assets:
         :param account_prefer: account username name if not set use account_policy
@@ -21,7 +21,6 @@ class JMSInventory:
         self.account_policy = account_policy
         self.host_callback = host_callback
         self.exclude_hosts = {}
-        self.unique_host_name = unique_host_name
 
     @staticmethod
     def clean_assets(assets):
@@ -114,8 +113,6 @@ class JMSInventory:
                 'secret': account.secret, 'secret_type': account.secret_type
             } if account else None
         }
-        if self.unique_host_name:
-            host['name'] += '({})'.format(asset.id)
 
         if host['jms_account'] and asset.platform.type == 'oracle':
             host['jms_account']['mode'] = 'sysdba' if account.privileged else None

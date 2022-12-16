@@ -88,7 +88,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
 
     @property
     def inventory(self):
-        return JMSInventory(self.assets.all(), self.runas_policy, self.runas, unique_host_name=True)
+        return JMSInventory(self.assets.all(), self.runas_policy, self.runas)
 
     def create_execution(self):
         return self.executions.create()
@@ -133,26 +133,25 @@ class JobExecution(JMSOrgBaseModel):
                     "status": "ok",
                     "tasks": [],
                 }
-                host_name = "{}({})".format(asset.name, asset.id)
-                if self.summary["excludes"].get(host_name, None):
+                if self.summary["excludes"].get(asset.name, None):
                     asset_detail.update({"status": "excludes"})
                     result["detail"].append(asset_detail)
                     break
-                if self.result["dark"].get(host_name, None):
+                if self.result["dark"].get(asset.name, None):
                     asset_detail.update({"status": "failed"})
-                    for key, task in self.result["dark"][host_name].items():
+                    for key, task in self.result["dark"][asset.name].items():
                         task_detail = {"name": key,
                                        "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
                         asset_detail["tasks"].append(task_detail)
-                if self.result["failures"].get(host_name, None):
+                if self.result["failures"].get(asset.name, None):
                     asset_detail.update({"status": "failed"})
-                    for key, task in self.result["failures"][host_name].items():
+                    for key, task in self.result["failures"][asset.name].items():
                         task_detail = {"name": key,
                                        "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
                         asset_detail["tasks"].append(task_detail)
 
-                if self.result["ok"].get(host_name, None):
-                    for key, task in self.result["ok"][host_name].items():
+                if self.result["ok"].get(asset.name, None):
+                    for key, task in self.result["ok"][asset.name].items():
                         task_detail = {"name": key,
                                        "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
                         asset_detail["tasks"].append(task_detail)
