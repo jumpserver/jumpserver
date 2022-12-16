@@ -7,14 +7,19 @@ def migrate_del_macos(apps, schema_editor):
     db_alias = schema_editor.connection.alias
     asset_model = apps.get_model('assets', 'Asset')
     platform_model = apps.get_model('assets', 'Platform')
-    old_macos = platform_model.objects.using(db_alias).get(
+    old_macos = platform_model.objects.using(db_alias).filter(
         name='MacOS', type='macos'
-    )
-    new_macos = platform_model.objects.using(db_alias).get(
+    ).first()
+    new_macos = platform_model.objects.using(db_alias).filter(
         name='macOS', type='unix'
-    )
+    ).first()
+
+    if not old_macos or not new_macos:
+        return
+
     asset_model.objects.using(db_alias).filter(
-        platform=old_macos).update(platform=new_macos)
+        platform=old_macos
+    ).update(platform=new_macos)
 
     platform_model.objects.using(db_alias).filter(id=old_macos.id).delete()
 

@@ -3,24 +3,23 @@ from __future__ import unicode_literals
 import os
 import uuid
 
-from django.db import models
-from django.utils.translation import ugettext_lazy as _
-from django.utils import timezone
 from django.conf import settings
-from django.core.files.storage import default_storage
 from django.core.cache import cache
+from django.core.files.storage import default_storage
+from django.db import models
+from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 
-from assets.models import Asset
 from assets.const import Protocol
-from users.models import User
-from orgs.mixins.models import OrgModelMixin
-from django.db.models import TextChoices
+from assets.models import Asset
 from common.utils import get_object_or_none, lazyproperty
+from orgs.mixins.models import OrgModelMixin
 from terminal.backends import get_multi_command_storage
+from users.models import User
 
 
 class Session(OrgModelMixin):
-    class LOGIN_FROM(TextChoices):
+    class LOGIN_FROM(models.TextChoices):
         ST = 'ST', 'SSH Terminal'
         RT = 'RT', 'RDP Terminal'
         WT = 'WT', 'Web Terminal'
@@ -34,6 +33,7 @@ class Session(OrgModelMixin):
     account = models.CharField(max_length=128, verbose_name=_("Account"), db_index=True)
     protocol = models.CharField(default='ssh', max_length=16, db_index=True)
     login_from = models.CharField(max_length=2, choices=LOGIN_FROM.choices, default="ST", verbose_name=_("Login from"))
+    type = models.CharField(max_length=16, default='normal', db_index=True)
     remote_addr = models.CharField(max_length=128, verbose_name=_("Remote addr"), blank=True, null=True)
     is_success = models.BooleanField(default=True, db_index=True)
     is_finished = models.BooleanField(default=False, db_index=True)
@@ -42,6 +42,7 @@ class Session(OrgModelMixin):
     terminal = models.ForeignKey('terminal.Terminal', null=True, on_delete=models.DO_NOTHING, db_constraint=False)
     date_start = models.DateTimeField(verbose_name=_("Date start"), db_index=True, default=timezone.now)
     date_end = models.DateTimeField(verbose_name=_("Date end"), null=True)
+    comment = models.TextField(blank=True, null=True, verbose_name=_("Comment"))
 
     upload_to = 'replay'
     ACTIVE_CACHE_KEY_PREFIX = 'SESSION_ACTIVE_{}'

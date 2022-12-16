@@ -4,25 +4,24 @@ from urllib.parse import parse_qsl
 from django.conf import settings
 from django.db.models import F, Value, CharField
 from rest_framework.generics import ListAPIView
+from rest_framework.generics import get_object_or_404
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.generics import get_object_or_404
 
+from assets.api import SerializeToTreeNodeMixin
 from assets.models import Asset, Account
 from assets.utils import KubernetesTree
-from assets.api import SerializeToTreeNodeMixin
+from common.utils import get_object_or_none, lazyproperty
+from common.utils.common import timeit
 from perms.hands import Node
 from perms.models import PermNode
+from perms.utils import PermAccountUtil
+from perms.utils.permission import AssetPermissionUtil
 from perms.utils.user_permission import (
     UserGrantedNodesQueryUtils, UserGrantedAssetsQueryUtils,
 )
-from perms.utils import PermAccountUtil
-from perms.utils.permission import AssetPermissionUtil
-from common.utils import get_object_or_none, lazyproperty
-from common.utils.common import timeit
-
-from ..mixin import SelfOrPKUserMixin
 from .mixin import RebuildTreeMixin
+from ..mixin import SelfOrPKUserMixin
 
 __all__ = [
     'UserGrantedK8sAsTreeApi',
@@ -31,8 +30,10 @@ __all__ = [
 ]
 
 
-class BaseUserNodeWithAssetAsTreeApi(SelfOrPKUserMixin, RebuildTreeMixin, SerializeToTreeNodeMixin,
-                                     ListAPIView):
+class BaseUserNodeWithAssetAsTreeApi(
+    SelfOrPKUserMixin, RebuildTreeMixin,
+    SerializeToTreeNodeMixin, ListAPIView
+):
 
     def list(self, request, *args, **kwargs):
         nodes, assets = self.get_nodes_assets()
@@ -129,10 +130,7 @@ class UserPermedNodeChildrenWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
         return self.query_node_key
 
 
-class UserGrantedK8sAsTreeApi(
-    SelfOrPKUserMixin,
-    ListAPIView
-):
+class UserGrantedK8sAsTreeApi(SelfOrPKUserMixin, ListAPIView):
     """ 用户授权的K8s树 """
 
     @staticmethod
