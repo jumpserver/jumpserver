@@ -2,6 +2,7 @@
 #
 from collections import defaultdict
 
+from django.conf import settings
 from django.db.models import TextChoices
 from django.utils.translation import ugettext_lazy as _
 
@@ -79,6 +80,10 @@ class NativeClient(TextChoices):
         return None
 
     @classmethod
+    def xpack_methods(cls):
+        return [cls.sqlplus, cls.mstsc]
+
+    @classmethod
     def get_methods(cls, os='windows'):
         clients_map = cls.get_native_clients()
         methods = defaultdict(list)
@@ -87,6 +92,8 @@ class NativeClient(TextChoices):
             if isinstance(_clients, dict):
                 _clients = _clients.get(os, _clients['default'])
             for client in _clients:
+                if not settings.XPACK_ENABLED and client in cls.xpack_methods():
+                    continue
                 methods[protocol].append({
                     'value': client.value,
                     'label': client.label,
@@ -121,8 +128,10 @@ class AppletMethod:
         from .models import Applet, AppletHost
 
         methods = defaultdict(list)
-        has_applet_hosts = AppletHost.objects.all().exists()
+        if not settings.XPACK_ENABLED:
+            return methods
 
+        has_applet_hosts = AppletHost.objects.all().exists()
         applets = Applet.objects.filter(is_active=True)
         for applet in applets:
             for protocol in applet.protocols:
