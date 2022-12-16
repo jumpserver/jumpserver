@@ -10,7 +10,6 @@ from kubernetes.client.exceptions import ApiException
 from rest_framework.generics import get_object_or_404
 
 from common.utils import get_logger
-from common.tree import TreeNode
 from assets.models import Account, Asset
 
 from ..const import CloudTypes, Category
@@ -19,13 +18,15 @@ logger = get_logger(__file__)
 
 
 class KubernetesClient:
-    def __init__(self, url, token):
+    def __init__(self, url, token, proxy=None):
         self.url = url
         self.token = token
+        self.proxy = proxy
 
     def get_api(self):
         configuration = client.Configuration()
         configuration.host = self.url
+        configuration.proxy = self.proxy
         configuration.verify_ssl = False
         configuration.api_key = {"authorization": "Bearer " + self.token}
         c = api_client.ApiClient(configuration=configuration)
@@ -82,11 +83,23 @@ class KubernetesClient:
                 data[namespace] = [pod_info, ]
         return data
 
-    @staticmethod
-    def get_kubernetes_data(app_id, username):
+    @classmethod
+    def get_proxy_url(cls, asset):
+        if not asset.domain:
+            return None
+
+        gateway = asset.domain.select_gateway()
+        if not gateway:
+            return None
+        return f'{gateway.address}:{gateway.port}'
+
+    @classmethod
+    def get_kubernetes_data(cls, app_id, username):
         asset = get_object_or_404(Asset, id=app_id)
         account = get_object_or_404(Account, asset=asset, username=username)
-        k8s = KubernetesClient(asset.address, account.secret)
+        k8s_url = f'{asset.address}:{asset.port}'
+        proxy_url = cls.get_proxy_url(asset)
+        k8s = cls(k8s_url, account.secret, proxy=proxy_url)
         return k8s.get_pods()
 
 
@@ -112,7 +125,7 @@ class KubernetesTree:
     def as_asset_tree_node(self, asset):
         i = urlencode({'asset_id': self.tree_id})
         node = self.create_tree_node(
-            i, str(asset.id), str(asset), 'asset',
+            i, str(asset.id), str(asset), 'asset', is_open=True,
         )
         return node
 
@@ -136,14 +149,14 @@ class KubernetesTree:
         return node
 
     @staticmethod
-    def create_tree_node(id_, pid, name, identity, icon='', is_container=False):
+    def create_tree_node(id_, pid, name, identity, icon='', is_container=False, is_open=False):
         node = {
             'id': id_,
             'name': name,
             'title': name,
             'pId': pid,
             'isParent': not is_container,
-            'open': False,
+            'open': is_open,
             'iconSkin': icon,
             'meta': {
                 'type': 'k8s',

@@ -9,15 +9,15 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from celery import current_task
 
-__all__ = ["Job", "JobExecution"]
+__all__ = ["Job", "JobExecution", "JobAuditLog"]
 
-from common.db.models import JMSBaseModel
 from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner
 from ops.mixin import PeriodTaskModelMixin
 from ops.variables import *
+from orgs.mixins.models import JMSOrgBaseModel
 
 
-class Job(JMSBaseModel, PeriodTaskModelMixin):
+class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     class Types(models.TextChoices):
         adhoc = 'adhoc', _('Adhoc')
         playbook = 'playbook', _('Playbook')
@@ -88,7 +88,7 @@ class Job(JMSBaseModel, PeriodTaskModelMixin):
 
     @property
     def inventory(self):
-        return JMSInventory(self.assets.all(), self.runas_policy, self.runas, unique_host_name=True)
+        return JMSInventory(self.assets.all(), self.runas_policy, self.runas)
 
     def create_execution(self):
         return self.executions.create()
@@ -97,7 +97,7 @@ class Job(JMSBaseModel, PeriodTaskModelMixin):
         ordering = ['date_created']
 
 
-class JobExecution(JMSBaseModel):
+class JobExecution(JMSOrgBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     task_id = models.UUIDField(null=True)
     status = models.CharField(max_length=16, verbose_name=_('Status'), default='running')
@@ -133,26 +133,25 @@ class JobExecution(JMSBaseModel):
                     "status": "ok",
                     "tasks": [],
                 }
-                host_name = "{}({})".format(asset.name, asset.id)
-                if self.summary["excludes"].get(host_name, None):
+                if self.summary["excludes"].get(asset.name, None):
                     asset_detail.update({"status": "excludes"})
                     result["detail"].append(asset_detail)
                     break
-                if self.result["dark"].get(host_name, None):
+                if self.result["dark"].get(asset.name, None):
                     asset_detail.update({"status": "failed"})
-                    for key, task in self.result["dark"][host_name].items():
+                    for key, task in self.result["dark"][asset.name].items():
                         task_detail = {"name": key,
                                        "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
                         asset_detail["tasks"].append(task_detail)
-                if self.result["failures"].get(host_name, None):
+                if self.result["failures"].get(asset.name, None):
                     asset_detail.update({"status": "failed"})
-                    for key, task in self.result["failures"][host_name].items():
+                    for key, task in self.result["failures"][asset.name].items():
                         task_detail = {"name": key,
                                        "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
                         asset_detail["tasks"].append(task_detail)
 
-                if self.result["ok"].get(host_name, None):
-                    for key, task in self.result["ok"][host_name].items():
+                if self.result["ok"].get(asset.name, None):
+                    for key, task in self.result["ok"][asset.name].items():
                         task_detail = {"name": key,
                                        "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
                         asset_detail["tasks"].append(task_detail)
@@ -202,10 +201,11 @@ class JobExecution(JMSBaseModel):
 
     def gather_static_variables(self):
         default = {
-            JMS_USERNAME: self.creator.username,
-            JMS_JOB_ID: self.job.id,
+            JMS_JOB_ID: str(self.job.id),
             JMS_JOB_NAME: self.job.name,
         }
+        if self.creator:
+            default.update({JMS_USERNAME: self.creator.username})
         return default
 
     @property
@@ -255,7 +255,10 @@ class JobExecution(JMSBaseModel):
         this = self.__class__.objects.get(id=self.id)
         this.status = status_mapper.get(cb.status, cb.status)
         this.summary.update(cb.summary)
-        this.result.update(cb.result)
+        if this.result:
+            this.result.update(cb.result)
+        else:
+            this.result = cb.result
         this.finish_task()
 
     def finish_task(self):
@@ -283,3 +286,12 @@ class JobExecution(JMSBaseModel):
 
     class Meta:
         ordering = ['-date_created']
+
+
+class JobAuditLog(JobExecution):
+    @property
+    def creator_name(self):
+        return self.creator.name
+
+    class Meta:
+        proxy = True
