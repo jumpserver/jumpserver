@@ -104,7 +104,7 @@ class JobExecution(JMSOrgBaseModel):
             return {
                 "ok": len(self.summary['ok']),
                 "failed": len(self.summary['failures']) + len(self.summary['dark']),
-                "excludes": len(self.summary['excludes']),
+                "excludes": len(self.summary.get('excludes', {})),
                 "total": self.job.assets.count()
             }
 
@@ -121,7 +121,7 @@ class JobExecution(JMSOrgBaseModel):
                     "status": "ok",
                     "tasks": [],
                 }
-                if self.summary["excludes"].get(asset.name, None):
+                if self.summary.get("excludes", None) and self.summary["excludes"].get(asset.name, None):
                     asset_detail.update({"status": "excludes"})
                     result["detail"].append(asset_detail)
                     break

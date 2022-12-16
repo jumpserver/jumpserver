@@ -3067,19 +3067,19 @@ msgstr "跳过"
 
 #: ops/models/job.py:39
 msgid "Chdir"
-msgstr ""
+msgstr "运行目录"
 
 #: ops/models/job.py:40
 msgid "Timeout (Seconds)"
-msgstr ""
+msgstr "超市时间（秒）"
 
 #: ops/models/job.py:45
 msgid "Runas"
-msgstr ""
+msgstr "运行用户"
 
 #: ops/models/job.py:47
 msgid "Runas policy"
-msgstr ""
+msgstr "用户策略"
 
 #: ops/models/job.py:48
 msgid "Use Parameter Define"
