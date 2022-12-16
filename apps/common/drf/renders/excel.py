@@ -30,10 +30,7 @@ class ExcelFileRenderer(BaseFileRenderer):
             # 处理非法字符
             column_count += 1
             cell_value = ILLEGAL_CHARACTERS_RE.sub(r'', cell_value)
-            cell = self.ws.cell(
-                row=self.row_count, column=column_count, value=cell_value
-            )
-            cell.alignment = Alignment(vertical='top', wrap_text=True)
+            self.ws.cell(row=self.row_count, column=column_count, value=cell_value)
 
     def _auto_adjust_column_width(self):
         def calc_handler(x):
