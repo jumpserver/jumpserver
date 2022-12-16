@@ -477,6 +477,9 @@ class Config(dict):
         'SECURITY_LOGIN_IP_WHITE_LIST': [],
         'SECURITY_LOGIN_IP_LIMIT_COUNT': 99999,
         'SECURITY_LOGIN_IP_LIMIT_TIME': 30,
+        # 数量限制
+        'MAX_LIMIT_EXPORT_NUMBER': 10000,
+        'MAX_LIMIT_PER_PAGE': 100,
 
         # 启动前
         'HTTP_BIND_HOST': '0.0.0.0',

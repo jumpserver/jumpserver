@@ -2,6 +2,9 @@ import abc
 from datetime import datetime
 from rest_framework.renderers import BaseRenderer
 from rest_framework.utils import encoders, json
+from rest_framework.fields import ChoiceField, BooleanField
+from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 from common.utils import get_logger
 
@@ -46,10 +49,26 @@ class BaseFileRenderer(BaseRenderer):
 
     @staticmethod
     def get_column_titles(render_fields):
-        return [
-            '*{}'.format(field.label) if field.required else str(field.label)
-            for field in render_fields
-        ]
+        title_list = []
+        for field in render_fields:
+            choices, choice_limit = None, True
+            if field.required:
+                field_name = '*{}'.format(field.label)
+            else:
+                field_name = str(field.label)
+
+            if isinstance(field, ChoiceField):
+                if getattr(field, 'field_name', '') == 'actions':
+                    choice_limit = False
+                choices = getattr(field, 'choice_mapper', None) or field.choices
+            elif isinstance(field, BooleanField):
+                choices = {"'True": _('Yes'), "'False": _('No')}
+
+            title_list.append({
+                'name': field_name, 'choices': choices,
+                'choice_limit': choice_limit
+            })
+        return title_list
 
     def process_data(self, data):
         results = data['results'] if 'results' in data else data
@@ -62,7 +81,7 @@ class BaseFileRenderer(BaseRenderer):
 
         else:
             # 限制数据数量
-            results = results[:10000]
+            results = results[:settings.MAX_LIMIT_EXPORT_NUMBER]
         # 会将一些 UUID 字段转化为 string
         results = json.loads(json.dumps(results, cls=encoders.JSONEncoder))
         return results
@@ -75,6 +94,8 @@ class BaseFileRenderer(BaseRenderer):
                 value = item.get(field.field_name)
                 if value is None:
                     value = ''
+                elif isinstance(value, dict) and value.get('value') is not None:
+                    value = str(value['value'])
                 else:
                     value = str(value)
                 row.append(value)
@@ -84,8 +105,9 @@ class BaseFileRenderer(BaseRenderer):
     def initial_writer(self):
         raise NotImplementedError
 
+    @abc.abstractmethod
     def write_column_titles(self, column_titles):
-        self.write_row(column_titles)
+        raise NotImplementedError
 
     def write_rows(self, rows):
         for row in rows:

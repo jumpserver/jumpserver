@@ -41,7 +41,8 @@ class BaseFileParser(BaseParser):
     def generate_rows(self, stream_data):
         raise NotImplementedError
 
-    def get_column_titles(self, rows):
+    @staticmethod
+    def get_column_titles(rows):
         return next(rows)
 
     def convert_to_field_names(self, column_titles):

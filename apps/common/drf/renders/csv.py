@@ -22,6 +22,10 @@ class CSVFileRenderer(BaseFileRenderer):
         self.buffer = csv_buffer
         self.writer = csv_writer
 
+    def write_column_titles(self, column_titles):
+        titles = [c['name'] for c in column_titles]
+        self.write_row(titles)
+
     def write_row(self, row):
         self.writer.writerow(row)
 
