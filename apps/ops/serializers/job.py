@@ -3,6 +3,7 @@ from rest_framework import serializers
 from common.drf.fields import ReadableHiddenField
 from ops.mixin import PeriodTaskSerializerMixin
 from ops.models import Job, JobExecution
+from ops.models.job import JobAuditLog
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 
@@ -40,3 +41,6 @@ class JobExecutionSerializer(BulkOrgResourceModelSerializer):
         fields = read_only_fields + [
             "job", "parameters"
         ]
+
+
+

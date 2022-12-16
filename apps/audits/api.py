@@ -13,17 +13,23 @@ from common.drf.api import JMSReadOnlyModelViewSet
 from common.plugins.es import QuerySet as ESQuerySet
 from common.drf.filters import DatetimeRangeFilter
 from common.api import CommonGenericViewSet
-from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet, OrgRelationMixin
+from ops.models.job import JobAuditLog
+from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet
 from orgs.utils import current_org
-# from ops.models import CommandExecution
-from . import filters
 from .backends import TYPE_ENGINE_MAPPING
 from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog
-from .serializers import FTPLogSerializer, UserLoginLogSerializer
+from .serializers import FTPLogSerializer, UserLoginLogSerializer, JobAuditLogSerializer
 from .serializers import (
     OperateLogSerializer, OperateLogActionDetailSerializer,
     PasswordChangeLogSerializer
 )
+
+
+class JobAuditViewSet(OrgBulkModelViewSet):
+    serializer_class = JobAuditLogSerializer
+    http_method_names = ('get', 'head', 'options',)
+    permission_classes = ()
+    model = JobAuditLog
 
 
 class FTPLogViewSet(CreateModelMixin, ListModelMixin, OrgGenericViewSet):

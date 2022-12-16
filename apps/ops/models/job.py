@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from celery import current_task
 
-__all__ = ["Job", "JobExecution"]
+__all__ = ["Job", "JobExecution", "JobAuditLog"]
 
 from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner
 from ops.mixin import PeriodTaskModelMixin
@@ -286,3 +286,12 @@ class JobExecution(JMSOrgBaseModel):
 
     class Meta:
         ordering = ['-date_created']
+
+
+class JobAuditLog(JobExecution):
+    @property
+    def creator_name(self):
+        return self.creator.name
+
+    class Meta:
+        proxy = True
