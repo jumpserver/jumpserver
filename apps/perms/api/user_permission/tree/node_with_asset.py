@@ -160,7 +160,7 @@ class UserGrantedK8sAsTreeApi(
         asset_id = parent_info.get('asset_id')
         asset_id = tree_id if not asset_id else asset_id
 
-        if tree_id and not account_username:
+        if tree_id and not key and not account_username:
             asset = self.asset(asset_id)
             accounts = self.get_accounts(asset)
             asset_node = KubernetesTree(tree_id).as_asset_tree_node(asset)
@@ -170,6 +170,6 @@ class UserGrantedK8sAsTreeApi(
                     account, parent_info,
                 )
                 tree.append(account_node)
-        else:
+        elif key and account_username:
             tree = KubernetesTree(key).async_tree_node(parent_info)
         return Response(data=tree)

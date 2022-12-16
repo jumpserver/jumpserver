@@ -60,6 +60,8 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         instance = serializer.save()
+        instance.applicant = self.request.user
+        instance.save(update_fields=['applicant'])
         instance.open()
 
     @action(detail=False, methods=[POST], permission_classes=[RBACPermission, ])

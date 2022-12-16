@@ -1,14 +1,14 @@
+from collections import defaultdict
 from copy import deepcopy
 
 from common.db.models import ChoicesMixin
 from common.tree import TreeNode
-
 from .category import Category
-from .host import HostTypes
-from .device import DeviceTypes
-from .database import DatabaseTypes
-from .web import WebTypes
 from .cloud import CloudTypes
+from .database import DatabaseTypes
+from .device import DeviceTypes
+from .host import HostTypes
+from .web import WebTypes
 
 
 class AllTypes(ChoicesMixin):
@@ -54,7 +54,7 @@ class AllTypes(ChoicesMixin):
             item_name = item.replace('_enabled', '')
             methods = filter_platform_methods(category, tp, item_name)
             methods = [{'name': m['name'], 'id': m['id']} for m in methods]
-            automation_methods[item_name+'_methods'] = methods
+            automation_methods[item_name + '_methods'] = methods
         automation.update(automation_methods)
         constraints['automation'] = automation
         return constraints
@@ -124,7 +124,7 @@ class AllTypes(ChoicesMixin):
     @staticmethod
     def choice_to_node(choice, pid, opened=True, is_parent=True, meta=None):
         node = TreeNode(**{
-            'id': choice.name,
+            'id': pid + '_' + choice.name,
             'name': choice.label,
             'title': choice.label,
             'pId': pid,
@@ -136,15 +136,56 @@ class AllTypes(ChoicesMixin):
         return node
 
     @classmethod
+    def platform_to_node(cls, p, pid):
+        node = TreeNode(**{
+            'id': '{}'.format(p.id),
+            'name': p.name,
+            'title': p.name,
+            'pId': pid,
+            'isParent': True,
+            'meta': {
+                'type': 'platform'
+            }
+        })
+        return node
+
+    @classmethod
     def to_tree_nodes(cls):
-        root = TreeNode(id='ROOT', name='类型节点', title='类型节点')
+        from ..models import Asset, Platform
+        asset_platforms = Asset.objects.all().values_list('platform_id', flat=True)
+        platform_count = defaultdict(int)
+        for platform_id in asset_platforms:
+            platform_count[platform_id] += 1
+
+        category_type_mapper = defaultdict(int)
+        platforms = Platform.objects.all()
+        tp_platforms = defaultdict(list)
+
+        for p in platforms:
+            category_type_mapper[p.category + '_' + p.type] += platform_count[p.id]
+            category_type_mapper[p.category] += platform_count[p.id]
+            tp_platforms[p.category + '_' + p.type].append(p)
+
+        root = TreeNode(id='ROOT', name='所有类型', title='所有类型', open=True, isParent=True)
         nodes = [root]
         for category, types in cls.category_types():
-            category_node = cls.choice_to_node(category, 'ROOT', meta={'type': 'category'})
+            meta = {'type': 'category', 'category': category.value}
+            category_node = cls.choice_to_node(category, 'ROOT', meta=meta)
+            category_count = category_type_mapper.get(category, 0)
+            category_node.name += f'({category_count})'
             nodes.append(category_node)
+
             for tp in types:
-                tp_node = cls.choice_to_node(tp, category_node.id, meta={'type': 'type'})
+                meta = {'type': 'type', 'category': category.value, '_type': tp.value}
+                tp_node = cls.choice_to_node(tp, category_node.id, opened=False, meta=meta)
+                tp_count = category_type_mapper.get(category + '_' + tp, 0)
+                tp_node.name += f'({tp_count})'
                 nodes.append(tp_node)
+
+                for p in tp_platforms.get(category + '_' + tp, []):
+                    platform_node = cls.platform_to_node(p, tp_node.id)
+                    platform_node.name += f'({platform_count.get(p.id, 0)})'
+                    nodes.append(platform_node)
         return nodes
 
     @classmethod
@@ -253,8 +294,3 @@ class AllTypes(ChoicesMixin):
             print("\t- Update platform: {}".format(platform.name))
             platform_data = cls.get_type_default_platform(platform.category, platform.type)
             cls.create_or_update_by_platform_data(platform.name, platform_data)
-
-
-
-
-

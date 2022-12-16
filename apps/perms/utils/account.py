@@ -16,7 +16,7 @@ class PermAccountUtil(AssetPermissionUtil):
         :param account_name: 可能是 @USER @INPUT 字符串
         """
         permed_accounts = self.get_permed_accounts_for_user(user, asset)
-        accounts_mapper = {account.name: account for account in permed_accounts}
+        accounts_mapper = {account.alias: account for account in permed_accounts}
         account = accounts_mapper.get(account_name)
         return account
 

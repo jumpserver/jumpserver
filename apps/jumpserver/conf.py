@@ -270,6 +270,8 @@ class Config(dict):
         'AUTH_OPENID_USER_ATTR_MAP': {
             'name': 'name', 'username': 'preferred_username', 'email': 'email'
         },
+        'AUTH_OPENID_PKCE': False,
+        'AUTH_OPENID_CODE_CHALLENGE_METHOD': 'S256',
 
         # OpenID 新配置参数 (version >= 1.5.9)
         'AUTH_OPENID_PROVIDER_ENDPOINT': 'https://oidc.example.com/',
