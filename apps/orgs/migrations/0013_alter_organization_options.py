@@ -14,7 +14,4 @@ class Migration(migrations.Migration):
             name='organization',
             options={'permissions': (('view_rootorg', 'Can view root org'), ('view_alljoinedorg', 'Can view all joined org')), 'verbose_name': 'Organization'},
         ),
-        migrations.DeleteModel(
-            name='OrganizationMember',
-        ),
     ]

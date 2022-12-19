@@ -871,7 +871,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     def delete(self, using=None, keep_parents=False):
         if self.pk == 1 or self.username == 'admin':
             return
-        return super(User, self).delete()
+        return super(User, self).delete(using=using, keep_parents=keep_parents)
 
     @classmethod
     def get_user_allowed_auth_backend_paths(cls, username):
