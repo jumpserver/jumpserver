@@ -29,7 +29,7 @@ logger = get_logger(__file__)
 @tmp_to_root_org()
 def check_asset_permission_expired():
     """ 这里的任务要足够短，不要影响周期任务 """
-    perms = AssetPermission.get_expired_permissions()
+    perms = AssetPermission.objects.get_expired_permissions()
     perm_ids = list(perms.distinct().values_list('id', flat=True))
     logger.info(f'Checking expired permissions: {perm_ids}')
     UserPermTreeExpireUtil().expire_perm_tree_for_perms(perm_ids)

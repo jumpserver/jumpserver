@@ -1,6 +1,5 @@
-import django
-from django.db.models import QuerySet, Model
-from collections.abc import Iterable
+from django.db.models import QuerySet
+
 from assets.models import Node, Asset
 from common.utils import get_logger
 
@@ -91,11 +90,6 @@ class AssetPermissionUtil(object):
         return perms
 
     @staticmethod
-    def get_permissions(ids):
-        perms = AssetPermission.objects.filter(id__in=ids).order_by('-date_expired')
-        return perms
-
-    @staticmethod
     def convert_to_queryset_if_need(objs_or_ids, model):
         if not objs_or_ids:
             return objs_or_ids
@@ -107,5 +101,7 @@ class AssetPermissionUtil(object):
         ]
         return model.objects.filter(id__in=ids)
 
-
-
+    @staticmethod
+    def get_permissions(ids):
+        perms = AssetPermission.objects.filter(id__in=ids).order_by('-date_expired')
+        return perms

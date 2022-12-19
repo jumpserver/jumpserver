@@ -15,6 +15,7 @@ from common.db.models import UnionQuerySet
 from common.utils import date_expired_default
 
 from perms.const import ActionChoices
+from .perm_node import PermNode
 
 __all__ = ['AssetPermission', 'ActionChoices']
 
@@ -47,6 +48,10 @@ class AssetPermissionQuerySet(models.QuerySet):
 class AssetPermissionManager(OrgManager):
     def valid(self):
         return self.get_queryset().valid()
+
+    def get_expired_permissions(self):
+        now = local_now()
+        return self.get_queryset().filter(Q(date_start__lte=now) | Q(date_expired__gte=now))
 
 
 class AssetPermission(OrgModelMixin):
@@ -147,10 +152,3 @@ class AssetPermission(OrgModelMixin):
         if flat:
             return user_ids
         return User.objects.filter(id__in=user_ids)
-
-    @classmethod
-    def get_expired_permissions(cls):
-        now = local_now()
-        return cls.objects.filter(Q(date_start__lte=now) | Q(date_expired__gte=now))
-
-
