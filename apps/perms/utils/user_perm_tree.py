@@ -24,6 +24,7 @@ from perms.models import (
     UserAssetGrantedTreeNodeRelation,
     PermNode
 )
+
 from .permission import AssetPermissionUtil
 
 logger = get_logger(__name__)
