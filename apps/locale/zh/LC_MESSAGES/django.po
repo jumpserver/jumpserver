@@ -5018,7 +5018,7 @@ msgstr "离线"
 #: terminal/const.py:81 terminal/const.py:82 terminal/const.py:83
 #: terminal/const.py:84 terminal/const.py:85
 msgid "DB Client"
-msgstr "客户端"
+msgstr "数据库客户端"
 
 #: terminal/exceptions.py:8
 msgid "Bulk create not support"

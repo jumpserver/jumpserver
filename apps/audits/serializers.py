@@ -4,6 +4,8 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from common.drf.fields import LabeledChoiceField
+from ops.models.job import JobAuditLog
+from ops.serializers.job import JobExecutionSerializer
 from terminal.models import Session
 from . import models
 from .const import (
@@ -13,6 +15,17 @@ from .const import (
     LoginStatusChoices,
     LoginTypeChoices,
 )
+
+
+class JobAuditLogSerializer(JobExecutionSerializer):
+    class Meta:
+        model = JobAuditLog
+        read_only_fields = ["timedelta", "time_cost", 'is_finished', 'date_start',
+                            'date_finished',
+                            'date_created',
+                            'is_success',
+                            'creator_name']
+        fields = read_only_fields + []
 
 
 class FTPLogSerializer(serializers.ModelSerializer):

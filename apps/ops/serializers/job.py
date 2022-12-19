@@ -3,9 +3,11 @@ from rest_framework import serializers
 from common.drf.fields import ReadableHiddenField
 from ops.mixin import PeriodTaskSerializerMixin
 from ops.models import Job, JobExecution
+from ops.models.job import JobAuditLog
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 
-class JobSerializer(serializers.ModelSerializer, PeriodTaskSerializerMixin):
+class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
     run_after_save = serializers.BooleanField(label=_("Run after save"), read_only=True, default=False, required=False)
 
@@ -25,7 +27,7 @@ class JobSerializer(serializers.ModelSerializer, PeriodTaskSerializerMixin):
         ]
 
 
-class JobExecutionSerializer(serializers.ModelSerializer):
+class JobExecutionSerializer(BulkOrgResourceModelSerializer):
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
     job_type = serializers.ReadOnlyField(label=_("Job type"))
     count = serializers.ReadOnlyField(label=_("Count"))
@@ -39,3 +41,6 @@ class JobExecutionSerializer(serializers.ModelSerializer):
         fields = read_only_fields + [
             "job", "parameters"
         ]
+
+
+

@@ -26,7 +26,6 @@ from perms.models import (
 )
 from .permission import AssetPermissionUtil
 
-
 logger = get_logger(__name__)
 
 __all__ = [

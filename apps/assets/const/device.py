@@ -52,3 +52,7 @@ class DeviceTypes(BaseType):
             cls.ROUTER: [],
             cls.FIREWALL: []
         }
+
+    @classmethod
+    def get_community_types(cls):
+        return []

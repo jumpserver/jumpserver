@@ -190,8 +190,8 @@ def _parse_ssh_private_key(text, password=None):
         if is_openssh_format_key(text):
             return serialization.load_ssh_private_key(text, password=password)
         return serialization.load_pem_private_key(text, password=password)
-    except (ValueError, TypeError) as e:
-        raise e
+    except (ValueError, TypeError):
+        return None
 
 
 def is_openssh_format_key(text: bytes):

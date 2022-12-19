@@ -88,7 +88,7 @@ class OIDCAuthCodeBackend(OIDCBaseBackend):
     """
 
     @ssl_verification
-    def authenticate(self, request, nonce=None, **kwargs):
+    def authenticate(self, request, nonce=None, code_verifier=None, **kwargs):
         """ Authenticates users in case of the OpenID Connect Authorization code flow. """
         log_prompt = "Process authenticate [OIDCAuthCodeBackend]: {}"
         logger.debug(log_prompt.format('start'))
@@ -134,6 +134,8 @@ class OIDCAuthCodeBackend(OIDCBaseBackend):
                 request, path=reverse(settings.AUTH_OPENID_AUTH_LOGIN_CALLBACK_URL_NAME)
             )
         }
+        if settings.AUTH_OPENID_PKCE and code_verifier:
+            token_payload['code_verifier'] = code_verifier
         if settings.AUTH_OPENID_CLIENT_AUTH_METHOD == 'client_secret_post':
             token_payload.update({
                 'client_id': settings.AUTH_OPENID_CLIENT_ID,

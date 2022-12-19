@@ -6,14 +6,10 @@ from django.db.models import Q
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
-from common.utils import lazyproperty
-from perms.models import AssetPermission
-from assets.models import Asset, Node
-from . import user_permission as uapi
-from perms import serializers
-from perms.utils import PermAccountUtil
 from assets.api.mixin import SerializeToTreeNodeMixin
-from users.models import UserGroup
+from assets.models import Asset, Node
+from perms import serializers
+from perms.models import AssetPermission
 
 __all__ = [
     'UserGroupGrantedAssetsApi', 'UserGroupGrantedNodesApi',
@@ -101,11 +97,11 @@ class UserGroupGrantedNodeAssetsApi(ListAPIView):
                 granted_node_q |= Q(nodes__key=_key)
 
             granted_asset_q = (
-                Q(granted_by_permissions__id__in=asset_perm_ids) &
-                (
-                    Q(nodes__key__startswith=f'{node.key}:') |
-                    Q(nodes__key=node.key)
-                )
+                    Q(granted_by_permissions__id__in=asset_perm_ids) &
+                    (
+                            Q(nodes__key__startswith=f'{node.key}:') |
+                            Q(nodes__key=node.key)
+                    )
             )
 
             assets = Asset.objects.filter(
@@ -115,7 +111,7 @@ class UserGroupGrantedNodeAssetsApi(ListAPIView):
 
 
 class UserGroupGrantedNodesApi(ListAPIView):
-    serializer_class = serializers.NodeGrantedSerializer
+    serializer_class = serializers.NodePermedSerializer
     rbac_perms = {
         'list': 'perms.view_usergroupassets',
     }

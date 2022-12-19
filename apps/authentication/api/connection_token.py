@@ -266,7 +266,7 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         permed_account = util.validate_permission(user, asset, account_name)
 
         if not permed_account or not permed_account.actions:
-            msg = 'user `{}` not has asset `{}` permission for login `{}`'.format(
+            msg = 'user `{}` not has asset `{}` permission for account `{}`'.format(
                 user, asset, account_name
             )
             raise PermissionDenied(msg)

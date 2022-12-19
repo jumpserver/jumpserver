@@ -9,7 +9,10 @@
 
 """
 
+import base64
+import hashlib
 import time
+import secrets
 
 from django.conf import settings
 from django.contrib import auth
@@ -38,6 +41,19 @@ class OIDCAuthRequestView(View):
 
     http_method_names = ['get', ]
 
+    @staticmethod
+    def gen_code_verifier(length=128):
+        # length range 43 ~ 128
+        return secrets.token_urlsafe(length - 32)
+
+    @staticmethod
+    def gen_code_challenge(code_verifier, code_challenge_method):
+        if code_challenge_method == 'plain':
+            return code_verifier
+        h = hashlib.sha256(code_verifier.encode('ascii')).digest()
+        b = base64.urlsafe_b64encode(h)
+        return b.decode('ascii')[:-1]
+
     def get(self, request):
         """ Processes GET requests. """
 
@@ -55,6 +71,16 @@ class OIDCAuthRequestView(View):
                 request, path=reverse(settings.AUTH_OPENID_AUTH_LOGIN_CALLBACK_URL_NAME)
             )
         })
+
+        if settings.AUTH_OPENID_PKCE:
+            code_verifier = self.gen_code_verifier()
+            code_challenge_method = settings.AUTH_OPENID_CODE_CHALLENGE_METHOD or 'S256'
+            code_challenge = self.gen_code_challenge(code_verifier, code_challenge_method)
+            authentication_request_params.update({
+                'code_challenge_method': code_challenge_method,
+                'code_challenge': code_challenge
+            })
+            request.session['oidc_auth_code_verifier'] = code_verifier
 
         # States should be used! They are recommended in order to maintain state between the
         # authentication request and the callback.
@@ -138,8 +164,9 @@ class OIDCAuthCallbackView(View):
 
             # Authenticates the end-user.
             next_url = request.session.get('oidc_auth_next_url', None)
+            code_verifier = request.session.get('oidc_auth_code_verifier', None)
             logger.debug(log_prompt.format('Process authenticate'))
-            user = auth.authenticate(nonce=nonce, request=request)
+            user = auth.authenticate(nonce=nonce, request=request, code_verifier=code_verifier)
             if user and user.is_valid:
                 logger.debug(log_prompt.format('Login: {}'.format(user)))
                 auth.login(self.request, user)

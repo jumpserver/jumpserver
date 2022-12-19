@@ -4,25 +4,24 @@ from urllib.parse import parse_qsl
 from django.conf import settings
 from django.db.models import F, Value, CharField
 from rest_framework.generics import ListAPIView
+from rest_framework.generics import get_object_or_404
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.generics import get_object_or_404
 
-from assets.models import Asset
-from assets.utils import KubernetesTree
 from assets.api import SerializeToTreeNodeMixin
+from assets.models import Asset, Account
+from assets.utils import KubernetesTree
+from common.utils import get_object_or_none, lazyproperty
+from common.utils.common import timeit
 from perms.hands import Node
 from perms.models import PermNode
+from perms.utils import PermAccountUtil
+from perms.utils.permission import AssetPermissionUtil
 from perms.utils.user_permission import (
     UserGrantedNodesQueryUtils, UserGrantedAssetsQueryUtils,
 )
-from perms.utils import PermAccountUtil
-from perms.utils.permission import AssetPermissionUtil
-from common.utils import get_object_or_none, lazyproperty
-from common.utils.common import timeit
-
-from ..mixin import SelfOrPKUserMixin
 from .mixin import RebuildTreeMixin
+from ..mixin import SelfOrPKUserMixin
 
 __all__ = [
     'UserGrantedK8sAsTreeApi',
@@ -31,8 +30,10 @@ __all__ = [
 ]
 
 
-class BaseUserNodeWithAssetAsTreeApi(SelfOrPKUserMixin, RebuildTreeMixin, SerializeToTreeNodeMixin,
-                                     ListAPIView):
+class BaseUserNodeWithAssetAsTreeApi(
+    SelfOrPKUserMixin, RebuildTreeMixin,
+    SerializeToTreeNodeMixin, ListAPIView
+):
 
     def list(self, request, *args, **kwargs):
         nodes, assets = self.get_nodes_assets()
@@ -129,10 +130,7 @@ class UserPermedNodeChildrenWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
         return self.query_node_key
 
 
-class UserGrantedK8sAsTreeApi(
-    SelfOrPKUserMixin,
-    ListAPIView
-):
+class UserGrantedK8sAsTreeApi(SelfOrPKUserMixin, ListAPIView):
     """ 用户授权的K8s树 """
 
     @staticmethod
@@ -141,21 +139,28 @@ class UserGrantedK8sAsTreeApi(
         asset = get_object_or_404(Asset, **kwargs)
         return asset
 
+    def get_accounts(self, asset):
+        util = PermAccountUtil()
+        accounts = util.get_permed_accounts_for_user(self.user, asset)
+        ignore_username = [Account.AliasAccount.INPUT, Account.AliasAccount.USER]
+        accounts = filter(lambda x: x.username not in ignore_username, accounts)
+        accounts = list(accounts)
+        return accounts
+
     def list(self, request: Request, *args, **kwargs):
         tree_id = request.query_params.get('tree_id')
         key = request.query_params.get('key', {})
 
         tree = []
-        util = PermAccountUtil()
         parent_info = dict(parse_qsl(key))
         account_username = parent_info.get('account')
 
         asset_id = parent_info.get('asset_id')
         asset_id = tree_id if not asset_id else asset_id
 
-        if tree_id and not account_username:
+        if tree_id and not key and not account_username:
             asset = self.asset(asset_id)
-            accounts = util.get_permed_accounts_for_user(self.user, asset)
+            accounts = self.get_accounts(asset)
             asset_node = KubernetesTree(tree_id).as_asset_tree_node(asset)
             tree.append(asset_node)
             for account in accounts:
@@ -163,6 +168,6 @@ class UserGrantedK8sAsTreeApi(
                     account, parent_info,
                 )
                 tree.append(account_node)
-        else:
+        elif key and account_username:
             tree = KubernetesTree(key).async_tree_node(parent_info)
         return Response(data=tree)

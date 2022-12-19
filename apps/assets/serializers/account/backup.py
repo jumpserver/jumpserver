@@ -34,7 +34,6 @@ class AccountBackupPlanSerializer(PeriodTaskSerializerMixin, BulkOrgResourceMode
 
 
 class AccountBackupPlanExecutionSerializer(serializers.ModelSerializer):
-    trigger = LabeledChoiceField(choices=Trigger.choices, label=_('Trigger mode'))
 
     class Meta:
         model = AccountBackupPlanExecution
