@@ -2,34 +2,29 @@
 #
 from importlib import import_module
 
-from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin
-from django.db.models import F, Value
-from django.db.models.functions import Concat
 from django.conf import settings
-from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin
 
-from common.drf.api import JMSReadOnlyModelViewSet
-from common.plugins.es import QuerySet as ESQuerySet
-from common.drf.filters import DatetimeRangeFilter
-from common.api import CommonGenericViewSet
 from ops.models.job import JobAuditLog
-from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet
+from common.api import CommonGenericViewSet
+from common.drf.filters import DatetimeRangeFilter
+from common.plugins.es import QuerySet as ESQuerySet
 from orgs.utils import current_org
+from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet
 from .backends import TYPE_ENGINE_MAPPING
 from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog
 from .serializers import FTPLogSerializer, UserLoginLogSerializer, JobAuditLogSerializer
 from .serializers import (
-    OperateLogSerializer, OperateLogActionDetailSerializer,
-    PasswordChangeLogSerializer
+    OperateLogSerializer, OperateLogActionDetailSerializer, PasswordChangeLogSerializer
 )
 
 
 class JobAuditViewSet(OrgBulkModelViewSet):
-    serializer_class = JobAuditLogSerializer
-    http_method_names = ('get', 'head', 'options',)
-    permission_classes = ()
     model = JobAuditLog
+    serializer_class = JobAuditLogSerializer
+    http_method_names = ('get', 'head', 'options')
 
 
 class FTPLogViewSet(CreateModelMixin, ListModelMixin, OrgGenericViewSet):

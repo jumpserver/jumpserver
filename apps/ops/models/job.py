@@ -14,23 +14,11 @@ __all__ = ["Job", "JobExecution", "JobAuditLog"]
 from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner
 from ops.mixin import PeriodTaskModelMixin
 from ops.variables import *
+from ops.const import Types, Modules, RunasPolicies, JobStatus
 from orgs.mixins.models import JMSOrgBaseModel
 
 
 class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
-    class Types(models.TextChoices):
-        adhoc = 'adhoc', _('Adhoc')
-        playbook = 'playbook', _('Playbook')
-
-    class RunasPolicies(models.TextChoices):
-        privileged_only = 'privileged_only', _('Privileged Only')
-        privileged_first = 'privileged_first', _('Privileged First')
-        skip = 'skip', _('Skip')
-
-    class Modules(models.TextChoices):
-        shell = 'shell', _('Shell')
-        winshell = 'win_shell', _('Powershell')
-
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, null=True, verbose_name=_('Name'))
     instant = models.BooleanField(default=False)
@@ -100,7 +88,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
 class JobExecution(JMSOrgBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     task_id = models.UUIDField(null=True)
-    status = models.CharField(max_length=16, verbose_name=_('Status'), default='running')
+    status = models.CharField(max_length=16, verbose_name=_('Status'), default=JobStatus.running)
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='executions', null=True)
     parameters = models.JSONField(default=dict, verbose_name=_('Parameters'))
     result = models.JSONField(blank=True, null=True, verbose_name=_('Result'))
@@ -226,11 +214,11 @@ class JobExecution(JMSOrgBaseModel):
 
     @property
     def is_finished(self):
-        return self.status in ['success', 'failed']
+        return self.status in [JobStatus.success, JobStatus.failed]
 
     @property
     def is_success(self):
-        return self.status == 'success'
+        return self.status == JobStatus.success
 
     @property
     def inventory_path(self):
@@ -244,13 +232,13 @@ class JobExecution(JMSOrgBaseModel):
 
     def set_error(self, error):
         this = self.__class__.objects.get(id=self.id)  # 重新获取一次，避免数据库超时连接超时
-        this.status = 'failed'
+        this.status = JobStatus.failed
         this.summary.update({'error': str(error)})
         this.finish_task()
 
     def set_result(self, cb):
         status_mapper = {
-            'successful': 'success',
+            'successful': JobStatus.success,
         }
         this = self.__class__.objects.get(id=self.id)
         this.status = status_mapper.get(cb.status, cb.status)
