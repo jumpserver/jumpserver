@@ -16,6 +16,8 @@ from assets.const import AllTypes
 from terminal.models import Session, Command
 from terminal.utils import ComponentsPrometheusMetricsUtil
 from orgs.utils import current_org
+from ops.const import JobStatus
+from ops.models import Job, JobExecution
 from common.utils import lazyproperty
 from audits.models import UserLoginLog, PasswordChangeLog, OperateLog
 from audits.const import LoginStatusChoices
@@ -118,12 +120,26 @@ class DateTimeMixin:
         queryset = Command.objects.filter(timestamp__gte=t)
         return queryset
 
+    @lazyproperty
+    def jobs_queryset(self):
+        t = self.days_to_datetime
+        queryset = Job.objects.filter(date_created__gte=t)
+        return queryset
+
+    @lazyproperty
+    def jobs_executed_queryset(self):
+        t = self.days_to_datetime
+        queryset = JobExecution.objects.filter(date_created__gte=t)
+        return queryset
+
 
 class DatesLoginMetricMixin:
     dates_list: list
     command_queryset: Command.objects
     sessions_queryset: Session.objects
     ftp_logs_queryset: OperateLog.objects
+    jobs_queryset: Job.objects
+    jobs_executed_queryset: JobExecution.objects
     login_logs_queryset: UserLoginLog.objects
     operate_logs_queryset: OperateLog.objects
     password_change_logs_queryset: PasswordChangeLog.objects
@@ -300,6 +316,21 @@ class DatesLoginMetricMixin:
         return self.command_queryset.filter(risk_level=Command.RISK_LEVEL_DANGEROUS).count()
 
     @lazyproperty
+    def jobs_amount(self):
+        return self.jobs_queryset.count()
+
+    @lazyproperty
+    def jobs_unexecuted_amount(self):
+        executed_amount = self.jobs_executed_queryset.values(
+            'job_id').order_by('job_id').distinct().count()
+        return self.jobs_amount - executed_amount
+
+    @lazyproperty
+    def jobs_executed_failed_amount(self):
+        return self.jobs_executed_queryset.objects.filter(
+            status=JobStatus.failed).count()
+
+    @lazyproperty
     def sessions_amount(self):
         return self.sessions_queryset.count()
 
@@ -406,6 +437,21 @@ class IndexApi(DateTimeMixin, DatesLoginMetricMixin, APIView):
         if _all or query_params.get('total_count') or query_params.get('total_count_ftp_logs'):
             data.update({
                 'total_count_ftp_logs': self.ftp_logs_amount,
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_jobs'):
+            data.update({
+                'total_count_jobs': self.jobs_amount,
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_jobs_unexecuted'):
+            data.update({
+                'total_count_jobs_unexecuted': self.jobs_unexecuted_amount,
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_jobs_executed_failed'):
+            data.update({
+                'total_count_jobs_executed_failed': self.jobs_executed_failed_amount,
             })
 
         if _all or query_params.get('total_count') or query_params.get('total_count_type_to_assets_amount'):
