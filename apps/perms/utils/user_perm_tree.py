@@ -29,7 +29,10 @@ from .permission import AssetPermissionUtil
 
 logger = get_logger(__name__)
 
-__all__ = ['UserPermTreeRefreshUtil', 'UserPermTreeExpireUtil']
+__all__ = [
+    'UserPermTreeRefreshUtil',
+    'UserPermTreeExpireUtil'
+]
 
 
 class _UserPermTreeCacheMixin:
@@ -71,7 +74,7 @@ class UserPermTreeRefreshUtil(_UserPermTreeCacheMixin):
     def _rebuild_user_perm_tree_for_org(self, org):
         with tmp_to_org(org):
             start = time.time()
-            UserGrantedTreeBuildUtils(self.user).rebuild_user_granted_tree()
+            UserPermTreeBuildUtil(self.user).rebuild_user_perm_tree()
             end = time.time()
             logger.info(
                 'Refresh user [{user}] org [{org}] perm tree, user {use_time:.2f}s'
@@ -166,7 +169,7 @@ class UserPermTreeBuildUtil(object):
             return
         self.compute_perm_nodes()
         self.compute_perm_nodes_asset_amount()
-        self.create_mapping_nodes_if_need()
+        self.create_mapping_nodes()
 
     def clean_user_perm_tree(self):
         UserAssetGrantedTreeNodeRelation.objects.filter(user=self.user).delete()
@@ -175,6 +178,47 @@ class UserPermTreeBuildUtil(object):
         self._compute_perm_nodes_for_direct()
         self._compute_perm_nodes_for_direct_asset_if_need()
         self._compute_perm_nodes_for_ancestor()
+
+    def compute_perm_nodes_asset_amount(self):
+        """ 这里计算的是一个组织的授权树 """
+        computed = self._only_compute_root_node_assets_amount_if_need()
+        if computed:
+            return
+
+        nodekey_assetid_mapper = defaultdict(set)
+        org_id = current_org.id
+        for key in self.perm_node_keys_for_granted:
+            asset_ids = PermNode.get_all_asset_ids_by_node_key(org_id, key)
+            nodekey_assetid_mapper[key].update(asset_ids)
+
+        for asset_id, node_id in self.direct_asset_id_node_id_pairs:
+            node_key = self.perm_nodes_id_key_mapper.get(node_id)
+            if not node_key:
+                continue
+            nodekey_assetid_mapper[node_key].add(asset_id)
+
+        util = NodeAssetsUtil(self.perm_nodes, nodekey_assetid_mapper)
+        util.generate()
+
+        for node in self.perm_nodes:
+            assets_amount = util.get_assets_amount(node.key)
+            node.assets_amount = assets_amount
+
+    def create_mapping_nodes(self):
+        to_create = []
+        for node in self.perm_nodes:
+            relation = UserAssetGrantedTreeNodeRelation(
+                user=self.user,
+                node=node,
+                node_key=node.key,
+                node_parent_key=node.parent_key,
+                node_from=node.node_from,
+                node_assets_amount=node.assets_amount,
+                org_id=node.org_id
+            )
+            to_create.append(relation)
+
+        UserAssetGrantedTreeNodeRelation.objects.bulk_create(to_create)
 
     def _compute_perm_nodes_for_direct(self):
         """ 直接授权的节点（叶子节点）"""
@@ -208,31 +252,6 @@ class UserPermTreeBuildUtil(object):
             node.node_from = node.NodeFrom.child
             self._perm_nodes_key_node_mapper[node.key] = node
 
-    def compute_perm_nodes_asset_amount(self):
-        """ 这里计算的是一个组织的授权树 """
-        computed = self._only_compute_root_node_assets_amount_if_need()
-        if computed:
-            return
-
-        nodekey_assetid_mapper = defaultdict(set)
-        org_id = current_org.id
-        for key in self.perm_node_keys_for_granted:
-            asset_ids = PermNode.get_all_asset_ids_by_node_key(org_id, key)
-            nodekey_assetid_mapper[key].update(asset_ids)
-
-        for asset_id, node_id in self.direct_asset_id_node_id_pairs:
-            node_key = self.perm_nodes_id_key_mapper.get(node_id)
-            if not node_key:
-                continue
-            nodekey_assetid_mapper[node_key].add(asset_id)
-
-        util = NodeAssetsUtil(self.perm_nodes, nodekey_assetid_mapper)
-        util.generate()
-
-        for node in self.perm_nodes:
-            assets_amount = util.get_assets_amount(node.key)
-            node.assets_amount = assets_amount
-
     @lazyproperty
     def perm_node_keys_for_granted(self):
         keys = [
@@ -262,6 +281,7 @@ class UserPermTreeBuildUtil(object):
 
     @lazyproperty
     def perm_nodes(self):
+        """ 授权树的所有节点 """
         return list(self._perm_nodes_key_node_mapper.values())
 
     def has_any_ancestor_direct_permed(self, node):
@@ -270,10 +290,12 @@ class UserPermTreeBuildUtil(object):
 
     @lazyproperty
     def direct_node_keys(self):
+        """ 直接授权的节点 keys """
         return {n.key for n in self.direct_nodes}
 
     @lazyproperty
     def direct_nodes(self):
+        """ 直接授权的节点 """
         node_ids = AssetPermission.nodes.through.objects \
             .filter(assetpermission_id__in=self.user_perm_ids) \
             .values_list('node_id', flat=True).distinct()
@@ -289,6 +311,7 @@ class UserPermTreeBuildUtil(object):
 
     @lazyproperty
     def direct_asset_id_node_id_pairs(self):
+        """ 直接授权的资产 id 和 节点 id  """
         asset_node_pairs = Asset.nodes.through.objects \
             .filter(asset_id__in=self.direct_asset_ids) \
             .annotate(
@@ -300,7 +323,9 @@ class UserPermTreeBuildUtil(object):
 
     @lazyproperty
     def direct_asset_ids(self):
+        """ 直接授权的资产 ids """
         asset_ids = AssetPermission.assets.through.objects \
             .filter(assetpermission_id__in=self.user_perm_ids) \
-            .values_list('asset_id', flat=True).distinct()
+            .values_list('asset_id', flat=True) \
+            .distinct()
         return asset_ids
