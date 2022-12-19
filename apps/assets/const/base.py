@@ -1,5 +1,6 @@
 from django.db.models import TextChoices
 
+from jumpserver.utils import has_valid_xpack_license
 from .protocol import Protocol
 
 
@@ -53,3 +54,25 @@ class BaseType(TextChoices):
     @classmethod
     def internal_platforms(cls):
         raise NotImplementedError
+
+    @classmethod
+    def get_community_types(cls):
+        raise NotImplementedError
+
+    @classmethod
+    def get_types(cls):
+        tps = [tp for tp in cls]
+        if not has_valid_xpack_license():
+            tps = cls.get_community_types()
+        return tps
+
+    @classmethod
+    def get_choices(cls):
+        tps = cls.get_types()
+        cls_choices = cls.choices
+        return [
+            choice for choice in cls_choices
+            if choice[0] in tps
+        ]
+
+

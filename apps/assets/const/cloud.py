@@ -49,3 +49,7 @@ class CloudTypes(BaseType):
             cls.PRIVATE: [{'name': 'Vmware-vSphere'}],
             cls.K8S: [{'name': 'Kubernetes'}],
         }
+
+    @classmethod
+    def get_community_types(cls):
+        return [cls.K8S]

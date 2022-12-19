@@ -34,7 +34,7 @@ class HostTypes(BaseType):
     def _get_protocol_constrains(cls) -> dict:
         return {
             '*': {
-               'choices': ['ssh', 'telnet', 'vnc', 'rdp']
+                'choices': ['ssh', 'telnet', 'vnc', 'rdp']
             },
             cls.WINDOWS: {
                 'choices': ['rdp', 'ssh', 'vnc']
@@ -97,7 +97,7 @@ class HostTypes(BaseType):
                 {
                     'name': 'RemoteAppHost',
                     '_protocols': ['rdp', 'ssh'],
-                    'protocols_setting':  {
+                    'protocols_setting': {
                         'ssh': {
                             'required': True
                         }
@@ -106,3 +106,9 @@ class HostTypes(BaseType):
             ],
             cls.OTHER_HOST: []
         }
+
+    @classmethod
+    def get_community_types(cls) -> list:
+        return [
+            cls.LINUX, cls.UNIX, cls.WINDOWS, cls.OTHER_HOST
+        ]

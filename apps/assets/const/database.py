@@ -1,4 +1,3 @@
-
 from .base import BaseType
 
 
@@ -62,3 +61,8 @@ class DatabaseTypes(BaseType):
             cls.REDIS: [{'name': 'Redis'}],
         }
 
+    @classmethod
+    def get_community_types(cls):
+        return [
+            cls.MYSQL, cls.MARIADB, cls.MONGODB, cls.REDIS
+        ]
