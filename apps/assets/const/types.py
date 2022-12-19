@@ -62,14 +62,18 @@ class AllTypes(ChoicesMixin):
     @classmethod
     def types(cls, with_constraints=True):
         types = []
-        for category, tps in cls.category_types():
+        for category, type_cls in cls.category_types():
+            tps = type_cls.get_types()
             types.extend([cls.serialize_type(category, tp, with_constraints) for tp in tps])
         return types
 
     @classmethod
     def categories(cls, with_constraints=True):
         categories = []
-        for category, tps in cls.category_types():
+        for category, type_cls in cls.category_types():
+            tps = type_cls.get_types()
+            if not tps:
+                continue
             category_data = {
                 'value': category.value,
                 'label': category.label,
@@ -121,6 +125,13 @@ class AllTypes(ChoicesMixin):
             (Category.CLOUD, CloudTypes)
         )
 
+    @classmethod
+    def get_types(cls):
+        tps = []
+        for i in dict(cls.category_types()).values():
+            tps.extend(i.get_types())
+        return tps
+
     @staticmethod
     def choice_to_node(choice, pid, opened=True, is_parent=True, meta=None):
         node = TreeNode(**{
@@ -168,14 +179,15 @@ class AllTypes(ChoicesMixin):
 
         root = TreeNode(id='ROOT', name='所有类型', title='所有类型', open=True, isParent=True)
         nodes = [root]
-        for category, types in cls.category_types():
+        for category, type_cls in cls.category_types():
             meta = {'type': 'category', 'category': category.value}
             category_node = cls.choice_to_node(category, 'ROOT', meta=meta)
             category_count = category_type_mapper.get(category, 0)
             category_node.name += f'({category_count})'
             nodes.append(category_node)
 
-            for tp in types:
+            tps = type_cls.get_types()
+            for tp in tps:
                 meta = {'type': 'type', 'category': category.value, '_type': tp.value}
                 tp_node = cls.choice_to_node(tp, category_node.id, opened=False, meta=meta)
                 tp_count = category_type_mapper.get(category + '_' + tp, 0)
