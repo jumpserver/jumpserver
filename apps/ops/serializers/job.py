@@ -30,17 +30,14 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
 class JobExecutionSerializer(BulkOrgResourceModelSerializer):
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
     job_type = serializers.ReadOnlyField(label=_("Job type"))
-    count = serializers.ReadOnlyField(label=_("Count"))
+    material = serializers.ReadOnlyField(label=_("Material"))
 
     class Meta:
         model = JobExecution
-        read_only_fields = ["id", "task_id", "timedelta", "count", "time_cost", 'is_finished', 'date_start',
+        read_only_fields = ["id", "task_id", "timedelta", "time_cost", 'is_finished', 'date_start',
                             'date_finished',
                             'date_created',
-                            'is_success', 'task_id', 'short_id', 'job_type', 'creator']
+                            'is_success', 'task_id', 'short_id', 'job_type', 'summary', 'material']
         fields = read_only_fields + [
-            "job", "parameters"
+            "job", "parameters", "creator"
         ]
-
-
-

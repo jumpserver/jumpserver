@@ -6,7 +6,7 @@ from rest_framework.generics import CreateAPIView, ListAPIView
 from orgs.mixins.api import OrgBulkModelViewSet
 
 from common.mixins import RecordViewLogMixin
-from assets.models import Account
+from assets.models import Account, Asset
 from assets.filters import AccountFilterSet
 from assets.tasks import verify_accounts_connectivity
 from assets import serializers
@@ -30,10 +30,18 @@ class AccountViewSet(OrgBulkModelViewSet):
         'su_from_accounts': 'assets.view_account',
     }
 
-    @action(methods=['get'], detail=True, url_path='su-from-accounts')
+    @action(methods=['get'], detail=False, url_path='su-from-accounts')
     def su_from_accounts(self, request, *args, **kwargs):
-        account = get_object_or_404(Account, pk=self.kwargs['pk'])
-        accounts = account.get_su_from_accounts()
+        account_id = request.query_params.get('account')
+        asset_id = request.query_params.get('asset')
+        if account_id:
+            account = get_object_or_404(Account, pk=account_id)
+            accounts = account.get_su_from_accounts()
+        elif asset_id:
+            asset = get_object_or_404(Asset, pk=asset_id)
+            accounts = asset.accounts.all()
+        else:
+            accounts = []
         serializer = serializers.AccountSerializer(accounts, many=True)
         return Response(data=serializer.data)
 

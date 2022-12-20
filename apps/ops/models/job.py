@@ -99,14 +99,11 @@ class JobExecution(JMSOrgBaseModel):
     date_finished = models.DateTimeField(null=True, verbose_name=_("Date finished"))
 
     @property
-    def count(self):
-        if self.is_finished and not self.summary.get('error', None):
-            return {
-                "ok": len(self.summary['ok']),
-                "failed": len(self.summary['failures']) + len(self.summary['dark']),
-                "excludes": len(self.summary['excludes']),
-                "total": self.job.assets.count()
-            }
+    def material(self):
+        if self.job.type == 'adhoc':
+            return "{}:{}".format(self.job.module, self.job.args)
+        if self.job.type == 'playbook':
+            return "{}:{}:{}".format(self.org.name, self.job.creator.name, self.job.playbook.name)
 
     @property
     def assent_result_detail(self):
@@ -121,7 +118,7 @@ class JobExecution(JMSOrgBaseModel):
                     "status": "ok",
                     "tasks": [],
                 }
-                if self.summary["excludes"].get(asset.name, None):
+                if self.summary.get("excludes", None) and self.summary["excludes"].get(asset.name, None):
                     asset_detail.update({"status": "excludes"})
                     result["detail"].append(asset_detail)
                     break
@@ -160,9 +157,10 @@ class JobExecution(JMSOrgBaseModel):
     def get_runner(self):
         inv = self.job.inventory
         inv.write_to_file(self.inventory_path)
+        self.summary = self.result = {"excludes": {}}
         if len(inv.exclude_hosts) > 0:
-            self.summary['excludes'] = inv.exclude_hosts
-            self.result['excludes'] = inv.exclude_hosts
+            self.summary.update({"excludes": inv.exclude_hosts})
+            self.result.update({"excludes": inv.exclude_hosts})
             self.save()
 
         if isinstance(self.parameters, str):
