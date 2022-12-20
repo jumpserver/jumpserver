@@ -20,7 +20,7 @@ from .const import (
 class JobAuditLogSerializer(JobExecutionSerializer):
     class Meta:
         model = JobAuditLog
-        read_only_fields = ["timedelta", "time_cost", 'is_finished', 'date_start',
+        read_only_fields = ["id", "material", "timedelta", "time_cost", 'is_finished', 'date_start',
                             'date_finished',
                             'date_created',
                             'is_success',
