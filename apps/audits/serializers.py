@@ -9,10 +9,8 @@ from ops.serializers.job import JobExecutionSerializer
 from terminal.models import Session
 from . import models
 from .const import (
-    ActionChoices,
-    OperateChoices,
-    MFAChoices,
-    LoginStatusChoices,
+    ActionChoices, OperateChoices,
+    MFAChoices, LoginStatusChoices,
     LoginTypeChoices,
 )
 
@@ -20,11 +18,11 @@ from .const import (
 class JobAuditLogSerializer(JobExecutionSerializer):
     class Meta:
         model = JobAuditLog
-        read_only_fields = ["id", "material", "timedelta", "time_cost", 'is_finished', 'date_start',
-                            'date_finished',
-                            'date_created',
-                            'is_success',
-                            'creator_name']
+        read_only_fields = [
+            "id", "material", "time_cost",
+            'date_start', 'date_finished', 'date_created',
+            'is_finished', 'is_success', 'creator_by'
+        ]
         fields = read_only_fields + []
 
 
@@ -35,14 +33,8 @@ class FTPLogSerializer(serializers.ModelSerializer):
         model = models.FTPLog
         fields_mini = ["id"]
         fields_small = fields_mini + [
-            "user",
-            "remote_addr",
-            "asset",
-            "system_user",
-            "org_id",
-            "operate",
-            "filename",
-            "is_success",
+            "user", "remote_addr", "asset", "account",
+            "org_id", "operate", "filename", "is_success",
             "date_start",
         ]
         fields = fields_small
