@@ -163,9 +163,10 @@ class JobExecution(JMSOrgBaseModel):
     def compile_shell(self):
         if self.current_job.type != 'adhoc':
             return
-        result = "{}{}{} ".format('\'', self.current_job.args, '\'')
-        result += "chdir={}".format(self.current_job.chdir)
-        return result
+        result = self.current_job.args
+        result += " chdir={}".format(self.current_job.chdir)
+        return self.job.args
+        # return result
 
     def get_runner(self):
         inv = self.current_job.inventory
