@@ -3,7 +3,6 @@
 #
 
 import logging
-import uuid
 from collections import defaultdict
 
 from django.db import models
@@ -52,7 +51,7 @@ class NodesRelationMixin:
     NODES_CACHE_KEY = 'ASSET_NODES_{}'
     ALL_ASSET_NODES_CACHE_KEY = 'ALL_ASSETS_NODES'
     CACHE_TIME = 3600 * 24 * 7
-    id = ""
+    id: str
     _all_nodes_keys = None
 
     def get_nodes(self):
@@ -99,7 +98,6 @@ class Protocol(models.Model):
 
 
 class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     address = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
     platform = models.ForeignKey(Platform, on_delete=models.PROTECT, verbose_name=_("Platform"), related_name='assets')
