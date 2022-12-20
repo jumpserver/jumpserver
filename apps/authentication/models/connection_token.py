@@ -11,10 +11,9 @@ from rest_framework.exceptions import PermissionDenied
 
 from assets.const import Protocol
 from common.db.fields import EncryptCharField
-from common.db.models import JMSBaseModel
 from common.utils import lazyproperty, pretty_string, bulk_get
 from common.utils.timezone import as_current_tz
-from orgs.mixins.models import OrgModelMixin
+from orgs.mixins.models import JMSOrgBaseModel
 from terminal.models import Applet
 
 
@@ -22,7 +21,7 @@ def date_expired_default():
     return timezone.now() + timedelta(seconds=settings.CONNECTION_TOKEN_EXPIRATION)
 
 
-class ConnectionToken(OrgModelMixin, JMSBaseModel):
+class ConnectionToken(JMSOrgBaseModel):
     value = models.CharField(max_length=64, default='', verbose_name=_("Value"))
     user = models.ForeignKey(
         'users.User', on_delete=models.SET_NULL, null=True, blank=True,

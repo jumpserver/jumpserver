@@ -1,8 +1,7 @@
-import uuid
-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from common.db.models import JMSBaseModel
 from common.tree import TreeNode
 from common.utils import lazyproperty, settings
 
@@ -64,13 +63,9 @@ class OrgRoleMixin:
         return self.get_origin_role_members('user')
 
 
-class Organization(OrgRoleMixin, models.Model):
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+class Organization(OrgRoleMixin, JMSBaseModel):
     name = models.CharField(max_length=128, unique=True, verbose_name=_("Name"))
-    created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     builtin = models.BooleanField(default=False, verbose_name=_('Builtin'))
-    date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
-    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
     members = models.ManyToManyField(
         'users.User', related_name='orgs', through='rbac.RoleBinding', through_fields=('org', 'user')
     )

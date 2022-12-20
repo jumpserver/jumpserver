@@ -19,9 +19,9 @@ class JobAuditLogSerializer(JobExecutionSerializer):
     class Meta:
         model = JobAuditLog
         read_only_fields = [
-            "id", "material", "time_cost",
-            'date_start', 'date_finished', 'date_created',
-            'is_finished', 'is_success', 'creator_by'
+            "id", "material", "time_cost", 'date_start',
+            'date_finished', 'date_created',
+            'is_finished', 'is_success', 'created_by',
         ]
         fields = read_only_fields + []
 

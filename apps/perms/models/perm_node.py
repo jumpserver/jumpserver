@@ -1,12 +1,10 @@
-
-from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.db.models import F, TextChoices
+from django.utils.translation import ugettext_lazy as _
 
 from assets.models import Asset, Node, FamilyMixin, Account
-from orgs.mixins.models import OrgModelMixin
 from common.utils import lazyproperty
-from common.db.models import BaseCreateUpdateModel
+from orgs.mixins.models import JMSOrgBaseModel
 
 
 class NodeFrom(TextChoices):
@@ -15,7 +13,7 @@ class NodeFrom(TextChoices):
     asset = 'asset', 'Direct asset granted'
 
 
-class UserAssetGrantedTreeNodeRelation(OrgModelMixin, FamilyMixin, BaseCreateUpdateModel):
+class UserAssetGrantedTreeNodeRelation(FamilyMixin, JMSOrgBaseModel):
     NodeFrom = NodeFrom
 
     user = models.ForeignKey('users.User', db_constraint=False, on_delete=models.CASCADE)
@@ -26,6 +24,7 @@ class UserAssetGrantedTreeNodeRelation(OrgModelMixin, FamilyMixin, BaseCreateUpd
                                        db_index=True)
     node_from = models.CharField(choices=NodeFrom.choices, max_length=16, db_index=True)
     node_assets_amount = models.IntegerField(default=0)
+    comment = ''
 
     @property
     def key(self):

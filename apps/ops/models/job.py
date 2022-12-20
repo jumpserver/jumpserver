@@ -1,13 +1,13 @@
 import json
+import logging
 import os
 import uuid
-import logging
 
+from celery import current_task
 from django.conf import settings
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
-from celery import current_task
+from django.utils.translation import gettext_lazy as _
 
 __all__ = ["Job", "JobExecution", "JobAuditLog"]
 
@@ -19,7 +19,6 @@ from orgs.mixins.models import JMSOrgBaseModel
 
 
 class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, null=True, verbose_name=_('Name'))
     instant = models.BooleanField(default=False)
     args = models.CharField(max_length=1024, default='', verbose_name=_('Args'), null=True, blank=True)

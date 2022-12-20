@@ -3,7 +3,7 @@ from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
-from common.mixins import CommonModelMixin
+from common.db.models import JMSBaseModel
 from common.utils import contains_ip
 from orgs.mixins.models import OrgModelMixin
 
@@ -58,7 +58,7 @@ class UserAssetAccountACLQuerySet(BaseACLQuerySet):
 
     def filter_account(self, username):
         q = Q(accounts__username_group__contains=username) | \
-             Q(accounts__username_group__contains='*')
+            Q(accounts__username_group__contains='*')
         return self.filter(q)
 
 
@@ -67,7 +67,7 @@ class ACLManager(models.Manager):
         return self.get_queryset().valid()
 
 
-class BaseACL(CommonModelMixin):
+class BaseACL(JMSBaseModel):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     priority = models.IntegerField(
         default=50, verbose_name=_("Priority"),
@@ -77,7 +77,6 @@ class BaseACL(CommonModelMixin):
     action = models.CharField(max_length=64, default=ActionChoices.reject, verbose_name=_('Action'))
     reviewers = models.ManyToManyField('users.User', blank=True, verbose_name=_("Reviewers"))
     is_active = models.BooleanField(default=True, verbose_name=_("Active"))
-    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
     ActionChoices = ActionChoices
     objects = ACLManager.from_queryset(BaseACLQuerySet)()

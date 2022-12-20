@@ -1,29 +1,24 @@
 # -*- coding: utf-8 -*-
 #
 import re
-import time
-import uuid
 import threading
-import os
 import time
 import uuid
-
 from collections import defaultdict
+
+from django.core.cache import cache
 from django.db import models, transaction
 from django.db.models import Q, Manager
-from django.db.utils import IntegrityError
-from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ugettext
 from django.db.transaction import atomic
-from django.core.cache import cache
+from django.utils.translation import ugettext
+from django.utils.translation import ugettext_lazy as _
 
-from common.utils.lock import DistributedLock
-from common.utils.common import timeit
 from common.db.models import output_as_string
 from common.utils import get_logger
-from orgs.mixins.models import OrgModelMixin, OrgManager
-from orgs.utils import get_current_org, tmp_to_org, tmp_to_root_org
+from common.utils.lock import DistributedLock
+from orgs.mixins.models import OrgManager, JMSOrgBaseModel
 from orgs.models import Organization
+from orgs.utils import get_current_org, tmp_to_org, tmp_to_root_org
 
 __all__ = ['Node', 'FamilyMixin', 'compute_parent_key', 'NodeQuerySet']
 logger = get_logger(__name__)
@@ -545,7 +540,7 @@ class SomeNodesMixin:
         return root_nodes
 
 
-class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
+class Node(JMSOrgBaseModel, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     key = models.CharField(unique=True, max_length=64, verbose_name=_("Key"))  # '1:1:1:1'
     value = models.CharField(max_length=128, verbose_name=_("Value"))

@@ -2,18 +2,17 @@
 # -*- coding: utf-8 -*-
 #
 
-import uuid
 import logging
+import uuid
 from collections import defaultdict
 
 from django.db import models
-from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import lazyproperty
 from orgs.mixins.models import OrgManager, JMSOrgBaseModel
-from ..platform import Platform
 from ..base import AbsConnectivity
+from ..platform import Platform
 
 __all__ = ['Asset', 'AssetQuerySet', 'default_node', 'Protocol']
 logger = logging.getLogger(__name__)
@@ -110,7 +109,6 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
                                    verbose_name=_("Nodes"))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     labels = models.ManyToManyField('assets.Label', blank=True, related_name='assets', verbose_name=_("Labels"))
-    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
     info = models.JSONField(verbose_name='Info', default=dict, blank=True)
 
     objects = AssetManager.from_queryset(AssetQuerySet)()

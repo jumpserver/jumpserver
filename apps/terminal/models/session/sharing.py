@@ -1,20 +1,19 @@
 import datetime
 
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
+
+from common.db.models import JMSBaseModel
+from orgs.mixins.models import OrgModelMixin
 from orgs.utils import tmp_to_root_org
 from users.models import User
-
-from common.mixins import CommonModelMixin
-from orgs.mixins.models import OrgModelMixin
 from .session import Session
-
 
 __all__ = ['SessionSharing', 'SessionJoinRecord']
 
 
-class SessionSharing(CommonModelMixin, OrgModelMixin):
+class SessionSharing(JMSBaseModel, OrgModelMixin):
     session = models.ForeignKey(
         'terminal.Session', on_delete=models.CASCADE, verbose_name=_('Session')
     )
@@ -33,7 +32,7 @@ class SessionSharing(CommonModelMixin, OrgModelMixin):
     users = models.TextField(blank=True, verbose_name=_("User"))
 
     class Meta:
-        ordering = ('-date_created', )
+        ordering = ('-date_created',)
         verbose_name = _('Session sharing')
         permissions = [
             ('add_supersessionsharing', _("Can add super session sharing"))
@@ -71,7 +70,7 @@ class SessionSharing(CommonModelMixin, OrgModelMixin):
         return True, ''
 
 
-class SessionJoinRecord(CommonModelMixin, OrgModelMixin):
+class SessionJoinRecord(JMSBaseModel, OrgModelMixin):
     LOGIN_FROM = Session.LOGIN_FROM
 
     session = models.ForeignKey(
@@ -112,7 +111,7 @@ class SessionJoinRecord(CommonModelMixin, OrgModelMixin):
     )
 
     class Meta:
-        ordering = ('-date_joined', )
+        ordering = ('-date_joined',)
         verbose_name = _("Session join record")
 
     def __str__(self):

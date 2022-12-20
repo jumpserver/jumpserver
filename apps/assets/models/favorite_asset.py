@@ -2,13 +2,12 @@
 #
 from django.db import models
 
-from common.mixins.models import CommonModelMixin
-
+from common.db.models import JMSBaseModel
 
 __all__ = ['FavoriteAsset']
 
 
-class FavoriteAsset(CommonModelMixin):
+class FavoriteAsset(JMSBaseModel):
     user = models.ForeignKey('users.User', on_delete=models.CASCADE)
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE)
 

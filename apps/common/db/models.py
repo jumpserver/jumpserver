@@ -72,10 +72,11 @@ class ChoicesMixin:
 
 
 class BaseCreateUpdateModel(models.Model):
-    created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
-    updated_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Updated by'))
+    created_by = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Created by'))
+    updated_by = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Updated by'))
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_('Date updated'))
+    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
     class Meta:
         abstract = True

@@ -28,6 +28,7 @@ class Migration(migrations.Migration):
                 ('type', models.CharField(choices=[('command', 'Command'), ('regex', 'Regex')], default='command',
                                           max_length=16, verbose_name='Type')),
                 ('content', models.TextField(help_text='One line one command', verbose_name='Content')),
+                ('comment', models.TextField(blank=True, default='', verbose_name='Comment')),
                 ('ignore_case', models.BooleanField(default=True, verbose_name='Ignore case')),
             ],
             options={
@@ -57,7 +58,8 @@ class Migration(migrations.Migration):
                 ('assets', models.JSONField(verbose_name='Asset')),
                 ('commands', models.ManyToManyField(to='acls.CommandGroup', verbose_name='Commands')),
                 (
-                'reviewers', models.ManyToManyField(blank=True, to=settings.AUTH_USER_MODEL, verbose_name='Reviewers')),
+                    'reviewers',
+                    models.ManyToManyField(blank=True, to=settings.AUTH_USER_MODEL, verbose_name='Reviewers')),
             ],
             options={
                 'verbose_name': 'Command acl',
