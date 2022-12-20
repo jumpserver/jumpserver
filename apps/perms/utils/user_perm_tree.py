@@ -96,7 +96,8 @@ class UserPermTreeRefreshUtil(_UserPermTreeCacheMixin):
         logger.info(f'Need to refresh orgs: {to_refresh_orgs}')
         return to_refresh_orgs
 
-    def _mark_user_orgs_refresh_finished(self, org_ids):
+    def _mark_user_orgs_refresh_finished(self, orgs):
+        org_ids = [str(org.id) for org in orgs]
         self.client.sadd(self.cache_key_user, *org_ids)
 
 
