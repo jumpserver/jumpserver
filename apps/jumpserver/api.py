@@ -327,7 +327,7 @@ class DatesLoginMetricMixin:
 
     @lazyproperty
     def jobs_executed_failed_amount(self):
-        return self.jobs_executed_queryset.objects.filter(
+        return self.jobs_executed_queryset.filter(
             status=JobStatus.failed).count()
 
     @lazyproperty
