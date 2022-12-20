@@ -343,9 +343,9 @@ if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
         }
     })
     if REDIS_USE_SSL:
-        REDIS_OPTIONS['CONNECTION_POOL_KWARGS'].update({
-            'connection_class': SentinelManagedSSLConnection
-        })
+        CONNECTION_POOL_KWARGS = REDIS_OPTIONS['CONNECTION_POOL_KWARGS']
+        CONNECTION_POOL_KWARGS['connection_class'] = SentinelManagedSSLConnection
+        REDIS_OPTIONS['CONNECTION_POOL_KWARGS'] = CONNECTION_POOL_KWARGS
     DJANGO_REDIS_CONNECTION_FACTORY = 'django_redis.pool.SentinelConnectionFactory'
 else:
     REDIS_LOCATION_NO_DB = '%(protocol)s://:%(password)s@%(host)s:%(port)s/{}' % {
