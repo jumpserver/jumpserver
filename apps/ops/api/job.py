@@ -3,7 +3,6 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 
 from ops.models import Job, JobExecution
-from ops.models.job import JobAuditLog
 from ops.serializers.job import JobSerializer, JobExecutionSerializer
 
 __all__ = ['JobViewSet', 'JobExecutionViewSet', 'JobRunVariableHelpAPIView', 'JobAssetDetail', ]
@@ -58,6 +57,8 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
 
     def perform_create(self, serializer):
         instance = serializer.save()
+        instance.job_version = instance.job.version
+        instance.save()
         task = run_ops_job_execution.delay(instance.id)
         set_task_to_serializer_data(serializer, task)
 

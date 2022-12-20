@@ -11,6 +11,8 @@ from celery import current_task
 
 __all__ = ["Job", "JobExecution", "JobAuditLog"]
 
+from simple_history.models import HistoricalRecords
+
 from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner
 from ops.mixin import PeriodTaskModelMixin
 from ops.variables import *
@@ -37,6 +39,11 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     use_parameter_define = models.BooleanField(default=False, verbose_name=(_('Use Parameter Define')))
     parameters_define = models.JSONField(default=dict, verbose_name=_('Parameters define'))
     comment = models.CharField(max_length=1024, default='', verbose_name=_('Comment'), null=True, blank=True)
+    version = models.IntegerField(default=0)
+    history = HistoricalRecords()
+
+    def get_history(self, version):
+        return self.history.filter(version=version).first()
 
     @property
     def last_execution(self):
@@ -79,7 +86,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
         return JMSInventory(self.assets.all(), self.runas_policy, self.runas)
 
     def create_execution(self):
-        return self.executions.create()
+        return self.executions.create(job_version=self.version)
 
     class Meta:
         ordering = ['date_created']
@@ -90,6 +97,7 @@ class JobExecution(JMSOrgBaseModel):
     task_id = models.UUIDField(null=True)
     status = models.CharField(max_length=16, verbose_name=_('Status'), default=JobStatus.running)
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='executions', null=True)
+    job_version = models.IntegerField(default=0)
     parameters = models.JSONField(default=dict, verbose_name=_('Parameters'))
     result = models.JSONField(blank=True, null=True, verbose_name=_('Result'))
     summary = models.JSONField(default=dict, verbose_name=_('Summary'))
@@ -99,11 +107,17 @@ class JobExecution(JMSOrgBaseModel):
     date_finished = models.DateTimeField(null=True, verbose_name=_("Date finished"))
 
     @property
+    def current_job(self):
+        if self.job.version != self.job_version:
+            return self.job.get_history(self.job_version)
+        return self.job
+
+    @property
     def material(self):
-        if self.job.type == 'adhoc':
-            return "{}:{}".format(self.job.module, self.job.args)
-        if self.job.type == 'playbook':
-            return "{}:{}:{}".format(self.org.name, self.job.creator.name, self.job.playbook.name)
+        if self.current_job.type == 'adhoc':
+            return "{}:{}".format(self.current_job.module, self.current_job.args)
+        if self.current_job.type == 'playbook':
+            return "{}:{}:{}".format(self.org.name, self.current_job.creator.name, self.current_job.playbook.name)
 
     @property
     def assent_result_detail(self):
@@ -112,7 +126,7 @@ class JobExecution(JMSOrgBaseModel):
                 "summary": self.count,
                 "detail": [],
             }
-            for asset in self.job.assets.all():
+            for asset in self.current_job.assets.all():
                 asset_detail = {
                     "name": asset.name,
                     "status": "ok",
@@ -145,17 +159,17 @@ class JobExecution(JMSOrgBaseModel):
 
     @property
     def job_type(self):
-        return self.job.type
+        return self.current_job.type
 
     def compile_shell(self):
-        if self.job.type != 'adhoc':
+        if self.current_job.type != 'adhoc':
             return
-        result = "{}{}{} ".format('\'', self.job.args, '\'')
-        result += "chdir={}".format(self.job.chdir)
+        result = "{}{}{} ".format('\'', self.current_job.args, '\'')
+        result += "chdir={}".format(self.current_job.chdir)
         return result
 
     def get_runner(self):
-        inv = self.job.inventory
+        inv = self.current_job.inventory
         inv.write_to_file(self.inventory_path)
         self.summary = self.result = {"excludes": {}}
         if len(inv.exclude_hosts) > 0:
@@ -171,15 +185,15 @@ class JobExecution(JMSOrgBaseModel):
         static_variables = self.gather_static_variables()
         extra_vars.update(static_variables)
 
-        if self.job.type == 'adhoc':
+        if self.current_job.type == 'adhoc':
             args = self.compile_shell()
             runner = AdHocRunner(
-                self.inventory_path, self.job.module, module_args=args,
+                self.inventory_path, self.current_job.module, module_args=args,
                 pattern="all", project_dir=self.private_dir, extra_vars=extra_vars,
             )
-        elif self.job.type == 'playbook':
+        elif self.current_job.type == 'playbook':
             runner = PlaybookRunner(
-                self.inventory_path, self.job.playbook.entry
+                self.inventory_path, self.current_job.playbook.entry
             )
         else:
             raise Exception("unsupported job type")
@@ -187,8 +201,8 @@ class JobExecution(JMSOrgBaseModel):
 
     def gather_static_variables(self):
         default = {
-            JMS_JOB_ID: str(self.job.id),
-            JMS_JOB_NAME: self.job.name,
+            JMS_JOB_ID: str(self.current_job.id),
+            JMS_JOB_NAME: self.current_job.name,
         }
         if self.creator:
             default.update({JMS_USERNAME: self.creator.username})
@@ -225,7 +239,7 @@ class JobExecution(JMSOrgBaseModel):
     @property
     def private_dir(self):
         uniq = self.date_created.strftime('%Y%m%d_%H%M%S') + '_' + self.short_id
-        job_name = self.job.name if self.job.name else 'instant'
+        job_name = self.current_job.name if self.current_job.name else 'instant'
         return os.path.join(settings.ANSIBLE_DIR, job_name, uniq)
 
     def set_error(self, error):
