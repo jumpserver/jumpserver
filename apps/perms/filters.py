@@ -13,15 +13,15 @@ class PermissionBaseFilter(BaseFilterSet):
     is_valid = filters.BooleanFilter(method='do_nothing')
     user_id = filters.UUIDFilter(method='do_nothing')
     username = filters.CharFilter(method='do_nothing')
-    system_user_id = filters.UUIDFilter(method='do_nothing')
-    system_user = filters.CharFilter(method='do_nothing')
+    account_id = filters.UUIDFilter(method='do_nothing')
+    account = filters.CharFilter(method='do_nothing')
     user_group_id = filters.UUIDFilter(method='do_nothing')
     user_group = filters.CharFilter(method='do_nothing')
     all = filters.BooleanFilter(method='do_nothing')
 
     class Meta:
         fields = (
-            'user_id', 'username', 'system_user_id', 'system_user',
+            'user_id', 'username', 'account_id', 'account',
             'user_group_id', 'user_group', 'name', 'all', 'is_valid',
         )
 

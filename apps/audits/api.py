@@ -34,7 +34,7 @@ class FTPLogViewSet(CreateModelMixin, ListModelMixin, OrgGenericViewSet):
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
     ]
-    filterset_fields = ['user', 'asset', 'system_user', 'filename']
+    filterset_fields = ['user', 'asset', 'account', 'filename']
     search_fields = filterset_fields
     ordering = ['-date_start']
 
