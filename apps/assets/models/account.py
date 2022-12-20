@@ -117,7 +117,7 @@ class AccountTemplate(BaseAccount):
                 account.setdefault(k, v)
         else:
             def _set(k, v):
-                raw = getattr(account, k)
+                raw = getattr(account, k, None)
                 if not isinstance(raw, bool) and not raw:
                     setattr(account, k, v)
 
