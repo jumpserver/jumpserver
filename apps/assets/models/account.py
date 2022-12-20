@@ -110,3 +110,25 @@ class AccountTemplate(BaseAccount):
 
     def __str__(self):
         return self.username
+
+    def copy_to_account(self, account):
+        if isinstance(account, dict):
+            def _set(k, v):
+                account.setdefault(k, v)
+        else:
+            def _set(k, v):
+                raw = getattr(account, k)
+                if not isinstance(raw, bool) and not raw:
+                    setattr(account, k, v)
+
+        exclude_fields = [
+            '_state', 'org_id', 'id', 'date_created',
+            'date_updated'
+        ]
+        template_attrs = {
+            k: v for k, v in self.__dict__.items()
+            if k not in exclude_fields
+        }
+        for k, v in template_attrs.items():
+            _set(k, v)
+        return account

@@ -26,23 +26,10 @@ class AccountSerializerCreateMixin(serializers.ModelSerializer):
         except AccountTemplate.DoesNotExist:
             raise serializers.ValidationError(_('Account template not found'))
 
-    @staticmethod
-    def replace_attrs(account_template: AccountTemplate, attrs: dict):
-        exclude_fields = [
-            '_state', 'org_id', 'id', 'date_created',
-            'date_updated'
-        ]
-        template_attrs = {
-            k: v for k, v in account_template.__dict__.items()
-            if k not in exclude_fields
-        }
-        for k, v in template_attrs.items():
-            attrs.setdefault(k, v)
-
     def validate(self, attrs):
         account_template = attrs.pop('template', None)
         if account_template:
-            self.replace_attrs(account_template, attrs)
+            account_template.copy_to_account(attrs)
         self.push_now = attrs.pop('push_now', False)
         return super().validate(attrs)
 
