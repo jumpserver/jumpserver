@@ -54,12 +54,9 @@ class UserGrantedUtilsBase:
 class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
 
     def get_favorite_assets(self) -> QuerySet:
-        favorite_asset_ids = FavoriteAsset.objects.filter(
-            user=self.user
-        ).values_list('asset_id', flat=True)
-        favorite_asset_ids = list(favorite_asset_ids)
         assets = self.get_all_granted_assets()
-        assets = assets.filter(id__in=favorite_asset_ids)
+        asset_ids = FavoriteAsset.objects.filter(user=self.user).values_list('asset_id', flat=True)
+        assets = assets.filter(id__in=list(asset_ids))
         return assets
 
     def get_ungroup_assets(self) -> AssetQuerySet:
@@ -83,8 +80,13 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
     def get_all_granted_assets(self) -> QuerySet:
         nodes_assets = self.get_direct_granted_nodes_assets()
         assets = self.get_direct_granted_assets()
-        queryset = UnionQuerySet(nodes_assets, assets)
-        return queryset
+        # queryset = UnionQuerySet(nodes_assets, assets)
+        # return queryset
+        node_asset_ids = nodes_assets.values_list('id', flat=True)
+        direct_asset_ids = assets.values_list('id', flat=True)
+        asset_ids = list(node_asset_ids) + list(direct_asset_ids)
+        asset = Asset.objects.filter(id__in=asset_ids)
+        return asset
 
     def get_node_all_assets(self, id) -> Tuple[PermNode, QuerySet]:
         node = PermNode.objects.get(id=id)
