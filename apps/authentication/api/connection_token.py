@@ -20,7 +20,7 @@ from common.utils.django import get_request_os
 from orgs.mixins.api import RootOrgViewMixin
 from perms.models import ActionChoices
 from terminal.connect_methods import NativeClient, ConnectMethodUtil
-from terminal.models import EndpointRule, Applet
+from terminal.models import EndpointRule
 from ..models import ConnectionToken
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
@@ -33,30 +33,6 @@ __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
 class RDPFileClientProtocolURLMixin:
     request: Request
     get_serializer: callable
-
-    @staticmethod
-    def set_applet_info(token, rdp_options):
-        # remote-app
-        applet = Applet.objects.filter(name=token.connect_method).first()
-        if not applet:
-            return rdp_options
-
-        cmdline = {
-            'app_name': applet.name,
-            'user_id': str(token.user.id),
-            'asset_id': str(token.asset.id),
-            'token_id': str(token.id)
-        }
-
-        app = '||tinker'
-        rdp_options['remoteapplicationmode:i'] = '1'
-        rdp_options['alternate shell:s'] = app
-        rdp_options['remoteapplicationprogram:s'] = app
-        rdp_options['remoteapplicationname:s'] = app
-
-        cmdline_b64 = base64.b64encode(json.dumps(cmdline).encode()).decode()
-        rdp_options['remoteapplicationcmdline:s'] = cmdline_b64
-        return rdp_options
 
     def get_rdp_file_info(self, token: ConnectionToken):
         rdp_options = {
@@ -114,9 +90,10 @@ class RDPFileClientProtocolURLMixin:
         rdp_options['session bpp:i'] = os.getenv('JUMPSERVER_COLOR_DEPTH', '32')
         rdp_options['audiomode:i'] = self.parse_env_bool('JUMPSERVER_DISABLE_AUDIO', 'false', '2', '0')
 
-        # 设置远程应用
-        remote_app_options = token.get_remote_app_option()
-        rdp_options.update(remote_app_options)
+        # 设置远程应用, 不是 Mstsc
+        if token.connect_method != NativeClient.mstsc:
+            remote_app_options = token.get_remote_app_option()
+            rdp_options.update(remote_app_options)
 
         # 文件名
         name = token.asset.name
@@ -160,15 +137,17 @@ class RDPFileClientProtocolURLMixin:
             'file': {}
         }
 
-        if connect_method_name == NativeClient.mstsc:
+        if connect_method_name == NativeClient.mstsc or connect_method_dict['type'] == 'applet':
             filename, content = self.get_rdp_file_info(token)
             data.update({
+                'protocol': 'rdp',
                 'file': {
                     'name': filename,
                     'content': content,
                 }
             })
         else:
+            print("Connect method: {}".format(connect_method_dict))
             endpoint = self.get_smart_endpoint(
                 protocol=connect_method_dict['endpoint_protocol'],
                 asset=token.asset

@@ -220,11 +220,10 @@ class ConnectMethodUtil:
 
         for component, component_protocol in cls.protocols().items():
             support = component_protocol['support']
+            component_web_methods = component_protocol.get('web_methods', [])
 
             for protocol in support:
                 # Web 方式
-                protocol_web_methods = set(web_methods.get(protocol, [])) \
-                                       & set(component_protocol.get('web_methods', []))
                 methods[protocol.value].extend([
                     {
                         'component': component.value,
@@ -233,7 +232,8 @@ class ConnectMethodUtil:
                         'value': method.value,
                         'label': method.label,
                     }
-                    for method in protocol_web_methods
+                    for method in web_methods.get(protocol, [])
+                    if method in component_web_methods
                 ])
 
                 # 客户端方式
