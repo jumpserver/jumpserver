@@ -3,6 +3,7 @@ from celery import signals
 
 from django.db import transaction
 from django.core.cache import cache
+from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.db.utils import ProgrammingError
 from django.utils import translation, timezone
@@ -12,12 +13,18 @@ from common.signals import django_ready
 from common.db.utils import close_old_connections, get_logger
 
 from .celery import app
-from .models import CeleryTaskExecution, CeleryTask
+from .models import CeleryTaskExecution, CeleryTask, Job
 
 logger = get_logger(__name__)
 
 TASK_LANG_CACHE_KEY = 'TASK_LANG_{}'
 TASK_LANG_CACHE_TTL = 1800
+
+
+@receiver(pre_save, sender=Job)
+def on_account_pre_create(sender, instance, **kwargs):
+    # 升级版本号
+    instance.version += 1
 
 
 @receiver(django_ready)
