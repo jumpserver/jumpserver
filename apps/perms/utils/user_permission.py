@@ -54,21 +54,25 @@ class UserGrantedUtilsBase:
 class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
 
     def get_favorite_assets(self) -> QuerySet:
+        # 1
         assets = self.get_all_granted_assets()
         asset_ids = FavoriteAsset.objects.filter(user=self.user).values_list('asset_id', flat=True)
         assets = assets.filter(id__in=list(asset_ids))
         return assets
 
     def get_ungroup_assets(self) -> AssetQuerySet:
+        # 1
         return self.get_direct_granted_assets()
 
     def get_direct_granted_assets(self) -> AssetQuerySet:
+        # 1
         queryset = Asset.objects.order_by().filter(
             granted_by_permissions__id__in=self.asset_perm_ids
         ).distinct()
         return queryset
 
     def get_direct_granted_nodes_assets(self) -> AssetQuerySet:
+        # 1
         granted_node_ids = AssetPermission.nodes.through.objects.filter(
             assetpermission_id__in=self.asset_perm_ids
         ).values_list('node_id', flat=True).distinct()
@@ -78,6 +82,7 @@ class UserGrantedAssetsQueryUtils(UserGrantedUtilsBase):
         return queryset
 
     def get_all_granted_assets(self) -> QuerySet:
+        # 1
         nodes_assets = self.get_direct_granted_nodes_assets()
         assets = self.get_direct_granted_assets()
         # queryset = UnionQuerySet(nodes_assets, assets)

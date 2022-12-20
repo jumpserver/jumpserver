@@ -18,8 +18,9 @@ from perms.models import PermNode
 from perms.utils import PermAccountUtil
 from perms.utils.permission import AssetPermissionUtil
 from perms.utils.user_permission import (
-    UserGrantedNodesQueryUtils, UserGrantedAssetsQueryUtils,
+    UserGrantedNodesQueryUtils
 )
+from perms.utils import UserPermAssetUtil
 from .mixin import RebuildTreeMixin
 from ..mixin import SelfOrPKUserMixin
 
@@ -53,12 +54,12 @@ class BaseUserNodeWithAssetAsTreeApi(
 
 class UserPermedNodesWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
     query_node_util: UserGrantedNodesQueryUtils
-    query_asset_util: UserGrantedAssetsQueryUtils
+    query_asset_util: UserPermAssetUtil
 
     def get_nodes_assets(self):
         perm_ids = AssetPermissionUtil().get_permissions_for_user(self.request.user, flat=True)
         self.query_node_util = UserGrantedNodesQueryUtils(self.request.user, perm_ids)
-        self.query_asset_util = UserGrantedAssetsQueryUtils(self.request.user, perm_ids)
+        self.query_asset_util = UserPermAssetUtil(self.request.user)
         ung_nodes, ung_assets = self._get_nodes_assets_for_ungrouped()
         fav_nodes, fav_assets = self._get_nodes_assets_for_favorite()
         all_nodes, all_assets = self._get_nodes_assets_for_all()
@@ -87,9 +88,9 @@ class UserPermedNodesWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
     def _get_nodes_assets_for_all(self):
         nodes = self.query_node_util.get_whole_tree_nodes(with_special=False)
         if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
-            assets = self.query_asset_util.get_direct_granted_nodes_assets()
+            assets = UserPermAssetUtil.get_nodes_assets(perm_ids=self.query_asset_util.perm_ids)
         else:
-            assets = self.query_asset_util.get_all_granted_assets()
+            assets = self.query_asset_util.get_all_assets()
         assets = assets.annotate(parent_key=F('nodes__key')).prefetch_related('platform')
         return nodes, assets
 
@@ -101,7 +102,7 @@ class UserPermedNodeChildrenWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
         nodes = PermNode.objects.none()
         assets = Asset.objects.none()
         query_node_util = UserGrantedNodesQueryUtils(self.user)
-        query_asset_util = UserGrantedAssetsQueryUtils(self.user)
+        query_asset_util = UserPermAssetUtil(self.user)
         node_key = self.query_node_key
         if not node_key:
             nodes = query_node_util.get_top_level_nodes()
@@ -111,7 +112,7 @@ class UserPermedNodeChildrenWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
             assets = query_asset_util.get_favorite_assets()
         else:
             nodes = query_node_util.get_node_children(node_key)
-            assets = query_asset_util.get_node_assets(node_key)
+            assets = query_asset_util.get_node_assets(key=node_key)
         assets = assets.prefetch_related('platform')
         return nodes, assets
 
