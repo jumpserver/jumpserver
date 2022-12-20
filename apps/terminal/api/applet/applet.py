@@ -78,6 +78,7 @@ class DownloadUploadMixin:
         with open(zip_path, 'rb') as f:
             response = HttpResponse(f.read(), status=200, content_type='application/octet-stream')
             response['Content-Disposition'] = 'attachment; filename*=UTF-8\'\'{}.zip'.format(instance.name)
+        os.unlink(zip_path)
         return response
 
 
