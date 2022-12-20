@@ -35,6 +35,7 @@ def parse_sentinels_host(sentinels_host):
 VERSION = const.VERSION
 BASE_DIR = const.BASE_DIR
 PROJECT_DIR = const.PROJECT_DIR
+APP_DIR = os.path.join(PROJECT_DIR, 'apps')
 DATA_DIR = os.path.join(PROJECT_DIR, 'data')
 ANSIBLE_DIR = os.path.join(DATA_DIR, 'ansible')
 CERTS_DIR = os.path.join(DATA_DIR, 'certs')

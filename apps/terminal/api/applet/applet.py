@@ -1,22 +1,21 @@
+import os.path
 import shutil
 import zipfile
-import yaml
-import os.path
 from typing import Callable
 
-from django.http import HttpResponse
+from django.conf import settings
 from django.core.files.storage import default_storage
+from django.http import HttpResponse
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
-from common.utils import is_uuid
 from common.drf.serializers import FileSerializer
+from common.utils import is_uuid
 from terminal import serializers
 from terminal.models import AppletPublication, Applet
-
 
 __all__ = ['AppletViewSet', 'AppletPublicationViewSet']
 
@@ -46,17 +45,7 @@ class DownloadUploadMixin:
             zp.extractall(extract_to)
 
         tmp_dir = os.path.join(extract_to, file.name.replace('.zip', ''))
-        files = ['manifest.yml', 'icon.png', 'i18n.yml', 'setup.yml']
-        for name in files:
-            path = os.path.join(tmp_dir, name)
-            if not os.path.exists(path):
-                raise ValidationError({'error': 'Missing file {}'.format(name)})
-
-        with open(os.path.join(tmp_dir, 'manifest.yml')) as f:
-            manifest = yaml.safe_load(f)
-
-        if not manifest.get('name', ''):
-            raise ValidationError({'error': 'Missing name in manifest.yml'})
+        manifest = Applet.validate_pkg(tmp_dir)
         return manifest, tmp_dir
 
     @action(detail=False, methods=['post'], serializer_class=FileSerializer)
@@ -81,7 +70,10 @@ class DownloadUploadMixin:
     @action(detail=True, methods=['get'])
     def download(self, request, *args, **kwargs):
         instance = self.get_object()
-        path = default_storage.path('applets/{}'.format(instance.name))
+        if instance.builtin:
+            path = os.path.join(settings.APPS_DIR, 'terminal', 'applets', instance.name)
+        else:
+            path = default_storage.path('applets/{}'.format(instance.name))
         zip_path = shutil.make_archive(path, 'zip', path)
         with open(zip_path, 'rb') as f:
             response = HttpResponse(f.read(), status=200, content_type='application/octet-stream')
