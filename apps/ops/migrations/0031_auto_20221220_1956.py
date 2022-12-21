@@ -4,9 +4,8 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('ops', '0030_jobauditlog'),
+        ('ops', '0030_auto_20221220_1941'),
     ]
 
     operations = [
