@@ -31,6 +31,7 @@ __all__ = [
 class AssetFilterSet(BaseFilterSet):
     type = django_filters.CharFilter(field_name="platform__type", lookup_expr="exact")
     category = django_filters.CharFilter(field_name="platform__category", lookup_expr="exact")
+    platform = django_filters.CharFilter(method='filter_platform')
 
     class Meta:
         model = Asset
@@ -38,6 +39,13 @@ class AssetFilterSet(BaseFilterSet):
             "id", "name", "address", "is_active",
             "type", "category", "platform"
         ]
+
+    @staticmethod
+    def filter_platform(queryset, name, value):
+        if value.isdigit():
+            return queryset.filter(platform_id=value)
+        else:
+            return queryset.filter(platform__name=value)
 
 
 class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
