@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 from urllib3.exceptions import MaxRetryError
-from urllib.parse import urlencode, parse_qsl
+from urllib.parse import urlencode
 
 from kubernetes import client
 from kubernetes.client import api_client
 from kubernetes.client.api import core_v1_api
 from kubernetes.client.exceptions import ApiException
 
-from rest_framework.generics import get_object_or_404
-
 from common.utils import get_logger
-from assets.models import Account, Asset
 
 from ..const import CloudTypes, Category
 
@@ -94,57 +91,45 @@ class KubernetesClient:
         return f'{gateway.address}:{gateway.port}'
 
     @classmethod
-    def get_kubernetes_data(cls, app_id, username):
-        asset = get_object_or_404(Asset, id=app_id)
-        account = get_object_or_404(Account, asset=asset, username=username)
+    def get_kubernetes_data(cls, asset, secret):
         k8s_url = f'{asset.address}:{asset.port}'
         proxy_url = cls.get_proxy_url(asset)
-        k8s = cls(k8s_url, account.secret, proxy=proxy_url)
+        k8s = cls(k8s_url, secret, proxy=proxy_url)
         return k8s.get_pods()
 
 
 class KubernetesTree:
-    def __init__(self, tree_id):
-        self.tree_id = str(tree_id)
+    def __init__(self, asset, secret):
+        self.asset = asset
+        self.secret = secret
 
-    @staticmethod
-    def create_tree_id(pid, tp, v):
-        i = dict(parse_qsl(pid))
-        i[tp] = v
-        tree_id = urlencode(i)
-        return tree_id
-
-    def as_tree_node(self, app):
-        pid = app.create_app_tree_pid(self.tree_id)
-        app_id = str(app.id)
+    def as_asset_tree_node(self):
+        i = str(self.asset.id)
+        name = str(self.asset)
         node = self.create_tree_node(
-            app_id, pid, app.name, 'k8s'
+            i, i, name, 'asset', is_open=True,
         )
         return node
 
-    def as_asset_tree_node(self, asset):
-        i = urlencode({'asset_id': self.tree_id})
-        node = self.create_tree_node(
-            i, str(asset.id), str(asset), 'asset', is_open=True,
-        )
+    def as_namespace_node(self, name, tp, counts=0):
+        i = urlencode({'namespace': name})
+        pid = str(self.asset.id)
+        name = f'{name}({counts})'
+        node = self.create_tree_node(i, pid, name, tp, icon='cloud')
         return node
 
-    def as_account_tree_node(self, account, parent_info):
-        username = account.username
-        name = str(account)
-        pid = urlencode({'asset_id': self.tree_id})
-        i = self.create_tree_id(pid, 'account', username)
-        parent_info.update({'account': username})
-        node = self.create_tree_node(
-            i, pid, name, 'account', icon='user-tie'
-        )
+    def as_pod_tree_node(self, namespace, name, tp, counts=0):
+        pid = urlencode({'namespace': namespace})
+        i = urlencode({'namespace': namespace, 'pod': name})
+        name = f'{name}({counts})'
+        node = self.create_tree_node(i, pid, name, tp, icon='cloud')
         return node
 
-    def as_namespace_pod_tree_node(self, name, tp, counts=0, is_container=False):
-        i = self.create_tree_id(self.tree_id, tp, name)
-        name = name if is_container else f'{name}({counts})'
+    def as_container_tree_node(self, namespace, pod, name, tp):
+        pid = urlencode({'namespace': namespace, 'pod': pod})
+        i = urlencode({'namespace': namespace, 'pod': pod, 'container': name})
         node = self.create_tree_node(
-            i, self.tree_id, name, tp, icon='cloud', is_container=is_container
+            i, pid, name, tp, icon='cloud', is_container=True
         )
         return node
 
@@ -169,36 +154,31 @@ class KubernetesTree:
         }
         return node
 
-    def async_tree_node(self, parent_info):
-        pod_name = parent_info.get('pod')
-        asset_id = parent_info.get('asset_id')
-        namespace = parent_info.get('namespace')
-        account_username = parent_info.get('account')
-
+    def async_tree_node(self, namespace, pod):
         tree = []
-        data = KubernetesClient.get_kubernetes_data(asset_id, account_username)
+        data = KubernetesClient.get_kubernetes_data(self.asset, self.secret)
         if not data:
             return tree
 
-        if pod_name:
+        if pod:
             for container in next(
                     filter(
-                        lambda x: x['pod_name'] == pod_name, data[namespace]
+                        lambda x: x['pod_name'] == pod, data[namespace]
                     )
             )['containers']:
-                container_node = self.as_namespace_pod_tree_node(
-                    container, 'container', is_container=True
+                container_node = self.as_container_tree_node(
+                    namespace, pod, container, 'container'
                 )
                 tree.append(container_node)
         elif namespace:
             for pod in data[namespace]:
-                pod_nodes = self.as_namespace_pod_tree_node(
-                    pod['pod_name'], 'pod', len(pod['containers'])
+                pod_nodes = self.as_pod_tree_node(
+                    namespace, pod['pod_name'], 'pod', len(pod['containers'])
                 )
                 tree.append(pod_nodes)
-        elif account_username:
+        else:
             for namespace, pods in data.items():
-                namespace_node = self.as_namespace_pod_tree_node(
+                namespace_node = self.as_namespace_node(
                     namespace, 'namespace', len(pods)
                 )
                 tree.append(namespace_node)
