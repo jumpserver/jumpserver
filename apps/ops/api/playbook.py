@@ -21,6 +21,9 @@ class PlaybookViewSet(OrgBulkModelViewSet):
     permission_classes = ()
     model = Playbook
 
+    def allow_bulk_destroy(self, qs, filtered):
+        return True
+
     def get_queryset(self):
         queryset = super().get_queryset()
         queryset = queryset.filter(creator=self.request.user)
