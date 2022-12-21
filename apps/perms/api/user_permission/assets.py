@@ -6,7 +6,7 @@ from assets.api.asset.asset import AssetFilterSet
 from perms import serializers
 from perms.pagination import AllPermedAssetPagination
 from perms.pagination import NodePermedAssetPagination
-from perms.utils.user_permission import UserGrantedAssetsQueryUtils
+from perms.utils import UserPermAssetUtil
 from common.utils import get_logger, lazyproperty
 
 from .mixin import (
@@ -43,21 +43,23 @@ class BaseUserPermedAssetsApi(SelfOrPKUserMixin, ListAPIView):
     def get_assets(self):
         return Asset.objects.none()
 
+    query_asset_util: UserPermAssetUtil
+
     @lazyproperty
     def query_asset_util(self):
-        return UserGrantedAssetsQueryUtils(self.user)
+        return UserPermAssetUtil(self.user)
 
 
 class UserAllPermedAssetsApi(BaseUserPermedAssetsApi):
     pagination_class = AllPermedAssetPagination
 
     def get_assets(self):
-        return self.query_asset_util.get_all_granted_assets()
+        return self.query_asset_util.get_all_assets()
 
 
 class UserDirectPermedAssetsApi(BaseUserPermedAssetsApi):
     def get_assets(self):
-        return self.query_asset_util.get_direct_granted_assets()
+        return self.query_asset_util.get_direct_assets()
 
 
 class UserFavoriteAssetsApi(BaseUserPermedAssetsApi):

@@ -9,7 +9,7 @@ from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import current_org
 from perms import serializers
 from perms import models
-from perms.utils.user_permission import UserGrantedAssetsQueryUtils
+from perms.utils import AssetPermissionPermAssetUtil
 from assets.serializers import AccountSerializer
 
 __all__ = [
@@ -95,8 +95,7 @@ class AssetPermissionAllAssetListApi(generics.ListAPIView):
 
     def get_queryset(self):
         pk = self.kwargs.get("pk")
-        query_utils = UserGrantedAssetsQueryUtils(None, asset_perm_ids=[pk])
-        assets = query_utils.get_all_granted_assets()
+        assets = AssetPermissionPermAssetUtil(perm_ids=[pk]).get_all_assets()
         return assets
 
 

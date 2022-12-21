@@ -23,6 +23,9 @@ class JobViewSet(OrgBulkModelViewSet):
     permission_classes = ()
     model = Job
 
+    def allow_bulk_destroy(self, qs, filtered):
+        return True
+
     def get_queryset(self):
         queryset = super().get_queryset()
         queryset = queryset.filter(creator=self.request.user)
@@ -31,20 +34,21 @@ class JobViewSet(OrgBulkModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
+        run_after_save = serializer.validated_data.pop('run_after_save', False)
         instance = serializer.save()
-        run_after_save = serializer.validated_data.get('run_after_save', False)
         if instance.instant or run_after_save:
             self.run_job(instance, serializer)
 
     def perform_update(self, serializer):
+        run_after_save = serializer.validated_data.pop('run_after_save', False)
         instance = serializer.save()
-        run_after_save = serializer.validated_data.get('run_after_save', False)
         if run_after_save:
             self.run_job(instance, serializer)
 
-    @staticmethod
-    def run_job(job, serializer):
+    def run_job(self, job, serializer):
         execution = job.create_execution()
+        execution.creator = self.request.user
+        execution.save()
         task = run_ops_job_execution.delay(execution.id)
         set_task_to_serializer_data(serializer, task)
 
@@ -58,6 +62,7 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
     def perform_create(self, serializer):
         instance = serializer.save()
         instance.job_version = instance.job.version
+        instance.creator = self.request.user
         instance.save()
         task = run_ops_job_execution.delay(instance.id)
         set_task_to_serializer_data(serializer, task)

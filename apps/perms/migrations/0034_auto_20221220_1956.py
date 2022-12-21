@@ -43,11 +43,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name='userassetgrantedtreenoderelation',
-            name='id',
-            field=models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False),
-        ),
-        migrations.AlterField(
-            model_name='userassetgrantedtreenoderelation',
             name='updated_by',
             field=models.CharField(blank=True, max_length=128, null=True, verbose_name='Updated by'),
         ),

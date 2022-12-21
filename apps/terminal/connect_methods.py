@@ -153,7 +153,7 @@ class ConnectMethodUtil:
         protocols = {
             TerminalType.koko: {
                 'web_methods': [WebMethod.web_cli, WebMethod.web_sftp],
-                'listen': [Protocol.ssh, Protocol.http],
+                'listen': [Protocol.http],
                 'support': [
                     Protocol.ssh, Protocol.telnet,
                     Protocol.mysql, Protocol.postgresql,

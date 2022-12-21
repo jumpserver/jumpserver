@@ -16,12 +16,18 @@ class NodeFrom(TextChoices):
 class UserAssetGrantedTreeNodeRelation(FamilyMixin, JMSOrgBaseModel):
     NodeFrom = NodeFrom
 
+    id = models.AutoField(
+        auto_created=True, primary_key=True, serialize=False, verbose_name=_('ID')
+    )
     user = models.ForeignKey('users.User', db_constraint=False, on_delete=models.CASCADE)
-    node = models.ForeignKey('assets.Node', default=None, on_delete=models.CASCADE,
-                             db_constraint=False, null=False, related_name='granted_node_rels')
+    node = models.ForeignKey(
+        'assets.Node', default=None, on_delete=models.CASCADE, db_constraint=False, null=False,
+        related_name='granted_node_rels'
+    )
     node_key = models.CharField(max_length=64, verbose_name=_("Key"), db_index=True)
-    node_parent_key = models.CharField(max_length=64, default='', verbose_name=_('Parent key'),
-                                       db_index=True)
+    node_parent_key = models.CharField(
+        max_length=64, default='', verbose_name=_('Parent key'), db_index=True
+    )
     node_from = models.CharField(choices=NodeFrom.choices, max_length=16, db_index=True)
     node_assets_amount = models.IntegerField(default=0)
     comment = ''
@@ -35,15 +41,14 @@ class UserAssetGrantedTreeNodeRelation(FamilyMixin, JMSOrgBaseModel):
         return self.node_parent_key
 
     @classmethod
-    def get_node_granted_status(cls, user, key):
+    def get_node_from_with_node(cls, user, key):
         ancestor_keys = set(cls.get_node_ancestor_keys(key, with_self=True))
-        ancestor_rel_nodes = cls.objects.filter(user=user, node_key__in=ancestor_keys)
-
-        for rel_node in ancestor_rel_nodes:
-            if rel_node.key == key:
-                return rel_node.node_from, rel_node
-            if rel_node.node_from == cls.NodeFrom.granted:
-                return cls.NodeFrom.granted, None
+        ancestor_nodes = cls.objects.filter(user=user, node_key__in=ancestor_keys)
+        for node in ancestor_nodes:
+            if node.key == key:
+                return node.node_from, node
+            if node.node_from == cls.NodeFrom.granted:
+                return node.node_from, None
         return '', None
 
 
@@ -68,6 +73,9 @@ class PermNode(Node):
         'node_from': F('granted_node_rels__node_from')
     }
 
+    def __str__(self):
+        return f'{self.name}'
+
     def use_granted_assets_amount(self):
         self.assets_amount = self.granted_assets_amount
 
@@ -90,15 +98,16 @@ class PermNode(Node):
         node.assets_amount = assets_amount
         return node
 
-    def get_granted_status(self, user):
-        status, rel_node = UserAssetGrantedTreeNodeRelation.get_node_granted_status(user, self.key)
-        self.node_from = status
-        if rel_node:
-            self.granted_assets_amount = rel_node.node_assets_amount
-        return status
+    def compute_node_from_and_assets_amount(self, user):
+        node_from, node = UserAssetGrantedTreeNodeRelation.get_node_from_with_node(
+            user, self.key
+        )
+        self.node_from = node_from
+        if node:
+            self.granted_assets_amount = node.node_assets_amount
 
     def save(self):
-        # 这是个只读 Model
+        """ 这是个只读 Model """
         raise NotImplementedError
 
 

@@ -3,23 +3,22 @@ from urllib.parse import parse_qsl
 
 from django.conf import settings
 from django.db.models import F, Value, CharField
-from rest_framework.generics import ListAPIView
-from rest_framework.generics import get_object_or_404
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.generics import ListAPIView
+from rest_framework.generics import get_object_or_404
+from rest_framework.exceptions import PermissionDenied, NotFound
 
-from assets.api import SerializeToTreeNodeMixin
-from assets.models import Asset, Account
 from assets.utils import KubernetesTree
+from assets.models import Asset, Account
+from assets.api import SerializeToTreeNodeMixin
+from authentication.models import ConnectionToken
 from common.utils import get_object_or_none, lazyproperty
 from common.utils.common import timeit
 from perms.hands import Node
 from perms.models import PermNode
-from perms.utils import PermAccountUtil
-from perms.utils.permission import AssetPermissionUtil
-from perms.utils.user_permission import (
-    UserGrantedNodesQueryUtils, UserGrantedAssetsQueryUtils,
-)
+from perms.utils import PermAccountUtil, UserPermNodeUtil, AssetPermissionUtil
+from perms.utils import UserPermAssetUtil
 from .mixin import RebuildTreeMixin
 from ..mixin import SelfOrPKUserMixin
 
@@ -52,13 +51,12 @@ class BaseUserNodeWithAssetAsTreeApi(
 
 
 class UserPermedNodesWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
-    query_node_util: UserGrantedNodesQueryUtils
-    query_asset_util: UserGrantedAssetsQueryUtils
+    query_node_util: UserPermNodeUtil
+    query_asset_util: UserPermAssetUtil
 
     def get_nodes_assets(self):
-        perm_ids = AssetPermissionUtil().get_permissions_for_user(self.request.user, flat=True)
-        self.query_node_util = UserGrantedNodesQueryUtils(self.request.user, perm_ids)
-        self.query_asset_util = UserGrantedAssetsQueryUtils(self.request.user, perm_ids)
+        self.query_node_util = UserPermNodeUtil(self.request.user)
+        self.query_asset_util = UserPermAssetUtil(self.request.user)
         ung_nodes, ung_assets = self._get_nodes_assets_for_ungrouped()
         fav_nodes, fav_assets = self._get_nodes_assets_for_favorite()
         all_nodes, all_assets = self._get_nodes_assets_for_all()
@@ -87,9 +85,9 @@ class UserPermedNodesWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
     def _get_nodes_assets_for_all(self):
         nodes = self.query_node_util.get_whole_tree_nodes(with_special=False)
         if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
-            assets = self.query_asset_util.get_direct_granted_nodes_assets()
+            assets = self.query_asset_util.get_perm_nodes_assets()
         else:
-            assets = self.query_asset_util.get_all_granted_assets()
+            assets = self.query_asset_util.get_all_assets()
         assets = assets.annotate(parent_key=F('nodes__key')).prefetch_related('platform')
         return nodes, assets
 
@@ -98,20 +96,21 @@ class UserPermedNodeChildrenWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
     """ 用户授权的节点的子节点与资产树 """
 
     def get_nodes_assets(self):
-        nodes = PermNode.objects.none()
-        assets = Asset.objects.none()
-        query_node_util = UserGrantedNodesQueryUtils(self.user)
-        query_asset_util = UserGrantedAssetsQueryUtils(self.user)
+        query_node_util = UserPermNodeUtil(self.user)
+        query_asset_util = UserPermAssetUtil(self.user)
         node_key = self.query_node_key
         if not node_key:
             nodes = query_node_util.get_top_level_nodes()
+            assets = Asset.objects.none()
         elif node_key == PermNode.UNGROUPED_NODE_KEY:
+            nodes = PermNode.objects.none()
             assets = query_asset_util.get_ungroup_assets()
         elif node_key == PermNode.FAVORITE_NODE_KEY:
+            nodes = PermNode.objects.none()
             assets = query_asset_util.get_favorite_assets()
         else:
             nodes = query_node_util.get_node_children(node_key)
-            assets = query_asset_util.get_node_assets(node_key)
+            assets = query_asset_util.get_node_assets(key=node_key)
         assets = assets.prefetch_related('platform')
         return nodes, assets
 
@@ -133,41 +132,48 @@ class UserPermedNodeChildrenWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
 class UserGrantedK8sAsTreeApi(SelfOrPKUserMixin, ListAPIView):
     """ 用户授权的K8s树 """
 
-    @staticmethod
-    def asset(asset_id):
-        kwargs = {'id': asset_id, 'is_active': True}
-        asset = get_object_or_404(Asset, **kwargs)
-        return asset
+    def get_token(self):
+        token_id = self.request.query_params.get('token')
+        token = get_object_or_404(ConnectionToken, pk=token_id)
+        if token.is_expired:
+            raise PermissionDenied('Token is expired')
+        token.renewal()
+        return token
 
-    def get_accounts(self, asset):
+    def get_account_secret(self, token: ConnectionToken):
         util = PermAccountUtil()
-        accounts = util.get_permed_accounts_for_user(self.user, asset)
-        ignore_username = [Account.AliasAccount.INPUT, Account.AliasAccount.USER]
-        accounts = filter(lambda x: x.username not in ignore_username, accounts)
+        accounts = util.get_permed_accounts_for_user(self.user, token.asset)
+        account_username = token.account
+        accounts = filter(lambda x: x.username == account_username, accounts)
         accounts = list(accounts)
-        return accounts
+        if not accounts:
+            raise NotFound('Account is not found')
+        account = accounts[0]
+        if account.username in [
+            Account.AliasAccount.INPUT, Account.AliasAccount.USER
+        ]:
+            return token.input_secret
+        else:
+            return account.secret
+
+    @staticmethod
+    def get_namespace_and_pod(key):
+        namespace_and_pod = dict(parse_qsl(key))
+        pod = namespace_and_pod.get('pod')
+        namespace = namespace_and_pod.get('namespace')
+        return namespace, pod
 
     def list(self, request: Request, *args, **kwargs):
-        tree_id = request.query_params.get('tree_id')
-        key = request.query_params.get('key', {})
+        token = self.get_token()
+        asset = token.asset
+        secret = self.get_account_secret(token)
+        key = self.request.query_params.get('key')
+        namespace, pod = self.get_namespace_and_pod(key)
 
         tree = []
-        parent_info = dict(parse_qsl(key))
-        account_username = parent_info.get('account')
-
-        asset_id = parent_info.get('asset_id')
-        asset_id = tree_id if not asset_id else asset_id
-
-        if tree_id and not key and not account_username:
-            asset = self.asset(asset_id)
-            accounts = self.get_accounts(asset)
-            asset_node = KubernetesTree(tree_id).as_asset_tree_node(asset)
+        k8s_tree_instance = KubernetesTree(asset, secret)
+        if not any([namespace, pod]) and not key:
+            asset_node = k8s_tree_instance.as_asset_tree_node()
             tree.append(asset_node)
-            for account in accounts:
-                account_node = KubernetesTree(tree_id).as_account_tree_node(
-                    account, parent_info,
-                )
-                tree.append(account_node)
-        elif key and account_username:
-            tree = KubernetesTree(key).async_tree_node(parent_info)
+        tree.extend(k8s_tree_instance.async_tree_node(namespace, pod))
         return Response(data=tree)
