@@ -94,6 +94,7 @@ exclude_permissions = (
     ('terminal', 'sessionsharing', 'view,add,change,delete', 'sessionsharing'),
     ('terminal', 'session', 'delete,share', 'session'),
     ('terminal', 'session', 'delete,change', 'command'),
+    ('applications', '*', '*', '*'),
 )
 
 
