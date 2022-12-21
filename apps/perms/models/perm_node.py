@@ -16,6 +16,7 @@ class NodeFrom(TextChoices):
 class UserAssetGrantedTreeNodeRelation(FamilyMixin, JMSOrgBaseModel):
     NodeFrom = NodeFrom
 
+    id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name=_('ID'))
     user = models.ForeignKey('users.User', db_constraint=False, on_delete=models.CASCADE)
     node = models.ForeignKey('assets.Node', default=None, on_delete=models.CASCADE,
                              db_constraint=False, null=False, related_name='granted_node_rels')
