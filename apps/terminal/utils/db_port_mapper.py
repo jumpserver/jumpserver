@@ -34,9 +34,22 @@ class DBPortManager(object):
     def magnus_listen_port_range(self):
         return settings.MAGNUS_PORTS
 
-    def init(self):
+    @staticmethod
+    def fetch_dbs():
         with tmp_to_root_org():
-            db_ids = Asset.objects.filter(platform__category=Category.DATABASE).values_list('id', flat=True)
+            dbs = Asset.objects.filter(platform__category=Category.DATABASE).order_by('id')
+            return dbs
+
+    def check(self):
+        dbs = self.fetch_dbs()
+        for db in dbs:
+            port = self.get_port_by_db(db, raise_exception=False)
+            if not port:
+                self.add(db)
+
+    def init(self):
+        dbs = self.fetch_dbs()
+        db_ids = dbs.values_list('id', flat=True)
         db_ids = [str(i) for i in db_ids]
         mapper = dict(zip(self.all_available_ports, list(db_ids)))
         self.set_mapper(mapper)

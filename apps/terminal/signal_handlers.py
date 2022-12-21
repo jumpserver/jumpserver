@@ -45,7 +45,7 @@ def on_applet_create(sender, instance, created=False, **kwargs):
 def init_db_port_mapper(sender, **kwargs):
     logger.info('Init db port mapper')
     try:
-        db_port_manager.init()
+        db_port_manager.check()
     except (ProgrammingError,) as e:
         pass
 
