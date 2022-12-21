@@ -11,11 +11,9 @@ from assets.models import Asset, Account
 from orgs.mixins.models import OrgManager
 from orgs.mixins.models import OrgModelMixin
 from common.utils.timezone import local_now
-from common.db.models import UnionQuerySet
 from common.utils import date_expired_default
 
 from perms.const import ActionChoices
-from .perm_node import PermNode
 
 __all__ = ['AssetPermission', 'ActionChoices']
 
@@ -111,9 +109,10 @@ class AssetPermission(OrgModelMixin):
         group_ids = self.user_groups.all().values_list('id', flat=True)
         user_ids = list(user_ids)
         group_ids = list(group_ids)
-        qs1 = User.objects.filter(id__in=user_ids).distinct()
-        qs2 = User.objects.filter(groups__id__in=group_ids).distinct()
-        qs = UnionQuerySet(qs1, qs2)
+        qs1_ids = User.objects.filter(id__in=user_ids).distinct().values_list('id', flat=True)
+        qs2_ids = User.objects.filter(groups__id__in=group_ids).distinct().values_list('id', flat=True)
+        qs_ids = list(qs1_ids) + list(qs2_ids)
+        qs = User.objects.filter(id__in=qs_ids)
         return qs
 
     def get_all_assets(self, flat=False):

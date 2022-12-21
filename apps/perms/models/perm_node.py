@@ -98,15 +98,8 @@ class PermNode(Node):
         if node:
             self.granted_assets_amount = node.node_assets_amount
 
-    # def get_granted_status(self, user):
-    #     status, node = UserAssetGrantedTreeNodeRelation.get_node_granted_status(user, self.key)
-    #     if node:
-    #         self.granted_assets_amount = node.node_assets_amount
-    #     self.node_from = status
-    #     return status
-
     def save(self):
-        # 这是个只读 Model
+        """ 这是个只读 Model """
         raise NotImplementedError
 
 

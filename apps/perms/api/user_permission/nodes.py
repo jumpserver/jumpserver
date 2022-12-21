@@ -7,7 +7,7 @@ from rest_framework.generics import ListAPIView
 from assets.models import Node
 from common.utils import get_logger, lazyproperty
 from perms import serializers
-from perms.utils.user_permission import UserGrantedNodesQueryUtils
+from perms.utils import UserPermNodeUtil
 from .mixin import SelfOrPKUserMixin
 
 logger = get_logger(__name__)
@@ -32,7 +32,7 @@ class BaseUserPermedNodesApi(SelfOrPKUserMixin, ListAPIView):
 
     @lazyproperty
     def query_node_util(self):
-        return UserGrantedNodesQueryUtils(self.user)
+        return UserPermNodeUtil(self.user)
 
 
 class UserAllPermedNodesApi(BaseUserPermedNodesApi):
