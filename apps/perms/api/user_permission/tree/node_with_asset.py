@@ -159,8 +159,8 @@ class UserGrantedK8sAsTreeApi(SelfOrPKUserMixin, ListAPIView):
         else:
             return account.secret
 
-    def get_namespace_and_pod(self):
-        key = self.request.query_params.get('key')
+    @staticmethod
+    def get_namespace_and_pod(key):
         namespace_and_pod = dict(parse_qsl(key))
         pod = namespace_and_pod.get('pod')
         namespace = namespace_and_pod.get('namespace')
@@ -170,11 +170,12 @@ class UserGrantedK8sAsTreeApi(SelfOrPKUserMixin, ListAPIView):
         token = self.get_token()
         asset = token.asset
         secret = self.get_account_secret(token)
-        namespace, pod = self.get_namespace_and_pod()
+        key = self.request.query_params.get('key')
+        namespace, pod = self.get_namespace_and_pod(key)
 
         tree = []
         k8s_tree_instance = KubernetesTree(asset, secret)
-        if not any([namespace, pod]):
+        if not any([namespace, pod]) and not key:
             asset_node = k8s_tree_instance.as_asset_tree_node()
             tree.append(asset_node)
         tree.extend(k8s_tree_instance.async_tree_node(namespace, pod))
