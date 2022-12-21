@@ -76,8 +76,7 @@ class AccountHistoriesSecretAPI(RecordViewLogMixin, ListAPIView):
     model = Account.history.model
     serializer_class = serializers.AccountHistorySerializer
     http_method_names = ['get', 'options']
-    # Todo: 记得打开
-    # permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
+    permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
     rbac_perms = {
         'list': 'assets.view_accountsecret',
     }
