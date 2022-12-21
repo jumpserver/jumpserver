@@ -1,7 +1,6 @@
 from django_filters import rest_framework as filters
 from django.db.models import QuerySet, Q
 
-from common.db.models import UnionQuerySet
 from common.drf.filters import BaseFilterSet
 from common.utils import get_object_or_none
 from users.models import User, UserGroup
@@ -169,10 +168,10 @@ class AssetPermissionFilter(PermissionBaseFilter):
         inherit_all_node_ids = Node.objects.filter(key__in=inherit_all_node_keys).values_list('id', flat=True)
         inherit_all_node_ids = list(inherit_all_node_ids)
 
-        qs1 = queryset.filter(assets__in=asset_ids).distinct()
-        qs2 = queryset.filter(nodes__in=inherit_all_node_ids).distinct()
-
-        qs = UnionQuerySet(qs1, qs2)
+        qs1_ids = queryset.filter(assets__in=asset_ids).distinct().values_list('id', flat=True)
+        qs2_ids = queryset.filter(nodes__in=inherit_all_node_ids).distinct().values_list('id', flat=True)
+        qs_ids = list(qs1_ids) + list(qs2_ids)
+        qs = queryset.filter(id__in=qs_ids)
         return qs
 
     def filter_effective(self, queryset):
