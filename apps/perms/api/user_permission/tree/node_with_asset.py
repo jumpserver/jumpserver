@@ -88,7 +88,7 @@ class UserPermedNodesWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
     def _get_nodes_assets_for_all(self):
         nodes = self.query_node_util.get_whole_tree_nodes(with_special=False)
         if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
-            assets = UserPermAssetUtil.get_nodes_assets(perm_ids=self.query_asset_util.perm_ids)
+            assets = UserPermAssetUtil.get_perm_nodes_assets(perm_ids=self.query_asset_util.perm_ids)
         else:
             assets = self.query_asset_util.get_all_assets()
         assets = assets.annotate(parent_key=F('nodes__key')).prefetch_related('platform')

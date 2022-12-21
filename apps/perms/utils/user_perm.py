@@ -28,14 +28,14 @@ class UserPermAssetUtil:
 
     @classmethod
     def get_all_assets_by_perms(cls, perm_ids):
-        node_asset_ids = cls.get_nodes_assets(perm_ids, flat=True)
+        node_asset_ids = cls.get_perm_nodes_assets(perm_ids, flat=True)
         direct_asset_ids = cls.get_direct_assets(perm_ids, flat=True)
         asset_ids = list(node_asset_ids) + list(direct_asset_ids)
         assets = Asset.objects.filter(id__in=asset_ids)
         return assets
 
     @classmethod
-    def get_nodes_assets(cls, perm_ids, flat=False):
+    def get_perm_nodes_assets(cls, perm_ids, flat=False):
         """ 获取所有授权节点下的资产 """
         node_ids = AssetPermission.nodes.through.objects \
             .filter(assetpermission_id__in=perm_ids) \
