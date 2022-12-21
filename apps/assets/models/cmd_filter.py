@@ -7,11 +7,6 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import get_logger
-from users.models import User, UserGroup
-from applications.models import Application
-from ..models import SystemUser, Asset, Node
-
-from common.utils import lazyproperty, get_logger, get_object_or_none
 from orgs.mixins.models import OrgModelMixin
 
 logger = get_logger(__file__)

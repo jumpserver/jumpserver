@@ -2,18 +2,16 @@
 # -*- coding: utf-8 -*-
 #
 
-import uuid
 import logging
 from collections import defaultdict
 
 from django.db import models
-from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import lazyproperty
 from orgs.mixins.models import OrgManager, JMSOrgBaseModel
-from ..platform import Platform
 from ..base import AbsConnectivity
+from ..platform import Platform
 
 __all__ = ['Asset', 'AssetQuerySet', 'default_node', 'Protocol']
 logger = logging.getLogger(__name__)
@@ -53,7 +51,7 @@ class NodesRelationMixin:
     NODES_CACHE_KEY = 'ASSET_NODES_{}'
     ALL_ASSET_NODES_CACHE_KEY = 'ALL_ASSETS_NODES'
     CACHE_TIME = 3600 * 24 * 7
-    id = ""
+    id: str
     _all_nodes_keys = None
 
     def get_nodes(self):
@@ -100,7 +98,6 @@ class Protocol(models.Model):
 
 
 class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     address = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
     platform = models.ForeignKey(Platform, on_delete=models.PROTECT, verbose_name=_("Platform"), related_name='assets')
@@ -110,7 +107,6 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
                                    verbose_name=_("Nodes"))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     labels = models.ManyToManyField('assets.Label', blank=True, related_name='assets', verbose_name=_("Labels"))
-    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
     info = models.JSONField(verbose_name='Info', default=dict, blank=True)
 
     objects = AssetManager.from_queryset(AssetQuerySet)()

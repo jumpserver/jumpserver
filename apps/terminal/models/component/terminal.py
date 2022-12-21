@@ -1,11 +1,11 @@
 import time
-import uuid
 
 from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from common.const.signals import SKIP_SIGNAL
+from common.db.models import JMSBaseModel
 from common.utils import get_logger, lazyproperty
 from orgs.utils import tmp_to_root_org
 from terminal.const import TerminalType as TypeChoices
@@ -75,8 +75,7 @@ class StorageMixin:
         return {"TERMINAL_REPLAY_STORAGE": config}
 
 
-class Terminal(StorageMixin, TerminalStatusMixin, models.Model):
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+class Terminal(StorageMixin, TerminalStatusMixin, JMSBaseModel):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     type = models.CharField(
         choices=TypeChoices.choices, default=TypeChoices.koko,
@@ -88,8 +87,6 @@ class Terminal(StorageMixin, TerminalStatusMixin, models.Model):
     user = models.OneToOneField(User, related_name='terminal', verbose_name=_('Application User'), null=True,
                                 on_delete=models.CASCADE)
     is_deleted = models.BooleanField(default=False)
-    date_created = models.DateTimeField(auto_now_add=True)
-    comment = models.TextField(blank=True, verbose_name=_('Comment'))
 
     @property
     def is_active(self):

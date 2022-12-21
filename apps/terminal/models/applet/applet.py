@@ -7,6 +7,7 @@ from django.core.cache import cache
 from django.core.files.storage import default_storage
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from rest_framework.serializers import ValidationError
 
 from common.db.models import JMSBaseModel
 
@@ -24,6 +25,7 @@ class Applet(JMSBaseModel):
     author = models.CharField(max_length=128, verbose_name=_('Author'))
     type = models.CharField(max_length=16, verbose_name=_('Type'), default='general', choices=Type.choices)
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
+    builtin = models.BooleanField(default=False, verbose_name=_('Builtin'))
     protocols = models.JSONField(default=list, verbose_name=_('Protocol'))
     tags = models.JSONField(default=list, verbose_name=_('Tags'))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
@@ -37,7 +39,10 @@ class Applet(JMSBaseModel):
 
     @property
     def path(self):
-        return default_storage.path('applets/{}'.format(self.name))
+        if self.builtin:
+            return os.path.join(settings.APPS_DIR, 'terminal', 'applets', self.name)
+        else:
+            return default_storage.path('applets/{}'.format(self.name))
 
     @property
     def manifest(self):
@@ -53,6 +58,33 @@ class Applet(JMSBaseModel):
         if not os.path.exists(path):
             return None
         return os.path.join(settings.MEDIA_URL, 'applets', self.name, 'icon.png')
+
+    @staticmethod
+    def validate_pkg(d):
+        files = ['manifest.yml', 'icon.png', 'i18n.yml', 'setup.yml']
+        for name in files:
+            path = os.path.join(d, name)
+            if not os.path.exists(path):
+                raise ValidationError({'error': 'Missing file {}'.format(path)})
+
+        with open(os.path.join(d, 'manifest.yml')) as f:
+            manifest = yaml.safe_load(f)
+
+        if not manifest.get('name', ''):
+            raise ValidationError({'error': 'Missing name in manifest.yml'})
+        return manifest
+
+    @classmethod
+    def install_from_dir(cls, path):
+        from terminal.serializers import AppletSerializer
+
+        manifest = cls.validate_pkg(path)
+        name = manifest['name']
+        instance = cls.objects.filter(name=name).first()
+        serializer = AppletSerializer(instance=instance, data=manifest)
+        serializer.is_valid()
+        serializer.save(builtin=True)
+        return instance
 
     def select_host_account(self):
         hosts = list(self.hosts.all())
@@ -73,6 +105,7 @@ class Applet(JMSBaseModel):
         ttl = 60 * 60 * 24
         lock_key = 'applet_host_accounts_{}_{}'.format(host.id, account.username)
         cache.set(lock_key, account.username, ttl)
+
         return {
             'host': host,
             'account': account,

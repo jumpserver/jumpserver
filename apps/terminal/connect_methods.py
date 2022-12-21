@@ -31,7 +31,7 @@ class WebMethod(TextChoices):
             Protocol.redis: [cls.web_cli],
             Protocol.mongodb: [cls.web_cli],
 
-            Protocol.k8s: [cls.web_gui],
+            Protocol.k8s: [cls.web_cli],
             Protocol.http: []
         }
 

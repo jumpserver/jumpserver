@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                 ('type', models.CharField(choices=[('null', 'Null'), ('server', 'Server'), ('es', 'Elasticsearch')],
                                           default='server', max_length=16, verbose_name='Type')),
                 ('meta', common.db.fields.EncryptJsonDictTextField(default={})),
-                ('comment', models.TextField(blank=True, default='', max_length=128, verbose_name='Comment')),
+                ('comment', models.TextField(blank=True, default='', verbose_name='Comment')),
             ],
             options={
                 'abstract': False,
@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
                              ('oss', 'OSS'), ('azure', 'Azure')], default='server', max_length=16,
                     verbose_name='Type')),
                 ('meta', common.db.fields.EncryptJsonDictTextField(default={})),
-                ('comment', models.TextField(blank=True, default='', max_length=128, verbose_name='Comment')),
+                ('comment', models.TextField(blank=True, default='', verbose_name='Comment')),
             ],
             options={
                 'abstract': False,

@@ -20,7 +20,6 @@ class Label(JMSOrgBaseModel):
     category = models.CharField(max_length=128, choices=CATEGORY_CHOICES,
                                 default=USER_CATEGORY, verbose_name=_("Category"))
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
-    comment = models.TextField(blank=True, null=True, verbose_name=_("Comment"))
 
     @classmethod
     def get_queryset_group_by_name(cls):

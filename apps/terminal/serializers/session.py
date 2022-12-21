@@ -22,7 +22,7 @@ class SessionType(models.TextChoices):
 class SessionSerializer(BulkOrgResourceModelSerializer):
     org_id = serializers.CharField(allow_blank=True)
     protocol = serializers.ChoiceField(choices=Protocol.choices, label=_("Protocol"))
-    type = LabeledChoiceField(choices=SessionType.choices, label=_("Type"))
+    type = LabeledChoiceField(choices=SessionType.choices, label=_("Type"), default=SessionType.normal)
 
     class Meta:
         model = Session

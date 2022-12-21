@@ -1,0 +1,41 @@
+{
+  "protocol": "web",
+  "user": {
+    "id": "2647CA35-5CAD-4DDF-8A88-6BD88F39BB30",
+    "name": "Administrator",
+    "username": "admin"
+  },
+  "asset": {
+    "id": "46EE5F50-F1C1-468C-97EE-560E3436754C",
+    "name": "test_baidu",
+    "address": "https://www.baidu.com",
+    "category": {
+      "value": "web",
+      "label": "web"
+    },
+    "protocols": [
+      {
+        "id": 2,
+        "name": "http",
+        "port": 80
+      }
+    ],
+    "specific": {
+      "autofill": "basic",
+      "username_selector": "name=username",
+      "password_selector": "name=password",
+      "submit_selector": "id=longin_button",
+      "script": []
+    },
+    "org_id": "2925D985-A435-411D-9BC4-FEA630F105D9"
+  },
+  "account": {
+    "id": "9D5585DE-5132-458C-AABE-89A83C112A83",
+    "name": "test_mysql",
+    "username": "root",
+    "secret": ""
+  },
+  "platform": {
+    "charset": "UTF-8"
+  }
+}

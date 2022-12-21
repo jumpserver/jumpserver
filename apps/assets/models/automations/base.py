@@ -1,25 +1,24 @@
 import uuid
+
 from celery import current_task
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from common.const.choices import Trigger
-from common.mixins.models import CommonModelMixin
-from common.db.fields import EncryptJsonDictTextField
-from orgs.mixins.models import OrgModelMixin
-from ops.mixin import PeriodTaskModelMixin
+from assets.const import AutomationTypes
 from assets.models import Node, Asset
 from assets.tasks import execute_automation
-from assets.const import AutomationTypes
+from common.const.choices import Trigger
+from common.db.fields import EncryptJsonDictTextField
+from ops.mixin import PeriodTaskModelMixin
+from orgs.mixins.models import OrgModelMixin, JMSOrgBaseModel
 
 
-class BaseAutomation(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
+class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
     accounts = models.JSONField(default=list, verbose_name=_("Accounts"))
     nodes = models.ManyToManyField('assets.Node', blank=True, verbose_name=_("Nodes"))
     assets = models.ManyToManyField('assets.Asset', blank=True, verbose_name=_("Assets"))
     type = models.CharField(max_length=16, choices=AutomationTypes.choices, verbose_name=_('Type'))
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
-    comment = models.TextField(blank=True, verbose_name=_('Comment'))
 
     def __str__(self):
         return self.name + '@' + str(self.created_by)

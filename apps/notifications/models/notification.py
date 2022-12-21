@@ -12,6 +12,7 @@ class UserMsgSubscription(JMSBaseModel):
         verbose_name=_('User')
     )
     receive_backends = models.JSONField(default=list, verbose_name=_('receive backend'))
+    comment = ''
 
     class Meta:
         verbose_name = _('User message')
@@ -25,6 +26,7 @@ class SystemMsgSubscription(JMSBaseModel):
     users = models.ManyToManyField('users.User', related_name='system_msg_subscriptions')
     groups = models.ManyToManyField('users.UserGroup', related_name='system_msg_subscriptions')
     receive_backends = models.JSONField(default=list)
+    comment = ''
 
     message_type_label = ''
 
