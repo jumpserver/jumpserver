@@ -872,7 +872,7 @@ msgstr "自动化任务执行历史"
 #: assets/models/automations/change_secret.py:15 assets/models/base.py:67
 #: assets/serializers/account/account.py:97 assets/serializers/base.py:13
 msgid "Secret type"
-msgstr "密问类型"
+msgstr "密文类型"
 
 #: assets/models/automations/change_secret.py:19
 #: assets/serializers/automations/change_secret.py:25
