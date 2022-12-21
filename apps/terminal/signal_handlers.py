@@ -42,7 +42,7 @@ def on_applet_create(sender, instance, created=False, **kwargs):
 
 
 @receiver(django_ready)
-def init_db_port_mapper(sender, **kwargs):
+def check_db_port_mapper(sender, **kwargs):
     logger.info('Init db port mapper')
     try:
         db_port_manager.check()
