@@ -3,14 +3,16 @@ from urllib.parse import parse_qsl
 
 from django.conf import settings
 from django.db.models import F, Value, CharField
-from rest_framework.generics import ListAPIView
-from rest_framework.generics import get_object_or_404
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.generics import ListAPIView
+from rest_framework.generics import get_object_or_404
+from rest_framework.exceptions import PermissionDenied, NotFound
 
-from assets.api import SerializeToTreeNodeMixin
-from assets.models import Asset, Account
 from assets.utils import KubernetesTree
+from assets.models import Asset, Account
+from assets.api import SerializeToTreeNodeMixin
+from authentication.models import ConnectionToken
 from common.utils import get_object_or_none, lazyproperty
 from common.utils.common import timeit
 from perms.hands import Node
@@ -133,41 +135,47 @@ class UserPermedNodeChildrenWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
 class UserGrantedK8sAsTreeApi(SelfOrPKUserMixin, ListAPIView):
     """ 用户授权的K8s树 """
 
-    @staticmethod
-    def asset(asset_id):
-        kwargs = {'id': asset_id, 'is_active': True}
-        asset = get_object_or_404(Asset, **kwargs)
-        return asset
+    def get_token(self):
+        token_id = self.request.query_params.get('token')
+        token = get_object_or_404(ConnectionToken, pk=token_id)
+        if token.is_expired:
+            raise PermissionDenied('Token is expired')
+        token.renewal()
+        return token
 
-    def get_accounts(self, asset):
+    def get_account_secret(self, token: ConnectionToken):
         util = PermAccountUtil()
-        accounts = util.get_permed_accounts_for_user(self.user, asset)
-        ignore_username = [Account.AliasAccount.INPUT, Account.AliasAccount.USER]
-        accounts = filter(lambda x: x.username not in ignore_username, accounts)
+        accounts = util.get_permed_accounts_for_user(self.user, token.asset)
+        account_username = token.account
+        accounts = filter(lambda x: x.username == account_username, accounts)
         accounts = list(accounts)
-        return accounts
+        if not accounts:
+            raise NotFound('Account is not found')
+        account = accounts[0]
+        if account.username in [
+            Account.AliasAccount.INPUT, Account.AliasAccount.USER
+        ]:
+            return token.input_secret
+        else:
+            return account.secret
+
+    def get_namespace_and_pod(self):
+        key = self.request.query_params.get('key')
+        namespace_and_pod = dict(parse_qsl(key))
+        pod = namespace_and_pod.get('pod')
+        namespace = namespace_and_pod.get('namespace')
+        return namespace, pod
 
     def list(self, request: Request, *args, **kwargs):
-        tree_id = request.query_params.get('tree_id')
-        key = request.query_params.get('key', {})
+        token = self.get_token()
+        asset = token.asset
+        secret = self.get_account_secret(token)
+        namespace, pod = self.get_namespace_and_pod()
 
         tree = []
-        parent_info = dict(parse_qsl(key))
-        account_username = parent_info.get('account')
-
-        asset_id = parent_info.get('asset_id')
-        asset_id = tree_id if not asset_id else asset_id
-
-        if tree_id and not key and not account_username:
-            asset = self.asset(asset_id)
-            accounts = self.get_accounts(asset)
-            asset_node = KubernetesTree(tree_id).as_asset_tree_node(asset)
+        k8s_tree_instance = KubernetesTree(asset, secret)
+        if not any([namespace, pod]):
+            asset_node = k8s_tree_instance.as_asset_tree_node()
             tree.append(asset_node)
-            for account in accounts:
-                account_node = KubernetesTree(tree_id).as_account_tree_node(
-                    account, parent_info,
-                )
-                tree.append(account_node)
-        elif key and account_username:
-            tree = KubernetesTree(key).async_tree_node(parent_info)
+        tree.extend(k8s_tree_instance.async_tree_node(namespace, pod))
         return Response(data=tree)
