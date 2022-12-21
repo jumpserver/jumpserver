@@ -39,6 +39,7 @@ ARG TOOLS="                           \
         sshpass                       \
         telnet                        \
         unzip                         \
+        vim                           \
         wget"
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \

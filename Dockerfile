@@ -39,6 +39,7 @@ ARG TOOLS="                           \
         sshpass                       \
         telnet                        \
         unzip                         \
+        vim                           \
         wget"
 
 ARG APT_MIRROR=http://mirrors.ustc.edu.cn
