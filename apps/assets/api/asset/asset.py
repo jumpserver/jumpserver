@@ -36,7 +36,7 @@ class AssetFilterSet(BaseFilterSet):
         model = Asset
         fields = [
             "id", "name", "address", "is_active",
-            "type", "category"
+            "type", "category", "platform"
         ]
 
 
