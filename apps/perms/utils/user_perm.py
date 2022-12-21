@@ -151,6 +151,7 @@ class UserPermNodeUtil:
     def get_top_level_nodes(self):
         nodes = self.get_special_nodes()
         real_nodes = self._get_indirect_perm_node_children(key='')
+        nodes.extend(real_nodes)
         if len(real_nodes) == 1:
             children = self.get_node_children(real_nodes[0].key)
             nodes.extend(children)

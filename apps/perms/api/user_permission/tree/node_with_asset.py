@@ -96,16 +96,17 @@ class UserPermedNodeChildrenWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
     """ 用户授权的节点的子节点与资产树 """
 
     def get_nodes_assets(self):
-        nodes = PermNode.objects.none()
-        assets = Asset.objects.none()
         query_node_util = UserPermNodeUtil(self.user)
         query_asset_util = UserPermAssetUtil(self.user)
         node_key = self.query_node_key
         if not node_key:
             nodes = query_node_util.get_top_level_nodes()
+            assets = Asset.objects.none()
         elif node_key == PermNode.UNGROUPED_NODE_KEY:
+            nodes = PermNode.objects.none()
             assets = query_asset_util.get_ungroup_assets()
         elif node_key == PermNode.FAVORITE_NODE_KEY:
+            nodes = PermNode.objects.none()
             assets = query_asset_util.get_favorite_assets()
         else:
             nodes = query_node_util.get_node_children(node_key)

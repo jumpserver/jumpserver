@@ -16,13 +16,18 @@ class NodeFrom(TextChoices):
 class UserAssetGrantedTreeNodeRelation(FamilyMixin, JMSOrgBaseModel):
     NodeFrom = NodeFrom
 
-    id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name=_('ID'))
+    id = models.AutoField(
+        auto_created=True, primary_key=True, serialize=False, verbose_name=_('ID')
+    )
     user = models.ForeignKey('users.User', db_constraint=False, on_delete=models.CASCADE)
-    node = models.ForeignKey('assets.Node', default=None, on_delete=models.CASCADE,
-                             db_constraint=False, null=False, related_name='granted_node_rels')
+    node = models.ForeignKey(
+        'assets.Node', default=None, on_delete=models.CASCADE, db_constraint=False, null=False,
+        related_name='granted_node_rels'
+    )
     node_key = models.CharField(max_length=64, verbose_name=_("Key"), db_index=True)
-    node_parent_key = models.CharField(max_length=64, default='', verbose_name=_('Parent key'),
-                                       db_index=True)
+    node_parent_key = models.CharField(
+        max_length=64, default='', verbose_name=_('Parent key'), db_index=True
+    )
     node_from = models.CharField(choices=NodeFrom.choices, max_length=16, db_index=True)
     node_assets_amount = models.IntegerField(default=0)
     comment = ''
@@ -67,6 +72,9 @@ class PermNode(Node):
         'granted_assets_amount': F('granted_node_rels__node_assets_amount'),
         'node_from': F('granted_node_rels__node_from')
     }
+
+    def __str__(self):
+        return f'{self.name}'
 
     def use_granted_assets_amount(self):
         self.assets_amount = self.granted_assets_amount
