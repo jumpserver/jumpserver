@@ -33,6 +33,7 @@ ARG TOOLS="                           \
         ca-certificates               \
         curl                          \
         default-libmysqlclient-dev    \
+        default-mysql-client          \
         locales                       \
         openssh-client                \
         sshpass                       \
