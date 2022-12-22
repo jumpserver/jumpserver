@@ -101,6 +101,12 @@ class AutomationExecution(OrgModelMixin):
 
     class Meta:
         verbose_name = _('Automation task execution')
+        permissions = [
+            ('view_changesecretexecution', _('Can view change secret execution')),
+            ('add_changesecretexection', _('Can add change secret execution')),
+            ('view_gatheraccountsexecution', _('Can view gather accounts execution')),
+            ('add_gatheraccountsexecution', _('Can add gather accounts execution')),
+        ]
 
     @property
     def manager_type(self):

@@ -11,7 +11,8 @@ from common.const.choices import Trigger
 
 __all__ = [
     'AutomationAssetsListApi', 'AutomationRemoveAssetApi',
-    'AutomationAddAssetApi', 'AutomationNodeAddRemoveApi', 'AutomationExecutionViewSet'
+    'AutomationAddAssetApi', 'AutomationNodeAddRemoveApi',
+    'ChangSecretExecutionViewSet', 'GatherAccountsExecutionViewSet',
 ]
 
 
@@ -114,3 +115,19 @@ class AutomationExecutionViewSet(
             pid=automation.pk, trigger=Trigger.manual, tp=tp
         )
         return Response({'task': task.id}, status=status.HTTP_201_CREATED)
+
+
+class ChangSecretExecutionViewSet(AutomationExecutionViewSet):
+    rbac_perms = (
+        ("list", "assets.view_changesecretexecution"),
+        ("retrieve", "assets.view_changesecretexecution"),
+        ("create", "assets.add_changesecretexecution"),
+    )
+
+
+class GatherAccountsExecutionViewSet(AutomationExecutionViewSet):
+    rbac_perms = (
+        ("list", "assets.view_gatheraccountsexecution"),
+        ("retrieve", "assets.view_gatheraccountsexecution"),
+        ("create", "assets.add_gatheraccountsexecution"),
+    )
