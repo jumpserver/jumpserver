@@ -70,7 +70,7 @@
 
         .right-image-box {
             height: 100%;
-            width: 56%;
+            width: 50%;
             float: right;
         }
 
@@ -78,7 +78,7 @@
             text-align: center;
             background-color: white;
             height: 100%;
-            width: 44%;
+            width: 50%;
             border-right: 1px solid #EFF0F1;
         }
 
@@ -204,6 +204,9 @@
         .auto-login input[type=checkbox]:checked {
             border: 4px solid var(--primary-color);
         }
+        .auto-login > .row::after {
+            clear: none;
+        }
     </style>
 </head>
 
@@ -274,7 +277,7 @@
                         </div>
                     {% endif %}
                     <div class="form-group auto-login" style="margin-bottom: 10px">
-                        <div class="row">
+                        <div class="row" style="overflow: hidden;">
                             <div class="col-md-6" style="text-align: left">
                                 {% if form.auto_login %}
                                     {% bootstrap_field form.auto_login form_group_class='auto_login_box' %}
