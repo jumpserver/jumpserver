@@ -36,6 +36,7 @@ ARG TOOLS="                           \
         default-mysql-client          \
         locales                       \
         openssh-client                \
+        procps                        \
         sshpass                       \
         telnet                        \
         unzip                         \
