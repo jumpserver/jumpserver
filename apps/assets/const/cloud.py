@@ -52,4 +52,6 @@ class CloudTypes(BaseType):
 
     @classmethod
     def get_community_types(cls):
-        return [cls.K8S]
+        return [
+            cls.K8S, cls.PUBLIC, cls.PRIVATE
+        ]
