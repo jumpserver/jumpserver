@@ -430,6 +430,12 @@ class NodeAssetsMixin(NodeAllAssetsMappingMixin):
         assets = Asset.objects.filter(nodes=self)
         return assets.distinct()
 
+    def get_assets_for_tree(self):
+        return self.get_assets().only(
+            "id", "name", "address", "platform_id",
+            "org_id", "is_active"
+        ).prefetch_related('platform')
+
     def get_valid_assets(self):
         return self.get_assets().valid()
 

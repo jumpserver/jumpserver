@@ -1,6 +1,5 @@
 # ~*~ coding: utf-8 ~*~
 
-from django.core.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
@@ -12,44 +11,20 @@ from orgs.utils import current_org
 from .mixin import SerializeToTreeNodeMixin
 from .. import serializers
 from ..const import AllTypes
-from ..models import Node
+from ..models import Node, Platform, Asset
 
 logger = get_logger(__file__)
 __all__ = [
     'NodeChildrenApi',
-    'NodeListAsTreeApi',
     'NodeChildrenAsTreeApi',
     'CategoryTreeApi',
 ]
 
 
-class NodeListAsTreeApi(generics.ListAPIView):
-    """
-    获取节点列表树
-    [
-      {
-        "id": "",
-        "name": "",
-        "pId": "",
-        "meta": ""
-      }
-    ]
-    """
-    model = Node
-    serializer_class = TreeNodeSerializer
-
-    @staticmethod
-    def to_tree_queryset(queryset):
-        queryset = [node.as_tree_node() for node in queryset]
-        return queryset
-
-    def filter_queryset(self, queryset):
-        queryset = super().filter_queryset(queryset)
-        queryset = self.to_tree_queryset(queryset)
-        return queryset
-
-
 class NodeChildrenApi(generics.ListCreateAPIView):
+    """
+    节点的增删改查
+    """
     serializer_class = serializers.NodeSerializer
     search_fields = ('value',)
 
@@ -141,33 +116,38 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
     def list(self, request, *args, **kwargs):
         nodes = self.filter_queryset(self.get_queryset()).order_by('value')
         nodes = self.serialize_nodes(nodes, with_asset_amount=True)
-        assets = self.get_assets()
+        assets = self.get_assets_as_node()
         data = [*nodes, *assets]
         return Response(data=data)
 
-    def get_assets(self):
+    def get_assets_as_node(self):
         include_assets = self.request.query_params.get('assets', '0') == '1'
         if not self.instance or not include_assets:
             return []
-        assets = self.instance.get_assets().only(
-            "id", "name", "address", "platform_id",
-            "org_id", "is_active",
-        ).prefetch_related('platform')
+        assets = self.instance.get_assets_for_tree()
         return self.serialize_assets(assets, self.instance.key)
 
 
 class CategoryTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
     serializer_class = TreeNodeSerializer
+    rbac_perms = {
+        'GET': 'assets.view_asset',
+        'list': 'assets.view_asset',
+    }
 
-    def check_permissions(self, request):
-        if not request.user.has_perm('assets.view_asset'):
-            raise PermissionDenied
-        return True
+    def get_assets(self):
+        key = self.request.query_params.get('key')
+        platform = Platform.objects.filter(id=key).first()
+        if not platform:
+            return []
+        assets = Asset.objects.filter(platform=platform).prefetch_related('platform')
+        return self.serialize_assets(assets, key)
 
     def list(self, request, *args, **kwargs):
-        if request.query_params.get('key'):
-            nodes = []
+        include_asset = bool(self.request.query_params.get('assets'))
+
+        if include_asset and self.request.query_params.get('key'):
+            nodes = self.get_assets()
         else:
-            nodes = AllTypes.to_tree_nodes()
-        serializer = self.get_serializer(nodes, many=True)
-        return Response(data=serializer.data)
+            nodes = AllTypes.to_tree_nodes(include_asset)
+        return Response(data=nodes)

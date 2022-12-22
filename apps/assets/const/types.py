@@ -1,8 +1,9 @@
 from collections import defaultdict
 from copy import deepcopy
 
+from django.utils.translation import gettext as _
+
 from common.db.models import ChoicesMixin
-from common.tree import TreeNode
 from .category import Category
 from .cloud import CloudTypes
 from .database import DatabaseTypes
@@ -134,34 +135,34 @@ class AllTypes(ChoicesMixin):
 
     @staticmethod
     def choice_to_node(choice, pid, opened=True, is_parent=True, meta=None):
-        node = TreeNode(**{
+        node = {
             'id': pid + '_' + choice.name,
             'name': choice.label,
             'title': choice.label,
             'pId': pid,
             'open': opened,
             'isParent': is_parent,
-        })
+        }
         if meta:
-            node.meta = meta
+            node['meta'] = meta
         return node
 
     @classmethod
-    def platform_to_node(cls, p, pid):
-        node = TreeNode(**{
+    def platform_to_node(cls, p, pid, include_asset):
+        node = {
             'id': '{}'.format(p.id),
             'name': p.name,
             'title': p.name,
             'pId': pid,
-            'isParent': True,
+            'isParent': include_asset,
             'meta': {
                 'type': 'platform'
             }
-        })
+        }
         return node
 
     @classmethod
-    def to_tree_nodes(cls):
+    def to_tree_nodes(cls, include_asset):
         from ..models import Asset, Platform
         asset_platforms = Asset.objects.all().values_list('platform_id', flat=True)
         platform_count = defaultdict(int)
@@ -177,26 +178,29 @@ class AllTypes(ChoicesMixin):
             category_type_mapper[p.category] += platform_count[p.id]
             tp_platforms[p.category + '_' + p.type].append(p)
 
-        root = TreeNode(id='ROOT', name='所有类型', title='所有类型', open=True, isParent=True)
+        root = dict(id='ROOT', name=_('All types'), title='所有类型', open=True, isParent=True)
         nodes = [root]
         for category, type_cls in cls.category_types():
+            # Category 格式化
             meta = {'type': 'category', 'category': category.value}
             category_node = cls.choice_to_node(category, 'ROOT', meta=meta)
             category_count = category_type_mapper.get(category, 0)
-            category_node.name += f'({category_count})'
+            category_node['name'] += f'({category_count})'
             nodes.append(category_node)
 
-            tps = type_cls.get_types()
-            for tp in tps:
+            # Type 格式化
+            types = type_cls.get_types()
+            for tp in types:
                 meta = {'type': 'type', 'category': category.value, '_type': tp.value}
-                tp_node = cls.choice_to_node(tp, category_node.id, opened=False, meta=meta)
+                tp_node = cls.choice_to_node(tp, category_node['id'], opened=False, meta=meta)
                 tp_count = category_type_mapper.get(category + '_' + tp, 0)
-                tp_node.name += f'({tp_count})'
+                tp_node['name'] += f'({tp_count})'
                 nodes.append(tp_node)
 
+                # Platform 格式化
                 for p in tp_platforms.get(category + '_' + tp, []):
-                    platform_node = cls.platform_to_node(p, tp_node.id)
-                    platform_node.name += f'({platform_count.get(p.id, 0)})'
+                    platform_node = cls.platform_to_node(p, tp_node['id'], include_asset)
+                    platform_node['name'] += f'({platform_count.get(p.id, 0)})'
                     nodes.append(platform_node)
         return nodes
 
