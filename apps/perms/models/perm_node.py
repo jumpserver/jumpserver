@@ -32,6 +32,9 @@ class UserAssetGrantedTreeNodeRelation(FamilyMixin, JMSOrgBaseModel):
     node_assets_amount = models.IntegerField(default=0)
     comment = ''
 
+    def __str__(self):
+        return f'{self.user}|{self.node}'
+
     @property
     def key(self):
         return self.node_key

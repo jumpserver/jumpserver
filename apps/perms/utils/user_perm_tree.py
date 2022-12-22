@@ -121,9 +121,8 @@ class UserPermTreeExpireUtil(_UserPermTreeCacheMixin):
         for org_id, perm_id in org_perm_ids:
             org_perms_mapper[org_id].add(perm_id)
         for org_id, perms_id in org_perms_mapper.items():
-            org_ids = [org_id]
             user_ids = AssetPermission.get_all_users_for_perms(perm_ids, flat=True)
-            self.expire_perm_tree_for_users_orgs(user_ids, org_ids)
+            self.expire_perm_tree_for_users_orgs(user_ids, [org_id])
 
     def expire_perm_tree_for_user_group(self, user_group):
         group_ids = [user_group.id]
@@ -138,7 +137,7 @@ class UserPermTreeExpireUtil(_UserPermTreeCacheMixin):
     @on_transaction_commit
     def expire_perm_tree_for_users_orgs(self, user_ids, org_ids):
         org_ids = [str(oid) for oid in org_ids]
-        with self.client.pipline() as p:
+        with self.client.pipeline() as p:
             for uid in user_ids:
                 cache_key = self.get_cache_key(uid)
                 p.srem(cache_key, *org_ids)
@@ -147,7 +146,7 @@ class UserPermTreeExpireUtil(_UserPermTreeCacheMixin):
 
     def expire_perm_tree_for_all_user(self):
         keys = self.client.keys(self.cache_key_all_user)
-        with self.client.pipline() as p:
+        with self.client.pipeline() as p:
             for k in keys:
                 p.delete(k)
             p.execute()
