@@ -107,7 +107,7 @@ class UserPermAssetUtil(AssetPermissionPermAssetUtil):
         asset_ids = set()
         children_from_granted = UserAssetGrantedTreeNodeRelation.objects \
             .filter(user=self.user) \
-            .filter(node_key__startwith=f'{node.key}:', node_from=node.NodeFrom.granted) \
+            .filter(node_key__startswith=f'{node.key}:', node_from=node.NodeFrom.granted) \
             .only('node_id', 'node_key')
         for n in children_from_granted:
             n.id = n.node_id
@@ -118,13 +118,13 @@ class UserPermAssetUtil(AssetPermissionPermAssetUtil):
         # 查询节点下资产授权的节点
         children_from_assets = UserAssetGrantedTreeNodeRelation.objects \
             .filter(user=self.user) \
-            .filter(node_key__startwith=f'{node.key}:', node_from=node.NodeFrom.asset) \
+            .filter(node_key__startswith=f'{node.key}:', node_from=node.NodeFrom.asset) \
             .values_list('node_id', flat=True)
         children_from_assets = set(children_from_assets)
         if node.node_from == node.NodeFrom.asset:
             children_from_assets.add(node.id)
         _asset_ids = Asset.objects \
-            .filter(node__id__in=children_from_assets) \
+            .filter(nodes__id__in=children_from_assets) \
             .filter(granted_by_permissions__id__in=self.perm_ids) \
             .distinct() \
             .order_by() \
