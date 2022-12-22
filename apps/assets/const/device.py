@@ -55,4 +55,6 @@ class DeviceTypes(BaseType):
 
     @classmethod
     def get_community_types(cls):
-        return []
+        return [
+            cls.GENERAL, cls.SWITCH, cls.ROUTER, cls.FIREWALL
+        ]

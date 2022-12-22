@@ -47,4 +47,6 @@ class WebTypes(BaseType):
 
     @classmethod
     def get_community_types(cls):
-        return []
+        return [
+            cls.WEBSITE,
+        ]
