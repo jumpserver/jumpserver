@@ -38,8 +38,8 @@ ARG TOOLS="                           \
         default-mysql-client          \
         iputils-ping                  \
         locales                       \
-        netcat                        \
-        redis-server                  \
+        procps                        \
+        redis-tools                   \
         telnet                        \
         vim                           \
         unzip                         \
