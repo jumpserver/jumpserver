@@ -31,14 +31,15 @@ user_permission_urlpatterns = [
     path('<str:user>/nodes/children/tree/', api.UserPermedNodeChildrenAsTreeApi.as_view(),
          name='user-node-children-as-tree'),
     # tree-node-with-asset
+    # 异步树
     path('<str:user>/nodes/children-with-assets/tree/',
          api.UserPermedNodeChildrenWithAssetsAsTreeApi.as_view(),
          name='user-node-children-with-assets-as-tree'),
-
     path('<str:user>/nodes/children-with-k8s/tree/',
          api.UserGrantedK8sAsTreeApi.as_view(),
          name='user-nodes-children-with-k8s-as-tree'),
 
+    # 同步树
     path('<str:user>/nodes-with-assets/tree/', api.UserPermedNodesWithAssetsAsTreeApi.as_view(),
          name='user-nodes-with-assets-as-tree'),
     # accounts
