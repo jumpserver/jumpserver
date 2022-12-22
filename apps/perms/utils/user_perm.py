@@ -150,6 +150,7 @@ class UserPermNodeUtil:
 
     def get_top_level_nodes(self):
         nodes = self.get_special_nodes()
+        # 获取组织下的根节点
         real_nodes = self._get_indirect_perm_node_children(key='')
         nodes.extend(real_nodes)
         if len(real_nodes) == 1:
