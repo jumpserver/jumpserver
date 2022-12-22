@@ -91,18 +91,6 @@ class Migration(migrations.Migration):
             field=models.BooleanField(default=False, verbose_name='Default'),
         ),
         migrations.CreateModel(
-            name='DiscoveryAccountAutomation',
-            fields=[
-                ('baseautomation_ptr',
-                 models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True,
-                                      primary_key=True, serialize=False, to='assets.baseautomation')),
-            ],
-            options={
-                'verbose_name': 'Discovery account automation',
-            },
-            bases=('assets.baseautomation',),
-        ),
-        migrations.CreateModel(
             name='GatherFactsAutomation',
             fields=[
                 ('baseautomation_ptr',
