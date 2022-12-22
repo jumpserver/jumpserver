@@ -2,12 +2,14 @@
 
 import os
 
-from kombu import Exchange, Queue
 from celery import Celery
+from kombu import Exchange, Queue
 
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'jumpserver.settings')
 from jumpserver import settings
+from .heatbeat import *
+
 # from django.conf import settings
 
 app = Celery('jumpserver')
