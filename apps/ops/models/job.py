@@ -88,6 +88,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
         return self.executions.create(job_version=self.version)
 
     class Meta:
+        verbose_name = _("Job")
         ordering = ['date_created']
 
 
@@ -284,6 +285,7 @@ class JobExecution(JMSOrgBaseModel):
             self.set_error(e)
 
     class Meta:
+        verbose_name = _("Job Execution")
         ordering = ['-date_created']
 
 
@@ -294,3 +296,4 @@ class JobAuditLog(JobExecution):
 
     class Meta:
         proxy = True
+        verbose_name = _("Job audit log")

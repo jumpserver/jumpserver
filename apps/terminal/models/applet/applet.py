@@ -34,6 +34,9 @@ class Applet(JMSBaseModel):
         to='AppletHost', verbose_name=_('Hosts')
     )
 
+    class Meta:
+        verbose_name = _("Applet")
+
     def __str__(self):
         return self.name
 

@@ -41,3 +41,6 @@ class AdHoc(JMSOrgBaseModel):
 
     def __str__(self):
         return "{}: {}".format(self.module, self.args)
+
+    class Meta:
+        verbose_name = _("AdHoc")
