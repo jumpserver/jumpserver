@@ -18,6 +18,23 @@
 
     <style>
         .login-content {
+        {#box-shadow: 0 5px 5px -3px rgb(0 0 0 / 15%), 0 8px 10px 1px rgb(0 0 0 / 14%), 0 3px 14px 2px rgb(0 0 0 / 12%);#}
+        }
+
+        .login-footer {
+            height: 50px;
+            width: 1000px;
+            margin: 40px auto;
+            text-align: center;
+        }
+
+        .footer-item {
+            padding: 5px 20px;
+            color: gray;
+        }
+
+        .footer-item a {
+            color: gray;
         }
 
         .help-block {
@@ -52,15 +69,15 @@
         }
 
         .login-content {
-            height: 490px;
-            width: 1066px;
+            height: 500px;
+            width: 1000px;
             margin-right: auto;
             margin-left: auto;
             margin-top: calc((100vh - 470px) / 3);
         }
 
         body {
-            background-color: #ffffff;
+            background-color: #f3f3f3;
             height: calc(100vh - (100vh - 470px) / 3);
         }
 
@@ -120,12 +137,12 @@
         }
 
         .login-page-language {
-            font-size: 12px!important;
+            font-size: 12px !important;
             margin-right: -32px !important;
             padding-top: 12px !important;
             padding-left: 0 !important;
             padding-bottom: 8px !important;
-            color:#8F959E !important;
+            color: #8F959E !important;
             font-weight: 350 !important;
             min-height: auto !important;
         }
@@ -137,14 +154,16 @@
 
         .jms-title {
             font-size: 21px;
-            font-weight:400;
+            font-weight: 400;
             color: #151515;
             letter-spacing: 0;
         }
+
         .more-methods-title {
             position: relative;
             margin-top: 20px;
         }
+
         .more-methods-title:before, .more-methods-title:after {
             position: absolute;
             top: 50%;
@@ -153,18 +172,23 @@
             border: 1px dashed #e7eaec;
             width: 35%;
         }
+
         .more-methods-title:before {
             left: 0;
         }
+
         .more-methods-title:after {
             right: 0;
         }
-        .more-methods-title.ja:before, .more-methods-title.ja:after{
+
+        .more-methods-title.ja:before, .more-methods-title.ja:after {
             width: 26%;
         }
+
         .captcha-field .form-group {
             margin-bottom: 5px;
         }
+
         .auto-login.form-group .checkbox {
             margin: 5px 0;
         }
@@ -176,16 +200,20 @@
         .has-error .more-login {
             margin-top: 0;
         }
+
         .welcome-message {
             color: #646A73;
         }
+
         .navbar-right .dropdown-menu {
-            right: -24px!important;
+            right: -24px !important;
             left: auto;
         }
+
         .auto_login_box {
             display: inline-block;
         }
+
         .auto-login input[type=checkbox] {
             -webkit-appearance: none;
             -moz-appearance: none;
@@ -201,9 +229,11 @@
             outline: none;
             cursor: pointer;
         }
+
         .auto-login input[type=checkbox]:checked {
             border: 4px solid var(--primary-color);
         }
+
         .auto-login > .row::after {
             clear: none;
         }
@@ -218,11 +248,31 @@
         </a>
     </div>
     <div class="left-form-box {% if not form.challenge and not form.captcha %} no-captcha-challenge {% endif %}">
-        <div style="background-color: white">
-            <div class="jms-title">
-                <img src="{{ INTERFACE.logo_text_green }}" class="jms-title-img" />
+        <div style="position: relative;top: 50%;transform: translateY(-50%);">
+            <div style='padding: 15px 60px; text-align: left'>
+                <h2 style='font-weight: 400;display: inline'>
+                    {% trans 'Login' %}
+                </h2>
+                <ul class=" nav navbar-top-links navbar-right">
+                    <li class="dropdown">
+                        <a class="dropdown-toggle login-page-language" data-toggle="dropdown" href="#"
+                           target="_blank">
+                            <i class="fa fa-globe fa-lg" style="margin-right: 2px"></i>
+                            <span>{{ current_lang.title }}<b class="caret"></b></span>
+                        </a>
+                        <ul class="dropdown-menu profile-dropdown dropdown-menu-right">
+                            {% for lang in langs %}
+                                <li>
+                                <a href="{% url 'i18n-switch' lang=lang.code %}">
+                                    <span>{{ lang.title }}</span>
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
             </div>
-            <div class="contact-form col-md-10 col-md-offset-1">
+            <div class="contact-form col-md-10 col-md-offset-1" style='float: none; overflow: hidden'>
                 <form id="login-form" action="" method="post" role="form" novalidate="novalidate">
                     {% csrf_token %}
                     <div style="line-height: 17px;margin-bottom: 20px;color: #999999;">
@@ -230,37 +280,17 @@
                         <p class="help-block red-fonts">
                             {{ form.non_field_errors.as_text }}
                         </p>
-                    {% else %}
-                        <p class="welcome-message">
-                            {% trans 'Welcome back, please enter username and password to login' %}
-                        </p>
                     {% endif %}
                     </div>
 
-                    <ul class="nav navbar-top-links navbar-right">
-                        <li class="dropdown">
-                            <a class="dropdown-toggle login-page-language" data-toggle="dropdown" href="#" target="_blank">
-                                <i class="fa fa-globe fa-lg" style="margin-right: 2px"></i>
-                                <span>{{ current_lang.title }}<b class="caret"></b></span>
-                            </a>
-                            <ul class="dropdown-menu profile-dropdown dropdown-menu-right">
-                                {% for lang in langs %}
-                                <li>
-                                    <a href="{% url 'i18n-switch' lang=lang.code %}">
-                                        <span>{{ lang.title }}</span>
-                                    </a>
-                                </li>
-                                {% endfor %}
-                            </ul>
-                        </li>
-                    </ul>
-
                     {% bootstrap_field form.username show_label=False %}
                     <div class="form-group {% if form.password.errors %} has-error {% endif %}">
-                        <input type="password" class="form-control" id="password" placeholder="{% trans 'Password' %}" required>
-                        <input id="password-hidden" type="text" style="display:none" name="{{ form.password.html_name }}">
+                        <input type="password" class="form-control" id="password" placeholder="{% trans 'Password' %}"
+                               required>
+                        <input id="password-hidden" type="text" style="display:none"
+                               name="{{ form.password.html_name }}">
                         {% if form.password.errors %}
-                        <p class="help-block" style="text-align: left">
+                            <p class="help-block" style="text-align: left">
                             {{ form.password.errors.as_text }}
                         </p>
                         {% endif %}
@@ -306,7 +336,8 @@
                             <div class="more-login-items">
                             {% for method in auth_methods %}
                                 <a href="{{ method.url }}" class="more-login-item">
-                                    <i class="fa"><img src="{{ method.logo }}" height="15" width="15"></i> {{ method.name }}
+                                    <i class="fa">
+                                        <img src="{{ method.logo }}" height="15" width="15"></i> {{ method.name }}
                                 </a>
                             {% endfor %}
                             </div>
@@ -320,6 +351,7 @@
         </div>
     </div>
 </div>
+
 </body>
 {% include '_foot_js.html' %}
 <script type="text/javascript" src="/static/js/plugins/jsencrypt/jsencrypt.min.js"></script>
