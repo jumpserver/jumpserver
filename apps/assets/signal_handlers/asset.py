@@ -103,6 +103,7 @@ def on_asset_nodes_add(instance, action, reverse, pk_set, **kwargs):
     # m2m_model.objects.bulk_create(to_create)
     #
 
+
 RELATED_NODE_IDS = '_related_node_ids'
 
 

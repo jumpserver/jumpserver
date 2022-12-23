@@ -102,6 +102,12 @@ class UserPermedNodeChildrenWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
         if not node_key:
             nodes = query_node_util.get_top_level_nodes()
             assets = Asset.objects.none()
+            # 获取根节点下的资产
+            for node in nodes:
+                if not node.key.isdigit():
+                    continue
+                assets = query_asset_util.get_node_assets(key=node.key)
+                break
         elif node_key == PermNode.UNGROUPED_NODE_KEY:
             nodes = PermNode.objects.none()
             assets = query_asset_util.get_ungroup_assets()

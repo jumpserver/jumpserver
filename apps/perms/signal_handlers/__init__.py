@@ -1,2 +1,2 @@
-from . import asset_permission
-from . import refresh_perms
+from .asset_permission import *
+from .refresh_perms import *

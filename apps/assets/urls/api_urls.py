@@ -29,7 +29,8 @@ router.register(r'account-backup-plans', api.AccountBackupPlanViewSet, 'account-
 router.register(r'account-backup-plan-executions', api.AccountBackupPlanExecutionViewSet, 'account-backup-execution')
 
 router.register(r'change-secret-automations', api.ChangeSecretAutomationViewSet, 'change-secret-automation')
-router.register(r'automation-executions', api.AutomationExecutionViewSet, 'automation-execution')
+router.register(r'change-secret-executions', api.ChangSecretExecutionViewSet, 'change-secret-execution')
+router.register(r'gather-account-executions', api.GatherAccountsExecutionViewSet, 'gather-account-execution')
 router.register(r'change-secret-records', api.ChangeSecretRecordViewSet, 'change-secret-record')
 router.register(r'gather-account-automations', api.GatherAccountsAutomationViewSet, 'gather-account-automation')
 
