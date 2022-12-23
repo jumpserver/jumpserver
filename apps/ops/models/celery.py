@@ -44,6 +44,7 @@ class CeleryTask(models.Model):
         return "green"
 
     class Meta:
+        verbose_name = _("Celery Task")
         ordering = ('name',)
 
 
@@ -77,3 +78,6 @@ class CeleryTaskExecution(models.Model):
 
     def __str__(self):
         return "{}: {}".format(self.name, self.id)
+
+    class Meta:
+        verbose_name = _("Celery Task Execution")
