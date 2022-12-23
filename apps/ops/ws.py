@@ -67,11 +67,12 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer):
                             task_end_mark.append(1)
                     elif len(task_end_mark) == 2:
                         logger.debug('Task log end: {}'.format(task_id))
+                        await self.send_json({'event': 'end', 'task': task_id})
                         break
                     await asyncio.sleep(0.2)
         except OSError as e:
             logger.warn('Task log path open failed: {}'.format(e))
-        await self.close()
+        # await self.close()
 
     async def disconnect(self, close_code):
         self.disconnected = True
