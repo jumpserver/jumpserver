@@ -148,15 +148,20 @@ class UserPermNodeUtil:
         assets_amount = UserPermAssetUtil(self.user).get_direct_assets().count()
         return PermNode.get_favorite_node(assets_amount)
 
-    def get_top_level_nodes(self):
+    def get_top_level_nodes(self, with_unfolded_node=False):
+        # 是否有节点展开, 展开的节点
+        unfolded_node = None
         nodes = self.get_special_nodes()
-        # 获取组织下的根节点
-        real_nodes = self._get_indirect_perm_node_children(key='')
+        real_nodes = self._get_perm_node_children_from_relation(key='')
         nodes.extend(real_nodes)
         if len(real_nodes) == 1:
-            children = self.get_node_children(real_nodes[0].key)
+            unfolded_node = real_nodes[0]
+            children = self.get_node_children(unfolded_node.key)
             nodes.extend(children)
-        return nodes
+        if with_unfolded_node:
+            return nodes, unfolded_node
+        else:
+            return nodes
 
     def get_special_nodes(self):
         nodes = []
@@ -177,16 +182,18 @@ class UserPermNodeUtil:
         node = PermNode.objects.get(key=key)
         node.compute_node_from_and_assets_amount(self.user)
         if node.node_from == node.NodeFrom.granted:
+            """ 直接授权的节点, 直接从完整资产树获取子节点 """
             children = PermNode.objects.filter(parent_key=key)
         elif node.node_from in (node.NodeFrom.asset, node.NodeFrom.child):
-            children = self._get_indirect_perm_node_children(key)
+            """ 间接授权的节点, 从 Relation 表中获取子节点 """
+            children = self._get_perm_node_children_from_relation(key)
         else:
             children = PermNode.objects.none()
         children = sorted(children, key=lambda x: x.value)
         return children
 
-    def _get_indirect_perm_node_children(self, key):
-        """ 获取未直接授权节点的子节点 """
+    def _get_perm_node_children_from_relation(self, key):
+        """ 获取授权节点的子节点, 从用户授权节点关系表中获取 """
         children = PermNode.objects.filter(granted_node_rels__user=self.user, parent_key=key)
         children = children.annotate(**PermNode.annotate_granted_node_rel_fields).distinct()
         for node in children:
