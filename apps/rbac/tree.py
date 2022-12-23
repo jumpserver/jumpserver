@@ -52,8 +52,8 @@ extra_nodes_data = [
     {"id": "terminal_node", "name": _("Terminal setting"), "pId": "view_setting"},
     {'id': "task_center", "name": _("Task Center"), "pId": "view_console"},
     {'id': "my_assets", "name": _("My assets"), "pId": "view_workbench"},
-    {'id': "operation_center", "name": _('Operation Center'), "pId": "view_workbench"},
-    {'id': "remote_application", "name": _("Remote application"), "pId": "view_setting"},
+    {'id': "operation_center", "name": _('App ops'), "pId": "view_workbench"},
+    {'id': "remote_application", "name": _("Applet"), "pId": "view_setting"},
 ]
 
 # 将 model 放到其它节点下，而不是本来的 app 中

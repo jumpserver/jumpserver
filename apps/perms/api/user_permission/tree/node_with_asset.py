@@ -37,7 +37,7 @@ class BaseUserNodeWithAssetAsTreeApi(
     def list(self, request, *args, **kwargs):
         nodes, assets = self.get_nodes_assets()
         tree_nodes = self.serialize_nodes(nodes, with_asset_amount=True)
-        tree_assets = self.serialize_assets(assets, node_key=self.node_key_for_serializer_assets)
+        tree_assets = self.serialize_assets(assets, node_key=self.node_key_for_serialize_assets)
         data = list(tree_nodes) + list(tree_assets)
         return Response(data=data)
 
@@ -46,7 +46,7 @@ class BaseUserNodeWithAssetAsTreeApi(
         return [], []
 
     @lazyproperty
-    def node_key_for_serializer_assets(self):
+    def node_key_for_serialize_assets(self):
         return None
 
 
@@ -95,19 +95,21 @@ class UserPermedNodesWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
 class UserPermedNodeChildrenWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
     """ 用户授权的节点的子节点与资产树 """
 
+    # 默认展开的节点key
+    default_unfolded_node_key = None
+
     def get_nodes_assets(self):
         query_node_util = UserPermNodeUtil(self.user)
         query_asset_util = UserPermAssetUtil(self.user)
         node_key = self.query_node_key
         if not node_key:
-            nodes = query_node_util.get_top_level_nodes()
-            assets = Asset.objects.none()
-            # 获取根节点下的资产
-            for node in nodes:
-                if not node.key.isdigit():
-                    continue
-                assets = query_asset_util.get_node_assets(key=node.key)
-                break
+            nodes, unfolded_node = query_node_util.get_top_level_nodes(with_unfolded_node=True)
+            if unfolded_node:
+                """ 默认展开的节点, 获取根节点下的资产 """
+                assets = query_asset_util.get_node_assets(key=unfolded_node.key)
+                self.default_unfolded_node_key = unfolded_node.key
+            else:
+                assets = Asset.objects.none()
         elif node_key == PermNode.UNGROUPED_NODE_KEY:
             nodes = PermNode.objects.none()
             assets = query_asset_util.get_ungroup_assets()
@@ -123,16 +125,15 @@ class UserPermedNodeChildrenWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
     @lazyproperty
     def query_node_key(self):
         node_key = self.request.query_params.get('key', None)
-        if node_key is not None:
-            return node_key
-        node_id = self.request.query_params.get('id', None)
-        node = get_object_or_none(Node, id=node_id)
-        node_key = getattr(node, 'key', None)
+        if node_key is None:
+            node_id = self.request.query_params.get('id', None)
+            node = get_object_or_none(Node, id=node_id)
+            node_key = getattr(node, 'key', None)
         return node_key
 
     @lazyproperty
-    def node_key_for_serializer_assets(self):
-        return self.query_node_key
+    def node_key_for_serialize_assets(self):
+        return self.query_node_key or self.default_unfolded_node_key
 
 
 class UserGrantedK8sAsTreeApi(SelfOrPKUserMixin, ListAPIView):

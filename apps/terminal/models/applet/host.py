@@ -29,6 +29,9 @@ class AppletHost(Host):
     )
     LOCKING_ORG = '00000000-0000-0000-0000-000000000004'
 
+    class Meta:
+        verbose_name = _("Applet host")
+
     def __str__(self):
         return self.name
 
