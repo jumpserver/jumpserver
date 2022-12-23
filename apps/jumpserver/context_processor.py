@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-from django.templatetags.static import static
 from django.conf import settings
+from django.templatetags.static import static
 from django.utils.translation import ugettext_lazy as _
 
 default_interface = dict((
@@ -37,6 +37,3 @@ def jumpserver_processor(request):
         'SECURITY_VIEW_AUTH_NEED_MFA': settings.SECURITY_VIEW_AUTH_NEED_MFA,
     })
     return context
-
-
-
