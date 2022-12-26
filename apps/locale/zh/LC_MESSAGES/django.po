@@ -340,9 +340,8 @@ msgid "App assets"
 msgstr "资产管理"
 
 #: assets/automations/base/manager.py:123
-#, fuzzy
 msgid "{} disabled"
-msgstr "禁用"
+msgstr "{} 已禁用"
 
 #: assets/const/account.py:6 audits/const.py:6 audits/const.py:64
 #: common/utils/ip/geoip/utils.py:31 common/utils/ip/geoip/utils.py:37
@@ -374,52 +373,45 @@ msgid "Password"
 msgstr "密码"
 
 #: assets/const/account.py:13
-#, fuzzy
-#| msgid "SSH Key"
 msgid "SSH key"
 msgstr "SSH 密钥"
 
 #: assets/const/account.py:14 authentication/models/access_key.py:33
 msgid "Access key"
-msgstr "Access key"
+msgstr "访问密钥"
 
 #: assets/const/account.py:15 assets/models/_user.py:38
 #: authentication/models/sso_token.py:14
 msgid "Token"
-msgstr "Token"
+msgstr "令牌"
 
 #: assets/const/automation.py:13
 msgid "Ping"
 msgstr ""
 
 #: assets/const/automation.py:14
-#, fuzzy
 msgid "Gather facts"
-msgstr "收集账号"
+msgstr "收集资产信息"
 
 #: assets/const/automation.py:15
-#, fuzzy
 msgid "Create account"
-msgstr "收集账号"
+msgstr "创建账号"
 
 #: assets/const/automation.py:16
-#, fuzzy
 msgid "Change secret"
-msgstr "执行改密"
+msgstr "更改密码"
 
 #: assets/const/automation.py:17
-#, fuzzy
 msgid "Verify account"
-msgstr "验证密码/密钥"
+msgstr "验证账号"
 
 #: assets/const/automation.py:18
-#, fuzzy
 msgid "Gather accounts"
 msgstr "收集账号"
 
 #: assets/const/automation.py:38 assets/serializers/account/base.py:26
 msgid "Specific"
-msgstr ""
+msgstr "特有的"
 
 #: assets/const/automation.py:39 ops/const.py:20
 msgid "All assets use the same random password"
@@ -450,7 +442,7 @@ msgstr "主机"
 
 #: assets/const/category.py:12
 msgid "Device"
-msgstr ""
+msgstr "网络设备"
 
 #: assets/const/category.py:13 assets/models/asset/database.py:8
 #: assets/models/asset/database.py:34
@@ -458,14 +450,13 @@ msgid "Database"
 msgstr "数据库"
 
 #: assets/const/category.py:14
-#, fuzzy
 msgid "Cloud service"
-msgstr "云管中心"
+msgstr "云服务"
 
 #: assets/const/category.py:15 audits/const.py:62
 #: terminal/models/applet/applet.py:20
 msgid "Web"
-msgstr ""
+msgstr "Web"
 
 #: assets/const/device.py:7 terminal/models/applet/applet.py:19
 #: tickets/const.py:8
@@ -473,28 +464,24 @@ msgid "General"
 msgstr "一般"
 
 #: assets/const/device.py:8
-#, fuzzy
 msgid "Switch"
-msgstr "切换自"
+msgstr "交换机"
 
 #: assets/const/device.py:9
 msgid "Router"
-msgstr ""
+msgstr "路由器"
 
 #: assets/const/device.py:10
 msgid "Firewall"
-msgstr ""
+msgstr "防火墙"
 
 #: assets/const/types.py:181
-#, fuzzy
-#| msgid "MFA type"
 msgid "All types"
-msgstr "MFA 类型"
+msgstr "所有类型"
 
 #: assets/const/web.py:7
-#, fuzzy
 msgid "Website"
-msgstr "网站图标"
+msgstr "网站"
 
 #: assets/models/_user.py:24
 msgid "Automatic managed"
@@ -656,9 +643,8 @@ msgid "Can view asset account template secret"
 msgstr "可以查看资产账号密码"
 
 #: assets/models/account.py:108
-#, fuzzy
 msgid "Can change asset account template secret"
-msgstr "可以更改资产账号密码"
+msgstr "可以更改账号模版密码"
 
 #: assets/models/asset/common.py:103 assets/models/platform.py:109
 #: assets/serializers/asset/common.py:65
@@ -702,9 +688,8 @@ msgid "Can test asset connectivity"
 msgstr "可以测试资产连接性"
 
 #: assets/models/asset/common.py:226
-#, fuzzy
 msgid "Can push account to asset"
-msgstr "可以推送系统用户到资产"
+msgstr "可以推送账号到资产"
 
 #: assets/models/asset/common.py:227
 msgid "Can match asset"
@@ -956,7 +941,7 @@ msgstr "校验日期"
 
 #: assets/models/base.py:70
 msgid "Privileged"
-msgstr ""
+msgstr "特权账号"
 
 #: assets/models/cmd_filter.py:28 perms/models/asset_permission.py:60
 #: users/models/group.py:25 users/models/user.py:681
@@ -996,9 +981,9 @@ msgid "No account"
 msgstr "没有账号"
 
 #: assets/models/gateway.py:84
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Unable to connect to port {port} on {address}"
-msgstr "无法连接到 {ip} 上的端口 {port}"
+msgstr "无法连接到 {port} 上的端口 {address}"
 
 #: assets/models/gateway.py:87 authentication/middleware.py:76
 #: xpack/plugins/cloud/providers/fc.py:48
@@ -1231,10 +1216,8 @@ msgid "Account template not found"
 msgstr "账号模版未找到"
 
 #: assets/serializers/account/account.py:72
-#, fuzzy
-#| msgid "Asset Info"
 msgid "Asset not found"
-msgstr "资产信息"
+msgstr "资产不存在"
 
 #: assets/serializers/account/backup.py:29
 #: assets/serializers/automations/base.py:34 ops/mixin.py:22 ops/mixin.py:102
@@ -2119,7 +2102,7 @@ msgstr "超级连接令牌"
 
 #: authentication/models/private_token.py:9
 msgid "Private Token"
-msgstr "SSH密钥"
+msgstr "私有令牌"
 
 #: authentication/models/sso_token.py:15
 msgid "Expired"
@@ -2142,8 +2125,6 @@ msgid "binding reminder"
 msgstr "绑定提醒"
 
 #: authentication/serializers/connect_token_secret.py:105
-#, fuzzy
-#| msgid "Builtin"
 msgid "Is builtin"
 msgstr "内置的"
 
@@ -2626,18 +2607,18 @@ msgid "This field is required."
 msgstr "该字段是必填项。"
 
 #: common/drf/fields.py:78
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Invalid pk \"{pk_value}\" - object does not exist."
-msgstr "%s对象不存在"
+msgstr "错误的 id \"{pk_value}\" - 对象不存在"
 
 #: common/drf/fields.py:79
 #, python-brace-format
 msgid "Incorrect type. Expected pk value, received {data_type}."
-msgstr ""
+msgstr "错误类型。期望 pk 值，收到 {data_type}。"
 
 #: common/drf/fields.py:141
 msgid "Invalid data type, should be list"
-msgstr ""
+msgstr "错误的数据类型，应该是列表"
 
 #: common/drf/fields.py:156
 msgid "Invalid choice: {}"
@@ -2653,7 +2634,7 @@ msgstr "解析文件错误: {}"
 
 #: common/drf/serializers/common.py:86
 msgid "Children"
-msgstr ""
+msgstr "节点"
 
 #: common/drf/serializers/common.py:94
 msgid "File"
@@ -3686,7 +3667,7 @@ msgstr "企业微信 认证"
 
 #: settings/serializers/auth/base.py:18
 msgid "SSO Auth"
-msgstr "SSO Token 认证"
+msgstr "SSO 令牌认证"
 
 #: settings/serializers/auth/base.py:19
 msgid "SAML2 Auth"
@@ -3882,8 +3863,6 @@ msgid "Enable PKCE"
 msgstr "启用 PKCE"
 
 #: settings/serializers/auth/oidc.py:43
-#, fuzzy
-#| msgid "Connect method"
 msgid "Code challenge method"
 msgstr "连接方式"
 
@@ -4047,7 +4026,7 @@ msgstr "模板+签名不能超过65个字"
 
 #: settings/serializers/auth/sso.py:13
 msgid "Enable SSO auth"
-msgstr "启用 SSO Token 认证"
+msgstr "启用 SSO 令牌认证"
 
 #: settings/serializers/auth/sso.py:14
 msgid "Other service can using SSO token login to JumpServer without password"
@@ -4055,7 +4034,7 @@ msgstr "其它系统可以使用 SSO Token 对接 JumpServer, 免去登录的过
 
 #: settings/serializers/auth/sso.py:17
 msgid "SSO auth key TTL"
-msgstr "Token 有效期"
+msgstr "令牌有效期"
 
 #: settings/serializers/auth/sso.py:17
 #: xpack/plugins/cloud/serializers/account_attrs.py:176
@@ -5662,8 +5641,6 @@ msgid "Run command"
 msgstr "运行的命令"
 
 #: tickets/models/ticket/command_confirm.py:19
-#, fuzzy
-#| msgid "Command filter"
 msgid "Command filter acl"
 msgstr "命令过滤器"
 
@@ -5712,9 +5689,8 @@ msgid "Login asset"
 msgstr "登录资产"
 
 #: tickets/models/ticket/login_asset_confirm.py:17
-#, fuzzy
 msgid "Login account"
-msgstr "登录访问控制"
+msgstr "登录账号"
 
 #: tickets/models/ticket/login_confirm.py:12
 msgid "Login datetime"
@@ -6342,7 +6318,7 @@ msgstr "非本地用户仅允许从第三方平台登录，不支持修改密码
 
 #: users/views/profile/reset.py:149 users/views/profile/reset.py:160
 msgid "Token invalid or expired"
-msgstr "Token错误或失效"
+msgstr "令牌错误或失效"
 
 #: users/views/profile/reset.py:165
 msgid "User auth from {}, go there change password"
