@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-23 15:35+0800\n"
+"POT-Creation-Date: 2022-12-26 20:28+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -94,8 +94,8 @@ msgstr "激活中"
 #: authentication/models/sso_token.py:16
 #: notifications/models/notification.py:12
 #: perms/api/user_permission/mixin.py:55 perms/models/asset_permission.py:57
-#: rbac/builtin.py:120 rbac/models/rolebinding.py:41
-#: terminal/backends/command/models.py:20
+#: perms/serializers/permission.py:23 rbac/builtin.py:120
+#: rbac/models/rolebinding.py:41 terminal/backends/command/models.py:20
 #: terminal/backends/command/serializers.py:13
 #: terminal/models/session/session.py:29 terminal/models/session/sharing.py:32
 #: terminal/notifications.py:94 terminal/notifications.py:142
@@ -113,7 +113,8 @@ msgstr "用户"
 #: assets/serializers/domain.py:19 assets/serializers/gathered_user.py:11
 #: assets/serializers/label.py:27 audits/models.py:34
 #: authentication/models/connection_token.py:32
-#: perms/models/asset_permission.py:63 terminal/backends/command/models.py:21
+#: perms/models/asset_permission.py:63 perms/serializers/permission.py:27
+#: terminal/backends/command/models.py:21
 #: terminal/backends/command/serializers.py:14
 #: terminal/models/session/session.py:31 terminal/notifications.py:93
 #: xpack/plugins/cloud/models.py:220
@@ -363,9 +364,9 @@ msgstr "失败"
 #: assets/const/account.py:12 assets/models/_user.py:35
 #: audits/signal_handlers.py:49 authentication/confirm/password.py:9
 #: authentication/forms.py:32
-#: authentication/templates/authentication/login.html:260
+#: authentication/templates/authentication/login.html:288
 #: settings/serializers/auth/ldap.py:25 settings/serializers/auth/ldap.py:47
-#: users/forms/profile.py:22 users/serializers/user.py:90
+#: users/forms/profile.py:22 users/serializers/user.py:97
 #: users/templates/users/_msg_user_created.html:13
 #: users/templates/users/user_password_verify.html:18
 #: xpack/plugins/cloud/serializers/account_attrs.py:28
@@ -409,7 +410,7 @@ msgstr "验证账号"
 msgid "Gather accounts"
 msgstr "收集账号"
 
-#: assets/const/automation.py:38 assets/serializers/account/base.py:26
+#: assets/const/automation.py:38 assets/serializers/account/base.py:29
 msgid "Specific"
 msgstr "特有的"
 
@@ -634,15 +635,15 @@ msgstr "可以查看资产历史账号"
 msgid "Can view asset history account secret"
 msgstr "可以查看资产历史账号密码"
 
-#: assets/models/account.py:102 assets/serializers/account/account.py:15
+#: assets/models/account.py:106 assets/serializers/account/account.py:15
 msgid "Account template"
 msgstr "账号模版"
 
-#: assets/models/account.py:107
+#: assets/models/account.py:111
 msgid "Can view asset account template secret"
 msgstr "可以查看资产账号密码"
 
-#: assets/models/account.py:108
+#: assets/models/account.py:112
 msgid "Can change asset account template secret"
 msgstr "可以更改账号模版密码"
 
@@ -671,7 +672,7 @@ msgstr "节点"
 #: assets/models/base.py:71 assets/models/cmd_filter.py:39
 #: assets/models/label.py:22
 #: authentication/serializers/connect_token_secret.py:106
-#: terminal/models/applet/applet.py:27 users/serializers/user.py:151
+#: terminal/models/applet/applet.py:27 users/serializers/user.py:158
 msgid "Is active"
 msgstr "激活"
 
@@ -944,7 +945,8 @@ msgid "Privileged"
 msgstr "特权账号"
 
 #: assets/models/cmd_filter.py:28 perms/models/asset_permission.py:60
-#: users/models/group.py:25 users/models/user.py:681
+#: perms/serializers/permission.py:25 users/models/group.py:25
+#: users/models/user.py:681
 msgid "User group"
 msgstr "用户组"
 
@@ -1062,7 +1064,8 @@ msgstr "全称"
 msgid "Parent key"
 msgstr "ssh私钥"
 
-#: assets/models/node.py:566 xpack/plugins/cloud/models.py:96
+#: assets/models/node.py:566 perms/serializers/permission.py:28
+#: xpack/plugins/cloud/models.py:96
 msgid "Node"
 msgstr "节点"
 
@@ -1208,6 +1211,7 @@ msgid "Push now"
 msgstr "立即推送"
 
 #: assets/serializers/account/account.py:20
+#: assets/serializers/account/base.py:13
 msgid "Has secret"
 msgstr "已托管密码"
 
@@ -1700,7 +1704,7 @@ msgid ""
 msgstr "用户来自 {} 请去相应系统修改密码"
 
 #: authentication/api/password.py:59
-#: authentication/templates/authentication/login.html:289
+#: authentication/templates/authentication/login.html:319
 #: users/templates/users/forgot_password.html:27
 #: users/templates/users/forgot_password.html:28
 #: users/templates/users/forgot_password_previewing.html:13
@@ -2166,7 +2170,7 @@ msgid "The {} cannot be empty"
 msgstr "{} 不能为空"
 
 #: authentication/serializers/token.py:79 perms/serializers/permission.py:30
-#: perms/serializers/permission.py:61 users/serializers/user.py:152
+#: perms/serializers/permission.py:61 users/serializers/user.py:159
 msgid "Is valid"
 msgstr "账号是否有效"
 
@@ -2347,16 +2351,13 @@ msgstr "如果这次公钥更新不是由你发起的，那么你的账号可能
 msgid "Cancel"
 msgstr "取消"
 
-#: authentication/templates/authentication/login.html:235
-msgid "Welcome back, please enter username and password to login"
-msgstr "欢迎回来，请输入用户名和密码登录"
-
-#: authentication/templates/authentication/login.html:297
+#: authentication/templates/authentication/login.html:254
+#: authentication/templates/authentication/login.html:327
 #: templates/_header_bar.html:89
 msgid "Login"
 msgstr "登录"
 
-#: authentication/templates/authentication/login.html:304
+#: authentication/templates/authentication/login.html:334
 msgid "More login options"
 msgstr "其他方式登录"
 
@@ -2624,6 +2625,10 @@ msgstr "错误的数据类型，应该是列表"
 msgid "Invalid choice: {}"
 msgstr "无效选项: {}"
 
+#: common/drf/metadata.py:130
+msgid "Organization ID"
+msgstr "组织 ID"
+
 #: common/drf/parsers/base.py:17
 msgid "The file content overflowed (The maximum length `{}` bytes)"
 msgstr "文件内容太大 (最大长度 `{}` 字节)"
@@ -2798,7 +2803,7 @@ msgstr "创建账号成功"
 msgid "Your account has been created successfully"
 msgstr "你的账号已创建成功"
 
-#: jumpserver/context_processor.py:13
+#: jumpserver/context_processor.py:12
 msgid "JumpServer Open Source Bastion Host"
 msgstr "JumpServer 开源堡垒机"
 
@@ -3053,11 +3058,11 @@ msgstr "作业"
 msgid "Parameters"
 msgstr ""
 
-#: ops/models/job.py:288
+#: ops/models/job.py:300
 msgid "Job Execution"
 msgstr "作业执行"
 
-#: ops/models/job.py:299
+#: ops/models/job.py:311
 msgid "Job audit log"
 msgstr "作业审计日志"
 
@@ -3089,15 +3094,15 @@ msgstr "内存使用率超过 {max_threshold}%: => {value}"
 msgid "CPU load more than {max_threshold}: => {value}"
 msgstr "CPU 使用率超过 {max_threshold}: => {value}"
 
-#: ops/serializers/job.py:12
+#: ops/serializers/job.py:14
 msgid "Run after save"
 msgstr "保存后执行"
 
-#: ops/serializers/job.py:31
+#: ops/serializers/job.py:43
 msgid "Job type"
 msgstr "任务类型"
 
-#: ops/serializers/job.py:32
+#: ops/serializers/job.py:44
 msgid "Material"
 msgstr ""
 
@@ -3323,7 +3328,7 @@ msgid "asset permissions of organization {}"
 msgstr "组织 ({}) 的资产授权"
 
 #: perms/serializers/permission.py:31 perms/serializers/permission.py:60
-#: users/serializers/user.py:85 users/serializers/user.py:154
+#: users/serializers/user.py:91 users/serializers/user.py:161
 msgid "Is expired"
 msgstr "已过期"
 
@@ -5930,7 +5935,7 @@ msgstr "强制启用"
 msgid "Local"
 msgstr "数据库"
 
-#: users/models/user.py:687 users/serializers/user.py:153
+#: users/models/user.py:687 users/serializers/user.py:160
 msgid "Is service account"
 msgstr "服务账号"
 
@@ -5959,7 +5964,7 @@ msgid "Secret key"
 msgstr "Secret key"
 
 #: users/models/user.py:716 users/serializers/profile.py:149
-#: users/serializers/user.py:150
+#: users/serializers/user.py:157
 msgid "Is first login"
 msgstr "首次登录"
 
@@ -6046,51 +6051,51 @@ msgstr "新密码不能是最近 {} 次的密码"
 msgid "The newly set password is inconsistent"
 msgstr "两次密码不一致"
 
-#: users/serializers/user.py:29
+#: users/serializers/user.py:31
 msgid "System roles"
 msgstr "系统角色"
 
-#: users/serializers/user.py:30
+#: users/serializers/user.py:35
 msgid "Org roles"
 msgstr "组织角色"
 
-#: users/serializers/user.py:78
+#: users/serializers/user.py:84
 msgid "Password strategy"
 msgstr "密码策略"
 
-#: users/serializers/user.py:80
+#: users/serializers/user.py:86
 msgid "MFA enabled"
 msgstr "MFA 已启用"
 
-#: users/serializers/user.py:82
+#: users/serializers/user.py:88
 msgid "MFA force enabled"
 msgstr "强制 MFA"
 
-#: users/serializers/user.py:84
+#: users/serializers/user.py:90
 msgid "Login blocked"
 msgstr "登录被阻塞"
 
-#: users/serializers/user.py:87
+#: users/serializers/user.py:93
 msgid "Can public key authentication"
 msgstr "能否公钥认证"
 
-#: users/serializers/user.py:155
+#: users/serializers/user.py:162
 msgid "Avatar url"
 msgstr "头像路径"
 
-#: users/serializers/user.py:158
+#: users/serializers/user.py:165
 msgid "Is OTP bound"
 msgstr "是否绑定了虚拟 MFA"
 
-#: users/serializers/user.py:265
+#: users/serializers/user.py:272
 msgid "Select users"
 msgstr "选择用户"
 
-#: users/serializers/user.py:266
+#: users/serializers/user.py:273
 msgid "For security, only list several users"
 msgstr "为了安全，仅列出几个用户"
 
-#: users/serializers/user.py:300
+#: users/serializers/user.py:307
 msgid "name not unique"
 msgstr "名称重复"
 
@@ -6907,6 +6912,9 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Welcome back, please enter username and password to login"
+#~ msgstr "欢迎回来，请输入用户名和密码登录"
 
 #~ msgid "Discovery account automation"
 #~ msgstr "账号发现"

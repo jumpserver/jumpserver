@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-23 15:35+0800\n"
+"POT-Creation-Date: 2022-12-26 20:28+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -95,8 +95,8 @@ msgstr "アクティブ"
 #: authentication/models/sso_token.py:16
 #: notifications/models/notification.py:12
 #: perms/api/user_permission/mixin.py:55 perms/models/asset_permission.py:57
-#: rbac/builtin.py:120 rbac/models/rolebinding.py:41
-#: terminal/backends/command/models.py:20
+#: perms/serializers/permission.py:23 rbac/builtin.py:120
+#: rbac/models/rolebinding.py:41 terminal/backends/command/models.py:20
 #: terminal/backends/command/serializers.py:13
 #: terminal/models/session/session.py:29 terminal/models/session/sharing.py:32
 #: terminal/notifications.py:94 terminal/notifications.py:142
@@ -114,7 +114,8 @@ msgstr "ユーザー"
 #: assets/serializers/domain.py:19 assets/serializers/gathered_user.py:11
 #: assets/serializers/label.py:27 audits/models.py:34
 #: authentication/models/connection_token.py:32
-#: perms/models/asset_permission.py:63 terminal/backends/command/models.py:21
+#: perms/models/asset_permission.py:63 perms/serializers/permission.py:27
+#: terminal/backends/command/models.py:21
 #: terminal/backends/command/serializers.py:14
 #: terminal/models/session/session.py:31 terminal/notifications.py:93
 #: xpack/plugins/cloud/models.py:220
@@ -369,9 +370,9 @@ msgstr "失敗しました"
 #: assets/const/account.py:12 assets/models/_user.py:35
 #: audits/signal_handlers.py:49 authentication/confirm/password.py:9
 #: authentication/forms.py:32
-#: authentication/templates/authentication/login.html:260
+#: authentication/templates/authentication/login.html:288
 #: settings/serializers/auth/ldap.py:25 settings/serializers/auth/ldap.py:47
-#: users/forms/profile.py:22 users/serializers/user.py:90
+#: users/forms/profile.py:22 users/serializers/user.py:97
 #: users/templates/users/_msg_user_created.html:13
 #: users/templates/users/user_password_verify.html:18
 #: xpack/plugins/cloud/serializers/account_attrs.py:28
@@ -421,7 +422,7 @@ msgstr "パスワード/キーの確認"
 msgid "Gather accounts"
 msgstr "アカウントを集める"
 
-#: assets/const/automation.py:38 assets/serializers/account/base.py:26
+#: assets/const/automation.py:38 assets/serializers/account/base.py:29
 msgid "Specific"
 msgstr ""
 
@@ -651,17 +652,17 @@ msgstr "資産履歴アカウントを表示できます"
 msgid "Can view asset history account secret"
 msgstr "資産履歴アカウントパスワードを表示できます"
 
-#: assets/models/account.py:102 assets/serializers/account/account.py:15
+#: assets/models/account.py:106 assets/serializers/account/account.py:15
 #, fuzzy
 msgid "Account template"
 msgstr "アカウント名"
 
-#: assets/models/account.py:107
+#: assets/models/account.py:111
 #, fuzzy
 msgid "Can view asset account template secret"
 msgstr "資産アカウントの秘密を表示できます"
 
-#: assets/models/account.py:108
+#: assets/models/account.py:112
 #, fuzzy
 msgid "Can change asset account template secret"
 msgstr "資産口座の秘密を変更できます"
@@ -691,7 +692,7 @@ msgstr "ノード"
 #: assets/models/base.py:71 assets/models/cmd_filter.py:39
 #: assets/models/label.py:22
 #: authentication/serializers/connect_token_secret.py:106
-#: terminal/models/applet/applet.py:27 users/serializers/user.py:151
+#: terminal/models/applet/applet.py:27 users/serializers/user.py:158
 msgid "Is active"
 msgstr "アクティブです。"
 
@@ -985,7 +986,8 @@ msgid "Privileged"
 msgstr ""
 
 #: assets/models/cmd_filter.py:28 perms/models/asset_permission.py:60
-#: users/models/group.py:25 users/models/user.py:681
+#: perms/serializers/permission.py:25 users/models/group.py:25
+#: users/models/user.py:681
 msgid "User group"
 msgstr "ユーザーグループ"
 
@@ -1104,7 +1106,8 @@ msgstr "フルバリュー"
 msgid "Parent key"
 msgstr "親キー"
 
-#: assets/models/node.py:566 xpack/plugins/cloud/models.py:96
+#: assets/models/node.py:566 perms/serializers/permission.py:28
+#: xpack/plugins/cloud/models.py:96
 msgid "Node"
 msgstr "ノード"
 
@@ -1267,6 +1270,7 @@ msgid "Push now"
 msgstr ""
 
 #: assets/serializers/account/account.py:20
+#: assets/serializers/account/base.py:13
 #, fuzzy
 msgid "Has secret"
 msgstr "ひみつ"
@@ -1781,7 +1785,7 @@ msgstr ""
 "さい。"
 
 #: authentication/api/password.py:59
-#: authentication/templates/authentication/login.html:289
+#: authentication/templates/authentication/login.html:319
 #: users/templates/users/forgot_password.html:27
 #: users/templates/users/forgot_password.html:28
 #: users/templates/users/forgot_password_previewing.html:13
@@ -2266,7 +2270,7 @@ msgid "The {} cannot be empty"
 msgstr "{} 空にしてはならない"
 
 #: authentication/serializers/token.py:79 perms/serializers/permission.py:30
-#: perms/serializers/permission.py:61 users/serializers/user.py:152
+#: perms/serializers/permission.py:61 users/serializers/user.py:159
 msgid "Is valid"
 msgstr "有効です"
 
@@ -2455,17 +2459,13 @@ msgstr ""
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: authentication/templates/authentication/login.html:235
-msgid "Welcome back, please enter username and password to login"
-msgstr ""
-"おかえりなさい、ログインするためにユーザー名とパスワードを入力してください"
-
-#: authentication/templates/authentication/login.html:297
+#: authentication/templates/authentication/login.html:254
+#: authentication/templates/authentication/login.html:327
 #: templates/_header_bar.html:89
 msgid "Login"
 msgstr "ログイン"
 
-#: authentication/templates/authentication/login.html:304
+#: authentication/templates/authentication/login.html:334
 msgid "More login options"
 msgstr "その他のログインオプション"
 
@@ -2735,6 +2735,10 @@ msgstr ""
 msgid "Invalid choice: {}"
 msgstr "無効なIP"
 
+#: common/drf/metadata.py:130
+msgid "Organization ID"
+msgstr "組織 ID"
+
 #: common/drf/parsers/base.py:17
 msgid "The file content overflowed (The maximum length `{}` bytes)"
 msgstr "ファイルの内容がオーバーフローしました (最大長 '{}' バイト)"
@@ -2912,7 +2916,7 @@ msgstr "アカウントを正常に作成"
 msgid "Your account has been created successfully"
 msgstr "アカウントが正常に作成されました"
 
-#: jumpserver/context_processor.py:13
+#: jumpserver/context_processor.py:12
 msgid "JumpServer Open Source Bastion Host"
 msgstr "JumpServer オープンソースの要塞ホスト"
 
@@ -3039,6 +3043,12 @@ msgstr "特権アカウント優先"
 #: ops/const.py:40
 msgid "Skip"
 msgstr "スキップ"
+
+#: ops/const.py:45 ops/models/adhoc.py:20
+#, fuzzy
+#| msgid "PowerShell"
+msgid "Powershell"
+msgstr "PowerShell"
 
 #: ops/exception.py:6
 msgid "no valid program entry found."
@@ -3176,11 +3186,11 @@ msgstr "ジョブ＃ジョブ＃"
 msgid "Parameters"
 msgstr "パラメータ"
 
-#: ops/models/job.py:288
+#: ops/models/job.py:300
 msgid "Job Execution"
 msgstr "ジョブ実行"
 
-#: ops/models/job.py:299
+#: ops/models/job.py:311
 msgid "Job audit log"
 msgstr "ジョブ監査ログ"
 
@@ -3212,17 +3222,17 @@ msgstr "{max_threshold}%: => {value} を超える使用メモリ"
 msgid "CPU load more than {max_threshold}: => {value}"
 msgstr "{max_threshold} を超えるCPUロード: => {value}"
 
-#: ops/serializers/job.py:12
+#: ops/serializers/job.py:14
 #, fuzzy
 msgid "Run after save"
 msgstr "システムユーザーの実行"
 
-#: ops/serializers/job.py:31
+#: ops/serializers/job.py:43
 #, fuzzy
 msgid "Job type"
 msgstr "Docタイプ"
 
-#: ops/serializers/job.py:32
+#: ops/serializers/job.py:44
 msgid "Material"
 msgstr "マテリアル"
 
@@ -3458,7 +3468,7 @@ msgid "asset permissions of organization {}"
 msgstr "組織 {} の資産権限"
 
 #: perms/serializers/permission.py:31 perms/serializers/permission.py:60
-#: users/serializers/user.py:85 users/serializers/user.py:154
+#: users/serializers/user.py:91 users/serializers/user.py:161
 msgid "Is expired"
 msgstr "期限切れです"
 
@@ -6131,7 +6141,7 @@ msgstr "強制有効"
 msgid "Local"
 msgstr "ローカル"
 
-#: users/models/user.py:687 users/serializers/user.py:153
+#: users/models/user.py:687 users/serializers/user.py:160
 msgid "Is service account"
 msgstr "サービスアカウントです"
 
@@ -6160,7 +6170,7 @@ msgid "Secret key"
 msgstr "秘密キー"
 
 #: users/models/user.py:716 users/serializers/profile.py:149
-#: users/serializers/user.py:150
+#: users/serializers/user.py:157
 msgid "Is first login"
 msgstr "最初のログインです"
 
@@ -6247,51 +6257,51 @@ msgstr "新しいパスワードを最後の {} 個のパスワードにする�
 msgid "The newly set password is inconsistent"
 msgstr "新しく設定されたパスワードが一致しない"
 
-#: users/serializers/user.py:29
+#: users/serializers/user.py:31
 msgid "System roles"
 msgstr "システムの役割"
 
-#: users/serializers/user.py:30
+#: users/serializers/user.py:35
 msgid "Org roles"
 msgstr "組織ロール"
 
-#: users/serializers/user.py:78
+#: users/serializers/user.py:84
 msgid "Password strategy"
 msgstr "パスワード戦略"
 
-#: users/serializers/user.py:80
+#: users/serializers/user.py:86
 msgid "MFA enabled"
 msgstr "MFA有効化"
 
-#: users/serializers/user.py:82
+#: users/serializers/user.py:88
 msgid "MFA force enabled"
 msgstr "MFAフォース有効化"
 
-#: users/serializers/user.py:84
+#: users/serializers/user.py:90
 msgid "Login blocked"
 msgstr "ログインブロック"
 
-#: users/serializers/user.py:87
+#: users/serializers/user.py:93
 msgid "Can public key authentication"
 msgstr "公開鍵認証が可能"
 
-#: users/serializers/user.py:155
+#: users/serializers/user.py:162
 msgid "Avatar url"
 msgstr "アバターURL"
 
-#: users/serializers/user.py:158
+#: users/serializers/user.py:165
 msgid "Is OTP bound"
 msgstr "仮想MFAがバインドされているか"
 
-#: users/serializers/user.py:265
+#: users/serializers/user.py:272
 msgid "Select users"
 msgstr "ユーザーの選択"
 
-#: users/serializers/user.py:266
+#: users/serializers/user.py:273
 msgid "For security, only list several users"
 msgstr "セキュリティのために、複数のユーザーのみをリストします"
 
-#: users/serializers/user.py:300
+#: users/serializers/user.py:307
 msgid "name not unique"
 msgstr "名前が一意ではない"
 
@@ -7123,6 +7133,10 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "コミュニティ版"
+
+#~ msgid "Welcome back, please enter username and password to login"
+#~ msgstr ""
+#~ "おかえりなさい、ログインするためにユーザー名とパスワードを入力してください"
 
 #, fuzzy
 #~ msgid "Run account"
