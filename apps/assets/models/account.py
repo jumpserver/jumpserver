@@ -82,6 +82,10 @@ class Account(AbsConnectivity, BaseAccount):
     def __str__(self):
         return '{}'.format(self.username)
 
+    @lazyproperty
+    def has_secret(self):
+        return bool(self.secret)
+
     @classmethod
     def get_manual_account(cls):
         """ @INPUT 手动登录的账号(any) """
