@@ -122,6 +122,10 @@ class SimpleMetadataWithFilters(SimpleMetadata):
             self.set_tree_field(field, field_info)
         elif isinstance(field, serializers.ChoiceField):
             self.set_choices_field(field, field_info)
+
+        if field.field_name == 'id':
+            field_info['label'] = 'ID'
+
         return field_info
 
     @staticmethod

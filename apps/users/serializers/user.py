@@ -83,8 +83,9 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
     )
     login_blocked = serializers.BooleanField(read_only=True, label=_("Login blocked"))
     is_expired = serializers.BooleanField(read_only=True, label=_("Is expired"))
-    can_public_key_auth = serializers.ReadOnlyField(
-        source="can_use_ssh_key_login", label=_("Can public key authentication")
+    can_public_key_auth = serializers.BooleanField(
+        source="can_use_ssh_key_login", label=_("Can public key authentication"),
+        read_only=True
     )
     password = EncryptedField(
         label=_("Password"),
