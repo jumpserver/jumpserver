@@ -20,12 +20,12 @@ class ActionChoicesField(BitChoicesField):
 
 
 class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
-    users = ObjectRelatedField(queryset=User.objects, many=True, required=False)
+    users = ObjectRelatedField(queryset=User.objects, many=True, required=False, label=_('User'))
     user_groups = ObjectRelatedField(
-        queryset=UserGroup.objects, many=True, required=False
+        queryset=UserGroup.objects, many=True, required=False, label=_('User group')
     )
-    assets = ObjectRelatedField(queryset=Asset.objects, many=True, required=False)
-    nodes = ObjectRelatedField(queryset=Node.objects, many=True, required=False)
+    assets = ObjectRelatedField(queryset=Asset.objects, many=True, required=False, label=_('Asset'))
+    nodes = ObjectRelatedField(queryset=Node.objects, many=True, required=False, label=_('Node'))
     actions = ActionChoicesField(required=False, allow_null=True, label=_("Actions"))
     is_valid = serializers.BooleanField(read_only=True, label=_("Is valid"))
     is_expired = serializers.BooleanField(read_only=True, label=_("Is expired"))
