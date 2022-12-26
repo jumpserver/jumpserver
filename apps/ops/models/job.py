@@ -166,6 +166,10 @@ class JobExecution(JMSOrgBaseModel):
             return
         result = self.current_job.args
         result += " chdir={}".format(self.current_job.chdir)
+
+        if self.current_job.module in ['python']:
+            result += " executable={}".format(self.current_job.module)
+        print(result)
         return self.job.args
 
     def get_runner(self):
@@ -187,9 +191,17 @@ class JobExecution(JMSOrgBaseModel):
 
         if self.current_job.type == 'adhoc':
             args = self.compile_shell()
+            module = "shell"
+            if self.current_job.module not in ['python']:
+                module = self.current_job.module
+
             runner = AdHocRunner(
-                self.inventory_path, self.current_job.module, module_args=args,
-                pattern="all", project_dir=self.private_dir, extra_vars=extra_vars,
+                self.inventory_path,
+                module,
+                module_args=args,
+                pattern="all",
+                project_dir=self.private_dir,
+                extra_vars=extra_vars,
             )
         elif self.current_job.type == 'playbook':
             runner = PlaybookRunner(
