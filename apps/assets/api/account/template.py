@@ -1,9 +1,6 @@
 from assets import serializers
 from assets.models import AccountTemplate
-from rbac.permissions import RBACPermission
-from authentication.const import ConfirmType
 from common.mixins import RecordViewLogMixin
-from common.permissions import UserConfirmation
 from orgs.mixins.api import OrgBulkModelViewSet
 
 

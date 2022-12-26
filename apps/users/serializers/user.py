@@ -26,8 +26,14 @@ logger = get_logger(__file__)
 
 
 class RolesSerializerMixin(serializers.Serializer):
-    system_roles = ObjectRelatedField(queryset=Role.system_roles, label=_("System roles"), many=True)
-    org_roles = ObjectRelatedField(queryset=Role.org_roles, label=_("Org roles"), many=True)
+    system_roles = ObjectRelatedField(
+        queryset=Role.system_roles, attrs=('id', 'display_name'),
+        label=_("System roles"), many=True
+    )
+    org_roles = ObjectRelatedField(
+        queryset=Role.org_roles, attrs=('id', 'display_name'),
+        label=_("Org roles"), many=True
+    )
 
     @staticmethod
     def get_system_roles_display(user):

@@ -13,7 +13,8 @@ class AdHocRunner:
         "reboot", 'shutdown', 'poweroff', 'halt', 'dd', 'half', 'top'
     ]
 
-    def __init__(self, inventory, module, module_args='', pattern='*', project_dir='/tmp/', extra_vars={}):
+    def __init__(self, inventory, module, module_args='', pattern='*', project_dir='/tmp/', extra_vars={},
+                 dry_run=False):
         self.id = uuid.uuid4()
         self.inventory = inventory
         self.pattern = pattern
@@ -23,6 +24,7 @@ class AdHocRunner:
         self.cb = DefaultCallback()
         self.runner = None
         self.extra_vars = extra_vars
+        self.dry_run = dry_run
 
     def check_module(self):
         if self.module not in self.cmd_modules_choices:

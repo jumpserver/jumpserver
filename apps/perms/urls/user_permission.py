@@ -25,23 +25,25 @@ user_permission_urlpatterns = [
          name='user-direct-assets-as-tree'),
     path('<str:user>/ungroup/assets/tree/', api.UserUngroupAssetsAsTreeApi.as_view(),
          name='user-ungroup-assets-as-tree'),
-    # tree-node
+
+    # tree-node，不包含资产
     path('<str:user>/nodes/tree/', api.UserAllPermedNodesAsTreeApi.as_view(),
          name='user-all-nodes-as-tree'),
     path('<str:user>/nodes/children/tree/', api.UserPermedNodeChildrenAsTreeApi.as_view(),
          name='user-node-children-as-tree'),
+
     # tree-node-with-asset
     # 异步树
     path('<str:user>/nodes/children-with-assets/tree/',
          api.UserPermedNodeChildrenWithAssetsAsTreeApi.as_view(),
          name='user-node-children-with-assets-as-tree'),
+    # 同步树
+    path('<str:user>/nodes/all-with-assets/tree/',
+         api.UserPermedNodesWithAssetsAsTreeApi.as_view(),
+         name='user-nodes-with-assets-as-tree'),
     path('<str:user>/nodes/children-with-k8s/tree/',
          api.UserGrantedK8sAsTreeApi.as_view(),
          name='user-nodes-children-with-k8s-as-tree'),
-
-    # 同步树
-    path('<str:user>/nodes-with-assets/tree/', api.UserPermedNodesWithAssetsAsTreeApi.as_view(),
-         name='user-nodes-with-assets-as-tree'),
     # accounts
     path('<str:user>/assets/<uuid:asset_id>/accounts/', api.UserPermedAssetAccountsApi.as_view(),
          name='user-permed-asset-accounts'),

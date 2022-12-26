@@ -1,5 +1,5 @@
-from common.drf.serializers import SecretReadableMixin
 from assets.models import AccountTemplate
+from common.drf.serializers import SecretReadableMixin
 from .base import BaseAccountSerializer
 
 
