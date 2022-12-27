@@ -165,12 +165,11 @@ class JobExecution(JMSOrgBaseModel):
         if self.current_job.type != 'adhoc':
             return
         result = self.current_job.args
-        result += " chdir={}".format(self.current_job.chdir)
-
+        if self.current_job.chdir:
+            result += " chdir={}".format(self.current_job.chdir)
         if self.current_job.module in ['python']:
             result += " executable={}".format(self.current_job.module)
-        print(result)
-        return self.job.args
+        return result
 
     def get_runner(self):
         inv = self.current_job.inventory
@@ -238,7 +237,7 @@ class JobExecution(JMSOrgBaseModel):
 
     @property
     def is_finished(self):
-        return self.status in [JobStatus.success, JobStatus.failed]
+        return self.status in [JobStatus.success, JobStatus.failed, JobStatus.timeout]
 
     @property
     def is_success(self):
