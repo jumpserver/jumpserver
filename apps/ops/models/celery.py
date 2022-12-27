@@ -46,6 +46,9 @@ class CeleryTask(models.Model):
     class Meta:
         verbose_name = _("Celery Task")
         ordering = ('name',)
+        permissions = [
+            ('view_taskmonitor', _('Can view task monitor'))
+        ]
 
 
 class CeleryTaskExecution(models.Model):
