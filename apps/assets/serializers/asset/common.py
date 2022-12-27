@@ -68,7 +68,6 @@ class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSeriali
     labels = AssetLabelSerializer(many=True, required=False, label=_('Labels'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
     accounts = AssetAccountSerializer(many=True, required=False, label=_('Account'))
-    enabled_info = serializers.SerializerMethodField()
 
     class Meta:
         model = Asset
