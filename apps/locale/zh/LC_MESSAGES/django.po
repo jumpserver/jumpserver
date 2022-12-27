@@ -1137,7 +1137,7 @@ msgstr "元数据"
 
 #: assets/models/platform.py:75
 msgid "Internal"
-msgstr "内部的"
+msgstr "内置"
 
 #: assets/models/platform.py:79 assets/serializers/platform.py:84
 msgid "Charset"
