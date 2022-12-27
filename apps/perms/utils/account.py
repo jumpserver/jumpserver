@@ -1,6 +1,7 @@
 from collections import defaultdict
 
 from assets.models import Account
+from assets.const import AliasAccount
 from .permission import AssetPermissionUtil
 
 __all__ = ['PermAccountUtil']
@@ -44,21 +45,21 @@ class PermAccountUtil(AssetPermissionUtil):
         cleaned_accounts_expired = defaultdict(list)
 
         # @ALL 账号先处理，后面的每个最多映射一个账号
-        all_action_bit = alias_action_bit_mapper.pop(Account.AliasAccount.ALL, None)
+        all_action_bit = alias_action_bit_mapper.pop(AliasAccount.ALL, None)
         if all_action_bit:
             for account in asset_accounts:
                 cleaned_accounts_action_bit[account] |= all_action_bit
                 cleaned_accounts_expired[account].extend(
-                    alias_expired_mapper[Account.AliasAccount.ALL]
+                    alias_expired_mapper[AliasAccount.ALL]
                 )
 
         for alias, action_bit in alias_action_bit_mapper.items():
-            if alias == Account.AliasAccount.USER:
+            if alias == AliasAccount.USER:
                 if user.username in username_account_mapper:
                     account = username_account_mapper[user.username]
                 else:
                     account = Account.get_user_account(user.username)
-            elif alias == Account.AliasAccount.INPUT:
+            elif alias == AliasAccount.INPUT:
                 account = Account.get_manual_account()
             elif alias in username_account_mapper:
                 account = username_account_mapper[alias]
