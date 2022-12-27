@@ -1,18 +1,18 @@
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
-from rest_framework.response import Response
 from rest_framework import status, mixins, viewsets
+from rest_framework.response import Response
 
-from orgs.mixins import generics
 from assets import serializers
-from assets.tasks import execute_automation
 from assets.models import BaseAutomation, AutomationExecution
+from assets.tasks import execute_automation
 from common.const.choices import Trigger
+from orgs.mixins import generics
 
 __all__ = [
     'AutomationAssetsListApi', 'AutomationRemoveAssetApi',
     'AutomationAddAssetApi', 'AutomationNodeAddRemoveApi',
-    'ChangSecretExecutionViewSet', 'GatherAccountsExecutionViewSet',
+    'AutomationExecutionViewSet',
 ]
 
 
@@ -115,19 +115,3 @@ class AutomationExecutionViewSet(
             pid=automation.pk, trigger=Trigger.manual, tp=tp
         )
         return Response({'task': task.id}, status=status.HTTP_201_CREATED)
-
-
-class ChangSecretExecutionViewSet(AutomationExecutionViewSet):
-    rbac_perms = (
-        ("list", "assets.view_changesecretexecution"),
-        ("retrieve", "assets.view_changesecretexecution"),
-        ("create", "assets.add_changesecretexecution"),
-    )
-
-
-class GatherAccountsExecutionViewSet(AutomationExecutionViewSet):
-    rbac_perms = (
-        ("list", "assets.view_gatheraccountsexecution"),
-        ("retrieve", "assets.view_gatheraccountsexecution"),
-        ("create", "assets.add_gatheraccountsexecution"),
-    )

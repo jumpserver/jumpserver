@@ -12,7 +12,7 @@ DEFAULT_PASSWORD_RULES = {
 class AutomationTypes(TextChoices):
     ping = 'ping', _('Ping')
     gather_facts = 'gather_facts', _('Gather facts')
-    push_account = 'push_account', _('Create account')
+    push_account = 'push_account', _('Push account')
     change_secret = 'change_secret', _('Change secret')
     verify_account = 'verify_account', _('Verify account')
     gather_accounts = 'gather_accounts', _('Gather accounts')
@@ -20,8 +20,9 @@ class AutomationTypes(TextChoices):
     @classmethod
     def get_type_model(cls, tp):
         from assets.models import (
-            PingAutomation, GatherFactsAutomation, PushAccountAutomation,
-            ChangeSecretAutomation, VerifyAccountAutomation, GatherAccountsAutomation,
+            PingAutomation, GatherFactsAutomation,
+            PushAccountAutomation, ChangeSecretAutomation,
+            VerifyAccountAutomation, GatherAccountsAutomation,
         )
         type_model_dict = {
             cls.ping: PingAutomation,

@@ -317,10 +317,11 @@ class SomeFieldsMixin:
     instance: None
     initial_data: dict
     common_fields = (
-        'comment', 'created_by', 'date_created', 'date_updated',
+        'comment', 'created_by', 'updated_by',
+        'date_created', 'date_updated',
     )
     secret_fields = (
-        'password', 'token', 'secret', 'key', 'private_key', 'public_key',
+        'password', 'token', 'secret', 'key', 'private_key'
     )
 
     def get_initial_value(self, attr, default=None):
@@ -335,7 +336,9 @@ class SomeFieldsMixin:
     def get_fields(self):
         fields = super().get_fields()
         for name, field in fields.items():
-            if name in self.secret_fields and \
+            if name == 'id':
+                field.label = 'ID'
+            elif name in self.secret_fields and \
                     not isinstance(self, SecretReadableMixin):
                 field.write_only = True
         return fields

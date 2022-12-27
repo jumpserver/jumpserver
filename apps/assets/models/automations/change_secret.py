@@ -1,15 +1,15 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from assets.const import AutomationTypes, SecretType, SecretStrategy, SSHKeyStrategy
 from common.db import fields
 from common.db.models import JMSBaseModel
-from assets.const import AutomationTypes, SecretType, SecretStrategy, SSHKeyStrategy
 from .base import BaseAutomation
 
-__all__ = ['ChangeSecretAutomation', 'ChangeSecretRecord']
+__all__ = ['ChangeSecretAutomation', 'ChangeSecretRecord', 'ChangeSecretMixin']
 
 
-class ChangeSecretAutomation(BaseAutomation):
+class ChangeSecretMixin(models.Model):
     secret_type = models.CharField(
         choices=SecretType.choices, max_length=16,
         default=SecretType.PASSWORD, verbose_name=_('Secret type')
@@ -24,6 +24,12 @@ class ChangeSecretAutomation(BaseAutomation):
         choices=SSHKeyStrategy.choices, max_length=16,
         default=SSHKeyStrategy.add, verbose_name=_('SSH key change strategy')
     )
+
+    class Meta:
+        abstract = True
+
+
+class ChangeSecretAutomation(BaseAutomation, ChangeSecretMixin):
     recipients = models.ManyToManyField('users.User', verbose_name=_("Recipient"), blank=True)
 
     def save(self, *args, **kwargs):

@@ -76,7 +76,6 @@ class HostTypes(BaseType):
                 {'name': 'macOS'},
                 {'name': 'BSD'},
                 {'name': 'AIX', 'automation': {
-                    'push_account_method': 'push_account_aix',
                     'change_secret_method': 'push_secret_aix'
                 }}
             ],
