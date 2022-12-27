@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-26 20:28+0800\n"
+"POT-Creation-Date: 2022-12-27 12:11+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1246,11 +1246,15 @@ msgstr "协议组"
 msgid "Address"
 msgstr "地址"
 
-#: assets/serializers/asset/common.py:156
+#: assets/serializers/asset/common.py:89
+msgid "Node path"
+msgstr "节点路径"
+
+#: assets/serializers/asset/common.py:157
 msgid "Platform not exist"
 msgstr "平台不存在"
 
-#: assets/serializers/asset/common.py:172
+#: assets/serializers/asset/common.py:173
 msgid "Protocol is required: {}"
 msgstr "协议是必填的: {}"
 
@@ -7216,9 +7220,6 @@ msgstr "社区版"
 
 #~ msgid "Apps amount"
 #~ msgstr "应用数量"
-
-#~ msgid "Nodes amount"
-#~ msgstr "节点数量"
 
 #~ msgid "Login mode display"
 #~ msgstr "认证方式名称"

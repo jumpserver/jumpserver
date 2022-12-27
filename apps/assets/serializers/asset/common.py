@@ -66,7 +66,7 @@ class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSeriali
     nodes = ObjectRelatedField(many=True, required=False, queryset=Node.objects, label=_('Nodes'))
     labels = AssetLabelSerializer(many=True, required=False, label=_('Labels'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
-    accounts = AssetAccountSerializer(many=True, required=False, label=_('Accounts'))
+    accounts = AssetAccountSerializer(many=True, required=False, label=_('Account'))
     enabled_info = serializers.SerializerMethodField()
 
     class Meta:
@@ -86,6 +86,7 @@ class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSeriali
         extra_kwargs = {
             'name': {'label': _("Name")},
             'address': {'label': _('Address')},
+            'nodes_display': {'label': _('Node path')},
         }
 
     def get_field_names(self, declared_fields, info):

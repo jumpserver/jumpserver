@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-26 20:28+0800\n"
+"POT-Creation-Date: 2022-12-27 12:11+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1308,12 +1308,16 @@ msgstr "プロトコル"
 msgid "Address"
 msgstr "アドレス"
 
-#: assets/serializers/asset/common.py:156
+#: assets/serializers/asset/common.py:89
+msgid "Node path"
+msgstr "ノードパスです"
+
+#: assets/serializers/asset/common.py:157
 #, fuzzy
 msgid "Platform not exist"
 msgstr "アプリが存在しません"
 
-#: assets/serializers/asset/common.py:172
+#: assets/serializers/asset/common.py:173
 #, fuzzy
 msgid "Protocol is required: {}"
 msgstr "プロトコル重複: {}"
@@ -7442,9 +7446,6 @@ msgstr "コミュニティ版"
 
 #~ msgid "Apps amount"
 #~ msgstr "アプリの量"
-
-#~ msgid "Nodes amount"
-#~ msgstr "ノード量"
 
 #~ msgid "Login mode display"
 #~ msgstr "ログインモード表示"
