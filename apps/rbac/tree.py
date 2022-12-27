@@ -100,6 +100,8 @@ special_pid_mapper = {
     'ops.jobauditlog': 'audits',
     'ops.view_celerytask': 'task_center',
     'ops.view_celerytaskexecution': 'task_center',
+    'ops.view_taskmonitor': 'task_center',
+    'ops.adhocexecution': 'task_center',
     'ops.job': 'operation_center',
     'ops.adhoc': 'operation_center',
     'ops.playbook': 'operation_center',
