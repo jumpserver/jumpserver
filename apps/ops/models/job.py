@@ -27,7 +27,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     module = models.CharField(max_length=128, choices=Modules.choices, default=Modules.shell,
                               verbose_name=_('Module'), null=True)
     chdir = models.CharField(default="", max_length=1024, verbose_name=_('Chdir'), null=True, blank=True)
-    timeout = models.IntegerField(default=60, verbose_name=_('Timeout (Seconds)'))
+    timeout = models.IntegerField(default=-1, verbose_name=_('Timeout (Seconds)'))
     playbook = models.ForeignKey('ops.Playbook', verbose_name=_("Playbook"), null=True, on_delete=models.SET_NULL)
     type = models.CharField(max_length=128, choices=Types.choices, default=Types.adhoc, verbose_name=_("Type"))
     creator = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
@@ -197,6 +197,7 @@ class JobExecution(JMSOrgBaseModel):
             runner = AdHocRunner(
                 self.inventory_path,
                 module,
+                timeout=self.current_job.timeout,
                 module_args=args,
                 pattern="all",
                 project_dir=self.private_dir,

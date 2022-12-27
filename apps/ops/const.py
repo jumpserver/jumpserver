@@ -43,9 +43,11 @@ class RunasPolicies(models.TextChoices):
 class Modules(models.TextChoices):
     shell = 'shell', _('Shell')
     winshell = 'win_shell', _('Powershell')
+    python = 'python', _('Python')
 
 
 class JobStatus(models.TextChoices):
     running = 'running', _('Running')
     success = 'success', _('Success')
+    timeout = 'timeout', _('Timeout')
     failed = 'failed', _('Failed')
