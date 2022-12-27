@@ -13,6 +13,7 @@ from common.utils import date_expired_default
 from common.utils.timezone import local_now
 
 from perms.const import ActionChoices
+from assets.const import AliasAccount
 
 __all__ = ['AssetPermission', 'ActionChoices']
 
@@ -38,7 +39,7 @@ class AssetPermissionQuerySet(models.QuerySet):
 
     def filter_by_accounts(self, accounts):
         q = Q(accounts__contains=list(accounts)) | \
-            Q(accounts__contains=Account.AliasAccount.ALL.value)
+            Q(accounts__contains=AliasAccount.ALL.value)
         return self.filter(q)
 
 
@@ -127,7 +128,7 @@ class AssetPermission(JMSOrgBaseModel):
         """
         asset_ids = self.get_all_assets(flat=True)
         q = Q(asset_id__in=asset_ids)
-        if Account.AliasAccount.ALL not in self.accounts:
+        if AliasAccount.ALL not in self.accounts:
             q &= Q(username__in=self.accounts)
         accounts = Account.objects.filter(q).order_by('asset__name', 'name', 'username')
         if not flat:

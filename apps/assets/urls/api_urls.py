@@ -23,7 +23,6 @@ router.register(r'labels', api.LabelViewSet, 'label')
 router.register(r'nodes', api.NodeViewSet, 'node')
 router.register(r'domains', api.DomainViewSet, 'domain')
 router.register(r'gateways', api.GatewayViewSet, 'gateway')
-router.register(r'gathered-users', api.GatheredUserViewSet, 'gathered-user')
 router.register(r'favorite-assets', api.FavoriteAssetViewSet, 'favorite-asset')
 router.register(r'account-backup-plans', api.AccountBackupPlanViewSet, 'account-backup')
 router.register(r'account-backup-plan-executions', api.AccountBackupPlanExecutionViewSet, 'account-backup-execution')
@@ -51,7 +50,6 @@ urlpatterns = [
          name='account-secret-history'),
 
     path('nodes/category/tree/', api.CategoryTreeApi.as_view(), name='asset-category-tree'),
-    # path('nodes/tree/', api.NodeListAsTreeApi.as_view(), name='node-tree'),
     path('nodes/children/tree/', api.NodeChildrenAsTreeApi.as_view(), name='node-children-tree'),
     path('nodes/<uuid:pk>/children/', api.NodeChildrenApi.as_view(), name='node-children'),
     path('nodes/children/', api.NodeChildrenApi.as_view(), name='node-children-2'),
