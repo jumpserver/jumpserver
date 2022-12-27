@@ -11,7 +11,7 @@ from common.signals import django_ready
 from common.utils import get_logger
 from common.utils.connection import RedisPubSub
 from orgs.utils import tmp_to_builtin_org
-from .models import Applet, AppletHost
+from .models import Applet, AppletHost, Task
 from .utils import db_port_manager, DBPortManager
 
 db_port_manager: DBPortManager
@@ -83,3 +83,16 @@ def subscribe_applet_host_change(sender, **kwargs):
 
 
 applet_host_change_pub_sub = AppletHostPubSub()
+
+
+class TerminalTaskPubSub(LazyObject):
+    def _setup(self):
+        self._wrapped = RedisPubSub('fm.terminal_task_change')
+
+
+terminal_task_pub_sub = TerminalTaskPubSub()
+
+
+@receiver(post_save, sender=Task)
+def on_db_app_created(sender, instance: Task, created, **kwargs):
+    terminal_task_pub_sub.publish(str(instance.id))
