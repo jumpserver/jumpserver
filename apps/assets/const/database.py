@@ -33,7 +33,6 @@ class DatabaseTypes(BaseType):
                 'gather_accounts_enabled': True,
                 'verify_account_enabled': True,
                 'change_secret_enabled': True,
-                'push_account_enabled': True,
             }
         }
         return constrains
