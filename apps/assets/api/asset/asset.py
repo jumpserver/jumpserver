@@ -60,6 +60,7 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
     ordering = ("name",)
     serializer_classes = (
         ("default", serializers.AssetSerializer),
+        ("retrieve", serializers.AssetDetailSerializer),
         ("suggestion", serializers.MiniAssetSerializer),
         ("platform", serializers.PlatformSerializer),
         ("gateways", serializers.GatewaySerializer),

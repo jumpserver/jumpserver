@@ -7,7 +7,7 @@ from ops.models import Job, JobExecution
 from ops.serializers.job import JobSerializer, JobExecutionSerializer
 
 __all__ = ['JobViewSet', 'JobExecutionViewSet', 'JobRunVariableHelpAPIView',
-           'JobAssetDetail', 'JobExecutionTaskDetail','FrequentUsernames']
+           'JobAssetDetail', 'JobExecutionTaskDetail', 'FrequentUsernames']
 
 from ops.tasks import run_ops_job_execution
 from ops.variables import JMS_JOB_VARIABLE_HELP
@@ -110,6 +110,7 @@ class JobExecutionTaskDetail(APIView):
             with tmp_to_org(org):
                 execution = get_object_or_404(JobExecution, task_id=task_id)
                 return Response(data={
+                    'status': execution.status,
                     'is_finished': execution.is_finished,
                     'is_success': execution.is_success,
                     'time_cost': execution.time_cost,
