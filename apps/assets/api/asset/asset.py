@@ -61,8 +61,8 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
     serializer_classes = (
         ("default", serializers.AssetSerializer),
         ("retrieve", serializers.AssetDetailSerializer),
-        ("suggestion", serializers.MiniAssetSerializer),
         ("platform", serializers.PlatformSerializer),
+        ("suggestion", serializers.MiniAssetSerializer),
         ("gateways", serializers.GatewaySerializer),
     )
     rbac_perms = (
