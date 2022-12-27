@@ -76,16 +76,6 @@ class Migration(migrations.Migration):
             field=models.CharField(blank=True, max_length=32, null=True, verbose_name='Updated by'),
         ),
         migrations.AlterField(
-            model_name='platformautomation',
-            name='push_account_enabled',
-            field=models.BooleanField(default=False, verbose_name='Push account enabled'),
-        ),
-        migrations.AlterField(
-            model_name='platformautomation',
-            name='push_account_method',
-            field=models.TextField(blank=True, max_length=32, null=True, verbose_name='Push account method'),
-        ),
-        migrations.AlterField(
             model_name='platformprotocol',
             name='default',
             field=models.BooleanField(default=False, verbose_name='Default'),

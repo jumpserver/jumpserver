@@ -7,7 +7,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.utils import validate_ssh_private_key
 
-
 __all__ = [
     'private_key_validator',
 ]
@@ -22,8 +21,6 @@ def private_key_validator(value):
 
 
 def update_internal_platforms(platform_model):
-    from assets.const import AllTypes
-
     platforms = [
         {'name': 'Linux', 'category': 'host', 'type': 'linux'},
         {'name': 'BSD', 'category': 'host', 'type': 'unix'},
@@ -32,7 +29,6 @@ def update_internal_platforms(platform_model):
         {'name': 'Windows', 'category': 'host', 'type': 'unix'},
         {
             'name': 'AIX', 'category': 'host', 'type': 'unix',
-            'push_account_method': 'create_account_aix',
             'change_secret_method': 'change_secret_aix',
         },
         {'name': 'Windows', 'category': 'host', 'type': 'windows'},

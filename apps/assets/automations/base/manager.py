@@ -1,19 +1,19 @@
 import os
-import yaml
 import shutil
-from hashlib import md5
-from copy import deepcopy
-from socket import gethostname
 from collections import defaultdict
+from copy import deepcopy
+from hashlib import md5
+from socket import gethostname
 
+import yaml
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
-from common.utils import get_logger
-from common.utils import ssh_pubkey_gen, ssh_key_string_to_obj
-from assets.const import SecretType
 from assets.automations.methods import platform_automation_methods
+from assets.const import SecretType
+from common.utils import get_logger, lazyproperty
+from common.utils import ssh_pubkey_gen, ssh_key_string_to_obj
 from ops.ansible import JMSInventory, PlaybookRunner, DefaultCallback
 
 logger = get_logger(__name__)
@@ -93,7 +93,7 @@ class BasePlaybookManager:
     def get_assets_group_by_platform(self):
         return self.automation.all_assets_group_by_platform()
 
-    @property
+    @lazyproperty
     def runtime_dir(self):
         ansible_dir = settings.ANSIBLE_DIR
         dir_name = '{}_{}'.format(self.automation.name.replace(' ', '_'), self.execution.id)
@@ -104,11 +104,6 @@ class BasePlaybookManager:
         if not os.path.exists(path):
             os.makedirs(path, exist_ok=True, mode=0o755)
         return path
-
-    def prepare_playbook_dir(self):
-        for d in [self.runtime_dir]:
-            if not os.path.exists(d):
-                os.makedirs(d, exist_ok=True, mode=0o755)
 
     def host_callback(self, host, automation=None, **kwargs):
         enabled_attr = '{}_enabled'.format(self.__class__.method_type())
