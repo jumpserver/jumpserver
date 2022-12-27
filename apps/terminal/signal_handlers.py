@@ -11,7 +11,7 @@ from common.signals import django_ready
 from common.utils import get_logger
 from common.utils.connection import RedisPubSub
 from orgs.utils import tmp_to_builtin_org
-from .models import Applet, AppletHost
+from .models import Applet, AppletHost, Task
 from .utils import db_port_manager, DBPortManager
 
 db_port_manager: DBPortManager
@@ -83,3 +83,20 @@ def subscribe_applet_host_change(sender, **kwargs):
 
 
 applet_host_change_pub_sub = AppletHostPubSub()
+
+
+class ComponentEventChan(LazyObject):
+    def _setup(self):
+        self._wrapped = RedisPubSub('fm.component_event_chan')
+
+
+component_event_chan = ComponentEventChan()
+
+
+@receiver(post_save, sender=Task)
+def on_db_app_created(sender, instance: Task, created, **kwargs):
+    data = {
+        "type": "task",
+        "id": str(instance.id),
+    }
+    component_event_chan.publish(data)
