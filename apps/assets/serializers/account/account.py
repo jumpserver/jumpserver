@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from assets.const import SecretType
+from assets.const import SecretType, Source
 from assets.models import Account, AccountTemplate, Asset
 from assets.tasks import push_accounts_to_assets
 from common.drf.fields import ObjectRelatedField, LabeledChoiceField
@@ -74,6 +74,7 @@ class AccountAssetSerializer(serializers.ModelSerializer):
 
 class AccountSerializer(AccountSerializerCreateMixin, BaseAccountSerializer):
     asset = AccountAssetSerializer(label=_('Asset'))
+    source = LabeledChoiceField(choices=Source.choices, label=_("Source"), read_only=True)
     su_from = ObjectRelatedField(
         required=False, queryset=Account.objects, allow_null=True, allow_empty=True,
         label=_('Su from'), attrs=('id', 'name', 'username')
@@ -83,7 +84,7 @@ class AccountSerializer(AccountSerializerCreateMixin, BaseAccountSerializer):
         model = Account
         fields = BaseAccountSerializer.Meta.fields \
                  + ['su_from', 'version', 'asset'] \
-                 + ['template', 'push_now']
+                 + ['template', 'push_now', 'source']
         extra_kwargs = {
             **BaseAccountSerializer.Meta.extra_kwargs,
             'name': {'required': False, 'allow_null': True},
