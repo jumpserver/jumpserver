@@ -17,12 +17,10 @@ MODELS_NEED_RECORD = (
     "LoginAssetACL",
     "LoginConfirmSetting",
     # assets
-    'Asset', 'Node', 'AdminUser', 'SystemUser', 'Domain', 'Gateway', 'CommandFilterRule',
+    'Asset', 'Node', 'Domain', 'Gateway', 'CommandFilterRule',
     'CommandFilter', 'Platform', 'Label',
-    # applications
-    'Application',
     # account
-    'AuthBook',
+    'Account',
     # orgs
     "Organization",
     # settings
@@ -36,8 +34,7 @@ MODELS_NEED_RECORD = (
     # rbac
     'Role', 'SystemRole', 'OrgRole', 'RoleBinding', 'OrgRoleBinding', 'SystemRoleBinding',
     # xpack
-    'License', 'Account', 'SyncInstanceTask', 'ChangeAuthPlan',
-    'GatherUserTask', 'Interface',
+    'License', 'Account', 'SyncInstanceTask', 'Interface',
 )
 
 

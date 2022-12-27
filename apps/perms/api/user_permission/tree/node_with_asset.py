@@ -11,6 +11,7 @@ from rest_framework.exceptions import PermissionDenied, NotFound
 
 from assets.utils import KubernetesTree
 from assets.models import Asset, Account
+from assets.const import AliasAccount
 from assets.api import SerializeToTreeNodeMixin
 from authentication.models import ConnectionToken
 from common.utils import get_object_or_none, lazyproperty
@@ -157,7 +158,7 @@ class UserGrantedK8sAsTreeApi(SelfOrPKUserMixin, ListAPIView):
             raise NotFound('Account is not found')
         account = accounts[0]
         if account.username in [
-            Account.AliasAccount.INPUT, Account.AliasAccount.USER
+            AliasAccount.INPUT, AliasAccount.USER
         ]:
             return token.input_secret
         else:
