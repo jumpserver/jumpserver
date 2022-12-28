@@ -74,7 +74,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     && pip config set global.index-url ${PIP_MIRROR} \
     && pip install --upgrade pip \
     && pip install --upgrade setuptools wheel \
-    && pip install https://download.jumpserver.org/pypi/simple/cryptography/cryptography-36.0.2-cp39-cp39-linux_loongarch64.whl \
+    && pip install https://download.jumpserver.org/pypi/simple/cryptography/cryptography-38.0.4-cp39-cp39-linux_loongarch64.whl \
     && pip install https://download.jumpserver.org/pypi/simple/greenlet/greenlet-1.1.2-cp39-cp39-linux_loongarch64.whl \
     && pip install $(grep 'PyNaCl' requirements/requirements.txt) \
     && GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=true pip install grpcio \

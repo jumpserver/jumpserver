@@ -7,10 +7,19 @@ def migrate_remove_redundant_permission(apps, *args):
     model = apps.get_model('rbac', 'ContentType')
     model.objects.filter(app_label='applications').delete()
     model.objects.filter(app_label='ops', model='task').delete()
+
     model.objects.filter(app_label='xpack', model__in=[
         'applicationchangeauthplan', 'applicationchangeauthplanexecution',
         'applicationchangeauthplantask', 'changeauthplan', 'changeauthplanexecution',
         'changeauthplantask', 'gatherusertask', 'gatherusertaskexecution'
+    ]).delete()
+
+    model.objects.filter(app_label='assets', model__in=[
+        'authbook', 'historicalauthbook'
+    ]).delete()
+
+    model.objects.filter(app_label='perms', model__in=[
+        'applicationpermission', 'permedapplication', 'commandfilterrule', 'historicalauthbook'
     ]).delete()
 
 

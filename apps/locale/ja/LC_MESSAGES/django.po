@@ -1188,7 +1188,7 @@ msgstr "メタ"
 
 #: assets/models/platform.py:75
 msgid "Internal"
-msgstr "内部"
+msgstr "ビルトイン"
 
 #: assets/models/platform.py:79 assets/serializers/platform.py:84
 msgid "Charset"
