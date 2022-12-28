@@ -87,6 +87,8 @@ class ObjectRelatedField(serializers.RelatedField):
     def to_representation(self, value):
         data = {}
         for attr in self.attrs:
+            if not hasattr(value, attr):
+                continue
             data[attr] = getattr(value, attr)
         return data
 
