@@ -3,12 +3,14 @@
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
-from common.utils import get_logger
-from common.drf.fields import LabeledChoiceField, ObjectRelatedField
-from assets.serializers.base import AuthValidateMixin
 from assets.const import DEFAULT_PASSWORD_RULES, SecretType, SecretStrategy, SSHKeyStrategy
-from assets.models import Asset, Account, ChangeSecretAutomation, ChangeSecretRecord, AutomationExecution
-
+from assets.models import (
+    Asset, Account, ChangeSecretAutomation,
+    ChangeSecretRecord, AutomationExecution
+)
+from assets.serializers.base import AuthValidateMixin
+from common.drf.fields import LabeledChoiceField, ObjectRelatedField
+from common.utils import get_logger
 from .base import BaseAutomationSerializer
 
 logger = get_logger(__file__)
@@ -50,10 +52,8 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
         secret_type = self.fields.get('secret_type')
         if not secret_type:
             return
-        choices = secret_type._choices
-        choices.pop(SecretType.ACCESS_KEY, None)
-        choices.pop(SecretType.TOKEN, None)
-        secret_type._choices = choices
+        excludes = [SecretType.ACCESS_KEY, SecretType.TOKEN]
+        secret_type._choices = {k: v for k, v in secret_type._choices.items() if k not in excludes}
 
     def validate_password_rules(self, password_rules):
         secret_type = self.initial_secret_type
@@ -69,6 +69,7 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
             logger.error(e)
             msg = _("* Please enter the correct password length")
             raise serializers.ValidationError(msg)
+
         if length < 6 or length > 30:
             msg = _('* Password length range 6-30 bits')
             raise serializers.ValidationError(msg)

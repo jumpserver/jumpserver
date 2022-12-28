@@ -5957,7 +5957,7 @@ msgstr "手机"
 
 #: users/models/user.py:701
 msgid "OTP secret key"
-msgstr "OTP 秘钥"
+msgstr "OTP 密钥"
 
 #: users/models/user.py:705
 msgid "Private key"
@@ -6780,7 +6780,7 @@ msgstr "证书文件"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:118
 msgid "Key File"
-msgstr "秘钥文件"
+msgstr "密钥文件"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:134
 msgid "Service account key"

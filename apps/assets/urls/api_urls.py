@@ -15,23 +15,24 @@ router.register(r'databases', api.DatabaseViewSet, 'database')
 router.register(r'webs', api.WebViewSet, 'web')
 router.register(r'clouds', api.CloudViewSet, 'cloud')
 router.register(r'accounts', api.AccountViewSet, 'account')
+router.register(r'account-secrets', api.AccountSecretsViewSet, 'account-secret')
 router.register(r'account-templates', api.AccountTemplateViewSet, 'account-template')
 router.register(r'account-template-secrets', api.AccountTemplateSecretsViewSet, 'account-template-secret')
-router.register(r'account-secrets', api.AccountSecretsViewSet, 'account-secret')
 router.register(r'platforms', api.AssetPlatformViewSet, 'platform')
 router.register(r'labels', api.LabelViewSet, 'label')
 router.register(r'nodes', api.NodeViewSet, 'node')
 router.register(r'domains', api.DomainViewSet, 'domain')
 router.register(r'gateways', api.GatewayViewSet, 'gateway')
 router.register(r'favorite-assets', api.FavoriteAssetViewSet, 'favorite-asset')
+
 router.register(r'account-backup-plans', api.AccountBackupPlanViewSet, 'account-backup')
 router.register(r'account-backup-plan-executions', api.AccountBackupPlanExecutionViewSet, 'account-backup-execution')
-
 router.register(r'change-secret-automations', api.ChangeSecretAutomationViewSet, 'change-secret-automation')
 router.register(r'change-secret-executions', api.ChangSecretExecutionViewSet, 'change-secret-execution')
-router.register(r'gather-account-executions', api.GatherAccountsExecutionViewSet, 'gather-account-execution')
 router.register(r'change-secret-records', api.ChangeSecretRecordViewSet, 'change-secret-record')
 router.register(r'gather-account-automations', api.GatherAccountsAutomationViewSet, 'gather-account-automation')
+router.register(r'gather-account-executions', api.GatherAccountsExecutionViewSet, 'gather-account-execution')
+router.register(r'push-account-automations', api.PushAccountAutomationViewSet, 'push-account-automation')
 
 urlpatterns = [
     # path('assets/<uuid:pk>/gateways/', api.AssetGatewayListApi.as_view(), name='asset-gateway-list'),
