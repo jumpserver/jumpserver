@@ -7,7 +7,7 @@ from rest_framework.renderers import JSONRenderer
 from common.db.utils import safe_db_connection
 from common.utils import get_logger
 from terminal.serializers import TaskSerializer
-from .signal_handlers import terminal_task_pub_sub
+from .signal_handlers import component_event_chan
 
 logger = get_logger(__name__)
 
@@ -21,7 +21,7 @@ class TerminalTaskWebsocket(JsonWebsocketConsumer):
         if user.terminal:
             self.accept()
             self.terminal = user.terminal
-            self.sub = self.watch_terminal_task_change()
+            self.sub = self.watch_component_event()
         else:
             self.close()
 
@@ -35,21 +35,23 @@ class TerminalTaskWebsocket(JsonWebsocketConsumer):
         serializer = TaskSerializer(tasks, many=True)
         return JSONRenderer().render(serializer.data)
 
-    def send_terminal_task_msg(self):
+    def send_component_tasks_msg(self):
         content = self.get_terminal_tasks()
         self.send(bytes_data=content)
 
-    def watch_terminal_task_change(self):
+    def watch_component_event(self):
         ws = self
         # 先发一次已有的任务
         with safe_db_connection():
-            self.send_terminal_task_msg()
+            self.send_component_tasks_msg()
 
-        def handle_terminal_task_msg_recv(msg):
-            logger.debug('New terminal task msg recv: {}'.format(msg))
-            ws.send_terminal_task_msg()
+        def handle_task_msg_recv(msg):
+            logger.debug('New component task msg recv: {}'.format(msg))
+            msg_type = msg.get('type')
+            if msg_type == 'task':
+                ws.send_component_tasks_msg()
 
-        return terminal_task_pub_sub.subscribe(handle_terminal_task_msg_recv)
+        return component_event_chan.subscribe(handle_task_msg_recv)
 
     def disconnect(self, code):
         if self.sub:

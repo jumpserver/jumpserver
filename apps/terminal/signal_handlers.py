@@ -85,14 +85,18 @@ def subscribe_applet_host_change(sender, **kwargs):
 applet_host_change_pub_sub = AppletHostPubSub()
 
 
-class TerminalTaskPubSub(LazyObject):
+class ComponentEventChan(LazyObject):
     def _setup(self):
-        self._wrapped = RedisPubSub('fm.terminal_task_change')
+        self._wrapped = RedisPubSub('fm.component_event_chan')
 
 
-terminal_task_pub_sub = TerminalTaskPubSub()
+component_event_chan = ComponentEventChan()
 
 
 @receiver(post_save, sender=Task)
 def on_db_app_created(sender, instance: Task, created, **kwargs):
-    terminal_task_pub_sub.publish(str(instance.id))
+    data = {
+        "type": "task",
+        "id": str(instance.id),
+    }
+    component_event_chan.publish(data)
