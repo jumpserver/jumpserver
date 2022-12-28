@@ -34,7 +34,7 @@ class AccountBackupPlan(PeriodTaskModelMixin, JMSOrgBaseModel):
         verbose_name = _('Account backup plan')
 
     def get_register_task(self):
-        from ..tasks import execute_account_backup_plan
+        from assets.tasks import execute_account_backup_plan
         name = "account_backup_plan_period_{}".format(str(self.id)[:8])
         task = execute_account_backup_plan.name
         args = (str(self.id), Trigger.timing)
