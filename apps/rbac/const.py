@@ -48,7 +48,6 @@ exclude_permissions = (
     ('assets', 'platformprotocol', '*', '*'),
     ('assets', 'platformautomation', '*', '*'),
     ('assets', 'gatherfactsautomation', '*', '*'),
-    ('assets', 'pushaccountautomation', '*', '*'),
     ('assets', 'verifyaccountautomation', '*', '*'),
     ('assets', 'changesecretrecord', 'add,delete,change', 'changesecretrecord'),
     ('assets', 'automationexecution', '*', 'automationexecution'),
@@ -111,7 +110,6 @@ exclude_permissions = (
     ('terminal', 'applethostdeployment', '*', '*'),
     ('applications', '*', '*', '*'),
 )
-
 
 only_system_permissions = (
     ('assets', 'platform', 'add,change,delete', 'platform'),

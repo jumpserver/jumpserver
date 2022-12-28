@@ -8,5 +8,6 @@ class PushAccountAutomationSerializer(ChangeSecretAutomationSerializer):
 
     def get_field_names(self, declared_fields, info):
         fields = super().get_field_names(declared_fields, info)
+        fields.remove('recipients')
         fields[fields.index('accounts')] = 'username'
         return fields
