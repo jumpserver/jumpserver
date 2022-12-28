@@ -9,15 +9,14 @@ from common.utils import get_logger
 
 __all__ = ["AdHoc"]
 
+from ops.const import Modules
+
 from orgs.mixins.models import JMSOrgBaseModel
 
 logger = get_logger(__file__)
 
 
 class AdHoc(JMSOrgBaseModel):
-    class Modules(models.TextChoices):
-        shell = 'shell', _('Shell')
-        winshell = 'win_shell', _('Powershell')
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
