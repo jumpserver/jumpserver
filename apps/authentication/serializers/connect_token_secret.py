@@ -2,8 +2,9 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from acls.models import CommandGroup, CommandFilterACL
-from assets.const import SecretType
-from assets.models import Asset, Account, Platform, Gateway, Domain
+from accounts.const import SecretType
+from accounts.models import Account
+from assets.models import Asset, Platform, Gateway, Domain
 from assets.serializers import PlatformSerializer, AssetProtocolsSerializer
 from common.drf.fields import LabeledChoiceField
 from common.drf.fields import ObjectRelatedField

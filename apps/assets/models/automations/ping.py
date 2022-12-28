@@ -1,12 +1,12 @@
 from django.utils.translation import ugettext_lazy as _
 
 from assets.const import AutomationTypes
-from .base import BaseAutomation
+from .base import AssetBaseAutomation
 
 __all__ = ['PingAutomation']
 
 
-class PingAutomation(BaseAutomation):
+class PingAutomation(AssetBaseAutomation):
     def save(self, *args, **kwargs):
         self.type = AutomationTypes.ping
         super().save(*args, **kwargs)

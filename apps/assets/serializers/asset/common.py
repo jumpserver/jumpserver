@@ -9,9 +9,9 @@ from rest_framework import serializers
 from common.drf.fields import LabeledChoiceField, ObjectRelatedField
 from common.drf.serializers import WritableNestedModelSerializer
 from orgs.mixins.serializers import BulkOrgResourceSerializerMixin
-from ..account import AccountSerializer
+from accounts.models import Account
 from ...const import Category, AllTypes
-from ...models import Asset, Node, Platform, Label, Domain, Account, Protocol
+from ...models import Asset, Node, Platform, Label, Domain, Protocol
 
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
@@ -45,10 +45,11 @@ class AssetPlatformSerializer(serializers.ModelSerializer):
         }
 
 
-class AssetAccountSerializer(AccountSerializer):
+class AssetAccountSerializer(serializers.ModelSerializer):
     add_org_fields = False
 
-    class Meta(AccountSerializer.Meta):
+    class Meta:
+        model = Account
         fields_mini = [
             'id', 'name', 'username', 'privileged',
             'version', 'secret_type',

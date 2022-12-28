@@ -1,8 +1,9 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from assets.models import Platform, Account
+from assets.models import Platform
 from assets.serializers import HostSerializer
+from accounts.models import Account
 from common.drf.fields import LabeledChoiceField
 from common.validators import ProjectUniqueValidator
 from .applet import AppletSerializer

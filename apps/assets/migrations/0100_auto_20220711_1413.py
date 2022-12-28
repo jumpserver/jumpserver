@@ -7,7 +7,7 @@ from assets.models import Platform
 
 def migrate_accounts(apps, schema_editor):
     auth_book_model = apps.get_model('assets', 'AuthBook')
-    account_model = apps.get_model('assets', 'Account')
+    account_model = apps.get_model('accounts', 'Account')
 
     count = 0
     bulk_size = 1000
@@ -15,8 +15,8 @@ def migrate_accounts(apps, schema_editor):
     while True:
         start = time.time()
         auth_books = auth_book_model.objects \
-            .prefetch_related('systemuser') \
-            .all()[count:count+bulk_size]
+                         .prefetch_related('systemuser') \
+                         .all()[count:count + bulk_size]
         if not auth_books:
             break
 
@@ -72,13 +72,13 @@ def migrate_accounts(apps, schema_editor):
 
         account_model.objects.bulk_create(accounts, ignore_conflicts=True)
         print("\t  - Create accounts: {}-{} using: {:.2f}s".format(
-            count - len(auth_books), count, time.time()-start
+            count - len(auth_books), count, time.time() - start
         ))
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
+        ('accounts', '0001_initial'),
         ('assets', '0099_auto_20220711_1409'),
     ]
 

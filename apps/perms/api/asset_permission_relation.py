@@ -10,7 +10,7 @@ from orgs.utils import current_org
 from perms import serializers
 from perms import models
 from perms.utils import AssetPermissionPermAssetUtil
-from assets.serializers import AccountSerializer
+from accounts.serializers import AccountSerializer
 
 __all__ = [
     'AssetPermissionUserRelationViewSet', 'AssetPermissionUserGroupRelationViewSet',
@@ -123,5 +123,3 @@ class AssetPermissionAccountListApi(generics.ListAPIView):
         perm = get_object_or_404(models.AssetPermission, pk=pk)
         accounts = perm.get_all_accounts()
         return accounts
-
-
