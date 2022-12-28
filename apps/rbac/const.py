@@ -52,6 +52,8 @@ exclude_permissions = (
     ('assets', 'verifyaccountautomation', '*', '*'),
     ('assets', 'changesecretrecord', 'add,delete,change', 'changesecretrecord'),
     ('assets', 'automationexecution', '*', 'automationexecution'),
+    ('assets', 'commandfilter', '*', '*'),
+    ('assets', 'commandfilterrule', '*', '*'),
     # TODO 暂时去掉历史账号的权限
     ('assets', 'account', '*', 'assethistoryaccount'),
     ('assets', 'account', '*', 'assethistoryaccountsecret'),
