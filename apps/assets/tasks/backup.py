@@ -3,9 +3,9 @@
 from celery import shared_task
 from django.utils.translation import gettext_lazy as _
 
+from assets.models.automations.backup import AccountBackupPlan
 from common.utils import get_object_or_none, get_logger
 from orgs.utils import tmp_to_org, tmp_to_root_org
-from assets.models import AccountBackupPlan
 
 logger = get_logger(__file__)
 
