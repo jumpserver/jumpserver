@@ -16,7 +16,7 @@ __all__ = [
 
 
 class TicketSerializer(OrgResourceModelSerializerMixin):
-    type = LabeledChoiceField(choices=TicketType.choices, required=True, label=_('Type'))
+    type = LabeledChoiceField(choices=TicketType.choices, read_only=True, label=_('Type'))
     status = LabeledChoiceField(choices=TicketStatus.choices, read_only=True, label=_('Status'))
     state = LabeledChoiceField(choices=TicketState.choices, read_only=True, label=_("State"))
 
