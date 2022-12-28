@@ -3,8 +3,8 @@
 
 from rest_framework import mixins
 
-from assets import serializers
-from assets.models import ChangeSecretAutomation, ChangeSecretRecord, AutomationExecution
+from accounts import serializers
+from accounts.models import ChangeSecretAutomation, ChangeSecretRecord, AutomationExecution
 from common.utils import get_object_or_none
 from orgs.mixins.api import OrgBulkModelViewSet, OrgGenericViewSet
 from .base import AutomationExecutionViewSet

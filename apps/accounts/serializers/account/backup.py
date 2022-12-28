@@ -13,10 +13,10 @@ from accounts.models import AccountBackupAutomation, AccountBackupExecution
 
 logger = get_logger(__file__)
 
-__all__ = ['AccountBackupPlanSerializer', 'AccountBackupPlanExecutionSerializer']
+__all__ = ['AccountBackupExecutionSerializer', 'AccountBackupPlanExecutionSerializer']
 
 
-class AccountBackupPlanSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSerializer):
+class AccountBackupExecutionSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSerializer):
     class Meta:
         model = AccountBackupAutomation
         fields = [

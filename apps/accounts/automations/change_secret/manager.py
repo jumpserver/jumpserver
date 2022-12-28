@@ -13,10 +13,10 @@ from common.utils.timezone import local_now_display
 from common.utils.file import encrypt_and_compress_zip_file
 from common.utils import get_logger, lazyproperty, gen_key_pair
 from users.models import User
-from assets.models import ChangeSecretRecord
-from assets.notifications import ChangeSecretExecutionTaskMsg
-from assets.serializers import ChangeSecretRecordBackUpSerializer
-from assets.const import (
+from accounts.models import ChangeSecretRecord
+from accounts.notifications import ChangeSecretExecutionTaskMsg
+from accounts.serializers import ChangeSecretRecordBackUpSerializer
+from accounts.const import (
     AutomationTypes, SecretType, SecretStrategy, SSHKeyStrategy, DEFAULT_PASSWORD_RULES
 )
 from ..base.manager import BasePlaybookManager

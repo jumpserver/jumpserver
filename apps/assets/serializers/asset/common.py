@@ -47,6 +47,9 @@ class AssetPlatformSerializer(serializers.ModelSerializer):
 
 class AssetAccountSerializer(serializers.ModelSerializer):
     add_org_fields = False
+    push_now = serializers.BooleanField(
+        default=False, label=_("Push now"), write_only=True
+    )
 
     class Meta:
         model = Account
@@ -68,7 +71,8 @@ class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSeriali
     nodes = ObjectRelatedField(many=True, required=False, queryset=Node.objects, label=_('Nodes'))
     labels = AssetLabelSerializer(many=True, required=False, label=_('Labels'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
-    accounts = AssetAccountSerializer(many=True, required=False, label=_('Account'))
+
+    # accounts = AssetAccountSerializer(many=True, required=False, label=_('Account'))
 
     class Meta:
         model = Asset
@@ -76,7 +80,7 @@ class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSeriali
         fields_small = fields_mini + ['is_active', 'comment']
         fields_fk = ['domain', 'platform', 'platform']
         fields_m2m = [
-            'nodes', 'labels', 'protocols', 'accounts', 'nodes_display',
+            'nodes', 'labels', 'protocols', 'nodes_display',
         ]
         read_only_fields = [
             'category', 'type', 'info',

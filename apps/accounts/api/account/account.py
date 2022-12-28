@@ -3,10 +3,11 @@ from rest_framework.decorators import action
 from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.response import Response
 
-from assets import serializers
-from assets.filters import AccountFilterSet
-from assets.models import Account, Asset
-from assets.tasks import verify_accounts_connectivity
+from accounts import serializers
+from accounts.filters import AccountFilterSet
+from accounts.models import Account
+from accounts.tasks import verify_accounts_connectivity
+from assets.models import Asset
 from authentication.const import ConfirmType
 from common.mixins import RecordViewLogMixin
 from common.permissions import UserConfirmation
@@ -25,10 +26,9 @@ class AccountViewSet(OrgBulkModelViewSet):
     filterset_class = AccountFilterSet
     serializer_classes = {
         'default': serializers.AccountSerializer,
-        'verify': serializers.AssetTaskSerializer
     }
     rbac_perms = {
-        'verify': 'assets.test_account',
+        'verify_account': 'assets.test_account',
         'partial_update': 'assets.change_accountsecret',
         'su_from_accounts': 'assets.view_account',
     }

@@ -9,11 +9,45 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.DeleteModel('CommandExecution'),
-        migrations.RemoveField(model_name='adhocexecution', name='adhoc'),
-        migrations.RemoveField(model_name='adhocexecution', name='task'),
-        migrations.DeleteModel('AdHocExecution'),
-        migrations.DeleteModel('AdHoc'),
-        migrations.DeleteModel('Task'),
+        migrations.RemoveField(
+            model_name='adhocexecution',
+            name='adhoc',
+        ),
+        migrations.RemoveField(
+            model_name='adhocexecution',
+            name='task',
+        ),
+        migrations.RemoveField(
+            model_name='commandexecution',
+            name='hosts',
+        ),
+        migrations.RemoveField(
+            model_name='commandexecution',
+            name='user',
+        ),
+        migrations.AlterUniqueTogether(
+            name='task',
+            unique_together=None,
+        ),
+        migrations.RemoveField(
+            model_name='task',
+            name='latest_adhoc',
+        ),
+        migrations.RemoveField(
+            model_name='task',
+            name='latest_execution',
+        ),
+        migrations.DeleteModel(
+            name='AdHoc',
+        ),
+        migrations.DeleteModel(
+            name='AdHocExecution',
+        ),
+        migrations.DeleteModel(
+            name='CommandExecution',
+        ),
+        migrations.DeleteModel(
+            name='Task',
+        ),
         migrations.DeleteModel('CeleryTask'),
     ]

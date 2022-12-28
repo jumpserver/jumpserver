@@ -1,5 +1,5 @@
 from common.utils import get_logger
-from assets.const import AutomationTypes
+from accounts.const import AutomationTypes
 from ..base.manager import BasePlaybookManager, PushOrVerifyHostCallbackMixin
 
 logger = get_logger(__name__)

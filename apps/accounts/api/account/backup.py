@@ -5,10 +5,10 @@ from rest_framework.response import Response
 
 from orgs.mixins.api import OrgBulkModelViewSet
 from common.const.choices import Trigger
-from assets import serializers
-from assets.tasks import execute_account_backup_plan
-from assets.models import (
-    AccountBackupPlan, AccountBackupPlanExecution
+from accounts import serializers
+from accounts.tasks import execute_account_backup_plan
+from accounts.models import (
+    AccountBackupAutomation, AccountBackupExecution
 )
 
 __all__ = [
@@ -17,12 +17,12 @@ __all__ = [
 
 
 class AccountBackupPlanViewSet(OrgBulkModelViewSet):
-    model = AccountBackupPlan
+    model = AccountBackupAutomation
     filter_fields = ('name',)
     search_fields = filter_fields
     ordering_fields = ('name',)
     ordering = ('name',)
-    serializer_class = serializers.AccountBackupPlanSerializer
+    serializer_class = serializers.AccountBackupExecutionSerializer
 
 
 class AccountBackupPlanExecutionViewSet(viewsets.ModelViewSet):
@@ -32,7 +32,7 @@ class AccountBackupPlanExecutionViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'options']
 
     def get_queryset(self):
-        queryset = AccountBackupPlanExecution.objects.all()
+        queryset = AccountBackupExecution.objects.all()
         return queryset
 
     def create(self, request, *args, **kwargs):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-from assets import serializers
-from assets.models import GatherAccountsAutomation
+from accounts import serializers
+from accounts.models import GatherAccountsAutomation
 from orgs.mixins.api import OrgBulkModelViewSet
 from .base import AutomationExecutionViewSet
 

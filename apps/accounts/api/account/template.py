@@ -1,7 +1,10 @@
-from assets import serializers
-from assets.models import AccountTemplate
+from rbac.permissions import RBACPermission
+from common.permissions import UserConfirmation, ConfirmType
+
 from common.mixins import RecordViewLogMixin
 from orgs.mixins.api import OrgBulkModelViewSet
+from accounts import serializers
+from accounts.models import AccountTemplate
 
 
 class AccountTemplateViewSet(OrgBulkModelViewSet):
@@ -18,8 +21,7 @@ class AccountTemplateSecretsViewSet(RecordViewLogMixin, AccountTemplateViewSet):
         'default': serializers.AccountTemplateSecretSerializer,
     }
     http_method_names = ['get', 'options']
-    # Todo: 记得打开
-    # permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
+    permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
     rbac_perms = {
         'list': 'assets.view_accounttemplatesecret',
         'retrieve': 'assets.view_accounttemplatesecret',

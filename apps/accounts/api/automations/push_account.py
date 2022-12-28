@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 
-from assets.models import PushAccountAutomation
-from assets.serializers import PushAccountAutomationSerializer
+from accounts.models import PushAccountAutomation
+from accounts.serializers import PushAccountAutomationSerializer
 from orgs.mixins.api import OrgBulkModelViewSet
 
 __all__ = ['PushAccountAutomationViewSet']

@@ -7,10 +7,10 @@ from django.conf import settings
 from django.db.models import F
 from rest_framework import serializers
 
-from assets.models import Account
+from accounts.models import Account
 from assets.const import AllTypes
-from assets.serializers import AccountSecretSerializer
-from assets.notifications import AccountBackupExecutionTaskMsg
+from accounts.serializers import AccountSecretSerializer
+from accounts.notifications import AccountBackupExecutionTaskMsg
 from users.models import User
 from common.utils import get_logger
 from common.utils.timezone import local_now_display

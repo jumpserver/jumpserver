@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from assets.automations.methods import platform_automation_methods
-from assets.const import SecretType
+from accounts.const import SecretType
 from common.utils import get_logger, lazyproperty
 from common.utils import ssh_pubkey_gen, ssh_key_string_to_obj
 from ops.ansible import JMSInventory, PlaybookRunner, DefaultCallback

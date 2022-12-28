@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import get_logger
-from assets.const import AutomationTypes, Source
+from accounts.const import AutomationTypes, Source
 from orgs.utils import tmp_to_org
 from .filter import GatherAccountsFilter
 from ..base.manager import BasePlaybookManager
