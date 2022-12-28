@@ -1,16 +1,15 @@
 from collections import Iterable
 
-from django.db.models import NOT_PROVIDED
 from django.core.exceptions import ObjectDoesNotExist
-from rest_framework.utils import html
+from django.db.models import NOT_PROVIDED
 from rest_framework import serializers
-from rest_framework.settings import api_settings
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SkipField, empty
+from rest_framework.settings import api_settings
+from rest_framework.utils import html
 
 from common.drf.fields import EncryptedField
-from common.utils import lazyproperty
-
+from ..fields import LabeledChoiceField, ObjectRelatedField
 
 __all__ = [
     'BulkSerializerMixin', 'BulkListSerializerMixin',
@@ -43,6 +42,7 @@ class BulkSerializerMixin(object):
     Become rest_framework_bulk not support uuid as a primary key
     so rewrite it. https://github.com/miki725/django-rest-framework-bulk/issues/66
     """
+
     def to_internal_value(self, data):
         from rest_framework_bulk import BulkListSerializer
         ret = super(BulkSerializerMixin, self).to_internal_value(data)
@@ -308,14 +308,20 @@ class DynamicFieldsMixin:
             self.fields.pop(field, None)
 
 
-class CommonSerializerMixin(DynamicFieldsMixin, DefaultValueFieldsMixin):
+class RelatedModelSerializerMixin:
+    serializer_related_field = ObjectRelatedField
+    serializer_choice_field = LabeledChoiceField
+
+
+class SomeFieldsMixin:
     instance: None
     initial_data: dict
     common_fields = (
-        'comment', 'created_by', 'date_created', 'date_updated',
+        'comment', 'created_by', 'updated_by',
+        'date_created', 'date_updated',
     )
     secret_fields = (
-        'password', 'token', 'secret', 'key', 'private_key', 'public_key',
+        'password', 'token', 'secret', 'key', 'private_key'
     )
 
     def get_initial_value(self, attr, default=None):
@@ -330,7 +336,9 @@ class CommonSerializerMixin(DynamicFieldsMixin, DefaultValueFieldsMixin):
     def get_fields(self):
         fields = super().get_fields()
         for name, field in fields.items():
-            if name in self.secret_fields and \
+            if name == 'id':
+                field.label = 'ID'
+            elif name in self.secret_fields and \
                     not isinstance(self, SecretReadableMixin):
                 field.write_only = True
         return fields
@@ -340,6 +348,11 @@ class CommonSerializerMixin(DynamicFieldsMixin, DefaultValueFieldsMixin):
         common_names = [i for i in self.common_fields if i in names]
         primary_names = [i for i in names if i not in self.common_fields]
         return primary_names + common_names
+
+
+class CommonSerializerMixin(DynamicFieldsMixin, RelatedModelSerializerMixin,
+                            SomeFieldsMixin, DefaultValueFieldsMixin):
+    pass
 
 
 class CommonBulkSerializerMixin(BulkSerializerMixin, CommonSerializerMixin):

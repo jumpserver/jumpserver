@@ -7,7 +7,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.utils import lazyproperty, get_logger
 from orgs.mixins.models import JMSOrgBaseModel
-
 from .base import UserAssetAccountBaseACL
 
 logger = get_logger(__file__)
@@ -26,7 +25,6 @@ class CommandGroup(JMSOrgBaseModel):
     )
     content = models.TextField(verbose_name=_("Content"), help_text=_("One line one command"))
     ignore_case = models.BooleanField(default=True, verbose_name=_('Ignore case'))
-    comment = models.TextField(blank=True, verbose_name=_("Comment"))
 
     TypeChoices = TypeChoices
 

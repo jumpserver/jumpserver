@@ -1,11 +1,11 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from common.mixins.models import CommonModelMixin
+from common.db.models import JMSBaseModel
 from .session import Session
 
 
-class SessionReplay(CommonModelMixin):
+class SessionReplay(JMSBaseModel):
     session = models.ForeignKey(Session, on_delete=models.CASCADE, verbose_name=_("Session"))
 
     class Meta:
@@ -14,5 +14,3 @@ class SessionReplay(CommonModelMixin):
             ('upload_sessionreplay', _("Can upload session replay")),
             ('download_sessionreplay', _("Can download session replay")),
         ]
-
-

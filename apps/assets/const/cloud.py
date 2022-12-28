@@ -25,7 +25,6 @@ class CloudTypes(BaseType):
                 'gather_facts_enabled': False,
                 'verify_account_enabled': False,
                 'change_secret_enabled': False,
-                'push_account_enabled': False,
                 'gather_accounts_enabled': False,
             }
         }
@@ -49,3 +48,9 @@ class CloudTypes(BaseType):
             cls.PRIVATE: [{'name': 'Vmware-vSphere'}],
             cls.K8S: [{'name': 'Kubernetes'}],
         }
+
+    @classmethod
+    def get_community_types(cls):
+        return [
+            cls.K8S, cls.PUBLIC, cls.PRIVATE
+        ]

@@ -6,10 +6,13 @@ __all__ = ('SiteMessageUsers', 'SiteMessage')
 
 
 class SiteMessageUsers(JMSBaseModel):
-    sitemessage = models.ForeignKey('notifications.SiteMessage', on_delete=models.CASCADE, db_constraint=False, related_name='m2m_sitemessageusers')
-    user = models.ForeignKey('users.User', on_delete=models.CASCADE, db_constraint=False, related_name='m2m_sitemessageusers')
+    sitemessage = models.ForeignKey('notifications.SiteMessage', on_delete=models.CASCADE, db_constraint=False,
+                                    related_name='m2m_sitemessageusers')
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE, db_constraint=False,
+                             related_name='m2m_sitemessageusers')
     has_read = models.BooleanField(default=False)
     read_at = models.DateTimeField(default=None, null=True)
+    comment = ''
 
 
 class SiteMessage(JMSBaseModel):
@@ -24,6 +27,7 @@ class SiteMessage(JMSBaseModel):
         'users.User', db_constraint=False, on_delete=models.DO_NOTHING, null=True, default=None,
         related_name='send_site_message'
     )
+    comment = ''
 
     has_read = False
     read_at = None

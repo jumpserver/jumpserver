@@ -1,9 +1,10 @@
+from django.db import models
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from django.utils.translation import ugettext_lazy as _
-from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-
 from assets.const import Protocol
+from common.drf.fields import LabeledChoiceField
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import Session
 
 __all__ = [
@@ -12,21 +13,28 @@ __all__ = [
 ]
 
 
+class SessionType(models.TextChoices):
+    normal = 'normal', _('Normal')
+    tunnel = 'tunnel', _('Tunnel')
+    command = 'command', _('Command')
+
+
 class SessionSerializer(BulkOrgResourceModelSerializer):
     org_id = serializers.CharField(allow_blank=True)
-    terminal_display = serializers.CharField(read_only=True, label=_('Terminal display'))
     protocol = serializers.ChoiceField(choices=Protocol.choices, label=_("Protocol"))
+    type = LabeledChoiceField(choices=SessionType.choices, label=_("Type"), default=SessionType.normal)
 
     class Meta:
         model = Session
         fields_mini = ["id"]
         fields_small = fields_mini + [
-            "user", "asset", "user_id", "asset_id", 'account', "protocol",
-            "login_from", "login_from_display", "remote_addr", "is_success",
-            "is_finished", "has_replay", "date_start", "date_end",
+            "user", "asset", "user_id", "asset_id", 'account',
+            "protocol", 'type', "login_from", "remote_addr",
+            "is_success", "is_finished", "has_replay", "has_command",
+            "date_start", "date_end", "comment"
         ]
         fields_fk = ["terminal", ]
-        fields_custom = ["can_replay", "can_join", "can_terminate", 'terminal_display']
+        fields_custom = ["can_replay", "can_join", "can_terminate"]
         fields = fields_small + fields_fk + fields_custom
         extra_kwargs = {
             "protocol": {'label': _('Protocol')},

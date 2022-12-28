@@ -27,3 +27,27 @@ DEFAULT_PASSWORD_RULES = {
     'length': DEFAULT_PASSWORD_LENGTH,
     'symbol_set': string_punctuation
 }
+
+
+class Types(models.TextChoices):
+    adhoc = 'adhoc', _('Adhoc')
+    playbook = 'playbook', _('Playbook')
+
+
+class RunasPolicies(models.TextChoices):
+    privileged_only = 'privileged_only', _('Privileged Only')
+    privileged_first = 'privileged_first', _('Privileged First')
+    skip = 'skip', _('Skip')
+
+
+class Modules(models.TextChoices):
+    shell = 'shell', _('Shell')
+    winshell = 'win_shell', _('Powershell')
+    python = 'python', _('Python')
+
+
+class JobStatus(models.TextChoices):
+    running = 'running', _('Running')
+    success = 'success', _('Success')
+    timeout = 'timeout', _('Timeout')
+    failed = 'failed', _('Failed')

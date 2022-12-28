@@ -2,9 +2,6 @@ import os
 import zipfile
 
 from django.conf import settings
-from rest_framework_bulk import BulkModelViewSet
-
-from common.mixins import CommonApiMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from ..exception import PlaybookNoValidEntry
 from ..models import Playbook
@@ -19,10 +16,18 @@ def unzip_playbook(src, dist):
         fz.extract(file, dist)
 
 
-class PlaybookViewSet(CommonApiMixin, BulkModelViewSet):
+class PlaybookViewSet(OrgBulkModelViewSet):
     serializer_class = PlaybookSerializer
     permission_classes = ()
     model = Playbook
+
+    def allow_bulk_destroy(self, qs, filtered):
+        return True
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(creator=self.request.user)
+        return queryset
 
     def perform_create(self, serializer):
         instance = serializer.save()

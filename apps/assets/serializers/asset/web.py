@@ -1,4 +1,3 @@
-
 from assets.models import Web
 from .common import AssetSerializer
 
@@ -19,12 +18,12 @@ class WebSerializer(AssetSerializer):
                 'label': 'URL'
             },
             'username_selector': {
-                'default': 'input[type=text]'
+                'default': 'name=username'
             },
             'password_selector': {
-                'default': 'input[type=password]'
+                'default': 'name=password'
             },
             'submit_selector': {
-                'default': 'button[type=submit]',
+                'default': 'id=longin_button',
             },
         }

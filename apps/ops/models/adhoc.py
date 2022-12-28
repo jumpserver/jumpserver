@@ -9,10 +9,12 @@ from common.utils import get_logger
 
 __all__ = ["AdHoc"]
 
+from orgs.mixins.models import JMSOrgBaseModel
+
 logger = get_logger(__file__)
 
 
-class AdHoc(JMSBaseModel):
+class AdHoc(JMSOrgBaseModel):
     class Modules(models.TextChoices):
         shell = 'shell', _('Shell')
         winshell = 'win_shell', _('Powershell')
@@ -39,3 +41,6 @@ class AdHoc(JMSBaseModel):
 
     def __str__(self):
         return "{}: {}".format(self.module, self.args)
+
+    class Meta:
+        verbose_name = _("AdHoc")

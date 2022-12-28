@@ -5,17 +5,17 @@ from typing import Callable
 
 from django.db import models
 from django.db.models import Q
-from django.forms import model_to_dict
-from django.db.utils import IntegrityError
 from django.db.models.fields import related
+from django.db.utils import IntegrityError
+from django.forms import model_to_dict
 from django.utils.translation import ugettext_lazy as _
 
-from orgs.utils import tmp_to_org
-from orgs.models import Organization
+from common.db.encoder import ModelJSONFieldEncoder
+from common.db.models import JMSBaseModel
 from common.exceptions import JMSException
 from common.utils.timezone import as_current_tz
-from common.mixins.models import CommonModelMixin
-from common.db.encoder import ModelJSONFieldEncoder
+from orgs.models import Organization
+from orgs.utils import tmp_to_org
 from tickets.const import (
     TicketType, TicketStatus, TicketState,
     TicketLevel, StepState, StepStatus
@@ -25,11 +25,12 @@ from tickets.handlers import get_ticket_handler
 from ..flow import TicketFlow
 
 __all__ = [
-    'Ticket', 'TicketStep', 'TicketAssignee', 'SuperTicket', 'SubTicketManager'
+    'Ticket', 'TicketStep', 'TicketAssignee',
+    'SuperTicket', 'SubTicketManager'
 ]
 
 
-class TicketStep(CommonModelMixin):
+class TicketStep(JMSBaseModel):
     ticket = models.ForeignKey(
         'Ticket', related_name='ticket_steps',
         on_delete=models.CASCADE, verbose_name='Ticket'
@@ -74,7 +75,7 @@ class TicketStep(CommonModelMixin):
         verbose_name = _("Ticket step")
 
 
-class TicketAssignee(CommonModelMixin):
+class TicketAssignee(JMSBaseModel):
     assignee = models.ForeignKey(
         'users.User', related_name='ticket_assignees',
         on_delete=models.CASCADE, verbose_name='Assignee'
@@ -267,7 +268,7 @@ class StatusMixin:
         return get_ticket_handler(ticket=self)
 
 
-class Ticket(StatusMixin, CommonModelMixin):
+class Ticket(StatusMixin, JMSBaseModel):
     title = models.CharField(max_length=256, verbose_name=_('Title'))
     type = models.CharField(
         max_length=64, choices=TicketType.choices,

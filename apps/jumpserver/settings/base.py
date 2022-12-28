@@ -3,7 +3,6 @@ import platform
 
 from redis.sentinel import SentinelManagedSSLConnection
 
-
 if platform.system() == 'Darwin' and platform.machine() == 'arm64':
     import pymysql
 
@@ -36,6 +35,7 @@ def parse_sentinels_host(sentinels_host):
 VERSION = const.VERSION
 BASE_DIR = const.BASE_DIR
 PROJECT_DIR = const.PROJECT_DIR
+APPS_DIR = os.path.join(PROJECT_DIR, 'apps')
 DATA_DIR = os.path.join(PROJECT_DIR, 'data')
 ANSIBLE_DIR = os.path.join(DATA_DIR, 'ansible')
 CERTS_DIR = os.path.join(DATA_DIR, 'certs')
@@ -308,17 +308,22 @@ else:
     REDIS_SENTINEL_SOCKET_TIMEOUT = None
 
 # Cache config
+
 REDIS_OPTIONS = {
     "REDIS_CLIENT_KWARGS": {
         "health_check_interval": 30
     },
     "CONNECTION_POOL_KWARGS": {
+        'max_connections': 100,
+    }
+}
+if REDIS_USE_SSL:
+    REDIS_OPTIONS['CONNECTION_POOL_KWARGS'].update({
         'ssl_cert_reqs': REDIS_SSL_REQUIRED,
         "ssl_keyfile": REDIS_SSL_KEY,
         "ssl_certfile": REDIS_SSL_CERT,
         "ssl_ca_certs": REDIS_SSL_CA
-    } if REDIS_USE_SSL else {}
-}
+    })
 
 if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
     REDIS_LOCATION_NO_DB = "%(protocol)s://%(service_name)s/{}" % {
@@ -338,16 +343,15 @@ if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
         }
     })
     if REDIS_USE_SSL:
-        REDIS_OPTIONS['CONNECTION_POOL_KWARGS'].update({
-            'connection_class': SentinelManagedSSLConnection
-        })
+        CONNECTION_POOL_KWARGS = REDIS_OPTIONS['CONNECTION_POOL_KWARGS']
+        CONNECTION_POOL_KWARGS['connection_class'] = SentinelManagedSSLConnection
+        REDIS_OPTIONS['CONNECTION_POOL_KWARGS'] = CONNECTION_POOL_KWARGS
     DJANGO_REDIS_CONNECTION_FACTORY = 'django_redis.pool.SentinelConnectionFactory'
 else:
     REDIS_LOCATION_NO_DB = '%(protocol)s://:%(password)s@%(host)s:%(port)s/{}' % {
         'protocol': REDIS_PROTOCOL, 'password': CONFIG.REDIS_PASSWORD,
         'host': CONFIG.REDIS_HOST, 'port': CONFIG.REDIS_PORT,
     }
-
 
 REDIS_CACHE_DEFAULT = {
     'BACKEND': 'redis_lock.django_cache.RedisCache',

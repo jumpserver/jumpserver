@@ -1,8 +1,13 @@
+from django.db.models import QuerySet
 
+from assets.models import Node, Asset
 from common.utils import get_logger
+
 from perms.models import AssetPermission
 
 logger = get_logger(__file__)
+
+__all__ = ['AssetPermissionUtil']
 
 
 class AssetPermissionUtil(object):
@@ -31,22 +36,24 @@ class AssetPermissionUtil(object):
             group_ids = [g.id for g in user_groups]
         else:
             group_ids = user_groups.values_list('id', flat=True).distinct()
-        group_perm_ids = AssetPermission.user_groups.through.objects \
+        perm_ids = AssetPermission.user_groups.through.objects \
             .filter(usergroup_id__in=group_ids) \
             .values_list('assetpermission_id', flat=True).distinct()
         if flat:
-            return group_perm_ids
-        perms = self.get_permissions(ids=group_perm_ids)
+            return perm_ids
+        perms = self.get_permissions(ids=perm_ids)
         return perms
 
-    def get_permissions_for_asset(self, asset, with_node=True, flat=False):
+    def get_permissions_for_assets(self, assets, with_node=True, flat=False):
         """ 获取资产的授权规则"""
         perm_ids = set()
-        asset_perm_ids = AssetPermission.assets.through.objects.filter(asset_id=asset.id) \
-            .values_list('assetpermission_id', flat=True).distinct()
+        assets = self.convert_to_queryset_if_need(assets, Asset)
+        asset_ids = [str(a.id) for a in assets]
+        relations = AssetPermission.assets.through.objects.filter(asset_id__in=asset_ids)
+        asset_perm_ids = relations.values_list('assetpermission_id', flat=True).distinct()
         perm_ids.update(asset_perm_ids)
         if with_node:
-            nodes = asset.get_all_nodes()
+            nodes = Asset.get_all_nodes_for_assets(assets)
             node_perm_ids = self.get_permissions_for_nodes(nodes, flat=True)
             perm_ids.update(node_perm_ids)
         if flat:
@@ -56,16 +63,12 @@ class AssetPermissionUtil(object):
 
     def get_permissions_for_nodes(self, nodes, with_ancestor=False, flat=False):
         """ 获取节点的授权规则 """
+        nodes = self.convert_to_queryset_if_need(nodes, Node)
         if with_ancestor:
-            node_ids = set()
-            for node in nodes:
-                _nodes = node.get_ancestors(with_self=True)
-                _node_ids = _nodes.values_list('id', flat=True).distinct()
-                node_ids.update(_node_ids)
-        else:
-            node_ids = nodes.values_list('id', flat=True).distinct()
-        perm_ids = AssetPermission.nodes.through.objects.filter(node_id__in=node_ids) \
-            .values_list('assetpermission_id', flat=True).distinct()
+            nodes = Node.get_ancestor_queryset(nodes)
+        node_ids = nodes.values_list('id', flat=True).distinct()
+        relations = AssetPermission.nodes.through.objects.filter(node_id__in=node_ids)
+        perm_ids = relations.values_list('assetpermission_id', flat=True).distinct()
         if flat:
             return perm_ids
         perms = self.get_permissions(ids=perm_ids)
@@ -74,17 +77,29 @@ class AssetPermissionUtil(object):
     def get_permissions_for_user_asset(self, user, asset):
         """ 获取同时包含用户、资产的授权规则 """
         user_perm_ids = self.get_permissions_for_user(user, flat=True)
-        asset_perm_ids = self.get_permissions_for_asset(asset, flat=True)
+        asset_perm_ids = self.get_permissions_for_assets([asset], flat=True)
         perm_ids = set(user_perm_ids) & set(asset_perm_ids)
         perms = self.get_permissions(ids=perm_ids)
         return perms
 
     def get_permissions_for_user_group_asset(self, user_group, asset):
         user_perm_ids = self.get_permissions_for_user_groups([user_group], flat=True)
-        asset_perm_ids = self.get_permissions_for_asset(asset, flat=True)
+        asset_perm_ids = self.get_permissions_for_assets([asset], flat=True)
         perm_ids = set(user_perm_ids) & set(asset_perm_ids)
         perms = self.get_permissions(ids=perm_ids)
         return perms
+
+    @staticmethod
+    def convert_to_queryset_if_need(objs_or_ids, model):
+        if not objs_or_ids:
+            return objs_or_ids
+        if isinstance(objs_or_ids, QuerySet) and isinstance(objs_or_ids.first(), model):
+            return objs_or_ids
+        ids = [
+            str(i.id) if isinstance(i, model) else i
+            for i in objs_or_ids
+        ]
+        return model.objects.filter(id__in=ids)
 
     @staticmethod
     def get_permissions(ids):

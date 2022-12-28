@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-#
-
-from rest_framework_bulk import BulkModelViewSet
-
-from common.mixins import CommonApiMixin
+from orgs.mixins.api import OrgBulkModelViewSet
 from ..models import AdHoc
 from ..serializers import (
     AdHocSerializer
@@ -14,9 +10,13 @@ __all__ = [
 ]
 
 
-class AdHocViewSet(CommonApiMixin, BulkModelViewSet):
+class AdHocViewSet(OrgBulkModelViewSet):
     serializer_class = AdHocSerializer
     permission_classes = ()
+    model = AdHoc
 
+    def allow_bulk_destroy(self, qs, filtered):
+        return True
     def get_queryset(self):
-        return AdHoc.objects.filter(creator=self.request.user)
+        queryset = super().get_queryset()
+        return queryset.filter(creator=self.request.user)

@@ -742,13 +742,6 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
 
-    @classmethod
-    def get_group_ids_by_user_id(cls, user_id):
-        group_ids = cls.groups.through.objects.filter(user_id=user_id) \
-            .distinct().values_list('usergroup_id', flat=True)
-        group_ids = list(group_ids)
-        return group_ids
-
     @property
     def receive_backends(self):
         return self.user_msg_subscription.receive_backends
@@ -871,7 +864,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     def delete(self, using=None, keep_parents=False):
         if self.pk == 1 or self.username == 'admin':
             return
-        return super(User, self).delete()
+        return super(User, self).delete(using=using, keep_parents=keep_parents)
 
     @classmethod
     def get_user_allowed_auth_backend_paths(cls, username):

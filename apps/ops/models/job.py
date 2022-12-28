@@ -1,43 +1,33 @@
 import json
+import logging
 import os
 import uuid
-import logging
 
+from celery import current_task
 from django.conf import settings
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
-from celery import current_task
+from django.utils.translation import gettext_lazy as _
 
-__all__ = ["Job", "JobExecution"]
+__all__ = ["Job", "JobExecution", "JobAuditLog"]
 
-from common.db.models import JMSBaseModel
+from simple_history.models import HistoricalRecords
+
 from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner
 from ops.mixin import PeriodTaskModelMixin
+from ops.variables import *
+from ops.const import Types, Modules, RunasPolicies, JobStatus
+from orgs.mixins.models import JMSOrgBaseModel
 
 
-class Job(JMSBaseModel, PeriodTaskModelMixin):
-    class Types(models.TextChoices):
-        adhoc = 'adhoc', _('Adhoc')
-        playbook = 'playbook', _('Playbook')
-
-    class RunasPolicies(models.TextChoices):
-        privileged_only = 'privileged_only', _('Privileged Only')
-        privileged_first = 'privileged_first', _('Privileged First')
-        skip = 'skip', _('Skip')
-
-    class Modules(models.TextChoices):
-        shell = 'shell', _('Shell')
-        winshell = 'win_shell', _('Powershell')
-
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     name = models.CharField(max_length=128, null=True, verbose_name=_('Name'))
     instant = models.BooleanField(default=False)
     args = models.CharField(max_length=1024, default='', verbose_name=_('Args'), null=True, blank=True)
     module = models.CharField(max_length=128, choices=Modules.choices, default=Modules.shell,
                               verbose_name=_('Module'), null=True)
     chdir = models.CharField(default="", max_length=1024, verbose_name=_('Chdir'), null=True, blank=True)
-    timeout = models.IntegerField(default=60, verbose_name=_('Timeout (Seconds)'))
+    timeout = models.IntegerField(default=-1, verbose_name=_('Timeout (Seconds)'))
     playbook = models.ForeignKey('ops.Playbook', verbose_name=_("Playbook"), null=True, on_delete=models.SET_NULL)
     type = models.CharField(max_length=128, choices=Types.choices, default=Types.adhoc, verbose_name=_("Type"))
     creator = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
@@ -48,6 +38,11 @@ class Job(JMSBaseModel, PeriodTaskModelMixin):
     use_parameter_define = models.BooleanField(default=False, verbose_name=(_('Use Parameter Define')))
     parameters_define = models.JSONField(default=dict, verbose_name=_('Parameters define'))
     comment = models.CharField(max_length=1024, default='', verbose_name=_('Comment'), null=True, blank=True)
+    version = models.IntegerField(default=0)
+    history = HistoricalRecords()
+
+    def get_history(self, version):
+        return self.history.filter(version=version).first()
 
     @property
     def last_execution(self):
@@ -90,17 +85,19 @@ class Job(JMSBaseModel, PeriodTaskModelMixin):
         return JMSInventory(self.assets.all(), self.runas_policy, self.runas)
 
     def create_execution(self):
-        return self.executions.create()
+        return self.executions.create(job_version=self.version)
 
     class Meta:
+        verbose_name = _("Job")
         ordering = ['date_created']
 
 
-class JobExecution(JMSBaseModel):
+class JobExecution(JMSOrgBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     task_id = models.UUIDField(null=True)
-    status = models.CharField(max_length=16, verbose_name=_('Status'), default='running')
+    status = models.CharField(max_length=16, verbose_name=_('Status'), default=JobStatus.running)
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='executions', null=True)
+    job_version = models.IntegerField(default=0)
     parameters = models.JSONField(default=dict, verbose_name=_('Parameters'))
     result = models.JSONField(blank=True, null=True, verbose_name=_('Result'))
     summary = models.JSONField(default=dict, verbose_name=_('Summary'))
@@ -110,37 +107,118 @@ class JobExecution(JMSBaseModel):
     date_finished = models.DateTimeField(null=True, verbose_name=_("Date finished"))
 
     @property
+    def current_job(self):
+        if self.job.version != self.job_version:
+            return self.job.get_history(self.job_version)
+        return self.job
+
+    @property
+    def material(self):
+        if self.current_job.type == 'adhoc':
+            return "{}:{}".format(self.current_job.module, self.current_job.args)
+        if self.current_job.type == 'playbook':
+            return "{}:{}:{}".format(self.org.name, self.current_job.creator.name, self.current_job.playbook.name)
+
+    @property
+    def assent_result_detail(self):
+        if self.is_finished and not self.summary.get('error', None):
+            result = {
+                "summary": self.count,
+                "detail": [],
+            }
+            for asset in self.current_job.assets.all():
+                asset_detail = {
+                    "name": asset.name,
+                    "status": "ok",
+                    "tasks": [],
+                }
+                if self.summary.get("excludes", None) and self.summary["excludes"].get(asset.name, None):
+                    asset_detail.update({"status": "excludes"})
+                    result["detail"].append(asset_detail)
+                    break
+                if self.result["dark"].get(asset.name, None):
+                    asset_detail.update({"status": "failed"})
+                    for key, task in self.result["dark"][asset.name].items():
+                        task_detail = {"name": key,
+                                       "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
+                        asset_detail["tasks"].append(task_detail)
+                if self.result["failures"].get(asset.name, None):
+                    asset_detail.update({"status": "failed"})
+                    for key, task in self.result["failures"][asset.name].items():
+                        task_detail = {"name": key,
+                                       "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
+                        asset_detail["tasks"].append(task_detail)
+
+                if self.result["ok"].get(asset.name, None):
+                    for key, task in self.result["ok"][asset.name].items():
+                        task_detail = {"name": key,
+                                       "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
+                        asset_detail["tasks"].append(task_detail)
+                result["detail"].append(asset_detail)
+            return result
+
+    @property
     def job_type(self):
-        return self.job.type
+        return self.current_job.type
 
     def compile_shell(self):
-        if self.job.type != 'adhoc':
+        if self.current_job.type != 'adhoc':
             return
-        result = "{}{}{} ".format('\'', self.job.args, '\'')
-        result += "chdir={}".format(self.job.chdir)
+        result = self.current_job.args
+        if self.current_job.chdir:
+            result += " chdir={}".format(self.current_job.chdir)
+        if self.current_job.module in ['python']:
+            result += " executable={}".format(self.current_job.module)
         return result
 
     def get_runner(self):
-        inv = self.job.inventory
+        inv = self.current_job.inventory
         inv.write_to_file(self.inventory_path)
+        self.summary = self.result = {"excludes": {}}
+        if len(inv.exclude_hosts) > 0:
+            self.summary.update({"excludes": inv.exclude_hosts})
+            self.result.update({"excludes": inv.exclude_hosts})
+            self.save()
+
         if isinstance(self.parameters, str):
             extra_vars = json.loads(self.parameters)
         else:
             extra_vars = {}
 
-        if self.job.type == 'adhoc':
+        static_variables = self.gather_static_variables()
+        extra_vars.update(static_variables)
+
+        if self.current_job.type == 'adhoc':
             args = self.compile_shell()
+            module = "shell"
+            if self.current_job.module not in ['python']:
+                module = self.current_job.module
+
             runner = AdHocRunner(
-                self.inventory_path, self.job.module, module_args=args,
-                pattern="all", project_dir=self.private_dir, extra_vars=extra_vars,
+                self.inventory_path,
+                module,
+                timeout=self.current_job.timeout,
+                module_args=args,
+                pattern="all",
+                project_dir=self.private_dir,
+                extra_vars=extra_vars,
             )
-        elif self.job.type == 'playbook':
+        elif self.current_job.type == 'playbook':
             runner = PlaybookRunner(
-                self.inventory_path, self.job.playbook.entry
+                self.inventory_path, self.current_job.playbook.entry
             )
         else:
             raise Exception("unsupported job type")
         return runner
+
+    def gather_static_variables(self):
+        default = {
+            JMS_JOB_ID: str(self.current_job.id),
+            JMS_JOB_NAME: self.current_job.name,
+        }
+        if self.creator:
+            default.update({JMS_USERNAME: self.creator.username})
+        return default
 
     @property
     def short_id(self):
@@ -160,11 +238,11 @@ class JobExecution(JMSBaseModel):
 
     @property
     def is_finished(self):
-        return self.status in ['success', 'failed']
+        return self.status in [JobStatus.success, JobStatus.failed, JobStatus.timeout]
 
     @property
     def is_success(self):
-        return self.status == 'success'
+        return self.status == JobStatus.success
 
     @property
     def inventory_path(self):
@@ -173,23 +251,26 @@ class JobExecution(JMSBaseModel):
     @property
     def private_dir(self):
         uniq = self.date_created.strftime('%Y%m%d_%H%M%S') + '_' + self.short_id
-        job_name = self.job.name if self.job.name else 'instant'
+        job_name = self.current_job.name if self.current_job.name else 'instant'
         return os.path.join(settings.ANSIBLE_DIR, job_name, uniq)
 
     def set_error(self, error):
         this = self.__class__.objects.get(id=self.id)  # 重新获取一次，避免数据库超时连接超时
-        this.status = 'failed'
-        this.summary['error'] = str(error)
+        this.status = JobStatus.failed
+        this.summary.update({'error': str(error)})
         this.finish_task()
 
     def set_result(self, cb):
         status_mapper = {
-            'successful': 'success',
+            'successful': JobStatus.success,
         }
         this = self.__class__.objects.get(id=self.id)
         this.status = status_mapper.get(cb.status, cb.status)
-        this.summary = cb.summary
-        this.result = cb.result
+        this.summary.update(cb.summary)
+        if this.result:
+            this.result.update(cb.result)
+        else:
+            this.result = cb.result
         this.finish_task()
 
     def finish_task(self):
@@ -216,4 +297,15 @@ class JobExecution(JMSBaseModel):
             self.set_error(e)
 
     class Meta:
+        verbose_name = _("Job Execution")
         ordering = ['-date_created']
+
+
+class JobAuditLog(JobExecution):
+    @property
+    def creator_name(self):
+        return self.creator.name
+
+    class Meta:
+        proxy = True
+        verbose_name = _("Job audit log")

@@ -76,31 +76,9 @@ class Migration(migrations.Migration):
             field=models.CharField(blank=True, max_length=32, null=True, verbose_name='Updated by'),
         ),
         migrations.AlterField(
-            model_name='platformautomation',
-            name='push_account_enabled',
-            field=models.BooleanField(default=False, verbose_name='Push account enabled'),
-        ),
-        migrations.AlterField(
-            model_name='platformautomation',
-            name='push_account_method',
-            field=models.TextField(blank=True, max_length=32, null=True, verbose_name='Push account method'),
-        ),
-        migrations.AlterField(
             model_name='platformprotocol',
             name='default',
             field=models.BooleanField(default=False, verbose_name='Default'),
-        ),
-        migrations.CreateModel(
-            name='DiscoveryAccountAutomation',
-            fields=[
-                ('baseautomation_ptr',
-                 models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True,
-                                      primary_key=True, serialize=False, to='assets.baseautomation')),
-            ],
-            options={
-                'verbose_name': 'Discovery account automation',
-            },
-            bases=('assets.baseautomation',),
         ),
         migrations.CreateModel(
             name='GatherFactsAutomation',

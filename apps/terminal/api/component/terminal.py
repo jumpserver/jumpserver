@@ -10,16 +10,13 @@ from rest_framework.views import APIView, Response
 
 from common.drf.api import JMSBulkModelViewSet
 from common.exceptions import JMSException
-from common.permissions import IsValidUser
 from common.permissions import WithBootstrapToken
-from common.utils import get_request_os
 from terminal import serializers
-from terminal.const import TerminalType
 from terminal.models import Terminal
 
 __all__ = [
     'TerminalViewSet', 'TerminalConfig',
-    'TerminalRegistrationApi', 'ConnectMethodListApi'
+    'TerminalRegistrationApi',
 ]
 logger = logging.getLogger(__file__)
 
@@ -72,15 +69,3 @@ class TerminalRegistrationApi(generics.CreateAPIView):
             return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
         return super().create(request, *args, **kwargs)
 
-
-class ConnectMethodListApi(generics.ListAPIView):
-    serializer_class = serializers.ConnectMethodSerializer
-    permission_classes = [IsValidUser]
-
-    def get_queryset(self):
-        os = get_request_os(self.request)
-        return TerminalType.get_protocols_connect_methods(os)
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        return Response(queryset)

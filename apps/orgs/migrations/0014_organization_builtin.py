@@ -27,4 +27,7 @@ class Migration(migrations.Migration):
             field=models.BooleanField(default=False, verbose_name='Builtin'),
         ),
         migrations.RunPython(update_builtin_org),
+        migrations.DeleteModel(
+            name='OrganizationMember',
+        ),
     ]

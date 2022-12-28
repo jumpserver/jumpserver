@@ -11,12 +11,12 @@ from common.drf.fields import ObjectRelatedField, LabeledChoiceField
 from perms.serializers.permission import ActionChoicesField
 
 __all__ = [
-    'NodeGrantedSerializer', 'AssetGrantedSerializer',
+    'NodePermedSerializer', 'AssetPermedSerializer',
     'AccountsPermedSerializer'
 ]
 
 
-class AssetGrantedSerializer(serializers.ModelSerializer):
+class AssetPermedSerializer(serializers.ModelSerializer):
     """ 被授权资产的数据结构 """
     platform = ObjectRelatedField(required=False, queryset=Platform.objects, label=_('Platform'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
@@ -26,15 +26,14 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Asset
         only_fields = [
-            "id", "name", "address",
-            'domain', 'platform',
+            "id", "name", "address", 'domain', 'platform',
             "comment", "org_id", "is_active",
         ]
         fields = only_fields + ['protocols', 'category', 'type', 'specific'] + ['org_name']
         read_only_fields = fields
 
 
-class NodeGrantedSerializer(serializers.ModelSerializer):
+class NodePermedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Node
         fields = [
@@ -48,6 +47,8 @@ class AccountsPermedSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ['id', 'name', 'has_username', 'username',
-                  'has_secret', 'secret_type', 'actions']
+        fields = [
+            'alias', 'name', 'username', 'has_username',
+            'has_secret', 'secret_type', 'actions'
+        ]
         read_only_fields = fields

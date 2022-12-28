@@ -1,109 +1,78 @@
-from django.conf import settings
+import abc
 from rest_framework.generics import ListAPIView
 
 from assets.models import Asset, Node
-from common.utils import get_logger
+from assets.api.asset.asset import AssetFilterSet
 from perms import serializers
-from perms.pagination import AllGrantedAssetPagination
-from perms.pagination import NodeGrantedAssetPagination
-from perms.utils.user_permission import UserGrantedAssetsQueryUtils
+from perms.pagination import AllPermedAssetPagination
+from perms.pagination import NodePermedAssetPagination
+from perms.utils import UserPermAssetUtil
+from common.utils import get_logger, lazyproperty
+
 from .mixin import (
-    SelfOrPKUserMixin, RebuildTreeMixin,
-    PermedAssetSerializerMixin, AssetsTreeFormatMixin
+    SelfOrPKUserMixin
 )
 
+
 __all__ = [
+    'UserAllPermedAssetsApi',
     'UserDirectPermedAssetsApi',
     'UserFavoriteAssetsApi',
-    'UserDirectPermedAssetsAsTreeApi',
-    'UserUngroupAssetsAsTreeApi',
-    'UserAllPermedAssetsApi',
     'UserPermedNodeAssetsApi',
 ]
 
 logger = get_logger(__name__)
 
 
-class UserDirectPermedAssetsApi(SelfOrPKUserMixin, PermedAssetSerializerMixin, ListAPIView):
-    """ 直接授权给用户的资产 """
-    only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
+class BaseUserPermedAssetsApi(SelfOrPKUserMixin, ListAPIView):
+    ordering = ('name',)
+    ordering_fields = ("name", "address")
+    search_fields = ('name', 'address', 'comment')
+    filterset_class = AssetFilterSet
+    serializer_class = serializers.AssetPermedSerializer
+    only_fields = serializers.AssetPermedSerializer.Meta.only_fields
 
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return Asset.objects.none()
-
-        assets = UserGrantedAssetsQueryUtils(self.user) \
-            .get_direct_granted_assets() \
-            .prefetch_related('platform') \
-            .only(*self.only_fields)
-        return assets
-
-
-class UserFavoriteAssetsApi(SelfOrPKUserMixin, PermedAssetSerializerMixin, ListAPIView):
-    only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
-    """ 用户收藏的授权资产 """
-
-    def get_queryset(self):
-        if getattr(self, 'swagger_fake_view', False):
-            return Asset.objects.none()
-
-        user = self.user
-        utils = UserGrantedAssetsQueryUtils(user)
-        assets = utils.get_favorite_assets()
+        assets = self.get_assets()
         assets = assets.prefetch_related('platform').only(*self.only_fields)
         return assets
 
+    @abc.abstractmethod
+    def get_assets(self):
+        return Asset.objects.none()
 
-class UserDirectPermedAssetsAsTreeApi(RebuildTreeMixin, AssetsTreeFormatMixin, UserDirectPermedAssetsApi):
-    """ 用户直接授权的资产作为树 """
-    only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
+    query_asset_util: UserPermAssetUtil
 
-    def get_queryset(self):
-        if getattr(self, 'swagger_fake_view', False):
-            return Asset.objects.none()
-
-        assets = UserGrantedAssetsQueryUtils(self.user) \
-            .get_direct_granted_assets() \
-            .prefetch_related('platform') \
-            .only(*self.only_fields)
-        return assets
+    @lazyproperty
+    def query_asset_util(self):
+        return UserPermAssetUtil(self.user)
 
 
-class UserUngroupAssetsAsTreeApi(UserDirectPermedAssetsAsTreeApi):
-    """ 用户未分组节点下的资产作为树 """
+class UserAllPermedAssetsApi(BaseUserPermedAssetsApi):
+    pagination_class = AllPermedAssetPagination
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        if not settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
-            queryset = queryset.none()
-        return queryset
+    def get_assets(self):
+        return self.query_asset_util.get_all_assets()
 
 
-class UserAllPermedAssetsApi(SelfOrPKUserMixin, PermedAssetSerializerMixin, ListAPIView):
-    only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
-    pagination_class = AllGrantedAssetPagination
-
-    def get_queryset(self):
-        if getattr(self, 'swagger_fake_view', False):
-            return Asset.objects.none()
-        queryset = UserGrantedAssetsQueryUtils(self.user).get_all_granted_assets()
-        only_fields = [i for i in self.only_fields if i not in ['protocols']]
-        queryset = queryset.prefetch_related('platform', 'protocols').only(*only_fields)
-        return queryset
+class UserDirectPermedAssetsApi(BaseUserPermedAssetsApi):
+    def get_assets(self):
+        return self.query_asset_util.get_direct_assets()
 
 
-class UserPermedNodeAssetsApi(SelfOrPKUserMixin, PermedAssetSerializerMixin, ListAPIView):
-    only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
-    pagination_class = NodeGrantedAssetPagination
-    kwargs: dict
+class UserFavoriteAssetsApi(BaseUserPermedAssetsApi):
+    def get_assets(self):
+        return self.query_asset_util.get_favorite_assets()
+
+
+class UserPermedNodeAssetsApi(BaseUserPermedAssetsApi):
+    pagination_class = NodePermedAssetPagination
     pagination_node: Node
 
-    def get_queryset(self):
-        if getattr(self, 'swagger_fake_view', False):
-            return Asset.objects.none()
+    def get_assets(self):
         node_id = self.kwargs.get("node_id")
-
-        node, assets = UserGrantedAssetsQueryUtils(self.user).get_node_all_assets(node_id)
-        assets = assets.prefetch_related('platform').only(*self.only_fields)
+        node, assets = self.query_asset_util.get_node_all_assets(node_id)
         self.pagination_node = node
         return assets

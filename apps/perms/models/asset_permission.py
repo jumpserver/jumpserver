@@ -1,17 +1,19 @@
 import logging
-import uuid
 
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
+from users.models import User
 from assets.models import Asset, Account
-from common.db.models import UnionQuerySet
-from common.utils import date_expired_default
+from orgs.mixins.models import JMSOrgBaseModel
 from orgs.mixins.models import OrgManager
-from orgs.mixins.models import OrgModelMixin
+from common.utils import date_expired_default
+from common.utils.timezone import local_now
+
 from perms.const import ActionChoices
+from assets.const import AliasAccount
 
 __all__ = ['AssetPermission', 'ActionChoices']
 
@@ -37,7 +39,7 @@ class AssetPermissionQuerySet(models.QuerySet):
 
     def filter_by_accounts(self, accounts):
         q = Q(accounts__contains=list(accounts)) | \
-            Q(accounts__contains=Account.AliasAccount.ALL.value)
+            Q(accounts__contains=AliasAccount.ALL.value)
         return self.filter(q)
 
 
@@ -45,9 +47,12 @@ class AssetPermissionManager(OrgManager):
     def valid(self):
         return self.get_queryset().valid()
 
+    def get_expired_permissions(self):
+        now = local_now()
+        return self.get_queryset().filter(Q(date_start__lte=now) | Q(date_expired__gte=now))
 
-class AssetPermission(OrgModelMixin):
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+
+class AssetPermission(JMSOrgBaseModel):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     users = models.ManyToManyField(
         'users.User', related_name='%(class)ss', blank=True, verbose_name=_("User")
@@ -68,11 +73,8 @@ class AssetPermission(OrgModelMixin):
     date_expired = models.DateTimeField(
         default=date_expired_default, db_index=True, verbose_name=_('Date expired')
     )
-    comment = models.TextField(verbose_name=_('Comment'), blank=True)
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
     from_ticket = models.BooleanField(default=False, verbose_name=_('From ticket'))
-    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
-    created_by = models.CharField(max_length=128, blank=True, verbose_name=_('Created by'))
 
     objects = AssetPermissionManager.from_queryset(AssetPermissionQuerySet)()
 
@@ -103,9 +105,10 @@ class AssetPermission(OrgModelMixin):
         group_ids = self.user_groups.all().values_list('id', flat=True)
         user_ids = list(user_ids)
         group_ids = list(group_ids)
-        qs1 = User.objects.filter(id__in=user_ids).distinct()
-        qs2 = User.objects.filter(groups__id__in=group_ids).distinct()
-        qs = UnionQuerySet(qs1, qs2)
+        qs1_ids = User.objects.filter(id__in=user_ids).distinct().values_list('id', flat=True)
+        qs2_ids = User.objects.filter(groups__id__in=group_ids).distinct().values_list('id', flat=True)
+        qs_ids = list(qs1_ids) + list(qs2_ids)
+        qs = User.objects.filter(id__in=qs_ids)
         return qs
 
     def get_all_assets(self, flat=False):
@@ -125,9 +128,22 @@ class AssetPermission(OrgModelMixin):
         """
         asset_ids = self.get_all_assets(flat=True)
         q = Q(asset_id__in=asset_ids)
-        if Account.AliasAccount.ALL not in self.accounts:
+        if AliasAccount.ALL not in self.accounts:
             q &= Q(username__in=self.accounts)
         accounts = Account.objects.filter(q).order_by('asset__name', 'name', 'username')
         if not flat:
             return accounts
         return accounts.values_list('id', flat=True)
+
+    @classmethod
+    def get_all_users_for_perms(cls, perm_ids, flat=False):
+        user_ids = cls.users.through.objects.filter(assetpermission_id__in=perm_ids) \
+            .values_list('user_id', flat=True).distinct()
+        group_ids = cls.user_groups.through.objects.filter(assetpermission_id__in=perm_ids) \
+            .values_list('usergroup_id', flat=True).distinct()
+        group_user_ids = User.groups.through.objects.filter(usergroup_id__in=group_ids) \
+            .values_list('user_id', flat=True).distinct()
+        user_ids = set(user_ids) | set(group_user_ids)
+        if flat:
+            return user_ids
+        return User.objects.filter(id__in=user_ids)

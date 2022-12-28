@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers
 
 from assets.models import BaseAccount
 from assets.serializers.base import AuthValidateMixin
@@ -9,6 +10,8 @@ __all__ = ['BaseAccountSerializer']
 
 
 class BaseAccountSerializer(AuthValidateMixin, BulkOrgResourceModelSerializer):
+    has_secret = serializers.BooleanField(label=_("Has secret"), read_only=True)
+
     class Meta:
         model = BaseAccount
         fields_mini = ['id', 'name', 'username']

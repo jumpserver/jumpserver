@@ -1,18 +1,17 @@
 import ast
-from celery import signals
 
-from django.db import transaction
+from celery import signals
 from django.core.cache import cache
-from django.dispatch import receiver
+from django.db import transaction
+from django.db.models.signals import pre_save
 from django.db.utils import ProgrammingError
+from django.dispatch import receiver
 from django.utils import translation, timezone
 from django.utils.translation import gettext as _
 
-from common.signals import django_ready
 from common.db.utils import close_old_connections, get_logger
-
 from .celery import app
-from .models import CeleryTaskExecution, CeleryTask
+from .models import CeleryTaskExecution, CeleryTask, Job
 
 logger = get_logger(__name__)
 
@@ -20,8 +19,18 @@ TASK_LANG_CACHE_KEY = 'TASK_LANG_{}'
 TASK_LANG_CACHE_TTL = 1800
 
 
-@receiver(django_ready)
+@receiver(pre_save, sender=Job)
+def on_account_pre_create(sender, instance, **kwargs):
+    # 升级版本号
+    instance.version += 1
+
+
+@receiver(signals.worker_ready)
 def sync_registered_tasks(*args, **kwargs):
+    synced = cache.get('synced_registered_tasks', False)
+    if synced:
+        return
+    cache.set('synced_registered_tasks', True, 60)
     with transaction.atomic():
         try:
             db_tasks = CeleryTask.objects.all()

@@ -44,7 +44,11 @@ class CeleryTask(models.Model):
         return "green"
 
     class Meta:
+        verbose_name = _("Celery Task")
         ordering = ('name',)
+        permissions = [
+            ('view_taskmonitor', _('Can view task monitor'))
+        ]
 
 
 class CeleryTaskExecution(models.Model):
@@ -77,3 +81,6 @@ class CeleryTaskExecution(models.Model):
 
     def __str__(self):
         return "{}: {}".format(self.name, self.id)
+
+    class Meta:
+        verbose_name = _("Celery Task Execution")

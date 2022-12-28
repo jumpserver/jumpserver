@@ -2,28 +2,29 @@
 #
 from importlib import import_module
 
-from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin
-from django.db.models import F, Value
-from django.db.models.functions import Concat
 from django.conf import settings
-from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin
 
-from common.drf.api import JMSReadOnlyModelViewSet
-from common.plugins.es import QuerySet as ESQuerySet
-from common.drf.filters import DatetimeRangeFilter
+from ops.models.job import JobAuditLog
 from common.api import CommonGenericViewSet
-from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet, OrgRelationMixin
+from common.drf.filters import DatetimeRangeFilter
+from common.plugins.es import QuerySet as ESQuerySet
 from orgs.utils import current_org
-# from ops.models import CommandExecution
-from . import filters
+from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet
 from .backends import TYPE_ENGINE_MAPPING
 from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog
-from .serializers import FTPLogSerializer, UserLoginLogSerializer
+from .serializers import FTPLogSerializer, UserLoginLogSerializer, JobAuditLogSerializer
 from .serializers import (
-    OperateLogSerializer, OperateLogActionDetailSerializer,
-    PasswordChangeLogSerializer
+    OperateLogSerializer, OperateLogActionDetailSerializer, PasswordChangeLogSerializer
 )
+
+
+class JobAuditViewSet(OrgBulkModelViewSet):
+    model = JobAuditLog
+    serializer_class = JobAuditLogSerializer
+    http_method_names = ('get', 'head', 'options')
 
 
 class FTPLogViewSet(CreateModelMixin, ListModelMixin, OrgGenericViewSet):
@@ -33,7 +34,7 @@ class FTPLogViewSet(CreateModelMixin, ListModelMixin, OrgGenericViewSet):
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
     ]
-    filterset_fields = ['user', 'asset', 'system_user', 'filename']
+    filterset_fields = ['user', 'asset', 'account', 'filename']
     search_fields = filterset_fields
     ordering = ['-date_start']
 

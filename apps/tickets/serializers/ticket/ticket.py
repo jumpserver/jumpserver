@@ -61,7 +61,6 @@ class TicketApplySerializer(TicketSerializer):
     org_id = serializers.CharField(
         required=True, max_length=36, allow_blank=True, label=_("Organization")
     )
-    applicant = serializers.CharField(required=False, allow_blank=True)
 
     def get_applicant(self, applicant_id):
         current_user = self.context['request'].user

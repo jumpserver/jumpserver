@@ -126,17 +126,6 @@ class LabelFilterBackend(filters.BaseFilterBackend):
         return queryset
 
 
-class AssetRelatedByNodeFilterBackend(AssetByNodeFilterBackend):
-    def filter_node_related_all(self, queryset, node):
-        return queryset.filter(
-            Q(asset__nodes__key__istartswith=f'{node.key}:') |
-            Q(asset__nodes__key=node.key)
-        ).distinct()
-
-    def filter_node_related_direct(self, queryset, node):
-        return queryset.filter(asset__nodes__key=node.key).distinct()
-
-
 class IpInFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         ips = request.query_params.get('ips')

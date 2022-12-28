@@ -1,11 +1,11 @@
-from django.utils.translation import ugettext_lazy as _, gettext
 from django.db import models
+from django.utils.translation import ugettext_lazy as _, gettext
 
 from common.db.models import JMSBaseModel
 from common.utils import lazyproperty
 from .permission import Permission
-from ..builtin import BuiltinRole
 from .. import const
+from ..builtin import BuiltinRole
 
 __all__ = ['Role', 'SystemRole', 'OrgRole']
 
@@ -33,7 +33,7 @@ class Role(JMSBaseModel):
     permissions = models.ManyToManyField(
         'rbac.Permission', related_name='roles', blank=True, verbose_name=_('Permissions')
     )
-    builtin = models.BooleanField(default=False, verbose_name=_('Built-in'))
+    builtin = models.BooleanField(default=False, verbose_name=_('Builtin'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
     BuiltinRole = BuiltinRole
@@ -71,14 +71,14 @@ class Role(JMSBaseModel):
     @classmethod
     def get_roles_permissions(cls, roles):
         org_roles = [role for role in roles if role.scope == cls.Scope.org]
-        org_perms_id = cls.get_scope_roles_perms(org_roles, cls.Scope.org)\
+        org_perms_id = cls.get_scope_roles_perms(org_roles, cls.Scope.org) \
             .values_list('id', flat=True)
 
         system_roles = [role for role in roles if role.scope == cls.Scope.system]
-        system_perms_id = cls.get_scope_roles_perms(system_roles, cls.Scope.system)\
+        system_perms_id = cls.get_scope_roles_perms(system_roles, cls.Scope.system) \
             .values_list('id', flat=True)
         perms_id = set(org_perms_id) | set(system_perms_id)
-        permissions = Permission.objects.filter(id__in=perms_id)\
+        permissions = Permission.objects.filter(id__in=perms_id) \
             .prefetch_related('content_type')
         return permissions
 

@@ -3,14 +3,15 @@
 
 from rest_framework import mixins
 
+from assets import serializers
+from assets.models import ChangeSecretAutomation, ChangeSecretRecord, AutomationExecution
 from common.utils import get_object_or_none
 from orgs.mixins.api import OrgBulkModelViewSet, OrgGenericViewSet
-
-from assets.models import ChangeSecretAutomation, ChangeSecretRecord, AutomationExecution
-from assets import serializers
+from .base import AutomationExecutionViewSet
 
 __all__ = [
-    'ChangeSecretAutomationViewSet', 'ChangeSecretRecordViewSet'
+    'ChangeSecretAutomationViewSet', 'ChangeSecretRecordViewSet',
+    'ChangSecretExecutionViewSet'
 ]
 
 
@@ -38,3 +39,11 @@ class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
             queryset = queryset.filter(execution=execution)
         queryset = queryset.order_by('-date_started')
         return queryset
+
+
+class ChangSecretExecutionViewSet(AutomationExecutionViewSet):
+    rbac_perms = (
+        ("list", "assets.view_changesecretexecution"),
+        ("retrieve", "assets.view_changesecretexecution"),
+        ("create", "assets.add_changesecretexecution"),
+    )

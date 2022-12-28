@@ -69,8 +69,6 @@ class BaseAccount(JMSOrgBaseModel):
     secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Secret'))
     privileged = models.BooleanField(verbose_name=_("Privileged"), default=False)
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
-    comment = models.TextField(blank=True, verbose_name=_('Comment'))
-    created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
 
     objects = BaseAccountManager.from_queryset(BaseAccountQuerySet)()
 

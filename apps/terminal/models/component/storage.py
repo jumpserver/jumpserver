@@ -1,22 +1,23 @@
 from __future__ import unicode_literals
+
 import copy
 import os
 from importlib import import_module
 
 import jms_storage
+from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
 
-from common.mixins import CommonModelMixin
+from common.db.fields import EncryptJsonDictTextField
+from common.db.models import JMSBaseModel
 from common.plugins.es import QuerySet as ESQuerySet
 from common.utils import get_logger
-from common.db.fields import EncryptJsonDictTextField
 from common.utils.timezone import local_now_date_display
+from terminal import const
 from terminal.backends import TYPE_ENGINE_MAPPING
 from .terminal import Terminal
 from ..session.command import Command
-from terminal import const
 
 logger = get_logger(__file__)
 
@@ -25,7 +26,6 @@ class CommonStorageModelMixin(models.Model):
     name = models.CharField(max_length=128, verbose_name=_("Name"), unique=True)
     meta = EncryptJsonDictTextField(default={})
     is_default = models.BooleanField(default=False, verbose_name=_('Default storage'))
-    comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
     class Meta:
         abstract = True
@@ -51,7 +51,7 @@ class CommonStorageModelMixin(models.Model):
         return objs.first()
 
 
-class CommandStorage(CommonStorageModelMixin, CommonModelMixin):
+class CommandStorage(CommonStorageModelMixin, JMSBaseModel):
     type = models.CharField(
         max_length=16, choices=const.CommandStorageType.choices,
         default=const.CommandStorageType.server.value, verbose_name=_('Type'),
@@ -140,7 +140,7 @@ class CommandStorage(CommonStorageModelMixin, CommonModelMixin):
         verbose_name = _("Command storage")
 
 
-class ReplayStorage(CommonStorageModelMixin, CommonModelMixin):
+class ReplayStorage(CommonStorageModelMixin, JMSBaseModel):
     type = models.CharField(
         max_length=16, choices=const.ReplayStorageType.choices,
         default=const.ReplayStorageType.server.value, verbose_name=_('Type')

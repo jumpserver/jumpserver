@@ -1,25 +1,22 @@
 # -*- coding: utf-8 -*-
 #
-from rest_framework import serializers
+from django.db.models import Count
 from django.utils.translation import ugettext_lazy as _
+from rest_framework import serializers
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-
 from ..models import Label
 
 
 class LabelSerializer(BulkOrgResourceModelSerializer):
-    asset_count = serializers.SerializerMethodField(label=_("Assets amount"))
-    category_display = serializers.ReadOnlyField(source='get_category_display', label=_('Category display'))
+    asset_count = serializers.ReadOnlyField(label=_("Assets amount"))
 
     class Meta:
         model = Label
         fields_mini = ['id', 'name']
         fields_small = fields_mini + [
-            'value', 'category', 'category_display',
-            'is_active',
-            'date_created',
-            'comment',
+            'value', 'category', 'is_active',
+            'date_created', 'comment',
         ]
         fields_m2m = ['asset_count', 'assets']
         fields = fields_small + fields_m2m
@@ -30,14 +27,10 @@ class LabelSerializer(BulkOrgResourceModelSerializer):
             'assets': {'required': False, 'label': _('Asset')}
         }
 
-    @staticmethod
-    def get_asset_count(obj):
-        return obj.assets.count()
-
-    def get_field_names(self, declared_fields, info):
-        fields = super().get_field_names(declared_fields, info)
-        fields.extend(['get_category_display'])
-        return fields
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        queryset = queryset.annotate(asset_count=Count('assets'))
+        return queryset
 
 
 class LabelDistinctSerializer(BulkOrgResourceModelSerializer):

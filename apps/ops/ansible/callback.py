@@ -8,6 +8,7 @@ class DefaultCallback:
         'failed': 'failed',
         'running': 'running',
         'pending': 'pending',
+        'timeout': 'timeout',
         'unknown': 'unknown'
     }
 

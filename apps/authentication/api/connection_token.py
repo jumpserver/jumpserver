@@ -19,12 +19,12 @@ from common.utils import random_string
 from common.utils.django import get_request_os
 from orgs.mixins.api import RootOrgViewMixin
 from perms.models import ActionChoices
-from terminal.const import NativeClient, TerminalType
-from terminal.models import EndpointRule, Applet
+from terminal.connect_methods import NativeClient, ConnectMethodUtil
+from terminal.models import EndpointRule
 from ..models import ConnectionToken
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
-    SuperConnectionTokenSerializer,
+    SuperConnectionTokenSerializer, ConnectTokenAppletOptionSerializer
 )
 
 __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
@@ -33,30 +33,6 @@ __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
 class RDPFileClientProtocolURLMixin:
     request: Request
     get_serializer: callable
-
-    @staticmethod
-    def set_applet_info(token, rdp_options):
-        # remote-app
-        applet = Applet.objects.filter(name=token.connect_method).first()
-        if not applet:
-            return rdp_options
-
-        cmdline = {
-            'app_name': applet.name,
-            'user_id': str(token.user.id),
-            'asset_id': str(token.asset.id),
-            'token_id': str(token.id)
-        }
-
-        app = '||tinker'
-        rdp_options['remoteapplicationmode:i'] = '1'
-        rdp_options['alternate shell:s'] = app
-        rdp_options['remoteapplicationprogram:s'] = app
-        rdp_options['remoteapplicationname:s'] = app
-
-        cmdline_b64 = base64.b64encode(json.dumps(cmdline).encode()).decode()
-        rdp_options['remoteapplicationcmdline:s'] = cmdline_b64
-        return rdp_options
 
     def get_rdp_file_info(self, token: ConnectionToken):
         rdp_options = {
@@ -114,8 +90,10 @@ class RDPFileClientProtocolURLMixin:
         rdp_options['session bpp:i'] = os.getenv('JUMPSERVER_COLOR_DEPTH', '32')
         rdp_options['audiomode:i'] = self.parse_env_bool('JUMPSERVER_DISABLE_AUDIO', 'false', '2', '0')
 
-        # 设置远程应用
-        self.set_applet_info(token, rdp_options)
+        # 设置远程应用, 不是 Mstsc
+        if token.connect_method != NativeClient.mstsc:
+            remote_app_options = token.get_remote_app_option()
+            rdp_options.update(remote_app_options)
 
         # 文件名
         name = token.asset.name
@@ -145,7 +123,7 @@ class RDPFileClientProtocolURLMixin:
         _os = get_request_os(self.request)
 
         connect_method_name = token.connect_method
-        connect_method_dict = TerminalType.get_connect_method(
+        connect_method_dict = ConnectMethodUtil.get_connect_method(
             token.connect_method, token.protocol, _os
         )
         if connect_method_dict is None:
@@ -159,15 +137,17 @@ class RDPFileClientProtocolURLMixin:
             'file': {}
         }
 
-        if connect_method_name == NativeClient.mstsc:
+        if connect_method_name == NativeClient.mstsc or connect_method_dict['type'] == 'applet':
             filename, content = self.get_rdp_file_info(token)
             data.update({
+                'protocol': 'rdp',
                 'file': {
                     'name': filename,
                     'content': content,
                 }
             })
         else:
+            print("Connect method: {}".format(connect_method_dict))
             endpoint = self.get_smart_endpoint(
                 protocol=connect_method_dict['endpoint_protocol'],
                 asset=token.asset
@@ -227,37 +207,15 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
     search_fields = filterset_fields
     serializer_classes = {
         'default': ConnectionTokenSerializer,
-        'get_secret_detail': ConnectionTokenSecretSerializer,
     }
     rbac_perms = {
         'list': 'authentication.view_connectiontoken',
         'retrieve': 'authentication.view_connectiontoken',
         'create': 'authentication.add_connectiontoken',
         'expire': 'authentication.add_connectiontoken',
-        'get_secret_detail': 'authentication.view_connectiontokensecret',
         'get_rdp_file': 'authentication.add_connectiontoken',
         'get_client_protocol_url': 'authentication.add_connectiontoken',
     }
-
-    @action(methods=['POST'], detail=False, url_path='secret')
-    def get_secret_detail(self, request, *args, **kwargs):
-        """ 非常重要的 api, 在逻辑层再判断一下 rbac 权限, 双重保险 """
-        rbac_perm = 'authentication.view_connectiontokensecret'
-        if not request.user.has_perm(rbac_perm):
-            raise PermissionDenied('Not allow to view secret')
-
-        token_id = request.data.get('id') or ''
-        token = get_object_or_404(ConnectionToken, pk=token_id)
-        if token.is_expired:
-            raise ValidationError({'id': 'Token is expired'})
-
-        token.is_valid()
-        serializer = self.get_serializer(instance=token)
-        expire_now = request.data.get('expire_now', True)
-        if expire_now:
-            token.expire()
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def get_queryset(self):
         queryset = ConnectionToken.objects \
@@ -287,7 +245,7 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         permed_account = util.validate_permission(user, asset, account_name)
 
         if not permed_account or not permed_account.actions:
-            msg = 'user `{}` not has asset `{}` permission for login `{}`'.format(
+            msg = 'user `{}` not has asset `{}` permission for account `{}`'.format(
                 user, asset, account_name
             )
             raise PermissionDenied(msg)
@@ -305,10 +263,14 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
 class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
     serializer_classes = {
         'default': SuperConnectionTokenSerializer,
+        'get_secret_detail': ConnectionTokenSecretSerializer,
     }
     rbac_perms = {
         'create': 'authentication.add_superconnectiontoken',
-        'renewal': 'authentication.add_superconnectiontoken'
+        'renewal': 'authentication.add_superconnectiontoken',
+        'get_secret_detail': 'authentication.view_connectiontokensecret',
+        'get_applet_info': 'authentication.view_superconnectiontoken',
+        'release_applet_account': 'authentication.view_superconnectiontoken',
     }
 
     def get_queryset(self):
@@ -332,3 +294,38 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
             'msg': f'Token is renewed, date expired: {date_expired}'
         }
         return Response(data=data, status=status.HTTP_200_OK)
+
+    @action(methods=['POST'], detail=False, url_path='secret')
+    def get_secret_detail(self, request, *args, **kwargs):
+        """ 非常重要的 api, 在逻辑层再判断一下 rbac 权限, 双重保险 """
+        rbac_perm = 'authentication.view_connectiontokensecret'
+        if not request.user.has_perm(rbac_perm):
+            raise PermissionDenied('Not allow to view secret')
+
+        token_id = request.data.get('id') or ''
+        token = get_object_or_404(ConnectionToken, pk=token_id)
+        if token.is_expired:
+            raise ValidationError({'id': 'Token is expired'})
+
+        token.is_valid()
+        serializer = self.get_serializer(instance=token)
+        expire_now = request.data.get('expire_now', True)
+        if expire_now:
+            token.expire()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(methods=['POST'], detail=False, url_path='applet-option')
+    def get_applet_info(self, *args, **kwargs):
+        token_id = self.request.data.get('id')
+        token = get_object_or_404(ConnectionToken, pk=token_id)
+        if token.is_expired:
+            return Response({'error': 'Token expired'}, status=status.HTTP_400_BAD_REQUEST)
+        data = token.get_applet_option()
+        serializer = ConnectTokenAppletOptionSerializer(data)
+        return Response(serializer.data)
+
+    @action(methods=['DELETE', 'POST'], detail=False, url_path='applet-account/release')
+    def release_applet_account(self, *args, **kwargs):
+        account_id = self.request.data.get('id')
+        msg = ConnectionToken.release_applet_account(account_id)
+        return Response({'msg': msg})

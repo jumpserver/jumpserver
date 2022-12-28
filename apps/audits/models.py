@@ -2,11 +2,11 @@ import uuid
 
 from django.db import models
 from django.db.models import Q
-from django.utils.translation import gettext, ugettext_lazy as _
 from django.utils import timezone
+from django.utils.translation import gettext, ugettext_lazy as _
 
-from common.utils import lazyproperty
 from common.db.encoder import ModelJSONFieldEncoder
+from common.utils import lazyproperty
 from orgs.mixins.models import OrgModelMixin, Organization
 from orgs.utils import current_org
 from .const import (
@@ -32,7 +32,7 @@ class FTPLog(OrgModelMixin):
         max_length=128, verbose_name=_("Remote addr"), blank=True, null=True
     )
     asset = models.CharField(max_length=1024, verbose_name=_("Asset"))
-    system_user = models.CharField(max_length=128, verbose_name=_("System user"))
+    account = models.CharField(max_length=128, verbose_name=_("Account"))
     operate = models.CharField(
         max_length=16, verbose_name=_("Operate"), choices=OperateChoices.choices
     )

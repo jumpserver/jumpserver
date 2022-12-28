@@ -4,15 +4,26 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from common.drf.fields import LabeledChoiceField
+from ops.models.job import JobAuditLog
+from ops.serializers.job import JobExecutionSerializer
 from terminal.models import Session
 from . import models
 from .const import (
-    ActionChoices,
-    OperateChoices,
-    MFAChoices,
-    LoginStatusChoices,
+    ActionChoices, OperateChoices,
+    MFAChoices, LoginStatusChoices,
     LoginTypeChoices,
 )
+
+
+class JobAuditLogSerializer(JobExecutionSerializer):
+    class Meta:
+        model = JobAuditLog
+        read_only_fields = [
+            "id", "material", "time_cost", 'date_start',
+            'date_finished', 'date_created',
+            'is_finished', 'is_success', 'created_by',
+        ]
+        fields = read_only_fields + []
 
 
 class FTPLogSerializer(serializers.ModelSerializer):
@@ -22,14 +33,8 @@ class FTPLogSerializer(serializers.ModelSerializer):
         model = models.FTPLog
         fields_mini = ["id"]
         fields_small = fields_mini + [
-            "user",
-            "remote_addr",
-            "asset",
-            "system_user",
-            "org_id",
-            "operate",
-            "filename",
-            "is_success",
+            "user", "remote_addr", "asset", "account",
+            "org_id", "operate", "filename", "is_success",
             "date_start",
         ]
         fields = fields_small
@@ -44,18 +49,11 @@ class UserLoginLogSerializer(serializers.ModelSerializer):
         model = models.UserLoginLog
         fields_mini = ["id"]
         fields_small = fields_mini + [
-            "username",
-            "type",
-            "ip",
-            "city",
-            "user_agent",
-            "mfa",
-            "reason",
-            "reason_display",
-            "backend",
-            "backend_display",
-            "status",
-            "datetime",
+            "username", "type", "ip",
+            "city", "user_agent", "mfa",
+            "reason", "reason_display",
+            "backend", "backend_display",
+            "status", "datetime",
         ]
         fields = fields_small
         extra_kwargs = {
@@ -78,14 +76,9 @@ class OperateLogSerializer(serializers.ModelSerializer):
         model = models.OperateLog
         fields_mini = ["id"]
         fields_small = fields_mini + [
-            "user",
-            "action",
-            "resource_type",
-            "resource_type_display",
-            "resource",
-            "remote_addr",
-            "datetime",
-            "org_id",
+            "user", "action", "resource_type",
+            "resource_type_display", "resource",
+            "remote_addr", "datetime", "org_id",
         ]
         fields = fields_small
         extra_kwargs = {"resource_type_display": {"label": _("Resource Type")}}
@@ -101,44 +94,3 @@ class SessionAuditSerializer(serializers.ModelSerializer):
     class Meta:
         model = Session
         fields = "__all__"
-
-
-#
-# class CommandExecutionSerializer(serializers.ModelSerializer):
-#     is_success = serializers.BooleanField(read_only=True, label=_('Is success'))
-#     hosts_display = serializers.ListSerializer(
-#         child=serializers.CharField(), source='hosts', read_only=True, label=_('Hosts display')
-#     )
-#
-#     class Meta:
-#         model = CommandExecution
-#         fields_mini = ['id']
-#         fields_small = fields_mini + [
-#             'command', 'is_finished', 'user',
-#             'date_start', 'result', 'is_success', 'org_id'
-#         ]
-#         fields = fields_small + ['hosts', 'hosts_display', 'user_display']
-#         extra_kwargs = {
-#             'result': {'label': _('Result')},  # model 上的方法，只能在这修改
-#             'is_success': {'label': _('Is success')},
-#             'hosts': {'label': _('Hosts')},  # 外键，会生成 sql。不在 model 上修改
-#             'user': {'label': _('User')},
-#             'user_display': {'label': _('User display')},
-#         }
-#
-#     @classmethod
-#     def setup_eager_loading(cls, queryset):
-#         """ Perform necessary eager loading of data. """
-#         queryset = queryset.prefetch_related('user', 'hosts')
-#         return queryset
-#
-#
-# class CommandExecutionHostsRelationSerializer(BulkSerializerMixin, serializers.ModelSerializer):
-#     asset_display = serializers.ReadOnlyField()
-#     commandexecution_display = serializers.ReadOnlyField()
-#
-#     class Meta:
-#         model = CommandExecution.hosts.through
-#         fields = [
-#             'id', 'asset', 'asset_display', 'commandexecution', 'commandexecution_display'
-#         ]

@@ -25,15 +25,6 @@ class UserGenerator(FakeDataGenerator):
     def pre_generate(self):
         self.group_ids = list(UserGroup.objects.all().values_list('id', flat=True))
 
-    def set_org(self, users):
-        relations = []
-        for u in users:
-            relations.append(OrganizationMember(
-                org_id=self.org.id,
-                user_id=u.id,
-            ))
-        OrganizationMember.objects.bulk_create(relations, ignore_conflicts=True)
-
     def set_groups(self, users):
         relations = []
         for i in users:
@@ -55,5 +46,4 @@ class UserGenerator(FakeDataGenerator):
             )
             users.append(u)
         users = User.objects.bulk_create(users, ignore_conflicts=True)
-        self.set_org(users)
         self.set_groups(users)

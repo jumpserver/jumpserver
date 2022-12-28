@@ -20,13 +20,9 @@ logger = get_logger(__file__)
 # ------------------------------------
 
 
-def get_node_assets_mapping_for_memory_pub_sub():
-    return RedisPubSub('fm.node_all_asset_ids_memory_mapping')
-
-
 class NodeAssetsMappingForMemoryPubSub(LazyObject):
     def _setup(self):
-        self._wrapped = get_node_assets_mapping_for_memory_pub_sub()
+        self._wrapped = RedisPubSub('fm.node_all_asset_ids_memory_mapping')
 
 
 node_assets_mapping_for_memory_pub_sub = NodeAssetsMappingForMemoryPubSub()

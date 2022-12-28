@@ -1,19 +1,22 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
-from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.response import Response
 
-from orgs.mixins.api import OrgBulkModelViewSet
-from rbac.permissions import RBACPermission
-
+from assets import serializers
+from assets.filters import AccountFilterSet
+from assets.models import Account, Asset
+from assets.tasks import verify_accounts_connectivity
+from authentication.const import ConfirmType
 from common.mixins import RecordViewLogMixin
 from common.permissions import UserConfirmation
-from authentication.const import ConfirmType
-from assets.models import Account
-from assets.filters import AccountFilterSet
-from assets.tasks import verify_accounts_connectivity
-from assets import serializers
+from orgs.mixins.api import OrgBulkModelViewSet
 
-__all__ = ['AccountViewSet', 'AccountSecretsViewSet', 'AccountTaskCreateAPI', 'AccountHistoriesSecretAPI']
+__all__ = [
+    'AccountViewSet', 'AccountSecretsViewSet', 'AccountTaskCreateAPI', 'AccountHistoriesSecretAPI'
+]
+
+from rbac.permissions import RBACPermission
 
 
 class AccountViewSet(OrgBulkModelViewSet):
@@ -30,10 +33,18 @@ class AccountViewSet(OrgBulkModelViewSet):
         'su_from_accounts': 'assets.view_account',
     }
 
-    @action(methods=['get'], detail=True, url_path='su-from-accounts')
+    @action(methods=['get'], detail=False, url_path='su-from-accounts')
     def su_from_accounts(self, request, *args, **kwargs):
-        account = super().get_object()
-        accounts = account.get_su_from_accounts()
+        account_id = request.query_params.get('account')
+        asset_id = request.query_params.get('asset')
+        if account_id:
+            account = get_object_or_404(Account, pk=account_id)
+            accounts = account.get_su_from_accounts()
+        elif asset_id:
+            asset = get_object_or_404(Asset, pk=asset_id)
+            accounts = asset.accounts.all()
+        else:
+            accounts = []
         serializer = serializers.AccountSerializer(accounts, many=True)
         return Response(data=serializer.data)
 
@@ -54,8 +65,7 @@ class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
         'default': serializers.AccountSecretSerializer,
     }
     http_method_names = ['get', 'options']
-    # Todo: 记得打开
-    # permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
+    permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
     rbac_perms = {
         'list': 'assets.view_accountsecret',
         'retrieve': 'assets.view_accountsecret',
@@ -66,8 +76,7 @@ class AccountHistoriesSecretAPI(RecordViewLogMixin, ListAPIView):
     model = Account.history.model
     serializer_class = serializers.AccountHistorySerializer
     http_method_names = ['get', 'options']
-    # Todo: 记得打开
-    # permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
+    permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
     rbac_perms = {
         'list': 'assets.view_accountsecret',
     }
@@ -102,4 +111,5 @@ class AccountTaskCreateAPI(CreateAPIView):
     def get_exception_handler(self):
         def handler(e, context):
             return Response({"error": str(e)}, status=400)
+
         return handler

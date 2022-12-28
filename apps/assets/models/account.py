@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
 from common.utils import lazyproperty
-
+from ..const import AliasAccount, Source
 from .base import AbsConnectivity, BaseAccount
 
 __all__ = ['Account', 'AccountTemplate']
@@ -41,11 +41,6 @@ class AccountHistoricalRecords(HistoricalRecords):
 
 
 class Account(AbsConnectivity, BaseAccount):
-    class AliasAccount(models.TextChoices):
-        ALL = '@ALL', _('All')
-        INPUT = '@INPUT', _('Manual input')
-        USER = '@USER', _('Dynamic user')
-
     asset = models.ForeignKey(
         'assets.Asset', related_name='accounts',
         on_delete=models.CASCADE, verbose_name=_('Asset')
@@ -56,6 +51,7 @@ class Account(AbsConnectivity, BaseAccount):
     )
     version = models.IntegerField(default=0, verbose_name=_('Version'))
     history = AccountHistoricalRecords(included_fields=['id', 'secret', 'secret_type', 'version'])
+    source = models.CharField(max_length=30, default=Source.LOCAL, verbose_name=_('Source'))
 
     class Meta:
         verbose_name = _('Account')
@@ -74,21 +70,32 @@ class Account(AbsConnectivity, BaseAccount):
     def platform(self):
         return self.asset.platform
 
+    @lazyproperty
+    def alias(self):
+        if self.username.startswith('@'):
+            return self.username
+        return self.name
+
     def __str__(self):
         return '{}'.format(self.username)
+
+    @lazyproperty
+    def has_secret(self):
+        return bool(self.secret)
 
     @classmethod
     def get_manual_account(cls):
         """ @INPUT 手动登录的账号(any) """
-        return cls(name=cls.AliasAccount.INPUT.label, username=cls.AliasAccount.INPUT.value, secret=None)
+        return cls(name=AliasAccount.INPUT.label, username=AliasAccount.INPUT.value, secret=None)
 
     @classmethod
     def get_user_account(cls, username):
         """ @USER 动态用户的账号(self) """
-        return cls(name=cls.AliasAccount.USER.label, username=cls.AliasAccount.USER.value)
+        return cls(name=AliasAccount.USER.label, username=AliasAccount.USER.value)
 
     def get_su_from_accounts(self):
-        return self.asset.accounts.exclude(id=self.id)
+        """ 排除自己和以自己为 su-from 的账号 """
+        return self.asset.accounts.exclude(id=self.id).exclude(su_from=self)
 
 
 class AccountTemplate(BaseAccount):

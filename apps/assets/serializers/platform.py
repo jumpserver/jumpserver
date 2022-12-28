@@ -25,7 +25,7 @@ class ProtocolSettingSerializer(serializers.Serializer):
     sftp_home = serializers.CharField(default="/tmp", label=_("SFTP home"))
 
     # HTTP
-    auto_fill = serializers.BooleanField(default=False, label=_("Auto fill"))
+    autofile = serializers.BooleanField(default=False, label=_("Autofill"))
     username_selector = serializers.CharField(
         default="", allow_blank=True, label=_("Username selector")
     )
@@ -38,37 +38,26 @@ class ProtocolSettingSerializer(serializers.Serializer):
 
 
 class PlatformAutomationSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = PlatformAutomation
         fields = [
             "id",
-            "ansible_enabled",
-            "ansible_config",
-            "ping_enabled",
-            "ping_method",
-            "gather_facts_enabled",
-            "gather_facts_method",
-            "push_account_enabled",
-            "push_account_method",
-            "change_secret_enabled",
-            "change_secret_method",
-            "verify_account_enabled",
-            "verify_account_method",
-            "gather_accounts_enabled",
-            "gather_accounts_method",
+            "ansible_enabled", "ansible_config",
+            "ping_enabled", "ping_method",
+            "gather_facts_enabled", "gather_facts_method",
+            "change_secret_enabled", "change_secret_method",
+            "verify_account_enabled", "verify_account_method",
+            "gather_accounts_enabled", "gather_accounts_method",
         ]
         extra_kwargs = {
             "ping_enabled": {"label": "启用资产探测"},
-            "ping_method": {"label": "探测方式"},
-            "gather_facts_enabled": {"label": "启用收集信息"},
+            "ping_method": {"label": "资产探测方式"},
+            "gather_facts_enabled": {"label": "收集资产信息"},
             "gather_facts_method": {"label": "收集信息方式"},
             "verify_account_enabled": {"label": "启用校验账号"},
             "verify_account_method": {"label": "校验账号方式"},
-            "push_account_enabled": {"label": "启用推送账号"},
-            "push_account_method": {"label": "推送账号方式"},
             "change_secret_enabled": {"label": "启用账号改密"},
-            "change_secret_method": {"label": "账号创建改密方式"},
+            "change_secret_method": {"label": "账号改密方式"},
             "gather_accounts_enabled": {"label": "启用账号收集"},
             "gather_accounts_method": {"label": "收集账号方式"},
         }
@@ -81,13 +70,8 @@ class PlatformProtocolsSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlatformProtocol
         fields = [
-            "id",
-            "name",
-            "port",
-            "primary",
-            "default",
-            "required",
-            "secret_types",
+            "id", "name", "port", "primary",
+            "default", "required", "secret_types",
             "setting",
         ]
 
@@ -113,17 +97,12 @@ class PlatformSerializer(WritableNestedModelSerializer):
         model = Platform
         fields_mini = ["id", "name", "internal"]
         fields_small = fields_mini + [
-            "category",
-            "type",
-            "charset",
+            "category", "type", "charset",
         ]
         fields = fields_small + [
-            "protocols_enabled",
-            "protocols",
-            "domain_enabled",
-            "su_enabled",
-            "su_method",
-            "automation",
+            "protocols_enabled", "protocols",
+            "domain_enabled", "su_enabled",
+            "su_method", "automation",
             "comment",
         ]
         extra_kwargs = {

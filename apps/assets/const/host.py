@@ -34,7 +34,7 @@ class HostTypes(BaseType):
     def _get_protocol_constrains(cls) -> dict:
         return {
             '*': {
-               'choices': ['ssh', 'telnet', 'vnc', 'rdp']
+                'choices': ['ssh', 'telnet', 'vnc', 'rdp']
             },
             cls.WINDOWS: {
                 'choices': ['rdp', 'ssh', 'vnc']
@@ -54,7 +54,6 @@ class HostTypes(BaseType):
                 'gather_accounts_enabled': True,
                 'verify_account_enabled': True,
                 'change_secret_enabled': True,
-                'push_account_enabled': True,
             },
             cls.WINDOWS: {
                 'ansible_config': {
@@ -76,7 +75,6 @@ class HostTypes(BaseType):
                 {'name': 'macOS'},
                 {'name': 'BSD'},
                 {'name': 'AIX', 'automation': {
-                    'push_account_method': 'push_account_aix',
                     'change_secret_method': 'push_secret_aix'
                 }}
             ],
@@ -97,7 +95,7 @@ class HostTypes(BaseType):
                 {
                     'name': 'RemoteAppHost',
                     '_protocols': ['rdp', 'ssh'],
-                    'protocols_setting':  {
+                    'protocols_setting': {
                         'ssh': {
                             'required': True
                         }
@@ -106,3 +104,9 @@ class HostTypes(BaseType):
             ],
             cls.OTHER_HOST: []
         }
+
+    @classmethod
+    def get_community_types(cls) -> list:
+        return [
+            cls.LINUX, cls.UNIX, cls.WINDOWS, cls.OTHER_HOST
+        ]

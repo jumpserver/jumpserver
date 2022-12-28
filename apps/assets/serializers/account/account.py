@@ -1,15 +1,15 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.drf.serializers import SecretReadableMixin
-from common.drf.fields import ObjectRelatedField, LabeledChoiceField
-from assets.tasks import push_accounts_to_assets
+from assets.const import SecretType, Source
 from assets.models import Account, AccountTemplate, Asset
+from assets.tasks import push_accounts_to_assets
+from common.drf.fields import ObjectRelatedField, LabeledChoiceField
+from common.drf.serializers import SecretReadableMixin, BulkModelSerializer
 from .base import BaseAccountSerializer
-from assets.const import SecretType
 
 
-class AccountSerializerCreateMixin(serializers.ModelSerializer):
+class AccountSerializerCreateMixin(BulkModelSerializer):
     template = serializers.UUIDField(
         required=False, allow_null=True, write_only=True,
         label=_('Account template')
@@ -53,35 +53,47 @@ class AccountSerializerCreateMixin(serializers.ModelSerializer):
         return instance
 
 
+class AccountAssetSerializer(serializers.ModelSerializer):
+    platform = ObjectRelatedField(read_only=True)
+
+    class Meta:
+        model = Asset
+        fields = ['id', 'name', 'address', 'platform']
+
+    def to_internal_value(self, data):
+        if isinstance(data, dict):
+            i = data.get('id')
+        else:
+            i = data
+
+        try:
+            return Asset.objects.get(id=i)
+        except Asset.DoesNotExist:
+            raise serializers.ValidationError(_('Asset not found'))
+
+
 class AccountSerializer(AccountSerializerCreateMixin, BaseAccountSerializer):
-    asset = ObjectRelatedField(
-        required=False, queryset=Asset.objects,
-        label=_('Asset'), attrs=('id', 'name', 'address', 'platform_id')
-    )
+    asset = AccountAssetSerializer(label=_('Asset'))
+    source = LabeledChoiceField(choices=Source.choices, label=_("Source"), read_only=True)
     su_from = ObjectRelatedField(
-        required=False, queryset=Account.objects,
-        label=_('Account'), attrs=('id', 'name', 'username')
+        required=False, queryset=Account.objects, allow_null=True, allow_empty=True,
+        label=_('Su from'), attrs=('id', 'name', 'username')
     )
 
     class Meta(BaseAccountSerializer.Meta):
         model = Account
         fields = BaseAccountSerializer.Meta.fields \
-            + ['su_from', 'version', 'asset'] \
-            + ['template', 'push_now']
+                 + ['su_from', 'version', 'asset'] \
+                 + ['template', 'push_now', 'source']
         extra_kwargs = {
             **BaseAccountSerializer.Meta.extra_kwargs,
             'name': {'required': False, 'allow_null': True},
         }
 
-    def __init__(self, *args, data=None, **kwargs):
-        super().__init__(*args, data=data, **kwargs)
-        if data and 'name' not in data:
-            username = data.get('username')
-            if username is not None:
-                data['name'] = username
-        if hasattr(self, 'initial_data') and \
-                not getattr(self, 'initial_data', None):
-            delattr(self, 'initial_data')
+    def validate_name(self, value):
+        if not value:
+            value = self.initial_data.get('username')
+        return value
 
     @classmethod
     def setup_eager_loading(cls, queryset):

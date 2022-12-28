@@ -2,9 +2,8 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from assets.const import AllTypes
-from common.db.fields import JsonDictTextField
-
 from assets.const import Protocol
+from common.db.fields import JsonDictTextField
 
 __all__ = ['Platform', 'PlatformProtocol', 'PlatformAutomation']
 
@@ -45,8 +44,6 @@ class PlatformAutomation(models.Model):
     ping_method = models.CharField(max_length=32, blank=True, null=True, verbose_name=_("Ping method"))
     gather_facts_enabled = models.BooleanField(default=False, verbose_name=_("Gather facts enabled"))
     gather_facts_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Gather facts method"))
-    push_account_enabled = models.BooleanField(default=False, verbose_name=_("Push account enabled"))
-    push_account_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Push account method"))
     change_secret_enabled = models.BooleanField(default=False, verbose_name=_("Change password enabled"))
     change_secret_method = models.TextField(
         max_length=32, blank=True, null=True, verbose_name=_("Change password method"))
@@ -83,7 +80,7 @@ class Platform(models.Model):
     protocols_enabled = models.BooleanField(default=True, verbose_name=_("Protocols enabled"))
     # 账号有关的
     su_enabled = models.BooleanField(default=False, verbose_name=_("Su enabled"))
-    su_method = models.CharField(max_length=32, blank=True, null=True, verbose_name=_("SU method"))
+    su_method = models.CharField(max_length=32, blank=True, null=True, verbose_name=_("Su method"))
     automation = models.OneToOneField(PlatformAutomation, on_delete=models.CASCADE, related_name='platform',
                                       blank=True, null=True, verbose_name=_("Automation"))
 

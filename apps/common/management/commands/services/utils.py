@@ -40,7 +40,8 @@ class ServicesUtil(object):
             service: BaseService
             service.start()
             self.files_preserve_map[service.name] = service.log_file
-            time.sleep(1)
+
+        time.sleep(1)
 
     def stop(self):
         for service in self._services:

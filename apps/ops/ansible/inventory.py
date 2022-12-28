@@ -20,6 +20,7 @@ class JMSInventory:
         self.account_prefer = account_prefer
         self.account_policy = account_policy
         self.host_callback = host_callback
+        self.exclude_hosts = {}
 
     @staticmethod
     def clean_assets(assets):
@@ -112,6 +113,7 @@ class JMSInventory:
                 'secret': account.secret, 'secret_type': account.secret_type
             } if account else None
         }
+
         if host['jms_account'] and asset.platform.type == 'oracle':
             host['jms_account']['mode'] = 'sysdba' if account.privileged else None
 
@@ -194,7 +196,7 @@ class JMSInventory:
             print(_("Skip hosts below:"))
             for i, host in enumerate(exclude_hosts, start=1):
                 print("{}: [{}] \t{}".format(i, host['name'], host['error']))
-
+                self.exclude_hosts[host['name']] = host['error']
         hosts = list(filter(lambda x: not x.get('error'), hosts))
         data = {'all': {'hosts': {}}}
         for host in hosts:

@@ -1,4 +1,3 @@
-
 from .base import BaseType
 
 
@@ -34,7 +33,6 @@ class DatabaseTypes(BaseType):
                 'gather_accounts_enabled': True,
                 'verify_account_enabled': True,
                 'change_secret_enabled': True,
-                'push_account_enabled': True,
             }
         }
         return constrains
@@ -62,3 +60,8 @@ class DatabaseTypes(BaseType):
             cls.REDIS: [{'name': 'Redis'}],
         }
 
+    @classmethod
+    def get_community_types(cls):
+        return [
+            cls.MYSQL, cls.MARIADB, cls.MONGODB, cls.REDIS
+        ]

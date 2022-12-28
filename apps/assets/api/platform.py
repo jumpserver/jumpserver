@@ -1,9 +1,9 @@
-
+from jumpserver.utils import has_valid_xpack_license
 from common.drf.api import JMSModelViewSet
 from common.drf.serializers import GroupedChoiceSerializer
 from assets.models import Platform
+from assets.const import AllTypes
 from assets.serializers import PlatformSerializer
-
 
 __all__ = ['AssetPlatformViewSet']
 
@@ -21,6 +21,11 @@ class AssetPlatformViewSet(JMSModelViewSet):
         'type_constraints': 'assets.view_platform',
         'ops_methods': 'assets.view_platform'
     }
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(type__in=AllTypes.get_types())
+        return queryset
 
     def get_object(self):
         pk = self.kwargs.get('pk', '')

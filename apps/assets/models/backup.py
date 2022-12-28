@@ -7,26 +7,23 @@ from celery import current_task
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from orgs.mixins.models import OrgModelMixin
-from ops.mixin import PeriodTaskModelMixin
-from common.utils import get_logger
 from common.const.choices import Trigger
 from common.db.encoder import ModelJSONFieldEncoder
-from common.mixins.models import CommonModelMixin
+from common.utils import get_logger
+from ops.mixin import PeriodTaskModelMixin
+from orgs.mixins.models import OrgModelMixin, JMSOrgBaseModel
 
 __all__ = ['AccountBackupPlan', 'AccountBackupPlanExecution']
 
 logger = get_logger(__file__)
 
 
-class AccountBackupPlan(CommonModelMixin, PeriodTaskModelMixin, OrgModelMixin):
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+class AccountBackupPlan(PeriodTaskModelMixin, JMSOrgBaseModel):
     types = models.JSONField(default=list)
     recipients = models.ManyToManyField(
         'users.User', related_name='recipient_escape_route_plans', blank=True,
         verbose_name=_("Recipient")
     )
-    comment = models.TextField(blank=True, verbose_name=_('Comment'))
 
     def __str__(self):
         return f'{self.name}({self.org_id})'

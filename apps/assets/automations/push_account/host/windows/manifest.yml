@@ -1,7 +1,0 @@
-id: push_account_windows
-name: Push account windows
-version: 1
-method: push_account
-category: host
-type:
-  - windows

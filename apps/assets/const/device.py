@@ -40,7 +40,6 @@ class DeviceTypes(BaseType):
                 'gather_accounts_enabled': False,
                 'verify_account_enabled': False,
                 'change_secret_enabled': False,
-                'push_account_enabled': False,
             }
         }
 
@@ -52,3 +51,9 @@ class DeviceTypes(BaseType):
             cls.ROUTER: [],
             cls.FIREWALL: []
         }
+
+    @classmethod
+    def get_community_types(cls):
+        return [
+            cls.GENERAL, cls.SWITCH, cls.ROUTER, cls.FIREWALL
+        ]

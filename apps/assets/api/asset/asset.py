@@ -30,17 +30,22 @@ __all__ = [
 
 class AssetFilterSet(BaseFilterSet):
     type = django_filters.CharFilter(field_name="platform__type", lookup_expr="exact")
-    category = django_filters.CharFilter(
-        field_name="platform__category", lookup_expr="exact"
-    )
-    hostname = django_filters.CharFilter(field_name="name", lookup_expr="exact")
+    category = django_filters.CharFilter(field_name="platform__category", lookup_expr="exact")
+    platform = django_filters.CharFilter(method='filter_platform')
 
     class Meta:
         model = Asset
         fields = [
             "id", "name", "address", "is_active",
-            "type", "category", "hostname"
+            "type", "category", "platform"
         ]
+
+    @staticmethod
+    def filter_platform(queryset, name, value):
+        if value.isdigit():
+            return queryset.filter(platform_id=value)
+        else:
+            return queryset.filter(platform__name=value)
 
 
 class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
@@ -55,8 +60,9 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
     ordering = ("name",)
     serializer_classes = (
         ("default", serializers.AssetSerializer),
-        ("suggestion", serializers.MiniAssetSerializer),
+        ("retrieve", serializers.AssetDetailSerializer),
         ("platform", serializers.PlatformSerializer),
+        ("suggestion", serializers.MiniAssetSerializer),
         ("gateways", serializers.GatewaySerializer),
     )
     rbac_perms = (
