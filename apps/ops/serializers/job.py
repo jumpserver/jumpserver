@@ -13,6 +13,7 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
     run_after_save = serializers.BooleanField(label=_("Run after save"), default=False, required=False)
     nodes = serializers.ListField(required=False, child=serializers.CharField())
+    date_last_run = serializers.DateTimeField(label=_('Date last run'), read_only=True)
 
     def create(self, validated_data):
         assets = validated_data.__getitem__('assets')
