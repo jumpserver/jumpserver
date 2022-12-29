@@ -64,11 +64,6 @@ class AssetAccountSerializer(serializers.ModelSerializer):
 
 
 class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSerializer):
-    category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
-    type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
-    domain = ObjectRelatedField(required=False, queryset=Domain.objects, label=_('Domain'), allow_null=True)
-    platform = ObjectRelatedField(required=False, queryset=Platform.objects, label=_('Platform'))
-    nodes = ObjectRelatedField(many=True, required=False, queryset=Node.objects, label=_('Nodes'))
     labels = AssetLabelSerializer(many=True, required=False, label=_('Labels'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
 
@@ -97,10 +92,10 @@ class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSeriali
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('domain', 'platform', 'protocols') \
+        queryset = queryset.prefetch_related('domain', 'platform') \
             .annotate(category=F("platform__category")) \
             .annotate(type=F("platform__type"))
-        queryset = queryset.prefetch_related('nodes', 'labels', 'accounts')
+        queryset = queryset.prefetch_related('nodes', 'labels', 'accounts', 'protocols')
         return queryset
 
     def perform_nodes_display_create(self, instance, nodes_display):

@@ -60,6 +60,17 @@ def on_request_finished_logging_db_query(sender, **kwargs):
             counter.counter, counter.time, name)
         )
 
+    for query in queries:
+        sql = query['sql']
+        if not sql or not sql.startswith('SELECT'):
+            continue
+        if sql.startswith('SELECT `rbac_') \
+                or sql.startswith('SELECT `django_') \
+                or sql.startswith('SELECT `auth_') \
+                or sql.startswith('SELECT DISTINCT `auth_'):
+            continue
+        print(' - ' + sql)
+
 
 def on_request_finished_release_local(sender, **kwargs):
     thread_local.__release_local__()

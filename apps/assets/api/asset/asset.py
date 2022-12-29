@@ -21,10 +21,8 @@ from ..mixin import NodeFilterMixin
 
 logger = get_logger(__file__)
 __all__ = [
-    "AssetViewSet",
-    "AssetTaskCreateApi",
-    "AssetsTaskCreateApi",
-    'AssetFilterSet'
+    "AssetViewSet", "AssetTaskCreateApi",
+    "AssetsTaskCreateApi", 'AssetFilterSet'
 ]
 
 
