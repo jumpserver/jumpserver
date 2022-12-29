@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-29 11:19+0800\n"
+"POT-Creation-Date: 2022-12-29 16:19+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -245,24 +245,34 @@ msgid "IP/Host"
 msgstr "IP/ホスト"
 
 #: acls/serializers/base.py:60
-msgid "ユーザー (ユーザー名)"
-msgstr "ユーザー (ユーザー名)"
+#, fuzzy
+#| msgid "Username"
+msgid "User (username)"
+msgstr "ユーザー名"
 
 #: acls/serializers/base.py:64
-msgid "アセット (名前)"
-msgstr "アセット (名前)"
+#, fuzzy
+#| msgid "Asset number"
+msgid "Asset (name)"
+msgstr "資産番号"
 
 #: acls/serializers/base.py:68
-msgid "資産 (アドレス)"
-msgstr "資産 (アドレス)"
+#, fuzzy
+#| msgid "Address"
+msgid "Asset (address)"
+msgstr "アドレス"
 
 #: acls/serializers/base.py:72
-msgid "アカウント (ユーザー名)"
-msgstr "アカウント (ユーザー名)"
+#, fuzzy
+#| msgid "Account name"
+msgid "Account (username)"
+msgstr "アカウント名"
 
 #: acls/serializers/base.py:78
-msgid "レビュアー数"
-msgstr "承認者数"
+#, fuzzy
+#| msgid "Reviewers"
+msgid "Reviewers amount"
+msgstr "レビュー担当者"
 
 #: acls/serializers/base.py:109 tickets/serializers/ticket/ticket.py:76
 msgid "The organization `{}` does not exist"
@@ -271,6 +281,10 @@ msgstr "組織 '{}'は存在しません"
 #: acls/serializers/base.py:115
 msgid "None of the reviewers belong to Organization `{}`"
 msgstr "いずれのレビューアも組織 '{}' に属していません"
+
+#: acls/serializers/command_acl.py:32
+msgid "Command group amount"
+msgstr "コマンドグループ数"
 
 #: acls/serializers/rules/rules.py:20
 #: xpack/plugins/cloud/serializers/task.py:22
@@ -7153,6 +7167,21 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "コミュニティ版"
+
+#~ msgid "ユーザー (ユーザー名)"
+#~ msgstr "ユーザー (ユーザー名)"
+
+#~ msgid "アセット (名前)"
+#~ msgstr "アセット (名前)"
+
+#~ msgid "資産 (アドレス)"
+#~ msgstr "資産 (アドレス)"
+
+#~ msgid "アカウント (ユーザー名)"
+#~ msgstr "アカウント (ユーザー名)"
+
+#~ msgid "レビュアー数"
+#~ msgstr "承認者数"
 
 #, fuzzy
 #~ msgid "Create account"
