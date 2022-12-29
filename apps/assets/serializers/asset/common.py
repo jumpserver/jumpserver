@@ -9,9 +9,9 @@ from rest_framework import serializers
 from common.drf.fields import LabeledChoiceField, ObjectRelatedField
 from common.drf.serializers import WritableNestedModelSerializer
 from orgs.mixins.serializers import BulkOrgResourceSerializerMixin
-from ..account import AccountSerializer
+from accounts.models import Account
 from ...const import Category, AllTypes
-from ...models import Asset, Node, Platform, Label, Domain, Account, Protocol
+from ...models import Asset, Node, Platform, Label, Domain, Protocol
 
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
@@ -45,10 +45,14 @@ class AssetPlatformSerializer(serializers.ModelSerializer):
         }
 
 
-class AssetAccountSerializer(AccountSerializer):
+class AssetAccountSerializer(serializers.ModelSerializer):
     add_org_fields = False
+    push_now = serializers.BooleanField(
+        default=False, label=_("Push now"), write_only=True
+    )
 
-    class Meta(AccountSerializer.Meta):
+    class Meta:
+        model = Account
         fields_mini = [
             'id', 'name', 'username', 'privileged',
             'version', 'secret_type',
@@ -60,14 +64,10 @@ class AssetAccountSerializer(AccountSerializer):
 
 
 class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSerializer):
-    category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
-    type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
-    domain = ObjectRelatedField(required=False, queryset=Domain.objects, label=_('Domain'), allow_null=True)
-    platform = ObjectRelatedField(required=False, queryset=Platform.objects, label=_('Platform'))
-    nodes = ObjectRelatedField(many=True, required=False, queryset=Node.objects, label=_('Nodes'))
     labels = AssetLabelSerializer(many=True, required=False, label=_('Labels'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
-    accounts = AssetAccountSerializer(many=True, required=False, label=_('Account'))
+
+    # accounts = AssetAccountSerializer(many=True, required=False, label=_('Account'))
 
     class Meta:
         model = Asset
@@ -75,7 +75,7 @@ class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSeriali
         fields_small = fields_mini + ['is_active', 'comment']
         fields_fk = ['domain', 'platform', 'platform']
         fields_m2m = [
-            'nodes', 'labels', 'protocols', 'accounts', 'nodes_display',
+            'nodes', 'labels', 'protocols', 'nodes_display',
         ]
         read_only_fields = [
             'category', 'type', 'info',
@@ -92,10 +92,10 @@ class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSeriali
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('domain', 'platform', 'protocols') \
+        queryset = queryset.prefetch_related('domain', 'platform') \
             .annotate(category=F("platform__category")) \
             .annotate(type=F("platform__type"))
-        queryset = queryset.prefetch_related('nodes', 'labels', 'accounts')
+        queryset = queryset.prefetch_related('nodes', 'labels', 'accounts', 'protocols')
         return queryset
 
     def perform_nodes_display_create(self, instance, nodes_display):

@@ -112,6 +112,13 @@ class PlatformSerializer(WritableNestedModelSerializer):
             "domain_default": {"label": "默认网域"},
         }
 
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        queryset = queryset.prefetch_related(
+            'protocols', 'automation'
+        )
+        return queryset
+
 
 class PlatformOpsMethodSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)

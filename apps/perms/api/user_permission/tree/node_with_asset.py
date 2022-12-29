@@ -10,9 +10,10 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.exceptions import PermissionDenied, NotFound
 
 from assets.utils import KubernetesTree
-from assets.models import Asset, Account
-from assets.const import AliasAccount
+from assets.models import Asset
+from accounts.const import AliasAccount
 from assets.api import SerializeToTreeNodeMixin
+from accounts.models import Account
 from authentication.models import ConnectionToken
 from common.utils import get_object_or_none, lazyproperty
 from common.utils.common import timeit

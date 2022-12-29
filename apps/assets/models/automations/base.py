@@ -15,10 +15,9 @@ from orgs.mixins.models import OrgModelMixin, JMSOrgBaseModel
 
 
 class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
-    accounts = models.JSONField(default=list, verbose_name=_("Accounts"))
     nodes = models.ManyToManyField('assets.Node', blank=True, verbose_name=_("Nodes"))
     assets = models.ManyToManyField('assets.Asset', blank=True, verbose_name=_("Assets"))
-    type = models.CharField(max_length=16, choices=AutomationTypes.choices, verbose_name=_('Type'))
+    type = models.CharField(max_length=16, verbose_name=_('Type'))
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
 
     def __str__(self):
@@ -60,7 +59,6 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
             'type': self.type,
             'org_id': str(self.org_id),
             'comment': self.comment,
-            'accounts': self.accounts,
             'nodes': self.get_many_to_many_ids('nodes'),
             'assets': self.get_many_to_many_ids('assets'),
         }
@@ -78,14 +76,20 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
         return execution.start()
 
     class Meta:
+        abstract = True
         unique_together = [('org_id', 'name')]
         verbose_name = _("Automation task")
+
+
+class AssetBaseAutomation(BaseAutomation):
+    class Meta:
+        verbose_name = _("Asset automation task")
 
 
 class AutomationExecution(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     automation = models.ForeignKey(
-        'BaseAutomation', related_name='executions', on_delete=models.CASCADE,
+        'AssetBaseAutomation', related_name='executions', on_delete=models.CASCADE,
         verbose_name=_('Automation task')
     )
     status = models.CharField(max_length=16, default='pending', verbose_name=_('Status'))
@@ -101,13 +105,8 @@ class AutomationExecution(OrgModelMixin):
     )
 
     class Meta:
+        ordering = ('-date_start',)
         verbose_name = _('Automation task execution')
-        permissions = [
-            ('view_changesecretexecution', _('Can view change secret execution')),
-            ('add_changesecretexection', _('Can add change secret execution')),
-            ('view_gatheraccountsexecution', _('Can view gather accounts execution')),
-            ('add_gatheraccountsexecution', _('Can add gather accounts execution')),
-        ]
 
     @property
     def manager_type(self):

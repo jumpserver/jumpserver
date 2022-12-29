@@ -2,6 +2,7 @@
 #
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework_bulk import BulkModelViewSet
+from django.db.models import QuerySet
 
 from common.mixins import CommonApiMixin, RelationMixin
 from orgs.utils import current_org
@@ -21,6 +22,10 @@ class RootOrgViewMixin:
 
 
 class OrgQuerySetMixin:
+    queryset: QuerySet
+    get_serializer_class: callable
+    action: str
+
     def get_queryset(self):
         if hasattr(self, 'model'):
             queryset = self.model.objects.all()
@@ -32,8 +37,9 @@ class OrgQuerySetMixin:
             queryset = super().get_queryset()
 
         if hasattr(self, 'swagger_fake_view'):
-            return queryset[:1]
-        if hasattr(self, 'action') and self.action == 'list':
+            return queryset.none()
+
+        if hasattr(self, 'action') and (self.action == 'list' or self.action == 'metadata'):
             serializer_class = self.get_serializer_class()
             if serializer_class and hasattr(serializer_class, 'setup_eager_loading'):
                 queryset = serializer_class.setup_eager_loading(queryset)

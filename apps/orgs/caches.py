@@ -7,7 +7,8 @@ from common.cache import Cache, IntegerField
 from common.utils import get_logger
 from common.utils.timezone import local_zero_hour, local_monday
 from users.models import UserGroup, User
-from assets.models import Node, Domain, Asset, Account
+from assets.models import Node, Domain, Asset
+from accounts.models import Account
 from terminal.models import Session
 from perms.models import AssetPermission
 

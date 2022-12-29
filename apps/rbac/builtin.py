@@ -19,7 +19,6 @@ user_perms = (
     ('assets', 'systemuser', 'match', 'systemuser'),
     ('assets', 'node', 'match', 'node'),
     ('applications', 'application', 'match', 'application'),
-    ('ops', 'commandexecution', 'add', 'commandexecution'),
 )
 
 system_user_perms = (
@@ -36,7 +35,6 @@ _auditor_perms = (
     ('terminal', 'sessionreplay', 'view,download', 'sessionreplay'),
     ('terminal', 'session', '*', '*'),
     ('terminal', 'command', '*', '*'),
-    ('ops', 'commandexecution', 'view', 'commandexecution'),
 )
 
 auditor_perms = user_perms + _auditor_perms

@@ -7,7 +7,6 @@ from .gateway import *
 from .domain import *
 from .node import *
 from .favorite_asset import *
-from .account import *
 from .automations import *
 # 废弃以下
 # from ._authbook import *

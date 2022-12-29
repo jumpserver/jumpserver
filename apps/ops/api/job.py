@@ -13,7 +13,7 @@ from ops.tasks import run_ops_job_execution
 from ops.variables import JMS_JOB_VARIABLE_HELP
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import tmp_to_org, get_current_org_id, get_current_org
-from assets.models import Account
+from accounts.models import Account
 
 
 def set_task_to_serializer_data(serializer, task):

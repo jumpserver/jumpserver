@@ -1,7 +1,7 @@
 from collections import defaultdict
 
-from assets.models import Account
-from assets.const import AliasAccount
+from accounts.models import Account
+from accounts.const import AliasAccount
 from .permission import AssetPermissionUtil
 
 __all__ = ['PermAccountUtil']
