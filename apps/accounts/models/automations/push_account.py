@@ -12,8 +12,12 @@ class PushAccountAutomation(AccountBaseAutomation, ChangeSecretMixin):
     accounts = None
     username = models.CharField(max_length=128, verbose_name=_('Username'))
 
+    def set_period_schedule(self):
+        pass
+
     def save(self, *args, **kwargs):
         self.type = AutomationTypes.push_account
+        self.is_periodic = False
         super().save(*args, **kwargs)
 
     class Meta:

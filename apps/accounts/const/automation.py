@@ -38,7 +38,7 @@ class AutomationTypes(TextChoices):
 
 
 class SecretStrategy(TextChoices):
-    custom = 'specific', _('Specific')
+    custom = 'specific', _('Specific password')
     random_one = 'random_one', _('All assets use the same random password')
     random_all = 'random_all', _('All assets use different random password')
 
