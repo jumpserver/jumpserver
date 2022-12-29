@@ -41,8 +41,3 @@ class AccountBackupPlanExecutionViewSet(viewsets.ModelViewSet):
         pid = serializer.data.get('plan')
         task = execute_account_backup_plan.delay(pid=pid, trigger=Trigger.manual)
         return Response({'task': task.id}, status=status.HTTP_201_CREATED)
-
-    def filter_queryset(self, queryset):
-        queryset = super().filter_queryset(queryset)
-        queryset = queryset.order_by('-date_start')
-        return queryset

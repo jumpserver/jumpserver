@@ -7,11 +7,16 @@ from accounts import serializers
 from accounts.models import ChangeSecretAutomation, ChangeSecretRecord, AutomationExecution
 from common.utils import get_object_or_none
 from orgs.mixins.api import OrgBulkModelViewSet, OrgGenericViewSet
-from .base import AutomationExecutionViewSet
+from .base import (
+    AutomationAssetsListApi, AutomationRemoveAssetApi, AutomationAddAssetApi,
+    AutomationNodeAddRemoveApi, AutomationExecutionViewSet
+)
 
 __all__ = [
     'ChangeSecretAutomationViewSet', 'ChangeSecretRecordViewSet',
-    'ChangSecretExecutionViewSet'
+    'ChangSecretExecutionViewSet', 'ChangSecretAssetsListApi',
+    'ChangSecretRemoveAssetApi', 'ChangSecretAddAssetApi',
+    'ChangSecretNodeAddRemoveApi'
 ]
 
 
@@ -43,7 +48,26 @@ class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
 
 class ChangSecretExecutionViewSet(AutomationExecutionViewSet):
     rbac_perms = (
-        ("list", "assets.view_changesecretexecution"),
-        ("retrieve", "assets.view_changesecretexecution"),
-        ("create", "assets.add_changesecretexecution"),
+        ("list", "accounts.view_changesecretexecution"),
+        ("retrieve", "accounts.view_changesecretexecution"),
+        ("create", "accounts.add_changesecretexecution"),
     )
+
+
+class ChangSecretAssetsListApi(AutomationAssetsListApi):
+    model = ChangeSecretAutomation
+
+
+class ChangSecretRemoveAssetApi(AutomationRemoveAssetApi):
+    model = ChangeSecretAutomation
+    serializer_class = serializers.ChangeSecretUpdateAssetSerializer
+
+
+class ChangSecretAddAssetApi(AutomationAddAssetApi):
+    model = ChangeSecretAutomation
+    serializer_class = serializers.ChangeSecretUpdateAssetSerializer
+
+
+class ChangSecretNodeAddRemoveApi(AutomationNodeAddRemoveApi):
+    model = ChangeSecretAutomation
+    serializer_class = serializers.ChangeSecretUpdateNodeSerializer

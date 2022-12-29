@@ -17,13 +17,14 @@ __all__ = [
 
 
 class AutomationAssetsListApi(generics.ListAPIView):
+    model = BaseAutomation
     serializer_class = serializers.AutomationAssetsSerializer
     filter_fields = ("name", "address")
     search_fields = filter_fields
 
     def get_object(self):
         pk = self.kwargs.get('pk')
-        return get_object_or_404(BaseAutomation, pk=pk)
+        return get_object_or_404(self.model, pk=pk)
 
     def get_queryset(self):
         instance = self.get_object()
@@ -68,7 +69,7 @@ class AutomationAddAssetApi(generics.RetrieveUpdateAPIView):
 
 class AutomationNodeAddRemoveApi(generics.RetrieveUpdateAPIView):
     model = BaseAutomation
-    serializer_class = serializers.UpdateAssetSerializer
+    serializer_class = serializers.UpdateNodeSerializer
 
     def update(self, request, *args, **kwargs):
         action_params = ['add', 'remove']
@@ -99,11 +100,6 @@ class AutomationExecutionViewSet(
 
     def get_queryset(self):
         queryset = AutomationExecution.objects.all()
-        return queryset
-
-    def filter_queryset(self, queryset):
-        queryset = super().filter_queryset(queryset)
-        queryset = queryset.order_by('-date_start')
         return queryset
 
     def create(self, request, *args, **kwargs):
