@@ -13,7 +13,7 @@ __all__ = [
 
 @org_aware_func("assets")
 def verify_accounts_connectivity_util(accounts, assets, task_name):
-    from assets.models import VerifyAccountAutomation
+    from accounts.models import VerifyAccountAutomation
     task_name = VerifyAccountAutomation.generate_unique_name(task_name)
     account_usernames = list(accounts.values_list('username', flat=True))
 
@@ -29,7 +29,8 @@ def verify_accounts_connectivity_util(accounts, assets, task_name):
 
 @shared_task(queue="ansible", verbose_name=_('Verify asset account availability'))
 def verify_accounts_connectivity(account_ids, asset_ids):
-    from assets.models import Asset, Account
+    from assets.models import Asset
+    from accounts.models import Account
     with tmp_to_root_org():
         assets = Asset.objects.filter(id__in=asset_ids)
         accounts = Account.objects.filter(id__in=account_ids)

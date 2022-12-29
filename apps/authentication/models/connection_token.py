@@ -192,7 +192,7 @@ class ConnectionToken(JMSOrgBaseModel):
 
     @lazyproperty
     def account_object(self):
-        from assets.models import Account
+        from accounts.models import Account
         if not self.asset:
             return None
 
