@@ -9,7 +9,7 @@ from rest_framework import serializers
 from common.drf.fields import LabeledChoiceField, ObjectRelatedField
 from common.drf.serializers import WritableNestedModelSerializer
 from orgs.mixins.serializers import BulkOrgResourceSerializerMixin
-from accounts.models import Account
+from accounts.models import Account, AccountTemplate
 from ...const import Category, AllTypes
 from ...models import Asset, Node, Platform, Label, Domain, Protocol
 
@@ -62,12 +62,50 @@ class AssetAccountSerializer(serializers.ModelSerializer):
         ]
         fields = fields_mini + fields_write_only
 
+    def validate_name(self, value):
+        if not value:
+            value = self.initial_data.get('username')
+        return value
+
+    @staticmethod
+    def validate_template(value):
+        try:
+            return AccountTemplate.objects.get(id=value)
+        except AccountTemplate.DoesNotExist:
+            raise serializers.ValidationError(_('Account template not found'))
+
+    @staticmethod
+    def replace_attrs(account_template: AccountTemplate, attrs: dict):
+        exclude_fields = [
+            '_state', 'org_id', 'id', 'date_created',
+            'date_updated'
+        ]
+        template_attrs = {
+            k: v for k, v in account_template.__dict__.items()
+            if k not in exclude_fields
+        }
+        for k, v in template_attrs.items():
+            attrs.setdefault(k, v)
+
+    def validate(self, attrs):
+        account_template = attrs.pop('template', None)
+        if account_template:
+            self.replace_attrs(account_template, attrs)
+        self.push_now = attrs.pop('push_now', False)
+        return super().validate(attrs)
+
+    def create(self, validated_data):
+        from accounts.tasks import push_accounts_to_assets
+        instance = super().create(validated_data)
+        if self.push_now:
+            push_accounts_to_assets.delay([instance.id], [instance.asset_id])
+        return instance
+
 
 class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSerializer):
     labels = AssetLabelSerializer(many=True, required=False, label=_('Labels'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
-
-    # accounts = AssetAccountSerializer(many=True, required=False, label=_('Account'))
+    accounts = AssetAccountSerializer(many=True, required=False, label=_('Account'))
 
     class Meta:
         model = Asset
@@ -76,6 +114,7 @@ class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSeriali
         fields_fk = ['domain', 'platform', 'platform']
         fields_m2m = [
             'nodes', 'labels', 'protocols', 'nodes_display',
+            'accounts',
         ]
         read_only_fields = [
             'category', 'type', 'info',
