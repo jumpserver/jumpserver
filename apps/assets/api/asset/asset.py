@@ -15,6 +15,7 @@ from assets.tasks import (
 from common.drf.filters import BaseFilterSet
 from common.mixins.api import SuggestionMixin
 from common.utils import get_logger
+from accounts.tasks import push_accounts_to_assets, verify_accounts_connectivity
 from orgs.mixins import generics
 from orgs.mixins.api import OrgBulkModelViewSet
 from ..mixin import NodeFilterMixin
@@ -121,7 +122,7 @@ class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
         action = request.data.get("action")
         action_perm_require = {
             "refresh": "assets.refresh_assethardwareinfo",
-            "push_account": "assets.push_assetsystemuser",
+            "push_account": "assets.push_assetaccount",
             "test": "assets.test_assetconnectivity",
             "test_account": "assets.test_assetconnectivity",
         }
@@ -134,7 +135,7 @@ class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
     @staticmethod
     def perform_asset_task(serializer):
         data = serializer.validated_data
-        if data["action"] not in ["push_system_user", "test_system_user"]:
+        if data["action"] not in ["push_account", "test_account"]:
             return
 
         asset = data["asset"]

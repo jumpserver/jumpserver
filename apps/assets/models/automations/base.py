@@ -105,6 +105,7 @@ class AutomationExecution(OrgModelMixin):
     )
 
     class Meta:
+        ordering = ('-date_start',)
         verbose_name = _('Automation task execution')
 
     @property

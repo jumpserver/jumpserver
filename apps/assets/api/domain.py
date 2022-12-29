@@ -40,7 +40,7 @@ class GatewayViewSet(OrgBulkModelViewSet):
 
 class GatewayTestConnectionApi(SingleObjectMixin, APIView):
     rbac_perms = {
-        'POST': 'assets.test_gateway'
+        'POST': 'assets.test_assetconnectivity'
     }
 
     def get_queryset(self):
