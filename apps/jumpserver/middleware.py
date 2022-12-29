@@ -14,7 +14,7 @@ from django.shortcuts import HttpResponse
 from django.utils import timezone
 
 from authentication.backends.drf import (SignatureAuthentication,
-                                         PrivateTokenAuthentication)
+                                         AccessTokenAuthentication)
 from .utils import set_current_request
 
 
@@ -143,7 +143,7 @@ def get_signature_user(scope):
         scope['method'] = 'GET'
     try:
         backends = [SignatureAuthentication(),
-                    PrivateTokenAuthentication()]
+                    AccessTokenAuthentication()]
         for backend in backends:
             user, _ = backend.authenticate(scope)
             if user:
