@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-28 16:45+0800\n"
+"POT-Creation-Date: 2022-12-29 11:19+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -66,14 +66,14 @@ msgstr "优先级"
 msgid "1-100, the lower the value will be match first"
 msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 
-#: acls/models/base.py:77 acls/serializers/base.py:63
+#: acls/models/base.py:77 acls/serializers/base.py:81
 #: assets/models/cmd_filter.py:81 audits/models.py:51 audits/serializers.py:73
 #: authentication/serializers/connect_token_secret.py:108
 #: authentication/templates/authentication/_access_key_modal.html:34
 msgid "Action"
 msgstr "动作"
 
-#: acls/models/base.py:78 acls/serializers/base.py:59
+#: acls/models/base.py:78 acls/serializers/base.py:75
 #: acls/serializers/login_acl.py:23 assets/models/cmd_filter.py:86
 #: authentication/serializers/connect_token_secret.py:81
 msgid "Reviewers"
@@ -131,7 +131,7 @@ msgid "Account"
 msgstr "账号"
 
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
-#: ops/serializers/job.py:44 terminal/backends/command/serializers.py:15
+#: ops/serializers/job.py:45 terminal/backends/command/serializers.py:15
 #: terminal/models/session/session.py:41 terminal/serializers/session.py:19
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
@@ -242,11 +242,31 @@ msgstr ""
 msgid "IP/Host"
 msgstr "IP/主机"
 
-#: acls/serializers/base.py:90 tickets/serializers/ticket/ticket.py:78
+#: acls/serializers/base.py:60
+msgid "User (username)"
+msgstr "用户（用户名）"
+
+#: acls/serializers/base.py:64
+msgid "Asset (name)"
+msgstr "资产（名称）"
+
+#: acls/serializers/base.py:68
+msgid "Asset (address)"
+msgstr "资产（地址）"
+
+#: acls/serializers/base.py:72
+msgid "Account (username)"
+msgstr "账号（用户名）"
+
+#: acls/serializers/base.py:78
+msgid "Reviewers amount"
+msgstr "审批人数量"
+
+#: acls/serializers/base.py:109 tickets/serializers/ticket/ticket.py:76
 msgid "The organization `{}` does not exist"
 msgstr "组织 `{}` 不存在"
 
-#: acls/serializers/base.py:96
+#: acls/serializers/base.py:115
 msgid "None of the reviewers belong to Organization `{}`"
 msgstr "所有复核人都不属于组织 `{}`"
 
@@ -813,7 +833,7 @@ msgstr "原因"
 #: assets/models/automations/backup.py:89
 #: assets/serializers/automations/change_secret.py:100
 #: assets/serializers/automations/change_secret.py:125
-#: ops/serializers/job.py:45 terminal/serializers/session.py:44
+#: ops/serializers/job.py:46 terminal/serializers/session.py:44
 msgid "Is success"
 msgstr "是否成功"
 
@@ -2163,7 +2183,7 @@ msgid "The {} cannot be empty"
 msgstr "{} 不能为空"
 
 #: authentication/serializers/token.py:79 perms/serializers/permission.py:30
-#: perms/serializers/permission.py:61 users/serializers/user.py:159
+#: perms/serializers/permission.py:62 users/serializers/user.py:159
 msgid "Is valid"
 msgstr "账号是否有效"
 
@@ -2610,11 +2630,11 @@ msgstr "错误的 id \"{pk_value}\" - 对象不存在"
 msgid "Incorrect type. Expected pk value, received {data_type}."
 msgstr "错误类型。期望 pk 值，收到 {data_type}。"
 
-#: common/drf/fields.py:141
+#: common/drf/fields.py:143
 msgid "Invalid data type, should be list"
 msgstr "错误的数据类型，应该是列表"
 
-#: common/drf/fields.py:156
+#: common/drf/fields.py:158
 msgid "Invalid choice: {}"
 msgstr "无效选项: {}"
 
@@ -2989,7 +3009,7 @@ msgstr "账号策略"
 msgid "Last execution"
 msgstr "最后执行"
 
-#: ops/models/base.py:22
+#: ops/models/base.py:22 ops/serializers/job.py:16
 msgid "Date last run"
 msgstr "最后运行日期"
 
@@ -3105,15 +3125,15 @@ msgstr "CPU 使用率超过 {max_threshold}: => {value}"
 msgid "Run after save"
 msgstr "保存后执行"
 
-#: ops/serializers/job.py:43
+#: ops/serializers/job.py:44
 msgid "Job type"
 msgstr "任务类型"
 
-#: ops/serializers/job.py:46 terminal/serializers/session.py:48
+#: ops/serializers/job.py:47 terminal/serializers/session.py:48
 msgid "Is finished"
 msgstr "是否完成"
 
-#: ops/serializers/job.py:47
+#: ops/serializers/job.py:48
 msgid "Time cost"
 msgstr "花费时间"
 
@@ -3215,7 +3235,7 @@ msgstr "组织管理"
 #: orgs/mixins/models.py:57 orgs/mixins/serializers.py:25 orgs/models.py:82
 #: rbac/const.py:7 rbac/models/rolebinding.py:48
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:63
-#: tickets/models/ticket/general.py:302 tickets/serializers/ticket/ticket.py:62
+#: tickets/models/ticket/general.py:302 tickets/serializers/ticket/ticket.py:60
 msgid "Organization"
 msgstr "组织"
 
@@ -3276,7 +3296,7 @@ msgid "Clipboard"
 msgstr "剪贴板"
 
 #: perms/models/asset_permission.py:71 perms/serializers/permission.py:29
-#: perms/serializers/permission.py:59
+#: perms/serializers/permission.py:60
 #: tickets/models/ticket/apply_application.py:28
 #: tickets/models/ticket/apply_asset.py:18
 msgid "Actions"
@@ -3338,7 +3358,7 @@ msgstr "资产授权规则将要过期"
 msgid "asset permissions of organization {}"
 msgstr "组织 ({}) 的资产授权"
 
-#: perms/serializers/permission.py:31 perms/serializers/permission.py:60
+#: perms/serializers/permission.py:31 perms/serializers/permission.py:61
 #: users/serializers/user.py:91 users/serializers/user.py:161
 msgid "Is expired"
 msgstr "已过期"
@@ -5773,7 +5793,7 @@ msgstr "过期时间要大于开始时间"
 msgid "Permission named `{}` already exists"
 msgstr "授权名称 `{}` 已存在"
 
-#: tickets/serializers/ticket/ticket.py:95
+#: tickets/serializers/ticket/ticket.py:88
 msgid "The ticket flow `{}` does not exist"
 msgstr "工单流程 `{}` 不存在"
 
@@ -7273,12 +7293,6 @@ msgstr "社区版"
 
 #~ msgid "Only system users with automatic login are allowed"
 #~ msgstr "仅允许自动登录的系统用户"
-
-#~ msgid "System user name"
-#~ msgstr "系统用户名称"
-
-#~ msgid "Asset hostname"
-#~ msgstr "资产主机名"
 
 #~ msgid "The asset {} system platform {} does not support run Ansible tasks"
 #~ msgstr "资产 {} 系统平台 {} 不支持运行 Ansible 任务"

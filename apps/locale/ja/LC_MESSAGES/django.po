@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-28 16:45+0800\n"
+"POT-Creation-Date: 2022-12-29 11:19+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -67,14 +67,14 @@ msgstr "優先順位"
 msgid "1-100, the lower the value will be match first"
 msgstr "1-100、低い値は最初に一致します"
 
-#: acls/models/base.py:77 acls/serializers/base.py:63
+#: acls/models/base.py:77 acls/serializers/base.py:81
 #: assets/models/cmd_filter.py:81 audits/models.py:51 audits/serializers.py:73
 #: authentication/serializers/connect_token_secret.py:108
 #: authentication/templates/authentication/_access_key_modal.html:34
 msgid "Action"
 msgstr "アクション"
 
-#: acls/models/base.py:78 acls/serializers/base.py:59
+#: acls/models/base.py:78 acls/serializers/base.py:75
 #: acls/serializers/login_acl.py:23 assets/models/cmd_filter.py:86
 #: authentication/serializers/connect_token_secret.py:81
 msgid "Reviewers"
@@ -132,7 +132,7 @@ msgid "Account"
 msgstr "アカウント"
 
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
-#: ops/serializers/job.py:44 terminal/backends/command/serializers.py:15
+#: ops/serializers/job.py:45 terminal/backends/command/serializers.py:15
 #: terminal/models/session/session.py:41 terminal/serializers/session.py:19
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
@@ -244,11 +244,31 @@ msgstr ""
 msgid "IP/Host"
 msgstr "IP/ホスト"
 
-#: acls/serializers/base.py:90 tickets/serializers/ticket/ticket.py:78
+#: acls/serializers/base.py:60
+msgid "ユーザー (ユーザー名)"
+msgstr "ユーザー (ユーザー名)"
+
+#: acls/serializers/base.py:64
+msgid "アセット (名前)"
+msgstr "アセット (名前)"
+
+#: acls/serializers/base.py:68
+msgid "資産 (アドレス)"
+msgstr "資産 (アドレス)"
+
+#: acls/serializers/base.py:72
+msgid "アカウント (ユーザー名)"
+msgstr "アカウント (ユーザー名)"
+
+#: acls/serializers/base.py:78
+msgid "レビュアー数"
+msgstr "承認者数"
+
+#: acls/serializers/base.py:109 tickets/serializers/ticket/ticket.py:76
 msgid "The organization `{}` does not exist"
 msgstr "組織 '{}'は存在しません"
 
-#: acls/serializers/base.py:96
+#: acls/serializers/base.py:115
 msgid "None of the reviewers belong to Organization `{}`"
 msgstr "いずれのレビューアも組織 '{}' に属していません"
 
@@ -836,7 +856,7 @@ msgstr "理由"
 #: assets/models/automations/backup.py:89
 #: assets/serializers/automations/change_secret.py:100
 #: assets/serializers/automations/change_secret.py:125
-#: ops/serializers/job.py:45 terminal/serializers/session.py:44
+#: ops/serializers/job.py:46 terminal/serializers/session.py:44
 msgid "Is success"
 msgstr "成功は"
 
@@ -2258,7 +2278,7 @@ msgid "The {} cannot be empty"
 msgstr "{} 空にしてはならない"
 
 #: authentication/serializers/token.py:79 perms/serializers/permission.py:30
-#: perms/serializers/permission.py:61 users/serializers/user.py:159
+#: perms/serializers/permission.py:62 users/serializers/user.py:159
 msgid "Is valid"
 msgstr "有効です"
 
@@ -2714,11 +2734,11 @@ msgstr "%s オブジェクトは存在しません。"
 msgid "Incorrect type. Expected pk value, received {data_type}."
 msgstr ""
 
-#: common/drf/fields.py:141
+#: common/drf/fields.py:143
 msgid "Invalid data type, should be list"
 msgstr ""
 
-#: common/drf/fields.py:156
+#: common/drf/fields.py:158
 #, fuzzy
 msgid "Invalid choice: {}"
 msgstr "無効なIP"
@@ -3110,7 +3130,7 @@ msgstr "アカウントキー"
 msgid "Last execution"
 msgstr "コマンド実行"
 
-#: ops/models/base.py:22
+#: ops/models/base.py:22 ops/serializers/job.py:16
 #, fuzzy
 msgid "Date last run"
 msgstr "最終同期日"
@@ -3229,16 +3249,16 @@ msgstr "{max_threshold} を超えるCPUロード: => {value}"
 msgid "Run after save"
 msgstr "システムユーザーの実行"
 
-#: ops/serializers/job.py:43
+#: ops/serializers/job.py:44
 #, fuzzy
 msgid "Job type"
 msgstr "Docタイプ"
 
-#: ops/serializers/job.py:46 terminal/serializers/session.py:48
+#: ops/serializers/job.py:47 terminal/serializers/session.py:48
 msgid "Is finished"
 msgstr "終了しました"
 
-#: ops/serializers/job.py:47
+#: ops/serializers/job.py:48
 #, fuzzy
 #| msgid "Timestamp"
 msgid "Time cost"
@@ -3347,7 +3367,7 @@ msgstr "アプリ組織"
 #: orgs/mixins/models.py:57 orgs/mixins/serializers.py:25 orgs/models.py:82
 #: rbac/const.py:7 rbac/models/rolebinding.py:48
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:63
-#: tickets/models/ticket/general.py:302 tickets/serializers/ticket/ticket.py:62
+#: tickets/models/ticket/general.py:302 tickets/serializers/ticket/ticket.py:60
 msgid "Organization"
 msgstr "組織"
 
@@ -3412,7 +3432,7 @@ msgid "Clipboard"
 msgstr "クリップボードのコピー"
 
 #: perms/models/asset_permission.py:71 perms/serializers/permission.py:29
-#: perms/serializers/permission.py:59
+#: perms/serializers/permission.py:60
 #: tickets/models/ticket/apply_application.py:28
 #: tickets/models/ticket/apply_asset.py:18
 msgid "Actions"
@@ -3475,7 +3495,7 @@ msgstr "資産権限の有効期限が近づいています"
 msgid "asset permissions of organization {}"
 msgstr "組織 {} の資産権限"
 
-#: perms/serializers/permission.py:31 perms/serializers/permission.py:60
+#: perms/serializers/permission.py:31 perms/serializers/permission.py:61
 #: users/serializers/user.py:91 users/serializers/user.py:161
 msgid "Is expired"
 msgstr "期限切れです"
@@ -5974,7 +5994,7 @@ msgstr "有効期限は開始日より大きくする必要があります"
 msgid "Permission named `{}` already exists"
 msgstr "'{}'という名前の権限は既に存在します"
 
-#: tickets/serializers/ticket/ticket.py:95
+#: tickets/serializers/ticket/ticket.py:88
 msgid "The ticket flow `{}` does not exist"
 msgstr "チケットフロー '{}'が存在しない"
 
@@ -7498,12 +7518,6 @@ msgstr "コミュニティ版"
 
 #~ msgid "Only system users with automatic login are allowed"
 #~ msgstr "自動ログインを持つシステムユーザーのみが許可されます"
-
-#~ msgid "System user name"
-#~ msgstr "システムユーザー名"
-
-#~ msgid "Asset hostname"
-#~ msgstr "資産ホスト名"
 
 #~ msgid "The asset {} system platform {} does not support run Ansible tasks"
 #~ msgstr ""
