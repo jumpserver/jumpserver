@@ -7,6 +7,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('assets', '0119_auto_20221227_1740'),
+        ('tickets', '0025_auto_20221206_1820'),
     ]
 
     operations = [
