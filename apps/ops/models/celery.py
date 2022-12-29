@@ -13,7 +13,7 @@ from ops.celery import app
 class CeleryTask(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=1024, verbose_name=_('Name'))
-    date_last_publish = models.DateTimeField(null=True)
+    date_last_publish = models.DateTimeField(null=True, verbose_name=_("Date last publish"))
 
     @property
     def meta(self):
