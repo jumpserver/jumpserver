@@ -50,7 +50,6 @@ exclude_permissions = (
 
     ('accounts', 'historicalaccount', '*', '*'),
     ('accounts', 'accountbaseautomation', '*', '*'),
-    ('accounts', 'pushaccountautomation', '*', '*'),
     ('accounts', 'verifyaccountautomation', '*', '*'),
     ('accounts', 'automationexecution', '*', 'automationexecution'),
     ('accounts', 'accountbackupexecution', 'delete,change', 'accountbackupexecution'),
