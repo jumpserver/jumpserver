@@ -122,5 +122,5 @@ class FrequentUsernames(APIView):
     permission_classes = ()
 
     def get(self, request, **kwargs):
-        top_accounts = Account.objects.all().values('username').annotate(total=Count('username')).order_by('total')
+        top_accounts = Account.objects.all().values('username').annotate(total=Count('username')).order_by('total')[:5]
         return Response(data=top_accounts)
