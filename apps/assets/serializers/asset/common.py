@@ -103,6 +103,8 @@ class AssetAccountSerializer(serializers.ModelSerializer):
 
 
 class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSerializer):
+    category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
+    type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
     labels = AssetLabelSerializer(many=True, required=False, label=_('Labels'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
     accounts = AssetAccountSerializer(many=True, required=False, label=_('Account'))
