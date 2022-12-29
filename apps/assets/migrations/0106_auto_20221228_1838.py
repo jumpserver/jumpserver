@@ -51,9 +51,7 @@ class Migration(migrations.Migration):
                 ('automation', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='executions',
                                                  to='assets.assetbaseautomation', verbose_name='Automation task')),
             ],
-            options={
-                'verbose_name': 'Automation task execution',
-            },
+            options={'ordering': ('-date_start',), 'verbose_name': 'Automation task execution'}
         ),
         migrations.RemoveField(
             model_name='accountbackupplanexecution',
