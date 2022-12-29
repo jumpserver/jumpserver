@@ -159,7 +159,7 @@ class JobExecution(JMSOrgBaseModel):
 
     @property
     def job_type(self):
-        return self.current_job.type
+        return Types[self.job.type].label
 
     def compile_shell(self):
         if self.current_job.type != 'adhoc':

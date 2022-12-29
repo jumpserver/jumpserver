@@ -34,26 +34,27 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
     class Meta:
         model = AssetPermission
         fields_mini = ["id", "name"]
-        fields_small = fields_mini + [
+        fields_generic = [
             "accounts",
-            "is_active",
-            "is_expired",
-            "is_valid",
             "actions",
             "created_by",
             "date_created",
-            "date_expired",
             "date_start",
+            "date_expired",
+            "is_active",
+            "is_expired",
+            "is_valid",
             "comment",
             "from_ticket",
         ]
+        fields_small = fields_mini + fields_generic
         fields_m2m = [
             "users",
             "user_groups",
             "assets",
             "nodes",
         ]
-        fields = fields_small + fields_m2m
+        fields = fields_mini + fields_m2m + fields_generic
         read_only_fields = ["created_by", "date_created", "from_ticket"]
         extra_kwargs = {
             "actions": {"label": _("Actions")},
