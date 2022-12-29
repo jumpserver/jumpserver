@@ -69,7 +69,7 @@ def on_request_finished_logging_db_query(sender, **kwargs):
                 or sql.startswith('SELECT `auth_') \
                 or sql.startswith('SELECT DISTINCT `auth_'):
             continue
-        print(' - ' + sql)
+        print(' - ' + sql + '\n')
 
 
 def on_request_finished_release_local(sender, **kwargs):

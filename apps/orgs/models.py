@@ -114,7 +114,6 @@ class Organization(OrgRoleMixin, JMSBaseModel):
 
     @classmethod
     def construct_orgs_mapping(cls):
-        print("Construct orgs mapping")
         orgs_mapping = {}
         for org in cls.objects.all():
             orgs_mapping[str(org.id)] = org
