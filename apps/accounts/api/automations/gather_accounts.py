@@ -20,7 +20,7 @@ class GatherAccountsAutomationViewSet(OrgBulkModelViewSet):
 
 class GatherAccountsExecutionViewSet(AutomationExecutionViewSet):
     rbac_perms = (
-        ("list", "assets.view_gatheraccountsexecution"),
-        ("retrieve", "assets.view_gatheraccountsexecution"),
-        ("create", "assets.add_gatheraccountsexecution"),
+        ("list", "accounts.view_gatheraccountsexecution"),
+        ("retrieve", "accounts.view_gatheraccountsexecution"),
+        ("create", "accounts.add_gatheraccountsexecution"),
     )

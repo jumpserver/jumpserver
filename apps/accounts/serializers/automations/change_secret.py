@@ -19,7 +19,9 @@ logger = get_logger(__file__)
 __all__ = [
     'ChangeSecretAutomationSerializer',
     'ChangeSecretRecordSerializer',
-    'ChangeSecretRecordBackUpSerializer'
+    'ChangeSecretRecordBackUpSerializer',
+    'ChangeSecretUpdateAssetSerializer',
+    'ChangeSecretUpdateNodeSerializer',
 ]
 
 
@@ -146,3 +148,15 @@ class ChangeSecretRecordBackUpSerializer(serializers.ModelSerializer):
         if obj.status == 'success':
             return _("Success")
         return _("Failed")
+
+
+class ChangeSecretUpdateAssetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ChangeSecretAutomation
+        fields = ['id', 'assets']
+
+
+class ChangeSecretUpdateNodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ChangeSecretAutomation
+        fields = ['id', 'nodes']

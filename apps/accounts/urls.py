@@ -25,10 +25,10 @@ urlpatterns = [
     path('accounts/tasks/', api.AccountTaskCreateAPI.as_view(), name='account-task-create'),
     path('account-secrets/<uuid:pk>/histories/', api.AccountHistoriesSecretAPI.as_view(),
          name='account-secret-history'),
-    path('automation/<uuid:pk>/asset/remove/', api.AutomationRemoveAssetApi.as_view(), name='automation-remove-asset'),
-    path('automation/<uuid:pk>/asset/add/', api.AutomationAddAssetApi.as_view(), name='automation-add-asset'),
-    path('automation/<uuid:pk>/nodes/', api.AutomationNodeAddRemoveApi.as_view(), name='automation-add-or-remove-node'),
-    path('automation/<uuid:pk>/assets/', api.AutomationAssetsListApi.as_view(), name='automation-assets'),
+    path('change-secret/<uuid:pk>/asset/remove/', api.ChangSecretRemoveAssetApi.as_view(), name='change-secret-remove-asset'),
+    path('change-secret/<uuid:pk>/asset/add/', api.ChangSecretAddAssetApi.as_view(), name='change-secret-add-asset'),
+    path('change-secret/<uuid:pk>/nodes/', api.ChangSecretNodeAddRemoveApi.as_view(), name='change-secret-add-or-remove-node'),
+    path('change-secret/<uuid:pk>/assets/', api.ChangSecretAssetsListApi.as_view(), name='change-secret-assets'),
 ]
 
 urlpatterns += router.urls
