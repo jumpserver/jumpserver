@@ -22,7 +22,12 @@ class SessionType(models.TextChoices):
 class SessionSerializer(BulkOrgResourceModelSerializer):
     org_id = serializers.CharField(allow_blank=True)
     protocol = serializers.ChoiceField(choices=Protocol.choices, label=_("Protocol"))
-    type = LabeledChoiceField(choices=SessionType.choices, label=_("Type"), default=SessionType.normal)
+    type = LabeledChoiceField(
+        choices=SessionType.choices, label=_("Type"), default=SessionType.normal
+    )
+    can_replay = serializers.BooleanField(read_only=True, label=_("Can replay"))
+    can_join = serializers.BooleanField(read_only=True, label=_("Can join"))
+    can_terminate = serializers.BooleanField(read_only=True, label=_("Can terminate"))
 
     class Meta:
         model = Session
