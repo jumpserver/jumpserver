@@ -4,13 +4,12 @@ from celery import current_task
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from assets.const import AutomationTypes
-from assets.models.asset import Asset
 from assets.models.node import Node
+from assets.models.asset import Asset
 from assets.tasks import execute_automation
+from ops.mixin import PeriodTaskModelMixin
 from common.const.choices import Trigger
 from common.db.fields import EncryptJsonDictTextField
-from ops.mixin import PeriodTaskModelMixin
 from orgs.mixins.models import OrgModelMixin, JMSOrgBaseModel
 
 

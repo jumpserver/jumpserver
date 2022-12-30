@@ -1,5 +1,8 @@
 from accounts.models import PushAccountAutomation
-from .change_secret import ChangeSecretAutomationSerializer
+from .change_secret import (
+    ChangeSecretAutomationSerializer, ChangeSecretUpdateAssetSerializer,
+    ChangeSecretUpdateNodeSerializer
+)
 
 
 class PushAccountAutomationSerializer(ChangeSecretAutomationSerializer):
@@ -12,3 +15,15 @@ class PushAccountAutomationSerializer(ChangeSecretAutomationSerializer):
         fields = [f for f in fields if f not in excludes]
         fields[fields.index('accounts')] = 'username'
         return fields
+
+
+class PushAccountUpdateAssetSerializer(ChangeSecretUpdateAssetSerializer):
+    class Meta:
+        model = PushAccountAutomation
+        fields = ChangeSecretUpdateAssetSerializer.Meta.fields
+
+
+class PushAccountUpdateNodeSerializer(ChangeSecretUpdateNodeSerializer):
+    class Meta:
+        model = PushAccountAutomation
+        fields = ChangeSecretUpdateNodeSerializer.Meta.fields
