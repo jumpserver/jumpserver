@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.drf.fields import ObjectRelatedField
-from ..serializers import GatewaySerializer
+from ..serializers import GatewayWithAccountSecretSerializer
 from ..models import Domain, Asset
 
 
@@ -30,7 +30,7 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
 
 
 class DomainWithGatewaySerializer(BulkOrgResourceModelSerializer):
-    gateways = GatewaySerializer(many=True, read_only=True)
+    gateways = GatewayWithAccountSecretSerializer(many=True, read_only=True)
 
     class Meta:
         model = Domain
