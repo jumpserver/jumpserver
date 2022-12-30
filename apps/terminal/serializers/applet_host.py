@@ -47,6 +47,7 @@ class AppletHostSerializer(HostSerializer):
             'load', 'date_synced', 'deploy_options'
         ]
         extra_kwargs = {
+            **HostSerializer.Meta.extra_kwargs,
             'date_synced': {'read_only': True}
         }
 
