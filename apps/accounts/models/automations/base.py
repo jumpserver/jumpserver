@@ -10,7 +10,9 @@ __all__ = ['AccountBaseAutomation', 'AutomationExecution']
 
 
 class AccountBaseAutomation(AssetBaseAutomation):
-    accounts = models.JSONField(default=list, verbose_name=_("Accounts"))
+    class Meta:
+        proxy = True
+        verbose_name = _("Account automation task")
 
     def to_attr_json(self):
         attr_json = super().to_attr_json()

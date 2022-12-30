@@ -4,7 +4,8 @@ from rest_framework import serializers
 
 from ops.mixin import PeriodTaskSerializerMixin
 from assets.const import AutomationTypes
-from assets.models import Asset, Node, BaseAutomation, AutomationExecution
+# from assets.models import Asset, Node, BaseAutomation, AutomationExecution
+from assets.models import Asset, Node, BaseAutomation
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.utils import get_logger
 from common.drf.fields import ObjectRelatedField
@@ -42,7 +43,7 @@ class AutomationExecutionSerializer(serializers.ModelSerializer):
     trigger_display = serializers.ReadOnlyField(source='get_trigger_display', label=_('Trigger mode'))
 
     class Meta:
-        model = AutomationExecution
+        model = BaseAutomation
         read_only_fields = [
             'trigger_display', 'date_start', 'date_finished', 'snapshot', 'status'
         ]

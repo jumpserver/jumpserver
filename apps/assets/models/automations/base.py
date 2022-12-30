@@ -15,6 +15,7 @@ from orgs.mixins.models import OrgModelMixin, JMSOrgBaseModel
 
 
 class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
+    accounts = models.JSONField(default=list, verbose_name=_("Accounts"))
     nodes = models.ManyToManyField('assets.Node', blank=True, verbose_name=_("Nodes"))
     assets = models.ManyToManyField('assets.Asset', blank=True, verbose_name=_("Assets"))
     type = models.CharField(max_length=16, verbose_name=_('Type'))
@@ -76,20 +77,20 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
         return execution.start()
 
     class Meta:
-        abstract = True
         unique_together = [('org_id', 'name')]
         verbose_name = _("Automation task")
 
 
 class AssetBaseAutomation(BaseAutomation):
     class Meta:
+        proxy = True
         verbose_name = _("Asset automation task")
 
 
 class AutomationExecution(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     automation = models.ForeignKey(
-        'AssetBaseAutomation', related_name='executions', on_delete=models.CASCADE,
+        'BaseAutomation', related_name='executions', on_delete=models.CASCADE,
         verbose_name=_('Automation task')
     )
     status = models.CharField(max_length=16, default='pending', verbose_name=_('Status'))

@@ -7,7 +7,8 @@ from accounts.const import DEFAULT_PASSWORD_RULES, SecretType, SecretStrategy, S
 from assets.models import Asset
 from accounts.models import (
     Account, ChangeSecretAutomation,
-    ChangeSecretRecord, AutomationExecution
+    # ChangeSecretRecord, AutomationExecution
+    ChangeSecretRecord
 )
 from assets.serializers.base import AuthValidateMixin
 from common.drf.fields import LabeledChoiceField, ObjectRelatedField
@@ -104,7 +105,7 @@ class ChangeSecretRecordSerializer(serializers.ModelSerializer):
     asset = ObjectRelatedField(queryset=Asset.objects, label=_('Asset'))
     account = ObjectRelatedField(queryset=Account.objects, label=_('Account'))
     execution = ObjectRelatedField(
-        queryset=AutomationExecution.objects, label=_('Automation task execution')
+        queryset=Account.objects, label=_('Automation task execution')
     )
 
     class Meta:
