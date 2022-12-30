@@ -32,7 +32,8 @@ class Endpoint(JMSBaseModel):
         from terminal.utils import db_port_manager
         if protocol in ['https', 'http', 'ssh', 'rdp']:
             port = getattr(self, f'{protocol}_port', 0)
-        elif isinstance(target_instance, Asset) and target_instance.category == 'dabase':
+        elif isinstance(target_instance, Asset) and \
+                target_instance.is_category(target_instance.Category.DATABASE):
             port = db_port_manager.get_port_by_db(target_instance)
         else:
             port = 0
