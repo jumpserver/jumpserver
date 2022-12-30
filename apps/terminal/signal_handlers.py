@@ -2,7 +2,6 @@
 #
 
 from django.db.models.signals import post_save, post_delete
-from django.db.utils import ProgrammingError
 from django.dispatch import receiver
 from django.utils.functional import LazyObject
 
@@ -94,9 +93,13 @@ component_event_chan = ComponentEventChan()
 
 
 @receiver(post_save, sender=Task)
-def on_db_app_created(sender, instance: Task, created, **kwargs):
-    data = {
-        "type": "task",
-        "id": str(instance.id),
+def on_task_created(sender, instance: Task, created, **kwargs):
+    if not created:
+        return
+    event = {
+        "type": instance.name,
+        "payload": {
+            "id": str(instance.id),
+        },
     }
-    component_event_chan.publish(data)
+    component_event_chan.publish(event)

@@ -18,7 +18,7 @@ class TerminalTaskWebsocket(JsonWebsocketConsumer):
 
     def connect(self):
         user = self.scope["user"]
-        if user.terminal:
+        if user.is_authenticated and user.terminal:
             self.accept()
             self.terminal = user.terminal
             self.sub = self.watch_component_event()
@@ -29,27 +29,30 @@ class TerminalTaskWebsocket(JsonWebsocketConsumer):
         # todo: 暂时不处理, 可仅保持心跳
         pass
 
-    def get_terminal_tasks(self):
-        critical_time = timezone.now() - datetime.timedelta(minutes=10)
-        tasks = self.terminal.task_set.filter(is_finished=False, date_created__gte=critical_time)
-        serializer = TaskSerializer(tasks, many=True)
-        return JSONRenderer().render(serializer.data)
+    def get_terminal_tasks(self, task_id=None):
+        with safe_db_connection():
+            critical_time = timezone.now() - datetime.timedelta(minutes=10)
+            tasks = self.terminal.task_set.filter(is_finished=False, date_created__gte=critical_time)
+            if task_id:
+                tasks = tasks.filter(id=task_id)
+            serializer = TaskSerializer(tasks, many=True)
+            return JSONRenderer().render(serializer.data)
 
-    def send_component_tasks_msg(self):
-        content = self.get_terminal_tasks()
+    def send_kill_tasks_msg(self, task_id=None):
+        content = self.get_terminal_tasks(task_id)
         self.send(bytes_data=content)
 
     def watch_component_event(self):
         ws = self
         # 先发一次已有的任务
-        with safe_db_connection():
-            self.send_component_tasks_msg()
+        self.send_kill_tasks_msg()
 
         def handle_task_msg_recv(msg):
             logger.debug('New component task msg recv: {}'.format(msg))
             msg_type = msg.get('type')
-            if msg_type == 'task':
-                ws.send_component_tasks_msg()
+            payload = msg.get('payload')
+            if msg_type == "kill_session":
+                ws.send_kill_tasks_msg(payload.get('id'))
 
         return component_event_chan.subscribe(handle_task_msg_recv)
 

@@ -9,6 +9,7 @@ import pytz
 from channels.db import database_sync_to_async
 from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
+from django.core.handlers.asgi import ASGIRequest
 from django.http.response import HttpResponseForbidden
 from django.shortcuts import HttpResponse
 from django.utils import timezone
@@ -142,10 +143,12 @@ def get_signature_user(scope):
     if scope['type'] == 'websocket':
         scope['method'] = 'GET'
     try:
+        # 因为 ws 使用的是 scope，所以需要转换成 request 对象，用于认证校验
+        request = ASGIRequest(scope, None)
         backends = [SignatureAuthentication(),
                     AccessTokenAuthentication()]
         for backend in backends:
-            user, _ = backend.authenticate(scope)
+            user, _ = backend.authenticate(request)
             if user:
                 return user
     except Exception as e:
