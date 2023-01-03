@@ -216,7 +216,9 @@ class AssetDetailSerializer(AssetSerializer):
     enabled_info = serializers.SerializerMethodField()
 
     class Meta(AssetSerializer.Meta):
-        fields = AssetSerializer.Meta.fields + ['accounts', 'enabled_info', 'info', 'specific']
+        fields = AssetSerializer.Meta.fields + [
+            'accounts', 'enabled_info', 'info', 'specific', 'specific_info'
+        ]
 
     @staticmethod
     def get_enabled_info(obj):
