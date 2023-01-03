@@ -99,6 +99,8 @@ class AutomationExecutionViewSet(
     filterset_fields = ('trigger', 'automation_id')
     serializer_class = serializers.AutomationExecutionSerializer
 
+    tp: str
+
     def get_queryset(self):
         queryset = AutomationExecution.objects.all()
         return queryset
@@ -107,8 +109,7 @@ class AutomationExecutionViewSet(
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         automation = serializer.validated_data.get('automation')
-        tp = serializer.validated_data.get('type')
         task = execute_automation.delay(
-            pid=automation.pk, trigger=Trigger.manual, tp=tp
+            pid=automation.pk, trigger=Trigger.manual, tp=self.tp
         )
         return Response({'task': task.id}, status=status.HTTP_201_CREATED)

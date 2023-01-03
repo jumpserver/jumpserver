@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from accounts import serializers
+from accounts.const import AutomationTypes
 from accounts.models import GatherAccountsAutomation
 from orgs.mixins.api import OrgBulkModelViewSet
 from .base import AutomationExecutionViewSet
@@ -24,3 +25,10 @@ class GatherAccountsExecutionViewSet(AutomationExecutionViewSet):
         ("retrieve", "accounts.view_gatheraccountsexecution"),
         ("create", "accounts.add_gatheraccountsexecution"),
     )
+
+    tp = AutomationTypes.gather_accounts
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(automation__type=self.tp)
+        return queryset

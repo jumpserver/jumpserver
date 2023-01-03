@@ -25,9 +25,9 @@ class BaseAutomationSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSe
             'date_created', 'date_updated', 'created_by', 'periodic_display'
         ]
         fields = [
-            'id', 'name', 'is_periodic', 'interval', 'crontab', 'comment',
-            'type', 'accounts', 'nodes', 'assets', 'is_active'
-        ] + read_only_fields
+                     'id', 'name', 'is_periodic', 'interval', 'crontab', 'comment',
+                     'type', 'accounts', 'nodes', 'assets', 'is_active'
+                 ] + read_only_fields
         extra_kwargs = {
             'name': {'required': True},
             'type': {'read_only': True},
@@ -37,7 +37,6 @@ class BaseAutomationSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSe
 
 class AutomationExecutionSerializer(serializers.ModelSerializer):
     snapshot = serializers.SerializerMethodField(label=_('Automation snapshot'))
-    type = serializers.ChoiceField(choices=AutomationTypes.choices, write_only=True, label=_('Type'))
     trigger_display = serializers.ReadOnlyField(source='get_trigger_display', label=_('Trigger mode'))
 
     class Meta:
@@ -45,7 +44,7 @@ class AutomationExecutionSerializer(serializers.ModelSerializer):
         read_only_fields = [
             'trigger_display', 'date_start', 'date_finished', 'snapshot', 'status'
         ]
-        fields = ['id', 'automation', 'trigger', 'type'] + read_only_fields
+        fields = ['id', 'automation', 'trigger'] + read_only_fields
 
     @staticmethod
     def get_snapshot(obj):

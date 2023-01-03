@@ -33,9 +33,11 @@ class PushAccountExecutionViewSet(AutomationExecutionViewSet):
         ("create", "accounts.add_pushaccountexecution"),
     )
 
+    tp = AutomationTypes.push_account
+
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.filter(automation__type=AutomationTypes.push_account)
+        queryset = queryset.filter(automation__type=self.tp)
         return queryset
 
 
