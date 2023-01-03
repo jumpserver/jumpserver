@@ -10,15 +10,10 @@ MODELS_NEED_RECORD = (
     'User', 'UserGroup',
     # authentication
     'AccessKey', 'TempToken',
-    "User",
-    "UserGroup",
     # acls
-    "LoginACL",
-    "LoginAssetACL",
-    "LoginConfirmSetting",
+    "LoginACL", "LoginAssetACL", "LoginConfirmSetting",
     # assets
-    'Asset', 'Node', 'Domain', 'Gateway', 'CommandFilterRule',
-    'CommandFilter', 'Platform', 'Label',
+    'Asset', 'Node', 'Domain', 'Gateway', 'Platform', 'Label',
     # account
     'Account',
     # orgs

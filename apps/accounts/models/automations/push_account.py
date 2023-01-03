@@ -10,6 +10,7 @@ __all__ = ['PushAccountAutomation']
 
 class PushAccountAutomation(AccountBaseAutomation, ChangeSecretMixin):
     accounts = None
+    tigger = models.CharField(max_length=16, default='asset_create', verbose_name=_('Trigger'))
     username = models.CharField(max_length=128, verbose_name=_('Username'))
 
     def set_period_schedule(self):
