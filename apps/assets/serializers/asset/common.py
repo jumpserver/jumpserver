@@ -61,6 +61,9 @@ class AssetAccountSerializer(serializers.ModelSerializer):
             'secret', 'push_now'
         ]
         fields = fields_mini + fields_write_only
+        extra_kwargs = {
+            'secret': {'write_only': True},
+        }
 
     def validate_name(self, value):
         if not value:
@@ -113,7 +116,7 @@ class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSeriali
         model = Asset
         fields_mini = ['id', 'name', 'address']
         fields_small = fields_mini + ['is_active', 'comment']
-        fields_fk = ['domain', 'platform', 'platform']
+        fields_fk = ['domain', 'platform']
         fields_m2m = [
             'nodes', 'labels', 'protocols', 'nodes_display',
             'accounts',

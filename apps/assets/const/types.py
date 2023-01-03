@@ -45,15 +45,24 @@ class AllTypes(ChoicesMixin):
         return constraints.get('protocols')[0]['name']
 
     @classmethod
+    def get_automation_methods(cls):
+        from assets.automations import platform_automation_methods as asset_methods
+        from accounts.automations import platform_automation_methods as account_methods
+        return asset_methods + account_methods
+
+    @classmethod
     def set_automation_methods(cls, category, tp, constraints):
         from assets.automations import filter_platform_methods
         automation = constraints.get('automation', {})
         automation_methods = {}
+        platform_automation_methods = cls.get_automation_methods()
         for item, enabled in automation.items():
             if not enabled:
                 continue
             item_name = item.replace('_enabled', '')
-            methods = filter_platform_methods(category, tp, item_name)
+            methods = filter_platform_methods(
+                category, tp, item_name, methods=platform_automation_methods
+            )
             methods = [{'name': m['name'], 'id': m['id']} for m in methods]
             automation_methods[item_name + '_methods'] = methods
         automation.update(automation_methods)

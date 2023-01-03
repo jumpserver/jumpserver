@@ -122,7 +122,7 @@ class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
         action = request.data.get("action")
         action_perm_require = {
             "refresh": "assets.refresh_assethardwareinfo",
-            "push_account": "assets.push_assetaccount",
+            "push_account": "accounts.add_pushaccountexecution",
             "test": "assets.test_assetconnectivity",
             "test_account": "assets.test_assetconnectivity",
         }

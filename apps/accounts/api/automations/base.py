@@ -4,8 +4,9 @@ from rest_framework import status, mixins, viewsets
 from rest_framework.response import Response
 
 from assets import serializers
-from assets.models import BaseAutomation, AutomationExecution
+from assets.models import BaseAutomation
 from assets.tasks import execute_automation
+from accounts.models import AutomationExecution
 from common.const.choices import Trigger
 from orgs.mixins import generics
 

@@ -10,6 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.utils import lazyproperty
 from orgs.mixins.models import OrgManager, JMSOrgBaseModel
+from assets import const
 from ..base import AbsConnectivity
 from ..platform import Platform
 
@@ -98,6 +99,8 @@ class Protocol(models.Model):
 
 
 class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
+    Category = const.Category
+
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     address = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
     platform = models.ForeignKey(Platform, on_delete=models.PROTECT, verbose_name=_("Platform"), related_name='assets')
@@ -176,6 +179,9 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
     @lazyproperty
     def category(self):
         return self.platform.category
+
+    def is_category(self, category):
+        return self.category == category
 
     def as_node(self):
         from assets.models import Node

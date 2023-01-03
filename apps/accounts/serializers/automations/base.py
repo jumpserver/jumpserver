@@ -1,10 +1,10 @@
-
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 from ops.mixin import PeriodTaskSerializerMixin
 from assets.const import AutomationTypes
-from assets.models import Asset, Node, BaseAutomation, AutomationExecution
+from assets.models import Asset, Node, BaseAutomation
+from accounts.models import AutomationExecution
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.utils import get_logger
 from common.drf.fields import ObjectRelatedField

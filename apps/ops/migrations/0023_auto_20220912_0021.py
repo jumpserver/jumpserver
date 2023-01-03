@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('name', models.CharField(max_length=1024, verbose_name='Name')),
-                ('date_last_publish', models.DateTimeField(null=True)),
+                ('date_last_publish', models.DateTimeField(null=True, verbose_name='Date last publish')),
             ],
             options={
                 'verbose_name': 'Celery Task',

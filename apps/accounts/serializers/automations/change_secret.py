@@ -3,13 +3,17 @@
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
-from accounts.const import DEFAULT_PASSWORD_RULES, SecretType, SecretStrategy, SSHKeyStrategy
+from accounts.models import AutomationExecution
+from accounts.const import (
+    DEFAULT_PASSWORD_RULES, SecretType, SecretStrategy, SSHKeyStrategy
+)
 from assets.models import Asset
 from accounts.models import (
     Account, ChangeSecretAutomation,
-    ChangeSecretRecord, AutomationExecution
+    ChangeSecretRecord
 )
 from assets.serializers.base import AuthValidateMixin
+
 from common.drf.fields import LabeledChoiceField, ObjectRelatedField
 from common.utils import get_logger
 from .base import BaseAutomationSerializer

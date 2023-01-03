@@ -21,5 +21,12 @@ class PushAccountAutomation(AccountBaseAutomation, ChangeSecretMixin):
         self.is_periodic = False
         super().save(*args, **kwargs)
 
+    def to_attr_json(self):
+        attr_json = super().to_attr_json()
+        attr_json.update({
+            'username': self.username
+        })
+        return attr_json
+
     class Meta:
         verbose_name = _("Push asset account")
