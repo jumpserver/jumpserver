@@ -6,7 +6,8 @@ from rest_framework.renderers import JSONRenderer
 
 from common.db.utils import safe_db_connection
 from common.utils import get_logger
-from terminal.serializers import TaskSerializer
+from terminal.models import Session
+from terminal.serializers import TaskSerializer, StatSerializer
 from .signal_handlers import component_event_chan
 
 logger = get_logger(__name__)
@@ -25,9 +26,22 @@ class TerminalTaskWebsocket(JsonWebsocketConsumer):
         else:
             self.close()
 
+    def handle_status(self, content):
+        serializer = StatSerializer(data=content)
+        if not serializer.is_valid():
+            logger.error('Invalid status data: {}'.format(serializer.errors))
+            return
+        serializer.validated_data["terminal"] = self.terminal
+        session_ids = serializer.validated_data.pop('sessions', [])
+        Session.set_sessions_active(session_ids)
+        with safe_db_connection():
+            serializer.save()
+
     def receive_json(self, content, **kwargs):
-        # todo: 暂时不处理, 可仅保持心跳
-        pass
+        req_type = content.get('type')
+        if req_type == "status":
+            payload = content.get('payload')
+            self.handle_status(payload)
 
     def get_terminal_tasks(self, task_id=None):
         with safe_db_connection():
