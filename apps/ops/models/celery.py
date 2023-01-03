@@ -13,7 +13,7 @@ from ops.celery import app
 class CeleryTask(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=1024, verbose_name=_('Name'))
-    last_published_time = models.DateTimeField(null=True)
+    date_last_publish = models.DateTimeField(null=True, verbose_name=_("Date last publish"))
 
     @property
     def meta(self):
@@ -44,7 +44,11 @@ class CeleryTask(models.Model):
         return "green"
 
     class Meta:
+        verbose_name = _("Celery Task")
         ordering = ('name',)
+        permissions = [
+            ('view_taskmonitor', _('Can view task monitor'))
+        ]
 
 
 class CeleryTaskExecution(models.Model):
@@ -77,3 +81,6 @@ class CeleryTaskExecution(models.Model):
 
     def __str__(self):
         return "{}: {}".format(self.name, self.id)
+
+    class Meta:
+        verbose_name = _("Celery Task Execution")

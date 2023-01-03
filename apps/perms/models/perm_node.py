@@ -2,7 +2,8 @@ from django.db import models
 from django.db.models import F, TextChoices
 from django.utils.translation import ugettext_lazy as _
 
-from assets.models import Asset, Node, FamilyMixin, Account
+from assets.models import Asset, Node, FamilyMixin
+from accounts.models import Account
 from common.utils import lazyproperty
 from orgs.mixins.models import JMSOrgBaseModel
 
@@ -31,6 +32,9 @@ class UserAssetGrantedTreeNodeRelation(FamilyMixin, JMSOrgBaseModel):
     node_from = models.CharField(choices=NodeFrom.choices, max_length=16, db_index=True)
     node_assets_amount = models.IntegerField(default=0)
     comment = ''
+
+    def __str__(self):
+        return f'{self.user}|{self.node}'
 
     @property
     def key(self):

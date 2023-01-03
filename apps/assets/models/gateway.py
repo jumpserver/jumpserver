@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
 #
 import socket
+
 import paramiko
-
 from django.utils.translation import ugettext_lazy as _
-
-from common.utils import get_logger, lazyproperty
-from orgs.mixins.models import OrgManager
 
 from assets.const import GATEWAY_NAME, Connectivity
 from assets.models.platform import Platform
-from assets.models.account import Account
-
+from common.utils import get_logger, lazyproperty
+from orgs.mixins.models import OrgManager
 from .asset.host import Host
 
 logger = get_logger(__file__)
@@ -37,6 +34,7 @@ class Gateway(Host):
 
     class Meta:
         proxy = True
+        verbose_name = _("Gateway")
 
     def save(self, *args, **kwargs):
         self.platform = self.default_platform()
@@ -52,11 +50,14 @@ class Gateway(Host):
         return account
 
     def test_connective(self, local_port=None):
+        from accounts.models import Account
+
         local_port = self.port if local_port is None else local_port
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         proxy = paramiko.SSHClient()
         proxy.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
         if not isinstance(self.select_account, Account):
             err = _('No account')
             return False, err

@@ -1,3 +1,4 @@
+from django.db.models import Count
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
@@ -5,11 +6,14 @@ from rest_framework.response import Response
 from ops.models import Job, JobExecution
 from ops.serializers.job import JobSerializer, JobExecutionSerializer
 
-__all__ = ['JobViewSet', 'JobExecutionViewSet', 'JobRunVariableHelpAPIView', 'JobAssetDetail', ]
+__all__ = ['JobViewSet', 'JobExecutionViewSet', 'JobRunVariableHelpAPIView',
+           'JobAssetDetail', 'JobExecutionTaskDetail', 'FrequentUsernames']
 
 from ops.tasks import run_ops_job_execution
 from ops.variables import JMS_JOB_VARIABLE_HELP
 from orgs.mixins.api import OrgBulkModelViewSet
+from orgs.utils import tmp_to_org, get_current_org_id, get_current_org
+from accounts.models import Account
 
 
 def set_task_to_serializer_data(serializer, task):
@@ -93,3 +97,31 @@ class JobAssetDetail(APIView):
         if execution_id:
             execution = get_object_or_404(JobExecution, id=execution_id)
             return Response(data=execution.assent_result_detail)
+
+
+class JobExecutionTaskDetail(APIView):
+    rbac_perms = ()
+    permission_classes = ()
+
+    def get(self, request, **kwargs):
+        org = get_current_org()
+        task_id = request.query_params.get('task_id')
+        if task_id:
+            with tmp_to_org(org):
+                execution = get_object_or_404(JobExecution, task_id=task_id)
+                return Response(data={
+                    'status': execution.status,
+                    'is_finished': execution.is_finished,
+                    'is_success': execution.is_success,
+                    'time_cost': execution.time_cost,
+                })
+
+
+class FrequentUsernames(APIView):
+    rbac_perms = ()
+    permission_classes = ()
+
+    def get(self, request, **kwargs):
+        top_accounts = Account.objects.exclude(username='root').values('username').annotate(
+            total=Count('username')).order_by('total')[:5]
+        return Response(data=top_accounts)

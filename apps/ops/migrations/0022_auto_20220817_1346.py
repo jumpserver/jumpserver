@@ -3,45 +3,51 @@
 from django.db import migrations, models
 
 
-def migrate_run_system_user_to_account(apps, schema_editor):
-    execution_model = apps.get_model('ops', 'CommandExecution')
-    count = 0
-    bulk_size = 1000
-
-    while True:
-        executions = execution_model.objects.all().prefetch_related('run_as')[count:bulk_size]
-        if not executions:
-            break
-        count += len(executions)
-        updated = []
-        for obj in executions:
-            run_as = obj.run_as
-            if not run_as:
-                continue
-            obj.account = run_as.username
-            updated.append(obj)
-        execution_model.objects.bulk_update(updated, ['account'])
-
-
 class Migration(migrations.Migration):
-
     dependencies = [
         ('ops', '0021_auto_20211130_1037'),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='adhoc',
-            name='run_system_user',
+            model_name='adhocexecution',
+            name='adhoc',
         ),
-        migrations.AddField(
-            model_name='commandexecution',
-            name='account',
-            field=models.CharField(default='', max_length=128, verbose_name='account'),
+        migrations.RemoveField(
+            model_name='adhocexecution',
+            name='task',
         ),
-        migrations.RunPython(migrate_run_system_user_to_account),
         migrations.RemoveField(
             model_name='commandexecution',
-            name='run_as',
+            name='hosts',
         ),
+        migrations.RemoveField(
+            model_name='commandexecution',
+            name='user',
+        ),
+        migrations.AlterUniqueTogether(
+            name='task',
+            unique_together=None,
+        ),
+        migrations.RemoveField(
+            model_name='task',
+            name='latest_adhoc',
+        ),
+        migrations.RemoveField(
+            model_name='task',
+            name='latest_execution',
+        ),
+        migrations.DeleteModel(
+            name='AdHoc',
+        ),
+        migrations.DeleteModel(
+            name='AdHocExecution',
+        ),
+        migrations.DeleteModel(
+            name='CommandExecution',
+        ),
+        migrations.DeleteModel(
+            name='Task',
+        ),
+        migrations.DeleteModel('CeleryTask'),
     ]

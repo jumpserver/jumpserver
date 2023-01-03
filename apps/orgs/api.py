@@ -15,20 +15,16 @@ from .serializers import (
 from users.models import User, UserGroup
 from assets.models import (
     Asset, Domain, Label, Node,
-    CommandFilter, CommandFilterRule, GatheredUser
 )
 from perms.models import AssetPermission
 from orgs.utils import current_org, tmp_to_root_org
 from common.utils import get_logger
 
-
 logger = get_logger(__file__)
-
 
 # 部分 org 相关的 model，需要清空这些数据之后才能删除该组织
 org_related_models = [
     User, UserGroup, Asset, Label, Domain, Node, Label,
-    CommandFilter, CommandFilterRule, GatheredUser,
     AssetPermission,
 ]
 
@@ -39,7 +35,7 @@ class OrgViewSet(BulkModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrgSerializer
     ordering_fields = ('name',)
-    ordering = ('name', )
+    ordering = ('name',)
 
     def get_serializer_class(self):
         mapper = {
@@ -69,7 +65,8 @@ class OrgViewSet(BulkModelViewSet):
 
         if str(instance.id) == settings.AUTH_LDAP_SYNC_ORG_ID:
             msg = _(
-                'LDAP synchronization is set to the current organization. Please switch to another organization before deleting'
+                'LDAP synchronization is set to the current organization. '
+                'Please switch to another organization before deleting'
             )
             raise PermissionDenied(detail=msg)
 

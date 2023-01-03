@@ -44,8 +44,6 @@ class PlatformAutomation(models.Model):
     ping_method = models.CharField(max_length=32, blank=True, null=True, verbose_name=_("Ping method"))
     gather_facts_enabled = models.BooleanField(default=False, verbose_name=_("Gather facts enabled"))
     gather_facts_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Gather facts method"))
-    push_account_enabled = models.BooleanField(default=False, verbose_name=_("Push account enabled"))
-    push_account_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Push account method"))
     change_secret_enabled = models.BooleanField(default=False, verbose_name=_("Change password enabled"))
     change_secret_method = models.TextField(
         max_length=32, blank=True, null=True, verbose_name=_("Change password method"))

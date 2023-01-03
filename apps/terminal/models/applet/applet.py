@@ -35,7 +35,7 @@ class Applet(JMSBaseModel):
     )
 
     class Meta:
-        verbose_name = _('Applet')
+        verbose_name = _("Applet")
 
     def __str__(self):
         return self.name
@@ -123,7 +123,7 @@ class Applet(JMSBaseModel):
 
 
 class AppletPublication(JMSBaseModel):
-    applet = models.ForeignKey('Applet', on_delete=models.PROTECT, related_name='publications',
+    applet = models.ForeignKey('Applet', on_delete=models.CASCADE, related_name='publications',
                                verbose_name=_('Applet'))
     host = models.ForeignKey('AppletHost', on_delete=models.PROTECT, related_name='publications',
                              verbose_name=_('Hosting'))

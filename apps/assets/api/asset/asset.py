@@ -9,22 +9,21 @@ from assets import serializers
 from assets.filters import IpInFilterBackend, LabelFilterBackend, NodeFilterBackend
 from assets.models import Asset, Gateway
 from assets.tasks import (
-    push_accounts_to_assets, test_assets_connectivity_manual,
-    update_assets_hardware_info_manual, verify_accounts_connectivity,
+    test_assets_connectivity_manual,
+    update_assets_hardware_info_manual
 )
 from common.drf.filters import BaseFilterSet
 from common.mixins.api import SuggestionMixin
 from common.utils import get_logger
+from accounts.tasks import push_accounts_to_assets, verify_accounts_connectivity
 from orgs.mixins import generics
 from orgs.mixins.api import OrgBulkModelViewSet
 from ..mixin import NodeFilterMixin
 
 logger = get_logger(__file__)
 __all__ = [
-    "AssetViewSet",
-    "AssetTaskCreateApi",
-    "AssetsTaskCreateApi",
-    'AssetFilterSet'
+    "AssetViewSet", "AssetTaskCreateApi",
+    "AssetsTaskCreateApi", 'AssetFilterSet'
 ]
 
 
@@ -60,8 +59,9 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
     ordering = ("name",)
     serializer_classes = (
         ("default", serializers.AssetSerializer),
-        ("suggestion", serializers.MiniAssetSerializer),
+        ("retrieve", serializers.AssetDetailSerializer),
         ("platform", serializers.PlatformSerializer),
+        ("suggestion", serializers.MiniAssetSerializer),
         ("gateways", serializers.GatewaySerializer),
     )
     rbac_perms = (
@@ -122,7 +122,7 @@ class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
         action = request.data.get("action")
         action_perm_require = {
             "refresh": "assets.refresh_assethardwareinfo",
-            "push_account": "assets.push_assetsystemuser",
+            "push_account": "accounts.add_pushaccountexecution",
             "test": "assets.test_assetconnectivity",
             "test_account": "assets.test_assetconnectivity",
         }
@@ -135,7 +135,7 @@ class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
     @staticmethod
     def perform_asset_task(serializer):
         data = serializer.validated_data
-        if data["action"] not in ["push_system_user", "test_system_user"]:
+        if data["action"] not in ["push_account", "test_account"]:
             return
 
         asset = data["asset"]

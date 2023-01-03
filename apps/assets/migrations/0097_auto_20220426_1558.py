@@ -13,6 +13,27 @@ def update_user_platforms(apps, *args):
     AllTypes.update_user_create_platforms(platform_cls)
 
 
+def migrate_macos_platform(apps, schema_editor):
+    db_alias = schema_editor.connection.alias
+    asset_model = apps.get_model('assets', 'Asset')
+    platform_model = apps.get_model('assets', 'Platform')
+    old_macos = platform_model.objects.using(db_alias).filter(
+        name='MacOS', type='macos'
+    ).first()
+    new_macos = platform_model.objects.using(db_alias).filter(
+        name='macOS', type='unix'
+    ).first()
+
+    if not old_macos or not new_macos:
+        return
+
+    asset_model.objects.using(db_alias).filter(
+        platform=old_macos
+    ).update(platform=new_macos)
+
+    platform_model.objects.using(db_alias).filter(id=old_macos.id).delete()
+
+
 class Migration(migrations.Migration):
     dependencies = [
         ('assets', '0096_auto_20220426_1550'),
@@ -21,4 +42,5 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(create_internal_platforms),
         migrations.RunPython(update_user_platforms),
+        migrations.RunPython(migrate_macos_platform),
     ]

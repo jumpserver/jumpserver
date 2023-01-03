@@ -26,8 +26,14 @@ logger = get_logger(__file__)
 
 
 class RolesSerializerMixin(serializers.Serializer):
-    system_roles = ObjectRelatedField(queryset=Role.system_roles, label=_("System roles"), many=True)
-    org_roles = ObjectRelatedField(queryset=Role.org_roles, label=_("Org roles"), many=True)
+    system_roles = ObjectRelatedField(
+        queryset=Role.system_roles, attrs=('id', 'display_name'),
+        label=_("System roles"), many=True
+    )
+    org_roles = ObjectRelatedField(
+        queryset=Role.org_roles, attrs=('id', 'display_name'),
+        label=_("Org roles"), many=True
+    )
 
     @staticmethod
     def get_system_roles_display(user):
@@ -83,8 +89,9 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
     )
     login_blocked = serializers.BooleanField(read_only=True, label=_("Login blocked"))
     is_expired = serializers.BooleanField(read_only=True, label=_("Is expired"))
-    can_public_key_auth = serializers.ReadOnlyField(
-        source="can_use_ssh_key_login", label=_("Can public key authentication")
+    can_public_key_auth = serializers.BooleanField(
+        source="can_use_ssh_key_login", label=_("Can public key authentication"),
+        read_only=True
     )
     password = EncryptedField(
         label=_("Password"),

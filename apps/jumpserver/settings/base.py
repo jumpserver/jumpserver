@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     'orgs.apps.OrgsConfig',
     'users.apps.UsersConfig',
     'assets.apps.AssetsConfig',
+    'accounts.apps.AccountsConfig',
     'perms.apps.PermsConfig',
     'ops.apps.OpsConfig',
     'settings.apps.SettingsConfig',

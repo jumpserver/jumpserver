@@ -4,12 +4,12 @@ from celery import current_task
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from assets.const import AutomationTypes
-from assets.models import Node, Asset
+from assets.models.node import Node
+from assets.models.asset import Asset
 from assets.tasks import execute_automation
+from ops.mixin import PeriodTaskModelMixin
 from common.const.choices import Trigger
 from common.db.fields import EncryptJsonDictTextField
-from ops.mixin import PeriodTaskModelMixin
 from orgs.mixins.models import OrgModelMixin, JMSOrgBaseModel
 
 
@@ -17,7 +17,7 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
     accounts = models.JSONField(default=list, verbose_name=_("Accounts"))
     nodes = models.ManyToManyField('assets.Node', blank=True, verbose_name=_("Nodes"))
     assets = models.ManyToManyField('assets.Asset', blank=True, verbose_name=_("Assets"))
-    type = models.CharField(max_length=16, choices=AutomationTypes.choices, verbose_name=_('Type'))
+    type = models.CharField(max_length=16, verbose_name=_('Type'))
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
 
     def __str__(self):
@@ -59,7 +59,6 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
             'type': self.type,
             'org_id': str(self.org_id),
             'comment': self.comment,
-            'accounts': self.accounts,
             'nodes': self.get_many_to_many_ids('nodes'),
             'assets': self.get_many_to_many_ids('assets'),
         }
@@ -81,6 +80,12 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
         verbose_name = _("Automation task")
 
 
+class AssetBaseAutomation(BaseAutomation):
+    class Meta:
+        proxy = True
+        verbose_name = _("Asset automation task")
+
+
 class AutomationExecution(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     automation = models.ForeignKey(
@@ -100,6 +105,7 @@ class AutomationExecution(OrgModelMixin):
     )
 
     class Meta:
+        ordering = ('-date_start',)
         verbose_name = _('Automation task execution')
 
     @property

@@ -4,9 +4,9 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('assets', '0111_alter_automationexecution_status'),
+        ('assets', '0101_auto_20220811_1511'),
+        ('accounts', '0001_initial'),
         ('perms', '0031_auto_20220816_1600'),
     ]
 
@@ -21,11 +21,11 @@ class Migration(migrations.Migration):
                 'indexes': [],
                 'constraints': [],
             },
-            bases=('assets.account',),
+            bases=('accounts.account',),
         ),
         migrations.AlterField(
             model_name='assetpermission',
             name='actions',
-            field=models.IntegerField(default=0, verbose_name='Actions'),
+            field=models.IntegerField(default=1, verbose_name='Actions'),
         ),
     ]

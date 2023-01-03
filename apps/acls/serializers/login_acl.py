@@ -24,9 +24,9 @@ class LoginACLSerializer(BulkModelSerializer):
     )
     action = LabeledChoiceField(choices=LoginACL.ActionChoices.choices)
     reviewers_amount = serializers.IntegerField(
-        read_only=True, source="reviewers.count"
+        read_only=True, source="reviewers.count", label=_("Reviewers amount")
     )
-    rules = MethodSerializer()
+    rules = MethodSerializer(label=_('Rule'))
 
     class Meta:
         model = LoginACL
@@ -34,15 +34,14 @@ class LoginACLSerializer(BulkModelSerializer):
         fields_small = fields_mini + [
             "priority", "user", "rules", "action",
             "is_active", "date_created", "date_updated",
-            "reviewers_amount", "comment", "created_by",
+            "comment", "created_by",
         ]
         fields_fk = ["user"]
-        fields_m2m = ["reviewers"]
+        fields_m2m = ["reviewers", "reviewers_amount"]
         fields = fields_small + fields_fk + fields_m2m
         extra_kwargs = {
             "priority": {"default": 50},
             "is_active": {"default": True},
-            "reviewers": {"allow_null": False, "required": True},
         }
 
     def __init__(self, *args, **kwargs):

@@ -55,16 +55,14 @@ class LabeledChoiceField(ChoiceField):
     def __init__(self, *args, **kwargs):
         super(LabeledChoiceField, self).__init__(*args, **kwargs)
         self.choice_mapper = {
-            six.text_type(key): value for key, value in self.choices.items()
+            key: value for key, value in self.choices.items()
         }
 
-    def to_representation(self, value):
-        if value is None:
-            return value
-        return {
-            "value": value,
-            "label": self.choice_mapper.get(six.text_type(value), value),
-        }
+    def to_representation(self, key):
+        if key is None:
+            return key
+        label = self.choice_mapper.get(key)
+        return {"value": key, "label": label}
 
     def to_internal_value(self, data):
         if isinstance(data, dict):
@@ -87,6 +85,8 @@ class ObjectRelatedField(serializers.RelatedField):
     def to_representation(self, value):
         data = {}
         for attr in self.attrs:
+            if not hasattr(value, attr):
+                continue
             data[attr] = getattr(value, attr)
         return data
 

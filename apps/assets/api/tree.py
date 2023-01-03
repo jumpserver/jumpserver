@@ -144,7 +144,7 @@ class CategoryTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
         return self.serialize_assets(assets, key)
 
     def list(self, request, *args, **kwargs):
-        include_asset = bool(self.request.query_params.get('assets'))
+        include_asset = self.request.query_params.get('assets', '0') == '1'
 
         if include_asset and self.request.query_params.get('key'):
             nodes = self.get_assets()

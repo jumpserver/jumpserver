@@ -27,7 +27,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     module = models.CharField(max_length=128, choices=Modules.choices, default=Modules.shell,
                               verbose_name=_('Module'), null=True)
     chdir = models.CharField(default="", max_length=1024, verbose_name=_('Chdir'), null=True, blank=True)
-    timeout = models.IntegerField(default=60, verbose_name=_('Timeout (Seconds)'))
+    timeout = models.IntegerField(default=-1, verbose_name=_('Timeout (Seconds)'))
     playbook = models.ForeignKey('ops.Playbook', verbose_name=_("Playbook"), null=True, on_delete=models.SET_NULL)
     type = models.CharField(max_length=128, choices=Types.choices, default=Types.adhoc, verbose_name=_("Type"))
     creator = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
@@ -88,6 +88,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
         return self.executions.create(job_version=self.version)
 
     class Meta:
+        verbose_name = _("Job")
         ordering = ['date_created']
 
 
@@ -158,14 +159,17 @@ class JobExecution(JMSOrgBaseModel):
 
     @property
     def job_type(self):
-        return self.current_job.type
+        return Types[self.job.type].label
 
     def compile_shell(self):
         if self.current_job.type != 'adhoc':
             return
         result = self.current_job.args
-        result += " chdir={}".format(self.current_job.chdir)
-        return self.job.args
+        if self.current_job.chdir:
+            result += " chdir={}".format(self.current_job.chdir)
+        if self.current_job.module in ['python']:
+            result += " executable={}".format(self.current_job.module)
+        return result
 
     def get_runner(self):
         inv = self.current_job.inventory
@@ -186,9 +190,18 @@ class JobExecution(JMSOrgBaseModel):
 
         if self.current_job.type == 'adhoc':
             args = self.compile_shell()
+            module = "shell"
+            if self.current_job.module not in ['python']:
+                module = self.current_job.module
+
             runner = AdHocRunner(
-                self.inventory_path, self.current_job.module, module_args=args,
-                pattern="all", project_dir=self.private_dir, extra_vars=extra_vars,
+                self.inventory_path,
+                module,
+                timeout=self.current_job.timeout,
+                module_args=args,
+                pattern="all",
+                project_dir=self.private_dir,
+                extra_vars=extra_vars,
             )
         elif self.current_job.type == 'playbook':
             runner = PlaybookRunner(
@@ -225,7 +238,7 @@ class JobExecution(JMSOrgBaseModel):
 
     @property
     def is_finished(self):
-        return self.status in [JobStatus.success, JobStatus.failed]
+        return self.status in [JobStatus.success, JobStatus.failed, JobStatus.timeout]
 
     @property
     def is_success(self):
@@ -284,6 +297,7 @@ class JobExecution(JMSOrgBaseModel):
             self.set_error(e)
 
     class Meta:
+        verbose_name = _("Job Execution")
         ordering = ['-date_created']
 
 
@@ -294,3 +308,4 @@ class JobAuditLog(JobExecution):
 
     class Meta:
         proxy = True
+        verbose_name = _("Job audit log")

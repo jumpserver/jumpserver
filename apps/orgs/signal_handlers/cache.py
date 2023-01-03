@@ -2,7 +2,8 @@ from django.db.models.signals import post_save, pre_delete, pre_save, post_delet
 from django.dispatch import receiver
 
 from orgs.models import Organization
-from assets.models import Node, Account
+from assets.models import Node
+from accounts.models import Account
 from perms.models import AssetPermission
 from audits.models import UserLoginLog
 from users.models import UserGroup, User

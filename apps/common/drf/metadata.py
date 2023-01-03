@@ -8,6 +8,7 @@ from collections import OrderedDict
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.utils.encoding import force_text
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import exceptions, serializers
 from rest_framework.fields import empty
 from rest_framework.metadata import SimpleMetadata
@@ -122,6 +123,12 @@ class SimpleMetadataWithFilters(SimpleMetadata):
             self.set_tree_field(field, field_info)
         elif isinstance(field, serializers.ChoiceField):
             self.set_choices_field(field, field_info)
+
+        if field.field_name == 'id':
+            field_info['label'] = 'ID'
+        if field.field_name == 'org_id':
+            field_info['label'] = _('Organization ID')
+
         return field_info
 
     @staticmethod

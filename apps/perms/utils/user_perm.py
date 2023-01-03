@@ -107,7 +107,7 @@ class UserPermAssetUtil(AssetPermissionPermAssetUtil):
         asset_ids = set()
         children_from_granted = UserAssetGrantedTreeNodeRelation.objects \
             .filter(user=self.user) \
-            .filter(node_key__startwith=f'{node.key}:', node_from=node.NodeFrom.granted) \
+            .filter(node_key__startswith=f'{node.key}:', node_from=node.NodeFrom.granted) \
             .only('node_id', 'node_key')
         for n in children_from_granted:
             n.id = n.node_id
@@ -118,13 +118,13 @@ class UserPermAssetUtil(AssetPermissionPermAssetUtil):
         # 查询节点下资产授权的节点
         children_from_assets = UserAssetGrantedTreeNodeRelation.objects \
             .filter(user=self.user) \
-            .filter(node_key__startwith=f'{node.key}:', node_from=node.NodeFrom.asset) \
+            .filter(node_key__startswith=f'{node.key}:', node_from=node.NodeFrom.asset) \
             .values_list('node_id', flat=True)
         children_from_assets = set(children_from_assets)
         if node.node_from == node.NodeFrom.asset:
             children_from_assets.add(node.id)
         _asset_ids = Asset.objects \
-            .filter(node__id__in=children_from_assets) \
+            .filter(nodes__id__in=children_from_assets) \
             .filter(granted_by_permissions__id__in=self.perm_ids) \
             .distinct() \
             .order_by() \
@@ -148,14 +148,20 @@ class UserPermNodeUtil:
         assets_amount = UserPermAssetUtil(self.user).get_direct_assets().count()
         return PermNode.get_favorite_node(assets_amount)
 
-    def get_top_level_nodes(self):
+    def get_top_level_nodes(self, with_unfolded_node=False):
+        # 是否有节点展开, 展开的节点
+        unfolded_node = None
         nodes = self.get_special_nodes()
-        real_nodes = self._get_indirect_perm_node_children(key='')
+        real_nodes = self._get_perm_node_children_from_relation(key='')
         nodes.extend(real_nodes)
         if len(real_nodes) == 1:
-            children = self.get_node_children(real_nodes[0].key)
+            unfolded_node = real_nodes[0]
+            children = self.get_node_children(unfolded_node.key)
             nodes.extend(children)
-        return nodes
+        if with_unfolded_node:
+            return nodes, unfolded_node
+        else:
+            return nodes
 
     def get_special_nodes(self):
         nodes = []
@@ -176,16 +182,18 @@ class UserPermNodeUtil:
         node = PermNode.objects.get(key=key)
         node.compute_node_from_and_assets_amount(self.user)
         if node.node_from == node.NodeFrom.granted:
+            """ 直接授权的节点, 直接从完整资产树获取子节点 """
             children = PermNode.objects.filter(parent_key=key)
         elif node.node_from in (node.NodeFrom.asset, node.NodeFrom.child):
-            children = self._get_indirect_perm_node_children(key)
+            """ 间接授权的节点, 从 Relation 表中获取子节点 """
+            children = self._get_perm_node_children_from_relation(key)
         else:
             children = PermNode.objects.none()
         children = sorted(children, key=lambda x: x.value)
         return children
 
-    def _get_indirect_perm_node_children(self, key):
-        """ 获取未直接授权节点的子节点 """
+    def _get_perm_node_children_from_relation(self, key):
+        """ 获取授权节点的子节点, 从用户授权节点关系表中获取 """
         children = PermNode.objects.filter(granted_node_rels__user=self.user, parent_key=key)
         children = children.annotate(**PermNode.annotate_granted_node_rel_fields).distinct()
         for node in children:
