@@ -71,6 +71,8 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         class_name = field.__class__.__name__
         if class_name == "LabeledChoiceField":
             tp = "labeled_choice"
+        elif class_name == "JSONField":
+            tp = 'json'
         elif class_name == "ObjectRelatedField":
             tp = "object_related_field"
         elif class_name == "ManyRelatedField":

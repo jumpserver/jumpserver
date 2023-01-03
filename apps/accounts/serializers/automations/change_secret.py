@@ -29,6 +29,13 @@ __all__ = [
 ]
 
 
+def get_secret_types():
+    return [
+        (SecretType.PASSWORD, _('Password')),
+        (SecretType.SSH_KEY, _('SSH key')),
+    ]
+
+
 class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializer):
     secret_strategy = LabeledChoiceField(
         choices=SecretStrategy.choices, required=True, label=_('Secret strategy')
@@ -37,6 +44,7 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
         choices=SSHKeyStrategy.choices, required=False, label=_('SSH Key strategy')
     )
     password_rules = serializers.DictField(default=DEFAULT_PASSWORD_RULES)
+    secret_type = LabeledChoiceField(choices=get_secret_types(), required=True, label=_('Secret type'))
 
     class Meta:
         model = ChangeSecretAutomation
@@ -51,20 +59,12 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
             )},
         }}
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.set_secret_type_choices()
-
-    def set_secret_type_choices(self):
-        secret_type = self.fields.get('secret_type')
-        if not secret_type:
-            return
-        excludes = [SecretType.ACCESS_KEY, SecretType.TOKEN]
-        secret_type._choices = {k: v for k, v in secret_type._choices.items() if k not in excludes}
-
     def validate_password_rules(self, password_rules):
         secret_type = self.initial_secret_type
         if secret_type != SecretType.PASSWORD:
+            return password_rules
+
+        if self.initial_data.get('secret_strategy') == SecretStrategy.custom:
             return password_rules
 
         length = password_rules.get('length')

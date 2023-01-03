@@ -16,7 +16,8 @@ __all__ = [
     "LabeledChoiceField",
     "ObjectRelatedField",
     "BitChoicesField",
-    "TreeChoicesMixin"
+    "TreeChoicesMixin",
+    "LabeledMultipleChoiceField"
 ]
 
 
@@ -68,6 +69,31 @@ class LabeledChoiceField(ChoiceField):
         if isinstance(data, dict):
             return data.get("value")
         return super(LabeledChoiceField, self).to_internal_value(data)
+
+
+class LabeledMultipleChoiceField(serializers.MultipleChoiceField):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.choice_mapper = {
+            key: value for key, value in self.choices.items()
+        }
+
+    def to_representation(self, keys):
+        if keys is None:
+            return keys
+        return [
+            {"value": key, "label": self.choice_mapper.get(key)}
+            for key in keys
+        ]
+
+    def to_internal_value(self, data):
+        if not data:
+            return data
+
+        if isinstance(data[0], dict):
+            return [item.get("value") for item in data]
+        else:
+            return data
 
 
 class ObjectRelatedField(serializers.RelatedField):

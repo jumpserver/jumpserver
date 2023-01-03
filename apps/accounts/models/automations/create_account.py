@@ -10,11 +10,21 @@ __all__ = ['PushAccountAutomation']
 
 class PushAccountAutomation(AccountBaseAutomation, ChangeSecretMixin):
     accounts = None
-    tigger = models.CharField(max_length=16, default='asset_create', verbose_name=_('Trigger'))
+    triggers = models.JSONField(max_length=16, default=list, verbose_name=_('Triggers'))
     username = models.CharField(max_length=128, verbose_name=_('Username'))
+    action = models.CharField(max_length=16, verbose_name=_('Action'))
 
     def set_period_schedule(self):
         pass
+
+    @property
+    def dynamic_username(self):
+        return self.username == '@USER'
+
+    @dynamic_username.setter
+    def dynamic_username(self, value):
+        if value:
+            self.username = '@USER'
 
     def save(self, *args, **kwargs):
         self.type = AutomationTypes.push_account
