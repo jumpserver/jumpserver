@@ -23,7 +23,7 @@ class ActionChoice(models.TextChoices):
 class PushAccountAutomationSerializer(ChangeSecretAutomationSerializer):
     dynamic_username = serializers.BooleanField(label=_('Dynamic username'), default=False)
     triggers = LabeledMultipleChoiceField(
-        choices=ActionChoice.choices, label=_('Trigger'),
+        choices=TriggerChoice.choices, label=_('Trigger'),
         default=[TriggerChoice.on_asset_create.value],
     )
     action = LabeledChoiceField(choices=ActionChoice.choices, label=_('Action'), default=ActionChoice.create_and_push)
@@ -45,6 +45,8 @@ class PushAccountAutomationSerializer(ChangeSecretAutomationSerializer):
         return value
 
     def validate_dynamic_username(self, value):
+        if not value:
+            return value
         queryset = self.Meta.model.objects.filter(username='@USER')
         if self.instance:
             queryset = queryset.exclude(id=self.instance.id)
