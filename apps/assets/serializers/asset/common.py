@@ -142,7 +142,8 @@ class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSeriali
         queryset = queryset.prefetch_related('nodes', 'labels', 'accounts', 'protocols')
         return queryset
 
-    def perform_nodes_display_create(self, instance, nodes_display):
+    @staticmethod
+    def perform_nodes_display_create(instance, nodes_display):
         if not nodes_display:
             return
         nodes_to_set = []
@@ -215,7 +216,9 @@ class AssetDetailSerializer(AssetSerializer):
     enabled_info = serializers.SerializerMethodField()
 
     class Meta(AssetSerializer.Meta):
-        fields = AssetSerializer.Meta.fields + ['accounts', 'enabled_info', 'info', 'specific']
+        fields = AssetSerializer.Meta.fields + [
+            'accounts', 'enabled_info', 'info', 'specific', 'specific_info'
+        ]
 
     @staticmethod
     def get_enabled_info(obj):
