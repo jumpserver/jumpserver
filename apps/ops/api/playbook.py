@@ -1,4 +1,5 @@
 import os
+import shutil
 import zipfile
 
 from django.conf import settings
@@ -38,5 +39,5 @@ class PlaybookViewSet(OrgBulkModelViewSet):
         for f in os.listdir(dest_path):
             if f in valid_entry:
                 return
-        os.remove(dest_path)
+        shutil.rmtree(dest_path)
         raise PlaybookNoValidEntry

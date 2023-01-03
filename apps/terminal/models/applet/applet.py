@@ -34,6 +34,9 @@ class Applet(JMSBaseModel):
         to='AppletHost', verbose_name=_('Hosts')
     )
 
+    class Meta:
+        verbose_name = _('Applet')
+
     def __str__(self):
         return self.name
 
@@ -123,7 +126,7 @@ class AppletPublication(JMSBaseModel):
     applet = models.ForeignKey('Applet', on_delete=models.PROTECT, related_name='publications',
                                verbose_name=_('Applet'))
     host = models.ForeignKey('AppletHost', on_delete=models.PROTECT, related_name='publications',
-                             verbose_name=_('Host'))
+                             verbose_name=_('Hosting'))
     status = models.CharField(max_length=16, default='ready', verbose_name=_('Status'))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 

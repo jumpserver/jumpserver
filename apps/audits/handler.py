@@ -81,7 +81,7 @@ class OperatorLogHandler(metaclass=Singleton):
 
     def get_instance_dict_from_cache(self, instance_id):
         if instance_id is None:
-            return None
+            return None, None
 
         key = '%s_%s' % (self.CACHE_KEY, instance_id)
         cache_instance = cache.get(key, {})

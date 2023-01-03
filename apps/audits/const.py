@@ -5,13 +5,12 @@ from django.db.models import TextChoices, IntegerChoices
 
 DEFAULT_CITY = _("Unknown")
 
-MODELS_NEED_RECORD = (
+MODELS_NEED_RECORD = []
+MODELS_NEED_RECORD1 = (
     # users
     'User', 'UserGroup',
     # authentication
     'AccessKey', 'TempToken',
-    "User",
-    "UserGroup",
     # acls
     "LoginACL",
     "LoginAssetACL",

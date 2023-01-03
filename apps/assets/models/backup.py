@@ -19,7 +19,7 @@ logger = get_logger(__file__)
 
 
 class AccountBackupPlan(PeriodTaskModelMixin, JMSOrgBaseModel):
-    types = models.JSONField(default=list)
+    types = models.JSONField(default=list, verbose_name=_('Type'))
     recipients = models.ManyToManyField(
         'users.User', related_name='recipient_escape_route_plans', blank=True,
         verbose_name=_("Recipient")
