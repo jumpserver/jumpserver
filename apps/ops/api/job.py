@@ -105,7 +105,7 @@ class JobExecutionTaskDetail(APIView):
 
     def get(self, request, **kwargs):
         org = get_current_org()
-        task_id = request.query_params.get('task_id')
+        task_id = str(kwargs.get('task_id'))
         if task_id:
             with tmp_to_org(org):
                 execution = get_object_or_404(JobExecution, task_id=task_id)
@@ -114,6 +114,7 @@ class JobExecutionTaskDetail(APIView):
                     'is_finished': execution.is_finished,
                     'is_success': execution.is_success,
                     'time_cost': execution.time_cost,
+                    'job_id': execution.job.id,
                 })
 
 
