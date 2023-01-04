@@ -144,7 +144,9 @@ class ActivitiesAuthChangeSerializer(BaseActivitiesSerializer):
 
     @staticmethod
     def get_content(obj):
-        ctn = _('User {} change auth for this account.({})').format(
+        ctn = _(
+            'User {} has executed change auth plan for this account.({})'
+        ).format(
             obj.created_by, _(obj.status.title())
         )
         return ctn
