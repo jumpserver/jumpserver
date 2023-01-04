@@ -59,7 +59,6 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
     ordering = ("name",)
     serializer_classes = (
         ("default", serializers.AssetSerializer),
-        ("retrieve", serializers.AssetDetailSerializer),
         ("platform", serializers.PlatformSerializer),
         ("suggestion", serializers.MiniAssetSerializer),
         ("gateways", serializers.GatewaySerializer),
@@ -70,6 +69,14 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
         ("gateways", "assets.view_gateway"),
     )
     extra_filter_backends = [LabelFilterBackend, IpInFilterBackend, NodeFilterBackend]
+
+    def get_serializer_class(self):
+        cls = super().get_serializer_class()
+        if self.action == "retrieve":
+            name = cls.__name__.replace("Serializer", "DetailSerializer")
+            retrieve_cls = type(name, (serializers.DetailMixin, cls), {})
+            return retrieve_cls
+        return cls
 
     @action(methods=["GET"], detail=True, url_path="platform")
     def platform(self, *args, **kwargs):

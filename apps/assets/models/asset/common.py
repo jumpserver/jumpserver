@@ -127,7 +127,7 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
         return info
 
     @property
-    def specific_info(self):
+    def spec_info(self):
         instance = getattr(self, self.category, None)
         if not instance:
             return []
@@ -141,6 +141,22 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
             for i in specific_fields
         ]
         return info
+
+    @lazyproperty
+    def enabled_info(self):
+        platform = self.platform
+        automation = self.platform.automation
+        return {
+            'su_enabled': platform.su_enabled,
+            'ping_enabled': automation.ping_enabled,
+            'domain_enabled': platform.domain_enabled,
+            'ansible_enabled': automation.ansible_enabled,
+            'protocols_enabled': platform.protocols_enabled,
+            'gather_facts_enabled': automation.gather_facts_enabled,
+            'change_secret_enabled': automation.change_secret_enabled,
+            'verify_account_enabled': automation.verify_account_enabled,
+            'gather_accounts_enabled': automation.gather_accounts_enabled,
+        }
 
     @staticmethod
     def get_specific_fields(instance):
