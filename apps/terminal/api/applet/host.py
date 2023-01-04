@@ -2,7 +2,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from common.api import JMSModelViewSet
+from common.api import JMSBulkModelViewSet
 from common.permissions import IsServiceAccount
 from orgs.utils import tmp_to_builtin_org
 from terminal.models import AppletHost, AppletHostDeployment
@@ -15,7 +15,7 @@ from terminal.tasks import run_applet_host_deployment, run_applet_host_deploymen
 __all__ = ['AppletHostViewSet', 'AppletHostDeploymentViewSet']
 
 
-class AppletHostViewSet(JMSModelViewSet):
+class AppletHostViewSet(JMSBulkModelViewSet):
     serializer_class = AppletHostSerializer
     queryset = AppletHost.objects.all()
 
