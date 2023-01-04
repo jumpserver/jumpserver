@@ -15,7 +15,7 @@ from common.permissions import IsValidUser
 from .http import HttpResponseTemporaryRedirect
 from .const import KEY_CACHE_RESOURCE_IDS
 from .utils import get_logger
-from .mixins import CommonApiMixin
+from .drf.api import CommonApiMixin
 
 __all__ = [
     'LogTailApi', 'ResourcesIDCacheApi', 'CommonGenericViewSet'
@@ -102,7 +102,7 @@ class ResourcesIDCacheApi(APIView):
 def redirect_plural_name_api(request, *args, **kwargs):
     resource = kwargs.get("resource", "")
     org_full_path = request.get_full_path()
-    full_path = org_full_path.replace(resource, resource+"s", 1)
+    full_path = org_full_path.replace(resource, resource + "s", 1)
     logger.debug("Redirect {} => {}".format(org_full_path, full_path))
     return HttpResponseTemporaryRedirect(full_path)
 

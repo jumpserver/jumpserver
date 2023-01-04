@@ -4,7 +4,7 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework_bulk import BulkModelViewSet
 from django.db.models import QuerySet
 
-from common.mixins import CommonApiMixin, RelationMixin
+from common.drf.api import CommonApiMixin, RelationMixin
 from orgs.utils import current_org
 
 from ..utils import set_to_root_org

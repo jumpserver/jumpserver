@@ -1,7 +1,8 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from assets.models import Asset
+from assets.models import Asset, Gateway, Domain
+from assets.serializers import GatewaySerializer
 from accounts.const import SecretType, Source
 from accounts.models import Account, AccountTemplate
 from accounts.tasks import push_accounts_to_assets

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-from accounts.serializers import AccountSecretSerializer
 from django.utils.translation import ugettext_lazy as _
+from .asset.common import AccountSecretSerializer
 from ..serializers import HostSerializer
 from ..models import Gateway
 

@@ -14,7 +14,9 @@ from ..fields import LabeledChoiceField, ObjectRelatedField
 __all__ = [
     'BulkSerializerMixin', 'BulkListSerializerMixin',
     'CommonSerializerMixin', 'CommonBulkSerializerMixin',
-    'SecretReadableMixin',
+    'SecretReadableMixin', 'CommonModelSerializer',
+    'CommonBulkModelSerializer',
+
 ]
 
 
@@ -355,5 +357,13 @@ class CommonSerializerMixin(DynamicFieldsMixin, RelatedModelSerializerMixin,
     pass
 
 
+class CommonModelSerializer(CommonSerializerMixin, serializers.ModelSerializer):
+    pass
+
+
 class CommonBulkSerializerMixin(BulkSerializerMixin, CommonSerializerMixin):
+    pass
+
+
+class CommonBulkModelSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
     pass

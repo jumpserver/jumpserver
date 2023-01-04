@@ -6,9 +6,9 @@ from django.db.transaction import atomic
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.drf.fields import LabeledChoiceField, ObjectRelatedField
-from common.drf.serializers import WritableNestedModelSerializer
-from orgs.mixins.serializers import BulkOrgResourceSerializerMixin
+from common.drf.fields import LabeledChoiceField, ObjectRelatedField, ReadableHiddenField
+from common.drf.serializers import WritableNestedModelSerializer, SecretReadableMixin, CommonModelSerializer
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from accounts.models import Account, AccountTemplate
 from ...const import Category, AllTypes
 from ...models import Asset, Node, Platform, Label, Domain, Protocol
@@ -16,7 +16,7 @@ from ...models import Asset, Node, Platform, Label, Domain, Protocol
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
     'AssetTaskSerializer', 'AssetsTaskSerializer', 'AssetProtocolsSerializer',
-    'AssetDetailSerializer', 'DetailMixin'
+    'AssetDetailSerializer', 'DetailMixin', 'AssetAccountSerializer',
 ]
 
 
@@ -45,7 +45,7 @@ class AssetPlatformSerializer(serializers.ModelSerializer):
         }
 
 
-class AssetAccountSerializer(serializers.ModelSerializer):
+class AssetAccountSerializer(CommonModelSerializer):
     add_org_fields = False
     push_now = serializers.BooleanField(
         default=False, label=_("Push now"), write_only=True
@@ -105,7 +105,18 @@ class AssetAccountSerializer(serializers.ModelSerializer):
         return instance
 
 
-class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSerializer):
+class AccountSecretSerializer(SecretReadableMixin, CommonModelSerializer):
+    class Meta(AssetAccountSerializer.Meta):
+        model = Account
+        fields = [
+            'name', 'username', 'privileged', 'secret_type',
+        ]
+        extra_kwargs = {
+            'secret': {'write_only': False},
+        }
+
+
+class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSerializer):
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
     labels = AssetLabelSerializer(many=True, required=False, label=_('Labels'))

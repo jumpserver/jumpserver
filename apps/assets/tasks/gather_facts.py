@@ -9,14 +9,14 @@ from orgs.utils import org_aware_func, tmp_to_root_org
 
 logger = get_logger(__file__)
 __all__ = [
-    'update_assets_hardware_info_util',
+    'update_assets_fact_util',
     'update_node_assets_hardware_info_manual',
     'update_assets_hardware_info_manual',
 ]
 
 
 @org_aware_func('assets')
-def update_assets_hardware_info_util(assets=None, nodes=None, task_name=None):
+def update_assets_fact_util(assets=None, nodes=None, task_name=None):
     from assets.models import GatherFactsAutomation
     if not assets and not nodes:
         logger.info("No assets or nodes to update hardware info")
@@ -47,7 +47,7 @@ def update_assets_hardware_info_manual(asset_ids):
     with tmp_to_root_org():
         assets = Asset.objects.filter(id__in=asset_ids)
     task_name = gettext_noop("Update assets hardware info: ")
-    update_assets_hardware_info_util(assets=assets, task_name=task_name)
+    update_assets_fact_util(assets=assets, task_name=task_name)
 
 
 @shared_task(queue="ansible", verbose_name=_('Manually update the hardware information of assets under a node'))
@@ -57,4 +57,4 @@ def update_node_assets_hardware_info_manual(node_id):
         node = Node.objects.get(id=node_id)
 
     task_name = gettext_noop("Update node asset hardware information: ")
-    update_assets_hardware_info_util(nodes=[node], task_name=task_name)
+    update_assets_fact_util(nodes=[node], task_name=task_name)

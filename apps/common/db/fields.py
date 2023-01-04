@@ -28,6 +28,7 @@ __all__ = [
     "EncryptJsonDictCharField",
     "PortField",
     "BitChoices",
+    "TreeChoices",
 ]
 
 
@@ -216,14 +217,14 @@ class PortField(models.IntegerField):
         super().__init__(*args, **kwargs)
 
 
-class BitChoices(models.IntegerChoices):
+class TreeChoices(models.Choices):
+    @classmethod
+    def is_tree(cls):
+        return True
+
     @classmethod
     def branches(cls):
         return [i for i in cls]
-
-    @classmethod
-    def is_tree(cls):
-        return False
 
     @classmethod
     def tree(cls):
@@ -234,7 +235,7 @@ class BitChoices(models.IntegerChoices):
 
     @classmethod
     def render_node(cls, node):
-        if isinstance(node, BitChoices):
+        if isinstance(node, models.Choices):
             return {
                 "value": node.name,
                 "label": node.label,
@@ -246,6 +247,17 @@ class BitChoices(models.IntegerChoices):
                 "label": name,
                 "children": [cls.render_node(child) for child in children],
             }
+
+    @classmethod
+    def all(cls):
+        print("CHoices: ", cls.choices)
+        return [i[0] for i in cls.choices]
+
+
+class BitChoices(models.IntegerChoices, TreeChoices):
+    @classmethod
+    def is_tree(cls):
+        return False
 
     @classmethod
     def all(cls):

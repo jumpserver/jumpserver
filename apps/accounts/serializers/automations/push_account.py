@@ -2,7 +2,8 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from django.db import models
 
-from common.drf.fields import LabeledChoiceField, LabeledMultipleChoiceField
+from common.drf.fields import LabeledChoiceField, LabeledMultipleChoiceField, TreeChoicesField
+from common.db.fields import TreeChoices
 from accounts.models import PushAccountAutomation
 from .change_secret import (
     ChangeSecretAutomationSerializer, ChangeSecretUpdateAssetSerializer,
@@ -10,9 +11,29 @@ from .change_secret import (
 )
 
 
-class TriggerChoice(models.TextChoices):
+class TriggerChoice(models.TextChoices, TreeChoices):
     on_asset_create = 'on_asset_create', _('On asset create')
-    on_perm_create = 'on_perm_change', _('On perm change')
+    on_asset_join_node = 'on_asset_join_node', _('On asset join node')
+    on_user_join_group = 'on_user_join_group', _('On user join group')
+    # 授权变化包含，用户加入授权，用户组加入授权，资产加入授权，节点加入授权，账号变化
+    on_perm_add_user = 'on_perm_add_user', _('On perm add user')
+    on_perm_add_user_group = 'on_perm_add_user_group', _('On perm add user group')
+    on_perm_add_asset = 'on_perm_add_asset', _('On perm add asset')
+    on_perm_add_node = 'on_perm_add_node', _('On perm add node')
+    on_perm_add_account = 'on_perm_add_account', _('On perm add account')
+
+    @classmethod
+    def branches(cls):
+        return [
+            cls.on_asset_create,
+            cls.on_asset_join_node,
+            cls.on_user_join_group,
+            (_("On perm change"), [
+                cls.on_perm_add_user, cls.on_perm_add_user_group,
+                cls.on_perm_add_asset, cls.on_perm_add_node,
+                cls.on_perm_add_account
+            ])
+        ]
 
 
 class ActionChoice(models.TextChoices):
@@ -22,11 +43,14 @@ class ActionChoice(models.TextChoices):
 
 class PushAccountAutomationSerializer(ChangeSecretAutomationSerializer):
     dynamic_username = serializers.BooleanField(label=_('Dynamic username'), default=False)
-    triggers = LabeledMultipleChoiceField(
-        choices=TriggerChoice.choices, label=_('Trigger'),
-        default=[TriggerChoice.on_asset_create.value],
+    triggers = TreeChoicesField(
+        choice_cls=TriggerChoice, label=_('Triggers'),
+        default=TriggerChoice.all(),
     )
-    action = LabeledChoiceField(choices=ActionChoice.choices, label=_('Action'), default=ActionChoice.create_and_push)
+    action = LabeledChoiceField(
+        choices=ActionChoice.choices, label=_('Action'),
+        default=ActionChoice.create_and_push
+    )
 
     class Meta(ChangeSecretAutomationSerializer.Meta):
         model = PushAccountAutomation
@@ -53,6 +77,10 @@ class PushAccountAutomationSerializer(ChangeSecretAutomationSerializer):
         if queryset.exists():
             raise serializers.ValidationError(_('Dynamic username already exists'))
         return value
+
+    def validate_triggers(self, value):
+        # Now triggers readonly, set all
+        return TriggerChoice.all()
 
     def get_field_names(self, declared_fields, info):
         fields = super().get_field_names(declared_fields, info)

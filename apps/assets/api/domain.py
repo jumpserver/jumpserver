@@ -22,8 +22,9 @@ class DomainViewSet(OrgBulkModelViewSet):
     ordering = ('name',)
 
     def get_serializer_class(self):
+        from accounts.serializers import DomainWithGatewaySerializer
         if self.request.query_params.get('gateway'):
-            return serializers.DomainWithGatewaySerializer
+            return DomainWithGatewaySerializer
         return super().get_serializer_class()
 
 
