@@ -23,7 +23,7 @@ __all__ = [
 class AssetProtocolsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Protocol
-        fields = ['id', 'name', 'port']
+        fields = ['name', 'port']
 
 
 class AssetLabelSerializer(serializers.ModelSerializer):
