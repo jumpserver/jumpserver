@@ -110,6 +110,7 @@ class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSeriali
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
     labels = AssetLabelSerializer(many=True, required=False, label=_('Labels'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
+    accounts = AssetAccountSerializer(many=True, required=False, write_only=True, label=_('Account'))
 
     class Meta:
         model = Asset
@@ -117,7 +118,7 @@ class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSeriali
         fields_small = fields_mini + ['is_active', 'comment']
         fields_fk = ['domain', 'platform']
         fields_m2m = [
-            'nodes', 'labels', 'protocols', 'nodes_display',
+            'nodes', 'labels', 'protocols', 'nodes_display', 'accounts'
         ]
         read_only_fields = [
             'category', 'type', 'info',
