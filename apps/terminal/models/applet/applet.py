@@ -125,7 +125,7 @@ class Applet(JMSBaseModel):
 class AppletPublication(JMSBaseModel):
     applet = models.ForeignKey('Applet', on_delete=models.CASCADE, related_name='publications',
                                verbose_name=_('Applet'))
-    host = models.ForeignKey('AppletHost', on_delete=models.PROTECT, related_name='publications',
+    host = models.ForeignKey('AppletHost', on_delete=models.CASCADE, related_name='publications',
                              verbose_name=_('Hosting'))
     status = models.CharField(max_length=16, default='ready', verbose_name=_('Status'))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
