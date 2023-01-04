@@ -1,3 +1,4 @@
+import datetime
 import json
 import logging
 import os
@@ -236,9 +237,9 @@ class JobExecution(JMSOrgBaseModel):
 
     @property
     def time_cost(self):
-        if self.date_finished and self.date_start:
+        if self.is_finished:
             return (self.date_finished - self.date_start).total_seconds()
-        return None
+        return (timezone.now() - self.date_start).total_seconds()
 
     @property
     def timedelta(self):
