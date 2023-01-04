@@ -13,14 +13,13 @@ from rest_framework import generics, serializers
 from common.permissions import IsValidUser
 from common.http import HttpResponseTemporaryRedirect
 from common.utils import get_logger
+from common.const import KEY_CACHE_RESOURCE_IDS
 
 __all__ = [
     'LogTailApi', 'ResourcesIDCacheApi'
 ]
 
 logger = get_logger(__file__)
-
-KEY_CACHE_RESOURCE_IDS = "RESOURCE_IDS_{}"
 
 
 class OutputSerializer(serializers.Serializer):

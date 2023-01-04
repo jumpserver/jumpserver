@@ -22,14 +22,9 @@ class SimpleMetadataWithFilters(SimpleMetadata):
 
     methods = {"PUT", "POST", "GET", "PATCH"}
     attrs = [
-        "read_only",
-        "label",
-        "help_text",
-        "min_length",
-        "max_length",
-        "min_value",
-        "max_value",
-        "write_only",
+        "read_only", "label", "help_text",
+        "min_length", "max_length", "min_value",
+        "max_value", "write_only",
     ]
 
     def determine_actions(self, request, view):
