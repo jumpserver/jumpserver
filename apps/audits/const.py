@@ -6,32 +6,6 @@ from django.db.models import TextChoices, IntegerChoices
 DEFAULT_CITY = _("Unknown")
 
 MODELS_NEED_RECORD = []
-MODELS_NEED_RECORD1 = (
-    # users
-    'User', 'UserGroup',
-    # authentication
-    'AccessKey', 'TempToken',
-    # acls
-    "LoginACL", "LoginAssetACL", "LoginConfirmSetting",
-    # assets
-    'Asset', 'Node', 'Domain', 'Gateway', 'Platform', 'Label',
-    # account
-    'Account',
-    # orgs
-    "Organization",
-    # settings
-    "Setting",
-    # perms
-    'AssetPermission',
-    # notifications
-    'SystemMsgSubscription', 'UserMsgSubscription',
-    # Terminal
-    'Terminal', 'Endpoint', 'EndpointRule', 'CommandStorage', 'ReplayStorage',
-    # rbac
-    'Role', 'SystemRole', 'OrgRole', 'RoleBinding', 'OrgRoleBinding', 'SystemRoleBinding',
-    # xpack
-    'License', 'Account', 'SyncInstanceTask', 'Interface',
-)
 
 
 class OperateChoices(TextChoices):

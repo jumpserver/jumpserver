@@ -10,7 +10,8 @@ class AuditsConfig(AppConfig):
     name = 'audits'
     verbose_name = _('Audits')
 
-    def _set_operate_log_monitor_models(self):
+    @staticmethod
+    def _set_operate_log_monitor_models():
         exclude_label = {
             'audits', 'django_cas_ng', 'captcha', 'admin',
             'django_celery_beat', 'contenttypes', 'sessions',
@@ -30,8 +31,6 @@ class AuditsConfig(AppConfig):
             'PermedAsset', 'PermedAccount', 'MenuPermission',
             'Permission', 'TicketSession', 'ApplyLoginTicket',
             'ApplyCommandTicket', 'ApplyLoginAssetTicket',
-            ''
-
         }
         for i, app in enumerate(apps.get_models(), 1):
             app_label = app._meta.app_label
