@@ -18,6 +18,7 @@ __all__ = ['AppletHostViewSet', 'AppletHostDeploymentViewSet']
 class AppletHostViewSet(JMSBulkModelViewSet):
     serializer_class = AppletHostSerializer
     queryset = AppletHost.objects.all()
+    search_fields = ['asset_ptr__name', 'asset_ptr__address', ]
 
     def dispatch(self, request, *args, **kwargs):
         with tmp_to_builtin_org(system=1):
