@@ -36,7 +36,6 @@ class AuditsConfig(AppConfig):
         for i, app in enumerate(apps.get_models(), 1):
             app_label = app._meta.app_label
             app_object_name = app._meta.object_name
-            print(app_label, app_object_name, i)
             if app_label in exclude_label or \
                     app_object_name in exclude_object_name or \
                     app_object_name.endswith('Execution'):
