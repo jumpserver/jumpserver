@@ -40,6 +40,7 @@ class AppletHostViewSet(JMSModelViewSet):
 class AppletHostDeploymentViewSet(viewsets.ModelViewSet):
     serializer_class = AppletHostDeploymentSerializer
     queryset = AppletHostDeployment.objects.all()
+    filterset_fields = ['host', ]
     rbac_perms = (
         ('applets', 'terminal.view_AppletHostDeployment'),
     )
