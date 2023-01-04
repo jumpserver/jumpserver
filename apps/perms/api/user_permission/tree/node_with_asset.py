@@ -152,13 +152,13 @@ class UserGrantedK8sAsTreeApi(SelfOrPKUserMixin, ListAPIView):
     def get_account_secret(self, token: ConnectionToken):
         util = PermAccountUtil()
         accounts = util.get_permed_accounts_for_user(self.user, token.asset)
-        account_username = token.account
-        accounts = filter(lambda x: x.username == account_username, accounts)
+        account_name = token.account
+        accounts = filter(lambda x: x.name == account_name, accounts)
         accounts = list(accounts)
         if not accounts:
             raise NotFound('Account is not found')
         account = accounts[0]
-        if account.username in [
+        if account.name in [
             AliasAccount.INPUT, AliasAccount.USER
         ]:
             return token.input_secret

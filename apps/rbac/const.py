@@ -39,6 +39,7 @@ exclude_permissions = (
     ('assets', 'device', '*', '*'),
     ('assets', 'database', '*', '*'),
     ('assets', 'protocol', '*', '*'),
+    ('assets', 'baseautomation', '*', '*'),
     ('assets', 'assetbaseautomation', '*', '*'),
     ('assets', 'automationexecution', '*', '*'),
     ('assets', 'pingautomation', '*', '*'),

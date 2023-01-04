@@ -16,7 +16,7 @@ from ...models import Asset, Node, Platform, Label, Domain, Protocol
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
     'AssetTaskSerializer', 'AssetsTaskSerializer', 'AssetProtocolsSerializer',
-    'AssetDetailSerializer',
+    'AssetDetailSerializer', 'DetailMixin'
 ]
 
 
@@ -110,7 +110,6 @@ class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSeriali
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
     labels = AssetLabelSerializer(many=True, required=False, label=_('Labels'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
-    accounts = AssetAccountSerializer(many=True, required=False, label=_('Account'))
 
     class Meta:
         model = Asset
@@ -119,7 +118,6 @@ class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSeriali
         fields_fk = ['domain', 'platform']
         fields_m2m = [
             'nodes', 'labels', 'protocols', 'nodes_display',
-            'accounts',
         ]
         read_only_fields = [
             'category', 'type', 'info',
@@ -139,10 +137,11 @@ class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSeriali
         queryset = queryset.prefetch_related('domain', 'platform') \
             .annotate(category=F("platform__category")) \
             .annotate(type=F("platform__type"))
-        queryset = queryset.prefetch_related('nodes', 'labels', 'accounts', 'protocols')
+        queryset = queryset.prefetch_related('nodes', 'labels', 'protocols')
         return queryset
 
-    def perform_nodes_display_create(self, instance, nodes_display):
+    @staticmethod
+    def perform_nodes_display_create(instance, nodes_display):
         if not nodes_display:
             return
         nodes_to_set = []
@@ -210,28 +209,21 @@ class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSeriali
         return instance
 
 
-class AssetDetailSerializer(AssetSerializer):
+class DetailMixin(serializers.Serializer):
     accounts = AssetAccountSerializer(many=True, required=False, label=_('Accounts'))
-    enabled_info = serializers.SerializerMethodField()
+    enabled_info = serializers.DictField(read_only=True, label=_('Enabled info'))
 
-    class Meta(AssetSerializer.Meta):
-        fields = AssetSerializer.Meta.fields + ['accounts', 'enabled_info', 'info', 'specific']
+    def get_field_names(self, declared_fields, info):
+        names = super().get_field_names(declared_fields, info)
+        names.extend([
+            'accounts', 'enabled_info', 'info',
+            'specific', 'spec_info'
+        ])
+        return names
 
-    @staticmethod
-    def get_enabled_info(obj):
-        platform = obj.platform
-        automation = platform.automation
-        return {
-            'su_enabled': platform.su_enabled,
-            'ping_enabled': automation.ping_enabled,
-            'domain_enabled': platform.domain_enabled,
-            'ansible_enabled': automation.ansible_enabled,
-            'protocols_enabled': platform.protocols_enabled,
-            'gather_facts_enabled': automation.gather_facts_enabled,
-            'change_secret_enabled': automation.change_secret_enabled,
-            'verify_account_enabled': automation.verify_account_enabled,
-            'gather_accounts_enabled': automation.gather_accounts_enabled,
-        }
+
+class AssetDetailSerializer(DetailMixin, AssetSerializer):
+    pass
 
 
 class MiniAssetSerializer(serializers.ModelSerializer):

@@ -5,7 +5,6 @@ from django.utils.translation import ugettext_lazy as _
 from ..serializers import HostSerializer
 from ..models import Gateway
 
-
 __all__ = ['GatewaySerializer', 'GatewayWithAccountSecretSerializer']
 
 
@@ -18,4 +17,4 @@ class GatewayWithAccountSecretSerializer(GatewaySerializer):
     accounts = AccountSecretSerializer(many=True, required=False, label=_('Account'))
 
     class Meta(GatewaySerializer.Meta):
-        fields = GatewaySerializer.Meta.fields
+        fields = GatewaySerializer.Meta.fields + ['accounts']

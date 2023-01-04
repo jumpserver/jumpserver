@@ -55,9 +55,11 @@ class ChangSecretExecutionViewSet(AutomationExecutionViewSet):
         ("create", "accounts.add_changesecretexecution"),
     )
 
+    tp = AutomationTypes.change_secret
+
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.filter(automation__type=AutomationTypes.change_secret)
+        queryset = queryset.filter(automation__type=self.tp)
         return queryset
 
 

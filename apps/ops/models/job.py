@@ -164,12 +164,24 @@ class JobExecution(JMSOrgBaseModel):
     def compile_shell(self):
         if self.current_job.type != 'adhoc':
             return
-        result = self.current_job.args
-        if self.current_job.chdir:
-            result += " chdir={}".format(self.current_job.chdir)
+
+        module = self.current_job.module
+        # replace win_shell
+        if module == 'win_shell':
+            module = 'ansible.windows.win_shell'
+
         if self.current_job.module in ['python']:
-            result += " executable={}".format(self.current_job.module)
-        return result
+            module = "shell"
+
+        shell = self.current_job.args
+        if self.current_job.chdir:
+            if module == self.current_job.module:
+                shell += " path={}".format(self.current_job.chdir)
+            else:
+                shell += " chdir={}".format(self.current_job.chdir)
+        if self.current_job.module in ['python']:
+            shell += " executable={}".format(self.current_job.module)
+        return module, shell
 
     def get_runner(self):
         inv = self.current_job.inventory
@@ -189,10 +201,8 @@ class JobExecution(JMSOrgBaseModel):
         extra_vars.update(static_variables)
 
         if self.current_job.type == 'adhoc':
-            args = self.compile_shell()
-            module = "shell"
-            if self.current_job.module not in ['python']:
-                module = self.current_job.module
+
+            module, args = self.compile_shell()
 
             runner = AdHocRunner(
                 self.inventory_path,

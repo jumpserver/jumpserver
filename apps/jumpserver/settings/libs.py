@@ -31,7 +31,6 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         # 'rest_framework.authentication.BasicAuthentication',
-        'authentication.backends.drf.AccessKeyAuthentication',
         'authentication.backends.drf.AccessTokenAuthentication',
         'authentication.backends.drf.PrivateTokenAuthentication',
         'authentication.backends.drf.SignatureAuthentication',
@@ -118,7 +117,6 @@ else:
     )
     REDIS_LAYERS_SSL_PARAMS.pop('ssl', None)
     REDIS_LAYERS_HOST['address'] = '{}?{}'.format(REDIS_LAYERS_ADDRESS, urlencode(REDIS_LAYERS_SSL_PARAMS))
-
 
 CHANNEL_LAYERS = {
     'default': {

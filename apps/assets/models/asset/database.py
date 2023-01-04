@@ -19,16 +19,5 @@ class Database(Asset):
     def ip(self):
         return self.address
 
-    @property
-    def specific(self):
-        return {
-            'db_name': self.db_name,
-            'use_ssl': self.use_ssl,
-            'ca_cert': self.ca_cert,
-            'client_cert': self.client_cert,
-            'client_key': self.client_key,
-            'allow_invalid_cert': self.allow_invalid_cert,
-        }
-
     class Meta:
         verbose_name = _("Database")
