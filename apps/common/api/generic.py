@@ -1,7 +1,7 @@
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework_bulk import BulkModelViewSet
 
-from .common import CommonApiMixin, RelationMixin
+from .mixin import CommonApiMixin, RelationMixin
 from .permission import AllowBulkDestroyMixin
 
 

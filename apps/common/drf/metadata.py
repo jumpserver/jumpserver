@@ -14,7 +14,7 @@ from rest_framework.fields import empty
 from rest_framework.metadata import SimpleMetadata
 from rest_framework.request import clone_request
 
-from common.drf.fields import TreeChoicesField
+from common.serializers.fields import TreeChoicesField
 
 
 class SimpleMetadataWithFilters(SimpleMetadata):

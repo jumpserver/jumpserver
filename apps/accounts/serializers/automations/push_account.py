@@ -2,7 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from django.db import models
 
-from common.drf.fields import LabeledChoiceField, LabeledMultipleChoiceField, TreeChoicesField
+from common.serializers.fields import LabeledChoiceField, TreeChoicesField
 from common.db.fields import TreeChoices
 from accounts.models import PushAccountAutomation
 from .change_secret import (

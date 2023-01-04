@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from accounts.const import SecretType
-from common.drf.fields import EncryptedField, LabeledChoiceField
+from common.serializers.fields import EncryptedField, LabeledChoiceField
 from .utils import validate_password_for_ansible, validate_ssh_key
 
 

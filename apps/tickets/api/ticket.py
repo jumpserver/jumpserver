@@ -7,7 +7,7 @@ from rest_framework.exceptions import MethodNotAllowed
 
 from orgs.utils import tmp_to_root_org
 from rbac.permissions import RBACPermission
-from common.drf.api import CommonApiMixin
+from common.api import CommonApiMixin
 from common.const.http import POST, PUT, PATCH
 from tickets import filters
 from tickets import serializers

@@ -53,8 +53,4 @@ urlpatterns = [
     path('components/connect-methods/', api.ConnectMethodListApi.as_view(), name='connect-methods'),
 ]
 
-old_version_urlpatterns = [
-    re_path('(?P<resource>terminal|command)/.*', capi.redirect_plural_name_api)
-]
-
-urlpatterns += router.urls + old_version_urlpatterns
+urlpatterns += router.urls

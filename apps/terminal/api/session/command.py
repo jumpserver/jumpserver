@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from terminal.models import CommandStorage, Session, Command
 from terminal.filters import CommandFilter
 from orgs.utils import current_org
-from common.drf.api import JMSBulkModelViewSet
+from common.api import JMSBulkModelViewSet
 from common.utils import get_logger
 from terminal.backends.command.serializers import InsecureCommandAlertSerializer
 from terminal.exceptions import StorageInvalid
@@ -104,7 +104,7 @@ class CommandViewSet(JMSBulkModelViewSet):
     filterset_class = CommandFilter
     search_fields = ('input',)
     model = Command
-    ordering_fields = ('timestamp', )
+    ordering_fields = ('timestamp',)
 
     def merge_all_storage_list(self, request, *args, **kwargs):
         merged_commands = []

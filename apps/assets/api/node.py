@@ -14,7 +14,7 @@ from assets.models import Asset
 from common.const.http import POST
 from common.const.signals import PRE_REMOVE, POST_REMOVE
 from common.exceptions import SomeoneIsDoingThis
-from common.drf.api import SuggestionMixin
+from common.api import SuggestionMixin
 from common.utils import get_logger
 from orgs.mixins import generics
 from orgs.mixins.api import OrgBulkModelViewSet

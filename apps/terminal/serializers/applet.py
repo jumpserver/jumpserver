@@ -2,9 +2,8 @@ from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 
-from common.drf.fields import ObjectRelatedField, LabeledChoiceField
+from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from ..models import Applet, AppletPublication, AppletHost
-
 
 __all__ = [
     'AppletSerializer', 'AppletPublicationSerializer',

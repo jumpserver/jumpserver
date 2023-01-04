@@ -12,7 +12,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
-from common.drf.serializers import FileSerializer
+from common.serializers import FileSerializer
 from common.utils import is_uuid
 from terminal import serializers
 from terminal.models import AppletPublication, Applet

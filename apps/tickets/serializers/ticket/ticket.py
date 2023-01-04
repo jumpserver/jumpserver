@@ -3,7 +3,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.drf.fields import LabeledChoiceField
+from common.serializers.fields import LabeledChoiceField
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from orgs.models import Organization
 from tickets.const import TicketType, TicketStatus, TicketState

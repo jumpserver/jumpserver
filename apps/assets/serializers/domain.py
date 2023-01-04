@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from common.drf.fields import ObjectRelatedField
+from common.serializers.fields import ObjectRelatedField
 from .gateway import GatewayWithAccountSecretSerializer
 from ..models import Domain, Asset
 

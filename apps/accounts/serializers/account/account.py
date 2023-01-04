@@ -1,13 +1,12 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from assets.models import Asset, Gateway, Domain
-from assets.serializers import GatewaySerializer
+from assets.models import Asset
 from accounts.const import SecretType, Source
 from accounts.models import Account, AccountTemplate
 from accounts.tasks import push_accounts_to_assets
-from common.drf.fields import ObjectRelatedField, LabeledChoiceField
-from common.drf.serializers import SecretReadableMixin, BulkModelSerializer
+from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
+from common.serializers import SecretReadableMixin, BulkModelSerializer
 from .base import BaseAccountSerializer
 
 

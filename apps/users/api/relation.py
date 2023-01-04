@@ -3,7 +3,7 @@
 
 from django.db.models import F
 
-from common.drf.api import JMSBulkRelationModelViewSet
+from common.api import JMSBulkRelationModelViewSet
 from .. import serializers
 from ..models import User, UserGroup
 

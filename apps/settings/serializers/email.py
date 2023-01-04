@@ -4,7 +4,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.drf.fields import EncryptedField
+from common.serializers.fields import EncryptedField
 
 __all__ = ['MailTestSerializer', 'EmailSettingSerializer', 'EmailContentSettingSerializer']
 
@@ -62,7 +62,8 @@ class EmailContentSettingSerializer(serializers.Serializer):
     EMAIL_CUSTOM_USER_CREATED_BODY = serializers.CharField(
         max_length=4096, allow_blank=True, required=False,
         label=_('Create user email content'),
-        help_text=_('Tips: When creating a user, send the content of the email, support {username} {name} {email} label')
+        help_text=_(
+            'Tips: When creating a user, send the content of the email, support {username} {name} {email} label')
     )
     EMAIL_CUSTOM_USER_CREATED_SIGNATURE = serializers.CharField(
         max_length=512, allow_blank=True, required=False, label=_('Signature'),

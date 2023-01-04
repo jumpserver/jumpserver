@@ -250,7 +250,6 @@ class TreeChoices(models.Choices):
 
     @classmethod
     def all(cls):
-        print("CHoices: ", cls.choices)
         return [i[0] for i in cls.choices]
 
 

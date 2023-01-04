@@ -6,12 +6,12 @@ from django.db.transaction import atomic
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.drf.fields import LabeledChoiceField, ObjectRelatedField, ReadableHiddenField
-from common.drf.serializers import WritableNestedModelSerializer, SecretReadableMixin, CommonModelSerializer
+from common.serializers.fields import LabeledChoiceField
+from common.serializers import WritableNestedModelSerializer, SecretReadableMixin, CommonModelSerializer
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from accounts.models import Account, AccountTemplate
 from ...const import Category, AllTypes
-from ...models import Asset, Node, Platform, Label, Domain, Protocol
+from ...models import Asset, Node, Platform, Label, Protocol
 
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',

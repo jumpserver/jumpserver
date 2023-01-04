@@ -4,7 +4,7 @@ from rest_framework import serializers
 from assets.models import Platform
 from assets.serializers import HostSerializer
 from accounts.models import Account
-from common.drf.fields import LabeledChoiceField
+from common.serializers.fields import LabeledChoiceField
 from common.validators import ProjectUniqueValidator
 from .applet import AppletSerializer
 from .. import const

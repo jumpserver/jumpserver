@@ -8,7 +8,6 @@ from rest_framework.request import Request
 
 from common.exceptions import UserConfirmRequired
 from audits.handler import create_or_update_operate_log
-from audits.models import OperateLog
 from audits.const import ActionChoices
 
 __all__ = [

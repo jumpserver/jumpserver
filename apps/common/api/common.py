@@ -9,19 +9,18 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics, serializers
-from rest_framework.viewsets import GenericViewSet
 
 from common.permissions import IsValidUser
-from .http import HttpResponseTemporaryRedirect
-from .const import KEY_CACHE_RESOURCE_IDS
-from .utils import get_logger
-from .drf.api import CommonApiMixin
+from common.http import HttpResponseTemporaryRedirect
+from common.utils import get_logger
 
 __all__ = [
-    'LogTailApi', 'ResourcesIDCacheApi', 'CommonGenericViewSet'
+    'LogTailApi', 'ResourcesIDCacheApi'
 ]
 
 logger = get_logger(__file__)
+
+KEY_CACHE_RESOURCE_IDS = "RESOURCE_IDS_{}"
 
 
 class OutputSerializer(serializers.Serializer):
@@ -105,7 +104,3 @@ def redirect_plural_name_api(request, *args, **kwargs):
     full_path = org_full_path.replace(resource, resource + "s", 1)
     logger.debug("Redirect {} => {}".format(org_full_path, full_path))
     return HttpResponseTemporaryRedirect(full_path)
-
-
-class CommonGenericViewSet(CommonApiMixin, GenericViewSet):
-    pass

@@ -6,8 +6,8 @@ from accounts.const import SecretType
 from accounts.models import Account
 from assets.models import Asset, Platform, Gateway, Domain
 from assets.serializers import PlatformSerializer, AssetProtocolsSerializer
-from common.drf.fields import LabeledChoiceField
-from common.drf.fields import ObjectRelatedField
+from common.serializers.fields import LabeledChoiceField
+from common.serializers.fields import ObjectRelatedField
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from perms.serializers.permission import ActionChoicesField
 from users.models import User

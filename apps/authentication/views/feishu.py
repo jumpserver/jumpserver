@@ -13,7 +13,7 @@ from authentication import errors
 from authentication.const import ConfirmType
 from authentication.mixins import AuthMixin
 from authentication.notifications import OAuthBindMessage
-from common.mixins.views import PermissionsMixin, UserConfirmRequiredExceptionMixin
+from common.views.mixins import PermissionsMixin, UserConfirmRequiredExceptionMixin
 from common.permissions import UserConfirmation
 from common.sdk.im.feishu import URL, FeiShu
 from common.utils import FlashMessageUtil, get_logger
@@ -24,7 +24,6 @@ from users.models import User
 from users.views import UserVerifyPasswordView
 
 logger = get_logger(__file__)
-
 
 FEISHU_STATE_SESSION_KEY = '_feishu_state'
 
@@ -166,7 +165,7 @@ class FeiShuEnableStartView(UserVerifyPasswordView):
 class FeiShuQRLoginView(FeiShuQRMixin, View):
     permission_classes = (AllowAny,)
 
-    def get(self,  request: HttpRequest):
+    def get(self, request: HttpRequest):
         redirect_url = request.GET.get('redirect_url') or reverse('index')
         redirect_uri = reverse('authentication:feishu-qr-login-callback', external=True)
         redirect_uri += '?' + urlencode({

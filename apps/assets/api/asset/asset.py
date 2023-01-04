@@ -13,7 +13,7 @@ from assets.tasks import (
     update_assets_hardware_info_manual
 )
 from common.drf.filters import BaseFilterSet
-from common.drf.api import SuggestionMixin
+from common.api import SuggestionMixin
 from common.utils import get_logger
 from accounts.tasks import push_accounts_to_assets, verify_accounts_connectivity
 from orgs.mixins import generics

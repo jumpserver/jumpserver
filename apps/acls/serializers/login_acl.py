@@ -1,8 +1,8 @@
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
-from common.drf.fields import ObjectRelatedField, LabeledChoiceField
-from common.drf.serializers import BulkModelSerializer, MethodSerializer
+from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
+from common.serializers import BulkModelSerializer, MethodSerializer
 from jumpserver.utils import has_valid_xpack_license
 from users.models import User
 from .rules import RuleSerializer

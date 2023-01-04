@@ -8,8 +8,8 @@ from rest_framework.fields import SkipField, empty
 from rest_framework.settings import api_settings
 from rest_framework.utils import html
 
-from common.drf.fields import EncryptedField
-from ..fields import LabeledChoiceField, ObjectRelatedField
+from common.serializers.fields import EncryptedField
+from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
 
 __all__ = [
     'BulkSerializerMixin', 'BulkListSerializerMixin',

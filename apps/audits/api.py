@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin
 
 from ops.models.job import JobAuditLog
-from common.api import CommonGenericViewSet
+from common.api import JMSGenericViewSet
 from common.drf.filters import DatetimeRangeFilter
 from common.plugins.es import QuerySet as ESQuerySet
 from orgs.utils import current_org
@@ -50,7 +50,7 @@ class UserLoginCommonMixin:
     search_fields = ['username', 'ip', 'city']
 
 
-class UserLoginLogViewSet(UserLoginCommonMixin, ListModelMixin, CommonGenericViewSet):
+class UserLoginLogViewSet(UserLoginCommonMixin, ListModelMixin, JMSGenericViewSet):
 
     @staticmethod
     def get_org_members():
@@ -103,7 +103,7 @@ class OperateLogViewSet(RetrieveModelMixin, ListModelMixin, OrgGenericViewSet):
         return qs
 
 
-class PasswordChangeLogViewSet(ListModelMixin, CommonGenericViewSet):
+class PasswordChangeLogViewSet(ListModelMixin, JMSGenericViewSet):
     queryset = PasswordChangeLog.objects.all()
     serializer_class = PasswordChangeLogSerializer
     extra_filter_backends = [DatetimeRangeFilter]

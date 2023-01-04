@@ -2,7 +2,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from common.drf.api import JMSModelViewSet
+from common.api import JMSModelViewSet
 from common.permissions import IsServiceAccount
 from orgs.utils import tmp_to_builtin_org
 from terminal.models import AppletHost, AppletHostDeployment
