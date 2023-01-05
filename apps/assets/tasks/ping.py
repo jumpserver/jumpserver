@@ -1,12 +1,15 @@
 # ~*~ coding: utf-8 ~*~
 from celery import shared_task
-from django.utils.translation import gettext_noop
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_noop, gettext_lazy as _
 
 from common.utils import get_logger
+from assets.const import AutomationTypes
 from orgs.utils import org_aware_func, tmp_to_root_org
 
+from .common import automation_execute_start
+
 logger = get_logger(__file__)
+
 __all__ = [
     'test_asset_connectivity_util',
     'test_assets_connectivity_manual',
@@ -21,13 +24,11 @@ def test_asset_connectivity_util(assets, task_name=None):
         task_name = gettext_noop("Test assets connectivity ")
 
     task_name = PingAutomation.generate_unique_name(task_name)
-    data = {
-        'name': task_name,
-        'comment': ', '.join([str(i) for i in assets])
+    tp = AutomationTypes.ping
+    child_snapshot = {
+        'assets': [str(asset.id) for asset in assets],
     }
-    instance = PingAutomation.objects.create(**data)
-    instance.assets.add(*assets)
-    instance.execute()
+    automation_execute_start(task_name, tp, child_snapshot)
 
 
 @shared_task(queue="ansible", verbose_name=_('Manually test the connectivity of a  asset'))

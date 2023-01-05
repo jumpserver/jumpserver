@@ -56,7 +56,6 @@ class AutomationExecutionSerializer(serializers.ModelSerializer):
             'accounts': obj.snapshot['accounts'],
             'node_amount': len(obj.snapshot['nodes']),
             'asset_amount': len(obj.snapshot['assets']),
-            'type_display': getattr(AutomationTypes, tp).label,
         }
         return snapshot
 

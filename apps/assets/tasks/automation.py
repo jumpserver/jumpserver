@@ -8,7 +8,7 @@ from assets.const import AutomationTypes
 logger = get_logger(__file__)
 
 
-@shared_task(queue='ansible', verbose_name=_('Execute automation'))
+@shared_task(queue='ansible', verbose_name=_('Asset execute automation'))
 def execute_automation(pid, trigger, tp):
     model = AutomationTypes.get_type_model(tp)
     with tmp_to_root_org():

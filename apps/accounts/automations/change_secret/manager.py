@@ -13,17 +13,20 @@ from accounts.const import (
 from accounts.models import ChangeSecretRecord
 from accounts.notifications import ChangeSecretExecutionTaskMsg
 from accounts.serializers import ChangeSecretRecordBackUpSerializer
+from accounts.const import (
+    AutomationTypes, SecretType, SecretStrategy, SSHKeyStrategy, DEFAULT_PASSWORD_RULES
+)
+from ..base.manager import AccountBasePlaybookManager
 from common.utils import get_logger, lazyproperty
 from common.utils.file import encrypt_and_compress_zip_file
 from common.utils.timezone import local_now_display
 from users.models import User
-from ..base.manager import BasePlaybookManager
 from ...utils import SecretGenerator
 
 logger = get_logger(__name__)
 
 
-class ChangeSecretManager(BasePlaybookManager):
+class ChangeSecretManager(AccountBasePlaybookManager):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.method_hosts_mapper = defaultdict(list)
