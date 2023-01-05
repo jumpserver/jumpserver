@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework import generics, serializers
 
 from common.permissions import IsValidUser
-from common.http import HttpResponseTemporaryRedirect
+from common.views.http import HttpResponseTemporaryRedirect
 from common.utils import get_logger
 from common.const import KEY_CACHE_RESOURCE_IDS
 

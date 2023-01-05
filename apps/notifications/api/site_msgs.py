@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.decorators import action
 
-from common.http import is_true
+from common.utils.http import is_true
 from common.permissions import IsValidUser
 from common.const.http import GET, PATCH, POST
 from common.api import JMSGenericViewSet

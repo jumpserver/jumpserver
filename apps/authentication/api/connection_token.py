@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
 from common.api import JMSModelViewSet
-from common.http import is_true
+from common.utils.http import is_true
 from common.utils import random_string
 from common.utils.django import get_request_os
 from orgs.mixins.api import RootOrgViewMixin

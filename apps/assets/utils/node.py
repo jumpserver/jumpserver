@@ -2,7 +2,7 @@
 #
 from collections import defaultdict
 from common.utils import get_logger, dict_get_any, is_uuid, get_object_or_none, timeit
-from common.http import is_true
+from common.utils.http import is_true
 from common.struct import Stack
 from common.db.models import output_as_string
 from orgs.utils import ensure_in_real_or_default_org, current_org
