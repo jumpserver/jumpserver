@@ -117,10 +117,15 @@ class PrepareRequestMixin:
 
         security_default = {
             'wantAttributeStatement': False,
-            'allowRepeatAttributeName': True
+            'allowRepeatAttributeName': True,
         }
         security = other_settings.get('security', {})
         security_default.update(security)
+
+        # set a default signing algo if authnRequestSigned is set to true but no sign algo provided
+        if security_default.get('authnRequestsSigned'):
+            if not security_default.get('signatureAlgorithm'):
+                security_default['signatureAlgorithm'] = 'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
 
         default = {
             "organization": {
@@ -146,12 +151,21 @@ class PrepareRequestMixin:
                 },
                 'singleLogoutService': {
                     'url': f"{sp_host}{reverse('authentication:saml2:saml2-logout')}"
-                }
+                },
             }
         }
         sp_settings['sp'].update(attrs)
         advanced_settings = self.get_advanced_settings()
         sp_settings.update(advanced_settings)
+
+        # load sp cert and key for encryption if advanced_settings.security.authnRequestsSigned is True
+        if advanced_settings['authnRequestsSigned']:
+            certs = {
+                "privateKey": settings.SAML2_SP_KEY_CONTENT,
+                "x509cert": settings.SAML2_SP_CERT_CONTENT
+            }
+            sp_settings['sp'].update(certs)
+
         return sp_settings
 
     def get_saml2_settings(self):
