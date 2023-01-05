@@ -22,6 +22,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         fields_small = fields_mini + [
             'user', 'asset', 'account', 'input_username',
             'input_secret', 'connect_method', 'protocol', 'actions',
+            'is_active', 'from_ticket',
             'date_expired', 'date_created', 'date_updated', 'created_by',
             'updated_by', 'org_id', 'org_name',
         ]
@@ -32,6 +33,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         ]
         fields = fields_small + read_only_fields
         extra_kwargs = {
+            'from_ticket': {'read_only': True},
             'value': {'read_only': True},
         }
 

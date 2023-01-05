@@ -14,7 +14,7 @@ class LoginAssetACL(UserAssetAccountBaseACL):
         return self.name
 
     @classmethod
-    def create_login_asset_confirm_ticket(cls, user, asset, account_username, assignees, org_id):
+    def create_login_asset_review_ticket(cls, user, asset, account_username, assignees, org_id):
         from tickets.const import TicketType
         from tickets.models import ApplyLoginAssetTicket
         title = _('Login asset confirm') + ' ({})'.format(user)
