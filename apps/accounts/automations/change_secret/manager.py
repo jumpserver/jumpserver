@@ -19,12 +19,12 @@ from accounts.serializers import ChangeSecretRecordBackUpSerializer
 from accounts.const import (
     AutomationTypes, SecretType, SecretStrategy, SSHKeyStrategy, DEFAULT_PASSWORD_RULES
 )
-from ..base.manager import BasePlaybookManager
+from ..base.manager import AccountBasePlaybookManager
 
 logger = get_logger(__name__)
 
 
-class ChangeSecretManager(BasePlaybookManager):
+class ChangeSecretManager(AccountBasePlaybookManager):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.method_hosts_mapper = defaultdict(list)

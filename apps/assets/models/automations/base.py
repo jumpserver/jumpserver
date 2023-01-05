@@ -57,11 +57,16 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
         return {
             'name': self.name,
             'type': self.type,
-            'org_id': str(self.org_id),
             'comment': self.comment,
+            'accounts': self.accounts,
+            'org_id': str(self.org_id),
             'nodes': self.get_many_to_many_ids('nodes'),
             'assets': self.get_many_to_many_ids('assets'),
         }
+
+    @property
+    def execution_model(self):
+        return AutomationExecution
 
     def execute(self, trigger=Trigger.manual):
         try:
@@ -69,7 +74,7 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
         except AttributeError:
             eid = str(uuid.uuid4())
 
-        execution = self.executions.model.objects.create(
+        execution = self.execution_model.objects.create(
             id=eid, trigger=trigger, automation=self,
             snapshot=self.to_attr_json(),
         )
@@ -90,7 +95,7 @@ class AutomationExecution(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     automation = models.ForeignKey(
         'BaseAutomation', related_name='executions', on_delete=models.CASCADE,
-        verbose_name=_('Automation task')
+        verbose_name=_('Automation task'), null=True
     )
     status = models.CharField(max_length=16, default='pending', verbose_name=_('Status'))
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
@@ -111,6 +116,18 @@ class AutomationExecution(OrgModelMixin):
     @property
     def manager_type(self):
         return self.snapshot['type']
+
+    def get_all_assets(self):
+        node_ids = self.snapshot['nodes']
+        asset_ids = self.snapshot['assets']
+        nodes = Node.objects.filter(id__in=node_ids)
+        node_asset_ids = Node.get_nodes_all_assets(*nodes).values_list('id', flat=True)
+        asset_ids = set(list(asset_ids) + list(node_asset_ids))
+        return Asset.objects.filter(id__in=asset_ids)
+
+    def all_assets_group_by_platform(self):
+        assets = self.get_all_assets().prefetch_related('platform')
+        return assets.group_by_platform()
 
     @property
     def recipients(self):

@@ -3,6 +3,8 @@ from django.utils.translation import gettext_noop
 from django.utils.translation import ugettext as _
 
 from common.utils import get_logger
+from accounts.tasks.common import automation_execute_start
+from accounts.const import AutomationTypes
 from orgs.utils import org_aware_func, tmp_to_root_org
 
 logger = get_logger(__name__)
@@ -17,14 +19,12 @@ def verify_accounts_connectivity_util(accounts, assets, task_name):
     task_name = VerifyAccountAutomation.generate_unique_name(task_name)
     account_usernames = list(accounts.values_list('username', flat=True))
 
-    data = {
-        'name': task_name,
+    child_snapshot = {
         'accounts': account_usernames,
-        'comment': ', '.join([str(i) for i in assets])
+        'assets': [str(asset.id) for asset in assets],
     }
-    instance = VerifyAccountAutomation.objects.create(**data)
-    instance.assets.add(*assets)
-    instance.execute()
+    tp = AutomationTypes.verify_account
+    automation_execute_start(task_name, tp, child_snapshot)
 
 
 @shared_task(queue="ansible", verbose_name=_('Verify asset account availability'))

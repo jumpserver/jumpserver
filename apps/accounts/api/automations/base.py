@@ -5,7 +5,7 @@ from rest_framework.response import Response
 
 from assets import serializers
 from assets.models import BaseAutomation
-from assets.tasks import execute_automation
+from accounts.tasks import execute_automation
 from accounts.models import AutomationExecution
 from common.const.choices import Trigger
 from orgs.mixins import generics
