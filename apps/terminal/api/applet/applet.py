@@ -12,6 +12,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
+from common.api import JMSBulkModelViewSet
 from common.serializers import FileSerializer
 from common.utils import is_uuid
 from terminal import serializers
@@ -82,7 +83,7 @@ class DownloadUploadMixin:
         return response
 
 
-class AppletViewSet(DownloadUploadMixin, viewsets.ModelViewSet):
+class AppletViewSet(DownloadUploadMixin, JMSBulkModelViewSet):
     queryset = Applet.objects.all()
     serializer_class = serializers.AppletSerializer
     rbac_perms = {
