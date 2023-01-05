@@ -4,9 +4,8 @@
 from rest_framework import serializers
 
 from orgs.utils import tmp_to_root_org
-from common.drf.serializers import BulkSerializerMixin
+from common.serializers import BulkSerializerMixin
 from ..models import FavoriteAsset
-
 
 __all__ = ['FavoriteAssetSerializer']
 

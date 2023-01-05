@@ -2,7 +2,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from common.drf.api import JMSModelViewSet
+from common.api import JMSBulkModelViewSet
 from common.permissions import IsServiceAccount
 from orgs.utils import tmp_to_builtin_org
 from terminal.models import AppletHost, AppletHostDeployment
@@ -15,9 +15,10 @@ from terminal.tasks import run_applet_host_deployment, run_applet_host_deploymen
 __all__ = ['AppletHostViewSet', 'AppletHostDeploymentViewSet']
 
 
-class AppletHostViewSet(JMSModelViewSet):
+class AppletHostViewSet(JMSBulkModelViewSet):
     serializer_class = AppletHostSerializer
     queryset = AppletHost.objects.all()
+    search_fields = ['asset_ptr__name', 'asset_ptr__address', ]
 
     def dispatch(self, request, *args, **kwargs):
         with tmp_to_builtin_org(system=1):
@@ -40,6 +41,7 @@ class AppletHostViewSet(JMSModelViewSet):
 class AppletHostDeploymentViewSet(viewsets.ModelViewSet):
     serializer_class = AppletHostDeploymentSerializer
     queryset = AppletHostDeployment.objects.all()
+    filterset_fields = ['host', ]
     rbac_perms = (
         ('applets', 'terminal.view_AppletHostDeployment'),
     )

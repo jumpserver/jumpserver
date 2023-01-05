@@ -11,8 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from rest_framework.views import APIView
 
-from common.http import HttpResponseTemporaryRedirect
-
+from common.views.http import HttpResponseTemporaryRedirect
 
 __all__ = [
     'LunaView', 'I18NView', 'KokoView', 'WsView',
@@ -23,8 +22,9 @@ __all__ = [
 
 class LunaView(View):
     def get(self, request):
-        msg = _("<div>Luna is a separately deployed program, you need to deploy Luna, koko, configure nginx for url distribution,</div> "
-                "</div>If you see this page, prove that you are not accessing the nginx listening port. Good luck.</div>")
+        msg = _(
+            "<div>Luna is a separately deployed program, you need to deploy Luna, koko, configure nginx for url distribution,</div> "
+            "</div>If you see this page, prove that you are not accessing the nginx listening port. Good luck.</div>")
         return HttpResponse(msg)
 
 

@@ -10,21 +10,11 @@ from common.utils import get_logger
 from common.decorator import on_transaction_commit
 from assets.models import Asset, Node
 from assets.tasks import (
-    update_assets_hardware_info_util,
+    update_assets_fact_util,
     test_asset_connectivity_util,
 )
 
 logger = get_logger(__file__)
-
-
-def update_asset_hardware_info_on_created(asset):
-    logger.debug("Update asset `{}` hardware info".format(asset))
-    update_assets_hardware_info_util.delay([asset])
-
-
-def test_asset_conn_on_created(asset):
-    logger.debug("Test asset `{}` connectivity".format(asset))
-    test_asset_connectivity_util.delay([asset])
 
 
 @receiver(pre_save, sender=Node)
@@ -34,22 +24,23 @@ def on_node_pre_save(sender, instance: Node, **kwargs):
 
 @receiver(post_save, sender=Asset)
 @on_transaction_commit
-def on_asset_created_or_update(sender, instance=None, created=False, **kwargs):
+def on_asset_create(sender, instance=None, created=False, **kwargs):
     """
     当资产创建时，更新硬件信息，更新可连接性
     确保资产必须属于一个节点
     """
-    if created:
-        logger.info("Asset create signal recv: {}".format(instance))
+    if not created:
+        return
+    logger.info("Asset create signal recv: {}".format(instance))
 
-        # 获取资产硬件信息
-        update_asset_hardware_info_on_created(instance)
-        test_asset_conn_on_created(instance)
+    # 获取资产硬件信息
+    update_assets_fact_util.delay([instance])
+    test_asset_connectivity_util.delay([instance])
 
-        # 确保资产存在一个节点
-        has_node = instance.nodes.all().exists()
-        if not has_node:
-            instance.nodes.add(Node.org_root())
+    # 确保资产存在一个节点
+    has_node = instance.nodes.all().exists()
+    if not has_node:
+        instance.nodes.add(Node.org_root())
 
 
 @receiver(m2m_changed, sender=Asset.nodes.through)

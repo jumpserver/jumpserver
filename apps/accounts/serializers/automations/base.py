@@ -7,7 +7,7 @@ from assets.models import Asset, Node, BaseAutomation
 from accounts.models import AutomationExecution
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.utils import get_logger
-from common.drf.fields import ObjectRelatedField
+from common.serializers.fields import ObjectRelatedField
 
 logger = get_logger(__file__)
 

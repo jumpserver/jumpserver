@@ -46,12 +46,12 @@ msgstr "SSH 密钥"
 
 #: accounts/const/account.py:8 authentication/models/access_key.py:33
 msgid "Access key"
-msgstr "访问密钥"
+msgstr "Access key"
 
 #: accounts/const/account.py:9 assets/models/_user.py:38
 #: authentication/models/sso_token.py:14
 msgid "Token"
-msgstr "令牌"
+msgstr "Token"
 
 #: accounts/const/account.py:13 common/db/fields.py:232
 #: settings/serializers/terminal.py:14
@@ -3167,7 +3167,7 @@ msgstr "运行目录"
 
 #: ops/models/job.py:30
 msgid "Timeout (Seconds)"
-msgstr "超市时间（秒）"
+msgstr "超时时间（秒）"
 
 #: ops/models/job.py:35
 msgid "Runas"
@@ -3242,10 +3242,8 @@ msgid "Is finished"
 msgstr "是否完成"
 
 #: ops/serializers/job.py:51
-#, fuzzy
-#| msgid "Test timeout"
 msgid "Time cost"
-msgstr "测试超时时间"
+msgstr "花费时间"
 
 #: ops/signal_handlers.py:74 terminal/models/applet/host.py:111
 #: terminal/models/component/task.py:24
@@ -5532,12 +5530,12 @@ msgstr "桶名称"
 #: terminal/serializers/storage.py:30
 #: xpack/plugins/cloud/serializers/account_attrs.py:17
 msgid "Access key id"
-msgstr "访问密钥 ID(AK)"
+msgstr "Access key ID(AK)"
 
 #: terminal/serializers/storage.py:34
 #: xpack/plugins/cloud/serializers/account_attrs.py:20
 msgid "Access key secret"
-msgstr "访问密钥密文(SK)"
+msgstr "Access key secret(SK)"
 
 #: terminal/serializers/storage.py:65 xpack/plugins/cloud/models.py:217
 msgid "Region"

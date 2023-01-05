@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.drf.fields import EncryptedField
+from common.serializers.fields import EncryptedField
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from ..models import ConnectionToken
 
@@ -13,7 +13,7 @@ __all__ = [
 class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
     expire_time = serializers.IntegerField(read_only=True, label=_('Expired time'))
     input_secret = EncryptedField(
-        label=_("Input secret"),  max_length=40960, required=False, allow_blank=True
+        label=_("Input secret"), max_length=40960, required=False, allow_blank=True
     )
 
     class Meta:

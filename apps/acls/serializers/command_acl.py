@@ -1,11 +1,10 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-
 from terminal.models import Session
 from acls.models import CommandGroup, CommandFilterACL
 from common.utils import lazyproperty, get_object_or_none
-from common.drf.fields import ObjectRelatedField, LabeledChoiceField
+from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from orgs.utils import tmp_to_root_org
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .base import BaseUserAssetAccountACLSerializerMixin as BaseSerializer

@@ -14,7 +14,7 @@ from rest_framework.fields import empty
 from rest_framework.metadata import SimpleMetadata
 from rest_framework.request import clone_request
 
-from common.drf.fields import TreeChoicesMixin
+from common.serializers.fields import TreeChoicesField
 
 
 class SimpleMetadataWithFilters(SimpleMetadata):
@@ -22,14 +22,9 @@ class SimpleMetadataWithFilters(SimpleMetadata):
 
     methods = {"PUT", "POST", "GET", "PATCH"}
     attrs = [
-        "read_only",
-        "label",
-        "help_text",
-        "min_length",
-        "max_length",
-        "min_value",
-        "max_value",
-        "write_only",
+        "read_only", "label", "help_text",
+        "min_length", "max_length", "min_value",
+        "max_value", "write_only",
     ]
 
     def determine_actions(self, request, view):
@@ -121,7 +116,7 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         elif getattr(field, "fields", None):
             field_info["children"] = self.get_serializer_info(field)
 
-        if isinstance(field, TreeChoicesMixin):
+        if isinstance(field, TreeChoicesField):
             self.set_tree_field(field, field_info)
         elif isinstance(field, serializers.ChoiceField):
             self.set_choices_field(field, field_info)

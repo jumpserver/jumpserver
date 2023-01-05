@@ -5,7 +5,6 @@ from rest_framework.request import Request
 
 from common.utils import lazyproperty
 
-
 __all__ = ['AllowBulkDestroyMixin', 'RoleAdminMixin', 'RoleUserMixin']
 
 
@@ -15,7 +14,8 @@ class AllowBulkDestroyMixin:
         我们规定，批量删除的情况必须用 `id` 指定要删除的数据。
         """
         query = str(filtered.query)
-        return '`id` IN (' in query or '`id` =' in query
+        can = '`id` IN (' in query or '`id` =' in query or 'ptr_id` IN (' in query
+        return can
 
 
 class RoleAdminMixin:

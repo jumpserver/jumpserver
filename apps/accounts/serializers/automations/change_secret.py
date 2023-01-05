@@ -14,7 +14,7 @@ from accounts.models import (
 )
 from assets.serializers.base import AuthValidateMixin
 
-from common.drf.fields import LabeledChoiceField, ObjectRelatedField
+from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
 from common.utils import get_logger
 from .base import BaseAutomationSerializer
 

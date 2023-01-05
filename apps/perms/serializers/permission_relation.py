@@ -2,7 +2,7 @@
 #
 from rest_framework import serializers
 
-from common.drf.serializers import BulkSerializerMixin
+from common.serializers import BulkSerializerMixin
 from perms.models import AssetPermission
 
 __all__ = [

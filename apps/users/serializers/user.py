@@ -5,8 +5,8 @@ from functools import partial
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.drf.fields import EncryptedField, ObjectRelatedField, LabeledChoiceField
-from common.drf.serializers import CommonBulkSerializerMixin
+from common.serializers.fields import EncryptedField, ObjectRelatedField, LabeledChoiceField
+from common.serializers import CommonBulkSerializerMixin
 from common.utils import pretty_string, get_logger
 from common.validators import PhoneValidator
 from rbac.builtin import BuiltinRole

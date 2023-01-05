@@ -2,11 +2,10 @@ from rest_framework import serializers
 from django.db.transaction import atomic
 from django.utils.translation import ugettext_lazy as _
 
-
 from orgs.models import Organization
 from orgs.utils import get_current_org_id
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
-from common.drf.fields import LabeledChoiceField
+from common.serializers.fields import LabeledChoiceField
 from tickets.models import TicketFlow, ApprovalRule
 from tickets.const import TicketApprovalStrategy, TicketType
 

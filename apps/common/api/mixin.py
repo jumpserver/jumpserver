@@ -11,7 +11,6 @@ from .filter import ExtraFilterFieldsMixin
 from .action import RenderToJsonMixin
 from .queryset import QuerySetMixin
 
-
 __all__ = [
     'CommonApiMixin', 'PaginatedResponseMixin', 'RelationMixin',
 ]
@@ -86,7 +85,3 @@ class CommonApiMixin(SerializerMixin, ExtraFilterFieldsMixin,
                      QuerySetMixin, RenderToJsonMixin,
                      PaginatedResponseMixin):
     pass
-
-
-
-

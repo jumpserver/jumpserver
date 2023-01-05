@@ -5,17 +5,17 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from common.validators import ProjectUniqueValidator
-from common.drf.serializers import BulkSerializerMixin, CommonSerializerMixin
+from common.serializers import BulkSerializerMixin, CommonSerializerMixin, CommonModelSerializer, \
+    CommonBulkModelSerializer
 from ..utils import get_current_org_id_for_serializer
 
-
 __all__ = [
-    "OrgResourceSerializerMixin", "BulkOrgResourceSerializerMixin",
-    "BulkOrgResourceModelSerializer", "OrgResourceModelSerializerMixin",
+    "OrgResourceSerializerMixin", "BulkOrgResourceModelSerializer",
+    "OrgResourceModelSerializerMixin",
 ]
 
 
-class OrgResourceSerializerMixin(CommonSerializerMixin, serializers.Serializer):
+class OrgResourceSerializerMixin(serializers.Serializer):
     """
     通过API批量操作资源时, 自动给每个资源添加所需属性org_id的值为current_org_id
     (同时为serializer.is_valid()对Model的unique_together校验做准备)
@@ -43,13 +43,9 @@ class OrgResourceSerializerMixin(CommonSerializerMixin, serializers.Serializer):
         return fields
 
 
-class OrgResourceModelSerializerMixin(OrgResourceSerializerMixin, serializers.ModelSerializer):
+class OrgResourceModelSerializerMixin(OrgResourceSerializerMixin, CommonModelSerializer):
     pass
 
 
-class BulkOrgResourceSerializerMixin(BulkSerializerMixin, OrgResourceSerializerMixin):
-    pass
-
-
-class BulkOrgResourceModelSerializer(BulkOrgResourceSerializerMixin, serializers.ModelSerializer):
+class BulkOrgResourceModelSerializer(OrgResourceSerializerMixin, CommonBulkModelSerializer):
     pass

@@ -5,7 +5,7 @@ from django.views import View
 
 from common.utils import get_logger, ssh_key_gen
 from common.permissions import IsValidUser
-from common.mixins.views import PermissionsMixin
+from common.views.mixins import PermissionsMixin
 
 __all__ = ['UserPublicKeyGenerateView']
 

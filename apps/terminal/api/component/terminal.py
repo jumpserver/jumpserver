@@ -8,7 +8,7 @@ from rest_framework import generics
 from rest_framework import status
 from rest_framework.views import APIView, Response
 
-from common.drf.api import JMSBulkModelViewSet
+from common.api import JMSBulkModelViewSet
 from common.exceptions import JMSException
 from common.permissions import WithBootstrapToken
 from terminal import serializers

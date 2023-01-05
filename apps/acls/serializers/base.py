@@ -2,7 +2,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from acls.models.base import ActionChoices
-from common.drf.fields import LabeledChoiceField, ObjectRelatedField
+from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
 from orgs.models import Organization
 from users.models import User
 
