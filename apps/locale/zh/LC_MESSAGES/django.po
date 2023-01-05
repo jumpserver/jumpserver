@@ -3167,7 +3167,7 @@ msgstr "运行目录"
 
 #: ops/models/job.py:30
 msgid "Timeout (Seconds)"
-msgstr "超市时间（秒）"
+msgstr "超时时间（秒）"
 
 #: ops/models/job.py:35
 msgid "Runas"
