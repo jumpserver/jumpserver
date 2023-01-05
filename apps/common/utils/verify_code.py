@@ -21,12 +21,12 @@ def send_async(sender):
 class SendAndVerifyCodeUtil(object):
     KEY_TMPL = 'auth-verify-code-{}'
 
-    def __init__(self, target, code=None, key=None, backend='email', timeout=60, **kwargs):
-        self.target = target
+    def __init__(self, target, code=None, key=None, backend='email', timeout=None, **kwargs):
         self.code = code
-        self.timeout = timeout
+        self.target = target
         self.backend = backend
         self.key = key or self.KEY_TMPL.format(target)
+        self.timeout = settings.VERIFY_CODE_TTL if timeout is None else timeout
         self.other_args = kwargs
 
     def gen_and_send_async(self):
