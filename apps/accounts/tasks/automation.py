@@ -3,12 +3,12 @@ from django.utils.translation import gettext_lazy as _
 
 from orgs.utils import tmp_to_root_org, tmp_to_org
 from common.utils import get_logger, get_object_or_none
-from assets.const import AutomationTypes
+from accounts.const import AutomationTypes
 
 logger = get_logger(__file__)
 
 
-@shared_task(queue='ansible', verbose_name=_('Execute automation'))
+@shared_task(queue='ansible', verbose_name=_('Account execute automation'))
 def execute_automation(pid, trigger, tp):
     model = AutomationTypes.get_type_model(tp)
     with tmp_to_root_org():

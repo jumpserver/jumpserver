@@ -4,12 +4,12 @@ from common.utils import get_logger
 from accounts.const import AutomationTypes, Source
 from orgs.utils import tmp_to_org
 from .filter import GatherAccountsFilter
-from ..base.manager import BasePlaybookManager
+from ..base.manager import AccountBasePlaybookManager
 
 logger = get_logger(__name__)
 
 
-class GatherAccountsManager(BasePlaybookManager):
+class GatherAccountsManager(AccountBasePlaybookManager):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.host_asset_mapper = {}

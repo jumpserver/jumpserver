@@ -1,17 +1,17 @@
 from collections import defaultdict
 
 from accounts.const import AutomationTypes
+from ..base.manager import PushOrVerifyHostCallbackMixin, AccountBasePlaybookManager
 from accounts.models import PushAccountAutomation, Account
 from accounts.serializers import TriggerChoice
 from accounts.utils import SecretGenerator
 from common.utils import get_logger
 from perms.utils import AssetPermissionUtil
-from ..base.manager import BasePlaybookManager, PushOrVerifyHostCallbackMixin
 
 logger = get_logger(__name__)
 
 
-class PushAccountManager(PushOrVerifyHostCallbackMixin, BasePlaybookManager):
+class PushAccountManager(PushOrVerifyHostCallbackMixin, AccountBasePlaybookManager):
     need_privilege_account = True
 
     def __init__(self, *args, **kwargs):

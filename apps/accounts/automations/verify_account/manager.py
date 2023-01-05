@@ -1,11 +1,11 @@
 from common.utils import get_logger
 from accounts.const import AutomationTypes, Connectivity
-from ..base.manager import BasePlaybookManager, PushOrVerifyHostCallbackMixin
+from ..base.manager import PushOrVerifyHostCallbackMixin, AccountBasePlaybookManager
 
 logger = get_logger(__name__)
 
 
-class VerifyAccountManager(PushOrVerifyHostCallbackMixin, BasePlaybookManager):
+class VerifyAccountManager(PushOrVerifyHostCallbackMixin, AccountBasePlaybookManager):
     need_privilege_account = False
 
     def __init__(self, *args, **kwargs):
