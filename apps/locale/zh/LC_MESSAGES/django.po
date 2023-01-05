@@ -3242,10 +3242,8 @@ msgid "Is finished"
 msgstr "是否完成"
 
 #: ops/serializers/job.py:51
-#, fuzzy
-#| msgid "Test timeout"
 msgid "Time cost"
-msgstr "测试超时时间"
+msgstr "花费时间"
 
 #: ops/signal_handlers.py:74 terminal/models/applet/host.py:111
 #: terminal/models/component/task.py:24

@@ -38,5 +38,4 @@ class PlaybookViewSet(OrgBulkModelViewSet):
         for f in os.listdir(dest_path):
             if f in valid_entry:
                 return
-        os.remove(dest_path)
         raise PlaybookNoValidEntry
