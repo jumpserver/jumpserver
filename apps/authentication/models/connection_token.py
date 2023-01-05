@@ -39,6 +39,12 @@ class ConnectionToken(JMSOrgBaseModel):
     user_display = models.CharField(max_length=128, default='', verbose_name=_("User display"))
     asset_display = models.CharField(max_length=128, default='', verbose_name=_("Asset display"))
     date_expired = models.DateTimeField(default=date_expired_default, verbose_name=_("Date expired"))
+    is_active = models.BooleanField(default=True, verbose_name=_("Active"))
+    from_ticket = models.OneToOneField(
+        'tickets.ApplyLoginAssetTicket', related_name='connection_token',
+        on_delete=models.SET_NULL, null=True, blank=True,
+        verbose_name=_('From ticket')
+    )
 
     class Meta:
         ordering = ('-date_expired',)

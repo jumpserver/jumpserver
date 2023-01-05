@@ -22,9 +22,6 @@ class LoginACL(BaseACL):
     def __str__(self):
         return self.name
 
-    def is_action(self, action):
-        return self.action == action
-
     @classmethod
     def filter_acl(cls, user):
         return user.login_acls.all().valid().distinct()

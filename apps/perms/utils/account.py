@@ -16,16 +16,16 @@ class PermAccountUtil(AssetPermissionUtil):
         :param asset: Asset
         :param account_name: 可能是 @USER @INPUT 字符串
         """
-        permed_accounts = self.get_permed_accounts_for_user(user, asset)
-        accounts_mapper = {account.alias: account for account in permed_accounts}
+        accounts = self.get_permed_accounts_for_user(user, asset)
+        accounts_mapper = {account.alias: account for account in accounts}
         account = accounts_mapper.get(account_name)
         return account
 
     def get_permed_accounts_for_user(self, user, asset):
         """ 获取授权给用户某个资产的账号 """
         perms = self.get_permissions_for_user_asset(user, asset)
-        permed_accounts = self.get_permed_accounts_from_perms(perms, user, asset)
-        return permed_accounts
+        accounts = self.get_permed_accounts_from_perms(perms, user, asset)
+        return accounts
 
     @staticmethod
     def get_permed_accounts_from_perms(perms, user, asset):

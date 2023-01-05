@@ -13,10 +13,12 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
+from tickets.models import ApplyLoginAssetTicket
 from common.drf.api import JMSModelViewSet
 from common.http import is_true
 from common.utils import random_string
 from common.utils.django import get_request_os
+from common.exceptions import JMSException
 from orgs.mixins.api import RootOrgViewMixin
 from perms.models import ActionChoices
 from terminal.connect_methods import NativeClient, ConnectMethodUtil
@@ -201,6 +203,18 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
         instance.expire()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @action(methods=['GET'], detail=True, url_path='check-ticket')
+    def check_ticket(self, request, *args, **kwargs):
+        token = self.get_object()
+        ticket = token.from_ticket
+        if not ticket:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if ticket.is_state(ticket.State.approved):
+            return Response(status=status.HTTP_200_OK)
+        else:
+            # pending closed rejected
+            raise JMSException(code=ticket.state)
+
 
 class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelViewSet):
     filterset_fields = (
@@ -217,6 +231,7 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         'expire': 'authentication.add_connectiontoken',
         'get_rdp_file': 'authentication.add_connectiontoken',
         'get_client_protocol_url': 'authentication.add_connectiontoken',
+        'check_ticket': 'authentication.add_connectiontoken',
     }
 
     def get_queryset(self):
@@ -233,7 +248,6 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         return super().perform_create(serializer)
 
     def validate_serializer(self, serializer):
-        from perms.utils.account import PermAccountUtil
 
         data = serializer.validated_data
         user = self.get_user(serializer)
@@ -243,23 +257,51 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         data['user'] = user
         data['value'] = random_string(16)
 
-        util = PermAccountUtil()
-        permed_account = util.validate_permission(user, asset, account_name)
+        account = self._validate_asset_permission(user, asset, account_name)
+        if account.has_secret:
+            data['input_secret'] = ''
+        if account.username != '@INPUT':
+            data['input_username'] = ''
 
-        if not permed_account or not permed_account.actions:
+        ticket = self._validate_login_asset_acl(user, asset, account)
+        if ticket:
+            data['from_ticket'] = ticket
+            data['is_active'] = False
+
+    def _validate_login_asset_acl(self, user, asset, account):
+        from acls.models import LoginAssetACL
+        acl = LoginAssetACL.filter_queryset(
+            user=user, asset=asset, account=account, is_active=True
+        ).first()
+        if not acl:
+            return
+        if acl.is_action(acl.ActionChoices.accept):
+            return
+        if acl.is_action(acl.ActionChoices.reject):
+            raise JMSException(code='login_reject', detail='ACL reject you login this asset')
+        if acl.is_action(acl.ActionChoices.review):
+            create_ticket = self.request.query_params.get('auto_create_ticket')
+            if not create_ticket:
+                raise JMSException(code='need_review', detail='Need login review for this asset')
+            ticket = LoginAssetACL.create_login_asset_confirm_ticket(
+                user=user, asset=asset, account_username=account.username,
+                assignees=acl.reviewers.all(), org_id=acl.org_id
+            )
+            return ticket
+
+    @staticmethod
+    def _validate_asset_permission(user, asset, account_name):
+        from perms.utils.account import PermAccountUtil
+        account = PermAccountUtil().validate_permission(user, asset, account_name)
+        if not account or not account.actions:
             msg = 'user `{}` not has asset `{}` permission for account `{}`'.format(
                 user, asset, account_name
             )
             raise PermissionDenied(msg)
-
-        if permed_account.date_expired < timezone.now():
+        # account.date_expired 在校验权限的时候动态赋值
+        if account.date_expired < timezone.now():
             raise PermissionDenied('Expired')
-
-        if permed_account.has_secret:
-            data['input_secret'] = ''
-        if permed_account.username != '@INPUT':
-            data['input_username'] = ''
-        return permed_account
+        return account
 
 
 class SuperConnectionTokenViewSet(ConnectionTokenViewSet):

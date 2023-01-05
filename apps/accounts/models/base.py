@@ -31,9 +31,12 @@ class BaseAccountManager(models.Manager):
 
 class BaseAccount(JMSOrgBaseModel):
     name = models.CharField(max_length=128, verbose_name=_("Name"))
-    username = models.CharField(max_length=128, blank=True, verbose_name=_('Username'), db_index=True)
+    username = models.CharField(
+        max_length=128, blank=True, verbose_name=_('Username'), db_index=True
+    )
     secret_type = models.CharField(
-        max_length=16, choices=SecretType.choices, default=SecretType.PASSWORD, verbose_name=_('Secret type')
+        max_length=16, choices=SecretType.choices, default=SecretType.PASSWORD,
+        verbose_name=_('Secret type')
     )
     secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Secret'))
     privileged = models.BooleanField(verbose_name=_("Privileged"), default=False)

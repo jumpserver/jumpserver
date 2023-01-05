@@ -85,6 +85,9 @@ class BaseACL(JMSBaseModel):
         ordering = ('priority', 'name')
         abstract = True
 
+    def is_action(self, action):
+        return self.action == action
+
 
 class UserAssetAccountBaseACL(BaseACL, OrgModelMixin):
     # username_group
@@ -105,13 +108,13 @@ class UserAssetAccountBaseACL(BaseACL, OrgModelMixin):
         queryset = cls.objects.all()
         org_id = None
         if user:
-            queryset = queryset.filter_user(user.username)
+            queryset = queryset.filter_user(username=user.username)
         if asset:
             org_id = asset.org_id
-            queryset = queryset.filter_asset(asset.name, asset.address)
+            queryset = queryset.filter_asset(name=asset.name, address=asset.address)
         if account:
             org_id = account.org_id
-            queryset = queryset.filter_account(account.username)
+            queryset = queryset.filter_account(username=account.username)
         if account_username:
             queryset = queryset.filter_account(username=account_username)
         if org_id:
