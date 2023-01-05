@@ -1,15 +1,16 @@
+import json
 import time
 from enum import Enum
 from subprocess import CREATE_NO_WINDOW
 
 from selenium import webdriver
-from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webelement import WebElement
 
 from common import (Asset, User, Account, Platform)
-from common import (notify_err_message, block_input, unblock_input)
 from common import (BaseApplication)
+from common import (notify_err_message, block_input, unblock_input)
 
 
 class Command(Enum):
@@ -93,7 +94,8 @@ class WebAPP(object):
         if autofill_type == "basic":
             self._steps = self._default_custom_steps()
         elif autofill_type == "script":
-            steps = sorted(self.asset.specific.script, key=lambda step_item: step_item['step'])
+            script_list = json.loads(self.asset.specific.script)
+            steps = sorted(script_list, key=lambda step_item: step_item.get('step'))
             for item in steps:
                 val = item['value']
                 if val:
