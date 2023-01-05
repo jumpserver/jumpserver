@@ -30,6 +30,11 @@ def on_applet_host_create(sender, instance, created=False, **kwargs):
     applet_host_change_pub_sub.publish(True)
 
 
+@receiver(post_delete, sender=AppletHost)
+def on_applet_host_delete(sender, instance, **kwargs):
+    applet_host_change_pub_sub.publish(True)
+
+
 @receiver(post_save, sender=Applet)
 def on_applet_create(sender, instance, created=False, **kwargs):
     if not created:
@@ -37,6 +42,11 @@ def on_applet_create(sender, instance, created=False, **kwargs):
     hosts = AppletHost.objects.all()
     instance.hosts.set(hosts)
 
+    applet_host_change_pub_sub.publish(True)
+
+
+@receiver(post_delete, sender=Applet)
+def on_applet_delete(sender, instance, **kwargs):
     applet_host_change_pub_sub.publish(True)
 
 
