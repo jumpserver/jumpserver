@@ -6,10 +6,10 @@ from django.db.transaction import atomic
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.serializers.fields import LabeledChoiceField
-from common.serializers import WritableNestedModelSerializer, SecretReadableMixin, CommonModelSerializer
-from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from accounts.models import Account, AccountTemplate
+from common.serializers import WritableNestedModelSerializer, SecretReadableMixin, CommonModelSerializer
+from common.serializers.fields import LabeledChoiceField
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ...const import Category, AllTypes
 from ...models import Asset, Node, Platform, Label, Protocol
 
@@ -17,6 +17,7 @@ __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
     'AssetTaskSerializer', 'AssetsTaskSerializer', 'AssetProtocolsSerializer',
     'AssetDetailSerializer', 'DetailMixin', 'AssetAccountSerializer',
+    'AccountSecretSerializer'
 ]
 
 
@@ -106,10 +107,10 @@ class AssetAccountSerializer(CommonModelSerializer):
 
 
 class AccountSecretSerializer(SecretReadableMixin, CommonModelSerializer):
-    class Meta(AssetAccountSerializer.Meta):
+    class Meta:
         model = Account
         fields = [
-            'name', 'username', 'privileged', 'secret_type',
+            'name', 'username', 'privileged', 'secret_type', 'secret',
         ]
         extra_kwargs = {
             'secret': {'write_only': False},

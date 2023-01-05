@@ -3,12 +3,12 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.serializers.fields import ObjectRelatedField
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .gateway import GatewayWithAccountSecretSerializer
 from ..models import Domain, Asset
 
-__all__ = ['DomainSerializer']
+__all__ = ['DomainSerializer', 'DomainWithGatewaySerializer']
 
 
 class DomainSerializer(BulkOrgResourceModelSerializer):
