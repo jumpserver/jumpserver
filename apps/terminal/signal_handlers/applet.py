@@ -1,20 +1,15 @@
-# -*- coding: utf-8 -*-
-#
-
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.utils.functional import LazyObject
 
-from assets.models import Asset
 from common.signals import django_ready
 from common.utils import get_logger
 from common.utils.connection import RedisPubSub
 from orgs.utils import tmp_to_builtin_org
-from .models import Applet, AppletHost, Task
-from .utils import db_port_manager, DBPortManager
+from ..models import Applet, AppletHost
+from ..utils import DBPortManager
 
 db_port_manager: DBPortManager
-
 logger = get_logger(__file__)
 
 
@@ -50,31 +45,6 @@ def on_applet_delete(sender, instance, **kwargs):
     applet_host_change_pub_sub.publish(True)
 
 
-@receiver(django_ready)
-def check_db_port_mapper(sender, **kwargs):
-    logger.info('Init db port mapper')
-    try:
-        db_port_manager.check()
-    except Exception as e:
-        pass
-
-
-@receiver(post_save, sender=Asset)
-def on_db_app_created(sender, instance: Asset, created, **kwargs):
-    if not instance.category != 'database':
-        return
-    if not created:
-        return
-    db_port_manager.add(instance)
-
-
-@receiver(post_delete, sender=Asset)
-def on_db_app_delete(sender, instance, **kwargs):
-    if not instance.category != 'database':
-        return
-    db_port_manager.pop(instance)
-
-
 class AppletHostPubSub(LazyObject):
     def _setup(self):
         self._wrapped = RedisPubSub('fm.applet_host_change')
@@ -92,24 +62,3 @@ def subscribe_applet_host_change(sender, **kwargs):
 
 
 applet_host_change_pub_sub = AppletHostPubSub()
-
-
-class ComponentEventChan(LazyObject):
-    def _setup(self):
-        self._wrapped = RedisPubSub('fm.component_event_chan')
-
-
-component_event_chan = ComponentEventChan()
-
-
-@receiver(post_save, sender=Task)
-def on_task_created(sender, instance: Task, created, **kwargs):
-    if not created:
-        return
-    event = {
-        "type": instance.name,
-        "payload": {
-            "id": str(instance.id),
-        },
-    }
-    component_event_chan.publish(event)

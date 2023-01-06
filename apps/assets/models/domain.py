@@ -45,7 +45,6 @@ class Domain(JMSOrgBaseModel):
     @property
     def gateways(self):
         queryset = self.get_gateway_queryset().filter(domain=self)
-        print('Query: {}'.format(queryset.query.__str__()))
         return queryset
 
     @classmethod

@@ -1,18 +1,13 @@
 # -*- coding: utf-8 -*-
 #
-from django.db.models.signals import (
-    post_save, m2m_changed, pre_delete, post_delete, pre_save
-)
+from django.db.models.signals import post_save, m2m_changed, pre_delete, post_delete, pre_save
 from django.dispatch import receiver
 
-from common.const.signals import POST_ADD, POST_REMOVE, PRE_REMOVE
-from common.utils import get_logger
-from common.decorator import on_transaction_commit
 from assets.models import Asset, Node
-from assets.tasks import (
-    update_assets_fact_util,
-    test_asset_connectivity_util,
-)
+from assets.tasks import update_assets_fact_util, test_asset_connectivity_util
+from common.const.signals import POST_ADD, POST_REMOVE, PRE_REMOVE
+from common.decorator import on_transaction_commit
+from common.utils import get_logger
 
 logger = get_logger(__file__)
 
@@ -100,6 +95,7 @@ RELATED_NODE_IDS = '_related_node_ids'
 
 @receiver(pre_delete, sender=Asset)
 def on_asset_delete(instance: Asset, using, **kwargs):
+    print("Asset pre delete signal recv: {}".format(instance))
     node_ids = set(Node.objects.filter(
         assets=instance
     ).distinct().values_list('id', flat=True))
@@ -112,9 +108,18 @@ def on_asset_delete(instance: Asset, using, **kwargs):
 
 @receiver(post_delete, sender=Asset)
 def on_asset_post_delete(instance: Asset, using, **kwargs):
+    print("Asset delete signal recv: {}".format(instance))
     node_ids = getattr(instance, RELATED_NODE_IDS, None)
     if node_ids:
         m2m_changed.send(
             sender=Asset.nodes.through, instance=instance, reverse=False,
             model=Node, pk_set=node_ids, using=using, action=POST_REMOVE
         )
+
+
+def resend_to_asset_signals(sender, signal=None, **kwargs):
+    signal.send(sender=Asset, **kwargs)
+
+# for model in (Host, Database, Device, Web, Cloud):
+#     for s in (pre_save, post_save, pre_delete, post_delete):
+#         s.connect(resend_to_asset_signals, sender=model)

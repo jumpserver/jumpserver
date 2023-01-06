@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 #
-from typing import Callable
-from rest_framework.response import Response
 from collections import defaultdict
+from typing import Callable
 
 from django.db.models.signals import m2m_changed
+from rest_framework.response import Response
 
-from .serializer import SerializerMixin
-from .filter import ExtraFilterFieldsMixin
 from .action import RenderToJsonMixin
-from .queryset import QuerySetMixin
+from .filter import ExtraFilterFieldsMixin
+from .serializer import SerializerMixin
 
 __all__ = [
     'CommonApiMixin', 'PaginatedResponseMixin', 'RelationMixin',
@@ -79,6 +78,20 @@ class RelationMixin:
     def perform_destroy(self, instance):
         instance.delete()
         self.send_m2m_changed_signal(instance, 'post_remove')
+
+
+class QuerySetMixin:
+    action: str
+    get_serializer_class: Callable
+    get_queryset: Callable
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if hasattr(self, 'action') and (self.action == 'list' or self.action == 'metadata'):
+            serializer_class = self.get_serializer_class()
+            if serializer_class and hasattr(serializer_class, 'setup_eager_loading'):
+                queryset = serializer_class.setup_eager_loading(queryset)
+        return queryset
 
 
 class CommonApiMixin(SerializerMixin, ExtraFilterFieldsMixin,
