@@ -34,9 +34,7 @@ def test_asset_connectivity_util(assets, task_name=None):
 @shared_task(queue="ansible", verbose_name=_('Manually test the connectivity of a  asset'))
 def test_assets_connectivity_manual(asset_ids):
     from assets.models import Asset
-    with tmp_to_root_org():
-        assets = Asset.objects.filter(id__in=asset_ids)
-
+    assets = Asset.objects.filter(id__in=asset_ids)
     task_name = gettext_noop("Test assets connectivity ")
     test_asset_connectivity_util(assets, task_name=task_name)
 
@@ -44,9 +42,7 @@ def test_assets_connectivity_manual(asset_ids):
 @shared_task(queue="ansible", verbose_name=_('Manually test the connectivity of assets under a node'))
 def test_node_assets_connectivity_manual(node_id):
     from assets.models import Node
-    with tmp_to_root_org():
-        node = Node.objects.get(id=node_id)
-
+    node = Node.objects.get(id=node_id)
     task_name = gettext_noop("Test if the assets under the node are connectable ")
     assets = node.get_all_assets()
     test_asset_connectivity_util(assets, task_name=task_name)
