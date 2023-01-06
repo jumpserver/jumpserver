@@ -111,6 +111,11 @@ class SecurityAuthSerializer(serializers.Serializer):
             "Unit: second, The verification MFA takes effect only when you view the account password"
         )
     )
+    VERIFY_CODE_TTL = serializers.IntegerField(
+        min_value=5, max_value=60 * 60 * 10,
+        label=_("Verify code TTL"),
+        help_text=_("Unit: second")
+    )
     SECURITY_LOGIN_CHALLENGE_ENABLED = serializers.BooleanField(
         required=False, default=False,
         label=_("Enable Login dynamic code"),

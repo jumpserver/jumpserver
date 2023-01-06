@@ -1,9 +1,9 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from acls.models import CommandGroup, CommandFilterACL
 from accounts.const import SecretType
 from accounts.models import Account
+from acls.models import CommandGroup, CommandFilterACL
 from assets.models import Asset, Platform, Gateway, Domain
 from assets.serializers import PlatformSerializer, AssetProtocolsSerializer
 from common.serializers.fields import LabeledChoiceField
@@ -59,9 +59,8 @@ class _ConnectionTokenAccountSerializer(serializers.ModelSerializer):
 class _ConnectionTokenGatewaySerializer(serializers.ModelSerializer):
     """ Gateway """
 
-    account = ObjectRelatedField(
-        required=False, source='select_account', queryset=Account.objects,
-        attrs=('id', 'name', 'username', 'secret', 'secret_type')
+    account = _SimpleAccountSerializer(
+        required=False, source='select_account', read_only=True
     )
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
 
