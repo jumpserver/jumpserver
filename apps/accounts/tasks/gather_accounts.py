@@ -30,6 +30,5 @@ def gather_asset_accounts(node_ids, task_name=None):
     if task_name is None:
         task_name = gettext_noop("Gather assets accounts")
 
-    with tmp_to_root_org():
-        nodes = Node.objects.filter(id__in=node_ids)
+    nodes = Node.objects.filter(id__in=node_ids)
     gather_asset_accounts_util(nodes=nodes, task_name=task_name)
