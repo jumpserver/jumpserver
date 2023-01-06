@@ -23,6 +23,10 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
     def __str__(self):
         return self.name + '@' + str(self.created_by)
 
+    class Meta:
+        unique_together = [('org_id', 'name', 'type')]
+        verbose_name = _("Automation task")
+
     @classmethod
     def generate_unique_name(cls, name):
         while True:
@@ -79,10 +83,6 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
             snapshot=self.to_attr_json(),
         )
         return execution.start()
-
-    class Meta:
-        unique_together = [('org_id', 'name')]
-        verbose_name = _("Automation task")
 
 
 class AssetBaseAutomation(BaseAutomation):

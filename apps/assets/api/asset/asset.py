@@ -131,7 +131,7 @@ class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
             "refresh": "assets.refresh_assethardwareinfo",
             "push_account": "accounts.add_pushaccountexecution",
             "test": "assets.test_assetconnectivity",
-            "test_account": "assets.test_assetconnectivity",
+            "test_account": "assets.test_account",
         }
         perm_required = action_perm_require.get(action)
         has = self.request.user.has_perm(perm_required)
