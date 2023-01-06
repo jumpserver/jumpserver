@@ -8,9 +8,9 @@ from collections import defaultdict
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from assets import const
 from common.utils import lazyproperty
 from orgs.mixins.models import OrgManager, JMSOrgBaseModel
-from assets import const
 from ..base import AbsConnectivity
 from ..platform import Platform
 
@@ -220,6 +220,12 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
 
     def is_category(self, category):
         return self.category == category
+
+    @lazyproperty
+    def gateway(self):
+        if self.domain_id:
+            return self.domain.select_gateway()
+        return None
 
     def as_node(self):
         from assets.models import Node

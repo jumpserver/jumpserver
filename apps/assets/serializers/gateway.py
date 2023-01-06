@@ -3,9 +3,9 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
+from .asset import HostSerializer
 from .asset.common import AccountSecretSerializer
 from ..models import Gateway, Asset
-from ..serializers import HostSerializer
 
 __all__ = ['GatewaySerializer', 'GatewayWithAccountSecretSerializer']
 
@@ -27,7 +27,7 @@ class GatewaySerializer(HostSerializer):
 
 
 class GatewayWithAccountSecretSerializer(GatewaySerializer):
-    accounts = AccountSecretSerializer(many=True, required=False, label=_('Account'))
+    account = AccountSecretSerializer(required=False, label=_('Account'), source='select_account')
 
     class Meta(GatewaySerializer.Meta):
-        fields = GatewaySerializer.Meta.fields + ['accounts']
+        fields = GatewaySerializer.Meta.fields + ['account']
