@@ -48,7 +48,7 @@ class LoginAssetCheckAPI(CreateAPIView):
         return response_data
 
     def _get_response_data_of_need_review(self, acl) -> dict:
-        ticket = LoginAssetACL.create_login_asset_confirm_ticket(
+        ticket = LoginAssetACL.create_login_asset_review_ticket(
             user=self.serializer.user,
             asset=self.serializer.asset,
             account_username=self.serializer.validated_data.get('account_username'),

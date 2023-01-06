@@ -16,3 +16,9 @@ class ApplyLoginAssetTicket(Ticket):
     apply_login_account = models.CharField(
         max_length=128, default='', verbose_name=_('Login account')
     )
+
+    def activate_connection_token_if_need(self):
+        if not self.connection_token:
+            return
+        self.connection_token.is_active = True
+        self.connection_token.save()

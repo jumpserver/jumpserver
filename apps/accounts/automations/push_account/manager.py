@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from accounts.const import AutomationTypes
+from accounts.const import AutomationTypes, SecretStrategy
 from ..base.manager import PushOrVerifyHostCallbackMixin, AccountBasePlaybookManager
 from accounts.models import PushAccountAutomation, Account
 from accounts.serializers import TriggerChoice
@@ -57,7 +57,7 @@ class PushAccountManager(PushOrVerifyHostCallbackMixin, AccountBasePlaybookManag
             if username in asset_usernames_exists:
                 continue
 
-            if automation.secret_strategy != 'specific':
+            if automation.secret_strategy != SecretStrategy.custom:
                 secret_generator = SecretGenerator(
                     automation.secret_strategy, automation.secret_type,
                     automation.password_rules
