@@ -113,7 +113,7 @@ class DBPortManager(object):
 
     def get_already_use_ports(self):
         mapper = self.get_mapper()
-        return sorted(list([int(i) for i in mapper.items()]))
+        return sorted([int(i) for i in mapper.keys()])
 
     def get_mapper(self):
         mapper = cache.get(self.CACHE_KEY, {})
