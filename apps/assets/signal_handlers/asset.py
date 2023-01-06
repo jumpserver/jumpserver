@@ -3,8 +3,7 @@
 from django.db.models.signals import post_save, m2m_changed, pre_delete, post_delete, pre_save
 from django.dispatch import receiver
 
-from assets.models import Asset, Node
-from assets.tasks import update_assets_fact_util, test_asset_connectivity_util
+from assets.models import Asset, Node, Cloud, Device, Host, Web, Database
 from common.const.signals import POST_ADD, POST_REMOVE, PRE_REMOVE
 from common.decorator import on_transaction_commit
 from common.utils import get_logger
@@ -29,8 +28,8 @@ def on_asset_create(sender, instance=None, created=False, **kwargs):
     logger.info("Asset create signal recv: {}".format(instance))
 
     # 获取资产硬件信息
-    update_assets_fact_util.delay([instance])
-    test_asset_connectivity_util.delay([instance])
+    # update_assets_fact_util.delay([instance])
+    # test_asset_connectivity_util.delay([instance])
 
     # 确保资产存在一个节点
     has_node = instance.nodes.all().exists()
@@ -120,6 +119,7 @@ def on_asset_post_delete(instance: Asset, using, **kwargs):
 def resend_to_asset_signals(sender, signal=None, **kwargs):
     signal.send(sender=Asset, **kwargs)
 
-# for model in (Host, Database, Device, Web, Cloud):
-#     for s in (pre_save, post_save, pre_delete, post_delete):
-#         s.connect(resend_to_asset_signals, sender=model)
+
+for model in (Host, Database, Device, Web, Cloud):
+    for s in (pre_save, post_save):
+        s.connect(resend_to_asset_signals, sender=model)
