@@ -16,7 +16,7 @@ __all__ = ['DBListenPortViewSet']
 
 class DBListenPortViewSet(GenericViewSet):
     rbac_perms = {
-        '*': 'assets.view_assets',
+        '*': ['assets.view_asset'],
     }
     http_method_names = ['get']
 
@@ -28,6 +28,7 @@ class DBListenPortViewSet(GenericViewSet):
     def db_info(self, request, *args, **kwargs):
         port = request.query_params.get("port")
         db = db_port_manager.get_db_by_port(port)
+
         with tmp_to_org(db.org):
             serializer = DatabaseWithGatewaySerializer(instance=db)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
