@@ -7782,7 +7782,7 @@ msgstr "コミュニティ版"
 #~ msgid "Clean task history period"
 #~ msgstr "クリーンなタスク履歴期間"
 
-#~ msgid "The administrator is modifying permissions. Please wait"
+#~ msgid "The administrator is modifyidng permissions. Please wait"
 #~ msgstr "管理者は権限を変更しています。お待ちください"
 
 #~ msgid "The authorization cannot be revoked for the time being"

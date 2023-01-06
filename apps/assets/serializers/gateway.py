@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 #
 from django.utils.translation import ugettext_lazy as _
+from rest_framework import serializers
 
 from .asset.common import AccountSecretSerializer
-from ..models import Gateway
+from ..models import Gateway, Asset
 from ..serializers import HostSerializer
 
 __all__ = ['GatewaySerializer', 'GatewayWithAccountSecretSerializer']
@@ -13,10 +14,16 @@ class GatewaySerializer(HostSerializer):
     class Meta(HostSerializer.Meta):
         model = Gateway
 
-    def get_field_names(self, declared_fields, info):
-        names = super(GatewaySerializer, self).get_field_names(declared_fields, info)
-        excludes = ['nodes', 'labels', 'nodes_display', 'info', 'platform']
-        return [name for name in names if name not in excludes]
+    def validate_name(self, value):
+        queryset = Asset.objects.filter(name=value)
+        if self.instance:
+            queryset = queryset.exclude(id=self.instance.id)
+        has = queryset.exists()
+        if has:
+            raise serializers.ValidationError(
+                _('This field must be unique.')
+            )
+        return value
 
 
 class GatewayWithAccountSecretSerializer(GatewaySerializer):
