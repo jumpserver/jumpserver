@@ -1,9 +1,11 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from accounts.const import AutomationTypes, SecretType, SecretStrategy, SSHKeyStrategy
 from common.db import fields
 from common.db.models import JMSBaseModel
+from accounts.const import (
+    AutomationTypes, SecretType, SecretStrategy, SSHKeyStrategy
+)
 from .base import AccountBaseAutomation
 
 __all__ = ['ChangeSecretAutomation', 'ChangeSecretRecord', 'ChangeSecretMixin']

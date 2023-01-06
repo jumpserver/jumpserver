@@ -121,9 +121,7 @@ class ChangeSecretRecordSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_is_success(obj):
-        if obj.status == 'success':
-            return _("Success")
-        return _("Failed")
+        return obj.status == 'success'
 
 
 class ChangeSecretRecordBackUpSerializer(serializers.ModelSerializer):

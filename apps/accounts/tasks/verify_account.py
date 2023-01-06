@@ -5,7 +5,7 @@ from django.utils.translation import ugettext as _
 from common.utils import get_logger
 from accounts.tasks.common import automation_execute_start
 from accounts.const import AutomationTypes
-from orgs.utils import org_aware_func, tmp_to_root_org
+from orgs.utils import org_aware_func
 
 logger = get_logger(__name__)
 __all__ = [

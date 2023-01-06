@@ -1,27 +1,22 @@
 import os
 import time
-from collections import defaultdict
 from copy import deepcopy
+from openpyxl import Workbook
+from collections import defaultdict
 
 from django.conf import settings
 from django.utils import timezone
-from openpyxl import Workbook
 
-from accounts.const import (
-    AutomationTypes, SecretType, SSHKeyStrategy
-)
+from users.models import User
 from accounts.models import ChangeSecretRecord
 from accounts.notifications import ChangeSecretExecutionTaskMsg
 from accounts.serializers import ChangeSecretRecordBackUpSerializer
-from accounts.const import (
-    AutomationTypes, SecretType, SecretStrategy, SSHKeyStrategy, DEFAULT_PASSWORD_RULES
-)
-from ..base.manager import AccountBasePlaybookManager
+from accounts.const import AutomationTypes, SecretType, SSHKeyStrategy, SecretStrategy
 from common.utils import get_logger, lazyproperty
 from common.utils.file import encrypt_and_compress_zip_file
 from common.utils.timezone import local_now_display
-from users.models import User
 from ...utils import SecretGenerator
+from ..base.manager import AccountBasePlaybookManager
 
 logger = get_logger(__name__)
 
@@ -58,11 +53,13 @@ class ChangeSecretManager(AccountBasePlaybookManager):
 
     @lazyproperty
     def secret_generator(self):
-        return SecretGenerator(self.secret_type, self.secret_strategy,
-                               self.execution.snapshot.get('password_rules'))
+        return SecretGenerator(
+            self.secret_strategy, self.secret_type,
+            self.execution.snapshot.get('password_rules')
+        )
 
     def get_secret(self):
-        if self.secret_strategy == 'specific':
+        if self.secret_strategy == SecretStrategy.custom:
             return self.execution.snapshot['secret']
         else:
             return self.secret_generator.get_secret()
