@@ -3,7 +3,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from assets.models import Asset
-from common.db.fields import PortField, PortRangeField
+from common.db.fields import PortField
 from common.db.models import JMSBaseModel
 from common.utils.ip import contains_ip
 
@@ -20,7 +20,6 @@ class Endpoint(JMSBaseModel):
     mariadb_port = PortField(default=33061, verbose_name=_('MariaDB port'))
     postgresql_port = PortField(default=54320, verbose_name=_('PostgreSQL port'))
     redis_port = PortField(default=63790, verbose_name=_('Redis port'))
-    oracle_port_range = PortRangeField(default='1-65535', verbose_name=_('Oracle port range'))
 
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 

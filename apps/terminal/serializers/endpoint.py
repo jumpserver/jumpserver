@@ -11,9 +11,9 @@ __all__ = ['EndpointSerializer', 'EndpointRuleSerializer']
 
 class EndpointSerializer(BulkModelSerializer):
     # 解决 luna 处理繁琐的问题, 返回 magnus 监听的当前 db 的 port
-    magnus_listen_db_port = serializers.SerializerMethodField(label=_('Magnus listen db port'))
-    magnus_listen_port_range = serializers.CharField(
-        max_length=128, default=db_port_manager.magnus_listen_port_range, read_only=True,
+    oracle_port = serializers.SerializerMethodField(label=_('Oracle port'))
+    oracle_port_range = serializers.CharField(
+        max_length=128, default=db_port_manager.oracle_port_range, read_only=True,
         label=_('Magnus Listen port range'),
         help_text=_(
             'The range of ports that Magnus listens on is modified in the configuration file'
@@ -25,19 +25,14 @@ class EndpointSerializer(BulkModelSerializer):
         fields_mini = ['id', 'name']
         fields_small = [
             'host', 'https_port', 'http_port', 'ssh_port', 'rdp_port',
-            'magnus_listen_db_port', 'magnus_listen_port_range',
+            'mysql_port', 'mariadb_port', 'postgresql_port', 'redis_port',
+            'oracle_port_range', 'oracle_port',
         ]
         fields = fields_mini + fields_small + [
             'comment', 'date_created', 'date_updated', 'created_by'
         ]
-        extra_kwargs = {
-            'https_port': {'default': 443},
-            'http_port': {'default': 80},
-            'ssh_port': {'default': 2222},
-            'rdp_port': {'default': 3389},
-        }
 
-    def get_magnus_listen_db_port(self, obj: Endpoint):
+    def get_oracle_port(self, obj: Endpoint):
         view = self.context.get('view')
         if not view or view.action not in ['smart']:
             return 0
