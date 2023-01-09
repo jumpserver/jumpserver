@@ -26,6 +26,12 @@ class TerminalTaskWebsocket(JsonWebsocketConsumer):
         else:
             self.close()
 
+    def receive_json(self, content, **kwargs):
+        req_type = content.get('type')
+        if req_type == "status":
+            payload = content.get('payload')
+            self.handle_status(payload)
+
     def handle_status(self, content):
         serializer = StatSerializer(data=content)
         if not serializer.is_valid():
@@ -37,11 +43,9 @@ class TerminalTaskWebsocket(JsonWebsocketConsumer):
         with safe_db_connection():
             serializer.save()
 
-    def receive_json(self, content, **kwargs):
-        req_type = content.get('type')
-        if req_type == "status":
-            payload = content.get('payload')
-            self.handle_status(payload)
+    def send_kill_tasks_msg(self, task_id=None):
+        content = self.get_terminal_tasks(task_id)
+        self.send(bytes_data=content)
 
     def get_terminal_tasks(self, task_id=None):
         with safe_db_connection():
@@ -52,14 +56,11 @@ class TerminalTaskWebsocket(JsonWebsocketConsumer):
             serializer = TaskSerializer(tasks, many=True)
             return JSONRenderer().render(serializer.data)
 
-    def send_kill_tasks_msg(self, task_id=None):
-        content = self.get_terminal_tasks(task_id)
-        self.send(bytes_data=content)
-
     def watch_component_event(self):
-        ws = self
         # 先发一次已有的任务
         self.send_kill_tasks_msg()
+
+        ws = self
 
         def handle_task_msg_recv(msg):
             logger.debug('New component task msg recv: {}'.format(msg))
