@@ -159,7 +159,7 @@ class PrepareRequestMixin:
         sp_settings.update(advanced_settings)
 
         # load sp cert and key for encryption if advanced_settings.security.authnRequestsSigned is True
-        if advanced_settings.get('authnRequestsSigned'):
+        if advanced_settings.get('security') and advanced_settings.get('security').get('authnRequestsSigned'):
             certs = {
                 "privateKey": settings.SAML2_SP_KEY_CONTENT,
                 "x509cert": settings.SAML2_SP_CERT_CONTENT
