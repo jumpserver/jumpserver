@@ -23,7 +23,7 @@ class DBPortManager(object):
             port_start, port_end = oracle_ports.split('-')
             port_start, port_end = int(port_start), int(port_end)
         except Exception as e:
-            logger.error('ORACLE_PORTS config error: {}'.format(e))
+            logger.error('MAGNUS_ORACLE_PORTS config error: {}'.format(e))
             port_start, port_end = 30000, 30100
 
         self.port_start, self.port_end = port_start, port_end
@@ -32,7 +32,7 @@ class DBPortManager(object):
 
     @property
     def oracle_port_range(self):
-        oracle_ports = settings.ORACLE_PORTS
+        oracle_ports = settings.MAGNUS_ORACLE_PORTS
         if not oracle_ports and settings.MAGNUS_PORTS:
             oracle_ports = settings.MAGNUS_PORTS
         return oracle_ports

@@ -506,7 +506,7 @@ class Config(dict):
         # 操作日志变更字段的存储ES配置
         'OPERATE_LOG_ELASTICSEARCH_CONFIG': {},
         # Magnus 组件需要监听的 Oracle 端口范围
-        'ORACLE_PORTS': '30000-30100',
+        'MAGNUS_ORACLE_PORTS': '30000-30100',
 
         # 记录清理清理
         'LOGIN_LOG_KEEP_DAYS': 200,

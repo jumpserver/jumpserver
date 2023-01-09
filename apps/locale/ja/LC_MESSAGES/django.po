@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-09 19:27+0800\n"
+"POT-Creation-Date: 2023-01-09 20:33+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -921,7 +921,7 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
-#: settings/serializers/terminal.py:10 terminal/serializers/endpoint.py:48
+#: settings/serializers/terminal.py:10 terminal/serializers/endpoint.py:51
 msgid "IP"
 msgstr "IP"
 
@@ -5560,7 +5560,7 @@ msgid "Redis port"
 msgstr "テストポート"
 
 #: terminal/models/component/endpoint.py:29
-#: terminal/models/component/endpoint.py:99 terminal/serializers/endpoint.py:51
+#: terminal/models/component/endpoint.py:99 terminal/serializers/endpoint.py:54
 #: terminal/serializers/storage.py:38 terminal/serializers/storage.py:50
 #: terminal/serializers/storage.py:80 terminal/serializers/storage.py:90
 #: terminal/serializers/storage.py:98
@@ -5791,9 +5791,11 @@ msgstr "Oracle がリッスンするポート範囲"
 msgid ""
 "Oracle proxy server listen port is dynamic, Each additional Oracle database "
 "instance adds a port listener"
-msgstr "Oracle プロキシサーバーがリッスンするポートは動的です。追加の Oracle データベースインスタンスはポートリスナーを追加します"
+msgstr ""
+"Oracle プロキシサーバーがリッスンするポートは動的です。追加の Oracle データ"
+"ベースインスタンスはポートリスナーを追加します"
 
-#: terminal/serializers/endpoint.py:45
+#: terminal/serializers/endpoint.py:48
 msgid ""
 "If asset IP addresses under different endpoints conflict, use asset labels"
 msgstr ""
