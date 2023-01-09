@@ -2,10 +2,9 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from assets.models import Node
-from common.drf.fields import ReadableHiddenField
+from common.serializers.fields import ReadableHiddenField
 from ops.mixin import PeriodTaskSerializerMixin
 from ops.models import Job, JobExecution
-from ops.models.job import JobAuditLog
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 

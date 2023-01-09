@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 from django.urls.conf import re_path, path
 from rest_framework.routers import DefaultRouter
 
-from common import api as capi
 from .. import api
 
 app_name = "audits"
@@ -19,10 +18,6 @@ router.register(r'job-logs', api.JobAuditViewSet, 'job-log')
 urlpatterns = [
     path('my-login-logs/', api.MyLoginLogAPIView.as_view(), name='my-login-log'),
     path('activities/', api.ResourceActivityAPIView.as_view(), name='resource-activities'),
-]
-
-old_version_urlpatterns = [
-    re_path('(?P<resource>ftp-log)/.*', capi.redirect_plural_name_api)
 ]
 
 urlpatterns += router.urls

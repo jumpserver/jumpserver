@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 
 from rbac.permissions import RBACPermission
-from common.drf.api import JMSModelViewSet
+from common.api import JMSModelViewSet
 from ..models import TempToken
 from ..serializers import TempTokenSerializer
 

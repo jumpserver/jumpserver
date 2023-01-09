@@ -8,7 +8,7 @@ from assets.const import Category, AllTypes
 from assets.models import Node, Asset, Platform
 from accounts.models import Account
 from assets.serializers.asset.common import AssetProtocolsSerializer
-from common.drf.fields import ObjectRelatedField, LabeledChoiceField
+from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from perms.serializers.permission import ActionChoicesField
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 

@@ -1,7 +1,7 @@
 from rbac.permissions import RBACPermission
 from common.permissions import UserConfirmation, ConfirmType
 
-from common.mixins import RecordViewLogMixin
+from common.views.mixins import RecordViewLogMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from accounts import serializers
 from accounts.models import AccountTemplate

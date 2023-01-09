@@ -3,18 +3,17 @@
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
-from accounts.models import AutomationExecution
 from accounts.const import (
     DEFAULT_PASSWORD_RULES, SecretType, SecretStrategy, SSHKeyStrategy
 )
-from assets.models import Asset
 from accounts.models import (
     Account, ChangeSecretAutomation,
     ChangeSecretRecord
 )
-from assets.serializers.base import AuthValidateMixin
-
-from common.drf.fields import LabeledChoiceField, ObjectRelatedField
+from accounts.models import AutomationExecution
+from accounts.serializers import AuthValidateMixin
+from assets.models import Asset
+from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
 from common.utils import get_logger
 from .base import BaseAutomationSerializer
 
@@ -121,9 +120,7 @@ class ChangeSecretRecordSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_is_success(obj):
-        if obj.status == 'success':
-            return _("Success")
-        return _("Failed")
+        return obj.status == 'success'
 
 
 class ChangeSecretRecordBackUpSerializer(serializers.ModelSerializer):

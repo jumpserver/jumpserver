@@ -3,7 +3,7 @@
 from django.views.generic import TemplateView
 from django.conf import settings
 
-from common.mixins.views import PermissionsMixin
+from common.views.mixins import PermissionsMixin
 from rbac.permissions import RBACPermission
 
 __all__ = ['CeleryTaskLogView']

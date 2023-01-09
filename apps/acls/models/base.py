@@ -85,6 +85,9 @@ class BaseACL(JMSBaseModel):
         ordering = ('priority', 'name')
         abstract = True
 
+    def is_action(self, action):
+        return self.action == action
+
 
 class UserAssetAccountBaseACL(BaseACL, OrgModelMixin):
     # username_group

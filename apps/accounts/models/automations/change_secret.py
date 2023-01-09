@@ -1,9 +1,11 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from accounts.const import AutomationTypes, SecretType, SecretStrategy, SSHKeyStrategy
 from common.db import fields
 from common.db.models import JMSBaseModel
+from accounts.const import (
+    AutomationTypes, SecretType, SecretStrategy, SSHKeyStrategy
+)
 from .base import AccountBaseAutomation
 
 __all__ = ['ChangeSecretAutomation', 'ChangeSecretRecord', 'ChangeSecretMixin']
@@ -28,6 +30,18 @@ class ChangeSecretMixin(models.Model):
     class Meta:
         abstract = True
 
+    def to_attr_json(self):
+        attr_json = super().to_attr_json()
+        attr_json.update({
+            'secret': self.secret,
+            'secret_type': self.secret_type,
+            'secret_strategy': self.secret_strategy,
+            'password_rules': self.password_rules,
+            'ssh_key_change_strategy': self.ssh_key_change_strategy,
+
+        })
+        return attr_json
+
 
 class ChangeSecretAutomation(AccountBaseAutomation, ChangeSecretMixin):
     recipients = models.ManyToManyField('users.User', verbose_name=_("Recipient"), blank=True)
@@ -42,11 +56,6 @@ class ChangeSecretAutomation(AccountBaseAutomation, ChangeSecretMixin):
     def to_attr_json(self):
         attr_json = super().to_attr_json()
         attr_json.update({
-            'secret': self.secret,
-            'secret_type': self.secret_type,
-            'secret_strategy': self.secret_strategy,
-            'password_rules': self.password_rules,
-            'ssh_key_change_strategy': self.ssh_key_change_strategy,
             'recipients': {
                 str(recipient.id): (str(recipient), bool(recipient.secret_key))
                 for recipient in self.recipients.all()

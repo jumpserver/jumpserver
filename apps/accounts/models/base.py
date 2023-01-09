@@ -58,6 +58,12 @@ class BaseAccount(JMSOrgBaseModel):
         return data
 
     @property
+    def password(self):
+        if self.secret_type == SecretType.PASSWORD:
+            return self.secret
+        return None
+
+    @property
     def private_key(self):
         if self.secret_type == SecretType.SSH_KEY:
             return self.secret
@@ -100,7 +106,9 @@ class BaseAccount(JMSOrgBaseModel):
 
     @property
     def private_key_path(self):
-        if not self.secret_type != SecretType.SSH_KEY or not self.secret:
+        if not self.secret_type != SecretType.SSH_KEY \
+                or not self.secret \
+                or not self.private_key:
             return None
         project_dir = settings.PROJECT_DIR
         tmp_dir = os.path.join(project_dir, 'tmp')

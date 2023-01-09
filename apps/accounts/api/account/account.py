@@ -9,7 +9,7 @@ from accounts.models import Account
 from accounts.tasks import verify_accounts_connectivity
 from assets.models import Asset
 from authentication.const import ConfirmType
-from common.mixins import RecordViewLogMixin
+from common.views.mixins import RecordViewLogMixin
 from common.permissions import UserConfirmation
 from orgs.mixins.api import OrgBulkModelViewSet
 

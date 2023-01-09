@@ -6,8 +6,6 @@ from rest_framework import serializers
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ops.mixin import PeriodTaskSerializerMixin
 from common.utils import get_logger
-from common.const.choices import Trigger
-from common.drf.fields import LabeledChoiceField
 
 from accounts.models import AccountBackupAutomation, AccountBackupExecution
 

@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.drf.fields import LabeledChoiceField
+from common.serializers.fields import LabeledChoiceField
 from users.models import User
 from ..models import Role
 

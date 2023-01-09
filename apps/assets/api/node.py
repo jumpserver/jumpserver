@@ -1,24 +1,24 @@
 # ~*~ coding: utf-8 ~*~
-from collections import namedtuple, defaultdict
 from functools import partial
+from collections import namedtuple, defaultdict
 
 from django.db.models.signals import m2m_changed
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import status
+from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
-from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
 from assets.models import Asset
 from common.const.http import POST
-from common.const.signals import PRE_REMOVE, POST_REMOVE
-from common.exceptions import SomeoneIsDoingThis
-from common.mixins.api import SuggestionMixin
 from common.utils import get_logger
+from common.api import SuggestionMixin
+from common.exceptions import SomeoneIsDoingThis
+from common.const.signals import PRE_REMOVE, POST_REMOVE
 from orgs.mixins import generics
-from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import current_org
+from orgs.mixins.api import OrgBulkModelViewSet
 from .. import serializers
 from ..models import Node
 from ..tasks import (
@@ -208,8 +208,9 @@ class NodeTaskCreateApi(generics.CreateAPIView):
             task = self.refresh_nodes_cache()
             self.set_serializer_data(serializer, task)
             return
+
         if action == "refresh":
-            task = update_node_assets_hardware_info_manual.delay(node)
+            task = update_node_assets_hardware_info_manual.delay(node.id)
         else:
-            task = test_node_assets_connectivity_manual.delay(node)
+            task = test_node_assets_connectivity_manual.delay(node.id)
         self.set_serializer_data(serializer, task)

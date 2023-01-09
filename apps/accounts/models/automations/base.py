@@ -1,3 +1,4 @@
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from assets.models.automations import (
@@ -13,12 +14,9 @@ class AccountBaseAutomation(AssetBaseAutomation):
         proxy = True
         verbose_name = _("Account automation task")
 
-    def to_attr_json(self):
-        attr_json = super().to_attr_json()
-        attr_json.update({
-            'accounts': self.accounts
-        })
-        return attr_json
+    @property
+    def execution_model(self):
+        return AutomationExecution
 
 
 class AutomationExecution(AssetAutomationExecution):
@@ -36,3 +34,8 @@ class AutomationExecution(AssetAutomationExecution):
             ('view_pushaccountexecution', _('Can view push account execution')),
             ('add_pushaccountexecution', _('Can add push account execution')),
         ]
+
+    def start(self):
+        from accounts.automations.endpoint import ExecutionManager
+        manager = ExecutionManager(execution=self)
+        return manager.run()

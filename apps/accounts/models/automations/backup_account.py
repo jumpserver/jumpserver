@@ -113,6 +113,6 @@ class AccountBackupExecution(OrgModelMixin):
         return 'backup_account'
 
     def start(self):
-        from assets.automations.endpoint import ExecutionManager
+        from accounts.automations.endpoint import ExecutionManager
         manager = ExecutionManager(execution=self)
         return manager.run()

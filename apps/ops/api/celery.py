@@ -17,7 +17,7 @@ from ..models import CeleryTaskExecution, CeleryTask
 from ..serializers import CeleryResultSerializer, CeleryPeriodTaskSerializer
 from ..celery.utils import get_celery_task_log_path
 from ..ansible.utils import get_ansible_task_log_path
-from common.mixins.api import CommonApiMixin
+from common.api import CommonApiMixin
 
 __all__ = [
     'CeleryTaskExecutionLogApi', 'CeleryResultApi', 'CeleryPeriodTaskViewSet',

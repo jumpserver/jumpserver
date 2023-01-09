@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.fields import ChoiceField, empty
 
-from common.db.fields import BitChoices
+from common.db.fields import TreeChoices
 from common.utils import decrypt_password
 from common.local import add_encrypted_field_set
 
@@ -16,8 +16,8 @@ __all__ = [
     "LabeledChoiceField",
     "ObjectRelatedField",
     "BitChoicesField",
-    "TreeChoicesMixin",
-    "LabeledMultipleChoiceField"
+    "TreeChoicesField",
+    "LabeledMultipleChoiceField",
 ]
 
 
@@ -132,21 +132,27 @@ class ObjectRelatedField(serializers.RelatedField):
             self.fail("incorrect_type", data_type=type(pk).__name__)
 
 
-class TreeChoicesMixin:
-    tree = []
-
-
-class BitChoicesField(TreeChoicesMixin, serializers.MultipleChoiceField):
-    """
-    位字段
-    """
-
+class TreeChoicesField(serializers.MultipleChoiceField):
     def __init__(self, choice_cls, **kwargs):
-        assert issubclass(choice_cls, BitChoices)
+        assert issubclass(choice_cls, TreeChoices)
         choices = [(c.name, c.label) for c in choice_cls]
         self.tree = choice_cls.tree()
         self._choice_cls = choice_cls
         super().__init__(choices=choices, **kwargs)
+
+    def to_internal_value(self, data):
+        if not data:
+            return data
+        if isinstance(data[0], dict):
+            return [item.get("value") for item in data]
+        else:
+            return data
+
+
+class BitChoicesField(TreeChoicesField):
+    """
+    位字段
+    """
 
     def to_representation(self, value):
         if isinstance(value, list) and len(value) == 1:

@@ -13,7 +13,7 @@ from authentication.mixins import AuthMixin
 from authentication.mfa import MFAOtp, otp_failed_msg
 from authentication.errors import SessionEmptyError
 from common.utils import get_logger, FlashMessageUtil
-from common.mixins.views import PermissionsMixin
+from common.views.mixins import PermissionsMixin
 from common.permissions import IsValidUser
 from .password import UserVerifyPasswordView
 from ... import forms
@@ -168,5 +168,3 @@ class UserOtpDisableView(PermissionsMixin, FormView):
         }
         url = FlashMessageUtil.gen_message_url(message_data)
         return url
-
-

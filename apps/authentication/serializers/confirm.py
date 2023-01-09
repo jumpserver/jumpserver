@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from common.drf.fields import EncryptedField
+from common.serializers.fields import EncryptedField
 from ..const import ConfirmType, MFAType
 
 

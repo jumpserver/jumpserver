@@ -2,7 +2,7 @@ from rest_framework.exceptions import MethodNotAllowed
 
 from tickets import serializers
 from tickets.models import TicketFlow
-from common.drf.api import JMSBulkModelViewSet
+from common.api import JMSBulkModelViewSet
 
 __all__ = ['TicketFlowViewSet']
 

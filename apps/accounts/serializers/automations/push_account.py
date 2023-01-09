@@ -1,32 +1,25 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
-from django.db import models
 
-from common.drf.fields import LabeledChoiceField, LabeledMultipleChoiceField
+from accounts.const import TriggerChoice, PushAccountActionChoice
 from accounts.models import PushAccountAutomation
+from common.serializers.fields import LabeledChoiceField, TreeChoicesField
 from .change_secret import (
     ChangeSecretAutomationSerializer, ChangeSecretUpdateAssetSerializer,
     ChangeSecretUpdateNodeSerializer
 )
 
 
-class TriggerChoice(models.TextChoices):
-    on_asset_create = 'on_asset_create', _('On asset create')
-    on_perm_create = 'on_perm_change', _('On perm change')
-
-
-class ActionChoice(models.TextChoices):
-    create_and_push = 'create_and_push', _('Create and push')
-    only_create = 'only_create', _('Only create')
-
-
 class PushAccountAutomationSerializer(ChangeSecretAutomationSerializer):
     dynamic_username = serializers.BooleanField(label=_('Dynamic username'), default=False)
-    triggers = LabeledMultipleChoiceField(
-        choices=TriggerChoice.choices, label=_('Trigger'),
-        default=[TriggerChoice.on_asset_create.value],
+    triggers = TreeChoicesField(
+        choice_cls=TriggerChoice, label=_('Triggers'),
+        default=TriggerChoice.all(),
     )
-    action = LabeledChoiceField(choices=ActionChoice.choices, label=_('Action'), default=ActionChoice.create_and_push)
+    action = LabeledChoiceField(
+        choices=PushAccountActionChoice.choices, label=_('Action'),
+        default=PushAccountActionChoice.create_and_push
+    )
 
     class Meta(ChangeSecretAutomationSerializer.Meta):
         model = PushAccountAutomation
@@ -53,6 +46,10 @@ class PushAccountAutomationSerializer(ChangeSecretAutomationSerializer):
         if queryset.exists():
             raise serializers.ValidationError(_('Dynamic username already exists'))
         return value
+
+    def validate_triggers(self, value):
+        # Now triggers readonly, set all
+        return TriggerChoice.all()
 
     def get_field_names(self, declared_fields, info):
         fields = super().get_field_names(declared_fields, info)

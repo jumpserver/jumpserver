@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.views.generic.base import TemplateView
 
 from common.permissions import IsValidUser
-from common.mixins.views import PermissionsMixin
+from common.views.mixins import PermissionsMixin
 from users.models import User
 
 __all__ = ['MFASettingView']
@@ -21,4 +21,3 @@ class MFASettingView(PermissionsMixin, TemplateView):
             'mfa_backends': mfa_backends,
         })
         return context
-

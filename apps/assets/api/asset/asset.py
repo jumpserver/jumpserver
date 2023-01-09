@@ -5,6 +5,7 @@ import django_filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from accounts.tasks import push_accounts_to_assets, verify_accounts_connectivity
 from assets import serializers
 from assets.filters import IpInFilterBackend, LabelFilterBackend, NodeFilterBackend
 from assets.models import Asset, Gateway
@@ -12,10 +13,9 @@ from assets.tasks import (
     test_assets_connectivity_manual,
     update_assets_hardware_info_manual
 )
+from common.api import SuggestionMixin
 from common.drf.filters import BaseFilterSet
-from common.mixins.api import SuggestionMixin
 from common.utils import get_logger
-from accounts.tasks import push_accounts_to_assets, verify_accounts_connectivity
 from orgs.mixins import generics
 from orgs.mixins.api import OrgBulkModelViewSet
 from ..mixin import NodeFilterMixin
@@ -51,7 +51,6 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
     """
     API endpoint that allows Asset to be viewed or edited.
     """
-
     model = Asset
     filterset_class = AssetFilterSet
     search_fields = ("name", "address")
@@ -80,8 +79,8 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
 
     @action(methods=["GET"], detail=True, url_path="platform")
     def platform(self, *args, **kwargs):
-        asset = self.get_object()
-        serializer = self.get_serializer(asset.platform)
+        asset = super().get_object()
+        serializer = super().get_serializer(instance=asset.platform)
         return Response(serializer.data)
 
     @action(methods=["GET"], detail=True, url_path="gateways")
@@ -131,7 +130,7 @@ class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
             "refresh": "assets.refresh_assethardwareinfo",
             "push_account": "accounts.add_pushaccountexecution",
             "test": "assets.test_assetconnectivity",
-            "test_account": "assets.test_assetconnectivity",
+            "test_account": "assets.test_account",
         }
         perm_required = action_perm_require.get(action)
         has = self.request.user.has_perm(perm_required)

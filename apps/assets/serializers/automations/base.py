@@ -6,7 +6,7 @@ from assets.const import AutomationTypes
 from assets.models import Asset, Node, BaseAutomation, AutomationExecution
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.utils import get_logger
-from common.drf.fields import ObjectRelatedField
+from common.serializers.fields import ObjectRelatedField
 
 logger = get_logger(__file__)
 
@@ -56,7 +56,6 @@ class AutomationExecutionSerializer(serializers.ModelSerializer):
             'accounts': obj.snapshot['accounts'],
             'node_amount': len(obj.snapshot['nodes']),
             'asset_amount': len(obj.snapshot['assets']),
-            'type_display': getattr(AutomationTypes, tp).label,
         }
         return snapshot
 

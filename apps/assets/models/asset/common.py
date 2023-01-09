@@ -2,15 +2,16 @@
 # -*- coding: utf-8 -*-
 #
 
+import json
 import logging
 from collections import defaultdict
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from assets import const
 from common.utils import lazyproperty
 from orgs.mixins.models import OrgManager, JMSOrgBaseModel
-from assets import const
 from ..base import AbsConnectivity
 from ..platform import Platform
 
@@ -123,7 +124,12 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
         if not instance:
             return {}
         specific_fields = self.get_specific_fields(instance)
-        info = {i.name: getattr(instance, i.name) for i in specific_fields}
+        info = {}
+        for i in specific_fields:
+            v = getattr(instance, i.name)
+            if isinstance(i, models.JSONField):
+                v = json.loads(v)
+            info[i.name] = v
         return info
 
     @property
@@ -221,6 +227,12 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
     def is_category(self, category):
         return self.category == category
 
+    @lazyproperty
+    def gateway(self):
+        if self.domain_id:
+            return self.domain.select_gateway()
+        return None
+
     def as_node(self):
         from assets.models import Node
         fake_node = Node()
@@ -268,6 +280,7 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
             ('refresh_assethardwareinfo', _('Can refresh asset hardware info')),
             ('test_assetconnectivity', _('Can test asset connectivity')),
             ('push_assetaccount', _('Can push account to asset')),
+            ('test_account', _('Can verify account')),
             ('match_asset', _('Can match asset')),
             ('add_assettonode', _('Add asset to node')),
             ('move_assettonode', _('Move asset to node')),

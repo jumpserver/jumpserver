@@ -25,7 +25,7 @@ router.register(r'task-executions', api.CeleryTaskExecutionViewSet, 'task-execut
 urlpatterns = [
     path('variables/help/', api.JobRunVariableHelpAPIView.as_view(), name='variable-help'),
     path('job-execution/asset-detail/', api.JobAssetDetail.as_view(), name='asset-detail'),
-    path('job-execution/task-detail/', api.JobExecutionTaskDetail.as_view(), name='task-detail'),
+    path('job-execution/task-detail/<uuid:task_id>/', api.JobExecutionTaskDetail.as_view(), name='task-detail'),
     path('frequent-username/', api.FrequentUsernames.as_view(), name='frequent-usernames'),
     path('ansible/job-execution/<uuid:pk>/log/', api.AnsibleTaskLogApi.as_view(), name='job-execution-log'),
 

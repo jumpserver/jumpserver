@@ -1,10 +1,10 @@
 import abc
+import base64
+import json
+import os
 import subprocess
 import sys
 import time
-import os
-import json
-import base64
 from subprocess import CREATE_NO_WINDOW
 
 _blockInput = None
@@ -88,7 +88,7 @@ class Specific(DictObj):
     username_selector: str
     password_selector: str
     submit_selector: str
-    script: list
+    script: str
 
     # database
     db_name: str

@@ -1,4 +1,4 @@
-from common.drf.api import JMSBulkModelViewSet
+from common.api import JMSBulkModelViewSet
 from ..models import LoginACL
 from .. import serializers
 from ..filters import LoginAclFilter
