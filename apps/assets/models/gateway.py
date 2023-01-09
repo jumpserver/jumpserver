@@ -6,7 +6,6 @@ import paramiko
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.models import OrgManager
-from accounts.const import SecretType
 from assets.models.platform import Platform
 from assets.const import GATEWAY_NAME, Connectivity
 from common.utils import get_logger, lazyproperty
