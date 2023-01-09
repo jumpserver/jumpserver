@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-09 16:13+0800\n"
+"POT-Creation-Date: 2023-01-09 19:02+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -453,7 +453,7 @@ msgstr "账号验证"
 #: perms/models/asset_permission.py:56 rbac/models/role.py:29
 #: settings/models.py:33 settings/serializers/sms.py:6
 #: terminal/models/applet/applet.py:22 terminal/models/component/endpoint.py:12
-#: terminal/models/component/endpoint.py:92
+#: terminal/models/component/endpoint.py:91
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:15
 #: terminal/models/component/terminal.py:79 users/forms/profile.py:33
 #: users/models/group.py:13 users/models/user.py:675
@@ -695,12 +695,12 @@ msgid "Review"
 msgstr "审批"
 
 #: acls/models/base.py:73 assets/models/_user.py:47
-#: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:95
+#: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:94
 msgid "Priority"
 msgstr "优先级"
 
 #: acls/models/base.py:74 assets/models/_user.py:47
-#: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:96
+#: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:95
 msgid "1-100, the lower the value will be match first"
 msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 
@@ -1049,8 +1049,8 @@ msgstr "SSH公钥"
 #: ops/models/job.py:41 ops/models/playbook.py:17 rbac/models/role.py:37
 #: settings/models.py:38 terminal/models/applet/applet.py:31
 #: terminal/models/applet/applet.py:131 terminal/models/applet/host.py:110
-#: terminal/models/component/endpoint.py:25
-#: terminal/models/component/endpoint.py:102
+#: terminal/models/component/endpoint.py:24
+#: terminal/models/component/endpoint.py:101
 #: terminal/models/session/session.py:45 tickets/models/comment.py:32
 #: tickets/models/ticket/general.py:297 users/models/user.py:714
 #: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:119
@@ -1300,25 +1300,25 @@ msgstr "过滤器"
 msgid "Command filter rule"
 msgstr "命令过滤规则"
 
-#: assets/models/gateway.py:39 assets/serializers/domain.py:16
+#: assets/models/gateway.py:38 assets/serializers/domain.py:16
 msgid "Gateway"
 msgstr "网关"
 
-#: assets/models/gateway.py:84 authentication/models/connection_token.py:113
+#: assets/models/gateway.py:83 authentication/models/connection_token.py:113
 msgid "No account"
 msgstr "没有账号"
 
-#: assets/models/gateway.py:106
+#: assets/models/gateway.py:105
 #, python-brace-format
 msgid "Unable to connect to port {port} on {address}"
 msgstr "无法连接到 {port} 上的端口 {address}"
 
-#: assets/models/gateway.py:109 authentication/middleware.py:76
+#: assets/models/gateway.py:108 authentication/middleware.py:76
 #: xpack/plugins/cloud/providers/fc.py:48
 msgid "Authentication failed"
 msgstr "认证失败"
 
-#: assets/models/gateway.py:111 assets/models/gateway.py:138
+#: assets/models/gateway.py:110 assets/models/gateway.py:137
 msgid "Connect failed"
 msgstr "连接失败"
 
@@ -5361,23 +5361,19 @@ msgstr "PostgreSQL 端口"
 msgid "Redis port"
 msgstr "Redis 端口"
 
-#: terminal/models/component/endpoint.py:23
-msgid "Oracle port range"
-msgstr "Oracle 端口范围"
-
-#: terminal/models/component/endpoint.py:30
-#: terminal/models/component/endpoint.py:100
-#: terminal/serializers/endpoint.py:51 terminal/serializers/storage.py:38
-#: terminal/serializers/storage.py:50 terminal/serializers/storage.py:80
-#: terminal/serializers/storage.py:90 terminal/serializers/storage.py:98
+#: terminal/models/component/endpoint.py:29
+#: terminal/models/component/endpoint.py:99 terminal/serializers/endpoint.py:51
+#: terminal/serializers/storage.py:38 terminal/serializers/storage.py:50
+#: terminal/serializers/storage.py:80 terminal/serializers/storage.py:90
+#: terminal/serializers/storage.py:98
 msgid "Endpoint"
 msgstr "端点"
 
-#: terminal/models/component/endpoint.py:93
+#: terminal/models/component/endpoint.py:92
 msgid "IP group"
 msgstr "IP 组"
 
-#: terminal/models/component/endpoint.py:105
+#: terminal/models/component/endpoint.py:104
 msgid "Endpoint rule"
 msgstr "端点规则"
 
@@ -5584,14 +5580,12 @@ msgid "Load status"
 msgstr "负载状态"
 
 #: terminal/serializers/endpoint.py:14
-#, fuzzy
-#| msgid "Test port"
 msgid "Oracle port"
-msgstr "测试端口"
+msgstr "Oracle 端口"
 
 #: terminal/serializers/endpoint.py:17
-msgid "Magnus Listen port range"
-msgstr "Magnus 监听的端口范围"
+msgid "Oracle port range"
+msgstr "Oracle 端口范围"
 
 #: terminal/serializers/endpoint.py:19
 msgid ""
@@ -5718,7 +5712,7 @@ msgstr "没有发现"
 msgid "view"
 msgstr "查看"
 
-#: terminal/utils/db_port_mapper.py:96
+#: terminal/utils/db_port_mapper.py:100
 msgid ""
 "No available port is matched. The number of databases may have exceeded the "
 "number of ports open to the database agent service, Contact the "
@@ -5727,13 +5721,13 @@ msgstr ""
 "未匹配到可用端口，数据库的数量可能已经超过数据库代理服务开放的端口数量，请联"
 "系管理员开放更多端口。"
 
-#: terminal/utils/db_port_mapper.py:124
+#: terminal/utils/db_port_mapper.py:128
 msgid ""
 "No ports can be used, check and modify the limit on the number of ports that "
 "Magnus listens on in the configuration file."
 msgstr "没有端口可以使用，检查并修改配置文件中 Magnus 监听的端口数量限制。"
 
-#: terminal/utils/db_port_mapper.py:126
+#: terminal/utils/db_port_mapper.py:130
 msgid "All available port count: {}, Already use port count: {}"
 msgstr "所有可用端口数量：{}，已使用端口数量：{}"
 
@@ -7160,6 +7154,9 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:85
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Magnus Listen port range"
+#~ msgstr "Magnus 监听的端口范围"
 
 #~ msgid "Published"
 #~ msgstr "已发布"

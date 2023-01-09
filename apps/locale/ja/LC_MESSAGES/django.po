@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-09 16:13+0800\n"
+"POT-Creation-Date: 2023-01-09 19:02+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -473,7 +473,7 @@ msgstr "パスワード/キーの確認"
 #: perms/models/asset_permission.py:56 rbac/models/role.py:29
 #: settings/models.py:33 settings/serializers/sms.py:6
 #: terminal/models/applet/applet.py:22 terminal/models/component/endpoint.py:12
-#: terminal/models/component/endpoint.py:92
+#: terminal/models/component/endpoint.py:91
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:15
 #: terminal/models/component/terminal.py:79 users/forms/profile.py:33
 #: users/models/group.py:13 users/models/user.py:675
@@ -733,12 +733,12 @@ msgid "Review"
 msgstr "レビュー担当者"
 
 #: acls/models/base.py:73 assets/models/_user.py:47
-#: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:95
+#: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:94
 msgid "Priority"
 msgstr "優先順位"
 
 #: acls/models/base.py:74 assets/models/_user.py:47
-#: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:96
+#: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:95
 msgid "1-100, the lower the value will be match first"
 msgstr "1-100、低い値は最初に一致します"
 
@@ -1098,8 +1098,8 @@ msgstr "SSHパブリックキー"
 #: ops/models/job.py:41 ops/models/playbook.py:17 rbac/models/role.py:37
 #: settings/models.py:38 terminal/models/applet/applet.py:31
 #: terminal/models/applet/applet.py:131 terminal/models/applet/host.py:110
-#: terminal/models/component/endpoint.py:25
-#: terminal/models/component/endpoint.py:102
+#: terminal/models/component/endpoint.py:24
+#: terminal/models/component/endpoint.py:101
 #: terminal/models/session/session.py:45 tickets/models/comment.py:32
 #: tickets/models/ticket/general.py:297 users/models/user.py:714
 #: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:119
@@ -1357,26 +1357,26 @@ msgstr "フィルター"
 msgid "Command filter rule"
 msgstr "コマンドフィルタルール"
 
-#: assets/models/gateway.py:39 assets/serializers/domain.py:16
+#: assets/models/gateway.py:38 assets/serializers/domain.py:16
 msgid "Gateway"
 msgstr "ゲートウェイ"
 
-#: assets/models/gateway.py:84 authentication/models/connection_token.py:113
+#: assets/models/gateway.py:83 authentication/models/connection_token.py:113
 #, fuzzy
 msgid "No account"
 msgstr "アカウント"
 
-#: assets/models/gateway.py:106
+#: assets/models/gateway.py:105
 #, fuzzy, python-brace-format
 msgid "Unable to connect to port {port} on {address}"
 msgstr "{ip} でポート {port} に接続できません"
 
-#: assets/models/gateway.py:109 authentication/middleware.py:76
+#: assets/models/gateway.py:108 authentication/middleware.py:76
 #: xpack/plugins/cloud/providers/fc.py:48
 msgid "Authentication failed"
 msgstr "認証に失敗しました"
 
-#: assets/models/gateway.py:111 assets/models/gateway.py:138
+#: assets/models/gateway.py:110 assets/models/gateway.py:137
 msgid "Connect failed"
 msgstr "接続に失敗しました"
 
@@ -5559,25 +5559,19 @@ msgstr ""
 msgid "Redis port"
 msgstr "テストポート"
 
-#: terminal/models/component/endpoint.py:23
-#, fuzzy
-#| msgid "Magnus Listen port range"
-msgid "Oracle port range"
-msgstr "Magnus がリッスンするポート範囲"
-
-#: terminal/models/component/endpoint.py:30
-#: terminal/models/component/endpoint.py:100
-#: terminal/serializers/endpoint.py:51 terminal/serializers/storage.py:38
-#: terminal/serializers/storage.py:50 terminal/serializers/storage.py:80
-#: terminal/serializers/storage.py:90 terminal/serializers/storage.py:98
+#: terminal/models/component/endpoint.py:29
+#: terminal/models/component/endpoint.py:99 terminal/serializers/endpoint.py:51
+#: terminal/serializers/storage.py:38 terminal/serializers/storage.py:50
+#: terminal/serializers/storage.py:80 terminal/serializers/storage.py:90
+#: terminal/serializers/storage.py:98
 msgid "Endpoint"
 msgstr "エンドポイント"
 
-#: terminal/models/component/endpoint.py:93
+#: terminal/models/component/endpoint.py:92
 msgid "IP group"
 msgstr "IP グループ"
 
-#: terminal/models/component/endpoint.py:105
+#: terminal/models/component/endpoint.py:104
 msgid "Endpoint rule"
 msgstr "エンドポイントルール"
 
@@ -5792,7 +5786,9 @@ msgid "Oracle port"
 msgstr "テストポート"
 
 #: terminal/serializers/endpoint.py:17
-msgid "Magnus Listen port range"
+#, fuzzy
+#| msgid "Magnus Listen port range"
+msgid "Oracle port range"
 msgstr "Magnus がリッスンするポート範囲"
 
 #: terminal/serializers/endpoint.py:19
@@ -5922,7 +5918,7 @@ msgstr "見つかりません"
 msgid "view"
 msgstr "表示"
 
-#: terminal/utils/db_port_mapper.py:96
+#: terminal/utils/db_port_mapper.py:100
 msgid ""
 "No available port is matched. The number of databases may have exceeded the "
 "number of ports open to the database agent service, Contact the "
@@ -5932,7 +5928,7 @@ msgstr ""
 "サービスによって開かれたポートの数を超えた可能性があります。さらにポートを開"
 "くには、管理者に連絡してください。"
 
-#: terminal/utils/db_port_mapper.py:124
+#: terminal/utils/db_port_mapper.py:128
 msgid ""
 "No ports can be used, check and modify the limit on the number of ports that "
 "Magnus listens on in the configuration file."
@@ -5940,7 +5936,7 @@ msgstr ""
 "使用できるポートがありません。設定ファイルで Magnus がリッスンするポート数の"
 "制限を確認して変更してください. "
 
-#: terminal/utils/db_port_mapper.py:126
+#: terminal/utils/db_port_mapper.py:130
 msgid "All available port count: {}, Already use port count: {}"
 msgstr "使用可能なすべてのポート数: {}、すでに使用しているポート数: {}"
 
@@ -7389,6 +7385,9 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:85
 msgid "Community edition"
 msgstr "コミュニティ版"
+
+#~ msgid "Magnus Listen port range"
+#~ msgstr "Magnus がリッスンするポート範囲"
 
 #, fuzzy
 #~ msgid "Published"
