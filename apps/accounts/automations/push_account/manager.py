@@ -1,26 +1,59 @@
 from collections import defaultdict
 
-from accounts.const import AutomationTypes, SecretStrategy
-from ..base.manager import PushOrVerifyHostCallbackMixin, AccountBasePlaybookManager
-from accounts.models import PushAccountAutomation, Account
-from accounts.serializers import TriggerChoice
-from accounts.utils import SecretGenerator
+from django.db.models import QuerySet
+
 from common.utils import get_logger
 from perms.utils import AssetPermissionUtil
+from accounts.utils import SecretGenerator
+from accounts.serializers import TriggerChoice
+from accounts.const import AutomationTypes, SecretStrategy
+from accounts.models import PushAccountAutomation, Account
+from ..base.manager import PushOrVerifyHostCallbackMixin, AccountBasePlaybookManager
 
 logger = get_logger(__name__)
 
 
 class PushAccountManager(PushOrVerifyHostCallbackMixin, AccountBasePlaybookManager):
-    need_privilege_account = True
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.secret_type = self.execution.snapshot['secret_type']
         self.host_account_mapper = {}
 
     @classmethod
     def method_type(cls):
         return AutomationTypes.push_account
+
+    def create_nonlocal_accounts(self, accounts, snapshot_account_usernames, asset):
+        secret = self.execution.snapshot['secret']
+        usernames = accounts.filter(secret_type=self.secret_type).values_list(
+            'username', flat=True
+        )
+        create_usernames = set(snapshot_account_usernames) - set(usernames)
+        create_account_objs = [
+            Account(
+                name=username, username=username, secret=secret,
+                secret_type=self.secret_type, asset=asset,
+            )
+            for username in create_usernames
+        ]
+        Account.objects.bulk_create(create_account_objs)
+
+    def get_accounts(self, privilege_account, accounts: QuerySet):
+        if not privilege_account:
+            logger.debug(f'not privilege account')
+            return []
+        snapshot_account_usernames = self.execution.snapshot['accounts']
+        accounts = accounts.exclude(id=privilege_account.id)
+        if '*' in snapshot_account_usernames:
+            return accounts
+
+        asset = privilege_account.asset
+        self.create_nonlocal_accounts(accounts, snapshot_account_usernames, asset)
+        accounts = asset.accounts.exclude(
+            id=privilege_account.id, secret_type=self.secret_type
+        )
+        return accounts
 
     @classmethod
     def trigger_by_asset_create(cls, asset):

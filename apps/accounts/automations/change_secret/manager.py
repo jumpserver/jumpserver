@@ -27,6 +27,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         self.method_hosts_mapper = defaultdict(list)
         self.secret_type = self.execution.snapshot['secret_type']
         self.secret_strategy = self.execution.snapshot['secret_strategy']
+        self.snapshot_account_usernames = self.execution.snapshot['accounts']
         self._password_generated = None
         self._ssh_key_generated = None
         self.name_recorder_mapper = {}  # 做个映射，方便后面处理
@@ -71,10 +72,10 @@ class ChangeSecretManager(AccountBasePlaybookManager):
 
         accounts = asset.accounts.all()
         if account:
-            accounts = accounts.exclude(id=account.id)
+            accounts = accounts.exclude(username=account.username)
 
-        if '*' not in self.execution.snapshot['accounts']:
-            accounts = accounts.filter(username__in=self.execution.snapshot['accounts'])
+        if '*' not in self.snapshot_account_usernames:
+            accounts = accounts.filter(username__in=self.snapshot_account_usernames)
 
         accounts = accounts.filter(secret_type=self.secret_type)
         method_attr = getattr(automation, self.method_type() + '_method')
