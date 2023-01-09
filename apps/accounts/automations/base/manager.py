@@ -1,7 +1,7 @@
 from copy import deepcopy
 
 from common.utils import get_logger
-from accounts.const import SecretType
+from accounts.const import AutomationTypes, SecretType
 from assets.automations.base.manager import BasePlaybookManager
 from accounts.automations.methods import platform_automation_methods
 
@@ -10,9 +10,8 @@ logger = get_logger(__name__)
 
 class PushOrVerifyHostCallbackMixin:
     execution: callable
+    get_accounts: callable
     host_account_mapper: dict
-    ignore_account: bool
-    need_privilege_account: bool
     generate_public_key: callable
     generate_private_key_path: callable
 
@@ -22,11 +21,7 @@ class PushOrVerifyHostCallbackMixin:
             return host
 
         accounts = asset.accounts.all()
-        if self.need_privilege_account and accounts.count() > 1 and account:
-            accounts = accounts.exclude(id=account.id)
-
-        if '*' not in self.execution.snapshot['accounts']:
-            accounts = accounts.filter(username__in=self.execution.snapshot['accounts'])
+        accounts = self.get_accounts(account, accounts)
 
         inventory_hosts = []
         for account in accounts:

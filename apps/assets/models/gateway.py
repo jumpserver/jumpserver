@@ -5,10 +5,12 @@ import socket
 import paramiko
 from django.utils.translation import ugettext_lazy as _
 
-from assets.const import GATEWAY_NAME, Connectivity
-from assets.models.platform import Platform
-from common.utils import get_logger, lazyproperty
 from orgs.mixins.models import OrgManager
+from accounts.const import SecretType
+from assets.models.platform import Platform
+from assets.const import GATEWAY_NAME, Connectivity
+from common.utils import get_logger, lazyproperty
+
 from .asset.host import Host
 
 logger = get_logger(__file__)
@@ -48,6 +50,26 @@ class Gateway(Host):
     def select_account(self):
         account = self.accounts.active().order_by('-privileged', '-date_updated').first()
         return account
+
+    @lazyproperty
+    def username(self):
+        account = self.select_account
+        return account.username if account else None
+
+    @lazyproperty
+    def password(self):
+        account = self.select_account
+        return account.password if account else None
+
+    @lazyproperty
+    def private_key(self):
+        account = self.select_account
+        return account.private_key if account else None
+
+    @lazyproperty
+    def private_key_path(self):
+        account = self.select_account
+        return account.private_key_path if account else None
 
     def test_connective(self, local_port=None):
         from accounts.models import Account

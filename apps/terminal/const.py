@@ -52,3 +52,10 @@ class TerminalType(TextChoices):
     @classmethod
     def types(cls):
         return set(dict(cls.choices).keys())
+
+
+class PublishStatus(TextChoices):
+    pending = 'pending', _('Pending')
+    success = 'success', _("Success")
+    failed = 'failed', _("Failed")
+    mismatch = 'mismatch', _("Mismatch")
