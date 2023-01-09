@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 
+import json
 import logging
 from collections import defaultdict
 
@@ -123,7 +124,12 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
         if not instance:
             return {}
         specific_fields = self.get_specific_fields(instance)
-        info = {i.name: getattr(instance, i.name) for i in specific_fields}
+        info = {}
+        for i in specific_fields:
+            v = getattr(instance, i.name)
+            if isinstance(i, models.JSONField):
+                v = json.loads(v)
+            info[i.name] = v
         return info
 
     @property
