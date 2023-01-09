@@ -26,7 +26,13 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
         fields_m2m = ['assets', 'gateways']
         read_only_fields = ['date_created']
         fields = fields_small + fields_m2m + read_only_fields
-        extra_kwargs = {}
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        assets = data['assets']
+        gateway_ids = [str(i['id']) for i in data['gateways']]
+        data['assets'] = [i for i in assets if str(i['id']) not in gateway_ids]
+        return data
 
 
 class DomainWithGatewaySerializer(serializers.ModelSerializer):

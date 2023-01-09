@@ -127,7 +127,7 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
         info = {}
         for i in specific_fields:
             v = getattr(instance, i.name)
-            if isinstance(i, models.JSONField):
+            if isinstance(i, models.JSONField) and not isinstance(v, (list, dict)):
                 v = json.loads(v)
             info[i.name] = v
         return info

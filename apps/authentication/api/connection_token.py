@@ -270,7 +270,7 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
 
     def _validate_acl(self, user, asset, account):
         from acls.models import LoginAssetACL
-        acl = LoginAssetACL.filter_queryset(user, asset, account).first()
+        acl = LoginAssetACL.filter_queryset(user, asset, account).valid().first()
         if not acl:
             return
         if acl.is_action(acl.ActionChoices.accept):

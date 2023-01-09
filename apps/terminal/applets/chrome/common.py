@@ -82,13 +82,20 @@ class User(DictObj):
     username: str
 
 
+class Step(DictObj):
+    step: int
+    target: str
+    command: str
+    value: str
+
+
 class Specific(DictObj):
     # web
     autofill: str
     username_selector: str
     password_selector: str
     submit_selector: str
-    script: str
+    script: list[Step]
 
     # database
     db_name: str

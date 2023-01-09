@@ -6,6 +6,8 @@ from rest_framework.renderers import JSONRenderer
 
 from common.db.utils import safe_db_connection
 from common.utils import get_logger
+from common.utils.connection import Subscription
+from terminal.models import Terminal
 from terminal.models import Session
 from terminal.serializers import TaskSerializer, StatSerializer
 from .signal_handlers import component_event_chan
@@ -14,8 +16,8 @@ logger = get_logger(__name__)
 
 
 class TerminalTaskWebsocket(JsonWebsocketConsumer):
-    sub = None
-    terminal = None
+    sub: Subscription = None
+    terminal: Terminal = None
 
     def connect(self):
         user = self.scope["user"]
@@ -72,5 +74,6 @@ class TerminalTaskWebsocket(JsonWebsocketConsumer):
         return component_event_chan.subscribe(handle_task_msg_recv)
 
     def disconnect(self, code):
-        if self.sub:
-            self.sub.unsubscribe()
+        if self.sub is None:
+            return
+        self.sub.unsubscribe()
