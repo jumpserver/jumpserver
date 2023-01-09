@@ -3,7 +3,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from assets.models import Asset
-from common.db.fields import PortField
+from common.db.fields import PortField, PortRangeField
 from common.db.models import JMSBaseModel
 from common.utils.ip import contains_ip
 
@@ -12,10 +12,15 @@ class Endpoint(JMSBaseModel):
     name = models.CharField(max_length=128, verbose_name=_('Name'), unique=True)
     host = models.CharField(max_length=256, blank=True, verbose_name=_('Host'))
     # value=0 表示 disabled
-    https_port = PortField(default=443, verbose_name=_('HTTPS Port'))
-    http_port = PortField(default=80, verbose_name=_('HTTP Port'))
-    ssh_port = PortField(default=2222, verbose_name=_('SSH Port'))
-    rdp_port = PortField(default=3389, verbose_name=_('RDP Port'))
+    https_port = PortField(default=443, verbose_name=_('HTTPS port'))
+    http_port = PortField(default=80, verbose_name=_('HTTP port'))
+    ssh_port = PortField(default=2222, verbose_name=_('SSH port'))
+    rdp_port = PortField(default=3389, verbose_name=_('RDP port'))
+    mysql_port = PortField(default=33060, verbose_name=_('MySQL port'))
+    mariadb_port = PortField(default=33061, verbose_name=_('MariaDB port'))
+    postgresql_port = PortField(default=54320, verbose_name=_('PostgreSQL port'))
+    redis_port = PortField(default=63790, verbose_name=_('Redis port'))
+    oracle_port_range = PortRangeField(default='1-65535', verbose_name=_('Oracle port range'))
 
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 

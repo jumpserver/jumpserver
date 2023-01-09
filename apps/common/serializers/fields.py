@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 #
-import six
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.fields import ChoiceField, empty
 
 from common.db.fields import TreeChoices
-from common.utils import decrypt_password
 from common.local import add_encrypted_field_set
+from common.utils import decrypt_password
 
 __all__ = [
     "ReadableHiddenField",

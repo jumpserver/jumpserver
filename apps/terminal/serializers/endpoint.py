@@ -1,9 +1,10 @@
-from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
-from common.serializers import BulkModelSerializer
+from rest_framework import serializers
+
 from acls.serializers.rules import ip_group_child_validator, ip_group_help_text
-from ..utils import db_port_manager
+from common.serializers import BulkModelSerializer
 from ..models import Endpoint, EndpointRule
+from ..utils import db_port_manager
 
 __all__ = ['EndpointSerializer', 'EndpointRuleSerializer']
 
@@ -23,8 +24,7 @@ class EndpointSerializer(BulkModelSerializer):
         model = Endpoint
         fields_mini = ['id', 'name']
         fields_small = [
-            'host',
-            'https_port', 'http_port', 'ssh_port', 'rdp_port',
+            'host', 'https_port', 'http_port', 'ssh_port', 'rdp_port',
             'magnus_listen_db_port', 'magnus_listen_port_range',
         ]
         fields = fields_mini + fields_small + [
