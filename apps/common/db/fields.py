@@ -9,6 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.local import add_encrypted_field_set
 from common.utils import signer, crypto
+from .validators import PortRangeValidator
 
 __all__ = [
     "JsonMixin",
@@ -27,6 +28,7 @@ __all__ = [
     "EncryptJsonDictTextField",
     "EncryptJsonDictCharField",
     "PortField",
+    "PortRangeField",
     "BitChoices",
     "TreeChoices",
 ]
@@ -264,3 +266,10 @@ class BitChoices(models.IntegerChoices, TreeChoices):
         for c in cls:
             value |= c.value
         return value
+
+
+class PortRangeField(models.CharField):
+    def __init__(self, **kwargs):
+        kwargs['max_length'] = 16
+        super().__init__(**kwargs)
+        self.validators.append(PortRangeValidator())

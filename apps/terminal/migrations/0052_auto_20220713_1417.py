@@ -16,13 +16,13 @@ class Migration(migrations.Migration):
             name='oracle_11g_port',
             field=common.db.fields.PortField(default=15211, validators=[
                 django.core.validators.MinValueValidator(0),
-                django.core.validators.MaxValueValidator(65535)], verbose_name='Oracle 11g Port'),
+                django.core.validators.MaxValueValidator(65535)], verbose_name='Oracle 11g port'),
         ),
         migrations.AddField(
             model_name='endpoint',
             name='oracle_12c_port',
             field=common.db.fields.PortField(default=15212, validators=[
                 django.core.validators.MinValueValidator(0),
-                django.core.validators.MaxValueValidator(65535)], verbose_name='Oracle 12c Port'),
+                django.core.validators.MaxValueValidator(65535)], verbose_name='Oracle 12c port'),
         ),
     ]
