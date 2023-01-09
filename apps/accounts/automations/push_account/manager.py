@@ -44,14 +44,14 @@ class PushAccountManager(PushOrVerifyHostCallbackMixin, AccountBasePlaybookManag
             logger.debug(f'not privilege account')
             return []
         snapshot_account_usernames = self.execution.snapshot['accounts']
-        accounts = accounts.exclude(id=privilege_account.id)
+        accounts = accounts.exclude(username=privilege_account.username)
         if '*' in snapshot_account_usernames:
             return accounts
 
         asset = privilege_account.asset
         self.create_nonlocal_accounts(accounts, snapshot_account_usernames, asset)
         accounts = asset.accounts.exclude(
-            id=privilege_account.id, secret_type=self.secret_type
+            username=privilege_account.username, secret_type=self.secret_type
         )
         return accounts
 
