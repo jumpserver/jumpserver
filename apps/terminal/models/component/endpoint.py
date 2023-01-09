@@ -16,8 +16,8 @@ class Endpoint(JMSBaseModel):
     http_port = PortField(default=80, verbose_name=_('HTTP port'))
     ssh_port = PortField(default=2222, verbose_name=_('SSH port'))
     rdp_port = PortField(default=3389, verbose_name=_('RDP port'))
-    mysql_port = PortField(default=33060, verbose_name=_('MySQL port'))
-    mariadb_port = PortField(default=33061, verbose_name=_('MariaDB port'))
+    mysql_port = PortField(default=33061, verbose_name=_('MySQL port'))
+    mariadb_port = PortField(default=33062, verbose_name=_('MariaDB port'))
     postgresql_port = PortField(default=54320, verbose_name=_('PostgreSQL port'))
     redis_port = PortField(default=63790, verbose_name=_('Redis port'))
 

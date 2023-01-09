@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-09 19:02+0800\n"
+"POT-Creation-Date: 2023-01-09 19:27+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5780,22 +5780,18 @@ msgid "Load status"
 msgstr "ロードステータス"
 
 #: terminal/serializers/endpoint.py:14
-#, fuzzy
-#| msgid "Test port"
 msgid "Oracle port"
-msgstr "テストポート"
+msgstr "Oracle ポート"
 
 #: terminal/serializers/endpoint.py:17
-#, fuzzy
-#| msgid "Magnus Listen port range"
 msgid "Oracle port range"
-msgstr "Magnus がリッスンするポート範囲"
+msgstr "Oracle がリッスンするポート範囲"
 
 #: terminal/serializers/endpoint.py:19
 msgid ""
-"The range of ports that Magnus listens on is modified in the configuration "
-"file"
-msgstr "Magnus がリッスンするポート範囲を構成ファイルで変更してください"
+"Oracle proxy server listen port is dynamic, Each additional Oracle database "
+"instance adds a port listener"
+msgstr "Oracle プロキシサーバーがリッスンするポートは動的です。追加の Oracle データベースインスタンスはポートリスナーを追加します"
 
 #: terminal/serializers/endpoint.py:45
 msgid ""
@@ -7385,6 +7381,11 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:85
 msgid "Community edition"
 msgstr "コミュニティ版"
+
+#~ msgid ""
+#~ "The range of ports that Magnus listens on is modified in the "
+#~ "configuration file"
+#~ msgstr "Magnus がリッスンするポート範囲を構成ファイルで変更してください"
 
 #~ msgid "Magnus Listen port range"
 #~ msgstr "Magnus がリッスンするポート範囲"

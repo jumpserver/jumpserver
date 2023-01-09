@@ -15,12 +15,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='endpoint',
             name='mariadb_port',
-            field=common.db.fields.PortField(default=33061, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(65535)], verbose_name='MariaDB port'),
+            field=common.db.fields.PortField(default=33062, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(65535)], verbose_name='MariaDB port'),
         ),
         migrations.AddField(
             model_name='endpoint',
             name='mysql_port',
-            field=common.db.fields.PortField(default=33060, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(65535)], verbose_name='MySQL port'),
+            field=common.db.fields.PortField(default=33061, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(65535)], verbose_name='MySQL port'),
         ),
         migrations.AddField(
             model_name='endpoint',

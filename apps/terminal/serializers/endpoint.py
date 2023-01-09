@@ -16,7 +16,7 @@ class EndpointSerializer(BulkModelSerializer):
         max_length=128, default=db_port_manager.oracle_port_range, read_only=True,
         label=_('Oracle port range'),
         help_text=_(
-            'The range of ports that Magnus listens on is modified in the configuration file'
+            'Oracle proxy server listen port is dynamic, Each additional Oracle database instance adds a port listener'
         )
     )
 
