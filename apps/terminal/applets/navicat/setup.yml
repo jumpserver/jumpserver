@@ -1,0 +1,5 @@
+type: exe # exe, zip, manual
+source: https://jms-pkg.oss-cn-beijing.aliyuncs.com/windows-pkgs/navicat161_premium_en_x64.exe
+destination: C:\Program Files\PremiumSoft\Navicat Premium 16
+program: C:\Program Files\PremiumSoft\Navicat Premium 16\navicat.exe
+md5: a04884fbd6fcd1cab69af31444e9bfb9

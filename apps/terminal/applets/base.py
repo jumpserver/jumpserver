@@ -130,6 +130,7 @@ class Account(DictObj):
     name: str
     username: str
     secret: str
+    privileged: bool
     secret_type: LabelValue
 
 
