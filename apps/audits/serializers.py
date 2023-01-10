@@ -150,3 +150,17 @@ class ActivitiesAuthChangeSerializer(BaseActivitiesSerializer):
             obj.created_by, _(obj.status.title())
         )
         return ctn
+
+
+class ActivitiesLoginLogSerializer(BaseActivitiesSerializer):
+    @staticmethod
+    def get_timestamp(obj):
+        return obj.datetime.strftime('%Y-%m-%d %H:%M:%S')
+
+    @staticmethod
+    def get_content(obj):
+        login_status = _('Success') if obj.status else _('Failed')
+        ctn = _('User {} login into this service.[{}]').format(
+            obj.username, login_status
+        )
+        return ctn

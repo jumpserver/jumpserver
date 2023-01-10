@@ -21,7 +21,7 @@ from .serializers import FTPLogSerializer, UserLoginLogSerializer, JobAuditLogSe
 from .serializers import (
     OperateLogSerializer, OperateLogActionDetailSerializer, PasswordChangeLogSerializer,
     ActivitiesSessionSerializer, ActivitiesOperatorLogSerializer,
-    ActivitiesAuthChangeSerializer
+    ActivitiesAuthChangeSerializer, ActivitiesLoginLogSerializer
 )
 
 
@@ -91,6 +91,7 @@ class ResourceActivityAPIView(generics.ListAPIView):
             'session': (Session, 'asset_id'),
             'operate_log': (OperateLog, 'resource_id'),
             'auth_change': (ChangeSecretRecord, 'account_id'),
+            'login': (UserLoginLog, 'username'),
         }
         model, filter_q = resource_mapping.get(resource, (None, None))
         if model is None or resource_id is None:
@@ -103,6 +104,7 @@ class ResourceActivityAPIView(generics.ListAPIView):
             'session': ActivitiesSessionSerializer,
             'operate_log': ActivitiesOperatorLogSerializer,
             'auth_change': ActivitiesAuthChangeSerializer,
+            'login': ActivitiesLoginLogSerializer,
         }
         return mapping.get(resource, ActivitiesOperatorLogSerializer)
 
