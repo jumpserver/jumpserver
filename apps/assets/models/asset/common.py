@@ -101,6 +101,7 @@ class Protocol(models.Model):
 
 class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
     Category = const.Category
+    Type = const.AllTypes
 
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     address = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
@@ -226,6 +227,9 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
 
     def is_category(self, category):
         return self.category == category
+
+    def is_type(self, tp):
+        return self.type == tp
 
     @lazyproperty
     def gateway(self):
