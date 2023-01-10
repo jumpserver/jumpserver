@@ -1301,6 +1301,11 @@ msgid "Command filter rule"
 msgstr "命令过滤规则"
 
 #: assets/models/gateway.py:38 assets/serializers/domain.py:16
+#: assets/models/favorite_asset.py:17
+msgid "Favorite Asset"
+msgstr "收藏的资产"
+
+#: assets/models/gateway.py:37 assets/serializers/domain.py:16
 msgid "Gateway"
 msgstr "网关"
 
@@ -1828,6 +1833,18 @@ msgstr "用户登录日志"
 #: audits/serializers.py:61
 msgid "Reason display"
 msgstr "原因描述"
+
+#: audits/serializers.py:120
+msgid "{} used account[{}], login method[{}] login the asset."
+msgstr "{} 使用账户[{}], 登录方式[{}]登录了这个资产."
+
+#: audits/serializers.py:134
+msgid "User {} {} it."
+msgstr "用户 {} {}了它."
+
+#: audits/serializers.py:148
+msgid "User {} has executed change auth plan for this account.({})"
+msgstr "用户 {} 为这个账号执行了改密计划.({})"
 
 #: audits/signal_handlers.py:48
 msgid "SSH Key"
@@ -5302,6 +5319,12 @@ msgid "Hosts"
 msgstr "主机"
 
 #: terminal/models/applet/host.py:18 terminal/serializers/applet_host.py:40
+#: terminal/models/applet/applet.py:129 terminal/models/applet/host.py:33
+#: terminal/models/applet/host.py:105
+msgid "Hosting"
+msgstr "宿主机"
+
+#: terminal/models/applet/host.py:18 terminal/serializers/applet_host.py:39
 msgid "Deploy options"
 msgstr "部署参数"
 
@@ -5885,6 +5908,10 @@ msgstr "申请资产"
 msgid "Apply accounts"
 msgstr "申请账号"
 
+#: tickets/models/ticket/apply_asset.py:26
+msgid "Apply Asset Ticket"
+msgstr "申请资产"
+
 #: tickets/models/ticket/command_confirm.py:9
 msgid "Run user"
 msgstr "运行的用户"
@@ -5996,6 +6023,14 @@ msgstr "处理人"
 #: tickets/serializers/ticket/apply_asset.py:16
 msgid "Support fuzzy search, and display up to 10 items"
 msgstr "支持模糊搜索，最多显示10项"
+
+#: tickets/serializers/ticket/apply_asset.py:22
+msgid "Apply assets"
+msgstr "申请资产"
+
+#: tickets/serializers/ticket/apply_asset.py:26
+msgid "Apply nodes"
+msgstr "申请节点"
 
 #: tickets/serializers/ticket/apply_asset.py:28
 msgid "Apply actions"

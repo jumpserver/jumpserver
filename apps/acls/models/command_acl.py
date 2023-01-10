@@ -93,7 +93,7 @@ class CommandGroup(JMSOrgBaseModel):
 
 
 class CommandFilterACL(UserAssetAccountBaseACL):
-    command_groups = models.ManyToManyField(CommandGroup, verbose_name=_('Commands'))
+    command_groups = models.ManyToManyField(CommandGroup, verbose_name=_('Command group'))
 
     class Meta(UserAssetAccountBaseACL.Meta):
         abstract = False

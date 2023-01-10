@@ -17,6 +17,7 @@ router.register(r'job-logs', api.JobAuditViewSet, 'job-log')
 
 urlpatterns = [
     path('my-login-logs/', api.MyLoginLogAPIView.as_view(), name='my-login-log'),
+    path('activities/', api.ResourceActivityAPIView.as_view(), name='resource-activities'),
 ]
 
 urlpatterns += router.urls

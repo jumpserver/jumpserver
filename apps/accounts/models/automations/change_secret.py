@@ -76,7 +76,7 @@ class ChangeSecretRecord(JMSBaseModel):
     error = models.TextField(blank=True, null=True, verbose_name=_('Error'))
 
     class Meta:
-        ordering = ('-date_started',)
+        ordering = ('-date_created',)
         verbose_name = _("Change secret record")
 
     def __str__(self):

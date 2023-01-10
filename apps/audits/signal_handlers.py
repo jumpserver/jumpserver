@@ -4,6 +4,7 @@ import uuid
 
 from django.conf import settings
 from django.contrib.auth import BACKEND_SESSION_KEY
+from django.apps import apps
 from django.db import transaction
 from django.db.models.signals import post_save, pre_save, m2m_changed, pre_delete
 from django.dispatch import receiver
@@ -23,6 +24,7 @@ from authentication.utils import check_different_city_login_if_need
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR, SKIP_SIGNAL
 from common.utils import get_request_ip, get_logger, get_syslogger
 from common.utils.encode import data_to_json
+from common.signals import django_ready
 from jumpserver.utils import current_request
 from terminal.backends.command.serializers import SessionCommandSerializer
 from terminal.models import Session, Command
@@ -278,3 +280,37 @@ def on_user_auth_failed(sender, username, request, reason='', **kwargs):
     data = generate_data(username, request)
     data.update({'reason': reason[:128], 'status': False})
     write_login_log(**data)
+
+
+@receiver(django_ready)
+def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
+    exclude_label = {
+        'audits', 'django_cas_ng', 'captcha', 'admin',
+        'django_celery_beat', 'contenttypes', 'sessions',
+        'jms_oidc_rp', 'auth'
+    }
+    exclude_object_name = {
+        'UserPasswordHistory', 'ContentType',
+        'SiteMessage', 'SiteMessageUsers',
+        'PlatformAutomation', 'PlatformProtocol', 'Protocol',
+        'HistoricalAccount', 'GatheredUser', 'ApprovalRule',
+        'BaseAutomation', 'ChangeSecretRecord', 'CeleryTask',
+        'Command', 'JobAuditLog',
+        'ConnectionToken', 'Session', 'SessionJoinRecord',
+        'HistoricalJob', 'Status', 'TicketStep', 'Ticket',
+        'UserAssetGrantedTreeNodeRelation', 'TicketAssignee',
+        'SuperTicket', 'SuperConnectionToken', 'PermNode',
+        'PermedAsset', 'PermedAccount', 'MenuPermission',
+        'Permission', 'TicketSession', 'ApplyLoginTicket',
+        'ApplyCommandTicket', 'ApplyLoginAssetTicket',
+    }
+    for i, app in enumerate(apps.get_models(), 1):
+        app_label = app._meta.app_label
+        app_object_name = app._meta.object_name
+        if app_label in exclude_label or \
+                app_object_name in exclude_object_name or \
+                app_object_name.endswith('Execution'):
+            continue
+        MODELS_NEED_RECORD.add(app_object_name)
+
+    print(MODELS_NEED_RECORD)

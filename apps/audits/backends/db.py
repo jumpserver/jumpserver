@@ -17,22 +17,26 @@ class OperateLogStore(object):
         return True
 
     def save(self, **kwargs):
+        before_limit, after_limit = None, None
         log_id = kwargs.get('id', '')
         before = kwargs.get('before') or {}
         after = kwargs.get('after') or {}
         if len(str(before)) > self.max_length:
-            before = {_('Tips'): self.max_length_tip_msg}
+            before_limit = {str(_('Tips')): self.max_length_tip_msg}
         if len(str(after)) > self.max_length:
-            after = {_('Tips'): self.max_length_tip_msg}
+            after_limit = {str(_('Tips')): self.max_length_tip_msg}
 
         op_log = self.model.objects.filter(pk=log_id).first()
         if op_log is not None:
-            raw_after = op_log.after or {}
-            raw_before = op_log.before or {}
-            raw_before.update(before)
-            raw_after.update(after)
-            op_log.before = raw_before
-            op_log.after = raw_after
-            op_log.save()
+            op_log_before = op_log.before or {}
+            op_log_after = op_log.after or {}
+            if not before_limit:
+                before.update(op_log_before)
+            if not after_limit:
+                after.update(op_log_after)
         else:
-            self.model.objects.create(**kwargs)
+            op_log = self.model(**kwargs)
+
+        op_log.before = before_limit if before_limit else before
+        op_log.after = after_limit if after_limit else after
+        op_log.save()
