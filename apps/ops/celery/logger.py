@@ -1,13 +1,14 @@
 from logging import StreamHandler
 from threading import get_ident
 
-from django.conf import settings
 from celery import current_task
 from celery.signals import task_prerun, task_postrun
+from django.conf import settings
 from kombu import Connection, Exchange, Queue, Producer
 from kombu.mixins import ConsumerMixin
 
 from .utils import get_celery_task_log_path
+from ..const import CELERY_LOG_MAGIC_MARK
 
 routing_key = 'celery_log'
 celery_log_exchange = Exchange('celery_log_exchange', type='direct')
@@ -198,8 +199,8 @@ class CeleryThreadTaskFileHandler(CeleryThreadingLoggerHandler):
         if not f:
             raise ValueError('Not found thread task file')
         msg = self.format(record)
-        f.write(msg)
-        f.write(self.terminator)
+        f.write(msg.encode())
+        f.write(self.terminator.encode())
         f.flush()
 
     def flush(self):
@@ -210,12 +211,13 @@ class CeleryThreadTaskFileHandler(CeleryThreadingLoggerHandler):
         log_path = get_celery_task_log_path(task_id)
         thread_id = self.get_current_thread_id()
         self.task_id_thread_id_mapper[task_id] = thread_id
-        f = open(log_path, 'a')
+        f = open(log_path, 'ab')
         self.thread_id_fd_mapper[thread_id] = f
 
     def handle_task_end(self, task_id):
         ident_id = self.task_id_thread_id_mapper.get(task_id, '')
         f = self.thread_id_fd_mapper.pop(ident_id, None)
         if f and not f.closed:
+            f.write(CELERY_LOG_MAGIC_MARK)
             f.close()
         self.task_id_thread_id_mapper.pop(task_id, None)

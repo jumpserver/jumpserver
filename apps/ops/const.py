@@ -51,3 +51,6 @@ class JobStatus(models.TextChoices):
     success = 'success', _('Success')
     timeout = 'timeout', _('Timeout')
     failed = 'failed', _('Failed')
+
+
+CELERY_LOG_MAGIC_MARK = b'\x00\x00\x00\x00\x00'
