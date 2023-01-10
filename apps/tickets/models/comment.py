@@ -33,3 +33,6 @@ class Comment(JMSBaseModel):
 
     def set_display_fields(self):
         self.user_display = str(self.user)
+
+    def __str__(self):
+        return str(self.ticket)

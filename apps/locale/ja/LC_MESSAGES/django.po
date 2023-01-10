@@ -1025,7 +1025,7 @@ msgid "Device"
 msgstr ""
 
 #: assets/const/category.py:13 assets/models/asset/database.py:8
-#: assets/models/asset/database.py:23
+#: assets/models/asset/database.py:34
 msgid "Database"
 msgstr "データベース"
 
@@ -1358,6 +1358,11 @@ msgid "Command filter rule"
 msgstr "コマンドフィルタルール"
 
 #: assets/models/gateway.py:38 assets/serializers/domain.py:16
+#: assets/models/favorite_asset.py:17
+msgid "Favorite Asset"
+msgstr "お気に入り"
+
+#: assets/models/gateway.py:37 assets/serializers/domain.py:16
 msgid "Gateway"
 msgstr "ゲートウェイ"
 
@@ -1433,7 +1438,7 @@ msgid "Parent key"
 msgstr "親キー"
 
 #: assets/models/node.py:566 perms/serializers/permission.py:28
-#: xpack/plugins/cloud/models.py:96
+#: tickets/models/ticket/apply_asset.py:14 xpack/plugins/cloud/models.py:96
 msgid "Node"
 msgstr "ノード"
 
@@ -1753,7 +1758,7 @@ msgstr "セキュリティのために、ユーザー {} をプッシュしな�
 msgid "No assets matched, stop task"
 msgstr "一致する資産がない、タスクを停止"
 
-#: audits/apps.py:9
+#: audits/apps.py:11
 msgid "Audits"
 msgstr "監査"
 
@@ -1761,37 +1766,37 @@ msgstr "監査"
 msgid "The text content is too long. Use Elasticsearch to store operation logs"
 msgstr "文章の内容が長すぎる。Elasticsearchで操作履歴を保存する"
 
-#: audits/backends/db.py:24 audits/backends/db.py:26
+#: audits/backends/db.py:25 audits/backends/db.py:27
 msgid "Tips"
 msgstr "謎々"
 
-#: audits/const.py:37
+#: audits/const.py:38
 msgid "Mkdir"
 msgstr "Mkdir"
 
-#: audits/const.py:38
+#: audits/const.py:39
 msgid "Rmdir"
 msgstr "Rmdir"
 
-#: audits/const.py:39 audits/const.py:49
+#: audits/const.py:40 audits/const.py:50
 #: authentication/templates/authentication/_access_key_modal.html:65
 #: rbac/tree.py:231
 msgid "Delete"
 msgstr "削除"
 
-#: audits/const.py:40 perms/const.py:13
+#: audits/const.py:41 perms/const.py:13
 msgid "Upload"
 msgstr "アップロード"
 
-#: audits/const.py:41
+#: audits/const.py:42
 msgid "Rename"
 msgstr "名前の変更"
 
-#: audits/const.py:42
+#: audits/const.py:43
 msgid "Symlink"
 msgstr "Symlink"
 
-#: audits/const.py:43 perms/const.py:14
+#: audits/const.py:44 perms/const.py:14
 msgid "Download"
 msgstr "ダウンロード"
 
@@ -1827,7 +1832,7 @@ msgstr "是"
 msgid "No"
 msgstr "否"
 
-#: audits/models.py:32 audits/models.py:55 audits/models.py:96
+#: audits/models.py:32 audits/models.py:59 audits/models.py:101
 #: terminal/models/session/session.py:37 terminal/models/session/sharing.py:95
 msgid "Remote addr"
 msgstr "リモートaddr"
@@ -1848,67 +1853,79 @@ msgstr "ファイル転送ログ"
 msgid "Resource Type"
 msgstr "リソースタイプ"
 
-#: audits/models.py:54
+#: audits/models.py:54 audits/models.py:57
 msgid "Resource"
 msgstr "リソース"
 
-#: audits/models.py:56 audits/models.py:98
+#: audits/models.py:60 audits/models.py:103
 #: terminal/backends/command/serializers.py:41
 msgid "Datetime"
 msgstr "時間"
 
-#: audits/models.py:88
+#: audits/models.py:92
 msgid "Operate log"
 msgstr "ログの操作"
 
-#: audits/models.py:94
+#: audits/models.py:99
 msgid "Change by"
 msgstr "による変更"
 
-#: audits/models.py:104
+#: audits/models.py:109
 msgid "Password change log"
 msgstr "パスワード変更ログ"
 
-#: audits/models.py:111
+#: audits/models.py:116
 msgid "Login type"
 msgstr "ログインタイプ"
 
-#: audits/models.py:113 tickets/models/ticket/login_confirm.py:10
+#: audits/models.py:118 tickets/models/ticket/login_confirm.py:10
 msgid "Login ip"
 msgstr "ログインIP"
 
-#: audits/models.py:115
+#: audits/models.py:120
 #: authentication/templates/authentication/_msg_different_city.html:11
 #: tickets/models/ticket/login_confirm.py:11
 msgid "Login city"
 msgstr "ログイン都市"
 
-#: audits/models.py:118 audits/serializers.py:60
+#: audits/models.py:123 audits/serializers.py:60
 msgid "User agent"
 msgstr "ユーザーエージェント"
 
-#: audits/models.py:121 audits/serializers.py:44
+#: audits/models.py:126 audits/serializers.py:44
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
 #: users/forms/profile.py:65 users/models/user.py:698
 #: users/serializers/profile.py:126
 msgid "MFA"
 msgstr "MFA"
 
-#: audits/models.py:131
+#: audits/models.py:136
 msgid "Date login"
 msgstr "日付ログイン"
 
-#: audits/models.py:133 audits/serializers.py:62
+#: audits/models.py:138 audits/serializers.py:62
 msgid "Authentication backend"
 msgstr "認証バックエンド"
 
-#: audits/models.py:174
+#: audits/models.py:179
 msgid "User login log"
 msgstr "ユーザーログインログ"
 
 #: audits/serializers.py:61
 msgid "Reason display"
 msgstr "理由表示"
+
+#: audits/serializers.py:120
+msgid "{} used account[{}], login method[{}] login the asset."
+msgstr "{} トムはアカウント[{}]、ログイン方法[{}]を使ってこの資産を登録しました"
+
+#: audits/serializers.py:134
+msgid "User {} {} it."
+msgstr "ユーザー {} はそれを {} しました"
+
+#: audits/serializers.py:148
+msgid "User {} has executed change auth plan for this account.({})"
+msgstr "ユーザー {} はこのアカウントのために改密計画を実行しました。({})"
 
 #: audits/signal_handlers.py:48
 msgid "SSH Key"
@@ -5489,6 +5506,12 @@ msgstr ""
 msgid "Hosts"
 msgstr "ホスト"
 
+#: terminal/models/applet/applet.py:129 terminal/models/applet/host.py:33
+#: terminal/models/applet/host.py:105
+#, fuzzy
+msgid "Hosting"
+msgstr "ホスト"
+
 #: terminal/models/applet/host.py:18 terminal/serializers/applet_host.py:40
 #, fuzzy
 msgid "Deploy options"
@@ -5507,15 +5530,6 @@ msgstr "終了日"
 #, fuzzy
 msgid "Date synced"
 msgstr "日付の同期"
-
-#: terminal/models/applet/host.py:33
-msgid "Applet host"
-msgstr "リモートアプリケーションパブリッシャ"
-
-#: terminal/models/applet/host.py:105
-#, fuzzy
-msgid "Hosting"
-msgstr "ホスト"
 
 #: terminal/models/applet/host.py:106
 msgid "Initial"
@@ -6077,20 +6091,14 @@ msgstr "システムユーザーの適用"
 msgid "Select at least one asset or node"
 msgstr "少なくとも1つのアセットまたはノードを選択します。"
 
-#: tickets/models/ticket/apply_asset.py:14
-#: tickets/serializers/ticket/apply_asset.py:26
-msgid "Apply nodes"
-msgstr "ノードの適用"
-
-#: tickets/models/ticket/apply_asset.py:16
-#: tickets/serializers/ticket/apply_asset.py:22
-msgid "Apply assets"
-msgstr "申請資産"
-
 #: tickets/models/ticket/apply_asset.py:17
 #, fuzzy
 msgid "Apply accounts"
 msgstr "アプリケーションアカウント"
+
+#: tickets/models/ticket/apply_asset.py:26
+msgid "Apply Asset Ticket"
+msgstr "申請資産"
 
 #: tickets/models/ticket/command_confirm.py:9
 msgid "Run user"
@@ -6206,6 +6214,14 @@ msgstr "プロセッサ"
 #: tickets/serializers/ticket/apply_asset.py:16
 msgid "Support fuzzy search, and display up to 10 items"
 msgstr "ファジー検索をサポートし、最大10項目を表示します。"
+
+#: tickets/serializers/ticket/apply_asset.py:22
+msgid "Apply assets"
+msgstr "申請資産"
+
+#: tickets/serializers/ticket/apply_asset.py:26
+msgid "Apply nodes"
+msgstr "ノードの適用"
 
 #: tickets/serializers/ticket/apply_asset.py:28
 msgid "Apply actions"

@@ -30,7 +30,7 @@ class AppletHost(Host):
     LOCKING_ORG = '00000000-0000-0000-0000-000000000004'
 
     class Meta:
-        verbose_name = _("Applet host")
+        verbose_name = _('Hosting')
 
     def __str__(self):
         return self.name
