@@ -312,5 +312,3 @@ def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
                 app_object_name.endswith('Execution'):
             continue
         MODELS_NEED_RECORD.add(app_object_name)
-
-    print(MODELS_NEED_RECORD)
