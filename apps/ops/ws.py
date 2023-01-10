@@ -65,7 +65,7 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer):
                             await self.send_json(
                                 {'event': 'end', 'task': task_id, 'message': ''}
                             )
-                            logger.debug("Task end mark: {}".format(data))
+                            logger.debug("Task log file magic mark found")
                             break
                     await asyncio.sleep(0.2)
         except OSError as e:
