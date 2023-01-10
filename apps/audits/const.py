@@ -5,7 +5,7 @@ from django.db.models import TextChoices, IntegerChoices
 
 DEFAULT_CITY = _("Unknown")
 
-MODELS_NEED_RECORD = []
+MODELS_NEED_RECORD = set()
 
 
 class OperateChoices(TextChoices):
