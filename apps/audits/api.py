@@ -84,6 +84,17 @@ class ResourceActivityAPIView(generics.ListAPIView):
         'GET': 'audits.view_operatelog',
     }
 
+    def get_rbac_perms(self):
+        resource_mapping = {
+            'session': 'terminal.view_session',
+            'operate_log': 'audits.view_operatelog',
+            'auth_change': 'accounts.view_changesecretrecord',
+            'login': 'audits.view_userloginlog',
+        }
+        resource = self.request.query_params.get('resource')
+        perm = resource_mapping.get(resource, 'audits.view_operatelog')
+        return {'GET': perm}
+
     def get_queryset(self):
         resource = self.request.query_params.get('resource')
         resource_id = self.request.query_params.get('resource_id')
