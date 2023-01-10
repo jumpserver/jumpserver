@@ -15,4 +15,9 @@ class Migration(migrations.Migration):
             name='date_last_publish',
             field=models.DateTimeField(null=True, verbose_name='Date last publish'),
         ),
+        migrations.AlterField(
+            model_name='celerytaskexecution',
+            name='name',
+            field=models.CharField(max_length=1024, verbose_name='Name'),
+        ),
     ]

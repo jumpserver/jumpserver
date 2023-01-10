@@ -1,11 +1,11 @@
 import abc
-import base64
-import json
-import locale
-import os
 import subprocess
+import locale
 import sys
 import time
+import os
+import json
+import base64
 from subprocess import CREATE_NO_WINDOW
 
 _blockInput = None
@@ -34,11 +34,6 @@ def unblock_input():
         _blockInput(False)
 
 
-def notify_err_message(msg):
-    if _messageBox:
-        _messageBox(msg, 'Error')
-
-
 def decode_content(content: bytes) -> str:
     for encoding_name in ['utf-8', 'gbk', 'gb2312']:
         try:
@@ -47,6 +42,11 @@ def decode_content(content: bytes) -> str:
             print(e)
     encoding_name = locale.getpreferredencoding()
     return content.decode(encoding_name)
+
+
+def notify_err_message(msg):
+    if _messageBox:
+        _messageBox(msg, 'Error')
 
 
 def check_pid_alive(pid) -> bool:
@@ -60,11 +60,13 @@ def check_pid_alive(pid) -> bool:
         content_list = content.strip().split("\r\n")
         if len(content_list) != 2:
             notify_err_message(content)
+            time.sleep(2)
             return False
         ret_pid = content_list[1].split(",")[1].strip('"')
         return str(pid) == ret_pid
     except Exception as e:
         notify_err_message(e)
+        time.sleep(2)
         return False
 
 
@@ -74,6 +76,7 @@ def wait_pid(pid):
         ok = check_pid_alive(pid)
         if not ok:
             notify_err_message("程序退出")
+            time.sleep(2)
             break
 
 
@@ -93,20 +96,13 @@ class User(DictObj):
     username: str
 
 
-class Step(DictObj):
-    step: int
-    target: str
-    command: str
-    value: str
-
-
 class Specific(DictObj):
     # web
     autofill: str
     username_selector: str
     password_selector: str
     submit_selector: str
-    script: list[Step]
+    script: list
 
     # database
     db_name: str
@@ -148,11 +144,12 @@ class Account(DictObj):
     name: str
     username: str
     secret: str
+    privileged: bool
     secret_type: LabelValue
 
 
 class Platform(DictObj):
-    id: str
+    charset: str
     name: str
     charset: LabelValue
     type: LabelValue

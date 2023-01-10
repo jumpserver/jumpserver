@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
 
-from assets.const import Category
+from assets.const import DatabaseTypes
 from assets.models import Database
 from common.decorator import Singleton
 from common.exceptions import JMSException
@@ -18,11 +18,12 @@ class DBPortManager(object):
     CACHE_KEY = 'PORT_DB_MAPPER'
 
     def __init__(self):
+        oracle_ports = self.oracle_port_range
         try:
-            port_start, port_end = settings.MAGNUS_PORTS.split('-')
+            port_start, port_end = oracle_ports.split('-')
             port_start, port_end = int(port_start), int(port_end)
         except Exception as e:
-            logger.error('MAGNUS_PORTS config error: {}'.format(e))
+            logger.error('MAGNUS_ORACLE_PORTS config error: {}'.format(e))
             port_start, port_end = 30000, 30100
 
         self.port_start, self.port_end = port_start, port_end
@@ -30,28 +31,31 @@ class DBPortManager(object):
         self.all_avail_ports = list(range(self.port_start, self.port_end + 1))
 
     @property
-    def magnus_listen_port_range(self):
-        return settings.MAGNUS_PORTS
+    def oracle_port_range(self):
+        oracle_ports = settings.MAGNUS_ORACLE_PORTS
+        if not oracle_ports and settings.MAGNUS_PORTS:
+            oracle_ports = settings.MAGNUS_PORTS
+        return oracle_ports
 
     @staticmethod
     def fetch_dbs():
         with tmp_to_root_org():
-            dbs = Database.objects.filter(platform__category=Category.DATABASE).order_by('id')
+            dbs = Database.objects.filter(platform__type=DatabaseTypes.ORACLE).order_by('id')
             return dbs
 
     def check(self):
         dbs = self.fetch_dbs()
-        db_ids_to_add = []
-        for db in dbs:
-            port = self.get_port_by_db(db, raise_exception=False)
-            if not port:
-                db_ids_to_add.append(db.id)
+        mapper = self.get_mapper()
+        db_ids = [str(db.id) for db in dbs]
+        db_ids_to_add = list(set(db_ids) - set(mapper.values()))
         self.bulk_add(db_ids_to_add)
 
-        mapper = self.get_mapper()
-        used_db = [i for i in mapper.values()]
-        db_ids_to_pop = [str(db.id) for db in dbs if str(db.id) not in used_db]
+        db_ids_to_pop = set(mapper.values()) | set(db_ids_to_add) - set(db_ids)
         self.bulk_pop(db_ids_to_pop)
+
+        if settings.DEBUG:
+            mapper = self.get_mapper()
+            logger.debug("Oracle listen ports: {}".format(len(mapper.keys())))
 
     def init(self):
         dbs = self.fetch_dbs()

@@ -112,4 +112,14 @@ class Migration(migrations.Migration):
             field=models.ManyToManyField(through='terminal.AppletPublication', to='terminal.AppletHost',
                                          verbose_name='Hosts'),
         ),
+        migrations.AlterField(
+            model_name='appletpublication',
+            name='applet',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='publications', to='terminal.applet', verbose_name='Applet'),
+        ),
+        migrations.AlterField(
+            model_name='appletpublication',
+            name='host',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='publications', to='terminal.applethost', verbose_name='Host'),
+        ),
     ]
