@@ -1,9 +1,9 @@
 import os
 import yaml
 import shutil
-from collections import defaultdict
 from hashlib import md5
 from socket import gethostname
+from collections import defaultdict
 
 from django.conf import settings
 from django.utils import timezone

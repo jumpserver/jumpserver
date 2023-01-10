@@ -10,6 +10,7 @@ class Connectivity(TextChoices):
 
 class AutomationTypes(TextChoices):
     ping = 'ping', _('Ping')
+    ping_gateway = 'ping_gateway', _('Ping gateway')
     gather_facts = 'gather_facts', _('Gather facts')
 
     @classmethod
