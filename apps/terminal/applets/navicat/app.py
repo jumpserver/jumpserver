@@ -20,8 +20,8 @@ class AppletApplication(BaseApplication):
         self.path = _default_path
         self.username = self.account.username
         self.password = self.account.secret
-        self.host = self.account.address
         self.privileged = self.account.privileged
+        self.host = self.asset.address
         self.port = self.asset.get_protocol_port(self.protocol)
         self.db = self.asset.specific.db_name
         self.name = '%s-%s' % (self.host, self.db)
