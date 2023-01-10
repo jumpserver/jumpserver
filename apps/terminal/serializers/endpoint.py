@@ -33,14 +33,6 @@ class EndpointSerializer(BulkModelSerializer):
         ]
         extra_kwargs = {
             'host': {'help_text': 'Visit IP/host, if empty, use the current request instead'},
-            'ssh_port': {'default': 2222},
-            'rdp_port': {'default': 3389},
-            'http_port': {'default': 0},
-            'https_port': {'default': 0},
-            'mysql_port': {'default': 33061},
-            'mariadb_port': {'default': 33062},
-            'postgresql_port': {'default': 54320},
-            'redis_port': {'default': 63790},
         }
 
     def get_oracle_port(self, obj: Endpoint):
@@ -48,6 +40,14 @@ class EndpointSerializer(BulkModelSerializer):
         if not view or view.action not in ['smart']:
             return 0
         return obj.get_port(view.target_instance, view.target_protocol)
+
+    def get_extra_kwargs(self):
+        extra_kwargs = super().get_extra_kwargs()
+        model_fields = self.Meta.model._meta.fields
+        for field in model_fields:
+            if field.name.endswith('_port'):
+                extra_kwargs[field.name]['default'] = field.default
+        return extra_kwargs
 
 
 class EndpointRuleSerializer(BulkModelSerializer):
