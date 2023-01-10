@@ -70,6 +70,7 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer):
                         await self.send_json(
                             {'event': 'end', 'task': task_id, 'message': ''}
                         )
+                        task_end_mark = []
                     await asyncio.sleep(0.2)
         except OSError as e:
             logger.warn('Task log path open failed: {}'.format(e))
