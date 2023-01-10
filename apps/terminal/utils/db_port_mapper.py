@@ -48,13 +48,13 @@ class DBPortManager(object):
         mapper = self.get_mapper()
         db_ids = [str(db.id) for db in dbs]
         db_ids_to_add = list(set(db_ids) - set(mapper.values()))
-        self.bulk_add(db_ids_to_add)
+        mapper = self.bulk_add(db_ids_to_add, mapper, commit=False)
 
-        db_ids_to_pop = set(mapper.values()) | set(db_ids_to_add) - set(db_ids)
-        self.bulk_pop(db_ids_to_pop)
+        db_ids_to_pop = set(mapper.values()) - set(db_ids)
+        mapper = self.bulk_pop(db_ids_to_pop, mapper, commit=False)
+        self.set_mapper(mapper)
 
         if settings.DEBUG:
-            mapper = self.get_mapper()
             logger.debug("Oracle listen ports: {}".format(len(mapper.keys())))
 
     def init(self):
@@ -64,31 +64,18 @@ class DBPortManager(object):
         mapper = dict(zip(self.all_avail_ports, list(db_ids)))
         self.set_mapper(mapper)
 
-    def add(self, db: Database):
-        mapper = self.get_mapper()
-        avail_port = self.get_next_avail_port()
-        mapper.update({avail_port: str(db.id)})
-        self.set_mapper(mapper)
-        return True
-
-    def pop(self, db: Database):
-        mapper = self.get_mapper()
-        to_delete_port = self.get_port_by_db(db, raise_exception=False)
-        mapper.pop(to_delete_port, None)
-        self.set_mapper(mapper)
-
-    def bulk_add(self, db_ids):
-        mapper = self.get_mapper()
+    def bulk_add(self, db_ids, mapper, commit=True):
         for db_id in db_ids:
             avail_port = self.get_next_avail_port(mapper)
             mapper[avail_port] = str(db_id)
-        self.set_mapper(mapper)
-        return True
 
-    def bulk_pop(self, db_ids):
-        mapper = self.get_mapper()
+        if commit:
+            self.set_mapper(mapper)
+        return mapper
+
+    def bulk_pop(self, db_ids, mapper, commit=True):
         new_mapper = {port: str(db_id) for port, db_id in mapper.items() if db_id not in db_ids}
-        self.set_mapper(new_mapper)
+        return new_mapper
 
     def get_port_by_db(self, db, raise_exception=True):
         mapper = self.get_mapper()

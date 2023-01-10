@@ -2,6 +2,7 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
 from assets.models import Asset
+from common.decorator import on_transaction_commit
 from common.signals import django_ready
 from common.utils import get_logger
 from ..utils import db_port_manager
@@ -11,7 +12,7 @@ logger = get_logger(__file__)
 
 @receiver(django_ready)
 def check_db_port_mapper(sender, **kwargs):
-    logger.info('Init db port mapper')
+    logger.info('Check oracle ports')
     try:
         db_port_manager.check()
     except Exception as e:
@@ -19,18 +20,20 @@ def check_db_port_mapper(sender, **kwargs):
 
 
 @receiver(post_save, sender=Asset)
+@on_transaction_commit
 def on_db_created(sender, instance: Asset, created, **kwargs):
-    print("Asset create: ", instance)
-    if not instance.category != 'database':
+    if instance.type != 'oracle':
         return
     if not created:
         return
-    db_port_manager.add(instance)
+    logger.info("Oracle create signal recv: {} {}".format(instance, instance.type))
+    db_port_manager.check()
 
 
 @receiver(post_delete, sender=Asset)
+@on_transaction_commit
 def on_db_delete(sender, instance, **kwargs):
-    print("Asset delete: ", instance)
-    if not instance.category != 'database':
+    if instance.type != 'oracle':
         return
-    db_port_manager.pop(instance)
+    logger.info("Oracle delete signal recv: {}".format(instance))
+    db_port_manager.check()
