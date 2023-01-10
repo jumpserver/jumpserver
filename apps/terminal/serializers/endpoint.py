@@ -33,6 +33,14 @@ class EndpointSerializer(BulkModelSerializer):
         ]
         extra_kwargs = {
             'host': {'help_text': 'Visit IP/host, if empty, use the current request instead'},
+            'ssh_port': {'default': 2222},
+            'rdp_port': {'default': 3389},
+            'http_port': {'default': 0},
+            'https_port': {'default': 0},
+            'mysql_port': {'default': 33061},
+            'mariadb_port': {'default': 33062},
+            'postgresql_port': {'default': 54320},
+            'redis_port': {'default': 63790},
         }
 
     def get_oracle_port(self, obj: Endpoint):
