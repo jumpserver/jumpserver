@@ -46,7 +46,9 @@ class EndpointSerializer(BulkModelSerializer):
         model_fields = self.Meta.model._meta.fields
         for field in model_fields:
             if field.name.endswith('_port'):
-                extra_kwargs[field.name]['default'] = field.default
+                kwargs = extra_kwargs.get(field.name, {})
+                kwargs = {'default': field.default, **kwargs}
+                extra_kwargs[field.name] = kwargs
         return extra_kwargs
 
 
