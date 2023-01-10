@@ -8,9 +8,9 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 
-from ..base import (Asset, User, Account, Platform)
-from ..base import (BaseApplication)
-from ..base import (notify_err_message, block_input, unblock_input)
+from common import (Asset, User, Account, Platform)
+from common import (BaseApplication)
+from common import (notify_err_message, block_input, unblock_input)
 
 
 class Command(Enum):

@@ -8,7 +8,7 @@ if sys.platform == 'win32':
     from pywinauto.controls.uia_controls import (
         EditWrapper, ComboBoxWrapper
     )
-from ..base import wait_pid, BaseApplication
+from common import wait_pid, BaseApplication
 
 
 _default_path = r'C:\Program Files\PremiumSoft\Navicat Premium 16\navicat.exe'

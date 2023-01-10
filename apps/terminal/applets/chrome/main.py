@@ -1,7 +1,7 @@
 import sys
 
-from ..base import (block_input, unblock_input)
-from ..base import convert_base64_to_dict
+from common import (block_input, unblock_input)
+from common import convert_base64_to_dict
 from app import AppletApplication
 
 
