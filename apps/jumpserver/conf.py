@@ -505,8 +505,8 @@ class Config(dict):
         'GMSSL_ENABLED': False,
         # 操作日志变更字段的存储ES配置
         'OPERATE_LOG_ELASTICSEARCH_CONFIG': {},
-        # Magnus 组件需要监听的端口范围
-        'MAGNUS_PORTS': '30000-30100',
+        # Magnus 组件需要监听的 Oracle 端口范围
+        'MAGNUS_ORACLE_PORTS': '30000-30100',
 
         # 记录清理清理
         'LOGIN_LOG_KEEP_DAYS': 200,
@@ -835,11 +835,13 @@ class ConfigManager:
         sys.path.insert(0, PROJECT_DIR)
         try:
             from config import config as c
+        except ImportError:
+            return False
+        if c:
             self.from_object(c)
             return True
-        except ImportError:
-            pass
-        return False
+        else:
+            return False
 
     def load_from_yml(self):
         for i in ['config.yml', 'config.yaml']:

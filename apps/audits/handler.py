@@ -81,7 +81,7 @@ class OperatorLogHandler(metaclass=Singleton):
 
     def get_instance_dict_from_cache(self, instance_id):
         if instance_id is None:
-            return None
+            return None, None
 
         key = '%s_%s' % (self.CACHE_KEY, instance_id)
         cache_instance = cache.get(key, {})
@@ -167,7 +167,7 @@ class OperatorLogHandler(metaclass=Singleton):
             'id': log_id, "user": str(user), 'action': action,
             'resource_type': str(resource_type), 'resource': resource_display,
             'remote_addr': remote_addr, 'before': before, 'after': after,
-            'org_id': get_current_org_id(),
+            'org_id': get_current_org_id(), 'resource_id': str(resource.id)
         }
         with transaction.atomic():
             if self.log_client.ping(timeout=1):

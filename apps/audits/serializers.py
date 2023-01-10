@@ -22,6 +22,7 @@ class JobAuditLogSerializer(JobExecutionSerializer):
             "id", "material", "time_cost", 'date_start',
             'date_finished', 'date_created',
             'is_finished', 'is_success', 'created_by',
+            'task_id'
         ]
         fields = read_only_fields + []
 
@@ -94,3 +95,59 @@ class SessionAuditSerializer(serializers.ModelSerializer):
     class Meta:
         model = Session
         fields = "__all__"
+
+
+class BaseActivitiesSerializer(serializers.Serializer):
+    timestamp = serializers.SerializerMethodField()
+    content = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_timestamp(obj):
+        raise NotImplementedError()
+
+    @staticmethod
+    def get_content(obj):
+        raise NotImplementedError()
+
+
+class ActivitiesSessionSerializer(BaseActivitiesSerializer):
+    @staticmethod
+    def get_timestamp(obj):
+        return obj.date_start.strftime('%Y-%m-%d %H:%M:%S')
+
+    @staticmethod
+    def get_content(obj):
+        ctn = _(
+            '{} used account[{}], login method[{}] login the asset.'
+        ).format(
+            obj.user, obj.account, obj.login_from_display
+        )
+        return ctn
+
+
+class ActivitiesOperatorLogSerializer(BaseActivitiesSerializer):
+    @staticmethod
+    def get_timestamp(obj):
+        return obj.datetime.strftime('%Y-%m-%d %H:%M:%S')
+
+    @staticmethod
+    def get_content(obj):
+        ctn = _('User {} {} it.').format(
+            obj.user, _(obj.action.title())
+        )
+        return ctn
+
+
+class ActivitiesAuthChangeSerializer(BaseActivitiesSerializer):
+    @staticmethod
+    def get_timestamp(obj):
+        return obj.date_created.strftime('%Y-%m-%d %H:%M:%S')
+
+    @staticmethod
+    def get_content(obj):
+        ctn = _(
+            'User {} has executed change auth plan for this account.({})'
+        ).format(
+            obj.created_by, _(obj.status.title())
+        )
+        return ctn

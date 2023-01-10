@@ -3,7 +3,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from assets.models import Asset
-from common.db.fields import PortField, PortRangeField
+from common.db.fields import PortField
 from common.db.models import JMSBaseModel
 from common.utils.ip import contains_ip
 
@@ -16,11 +16,10 @@ class Endpoint(JMSBaseModel):
     http_port = PortField(default=80, verbose_name=_('HTTP port'))
     ssh_port = PortField(default=2222, verbose_name=_('SSH port'))
     rdp_port = PortField(default=3389, verbose_name=_('RDP port'))
-    mysql_port = PortField(default=33060, verbose_name=_('MySQL port'))
-    mariadb_port = PortField(default=33061, verbose_name=_('MariaDB port'))
+    mysql_port = PortField(default=33061, verbose_name=_('MySQL port'))
+    mariadb_port = PortField(default=33062, verbose_name=_('MariaDB port'))
     postgresql_port = PortField(default=54320, verbose_name=_('PostgreSQL port'))
     redis_port = PortField(default=63790, verbose_name=_('Redis port'))
-    oracle_port_range = PortRangeField(default='1-65535', verbose_name=_('Oracle port range'))
 
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
@@ -35,13 +34,12 @@ class Endpoint(JMSBaseModel):
 
     def get_port(self, target_instance, protocol):
         from terminal.utils import db_port_manager
-        if protocol in ['https', 'http', 'ssh', 'rdp']:
-            port = getattr(self, f'{protocol}_port', 0)
-        elif isinstance(target_instance, Asset) and \
-                target_instance.is_category(target_instance.Category.DATABASE):
+        from assets.const import DatabaseTypes
+        if isinstance(target_instance, Asset) and \
+                target_instance.is_type(DatabaseTypes.ORACLE):
             port = db_port_manager.get_port_by_db(target_instance)
         else:
-            port = 0
+            port = getattr(self, f'{protocol}_port', 0)
         return port
 
     def is_default(self):

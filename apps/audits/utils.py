@@ -56,33 +56,56 @@ def get_resource_display(resource):
     return resource_display
 
 
+def _get_instance_field_value(
+        instance, include_model_fields,
+        model_need_continue_fields, exclude_fields=None
+):
+    data = {}
+    opts = getattr(instance, '_meta', None)
+    if opts is not None:
+        for f in chain(opts.concrete_fields, opts.private_fields):
+            if not include_model_fields and not getattr(f, 'primary_key', False):
+                continue
+
+            if isinstance(f, (models.FileField, models.ImageField)):
+                continue
+
+            if getattr(f, 'attname', None) in model_need_continue_fields:
+                continue
+
+            value = getattr(instance, f.name) or getattr(instance, f.attname)
+            if not isinstance(value, bool) and not value:
+                continue
+
+            if getattr(f, 'primary_key', False):
+                f.verbose_name = 'id'
+            elif isinstance(value, list):
+                value = [str(v) for v in value]
+            elif isinstance(f, models.OneToOneField) and isinstance(value, models.Model):
+                nested_data = _get_instance_field_value(
+                    value, include_model_fields, model_need_continue_fields, ('id',)
+                )
+                for k, v in nested_data.items():
+                    if exclude_fields and k in exclude_fields:
+                        continue
+                    data.setdefault(k, v)
+                continue
+            data.setdefault(str(f.verbose_name), value)
+    return data
+
+
 def model_to_dict_for_operate_log(
         instance, include_model_fields=True, include_related_fields=True
 ):
     model_need_continue_fields = ['date_updated']
     m2m_need_continue_fields = ['history_passwords']
-    opts = instance._meta
-    data = {}
-    for f in chain(opts.concrete_fields, opts.private_fields):
-        if isinstance(f, (models.FileField, models.ImageField)):
-            continue
 
-        if getattr(f, 'attname', None) in model_need_continue_fields:
-            continue
-
-        value = getattr(instance, f.name) or getattr(instance, f.attname)
-        if not isinstance(value, bool) and not value:
-            continue
-
-        if getattr(f, 'primary_key', False):
-            f.verbose_name = 'id'
-        elif isinstance(value, list):
-            value = [str(v) for v in value]
-
-        if include_model_fields or getattr(f, 'primary_key', False):
-            data[str(f.verbose_name)] = value
+    data = _get_instance_field_value(
+        instance, include_model_fields, model_need_continue_fields
+    )
 
     if include_related_fields:
+        opts = instance._meta
         for f in chain(opts.many_to_many, opts.related_objects):
             value = []
             if instance.pk is not None:
@@ -97,7 +120,7 @@ def model_to_dict_for_operate_log(
                 continue
             try:
                 field_key = getattr(f, 'verbose_name', None) or f.related_model._meta.verbose_name
-                data[str(field_key)] = value
+                data.setdefault(str(field_key), value)
             except:
                 pass
     return data
