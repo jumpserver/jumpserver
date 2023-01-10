@@ -3,8 +3,8 @@ from celery import shared_task
 from django.utils.translation import gettext_noop, gettext_lazy as _
 
 from common.utils import get_logger
-from assets.const import AutomationTypes
-from orgs.utils import org_aware_func, tmp_to_root_org
+from assets.const import AutomationTypes, GATEWAY_NAME
+from orgs.utils import org_aware_func
 
 from .common import automation_execute_start
 
@@ -17,6 +17,15 @@ __all__ = [
 ]
 
 
+def test_connectivity_util(assets, tp, task_name=None):
+    if not assets:
+        return
+    child_snapshot = {
+        'assets': [str(asset.id) for asset in assets],
+    }
+    automation_execute_start(task_name, tp, child_snapshot)
+
+
 @org_aware_func('assets')
 def test_asset_connectivity_util(assets, task_name=None):
     from assets.models import PingAutomation
@@ -24,14 +33,15 @@ def test_asset_connectivity_util(assets, task_name=None):
         task_name = gettext_noop("Test assets connectivity ")
 
     task_name = PingAutomation.generate_unique_name(task_name)
-    tp = AutomationTypes.ping
-    child_snapshot = {
-        'assets': [str(asset.id) for asset in assets],
-    }
-    automation_execute_start(task_name, tp, child_snapshot)
+
+    gateway_assets = assets.filter(platform__name=GATEWAY_NAME)
+    test_connectivity_util(gateway_assets, AutomationTypes.ping_gateway, task_name)
+
+    non_gateway_assets = assets.exclude(platform__name=GATEWAY_NAME)
+    test_connectivity_util(non_gateway_assets, AutomationTypes.ping, task_name)
 
 
-@shared_task(queue="ansible", verbose_name=_('Manually test the connectivity of a  asset'))
+@shared_task(queue="ansible", verbose_name=_('Manually test the connectivity of a asset'))
 def test_assets_connectivity_manual(asset_ids):
     from assets.models import Asset
     assets = Asset.objects.filter(id__in=asset_ids)

@@ -1,11 +1,13 @@
-from .gather_facts.manager import GatherFactsManager
 from .ping.manager import PingManager
+from .ping_gateway.manager import PingGatewayManager
+from .gather_facts.manager import GatherFactsManager
 from ..const import AutomationTypes
 
 
 class ExecutionManager:
     manager_type_mapper = {
         AutomationTypes.ping: PingManager,
+        AutomationTypes.ping_gateway: PingGatewayManager,
         AutomationTypes.gather_facts: GatherFactsManager,
     }
 
