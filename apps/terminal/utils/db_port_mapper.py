@@ -48,10 +48,10 @@ class DBPortManager(object):
         mapper = self.get_mapper()
         db_ids = [str(db.id) for db in dbs]
         db_ids_to_add = list(set(db_ids) - set(mapper.values()))
-        mapper = self.bulk_add(db_ids_to_add, mapper, commit=False)
+        mapper = self.bulk_add(db_ids_to_add, mapper)
 
         db_ids_to_pop = set(mapper.values()) - set(db_ids)
-        mapper = self.bulk_pop(db_ids_to_pop, mapper, commit=False)
+        mapper = self.bulk_pop(db_ids_to_pop, mapper)
         self.set_mapper(mapper)
 
         if settings.DEBUG:
@@ -64,16 +64,13 @@ class DBPortManager(object):
         mapper = dict(zip(self.all_avail_ports, list(db_ids)))
         self.set_mapper(mapper)
 
-    def bulk_add(self, db_ids, mapper, commit=True):
+    def bulk_add(self, db_ids, mapper):
         for db_id in db_ids:
             avail_port = self.get_next_avail_port(mapper)
             mapper[avail_port] = str(db_id)
-
-        if commit:
-            self.set_mapper(mapper)
         return mapper
 
-    def bulk_pop(self, db_ids, mapper, commit=True):
+    def bulk_pop(self, db_ids, mapper):
         new_mapper = {port: str(db_id) for port, db_id in mapper.items() if db_id not in db_ids}
         return new_mapper
 
