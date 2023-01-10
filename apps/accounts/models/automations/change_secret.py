@@ -43,7 +43,7 @@ class ChangeSecretMixin(models.Model):
         return attr_json
 
 
-class ChangeSecretAutomation(AccountBaseAutomation, ChangeSecretMixin):
+class ChangeSecretAutomation(ChangeSecretMixin, AccountBaseAutomation):
     recipients = models.ManyToManyField('users.User', verbose_name=_("Recipient"), blank=True)
 
     def save(self, *args, **kwargs):

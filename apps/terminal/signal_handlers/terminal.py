@@ -2,6 +2,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.functional import LazyObject
 
+from common.decorator import on_transaction_commit
 from common.utils import get_logger
 from common.utils.connection import RedisPubSub
 from ..models import Task
@@ -21,6 +22,7 @@ component_event_chan = ComponentEventChan()
 
 
 @receiver(post_save, sender=Task)
+@on_transaction_commit
 def on_task_created(sender, instance: Task, created, **kwargs):
     if not created:
         return

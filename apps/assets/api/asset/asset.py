@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-
 import django_filters
 from rest_framework.decorators import action
 from rest_framework.response import Response

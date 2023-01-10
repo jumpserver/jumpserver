@@ -2,6 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from assets.models import Node
+from perms.utils.user_perm import UserPermAssetUtil
 from common.serializers.fields import ReadableHiddenField
 from ops.mixin import PeriodTaskSerializerMixin
 from ops.models import Job, JobExecution
@@ -14,13 +15,20 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
     nodes = serializers.ListField(required=False, child=serializers.CharField())
     date_last_run = serializers.DateTimeField(label=_('Date last run'), read_only=True)
 
+    def get_request_user(self):
+        request = self.context.get('request')
+        user = request.user if request else None
+        return user
+
     def create(self, validated_data):
         assets = validated_data.__getitem__('assets')
         node_ids = validated_data.pop('nodes', None)
         if node_ids:
-            nodes = Node.objects.filter(id__in=node_ids)
-            assets.extend(
-                Node.get_nodes_all_assets(*nodes).exclude(id__in=[asset.id for asset in assets]))
+            user = self.get_request_user()
+            perm_util = UserPermAssetUtil(user=user)
+            for node_id in node_ids:
+                node, node_assets = perm_util.get_node_all_assets(node_id)
+                assets.extend(node_assets.exclude(id__in=[asset.id for asset in assets]))
         return super().create(validated_data)
 
     class Meta:

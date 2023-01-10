@@ -22,6 +22,7 @@ class JobAuditLogSerializer(JobExecutionSerializer):
             "id", "material", "time_cost", 'date_start',
             'date_finished', 'date_created',
             'is_finished', 'is_success', 'created_by',
+            'task_id'
         ]
         fields = read_only_fields + []
 

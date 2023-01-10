@@ -135,6 +135,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
             'id', 'value', 'user', 'asset', 'account',
             'platform', 'command_filter_acls', 'protocol',
             'domain', 'gateway', 'actions', 'expire_at',
+            'from_ticket',
             'expire_now', 'connect_method',
         ]
         extra_kwargs = {
