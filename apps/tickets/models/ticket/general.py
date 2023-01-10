@@ -14,6 +14,7 @@ from common.db.encoder import ModelJSONFieldEncoder
 from common.db.models import JMSBaseModel
 from common.exceptions import JMSException
 from common.utils.timezone import as_current_tz
+from common.utils import reverse
 from orgs.models import Organization
 from orgs.utils import tmp_to_org
 from tickets.const import (
@@ -250,9 +251,8 @@ class StatusMixin:
 
     @property
     def processor(self):
-        processor = self.current_step.ticket_assignees \
-            .exclude(state=StepState.pending).first()
-        return processor.assignee if processor else None
+        """ 返回最后一步的处理人 """
+        return self.current_step.processor
 
     def has_current_assignee(self, assignee):
         return self.ticket_steps.filter(
@@ -417,6 +417,39 @@ class Ticket(StatusMixin, JMSBaseModel):
             value = self.get_field_display(name, field, data)
             snapshot[field.verbose_name] = value
         return snapshot
+
+    def get_extra_info_of_review(self, user=None):
+        if user and user.is_service_account:
+            url_ticket_status = reverse(
+                view_name='api-tickets:super-ticket-status', kwargs={'pk': str(self.id)}
+            )
+            check_ticket_api = {'method': 'GET', 'url': url_ticket_status}
+            close_ticket_api = {'method': 'DELETE', 'url': url_ticket_status}
+        else:
+            url_ticket_status = reverse(
+                view_name='api-tickets:ticket-detail', kwargs={'pk': str(self.id)}
+            )
+            url_ticket_close = reverse(
+                view_name='api-tickets:ticket-close', kwargs={'pk': str(self.id)}
+            )
+            check_ticket_api = {'method': 'GET', 'url': url_ticket_status}
+            close_ticket_api = {'method': 'PUT', 'url': url_ticket_close}
+
+        url_ticket_detail_external = reverse(
+            view_name='api-tickets:ticket-detail',
+            kwargs={'pk': str(self.id)},
+            external=True,
+            api_to_ui=True
+        )
+        ticket_assignees = self.current_step.ticket_assignees.all()
+        return {
+            'check_ticket_api': check_ticket_api,
+            'close_ticket_api': close_ticket_api,
+            'ticket_detail_page_url': '{url}?type={type}'.format(
+                url=url_ticket_detail_external, type=self.type
+            ),
+            'assignees': [str(ticket_assignee.assignee) for ticket_assignee in ticket_assignees]
+        }
 
 
 class SuperTicket(Ticket):

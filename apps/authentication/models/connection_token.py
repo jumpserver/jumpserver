@@ -11,7 +11,7 @@ from rest_framework.exceptions import PermissionDenied
 
 from assets.const import Protocol
 from common.db.fields import EncryptCharField
-from common.utils import lazyproperty, pretty_string, bulk_get
+from common.utils import lazyproperty, pretty_string, bulk_get, reverse
 from common.utils.timezone import as_current_tz
 from orgs.mixins.models import JMSOrgBaseModel
 from terminal.models import Applet
