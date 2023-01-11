@@ -45,6 +45,7 @@ class PlatformAutomation(models.Model):
     gather_facts_enabled = models.BooleanField(default=False, verbose_name=_("Gather facts enabled"))
     gather_facts_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Gather facts method"))
     change_secret_enabled = models.BooleanField(default=False, verbose_name=_("Change password enabled"))
+    push_account_enabled = models.BooleanField(default=False, verbose_name=_("Push account enabled"))
     change_secret_method = models.TextField(
         max_length=32, blank=True, null=True, verbose_name=_("Change password method"))
     verify_account_enabled = models.BooleanField(default=False, verbose_name=_("Verify account enabled"))
