@@ -94,7 +94,7 @@ RELATED_NODE_IDS = '_related_node_ids'
 
 @receiver(pre_delete, sender=Asset)
 def on_asset_delete(instance: Asset, using, **kwargs):
-    print("Asset pre delete signal recv: {}".format(instance))
+    logger.debug("Asset pre delete signal recv: {}".format(instance))
     node_ids = set(Node.objects.filter(
         assets=instance
     ).distinct().values_list('id', flat=True))
@@ -107,7 +107,7 @@ def on_asset_delete(instance: Asset, using, **kwargs):
 
 @receiver(post_delete, sender=Asset)
 def on_asset_post_delete(instance: Asset, using, **kwargs):
-    print("Asset delete signal recv: {}".format(instance))
+    logger.debug("Asset delete signal recv: {}".format(instance))
     node_ids = getattr(instance, RELATED_NODE_IDS, None)
     if node_ids:
         m2m_changed.send(
@@ -116,7 +116,7 @@ def on_asset_post_delete(instance: Asset, using, **kwargs):
         )
 
 
-def resend_to_asset_signals(sender, signal=None, **kwargs):
+def resend_to_asset_signals(sender, signal, **kwargs):
     signal.send(sender=Asset, **kwargs)
 
 
