@@ -30,6 +30,7 @@ class WebMethod(TextChoices):
             Protocol.sqlserver: [cls.web_cli, cls.web_gui],
             Protocol.redis: [cls.web_cli],
             Protocol.mongodb: [cls.web_cli],
+            Protocol.clickhouse: [cls.web_cli],
 
             Protocol.k8s: [cls.web_cli],
             Protocol.http: []
