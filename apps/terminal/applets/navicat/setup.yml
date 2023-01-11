@@ -1,4 +1,4 @@
-type: exe # exe, zip, manual
+type: manual # exe, zip, manual
 # 从这里下载的: https://www.navicat.com.cn/download/direct-download?product=navicat_premium_en_x64.exe
 source: https://jms-pkg.oss-cn-beijing.aliyuncs.com/windows-pkgs/navicat161_premium_en_x64.exe
 destination: C:\Program Files\PremiumSoft\Navicat Premium 16
