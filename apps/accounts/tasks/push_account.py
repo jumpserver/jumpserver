@@ -2,7 +2,7 @@ from celery import shared_task
 from django.utils.translation import gettext_noop, ugettext_lazy as _
 
 from common.utils import get_logger
-from orgs.utils import org_aware_func, tmp_to_root_org
+from orgs.utils import org_aware_func
 from accounts.const import AutomationTypes
 from accounts.tasks.common import automation_execute_start
 
@@ -12,19 +12,25 @@ __all__ = [
 ]
 
 
+def push_util(account, assets, task_name):
+    child_snapshot = {
+        'secret': account.secret,
+        'secret_type': account.secret_type,
+        'accounts': [account.username],
+        'assets': [str(asset.id) for asset in assets],
+    }
+    tp = AutomationTypes.push_account
+    automation_execute_start(task_name, tp, child_snapshot)
+
+
 @org_aware_func("assets")
 def push_accounts_to_assets_util(accounts, assets):
     from accounts.models import PushAccountAutomation
 
     task_name = gettext_noop("Push accounts to assets")
     task_name = PushAccountAutomation.generate_unique_name(task_name)
-
-    child_snapshot = {
-        'assets': [str(asset.id) for asset in assets],
-        'accounts': list(accounts.values_list('username', flat=True)),
-    }
-    tp = AutomationTypes.verify_account
-    automation_execute_start(task_name, tp, child_snapshot)
+    for account in accounts:
+        push_util(account, assets, task_name)
 
 
 @shared_task(queue="ansible", verbose_name=_('Push accounts to assets'))
