@@ -1,13 +1,8 @@
-from collections import defaultdict
-
 from django.db.models import QuerySet
 
 from common.utils import get_logger
-from perms.utils import AssetPermissionUtil
-from accounts.utils import SecretGenerator
-from accounts.serializers import TriggerChoice
-from accounts.const import AutomationTypes, SecretStrategy
-from accounts.models import PushAccountAutomation, Account
+from accounts.const import AutomationTypes
+from accounts.models import Account
 from ..base.manager import PushOrVerifyHostCallbackMixin, AccountBasePlaybookManager
 
 logger = get_logger(__name__)
@@ -50,8 +45,8 @@ class PushAccountManager(PushOrVerifyHostCallbackMixin, AccountBasePlaybookManag
 
         asset = privilege_account.asset
         self.create_nonlocal_accounts(accounts, snapshot_account_usernames, asset)
-        accounts = asset.accounts.exclude(
-            username=privilege_account.username, secret_type=self.secret_type
+        accounts = asset.accounts.exclude(username=privilege_account.username).filter(
+            username__in=snapshot_account_usernames, secret_type=self.secret_type
         )
         return accounts
 
