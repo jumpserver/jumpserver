@@ -28,6 +28,11 @@ class AllTypes(ChoicesMixin):
         return choices
 
     @classmethod
+    def filter_choices(cls, category):
+        choices = dict(cls.category_types()).get(category, cls).choices
+        return choices() if callable(choices) else choices
+
+    @classmethod
     def get_constraints(cls, category, tp):
         types_cls = dict(cls.category_types()).get(category)
         if not types_cls:
