@@ -19,6 +19,9 @@ class AccountFilterSet(BaseFilterSet):
     nodes = drf_filters.CharFilter(method='filter_nodes')
     node_id = drf_filters.CharFilter(method='filter_nodes')
     has_secret = drf_filters.BooleanFilter(method='filter_has_secret')
+    platform = drf_filters.CharFilter(field_name='asset__platform__id', lookup_expr='exact')
+    category = drf_filters.CharFilter(field_name='asset__platform__category', lookup_expr='exact')
+    type = drf_filters.CharFilter(field_name='asset__platform__type', lookup_expr='exact')
 
     @staticmethod
     def filter_has_secret(queryset, name, has_secret):
