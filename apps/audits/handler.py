@@ -185,6 +185,7 @@ class OperatorLogHandler(metaclass=Singleton):
         param_func = getattr(self, '_get_%s_params' % object_name, None)
         if param_func is not None:
             params = param_func(resource, data=data)
+            data['is_activity'] = True
             data.update(params)
         return data
 
