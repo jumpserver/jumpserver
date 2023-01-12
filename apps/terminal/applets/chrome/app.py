@@ -201,6 +201,7 @@ class AppletApplication(BaseApplication):
     def close(self):
         if self.driver:
             try:
-                self.driver.close()
+                # quit 退出全部打开的窗口
+                self.driver.quit()
             except Exception as e:
                 print(e)
