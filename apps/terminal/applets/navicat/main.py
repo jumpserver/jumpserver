@@ -13,7 +13,6 @@ def main():
     applet_app.run()
     unblock_input()
     applet_app.wait()
-    applet_app.clean_up()
 
 
 if __name__ == '__main__':

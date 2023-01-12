@@ -194,4 +194,9 @@ class AppletApplication(BaseApplication):
         self.app = app
 
     def wait(self):
-        wait_pid(self.pid)
+        try:
+            wait_pid(self.pid)
+        except Exception:
+            pass
+        finally:
+            self.clean_up()
