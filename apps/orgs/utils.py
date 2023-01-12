@@ -48,6 +48,10 @@ def set_to_root_org():
     set_current_org(Organization.root())
 
 
+def set_to_system_org():
+    set_current_org(Organization.system())
+
+
 def _find(attr):
     return getattr(thread_local, attr, None)
 
@@ -114,6 +118,7 @@ def filter_org_queryset(queryset):
     else:
         kwargs = {'org_id': org.id}
 
+    # import traceback
     # lines = traceback.format_stack()
     # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     # for line in lines[-10:-1]:
