@@ -4,6 +4,7 @@ from django.db import transaction
 from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
 
+from users.models import User
 from common.utils import get_request_ip, get_logger
 from common.utils.timezone import as_current_tz
 from common.utils.encode import Singleton
@@ -14,6 +15,7 @@ from audits.models import OperateLog
 from orgs.utils import get_current_org_id
 
 from .backends import get_operate_log_storage
+from .const import ActionChoices
 
 
 logger = get_logger(__name__)
@@ -148,9 +150,48 @@ class OperatorLogHandler(metaclass=Singleton):
             after = self.__data_processing(after)
         return before, after
 
+    @staticmethod
+    def _get_Session_params(resource, **kwargs):
+        # 更新会话的日志不在Activity中体现，
+        # 否则会话结束，录像文件结束操作的会话记录都会体现出来
+        params = {}
+        action = kwargs.get('data', {}).get('action', 'create')
+        if action == ActionChoices.create:
+            params = {
+                'action': ActionChoices.connect,
+                'resource_id': str(resource.asset_id),
+                'user': resource.user
+            }
+        return params
+
+    @staticmethod
+    def _get_ChangeSecretRecord_params(resource, **kwargs):
+        return {
+            'action': ActionChoices.change_auth,
+            'resource_id': str(resource.account_id),
+        }
+
+    @staticmethod
+    def _get_UserLoginLog_params(resource, **kwargs):
+        username = resource.username
+        user_id = User.objects.filter(username=username).\
+            values_list('id', flat=True)[0]
+        return {
+            'action': ActionChoices.login,
+            'resource_id': str(user_id),
+        }
+
+    def _activity_handle(self, data, object_name, resource):
+        param_func = getattr(self, '_get_%s_params' % object_name, None)
+        if param_func is not None:
+            params = param_func(resource, data=data)
+            data.update(params)
+        return data
+
     def create_or_update_operate_log(
             self, action, resource_type, resource=None,
-            force=False, log_id=None, before=None, after=None
+            force=False, log_id=None, before=None, after=None,
+            object_name=None
     ):
         user = current_request.user if current_request else None
         if not user or not user.is_authenticated:
@@ -169,6 +210,7 @@ class OperatorLogHandler(metaclass=Singleton):
             'remote_addr': remote_addr, 'before': before, 'after': after,
             'org_id': get_current_org_id(), 'resource_id': str(resource.id)
         }
+        data = self._activity_handle(data, object_name, resource=resource)
         with transaction.atomic():
             if self.log_client.ping(timeout=1):
                 client = self.log_client
