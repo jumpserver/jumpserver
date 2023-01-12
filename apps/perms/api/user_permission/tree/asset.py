@@ -5,14 +5,14 @@ from assets.models import Asset
 from assets.api import SerializeToTreeNodeMixin
 from common.utils import get_logger
 
-from ..assets import UserDirectPermedAssetsApi
+from ..assets import UserAllPermedAssetsApi
 from .mixin import RebuildTreeMixin
 
 logger = get_logger(__name__)
 
 
 __all__ = [
-    'UserDirectPermedAssetsAsTreeApi',
+    'UserAllPermedAssetsAsTreeApi',
     'UserUngroupAssetsAsTreeApi',
 ]
 
@@ -35,12 +35,12 @@ class AssetTreeMixin(RebuildTreeMixin, SerializeToTreeNodeMixin):
         return Response(data=data)
 
 
-class UserDirectPermedAssetsAsTreeApi(AssetTreeMixin, UserDirectPermedAssetsApi):
+class UserAllPermedAssetsAsTreeApi(AssetTreeMixin, UserAllPermedAssetsApi):
     """ 用户 '直接授权的资产' 作为树 """
     pass
 
 
-class UserUngroupAssetsAsTreeApi(UserDirectPermedAssetsAsTreeApi):
+class UserUngroupAssetsAsTreeApi(UserAllPermedAssetsAsTreeApi):
     """ 用户 '未分组节点的资产(直接授权的资产)' 作为树 """
     def get_assets(self):
         if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:

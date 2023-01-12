@@ -21,7 +21,7 @@ user_permission_urlpatterns = [
          name='user-node-children'),
 
     # tree-asset
-    path('<str:user>/assets/tree/', api.UserDirectPermedAssetsAsTreeApi.as_view(),
+    path('<str:user>/assets/tree/', api.UserAllPermedAssetsAsTreeApi.as_view(),
          name='user-direct-assets-as-tree'),
     path('<str:user>/ungroup/assets/tree/', api.UserUngroupAssetsAsTreeApi.as_view(),
          name='user-ungroup-assets-as-tree'),
