@@ -1,4 +1,5 @@
 import sys
+import time
 
 if sys.platform == 'win32':
     import winreg
@@ -6,7 +7,7 @@ if sys.platform == 'win32':
 
     from pywinauto import Application
     from pywinauto.controls.uia_controls import (
-        EditWrapper, ComboBoxWrapper
+        EditWrapper, ComboBoxWrapper, ButtonWrapper
     )
 from common import wait_pid, BaseApplication
 
@@ -159,6 +160,16 @@ class AppletApplication(BaseApplication):
         app = Application(backend='uia')
         app.start(self.path)
         self.pid = app.process
+
+        # 检测是否为试用版本
+        try:
+            trial_btn = app.top_window().child_window(
+                best_match='Trial', control_type='Button'
+            )
+            ButtonWrapper(trial_btn.element_info).click()
+            time.sleep(0.5)
+        except Exception:
+            pass
 
         menubar = app.window(best_match='Navicat Premium', control_type='Window') \
             .child_window(best_match='Menu', control_type='MenuBar')
