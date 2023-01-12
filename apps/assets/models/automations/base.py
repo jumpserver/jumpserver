@@ -133,8 +133,8 @@ class AutomationExecution(OrgModelMixin):
     def recipients(self):
         recipients = self.snapshot.get('recipients')
         if not recipients:
-            return []
-        return recipients.values()
+            return {}
+        return recipients
 
     def start(self):
         from assets.automations.endpoint import ExecutionManager
