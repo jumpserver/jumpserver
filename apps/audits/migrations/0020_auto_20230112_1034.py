@@ -15,9 +15,4 @@ class Migration(migrations.Migration):
             name='is_activity',
             field=models.BooleanField(default=False, verbose_name='Is Activity'),
         ),
-        migrations.AlterField(
-            model_name='operatelog',
-            name='action',
-            field=models.CharField(choices=[('view', 'View'), ('update', 'Update'), ('delete', 'Delete'), ('create', 'Create'), ('connect', 'Connect'), ('login', 'Login'), ('change_password', 'Change password')], max_length=16, verbose_name='Action'),
-        ),
     ]
