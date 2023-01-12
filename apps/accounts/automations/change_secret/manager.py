@@ -156,7 +156,8 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         recipients = self.execution.recipients
         if not recorders or not recipients:
             return
-        recipients = User.objects.filter(id__in=list(recipients))
+
+        recipients = User.objects.filter(id__in=list(recipients.keys()))
 
         name = self.execution.snapshot['name']
         path = os.path.join(os.path.dirname(settings.BASE_DIR), 'tmp')
@@ -178,7 +179,8 @@ class ChangeSecretManager(AccountBasePlaybookManager):
     def create_file(recorders, filename):
         serializer_cls = ChangeSecretRecordBackUpSerializer
         serializer = serializer_cls(recorders, many=True)
-        header = [v.label for v in serializer.child.fields.values()]
+
+        header = [str(v.label) for v in serializer.child.fields.values()]
         rows = [list(row.values()) for row in serializer.data]
         if not rows:
             return False
