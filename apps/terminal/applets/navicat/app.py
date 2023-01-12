@@ -174,10 +174,8 @@ class AppletApplication(BaseApplication):
 
         menubar = app.window(best_match='Navicat Premium', control_type='Window') \
             .child_window(best_match='Menu', control_type='MenuBar')
-        menubar.wait('ready', timeout=10, retry_interval=5)
 
         file = menubar.child_window(best_match='File', control_type='MenuItem')
-        file.wait('ready', timeout=10, retry_interval=5)
         file.click_input()
         menubar.item_by_path('File->New Connection').click_input()
 
