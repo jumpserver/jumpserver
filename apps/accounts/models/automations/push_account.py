@@ -8,7 +8,7 @@ from .change_secret import ChangeSecretMixin
 __all__ = ['PushAccountAutomation']
 
 
-class PushAccountAutomation(AccountBaseAutomation, ChangeSecretMixin):
+class PushAccountAutomation(ChangeSecretMixin, AccountBaseAutomation):
     accounts = None
     triggers = models.JSONField(max_length=16, default=list, verbose_name=_('Triggers'))
     username = models.CharField(max_length=128, verbose_name=_('Username'))
@@ -28,7 +28,6 @@ class PushAccountAutomation(AccountBaseAutomation, ChangeSecretMixin):
 
     def save(self, *args, **kwargs):
         self.type = AutomationTypes.push_account
-        self.is_periodic = False
         super().save(*args, **kwargs)
 
     def to_attr_json(self):

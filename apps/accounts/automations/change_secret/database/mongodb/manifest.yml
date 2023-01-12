@@ -1,5 +1,5 @@
 id: change_secret_mongodb
-name: Change password for MongoDB
+name: Change secret for MongoDB
 category: database
 type:
   - mongodb

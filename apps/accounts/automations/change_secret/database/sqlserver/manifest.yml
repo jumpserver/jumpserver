@@ -1,5 +1,5 @@
 id: change_secret_sqlserver
-name: Change password for SQLServer
+name: Change secret for SQLServer
 category: database
 type:
   - sqlserver
