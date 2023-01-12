@@ -43,7 +43,8 @@ class PlatformAutomationSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "ansible_enabled", "ansible_config",
-            "ping_enabled", "ping_method", "push_account_enabled",
+            "ping_enabled", "ping_method",
+            "push_account_enabled", "push_account_method",
             "gather_facts_enabled", "gather_facts_method",
             "change_secret_enabled", "change_secret_method",
             "verify_account_enabled", "verify_account_method",
@@ -59,6 +60,7 @@ class PlatformAutomationSerializer(serializers.ModelSerializer):
             "change_secret_enabled": {"label": "启用账号改密"},
             "change_secret_method": {"label": "账号改密方式"},
             "push_account_enabled": {"label": "启用推送账号"},
+            "push_account_method": {"label": "推送账号方式"},
             "gather_accounts_enabled": {"label": "启用账号收集"},
             "gather_accounts_method": {"label": "收集账号方式"},
         }
