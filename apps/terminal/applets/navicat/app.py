@@ -152,9 +152,10 @@ class AppletApplication(BaseApplication):
         password_ele = conn_window.child_window(best_match='Edit4')
         EditWrapper(password_ele.element_info).set_edit_text(self.password)
 
-        conn_window.child_window(best_match='Advanced', control_type='TabItem').click_input()
-        role_ele = conn_window.child_window(best_match='ComboBox2')
-        ComboBoxWrapper(role_ele.element_info).select('SYSDBA')
+        if self.privileged:
+            conn_window.child_window(best_match='Advanced', control_type='TabItem').click_input()
+            role_ele = conn_window.child_window(best_match='ComboBox2')
+            ComboBoxWrapper(role_ele.element_info).select('SYSDBA')
 
     def run(self):
         app = Application(backend='uia')
