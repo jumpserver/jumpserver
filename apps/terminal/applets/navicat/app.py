@@ -42,6 +42,19 @@ class AppletApplication(BaseApplication):
         except Exception as err:
             print('Error: %s' % err)
 
+    @staticmethod
+    def launch():
+        sub_key = r'Software\PremiumSoft\NavicatPremium'
+        try:
+            key = winreg.CreateKey(winreg.HKEY_CURRENT_USER, sub_key)
+            # 禁止弹出欢迎页面
+            winreg.SetValueEx(key, 'AlreadyShowNavicatV16WelcomeScreen', 0, winreg.REG_DWORD, 1)
+            # 禁止开启自动检查更新
+            winreg.SetValueEx(key, 'AutoCheckUpdate', 0, winreg.REG_DWORD, 0)
+            winreg.SetValueEx(key, 'ShareUsageData', 0, winreg.REG_DWORD, 0)
+        except Exception as err:
+            print('Launch error: %s' % err)
+
     def _fill_to_mysql(self, app, menu, protocol_display='MySQL'):
         menu.item_by_path('File->New Connection->%s' % protocol_display).click_input()
         conn_window = app.window(best_match='Dialog').child_window(title_re='New Connection')
