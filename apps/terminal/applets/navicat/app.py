@@ -171,6 +171,7 @@ class AppletApplication(BaseApplication):
             ComboBoxWrapper(role_ele.element_info).select('SYSDBA')
 
     def run(self):
+        self.launch()
         app = Application(backend='uia')
         app.start(self.path)
         self.pid = app.process
