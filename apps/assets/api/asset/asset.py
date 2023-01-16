@@ -124,14 +124,14 @@ class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
         return super().create(request, *args, **kwargs)
 
     def check_permissions(self, request):
-        action = request.data.get("action")
         action_perm_require = {
             "refresh": "assets.refresh_assethardwareinfo",
             "push_account": "accounts.add_pushaccountexecution",
             "test": "assets.test_assetconnectivity",
             "test_account": "assets.test_account",
         }
-        perm_required = action_perm_require.get(action)
+        _action = request.data.get("action")
+        perm_required = action_perm_require.get(_action)
         has = self.request.user.has_perm(perm_required)
 
         if not has:
@@ -170,11 +170,11 @@ class AssetsTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
     serializer_class = serializers.AssetsTaskSerializer
 
     def check_permissions(self, request):
-        action = request.data.get("action")
         action_perm_require = {
             "refresh": "assets.refresh_assethardwareinfo",
         }
-        perm_required = action_perm_require.get(action)
+        _action = request.data.get("action")
+        perm_required = action_perm_require.get(_action)
         has = self.request.user.has_perm(perm_required)
         if not has:
             self.permission_denied(request)

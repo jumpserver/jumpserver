@@ -143,6 +143,15 @@ class Organization(OrgRoleMixin, JMSBaseModel):
         return obj
 
     @classmethod
+    def system(cls):
+        defaults = dict(id=cls.SYSTEM_ID, name=cls.SYSTEM_NAME)
+        obj, created = cls.objects.get_or_create(defaults=defaults, id=cls.SYSTEM_ID)
+        if not obj.builtin:
+            obj.builtin = True
+            obj.save()
+        return obj
+
+    @classmethod
     def root(cls):
         name = settings.GLOBAL_ORG_DISPLAY_NAME or cls.ROOT_NAME
         return cls(id=cls.ROOT_ID, name=name, builtin=True)

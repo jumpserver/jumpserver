@@ -60,6 +60,7 @@ class OperateLog(OrgModelMixin):
     datetime = models.DateTimeField(auto_now=True, verbose_name=_('Datetime'), db_index=True)
     before = models.JSONField(default=dict, encoder=ModelJSONFieldEncoder, null=True)
     after = models.JSONField(default=dict, encoder=ModelJSONFieldEncoder, null=True)
+    is_activity = models.BooleanField(default=False, verbose_name=(_('Is Activity')))
 
     def __str__(self):
         return "<{}> {} <{}>".format(self.user, self.action, self.resource)

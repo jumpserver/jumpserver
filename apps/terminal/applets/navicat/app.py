@@ -1,4 +1,5 @@
 import sys
+import time
 
 if sys.platform == 'win32':
     import winreg
@@ -6,7 +7,7 @@ if sys.platform == 'win32':
 
     from pywinauto import Application
     from pywinauto.controls.uia_controls import (
-        EditWrapper, ComboBoxWrapper
+        EditWrapper, ComboBoxWrapper, ButtonWrapper
     )
 from common import wait_pid, BaseApplication
 
@@ -40,6 +41,19 @@ class AppletApplication(BaseApplication):
             win32api.RegDeleteTree(winreg.HKEY_CURRENT_USER, sub_key)
         except Exception as err:
             print('Error: %s' % err)
+
+    @staticmethod
+    def launch():
+        sub_key = r'Software\PremiumSoft\NavicatPremium'
+        try:
+            key = winreg.CreateKey(winreg.HKEY_CURRENT_USER, sub_key)
+            # 禁止弹出欢迎页面
+            winreg.SetValueEx(key, 'AlreadyShowNavicatV16WelcomeScreen', 0, winreg.REG_DWORD, 1)
+            # 禁止开启自动检查更新
+            winreg.SetValueEx(key, 'AutoCheckUpdate', 0, winreg.REG_DWORD, 0)
+            winreg.SetValueEx(key, 'ShareUsageData', 0, winreg.REG_DWORD, 0)
+        except Exception as err:
+            print('Launch error: %s' % err)
 
     def _fill_to_mysql(self, app, menu, protocol_display='MySQL'):
         menu.item_by_path('File->New Connection->%s' % protocol_display).click_input()
@@ -151,21 +165,31 @@ class AppletApplication(BaseApplication):
         password_ele = conn_window.child_window(best_match='Edit4')
         EditWrapper(password_ele.element_info).set_edit_text(self.password)
 
-        conn_window.child_window(best_match='Advanced', control_type='TabItem').click_input()
-        role_ele = conn_window.child_window(best_match='ComboBox2')
-        ComboBoxWrapper(role_ele.element_info).select('SYSDBA')
+        if self.privileged:
+            conn_window.child_window(best_match='Advanced', control_type='TabItem').click_input()
+            role_ele = conn_window.child_window(best_match='ComboBox2')
+            ComboBoxWrapper(role_ele.element_info).select('SYSDBA')
 
     def run(self):
+        self.launch()
         app = Application(backend='uia')
         app.start(self.path)
         self.pid = app.process
 
+        # 检测是否为试用版本
+        try:
+            trial_btn = app.top_window().child_window(
+                best_match='Trial', control_type='Button'
+            )
+            ButtonWrapper(trial_btn.element_info).click()
+            time.sleep(0.5)
+        except Exception:
+            pass
+
         menubar = app.window(best_match='Navicat Premium', control_type='Window') \
             .child_window(best_match='Menu', control_type='MenuBar')
-        menubar.wait('ready', timeout=10, retry_interval=5)
 
         file = menubar.child_window(best_match='File', control_type='MenuItem')
-        file.wait('ready', timeout=10, retry_interval=5)
         file.click_input()
         menubar.item_by_path('File->New Connection').click_input()
 
@@ -184,4 +208,9 @@ class AppletApplication(BaseApplication):
         self.app = app
 
     def wait(self):
-        wait_pid(self.pid)
+        try:
+            wait_pid(self.pid)
+        except Exception:
+            pass
+        finally:
+            self.clean_up()

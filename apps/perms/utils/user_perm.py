@@ -82,7 +82,7 @@ class UserPermAssetUtil(AssetPermissionPermAssetUtil):
         node = PermNode.objects.get(id=node_id)
         node.compute_node_from_and_assets_amount(self.user)
         if node.node_from == node.NodeFrom.granted:
-            assets = PermNode.get_nodes_all_assets()
+            assets = PermNode.get_nodes_all_assets(node)
         elif node.node_from in (node.NodeFrom.asset, node.NodeFrom.child):
             node.assets_amount = node.granted_assets_amount
             assets = self._get_indirect_perm_node_all_assets(node)

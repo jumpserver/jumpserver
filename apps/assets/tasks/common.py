@@ -2,6 +2,7 @@
 #
 import uuid
 from celery import current_task
+from django.db.utils import IntegrityError
 from orgs.utils import current_org
 
 from common.const.choices import Trigger
@@ -31,6 +32,14 @@ def generate_data(task_name, tp, child_snapshot=None):
 def automation_execute_start(task_name, tp, child_snapshot=None):
     from assets.models import AutomationExecution
     data = generate_data(task_name, tp, child_snapshot)
+
+    while True:
+        try:
+            _id = data['id']
+            AutomationExecution.objects.get(id=_id)
+            data['id'] = str(uuid.uuid4())
+        except AutomationExecution.DoesNotExist:
+            break
     execution = AutomationExecution.objects.create(
         trigger=Trigger.manual, **data
     )

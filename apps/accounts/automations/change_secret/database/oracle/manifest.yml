@@ -1,5 +1,5 @@
 id: change_secret_oracle
-name: Change password for Oracle
+name: Change secret for Oracle
 category: database
 type:
   - oracle

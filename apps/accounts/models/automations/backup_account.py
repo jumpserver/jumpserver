@@ -56,6 +56,10 @@ class AccountBackupAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
             }
         }
 
+    @property
+    def executed_amount(self):
+        return self.execution.count()
+
     def execute(self, trigger):
         try:
             hid = current_task.request.id

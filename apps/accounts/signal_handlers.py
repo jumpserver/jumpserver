@@ -23,4 +23,4 @@ def on_account_pre_create(sender, instance, **kwargs):
 def on_asset_create(sender, instance, created=False, **kwargs):
     if not created:
         return
-    PushAccountManager.trigger_by_asset_create(instance)
+    # PushAccountManager.trigger_by_asset_create(instance)

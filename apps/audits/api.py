@@ -7,21 +7,18 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin
 
-from accounts.models import ChangeSecretRecord
 from ops.models.job import JobAuditLog
 from common.api import JMSGenericViewSet
 from common.drf.filters import DatetimeRangeFilter
 from common.plugins.es import QuerySet as ESQuerySet
-from orgs.utils import current_org
+from orgs.utils import current_org, tmp_to_root_org
 from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet
-from terminal.models import Session
 from .backends import TYPE_ENGINE_MAPPING
 from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog
 from .serializers import FTPLogSerializer, UserLoginLogSerializer, JobAuditLogSerializer
 from .serializers import (
-    OperateLogSerializer, OperateLogActionDetailSerializer, PasswordChangeLogSerializer,
-    ActivitiesSessionSerializer, ActivitiesOperatorLogSerializer,
-    ActivitiesAuthChangeSerializer
+    OperateLogSerializer, OperateLogActionDetailSerializer,
+    PasswordChangeLogSerializer, ActivitiesOperatorLogSerializer,
 )
 
 
@@ -80,31 +77,16 @@ class MyLoginLogAPIView(UserLoginCommonMixin, generics.ListAPIView):
 
 
 class ResourceActivityAPIView(generics.ListAPIView):
+    serializer_class = ActivitiesOperatorLogSerializer
     rbac_perms = {
         'GET': 'audits.view_operatelog',
     }
 
     def get_queryset(self):
-        resource = self.request.query_params.get('resource')
         resource_id = self.request.query_params.get('resource_id')
-        resource_mapping = {
-            'session': (Session, 'asset_id'),
-            'operate_log': (OperateLog, 'resource_id'),
-            'auth_change': (ChangeSecretRecord, 'account_id'),
-        }
-        model, filter_q = resource_mapping.get(resource, (None, None))
-        if model is None or resource_id is None:
-            return OperateLog.objects.none()
-        return model.objects.filter(**{filter_q: resource_id})[:8]
-
-    def get_serializer_class(self):
-        resource = self.request.query_params.get('resource')
-        mapping = {
-            'session': ActivitiesSessionSerializer,
-            'operate_log': ActivitiesOperatorLogSerializer,
-            'auth_change': ActivitiesAuthChangeSerializer,
-        }
-        return mapping.get(resource, ActivitiesOperatorLogSerializer)
+        with tmp_to_root_org():
+            queryset = OperateLog.objects.filter(resource_id=resource_id)[:30]
+        return queryset
 
 
 class OperateLogViewSet(RetrieveModelMixin, ListModelMixin, OrgGenericViewSet):
@@ -124,7 +106,7 @@ class OperateLogViewSet(RetrieveModelMixin, ListModelMixin, OrgGenericViewSet):
         return super().get_serializer_class()
 
     def get_queryset(self):
-        qs = OperateLog.objects.all()
+        qs = OperateLog.objects.filter(is_activity=False)
         es_config = settings.OPERATE_LOG_ELASTICSEARCH_CONFIG
         if es_config:
             engine_mod = import_module(TYPE_ENGINE_MAPPING['es'])

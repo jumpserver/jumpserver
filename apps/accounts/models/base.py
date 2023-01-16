@@ -14,7 +14,7 @@ from common.utils import (
     ssh_key_string_to_obj, ssh_key_gen, get_logger,
     random_string, lazyproperty, parse_ssh_public_key_str
 )
-from orgs.mixins.models import JMSOrgBaseModel
+from orgs.mixins.models import JMSOrgBaseModel, OrgManager
 
 logger = get_logger(__file__)
 
@@ -24,7 +24,7 @@ class BaseAccountQuerySet(models.QuerySet):
         return self.filter(is_active=True)
 
 
-class BaseAccountManager(models.Manager):
+class BaseAccountManager(OrgManager):
     def active(self):
         return self.get_queryset().active()
 

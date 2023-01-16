@@ -123,6 +123,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
     labels = AssetLabelSerializer(many=True, required=False, label=_('Labels'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
     accounts = AssetAccountSerializer(many=True, required=False, write_only=True, label=_('Account'))
+    enabled_info = serializers.DictField(read_only=True, label=_('Enabled info'))
 
     class Meta:
         model = Asset
@@ -133,7 +134,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
             'nodes', 'labels', 'protocols', 'nodes_display', 'accounts'
         ]
         read_only_fields = [
-            'category', 'type', 'info',
+            'category', 'type', 'info', 'enabled_info',
             'connectivity', 'date_verified',
             'created_by', 'date_created'
         ]
@@ -143,6 +144,20 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
             'address': {'label': _('Address')},
             'nodes_display': {'label': _('Node path')},
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._init_field_choices()
+
+    def _init_field_choices(self):
+        request = self.context.get('request')
+        if not request:
+            return
+        category = request.path.strip('/').split('/')[-1].rstrip('s')
+        field_category = self.fields.get('category')
+        field_category._choices = Category.filter_choices(category)
+        field_type = self.fields.get('type')
+        field_type._choices = AllTypes.filter_choices(category)
 
     @classmethod
     def setup_eager_loading(cls, queryset):
@@ -224,13 +239,12 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
 
 class DetailMixin(serializers.Serializer):
     accounts = AssetAccountSerializer(many=True, required=False, label=_('Accounts'))
-    enabled_info = serializers.DictField(read_only=True, label=_('Enabled info'))
+
 
     def get_field_names(self, declared_fields, info):
         names = super().get_field_names(declared_fields, info)
         names.extend([
-            'accounts', 'enabled_info', 'info',
-            'specific', 'spec_info'
+            'accounts', 'info', 'specific', 'spec_info'
         ])
         return names
 

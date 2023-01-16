@@ -11,20 +11,21 @@ from accounts.models import AccountBackupAutomation, AccountBackupExecution
 
 logger = get_logger(__file__)
 
-__all__ = ['AccountBackupExecutionSerializer', 'AccountBackupPlanExecutionSerializer']
+__all__ = ['AccountBackupSerializer', 'AccountBackupPlanExecutionSerializer']
 
 
-class AccountBackupExecutionSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSerializer):
+class AccountBackupSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSerializer):
     class Meta:
         model = AccountBackupAutomation
         fields = [
             'id', 'name', 'is_periodic', 'interval', 'crontab', 'date_created',
             'date_updated', 'created_by', 'periodic_display', 'comment',
-            'recipients', 'types'
+            'recipients', 'types', 'executed_amount'
         ]
         extra_kwargs = {
             'name': {'required': True},
             'periodic_display': {'label': _('Periodic perform')},
+            'executed_amount': {'label': _('Executed amount')},
             'recipients': {'label': _('Recipient'), 'help_text': _(
                 'Currently only mail sending is supported'
             )}

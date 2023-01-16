@@ -26,7 +26,12 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         super().__init__(*args, **kwargs)
         self.method_hosts_mapper = defaultdict(list)
         self.secret_type = self.execution.snapshot['secret_type']
-        self.secret_strategy = self.execution.snapshot['secret_strategy']
+        self.secret_strategy = self.execution.snapshot.get(
+            'secret_strategy', SecretStrategy.custom
+        )
+        self.ssh_key_change_strategy = self.execution.snapshot.get(
+            'ssh_key_change_strategy', SSHKeyStrategy.add
+        )
         self.snapshot_account_usernames = self.execution.snapshot['accounts']
         self._password_generated = None
         self._ssh_key_generated = None
@@ -44,7 +49,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         kwargs = {}
         if self.secret_type != SecretType.SSH_KEY:
             return kwargs
-        kwargs['strategy'] = self.execution.snapshot['ssh_key_change_strategy']
+        kwargs['strategy'] = self.ssh_key_change_strategy
         kwargs['exclusive'] = 'yes' if kwargs['strategy'] == SSHKeyStrategy.set else 'no'
 
         if kwargs['strategy'] == SSHKeyStrategy.set_jms:
@@ -151,7 +156,8 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         recipients = self.execution.recipients
         if not recorders or not recipients:
             return
-        recipients = User.objects.filter(id__in=list(recipients))
+
+        recipients = User.objects.filter(id__in=list(recipients.keys()))
 
         name = self.execution.snapshot['name']
         path = os.path.join(os.path.dirname(settings.BASE_DIR), 'tmp')
@@ -173,7 +179,8 @@ class ChangeSecretManager(AccountBasePlaybookManager):
     def create_file(recorders, filename):
         serializer_cls = ChangeSecretRecordBackUpSerializer
         serializer = serializer_cls(recorders, many=True)
-        header = [v.label for v in serializer.child.fields.values()]
+
+        header = [str(v.label) for v in serializer.child.fields.values()]
         rows = [list(row.values()) for row in serializer.data]
         if not rows:
             return False
