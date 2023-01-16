@@ -6,6 +6,8 @@ from rest_framework import serializers
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ops.mixin import PeriodTaskSerializerMixin
 from common.utils import get_logger
+from common.const.choices import Trigger
+from common.serializers.fields import LabeledChoiceField
 
 from accounts.models import AccountBackupAutomation, AccountBackupExecution
 
@@ -17,10 +19,11 @@ __all__ = ['AccountBackupSerializer', 'AccountBackupPlanExecutionSerializer']
 class AccountBackupSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSerializer):
     class Meta:
         model = AccountBackupAutomation
-        fields = [
-            'id', 'name', 'is_periodic', 'interval', 'crontab', 'date_created',
-            'date_updated', 'created_by', 'periodic_display', 'comment',
-            'recipients', 'types', 'executed_amount'
+        read_only_fields = [
+            'date_created', 'date_updated', 'created_by', 'periodic_display', 'executed_amount'
+        ]
+        fields = read_only_fields + [
+            'id', 'name', 'is_periodic', 'interval', 'crontab', 'comment', 'recipients', 'types'
         ]
         extra_kwargs = {
             'name': {'required': True},
@@ -33,6 +36,8 @@ class AccountBackupSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSer
 
 
 class AccountBackupPlanExecutionSerializer(serializers.ModelSerializer):
+    trigger = LabeledChoiceField(choices=Trigger.choices, label=_("Trigger mode"))
+
     class Meta:
         model = AccountBackupExecution
         read_only_fields = [

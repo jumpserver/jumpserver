@@ -2,11 +2,11 @@ from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 from ops.mixin import PeriodTaskSerializerMixin
-from assets.const import AutomationTypes
 from assets.models import Asset, Node, BaseAutomation, AutomationExecution
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.utils import get_logger
-from common.serializers.fields import ObjectRelatedField
+from common.const.choices import Trigger
+from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 
 logger = get_logger(__file__)
 
@@ -37,12 +37,12 @@ class BaseAutomationSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSe
 
 class AutomationExecutionSerializer(serializers.ModelSerializer):
     snapshot = serializers.SerializerMethodField(label=_('Automation snapshot'))
-    trigger_display = serializers.ReadOnlyField(source='get_trigger_display', label=_('Trigger mode'))
+    trigger = LabeledChoiceField(choices=Trigger.choices, label=_("Trigger mode"))
 
     class Meta:
         model = AutomationExecution
         read_only_fields = [
-            'trigger_display', 'date_start', 'date_finished', 'snapshot', 'status'
+            'trigger', 'date_start', 'date_finished', 'snapshot', 'status'
         ]
         fields = ['id', 'automation', 'trigger'] + read_only_fields
 
