@@ -99,7 +99,6 @@ VOLUME /opt/jumpserver/data
 VOLUME /opt/jumpserver/logs
 
 ENV LANG=zh_CN.UTF-8
-ENV ANSIBLE_LIBRARY=/opt/jumpserver/apps/ops/ansible/modules
 
 EXPOSE 8080
 
