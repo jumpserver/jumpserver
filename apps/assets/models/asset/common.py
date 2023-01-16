@@ -158,7 +158,6 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
             'ping_enabled': automation.ping_enabled,
             'domain_enabled': platform.domain_enabled,
             'ansible_enabled': automation.ansible_enabled,
-            'protocols_enabled': platform.protocols_enabled,
             'gather_facts_enabled': automation.gather_facts_enabled,
             'change_secret_enabled': automation.change_secret_enabled,
             'verify_account_enabled': automation.verify_account_enabled,

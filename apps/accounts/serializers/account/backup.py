@@ -17,10 +17,11 @@ __all__ = ['AccountBackupSerializer', 'AccountBackupPlanExecutionSerializer']
 class AccountBackupSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSerializer):
     class Meta:
         model = AccountBackupAutomation
-        fields = [
-            'id', 'name', 'is_periodic', 'interval', 'crontab', 'date_created',
-            'date_updated', 'created_by', 'periodic_display', 'comment',
-            'recipients', 'types', 'executed_amount'
+        read_only_fields = [
+            'date_created', 'date_updated', 'created_by', 'periodic_display', 'executed_amount'
+        ]
+        fields = read_only_fields + [
+            'id', 'name', 'is_periodic', 'interval', 'crontab', 'comment', 'recipients', 'types'
         ]
         extra_kwargs = {
             'name': {'required': True},
