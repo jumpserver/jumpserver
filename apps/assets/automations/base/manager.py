@@ -1,7 +1,6 @@
 import os
 import shutil
 from collections import defaultdict
-from copy import deepcopy
 from hashlib import md5
 from socket import gethostname
 
@@ -11,56 +10,11 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from assets.automations.methods import platform_automation_methods
-from assets.const import SecretType
 from common.utils import get_logger, lazyproperty
 from common.utils import ssh_pubkey_gen, ssh_key_string_to_obj
 from ops.ansible import JMSInventory, PlaybookRunner, DefaultCallback
 
 logger = get_logger(__name__)
-
-
-class PushOrVerifyHostCallbackMixin:
-    execution: callable
-    host_account_mapper: dict
-    ignore_account: bool
-    need_privilege_account: bool
-    generate_public_key: callable
-    generate_private_key_path: callable
-
-    def host_callback(self, host, asset=None, account=None, automation=None, path_dir=None, **kwargs):
-        host = super().host_callback(host, asset=asset, account=account, automation=automation, **kwargs)
-        if host.get('error'):
-            return host
-
-        accounts = asset.accounts.all()
-        if self.need_privilege_account and accounts.count() > 1 and account:
-            accounts = accounts.exclude(id=account.id)
-
-        if '*' not in self.execution.snapshot['accounts']:
-            accounts = accounts.filter(username__in=self.execution.snapshot['accounts'])
-
-        inventory_hosts = []
-        for account in accounts:
-            h = deepcopy(host)
-            h['name'] += '_' + account.username
-            self.host_account_mapper[h['name']] = account
-            secret = account.secret
-
-            private_key_path = None
-            if account.secret_type == SecretType.SSH_KEY:
-                private_key_path = self.generate_private_key_path(secret, path_dir)
-                secret = self.generate_public_key(secret)
-
-            h['secret_type'] = account.secret_type
-            h['account'] = {
-                'name': account.name,
-                'username': account.username,
-                'secret_type': account.secret_type,
-                'secret': secret,
-                'private_key_path': private_key_path
-            }
-            inventory_hosts.append(h)
-        return inventory_hosts
 
 
 class PlaybookCallback(DefaultCallback):
@@ -74,10 +28,9 @@ class BasePlaybookManager:
 
     def __init__(self, execution):
         self.execution = execution
-        self.automation = execution.automation
         self.method_id_meta_mapper = {
             method['id']: method
-            for method in platform_automation_methods
+            for method in self.platform_automation_methods
             if method['method'] == self.__class__.method_type()
         }
         # 根据执行方式就行分组, 不同资产的改密、推送等操作可能会使用不同的执行方式
@@ -86,17 +39,22 @@ class BasePlaybookManager:
         self.method_hosts_mapper = defaultdict(list)
         self.playbooks = []
 
+    @property
+    def platform_automation_methods(self):
+        return platform_automation_methods
+
     @classmethod
     def method_type(cls):
         raise NotImplementedError
 
     def get_assets_group_by_platform(self):
-        return self.automation.all_assets_group_by_platform()
+        return self.execution.all_assets_group_by_platform()
 
     @lazyproperty
     def runtime_dir(self):
         ansible_dir = settings.ANSIBLE_DIR
-        dir_name = '{}_{}'.format(self.automation.name.replace(' ', '_'), self.execution.id)
+        task_name = self.execution.snapshot['name']
+        dir_name = '{}_{}'.format(task_name.replace(' ', '_'), self.execution.id)
         path = os.path.join(
             ansible_dir, 'automations', self.execution.snapshot['type'],
             dir_name, timezone.now().strftime('%Y%m%d_%H%M%S')
@@ -205,9 +163,7 @@ class BasePlaybookManager:
         print("Runner failed: {} {}".format(e, self))
 
     def before_runner_start(self, runner):
-        print("Start run task: ")
-        print("  inventory: {}".format(runner.inventory))
-        print("  playbook: {}".format(runner.playbook))
+        pass
 
     def run(self, *args, **kwargs):
         runners = self.get_runners()

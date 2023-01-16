@@ -2,7 +2,7 @@ import os
 
 from rest_framework import serializers
 
-from common.drf.fields import ReadableHiddenField
+from common.serializers.fields import ReadableHiddenField
 from ops.models import Playbook
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 

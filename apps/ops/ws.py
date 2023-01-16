@@ -8,6 +8,7 @@ from common.db.utils import close_old_connections
 from common.utils import get_logger
 from .ansible.utils import get_ansible_task_log_path
 from .celery.utils import get_celery_task_log_path
+from .const import CELERY_LOG_MAGIC_MARK
 
 logger = get_logger(__name__)
 
@@ -52,7 +53,6 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer):
         await self.send_json({'message': '\r\n'})
         try:
             logger.debug('Task log path: {}'.format(log_path))
-            task_end_mark = []
             async with aiofiles.open(log_path, 'rb') as task_log_f:
                 while not self.disconnected:
                     data = await task_log_f.read(4096)
@@ -61,18 +61,15 @@ class TaskLogWebsocket(AsyncJsonWebsocketConsumer):
                         await self.send_json(
                             {'message': data.decode(errors='ignore'), 'task': task_id}
                         )
-                        if data.find(b'succeeded in') != -1:
-                            task_end_mark.append(1)
-                        if data.find(bytes(task_id, 'utf8')) != -1:
-                            task_end_mark.append(1)
-                    elif len(task_end_mark) == 2:
-                        logger.debug('Task log end: {}'.format(task_id))
-                        await self.send_json({'event': 'end', 'task': task_id})
-                        break
+                        if data.find(CELERY_LOG_MAGIC_MARK) != -1:
+                            await self.send_json(
+                                {'event': 'end', 'task': task_id, 'message': ''}
+                            )
+                            logger.debug("Task log file magic mark found")
+                            break
                     await asyncio.sleep(0.2)
         except OSError as e:
             logger.warn('Task log path open failed: {}'.format(e))
-        # await self.close()
 
     async def disconnect(self, close_code):
         self.disconnected = True

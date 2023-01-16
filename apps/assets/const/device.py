@@ -40,6 +40,7 @@ class DeviceTypes(BaseType):
                 'gather_accounts_enabled': False,
                 'verify_account_enabled': False,
                 'change_secret_enabled': False,
+                'push_account_enabled': False
             }
         }
 

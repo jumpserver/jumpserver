@@ -6,7 +6,7 @@ from rest_framework.request import Request
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from common.drf.api import JMSModelViewSet
+from common.api import JMSModelViewSet
 from common.permissions import IsServiceAccount
 from common.utils import is_uuid
 from orgs.utils import tmp_to_builtin_org

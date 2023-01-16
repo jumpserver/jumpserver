@@ -1,11 +1,10 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-
 from terminal.models import Session
 from acls.models import CommandGroup, CommandFilterACL
 from common.utils import lazyproperty, get_object_or_none
-from common.drf.fields import ObjectRelatedField, LabeledChoiceField
+from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from orgs.utils import tmp_to_root_org
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .base import BaseUserAssetAccountACLSerializerMixin as BaseSerializer
@@ -28,10 +27,13 @@ class CommandFilterACLSerializer(BaseSerializer, BulkOrgResourceModelSerializer)
     command_groups = ObjectRelatedField(
         queryset=CommandGroup.objects, many=True, required=False, label=_('Command group')
     )
+    command_groups_amount = serializers.IntegerField(
+        source='command_groups.count', read_only=True, label=_('Command group amount')
+    )
 
     class Meta(BaseSerializer.Meta):
         model = CommandFilterACL
-        fields = BaseSerializer.Meta.fields + ['command_groups']
+        fields = BaseSerializer.Meta.fields + ['command_groups', 'command_groups_amount']
 
 
 class CommandReviewSerializer(serializers.Serializer):

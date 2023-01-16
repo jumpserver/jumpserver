@@ -10,9 +10,10 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.exceptions import PermissionDenied, NotFound
 
 from assets.utils import KubernetesTree
-from assets.models import Asset, Account
-from assets.const import AliasAccount
+from assets.models import Asset
+from accounts.const import AliasAccount
 from assets.api import SerializeToTreeNodeMixin
+from accounts.models import Account
 from authentication.models import ConnectionToken
 from common.utils import get_object_or_none, lazyproperty
 from common.utils.common import timeit
@@ -151,13 +152,13 @@ class UserGrantedK8sAsTreeApi(SelfOrPKUserMixin, ListAPIView):
     def get_account_secret(self, token: ConnectionToken):
         util = PermAccountUtil()
         accounts = util.get_permed_accounts_for_user(self.user, token.asset)
-        account_username = token.account
-        accounts = filter(lambda x: x.username == account_username, accounts)
+        account_name = token.account
+        accounts = filter(lambda x: x.name == account_name, accounts)
         accounts = list(accounts)
         if not accounts:
             raise NotFound('Account is not found')
         account = accounts[0]
-        if account.username in [
+        if account.name in [
             AliasAccount.INPUT, AliasAccount.USER
         ]:
             return token.input_secret

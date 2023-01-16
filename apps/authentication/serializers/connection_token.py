@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.drf.fields import EncryptedField
+from common.serializers.fields import EncryptedField
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from ..models import ConnectionToken
 
@@ -13,8 +13,9 @@ __all__ = [
 class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
     expire_time = serializers.IntegerField(read_only=True, label=_('Expired time'))
     input_secret = EncryptedField(
-        label=_("Input secret"),  max_length=40960, required=False, allow_blank=True
+        label=_("Input secret"), max_length=40960, required=False, allow_blank=True
     )
+    from_ticket_info = serializers.SerializerMethodField(label=_("Ticket info"))
 
     class Meta:
         model = ConnectionToken
@@ -22,6 +23,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         fields_small = fields_mini + [
             'user', 'asset', 'account', 'input_username',
             'input_secret', 'connect_method', 'protocol', 'actions',
+            'is_active', 'from_ticket', 'from_ticket_info',
             'date_expired', 'date_created', 'date_updated', 'created_by',
             'updated_by', 'org_id', 'org_name',
         ]
@@ -32,13 +34,24 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         ]
         fields = fields_small + read_only_fields
         extra_kwargs = {
+            'from_ticket': {'read_only': True},
             'value': {'read_only': True},
         }
 
-    def get_user(self, attrs):
+    def get_request_user(self):
         request = self.context.get('request')
         user = request.user if request else None
         return user
+
+    def get_user(self, attrs):
+        return self.get_request_user()
+
+    def get_from_ticket_info(self, instance):
+        if not instance.from_ticket:
+            return {}
+        user = self.get_request_user()
+        info = instance.from_ticket.get_extra_info_of_review(user=user)
+        return info
 
 
 class SuperConnectionTokenSerializer(ConnectionTokenSerializer):

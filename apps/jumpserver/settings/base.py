@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     'orgs.apps.OrgsConfig',
     'users.apps.UsersConfig',
     'assets.apps.AssetsConfig',
+    'accounts.apps.AccountsConfig',
     'perms.apps.PermsConfig',
     'ops.apps.OpsConfig',
     'settings.apps.SettingsConfig',
@@ -349,8 +350,10 @@ if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
     DJANGO_REDIS_CONNECTION_FACTORY = 'django_redis.pool.SentinelConnectionFactory'
 else:
     REDIS_LOCATION_NO_DB = '%(protocol)s://:%(password)s@%(host)s:%(port)s/{}' % {
-        'protocol': REDIS_PROTOCOL, 'password': CONFIG.REDIS_PASSWORD,
-        'host': CONFIG.REDIS_HOST, 'port': CONFIG.REDIS_PORT,
+        'protocol': REDIS_PROTOCOL,
+        'password': CONFIG.REDIS_PASSWORD,
+        'host': CONFIG.REDIS_HOST,
+        'port': CONFIG.REDIS_PORT,
     }
 
 REDIS_CACHE_DEFAULT = {

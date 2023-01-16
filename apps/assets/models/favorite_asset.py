@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
 from common.db.models import JMSBaseModel
 
@@ -13,7 +14,11 @@ class FavoriteAsset(JMSBaseModel):
 
     class Meta:
         unique_together = ('user', 'asset')
+        verbose_name = _("Favorite Asset")
 
     @classmethod
     def get_user_favorite_asset_ids(cls, user):
         return cls.objects.filter(user=user).values_list('asset', flat=True)
+
+    def __str__(self):
+        return '%s' % self.asset

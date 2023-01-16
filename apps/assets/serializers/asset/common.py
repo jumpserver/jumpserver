@@ -6,24 +6,25 @@ from django.db.transaction import atomic
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.drf.fields import LabeledChoiceField, ObjectRelatedField
-from common.drf.serializers import WritableNestedModelSerializer
-from orgs.mixins.serializers import BulkOrgResourceSerializerMixin
-from ..account import AccountSerializer
+from accounts.models import Account, AccountTemplate
+from common.serializers import WritableNestedModelSerializer, SecretReadableMixin, CommonModelSerializer
+from common.serializers.fields import LabeledChoiceField
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ...const import Category, AllTypes
-from ...models import Asset, Node, Platform, Label, Domain, Account, Protocol
+from ...models import Asset, Node, Platform, Label, Protocol
 
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
     'AssetTaskSerializer', 'AssetsTaskSerializer', 'AssetProtocolsSerializer',
-    'AssetDetailSerializer',
+    'AssetDetailSerializer', 'DetailMixin', 'AssetAccountSerializer',
+    'AccountSecretSerializer'
 ]
 
 
 class AssetProtocolsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Protocol
-        fields = ['id', 'name', 'port']
+        fields = ['name', 'port']
 
 
 class AssetLabelSerializer(serializers.ModelSerializer):
@@ -45,10 +46,14 @@ class AssetPlatformSerializer(serializers.ModelSerializer):
         }
 
 
-class AssetAccountSerializer(AccountSerializer):
+class AssetAccountSerializer(CommonModelSerializer):
     add_org_fields = False
+    push_now = serializers.BooleanField(
+        default=False, label=_("Push now"), write_only=True
+    )
 
-    class Meta(AccountSerializer.Meta):
+    class Meta:
+        model = Account
         fields_mini = [
             'id', 'name', 'username', 'privileged',
             'version', 'secret_type',
@@ -57,28 +62,79 @@ class AssetAccountSerializer(AccountSerializer):
             'secret', 'push_now'
         ]
         fields = fields_mini + fields_write_only
+        extra_kwargs = {
+            'secret': {'write_only': True},
+        }
+
+    def validate_name(self, value):
+        if not value:
+            value = self.initial_data.get('username')
+        return value
+
+    @staticmethod
+    def validate_template(value):
+        try:
+            return AccountTemplate.objects.get(id=value)
+        except AccountTemplate.DoesNotExist:
+            raise serializers.ValidationError(_('Account template not found'))
+
+    @staticmethod
+    def replace_attrs(account_template: AccountTemplate, attrs: dict):
+        exclude_fields = [
+            '_state', 'org_id', 'id', 'date_created',
+            'date_updated'
+        ]
+        template_attrs = {
+            k: v for k, v in account_template.__dict__.items()
+            if k not in exclude_fields
+        }
+        for k, v in template_attrs.items():
+            attrs.setdefault(k, v)
+
+    def validate(self, attrs):
+        account_template = attrs.pop('template', None)
+        if account_template:
+            self.replace_attrs(account_template, attrs)
+        self.push_now = attrs.pop('push_now', False)
+        return super().validate(attrs)
+
+    def create(self, validated_data):
+        from accounts.tasks import push_accounts_to_assets
+        instance = super().create(validated_data)
+        if self.push_now:
+            push_accounts_to_assets.delay([instance.id], [instance.asset_id])
+        return instance
 
 
-class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSerializer):
+class AccountSecretSerializer(SecretReadableMixin, CommonModelSerializer):
+    class Meta:
+        model = Account
+        fields = [
+            'name', 'username', 'privileged', 'secret_type', 'secret',
+        ]
+        extra_kwargs = {
+            'secret': {'write_only': False},
+        }
+
+
+class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSerializer):
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
-    domain = ObjectRelatedField(required=False, queryset=Domain.objects, label=_('Domain'), allow_null=True)
-    platform = ObjectRelatedField(required=False, queryset=Platform.objects, label=_('Platform'))
-    nodes = ObjectRelatedField(many=True, required=False, queryset=Node.objects, label=_('Nodes'))
-    labels = AssetLabelSerializer(many=True, required=False, label=_('Labels'))
+    labels = AssetLabelSerializer(many=True, required=False, label=_('Label'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
-    accounts = AssetAccountSerializer(many=True, required=False, label=_('Account'))
+    accounts = AssetAccountSerializer(many=True, required=False, write_only=True, label=_('Account'))
+    enabled_info = serializers.DictField(read_only=True, label=_('Enabled info'))
 
     class Meta:
         model = Asset
         fields_mini = ['id', 'name', 'address']
         fields_small = fields_mini + ['is_active', 'comment']
-        fields_fk = ['domain', 'platform', 'platform']
+        fields_fk = ['domain', 'platform']
         fields_m2m = [
-            'nodes', 'labels', 'protocols', 'accounts', 'nodes_display',
+            'nodes', 'labels', 'protocols', 'nodes_display', 'accounts'
         ]
         read_only_fields = [
-            'category', 'type', 'info',
+            'category', 'type', 'info', 'enabled_info',
             'connectivity', 'date_verified',
             'created_by', 'date_created'
         ]
@@ -89,16 +145,31 @@ class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSeriali
             'nodes_display': {'label': _('Node path')},
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._init_field_choices()
+
+    def _init_field_choices(self):
+        request = self.context.get('request')
+        if not request:
+            return
+        category = request.path.strip('/').split('/')[-1].rstrip('s')
+        field_category = self.fields.get('category')
+        field_category._choices = Category.filter_choices(category)
+        field_type = self.fields.get('type')
+        field_type._choices = AllTypes.filter_choices(category)
+
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('domain', 'platform', 'protocols') \
+        queryset = queryset.prefetch_related('domain', 'platform') \
             .annotate(category=F("platform__category")) \
             .annotate(type=F("platform__type"))
-        queryset = queryset.prefetch_related('nodes', 'labels', 'accounts')
+        queryset = queryset.prefetch_related('nodes', 'labels', 'protocols')
         return queryset
 
-    def perform_nodes_display_create(self, instance, nodes_display):
+    @staticmethod
+    def perform_nodes_display_create(instance, nodes_display):
         if not nodes_display:
             return
         nodes_to_set = []
@@ -166,28 +237,20 @@ class AssetSerializer(BulkOrgResourceSerializerMixin, WritableNestedModelSeriali
         return instance
 
 
-class AssetDetailSerializer(AssetSerializer):
+class DetailMixin(serializers.Serializer):
     accounts = AssetAccountSerializer(many=True, required=False, label=_('Accounts'))
-    enabled_info = serializers.SerializerMethodField()
 
-    class Meta(AssetSerializer.Meta):
-        fields = AssetSerializer.Meta.fields + ['accounts', 'enabled_info', 'info', 'specific']
 
-    @staticmethod
-    def get_enabled_info(obj):
-        platform = obj.platform
-        automation = platform.automation
-        return {
-            'su_enabled': platform.su_enabled,
-            'ping_enabled': automation.ping_enabled,
-            'domain_enabled': platform.domain_enabled,
-            'ansible_enabled': automation.ansible_enabled,
-            'protocols_enabled': platform.protocols_enabled,
-            'gather_facts_enabled': automation.gather_facts_enabled,
-            'change_secret_enabled': automation.change_secret_enabled,
-            'verify_account_enabled': automation.verify_account_enabled,
-            'gather_accounts_enabled': automation.gather_accounts_enabled,
-        }
+    def get_field_names(self, declared_fields, info):
+        names = super().get_field_names(declared_fields, info)
+        names.extend([
+            'accounts', 'info', 'specific', 'spec_info'
+        ])
+        return names
+
+
+class AssetDetailSerializer(DetailMixin, AssetSerializer):
+    pass
 
 
 class MiniAssetSerializer(serializers.ModelSerializer):

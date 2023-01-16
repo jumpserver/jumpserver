@@ -98,7 +98,7 @@ class BaseHandler:
         approve_info = _('{} {} the ticket').format(user_display, state_display)
         context = self._diff_prev_approve_context(state)
         context.update({'approve_info': approve_info})
-        body = self.reject_html_script(
+        body = self.safe_html_script(
             render_to_string('tickets/ticket_approve_diff.html', context)
         )
         data = {
@@ -111,6 +111,6 @@ class BaseHandler:
         return self.ticket.comments.create(**data)
 
     @staticmethod
-    def reject_html_script(unsafe_html):
+    def safe_html_script(unsafe_html):
         safe_html = escape(unsafe_html)
         return safe_html

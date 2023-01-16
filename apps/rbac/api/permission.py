@@ -3,7 +3,7 @@ from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 
 from common.tree import TreeNodeSerializer
-from common.drf.api import JMSModelViewSet
+from common.api import JMSModelViewSet
 from ..models import Permission, Role
 from ..serializers import PermissionSerializer
 

@@ -3,7 +3,8 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.drf.fields import LabeledChoiceField
+from common.serializers.fields import LabeledChoiceField
+from common.utils.timezone import as_current_tz
 from ops.models.job import JobAuditLog
 from ops.serializers.job import JobExecutionSerializer
 from terminal.models import Session
@@ -22,6 +23,7 @@ class JobAuditLogSerializer(JobExecutionSerializer):
             "id", "material", "time_cost", 'date_start',
             'date_finished', 'date_created',
             'is_finished', 'is_success', 'created_by',
+            'task_id'
         ]
         fields = read_only_fields + []
 
@@ -94,3 +96,18 @@ class SessionAuditSerializer(serializers.ModelSerializer):
     class Meta:
         model = Session
         fields = "__all__"
+
+
+class ActivitiesOperatorLogSerializer(serializers.Serializer):
+    timestamp = serializers.SerializerMethodField()
+    content = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_timestamp(obj):
+        return as_current_tz(obj.datetime).strftime('%Y-%m-%d %H:%M:%S')
+
+    @staticmethod
+    def get_content(obj):
+        action = obj.action.replace('_', ' ').capitalize()
+        ctn = _('User {} {} this resource.').format(obj.user, _(action))
+        return ctn

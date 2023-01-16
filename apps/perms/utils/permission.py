@@ -25,9 +25,9 @@ class AssetPermissionUtil(object):
             groups = user.groups.all()
             group_perm_ids = self.get_permissions_for_user_groups(groups, flat=True)
             perm_ids.update(group_perm_ids)
-        if flat:
-            return perm_ids
         perms = self.get_permissions(ids=perm_ids)
+        if flat:
+            return perms.values_list('id', flat=True)
         return perms
 
     def get_permissions_for_user_groups(self, user_groups, flat=False):
@@ -39,9 +39,9 @@ class AssetPermissionUtil(object):
         perm_ids = AssetPermission.user_groups.through.objects \
             .filter(usergroup_id__in=group_ids) \
             .values_list('assetpermission_id', flat=True).distinct()
-        if flat:
-            return perm_ids
         perms = self.get_permissions(ids=perm_ids)
+        if flat:
+            return perms.values_list('id', flat=True)
         return perms
 
     def get_permissions_for_assets(self, assets, with_node=True, flat=False):
@@ -56,9 +56,9 @@ class AssetPermissionUtil(object):
             nodes = Asset.get_all_nodes_for_assets(assets)
             node_perm_ids = self.get_permissions_for_nodes(nodes, flat=True)
             perm_ids.update(node_perm_ids)
-        if flat:
-            return perm_ids
         perms = self.get_permissions(ids=perm_ids)
+        if flat:
+            return perms.values_list('id', flat=True)
         return perms
 
     def get_permissions_for_nodes(self, nodes, with_ancestor=False, flat=False):
@@ -69,9 +69,9 @@ class AssetPermissionUtil(object):
         node_ids = nodes.values_list('id', flat=True).distinct()
         relations = AssetPermission.nodes.through.objects.filter(node_id__in=node_ids)
         perm_ids = relations.values_list('assetpermission_id', flat=True).distinct()
-        if flat:
-            return perm_ids
         perms = self.get_permissions(ids=perm_ids)
+        if flat:
+            return perms.values_list('id', flat=True)
         return perms
 
     def get_permissions_for_user_asset(self, user, asset):
@@ -103,5 +103,5 @@ class AssetPermissionUtil(object):
 
     @staticmethod
     def get_permissions(ids):
-        perms = AssetPermission.objects.filter(id__in=ids).order_by('-date_expired')
+        perms = AssetPermission.objects.filter(id__in=ids).valid().order_by('-date_expired')
         return perms

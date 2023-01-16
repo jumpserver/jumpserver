@@ -1,8 +1,8 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from common.drf.fields import LabeledChoiceField
-from common.drf.serializers import WritableNestedModelSerializer
+from common.serializers.fields import LabeledChoiceField
+from common.serializers import WritableNestedModelSerializer
 from ..const import Category, AllTypes
 from ..models import Platform, PlatformProtocol, PlatformAutomation
 
@@ -44,6 +44,7 @@ class PlatformAutomationSerializer(serializers.ModelSerializer):
             "id",
             "ansible_enabled", "ansible_config",
             "ping_enabled", "ping_method",
+            "push_account_enabled", "push_account_method",
             "gather_facts_enabled", "gather_facts_method",
             "change_secret_enabled", "change_secret_method",
             "verify_account_enabled", "verify_account_method",
@@ -58,6 +59,8 @@ class PlatformAutomationSerializer(serializers.ModelSerializer):
             "verify_account_method": {"label": "校验账号方式"},
             "change_secret_enabled": {"label": "启用账号改密"},
             "change_secret_method": {"label": "账号改密方式"},
+            "push_account_enabled": {"label": "启用推送账号"},
+            "push_account_method": {"label": "推送账号方式"},
             "gather_accounts_enabled": {"label": "启用账号收集"},
             "gather_accounts_method": {"label": "收集账号方式"},
         }
@@ -100,17 +103,23 @@ class PlatformSerializer(WritableNestedModelSerializer):
             "category", "type", "charset",
         ]
         fields = fields_small + [
-            "protocols_enabled", "protocols",
+            "protocols",
             "domain_enabled", "su_enabled",
             "su_method", "automation",
             "comment",
         ]
         extra_kwargs = {
             "su_enabled": {"label": "启用切换账号"},
-            "protocols_enabled": {"label": "启用协议"},
             "domain_enabled": {"label": "启用网域"},
             "domain_default": {"label": "默认网域"},
         }
+
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        queryset = queryset.prefetch_related(
+            'protocols', 'automation'
+        )
+        return queryset
 
 
 class PlatformOpsMethodSerializer(serializers.Serializer):

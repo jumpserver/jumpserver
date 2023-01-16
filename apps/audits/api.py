@@ -8,16 +8,17 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin
 
 from ops.models.job import JobAuditLog
-from common.api import CommonGenericViewSet
+from common.api import JMSGenericViewSet
 from common.drf.filters import DatetimeRangeFilter
 from common.plugins.es import QuerySet as ESQuerySet
-from orgs.utils import current_org
+from orgs.utils import current_org, tmp_to_root_org
 from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet
 from .backends import TYPE_ENGINE_MAPPING
 from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog
 from .serializers import FTPLogSerializer, UserLoginLogSerializer, JobAuditLogSerializer
 from .serializers import (
-    OperateLogSerializer, OperateLogActionDetailSerializer, PasswordChangeLogSerializer
+    OperateLogSerializer, OperateLogActionDetailSerializer,
+    PasswordChangeLogSerializer, ActivitiesOperatorLogSerializer,
 )
 
 
@@ -50,7 +51,7 @@ class UserLoginCommonMixin:
     search_fields = ['username', 'ip', 'city']
 
 
-class UserLoginLogViewSet(UserLoginCommonMixin, ListModelMixin, CommonGenericViewSet):
+class UserLoginLogViewSet(UserLoginCommonMixin, ListModelMixin, JMSGenericViewSet):
 
     @staticmethod
     def get_org_members():
@@ -75,6 +76,19 @@ class MyLoginLogAPIView(UserLoginCommonMixin, generics.ListAPIView):
         return qs
 
 
+class ResourceActivityAPIView(generics.ListAPIView):
+    serializer_class = ActivitiesOperatorLogSerializer
+    rbac_perms = {
+        'GET': 'audits.view_operatelog',
+    }
+
+    def get_queryset(self):
+        resource_id = self.request.query_params.get('resource_id')
+        with tmp_to_root_org():
+            queryset = OperateLog.objects.filter(resource_id=resource_id)[:30]
+        return queryset
+
+
 class OperateLogViewSet(RetrieveModelMixin, ListModelMixin, OrgGenericViewSet):
     model = OperateLog
     serializer_class = OperateLogSerializer
@@ -92,7 +106,7 @@ class OperateLogViewSet(RetrieveModelMixin, ListModelMixin, OrgGenericViewSet):
         return super().get_serializer_class()
 
     def get_queryset(self):
-        qs = OperateLog.objects.all()
+        qs = OperateLog.objects.filter(is_activity=False)
         es_config = settings.OPERATE_LOG_ELASTICSEARCH_CONFIG
         if es_config:
             engine_mod = import_module(TYPE_ENGINE_MAPPING['es'])
@@ -103,7 +117,7 @@ class OperateLogViewSet(RetrieveModelMixin, ListModelMixin, OrgGenericViewSet):
         return qs
 
 
-class PasswordChangeLogViewSet(ListModelMixin, CommonGenericViewSet):
+class PasswordChangeLogViewSet(ListModelMixin, JMSGenericViewSet):
     queryset = PasswordChangeLog.objects.all()
     serializer_class = PasswordChangeLogSerializer
     extra_filter_backends = [DatetimeRangeFilter]

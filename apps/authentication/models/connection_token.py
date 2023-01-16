@@ -11,7 +11,7 @@ from rest_framework.exceptions import PermissionDenied
 
 from assets.const import Protocol
 from common.db.fields import EncryptCharField
-from common.utils import lazyproperty, pretty_string, bulk_get
+from common.utils import lazyproperty, pretty_string, bulk_get, reverse
 from common.utils.timezone import as_current_tz
 from orgs.mixins.models import JMSOrgBaseModel
 from terminal.models import Applet
@@ -39,6 +39,12 @@ class ConnectionToken(JMSOrgBaseModel):
     user_display = models.CharField(max_length=128, default='', verbose_name=_("User display"))
     asset_display = models.CharField(max_length=128, default='', verbose_name=_("Asset display"))
     date_expired = models.DateTimeField(default=date_expired_default, verbose_name=_("Date expired"))
+    from_ticket = models.OneToOneField(
+        'tickets.ApplyLoginAssetTicket', related_name='connection_token',
+        on_delete=models.SET_NULL, null=True, blank=True,
+        verbose_name=_('From ticket')
+    )
+    is_active = models.BooleanField(default=True, verbose_name=_("Active"))
 
     class Meta:
         ordering = ('-date_expired',)
@@ -90,6 +96,9 @@ class ConnectionToken(JMSOrgBaseModel):
         return self.permed_account.date_expired.timestamp()
 
     def is_valid(self):
+        if not self.is_active:
+            error = _('Connection token inactive')
+            raise PermissionDenied(error)
         if self.is_expired:
             error = _('Connection token expired at: {}').format(as_current_tz(self.date_expired))
             raise PermissionDenied(error)
@@ -192,7 +201,7 @@ class ConnectionToken(JMSOrgBaseModel):
 
     @lazyproperty
     def account_object(self):
-        from assets.models import Account
+        from accounts.models import Account
         if not self.asset:
             return None
 

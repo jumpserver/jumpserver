@@ -30,7 +30,7 @@ class AppletHost(Host):
     LOCKING_ORG = '00000000-0000-0000-0000-000000000004'
 
     class Meta:
-        verbose_name = _("Applet host")
+        verbose_name = _('Hosting')
 
     def __str__(self):
         return self.name
@@ -104,7 +104,7 @@ class AppletHost(Host):
 class AppletHostDeployment(JMSBaseModel):
     host = models.ForeignKey('AppletHost', on_delete=models.CASCADE, verbose_name=_('Hosting'))
     initial = models.BooleanField(default=False, verbose_name=_('Initial'))
-    status = models.CharField(max_length=16, default='', verbose_name=_('Status'))
+    status = models.CharField(max_length=16, default='pending', verbose_name=_('Status'))
     date_start = models.DateTimeField(null=True, verbose_name=_('Date start'), db_index=True)
     date_finished = models.DateTimeField(null=True, verbose_name=_("Date finished"))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))

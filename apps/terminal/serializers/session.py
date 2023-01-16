@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from assets.const import Protocol
-from common.drf.fields import LabeledChoiceField
+from common.serializers.fields import LabeledChoiceField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import Session
 
@@ -22,7 +22,12 @@ class SessionType(models.TextChoices):
 class SessionSerializer(BulkOrgResourceModelSerializer):
     org_id = serializers.CharField(allow_blank=True)
     protocol = serializers.ChoiceField(choices=Protocol.choices, label=_("Protocol"))
-    type = LabeledChoiceField(choices=SessionType.choices, label=_("Type"), default=SessionType.normal)
+    type = LabeledChoiceField(
+        choices=SessionType.choices, label=_("Type"), default=SessionType.normal
+    )
+    can_replay = serializers.BooleanField(read_only=True, label=_("Can replay"))
+    can_join = serializers.BooleanField(read_only=True, label=_("Can join"))
+    can_terminate = serializers.BooleanField(read_only=True, label=_("Can terminate"))
 
     class Meta:
         model = Session

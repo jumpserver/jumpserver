@@ -52,10 +52,15 @@ class OperateLog(OrgModelMixin):
     )
     resource_type = models.CharField(max_length=64, verbose_name=_("Resource Type"))
     resource = models.CharField(max_length=128, verbose_name=_("Resource"))
+    resource_id = models.CharField(
+        max_length=36, blank=True, default='', db_index=True,
+        verbose_name=_("Resource")
+    )
     remote_addr = models.CharField(max_length=128, verbose_name=_("Remote addr"), blank=True, null=True)
     datetime = models.DateTimeField(auto_now=True, verbose_name=_('Datetime'), db_index=True)
     before = models.JSONField(default=dict, encoder=ModelJSONFieldEncoder, null=True)
     after = models.JSONField(default=dict, encoder=ModelJSONFieldEncoder, null=True)
+    is_activity = models.BooleanField(default=False, verbose_name=(_('Is Activity')))
 
     def __str__(self):
         return "<{}> {} <{}>".format(self.user, self.action, self.resource)
@@ -86,6 +91,7 @@ class OperateLog(OrgModelMixin):
 
     class Meta:
         verbose_name = _("Operate log")
+        ordering = ('-datetime',)
 
 
 class PasswordChangeLog(models.Model):

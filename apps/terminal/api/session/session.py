@@ -18,7 +18,7 @@ from rest_framework.response import Response
 from common.const.http import GET
 from common.drf.filters import DatetimeRangeFilter
 from common.drf.renders import PassthroughRenderer
-from common.mixins.api import AsyncApiMixin
+from common.api import AsyncApiMixin
 from common.utils import data_to_json
 from common.utils import get_logger, get_object_or_none
 from orgs.mixins.api import OrgBulkModelViewSet

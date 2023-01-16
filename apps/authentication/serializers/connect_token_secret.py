@@ -1,12 +1,13 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
+from accounts.const import SecretType
+from accounts.models import Account
 from acls.models import CommandGroup, CommandFilterACL
-from assets.const import SecretType
-from assets.models import Asset, Account, Platform, Gateway, Domain
+from assets.models import Asset, Platform, Gateway, Domain
 from assets.serializers import PlatformSerializer, AssetProtocolsSerializer
-from common.drf.fields import LabeledChoiceField
-from common.drf.fields import ObjectRelatedField
+from common.serializers.fields import LabeledChoiceField
+from common.serializers.fields import ObjectRelatedField
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from perms.serializers.permission import ActionChoicesField
 from users.models import User
@@ -51,16 +52,15 @@ class _ConnectionTokenAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
         fields = [
-            'name', 'username', 'secret_type', 'secret', 'su_from',
+            'name', 'username', 'secret_type', 'secret', 'su_from', 'privileged'
         ]
 
 
 class _ConnectionTokenGatewaySerializer(serializers.ModelSerializer):
     """ Gateway """
 
-    account = ObjectRelatedField(
-        required=False, source='select_account', queryset=Account.objects,
-        attrs=('id', 'name', 'username', 'secret', 'secret_type')
+    account = _SimpleAccountSerializer(
+        required=False, source='select_account', read_only=True
     )
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
 
@@ -135,6 +135,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
             'id', 'value', 'user', 'asset', 'account',
             'platform', 'command_filter_acls', 'protocol',
             'domain', 'gateway', 'actions', 'expire_at',
+            'from_ticket',
             'expire_now', 'connect_method',
         ]
         extra_kwargs = {

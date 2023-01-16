@@ -3,7 +3,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.drf.fields import LabeledChoiceField
+from common.serializers.fields import LabeledChoiceField
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from orgs.models import Organization
 from tickets.const import TicketType, TicketStatus, TicketState
@@ -29,9 +29,7 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
             'status', 'date_created', 'date_updated', 'org_name', 'rel_snapshot'
         ]
         fields = fields_small + read_only_fields
-        extra_kwargs = {
-            'type': {'required': True}
-        }
+        extra_kwargs = {}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -85,15 +83,10 @@ class TicketApplySerializer(TicketSerializer):
 
         ticket_type = attrs.get('type')
         org_id = attrs.get('org_id')
-        flow = TicketFlow.get_org_related_flows(org_id=org_id) \
-            .filter(type=ticket_type).first()
-
-        if flow:
-            attrs['flow'] = flow
-            return attrs
-        else:
+        flow = TicketFlow.get_org_related_flows(org_id=org_id).filter(type=ticket_type).first()
+        if not flow:
             error = _('The ticket flow `{}` does not exist'.format(ticket_type))
             raise serializers.ValidationError(error)
-
+        attrs['flow'] = flow
         attrs['applicant'] = self.get_applicant(attrs.get('applicant'))
         return attrs

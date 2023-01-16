@@ -1,23 +1,14 @@
-from .change_secret.manager import ChangeSecretManager
-from .gather_facts.manager import GatherFactsManager
-from .gather_accounts.manager import GatherAccountsManager
-from .verify_account.manager import VerifyAccountManager
-from .push_account.manager import PushAccountManager
-from .backup_account.manager import AccountBackupManager
 from .ping.manager import PingManager
+from .ping_gateway.manager import PingGatewayManager
+from .gather_facts.manager import GatherFactsManager
 from ..const import AutomationTypes
 
 
 class ExecutionManager:
     manager_type_mapper = {
         AutomationTypes.ping: PingManager,
-        AutomationTypes.push_account: PushAccountManager,
+        AutomationTypes.ping_gateway: PingGatewayManager,
         AutomationTypes.gather_facts: GatherFactsManager,
-        AutomationTypes.change_secret: ChangeSecretManager,
-        AutomationTypes.verify_account: VerifyAccountManager,
-        AutomationTypes.gather_accounts: GatherAccountsManager,
-        # TODO 后期迁移到自动化策略中
-        'backup_account': AccountBackupManager,
     }
 
     def __init__(self, execution):

@@ -1,9 +1,11 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from assets.models import Platform, Account
+from accounts.models import Account
+from assets.models import Platform
 from assets.serializers import HostSerializer
-from common.drf.fields import LabeledChoiceField
+from common.const.choices import Status
+from common.serializers.fields import LabeledChoiceField
 from common.validators import ProjectUniqueValidator
 from .applet import AppletSerializer
 from .. import const
@@ -46,6 +48,7 @@ class AppletHostSerializer(HostSerializer):
             'load', 'date_synced', 'deploy_options'
         ]
         extra_kwargs = {
+            **HostSerializer.Meta.extra_kwargs,
             'date_synced': {'read_only': True}
         }
 
@@ -84,6 +87,8 @@ class HostAppletSerializer(AppletSerializer):
 
 
 class AppletHostDeploymentSerializer(serializers.ModelSerializer):
+    status = LabeledChoiceField(choices=Status.choices, label=_('Status'), default=Status.pending)
+
     class Meta:
         model = AppletHostDeployment
         fields_mini = ['id', 'host', 'status', 'task']

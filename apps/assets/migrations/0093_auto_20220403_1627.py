@@ -113,6 +113,11 @@ class Migration(migrations.Migration):
                  models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True,
                                       primary_key=True, serialize=False, to='assets.asset')),
                 ('db_name', models.CharField(blank=True, max_length=1024, verbose_name='Database')),
+                ('allow_invalid_cert', models.BooleanField(default=False, verbose_name='Allow invalid cert')),
+                ('ca_cert', models.TextField(blank=True, verbose_name='CA cert')),
+                ('client_cert', models.TextField(blank=True, verbose_name='Client cert')),
+                ('client_key', models.TextField(blank=True, verbose_name='Client key'),),
+                ('use_ssl', models.BooleanField(default=False, verbose_name='Use SSL'),),
             ],
             options={
                 'verbose_name': 'Database',

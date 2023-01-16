@@ -34,6 +34,8 @@ class Counter:
 def on_request_finished_logging_db_query(sender, **kwargs):
     queries = connection.queries
     counters = defaultdict(Counter)
+    table_queries = defaultdict(list)
+
     for query in queries:
         if not query['sql'] or not query['sql'].startswith('SELECT'):
             continue
@@ -44,21 +46,37 @@ def on_request_finished_logging_db_query(sender, **kwargs):
         counters[table_name].time += float(time)
         counters['total'].counter += 1
         counters['total'].time += float(time)
+        table_queries[table_name].append(query)
 
     counters = sorted(counters.items(), key=lambda x: x[1])
     if not counters:
         return
+
     method = 'GET'
     path = '/Unknown'
     current_request = get_current_request()
     if current_request:
         method = current_request.method
         path = current_request.get_full_path()
+
     logger.debug(">>> [{}] {}".format(method, path))
     for name, counter in counters:
         logger.debug("Query {:3} times using {:.2f}s {}".format(
             counter.counter, counter.time, name)
         )
+
+    # print(">>> [{}] {}".format(method, path))
+    # for table_name, queries in table_queries.items():
+    #     if table_name.startswith('rbac_') or table_name.startswith('auth_permission'):
+    #         continue
+    #     print("- Table: {}".format(table_name))
+    #     for i, query in enumerate(queries, 1):
+    #         sql = query['sql']
+    #         if not sql or not sql.startswith('SELECT'):
+    #             continue
+    #         print('\t{}. {}'.format(i, sql))
+
+    on_request_finished_release_local(sender, **kwargs)
 
 
 def on_request_finished_release_local(sender, **kwargs):

@@ -1,5 +1,6 @@
 import os.path
 import random
+import shutil
 
 import yaml
 from django.conf import settings
@@ -87,6 +88,11 @@ class Applet(JMSBaseModel):
         serializer = AppletSerializer(instance=instance, data=manifest)
         serializer.is_valid()
         serializer.save(builtin=True)
+        pkg_path = default_storage.path('applets/{}'.format(name))
+
+        if os.path.exists(pkg_path):
+            shutil.rmtree(pkg_path)
+        shutil.copytree(path, pkg_path)
         return instance
 
     def select_host_account(self):
@@ -123,11 +129,11 @@ class Applet(JMSBaseModel):
 
 
 class AppletPublication(JMSBaseModel):
-    applet = models.ForeignKey('Applet', on_delete=models.PROTECT, related_name='publications',
+    applet = models.ForeignKey('Applet', on_delete=models.CASCADE, related_name='publications',
                                verbose_name=_('Applet'))
-    host = models.ForeignKey('AppletHost', on_delete=models.PROTECT, related_name='publications',
-                             verbose_name=_('Host'))
-    status = models.CharField(max_length=16, default='ready', verbose_name=_('Status'))
+    host = models.ForeignKey('AppletHost', on_delete=models.CASCADE, related_name='publications',
+                             verbose_name=_('Hosting'))
+    status = models.CharField(max_length=16, default='pending', verbose_name=_('Status'))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
     class Meta:

@@ -28,6 +28,11 @@ class AllTypes(ChoicesMixin):
         return choices
 
     @classmethod
+    def filter_choices(cls, category):
+        choices = dict(cls.category_types()).get(category, cls).choices
+        return choices() if callable(choices) else choices
+
+    @classmethod
     def get_constraints(cls, category, tp):
         types_cls = dict(cls.category_types()).get(category)
         if not types_cls:
@@ -45,15 +50,24 @@ class AllTypes(ChoicesMixin):
         return constraints.get('protocols')[0]['name']
 
     @classmethod
+    def get_automation_methods(cls):
+        from assets.automations import platform_automation_methods as asset_methods
+        from accounts.automations import platform_automation_methods as account_methods
+        return asset_methods + account_methods
+
+    @classmethod
     def set_automation_methods(cls, category, tp, constraints):
         from assets.automations import filter_platform_methods
         automation = constraints.get('automation', {})
         automation_methods = {}
+        platform_automation_methods = cls.get_automation_methods()
         for item, enabled in automation.items():
             if not enabled:
                 continue
             item_name = item.replace('_enabled', '')
-            methods = filter_platform_methods(category, tp, item_name)
+            methods = filter_platform_methods(
+                category, tp, item_name, methods=platform_automation_methods
+            )
             methods = [{'name': m['name'], 'id': m['id']} for m in methods]
             automation_methods[item_name + '_methods'] = methods
         automation.update(automation_methods)
@@ -162,11 +176,16 @@ class AllTypes(ChoicesMixin):
         return node
 
     @classmethod
-    def to_tree_nodes(cls, include_asset):
+    def to_tree_nodes(cls, include_asset, count_resource='asset'):
+        from accounts.models import Account
         from ..models import Asset, Platform
-        asset_platforms = Asset.objects.all().values_list('platform_id', flat=True)
+        if count_resource == 'account':
+            resource_platforms = Account.objects.all().values_list('asset__platform_id', flat=True)
+        else:
+            resource_platforms = Asset.objects.all().values_list('platform_id', flat=True)
+
         platform_count = defaultdict(int)
-        for platform_id in asset_platforms:
+        for platform_id in resource_platforms:
             platform_count[platform_id] += 1
 
         category_type_mapper = defaultdict(int)

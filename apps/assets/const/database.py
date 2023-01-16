@@ -29,11 +29,19 @@ class DatabaseTypes(BaseType):
                 'ansible_config': {
                     'ansible_connection': 'local',
                 },
+                'ping_enabled': True,
                 'gather_facts_enabled': True,
                 'gather_accounts_enabled': True,
                 'verify_account_enabled': True,
                 'change_secret_enabled': True,
-            }
+                'push_account_enabled': True,
+            },
+            cls.REDIS: {
+                'push_account_enabled': False,
+            },
+            cls.CLICKHOUSE: {
+                'push_account_enabled': False,
+            },
         }
         return constrains
 

@@ -6,6 +6,7 @@ import urllib.parse
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
@@ -13,10 +14,11 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
-from common.drf.api import JMSModelViewSet
-from common.http import is_true
+from common.api import JMSModelViewSet
+from common.utils.http import is_true
 from common.utils import random_string
 from common.utils.django import get_request_os
+from common.exceptions import JMSException
 from orgs.mixins.api import RootOrgViewMixin
 from perms.models import ActionChoices
 from terminal.connect_methods import NativeClient, ConnectMethodUtil
@@ -158,7 +160,9 @@ class RDPFileClientProtocolURLMixin:
 
     def get_smart_endpoint(self, protocol, asset=None):
         target_ip = asset.get_target_ip() if asset else ''
-        endpoint = EndpointRule.match_endpoint(target_ip, protocol, self.request)
+        endpoint = EndpointRule.match_endpoint(
+            target_instance=asset, target_ip=target_ip, protocol=protocol, request=self.request
+        )
         return endpoint
 
 
@@ -231,8 +235,6 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         return super().perform_create(serializer)
 
     def validate_serializer(self, serializer):
-        from perms.utils.account import PermAccountUtil
-
         data = serializer.validated_data
         user = self.get_user(serializer)
         asset = data.get('asset')
@@ -241,23 +243,51 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         data['user'] = user
         data['value'] = random_string(16)
 
-        util = PermAccountUtil()
-        permed_account = util.validate_permission(user, asset, account_name)
-
-        if not permed_account or not permed_account.actions:
-            msg = 'user `{}` not has asset `{}` permission for account `{}`'.format(
-                user, asset, account_name
-            )
-            raise PermissionDenied(msg)
-
-        if permed_account.date_expired < timezone.now():
-            raise PermissionDenied('Expired')
-
-        if permed_account.has_secret:
+        account = self._validate_perm(user, asset, account_name)
+        if account.has_secret:
             data['input_secret'] = ''
-        if permed_account.username != '@INPUT':
+        if account.username != '@INPUT':
             data['input_username'] = ''
-        return permed_account
+
+        ticket = self._validate_acl(user, asset, account)
+        if ticket:
+            data['from_ticket'] = ticket
+            data['is_active'] = False
+
+        return account
+
+    @staticmethod
+    def _validate_perm(user, asset, account_name):
+        from perms.utils.account import PermAccountUtil
+        account = PermAccountUtil().validate_permission(user, asset, account_name)
+        if not account or not account.actions:
+            msg = _('Account not found')
+            raise JMSException(code='perm_account_invalid', detail=msg)
+        if account.date_expired < timezone.now():
+            msg = _('Permission Expired')
+            raise JMSException(code='perm_expired', detail=msg)
+        return account
+
+    def _validate_acl(self, user, asset, account):
+        from acls.models import LoginAssetACL
+        acl = LoginAssetACL.filter_queryset(user, asset, account).valid().first()
+        if not acl:
+            return
+        if acl.is_action(acl.ActionChoices.accept):
+            return
+        if acl.is_action(acl.ActionChoices.reject):
+            msg = _('ACL action is reject')
+            raise JMSException(code='acl_reject', detail=msg)
+        if acl.is_action(acl.ActionChoices.review):
+            if not self.request.query_params.get('create_ticket'):
+                msg = _('ACL action is review')
+                raise JMSException(code='acl_review', detail=msg)
+
+            ticket = LoginAssetACL.create_login_asset_review_ticket(
+                user=user, asset=asset, account_username=account.username,
+                assignees=acl.reviewers.all(), org_id=asset.org_id
+            )
+            return ticket
 
 
 class SuperConnectionTokenViewSet(ConnectionTokenViewSet):

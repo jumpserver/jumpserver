@@ -6,7 +6,9 @@ from django.db import migrations
 def migrate_remove_redundant_permission(apps, *args):
     model = apps.get_model('rbac', 'ContentType')
     model.objects.filter(app_label='applications').delete()
-    model.objects.filter(app_label='ops', model='task').delete()
+    model.objects.filter(app_label='ops', model__in=[
+        'task', 'commandexecution'
+    ]).delete()
 
     model.objects.filter(app_label='xpack', model__in=[
         'applicationchangeauthplan', 'applicationchangeauthplanexecution',
@@ -15,11 +17,17 @@ def migrate_remove_redundant_permission(apps, *args):
     ]).delete()
 
     model.objects.filter(app_label='assets', model__in=[
-        'authbook', 'historicalauthbook'
+        'authbook', 'historicalauthbook', 'test_gateway',
+        'accountbackupplan', 'accountbackupplanexecution', 'gathereduser', 'systemuser'
     ]).delete()
 
     model.objects.filter(app_label='perms', model__in=[
         'applicationpermission', 'permedapplication', 'commandfilterrule', 'historicalauthbook'
+    ]).delete()
+
+    perm_model = apps.get_model('auth', 'Permission')
+    perm_model.objects.filter(codename__in=[
+        'view_permusergroupasset', 'view_permuserasset', 'push_assetsystemuser'
     ]).delete()
 
 

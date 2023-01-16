@@ -6,14 +6,14 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from users.models import User
-from assets.models import Asset, Account
+from assets.models import Asset
+from accounts.models import Account
 from orgs.mixins.models import JMSOrgBaseModel
 from orgs.mixins.models import OrgManager
 from common.utils import date_expired_default
 from common.utils.timezone import local_now
-
 from perms.const import ActionChoices
-from assets.const import AliasAccount
+from accounts.const import AliasAccount
 
 __all__ = ['AssetPermission', 'ActionChoices']
 

@@ -1,13 +1,14 @@
 # ~*~ coding: utf-8 ~*~
-from django.views.generic.detail import SingleObjectMixin
 from django.utils.translation import ugettext as _
-from rest_framework.views import APIView, Response
+from django.views.generic.detail import SingleObjectMixin
 from rest_framework.serializers import ValidationError
+from rest_framework.views import APIView, Response
 
 from common.utils import get_logger
+from assets.tasks import test_assets_connectivity_manual
 from orgs.mixins.api import OrgBulkModelViewSet
-from ..models import Domain, Gateway
 from .. import serializers
+from ..models import Domain, Gateway
 
 logger = get_logger(__file__)
 __all__ = ['DomainViewSet', 'GatewayViewSet', "GatewayTestConnectionApi"]
@@ -40,7 +41,7 @@ class GatewayViewSet(OrgBulkModelViewSet):
 
 class GatewayTestConnectionApi(SingleObjectMixin, APIView):
     rbac_perms = {
-        'POST': 'assets.test_gateway'
+        'POST': 'assets.test_assetconnectivity'
     }
 
     def get_queryset(self):
@@ -54,8 +55,5 @@ class GatewayTestConnectionApi(SingleObjectMixin, APIView):
             local_port = int(local_port)
         except ValueError:
             raise ValidationError({'port': _('Number required')})
-        ok, e = gateway.test_connective(local_port=local_port)
-        if ok:
-            return Response("ok")
-        else:
-            return Response({"error": e}, status=400)
+        task = test_assets_connectivity_manual.delay([gateway.id], local_port)
+        return Response({'task': task.id})

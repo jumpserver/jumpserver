@@ -2,7 +2,7 @@ from django.core.cache import cache
 
 from rest_framework.request import Request
 
-from common.http import is_true
+from common.utils.http import is_true
 from common.utils import lazyproperty
 from perms.utils import UserPermTreeRefreshUtil
 from users.models import User
@@ -36,5 +36,5 @@ class RebuildTreeMixin:
             cache.delete(force_cache_key)
         else:
             force = False
-            cache.set(force_cache_key, count+1, force_timeout)
+            cache.set(force_cache_key, count + 1, force_timeout)
         return force

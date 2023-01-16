@@ -9,6 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.local import add_encrypted_field_set
 from common.utils import signer, crypto
+from .validators import PortRangeValidator
 
 __all__ = [
     "JsonMixin",
@@ -27,7 +28,9 @@ __all__ = [
     "EncryptJsonDictTextField",
     "EncryptJsonDictCharField",
     "PortField",
+    "PortRangeField",
     "BitChoices",
+    "TreeChoices",
 ]
 
 
@@ -216,14 +219,14 @@ class PortField(models.IntegerField):
         super().__init__(*args, **kwargs)
 
 
-class BitChoices(models.IntegerChoices):
+class TreeChoices(models.Choices):
+    @classmethod
+    def is_tree(cls):
+        return True
+
     @classmethod
     def branches(cls):
         return [i for i in cls]
-
-    @classmethod
-    def is_tree(cls):
-        return False
 
     @classmethod
     def tree(cls):
@@ -234,7 +237,7 @@ class BitChoices(models.IntegerChoices):
 
     @classmethod
     def render_node(cls, node):
-        if isinstance(node, BitChoices):
+        if isinstance(node, models.Choices):
             return {
                 "value": node.name,
                 "label": node.label,
@@ -249,7 +252,24 @@ class BitChoices(models.IntegerChoices):
 
     @classmethod
     def all(cls):
+        return [i[0] for i in cls.choices]
+
+
+class BitChoices(models.IntegerChoices, TreeChoices):
+    @classmethod
+    def is_tree(cls):
+        return False
+
+    @classmethod
+    def all(cls):
         value = 0
         for c in cls:
             value |= c.value
         return value
+
+
+class PortRangeField(models.CharField):
+    def __init__(self, **kwargs):
+        kwargs['max_length'] = 16
+        super().__init__(**kwargs)
+        self.validators.append(PortRangeValidator())

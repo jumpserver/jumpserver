@@ -1,10 +1,11 @@
 import abc
+import base64
+import json
+import locale
+import os
 import subprocess
 import sys
 import time
-import os
-import json
-import base64
 from subprocess import CREATE_NO_WINDOW
 
 _blockInput = None
@@ -38,6 +39,16 @@ def notify_err_message(msg):
         _messageBox(msg, 'Error')
 
 
+def decode_content(content: bytes) -> str:
+    for encoding_name in ['utf-8', 'gbk', 'gb2312']:
+        try:
+            return content.decode(encoding_name)
+        except Exception as e:
+            print(e)
+    encoding_name = locale.getpreferredencoding()
+    return content.decode(encoding_name)
+
+
 def check_pid_alive(pid) -> bool:
     # tasklist  /fi "PID eq 508" /fo csv
     # '"映像名称","PID","会话名      ","会话#   ","内存使用 "\r\n"wininit.exe","508","Services","0","6,920 K"\r\n'
@@ -45,7 +56,7 @@ def check_pid_alive(pid) -> bool:
 
         csv_ret = subprocess.check_output(["tasklist", "/fi", f'PID eq {pid}', "/fo", "csv"],
                                           creationflags=CREATE_NO_WINDOW)
-        content = csv_ret.decode()
+        content = decode_content(csv_ret)
         content_list = content.strip().split("\r\n")
         if len(content_list) != 2:
             notify_err_message(content)
@@ -82,13 +93,20 @@ class User(DictObj):
     username: str
 
 
+class Step(DictObj):
+    step: int
+    target: str
+    command: str
+    value: str
+
+
 class Specific(DictObj):
     # web
     autofill: str
     username_selector: str
     password_selector: str
     submit_selector: str
-    script: list
+    script: list[Step]
 
     # database
     db_name: str

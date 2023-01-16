@@ -6,13 +6,15 @@ from typing import Callable
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
-from common.drf.serializers import FileSerializer
+from common.api import JMSBulkModelViewSet
+from common.serializers import FileSerializer
 from common.utils import is_uuid
 from terminal import serializers
 from terminal.models import AppletPublication, Applet
@@ -82,7 +84,7 @@ class DownloadUploadMixin:
         return response
 
 
-class AppletViewSet(DownloadUploadMixin, viewsets.ModelViewSet):
+class AppletViewSet(DownloadUploadMixin, JMSBulkModelViewSet):
     queryset = Applet.objects.all()
     serializer_class = serializers.AppletSerializer
     rbac_perms = {
@@ -93,9 +95,9 @@ class AppletViewSet(DownloadUploadMixin, viewsets.ModelViewSet):
     def get_object(self):
         pk = self.kwargs.get('pk')
         if not is_uuid(pk):
-            return self.queryset.get(name=pk)
+            return get_object_or_404(Applet, name=pk)
         else:
-            return self.queryset.get(pk=pk)
+            return get_object_or_404(Applet, pk=pk)
 
     def perform_destroy(self, instance):
         if not instance.name:

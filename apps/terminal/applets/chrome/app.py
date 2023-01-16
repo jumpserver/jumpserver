@@ -3,13 +3,13 @@ from enum import Enum
 from subprocess import CREATE_NO_WINDOW
 
 from selenium import webdriver
-from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webelement import WebElement
 
-from common import (Asset, User, Account, Platform)
-from common import (notify_err_message, block_input, unblock_input)
+from common import (Asset, User, Account, Platform, Step)
 from common import (BaseApplication)
+from common import (notify_err_message, block_input, unblock_input)
 
 
 class Command(Enum):
@@ -93,37 +93,38 @@ class WebAPP(object):
         if autofill_type == "basic":
             self._steps = self._default_custom_steps()
         elif autofill_type == "script":
-            steps = sorted(self.asset.specific.script, key=lambda step_item: step_item['step'])
+            script_list = self.asset.specific.script
+            steps = sorted(script_list, key=lambda step_item: step_item.step)
             for item in steps:
-                val = item['value']
+                val = item.value
                 if val:
                     val = val.replace("{USERNAME}", self.account.username)
                     val = val.replace("{SECRET}", self.account.secret)
-                item['value'] = val
+                item.value = val
                 self._steps.append(item)
 
     def _default_custom_steps(self) -> list:
         account = self.account
         specific_property = self.asset.specific
         default_steps = [
-            {
+            Step({
                 "step": 1,
                 "value": account.username,
                 "target": specific_property.username_selector,
                 "command": "type"
-            },
-            {
+            }),
+            Step({
                 "step": 2,
                 "value": account.secret,
                 "target": specific_property.password_selector,
                 "command": "type"
-            },
-            {
+            }),
+            Step({
                 "step": 3,
                 "value": "",
                 "target": specific_property.submit_selector,
                 "command": "click"
-            }
+            })
         ]
         return default_steps
 
@@ -132,7 +133,8 @@ class WebAPP(object):
             return True
 
         for step in self._steps:
-            action = StepAction(**step)
+            action = StepAction(target=step.target, value=step.value,
+                                command=step.command)
             ret = execute_action(driver, action)
             if not ret:
                 unblock_input()
@@ -180,7 +182,9 @@ class AppletApplication(BaseApplication):
         self.driver.maximize_window()
 
     def wait(self):
-        msg = "Unable to evaluate script: disconnected: not connected to DevTools\n"
+        disconnected_msg = "Unable to evaluate script: disconnected: not connected to DevTools\n"
+        closed_msg = "Unable to evaluate script: no such window: target window already closed"
+
         while True:
             time.sleep(5)
             logs = self.driver.get_log('driver')
@@ -188,14 +192,16 @@ class AppletApplication(BaseApplication):
                 continue
             ret = logs[-1]
             if isinstance(ret, dict):
-                if ret.get("message") == msg:
-                    print(ret)
+                message = ret.get('message', '')
+                if disconnected_msg in message or closed_msg in message:
                     break
+                print("ret: ", ret)
         self.close()
 
     def close(self):
         if self.driver:
             try:
-                self.driver.close()
+                # quit 退出全部打开的窗口
+                self.driver.quit()
             except Exception as e:
                 print(e)

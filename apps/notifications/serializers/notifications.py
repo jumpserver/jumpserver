@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from common.drf.serializers import BulkModelSerializer
+from common.serializers import BulkModelSerializer
 from notifications.models import SystemMsgSubscription, UserMsgSubscription
 
 

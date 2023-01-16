@@ -5,7 +5,7 @@ import random
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import get_logger, lazyproperty
+from common.utils import get_logger
 from orgs.mixins.models import JMSOrgBaseModel
 from .gateway import Gateway
 
@@ -31,17 +31,21 @@ class Domain(JMSOrgBaseModel):
     def random_gateway(self):
         gateways = [gw for gw in self.active_gateways if gw.is_connective]
         if not gateways:
-            gateways = self.active_gateways
             logger.warn(f'Gateway all bad. domain={self}, gateway_num={len(gateways)}.')
+            gateways = self.active_gateways
+        if not gateways:
+            logger.warn(f'Not active gateway. domain={self}')
+            return None
         return random.choice(gateways)
 
-    @lazyproperty
+    @property
     def active_gateways(self):
         return self.gateways.filter(is_active=True)
 
-    @lazyproperty
+    @property
     def gateways(self):
-        return self.get_gateway_queryset().filter(domain=self)
+        queryset = self.get_gateway_queryset().filter(domain=self)
+        return queryset
 
     @classmethod
     def get_gateway_queryset(cls):

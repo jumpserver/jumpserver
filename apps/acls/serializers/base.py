@@ -2,7 +2,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from acls.models.base import ActionChoices
-from common.drf.fields import LabeledChoiceField, ObjectRelatedField
+from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
 from orgs.models import Organization
 from users.models import User
 
@@ -55,10 +55,28 @@ class BaseUserAssetAccountACLSerializerMixin(serializers.Serializer):
     users = ACLUsersSerializer(label=_('User'))
     assets = ACLAssestsSerializer(label=_('Asset'))
     accounts = ACLAccountsSerializer(label=_('Account'))
+    users_username_group = serializers.ListField(
+        source='users.username_group', read_only=True, child=serializers.CharField(),
+        label=_('User (username)')
+    )
+    assets_name_group = serializers.ListField(
+        source='assets.name_group', read_only=True, child=serializers.CharField(),
+        label=_('Asset (name)')
+    )
+    assets_address_group = serializers.ListField(
+        source='assets.address_group', read_only=True, child=serializers.CharField(),
+        label=_('Asset (address)')
+    )
+    accounts_username_group = serializers.ListField(
+        source='accounts.username_group', read_only=True, child=serializers.CharField(),
+        label=_('Account (username)')
+    )
     reviewers = ObjectRelatedField(
         queryset=User.objects, many=True, required=False, label=_('Reviewers')
     )
-    reviewers_amount = serializers.IntegerField(read_only=True, source="reviewers.count")
+    reviewers_amount = serializers.IntegerField(
+        read_only=True, source="reviewers.count", label=_('Reviewers amount')
+    )
     action = LabeledChoiceField(
         choices=ActionChoices.choices, default=ActionChoices.reject, label=_("Action")
     )
@@ -66,6 +84,8 @@ class BaseUserAssetAccountACLSerializerMixin(serializers.Serializer):
     class Meta:
         fields_mini = ["id", "name"]
         fields_small = fields_mini + [
+            'users_username_group', 'assets_address_group', 'assets_name_group',
+            'accounts_username_group',
             "users", "accounts", "assets", "is_active",
             "date_created", "date_updated", "priority",
             "action", "comment", "created_by", "org_id",
@@ -73,7 +93,6 @@ class BaseUserAssetAccountACLSerializerMixin(serializers.Serializer):
         fields_m2m = ["reviewers", "reviewers_amount"]
         fields = fields_small + fields_m2m
         extra_kwargs = {
-            "reviewers": {"allow_null": False, "required": True},
             "priority": {"default": 50},
             "is_active": {"default": True},
         }

@@ -2,6 +2,7 @@
 #
 import uuid
 
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth import BACKEND_SESSION_KEY
 from django.db import transaction
@@ -21,6 +22,7 @@ from audits.utils import model_to_dict_for_operate_log as model_to_dict
 from authentication.signals import post_auth_failed, post_auth_success
 from authentication.utils import check_different_city_login_if_need
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR, SKIP_SIGNAL
+from common.signals import django_ready
 from common.utils import get_request_ip, get_logger, get_syslogger
 from common.utils.encode import data_to_json
 from jumpserver.utils import current_request
@@ -164,9 +166,10 @@ def on_object_created_or_update(sender, instance=None, created=False, update_fie
         log_id, before, after = get_instance_current_with_cache_diff(current_instance)
 
     resource_type = sender._meta.verbose_name
+    object_name = sender._meta.object_name
     create_or_update_operate_log(
-        action, resource_type, resource=instance,
-        log_id=log_id, before=before, after=after
+        action, resource_type, resource=instance, log_id=log_id,
+        before=before, after=after, object_name=object_name
     )
 
 
@@ -278,3 +281,34 @@ def on_user_auth_failed(sender, username, request, reason='', **kwargs):
     data = generate_data(username, request)
     data.update({'reason': reason[:128], 'status': False})
     write_login_log(**data)
+
+
+@receiver(django_ready)
+def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
+    exclude_label = {
+        'django_cas_ng', 'captcha', 'admin', 'jms_oidc_rp',
+        'django_celery_beat', 'contenttypes', 'sessions', 'auth'
+    }
+    exclude_object_name = {
+        'UserPasswordHistory', 'ContentType',
+        'SiteMessage', 'SiteMessageUsers',
+        'PlatformAutomation', 'PlatformProtocol', 'Protocol',
+        'HistoricalAccount', 'GatheredUser', 'ApprovalRule',
+        'BaseAutomation', 'CeleryTask', 'Command', 'JobAuditLog',
+        'ConnectionToken', 'SessionJoinRecord',
+        'HistoricalJob', 'Status', 'TicketStep', 'Ticket',
+        'UserAssetGrantedTreeNodeRelation', 'TicketAssignee',
+        'SuperTicket', 'SuperConnectionToken', 'PermNode',
+        'PermedAsset', 'PermedAccount', 'MenuPermission',
+        'Permission', 'TicketSession', 'ApplyLoginTicket',
+        'ApplyCommandTicket', 'ApplyLoginAssetTicket',
+        'FTPLog', 'OperateLog', 'PasswordChangeLog'
+    }
+    for i, app in enumerate(apps.get_models(), 1):
+        app_label = app._meta.app_label
+        app_object_name = app._meta.object_name
+        if app_label in exclude_label or \
+                app_object_name in exclude_object_name or \
+                app_object_name.endswith('Execution'):
+            continue
+        MODELS_NEED_RECORD.add(app_object_name)

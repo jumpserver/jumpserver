@@ -35,21 +35,5 @@ class CommandFilterACLViewSet(OrgBulkModelViewSet):
             'org_id': serializer.org.id
         }
         ticket = serializer.cmd_filter_acl.create_command_review_ticket(**data)
-
-        url_review_status = reverse(
-            view_name='api-tickets:super-ticket-status', kwargs={'pk': str(ticket.id)}
-        )
-        url_ticket_detail = reverse(
-            view_name='api-tickets:ticket-detail', kwargs={'pk': str(ticket.id)},
-            external=True, api_to_ui=True
-        )
-        resp_data = {
-            'check_review_status': {'method': 'GET', 'url': url_review_status},
-            'close_review': {'method': 'DELETE', 'url': url_review_status},
-            'ticket_detail_url': url_ticket_detail,
-            'reviewers': [
-                str(ticket_assignee.assignee)
-                for ticket_assignee in ticket.current_step.ticket_assignees.all()
-            ]
-        }
-        return Response(resp_data)
+        info = ticket.get_extra_info_of_review(user=request.user)
+        return info

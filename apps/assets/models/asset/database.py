@@ -16,19 +16,16 @@ class Database(Asset):
         return '{}({}://{}/{})'.format(self.name, self.type, self.address, self.db_name)
 
     @property
-    def ip(self):
-        return self.address
-
-    @property
     def specific(self):
         return {
             'db_name': self.db_name,
             'use_ssl': self.use_ssl,
-            'ca_cert': self.ca_cert,
-            'client_cert': self.client_cert,
-            'client_key': self.client_key,
             'allow_invalid_cert': self.allow_invalid_cert,
         }
+
+    @property
+    def ip(self):
+        return self.address
 
     class Meta:
         verbose_name = _("Database")

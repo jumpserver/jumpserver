@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.mixins import CreateModelMixin
 
 from orgs.utils import tmp_to_root_org
-from common.drf.api import JMSGenericViewSet
+from common.api import JMSGenericViewSet
 from terminal.serializers import SessionSerializer
 from tickets.models import TicketSession
 from tickets.serializers import TicketSessionRelationSerializer

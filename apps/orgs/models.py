@@ -3,7 +3,9 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.db.models import JMSBaseModel
 from common.tree import TreeNode
-from common.utils import lazyproperty, settings
+from common.utils import lazyproperty, settings, get_logger
+
+logger = get_logger(__name__)
 
 
 class OrgRoleMixin:
@@ -126,7 +128,6 @@ class Organization(OrgRoleMixin, JMSBaseModel):
 
     @classmethod
     def expire_orgs_mapping(cls):
-        print("Expire orgs mapping: ")
         cls.orgs_mapping = None
 
     def org_id(self):
@@ -136,6 +137,15 @@ class Organization(OrgRoleMixin, JMSBaseModel):
     def default(cls):
         defaults = dict(id=cls.DEFAULT_ID, name=cls.DEFAULT_NAME)
         obj, created = cls.objects.get_or_create(defaults=defaults, id=cls.DEFAULT_ID)
+        if not obj.builtin:
+            obj.builtin = True
+            obj.save()
+        return obj
+
+    @classmethod
+    def system(cls):
+        defaults = dict(id=cls.SYSTEM_ID, name=cls.SYSTEM_NAME)
+        obj, created = cls.objects.get_or_create(defaults=defaults, id=cls.SYSTEM_ID)
         if not obj.builtin:
             obj.builtin = True
             obj.save()

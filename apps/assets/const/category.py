@@ -14,6 +14,12 @@ class Category(ChoicesMixin, models.TextChoices):
     CLOUD = 'cloud', _("Cloud service")
     WEB = 'web', _("Web")
 
+    @classmethod
+    def filter_choices(cls, category):
+        _category = getattr(cls, category.upper(), None)
+        choices = [(_category.value, _category.label)] if _category else cls.choices
+        return choices
+
 
 
 

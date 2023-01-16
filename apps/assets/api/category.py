@@ -2,7 +2,7 @@ from rest_framework.mixins import ListModelMixin
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from common.drf.api import JMSGenericViewSet
+from common.api import JMSGenericViewSet
 from assets.serializers import CategorySerializer, TypeSerializer
 from assets.const import AllTypes
 

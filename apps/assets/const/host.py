@@ -54,6 +54,7 @@ class HostTypes(BaseType):
                 'gather_accounts_enabled': True,
                 'verify_account_enabled': True,
                 'change_secret_enabled': True,
+                'push_account_enabled': True
             },
             cls.WINDOWS: {
                 'ansible_config': {
@@ -74,9 +75,7 @@ class HostTypes(BaseType):
                 {'name': 'Unix'},
                 {'name': 'macOS'},
                 {'name': 'BSD'},
-                {'name': 'AIX', 'automation': {
-                    'change_secret_method': 'push_secret_aix'
-                }}
+                {'name': 'AIX'},
             ],
             cls.WINDOWS: [
                 {'name': 'Windows'},

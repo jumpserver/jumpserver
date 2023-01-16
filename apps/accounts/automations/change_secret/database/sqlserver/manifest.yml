@@ -1,0 +1,6 @@
+id: change_secret_sqlserver
+name: Change secret for SQLServer
+category: database
+type:
+  - sqlserver
+method: change_secret

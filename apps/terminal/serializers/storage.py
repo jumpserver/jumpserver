@@ -5,9 +5,9 @@ from rest_framework.validators import UniqueValidator
 from urllib.parse import urlparse
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import TextChoices
-
-from common.drf.serializers import MethodSerializer
-from common.drf.fields import ReadableHiddenField, EncryptedField
+from common.serializers.fields import LabeledChoiceField
+from common.serializers import MethodSerializer
+from common.serializers.fields import ReadableHiddenField, EncryptedField
 from ..models import ReplayStorage, CommandStorage
 from .. import const
 
@@ -178,6 +178,7 @@ command_storage_type_serializer_classes_mapping = {
 
 # BaseStorageSerializer
 class BaseStorageSerializer(serializers.ModelSerializer):
+    type = LabeledChoiceField(choices=const.ReplayStorageType.choices, label=_('Type'))
     storage_type_serializer_classes_mapping = {}
     meta = MethodSerializer()
 

@@ -39,11 +39,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='platform',
-            name='protocols_enabled',
-            field=models.BooleanField(default=True, verbose_name='Protocols enabled'),
-        ),
-        migrations.AddField(
-            model_name='platform',
             name='su_enabled',
             field=models.BooleanField(default=False, verbose_name='Su enabled'),
         ),

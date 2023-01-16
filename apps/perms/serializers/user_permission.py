@@ -5,10 +5,12 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from assets.const import Category, AllTypes
-from assets.models import Node, Asset, Platform, Account
+from assets.models import Node, Asset, Platform
+from accounts.models import Account
 from assets.serializers.asset.common import AssetProtocolsSerializer
-from common.drf.fields import ObjectRelatedField, LabeledChoiceField
+from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from perms.serializers.permission import ActionChoicesField
+from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 
 __all__ = [
     'NodePermedSerializer', 'AssetPermedSerializer',
@@ -16,12 +18,13 @@ __all__ = [
 ]
 
 
-class AssetPermedSerializer(serializers.ModelSerializer):
+class AssetPermedSerializer(OrgResourceModelSerializerMixin):
     """ 被授权资产的数据结构 """
     platform = ObjectRelatedField(required=False, queryset=Platform.objects, label=_('Platform'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
+    domain = ObjectRelatedField(required=False, queryset=Node.objects, label=_('Domain'))
 
     class Meta:
         model = Asset

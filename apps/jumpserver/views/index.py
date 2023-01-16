@@ -1,7 +1,7 @@
 from django.views.generic import View
 from django.shortcuts import redirect
 from common.permissions import IsValidUser
-from common.mixins.views import PermissionsMixin
+from common.views.mixins import PermissionsMixin
 
 __all__ = ['IndexView']
 

@@ -2,7 +2,7 @@ from django_filters import rest_framework as filters
 from django.db.models import QuerySet, Q
 
 from common.drf.filters import BaseFilterSet
-from common.utils import get_object_or_none
+from common.utils import get_object_or_none, is_uuid
 from users.models import User, UserGroup
 from assets.models import Node, Asset
 from perms.models import AssetPermission
@@ -91,7 +91,7 @@ class PermissionBaseFilter(BaseFilterSet):
 class AssetPermissionFilter(PermissionBaseFilter):
     is_effective = filters.BooleanFilter(method='do_nothing')
     node_id = filters.UUIDFilter(method='do_nothing')
-    node = filters.CharFilter(method='do_nothing')
+    node_name = filters.CharFilter(method='do_nothing')
     asset_id = filters.UUIDFilter(method='do_nothing')
     asset_name = filters.CharFilter(method='do_nothing')
     ip = filters.CharFilter(method='do_nothing')
@@ -100,8 +100,9 @@ class AssetPermissionFilter(PermissionBaseFilter):
         model = AssetPermission
         fields = (
             'user_id', 'username', 'user_group_id',
-            'user_group', 'node_id', 'node', 'asset_id', 'name', 'ip', 'name',
-            'all', 'asset_id', 'is_valid', 'is_effective', 'from_ticket'
+            'user_group', 'node_id', 'node_name', 'asset_id', 'asset_name',
+            'name', 'ip', 'name',
+            'all', 'is_valid', 'is_effective', 'from_ticket'
         )
 
     @property
@@ -116,7 +117,7 @@ class AssetPermissionFilter(PermissionBaseFilter):
     def filter_node(self, queryset: QuerySet):
         is_query_all = self.get_query_param('all', True)
         node_id = self.get_query_param('node_id')
-        node_name = self.get_query_param('node')
+        node_name = self.get_query_param('node_name')
         if node_id:
             _nodes = Node.objects.filter(pk=node_id)
         elif node_name:

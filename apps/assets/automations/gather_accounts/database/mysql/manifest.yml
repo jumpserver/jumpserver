@@ -1,6 +1,0 @@
-id: gather_accounts_mysql
-name: Gather account from MySQL
-category: database
-type:
-  - mysql
-method: gather_accounts
