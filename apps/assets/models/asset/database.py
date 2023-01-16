@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from common.db.fields import EncryptTextField
 from .common import Asset
 
 
@@ -10,7 +9,7 @@ class Database(Asset):
     use_ssl = models.BooleanField(default=False, verbose_name=_("Use SSL"))
     ca_cert = models.TextField(verbose_name=_("CA cert"), blank=True)
     client_cert = models.TextField(verbose_name=_("Client cert"), blank=True)
-    client_key = EncryptTextField(verbose_name=_("Client key"), blank=True)
+    client_key = models.TextField(verbose_name=_("Client key"), blank=True)
     allow_invalid_cert = models.BooleanField(default=False, verbose_name=_('Allow invalid cert'))
 
     def __str__(self):
