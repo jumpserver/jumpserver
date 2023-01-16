@@ -72,6 +72,10 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
     def execution_model(self):
         return AutomationExecution
 
+    @property
+    def executed_amount(self):
+        return self.executions.count()
+
     def execute(self, trigger=Trigger.manual):
         try:
             eid = current_task.request.id

@@ -13,7 +13,3 @@ class GatherAccountsAutomation(AccountBaseAutomation):
 
     class Meta:
         verbose_name = _("Gather asset accounts")
-
-    @property
-    def executed_amount(self):
-        return self.executions.count()

@@ -103,14 +103,13 @@ class PlatformSerializer(WritableNestedModelSerializer):
             "category", "type", "charset",
         ]
         fields = fields_small + [
-            "protocols_enabled", "protocols",
+            "protocols",
             "domain_enabled", "su_enabled",
             "su_method", "automation",
             "comment",
         ]
         extra_kwargs = {
             "su_enabled": {"label": "启用切换账号"},
-            "protocols_enabled": {"label": "启用协议"},
             "domain_enabled": {"label": "启用网域"},
             "domain_default": {"label": "默认网域"},
         }
