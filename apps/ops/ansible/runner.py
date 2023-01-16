@@ -1,5 +1,5 @@
-import uuid
 import os
+import uuid
 
 import ansible_runner
 from django.conf import settings
@@ -78,6 +78,7 @@ class PlaybookRunner:
             verbosity=verbosity,
             event_handler=self.cb.event_handler,
             status_handler=self.cb.status_handler,
+            host_cwd=self.project_dir,
             **kwargs
         )
         return self.cb

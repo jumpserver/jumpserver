@@ -2,10 +2,9 @@
 import os
 import subprocess
 
-from django.conf import settings
 from celery import shared_task
-
 from celery.exceptions import SoftTimeLimitExceeded
+from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
@@ -30,6 +29,15 @@ def run_ops_job(job_id):
     job = get_object_or_none(Job, id=job_id)
     execution = job.create_execution()
     run_ops_job_execution(execution)
+
+
+#
+# @shared_task(soft_time_limit=60, queue="ansible")
+# def show_env():
+#     import json
+#     print(os.environ)
+#     data = json.dumps(dict(os.environ), indent=4)
+#     return data
 
 
 @shared_task(soft_time_limit=60, queue="ansible", verbose_name=_("Run ansible task execution"))
