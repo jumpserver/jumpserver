@@ -7,7 +7,7 @@ from audits.models import OperateLog
 class OperateLogStore(object):
     def __init__(self, config):
         self.model = OperateLog
-        self.max_length = 1024
+        self.max_length = 2048
         self.max_length_tip_msg = _(
             'The text content is too long. Use Elasticsearch to store operation logs'
         )

@@ -21,30 +21,39 @@ from .const import ActionChoices
 logger = get_logger(__name__)
 
 
-class ModelClient:
-    @staticmethod
-    def save(**kwargs):
-        log_id = kwargs.get('id', '')
-        op_log = OperateLog.objects.filter(pk=log_id).first()
-        if op_log is not None:
-            raw_after = op_log.after or {}
-            raw_before = op_log.before or {}
-            cur_before = kwargs.get('before') or {}
-            cur_after = kwargs.get('after') or {}
-            raw_before.update(cur_before)
-            raw_after.update(cur_after)
-            op_log.before = raw_before
-            op_log.after = raw_after
-            op_log.save()
-        else:
-            OperateLog.objects.create(**kwargs)
-
-
 class OperatorLogHandler(metaclass=Singleton):
     CACHE_KEY = 'OPERATOR_LOG_CACHE_KEY'
+    # 用不可见字符分割前后数据，节省存储-> diff: {'key': 'before\0after'}
+    SEP = '\0'
 
     def __init__(self):
         self.log_client = self.get_storage_client()
+
+    @classmethod
+    def convert_before_after_to_diff(cls, before, after):
+        if not isinstance(before, dict):
+            before = dict()
+        if not isinstance(after, dict):
+            after = dict()
+
+        diff = dict()
+        keys = set(before.keys()) | set(after.keys())
+        for k in keys:
+            before_value = before.get(k, '')
+            after_value = after.get(k, '')
+            diff[k] = '%s%s%s' % (before_value, cls.SEP, after_value)
+        return diff
+
+    @classmethod
+    def convert_diff_friendly(cls, diff):
+        before, after = dict(), dict()
+        for k, v in diff.items():
+            before_value, after_value = v.split(cls.SEP, 1)
+            if before_value:
+                before[k] = before_value
+            if after_value:
+                after[k] = after_value
+        return before, after
 
     @staticmethod
     def get_storage_client():
@@ -156,36 +165,50 @@ class OperatorLogHandler(metaclass=Singleton):
         # 否则会话结束，录像文件结束操作的会话记录都会体现出来
         params = {}
         action = kwargs.get('data', {}).get('action', 'create')
+        detail = _(
+            '{} used account[{}], login method[{}] login the asset.'
+        ).format(
+            resource.user, resource.account, resource.login_from_display
+        )
         if action == ActionChoices.create:
             params = {
                 'action': ActionChoices.connect,
                 'resource_id': str(resource.asset_id),
-                'user': resource.user
+                'user': resource.user, 'detail': detail
             }
         return params
 
     @staticmethod
     def _get_ChangeSecretRecord_params(resource, **kwargs):
+        detail = _(
+            'User {} has executed change auth plan for this account.({})'
+        ).format(
+            resource.created_by, _(resource.status.title())
+        )
         return {
             'action': ActionChoices.change_auth,
             'resource_id': str(resource.account_id),
+            'detail': detail
         }
 
     @staticmethod
     def _get_UserLoginLog_params(resource, **kwargs):
         username = resource.username
+        login_status = _('Success') if resource.status else _('Failed')
+        detail = _('User {} login into this service.[{}]').format(
+            resource.username, login_status
+        )
         user_id = User.objects.filter(username=username).\
             values_list('id', flat=True)[0]
         return {
+            'resource_id': str(user_id), 'detail': detail,
             'action': ActionChoices.login,
-            'resource_id': str(user_id),
         }
 
     def _activity_handle(self, data, object_name, resource):
         param_func = getattr(self, '_get_%s_params' % object_name, None)
         if param_func is not None:
             params = param_func(resource, data=data)
-            data['is_activity'] = True
             data.update(params)
         return data
 
@@ -200,15 +223,16 @@ class OperatorLogHandler(metaclass=Singleton):
 
         remote_addr = get_request_ip(current_request)
         resource_display = self.get_resource_display(resource)
+        # 脱敏
         before, after = self.data_processing(before, after)
         if not force and not any([before, after]):
             # 前后都没变化，没必要生成日志，除非手动强制保存
             return
-
+        diff = self.convert_before_after_to_diff(before, after)
         data = {
-            'id': log_id, "user": str(user), 'action': action,
+            'id': log_id, 'remote_addr': remote_addr,
+            "user": str(user), 'action': action, 'diff': diff,
             'resource_type': str(resource_type), 'resource': resource_display,
-            'remote_addr': remote_addr, 'before': before, 'after': after,
             'org_id': get_current_org_id(), 'resource_id': str(resource.id)
         }
         data = self._activity_handle(data, object_name, resource=resource)
@@ -228,6 +252,7 @@ class OperatorLogHandler(metaclass=Singleton):
 
 
 op_handler = OperatorLogHandler()
+# 理论上操作日志的唯一入口
 create_or_update_operate_log = op_handler.create_or_update_operate_log
 cache_instance_before_data = op_handler.cache_instance_before_data
 get_instance_current_with_cache_diff = op_handler.get_instance_current_with_cache_diff

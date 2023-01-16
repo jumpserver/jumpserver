@@ -58,9 +58,8 @@ class OperateLog(OrgModelMixin):
     )
     remote_addr = models.CharField(max_length=128, verbose_name=_("Remote addr"), blank=True, null=True)
     datetime = models.DateTimeField(auto_now=True, verbose_name=_('Datetime'), db_index=True)
-    before = models.JSONField(default=dict, encoder=ModelJSONFieldEncoder, null=True)
-    after = models.JSONField(default=dict, encoder=ModelJSONFieldEncoder, null=True)
-    is_activity = models.BooleanField(default=False, verbose_name=(_('Is Activity')))
+    diff = models.JSONField(default=dict, encoder=ModelJSONFieldEncoder, null=True)
+    detail = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Detail'))
 
     def __str__(self):
         return "<{}> {} <{}>".format(self.user, self.action, self.resource)

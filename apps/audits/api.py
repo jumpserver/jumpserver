@@ -106,7 +106,7 @@ class OperateLogViewSet(RetrieveModelMixin, ListModelMixin, OrgGenericViewSet):
         return super().get_serializer_class()
 
     def get_queryset(self):
-        qs = OperateLog.objects.filter(is_activity=False)
+        qs = OperateLog.objects.all()
         es_config = settings.OPERATE_LOG_ELASTICSEARCH_CONFIG
         if es_config:
             engine_mod = import_module(TYPE_ENGINE_MAPPING['es'])
