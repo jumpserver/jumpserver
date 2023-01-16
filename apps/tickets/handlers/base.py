@@ -1,4 +1,4 @@
-from html import escape
+import html2text
 
 from django.utils.translation import ugettext as _
 from django.template.loader import render_to_string
@@ -67,7 +67,7 @@ class BaseHandler:
         if state != TicketState.approved:
             return diff_context
 
-        if self.ticket.type == TicketType.apply_asset:
+        if self.ticket.type != TicketType.apply_asset:
             return diff_context
 
         # 企业微信，钉钉审批不做diff
@@ -112,5 +112,4 @@ class BaseHandler:
 
     @staticmethod
     def safe_html_script(unsafe_html):
-        safe_html = escape(unsafe_html)
-        return safe_html
+        return html2text.html2text(unsafe_html)
