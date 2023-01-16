@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 import django_filters
+from django.db.models import Q
+from django.utils.translation import ugettext_lazy as _
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -30,11 +32,12 @@ class AssetFilterSet(BaseFilterSet):
     type = django_filters.CharFilter(field_name="platform__type", lookup_expr="exact")
     category = django_filters.CharFilter(field_name="platform__category", lookup_expr="exact")
     platform = django_filters.CharFilter(method='filter_platform')
+    labels = django_filters.CharFilter(method='filter_labels')
 
     class Meta:
         model = Asset
         fields = [
-            "id", "name", "address", "is_active",
+            "id", "name", "address", "is_active", "labels",
             "type", "category", "platform"
         ]
 
@@ -44,6 +47,15 @@ class AssetFilterSet(BaseFilterSet):
             return queryset.filter(platform_id=value)
         else:
             return queryset.filter(platform__name=value)
+
+    @staticmethod
+    def filter_labels(queryset, name, value):
+        if ':' in value:
+            n, v = value.split(':', 1)
+            queryset = queryset.filter(labels__name=n, labels__value=v)
+        else:
+            queryset = queryset.filter(Q(labels__name=value) | Q(labels__value=value))
+        return queryset
 
 
 class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
