@@ -22,7 +22,7 @@ class AccountBackupPlanViewSet(OrgBulkModelViewSet):
     search_fields = filter_fields
     ordering_fields = ('name',)
     ordering = ('name',)
-    serializer_class = serializers.AccountBackupExecutionSerializer
+    serializer_class = serializers.AccountBackupSerializer
 
 
 class AccountBackupPlanExecutionViewSet(viewsets.ModelViewSet):

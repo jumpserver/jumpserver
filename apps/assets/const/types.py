@@ -28,6 +28,11 @@ class AllTypes(ChoicesMixin):
         return choices
 
     @classmethod
+    def filter_choices(cls, category):
+        choices = dict(cls.category_types()).get(category, cls).choices
+        return choices() if callable(choices) else choices
+
+    @classmethod
     def get_constraints(cls, category, tp):
         types_cls = dict(cls.category_types()).get(category)
         if not types_cls:
@@ -171,11 +176,16 @@ class AllTypes(ChoicesMixin):
         return node
 
     @classmethod
-    def to_tree_nodes(cls, include_asset):
+    def to_tree_nodes(cls, include_asset, count_resource='asset'):
+        from accounts.models import Account
         from ..models import Asset, Platform
-        asset_platforms = Asset.objects.all().values_list('platform_id', flat=True)
+        if count_resource == 'account':
+            resource_platforms = Account.objects.all().values_list('asset__platform_id', flat=True)
+        else:
+            resource_platforms = Asset.objects.all().values_list('platform_id', flat=True)
+
         platform_count = defaultdict(int)
-        for platform_id in asset_platforms:
+        for platform_id in resource_platforms:
             platform_count[platform_id] += 1
 
         category_type_mapper = defaultdict(int)

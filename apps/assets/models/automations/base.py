@@ -72,6 +72,10 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
     def execution_model(self):
         return AutomationExecution
 
+    @property
+    def executed_amount(self):
+        return self.executions.count()
+
     def execute(self, trigger=Trigger.manual):
         try:
             eid = current_task.request.id
@@ -133,8 +137,8 @@ class AutomationExecution(OrgModelMixin):
     def recipients(self):
         recipients = self.snapshot.get('recipients')
         if not recipients:
-            return []
-        return recipients.values()
+            return {}
+        return recipients
 
     def start(self):
         from assets.automations.endpoint import ExecutionManager

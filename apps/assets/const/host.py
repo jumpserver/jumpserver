@@ -75,9 +75,7 @@ class HostTypes(BaseType):
                 {'name': 'Unix'},
                 {'name': 'macOS'},
                 {'name': 'BSD'},
-                {'name': 'AIX', 'automation': {
-                    'change_secret_method': 'push_secret_aix'
-                }}
+                {'name': 'AIX'},
             ],
             cls.WINDOWS: [
                 {'name': 'Windows'},

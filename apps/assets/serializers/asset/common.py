@@ -120,7 +120,7 @@ class AccountSecretSerializer(SecretReadableMixin, CommonModelSerializer):
 class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSerializer):
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
-    labels = AssetLabelSerializer(many=True, required=False, label=_('Labels'))
+    labels = AssetLabelSerializer(many=True, required=False, label=_('Label'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
     accounts = AssetAccountSerializer(many=True, required=False, write_only=True, label=_('Account'))
     enabled_info = serializers.DictField(read_only=True, label=_('Enabled info'))
@@ -144,6 +144,20 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
             'address': {'label': _('Address')},
             'nodes_display': {'label': _('Node path')},
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._init_field_choices()
+
+    def _init_field_choices(self):
+        request = self.context.get('request')
+        if not request:
+            return
+        category = request.path.strip('/').split('/')[-1].rstrip('s')
+        field_category = self.fields.get('category')
+        field_category._choices = Category.filter_choices(category)
+        field_type = self.fields.get('type')
+        field_type._choices = AllTypes.filter_choices(category)
 
     @classmethod
     def setup_eager_loading(cls, queryset):

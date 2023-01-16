@@ -1,5 +1,6 @@
 import os.path
 import random
+import shutil
 
 import yaml
 from django.conf import settings
@@ -87,6 +88,11 @@ class Applet(JMSBaseModel):
         serializer = AppletSerializer(instance=instance, data=manifest)
         serializer.is_valid()
         serializer.save(builtin=True)
+        pkg_path = default_storage.path('applets/{}'.format(name))
+
+        if os.path.exists(pkg_path):
+            shutil.rmtree(pkg_path)
+        shutil.copytree(path, pkg_path)
         return instance
 
     def select_host_account(self):

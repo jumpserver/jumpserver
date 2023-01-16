@@ -6,25 +6,29 @@ from rest_framework import serializers
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ops.mixin import PeriodTaskSerializerMixin
 from common.utils import get_logger
+from common.const.choices import Trigger
+from common.serializers.fields import LabeledChoiceField
 
 from accounts.models import AccountBackupAutomation, AccountBackupExecution
 
 logger = get_logger(__file__)
 
-__all__ = ['AccountBackupExecutionSerializer', 'AccountBackupPlanExecutionSerializer']
+__all__ = ['AccountBackupSerializer', 'AccountBackupPlanExecutionSerializer']
 
 
-class AccountBackupExecutionSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSerializer):
+class AccountBackupSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSerializer):
     class Meta:
         model = AccountBackupAutomation
-        fields = [
-            'id', 'name', 'is_periodic', 'interval', 'crontab', 'date_created',
-            'date_updated', 'created_by', 'periodic_display', 'comment',
-            'recipients', 'types'
+        read_only_fields = [
+            'date_created', 'date_updated', 'created_by', 'periodic_display', 'executed_amount'
+        ]
+        fields = read_only_fields + [
+            'id', 'name', 'is_periodic', 'interval', 'crontab', 'comment', 'recipients', 'types'
         ]
         extra_kwargs = {
             'name': {'required': True},
             'periodic_display': {'label': _('Periodic perform')},
+            'executed_amount': {'label': _('Executed amount')},
             'recipients': {'label': _('Recipient'), 'help_text': _(
                 'Currently only mail sending is supported'
             )}
@@ -32,6 +36,8 @@ class AccountBackupExecutionSerializer(PeriodTaskSerializerMixin, BulkOrgResourc
 
 
 class AccountBackupPlanExecutionSerializer(serializers.ModelSerializer):
+    trigger = LabeledChoiceField(choices=Trigger.choices, label=_("Trigger mode"))
+
     class Meta:
         model = AccountBackupExecution
         read_only_fields = [

@@ -52,7 +52,7 @@ class _ConnectionTokenAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
         fields = [
-            'name', 'username', 'secret_type', 'secret', 'su_from',
+            'name', 'username', 'secret_type', 'secret', 'su_from', 'privileged'
         ]
 
 

@@ -3,4 +3,5 @@ name: Change secret for MySQL
 category: database
 type:
   - mysql
+  - mariadb
 method: change_secret

@@ -1,5 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 
+from django.db.models import Q
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
@@ -107,25 +108,38 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
     model = Node
 
     def filter_queryset(self, queryset):
+        """ queryset is Node queryset """
         if not self.request.GET.get('search'):
             return queryset
         queryset = super().filter_queryset(queryset)
         queryset = self.model.get_ancestor_queryset(queryset)
         return queryset
 
-    def list(self, request, *args, **kwargs):
-        nodes = self.filter_queryset(self.get_queryset()).order_by('value')
-        nodes = self.serialize_nodes(nodes, with_asset_amount=True)
-        assets = self.get_assets_as_node()
-        data = [*nodes, *assets]
-        return Response(data=data)
-
-    def get_assets_as_node(self):
+    def get_queryset_for_assets(self):
+        query_all = self.request.query_params.get("all", "0") == "all"
         include_assets = self.request.query_params.get('assets', '0') == '1'
         if not self.instance or not include_assets:
             return []
-        assets = self.instance.get_assets_for_tree()
-        return self.serialize_assets(assets, self.instance.key)
+        if query_all:
+            assets = self.instance.get_all_assets_for_tree()
+        else:
+            assets = self.instance.get_assets_for_tree()
+        return assets
+
+    def filter_queryset_for_assets(self, assets):
+        search = self.request.query_params.get('search')
+        if search:
+            q = Q(name__icontains=search) | Q(address__icontains=search)
+            assets = assets.filter(q)
+        return assets
+
+    def list(self, request, *args, **kwargs):
+        nodes = self.filter_queryset(self.get_queryset()).order_by('value')
+        nodes = self.serialize_nodes(nodes, with_asset_amount=True)
+        assets = self.filter_queryset_for_assets(self.get_queryset_for_assets())
+        assets = self.serialize_assets(assets, self.instance.key)
+        data = [*nodes, *assets]
+        return Response(data=data)
 
 
 class CategoryTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
@@ -145,9 +159,11 @@ class CategoryTreeApi(SerializeToTreeNodeMixin, generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         include_asset = self.request.query_params.get('assets', '0') == '1'
+        # 资源数量统计可选项 (asset, account)
+        count_resource = self.request.query_params.get('count_resource', 'asset')
 
         if include_asset and self.request.query_params.get('key'):
             nodes = self.get_assets()
         else:
-            nodes = AllTypes.to_tree_nodes(include_asset)
+            nodes = AllTypes.to_tree_nodes(include_asset, count_resource=count_resource)
         return Response(data=nodes)

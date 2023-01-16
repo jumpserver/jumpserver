@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 import django_filters
+from django.db.models import Q
+from django.utils.translation import ugettext_lazy as _
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -30,11 +32,12 @@ class AssetFilterSet(BaseFilterSet):
     type = django_filters.CharFilter(field_name="platform__type", lookup_expr="exact")
     category = django_filters.CharFilter(field_name="platform__category", lookup_expr="exact")
     platform = django_filters.CharFilter(method='filter_platform')
+    labels = django_filters.CharFilter(method='filter_labels')
 
     class Meta:
         model = Asset
         fields = [
-            "id", "name", "address", "is_active",
+            "id", "name", "address", "is_active", "labels",
             "type", "category", "platform"
         ]
 
@@ -44,6 +47,15 @@ class AssetFilterSet(BaseFilterSet):
             return queryset.filter(platform_id=value)
         else:
             return queryset.filter(platform__name=value)
+
+    @staticmethod
+    def filter_labels(queryset, name, value):
+        if ':' in value:
+            n, v = value.split(':', 1)
+            queryset = queryset.filter(labels__name=n, labels__value=v)
+        else:
+            queryset = queryset.filter(Q(labels__name=value) | Q(labels__value=value))
+        return queryset
 
 
 class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
@@ -124,14 +136,14 @@ class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
         return super().create(request, *args, **kwargs)
 
     def check_permissions(self, request):
-        action = request.data.get("action")
         action_perm_require = {
             "refresh": "assets.refresh_assethardwareinfo",
             "push_account": "accounts.add_pushaccountexecution",
             "test": "assets.test_assetconnectivity",
             "test_account": "assets.test_account",
         }
-        perm_required = action_perm_require.get(action)
+        _action = request.data.get("action")
+        perm_required = action_perm_require.get(_action)
         has = self.request.user.has_perm(perm_required)
 
         if not has:
@@ -170,11 +182,11 @@ class AssetsTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
     serializer_class = serializers.AssetsTaskSerializer
 
     def check_permissions(self, request):
-        action = request.data.get("action")
         action_perm_require = {
             "refresh": "assets.refresh_assethardwareinfo",
         }
-        perm_required = action_perm_require.get(action)
+        _action = request.data.get("action")
+        perm_required = action_perm_require.get(_action)
         has = self.request.user.has_perm(perm_required)
         if not has:
             self.permission_denied(request)

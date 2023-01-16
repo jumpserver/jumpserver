@@ -2,10 +2,8 @@
 #
 from django.db.models import Q
 from django_filters import rest_framework as drf_filters
-from rest_framework import filters
-from rest_framework.compat import coreapi, coreschema
 
-from assets.utils import get_node_from_request, is_query_node_all_assets
+from assets.models import Node
 from common.drf.filters import BaseFilterSet
 
 from .models import Account
@@ -19,7 +17,11 @@ class AccountFilterSet(BaseFilterSet):
     asset = drf_filters.CharFilter(field_name="asset_id", lookup_expr='exact')
     assets = drf_filters.CharFilter(field_name='asset_id', lookup_expr='exact')
     nodes = drf_filters.CharFilter(method='filter_nodes')
+    node_id = drf_filters.CharFilter(method='filter_nodes')
     has_secret = drf_filters.BooleanFilter(method='filter_has_secret')
+    platform = drf_filters.CharFilter(field_name='asset__platform_id', lookup_expr='exact')
+    category = drf_filters.CharFilter(field_name='asset__platform__category', lookup_expr='exact')
+    type = drf_filters.CharFilter(field_name='asset__platform__type', lookup_expr='exact')
 
     @staticmethod
     def filter_has_secret(queryset, name, has_secret):
@@ -44,4 +46,4 @@ class AccountFilterSet(BaseFilterSet):
 
     class Meta:
         model = Account
-        fields = ['id']
+        fields = ['id', 'asset_id']

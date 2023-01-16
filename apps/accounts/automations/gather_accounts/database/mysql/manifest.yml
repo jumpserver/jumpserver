@@ -3,4 +3,5 @@ name: Gather account from MySQL
 category: database
 type:
   - mysql
+  - mariadb
 method: gather_accounts

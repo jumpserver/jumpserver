@@ -3,4 +3,5 @@ name: Ping MySQL
 category: database
 type:
   - mysql
+  - mariadb
 method: ping

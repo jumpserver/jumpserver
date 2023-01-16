@@ -179,7 +179,7 @@ class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSeri
         help_text=_('Multiple user using , split')
     )
     SECURITY_COMMAND_EXECUTION = serializers.BooleanField(
-        required=False, label=_('Batch command execution'),
+        required=False, label=_('Operation center'),
         help_text=_('Allow user run batch command or not using ansible')
     )
     SECURITY_SESSION_SHARE = serializers.BooleanField(

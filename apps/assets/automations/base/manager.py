@@ -1,17 +1,17 @@
 import os
-import yaml
 import shutil
+from collections import defaultdict
 from hashlib import md5
 from socket import gethostname
-from collections import defaultdict
 
+import yaml
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
+from assets.automations.methods import platform_automation_methods
 from common.utils import get_logger, lazyproperty
 from common.utils import ssh_pubkey_gen, ssh_key_string_to_obj
-from assets.automations.methods import platform_automation_methods
 from ops.ansible import JMSInventory, PlaybookRunner, DefaultCallback
 
 logger = get_logger(__name__)
@@ -163,9 +163,7 @@ class BasePlaybookManager:
         print("Runner failed: {} {}".format(e, self))
 
     def before_runner_start(self, runner):
-        print("Start run task: ")
-        print("  inventory: {}".format(runner.inventory))
-        print("  playbook: {}".format(runner.playbook))
+        pass
 
     def run(self, *args, **kwargs):
         runners = self.get_runners()
