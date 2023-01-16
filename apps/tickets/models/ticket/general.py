@@ -399,7 +399,10 @@ class Ticket(StatusMixin, JMSBaseModel):
         elif isinstance(field, related.ForeignKey):
             value = self.rel_snapshot[name]
         elif isinstance(field, related.ManyToManyField):
-            value = ', '.join(self.rel_snapshot[name])
+            if isinstance(self.rel_snapshot[name], str):
+                value = self.rel_snapshot[name]
+            elif isinstance(self.rel_snapshot[name], list):
+                value = ','.join(self.rel_snapshot[name])
         elif isinstance(value, list):
             value = ', '.join(value)
         return value
