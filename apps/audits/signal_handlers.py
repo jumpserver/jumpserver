@@ -166,9 +166,10 @@ def on_object_created_or_update(sender, instance=None, created=False, update_fie
         log_id, before, after = get_instance_current_with_cache_diff(current_instance)
 
     resource_type = sender._meta.verbose_name
+    object_name = sender._meta.object_name
     create_or_update_operate_log(
-        action, resource_type, resource=instance,
-        log_id=log_id, before=before, after=after
+        action, resource_type, resource=instance, log_id=log_id,
+        before=before, after=after, object_name=object_name
     )
 
 
@@ -285,24 +286,23 @@ def on_user_auth_failed(sender, username, request, reason='', **kwargs):
 @receiver(django_ready)
 def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
     exclude_label = {
-        'audits', 'django_cas_ng', 'captcha', 'admin',
-        'django_celery_beat', 'contenttypes', 'sessions',
-        'jms_oidc_rp', 'auth'
+        'django_cas_ng', 'captcha', 'admin', 'jms_oidc_rp',
+        'django_celery_beat', 'contenttypes', 'sessions', 'auth'
     }
     exclude_object_name = {
         'UserPasswordHistory', 'ContentType',
         'SiteMessage', 'SiteMessageUsers',
         'PlatformAutomation', 'PlatformProtocol', 'Protocol',
         'HistoricalAccount', 'GatheredUser', 'ApprovalRule',
-        'BaseAutomation', 'ChangeSecretRecord', 'CeleryTask',
-        'Command', 'JobAuditLog',
-        'ConnectionToken', 'Session', 'SessionJoinRecord',
+        'BaseAutomation', 'CeleryTask', 'Command', 'JobAuditLog',
+        'ConnectionToken', 'SessionJoinRecord',
         'HistoricalJob', 'Status', 'TicketStep', 'Ticket',
         'UserAssetGrantedTreeNodeRelation', 'TicketAssignee',
         'SuperTicket', 'SuperConnectionToken', 'PermNode',
         'PermedAsset', 'PermedAccount', 'MenuPermission',
         'Permission', 'TicketSession', 'ApplyLoginTicket',
         'ApplyCommandTicket', 'ApplyLoginAssetTicket',
+        'FTPLog', 'OperateLog', 'PasswordChangeLog'
     }
     for i, app in enumerate(apps.get_models(), 1):
         app_label = app._meta.app_label

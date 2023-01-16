@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers.fields import LabeledChoiceField
+from common.utils.timezone import as_current_tz
 from ops.models.job import JobAuditLog
 from ops.serializers.job import JobExecutionSerializer
 from terminal.models import Session
@@ -97,57 +98,16 @@ class SessionAuditSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class BaseActivitiesSerializer(serializers.Serializer):
+class ActivitiesOperatorLogSerializer(serializers.Serializer):
     timestamp = serializers.SerializerMethodField()
     content = serializers.SerializerMethodField()
 
     @staticmethod
     def get_timestamp(obj):
-        raise NotImplementedError()
+        return as_current_tz(obj.datetime).strftime('%Y-%m-%d %H:%M:%S')
 
     @staticmethod
     def get_content(obj):
-        raise NotImplementedError()
-
-
-class ActivitiesSessionSerializer(BaseActivitiesSerializer):
-    @staticmethod
-    def get_timestamp(obj):
-        return obj.date_start.strftime('%Y-%m-%d %H:%M:%S')
-
-    @staticmethod
-    def get_content(obj):
-        ctn = _(
-            '{} used account[{}], login method[{}] login the asset.'
-        ).format(
-            obj.user, obj.account, obj.login_from_display
-        )
-        return ctn
-
-
-class ActivitiesOperatorLogSerializer(BaseActivitiesSerializer):
-    @staticmethod
-    def get_timestamp(obj):
-        return obj.datetime.strftime('%Y-%m-%d %H:%M:%S')
-
-    @staticmethod
-    def get_content(obj):
-        ctn = _('User {} {} it.').format(
-            obj.user, _(obj.action.title())
-        )
-        return ctn
-
-
-class ActivitiesAuthChangeSerializer(BaseActivitiesSerializer):
-    @staticmethod
-    def get_timestamp(obj):
-        return obj.date_created.strftime('%Y-%m-%d %H:%M:%S')
-
-    @staticmethod
-    def get_content(obj):
-        ctn = _(
-            'User {} has executed change auth plan for this account.({})'
-        ).format(
-            obj.created_by, _(obj.status.title())
-        )
+        action = obj.action.replace('_', ' ').capitalize()
+        ctn = _('User {} {} this resource.').format(obj.user, _(action))
         return ctn
