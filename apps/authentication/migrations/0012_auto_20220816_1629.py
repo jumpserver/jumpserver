@@ -18,9 +18,9 @@ def migrate_system_user_to_account(apps, schema_editor):
         for connection_token in connection_tokens:
             if not connection_token.system_user:
                 continue
-            connection_token.account = connection_token.system_user.username
+            connection_token.account_username = connection_token.system_user.username
             updated.append(connection_token)
-        connection_token_model.objects.bulk_update(updated, ['account'])
+        connection_token_model.objects.bulk_update(updated, ['account_username'])
 
 
 class Migration(migrations.Migration):
