@@ -137,7 +137,8 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
         nodes = self.filter_queryset(self.get_queryset()).order_by('value')
         nodes = self.serialize_nodes(nodes, with_asset_amount=True)
         assets = self.filter_queryset_for_assets(self.get_queryset_for_assets())
-        assets = self.serialize_assets(assets, self.instance.key)
+        node_key = self.instance.key if self.instance else None
+        assets = self.serialize_assets(assets, node_key=node_key)
         data = [*nodes, *assets]
         return Response(data=data)
 
