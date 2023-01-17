@@ -6,7 +6,7 @@ from perms import serializers
 from perms.hands import Asset
 from perms.utils import PermAccountUtil
 from .mixin import SelfOrPKUserMixin
-
+from ...models import AssetPermission
 logger = get_logger(__name__)
 
 __all__ = [
@@ -16,6 +16,7 @@ __all__ = [
 
 class UserPermedAssetAccountsApi(SelfOrPKUserMixin, ListAPIView):
     serializer_class = serializers.AccountsPermedSerializer
+    perm_model = AssetPermission
 
     @lazyproperty
     def asset(self):
