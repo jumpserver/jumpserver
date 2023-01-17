@@ -285,11 +285,11 @@ def on_user_auth_failed(sender, username, request, reason='', **kwargs):
 
 @receiver(django_ready)
 def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
-    exclude_label = {
+    exclude_apps = {
         'django_cas_ng', 'captcha', 'admin', 'jms_oidc_rp',
         'django_celery_beat', 'contenttypes', 'sessions', 'auth'
     }
-    exclude_object_name = {
+    exclude_models = {
         'UserPasswordHistory', 'ContentType',
         'SiteMessage', 'SiteMessageUsers',
         'PlatformAutomation', 'PlatformProtocol', 'Protocol',
@@ -305,10 +305,10 @@ def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
         'FTPLog', 'OperateLog', 'PasswordChangeLog'
     }
     for i, app in enumerate(apps.get_models(), 1):
-        app_label = app._meta.app_label
-        app_object_name = app._meta.object_name
-        if app_label in exclude_label or \
-                app_object_name in exclude_object_name or \
-                app_object_name.endswith('Execution'):
+        app_name = app._meta.app_label
+        model_name = app._meta.object_name
+        if app_name in exclude_apps or \
+                model_name in exclude_models or \
+                model_name.endswith('Execution'):
             continue
-        MODELS_NEED_RECORD.add(app_object_name)
+        MODELS_NEED_RECORD.add(model_name)

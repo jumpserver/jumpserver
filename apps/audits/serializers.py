@@ -3,6 +3,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
+from audits.backends.db import OperateLogStore
 from common.serializers.fields import LabeledChoiceField
 from common.utils.timezone import as_current_tz
 from ops.models.job import JobAuditLog
@@ -68,7 +69,13 @@ class UserLoginLogSerializer(serializers.ModelSerializer):
 class OperateLogActionDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.OperateLog
-        fields = ('before', 'after')
+        fields = ('diff',)
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        diff = OperateLogStore.convert_diff_friendly(data['diff'])
+        data['diff'] = diff
+        return data
 
 
 class OperateLogSerializer(serializers.ModelSerializer):
@@ -109,5 +116,8 @@ class ActivitiesOperatorLogSerializer(serializers.Serializer):
     @staticmethod
     def get_content(obj):
         action = obj.action.replace('_', ' ').capitalize()
-        ctn = _('User {} {} this resource.').format(obj.user, _(action))
+        if not obj.detail:
+            ctn = _('User {} {} this resource.').format(obj.user, _(action))
+        else:
+            ctn = obj.detail
         return ctn
