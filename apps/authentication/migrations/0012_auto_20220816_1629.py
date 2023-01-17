@@ -16,7 +16,9 @@ def migrate_system_user_to_account(apps, schema_editor):
         count += len(connection_tokens)
         updated = []
         for connection_token in connection_tokens:
-            connection_token.account = connection_token.system_user.username
+            if not connection_token.system_user:
+                continue
+            connection_token.account_username = connection_token.system_user.username
             updated.append(connection_token)
         connection_token_model.objects.bulk_update(updated, ['account_username'])
 
