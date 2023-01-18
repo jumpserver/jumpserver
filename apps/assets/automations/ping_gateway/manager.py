@@ -5,8 +5,8 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import get_logger
-from assets.const import AutomationTypes, Connectivity
 from assets.models import Gateway
+from assets.const import AutomationTypes, Connectivity
 
 logger = get_logger(__name__)
 
@@ -91,7 +91,7 @@ class PingGatewayManager:
 
     @staticmethod
     def on_host_success(gateway, account):
-        logger.info('\033[32m {}\033[0m\n'.format(gateway))
+        logger.info('\033[32m {} -> {}\033[0m\n'.format(gateway, account))
         gateway.set_connectivity(Connectivity.OK)
         if not account:
             return
@@ -99,25 +99,35 @@ class PingGatewayManager:
 
     @staticmethod
     def on_host_error(gateway, account, error):
-        logger.info('\033[31m {} 原因: {} \033[0m\n'.format(gateway, error))
+        logger.info('\033[31m {} -> {} 原因: {} \033[0m\n'.format(gateway, account, error))
         gateway.set_connectivity(Connectivity.FAILED)
         if not account:
             return
         account.set_connectivity(Connectivity.FAILED)
 
+    @staticmethod
+    def before_runner_start():
+        logger.info(">>> 开始执行测试网关可连接性任务")
+
+    def get_accounts(self, gateway):
+        account = gateway.select_account
+        return [account]
+
     def run(self):
         asset_ids = self.execution.snapshot['assets']
         gateways = Gateway.objects.filter(id__in=asset_ids)
         self.execution.date_start = timezone.now()
-        logger.info(">>> 开始执行测试网关可连接性任务")
+        self.before_runner_start()
+
         for gateway in gateways:
-            account = gateway.select_account
-            ok, e = self.execute_task(gateway, account)
-            if ok:
-                self.on_host_success(gateway, account)
-            else:
-                self.on_host_error(gateway, account, e)
-            print('\n')
+            accounts = self.get_accounts(gateway)
+            for account in accounts:
+                ok, e = self.execute_task(gateway, account)
+                if ok:
+                    self.on_host_success(gateway, account)
+                else:
+                    self.on_host_error(gateway, account, e)
+                print('\n')
         self.execution.status = 'success'
         self.execution.date_finished = timezone.now()
         self.execution.save()

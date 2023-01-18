@@ -122,7 +122,7 @@ class JMSInventory:
         host.update(ansible_config)
 
         gateway = None
-        if asset.domain:
+        if not asset.is_gateway and asset.domain:
             gateway = asset.domain.select_gateway()
 
         if ansible_connection == 'local':

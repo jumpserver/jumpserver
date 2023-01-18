@@ -17,7 +17,7 @@ __all__ = [
 ]
 
 
-def test_connectivity_util(assets, tp, task_name=None, local_port=None):
+def test_connectivity_util(assets, tp, task_name, local_port=None):
     if not assets:
         return
 
