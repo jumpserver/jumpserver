@@ -21,14 +21,15 @@ class PushAccountManager(PushOrVerifyHostCallbackMixin, AccountBasePlaybookManag
 
     def create_nonlocal_accounts(self, accounts, snapshot_account_usernames, asset):
         secret = self.execution.snapshot['secret']
-        usernames = accounts.filter(secret_type=self.secret_type).values_list(
+        secret_type = self.secret_type
+        usernames = accounts.filter(secret_type=secret_type).values_list(
             'username', flat=True
         )
         create_usernames = set(snapshot_account_usernames) - set(usernames)
         create_account_objs = [
             Account(
-                name=username, username=username, secret=secret,
-                secret_type=self.secret_type, asset=asset,
+                name=f'{username}-{secret_type}', username=username,
+                secret=secret, secret_type=secret_type, asset=asset,
             )
             for username in create_usernames
         ]
