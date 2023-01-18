@@ -230,6 +230,10 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
     def is_type(self, tp):
         return self.type == tp
 
+    @property
+    def is_gateway(self):
+        return self.platform.name == const.GATEWAY_NAME
+
     @lazyproperty
     def gateway(self):
         if self.domain_id:

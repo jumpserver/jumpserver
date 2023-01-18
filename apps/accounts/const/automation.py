@@ -23,6 +23,7 @@ class AutomationTypes(models.TextChoices):
     change_secret = 'change_secret', _('Change secret')
     verify_account = 'verify_account', _('Verify account')
     gather_accounts = 'gather_accounts', _('Gather accounts')
+    verify_gateway_account = 'verify_gateway_account', _('Verify gateway account')
 
     @classmethod
     def get_type_model(cls, tp):
