@@ -23,6 +23,7 @@ router.register(r'tasks', api.CeleryTaskViewSet, 'task')
 router.register(r'task-executions', api.CeleryTaskExecutionViewSet, 'task-executions')
 
 urlpatterns = [
+    path('playbook/<uuid:pk>/file/', api.PlaybookFileBrowserAPIView.as_view(), name='playbook-file'),
     path('variables/help/', api.JobRunVariableHelpAPIView.as_view(), name='variable-help'),
     path('job-execution/asset-detail/', api.JobAssetDetail.as_view(), name='asset-detail'),
     path('job-execution/task-detail/<uuid:task_id>/', api.JobExecutionTaskDetail.as_view(), name='task-detail'),

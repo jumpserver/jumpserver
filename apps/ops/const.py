@@ -29,6 +29,11 @@ DEFAULT_PASSWORD_RULES = {
 }
 
 
+class CreateMethods(models.TextChoices):
+    blank = 'blank', _('Blank')
+    vcs = 'vcs', _('VCS')
+
+
 class Types(models.TextChoices):
     adhoc = 'adhoc', _('Adhoc')
     playbook = 'playbook', _('Playbook')
