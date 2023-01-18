@@ -37,14 +37,14 @@ class BaseAutomationSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSe
 
 class AutomationExecutionSerializer(serializers.ModelSerializer):
     snapshot = serializers.SerializerMethodField(label=_('Automation snapshot'))
-    trigger = LabeledChoiceField(choices=Trigger.choices, label=_("Trigger mode"))
+    trigger = LabeledChoiceField(choices=Trigger.choices, read_only=True, label=_("Trigger mode"))
 
     class Meta:
         model = AutomationExecution
         read_only_fields = [
             'trigger', 'date_start', 'date_finished', 'snapshot', 'status'
         ]
-        fields = ['id', 'automation', 'trigger'] + read_only_fields
+        fields = ['id', 'automation'] + read_only_fields
 
     @staticmethod
     def get_snapshot(obj):
