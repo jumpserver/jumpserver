@@ -100,26 +100,26 @@ class JMSInventory:
 
     @staticmethod
     def write_cert_to_file(filename, content):
-        if not content:
-            return ''
         with open(filename, 'w') as f:
             f.write(content)
         return filename
 
     def convert_cert_to_file(self, host, path_dir):
-        specific = host.get('jms_asset', {}).get('specific')
-        if not specific:
+        specific = host.get('jms_asset', {}).get('specific', {})
+        cert_fields = ('ca_cert', 'client_key', 'client_cert')
+        filtered = list(filter(lambda x: specific.get(x), cert_fields))
+        if not filtered:
             return host
 
         cert_dir = os.path.join(path_dir, 'certs')
         if not os.path.exists(cert_dir):
             os.makedirs(cert_dir, 0o700, True)
 
-        for i in ('ca_cert', 'client_key', 'client_cert'):
+        for f in filtered:
             result = self.write_cert_to_file(
-                os.path.join(cert_dir, i), specific.get(i)
+                os.path.join(cert_dir, f), specific.get(f)
             )
-            host['jms_asset']['specific'][i] = result
+            host['jms_asset']['specific'][f] = result
         return host
 
     def asset_to_host(self, asset, account, automation, protocols, platform):
