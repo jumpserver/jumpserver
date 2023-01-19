@@ -98,6 +98,30 @@ class JMSInventory:
         if gateway:
             host.update(self.make_proxy_command(gateway))
 
+    @staticmethod
+    def write_cert_to_file(filename, content):
+        if not content:
+            return ''
+        with open(filename, 'w') as f:
+            f.write(content)
+        return filename
+
+    def convert_cert_to_file(self, host, path_dir):
+        specific = host.get('jms_asset', {}).get('specific')
+        if not specific:
+            return host
+
+        cert_dir = os.path.join(path_dir, 'certs')
+        if not os.path.exists(cert_dir):
+            os.makedirs(cert_dir, 0o700, True)
+
+        for i in ('ca_cert', 'client_key', 'client_cert'):
+            result = self.write_cert_to_file(
+                os.path.join(cert_dir, i), specific.get(i)
+            )
+            host['jms_asset']['specific'][i] = result
+        return host
+
     def asset_to_host(self, asset, account, automation, protocols, platform):
         host = {
             'name': '{}'.format(asset.name),
@@ -178,6 +202,8 @@ class JMSInventory:
 
                 if not automation.ansible_enabled:
                     host['error'] = _('Ansible disabled')
+                else:
+                    host = self.convert_cert_to_file(host, path_dir)
 
                 if self.host_callback is not None:
                     host = self.host_callback(
