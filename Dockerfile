@@ -41,6 +41,7 @@ ARG TOOLS="                           \
         telnet                        \
         unzip                         \
         vim                           \
+        git                           \
         wget"
 
 ARG APT_MIRROR=http://mirrors.ustc.edu.cn

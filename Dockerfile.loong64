@@ -41,6 +41,7 @@ ARG TOOLS="                           \
         telnet                        \
         unzip                         \
         vim                           \
+        git                           \
         wget"
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
