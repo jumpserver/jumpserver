@@ -1,6 +1,5 @@
 aiofiles==22.1.0
 amqp==5.0.9
-git+https://github.com/jumpserver/ansible@master#egg=ansible-core
 ansible-runner==2.2.1
 asn1crypto==0.24.0
 bcrypt==3.1.4
