@@ -126,9 +126,9 @@ def download_ip_db():
 def install_builtin_applets():
     logging.info("Install builtin applets")
     try:
-        management.call_command('install_builtin_applets', verbosity=0, interactive=False)
-    except:
-        pass
+        management.call_command('install_builtin_applets', verbosity=0)
+    except Exception as e:
+        logging.error("Install builtin applets err: {}".format(e))
 
 
 def upgrade_db():
