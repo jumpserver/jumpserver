@@ -1,44 +1,33 @@
 <p align="center">
   <a href="https://jumpserver.org"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
 </p>
-<h3 align="center">多云环境下更好用的堡垒机</h3>
+<h3 align="center">广受欢迎的开源堡垒机</h3>
 
 <p align="center">
   <a href="https://www.gnu.org/licenses/gpl-3.0.html"><img src="https://img.shields.io/github/license/jumpserver/jumpserver" alt="License: GPLv3"></a>
-  <a href="https://shields.io/github/downloads/jumpserver/jumpserver/total"><img src="https://shields.io/github/downloads/jumpserver/jumpserver/total" alt=" release"></a>
-  <a href="https://hub.docker.com/u/jumpserver"><img src="https://img.shields.io/docker/pulls/jumpserver/jms_all.svg" alt="Codacy"></a>
-  <a href="https://github.com/jumpserver/jumpserver/commits"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/jumpserver/jumpserver.svg" /></a>
+  <a href="https://hub.docker.com/u/jumpserver"><img src="https://img.shields.io/docker/pulls/jumpserver/jms_all.svg" alt="Docker pulls"></a>
+  <a href="https://github.com/jumpserver/jumpserver/releases/latest"><img src="https://img.shields.io/github/v/release/jumpserver/jumpserver" alt="Latest release"></a>
   <a href="https://github.com/jumpserver/jumpserver"><img src="https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square" alt="Stars"></a>
 </p>
 
 --------------------------
-- [ENGLISH](https://github.com/jumpserver/jumpserver/blob/master/README_EN.md)
 
-
-
-JumpServer 是广受欢迎的开源堡垒机，是符合 4A 规范的专业运维安全审计系统。
-
-JumpServer 使用 Python 开发，配备了业界领先的 Web Terminal 方案，交互界面美观、用户体验好。
-
-JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向扩展，无资产数量及并发限制。
-
-
-
-### 特色优势
+JumpServer 是广受欢迎的开源堡垒机，是符合 4A 规范的专业运维安全审计系统。JumpServer 的特色优势包括：
 
 - 开源: 零门槛，线上快速获取和安装；
-- 分布式: 轻松支持大规模并发访问；
 - 无插件: 仅需浏览器，极致的 Web Terminal 使用体验；
-- 多租户: 一套系统，多个子公司或部门同时使用；
+- 分布式: 支持分布式部署和横向扩展，轻松支持大规模并发访问；
 - 多云支持: 一套系统，同时管理不同云上面的资产；
+- 多租户: 一套系统，多个子公司或部门同时使用；
 - 云端存储: 审计录像云端存储，永不丢失；
-- 多应用支持: 数据库，Windows远程应用，Kubernetes。
+- 多应用支持: 全面支持各类资产，包括服务器、数据库、Windows RemoteApp、Kubernetes 等;
+- 安全可靠: 被广泛使用、验证和信赖，连续 9 年的持续研发投入和产品更新升级。
 
-### UI 展示
+## UI 展示
 
 ![UI展示](https://www.jumpserver.org/images/screenshot/1.png)
 
-### 在线体验
+## 在线体验
 
 -   环境地址：<https://demo.jumpserver.org/>
 
@@ -48,50 +37,14 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 | 请勿修改体验环境用户的密码！               |
 | 请勿在环境中添加业务生产环境地址、用户名密码等敏感信息！ |
 
-### 快速开始
+## 快速开始
 
 - [极速安装](https://docs.jumpserver.org/zh/master/install/setup_by_fast/)
-- [完整文档](https://docs.jumpserver.org)
-- [演示视频](https://www.bilibili.com/video/BV1ZV41127GB)
 - [手动安装](https://github.com/jumpserver/installer)
+- [产品文档](https://docs.jumpserver.org)
+- [知识库](https://kb.fit2cloud.com/categories/jumpserver)
 
-### 组件项目
-| 项目                                                                          |  状态          | 描述                                     |
-| ---------------------------------------------------------------------------  |  -------------------   | ---------------------------------------- |
-| [Lina](https://github.com/jumpserver/lina) | <a href="https://github.com/jumpserver/lina/releases"><img alt="Lina release" src="https://img.shields.io/github/release/jumpserver/lina.svg" /></a> | JumpServer Web UI 项目 |
-| [Luna](https://github.com/jumpserver/luna) | <a href="https://github.com/jumpserver/luna/releases"><img alt="Luna release" src="https://img.shields.io/github/release/jumpserver/luna.svg" /></a> | JumpServer Web Terminal 项目 |
-| [KoKo](https://github.com/jumpserver/koko) | <a href="https://github.com/jumpserver/koko/releases"><img alt="Koko release" src="https://img.shields.io/github/release/jumpserver/koko.svg" /></a> | JumpServer 字符协议 Connector 项目，替代原来 Python 版本的 [Coco](https://github.com/jumpserver/coco) |
-| [Lion](https://github.com/jumpserver/lion-release) | <a href="https://github.com/jumpserver/lion-release/releases"><img alt="Lion release" src="https://img.shields.io/github/release/jumpserver/lion-release.svg" /></a>  | JumpServer 图形协议 Connector 项目，依赖 [Apache Guacamole](https://guacamole.apache.org/) |
-| [Magnus](https://github.com/jumpserver/magnus-release) | <a href="https://github.com/jumpserver/magnus-release/releases"><img alt="Magnus release" src="https://img.shields.io/github/release/jumpserver/magnus-release.svg" /> | JumpServer 数据库代理 Connector 项目 |
-| [Clients](https://github.com/jumpserver/clients) | <a href="https://github.com/jumpserver/clients/releases"><img alt="Clients release" src="https://img.shields.io/github/release/jumpserver/clients.svg" /> | JumpServer 客户端 项目 |
-| [Installer](https://github.com/jumpserver/installer)| <a href="https://github.com/jumpserver/installer/releases"><img alt="Installer release" src="https://img.shields.io/github/release/jumpserver/installer.svg" /> | JumpServer 安装包 项目 |
-
-### 社区
-
-如果您在使用过程中有任何疑问或对建议，欢迎提交 [GitHub Issue](https://github.com/jumpserver/jumpserver/issues/new/choose) 或加入到我们的社区当中进行进一步交流沟通。
-
-#### 微信交流群
-
-<img src="https://download.jumpserver.org/images/wecom-group.jpeg" alt="微信群二维码" width="200"/>
-
-### 贡献
-如果有你好的想法创意，或者帮助我们修复了 Bug, 欢迎提交 Pull Request
-
-感谢以下贡献者，让 JumpServer 更加完善
-
-<a href="https://github.com/jumpserver/jumpserver/graphs/contributors"><img src="https://opencollective.com/jumpserver/contributors.svg?width=890&button=false" /></a>
-
-
-
-### 致谢
-- [Apache Guacamole](https://guacamole.apache.org/) Web页面连接 RDP, SSH, VNC 协议设备，JumpServer 图形化组件 Lion 依赖 
-- [OmniDB](https://omnidb.org/) Web 页面连接使用数据库，JumpServer Web 数据库依赖
-
-
-### JumpServer 企业版 
-- [申请企业版试用](https://jinshuju.net/f/kyOYpi)
-
-### 案例研究
+## 案例研究
 
 - [腾讯海外游戏：基于JumpServer构建游戏安全运营能力](https://blog.fit2cloud.com/?p=3704)
 - [万华化学：通过JumpServer管理全球化分布式IT资产，并且实现与云管平台的联动](https://blog.fit2cloud.com/?p=3504)
@@ -106,17 +59,45 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 - [东方明珠：JumpServer高效管控异构化、分布式云端资产](https://blog.fit2cloud.com/?p=687)
 - [江苏农信：JumpServer堡垒机助力行业云安全运维](https://blog.fit2cloud.com/?p=666)
 
-### 安全说明
+## 社区
 
-JumpServer是一款安全产品，请参考 [基本安全建议](https://docs.jumpserver.org/zh/master/install/install_security/) 部署安装.
+如果您在使用过程中有任何疑问或对建议，欢迎提交 [GitHub Issue](https://github.com/jumpserver/jumpserver/issues/new/choose) 或加入到我们的社区当中进行进一步交流沟通。
 
-如果你发现安全问题，可以直接联系我们：
+### 微信交流群
 
-- ibuler@fit2cloud.com 
-- support@fit2cloud.com 
-- 400-052-0755
+<img src="https://download.jumpserver.org/images/wecom-group.jpeg" alt="微信群二维码" width="200"/>
 
-### License & Copyright
+### 参与贡献
+
+欢迎提交 PR 参与贡献。感谢以下贡献者，他们让 JumpServer 变的越来越好。
+
+<a href="https://github.com/jumpserver/jumpserver/graphs/contributors"><img src="https://opencollective.com/jumpserver/contributors.svg?width=890&button=false" /></a>
+
+## 组件项目
+
+| 项目                                                                          |  状态          | 描述                                     |
+| ---------------------------------------------------------------------------  |  -------------------   | ---------------------------------------- |
+| [Lina](https://github.com/jumpserver/lina) | <a href="https://github.com/jumpserver/lina/releases"><img alt="Lina release" src="https://img.shields.io/github/release/jumpserver/lina.svg" /></a> | JumpServer Web UI 项目 |
+| [Luna](https://github.com/jumpserver/luna) | <a href="https://github.com/jumpserver/luna/releases"><img alt="Luna release" src="https://img.shields.io/github/release/jumpserver/luna.svg" /></a> | JumpServer Web Terminal 项目 |
+| [KoKo](https://github.com/jumpserver/koko) | <a href="https://github.com/jumpserver/koko/releases"><img alt="Koko release" src="https://img.shields.io/github/release/jumpserver/koko.svg" /></a> | JumpServer 字符协议 Connector 项目，替代原来 Python 版本的 [Coco](https://github.com/jumpserver/coco) |
+| [Lion](https://github.com/jumpserver/lion-release) | <a href="https://github.com/jumpserver/lion-release/releases"><img alt="Lion release" src="https://img.shields.io/github/release/jumpserver/lion-release.svg" /></a>  | JumpServer 图形协议 Connector 项目，依赖 [Apache Guacamole](https://guacamole.apache.org/) |
+| [Magnus](https://github.com/jumpserver/magnus-release) | <a href="https://github.com/jumpserver/magnus-release/releases"><img alt="Magnus release" src="https://img.shields.io/github/release/jumpserver/magnus-release.svg" /> | JumpServer 数据库代理 Connector 项目 |
+| [Clients](https://github.com/jumpserver/clients) | <a href="https://github.com/jumpserver/clients/releases"><img alt="Clients release" src="https://img.shields.io/github/release/jumpserver/clients.svg" /> | JumpServer 客户端 项目 |
+| [Installer](https://github.com/jumpserver/installer)| <a href="https://github.com/jumpserver/installer/releases"><img alt="Installer release" src="https://img.shields.io/github/release/jumpserver/installer.svg" /> | JumpServer 安装包 项目 |
+
+## 安全说明
+
+JumpServer是一款安全产品，请参考 [基本安全建议](https://docs.jumpserver.org/zh/master/install/install_security/) 进行安装部署。如果您发现安全相关问题，请直接联系我们：
+
+- 邮箱：support@fit2cloud.com 
+- 电话：400-052-0755
+
+## 致谢
+  
+- [Apache Guacamole](https://guacamole.apache.org/)： Web 页面连接 RDP、SSH、VNC 等协议资产，JumpServer Lion 组件使用到该项目；
+- [OmniDB](https://omnidb.org/)： Web 页面连接使用数据库，JumpServer Web 数据库组件使用到该项目。  
+  
+## License & Copyright
 
 Copyright (c) 2014-2023 飞致云 FIT2CLOUD, All rights reserved.
 
