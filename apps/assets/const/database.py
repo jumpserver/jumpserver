@@ -37,10 +37,10 @@ class DatabaseTypes(BaseType):
                 'push_account_enabled': True,
             },
             cls.REDIS: {
-                'push_account_enabled': False,
+                'ansible_enabled': False,
             },
             cls.CLICKHOUSE: {
-                'push_account_enabled': False,
+                'ansible_enabled': False,
             },
         }
         return constrains
@@ -61,9 +61,7 @@ class DatabaseTypes(BaseType):
             cls.POSTGRESQL: [{'name': 'PostgreSQL'}],
             cls.ORACLE: [{'name': 'Oracle'}],
             cls.SQLSERVER: [{'name': 'SQLServer'}],
-            cls.CLICKHOUSE: [
-                {'name': 'ClickHouse', 'automation': {'ansible_enabled': False}}
-            ],
+            cls.CLICKHOUSE: [{'name': 'ClickHouse'}],
             cls.MONGODB: [{'name': 'MongoDB'}],
             cls.REDIS: [{'name': 'Redis'}],
         }
