@@ -31,10 +31,10 @@
         login_port: "{{ jms_asset.port }}"
         login_database: "{{ jms_asset.specific.db_name }}"
         ssl: "{{ jms_asset.specific.use_ssl }}"
-          ssl_ca_certs: "{{ jms_asset.specific.ca_cert }}"
-          ssl_certfile: "{{ jms_asset.specific.client_key }}"
-          connection_options:
-            - tlsAllowInvalidHostnames: "{{ jms_asset.specific.allow_invalid_cert}}"
+        ssl_ca_certs: "{{ jms_asset.specific.ca_cert }}"
+        ssl_certfile: "{{ jms_asset.specific.client_key }}"
+        connection_options:
+          - tlsAllowInvalidHostnames: "{{ jms_asset.specific.allow_invalid_cert}}"
         db: "{{ jms_asset.specific.db_name }}"
         name: "{{ account.username }}"
         password: "{{ account.secret }}"

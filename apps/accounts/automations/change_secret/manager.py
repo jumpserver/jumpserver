@@ -70,8 +70,14 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         else:
             return self.secret_generator.get_secret()
 
-    def host_callback(self, host, asset=None, account=None, automation=None, path_dir=None, **kwargs):
-        host = super().host_callback(host, asset=asset, account=account, automation=automation, **kwargs)
+    def host_callback(
+            self, host, asset=None, account=None,
+            automation=None, path_dir=None, **kwargs
+    ):
+        host = super().host_callback(
+            host, asset=asset, account=account, automation=automation,
+            path_dir=path_dir, **kwargs
+        )
         if host.get('error'):
             return host
 
