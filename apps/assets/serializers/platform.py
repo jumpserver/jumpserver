@@ -91,9 +91,7 @@ class PlatformSerializer(WritableNestedModelSerializer):
     automation = PlatformAutomationSerializer(label=_("Automation"), required=False)
     su_method = LabeledChoiceField(
         choices=[("sudo", "sudo su -"), ("su", "su - ")],
-        label="切换方式",
-        required=False,
-        default="sudo",
+        label="切换方式", required=False, default="sudo", allow_null=True
     )
 
     class Meta:
