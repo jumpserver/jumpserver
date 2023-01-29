@@ -81,14 +81,11 @@ ENV PIP_MIRROR=$PIP_MIRROR
 ARG PIP_JMS_MIRROR=https://pypi.douban.com/simple
 ENV PIP_JMS_MIRROR=$PIP_JMS_MIRROR
 
-ARG ANSIBLE_CORE_VERSION=2.14.1
-
 RUN --mount=type=cache,target=/root/.cache/pip \
     set -ex \
     && pip config set global.index-url ${PIP_MIRROR} \
     && pip install --upgrade pip \
     && pip install --upgrade setuptools wheel \
-    && pip install https://download.jumpserver.org/pypi/simple/ansible_core/ansible_core-${ANSIBLE_CORE_VERSION}-py3-none-any.whl \
     && pip install $(grep -E 'jms|jumpserver' requirements/requirements.txt) -i ${PIP_JMS_MIRROR} \
     && pip install -r requirements/requirements.txt
 
