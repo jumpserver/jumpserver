@@ -29,7 +29,7 @@ class AppletSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Applet
-        fields_mini = ['id', 'name', 'display_name']
+        fields_mini = ['id', 'name', 'display_name', 'is_active']
         read_only_fields = [
             'icon', 'date_created', 'date_updated',
         ]
