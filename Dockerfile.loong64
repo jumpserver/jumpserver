@@ -68,8 +68,6 @@ ENV PIP_MIRROR=$PIP_MIRROR
 ARG PIP_JMS_MIRROR=https://pypi.douban.com/simple
 ENV PIP_JMS_MIRROR=$PIP_JMS_MIRROR
 
-ARG ANSIBLE_CORE_VERSION=2.14.1
-
 RUN --mount=type=cache,target=/root/.cache/pip \
     set -ex \
     && pip config set global.index-url ${PIP_MIRROR} \
@@ -77,7 +75,6 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     && pip install --upgrade setuptools wheel \
     && pip install https://download.jumpserver.org/pypi/simple/cryptography/cryptography-38.0.4-cp39-cp39-linux_loongarch64.whl \
     && pip install https://download.jumpserver.org/pypi/simple/greenlet/greenlet-1.1.2-cp39-cp39-linux_loongarch64.whl \
-    && pip install https://download.jumpserver.org/pypi/simple/ansible_core/ansible_core-${ANSIBLE_CORE_VERSION}-py3-none-any.whl \
     && pip install $(grep 'PyNaCl' requirements/requirements.txt) \
     && GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=true pip install grpcio \
     && pip install $(grep -E 'jms|jumpserver' requirements/requirements.txt) -i ${PIP_JMS_MIRROR} \
