@@ -3,4 +3,5 @@ name: Verify account from MySQL
 category: database
 type:
   - mysql
+  - mariadb
 method: verify_account
