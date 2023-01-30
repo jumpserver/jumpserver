@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from common.utils import validate_ssh_public_key
-from common.serializers.fields import EncryptedField
+from common.serializers.fields import EncryptedField, LabeledChoiceField
 from ..models import User
 
 from .user import UserSerializer
@@ -123,7 +123,7 @@ class UserProfileSerializer(UserSerializer):
     public_key_hash_md5 = serializers.CharField(
         source='get_public_key_hash_md5', required=False, read_only=True, max_length=128
     )
-    mfa_level = serializers.ChoiceField(choices=MFA_LEVEL_CHOICES, label=_('MFA'), required=False)
+    mfa_level = LabeledChoiceField(choices=MFA_LEVEL_CHOICES, label=_("MFA"), required=False)
     guide_url = serializers.SerializerMethodField()
     receive_backends = serializers.ListField(child=serializers.CharField(), read_only=True)
     console_orgs = UserOrgSerializer(many=True, read_only=True)
