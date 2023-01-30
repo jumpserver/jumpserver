@@ -13,7 +13,7 @@ __all__ = ['DomainSerializer', 'DomainWithGatewaySerializer']
 
 class DomainSerializer(BulkOrgResourceModelSerializer):
     gateways = ObjectRelatedField(
-        many=True, required=False, queryset=Asset.objects, label=_('Gateway')
+        many=True, required=False, label=_('Gateway'), read_only=True,
     )
     assets = ObjectRelatedField(
         many=True, required=False, queryset=Asset.objects, label=_('Asset')
