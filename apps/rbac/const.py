@@ -74,7 +74,7 @@ exclude_permissions = (
     ('ops', 'adhocexecution', 'add,delete,change', '*'),
     ('ops', 'jobexecution', 'change,delete', 'jobexecution'),
     ('ops', 'historicaljob', '*', '*'),
-    ('ops', 'celerytask', 'add,change,delete', 'celerytask'),
+    ('ops', 'celerytask', 'add,change', 'celerytask'),
     ('ops', 'celerytaskexecution', 'add,change,delete', 'celerytaskexecution'),
     ('orgs', 'organizationmember', '*', '*'),
     ('settings', 'setting', 'add,change,delete', 'setting'),
