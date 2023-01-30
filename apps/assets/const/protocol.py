@@ -58,36 +58,43 @@ class Protocol(ChoicesMixin, models.TextChoices):
         return {
             cls.mysql: {
                 'port': 3306,
+                'setting': {},
+                'required': True,
                 'secret_types': ['password'],
-                'setting': {
-                }
             },
             cls.mariadb: {
                 'port': 3306,
+                'required': True,
                 'secret_types': ['password'],
             },
             cls.postgresql: {
                 'port': 5432,
+                'required': True,
                 'secret_types': ['password'],
             },
             cls.oracle: {
                 'port': 1521,
+                'required': True,
                 'secret_types': ['password'],
             },
             cls.sqlserver: {
                 'port': 1433,
+                'required': True,
                 'secret_types': ['password'],
             },
             cls.clickhouse: {
                 'port': 9000,
+                'required': True,
                 'secret_types': ['password'],
             },
             cls.mongodb: {
                 'port': 27017,
+                'required': True,
                 'secret_types': ['password'],
             },
             cls.redis: {
                 'port': 6379,
+                'required': True,
                 'secret_types': ['password'],
             },
         }
@@ -97,6 +104,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
         return {
             cls.k8s: {
                 'port': 443,
+                'required': True,
                 'secret_types': ['token'],
             },
             cls.http: {

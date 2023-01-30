@@ -114,6 +114,13 @@ class AppletHostDeployment(JMSBaseModel):
         ordering = ('-date_start',)
 
     def start(self, **kwargs):
+        # 重新初始化部署，applet host 关联的终端需要删除
+        # 否则 tinker 会因终端注册名称相同，造成冲突，执行任务失败
+        if self.host.terminal:
+            terminal = self.host.terminal
+            self.host.terminal = None
+            self.host.save()
+            terminal.delete()
         from ...automations.deploy_applet_host import DeployAppletHostManager
         manager = DeployAppletHostManager(self)
         manager.run(**kwargs)

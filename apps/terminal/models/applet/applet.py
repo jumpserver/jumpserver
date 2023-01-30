@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.serializers import ValidationError
 
 from common.db.models import JMSBaseModel
+from common.utils import lazyproperty
 
 __all__ = ['Applet', 'AppletPublication']
 
@@ -47,6 +48,14 @@ class Applet(JMSBaseModel):
             return os.path.join(settings.APPS_DIR, 'terminal', 'applets', self.name)
         else:
             return default_storage.path('applets/{}'.format(self.name))
+
+    @lazyproperty
+    def readme(self):
+        readme_file = os.path.join(self.path, 'README.md')
+        if os.path.isfile(readme_file):
+            with open(readme_file, 'r') as f:
+                return f.read()
+        return ''
 
     @property
     def manifest(self):
