@@ -87,6 +87,7 @@ class DownloadUploadMixin:
 class AppletViewSet(DownloadUploadMixin, JMSBulkModelViewSet):
     queryset = Applet.objects.all()
     serializer_class = serializers.AppletSerializer
+    filterset_fields = ['name', 'version', 'builtin', 'is_active']
     search_fields = ['name', 'display_name', 'author']
     rbac_perms = {
         'upload': 'terminal.add_applet',
