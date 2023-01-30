@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.files.storage import default_storage
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext as _
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.request import Request
@@ -41,10 +42,13 @@ class DownloadUploadMixin:
         if os.path.exists(extract_to):
             shutil.rmtree(extract_to)
 
-        with zipfile.ZipFile(path) as zp:
-            if zp.testzip() is not None:
-                return Response({'msg': 'Invalid Zip file'}, status=400)
-            zp.extractall(extract_to)
+        try:
+            with zipfile.ZipFile(path) as zp:
+                if zp.testzip() is not None:
+                    raise ValidationError({'error': _('Invalid zip file')})
+                zp.extractall(extract_to)
+        except RuntimeError as e:
+            raise ValidationError({'error': _('Invalid zip file') + ': {}'.format(e)})
 
         tmp_dir = os.path.join(extract_to, file.name.replace('.zip', ''))
         manifest = Applet.validate_pkg(tmp_dir)
