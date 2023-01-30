@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from accounts.models import Account, AccountTemplate
+from accounts.serializers import AccountSerializerCreateValidateMixin
 from common.serializers import WritableNestedModelSerializer, SecretReadableMixin, CommonModelSerializer
 from common.serializers.fields import LabeledChoiceField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
@@ -46,7 +47,9 @@ class AssetPlatformSerializer(serializers.ModelSerializer):
         }
 
 
-class AssetAccountSerializer(CommonModelSerializer):
+class AssetAccountSerializer(
+    AccountSerializerCreateValidateMixin, CommonModelSerializer
+):
     add_org_fields = False
     push_now = serializers.BooleanField(
         default=False, label=_("Push now"), write_only=True
@@ -90,13 +93,6 @@ class AssetAccountSerializer(CommonModelSerializer):
         }
         for k, v in template_attrs.items():
             attrs.setdefault(k, v)
-
-    def validate(self, attrs):
-        account_template = attrs.pop('template', None)
-        if account_template:
-            self.replace_attrs(account_template, attrs)
-        self.push_now = attrs.pop('push_now', False)
-        return super().validate(attrs)
 
     def create(self, validated_data):
         from accounts.tasks import push_accounts_to_assets
@@ -239,7 +235,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
 
 class DetailMixin(serializers.Serializer):
     accounts = AssetAccountSerializer(many=True, required=False, label=_('Accounts'))
-
 
     def get_field_names(self, declared_fields, info):
         names = super().get_field_names(declared_fields, info)

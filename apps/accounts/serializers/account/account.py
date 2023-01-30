@@ -10,7 +10,25 @@ from common.serializers import SecretReadableMixin, BulkModelSerializer
 from .base import BaseAccountSerializer
 
 
-class AccountSerializerCreateMixin(BulkModelSerializer):
+class AccountSerializerCreateValidateMixin:
+    replace_attrs: callable
+    push_now: bool
+
+    def validate(self, attrs):
+        _id = attrs.pop('id', None)
+        if _id:
+            account_template = AccountTemplate.objects.get(id=_id)
+            attrs['secret'] = account_template.secret
+        account_template = attrs.pop('template', None)
+        if account_template:
+            self.replace_attrs(account_template, attrs)
+        self.push_now = attrs.pop('push_now', False)
+        return super().validate(attrs)
+
+
+class AccountSerializerCreateMixin(
+    AccountSerializerCreateValidateMixin, BulkModelSerializer
+):
     template = serializers.UUIDField(
         required=False, allow_null=True, write_only=True,
         label=_('Account template')
@@ -39,13 +57,6 @@ class AccountSerializerCreateMixin(BulkModelSerializer):
         }
         for k, v in template_attrs.items():
             attrs.setdefault(k, v)
-
-    def validate(self, attrs):
-        account_template = attrs.pop('template', None)
-        if account_template:
-            self.replace_attrs(account_template, attrs)
-        self.push_now = attrs.pop('push_now', False)
-        return super().validate(attrs)
 
     def create(self, validated_data):
         instance = super().create(validated_data)
