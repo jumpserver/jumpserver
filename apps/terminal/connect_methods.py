@@ -184,7 +184,8 @@ class ConnectMethodUtil:
                 'listen': [],
                 'support': [
                     Protocol.mysql, Protocol.postgresql,
-                    Protocol.oracle, Protocol.mariadb
+                    Protocol.oracle, Protocol.mariadb,
+                    Protocol.redis
                 ],
                 'match': 'map'
             },
