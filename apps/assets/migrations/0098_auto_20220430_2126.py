@@ -64,7 +64,7 @@ def migrate_cloud_to_asset(apps, *args):
         cloud = cloud_model(
             id=app.id, name=app.name,
             address=attrs.get('cluster', ''),
-            protocols='', platform=platform,
+            protocols='k8s/443', platform=platform,
             org_id=app.org_id,
         )
 

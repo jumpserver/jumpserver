@@ -14,7 +14,7 @@ class FavoriteAsset(JMSBaseModel):
 
     class Meta:
         unique_together = ('user', 'asset')
-        verbose_name = _("Favorite Asset")
+        verbose_name = _("Favorite asset")
 
     @classmethod
     def get_user_favorite_asset_ids(cls, user):
