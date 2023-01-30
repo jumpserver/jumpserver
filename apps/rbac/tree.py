@@ -96,7 +96,7 @@ special_pid_mapper = {
     'audits.ftplog': 'terminal',
     'perms.view_myassets': 'my_assets',
     'ops.jobauditlog': 'audits',
-    'ops.view_celerytask': 'task_center',
+    'ops.celerytask': 'task_center',
     'ops.view_celerytaskexecution': 'task_center',
     'ops.view_taskmonitor': 'task_center',
     'ops.adhocexecution': 'task_center',
