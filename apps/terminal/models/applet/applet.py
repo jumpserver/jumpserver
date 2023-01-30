@@ -78,7 +78,7 @@ class Applet(JMSBaseModel):
         for name in files:
             path = os.path.join(d, name)
             if not os.path.exists(path):
-                raise ValidationError({'error': 'Missing file {}'.format(path)})
+                raise ValidationError({'error': _('Applet pkg not valid, Missing file {}').format(name)})
 
         with open(os.path.join(d, 'manifest.yml')) as f:
             manifest = yaml.safe_load(f)
