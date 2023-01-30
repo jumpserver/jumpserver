@@ -26,6 +26,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'unique_together': {('user', 'asset')},
+                'verbose_name': 'Favorite asset',
             },
         ),
     ]

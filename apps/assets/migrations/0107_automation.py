@@ -88,4 +88,23 @@ class Migration(migrations.Migration):
             },
             bases=('assets.assetbaseautomation',),
         ),
-    ]
+        migrations.AlterField(
+            model_name='automationexecution',
+            name='automation',
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='executions', to='assets.baseautomation', verbose_name='Automation task'),
+        ),
+        migrations.AlterUniqueTogether(
+            name='baseautomation',
+            unique_together={('org_id', 'name', 'type')},
+        ),
+        migrations.AlterModelOptions(
+            name='asset',
+            options={'ordering': ['name'],
+                     'permissions': [('refresh_assethardwareinfo', 'Can refresh asset hardware info'),
+                                     ('test_assetconnectivity', 'Can test asset connectivity'),
+                                     ('push_assetaccount', 'Can push account to asset'),
+                                     ('test_account', 'Can verify account'), ('match_asset', 'Can match asset'),
+                                     ('add_assettonode', 'Add asset to node'),
+                                     ('move_assettonode', 'Move asset to node')], 'verbose_name': 'Asset'},
+        ),
+]

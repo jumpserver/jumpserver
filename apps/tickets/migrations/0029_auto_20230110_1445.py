@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0110_alter_favoriteasset_options'),
+        ('assets', '0107_automation'),
         ('tickets', '0028_remove_app_tickets'),
     ]
 
