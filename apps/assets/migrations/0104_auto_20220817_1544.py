@@ -53,9 +53,6 @@ class Migration(migrations.Migration):
             name='Cluster',
         ),
         migrations.DeleteModel(
-            name='AdminUser',
-        ),
-        migrations.DeleteModel(
             name='HistoricalAuthBook',
         ),
         migrations.DeleteModel(
