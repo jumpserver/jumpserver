@@ -71,12 +71,18 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelOptions(
             name='asset',
-            options={'ordering': ['name'],
-                     'permissions': [('refresh_assethardwareinfo', 'Can refresh asset hardware info'),
-                                     ('test_assetconnectivity', 'Can test asset connectivity'),
-                                     ('push_assetsystemuser', 'Can push system user to asset'),
-                                     ('match_asset', 'Can match asset'), ('add_assettonode', 'Add asset to node'),
-                                     ('move_assettonode', 'Move asset to node')], 'verbose_name': 'Asset'},
+            options={
+                'ordering': ['name'],
+                'permissions': [
+                    ('refresh_assethardwareinfo', 'Can refresh asset hardware info'),
+                    ('test_assetconnectivity', 'Can test asset connectivity'),
+                    ('push_assetaccount', 'Can push account to asset'),
+                    ('test_account', 'Can verify account'), ('match_asset', 'Can match asset'),
+                    ('add_assettonode', 'Add asset to node'),
+                    ('move_assettonode', 'Move asset to node')
+                ],
+                'verbose_name': 'Asset'
+            },
         ),
         migrations.RenameField(
             model_name='asset',
