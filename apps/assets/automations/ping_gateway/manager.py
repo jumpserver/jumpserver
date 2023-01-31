@@ -1,12 +1,12 @@
 import socket
-import paramiko
 
+import paramiko
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import get_logger
-from assets.models import Gateway
 from assets.const import AutomationTypes, Connectivity
+from assets.models import Gateway
+from common.utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -100,10 +100,10 @@ class PingGatewayManager:
     @staticmethod
     def on_host_error(gateway, account, error):
         logger.info('\033[31m {} -> {} 原因: {} \033[0m\n'.format(gateway, account, error))
-        gateway.set_connectivity(Connectivity.FAILED)
+        gateway.set_connectivity(Connectivity.ERR)
         if not account:
             return
-        account.set_connectivity(Connectivity.FAILED)
+        account.set_connectivity(Connectivity.ERR)
 
     @staticmethod
     def before_runner_start():
