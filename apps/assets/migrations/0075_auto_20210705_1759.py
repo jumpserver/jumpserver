@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='asset',
             name='connectivity',
-            field=models.CharField(choices=[('unknown', 'Unknown'), ('ok', 'Ok'), ('failed', 'Failed')], default='unknown', max_length=16, verbose_name='Connectivity'),
+            field=models.CharField(choices=[('-', 'Unknown'), ('ok', 'Ok'), ('err', 'Error')], default='-', max_length=16, verbose_name='Connectivity'),
         ),
         migrations.AddField(
             model_name='asset',
@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='authbook',
             name='connectivity',
-            field=models.CharField(choices=[('unknown', 'Unknown'), ('ok', 'Ok'), ('failed', 'Failed')], default='unknown', max_length=16, verbose_name='Connectivity'),
+            field=models.CharField(choices=[('-', 'Unknown'), ('ok', 'Ok'), ('err', 'Error')], default='-', max_length=16, verbose_name='Connectivity'),
         ),
         migrations.AddField(
             model_name='authbook',
@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='historicalauthbook',
             name='connectivity',
-            field=models.CharField(choices=[('unknown', 'Unknown'), ('ok', 'Ok'), ('failed', 'Failed')], default='unknown', max_length=16, verbose_name='Connectivity'),
+            field=models.CharField(choices=[('-', 'Unknown'), ('ok', 'Ok'), ('err', 'Error')], default='-', max_length=16, verbose_name='Connectivity'),
         ),
         migrations.AddField(
             model_name='historicalauthbook',
