@@ -63,6 +63,33 @@ class BasePlaybookManager:
             os.makedirs(path, exist_ok=True, mode=0o755)
         return path
 
+    @staticmethod
+    def write_cert_to_file(filename, content):
+        with open(filename, 'w') as f:
+            f.write(content)
+        return filename
+
+    def convert_cert_to_file(self, host, path_dir):
+        if not path_dir:
+            return host
+
+        specific = host.get('jms_asset', {}).get('specific', {})
+        cert_fields = ('ca_cert', 'client_key', 'client_cert')
+        filtered = list(filter(lambda x: specific.get(x), cert_fields))
+        if not filtered:
+            return host
+
+        cert_dir = os.path.join(path_dir, 'certs')
+        if not os.path.exists(cert_dir):
+            os.makedirs(cert_dir, 0o700, True)
+
+        for f in filtered:
+            result = self.write_cert_to_file(
+                os.path.join(cert_dir, f), specific.get(f)
+            )
+            host['jms_asset']['specific'][f] = result
+        return host
+
     def host_callback(self, host, automation=None, **kwargs):
         enabled_attr = '{}_enabled'.format(self.__class__.method_type())
         method_attr = '{}_method'.format(self.__class__.method_type())
@@ -75,6 +102,8 @@ class BasePlaybookManager:
         if not method_enabled:
             host['error'] = _('{} disabled'.format(self.__class__.method_type()))
             return host
+
+        host = self.convert_cert_to_file(host, kwargs.get('path_dir'))
         return host
 
     @staticmethod
