@@ -1,30 +1,25 @@
 # -*- coding: utf-8 -*-
 #
-
 import os
 import re
 
+from celery.result import AsyncResult
+from rest_framework import generics, viewsets, mixins
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
-from rest_framework import viewsets
-from celery.result import AsyncResult
-from rest_framework import generics
 from django_celery_beat.models import PeriodicTask
-
 from common.permissions import IsValidUser
-from common.api import LogTailApi
+from common.api import LogTailApi, CommonApiMixin
 from ..models import CeleryTaskExecution, CeleryTask
-from ..serializers import CeleryResultSerializer, CeleryPeriodTaskSerializer
 from ..celery.utils import get_celery_task_log_path
 from ..ansible.utils import get_ansible_task_log_path
-from common.api import CommonApiMixin
+from ..serializers import CeleryResultSerializer, CeleryPeriodTaskSerializer
+from ..serializers.celery import CeleryTaskSerializer, CeleryTaskExecutionSerializer
 
 __all__ = [
     'CeleryTaskExecutionLogApi', 'CeleryResultApi', 'CeleryPeriodTaskViewSet',
     'AnsibleTaskLogApi', 'CeleryTaskViewSet', 'CeleryTaskExecutionViewSet'
 ]
-
-from ..serializers.celery import CeleryTaskSerializer, CeleryTaskExecutionSerializer
 
 
 class CeleryTaskExecutionLogApi(LogTailApi):
@@ -103,9 +98,12 @@ class CelerySummaryAPIView(generics.RetrieveAPIView):
         pass
 
 
-class CeleryTaskViewSet(CommonApiMixin, viewsets.ReadOnlyModelViewSet):
+class CeleryTaskViewSet(
+    CommonApiMixin, mixins.RetrieveModelMixin,
+    mixins.ListModelMixin, mixins.DestroyModelMixin,
+    viewsets.GenericViewSet
+):
     serializer_class = CeleryTaskSerializer
-    http_method_names = ('get', 'head', 'options',)
 
     def get_queryset(self):
         return CeleryTask.objects.exclude(name__startswith='celery')
