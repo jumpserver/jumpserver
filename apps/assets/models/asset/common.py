@@ -11,6 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from assets import const
 from common.utils import lazyproperty
+from common.db.fields import EncryptMixin
 from orgs.mixins.models import OrgManager, JMSOrgBaseModel
 from ..base import AbsConnectivity
 from ..platform import Platform
@@ -139,6 +140,7 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
         if not instance:
             return []
         specific_fields = self.get_specific_fields(instance)
+        specific_fields = [i for i in specific_fields if not isinstance(i, EncryptMixin)]
         info = [
             {
                 'label': i.verbose_name,
