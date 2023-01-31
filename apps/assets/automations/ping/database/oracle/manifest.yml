@@ -1,0 +1,6 @@
+id: oracle_ping
+name: Ping Oracle
+category: database
+type:
+  - oracle
+method: ping

@@ -47,7 +47,5 @@ class UserGroupSerializer(BulkOrgResourceModelSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related(
-            Prefetch('users', queryset=User.objects.only('id'))
-        ).annotate(users_amount=Count('users'))
+        queryset = queryset.prefetch_related('users').annotate(users_amount=Count('users'))
         return queryset

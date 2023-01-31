@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 #
 import os
-import ssl
+from urllib.parse import urlencode
 
 from .base import (
     REDIS_SSL_CA, REDIS_SSL_CERT, REDIS_SSL_KEY, REDIS_SSL_REQUIRED, REDIS_USE_SSL,
-    REDIS_SENTINEL_SERVICE_NAME, REDIS_SENTINELS, REDIS_SENTINEL_PASSWORD,
+    REDIS_PROTOCOL, REDIS_SENTINEL_SERVICE_NAME, REDIS_SENTINELS, REDIS_SENTINEL_PASSWORD,
     REDIS_SENTINEL_SOCKET_TIMEOUT
 )
 from ..const import CONFIG, PROJECT_DIR
@@ -31,7 +31,6 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         # 'rest_framework.authentication.BasicAuthentication',
-        'authentication.backends.drf.AccessKeyAuthentication',
         'authentication.backends.drf.AccessTokenAuthentication',
         'authentication.backends.drf.PrivateTokenAuthentication',
         'authentication.backends.drf.SignatureAuthentication',
@@ -81,41 +80,53 @@ BOOTSTRAP3 = {
 }
 
 # Django channels support websocket
-if not REDIS_USE_SSL:
-    redis_ssl = None
-else:
-    redis_ssl = ssl.SSLContext()
-    redis_ssl.check_hostname = bool(CONFIG.REDIS_SSL_REQUIRED)
-    if REDIS_SSL_CA:
-        redis_ssl.load_verify_locations(REDIS_SSL_CA)
-    if REDIS_SSL_CERT and REDIS_SSL_KEY:
-        redis_ssl.load_cert_chain(REDIS_SSL_CERT, REDIS_SSL_KEY)
-
-REDIS_HOST = {
+REDIS_LAYERS_HOST = {
     'db': CONFIG.REDIS_DB_WS,
     'password': CONFIG.REDIS_PASSWORD or None,
-    'ssl': redis_ssl,
 }
 
+REDIS_LAYERS_SSL_PARAMS = {}
+if REDIS_USE_SSL:
+    REDIS_LAYERS_SSL_PARAMS.update({
+        'ssl': REDIS_USE_SSL,
+        'ssl_cert_reqs': REDIS_SSL_REQUIRED,
+        "ssl_keyfile": REDIS_SSL_KEY,
+        "ssl_certfile": REDIS_SSL_CERT,
+        "ssl_ca_certs": REDIS_SSL_CA
+    })
+    REDIS_LAYERS_HOST.update(REDIS_LAYERS_SSL_PARAMS)
+
 if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
-    REDIS_HOST['sentinels'] = REDIS_SENTINELS
-    REDIS_HOST['master_name'] = REDIS_SENTINEL_SERVICE_NAME
-    REDIS_HOST['sentinel_kwargs'] = {
+    REDIS_LAYERS_HOST['sentinels'] = REDIS_SENTINELS
+    REDIS_LAYERS_HOST['master_name'] = REDIS_SENTINEL_SERVICE_NAME
+    REDIS_LAYERS_HOST['sentinel_kwargs'] = {
         'password': REDIS_SENTINEL_PASSWORD,
-        'socket_timeout': REDIS_SENTINEL_SOCKET_TIMEOUT
+        'socket_timeout': REDIS_SENTINEL_SOCKET_TIMEOUT,
+        'ssl': REDIS_USE_SSL,
+        'ssl_cert_reqs': REDIS_SSL_REQUIRED,
+        "ssl_keyfile": REDIS_SSL_KEY,
+        "ssl_certfile": REDIS_SSL_CERT,
+        "ssl_ca_certs": REDIS_SSL_CA
     }
 else:
-    REDIS_HOST['address'] = (CONFIG.REDIS_HOST, CONFIG.REDIS_PORT)
-
+    # More info see: https://github.com/django/channels_redis/issues/334
+    # REDIS_LAYERS_HOST['address'] = (CONFIG.REDIS_HOST, CONFIG.REDIS_PORT)
+    REDIS_LAYERS_ADDRESS = '{protocol}://:{password}@{host}:{port}/{db}'.format(
+        protocol=REDIS_PROTOCOL, password=CONFIG.REDIS_PASSWORD,
+        host=CONFIG.REDIS_HOST, port=CONFIG.REDIS_PORT, db=CONFIG.REDIS_DB_WS
+    )
+    REDIS_LAYERS_SSL_PARAMS.pop('ssl', None)
+    REDIS_LAYERS_HOST['address'] = '{}?{}'.format(REDIS_LAYERS_ADDRESS, urlencode(REDIS_LAYERS_SSL_PARAMS))
 
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'common.cache.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [REDIS_HOST],
+            "hosts": [REDIS_LAYERS_HOST],
         },
     },
 }
+
 ASGI_APPLICATION = 'jumpserver.routing.application'
 
 # Dump all celery log to here
@@ -132,13 +143,18 @@ if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
         'master_name': REDIS_SENTINEL_SERVICE_NAME,
         'sentinel_kwargs': {
             'password': REDIS_SENTINEL_PASSWORD,
-            'socket_timeout': REDIS_SENTINEL_SOCKET_TIMEOUT
+            'socket_timeout': REDIS_SENTINEL_SOCKET_TIMEOUT,
+            'ssl': REDIS_USE_SSL,
+            'ssl_cert_reqs': REDIS_SSL_REQUIRED,
+            "ssl_keyfile": REDIS_SSL_KEY,
+            "ssl_certfile": REDIS_SSL_CERT,
+            "ssl_ca_certs": REDIS_SSL_CA
         }
     }
     CELERY_BROKER_TRANSPORT_OPTIONS = CELERY_RESULT_BACKEND_TRANSPORT_OPTIONS = SENTINEL_OPTIONS
 else:
     CELERY_BROKER_URL = CELERY_BROKER_URL_FORMAT % {
-        'protocol': 'rediss' if REDIS_USE_SSL else 'redis',
+        'protocol': REDIS_PROTOCOL,
         'password': CONFIG.REDIS_PASSWORD,
         'host': CONFIG.REDIS_HOST,
         'port': CONFIG.REDIS_PORT,

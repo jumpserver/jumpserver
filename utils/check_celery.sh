@@ -1,7 +1,8 @@
 #!/bin/bash
 
-if [[ "$(ps axu | grep 'celery' | grep -v 'grep' | grep -cv 'defunct')" -gt "2" ]];then
-  exit 0
-else
-  exit 1
-fi
+set -e
+
+test -e /tmp/worker_ready_ansible
+test -e /tmp/worker_ready_celery
+test -e /tmp/worker_heartbeat_ansible && test $(($(date +%s) - $(stat -c %Y /tmp/worker_heartbeat_ansible))) -lt 10
+test -e /tmp/worker_heartbeat_celery && test $(($(date +%s) - $(stat -c %Y /tmp/worker_heartbeat_celery))) -lt 10

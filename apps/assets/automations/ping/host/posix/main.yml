@@ -1,0 +1,5 @@
+- hosts: demo
+  gather_facts: no
+  tasks:
+    - name: Posix ping
+      ansible.builtin.ping:

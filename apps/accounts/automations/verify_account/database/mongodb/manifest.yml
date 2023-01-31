@@ -1,0 +1,6 @@
+id: verify_account_mongodb
+name: Verify account from MongoDB
+category: database
+type:
+  - mongodb
+method: verify_account

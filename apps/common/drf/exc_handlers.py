@@ -1,13 +1,14 @@
+from logging import getLogger
+
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist as DJObjectDoesNotExist
+from django.db.models.deletion import ProtectedError
 from django.http import Http404
 from django.utils.translation import gettext
-from django.db.models.deletion import ProtectedError
 from rest_framework import exceptions
-from rest_framework.views import set_rollback
 from rest_framework.response import Response
+from rest_framework.views import set_rollback
 
 from common.exceptions import JMSObjectDoesNotExist, ReferencedByOthers
-from logging import getLogger
 
 logger = getLogger('drf_exception')
 unexpected_exception_logger = getLogger('unexpected_exception')
@@ -27,7 +28,7 @@ def extract_object_name(exc, index=0):
 
 
 def common_exception_handler(exc, context):
-    logger.exception('')
+    # logger.exception('')
 
     if isinstance(exc, Http404):
         exc = JMSObjectDoesNotExist(object_name=extract_object_name(exc, 1))

@@ -1,11 +1,11 @@
-from urllib.parse import urljoin
 import json
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import reverse
-from django.template.loader import render_to_string
 from django.forms import model_to_dict
+from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 
 from notifications.notifications import UserMessage
@@ -94,9 +94,9 @@ class BaseTicketMessage(UserMessage):
 
 class TicketAppliedToAssigneeMessage(BaseTicketMessage):
     def __init__(self, user, ticket):
+        self._token = None
         self.ticket = ticket
         super().__init__(user)
-        self._token = None
 
     @property
     def token(self):

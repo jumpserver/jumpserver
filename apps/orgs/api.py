@@ -7,31 +7,25 @@ from rest_framework_bulk import BulkModelViewSet
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.exceptions import PermissionDenied
 
+from common.utils import get_logger
 from common.permissions import IsValidUser
+from users.models import User, UserGroup
+from assets.models import (
+    Asset, Domain, Label, Node,
+)
+from perms.models import AssetPermission
+from orgs.utils import current_org, tmp_to_root_org
 from .models import Organization
 from .serializers import (
     OrgSerializer, CurrentOrgSerializer
 )
-from users.models import User, UserGroup
-from assets.models import (
-    Asset, Domain, SystemUser, Label, Node, Gateway,
-    CommandFilter, CommandFilterRule, GatheredUser
-)
-from applications.models import Application
-from perms.models import AssetPermission, ApplicationPermission
-from orgs.utils import current_org, tmp_to_root_org
-from common.utils import get_logger
-
 
 logger = get_logger(__file__)
 
-
 # 部分 org 相关的 model，需要清空这些数据之后才能删除该组织
 org_related_models = [
-    User, UserGroup, Asset, Label, Domain, Gateway, Node, SystemUser, Label,
-    CommandFilter, CommandFilterRule, GatheredUser,
-    AssetPermission, ApplicationPermission,
-    Application,
+    User, UserGroup, Asset, Label, Domain, Node, Label,
+    AssetPermission,
 ]
 
 
@@ -41,7 +35,7 @@ class OrgViewSet(BulkModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrgSerializer
     ordering_fields = ('name',)
-    ordering = ('name', )
+    ordering = ('name',)
 
     def get_serializer_class(self):
         mapper = {
@@ -71,7 +65,8 @@ class OrgViewSet(BulkModelViewSet):
 
         if str(instance.id) == settings.AUTH_LDAP_SYNC_ORG_ID:
             msg = _(
-                'LDAP synchronization is set to the current organization. Please switch to another organization before deleting'
+                'LDAP synchronization is set to the current organization. '
+                'Please switch to another organization before deleting'
             )
             raise PermissionDenied(detail=msg)
 

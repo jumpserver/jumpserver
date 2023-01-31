@@ -11,8 +11,8 @@ from rest_framework.permissions import AllowAny
 
 from common.utils.timezone import utc_now
 from common.const.http import POST, GET
-from common.drf.api import JMSGenericViewSet
-from common.drf.serializers import EmptySerializer
+from common.api import JMSGenericViewSet
+from common.serializers import EmptySerializer
 from common.permissions import OnlySuperUser
 from common.utils import reverse
 from users.models import User

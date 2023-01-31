@@ -2,7 +2,7 @@ from rest_framework.mixins import ListModelMixin, UpdateModelMixin, RetrieveMode
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from common.drf.api import JMSGenericViewSet
+from common.api import JMSGenericViewSet
 from common.permissions import IsValidUser
 from notifications.notifications import system_msgs
 from notifications.models import SystemMsgSubscription, UserMsgSubscription

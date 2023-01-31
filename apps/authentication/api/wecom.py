@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from users.models import User
 from common.utils import get_logger
 from common.permissions import UserConfirmation
-from common.mixins.api import RoleUserMixin, RoleAdminMixin
+from common.api import RoleUserMixin, RoleAdminMixin
 from authentication.const import ConfirmType
 from authentication import errors
 

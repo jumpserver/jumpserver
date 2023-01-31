@@ -1,5 +1,4 @@
-# coding: utf-8
-#
-
-from .asset import *
-from .application import *
+from .permission import *
+from .account import *
+from .user_perm_tree import *
+from .user_perm import *

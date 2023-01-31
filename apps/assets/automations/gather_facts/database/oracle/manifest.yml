@@ -1,0 +1,6 @@
+id: gather_facts_oracle
+name: Gather facts from Oracle
+category: database
+type:
+  - oracle
+method: gather_facts

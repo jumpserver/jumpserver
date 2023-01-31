@@ -1,13 +1,13 @@
-from rest_framework.mixins import CreateModelMixin
 from rest_framework import views
-from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.mixins import CreateModelMixin
 
-from common.drf.api import JMSGenericViewSet
+from orgs.utils import tmp_to_root_org
+from common.api import JMSGenericViewSet
+from terminal.serializers import SessionSerializer
 from tickets.models import TicketSession
 from tickets.serializers import TicketSessionRelationSerializer
-from terminal.serializers import SessionSerializer
-from orgs.utils import tmp_to_root_org
 
 
 class TicketSessionRelationViewSet(CreateModelMixin, JMSGenericViewSet):

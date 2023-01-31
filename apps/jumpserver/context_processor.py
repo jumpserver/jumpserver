@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 #
-from django.templatetags.static import static
 from django.conf import settings
+from django.templatetags.static import static
 from django.utils.translation import ugettext_lazy as _
 
 default_interface = dict((
     ('logo_logout', static('img/logo.png')),
-    ('logo_index', static('img/logo_text.png')),
-    ('login_image', static('img/login_image.jpg')),
+    ('logo_index', static('img/logo_text_white.png')),
+    ('login_image', static('img/login_image.png')),
     ('favicon', static('img/facio.ico')),
     ('login_title', _('JumpServer Open Source Bastion Host')),
     ('theme', 'classic_green'),
@@ -36,6 +36,3 @@ def jumpserver_processor(request):
         'SECURITY_VIEW_AUTH_NEED_MFA': settings.SECURITY_VIEW_AUTH_NEED_MFA,
     })
     return context
-
-
-

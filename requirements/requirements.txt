@@ -1,5 +1,8 @@
+aiofiles==22.1.0
 amqp==5.0.9
-ansible==2.10.7
+git+https://gitee.com/jumpserver/ansible@master#egg=ansible-core
+ansible==7.1.0
+ansible-runner==2.2.1
 asn1crypto==0.24.0
 bcrypt==3.1.4
 billiard==3.6.4.0
@@ -23,7 +26,7 @@ paramiko==2.11.0
 passlib==1.7.4
 pyasn1==0.4.8
 pycparser==2.21
-cryptography==36.0.1
+cryptography==38.0.4
 pycryptodome==3.15.0
 pycryptodomex==3.15.0
 gmssl==3.2.1
@@ -37,7 +40,6 @@ jms-storage==0.0.44
 simplejson==3.17.6
 six==1.16.0
 sshpubkeys==3.3.1
-sshtunnel==0.4.0
 uritemplate==4.1.1
 urllib3==1.26.9
 vine==5.0.0
@@ -75,18 +77,17 @@ djangorestframework==3.13.1
 djangorestframework-bulk==0.2.1
 django-simple-history==3.1.1
 drf-nested-routers==0.93.4
+drf-writable-nested==0.6.4
 rest_condition==1.0.3
 drf-yasg==1.20.0
 coreapi==2.3.3
 coreschema==0.0.4
 openapi-codec==1.3.2
-Pillow==9.1.1
+Pillow==9.3.0
 pytz==2022.1
 # Runtime
 django-proxy==1.2.1
 channels-redis==4.0.0
-channels==3.0.4
-daphne==3.0.2
 python-daemon==2.3.0
 eventlet==0.33.1
 greenlet==1.1.2
@@ -95,6 +96,8 @@ celery==5.2.7
 flower==1.2.0
 django-celery-beat==2.3.0
 kombu==5.2.4
+uvicorn==0.20.0
+websockets==10.4
 # Auth
 python-ldap==3.4.0
 ldap3==2.9.1
@@ -104,23 +107,6 @@ django-cas-ng==4.0.1
 python-cas==1.5.0
 django-auth-ldap==2.2.0
 # Cloud req
-qingcloud-sdk==1.2.12
-azure-mgmt-subscription==1.0.0
-azure-identity==1.5.0
-azure-mgmt-compute==4.6.2
-azure-mgmt-network==2.7.0
-google-cloud-compute==0.5.0
-alibabacloud_dysmsapi20170525==2.0.2
-python-novaclient==11.0.1
-python-keystoneclient==4.3.0
-bce-python-sdk==0.8.64
-tencentcloud-sdk-python==3.0.662
-aliyun-python-sdk-core-v3==2.9.1
-aliyun-python-sdk-ecs==4.10.1
-huaweicloud-sdk-python==1.0.21
-# python-keystoneclient need keystoneauth1>=3.4.0
-# huaweicloud-sdk-python need keystoneauth1<=3.4.0
-keystoneauth1==3.4.0
 boto3==1.24.12
 botocore==1.27.12
 s3transfer==0.6.0
@@ -128,18 +114,16 @@ kubernetes==21.7.0
 # DB requirements
 mysqlclient==2.1.0
 PyMySQL==1.0.2
-oracledb==1.0.1
-psycopg2-binary==2.9.1
-pymssql==2.1.5
+pymssql==2.2.5
 django-mysql==3.9.0
 django-redis==5.2.0
 python-redis-lock==3.7.0
 pyOpenSSL==22.0.0
 redis==4.3.3
+pyOpenSSL==22.0.0
 pymongo==4.2.0
 # Debug
 ipython==8.4.0
 ForgeryPy3==0.3.1
 django-debug-toolbar==3.5
 Pympler==1.0.1
-IPy==1.1

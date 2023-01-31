@@ -1,0 +1,7 @@
+id: change_secret_mysql
+name: Change secret for MySQL
+category: database
+type:
+  - mysql
+  - mariadb
+method: change_secret

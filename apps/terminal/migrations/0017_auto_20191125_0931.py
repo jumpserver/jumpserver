@@ -31,14 +31,16 @@ def init_storage_data(model):
         name='null', type='null',
         defaults={
             'name': 'null', 'type': 'null',
-            'comment': "Do not save"
+            'comment': "Do not save",
+            'meta': '{}'
         }
     )
     model.objects.update_or_create(
         name='default', type='server',
         defaults={
             'name': 'default', 'type': 'server',
-            'comment': "Store locally"
+            'comment': "Store locally",
+            'meta': '{}'
         }
     )
 
@@ -55,6 +57,7 @@ def migrate_command_storage(apps, schema_editor):
         tp = meta.pop("TYPE")
         if not tp or name in ['default', 'null']:
             continue
+        print("- command storage Meta: ", meta)
         model.objects.create(name=name, type=tp, meta=meta)
 
 
@@ -74,7 +77,6 @@ def migrate_replay_storage(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('settings', '0001_initial'),
         ('terminal', '0016_commandstorage_replaystorage'),

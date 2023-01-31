@@ -1,0 +1,6 @@
+id: verify_account_sqlserver
+name: Verify account from SQLServer
+category: database
+type:
+  - sqlserver
+method: verify_account

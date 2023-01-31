@@ -34,13 +34,13 @@ def migrate_default_org_id(apps, schema_editor):
     for app, models_name in org_app_models:
         for model_name in models_name:
             t_start = time.time()
-            print("Migrate model org id: {}".format(model_name), end='')
+            print("\tMigrate model org id: {}".format(model_name), end='')
             sys.stdout.flush()
 
             model_cls = apps.get_model(app, model_name)
             model_cls.objects.filter(org_id='').update(org_id=default_id)
             interval = round((time.time() - t_start) * 1000, 2)
-            print(" done, use {} ms".format(interval))
+            print("\tdone, use {} ms".format(interval))
 
 
 def add_all_user_to_default_org(apps, schema_editor):
@@ -53,16 +53,16 @@ def add_all_user_to_default_org(apps, schema_editor):
 
     t_start = time.time()
     count = users_qs.count()
-    print(f'Will add users to default org: {count}')
+    print(f'\tWill add users to default org: {count}')
 
     batch_size = 1000
     for i in range(0, count, batch_size):
         users = list(users_qs[i:i + batch_size])
         members = [org_members_model(user=user, org=default_org) for user in users]
         org_members_model.objects.bulk_create(members, ignore_conflicts=True)
-        print(f'Add users to default org: {i+1}-{i+len(users)}')
+        print(f'\t  Add users to default org: {i+1}-{i+len(users)}')
     interval = round((time.time() - t_start) * 1000, 2)
-    print(f'done, use {interval} ms')
+    print(f'\tdone, use {interval} ms')
 
 
 class Migration(migrations.Migration):

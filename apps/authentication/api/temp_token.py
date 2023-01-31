@@ -2,10 +2,10 @@ from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
-from common.drf.api import JMSModelViewSet
+from rbac.permissions import RBACPermission
+from common.api import JMSModelViewSet
 from ..models import TempToken
 from ..serializers import TempTokenSerializer
-from rbac.permissions import RBACPermission
 
 
 class TempTokenViewSet(JMSModelViewSet):

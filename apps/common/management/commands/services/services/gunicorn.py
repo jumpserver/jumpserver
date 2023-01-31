@@ -16,11 +16,11 @@ class GunicornService(BaseService):
 
         log_format = '%(h)s %(t)s %(L)ss "%(r)s" %(s)s %(b)s '
         bind = f'{HTTP_HOST}:{HTTP_PORT}'
+
         cmd = [
-            'gunicorn', 'jumpserver.wsgi',
+            'gunicorn', 'jumpserver.asgi:application',
             '-b', bind,
-            '-k', 'gthread',
-            '--threads', '10',
+            '-k', 'uvicorn.workers.UvicornWorker',
             '-w', str(self.worker),
             '--max-requests', '4096',
             '--access-logformat', log_format,

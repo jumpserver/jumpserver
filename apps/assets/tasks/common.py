@@ -1,36 +1,46 @@
 # -*- coding: utf-8 -*-
 #
+import uuid
+from celery import current_task
+from django.db.utils import IntegrityError
+from orgs.utils import current_org
 
-from celery import shared_task
-
-from orgs.utils import tmp_to_root_org
-from assets.models import AuthBook
-
-__all__ = ['add_nodes_assets_to_system_users']
+from common.const.choices import Trigger
 
 
-@shared_task
-@tmp_to_root_org()
-def add_nodes_assets_to_system_users(nodes_keys, system_users):
-    from ..models import Node
-    from assets.tasks import push_system_user_to_assets
+def generate_data(task_name, tp, child_snapshot=None):
+    child_snapshot = child_snapshot or {}
+    from assets.models import BaseAutomation
+    try:
+        eid = current_task.request.id
+    except AttributeError:
+        eid = str(uuid.uuid4())
 
-    nodes = Node.objects.filter(key__in=nodes_keys)
-    assets = Node.get_nodes_all_assets(*nodes)
-    for system_user in system_users:
-        """ 解决资产和节点进行关联时，已经关联过的节点不会触发 authbook post_save 信号， 
-        无法更新节点下所有资产的管理用户的问题 """
-        need_push_asset_ids = []
-        for asset in assets:
-            defaults = {'asset': asset, 'systemuser': system_user, 'org_id': asset.org_id}
-            instance, created = AuthBook.objects.update_or_create(
-                defaults=defaults, asset=asset, systemuser=system_user
-            )
-            if created:
-                need_push_asset_ids.append(asset.id)
-            # # 不再自动更新资产管理用户，只允许用户手动指定。
-            # 只要关联都需要更新资产的管理用户
-            # instance.update_asset_admin_user_if_need()
+    data = {
+        'type': tp,
+        'name': task_name,
+        'org_id': str(current_org.id)
+    }
 
-        if need_push_asset_ids:
-            push_system_user_to_assets.delay(system_user.id, need_push_asset_ids)
+    automation_instance = BaseAutomation()
+    snapshot = automation_instance.to_attr_json()
+    snapshot.update(data)
+    snapshot.update(child_snapshot)
+    return {'id': eid, 'snapshot': snapshot}
+
+
+def automation_execute_start(task_name, tp, child_snapshot=None):
+    from assets.models import AutomationExecution
+    data = generate_data(task_name, tp, child_snapshot)
+
+    while True:
+        try:
+            _id = data['id']
+            AutomationExecution.objects.get(id=_id)
+            data['id'] = str(uuid.uuid4())
+        except AutomationExecution.DoesNotExist:
+            break
+    execution = AutomationExecution.objects.create(
+        trigger=Trigger.manual, **data
+    )
+    execution.start()

@@ -48,6 +48,10 @@ def set_to_root_org():
     set_current_org(Organization.root())
 
 
+def set_to_system_org():
+    set_current_org(Organization.system())
+
+
 def _find(attr):
     return getattr(thread_local, attr, None)
 
@@ -88,22 +92,33 @@ def tmp_to_org(org):
         set_current_org(ori_org)
 
 
-def get_org_filters():
-    kwargs = {}
-
-    _current_org = get_current_org()
-    if _current_org is None:
-        return kwargs
-    if _current_org.is_root():
-        return kwargs
-    kwargs['org_id'] = _current_org.id
-    return kwargs
+@contextmanager
+def tmp_to_builtin_org(system=0, default=0):
+    if system:
+        org_id = Organization.SYSTEM_ID
+    elif default:
+        org_id = Organization.DEFAULT_ID
+    else:
+        raise ValueError("Must set system or default")
+    ori_org = get_current_org()
+    set_current_org(org_id)
+    yield
+    if ori_org is not None:
+        set_current_org(ori_org)
 
 
 def filter_org_queryset(queryset):
-    kwargs = get_org_filters()
+    locking_org = getattr(queryset.model, 'LOCKING_ORG', None)
+    org = get_current_org()
 
-    #
+    if locking_org:
+        kwargs = {'org_id': locking_org}
+    elif org is None or org.is_root():
+        kwargs = {}
+    else:
+        kwargs = {'org_id': org.id}
+
+    # import traceback
     # lines = traceback.format_stack()
     # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     # for line in lines[-10:-1]:

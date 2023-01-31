@@ -3,13 +3,12 @@
 from collections import defaultdict
 from functools import partial
 
-from django.db.models.signals import m2m_changed
-from django.db.models.signals import post_save, pre_delete
+from django.conf import settings
+from django.db.models.signals import post_save, pre_delete, m2m_changed
+from django.db.utils import ProgrammingError, OperationalError
 from django.dispatch import receiver
 from django.utils.functional import LazyObject
 
-from assets.models import CommandFilterRule
-from assets.models import SystemUser
 from common.const.signals import PRE_REMOVE, POST_REMOVE
 from common.decorator import on_transaction_commit
 from common.signals import django_ready
@@ -17,21 +16,17 @@ from common.utils import get_logger
 from common.utils.connection import RedisPubSub
 from orgs.hands import set_current_org, Node, get_current_org
 from orgs.models import Organization
-from orgs.utils import tmp_to_org
-from perms.models import (AssetPermission, ApplicationPermission)
+from orgs.utils import tmp_to_org, set_to_default_org
+from perms.models import AssetPermission
 from users.models import UserGroup, User
 from users.signals import post_user_leave_org
 
 logger = get_logger(__file__)
 
 
-def get_orgs_mapping_for_memory_pub_sub():
-    return RedisPubSub('fm.orgs_mapping')
-
-
 class OrgsMappingForMemoryPubSub(LazyObject):
     def _setup(self):
-        self._wrapped = get_orgs_mapping_for_memory_pub_sub()
+        self._wrapped = RedisPubSub('fm.orgs_mapping')
 
 
 orgs_mapping_for_memory_pub_sub = OrgsMappingForMemoryPubSub()
@@ -45,6 +40,12 @@ def expire_orgs_mapping_for_memory(org_id):
 def subscribe_orgs_mapping_expire(sender, **kwargs):
     logger.debug("Start subscribe for expire orgs mapping from memory")
 
+    if settings.DEBUG:
+        try:
+            set_to_default_org()
+        except (ProgrammingError, OperationalError):
+            pass
+
     orgs_mapping_for_memory_pub_sub.subscribe(
         lambda org_id: Organization.expire_orgs_mapping()
     )
@@ -55,6 +56,7 @@ def subscribe_orgs_mapping_expire(sender, **kwargs):
 def on_org_create_or_update(sender, instance, created=False, **kwargs):
     # 必须放到最开始, 因为下面调用Node.save方法时会获取当前组织的org_id(即instance.org_id), 如果不过期会找不到
     expire_orgs_mapping_for_memory(instance.id)
+
     old_org = get_current_org()
     set_current_org(instance)
     node_root = Node.org_root()
@@ -129,12 +131,12 @@ def _clear_users_from_org(org, users):
     if not users:
         return
 
-    models = (AssetPermission, ApplicationPermission, UserGroup, SystemUser)
+    models = (AssetPermission, UserGroup)
 
     for m in models:
         _remove_users(m, users, org)
 
-    _remove_users(CommandFilterRule, users, org, user_field_name='reviewers')
+    # _remove_users(CommandFilterRule, users, org, user_field_name='reviewers')
 
 
 @receiver(post_save, sender=User)

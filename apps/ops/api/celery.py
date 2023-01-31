@@ -1,31 +1,28 @@
 # -*- coding: utf-8 -*-
 #
-
 import os
 import re
 
-from django.utils.translation import ugettext as _
-from rest_framework import viewsets
 from celery.result import AsyncResult
-from rest_framework import generics
+from rest_framework import generics, viewsets, mixins
+from django.shortcuts import get_object_or_404
+from django.utils.translation import ugettext as _
 from django_celery_beat.models import PeriodicTask
-
 from common.permissions import IsValidUser
-from common.api import LogTailApi
-from ..models import CeleryTask
-from ..serializers import CeleryResultSerializer, CeleryPeriodTaskSerializer
+from common.api import LogTailApi, CommonApiMixin
+from ..models import CeleryTaskExecution, CeleryTask
 from ..celery.utils import get_celery_task_log_path
 from ..ansible.utils import get_ansible_task_log_path
-from common.mixins.api import CommonApiMixin
-
+from ..serializers import CeleryResultSerializer, CeleryPeriodTaskSerializer
+from ..serializers.celery import CeleryTaskSerializer, CeleryTaskExecutionSerializer
 
 __all__ = [
-    'CeleryTaskLogApi', 'CeleryResultApi', 'CeleryPeriodTaskViewSet',
-    'AnsibleTaskLogApi',
+    'CeleryTaskExecutionLogApi', 'CeleryResultApi', 'CeleryPeriodTaskViewSet',
+    'AnsibleTaskLogApi', 'CeleryTaskViewSet', 'CeleryTaskExecutionViewSet'
 ]
 
 
-class CeleryTaskLogApi(LogTailApi):
+class CeleryTaskExecutionLogApi(LogTailApi):
     permission_classes = (IsValidUser,)
     task = None
     task_id = ''
@@ -46,8 +43,8 @@ class CeleryTaskLogApi(LogTailApi):
         if new_path and os.path.isfile(new_path):
             return new_path
         try:
-            task = CeleryTask.objects.get(id=self.task_id)
-        except CeleryTask.DoesNotExist:
+            task = CeleryTaskExecution.objects.get(id=self.task_id)
+        except CeleryTaskExecution.DoesNotExist:
             return None
         return task.full_log_path
 
@@ -94,3 +91,32 @@ class CeleryPeriodTaskViewSet(CommonApiMixin, viewsets.ModelViewSet):
         queryset = super().get_queryset()
         queryset = queryset.exclude(description='')
         return queryset
+
+
+class CelerySummaryAPIView(generics.RetrieveAPIView):
+    def get(self, request, *args, **kwargs):
+        pass
+
+
+class CeleryTaskViewSet(
+    CommonApiMixin, mixins.RetrieveModelMixin,
+    mixins.ListModelMixin, mixins.DestroyModelMixin,
+    viewsets.GenericViewSet
+):
+    serializer_class = CeleryTaskSerializer
+
+    def get_queryset(self):
+        return CeleryTask.objects.exclude(name__startswith='celery')
+
+
+class CeleryTaskExecutionViewSet(CommonApiMixin, viewsets.ReadOnlyModelViewSet):
+    serializer_class = CeleryTaskExecutionSerializer
+    http_method_names = ('get', 'head', 'options',)
+    queryset = CeleryTaskExecution.objects.all()
+
+    def get_queryset(self):
+        task_id = self.request.query_params.get('task_id')
+        if task_id:
+            task = get_object_or_404(CeleryTask, id=task_id)
+            self.queryset = self.queryset.filter(name=task.name)
+        return self.queryset

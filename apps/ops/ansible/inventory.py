@@ -1,156 +1,213 @@
 # ~*~ coding: utf-8 ~*~
-from ansible.inventory.host import Host
-from ansible.vars.manager import VariableManager
-from ansible.inventory.manager import InventoryManager
-from ansible.parsing.dataloader import DataLoader
+import json
+import os
+from collections import defaultdict
+
+from django.utils.translation import gettext as _
+
+__all__ = ['JMSInventory']
 
 
-__all__ = [
-    'BaseHost', 'BaseInventory'
-]
-
-
-class BaseHost(Host):
-    def __init__(self, host_data):
+class JMSInventory:
+    def __init__(self, assets, account_policy='privileged_first',
+                 account_prefer='root,Administrator', host_callback=None):
         """
-        初始化
-        :param host_data:  {
-            "hostname": "",
-            "ip": "",
-            "port": "",
-            # behind is not must be required
-            "username": "",
-            "password": "",
-            "private_key": "",
-            "become": {
-                "method": "",
-                "user": "",
-                "pass": "",
-            }
-            "groups": [],
-            "vars": {},
+        :param assets:
+        :param account_prefer: account username name if not set use account_policy
+        :param account_policy: privileged_only, privileged_first, skip
+        """
+        self.assets = self.clean_assets(assets)
+        self.account_prefer = account_prefer
+        self.account_policy = account_policy
+        self.host_callback = host_callback
+        self.exclude_hosts = {}
+
+    @staticmethod
+    def clean_assets(assets):
+        from assets.models import Asset
+        asset_ids = [asset.id for asset in assets]
+        assets = Asset.objects.filter(id__in=asset_ids, is_active=True) \
+            .prefetch_related('platform', 'domain', 'accounts')
+        return assets
+
+    @staticmethod
+    def group_by_platform(assets):
+        groups = defaultdict(list)
+        for asset in assets:
+            groups[asset.platform].append(asset)
+        return groups
+
+    @staticmethod
+    def make_proxy_command(gateway):
+        proxy_command_list = [
+            "ssh", "-o", "Port={}".format(gateway.port),
+            "-o", "StrictHostKeyChecking=no",
+            "{}@{}".format(gateway.username, gateway.address),
+            "-W", "%h:%p", "-q",
+        ]
+
+        if gateway.password:
+            proxy_command_list.insert(
+                0, "sshpass -p '{}'".format(gateway.password)
+            )
+        if gateway.private_key:
+            proxy_command_list.append("-i {}".format(gateway.private_key_path))
+
+        proxy_command = "'-o ProxyCommand={}'".format(
+            " ".join(proxy_command_list)
+        )
+        return {"ansible_ssh_common_args": proxy_command}
+
+    @staticmethod
+    def make_account_ansible_vars(account):
+        var = {
+            'ansible_user': account.username,
         }
-        """
-        self.host_data = host_data
-        hostname = host_data.get('hostname') or host_data.get('ip')
-        port = host_data.get('port') or 22
-        super().__init__(hostname, port)
-        self.__set_required_variables()
-        self.__set_extra_variables()
+        if not account.secret:
+            return var
+        if account.secret_type == 'password':
+            var['ansible_password'] = account.secret
+        elif account.secret_type == 'ssh_key':
+            var['ansible_ssh_private_key_file'] = account.private_key_path
+        return var
 
-    def __set_required_variables(self):
-        host_data = self.host_data
-        self.set_variable('ansible_host', host_data['ip'])
-        self.set_variable('ansible_port', host_data['port'])
+    def make_ssh_account_vars(self, host, asset, account, automation, protocols, platform, gateway):
+        if not account:
+            host['error'] = _("No account available")
+            return host
 
-        if host_data.get('username'):
-            self.set_variable('ansible_user', host_data['username'])
+        ssh_protocol_matched = list(filter(lambda x: x.name == 'ssh', protocols))
+        ssh_protocol = ssh_protocol_matched[0] if ssh_protocol_matched else None
+        host['ansible_host'] = asset.address
+        host['ansible_port'] = ssh_protocol.port if ssh_protocol else 22
 
-        # 添加密码和密钥
-        if host_data.get('password'):
-            self.set_variable('ansible_ssh_pass', host_data['password'])
-        if host_data.get('private_key'):
-            self.set_variable('ansible_ssh_private_key_file', host_data['private_key'])
-
-        # 添加become支持
-        become = host_data.get("become", False)
-        if become:
-            self.set_variable("ansible_become", True)
-            self.set_variable("ansible_become_method", become.get('method', 'sudo'))
-            self.set_variable("ansible_become_user", become.get('user', 'root'))
-            self.set_variable("ansible_become_pass", become.get('pass', ''))
-        else:
-            self.set_variable("ansible_become", False)
-
-    def __set_extra_variables(self):
-        for k, v in self.host_data.get('vars', {}).items():
-            self.set_variable(k, v)
-
-    def __repr__(self):
-        return self.name
-
-
-class BaseInventory(InventoryManager):
-    """
-    提供生成Ansible inventory对象的方法
-    """
-    loader_class = DataLoader
-    variable_manager_class = VariableManager
-    host_manager_class = BaseHost
-
-    def __init__(self, host_list=None, group_list=None):
-        """
-        用于生成动态构建Ansible Inventory. super().__init__ 会自动调用
-        host_list: [{
-            "hostname": "",
-            "ip": "",
-            "port": "",
-            "username": "",
-            "password": "",
-            "private_key": "",
-            "become": {
-                "method": "",
-                "user": "",
-                "pass": "",
-            },
-            "groups": [],
-            "vars": {},
-          },
-        ]
-        group_list: [
-          {"name: "", children: [""]},
-        ]
-        :param host_list:
-        :param group_list
-        """
-        self.host_list = host_list or []
-        self.group_list = group_list or []
-        assert isinstance(host_list, list)
-        self.loader = self.loader_class()
-        self.variable_manager = self.variable_manager_class()
-        super().__init__(self.loader)
-
-    def get_groups(self):
-        return self._inventory.groups
-
-    def get_group(self, name):
-        return self._inventory.groups.get(name, None)
-
-    def get_or_create_group(self, name):
-        group = self.get_group(name)
-        if not group:
-            self.add_group(name)
-            return self.get_or_create_group(name)
-        else:
-            return group
-
-    def parse_groups(self):
-        for g in self.group_list:
-            parent = self.get_or_create_group(g.get("name"))
-            children = [self.get_or_create_group(n) for n in g.get('children', [])]
-            for child in children:
-                parent.add_child_group(child)
-
-    def parse_hosts(self):
-        group_all = self.get_or_create_group('all')
-        ungrouped = self.get_or_create_group('ungrouped')
-        for host_data in self.host_list:
-            host = self.host_manager_class(host_data=host_data)
-            self.hosts[host_data['hostname']] = host
-            groups_data = host_data.get('groups')
-            if groups_data:
-                for group_name in groups_data:
-                    group = self.get_or_create_group(group_name)
-                    group.add_host(host)
+        su_from = account.su_from
+        if platform.su_enabled and su_from:
+            host.update(self.make_account_ansible_vars(su_from))
+            become_method = 'sudo' if platform.su_method != 'su' else 'su'
+            host['ansible_become'] = True
+            host['ansible_become_method'] = 'sudo'
+            host['ansible_become_user'] = account.username
+            if become_method == 'sudo':
+                host['ansible_become_password'] = su_from.secret
             else:
-                ungrouped.add_host(host)
-            group_all.add_host(host)
+                host['ansible_become_password'] = account.secret
+        else:
+            host.update(self.make_account_ansible_vars(account))
 
-    def parse_sources(self, cache=False):
-        self.parse_groups()
-        self.parse_hosts()
+        if gateway:
+            host.update(self.make_proxy_command(gateway))
 
-    def get_matched_hosts(self, pattern):
-        return self.get_hosts(pattern)
+    def asset_to_host(self, asset, account, automation, protocols, platform):
+        host = {
+            'name': '{}'.format(asset.name),
+            'jms_asset': {
+                'id': str(asset.id), 'name': asset.name, 'address': asset.address,
+                'type': asset.type, 'category': asset.category,
+                'protocol': asset.protocol, 'port': asset.port,
+                'specific': asset.specific,
+                'protocols': [{'name': p.name, 'port': p.port} for p in protocols],
+            },
+            'jms_account': {
+                'id': str(account.id), 'username': account.username,
+                'secret': account.secret, 'secret_type': account.secret_type
+            } if account else None
+        }
 
+        if host['jms_account'] and asset.platform.type == 'oracle':
+            host['jms_account']['mode'] = 'sysdba' if account.privileged else None
 
+        ansible_config = dict(automation.ansible_config)
+        ansible_connection = ansible_config.get('ansible_connection', 'ssh')
+        host.update(ansible_config)
+
+        gateway = None
+        if not asset.is_gateway and asset.domain:
+            gateway = asset.domain.select_gateway()
+
+        if ansible_connection == 'local':
+            if gateway:
+                host['ansible_host'] = gateway.address
+                host['ansible_port'] = gateway.port
+                host['ansible_user'] = gateway.username
+                host['ansible_password'] = gateway.password
+                host['ansible_connection'] = 'smart'
+            else:
+                host['ansible_connection'] = 'local'
+        else:
+            self.make_ssh_account_vars(host, asset, account, automation, protocols, platform, gateway)
+        return host
+
+    def select_account(self, asset):
+        accounts = list(asset.accounts.all())
+        account_selected = None
+        account_usernames = self.account_prefer
+
+        if isinstance(self.account_prefer, str):
+            account_usernames = self.account_prefer.split(',')
+
+        # 优先使用提供的名称
+        if account_usernames:
+            account_matched = list(filter(lambda account: account.username in account_usernames, accounts))
+            account_selected = account_matched[0] if account_matched else None
+
+        if account_selected or self.account_policy == 'skip':
+            return account_selected
+
+        if self.account_policy in ['privileged_only', 'privileged_first']:
+            account_matched = list(filter(lambda account: account.privileged, accounts))
+            account_selected = account_matched[0] if account_matched else None
+
+        if account_selected:
+            return account_selected
+
+        if self.account_policy == 'privileged_first':
+            account_selected = accounts[0] if accounts else None
+        return account_selected
+
+    def generate(self, path_dir):
+        hosts = []
+        platform_assets = self.group_by_platform(self.assets)
+        for platform, assets in platform_assets.items():
+            automation = platform.automation
+
+            for asset in assets:
+                protocols = asset.protocols.all()
+                account = self.select_account(asset)
+                host = self.asset_to_host(asset, account, automation, protocols, platform)
+
+                if not automation.ansible_enabled:
+                    host['error'] = _('Ansible disabled')
+
+                if self.host_callback is not None:
+                    host = self.host_callback(
+                        host, asset=asset, account=account,
+                        platform=platform, automation=automation,
+                        path_dir=path_dir
+                    )
+
+                if isinstance(host, list):
+                    hosts.extend(host)
+                else:
+                    hosts.append(host)
+
+        exclude_hosts = list(filter(lambda x: x.get('error'), hosts))
+        if exclude_hosts:
+            print(_("Skip hosts below:"))
+            for i, host in enumerate(exclude_hosts, start=1):
+                print("{}: [{}] \t{}".format(i, host['name'], host['error']))
+                self.exclude_hosts[host['name']] = host['error']
+        hosts = list(filter(lambda x: not x.get('error'), hosts))
+        data = {'all': {'hosts': {}}}
+        for host in hosts:
+            name = host.pop('name')
+            data['all']['hosts'][name] = host
+        return data
+
+    def write_to_file(self, path):
+        path_dir = os.path.dirname(path)
+        if not os.path.exists(path_dir):
+            os.makedirs(path_dir, 0o700, True)
+        data = self.generate(path_dir)
+        with open(path, 'w') as f:
+            f.write(json.dumps(data, indent=4))

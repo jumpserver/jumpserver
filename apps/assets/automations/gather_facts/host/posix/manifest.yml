@@ -1,0 +1,7 @@
+id: gather_facts_posix
+name: Gather posix facts
+category: host
+type:
+  - linux
+  - unix
+method: gather_facts

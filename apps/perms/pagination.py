@@ -9,23 +9,27 @@ logger = get_logger(__name__)
 
 
 class GrantedAssetPaginationBase(AssetPaginationBase):
+    _user: object
+
     def init_attrs(self, queryset, request: Request, view=None):
         super().init_attrs(queryset, request, view)
         self._user = view.user
 
 
-class NodeGrantedAssetPagination(GrantedAssetPaginationBase):
+class NodePermedAssetPagination(GrantedAssetPaginationBase):
     def get_count_from_nodes(self, queryset):
         node = getattr(self._view, 'pagination_node', None)
         if node:
-            logger.debug(f'Hit node.assets_amount[{node.assets_amount}] -> {self._request.get_full_path()}')
+            logger.debug(f'Hit node.assets_amount[{node.assets_amount}] -> '
+                         f'{self._request.get_full_path()}')
             return node.assets_amount
         else:
-            logger.warn(f'Not hit node.assets_amount[{node}] because {self._view} not has `pagination_node` -> {self._request.get_full_path()}')
+            logger.warn(f'Not hit node.assets_amount[{node}] because {self._view} '
+                        f'not has `pagination_node` -> {self._request.get_full_path()}')
             return None
 
 
-class AllGrantedAssetPagination(GrantedAssetPaginationBase):
+class AllPermedAssetPagination(GrantedAssetPaginationBase):
     def get_count_from_nodes(self, queryset):
         if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
             return None

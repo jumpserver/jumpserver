@@ -19,10 +19,10 @@ def migrate_nodes_value_with_slash(apps, schema_editor):
     db_alias = schema_editor.connection.alias
     nodes = model.objects.using(db_alias).filter(value__contains='/')
     print('')
-    print("- Start migrate node value if has /")
+    print("\t- Start migrate node value if has /")
     for i, node in enumerate(list(nodes)):
         new_value = node.value.replace('/', '|')
-        print("{} start migrate node value: {} => {}".format(i, node.value, new_value))
+        print("\t  - {} start migrate node value: {} => {}".format(i, node.value, new_value))
         node.value = new_value
         node.save()
 
@@ -31,9 +31,9 @@ def migrate_nodes_full_value(apps, schema_editor):
     model = apps.get_model("assets", "Node")
     db_alias = schema_editor.connection.alias
     nodes = model.objects.using(db_alias).all()
-    print("- Start migrate node full value")
+    print("\n\t- Start migrate node full value")
     for i, node in enumerate(list(nodes)):
-        print("{} start migrate {} node full value".format(i, node.value))
+        print("\t  - {} start migrate {} node full value".format(i, node.value))
         ancestor_keys = get_node_ancestor_keys(node.key, True)
         values = model.objects.filter(key__in=ancestor_keys).values_list('key', 'value')
         values = [v for k, v in sorted(values, key=lambda x: len(x[0]))]

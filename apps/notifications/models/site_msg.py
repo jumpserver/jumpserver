@@ -1,18 +1,21 @@
 from django.db import models
 
-from common.db.models import JMSModel
+from common.db.models import JMSBaseModel
 
 __all__ = ('SiteMessageUsers', 'SiteMessage')
 
 
-class SiteMessageUsers(JMSModel):
-    sitemessage = models.ForeignKey('notifications.SiteMessage', on_delete=models.CASCADE, db_constraint=False, related_name='m2m_sitemessageusers')
-    user = models.ForeignKey('users.User', on_delete=models.CASCADE, db_constraint=False, related_name='m2m_sitemessageusers')
+class SiteMessageUsers(JMSBaseModel):
+    sitemessage = models.ForeignKey('notifications.SiteMessage', on_delete=models.CASCADE, db_constraint=False,
+                                    related_name='m2m_sitemessageusers')
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE, db_constraint=False,
+                             related_name='m2m_sitemessageusers')
     has_read = models.BooleanField(default=False)
     read_at = models.DateTimeField(default=None, null=True)
+    comment = ''
 
 
-class SiteMessage(JMSModel):
+class SiteMessage(JMSBaseModel):
     subject = models.CharField(max_length=1024)
     message = models.TextField()
     users = models.ManyToManyField(
@@ -24,6 +27,7 @@ class SiteMessage(JMSModel):
         'users.User', db_constraint=False, on_delete=models.DO_NOTHING, null=True, default=None,
         related_name='send_site_message'
     )
+    comment = ''
 
     has_read = False
     read_at = None

@@ -13,6 +13,10 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='terminal',
             name='type',
-            field=models.CharField(choices=[('koko', 'KoKo'), ('guacamole', 'Guacamole'), ('omnidb', 'OmniDB'), ('xrdp', 'Xrdp'), ('lion', 'Lion'), ('core', 'Core'), ('celery', 'Celery'), ('magnus', 'Magnus'), ('razor', 'Razor')], default='koko', max_length=64, verbose_name='type'),
+            field=models.CharField(choices=[
+                ('koko', 'KoKo'), ('guacamole', 'Guacamole'), ('omnidb', 'OmniDB'),
+                ('xrdp', 'Xrdp'), ('lion', 'Lion'), ('core', 'Core'), ('celery', 'Celery'),
+                ('magnus', 'Magnus'), ('razor', 'Razor'), ('tinker', 'Tinker'),
+            ], default='koko', max_length=64, verbose_name='type'),
         ),
     ]

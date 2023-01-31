@@ -1,45 +1,23 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from .base import BaseACL, BaseACLQuerySet
+
 from common.utils import get_request_ip, get_ip_city
 from common.utils.ip import contains_ip
 from common.utils.time_period import contains_time_period
 from common.utils.timezone import local_now_display
-
-
-class ACLManager(models.Manager):
-
-    def valid(self):
-        return self.get_queryset().valid()
+from .base import BaseACL
 
 
 class LoginACL(BaseACL):
-    class ActionChoices(models.TextChoices):
-        reject = 'reject', _('Reject')
-        allow = 'allow', _('Allow')
-        confirm = 'confirm', _('Login confirm')
-
-    # 用户
     user = models.ForeignKey(
-        'users.User', on_delete=models.CASCADE, verbose_name=_('User'),
-        related_name='login_acls'
+        'users.User', on_delete=models.CASCADE, related_name='login_acls', verbose_name=_('User')
     )
-    # 规则
+    # 规则, ip_group, time_period
     rules = models.JSONField(default=dict, verbose_name=_('Rule'))
-    # 动作
-    action = models.CharField(
-        max_length=64, verbose_name=_('Action'),
-        choices=ActionChoices.choices, default=ActionChoices.reject
-    )
-    reviewers = models.ManyToManyField(
-        'users.User', verbose_name=_("Reviewers"),
-        related_name="login_confirm_acls", blank=True
-    )
-    objects = ACLManager.from_queryset(BaseACLQuerySet)()
 
-    class Meta:
-        ordering = ('priority', '-date_updated', 'name')
+    class Meta(BaseACL.Meta):
         verbose_name = _('Login acl')
+        abstract = False
 
     def __str__(self):
         return self.name
@@ -53,12 +31,13 @@ class LoginACL(BaseACL):
 
     @staticmethod
     def match(user, ip):
-        acls = LoginACL.filter_acl(user)
-        if not acls:
+        acl_qs = LoginACL.filter_acl(user)
+        if not acl_qs:
             return
 
-        for acl in acls:
-            if acl.is_action(LoginACL.ActionChoices.confirm) and not acl.reviewers.exists():
+        for acl in acl_qs:
+            if acl.is_action(LoginACL.ActionChoices.review) and \
+                    not acl.reviewers.exists():
                 continue
             ip_group = acl.rules.get('ip_group')
             time_periods = acl.rules.get('time_period')
@@ -79,12 +58,12 @@ class LoginACL(BaseACL):
         login_datetime = local_now_display()
         data = {
             'title': title,
-            'type': const.TicketType.login_confirm,
             'applicant': self.user,
-            'apply_login_city': login_city,
             'apply_login_ip': login_ip,
-            'apply_login_datetime': login_datetime,
             'org_id': Organization.ROOT_ID,
+            'apply_login_city': login_city,
+            'apply_login_datetime': login_datetime,
+            'type': const.TicketType.login_confirm,
         }
         ticket = ApplyLoginTicket.objects.create(**data)
         assignees = self.reviewers.all()

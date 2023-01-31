@@ -1,0 +1,13 @@
+- hosts: postgresql
+  gather_facts: no
+  vars:
+    ansible_python_interpreter: /usr/local/bin/python
+
+  tasks:
+    - name: Verify account
+      community.postgresql.postgresql_ping:
+        login_user: "{{ account.username }}"
+        login_password: "{{ account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        db: "{{ jms_asset.specific.db_name }}"

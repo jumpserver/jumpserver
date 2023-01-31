@@ -1,6 +1,7 @@
 from rest_framework import serializers
+
+from common.serializers.fields import ReadableHiddenField
 from ..models import Comment
-from common.drf.fields import ReadableHiddenField
 
 __all__ = ['CommentSerializer']
 
@@ -23,8 +24,7 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields_mini = ['id']
         fields_small = fields_mini + [
-            'body',  'user_display',
-            'date_created', 'date_updated'
+            'body', 'user_display', 'date_created', 'date_updated'
         ]
         fields_fk = ['ticket', 'user', ]
         fields = fields_small + fields_fk

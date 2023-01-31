@@ -4,11 +4,8 @@
 from django.db.models import TextChoices
 from django.utils.translation import ugettext_lazy as _
 
-# Replay & Command Storage Choices
-# --------------------------------
 
-
-class ReplayStorageTypeChoices(TextChoices):
+class ReplayStorageType(TextChoices):
     null = 'null', 'Null',
     server = 'server', 'Server'
     s3 = 's3', 'S3'
@@ -20,7 +17,7 @@ class ReplayStorageTypeChoices(TextChoices):
     cos = 'cos', 'COS'
 
 
-class CommandStorageTypeChoices(TextChoices):
+class CommandStorageType(TextChoices):
     null = 'null', 'Null',
     server = 'server', 'Server'
     es = 'es', 'Elasticsearch'
@@ -29,7 +26,7 @@ class CommandStorageTypeChoices(TextChoices):
 # Component Status Choices
 # ------------------------
 
-class ComponentStatusChoices(TextChoices):
+class ComponentLoad(TextChoices):
     critical = 'critical', _('Critical')
     high = 'high', _('High')
     normal = 'normal', _('Normal')
@@ -40,7 +37,7 @@ class ComponentStatusChoices(TextChoices):
         return set(dict(cls.choices).keys())
 
 
-class TerminalTypeChoices(TextChoices):
+class TerminalType(TextChoices):
     koko = 'koko', 'KoKo'
     guacamole = 'guacamole', 'Guacamole'
     omnidb = 'omnidb', 'OmniDB'
@@ -48,10 +45,17 @@ class TerminalTypeChoices(TextChoices):
     lion = 'lion', 'Lion'
     core = 'core', 'Core'
     celery = 'celery', 'Celery'
-    magnus = 'magnus',  'Magnus'
-    razor = 'razor',  'Razor'
+    magnus = 'magnus', 'Magnus'
+    razor = 'razor', 'Razor'
+    tinker = 'tinker', 'Tinker'
 
     @classmethod
     def types(cls):
         return set(dict(cls.choices).keys())
 
+
+class PublishStatus(TextChoices):
+    pending = 'pending', _('Pending')
+    success = 'success', _("Success")
+    failed = 'failed', _("Failed")
+    mismatch = 'mismatch', _("Mismatch")

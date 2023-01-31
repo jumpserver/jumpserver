@@ -1,29 +1,24 @@
 # -*- coding: utf-8 -*-
 #
 import re
-import time
-import uuid
 import threading
-import os
 import time
 import uuid
-
 from collections import defaultdict
+
+from django.core.cache import cache
 from django.db import models, transaction
 from django.db.models import Q, Manager
-from django.db.utils import IntegrityError
-from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ugettext
 from django.db.transaction import atomic
-from django.core.cache import cache
+from django.utils.translation import ugettext
+from django.utils.translation import ugettext_lazy as _
 
-from common.utils.lock import DistributedLock
-from common.utils.common import timeit
 from common.db.models import output_as_string
 from common.utils import get_logger
-from orgs.mixins.models import OrgModelMixin, OrgManager
-from orgs.utils import get_current_org, tmp_to_org, tmp_to_root_org
+from common.utils.lock import DistributedLock
+from orgs.mixins.models import OrgManager, JMSOrgBaseModel
 from orgs.models import Organization
+from orgs.utils import get_current_org, tmp_to_org, tmp_to_root_org
 
 __all__ = ['Node', 'FamilyMixin', 'compute_parent_key', 'NodeQuerySet']
 logger = get_logger(__name__)
@@ -178,9 +173,7 @@ class FamilyMixin:
         return parent_keys
 
     def get_ancestor_keys(self, with_self=False):
-        return self.get_node_ancestor_keys(
-            self.key, with_self=with_self
-        )
+        return self.get_node_ancestor_keys(self.key, with_self=with_self)
 
     @property
     def ancestors(self):
@@ -437,6 +430,18 @@ class NodeAssetsMixin(NodeAllAssetsMappingMixin):
         assets = Asset.objects.filter(nodes=self)
         return assets.distinct()
 
+    def get_assets_for_tree(self):
+        return self.get_assets().only(
+            "id", "name", "address", "platform_id",
+            "org_id", "is_active"
+        ).prefetch_related('platform')
+
+    def get_all_assets_for_tree(self):
+        return self.get_all_assets().only(
+            "id", "name", "address", "platform_id",
+            "org_id", "is_active"
+        ).prefetch_related('platform')
+
     def get_valid_assets(self):
         return self.get_assets().valid()
 
@@ -547,15 +552,16 @@ class SomeNodesMixin:
         return root_nodes
 
 
-class Node(OrgModelMixin, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
+class Node(JMSOrgBaseModel, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     key = models.CharField(unique=True, max_length=64, verbose_name=_("Key"))  # '1:1:1:1'
     value = models.CharField(max_length=128, verbose_name=_("Value"))
     full_value = models.CharField(max_length=4096, verbose_name=_('Full value'), default='')
     child_mark = models.IntegerField(default=0)
     date_create = models.DateTimeField(auto_now_add=True)
-    parent_key = models.CharField(max_length=64, verbose_name=_("Parent key"),
-                                  db_index=True, default='')
+    parent_key = models.CharField(
+        max_length=64, verbose_name=_("Parent key"), db_index=True, default=''
+    )
     assets_amount = models.IntegerField(default=0)
 
     objects = OrgManager.from_queryset(NodeQuerySet)()

@@ -7,16 +7,18 @@ from django.db.transaction import atomic
 from django.conf import settings
 from celery import shared_task
 
+from ops.celery.decorator import register_as_period_task
 from orgs.utils import tmp_to_root_org
 from common.utils import get_logger
-from common.utils.timezone import local_now, dt_formatter, dt_parser
-from ops.celery.decorator import register_as_period_task
+from common.utils.timezone import local_now, dt_parser
+from common.const.crontab import CRONTAB_AT_AM_TEN
+
+from perms.models import AssetPermission
+from perms.utils import UserPermTreeExpireUtil
 from perms.notifications import (
-    PermedAssetsWillExpireUserMsg, AssetPermsWillExpireForOrgAdminMsg,
-    PermedAppsWillExpireUserMsg, AppPermsWillExpireForOrgAdminMsg
+    PermedAssetsWillExpireUserMsg,
+    AssetPermsWillExpireForOrgAdminMsg,
 )
-from perms.models import AssetPermission, ApplicationPermission
-from perms.utils.asset.user_permission import UserGrantedTreeRefreshController
 
 logger = get_logger(__file__)
 
@@ -26,36 +28,14 @@ logger = get_logger(__file__)
 @atomic()
 @tmp_to_root_org()
 def check_asset_permission_expired():
-    """
-    这里的任务要足够短，不要影响周期任务
-    """
-    from settings.models import Setting
-
-    setting_name = 'last_asset_perm_expired_check'
-
-    end = local_now()
-    default_start = end - timedelta(days=36000)  # Long long ago in china
-
-    defaults = {'value': dt_formatter(default_start)}
-    setting, created = Setting.objects.get_or_create(
-        name=setting_name, defaults=defaults
-    )
-    if created:
-        start = default_start
-    else:
-        start = dt_parser(setting.value)
-    setting.value = dt_formatter(end)
-    setting.save()
-
-    asset_perm_ids = AssetPermission.objects.filter(
-        date_expired__gte=start, date_expired__lte=end
-    ).distinct().values_list('id', flat=True)
-    asset_perm_ids = list(asset_perm_ids)
-    logger.info(f'>>> checking {start} to {end} have {asset_perm_ids} expired')
-    UserGrantedTreeRefreshController.add_need_refresh_by_asset_perm_ids_cross_orgs(asset_perm_ids)
+    """ 这里的任务要足够短，不要影响周期任务 """
+    perms = AssetPermission.objects.get_expired_permissions()
+    perm_ids = list(perms.distinct().values_list('id', flat=True))
+    logger.info(f'Checking expired permissions: {perm_ids}')
+    UserPermTreeExpireUtil().expire_perm_tree_for_perms(perm_ids)
 
 
-@register_as_period_task(crontab='0 10 * * *')
+@register_as_period_task(crontab=CRONTAB_AT_AM_TEN)
 @shared_task()
 @atomic()
 @tmp_to_root_org()
@@ -101,48 +81,3 @@ def check_asset_permission_will_expired():
             org_admins = org.admins.all()
             for org_admin in org_admins:
                 AssetPermsWillExpireForOrgAdminMsg(org_admin, perms, org, day_count).publish_async()
-
-
-@register_as_period_task(crontab='0 10 * * *')
-@shared_task()
-@atomic()
-@tmp_to_root_org()
-def check_app_permission_will_expired():
-    start = local_now()
-    end = start + timedelta(days=3)
-
-    app_perms = ApplicationPermission.objects.filter(
-        date_expired__gte=start,
-        date_expired__lte=end
-    ).distinct()
-
-    user_app_remain_day_mapper = defaultdict(dict)
-    org_perm_remain_day_mapper = defaultdict(dict)
-
-    for app_perm in app_perms:
-        date_expired = dt_parser(app_perm.date_expired)
-        remain_days = (date_expired - start).days
-
-        org = app_perm.org
-        if org in org_perm_remain_day_mapper[remain_days]:
-            org_perm_remain_day_mapper[remain_days][org].add(app_perm)
-        else:
-            org_perm_remain_day_mapper[remain_days][org] = {app_perm, }
-
-        users = app_perm.get_all_users()
-        apps = app_perm.applications.all()
-        for u in users:
-            if u in user_app_remain_day_mapper[remain_days]:
-                user_app_remain_day_mapper[remain_days][u].update(apps)
-            else:
-                user_app_remain_day_mapper[remain_days][u] = set(apps)
-
-    for day_count, user_app_mapper in user_app_remain_day_mapper.items():
-        for user, apps in user_app_mapper.items():
-            PermedAppsWillExpireUserMsg(user, apps, day_count).publish_async()
-
-    for day_count, org_perm_mapper in org_perm_remain_day_mapper.items():
-        for org, perms in org_perm_mapper.items():
-            org_admins = org.admins.all()
-            for org_admin in org_admins:
-                AppPermsWillExpireForOrgAdminMsg(org_admin, perms, org, day_count).publish_async()

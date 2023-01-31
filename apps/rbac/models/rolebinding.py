@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from rest_framework.serializers import ValidationError
 
-from common.db.models import JMSModel, CASCADE_SIGNAL_SKIP
+from common.db.models import JMSBaseModel, CASCADE_SIGNAL_SKIP
 from common.utils import lazyproperty
 from orgs.utils import current_org, tmp_to_root_org
 from .role import Role
@@ -30,7 +30,7 @@ class RoleBindingManager(models.Manager):
         return self.get_queryset()
 
 
-class RoleBinding(JMSModel):
+class RoleBinding(JMSBaseModel):
     Scope = Scope
     """ 定义 用户-角色 关系 """
     scope = models.CharField(

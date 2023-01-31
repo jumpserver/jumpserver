@@ -1,0 +1,331 @@
+from collections import defaultdict
+from copy import deepcopy
+
+from django.utils.translation import gettext as _
+
+from common.db.models import ChoicesMixin
+from .category import Category
+from .cloud import CloudTypes
+from .database import DatabaseTypes
+from .device import DeviceTypes
+from .host import HostTypes
+from .web import WebTypes
+
+
+class AllTypes(ChoicesMixin):
+    choices: list
+    includes = [
+        HostTypes, DeviceTypes, DatabaseTypes,
+        CloudTypes, WebTypes,
+    ]
+    _category_constrains = {}
+
+    @classmethod
+    def choices(cls):
+        choices = []
+        for tp in cls.includes:
+            choices.extend(tp.choices)
+        return choices
+
+    @classmethod
+    def filter_choices(cls, category):
+        choices = dict(cls.category_types()).get(category, cls).choices
+        return choices() if callable(choices) else choices
+
+    @classmethod
+    def get_constraints(cls, category, tp):
+        types_cls = dict(cls.category_types()).get(category)
+        if not types_cls:
+            return {}
+        type_constraints = types_cls.get_constrains()
+        constraints = type_constraints.get(tp, {})
+        cls.set_automation_methods(category, tp, constraints)
+        return constraints
+
+    @classmethod
+    def get_primary_protocol_name(cls, category, tp):
+        constraints = cls.get_constraints(category, tp)
+        if not constraints:
+            return None
+        return constraints.get('protocols')[0]['name']
+
+    @classmethod
+    def get_automation_methods(cls):
+        from assets.automations import platform_automation_methods as asset_methods
+        from accounts.automations import platform_automation_methods as account_methods
+        return asset_methods + account_methods
+
+    @classmethod
+    def set_automation_methods(cls, category, tp, constraints):
+        from assets.automations import filter_platform_methods
+        automation = constraints.get('automation', {})
+        automation_methods = {}
+        platform_automation_methods = cls.get_automation_methods()
+        for item, enabled in automation.items():
+            if not enabled:
+                continue
+            item_name = item.replace('_enabled', '')
+            methods = filter_platform_methods(
+                category, tp, item_name, methods=platform_automation_methods
+            )
+            methods = [{'name': m['name'], 'id': m['id']} for m in methods]
+            automation_methods[item_name + '_methods'] = methods
+        automation.update(automation_methods)
+        constraints['automation'] = automation
+        return constraints
+
+    @classmethod
+    def types(cls, with_constraints=True):
+        types = []
+        for category, type_cls in cls.category_types():
+            tps = type_cls.get_types()
+            types.extend([cls.serialize_type(category, tp, with_constraints) for tp in tps])
+        return types
+
+    @classmethod
+    def categories(cls, with_constraints=True):
+        categories = []
+        for category, type_cls in cls.category_types():
+            tps = type_cls.get_types()
+            if not tps:
+                continue
+            category_data = {
+                'value': category.value,
+                'label': category.label,
+                'types': [cls.serialize_type(category, tp, with_constraints) for tp in tps]
+            }
+            categories.append(category_data)
+        return categories
+
+    @classmethod
+    def serialize_type(cls, category, tp, with_constraints=True):
+        data = {
+            'value': tp.value,
+            'label': tp.label,
+            'category': category,
+        }
+
+        if with_constraints:
+            data['constraints'] = cls.get_constraints(category, tp)
+        else:
+            data['constraints'] = []
+        return data
+
+    @classmethod
+    def grouped_choices(cls):
+        grouped_types = [(str(ca), tp.choices) for ca, tp in cls.category_types()]
+        return grouped_types
+
+    @classmethod
+    def grouped_choices_to_objs(cls):
+        choices = cls.serialize_to_objs(Category.choices)
+        mapper = dict(cls.grouped_choices())
+        for choice in choices:
+            children = cls.serialize_to_objs(mapper[choice['value']])
+            choice['children'] = children
+        return choices
+
+    @staticmethod
+    def serialize_to_objs(choices):
+        title = ['value', 'display_name']
+        return [dict(zip(title, choice)) for choice in choices]
+
+    @classmethod
+    def category_types(cls):
+        return (
+            (Category.HOST, HostTypes),
+            (Category.DEVICE, DeviceTypes),
+            (Category.DATABASE, DatabaseTypes),
+            (Category.WEB, WebTypes),
+            (Category.CLOUD, CloudTypes)
+        )
+
+    @classmethod
+    def get_types(cls):
+        tps = []
+        for i in dict(cls.category_types()).values():
+            tps.extend(i.get_types())
+        return tps
+
+    @staticmethod
+    def choice_to_node(choice, pid, opened=True, is_parent=True, meta=None):
+        node = {
+            'id': pid + '_' + choice.name,
+            'name': choice.label,
+            'title': choice.label,
+            'pId': pid,
+            'open': opened,
+            'isParent': is_parent,
+        }
+        if meta:
+            node['meta'] = meta
+        return node
+
+    @classmethod
+    def platform_to_node(cls, p, pid, include_asset):
+        node = {
+            'id': '{}'.format(p.id),
+            'name': p.name,
+            'title': p.name,
+            'pId': pid,
+            'isParent': include_asset,
+            'meta': {
+                'type': 'platform'
+            }
+        }
+        return node
+
+    @classmethod
+    def to_tree_nodes(cls, include_asset, count_resource='asset'):
+        from accounts.models import Account
+        from ..models import Asset, Platform
+        if count_resource == 'account':
+            resource_platforms = Account.objects.all().values_list('asset__platform_id', flat=True)
+        else:
+            resource_platforms = Asset.objects.all().values_list('platform_id', flat=True)
+
+        platform_count = defaultdict(int)
+        for platform_id in resource_platforms:
+            platform_count[platform_id] += 1
+
+        category_type_mapper = defaultdict(int)
+        platforms = Platform.objects.all()
+        tp_platforms = defaultdict(list)
+
+        for p in platforms:
+            category_type_mapper[p.category + '_' + p.type] += platform_count[p.id]
+            category_type_mapper[p.category] += platform_count[p.id]
+            tp_platforms[p.category + '_' + p.type].append(p)
+
+        root = dict(id='ROOT', name=_('All types'), title='所有类型', open=True, isParent=True)
+        nodes = [root]
+        for category, type_cls in cls.category_types():
+            # Category 格式化
+            meta = {'type': 'category', 'category': category.value}
+            category_node = cls.choice_to_node(category, 'ROOT', meta=meta)
+            category_count = category_type_mapper.get(category, 0)
+            category_node['name'] += f'({category_count})'
+            nodes.append(category_node)
+
+            # Type 格式化
+            types = type_cls.get_types()
+            for tp in types:
+                meta = {'type': 'type', 'category': category.value, '_type': tp.value}
+                tp_node = cls.choice_to_node(tp, category_node['id'], opened=False, meta=meta)
+                tp_count = category_type_mapper.get(category + '_' + tp, 0)
+                tp_node['name'] += f'({tp_count})'
+                nodes.append(tp_node)
+
+                # Platform 格式化
+                for p in tp_platforms.get(category + '_' + tp, []):
+                    platform_node = cls.platform_to_node(p, tp_node['id'], include_asset)
+                    platform_node['name'] += f'({platform_count.get(p.id, 0)})'
+                    nodes.append(platform_node)
+        return nodes
+
+    @classmethod
+    def get_type_default_platform(cls, category, tp):
+        constraints = cls.get_constraints(category, tp)
+        data = {
+            'category': category,
+            'type': tp, 'internal': True,
+            'charset': constraints.get('charset', 'utf-8'),
+            'domain_enabled': constraints.get('domain_enabled', False),
+            'su_enabled': constraints.get('su_enabled', False),
+        }
+        if data['su_enabled'] and data.get('su_methods'):
+            data['su_method'] = data['su_methods'][0]['id']
+
+        protocols = constraints.get('protocols', [])
+        for p in protocols:
+            p.pop('secret_types', None)
+        data['protocols'] = protocols
+
+        automation = constraints.get('automation', {})
+
+        enable_fields = {k: v for k, v in automation.items() if k.endswith('_enabled')}
+        for k, v in enable_fields.items():
+            auto_item = k.replace('_enabled', '')
+            methods = automation.pop(auto_item + '_methods', [])
+            if methods:
+                automation[auto_item + '_method'] = methods[0]['id']
+        data['automation'] = automation
+        return data
+
+    @classmethod
+    def create_or_update_by_platform_data(cls, name, platform_data):
+        from assets.models import Platform, PlatformAutomation, PlatformProtocol
+
+        automation_data = platform_data.pop('automation', {})
+        protocols_data = platform_data.pop('protocols', [])
+
+        platform, created = Platform.objects.update_or_create(
+            defaults=platform_data, name=name
+        )
+        if not platform.automation:
+            automation = PlatformAutomation.objects.create()
+            platform.automation = automation
+            platform.save()
+        else:
+            automation = platform.automation
+        for k, v in automation_data.items():
+            setattr(automation, k, v)
+        automation.save()
+
+        platform.protocols.all().delete()
+        for p in protocols_data:
+            p.pop('primary', None)
+            PlatformProtocol.objects.create(**p, platform=platform)
+
+    @classmethod
+    def create_or_update_internal_platforms(cls):
+        print("\n\tCreate internal platforms")
+        for category, type_cls in cls.category_types():
+            print("\t## Category: {}".format(category.label))
+            data = type_cls.internal_platforms()
+
+            for tp, platform_datas in data.items():
+                print("\t  >> Type: {}".format(tp.label))
+                default_platform_data = cls.get_type_default_platform(category, tp)
+                default_automation = default_platform_data.pop('automation', {})
+                default_protocols = default_platform_data.pop('protocols', [])
+
+                for d in platform_datas:
+                    name = d['name']
+                    print("\t    - Platform: {}".format(name))
+                    _automation = d.pop('automation', {})
+                    _protocols = d.pop('_protocols', [])
+                    _protocols_setting = d.pop('protocols_setting', {})
+
+                    protocols_data = deepcopy(default_protocols)
+                    if _protocols:
+                        protocols_data = [p for p in protocols_data if p['name'] in _protocols]
+                    for p in protocols_data:
+                        setting = _protocols_setting.get(p['name'], {})
+                        p['required'] = p.pop('required', False)
+                        p['default'] = p.pop('default', False)
+                        p['setting'] = {**setting, **p.get('setting', {})}
+
+                    platform_data = {
+                        **default_platform_data, **d,
+                        'automation': {**default_automation, **_automation},
+                        'protocols': protocols_data
+                    }
+                    cls.create_or_update_by_platform_data(name, platform_data)
+
+    @classmethod
+    def update_user_create_platforms(cls, platform_cls):
+        internal_platforms = []
+        for category, type_cls in cls.category_types():
+            data = type_cls.internal_platforms()
+            for tp, platform_datas in data.items():
+                for d in platform_datas:
+                    internal_platforms.append(d['name'])
+
+        user_platforms = platform_cls.objects.exclude(name__in=internal_platforms)
+        user_platforms.update(internal=False)
+
+        for platform in user_platforms:
+            print("\t- Update platform: {}".format(platform.name))
+            platform_data = cls.get_type_default_platform(platform.category, platform.type)
+            cls.create_or_update_by_platform_data(platform.name, platform_data)

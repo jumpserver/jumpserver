@@ -1,0 +1,7 @@
+id: verify_account_mysql
+name: Verify account from MySQL
+category: database
+type:
+  - mysql
+  - mariadb
+method: verify_account

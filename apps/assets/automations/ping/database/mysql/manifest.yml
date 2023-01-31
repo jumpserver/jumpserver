@@ -1,0 +1,7 @@
+id: mysql_ping
+name: Ping MySQL
+category: database
+type:
+  - mysql
+  - mariadb
+method: ping

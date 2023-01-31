@@ -1,0 +1,24 @@
+# Cloud req
+qingcloud-sdk==1.2.12
+azure-mgmt-subscription==1.0.0
+azure-identity==1.5.0
+azure-mgmt-compute==4.6.2
+azure-mgmt-network==2.7.0
+google-cloud-compute==0.5.0
+alibabacloud_dysmsapi20170525==2.0.2
+python-novaclient==11.0.1
+python-keystoneclient==4.3.0
+bce-python-sdk==0.8.64
+tencentcloud-sdk-python==3.0.662
+aliyun-python-sdk-core-v3==2.9.1
+aliyun-python-sdk-ecs==4.10.1
+huaweicloud-sdk-python==1.0.21
+# python-keystoneclient need keystoneauth1>=3.4.0
+# huaweicloud-sdk-python need keystoneauth1<=3.4.0
+keystoneauth1==3.4.0
+# DB requirements
+oracledb==1.0.1
+psycopg2-binary==2.9.1
+pymssql==2.2.5
+IPy==1.1
+psycopg2==2.9.4

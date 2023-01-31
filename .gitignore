@@ -16,6 +16,7 @@ dump.rdb
 .cache/
 .idea/
 .vscode/
+.fleet/
 db.sqlite3
 config.py
 config.yml
@@ -41,4 +42,4 @@ release/*
 releashe
 /apps/script.py
 data/*
-
+test.py

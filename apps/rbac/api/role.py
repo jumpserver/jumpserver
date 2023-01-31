@@ -3,12 +3,12 @@ from django.utils.translation import ugettext as _
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.decorators import action
 
-from common.drf.api import JMSModelViewSet
+from common.api import JMSModelViewSet
+from common.api import PaginatedResponseMixin
 from ..filters import RoleFilter
 from ..serializers import RoleSerializer, RoleUserSerializer
 from ..models import Role, SystemRole, OrgRole
 from .permission import PermissionViewSet
-from common.mixins.api import PaginatedResponseMixin
 
 __all__ = [
     'RoleViewSet', 'SystemRoleViewSet', 'OrgRoleViewSet',
@@ -16,7 +16,7 @@ __all__ = [
 ]
 
 
-class RoleViewSet(PaginatedResponseMixin, JMSModelViewSet):
+class RoleViewSet(JMSModelViewSet):
     queryset = Role.objects.all()
     serializer_classes = {
         'default': RoleSerializer,
@@ -117,4 +117,3 @@ class OrgRolePermissionsViewSet(BaseRolePermissionsViewSet):
     rbac_perms = (
         ('get_tree', 'rbac.view_permission'),
     )
-

@@ -1,4 +1,4 @@
-FROM python:3.8-slim as stage-build
+FROM python:3.9-slim as stage-build
 ARG TARGETARCH
 
 ARG VERSION
@@ -8,7 +8,7 @@ WORKDIR /opt/jumpserver
 ADD . .
 RUN cd utils && bash -ixeu build.sh
 
-FROM python:3.8-slim
+FROM python:3.9-slim
 ARG TARGETARCH
 MAINTAINER JumpServer Team <ibuler@qq.com>
 
@@ -18,7 +18,6 @@ ARG BUILD_DEPENDENCIES="              \
         pkg-config"
 
 ARG DEPENDENCIES="                    \
-        default-libmysqlclient-dev    \
         freetds-dev                   \
         libpq-dev                     \
         libffi-dev                    \
@@ -28,21 +27,21 @@ ARG DEPENDENCIES="                    \
         libxml2-dev                   \
         libxmlsec1-dev                \
         libxmlsec1-openssl            \
-        libaio-dev                    \
-        openssh-client                \
-        sshpass"
+        libaio-dev"
 
 ARG TOOLS="                           \
         ca-certificates               \
         curl                          \
+        default-libmysqlclient-dev    \
         default-mysql-client          \
-        iputils-ping                  \
         locales                       \
-        netcat                        \
-        redis-server                  \
+        openssh-client                \
+        procps                        \
+        sshpass                       \
         telnet                        \
-        vim                           \
         unzip                         \
+        vim                           \
+        git                           \
         wget"
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
@@ -54,10 +53,11 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
     && apt-get -y install --no-install-recommends ${TOOLS} \
     && mkdir -p /root/.ssh/ \
     && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > /root/.ssh/config \
-    && sed -i "s@# alias l@alias l@g" ~/.bashrc \
     && echo "set mouse-=a" > ~/.vimrc \
     && echo "no" | dpkg-reconfigure dash \
     && echo "zh_CN.UTF-8" | dpkg-reconfigure locales \
+    && sed -i "s@# export @export @g" ~/.bashrc \
+    && sed -i "s@# alias @alias @g" ~/.bashrc \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /tmp/build
@@ -73,8 +73,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     && pip config set global.index-url ${PIP_MIRROR} \
     && pip install --upgrade pip \
     && pip install --upgrade setuptools wheel \
-    && pip install https://download.jumpserver.org/pypi/simple/cryptography/cryptography-36.0.1-cp38-cp38-linux_loongarch64.whl \
-    && pip install https://download.jumpserver.org/pypi/simple/greenlet/greenlet-1.1.2-cp38-cp38-linux_loongarch64.whl \
+    && pip install https://download.jumpserver.org/pypi/simple/cryptography/cryptography-38.0.4-cp39-cp39-linux_loongarch64.whl \
+    && pip install https://download.jumpserver.org/pypi/simple/greenlet/greenlet-1.1.2-cp39-cp39-linux_loongarch64.whl \
     && pip install $(grep 'PyNaCl' requirements/requirements.txt) \
     && GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=true pip install grpcio \
     && pip install $(grep -E 'jms|jumpserver' requirements/requirements.txt) -i ${PIP_JMS_MIRROR} \
@@ -90,6 +90,6 @@ VOLUME /opt/jumpserver/logs
 
 ENV LANG=zh_CN.UTF-8
 
-EXPOSE 8070
 EXPOSE 8080
+
 ENTRYPOINT ["./entrypoint.sh"]

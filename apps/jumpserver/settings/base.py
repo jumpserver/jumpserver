@@ -1,6 +1,8 @@
 import os
 import platform
 
+from redis.sentinel import SentinelManagedSSLConnection
+
 if platform.system() == 'Darwin' and platform.machine() == 'arm64':
     import pymysql
 
@@ -33,7 +35,9 @@ def parse_sentinels_host(sentinels_host):
 VERSION = const.VERSION
 BASE_DIR = const.BASE_DIR
 PROJECT_DIR = const.PROJECT_DIR
+APPS_DIR = os.path.join(PROJECT_DIR, 'apps')
 DATA_DIR = os.path.join(PROJECT_DIR, 'data')
+ANSIBLE_DIR = os.path.join(DATA_DIR, 'ansible')
 CERTS_DIR = os.path.join(DATA_DIR, 'certs')
 
 # Quick-start development settings - unsuitable for production
@@ -53,8 +57,14 @@ DEBUG_DEV = CONFIG.DEBUG_DEV
 # Absolute url for some case, for example email link
 SITE_URL = CONFIG.SITE_URL
 
+# Absolute url for downloading applet
+APPLET_DOWNLOAD_HOST = CONFIG.APPLET_DOWNLOAD_HOST
+
 # https://docs.djangoproject.com/en/4.1/ref/settings/
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# https://docs.djangoproject.com/en/4.1/ref/settings/#std-setting-CSRF_TRUSTED_ORIGINS
+CSRF_TRUSTED_ORIGINS = CONFIG.CSRF_TRUSTED_ORIGINS.split(',') if CONFIG.CSRF_TRUSTED_ORIGINS else []
 
 # LOG LEVEL
 LOG_LEVEL = CONFIG.LOG_LEVEL
@@ -70,6 +80,7 @@ INSTALLED_APPS = [
     'orgs.apps.OrgsConfig',
     'users.apps.UsersConfig',
     'assets.apps.AssetsConfig',
+    'accounts.apps.AccountsConfig',
     'perms.apps.PermsConfig',
     'ops.apps.OpsConfig',
     'settings.apps.SettingsConfig',
@@ -103,6 +114,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'jumpserver.middleware.StartMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -122,6 +134,7 @@ MIDDLEWARE = [
     'authentication.middleware.ThirdPartyLoginMiddleware',
     'authentication.middleware.SessionCookieMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
+    'jumpserver.middleware.EndMiddleware',
 ]
 
 ROOT_URLCONF = 'jumpserver.urls'
@@ -195,13 +208,12 @@ DATABASES = {
     }
 }
 
-DB_CA_PATH = os.path.join(PROJECT_DIR, 'data', 'certs', 'db_ca.pem')
-DB_USE_SSL = False
+DB_USE_SSL = CONFIG.DB_USE_SSL
 if CONFIG.DB_ENGINE.lower() == 'mysql':
     DB_OPTIONS['init_command'] = "SET sql_mode='STRICT_TRANS_TABLES'"
-    if os.path.isfile(DB_CA_PATH):
+    if DB_USE_SSL:
+        DB_CA_PATH = exist_or_default(os.path.join(CERTS_DIR, 'db_ca.pem'), None)
         DB_OPTIONS['ssl'] = {'ca': DB_CA_PATH}
-        DB_USE_SSL = True
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -297,17 +309,22 @@ else:
     REDIS_SENTINEL_SOCKET_TIMEOUT = None
 
 # Cache config
+
 REDIS_OPTIONS = {
     "REDIS_CLIENT_KWARGS": {
         "health_check_interval": 30
     },
     "CONNECTION_POOL_KWARGS": {
+        'max_connections': 100,
+    }
+}
+if REDIS_USE_SSL:
+    REDIS_OPTIONS['CONNECTION_POOL_KWARGS'].update({
         'ssl_cert_reqs': REDIS_SSL_REQUIRED,
         "ssl_keyfile": REDIS_SSL_KEY,
         "ssl_certfile": REDIS_SSL_CERT,
         "ssl_ca_certs": REDIS_SSL_CA
-    } if REDIS_USE_SSL else {}
-}
+    })
 
 if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
     REDIS_LOCATION_NO_DB = "%(protocol)s://%(service_name)s/{}" % {
@@ -317,17 +334,27 @@ if REDIS_SENTINEL_SERVICE_NAME and REDIS_SENTINELS:
         'CLIENT_CLASS': 'django_redis.client.SentinelClient',
         'SENTINELS': REDIS_SENTINELS, 'PASSWORD': CONFIG.REDIS_PASSWORD,
         'SENTINEL_KWARGS': {
+            'ssl': REDIS_USE_SSL,
+            'ssl_cert_reqs': REDIS_SSL_REQUIRED,
+            "ssl_keyfile": REDIS_SSL_KEY,
+            "ssl_certfile": REDIS_SSL_CERT,
+            "ssl_ca_certs": REDIS_SSL_CA,
             'password': REDIS_SENTINEL_PASSWORD,
             'socket_timeout': REDIS_SENTINEL_SOCKET_TIMEOUT
         }
     })
+    if REDIS_USE_SSL:
+        CONNECTION_POOL_KWARGS = REDIS_OPTIONS['CONNECTION_POOL_KWARGS']
+        CONNECTION_POOL_KWARGS['connection_class'] = SentinelManagedSSLConnection
+        REDIS_OPTIONS['CONNECTION_POOL_KWARGS'] = CONNECTION_POOL_KWARGS
     DJANGO_REDIS_CONNECTION_FACTORY = 'django_redis.pool.SentinelConnectionFactory'
 else:
     REDIS_LOCATION_NO_DB = '%(protocol)s://:%(password)s@%(host)s:%(port)s/{}' % {
-        'protocol': REDIS_PROTOCOL, 'password': CONFIG.REDIS_PASSWORD,
-        'host': CONFIG.REDIS_HOST, 'port': CONFIG.REDIS_PORT,
+        'protocol': REDIS_PROTOCOL,
+        'password': CONFIG.REDIS_PASSWORD,
+        'host': CONFIG.REDIS_HOST,
+        'port': CONFIG.REDIS_PORT,
     }
-
 
 REDIS_CACHE_DEFAULT = {
     'BACKEND': 'redis_lock.django_cache.RedisCache',
@@ -356,7 +383,6 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
 ]
 
-
 GMSSL_ENABLED = CONFIG.GMSSL_ENABLED
 GM_HASHER = 'common.hashers.PBKDF2SM3PasswordHasher'
 if GMSSL_ENABLED:
@@ -372,4 +398,3 @@ if os.environ.get('DEBUG_TOOLBAR', False):
     DEBUG_TOOLBAR_PANELS = [
         'debug_toolbar.panels.profiling.ProfilingPanel',
     ]
-

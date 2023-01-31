@@ -1,0 +1,7 @@
+id: gather_facts_mysql
+name: Gather facts from MySQL
+category: database
+type:
+  - mysql
+  - mariadb
+method: gather_facts

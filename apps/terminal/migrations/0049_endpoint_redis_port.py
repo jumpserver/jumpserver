@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='endpoint',
             name='redis_port',
-            field=common.db.fields.PortField(default=63790, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(65535)], verbose_name='Redis Port'),
+            field=common.db.fields.PortField(default=63790, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(65535)], verbose_name='Redis port'),
         ),
     ]

@@ -1,22 +1,16 @@
 # -*- coding: utf-8 -*-
-import uuid
 
-from django.db import models, IntegrityError
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import lazyproperty
-from orgs.mixins.models import OrgModelMixin
+from orgs.mixins.models import JMSOrgBaseModel
 
 __all__ = ['UserGroup']
 
 
-class UserGroup(OrgModelMixin):
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+class UserGroup(JMSOrgBaseModel):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
-    comment = models.TextField(blank=True, verbose_name=_('Comment'))
-    date_created = models.DateTimeField(auto_now_add=True, null=True,
-                                        verbose_name=_('Date created'))
-    created_by = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -27,7 +21,7 @@ class UserGroup(OrgModelMixin):
 
     class Meta:
         ordering = ['name']
-        unique_together = [('org_id', 'name'),]
+        unique_together = [('org_id', 'name'), ]
         verbose_name = _("User group")
 
     @classmethod

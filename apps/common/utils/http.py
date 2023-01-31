@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 #
-import time
-from email.utils import formatdate
 import calendar
 import threading
+import time
+from email.utils import formatdate
+
+from rest_framework.serializers import BooleanField
 
 _STRPTIME_LOCK = threading.Lock()
 
@@ -35,3 +37,11 @@ def http_to_unixtime(time_string):
 def iso8601_to_unixtime(time_string):
     """把ISO8601时间字符串（形如，2012-02-24T06:07:48.000Z）转换为UNIX时间，精确到秒。"""
     return to_unixtime(time_string, _ISO8601_FORMAT)
+
+
+def get_remote_addr(request):
+    return request.META.get("HTTP_X_FORWARDED_HOST") or request.META.get("REMOTE_ADDR")
+
+
+def is_true(value):
+    return value in BooleanField.TRUE_VALUES

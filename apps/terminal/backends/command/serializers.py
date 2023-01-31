@@ -17,7 +17,9 @@ class SimpleSessionCommandSerializer(serializers.Serializer):
     risk_level = serializers.ChoiceField(
         required=False, label=_("Risk level"), choices=AbstractSessionCommand.RISK_LEVEL_CHOICES
     )
-    org_id = serializers.CharField(max_length=36, required=False, default='', allow_null=True, allow_blank=True)
+    org_id = serializers.CharField(
+        max_length=36, required=False, default='', allow_null=True, allow_blank=True
+    )
 
     def validate_user(self, value):
         if len(value) > 64:
@@ -29,23 +31,23 @@ class InsecureCommandAlertSerializer(SimpleSessionCommandSerializer):
     pass
 
 
-class SessionCommandSerializer(SimpleSessionCommandSerializer):
+class SessionCommandSerializerMixin(serializers.Serializer):
     """使用这个类作为基础Command Log Serializer类, 用来序列化"""
-
     id = serializers.UUIDField(read_only=True)
-    system_user = serializers.CharField(label=_("System user"))  # 限制 64 字符，不能直接迁移成 128 字符，命令表数据量会比较大
+    # 限制 64 字符，不能直接迁移成 128 字符，命令表数据量会比较大
+    account = serializers.CharField(label=_("Account "))
     output = serializers.CharField(max_length=2048, allow_blank=True, label=_("Output"))
-    risk_level_display = serializers.SerializerMethodField(label=_('Risk level display'))
     timestamp = serializers.IntegerField(label=_('Timestamp'))
     timestamp_display = serializers.DateTimeField(read_only=True, label=_('Datetime'))
     remote_addr = serializers.CharField(read_only=True, label=_('Remote Address'))
 
-    @staticmethod
-    def get_risk_level_display(obj):
-        risk_mapper = dict(AbstractSessionCommand.RISK_LEVEL_CHOICES)
-        return risk_mapper.get(obj.risk_level)
-
-    def validate_system_user(self, value):
+    def validate_account(self, value):
         if len(value) > 64:
             value = pretty_string(value, 64)
         return value
+
+
+class SessionCommandSerializer(SessionCommandSerializerMixin, SimpleSessionCommandSerializer):
+    """ 字段排序序列类 """
+    pass
+

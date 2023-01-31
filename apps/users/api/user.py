@@ -7,9 +7,9 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 
-from common.mixins import CommonApiMixin
+from common.api import CommonApiMixin
 from common.utils import get_logger
-from common.mixins.api import SuggestionMixin
+from common.api import SuggestionMixin
 from orgs.utils import current_org, tmp_to_root_org
 from rbac.models import Role, RoleBinding
 from users.utils import LoginBlockUtil, MFABlockUtils

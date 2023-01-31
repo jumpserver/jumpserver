@@ -1,29 +1,27 @@
-from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
+from rest_framework import serializers
 
-from common.drf.serializers import BulkModelSerializer, AdaptedBulkListSerializer
-from common.utils import is_uuid
+from common.serializers.fields import LabeledChoiceField
+from common.serializers import BulkModelSerializer
+from common.utils import get_request_ip, pretty_string, is_uuid
 from users.serializers import ServiceAccountSerializer
-from common.utils import get_request_ip, pretty_string
 from .. import const
-
-from ..models import (
-    Terminal, Status, Task, CommandStorage, ReplayStorage
-)
+from ..models import Terminal, Status, Task, CommandStorage, ReplayStorage
 
 
-class StatusSerializer(serializers.ModelSerializer):
+class StatSerializer(serializers.ModelSerializer):
     sessions = serializers.ListSerializer(
-        child=serializers.CharField(max_length=36), write_only=True
+        child=serializers.CharField(max_length=36),
+        write_only=True
     )
 
     class Meta:
+        model = Status
         fields_mini = ['id']
         fields_write_only = ['sessions', ]
         fields_small = fields_mini + fields_write_only + [
             'cpu_load', 'memory_used', 'disk_used',
-            'session_online',
-            'date_created'
+            'session_online', 'date_created'
         ]
         fields_fk = ['terminal']
         fields = fields_small + fields_fk
@@ -32,30 +30,28 @@ class StatusSerializer(serializers.ModelSerializer):
             "memory_used": {'default': 0},
             "disk_used": {'default': 0},
         }
-        model = Status
 
 
 class TerminalSerializer(BulkModelSerializer):
     session_online = serializers.ReadOnlyField(source='get_online_session_count')
     is_alive = serializers.BooleanField(read_only=True)
     is_active = serializers.BooleanField(read_only=True, label='Is active')
-    status = serializers.ChoiceField(
-        read_only=True, choices=const.ComponentStatusChoices.choices,
-        source='latest_status', label=_('Load status')
+    load = LabeledChoiceField(
+        read_only=True, choices=const.ComponentLoad.choices,
+        label=_('Load status')
     )
-    status_display = serializers.CharField(read_only=True, source='latest_status_display')
-    stat = StatusSerializer(read_only=True, source='latest_stat')
+    stat = StatSerializer(read_only=True, source='last_stat')
 
     class Meta:
         model = Terminal
         fields_mini = ['id', 'name']
         fields_small = fields_mini + [
-            'type', 'remote_addr', 'http_port', 'ssh_port',
-            'session_online', 'command_storage', 'replay_storage',
-            'is_accepted', "is_active", 'is_alive',
+            'type', 'remote_addr', 'session_online',
+            'command_storage', 'replay_storage',
+            'is_active', 'is_alive',
             'date_created', 'comment',
         ]
-        fields_fk = ['status', 'status_display', 'stat']
+        fields_fk = ['load', 'stat']
         fields = fields_small + fields_fk
         read_only_fields = ['type', 'date_created']
         extra_kwargs = {
@@ -137,3 +133,11 @@ class TerminalRegistrationSerializer(serializers.ModelSerializer):
         instance.replay_storage = ReplayStorage.default().name
         instance.save()
         return instance
+
+
+class ConnectMethodSerializer(serializers.Serializer):
+    value = serializers.CharField(max_length=128)
+    label = serializers.CharField(max_length=128)
+    type = serializers.CharField(max_length=128)
+    endpoint_protocol = serializers.CharField(max_length=128)
+    component = serializers.CharField(max_length=128)

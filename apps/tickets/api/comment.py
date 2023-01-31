@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-
 from rest_framework import viewsets, mixins
+
 from common.exceptions import JMSException
 from common.utils import lazyproperty
 from rbac.permissions import RBACPermission

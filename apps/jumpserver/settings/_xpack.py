@@ -6,7 +6,6 @@ from .. import const
 from .base import INSTALLED_APPS, TEMPLATES
 
 XPACK_DIR = os.path.join(const.BASE_DIR, 'xpack')
-# XPACK_ENABLED = False
 XPACK_ENABLED = os.path.isdir(XPACK_DIR)
 XPACK_TEMPLATES_DIR = []
 XPACK_CONTEXT_PROCESSOR = []

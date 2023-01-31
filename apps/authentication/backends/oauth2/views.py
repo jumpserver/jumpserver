@@ -26,8 +26,13 @@ class OAuth2AuthRequestView(View):
             )
         }
 
-        redirect_url = '{url}?{query}'.format(
+        if '?' in settings.AUTH_OAUTH2_PROVIDER_AUTHORIZATION_ENDPOINT:
+            separator = '&'
+        else:
+            separator = '?'
+        redirect_url = '{url}{separator}{query}'.format(
             url=settings.AUTH_OAUTH2_PROVIDER_AUTHORIZATION_ENDPOINT,
+            separator=separator,
             query=urlencode(query_dict)
         )
         logger.debug(log_prompt.format('Redirect login url'))

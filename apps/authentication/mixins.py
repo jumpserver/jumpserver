@@ -1,25 +1,25 @@
 # -*- coding: utf-8 -*-
 #
 import inspect
-from functools import partial
 import time
+from functools import partial
 from typing import Callable
 
-from django.utils.http import urlencode
-from django.core.cache import cache
 from django.conf import settings
 from django.contrib import auth
-from django.utils.translation import ugettext as _
-from rest_framework.request import Request
 from django.contrib.auth import (
     BACKEND_SESSION_KEY, load_backend,
     PermissionDenied, user_login_failed, _clean_credentials,
 )
+from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import reverse, redirect, get_object_or_404
+from django.utils.http import urlencode
+from django.utils.translation import ugettext as _
+from rest_framework.request import Request
 
-from common.utils import get_request_ip, get_logger, bulk_get, FlashMessageUtil
 from acls.models import LoginACL
+from common.utils import get_request_ip, get_logger, bulk_get, FlashMessageUtil
 from users.models import User
 from users.utils import LoginBlockUtil, MFABlockUtils, LoginIpBlockUtil
 from . import errors
@@ -333,13 +333,13 @@ class AuthACLMixin:
             return
 
         acl: LoginACL
-        if acl.is_action(acl.ActionChoices.allow):
+        if acl.is_action(acl.ActionChoices.accept):
             return
 
         if acl.is_action(acl.ActionChoices.reject):
             raise errors.LoginACLIPAndTimePeriodNotAllowed(user.username, request=self.request)
 
-        if acl.is_action(acl.ActionChoices.confirm):
+        if acl.is_action(acl.ActionChoices.review):
             self.request.session['auth_confirm_required'] = '1'
             self.request.session['auth_acl_id'] = str(acl.id)
             return
@@ -354,7 +354,7 @@ class AuthACLMixin:
         acl = LoginACL.filter_acl(user).filter(id=acl_id).first()
         if not acl:
             return
-        if not acl.is_action(acl.ActionChoices.confirm):
+        if not acl.is_action(acl.ActionChoices.review):
             return
         self.get_ticket_or_create(acl)
         self.check_user_login_confirm()

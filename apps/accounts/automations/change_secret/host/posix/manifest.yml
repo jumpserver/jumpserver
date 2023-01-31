@@ -1,0 +1,7 @@
+id: change_secret_posix
+name: Change secret for posix
+category: host
+type:
+  - unix
+  - linux
+method: change_secret

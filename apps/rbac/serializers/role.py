@@ -1,6 +1,7 @@
-from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
+from rest_framework import serializers
 
+from common.serializers.fields import LabeledChoiceField
 from users.models import User
 from ..models import Role
 
@@ -8,13 +9,13 @@ __all__ = ['RoleSerializer', 'RoleUserSerializer']
 
 
 class RoleSerializer(serializers.ModelSerializer):
-    scope_display = serializers.ReadOnlyField(source='get_scope_display', label=_('Scope display'))
+    scope = LabeledChoiceField(choices=Role.Scope.choices, label=_("Scope"))
 
     class Meta:
         model = Role
         fields_mini = ['id', 'name', 'display_name', 'scope']
         read_only_fields = [
-            'users_amount', 'builtin', 'scope_display',
+            'users_amount', 'builtin',
             'date_created', 'date_updated',
             'created_by', 'updated_by',
         ]

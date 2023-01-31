@@ -45,6 +45,11 @@ class BaseService(object):
             msg = f'{self.name} is running: {self.pid}.'
         else:
             msg = f'{self.name} is stopped.'
+            if DEBUG:
+                msg = '\033[31m{} is stopped.\033[0m\nYou can manual start it to find the error: \n' \
+                      '  $ cd {}\n' \
+                      '  $ {}'.format(self.name, self.cwd, ' '.join(self.cmd))
+
         print(msg)
 
     # -- log --
@@ -145,7 +150,6 @@ class BaseService(object):
                 self.remove_pid()
                 break
             else:
-                time.sleep(1)
                 continue
 
     def watch(self):
@@ -201,4 +205,3 @@ class BaseService(object):
             logging.info(f'Remove old log: {to_delete_dir}')
             shutil.rmtree(to_delete_dir, ignore_errors=True)
     # -- end action --
-

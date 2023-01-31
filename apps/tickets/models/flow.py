@@ -3,18 +3,17 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from users.models import User
-from common.mixins.models import CommonModelMixin
-
+from common.db.models import JMSBaseModel
 from orgs.mixins.models import OrgModelMixin
 from orgs.models import Organization
 from orgs.utils import tmp_to_org, get_current_org_id
+from users.models import User
 from ..const import TicketType, TicketLevel, TicketApprovalStrategy
 
 __all__ = ['TicketFlow', 'ApprovalRule']
 
 
-class ApprovalRule(CommonModelMixin):
+class ApprovalRule(JMSBaseModel):
     level = models.SmallIntegerField(
         default=TicketLevel.one, choices=TicketLevel.choices,
         verbose_name=_('Approve level')
@@ -51,7 +50,7 @@ class ApprovalRule(CommonModelMixin):
         return assignees
 
 
-class TicketFlow(CommonModelMixin, OrgModelMixin):
+class TicketFlow(JMSBaseModel, OrgModelMixin):
     type = models.CharField(
         max_length=64, choices=TicketType.choices,
         default=TicketType.general, verbose_name=_("Type")

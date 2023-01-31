@@ -111,6 +111,11 @@ class SecurityAuthSerializer(serializers.Serializer):
             "Unit: second, The verification MFA takes effect only when you view the account password"
         )
     )
+    VERIFY_CODE_TTL = serializers.IntegerField(
+        min_value=5, max_value=60 * 60 * 10,
+        label=_("Verify code TTL"),
+        help_text=_("Unit: second")
+    )
     SECURITY_LOGIN_CHALLENGE_ENABLED = serializers.BooleanField(
         required=False, default=False,
         label=_("Enable Login dynamic code"),
@@ -174,7 +179,7 @@ class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSeri
         help_text=_('Multiple user using , split')
     )
     SECURITY_COMMAND_EXECUTION = serializers.BooleanField(
-        required=False, label=_('Batch command execution'),
+        required=False, label=_('Operation center'),
         help_text=_('Allow user run batch command or not using ansible')
     )
     SECURITY_SESSION_SHARE = serializers.BooleanField(

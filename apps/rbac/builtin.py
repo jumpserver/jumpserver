@@ -19,7 +19,6 @@ user_perms = (
     ('assets', 'systemuser', 'match', 'systemuser'),
     ('assets', 'node', 'match', 'node'),
     ('applications', 'application', 'match', 'application'),
-    ('ops', 'commandexecution', 'add', 'commandexecution'),
 )
 
 system_user_perms = (
@@ -32,11 +31,11 @@ system_user_perms = (
 _auditor_perms = (
     ('rbac', 'menupermission', 'view', 'audit'),
     ('audits', '*', '*', '*'),
+    ('ops', 'jobauditlog', '*', '*'),
     ('terminal', 'commandstorage', 'view', 'commandstorage'),
     ('terminal', 'sessionreplay', 'view,download', 'sessionreplay'),
     ('terminal', 'session', '*', '*'),
     ('terminal', 'command', '*', '*'),
-    ('ops', 'commandexecution', 'view', 'commandexecution'),
 )
 
 auditor_perms = user_perms + _auditor_perms
@@ -164,8 +163,9 @@ class BuiltinRole:
     @classmethod
     def sync_to_db(cls, show_msg=False):
         roles = cls.get_roles()
+        print("  - Update builtin roles")
 
         for pre_role in roles.values():
             role, created = pre_role.update_or_create_role()
             if show_msg:
-                print("Update builtin Role: {} - {}".format(role.name, created))
+                print("    - Update: {} - {}".format(role.name, created))

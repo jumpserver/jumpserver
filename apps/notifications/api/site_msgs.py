@@ -2,10 +2,10 @@ from rest_framework.response import Response
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.decorators import action
 
-from common.http import is_true
+from common.utils.http import is_true
 from common.permissions import IsValidUser
 from common.const.http import GET, PATCH, POST
-from common.drf.api import JMSGenericViewSet
+from common.api import JMSGenericViewSet
 from ..serializers import (
     SiteMessageDetailSerializer, SiteMessageIdsSerializer,
     SiteMessageSendSerializer,
@@ -13,7 +13,7 @@ from ..serializers import (
 from ..site_msg import SiteMessageUtil
 from ..filters import SiteMsgFilter
 
-__all__ = ('SiteMessageViewSet', )
+__all__ = ('SiteMessageViewSet',)
 
 
 class SiteMessageViewSet(ListModelMixin, RetrieveModelMixin, JMSGenericViewSet):

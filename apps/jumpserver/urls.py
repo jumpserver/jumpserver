@@ -13,6 +13,7 @@ api_v1 = [
     path('index/', api.IndexApi.as_view()),
     path('users/', include('users.urls.api_urls', namespace='api-users')),
     path('assets/', include('assets.urls.api_urls', namespace='api-assets')),
+    path('accounts/', include('accounts.urls', namespace='api-accounts')),
     path('perms/', include('perms.urls.api_urls', namespace='api-perms')),
     path('terminal/', include('terminal.urls.api_urls', namespace='api-terminal')),
     path('ops/', include('ops.urls.api_urls', namespace='api-ops')),
@@ -21,7 +22,6 @@ api_v1 = [
     path('settings/', include('settings.urls.api_urls', namespace='api-settings')),
     path('authentication/', include('authentication.urls.api_urls', namespace='api-auth')),
     path('common/', include('common.urls.api_urls', namespace='api-common')),
-    path('applications/', include('applications.urls.api_urls', namespace='api-applications')),
     path('tickets/', include('tickets.urls.api_urls', namespace='api-tickets')),
     path('acls/', include('acls.urls.api_urls', namespace='api-acls')),
     path('notifications/', include('notifications.urls.api_urls', namespace='api-notifications')),
@@ -44,13 +44,6 @@ if settings.XPACK_ENABLED:
         path('xpack/', include('xpack.urls.api_urls', namespace='api-xpack'))
     )
 
-
-apps = [
-    'users', 'assets', 'perms', 'terminal', 'ops', 'audits',
-    'orgs', 'auth', 'applications', 'tickets', 'settings', 'xpack',
-    'flower', 'luna', 'koko', 'ws', 'docs', 'redocs',
-]
-
 urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
     path('api/v1/', include(api_v1)),
@@ -65,7 +58,7 @@ urlpatterns = [
 
 # 静态文件处理路由
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
-            + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+               + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # js i18n 路由文件
 urlpatterns += [
@@ -84,13 +77,6 @@ if os.environ.get('DEBUG_TOOLBAR', False):
     urlpatterns += [
         path('__debug__/', include('debug_toolbar.urls')),
     ]
-
-
-# 兼容之前的
-old_app_pattern = '|'.join(apps)
-old_app_pattern = r'^{}'.format(old_app_pattern)
-urlpatterns += [re_path(old_app_pattern, views.redirect_old_apps_view)]
-
 
 handler404 = 'jumpserver.views.handler404'
 handler500 = 'jumpserver.views.handler500'

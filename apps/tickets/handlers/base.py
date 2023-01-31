@@ -1,3 +1,5 @@
+import html2text
+
 from django.utils.translation import ugettext as _
 from django.template.loader import render_to_string
 
@@ -65,7 +67,7 @@ class BaseHandler:
         if state != TicketState.approved:
             return diff_context
 
-        if self.ticket.type not in [TicketType.apply_asset, TicketType.apply_application]:
+        if self.ticket.type != TicketType.apply_asset:
             return diff_context
 
         # 企业微信，钉钉审批不做diff
@@ -96,11 +98,18 @@ class BaseHandler:
         approve_info = _('{} {} the ticket').format(user_display, state_display)
         context = self._diff_prev_approve_context(state)
         context.update({'approve_info': approve_info})
+        body = self.safe_html_script(
+            render_to_string('tickets/ticket_approve_diff.html', context)
+        )
         data = {
-            'body': render_to_string('tickets/ticket_approve_diff.html', context),
+            'body': body,
             'user': user,
             'user_display': str(user),
             'type': 'state',
             'state': state
         }
         return self.ticket.comments.create(**data)
+
+    @staticmethod
+    def safe_html_script(unsafe_html):
+        return html2text.html2text(unsafe_html)

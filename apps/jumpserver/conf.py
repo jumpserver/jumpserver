@@ -7,23 +7,22 @@
 2. 程序需要, 用户不需要更改的写到settings中
 3. 程序需要, 用户需要更改的写到本config中
 """
+import base64
+import copy
+import errno
+import json
+import logging
 import os
 import re
 import sys
 import types
-import errno
-import json
-import yaml
-import copy
-import base64
-import logging
 from importlib import import_module
 from urllib.parse import urljoin, urlparse
-from gmssl.sm4 import CryptSM4, SM4_ENCRYPT, SM4_DECRYPT
 
+import yaml
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
-
+from gmssl.sm4 import CryptSM4, SM4_ENCRYPT, SM4_DECRYPT
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
@@ -124,7 +123,7 @@ class ConfigCrypto:
             if plaintext:
                 value = plaintext
         except Exception as e:
-            logger.error('decrypt %s error: %s', item, e)
+            pass
         return value
 
     @classmethod
@@ -134,7 +133,7 @@ class ConfigCrypto:
         secret_encrypt_key = os.environ.get('SECRET_ENCRYPT_KEY', '')
         if not secret_encrypt_key:
             return None
-        print('Info: Using SM4 to encrypt config secret value')
+        print('Info: try using SM4 to decrypt config secret value')
         return cls(secret_encrypt_key)
 
 
@@ -195,6 +194,7 @@ class Config(dict):
         'DB_PORT': 3306,
         'DB_USER': 'root',
         'DB_PASSWORD': '',
+        'DB_USE_SSL': False,
         'REDIS_HOST': '127.0.0.1',
         'REDIS_PORT': 6379,
         'REDIS_PASSWORD': '',
@@ -202,6 +202,7 @@ class Config(dict):
         'REDIS_SSL_KEY': None,
         'REDIS_SSL_CERT': None,
         'REDIS_SSL_CA': None,
+        'REDIS_SSL_REQUIRED': 'none',
         # Redis Sentinel
         'REDIS_SENTINEL_HOSTS': '',
         'REDIS_SENTINEL_PASSWORD': '',
@@ -269,6 +270,8 @@ class Config(dict):
         'AUTH_OPENID_USER_ATTR_MAP': {
             'name': 'name', 'username': 'preferred_username', 'email': 'email'
         },
+        'AUTH_OPENID_PKCE': False,
+        'AUTH_OPENID_CODE_CHALLENGE_METHOD': 'S256',
 
         # OpenID 新配置参数 (version >= 1.5.9)
         'AUTH_OPENID_PROVIDER_ENDPOINT': 'https://oidc.example.com/',
@@ -421,7 +424,7 @@ class Config(dict):
         'TERMINAL_PASSWORD_AUTH': True,
         'TERMINAL_PUBLIC_KEY_AUTH': True,
         'TERMINAL_HEARTBEAT_INTERVAL': 20,
-        'TERMINAL_ASSET_LIST_SORT_BY': 'hostname',
+        'TERMINAL_ASSET_LIST_SORT_BY': 'name',
         'TERMINAL_ASSET_LIST_PAGE_SIZE': 'auto',
         'TERMINAL_SESSION_KEEP_DURATION': 200,
         'TERMINAL_HOST_KEY': '',
@@ -461,6 +464,7 @@ class Config(dict):
         'SECURITY_LUNA_REMEMBER_AUTH': True,
         'SECURITY_WATERMARK_ENABLED': True,
         'SECURITY_MFA_VERIFY_TTL': 3600,
+        'VERIFY_CODE_TTL': 60,
         'SECURITY_SESSION_SHARE': True,
         'SECURITY_CHECK_DIFFERENT_CITY_LOGIN': True,
         'OLD_PASSWORD_HISTORY_LIMIT_COUNT': 5,
@@ -492,6 +496,7 @@ class Config(dict):
         'SESSION_COOKIE_SECURE': False,
         'CSRF_COOKIE_SECURE': False,
         'REFERER_CHECK_ENABLED': False,
+        'CSRF_TRUSTED_ORIGINS': '',
         'SESSION_ENGINE': 'cache',
         'SESSION_SAVE_EVERY_REQUEST': True,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE': False,
@@ -500,8 +505,8 @@ class Config(dict):
         'GMSSL_ENABLED': False,
         # 操作日志变更字段的存储ES配置
         'OPERATE_LOG_ELASTICSEARCH_CONFIG': {},
-        # Magnus 组件需要监听的端口范围
-        'MAGNUS_PORTS': '30000-30100',
+        # Magnus 组件需要监听的 Oracle 端口范围
+        'MAGNUS_ORACLE_PORTS': '30000-30030',
 
         # 记录清理清理
         'LOGIN_LOG_KEEP_DAYS': 200,
@@ -530,6 +535,9 @@ class Config(dict):
 
         'FORGOT_PASSWORD_URL': '',
         'HEALTH_CHECK_TOKEN': '',
+
+        # Applet 等软件的下载地址
+        'APPLET_DOWNLOAD_HOST': '',
     }
 
     def __init__(self, *args):
@@ -827,11 +835,13 @@ class ConfigManager:
         sys.path.insert(0, PROJECT_DIR)
         try:
             from config import config as c
+        except ImportError:
+            return False
+        if c:
             self.from_object(c)
             return True
-        except ImportError:
-            pass
-        return False
+        else:
+            return False
 
     def load_from_yml(self):
         for i in ['config.yml', 'config.yaml']:

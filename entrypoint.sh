@@ -22,4 +22,3 @@ elif [[ "$action" == "sleep" ]];then
 else
     python jms "${action}" "${service}"
 fi
-

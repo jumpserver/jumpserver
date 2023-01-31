@@ -1,0 +1,6 @@
+id: change_secret_oracle
+name: Change secret for Oracle
+category: database
+type:
+  - oracle
+method: change_secret

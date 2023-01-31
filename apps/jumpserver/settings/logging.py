@@ -50,7 +50,7 @@ LOGGING = {
             'encoding': 'utf8',
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'maxBytes': 1024*1024*100,
+            'maxBytes': 1024 * 1024 * 100,
             'backupCount': 7,
             'formatter': 'main',
             'filename': JUMPSERVER_LOG_FILE,
@@ -60,7 +60,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'main',
-            'maxBytes': 1024*1024*100,
+            'maxBytes': 1024 * 1024 * 100,
             'backupCount': 7,
             'filename': ANSIBLE_LOG_FILE,
         },
@@ -135,12 +135,6 @@ LOGGING = {
 
     }
 }
-
-if CONFIG.DEBUG_DEV:
-    LOGGING['loggers']['django.db'] = {
-       'handlers': ['console', 'file'],
-       'level': 'DEBUG'
-    }
 
 SYSLOG_ENABLE = CONFIG.SYSLOG_ENABLE
 
