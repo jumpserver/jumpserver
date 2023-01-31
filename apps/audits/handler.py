@@ -16,7 +16,6 @@ from orgs.utils import get_current_org_id
 from .backends import get_operate_log_storage
 from .const import ActionChoices
 
-
 logger = get_logger(__name__)
 
 
@@ -95,11 +94,19 @@ class OperatorLogHandler(metaclass=Singleton):
         return resource_display
 
     def get_resource_display(self, resource):
+        if isinstance(resource, str):
+            return resource
         resource_display = str(resource)
         return_value = self.get_resource_display_from_setting(resource_display)
         if return_value is not None:
             resource_display = return_value
         return resource_display
+
+    @staticmethod
+    def get_resource_id(resource):
+        if isinstance(resource, str):
+            return ''
+        return str(resource.id)
 
     @staticmethod
     def serialized_value(value: (list, tuple)):
@@ -168,7 +175,7 @@ class OperatorLogHandler(metaclass=Singleton):
         detail = _('User {} login into this service.[{}]').format(
             resource.username, login_status
         )
-        user_id = User.objects.filter(username=username).\
+        user_id = User.objects.filter(username=username). \
             values_list('id', flat=True)[0]
         return {
             'action': ActionChoices.login, 'detail': detail,
@@ -192,6 +199,7 @@ class OperatorLogHandler(metaclass=Singleton):
             return
 
         remote_addr = get_request_ip(current_request)
+        resource_id = self.get_resource_id(resource)
         resource_display = self.get_resource_display(resource)
         before, after = self.data_processing(before, after)
         if not force and not any([before, after]):
@@ -202,7 +210,7 @@ class OperatorLogHandler(metaclass=Singleton):
             'id': log_id, "user": str(user), 'action': action,
             'resource_type': str(resource_type), 'resource': resource_display,
             'remote_addr': remote_addr, 'before': before, 'after': after,
-            'org_id': get_current_org_id(), 'resource_id': str(resource.id)
+            'org_id': get_current_org_id(), 'resource_id': resource_id
         }
         data = self._activity_handle(data, object_name, resource=resource)
         with transaction.atomic():
