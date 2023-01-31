@@ -11,7 +11,6 @@ if sys.platform == 'win32':
     )
 from common import wait_pid, BaseApplication
 
-
 _default_path = r'C:\Program Files\PremiumSoft\Navicat Premium 16\navicat.exe'
 
 
@@ -24,7 +23,7 @@ class AppletApplication(BaseApplication):
         self.privileged = self.account.privileged
         self.host = self.asset.address
         self.port = self.asset.get_protocol_port(self.protocol)
-        self.db = self.asset.specific.db_name
+        self.db = self.asset.spec.db_name
         self.name = '%s-%s' % (self.host, self.db)
         self.pid = None
         self.app = None

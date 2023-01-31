@@ -105,7 +105,7 @@ class JMSInventory:
                 'id': str(asset.id), 'name': asset.name, 'address': asset.address,
                 'type': asset.type, 'category': asset.category,
                 'protocol': asset.protocol, 'port': asset.port,
-                'specific': asset.specific,
+                'specific': asset.spec,
                 'protocols': [{'name': p.name, 'port': p.port} for p in protocols],
             },
             'jms_account': {
