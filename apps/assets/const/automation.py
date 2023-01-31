@@ -3,9 +3,9 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class Connectivity(TextChoices):
-    UNKNOWN = 'unknown', _('Unknown')
+    UNKNOWN = '-', _('Unknown')
     OK = 'ok', _('Ok')
-    FAILED = 'failed', _('Failed')
+    ERR = 'err', _('Error')
 
 
 class AutomationTypes(TextChoices):

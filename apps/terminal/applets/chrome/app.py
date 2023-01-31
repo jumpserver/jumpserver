@@ -87,13 +87,13 @@ class WebAPP(object):
         self.account = account
         self.platform = platform
 
-        self.extra_data = self.asset.specific
+        self.extra_data = self.asset.spec_info
         self._steps = list()
-        autofill_type = self.asset.specific.autofill
+        autofill_type = self.asset.spec_info.autofill
         if autofill_type == "basic":
             self._steps = self._default_custom_steps()
         elif autofill_type == "script":
-            script_list = self.asset.specific.script
+            script_list = self.asset.spec_info.script
             steps = sorted(script_list, key=lambda step_item: step_item.step)
             for item in steps:
                 val = item.value
@@ -105,24 +105,24 @@ class WebAPP(object):
 
     def _default_custom_steps(self) -> list:
         account = self.account
-        specific_property = self.asset.specific
+        spec_info = self.asset.spec_info
         default_steps = [
             Step({
                 "step": 1,
                 "value": account.username,
-                "target": specific_property.username_selector,
+                "target": spec_info.username_selector,
                 "command": "type"
             }),
             Step({
                 "step": 2,
                 "value": account.secret,
-                "target": specific_property.password_selector,
+                "target": spec_info.password_selector,
                 "command": "type"
             }),
             Step({
                 "step": 3,
                 "value": "",
-                "target": specific_property.submit_selector,
+                "target": spec_info.submit_selector,
                 "command": "click"
             })
         ]

@@ -1,5 +1,5 @@
-from common.utils import get_logger
 from assets.const import AutomationTypes, Connectivity
+from common.utils import get_logger
 from ..base.manager import BasePlaybookManager
 
 logger = get_logger(__name__)
@@ -28,7 +28,7 @@ class PingManager(BasePlaybookManager):
 
     def on_host_error(self, host, error, result):
         asset, account = self.host_asset_and_account_mapper.get(host)
-        asset.set_connectivity(Connectivity.FAILED)
+        asset.set_connectivity(Connectivity.ERR)
         if not account:
             return
-        account.set_connectivity(Connectivity.FAILED)
+        account.set_connectivity(Connectivity.ERR)

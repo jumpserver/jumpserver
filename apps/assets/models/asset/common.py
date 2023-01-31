@@ -10,8 +10,8 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from assets import const
-from common.utils import lazyproperty
 from common.db.fields import EncryptMixin
+from common.utils import lazyproperty
 from orgs.mixins.models import OrgManager, JMSOrgBaseModel
 from ..base import AbsConnectivity
 from ..platform import Platform
@@ -113,45 +113,47 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
                                    verbose_name=_("Nodes"))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     labels = models.ManyToManyField('assets.Label', blank=True, related_name='assets', verbose_name=_("Labels"))
-    info = models.JSONField(verbose_name='Info', default=dict, blank=True)
+    info = models.JSONField(verbose_name='Info', default=dict, blank=True)  # 资产的一些信息，如 硬件信息
 
     objects = AssetManager.from_queryset(AssetQuerySet)()
 
     def __str__(self):
         return '{0.name}({0.address})'.format(self)
 
-    @property
-    def specific(self):
-        instance = getattr(self, self.category, None)
-        if not instance:
-            return {}
-        specific_fields = self.get_specific_fields(instance)
+    @staticmethod
+    def get_spec_values(instance, fields):
         info = {}
-        for i in specific_fields:
+        for i in fields:
             v = getattr(instance, i.name)
             if isinstance(i, models.JSONField) and not isinstance(v, (list, dict)):
                 v = json.loads(v)
             info[i.name] = v
         return info
 
-    @property
+    @lazyproperty
     def spec_info(self):
         instance = getattr(self, self.category, None)
         if not instance:
-            return []
-        specific_fields = self.get_specific_fields(instance)
-        info = [
-            {
-                'label': i.verbose_name,
-                'name': i.name,
-                'value': getattr(instance, i.name)
-            }
-            for i in specific_fields
-        ]
-        return info
+            return {}
+        spec_fields = self.get_spec_fields(instance)
+        return self.get_spec_values(instance, spec_fields)
+
+    @staticmethod
+    def get_spec_fields(instance, secret=False):
+        spec_fields = [i for i in instance._meta.local_fields if i.name != 'asset_ptr']
+        spec_fields = [i for i in spec_fields if isinstance(i, EncryptMixin) == secret]
+        return spec_fields
 
     @lazyproperty
-    def enabled_info(self):
+    def secret_info(self):
+        instance = getattr(self, self.category, None)
+        if not instance:
+            return {}
+        spec_fields = self.get_spec_fields(instance, secret=True)
+        return self.get_spec_values(instance, spec_fields)
+
+    @lazyproperty
+    def auto_info(self):
         platform = self.platform
         automation = self.platform.automation
         return {
@@ -164,12 +166,6 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
             'verify_account_enabled': automation.verify_account_enabled,
             'gather_accounts_enabled': automation.gather_accounts_enabled,
         }
-
-    @staticmethod
-    def get_specific_fields(instance):
-        specific_fields = [i for i in instance._meta.local_fields if i.name != 'asset_ptr']
-        specific_fields = [i for i in specific_fields if not isinstance(i, EncryptMixin)]
-        return specific_fields
 
     def get_target_ip(self):
         return self.address

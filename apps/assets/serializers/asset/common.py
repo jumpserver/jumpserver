@@ -18,7 +18,7 @@ __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
     'AssetTaskSerializer', 'AssetsTaskSerializer', 'AssetProtocolsSerializer',
     'AssetDetailSerializer', 'DetailMixin', 'AssetAccountSerializer',
-    'AccountSecretSerializer'
+    'AccountSecretSerializer', 'SpecSerializer'
 ]
 
 
@@ -113,13 +113,25 @@ class AccountSecretSerializer(SecretReadableMixin, CommonModelSerializer):
         }
 
 
+class SpecSerializer(serializers.Serializer):
+    # 数据库
+    db_name = serializers.CharField(label=_("Database"), max_length=128, required=False)
+    use_ssl = serializers.BooleanField(label=_("Use SSL"), required=False)
+    allow_invalid_cert = serializers.BooleanField(label=_("Allow invalid cert"), required=False)
+    # Web
+    autofill = serializers.CharField(label=_("Auto fill"), required=False)
+    username_selector = serializers.CharField(label=_("Username selector"), required=False)
+    password_selector = serializers.CharField(label=_("Password selector"), required=False)
+    submit_selector = serializers.CharField(label=_("Submit selector"), required=False)
+    script = serializers.JSONField(label=_("Script"), required=False)
+
+
 class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSerializer):
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
     labels = AssetLabelSerializer(many=True, required=False, label=_('Label'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
     accounts = AssetAccountSerializer(many=True, required=False, write_only=True, label=_('Account'))
-    enabled_info = serializers.DictField(read_only=True, label=_('Enabled info'))
 
     class Meta:
         model = Asset
@@ -127,11 +139,11 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         fields_small = fields_mini + ['is_active', 'comment']
         fields_fk = ['domain', 'platform']
         fields_m2m = [
-            'nodes', 'labels', 'protocols', 'nodes_display', 'accounts'
+            'nodes', 'labels', 'protocols',
+            'nodes_display', 'accounts'
         ]
         read_only_fields = [
-            'category', 'type', 'info', 'enabled_info',
-            'connectivity', 'date_verified',
+            'category', 'type', 'connectivity', 'date_verified',
             'created_by', 'date_created'
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
@@ -235,11 +247,13 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
 
 class DetailMixin(serializers.Serializer):
     accounts = AssetAccountSerializer(many=True, required=False, label=_('Accounts'))
+    spec_info = serializers.DictField(label=_('Spec info'), read_only=True)
+    auto_info = serializers.DictField(read_only=True, label=_('Auto info'))
 
     def get_field_names(self, declared_fields, info):
         names = super().get_field_names(declared_fields, info)
         names.extend([
-            'accounts', 'info', 'specific', 'spec_info'
+            'accounts', 'info', 'spec_info', 'auto_info'
         ])
         return names
 

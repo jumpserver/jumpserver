@@ -10,12 +10,12 @@
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
-        login_database: "{{ jms_asset.specific.db_name }}"
-        ssl: "{{ jms_asset.specific.use_ssl }}"
-        ssl_ca_certs: "{{ jms_asset.specific.ca_cert }}"
-        ssl_certfile: "{{ jms_asset.specific.client_key }}"
+        login_database: "{{ jms_asset.spec_info.db_name }}"
+        ssl: "{{ jms_asset.spec_info.use_ssl }}"
+        ssl_ca_certs: "{{ jms_asset.secret_info.ca_cert }}"
+        ssl_certfile: "{{ jms_asset.secret_info.client_key }}"
         connection_options:
-          - tlsAllowInvalidHostnames: "{{ jms_asset.specific.allow_invalid_cert}}"
+          - tlsAllowInvalidHostnames: "{{ jms_asset.spec_info.allow_invalid_cert}}"
       register: db_info
 
     - name: Display MongoDB version
@@ -29,13 +29,13 @@
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
-        login_database: "{{ jms_asset.specific.db_name }}"
-        ssl: "{{ jms_asset.specific.use_ssl }}"
-        ssl_ca_certs: "{{ jms_asset.specific.ca_cert }}"
-        ssl_certfile: "{{ jms_asset.specific.client_key }}"
+        login_database: "{{ jms_asset.spec_info.db_name }}"
+        ssl: "{{ jms_asset.spec_info.use_ssl }}"
+        ssl_ca_certs: "{{ jms_asset.secret_info.ca_cert }}"
+        ssl_certfile: "{{ jms_asset.secret_info.client_key }}"
         connection_options:
-          - tlsAllowInvalidHostnames: "{{ jms_asset.specific.allow_invalid_cert}}"
-        db: "{{ jms_asset.specific.db_name }}"
+          - tlsAllowInvalidHostnames: "{{ jms_asset.spec_info.allow_invalid_cert}}"
+        db: "{{ jms_asset.spec_info.db_name }}"
         name: "{{ account.username }}"
         password: "{{ account.secret }}"
       when: db_info is succeeded
@@ -47,12 +47,12 @@
         login_password: "{{ account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
-        login_database: "{{ jms_asset.specific.db_name }}"
-        ssl: "{{ jms_asset.specific.use_ssl }}"
-        ssl_ca_certs: "{{ jms_asset.specific.ca_cert }}"
-        ssl_certfile: "{{ jms_asset.specific.client_key }}"
+        login_database: "{{ jms_asset.spec_info.db_name }}"
+        ssl: "{{ jms_asset.spec_info.use_ssl }}"
+        ssl_ca_certs: "{{ jms_asset.secret_info.ca_cert }}"
+        ssl_certfile: "{{ jms_asset.secret_info.client_key }}"
         connection_options:
-          - tlsAllowInvalidHostnames: "{{ jms_asset.specific.allow_invalid_cert}}"
+          - tlsAllowInvalidHostnames: "{{ jms_asset.spec_info.allow_invalid_cert}}"
       when:
-      - db_info is succeeded
-      - change_info is succeeded
+        - db_info is succeeded
+        - change_info is succeeded
