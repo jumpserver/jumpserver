@@ -23,7 +23,7 @@ class AppletApplication(BaseApplication):
         self.privileged = self.account.privileged
         self.host = self.asset.address
         self.port = self.asset.get_protocol_port(self.protocol)
-        self.db = self.asset.spec.db_name
+        self.db = self.asset.spec_info.db_name
         self.name = '%s-%s' % (self.host, self.db)
         self.pid = None
         self.app = None
