@@ -140,7 +140,6 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
         if not instance:
             return []
         specific_fields = self.get_specific_fields(instance)
-        specific_fields = [i for i in specific_fields if not isinstance(i, EncryptMixin)]
         info = [
             {
                 'label': i.verbose_name,
@@ -169,6 +168,7 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
     @staticmethod
     def get_specific_fields(instance):
         specific_fields = [i for i in instance._meta.local_fields if i.name != 'asset_ptr']
+        specific_fields = [i for i in specific_fields if not isinstance(i, EncryptMixin)]
         return specific_fields
 
     def get_target_ip(self):
