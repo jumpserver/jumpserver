@@ -2,6 +2,7 @@
 
 import django.db
 from django.db import migrations, models
+import common.db.fields
 
 
 def migrate_to_host(apps, schema_editor):
@@ -120,9 +121,9 @@ class Migration(migrations.Migration):
                                       primary_key=True, serialize=False, to='assets.asset')),
                 ('db_name', models.CharField(blank=True, max_length=1024, verbose_name='Database')),
                 ('allow_invalid_cert', models.BooleanField(default=False, verbose_name='Allow invalid cert')),
-                ('ca_cert', models.TextField(blank=True, verbose_name='CA cert')),
-                ('client_cert', models.TextField(blank=True, verbose_name='Client cert')),
-                ('client_key', models.TextField(blank=True, verbose_name='Client key'),),
+                ('ca_cert', common.db.fields.EncryptTextField(blank=True, verbose_name='CA cert')),
+                ('client_cert', common.db.fields.EncryptTextField(blank=True, verbose_name='Client cert')),
+                ('client_key', common.db.fields.EncryptTextField(blank=True, verbose_name='Client key'),),
                 ('use_ssl', models.BooleanField(default=False, verbose_name='Use SSL'),),
             ],
             options={
