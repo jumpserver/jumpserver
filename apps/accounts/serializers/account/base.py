@@ -16,7 +16,7 @@ class AuthValidateMixin(serializers.Serializer):
         choices=SecretType.choices, required=True, label=_('Secret type')
     )
     secret = EncryptedField(
-        label=_('Secret'), required=False, max_length=40960, allow_blank=True,
+        label=_('Secret/Password'), required=False, max_length=40960, allow_blank=True,
         allow_null=True, write_only=True,
     )
     passphrase = serializers.CharField(
