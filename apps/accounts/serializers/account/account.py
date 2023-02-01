@@ -17,10 +17,11 @@ class AccountSerializerCreateValidateMixin:
     replace_attrs: callable
 
     def to_internal_value(self, data):
-        self.id = data.pop('id', None)
-        self.push_now = data.pop('push_now', False)
-        self.template = data.pop('template', False)
-        return super().to_internal_value(data)
+        ret = super().to_internal_value(data)
+        self.id = ret.pop('id', None)
+        self.push_now = ret.pop('push_now', False)
+        self.template = ret.pop('template', False)
+        return ret
 
     def set_secret(self, attrs):
         _id = self.id
