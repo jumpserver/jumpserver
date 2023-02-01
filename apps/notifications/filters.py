@@ -1,7 +1,7 @@
 import django_filters
 
 from common.drf.filters import BaseFilterSet
-from .models import SiteMessage
+from .models import MessageContent
 
 
 class SiteMsgFilter(BaseFilterSet):
@@ -14,5 +14,5 @@ class SiteMsgFilter(BaseFilterSet):
     has_read = django_filters.BooleanFilter(method='do_nothing')
 
     class Meta:
-        model = SiteMessage
+        model = MessageContent
         fields = ('has_read',)
