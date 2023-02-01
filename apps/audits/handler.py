@@ -194,7 +194,7 @@ class OperatorLogHandler(metaclass=Singleton):
         remote_addr = get_request_ip(current_request)
         if resource_display is None:
             resource_display = self.get_resource_display(resource)
-        resource_id = resource.id if resource is not None else ''
+        resource_id = getattr(resource, 'pk', '')
         before, after = self.data_processing(before, after)
         if not force and not any([before, after]):
             # 前后都没变化，没必要生成日志，除非手动强制保存

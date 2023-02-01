@@ -137,8 +137,8 @@ def on_object_pre_create_or_update(sender, instance=None, raw=False, using=None,
     )
     if not ok:
         return
-    instance_before_data = {'id': instance.id}
-    raw_instance = type(instance).objects.filter(pk=instance.id).first()
+    instance_before_data = {'id': instance.pk}
+    raw_instance = type(instance).objects.filter(pk=instance.pk).first()
     if raw_instance:
         instance_before_data = model_to_dict(raw_instance)
     operate_log_id = str(uuid.uuid4())
