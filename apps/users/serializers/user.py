@@ -5,8 +5,8 @@ from functools import partial
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.serializers.fields import EncryptedField, ObjectRelatedField, LabeledChoiceField
 from common.serializers import CommonBulkSerializerMixin
+from common.serializers.fields import EncryptedField, ObjectRelatedField, LabeledChoiceField
 from common.utils import pretty_string, get_logger
 from common.validators import PhoneValidator
 from rbac.builtin import BuiltinRole
@@ -25,23 +25,24 @@ __all__ = [
 logger = get_logger(__file__)
 
 
+def default_system_roles():
+    return [BuiltinRole.system_user.get_role()]
+
+
+def default_org_roles():
+    return [BuiltinRole.org_user.get_role()]
+
+
 class RolesSerializerMixin(serializers.Serializer):
     system_roles = ObjectRelatedField(
         queryset=Role.system_roles, attrs=('id', 'display_name'),
-        label=_("System roles"), many=True
+        label=_("System roles"), many=True, default=default_system_roles
     )
     org_roles = ObjectRelatedField(
         queryset=Role.org_roles, attrs=('id', 'display_name'),
-        label=_("Org roles"), many=True
+        label=_("Org roles"), many=True, required=False,
+        default=default_org_roles
     )
-
-    @staticmethod
-    def get_system_roles_display(user):
-        return user.system_roles.display
-
-    @staticmethod
-    def get_org_roles_display(user):
-        return user.org_roles.display
 
     def pop_roles_if_need(self, fields):
         request = self.context.get("request")
@@ -55,6 +56,7 @@ class RolesSerializerMixin(serializers.Serializer):
         action = view.action or "list"
         if action in ("partial_bulk_update", "bulk_update", "partial_update", "update"):
             action = "create"
+
         model_cls_field_mapper = {
             SystemRoleBinding: ["system_roles"],
             OrgRoleBinding: ["org_roles"],
