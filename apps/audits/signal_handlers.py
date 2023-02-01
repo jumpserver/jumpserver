@@ -294,7 +294,7 @@ def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
     }
     exclude_models = {
         'UserPasswordHistory', 'ContentType',
-        'SiteMessage', 'SiteMessageUsers',
+        'MessageContent', 'SiteMessage',
         'PlatformAutomation', 'PlatformProtocol', 'Protocol',
         'HistoricalAccount', 'GatheredUser', 'ApprovalRule',
         'BaseAutomation', 'CeleryTask', 'Command', 'JobAuditLog',

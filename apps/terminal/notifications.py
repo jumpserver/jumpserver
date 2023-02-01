@@ -1,18 +1,17 @@
 from typing import Callable
 
-from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.template.loader import render_to_string
+from django.utils.translation import ugettext_lazy as _
 
-from users.models import User
 from common.utils import get_logger, reverse
-from notifications.notifications import SystemMessage
-from terminal.models import Session, Command
-from notifications.models import SystemMsgSubscription
-from notifications.backends import BACKEND
 from common.utils import lazyproperty
 from common.utils.timezone import local_now_display
-
+from notifications.backends import BACKEND
+from notifications.models import SystemMsgSubscription
+from notifications.notifications import SystemMessage
+from terminal.models import Session, Command
+from users.models import User
 
 logger = get_logger(__name__)
 
@@ -75,8 +74,11 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
 
     @classmethod
     def gen_test_msg(cls):
-        command = Command.objects.first().to_dict()
-        command['session'] = Session.objects.first().id
+        command = Command.objects.first()
+        if not command:
+            command = Command(user='test', asset='test', input='test', session='111111111')
+        else:
+            command['session'] = Session.objects.first().id
         return cls(command)
 
     def get_html_msg(self) -> dict:
