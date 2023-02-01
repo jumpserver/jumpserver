@@ -136,10 +136,12 @@ def on_object_pre_create_or_update(sender, instance=None, raw=False, using=None,
     )
     if not ok:
         return
+
     # users.PrivateToken Model 没有 id 有 pk字段
     instance_id = getattr(instance, 'id', getattr(instance, 'pk', None))
     instance_before_data = {'id': instance_id}
     raw_instance = type(instance).objects.filter(pk=instance_id).first()
+
     if raw_instance:
         instance_before_data = model_to_dict(raw_instance)
     operate_log_id = str(uuid.uuid4())

@@ -53,7 +53,7 @@ class OperateLog(OrgModelMixin):
     resource_type = models.CharField(max_length=64, verbose_name=_("Resource Type"))
     resource = models.CharField(max_length=128, verbose_name=_("Resource"))
     resource_id = models.CharField(
-        max_length=36, blank=True, default='', db_index=True,
+        max_length=128, blank=True, default='', db_index=True,
         verbose_name=_("Resource")
     )
     remote_addr = models.CharField(max_length=128, verbose_name=_("Remote addr"), blank=True, null=True)
