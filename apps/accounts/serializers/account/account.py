@@ -11,58 +11,49 @@ from .base import BaseAccountSerializer
 
 
 class AccountSerializerCreateValidateMixin:
-    replace_attrs: callable
+    id: str
+    template: bool
     push_now: bool
+    replace_attrs: callable
 
-    def validate(self, attrs):
-        _id = attrs.pop('id', None)
-        if _id:
+    def to_internal_value(self, data):
+        self.id = data.pop('id', None)
+        self.push_now = data.pop('push_now', False)
+        self.template = data.pop('template', False)
+        return super().to_internal_value(data)
+
+    def set_secret(self, attrs):
+        _id = self.id
+        template = self.template
+
+        if _id and template:
             account_template = AccountTemplate.objects.get(id=_id)
             attrs['secret'] = account_template.secret
-        account_template = attrs.pop('template', None)
-        if account_template:
-            self.replace_attrs(account_template, attrs)
-        self.push_now = attrs.pop('push_now', False)
+        elif _id and not template:
+            account = Account.objects.get(id=_id)
+            attrs['secret'] = account.secret
+
+    def validate(self, attrs):
+        self.set_secret(attrs)
         return super().validate(attrs)
-
-
-class AccountSerializerCreateMixin(
-    AccountSerializerCreateValidateMixin, BulkModelSerializer
-):
-    template = serializers.UUIDField(
-        required=False, allow_null=True, write_only=True,
-        label=_('Account template')
-    )
-    push_now = serializers.BooleanField(
-        default=False, label=_("Push now"), write_only=True
-    )
-    has_secret = serializers.BooleanField(label=_("Has secret"), read_only=True)
-
-    @staticmethod
-    def validate_template(value):
-        try:
-            return AccountTemplate.objects.get(id=value)
-        except AccountTemplate.DoesNotExist:
-            raise serializers.ValidationError(_('Account template not found'))
-
-    @staticmethod
-    def replace_attrs(account_template: AccountTemplate, attrs: dict):
-        exclude_fields = [
-            '_state', 'org_id', 'id', 'date_created',
-            'date_updated'
-        ]
-        template_attrs = {
-            k: v for k, v in account_template.__dict__.items()
-            if k not in exclude_fields
-        }
-        for k, v in template_attrs.items():
-            attrs.setdefault(k, v)
 
     def create(self, validated_data):
         instance = super().create(validated_data)
         if self.push_now:
             push_accounts_to_assets.delay([instance.id], [instance.asset_id])
         return instance
+
+
+class AccountSerializerCreateMixin(
+    AccountSerializerCreateValidateMixin, BulkModelSerializer
+):
+    template = serializers.BooleanField(
+        default=False, label=_("Template"), write_only=True
+    )
+    push_now = serializers.BooleanField(
+        default=False, label=_("Push now"), write_only=True
+    )
+    has_secret = serializers.BooleanField(label=_("Has secret"), read_only=True)
 
 
 class AccountAssetSerializer(serializers.ModelSerializer):
