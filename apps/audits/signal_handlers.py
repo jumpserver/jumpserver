@@ -121,8 +121,7 @@ def signal_of_operate_log_whether_continue(sender, instance, created, update_fie
     if instance._meta.object_name == 'Terminal' and created:
         condition = False
     # last_login 改变是最后登录日期, 每次登录都会改变
-    if instance._meta.object_name == 'User' and \
-            update_fields and 'last_login' in update_fields:
+    if instance._meta.object_name == 'User' and update_fields and 'last_login' in update_fields:
         condition = False
     # 不在记录白名单中，跳过
     if sender._meta.object_name not in MODELS_NEED_RECORD:
@@ -137,8 +136,10 @@ def on_object_pre_create_or_update(sender, instance=None, raw=False, using=None,
     )
     if not ok:
         return
-    instance_before_data = {'id': instance.id}
-    raw_instance = type(instance).objects.filter(pk=instance.id).first()
+    # users.PrivateToken Model 没有 id 有 pk字段
+    instance_id = getattr(instance, 'id', getattr(instance, 'pk', None))
+    instance_before_data = {'id': instance_id}
+    raw_instance = type(instance).objects.filter(pk=instance_id).first()
     if raw_instance:
         instance_before_data = model_to_dict(raw_instance)
     operate_log_id = str(uuid.uuid4())
