@@ -96,11 +96,8 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         read_only=True
     )
     password = EncryptedField(
-        label=_("Password"),
-        required=False,
-        allow_blank=True,
-        allow_null=True,
-        max_length=1024,
+        label=_("Password"), required=False, allow_blank=True,
+        allow_null=True, max_length=1024,
     )
     custom_m2m_fields = {
         "system_roles": [BuiltinRole.system_user],
@@ -129,10 +126,8 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         ]
         # 包含不太常用的字段，可以没有
         fields_verbose = fields_small + [
-            "mfa_force_enabled",
-            "is_first_login",
-            "date_password_last_updated",
-            "avatar_url",
+            "mfa_force_enabled", "is_first_login",
+            "date_password_last_updated", "avatar_url",
         ]
         # 外键的字段
         fields_fk = []

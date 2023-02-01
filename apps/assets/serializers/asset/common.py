@@ -6,7 +6,7 @@ from django.db.transaction import atomic
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from accounts.models import Account, AccountTemplate
+from accounts.models import Account
 from accounts.serializers import AccountSerializerCreateValidateMixin
 from common.serializers import WritableNestedModelSerializer, SecretReadableMixin, CommonModelSerializer
 from common.serializers.fields import LabeledChoiceField
