@@ -1,11 +1,11 @@
 import abc
-import subprocess
+import base64
+import json
 import locale
+import os
+import subprocess
 import sys
 import time
-import os
-import json
-import base64
 from subprocess import CREATE_NO_WINDOW
 
 _blockInput = None
@@ -125,7 +125,7 @@ class Asset(DictObj):
     address: str
     protocols: list[Protocol]
     category: Category
-    specific: Specific
+    spec_info: Specific
 
     def get_protocol_port(self, protocol):
         for item in self.protocols:
