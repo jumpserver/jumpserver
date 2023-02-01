@@ -1,16 +1,13 @@
-import csv
 import codecs
-
+import csv
 from itertools import chain
 
-from django.http import HttpResponse
 from django.db import models
+from django.http import HttpResponse
 
-from settings.serializers import SettingsSerializer
 from common.utils import validate_ip, get_ip_city, get_logger
-from common.db import fields
+from settings.serializers import SettingsSerializer
 from .const import DEFAULT_CITY
-
 
 logger = get_logger(__name__)
 
@@ -95,7 +92,7 @@ def _get_instance_field_value(
 
 
 def model_to_dict_for_operate_log(
-        instance, include_model_fields=True, include_related_fields=True
+        instance, include_model_fields=True, include_related_fields=False
 ):
     model_need_continue_fields = ['date_updated']
     m2m_need_continue_fields = ['history_passwords']
@@ -106,7 +103,7 @@ def model_to_dict_for_operate_log(
 
     if include_related_fields:
         opts = instance._meta
-        for f in chain(opts.many_to_many, opts.related_objects):
+        for f in opts.many_to_many:
             value = []
             if instance.pk is not None:
                 related_name = getattr(f, 'attname', '') or getattr(f, 'related_name', '')
