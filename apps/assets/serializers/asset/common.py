@@ -54,6 +54,9 @@ class AssetAccountSerializer(
     push_now = serializers.BooleanField(
         default=False, label=_("Push now"), write_only=True
     )
+    template = serializers.BooleanField(
+        default=False, label=_("Template"), write_only=True
+    )
 
     class Meta:
         model = Account
@@ -62,7 +65,7 @@ class AssetAccountSerializer(
             'version', 'secret_type',
         ]
         fields_write_only = [
-            'secret', 'push_now'
+            'secret', 'push_now', 'template'
         ]
         fields = fields_mini + fields_write_only
         extra_kwargs = {
@@ -73,33 +76,6 @@ class AssetAccountSerializer(
         if not value:
             value = self.initial_data.get('username')
         return value
-
-    @staticmethod
-    def validate_template(value):
-        try:
-            return AccountTemplate.objects.get(id=value)
-        except AccountTemplate.DoesNotExist:
-            raise serializers.ValidationError(_('Account template not found'))
-
-    @staticmethod
-    def replace_attrs(account_template: AccountTemplate, attrs: dict):
-        exclude_fields = [
-            '_state', 'org_id', 'id', 'date_created',
-            'date_updated'
-        ]
-        template_attrs = {
-            k: v for k, v in account_template.__dict__.items()
-            if k not in exclude_fields
-        }
-        for k, v in template_attrs.items():
-            attrs.setdefault(k, v)
-
-    def create(self, validated_data):
-        from accounts.tasks import push_accounts_to_assets
-        instance = super().create(validated_data)
-        if self.push_now:
-            push_accounts_to_assets.delay([instance.id], [instance.asset_id])
-        return instance
 
 
 class AccountSecretSerializer(SecretReadableMixin, CommonModelSerializer):
