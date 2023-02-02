@@ -73,7 +73,7 @@ class BasePlaybookManager:
         if not path_dir:
             return host
 
-        specific = host.get('jms_asset', {}).get('specific', {})
+        specific = host.get('jms_asset', {}).get('secret_info', {})
         cert_fields = ('ca_cert', 'client_key', 'client_cert')
         filtered = list(filter(lambda x: specific.get(x), cert_fields))
         if not filtered:
@@ -87,7 +87,7 @@ class BasePlaybookManager:
             result = self.write_cert_to_file(
                 os.path.join(cert_dir, f), specific.get(f)
             )
-            host['jms_asset']['specific'][f] = result
+            host['jms_asset']['secret_info'][f] = result
         return host
 
     def host_callback(self, host, automation=None, **kwargs):
