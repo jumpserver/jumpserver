@@ -193,7 +193,7 @@ class PlaybookFileBrowserAPIView(APIView):
                     "id": os.path.join(relative_path, d) if not os.path.join(relative_path, d).startswith(
                         '.') else d,
                     "isParent": True,
-                    "open": False,
+                    "open": True,
                     "pId": relative_path if not relative_path.startswith('.') else 'root',
                     "temp": False
                 }
