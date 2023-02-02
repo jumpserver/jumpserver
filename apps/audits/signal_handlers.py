@@ -26,9 +26,8 @@ from common.signals import django_ready
 from common.utils import get_request_ip, get_logger, get_syslogger
 from common.utils.encode import data_to_json
 from jumpserver.utils import current_request
-from terminal.backends.command.serializers import SessionCommandSerializer
 from terminal.models import Session, Command
-from terminal.serializers import SessionSerializer
+from terminal.serializers import SessionSerializer, SessionCommandSerializer
 from users.models import User
 from users.signals import post_user_change_password
 from . import models, serializers
