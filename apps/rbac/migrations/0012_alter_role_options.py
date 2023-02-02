@@ -12,6 +12,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='role',
-            options={'ordering': ('scope', 'name'), 'verbose_name': 'Role'},
+            options={'ordering': ('-builtin', 'scope', 'name'), 'verbose_name': 'Role'},
         ),
     ]
