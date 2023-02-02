@@ -8,12 +8,12 @@ from common.sdk.sms.endpoint import SMS
 from common.exceptions import JMSException
 from common.utils.random import random_string
 from common.utils import get_logger
-
+from django.utils.translation import gettext_lazy as _
 
 logger = get_logger(__file__)
 
 
-@shared_task
+@shared_task(verbose_name=_('Send email'))
 def send_async(sender):
     sender.gen_and_send()
 

@@ -21,13 +21,14 @@ from .models import (
     Status, Session, Command, Task, AppletHostDeployment
 )
 from .utils import find_session_replay_local
+from django.utils.translation import gettext_lazy as _
 
 CACHE_REFRESH_INTERVAL = 10
 RUNNING = False
 logger = get_task_logger(__name__)
 
 
-@shared_task
+@shared_task(verbose_name=_('Periodic delete terminal status'))
 @register_as_period_task(interval=3600)
 @after_app_ready_start
 @after_app_shutdown_clean_periodic
@@ -36,7 +37,7 @@ def delete_terminal_status_period():
     Status.objects.filter(date_created__lt=yesterday).delete()
 
 
-@shared_task
+@shared_task(verbose_name=_('Clean orphan session'))
 @register_as_period_task(interval=600)
 @after_app_ready_start
 @after_app_shutdown_clean_periodic
@@ -55,7 +56,7 @@ def clean_orphan_session():
         session.save()
 
 
-@shared_task
+@shared_task(verbose_name=_('Periodic clean expired session'))
 @register_as_period_task(interval=3600 * 24)
 @after_app_ready_start
 @after_app_shutdown_clean_periodic
@@ -81,7 +82,7 @@ def clean_expired_session_period():
     logger.info("Clean session replay done")
 
 
-@shared_task
+@shared_task(verbose_name=_('Upload session replay to external storage'))
 def upload_session_replay_to_external_storage(session_id):
     logger.info(f'Start upload session to external storage: {session_id}')
     session = Session.objects.filter(id=session_id).first()
@@ -108,14 +109,14 @@ def upload_session_replay_to_external_storage(session_id):
     return
 
 
-@shared_task
+@shared_task(verbose_name=_('Run applet host deployment'))
 def run_applet_host_deployment(did):
     with tmp_to_builtin_org(system=1):
         deployment = AppletHostDeployment.objects.get(id=did)
         deployment.start()
 
 
-@shared_task
+@shared_task(verbose_name=_('Install applet'))
 def run_applet_host_deployment_install_applet(did, applet_id):
     with tmp_to_builtin_org(system=1):
         deployment = AppletHostDeployment.objects.get(id=did)
