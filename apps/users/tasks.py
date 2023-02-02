@@ -16,12 +16,12 @@ from .models import User
 from users.notifications import UserExpirationReminderMsg
 from settings.utils import LDAPServerUtil, LDAPImportUtil
 from common.const.crontab import CRONTAB_AT_AM_TEN, CRONTAB_AT_PM_TWO
-
+from django.utils.translation import gettext_lazy as _
 
 logger = get_logger(__file__)
 
 
-@shared_task
+@shared_task(verbose_name=_('Check password expired'))
 def check_password_expired():
     users = User.get_nature_users().filter(source=User.Source.local)
     for user in users:
@@ -35,7 +35,7 @@ def check_password_expired():
         PasswordExpirationReminderMsg(user).publish_async()
 
 
-@shared_task
+@shared_task(verbose_name=_('Periodic check password expired'))
 @after_app_ready_start
 def check_password_expired_periodic():
     tasks = {
@@ -49,11 +49,11 @@ def check_password_expired_periodic():
     create_or_update_celery_periodic_tasks(tasks)
 
 
-@shared_task
+@shared_task(verbose_name=_('Check user expired'))
 def check_user_expired():
     date_expired_lt = timezone.now() + timezone.timedelta(days=User.DATE_EXPIRED_WARNING_DAYS)
-    users = User.get_nature_users()\
-        .filter(source=User.Source.local)\
+    users = User.get_nature_users() \
+        .filter(source=User.Source.local) \
         .filter(date_expired__lt=date_expired_lt)
 
     for user in users:
@@ -66,7 +66,7 @@ def check_user_expired():
         UserExpirationReminderMsg(user).publish_async()
 
 
-@shared_task
+@shared_task(verbose_name=_('Periodic check user expired'))
 @after_app_ready_start
 def check_user_expired_periodic():
     tasks = {
@@ -80,7 +80,7 @@ def check_user_expired_periodic():
     create_or_update_celery_periodic_tasks(tasks)
 
 
-@shared_task
+@shared_task(verbose_name=_('Import ldap user'))
 def import_ldap_user():
     logger.info("Start import ldap user task")
     util_server = LDAPServerUtil()
@@ -101,7 +101,7 @@ def import_ldap_user():
         logger.info('Imported {} users successfully'.format(len(users)))
 
 
-@shared_task
+@shared_task(verbose_name=_('Periodic import ldap user'))
 @after_app_ready_start
 def import_ldap_user_periodic():
     if not settings.AUTH_LDAP:
