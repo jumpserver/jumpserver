@@ -52,10 +52,10 @@ class LoginACLSerializer(BulkModelSerializer):
         action = self.fields.get("action")
         if not action:
             return
-        choices = action._choices
+        choices = action.choices
         if not has_valid_xpack_license():
             choices.pop(LoginACL.ActionChoices.review, None)
-        action._choices = choices
+        action.choices = choices
 
     def get_rules_serializer(self):
         return RuleSerializer()
