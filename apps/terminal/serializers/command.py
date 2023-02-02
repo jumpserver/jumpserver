@@ -3,18 +3,20 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from common.utils import pretty_string
-from .models import AbstractSessionCommand
+from common.serializers.fields import LabeledChoiceField
+from terminal.backends.command.models import AbstractSessionCommand
 
 __all__ = ['SessionCommandSerializer', 'InsecureCommandAlertSerializer']
 
 
 class SimpleSessionCommandSerializer(serializers.Serializer):
+
     """ 简单Session命令序列类, 用来提取公共字段 """
     user = serializers.CharField(label=_("User"))  # 限制 64 字符，见 validate_user
     asset = serializers.CharField(max_length=128, label=_("Asset"))
     input = serializers.CharField(max_length=2048, label=_("Command"))
     session = serializers.CharField(max_length=36, label=_("Session ID"))
-    risk_level = serializers.ChoiceField(
+    risk_level = LabeledChoiceField(
         required=False, label=_("Risk level"), choices=AbstractSessionCommand.RISK_LEVEL_CHOICES
     )
     org_id = serializers.CharField(
