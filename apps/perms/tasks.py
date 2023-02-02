@@ -19,12 +19,13 @@ from perms.notifications import (
     PermedAssetsWillExpireUserMsg,
     AssetPermsWillExpireForOrgAdminMsg,
 )
+from django.utils.translation import gettext_lazy as _
 
 logger = get_logger(__file__)
 
 
 @register_as_period_task(interval=settings.PERM_EXPIRED_CHECK_PERIODIC)
-@shared_task()
+@shared_task(verbose_name=_('Check asset permission expired'))
 @atomic()
 @tmp_to_root_org()
 def check_asset_permission_expired():
@@ -36,7 +37,7 @@ def check_asset_permission_expired():
 
 
 @register_as_period_task(crontab=CRONTAB_AT_AM_TEN)
-@shared_task()
+@shared_task(verbose_name=_('Send asset permission expired notification'))
 @atomic()
 @tmp_to_root_org()
 def check_asset_permission_will_expired():

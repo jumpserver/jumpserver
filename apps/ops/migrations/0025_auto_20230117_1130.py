@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='playbook',
             name='create_method',
-            field=models.CharField(choices=[('blank', 'Blank'), ('upload', 'Upload'), ('vcs', 'VCS')], default='blank', max_length=128, verbose_name='CreateMethod'),
+            field=models.CharField(choices=[('blank', 'Blank'), ('vcs', 'VCS')], default='blank', max_length=128, verbose_name='CreateMethod'),
         ),
         migrations.AddField(
             model_name='playbook',

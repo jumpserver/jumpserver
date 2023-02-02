@@ -9,6 +9,7 @@ from ops.celery.decorator import (
 )
 from .models import UserLoginLog, OperateLog, FTPLog
 from common.utils import get_log_keep_day
+from django.utils.translation import gettext_lazy as _
 
 
 def clean_login_log_period():
@@ -32,8 +33,8 @@ def clean_ftp_log_period():
     FTPLog.objects.filter(date_start__lt=expired_day).delete()
 
 
-@register_as_period_task(interval=3600*24)
-@shared_task
+@register_as_period_task(interval=3600 * 24)
+@shared_task(verbose_name=_('Clean audits log'))
 def clean_audits_log_period():
     clean_login_log_period()
     clean_operation_log_period()

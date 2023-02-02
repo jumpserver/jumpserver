@@ -36,7 +36,7 @@ class UserFilter(BaseFilterSet):
         if not role:
             return queryset.none()
         queryset = queryset.prefetch_related('role_bindings') \
-            .filter(role_bindings__role_id=role.id) \
+            .filter(role_bindings__role_id=role.id, role_bindings__role__scope='system') \
             .distinct()
         return queryset
 
@@ -45,6 +45,6 @@ class UserFilter(BaseFilterSet):
         if not role:
             return queryset.none()
         queryset = queryset.prefetch_related('role_bindings') \
-            .filter(role_bindings__role_id=role.id) \
+            .filter(role_bindings__role_id=role.id, role_bindings__role__scope='org') \
             .distinct()
         return queryset
