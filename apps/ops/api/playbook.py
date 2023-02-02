@@ -88,20 +88,26 @@ class PlaybookFileBrowserAPIView(APIView):
 
         is_directory = request.data.get('is_directory', False)
         content = request.data.get('content', '')
+        name = request.data.get('name', '')
+
+        def find_new_name(p, is_file=False):
+            if not p:
+                if is_file:
+                    p = 'new_file.yml'
+                else:
+                    p = 'new_dir'
+            np = os.path.join(full_path, p)
+            n = 0
+            while os.path.exists(np):
+                n += 1
+                np = os.path.join(full_path, '{}({})'.format(p, n))
+            return np
 
         if is_directory:
-            new_file_path = os.path.join(full_path, 'new_dir')
-            i = 0
-            while os.path.exists(new_file_path):
-                i += 1
-                new_file_path = os.path.join(full_path, 'new_dir({})'.format(i))
+            new_file_path = find_new_name(name)
             os.makedirs(new_file_path)
         else:
-            new_file_path = os.path.join(full_path, 'new_file.yml')
-            i = 0
-            while os.path.exists(new_file_path):
-                i += 1
-                new_file_path = os.path.join(full_path, 'new_file({}).yml'.format(i))
+            new_file_path = find_new_name(name, True)
             with open(new_file_path, 'w') as f:
                 f.write(content)
 
@@ -118,7 +124,6 @@ class PlaybookFileBrowserAPIView(APIView):
         }
         if not is_directory:
             new_node['iconSkin'] = 'file'
-
         return Response(new_node)
 
     def patch(self, request, **kwargs):
