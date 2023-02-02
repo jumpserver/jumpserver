@@ -70,9 +70,7 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
         actions = self.fields.get("actions")
         if not actions:
             return
-        choices = actions._choices
-        actions._choices = choices
-        actions.default = list(choices.keys())
+        actions.default = list(actions.choices.keys())
 
     @classmethod
     def setup_eager_loading(cls, queryset):

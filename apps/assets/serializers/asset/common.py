@@ -139,9 +139,9 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
             return
         category = request.path.strip('/').split('/')[-1].rstrip('s')
         field_category = self.fields.get('category')
-        field_category._choices = Category.filter_choices(category)
+        field_category.choices = Category.filter_choices(category)
         field_type = self.fields.get('type')
-        field_type._choices = AllTypes.filter_choices(category)
+        field_type.choices = AllTypes.filter_choices(category)
 
     @classmethod
     def setup_eager_loading(cls, queryset):
