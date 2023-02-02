@@ -6381,7 +6381,7 @@ msgstr "登录被阻塞"
 
 #: users/serializers/user.py:93
 msgid "Can public key authentication"
-msgstr "能否公钥认证"
+msgstr "公钥认证"
 
 #: users/serializers/user.py:162
 msgid "Avatar url"
