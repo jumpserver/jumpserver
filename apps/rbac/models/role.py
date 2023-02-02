@@ -43,7 +43,6 @@ class Role(JMSBaseModel):
 
     class Meta:
         unique_together = [('name', 'scope')]
-        ordering = ('-builtin', 'scope', 'name')
         verbose_name = _('Role')
 
     def __str__(self):

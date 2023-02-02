@@ -17,6 +17,7 @@ __all__ = [
 
 class RoleViewSet(JMSModelViewSet):
     queryset = Role.objects.all()
+    ordering = ('-builtin', 'scope', 'name')
     serializer_classes = {
         'default': RoleSerializer,
         'users': RoleUserSerializer,
@@ -61,8 +62,7 @@ class RoleViewSet(JMSModelViewSet):
         return super().perform_update(serializer)
 
     def get_queryset(self):
-        queryset = super().get_queryset() \
-            .annotate(permissions_amount=Count('permissions'))
+        queryset = super().get_queryset().annotate(permissions_amount=Count('permissions'))
         return queryset
 
     @action(methods=['GET'], detail=True)
