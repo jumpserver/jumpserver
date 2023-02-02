@@ -1,4 +1,4 @@
-from collections import Iterable
+from collections import Iterable, defaultdict
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import NOT_PROVIDED
@@ -362,7 +362,7 @@ class CommonModelSerializer(CommonSerializerMixin, serializers.ModelSerializer):
 
 
 class CommonBulkSerializerMixin(BulkSerializerMixin, CommonSerializerMixin):
-    pass
+    _save_kwargs = defaultdict(dict)
 
 
 class CommonBulkModelSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):

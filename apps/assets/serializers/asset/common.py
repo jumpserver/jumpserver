@@ -119,8 +119,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
             'nodes_display', 'accounts'
         ]
         read_only_fields = [
-            'category', 'type', 'connectivity', 'date_verified',
-            'created_by', 'date_created'
+            'category', 'type', 'connectivity',
+            'date_verified', 'created_by', 'date_created'
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
         extra_kwargs = {
