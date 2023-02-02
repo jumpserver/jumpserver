@@ -53,14 +53,15 @@ class DeployAppletHostManager:
         if not download_host:
             download_host = site_url
         options = self.deployment.host.deploy_options
-        site_url = site_url.rstrip("/")
+        core_host = options.get("CORE_HOST", site_url)
+        core_host = core_host.rstrip("/")
         download_host = download_host.rstrip("/")
 
         def handler(plays):
             for play in plays:
                 play["vars"].update(options)
                 play["vars"]["APPLET_DOWNLOAD_HOST"] = download_host
-                play["vars"]["CORE_HOST"] = site_url
+                play["vars"]["CORE_HOST"] = core_host
                 play["vars"]["BOOTSTRAP_TOKEN"] = bootstrap_token
                 play["vars"]["HOST_ID"] = host_id
                 play["vars"]["HOST_NAME"] = self.deployment.host.name
