@@ -50,11 +50,11 @@ class DeployAppletHostManager:
         host_id = str(self.deployment.host.id)
         if not site_url:
             site_url = "http://localhost:8080"
-        if not download_host:
-            download_host = site_url
         options = self.deployment.host.deploy_options
         core_host = options.get("CORE_HOST", site_url)
         core_host = core_host.rstrip("/")
+        if not download_host:
+            download_host = core_host
         download_host = download_host.rstrip("/")
 
         def handler(plays):
