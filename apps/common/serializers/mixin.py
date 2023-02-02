@@ -169,15 +169,6 @@ class BulkListSerializerMixin:
         else:
             return super().create(validated_data)
 
-    def save(self, **kwargs):
-        """
-        重写save方法，使得在批量更新时，可以获取到当前操作的数据集
-        :param kwargs:
-        :return:
-        """
-        self._save_kwargs = defaultdict(dict, kwargs)
-        return super().save(**kwargs)
-
 
 class BaseDynamicFieldsPlugin:
     def __init__(self, serializer):
@@ -371,9 +362,7 @@ class CommonModelSerializer(CommonSerializerMixin, serializers.ModelSerializer):
 
 
 class CommonBulkSerializerMixin(BulkSerializerMixin, CommonSerializerMixin):
-    def update(self, *args, **kwargs):
-        self._save_kwargs = defaultdict(dict)
-        return super().update(*args, **kwargs)
+    _save_kwargs = defaultdict(dict)
 
 
 class CommonBulkModelSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
