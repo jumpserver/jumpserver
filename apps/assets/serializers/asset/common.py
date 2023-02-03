@@ -10,6 +10,7 @@ from accounts.models import Account
 from accounts.serializers import AccountSerializerCreateValidateMixin
 from common.serializers import WritableNestedModelSerializer, SecretReadableMixin, CommonModelSerializer
 from common.serializers.fields import LabeledChoiceField
+from common.utils import lazyproperty
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ...const import Category, AllTypes
 from ...models import Asset, Node, Platform, Label, Protocol
@@ -107,7 +108,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
     labels = AssetLabelSerializer(many=True, required=False, label=_('Label'))
-    protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
+    protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'), default=())
     accounts = AssetAccountSerializer(many=True, required=False, write_only=True, label=_('Account'))
 
     class Meta:
@@ -133,6 +134,27 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._init_field_choices()
+
+    def _get_protocols_required_default(self):
+        platform = self._initial_data_platform
+        platform_protocols = platform.protocols.all()
+        protocols_default = [p for p in platform_protocols if p.default]
+        protocols_required = [p for p in platform_protocols if p.required or p.primary]
+        return protocols_required, protocols_default
+
+    def _set_protocols_default(self):
+        if not hasattr(self, 'initial_data'):
+            return
+        protocols = self.initial_data.get('protocols')
+        if protocols is not None:
+            return
+
+        protocols_required, protocols_default = self._get_protocols_required_default()
+        protocols_data = [
+            {'name': p.name, 'port': p.port}
+            for p in protocols_required + protocols_default
+        ]
+        self.initial_data['protocols'] = protocols_data
 
     def _init_field_choices(self):
         request = self.context.get('request')
@@ -169,6 +191,26 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
             nodes_to_set.append(node)
         instance.nodes.set(nodes_to_set)
 
+    @lazyproperty
+    def _initial_data_platform(self):
+        if self.instance:
+            return self.instance.platform
+
+        platform_id = self.initial_data.get('platform')
+        if isinstance(platform_id, dict):
+            platform_id = platform_id.get('id') or platform_id.get('pk')
+        platform = Platform.objects.filter(id=platform_id).first()
+        if not platform:
+            raise serializers.ValidationError({'platform': _("Platform not exist")})
+        return platform
+
+    def validate_domain(self, value):
+        platform = self._initial_data_platform
+        if platform.domain_enabled:
+            return value
+        else:
+            return None
+
     def validate_nodes(self, nodes):
         if nodes:
             return nodes
@@ -179,33 +221,20 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         if not node_id:
             return []
 
+    def is_valid(self, raise_exception=False):
+        self._set_protocols_default()
+        return super().is_valid(raise_exception)
+
     def validate_protocols(self, protocols_data):
-        if not protocols_data:
-            protocols_data = []
-        platform_id = self.initial_data.get('platform')
-        if isinstance(platform_id, dict):
-            platform_id = platform_id.get('id') or platform_id.get('pk')
-        platform = Platform.objects.filter(id=platform_id).first()
-        if not platform:
-            raise serializers.ValidationError({'platform': _("Platform not exist")})
-
+        # 目的是去重
         protocols_data_map = {p['name']: p for p in protocols_data}
-        platform_protocols = platform.protocols.all()
-        protocols_default = [p for p in platform_protocols if p.default]
-        protocols_required = [p for p in platform_protocols if p.required or p.primary]
-
         for p in protocols_data:
             port = p.get('port', 0)
             if port < 1 or port > 65535:
                 error = p.get('name') + ': ' + _("port out of range (1-65535)")
                 raise serializers.ValidationError(error)
 
-        if not protocols_data_map:
-            protocols_data_map = {
-                p.name: {'name': p.name, 'port': p.port}
-                for p in protocols_required + protocols_default
-            }
-
+        protocols_required, protocols_default = self._get_protocols_required_default()
         protocols_not_found = [p.name for p in protocols_required if p.name not in protocols_data_map]
         if protocols_not_found:
             raise serializers.ValidationError({
