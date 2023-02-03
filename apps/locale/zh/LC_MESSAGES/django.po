@@ -2887,7 +2887,7 @@ msgstr "忽略时间"
 
 #: common/db/models.py:34
 msgid "Updated by"
-msgstr "更新人"
+msgstr "最后更新者"
 
 #: common/db/validators.py:9
 #, fuzzy

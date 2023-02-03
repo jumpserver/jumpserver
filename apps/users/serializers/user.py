@@ -115,17 +115,21 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         # small 指的是 不需要计算的直接能从一张表中获取到的数据
         fields_small = fields_mini + fields_write_only + [
             "email", "wechat", "phone", "mfa_level", "source",
-            "need_update_password", "mfa_enabled",
+            "wecom_id", "dingtalk_id", "feishu_id",
+            "created_by", "updated_by", "comment",  # 通用字段
+        ]
+        fields_date = [
+            "date_expired", "date_joined",
+            "last_login", "date_updated"  # 日期字段
+        ]
+        fields_bool = [
             "is_service_account", "is_valid",
             "is_expired", "is_active",  # 布尔字段
             "is_otp_secret_key_bound", "can_public_key_auth",
-            "date_expired", "date_joined",
-            "last_login",  # 日期字段
-            "created_by", "comment",  # 通用字段
-            "wecom_id", "dingtalk_id", "feishu_id",
+            "mfa_enabled", "need_update_password",
         ]
         # 包含不太常用的字段，可以没有
-        fields_verbose = fields_small + [
+        fields_verbose = fields_small + fields_date + fields_bool + [
             "mfa_force_enabled", "is_first_login",
             "date_password_last_updated", "avatar_url",
         ]
@@ -281,7 +285,6 @@ class ServiceAccountSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         from authentication.serializers import AccessKeySerializer
-
         self.fields["access_key"] = AccessKeySerializer(read_only=True)
 
     def get_username(self):
