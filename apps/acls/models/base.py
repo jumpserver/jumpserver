@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.db.models import JMSBaseModel
 from common.utils import contains_ip
-from orgs.mixins.models import OrgModelMixin
+from orgs.mixins.models import OrgModelMixin, OrgManager
 
 __all__ = [
     'ACLManager',
@@ -62,7 +62,7 @@ class UserAssetAccountACLQuerySet(BaseACLQuerySet):
         return self.filter(q)
 
 
-class ACLManager(models.Manager):
+class ACLManager(OrgManager):
     def valid(self):
         return self.get_queryset().valid()
 
