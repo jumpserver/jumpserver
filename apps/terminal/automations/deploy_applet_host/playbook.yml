@@ -122,8 +122,8 @@
 
     - name: Install python requirements offline
       ansible.windows.win_shell: >
-        pip install -r '{{ ansible_env.TEMP }}\pip_packages\requirements.txt'
-        --no-index --find-links='{{ ansible_env.TEMP }}\pip_packages'
+        pip install -r '{{ ansible_env.TEMP }}\pip_packages\pip_packages\requirements.txt'
+        --no-index --find-links='{{ ansible_env.TEMP }}\pip_packages\pip_packages'
 
     - name: Download chromedriver (Chromium)
       ansible.windows.win_get_url:
