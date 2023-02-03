@@ -1,4 +1,3 @@
-import datetime
 import json
 import logging
 import os
@@ -97,7 +96,7 @@ class JobExecution(JMSOrgBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     task_id = models.UUIDField(null=True)
     status = models.CharField(max_length=16, verbose_name=_('Status'), default=JobStatus.running)
-    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='executions', null=True)
+    job = models.ForeignKey(Job, on_delete=models.SET_NULL, related_name='executions', null=True)
     job_version = models.IntegerField(default=0)
     parameters = models.JSONField(default=dict, verbose_name=_('Parameters'))
     result = models.JSONField(blank=True, null=True, verbose_name=_('Result'))
@@ -122,41 +121,42 @@ class JobExecution(JMSOrgBaseModel):
 
     @property
     def assent_result_detail(self):
-        if self.is_finished and not self.summary.get('error', None):
-            result = {
-                "summary": self.count,
-                "detail": [],
+        if not self.is_finished or self.summary.get('error'):
+            return None
+        result = {
+            "summary": self.summary,
+            "detail": [],
+        }
+        for asset in self.current_job.assets.all():
+            asset_detail = {
+                "name": asset.name,
+                "status": "ok",
+                "tasks": [],
             }
-            for asset in self.current_job.assets.all():
-                asset_detail = {
-                    "name": asset.name,
-                    "status": "ok",
-                    "tasks": [],
-                }
-                if self.summary.get("excludes", None) and self.summary["excludes"].get(asset.name, None):
-                    asset_detail.update({"status": "excludes"})
-                    result["detail"].append(asset_detail)
-                    break
-                if self.result["dark"].get(asset.name, None):
-                    asset_detail.update({"status": "failed"})
-                    for key, task in self.result["dark"][asset.name].items():
-                        task_detail = {"name": key,
-                                       "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
-                        asset_detail["tasks"].append(task_detail)
-                if self.result["failures"].get(asset.name, None):
-                    asset_detail.update({"status": "failed"})
-                    for key, task in self.result["failures"][asset.name].items():
-                        task_detail = {"name": key,
-                                       "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
-                        asset_detail["tasks"].append(task_detail)
-
-                if self.result["ok"].get(asset.name, None):
-                    for key, task in self.result["ok"][asset.name].items():
-                        task_detail = {"name": key,
-                                       "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
-                        asset_detail["tasks"].append(task_detail)
+            if self.summary.get("excludes", None) and self.summary["excludes"].get(asset.name, None):
+                asset_detail.update({"status": "excludes"})
                 result["detail"].append(asset_detail)
-            return result
+                break
+            if self.result["dark"].get(asset.name, None):
+                asset_detail.update({"status": "failed"})
+                for key, task in self.result["dark"][asset.name].items():
+                    task_detail = {"name": key,
+                                   "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
+                    asset_detail["tasks"].append(task_detail)
+            if self.result["failures"].get(asset.name, None):
+                asset_detail.update({"status": "failed"})
+                for key, task in self.result["failures"][asset.name].items():
+                    task_detail = {"name": key,
+                                   "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
+                    asset_detail["tasks"].append(task_detail)
+
+            if self.result["ok"].get(asset.name, None):
+                for key, task in self.result["ok"][asset.name].items():
+                    task_detail = {"name": key,
+                                   "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
+                    asset_detail["tasks"].append(task_detail)
+            result["detail"].append(asset_detail)
+        return result
 
     @property
     def job_type(self):
