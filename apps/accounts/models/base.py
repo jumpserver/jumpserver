@@ -92,6 +92,9 @@ class BaseAccount(JMSOrgBaseModel):
         else:
             return ''
 
+        if not public_key:
+            return ''
+
         public_key_obj = sshpubkeys.SSHKey(public_key)
         fingerprint = public_key_obj.hash_md5()
         return fingerprint
