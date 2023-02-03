@@ -2,6 +2,7 @@
 #
 import django_filters
 from django.db.models import Q
+from django.utils.translation import gettext as _
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -108,6 +109,11 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
         else:
             gateways = asset.domain.gateways
         return self.get_paginated_response_from_queryset(gateways)
+
+    def create(self, request, *args, **kwargs):
+        if request.path.find('/api/v1/assets/assets/') > -1:
+            return Response({'error': _('Cannot create asset directly, you should create a host or other')}, status=400)
+        return super().create(request, *args, **kwargs)
 
 
 class AssetsTaskMixin:
