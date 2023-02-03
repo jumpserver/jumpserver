@@ -39,7 +39,6 @@
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         login_database: "{{ jms_asset.spec_info.db_name }}"
-        mode: "{{ account.mode }}"
       when:
         - db_info is succeeded
         - change_info is succeeded
