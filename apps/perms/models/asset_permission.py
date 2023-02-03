@@ -15,7 +15,7 @@ from common.utils.timezone import local_now
 from perms.const import ActionChoices
 from accounts.const import AliasAccount
 
-__all__ = ['AssetPermission', 'ActionChoices']
+__all__ = ['AssetPermission', 'ActionChoices', 'AssetPermissionQuerySet']
 
 # 使用场景
 logger = logging.getLogger(__name__)

@@ -5,7 +5,7 @@ from common.drf.filters import BaseFilterSet
 from common.utils import get_object_or_none, is_uuid
 from users.models import User, UserGroup
 from assets.models import Node, Asset
-from perms.models import AssetPermission
+from perms.models import AssetPermission, AssetPermissionQuerySet
 
 
 class PermissionBaseFilter(BaseFilterSet):
@@ -94,6 +94,7 @@ class AssetPermissionFilter(PermissionBaseFilter):
     node_name = filters.CharFilter(method='do_nothing')
     asset_id = filters.UUIDFilter(method='do_nothing')
     asset_name = filters.CharFilter(method='do_nothing')
+    accounts = filters.CharFilter(method='do_nothing')
     ip = filters.CharFilter(method='do_nothing')
 
     class Meta:
@@ -111,8 +112,17 @@ class AssetPermissionFilter(PermissionBaseFilter):
         qs = self.filter_effective(qs)
         qs = self.filter_asset(qs)
         qs = self.filter_node(qs)
+        qs = self.filter_accounts(qs)
         qs = qs.distinct()
         return qs
+
+    def filter_accounts(self, queryset: AssetPermissionQuerySet):
+        accounts = self.get_query_param('accounts')
+        if not accounts:
+            return queryset
+        accounts = accounts.split(',')
+        queryset = queryset.filter_by_accounts(accounts)
+        return queryset
 
     def filter_node(self, queryset: QuerySet):
         is_query_all = self.get_query_param('all', True)

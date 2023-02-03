@@ -72,6 +72,10 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
             return
         actions.default = list(actions.choices.keys())
 
+    @staticmethod
+    def validate_accounts(accounts):
+        return list(set(accounts))
+
     @classmethod
     def setup_eager_loading(cls, queryset):
         """Perform necessary eager loading of data."""
