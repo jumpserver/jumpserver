@@ -125,33 +125,40 @@
         pip install -r '{{ ansible_env.TEMP }}\pip_packages\requirements.txt'
         --no-index --find-links='{{ ansible_env.TEMP }}\pip_packages'
 
-    - name: Download chromedriver (chrome)
+    - name: Download chromedriver (Chromium)
       ansible.windows.win_get_url:
         url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/chromedriver_win32.zip"
         dest: "{{ ansible_env.TEMP }}\\chromedriver_win32.zip"
 
-    - name: Unzip chromedriver (chrome)
+    - name: Unzip chromedriver (Chromium)
       community.windows.win_unzip:
         src: "{{ ansible_env.TEMP }}\\chromedriver_win32.zip"
         dest: C:\Program Files\JumpServer\drivers
 
-    - name: Set chromedriver on the global system path (chrome)
+    - name: Download chromium zip package (Chromium)
+      ansible.windows.win_get_url:
+        url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/chrome-win.zip"
+        dest: "{{ ansible_env.TEMP }}\\chrome-win.zip"
+
+    - name: Unzip chromedriver (Chromium)
+      community.windows.win_unzip:
+        src: "{{ ansible_env.TEMP }}\\chrome-win.zip"
+        dest: C:\Program Files\chrome-win
+
+    - name: Set chromium and driver on the global system path (Chromium)
       ansible.windows.win_path:
         elements:
+          - 'C:\Program Files\chrome-win'
           - 'C:\Program Files\JumpServer\drivers'
 
-    - name: Download chrome msi package (chrome)
-      ansible.windows.win_get_url:
-        url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/googlechromestandaloneenterprise64.msi"
-        dest: "{{ ansible_env.TEMP }}\\googlechromestandaloneenterprise64.msi"
+    - name: Set Chromium variables diable Google Api (Chromium)
+      ansible.windows.win_environment:
+        level: machine
+        variables:
+          GOOGLE_API_KEY: ''
+          GOOGLE_DEFAULT_CLIENT_ID: ''
+          GOOGLE_DEFAULT_CLIENT_SECRET: ''
 
-    - name: Install chrome (chrome)
-      ansible.windows.win_package:
-        path: "{{ ansible_env.TEMP }}\\googlechromestandaloneenterprise64.msi"
-        state: present
-        arguments:
-          - /quiet
-          -
     - name: Download navicat161_premium_en package (navicat)
       ansible.windows.win_get_url:
         url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/navicat161_premium_en_x64.exe"

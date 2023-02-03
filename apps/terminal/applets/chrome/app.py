@@ -7,6 +7,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 
+from code_dialog import CodeDialog
 from common import (Asset, User, Account, Platform, Step)
 from common import (BaseApplication)
 from common import (notify_err_message, block_input, unblock_input)
@@ -16,6 +17,7 @@ class Command(Enum):
     TYPE = 'type'
     CLICK = 'click'
     OPEN = 'open'
+    CODE = 'code'
 
 
 def _execute_type(ele: WebElement, value: str):
@@ -62,6 +64,11 @@ class StepAction:
             ele.click()
         elif self.command in ['open']:
             driver.get(self.value)
+        elif self.command == 'code':
+            unblock_input()
+            code_string = CodeDialog(title="Code Dialog", label="Code").wait_string()
+            block_input()
+            ele.send_keys(code_string)
         return True
 
     def _execute_command_type(self, ele, value):
