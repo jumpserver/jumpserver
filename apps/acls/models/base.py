@@ -62,9 +62,13 @@ class UserAssetAccountACLQuerySet(BaseACLQuerySet):
         return self.filter(q)
 
 
-class ACLManager(OrgManager):
+class ACLManager(models.Manager):
     def valid(self):
         return self.get_queryset().valid()
+
+
+class OrgACLManager(OrgManager, ACLManager):
+    pass
 
 
 class BaseACL(JMSBaseModel):
@@ -97,7 +101,7 @@ class UserAssetAccountBaseACL(BaseACL, OrgModelMixin):
     # username_group
     accounts = models.JSONField(verbose_name=_('Account'))
 
-    objects = ACLManager.from_queryset(UserAssetAccountACLQuerySet)()
+    objects = OrgACLManager.from_queryset(UserAssetAccountACLQuerySet)()
 
     class Meta(BaseACL.Meta):
         unique_together = ('name', 'org_id')
