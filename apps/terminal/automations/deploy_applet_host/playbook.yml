@@ -140,7 +140,7 @@
         url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/chrome-win.zip"
         dest: "{{ ansible_env.TEMP }}\\chrome-win.zip"
 
-    - name: Unzip chromedriver (Chromium)
+    - name: Unzip Chromium (Chromium)
       community.windows.win_unzip:
         src: "{{ ansible_env.TEMP }}\\chrome-win.zip"
         dest: C:\Program Files\Chrome
@@ -149,7 +149,7 @@
       ansible.windows.win_path:
         elements:
           - 'C:\Program Files\Chrome\chrome-win'
-          - 'C:\Program Files\JumpServer\drivers'
+          - 'C:\Program Files\JumpServer\drivers\chromedriver_win32'
 
     - name: Set Chromium variables diable Google Api (Chromium)
       ansible.windows.win_environment:
