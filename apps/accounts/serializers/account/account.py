@@ -17,15 +17,14 @@ class AccountSerializerCreateValidateMixin:
     replace_attrs: callable
 
     def to_internal_value(self, data):
-        self.id = data.pop('id', None)
+        _id = data.pop('id', None)
         ret = super().to_internal_value(data)
-        self.push_now = ret.pop('push_now', False)
-        self.template = ret.pop('template', False)
+        self.id = _id
         return ret
 
     def set_secret(self, attrs):
         _id = self.id
-        template = self.template
+        template = attrs.pop('template', None)
 
         if _id and template:
             account_template = AccountTemplate.objects.get(id=_id)
@@ -33,14 +32,16 @@ class AccountSerializerCreateValidateMixin:
         elif _id and not template:
             account = Account.objects.get(id=_id)
             attrs['secret'] = account.secret
+        return attrs
 
     def validate(self, attrs):
-        self.set_secret(attrs)
-        return super().validate(attrs)
+        attrs = super().validate(attrs)
+        return self.set_secret(attrs)
 
     def create(self, validated_data):
+        push_now = validated_data.pop('push_now', None)
         instance = super().create(validated_data)
-        if self.push_now:
+        if push_now:
             push_accounts_to_assets.delay([instance.id], [instance.asset_id])
         return instance
 
