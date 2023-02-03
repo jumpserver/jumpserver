@@ -57,6 +57,7 @@ class AssetAccountSerializer(
     template = serializers.BooleanField(
         default=False, label=_("Template"), write_only=True
     )
+    name = serializers.CharField(max_length=128, required=False, label=_("Name"))
 
     class Meta:
         model = Account
@@ -192,6 +193,12 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         platform_protocols = platform.protocols.all()
         protocols_default = [p for p in platform_protocols if p.default]
         protocols_required = [p for p in platform_protocols if p.required or p.primary]
+
+        for p in protocols_data:
+            port = p.get('port', 0)
+            if port < 1 or port > 65535:
+                error = p.get('name') + ': ' + _("port out of range (1-65535)")
+                raise serializers.ValidationError(error)
 
         if not protocols_data_map:
             protocols_data_map = {

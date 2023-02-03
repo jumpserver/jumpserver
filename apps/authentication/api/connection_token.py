@@ -15,10 +15,10 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
 from common.api import JMSModelViewSet
-from common.utils.http import is_true
+from common.exceptions import JMSException
 from common.utils import random_string
 from common.utils.django import get_request_os
-from common.exceptions import JMSException
+from common.utils.http import is_true
 from orgs.mixins.api import RootOrgViewMixin
 from perms.models import ActionChoices
 from terminal.connect_methods import NativeClient, ConnectMethodUtil
@@ -264,7 +264,7 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
             msg = _('Account not found')
             raise JMSException(code='perm_account_invalid', detail=msg)
         if account.date_expired < timezone.now():
-            msg = _('Permission Expired')
+            msg = _('Permission expired')
             raise JMSException(code='perm_expired', detail=msg)
         return account
 
