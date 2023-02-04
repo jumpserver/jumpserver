@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-03 15:49+0800\n"
+"POT-Creation-Date: 2023-02-04 20:29+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -187,13 +187,14 @@ msgstr "によって作成された"
 msgid "Only create"
 msgstr "作成された日付"
 
-#: accounts/models/account.py:47 accounts/serializers/account/account.py:80
+#: accounts/models/account.py:47 accounts/serializers/account/account.py:81
 #: accounts/serializers/automations/change_secret.py:107
-#: accounts/serializers/automations/change_secret.py:127 acls/models/base.py:96
-#: acls/serializers/base.py:56 assets/models/asset/common.py:97
-#: assets/models/asset/common.py:282 assets/models/cmd_filter.py:36
-#: assets/serializers/domain.py:19 assets/serializers/label.py:27
-#: audits/models.py:34 authentication/models/connection_token.py:32
+#: accounts/serializers/automations/change_secret.py:127
+#: acls/models/base.py:100 acls/serializers/base.py:56
+#: assets/models/asset/common.py:97 assets/models/asset/common.py:282
+#: assets/models/cmd_filter.py:36 assets/serializers/domain.py:19
+#: assets/serializers/label.py:27 audits/models.py:34
+#: authentication/models/connection_token.py:32
 #: perms/models/asset_permission.py:64 perms/serializers/permission.py:27
 #: terminal/backends/command/models.py:21 terminal/models/session/session.py:31
 #: terminal/notifications.py:95 terminal/serializers/command.py:16
@@ -201,7 +202,7 @@ msgstr "作成された日付"
 msgid "Asset"
 msgstr "資産"
 
-#: accounts/models/account.py:51 accounts/serializers/account/account.py:84
+#: accounts/models/account.py:51 accounts/serializers/account/account.py:85
 #: authentication/serializers/connect_token_secret.py:50
 msgid "Su from"
 msgstr "から切り替え"
@@ -211,16 +212,17 @@ msgstr "から切り替え"
 msgid "Version"
 msgstr "バージョン"
 
-#: accounts/models/account.py:55 accounts/serializers/account/account.py:81
+#: accounts/models/account.py:55 accounts/serializers/account/account.py:82
 #: users/models/user.py:726
 msgid "Source"
 msgstr "ソース"
 
 #: accounts/models/account.py:58
 #: accounts/serializers/automations/change_secret.py:108
-#: accounts/serializers/automations/change_secret.py:128 acls/models/base.py:98
-#: acls/serializers/base.py:57 assets/serializers/asset/common.py:111
-#: assets/serializers/gateway.py:30 audits/models.py:35 ops/models/base.py:18
+#: accounts/serializers/automations/change_secret.py:128
+#: acls/models/base.py:102 acls/serializers/base.py:57
+#: assets/serializers/asset/common.py:112 assets/serializers/gateway.py:30
+#: audits/models.py:35 ops/models/base.py:18
 #: terminal/backends/command/models.py:22 terminal/models/session/session.py:33
 #: tickets/models/ticket/command_confirm.py:13 xpack/plugins/cloud/models.py:85
 msgid "Account"
@@ -271,7 +273,7 @@ msgstr "アカウントバックアップ計画"
 
 #: accounts/models/automations/backup_account.py:77
 #: assets/models/automations/base.py:106 audits/models.py:41
-#: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:107
+#: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:106
 #: perms/models/asset_permission.py:72 terminal/models/applet/host.py:108
 #: terminal/models/session/session.py:43
 #: tickets/models/ticket/apply_application.py:30
@@ -357,7 +359,7 @@ msgid "Can add push account execution"
 msgstr "収集アカウントの作成実行"
 
 #: accounts/models/automations/change_secret.py:17 accounts/models/base.py:36
-#: accounts/serializers/account/account.py:117
+#: accounts/serializers/account/account.py:118
 #: accounts/serializers/account/base.py:16
 #: accounts/serializers/automations/change_secret.py:46
 #: authentication/serializers/connect_token_secret.py:41
@@ -404,7 +406,7 @@ msgstr "開始日"
 
 #: accounts/models/automations/change_secret.py:74
 #: assets/models/automations/base.py:107 ops/models/base.py:56
-#: ops/models/celery.py:64 ops/models/job.py:108
+#: ops/models/celery.py:64 ops/models/job.py:107
 #: terminal/models/applet/host.py:109
 msgid "Date finished"
 msgstr "終了日"
@@ -444,7 +446,7 @@ msgstr "トリガーモード"
 msgid "Username"
 msgstr "ユーザー名"
 
-#: accounts/models/automations/push_account.py:15 acls/models/base.py:77
+#: accounts/models/automations/push_account.py:15 acls/models/base.py:81
 #: acls/serializers/base.py:81 assets/models/cmd_filter.py:81
 #: audits/models.py:51 audits/serializers.py:82
 #: authentication/serializers/connect_token_secret.py:109
@@ -462,18 +464,18 @@ msgstr "サービスアカウントです"
 msgid "Verify asset account"
 msgstr "パスワード/キーの確認"
 
-#: accounts/models/base.py:33 acls/models/base.py:71
+#: accounts/models/base.py:33 acls/models/base.py:75
 #: acls/models/command_acl.py:21 acls/serializers/base.py:34
 #: applications/models.py:9 assets/models/_user.py:22
 #: assets/models/asset/common.py:95 assets/models/asset/common.py:107
 #: assets/models/cmd_filter.py:21 assets/models/domain.py:18
 #: assets/models/group.py:20 assets/models/label.py:18
 #: assets/models/platform.py:20 assets/models/platform.py:74
-#: assets/serializers/asset/common.py:60 assets/serializers/asset/common.py:128
-#: assets/serializers/platform.py:125
+#: assets/serializers/asset/common.py:61 assets/serializers/asset/common.py:129
+#: assets/serializers/platform.py:137
 #: authentication/serializers/connect_token_secret.py:103 ops/mixin.py:20
 #: ops/models/adhoc.py:22 ops/models/celery.py:15 ops/models/celery.py:57
-#: ops/models/job.py:25 ops/models/playbook.py:15 orgs/models.py:69
+#: ops/models/job.py:24 ops/models/playbook.py:15 orgs/models.py:69
 #: perms/models/asset_permission.py:56 rbac/models/role.py:29
 #: settings/models.py:33 settings/serializers/sms.py:6
 #: terminal/models/applet/applet.py:24 terminal/models/component/endpoint.py:12
@@ -538,23 +540,23 @@ msgstr ""
 "{} -暗号化変更タスクが完了しました: 暗号化パスワードが設定されていません-個人"
 "情報にアクセスしてください-> ファイル暗号化パスワードを設定してください"
 
-#: accounts/serializers/account/account.py:52
-#: assets/serializers/asset/common.py:58 settings/serializers/auth/sms.py:75
+#: accounts/serializers/account/account.py:53
+#: assets/serializers/asset/common.py:59 settings/serializers/auth/sms.py:75
 msgid "Template"
 msgstr "テンプレート"
 
-#: accounts/serializers/account/account.py:55
-#: assets/serializers/asset/common.py:55
+#: accounts/serializers/account/account.py:56
+#: assets/serializers/asset/common.py:56
 msgid "Push now"
 msgstr ""
 
-#: accounts/serializers/account/account.py:57
+#: accounts/serializers/account/account.py:58
 #: accounts/serializers/account/base.py:64
 #, fuzzy
 msgid "Has secret"
 msgstr "ひみつ"
 
-#: accounts/serializers/account/account.py:76
+#: accounts/serializers/account/account.py:77
 #, fuzzy
 #| msgid "Asset Info"
 msgid "Asset not found"
@@ -587,7 +589,7 @@ msgid "Key password"
 msgstr "キーパスワード"
 
 #: accounts/serializers/account/base.py:80
-#: assets/serializers/asset/common.py:233
+#: assets/serializers/asset/common.py:262
 #, fuzzy
 #| msgid "Ticket flow"
 msgid "Spec info"
@@ -596,7 +598,7 @@ msgstr "チケットの流れ"
 #: accounts/serializers/automations/base.py:22
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20 ops/models/base.py:17
-#: ops/models/job.py:35
+#: ops/models/job.py:34
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 msgid "Assets"
 msgstr "資産"
@@ -619,9 +621,9 @@ msgstr "製造オーダスナップショット"
 #: acls/serializers/command_acl.py:18 applications/models.py:14
 #: assets/models/_user.py:50 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:76
-#: assets/serializers/asset/common.py:108 assets/serializers/platform.py:86
+#: assets/serializers/asset/common.py:109 assets/serializers/platform.py:98
 #: audits/serializers.py:48
-#: authentication/serializers/connect_token_secret.py:116 ops/models/job.py:33
+#: authentication/serializers/connect_token_secret.py:116 ops/models/job.py:32
 #: perms/serializers/user_permission.py:26 terminal/models/applet/applet.py:28
 #: terminal/models/component/storage.py:57
 #: terminal/models/component/storage.py:146 terminal/serializers/applet.py:28
@@ -726,23 +728,23 @@ msgstr "受け入れられる"
 msgid "Review"
 msgstr "レビュー担当者"
 
-#: acls/models/base.py:73 assets/models/_user.py:51
+#: acls/models/base.py:77 assets/models/_user.py:51
 #: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:93
 msgid "Priority"
 msgstr "優先順位"
 
-#: acls/models/base.py:74 assets/models/_user.py:51
+#: acls/models/base.py:78 assets/models/_user.py:51
 #: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:94
 msgid "1-100, the lower the value will be match first"
 msgstr "1-100、低い値は最初に一致します"
 
-#: acls/models/base.py:78 acls/serializers/base.py:75
+#: acls/models/base.py:82 acls/serializers/base.py:75
 #: acls/serializers/login_acl.py:23 assets/models/cmd_filter.py:86
 #: authentication/serializers/connect_token_secret.py:82
 msgid "Reviewers"
 msgstr "レビュー担当者"
 
-#: acls/models/base.py:79 authentication/models/access_key.py:17
+#: acls/models/base.py:83 authentication/models/access_key.py:17
 #: authentication/models/connection_token.py:47
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/asset_permission.py:76 terminal/models/session/sharing.py:27
@@ -750,7 +752,7 @@ msgstr "レビュー担当者"
 msgid "Active"
 msgstr "アクティブ"
 
-#: acls/models/base.py:94 acls/models/login_acl.py:13
+#: acls/models/base.py:98 acls/models/login_acl.py:13
 #: acls/serializers/base.py:55 acls/serializers/login_acl.py:21
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:30
 #: audits/models.py:49 audits/models.py:98
@@ -845,7 +847,7 @@ msgstr ""
 "192.168.10.1、192.168.1.0/24、10.1.1.1-10.1.1.20、2001:db8:2de::e13、2001:"
 "db8:1a:1110:::/64 (ドメイン名サポート)"
 
-#: acls/serializers/base.py:40 assets/serializers/asset/host.py:40
+#: acls/serializers/base.py:40 assets/serializers/asset/host.py:37
 msgid "IP/Host"
 msgstr "IP/ホスト"
 
@@ -925,9 +927,9 @@ msgid "Applications"
 msgstr "アプリケーション"
 
 #: applications/models.py:11 assets/models/label.py:21
-#: assets/models/platform.py:75 assets/serializers/asset/common.py:107
-#: assets/serializers/cagegory.py:8 assets/serializers/platform.py:87
-#: assets/serializers/platform.py:126 perms/serializers/user_permission.py:25
+#: assets/models/platform.py:75 assets/serializers/asset/common.py:108
+#: assets/serializers/cagegory.py:8 assets/serializers/platform.py:99
+#: assets/serializers/platform.py:138 perms/serializers/user_permission.py:25
 #: settings/models.py:35 tickets/models/ticket/apply_application.py:13
 msgid "Category"
 msgstr "カテゴリ"
@@ -962,7 +964,9 @@ msgstr ""
 
 #: assets/api/asset/asset.py:115
 msgid "Cannot create asset directly, you should create a host or other"
-msgstr "資産を直接作成することはできません。ホストまたはその他を作成する必要があります"
+msgstr ""
+"資産を直接作成することはできません。ホストまたはその他を作成する必要がありま"
+"す"
 
 #: assets/api/domain.py:57
 msgid "Number required"
@@ -1046,7 +1050,7 @@ msgid "Device"
 msgstr ""
 
 #: assets/const/category.py:13 assets/models/asset/database.py:9
-#: assets/models/asset/database.py:24 assets/serializers/asset/common.py:95
+#: assets/models/asset/database.py:24 assets/serializers/asset/common.py:96
 msgid "Database"
 msgstr "データベース"
 
@@ -1100,7 +1104,7 @@ msgstr "SSHパブリックキー"
 #: assets/models/_user.py:27 assets/models/cmd_filter.py:40
 #: assets/models/cmd_filter.py:88 assets/models/group.py:23
 #: assets/models/platform.py:79 common/db/models.py:37 ops/models/adhoc.py:28
-#: ops/models/job.py:41 ops/models/playbook.py:18 rbac/models/role.py:37
+#: ops/models/job.py:40 ops/models/playbook.py:18 rbac/models/role.py:37
 #: settings/models.py:38 terminal/models/applet/applet.py:33
 #: terminal/models/applet/applet.py:146 terminal/models/applet/host.py:110
 #: terminal/models/component/endpoint.py:24
@@ -1113,7 +1117,7 @@ msgstr "コメント"
 
 #: assets/models/_user.py:28 assets/models/automations/base.py:105
 #: assets/models/cmd_filter.py:41 assets/models/group.py:22
-#: common/db/models.py:35 ops/models/base.py:54 ops/models/job.py:106
+#: common/db/models.py:35 ops/models/base.py:54 ops/models/job.py:105
 #: users/models/user.py:932
 msgid "Date created"
 msgstr "作成された日付"
@@ -1248,7 +1252,7 @@ msgstr "ノードにアセットを追加する"
 msgid "Move asset to node"
 msgstr "アセットをノードに移動する"
 
-#: assets/models/asset/database.py:10 assets/serializers/asset/common.py:96
+#: assets/models/asset/database.py:10 assets/serializers/asset/common.py:97
 #: settings/serializers/email.py:37
 msgid "Use SSL"
 msgstr "SSLの使用"
@@ -1268,7 +1272,7 @@ msgstr "クライアント秘密"
 msgid "Client key"
 msgstr "クライアント"
 
-#: assets/models/asset/database.py:14 assets/serializers/asset/common.py:97
+#: assets/models/asset/database.py:14 assets/serializers/asset/common.py:98
 msgid "Allow invalid cert"
 msgstr "証明書チェックを無視"
 
@@ -1283,7 +1287,7 @@ msgid "Basic"
 msgstr "基本"
 
 #: assets/models/asset/web.py:11 assets/models/asset/web.py:17
-#: assets/serializers/asset/common.py:103
+#: assets/serializers/asset/common.py:104
 msgid "Script"
 msgstr ""
 
@@ -1292,25 +1296,25 @@ msgstr ""
 msgid "Autofill"
 msgstr "自動"
 
-#: assets/models/asset/web.py:14 assets/serializers/asset/common.py:100
+#: assets/models/asset/web.py:14 assets/serializers/asset/common.py:101
 #: assets/serializers/platform.py:30
 #, fuzzy
 msgid "Username selector"
 msgstr "ユーザー名のプロパティ"
 
-#: assets/models/asset/web.py:15 assets/serializers/asset/common.py:101
+#: assets/models/asset/web.py:15 assets/serializers/asset/common.py:102
 #: assets/serializers/platform.py:33
 #, fuzzy
 msgid "Password selector"
 msgstr "パスワードルール"
 
-#: assets/models/asset/web.py:16 assets/serializers/asset/common.py:102
+#: assets/models/asset/web.py:16 assets/serializers/asset/common.py:103
 #: assets/serializers/platform.py:36
 msgid "Submit selector"
 msgstr ""
 
 #: assets/models/automations/base.py:17 assets/models/cmd_filter.py:38
-#: assets/serializers/asset/common.py:232 perms/models/asset_permission.py:70
+#: assets/serializers/asset/common.py:261 perms/models/asset_permission.py:70
 #: perms/serializers/permission.py:32 rbac/tree.py:36
 msgid "Accounts"
 msgstr "アカウント"
@@ -1326,7 +1330,7 @@ msgid "Asset automation task"
 msgstr "自動管理"
 
 #: assets/models/automations/base.py:104 audits/models.py:134
-#: audits/serializers.py:49 ops/models/base.py:49 ops/models/job.py:99
+#: audits/serializers.py:49 ops/models/base.py:49 ops/models/job.py:98
 #: terminal/models/applet/applet.py:145 terminal/models/applet/host.py:107
 #: terminal/models/component/status.py:27 terminal/serializers/applet.py:17
 #: terminal/serializers/applet_host.py:93 tickets/models/ticket/general.py:283
@@ -1419,7 +1423,7 @@ msgstr "システム"
 msgid "Value"
 msgstr "値"
 
-#: assets/models/label.py:40 assets/serializers/asset/common.py:109
+#: assets/models/label.py:40 assets/serializers/asset/common.py:110
 #: assets/serializers/cagegory.py:6 assets/serializers/cagegory.py:13
 #: authentication/serializers/connect_token_secret.py:114
 #: common/serializers/common.py:79 settings/serializers/sms.py:7
@@ -1474,51 +1478,53 @@ msgstr "有効化"
 msgid "Ansible config"
 msgstr ""
 
-#: assets/models/platform.py:43
+#: assets/models/platform.py:43 assets/serializers/platform.py:55
 #, fuzzy
 msgid "Ping enabled"
 msgstr "MFA有効化"
 
-#: assets/models/platform.py:44
+#: assets/models/platform.py:44 assets/serializers/platform.py:57
 msgid "Ping method"
 msgstr ""
 
 #: assets/models/platform.py:45 assets/models/platform.py:58
+#: assets/serializers/platform.py:59
 #, fuzzy
 msgid "Gather facts enabled"
 msgstr "資産ユーザーの収集"
 
 #: assets/models/platform.py:46 assets/models/platform.py:60
+#: assets/serializers/platform.py:61
 #, fuzzy
 msgid "Gather facts method"
 msgstr "資産ユーザーの収集"
 
-#: assets/models/platform.py:47
+#: assets/models/platform.py:47 assets/serializers/platform.py:67
 #, fuzzy
 msgid "Change secret enabled"
 msgstr "パスワードの変更"
 
-#: assets/models/platform.py:49
+#: assets/models/platform.py:49 assets/serializers/platform.py:69
 #, fuzzy
 msgid "Change secret method"
 msgstr "パスワードの変更"
 
-#: assets/models/platform.py:51
+#: assets/models/platform.py:51 assets/serializers/platform.py:71
 #, fuzzy
 msgid "Push account enabled"
 msgstr "MFAが有効化されていません"
 
-#: assets/models/platform.py:53
+#: assets/models/platform.py:53 assets/serializers/platform.py:73
 #, fuzzy
 msgid "Push account method"
 msgstr "サービスアカウントです"
 
-#: assets/models/platform.py:55
+#: assets/models/platform.py:55 assets/serializers/platform.py:63
 #, fuzzy
 msgid "Verify account enabled"
 msgstr "サービスアカウントキー"
 
-#: assets/models/platform.py:57
+#: assets/models/platform.py:57 assets/serializers/platform.py:65
 #, fuzzy
 msgid "Verify account method"
 msgstr "パスワード/キーの確認"
@@ -1531,26 +1537,25 @@ msgstr "メタ"
 msgid "Internal"
 msgstr "ビルトイン"
 
-#: assets/models/platform.py:82 assets/serializers/platform.py:84
+#: assets/models/platform.py:82 assets/serializers/platform.py:96
 msgid "Charset"
 msgstr "シャーセット"
 
-#: assets/models/platform.py:84
+#: assets/models/platform.py:84 assets/serializers/platform.py:123
 #, fuzzy
 msgid "Domain enabled"
 msgstr "ドメイン名"
 
-#: assets/models/platform.py:86
-#, fuzzy
+#: assets/models/platform.py:86 assets/serializers/platform.py:122
 msgid "Su enabled"
-msgstr "MFA有効化"
+msgstr "アカウントの切り替えを有効にする"
 
-#: assets/models/platform.py:87
+#: assets/models/platform.py:87 assets/serializers/platform.py:106
 #, fuzzy
 msgid "Su method"
 msgstr "接続タイムアウト"
 
-#: assets/models/platform.py:89 assets/serializers/platform.py:91
+#: assets/models/platform.py:89 assets/serializers/platform.py:103
 #, fuzzy
 msgid "Automation"
 msgstr "自動管理"
@@ -1560,12 +1565,12 @@ msgstr "自動管理"
 msgid "%(value)s is not an even number"
 msgstr "%(value)s は偶数ではありません"
 
-#: assets/serializers/asset/common.py:99
+#: assets/serializers/asset/common.py:100
 #, fuzzy
 msgid "Auto fill"
 msgstr "自動"
 
-#: assets/serializers/asset/common.py:110 assets/serializers/platform.py:89
+#: assets/serializers/asset/common.py:111 assets/serializers/platform.py:101
 #: authentication/serializers/connect_token_secret.py:28
 #: authentication/serializers/connect_token_secret.py:66
 #: perms/serializers/user_permission.py:24 xpack/plugins/cloud/models.py:107
@@ -1573,27 +1578,27 @@ msgstr "自動"
 msgid "Protocols"
 msgstr "プロトコル"
 
-#: assets/serializers/asset/common.py:129
+#: assets/serializers/asset/common.py:130
 msgid "Address"
 msgstr "アドレス"
 
-#: assets/serializers/asset/common.py:130
+#: assets/serializers/asset/common.py:131
 msgid "Node path"
 msgstr "ノードパスです"
 
-#: assets/serializers/asset/common.py:190
+#: assets/serializers/asset/common.py:204
 msgid "Platform not exist"
 msgstr "プラットフォームが存在しません"
 
-#: assets/serializers/asset/common.py:200
+#: assets/serializers/asset/common.py:234
 msgid "port out of range (1-65535)"
 msgstr "ポート番号が範囲外です (1-65535)"
 
-#: assets/serializers/asset/common.py:212
+#: assets/serializers/asset/common.py:241
 msgid "Protocol is required: {}"
 msgstr "プロトコルが必要です: {}"
 
-#: assets/serializers/asset/common.py:234
+#: assets/serializers/asset/common.py:263
 msgid "Auto info"
 msgstr "自動情報"
 
@@ -1639,30 +1644,18 @@ msgstr "メモリ"
 msgid "Disk total"
 msgstr "ディスクの合計"
 
-#: assets/serializers/asset/host.py:22
-msgid "Disk info"
-msgstr "ディスク情報"
-
-#: assets/serializers/asset/host.py:24
+#: assets/serializers/asset/host.py:23
 #: authentication/serializers/connect_token_secret.py:105
 msgid "OS"
 msgstr "OS"
 
-#: assets/serializers/asset/host.py:25
+#: assets/serializers/asset/host.py:24
 msgid "OS version"
 msgstr "システムバージョン"
 
-#: assets/serializers/asset/host.py:26
+#: assets/serializers/asset/host.py:25
 msgid "OS arch"
 msgstr "システムアーキテクチャ"
-
-#: assets/serializers/asset/host.py:27
-msgid "Hostname raw"
-msgstr "ホスト名生"
-
-#: assets/serializers/asset/host.py:28
-msgid "Asset number"
-msgstr "資産番号"
 
 #: assets/serializers/cagegory.py:9
 msgid "Constraints"
@@ -1703,9 +1696,25 @@ msgstr "MFA有効化"
 msgid "SFTP home"
 msgstr "SFTPルート"
 
-#: assets/serializers/platform.py:71
+#: assets/serializers/platform.py:75
+#, fuzzy
+msgid "Gather accounts enabled"
+msgstr "資産ユーザーの収集"
+
+#: assets/serializers/platform.py:77
+#, fuzzy
+msgid "Gather accounts method"
+msgstr "資産ユーザーの収集"
+
+#: assets/serializers/platform.py:83
 msgid "Primary"
 msgstr ""
+
+#: assets/serializers/platform.py:124
+#, fuzzy
+#| msgid "Default storage"
+msgid "Default Domain"
+msgstr "デフォルトのストレージ"
 
 #: assets/tasks/automation.py:11
 #, fuzzy
@@ -2033,7 +2042,7 @@ msgstr "資産情報"
 #: authentication/api/connection_token.py:267
 #, fuzzy
 #| msgid "Permission name"
-msgid "Permission Expired"
+msgid "Permission expired"
 msgstr "認可ルール名"
 
 #: authentication/api/connection_token.py:279
@@ -3335,7 +3344,7 @@ msgstr "CAS"
 msgid "Adhoc"
 msgstr "コマンド＃コマンド＃"
 
-#: ops/const.py:39 ops/models/job.py:32
+#: ops/const.py:39 ops/models/job.py:31
 msgid "Playbook"
 msgstr "Playbook"
 
@@ -3400,17 +3409,17 @@ msgstr "定期的または定期的に設定を行う必要があります"
 msgid "Pattern"
 msgstr "パターン"
 
-#: ops/models/adhoc.py:25 ops/models/job.py:29
+#: ops/models/adhoc.py:25 ops/models/job.py:28
 msgid "Module"
 msgstr "モジュール"
 
-#: ops/models/adhoc.py:26 ops/models/celery.py:58 ops/models/job.py:27
+#: ops/models/adhoc.py:26 ops/models/celery.py:58 ops/models/job.py:26
 #: terminal/models/component/task.py:16
 msgid "Args"
 msgstr "アルグ"
 
 #: ops/models/adhoc.py:27 ops/models/base.py:16 ops/models/base.py:53
-#: ops/models/job.py:34 ops/models/job.py:105 ops/models/playbook.py:17
+#: ops/models/job.py:33 ops/models/job.py:104 ops/models/playbook.py:17
 #: terminal/models/session/sharing.py:23
 msgid "Creator"
 msgstr "作成者"
@@ -3434,12 +3443,12 @@ msgstr "コマンド実行"
 msgid "Date last run"
 msgstr "最終同期日"
 
-#: ops/models/base.py:51 ops/models/job.py:103
+#: ops/models/base.py:51 ops/models/job.py:102
 #: xpack/plugins/cloud/models.py:170
 msgid "Result"
 msgstr "結果"
 
-#: ops/models/base.py:52 ops/models/job.py:104
+#: ops/models/base.py:52 ops/models/job.py:103
 msgid "Summary"
 msgstr "概要"
 
@@ -3481,35 +3490,35 @@ msgstr "終了日"
 msgid "Celery Task Execution"
 msgstr "Celery タスク実行"
 
-#: ops/models/job.py:30
+#: ops/models/job.py:29
 msgid "Chdir"
 msgstr "Chdir"
 
-#: ops/models/job.py:31
+#: ops/models/job.py:30
 msgid "Timeout (Seconds)"
 msgstr "タイムアウト（秒）"
 
-#: ops/models/job.py:36
+#: ops/models/job.py:35
 msgid "Runas"
 msgstr "Runas"
 
-#: ops/models/job.py:38
+#: ops/models/job.py:37
 msgid "Runas policy"
 msgstr "Runas ポリシー"
 
-#: ops/models/job.py:39
+#: ops/models/job.py:38
 msgid "Use Parameter Define"
 msgstr "パラメータ定義を使用する"
 
-#: ops/models/job.py:40
+#: ops/models/job.py:39
 msgid "Parameters define"
 msgstr "パラメータ定義"
 
-#: ops/models/job.py:92
+#: ops/models/job.py:91
 msgid "Job"
 msgstr "ジョブ＃ジョブ＃"
 
-#: ops/models/job.py:102
+#: ops/models/job.py:101
 msgid "Parameters"
 msgstr "パラメータ"
 
@@ -5849,7 +5858,7 @@ msgid "RDS Licensing Mode"
 msgstr ""
 
 #: terminal/serializers/applet_host.py:37
-msgid "RDS fSingleSessionPerUser"
+msgid "RDS Single Session Per User"
 msgstr ""
 
 #: terminal/serializers/applet_host.py:38
@@ -7550,6 +7559,15 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:85
 msgid "Community edition"
 msgstr "コミュニティ版"
+
+#~ msgid "Disk info"
+#~ msgstr "ディスク情報"
+
+#~ msgid "Hostname raw"
+#~ msgstr "ホスト名生"
+
+#~ msgid "Asset number"
+#~ msgstr "資産番号"
 
 #, fuzzy
 #~| msgid "Enabled"

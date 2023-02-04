@@ -197,7 +197,7 @@ class AllTypes(ChoicesMixin):
             category_type_mapper[p.category] += platform_count[p.id]
             tp_platforms[p.category + '_' + p.type].append(p)
 
-        root = dict(id='ROOT', name=_('All types'), title='所有类型', open=True, isParent=True)
+        root = dict(id='ROOT', name=_('All types'), title=_('All types'), open=True, isParent=True)
         nodes = [root]
         for category, type_cls in cls.category_types():
             # Category 格式化
