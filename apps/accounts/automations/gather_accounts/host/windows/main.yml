@@ -2,8 +2,7 @@
   gather_facts: no
   tasks:
     - name: Gather posix account
-      ansible.builtin.win_shell:
-        cmd: net user
+      ansible.builtin.win_shell: net user
       register: result
 
     - name: Define info by set_fact
