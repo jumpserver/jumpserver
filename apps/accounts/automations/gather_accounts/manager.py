@@ -53,7 +53,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         info = result.get('debug', {}).get('res', {}).get('info', {})
         asset = self.host_asset_mapper.get(host)
         if asset and info:
-            result = self.filter_success_result(host, info)
+            result = self.filter_success_result(asset.type, info)
             self.bulk_create_accounts(asset, result)
         else:
             logger.error("Not found info".format(host))
