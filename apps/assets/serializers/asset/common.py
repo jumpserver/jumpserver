@@ -242,10 +242,18 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
             })
         return protocols_data_map.values()
 
+    @staticmethod
+    def accounts_create(accounts_data, asset):
+        for data in accounts_data:
+            data['asset'] = asset
+            AssetAccountSerializer().create(data)
+
     @atomic
     def create(self, validated_data):
         nodes_display = validated_data.pop('nodes_display', '')
+        accounts = validated_data.pop('accounts', [])
         instance = super().create(validated_data)
+        self.accounts_create(accounts, instance)
         self.perform_nodes_display_create(instance, nodes_display)
         return instance
 
