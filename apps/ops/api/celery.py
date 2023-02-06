@@ -4,12 +4,15 @@ import os
 import re
 
 from celery.result import AsyncResult
-from rest_framework import generics, viewsets, mixins
+from rest_framework import generics, viewsets, mixins, status
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
 from django_celery_beat.models import PeriodicTask
+from rest_framework.response import Response
+
 from common.permissions import IsValidUser
 from common.api import LogTailApi, CommonApiMixin
+from ops.celery import app
 from ..models import CeleryTaskExecution, CeleryTask
 from ..celery.utils import get_celery_task_log_path
 from ..ansible.utils import get_ansible_task_log_path
@@ -109,9 +112,9 @@ class CeleryTaskViewSet(
         return CeleryTask.objects.exclude(name__startswith='celery')
 
 
-class CeleryTaskExecutionViewSet(CommonApiMixin, viewsets.ReadOnlyModelViewSet):
+class CeleryTaskExecutionViewSet(CommonApiMixin, viewsets.ModelViewSet):
     serializer_class = CeleryTaskExecutionSerializer
-    http_method_names = ('get', 'head', 'options',)
+    http_method_names = ('get', 'post', 'head', 'options',)
     queryset = CeleryTaskExecution.objects.all()
 
     def get_queryset(self):
@@ -120,3 +123,14 @@ class CeleryTaskExecutionViewSet(CommonApiMixin, viewsets.ReadOnlyModelViewSet):
             task = get_object_or_404(CeleryTask, id=task_id)
             self.queryset = self.queryset.filter(name=task.name)
         return self.queryset
+
+    def create(self, request, *args, **kwargs):
+        form_id = self.request.query_params.get('from', None)
+        if not form_id:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        execution = get_object_or_404(CeleryTaskExecution, id=form_id)
+        task = app.tasks.get(execution.name, None)
+        if not task:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        t = task.delay(*execution.args, **execution.kwargs)
+        return Response(status=status.HTTP_201_CREATED, data={'task_id': t.id})
