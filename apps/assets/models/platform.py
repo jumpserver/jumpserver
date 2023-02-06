@@ -68,7 +68,7 @@ class Platform(models.Model):
     """
 
     class CharsetChoices(models.TextChoices):
-        utf8 = 'utf8', 'UTF-8'
+        utf8 = 'utf-8', 'UTF-8'
         gbk = 'gbk', 'GBK'
 
     name = models.SlugField(verbose_name=_("Name"), unique=True, allow_unicode=True)
