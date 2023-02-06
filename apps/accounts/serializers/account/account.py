@@ -60,10 +60,11 @@ class AccountSerializerCreateMixin(
 
 class AccountAssetSerializer(serializers.ModelSerializer):
     platform = ObjectRelatedField(read_only=True)
+    category = serializers.CharField(source='platform.category', read_only=True)
 
     class Meta:
         model = Asset
-        fields = ['id', 'name', 'address', 'platform']
+        fields = ['id', 'name', 'address', 'category', 'platform']
 
     def to_internal_value(self, data):
         if isinstance(data, dict):
