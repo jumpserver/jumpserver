@@ -29,10 +29,31 @@ __all__ = [
 
 
 class AssetFilterSet(BaseFilterSet):
+    labels = django_filters.CharFilter(method='filter_labels')
+    platform = django_filters.CharFilter(method='filter_platform')
     type = django_filters.CharFilter(field_name="platform__type", lookup_expr="exact")
     category = django_filters.CharFilter(field_name="platform__category", lookup_expr="exact")
-    platform = django_filters.CharFilter(method='filter_platform')
-    labels = django_filters.CharFilter(method='filter_labels')
+    domain_enabled = django_filters.BooleanFilter(
+        field_name="platform__domain_enabled", lookup_expr="exact"
+    )
+    ping_enabled = django_filters.BooleanFilter(
+        field_name="platform__automation__ping_enabled", lookup_expr="exact"
+    )
+    gather_facts_enabled = django_filters.BooleanFilter(
+        field_name="platform__automation__gather_facts_enabled", lookup_expr="exact"
+    )
+    change_secret_enabled = django_filters.BooleanFilter(
+        field_name="platform__automation__change_secret_enabled", lookup_expr="exact"
+    )
+    push_account_enabled = django_filters.BooleanFilter(
+        field_name="platform__automation__push_account_enabled", lookup_expr="exact"
+    )
+    verify_account_enabled = django_filters.BooleanFilter(
+        field_name="platform__automation__verify_account_enabled", lookup_expr="exact"
+    )
+    gather_accounts_enabled = django_filters.BooleanFilter(
+        field_name="platform__automation__gather_accounts_enabled", lookup_expr="exact"
+    )
 
     class Meta:
         model = Asset
