@@ -5,6 +5,7 @@ from assets.models import Asset
 from accounts.const import SecretType, Source
 from accounts.models import Account, AccountTemplate
 from accounts.tasks import push_accounts_to_assets
+from assets.const import Category, AllTypes
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from common.serializers import SecretReadableMixin, BulkModelSerializer
 from .base import BaseAccountSerializer
@@ -60,11 +61,12 @@ class AccountSerializerCreateMixin(
 
 class AccountAssetSerializer(serializers.ModelSerializer):
     platform = ObjectRelatedField(read_only=True)
-    category = serializers.CharField(source='platform.category', read_only=True)
+    category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
+    type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
 
     class Meta:
         model = Asset
-        fields = ['id', 'name', 'address', 'category', 'platform']
+        fields = ['id', 'name', 'address', 'type', 'category', 'platform']
 
     def to_internal_value(self, data):
         if isinstance(data, dict):
