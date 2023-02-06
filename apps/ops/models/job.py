@@ -176,9 +176,7 @@ class JobExecution(JMSOrgBaseModel):
 
         shell = self.current_job.args
         if self.current_job.chdir:
-            if module == self.current_job.module:
-                shell += " path={}".format(self.current_job.chdir)
-            else:
+            if module == "shell":
                 shell += " chdir={}".format(self.current_job.chdir)
         if self.current_job.module in ['python']:
             shell += " executable={}".format(self.current_job.module)
