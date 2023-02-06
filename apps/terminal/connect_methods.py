@@ -64,6 +64,7 @@ class NativeClient(TextChoices):
             },
             Protocol.rdp: [cls.mstsc],
             Protocol.mysql: [cls.mysql],
+            Protocol.mariadb: [cls.mysql],
             Protocol.oracle: [cls.sqlplus],
             Protocol.postgresql: [cls.psql],
             Protocol.redis: [cls.redis],
