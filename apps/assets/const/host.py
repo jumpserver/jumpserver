@@ -71,7 +71,7 @@ class HostTypes(BaseType):
                 {'name': 'Linux'},
                 {
                     'name': GATEWAY_NAME,
-                    'domain_enabled': False,
+                    'domain_enabled': True,
                 }
             ],
             cls.UNIX: [
