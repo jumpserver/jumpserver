@@ -69,8 +69,8 @@ class RoleViewSet(JMSModelViewSet):
             role.users_amount = role_user_amount_mapper.get(role.id, 0)
         return queryset
 
-    def filter_queryset(self, queryset):
-        queryset = super().filter_queryset(queryset)
+    def page_queryset(self, queryset):
+        queryset = super().page_queryset(queryset)
         queryset = self.set_users_amount(queryset)
         return queryset
 
