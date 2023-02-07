@@ -87,7 +87,11 @@ class QuerySetMixin:
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if hasattr(self, 'action') and (self.action == 'list' or self.action == 'metadata'):
+        if not hasattr(self, 'action'):
+            return queryset
+        if self.action == 'metadata':
+            queryset = queryset.none()
+        if self.action in ['list', 'metadata']:
             serializer_class = self.get_serializer_class()
             if serializer_class and hasattr(serializer_class, 'setup_eager_loading'):
                 queryset = serializer_class.setup_eager_loading(queryset)

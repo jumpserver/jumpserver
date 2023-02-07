@@ -60,12 +60,6 @@ def on_request_finished_logging_db_query(sender, **kwargs):
         method = current_request.method
         path = current_request.get_full_path()
 
-    logger.debug(">>> [{}] {}".format(method, path))
-    for name, counter in counters:
-        logger.debug("Query {:3} times using {:.2f}s {}".format(
-            counter.counter, counter.time, name)
-        )
-
     # print(">>> [{}] {}".format(method, path))
     # for table_name, queries in table_queries.items():
     #     if table_name.startswith('rbac_') or table_name.startswith('auth_permission'):
@@ -76,6 +70,12 @@ def on_request_finished_logging_db_query(sender, **kwargs):
     #         if not sql or not sql.startswith('SELECT'):
     #             continue
     #         print('\t{}. {}'.format(i, sql))
+
+    logger.debug(">>> [{}] {}".format(method, path))
+    for name, counter in counters:
+        logger.debug("Query {:3} times using {:.2f}s {}".format(
+            counter.counter, counter.time, name)
+        )
 
     on_request_finished_release_local(sender, **kwargs)
 

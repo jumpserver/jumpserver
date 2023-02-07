@@ -18,7 +18,5 @@
           arch: "{{ ansible_architecture }}"
           kernel: "{{ ansible_kernel }}"
 
-
-
     - debug:
         var: info

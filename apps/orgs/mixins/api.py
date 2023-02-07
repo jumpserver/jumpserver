@@ -34,9 +34,6 @@ class OrgQuerySetMixin:
                     % self.__class__.__name__
             )
             queryset = super().get_queryset()
-
-        if hasattr(self, 'swagger_fake_view'):
-            return queryset.none()
         return queryset
 
 

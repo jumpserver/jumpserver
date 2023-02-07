@@ -92,12 +92,17 @@ class RBACPermission(permissions.DjangoModelPermissions):
 
         try:
             queryset = self._queryset(view)
-            model_cls = queryset.model
+            if isinstance(queryset, list) and queryset:
+                model_cls = queryset[0].__class__
+            else:
+                model_cls = queryset.model
         except AssertionError:
+            model_cls = None
+        except AttributeError:
             model_cls = None
         except Exception as e:
             logger.error('Error get model class: {} of {}'.format(e, view))
-            model_cls = None
+            raise e
         return model_cls
 
     def get_require_perms(self, request, view):
