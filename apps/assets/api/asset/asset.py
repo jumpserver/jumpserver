@@ -133,7 +133,8 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
 
     def create(self, request, *args, **kwargs):
         if request.path.find('/api/v1/assets/assets/') > -1:
-            return Response({'error': _('Cannot create asset directly, you should create a host or other')}, status=400)
+            error = _('Cannot create asset directly, you should create a host or other')
+            return Response({'error': error}, status=400)
         return super().create(request, *args, **kwargs)
 
 
