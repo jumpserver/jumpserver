@@ -6,14 +6,14 @@ from .account import AccountAssetSerializer
 from .base import BaseAccountSerializer
 
 
-class AccountSerializer(BulkOrgResourceModelSerializer):
+class GatheredAccountSerializer(BulkOrgResourceModelSerializer):
     asset = AccountAssetSerializer(label=_('Asset'))
 
     class Meta(BaseAccountSerializer.Meta):
         model = GatheredAccount
         fields = [
-            'present', 'asset', 'username',
-            'address_last_login', 'date_last_login'
+            'id', 'present', 'asset', 'username',
+            'date_updated', 'address_last_login', 'date_last_login'
         ]
 
     @classmethod
