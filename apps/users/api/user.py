@@ -2,27 +2,27 @@
 from collections import defaultdict
 
 from django.utils.translation import ugettext as _
-from rest_framework.decorators import action
 from rest_framework import generics
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 
 from common.api import CommonApiMixin
-from common.utils import get_logger
 from common.api import SuggestionMixin
+from common.utils import get_logger
 from orgs.utils import current_org, tmp_to_root_org
 from rbac.models import Role, RoleBinding
 from users.utils import LoginBlockUtil, MFABlockUtils
 from .mixins import UserQuerysetMixin
-from ..notifications import ResetMFAMsg
 from .. import serializers
+from ..filters import UserFilter
+from ..models import User
+from ..notifications import ResetMFAMsg
 from ..serializers import (
     UserSerializer,
     MiniUserSerializer, InviteSerializer
 )
-from ..models import User
 from ..signals import post_user_create
-from ..filters import UserFilter
 
 logger = get_logger(__name__)
 __all__ = [
@@ -53,13 +53,8 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
         return queryset
 
     def paginate_queryset(self, queryset):
-        page = super().paginate_queryset(queryset)
-
-        if page:
-            page = self.set_users_roles_for_cache(page)
-        else:
-            self.set_users_roles_for_cache(queryset)
-        return page
+        queryset = super().paginate_queryset(queryset) or queryset
+        return self.set_users_roles_for_cache(queryset)
 
     @action(methods=['get'], detail=False, url_path='suggestions')
     def match(self, request, *args, **kwargs):
