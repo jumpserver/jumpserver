@@ -30,10 +30,31 @@ __all__ = [
 
 
 class AssetFilterSet(BaseFilterSet):
+    labels = django_filters.CharFilter(method='filter_labels')
+    platform = django_filters.CharFilter(method='filter_platform')
     type = django_filters.CharFilter(field_name="platform__type", lookup_expr="exact")
     category = django_filters.CharFilter(field_name="platform__category", lookup_expr="exact")
-    platform = django_filters.CharFilter(method='filter_platform')
-    labels = django_filters.CharFilter(method='filter_labels')
+    domain_enabled = django_filters.BooleanFilter(
+        field_name="platform__domain_enabled", lookup_expr="exact"
+    )
+    ping_enabled = django_filters.BooleanFilter(
+        field_name="platform__automation__ping_enabled", lookup_expr="exact"
+    )
+    gather_facts_enabled = django_filters.BooleanFilter(
+        field_name="platform__automation__gather_facts_enabled", lookup_expr="exact"
+    )
+    change_secret_enabled = django_filters.BooleanFilter(
+        field_name="platform__automation__change_secret_enabled", lookup_expr="exact"
+    )
+    push_account_enabled = django_filters.BooleanFilter(
+        field_name="platform__automation__push_account_enabled", lookup_expr="exact"
+    )
+    verify_account_enabled = django_filters.BooleanFilter(
+        field_name="platform__automation__verify_account_enabled", lookup_expr="exact"
+    )
+    gather_accounts_enabled = django_filters.BooleanFilter(
+        field_name="platform__automation__gather_accounts_enabled", lookup_expr="exact"
+    )
 
     class Meta:
         model = Asset
@@ -73,11 +94,13 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
         ("platform", serializers.PlatformSerializer),
         ("suggestion", serializers.MiniAssetSerializer),
         ("gateways", serializers.GatewaySerializer),
+        ("spec_info", serializers.SpecSerializer)
     )
     rbac_perms = (
         ("match", "assets.match_asset"),
         ("platform", "assets.view_platform"),
         ("gateways", "assets.view_gateway"),
+        ("spec_info", "assets.view_asset"),
     )
     extra_filter_backends = [LabelFilterBackend, IpInFilterBackend, NodeFilterBackend]
 
@@ -95,6 +118,11 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
         serializer = super().get_serializer(instance=asset.platform)
         return Response(serializer.data)
 
+    @action(methods=["GET"], detail=True, url_path="spec-info")
+    def spec_info(self, *args, **kwargs):
+        asset = super().get_object()
+        return Response(asset.spec_info)
+
     @action(methods=["GET"], detail=True, url_path="gateways")
     def gateways(self, *args, **kwargs):
         asset = self.get_object()
@@ -103,6 +131,11 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
         else:
             gateways = asset.domain.gateways
         return self.get_paginated_response_from_queryset(gateways)
+
+    def create(self, request, *args, **kwargs):
+        if request.path.find('/api/v1/assets/assets/') > -1:
+            return Response({'error': _('Cannot create asset directly, you should create a host or other')}, status=400)
+        return super().create(request, *args, **kwargs)
 
 
 class AssetsTaskMixin:

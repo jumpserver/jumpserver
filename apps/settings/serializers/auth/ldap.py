@@ -15,7 +15,7 @@ class LDAPTestConfigSerializer(serializers.Serializer):
     AUTH_LDAP_BIND_PASSWORD = EncryptedField(required=False, allow_blank=True)
     AUTH_LDAP_SEARCH_OU = serializers.CharField()
     AUTH_LDAP_SEARCH_FILTER = serializers.CharField()
-    AUTH_LDAP_USER_ATTR_MAP = serializers.CharField()
+    AUTH_LDAP_USER_ATTR_MAP = serializers.JSONField()
     AUTH_LDAP_START_TLS = serializers.BooleanField(required=False)
     AUTH_LDAP = serializers.BooleanField(required=False)
 

@@ -19,13 +19,10 @@ class HostInfoSerializer(serializers.Serializer):
     cpu_vcpus = serializers.IntegerField(required=False, label=_('CPU vcpus'))
     memory = serializers.CharField(max_length=64, allow_blank=True, required=False, label=_('Memory'))
     disk_total = serializers.CharField(max_length=1024, allow_blank=True, required=False, label=_('Disk total'))
-    disk_info = serializers.CharField(max_length=1024, allow_blank=True, required=False, label=_('Disk info'))
 
-    os = serializers.CharField(max_length=128, allow_blank=True, required=False, label=_('OS'))
-    os_version = serializers.CharField(max_length=16,  allow_blank=True, required=False, label=_('OS version'))
-    os_arch = serializers.CharField(max_length=16, allow_blank=True, required=False, label=_('OS arch'))
-    hostname_raw = serializers.CharField(max_length=128, allow_blank=True, required=False, label=_('Hostname raw'))
-    number = serializers.CharField(max_length=128, allow_blank=True, required=False, label=_('Asset number'))
+    distribution = serializers.CharField(max_length=128, allow_blank=True, required=False, label=_('OS'))
+    distribution_version = serializers.CharField(max_length=16,  allow_blank=True, required=False, label=_('OS version'))
+    arch = serializers.CharField(max_length=16, allow_blank=True, required=False, label=_('OS arch'))
 
 
 class HostSerializer(AssetSerializer):

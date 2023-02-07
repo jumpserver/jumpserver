@@ -25,7 +25,7 @@ class TerminalViewSet(JMSBulkModelViewSet):
     queryset = Terminal.objects.filter(is_deleted=False)
     serializer_class = serializers.TerminalSerializer
     filterset_fields = ['name', 'remote_addr', 'type']
-    custom_filter_fields = ['status']
+    custom_filter_fields = ['load']
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -40,7 +40,7 @@ class TerminalViewSet(JMSBulkModelViewSet):
 
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
-        s = self.request.query_params.get('status')
+        s = self.request.query_params.get('load')
         if not s:
             return queryset
         filtered_queryset_id = [str(q.id) for q in queryset if q.load == s]

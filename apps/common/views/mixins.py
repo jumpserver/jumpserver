@@ -66,11 +66,11 @@ class RecordViewLogMixin:
 
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
-        resource = self.get_resource_display(request)
+        resource_display = self.get_resource_display(request)
         resource_type = self.model._meta.verbose_name
         create_or_update_operate_log(
             self.ACTION, resource_type, force=True,
-            resource=resource
+            resource_display=resource_display
         )
         return response
 
@@ -78,7 +78,6 @@ class RecordViewLogMixin:
         response = super().retrieve(request, *args, **kwargs)
         resource_type = self.model._meta.verbose_name
         create_or_update_operate_log(
-            self.ACTION, resource_type, force=True,
-            resource=self.get_object()
+            self.ACTION, resource_type, force=True, resource=self.get_object()
         )
         return response

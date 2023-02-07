@@ -3,18 +3,15 @@
 import json
 
 from django.conf import LazySettings
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save
 from django.db.utils import ProgrammingError, OperationalError
 from django.dispatch import receiver
 from django.utils.functional import LazyObject
-
-from jumpserver.utils import current_request
 
 from common.decorator import on_transaction_commit
 from common.signals import django_ready
 from common.utils import get_logger, ssh_key_gen
 from common.utils.connection import RedisPubSub
-
 from .models import Setting
 
 logger = get_logger(__file__)
@@ -56,19 +53,6 @@ def auto_generate_terminal_host_key(sender, **kwargs):
         Setting.objects.create(name='TERMINAL_HOST_KEY', value=value)
     except:
         pass
-
-
-@receiver(pre_save, dispatch_uid="my_unique_identifier")
-def on_create_set_created_by(sender, instance=None, **kwargs):
-    if getattr(instance, '_ignore_auto_created_by', False) is True:
-        return
-    if not hasattr(instance, 'created_by') or instance.created_by:
-        return
-    if current_request and current_request.user.is_authenticated:
-        user_name = current_request.user.name
-        if isinstance(user_name, str):
-            user_name = user_name[:30]
-        instance.created_by = user_name
 
 
 @receiver(django_ready)

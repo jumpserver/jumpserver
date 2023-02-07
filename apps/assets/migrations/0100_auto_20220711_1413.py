@@ -2,16 +2,15 @@
 
 import time
 from django.db import migrations
-from assets.models import Platform
 
 
-def migrate_accounts(apps, schema_editor):
+def migrate_asset_accounts(apps, schema_editor):
     auth_book_model = apps.get_model('assets', 'AuthBook')
     account_model = apps.get_model('accounts', 'Account')
 
     count = 0
     bulk_size = 1000
-    print("\n\tStart migrate accounts")
+    print("\n\tStart migrate asset accounts")
     while True:
         start = time.time()
         auth_books = auth_book_model.objects \
@@ -71,8 +70,73 @@ def migrate_accounts(apps, schema_editor):
                 accounts.append(account)
 
         account_model.objects.bulk_create(accounts, ignore_conflicts=True)
-        print("\t  - Create accounts: {}-{} using: {:.2f}s".format(
+        print("\t  - Create asset accounts: {}-{} using: {:.2f}s".format(
             count - len(auth_books), count, time.time() - start
+        ))
+
+
+def migrate_db_accounts(apps, schema_editor):
+    app_perm_model = apps.get_model('perms', 'ApplicationPermission')
+    account_model = apps.get_model('accounts', 'Account')
+    perms = app_perm_model.objects.filter(category__in=['db', 'cloud'])
+
+    same_attrs = [
+        'id', 'username', 'comment', 'date_created', 'date_updated',
+        'created_by', 'org_id',
+    ]
+    auth_attrs = ['password', 'private_key', 'token']
+    all_attrs = same_attrs + auth_attrs
+
+    print("\n\tStart migrate app accounts")
+
+    index = 0
+    total = perms.count()
+
+    for perm in perms:
+        index += 1
+        start = time.time()
+
+        system_users = perm.system_users.all()
+        accounts = []
+        for s in system_users:
+            values = {'version': 1}
+            values.update({attr: getattr(s, attr, '') for attr in all_attrs})
+            values['created_by'] = str(s.id)
+
+            auth_infos = []
+            username = values['username']
+            for attr in auth_attrs:
+                secret = values.pop(attr, None)
+                if not secret:
+                    continue
+
+                if attr == 'private_key':
+                    secret_type = 'ssh_key'
+                    name = f'{username}(ssh key)'
+                elif attr == 'token':
+                    secret_type = 'token'
+                    name = f'{username}(token)'
+                else:
+                    secret_type = attr
+                    name = username
+                auth_infos.append((name, secret_type, secret))
+
+            if not auth_infos:
+                auth_infos.append((username, 'password', ''))
+
+            for name, secret_type, secret in auth_infos:
+                account = account_model(**values, name=name, secret=secret, secret_type=secret_type)
+                accounts.append(account)
+
+        apps = perm.applications.all()
+        for app in apps:
+            for account in accounts:
+                setattr(account, 'asset_id', str(app.id))
+
+        account_model.objects.bulk_create(accounts, ignore_conflicts=True)
+
+        print("\t  - Progress ({}/{}), Create app accounts: {} using: {:.2f}s".format(
+            index, total, len(accounts), time.time() - start
         ))
 
 
@@ -83,5 +147,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(migrate_accounts),
+        migrations.RunPython(migrate_asset_accounts),
+        migrations.RunPython(migrate_db_accounts),
     ]

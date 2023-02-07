@@ -47,4 +47,9 @@ class Migration(migrations.Migration):
         migrations.RunPython(migrate_operate_log_after_before),
         migrations.RemoveField(model_name='operatelog', name='after', ),
         migrations.RemoveField(model_name='operatelog', name='before', ),
+        migrations.AlterField(
+            model_name='operatelog',
+            name='resource_id',
+            field=models.CharField(blank=True, db_index=True, default='', max_length=128, verbose_name='Resource'),
+        ),
     ]

@@ -12,7 +12,7 @@ from common.utils import get_logger
 from common.utils.connection import RedisPubSub
 from notifications.backends import BACKEND
 from users.models import User
-from .models import SiteMessage, SystemMsgSubscription, UserMsgSubscription
+from .models import MessageContent, SystemMsgSubscription, UserMsgSubscription
 from .notifications import SystemMessage
 
 logger = get_logger(__name__)
@@ -26,7 +26,7 @@ class NewSiteMsgSubPub(LazyObject):
 new_site_msg_chan = NewSiteMsgSubPub()
 
 
-@receiver(post_save, sender=SiteMessage)
+@receiver(post_save, sender=MessageContent)
 @on_transaction_commit
 def on_site_message_create(sender, instance, created, **kwargs):
     if not created:

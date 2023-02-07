@@ -20,6 +20,8 @@ class WebTypes(BaseType):
     def _get_automation_constrains(cls) -> dict:
         constrains = {
             '*': {
+                'ansible_enabled': False,
+                'ping_enabled': False,
                 'gather_facts_enabled': False,
                 'verify_account_enabled': False,
                 'change_secret_enabled': False,

@@ -86,7 +86,7 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         instance.reject(processor=request.user)
         return Response('ok')
 
-    @action(detail=True, methods=[PUT], permission_classes=[IsAssignee, ])
+    @action(detail=True, methods=[PUT], permission_classes=[IsAssignee | IsApplicant, ])
     def close(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.close()

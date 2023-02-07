@@ -5,8 +5,8 @@ from functools import partial
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.serializers.fields import EncryptedField, ObjectRelatedField, LabeledChoiceField
 from common.serializers import CommonBulkSerializerMixin
+from common.serializers.fields import EncryptedField, ObjectRelatedField, LabeledChoiceField
 from common.utils import pretty_string, get_logger
 from common.validators import PhoneValidator
 from rbac.builtin import BuiltinRole
@@ -25,23 +25,24 @@ __all__ = [
 logger = get_logger(__file__)
 
 
+def default_system_roles():
+    return [BuiltinRole.system_user.get_role()]
+
+
+def default_org_roles():
+    return [BuiltinRole.org_user.get_role()]
+
+
 class RolesSerializerMixin(serializers.Serializer):
     system_roles = ObjectRelatedField(
         queryset=Role.system_roles, attrs=('id', 'display_name'),
-        label=_("System roles"), many=True
+        label=_("System roles"), many=True, default=default_system_roles
     )
     org_roles = ObjectRelatedField(
         queryset=Role.org_roles, attrs=('id', 'display_name'),
-        label=_("Org roles"), many=True
+        label=_("Org roles"), many=True, required=False,
+        default=default_org_roles
     )
-
-    @staticmethod
-    def get_system_roles_display(user):
-        return user.system_roles.display
-
-    @staticmethod
-    def get_org_roles_display(user):
-        return user.org_roles.display
 
     def pop_roles_if_need(self, fields):
         request = self.context.get("request")
@@ -55,6 +56,7 @@ class RolesSerializerMixin(serializers.Serializer):
         action = view.action or "list"
         if action in ("partial_bulk_update", "bulk_update", "partial_update", "update"):
             action = "create"
+
         model_cls_field_mapper = {
             SystemRoleBinding: ["system_roles"],
             OrgRoleBinding: ["org_roles"],
@@ -94,11 +96,8 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         read_only=True
     )
     password = EncryptedField(
-        label=_("Password"),
-        required=False,
-        allow_blank=True,
-        allow_null=True,
-        max_length=1024,
+        label=_("Password"), required=False, allow_blank=True,
+        allow_null=True, max_length=1024,
     )
     custom_m2m_fields = {
         "system_roles": [BuiltinRole.system_user],
@@ -116,21 +115,23 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         # small 指的是 不需要计算的直接能从一张表中获取到的数据
         fields_small = fields_mini + fields_write_only + [
             "email", "wechat", "phone", "mfa_level", "source",
-            "need_update_password", "mfa_enabled",
+            "wecom_id", "dingtalk_id", "feishu_id",
+            "created_by", "updated_by", "comment",  # 通用字段
+        ]
+        fields_date = [
+            "date_expired", "date_joined",
+            "last_login", "date_updated"  # 日期字段
+        ]
+        fields_bool = [
             "is_service_account", "is_valid",
             "is_expired", "is_active",  # 布尔字段
             "is_otp_secret_key_bound", "can_public_key_auth",
-            "date_expired", "date_joined",
-            "last_login",  # 日期字段
-            "created_by", "comment",  # 通用字段
-            "wecom_id", "dingtalk_id", "feishu_id",
+            "mfa_enabled", "need_update_password",
         ]
         # 包含不太常用的字段，可以没有
-        fields_verbose = fields_small + [
-            "mfa_force_enabled",
-            "is_first_login",
-            "date_password_last_updated",
-            "avatar_url",
+        fields_verbose = fields_small + fields_date + fields_bool + [
+            "mfa_force_enabled", "is_first_login",
+            "date_password_last_updated", "avatar_url",
         ]
         # 外键的字段
         fields_fk = []
@@ -284,7 +285,6 @@ class ServiceAccountSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         from authentication.serializers import AccessKeySerializer
-
         self.fields["access_key"] = AccessKeySerializer(read_only=True)
 
     def get_username(self):

@@ -4,9 +4,9 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from common.validators import ProjectUniqueValidator
-from common.serializers import BulkSerializerMixin, CommonSerializerMixin, CommonModelSerializer, \
+from common.serializers import CommonModelSerializer, \
     CommonBulkModelSerializer
+from common.validators import ProjectUniqueValidator
 from ..utils import get_current_org_id_for_serializer
 
 __all__ = [

@@ -4,13 +4,13 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
+from accounts.models import Account
 from assets.const import Category, AllTypes
 from assets.models import Node, Asset, Platform
-from accounts.models import Account
 from assets.serializers.asset.common import AssetProtocolsSerializer
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
-from perms.serializers.permission import ActionChoicesField
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
+from perms.serializers.permission import ActionChoicesField
 
 __all__ = [
     'NodePermedSerializer', 'AssetPermedSerializer',
@@ -32,7 +32,7 @@ class AssetPermedSerializer(OrgResourceModelSerializerMixin):
             "id", "name", "address", 'domain', 'platform',
             "comment", "org_id", "is_active",
         ]
-        fields = only_fields + ['protocols', 'category', 'type', 'specific'] + ['org_name']
+        fields = only_fields + ['protocols', 'category', 'type', 'spec_info'] + ['org_name']
         read_only_fields = fields
 
 

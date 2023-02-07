@@ -27,5 +27,5 @@ class PlaybookSerializer(BulkOrgResourceModelSerializer):
         model = Playbook
         read_only_fields = ["id", "date_created", "date_updated"]
         fields = read_only_fields + [
-            "id", 'path', "name", "comment", "creator",
+            "id", 'path', "name", "comment", "creator", 'create_method', 'vcs_url',
         ]

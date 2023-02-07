@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.db.models import JMSBaseModel
 from common.utils import contains_ip
-from orgs.mixins.models import OrgModelMixin
+from orgs.mixins.models import OrgModelMixin, OrgManager
 
 __all__ = [
     'ACLManager',
@@ -67,6 +67,10 @@ class ACLManager(models.Manager):
         return self.get_queryset().valid()
 
 
+class OrgACLManager(OrgManager, ACLManager):
+    pass
+
+
 class BaseACL(JMSBaseModel):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     priority = models.IntegerField(
@@ -82,7 +86,7 @@ class BaseACL(JMSBaseModel):
     objects = ACLManager.from_queryset(BaseACLQuerySet)()
 
     class Meta:
-        ordering = ('priority', 'name')
+        ordering = ('priority', 'date_updated', 'name')
         abstract = True
 
     def is_action(self, action):
@@ -97,7 +101,7 @@ class UserAssetAccountBaseACL(BaseACL, OrgModelMixin):
     # username_group
     accounts = models.JSONField(verbose_name=_('Account'))
 
-    objects = ACLManager.from_queryset(UserAssetAccountACLQuerySet)()
+    objects = OrgACLManager.from_queryset(UserAssetAccountACLQuerySet)()
 
     class Meta(BaseACL.Meta):
         unique_together = ('name', 'org_id')

@@ -1,7 +1,7 @@
 from django.db.models import QuerySet
 
-from common.utils import get_logger
 from accounts.const import AutomationTypes, Connectivity
+from common.utils import get_logger
 from ..base.manager import PushOrVerifyHostCallbackMixin, AccountBasePlaybookManager
 
 logger = get_logger(__name__)
@@ -29,4 +29,4 @@ class VerifyAccountManager(PushOrVerifyHostCallbackMixin, AccountBasePlaybookMan
 
     def on_host_error(self, host, error, result):
         account = self.host_account_mapper.get(host)
-        account.set_connectivity(Connectivity.FAILED)
+        account.set_connectivity(Connectivity.ERR)

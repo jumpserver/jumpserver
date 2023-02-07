@@ -20,10 +20,10 @@ p {
             {% trans 'JumpServer Client, currently used to launch the client, now only support launch RDP SSH client, The Telnet client will next' %}
         </p>
         <ul>
-            <li> <a href="/download/JumpServer-Client-Installer-x86_64.msi">jumpserver-client-windows-x86_64.msi</a></li>
-            <li> <a href="/download/JumpServer-Client-Installer.dmg">jumpserver-client-darwin.dmg</a></li>
-            <li> <a href="/download/JumpServer-Client-Installer-amd64.run">jumpserver-client-linux-amd64.run</a></li>
-            <li> <a href="/download/JumpServer-Client-Installer-arm64.run">jumpserver-client-linux-arm64.run</a></li>
+            <li> <a href="/download/public/JumpServer-Client-Installer-x86_64.msi">jumpserver-client-windows-x86_64.msi</a></li>
+            <li> <a href="/download/public/JumpServer-Client-Installer.dmg">jumpserver-client-darwin.dmg</a></li>
+            <li> <a href="/download/public/JumpServer-Client-Installer-amd64.run">jumpserver-client-linux-amd64.run</a></li>
+            <li> <a href="/download/public/JumpServer-Client-Installer-arm64.run">jumpserver-client-linux-arm64.run</a></li>
         </ul>
     </div>
 
@@ -33,7 +33,7 @@ p {
             {% trans 'macOS needs to download the client to connect RDP asset, which comes with Windows' %}
         </p>
         <ul>
-            <li><a href="/download/Microsoft_Remote_Desktop_10.6.7_installer.pkg">microsoft-remote-desktop-installer.pkg</a></li>
+            <li><a href="/download/public/Microsoft_Remote_Desktop_10.6.7_installer.pkg">microsoft-remote-desktop-installer.pkg</a></li>
         </ul>
     </div>
 
@@ -42,22 +42,16 @@ p {
             <h2>{% trans 'Windows Remote application publisher tools' %}</h2>
                 <p>{% trans 'OpenSSH is a program used to connect remote applications in the Windows Remote Application Publisher' %}</p>
                 <ul>
-                    <li><a href="/download/OpenSSH-Win64.msi">openSSH-win64.msi</a></li>
+                    <li><a href="/download/public/OpenSSH-Win64.msi">openSSH-win64.msi</a></li>
                 </ul>
-            {% if XPACK_ENABLED  %}
-                <p>{% trans 'Jmservisor is the program used to pull up remote applications in Windows Remote Application publisher' %}</p>
-                <ul>
-                    <li><a href="/download/Jmservisor.msi">jmservisor.msi</a></li>
-                </ul>
-            {% endif %}
         </div>
 
 
     <div class="group">
         <h2>JumpServer {% trans 'Offline video player' %} v0.1.5</h2>
         <ul>
-            <li><a href="/download/JumpServer-Video-Player.dmg">jumpserver-video-player.dmg</a></li>
-            <li><a href="/download/JumpServer-Video-Player.exe">jumpserver-video-player.exe</a></li>
+            <li><a href="/download/public/JumpServer-Video-Player.dmg">jumpserver-video-player.dmg</a></li>
+            <li><a href="/download/public/JumpServer-Video-Player.exe">jumpserver-video-player.exe</a></li>
         </ul>
     </div>
 

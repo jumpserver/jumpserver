@@ -2,6 +2,7 @@
 
 import django.db
 from django.db import migrations, models
+import common.db.fields
 
 
 def migrate_to_host(apps, schema_editor):
@@ -71,12 +72,18 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelOptions(
             name='asset',
-            options={'ordering': ['name'],
-                     'permissions': [('refresh_assethardwareinfo', 'Can refresh asset hardware info'),
-                                     ('test_assetconnectivity', 'Can test asset connectivity'),
-                                     ('push_assetsystemuser', 'Can push system user to asset'),
-                                     ('match_asset', 'Can match asset'), ('add_assettonode', 'Add asset to node'),
-                                     ('move_assettonode', 'Move asset to node')], 'verbose_name': 'Asset'},
+            options={
+                'ordering': ['name'],
+                'permissions': [
+                    ('refresh_assethardwareinfo', 'Can refresh asset hardware info'),
+                    ('test_assetconnectivity', 'Can test asset connectivity'),
+                    ('push_assetaccount', 'Can push account to asset'),
+                    ('test_account', 'Can verify account'), ('match_asset', 'Can match asset'),
+                    ('add_assettonode', 'Add asset to node'),
+                    ('move_assettonode', 'Move asset to node')
+                ],
+                'verbose_name': 'Asset'
+            },
         ),
         migrations.RenameField(
             model_name='asset',
@@ -114,9 +121,9 @@ class Migration(migrations.Migration):
                                       primary_key=True, serialize=False, to='assets.asset')),
                 ('db_name', models.CharField(blank=True, max_length=1024, verbose_name='Database')),
                 ('allow_invalid_cert', models.BooleanField(default=False, verbose_name='Allow invalid cert')),
-                ('ca_cert', models.TextField(blank=True, verbose_name='CA cert')),
-                ('client_cert', models.TextField(blank=True, verbose_name='Client cert')),
-                ('client_key', models.TextField(blank=True, verbose_name='Client key'),),
+                ('ca_cert', common.db.fields.EncryptTextField(blank=True, verbose_name='CA cert')),
+                ('client_cert', common.db.fields.EncryptTextField(blank=True, verbose_name='Client cert')),
+                ('client_key', common.db.fields.EncryptTextField(blank=True, verbose_name='Client key'),),
                 ('use_ssl', models.BooleanField(default=False, verbose_name='Use SSL'),),
             ],
             options={

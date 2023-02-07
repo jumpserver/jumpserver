@@ -3,8 +3,6 @@ from django.conf import settings
 from django.utils.functional import LazyObject
 
 from common.utils import get_logger
-from .command.serializers import SessionCommandSerializer
-
 
 logger = get_logger(__file__)
 

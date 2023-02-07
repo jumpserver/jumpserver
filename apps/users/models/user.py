@@ -718,9 +718,8 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         default=date_expired_default, blank=True, null=True,
         db_index=True, verbose_name=_('Date expired')
     )
-    created_by = models.CharField(
-        max_length=30, default='', blank=True, verbose_name=_('Created by')
-    )
+    created_by = models.CharField(max_length=30, default='', blank=True, verbose_name=_('Created by'))
+    updated_by = models.CharField(max_length=30, default='', blank=True, verbose_name=_('Updated by'))
     source = models.CharField(
         max_length=30, default=Source.local,
         choices=Source.choices,
@@ -733,6 +732,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     need_update_password = models.BooleanField(
         default=False, verbose_name=_('Need update password')
     )
+    date_updated = models.DateTimeField(auto_now=True, verbose_name=_('Date updated'))
     wecom_id = models.CharField(null=True, default=None, unique=True, max_length=128, verbose_name=_('WeCom'))
     dingtalk_id = models.CharField(null=True, default=None, unique=True, max_length=128, verbose_name=_('DingTalk'))
     feishu_id = models.CharField(null=True, default=None, unique=True, max_length=128, verbose_name=_('FeiShu'))

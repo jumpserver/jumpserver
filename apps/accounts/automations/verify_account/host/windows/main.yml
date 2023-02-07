@@ -1,5 +1,5 @@
 - hosts: windows
-  gather_facts: yes
+  gather_facts: no
   tasks:
     - name: Verify account
       ansible.windows.win_ping:

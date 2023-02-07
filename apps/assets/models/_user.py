@@ -17,7 +17,23 @@ __all__ = ['SystemUser']
 logger = logging.getLogger(__name__)
 
 
-class SystemUser(OrgModelMixin):
+class OldBaseUser(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    name = models.CharField(max_length=128, verbose_name=_('Name'))
+    username = models.CharField(max_length=128, blank=True, verbose_name=_('Username'), db_index=True)
+    password = fields.EncryptCharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
+    private_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH private key'))
+    public_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH public key'))
+    comment = models.TextField(blank=True, verbose_name=_('Comment'))
+    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
+    date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
+    created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
+
+    class Meta:
+        abstract = True
+
+
+class SystemUser(OrgModelMixin, OldBaseUser):
     LOGIN_AUTO = 'auto'
     LOGIN_MANUAL = 'manual'
     LOGIN_MODE_CHOICES = (
@@ -29,19 +45,7 @@ class SystemUser(OrgModelMixin):
         common = 'common', _('Common user')
         admin = 'admin', _('Admin user')
 
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    name = models.CharField(max_length=128, verbose_name=_('Name'))
-    username = models.CharField(max_length=128, blank=True, verbose_name=_('Username'), db_index=True)
-    password = fields.EncryptCharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
-    private_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH private key'))
-    public_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH public key'))
     token = models.TextField(default='', verbose_name=_('Token'))
-
-    comment = models.TextField(blank=True, verbose_name=_('Comment'))
-    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
-    date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
-    created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
-
     username_same_with_user = models.BooleanField(default=False, verbose_name=_("Username same with user"))
     type = models.CharField(max_length=16, choices=Type.choices, default=Type.common, verbose_name=_('Type'))
     priority = models.IntegerField(default=81, verbose_name=_("Priority"), help_text=_("1-100, the lower the value will be match first"), validators=[MinValueValidator(1), MaxValueValidator(100)])
@@ -66,3 +70,26 @@ class SystemUser(OrgModelMixin):
         permissions = [
             ('match_systemuser', _('Can match system user')),
         ]
+
+
+# Deprecated: 准备废弃
+class AdminUser(OrgModelMixin, OldBaseUser):
+    """
+    A privileged user that ansible can use it to push system user and so on
+    """
+    BECOME_METHOD_CHOICES = (
+        ('sudo', 'sudo'),
+        ('su', 'su'),
+    )
+    become = models.BooleanField(default=True)
+    become_method = models.CharField(choices=BECOME_METHOD_CHOICES, default='sudo', max_length=4)
+    become_user = models.CharField(default='root', max_length=64)
+    _become_pass = models.CharField(default='', blank=True, max_length=128)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name']
+        unique_together = [('name', 'org_id')]
+        verbose_name = _("Admin user")

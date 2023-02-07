@@ -1,12 +1,12 @@
 import socket
-import paramiko
 
+import paramiko
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import get_logger
-from assets.models import Gateway
 from assets.const import AutomationTypes, Connectivity
+from assets.models import Gateway
+from common.utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -33,7 +33,7 @@ class PingGatewayManager:
             err = _('No account')
             return False, err
 
-        logger.debug('Test account: {}'.format(account))
+        print('Test account: {}'.format(account))
         try:
             proxy.connect(
                 gateway.address,
@@ -91,7 +91,7 @@ class PingGatewayManager:
 
     @staticmethod
     def on_host_success(gateway, account):
-        logger.info('\033[32m {} -> {}\033[0m\n'.format(gateway, account))
+        print('\033[32m {} -> {}\033[0m\n'.format(gateway, account))
         gateway.set_connectivity(Connectivity.OK)
         if not account:
             return
@@ -99,15 +99,15 @@ class PingGatewayManager:
 
     @staticmethod
     def on_host_error(gateway, account, error):
-        logger.info('\033[31m {} -> {} 原因: {} \033[0m\n'.format(gateway, account, error))
-        gateway.set_connectivity(Connectivity.FAILED)
+        print('\033[31m {} -> {} 原因: {} \033[0m\n'.format(gateway, account, error))
+        gateway.set_connectivity(Connectivity.ERR)
         if not account:
             return
-        account.set_connectivity(Connectivity.FAILED)
+        account.set_connectivity(Connectivity.ERR)
 
     @staticmethod
     def before_runner_start():
-        logger.info(">>> 开始执行测试网关可连接性任务")
+        print(">>> 开始执行测试网关可连接性任务")
 
     def get_accounts(self, gateway):
         account = gateway.select_account

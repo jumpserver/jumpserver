@@ -1,14 +1,13 @@
 from django.db.models import Count
 from django.utils.translation import ugettext as _
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 
 from common.api import JMSModelViewSet
-from common.api import PaginatedResponseMixin
-from ..filters import RoleFilter
-from ..serializers import RoleSerializer, RoleUserSerializer
-from ..models import Role, SystemRole, OrgRole
 from .permission import PermissionViewSet
+from ..filters import RoleFilter
+from ..models import Role, SystemRole, OrgRole
+from ..serializers import RoleSerializer, RoleUserSerializer
 
 __all__ = [
     'RoleViewSet', 'SystemRoleViewSet', 'OrgRoleViewSet',
@@ -18,6 +17,7 @@ __all__ = [
 
 class RoleViewSet(JMSModelViewSet):
     queryset = Role.objects.all()
+    ordering = ('-builtin', 'scope', 'name')
     serializer_classes = {
         'default': RoleSerializer,
         'users': RoleUserSerializer,
@@ -52,7 +52,7 @@ class RoleViewSet(JMSModelViewSet):
         clone = Role.objects.filter(id=clone_from).first()
         if not clone:
             return
-        instance.permissions.set(clone.permissions.all())
+        instance.permissions.set(clone.get_permissions())
 
     def perform_update(self, serializer):
         instance = serializer.instance
@@ -62,8 +62,7 @@ class RoleViewSet(JMSModelViewSet):
         return super().perform_update(serializer)
 
     def get_queryset(self):
-        queryset = super().get_queryset() \
-            .annotate(permissions_amount=Count('permissions'))
+        queryset = super().get_queryset().annotate(permissions_amount=Count('permissions'))
         return queryset
 
     @action(methods=['GET'], detail=True)

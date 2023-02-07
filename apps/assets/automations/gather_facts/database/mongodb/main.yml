@@ -10,7 +10,12 @@
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
-        login_database: "{{ jms_asset.specific.db_name }}"
+        login_database: "{{ jms_asset.spec_info.db_name }}"
+        ssl: "{{ jms_asset.spec_info.use_ssl }}"
+        ssl_ca_certs: "{{ jms_asset.secret_info.ca_cert }}"
+        ssl_certfile: "{{ jms_asset.secret_info.client_key }}"
+        connection_options:
+          - tlsAllowInvalidHostnames: "{{ jms_asset.spec_info.allow_invalid_cert}}"
       register: db_info
 
     - name: Define info by set_fact

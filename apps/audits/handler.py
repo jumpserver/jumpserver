@@ -131,7 +131,7 @@ class OperatorLogHandler(metaclass=Singleton):
         return before, after
 
     def create_or_update_operate_log(
-            self, action, resource_type, resource=None,
+            self, action, resource_type, resource=None, resource_display=None,
             force=False, log_id=None, before=None, after=None,
             object_name=None
     ):
@@ -140,7 +140,9 @@ class OperatorLogHandler(metaclass=Singleton):
             return
 
         remote_addr = get_request_ip(current_request)
-        resource_display = self.get_resource_display(resource)
+        if resource_display is None:
+            resource_display = self.get_resource_display(resource)
+        resource_id = getattr(resource, 'pk', '')
         before, after = self.data_processing(before, after)
         if not force and not any([before, after]):
             # 前后都没变化，没必要生成日志，除非手动强制保存
@@ -148,9 +150,10 @@ class OperatorLogHandler(metaclass=Singleton):
 
         data = {
             'id': log_id, "user": str(user), 'action': action,
-            'resource_type': str(resource_type), 'resource': resource_display,
+            'resource_type': str(resource_type),
+            'resource_id': resource_id, 'resource': resource_display,
             'remote_addr': remote_addr, 'before': before, 'after': after,
-            'org_id': get_current_org_id(), 'resource_id': str(resource.id)
+            'org_id': get_current_org_id(),
         }
         with transaction.atomic():
             if self.log_client.ping(timeout=1):
