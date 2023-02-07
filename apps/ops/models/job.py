@@ -84,8 +84,15 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     def inventory(self):
         return JMSInventory(self.assets.all(), self.runas_policy, self.runas)
 
+    @property
+    def material(self):
+        if self.type == 'adhoc':
+            return "{}:{}".format(self.module, self.args)
+        if self.type == 'playbook':
+            return "{}:{}:{}".format(self.org.name, self.creator.name, self.playbook.name)
+
     def create_execution(self):
-        return self.executions.create(job_version=self.version)
+        return self.executions.create(job_version=self.version, material=self.material, job_type=Types[self.type].label)
 
     class Meta:
         verbose_name = _("Job")
@@ -106,18 +113,15 @@ class JobExecution(JMSOrgBaseModel):
     date_start = models.DateTimeField(null=True, verbose_name=_('Date start'), db_index=True)
     date_finished = models.DateTimeField(null=True, verbose_name=_("Date finished"))
 
+    material = models.CharField(max_length=1024, default='', verbose_name=_('Material'), null=True, blank=True)
+    job_type = models.CharField(max_length=128, choices=Types.choices, default=Types.adhoc,
+                                verbose_name=_("Material Type"))
+
     @property
     def current_job(self):
         if self.job.version != self.job_version:
             return self.job.get_history(self.job_version)
         return self.job
-
-    @property
-    def material(self):
-        if self.current_job.type == 'adhoc':
-            return "{}:{}".format(self.current_job.module, self.current_job.args)
-        if self.current_job.type == 'playbook':
-            return "{}:{}:{}".format(self.org.name, self.current_job.creator.name, self.current_job.playbook.name)
 
     @property
     def assent_result_detail(self):
@@ -157,10 +161,6 @@ class JobExecution(JMSOrgBaseModel):
                     asset_detail["tasks"].append(task_detail)
             result["detail"].append(asset_detail)
         return result
-
-    @property
-    def job_type(self):
-        return Types[self.job.type].label
 
     def compile_shell(self):
         if self.current_job.type != 'adhoc':
