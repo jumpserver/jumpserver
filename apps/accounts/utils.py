@@ -20,7 +20,8 @@ class SecretGenerator:
         return private_key
 
     def generate_password(self):
-        length = int(self.password_rules.get('length', DEFAULT_PASSWORD_RULES['length']))
+        length = int(self.password_rules.get('length', 0))
+        length = length if length else DEFAULT_PASSWORD_RULES['length']
         return random_string(length, special_char=True)
 
     def get_secret(self):
