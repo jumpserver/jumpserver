@@ -1,4 +1,4 @@
-from collections import Iterable, defaultdict
+from collections import Iterable, defaultdict, OrderedDict
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import NOT_PROVIDED
@@ -8,8 +8,8 @@ from rest_framework.fields import SkipField, empty
 from rest_framework.settings import api_settings
 from rest_framework.utils import html
 
-from common.serializers.fields import EncryptedField
-from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
+from common.db.fields import EncryptMixin
+from common.serializers.fields import EncryptedField, LabeledChoiceField, ObjectRelatedField
 
 __all__ = [
     'BulkSerializerMixin', 'BulkListSerializerMixin',
@@ -268,6 +268,7 @@ class DefaultValueFieldsMixin:
         if not hasattr(self.Meta, 'model'):
             return
         model = self.Meta.model
+
         for name, serializer_field in self.fields.items():
             if serializer_field.default != empty or serializer_field.required:
                 continue
@@ -335,21 +336,37 @@ class SomeFieldsMixin:
             return value
         return default
 
+    @staticmethod
+    def order_fields(fields):
+        bool_fields = []
+        datetime_fields = []
+        other_fields = []
+
+        for name, field in fields.items():
+            to_add = (name, field)
+            if isinstance(field, serializers.BooleanField):
+                bool_fields.append(to_add)
+            elif isinstance(field, serializers.DateTimeField):
+                datetime_fields.append(to_add)
+            else:
+                other_fields.append(to_add)
+        _fields = [*other_fields, *bool_fields, *datetime_fields]
+        fields = OrderedDict()
+        for name, field in _fields:
+            fields[name] = field
+        return fields
+
     def get_fields(self):
         fields = super().get_fields()
+        fields = self.order_fields(fields)
+        secret_readable = isinstance(self, SecretReadableMixin)
+
         for name, field in fields.items():
             if name == 'id':
                 field.label = 'ID'
-            elif name in self.secret_fields and \
-                    not isinstance(self, SecretReadableMixin):
+            elif isinstance(field, EncryptMixin) and not secret_readable:
                 field.write_only = True
         return fields
-
-    def get_field_names(self, declared_fields, info):
-        names = super().get_field_names(declared_fields, info)
-        common_names = [i for i in self.common_fields if i in names]
-        primary_names = [i for i in names if i not in self.common_fields]
-        return primary_names + common_names
 
 
 class CommonSerializerMixin(DynamicFieldsMixin, RelatedModelSerializerMixin,

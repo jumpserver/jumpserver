@@ -2,11 +2,10 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.utils import validate_ssh_public_key
 from common.serializers.fields import EncryptedField, LabeledChoiceField
-from ..models import User
-
+from common.utils import validate_ssh_public_key
 from .user import UserSerializer
+from ..models import User
 
 
 class UserOrgSerializer(serializers.Serializer):
@@ -116,7 +115,6 @@ class UserProfileSerializer(UserSerializer):
         (0, _('Disable')),
         (1, _('Enable')),
     )
-
     public_key_comment = serializers.CharField(
         source='get_public_key_comment', required=False, read_only=True, max_length=128
     )

@@ -330,7 +330,7 @@ class RoleMixin:
     id: str
     _org_roles = None
     _system_roles = None
-    PERM_CACHE_KEY = 'USER_PERMS_{}_{}'
+    PERM_CACHE_KEY = 'USER_PERMS_ROLES_{}_{}'
     _is_superuser = None
     _update_superuser = False
 
@@ -347,13 +347,36 @@ class RoleMixin:
         return SystemRoleManager(self)
 
     @lazyproperty
-    def perms(self):
+    def console_orgs(self):
+        return self.cached_role_and_perms['console_orgs']
+
+    @lazyproperty
+    def audit_orgs(self):
+        return self.cached_role_and_perms['audit_orgs']
+
+    @lazyproperty
+    def workbench_orgs(self):
+        return self.cached_role_and_perms['workbench_orgs']
+
+    @lazyproperty
+    def cached_role_and_perms(self):
+        from rbac.models import RoleBinding
+
         key = self.PERM_CACHE_KEY.format(self.id, current_org.id)
-        perms = cache.get(key)
-        if not perms or settings.DEBUG:
-            perms = self.get_all_permissions()
-            cache.set(key, perms, 3600)
-        return perms
+        data = cache.get(key)
+        if data:
+            return data
+
+        data = {
+            'console_orgs': RoleBinding.get_user_has_the_perm_orgs('rbac.view_console', self),
+            'audit_orgs': RoleBinding.get_user_has_the_perm_orgs('rbac.view_audit', self),
+            'workbench_orgs': RoleBinding.get_user_has_the_perm_orgs('rbac.view_workbench', self),
+            'org_roles': self.org_roles.all(),
+            'system_roles': self.system_roles.all(),
+            'perms': self.get_all_permissions(),
+        }
+        cache.set(key, data, 60 * 60)
+        return data
 
     def expire_rbac_perms_cache(self):
         key = self.PERM_CACHE_KEY.format(self.id, '*')
@@ -363,6 +386,10 @@ class RoleMixin:
     def expire_users_rbac_perms_cache(cls):
         key = cls.PERM_CACHE_KEY.format('*', '*')
         cache.delete_pattern(key)
+
+    @lazyproperty
+    def perms(self):
+        return self.cached_role_and_perms['perms']
 
     @property
     def is_superuser(self):
@@ -747,27 +774,11 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         return self.user_msg_subscription.receive_backends
 
     @property
-    def is_wecom_bound(self):
-        return bool(self.wecom_id)
-
-    @property
-    def is_dingtalk_bound(self):
-        return bool(self.dingtalk_id)
-
-    @property
-    def is_feishu_bound(self):
-        return bool(self.feishu_id)
-
-    @property
     def is_otp_secret_key_bound(self):
         return bool(self.otp_secret_key)
 
     def get_absolute_url(self):
         return reverse('users:user-detail', args=(self.id,))
-
-    @property
-    def groups_display(self):
-        return ' '.join([group.name for group in self.groups.all()])
 
     @property
     def source_display(self):
@@ -808,7 +819,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         oauth2 = self.Source.oauth2
         return self.source not in [cas, saml2, oauth2]
 
-    def set_unprovide_attr_if_need(self):
+    def set_required_attr_if_need(self):
         if not self.name:
             self.name = self.username
         if not self.email or '@' not in self.email:
@@ -818,7 +829,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
             self.email = email
 
     def save(self, *args, **kwargs):
-        self.set_unprovide_attr_if_need()
+        self.set_required_attr_if_need()
         if self.username == 'admin':
             self.role = 'Admin'
             self.is_active = True
@@ -879,21 +890,6 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         if not settings.ONLY_ALLOW_AUTH_FROM_SOURCE:
             return None
         return self.SOURCE_BACKEND_MAPPING.get(self.source, [])
-
-    @lazyproperty
-    def console_orgs(self):
-        from rbac.models import RoleBinding
-        return RoleBinding.get_user_has_the_perm_orgs('rbac.view_console', self)
-
-    @lazyproperty
-    def audit_orgs(self):
-        from rbac.models import RoleBinding
-        return RoleBinding.get_user_has_the_perm_orgs('rbac.view_audit', self)
-
-    @lazyproperty
-    def workbench_orgs(self):
-        from rbac.models import RoleBinding
-        return RoleBinding.get_user_has_the_perm_orgs('rbac.view_workbench', self)
 
     class Meta:
         ordering = ['username']
