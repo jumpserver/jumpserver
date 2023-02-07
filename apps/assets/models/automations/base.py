@@ -76,7 +76,7 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
     def executed_amount(self):
         return self.executions.count()
 
-    def execute(self, trigger=Trigger.manual):
+    def execute(self, trigger=Trigger.manual, **kwargs):
         try:
             eid = current_task.request.id
         except AttributeError:
@@ -86,7 +86,7 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
             id=eid, trigger=trigger, automation=self,
             snapshot=self.to_attr_json(),
         )
-        return execution.start()
+        return execution.start(**kwargs)
 
 
 class AssetBaseAutomation(BaseAutomation):
@@ -140,7 +140,7 @@ class AutomationExecution(OrgModelMixin):
             return {}
         return recipients
 
-    def start(self):
+    def start(self, **kwargs):
         from assets.automations.endpoint import ExecutionManager
         manager = ExecutionManager(execution=self)
-        return manager.run()
+        return manager.run(**kwargs)

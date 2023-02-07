@@ -5,11 +5,14 @@ from itertools import chain
 
 from django.http import HttpResponse
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
+from audits.const import ActivityChoices
 from settings.serializers import SettingsSerializer
 from common.utils import validate_ip, get_ip_city, get_logger
 from common.db import fields
 from .const import DEFAULT_CITY
+from .signals import post_activity_log
 
 
 logger = get_logger(__name__)
@@ -44,7 +47,19 @@ def write_login_log(*args, **kwargs):
     else:
         city = get_ip_city(ip) or DEFAULT_CITY
     kwargs.update({'ip': ip, 'city': city})
-    UserLoginLog.objects.create(**kwargs)
+    user_id = kwargs.pop('user_id', None)
+    audit_log = UserLoginLog.objects.create(**kwargs)
+
+    # 发送Activity信号
+    if user_id is not None:
+        login_status = _('Success') if audit_log.status else _('Failed')
+        detail = _('User {} login into this service.[{}]').format(
+            audit_log.username, login_status
+        )
+        post_activity_log.send(
+            sender=UserLoginLog, resource_id=user_id, detail=detail,
+            type=ActivityChoices.login_log
+        )
 
 
 def get_resource_display(resource):

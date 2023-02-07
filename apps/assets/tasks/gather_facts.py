@@ -17,7 +17,7 @@ __all__ = [
 ]
 
 
-def update_fact_util(assets=None, nodes=None, task_name=None):
+def update_fact_util(assets=None, nodes=None, task_name=None, **kwargs):
     from assets.models import GatherFactsAutomation
     if task_name is None:
         task_name = gettext_noop("Update some assets hardware info. ")
@@ -30,16 +30,16 @@ def update_fact_util(assets=None, nodes=None, task_name=None):
         'nodes': [str(node.id) for node in nodes],
     }
     tp = AutomationTypes.gather_facts
-    automation_execute_start(task_name, tp, child_snapshot)
+    automation_execute_start(task_name, tp, child_snapshot, **kwargs)
 
 
 @org_aware_func('assets')
-def update_assets_fact_util(assets=None, task_name=None):
+def update_assets_fact_util(assets=None, task_name=None, **kwargs):
     if assets is None:
         logger.info("No assets to update hardware info")
         return
 
-    update_fact_util(assets=assets, task_name=task_name)
+    update_fact_util(assets=assets, task_name=task_name, **kwargs)
 
 
 @org_aware_func('nodes')
@@ -51,11 +51,11 @@ def update_nodes_fact_util(nodes=None, task_name=None):
 
 
 @shared_task(queue="ansible", verbose_name=_('Manually update the hardware information of assets'))
-def update_assets_hardware_info_manual(asset_ids):
+def update_assets_hardware_info_manual(asset_ids, **kwargs):
     from assets.models import Asset
     assets = Asset.objects.filter(id__in=asset_ids)
     task_name = gettext_noop("Update assets hardware info: ")
-    update_assets_fact_util(assets=assets, task_name=task_name)
+    update_assets_fact_util(assets=assets, task_name=task_name, **kwargs)
 
 
 @shared_task(queue="ansible", verbose_name=_('Manually update the hardware information of assets under a node'))

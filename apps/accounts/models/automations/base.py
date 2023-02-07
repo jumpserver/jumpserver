@@ -35,7 +35,7 @@ class AutomationExecution(AssetAutomationExecution):
             ('add_pushaccountexecution', _('Can add push account execution')),
         ]
 
-    def start(self):
+    def start(self, **kwargs):
         from accounts.automations.endpoint import ExecutionManager
         manager = ExecutionManager(execution=self)
-        return manager.run()
+        return manager.run(**kwargs)

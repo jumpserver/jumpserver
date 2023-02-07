@@ -5,7 +5,7 @@ from assets.tasks.common import generate_data
 from common.const.choices import Trigger
 
 
-def automation_execute_start(task_name, tp, child_snapshot=None):
+def automation_execute_start(task_name, tp, child_snapshot=None, **kwargs):
     from accounts.models import AutomationExecution
     data = generate_data(task_name, tp, child_snapshot)
 
@@ -19,4 +19,4 @@ def automation_execute_start(task_name, tp, child_snapshot=None):
     execution = AutomationExecution.objects.create(
         trigger=Trigger.manual, **data
     )
-    execution.start()
+    execution.start(**kwargs)

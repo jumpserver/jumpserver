@@ -7,7 +7,7 @@ from celery import shared_task
 from ops.celery.decorator import (
     register_as_period_task
 )
-from .models import UserLoginLog, OperateLog, FTPLog
+from .models import UserLoginLog, OperateLog, FTPLog, ActivityLog
 from common.utils import get_log_keep_day
 
 
@@ -23,6 +23,13 @@ def clean_operation_log_period():
     days = get_log_keep_day('OPERATE_LOG_KEEP_DAYS')
     expired_day = now - datetime.timedelta(days=days)
     OperateLog.objects.filter(datetime__lt=expired_day).delete()
+
+
+def clean_activity_log_period():
+    now = timezone.now()
+    days = get_log_keep_day('ACTIVITY_LOG_KEEP_DAYS')
+    expired_day = now - datetime.timedelta(days=days)
+    ActivityLog.objects.filter(datetime__lt=expired_day).delete()
 
 
 def clean_ftp_log_period():

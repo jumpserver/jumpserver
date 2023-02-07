@@ -10,6 +10,9 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from assets.automations.methods import platform_automation_methods
+from audits.signals import post_activity_log
+from audits.const import ActivityChoices
+from common.utils import reverse
 from common.utils import get_logger, lazyproperty
 from common.utils import ssh_pubkey_gen, ssh_key_string_to_obj
 from ops.ansible import JMSInventory, PlaybookRunner, DefaultCallback
@@ -118,7 +121,22 @@ class BasePlaybookManager:
             yaml.safe_dump(plays, f)
         return sub_playbook_path
 
-    def get_runners(self):
+    def send_activity(self, assets, **kwargs):
+        user = kwargs.pop('user', _('Unknown'))
+        task_type = self.method_type().label
+        detail = 'User %s performs a task(%s) for this resource.' % (
+                     user, task_type
+                 )
+        detail_url = reverse(
+            'ops:celery-task-log', kwargs={'pk': self.execution.id}
+        )
+        for a in assets:
+            post_activity_log.send(
+                sender=self, resource_id=a.id, detail=detail,
+                detail_url=detail_url, type=ActivityChoices.task
+            )
+
+    def get_runners(self, **kwargs):
         runners = []
         for platform, assets in self.get_assets_group_by_platform().items():
             assets_bulked = [assets[i:i + self.bulk_size] for i in range(0, len(assets), self.bulk_size)]
@@ -137,6 +155,7 @@ class BasePlaybookManager:
                     callback=PlaybookCallback(),
                 )
                 runners.append(runer)
+            self.send_activity(assets, **kwargs)
         return runners
 
     def on_host_success(self, host, result):
@@ -166,7 +185,7 @@ class BasePlaybookManager:
         pass
 
     def run(self, *args, **kwargs):
-        runners = self.get_runners()
+        runners = self.get_runners(user=kwargs.pop('user'))
         if len(runners) > 1:
             print("### 分批次执行开始任务, 总共 {}\n".format(len(runners)))
         else:

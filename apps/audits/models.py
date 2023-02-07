@@ -12,6 +12,7 @@ from orgs.utils import current_org
 from .const import (
     OperateChoices,
     ActionChoices,
+    ActivityChoices,
     LoginTypeChoices,
     MFAChoices,
     LoginStatusChoices,
@@ -20,6 +21,7 @@ from .const import (
 __all__ = [
     "FTPLog",
     "OperateLog",
+    "ActivityLog",
     "PasswordChangeLog",
     "UserLoginLog",
 ]
@@ -59,7 +61,6 @@ class OperateLog(OrgModelMixin):
     remote_addr = models.CharField(max_length=128, verbose_name=_("Remote addr"), blank=True, null=True)
     datetime = models.DateTimeField(auto_now=True, verbose_name=_('Datetime'), db_index=True)
     diff = models.JSONField(default=dict, encoder=ModelJSONFieldEncoder, null=True)
-    detail = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Detail'))
 
     def __str__(self):
         return "<{}> {} <{}>".format(self.user, self.action, self.resource)
@@ -91,6 +92,34 @@ class OperateLog(OrgModelMixin):
     class Meta:
         verbose_name = _("Operate log")
         ordering = ('-datetime',)
+
+
+class ActivityLog(OrgModelMixin):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    type = models.CharField(
+        choices=ActivityChoices.choices, max_length=2,
+        null=True, default=None, verbose_name=_("Activity type"),
+    )
+    resource_id = models.CharField(
+        max_length=36, blank=True, default='',
+        db_index=True, verbose_name=_("Resource")
+    )
+    datetime = models.DateTimeField(
+        auto_now=True, verbose_name=_('Datetime'), db_index=True
+    )
+    detail = models.TextField(default='', blank=True, verbose_name=_('Detail'))
+    detail_url = models.CharField(
+        max_length=256, default=None, null=True, verbose_name=_('Detail url')
+    )
+
+    class Meta:
+        verbose_name = _("Activity log")
+        ordering = ('-datetime',)
+
+    def save(self, *args, **kwargs):
+        if current_org.is_root() and not self.org_id:
+            self.org_id = Organization.ROOT_ID
+        return super(ActivityLog, self).save(*args, **kwargs)
 
 
 class PasswordChangeLog(models.Model):

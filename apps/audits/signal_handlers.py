@@ -18,6 +18,7 @@ from audits.handler import (
     get_instance_current_with_cache_diff, cache_instance_before_data,
     create_or_update_operate_log, get_instance_dict_from_cache
 )
+from audits.models import ActivityLog
 from audits.utils import model_to_dict_for_operate_log as model_to_dict
 from authentication.signals import post_auth_failed, post_auth_success
 from authentication.utils import check_different_city_login_if_need
@@ -34,6 +35,8 @@ from users.signals import post_user_change_password
 from . import models, serializers
 from .const import MODELS_NEED_RECORD, ActionChoices
 from .utils import write_login_log
+from .signals import post_activity_log
+
 
 logger = get_logger(__name__)
 sys_logger = get_syslogger(__name__)
@@ -242,7 +245,7 @@ def get_login_backend(request):
     return backend_label
 
 
-def generate_data(username, request, login_type=None):
+def generate_data(username, request, login_type=None, user_id=None):
     user_agent = request.META.get('HTTP_USER_AGENT', '')
     login_ip = get_request_ip(request) or '0.0.0.0'
 
@@ -255,6 +258,7 @@ def generate_data(username, request, login_type=None):
         backend = str(get_login_backend(request))
 
     data = {
+        'user_id': user_id,
         'username': username,
         'ip': login_ip,
         'type': login_type,
@@ -269,7 +273,9 @@ def generate_data(username, request, login_type=None):
 def on_user_auth_success(sender, user, request, login_type=None, **kwargs):
     logger.debug('User login success: {}'.format(user.username))
     check_different_city_login_if_need(user, request)
-    data = generate_data(user.username, request, login_type=login_type)
+    data = generate_data(
+        user.username, request, login_type=login_type, user_id=user.id
+    )
     request.session['login_time'] = data['datetime'].strftime("%Y-%m-%d %H:%M:%S")
     data.update({'mfa': int(user.mfa_enabled), 'status': True})
     write_login_log(**data)
@@ -286,8 +292,8 @@ def on_user_auth_failed(sender, username, request, reason='', **kwargs):
 @receiver(django_ready)
 def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
     exclude_apps = {
-        'django_cas_ng', 'captcha', 'admin', 'jms_oidc_rp',
-        'django_celery_beat', 'contenttypes', 'sessions', 'auth'
+        'django_cas_ng', 'captcha', 'admin', 'jms_oidc_rp', 'audits',
+        'django_celery_beat', 'contenttypes', 'sessions', 'auth',
     }
     exclude_models = {
         'UserPasswordHistory', 'ContentType',
@@ -302,7 +308,6 @@ def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
         'PermedAsset', 'PermedAccount', 'MenuPermission',
         'Permission', 'TicketSession', 'ApplyLoginTicket',
         'ApplyCommandTicket', 'ApplyLoginAssetTicket',
-        'FTPLog', 'OperateLog', 'PasswordChangeLog'
     }
     for i, app in enumerate(apps.get_models(), 1):
         app_name = app._meta.app_label
@@ -312,3 +317,11 @@ def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
                 model_name.endswith('Execution'):
             continue
         MODELS_NEED_RECORD.add(model_name)
+
+
+@receiver(post_activity_log)
+def on_activity_log_trigger(sender, **kwargs):
+    ActivityLog.objects.create(
+        resource_id=kwargs['resource_id'],
+        detail=kwargs.get('detail'), detail_url=kwargs.get('detail_url')
+    )

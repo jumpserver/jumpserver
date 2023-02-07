@@ -15,6 +15,8 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from audits.signals import post_activity_log
+from audits.const import ActivityChoices
 from common.const.http import GET
 from common.drf.filters import DatetimeRangeFilter
 from common.drf.renders import PassthroughRenderer
@@ -120,10 +122,30 @@ class SessionViewSet(OrgBulkModelViewSet):
             queryset = queryset.select_for_update()
         return queryset
 
+    @staticmethod
+    def send_activity(serializer):
+        # 发送Activity信号
+        data = serializer.validated_data
+        user, asset_id = data['user'], data["asset_id"]
+        account, login_from = data['account'], data["login_from"]
+        login_from = Session(login_from=login_from).get_login_from_display()
+        detail = _(
+            '{} used account[{}], login method[{}] login the asset.'
+        ).format(
+            user, account, login_from
+        )
+        post_activity_log.send(
+            sender=Session, resource_id=asset_id, detail=detail,
+            type=ActivityChoices.session_log
+        )
+
     def perform_create(self, serializer):
         if hasattr(self.request.user, 'terminal'):
             serializer.validated_data["terminal"] = self.request.user.terminal
-        return super().perform_create(serializer)
+
+        resp = super().perform_create(serializer)
+        self.send_activity(serializer)
+        return resp
 
 
 class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
