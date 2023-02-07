@@ -6,7 +6,7 @@ from django.db import models
 from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _
 
-from common.utils import validate_ip, get_ip_city, get_logger
+from common.utils import validate_ip, get_ip_city, get_logger, reverse
 from audits.const import ActivityChoices
 from settings.serializers import SettingsSerializer
 from .const import DEFAULT_CITY
@@ -53,8 +53,13 @@ def write_login_log(*args, **kwargs):
         detail = _('User {} login into this service.[{}]').format(
             audit_log.username, login_status
         )
+        detail_url = '%s?id=%s' % (
+            reverse('api-audits:login-log-list', api_to_ui=True, is_audit=True,),
+            audit_log.id
+        )
         post_activity_log.send(
-            sender=UserLoginLog, resource_id=user_id, detail=detail,
+            sender=UserLoginLog, resource_id=user_id,
+            detail=detail, detail_url=detail_url,
             type=ActivityChoices.login_log
         )
 

@@ -259,6 +259,10 @@ def generate_data(username, request, login_type=None, user_id=None):
     with translation.override('en'):
         backend = str(get_login_backend(request))
 
+    if user_id is None:
+        user = User.objects.filter(username=username).first()
+        user_id = getattr(user, 'id', None)
+
     data = {
         'user_id': user_id,
         'username': username,

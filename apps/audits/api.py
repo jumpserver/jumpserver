@@ -49,8 +49,8 @@ class UserLoginCommonMixin:
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
     ]
-    filterset_fields = ['username', 'ip', 'city', 'type', 'status', 'mfa']
-    search_fields = ['username', 'ip', 'city']
+    filterset_fields = ['id', 'username', 'ip', 'city', 'type', 'status', 'mfa']
+    search_fields = ['id', 'username', 'ip', 'city']
 
 
 class UserLoginLogViewSet(UserLoginCommonMixin, ListModelMixin, JMSGenericViewSet):
