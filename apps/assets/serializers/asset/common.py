@@ -34,8 +34,10 @@ class AssetLabelSerializer(serializers.ModelSerializer):
         model = Label
         fields = ['id', 'name', 'value']
         extra_kwargs = {
+            # 取消默认唯一键的校验
+            'id': {'validators': []},
             'name': {'required': False},
-            'value': {'required': False}
+            'value': {'required': False},
         }
 
 
