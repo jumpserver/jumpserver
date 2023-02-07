@@ -1,8 +1,7 @@
-from django.utils.translation import ugettext_lazy as _
-
-from common.utils import get_logger
-from accounts.const import AutomationTypes, Source
 from orgs.utils import tmp_to_org
+from common.utils import get_logger
+from accounts.models import GatheredAccount
+from accounts.const import AutomationTypes, Source
 from .filter import GatherAccountsFilter
 from ..base.manager import AccountBasePlaybookManager
 
@@ -28,32 +27,24 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         return result
 
     @staticmethod
-    def bulk_create_accounts(asset, result):
-        account_objs = []
-        account_model = asset.accounts.model
-        account_usernames = set(asset.accounts.values_list('username', flat=True))
+    def update_or_create_gathered_accounts(asset, result):
         with tmp_to_org(asset.org_id):
-            accounts_dict = {}
+            GatheredAccount.objects.filter(asset=asset, present=True).update(present=False)
             for username, data in result.items():
-                comment = ''
-                d = {'asset': asset, 'username': username, 'name': username, 'source': Source.COLLECTED}
+                d = {'asset': asset, 'username': username, 'present': True}
                 if data.get('date'):
-                    comment += f"{_('Date last login')}: {data['date']}\n "
+                    d['date_last_login'] = data['date']
                 if data.get('address'):
-                    comment += f"{_('IP last login')}: {data['address'][:32]}"
-                d['comment'] = comment
-                accounts_dict[username] = d
-            for username, data in accounts_dict.items():
-                if username in account_usernames:
-                    continue
-                account_objs.append(account_model(**data))
-            account_model.objects.bulk_create(account_objs)
+                    d['address_last_login'] = data['address'][:32]
+                GatheredAccount.objects.update_or_create(
+                    defaults=d, asset=asset, username=username,
+                )
 
     def on_host_success(self, host, result):
         info = result.get('debug', {}).get('res', {}).get('info', {})
         asset = self.host_asset_mapper.get(host)
         if asset and info:
             result = self.filter_success_result(asset.type, info)
-            self.bulk_create_accounts(asset, result)
+            self.update_or_create_gathered_accounts(asset, result)
         else:
             logger.error("Not found info".format(host))
