@@ -47,7 +47,7 @@ class AccountSerializerCreateValidateMixin:
 
     def create(self, validated_data):
         push_now = validated_data.pop('push_now', None)
-        instance = super().create(validated_data, push_now)
+        instance = super().create(validated_data)
         self.push_account(instance, push_now)
         return instance
 
