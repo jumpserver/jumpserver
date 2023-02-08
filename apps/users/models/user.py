@@ -331,6 +331,7 @@ class RoleMixin:
     _org_roles = None
     _system_roles = None
     PERM_CACHE_KEY = 'USER_PERMS_ROLES_{}_{}'
+    PERM_ORG_KEY = 'USER_PERMS_ORG_{}'
     _is_superuser = None
     _update_superuser = False
 
@@ -348,29 +349,39 @@ class RoleMixin:
 
     @lazyproperty
     def console_orgs(self):
-        return self.cached_role_and_perms['console_orgs']
+        return self.cached_orgs['console_orgs']
 
     @lazyproperty
     def audit_orgs(self):
-        return self.cached_role_and_perms['audit_orgs']
+        return self.cached_orgs['audit_orgs']
 
     @lazyproperty
     def workbench_orgs(self):
-        return self.cached_role_and_perms['workbench_orgs']
+        return self.cached_orgs['workbench_orgs']
+
+    @lazyproperty
+    def cached_orgs(self):
+        from rbac.models import RoleBinding
+        key = self.PERM_ORG_KEY.format(self.id)
+        data = cache.get(key)
+        if data:
+            return data
+        data = {
+            'console_orgs': RoleBinding.get_user_has_the_perm_orgs('rbac.view_console', self),
+            'audit_orgs': RoleBinding.get_user_has_the_perm_orgs('rbac.view_audit', self),
+            'workbench_orgs': RoleBinding.get_user_has_the_perm_orgs('rbac.view_workbench', self),
+        }
+        cache.set(key, data, 60 * 60)
+        return data
 
     @lazyproperty
     def cached_role_and_perms(self):
-        from rbac.models import RoleBinding
-
         key = self.PERM_CACHE_KEY.format(self.id, current_org.id)
         data = cache.get(key)
         if data:
             return data
 
         data = {
-            'console_orgs': RoleBinding.get_user_has_the_perm_orgs('rbac.view_console', self),
-            'audit_orgs': RoleBinding.get_user_has_the_perm_orgs('rbac.view_audit', self),
-            'workbench_orgs': RoleBinding.get_user_has_the_perm_orgs('rbac.view_workbench', self),
             'org_roles': self.org_roles.all(),
             'system_roles': self.system_roles.all(),
             'perms': self.get_all_permissions(),
@@ -381,10 +392,14 @@ class RoleMixin:
     def expire_rbac_perms_cache(self):
         key = self.PERM_CACHE_KEY.format(self.id, '*')
         cache.delete_pattern(key)
+        key = self.PERM_ORG_KEY.format(self.id)
+        cache.delete(key)
 
     @classmethod
     def expire_users_rbac_perms_cache(cls):
         key = cls.PERM_CACHE_KEY.format('*', '*')
+        cache.delete_pattern(key)
+        key = cls.PERM_ORG_KEY.format('*')
         cache.delete_pattern(key)
 
     @lazyproperty
