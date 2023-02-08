@@ -17,7 +17,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         label=_("Input secret"), max_length=40960, required=False, allow_blank=True
     )
     from_ticket_info = serializers.SerializerMethodField(label=_("Ticket info"))
-    actions = ActionChoicesField()
+    actions = ActionChoicesField(read_only=True, label=_("Actions"))
 
     class Meta:
         model = ConnectionToken
