@@ -2,8 +2,7 @@
 #
 import django_filters
 from django.db.models import Q
-from django.utils.translation import ugettext_lazy as _
-from rest_framework.request import Request
+from django.utils.translation import gettext as _
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -139,21 +138,14 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
 
 
 class AssetsTaskMixin:
-    request: Request
-
     def perform_assets_task(self, serializer):
         data = serializer.validated_data
         assets = data.get("assets", [])
         asset_ids = [asset.id for asset in assets]
-        user = self.request.user
         if data["action"] == "refresh":
-            task = update_assets_hardware_info_manual.delay(
-                asset_ids, user=user
-            )
+            task = update_assets_hardware_info_manual.delay(asset_ids)
         else:
-            task = test_assets_connectivity_manual.delay(
-                asset_ids, user=user
-            )
+            task = test_assets_connectivity_manual.delay(asset_ids)
         return task
 
     def perform_create(self, serializer):

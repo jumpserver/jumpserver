@@ -9,7 +9,7 @@ logger = get_logger(__file__)
 
 
 @shared_task(queue='ansible', verbose_name=_('Account execute automation'))
-def execute_automation(pid, trigger, tp, **kwargs):
+def execute_automation(pid, trigger, tp):
     model = AutomationTypes.get_type_model(tp)
     with tmp_to_root_org():
         instance = get_object_or_none(model, pk=pid)
@@ -17,4 +17,4 @@ def execute_automation(pid, trigger, tp, **kwargs):
         logger.error("No automation task found: {}".format(pid))
         return
     with tmp_to_org(instance.org):
-        instance.execute(trigger, **kwargs)
+        instance.execute(trigger)

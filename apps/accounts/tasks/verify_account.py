@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-def verify_connectivity_util(assets, tp, accounts, task_name, **kwargs):
+def verify_connectivity_util(assets, tp, accounts, task_name):
     if not assets or not accounts:
         return
     account_usernames = list(accounts.values_list('username', flat=True))
@@ -22,30 +22,28 @@ def verify_connectivity_util(assets, tp, accounts, task_name, **kwargs):
         'accounts': account_usernames,
         'assets': [str(asset.id) for asset in assets],
     }
-    automation_execute_start(task_name, tp, child_snapshot, **kwargs)
+    automation_execute_start(task_name, tp, child_snapshot)
 
 
 @org_aware_func("assets")
-def verify_accounts_connectivity_util(accounts, assets, task_name, **kwargs):
+def verify_accounts_connectivity_util(accounts, assets, task_name):
     gateway_assets = assets.filter(platform__name=GATEWAY_NAME)
     verify_connectivity_util(
-        gateway_assets, AutomationTypes.verify_gateway_account,
-        accounts, task_name, **kwargs
+        gateway_assets, AutomationTypes.verify_gateway_account, accounts, task_name
     )
 
     non_gateway_assets = assets.exclude(platform__name=GATEWAY_NAME)
     verify_connectivity_util(
-        non_gateway_assets, AutomationTypes.verify_account,
-        accounts, task_name, **kwargs
+        non_gateway_assets, AutomationTypes.verify_account, accounts, task_name
     )
 
 
 @shared_task(queue="ansible", verbose_name=_('Verify asset account availability'))
-def verify_accounts_connectivity(account_ids, asset_ids, **kwargs):
+def verify_accounts_connectivity(account_ids, asset_ids):
     from assets.models import Asset
     from accounts.models import Account, VerifyAccountAutomation
     assets = Asset.objects.filter(id__in=asset_ids)
     accounts = Account.objects.filter(id__in=account_ids)
     task_name = gettext_noop("Verify accounts connectivity")
     task_name = VerifyAccountAutomation.generate_unique_name(task_name)
-    return verify_accounts_connectivity_util(accounts, assets, task_name, **kwargs)
+    return verify_accounts_connectivity_util(accounts, assets, task_name)

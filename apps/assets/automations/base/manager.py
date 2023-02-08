@@ -147,7 +147,7 @@ class BasePlaybookManager:
             yaml.safe_dump(plays, f)
         return sub_playbook_path
 
-    def get_runners(self, **kwargs):
+    def get_runners(self):
         runners = []
         for platform, assets in self.get_assets_group_by_platform().items():
             assets_bulked = [assets[i:i + self.bulk_size] for i in range(0, len(assets), self.bulk_size)]
@@ -195,7 +195,7 @@ class BasePlaybookManager:
         pass
 
     def run(self, *args, **kwargs):
-        runners = self.get_runners(user=kwargs.pop('user', None))
+        runners = self.get_runners()
         if len(runners) > 1:
             print("### 分批次执行开始任务, 总共 {}\n".format(len(runners)))
         else:

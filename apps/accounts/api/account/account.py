@@ -53,9 +53,7 @@ class AccountViewSet(OrgBulkModelViewSet):
         account = super().get_object()
         account_ids = [account.id]
         asset_ids = [account.asset_id]
-        task = verify_accounts_connectivity.delay(
-            account_ids, asset_ids, user=request.user
-        )
+        task = verify_accounts_connectivity.delay(account_ids, asset_ids)
         return Response(data={'task': task.id})
 
 

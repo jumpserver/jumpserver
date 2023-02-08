@@ -110,7 +110,6 @@ class AutomationExecutionViewSet(
         serializer.is_valid(raise_exception=True)
         automation = serializer.validated_data.get('automation')
         task = execute_automation.delay(
-            pid=automation.pk, trigger=Trigger.manual,
-            tp=self.tp, user=request.user
+            pid=automation.pk, trigger=Trigger.manual, tp=self.tp
         )
         return Response({'task': task.id}, status=status.HTTP_201_CREATED)

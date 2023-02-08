@@ -29,7 +29,7 @@ def generate_data(task_name, tp, child_snapshot=None):
     return {'id': eid, 'snapshot': snapshot}
 
 
-def automation_execute_start(task_name, tp, child_snapshot=None, **kwargs):
+def automation_execute_start(task_name, tp, child_snapshot=None):
     from assets.models import AutomationExecution
     data = generate_data(task_name, tp, child_snapshot)
 
@@ -43,4 +43,4 @@ def automation_execute_start(task_name, tp, child_snapshot=None, **kwargs):
     execution = AutomationExecution.objects.create(
         trigger=Trigger.manual, **data
     )
-    execution.start(**kwargs)
+    execution.start()
