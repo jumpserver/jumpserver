@@ -11,12 +11,13 @@
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         login_db: "{{ jms_asset.spec_info.db_name }}"
-      register: db_info
+      register: result
+      failed_when: not result.is_available
 
     - name: Display PostgreSQL version
       debug:
-        var: db_info.server_version.full
-      when: db_info is succeeded
+        var: result.server_version.full
+      when: result is succeeded
 
     - name: Change PostgreSQL password
       community.postgresql.postgresql_user:
@@ -27,7 +28,7 @@
         db: "{{ jms_asset.spec_info.db_name }}"
         name: "{{ account.username }}"
         password: "{{ account.secret }}"
-      when: db_info is succeeded
+      when: result is succeeded
       register: change_info
 
     - name: Verify password
@@ -38,5 +39,7 @@
         login_port: "{{ jms_asset.port }}"
         db: "{{ jms_asset.spec_info.db_name }}"
       when:
-        - db_info is succeeded
+        - result is succeeded
         - change_info is succeeded
+      register: result
+      failed_when: not result.is_available

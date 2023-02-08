@@ -3,6 +3,7 @@
   vars:
     ansible_python_interpreter: /usr/local/bin/python
 
+
   tasks:
     - name: Verify account
       community.postgresql.postgresql_ping:
@@ -11,3 +12,5 @@
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         db: "{{ jms_asset.spec_info.db_name }}"
+      register: result
+      failed_when: not result.is_available
