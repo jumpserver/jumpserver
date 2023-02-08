@@ -77,14 +77,17 @@ def wait_pid(pid):
             break
 
 
-class DictObj:
-    def __init__(self, in_dict: dict):
-        assert isinstance(in_dict, dict)
-        for key, val in in_dict.items():
+class DictObj(dict):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for key, val in self.items():
             if isinstance(val, (list, tuple)):
                 setattr(self, key, [DictObj(x) if isinstance(x, dict) else x for x in val])
             else:
                 setattr(self, key, DictObj(val) if isinstance(val, dict) else val)
+
+    def __getattr__(self, item):
+        return self.get(item, None)
 
 
 class User(DictObj):
@@ -151,11 +154,32 @@ class Account(DictObj):
     secret_type: LabelValue
 
 
+class ProtocolSetting(DictObj):
+    autofill: str
+    username_selector: str
+    password_selector: str
+    submit_selector: str
+    script: list[Step]
+
+
+class PlatformProtocolSetting(DictObj):
+    name: str
+    port: int
+    setting: ProtocolSetting
+
+
 class Platform(DictObj):
     id: str
     name: str
     charset: LabelValue
     type: LabelValue
+    protocols: list[PlatformProtocolSetting]
+
+    def get_protocol_setting(self, protocol):
+        for item in self.protocols:
+            if item.name == protocol:
+                return item.setting
+        return None
 
 
 class Manifest(DictObj):
