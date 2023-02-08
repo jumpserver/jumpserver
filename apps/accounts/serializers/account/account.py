@@ -39,11 +39,22 @@ class AccountSerializerCreateValidateMixin:
         attrs = super().validate(attrs)
         return self.set_secret(attrs)
 
+    @staticmethod
+    def push_account(instance, push_now):
+        if not push_now:
+            return
+        push_accounts_to_assets.delay([instance.id], [instance.asset_id])
+
     def create(self, validated_data):
         push_now = validated_data.pop('push_now', None)
-        instance = super().create(validated_data)
-        if push_now:
-            push_accounts_to_assets.delay([instance.id], [instance.asset_id])
+        instance = super().create(validated_data, push_now)
+        self.push_account(instance, push_now)
+        return instance
+
+    def update(self, instance, validated_data):
+        push_now = validated_data.pop('push_now', None)
+        instance = super().update(instance, validated_data)
+        self.push_account(instance, push_now)
         return instance
 
 

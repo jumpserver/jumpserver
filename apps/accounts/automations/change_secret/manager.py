@@ -153,6 +153,11 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         logger.error("Change secret error: ", e)
 
     def run(self, *args, **kwargs):
+        if self.secret_strategy == SecretStrategy.custom \
+                and not self.execution.snapshot['secret']:
+            print('Custom secret is empty')
+            return
+
         super().run(*args, **kwargs)
         recorders = self.name_recorder_mapper.values()
         recorders = list(recorders)
