@@ -33,17 +33,11 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             'ssh_key_change_strategy', SSHKeyStrategy.add
         )
         self.snapshot_account_usernames = self.execution.snapshot['accounts']
-        self._password_generated = None
-        self._ssh_key_generated = None
         self.name_recorder_mapper = {}  # 做个映射，方便后面处理
 
     @classmethod
     def method_type(cls):
         return AutomationTypes.change_secret
-
-    @lazyproperty
-    def related_accounts(self):
-        pass
 
     def get_kwargs(self, account, secret):
         kwargs = {}
@@ -152,12 +146,16 @@ class ChangeSecretManager(AccountBasePlaybookManager):
     def on_runner_failed(self, runner, e):
         logger.error("Change secret error: ", e)
 
-    def run(self, *args, **kwargs):
+    def check_secret(self):
         if self.secret_strategy == SecretStrategy.custom \
                 and not self.execution.snapshot['secret']:
             print('Custom secret is empty')
-            return
+            return False
+        return True
 
+    def run(self, *args, **kwargs):
+        if not self.check_secret():
+            return
         super().run(*args, **kwargs)
         recorders = self.name_recorder_mapper.values()
         recorders = list(recorders)
