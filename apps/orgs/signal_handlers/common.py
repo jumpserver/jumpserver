@@ -10,7 +10,7 @@ from django.dispatch import receiver
 from django.utils.functional import LazyObject
 
 from common.const.signals import PRE_REMOVE, POST_REMOVE
-from common.decorator import on_transaction_commit
+from common.decorators import on_transaction_commit
 from common.signals import django_ready
 from common.utils import get_logger
 from common.utils.connection import RedisPubSub

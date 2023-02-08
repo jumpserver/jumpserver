@@ -2,9 +2,8 @@ from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 
 from assets.models import Asset
-from common.decorator import on_transaction_commit
+from common.decorators import on_transaction_commit
 from common.utils import get_logger
-from .automations.push_account.manager import PushAccountManager
 from .models import Account
 
 logger = get_logger(__name__)

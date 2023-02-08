@@ -4,27 +4,25 @@ from collections import defaultdict
 from django.conf import settings
 from django.core.cache import cache
 
-from users.models import User
 from assets.models import Asset
 from assets.utils import NodeAssetsUtil
+from common.db.models import output_as_string
+from common.decorators import on_transaction_commit
+from common.utils import get_logger
+from common.utils.common import lazyproperty, timeit
 from orgs.models import Organization
 from orgs.utils import (
     current_org,
     tmp_to_org,
     tmp_to_root_org
 )
-from common.decorator import on_transaction_commit
-from common.utils import get_logger
-from common.utils.common import lazyproperty, timeit
-from common.db.models import output_as_string
-
 from perms.locks import UserGrantedTreeRebuildLock
 from perms.models import (
     AssetPermission,
     UserAssetGrantedTreeNodeRelation,
     PermNode
 )
-
+from users.models import User
 from .permission import AssetPermissionUtil
 
 logger = get_logger(__name__)
@@ -78,7 +76,7 @@ class UserPermTreeRefreshUtil(_UserPermTreeCacheMixin):
             end = time.time()
             logger.info(
                 'Refresh user [{user}] org [{org}] perm tree, user {use_time:.2f}s'
-                ''.format(user=self.user, org=org, use_time=end-start)
+                ''.format(user=self.user, org=org, use_time=end - start)
             )
 
     def _clean_user_perm_tree_for_legacy_org(self):
@@ -315,9 +313,9 @@ class UserPermTreeBuildUtil(object):
         asset_node_pairs = Asset.nodes.through.objects \
             .filter(asset_id__in=self.direct_asset_ids) \
             .annotate(
-                str_asset_id=output_as_string('asset_id'),
-                str_node_id=output_as_string('node_id')
-            ).values_list('str_asset_id', 'str_node_id')
+            str_asset_id=output_as_string('asset_id'),
+            str_node_id=output_as_string('node_id')
+        ).values_list('str_asset_id', 'str_node_id')
         asset_node_pairs = list(asset_node_pairs)
         return asset_node_pairs
 

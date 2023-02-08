@@ -8,7 +8,7 @@ from django.db.utils import ProgrammingError, OperationalError
 from django.dispatch import receiver
 from django.utils.functional import LazyObject
 
-from common.decorator import on_transaction_commit
+from common.decorators import on_transaction_commit
 from common.signals import django_ready
 from common.utils import get_logger, ssh_key_gen
 from common.utils.connection import RedisPubSub

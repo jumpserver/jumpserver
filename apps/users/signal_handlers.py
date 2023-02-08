@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
 #
-from django.dispatch import receiver
-from django_auth_ldap.backend import populate_user
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django_cas_ng.signals import cas_user_authenticated
 from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django_auth_ldap.backend import populate_user
+from django_cas_ng.signals import cas_user_authenticated
 
+from authentication.backends.oauth2.signals import oauth2_create_or_update_user
 from authentication.backends.oidc.signals import openid_create_or_update_user
 from authentication.backends.saml2.signals import saml2_create_or_update_user
-from authentication.backends.oauth2.signals import oauth2_create_or_update_user
+from common.decorators import on_transaction_commit
 from common.utils import get_logger
-from common.decorator import on_transaction_commit
-from .signals import post_user_create
 from .models import User, UserPasswordHistory
-
+from .signals import post_user_create
 
 logger = get_logger(__file__)
 
@@ -47,9 +46,9 @@ def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
 
 @receiver(post_save, sender=User)
 def save_passwd_change(sender, instance: User, **kwargs):
-    passwords = UserPasswordHistory.objects\
+    passwords = UserPasswordHistory.objects \
         .filter(user=instance) \
-        .order_by('-date_created')\
+        .order_by('-date_created') \
         .values_list('password', flat=True)
     passwords = passwords[:int(settings.OLD_PASSWORD_HISTORY_LIMIT_COUNT)]
 
