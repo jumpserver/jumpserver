@@ -139,7 +139,7 @@ class JMSInventory:
         return host
 
     def select_account(self, asset):
-        accounts = list(asset.accounts.all(is_active=True))
+        accounts = list(asset.accounts.filter(is_active=True))
         if not accounts:
             return None
         account_selected = None
