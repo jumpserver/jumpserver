@@ -74,7 +74,7 @@ class Endpoint(JMSBaseModel):
         from assets.models import Asset
         from terminal.models import Session
         if isinstance(instance, Session):
-            instance = instance.get_asset_or_application()
+            instance = instance.get_asset()
         if not isinstance(instance, Asset):
             return None
         values = instance.labels.filter(name='endpoint').values_list('value', flat=True)
