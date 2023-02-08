@@ -113,14 +113,14 @@ class UserAssetAccountBaseACL(BaseACL, OrgModelMixin):
         org_id = None
         if user:
             queryset = queryset.filter_user(user.username)
-        if asset:
-            org_id = asset.org_id
-            queryset = queryset.filter_asset(asset.name, asset.address)
         if account:
             org_id = account.org_id
             queryset = queryset.filter_account(account.username)
         if account_username:
             queryset = queryset.filter_account(username=account_username)
+        if asset:
+            org_id = asset.org_id
+            queryset = queryset.filter_asset(asset.name, asset.address)
         if org_id:
             kwargs['org_id'] = org_id
         if kwargs:
