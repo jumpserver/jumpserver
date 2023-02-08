@@ -90,6 +90,11 @@ class Migration(migrations.Migration):
             old_name='ip',
             new_name='address',
         ),
+        migrations.AlterField(
+            model_name='asset',
+            name='address',
+            field=models.CharField(db_index=True, max_length=1024, verbose_name='Address'),
+        ),
         migrations.AddField(
             model_name='asset',
             name='date_updated',

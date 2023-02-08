@@ -1,16 +1,16 @@
 import os
-import time
 import socket
 import threading
+import time
+
 from django.conf import settings
 
 from common.db.utils import close_old_connections
-from common.decorator import Singleton
-from common.utils import get_disk_usage, get_cpu_load, get_memory_usage, get_logger
-
-from .serializers.terminal import TerminalRegistrationSerializer, StatSerializer
+from common.decorators import Singleton
+from common.utils import get_disk_usage, get_cpu_load, get_memory_usage
 from .const import TerminalType
 from .models import Terminal
+from .serializers.terminal import TerminalRegistrationSerializer, StatSerializer
 
 __all__ = ['CoreTerminal', 'CeleryTerminal']
 

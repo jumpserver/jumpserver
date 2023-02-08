@@ -3,11 +3,10 @@
 from celery import shared_task
 from django.utils.translation import gettext_noop, gettext_lazy as _
 
-from common.utils import get_logger
 from assets.const import AutomationTypes
-from orgs.utils import org_aware_func, tmp_to_root_org
-
-from .common import automation_execute_start
+from common.utils import get_logger
+from orgs.utils import org_aware_func
+from .common import quickstart_automation
 
 logger = get_logger(__file__)
 __all__ = [
@@ -30,7 +29,7 @@ def update_fact_util(assets=None, nodes=None, task_name=None):
         'nodes': [str(node.id) for node in nodes],
     }
     tp = AutomationTypes.gather_facts
-    automation_execute_start(task_name, tp, child_snapshot)
+    quickstart_automation(task_name, tp, child_snapshot)
 
 
 @org_aware_func('assets')

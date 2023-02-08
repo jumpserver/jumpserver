@@ -105,7 +105,7 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
     Type = const.AllTypes
 
     name = models.CharField(max_length=128, verbose_name=_('Name'))
-    address = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
+    address = models.CharField(max_length=1024, verbose_name=_('Address'), db_index=True)
     platform = models.ForeignKey(Platform, on_delete=models.PROTECT, verbose_name=_("Platform"), related_name='assets')
     domain = models.ForeignKey("assets.Domain", null=True, blank=True, related_name='assets',
                                verbose_name=_("Domain"), on_delete=models.SET_NULL)

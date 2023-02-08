@@ -1,8 +1,9 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from common.serializers.fields import LabeledChoiceField
+from assets.const.web import FillType
 from common.serializers import WritableNestedModelSerializer
+from common.serializers.fields import LabeledChoiceField
 from ..const import Category, AllTypes
 from ..models import Platform, PlatformProtocol, PlatformAutomation
 
@@ -25,7 +26,7 @@ class ProtocolSettingSerializer(serializers.Serializer):
     sftp_home = serializers.CharField(default="/tmp", label=_("SFTP home"))
 
     # HTTP
-    autofile = serializers.BooleanField(default=False, label=_("Autofill"))
+    autofill = serializers.ChoiceField(default='basic', choices=FillType.choices, label=_("Autofill"))
     username_selector = serializers.CharField(
         default="", allow_blank=True, label=_("Username selector")
     )
@@ -35,6 +36,7 @@ class ProtocolSettingSerializer(serializers.Serializer):
     submit_selector = serializers.CharField(
         default="", allow_blank=True, label=_("Submit selector")
     )
+    script = serializers.JSONField(default=list, label=_("Script"))
 
 
 class PlatformAutomationSerializer(serializers.ModelSerializer):

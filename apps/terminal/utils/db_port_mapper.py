@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from assets.const import DatabaseTypes
 from assets.models import Database
-from common.decorator import Singleton
+from common.decorators import Singleton
 from common.exceptions import JMSException
 from common.utils import get_logger, get_object_or_none
 from orgs.utils import tmp_to_root_org
