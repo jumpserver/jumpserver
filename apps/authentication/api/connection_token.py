@@ -23,6 +23,7 @@ from orgs.mixins.api import RootOrgViewMixin
 from perms.models import ActionChoices
 from terminal.connect_methods import NativeClient, ConnectMethodUtil
 from terminal.models import EndpointRule
+from assets.const import CloudTypes
 from ..models import ConnectionToken
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
@@ -340,6 +341,11 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         token.is_valid()
         serializer = self.get_serializer(instance=token)
         expire_now = request.data.get('expire_now', True)
+
+        # TODO 暂时特殊处理 k8s 不过期
+        if token.asset.type == CloudTypes.K8S:
+            expire_now = False
+
         if expire_now:
             token.expire()
         return Response(serializer.data, status=status.HTTP_200_OK)
