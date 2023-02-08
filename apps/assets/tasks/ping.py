@@ -44,9 +44,7 @@ def test_asset_connectivity_util(assets, task_name=None, local_port=None):
     )
 
     non_gateway_assets = assets.exclude(platform__name=GATEWAY_NAME)
-    test_connectivity_util(
-        non_gateway_assets, AutomationTypes.ping, task_name
-    )
+    test_connectivity_util(non_gateway_assets, AutomationTypes.ping, task_name)
 
 
 @shared_task(queue="ansible", verbose_name=_('Manually test the connectivity of a asset'))
