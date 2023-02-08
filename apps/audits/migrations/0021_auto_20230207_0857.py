@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('resource_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Resource')),
                 ('datetime', models.DateTimeField(auto_now=True, db_index=True, verbose_name='Datetime')),
                 ('detail', models.TextField(blank=True, default='', verbose_name='Detail')),
-                ('detail_url', models.CharField(default=None, max_length=256, null=True, verbose_name='Detail url')),
+                ('detail_id', models.CharField(default=None, max_length=36, null=True, verbose_name='Detail ID')),
             ],
             options={
                 'verbose_name': 'Activity log',

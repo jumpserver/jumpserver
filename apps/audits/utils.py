@@ -4,13 +4,10 @@ from itertools import chain
 
 from django.db import models
 from django.http import HttpResponse
-from django.utils.translation import gettext_lazy as _
 
-from common.utils import validate_ip, get_ip_city, get_logger, reverse
-from audits.const import ActivityChoices
+from common.utils import validate_ip, get_ip_city, get_logger
 from settings.serializers import SettingsSerializer
 from .const import DEFAULT_CITY
-from .signals import post_activity_log
 
 logger = get_logger(__name__)
 
@@ -44,24 +41,7 @@ def write_login_log(*args, **kwargs):
     else:
         city = get_ip_city(ip) or DEFAULT_CITY
     kwargs.update({'ip': ip, 'city': city})
-    user_id = kwargs.pop('user_id', None)
-    audit_log = UserLoginLog.objects.create(**kwargs)
-
-    # 发送Activity信号
-    if user_id is not None:
-        login_status = _('Success') if audit_log.status else _('Failed')
-        detail = _('User {} login into this service.[{}]').format(
-            audit_log.username, login_status
-        )
-        detail_url = '%s?id=%s' % (
-            reverse('api-audits:login-log-list', api_to_ui=True, is_audit=True,),
-            audit_log.id
-        )
-        post_activity_log.send(
-            sender=UserLoginLog, resource_id=user_id,
-            detail=detail, detail_url=detail_url,
-            type=ActivityChoices.login_log
-        )
+    UserLoginLog.objects.create(**kwargs)
 
 
 def get_resource_display(resource):

@@ -20,7 +20,7 @@ from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog, Activit
 from .serializers import FTPLogSerializer, UserLoginLogSerializer, JobAuditLogSerializer
 from .serializers import (
     OperateLogSerializer, OperateLogActionDetailSerializer,
-    PasswordChangeLogSerializer, ActivitiesOperatorLogSerializer,
+    PasswordChangeLogSerializer, ActivityOperatorLogSerializer,
 )
 
 
@@ -79,7 +79,7 @@ class MyLoginLogAPIView(UserLoginCommonMixin, generics.ListAPIView):
 
 
 class ResourceActivityAPIView(generics.ListAPIView):
-    serializer_class = ActivitiesOperatorLogSerializer
+    serializer_class = ActivityOperatorLogSerializer
     rbac_perms = {
         'GET': 'audits.view_activitylog',
     }
@@ -88,8 +88,7 @@ class ResourceActivityAPIView(generics.ListAPIView):
     def get_operate_log_qs(fields, limit=30, **filters):
         queryset = OperateLog.objects.filter(**filters).annotate(
             r_type=Value(ActivityChoices.operate_log, CharField()),
-            r_detail_url=Value(None, CharField()),
-            r_detail=Value(None, CharField()),
+            r_detail_id=F('id'), r_detail=Value(None, CharField()),
             r_user=F('user'), r_action=F('action'),
         ).values(*fields)[:limit]
         return queryset
@@ -97,8 +96,8 @@ class ResourceActivityAPIView(generics.ListAPIView):
     @staticmethod
     def get_activity_log_qs(fields, limit=30, **filters):
         queryset = ActivityLog.objects.filter(**filters).annotate(
-                r_type=F('type'), r_detail_url=F('detail_url'), r_detail=F('detail'),
-                r_user=Value(None, CharField()),
+                r_type=F('type'), r_detail_id=F('detail_id'),
+                r_detail=F('detail'), r_user=Value(None, CharField()),
                 r_action=Value(None, CharField()),
             ).values(*fields)[:limit]
         return queryset
@@ -106,7 +105,10 @@ class ResourceActivityAPIView(generics.ListAPIView):
     def get_queryset(self):
         limit = 30
         resource_id = self.request.query_params.get('resource_id')
-        fields = ('id', 'datetime', 'r_detail', 'r_detail_url', 'r_user', 'r_action', 'r_type')
+        fields = (
+            'id', 'datetime', 'r_detail', 'r_detail_id',
+            'r_user', 'r_action', 'r_type'
+        )
         with tmp_to_root_org():
             qs1 = self.get_operate_log_qs(fields, resource_id=resource_id)
             qs2 = self.get_activity_log_qs(fields, resource_id=resource_id)

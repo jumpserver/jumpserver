@@ -108,8 +108,8 @@ class ActivityLog(OrgModelMixin):
         auto_now=True, verbose_name=_('Datetime'), db_index=True
     )
     detail = models.TextField(default='', blank=True, verbose_name=_('Detail'))
-    detail_url = models.CharField(
-        max_length=256, default=None, null=True, verbose_name=_('Detail url')
+    detail_id = models.CharField(
+        max_length=36, default=None, null=True, verbose_name=_('Detail ID')
     )
 
     class Meta:
