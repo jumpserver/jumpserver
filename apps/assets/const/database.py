@@ -30,7 +30,7 @@ class DatabaseTypes(BaseType):
                     'ansible_connection': 'local',
                 },
                 'ping_enabled': True,
-                'gather_facts_enabled': True,
+                'gather_facts_enabled': False,
                 'gather_accounts_enabled': True,
                 'verify_account_enabled': True,
                 'change_secret_enabled': True,

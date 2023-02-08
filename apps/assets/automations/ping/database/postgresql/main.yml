@@ -11,3 +11,5 @@
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         login_db: "{{ jms_asset.spec_info.db_name }}"
+      register: result
+      failed_when: not result.is_available
