@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from urllib3.exceptions import MaxRetryError
 from urllib.parse import urlencode
+from urllib3.exceptions import MaxRetryError, LocationParseError
 
 from kubernetes import client
 from kubernetes.client import api_client
@@ -8,7 +8,7 @@ from kubernetes.client.api import core_v1_api
 from kubernetes.client.exceptions import ApiException
 
 from common.utils import get_logger
-
+from common.exceptions import JMSException
 from ..const import CloudTypes, Category
 
 logger = get_logger(__file__)
@@ -58,15 +58,21 @@ class KubernetesClient:
         api = self.get_api()
         try:
             ret = api.list_pod_for_all_namespaces(watch=False, _request_timeout=(3, 3))
+        except LocationParseError as e:
+            logger.warning("Kubernetes API request url error: {}".format(e))
+            raise JMSException(code='k8s_tree_error', detail=e)
         except MaxRetryError:
-            logger.warning('Kubernetes connection timed out')
-            return
+            msg = "Kubernetes API request timeout"
+            logger.warning(msg)
+            raise JMSException(code='k8s_tree_error', detail=msg)
         except ApiException as e:
             if e.status == 401:
-                logger.warning('Kubernetes User not authenticated')
+                msg = "Kubernetes API request unauthorized"
+                logger.warning(msg)
             else:
-                logger.warning(e)
-            return
+                msg = e
+                logger.warning(msg)
+            raise JMSException(code='k8s_tree_error', detail=msg)
         data = {}
         for i in ret.items:
             namespace = i.metadata.namespace
