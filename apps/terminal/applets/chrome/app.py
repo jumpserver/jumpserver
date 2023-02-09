@@ -99,6 +99,9 @@ class WebAPP(object):
         autofill_type = extra_data.autofill
         if not autofill_type:
             protocol_setting = self.platform.get_protocol_setting("http")
+            if not protocol_setting:
+                print("No protocol setting found")
+                return
             extra_data = protocol_setting
             autofill_type = extra_data.autofill
         if autofill_type == "basic":
