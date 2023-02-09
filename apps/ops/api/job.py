@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 
+from ops.const import Types
 from ops.models import Job, JobExecution
 from ops.serializers.job import JobSerializer, JobExecutionSerializer
 
@@ -66,6 +67,8 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
     def perform_create(self, serializer):
         instance = serializer.save()
         instance.job_version = instance.job.version
+        instance.material = instance.job.material
+        instance.type = Types[instance.job.type].value
         instance.creator = self.request.user
         instance.save()
         task = run_ops_job_execution.delay(instance.id)
@@ -123,6 +126,7 @@ class FrequentUsernames(APIView):
     permission_classes = ()
 
     def get(self, request, **kwargs):
-        top_accounts = Account.objects.exclude(username='root').exclude(username__startswith='jms_').values('username').annotate(
+        top_accounts = Account.objects.exclude(username='root').exclude(username__startswith='jms_').values(
+            'username').annotate(
             total=Count('username')).order_by('total')[:5]
         return Response(data=top_accounts)
