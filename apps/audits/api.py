@@ -129,10 +129,12 @@ class PasswordChangeLogViewSet(ListModelMixin, JMSGenericViewSet):
     ordering = ['-datetime']
 
     def get_queryset(self):
-        users = current_org.get_members()
-        queryset = super().get_queryset().filter(
-            user__in=[user.__str__() for user in users]
-        )
+        queryset = super().get_queryset()
+        if not current_org.is_root():
+            users = current_org.get_members()
+            queryset = queryset.filter(
+                user__in=[str(user) for user in users]
+            )
         return queryset
 
 # Todo: 看看怎么搞
