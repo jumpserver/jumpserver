@@ -65,7 +65,7 @@ class AssetAccountSerializer(
     class Meta:
         model = Account
         fields_mini = [
-            'id', 'name', 'username', 'privileged',
+            'id', 'name', 'username', 'privileged', 'is_active',
             'version', 'secret_type',
         ]
         fields_write_only = [
