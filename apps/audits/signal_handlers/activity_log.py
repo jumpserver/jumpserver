@@ -176,7 +176,7 @@ def on_object_created(
         'UserLoginLog': activity_handler.login_log_for_activity
     }
     model_name = sender._meta.object_name
-    if not created or model_name not in handler_mapping.keys():
+    if not created or model_name not in handler_mapping:
         return
 
     resource_id, detail, a_type = handler_mapping[model_name](instance)

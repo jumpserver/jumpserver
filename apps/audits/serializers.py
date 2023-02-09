@@ -128,20 +128,22 @@ class ActivityOperatorLogSerializer(serializers.Serializer):
     def get_detail_url(obj):
         detail_url = ''
         detail_id, obj_type = obj['r_detail_id'], obj['r_type']
-        if detail_id:
-            if obj_type == ActivityChoices.operate_log:
-                detail_url = reverse(
-                    view_name='audits:operate-log-detail',
-                    kwargs={'pk': obj['id']},
-                    api_to_ui=True, is_audit=True
-                )
-            elif obj_type == ActivityChoices.task:
-                detail_url = reverse(
-                    'ops:celery-task-log', kwargs={'pk': detail_id}
-                )
-            elif obj_type == ActivityChoices.login_log:
-                detail_url = '%s?id=%s' % (
-                    reverse('api-audits:login-log-list', api_to_ui=True, is_audit=True),
-                    detail_id
-                )
+        if not detail_id:
+            return detail_url
+
+        if obj_type == ActivityChoices.operate_log:
+            detail_url = reverse(
+                view_name='audits:operate-log-detail',
+                kwargs={'pk': obj['id']},
+                api_to_ui=True, is_audit=True
+            )
+        elif obj_type == ActivityChoices.task:
+            detail_url = reverse(
+                'ops:celery-task-log', kwargs={'pk': detail_id}
+            )
+        elif obj_type == ActivityChoices.login_log:
+            detail_url = '%s?id=%s' % (
+                reverse('api-audits:login-log-list', api_to_ui=True, is_audit=True),
+                detail_id
+            )
         return detail_url
