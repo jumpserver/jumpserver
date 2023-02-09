@@ -69,6 +69,12 @@ class OperateLogStore(object):
             before.update(op_before)
             after.update(op_after)
         else:
+            # 限制长度 128 OperateLog.resource.field.max_length
+            max_length = 128
+            resource = kwargs.get('resource', '')
+            if isinstance(resource, str) and (len(resource) > max_length):
+                # 截取字符串
+                kwargs.update({'resource': resource[:max_length]})
             op_log = self.model(**kwargs)
 
         diff = self.convert_before_after_to_diff(before, after)
