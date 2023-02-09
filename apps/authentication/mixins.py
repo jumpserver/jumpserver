@@ -369,7 +369,7 @@ class AuthACLMixin:
     def check_user_login_confirm(self):
         ticket = self.get_ticket()
         if not ticket:
-            raise errors.LoginConfirmOtherError('', "Not found")
+            raise errors.LoginConfirmOtherError('', "Not found", '')
         elif ticket.is_state(ticket.State.approved):
             self.request.session["auth_confirm_required"] = ''
             return
