@@ -26,6 +26,7 @@ def set_task_to_serializer_data(serializer, task):
 class JobViewSet(OrgBulkModelViewSet):
     serializer_class = JobSerializer
     permission_classes = ()
+    search_fields = ('name', 'comment')
     model = Job
 
     def allow_bulk_destroy(self, qs, filtered):
@@ -63,6 +64,7 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
     http_method_names = ('get', 'post', 'head', 'options',)
     permission_classes = ()
     model = JobExecution
+    search_fields = ('material',)
 
     def perform_create(self, serializer):
         instance = serializer.save()
