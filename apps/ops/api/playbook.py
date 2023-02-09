@@ -146,6 +146,8 @@ class PlaybookFileBrowserAPIView(APIView):
 
         if new_name:
             new_file_path = os.path.join(os.path.dirname(file_path), new_name)
+            if os.path.exists(new_file_path):
+                return Response({'msg': '{} already exists'.format(new_name)}, status=400)
             os.rename(file_path, new_file_path)
             file_path = new_file_path
 
