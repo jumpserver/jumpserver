@@ -26,6 +26,7 @@ class PlaybookViewSet(OrgBulkModelViewSet):
     serializer_class = PlaybookSerializer
     permission_classes = ()
     model = Playbook
+    search_fields = ('name', 'comment')
 
     def allow_bulk_destroy(self, qs, filtered):
         return True

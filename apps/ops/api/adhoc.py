@@ -13,10 +13,12 @@ __all__ = [
 class AdHocViewSet(OrgBulkModelViewSet):
     serializer_class = AdHocSerializer
     permission_classes = ()
+    search_fields = ('name', 'comment')
     model = AdHoc
 
     def allow_bulk_destroy(self, qs, filtered):
         return True
+
     def get_queryset(self):
         queryset = super().get_queryset()
         return queryset.filter(creator=self.request.user)
