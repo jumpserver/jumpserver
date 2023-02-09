@@ -59,7 +59,7 @@ class JobExecutionSerializer(BulkOrgResourceModelSerializer):
         model = JobExecution
         read_only_fields = ["id", "task_id", "timedelta", "time_cost",
                             'is_finished', 'date_start', 'date_finished',
-                            'date_created', 'is_success', 'task_id', 'job_type',
+                            'date_created', 'is_success', 'job_type',
                             'summary', 'material']
         fields = read_only_fields + [
             "job", "parameters", "creator"
