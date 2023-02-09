@@ -2,10 +2,10 @@ from celery import shared_task
 from django.utils.translation import gettext_noop
 from django.utils.translation import ugettext as _
 
-from common.utils import get_logger
-from assets.const import GATEWAY_NAME
 from accounts.const import AutomationTypes
 from accounts.tasks.common import automation_execute_start
+from assets.const import GATEWAY_NAME
+from common.utils import get_logger
 from orgs.utils import org_aware_func
 
 logger = get_logger(__name__)
@@ -18,11 +18,11 @@ def verify_connectivity_util(assets, tp, accounts, task_name):
     if not assets or not accounts:
         return
     account_usernames = list(accounts.values_list('username', flat=True))
-    child_snapshot = {
+    task_snapshot = {
         'accounts': account_usernames,
         'assets': [str(asset.id) for asset in assets],
     }
-    automation_execute_start(task_name, tp, child_snapshot)
+    automation_execute_start(task_name, tp, task_snapshot)
 
 
 @org_aware_func("assets")

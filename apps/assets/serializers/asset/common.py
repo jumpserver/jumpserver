@@ -124,7 +124,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         ]
         read_only_fields = [
             'category', 'type', 'connectivity',
-            'date_verified', 'created_by', 'date_created'
+            'date_verified', 'created_by', 'date_created',
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
         extra_kwargs = {
@@ -222,6 +222,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         node_id = request.query_params.get('node_id')
         if not node_id:
             return []
+        nodes = Node.objects.filter(id=node_id)
+        return nodes
 
     def is_valid(self, raise_exception=False):
         self._set_protocols_default()

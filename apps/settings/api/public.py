@@ -1,13 +1,10 @@
-from rest_framework import generics
-from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.conf import settings
+from rest_framework import generics
+from rest_framework.permissions import AllowAny
 
-from jumpserver.utils import has_valid_xpack_license, get_xpack_license_info
-from common.utils import get_logger, lazyproperty, get_object_or_none
-from authentication.models import ConnectionToken
-from orgs.utils import tmp_to_root_org
 from common.permissions import IsValidUserOrConnectionToken
-
+from common.utils import get_logger, lazyproperty
+from jumpserver.utils import has_valid_xpack_license, get_xpack_license_info
 from .. import serializers
 from ..utils import get_interface_setting_or_default
 
@@ -58,6 +55,3 @@ class PublicSettingApi(OpenPublicSettingApi):
             # 提前把异常爆出来
             values[name] = getattr(settings, name)
         return values
-
-
-

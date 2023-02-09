@@ -24,8 +24,8 @@ def test_assets_connectivity_task(assets, task_name=None):
         task_name = gettext_noop("Test assets connectivity ")
 
     task_name = PingAutomation.generate_unique_name(task_name)
-    child_snapshot = {'assets': [str(asset.id) for asset in assets]}
-    quickstart_automation(task_name, AutomationTypes.ping, child_snapshot)
+    task_snapshot = {'assets': [str(asset.id) for asset in assets]}
+    quickstart_automation(task_name, AutomationTypes.ping, task_snapshot)
 
 
 def test_assets_connectivity_manual(asset_ids):

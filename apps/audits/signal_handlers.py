@@ -6,7 +6,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.auth import BACKEND_SESSION_KEY
 from django.db import transaction
-from django.db.models.signals import post_save, pre_save, m2m_changed, pre_delete
+from django.db.models.signals import pre_delete, pre_save, m2m_changed, post_save
 from django.dispatch import receiver
 from django.utils import timezone, translation
 from django.utils.functional import LazyObject
@@ -75,6 +75,7 @@ def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
         return
     if not instance:
         return
+    return
 
     resource_type = instance._meta.verbose_name
     current_instance = model_to_dict(instance, include_model_fields=False)
@@ -151,6 +152,7 @@ def on_object_pre_create_or_update(sender, instance=None, raw=False, using=None,
 
 @receiver(post_save)
 def on_object_created_or_update(sender, instance=None, created=False, update_fields=None, **kwargs):
+    return
     ok = signal_of_operate_log_whether_continue(
         sender, instance, created, update_fields
     )

@@ -327,6 +327,7 @@ class AuthACLMixin:
     get_request_ip: Callable
 
     def _check_login_acl(self, user, ip):
+        raise ValueError('Not implement')
         # ACL 限制用户登录
         acl = LoginACL.match(user, ip)
         if not acl:

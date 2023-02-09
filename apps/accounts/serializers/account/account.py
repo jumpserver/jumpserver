@@ -1,13 +1,13 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from assets.models import Asset
 from accounts.const import SecretType, Source
 from accounts.models import Account, AccountTemplate
 from accounts.tasks import push_accounts_to_assets
 from assets.const import Category, AllTypes
-from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
+from assets.models import Asset
 from common.serializers import SecretReadableMixin, BulkModelSerializer
+from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from .base import BaseAccountSerializer
 
 
@@ -47,7 +47,7 @@ class AccountSerializerCreateValidateMixin:
 
     def create(self, validated_data):
         push_now = validated_data.pop('push_now', None)
-        instance = super().create(validated_data, push_now)
+        instance = super().create(validated_data)
         self.push_account(instance, push_now)
         return instance
 
