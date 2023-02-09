@@ -1,3 +1,4 @@
+import os
 import sys
 import time
 
@@ -172,7 +173,8 @@ class AppletApplication(BaseApplication):
     def run(self):
         self.launch()
         app = Application(backend='uia')
-        app.start(self.path)
+        work_dir = os.path.dirname(self.path)
+        app.start(self.path, work_dir=work_dir)
         self.pid = app.process
 
         # 检测是否为试用版本
