@@ -28,9 +28,6 @@ class PlaybookViewSet(OrgBulkModelViewSet):
     model = Playbook
     search_fields = ('name', 'comment')
 
-    def allow_bulk_destroy(self, qs, filtered):
-        return True
-
     def get_queryset(self):
         queryset = super().get_queryset()
         queryset = queryset.filter(creator=self.request.user)
