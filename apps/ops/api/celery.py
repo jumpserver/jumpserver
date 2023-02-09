@@ -106,6 +106,8 @@ class CeleryTaskViewSet(
     mixins.ListModelMixin, mixins.DestroyModelMixin,
     viewsets.GenericViewSet
 ):
+    filterset_fields = ('id', 'name')
+    search_fields = filterset_fields
     serializer_class = CeleryTaskSerializer
 
     def get_queryset(self):
