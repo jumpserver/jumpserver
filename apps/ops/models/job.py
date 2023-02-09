@@ -235,6 +235,8 @@ class JobExecution(JMSOrgBaseModel):
 
     @property
     def time_cost(self):
+        if not self.date_start:
+            return 0
         if self.is_finished:
             return (self.date_finished - self.date_start).total_seconds()
         return (timezone.now() - self.date_start).total_seconds()
