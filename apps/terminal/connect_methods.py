@@ -170,8 +170,8 @@ class ConnectMethodUtil:
                 'web_methods': [WebMethod.web_gui],
                 'listen': [Protocol.http],
                 'support': [
-                    Protocol.mysql, Protocol.postgresql, Protocol.oracle,
-                    Protocol.sqlserver, Protocol.mariadb
+                    Protocol.mysql, Protocol.postgresql,
+                    Protocol.oracle, Protocol.mariadb
                 ],
                 'match': 'm2m'
             },
