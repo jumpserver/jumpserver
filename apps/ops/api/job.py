@@ -1,4 +1,5 @@
 from django.db.models import Count
+from django.db.transaction import atomic
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
@@ -66,6 +67,7 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
     model = JobExecution
     search_fields = ('material',)
 
+    @atomic
     def perform_create(self, serializer):
         instance = serializer.save()
         instance.job_version = instance.job.version
