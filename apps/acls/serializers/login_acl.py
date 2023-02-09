@@ -22,7 +22,7 @@ class LoginACLSerializer(BulkModelSerializer):
     reviewers = ObjectRelatedField(
         queryset=User.objects, label=_("Reviewers"), many=True, required=False
     )
-    action = LabeledChoiceField(choices=LoginACL.ActionChoices.choices)
+    action = LabeledChoiceField(choices=LoginACL.ActionChoices.choices, label=_('Action'))
     reviewers_amount = serializers.IntegerField(
         read_only=True, source="reviewers.count", label=_("Reviewers amount")
     )
