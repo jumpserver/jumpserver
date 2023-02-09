@@ -37,22 +37,19 @@ class PlaybookViewSet(OrgBulkModelViewSet):
 
     def perform_create(self, serializer):
         instance = serializer.save()
-        if instance.create_method == 'blank':
-            dest_path = os.path.join(settings.DATA_DIR, "ops", "playbook", instance.id.__str__())
-            os.makedirs(dest_path)
-            with open(os.path.join(dest_path, 'main.yml'), 'w') as f:
-                f.write('## write your playbook here')
-
-        if instance.create_method == 'upload':
+        if 'multipart/form-data' in self.request.headers['Content-Type']:
             src_path = os.path.join(settings.MEDIA_ROOT, instance.path.name)
             dest_path = os.path.join(settings.DATA_DIR, "ops", "playbook", instance.id.__str__())
             unzip_playbook(src_path, dest_path)
-            valid_entry = ('main.yml', 'main.yaml', 'main')
-            for f in os.listdir(dest_path):
-                if f in valid_entry:
-                    return
-            os.remove(dest_path)
-            raise PlaybookNoValidEntry
+            if 'main.yml' not in os.listdir(dest_path):
+                raise PlaybookNoValidEntry
+
+        else:
+            if instance.create_method == 'blank':
+                dest_path = os.path.join(settings.DATA_DIR, "ops", "playbook", instance.id.__str__())
+                os.makedirs(dest_path)
+                with open(os.path.join(dest_path, 'main.yml'), 'w') as f:
+                    f.write('## write your playbook here')
 
 
 class PlaybookFileBrowserAPIView(APIView):
