@@ -19,7 +19,7 @@ from orgs.utils import current_org
 from ops.const import JobStatus
 from ops.models import Job, JobExecution
 from common.utils import lazyproperty
-from audits.models import UserLoginLog, PasswordChangeLog, OperateLog
+from audits.models import UserLoginLog, PasswordChangeLog, OperateLog, FTPLog
 from audits.const import LoginStatusChoices
 from common.utils.timezone import local_now, local_zero_hour
 from orgs.caches import OrgResourceStatisticsCache
@@ -38,13 +38,13 @@ class DateTimeMixin:
     def days(self):
         query_params = self.request.query_params
         count = query_params.get('days')
-        count = int(count) if count else 0
+        count = int(count) if count else 1
         return count
 
     @property
     def days_to_datetime(self):
         days = self.days
-        if days == 0:
+        if days == 1:
             t = local_zero_hour()
         else:
             t = local_now() - timezone.timedelta(days=days)
@@ -109,7 +109,7 @@ class DateTimeMixin:
     @lazyproperty
     def ftp_logs_queryset(self):
         t = self.days_to_datetime
-        queryset = OperateLog.objects.filter(datetime__gte=t)
+        queryset = FTPLog.objects.filter(date_start__gte=t)
         queryset = self.get_logs_queryset(queryset, 'user')
         return queryset
 
@@ -297,7 +297,7 @@ class DatesLoginMetricMixin:
 
     @lazyproperty
     def user_login_amount(self):
-        return self.login_logs_queryset.values('username').distinct().count()
+        return self.login_logs_queryset.values('username').count()
 
     @lazyproperty
     def operate_logs_amount(self):
