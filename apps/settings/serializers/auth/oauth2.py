@@ -49,7 +49,7 @@ class OAuth2SettingSerializer(serializers.Serializer):
         required=True, max_length=1024, label=_('Provider userinfo endpoint')
     )
     AUTH_OAUTH2_PROVIDER_END_SESSION_ENDPOINT = serializers.CharField(
-        required=False, max_length=1024, label=_('Provider end session endpoint')
+        required=False, allow_blank=True, max_length=1024, label=_('Provider end session endpoint')
     )
     AUTH_OAUTH2_LOGOUT_COMPLETELY = serializers.BooleanField(required=False, label=_('Logout completely'))
     AUTH_OAUTH2_USER_ATTR_MAP = serializers.DictField(
