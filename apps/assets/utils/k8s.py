@@ -98,7 +98,7 @@ class KubernetesClient:
 
     @classmethod
     def get_kubernetes_data(cls, asset, secret):
-        k8s_url = f'{asset.address}:{asset.port}'
+        k8s_url = f'{asset.address}'
         proxy_url = cls.get_proxy_url(asset)
         k8s = cls(k8s_url, secret, proxy=proxy_url)
         return k8s.get_pods()
