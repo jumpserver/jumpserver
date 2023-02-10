@@ -72,7 +72,7 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
         instance = serializer.save()
         instance.job_version = instance.job.version
         instance.material = instance.job.material
-        instance.type = Types[instance.job.type].value
+        instance.job_type = Types[instance.job.type].value
         instance.creator = self.request.user
         instance.save()
         task = run_ops_job_execution.delay(instance.id)
