@@ -14,16 +14,16 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
+from assets.const import CloudTypes
 from common.api import JMSModelViewSet
 from common.exceptions import JMSException
-from common.utils import random_string
+from common.utils import random_string, get_logger
 from common.utils.django import get_request_os
 from common.utils.http import is_true
 from orgs.mixins.api import RootOrgViewMixin
 from perms.models import ActionChoices
 from terminal.connect_methods import NativeClient, ConnectMethodUtil
 from terminal.models import EndpointRule
-from assets.const import CloudTypes
 from ..models import ConnectionToken
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
@@ -31,6 +31,7 @@ from ..serializers import (
 )
 
 __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
+logger = get_logger(__name__)
 
 
 class RDPFileClientProtocolURLMixin:
@@ -366,5 +367,11 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
     @action(methods=['DELETE', 'POST'], detail=False, url_path='applet-account/release')
     def release_applet_account(self, *args, **kwargs):
         account_id = self.request.data.get('id')
-        msg = ConnectionToken.release_applet_account(account_id)
-        return Response({'msg': msg})
+        released = ConnectionToken.release_applet_account(account_id)
+
+        if released:
+            logger.debug('Release applet account success: {}'.format(account_id))
+            return Response({'msg': 'released'})
+        else:
+            logger.error('Release applet account error: {}'.format(account_id))
+            return Response({'error': 'not found or expired'}, status=400)

@@ -11,7 +11,9 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.serializers import ValidationError
 
 from common.db.models import JMSBaseModel
-from common.utils import lazyproperty
+from common.utils import lazyproperty, get_logger
+
+logger = get_logger(__name__)
 
 __all__ = ['Applet', 'AppletPublication']
 
@@ -109,19 +111,27 @@ class Applet(JMSBaseModel):
         if not hosts:
             return None
 
+        key_tmpl = 'applet_host_accounts_{}_{}'
         host = random.choice(hosts)
-        using_keys = cache.keys('host_accounts_{}_*'.format(host.id)) or []
-        accounts_used = cache.get_many(using_keys)
-        accounts = host.accounts.all().exclude(username__in=accounts_used)
+        using_keys = cache.keys(key_tmpl.format(host.id, '*')) or []
+        accounts_username_used = list(cache.get_many(using_keys).values())
+        logger.debug('Applet host account using: {}: {}'.format(host.name, accounts_username_used))
+        accounts = host.accounts.all() \
+            .filter(is_active=True, privileged=False) \
+            .exclude(username__in=accounts_username_used)
 
-        if not accounts:
-            accounts = host.accounts.all()
+        msg = 'Applet host remain accounts: {}: {}'.format(host.name, len(accounts))
+        if len(accounts) == 0:
+            logger.error(msg)
+        else:
+            logger.debug(msg)
+
         if not accounts:
             return None
 
         account = random.choice(accounts)
         ttl = 60 * 60 * 24
-        lock_key = 'applet_host_accounts_{}_{}'.format(host.id, account.username)
+        lock_key = key_tmpl.format(host.id, account.username)
         cache.set(lock_key, account.username, ttl)
 
         return {
@@ -130,11 +140,6 @@ class Applet(JMSBaseModel):
             'lock_key': lock_key,
             'ttl': ttl
         }
-
-    @staticmethod
-    def release_host_and_account(host_id, username):
-        key = 'applet_host_accounts_{}_{}'.format(host_id, username)
-        cache.delete(key)
 
 
 class AppletPublication(JMSBaseModel):

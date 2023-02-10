@@ -134,12 +134,12 @@ class Organization(OrgRoleMixin, JMSBaseModel):
         return self.id
 
     @classmethod
-    def get_or_create_builtin(cls, name, **kwargs):
-        _id = kwargs.get('id')
-        org = cls.get_instance(cls.DEFAULT_ID)
+    def get_or_create_builtin(cls, **kwargs):
+        _id = kwargs['id']
+        org = cls.get_instance(_id)
         if org:
             return org
-        org, created = cls.objects.get_or_create(name=name, defaults=kwargs)
+        org, created = cls.objects.get_or_create(id=_id, defaults=kwargs)
         if created:
             org.builtin = True
             org.save()
