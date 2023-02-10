@@ -2,42 +2,35 @@
 #
 
 from django.db.models.signals import (
-    m2m_changed, post_save, post_delete
+    post_save, post_delete, m2m_changed
 )
 from django.dispatch import receiver
-from django.utils.functional import LazyObject
+from django.utils.functional import lazy
 
-from assets.models import Asset, Node
+from assets.models import Node, Asset
+from common.decorators import merge_delay_run
 from common.signals import django_ready
 from common.utils import get_logger
 from common.utils.connection import RedisPubSub
 from orgs.models import Organization
 
-logger = get_logger(__file__)
-
+logger = get_logger(__name__)
 
 # clear node assets mapping for memory
 # ------------------------------------
+node_assets_mapping_pub_sub = lazy(lambda: RedisPubSub('fm.node_asset_mapping'), RedisPubSub)()
 
 
-class NodeAssetsMappingForMemoryPubSub(LazyObject):
-    def _setup(self):
-        self._wrapped = RedisPubSub('fm.node_all_asset_ids_memory_mapping')
-
-
-node_assets_mapping_for_memory_pub_sub = NodeAssetsMappingForMemoryPubSub()
-
-
-def expire_node_assets_mapping_for_memory(org_id):
+@merge_delay_run(ttl=5)
+def expire_node_assets_mapping(*org_ids):
     # 所有进程清除(自己的 memory 数据)
-    org_id = str(org_id)
     root_org_id = Organization.ROOT_ID
-
-    # 当前进程清除(cache 数据)
-    Node.expire_node_all_asset_ids_mapping_from_cache(org_id)
-    Node.expire_node_all_asset_ids_mapping_from_cache(root_org_id)
-
-    node_assets_mapping_for_memory_pub_sub.publish(org_id)
+    Node.expire_node_all_asset_ids_cache_mapping(root_org_id)
+    for org_id in set(org_ids):
+        org_id = str(org_id)
+        # 当前进程清除(cache 数据)
+        Node.expire_node_all_asset_ids_cache_mapping(org_id)
+        node_assets_mapping_pub_sub.publish(org_id)
 
 
 @receiver(post_save, sender=Node)
@@ -50,17 +43,18 @@ def on_node_post_create(sender, instance, created, update_fields, **kwargs):
         need_expire = False
 
     if need_expire:
-        expire_node_assets_mapping_for_memory(instance.org_id)
+        expire_node_assets_mapping(instance.org_id)
 
 
 @receiver(post_delete, sender=Node)
 def on_node_post_delete(sender, instance, **kwargs):
-    expire_node_assets_mapping_for_memory(instance.org_id)
+    expire_node_assets_mapping(instance.org_id)
 
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
 def on_node_asset_change(sender, instance, **kwargs):
-    expire_node_assets_mapping_for_memory(instance.org_id)
+    logger.debug("Recv asset nodes changed signal, expire memery node asset mapping")
+    expire_node_assets_mapping(instance.org_id)
 
 
 @receiver(django_ready)
@@ -69,7 +63,7 @@ def subscribe_node_assets_mapping_expire(sender, **kwargs):
 
     def handle_node_relation_change(org_id):
         root_org_id = Organization.ROOT_ID
-        Node.expire_node_all_asset_ids_mapping_from_memory(org_id)
-        Node.expire_node_all_asset_ids_mapping_from_memory(root_org_id)
+        Node.expire_node_all_asset_ids_memory_mapping(org_id)
+        Node.expire_node_all_asset_ids_memory_mapping(root_org_id)
 
-    node_assets_mapping_for_memory_pub_sub.subscribe(handle_node_relation_change)
+    node_assets_mapping_pub_sub.subscribe(handle_node_relation_change)

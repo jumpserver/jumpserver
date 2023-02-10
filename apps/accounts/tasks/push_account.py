@@ -1,10 +1,10 @@
 from celery import shared_task
 from django.utils.translation import gettext_noop, ugettext_lazy as _
 
-from common.utils import get_logger
-from orgs.utils import org_aware_func
 from accounts.const import AutomationTypes
 from accounts.tasks.common import automation_execute_start
+from common.utils import get_logger
+from orgs.utils import org_aware_func
 
 logger = get_logger(__file__)
 __all__ = [
@@ -13,14 +13,14 @@ __all__ = [
 
 
 def push_util(account, assets, task_name):
-    child_snapshot = {
+    task_snapshot = {
         'secret': account.secret,
         'secret_type': account.secret_type,
         'accounts': [account.username],
         'assets': [str(asset.id) for asset in assets],
     }
     tp = AutomationTypes.push_account
-    automation_execute_start(task_name, tp, child_snapshot)
+    automation_execute_start(task_name, tp, task_snapshot)
 
 
 @org_aware_func("assets")

@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
-from random import seed
+import time
 from itertools import islice
+from random import seed
 
 from orgs.models import Organization
 
@@ -18,7 +19,6 @@ class FakeDataGenerator:
         o = Organization.get_instance(org_id, default=Organization.default())
         if o:
             o.change_to()
-        print('Current org is: {}'.format(o))
         return o
 
     def do_generate(self, batch, batch_size):
@@ -38,8 +38,11 @@ class FakeDataGenerator:
             batch = list(islice(counter, self.batch_size))
             if not batch:
                 break
+            start = time.time()
             self.do_generate(batch, self.batch_size)
+            end = time.time()
+            using = end - start
             from_size = created
             created += len(batch)
-            print('Generate %s: %s-%s' % (self.resource, from_size, created))
+            print('Generate %s: %s-%s [{}s]' % (self.resource, from_size, created, using))
         self.after_generate()

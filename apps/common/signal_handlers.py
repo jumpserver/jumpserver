@@ -60,16 +60,18 @@ def on_request_finished_logging_db_query(sender, **kwargs):
         method = current_request.method
         path = current_request.get_full_path()
 
-    # print(">>> [{}] {}".format(method, path))
-    # for table_name, queries in table_queries.items():
-    #     if table_name.startswith('rbac_') or table_name.startswith('auth_permission'):
-    #         continue
-    #     print("- Table: {}".format(table_name))
-    #     for i, query in enumerate(queries, 1):
-    #         sql = query['sql']
-    #         if not sql or not sql.startswith('SELECT'):
-    #             continue
-    #         print('\t{}. {}'.format(i, sql))
+    print(">>> [{}] {}".format(method, path))
+    for table_name, queries in table_queries.items():
+        if table_name.startswith('rbac_') or table_name.startswith('auth_permission'):
+            continue
+        if len(queries) < 3:
+            continue
+        print("- Table: {}".format(table_name))
+        for i, query in enumerate(queries, 1):
+            sql = query['sql']
+            if not sql or not sql.startswith('SELECT'):
+                continue
+            print('\t{}. {}'.format(i, sql))
 
     logger.debug(">>> [{}] {}".format(method, path))
     for name, counter in counters:

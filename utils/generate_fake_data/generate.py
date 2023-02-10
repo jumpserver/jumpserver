@@ -50,7 +50,7 @@ def main():
     if resource == 'all':
         generator_cls = resource_generator_mapper.values()
     else:
-        generator_cls.push(resource_generator_mapper[resource])
+        generator_cls.append(resource_generator_mapper[resource])
 
     for _cls in generator_cls:
         generator = _cls(org_id=org_id, batch_size=batch_size)
