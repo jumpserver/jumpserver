@@ -58,7 +58,7 @@ class PermAccountUtil(AssetPermissionUtil):
                 if user.username in username_account_mapper:
                     account = username_account_mapper[user.username]
                 else:
-                    account = Account.get_user_account(user.username)
+                    account = Account.get_user_account()
             elif alias == AliasAccount.INPUT:
                 account = Account.get_manual_account()
             elif alias in username_account_mapper:

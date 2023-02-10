@@ -247,8 +247,11 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         account = self._validate_perm(user, asset, account_name)
         if account.has_secret:
             data['input_secret'] = ''
+
         if account.username != '@INPUT':
             data['input_username'] = ''
+        if account.username == '@USER':
+            data['input_username'] = user.username
 
         ticket = self._validate_acl(user, asset, account)
         if ticket:
