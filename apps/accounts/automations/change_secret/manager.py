@@ -22,6 +22,8 @@ logger = get_logger(__name__)
 
 
 class ChangeSecretManager(AccountBasePlaybookManager):
+    ansible_account_prefer = ''
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.method_hosts_mapper = defaultdict(list)

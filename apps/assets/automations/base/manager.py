@@ -25,6 +25,7 @@ class PlaybookCallback(DefaultCallback):
 class BasePlaybookManager:
     bulk_size = 100
     ansible_account_policy = 'privileged_first'
+    ansible_account_prefer = 'root,Administrator'
 
     def __init__(self, execution):
         self.execution = execution
@@ -123,6 +124,7 @@ class BasePlaybookManager:
     def generate_inventory(self, platformed_assets, inventory_path):
         inventory = JMSInventory(
             assets=platformed_assets,
+            account_prefer=self.ansible_account_prefer,
             account_policy=self.ansible_account_policy,
             host_callback=self.host_callback,
         )
