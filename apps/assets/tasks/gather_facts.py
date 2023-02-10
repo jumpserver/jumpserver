@@ -45,11 +45,11 @@ def update_assets_hardware_info_manual(asset_ids):
     from assets.models import Asset
     assets = Asset.objects.filter(id__in=asset_ids)
     task_name = gettext_noop("Update assets hardware info: ")
-    gather_assets_facts_task.delay(assets=assets, task_name=task_name)
+    return gather_assets_facts_task.delay(assets=assets, task_name=task_name)
 
 
 def update_node_assets_hardware_info_manual(node_id):
     from assets.models import Node
     node = Node.objects.get(id=node_id)
     task_name = gettext_noop("Update node asset hardware information: ")
-    gather_assets_facts_task.delay(nodes=[node], task_name=task_name)
+    return gather_assets_facts_task.delay(nodes=[node], task_name=task_name)
