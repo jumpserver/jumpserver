@@ -174,7 +174,7 @@ class BasePlaybookManager:
         pass
 
     def on_host_error(self, host, error, result):
-        pass
+        print('host error: {} -> {}'.format(host, error))
 
     def on_runner_success(self, runner, cb):
         summary = cb.summary
@@ -200,8 +200,11 @@ class BasePlaybookManager:
         runners = self.get_runners()
         if len(runners) > 1:
             print("### 分批次执行开始任务, 总共 {}\n".format(len(runners)))
-        else:
+        elif len(runners) == 1:
             print(">>> 开始执行任务\n")
+        else:
+            print("### 没有需要执行的任务\n")
+            return
 
         self.execution.date_start = timezone.now()
         for i, runner in enumerate(runners, start=1):
