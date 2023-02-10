@@ -76,6 +76,12 @@ class AssetAccountSerializer(
             'secret': {'write_only': True},
         }
 
+    def validate_push_now(self, value):
+        request = self.context['request']
+        if not request.user.has_perms('assets.push_assetaccount'):
+            return False
+        return value
+
     def validate_name(self, value):
         if not value:
             value = self.initial_data.get('username')
