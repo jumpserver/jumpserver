@@ -106,6 +106,8 @@ class CeleryTaskViewSet(
     mixins.ListModelMixin, mixins.DestroyModelMixin,
     viewsets.GenericViewSet
 ):
+    filterset_fields = ('id', 'name')
+    search_fields = filterset_fields
     serializer_class = CeleryTaskSerializer
 
     def get_queryset(self):
@@ -116,6 +118,7 @@ class CeleryTaskExecutionViewSet(CommonApiMixin, viewsets.ModelViewSet):
     serializer_class = CeleryTaskExecutionSerializer
     http_method_names = ('get', 'post', 'head', 'options',)
     queryset = CeleryTaskExecution.objects.all()
+    search_fields = ('name',)
 
     def get_queryset(self):
         task_id = self.request.query_params.get('task_id')

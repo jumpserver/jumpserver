@@ -30,32 +30,36 @@ def refresh_cache(name, org):
         logger.warning('refresh cache fail: {}'.format(name))
 
 
-def refresh_user_amount_cache(user):
+def refresh_all_orgs_user_amount_cache(user):
     orgs = user.orgs.distinct()
     for org in orgs:
         refresh_cache('users_amount', org)
+        refresh_cache('new_users_amount_this_week', org)
 
 
 @receiver(post_save, sender=OrgRoleBinding)
 def on_user_create_or_invite_refresh_cache(sender, instance, created, **kwargs):
     if created:
         refresh_cache('users_amount', instance.org)
+        refresh_cache('new_users_amount_this_week', instance.org)
 
 
 @receiver(post_save, sender=SystemRoleBinding)
 def on_user_global_create_refresh_cache(sender, instance, created, **kwargs):
     if created and current_org.is_root():
         refresh_cache('users_amount', current_org)
+        refresh_cache('new_users_amount_this_week', current_org)
 
 
 @receiver(pre_user_leave_org)
 def on_user_remove_refresh_cache(sender, org=None, **kwargs):
     refresh_cache('users_amount', org)
+    refresh_cache('new_users_amount_this_week', org)
 
 
 @receiver(pre_delete, sender=User)
 def on_user_delete_refresh_cache(sender, instance, **kwargs):
-    refresh_user_amount_cache(instance)
+    refresh_all_orgs_user_amount_cache(instance)
 
 
 model_cache_field_mapper = {

@@ -31,4 +31,7 @@ class CleaningSerializer(serializers.Serializer):
         min_value=1, max_value=99999, required=True, label=_('Session keep duration'),
         help_text=_('Unit: days, Session, record, command will be delete if more than duration, only in database')
     )
-
+    ACTIVITY_LOG_KEEP_DAYS = serializers.IntegerField(
+        min_value=1, max_value=9999,
+        label=_("Activity log keep days"), help_text=_("Unit: day")
+    )

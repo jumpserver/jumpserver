@@ -2,12 +2,12 @@ from django.db.models import QuerySet
 
 from accounts.const import AutomationTypes, Connectivity
 from common.utils import get_logger
-from ..base.manager import PushOrVerifyHostCallbackMixin, AccountBasePlaybookManager
+from ..base.manager import VerifyHostCallbackMixin, AccountBasePlaybookManager
 
 logger = get_logger(__name__)
 
 
-class VerifyAccountManager(PushOrVerifyHostCallbackMixin, AccountBasePlaybookManager):
+class VerifyAccountManager(VerifyHostCallbackMixin, AccountBasePlaybookManager):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

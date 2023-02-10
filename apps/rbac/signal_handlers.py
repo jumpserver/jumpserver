@@ -1,8 +1,8 @@
 from django.dispatch import receiver
-from django.db.models.signals import post_migrate, post_save
+from django.db.models.signals import post_migrate, post_save, m2m_changed, post_delete
 from django.apps import apps
 
-from .models import SystemRole, OrgRole
+from .models import SystemRole, OrgRole, OrgRoleBinding, SystemRoleBinding
 from .builtin import BuiltinRole
 
 
@@ -21,7 +21,32 @@ def on_system_role_update(sender, instance, created, **kwargs):
     User.expire_users_rbac_perms_cache()
 
 
+@receiver(m2m_changed, sender=SystemRole.permissions.through)
+def on_system_role_permission_changed(sender, instance, action, **kwargs):
+    from users.models import User
+    User.expire_users_rbac_perms_cache()
+
+
+@receiver([post_save, post_delete], sender=SystemRoleBinding)
+def on_system_role_binding_update(sender, instance, created, **kwargs):
+    from users.models import User
+    User.expire_users_rbac_perms_cache()
+
+
 @receiver(post_save, sender=OrgRole)
 def on_org_role_update(sender, instance, created, **kwargs):
+    from users.models import User
+    User.expire_users_rbac_perms_cache()
+
+
+@receiver(m2m_changed, sender=OrgRole.permissions.through)
+def on_org_role_permission_changed(sender, instance, action, **kwargs):
+    from users.models import User
+    User.expire_users_rbac_perms_cache()
+
+
+@receiver([post_save, post_delete], sender=OrgRoleBinding)
+def on_org_role_binding_update(sender, instance, **kwargs):
+    print('>>>>>>>>>>>')
     from users.models import User
     User.expire_users_rbac_perms_cache()

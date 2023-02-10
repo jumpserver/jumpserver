@@ -93,14 +93,21 @@ class WebAPP(object):
         self.asset = asset
         self.account = account
         self.platform = platform
-
-        self.extra_data = self.asset.spec_info
         self._steps = list()
-        autofill_type = self.asset.spec_info.autofill
+
+        extra_data = self.asset.spec_info
+        autofill_type = extra_data.autofill
+        if not autofill_type:
+            protocol_setting = self.platform.get_protocol_setting("http")
+            if not protocol_setting:
+                print("No protocol setting found")
+                return
+            extra_data = protocol_setting
+            autofill_type = extra_data.autofill
         if autofill_type == "basic":
-            self._steps = self._default_custom_steps()
+            self._steps = self._default_custom_steps(extra_data)
         elif autofill_type == "script":
-            script_list = self.asset.spec_info.script
+            script_list = extra_data.script
             steps = sorted(script_list, key=lambda step_item: step_item.step)
             for item in steps:
                 val = item.value
@@ -110,9 +117,8 @@ class WebAPP(object):
                 item.value = val
                 self._steps.append(item)
 
-    def _default_custom_steps(self) -> list:
+    def _default_custom_steps(self, spec_info) -> list:
         account = self.account
-        spec_info = self.asset.spec_info
         default_steps = [
             Step({
                 "step": 1,

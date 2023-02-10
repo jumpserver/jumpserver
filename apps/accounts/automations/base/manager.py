@@ -1,14 +1,14 @@
 from copy import deepcopy
 
 from common.utils import get_logger
-from accounts.const import AutomationTypes, SecretType
+from accounts.const import SecretType
 from assets.automations.base.manager import BasePlaybookManager
 from accounts.automations.methods import platform_automation_methods
 
 logger = get_logger(__name__)
 
 
-class PushOrVerifyHostCallbackMixin:
+class VerifyHostCallbackMixin:
     execution: callable
     get_accounts: callable
     host_account_mapper: dict

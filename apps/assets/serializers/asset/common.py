@@ -65,7 +65,7 @@ class AssetAccountSerializer(
     class Meta:
         model = Account
         fields_mini = [
-            'id', 'name', 'username', 'privileged',
+            'id', 'name', 'username', 'privileged', 'is_active',
             'version', 'secret_type',
         ]
         fields_write_only = [
@@ -75,6 +75,12 @@ class AssetAccountSerializer(
         extra_kwargs = {
             'secret': {'write_only': True},
         }
+
+    def validate_push_now(self, value):
+        request = self.context['request']
+        if not request.user.has_perms('assets.push_assetaccount'):
+            return False
+        return value
 
     def validate_name(self, value):
         if not value:

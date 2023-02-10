@@ -99,8 +99,9 @@ def on_asset_post_delete(instance: Asset, using, **kwargs):
         )
 
 
-def resend_to_asset_signals(sender, signal, **kwargs):
-    signal.send(sender=Asset, **kwargs)
+@on_transaction_commit
+def resend_to_asset_signals(sender, signal, instance, **kwargs):
+    signal.send(sender=Asset, instance=instance.asset_ptr, **kwargs)
 
 
 for model in (Host, Database, Device, Web, Cloud):

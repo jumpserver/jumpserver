@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from audits.backends.db import OperateLogStore
 from common.serializers.fields import LabeledChoiceField
+from common.utils import reverse
 from common.utils.timezone import as_current_tz
 from ops.models.job import JobAuditLog
 from ops.serializers.job import JobExecutionSerializer
@@ -13,7 +14,7 @@ from . import models
 from .const import (
     ActionChoices, OperateChoices,
     MFAChoices, LoginStatusChoices,
-    LoginTypeChoices,
+    LoginTypeChoices, ActivityChoices,
 )
 
 
@@ -105,19 +106,44 @@ class SessionAuditSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ActivitiesOperatorLogSerializer(serializers.Serializer):
+class ActivityOperatorLogSerializer(serializers.Serializer):
     timestamp = serializers.SerializerMethodField()
+    detail_url = serializers.SerializerMethodField()
     content = serializers.SerializerMethodField()
 
     @staticmethod
     def get_timestamp(obj):
-        return as_current_tz(obj.datetime).strftime('%Y-%m-%d %H:%M:%S')
+        return as_current_tz(obj['datetime']).strftime('%Y-%m-%d %H:%M:%S')
 
     @staticmethod
     def get_content(obj):
-        action = obj.action.replace('_', ' ').capitalize()
-        if not obj.detail:
-            ctn = _('User {} {} this resource.').format(obj.user, _(action))
+        if not obj['r_detail']:
+            action = obj['r_action'].replace('_', ' ').capitalize()
+            ctn = _('User {} {} this resource.').format(obj['r_user'], _(action))
         else:
-            ctn = obj.detail
+            ctn = obj['r_detail']
         return ctn
+
+    @staticmethod
+    def get_detail_url(obj):
+        detail_url = ''
+        detail_id, obj_type = obj['r_detail_id'], obj['r_type']
+        if not detail_id:
+            return detail_url
+
+        if obj_type == ActivityChoices.operate_log:
+            detail_url = reverse(
+                view_name='audits:operate-log-detail',
+                kwargs={'pk': obj['id']},
+                api_to_ui=True, is_audit=True
+            )
+        elif obj_type == ActivityChoices.task:
+            detail_url = reverse(
+                'ops:celery-task-log', kwargs={'pk': detail_id}
+            )
+        elif obj_type == ActivityChoices.login_log:
+            detail_url = '%s?id=%s' % (
+                reverse('api-audits:login-log-list', api_to_ui=True, is_audit=True),
+                detail_id
+            )
+        return detail_url

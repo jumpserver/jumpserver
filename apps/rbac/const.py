@@ -78,6 +78,7 @@ exclude_permissions = (
     ('orgs', 'organizationmember', '*', '*'),
     ('settings', 'setting', 'add,change,delete', 'setting'),
     ('audits', 'operatelog', 'add,delete,change', 'operatelog'),
+    ('audits', 'activitylog', 'add,delete,change', 'activitylog'),
     ('audits', 'passwordchangelog', 'add,change,delete', 'passwordchangelog'),
     ('audits', 'userloginlog', 'add,change,delete,change', 'userloginlog'),
     ('audits', 'ftplog', 'change,delete', 'ftplog'),

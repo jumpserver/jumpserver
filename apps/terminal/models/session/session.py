@@ -178,14 +178,11 @@ class Session(OrgModelMixin):
     def login_from_display(self):
         return self.get_login_from_display()
 
-    def get_asset_or_application(self):
-        instance = get_object_or_none(Asset, pk=self.asset_id)
-        if not instance:
-            instance = get_object_or_none(Application, pk=self.asset_id)
-        return instance
+    def get_asset(self):
+        return get_object_or_none(Asset, pk=self.asset_id)
 
     def get_target_ip(self):
-        instance = self.get_asset_or_application()
+        instance = self.get_asset()
         target_ip = instance.get_target_ip() if instance else ''
         return target_ip
 

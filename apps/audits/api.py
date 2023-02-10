@@ -3,6 +3,7 @@
 from importlib import import_module
 
 from django.conf import settings
+from django.db.models import F, Value, CharField
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin
@@ -14,11 +15,12 @@ from common.plugins.es import QuerySet as ESQuerySet
 from orgs.utils import current_org, tmp_to_root_org
 from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet
 from .backends import TYPE_ENGINE_MAPPING
-from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog
+from .const import ActivityChoices
+from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog, ActivityLog
 from .serializers import FTPLogSerializer, UserLoginLogSerializer, JobAuditLogSerializer
 from .serializers import (
     OperateLogSerializer, OperateLogActionDetailSerializer,
-    PasswordChangeLogSerializer, ActivitiesOperatorLogSerializer,
+    PasswordChangeLogSerializer, ActivityOperatorLogSerializer,
 )
 
 
@@ -47,8 +49,8 @@ class UserLoginCommonMixin:
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
     ]
-    filterset_fields = ['username', 'ip', 'city', 'type', 'status', 'mfa']
-    search_fields = ['username', 'ip', 'city']
+    filterset_fields = ['id', 'username', 'ip', 'city', 'type', 'status', 'mfa']
+    search_fields = ['id', 'username', 'ip', 'city']
 
 
 class UserLoginLogViewSet(UserLoginCommonMixin, ListModelMixin, JMSGenericViewSet):
@@ -77,16 +79,41 @@ class MyLoginLogAPIView(UserLoginCommonMixin, generics.ListAPIView):
 
 
 class ResourceActivityAPIView(generics.ListAPIView):
-    serializer_class = ActivitiesOperatorLogSerializer
+    serializer_class = ActivityOperatorLogSerializer
     rbac_perms = {
-        'GET': 'audits.view_operatelog',
+        'GET': 'audits.view_activitylog',
     }
 
-    def get_queryset(self):
-        resource_id = self.request.query_params.get('resource_id')
-        with tmp_to_root_org():
-            queryset = OperateLog.objects.filter(resource_id=resource_id)[:30]
+    @staticmethod
+    def get_operate_log_qs(fields, limit=30, **filters):
+        queryset = OperateLog.objects.filter(**filters).annotate(
+            r_type=Value(ActivityChoices.operate_log, CharField()),
+            r_detail_id=F('id'), r_detail=Value(None, CharField()),
+            r_user=F('user'), r_action=F('action'),
+        ).values(*fields)[:limit]
         return queryset
+
+    @staticmethod
+    def get_activity_log_qs(fields, limit=30, **filters):
+        queryset = ActivityLog.objects.filter(**filters).annotate(
+                r_type=F('type'), r_detail_id=F('detail_id'),
+                r_detail=F('detail'), r_user=Value(None, CharField()),
+                r_action=Value(None, CharField()),
+            ).values(*fields)[:limit]
+        return queryset
+
+    def get_queryset(self):
+        limit = 30
+        resource_id = self.request.query_params.get('resource_id')
+        fields = (
+            'id', 'datetime', 'r_detail', 'r_detail_id',
+            'r_user', 'r_action', 'r_type'
+        )
+        with tmp_to_root_org():
+            qs1 = self.get_operate_log_qs(fields, resource_id=resource_id)
+            qs2 = self.get_activity_log_qs(fields, resource_id=resource_id)
+            queryset = qs2.union(qs1)
+        return queryset[:limit]
 
 
 class OperateLogViewSet(RetrieveModelMixin, ListModelMixin, OrgGenericViewSet):
@@ -129,10 +156,12 @@ class PasswordChangeLogViewSet(ListModelMixin, JMSGenericViewSet):
     ordering = ['-datetime']
 
     def get_queryset(self):
-        users = current_org.get_members()
-        queryset = super().get_queryset().filter(
-            user__in=[user.__str__() for user in users]
-        )
+        queryset = super().get_queryset()
+        if not current_org.is_root():
+            users = current_org.get_members()
+            queryset = queryset.filter(
+                user__in=[str(user) for user in users]
+            )
         return queryset
 
 # Todo: 看看怎么搞

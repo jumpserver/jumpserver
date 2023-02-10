@@ -25,6 +25,7 @@ class PlaybookCallback(DefaultCallback):
 class BasePlaybookManager:
     bulk_size = 100
     ansible_account_policy = 'privileged_first'
+    ansible_account_prefer = 'root,Administrator'
 
     def __init__(self, execution):
         self.execution = execution
@@ -123,6 +124,7 @@ class BasePlaybookManager:
     def generate_inventory(self, platformed_assets, inventory_path):
         inventory = JMSInventory(
             assets=platformed_assets,
+            account_prefer=self.ansible_account_prefer,
             account_policy=self.ansible_account_policy,
             host_callback=self.host_callback,
         )
@@ -172,7 +174,7 @@ class BasePlaybookManager:
         pass
 
     def on_host_error(self, host, error, result):
-        pass
+        print('host error: {} -> {}'.format(host, error))
 
     def on_runner_success(self, runner, cb):
         summary = cb.summary
@@ -198,8 +200,11 @@ class BasePlaybookManager:
         runners = self.get_runners()
         if len(runners) > 1:
             print("### 分批次执行开始任务, 总共 {}\n".format(len(runners)))
-        else:
+        elif len(runners) == 1:
             print(">>> 开始执行任务\n")
+        else:
+            print("### 没有需要执行的任务\n")
+            return
 
         self.execution.date_start = timezone.now()
         for i, runner in enumerate(runners, start=1):

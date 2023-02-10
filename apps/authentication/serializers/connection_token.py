@@ -1,8 +1,9 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from common.serializers.fields import EncryptedField
+from perms.serializers.permission import ActionChoicesField
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
+from common.serializers.fields import EncryptedField
 from ..models import ConnectionToken
 
 __all__ = [
@@ -16,6 +17,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         label=_("Input secret"), max_length=40960, required=False, allow_blank=True
     )
     from_ticket_info = serializers.SerializerMethodField(label=_("Ticket info"))
+    actions = ActionChoicesField(read_only=True, label=_("Actions"))
 
     class Meta:
         model = ConnectionToken
@@ -29,7 +31,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         ]
         read_only_fields = [
             # 普通 Token 不支持指定 user
-            'user', 'expire_time',
+            'user', 'expire_time', 'is_expired',
             'user_display', 'asset_display',
         ]
         fields = fields_small + read_only_fields

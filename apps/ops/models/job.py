@@ -92,7 +92,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
             return "{}:{}:{}".format(self.org.name, self.creator.name, self.playbook.name)
 
     def create_execution(self):
-        return self.executions.create(job_version=self.version, material=self.material, job_type=Types[self.type].label)
+        return self.executions.create(job_version=self.version, material=self.material, job_type=Types[self.type].value)
 
     class Meta:
         verbose_name = _("Job")
@@ -235,6 +235,8 @@ class JobExecution(JMSOrgBaseModel):
 
     @property
     def time_cost(self):
+        if not self.date_start:
+            return 0
         if self.is_finished:
             return (self.date_finished - self.date_start).total_seconds()
         return (timezone.now() - self.date_start).total_seconds()

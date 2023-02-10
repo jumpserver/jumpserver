@@ -1,7 +1,5 @@
 from rest_framework.decorators import action
 from rest_framework.response import Response
-
-from common.utils import reverse
 from orgs.mixins.api import OrgBulkModelViewSet
 from .. import models, serializers
 
@@ -36,4 +34,4 @@ class CommandFilterACLViewSet(OrgBulkModelViewSet):
         }
         ticket = serializer.cmd_filter_acl.create_command_review_ticket(**data)
         info = ticket.get_extra_info_of_review(user=request.user)
-        return info
+        return Response(data=info)

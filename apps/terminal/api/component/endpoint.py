@@ -24,6 +24,7 @@ class SmartEndpointViewMixin:
     target_protocol: None
 
     @action(methods=['get'], detail=False, permission_classes=[IsValidUserOrConnectionToken])
+    @tmp_to_root_org()
     def smart(self, request, *args, **kwargs):
         self.target_instance = self.get_target_instance()
         self.target_protocol = self.get_target_protocol()
