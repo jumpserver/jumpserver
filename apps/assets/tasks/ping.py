@@ -32,7 +32,7 @@ def test_assets_connectivity_manual(asset_ids):
     from assets.models import Asset
     assets = Asset.objects.filter(id__in=asset_ids)
     task_name = gettext_noop("Test assets connectivity ")
-    test_assets_connectivity_task.delay(assets, task_name)
+    return test_assets_connectivity_task.delay(assets, task_name)
 
 
 def test_node_assets_connectivity_manual(node_id):
@@ -40,4 +40,4 @@ def test_node_assets_connectivity_manual(node_id):
     node = Node.objects.get(id=node_id)
     task_name = gettext_noop("Test if the assets under the node are connectable ")
     assets = node.get_all_assets()
-    test_assets_connectivity_task.delay(*assets, task_name)
+    return test_assets_connectivity_task.delay(*assets, task_name)
