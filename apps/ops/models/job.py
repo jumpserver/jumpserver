@@ -73,9 +73,9 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
         return total_cost / finished_count if finished_count else 0
 
     def get_register_task(self):
-        from ..tasks import run_ops_job_execution
+        from ..tasks import run_ops_job
         name = "run_ops_job_period_{}".format(str(self.id)[:8])
-        task = run_ops_job_execution.name
+        task = run_ops_job.name
         args = (str(self.id),)
         kwargs = {}
         return name, task, args, kwargs

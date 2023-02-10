@@ -27,17 +27,18 @@ logger = get_logger(__file__)
 @shared_task(soft_time_limit=60, queue="ansible", verbose_name=_("Run ansible task"))
 def run_ops_job(job_id):
     job = get_object_or_none(Job, id=job_id)
-    execution = job.create_execution()
-    run_ops_job_execution(execution)
-
-
-#
-# @shared_task(soft_time_limit=60, queue="ansible")
-# def show_env():
-#     import json
-#     print(os.environ)
-#     data = json.dumps(dict(os.environ), indent=4)
-#     return data
+    with tmp_to_org(job.org):
+        execution = job.create_execution()
+        execution.creator = job.creator
+        run_ops_job_execution(execution.id)
+        try:
+            execution.start()
+        except SoftTimeLimitExceeded:
+            execution.set_error('Run timeout')
+            logger.error("Run adhoc timeout")
+        except Exception as e:
+            execution.set_error(e)
+            logger.error("Start adhoc execution error: {}".format(e))
 
 
 @shared_task(soft_time_limit=60, queue="ansible", verbose_name=_("Run ansible task execution"))
