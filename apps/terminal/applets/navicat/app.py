@@ -7,9 +7,11 @@ if sys.platform == 'win32':
     import win32api
 
     from pywinauto import Application
-    from pywinauto.controls.uia_controls import (
-        EditWrapper, ComboBoxWrapper, ButtonWrapper
-    )
+    from pywinauto.controls.uia_controls import ButtonWrapper
+    from pywinauto.keyboard import send_keys
+
+import const as c
+
 from common import wait_pid, BaseApplication
 
 _default_path = r'C:\Program Files\PremiumSoft\Navicat Premium 16\navicat.exe'
@@ -30,17 +32,16 @@ class AppletApplication(BaseApplication):
         self.app = None
 
     def clean_up(self):
-        protocol_mapping = {
-            'mariadb': 'NavicatMARIADB', 'mongodb': 'NavicatMONGODB',
-            'mysql': 'Navicat', 'oracle': 'NavicatORA',
-            'sqlserver': 'NavicatMSSQL', 'postgresql': 'NavicatPG'
-        }
-        protocol_display = protocol_mapping.get(self.protocol, 'mysql')
-        sub_key = r'Software\PremiumSoft\%s\Servers' % protocol_display
-        try:
-            win32api.RegDeleteTree(winreg.HKEY_CURRENT_USER, sub_key)
-        except Exception as err:
-            print('Error: %s' % err)
+        protocols = (
+            'NavicatMARIADB', 'NavicatMONGODB', 'Navicat',
+            'NavicatORA', 'NavicatMSSQL', 'NavicatPG'
+        )
+        for p in protocols:
+            sub_key = r'Software\PremiumSoft\%s\Servers' % p
+            try:
+                win32api.RegDeleteTree(winreg.HKEY_CURRENT_USER, sub_key)
+            except Exception:
+                pass
 
     @staticmethod
     def launch():
@@ -51,135 +52,208 @@ class AppletApplication(BaseApplication):
             winreg.SetValueEx(key, 'AlreadyShowNavicatV16WelcomeScreen', 0, winreg.REG_DWORD, 1)
             # 禁止开启自动检查更新
             winreg.SetValueEx(key, 'AutoCheckUpdate', 0, winreg.REG_DWORD, 0)
+            # 禁止弹出初始化界面
             winreg.SetValueEx(key, 'ShareUsageData', 0, winreg.REG_DWORD, 0)
         except Exception as err:
             print('Launch error: %s' % err)
 
-    def _fill_to_mysql(self, app, menu, protocol_display='MySQL'):
-        menu.item_by_path('File->New Connection->%s' % protocol_display).click_input()
-        conn_window = app.window(best_match='Dialog').child_window(title_re='New Connection')
+    @staticmethod
+    def _exec_commands(commands):
+        for command in commands:
+            if command['type'] == 'key':
+                time.sleep(0.5)
+                send_keys(' '.join(command['commands']))
+            elif command['type'] == 'action':
+                for f in command['commands']:
+                    f()
 
-        name_ele = conn_window.child_window(best_match='Edit5')
-        EditWrapper(name_ele.element_info).set_edit_text(self.name)
+    def _action_not_remember_password(self):
+        conn_window = self.app.window(best_match='Dialog'). \
+            child_window(title_re='New Connection')
+        remember_checkbox = conn_window.child_window(best_match='Save password')
+        remember_checkbox.click()
 
-        host_ele = conn_window.child_window(best_match='Edit4')
-        EditWrapper(host_ele.element_info).set_edit_text(self.host)
+    def _get_mysql_commands(self):
+        commands = [
+            {
+                'type': 'key',
+                'commands': [
+                    '%f', c.DOWN, c.RIGHT, c.ENTER
+                ],
+            },
+            {
+                'type': 'key',
+                'commands': [
+                    self.name, c.TAB, self.host, c.TAB,
+                    str(self.port), c.TAB, self.username,
+                ]
+            },
+            {
+                'type': 'action',
+                'commands': [
+                    self._action_not_remember_password
+                ]
+            },
+            {
+                'type': 'key',
+                'commands': [c.ENTER]
+            }
+        ]
+        return commands
 
-        port_ele = conn_window.child_window(best_match='Edit2')
-        EditWrapper(port_ele.element_info).set_edit_text(self.port)
+    def _get_mariadb_commands(self):
+        commands = [
+            {
+                'type': 'key',
+                'commands': [
+                    '%f', c.DOWN, c.RIGHT, c.DOWN * 5, c.ENTER,
+                ],
+            },
+            {
+                'type': 'key',
+                'commands': [
+                    self.name, c.TAB, self.host, c.TAB,
+                    str(self.port), c.TAB, self.username
+                ]
+            },
+            {
+                'type': 'action',
+                'commands': [
+                    self._action_not_remember_password
+                ]
+            },
+            {
+                'type': 'key',
+                'commands': [c.ENTER]
+            }
+        ]
+        return commands
 
-        username_ele = conn_window.child_window(best_match='Edit1')
-        EditWrapper(username_ele.element_info).set_edit_text(self.username)
+    def _get_mongodb_commands(self):
+        commands = [
+            {
+                'type': 'key',
+                'commands': [
+                    '%f', c.DOWN, c.RIGHT, c.DOWN * 6, c.ENTER,
+                ],
+            },
+            {
+                'type': 'key',
+                'commands': [
+                    self.name, c.TAB * 3, self.host, c.TAB, str(self.port),
+                    c.TAB, c.DOWN, c.TAB, self.db, c.TAB, self.username,
+                ]
+            },
+            {
+                'type': 'action',
+                'commands': [
+                    self._action_not_remember_password
+                ]
+            },
+            {
+                'type': 'key',
+                'commands': [c.ENTER]
+            }
+        ]
+        return commands
 
-        password_ele = conn_window.child_window(best_match='Edit3')
-        EditWrapper(password_ele.element_info).set_edit_text(self.password)
+    def _get_postgresql_commands(self):
+        commands = [
+            {
+                'type': 'key',
+                'commands': [
+                    '%f', c.DOWN, c.RIGHT, c.DOWN, c.ENTER,
+                ],
+            },
+            {
+                'type': 'key',
+                'commands': [
+                    self.name, c.TAB, self.host, c.TAB, str(self.port),
+                    c.TAB, self.db, c.TAB, self.username
+                ]
+            },
+            {
+                'type': 'action',
+                'commands': [
+                    self._action_not_remember_password
+                ]
+            },
+            {
+                'type': 'key',
+                'commands': [c.ENTER]
+            }
+        ]
+        return commands
 
-    def _fill_to_mariadb(self, app, menu):
-        self._fill_to_mysql(app, menu, 'MariaDB')
+    def _get_sqlserver_commands(self):
+        commands = [
+            {
+                'type': 'key',
+                'commands': [
+                    '%f', c.DOWN, c.RIGHT, c.DOWN * 4, c.ENTER,
+                ],
+            },
+            {
+                'type': 'key',
+                'commands': [
+                    self.name, c.TAB, '%s,%s' % (self.host, self.port),
+                                      c.TAB * 2, self.db, c.TAB * 2, self.username
+                ]
+            },
+            {
+                'type': 'action',
+                'commands': [
+                    self._action_not_remember_password
+                ]
+            },
+            {
+                'type': 'key',
+                'commands': [c.ENTER]
+            }
+        ]
+        return commands
 
-    def _fill_to_mongodb(self, app, menu):
-        menu.item_by_path('File->New Connection->MongoDB').click_input()
-        conn_window = app.window(best_match='Dialog').child_window(title_re='New Connection')
-
-        auth_type_ele = conn_window.child_window(best_match='ComboBox2')
-        ComboBoxWrapper(auth_type_ele.element_info).select('Password')
-
-        name_ele = conn_window.child_window(best_match='Edit5')
-        EditWrapper(name_ele.element_info).set_edit_text(self.name)
-
-        host_ele = conn_window.child_window(best_match='Edit4')
-        EditWrapper(host_ele.element_info).set_edit_text(self.host)
-
-        port_ele = conn_window.child_window(best_match='Edit2')
-        EditWrapper(port_ele.element_info).set_edit_text(self.port)
-
-        db_ele = conn_window.child_window(best_match='Edit6')
-        EditWrapper(db_ele.element_info).set_edit_text(self.db)
-
-        username_ele = conn_window.child_window(best_match='Edit1')
-        EditWrapper(username_ele.element_info).set_edit_text(self.username)
-
-        password_ele = conn_window.child_window(best_match='Edit3')
-        EditWrapper(password_ele.element_info).set_edit_text(self.password)
-
-    def _fill_to_postgresql(self, app, menu):
-        menu.item_by_path('File->New Connection->PostgreSQL').click_input()
-        conn_window = app.window(best_match='Dialog').child_window(title_re='New Connection')
-
-        name_ele = conn_window.child_window(best_match='Edit6')
-        EditWrapper(name_ele.element_info).set_edit_text(self.name)
-
-        host_ele = conn_window.child_window(best_match='Edit5')
-        EditWrapper(host_ele.element_info).set_edit_text(self.host)
-
-        port_ele = conn_window.child_window(best_match='Edit2')
-        EditWrapper(port_ele.element_info).set_edit_text(self.port)
-
-        db_ele = conn_window.child_window(best_match='Edit4')
-        EditWrapper(db_ele.element_info).set_edit_text(self.db)
-
-        username_ele = conn_window.child_window(best_match='Edit1')
-        EditWrapper(username_ele.element_info).set_edit_text(self.username)
-
-        password_ele = conn_window.child_window(best_match='Edit3')
-        EditWrapper(password_ele.element_info).set_edit_text(self.password)
-
-    def _fill_to_sqlserver(self, app, menu):
-        menu.item_by_path('File->New Connection->SQL Server').click_input()
-        conn_window = app.window(best_match='Dialog').child_window(title_re='New Connection')
-
-        name_ele = conn_window.child_window(best_match='Edit5')
-        EditWrapper(name_ele.element_info).set_edit_text(self.name)
-
-        host_ele = conn_window.child_window(best_match='Edit4')
-        EditWrapper(host_ele.element_info).set_edit_text('%s,%s' % (self.host, self.port))
-
-        db_ele = conn_window.child_window(best_match='Edit3')
-        EditWrapper(db_ele.element_info).set_edit_text(self.db)
-
-        username_ele = conn_window.child_window(best_match='Edit6')
-        EditWrapper(username_ele.element_info).set_edit_text(self.username)
-
-        password_ele = conn_window.child_window(best_match='Edit2')
-        EditWrapper(password_ele.element_info).set_edit_text(self.password)
-
-    def _fill_to_oracle(self, app, menu):
-        menu.item_by_path('File->New Connection->Oracle').click_input()
-        conn_window = app.window(best_match='Dialog').child_window(title_re='New Connection')
-
-        name_ele = conn_window.child_window(best_match='Edit6')
-        EditWrapper(name_ele.element_info).set_edit_text(self.name)
-
-        host_ele = conn_window.child_window(best_match='Edit5')
-        EditWrapper(host_ele.element_info).set_edit_text(self.host)
-
-        port_ele = conn_window.child_window(best_match='Edit3')
-        EditWrapper(port_ele.element_info).set_edit_text(self.port)
-
-        db_ele = conn_window.child_window(best_match='Edit2')
-        EditWrapper(db_ele.element_info).set_edit_text(self.db)
-
-        username_ele = conn_window.child_window(best_match='Edit')
-        EditWrapper(username_ele.element_info).set_edit_text(self.username)
-
-        password_ele = conn_window.child_window(best_match='Edit4')
-        EditWrapper(password_ele.element_info).set_edit_text(self.password)
-
+    def _get_oracle_commands(self):
+        commands = [
+            {
+                'type': 'key',
+                'commands': [
+                    '%f', c.DOWN, c.RIGHT, c.DOWN * 2, c.ENTER,
+                ],
+            },
+            {
+                'type': 'key',
+                'commands': [
+                    self.name, c.TAB * 2, self.host, c.TAB,
+                    str(self.port), c.TAB, self.db, c.TAB, c.TAB, self.username,
+                ]
+            },
+            {
+                'type': 'action',
+                'commands': (self._action_not_remember_password,)
+            },
+            {
+                'type': 'key',
+                'commands': [c.ENTER]
+            }
+        ]
         if self.privileged:
-            conn_window.child_window(best_match='Advanced', control_type='TabItem').click_input()
-            role_ele = conn_window.child_window(best_match='ComboBox2')
-            ComboBoxWrapper(role_ele.element_info).select('SYSDBA')
+            commands.insert(3, {
+                'type': 'key',
+                'commands': (c.TAB * 4, c.RIGHT, c.TAB * 3, c.DOWN)
+            })
+        return commands
 
     def run(self):
         self.launch()
-        app = Application(backend='uia')
+        self.app = Application(backend='uia')
         work_dir = os.path.dirname(self.path)
-        app.start(self.path, work_dir=work_dir)
-        self.pid = app.process
+        self.app.start(self.path, work_dir=work_dir)
+        self.pid = self.app.process
 
         # 检测是否为试用版本
         try:
-            trial_btn = app.top_window().child_window(
+            trial_btn = self.app.top_window().child_window(
                 best_match='Trial', control_type='Button'
             )
             ButtonWrapper(trial_btn.element_info).click()
@@ -187,26 +261,27 @@ class AppletApplication(BaseApplication):
         except Exception:
             pass
 
-        menubar = app.window(best_match='Navicat Premium', control_type='Window') \
-            .child_window(best_match='Menu', control_type='MenuBar')
-
-        file = menubar.child_window(best_match='File', control_type='MenuItem')
-        file.click_input()
-        menubar.item_by_path('File->New Connection').click_input()
-
-        # 根据协议选择动作
-        action = getattr(self, '_fill_to_%s' % self.protocol, None)
+        # 根据协议获取相应操作命令
+        action = getattr(self, '_get_%s_commands' % self.protocol, None)
         if action is None:
             raise ValueError('This protocol is not supported: %s' % self.protocol)
-        action(app, menubar)
-
-        conn_window = app.window(best_match='Dialog').child_window(title_re='New Connection')
-        ok_btn = conn_window.child_window(best_match='OK', control_type='Button')
-        ok_btn.click()
-
-        file.click_input()
-        menubar.item_by_path('File->Open Connection').click_input()
-        self.app = app
+        commands = action()
+        # 关闭掉桌面许可弹框
+        commands.insert(0, {'type': 'key', 'commands': (c.ENTER,)})
+        # 登录
+        commands.extend([
+            {
+                'type': 'key',
+                'commands': (
+                    '%f', c.DOWN * 5, c.ENTER
+                )
+            },
+            {
+                'type': 'key',
+                'commands': (self.password, c.ENTER)
+            }
+        ])
+        self._exec_commands(commands)
 
     def wait(self):
         try:
