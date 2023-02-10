@@ -266,6 +266,9 @@ class AppletApplication(BaseApplication):
         if action is None:
             raise ValueError('This protocol is not supported: %s' % self.protocol)
         commands = action()
+        # 关闭掉桌面许可弹框
+        commands.insert(0, {'type': 'key', 'commands': (c.ENTER,)})
+        # 登录
         commands.extend([
             {
                 'type': 'key',
