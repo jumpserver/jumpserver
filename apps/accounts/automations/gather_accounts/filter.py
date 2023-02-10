@@ -30,6 +30,10 @@ class GatherAccountsFilter:
         result = {}
         for line in info:
             data = line.split('@')
+            if len(data) == 1:
+                result[line] = {}
+                continue
+
             if len(data) != 3:
                 continue
             username, address, dt = data

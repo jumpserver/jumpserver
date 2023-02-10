@@ -86,10 +86,10 @@ class OAuth2EndSessionView(View):
             logger.debug(log_prompt.format('Log out the current user: {}'.format(request.user)))
             auth.logout(request)
 
-            if settings.AUTH_OAUTH2_LOGOUT_COMPLETELY:
+            logout_url = settings.AUTH_OAUTH2_PROVIDER_END_SESSION_ENDPOINT
+            if settings.AUTH_OAUTH2_LOGOUT_COMPLETELY and logout_url:
                 logger.debug(log_prompt.format('Log out OAUTH2 platform user session synchronously'))
-                next_url = settings.AUTH_OAUTH2_PROVIDER_END_SESSION_ENDPOINT
-                return HttpResponseRedirect(next_url)
+                return HttpResponseRedirect(logout_url)
 
         logger.debug(log_prompt.format('Redirect'))
         return HttpResponseRedirect(logout_url)
