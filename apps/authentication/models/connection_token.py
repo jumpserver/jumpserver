@@ -11,7 +11,8 @@ from rest_framework.exceptions import PermissionDenied
 
 from assets.const import Protocol
 from common.db.fields import EncryptCharField
-from common.utils import lazyproperty, pretty_string, bulk_get, reverse
+from common.exceptions import JMSException
+from common.utils import lazyproperty, pretty_string, bulk_get
 from common.utils.timezone import as_current_tz
 from orgs.mixins.models import JMSOrgBaseModel
 from terminal.models import Applet
@@ -172,7 +173,7 @@ class ConnectionToken(JMSOrgBaseModel):
 
         host_account = applet.select_host_account()
         if not host_account:
-            return None
+            raise JMSException({'error': 'No host account available'})
 
         host, account, lock_key, ttl = bulk_get(host_account, ('host', 'account', 'lock_key', 'ttl'))
         gateway = host.gateway.select_gateway() if host.domain else None
@@ -196,8 +197,7 @@ class ConnectionToken(JMSOrgBaseModel):
         if lock_key:
             cache.delete(lock_key)
             cache.delete(token_account_relate_key)
-            return 'released'
-        return 'not found or expired'
+            return True
 
     @lazyproperty
     def account_object(self):
