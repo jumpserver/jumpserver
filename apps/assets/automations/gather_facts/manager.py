@@ -23,6 +23,8 @@ class GatherFactsManager(BasePlaybookManager):
         info = result.get('debug', {}).get('res', {}).get('info', {})
         asset = self.host_asset_mapper.get(host)
         if asset and info:
+            for k, v in info.items():
+                info[k] = v.strip()
             asset.info = info
             asset.save()
         else:
