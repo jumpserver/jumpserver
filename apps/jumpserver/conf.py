@@ -512,6 +512,7 @@ class Config(dict):
         'LOGIN_LOG_KEEP_DAYS': 200,
         'TASK_LOG_KEEP_DAYS': 90,
         'OPERATE_LOG_KEEP_DAYS': 200,
+        'ACTIVITY_LOG_KEEP_DAYS': 200,
         'FTP_LOG_KEEP_DAYS': 200,
         'CLOUD_SYNC_TASK_EXECUTION_KEEP_DAYS': 30,
 
