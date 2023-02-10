@@ -27,7 +27,7 @@ class AppletApplication(BaseApplication):
         self.host = self.asset.address
         self.port = self.asset.get_protocol_port(self.protocol)
         self.db = self.asset.spec_info.db_name
-        self.name = '%s-%s' % (self.host, self.db)
+        self.name = '%s-%s-%s' % (self.host, self.db, int(time.time()))
         self.pid = None
         self.app = None
 
@@ -267,7 +267,7 @@ class AppletApplication(BaseApplication):
             raise ValueError('This protocol is not supported: %s' % self.protocol)
         commands = action()
         # 关闭掉桌面许可弹框
-        commands.insert(0, {'type': 'key', 'commands': (c.ENTER,)})
+        commands.insert(0, {'type': 'key', 'commands': (c.ESC,)})
         # 登录
         commands.extend([
             {
