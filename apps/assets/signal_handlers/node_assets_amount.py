@@ -10,6 +10,7 @@ from common.const.signals import PRE_ADD, POST_REMOVE, PRE_CLEAR
 from common.decorators import on_transaction_commit, merge_delay_run
 from common.utils import get_logger
 from orgs.utils import tmp_to_org
+from ..tasks import check_node_assets_amount_task
 
 logger = get_logger(__file__)
 
@@ -33,13 +34,18 @@ def on_node_asset_change(sender, action, instance, reverse, pk_set, **kwargs):
             node_ids = [instance.id]
         else:
             node_ids = pk_set
-        update_node_assets_amount(*node_ids)
+        update_nodes_assets_amount(*node_ids)
 
 
 @merge_delay_run(ttl=5)
-def update_node_assets_amount(*node_ids):
+def update_nodes_assets_amount(*node_ids):
     nodes = list(Node.objects.filter(id__in=node_ids))
     logger.info('Update nodes assets amount: {} nodes'.format(len(node_ids)))
+
+    if len(node_ids) > 100:
+        check_node_assets_amount_task.delay()
+        return
+
     for node in nodes:
         node.assets_amount = node.get_assets_amount()
 

@@ -65,7 +65,7 @@ def _run_func_if_is_last(ttl, suffix_key, org, func, *args, **kwargs):
         logger.error('delay run error: %s' % e)
 
 
-executor = ThreadPoolExecutor(10)
+executor = ThreadPoolExecutor(20)
 
 
 def delay_run(ttl=5, key=None):

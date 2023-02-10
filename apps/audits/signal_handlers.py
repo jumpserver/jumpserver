@@ -2,6 +2,7 @@
 #
 import uuid
 
+from celery import shared_task
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth import BACKEND_SESSION_KEY
@@ -26,6 +27,7 @@ from common.signals import django_ready
 from common.utils import get_request_ip, get_logger, get_syslogger
 from common.utils.encode import data_to_json
 from jumpserver.utils import current_request
+from orgs.utils import org_aware_func
 from terminal.models import Session, Command
 from terminal.serializers import SessionSerializer, SessionCommandSerializer
 from users.models import User
@@ -69,24 +71,18 @@ M2M_ACTION = {
 }
 
 
-@receiver(m2m_changed)
-def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
-    if action not in M2M_ACTION:
-        return
-    if not instance:
-        return
-    return
-
-    resource_type = instance._meta.verbose_name
+@shared_task(verbose_name=_("Create m2m operate log"))
+@org_aware_func('instance')
+def create_m2m_operate_log(instance, action, model, pk_set):
     current_instance = model_to_dict(instance, include_model_fields=False)
-
+    resource_type = instance._meta.verbose_name
+    field_name = str(model._meta.verbose_name)
+    action = M2M_ACTION[action]
     instance_id = current_instance.get('id')
     log_id, before_instance = get_instance_dict_from_cache(instance_id)
 
-    field_name = str(model._meta.verbose_name)
     objs = model.objects.filter(pk__in=pk_set)
     objs_display = [str(o) for o in objs]
-    action = M2M_ACTION[action]
     changed_field = current_instance.get(field_name, [])
 
     after, before, before_value = None, None, None
@@ -107,8 +103,18 @@ def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
 
     create_or_update_operate_log(
         ActionChoices.update, resource_type,
-        resource=instance, log_id=log_id, before=before, after=after
+        resource=instance, log_id=log_id,
+        before=before, after=after
     )
+
+
+@receiver(m2m_changed)
+def on_m2m_changed(sender, action, instance, model, pk_set, **kwargs):
+    if action not in M2M_ACTION:
+        return
+    if not instance:
+        return
+    create_m2m_operate_log.delay(instance, action, model, pk_set)
 
 
 def signal_of_operate_log_whether_continue(sender, instance, created, update_fields=None):
@@ -129,16 +135,21 @@ def signal_of_operate_log_whether_continue(sender, instance, created, update_fie
     return condition
 
 
+@shared_task(verbose_name=_("Create operate log"))
+@org_aware_func('instance')
+def create_operate_log(instance, created, update_fields=None):
+    pass
+
+
 @receiver(pre_save)
-def on_object_pre_create_or_update(sender, instance=None, raw=False, using=None, update_fields=None, **kwargs):
+def on_object_pre_create_or_update(sender, instance=None, update_fields=None, **kwargs):
     ok = signal_of_operate_log_whether_continue(
         sender, instance, False, update_fields
     )
     if not ok:
         return
 
-    # users.PrivateToken Model 没有 id 有 pk字段
-    instance_id = getattr(instance, 'id', getattr(instance, 'pk', None))
+    instance_id = getattr(instance, 'pk', None)
     instance_before_data = {'id': instance_id}
     raw_instance = type(instance).objects.filter(pk=instance_id).first()
 
@@ -152,7 +163,6 @@ def on_object_pre_create_or_update(sender, instance=None, raw=False, using=None,
 
 @receiver(post_save)
 def on_object_created_or_update(sender, instance=None, created=False, update_fields=None, **kwargs):
-    return
     ok = signal_of_operate_log_whether_continue(
         sender, instance, created, update_fields
     )
