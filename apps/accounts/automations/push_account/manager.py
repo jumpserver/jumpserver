@@ -12,6 +12,7 @@ logger = get_logger(__name__)
 
 
 class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
+    ansible_account_prefer = ''
 
     @classmethod
     def method_type(cls):
