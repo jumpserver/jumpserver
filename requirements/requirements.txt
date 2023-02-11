@@ -123,7 +123,7 @@ redis==4.3.3
 pyOpenSSL==22.0.0
 pymongo==4.2.0
 # Debug
-ipython==8.4.0
+ipython==8.10.0
 ForgeryPy3==0.3.1
 django-debug-toolbar==3.5
 Pympler==1.0.1
