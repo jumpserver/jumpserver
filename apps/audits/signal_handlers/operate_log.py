@@ -3,8 +3,8 @@
 import uuid
 
 from django.apps import apps
-from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save, m2m_changed, pre_delete
+from django.dispatch import receiver
 
 from audits.handler import (
     get_instance_current_with_cache_diff, cache_instance_before_data,
@@ -13,9 +13,7 @@ from audits.handler import (
 from audits.utils import model_to_dict_for_operate_log as model_to_dict
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR, SKIP_SIGNAL
 from common.signals import django_ready
-
 from ..const import MODELS_NEED_RECORD, ActionChoices
-
 
 M2M_ACTION = {
     POST_ADD: ActionChoices.create,
@@ -30,7 +28,10 @@ def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
         return
     if not instance:
         return
+    create_m2m_operate_log(instance, model, action, pk_set)
 
+
+def create_m2m_operate_log(instance, model, action, pk_set):
     resource_type = instance._meta.verbose_name
     current_instance = model_to_dict(instance, include_model_fields=False)
 
@@ -65,9 +66,7 @@ def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
     )
 
 
-def signal_of_operate_log_whether_continue(
-        sender, instance, created, update_fields=None
-):
+def signal_of_operate_log_whether_continue(sender, instance, created, update_fields=None):
     condition = True
     if not instance:
         condition = False
@@ -87,9 +86,7 @@ def signal_of_operate_log_whether_continue(
 
 
 @receiver(pre_save)
-def on_object_pre_create_or_update(
-        sender, instance=None, raw=False, using=None, update_fields=None, **kwargs
-):
+def on_object_pre_create_or_update(sender, instance=None, update_fields=None, **kwargs):
     ok = signal_of_operate_log_whether_continue(
         sender, instance, False, update_fields
     )
@@ -97,7 +94,7 @@ def on_object_pre_create_or_update(
         return
 
     # users.PrivateToken Model 没有 id 有 pk字段
-    instance_id = getattr(instance, 'id', getattr(instance, 'pk', None))
+    instance_id = getattr(instance, 'pk', None)
     instance_before_data = {'id': instance_id}
     raw_instance = type(instance).objects.filter(pk=instance_id).first()
 
@@ -110,9 +107,7 @@ def on_object_pre_create_or_update(
 
 
 @receiver(post_save)
-def on_object_created_or_update(
-        sender, instance=None, created=False, update_fields=None, **kwargs
-):
+def on_object_created_or_update(sender, instance=None, created=False, update_fields=None, **kwargs):
     ok = signal_of_operate_log_whether_continue(
         sender, instance, created, update_fields
     )

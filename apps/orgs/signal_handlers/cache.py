@@ -77,6 +77,7 @@ class OrgResourceStatisticsRefreshUtil:
     @staticmethod
     @merge_delay_run(ttl=5)
     def refresh_org_fields(*org_fields):
+        # Todo: 优化这里，一次清理
         for org, cache_field_name in org_fields:
             OrgResourceStatisticsCache(org).expire(*cache_field_name)
             OrgResourceStatisticsCache(Organization.root()).expire(*cache_field_name)
@@ -102,7 +103,11 @@ def on_post_delete_refresh_org_resource_statistics_cache(sender, instance, **kwa
 
 
 def _refresh_session_org_resource_statistics_cache(instance: Session):
-    cache_field_name = ['total_count_online_users', 'total_count_online_sessions', 'total_count_today_failed_sessions']
+    cache_field_name = [
+        'total_count_online_users',
+        'total_count_online_sessions',
+        'total_count_today_failed_sessions'
+    ]
 
     org_cache = OrgResourceStatisticsCache(instance.org)
     org_cache.expire(*cache_field_name)
