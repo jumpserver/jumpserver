@@ -210,7 +210,7 @@ class NodeTaskCreateApi(generics.CreateAPIView):
             return
 
         if action == "refresh":
-            task = update_node_assets_hardware_info_manual.delay(node.id)
+            task = update_node_assets_hardware_info_manual(node.id)
         else:
-            task = test_node_assets_connectivity_manual.delay(node.id)
+            task = test_node_assets_connectivity_manual(node.id)
         self.set_serializer_data(serializer, task)
