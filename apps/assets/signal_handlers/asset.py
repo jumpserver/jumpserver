@@ -21,13 +21,13 @@ def on_node_pre_save(sender, instance: Node, **kwargs):
 
 
 @merge_delay_run(ttl=5, key=key_by_org)
-def test_assets_connectivity_handler(*assets):
+def test_assets_connectivity_handler(assets=()):
     task_name = gettext_noop("Test assets connectivity ")
     test_assets_connectivity_task.delay(assets, task_name)
 
 
 @merge_delay_run(ttl=5, key=key_by_org)
-def gather_assets_facts_handler(*assets):
+def gather_assets_facts_handler(assets=()):
     if not assets:
         logger.info("No assets to update hardware info")
         return
@@ -36,7 +36,7 @@ def gather_assets_facts_handler(*assets):
 
 
 @merge_delay_run(ttl=5, key=key_by_org)
-def ensure_asset_has_node(*assets):
+def ensure_asset_has_node(assets=()):
     asset_ids = [asset.id for asset in assets]
     has_ids = Asset.nodes.through.objects \
         .filter(asset_id__in=asset_ids) \
@@ -60,16 +60,16 @@ def on_asset_create(sender, instance=None, created=False, **kwargs):
         return
     logger.info("Asset create signal recv: {}".format(instance))
 
-    ensure_asset_has_node(instance)
+    ensure_asset_has_node(assets=(instance,))
 
     # 获取资产硬件信息
     auto_info = instance.auto_info
     if auto_info.get('ping_enabled'):
         logger.debug('Asset {} ping enabled, test connectivity'.format(instance.name))
-        test_assets_connectivity_handler(instance)
+        test_assets_connectivity_handler(assets=(instance,))
     if auto_info.get('gather_facts_enabled'):
         logger.debug('Asset {} gather facts enabled, gather facts'.format(instance.name))
-        gather_assets_facts_handler(instance)
+        gather_assets_facts_handler(assets=(instance,))
 
 
 RELATED_NODE_IDS = '_related_node_ids'
