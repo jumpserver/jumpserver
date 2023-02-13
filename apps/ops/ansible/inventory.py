@@ -10,7 +10,7 @@ __all__ = ['JMSInventory']
 
 class JMSInventory:
     def __init__(self, assets, account_policy='privileged_first',
-                 account_prefer='root,Administrator', host_callback=None):
+                 account_prefer='root,Administrator', host_callback=None, exclude_localhost=False):
         """
         :param assets:
         :param account_prefer: account username name if not set use account_policy
@@ -21,6 +21,7 @@ class JMSInventory:
         self.account_policy = account_policy
         self.host_callback = host_callback
         self.exclude_hosts = {}
+        self.exclude_localhost = exclude_localhost
 
     @staticmethod
     def clean_assets(assets):
@@ -207,6 +208,8 @@ class JMSInventory:
         for host in hosts:
             name = host.pop('name')
             data['all']['hosts'][name] = host
+        if self.exclude_localhost and data['all']['hosts'].__contains__('localhost'):
+            data['all']['hosts'].update({'localhost': {'ansible_host': '255.255.255.255'}})
         return data
 
     def write_to_file(self, path):

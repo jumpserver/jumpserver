@@ -295,10 +295,20 @@ class JobExecution(JMSOrgBaseModel):
         task_id = current_task.request.root_id
         self.task_id = task_id
 
+    def check_danger_keywords(self):
+        lines = self.job.playbook.check_dangerous_keywords()
+        if len(lines) > 0:
+            for line in lines:
+                print('\033[31mThe {} line of the file \'{}\' contains the '
+                      'dangerous keyword \'{}\'\033[0m'.format(line['line'], line['file'], line['keyword']))
+            raise Exception("Playbook contains dangerous keywords")
+
     def start(self, **kwargs):
         self.date_start = timezone.now()
         self.set_celery_id()
         self.save()
+        if self.job.type == 'playbook':
+            self.check_danger_keywords()
         runner = self.get_runner()
         try:
             cb = runner.run(**kwargs)
