@@ -34,11 +34,11 @@ def on_node_asset_change(sender, action, instance, reverse, pk_set, **kwargs):
             node_ids = [instance.id]
         else:
             node_ids = pk_set
-        update_nodes_assets_amount(*node_ids)
+        update_nodes_assets_amount(node_ids=node_ids)
 
 
 @merge_delay_run(ttl=5)
-def update_nodes_assets_amount(*node_ids):
+def update_nodes_assets_amount(node_ids=()):
     nodes = list(Node.objects.filter(id__in=node_ids))
     logger.info('Update nodes assets amount: {} nodes'.format(len(node_ids)))
 
