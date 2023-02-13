@@ -4,6 +4,7 @@ import zipfile
 
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+from rest_framework import status
 
 from orgs.mixins.api import OrgBulkModelViewSet
 from ..exception import PlaybookNoValidEntry
@@ -129,25 +130,25 @@ class PlaybookFileBrowserAPIView(APIView):
         work_path = playbook.work_dir
 
         file_key = request.data.get('key', '')
+        new_name = request.data.get('new_name', '')
 
-        if file_key in self.protected_files:
-            return Response({'msg': '{} can not be modified'.format(file_key)}, status=400)
+        if file_key in self.protected_files and new_name:
+            return Response({'msg': '{} can not be rename'.format(file_key)}, status=status.HTTP_400_BAD_REQUEST)
 
         if os.path.dirname(file_key) == 'root':
             file_key = os.path.basename(file_key)
 
-        new_name = request.data.get('new_name', '')
         content = request.data.get('content', '')
         is_directory = request.data.get('is_directory', False)
 
         if not file_key or file_key == 'root':
-            return Response(status=400)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         file_path = os.path.join(work_path, file_key)
 
         if new_name:
             new_file_path = os.path.join(os.path.dirname(file_path), new_name)
             if os.path.exists(new_file_path):
-                return Response({'msg': '{} already exists'.format(new_name)}, status=400)
+                return Response({'msg': '{} already exists'.format(new_name)}, status=status.HTTP_400_BAD_REQUEST)
             os.rename(file_path, new_file_path)
             file_path = new_file_path
 
@@ -162,9 +163,9 @@ class PlaybookFileBrowserAPIView(APIView):
         work_path = playbook.work_dir
         file_key = request.query_params.get('key', '')
         if not file_key:
-            return Response({'msg': 'key is required'}, status=400)
+            return Response({'msg': 'key is required'}, status=status.HTTP_400_BAD_REQUEST)
         if file_key in self.protected_files:
-            return Response({'msg': ' {} can not be delete'.format(file_key)}, status=400)
+            return Response({'msg': ' {} can not be delete'.format(file_key)}, status=status.HTTP_400_BAD_REQUEST)
         file_path = os.path.join(work_path, file_key)
         if os.path.isdir(file_path):
             shutil.rmtree(file_path)
