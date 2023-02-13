@@ -175,13 +175,17 @@ def merge_delay_run(ttl=5, key=None):
             key_suffix = suffix_key_func(*args, **kwargs)
             cache_key = f'MERGE_DELAY_RUN_{func_name}_{key_suffix}'
             cache_kwargs = _loop_debouncer_func_args_cache.get(cache_key, {})
+
             for k, v in kwargs.items():
-                if not isinstance(v, tuple):
-                    raise ValueError('func kwargs value must be list or tuple: %s' % func.__name__)
+                if not isinstance(v, (tuple, list, set)):
+                    raise ValueError('func kwargs value must be list or tuple: %s %s' % (func.__name__, v))
                 if k not in cache_kwargs:
                     cache_kwargs[k] = v
+                elif isinstance(v, set):
+                    cache_kwargs[k] = cache_kwargs[k].union(v)
                 else:
                     cache_kwargs[k] += v
+            _loop_debouncer_func_args_cache[cache_key] = cache_kwargs
             run_debouncer_func(cache_key, org, ttl, func, *args, **cache_kwargs)
 
         return wrapper
@@ -190,11 +194,11 @@ def merge_delay_run(ttl=5, key=None):
 
 
 @delay_run(ttl=5)
-def test_delay_run(*username):
+def test_delay_run(username):
     print("Hello, %s, now is %s" % (username, time.time()))
 
 
-@merge_delay_run(ttl=5, key=lambda *users: users[0][0])
+@merge_delay_run(ttl=5, key=lambda users=(): users[0][0])
 def test_merge_delay_run(users=()):
     name = ','.join(users)
     time.sleep(2)
@@ -206,8 +210,8 @@ def do_test():
     print("start : %s" % time.time())
     for i in range(100):
         # test_delay_run('test', year=i)
-        test_merge_delay_run('test %s' % i)
-        test_merge_delay_run('best %s' % i)
+        test_merge_delay_run(users=['test %s' % i])
+        test_merge_delay_run(users=['best %s' % i])
         test_delay_run('test run %s' % i)
 
     end = time.time()

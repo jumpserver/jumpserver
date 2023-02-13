@@ -40,7 +40,7 @@ def main():
         default='all',
         help="resource to generate"
     )
-    parser.add_argument('-c', '--count', type=int, default=10000)
+    parser.add_argument('-c', '--count', type=int, default=1000)
     parser.add_argument('-b', '--batch_size', type=int, default=100)
     parser.add_argument('-o', '--org', type=str, default='')
     args = parser.parse_args()
