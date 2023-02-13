@@ -96,6 +96,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
 
     class Meta:
         verbose_name = _("Job")
+        unique_together = [('name', 'org_id', 'creator')]
         ordering = ['date_created']
 
 
