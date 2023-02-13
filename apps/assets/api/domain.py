@@ -5,7 +5,7 @@ from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView, Response
 
 from common.utils import get_logger
-from assets.tasks import test_assets_connectivity_manual
+from assets.tasks import test_gateways_connectivity_manual
 from orgs.mixins.api import OrgBulkModelViewSet
 from .. import serializers
 from ..models import Domain, Gateway
@@ -55,5 +55,5 @@ class GatewayTestConnectionApi(SingleObjectMixin, APIView):
             local_port = int(local_port)
         except ValueError:
             raise ValidationError({'port': _('Number required')})
-        task = test_assets_connectivity_manual.delay([gateway.id], local_port)
+        task = test_gateways_connectivity_manual([gateway.id], local_port)
         return Response({'task': task.id})
