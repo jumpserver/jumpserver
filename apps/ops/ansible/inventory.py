@@ -10,7 +10,7 @@ __all__ = ['JMSInventory']
 
 class JMSInventory:
     def __init__(self, assets, account_policy='privileged_first',
-                 account_prefer='root,Administrator', host_callback=None):
+                 account_prefer='root,Administrator', host_callback=None, exclude_localhost=False):
         """
         :param assets:
         :param account_prefer: account username name if not set use account_policy
@@ -21,6 +21,7 @@ class JMSInventory:
         self.account_policy = account_policy
         self.host_callback = host_callback
         self.exclude_hosts = {}
+        self.exclude_localhost = exclude_localhost
 
     @staticmethod
     def clean_assets(assets):
@@ -169,6 +170,13 @@ class JMSInventory:
 
     def generate(self, path_dir):
         hosts = []
+        # localhost taint
+        if self.exclude_localhost:
+            hosts.append({
+                'name': 'localhost',
+                'ansible_host': '255.255.255.255'
+            })
+
         platform_assets = self.group_by_platform(self.assets)
         for platform, assets in platform_assets.items():
             automation = platform.automation

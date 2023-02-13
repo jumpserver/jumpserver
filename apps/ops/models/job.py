@@ -82,7 +82,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
 
     @property
     def inventory(self):
-        return JMSInventory(self.assets.all(), self.runas_policy, self.runas)
+        return JMSInventory(self.assets.all(), self.runas_policy, self.runas, exclude_localhost=True)
 
     @property
     def material(self):
