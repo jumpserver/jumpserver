@@ -103,9 +103,9 @@ class CommandViewSet(JMSBulkModelViewSet):
     command_store = get_command_storage()
     serializer_class = SessionCommandSerializer
     filterset_class = CommandFilter
-    search_fields = ('input',)
     model = Command
-    ordering_fields = ('timestamp',)
+    search_fields = ('input',)
+    ordering_fields = ('timestamp', 'risk_level')
 
     def merge_all_storage_list(self, request, *args, **kwargs):
         merged_commands = []
