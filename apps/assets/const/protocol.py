@@ -96,6 +96,9 @@ class Protocol(ChoicesMixin, models.TextChoices):
                 'port': 6379,
                 'required': True,
                 'secret_types': ['password'],
+                'setting': {
+                    'auth_username': True,
+                }
             },
         }
 

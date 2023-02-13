@@ -63,7 +63,7 @@ class DatabaseTypes(BaseType):
             cls.SQLSERVER: [{'name': 'SQLServer'}],
             cls.CLICKHOUSE: [{'name': 'ClickHouse'}],
             cls.MONGODB: [{'name': 'MongoDB'}],
-            cls.REDIS: [{'name': 'Redis'}],
+            cls.REDIS: [{'name': 'Redis'}, {'name': 'Redis6+'}],
         }
 
     @classmethod

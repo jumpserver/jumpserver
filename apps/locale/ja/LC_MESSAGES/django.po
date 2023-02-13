@@ -1765,7 +1765,7 @@ msgid "User {} has executed change auth plan for this account.({})"
 msgstr "ユーザー {} はこのアカウントのために改密計画を実行しました。({})"
 
 #: audits/handler.py:168
-msgid "User {} login into this service.[{}]"
+msgid "User [{}] login this system.[{}]"
 msgstr "ユーザー {} がサービスにログインしました。[{}]"
 
 #: audits/models.py:32 audits/models.py:59 audits/models.py:101

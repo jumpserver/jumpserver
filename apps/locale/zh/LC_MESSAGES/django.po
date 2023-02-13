@@ -1752,7 +1752,7 @@ msgid "User {} has executed change auth plan for this account.({})"
 msgstr "用户 {} 为这个账号执行了改密计划.({})"
 
 #: audits/handler.py:168
-msgid "User {} login into this service.[{}]"
+msgid "User [{}] login this system.[{}]"
 msgstr "用户 {} 登录了服务.[{}]"
 
 #: audits/models.py:32 audits/models.py:59 audits/models.py:101

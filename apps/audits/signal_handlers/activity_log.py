@@ -4,18 +4,18 @@ from celery import signals
 from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
 
-from audits.models import ActivityLog
-from assets.models import Asset, Node
 from accounts.const import AutomationTypes
 from accounts.models import AccountBackupAutomation
+from assets.models import Asset, Node
+from audits.models import ActivityLog
 from common.utils import get_object_or_none
+from jumpserver.utils import current_request
 from ops.celery import app
 from orgs.utils import tmp_to_root_org
 from terminal.models import Session
 from users.models import User
-from jumpserver.utils import current_request
-
 from ..const import ActivityChoices
+from ..models import UserLoginLog
 
 
 class ActivityLogHandler(object):
@@ -118,8 +118,8 @@ class ActivityLogHandler(object):
     @staticmethod
     def login_log_for_activity(obj):
         login_status = _('Success') if obj.status else _('Failed')
-        detail = _('User {} login into this service.[{}]').format(
-            obj.username, login_status
+        detail = _('User {} login this system {}').format(
+            obj.name, login_status
         )
         user_id = User.objects.filter(username=obj.username).values('id').first()
         return user_id['id'], detail, ActivityChoices.login_log
@@ -164,12 +164,11 @@ def on_celery_task_pre_run_for_activity_log(task_id='', **kwargs):
         activities.append(
             ActivityLog(id=activity_id, detail_id=task_id)
         )
-    ActivityLog.objects.bulk_update(activities, ('detail_id', ))
+    ActivityLog.objects.bulk_update(activities, ('detail_id',))
 
 
-@post_save.connect
-def on_object_created(
-        sender, instance=None, created=False, update_fields=None, **kwargs
+def on_session_or_login_log_created(
+        sender, instance=None, created=False, **kwargs
 ):
     handler_mapping = {
         'Session': activity_handler.session_for_activity,
@@ -179,12 +178,13 @@ def on_object_created(
     if not created or model_name not in handler_mapping:
         return
 
-    resource_id, detail, a_type = handler_mapping[model_name](instance)
+    resource_id, detail, act_type = handler_mapping[model_name](instance)
 
     ActivityLog.objects.create(
-        resource_id=resource_id, type=a_type,
+        resource_id=resource_id, type=act_type,
         detail=detail, detail_id=instance.id
     )
 
 
-
+for sender in [Session, UserLoginLog]:
+    post_save.connect(on_session_or_login_log_created, sender=sender)
