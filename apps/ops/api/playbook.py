@@ -129,14 +129,14 @@ class PlaybookFileBrowserAPIView(APIView):
         work_path = playbook.work_dir
 
         file_key = request.data.get('key', '')
+        new_name = request.data.get('new_name', '')
 
-        if file_key in self.protected_files:
-            return Response({'msg': '{} can not be modified'.format(file_key)}, status=400)
+        if file_key in self.protected_files and new_name:
+            return Response({'msg': '{} can not be rename'.format(file_key)}, status=400)
 
         if os.path.dirname(file_key) == 'root':
             file_key = os.path.basename(file_key)
 
-        new_name = request.data.get('new_name', '')
         content = request.data.get('content', '')
         is_directory = request.data.get('is_directory', False)
 
