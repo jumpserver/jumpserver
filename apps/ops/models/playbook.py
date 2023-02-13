@@ -33,3 +33,7 @@ class Playbook(JMSOrgBaseModel):
     def work_dir(self):
         work_dir = os.path.join(settings.DATA_DIR, "ops", "playbook", self.id.__str__())
         return work_dir
+
+    class Meta:
+        unique_together = [('name', 'org_id', 'creator')]
+        ordering = ['date_created']
