@@ -22,7 +22,7 @@ exclude_permissions = (
     ('common', 'setting', '*', '*'),
 
     ('authentication', 'privatetoken', '*', '*'),
-    ('authentication', 'connectiontoken', 'change,delete', 'connectiontoken'),
+    ('authentication', 'connectiontoken', 'delete', 'connectiontoken'),
     ('authentication', 'ssotoken', '*', '*'),
     ('authentication', 'superconnectiontoken', 'change,delete', 'superconnectiontoken'),
     ('authentication', 'temptoken', 'delete', 'temptoken'),
