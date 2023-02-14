@@ -47,6 +47,5 @@ def on_org_role_permission_changed(sender, instance, action, **kwargs):
 
 @receiver([post_save, post_delete], sender=OrgRoleBinding)
 def on_org_role_binding_update(sender, instance, **kwargs):
-    print('>>>>>>>>>>>')
     from users.models import User
     User.expire_users_rbac_perms_cache()
