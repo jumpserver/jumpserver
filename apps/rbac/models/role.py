@@ -102,7 +102,7 @@ class Role(JMSBaseModel):
 
     @lazyproperty
     def users_amount(self):
-        return 0
+        return self.users.count()
 
     @lazyproperty
     def permissions_amount(self):

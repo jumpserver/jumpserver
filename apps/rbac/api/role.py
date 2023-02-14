@@ -69,8 +69,10 @@ class RoleViewSet(JMSModelViewSet):
             role.users_amount = role_user_amount_mapper.get(role.id, 0)
         return queryset
 
-    def page_queryset(self, queryset):
-        queryset = super().page_queryset(queryset)
+    def paginate_queryset(self, queryset):
+        page_queryset = super().paginate_queryset(queryset)  # 返回是 list 对象
+        page_queryset_ids = [str(i.id) for i in page_queryset]
+        queryset = queryset.filter(id__in=page_queryset_ids)
         queryset = self.set_users_amount(queryset)
         return queryset
 
