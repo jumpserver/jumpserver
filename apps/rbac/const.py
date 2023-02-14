@@ -58,10 +58,12 @@ exclude_permissions = (
     ('accounts', 'changesecretrecord', 'add,delete,change', 'changesecretrecord'),
 
     ('perms', 'userassetgrantedtreenoderelation', '*', '*'),
+    ('perms', 'permedaccount', '*', '*'),
+    ('perms', 'permedasset', 'view', 'usergroupassets'),
     ('perms', 'usergrantedmappingnode', '*', '*'),
     ('perms', 'permnode', '*', '*'),
     ('perms', 'rebuildusertreetask', '*', '*'),
-    ('perms', 'permedasset', 'add,change,delete', 'permedasset'),
+    ('perms', 'permedasset', '*', 'permedasset'),
     ('perms', 'permedapplication', 'add,change,delete', 'permedapplication'),
     ('rbac', 'contenttype', '*', '*'),
     ('rbac', 'permission', 'add,delete,change', 'permission'),
