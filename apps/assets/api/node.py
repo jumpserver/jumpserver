@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
 from assets.models import Asset
+from rbac.permissions import RBACPermission
 from common.api import SuggestionMixin
 from common.const.http import POST
 from common.const.signals import PRE_REMOVE, POST_REMOVE
@@ -26,6 +27,7 @@ from ..tasks import (
     test_node_assets_connectivity_manual,
     check_node_assets_amount_task
 )
+
 
 logger = get_logger(__file__)
 __all__ = [
@@ -100,6 +102,10 @@ class NodeAddAssetsApi(generics.UpdateAPIView):
     model = Node
     serializer_class = serializers.NodeAssetsSerializer
     instance = None
+    permission_classes = (RBACPermission,)
+    rbac_perms = {
+        'PUT': 'assets.add_assettonode',
+    }
 
     def perform_update(self, serializer):
         assets = serializer.validated_data.get('assets')
@@ -111,6 +117,10 @@ class NodeRemoveAssetsApi(generics.UpdateAPIView):
     model = Node
     serializer_class = serializers.NodeAssetsSerializer
     instance = None
+    permission_classes = (RBACPermission,)
+    rbac_perms = {
+        'PUT': 'assets.remove_assetfromnode',
+    }
 
     def perform_update(self, serializer):
         assets = serializer.validated_data.get('assets')
@@ -129,6 +139,10 @@ class MoveAssetsToNodeApi(generics.UpdateAPIView):
     model = Node
     serializer_class = serializers.NodeAssetsSerializer
     instance = None
+    permission_classes = (RBACPermission,)
+    rbac_perms = {
+        'PUT': 'assets.move_assettonode',
+    }
 
     def perform_update(self, serializer):
         assets = serializer.validated_data.get('assets')

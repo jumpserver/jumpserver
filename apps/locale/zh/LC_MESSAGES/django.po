@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-13 15:27+0800\n"
+"POT-Creation-Date: 2023-02-14 15:32+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -242,7 +242,7 @@ msgstr "账号备份计划"
 
 #: accounts/models/automations/backup_account.py:77
 #: assets/models/automations/base.py:106 audits/models.py:43
-#: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:113
+#: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:114
 #: perms/models/asset_permission.py:72 terminal/models/applet/host.py:108
 #: terminal/models/session/session.py:43
 #: tickets/models/ticket/apply_application.py:30
@@ -276,7 +276,7 @@ msgstr "原因"
 #: accounts/models/automations/backup_account.py:93
 #: accounts/serializers/automations/change_secret.py:106
 #: accounts/serializers/automations/change_secret.py:129
-#: ops/serializers/job.py:54 terminal/serializers/session.py:49
+#: ops/serializers/job.py:64 terminal/serializers/session.py:49
 msgid "Is success"
 msgstr "是否成功"
 
@@ -364,7 +364,7 @@ msgstr "开始日期"
 
 #: accounts/models/automations/change_secret.py:74
 #: assets/models/automations/base.py:107 ops/models/base.py:56
-#: ops/models/celery.py:64 ops/models/job.py:114
+#: ops/models/celery.py:64 ops/models/job.py:115
 #: terminal/models/applet/host.py:109
 msgid "Date finished"
 msgstr "结束日期"
@@ -426,9 +426,9 @@ msgstr "账号验证"
 #: assets/serializers/asset/common.py:63 assets/serializers/asset/common.py:137
 #: assets/serializers/platform.py:128
 #: authentication/serializers/connect_token_secret.py:103 ops/mixin.py:20
-#: ops/models/adhoc.py:22 ops/models/celery.py:15 ops/models/celery.py:57
-#: ops/models/job.py:24 ops/models/playbook.py:15 orgs/models.py:69
-#: perms/models/asset_permission.py:56 rbac/models/role.py:29
+#: ops/models/adhoc.py:21 ops/models/celery.py:15 ops/models/celery.py:57
+#: ops/models/job.py:24 ops/models/playbook.py:22 ops/serializers/job.py:19
+#: orgs/models.py:69 perms/models/asset_permission.py:56 rbac/models/role.py:29
 #: settings/models.py:33 settings/serializers/sms.py:6
 #: terminal/models/applet/applet.py:26 terminal/models/component/endpoint.py:12
 #: terminal/models/component/endpoint.py:90
@@ -577,7 +577,7 @@ msgstr "密钥/密码"
 msgid "Key password"
 msgstr "密钥密码"
 
-#: accounts/serializers/account/base.py:80
+#: accounts/serializers/account/base.py:81
 #: assets/serializers/asset/common.py:280
 msgid "Spec info"
 msgstr "特殊信息"
@@ -734,7 +734,7 @@ msgid "User"
 msgstr "用户"
 
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
-#: ops/serializers/job.py:53 terminal/models/session/session.py:41
+#: ops/serializers/job.py:63 terminal/models/session/session.py:41
 #: terminal/serializers/command.py:17 terminal/serializers/session.py:19
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
@@ -909,15 +909,15 @@ msgstr "不能直接创建资产, 你应该创建主机或其他资产"
 msgid "Number required"
 msgstr "需要为数字"
 
-#: assets/api/node.py:56
+#: assets/api/node.py:58
 msgid "You can't update the root node name"
 msgstr "不能修改根节点名称"
 
-#: assets/api/node.py:63
+#: assets/api/node.py:65
 msgid "You can't delete the root node ({})"
 msgstr "不能删除根节点 ({})"
 
-#: assets/api/node.py:66
+#: assets/api/node.py:68
 msgid "Deletion failed and the node contains assets"
 msgstr "删除失败，节点包含资产"
 
@@ -1045,8 +1045,8 @@ msgstr "SSH公钥"
 
 #: assets/models/_user.py:27 assets/models/cmd_filter.py:40
 #: assets/models/cmd_filter.py:88 assets/models/group.py:23
-#: assets/models/platform.py:79 common/db/models.py:37 ops/models/adhoc.py:28
-#: ops/models/job.py:40 ops/models/playbook.py:18 rbac/models/role.py:37
+#: assets/models/platform.py:79 common/db/models.py:37 ops/models/adhoc.py:27
+#: ops/models/job.py:40 ops/models/playbook.py:25 rbac/models/role.py:37
 #: settings/models.py:38 terminal/models/applet/applet.py:35
 #: terminal/models/applet/applet.py:151 terminal/models/applet/host.py:110
 #: terminal/models/component/endpoint.py:24
@@ -1059,7 +1059,7 @@ msgstr "备注"
 
 #: assets/models/_user.py:28 assets/models/automations/base.py:105
 #: assets/models/cmd_filter.py:41 assets/models/group.py:22
-#: common/db/models.py:35 ops/models/base.py:54 ops/models/job.py:112
+#: common/db/models.py:35 ops/models/base.py:54 ops/models/job.py:113
 #: users/models/user.py:943
 msgid "Date created"
 msgstr "创建日期"
@@ -1196,6 +1196,10 @@ msgstr "添加资产到节点"
 msgid "Move asset to node"
 msgstr "移动资产到节点"
 
+#: assets/models/asset/common.py:292
+msgid "Remove asset from node"
+msgstr "从节点移除资产"
+
 #: assets/models/asset/database.py:10 assets/serializers/asset/common.py:105
 #: settings/serializers/email.py:37
 msgid "Use SSL"
@@ -1251,7 +1255,7 @@ msgid "Asset automation task"
 msgstr "资产自动化任务"
 
 #: assets/models/automations/base.py:104 audits/models.py:163
-#: audits/serializers.py:50 ops/models/base.py:49 ops/models/job.py:105
+#: audits/serializers.py:50 ops/models/base.py:49 ops/models/job.py:106
 #: terminal/models/applet/applet.py:150 terminal/models/applet/host.py:107
 #: terminal/models/component/status.py:27 terminal/serializers/applet.py:17
 #: terminal/serializers/applet_host.py:93 tickets/models/ticket/general.py:283
@@ -1653,6 +1657,12 @@ msgstr "周期性检查节点下资产数量"
 #: assets/tasks/ping.py:41
 msgid "Test if the assets under the node are connectable "
 msgstr "测试节点下资产是否可连接"
+
+#: assets/tasks/ping_gateway.py:23 assets/tasks/ping_gateway.py:33
+#, fuzzy
+#| msgid "Test assets connectivity "
+msgid "Test gateways connectivity "
+msgstr "测试资产可连接性"
 
 #: assets/tasks/utils.py:17
 msgid "Asset has been disabled, skipped: {}"
@@ -3148,15 +3158,15 @@ msgstr "系统信息"
 msgid "Publish the station message"
 msgstr "发布站内消息"
 
-#: ops/ansible/inventory.py:76
+#: ops/ansible/inventory.py:77
 msgid "No account available"
 msgstr "无可用账号"
 
-#: ops/ansible/inventory.py:182
+#: ops/ansible/inventory.py:186
 msgid "Ansible disabled"
 msgstr "Ansible 已禁用"
 
-#: ops/ansible/inventory.py:198
+#: ops/ansible/inventory.py:202
 msgid "Skip hosts below:"
 msgstr "跳过以下主机: "
 
@@ -3261,21 +3271,21 @@ msgstr "输入在 {} - {} 范围之间"
 msgid "Require periodic or regularly perform setting"
 msgstr "需要周期或定期设置"
 
-#: ops/models/adhoc.py:23
+#: ops/models/adhoc.py:22
 msgid "Pattern"
 msgstr "模式"
 
-#: ops/models/adhoc.py:25 ops/models/job.py:28
+#: ops/models/adhoc.py:24 ops/models/job.py:28
 msgid "Module"
 msgstr "模块"
 
-#: ops/models/adhoc.py:26 ops/models/celery.py:58 ops/models/job.py:26
+#: ops/models/adhoc.py:25 ops/models/celery.py:58 ops/models/job.py:26
 #: terminal/models/component/task.py:16
 msgid "Args"
 msgstr "参数"
 
-#: ops/models/adhoc.py:27 ops/models/base.py:16 ops/models/base.py:53
-#: ops/models/job.py:33 ops/models/job.py:111 ops/models/playbook.py:17
+#: ops/models/adhoc.py:26 ops/models/base.py:16 ops/models/base.py:53
+#: ops/models/job.py:33 ops/models/job.py:112 ops/models/playbook.py:24
 #: terminal/models/session/sharing.py:23
 msgid "Creator"
 msgstr "创建者"
@@ -3292,16 +3302,16 @@ msgstr "账号策略"
 msgid "Last execution"
 msgstr "最后执行"
 
-#: ops/models/base.py:22 ops/serializers/job.py:16
+#: ops/models/base.py:22 ops/serializers/job.py:18
 msgid "Date last run"
 msgstr "最后运行日期"
 
-#: ops/models/base.py:51 ops/models/job.py:109
+#: ops/models/base.py:51 ops/models/job.py:110
 #: xpack/plugins/cloud/models.py:162
 msgid "Result"
 msgstr "结果"
 
-#: ops/models/base.py:52 ops/models/job.py:110
+#: ops/models/base.py:52 ops/models/job.py:111
 msgid "Summary"
 msgstr "汇总"
 
@@ -3369,31 +3379,31 @@ msgstr "参数定义"
 msgid "Job"
 msgstr "作业"
 
-#: ops/models/job.py:108
+#: ops/models/job.py:109
 msgid "Parameters"
 msgstr "参数"
 
-#: ops/models/job.py:116
+#: ops/models/job.py:117
 msgid "Material"
 msgstr ""
 
-#: ops/models/job.py:118
+#: ops/models/job.py:119
 msgid "Material Type"
 msgstr ""
 
-#: ops/models/job.py:311
+#: ops/models/job.py:322
 msgid "Job Execution"
 msgstr "作业执行"
 
-#: ops/models/job.py:322
+#: ops/models/job.py:333
 msgid "Job audit log"
 msgstr "作业审计日志"
 
-#: ops/models/playbook.py:20
+#: ops/models/playbook.py:27
 msgid "CreateMethod"
 msgstr "创建方式"
 
-#: ops/models/playbook.py:21
+#: ops/models/playbook.py:28
 msgid "VCS URL"
 msgstr ""
 
@@ -3425,19 +3435,19 @@ msgstr "内存使用率超过 {max_threshold}%: => {value}"
 msgid "CPU load more than {max_threshold}: => {value}"
 msgstr "CPU 使用率超过 {max_threshold}: => {value}"
 
-#: ops/serializers/job.py:14
+#: ops/serializers/job.py:16
 msgid "Run after save"
 msgstr "保存后执行"
 
-#: ops/serializers/job.py:52
+#: ops/serializers/job.py:62
 msgid "Job type"
 msgstr "任务类型"
 
-#: ops/serializers/job.py:55 terminal/serializers/session.py:53
+#: ops/serializers/job.py:65 terminal/serializers/session.py:53
 msgid "Is finished"
 msgstr "是否完成"
 
-#: ops/serializers/job.py:56
+#: ops/serializers/job.py:66
 msgid "Time cost"
 msgstr "花费时间"
 
@@ -3877,7 +3887,7 @@ msgstr "查看授权树"
 msgid "Test success"
 msgstr "测试成功"
 
-#: settings/api/email.py:20
+#: settings/api/email.py:21
 msgid "Test mail sent to {}, please check"
 msgstr "邮件已经发送{}, 请检查"
 

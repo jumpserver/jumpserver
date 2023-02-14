@@ -184,7 +184,7 @@ def merge_delay_run(ttl=5, key=None):
                 elif isinstance(v, set):
                     cache_kwargs[k] = cache_kwargs[k].union(v)
                 else:
-                    cache_kwargs[k] += v
+                    cache_kwargs[k] = list(cache_kwargs[k]) + list(v)
             _loop_debouncer_func_args_cache[cache_key] = cache_kwargs
             run_debouncer_func(cache_key, org, ttl, func, *args, **cache_kwargs)
 

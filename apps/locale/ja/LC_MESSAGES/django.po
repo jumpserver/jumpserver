@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-13 15:27+0800\n"
+"POT-Creation-Date: 2023-02-14 15:32+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -243,7 +243,7 @@ msgstr "アカウントバックアップ計画"
 
 #: accounts/models/automations/backup_account.py:77
 #: assets/models/automations/base.py:106 audits/models.py:43
-#: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:113
+#: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:114
 #: perms/models/asset_permission.py:72 terminal/models/applet/host.py:108
 #: terminal/models/session/session.py:43
 #: tickets/models/ticket/apply_application.py:30
@@ -277,7 +277,7 @@ msgstr "理由"
 #: accounts/models/automations/backup_account.py:93
 #: accounts/serializers/automations/change_secret.py:106
 #: accounts/serializers/automations/change_secret.py:129
-#: ops/serializers/job.py:54 terminal/serializers/session.py:49
+#: ops/serializers/job.py:64 terminal/serializers/session.py:49
 msgid "Is success"
 msgstr "成功は"
 
@@ -365,7 +365,7 @@ msgstr "開始日"
 
 #: accounts/models/automations/change_secret.py:74
 #: assets/models/automations/base.py:107 ops/models/base.py:56
-#: ops/models/celery.py:64 ops/models/job.py:114
+#: ops/models/celery.py:64 ops/models/job.py:115
 #: terminal/models/applet/host.py:109
 msgid "Date finished"
 msgstr "終了日"
@@ -427,9 +427,9 @@ msgstr "アカウントの確認"
 #: assets/serializers/asset/common.py:63 assets/serializers/asset/common.py:137
 #: assets/serializers/platform.py:128
 #: authentication/serializers/connect_token_secret.py:103 ops/mixin.py:20
-#: ops/models/adhoc.py:22 ops/models/celery.py:15 ops/models/celery.py:57
-#: ops/models/job.py:24 ops/models/playbook.py:15 orgs/models.py:69
-#: perms/models/asset_permission.py:56 rbac/models/role.py:29
+#: ops/models/adhoc.py:21 ops/models/celery.py:15 ops/models/celery.py:57
+#: ops/models/job.py:24 ops/models/playbook.py:22 ops/serializers/job.py:19
+#: orgs/models.py:69 perms/models/asset_permission.py:56 rbac/models/role.py:29
 #: settings/models.py:33 settings/serializers/sms.py:6
 #: terminal/models/applet/applet.py:26 terminal/models/component/endpoint.py:12
 #: terminal/models/component/endpoint.py:90
@@ -581,7 +581,7 @@ msgstr "キー/パスワード"
 msgid "Key password"
 msgstr "キーパスワード"
 
-#: accounts/serializers/account/base.py:80
+#: accounts/serializers/account/base.py:81
 #: assets/serializers/asset/common.py:280
 msgid "Spec info"
 msgstr "特別情報"
@@ -738,7 +738,7 @@ msgid "User"
 msgstr "ユーザー"
 
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
-#: ops/serializers/job.py:53 terminal/models/session/session.py:41
+#: ops/serializers/job.py:63 terminal/models/session/session.py:41
 #: terminal/serializers/command.py:17 terminal/serializers/session.py:19
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
@@ -919,15 +919,15 @@ msgstr ""
 msgid "Number required"
 msgstr "必要な数"
 
-#: assets/api/node.py:56
+#: assets/api/node.py:58
 msgid "You can't update the root node name"
 msgstr "ルートノード名を更新できません"
 
-#: assets/api/node.py:63
+#: assets/api/node.py:65
 msgid "You can't delete the root node ({})"
 msgstr "ルートノード ({}) を削除できません。"
 
-#: assets/api/node.py:66
+#: assets/api/node.py:68
 msgid "Deletion failed and the node contains assets"
 msgstr "削除に失敗し、ノードにアセットが含まれています。"
 
@@ -1055,8 +1055,8 @@ msgstr "SSHパブリックキー"
 
 #: assets/models/_user.py:27 assets/models/cmd_filter.py:40
 #: assets/models/cmd_filter.py:88 assets/models/group.py:23
-#: assets/models/platform.py:79 common/db/models.py:37 ops/models/adhoc.py:28
-#: ops/models/job.py:40 ops/models/playbook.py:18 rbac/models/role.py:37
+#: assets/models/platform.py:79 common/db/models.py:37 ops/models/adhoc.py:27
+#: ops/models/job.py:40 ops/models/playbook.py:25 rbac/models/role.py:37
 #: settings/models.py:38 terminal/models/applet/applet.py:35
 #: terminal/models/applet/applet.py:151 terminal/models/applet/host.py:110
 #: terminal/models/component/endpoint.py:24
@@ -1069,7 +1069,7 @@ msgstr "コメント"
 
 #: assets/models/_user.py:28 assets/models/automations/base.py:105
 #: assets/models/cmd_filter.py:41 assets/models/group.py:22
-#: common/db/models.py:35 ops/models/base.py:54 ops/models/job.py:112
+#: common/db/models.py:35 ops/models/base.py:54 ops/models/job.py:113
 #: users/models/user.py:943
 msgid "Date created"
 msgstr "作成された日付"
@@ -1206,6 +1206,10 @@ msgstr "ノードにアセットを追加する"
 msgid "Move asset to node"
 msgstr "アセットをノードに移動する"
 
+#: assets/models/asset/common.py:292
+msgid "Remove asset from node"
+msgstr "ノードからアセットを削除"
+
 #: assets/models/asset/database.py:10 assets/serializers/asset/common.py:105
 #: settings/serializers/email.py:37
 msgid "Use SSL"
@@ -1261,7 +1265,7 @@ msgid "Asset automation task"
 msgstr "アセットの自動化タスク"
 
 #: assets/models/automations/base.py:104 audits/models.py:163
-#: audits/serializers.py:50 ops/models/base.py:49 ops/models/job.py:105
+#: audits/serializers.py:50 ops/models/base.py:49 ops/models/job.py:106
 #: terminal/models/applet/applet.py:150 terminal/models/applet/host.py:107
 #: terminal/models/component/status.py:27 terminal/serializers/applet.py:17
 #: terminal/serializers/applet_host.py:93 tickets/models/ticket/general.py:283
@@ -1665,6 +1669,12 @@ msgstr "ノードの下にあるアセットの数を定期的に確認する"
 #: assets/tasks/ping.py:41
 msgid "Test if the assets under the node are connectable "
 msgstr "ノード配下のアセットが接続できるかテストする"
+
+#: assets/tasks/ping_gateway.py:23 assets/tasks/ping_gateway.py:33
+#, fuzzy
+#| msgid "Test assets connectivity "
+msgid "Test gateways connectivity "
+msgstr "アセット接続のテスト。"
 
 #: assets/tasks/utils.py:17
 msgid "Asset has been disabled, skipped: {}"
@@ -3186,15 +3196,15 @@ msgstr "システムメッセージ"
 msgid "Publish the station message"
 msgstr "投稿サイトニュース"
 
-#: ops/ansible/inventory.py:76
+#: ops/ansible/inventory.py:77
 msgid "No account available"
 msgstr "利用可能なアカウントがありません"
 
-#: ops/ansible/inventory.py:182
+#: ops/ansible/inventory.py:186
 msgid "Ansible disabled"
 msgstr "Ansible 無効"
 
-#: ops/ansible/inventory.py:198
+#: ops/ansible/inventory.py:202
 msgid "Skip hosts below:"
 msgstr "次のホストをスキップします: "
 
@@ -3299,21 +3309,21 @@ msgstr "{} から {} までの範囲"
 msgid "Require periodic or regularly perform setting"
 msgstr "定期的または定期的に設定を行う必要があります"
 
-#: ops/models/adhoc.py:23
+#: ops/models/adhoc.py:22
 msgid "Pattern"
 msgstr "パターン"
 
-#: ops/models/adhoc.py:25 ops/models/job.py:28
+#: ops/models/adhoc.py:24 ops/models/job.py:28
 msgid "Module"
 msgstr "モジュール"
 
-#: ops/models/adhoc.py:26 ops/models/celery.py:58 ops/models/job.py:26
+#: ops/models/adhoc.py:25 ops/models/celery.py:58 ops/models/job.py:26
 #: terminal/models/component/task.py:16
 msgid "Args"
 msgstr "アルグ"
 
-#: ops/models/adhoc.py:27 ops/models/base.py:16 ops/models/base.py:53
-#: ops/models/job.py:33 ops/models/job.py:111 ops/models/playbook.py:17
+#: ops/models/adhoc.py:26 ops/models/base.py:16 ops/models/base.py:53
+#: ops/models/job.py:33 ops/models/job.py:112 ops/models/playbook.py:24
 #: terminal/models/session/sharing.py:23
 msgid "Creator"
 msgstr "作成者"
@@ -3330,16 +3340,16 @@ msgstr "アカウント ポリシー"
 msgid "Last execution"
 msgstr "最後の実行"
 
-#: ops/models/base.py:22 ops/serializers/job.py:16
+#: ops/models/base.py:22 ops/serializers/job.py:18
 msgid "Date last run"
 msgstr "最終実行日"
 
-#: ops/models/base.py:51 ops/models/job.py:109
+#: ops/models/base.py:51 ops/models/job.py:110
 #: xpack/plugins/cloud/models.py:162
 msgid "Result"
 msgstr "結果"
 
-#: ops/models/base.py:52 ops/models/job.py:110
+#: ops/models/base.py:52 ops/models/job.py:111
 msgid "Summary"
 msgstr "概要"
 
@@ -3407,31 +3417,31 @@ msgstr "パラメータ定義"
 msgid "Job"
 msgstr "ジョブ＃ジョブ＃"
 
-#: ops/models/job.py:108
+#: ops/models/job.py:109
 msgid "Parameters"
 msgstr "パラメータ"
 
-#: ops/models/job.py:116
+#: ops/models/job.py:117
 msgid "Material"
 msgstr ""
 
-#: ops/models/job.py:118
+#: ops/models/job.py:119
 msgid "Material Type"
 msgstr ""
 
-#: ops/models/job.py:311
+#: ops/models/job.py:322
 msgid "Job Execution"
 msgstr "ジョブ実行"
 
-#: ops/models/job.py:322
+#: ops/models/job.py:333
 msgid "Job audit log"
 msgstr "ジョブ監査ログ"
 
-#: ops/models/playbook.py:20
+#: ops/models/playbook.py:27
 msgid "CreateMethod"
 msgstr "创建方式"
 
-#: ops/models/playbook.py:21
+#: ops/models/playbook.py:28
 msgid "VCS URL"
 msgstr ""
 
@@ -3463,19 +3473,19 @@ msgstr "{max_threshold}%: => {value} を超える使用メモリ"
 msgid "CPU load more than {max_threshold}: => {value}"
 msgstr "{max_threshold} を超えるCPUロード: => {value}"
 
-#: ops/serializers/job.py:14
+#: ops/serializers/job.py:16
 msgid "Run after save"
 msgstr "保存後に実行"
 
-#: ops/serializers/job.py:52
+#: ops/serializers/job.py:62
 msgid "Job type"
 msgstr "タスクの種類"
 
-#: ops/serializers/job.py:55 terminal/serializers/session.py:53
+#: ops/serializers/job.py:65 terminal/serializers/session.py:53
 msgid "Is finished"
 msgstr "終了しました"
 
-#: ops/serializers/job.py:56
+#: ops/serializers/job.py:66
 msgid "Time cost"
 msgstr "時を過ごす"
 
@@ -3917,7 +3927,7 @@ msgstr "権限ツリーの表示"
 msgid "Test success"
 msgstr "テストの成功"
 
-#: settings/api/email.py:20
+#: settings/api/email.py:21
 msgid "Test mail sent to {}, please check"
 msgstr "{}に送信されたテストメールを確認してください"
 
