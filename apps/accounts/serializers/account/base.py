@@ -77,5 +77,6 @@ class BaseAccountSerializer(AuthValidateMixin, BulkOrgResourceModelSerializer):
             'date_verified', 'created_by', 'date_created',
         ]
         extra_kwargs = {
+            'name': {'required': True},
             'spec_info': {'label': _('Spec info')},
         }
