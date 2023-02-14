@@ -1,0 +1,17 @@
+name: dbeaver
+display_name: DBeaver Community
+comment: Free multi-platform database tool for developers, database administrators, analysts and all people who need to work with databases.
+version: 0.1
+exec_type: python
+author: JumpServer Team
+type: general
+update_policy: always
+tags:
+  - database
+protocols:
+  - mysql
+  - mariadb
+  - postgresql
+  - sqlserver
+  - oracle
+  - clickhouse
