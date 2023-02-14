@@ -16,25 +16,25 @@ def after_migrate_update_builtin_role_permissions(sender, app_config, **kwargs):
 
 
 @receiver(post_save, sender=SystemRole)
-def on_system_role_update(sender, instance, created, **kwargs):
+def on_system_role_update(sender, instance, **kwargs):
     from users.models import User
     User.expire_users_rbac_perms_cache()
 
 
 @receiver(m2m_changed, sender=SystemRole.permissions.through)
-def on_system_role_permission_changed(sender, instance, action, **kwargs):
+def on_system_role_permission_changed(sender, instance, **kwargs):
     from users.models import User
     User.expire_users_rbac_perms_cache()
 
 
 @receiver([post_save, post_delete], sender=SystemRoleBinding)
-def on_system_role_binding_update(sender, instance, created, **kwargs):
+def on_system_role_binding_update(sender, instance, **kwargs):
     from users.models import User
     User.expire_users_rbac_perms_cache()
 
 
 @receiver(post_save, sender=OrgRole)
-def on_org_role_update(sender, instance, created, **kwargs):
+def on_org_role_update(sender, instance, **kwargs):
     from users.models import User
     User.expire_users_rbac_perms_cache()
 
