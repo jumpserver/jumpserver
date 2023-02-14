@@ -38,7 +38,7 @@ class PermAccountUtil(AssetPermissionUtil):
                 alias_action_bit_mapper[alias] |= perm.actions
                 alias_expired_mapper[alias].append(perm.date_expired)
 
-        asset_accounts = asset.accounts.all()
+        asset_accounts = asset.accounts.all().active()
         username_account_mapper = {account.username: account for account in asset_accounts}
 
         cleaned_accounts_action_bit = defaultdict(int)
