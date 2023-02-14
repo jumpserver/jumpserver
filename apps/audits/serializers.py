@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from audits.backends.db import OperateLogStore
 from common.serializers.fields import LabeledChoiceField
-from common.utils import reverse
+from common.utils import reverse, i18n_trans
 from common.utils.timezone import as_current_tz
 from ops.models.job import JobAuditLog
 from ops.serializers.job import JobExecutionSerializer
@@ -106,7 +106,7 @@ class SessionAuditSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ActivityOperatorLogSerializer(serializers.Serializer):
+class ActivityUnionLogSerializer(serializers.Serializer):
     timestamp = serializers.SerializerMethodField()
     detail_url = serializers.SerializerMethodField()
     content = serializers.SerializerMethodField()
@@ -119,9 +119,9 @@ class ActivityOperatorLogSerializer(serializers.Serializer):
     def get_content(obj):
         if not obj['r_detail']:
             action = obj['r_action'].replace('_', ' ').capitalize()
-            ctn = _('User {} {} this resource.').format(obj['r_user'], _(action))
+            ctn = _('User {} {} this resource').format(obj['r_user'], _(action))
         else:
-            ctn = obj['r_detail']
+            ctn = i18n_trans(obj['r_detail'])
         return ctn
 
     @staticmethod

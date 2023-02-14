@@ -10,8 +10,4 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterModelOptions(
-            name='operatelog',
-            options={'ordering': ('-datetime',), 'verbose_name': 'Operate log'},
-        ),
     ]

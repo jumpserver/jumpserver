@@ -1,20 +1,18 @@
 # -*- coding: utf-8 -*-
 #
-from django.utils.functional import LazyObject
-from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.contrib.auth import BACKEND_SESSION_KEY
 from django.dispatch import receiver
 from django.utils import timezone, translation
+from django.utils.functional import LazyObject
+from django.utils.translation import ugettext_lazy as _
 from rest_framework.request import Request
 
 from authentication.signals import post_auth_failed, post_auth_success
 from authentication.utils import check_different_city_login_if_need
 from common.utils import get_request_ip, get_logger
 from users.models import User
-
 from ..utils import write_login_log
-
 
 logger = get_logger(__name__)
 
