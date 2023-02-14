@@ -1789,7 +1789,19 @@ msgstr "是"
 msgid "No"
 msgstr "否"
 
-#: audits/models.py:34 audits/models.py:61 audits/models.py:130
+#: audits/handler.py:140
+msgid "{} used account[{}], login method[{}] login the asset."
+msgstr "{} 使用账户[{}], 登录方式[{}]登录了这个资产."
+
+#: audits/handler.py:155
+msgid "User {} has executed change auth plan for this account.({})"
+msgstr "用户 {} 为这个账号执行了改密计划.({})"
+
+#: audits/handler.py:168
+msgid "User [{}] login this system.[{}]"
+msgstr "用户 {} 登录了服务.[{}]"
+
+#: audits/models.py:32 audits/models.py:59 audits/models.py:101
 #: terminal/models/session/session.py:37 terminal/models/session/sharing.py:95
 msgid "Remote addr"
 msgstr "远端地址"

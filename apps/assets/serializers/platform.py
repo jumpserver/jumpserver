@@ -38,6 +38,9 @@ class ProtocolSettingSerializer(serializers.Serializer):
     )
     script = serializers.JSONField(default=list, label=_("Script"))
 
+    # Redis
+    auth_username = serializers.BooleanField(default=False, label=_("Auth with username"))
+
 
 class PlatformAutomationSerializer(serializers.ModelSerializer):
     class Meta:
