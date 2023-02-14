@@ -1,14 +1,16 @@
 import os
+import sys
 import time
 
-import winreg
-import win32api
+if sys.platform == 'win32':
+    import winreg
+    import win32api
+
+    from pywinauto import Application
+    from pywinauto.controls.uia_controls import ButtonWrapper
+    from pywinauto.keyboard import send_keys
 
 import const as c
-
-from pywinauto import Application
-from pywinauto.controls.uia_controls import ButtonWrapper
-from pywinauto.keyboard import send_keys
 
 from common import wait_pid, BaseApplication
 
@@ -29,8 +31,7 @@ class AppletApplication(BaseApplication):
         self.pid = None
         self.app = None
 
-    @staticmethod
-    def clean_up():
+    def clean_up(self):
         protocols = (
             'NavicatMARIADB', 'NavicatMONGODB', 'Navicat',
             'NavicatORA', 'NavicatMSSQL', 'NavicatPG'
@@ -42,9 +43,8 @@ class AppletApplication(BaseApplication):
             except Exception:
                 pass
 
-    def launch(self):
-        # 清理异常导致未删除的会话
-        self.clean_up()
+    @staticmethod
+    def launch():
         sub_key = r'Software\PremiumSoft\NavicatPremium'
         try:
             key = winreg.CreateKey(winreg.HKEY_CURRENT_USER, sub_key)
