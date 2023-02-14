@@ -13,11 +13,13 @@ __all__ = ["Job", "JobExecution", "JobAuditLog"]
 
 from simple_history.models import HistoricalRecords
 
+from acls.models import CommandFilterACL
 from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner
 from ops.mixin import PeriodTaskModelMixin
 from ops.variables import *
 from ops.const import Types, Modules, RunasPolicies, JobStatus
 from orgs.mixins.models import JMSOrgBaseModel
+from terminal.notifications import CommandExecutionAlert
 
 
 class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
@@ -295,6 +297,34 @@ class JobExecution(JMSOrgBaseModel):
         task_id = current_task.request.root_id
         self.task_id = task_id
 
+    def match_command_group(self, acl, asset):
+        for cg in acl.command_groups.all():
+            matched, _ = cg.match(self.current_job.args)
+            if matched:
+                if acl.is_action(CommandFilterACL.ActionChoices.accept):
+                    return True
+                elif acl.is_action(CommandFilterACL.ActionChoices.reject) or acl.is_action(
+                        CommandFilterACL.ActionChoices.review):
+                    print("\033[31mcommand \'{}\' on asset {}({}) is rejected by acl {}\033[0m"
+                          .format(self.current_job.args, asset.name, asset.address, acl))
+                    CommandExecutionAlert({
+                        "assets": self.current_job.assets.all(),
+                        "input": self.material,
+                        "risk_level": 5,
+                        "user": self.creator,
+                    }).publish_async()
+                    raise Exception("command is rejected by ACL")
+        return False
+
+    def check_command_acl(self):
+        for asset in self.current_job.assets.all():
+            acls = CommandFilterACL.filter_queryset(user=self.creator,
+                                                    asset=asset,
+                                                    account_username=self.current_job.runas)
+            for acl in acls:
+                if self.match_command_group(acl, asset):
+                    break
+
     def check_danger_keywords(self):
         lines = self.job.playbook.check_dangerous_keywords()
         if len(lines) > 0:
@@ -303,12 +333,18 @@ class JobExecution(JMSOrgBaseModel):
                       'dangerous keyword \'{}\'\033[0m'.format(line['line'], line['file'], line['keyword']))
             raise Exception("Playbook contains dangerous keywords")
 
+    def before_start(self):
+        if self.current_job.type == 'playbook':
+            self.check_danger_keywords()
+        if self.current_job.type == 'adhoc':
+            self.check_command_acl()
+
     def start(self, **kwargs):
         self.date_start = timezone.now()
         self.set_celery_id()
         self.save()
-        if self.job.type == 'playbook':
-            self.check_danger_keywords()
+        self.before_start()
+
         runner = self.get_runner()
         try:
             cb = runner.run(**kwargs)
@@ -319,8 +355,9 @@ class JobExecution(JMSOrgBaseModel):
             self.set_error(e)
 
     class Meta:
+
         verbose_name = _("Job Execution")
-        ordering = ['-date_created']
+    ordering = ['-date_created']
 
 
 class JobAuditLog(JobExecution):
