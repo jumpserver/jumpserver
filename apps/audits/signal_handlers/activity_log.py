@@ -119,7 +119,7 @@ class ActivityLogHandler(object):
     def login_log_for_activity(obj):
         login_status = _('Success') if obj.status else _('Failed')
         detail = _('User {} login this system {}').format(
-            obj.name, login_status
+            obj.username, login_status
         )
         user_id = User.objects.filter(username=obj.username).values('id').first()
         return user_id['id'], detail, ActivityChoices.login_log

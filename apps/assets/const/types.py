@@ -304,7 +304,7 @@ class AllTypes(ChoicesMixin):
                         setting = _protocols_setting.get(p['name'], {})
                         p['required'] = p.pop('required', False)
                         p['default'] = p.pop('default', False)
-                        p['setting'] = {**setting, **p.get('setting', {})}
+                        p['setting'] = {**p.get('setting', {}), **setting}
 
                     platform_data = {
                         **default_platform_data, **d,

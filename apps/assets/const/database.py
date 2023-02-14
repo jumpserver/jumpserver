@@ -63,7 +63,20 @@ class DatabaseTypes(BaseType):
             cls.SQLSERVER: [{'name': 'SQLServer'}],
             cls.CLICKHOUSE: [{'name': 'ClickHouse'}],
             cls.MONGODB: [{'name': 'MongoDB'}],
-            cls.REDIS: [{'name': 'Redis'}, {'name': 'Redis6+'}],
+            cls.REDIS: [
+                {
+                    'name': 'Redis',
+                    'protocols_setting': {
+                        'redis': {'auth_username': False}
+                    }
+                },
+                {
+                    'name': 'Redis6+',
+                    'protocols_setting': {
+                        'redis': {'auth_username': True}
+                    }
+                }
+            ]
         }
 
     @classmethod
