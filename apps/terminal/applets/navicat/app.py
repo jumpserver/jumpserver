@@ -1,18 +1,17 @@
 import os
-import sys
 import time
 
-if sys.platform == 'win32':
-    import winreg
-    import win32api
-
-    from pywinauto import Application
-    from pywinauto.controls.uia_controls import ButtonWrapper
-    from pywinauto.keyboard import send_keys
+import winreg
+import win32api
+import win32con
 
 import const as c
 
-from common import wait_pid, BaseApplication
+from pywinauto import Application
+from pywinauto.controls.uia_controls import ButtonWrapper
+from pywinauto.keyboard import send_keys
+
+from common import wait_pid, BaseApplication, _messageBox
 
 _default_path = r'C:\Program Files\PremiumSoft\Navicat Premium 16\navicat.exe'
 
@@ -31,7 +30,8 @@ class AppletApplication(BaseApplication):
         self.pid = None
         self.app = None
 
-    def clean_up(self):
+    @staticmethod
+    def clean_up():
         protocols = (
             'NavicatMARIADB', 'NavicatMONGODB', 'Navicat',
             'NavicatORA', 'NavicatMSSQL', 'NavicatPG'
@@ -43,8 +43,9 @@ class AppletApplication(BaseApplication):
             except Exception:
                 pass
 
-    @staticmethod
-    def launch():
+    def launch(self):
+        # 清理因为异常未关闭的会话历史记录
+        self.clean_up()
         sub_key = r'Software\PremiumSoft\NavicatPremium'
         try:
             key = winreg.CreateKey(winreg.HKEY_CURRENT_USER, sub_key)
@@ -60,12 +61,23 @@ class AppletApplication(BaseApplication):
     @staticmethod
     def _exec_commands(commands):
         for command in commands:
+            pre_check = command.get('pre_check', lambda: True)
+            if not pre_check():
+                _messageBox('程序启动异常,请重新连接!!', 'Error', win32con.MB_DEFAULT_DESKTOP_ONLY)
+                return
             if command['type'] == 'key':
                 time.sleep(0.5)
                 send_keys(' '.join(command['commands']))
             elif command['type'] == 'action':
                 for f in command['commands']:
                     f()
+
+    def _pre_check_is_password_input(self):
+        try:
+            self.app.window(best_match='Connection Password')
+        except Exception:
+            return False
+        return True
 
     def _action_not_remember_password(self):
         conn_window = self.app.window(best_match='Dialog'). \
@@ -278,7 +290,8 @@ class AppletApplication(BaseApplication):
             },
             {
                 'type': 'key',
-                'commands': (self.password, c.ENTER)
+                'commands': (self.password, c.ENTER),
+                'pre_check': self._pre_check_is_password_input
             }
         ])
         self._exec_commands(commands)
