@@ -5,22 +5,22 @@ from importlib import import_module
 from django.conf import settings
 from django.db.models import F, Value, CharField
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin
+from rest_framework.permissions import IsAuthenticated
 
-from ops.models.job import JobAuditLog
 from common.api import JMSGenericViewSet
 from common.drf.filters import DatetimeRangeFilter
 from common.plugins.es import QuerySet as ESQuerySet
-from orgs.utils import current_org, tmp_to_root_org
+from ops.models.job import JobAuditLog
 from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet
+from orgs.utils import current_org, tmp_to_root_org
 from .backends import TYPE_ENGINE_MAPPING
 from .const import ActivityChoices
 from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog, ActivityLog
 from .serializers import FTPLogSerializer, UserLoginLogSerializer, JobAuditLogSerializer
 from .serializers import (
     OperateLogSerializer, OperateLogActionDetailSerializer,
-    PasswordChangeLogSerializer, ActivityOperatorLogSerializer,
+    PasswordChangeLogSerializer, ActivityUnionLogSerializer,
 )
 
 
@@ -79,7 +79,7 @@ class MyLoginLogAPIView(UserLoginCommonMixin, generics.ListAPIView):
 
 
 class ResourceActivityAPIView(generics.ListAPIView):
-    serializer_class = ActivityOperatorLogSerializer
+    serializer_class = ActivityUnionLogSerializer
     rbac_perms = {
         'GET': 'audits.view_activitylog',
     }
@@ -96,10 +96,10 @@ class ResourceActivityAPIView(generics.ListAPIView):
     @staticmethod
     def get_activity_log_qs(fields, limit=30, **filters):
         queryset = ActivityLog.objects.filter(**filters).annotate(
-                r_type=F('type'), r_detail_id=F('detail_id'),
-                r_detail=F('detail'), r_user=Value(None, CharField()),
-                r_action=Value(None, CharField()),
-            ).values(*fields)[:limit]
+            r_type=F('type'), r_detail_id=F('detail_id'),
+            r_detail=F('detail'), r_user=Value(None, CharField()),
+            r_action=Value(None, CharField()),
+        ).values(*fields)[:limit]
         return queryset
 
     def get_queryset(self):
@@ -113,7 +113,7 @@ class ResourceActivityAPIView(generics.ListAPIView):
             qs1 = self.get_operate_log_qs(fields, resource_id=resource_id)
             qs2 = self.get_activity_log_qs(fields, resource_id=resource_id)
             queryset = qs2.union(qs1)
-        return queryset[:limit]
+        return queryset.order_by('-datetime')[:limit]
 
 
 class OperateLogViewSet(RetrieveModelMixin, ListModelMixin, OrgGenericViewSet):
@@ -163,54 +163,3 @@ class PasswordChangeLogViewSet(ListModelMixin, JMSGenericViewSet):
                 user__in=[str(user) for user in users]
             )
         return queryset
-
-# Todo: 看看怎么搞
-# class CommandExecutionViewSet(ListModelMixin, OrgGenericViewSet):
-#     model = CommandExecution
-#     serializer_class = CommandExecutionSerializer
-#     extra_filter_backends = [DatetimeRangeFilter]
-#     date_range_filter_fields = [
-#         ('date_start', ('date_from', 'date_to'))
-#     ]
-#     filterset_fields = [
-#         'user__name', 'user__username', 'command',
-#         'account', 'is_finished'
-#     ]
-#     search_fields = [
-#         'command', 'user__name', 'user__username',
-#         'account__username',
-#     ]
-#     ordering = ['-date_created']
-#
-#     def get_queryset(self):
-#         queryset = super().get_queryset()
-#         if getattr(self, 'swagger_fake_view', False):
-#             return queryset.model.objects.none()
-#         if current_org.is_root():
-#             return queryset
-#         # queryset = queryset.filter(run_as__org_id=current_org.org_id())
-#         return queryset
-#
-#
-# class CommandExecutionHostRelationViewSet(OrgRelationMixin, OrgBulkModelViewSet):
-#     serializer_class = CommandExecutionHostsRelationSerializer
-#     m2m_field = CommandExecution.hosts.field
-#     filterset_fields = [
-#         'id', 'asset', 'commandexecution'
-#     ]
-#     search_fields = ('asset__name', )
-#     http_method_names = ['options', 'get']
-#     rbac_perms = {
-#         'GET': 'ops.view_commandexecution',
-#         'list': 'ops.view_commandexecution',
-#     }
-#
-#     def get_queryset(self):
-#         queryset = super().get_queryset()
-#         queryset = queryset.annotate(
-#             asset_display=Concat(
-#                 F('asset__name'), Value('('),
-#                 F('asset__address'), Value(')')
-#             )
-#         )
-#         return queryset

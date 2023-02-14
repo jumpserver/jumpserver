@@ -2,13 +2,13 @@
 #
 from celery import signals
 from django.db.models.signals import post_save
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _, gettext_noop
 
 from accounts.const import AutomationTypes
 from accounts.models import AccountBackupAutomation
 from assets.models import Asset, Node
 from audits.models import ActivityLog
-from common.utils import get_object_or_none
+from common.utils import get_object_or_none, i18n_fmt
 from jumpserver.utils import current_request
 from ops.celery import app
 from orgs.utils import tmp_to_root_org
@@ -108,21 +108,21 @@ class ActivityLogHandler(object):
 
     @staticmethod
     def session_for_activity(obj):
-        detail = _(
-            '{} used account[{}], login method[{}] login the asset.'
-        ).format(
-            obj.user, obj.account, obj.login_from_display
+        detail = i18n_fmt(
+            gettext_noop('User %s use account %s login asset %s'),
+            obj.user, obj.account, obj.asset
         )
-        return obj.asset_id, detail, ActivityChoices.session_log
+        return [obj.asset_id, obj.user_id, obj.account_id], detail, ActivityChoices.session_log
 
     @staticmethod
     def login_log_for_activity(obj):
-        login_status = _('Success') if obj.status else _('Failed')
-        detail = _('User {} login this system {}').format(
-            obj.username, login_status
-        )
+        login_status = gettext_noop('Success') if obj.status else gettext_noop('Failed')
+        detail = i18n_fmt(gettext_noop('User %s login system %s'), obj.username, login_status)
         user_id = User.objects.filter(username=obj.username).values('id').first()
-        return user_id['id'], detail, ActivityChoices.login_log
+        resource_list = []
+        if user_id:
+            resource_list = [user_id['id']]
+        return resource_list, detail, ActivityChoices.login_log
 
 
 activity_handler = ActivityLogHandler()
@@ -135,18 +135,20 @@ def before_task_publish_for_activity_log(headers=None, **kwargs):
     task_display, resource_ids = activity_handler.get_celery_task_info(
         task_name, args, **kwargs
     )
-    activities = []
-    detail = _('User %s performs a task(%s) for this resource.') % (
-        getattr(current_request, 'user', None), task_display
-    )
-    for resource_id in resource_ids:
-        activities.append(
-            ActivityLog(
-                resource_id=resource_id, type=ActivityChoices.task, detail=detail
-            )
-        )
-    ActivityLog.objects.bulk_create(activities)
+    if not current_request:
+        user = 'System'
+    else:
+        user = str(current_request.user)
 
+    detail = i18n_fmt(
+        gettext_noop('User %s perform a task (%s) for this resource'),
+        user, task_display
+    )
+    activities = [
+        ActivityLog(resource_id=resource_id, type=ActivityChoices.task, detail=detail)
+        for resource_id in resource_ids
+    ]
+    ActivityLog.objects.bulk_create(activities)
     activity_info = {
         'activity_ids': [a.id for a in activities]
     }
@@ -167,9 +169,7 @@ def on_celery_task_pre_run_for_activity_log(task_id='', **kwargs):
     ActivityLog.objects.bulk_update(activities, ('detail_id',))
 
 
-def on_session_or_login_log_created(
-        sender, instance=None, created=False, **kwargs
-):
+def on_session_or_login_log_created(sender, instance=None, created=False, **kwargs):
     handler_mapping = {
         'Session': activity_handler.session_for_activity,
         'UserLoginLog': activity_handler.login_log_for_activity
@@ -178,13 +178,13 @@ def on_session_or_login_log_created(
     if not created or model_name not in handler_mapping:
         return
 
-    resource_id, detail, act_type = handler_mapping[model_name](instance)
+    resource_ids, detail, act_type = handler_mapping[model_name](instance)
+    activities = [
+        ActivityLog(resource_id=i, type=act_type, detail=detail, detail_id=instance.id)
+        for i in resource_ids
+    ]
+    ActivityLog.objects.bulk_create(activities)
 
-    ActivityLog.objects.create(
-        resource_id=resource_id, type=act_type,
-        detail=detail, detail_id=instance.id
-    )
 
-
-for sender in [Session, UserLoginLog]:
-    post_save.connect(on_session_or_login_log_created, sender=sender)
+for sd in [Session, UserLoginLog]:
+    post_save.connect(on_session_or_login_log_created, sender=sd)
