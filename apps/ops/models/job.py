@@ -299,7 +299,7 @@ class JobExecution(JMSOrgBaseModel):
 
     def match_command_group(self, acl, asset):
         for cg in acl.command_groups.all():
-            matched, _ = cg.match(self.current_job.args)
+            matched, __ = cg.match(self.current_job.args)
             if matched:
                 if acl.is_action(CommandFilterACL.ActionChoices.accept):
                     return True
@@ -355,9 +355,8 @@ class JobExecution(JMSOrgBaseModel):
             self.set_error(e)
 
     class Meta:
-
         verbose_name = _("Job Execution")
-    ordering = ['-date_created']
+        ordering = ['-date_created']
 
 
 class JobAuditLog(JobExecution):
