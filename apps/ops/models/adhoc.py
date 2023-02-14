@@ -17,7 +17,6 @@ logger = get_logger(__file__)
 
 
 class AdHoc(JMSOrgBaseModel):
-
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     pattern = models.CharField(max_length=1024, verbose_name=_("Pattern"), default='all')
@@ -42,4 +41,5 @@ class AdHoc(JMSOrgBaseModel):
         return "{}: {}".format(self.module, self.args)
 
     class Meta:
+        unique_together = [('name', 'org_id', 'creator')]
         verbose_name = _("AdHoc")

@@ -24,7 +24,6 @@ def on_node_asset_change(sender, action, instance, reverse, pk_set, **kwargs):
     if action in refused:
         raise ValueError
 
-    logger.debug('Recv asset nodes change signal, recompute node assets amount')
     mapper = {PRE_ADD: add, POST_REMOVE: sub}
     if action not in mapper:
         return
@@ -34,12 +33,13 @@ def on_node_asset_change(sender, action, instance, reverse, pk_set, **kwargs):
             node_ids = [instance.id]
         else:
             node_ids = pk_set
-        update_nodes_assets_amount(*node_ids)
+        update_nodes_assets_amount(node_ids=node_ids)
 
 
 @merge_delay_run(ttl=5)
-def update_nodes_assets_amount(*node_ids):
+def update_nodes_assets_amount(node_ids=()):
     nodes = list(Node.objects.filter(id__in=node_ids))
+    logger.debug('Recv asset nodes change signal, recompute node assets amount')
     logger.info('Update nodes assets amount: {} nodes'.format(len(node_ids)))
 
     if len(node_ids) > 100:

@@ -59,14 +59,12 @@ def check_pid_alive(pid) -> bool:
         content = decode_content(csv_ret)
         content_list = content.strip().split("\r\n")
         if len(content_list) != 2:
-            notify_err_message(content)
-            time.sleep(2)
+            print("check pid {} ret invalid: {}".format(pid, content))
             return False
         ret_pid = content_list[1].split(",")[1].strip('"')
         return str(pid) == ret_pid
     except Exception as e:
-        notify_err_message(e)
-        time.sleep(2)
+        print("check pid {} err: {}".format(pid, e))
         return False
 
 
@@ -75,8 +73,7 @@ def wait_pid(pid):
         time.sleep(5)
         ok = check_pid_alive(pid)
         if not ok:
-            notify_err_message("程序退出")
-            time.sleep(2)
+            print("pid {} is not alive".format(pid))
             break
 
 

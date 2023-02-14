@@ -41,7 +41,10 @@ def default_suffix_key(*args, **kwargs):
 
 
 def key_by_org(*args, **kwargs):
-    return args[0].org_id
+    values = list(kwargs.values())
+    if not values:
+        return 'default'
+    return values[0][0].org_id
 
 
 class EventLoopThread(threading.Thread):
@@ -79,6 +82,15 @@ def cancel_or_remove_debouncer_task(cache_key):
         task.cancel()
 
 
+def run_debouncer_func(cache_key, org, ttl, func, *args, **kwargs):
+    cancel_or_remove_debouncer_task(cache_key)
+    run_func_partial = functools.partial(_run_func_with_org, cache_key, org, func)
+    loop = _loop_thread.get_loop()
+    _debouncer = Debouncer(run_func_partial, lambda: True, ttl, loop=loop, executor=executor)
+    task = asyncio.run_coroutine_threadsafe(_debouncer(*args, **kwargs), loop=loop)
+    _loop_debouncer_func_task_cache[cache_key] = task
+
+
 class Debouncer(object):
     def __init__(self, callback, check, delay, loop=None, executor=None):
         self.callback = callback
@@ -113,12 +125,36 @@ def _run_func_with_org(key, org, func, *args, **kwargs):
     _loop_debouncer_func_args_cache.pop(key, None)
 
 
-def delay_run(ttl=5, key=None, merge_args=False):
+def delay_run(ttl=5, key=None):
     """
     延迟执行函数, 在 ttl 秒内, 只执行最后一次
     :param ttl:
     :param key: 是否合并参数, 一个 callback
-    :param merge_args: 是否合并之前的参数, bool
+    :return:
+    """
+
+    def inner(func):
+        suffix_key_func = key if key else default_suffix_key
+
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            from orgs.utils import get_current_org
+            org = get_current_org()
+            func_name = f'{func.__module__}_{func.__name__}'
+            key_suffix = suffix_key_func(*args)
+            cache_key = f'DELAY_RUN_{func_name}_{key_suffix}'
+            run_debouncer_func(cache_key, org, ttl, func, *args, **kwargs)
+
+        return wrapper
+
+    return inner
+
+
+def merge_delay_run(ttl=5, key=None):
+    """
+    延迟执行函数, 在 ttl 秒内, 只执行最后一次, 并且合并参数
+    :param ttl:
+    :param key: 是否合并参数, 一个 callback
     :return:
     """
 
@@ -127,48 +163,43 @@ def delay_run(ttl=5, key=None, merge_args=False):
         if len(sigs.parameters) != 1:
             raise ValueError('func must have one arguments: %s' % func.__name__)
         param = list(sigs.parameters.values())[0]
-        if not str(param).startswith('*') or param.kind == param.VAR_KEYWORD:
-            raise ValueError('func args must be startswith *: %s and not have **kwargs ' % func.__name__)
+        if not isinstance(param.default, tuple):
+            raise ValueError('func default must be tuple: %s' % param.default)
         suffix_key_func = key if key else default_suffix_key
 
         @functools.wraps(func)
-        def wrapper(*args):
+        def wrapper(*args, **kwargs):
             from orgs.utils import get_current_org
             org = get_current_org()
             func_name = f'{func.__module__}_{func.__name__}'
-            key_suffix = suffix_key_func(*args)
-            cache_key = f'DELAY_RUN_{func_name}_{key_suffix}'
-            new_arg = args
-            if merge_args:
-                values = _loop_debouncer_func_args_cache.get(cache_key, [])
-                new_arg = [*values, *args]
-                _loop_debouncer_func_args_cache[cache_key] = new_arg
+            key_suffix = suffix_key_func(*args, **kwargs)
+            cache_key = f'MERGE_DELAY_RUN_{func_name}_{key_suffix}'
+            cache_kwargs = _loop_debouncer_func_args_cache.get(cache_key, {})
 
-            cancel_or_remove_debouncer_task(cache_key)
-
-            run_func_partial = functools.partial(_run_func_with_org, cache_key, org, func)
-            loop = _loop_thread.get_loop()
-            _debouncer = Debouncer(run_func_partial, lambda: True, ttl,
-                                   loop=loop, executor=executor)
-            task = asyncio.run_coroutine_threadsafe(_debouncer(*new_arg),
-                                                    loop=loop)
-            _loop_debouncer_func_task_cache[cache_key] = task
+            for k, v in kwargs.items():
+                if not isinstance(v, (tuple, list, set)):
+                    raise ValueError('func kwargs value must be list or tuple: %s %s' % (func.__name__, v))
+                if k not in cache_kwargs:
+                    cache_kwargs[k] = v
+                elif isinstance(v, set):
+                    cache_kwargs[k] = cache_kwargs[k].union(v)
+                else:
+                    cache_kwargs[k] = list(cache_kwargs[k]) + list(v)
+            _loop_debouncer_func_args_cache[cache_key] = cache_kwargs
+            run_debouncer_func(cache_key, org, ttl, func, *args, **cache_kwargs)
 
         return wrapper
 
     return inner
 
 
-merge_delay_run = functools.partial(delay_run, merge_args=True)
-
-
 @delay_run(ttl=5)
-def test_delay_run(*username):
+def test_delay_run(username):
     print("Hello, %s, now is %s" % (username, time.time()))
 
 
-@delay_run(ttl=5, key=lambda *users: users[0][0], merge_args=True)
-def test_merge_delay_run(*users):
+@merge_delay_run(ttl=5, key=lambda users=(): users[0][0])
+def test_merge_delay_run(users=()):
     name = ','.join(users)
     time.sleep(2)
     print("Hello, %s, now is %s" % (name, time.time()))
@@ -179,8 +210,8 @@ def do_test():
     print("start : %s" % time.time())
     for i in range(100):
         # test_delay_run('test', year=i)
-        test_merge_delay_run('test %s' % i)
-        test_merge_delay_run('best %s' % i)
+        test_merge_delay_run(users=['test %s' % i])
+        test_merge_delay_run(users=['best %s' % i])
         test_delay_run('test run %s' % i)
 
     end = time.time()

@@ -1,3 +1,5 @@
+import uuid
+
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -14,6 +16,14 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
     run_after_save = serializers.BooleanField(label=_("Run after save"), default=False, required=False)
     nodes = serializers.ListField(required=False, child=serializers.CharField())
     date_last_run = serializers.DateTimeField(label=_('Date last run'), read_only=True)
+    name = serializers.CharField(label=_('Name'), max_length=128, allow_blank=True, required=False)
+
+    def to_internal_value(self, data):
+        instant = data.get('instant', False)
+        if instant:
+            _uid = str(uuid.uuid4()).split('-')[-1]
+            data['name'] = f'job-{_uid}'
+        return super().to_internal_value(data)
 
     def get_request_user(self):
         request = self.context.get('request')

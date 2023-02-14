@@ -162,6 +162,12 @@ def default_chrome_driver_options():
     options.add_argument("start-maximized")
     # 禁用 扩展
     options.add_argument("--disable-extensions")
+    # 忽略证书错误相关
+    options.add_argument('--ignore-ssl-errors')
+    options.add_argument('--ignore-certificate-errors')
+    options.add_argument('--ignore-certificate-errors-spki-list')
+    options.add_argument('--allow-running-insecure-content')
+
     # 禁用开发者工具
     options.add_argument("--disable-dev-tools")
     # 禁用 密码管理器弹窗

@@ -60,7 +60,7 @@ class AssetAccountSerializer(
     template = serializers.BooleanField(
         default=False, label=_("Template"), write_only=True
     )
-    name = serializers.CharField(max_length=128, required=False, label=_("Name"))
+    name = serializers.CharField(max_length=128, required=True, label=_("Name"))
 
     class Meta:
         model = Account

@@ -28,9 +28,9 @@ class AccountViewSet(OrgBulkModelViewSet):
         'default': serializers.AccountSerializer,
     }
     rbac_perms = {
-        'verify_account': 'assets.test_account',
-        'partial_update': 'assets.change_accountsecret',
-        'su_from_accounts': 'assets.view_account',
+        'verify_account': 'accounts.test_account',
+        'partial_update': ['accounts.change_accountsecret', 'accounts.change_account'],
+        'su_from_accounts': 'accounts.view_account',
     }
 
     @action(methods=['get'], detail=False, url_path='su-from-accounts')
@@ -67,8 +67,8 @@ class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
     http_method_names = ['get', 'options']
     permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
     rbac_perms = {
-        'list': 'assets.view_accountsecret',
-        'retrieve': 'assets.view_accountsecret',
+        'list': 'accounts.view_accountsecret',
+        'retrieve': 'accounts.view_accountsecret',
     }
 
 

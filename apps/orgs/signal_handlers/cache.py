@@ -76,7 +76,7 @@ model_cache_field_mapper = {
 class OrgResourceStatisticsRefreshUtil:
     @staticmethod
     @merge_delay_run(ttl=5)
-    def refresh_org_fields(*org_fields):
+    def refresh_org_fields(org_fields=()):
         for org, cache_field_name in org_fields:
             OrgResourceStatisticsCache(org).expire(*cache_field_name)
             OrgResourceStatisticsCache(Organization.root()).expire(*cache_field_name)

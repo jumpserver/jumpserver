@@ -22,7 +22,8 @@ node_assets_mapping_pub_sub = lazy(lambda: RedisPubSub('fm.node_asset_mapping'),
 
 
 @merge_delay_run(ttl=5)
-def expire_node_assets_mapping(*org_ids):
+def expire_node_assets_mapping(org_ids=()):
+    logger.debug("Recv asset nodes changed signal, expire memery node asset mapping")
     # 所有进程清除(自己的 memory 数据)
     root_org_id = Organization.ROOT_ID
     Node.expire_node_all_asset_ids_cache_mapping(root_org_id)
@@ -43,18 +44,17 @@ def on_node_post_create(sender, instance, created, update_fields, **kwargs):
         need_expire = False
 
     if need_expire:
-        expire_node_assets_mapping(instance.org_id)
+        expire_node_assets_mapping(org_ids=(instance.org_id,))
 
 
 @receiver(post_delete, sender=Node)
 def on_node_post_delete(sender, instance, **kwargs):
-    expire_node_assets_mapping(instance.org_id)
+    expire_node_assets_mapping(org_ids=(instance.org_id,))
 
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
 def on_node_asset_change(sender, instance, **kwargs):
-    logger.debug("Recv asset nodes changed signal, expire memery node asset mapping")
-    expire_node_assets_mapping(instance.org_id)
+    expire_node_assets_mapping(org_ids=(instance.org_id,))
 
 
 @receiver(django_ready)

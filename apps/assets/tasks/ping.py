@@ -40,4 +40,4 @@ def test_node_assets_connectivity_manual(node_id):
     node = Node.objects.get(id=node_id)
     task_name = gettext_noop("Test if the assets under the node are connectable ")
     assets = node.get_all_assets()
-    return test_assets_connectivity_task.delay(*assets, task_name)
+    return test_assets_connectivity_task.delay(assets, task_name)
