@@ -53,8 +53,9 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
         return queryset
 
     def paginate_queryset(self, queryset):
-        queryset = super().paginate_queryset(queryset) or queryset
-        return self.set_users_roles_for_cache(queryset)
+        page = super().paginate_queryset(queryset)
+        self.set_users_roles_for_cache(page or queryset)
+        return page
 
     @action(methods=['get'], detail=False, url_path='suggestions')
     def match(self, request, *args, **kwargs):
