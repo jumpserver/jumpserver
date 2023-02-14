@@ -62,6 +62,9 @@ class HostTypes(BaseType):
                     'ansible_connection': 'ssh',
                 },
             },
+            cls.OTHER_HOST: {
+                'ansible_enabled': False
+            },
         }
 
     @classmethod
@@ -103,8 +106,7 @@ class HostTypes(BaseType):
                         }
                     }
                 }
-            ],
-            cls.OTHER_HOST: []
+            ]
         }
 
     @classmethod
