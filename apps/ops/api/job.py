@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db.models import Count
 from django.db.transaction import atomic
 from rest_framework.views import APIView
@@ -29,6 +30,11 @@ class JobViewSet(OrgBulkModelViewSet):
     permission_classes = ()
     search_fields = ('name', 'comment')
     model = Job
+
+    def check_permissions(self, request):
+        if not settings.SECURITY_COMMAND_EXECUTION:
+            return self.permission_denied(request, "Command execution disabled")
+        return super().check_permissions(request)
 
     def allow_bulk_destroy(self, qs, filtered):
         return True
