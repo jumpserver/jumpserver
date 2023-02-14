@@ -89,11 +89,15 @@ class RoleViewSet(JMSModelViewSet):
 
 
 class SystemRoleViewSet(RoleViewSet):
+    perm_model = SystemRole
+
     def get_queryset(self):
         return super().get_queryset().filter(scope='system')
 
 
 class OrgRoleViewSet(RoleViewSet):
+    perm_model = OrgRole
+
     def get_queryset(self):
         return super().get_queryset().filter(scope='org')
 
