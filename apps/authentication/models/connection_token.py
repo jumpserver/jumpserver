@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import PermissionDenied
 
 from assets.const import Protocol
-from common.db.fields import EncryptCharField
+from common.db.fields import EncryptTextField
 from common.exceptions import JMSException
 from common.utils import lazyproperty, pretty_string, bulk_get
 from common.utils.timezone import as_current_tz
@@ -34,7 +34,7 @@ class ConnectionToken(JMSOrgBaseModel):
     )
     account = models.CharField(max_length=128, verbose_name=_("Account name"))  # 登录账号Name
     input_username = models.CharField(max_length=128, default='', blank=True, verbose_name=_("Input username"))
-    input_secret = EncryptCharField(max_length=64, default='', blank=True, verbose_name=_("Input secret"))
+    input_secret = EncryptTextField(max_length=64, default='', blank=True, verbose_name=_("Input secret"))
     protocol = models.CharField(max_length=16, default=Protocol.ssh, verbose_name=_("Protocol"))
     connect_method = models.CharField(max_length=32, verbose_name=_("Connect method"))
     user_display = models.CharField(max_length=128, default='', verbose_name=_("User display"))
