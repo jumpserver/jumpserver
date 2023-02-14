@@ -44,7 +44,7 @@ def key_by_org(*args, **kwargs):
     values = list(kwargs.values())
     if not values:
         return 'default'
-    return values[0].org_id
+    return values[0][0].org_id
 
 
 class EventLoopThread(threading.Thread):
