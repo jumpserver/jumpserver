@@ -12,6 +12,7 @@ from common.utils import get_object_or_none, i18n_fmt
 from jumpserver.utils import current_request
 from ops.celery import app
 from orgs.utils import tmp_to_root_org
+from orgs.models import Organization
 from terminal.models import Session
 from users.models import User
 from ..const import ActivityChoices
@@ -112,7 +113,7 @@ class ActivityLogHandler(object):
             gettext_noop('User %s use account %s login asset %s'),
             obj.user, obj.account, obj.asset
         )
-        return [obj.asset_id, obj.user_id, obj.account_id], detail, ActivityChoices.session_log
+        return [obj.asset_id, obj.user_id, obj.account_id], detail, ActivityChoices.session_log, obj.org_id
 
     @staticmethod
     def login_log_for_activity(obj):
@@ -122,7 +123,7 @@ class ActivityLogHandler(object):
         resource_list = []
         if user_id:
             resource_list = [user_id['id']]
-        return resource_list, detail, ActivityChoices.login_log
+        return resource_list, detail, ActivityChoices.login_log, Organization.SYSTEM_ID
 
 
 activity_handler = ActivityLogHandler()
@@ -178,9 +179,12 @@ def on_session_or_login_log_created(sender, instance=None, created=False, **kwar
     if not created or model_name not in handler_mapping:
         return
 
-    resource_ids, detail, act_type = handler_mapping[model_name](instance)
+    resource_ids, detail, act_type, org_id = handler_mapping[model_name](instance)
     activities = [
-        ActivityLog(resource_id=i, type=act_type, detail=detail, detail_id=instance.id)
+        ActivityLog(
+            resource_id=i, type=act_type, detail=detail,
+            detail_id=instance.id, org_id=org_id
+        )
         for i in resource_ids
     ]
     ActivityLog.objects.bulk_create(activities)
