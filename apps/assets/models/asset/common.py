@@ -289,4 +289,5 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
             ('match_asset', _('Can match asset')),
             ('add_assettonode', _('Add asset to node')),
             ('move_assettonode', _('Move asset to node')),
+            ('remove_assetfromnode', _('Remove asset from node'))
         ]
