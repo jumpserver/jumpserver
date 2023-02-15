@@ -1845,17 +1845,15 @@ msgstr "アクティブ"
 
 #: audits/models.py:110
 msgid "Detail"
-msgstr ""
+msgstr "詳細"
 
 #: audits/models.py:112
-#, fuzzy
-#| msgid "Terminal ID"
 msgid "Detail ID"
-msgstr "ターミナル ID"
+msgstr "詳細 ID"
 
 #: audits/models.py:116
 msgid "Activity log"
-msgstr ""
+msgstr "活動記録"
 
 #: audits/models.py:128
 msgid "Change by"

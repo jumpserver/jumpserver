@@ -1833,13 +1833,11 @@ msgstr "激活中"
 
 #: audits/models.py:110
 msgid "Detail"
-msgstr ""
+msgstr "详情"
 
 #: audits/models.py:112
-#, fuzzy
-#| msgid "Terminal ID"
 msgid "Detail ID"
-msgstr "终端 ID"
+msgstr "详情 ID"
 
 #: audits/models.py:116
 msgid "Activity log"
