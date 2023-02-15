@@ -18,7 +18,7 @@ class ConnectMethodListApi(generics.ListAPIView):
 
     def get_queryset(self):
         os = get_request_os(self.request)
-        return ConnectMethodUtil.get_protocols_connect_methods(os)
+        return ConnectMethodUtil.get_filtered_protocols_connect_methods(os)
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
