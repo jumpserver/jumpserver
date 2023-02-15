@@ -42,4 +42,4 @@ class AdHoc(JMSOrgBaseModel):
 
     class Meta:
         unique_together = [('name', 'org_id', 'creator')]
-        verbose_name = _("AdHoc")
+        verbose_name = _("Adhoc")
