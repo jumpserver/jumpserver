@@ -38,6 +38,7 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         extra_kwargs = {
             'from_ticket': {'read_only': True},
             'value': {'read_only': True},
+            'is_expired': {'read_only': True, 'label': _('Is expired')},
         }
 
     def get_request_user(self):
