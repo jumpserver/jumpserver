@@ -155,7 +155,7 @@ class ConnectMethodUtil:
         protocols = {
             TerminalType.koko: {
                 'web_methods': [WebMethod.web_cli, WebMethod.web_sftp],
-                'listen': [Protocol.http],
+                'listen': [Protocol.http, Protocol.ssh],
                 'support': [
                     Protocol.ssh, Protocol.telnet,
                     Protocol.mysql, Protocol.postgresql,
@@ -212,6 +212,37 @@ class ConnectMethodUtil:
         cls._all_methods = None
 
     @classmethod
+    def get_filtered_protocols_connect_methods(cls, os):
+        methods = dict(cls.get_protocols_connect_methods(os))
+        methods = cls._filter_disable_components_connect_methods(methods)
+        methods = cls._filter_disable_protocols_connect_methods(methods)
+        return methods
+
+    @classmethod
+    def _filter_disable_components_connect_methods(cls, methods):
+        component_setting = {
+            'razor': 'TERMINAL_RAZOR_ENABLED',
+            'magnus': 'TERMINAL_MAGNUS_ENABLED',
+        }
+        disabled_component = [comp for comp, attr in component_setting.items() if not getattr(settings, attr)]
+        if not disabled_component:
+            return methods
+
+        for protocol, ms in methods.items():
+            filtered_methods = [m for m in ms if m['component'] not in disabled_component]
+            methods[protocol] = filtered_methods
+        return methods
+
+    @classmethod
+    def _filter_disable_protocols_connect_methods(cls, methods):
+        # 过滤一些特殊的协议方式
+        if not getattr(settings, 'TERMINAL_KOKO_SSH_ENABLED'):
+            protocol = Protocol.ssh
+            methods[protocol] = [m for m in methods[protocol] if m['type'] != 'native']
+
+        return methods
+
+    @classmethod
     def get_protocols_connect_methods(cls, os):
         if cls._all_methods is not None:
             return cls._all_methods
@@ -244,9 +275,11 @@ class ConnectMethodUtil:
                     listen = [protocol]
                 else:
                     listen = component_protocol['listen']
-
                 for listen_protocol in listen:
                     # Native method
+                    if component == TerminalType.koko and protocol.value != Protocol.ssh:
+                        # koko 仅支持 ssh 的 native 方式，其他数据库的 native 方式不提供
+                        continue
                     methods[protocol.value].extend([
                         {
                             'component': component.value,

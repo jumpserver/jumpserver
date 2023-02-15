@@ -8,9 +8,10 @@ from rest_framework import serializers
 
 from accounts.models import Account
 from accounts.serializers import AccountSerializerCreateValidateMixin
+from accounts.serializers import AuthValidateMixin
 from common.serializers import WritableNestedModelSerializer, SecretReadableMixin, CommonModelSerializer
 from common.serializers.fields import LabeledChoiceField
-from common.utils import lazyproperty
+from common.utils import lazyproperty, decrypt_password
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ...const import Category, AllTypes
 from ...models import Asset, Node, Platform, Label, Protocol
@@ -51,7 +52,9 @@ class AssetPlatformSerializer(serializers.ModelSerializer):
 
 
 class AssetAccountSerializer(
-    AccountSerializerCreateValidateMixin, CommonModelSerializer
+    AuthValidateMixin,
+    AccountSerializerCreateValidateMixin,
+    CommonModelSerializer
 ):
     add_org_fields = False
     push_now = serializers.BooleanField(
@@ -256,6 +259,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
     def accounts_create(accounts_data, asset):
         for data in accounts_data:
             data['asset'] = asset
+            secret = data.get('secret')
+            data['secret'] = decrypt_password(secret) if secret else secret
             AssetAccountSerializer().create(data)
 
     @atomic
@@ -269,6 +274,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
 
     @atomic
     def update(self, instance, validated_data):
+        if not validated_data.get('accounts'):
+            validated_data.pop('accounts', None)
         nodes_display = validated_data.pop('nodes_display', '')
         instance = super().update(instance, validated_data)
         self.perform_nodes_display_create(instance, nodes_display)

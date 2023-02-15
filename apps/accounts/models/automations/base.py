@@ -1,6 +1,6 @@
-from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from accounts.tasks import execute_automation
 from assets.models.automations import (
     BaseAutomation as AssetBaseAutomation,
     AutomationExecution as AssetAutomationExecution
@@ -13,6 +13,10 @@ class AccountBaseAutomation(AssetBaseAutomation):
     class Meta:
         proxy = True
         verbose_name = _("Account automation task")
+
+    @property
+    def execute_task(self):
+        return execute_automation
 
     @property
     def execution_model(self):
