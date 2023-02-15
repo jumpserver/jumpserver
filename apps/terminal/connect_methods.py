@@ -214,6 +214,12 @@ class ConnectMethodUtil:
     @classmethod
     def get_filtered_protocols_connect_methods(cls, os):
         methods = dict(cls.get_protocols_connect_methods(os))
+        methods = cls._filter_disable_components_connect_methods(methods)
+        methods = cls._filter_disable_protocols_connect_methods(methods)
+        return methods
+
+    @classmethod
+    def _filter_disable_components_connect_methods(cls, methods):
         component_setting = {
             'razor': 'TERMINAL_RAZOR_ENABLED',
             'magnus': 'TERMINAL_MAGNUS_ENABLED',
@@ -225,6 +231,15 @@ class ConnectMethodUtil:
         for protocol, ms in methods.items():
             filtered_methods = [m for m in ms if m['component'] not in disabled_component]
             methods[protocol] = filtered_methods
+        return methods
+
+    @classmethod
+    def _filter_disable_protocols_connect_methods(cls, methods):
+        # 过滤一些特殊的协议方式
+        if not getattr(settings, 'TERMINAL_KOKO_SSH_ENABLED'):
+            protocol = Protocol.ssh
+            methods[protocol] = [m for m in methods[protocol] if m['type'] != 'native']
+
         return methods
 
     @classmethod
