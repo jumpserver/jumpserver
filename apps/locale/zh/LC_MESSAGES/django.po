@@ -461,7 +461,7 @@ msgstr "最后登录日期"
 
 #: accounts/models/gathered_account.py:16
 msgid "Address last login"
-msgstr "首次登录地址"
+msgstr "最后登录地址"
 
 #: accounts/models/gathered_account.py:23 rbac/tree.py:50
 msgid "Gather account"
