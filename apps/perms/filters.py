@@ -1,4 +1,5 @@
 from django_filters import rest_framework as filters
+from django.utils.translation import ugettext_lazy as _
 from django.db.models import QuerySet, Q
 
 from common.drf.filters import BaseFilterSet
