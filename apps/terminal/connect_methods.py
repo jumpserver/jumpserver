@@ -262,6 +262,9 @@ class ConnectMethodUtil:
                     listen = component_protocol['listen']
                 for listen_protocol in listen:
                     # Native method
+                    if component == TerminalType.koko and protocol.value != Protocol.ssh:
+                        # koko 仅支持 ssh 的 native 方式，其他数据库的 native 方式不提供
+                        continue
                     methods[protocol.value].extend([
                         {
                             'component': component.value,
