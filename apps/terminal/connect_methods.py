@@ -212,6 +212,18 @@ class ConnectMethodUtil:
         cls._all_methods = None
 
     @classmethod
+    def get_filtered_protocols_connect_methods(cls, os):
+        methods = dict(cls.get_protocols_connect_methods(os))
+        for protocol, ms in methods.items():
+            allow_methods = ms
+            if not settings.TERMINAL_MAGNUS_ENABLED:
+                allow_methods = [m for m in allow_methods if m['component'] != 'magnus']
+            if not settings.TERMINAL_RAZOR_ENABLED:
+                allow_methods = [m for m in allow_methods if m['component'] != 'razor']
+            methods[protocol] = allow_methods
+        return methods
+
+    @classmethod
     def get_protocols_connect_methods(cls, os):
         if cls._all_methods is not None:
             return cls._all_methods
