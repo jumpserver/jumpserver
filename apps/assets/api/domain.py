@@ -3,10 +3,10 @@ from django.utils.translation import ugettext as _
 from django.views.generic.detail import SingleObjectMixin
 from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView, Response
-
 from common.utils import get_logger
 from assets.tasks import test_gateways_connectivity_manual
 from orgs.mixins.api import OrgBulkModelViewSet
+from .asset import AssetViewSet
 from .. import serializers
 from ..models import Domain, Gateway
 
@@ -28,7 +28,7 @@ class DomainViewSet(OrgBulkModelViewSet):
         return super().get_serializer_class()
 
 
-class GatewayViewSet(OrgBulkModelViewSet):
+class GatewayViewSet(AssetViewSet):
     perm_model = Gateway
     filterset_fields = ("domain__name", "name", "domain")
     search_fields = ("domain__name",)

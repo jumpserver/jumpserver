@@ -20,9 +20,7 @@ class GatewaySerializer(HostSerializer):
             queryset = queryset.exclude(id=self.instance.id)
         has = queryset.exists()
         if has:
-            raise serializers.ValidationError(
-                _('This field must be unique.')
-            )
+            raise serializers.ValidationError(_('This field must be unique.'))
         return value
 
 
