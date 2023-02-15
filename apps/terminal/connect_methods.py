@@ -214,13 +214,17 @@ class ConnectMethodUtil:
     @classmethod
     def get_filtered_protocols_connect_methods(cls, os):
         methods = dict(cls.get_protocols_connect_methods(os))
+        component_setting = {
+            'razor': 'TERMINAL_RAZOR_ENABLED',
+            'magnus': 'TERMINAL_MAGNUS_ENABLED',
+        }
+        disabled_component = [comp for comp, attr in component_setting.items() if not getattr(settings, attr)]
+        if not disabled_component:
+            return methods
+
         for protocol, ms in methods.items():
-            allow_methods = ms
-            if not settings.TERMINAL_MAGNUS_ENABLED:
-                allow_methods = [m for m in allow_methods if m['component'] != 'magnus']
-            if not settings.TERMINAL_RAZOR_ENABLED:
-                allow_methods = [m for m in allow_methods if m['component'] != 'razor']
-            methods[protocol] = allow_methods
+            filtered_methods = [m for m in ms if m['component'] not in disabled_component]
+            methods[protocol] = filtered_methods
         return methods
 
     @classmethod
