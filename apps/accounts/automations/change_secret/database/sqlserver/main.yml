@@ -22,26 +22,26 @@
     - debug:
         var: info
 
-        - name: Change SQLServer password
-          community.general.mssql_script:
-            login_user: "{{ jms_account.username }}"
-            login_password: "{{ jms_account.secret }}"
-            login_host: "{{ jms_asset.address }}"
-            login_port: "{{ jms_asset.port }}"
-            name: '{{ jms_asset.spec_info.db_name }}'
-            script: "ALTER LOGIN {{ account.username }} WITH PASSWORD = '{{ account.secret }}'; select @@version"
-          when: db_info is succeeded
-          register: change_info
+    - name: Change SQLServer password
+      community.general.mssql_script:
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        name: '{{ jms_asset.spec_info.db_name }}'
+        script: "ALTER LOGIN {{ account.username }} WITH PASSWORD = '{{ account.secret }}'; select @@version"
+      when: db_info is succeeded
+      register: change_info
 
-        - name: Verify password
-          community.general.mssql_script:
-            login_user: "{{ account.username }}"
-            login_password: "{{ account.secret }}"
-            login_host: "{{ jms_asset.address }}"
-            login_port: "{{ jms_asset.port }}"
-            name: '{{ jms_asset.spec_info.db_name }}'
-            script: |
-              SELECT @@version
-          when:
-            - db_info is succeeded
-            - change_info is succeeded
+    - name: Verify password
+      community.general.mssql_script:
+        login_user: "{{ account.username }}"
+        login_password: "{{ account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        name: '{{ jms_asset.spec_info.db_name }}'
+        script: |
+          SELECT @@version
+      when:
+        - db_info is succeeded
+        - change_info is succeeded
