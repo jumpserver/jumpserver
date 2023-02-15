@@ -155,7 +155,7 @@ class ConnectMethodUtil:
         protocols = {
             TerminalType.koko: {
                 'web_methods': [WebMethod.web_cli, WebMethod.web_sftp],
-                'listen': [Protocol.http],
+                'listen': [Protocol.http, Protocol.ssh],
                 'support': [
                     Protocol.ssh, Protocol.telnet,
                     Protocol.mysql, Protocol.postgresql,
@@ -244,7 +244,6 @@ class ConnectMethodUtil:
                     listen = [protocol]
                 else:
                     listen = component_protocol['listen']
-
                 for listen_protocol in listen:
                     # Native method
                     methods[protocol.value].extend([
