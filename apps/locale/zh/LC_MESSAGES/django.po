@@ -2480,7 +2480,7 @@ msgstr "{} 不能为空"
 #: authentication/serializers/token.py:79 perms/serializers/permission.py:30
 #: perms/serializers/permission.py:62 users/serializers/user.py:160
 msgid "Is valid"
-msgstr "账号是否有效"
+msgstr "是否有效"
 
 #: authentication/tasks.py:12
 msgid "Clean expired session"
