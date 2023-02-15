@@ -50,9 +50,7 @@ class AssetPlatformSerializer(serializers.ModelSerializer):
         }
 
 
-class AssetAccountSerializer(
-    AccountSerializerCreateValidateMixin, CommonModelSerializer
-):
+class AssetAccountSerializer(AccountSerializerCreateValidateMixin, CommonModelSerializer):
     add_org_fields = False
     push_now = serializers.BooleanField(
         default=False, label=_("Push now"), write_only=True
@@ -65,8 +63,8 @@ class AssetAccountSerializer(
     class Meta:
         model = Account
         fields_mini = [
-            'id', 'name', 'username', 'privileged', 'is_active',
-            'version', 'secret_type',
+            'id', 'name', 'username', 'privileged',
+            'is_active', 'version', 'secret_type',
         ]
         fields_write_only = [
             'secret', 'push_now', 'template'

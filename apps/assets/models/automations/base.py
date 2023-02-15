@@ -4,12 +4,12 @@ from celery import current_task
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from assets.models.node import Node
 from assets.models.asset import Asset
+from assets.models.node import Node
 from assets.tasks import execute_automation
-from ops.mixin import PeriodTaskModelMixin
 from common.const.choices import Trigger
 from common.db.fields import EncryptJsonDictTextField
+from ops.mixin import PeriodTaskModelMixin
 from orgs.mixins.models import OrgModelMixin, JMSOrgBaseModel
 
 
@@ -121,12 +121,16 @@ class AutomationExecution(OrgModelMixin):
     def manager_type(self):
         return self.snapshot['type']
 
-    def get_all_assets(self):
+    def get_all_asset_ids(self):
         node_ids = self.snapshot['nodes']
         asset_ids = self.snapshot['assets']
         nodes = Node.objects.filter(id__in=node_ids)
         node_asset_ids = Node.get_nodes_all_assets(*nodes).values_list('id', flat=True)
         asset_ids = set(list(asset_ids) + list(node_asset_ids))
+        return asset_ids
+
+    def get_all_assets(self):
+        asset_ids = self.get_all_asset_ids()
         return Asset.objects.filter(id__in=asset_ids)
 
     def all_assets_group_by_platform(self):

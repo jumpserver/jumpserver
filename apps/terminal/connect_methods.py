@@ -182,6 +182,7 @@ class ConnectMethodUtil:
                 'match': 'm2m'
             },
             TerminalType.magnus: {
+                'web_methods': [],
                 'listen': [],
                 'support': [
                     Protocol.mysql, Protocol.postgresql,
@@ -191,6 +192,7 @@ class ConnectMethodUtil:
                 'match': 'map'
             },
             TerminalType.razor: {
+                'web_methods': [],
                 'listen': [Protocol.rdp],
                 'support': [Protocol.rdp],
                 'match': 'map'
