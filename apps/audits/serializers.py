@@ -110,6 +110,7 @@ class ActivityUnionLogSerializer(serializers.Serializer):
     timestamp = serializers.SerializerMethodField()
     detail_url = serializers.SerializerMethodField()
     content = serializers.SerializerMethodField()
+    r_type = serializers.CharField(read_only=True)
 
     @staticmethod
     def get_timestamp(obj):
@@ -132,18 +133,19 @@ class ActivityUnionLogSerializer(serializers.Serializer):
             return detail_url
 
         if obj_type == ActivityChoices.operate_log:
-            detail_url = reverse(
-                view_name='audits:operate-log-detail',
-                kwargs={'pk': obj['id']},
-                api_to_ui=True, is_audit=True
-            )
+            detail_url = '%s?%s' % (
+                reverse(
+                    'audits:operate-log-detail',
+                    kwargs={'pk': obj['id']},
+                ), 'type=action_detail')
         elif obj_type == ActivityChoices.task:
             detail_url = reverse(
                 'ops:celery-task-log', kwargs={'pk': detail_id}
             )
         elif obj_type == ActivityChoices.login_log:
-            detail_url = '%s?id=%s' % (
-                reverse('api-audits:login-log-list', api_to_ui=True, is_audit=True),
-                detail_id
+            detail_url = reverse(
+                'audits:login-log-detail',
+                kwargs={'pk': detail_id},
+                api_to_ui=True, is_audit=True
             )
         return detail_url

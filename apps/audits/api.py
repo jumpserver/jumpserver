@@ -53,8 +53,9 @@ class UserLoginCommonMixin:
     search_fields = ['id', 'username', 'ip', 'city']
 
 
-class UserLoginLogViewSet(UserLoginCommonMixin, ListModelMixin, JMSGenericViewSet):
-
+class UserLoginLogViewSet(
+    UserLoginCommonMixin, RetrieveModelMixin, ListModelMixin, JMSGenericViewSet
+):
     @staticmethod
     def get_org_members():
         users = current_org.get_members().values_list('username', flat=True)
