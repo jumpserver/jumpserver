@@ -8,8 +8,10 @@ import win32con
 import const as c
 
 from pywinauto import Application
-from pywinauto.controls.uia_controls import ButtonWrapper
 from pywinauto.keyboard import send_keys
+from pywinauto.controls.uia_controls import (
+    EditWrapper, ComboBoxWrapper, ButtonWrapper
+)
 
 from common import wait_pid, BaseApplication, _messageBox
 
@@ -65,8 +67,8 @@ class AppletApplication(BaseApplication):
             if not pre_check():
                 _messageBox('程序启动异常,请重新连接!!', 'Error', win32con.MB_DEFAULT_DESKTOP_ONLY)
                 return
+            time.sleep(0.5)
             if command['type'] == 'key':
-                time.sleep(0.5)
                 send_keys(' '.join(command['commands']))
             elif command['type'] == 'action':
                 for f in command['commands']:
@@ -85,6 +87,22 @@ class AppletApplication(BaseApplication):
         remember_checkbox = conn_window.child_window(best_match='Save password')
         remember_checkbox.click()
 
+    def _fill_mysql_auth_info(self):
+        conn_window = self.app.window(best_match='Dialog'). \
+            child_window(title_re='New Connection')
+
+        name_ele = conn_window.child_window(best_match='Edit5')
+        EditWrapper(name_ele.element_info).set_edit_text(self.name)
+
+        host_ele = conn_window.child_window(best_match='Edit4')
+        EditWrapper(host_ele.element_info).set_edit_text(self.host)
+
+        port_ele = conn_window.child_window(best_match='Edit2')
+        EditWrapper(port_ele.element_info).set_edit_text(self.port)
+
+        username_ele = conn_window.child_window(best_match='Edit1')
+        EditWrapper(username_ele.element_info).set_edit_text(self.username)
+
     def _get_mysql_commands(self):
         commands = [
             {
@@ -94,16 +112,9 @@ class AppletApplication(BaseApplication):
                 ],
             },
             {
-                'type': 'key',
-                'commands': [
-                    self.name, c.TAB, self.host, c.TAB,
-                    str(self.port), c.TAB, self.username,
-                ]
-            },
-            {
                 'type': 'action',
                 'commands': [
-                    self._action_not_remember_password
+                    self._fill_mysql_auth_info, self._action_not_remember_password
                 ]
             },
             {
@@ -122,16 +133,9 @@ class AppletApplication(BaseApplication):
                 ],
             },
             {
-                'type': 'key',
-                'commands': [
-                    self.name, c.TAB, self.host, c.TAB,
-                    str(self.port), c.TAB, self.username
-                ]
-            },
-            {
                 'type': 'action',
                 'commands': [
-                    self._action_not_remember_password
+                    self._fill_mysql_auth_info, self._action_not_remember_password
                 ]
             },
             {
@@ -140,6 +144,28 @@ class AppletApplication(BaseApplication):
             }
         ]
         return commands
+
+    def _fill_mongodb_auth_info(self):
+        conn_window = self.app.window(best_match='Dialog'). \
+            child_window(title_re='New Connection')
+
+        auth_type_ele = conn_window.child_window(best_match='ComboBox2')
+        ComboBoxWrapper(auth_type_ele.element_info).select('Password')
+
+        name_ele = conn_window.child_window(best_match='Edit5')
+        EditWrapper(name_ele.element_info).set_edit_text(self.name)
+
+        host_ele = conn_window.child_window(best_match='Edit4')
+        EditWrapper(host_ele.element_info).set_edit_text(self.host)
+
+        port_ele = conn_window.child_window(best_match='Edit2')
+        EditWrapper(port_ele.element_info).set_edit_text(self.port)
+
+        db_ele = conn_window.child_window(best_match='Edit6')
+        EditWrapper(db_ele.element_info).set_edit_text(self.db)
+
+        username_ele = conn_window.child_window(best_match='Edit1')
+        EditWrapper(username_ele.element_info).set_edit_text(self.username)
 
     def _get_mongodb_commands(self):
         commands = [
@@ -150,16 +176,9 @@ class AppletApplication(BaseApplication):
                 ],
             },
             {
-                'type': 'key',
-                'commands': [
-                    self.name, c.TAB * 3, self.host, c.TAB, str(self.port),
-                    c.TAB, c.DOWN, c.TAB, self.db, c.TAB, self.username,
-                ]
-            },
-            {
                 'type': 'action',
                 'commands': [
-                    self._action_not_remember_password
+                    self._fill_mongodb_auth_info, self._action_not_remember_password
                 ]
             },
             {
@@ -168,6 +187,25 @@ class AppletApplication(BaseApplication):
             }
         ]
         return commands
+
+    def _fill_postgresql_auth_info(self):
+        conn_window = self.app.window(best_match='Dialog'). \
+            child_window(title_re='New Connection')
+
+        name_ele = conn_window.child_window(best_match='Edit6')
+        EditWrapper(name_ele.element_info).set_edit_text(self.name)
+
+        host_ele = conn_window.child_window(best_match='Edit5')
+        EditWrapper(host_ele.element_info).set_edit_text(self.host)
+
+        port_ele = conn_window.child_window(best_match='Edit2')
+        EditWrapper(port_ele.element_info).set_edit_text(self.port)
+
+        db_ele = conn_window.child_window(best_match='Edit4')
+        EditWrapper(db_ele.element_info).set_edit_text(self.db)
+
+        username_ele = conn_window.child_window(best_match='Edit1')
+        EditWrapper(username_ele.element_info).set_edit_text(self.username)
 
     def _get_postgresql_commands(self):
         commands = [
@@ -178,16 +216,9 @@ class AppletApplication(BaseApplication):
                 ],
             },
             {
-                'type': 'key',
-                'commands': [
-                    self.name, c.TAB, self.host, c.TAB, str(self.port),
-                    c.TAB, self.db, c.TAB, self.username
-                ]
-            },
-            {
                 'type': 'action',
                 'commands': [
-                    self._action_not_remember_password
+                    self._fill_postgresql_auth_info, self._action_not_remember_password
                 ]
             },
             {
@@ -196,6 +227,22 @@ class AppletApplication(BaseApplication):
             }
         ]
         return commands
+
+    def _fill_sqlserver_auth_info(self):
+        conn_window = self.app.window(best_match='Dialog'). \
+            child_window(title_re='New Connection')
+
+        name_ele = conn_window.child_window(best_match='Edit5')
+        EditWrapper(name_ele.element_info).set_edit_text(self.name)
+
+        host_ele = conn_window.child_window(best_match='Edit4')
+        EditWrapper(host_ele.element_info).set_edit_text('%s,%s' % (self.host, self.port))
+
+        db_ele = conn_window.child_window(best_match='Edit3')
+        EditWrapper(db_ele.element_info).set_edit_text(self.db)
+
+        username_ele = conn_window.child_window(best_match='Edit6')
+        EditWrapper(username_ele.element_info).set_edit_text(self.username)
 
     def _get_sqlserver_commands(self):
         commands = [
@@ -206,16 +253,9 @@ class AppletApplication(BaseApplication):
                 ],
             },
             {
-                'type': 'key',
-                'commands': [
-                    self.name, c.TAB, '%s,%s' % (self.host, self.port),
-                                      c.TAB * 2, self.db, c.TAB * 2, self.username
-                ]
-            },
-            {
                 'type': 'action',
                 'commands': [
-                    self._action_not_remember_password
+                    self._fill_sqlserver_auth_info, self._action_not_remember_password
                 ]
             },
             {
@@ -224,6 +264,30 @@ class AppletApplication(BaseApplication):
             }
         ]
         return commands
+
+    def _fill_oracle_auth_info(self):
+        conn_window = self.app.window(best_match='Dialog'). \
+            child_window(title_re='New Connection')
+
+        name_ele = conn_window.child_window(best_match='Edit6')
+        EditWrapper(name_ele.element_info).set_edit_text(self.name)
+
+        host_ele = conn_window.child_window(best_match='Edit5')
+        EditWrapper(host_ele.element_info).set_edit_text(self.host)
+
+        port_ele = conn_window.child_window(best_match='Edit3')
+        EditWrapper(port_ele.element_info).set_edit_text(self.port)
+
+        db_ele = conn_window.child_window(best_match='Edit2')
+        EditWrapper(db_ele.element_info).set_edit_text(self.db)
+
+        username_ele = conn_window.child_window(best_match='Edit')
+        EditWrapper(username_ele.element_info).set_edit_text(self.username)
+
+        if self.privileged:
+            conn_window.child_window(best_match='Advanced', control_type='TabItem').click_input()
+            role_ele = conn_window.child_window(best_match='ComboBox2')
+            ComboBoxWrapper(role_ele.element_info).select('SYSDBA')
 
     def _get_oracle_commands(self):
         commands = [
@@ -234,26 +298,16 @@ class AppletApplication(BaseApplication):
                 ],
             },
             {
-                'type': 'key',
-                'commands': [
-                    self.name, c.TAB * 2, self.host, c.TAB,
-                    str(self.port), c.TAB, self.db, c.TAB, c.TAB, self.username,
-                ]
-            },
-            {
                 'type': 'action',
-                'commands': (self._action_not_remember_password,)
+                'commands': [
+                    self._action_not_remember_password, self._fill_oracle_auth_info
+                ]
             },
             {
                 'type': 'key',
                 'commands': [c.ENTER]
             }
         ]
-        if self.privileged:
-            commands.insert(3, {
-                'type': 'key',
-                'commands': (c.TAB * 4, c.RIGHT, c.TAB * 3, c.DOWN)
-            })
         return commands
 
     def run(self):
