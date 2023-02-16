@@ -117,10 +117,13 @@ class ActivityLogHandler:
     def login_log_for_activity(obj):
         login_status = gettext_noop('Success') if obj.status else gettext_noop('Failed')
         detail = i18n_fmt(gettext_noop('User %s login system %s'), obj.username, login_status)
-        user_id = User.objects.filter(username=obj.username).values('id').first()
+
+        username = obj.username
+        user_id = User.objects.filter(username=username) \
+            .values_list('id', flat=True).first()
         resource_list = []
         if user_id:
-            resource_list = [user_id['id']]
+            resource_list = [user_id]
         return resource_list, detail, ActivityChoices.login_log, Organization.SYSTEM_ID
 
     @staticmethod
