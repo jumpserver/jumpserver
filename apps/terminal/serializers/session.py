@@ -33,7 +33,7 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
         model = Session
         fields_mini = ["id"]
         fields_small = fields_mini + [
-            "user", "asset", "user_id", "asset_id", 'account',
+            "user", "asset", "user_id", "asset_id", 'account', 'account_id',
             "protocol", 'type', "login_from", "remote_addr",
             "is_success", "is_finished", "has_replay", "has_command",
             "date_start", "date_end", "comment"
