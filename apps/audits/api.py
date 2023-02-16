@@ -26,7 +26,13 @@ from .serializers import (
 
 class JobAuditViewSet(OrgBulkModelViewSet):
     model = JobAuditLog
+    extra_filter_backends = [DatetimeRangeFilter]
+    date_range_filter_fields = [
+        ('date_start', ('date_from', 'date_to'))
+    ]
+    search_fields = ['creator__name', 'material']
     serializer_class = JobAuditLogSerializer
+    ordering = ['-date_start']
     http_method_names = ('get', 'head', 'options')
 
 
