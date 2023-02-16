@@ -38,7 +38,7 @@ class ToolsWebsocket(JsonWebsocketConsumer):
                 self.send_json({'msg': msg})
                 break
             if delay is None:
-                msg = msg.format(dest_addr, 'failed. (timeout within {}sec.)'.format(timeout))
+                msg = msg.format(dest_addr, 'failed. (timeout within {}s)'.format(timeout))
             else:
                 delay = delay * 1000
                 msg = msg.format(dest_addr, 'get ping in %0.4fms' % delay)

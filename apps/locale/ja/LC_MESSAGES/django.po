@@ -4526,10 +4526,8 @@ msgstr ""
 "タベースストレージにのみ影響します。ossなどは影響しません」影響を受ける)"
 
 #: settings/serializers/cleaning.py:36
-#, fuzzy
-#| msgid "Login log keep days"
 msgid "Activity log keep days"
-msgstr "ログインログは日数を保持します"
+msgstr "活動ログは日数を保持します"
 
 #: settings/serializers/email.py:21
 msgid "SMTP host"
