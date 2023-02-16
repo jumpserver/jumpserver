@@ -1,9 +1,9 @@
 from copy import deepcopy
 
-from common.utils import get_logger
+from accounts.automations.methods import platform_automation_methods
 from accounts.const import SecretType
 from assets.automations.base.manager import BasePlaybookManager
-from accounts.automations.methods import platform_automation_methods
+from common.utils import get_logger
 
 logger = get_logger(__name__)
 
