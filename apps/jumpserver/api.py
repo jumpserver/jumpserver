@@ -1,28 +1,28 @@
 import time
 
 from django.core.cache import cache
-from django.utils import timezone
-from django.utils.timesince import timesince
 from django.db.models import Count, Max, F
 from django.http.response import JsonResponse, HttpResponse
-from rest_framework.views import APIView
+from django.utils import timezone
+from django.utils.timesince import timesince
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from users.models import User
-from assets.models import Asset
 from assets.const import AllTypes
-from terminal.models import Session, Command
-from terminal.utils import ComponentsPrometheusMetricsUtil
-from orgs.utils import current_org
+from assets.models import Asset
+from audits.const import LoginStatusChoices
+from audits.models import UserLoginLog, PasswordChangeLog, OperateLog, FTPLog
+from common.utils import lazyproperty
+from common.utils.timezone import local_now, local_zero_hour
 from ops.const import JobStatus
 from ops.models import Job, JobExecution
-from common.utils import lazyproperty
-from audits.models import UserLoginLog, PasswordChangeLog, OperateLog, FTPLog
-from audits.const import LoginStatusChoices
-from common.utils.timezone import local_now, local_zero_hour
 from orgs.caches import OrgResourceStatisticsCache
+from orgs.utils import current_org
+from terminal.models import Session, Command
+from terminal.utils import ComponentsPrometheusMetricsUtil
+from users.models import User
 
 __all__ = ['IndexApi']
 
@@ -296,8 +296,12 @@ class DatesLoginMetricMixin:
         return self.login_logs_queryset.filter(status=LoginStatusChoices.success).count()
 
     @lazyproperty
-    def user_login_amount(self):
+    def user_login_logs_amount(self):
         return self.login_logs_queryset.values('username').count()
+
+    @lazyproperty
+    def user_login_amount(self):
+        return self.login_logs_queryset.values('username').distinct().count()
 
     @lazyproperty
     def operate_logs_amount(self):
@@ -377,6 +381,11 @@ class IndexApi(DateTimeMixin, DatesLoginMetricMixin, APIView):
         if _all or query_params.get('total_count') or query_params.get('total_count_login_users'):
             data.update({
                 'total_count_login_users': self.user_login_amount
+            })
+
+        if _all or query_params.get('total_count') or query_params.get('total_count_login_user_logs'):
+            data.update({
+                'total_count_login_user_logs': self.user_login_logs_amount
             })
 
         if _all or query_params.get('total_count') or query_params.get('total_count_today_active_assets'):
