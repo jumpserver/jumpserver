@@ -10,6 +10,7 @@ from django.utils.translation import ugettext as _
 from django_celery_beat.models import PeriodicTask
 from rest_framework.response import Response
 
+from common.exceptions import JMSException
 from common.permissions import IsValidUser
 from common.api import LogTailApi, CommonApiMixin
 from ops.celery import app
@@ -134,6 +135,11 @@ class CeleryTaskExecutionViewSet(CommonApiMixin, viewsets.ModelViewSet):
         execution = get_object_or_404(CeleryTaskExecution, id=form_id)
         task = app.tasks.get(execution.name, None)
         if not task:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        t = task.delay(*execution.args, **execution.kwargs)
+            msg = _("Task {} not found").format(execution.name)
+            raise JMSException(code='task_not_found_error', detail=msg)
+        try:
+            t = task.delay(*execution.args, **execution.kwargs)
+        except TypeError:
+            msg = _("Task {} args or kwargs error").format(execution.name)
+            raise JMSException(code='task_args_error', detail=msg)
         return Response(status=status.HTTP_201_CREATED, data={'task_id': t.id})
