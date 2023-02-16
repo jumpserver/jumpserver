@@ -227,7 +227,7 @@ class Migration(migrations.Migration):
                                    verbose_name='Creator')),
             ],
             options={
-                'verbose_name': 'AdHoc',
+                'verbose_name': 'Adhoc',
             },
         ),
         migrations.CreateModel(
