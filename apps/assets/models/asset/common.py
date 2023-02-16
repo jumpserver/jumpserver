@@ -234,9 +234,11 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
 
     @lazyproperty
     def gateway(self):
-        if self.domain_id:
-            return self.domain.select_gateway()
-        return None
+        if not self.domain_id:
+            return
+        if not self.platform.domain_enabled:
+            return
+        return self.domain.select_gateway()
 
     def as_node(self):
         from assets.models import Node
