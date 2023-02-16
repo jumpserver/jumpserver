@@ -19,7 +19,7 @@ __all__ = [
 
 @shared_task(
     queue="ansible", verbose_name=_('Gather assets facts'),
-    activity_callback=lambda self, asset_ids, org_id, **kwargs: (asset_ids, org_id)
+    activity_callback=lambda self, asset_ids, org_id, *args, **kwargs: (asset_ids, org_id)
 )
 def gather_assets_facts_task(asset_ids, org_id, task_name=None):
     from assets.models import GatherFactsAutomation

@@ -142,7 +142,7 @@ class ActivityLogHandler:
         print(">>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<,,")
 
         data = activity_callback(*args, **kwargs)
-        resource_ids, org_id, user = data + [''] * (3 - len(data))
+        resource_ids, org_id, user = data + ('',) * (3 - len(data))
         if not user:
             if current_request:
                 user = str(current_request.user)
@@ -182,8 +182,8 @@ def create_activities(resource_ids, detail, detail_id, action, org_id):
         return
     activities = [
         ActivityLog(
-            resource_id=resource_id, type=action, detail=detail,
-            detail_id=detail_id, org_id=org_id
+            resource_id=getattr(resource_id, 'pk', resource_id),
+            type=action, detail=detail, detail_id=detail_id, org_id=org_id
         )
         for resource_id in resource_ids
     ]
