@@ -30,7 +30,7 @@ class WebMethod(TextChoices):
             Protocol.sqlserver: [cls.web_cli, cls.web_gui],
             Protocol.redis: [cls.web_cli],
             Protocol.mongodb: [cls.web_cli],
-            Protocol.clickhouse: [cls.web_cli],
+            Protocol.clickhouse_tcp: [cls.web_cli],
 
             Protocol.k8s: [cls.web_cli],
             Protocol.http: []
@@ -161,7 +161,7 @@ class ConnectMethodUtil:
                     Protocol.mysql, Protocol.postgresql,
                     Protocol.sqlserver, Protocol.mariadb,
                     Protocol.redis, Protocol.mongodb,
-                    Protocol.k8s, Protocol.clickhouse,
+                    Protocol.k8s, Protocol.clickhouse_tcp,
                 ],
                 'match': 'm2m'
             },

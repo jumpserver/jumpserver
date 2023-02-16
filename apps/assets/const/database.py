@@ -50,6 +50,9 @@ class DatabaseTypes(BaseType):
         return {
             '*': {
                 'choices': '__self__',
+            },
+            cls.CLICKHOUSE: {
+                'choices': ['clickhouse_tcp', 'clickhouse_http']
             }
         }
 

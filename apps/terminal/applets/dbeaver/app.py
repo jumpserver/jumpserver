@@ -55,6 +55,10 @@ class AppletApplication(BaseApplication):
             self.username = '%s as sysdba' % self.username
         return self._get_exec_params()
 
+    def _get_clickhouse_http_exec_params(self):
+        setattr(self, 'driver', 'clickhouse')
+        return self._get_exec_params()
+
     def _get_sqlserver_exec_params(self):
         setattr(self, 'driver', 'mssql_jdbc_ms_new')
         return self._get_exec_params()
