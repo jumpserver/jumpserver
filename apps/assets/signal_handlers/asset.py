@@ -91,7 +91,7 @@ def on_asset_delete(instance: Asset, using, **kwargs):
 @receiver(post_delete, sender=Asset)
 def on_asset_post_delete(instance: Asset, using, **kwargs):
     logger.debug("Asset post delete signal recv: {}".format(instance))
-    node_ids = getattr(instance, RELATED_NODE_IDS, None)
+    node_ids = getattr(instance, RELATED_NODE_IDS, [])
     if node_ids:
         m2m_changed.send(
             sender=Asset.nodes.through, instance=instance, reverse=False,
