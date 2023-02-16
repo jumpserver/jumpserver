@@ -1,4 +1,5 @@
 import codecs
+import copy
 import csv
 from itertools import chain
 
@@ -76,8 +77,8 @@ def _get_instance_field_value(
 
             if getattr(f, 'primary_key', False):
                 f.verbose_name = 'id'
-            elif isinstance(value, list):
-                value = [str(v) for v in value]
+            elif isinstance(value, (list, dict)):
+                value = copy.deepcopy(value)
             elif isinstance(f, models.OneToOneField) and isinstance(value, models.Model):
                 nested_data = _get_instance_field_value(
                     value, include_model_fields, model_need_continue_fields, ('id',)
