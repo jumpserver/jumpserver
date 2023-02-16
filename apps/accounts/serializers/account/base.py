@@ -45,7 +45,7 @@ class AuthValidateMixin(serializers.Serializer):
         validated_data['secret'] = secret
         for field in ('secret',):
             value = validated_data.get(field)
-            if value is None:
+            if not value:
                 validated_data.pop(field, None)
         validated_data.pop('passphrase', None)
 
