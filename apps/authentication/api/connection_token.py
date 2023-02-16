@@ -151,7 +151,6 @@ class RDPFileClientProtocolURLMixin:
                 }
             })
         else:
-            print("Connect method: {}".format(connect_method_dict))
             endpoint = self.get_smart_endpoint(
                 protocol=connect_method_dict['endpoint_protocol'],
                 asset=token.asset
