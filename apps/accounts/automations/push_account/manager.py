@@ -2,9 +2,9 @@ from copy import deepcopy
 
 from django.db.models import QuerySet
 
-from common.utils import get_logger
-from accounts.models import Account
 from accounts.const import AutomationTypes, SecretType
+from accounts.models import Account
+from common.utils import get_logger
 from ..base.manager import AccountBasePlaybookManager
 from ..change_secret.manager import ChangeSecretManager
 
@@ -66,14 +66,14 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
             h['name'] += '_' + account.username
             new_secret = self.get_secret()
 
+            self.name_recorder_mapper[h['name']] = {
+                'account': account, 'new_secret': new_secret,
+            }
+
             private_key_path = None
             if self.secret_type == SecretType.SSH_KEY:
                 private_key_path = self.generate_private_key_path(new_secret, path_dir)
                 new_secret = self.generate_public_key(new_secret)
-
-            self.name_recorder_mapper[h['name']] = {
-                'account': account, 'new_secret': new_secret,
-            }
 
             h['kwargs'] = self.get_kwargs(account, new_secret)
             h['account'] = {
@@ -92,6 +92,7 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
         account_info = self.name_recorder_mapper.get(host)
         if not account_info:
             return
+        print('account_info', account_info)
         account = account_info['account']
         new_secret = account_info['new_secret']
         if not account:
