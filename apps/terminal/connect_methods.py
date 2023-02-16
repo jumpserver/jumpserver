@@ -159,10 +159,9 @@ class ConnectMethodUtil:
                 'support': [
                     Protocol.ssh, Protocol.telnet,
                     Protocol.mysql, Protocol.postgresql,
-                    Protocol.oracle, Protocol.sqlserver,
-                    Protocol.mariadb, Protocol.redis,
-                    Protocol.mongodb, Protocol.k8s,
-                    Protocol.clickhouse,
+                    Protocol.sqlserver, Protocol.mariadb,
+                    Protocol.redis, Protocol.mongodb,
+                    Protocol.k8s, Protocol.clickhouse,
                 ],
                 'match': 'm2m'
             },
