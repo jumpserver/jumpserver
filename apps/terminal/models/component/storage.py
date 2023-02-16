@@ -77,6 +77,11 @@ class CommandStorage(CommonStorageModelMixin, JMSBaseModel):
     def config(self):
         config = self.meta
         config.update({'TYPE': self.type})
+        # 处理 hosts 对象, 正常应该是list, 但是有时候是 str, debug 未果
+        hosts = config.get('HOSTS', [])
+        if isinstance(hosts, str) and ',' in hosts:
+            hosts = hosts.split(',')
+        config['HOSTS'] = hosts
         return copy.deepcopy(config)
 
     @property
