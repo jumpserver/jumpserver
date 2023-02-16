@@ -4469,7 +4469,7 @@ msgstr "云同步记录"
 
 #: settings/serializers/cleaning.py:31
 msgid "Session keep duration"
-msgstr "会话日志保存时间"
+msgstr "资产会话日志"
 
 #: settings/serializers/cleaning.py:32
 msgid ""
@@ -4480,10 +4480,8 @@ msgstr ""
 "受影响)"
 
 #: settings/serializers/cleaning.py:36
-#, fuzzy
-#| msgid "Login log keep days"
 msgid "Activity log keep days"
-msgstr "登录日志"
+msgstr "活动记录"
 
 #: settings/serializers/email.py:21
 msgid "SMTP host"

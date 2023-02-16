@@ -14,7 +14,8 @@ from common.views.mixins import RecordViewLogMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 
 __all__ = [
-    'AccountViewSet', 'AccountSecretsViewSet', 'AccountTaskCreateAPI', 'AccountHistoriesSecretAPI'
+    'AccountViewSet', 'AccountSecretsViewSet',
+    'AccountTaskCreateAPI', 'AccountHistoriesSecretAPI'
 ]
 
 from rbac.permissions import RBACPermission

@@ -2,15 +2,13 @@
 #
 
 import datetime
-import os
-import subprocess
 
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.core.files.storage import default_storage
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
-from common.utils import get_log_keep_day
 from ops.celery.decorator import (
     register_as_period_task, after_app_ready_start,
     after_app_shutdown_clean_periodic
@@ -18,10 +16,9 @@ from ops.celery.decorator import (
 from orgs.utils import tmp_to_builtin_org
 from .backends import server_replay_storage
 from .models import (
-    Status, Session, Command, Task, AppletHostDeployment
+    Status, Session, Task, AppletHostDeployment
 )
 from .utils import find_session_replay_local
-from django.utils.translation import gettext_lazy as _
 
 CACHE_REFRESH_INTERVAL = 10
 RUNNING = False
@@ -54,32 +51,6 @@ def clean_orphan_session():
         session.is_finished = True
         session.date_end = timezone.now()
         session.save()
-
-
-@shared_task(verbose_name=_('Periodic clean expired session'))
-@register_as_period_task(interval=3600 * 24)
-@after_app_ready_start
-@after_app_shutdown_clean_periodic
-def clean_expired_session_period():
-    logger.info("Start clean expired session record, commands and replay")
-    days = get_log_keep_day('TERMINAL_SESSION_KEEP_DURATION')
-    expire_date = timezone.now() - timezone.timedelta(days=days)
-    expired_sessions = Session.objects.filter(date_start__lt=expire_date)
-    timestamp = expire_date.timestamp()
-    expired_commands = Command.objects.filter(timestamp__lt=timestamp)
-    replay_dir = os.path.join(default_storage.base_location, 'replay')
-
-    expired_sessions.delete()
-    logger.info("Clean session item done")
-    expired_commands.delete()
-    logger.info("Clean session command done")
-    command = "find %s -mtime +%s \\( -name '*.json' -o -name '*.tar' -o -name '*.gz' \\) -exec rm -f {} \\;" % (
-        replay_dir, days
-    )
-    subprocess.call(command, shell=True)
-    command = "find %s -type d -empty -delete;" % replay_dir
-    subprocess.call(command, shell=True)
-    logger.info("Clean session replay done")
 
 
 @shared_task(verbose_name=_('Upload session replay to external storage'))
