@@ -5,6 +5,7 @@ from rest_framework import serializers
 from common.serializers.fields import ReadableHiddenField
 from ops.models import Playbook
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+from django.utils.translation import gettext_lazy as _
 
 
 def parse_playbook_name(path):
@@ -15,13 +16,13 @@ def parse_playbook_name(path):
 class PlaybookSerializer(BulkOrgResourceModelSerializer):
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
     path = serializers.FileField(required=False)
+    name = serializers.CharField(label=_('Name'), max_length=128, allow_blank=True, required=False)
 
-    def create(self, validated_data):
-        name = validated_data.get('name')
+    def to_internal_value(self, data):
+        name = data.get('name', False)
         if not name:
-            path = validated_data.get('path').name
-            validated_data['name'] = parse_playbook_name(path)
-        return super().create(validated_data)
+            data['name'] = parse_playbook_name(data['path'].name)
+        return super().to_internal_value(data)
 
     class Meta:
         model = Playbook
