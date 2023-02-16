@@ -17,7 +17,7 @@ from audits.models import UserLoginLog, PasswordChangeLog, OperateLog, FTPLog
 from common.utils import lazyproperty
 from common.utils.timezone import local_now, local_zero_hour
 from ops.const import JobStatus
-from ops.models import Job, JobExecution
+from ops.models import Job, JobExecution, JobAuditLog
 from orgs.caches import OrgResourceStatisticsCache
 from orgs.utils import current_org
 from terminal.models import Session, Command
@@ -121,9 +121,9 @@ class DateTimeMixin:
         return queryset
 
     @lazyproperty
-    def jobs_queryset(self):
+    def job_logs_queryset(self):
         t = self.days_to_datetime
-        queryset = Job.objects.filter(date_created__gte=t)
+        queryset = JobAuditLog.objects.filter(date_created__gte=t)
         return queryset
 
     @lazyproperty
@@ -138,8 +138,7 @@ class DatesLoginMetricMixin:
     command_queryset: Command.objects
     sessions_queryset: Session.objects
     ftp_logs_queryset: OperateLog.objects
-    jobs_queryset: Job.objects
-    jobs_executed_queryset: JobExecution.objects
+    job_logs_queryset: JobAuditLog.objects
     login_logs_queryset: UserLoginLog.objects
     operate_logs_queryset: OperateLog.objects
     password_change_logs_queryset: PasswordChangeLog.objects
@@ -316,19 +315,17 @@ class DatesLoginMetricMixin:
         return self.command_queryset.filter(risk_level=Command.RISK_LEVEL_DANGEROUS).count()
 
     @lazyproperty
-    def jobs_amount(self):
-        return self.jobs_queryset.count()
+    def job_logs_running_amount(self):
+        return self.job_logs_queryset.filter(status__in=[JobStatus.running]).count()
 
     @lazyproperty
-    def jobs_unexecuted_amount(self):
-        executed_amount = self.jobs_executed_queryset.values(
-            'job_id').order_by('job_id').distinct().count()
-        return self.jobs_amount - executed_amount
+    def job_logs_failed_amount(self):
+        return self.job_logs_queryset.filter(
+            status__in=[JobStatus.failed, JobStatus.timeout]).count()
 
     @lazyproperty
-    def jobs_executed_failed_amount(self):
-        return self.jobs_executed_queryset.filter(
-            status=JobStatus.failed).count()
+    def job_logs_amount(self):
+        return self.job_logs_queryset.count()
 
     @lazyproperty
     def sessions_amount(self):
@@ -439,19 +436,19 @@ class IndexApi(DateTimeMixin, DatesLoginMetricMixin, APIView):
                 'total_count_ftp_logs': self.ftp_logs_amount,
             })
 
-        if _all or query_params.get('total_count') or query_params.get('total_count_jobs'):
+        if _all or query_params.get('total_count') or query_params.get('total_count_job_logs'):
             data.update({
-                'total_count_jobs': self.jobs_amount,
+                'total_count_job_logs': self.job_logs_amount,
             })
 
-        if _all or query_params.get('total_count') or query_params.get('total_count_jobs_unexecuted'):
+        if _all or query_params.get('total_count') or query_params.get('total_count_job_logs_running'):
             data.update({
-                'total_count_jobs_unexecuted': self.jobs_unexecuted_amount,
+                'total_count_job_logs_running': self.job_logs_running_amount,
             })
 
-        if _all or query_params.get('total_count') or query_params.get('total_count_jobs_executed_failed'):
+        if _all or query_params.get('total_count') or query_params.get('total_count_job_logs_failed'):
             data.update({
-                'total_count_jobs_executed_failed': self.jobs_executed_failed_amount,
+                'total_count_job_logs_failed': self.job_logs_failed_amount,
             })
 
         if _all or query_params.get('total_count') or query_params.get('total_count_type_to_assets_amount'):
