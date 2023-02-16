@@ -12,19 +12,19 @@ from .base import BaseAccountSerializer
 
 
 class AccountSerializerCreateValidateMixin:
-    id: str
+    from_id: str
     template: bool
     push_now: bool
     replace_attrs: callable
 
     def to_internal_value(self, data):
-        _id = data.pop('id', None)
+        from_id = data.pop('id', None)
         ret = super().to_internal_value(data)
-        self.id = _id
+        self.from_id = from_id
         return ret
 
     def set_secret(self, attrs):
-        _id = self.id
+        _id = self.from_id
         template = attrs.pop('template', None)
 
         if _id and template:
