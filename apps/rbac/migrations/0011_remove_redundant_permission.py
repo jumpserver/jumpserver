@@ -27,7 +27,7 @@ def migrate_remove_redundant_permission(apps, *args):
 
     perm_model = apps.get_model('auth', 'Permission')
     perm_model.objects.filter(codename__in=[
-        'view_permusergroupasset', 'view_permuserasset', 'push_assetsystemuser'
+        'view_permusergroupasset', 'view_permuserasset', 'push_assetsystemuser', 'change_accountsecret'
     ]).delete()
 
 

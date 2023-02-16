@@ -62,7 +62,6 @@ class Account(AbsConnectivity, BaseAccount):
         ]
         permissions = [
             ('view_accountsecret', _('Can view asset account secret')),
-            ('change_accountsecret', _('Can change asset account secret')),
             ('view_historyaccount', _('Can view asset history account')),
             ('view_historyaccountsecret', _('Can view asset history account secret')),
         ]
