@@ -52,6 +52,8 @@ class AccountSerializerCreateValidateMixin:
         return instance
 
     def update(self, instance, validated_data):
+        # account cannot be modified
+        validated_data.pop('username', None)
         push_now = validated_data.pop('push_now', None)
         instance = super().update(instance, validated_data)
         self.push_account(instance, push_now)

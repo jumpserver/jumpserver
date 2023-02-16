@@ -296,10 +296,6 @@ class DatesLoginMetricMixin:
         return self.login_logs_queryset.filter(status=LoginStatusChoices.success).count()
 
     @lazyproperty
-    def user_login_logs_amount(self):
-        return self.login_logs_queryset.values('username').count()
-
-    @lazyproperty
     def user_login_amount(self):
         return self.login_logs_queryset.values('username').distinct().count()
 
@@ -381,11 +377,6 @@ class IndexApi(DateTimeMixin, DatesLoginMetricMixin, APIView):
         if _all or query_params.get('total_count') or query_params.get('total_count_login_users'):
             data.update({
                 'total_count_login_users': self.user_login_amount
-            })
-
-        if _all or query_params.get('total_count') or query_params.get('total_count_login_user_logs'):
-            data.update({
-                'total_count_login_user_logs': self.user_login_logs_amount
             })
 
         if _all or query_params.get('total_count') or query_params.get('total_count_today_active_assets'):

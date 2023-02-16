@@ -1,4 +1,7 @@
+import os
 import time
+import win32api
+import shutil
 
 from pywinauto import Application
 
@@ -21,6 +24,13 @@ class AppletApplication(BaseApplication):
         self.name = '%s-%s-%s' % (self.host, self.db, int(time.time()))
         self.pid = None
         self.app = None
+
+    def launch(self):
+        win_user_name = win32api.GetUserName()
+        src_driver = os.path.join(os.path.dirname(self.path), 'drivers')
+        dest_driver = r'C:\Users\%s\AppData\Roaming\DBeaverData\drivers' % win_user_name
+        if not os.path.exists(dest_driver):
+            shutil.copytree(src_driver, dest_driver, dirs_exist_ok=True)
 
     def _get_exec_params(self):
         driver = getattr(self, 'driver', self.protocol)
@@ -50,6 +60,7 @@ class AppletApplication(BaseApplication):
         return self._get_exec_params()
 
     def run(self):
+        self.launch()
         self.app = Application(backend='uia')
 
         function = getattr(self, '_get_%s_exec_params' % self.protocol, None)
@@ -57,7 +68,8 @@ class AppletApplication(BaseApplication):
             params = self._get_exec_params()
         else:
             params = function()
-        self.app.start('%s -con %s' % (self.path, params), wait_for_idle=False)
+        exec_string = '%s -con %s' % (self.path, params)
+        self.app.start(exec_string, wait_for_idle=False)
         self.pid = self.app.process
 
     def wait(self):
