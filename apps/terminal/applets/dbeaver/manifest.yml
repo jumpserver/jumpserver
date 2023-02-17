@@ -14,4 +14,3 @@ protocols:
   - postgresql
   - sqlserver
   - oracle
-  - clickhouse
