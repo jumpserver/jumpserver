@@ -146,7 +146,7 @@ class UserPermNodeUtil:
 
     def get_ungrouped_node(self):
         assets_amount = UserPermAssetUtil(self.user).get_direct_assets().count()
-        return PermNode.get_favorite_node(assets_amount)
+        return PermNode.get_ungrouped_node(assets_amount)
 
     def get_top_level_nodes(self, with_unfolded_node=False):
         # 是否有节点展开, 展开的节点
