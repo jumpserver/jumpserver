@@ -59,8 +59,6 @@ class AssetPermUserGroupListApi(BaseAssetPermUserOrUserGroupListApi):
     queryset = UserGroup.objects.none()
 
     def get_queryset(self):
-        if getattr(self, 'swagger_fake_view', False):
-            return UserGroup.objects.none()
         perms = self.get_asset_related_perms()
         user_groups = UserGroup.objects.filter(assetpermissions__in=perms).distinct()
         return user_groups
