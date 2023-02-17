@@ -23,7 +23,7 @@ __all__ = [
 def test_gateways_connectivity_task(asset_ids, org_id, local_port, task_name=None):
     from assets.models import PingAutomation
     if task_name is None:
-        task_name = gettext_noop("Test gateways connectivity ")
+        task_name = gettext_noop("Test gateways connectivity")
 
     task_name = PingAutomation.generate_unique_name(task_name)
     task_snapshot = {'assets': asset_ids, 'local_port': local_port}
@@ -34,5 +34,5 @@ def test_gateways_connectivity_task(asset_ids, org_id, local_port, task_name=Non
 def test_gateways_connectivity_manual(gateway_ids, local_port):
     from assets.models import Asset
     gateways = Asset.objects.filter(id__in=gateway_ids).values_list('id', flat=True)
-    task_name = gettext_noop("Test gateways connectivity ")
+    task_name = gettext_noop("Test gateways connectivity")
     return test_gateways_connectivity_task.delay(gateways, str(current_org.id), local_port, task_name)
