@@ -312,7 +312,7 @@ class DatesLoginMetricMixin:
 
     @lazyproperty
     def commands_danger_amount(self):
-        return self.command_queryset.filter(risk_level=Command.RISK_LEVEL_DANGEROUS).count()
+        return self.command_queryset.filter(risk_level=Command.RiskLevelChoices.dangerous).count()
 
     @lazyproperty
     def job_logs_running_amount(self):
