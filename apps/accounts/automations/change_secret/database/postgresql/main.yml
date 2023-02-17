@@ -28,6 +28,7 @@
         db: "{{ jms_asset.spec_info.db_name }}"
         name: "{{ account.username }}"
         password: "{{ account.secret }}"
+        role_attr_flags: LOGIN
       when: result is succeeded
       register: change_info
 
