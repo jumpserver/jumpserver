@@ -87,11 +87,10 @@ class OperateLogSerializer(serializers.ModelSerializer):
         fields_mini = ["id"]
         fields_small = fields_mini + [
             "user", "action", "resource_type",
-            "resource_type_display", "resource",
-            "remote_addr", "datetime", "org_id",
+            "resource", "remote_addr", "datetime",
+            "org_id",
         ]
         fields = fields_small
-        extra_kwargs = {"resource_type_display": {"label": _("Resource Type")}}
 
 
 class PasswordChangeLogSerializer(serializers.ModelSerializer):

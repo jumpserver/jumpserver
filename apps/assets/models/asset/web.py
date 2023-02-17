@@ -11,3 +11,6 @@ class Web(Asset):
     password_selector = models.CharField(max_length=128, blank=True, default='', verbose_name=_("Password selector"))
     submit_selector = models.CharField(max_length=128, blank=True, default='', verbose_name=_("Submit selector"))
     script = models.JSONField(blank=True, default=list, verbose_name=_("Script"))
+
+    class Meta:
+        verbose_name = _("Web")
