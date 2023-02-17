@@ -81,5 +81,6 @@ class OperateLogStore(object):
             limit = {str(_('Tips')): self.max_length_tip_msg}
             diff = self.convert_before_after_to_diff(limit, limit)
 
+        setattr(op_log, 'LOCKING_ORG', op_log.org_id)
         op_log.diff = diff
         op_log.save()

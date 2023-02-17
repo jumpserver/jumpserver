@@ -12,9 +12,9 @@ from common.local import encrypted_field_set
 from settings.serializers import SettingsSerializer
 from jumpserver.utils import current_request
 from orgs.utils import get_current_org_id
+from orgs.models import Organization
 
 from .backends import get_operate_log_storage
-from .const import ActionChoices
 
 
 logger = get_logger(__name__)
@@ -130,6 +130,14 @@ class OperatorLogHandler(metaclass=Singleton):
             after = self.__data_processing(after)
         return before, after
 
+    @staticmethod
+    def get_org_id(object_name):
+        system_obj = ('Role',)
+        org_id = get_current_org_id()
+        if object_name in system_obj:
+            org_id = Organization.SYSTEM_ID
+        return org_id
+
     def create_or_update_operate_log(
             self, action, resource_type, resource=None, resource_display=None,
             force=False, log_id=None, before=None, after=None,
@@ -148,12 +156,12 @@ class OperatorLogHandler(metaclass=Singleton):
             # 前后都没变化，没必要生成日志，除非手动强制保存
             return
 
+        org_id = self.get_org_id(object_name)
         data = {
             'id': log_id, "user": str(user), 'action': action,
-            'resource_type': str(resource_type),
+            'resource_type': str(resource_type), 'org_id': org_id,
             'resource_id': resource_id, 'resource': resource_display,
             'remote_addr': remote_addr, 'before': before, 'after': after,
-            'org_id': get_current_org_id(),
         }
         with transaction.atomic():
             if self.log_client.ping(timeout=1):

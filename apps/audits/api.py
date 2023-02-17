@@ -3,7 +3,7 @@
 from importlib import import_module
 
 from django.conf import settings
-from django.db.models import F, Value, CharField
+from django.db.models import F, Value, CharField, Q
 from rest_framework import generics
 from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
@@ -14,6 +14,7 @@ from common.plugins.es import QuerySet as ESQuerySet
 from ops.models.job import JobAuditLog
 from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet
 from orgs.utils import current_org, tmp_to_root_org
+from orgs.models import Organization
 from .backends import TYPE_ENGINE_MAPPING
 from .const import ActivityChoices
 from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog, ActivityLog
@@ -140,7 +141,10 @@ class OperateLogViewSet(RetrieveModelMixin, ListModelMixin, OrgGenericViewSet):
         return super().get_serializer_class()
 
     def get_queryset(self):
-        qs = OperateLog.objects.all()
+        with tmp_to_root_org():
+            qs = OperateLog.objects.filter(
+                Q(org_id=current_org.id) | Q(org_id=Organization.SYSTEM_ID)
+            )
         es_config = settings.OPERATE_LOG_ELASTICSEARCH_CONFIG
         if es_config:
             engine_mod = import_module(TYPE_ENGINE_MAPPING['es'])
