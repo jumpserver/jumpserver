@@ -15,6 +15,8 @@ def task_activity_callback(self, pid, trigger):
         plan = get_object_or_none(AccountBackupAutomation, pk=pid)
     if not plan:
         return
+    if not plan.latest_execution:
+        return
     resource_ids = plan.latest_execution.backup_accounts
     org_id = plan.org_id
     return resource_ids, org_id

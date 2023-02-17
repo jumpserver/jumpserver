@@ -10,7 +10,14 @@ from .utils import get_logger
 logger = get_logger(__file__)
 
 
-@shared_task(verbose_name=_("Send email"))
+def task_activity_callback(self, subject, message, from_email, recipient_list, **kwargs):
+    from users.models import User
+    email_list = recipient_list
+    resource_ids = list(User.objects.filter(email__in=email_list).values_list('id', flat=True))
+    return resource_ids
+
+
+@shared_task(verbose_name=_("Send email"), activity_callback=task_activity_callback)
 def send_mail_async(*args, **kwargs):
     """ Using celery to send email async
 
@@ -19,7 +26,7 @@ def send_mail_async(*args, **kwargs):
     Example:
     send_mail_sync.delay(subject, message, from_mail, recipient_list, fail_silently=False, html_message=None)
 
-    Also you can ignore the from_mail, unlike django send_mail, from_email is not a require args:
+    Also, you can ignore the from_mail, unlike django send_mail, from_email is not a required args:
 
     Example:
     send_mail_sync.delay(subject, message, recipient_list, fail_silently=False, html_message=None)
@@ -37,7 +44,7 @@ def send_mail_async(*args, **kwargs):
         logger.error("Sending mail error: {}".format(e))
 
 
-@shared_task(verbose_name=_("Send email attachment"))
+@shared_task(verbose_name=_("Send email attachment"), activity_callback=task_activity_callback)
 def send_mail_attachment_async(subject, message, recipient_list, attachment_list=None):
     if attachment_list is None:
         attachment_list = []
