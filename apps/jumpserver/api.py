@@ -17,7 +17,7 @@ from audits.models import UserLoginLog, PasswordChangeLog, OperateLog, FTPLog, J
 from common.utils import lazyproperty
 from common.utils.timezone import local_now, local_zero_hour
 from ops.const import JobStatus
-from ops.models import Job, JobExecution
+from ops.models import Job, JobExecution, JobAuditLog
 from orgs.caches import OrgResourceStatisticsCache
 from orgs.utils import current_org
 from terminal.models import Session, Command
@@ -158,7 +158,7 @@ class DatesLoginMetricMixin:
 
     def __set_data_to_cache(self, date, tp, count):
         cache_key = self.get_cache_key(date, tp)
-        cache.set(cache_key, count, 3600 * 24 * 7)
+        cache.set(cache_key, count, 3600)
 
     @staticmethod
     def get_date_start_2_end(d):
@@ -170,12 +170,12 @@ class DatesLoginMetricMixin:
         return ds, de
 
     def get_date_login_count(self, date):
-        tp = "LOGIN"
+        tp = "LOGIN-USER"
         count = self.__get_data_from_cache(date, tp)
         if count is not None:
             return count
         ds, de = self.get_date_start_2_end(date)
-        count = Session.objects.filter(date_start__range=(ds, de)).count()
+        count = UserLoginLog.objects.filter(datetime__range=(ds, de)).count()
         self.__set_data_to_cache(date, tp, count)
         return count
 
