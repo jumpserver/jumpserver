@@ -4,6 +4,7 @@ import uuid
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from private_storage.fields import PrivateFileField
 
 from ops.const import CreateMethods
 from ops.exception import PlaybookNoValidEntry
@@ -20,7 +21,7 @@ dangerous_keywords = (
 class Playbook(JMSOrgBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'), null=True)
-    path = models.FileField(upload_to='playbooks/')
+    path = PrivateFileField(upload_to='playbooks/')
     creator = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
     comment = models.CharField(max_length=1024, default='', verbose_name=_('Comment'), null=True, blank=True)
     create_method = models.CharField(max_length=128, choices=CreateMethods.choices, default=CreateMethods.blank,
