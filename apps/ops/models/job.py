@@ -9,7 +9,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-__all__ = ["Job", "JobExecution", "JobAuditLog"]
+__all__ = ["Job", "JobExecution"]
 
 from simple_history.models import HistoricalRecords
 
@@ -362,11 +362,3 @@ class JobExecution(JMSOrgBaseModel):
         ordering = ['-date_created']
 
 
-class JobAuditLog(JobExecution):
-    @property
-    def creator_name(self):
-        return self.creator.name
-
-    class Meta:
-        proxy = True
-        verbose_name = _("Job audit log")

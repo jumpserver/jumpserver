@@ -13,11 +13,11 @@ from rest_framework.views import APIView
 from assets.const import AllTypes
 from assets.models import Asset
 from audits.const import LoginStatusChoices
-from audits.models import UserLoginLog, PasswordChangeLog, OperateLog, FTPLog
+from audits.models import UserLoginLog, PasswordChangeLog, OperateLog, FTPLog, JobLog
 from common.utils import lazyproperty
 from common.utils.timezone import local_now, local_zero_hour
 from ops.const import JobStatus
-from ops.models import Job, JobExecution, JobAuditLog
+from ops.models import JobExecution
 from orgs.caches import OrgResourceStatisticsCache
 from orgs.utils import current_org
 from terminal.models import Session, Command
@@ -123,7 +123,7 @@ class DateTimeMixin:
     @lazyproperty
     def job_logs_queryset(self):
         t = self.days_to_datetime
-        queryset = JobAuditLog.objects.filter(date_created__gte=t)
+        queryset = JobLog.objects.filter(date_created__gte=t)
         return queryset
 
     @lazyproperty
@@ -138,7 +138,7 @@ class DatesLoginMetricMixin:
     command_queryset: Command.objects
     sessions_queryset: Session.objects
     ftp_logs_queryset: OperateLog.objects
-    job_logs_queryset: JobAuditLog.objects
+    job_logs_queryset: JobLog.objects
     login_logs_queryset: UserLoginLog.objects
     operate_logs_queryset: OperateLog.objects
     password_change_logs_queryset: PasswordChangeLog.objects
@@ -158,7 +158,7 @@ class DatesLoginMetricMixin:
 
     def __set_data_to_cache(self, date, tp, count):
         cache_key = self.get_cache_key(date, tp)
-        cache.set(cache_key, count, 3600 * 24 * 7)
+        cache.set(cache_key, count, 3600)
 
     @staticmethod
     def get_date_start_2_end(d):
@@ -170,12 +170,12 @@ class DatesLoginMetricMixin:
         return ds, de
 
     def get_date_login_count(self, date):
-        tp = "LOGIN"
+        tp = "LOGIN-USER"
         count = self.__get_data_from_cache(date, tp)
         if count is not None:
             return count
         ds, de = self.get_date_start_2_end(date)
-        count = Session.objects.filter(date_start__range=(ds, de)).count()
+        count = UserLoginLog.objects.filter(datetime__range=(ds, de)).count()
         self.__set_data_to_cache(date, tp, count)
         return count
 
@@ -312,7 +312,7 @@ class DatesLoginMetricMixin:
 
     @lazyproperty
     def commands_danger_amount(self):
-        return self.command_queryset.filter(risk_level=Command.RISK_LEVEL_DANGEROUS).count()
+        return self.command_queryset.filter(risk_level=Command.RiskLevelChoices.dangerous).count()
 
     @lazyproperty
     def job_logs_running_amount(self):

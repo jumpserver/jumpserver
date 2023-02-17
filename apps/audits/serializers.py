@@ -7,7 +7,6 @@ from audits.backends.db import OperateLogStore
 from common.serializers.fields import LabeledChoiceField
 from common.utils import reverse, i18n_trans
 from common.utils.timezone import as_current_tz
-from ops.models.job import JobAuditLog
 from ops.serializers.job import JobExecutionSerializer
 from terminal.models import Session
 from . import models
@@ -18,9 +17,9 @@ from .const import (
 )
 
 
-class JobAuditLogSerializer(JobExecutionSerializer):
+class JobLogSerializer(JobExecutionSerializer):
     class Meta:
-        model = JobAuditLog
+        model = models.JobLog
         read_only_fields = [
             "id", "material", "time_cost", 'date_start',
             'date_finished', 'date_created',

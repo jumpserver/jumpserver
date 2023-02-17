@@ -27,4 +27,16 @@ class Migration(migrations.Migration):
                 'ordering': ('-datetime',),
             },
         ),
+        migrations.CreateModel(
+            name='JobLog',
+            fields=[
+            ],
+            options={
+                'verbose_name': 'Job audit log',
+                'proxy': True,
+                'indexes': [],
+                'constraints': [],
+            },
+            bases=('ops.jobexecution',),
+        ),
     ]

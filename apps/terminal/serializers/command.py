@@ -5,11 +5,12 @@ from rest_framework import serializers
 from common.utils import pretty_string
 from common.serializers.fields import LabeledChoiceField
 from terminal.backends.command.models import AbstractSessionCommand
+from terminal.models import Command
 
 __all__ = ['SessionCommandSerializer', 'InsecureCommandAlertSerializer']
 
 
-class SimpleSessionCommandSerializer(serializers.Serializer):
+class SimpleSessionCommandSerializer(serializers.ModelSerializer):
 
     """ 简单Session命令序列类, 用来提取公共字段 """
     user = serializers.CharField(label=_("User"))  # 限制 64 字符，见 validate_user
@@ -17,11 +18,17 @@ class SimpleSessionCommandSerializer(serializers.Serializer):
     input = serializers.CharField(max_length=2048, label=_("Command"))
     session = serializers.CharField(max_length=36, label=_("Session ID"))
     risk_level = LabeledChoiceField(
-        required=False, label=_("Risk level"), choices=AbstractSessionCommand.RISK_LEVEL_CHOICES
+        choices=AbstractSessionCommand.RiskLevelChoices.choices,
+        required=False, label=_("Risk level"),
     )
     org_id = serializers.CharField(
         max_length=36, required=False, default='', allow_null=True, allow_blank=True
     )
+
+    class Meta:
+        # 继承 ModelSerializer 解决 swagger risk_level type 为 object 的问题
+        model = Command
+        fields = ['user', 'asset', 'input', 'session', 'risk_level', 'org_id']
 
     def validate_user(self, value):
         if len(value) > 64:
@@ -51,5 +58,9 @@ class SessionCommandSerializerMixin(serializers.Serializer):
 
 class SessionCommandSerializer(SessionCommandSerializerMixin, SimpleSessionCommandSerializer):
     """ 字段排序序列类 """
-    pass
+
+    class Meta(SimpleSessionCommandSerializer.Meta):
+        fields = SimpleSessionCommandSerializer.Meta.fields + [
+            'id', 'account', 'output', 'timestamp', 'timestamp_display', 'remote_addr'
+        ]
 
