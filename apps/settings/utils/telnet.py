@@ -3,6 +3,8 @@
 import socket
 import telnetlib
 
+from common.utils import lookup_domain
+
 PROMPT_REGEX = r'[\<|\[](.*)[\>|\]]'
 
 
@@ -16,10 +18,29 @@ def telnet(dest_addr, port_number=23, timeout=10):
     return True, output.decode('utf-8', 'ignore')
 
 
+def verbose_telnet(dest_addr, port_number=23, timeout=10, display=None):
+    if display is None:
+        display = print
+    msg = '$ telnet %s %s' % (dest_addr, port_number)
+    display(msg)
+    ip = lookup_domain(dest_addr)
+    display('Trying %s...' % ip)
+    try:
+        is_connective, resp = telnet(dest_addr, port_number, timeout)
+        if is_connective:
+            template = 'Connected to {0} {1}.\r\n{2}Connection closed by foreign host.'
+        else:
+            template = 'telnet: connect to {0} {1} {2}\r\ntelnet: Unable to connect to remote host'
+        msg = template.format(dest_addr, port_number, resp)
+    except Exception as e:
+        msg = 'Error: %s' % e
+    display(msg)
+
+
 if __name__ == "__main__":
-    print(telnet(dest_addr='1.1.1.1', port_number=2222))
-    print(telnet(dest_addr='baidu.com', port_number=80))
-    print(telnet(dest_addr='baidu.com', port_number=8080))
-    print(telnet(dest_addr='192.168.4.1', port_number=2222))
-    print(telnet(dest_addr='192.168.4.1', port_number=2223))
-    print(telnet(dest_addr='ssssss', port_number=-1))
+    print(verbose_telnet(dest_addr='1.1.1.1', port_number=2222))
+    print(verbose_telnet(dest_addr='baidu.com', port_number=80))
+    print(verbose_telnet(dest_addr='baidu.com', port_number=8080))
+    print(verbose_telnet(dest_addr='192.168.4.1', port_number=2222))
+    print(verbose_telnet(dest_addr='192.168.4.1', port_number=2223))
+    print(verbose_telnet(dest_addr='ssssss', port_number=-1))
