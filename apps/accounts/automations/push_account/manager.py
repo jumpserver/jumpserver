@@ -92,7 +92,7 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
         account_info = self.name_recorder_mapper.get(host)
         if not account_info:
             return
-        print('account_info', account_info)
+
         account = account_info['account']
         new_secret = account_info['new_secret']
         if not account:

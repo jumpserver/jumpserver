@@ -2,6 +2,7 @@
   gather_facts: no
   vars:
     ansible_python_interpreter: /usr/local/bin/python
+    db_name: "{{ jms_asset.spec_info.db_name }}"
 
   tasks:
     - name: Test MySQL connection
@@ -26,6 +27,7 @@
         name: "{{ account.username }}"
         password: "{{ account.secret }}"
         host: "%"
+        priv: "{{ account.username + '.*:USAGE' if db_name == '' else db_name + '.*:ALL' }}"
       when: db_info is succeeded
       register: change_info
 
@@ -37,5 +39,5 @@
         login_port: "{{ jms_asset.port }}"
         filter: version
       when:
-      - db_info is succeeded
-      - change_info is succeeded
+        - db_info is succeeded
+        - change_info is succeeded
