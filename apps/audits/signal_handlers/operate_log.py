@@ -3,8 +3,8 @@
 import uuid
 
 from django.apps import apps
-from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save, m2m_changed, pre_delete
+from django.dispatch import receiver
 
 from audits.handler import (
     get_instance_current_with_cache_diff, cache_instance_before_data,
@@ -13,9 +13,7 @@ from audits.handler import (
 from audits.utils import model_to_dict_for_operate_log as model_to_dict
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR, SKIP_SIGNAL
 from common.signals import django_ready
-
 from ..const import MODELS_NEED_RECORD, ActionChoices
-
 
 M2M_ACTION = {
     POST_ADD: ActionChoices.create,
@@ -169,6 +167,7 @@ def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
         'PermedAsset', 'PermedAccount', 'MenuPermission',
         'Permission', 'TicketSession', 'ApplyLoginTicket',
         'ApplyCommandTicket', 'ApplyLoginAssetTicket',
+        'FavoriteAsset',
     }
     for i, app in enumerate(apps.get_models(), 1):
         app_name = app._meta.app_label
