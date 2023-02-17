@@ -12,8 +12,8 @@ from common.api import JMSGenericViewSet
 from common.drf.filters import DatetimeRangeFilter
 from common.plugins.es import QuerySet as ESQuerySet
 from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet
-from orgs.utils import current_org, tmp_to_root_org
 from orgs.models import Organization
+from orgs.utils import current_org, tmp_to_root_org
 from users.models import User
 from .backends import TYPE_ENGINE_MAPPING
 from .const import ActivityChoices
@@ -135,8 +135,11 @@ class OperateLogViewSet(RetrieveModelMixin, ListModelMixin, OrgGenericViewSet):
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
     ]
-    filterset_fields = ['user', 'action', 'resource_type', 'resource', 'remote_addr']
-    search_fields = ['resource']
+    filterset_fields = [
+        'user', 'action', 'resource_type', 'resource',
+        'remote_addr'
+    ]
+    search_fields = ['resource', 'user']
     ordering = ['-datetime']
 
     def get_serializer_class(self):

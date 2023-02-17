@@ -21,12 +21,9 @@ logger = logging.getLogger(__name__)
 
 
 def default_node():
-    try:
-        from assets.models import Node
-        root = Node.org_root()
-        return Node.objects.filter(id=root.id)
-    except:
-        return None
+    from orgs.utils import current_org
+    from ..node import Node
+    return Node(id=current_org.id)
 
 
 class AssetManager(OrgManager):
