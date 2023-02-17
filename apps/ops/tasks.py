@@ -55,8 +55,8 @@ def run_ops_job_execution(execution_id, **kwargs):
         logger.error("Start adhoc execution error: {}".format(e))
 
 
-@shared_task(verbose_name=_('Periodic clear celery tasks'))
 @after_app_shutdown_clean_periodic
+@shared_task(verbose_name=_('Periodic clear celery tasks'))
 @register_as_period_task(interval=3600 * 24, description=_("Clean celery log period"))
 def clean_celery_tasks_period():
     logger.debug("Start clean celery task history")

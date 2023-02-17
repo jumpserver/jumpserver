@@ -77,13 +77,19 @@ class AssetAccountHandler(BaseAccountHandler):
         return filename
 
     @classmethod
-    def create_data_map(cls, types: list):
-        data_map = defaultdict(list)
-
+    def get_accounts(cls, types):
         # TODO 可以优化一下查询 在账号上做 category 的缓存 避免数据量大时连表操作
         qs = Account.objects.filter(
             asset__platform__type__in=types
         ).annotate(type=F('asset__platform__type'))
+        return qs
+
+    @classmethod
+    def create_data_map(cls, types: list):
+        data_map = defaultdict(list)
+
+        # TODO 可以优化一下查询 在账号上做 category 的缓存 避免数据量大时连表操作
+        qs = cls.get_accounts(types)
 
         if not qs.exists():
             return data_map

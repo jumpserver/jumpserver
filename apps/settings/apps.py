@@ -7,4 +7,5 @@ class SettingsConfig(AppConfig):
     verbose_name = _('Settings')
 
     def ready(self):
+        from . import tasks
         from . import signal_handlers

@@ -134,14 +134,17 @@ class ActivityLogHandler:
             raise ValueError('Task not found: {}'.format(task_name))
 
         args, kwargs = body[:2]
+        print('args, kwargs: {}'.format((args, kwargs)))
+        print('body: ', body)
         activity_callback = getattr(task, 'activity_callback', None)
-        if activity_callback is None:
+        if not callable(activity_callback):
+            return [], '', ''
+        data = activity_callback(*args, **kwargs)
+        if data is None:
             return [], '', ''
 
         print(">>>>>>>>>>>>> current request")
         print(">>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<,,")
-
-        data = activity_callback(*args, **kwargs)
         resource_ids, org_id, user = data + ('',) * (3 - len(data))
         if not user:
             if current_request:
@@ -156,6 +159,20 @@ class ActivityLogHandler:
         )
 
         return resource_ids, detail, org_id
+
+
+def create_activities(resource_ids, detail, detail_id, action, org_id):
+    if not resource_ids:
+        return
+    activities = [
+        ActivityLog(
+            resource_id=getattr(resource_id, 'pk', resource_id),
+            type=action, detail=detail, detail_id=detail_id, org_id=org_id
+        )
+        for resource_id in resource_ids
+    ]
+    ActivityLog.objects.bulk_create(activities)
+    return activities
 
 
 @signals.after_task_publish.connect
@@ -175,20 +192,6 @@ model_activity_handler_map = {
     Session: ActivityLogHandler.session_for_activity,
     UserLoginLog: ActivityLogHandler.login_log_for_activity,
 }
-
-
-def create_activities(resource_ids, detail, detail_id, action, org_id):
-    if not resource_ids:
-        return
-    activities = [
-        ActivityLog(
-            resource_id=getattr(resource_id, 'pk', resource_id),
-            type=action, detail=detail, detail_id=detail_id, org_id=org_id
-        )
-        for resource_id in resource_ids
-    ]
-    ActivityLog.objects.bulk_create(activities)
-    return activities
 
 
 def on_session_or_login_log_created(sender, instance=None, created=False, **kwargs):

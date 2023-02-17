@@ -10,5 +10,7 @@ class AuditsConfig(AppConfig):
 
     def ready(self):
         from . import signal_handlers
+        from . import tasks
+
         if settings.SYSLOG_ENABLE:
             post_save.connect(signal_handlers.on_audits_log_create)

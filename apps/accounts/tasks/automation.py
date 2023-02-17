@@ -7,13 +7,15 @@ from orgs.utils import tmp_to_org
 logger = get_logger(__file__)
 
 
-def automation_activity_callback(instance, *args):
+def automation_activity_callback(self, instance, *args):
     asset_ids = instance.get_all_asset_ids()
     return asset_ids, instance.org_id
 
 
-@shared_task(queue='ansible', verbose_name=_('Account execute automation'),
-             activity_callback=automation_activity_callback)
+@shared_task(
+    queue='ansible', verbose_name=_('Account execute automation'),
+    activity_callback=automation_activity_callback
+)
 def execute_automation(instance, trigger):
     with tmp_to_org(instance.org):
         instance.execute(trigger)
