@@ -4454,7 +4454,7 @@ msgstr "云同步记录"
 
 #: settings/serializers/cleaning.py:31
 msgid "Session keep duration"
-msgstr "资产会话日志"
+msgstr "会话日志"
 
 #: settings/serializers/cleaning.py:32
 msgid ""

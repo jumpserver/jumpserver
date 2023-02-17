@@ -18,15 +18,6 @@ class OtherSettingSerializer(serializers.Serializer):
         label=_("OTP valid window")
     )
 
-    WINDOWS_SSH_DEFAULT_SHELL = serializers.ChoiceField(
-        choices=[
-            ('cmd', _("CMD")),
-            ('powershell', _("PowerShell"))
-        ],
-        label=_('Shell (Windows)'),
-        help_text=_('The shell type used when Windows assets perform ansible tasks')
-    )
-
     PERM_SINGLE_ASSET_TO_UNGROUP_NODE = serializers.BooleanField(
         required=False, label=_("Perm ungroup node"),
         help_text=_("Perm single to ungroup node")

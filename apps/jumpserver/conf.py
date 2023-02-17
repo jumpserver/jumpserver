@@ -527,7 +527,6 @@ class Config(dict):
         'PERM_SINGLE_ASSET_TO_UNGROUP_NODE': False,
         'TICKET_AUTHORIZE_DEFAULT_TIME': 7,
         'TICKET_AUTHORIZE_DEFAULT_TIME_UNIT': 'day',
-        'WINDOWS_SSH_DEFAULT_SHELL': 'cmd',
         'PERIOD_TASK_ENABLED': True,
 
         # 导航栏 帮助
