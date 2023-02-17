@@ -7,6 +7,8 @@ import socket
 import struct
 import time
 
+from common.utils import lookup_domain
+
 # From /usr/include/linux/icmp.h; your milage may vary.
 ICMP_ECHO_REQUEST = 8  # Seems to be the same on Solaris.
 
@@ -126,24 +128,30 @@ def ping(dest_addr, timeout, psize, flag=0):
     return delay
 
 
-def verbose_ping(dest_addr, timeout=2, count=5, psize=64):
+def verbose_ping(dest_addr, timeout=2, count=5, psize=64, display=None):
     """
     Send `count' ping with `psize' size to `dest_addr' with
     the given `timeout' and display the result.
     """
+    ip = lookup_domain(dest_addr)
+    if not ip:
+        return
+    if display is None:
+        display = print
+    display("PING %s (%s): 56 data bytes" % (dest_addr, ip))
     for i in range(count):
-        print("ping %s with ..." % dest_addr, end="")
         try:
             delay = ping(dest_addr, timeout, psize)
         except socket.gaierror as e:
-            print("failed. (socket error: '%s')" % str(e))
+            display("failed. (socket error: '%s')" % str(e))
             break
 
         if delay is None:
-            print("failed. (timeout within %ssec.)" % timeout)
+            display("Request timeout for icmp_seq %i" % i)
         else:
             delay = delay * 1000
-            print("get ping in %0.4fms" % delay)
+            display("64 bytes from %s: icmp_seq=0 ttl=115 time=%.3f ms" % (ip, delay))
+        time.sleep(1)
     print()
 
 
