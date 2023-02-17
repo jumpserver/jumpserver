@@ -7,4 +7,5 @@ class AccountsConfig(AppConfig):
 
     def ready(self):
         from . import signal_handlers
+        from . import tasks
         __all__ = signal_handlers

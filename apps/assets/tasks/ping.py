@@ -1,10 +1,10 @@
 # ~*~ coding: utf-8 ~*~
 from celery import shared_task
-from django.utils.translation import gettext_noop
+from django.utils.translation import gettext_noop, gettext_lazy as _
 
 from assets.const import AutomationTypes
 from common.utils import get_logger
-from orgs.utils import org_aware_func
+from orgs.utils import tmp_to_org, current_org
 from .common import quickstart_automation
 
 logger = get_logger(__file__)
@@ -16,28 +16,31 @@ __all__ = [
 ]
 
 
-@shared_task
-@org_aware_func('assets')
-def test_assets_connectivity_task(assets, task_name=None):
+@shared_task(
+    verbose_name=_('Test assets connectivity'), queue='ansible',
+    activity_callback=lambda self, asset_ids, org_id, *args, **kwargs: (asset_ids, org_id)
+)
+def test_assets_connectivity_task(asset_ids, org_id, task_name=None):
     from assets.models import PingAutomation
     if task_name is None:
-        task_name = gettext_noop("Test assets connectivity ")
+        task_name = gettext_noop("Test assets connectivity")
 
     task_name = PingAutomation.generate_unique_name(task_name)
-    task_snapshot = {'assets': [str(asset.id) for asset in assets]}
-    quickstart_automation(task_name, AutomationTypes.ping, task_snapshot)
+    task_snapshot = {'assets': asset_ids}
+    with tmp_to_org(org_id):
+        quickstart_automation(task_name, AutomationTypes.ping, task_snapshot)
 
 
-def test_assets_connectivity_manual(asset_ids):
-    from assets.models import Asset
-    assets = Asset.objects.filter(id__in=asset_ids)
+def test_assets_connectivity_manual(assets):
     task_name = gettext_noop("Test assets connectivity ")
-    return test_assets_connectivity_task.delay(assets, task_name)
+    asset_ids = [str(i.id) for i in assets]
+    org_id = str(current_org.id)
+    return test_assets_connectivity_task.delay(asset_ids, org_id, task_name)
 
 
-def test_node_assets_connectivity_manual(node_id):
-    from assets.models import Node
-    node = Node.objects.get(id=node_id)
+def test_node_assets_connectivity_manual(node):
     task_name = gettext_noop("Test if the assets under the node are connectable ")
-    assets = node.get_all_assets()
-    return test_assets_connectivity_task.delay(assets, task_name)
+    asset_ids = node.get_all_asset_ids()
+    asset_ids = [str(i) for i in asset_ids]
+    org_id = str(current_org.id)
+    return test_assets_connectivity_task.delay(asset_ids, org_id, task_name)

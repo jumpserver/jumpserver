@@ -107,6 +107,7 @@ class SessionAuditSerializer(serializers.ModelSerializer):
 
 
 class ActivityUnionLogSerializer(serializers.Serializer):
+    id = serializers.CharField()
     timestamp = serializers.SerializerMethodField()
     detail_url = serializers.SerializerMethodField()
     content = serializers.SerializerMethodField()
@@ -120,7 +121,7 @@ class ActivityUnionLogSerializer(serializers.Serializer):
     def get_content(obj):
         if not obj['r_detail']:
             action = obj['r_action'].replace('_', ' ').capitalize()
-            ctn = _('User {} {} this resource').format(obj['r_user'], _(action))
+            ctn = _('User %s %s this resource') % (obj['r_user'], _(action))
         else:
             ctn = i18n_trans(obj['r_detail'])
         return ctn

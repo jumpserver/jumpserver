@@ -11,4 +11,5 @@ class UsersConfig(AppConfig):
     def ready(self):
         from . import signal_handlers
         from . import notifications
+        from . import tasks
         super().ready()

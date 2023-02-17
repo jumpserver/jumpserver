@@ -10,6 +10,7 @@ from django.utils import translation, timezone
 from django.utils.translation import gettext as _
 
 from common.db.utils import close_old_connections, get_logger
+from common.signals import django_ready
 from .celery import app
 from .models import CeleryTaskExecution, CeleryTask, Job
 
@@ -43,6 +44,17 @@ def sync_registered_tasks(*args, **kwargs):
             CeleryTask.objects.bulk_create(tasks_to_create)
         except ProgrammingError:
             pass
+
+
+@receiver(django_ready)
+def check_registered_tasks(*args, **kwargs):
+    attrs = ['verbose_name', 'activity_callback']
+    for name, task in app.tasks.items():
+        if name.startswith('celery.'):
+            continue
+        for attr in attrs:
+            if not hasattr(task, attr):
+                print('>>> Task {} has no attribute {}'.format(name, attr))
 
 
 @signals.before_task_publish.connect

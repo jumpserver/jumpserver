@@ -38,7 +38,10 @@ def verify_accounts_connectivity_util(accounts, assets, task_name):
     )
 
 
-@shared_task(queue="ansible", verbose_name=_('Verify asset account availability'))
+@shared_task(
+    queue="ansible", verbose_name=_('Verify asset account availability'),
+    activity_callback=lambda self, account_ids, asset_ids: (account_ids, None)
+)
 def verify_accounts_connectivity(account_ids, asset_ids):
     from assets.models import Asset
     from accounts.models import Account, VerifyAccountAutomation
