@@ -21,10 +21,11 @@ def telnet(dest_addr, port_number=23, timeout=10):
 def verbose_telnet(dest_addr, port_number=23, timeout=10, display=None):
     if display is None:
         display = print
-    msg = '$ telnet %s %s' % (dest_addr, port_number)
-    display(msg)
     ip = lookup_domain(dest_addr)
-    display('Trying %s...' % ip)
+    if not ip:
+        return
+    msg = 'Trying %s (%s:%s)' % (dest_addr, ip, port_number)
+    display(msg)
     try:
         is_connective, resp = telnet(dest_addr, port_number, timeout)
         if is_connective:
