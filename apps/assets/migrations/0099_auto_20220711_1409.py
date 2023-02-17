@@ -35,6 +35,7 @@ def migrate_asset_protocols(apps, schema_editor):
                     continue
 
                 name, port = name_port_list
+                name = name + '_tcp' if name == 'clickhouse' else name
                 protocol = protocol_model(**{'name': name, 'port': port, 'asset': asset})
                 assets_protocols.append(protocol)
 
