@@ -1,22 +1,22 @@
 import os
 import time
-from copy import deepcopy
-from openpyxl import Workbook
 from collections import defaultdict
+from copy import deepcopy
 
 from django.conf import settings
 from django.utils import timezone
+from openpyxl import Workbook
 
-from users.models import User
+from accounts.const import AutomationTypes, SecretType, SSHKeyStrategy, SecretStrategy
 from accounts.models import ChangeSecretRecord
 from accounts.notifications import ChangeSecretExecutionTaskMsg
 from accounts.serializers import ChangeSecretRecordBackUpSerializer
-from accounts.const import AutomationTypes, SecretType, SSHKeyStrategy, SecretStrategy
 from common.utils import get_logger, lazyproperty
 from common.utils.file import encrypt_and_compress_zip_file
 from common.utils.timezone import local_now_display
-from ...utils import SecretGenerator
+from users.models import User
 from ..base.manager import AccountBasePlaybookManager
+from ...utils import SecretGenerator
 
 logger = get_logger(__name__)
 
@@ -131,7 +131,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         recorder.status = 'success'
         recorder.date_finished = timezone.now()
         recorder.save()
-
+        print('recorder.new_secret', recorder.new_secret)
         account = recorder.account
         account.secret = recorder.new_secret
         account.save(update_fields=['secret'])

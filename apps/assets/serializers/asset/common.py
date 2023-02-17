@@ -8,9 +8,10 @@ from rest_framework import serializers
 
 from accounts.models import Account
 from accounts.serializers import AccountSerializerCreateValidateMixin
+from accounts.serializers import AuthValidateMixin
 from common.serializers import WritableNestedModelSerializer, SecretReadableMixin, CommonModelSerializer
 from common.serializers.fields import LabeledChoiceField
-from common.utils import lazyproperty
+from common.utils import lazyproperty, decrypt_password
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ...const import Category, AllTypes
 from ...models import Asset, Node, Platform, Label, Protocol
@@ -50,7 +51,11 @@ class AssetPlatformSerializer(serializers.ModelSerializer):
         }
 
 
-class AssetAccountSerializer(AccountSerializerCreateValidateMixin, CommonModelSerializer):
+class AssetAccountSerializer(
+    AuthValidateMixin,
+    AccountSerializerCreateValidateMixin,
+    CommonModelSerializer
+):
     add_org_fields = False
     push_now = serializers.BooleanField(
         default=False, label=_("Push now"), write_only=True

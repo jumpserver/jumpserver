@@ -62,7 +62,7 @@ class JobViewSet(OrgBulkModelViewSet):
         execution = job.create_execution()
         execution.creator = self.request.user
         execution.save()
-        task = run_ops_job_execution.delay(execution.id)
+        task = run_ops_job_execution.delay(str(execution.id))
         set_task_to_serializer_data(serializer, task)
 
 
@@ -81,7 +81,7 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
         instance.job_type = Types[instance.job.type].value
         instance.creator = self.request.user
         instance.save()
-        task = run_ops_job_execution.delay(instance.id)
+        task = run_ops_job_execution.delay(str(instance.id))
         set_task_to_serializer_data(serializer, task)
 
     def get_queryset(self):

@@ -1,10 +1,10 @@
-from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
+from rest_framework import serializers
 
 from assets.models import Asset, Node
+from common.serializers.fields import ObjectRelatedField
 from perms.models import AssetPermission
 from perms.serializers.permission import ActionChoicesField
-from common.serializers.fields import ObjectRelatedField
 from tickets.models import ApplyAssetTicket
 from .common import BaseApplyAssetSerializer
 from .ticket import TicketApplySerializer

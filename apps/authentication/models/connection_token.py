@@ -228,16 +228,16 @@ class ConnectionToken(JMSOrgBaseModel):
 
     @lazyproperty
     def domain(self):
+        if not self.asset.platform.domain_enabled:
+            return
         domain = self.asset.domain if self.asset else None
         return domain
 
     @lazyproperty
     def gateway(self):
-        from assets.models import Domain
-        if not self.domain:
+        if not self.asset:
             return
-        self.domain: Domain
-        return self.domain.select_gateway()
+        return self.asset.gateway
 
     @lazyproperty
     def command_filter_acls(self):

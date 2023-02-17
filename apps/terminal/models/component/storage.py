@@ -75,9 +75,9 @@ class CommandStorage(CommonStorageModelMixin, JMSBaseModel):
 
     @property
     def config(self):
-        config = self.meta
+        config = copy.deepcopy(self.meta)
         config.update({'TYPE': self.type})
-        return copy.deepcopy(config)
+        return config
 
     @property
     def valid_config(self):

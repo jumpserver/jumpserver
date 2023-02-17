@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='assetpermission',
             name='accounts',
-            field=models.JSONField(default=list, verbose_name='Accounts'),
+            field=models.JSONField(default=list, verbose_name='Account'),
         ),
         migrations.RunPython(migrate_system_user_to_accounts),
         migrations.RemoveField(

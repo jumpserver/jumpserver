@@ -27,7 +27,13 @@ from .serializers import (
 
 class JobAuditViewSet(OrgBulkModelViewSet):
     model = JobAuditLog
+    extra_filter_backends = [DatetimeRangeFilter]
+    date_range_filter_fields = [
+        ('date_start', ('date_from', 'date_to'))
+    ]
+    search_fields = ['creator__name', 'material']
     serializer_class = JobAuditLogSerializer
+    ordering = ['-date_start']
     http_method_names = ('get', 'head', 'options')
 
 
@@ -54,8 +60,9 @@ class UserLoginCommonMixin:
     search_fields = ['id', 'username', 'ip', 'city']
 
 
-class UserLoginLogViewSet(UserLoginCommonMixin, ListModelMixin, JMSGenericViewSet):
-
+class UserLoginLogViewSet(
+    UserLoginCommonMixin, RetrieveModelMixin, ListModelMixin, JMSGenericViewSet
+):
     @staticmethod
     def get_org_members():
         users = current_org.get_members().values_list('username', flat=True)

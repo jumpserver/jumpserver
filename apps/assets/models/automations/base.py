@@ -47,9 +47,13 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
         assets = self.get_all_assets().prefetch_related('platform')
         return assets.group_by_platform()
 
+    @property
+    def execute_task(self):
+        return execute_automation
+
     def get_register_task(self):
         name = f"automation_{self.type}_strategy_period_{str(self.id)[:8]}"
-        task = execute_automation.name
+        task = self.execute_task.name
         args = (str(self.id), Trigger.timing, self.type)
         kwargs = {}
         return name, task, args, kwargs

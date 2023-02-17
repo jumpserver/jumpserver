@@ -2,6 +2,8 @@
 from __future__ import unicode_literals
 import os
 
+import private_storage.urls
+
 from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
@@ -57,8 +59,11 @@ urlpatterns = [
 ]
 
 # 静态文件处理路由
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
-               + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += [
+    # Protect media
+    path('media/', include(private_storage.urls)),
+]
 
 # js i18n 路由文件
 urlpatterns += [

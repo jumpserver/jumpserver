@@ -33,7 +33,7 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
         model = Session
         fields_mini = ["id"]
         fields_small = fields_mini + [
-            "user", "asset", "user_id", "asset_id", 'account',
+            "user", "asset", "user_id", "asset_id", 'account', 'account_id',
             "protocol", 'type', "login_from", "remote_addr",
             "is_success", "is_finished", "has_replay", "has_command",
             "date_start", "date_end", "comment"
@@ -49,7 +49,7 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
             'is_success': {'label': _('Is success')},
             'can_replay': {'label': _('Can replay')},
             'can_join': {'label': _('Can join')},
-            'terminal': {'label': _('Terminal ID')},
+            'terminal': {'label': _('Terminal')},
             'is_finished': {'label': _('Is finished')},
             'can_terminate': {'label': _('Can terminate')},
             'terminal_display': {'label': _('Terminal display')},

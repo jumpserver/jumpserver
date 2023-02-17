@@ -19,7 +19,8 @@ class DatabaseSerializer(AssetSerializer):
 
     def validate(self, attrs):
         platform = attrs.get('platform')
-        if platform and getattr(platform, 'type') == 'mongodb' \
+        db_type_required = ('mongodb', 'postgresql')
+        if platform and getattr(platform, 'type') in db_type_required \
                 and not attrs.get('db_name'):
             raise ValidationError({'db_name': _('This field is required.')})
         return attrs

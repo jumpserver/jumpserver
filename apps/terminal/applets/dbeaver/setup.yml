@@ -1,0 +1,8 @@
+type: exe # exe, zip, manual
+source:  jms:///download/applets/dbeaver-ce-22.3.4-x86_64-setup.exe
+arguments:
+  - /S
+  - /allusers
+destination: C:\Program Files\DBeaver
+program: C:\Program Files\DBeaver\dbeaver-cli.exe
+md5: EDA4440D4E32312DD25C9CE5289A228E

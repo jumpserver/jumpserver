@@ -59,7 +59,7 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
         }}
 
     def validate_password_rules(self, password_rules):
-        secret_type = self.initial_secret_type
+        secret_type = self.initial_data['secret_type']
         if secret_type != SecretType.PASSWORD:
             return password_rules
 
