@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-17 16:56+0800\n"
+"POT-Creation-Date: 2023-02-17 19:12+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -886,19 +886,6 @@ msgstr "应用程序"
 msgid "Can match application"
 msgstr "匹配应用"
 
-#: applications/serializers/attrs/application_type/clickhouse.py:11
-#: assets/models/asset/common.py:96 assets/models/platform.py:21
-#: settings/serializers/auth/radius.py:17 settings/serializers/auth/sms.py:68
-#: xpack/plugins/cloud/serializers/account_attrs.py:73
-msgid "Port"
-msgstr "端口"
-
-#: applications/serializers/attrs/application_type/clickhouse.py:13
-msgid ""
-"Typically, the port is 9000，the HTTP interface and the native interface use "
-"different ports"
-msgstr "默认端口为9000, HTTP接口和本机接口使用不同的端口"
-
 #: assets/api/asset/asset.py:145
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr "不能直接创建资产, 你应该创建主机或其他资产"
@@ -970,13 +957,14 @@ msgstr "测试网关"
 msgid "Gather facts"
 msgstr "收集资产信息"
 
-#: assets/const/category.py:11 settings/serializers/auth/radius.py:16
-#: settings/serializers/auth/sms.py:67 terminal/models/component/endpoint.py:13
+#: assets/const/category.py:11 assets/models/asset/host.py:8
+#: settings/serializers/auth/radius.py:16 settings/serializers/auth/sms.py:67
+#: terminal/models/component/endpoint.py:13
 #: xpack/plugins/cloud/serializers/account_attrs.py:72
 msgid "Host"
 msgstr "主机"
 
-#: assets/const/category.py:12
+#: assets/const/category.py:12 assets/models/asset/device.py:8
 msgid "Device"
 msgstr "网络设备"
 
@@ -989,7 +977,7 @@ msgstr "数据库"
 msgid "Cloud service"
 msgstr "云服务"
 
-#: assets/const/category.py:15 audits/const.py:33
+#: assets/const/category.py:15 assets/models/asset/web.py:16 audits/const.py:33
 #: terminal/models/applet/applet.py:24
 msgid "Web"
 msgstr "Web"
@@ -1145,6 +1133,16 @@ msgstr "系统用户"
 #: assets/models/_user.py:71
 msgid "Can match system user"
 msgstr "可以匹配系统用户"
+
+#: assets/models/asset/cloud.py:11
+msgid "Cloud"
+msgstr "云服务"
+
+#: assets/models/asset/common.py:96 assets/models/platform.py:21
+#: settings/serializers/auth/radius.py:17 settings/serializers/auth/sms.py:68
+#: xpack/plugins/cloud/serializers/account_attrs.py:73
+msgid "Port"
+msgstr "端口"
 
 #: assets/models/asset/common.py:108 assets/serializers/asset/common.py:141
 msgid "Address"
@@ -1804,7 +1802,7 @@ msgstr "文件名"
 msgid "File transfer log"
 msgstr "文件管理"
 
-#: audits/models.py:55 audits/serializers.py:94
+#: audits/models.py:55
 msgid "Resource Type"
 msgstr "资源类型"
 
@@ -1882,7 +1880,7 @@ msgstr "用户登录日志"
 msgid "Reason display"
 msgstr "原因描述"
 
-#: audits/serializers.py:124
+#: audits/serializers.py:123
 #, python-format
 msgid "User %s %s this resource"
 msgstr "用户 %s %s 了当前资源"
@@ -1938,11 +1936,7 @@ msgstr "钉钉"
 msgid "Temporary token"
 msgstr "临时密码"
 
-#: audits/tasks.py:52
-msgid "Clean audits log"
-msgstr "清理审计日志"
-
-#: audits/tasks.py:92
+#: audits/tasks.py:90
 msgid "Clean audits session task log"
 msgstr "清理审计会话任务日志"
 
@@ -4575,61 +4569,45 @@ msgstr "OTP 扫描后的名称"
 msgid "OTP valid window"
 msgstr "OTP 延迟有效次数"
 
-#: settings/serializers/other.py:23
-msgid "CMD"
-msgstr "CMD"
-
-#: settings/serializers/other.py:24
-msgid "PowerShell"
-msgstr "PowerShell"
-
-#: settings/serializers/other.py:26
-msgid "Shell (Windows)"
-msgstr "Windows shell"
-
-#: settings/serializers/other.py:27
-msgid "The shell type used when Windows assets perform ansible tasks"
-msgstr "windows 资产执行 Ansible 任务时，使用的 Shell 类型。"
-
-#: settings/serializers/other.py:31
+#: settings/serializers/other.py:22
 msgid "Perm ungroup node"
 msgstr "显示未分组节点"
 
-#: settings/serializers/other.py:32
+#: settings/serializers/other.py:23
 msgid "Perm single to ungroup node"
 msgstr ""
 "放置单独授权的资产到未分组节点, 避免能看到资产所在节点，但该节点未被授权的问"
 "题"
 
-#: settings/serializers/other.py:37
+#: settings/serializers/other.py:28
 msgid "Ticket authorize default time"
 msgstr "默认工单授权时间"
 
-#: settings/serializers/other.py:40
+#: settings/serializers/other.py:31
 msgid "day"
 msgstr "天"
 
-#: settings/serializers/other.py:40
+#: settings/serializers/other.py:31
 msgid "hour"
 msgstr "时"
 
-#: settings/serializers/other.py:41
+#: settings/serializers/other.py:32
 msgid "Ticket authorize default time unit"
 msgstr "默认工单授权时间单位"
 
-#: settings/serializers/other.py:44
+#: settings/serializers/other.py:35
 msgid "Help Docs URL"
 msgstr "文档链接"
 
-#: settings/serializers/other.py:45
+#: settings/serializers/other.py:36
 msgid "default: http://docs.jumpserver.org"
 msgstr "默认: http://dev.jumpserver.org:8080"
 
-#: settings/serializers/other.py:49
+#: settings/serializers/other.py:40
 msgid "Help Support URL"
 msgstr "支持链接"
 
-#: settings/serializers/other.py:50
+#: settings/serializers/other.py:41
 msgid "default: http://www.jumpserver.org/support/"
 msgstr "默认: http://www.jumpserver.org/support/"
 
@@ -7217,6 +7195,10 @@ msgstr "实例个数"
 msgid "Run sync instance task"
 msgstr "执行同步实例任务"
 
+#: xpack/plugins/cloud/tasks.py:41
+msgid "Period clean sync instance task execution"
+msgstr "定期清除同步实例任务执行记录"
+
 #: xpack/plugins/cloud/utils.py:69
 msgid "Account unavailable"
 msgstr "账号无效"
@@ -7284,6 +7266,26 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:85
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Clean audits log"
+#~ msgstr "清理审计日志"
+
+#~ msgid ""
+#~ "Typically, the port is 9000，the HTTP interface and the native interface "
+#~ "use different ports"
+#~ msgstr "默认端口为9000, HTTP接口和本机接口使用不同的端口"
+
+#~ msgid "CMD"
+#~ msgstr "CMD"
+
+#~ msgid "PowerShell"
+#~ msgstr "PowerShell"
+
+#~ msgid "Shell (Windows)"
+#~ msgstr "Windows shell"
+
+#~ msgid "The shell type used when Windows assets perform ansible tasks"
+#~ msgstr "windows 资产执行 Ansible 任务时，使用的 Shell 类型。"
 
 #~ msgid "Can change asset account secret"
 #~ msgstr "可以更改资产账号密码"

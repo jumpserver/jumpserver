@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-17 16:56+0800\n"
+"POT-Creation-Date: 2023-02-17 19:12+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -892,21 +892,6 @@ msgstr "アプリケーション"
 msgid "Can match application"
 msgstr "アプリケーションを一致させることができます"
 
-#: applications/serializers/attrs/application_type/clickhouse.py:11
-#: assets/models/asset/common.py:96 assets/models/platform.py:21
-#: settings/serializers/auth/radius.py:17 settings/serializers/auth/sms.py:68
-#: xpack/plugins/cloud/serializers/account_attrs.py:73
-msgid "Port"
-msgstr "ポート"
-
-#: applications/serializers/attrs/application_type/clickhouse.py:13
-msgid ""
-"Typically, the port is 9000，the HTTP interface and the native interface use "
-"different ports"
-msgstr ""
-"デフォルトポートは9000で、HTTPインタフェースとネイティブインタフェースは異な"
-"るポートを使用する"
-
 #: assets/api/asset/asset.py:145
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr ""
@@ -980,13 +965,14 @@ msgstr "テストゲートウェイ"
 msgid "Gather facts"
 msgstr "資産情報の収集"
 
-#: assets/const/category.py:11 settings/serializers/auth/radius.py:16
-#: settings/serializers/auth/sms.py:67 terminal/models/component/endpoint.py:13
+#: assets/const/category.py:11 assets/models/asset/host.py:8
+#: settings/serializers/auth/radius.py:16 settings/serializers/auth/sms.py:67
+#: terminal/models/component/endpoint.py:13
 #: xpack/plugins/cloud/serializers/account_attrs.py:72
 msgid "Host"
 msgstr "ホスト"
 
-#: assets/const/category.py:12
+#: assets/const/category.py:12 assets/models/asset/device.py:8
 msgid "Device"
 msgstr "インターネット機器"
 
@@ -999,7 +985,7 @@ msgstr "データベース"
 msgid "Cloud service"
 msgstr "クラウド サービス"
 
-#: assets/const/category.py:15 audits/const.py:33
+#: assets/const/category.py:15 assets/models/asset/web.py:16 audits/const.py:33
 #: terminal/models/applet/applet.py:24
 msgid "Web"
 msgstr "Web"
@@ -1155,6 +1141,16 @@ msgstr "システムユーザー"
 #: assets/models/_user.py:71
 msgid "Can match system user"
 msgstr "システムユーザーに一致できます"
+
+#: assets/models/asset/cloud.py:11
+msgid "Cloud"
+msgstr "クラウド サービス"
+
+#: assets/models/asset/common.py:96 assets/models/platform.py:21
+#: settings/serializers/auth/radius.py:17 settings/serializers/auth/sms.py:68
+#: xpack/plugins/cloud/serializers/account_attrs.py:73
+msgid "Port"
+msgstr "ポート"
 
 #: assets/models/asset/common.py:108 assets/serializers/asset/common.py:141
 msgid "Address"
@@ -1816,7 +1812,7 @@ msgstr "ファイル名"
 msgid "File transfer log"
 msgstr "ファイル転送ログ"
 
-#: audits/models.py:55 audits/serializers.py:94
+#: audits/models.py:55
 msgid "Resource Type"
 msgstr "リソースタイプ"
 
@@ -1894,7 +1890,7 @@ msgstr "ユーザーログインログ"
 msgid "Reason display"
 msgstr "理由表示"
 
-#: audits/serializers.py:124
+#: audits/serializers.py:123
 #, python-format
 msgid "User %s %s this resource"
 msgstr "ユーザー %s %s が現在のリソースをサブスクライブしました。"
@@ -1950,11 +1946,7 @@ msgstr "DingTalk"
 msgid "Temporary token"
 msgstr "仮パスワード"
 
-#: audits/tasks.py:52
-msgid "Clean audits log"
-msgstr "監査ログのクリーンアップ"
-
-#: audits/tasks.py:92
+#: audits/tasks.py:90
 msgid "Clean audits session task log"
 msgstr "監査セッション タスク ログのクリーンアップ"
 
@@ -3106,10 +3098,9 @@ msgid "Invalid address"
 msgstr "無効なアドレス。"
 
 #: common/utils/translate.py:42
-#, fuzzy, python-format
-#| msgid "Hello"
+#, python-format
 msgid "Hello %s"
-msgstr "こんにちは"
+msgstr "こんにちは %s"
 
 #: common/validators.py:14
 msgid "Special char not allowed"
@@ -4623,63 +4614,46 @@ msgstr "OTP発行者名"
 msgid "OTP valid window"
 msgstr "OTP有効なウィンドウ"
 
-#: settings/serializers/other.py:23
-msgid "CMD"
-msgstr "CMD"
-
-#: settings/serializers/other.py:24
-msgid "PowerShell"
-msgstr "PowerShell"
-
-#: settings/serializers/other.py:26
-msgid "Shell (Windows)"
-msgstr "シェル (Windows)"
-
-#: settings/serializers/other.py:27
-msgid "The shell type used when Windows assets perform ansible tasks"
-msgstr ""
-"Windowsアセットが実行可能なタスクを実行するときに使用されるシェルタイプ"
-
-#: settings/serializers/other.py:31
+#: settings/serializers/other.py:22
 msgid "Perm ungroup node"
 msgstr "グループ化されていないノードを表示"
 
-#: settings/serializers/other.py:32
+#: settings/serializers/other.py:23
 msgid "Perm single to ungroup node"
 msgstr ""
 "グループ化されていないノードに個別に許可された資産を配置し、資産が存在する"
 "ノードが表示されないようにしますが、そのノードが許可されていないという質問に"
 "質問"
 
-#: settings/serializers/other.py:37
+#: settings/serializers/other.py:28
 msgid "Ticket authorize default time"
 msgstr "デフォルト製造オーダ承認時間"
 
-#: settings/serializers/other.py:40
+#: settings/serializers/other.py:31
 msgid "day"
 msgstr "日"
 
-#: settings/serializers/other.py:40
+#: settings/serializers/other.py:31
 msgid "hour"
 msgstr "時"
 
-#: settings/serializers/other.py:41
+#: settings/serializers/other.py:32
 msgid "Ticket authorize default time unit"
 msgstr "デフォルト製造オーダ承認時間単位"
 
-#: settings/serializers/other.py:44
+#: settings/serializers/other.py:35
 msgid "Help Docs URL"
 msgstr "ドキュメントリンク"
 
-#: settings/serializers/other.py:45
+#: settings/serializers/other.py:36
 msgid "default: http://docs.jumpserver.org"
 msgstr "デフォルト: http://docs.jumpserver.org"
 
-#: settings/serializers/other.py:49
+#: settings/serializers/other.py:40
 msgid "Help Support URL"
 msgstr "サポートリンク"
 
-#: settings/serializers/other.py:50
+#: settings/serializers/other.py:41
 msgid "default: http://www.jumpserver.org/support/"
 msgstr "デフォルト: http://www.jumpserver.org/support/"
 
@@ -7315,6 +7289,10 @@ msgstr "インスタンス数"
 #: xpack/plugins/cloud/tasks.py:27
 msgid "Run sync instance task"
 msgstr "同期インスタンス タスクを実行する"
+
+#: xpack/plugins/cloud/tasks.py:41
+msgid "Period clean sync instance task execution"
+msgstr "同期インスタンス タスクの実行記録を定期的にクリアする"
 
 #: xpack/plugins/cloud/utils.py:69
 msgid "Account unavailable"
