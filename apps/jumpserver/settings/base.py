@@ -264,6 +264,7 @@ STATICFILES_DIRS = (
 )
 
 # Media files (File, ImageField) will be save these
+MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(PROJECT_DIR, 'data', 'media').replace('\\', '/') + '/'
 
 PRIVATE_STORAGE_ROOT = MEDIA_ROOT
