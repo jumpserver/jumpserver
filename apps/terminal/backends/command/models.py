@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-from datetime import datetime
 import uuid
+from datetime import datetime
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -23,7 +24,8 @@ class AbstractSessionCommand(OrgModelMixin):
     input = models.CharField(max_length=128, db_index=True, verbose_name=_("Input"))
     output = models.CharField(max_length=1024, blank=True, verbose_name=_("Output"))
     session = models.CharField(max_length=36, db_index=True, verbose_name=_("Session"))
-    risk_level = models.SmallIntegerField(default=RISK_LEVEL_ORDINARY, choices=RISK_LEVEL_CHOICES, db_index=True, verbose_name=_("Risk level"))
+    risk_level = models.SmallIntegerField(default=RISK_LEVEL_ORDINARY, choices=RISK_LEVEL_CHOICES, db_index=True,
+                                          verbose_name=_("Risk level"))
     timestamp = models.IntegerField(db_index=True)
 
     class Meta:

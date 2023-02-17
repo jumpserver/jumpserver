@@ -11,7 +11,7 @@ from accounts.serializers import AccountSerializerCreateValidateMixin
 from accounts.serializers import AuthValidateMixin
 from common.serializers import WritableNestedModelSerializer, SecretReadableMixin, CommonModelSerializer
 from common.serializers.fields import LabeledChoiceField
-from common.utils import lazyproperty, decrypt_password
+from common.utils import lazyproperty
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ...const import Category, AllTypes
 from ...models import Asset, Node, Platform, Label, Protocol
@@ -25,6 +25,8 @@ __all__ = [
 
 
 class AssetProtocolsSerializer(serializers.ModelSerializer):
+    port = serializers.IntegerField(required=False, allow_null=True, max_value=65535, min_value=1)
+
     class Meta:
         model = Protocol
         fields = ['name', 'port']

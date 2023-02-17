@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 #
-from rest_framework.generics import ListAPIView
-from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
+from rest_framework.generics import ListAPIView
 
+from assets.models import Asset
 from common.utils import get_logger
-from users.models import User, UserGroup
-from users.serializers import UserSerializer, UserGroupSerializer
-from users.filters import UserFilter
+from orgs.mixins import generics
+from perms.filters import AssetPermissionFilter
 from perms.models import AssetPermission
 from perms.serializers import AssetPermissionSerializer
-from perms.filters import AssetPermissionFilter
-from orgs.mixins import generics
-from assets.models import Asset
+from users.filters import UserFilter
+from users.models import User, UserGroup
+from users.serializers import UserSerializer, UserGroupSerializer
 
 logger = get_logger(__file__)
 __all__ = [
@@ -56,8 +56,11 @@ class AssetPermUserListApi(BaseAssetPermUserOrUserGroupListApi):
 
 class AssetPermUserGroupListApi(BaseAssetPermUserOrUserGroupListApi):
     serializer_class = UserGroupSerializer
+    queryset = UserGroup.objects.none()
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return UserGroup.objects.none()
         perms = self.get_asset_related_perms()
         user_groups = UserGroup.objects.filter(assetpermissions__in=perms).distinct()
         return user_groups
@@ -124,4 +127,3 @@ class AssetPermUserGroupPermissionsListApi(BaseAssetRelatedPermissionListApi):
         user_group_id = self.kwargs.get('perm_user_group_id')
         user_group = get_object_or_404(UserGroup, pk=user_group_id)
         return user_group
-
