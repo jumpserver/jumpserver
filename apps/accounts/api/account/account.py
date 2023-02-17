@@ -66,7 +66,7 @@ class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
         'default': serializers.AccountSecretSerializer,
     }
     http_method_names = ['get', 'options']
-    # permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
+    permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
     rbac_perms = {
         'list': 'accounts.view_accountsecret',
         'retrieve': 'accounts.view_accountsecret',
