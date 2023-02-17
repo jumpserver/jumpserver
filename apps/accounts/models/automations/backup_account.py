@@ -5,7 +5,9 @@ import uuid
 
 from celery import current_task
 from django.db import models
+from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
+from common.utils import lazyproperty
 
 from common.const.choices import Trigger
 from common.db.encoder import ModelJSONFieldEncoder
@@ -70,6 +72,10 @@ class AccountBackupAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
         )
         return execution.start()
 
+    @lazyproperty
+    def latest_execution(self):
+        return self.execution.first()
+
 
 class AccountBackupExecution(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
@@ -111,6 +117,15 @@ class AccountBackupExecution(OrgModelMixin):
         if not recipients:
             return []
         return recipients.values()
+
+    @lazyproperty
+    def backup_accounts(self):
+        from accounts.models import Account
+        # TODO 可以优化一下查询 在账号上做 category 的缓存 避免数据量大时连表操作
+        qs = Account.objects.filter(
+            asset__platform__type__in=self.types
+        ).annotate(type=F('asset__platform__type'))
+        return qs
 
     @property
     def manager_type(self):
