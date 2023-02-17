@@ -132,32 +132,22 @@ class ActivityLogHandler:
         task = app.tasks.get(task_name)
         if not task:
             raise ValueError('Task not found: {}'.format(task_name))
-
-        args, kwargs = body[:2]
-        print('args, kwargs: {}'.format((args, kwargs)))
-        print('body: ', body)
         activity_callback = getattr(task, 'activity_callback', None)
         if not callable(activity_callback):
             return [], '', ''
+        args, kwargs = body[:2]
         data = activity_callback(*args, **kwargs)
         if data is None:
             return [], '', ''
 
-        print(">>>>>>>>>>>>> current request")
-        print(">>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<,,")
         resource_ids, org_id, user = data + ('',) * (3 - len(data))
         if not user:
-            if current_request:
-                user = str(current_request.user)
-            else:
-                user = 'System'
-
+            user = str(current_request.user) if current_request else 'System'
         task_display = getattr(task, 'verbose_name', _('Unknown'))
         detail = i18n_fmt(
             gettext_noop('User %s perform a task for this resource: %s'),
             user, task_display
         )
-
         return resource_ids, detail, org_id
 
 
@@ -177,15 +167,15 @@ def create_activities(resource_ids, detail, detail_id, action, org_id):
 
 @signals.after_task_publish.connect
 def after_task_publish_for_activity_log(headers=None, body=None, **kwargs):
-    task_id = headers.get('id')
+    """ Tip: https://docs.celeryq.dev/en/stable/internals/protocol.html#message-protocol-task-v2 """
     try:
+        task_id = headers.get('id')
         resource_ids, detail, org_id = ActivityLogHandler.task_log_for_celery(headers, body)
-    except Exception:
-        logger.error('Get celery task info error', exc_info=True)
-        return
-
-    logger.debug('Create activity log for celery task: {}'.format(task_id))
-    create_activities(resource_ids, detail, task_id, ActivityChoices.task, org_id)
+    except Exception as e:
+        logger.error(f'Get celery task info error: {e}', exc_info=True)
+    else:
+        logger.debug(f'Create activity log for celery task: {task_id}')
+        create_activities(resource_ids, detail, task_id, action=ActivityChoices.task, org_id=org_id)
 
 
 model_activity_handler_map = {
