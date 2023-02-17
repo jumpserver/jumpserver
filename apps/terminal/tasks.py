@@ -80,14 +80,14 @@ def upload_session_replay_to_external_storage(session_id):
     return
 
 
-@shared_task(verbose_name=_('Run applet host deployment'))
+@shared_task(verbose_name=_('Run applet host deployment'), activity_callback=lambda did: ([did], ))
 def run_applet_host_deployment(did):
     with tmp_to_builtin_org(system=1):
         deployment = AppletHostDeployment.objects.get(id=did)
         deployment.start()
 
 
-@shared_task(verbose_name=_('Install applet'))
+@shared_task(verbose_name=_('Install applet'), activity_callback=lambda did, applet_id: ([did],))
 def run_applet_host_deployment_install_applet(did, applet_id):
     with tmp_to_builtin_org(system=1):
         deployment = AppletHostDeployment.objects.get(id=did)

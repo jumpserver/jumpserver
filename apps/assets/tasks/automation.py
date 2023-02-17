@@ -8,7 +8,22 @@ from assets.const import AutomationTypes
 logger = get_logger(__file__)
 
 
-@shared_task(queue='ansible', verbose_name=_('Asset execute automation'))
+def task_activity_callback(self, pid, trigger, tp):
+    model = AutomationTypes.get_type_model(tp)
+    with tmp_to_root_org():
+        instance = get_object_or_none(model, pk=pid)
+    if not instance:
+        return
+    if not instance.latest_execution:
+        return
+    resource_ids = instance.latest_execution.get_all_asset_ids()
+    return resource_ids, instance.org_id
+
+
+@shared_task(
+    queue='ansible', verbose_name=_('Asset execute automation'),
+    activity_callback=task_activity_callback
+)
 def execute_automation(pid, trigger, tp):
     model = AutomationTypes.get_type_model(tp)
     with tmp_to_root_org():

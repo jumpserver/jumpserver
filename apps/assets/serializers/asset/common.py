@@ -68,8 +68,8 @@ class AssetAccountSerializer(
     class Meta:
         model = Account
         fields_mini = [
-            'id', 'name', 'username', 'privileged', 'is_active',
-            'version', 'secret_type',
+            'id', 'name', 'username', 'privileged',
+            'is_active', 'version', 'secret_type',
         ]
         fields_write_only = [
             'secret', 'push_now', 'template'
@@ -259,8 +259,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
     def accounts_create(accounts_data, asset):
         for data in accounts_data:
             data['asset'] = asset
-            secret = data.get('secret')
-            data['secret'] = decrypt_password(secret) if secret else secret
             AssetAccountSerializer().create(data)
 
     @atomic
@@ -274,8 +272,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
 
     @atomic
     def update(self, instance, validated_data):
-        if not validated_data.get('accounts'):
-            validated_data.pop('accounts', None)
         nodes_display = validated_data.pop('nodes_display', '')
         instance = super().update(instance, validated_data)
         self.perform_nodes_display_create(instance, nodes_display)

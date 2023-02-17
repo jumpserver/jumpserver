@@ -8,18 +8,20 @@ from accounts.const import AutomationTypes
 from accounts.models import AccountBackupAutomation
 from assets.models import Asset, Node
 from audits.models import ActivityLog
-from common.utils import get_object_or_none, i18n_fmt
+from common.utils import get_object_or_none, i18n_fmt, get_logger
 from jumpserver.utils import current_request
 from ops.celery import app
-from orgs.utils import tmp_to_root_org
 from orgs.models import Organization
+from orgs.utils import tmp_to_root_org, current_org
 from terminal.models import Session
 from users.models import User
 from ..const import ActivityChoices
 from ..models import UserLoginLog
 
+logger = get_logger(__name__)
 
-class ActivityLogHandler(object):
+
+class TaskActivityHandler(object):
 
     @staticmethod
     def _func_accounts_execute_automation(*args, **kwargs):
@@ -80,12 +82,6 @@ class ActivityLogHandler(object):
             asset_ids = node.get_all_assets().values_list('id', flat=True)
         return '', asset_ids
 
-    def get_celery_task_info(self, task_name, *args, **kwargs):
-        task_display, resource_ids = self.get_info_by_task_name(
-            task_name, *args, **kwargs
-        )
-        return task_display, resource_ids
-
     @staticmethod
     def get_task_display(task_name, **kwargs):
         task = app.tasks.get(task_name)
@@ -107,6 +103,8 @@ class ActivityLogHandler(object):
                 task_display = '%s-%s' % (task_display, task_type)
         return task_display, resource_ids
 
+
+class ActivityLogHandler:
     @staticmethod
     def session_for_activity(obj):
         detail = i18n_fmt(
@@ -119,75 +117,84 @@ class ActivityLogHandler(object):
     def login_log_for_activity(obj):
         login_status = gettext_noop('Success') if obj.status else gettext_noop('Failed')
         detail = i18n_fmt(gettext_noop('User %s login system %s'), obj.username, login_status)
-        user_id = User.objects.filter(username=obj.username).values('id').first()
+
+        username = obj.username
+        user_id = User.objects.filter(username=username) \
+            .values_list('id', flat=True).first()
         resource_list = []
         if user_id:
-            resource_list = [user_id['id']]
+            resource_list = [user_id]
         return resource_list, detail, ActivityChoices.login_log, Organization.SYSTEM_ID
 
+    @staticmethod
+    def task_log_for_celery(headers, body):
+        task_id, task_name = headers.get('id'), headers.get('task')
+        task = app.tasks.get(task_name)
+        if not task:
+            raise ValueError('Task not found: {}'.format(task_name))
+        activity_callback = getattr(task, 'activity_callback', None)
+        if not callable(activity_callback):
+            return [], '', ''
+        args, kwargs = body[:2]
+        data = activity_callback(*args, **kwargs)
+        if data is None:
+            return [], '', ''
+        resource_ids, org_id, user = data + ('',) * (3 - len(data))
+        if not user:
+            user = str(current_request.user) if current_request else 'System'
+        if org_id is None:
+            org_id = current_org.org_id
+        task_display = getattr(task, 'verbose_name', _('Unknown'))
+        detail = i18n_fmt(
+            gettext_noop('User %s perform a task for this resource: %s'),
+            user, task_display
+        )
+        return resource_ids, detail, org_id
 
-activity_handler = ActivityLogHandler()
 
-
-@signals.before_task_publish.connect
-def before_task_publish_for_activity_log(headers=None, **kwargs):
-    task_id, task_name = headers.get('id'), headers.get('task')
-    args, kwargs = kwargs['body'][:2]
-    task_display, resource_ids = activity_handler.get_celery_task_info(
-        task_name, args, **kwargs
-    )
-    if not current_request:
-        user = 'System'
-    else:
-        user = str(current_request.user)
-
-    detail = i18n_fmt(
-        gettext_noop('User %s perform a task (%s) for this resource'),
-        user, task_display
-    )
+def create_activities(resource_ids, detail, detail_id, action, org_id):
+    if not resource_ids:
+        return
     activities = [
-        ActivityLog(resource_id=resource_id, type=ActivityChoices.task, detail=detail)
+        ActivityLog(
+            resource_id=getattr(resource_id, 'pk', resource_id),
+            type=action, detail=detail, detail_id=detail_id, org_id=org_id
+        )
         for resource_id in resource_ids
     ]
     ActivityLog.objects.bulk_create(activities)
-    activity_info = {
-        'activity_ids': [a.id for a in activities]
-    }
-    kwargs['activity_info'] = activity_info
+    return activities
 
 
-@signals.task_prerun.connect
-def on_celery_task_pre_run_for_activity_log(task_id='', **kwargs):
-    activity_info = kwargs['kwargs'].pop('activity_info', None)
-    if activity_info is None:
-        return
+@signals.after_task_publish.connect
+def after_task_publish_for_activity_log(headers=None, body=None, **kwargs):
+    """ Tip: https://docs.celeryq.dev/en/stable/internals/protocol.html#message-protocol-task-v2 """
+    try:
+        task_id = headers.get('id')
+        resource_ids, detail, org_id = ActivityLogHandler.task_log_for_celery(headers, body)
+    except Exception as e:
+        logger.error(f'Get celery task info error: {e}', exc_info=True)
+    else:
+        logger.debug(f'Create activity log for celery task: {task_id}')
+        create_activities(resource_ids, detail, task_id, action=ActivityChoices.task, org_id=org_id)
 
-    activities = []
-    for activity_id in activity_info['activity_ids']:
-        activities.append(
-            ActivityLog(id=activity_id, detail_id=task_id)
-        )
-    ActivityLog.objects.bulk_update(activities, ('detail_id',))
+
+model_activity_handler_map = {
+    Session: ActivityLogHandler.session_for_activity,
+    UserLoginLog: ActivityLogHandler.login_log_for_activity,
+}
 
 
 def on_session_or_login_log_created(sender, instance=None, created=False, **kwargs):
-    handler_mapping = {
-        'Session': activity_handler.session_for_activity,
-        'UserLoginLog': activity_handler.login_log_for_activity
-    }
-    model_name = sender._meta.object_name
-    if not created or model_name not in handler_mapping:
+    if not created:
         return
 
-    resource_ids, detail, act_type, org_id = handler_mapping[model_name](instance)
-    activities = [
-        ActivityLog(
-            resource_id=i, type=act_type, detail=detail,
-            detail_id=instance.id, org_id=org_id
-        )
-        for i in resource_ids
-    ]
-    ActivityLog.objects.bulk_create(activities)
+    func = model_activity_handler_map.get(sender)
+    if not func:
+        logger.error('Activity log handler not found: {}'.format(sender))
+
+    resource_ids, detail, act_type, org_id = func(instance)
+    return create_activities(resource_ids, detail, instance.id, act_type, org_id)
 
 
 for sd in [Session, UserLoginLog]:

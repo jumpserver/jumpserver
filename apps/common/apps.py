@@ -9,6 +9,7 @@ class CommonConfig(AppConfig):
 
     def ready(self):
         from . import signal_handlers
+        from . import tasks
         from .signals import django_ready
         excludes = ['migrate', 'compilemessages', 'makemigrations']
         for i in excludes:

@@ -80,6 +80,10 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
     def executed_amount(self):
         return self.executions.count()
 
+    @property
+    def latest_execution(self):
+        return self.executions.first()
+
     def execute(self, trigger=Trigger.manual):
         try:
             eid = current_task.request.id
@@ -125,12 +129,16 @@ class AutomationExecution(OrgModelMixin):
     def manager_type(self):
         return self.snapshot['type']
 
-    def get_all_assets(self):
+    def get_all_asset_ids(self):
         node_ids = self.snapshot['nodes']
         asset_ids = self.snapshot['assets']
         nodes = Node.objects.filter(id__in=node_ids)
         node_asset_ids = Node.get_nodes_all_assets(*nodes).values_list('id', flat=True)
         asset_ids = set(list(asset_ids) + list(node_asset_ids))
+        return asset_ids
+
+    def get_all_assets(self):
+        asset_ids = self.get_all_asset_ids()
         return Asset.objects.filter(id__in=asset_ids)
 
     def all_assets_group_by_platform(self):

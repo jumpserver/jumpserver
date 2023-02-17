@@ -25,7 +25,10 @@ def gather_asset_accounts_util(nodes, task_name):
     automation_execute_start(task_name, tp, task_snapshot)
 
 
-@shared_task(queue="ansible", verbose_name=_('Gather asset accounts'))
+@shared_task(
+    queue="ansible", verbose_name=_('Gather asset accounts'),
+    activity_callback=lambda self, node_ids, task_name=None: (node_ids, None)
+)
 def gather_asset_accounts(node_ids, task_name=None):
     if task_name is None:
         task_name = gettext_noop("Gather assets accounts")

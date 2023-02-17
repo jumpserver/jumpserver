@@ -49,6 +49,8 @@ def clean_ftp_log_period():
     FTPLog.objects.filter(date_start__lt=expired_day).delete()
 
 
+@shared_task(verbose_name=_('Clean audits log'))
+@register_as_period_task(interval=3600 * 24)
 def clean_celery_tasks_period():
     logger.debug("Start clean celery task history")
     expire_days = get_log_keep_day('TASK_LOG_KEEP_DAYS')

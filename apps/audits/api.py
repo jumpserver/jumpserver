@@ -3,7 +3,7 @@
 from importlib import import_module
 
 from django.conf import settings
-from django.db.models import F, Value, CharField
+from django.db.models import F, Value, CharField, Q
 from rest_framework import generics
 from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
@@ -14,6 +14,7 @@ from common.plugins.es import QuerySet as ESQuerySet
 from ops.models.job import JobAuditLog
 from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet
 from orgs.utils import current_org, tmp_to_root_org
+from users.models import User
 from .backends import TYPE_ENGINE_MAPPING
 from .const import ActivityChoices
 from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog, ActivityLog
@@ -92,8 +93,12 @@ class ResourceActivityAPIView(generics.ListAPIView):
     }
 
     @staticmethod
-    def get_operate_log_qs(fields, limit=30, **filters):
-        queryset = OperateLog.objects.filter(**filters).annotate(
+    def get_operate_log_qs(fields, limit=30, resource_id=None):
+        q = Q(resource_id=resource_id)
+        user = User.objects.filter(id=resource_id).first()
+        if user:
+            q |= Q(user=str(user))
+        queryset = OperateLog.objects.filter(q).annotate(
             r_type=Value(ActivityChoices.operate_log, CharField()),
             r_detail_id=F('id'), r_detail=Value(None, CharField()),
             r_user=F('user'), r_action=F('action'),

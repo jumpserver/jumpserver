@@ -92,7 +92,6 @@ INSTALLED_APPS = [
     'acls.apps.AclsConfig',
     'notifications.apps.NotificationsConfig',
     'rbac.apps.RBACConfig',
-    'common.apps.CommonConfig',
     'jms_oidc_rp',
     'rest_framework',
     'rest_framework_swagger',
@@ -111,6 +110,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.forms',
+    'common.apps.CommonConfig',  # 这个放到内置的最后, django ready
     'simple_history',  # 这个要放到最后，别特么瞎改顺序
 ]
 

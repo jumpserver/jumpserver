@@ -19,7 +19,19 @@ from .notifications import ServerPerformanceCheckUtil
 logger = get_logger(__file__)
 
 
-@shared_task(soft_time_limit=60, queue="ansible", verbose_name=_("Run ansible task"))
+def job_task_activity_callback(self, job_id, trigger):
+    job = get_object_or_none(Job, id=job_id)
+    if not job:
+        return
+    resource_ids = [job.id]
+    org_id = job.org_id
+    return resource_ids, org_id
+
+
+@shared_task(
+    soft_time_limit=60, queue="ansible", verbose_name=_("Run ansible task"),
+    activity_callback=job_task_activity_callback
+)
 def run_ops_job(job_id):
     job = get_object_or_none(Job, id=job_id)
     with tmp_to_org(job.org):
@@ -36,7 +48,19 @@ def run_ops_job(job_id):
             logger.error("Start adhoc execution error: {}".format(e))
 
 
-@shared_task(soft_time_limit=60, queue="ansible", verbose_name=_("Run ansible task execution"))
+def job_execution_task_activity_callback(self, execution_id, trigger):
+    execution = get_object_or_none(JobExecution, id=execution_id)
+    if not execution:
+        return
+    resource_ids = [execution.id]
+    org_id = execution.org_id
+    return resource_ids, org_id
+
+
+@shared_task(
+    soft_time_limit=60, queue="ansible", verbose_name=_("Run ansible task execution"),
+    activity_callback=job_execution_task_activity_callback
+)
 def run_ops_job_execution(execution_id, **kwargs):
     execution = get_object_or_none(JobExecution, id=execution_id)
     try:

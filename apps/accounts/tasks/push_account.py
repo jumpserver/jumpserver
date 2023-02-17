@@ -33,7 +33,10 @@ def push_accounts_to_assets_util(accounts, assets):
         push_util(account, assets, task_name)
 
 
-@shared_task(queue="ansible", verbose_name=_('Push accounts to assets'))
+@shared_task(
+    queue="ansible", verbose_name=_('Push accounts to assets'),
+    activity_callback=lambda self, account_ids, asset_ids: (account_ids, None)
+)
 def push_accounts_to_assets(account_ids, asset_ids):
     from assets.models import Asset
     from accounts.models import Account
