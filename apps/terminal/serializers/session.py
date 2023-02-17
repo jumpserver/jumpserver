@@ -1,10 +1,10 @@
-from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from assets.const import Protocol
 from common.serializers.fields import LabeledChoiceField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+from ..const import SessionType
 from ..models import Session
 
 __all__ = [
@@ -13,10 +13,6 @@ __all__ = [
 ]
 
 
-class SessionType(models.TextChoices):
-    normal = 'normal', _('Normal')
-    tunnel = 'tunnel', _('Tunnel')
-    command = 'command', _('Command')
 
 
 class SessionSerializer(BulkOrgResourceModelSerializer):

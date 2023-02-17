@@ -15,6 +15,7 @@ from assets.models import Asset
 from common.utils import get_object_or_none, lazyproperty
 from orgs.mixins.models import OrgModelMixin
 from terminal.backends import get_multi_command_storage
+from terminal.const import SessionType
 from users.models import User
 
 
@@ -124,6 +125,9 @@ class Session(OrgModelMixin):
             return False
         if self.login_from == self.LOGIN_FROM.RT:
             return False
+        if self.type != SessionType.normal:
+            # 会话监控仅支持 normal，不支持 tunnel 和 command
+            return False
         if self.protocol in [
             Protocol.ssh, Protocol.vnc, Protocol.rdp,
             Protocol.telnet, Protocol.k8s
@@ -153,7 +157,7 @@ class Session(OrgModelMixin):
             return None, e
 
         if settings.SERVER_REPLAY_STORAGE:
-            from ..tasks import upload_session_replay_to_external_storage
+            from terminal.tasks import upload_session_replay_to_external_storage
             upload_session_replay_to_external_storage.delay(str(self.id))
         return name, None
 

@@ -11,15 +11,14 @@ from rest_framework.permissions import IsAuthenticated
 from common.api import JMSGenericViewSet
 from common.drf.filters import DatetimeRangeFilter
 from common.plugins.es import QuerySet as ESQuerySet
-from ops.models.job import JobAuditLog
 from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet
 from orgs.utils import current_org, tmp_to_root_org
 from orgs.models import Organization
 from users.models import User
 from .backends import TYPE_ENGINE_MAPPING
 from .const import ActivityChoices
-from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog, ActivityLog
-from .serializers import FTPLogSerializer, UserLoginLogSerializer, JobAuditLogSerializer
+from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog, ActivityLog, JobLog
+from .serializers import FTPLogSerializer, UserLoginLogSerializer, JobLogSerializer
 from .serializers import (
     OperateLogSerializer, OperateLogActionDetailSerializer,
     PasswordChangeLogSerializer, ActivityUnionLogSerializer,
@@ -27,13 +26,13 @@ from .serializers import (
 
 
 class JobAuditViewSet(OrgBulkModelViewSet):
-    model = JobAuditLog
+    model = JobLog
     extra_filter_backends = [DatetimeRangeFilter]
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
     ]
     search_fields = ['creator__name', 'material']
-    serializer_class = JobAuditLogSerializer
+    serializer_class = JobLogSerializer
     ordering = ['-date_start']
     http_method_names = ('get', 'head', 'options')
 

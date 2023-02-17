@@ -7,6 +7,7 @@ from django.utils.translation import gettext, ugettext_lazy as _
 
 from common.db.encoder import ModelJSONFieldEncoder
 from common.utils import lazyproperty
+from ops.models import JobExecution
 from orgs.mixins.models import OrgModelMixin, Organization
 from orgs.utils import current_org
 from .const import (
@@ -24,7 +25,18 @@ __all__ = [
     "ActivityLog",
     "PasswordChangeLog",
     "UserLoginLog",
+    "JobLog"
 ]
+
+
+class JobLog(JobExecution):
+    @property
+    def creator_name(self):
+        return self.creator.name
+
+    class Meta:
+        proxy = True
+        verbose_name = _("Job audit log")
 
 
 class FTPLog(OrgModelMixin):

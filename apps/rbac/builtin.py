@@ -30,7 +30,7 @@ system_user_perms = (
 _auditor_perms = (
     ('rbac', 'menupermission', 'view', 'audit'),
     ('audits', '*', '*', '*'),
-    ('ops', 'jobauditlog', '*', '*'),
+    ('audits', 'joblog', '*', '*'),
     ('terminal', 'commandstorage', 'view', 'commandstorage'),
     ('terminal', 'sessionreplay', 'view,download', 'sessionreplay'),
     ('terminal', 'session', '*', '*'),

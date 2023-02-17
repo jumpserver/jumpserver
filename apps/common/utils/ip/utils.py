@@ -1,9 +1,11 @@
+import socket
 from ipaddress import ip_network, ip_address
+
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
-from .ipip import get_ip_city_by_ipip
 from .geoip import get_ip_city_by_geoip
+from .ipip import get_ip_city_by_ipip
 
 
 def is_ip_address(address):
@@ -89,3 +91,11 @@ def get_ip_city(ip):
         if country == '中国' and is_zh:
             return city
     return get_ip_city_by_geoip(ip)
+
+
+def lookup_domain(domain):
+    try:
+        return socket.gethostbyname(domain)
+    except Exception as e:
+        print("Cannot resolve %s: Unknown host, %s" % (domain, e))
+        return None

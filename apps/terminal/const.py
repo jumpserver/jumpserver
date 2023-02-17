@@ -59,3 +59,9 @@ class PublishStatus(TextChoices):
     success = 'success', _("Success")
     failed = 'failed', _("Failed")
     mismatch = 'mismatch', _("Mismatch")
+
+
+class SessionType(TextChoices):
+    normal = 'normal', _('Normal')
+    tunnel = 'tunnel', _('Tunnel')
+    command = 'command', _('Command')
