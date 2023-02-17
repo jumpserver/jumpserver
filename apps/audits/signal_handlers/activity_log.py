@@ -12,7 +12,7 @@ from common.utils import get_object_or_none, i18n_fmt, get_logger
 from jumpserver.utils import current_request
 from ops.celery import app
 from orgs.models import Organization
-from orgs.utils import tmp_to_root_org
+from orgs.utils import tmp_to_root_org, current_org
 from terminal.models import Session
 from users.models import User
 from ..const import ActivityChoices
@@ -139,10 +139,11 @@ class ActivityLogHandler:
         data = activity_callback(*args, **kwargs)
         if data is None:
             return [], '', ''
-
         resource_ids, org_id, user = data + ('',) * (3 - len(data))
         if not user:
             user = str(current_request.user) if current_request else 'System'
+        if org_id is None:
+            org_id = current_org.org_id
         task_display = getattr(task, 'verbose_name', _('Unknown'))
         detail = i18n_fmt(
             gettext_noop('User %s perform a task for this resource: %s'),
