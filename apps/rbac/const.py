@@ -79,6 +79,7 @@ exclude_permissions = (
     ('ops', 'celerytaskexecution', 'add,change,delete', 'celerytaskexecution'),
     ('orgs', 'organizationmember', '*', '*'),
     ('settings', 'setting', 'add,change,delete', 'setting'),
+    ('audits', 'joblog', 'add,delete,change', '*'),
     ('audits', 'operatelog', 'add,delete,change', 'operatelog'),
     ('audits', 'activitylog', 'add,delete,change', 'activitylog'),
     ('audits', 'passwordchangelog', 'add,change,delete', 'passwordchangelog'),

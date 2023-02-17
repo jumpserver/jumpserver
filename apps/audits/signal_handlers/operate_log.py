@@ -159,7 +159,7 @@ def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
         'MessageContent', 'SiteMessage',
         'PlatformAutomation', 'PlatformProtocol', 'Protocol',
         'HistoricalAccount', 'GatheredUser', 'ApprovalRule',
-        'BaseAutomation', 'CeleryTask', 'Command', 'JobAuditLog',
+        'BaseAutomation', 'CeleryTask', 'Command', 'JobLog',
         'ConnectionToken', 'SessionJoinRecord',
         'HistoricalJob', 'Status', 'TicketStep', 'Ticket',
         'UserAssetGrantedTreeNodeRelation', 'TicketAssignee',

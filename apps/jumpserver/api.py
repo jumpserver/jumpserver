@@ -13,11 +13,11 @@ from rest_framework.views import APIView
 from assets.const import AllTypes
 from assets.models import Asset
 from audits.const import LoginStatusChoices
-from audits.models import UserLoginLog, PasswordChangeLog, OperateLog, FTPLog
+from audits.models import UserLoginLog, PasswordChangeLog, OperateLog, FTPLog, JobLog
 from common.utils import lazyproperty
 from common.utils.timezone import local_now, local_zero_hour
 from ops.const import JobStatus
-from ops.models import Job, JobExecution, JobAuditLog
+from ops.models import Job, JobExecution
 from orgs.caches import OrgResourceStatisticsCache
 from orgs.utils import current_org
 from terminal.models import Session, Command
@@ -123,7 +123,7 @@ class DateTimeMixin:
     @lazyproperty
     def job_logs_queryset(self):
         t = self.days_to_datetime
-        queryset = JobAuditLog.objects.filter(date_created__gte=t)
+        queryset = JobLog.objects.filter(date_created__gte=t)
         return queryset
 
     @lazyproperty
@@ -138,7 +138,7 @@ class DatesLoginMetricMixin:
     command_queryset: Command.objects
     sessions_queryset: Session.objects
     ftp_logs_queryset: OperateLog.objects
-    job_logs_queryset: JobAuditLog.objects
+    job_logs_queryset: JobLog.objects
     login_logs_queryset: UserLoginLog.objects
     operate_logs_queryset: OperateLog.objects
     password_change_logs_queryset: PasswordChangeLog.objects

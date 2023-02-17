@@ -64,5 +64,8 @@ class Migration(migrations.Migration):
             name='material',
             field=models.CharField(blank=True, default='', max_length=1024, null=True, verbose_name='Material'),
         ),
+        migrations.DeleteModel(
+            name='JobAuditLog',
+        ),
         migrations.RunPython(compatible),
     ]
