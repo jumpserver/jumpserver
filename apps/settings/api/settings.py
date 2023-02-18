@@ -62,6 +62,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'cas': 'settings.change_auth',
         'sso': 'settings.change_auth',
         'saml2': 'settings.change_auth',
+        'oauth2': 'settings.change_auth',
         'clean': 'settings.change_clean',
         'other': 'settings.change_other',
         'sms': 'settings.change_sms',
