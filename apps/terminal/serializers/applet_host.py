@@ -108,11 +108,6 @@ class AppletHostDeployAppletSerializer(AppletHostDeploymentSerializer):
     class Meta(AppletHostDeploymentSerializer.Meta):
         fields = AppletHostDeploymentSerializer.Meta.fields + ['applet_id']
 
-    def create(self, validated_data):
-        applet_id = validated_data.pop('applet_id', None)
-        deployment = super().create(validated_data)
-        return deployment
-
 
 class AppletHostAccountSerializer(serializers.ModelSerializer):
     class Meta:
