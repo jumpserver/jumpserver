@@ -8,6 +8,7 @@ from rest_framework import generics
 from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
 
+from common.utils import is_uuid
 from common.api import JMSGenericViewSet
 from common.drf.filters import DatetimeRangeFilter
 from common.plugins.es import QuerySet as ESQuerySet
@@ -93,9 +94,10 @@ class ResourceActivityAPIView(generics.ListAPIView):
 
     @staticmethod
     def get_operate_log_qs(fields, limit=30, resource_id=None):
-        q = Q(resource_id=resource_id)
-        user = User.objects.filter(id=resource_id).first()
-        if user:
+        q, user = Q(resource_id=resource_id), None
+        if is_uuid(resource_id):
+            user = User.objects.filter(id=resource_id).first()
+        if user is not None:
             q |= Q(user=str(user))
         queryset = OperateLog.objects.filter(q).annotate(
             r_type=Value(ActivityChoices.operate_log, CharField()),
