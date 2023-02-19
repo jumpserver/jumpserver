@@ -227,6 +227,9 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
     def validate_nodes(self, nodes):
         if nodes:
             return nodes
+        nodes_display = self.initial_data.get('nodes_display')
+        if nodes_display:
+            return nodes
         request = self.context.get('request')
         if not request:
             return []
