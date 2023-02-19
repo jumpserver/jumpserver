@@ -97,7 +97,7 @@ class ResourceActivityAPIView(generics.ListAPIView):
         q, user = Q(resource_id=resource_id), None
         if is_uuid(resource_id):
             user = User.objects.filter(id=resource_id).first()
-        if user:
+        if user is not None:
             q |= Q(user=str(user))
         queryset = OperateLog.objects.filter(q).annotate(
             r_type=Value(ActivityChoices.operate_log, CharField()),
