@@ -6,6 +6,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
+from rest_framework.utils.encoders import JSONEncoder
 
 from common.local import add_encrypted_field_set
 from common.utils import signer, crypto
@@ -46,7 +47,7 @@ class JsonMixin:
 
     @staticmethod
     def json_encode(data):
-        return json.dumps(data)
+        return json.dumps(data, cls=JSONEncoder)
 
     def from_db_value(self, value, expression, connection, context=None):
         if value is None:
