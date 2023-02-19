@@ -8,6 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('audits', '0020_auto_20230117_1004'),
+        ('ops', '0023_auto_20220912_0021'),
     ]
 
     operations = [
