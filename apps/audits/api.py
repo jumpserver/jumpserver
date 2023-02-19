@@ -13,7 +13,6 @@ from common.api import JMSGenericViewSet
 from common.drf.filters import DatetimeRangeFilter
 from common.plugins.es import QuerySet as ESQuerySet
 from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet
-from orgs.models import Organization
 from orgs.utils import current_org, tmp_to_root_org
 from users.models import User
 from .backends import TYPE_ENGINE_MAPPING
@@ -151,9 +150,7 @@ class OperateLogViewSet(RetrieveModelMixin, ListModelMixin, OrgGenericViewSet):
 
     def get_queryset(self):
         with tmp_to_root_org():
-            qs = OperateLog.objects.filter(
-                Q(org_id=current_org.id) | Q(org_id=Organization.SYSTEM_ID)
-            )
+            qs = OperateLog.objects.all()
         es_config = settings.OPERATE_LOG_ELASTICSEARCH_CONFIG
         if es_config:
             engine_mod = import_module(TYPE_ENGINE_MAPPING['es'])
