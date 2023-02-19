@@ -82,5 +82,5 @@ class LDAPSettingSerializer(serializers.Serializer):
 
     @staticmethod
     def post_save():
-        from users.tasks import import_ldap_user_periodic
+        from settings.tasks import import_ldap_user_periodic
         import_ldap_user_periodic()
