@@ -21,9 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 def default_node():
-    from orgs.utils import current_org
-    from ..node import Node
-    return Node(id=current_org.id)
+    return []
 
 
 class AssetManager(OrgManager):
