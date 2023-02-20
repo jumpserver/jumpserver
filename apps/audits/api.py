@@ -30,6 +30,7 @@ class JobAuditViewSet(OrgReadonlyModelViewSet):
         ('date_start', ('date_from', 'date_to'))
     ]
     search_fields = ['creator__name', 'material']
+    filterset_fields = ['creator__name', 'material']
     serializer_class = JobLogSerializer
     ordering = ['-date_start']
 
