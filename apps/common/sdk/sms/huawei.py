@@ -86,8 +86,11 @@ class HuaweiSMS(BaseSMSClient):
         except Exception as error:
             raise JMSException(code='response_bad', detail=error)
 
-        if resp_msg.get('code') != '000000':
-            raise JMSException(code='response_bad', detail=resp_msg)
+        resp_code = resp_msg.get('code', '')
+        resp_desc = resp_msg.get('description', '')
+        if resp_code != '000000':
+            raise JMSException(code='response_bad',
+                               detail="{}:{},{}:{}".format("code", resp_code, "description", resp_desc))
         return resp_msg
 
 
