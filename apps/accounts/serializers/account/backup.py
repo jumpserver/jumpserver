@@ -31,7 +31,8 @@ class AccountBackupSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSer
             'executed_amount': {'label': _('Executed amount')},
             'recipients': {'label': _('Recipient'), 'help_text': _(
                 'Currently only mail sending is supported'
-            )}
+            )},
+            'types': {'label': _('Asset type')}
         }
 
 
