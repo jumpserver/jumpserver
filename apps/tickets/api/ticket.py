@@ -2,13 +2,13 @@
 #
 from rest_framework import viewsets
 from rest_framework.decorators import action
-from rest_framework.response import Response
 from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.response import Response
 
-from orgs.utils import tmp_to_root_org
-from rbac.permissions import RBACPermission
 from common.api import CommonApiMixin
 from common.const.http import POST, PUT, PATCH
+from orgs.utils import tmp_to_root_org
+from rbac.permissions import RBACPermission
 from tickets import filters
 from tickets import serializers
 from tickets.models import (
@@ -39,6 +39,14 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     rbac_perms = {
         'open': 'tickets.view_ticket',
     }
+
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        with tmp_to_root_org():
+            serializer = self.get_serializer(instance)
+            data = serializer.data
+        return Response(data)
 
     def create(self, request, *args, **kwargs):
         raise MethodNotAllowed(self.action)
