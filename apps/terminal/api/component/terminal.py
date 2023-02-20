@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 #
 import logging
-
+from django.db.models import Q
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.views import APIView, Response
+from django_filters import rest_framework as filters
 
+from common.drf.filters import BaseFilterSet
 from common.api import JMSBulkModelViewSet
 from common.exceptions import JMSException
 from common.permissions import WithBootstrapToken
@@ -21,10 +23,28 @@ __all__ = [
 logger = logging.getLogger(__file__)
 
 
+class TerminalFilterSet(BaseFilterSet):
+    name = filters.CharFilter(field_name='name', lookup_expr='icontains')
+    remote_addr = filters.CharFilter(field_name='remote_addr', lookup_expr='icontains')
+
+    class Meta:
+        model = Terminal
+        fields = ['name', 'remote_addr', 'type']
+
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        search = self.request.query_params.get('search')
+        if not search:
+            return queryset
+        q = Q(name__icontains=search) | Q(remote_addr__icontains=search)
+        queryset = queryset.filter(q)
+        return queryset
+
+
 class TerminalViewSet(JMSBulkModelViewSet):
     queryset = Terminal.objects.filter(is_deleted=False)
     serializer_class = serializers.TerminalSerializer
-    filterset_fields = ['name', 'remote_addr', 'type']
+    filterset_class = TerminalFilterSet
     custom_filter_fields = ['load']
 
     def destroy(self, request, *args, **kwargs):
