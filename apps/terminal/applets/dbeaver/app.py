@@ -70,7 +70,8 @@ class AppletApplication(BaseApplication):
         startupinfo = subprocess.STARTUPINFO()
         startupinfo.dwFlags = subprocess.CREATE_NEW_CONSOLE | subprocess.STARTF_USESHOWWINDOW
         startupinfo.wShowWindow = subprocess.SW_HIDE
-        ret = subprocess.Popen([self.path, '-con', params], startupinfo=startupinfo)
+        exec_string = '%s -con %s' % (self.path, params)
+        ret = subprocess.Popen(exec_string, startupinfo=startupinfo)
         self.pid = ret.pid
 
     def wait(self):
