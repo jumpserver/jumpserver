@@ -151,8 +151,12 @@ class BasePlaybookManager:
         return sub_playbook_path
 
     def get_runners(self):
+        # TODO 临时打印一下 找一下打印不出日志的原因
+        print('ansible runner: 任务开始执行')
+        assets_group_by_platform = self.get_assets_group_by_platform()
+        print('ansible runner: 获取资产分组', assets_group_by_platform)
         runners = []
-        for platform, assets in self.get_assets_group_by_platform().items():
+        for platform, assets in assets_group_by_platform.items():
             assets_bulked = [assets[i:i + self.bulk_size] for i in range(0, len(assets), self.bulk_size)]
 
             for i, _assets in enumerate(assets_bulked, start=1):
