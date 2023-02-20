@@ -79,7 +79,7 @@ class AccountHistoriesSecretAPI(RecordViewLogMixin, ListAPIView):
     http_method_names = ['get', 'options']
     permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
     rbac_perms = {
-        'list': 'assets.view_accountsecret',
+        'list': 'accounts.view_accountsecret',
     }
 
     def get_queryset(self):
