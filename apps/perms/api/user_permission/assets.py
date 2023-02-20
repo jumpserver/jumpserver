@@ -1,18 +1,17 @@
 import abc
+
 from rest_framework.generics import ListAPIView
 
-from assets.models import Asset, Node
 from assets.api.asset.asset import AssetFilterSet
+from assets.models import Asset, Node
+from common.utils import get_logger, lazyproperty
 from perms import serializers
 from perms.pagination import AllPermedAssetPagination
 from perms.pagination import NodePermedAssetPagination
 from perms.utils import UserPermAssetUtil
-from common.utils import get_logger, lazyproperty
-
 from .mixin import (
     SelfOrPKUserMixin
 )
-
 
 __all__ = [
     'UserAllPermedAssetsApi',
@@ -26,8 +25,8 @@ logger = get_logger(__name__)
 
 class BaseUserPermedAssetsApi(SelfOrPKUserMixin, ListAPIView):
     ordering = ('name',)
-    ordering_fields = ("name", "address")
     search_fields = ('name', 'address', 'comment')
+    ordering_fields = ("name", "address")
     filterset_class = AssetFilterSet
     serializer_class = serializers.AssetPermedSerializer
     only_fields = serializers.AssetPermedSerializer.Meta.only_fields

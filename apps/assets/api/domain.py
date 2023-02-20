@@ -3,8 +3,9 @@ from django.utils.translation import ugettext as _
 from django.views.generic.detail import SingleObjectMixin
 from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView, Response
-from common.utils import get_logger
+
 from assets.tasks import test_gateways_connectivity_manual
+from common.utils import get_logger
 from orgs.mixins.api import OrgBulkModelViewSet
 from .asset import HostViewSet
 from .. import serializers
@@ -18,14 +19,12 @@ class DomainViewSet(OrgBulkModelViewSet):
     model = Domain
     filterset_fields = ("name",)
     search_fields = filterset_fields
-    serializer_class = serializers.DomainSerializer
-    ordering_fields = ('name',)
     ordering = ('name',)
 
     def get_serializer_class(self):
         if self.request.query_params.get('gateway'):
             return serializers.DomainWithGatewaySerializer
-        return super().get_serializer_class()
+        return serializers.DomainSerializer
 
 
 class GatewayViewSet(HostViewSet):
