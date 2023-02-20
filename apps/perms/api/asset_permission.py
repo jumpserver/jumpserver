@@ -16,5 +16,4 @@ class AssetPermissionViewSet(OrgBulkModelViewSet):
     serializer_class = serializers.AssetPermissionSerializer
     filterset_class = AssetPermissionFilter
     search_fields = ('name',)
-    ordering_fields = ('name',)
     ordering = ('name',)

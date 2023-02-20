@@ -20,7 +20,6 @@ class AccountBackupPlanViewSet(OrgBulkModelViewSet):
     model = AccountBackupAutomation
     filter_fields = ('name',)
     search_fields = filter_fields
-    ordering_fields = ('name',)
     ordering = ('name',)
     serializer_class = serializers.AccountBackupSerializer
 

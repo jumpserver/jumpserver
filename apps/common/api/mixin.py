@@ -7,7 +7,7 @@ from django.db.models.signals import m2m_changed
 from rest_framework.response import Response
 
 from .action import RenderToJsonMixin
-from .filter import ExtraFilterFieldsMixin
+from .filter import ExtraFilterFieldsMixin, OrderingFielderFieldsMixin
 from .serializer import SerializerMixin
 
 __all__ = [
@@ -98,7 +98,6 @@ class QuerySetMixin:
         return queryset
 
 
-class CommonApiMixin(SerializerMixin, ExtraFilterFieldsMixin,
-                     QuerySetMixin, RenderToJsonMixin,
-                     PaginatedResponseMixin):
+class CommonApiMixin(SerializerMixin, ExtraFilterFieldsMixin, OrderingFielderFieldsMixin,
+                     QuerySetMixin, RenderToJsonMixin, PaginatedResponseMixin):
     pass

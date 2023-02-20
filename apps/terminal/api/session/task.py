@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
 #
 import logging
-from rest_framework.views import APIView, Response
-from rest_framework_bulk import BulkModelViewSet
+
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView, Response
 
+from common.api import JMSBulkModelViewSet
 from common.utils import get_object_or_none
 from orgs.utils import tmp_to_root_org
-from terminal.models import Session, Task
 from terminal import serializers
+from terminal.models import Session, Task
 from terminal.utils import is_session_approver
 
 __all__ = ['TaskViewSet', 'KillSessionAPI', 'KillSessionForTicketAPI']
 logger = logging.getLogger(__file__)
 
 
-class TaskViewSet(BulkModelViewSet):
+class TaskViewSet(JMSBulkModelViewSet):
     queryset = Task.objects.all()
     serializer_class = serializers.TaskSerializer
     filterset_fields = ('is_finished',)
@@ -51,7 +52,7 @@ class KillSessionAPI(APIView):
 
 
 class KillSessionForTicketAPI(APIView):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
         session_ids = request.data
