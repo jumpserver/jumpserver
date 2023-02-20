@@ -60,9 +60,7 @@ class AccountSerializerCreateValidateMixin:
         return instance
 
 
-class AccountSerializerCreateMixin(
-    AccountSerializerCreateValidateMixin, BulkModelSerializer
-):
+class AccountSerializerCreateMixin(AccountSerializerCreateValidateMixin, BulkModelSerializer):
     template = serializers.BooleanField(
         default=False, label=_("Template"), write_only=True
     )
