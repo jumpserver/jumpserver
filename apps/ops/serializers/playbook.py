@@ -16,11 +16,10 @@ def parse_playbook_name(path):
 class PlaybookSerializer(BulkOrgResourceModelSerializer):
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
     path = serializers.FileField(required=False)
-    name = serializers.CharField(label=_('Name'), max_length=128, allow_blank=True, required=False)
 
     def to_internal_value(self, data):
         name = data.get('name', False)
-        if not name:
+        if not name and data.get('path'):
             data['name'] = parse_playbook_name(data['path'].name)
         return super().to_internal_value(data)
 
