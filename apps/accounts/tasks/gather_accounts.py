@@ -9,7 +9,7 @@ from assets.models import Node
 from common.utils import get_logger
 from orgs.utils import org_aware_func
 
-__all__ = ['gather_asset_accounts']
+__all__ = ['gather_asset_accounts_task']
 logger = get_logger(__name__)
 
 
@@ -29,7 +29,7 @@ def gather_asset_accounts_util(nodes, task_name):
     queue="ansible", verbose_name=_('Gather asset accounts'),
     activity_callback=lambda self, node_ids, task_name=None: (node_ids, None)
 )
-def gather_asset_accounts(node_ids, task_name=None):
+def gather_asset_accounts_task(node_ids, task_name=None):
     if task_name is None:
         task_name = gettext_noop("Gather assets accounts")
 

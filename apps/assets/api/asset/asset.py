@@ -6,7 +6,7 @@ from django.utils.translation import gettext as _
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from accounts.tasks import push_accounts_to_assets, verify_accounts_connectivity
+from accounts.tasks import push_accounts_to_assets_task, verify_accounts_connectivity_task
 from assets import serializers
 from assets.filters import IpInFilterBackend, LabelFilterBackend, NodeFilterBackend
 from assets.models import Asset, Gateway
@@ -205,9 +205,9 @@ class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
         asset_ids = [asset.id]
         account_ids = accounts.values_list("id", flat=True)
         if action == "push_account":
-            task = push_accounts_to_assets.delay(account_ids, asset_ids)
+            task = push_accounts_to_assets_task.delay(account_ids, asset_ids)
         elif action == "test_account":
-            task = verify_accounts_connectivity.delay(account_ids, asset_ids)
+            task = verify_accounts_connectivity_task.delay(account_ids, asset_ids)
         else:
             task = None
         return task

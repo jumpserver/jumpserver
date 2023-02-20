@@ -24,7 +24,7 @@ def task_activity_callback(self, pid, trigger, tp):
     queue='ansible', verbose_name=_('Account execute automation'),
     activity_callback=task_activity_callback
 )
-def execute_automation(pid, trigger, tp):
+def execute_account_automation_task(pid, trigger, tp):
     model = AutomationTypes.get_type_model(tp)
     with tmp_to_root_org():
         instance = get_object_or_none(model, pk=pid)

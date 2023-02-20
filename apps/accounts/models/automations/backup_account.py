@@ -7,11 +7,11 @@ from celery import current_task
 from django.db import models
 from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
-from common.utils import lazyproperty
 
 from common.const.choices import Trigger
 from common.db.encoder import ModelJSONFieldEncoder
 from common.utils import get_logger
+from common.utils import lazyproperty
 from ops.mixin import PeriodTaskModelMixin
 from orgs.mixins.models import OrgModelMixin, JMSOrgBaseModel
 
@@ -36,9 +36,9 @@ class AccountBackupAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
         verbose_name = _('Account backup plan')
 
     def get_register_task(self):
-        from ...tasks import execute_account_backup_plan
+        from ...tasks import execute_account_backup_task
         name = "account_backup_plan_period_{}".format(str(self.id)[:8])
-        task = execute_account_backup_plan.name
+        task = execute_account_backup_task.name
         args = (str(self.id), Trigger.timing)
         kwargs = {}
         return name, task, args, kwargs

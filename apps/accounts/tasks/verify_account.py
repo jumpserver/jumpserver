@@ -1,6 +1,6 @@
 from celery import shared_task
-from django.utils.translation import gettext_noop
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_noop
 
 from accounts.const import AutomationTypes
 from accounts.tasks.common import automation_execute_start
@@ -10,7 +10,7 @@ from orgs.utils import org_aware_func
 
 logger = get_logger(__name__)
 __all__ = [
-    'verify_accounts_connectivity'
+    'verify_accounts_connectivity_task'
 ]
 
 
@@ -42,7 +42,7 @@ def verify_accounts_connectivity_util(accounts, assets, task_name):
     queue="ansible", verbose_name=_('Verify asset account availability'),
     activity_callback=lambda self, account_ids, asset_ids: (account_ids, None)
 )
-def verify_accounts_connectivity(account_ids, asset_ids):
+def verify_accounts_connectivity_task(account_ids, asset_ids):
     from assets.models import Asset
     from accounts.models import Account, VerifyAccountAutomation
     assets = Asset.objects.filter(id__in=asset_ids)

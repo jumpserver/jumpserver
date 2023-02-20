@@ -25,17 +25,22 @@ router.register(r'push-account-executions', api.PushAccountExecutionViewSet, 'pu
 router.register(r'push-account-records', api.PushAccountRecordViewSet, 'push-account-record')
 
 urlpatterns = [
-    path('accounts/tasks/', api.AccountTaskCreateAPI.as_view(), name='account-task-create'),
-    path('account-secrets/<uuid:pk>/histories/', api.AccountHistoriesSecretAPI.as_view(), name='account-secret-history'),
+    path('accounts/tasks/', api.AccountsTaskCreateAPI.as_view(), name='account-task-create'),
+    path('account-secrets/<uuid:pk>/histories/', api.AccountHistoriesSecretAPI.as_view(),
+         name='account-secret-history'),
 
-    path('change-secret/<uuid:pk>/asset/remove/', api.ChangSecretRemoveAssetApi.as_view(), name='change-secret-remove-asset'),
+    path('change-secret/<uuid:pk>/asset/remove/', api.ChangSecretRemoveAssetApi.as_view(),
+         name='change-secret-remove-asset'),
     path('change-secret/<uuid:pk>/asset/add/', api.ChangSecretAddAssetApi.as_view(), name='change-secret-add-asset'),
-    path('change-secret/<uuid:pk>/nodes/', api.ChangSecretNodeAddRemoveApi.as_view(), name='change-secret-add-or-remove-node'),
+    path('change-secret/<uuid:pk>/nodes/', api.ChangSecretNodeAddRemoveApi.as_view(),
+         name='change-secret-add-or-remove-node'),
     path('change-secret/<uuid:pk>/assets/', api.ChangSecretAssetsListApi.as_view(), name='change-secret-assets'),
 
-    path('push-account/<uuid:pk>/asset/remove/', api.PushAccountRemoveAssetApi.as_view(), name='push-account-remove-asset'),
+    path('push-account/<uuid:pk>/asset/remove/', api.PushAccountRemoveAssetApi.as_view(),
+         name='push-account-remove-asset'),
     path('push-accountt/<uuid:pk>/asset/add/', api.PushAccountAddAssetApi.as_view(), name='push-account-add-asset'),
-    path('push-account/<uuid:pk>/nodes/', api.PushAccountNodeAddRemoveApi.as_view(), name='push-account-add-or-remove-node'),
+    path('push-account/<uuid:pk>/nodes/', api.PushAccountNodeAddRemoveApi.as_view(),
+         name='push-account-add-or-remove-node'),
     path('push-account/<uuid:pk>/assets/', api.PushAccountAssetsListApi.as_view(), name='push-account-assets'),
 ]
 

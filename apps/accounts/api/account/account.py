@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from accounts import serializers
 from accounts.filters import AccountFilterSet
 from accounts.models import Account
-from accounts.tasks import verify_accounts_connectivity
+from accounts.tasks import verify_accounts_connectivity_task, push_accounts_to_assets_task
 from assets.models import Asset
 from authentication.const import ConfirmType
 from common.permissions import UserConfirmation
@@ -15,7 +15,7 @@ from orgs.mixins.api import OrgBulkModelViewSet
 
 __all__ = [
     'AccountViewSet', 'AccountSecretsViewSet',
-    'AccountTaskCreateAPI', 'AccountHistoriesSecretAPI'
+    'AccountsTaskCreateAPI', 'AccountHistoriesSecretAPI'
 ]
 
 from rbac.permissions import RBACPermission
@@ -29,7 +29,6 @@ class AccountViewSet(OrgBulkModelViewSet):
         'default': serializers.AccountSerializer,
     }
     rbac_perms = {
-        'verify_account': 'accounts.test_account',
         'partial_update': ['accounts.change_account'],
         'su_from_accounts': 'accounts.view_account',
     }
@@ -48,14 +47,6 @@ class AccountViewSet(OrgBulkModelViewSet):
             accounts = []
         serializer = serializers.AccountSerializer(accounts, many=True)
         return Response(data=serializer.data)
-
-    @action(methods=['post'], detail=True, url_path='verify')
-    def verify_account(self, request, *args, **kwargs):
-        account = super().get_object()
-        account_ids = [account.id]
-        asset_ids = [account.asset_id]
-        task = verify_accounts_connectivity.delay(account_ids, asset_ids)
-        return Response(data={'task': task.id})
 
 
 class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
@@ -86,7 +77,7 @@ class AccountHistoriesSecretAPI(RecordViewLogMixin, ListAPIView):
         return self.model.objects.filter(id=self.kwargs.get('pk'))
 
 
-class AccountTaskCreateAPI(CreateAPIView):
+class AccountsTaskCreateAPI(CreateAPIView):
     serializer_class = serializers.AccountTaskSerializer
     search_fields = AccountViewSet.search_fields
     filterset_class = AccountViewSet.filterset_class
@@ -100,10 +91,16 @@ class AccountTaskCreateAPI(CreateAPIView):
         return queryset
 
     def perform_create(self, serializer):
+        data = serializer.validated_data
         accounts = self.get_accounts()
         account_ids = accounts.values_list('id', flat=True)
         asset_ids = [account.asset_id for account in accounts]
-        task = verify_accounts_connectivity.delay(account_ids, asset_ids)
+
+        if data['action'] == 'push':
+            task = push_accounts_to_assets_task.delay(account_ids, asset_ids)
+        else:
+            task = verify_accounts_connectivity_task.delay(account_ids, asset_ids)
+
         data = getattr(serializer, '_data', {})
         data["task"] = task.id
         setattr(serializer, '_data', data)
