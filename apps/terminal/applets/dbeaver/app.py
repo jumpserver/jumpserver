@@ -2,8 +2,7 @@ import os
 import time
 import win32api
 import shutil
-
-from pywinauto import Application
+import subprocess
 
 from common import wait_pid, BaseApplication
 
@@ -61,16 +60,18 @@ class AppletApplication(BaseApplication):
 
     def run(self):
         self.launch()
-        self.app = Application(backend='uia')
 
         function = getattr(self, '_get_%s_exec_params' % self.protocol, None)
         if function is None:
             params = self._get_exec_params()
         else:
             params = function()
-        exec_string = '%s -con %s' % (self.path, params)
-        self.app.start(exec_string, wait_for_idle=False)
-        self.pid = self.app.process
+
+        startupinfo = subprocess.STARTUPINFO()
+        startupinfo.dwFlags = subprocess.CREATE_NEW_CONSOLE | subprocess.STARTF_USESHOWWINDOW
+        startupinfo.wShowWindow = subprocess.SW_HIDE
+        ret = subprocess.Popen([self.path, '-con', params], startupinfo=startupinfo)
+        self.pid = ret.pid
 
     def wait(self):
         wait_pid(self.pid)
