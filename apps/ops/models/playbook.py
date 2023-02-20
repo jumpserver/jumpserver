@@ -28,6 +28,9 @@ class Playbook(JMSOrgBaseModel):
                                      verbose_name=_('CreateMethod'))
     vcs_url = models.CharField(max_length=1024, default='', verbose_name=_('VCS URL'), null=True, blank=True)
 
+    def __str__(self):
+        return self.name
+
     def check_dangerous_keywords(self):
         result = []
         for root, dirs, files in os.walk(self.work_dir):
