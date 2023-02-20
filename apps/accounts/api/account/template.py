@@ -23,6 +23,6 @@ class AccountTemplateSecretsViewSet(RecordViewLogMixin, AccountTemplateViewSet):
     http_method_names = ['get', 'options']
     permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
     rbac_perms = {
-        'list': 'assets.view_accounttemplatesecret',
-        'retrieve': 'assets.view_accounttemplatesecret',
+        'list': 'accounts.view_accounttemplatesecret',
+        'retrieve': 'accounts.view_accounttemplatesecret',
     }
