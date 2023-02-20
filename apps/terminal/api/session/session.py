@@ -22,6 +22,7 @@ from common.drf.renders import PassthroughRenderer
 from common.api import AsyncApiMixin
 from common.utils import data_to_json, is_uuid
 from common.utils import get_logger, get_object_or_none
+from rbac.permissions import RBACPermission
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import tmp_to_root_org, tmp_to_org
 from terminal import serializers
@@ -30,6 +31,7 @@ from terminal.utils import (
     find_session_replay_local, download_session_replay,
     is_session_approver, get_session_replay_url
 )
+from terminal.permissions import IsSessionAssignee
 from users.models import User
 
 __all__ = [
@@ -86,6 +88,7 @@ class SessionViewSet(OrgBulkModelViewSet):
     rbac_perms = {
         'download': ['terminal.download_sessionreplay']
     }
+    permission_classes = [RBACPermission | IsSessionAssignee]
 
     @staticmethod
     def prepare_offline_file(session, local_path):

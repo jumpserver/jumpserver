@@ -141,3 +141,6 @@ class RBACPermission(permissions.DjangoModelPermissions):
         has = request.user.has_perms(perms)
         logger.debug('View require perms: {}, result: {}'.format(perms, has))
         return has
+
+    def has_object_permission(self, request, view, obj):
+        return self.has_permission(request, view)
