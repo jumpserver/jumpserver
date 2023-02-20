@@ -68,6 +68,10 @@ class Applet(JMSBaseModel):
             return yaml.safe_load(f)
 
     @property
+    def xpack(self):
+        return self.manifest.get('xpack', False)
+
+    @property
     def icon(self):
         path = os.path.join(self.path, 'icon.png')
         if not os.path.exists(path):

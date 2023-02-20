@@ -2,13 +2,16 @@ from typing import Callable
 
 from django.shortcuts import get_object_or_404
 from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
 from rest_framework.request import Request
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from common.api import JMSModelViewSet
 from common.permissions import IsServiceAccount
+from common.exceptions import JMSObjectDoesNotExist
 from common.utils import is_uuid
+from jumpserver.utils import has_valid_xpack_license
 from orgs.utils import tmp_to_builtin_org
 from rbac.permissions import RBACPermission
 from terminal.models import AppletHost
@@ -67,12 +70,17 @@ class AppletHostAppletViewSet(HostMixin, JMSModelViewSet):
     def get_object(self):
         pk = self.kwargs.get('pk')
         if not is_uuid(pk):
-            return self.host.publications.get(applet__name=pk)
+            obj = self.host.publications.get(applet__name=pk)
         else:
-            return self.host.publications.get(pk=pk)
+            obj = self.host.publications.get(pk=pk)
+        if not has_valid_xpack_license() and obj.applet.xpack:
+            raise JMSObjectDoesNotExist(object_name=_('AppletPublication'))
+        return obj
 
     def get_queryset(self):
         queryset = self.host.publications.all()
+        if not has_valid_xpack_license():
+            queryset = [p for p in queryset if not p.applet.xpack]
         return queryset
 
     @action(methods=['post'], detail=False)
