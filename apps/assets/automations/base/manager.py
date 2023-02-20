@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 from collections import defaultdict
@@ -196,6 +197,30 @@ class BasePlaybookManager:
     def before_runner_start(self, runner):
         pass
 
+    @staticmethod
+    def delete_sensitive_data(path):
+        if settings.DEBUG_DEV:
+            return
+
+        with open(path, 'r') as f:
+            d = json.load(f)
+        def delete_keys(d, keys_to_delete):
+            """
+            递归函数：删除嵌套字典中的指定键
+            """
+            if not isinstance(d, dict):
+                return d
+            keys = list(d.keys())
+            for key in keys:
+                if key in keys_to_delete:
+                    del d[key]
+                else:
+                    delete_keys(d[key], keys_to_delete)
+            return d
+        d = delete_keys(d, ['secret', 'ansible_password'])
+        with open(path, 'w') as f:
+            json.dump(d, f)
+
     def run(self, *args, **kwargs):
         runners = self.get_runners()
         if len(runners) > 1:
@@ -213,6 +238,7 @@ class BasePlaybookManager:
             self.before_runner_start(runner)
             try:
                 cb = runner.run(**kwargs)
+                self.delete_sensitive_data(runner.inventory)
                 self.on_runner_success(runner, cb)
             except Exception as e:
                 self.on_runner_failed(runner, e)
