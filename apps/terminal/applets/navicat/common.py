@@ -103,6 +103,11 @@ class Specific(DictObj):
 
     # database
     db_name: str
+    use_ssl: str
+
+
+class Secret(DictObj):
+    client_key: str
 
 
 class Category(DictObj):
@@ -123,6 +128,7 @@ class Asset(DictObj):
     protocols: list[Protocol]
     category: Category
     spec_info: Specific
+    secret_info: Secret
 
     def get_protocol_port(self, protocol):
         for item in self.protocols:
