@@ -188,7 +188,7 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
         data = {
             'type': tp, 'src': url,
             'user': session.user, 'asset': session.asset,
-            'system_user': session.account,
+            'account': session.account,
             'date_start': session.date_start,
             'date_end': session.date_end,
             'download_url': download_url,
