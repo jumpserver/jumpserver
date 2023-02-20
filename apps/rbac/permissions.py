@@ -96,9 +96,11 @@ class RBACPermission(permissions.DjangoModelPermissions):
                 model_cls = queryset[0].__class__
             else:
                 model_cls = queryset.model
-        except AssertionError:
+        except AssertionError as e:
+            logger.error('Error get model cls: ', e)
             model_cls = None
-        except AttributeError:
+        except AttributeError as e:
+            logger.error('Error get model cls: ', e)
             model_cls = None
         except Exception as e:
             logger.error('Error get model class: {} of {}'.format(e, view))

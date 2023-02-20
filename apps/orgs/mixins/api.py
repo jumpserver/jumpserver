@@ -10,7 +10,7 @@ from ..utils import set_to_root_org
 
 __all__ = [
     'RootOrgViewMixin', 'OrgModelViewSet', 'OrgBulkModelViewSet', 'OrgQuerySetMixin',
-    'OrgGenericViewSet', 'OrgRelationMixin'
+    'OrgGenericViewSet', 'OrgRelationMixin', 'OrgReadonlyModelViewSet'
 ]
 
 
@@ -60,6 +60,10 @@ class OrgBulkModelViewSet(CommonApiMixin, OrgViewSetMixin, BulkModelViewSet):
         if self.request.query_params.get('spm', ''):
             return True
         return False
+
+
+class OrgReadonlyModelViewSet(OrgModelViewSet):
+    http_method_names = ['get', 'head', 'options']
 
 
 class OrgRelationMixin(RelationMixin):
