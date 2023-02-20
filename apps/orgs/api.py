@@ -34,7 +34,6 @@ class OrgViewSet(BulkModelViewSet):
     search_fields = ('name', 'comment')
     queryset = Organization.objects.all()
     serializer_class = OrgSerializer
-    ordering_fields = ('name',)
     ordering = ('name',)
 
     def get_serializer_class(self):

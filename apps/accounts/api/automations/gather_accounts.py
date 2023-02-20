@@ -15,7 +15,6 @@ class GatherAccountsAutomationViewSet(OrgBulkModelViewSet):
     model = GatherAccountsAutomation
     filter_fields = ('name',)
     search_fields = filter_fields
-    ordering_fields = ('name',)
     serializer_class = serializers.GatherAccountAutomationSerializer
 
 

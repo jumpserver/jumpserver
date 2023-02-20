@@ -35,10 +35,6 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     search_fields = [
         'title', 'type', 'status'
     ]
-    ordering_fields = (
-        'title', 'status', 'state', 'action_display',
-        'date_created', 'serial_num',
-    )
     ordering = ('-date_created',)
     rbac_perms = {
         'open': 'tickets.view_ticket',

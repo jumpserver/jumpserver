@@ -106,12 +106,13 @@ class PlatformSerializer(WritableNestedModelSerializer):
         fields_small = fields_mini + [
             "category", "type", "charset",
         ]
-        fields = fields_small + [
-            "protocols",
-            "domain_enabled", "su_enabled",
-            "su_method", "automation",
-            "comment",
+        fields_other = [
+            'date_created', 'date_updated', 'created_by', 'updated_by',
         ]
+        fields = fields_small + [
+            "protocols", "domain_enabled", "su_enabled",
+            "su_method", "automation", "comment",
+        ] + fields_other
         extra_kwargs = {
             "su_enabled": {"label": _('Su enabled')},
             "domain_enabled": {"label": _('Domain enabled')},
