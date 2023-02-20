@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.utils.translation import ugettext as _
 from django.conf import settings
-from rest_framework_bulk import BulkModelViewSet
-from rest_framework.generics import RetrieveAPIView
+from django.utils.translation import ugettext as _
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.generics import RetrieveAPIView
 
-from common.utils import get_logger
-from common.permissions import IsValidUser
-from users.models import User, UserGroup
 from assets.models import (
     Asset, Domain, Label, Node,
 )
-from perms.models import AssetPermission
+from common.api import JMSBulkModelViewSet
+from common.permissions import IsValidUser
+from common.utils import get_logger
 from orgs.utils import current_org, tmp_to_root_org
+from perms.models import AssetPermission
+from users.models import User, UserGroup
 from .models import Organization
 from .serializers import (
     OrgSerializer, CurrentOrgSerializer
@@ -29,7 +29,7 @@ org_related_models = [
 ]
 
 
-class OrgViewSet(BulkModelViewSet):
+class OrgViewSet(JMSBulkModelViewSet):
     filterset_fields = ('name',)
     search_fields = ('name', 'comment')
     queryset = Organization.objects.all()

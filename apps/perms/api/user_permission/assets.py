@@ -26,6 +26,7 @@ logger = get_logger(__name__)
 class BaseUserPermedAssetsApi(SelfOrPKUserMixin, ListAPIView):
     ordering = ('name',)
     search_fields = ('name', 'address', 'comment')
+    ordering_fields = ("name", "address")
     filterset_class = AssetFilterSet
     serializer_class = serializers.AssetPermedSerializer
     only_fields = serializers.AssetPermedSerializer.Meta.only_fields
