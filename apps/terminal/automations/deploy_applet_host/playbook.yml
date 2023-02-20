@@ -30,6 +30,16 @@
         include_management_tools: yes
       register: rds_install
 
+    - name: Stop Tinker before install (jumpserver)
+      ansible.windows.win_powershell:
+        script: |
+          if (Get-Service -Name 'JumpServer Tinker' -ErrorAction SilentlyContinue) {
+            Stop-Service -Name 'JumpServer Tinker' -Force
+          }
+          else {
+           $Ansible.Changed = $false
+          }
+
     - name: Download JumpServer Tinker installer (jumpserver)
       ansible.windows.win_get_url:
         url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/{{ TinkerInstaller }}"
@@ -44,7 +54,7 @@
           - /NORESTART
         state: present
 
-    - name: Set remote-server on the global system path (remote-server)
+    - name: Set Tinkerd on the global system path (jumpserver)
       ansible.windows.win_path:
         elements:
           - '%USERPROFILE%\AppData\Local\Programs\Tinker\'

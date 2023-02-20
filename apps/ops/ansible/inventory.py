@@ -54,7 +54,7 @@ class JMSInventory:
         if gateway.private_key:
             proxy_command_list.append("-i {}".format(gateway.private_key_path))
 
-        proxy_command = "'-o ProxyCommand={}'".format(
+        proxy_command = '-o ProxyCommand=\"{}\"'.format(
             " ".join(proxy_command_list)
         )
         return {"ansible_ssh_common_args": proxy_command}

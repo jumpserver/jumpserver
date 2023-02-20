@@ -24,7 +24,8 @@ def on_node_pre_save(sender, instance: Node, **kwargs):
 @merge_delay_run(ttl=5, key=key_by_org)
 def test_assets_connectivity_handler(assets=()):
     task_name = gettext_noop("Test assets connectivity ")
-    test_assets_connectivity_task.delay(assets, str(current_org.id), task_name)
+    asset_ids = [a.id for a in assets]
+    test_assets_connectivity_task.delay(asset_ids, str(current_org.id), task_name)
 
 
 @merge_delay_run(ttl=5, key=key_by_org)
@@ -33,7 +34,8 @@ def gather_assets_facts_handler(assets=()):
         logger.info("No assets to update hardware info")
         return
     name = gettext_noop("Gather asset hardware info")
-    gather_assets_facts_task.delay(assets, str(current_org.id), task_name=name)
+    asset_ids = [a.id for a in assets]
+    gather_assets_facts_task.delay(asset_ids, str(current_org.id), task_name=name)
 
 
 @merge_delay_run(ttl=5, key=key_by_org)

@@ -46,6 +46,9 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     version = models.IntegerField(default=0)
     history = HistoricalRecords()
 
+    def __str__(self):
+        return self.name
+
     def get_history(self, version):
         return self.history.filter(version=version).first()
 
@@ -360,5 +363,3 @@ class JobExecution(JMSOrgBaseModel):
     class Meta:
         verbose_name = _("Job Execution")
         ordering = ['-date_created']
-
-

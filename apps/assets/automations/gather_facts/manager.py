@@ -24,7 +24,7 @@ class GatherFactsManager(BasePlaybookManager):
         asset = self.host_asset_mapper.get(host)
         if asset and info:
             for k, v in info.items():
-                info[k] = v.strip()
+                info[k] = v.strip() if isinstance(v, str) else v
             asset.info = info
             asset.save()
         else:
