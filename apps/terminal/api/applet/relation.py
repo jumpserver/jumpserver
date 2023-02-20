@@ -2,14 +2,12 @@ from typing import Callable
 
 from django.shortcuts import get_object_or_404
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
 from rest_framework.request import Request
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from common.api import JMSModelViewSet
 from common.permissions import IsServiceAccount
-from common.exceptions import JMSObjectDoesNotExist
 from common.utils import is_uuid
 from orgs.utils import tmp_to_builtin_org
 from rbac.permissions import RBACPermission
