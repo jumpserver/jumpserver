@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.translation import gettext_noop
 
 from accounts.const import AutomationTypes
-from accounts.tasks.common import automation_execute_start
+from accounts.tasks.common import quickstart_automation_by_snapshot
 from assets.models import Node
 from common.utils import get_logger
 from orgs.utils import org_aware_func
@@ -22,7 +22,7 @@ def gather_asset_accounts_util(nodes, task_name):
         'nodes': [str(node.id) for node in nodes],
     }
     tp = AutomationTypes.verify_account
-    automation_execute_start(task_name, tp, task_snapshot)
+    quickstart_automation_by_snapshot(task_name, tp, task_snapshot)
 
 
 @shared_task(

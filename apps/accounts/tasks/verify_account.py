@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.translation import gettext_noop
 
 from accounts.const import AutomationTypes
-from accounts.tasks.common import automation_execute_start
+from accounts.tasks.common import quickstart_automation_by_snapshot
 from assets.const import GATEWAY_NAME
 from common.utils import get_logger
 from orgs.utils import org_aware_func
@@ -22,7 +22,7 @@ def verify_connectivity_util(assets, tp, accounts, task_name):
         'accounts': account_usernames,
         'assets': [str(asset.id) for asset in assets],
     }
-    automation_execute_start(task_name, tp, task_snapshot)
+    quickstart_automation_by_snapshot(task_name, tp, task_snapshot)
 
 
 @org_aware_func("assets")

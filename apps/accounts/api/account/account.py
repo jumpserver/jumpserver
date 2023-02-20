@@ -92,7 +92,7 @@ class AccountsTaskCreateAPI(CreateAPIView):
 
     def perform_create(self, serializer):
         data = serializer.validated_data
-        accounts = self.get_accounts()
+        accounts = data.get('accounts')
         account_ids = accounts.values_list('id', flat=True)
         asset_ids = [account.asset_id for account in accounts]
 

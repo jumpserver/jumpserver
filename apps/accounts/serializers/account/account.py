@@ -144,4 +144,7 @@ class AccountTaskSerializer(serializers.Serializer):
         ('push', 'push'),
     )
     action = serializers.ChoiceField(choices=ACTION_CHOICES, write_only=True)
+    accounts = serializers.PrimaryKeyRelatedField(
+        queryset=Account.objects, required=False, allow_empty=True, many=True
+    )
     task = serializers.CharField(read_only=True)
