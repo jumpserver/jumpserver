@@ -10,7 +10,6 @@ from simple_history.utils import bulk_create_with_history
 from assets.models import Host
 from common.db.models import JMSBaseModel
 from common.utils import random_string
-from jumpserver.utils import has_valid_xpack_license
 
 __all__ = ['AppletHost', 'AppletHostDeployment']
 
@@ -131,7 +130,7 @@ class AppletHostDeployment(JMSBaseModel):
         from .applet import Applet
         if applet_id:
             applet = Applet.objects.get(id=applet_id)
-            if not has_valid_xpack_license and applet.xpack:
+            if not applet.can_show:
                 return
         else:
             applet = None

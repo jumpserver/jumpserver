@@ -12,6 +12,7 @@ from rest_framework.serializers import ValidationError
 
 from common.db.models import JMSBaseModel
 from common.utils import lazyproperty, get_logger
+from jumpserver.utils import has_valid_xpack_license
 
 logger = get_logger(__name__)
 
@@ -68,8 +69,12 @@ class Applet(JMSBaseModel):
             return yaml.safe_load(f)
 
     @property
+    def can_show(self):
+        return has_valid_xpack_license() or not self.xpack
+
+    @property
     def xpack(self):
-        return self.manifest.get('xpack', False)
+        return self.name in ('navicat', )
 
     @property
     def icon(self):

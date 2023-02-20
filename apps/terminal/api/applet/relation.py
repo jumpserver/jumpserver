@@ -11,7 +11,6 @@ from common.api import JMSModelViewSet
 from common.permissions import IsServiceAccount
 from common.exceptions import JMSObjectDoesNotExist
 from common.utils import is_uuid
-from jumpserver.utils import has_valid_xpack_license
 from orgs.utils import tmp_to_builtin_org
 from rbac.permissions import RBACPermission
 from terminal.models import AppletHost
@@ -73,14 +72,15 @@ class AppletHostAppletViewSet(HostMixin, JMSModelViewSet):
             obj = self.host.publications.get(applet__name=pk)
         else:
             obj = self.host.publications.get(pk=pk)
-        if not has_valid_xpack_license() and obj.applet.xpack:
-            raise JMSObjectDoesNotExist(object_name=_('AppletPublication'))
+        if not obj.applet.can_show:
+            msg = 'You do not have permission on this resource'
+            raise self.permission_denied(self.request, msg)
         return obj
 
     def get_queryset(self):
-        queryset = self.host.publications.all()
-        if not has_valid_xpack_license():
-            queryset = [p for p in queryset if not p.applet.xpack]
+        queryset = [
+            p for p in self.host.publications.all() if not p.applet.can_show
+        ]
         return queryset
 
     @action(methods=['post'], detail=False)
