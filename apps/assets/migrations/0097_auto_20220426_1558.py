@@ -5,7 +5,8 @@ from assets.const import AllTypes
 
 
 def create_internal_platforms(apps, *args):
-    AllTypes.create_or_update_internal_platforms()
+    platform_cls = apps.get_model('assets', 'Platform')
+    AllTypes.create_or_update_internal_platforms(platform_cls)
 
 
 def update_user_platforms(apps, *args):
