@@ -130,8 +130,6 @@ class AppletHostDeployment(JMSBaseModel):
         from .applet import Applet
         if applet_id:
             applet = Applet.objects.get(id=applet_id)
-            if not applet.can_show:
-                return
         else:
             applet = None
         manager = DeployAppletHostManager(self, applet=applet)

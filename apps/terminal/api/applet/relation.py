@@ -67,18 +67,12 @@ class AppletHostAppletViewSet(HostMixin, JMSModelViewSet):
     def get_object(self):
         pk = self.kwargs.get('pk')
         if not is_uuid(pk):
-            obj = self.host.publications.get(applet__name=pk)
+            return self.host.publications.get(applet__name=pk)
         else:
-            obj = self.host.publications.get(pk=pk)
-        if not obj.applet.can_show:
-            msg = 'You do not have permission on this resource'
-            raise self.permission_denied(self.request, msg)
-        return obj
+            return self.host.publications.get(pk=pk)
 
     def get_queryset(self):
-        queryset = [
-            p for p in self.host.publications.all() if not p.applet.can_show
-        ]
+        queryset = self.host.publications.all()
         return queryset
 
     @action(methods=['post'], detail=False)

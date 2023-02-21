@@ -69,14 +69,6 @@ class Applet(JMSBaseModel):
             return yaml.safe_load(f)
 
     @property
-    def can_show(self):
-        return has_valid_xpack_license() or not self.xpack
-
-    @property
-    def xpack(self):
-        return self.name in ('navicat', )
-
-    @property
     def icon(self):
         path = os.path.join(self.path, 'icon.png')
         if not os.path.exists(path):
@@ -104,6 +96,10 @@ class Applet(JMSBaseModel):
 
         manifest = cls.validate_pkg(path)
         name = manifest['name']
+        if not has_valid_xpack_license() and name.lower() in ('navicat', ):
+            return
+
+        print("Install or update applet: {}".format(path))
         instance = cls.objects.filter(name=name).first()
         serializer = AppletSerializer(instance=instance, data=manifest)
         serializer.is_valid()
