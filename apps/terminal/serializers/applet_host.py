@@ -32,7 +32,7 @@ class DeployOptionsSerializer(serializers.Serializer):
     CORE_HOST = serializers.CharField(default=settings.SITE_URL, label=_('API Server'), max_length=1024)
     RDS_Licensing = serializers.BooleanField(default=False, label=_("RDS Licensing"))
     RDS_LicenseServer = serializers.CharField(default='127.0.0.1', label=_('RDS License Server'), max_length=1024)
-    RDS_LicensingMode = serializers.ChoiceField(choices=LICENSE_MODE_CHOICES, default=4, label=_('RDS Licensing Mode'))
+    RDS_LicensingMode = serializers.ChoiceField(choices=LICENSE_MODE_CHOICES, default=2, label=_('RDS Licensing Mode'))
     RDS_fSingleSessionPerUser = serializers.ChoiceField(choices=SESSION_PER_USER, default=1,
                                                         label=_("RDS Single Session Per User"))
     RDS_MaxDisconnectionTime = serializers.IntegerField(default=60000, label=_("RDS Max Disconnection Time"))
