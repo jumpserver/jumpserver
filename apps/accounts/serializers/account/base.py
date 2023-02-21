@@ -38,7 +38,7 @@ class AuthValidateMixin(serializers.Serializer):
             return secret
 
     def clean_auth_fields(self, validated_data):
-        secret_type = validated_data.pop('secret_type', None)
+        secret_type = validated_data.get('secret_type')
         passphrase = validated_data.get('passphrase')
         secret = validated_data.pop('secret', None)
         self.handle_secret(secret, secret_type, passphrase)
