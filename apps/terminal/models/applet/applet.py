@@ -99,7 +99,6 @@ class Applet(JMSBaseModel):
         if not has_valid_xpack_license() and name.lower() in ('navicat', ):
             return
 
-        print("Install or update applet: {}".format(path))
         instance = cls.objects.filter(name=name).first()
         serializer = AppletSerializer(instance=instance, data=manifest)
         serializer.is_valid()
