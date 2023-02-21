@@ -49,6 +49,8 @@ exclude_permissions = (
     ('assets', 'gatherfactsautomation', '*', '*'),
     ('assets', 'commandfilter', '*', '*'),
     ('assets', 'commandfilterrule', '*', '*'),
+    ('assets', 'asset', 'add,move', 'assettonode'),
+    ('assets', 'asset', 'remove', 'assetfromnode'),
 
     ('accounts', 'historicalaccount', '*', '*'),
     ('accounts', 'accountbaseautomation', '*', '*'),
