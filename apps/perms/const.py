@@ -36,8 +36,7 @@ class ActionChoices(BitChoices):
         return cls.copy | cls.paste
 
     @classmethod
-    def contains(cls, total, action):
-        action_value = getattr(cls, action)
+    def contains(cls, total, action_value):
         return action_value & total == action_value
 
     @classmethod
