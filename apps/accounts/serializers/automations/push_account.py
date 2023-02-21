@@ -1,4 +1,4 @@
-import copy
+from accounts.const import AutomationTypes
 from accounts.models import PushAccountAutomation
 from .change_secret import (
     ChangeSecretAutomationSerializer, ChangeSecretUpdateAssetSerializer,
@@ -13,6 +13,10 @@ class PushAccountAutomationSerializer(ChangeSecretAutomationSerializer):
             n for n in ChangeSecretAutomationSerializer.Meta.fields
             if n not in ['recipients']
         ]
+
+    @property
+    def model_type(self):
+        return AutomationTypes.push_account
 
 
 class PushAccountUpdateAssetSerializer(ChangeSecretUpdateAssetSerializer):

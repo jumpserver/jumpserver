@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-21 13:46+0800\n"
+"POT-Creation-Date: 2023-02-21 18:29+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -162,8 +162,8 @@ msgstr "作成のみ"
 #: accounts/models/automations/gather_account.py:16
 #: accounts/serializers/account/account.py:95
 #: accounts/serializers/account/gathered_account.py:10
-#: accounts/serializers/automations/change_secret.py:107
-#: accounts/serializers/automations/change_secret.py:127
+#: accounts/serializers/automations/change_secret.py:111
+#: accounts/serializers/automations/change_secret.py:131
 #: acls/models/base.py:100 acls/serializers/base.py:56
 #: assets/models/asset/common.py:92 assets/models/asset/common.py:279
 #: assets/models/cmd_filter.py:36 assets/serializers/domain.py:19
@@ -192,8 +192,8 @@ msgid "Source"
 msgstr "ソース"
 
 #: accounts/models/account.py:58
-#: accounts/serializers/automations/change_secret.py:108
-#: accounts/serializers/automations/change_secret.py:128
+#: accounts/serializers/automations/change_secret.py:112
+#: accounts/serializers/automations/change_secret.py:132
 #: acls/models/base.py:102 acls/serializers/base.py:57
 #: assets/serializers/asset/common.py:125 assets/serializers/gateway.py:28
 #: audits/models.py:49 ops/models/base.py:18
@@ -238,7 +238,7 @@ msgstr "アセット アカウント テンプレートのパスワードを変�
 #: accounts/models/automations/backup_account.py:27
 #: accounts/models/automations/change_secret.py:47
 #: accounts/serializers/account/backup.py:34
-#: accounts/serializers/automations/change_secret.py:56
+#: accounts/serializers/automations/change_secret.py:57
 msgid "Recipient"
 msgstr "受信者"
 
@@ -269,7 +269,7 @@ msgstr "アカウントのバックアップスナップショット"
 
 #: accounts/models/automations/backup_account.py:94
 #: accounts/serializers/account/backup.py:42
-#: accounts/serializers/automations/base.py:44
+#: accounts/serializers/automations/base.py:53
 #: assets/models/automations/base.py:121
 #: assets/serializers/automations/base.py:40
 msgid "Trigger mode"
@@ -281,8 +281,8 @@ msgid "Reason"
 msgstr "理由"
 
 #: accounts/models/automations/backup_account.py:99
-#: accounts/serializers/automations/change_secret.py:106
-#: accounts/serializers/automations/change_secret.py:129
+#: accounts/serializers/automations/change_secret.py:110
+#: accounts/serializers/automations/change_secret.py:133
 #: ops/serializers/job.py:64 terminal/serializers/session.py:45
 msgid "Is success"
 msgstr "成功は"
@@ -540,7 +540,7 @@ msgid "Category"
 msgstr "カテゴリ"
 
 #: accounts/serializers/account/account.py:76
-#: accounts/serializers/automations/base.py:43 acls/models/command_acl.py:24
+#: accounts/serializers/automations/base.py:52 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:18 applications/models.py:14
 #: assets/models/_user.py:50 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:78
@@ -575,7 +575,7 @@ msgid "Executed amount"
 msgstr "実行回数"
 
 #: accounts/serializers/account/backup.py:35
-#: accounts/serializers/automations/change_secret.py:57
+#: accounts/serializers/automations/change_secret.py:58
 msgid "Currently only mail sending is supported"
 msgstr "現在、メール送信のみがサポートされています"
 
@@ -612,6 +612,10 @@ msgid "Nodes"
 msgstr "ノード"
 
 #: accounts/serializers/automations/base.py:42
+msgid "Name already exists"
+msgstr "名前は既に存在します。"
+
+#: accounts/serializers/automations/base.py:51
 #: assets/models/automations/base.py:117
 #: assets/serializers/automations/base.py:39
 msgid "Automation snapshot"
@@ -621,20 +625,20 @@ msgstr "自動スナップショット"
 msgid "SSH Key strategy"
 msgstr "SSHキー戦略"
 
-#: accounts/serializers/automations/change_secret.py:76
+#: accounts/serializers/automations/change_secret.py:80
 msgid "* Please enter the correct password length"
 msgstr "* 正しいパスワードの長さを入力してください"
 
-#: accounts/serializers/automations/change_secret.py:80
+#: accounts/serializers/automations/change_secret.py:84
 msgid "* Password length range 6-30 bits"
 msgstr "* パスワードの長さの範囲6-30ビット"
 
-#: accounts/serializers/automations/change_secret.py:110
+#: accounts/serializers/automations/change_secret.py:114
 #: assets/models/automations/base.py:126
 msgid "Automation task execution"
 msgstr "自動タスク実行履歴"
 
-#: accounts/serializers/automations/change_secret.py:150 audits/const.py:52
+#: accounts/serializers/automations/change_secret.py:154 audits/const.py:52
 #: audits/models.py:54 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:18 ops/const.py:56 ops/serializers/celery.py:39
 #: terminal/const.py:59 terminal/models/session/sharing.py:103
@@ -642,7 +646,7 @@ msgstr "自動タスク実行履歴"
 msgid "Success"
 msgstr "成功"
 
-#: accounts/serializers/automations/change_secret.py:151 audits/const.py:53
+#: accounts/serializers/automations/change_secret.py:155 audits/const.py:53
 #: audits/signal_handlers/activity_log.py:33 common/const/choices.py:19
 #: ops/const.py:58 terminal/const.py:60 xpack/plugins/cloud/const.py:41
 msgid "Failed"
@@ -7286,6 +7290,14 @@ msgstr "実行回数"
 msgid "Instance count"
 msgstr "インスタンス数"
 
+#: xpack/plugins/cloud/tasks.py:27
+msgid "Run sync instance task"
+msgstr "同期インスタンス タスクを実行する"
+
+#: xpack/plugins/cloud/tasks.py:41
+msgid "Period clean sync instance task execution"
+msgstr "同期インスタンス タスクの実行記録を定期的にクリアする"
+
 #: xpack/plugins/cloud/utils.py:69
 msgid "Account unavailable"
 msgstr "利用できないアカウント"
@@ -7365,9 +7377,3 @@ msgstr "コミュニティ版"
 
 #~ msgid "Remove asset from node"
 #~ msgstr "ノードからアセットを削除"
-
-#~ msgid "Run sync instance task"
-#~ msgstr "同期インスタンス タスクを実行する"
-
-#~ msgid "Period clean sync instance task execution"
-#~ msgstr "同期インスタンス タスクの実行記録を定期的にクリアする"

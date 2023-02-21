@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-21 13:46+0800\n"
+"POT-Creation-Date: 2023-02-21 18:29+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -161,8 +161,8 @@ msgstr "仅创建"
 #: accounts/models/automations/gather_account.py:16
 #: accounts/serializers/account/account.py:95
 #: accounts/serializers/account/gathered_account.py:10
-#: accounts/serializers/automations/change_secret.py:107
-#: accounts/serializers/automations/change_secret.py:127
+#: accounts/serializers/automations/change_secret.py:111
+#: accounts/serializers/automations/change_secret.py:131
 #: acls/models/base.py:100 acls/serializers/base.py:56
 #: assets/models/asset/common.py:92 assets/models/asset/common.py:279
 #: assets/models/cmd_filter.py:36 assets/serializers/domain.py:19
@@ -191,8 +191,8 @@ msgid "Source"
 msgstr "来源"
 
 #: accounts/models/account.py:58
-#: accounts/serializers/automations/change_secret.py:108
-#: accounts/serializers/automations/change_secret.py:128
+#: accounts/serializers/automations/change_secret.py:112
+#: accounts/serializers/automations/change_secret.py:132
 #: acls/models/base.py:102 acls/serializers/base.py:57
 #: assets/serializers/asset/common.py:125 assets/serializers/gateway.py:28
 #: audits/models.py:49 ops/models/base.py:18
@@ -237,7 +237,7 @@ msgstr "可以更改资产账号模版密码"
 #: accounts/models/automations/backup_account.py:27
 #: accounts/models/automations/change_secret.py:47
 #: accounts/serializers/account/backup.py:34
-#: accounts/serializers/automations/change_secret.py:56
+#: accounts/serializers/automations/change_secret.py:57
 msgid "Recipient"
 msgstr "收件人"
 
@@ -268,7 +268,7 @@ msgstr "账号备份快照"
 
 #: accounts/models/automations/backup_account.py:94
 #: accounts/serializers/account/backup.py:42
-#: accounts/serializers/automations/base.py:44
+#: accounts/serializers/automations/base.py:53
 #: assets/models/automations/base.py:121
 #: assets/serializers/automations/base.py:40
 msgid "Trigger mode"
@@ -280,8 +280,8 @@ msgid "Reason"
 msgstr "原因"
 
 #: accounts/models/automations/backup_account.py:99
-#: accounts/serializers/automations/change_secret.py:106
-#: accounts/serializers/automations/change_secret.py:129
+#: accounts/serializers/automations/change_secret.py:110
+#: accounts/serializers/automations/change_secret.py:133
 #: ops/serializers/job.py:64 terminal/serializers/session.py:45
 msgid "Is success"
 msgstr "是否成功"
@@ -536,7 +536,7 @@ msgid "Category"
 msgstr "类别"
 
 #: accounts/serializers/account/account.py:76
-#: accounts/serializers/automations/base.py:43 acls/models/command_acl.py:24
+#: accounts/serializers/automations/base.py:52 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:18 applications/models.py:14
 #: assets/models/_user.py:50 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:78
@@ -571,7 +571,7 @@ msgid "Executed amount"
 msgstr "执行次数"
 
 #: accounts/serializers/account/backup.py:35
-#: accounts/serializers/automations/change_secret.py:57
+#: accounts/serializers/automations/change_secret.py:58
 msgid "Currently only mail sending is supported"
 msgstr "当前只支持邮件发送"
 
@@ -608,6 +608,10 @@ msgid "Nodes"
 msgstr "节点"
 
 #: accounts/serializers/automations/base.py:42
+msgid "Name already exists"
+msgstr "名称已存在"
+
+#: accounts/serializers/automations/base.py:51
 #: assets/models/automations/base.py:117
 #: assets/serializers/automations/base.py:39
 msgid "Automation snapshot"
@@ -617,20 +621,20 @@ msgstr "自动化快照"
 msgid "SSH Key strategy"
 msgstr "SSH 密钥更改方式"
 
-#: accounts/serializers/automations/change_secret.py:76
+#: accounts/serializers/automations/change_secret.py:80
 msgid "* Please enter the correct password length"
 msgstr "* 请输入正确的密码长度"
 
-#: accounts/serializers/automations/change_secret.py:80
+#: accounts/serializers/automations/change_secret.py:84
 msgid "* Password length range 6-30 bits"
 msgstr "* 密码长度范围 6-30 位"
 
-#: accounts/serializers/automations/change_secret.py:110
+#: accounts/serializers/automations/change_secret.py:114
 #: assets/models/automations/base.py:126
 msgid "Automation task execution"
 msgstr "自动化任务执行历史"
 
-#: accounts/serializers/automations/change_secret.py:150 audits/const.py:52
+#: accounts/serializers/automations/change_secret.py:154 audits/const.py:52
 #: audits/models.py:54 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:18 ops/const.py:56 ops/serializers/celery.py:39
 #: terminal/const.py:59 terminal/models/session/sharing.py:103
@@ -638,7 +642,7 @@ msgstr "自动化任务执行历史"
 msgid "Success"
 msgstr "成功"
 
-#: accounts/serializers/automations/change_secret.py:151 audits/const.py:53
+#: accounts/serializers/automations/change_secret.py:155 audits/const.py:53
 #: audits/signal_handlers/activity_log.py:33 common/const/choices.py:19
 #: ops/const.py:58 terminal/const.py:60 xpack/plugins/cloud/const.py:41
 msgid "Failed"
@@ -7191,6 +7195,14 @@ msgstr "执行次数"
 msgid "Instance count"
 msgstr "实例个数"
 
+#: xpack/plugins/cloud/tasks.py:27
+msgid "Run sync instance task"
+msgstr "执行同步实例任务"
+
+#: xpack/plugins/cloud/tasks.py:41
+msgid "Period clean sync instance task execution"
+msgstr "定期清除同步实例任务执行记录"
+
 #: xpack/plugins/cloud/utils.py:69
 msgid "Account unavailable"
 msgstr "账号无效"
@@ -7270,12 +7282,6 @@ msgstr "社区版"
 
 #~ msgid "Remove asset from node"
 #~ msgstr "从节点移除资产"
-
-#~ msgid "Run sync instance task"
-#~ msgstr "执行同步实例任务"
-
-#~ msgid "Period clean sync instance task execution"
-#~ msgstr "定期清除同步实例任务执行记录"
 
 #~ msgid "Clean audits log"
 #~ msgstr "清理审计日志"
