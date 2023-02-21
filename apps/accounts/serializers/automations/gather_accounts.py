@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-from django.utils.translation import ugettext_lazy as _
+from accounts.const import AutomationTypes
 from accounts.models import GatherAccountsAutomation
 from common.utils import get_logger
 
@@ -20,3 +20,7 @@ class GatherAccountAutomationSerializer(BaseAutomationSerializer):
         fields = BaseAutomationSerializer.Meta.fields + read_only_fields
 
         extra_kwargs = BaseAutomationSerializer.Meta.extra_kwargs
+
+    @property
+    def model_type(self):
+        return AutomationTypes.gather_accounts
