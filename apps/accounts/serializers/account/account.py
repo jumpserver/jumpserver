@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from accounts.const import SecretType, Source
 from accounts.models import Account, AccountTemplate
-from accounts.tasks import push_accounts_to_assets
+from accounts.tasks import push_accounts_to_assets_task
 from assets.const import Category, AllTypes
 from assets.models import Asset
 from common.serializers import SecretReadableMixin, BulkModelSerializer
@@ -43,7 +43,7 @@ class AccountSerializerCreateValidateMixin:
     def push_account(instance, push_now):
         if not push_now:
             return
-        push_accounts_to_assets.delay([instance.id], [instance.asset_id])
+        push_accounts_to_assets_task.delay([instance.id], [instance.asset_id])
 
     def create(self, validated_data):
         push_now = validated_data.pop('push_now', None)
@@ -140,6 +140,11 @@ class AccountHistorySerializer(serializers.ModelSerializer):
 class AccountTaskSerializer(serializers.Serializer):
     ACTION_CHOICES = (
         ('test', 'test'),
+        ('verify', 'verify'),
+        ('push', 'push'),
     )
     action = serializers.ChoiceField(choices=ACTION_CHOICES, write_only=True)
+    accounts = serializers.PrimaryKeyRelatedField(
+        queryset=Account.objects, required=False, allow_empty=True, many=True
+    )
     task = serializers.CharField(read_only=True)

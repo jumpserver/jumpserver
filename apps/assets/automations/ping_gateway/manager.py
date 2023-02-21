@@ -33,7 +33,7 @@ class PingGatewayManager:
             err = _('No account')
             return False, err
 
-        print('Test account: {}'.format(account))
+        print('- ' + _('Asset, {}, using account {}').format(gateway, account))
         try:
             proxy.connect(
                 gateway.address,

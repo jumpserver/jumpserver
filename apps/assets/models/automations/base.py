@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from assets.models.asset import Asset
 from assets.models.node import Node
-from assets.tasks import execute_automation
+from assets.tasks import execute_asset_automation_task
 from common.const.choices import Trigger
 from common.db.fields import EncryptJsonDictTextField
 from ops.mixin import PeriodTaskModelMixin
@@ -49,7 +49,7 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
 
     @property
     def execute_task(self):
-        return execute_automation
+        return execute_asset_automation_task
 
     def get_register_task(self):
         name = f"automation_{self.type}_strategy_period_{str(self.id)[:8]}"

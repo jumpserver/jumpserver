@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-20 19:19+0800\n"
+"POT-Creation-Date: 2023-02-21 13:46+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -158,7 +158,8 @@ msgstr "作成してプッシュ"
 msgid "Only create"
 msgstr "作成のみ"
 
-#: accounts/models/account.py:47 accounts/models/gathered_account.py:14
+#: accounts/models/account.py:47
+#: accounts/models/automations/gather_account.py:16
 #: accounts/serializers/account/account.py:95
 #: accounts/serializers/account/gathered_account.py:10
 #: accounts/serializers/automations/change_secret.py:107
@@ -181,7 +182,7 @@ msgid "Su from"
 msgstr "から切り替え"
 
 #: accounts/models/account.py:53 settings/serializers/auth/cas.py:20
-#: terminal/models/applet/applet.py:28
+#: terminal/models/applet/applet.py:29
 msgid "Version"
 msgstr "バージョン"
 
@@ -214,15 +215,23 @@ msgstr "資産履歴アカウントを表示できます"
 msgid "Can view asset history account secret"
 msgstr "資産履歴アカウントパスワードを表示できます"
 
-#: accounts/models/account.py:111
+#: accounts/models/account.py:67
+msgid "Can verify account"
+msgstr "アカウントを確認できます"
+
+#: accounts/models/account.py:68
+msgid "Can push account"
+msgstr "アカウントをプッシュできます"
+
+#: accounts/models/account.py:113
 msgid "Account template"
 msgstr "アカウント テンプレート"
 
-#: accounts/models/account.py:116
+#: accounts/models/account.py:118
 msgid "Can view asset account template secret"
 msgstr "アセット アカウント テンプレートのパスワードを表示できます"
 
-#: accounts/models/account.py:117
+#: accounts/models/account.py:119
 msgid "Can change asset account template secret"
 msgstr "アセット アカウント テンプレートのパスワードを変更できます"
 
@@ -241,7 +250,7 @@ msgstr "アカウントバックアップ計画"
 #: accounts/models/automations/backup_account.py:83
 #: assets/models/automations/base.py:114 audits/models.py:55
 #: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:122
-#: perms/models/asset_permission.py:72 terminal/models/applet/host.py:108
+#: perms/models/asset_permission.py:72 terminal/models/applet/host.py:109
 #: terminal/models/session/session.py:45
 #: tickets/models/ticket/apply_application.py:30
 #: tickets/models/ticket/apply_asset.py:19
@@ -327,18 +336,18 @@ msgstr "プッシュ アカウントの作成の実行"
 msgid "Secret type"
 msgstr "鍵の種類"
 
-#: accounts/models/automations/change_secret.py:21
-#: accounts/serializers/automations/change_secret.py:40
-msgid "Secret strategy"
-msgstr "鍵ポリシー"
-
-#: accounts/models/automations/change_secret.py:23
+#: accounts/models/automations/change_secret.py:19
 #: accounts/models/automations/change_secret.py:72 accounts/models/base.py:38
 #: authentication/models/temp_token.py:10
 #: authentication/templates/authentication/_access_key_modal.html:31
 #: settings/serializers/auth/radius.py:19
 msgid "Secret"
 msgstr "ひみつ"
+
+#: accounts/models/automations/change_secret.py:22
+#: accounts/serializers/automations/change_secret.py:40
+msgid "Secret strategy"
+msgstr "鍵ポリシー"
 
 #: accounts/models/automations/change_secret.py:24
 msgid "Password rules"
@@ -363,7 +372,7 @@ msgstr "開始日"
 #: accounts/models/automations/change_secret.py:74
 #: assets/models/automations/base.py:115 ops/models/base.py:56
 #: ops/models/celery.py:64 ops/models/job.py:123
-#: terminal/models/applet/host.py:109
+#: terminal/models/applet/host.py:110
 msgid "Date finished"
 msgstr "終了日"
 
@@ -376,20 +385,19 @@ msgstr "間違い"
 msgid "Change secret record"
 msgstr "パスワード レコードの変更"
 
+#: accounts/models/automations/gather_account.py:14
+msgid "Present"
+msgstr "存在する"
+
 #: accounts/models/automations/gather_account.py:15
-#: accounts/tasks/gather_accounts.py:29
-msgid "Gather asset accounts"
-msgstr "アカウントのコレクション"
+msgid "Date last login"
+msgstr "最終ログイン日"
 
-#: accounts/models/automations/push_account.py:13
-msgid "Triggers"
-msgstr "トリガー方式"
-
-#: accounts/models/automations/push_account.py:14 accounts/models/base.py:34
-#: accounts/models/gathered_account.py:15 acls/serializers/base.py:18
-#: acls/serializers/base.py:49 assets/models/_user.py:23 audits/models.py:157
-#: authentication/forms.py:25 authentication/forms.py:27
-#: authentication/models/temp_token.py:9
+#: accounts/models/automations/gather_account.py:17
+#: accounts/models/automations/push_account.py:13 accounts/models/base.py:34
+#: acls/serializers/base.py:18 acls/serializers/base.py:49
+#: assets/models/_user.py:23 audits/models.py:157 authentication/forms.py:25
+#: authentication/forms.py:27 authentication/models/temp_token.py:9
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
 #: users/forms/profile.py:32 users/forms/profile.py:112
@@ -398,7 +406,24 @@ msgstr "トリガー方式"
 msgid "Username"
 msgstr "ユーザー名"
 
-#: accounts/models/automations/push_account.py:15 acls/models/base.py:81
+#: accounts/models/automations/gather_account.py:18
+msgid "Address last login"
+msgstr "最終ログインアドレス"
+
+#: accounts/models/automations/gather_account.py:25 rbac/tree.py:50
+msgid "Gather account"
+msgstr "アカウントを集める"
+
+#: accounts/models/automations/gather_account.py:41
+#: accounts/tasks/gather_accounts.py:29
+msgid "Gather asset accounts"
+msgstr "アカウントのコレクション"
+
+#: accounts/models/automations/push_account.py:12
+msgid "Triggers"
+msgstr "トリガー方式"
+
+#: accounts/models/automations/push_account.py:14 acls/models/base.py:81
 #: acls/serializers/base.py:81 acls/serializers/login_acl.py:25
 #: assets/models/cmd_filter.py:81 audits/models.py:65 audits/serializers.py:82
 #: authentication/serializers/connect_token_secret.py:109
@@ -406,7 +431,7 @@ msgstr "ユーザー名"
 msgid "Action"
 msgstr "アクション"
 
-#: accounts/models/automations/push_account.py:41
+#: accounts/models/automations/push_account.py:40
 msgid "Push asset account"
 msgstr "アカウントプッシュ"
 
@@ -422,13 +447,13 @@ msgstr "アカウントの確認"
 #: assets/models/group.py:20 assets/models/label.py:18
 #: assets/models/platform.py:21 assets/models/platform.py:76
 #: assets/serializers/asset/common.py:68 assets/serializers/asset/common.py:142
-#: assets/serializers/platform.py:132
+#: assets/serializers/platform.py:91 assets/serializers/platform.py:136
 #: authentication/serializers/connect_token_secret.py:103 ops/mixin.py:21
 #: ops/models/adhoc.py:21 ops/models/celery.py:15 ops/models/celery.py:57
 #: ops/models/job.py:26 ops/models/playbook.py:23 ops/serializers/job.py:19
 #: orgs/models.py:69 perms/models/asset_permission.py:56 rbac/models/role.py:29
 #: settings/models.py:33 settings/serializers/sms.py:6
-#: terminal/models/applet/applet.py:26 terminal/models/component/endpoint.py:12
+#: terminal/models/applet/applet.py:27 terminal/models/component/endpoint.py:12
 #: terminal/models/component/endpoint.py:90
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:15
 #: terminal/models/component/terminal.py:79 users/forms/profile.py:33
@@ -445,25 +470,9 @@ msgstr "特権アカウント"
 #: assets/models/automations/base.py:21 assets/models/cmd_filter.py:39
 #: assets/models/label.py:22
 #: authentication/serializers/connect_token_secret.py:107
-#: terminal/models/applet/applet.py:31 users/serializers/user.py:159
+#: terminal/models/applet/applet.py:32 users/serializers/user.py:159
 msgid "Is active"
 msgstr "アクティブです。"
-
-#: accounts/models/gathered_account.py:12
-msgid "Present"
-msgstr "存在する"
-
-#: accounts/models/gathered_account.py:13
-msgid "Date last login"
-msgstr "最終ログイン日"
-
-#: accounts/models/gathered_account.py:16
-msgid "Address last login"
-msgstr "最終ログインアドレス"
-
-#: accounts/models/gathered_account.py:23 rbac/tree.py:50
-msgid "Gather account"
-msgstr "アカウントを集める"
 
 #: accounts/notifications.py:8
 msgid "Notification of account backup route task results"
@@ -524,7 +533,7 @@ msgstr "エスクローされたパスワード"
 #: accounts/serializers/account/account.py:75 applications/models.py:11
 #: assets/models/label.py:21 assets/models/platform.py:77
 #: assets/serializers/asset/common.py:121 assets/serializers/cagegory.py:8
-#: assets/serializers/platform.py:93 assets/serializers/platform.py:133
+#: assets/serializers/platform.py:97 assets/serializers/platform.py:137
 #: perms/serializers/user_permission.py:25 settings/models.py:35
 #: tickets/models/ticket/apply_application.py:13
 msgid "Category"
@@ -535,10 +544,10 @@ msgstr "カテゴリ"
 #: acls/serializers/command_acl.py:18 applications/models.py:14
 #: assets/models/_user.py:50 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:78
-#: assets/serializers/asset/common.py:122 assets/serializers/platform.py:92
+#: assets/serializers/asset/common.py:122 assets/serializers/platform.py:96
 #: audits/serializers.py:48
 #: authentication/serializers/connect_token_secret.py:116 ops/models/job.py:37
-#: perms/serializers/user_permission.py:26 terminal/models/applet/applet.py:30
+#: perms/serializers/user_permission.py:26 terminal/models/applet/applet.py:31
 #: terminal/models/component/storage.py:57
 #: terminal/models/component/storage.py:146 terminal/serializers/applet.py:28
 #: terminal/serializers/session.py:22 terminal/serializers/storage.py:224
@@ -643,7 +652,7 @@ msgstr "失敗しました"
 msgid "Account execute automation"
 msgstr "アカウント実行の自動化"
 
-#: accounts/tasks/backup_account.py:24
+#: accounts/tasks/backup_account.py:25
 msgid "Execute account backup plan"
 msgstr "アカウントのバックアップ計画を実施する"
 
@@ -651,15 +660,15 @@ msgstr "アカウントのバックアップ計画を実施する"
 msgid "Gather assets accounts"
 msgstr "資産の口座番号を収集する"
 
-#: accounts/tasks/push_account.py:30 accounts/tasks/push_account.py:37
+#: accounts/tasks/push_account.py:15 accounts/tasks/push_account.py:23
 msgid "Push accounts to assets"
 msgstr "アカウントをアセットにプッシュ:"
 
-#: accounts/tasks/verify_account.py:42
+#: accounts/tasks/verify_account.py:49
 msgid "Verify asset account availability"
 msgstr "アセット アカウントの可用性を確認する"
 
-#: accounts/tasks/verify_account.py:50
+#: accounts/tasks/verify_account.py:55
 msgid "Verify accounts connectivity"
 msgstr "アカウント接続のテスト"
 
@@ -921,7 +930,7 @@ msgstr "削除に失敗し、ノードにアセットが含まれています。
 msgid "App assets"
 msgstr "アプリ資産"
 
-#: assets/automations/base/manager.py:105
+#: assets/automations/base/manager.py:107
 msgid "{} disabled"
 msgstr "{} 無効"
 
@@ -929,6 +938,12 @@ msgstr "{} 無効"
 #: authentication/models/connection_token.py:114
 msgid "No account"
 msgstr "アカウントなし"
+
+#: assets/automations/ping_gateway/manager.py:36
+#, fuzzy
+#| msgid "Assets amount"
+msgid "Asset, {}, using account {}"
+msgstr "資産額"
 
 #: assets/automations/ping_gateway/manager.py:55
 #, python-brace-format
@@ -988,11 +1003,11 @@ msgid "Cloud service"
 msgstr "クラウド サービス"
 
 #: assets/const/category.py:15 assets/models/asset/web.py:16 audits/const.py:33
-#: terminal/models/applet/applet.py:24
+#: terminal/models/applet/applet.py:25
 msgid "Web"
 msgstr "Web"
 
-#: assets/const/device.py:7 terminal/models/applet/applet.py:23
+#: assets/const/device.py:7 terminal/models/applet/applet.py:24
 #: tickets/const.py:8
 msgid "General"
 msgstr "一般"
@@ -1028,7 +1043,7 @@ msgid "Basic"
 msgstr "基本"
 
 #: assets/const/web.py:61 assets/models/asset/web.py:13
-#: assets/serializers/asset/common.py:117 assets/serializers/platform.py:39
+#: assets/serializers/asset/common.py:117 assets/serializers/platform.py:40
 msgid "Script"
 msgstr "脚本"
 
@@ -1044,8 +1059,8 @@ msgstr "SSHパブリックキー"
 #: assets/models/cmd_filter.py:88 assets/models/group.py:23
 #: common/db/models.py:37 ops/models/adhoc.py:27 ops/models/job.py:45
 #: ops/models/playbook.py:26 rbac/models/role.py:37 settings/models.py:38
-#: terminal/models/applet/applet.py:35 terminal/models/applet/applet.py:151
-#: terminal/models/applet/host.py:110 terminal/models/component/endpoint.py:24
+#: terminal/models/applet/applet.py:36 terminal/models/applet/applet.py:155
+#: terminal/models/applet/host.py:111 terminal/models/component/endpoint.py:24
 #: terminal/models/component/endpoint.py:100
 #: terminal/models/session/session.py:47 tickets/models/comment.py:32
 #: tickets/models/ticket/general.py:297 users/models/user.py:756
@@ -1094,7 +1109,7 @@ msgstr "ユーザーと同じユーザー名"
 
 #: assets/models/_user.py:52 authentication/models/connection_token.py:38
 #: authentication/serializers/connect_token_secret.py:104
-#: terminal/models/applet/applet.py:33 terminal/serializers/session.py:20
+#: terminal/models/applet/applet.py:34 terminal/serializers/session.py:20
 #: terminal/serializers/session.py:41 terminal/serializers/storage.py:68
 msgid "Protocol"
 msgstr "プロトコル"
@@ -1183,28 +1198,12 @@ msgid "Can test asset connectivity"
 msgstr "資産接続をテストできます"
 
 #: assets/models/asset/common.py:284
-msgid "Can push account to asset"
-msgstr "アカウントをアセットにプッシュできます"
-
-#: assets/models/asset/common.py:285
-msgid "Can verify account"
-msgstr "アカウントを確認できます"
-
-#: assets/models/asset/common.py:286
 msgid "Can match asset"
 msgstr "アセットを一致させることができます"
 
-#: assets/models/asset/common.py:287
-msgid "Add asset to node"
-msgstr "ノードにアセットを追加する"
-
-#: assets/models/asset/common.py:288
-msgid "Move asset to node"
-msgstr "アセットをノードに移動する"
-
-#: assets/models/asset/common.py:289
-msgid "Remove asset from node"
-msgstr "ノードからアセットを削除"
+#: assets/models/asset/common.py:285
+msgid "Can change asset nodes"
+msgstr "資産ノードを変更できます"
 
 #: assets/models/asset/database.py:10 assets/serializers/asset/common.py:110
 #: settings/serializers/email.py:37
@@ -1227,22 +1226,22 @@ msgstr "クライアントキー"
 msgid "Allow invalid cert"
 msgstr "証明書チェックを無視"
 
-#: assets/models/asset/web.py:9 assets/serializers/platform.py:29
+#: assets/models/asset/web.py:9 assets/serializers/platform.py:30
 msgid "Autofill"
 msgstr "自動充填"
 
 #: assets/models/asset/web.py:10 assets/serializers/asset/common.py:114
-#: assets/serializers/platform.py:31
+#: assets/serializers/platform.py:32
 msgid "Username selector"
 msgstr "ユーザー名ピッカー"
 
 #: assets/models/asset/web.py:11 assets/serializers/asset/common.py:115
-#: assets/serializers/platform.py:34
+#: assets/serializers/platform.py:35
 msgid "Password selector"
 msgstr "パスワードセレクター"
 
 #: assets/models/asset/web.py:12 assets/serializers/asset/common.py:116
-#: assets/serializers/platform.py:37
+#: assets/serializers/platform.py:38
 msgid "Submit selector"
 msgstr "ボタンセレクターを確認する"
 
@@ -1261,7 +1260,7 @@ msgstr "アセットの自動化タスク"
 
 #: assets/models/automations/base.py:112 audits/models.py:177
 #: audits/serializers.py:49 ops/models/base.py:49 ops/models/job.py:114
-#: terminal/models/applet/applet.py:150 terminal/models/applet/host.py:107
+#: terminal/models/applet/applet.py:154 terminal/models/applet/host.py:108
 #: terminal/models/component/status.py:27 terminal/serializers/applet.py:17
 #: terminal/serializers/applet_host.py:93 tickets/models/ticket/general.py:283
 #: tickets/serializers/super_ticket.py:13
@@ -1403,45 +1402,45 @@ msgstr "有効化"
 msgid "Ansible config"
 msgstr "Ansible 構成"
 
-#: assets/models/platform.py:44 assets/serializers/platform.py:60
+#: assets/models/platform.py:44 assets/serializers/platform.py:61
 msgid "Ping enabled"
 msgstr "アセット ディスカバリを有効にする"
 
-#: assets/models/platform.py:45 assets/serializers/platform.py:61
+#: assets/models/platform.py:45 assets/serializers/platform.py:62
 msgid "Ping method"
 msgstr "資産検出方法"
 
 #: assets/models/platform.py:46 assets/models/platform.py:59
-#: assets/serializers/platform.py:62
+#: assets/serializers/platform.py:63
 msgid "Gather facts enabled"
 msgstr "資産情報の収集を有効にする"
 
 #: assets/models/platform.py:47 assets/models/platform.py:61
-#: assets/serializers/platform.py:63
+#: assets/serializers/platform.py:64
 msgid "Gather facts method"
 msgstr "情報収集の方法"
 
-#: assets/models/platform.py:48 assets/serializers/platform.py:66
+#: assets/models/platform.py:48 assets/serializers/platform.py:67
 msgid "Change secret enabled"
 msgstr "パスワードの変更が有効"
 
-#: assets/models/platform.py:50 assets/serializers/platform.py:67
+#: assets/models/platform.py:50 assets/serializers/platform.py:68
 msgid "Change secret method"
 msgstr "パスワード変更モード"
 
-#: assets/models/platform.py:52 assets/serializers/platform.py:68
+#: assets/models/platform.py:52 assets/serializers/platform.py:69
 msgid "Push account enabled"
 msgstr "アカウントのプッシュを有効にする"
 
-#: assets/models/platform.py:54 assets/serializers/platform.py:69
+#: assets/models/platform.py:54 assets/serializers/platform.py:70
 msgid "Push account method"
 msgstr "アカウントプッシュ方式"
 
-#: assets/models/platform.py:56 assets/serializers/platform.py:64
+#: assets/models/platform.py:56 assets/serializers/platform.py:65
 msgid "Verify account enabled"
 msgstr "アカウントの確認をオンにする"
 
-#: assets/models/platform.py:58 assets/serializers/platform.py:65
+#: assets/models/platform.py:58 assets/serializers/platform.py:66
 msgid "Verify account method"
 msgstr "アカウント認証方法"
 
@@ -1453,23 +1452,23 @@ msgstr "メタ"
 msgid "Internal"
 msgstr "ビルトイン"
 
-#: assets/models/platform.py:83 assets/serializers/platform.py:90
+#: assets/models/platform.py:83 assets/serializers/platform.py:94
 msgid "Charset"
 msgstr "シャーセット"
 
-#: assets/models/platform.py:85 assets/serializers/platform.py:118
+#: assets/models/platform.py:85 assets/serializers/platform.py:122
 msgid "Domain enabled"
 msgstr "ドメインを有効にする"
 
-#: assets/models/platform.py:87 assets/serializers/platform.py:117
+#: assets/models/platform.py:87 assets/serializers/platform.py:121
 msgid "Su enabled"
 msgstr "アカウントの切り替えを有効にする"
 
-#: assets/models/platform.py:88 assets/serializers/platform.py:100
+#: assets/models/platform.py:88 assets/serializers/platform.py:104
 msgid "Su method"
 msgstr "アカウントの切り替え方法"
 
-#: assets/models/platform.py:90 assets/serializers/platform.py:97
+#: assets/models/platform.py:90 assets/serializers/platform.py:101
 msgid "Automation"
 msgstr "オートメーション"
 
@@ -1482,7 +1481,7 @@ msgstr "%(value)s は偶数ではありません"
 msgid "Auto fill"
 msgstr "自動充填"
 
-#: assets/serializers/asset/common.py:124 assets/serializers/platform.py:95
+#: assets/serializers/asset/common.py:124 assets/serializers/platform.py:99
 #: authentication/serializers/connect_token_secret.py:28
 #: authentication/serializers/connect_token_secret.py:66
 #: perms/serializers/user_permission.py:24 xpack/plugins/cloud/models.py:99
@@ -1594,31 +1593,31 @@ msgstr "含まれない:/"
 msgid "The same level node name cannot be the same"
 msgstr "同じレベルのノード名を同じにすることはできません。"
 
-#: assets/serializers/platform.py:25
+#: assets/serializers/platform.py:26
 msgid "SFTP enabled"
 msgstr "SFTP が有効"
 
-#: assets/serializers/platform.py:26
+#: assets/serializers/platform.py:27
 msgid "SFTP home"
 msgstr "SFTP ルート パス"
 
-#: assets/serializers/platform.py:42
+#: assets/serializers/platform.py:43
 msgid "Auth with username"
 msgstr "ユーザー名で認証する"
 
-#: assets/serializers/platform.py:70
+#: assets/serializers/platform.py:71
 msgid "Gather accounts enabled"
 msgstr "アカウント収集を有効にする"
 
-#: assets/serializers/platform.py:71
+#: assets/serializers/platform.py:72
 msgid "Gather accounts method"
 msgstr "アカウントの収集方法"
 
-#: assets/serializers/platform.py:77
+#: assets/serializers/platform.py:78
 msgid "Primary"
 msgstr "主要"
 
-#: assets/serializers/platform.py:119
+#: assets/serializers/platform.py:123
 msgid "Default Domain"
 msgstr "デフォルト ドメイン"
 
@@ -1762,7 +1761,7 @@ msgid "Change password"
 msgstr "パスワードを変更する"
 
 #: audits/const.py:34 settings/serializers/terminal.py:6
-#: terminal/models/applet/host.py:24 terminal/models/component/terminal.py:156
+#: terminal/models/applet/host.py:25 terminal/models/component/terminal.py:156
 #: terminal/serializers/session.py:48
 msgid "Terminal"
 msgstr "ターミナル"
@@ -1779,7 +1778,7 @@ msgstr "セッションログ"
 msgid "Login log"
 msgstr "ログインログ"
 
-#: audits/const.py:42 terminal/models/applet/host.py:111
+#: audits/const.py:42 terminal/models/applet/host.py:112
 #: terminal/models/component/task.py:24
 msgid "Task"
 msgstr "タスク"
@@ -3587,7 +3586,7 @@ msgstr "組織"
 msgid "Org name"
 msgstr "組織名"
 
-#: orgs/models.py:70 rbac/models/role.py:36 terminal/models/applet/applet.py:32
+#: orgs/models.py:70 rbac/models/role.py:36 terminal/models/applet/applet.py:33
 msgid "Builtin"
 msgstr "ビルトイン"
 
@@ -3832,7 +3831,7 @@ msgstr "パーマ"
 msgid "Users amount"
 msgstr "ユーザー数"
 
-#: rbac/serializers/role.py:28 terminal/models/applet/applet.py:27
+#: rbac/serializers/role.py:28 terminal/models/applet/applet.py:28
 msgid "Display name"
 msgstr "表示名"
 
@@ -3896,8 +3895,8 @@ msgstr "タスクセンター"
 msgid "My assets"
 msgstr "私の資産"
 
-#: rbac/tree.py:57 terminal/models/applet/applet.py:42
-#: terminal/models/applet/applet.py:147 terminal/models/applet/host.py:27
+#: rbac/tree.py:57 terminal/models/applet/applet.py:43
+#: terminal/models/applet/applet.py:151 terminal/models/applet/host.py:28
 msgid "Applet"
 msgstr "リモートアプリケーション"
 
@@ -5421,44 +5420,44 @@ msgstr "一括作成非サポート"
 msgid "Storage is invalid"
 msgstr "ストレージが無効です"
 
-#: terminal/models/applet/applet.py:29
+#: terminal/models/applet/applet.py:30
 msgid "Author"
 msgstr "著者"
 
-#: terminal/models/applet/applet.py:34
+#: terminal/models/applet/applet.py:35
 msgid "Tags"
 msgstr "ラベル"
 
-#: terminal/models/applet/applet.py:38 terminal/serializers/storage.py:157
+#: terminal/models/applet/applet.py:39 terminal/serializers/storage.py:157
 msgid "Hosts"
 msgstr "ホスト"
 
-#: terminal/models/applet/applet.py:83
+#: terminal/models/applet/applet.py:84
 msgid "Applet pkg not valid, Missing file {}"
 msgstr "無効なアプレット パッケージ、ファイル {} がありません"
 
-#: terminal/models/applet/applet.py:149 terminal/models/applet/host.py:33
-#: terminal/models/applet/host.py:105
+#: terminal/models/applet/applet.py:153 terminal/models/applet/host.py:34
+#: terminal/models/applet/host.py:106
 msgid "Hosting"
 msgstr "ホスト マシン"
 
-#: terminal/models/applet/host.py:18 terminal/serializers/applet_host.py:43
+#: terminal/models/applet/host.py:19 terminal/serializers/applet_host.py:43
 msgid "Deploy options"
 msgstr "展開パラメーター"
 
-#: terminal/models/applet/host.py:19
+#: terminal/models/applet/host.py:20
 msgid "Inited"
 msgstr "初期化された"
 
-#: terminal/models/applet/host.py:20
+#: terminal/models/applet/host.py:21
 msgid "Date inited"
 msgstr ""
 
-#: terminal/models/applet/host.py:21
+#: terminal/models/applet/host.py:22
 msgid "Date synced"
 msgstr "同期日"
 
-#: terminal/models/applet/host.py:106
+#: terminal/models/applet/host.py:107
 msgid "Initial"
 msgstr "初期化"
 
@@ -7287,14 +7286,6 @@ msgstr "実行回数"
 msgid "Instance count"
 msgstr "インスタンス数"
 
-#: xpack/plugins/cloud/tasks.py:27
-msgid "Run sync instance task"
-msgstr "同期インスタンス タスクを実行する"
-
-#: xpack/plugins/cloud/tasks.py:41
-msgid "Period clean sync instance task execution"
-msgstr "同期インスタンス タスクの実行記録を定期的にクリアする"
-
 #: xpack/plugins/cloud/utils.py:69
 msgid "Account unavailable"
 msgstr "利用できないアカウント"
@@ -7362,3 +7353,21 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:85
 msgid "Community edition"
 msgstr "コミュニティ版"
+
+#~ msgid "Can push account to asset"
+#~ msgstr "アカウントをアセットにプッシュできます"
+
+#~ msgid "Add asset to node"
+#~ msgstr "ノードにアセットを追加する"
+
+#~ msgid "Move asset to node"
+#~ msgstr "アセットをノードに移動する"
+
+#~ msgid "Remove asset from node"
+#~ msgstr "ノードからアセットを削除"
+
+#~ msgid "Run sync instance task"
+#~ msgstr "同期インスタンス タスクを実行する"
+
+#~ msgid "Period clean sync instance task execution"
+#~ msgstr "同期インスタンス タスクの実行記録を定期的にクリアする"

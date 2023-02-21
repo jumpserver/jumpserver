@@ -3,10 +3,6 @@
   tasks:
     - name: Test privileged account
       ansible.builtin.ping:
-    #
-    #    - name: print variables
-    #      debug:
-    #        msg: "Username: {{ account.username }}, Secret: {{ account.secret }}, Secret type: {{ secret_type }}"
 
     - name: Change password
       ansible.builtin.user:
@@ -26,8 +22,8 @@
         regexp: "{{ kwargs.regexp }}"
         state: absent
       when:
-      - secret_type == "ssh_key"
-      - kwargs.strategy == "set_jms"
+        - secret_type == "ssh_key"
+        - kwargs.strategy == "set_jms"
 
     - name: Change SSH key
       ansible.builtin.authorized_key:

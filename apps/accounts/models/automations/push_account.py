@@ -9,7 +9,6 @@ __all__ = ['PushAccountAutomation']
 
 
 class PushAccountAutomation(ChangeSecretMixin, AccountBaseAutomation):
-    accounts = None
     triggers = models.JSONField(max_length=16, default=list, verbose_name=_('Triggers'))
     username = models.CharField(max_length=128, verbose_name=_('Username'))
     action = models.CharField(max_length=16, verbose_name=_('Action'))

@@ -46,8 +46,24 @@ def sync_registered_tasks(*args, **kwargs):
 @receiver(django_ready)
 def check_registered_tasks(*args, **kwargs):
     attrs = ['verbose_name', 'activity_callback']
+    ignores = [
+        'users.tasks.check_user_expired_periodic', 'ops.tasks.clean_celery_periodic_tasks',
+        'terminal.tasks.delete_terminal_status_period', 'ops.tasks.check_server_performance_period',
+        'settings.tasks.ldap.import_ldap_user', 'users.tasks.check_password_expired',
+        'assets.tasks.nodes_amount.check_node_assets_amount_task', 'notifications.notifications.publish_task',
+        'perms.tasks.check_asset_permission_will_expired',
+        'ops.tasks.create_or_update_registered_periodic_tasks', 'perms.tasks.check_asset_permission_expired',
+        'settings.tasks.ldap.import_ldap_user_periodic', 'users.tasks.check_password_expired_periodic',
+        'common.utils.verify_code.send_async', 'assets.tasks.nodes_amount.check_node_assets_amount_period_task',
+        'users.tasks.check_user_expired', 'orgs.tasks.refresh_org_cache_task',
+        'terminal.tasks.upload_session_replay_to_external_storage', 'terminal.tasks.clean_orphan_session',
+        'audits.tasks.clean_audits_log_period', 'authentication.tasks.clean_django_sessions'
+    ]
+
     for name, task in app.tasks.items():
         if name.startswith('celery.'):
+            continue
+        if name in ignores:
             continue
         for attr in attrs:
             if not hasattr(task, attr):

@@ -12,6 +12,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='asset',
-            options={'ordering': ['name'], 'permissions': [('refresh_assethardwareinfo', 'Can refresh asset hardware info'), ('test_assetconnectivity', 'Can test asset connectivity'), ('push_assetaccount', 'Can push account to asset'), ('test_account', 'Can verify account'), ('match_asset', 'Can match asset'), ('add_assettonode', 'Add asset to node'), ('move_assettonode', 'Move asset to node'), ('remove_assetfromnode', 'Remove asset from node')], 'verbose_name': 'Asset'},
+            options={'ordering': ['name'], 'permissions': [('refresh_assethardwareinfo', 'Can refresh asset hardware info'), ('test_assetconnectivity', 'Can test asset connectivity'), ('push_assetaccount', 'Can push account to asset'), ('test_account', 'Can verify account'), ('match_asset', 'Can match asset'), ('change_assettonode', 'Can change asset nodes')], 'verbose_name': 'Asset'},
         ),
     ]

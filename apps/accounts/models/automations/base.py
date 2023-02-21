@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 
-from accounts.tasks import execute_automation
+from accounts.tasks import execute_account_automation_task
 from assets.models.automations import (
     BaseAutomation as AssetBaseAutomation,
     AutomationExecution as AssetAutomationExecution
@@ -16,7 +16,7 @@ class AccountBaseAutomation(AssetBaseAutomation):
 
     @property
     def execute_task(self):
-        return execute_automation
+        return execute_account_automation_task
 
     @property
     def execution_model(self):
