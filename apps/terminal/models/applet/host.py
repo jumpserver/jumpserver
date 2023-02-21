@@ -10,6 +10,7 @@ from simple_history.utils import bulk_create_with_history
 from assets.models import Host
 from common.db.models import JMSBaseModel
 from common.utils import random_string
+from terminal.const import PublishStatus
 
 __all__ = ['AppletHost', 'AppletHostDeployment']
 
@@ -63,11 +64,11 @@ class AppletHost(Host):
         status_applets = defaultdict(list)
         for applet in applets:
             if applet.name not in name_version_mapper:
-                status_applets['unpublished'].append(applet)
+                status_applets[PublishStatus.failed.value].append(applet)
             elif applet.version != name_version_mapper[applet.name]:
-                status_applets['not_match'].append(applet)
+                status_applets[PublishStatus.mismatch.value].append(applet)
             else:
-                status_applets['published'].append(applet)
+                status_applets[PublishStatus.success.value].append(applet)
 
         for status, applets in status_applets.items():
             self.publications.filter(applet__in=applets) \
