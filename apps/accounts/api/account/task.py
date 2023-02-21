@@ -13,7 +13,12 @@ class AccountsTaskCreateAPI(CreateAPIView):
     serializer_class = serializers.AccountTaskSerializer
 
     def check_permissions(self, request):
-        return request.user.has_perm('assets.test_assetconnectivity')
+        act = request.data.get('action')
+        if act == 'push':
+            code = 'accounts.push_account'
+        else:
+            code = 'accounts.verify_account'
+        return request.user.has_perm(code)
 
     def perform_create(self, serializer):
         data = serializer.validated_data
