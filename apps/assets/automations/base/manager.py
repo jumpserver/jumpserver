@@ -241,7 +241,6 @@ class BasePlaybookManager:
             print(">>> 开始执行任务\n")
         else:
             print("### 没有需要执行的任务\n")
-            return
 
         self.execution.date_start = timezone.now()
         for i, runner in enumerate(runners, start=1):
