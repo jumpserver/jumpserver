@@ -1,0 +1,6 @@
+id: change_secret_aix
+name: Change secret for aix
+category: host
+type:
+  - AIX
+method: change_secret

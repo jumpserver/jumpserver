@@ -11,6 +11,7 @@ from accounts.const import AutomationTypes, SecretType, SSHKeyStrategy, SecretSt
 from accounts.models import ChangeSecretRecord
 from accounts.notifications import ChangeSecretExecutionTaskMsg
 from accounts.serializers import ChangeSecretRecordBackUpSerializer
+from assets.const import HostTypes
 from common.utils import get_logger, lazyproperty
 from common.utils.file import encrypt_and_compress_zip_file
 from common.utils.timezone import local_now_display
@@ -91,6 +92,11 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         inventory_hosts = []
         records = []
         host['secret_type'] = self.secret_type
+
+        if asset.type == HostTypes.WINDOWS and self.secret_type == SecretType.SSH_KEY:
+            print(f'Windows {asset} does not support ssh key push \n')
+            return inventory_hosts
+
         for account in accounts:
             h = deepcopy(host)
             h['name'] += '(' + account.username + ')'

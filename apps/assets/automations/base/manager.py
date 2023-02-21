@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 from collections import defaultdict
@@ -152,8 +153,12 @@ class BasePlaybookManager:
         return sub_playbook_path
 
     def get_runners(self):
+        # TODO 临时打印一下 找一下打印不出日志的原因
+        print('ansible runner: 任务开始执行')
+        assets_group_by_platform = self.get_assets_group_by_platform()
+        print('ansible runner: 获取资产分组', assets_group_by_platform)
         runners = []
-        for platform, assets in self.get_assets_group_by_platform().items():
+        for platform, assets in assets_group_by_platform.items():
             assets_bulked = [assets[i:i + self.bulk_size] for i in range(0, len(assets), self.bulk_size)]
 
             for i, _assets in enumerate(assets_bulked, start=1):
@@ -198,6 +203,30 @@ class BasePlaybookManager:
     def before_runner_start(self, runner):
         pass
 
+    @staticmethod
+    def delete_sensitive_data(path):
+        if settings.DEBUG_DEV:
+            return
+
+        with open(path, 'r') as f:
+            d = json.load(f)
+        def delete_keys(d, keys_to_delete):
+            """
+            递归函数：删除嵌套字典中的指定键
+            """
+            if not isinstance(d, dict):
+                return d
+            keys = list(d.keys())
+            for key in keys:
+                if key in keys_to_delete:
+                    del d[key]
+                else:
+                    delete_keys(d[key], keys_to_delete)
+            return d
+        d = delete_keys(d, ['secret', 'ansible_password'])
+        with open(path, 'w') as f:
+            json.dump(d, f)
+
     def run(self, *args, **kwargs):
         runners = self.get_runners()
         if len(runners) > 1:
@@ -215,6 +244,7 @@ class BasePlaybookManager:
             self.before_runner_start(runner)
             try:
                 cb = runner.run(**kwargs)
+                self.delete_sensitive_data(runner.inventory)
                 self.on_runner_success(runner, cb)
             except Exception as e:
                 self.on_runner_failed(runner, e)

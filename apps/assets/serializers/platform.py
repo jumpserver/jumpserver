@@ -1,5 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
+from django.core import validators
 
 from assets.const.web import FillType
 from common.serializers import WritableNestedModelSerializer
@@ -86,6 +87,9 @@ class PlatformProtocolsSerializer(serializers.ModelSerializer):
 
 
 class PlatformSerializer(WritableNestedModelSerializer):
+    name = serializers.CharField(
+        label=_("Name"), max_length=50, validators=[validators.validate_unicode_slug]
+    )
     charset = LabeledChoiceField(
         choices=Platform.CharsetChoices.choices, label=_("Charset")
     )

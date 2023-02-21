@@ -4,6 +4,7 @@ from django.db.models import QuerySet
 
 from accounts.const import AutomationTypes, SecretType
 from accounts.models import Account
+from assets.const import HostTypes
 from common.utils import get_logger
 from ..base.manager import AccountBasePlaybookManager
 from ..change_secret.manager import ChangeSecretManager
@@ -61,6 +62,10 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
 
         inventory_hosts = []
         host['secret_type'] = self.secret_type
+        if asset.type == HostTypes.WINDOWS and self.secret_type == SecretType.SSH_KEY:
+            print(f'Windows {asset} does not support ssh key push \n')
+            return inventory_hosts
+
         for account in accounts:
             h = deepcopy(host)
             h['name'] += '(' + account.username + ')'

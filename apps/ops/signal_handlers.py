@@ -67,7 +67,8 @@ def check_registered_tasks(*args, **kwargs):
             continue
         for attr in attrs:
             if not hasattr(task, attr):
-                print('>>> Task {} has no attribute {}'.format(name, attr))
+                # print('>>> Task {} has no attribute {}'.format(name, attr))
+                pass
 
 
 @signals.before_task_publish.connect

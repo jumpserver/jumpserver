@@ -12,8 +12,7 @@ class HostInfoSerializer(serializers.Serializer):
     vendor = serializers.CharField(max_length=64, required=False, allow_blank=True, label=_('Vendor'))
     model = serializers.CharField(max_length=54, required=False, allow_blank=True,  label=_('Model'))
     sn = serializers.CharField(max_length=128, required=False, allow_blank=True,  label=_('Serial number'))
-
-    cpu_model = serializers.CharField(max_length=64, required=False, allow_blank=True, label=_('CPU model'))
+    cpu_model = serializers.ListField(child=serializers.CharField(max_length=64, allow_blank=True), required=False, label=_('CPU model'))
     cpu_count = serializers.IntegerField(required=False, label=_('CPU count'))
     cpu_cores = serializers.IntegerField(required=False, label=_('CPU cores'))
     cpu_vcpus = serializers.IntegerField(required=False, label=_('CPU vcpus'))

@@ -12,6 +12,7 @@ from rest_framework.serializers import ValidationError
 
 from common.db.models import JMSBaseModel
 from common.utils import lazyproperty, get_logger
+from jumpserver.utils import has_valid_xpack_license
 
 logger = get_logger(__name__)
 
@@ -95,6 +96,9 @@ class Applet(JMSBaseModel):
 
         manifest = cls.validate_pkg(path)
         name = manifest['name']
+        if not has_valid_xpack_license() and name.lower() in ('navicat', ):
+            return
+
         instance = cls.objects.filter(name=name).first()
         serializer = AppletSerializer(instance=instance, data=manifest)
         serializer.is_valid()
