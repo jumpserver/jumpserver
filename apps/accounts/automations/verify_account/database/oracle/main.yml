@@ -6,9 +6,9 @@
   tasks:
     - name: Verify account
       oracle_ping:
-        login_user: "{{ jms_account.username }}"
-        login_password: "{{ jms_account.secret }}"
+        login_user: "{{ account.username }}"
+        login_password: "{{ account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         login_database: "{{ jms_asset.spec_info.db_name }}"
-        mode: "{{ jms_account.mode }}"
+        mode: "{{ account.mode }}"
