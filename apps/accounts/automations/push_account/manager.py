@@ -68,7 +68,7 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
 
         for account in accounts:
             h = deepcopy(host)
-            h['name'] += '_' + account.username
+            h['name'] += '(' + account.username + ')'
             new_secret = self.get_secret()
 
             self.name_recorder_mapper[h['name']] = {

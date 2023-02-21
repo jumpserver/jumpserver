@@ -1,7 +1,7 @@
-from orgs.utils import tmp_to_org
-from common.utils import get_logger
+from accounts.const import AutomationTypes
 from accounts.models import GatheredAccount
-from accounts.const import AutomationTypes, Source
+from common.utils import get_logger
+from orgs.utils import tmp_to_org
 from .filter import GatherAccountsFilter
 from ..base.manager import AccountBasePlaybookManager
 

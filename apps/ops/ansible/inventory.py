@@ -101,7 +101,7 @@ class JMSInventory:
 
     def asset_to_host(self, asset, account, automation, protocols, platform):
         host = {
-            'name': '{}'.format(asset.name),
+            'name': '{}'.format(asset.name.replace(' ', '_')),
             'jms_asset': {
                 'id': str(asset.id), 'name': asset.name, 'address': asset.address,
                 'type': asset.type, 'category': asset.category,

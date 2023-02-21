@@ -16,11 +16,11 @@ class ChangeSecretMixin(models.Model):
         choices=SecretType.choices, max_length=16,
         default=SecretType.PASSWORD, verbose_name=_('Secret type')
     )
+    secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Secret'))
     secret_strategy = models.CharField(
         choices=SecretStrategy.choices, max_length=16,
         default=SecretStrategy.custom, verbose_name=_('Secret strategy')
     )
-    secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Secret'))
     password_rules = models.JSONField(default=dict, verbose_name=_('Password rules'))
     ssh_key_change_strategy = models.CharField(
         choices=SSHKeyStrategy.choices, max_length=16,

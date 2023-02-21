@@ -4,7 +4,7 @@ from rest_framework import status, mixins, viewsets
 from rest_framework.response import Response
 
 from accounts.models import AutomationExecution
-from accounts.tasks import execute_automation
+from accounts.tasks import execute_account_automation_task
 from assets import serializers
 from assets.models import BaseAutomation
 from common.const.choices import Trigger
@@ -109,7 +109,7 @@ class AutomationExecutionViewSet(
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         automation = serializer.validated_data.get('automation')
-        task = execute_automation.delay(
+        task = execute_account_automation_task.delay(
             pid=str(automation.pk), trigger=Trigger.manual, tp=self.tp
         )
         return Response({'task': task.id}, status=status.HTTP_201_CREATED)

@@ -63,7 +63,13 @@ class HostTypes(BaseType):
                 },
             },
             cls.OTHER_HOST: {
-                'ansible_enabled': False
+                'ansible_enabled': False,
+                'ping_enabled': False,
+                'gather_facts_enabled': False,
+                'gather_accounts_enabled': False,
+                'verify_account_enabled': False,
+                'change_secret_enabled': False,
+                'push_account_enabled': False
             },
         }
 

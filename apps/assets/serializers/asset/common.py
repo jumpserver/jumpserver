@@ -83,7 +83,7 @@ class AssetAccountSerializer(
 
     def validate_push_now(self, value):
         request = self.context['request']
-        if not request.user.has_perms('assets.push_assetaccount'):
+        if not request.user.has_perms('accounts.push_account'):
             return False
         return value
 

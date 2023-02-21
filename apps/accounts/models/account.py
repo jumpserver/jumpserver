@@ -64,6 +64,8 @@ class Account(AbsConnectivity, BaseAccount):
             ('view_accountsecret', _('Can view asset account secret')),
             ('view_historyaccount', _('Can view asset history account')),
             ('view_historyaccountsecret', _('Can view asset history account secret')),
+            ('verify_account', _('Can verify account')),
+            ('push_account', _('Can push account')),
         ]
 
     @lazyproperty

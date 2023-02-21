@@ -66,6 +66,8 @@ class BasePlaybookManager:
         )
         if not os.path.exists(path):
             os.makedirs(path, exist_ok=True, mode=0o755)
+        if settings.DEBUG_DEV:
+            logger.debug('Ansible runtime dir: {}'.format(path))
         return path
 
     @staticmethod
@@ -175,6 +177,12 @@ class BasePlaybookManager:
                     self.runtime_dir,
                     callback=PlaybookCallback(),
                 )
+
+                with open(inventory_path, 'r') as f:
+                    inventory_data = json.load(f)
+                    if not inventory_data['all'].get('hosts'):
+                        continue
+
                 runners.append(runer)
         return runners
 
@@ -279,7 +287,6 @@ class BasePlaybookManager:
             print(">>> 开始执行任务\n")
         else:
             print("### 没有需要执行的任务\n")
-            return
 
         self.execution.date_start = timezone.now()
         for i, runner in enumerate(runners, start=1):
@@ -291,8 +298,9 @@ class BasePlaybookManager:
                 self.on_runner_success(runner, cb)
             except Exception as e:
                 self.on_runner_failed(runner, e)
-            self.after_runner_end(runner)
-            print('\n')
+            finally:
+                self.after_runner_end(runner)
+                print('\n')
         self.execution.status = 'success'
         self.execution.date_finished = timezone.now()
         self.execution.save()

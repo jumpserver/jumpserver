@@ -145,16 +145,17 @@ class PlaybookFileBrowserAPIView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         file_path = os.path.join(work_path, file_key)
 
+        # rename
         if new_name:
             new_file_path = os.path.join(os.path.dirname(file_path), new_name)
             if os.path.exists(new_file_path):
                 return Response({'msg': '{} already exists'.format(new_name)}, status=status.HTTP_400_BAD_REQUEST)
             os.rename(file_path, new_file_path)
-            file_path = new_file_path
-
-        if not is_directory and content:
-            with open(file_path, 'w') as f:
-                f.write(content)
+        # edit content
+        else:
+            if not is_directory:
+                with open(file_path, 'w') as f:
+                    f.write(content)
         return Response({'msg': 'ok'})
 
     def delete(self, request, **kwargs):

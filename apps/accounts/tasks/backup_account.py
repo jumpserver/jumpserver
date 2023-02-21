@@ -10,6 +10,7 @@ logger = get_logger(__file__)
 
 
 def task_activity_callback(self, pid, trigger):
+    from accounts.models import AccountBackupAutomation
     with tmp_to_root_org():
         plan = get_object_or_none(AccountBackupAutomation, pk=pid)
     if not plan:
@@ -22,7 +23,7 @@ def task_activity_callback(self, pid, trigger):
 
 
 @shared_task(verbose_name=_('Execute account backup plan'), activity_callback=task_activity_callback)
-def execute_account_backup_plan(pid, trigger):
+def execute_account_backup_task(pid, trigger):
     from accounts.models import AccountBackupAutomation
     with tmp_to_root_org():
         plan = get_object_or_none(AccountBackupAutomation, pk=pid)

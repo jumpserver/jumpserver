@@ -15,4 +15,29 @@ class Migration(migrations.Migration):
             name='charset',
             field=models.CharField(choices=[('utf-8', 'UTF-8'), ('gbk', 'GBK')], default='utf-8', max_length=8, verbose_name='Charset'),
         ),
+        migrations.AddField(
+            model_name='platform',
+            name='created_by',
+            field=models.CharField(blank=True, max_length=128, null=True, verbose_name='Created by'),
+        ),
+        migrations.AddField(
+            model_name='platform',
+            name='date_created',
+            field=models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date created'),
+        ),
+        migrations.AddField(
+            model_name='platform',
+            name='date_updated',
+            field=models.DateTimeField(auto_now=True, verbose_name='Date updated'),
+        ),
+        migrations.AddField(
+            model_name='platform',
+            name='updated_by',
+            field=models.CharField(blank=True, max_length=128, null=True, verbose_name='Updated by'),
+        ),
+        migrations.AlterField(
+            model_name='platform',
+            name='comment',
+            field=models.TextField(blank=True, default='', verbose_name='Comment'),
+        ),
     ]

@@ -18,7 +18,8 @@ def migrate_remove_redundant_permission(apps, *args):
 
     model.objects.filter(app_label='assets', model__in=[
         'authbook', 'historicalauthbook', 'test_gateway',
-        'accountbackupplan', 'accountbackupplanexecution', 'gathereduser', 'systemuser'
+        'accountbackupplan', 'accountbackupplanexecution',
+        'gathereduser', 'systemuser'
     ]).delete()
 
     model.objects.filter(app_label='perms', model__in=[
@@ -27,7 +28,8 @@ def migrate_remove_redundant_permission(apps, *args):
 
     perm_model = apps.get_model('auth', 'Permission')
     perm_model.objects.filter(codename__in=[
-        'view_permusergroupasset', 'view_permuserasset', 'push_assetsystemuser', 'change_accountsecret'
+        'view_permusergroupasset', 'view_permuserasset', 'push_assetsystemuser',
+        'add_assettonode', 'move_assettonode', 'remove_assetfromnode',
     ]).delete()
 
 
