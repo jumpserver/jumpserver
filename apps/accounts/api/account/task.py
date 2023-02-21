@@ -3,6 +3,7 @@ from rest_framework.response import Response
 
 from accounts import serializers
 from accounts.tasks import verify_accounts_connectivity_task, push_accounts_to_assets_task
+from assets.exceptions import NotSupportedTemporarilyError
 
 __all__ = [
     'AccountsTaskCreateAPI',
@@ -28,6 +29,11 @@ class AccountsTaskCreateAPI(CreateAPIView):
         if data['action'] == 'push':
             task = push_accounts_to_assets_task.delay(account_ids)
         else:
+            account = accounts[0]
+            asset = account.asset
+            if not asset.auto_info['ansible_enabled'] or \
+                not asset.auto_info['ping_enabled']:
+                raise NotSupportedTemporarilyError()
             task = verify_accounts_connectivity_task.delay(account_ids)
 
         data = getattr(serializer, '_data', {})
