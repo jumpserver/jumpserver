@@ -6,6 +6,7 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 
+from common.exceptions import JMSException
 from orgs.mixins.api import OrgBulkModelViewSet
 from ..exception import PlaybookNoValidEntry
 from ..models import Playbook
@@ -39,7 +40,11 @@ class PlaybookViewSet(OrgBulkModelViewSet):
         if 'multipart/form-data' in self.request.headers['Content-Type']:
             src_path = os.path.join(settings.MEDIA_ROOT, instance.path.name)
             dest_path = os.path.join(settings.DATA_DIR, "ops", "playbook", instance.id.__str__())
-            unzip_playbook(src_path, dest_path)
+            try:
+                unzip_playbook(src_path, dest_path)
+            except RuntimeError as e:
+                raise JMSException(code='invalid_playbook_file', detail={"msg": "Unzip failed"})
+
             if 'main.yml' not in os.listdir(dest_path):
                 raise PlaybookNoValidEntry
 
