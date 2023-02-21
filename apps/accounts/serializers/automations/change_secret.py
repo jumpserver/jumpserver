@@ -53,6 +53,7 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
             'ssh_key_change_strategy', 'passphrase', 'recipients',
         ]
         extra_kwargs = {**BaseAutomationSerializer.Meta.extra_kwargs, **{
+            'accounts': {'required': True},
             'recipients': {'label': _('Recipient'), 'help_text': _(
                 "Currently only mail sending is supported"
             )},
