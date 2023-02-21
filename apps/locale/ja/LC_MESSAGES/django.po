@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-21 13:00+0800\n"
+"POT-Creation-Date: 2023-02-21 13:14+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -215,15 +215,23 @@ msgstr "資産履歴アカウントを表示できます"
 msgid "Can view asset history account secret"
 msgstr "資産履歴アカウントパスワードを表示できます"
 
-#: accounts/models/account.py:111
+#: accounts/models/account.py:67 assets/models/asset/common.py:285
+msgid "Can verify account"
+msgstr "アカウントを確認できます"
+
+#: accounts/models/account.py:68
+msgid "Can push account"
+msgstr "アカウントをプッシュできます"
+
+#: accounts/models/account.py:113
 msgid "Account template"
 msgstr "アカウント テンプレート"
 
-#: accounts/models/account.py:116
+#: accounts/models/account.py:118
 msgid "Can view asset account template secret"
 msgstr "アセット アカウント テンプレートのパスワードを表示できます"
 
-#: accounts/models/account.py:117
+#: accounts/models/account.py:119
 msgid "Can change asset account template secret"
 msgstr "アセット アカウント テンプレートのパスワードを変更できます"
 
@@ -1192,10 +1200,6 @@ msgstr "資産接続をテストできます"
 #: assets/models/asset/common.py:284
 msgid "Can push account to asset"
 msgstr "アカウントをアセットにプッシュできます"
-
-#: assets/models/asset/common.py:285
-msgid "Can verify account"
-msgstr "アカウントを確認できます"
 
 #: assets/models/asset/common.py:286
 msgid "Can match asset"

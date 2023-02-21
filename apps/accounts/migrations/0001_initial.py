@@ -50,7 +50,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Account',
                 'permissions': [('view_accountsecret', 'Can view asset account secret'),
-                                ('change_accountsecret', 'Can change asset account secret'),
                                 ('view_historyaccount', 'Can view asset history account'),
                                 ('view_historyaccountsecret', 'Can view asset history account secret')],
                 'unique_together': {('username', 'asset', 'secret_type'), ('name', 'asset')},

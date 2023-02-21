@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-21 13:00+0800\n"
+"POT-Creation-Date: 2023-02-21 13:14+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -214,15 +214,23 @@ msgstr "可以查看资产历史账号"
 msgid "Can view asset history account secret"
 msgstr "可以查看资产历史账号密码"
 
-#: accounts/models/account.py:111
+#: accounts/models/account.py:67 assets/models/asset/common.py:285
+msgid "Can verify account"
+msgstr "可以验证账号"
+
+#: accounts/models/account.py:68
+msgid "Can push account"
+msgstr "可以推送账号"
+
+#: accounts/models/account.py:113
 msgid "Account template"
 msgstr "账号模版"
 
-#: accounts/models/account.py:116
+#: accounts/models/account.py:118
 msgid "Can view asset account template secret"
 msgstr "可以查看资产账号模版密码"
 
-#: accounts/models/account.py:117
+#: accounts/models/account.py:119
 msgid "Can change asset account template secret"
 msgstr "可以更改资产账号模版密码"
 
@@ -1184,10 +1192,6 @@ msgstr "可以测试资产连接性"
 #: assets/models/asset/common.py:284
 msgid "Can push account to asset"
 msgstr "可以推送账号到资产"
-
-#: assets/models/asset/common.py:285
-msgid "Can verify account"
-msgstr "可以验证账号"
 
 #: assets/models/asset/common.py:286
 msgid "Can match asset"
