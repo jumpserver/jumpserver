@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from common.drf.filters import DatetimeRangeFilter
 from common.plugins.es import QuerySet as ESQuerySet
 from common.utils import is_uuid
-from orgs.mixins.api import OrgReadonlyModelViewSet
+from orgs.mixins.api import OrgReadonlyModelViewSet, OrgModelViewSet
 from orgs.utils import current_org, tmp_to_root_org
 from users.models import User
 from .backends import TYPE_ENGINE_MAPPING
@@ -35,7 +35,7 @@ class JobAuditViewSet(OrgReadonlyModelViewSet):
     ordering = ['-date_start']
 
 
-class FTPLogViewSet(OrgReadonlyModelViewSet):
+class FTPLogViewSet(OrgModelViewSet):
     model = FTPLog
     serializer_class = FTPLogSerializer
     extra_filter_backends = [DatetimeRangeFilter]
@@ -45,6 +45,7 @@ class FTPLogViewSet(OrgReadonlyModelViewSet):
     filterset_fields = ['user', 'asset', 'account', 'filename']
     search_fields = filterset_fields
     ordering = ['-date_start']
+    http_method_names = ['post', 'get', 'head', 'options']
 
 
 class UserLoginCommonMixin:
