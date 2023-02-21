@@ -111,7 +111,8 @@ class Applet(JMSBaseModel):
         return instance
 
     def select_host_account(self):
-        hosts = list(self.hosts.all())
+        # 选择激活的发布机
+        hosts = list(self.hosts.filter(is_active=True).all())
         if not hosts:
             return None
 
