@@ -109,7 +109,7 @@ class BaseAccount(JMSOrgBaseModel):
 
     @property
     def private_key_path(self):
-        if not self.secret_type != SecretType.SSH_KEY \
+        if self.secret_type != SecretType.SSH_KEY \
                 or not self.secret \
                 or not self.private_key:
             return None
