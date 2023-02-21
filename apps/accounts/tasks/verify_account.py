@@ -26,15 +26,22 @@ def verify_connectivity_util(assets, tp, accounts, task_name):
 
 
 @org_aware_func("assets")
-def verify_accounts_connectivity_util(accounts, assets, task_name):
-    gateway_assets = assets.filter(platform__name=GATEWAY_NAME)
+def verify_accounts_connectivity_util(accounts, task_name):
+    from assets.models import Asset
+
+    asset_ids = [a.asset_id for a in accounts]
+    assets = Asset.objects.filter(id__in=asset_ids)
+
+    gateways = assets.filter(platform__name=GATEWAY_NAME)
     verify_connectivity_util(
-        gateway_assets, AutomationTypes.verify_gateway_account, accounts, task_name
+        gateways, AutomationTypes.verify_gateway_account,
+        accounts, task_name
     )
 
-    non_gateway_assets = assets.exclude(platform__name=GATEWAY_NAME)
+    common_assets = assets.exclude(platform__name=GATEWAY_NAME)
     verify_connectivity_util(
-        non_gateway_assets, AutomationTypes.verify_account, accounts, task_name
+        common_assets, AutomationTypes.verify_account,
+        accounts, task_name
     )
 
 
@@ -42,11 +49,9 @@ def verify_accounts_connectivity_util(accounts, assets, task_name):
     queue="ansible", verbose_name=_('Verify asset account availability'),
     activity_callback=lambda self, account_ids, asset_ids: (account_ids, None)
 )
-def verify_accounts_connectivity_task(account_ids, asset_ids):
-    from assets.models import Asset
+def verify_accounts_connectivity_task(account_ids):
     from accounts.models import Account, VerifyAccountAutomation
-    assets = Asset.objects.filter(id__in=asset_ids)
     accounts = Account.objects.filter(id__in=account_ids)
     task_name = gettext_noop("Verify accounts connectivity")
     task_name = VerifyAccountAutomation.generate_unique_name(task_name)
-    return verify_accounts_connectivity_util(accounts, assets, task_name)
+    return verify_accounts_connectivity_util(accounts, task_name)

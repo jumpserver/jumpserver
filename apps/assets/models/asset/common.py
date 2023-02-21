@@ -284,7 +284,5 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
             ('push_assetaccount', _('Can push account to asset')),
             ('test_account', _('Can verify account')),
             ('match_asset', _('Can match asset')),
-            ('add_assettonode', _('Add asset to node')),
-            ('move_assettonode', _('Move asset to node')),
-            ('remove_assetfromnode', _('Remove asset from node'))
+            ('change_assettonode', _('Can change asset nodes')),
         ]

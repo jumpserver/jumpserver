@@ -17,19 +17,19 @@ class VerifyHostCallbackMixin:
 
     def host_callback(self, host, asset=None, account=None, automation=None, path_dir=None, **kwargs):
         host = super().host_callback(
-            host, asset=asset, account=account, automation=automation,
-            path_dir=path_dir, **kwargs
+            host, asset=asset, account=account,
+            automation=automation, path_dir=path_dir, **kwargs
         )
         if host.get('error'):
             return host
 
         accounts = asset.accounts.all()
         accounts = self.get_accounts(account, accounts)
-
         inventory_hosts = []
+
         for account in accounts:
             h = deepcopy(host)
-            h['name'] += '_' + account.username
+            h['name'] += '(' + account.username + ')'
             self.host_account_mapper[h['name']] = account
             secret = account.secret
 

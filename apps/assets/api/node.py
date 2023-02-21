@@ -103,7 +103,7 @@ class NodeAddAssetsApi(generics.UpdateAPIView):
     instance = None
     permission_classes = (RBACPermission,)
     rbac_perms = {
-        'PUT': 'assets.add_assettonode',
+        'PUT': 'assets.change_assettonode',
     }
 
     def perform_update(self, serializer):
@@ -118,7 +118,7 @@ class NodeRemoveAssetsApi(generics.UpdateAPIView):
     instance = None
     permission_classes = (RBACPermission,)
     rbac_perms = {
-        'PUT': 'assets.remove_assetfromnode',
+        'PUT': 'assets.change_assetfromnode',
     }
 
     def perform_update(self, serializer):
@@ -140,7 +140,7 @@ class MoveAssetsToNodeApi(generics.UpdateAPIView):
     instance = None
     permission_classes = (RBACPermission,)
     rbac_perms = {
-        'PUT': 'assets.move_assettonode',
+        'PUT': 'assets.change_assettonode',
     }
 
     def perform_update(self, serializer):

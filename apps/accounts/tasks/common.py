@@ -9,7 +9,7 @@ def quickstart_automation_by_snapshot(task_name, tp, task_snapshot=None):
     data = generate_automation_execution_data(task_name, tp, task_snapshot)
 
     pk = data['id']
-    if AutomationExecution.objects.exists(id=pk):
+    if AutomationExecution.objects.filter(id=pk).exists():
         data['id'] = str(uuid.uuid4())
 
     execution = AutomationExecution.objects.create(

@@ -93,7 +93,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         host['secret_type'] = self.secret_type
         for account in accounts:
             h = deepcopy(host)
-            h['name'] += '_' + account.username
+            h['name'] += '(' + account.username + ')'
             new_secret = self.get_secret()
 
             recorder = ChangeSecretRecord(

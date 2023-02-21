@@ -1,5 +1,4 @@
 from celery import shared_task
-from collections import defaultdict
 from django.utils.translation import gettext_noop, ugettext_lazy as _
 
 from accounts.const import AutomationTypes
@@ -21,20 +20,15 @@ def push_accounts_to_assets_task(account_ids):
     from accounts.models import Account
 
     accounts = Account.objects.filter(id__in=account_ids)
-
     task_name = gettext_noop("Push accounts to assets")
     task_name = PushAccountAutomation.generate_unique_name(task_name)
 
-    account_asset_mapper = defaultdict(set)
     for account in accounts:
-        account_asset_mapper[account.username].add(account.asset)
-
-    for username, assets in account_asset_mapper.items():
         task_snapshot = {
             'secret': account.secret,
             'secret_type': account.secret_type,
             'accounts': [account.username],
-            'assets': asset_ids,
+            'assets': [str(account.asset_id)],
         }
         tp = AutomationTypes.push_account
         quickstart_automation_by_snapshot(task_name, tp, task_snapshot)
