@@ -99,13 +99,6 @@ class Account(AbsConnectivity, BaseAccount):
         """ 排除自己和以自己为 su-from 的账号 """
         return self.asset.accounts.exclude(id=self.id).exclude(su_from=self)
 
-    def secret_changed(self):
-        pre_secret = self.history.exclude(version=self.version) \
-            .values_list('secret', flat=True) \
-            .first()
-        print("Pre secret is: ", pre_secret)
-        return pre_secret != self.secret
-
 
 class AccountTemplate(BaseAccount):
     class Meta:

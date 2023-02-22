@@ -64,7 +64,7 @@ class BasePlaybookManager:
         if not os.path.exists(path):
             os.makedirs(path, exist_ok=True, mode=0o755)
         if settings.DEBUG_DEV:
-            print(f'Ansible runtime dir:{path}')
+            print(f'Ansible runtime dir: {path}')
         return path
 
     @staticmethod
