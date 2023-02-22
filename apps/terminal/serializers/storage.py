@@ -178,7 +178,6 @@ command_storage_type_serializer_classes_mapping = {
 
 # BaseStorageSerializer
 class BaseStorageSerializer(serializers.ModelSerializer):
-    type = LabeledChoiceField(choices=const.ReplayStorageType.choices, label=_('Type'))
     storage_type_serializer_classes_mapping = {}
     meta = MethodSerializer()
 
@@ -222,6 +221,7 @@ class BaseStorageSerializer(serializers.ModelSerializer):
 
 # CommandStorageSerializer
 class CommandStorageSerializer(BaseStorageSerializer):
+    type = LabeledChoiceField(choices=const.CommandStorageType.choices, label=_('Type'))
     storage_type_serializer_classes_mapping = command_storage_type_serializer_classes_mapping
 
     class Meta(BaseStorageSerializer.Meta):
@@ -233,6 +233,7 @@ class CommandStorageSerializer(BaseStorageSerializer):
 
 # ReplayStorageSerializer
 class ReplayStorageSerializer(BaseStorageSerializer):
+    type = LabeledChoiceField(choices=const.ReplayStorageType.choices, label=_('Type'))
     storage_type_serializer_classes_mapping = replay_storage_type_serializer_classes_mapping
 
     class Meta(BaseStorageSerializer.Meta):

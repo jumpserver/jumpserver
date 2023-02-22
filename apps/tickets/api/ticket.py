@@ -2,13 +2,13 @@
 #
 from rest_framework import viewsets
 from rest_framework.decorators import action
-from rest_framework.response import Response
 from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.response import Response
 
-from orgs.utils import tmp_to_root_org
-from rbac.permissions import RBACPermission
 from common.api import CommonApiMixin
 from common.const.http import POST, PUT, PATCH
+from orgs.utils import tmp_to_root_org
+from rbac.permissions import RBACPermission
 from tickets import filters
 from tickets import serializers
 from tickets.models import (
@@ -35,14 +35,18 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     search_fields = [
         'title', 'type', 'status'
     ]
-    ordering_fields = (
-        'title', 'status', 'state', 'action_display',
-        'date_created', 'serial_num',
-    )
     ordering = ('-date_created',)
     rbac_perms = {
         'open': 'tickets.view_ticket',
     }
+
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        with tmp_to_root_org():
+            serializer = self.get_serializer(instance)
+            data = serializer.data
+        return Response(data)
 
     def create(self, request, *args, **kwargs):
         raise MethodNotAllowed(self.action)
@@ -86,7 +90,7 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         instance.reject(processor=request.user)
         return Response('ok')
 
-    @action(detail=True, methods=[PUT], permission_classes=[IsAssignee, ])
+    @action(detail=True, methods=[PUT], permission_classes=[IsAssignee | IsApplicant, ])
     def close(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.close()

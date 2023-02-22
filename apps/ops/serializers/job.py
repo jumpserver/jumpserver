@@ -1,7 +1,9 @@
+import uuid
+
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from assets.models import Node
+from assets.models import Node, Asset
 from perms.utils.user_perm import UserPermAssetUtil
 from common.serializers.fields import ReadableHiddenField
 from ops.mixin import PeriodTaskSerializerMixin
@@ -14,6 +16,16 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
     run_after_save = serializers.BooleanField(label=_("Run after save"), default=False, required=False)
     nodes = serializers.ListField(required=False, child=serializers.CharField())
     date_last_run = serializers.DateTimeField(label=_('Date last run'), read_only=True)
+    name = serializers.CharField(label=_('Name'), max_length=128, allow_blank=True, required=False)
+    assets = serializers.PrimaryKeyRelatedField(label=_('Assets'), queryset=Asset.objects, many=True,
+                                                required=False)
+
+    def to_internal_value(self, data):
+        instant = data.get('instant', False)
+        if instant:
+            _uid = str(uuid.uuid4()).split('-')[-1]
+            data['name'] = f'job-{_uid}'
+        return super().to_internal_value(data)
 
     def get_request_user(self):
         request = self.context.get('request')
@@ -59,7 +71,7 @@ class JobExecutionSerializer(BulkOrgResourceModelSerializer):
         model = JobExecution
         read_only_fields = ["id", "task_id", "timedelta", "time_cost",
                             'is_finished', 'date_start', 'date_finished',
-                            'date_created', 'is_success', 'task_id', 'job_type',
+                            'date_created', 'is_success', 'job_type',
                             'summary', 'material']
         fields = read_only_fields + [
             "job", "parameters", "creator"

@@ -59,12 +59,12 @@ def check_pid_alive(pid) -> bool:
         content = decode_content(csv_ret)
         content_list = content.strip().split("\r\n")
         if len(content_list) != 2:
-            notify_err_message(content)
+            print("check pid {} ret invalid: {}".format(pid, content))
             return False
         ret_pid = content_list[1].split(",")[1].strip('"')
         return str(pid) == ret_pid
     except Exception as e:
-        notify_err_message(e)
+        print("check pid {} err: {}".format(pid, e))
         return False
 
 
@@ -73,18 +73,21 @@ def wait_pid(pid):
         time.sleep(5)
         ok = check_pid_alive(pid)
         if not ok:
-            notify_err_message("程序退出")
+            print("pid {} is not alive".format(pid))
             break
 
 
-class DictObj:
-    def __init__(self, in_dict: dict):
-        assert isinstance(in_dict, dict)
-        for key, val in in_dict.items():
+class DictObj(dict):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for key, val in self.items():
             if isinstance(val, (list, tuple)):
                 setattr(self, key, [DictObj(x) if isinstance(x, dict) else x for x in val])
             else:
                 setattr(self, key, DictObj(val) if isinstance(val, dict) else val)
+
+    def __getattr__(self, item):
+        return self.get(item, None)
 
 
 class User(DictObj):
@@ -129,7 +132,7 @@ class Asset(DictObj):
     address: str
     protocols: list[Protocol]
     category: Category
-    specific: Specific
+    spec_info: Specific
 
     def get_protocol_port(self, protocol):
         for item in self.protocols:
@@ -151,11 +154,32 @@ class Account(DictObj):
     secret_type: LabelValue
 
 
+class ProtocolSetting(DictObj):
+    autofill: str
+    username_selector: str
+    password_selector: str
+    submit_selector: str
+    script: list[Step]
+
+
+class PlatformProtocolSetting(DictObj):
+    name: str
+    port: int
+    setting: ProtocolSetting
+
+
 class Platform(DictObj):
     id: str
     name: str
     charset: LabelValue
     type: LabelValue
+    protocols: list[PlatformProtocolSetting]
+
+    def get_protocol_setting(self, protocol):
+        for item in self.protocols:
+            if item.name == protocol:
+                return item.setting
+        return None
 
 
 class Manifest(DictObj):

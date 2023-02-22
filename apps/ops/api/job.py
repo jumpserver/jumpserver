@@ -1,8 +1,11 @@
+from django.conf import settings
 from django.db.models import Count
+from django.db.transaction import atomic
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 
+from ops.const import Types
 from ops.models import Job, JobExecution
 from ops.serializers.job import JobSerializer, JobExecutionSerializer
 
@@ -12,8 +15,9 @@ __all__ = ['JobViewSet', 'JobExecutionViewSet', 'JobRunVariableHelpAPIView',
 from ops.tasks import run_ops_job_execution
 from ops.variables import JMS_JOB_VARIABLE_HELP
 from orgs.mixins.api import OrgBulkModelViewSet
-from orgs.utils import tmp_to_org, get_current_org_id, get_current_org
+from orgs.utils import tmp_to_org, get_current_org
 from accounts.models import Account
+from rbac.permissions import RBACPermission
 
 
 def set_task_to_serializer_data(serializer, task):
@@ -24,8 +28,14 @@ def set_task_to_serializer_data(serializer, task):
 
 class JobViewSet(OrgBulkModelViewSet):
     serializer_class = JobSerializer
-    permission_classes = ()
+    permission_classes = (RBACPermission,)
+    search_fields = ('name', 'comment')
     model = Job
+
+    def check_permissions(self, request):
+        if not settings.SECURITY_COMMAND_EXECUTION:
+            return self.permission_denied(request, "Command execution disabled")
+        return super().check_permissions(request)
 
     def allow_bulk_destroy(self, qs, filtered):
         return True
@@ -53,22 +63,26 @@ class JobViewSet(OrgBulkModelViewSet):
         execution = job.create_execution()
         execution.creator = self.request.user
         execution.save()
-        task = run_ops_job_execution.delay(execution.id)
+        task = run_ops_job_execution.delay(str(execution.id))
         set_task_to_serializer_data(serializer, task)
 
 
 class JobExecutionViewSet(OrgBulkModelViewSet):
     serializer_class = JobExecutionSerializer
     http_method_names = ('get', 'post', 'head', 'options',)
-    permission_classes = ()
+    permission_classes = (RBACPermission,)
     model = JobExecution
+    search_fields = ('material',)
 
+    @atomic
     def perform_create(self, serializer):
         instance = serializer.save()
         instance.job_version = instance.job.version
+        instance.material = instance.job.material
+        instance.job_type = Types[instance.job.type].value
         instance.creator = self.request.user
         instance.save()
-        task = run_ops_job_execution.delay(instance.id)
+        task = run_ops_job_execution.delay(str(instance.id))
         set_task_to_serializer_data(serializer, task)
 
     def get_queryset(self):
@@ -123,6 +137,7 @@ class FrequentUsernames(APIView):
     permission_classes = ()
 
     def get(self, request, **kwargs):
-        top_accounts = Account.objects.exclude(username='root').exclude(username__startswith='jms_').values('username').annotate(
+        top_accounts = Account.objects.exclude(username='root').exclude(username__startswith='jms_').values(
+            'username').annotate(
             total=Count('username')).order_by('total')[:5]
         return Response(data=top_accounts)

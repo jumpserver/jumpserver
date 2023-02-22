@@ -1,14 +1,14 @@
-from django.db.models import Count
+from django.db.models import Q, Count
 from django.utils.translation import ugettext as _
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 
 from common.api import JMSModelViewSet
-from common.api import PaginatedResponseMixin
-from ..filters import RoleFilter
-from ..serializers import RoleSerializer, RoleUserSerializer
-from ..models import Role, SystemRole, OrgRole
+from orgs.utils import current_org
 from .permission import PermissionViewSet
+from ..filters import RoleFilter
+from ..models import Role, SystemRole, OrgRole, RoleBinding
+from ..serializers import RoleSerializer, RoleUserSerializer
 
 __all__ = [
     'RoleViewSet', 'SystemRoleViewSet', 'OrgRoleViewSet',
@@ -18,6 +18,7 @@ __all__ = [
 
 class RoleViewSet(JMSModelViewSet):
     queryset = Role.objects.all()
+    ordering = ('-builtin', 'scope', 'name')
     serializer_classes = {
         'default': RoleSerializer,
         'users': RoleUserSerializer,
@@ -33,6 +34,7 @@ class RoleViewSet(JMSModelViewSet):
         if instance.builtin:
             error = _("Internal role, can't be destroy")
             raise PermissionDenied(error)
+
         with tmp_to_root_org():
             if instance.users.count() >= 1:
                 error = _("The role has been bound to users, can't be destroy")
@@ -52,7 +54,28 @@ class RoleViewSet(JMSModelViewSet):
         clone = Role.objects.filter(id=clone_from).first()
         if not clone:
             return
-        instance.permissions.set(clone.permissions.all())
+        instance.permissions.set(clone.get_permissions())
+
+    @staticmethod
+    def set_users_amount(queryset):
+        """设置角色的用户绑定数量，以减少查询"""
+        ids = [role.id for role in queryset]
+        queryset = Role.objects.filter(id__in=ids)
+        org_id = current_org.id
+        q = Q(role__scope=Role.Scope.system) | Q(role__scope=Role.Scope.org, org_id=org_id)
+        role_bindings = RoleBinding.objects.filter(q).values_list('role_id').annotate(user_count=Count('user_id'))
+        role_user_amount_mapper = {role_id: user_count for role_id, user_count in role_bindings}
+        queryset = queryset.annotate(permissions_amount=Count('permissions'))
+        queryset = list(queryset)
+        for role in queryset:
+            role.users_amount = role_user_amount_mapper.get(role.id, 0)
+        return queryset
+
+    def get_serializer(self, *args, **kwargs):
+        if len(args) == 1 and kwargs.get('many', False):
+            queryset = self.set_users_amount(args[0])
+            args = (queryset,)
+        return super().get_serializer(*args, **kwargs)
 
     def perform_update(self, serializer):
         instance = serializer.instance
@@ -60,11 +83,6 @@ class RoleViewSet(JMSModelViewSet):
             error = _("Internal role, can't be update")
             raise PermissionDenied(error)
         return super().perform_update(serializer)
-
-    def get_queryset(self):
-        queryset = super().get_queryset() \
-            .annotate(permissions_amount=Count('permissions'))
-        return queryset
 
     @action(methods=['GET'], detail=True)
     def users(self, *args, **kwargs):
@@ -74,11 +92,17 @@ class RoleViewSet(JMSModelViewSet):
 
 
 class SystemRoleViewSet(RoleViewSet):
-    queryset = SystemRole.objects.all()
+    perm_model = SystemRole
+
+    def get_queryset(self):
+        return super().get_queryset().filter(scope='system')
 
 
 class OrgRoleViewSet(RoleViewSet):
-    queryset = OrgRole.objects.all()
+    perm_model = OrgRole
+
+    def get_queryset(self):
+        return super().get_queryset().filter(scope='org')
 
 
 class BaseRolePermissionsViewSet(PermissionViewSet):

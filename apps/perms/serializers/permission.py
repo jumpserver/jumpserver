@@ -29,7 +29,7 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
     actions = ActionChoicesField(required=False, allow_null=True, label=_("Actions"))
     is_valid = serializers.BooleanField(read_only=True, label=_("Is valid"))
     is_expired = serializers.BooleanField(read_only=True, label=_("Is expired"))
-    accounts = serializers.ListField(label=_("Accounts"), required=False)
+    accounts = serializers.ListField(label=_("Account"), required=False)
 
     class Meta:
         model = AssetPermission
@@ -70,9 +70,11 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
         actions = self.fields.get("actions")
         if not actions:
             return
-        choices = actions._choices
-        actions._choices = choices
-        actions.default = list(choices.keys())
+        actions.default = list(actions.choices.keys())
+
+    @staticmethod
+    def validate_accounts(accounts):
+        return list(set(accounts))
 
     @classmethod
     def setup_eager_loading(cls, queryset):

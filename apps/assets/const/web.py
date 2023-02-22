@@ -1,3 +1,4 @@
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from .base import BaseType
@@ -20,6 +21,8 @@ class WebTypes(BaseType):
     def _get_automation_constrains(cls) -> dict:
         constrains = {
             '*': {
+                'ansible_enabled': False,
+                'ping_enabled': False,
                 'gather_facts_enabled': False,
                 'verify_account_enabled': False,
                 'change_secret_enabled': False,
@@ -50,3 +53,9 @@ class WebTypes(BaseType):
         return [
             cls.WEBSITE,
         ]
+
+
+class FillType(models.TextChoices):
+    no = 'no', _('Disabled')
+    basic = 'basic', _('Basic')
+    script = 'script', _('Script')

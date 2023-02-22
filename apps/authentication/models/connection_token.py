@@ -10,8 +10,9 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import PermissionDenied
 
 from assets.const import Protocol
-from common.db.fields import EncryptCharField
-from common.utils import lazyproperty, pretty_string, bulk_get, reverse
+from common.db.fields import EncryptTextField
+from common.exceptions import JMSException
+from common.utils import lazyproperty, pretty_string, bulk_get
 from common.utils.timezone import as_current_tz
 from orgs.mixins.models import JMSOrgBaseModel
 from terminal.models import Applet
@@ -33,7 +34,7 @@ class ConnectionToken(JMSOrgBaseModel):
     )
     account = models.CharField(max_length=128, verbose_name=_("Account name"))  # 登录账号Name
     input_username = models.CharField(max_length=128, default='', blank=True, verbose_name=_("Input username"))
-    input_secret = EncryptCharField(max_length=64, default='', blank=True, verbose_name=_("Input secret"))
+    input_secret = EncryptTextField(max_length=64, default='', blank=True, verbose_name=_("Input secret"))
     protocol = models.CharField(max_length=16, default=Protocol.ssh, verbose_name=_("Protocol"))
     connect_method = models.CharField(max_length=32, verbose_name=_("Connect method"))
     user_display = models.CharField(max_length=128, default='', verbose_name=_("User display"))
@@ -172,7 +173,7 @@ class ConnectionToken(JMSOrgBaseModel):
 
         host_account = applet.select_host_account()
         if not host_account:
-            return None
+            raise JMSException({'error': 'No host account available'})
 
         host, account, lock_key, ttl = bulk_get(host_account, ('host', 'account', 'lock_key', 'ttl'))
         gateway = host.gateway.select_gateway() if host.domain else None
@@ -196,8 +197,7 @@ class ConnectionToken(JMSOrgBaseModel):
         if lock_key:
             cache.delete(lock_key)
             cache.delete(token_account_relate_key)
-            return 'released'
-        return 'not found or expired'
+            return True
 
     @lazyproperty
     def account_object(self):
@@ -228,16 +228,16 @@ class ConnectionToken(JMSOrgBaseModel):
 
     @lazyproperty
     def domain(self):
+        if not self.asset.platform.domain_enabled:
+            return
         domain = self.asset.domain if self.asset else None
         return domain
 
     @lazyproperty
     def gateway(self):
-        from assets.models import Domain
-        if not self.domain:
+        if not self.asset:
             return
-        self.domain: Domain
-        return self.domain.select_gateway()
+        return self.asset.gateway
 
     @lazyproperty
     def command_filter_acls(self):

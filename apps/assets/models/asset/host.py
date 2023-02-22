@@ -1,7 +1,8 @@
-from .common import Asset
+from django.utils.translation import ugettext_lazy as _
 
-__all__ = ['Host']
+from .common import Asset
 
 
 class Host(Asset):
-    pass
+    class Meta:
+        verbose_name = _("Host")

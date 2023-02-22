@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 #
 
-from rest_framework import generics
 from django.conf import settings
+from rest_framework import generics
 
+from common.utils import get_logger
 from jumpserver.conf import Config
 from rbac.permissions import RBACPermission
-from common.utils import get_logger
 from .. import serializers
 from ..models import Setting
+from ..signals import category_setting_updated
 
 logger = get_logger(__file__)
 
@@ -61,6 +62,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'cas': 'settings.change_auth',
         'sso': 'settings.change_auth',
         'saml2': 'settings.change_auth',
+        'oauth2': 'settings.change_auth',
         'clean': 'settings.change_clean',
         'other': 'settings.change_other',
         'sms': 'settings.change_sms',
@@ -115,10 +117,15 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
             })
         return data
 
+    def send_signal(self, serializer):
+        category = self.request.query_params.get('category', '')
+        category_setting_updated.send(sender=self.__class__, category=category, serializer=serializer)
+
     def perform_update(self, serializer):
         post_data_names = list(self.request.data.keys())
         settings_items = self.parse_serializer_data(serializer)
         serializer_data = getattr(serializer, 'data', {})
+
         for item in settings_items:
             if item['name'] not in post_data_names:
                 continue
@@ -126,6 +133,8 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
             if not changed:
                 continue
             serializer_data[setting.name] = setting.cleaned_value
+
         setattr(serializer, '_data', serializer_data)
         if hasattr(serializer, 'post_save'):
             serializer.post_save()
+        self.send_signal(serializer)

@@ -256,8 +256,6 @@ class FamilyMixin:
 
 
 class NodeAllAssetsMappingMixin:
-    # Use a new plan
-
     # { org_id: { node_key: [ asset1_id, asset2_id ] } }
     orgid_nodekey_assetsid_mapping = defaultdict(dict)
     locks_for_get_mapping_from_cache = defaultdict(threading.Lock)
@@ -273,20 +271,7 @@ class NodeAllAssetsMappingMixin:
         if _mapping:
             return _mapping
 
-        logger.debug(f'Get node asset mapping from memory failed, acquire thread lock: '
-                     f'thread={threading.get_ident()} '
-                     f'org_id={org_id}')
         with cls.get_lock(org_id):
-            logger.debug(f'Acquired thread lock ok. check if mapping is in memory now: '
-                         f'thread={threading.get_ident()} '
-                         f'org_id={org_id}')
-            _mapping = cls.get_node_all_asset_ids_mapping_from_memory(org_id)
-            if _mapping:
-                logger.debug(f'Mapping is already in memory now: '
-                             f'thread={threading.get_ident()} '
-                             f'org_id={org_id}')
-                return _mapping
-
             _mapping = cls.get_node_all_asset_ids_mapping_from_cache_or_generate_to_cache(org_id)
             cls.set_node_all_asset_ids_mapping_to_memory(org_id, mapping=_mapping)
         return _mapping
@@ -302,18 +287,18 @@ class NodeAllAssetsMappingMixin:
         cls.orgid_nodekey_assetsid_mapping[org_id] = mapping
 
     @classmethod
-    def expire_node_all_asset_ids_mapping_from_memory(cls, org_id):
+    def expire_node_all_asset_ids_memory_mapping(cls, org_id):
         org_id = str(org_id)
         cls.orgid_nodekey_assetsid_mapping.pop(org_id, None)
 
     @classmethod
-    def expire_all_orgs_node_all_asset_ids_mapping_from_memory(cls):
+    def expire_all_orgs_node_all_asset_ids_memory_mapping(cls):
         orgs = Organization.objects.all()
         org_ids = [str(org.id) for org in orgs]
         org_ids.append(Organization.ROOT_ID)
 
-        for id in org_ids:
-            cls.expire_node_all_asset_ids_mapping_from_memory(id)
+        for i in org_ids:
+            cls.expire_node_all_asset_ids_memory_mapping(i)
 
     # get order: from memory -> (from cache -> to generate)
     @classmethod
@@ -332,25 +317,18 @@ class NodeAllAssetsMappingMixin:
                 return _mapping
 
             _mapping = cls.generate_node_all_asset_ids_mapping(org_id)
-            cls.set_node_all_asset_ids_mapping_to_cache(org_id=org_id, mapping=_mapping)
+            cache_key = cls._get_cache_key_for_node_all_asset_ids_mapping(org_id)
+            cache.set(cache_key, mapping, timeout=None)
             return _mapping
 
     @classmethod
     def get_node_all_asset_ids_mapping_from_cache(cls, org_id):
         cache_key = cls._get_cache_key_for_node_all_asset_ids_mapping(org_id)
         mapping = cache.get(cache_key)
-        logger.info(f'Get node asset mapping from cache {bool(mapping)}: '
-                    f'thread={threading.get_ident()} '
-                    f'org_id={org_id}')
         return mapping
 
     @classmethod
-    def set_node_all_asset_ids_mapping_to_cache(cls, org_id, mapping):
-        cache_key = cls._get_cache_key_for_node_all_asset_ids_mapping(org_id)
-        cache.set(cache_key, mapping, timeout=None)
-
-    @classmethod
-    def expire_node_all_asset_ids_mapping_from_cache(cls, org_id):
+    def expire_node_all_asset_ids_cache_mapping(cls, org_id):
         cache_key = cls._get_cache_key_for_node_all_asset_ids_mapping(org_id)
         cache.delete(cache_key)
 
@@ -410,6 +388,14 @@ class NodeAssetsMixin(NodeAllAssetsMappingMixin):
         from .asset import Asset
         q = Q(nodes__key__startswith=f'{self.key}:') | Q(nodes__key=self.key)
         return Asset.objects.filter(q).distinct()
+
+    def get_assets_amount(self):
+        q = Q(node__key__startswith=f'{self.key}:') | Q(node__key=self.key)
+        return self.assets.through.objects.filter(q).count()
+
+    def get_assets_account_by_children(self):
+        children = self.get_all_children().values_list()
+        return self.assets.through.objects.filter(node_id__in=children).count()
 
     @classmethod
     def get_node_all_assets_by_key_v2(cls, key):

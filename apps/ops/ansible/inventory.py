@@ -10,7 +10,7 @@ __all__ = ['JMSInventory']
 
 class JMSInventory:
     def __init__(self, assets, account_policy='privileged_first',
-                 account_prefer='root,Administrator', host_callback=None):
+                 account_prefer='root,Administrator', host_callback=None, exclude_localhost=False):
         """
         :param assets:
         :param account_prefer: account username name if not set use account_policy
@@ -21,6 +21,7 @@ class JMSInventory:
         self.account_policy = account_policy
         self.host_callback = host_callback
         self.exclude_hosts = {}
+        self.exclude_localhost = exclude_localhost
 
     @staticmethod
     def clean_assets(assets):
@@ -53,7 +54,7 @@ class JMSInventory:
         if gateway.private_key:
             proxy_command_list.append("-i {}".format(gateway.private_key_path))
 
-        proxy_command = "'-o ProxyCommand={}'".format(
+        proxy_command = '-o ProxyCommand=\"{}\"'.format(
             " ".join(proxy_command_list)
         )
         return {"ansible_ssh_common_args": proxy_command}
@@ -100,12 +101,12 @@ class JMSInventory:
 
     def asset_to_host(self, asset, account, automation, protocols, platform):
         host = {
-            'name': '{}'.format(asset.name),
+            'name': '{}'.format(asset.name.replace(' ', '_')),
             'jms_asset': {
                 'id': str(asset.id), 'name': asset.name, 'address': asset.address,
                 'type': asset.type, 'category': asset.category,
                 'protocol': asset.protocol, 'port': asset.port,
-                'specific': asset.specific,
+                'spec_info': asset.spec_info, 'secret_info': asset.secret_info,
                 'protocols': [{'name': p.name, 'port': p.port} for p in protocols],
             },
             'jms_account': {
@@ -117,7 +118,10 @@ class JMSInventory:
         if host['jms_account'] and asset.platform.type == 'oracle':
             host['jms_account']['mode'] = 'sysdba' if account.privileged else None
 
-        ansible_config = dict(automation.ansible_config)
+        try:
+            ansible_config = dict(automation.ansible_config)
+        except Exception as e:
+            ansible_config = {}
         ansible_connection = ansible_config.get('ansible_connection', 'ssh')
         host.update(ansible_config)
 
@@ -127,19 +131,21 @@ class JMSInventory:
 
         if ansible_connection == 'local':
             if gateway:
-                host['ansible_host'] = gateway.address
-                host['ansible_port'] = gateway.port
-                host['ansible_user'] = gateway.username
-                host['ansible_password'] = gateway.password
-                host['ansible_connection'] = 'smart'
-            else:
-                host['ansible_connection'] = 'local'
+                host['gateway'] = {
+                    'address': gateway.address, 'port': gateway.port,
+                    'username': gateway.username, 'secret': gateway.password
+                }
         else:
             self.make_ssh_account_vars(host, asset, account, automation, protocols, platform, gateway)
         return host
 
+    def get_asset_accounts(self, asset):
+        return list(asset.accounts.filter(is_active=True))
+
     def select_account(self, asset):
-        accounts = list(asset.accounts.all())
+        accounts = self.get_asset_accounts(asset)
+        if not accounts:
+            return None
         account_selected = None
         account_usernames = self.account_prefer
 
@@ -202,6 +208,8 @@ class JMSInventory:
         for host in hosts:
             name = host.pop('name')
             data['all']['hosts'][name] = host
+        if self.exclude_localhost and data['all']['hosts'].__contains__('localhost'):
+            data['all']['hosts'].update({'localhost': {'ansible_host': '255.255.255.255'}})
         return data
 
     def write_to_file(self, path):

@@ -18,11 +18,10 @@ user_perms = (
     ('assets', 'asset', 'match', 'asset'),
     ('assets', 'systemuser', 'match', 'systemuser'),
     ('assets', 'node', 'match', 'node'),
-    ('applications', 'application', 'match', 'application'),
 )
 
 system_user_perms = (
-    ('authentication', 'connectiontoken', 'add,view', 'connectiontoken'),
+    ('authentication', 'connectiontoken', 'add,change,view', 'connectiontoken'),
     ('authentication', 'temptoken', 'add,change,view', 'temptoken'),
     ('authentication', 'accesskey', '*', '*'),
     ('tickets', 'ticket', 'view', 'ticket'),
@@ -31,7 +30,7 @@ system_user_perms = (
 _auditor_perms = (
     ('rbac', 'menupermission', 'view', 'audit'),
     ('audits', '*', '*', '*'),
-    ('ops', 'jobauditlog', '*', '*'),
+    ('audits', 'joblog', '*', '*'),
     ('terminal', 'commandstorage', 'view', 'commandstorage'),
     ('terminal', 'sessionreplay', 'view,download', 'sessionreplay'),
     ('terminal', 'session', '*', '*'),

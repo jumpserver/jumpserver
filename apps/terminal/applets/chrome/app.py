@@ -7,6 +7,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 
+from code_dialog import CodeDialog
 from common import (Asset, User, Account, Platform, Step)
 from common import (BaseApplication)
 from common import (notify_err_message, block_input, unblock_input)
@@ -16,6 +17,7 @@ class Command(Enum):
     TYPE = 'type'
     CLICK = 'click'
     OPEN = 'open'
+    CODE = 'code'
 
 
 def _execute_type(ele: WebElement, value: str):
@@ -62,6 +64,11 @@ class StepAction:
             ele.click()
         elif self.command in ['open']:
             driver.get(self.value)
+        elif self.command == 'code':
+            unblock_input()
+            code_string = CodeDialog(title="Code Dialog", label="Code").wait_string()
+            block_input()
+            ele.send_keys(code_string)
         return True
 
     def _execute_command_type(self, ele, value):
@@ -86,14 +93,21 @@ class WebAPP(object):
         self.asset = asset
         self.account = account
         self.platform = platform
-
-        self.extra_data = self.asset.specific
         self._steps = list()
-        autofill_type = self.asset.specific.autofill
+
+        extra_data = self.asset.spec_info
+        autofill_type = extra_data.autofill
+        if not autofill_type:
+            protocol_setting = self.platform.get_protocol_setting("http")
+            if not protocol_setting:
+                print("No protocol setting found")
+                return
+            extra_data = protocol_setting
+            autofill_type = extra_data.autofill
         if autofill_type == "basic":
-            self._steps = self._default_custom_steps()
+            self._steps = self._default_custom_steps(extra_data)
         elif autofill_type == "script":
-            script_list = self.asset.specific.script
+            script_list = extra_data.script
             steps = sorted(script_list, key=lambda step_item: step_item.step)
             for item in steps:
                 val = item.value
@@ -103,26 +117,25 @@ class WebAPP(object):
                 item.value = val
                 self._steps.append(item)
 
-    def _default_custom_steps(self) -> list:
+    def _default_custom_steps(self, spec_info) -> list:
         account = self.account
-        specific_property = self.asset.specific
         default_steps = [
             Step({
                 "step": 1,
                 "value": account.username,
-                "target": specific_property.username_selector,
+                "target": spec_info.username_selector,
                 "command": "type"
             }),
             Step({
                 "step": 2,
                 "value": account.secret,
-                "target": specific_property.password_selector,
+                "target": spec_info.password_selector,
                 "command": "type"
             }),
             Step({
                 "step": 3,
                 "value": "",
-                "target": specific_property.submit_selector,
+                "target": spec_info.submit_selector,
                 "command": "click"
             })
         ]
@@ -149,6 +162,12 @@ def default_chrome_driver_options():
     options.add_argument("start-maximized")
     # 禁用 扩展
     options.add_argument("--disable-extensions")
+    # 忽略证书错误相关
+    options.add_argument('--ignore-ssl-errors')
+    options.add_argument('--ignore-certificate-errors')
+    options.add_argument('--ignore-certificate-errors-spki-list')
+    options.add_argument('--allow-running-insecure-content')
+
     # 禁用开发者工具
     options.add_argument("--disable-dev-tools")
     # 禁用 密码管理器弹窗

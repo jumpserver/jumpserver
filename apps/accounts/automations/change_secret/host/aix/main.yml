@@ -1,0 +1,54 @@
+- hosts: demo
+  gather_facts: no
+  tasks:
+    - name: Test privileged account
+      ansible.builtin.ping:
+
+    - name: Change password
+      ansible.builtin.user:
+        name: "{{ account.username }}"
+        password: "{{ account.secret | password_hash('des') }}"
+        update_password: always
+      when: secret_type == "password"
+
+    - name: create user If it already exists, no operation will be performed
+      ansible.builtin.user:
+        name: "{{ account.username }}"
+      when: secret_type == "ssh_key"
+
+    - name: remove jumpserver ssh key
+      ansible.builtin.lineinfile:
+        dest: "{{ kwargs.dest }}"
+        regexp: "{{ kwargs.regexp }}"
+        state: absent
+      when:
+      - secret_type == "ssh_key"
+      - kwargs.strategy == "set_jms"
+
+    - name: Change SSH key
+      ansible.builtin.authorized_key:
+        user: "{{ account.username }}"
+        key: "{{ account.secret }}"
+        exclusive: "{{ kwargs.exclusive }}"
+      when: secret_type == "ssh_key"
+
+    - name: Refresh connection
+      ansible.builtin.meta: reset_connection
+
+    - name: Verify password
+      ansible.builtin.ping:
+      become: no
+      vars:
+        ansible_user: "{{ account.username }}"
+        ansible_password: "{{ account.secret }}"
+        ansible_become: no
+      when: secret_type == "password"
+
+    - name: Verify SSH key
+      ansible.builtin.ping:
+      become: no
+      vars:
+        ansible_user: "{{ account.username }}"
+        ansible_ssh_private_key_file: "{{ account.private_key_path }}"
+        ansible_become: no
+      when: secret_type == "ssh_key"

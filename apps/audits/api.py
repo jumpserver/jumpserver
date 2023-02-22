@@ -3,32 +3,40 @@
 from importlib import import_module
 
 from django.conf import settings
+from django.db.models import F, Value, CharField, Q
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin
 
-from ops.models.job import JobAuditLog
-from common.api import JMSGenericViewSet
 from common.drf.filters import DatetimeRangeFilter
 from common.plugins.es import QuerySet as ESQuerySet
+from common.utils import is_uuid
+from orgs.mixins.api import OrgReadonlyModelViewSet, OrgModelViewSet
 from orgs.utils import current_org, tmp_to_root_org
-from orgs.mixins.api import OrgGenericViewSet, OrgBulkModelViewSet
+from orgs.models import Organization
+from users.models import User
 from .backends import TYPE_ENGINE_MAPPING
-from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog
-from .serializers import FTPLogSerializer, UserLoginLogSerializer, JobAuditLogSerializer
+from .const import ActivityChoices
+from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog, ActivityLog, JobLog
+from .serializers import FTPLogSerializer, UserLoginLogSerializer, JobLogSerializer
 from .serializers import (
     OperateLogSerializer, OperateLogActionDetailSerializer,
-    PasswordChangeLogSerializer, ActivitiesOperatorLogSerializer,
+    PasswordChangeLogSerializer, ActivityUnionLogSerializer,
 )
 
 
-class JobAuditViewSet(OrgBulkModelViewSet):
-    model = JobAuditLog
-    serializer_class = JobAuditLogSerializer
-    http_method_names = ('get', 'head', 'options')
+class JobAuditViewSet(OrgReadonlyModelViewSet):
+    model = JobLog
+    extra_filter_backends = [DatetimeRangeFilter]
+    date_range_filter_fields = [
+        ('date_start', ('date_from', 'date_to'))
+    ]
+    search_fields = ['creator__name', 'material']
+    filterset_fields = ['creator__name', 'material']
+    serializer_class = JobLogSerializer
+    ordering = ['-date_start']
 
 
-class FTPLogViewSet(CreateModelMixin, ListModelMixin, OrgGenericViewSet):
+class FTPLogViewSet(OrgModelViewSet):
     model = FTPLog
     serializer_class = FTPLogSerializer
     extra_filter_backends = [DatetimeRangeFilter]
@@ -38,21 +46,21 @@ class FTPLogViewSet(CreateModelMixin, ListModelMixin, OrgGenericViewSet):
     filterset_fields = ['user', 'asset', 'account', 'filename']
     search_fields = filterset_fields
     ordering = ['-date_start']
+    http_method_names = ['post', 'get', 'head', 'options']
 
 
 class UserLoginCommonMixin:
-    queryset = UserLoginLog.objects.all()
+    model = UserLoginLog
     serializer_class = UserLoginLogSerializer
     extra_filter_backends = [DatetimeRangeFilter]
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
     ]
-    filterset_fields = ['username', 'ip', 'city', 'type', 'status', 'mfa']
-    search_fields = ['username', 'ip', 'city']
+    filterset_fields = ['id', 'username', 'ip', 'city', 'type', 'status', 'mfa']
+    search_fields = ['id', 'username', 'ip', 'city']
 
 
-class UserLoginLogViewSet(UserLoginCommonMixin, ListModelMixin, JMSGenericViewSet):
-
+class UserLoginLogViewSet(UserLoginCommonMixin, OrgReadonlyModelViewSet):
     @staticmethod
     def get_org_members():
         users = current_org.get_members().values_list('username', flat=True)
@@ -67,7 +75,7 @@ class UserLoginLogViewSet(UserLoginCommonMixin, ListModelMixin, JMSGenericViewSe
         return queryset
 
 
-class MyLoginLogAPIView(UserLoginCommonMixin, generics.ListAPIView):
+class MyLoginLogViewSet(UserLoginCommonMixin, OrgReadonlyModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -77,27 +85,62 @@ class MyLoginLogAPIView(UserLoginCommonMixin, generics.ListAPIView):
 
 
 class ResourceActivityAPIView(generics.ListAPIView):
-    serializer_class = ActivitiesOperatorLogSerializer
+    serializer_class = ActivityUnionLogSerializer
+    ordering_fields = ['datetime']
     rbac_perms = {
-        'GET': 'audits.view_operatelog',
+        'GET': 'audits.view_activitylog',
     }
 
-    def get_queryset(self):
-        resource_id = self.request.query_params.get('resource_id')
-        with tmp_to_root_org():
-            queryset = OperateLog.objects.filter(resource_id=resource_id)[:30]
+    @staticmethod
+    def get_operate_log_qs(fields, limit, org_q, resource_id=None):
+        q, user = Q(resource_id=resource_id), None
+        if is_uuid(resource_id):
+            user = User.objects.filter(id=resource_id).first()
+        if user is not None:
+            q |= Q(user=str(user))
+        queryset = OperateLog.objects.filter(q, org_q).annotate(
+            r_type=Value(ActivityChoices.operate_log, CharField()),
+            r_detail_id=F('id'), r_detail=Value(None, CharField()),
+            r_user=F('user'), r_action=F('action'),
+        ).values(*fields)[:limit]
         return queryset
 
+    @staticmethod
+    def get_activity_log_qs(fields, limit, org_q, **filters):
+        queryset = ActivityLog.objects.filter(org_q, **filters).annotate(
+            r_type=F('type'), r_detail_id=F('detail_id'),
+            r_detail=F('detail'), r_user=Value(None, CharField()),
+            r_action=Value(None, CharField()),
+        ).values(*fields)[:limit]
+        return queryset
 
-class OperateLogViewSet(RetrieveModelMixin, ListModelMixin, OrgGenericViewSet):
+    def get_queryset(self):
+        limit = 30
+        resource_id = self.request.query_params.get('resource_id')
+        fields = (
+            'id', 'datetime', 'r_detail', 'r_detail_id',
+            'r_user', 'r_action', 'r_type'
+        )
+        org_q = Q(org_id=Organization.SYSTEM_ID) | Q(org_id=current_org.id)
+        with tmp_to_root_org():
+            qs1 = self.get_operate_log_qs(fields, limit, org_q, resource_id=resource_id)
+            qs2 = self.get_activity_log_qs(fields, limit, org_q, resource_id=resource_id)
+            queryset = qs2.union(qs1)
+        return queryset.order_by('-datetime')[:limit]
+
+
+class OperateLogViewSet(OrgReadonlyModelViewSet):
     model = OperateLog
     serializer_class = OperateLogSerializer
     extra_filter_backends = [DatetimeRangeFilter]
     date_range_filter_fields = [
         ('datetime', ('date_from', 'date_to'))
     ]
-    filterset_fields = ['user', 'action', 'resource_type', 'resource', 'remote_addr']
-    search_fields = ['resource']
+    filterset_fields = [
+        'user', 'action', 'resource_type', 'resource',
+        'remote_addr'
+    ]
+    search_fields = ['resource', 'user']
     ordering = ['-datetime']
 
     def get_serializer_class(self):
@@ -106,7 +149,9 @@ class OperateLogViewSet(RetrieveModelMixin, ListModelMixin, OrgGenericViewSet):
         return super().get_serializer_class()
 
     def get_queryset(self):
-        qs = OperateLog.objects.all()
+        org_q = Q(org_id=Organization.SYSTEM_ID) | Q(org_id=current_org.id)
+        with tmp_to_root_org():
+            qs = OperateLog.objects.filter(org_q)
         es_config = settings.OPERATE_LOG_ELASTICSEARCH_CONFIG
         if es_config:
             engine_mod = import_module(TYPE_ENGINE_MAPPING['es'])
@@ -117,8 +162,8 @@ class OperateLogViewSet(RetrieveModelMixin, ListModelMixin, OrgGenericViewSet):
         return qs
 
 
-class PasswordChangeLogViewSet(ListModelMixin, JMSGenericViewSet):
-    queryset = PasswordChangeLog.objects.all()
+class PasswordChangeLogViewSet(OrgReadonlyModelViewSet):
+    model = PasswordChangeLog
     serializer_class = PasswordChangeLogSerializer
     extra_filter_backends = [DatetimeRangeFilter]
     date_range_filter_fields = [
@@ -129,59 +174,10 @@ class PasswordChangeLogViewSet(ListModelMixin, JMSGenericViewSet):
     ordering = ['-datetime']
 
     def get_queryset(self):
-        users = current_org.get_members()
-        queryset = super().get_queryset().filter(
-            user__in=[user.__str__() for user in users]
-        )
+        queryset = super().get_queryset()
+        if not current_org.is_root():
+            users = current_org.get_members()
+            queryset = queryset.filter(
+                user__in=[str(user) for user in users]
+            )
         return queryset
-
-# Todo: 看看怎么搞
-# class CommandExecutionViewSet(ListModelMixin, OrgGenericViewSet):
-#     model = CommandExecution
-#     serializer_class = CommandExecutionSerializer
-#     extra_filter_backends = [DatetimeRangeFilter]
-#     date_range_filter_fields = [
-#         ('date_start', ('date_from', 'date_to'))
-#     ]
-#     filterset_fields = [
-#         'user__name', 'user__username', 'command',
-#         'account', 'is_finished'
-#     ]
-#     search_fields = [
-#         'command', 'user__name', 'user__username',
-#         'account__username',
-#     ]
-#     ordering = ['-date_created']
-#
-#     def get_queryset(self):
-#         queryset = super().get_queryset()
-#         if getattr(self, 'swagger_fake_view', False):
-#             return queryset.model.objects.none()
-#         if current_org.is_root():
-#             return queryset
-#         # queryset = queryset.filter(run_as__org_id=current_org.org_id())
-#         return queryset
-#
-#
-# class CommandExecutionHostRelationViewSet(OrgRelationMixin, OrgBulkModelViewSet):
-#     serializer_class = CommandExecutionHostsRelationSerializer
-#     m2m_field = CommandExecution.hosts.field
-#     filterset_fields = [
-#         'id', 'asset', 'commandexecution'
-#     ]
-#     search_fields = ('asset__name', )
-#     http_method_names = ['options', 'get']
-#     rbac_perms = {
-#         'GET': 'ops.view_commandexecution',
-#         'list': 'ops.view_commandexecution',
-#     }
-#
-#     def get_queryset(self):
-#         queryset = super().get_queryset()
-#         queryset = queryset.annotate(
-#             asset_display=Concat(
-#                 F('asset__name'), Value('('),
-#                 F('asset__address'), Value(')')
-#             )
-#         )
-#         return queryset

@@ -1,11 +1,11 @@
-from random import choice
 import random
+from random import choice
+
 import forgery_py
 
-from .base import FakeDataGenerator
-
-from assets.models import *
 from assets.const import AllTypes
+from assets.models import *
+from .base import FakeDataGenerator
 
 
 class NodesGenerator(FakeDataGenerator):
@@ -59,11 +59,11 @@ class AssetsGenerator(FakeDataGenerator):
         assets = []
 
         for i in batch:
-            ip = forgery_py.internet.ip_v4()
+            address = forgery_py.internet.ip_v4()
             hostname = forgery_py.email.address().replace('@', '.')
-            hostname = f'{hostname}-{ip}'
+            hostname = f'{hostname}-{address}'
             data = dict(
-                ip=ip,
+                address=address,
                 name=hostname,
                 platform_id=choice(self.platform_ids),
                 created_by='Fake',

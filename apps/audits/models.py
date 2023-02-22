@@ -7,11 +7,13 @@ from django.utils.translation import gettext, ugettext_lazy as _
 
 from common.db.encoder import ModelJSONFieldEncoder
 from common.utils import lazyproperty
+from ops.models import JobExecution
 from orgs.mixins.models import OrgModelMixin, Organization
 from orgs.utils import current_org
 from .const import (
     OperateChoices,
     ActionChoices,
+    ActivityChoices,
     LoginTypeChoices,
     MFAChoices,
     LoginStatusChoices,
@@ -20,9 +22,21 @@ from .const import (
 __all__ = [
     "FTPLog",
     "OperateLog",
+    "ActivityLog",
     "PasswordChangeLog",
     "UserLoginLog",
+    "JobLog"
 ]
+
+
+class JobLog(JobExecution):
+    @property
+    def creator_name(self):
+        return self.creator.name
+
+    class Meta:
+        proxy = True
+        verbose_name = _("Job audit log")
 
 
 class FTPLog(OrgModelMixin):
@@ -53,13 +67,12 @@ class OperateLog(OrgModelMixin):
     resource_type = models.CharField(max_length=64, verbose_name=_("Resource Type"))
     resource = models.CharField(max_length=128, verbose_name=_("Resource"))
     resource_id = models.CharField(
-        max_length=36, blank=True, default='', db_index=True,
+        max_length=128, blank=True, default='', db_index=True,
         verbose_name=_("Resource")
     )
     remote_addr = models.CharField(max_length=128, verbose_name=_("Remote addr"), blank=True, null=True)
     datetime = models.DateTimeField(auto_now=True, verbose_name=_('Datetime'), db_index=True)
     diff = models.JSONField(default=dict, encoder=ModelJSONFieldEncoder, null=True)
-    detail = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Detail'))
 
     def __str__(self):
         return "<{}> {} <{}>".format(self.user, self.action, self.resource)
@@ -91,6 +104,36 @@ class OperateLog(OrgModelMixin):
     class Meta:
         verbose_name = _("Operate log")
         ordering = ('-datetime',)
+
+
+class ActivityLog(OrgModelMixin):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    type = models.CharField(
+        choices=ActivityChoices.choices, max_length=2,
+        null=True, default=None, verbose_name=_("Activity type"),
+    )
+    resource_id = models.CharField(
+        max_length=36, blank=True, default='',
+        db_index=True, verbose_name=_("Resource")
+    )
+    datetime = models.DateTimeField(
+        auto_now=True, verbose_name=_('Datetime'), db_index=True
+    )
+    # 日志的描述信息
+    detail = models.TextField(default='', blank=True, verbose_name=_('Detail'))
+    # 详情ID, 结合 type 来使用, (实例ID 和 CeleryTaskID)
+    detail_id = models.CharField(
+        max_length=36, default=None, null=True, verbose_name=_('Detail ID')
+    )
+
+    class Meta:
+        verbose_name = _("Activity log")
+        ordering = ('-datetime',)
+
+    def save(self, *args, **kwargs):
+        if current_org.is_root() and not self.org_id:
+            self.org_id = Organization.ROOT_ID
+        return super(ActivityLog, self).save(*args, **kwargs)
 
 
 class PasswordChangeLog(models.Model):

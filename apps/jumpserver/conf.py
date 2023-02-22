@@ -512,6 +512,7 @@ class Config(dict):
         'LOGIN_LOG_KEEP_DAYS': 200,
         'TASK_LOG_KEEP_DAYS': 90,
         'OPERATE_LOG_KEEP_DAYS': 200,
+        'ACTIVITY_LOG_KEEP_DAYS': 200,
         'FTP_LOG_KEEP_DAYS': 200,
         'CLOUD_SYNC_TASK_EXECUTION_KEEP_DAYS': 30,
 
@@ -526,11 +527,10 @@ class Config(dict):
         'PERM_SINGLE_ASSET_TO_UNGROUP_NODE': False,
         'TICKET_AUTHORIZE_DEFAULT_TIME': 7,
         'TICKET_AUTHORIZE_DEFAULT_TIME_UNIT': 'day',
-        'WINDOWS_SSH_DEFAULT_SHELL': 'cmd',
         'PERIOD_TASK_ENABLED': True,
 
         # 导航栏 帮助
-        'HELP_DOCUMENT_URL': 'http://docs.jumpserver.org',
+        'HELP_DOCUMENT_URL': 'https://docs.jumpserver.org/zh/v3/',
         'HELP_SUPPORT_URL': 'http://www.jumpserver.org/support/',
 
         'FORGOT_PASSWORD_URL': '',

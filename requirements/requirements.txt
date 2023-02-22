@@ -39,6 +39,7 @@ requests==2.28.0
 jms-storage==0.0.44
 simplejson==3.17.6
 six==1.16.0
+sshtunnel==0.4.0
 sshpubkeys==3.3.1
 uritemplate==4.1.1
 urllib3==1.26.9
@@ -65,7 +66,7 @@ jsonfield2==4.0.0.post0
 geoip2==4.5.0
 ipip-ipdb==1.6.1
 # Django environment
-Django==3.2.16
+Django==3.2.17
 django-bootstrap3==14.2.0
 django-filter==2.4.0
 django-formtools==2.2
@@ -76,6 +77,7 @@ django-timezone-field==5.0
 djangorestframework==3.13.1
 djangorestframework-bulk==0.2.1
 django-simple-history==3.1.1
+django-private-storage==3.0
 drf-nested-routers==0.93.4
 drf-writable-nested==0.6.4
 rest_condition==1.0.3
@@ -123,7 +125,7 @@ redis==4.3.3
 pyOpenSSL==22.0.0
 pymongo==4.2.0
 # Debug
-ipython==8.4.0
+ipython==8.10.0
 ForgeryPy3==0.3.1
 django-debug-toolbar==3.5
 Pympler==1.0.1

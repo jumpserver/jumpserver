@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -27,11 +28,13 @@ class DeployOptionsSerializer(serializers.Serializer):
         (1, _("Disabled")),
         (0, _("Enabled")),
     )
+
+    CORE_HOST = serializers.CharField(default=settings.SITE_URL, label=_('API Server'), max_length=1024)
     RDS_Licensing = serializers.BooleanField(default=False, label=_("RDS Licensing"))
     RDS_LicenseServer = serializers.CharField(default='127.0.0.1', label=_('RDS License Server'), max_length=1024)
-    RDS_LicensingMode = serializers.ChoiceField(choices=LICENSE_MODE_CHOICES, default=4, label=_('RDS Licensing Mode'))
+    RDS_LicensingMode = serializers.ChoiceField(choices=LICENSE_MODE_CHOICES, default=2, label=_('RDS Licensing Mode'))
     RDS_fSingleSessionPerUser = serializers.ChoiceField(choices=SESSION_PER_USER, default=1,
-                                                        label=_("RDS fSingleSessionPerUser"))
+                                                        label=_("RDS Single Session Per User"))
     RDS_MaxDisconnectionTime = serializers.IntegerField(default=60000, label=_("RDS Max Disconnection Time"))
     RDS_RemoteAppLogoffTimeLimit = serializers.IntegerField(default=0, label=_("RDS Remote App Logoff Time Limit"))
 
@@ -104,11 +107,6 @@ class AppletHostDeployAppletSerializer(AppletHostDeploymentSerializer):
 
     class Meta(AppletHostDeploymentSerializer.Meta):
         fields = AppletHostDeploymentSerializer.Meta.fields + ['applet_id']
-
-    def create(self, validated_data):
-        applet_id = validated_data.pop('applet_id', None)
-        deployment = super().create(validated_data)
-        return deployment
 
 
 class AppletHostAccountSerializer(serializers.ModelSerializer):

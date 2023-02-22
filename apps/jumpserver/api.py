@@ -1,28 +1,28 @@
 import time
 
 from django.core.cache import cache
-from django.utils import timezone
-from django.utils.timesince import timesince
 from django.db.models import Count, Max, F
 from django.http.response import JsonResponse, HttpResponse
-from rest_framework.views import APIView
+from django.utils import timezone
+from django.utils.timesince import timesince
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from users.models import User
-from assets.models import Asset
 from assets.const import AllTypes
+from assets.models import Asset
+from audits.const import LoginStatusChoices
+from audits.models import UserLoginLog, PasswordChangeLog, OperateLog, FTPLog, JobLog
+from common.utils import lazyproperty
+from common.utils.timezone import local_now, local_zero_hour
+from ops.const import JobStatus
+from ops.models import JobExecution
+from orgs.caches import OrgResourceStatisticsCache
+from orgs.utils import current_org
 from terminal.models import Session, Command
 from terminal.utils import ComponentsPrometheusMetricsUtil
-from orgs.utils import current_org
-from ops.const import JobStatus
-from ops.models import Job, JobExecution
-from common.utils import lazyproperty
-from audits.models import UserLoginLog, PasswordChangeLog, OperateLog
-from audits.const import LoginStatusChoices
-from common.utils.timezone import local_now, local_zero_hour
-from orgs.caches import OrgResourceStatisticsCache
+from users.models import User
 
 __all__ = ['IndexApi']
 
@@ -38,13 +38,13 @@ class DateTimeMixin:
     def days(self):
         query_params = self.request.query_params
         count = query_params.get('days')
-        count = int(count) if count else 0
+        count = int(count) if count else 1
         return count
 
     @property
     def days_to_datetime(self):
         days = self.days
-        if days == 0:
+        if days == 1:
             t = local_zero_hour()
         else:
             t = local_now() - timezone.timedelta(days=days)
@@ -101,15 +101,15 @@ class DateTimeMixin:
 
     @lazyproperty
     def operate_logs_queryset(self):
+        from audits.api import OperateLogViewSet
         t = self.days_to_datetime
-        queryset = OperateLog.objects.filter(datetime__gte=t)
-        queryset = self.get_logs_queryset(queryset, 'user')
+        queryset = OperateLogViewSet().get_queryset().filter(datetime__gte=t)
         return queryset
 
     @lazyproperty
     def ftp_logs_queryset(self):
         t = self.days_to_datetime
-        queryset = OperateLog.objects.filter(datetime__gte=t)
+        queryset = FTPLog.objects.filter(date_start__gte=t)
         queryset = self.get_logs_queryset(queryset, 'user')
         return queryset
 
@@ -121,9 +121,9 @@ class DateTimeMixin:
         return queryset
 
     @lazyproperty
-    def jobs_queryset(self):
+    def job_logs_queryset(self):
         t = self.days_to_datetime
-        queryset = Job.objects.filter(date_created__gte=t)
+        queryset = JobLog.objects.filter(date_created__gte=t)
         return queryset
 
     @lazyproperty
@@ -138,8 +138,7 @@ class DatesLoginMetricMixin:
     command_queryset: Command.objects
     sessions_queryset: Session.objects
     ftp_logs_queryset: OperateLog.objects
-    jobs_queryset: Job.objects
-    jobs_executed_queryset: JobExecution.objects
+    job_logs_queryset: JobLog.objects
     login_logs_queryset: UserLoginLog.objects
     operate_logs_queryset: OperateLog.objects
     password_change_logs_queryset: PasswordChangeLog.objects
@@ -159,7 +158,7 @@ class DatesLoginMetricMixin:
 
     def __set_data_to_cache(self, date, tp, count):
         cache_key = self.get_cache_key(date, tp)
-        cache.set(cache_key, count, 3600 * 24 * 7)
+        cache.set(cache_key, count, 3600)
 
     @staticmethod
     def get_date_start_2_end(d):
@@ -171,12 +170,12 @@ class DatesLoginMetricMixin:
         return ds, de
 
     def get_date_login_count(self, date):
-        tp = "LOGIN"
+        tp = "LOGIN-USER"
         count = self.__get_data_from_cache(date, tp)
         if count is not None:
             return count
         ds, de = self.get_date_start_2_end(date)
-        count = Session.objects.filter(date_start__range=(ds, de)).count()
+        count = UserLoginLog.objects.filter(datetime__range=(ds, de)).count()
         self.__set_data_to_cache(date, tp, count)
         return count
 
@@ -313,22 +312,20 @@ class DatesLoginMetricMixin:
 
     @lazyproperty
     def commands_danger_amount(self):
-        return self.command_queryset.filter(risk_level=Command.RISK_LEVEL_DANGEROUS).count()
+        return self.command_queryset.filter(risk_level=Command.RiskLevelChoices.dangerous).count()
 
     @lazyproperty
-    def jobs_amount(self):
-        return self.jobs_queryset.count()
+    def job_logs_running_amount(self):
+        return self.job_logs_queryset.filter(status__in=[JobStatus.running]).count()
 
     @lazyproperty
-    def jobs_unexecuted_amount(self):
-        executed_amount = self.jobs_executed_queryset.values(
-            'job_id').order_by('job_id').distinct().count()
-        return self.jobs_amount - executed_amount
+    def job_logs_failed_amount(self):
+        return self.job_logs_queryset.filter(
+            status__in=[JobStatus.failed, JobStatus.timeout]).count()
 
     @lazyproperty
-    def jobs_executed_failed_amount(self):
-        return self.jobs_executed_queryset.filter(
-            status=JobStatus.failed).count()
+    def job_logs_amount(self):
+        return self.job_logs_queryset.count()
 
     @lazyproperty
     def sessions_amount(self):
@@ -439,19 +436,19 @@ class IndexApi(DateTimeMixin, DatesLoginMetricMixin, APIView):
                 'total_count_ftp_logs': self.ftp_logs_amount,
             })
 
-        if _all or query_params.get('total_count') or query_params.get('total_count_jobs'):
+        if _all or query_params.get('total_count') or query_params.get('total_count_job_logs'):
             data.update({
-                'total_count_jobs': self.jobs_amount,
+                'total_count_job_logs': self.job_logs_amount,
             })
 
-        if _all or query_params.get('total_count') or query_params.get('total_count_jobs_unexecuted'):
+        if _all or query_params.get('total_count') or query_params.get('total_count_job_logs_running'):
             data.update({
-                'total_count_jobs_unexecuted': self.jobs_unexecuted_amount,
+                'total_count_job_logs_running': self.job_logs_running_amount,
             })
 
-        if _all or query_params.get('total_count') or query_params.get('total_count_jobs_executed_failed'):
+        if _all or query_params.get('total_count') or query_params.get('total_count_job_logs_failed'):
             data.update({
-                'total_count_jobs_executed_failed': self.jobs_executed_failed_amount,
+                'total_count_job_logs_failed': self.job_logs_failed_amount,
             })
 
         if _all or query_params.get('total_count') or query_params.get('total_count_type_to_assets_amount'):

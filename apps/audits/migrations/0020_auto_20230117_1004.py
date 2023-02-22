@@ -39,12 +39,12 @@ class Migration(migrations.Migration):
             name='diff',
             field=models.JSONField(default=dict, encoder=common.db.encoder.ModelJSONFieldEncoder, null=True),
         ),
-        migrations.AddField(
-            model_name='operatelog',
-            name='detail',
-            field=models.CharField(blank=True, max_length=128, null=True, verbose_name='Detail'),
-        ),
         migrations.RunPython(migrate_operate_log_after_before),
         migrations.RemoveField(model_name='operatelog', name='after', ),
         migrations.RemoveField(model_name='operatelog', name='before', ),
+        migrations.AlterField(
+            model_name='operatelog',
+            name='resource_id',
+            field=models.CharField(blank=True, db_index=True, default='', max_length=128, verbose_name='Resource'),
+        ),
     ]

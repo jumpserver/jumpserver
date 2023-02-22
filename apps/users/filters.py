@@ -1,17 +1,15 @@
+from django.utils.translation import gettext as _
 from django_filters import rest_framework as filters
 
 from common.drf.filters import BaseFilterSet
-from users.models.user import User
+from common.utils import is_uuid
 from rbac.models import Role
+from users.models.user import User
 
 
 class UserFilter(BaseFilterSet):
-    system_roles = filters.ModelChoiceFilter(
-        queryset=Role.objects.filter(scope='system'), method='filter_system_roles'
-    )
-    org_roles = filters.ModelChoiceFilter(
-        queryset=Role.objects.filter(scope='org'), method='filter_org_roles'
-    )
+    system_roles = filters.CharFilter(method='filter_system_roles')
+    org_roles = filters.CharFilter(method='filter_org_roles')
 
     class Meta:
         model = User
@@ -21,17 +19,34 @@ class UserFilter(BaseFilterSet):
         )
 
     @staticmethod
-    def filter_system_roles(queryset, name, value):
-        queryset = queryset.prefetch_related('role_bindings')\
-            .filter(role_bindings__role_id=value.id)\
-            .distinct()
-        return queryset
+    def get_role(value):
+        from rbac.builtin import BuiltinRole
+        roles = BuiltinRole.get_roles()
+        for role in roles.values():
+            if _(role.name) == value:
+                return role
 
-    @staticmethod
-    def filter_org_roles(queryset, name, value):
+        if is_uuid(value):
+            return Role.objects.filter(id=value).first()
+        else:
+            return Role.objects.filter(name=value).first()
+
+    def filter_system_roles(self, queryset, name, value):
+        role = self.get_role(value)
+        if not role:
+            return queryset.none()
         queryset = queryset.prefetch_related('role_bindings') \
-            .filter(role_bindings__role_id=value.id) \
+            .filter(role_bindings__role_id=role.id) \
+            .filter(role_bindings__role__scope='system') \
             .distinct()
         return queryset
 
-
+    def filter_org_roles(self, queryset, name, value):
+        role = self.get_role(value)
+        if not role:
+            return queryset.none()
+        queryset = queryset.prefetch_related('role_bindings') \
+            .filter(role_bindings__role_id=role.id) \
+            .filter(role_bindings__role__scope='org') \
+            .distinct()
+        return queryset

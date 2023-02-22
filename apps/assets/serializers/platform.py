@@ -1,8 +1,10 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
+from django.core import validators
 
-from common.serializers.fields import LabeledChoiceField
+from assets.const.web import FillType
 from common.serializers import WritableNestedModelSerializer
+from common.serializers.fields import LabeledChoiceField
 from ..const import Category, AllTypes
 from ..models import Platform, PlatformProtocol, PlatformAutomation
 
@@ -25,7 +27,7 @@ class ProtocolSettingSerializer(serializers.Serializer):
     sftp_home = serializers.CharField(default="/tmp", label=_("SFTP home"))
 
     # HTTP
-    autofile = serializers.BooleanField(default=False, label=_("Autofill"))
+    autofill = serializers.ChoiceField(default='basic', choices=FillType.choices, label=_("Autofill"))
     username_selector = serializers.CharField(
         default="", allow_blank=True, label=_("Username selector")
     )
@@ -35,6 +37,10 @@ class ProtocolSettingSerializer(serializers.Serializer):
     submit_selector = serializers.CharField(
         default="", allow_blank=True, label=_("Submit selector")
     )
+    script = serializers.JSONField(default=list, label=_("Script"))
+
+    # Redis
+    auth_username = serializers.BooleanField(default=False, label=_("Auth with username"))
 
 
 class PlatformAutomationSerializer(serializers.ModelSerializer):
@@ -51,18 +57,19 @@ class PlatformAutomationSerializer(serializers.ModelSerializer):
             "gather_accounts_enabled", "gather_accounts_method",
         ]
         extra_kwargs = {
-            "ping_enabled": {"label": "启用资产探测"},
-            "ping_method": {"label": "资产探测方式"},
-            "gather_facts_enabled": {"label": "收集资产信息"},
-            "gather_facts_method": {"label": "收集信息方式"},
-            "verify_account_enabled": {"label": "启用校验账号"},
-            "verify_account_method": {"label": "校验账号方式"},
-            "change_secret_enabled": {"label": "启用账号改密"},
-            "change_secret_method": {"label": "账号改密方式"},
-            "push_account_enabled": {"label": "启用推送账号"},
-            "push_account_method": {"label": "推送账号方式"},
-            "gather_accounts_enabled": {"label": "启用账号收集"},
-            "gather_accounts_method": {"label": "收集账号方式"},
+            # 启用资产探测
+            "ping_enabled": {"label": _("Ping enabled")},
+            "ping_method": {"label": _("Ping method")},
+            "gather_facts_enabled": {"label": _("Gather facts enabled")},
+            "gather_facts_method": {"label": _("Gather facts method")},
+            "verify_account_enabled": {"label": _("Verify account enabled")},
+            "verify_account_method": {"label": _("Verify account method")},
+            "change_secret_enabled": {"label": _("Change secret enabled")},
+            "change_secret_method": {"label": _("Change secret method")},
+            "push_account_enabled": {"label": _("Push account enabled")},
+            "push_account_method": {"label": _("Push account method")},
+            "gather_accounts_enabled": {"label": _("Gather accounts enabled")},
+            "gather_accounts_method": {"label": _("Gather accounts method")},
         }
 
 
@@ -80,6 +87,9 @@ class PlatformProtocolsSerializer(serializers.ModelSerializer):
 
 
 class PlatformSerializer(WritableNestedModelSerializer):
+    name = serializers.CharField(
+        label=_("Name"), max_length=50, validators=[validators.validate_unicode_slug]
+    )
     charset = LabeledChoiceField(
         choices=Platform.CharsetChoices.choices, label=_("Charset")
     )
@@ -91,7 +101,7 @@ class PlatformSerializer(WritableNestedModelSerializer):
     automation = PlatformAutomationSerializer(label=_("Automation"), required=False)
     su_method = LabeledChoiceField(
         choices=[("sudo", "sudo su -"), ("su", "su - ")],
-        label="切换方式", required=False, default="sudo", allow_null=True
+        label=_("Su method"), required=False, default="sudo", allow_null=True
     )
 
     class Meta:
@@ -100,16 +110,17 @@ class PlatformSerializer(WritableNestedModelSerializer):
         fields_small = fields_mini + [
             "category", "type", "charset",
         ]
-        fields = fields_small + [
-            "protocols",
-            "domain_enabled", "su_enabled",
-            "su_method", "automation",
-            "comment",
+        fields_other = [
+            'date_created', 'date_updated', 'created_by', 'updated_by',
         ]
+        fields = fields_small + [
+            "protocols", "domain_enabled", "su_enabled",
+            "su_method", "automation", "comment",
+        ] + fields_other
         extra_kwargs = {
-            "su_enabled": {"label": "启用切换账号"},
-            "domain_enabled": {"label": "启用网域"},
-            "domain_default": {"label": "默认网域"},
+            "su_enabled": {"label": _('Su enabled')},
+            "domain_enabled": {"label": _('Domain enabled')},
+            "domain_default": {"label": _('Default Domain')},
         }
 
     @classmethod

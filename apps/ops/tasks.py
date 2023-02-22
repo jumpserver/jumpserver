@@ -1,46 +1,66 @@
 # coding: utf-8
-import os
-import subprocess
 
 from celery import shared_task
 from celery.exceptions import SoftTimeLimitExceeded
-from django.conf import settings
-from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import get_logger, get_object_or_none, get_log_keep_day
+from common.utils import get_logger, get_object_or_none
 from orgs.utils import tmp_to_org
 from .celery.decorator import (
-    register_as_period_task, after_app_shutdown_clean_periodic,
-    after_app_ready_start
+    register_as_period_task, after_app_ready_start
 )
 from .celery.utils import (
     create_or_update_celery_periodic_tasks, get_celery_periodic_task,
     disable_celery_periodic_task, delete_celery_periodic_task
 )
-from .models import CeleryTaskExecution, Job, JobExecution
+from .models import Job, JobExecution
 from .notifications import ServerPerformanceCheckUtil
 
 logger = get_logger(__file__)
 
 
-@shared_task(soft_time_limit=60, queue="ansible", verbose_name=_("Run ansible task"))
+def job_task_activity_callback(self, job_id, trigger):
+    job = get_object_or_none(Job, id=job_id)
+    if not job:
+        return
+    resource_ids = [job.id]
+    org_id = job.org_id
+    return resource_ids, org_id
+
+
+@shared_task(
+    soft_time_limit=60, queue="ansible", verbose_name=_("Run ansible task"),
+    activity_callback=job_task_activity_callback
+)
 def run_ops_job(job_id):
     job = get_object_or_none(Job, id=job_id)
-    execution = job.create_execution()
-    run_ops_job_execution(execution)
+    with tmp_to_org(job.org):
+        execution = job.create_execution()
+        execution.creator = job.creator
+        run_ops_job_execution(execution.id)
+        try:
+            execution.start()
+        except SoftTimeLimitExceeded:
+            execution.set_error('Run timeout')
+            logger.error("Run adhoc timeout")
+        except Exception as e:
+            execution.set_error(e)
+            logger.error("Start adhoc execution error: {}".format(e))
 
 
-#
-# @shared_task(soft_time_limit=60, queue="ansible")
-# def show_env():
-#     import json
-#     print(os.environ)
-#     data = json.dumps(dict(os.environ), indent=4)
-#     return data
+def job_execution_task_activity_callback(self, execution_id, trigger):
+    execution = get_object_or_none(JobExecution, id=execution_id)
+    if not execution:
+        return
+    resource_ids = [execution.id]
+    org_id = execution.org_id
+    return resource_ids, org_id
 
 
-@shared_task(soft_time_limit=60, queue="ansible", verbose_name=_("Run ansible task execution"))
+@shared_task(
+    soft_time_limit=60, queue="ansible", verbose_name=_("Run ansible task execution"),
+    activity_callback=job_execution_task_activity_callback
+)
 def run_ops_job_execution(execution_id, **kwargs):
     execution = get_object_or_none(JobExecution, id=execution_id)
     try:
@@ -52,25 +72,6 @@ def run_ops_job_execution(execution_id, **kwargs):
     except Exception as e:
         execution.set_error(e)
         logger.error("Start adhoc execution error: {}".format(e))
-
-
-@shared_task(verbose_name=_('Periodic clear celery tasks'))
-@after_app_shutdown_clean_periodic
-@register_as_period_task(interval=3600 * 24, description=_("Clean celery log period"))
-def clean_celery_tasks_period():
-    logger.debug("Start clean celery task history")
-    expire_days = get_log_keep_day('TASK_LOG_KEEP_DAYS')
-    days_ago = timezone.now() - timezone.timedelta(days=expire_days)
-    tasks = CeleryTaskExecution.objects.filter(date_start__lt=days_ago)
-    tasks.delete()
-    tasks = CeleryTaskExecution.objects.filter(date_start__isnull=True)
-    tasks.delete()
-    command = "find %s -mtime +%s -name '*.log' -type f -exec rm -f {} \\;" % (
-        settings.CELERY_LOG_DIR, expire_days
-    )
-    subprocess.call(command, shell=True)
-    command = "echo > {}".format(os.path.join(settings.LOG_DIR, 'celery.log'))
-    subprocess.call(command, shell=True)
 
 
 @shared_task(verbose_name=_('Clear celery periodic tasks'))

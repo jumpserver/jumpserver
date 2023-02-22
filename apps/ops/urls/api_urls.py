@@ -12,10 +12,10 @@ app_name = "ops"
 router = DefaultRouter()
 bulk_router = BulkRouter()
 
-router.register(r'adhocs', api.AdHocViewSet, 'adhoc')
-router.register(r'playbooks', api.PlaybookViewSet, 'playbook')
-router.register(r'jobs', api.JobViewSet, 'job')
-router.register(r'job-executions', api.JobExecutionViewSet, 'job-execution')
+bulk_router.register(r'adhocs', api.AdHocViewSet, 'adhoc')
+bulk_router.register(r'playbooks', api.PlaybookViewSet, 'playbook')
+bulk_router.register(r'jobs', api.JobViewSet, 'job')
+bulk_router.register(r'job-executions', api.JobExecutionViewSet, 'job-execution')
 
 router.register(r'celery/period-tasks', api.CeleryPeriodTaskViewSet, 'celery-period-task')
 
@@ -23,6 +23,7 @@ router.register(r'tasks', api.CeleryTaskViewSet, 'task')
 router.register(r'task-executions', api.CeleryTaskExecutionViewSet, 'task-executions')
 
 urlpatterns = [
+    path('playbook/<uuid:pk>/file/', api.PlaybookFileBrowserAPIView.as_view(), name='playbook-file'),
     path('variables/help/', api.JobRunVariableHelpAPIView.as_view(), name='variable-help'),
     path('job-execution/asset-detail/', api.JobAssetDetail.as_view(), name='asset-detail'),
     path('job-execution/task-detail/<uuid:task_id>/', api.JobExecutionTaskDetail.as_view(), name='task-detail'),

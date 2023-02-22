@@ -3,6 +3,7 @@ from django.db import models
 from django.db.models import Q
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db.models.signals import post_save
 from rest_framework.serializers import ValidationError
 
 from common.db.models import JMSBaseModel, CASCADE_SIGNAL_SKIP
@@ -15,6 +16,13 @@ __all__ = ['RoleBinding', 'SystemRoleBinding', 'OrgRoleBinding']
 
 
 class RoleBindingManager(models.Manager):
+
+    def bulk_create(self, objs, batch_size=None, ignore_conflicts=False):
+        objs = super().bulk_create(objs, batch_size=batch_size, ignore_conflicts=ignore_conflicts)
+        for i in objs:
+            post_save.send(i.__class__, instance=i, created=True)
+        return objs
+
     def get_queryset(self):
         queryset = super(RoleBindingManager, self).get_queryset()
         q = Q(scope=Scope.system, org__isnull=True)

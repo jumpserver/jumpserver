@@ -11,11 +11,12 @@ from terminal.filters import CommandFilter
 from orgs.utils import current_org
 from common.api import JMSBulkModelViewSet
 from common.utils import get_logger
-from terminal.backends.command.serializers import InsecureCommandAlertSerializer
+from terminal.serializers import (
+    SessionCommandSerializer,  InsecureCommandAlertSerializer
+)
 from terminal.exceptions import StorageInvalid
 from terminal.backends import (
-    get_command_storage, get_multi_command_storage,
-    SessionCommandSerializer,
+    get_command_storage, get_multi_command_storage
 )
 from terminal.notifications import CommandAlertMessage
 
@@ -102,9 +103,9 @@ class CommandViewSet(JMSBulkModelViewSet):
     command_store = get_command_storage()
     serializer_class = SessionCommandSerializer
     filterset_class = CommandFilter
-    search_fields = ('input',)
     model = Command
-    ordering_fields = ('timestamp',)
+    search_fields = ('input',)
+    ordering_fields = ('timestamp', 'risk_level')
 
     def merge_all_storage_list(self, request, *args, **kwargs):
         merged_commands = []

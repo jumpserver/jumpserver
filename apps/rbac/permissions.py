@@ -92,12 +92,19 @@ class RBACPermission(permissions.DjangoModelPermissions):
 
         try:
             queryset = self._queryset(view)
-            model_cls = queryset.model
-        except AssertionError:
+            if isinstance(queryset, list) and queryset:
+                model_cls = queryset[0].__class__
+            else:
+                model_cls = queryset.model
+        except AssertionError as e:
+            logger.error(f'Error get model cls: {e}')
+            model_cls = None
+        except AttributeError as e:
+            logger.error(f'Error get model cls: {e}')
             model_cls = None
         except Exception as e:
             logger.error('Error get model class: {} of {}'.format(e, view))
-            model_cls = None
+            raise e
         return model_cls
 
     def get_require_perms(self, request, view):
@@ -134,3 +141,6 @@ class RBACPermission(permissions.DjangoModelPermissions):
         has = request.user.has_perms(perms)
         logger.debug('View require perms: {}, result: {}'.format(perms, has))
         return has
+
+    def has_object_permission(self, request, view, obj):
+        return self.has_permission(request, view)

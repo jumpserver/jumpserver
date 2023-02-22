@@ -1,26 +1,25 @@
+from copy import deepcopy
+
 from django.db.models import QuerySet
 
-from common.utils import get_logger
-from accounts.const import AutomationTypes
+from accounts.const import AutomationTypes, SecretType
 from accounts.models import Account
-from ..base.manager import PushOrVerifyHostCallbackMixin, AccountBasePlaybookManager
+from assets.const import HostTypes
+from common.utils import get_logger
+from ..base.manager import AccountBasePlaybookManager
+from ..change_secret.manager import ChangeSecretManager
 
 logger = get_logger(__name__)
 
 
-class PushAccountManager(PushOrVerifyHostCallbackMixin, AccountBasePlaybookManager):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.secret_type = self.execution.snapshot['secret_type']
-        self.host_account_mapper = {}
+class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
+    ansible_account_prefer = ''
 
     @classmethod
     def method_type(cls):
         return AutomationTypes.push_account
 
     def create_nonlocal_accounts(self, accounts, snapshot_account_usernames, asset):
-        secret = self.execution.snapshot['secret']
         secret_type = self.secret_type
         usernames = accounts.filter(secret_type=secret_type).values_list(
             'username', flat=True
@@ -29,7 +28,7 @@ class PushAccountManager(PushOrVerifyHostCallbackMixin, AccountBasePlaybookManag
         create_account_objs = [
             Account(
                 name=f'{username}-{secret_type}', username=username,
-                secret=secret, secret_type=secret_type, asset=asset,
+                secret_type=secret_type, asset=asset,
             )
             for username in create_usernames
         ]
@@ -37,7 +36,7 @@ class PushAccountManager(PushOrVerifyHostCallbackMixin, AccountBasePlaybookManag
 
     def get_accounts(self, privilege_account, accounts: QuerySet):
         if not privilege_account:
-            logger.debug(f'not privilege account')
+            print(f'not privilege account')
             return []
         snapshot_account_usernames = self.execution.snapshot['accounts']
         if '*' in snapshot_account_usernames:
@@ -49,6 +48,73 @@ class PushAccountManager(PushOrVerifyHostCallbackMixin, AccountBasePlaybookManag
             username__in=snapshot_account_usernames, secret_type=self.secret_type
         )
         return accounts
+
+    def host_callback(self, host, asset=None, account=None, automation=None, path_dir=None, **kwargs):
+        host = super(ChangeSecretManager, self).host_callback(
+            host, asset=asset, account=account, automation=automation,
+            path_dir=path_dir, **kwargs
+        )
+        if host.get('error'):
+            return host
+
+        accounts = asset.accounts.all()
+        accounts = self.get_accounts(account, accounts)
+        inventory_hosts = []
+        host['secret_type'] = self.secret_type
+        if asset.type == HostTypes.WINDOWS and self.secret_type == SecretType.SSH_KEY:
+            msg = f'Windows {asset} does not support ssh key push \n'
+            print(msg)
+            return inventory_hosts
+
+        for account in accounts:
+            h = deepcopy(host)
+            h['name'] += '(' + account.username + ')'
+            new_secret = self.get_secret()
+
+            self.name_recorder_mapper[h['name']] = {
+                'account': account, 'new_secret': new_secret,
+            }
+
+            private_key_path = None
+            if self.secret_type == SecretType.SSH_KEY:
+                private_key_path = self.generate_private_key_path(new_secret, path_dir)
+                new_secret = self.generate_public_key(new_secret)
+
+            h['kwargs'] = self.get_kwargs(account, new_secret)
+            h['account'] = {
+                'name': account.name,
+                'username': account.username,
+                'secret_type': account.secret_type,
+                'secret': new_secret,
+                'private_key_path': private_key_path
+            }
+            if asset.platform.type == 'oracle':
+                h['account']['mode'] = 'sysdba' if account.privileged else None
+            inventory_hosts.append(h)
+        return inventory_hosts
+
+    def on_host_success(self, host, result):
+        account_info = self.name_recorder_mapper.get(host)
+        if not account_info:
+            return
+
+        account = account_info['account']
+        new_secret = account_info['new_secret']
+        if not account:
+            return
+        account.secret = new_secret
+        account.save(update_fields=['secret'])
+
+    def on_host_error(self, host, error, result):
+        pass
+
+    def on_runner_failed(self, runner, e):
+        logger.error("Pust account error: ", e)
+
+    def run(self, *args, **kwargs):
+        if not self.check_secret():
+            return
+        super().run(*args, **kwargs)
 
     # @classmethod
     # def trigger_by_asset_create(cls, asset):

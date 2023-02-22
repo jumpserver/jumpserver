@@ -134,22 +134,26 @@ class Organization(OrgRoleMixin, JMSBaseModel):
         return self.id
 
     @classmethod
+    def get_or_create_builtin(cls, **kwargs):
+        _id = kwargs['id']
+        org = cls.get_instance(_id)
+        if org:
+            return org
+        org, created = cls.objects.get_or_create(id=_id, defaults=kwargs)
+        if created:
+            org.builtin = True
+            org.save()
+        return org
+
+    @classmethod
     def default(cls):
-        defaults = dict(id=cls.DEFAULT_ID, name=cls.DEFAULT_NAME)
-        obj, created = cls.objects.get_or_create(defaults=defaults, id=cls.DEFAULT_ID)
-        if not obj.builtin:
-            obj.builtin = True
-            obj.save()
-        return obj
+        kwargs = {'id': cls.DEFAULT_ID, 'name': cls.DEFAULT_NAME}
+        return cls.get_or_create_builtin(**kwargs)
 
     @classmethod
     def system(cls):
-        defaults = dict(id=cls.SYSTEM_ID, name=cls.SYSTEM_NAME)
-        obj, created = cls.objects.get_or_create(defaults=defaults, id=cls.SYSTEM_ID)
-        if not obj.builtin:
-            obj.builtin = True
-            obj.save()
-        return obj
+        kwargs = {'id': cls.SYSTEM_ID, 'name': cls.SYSTEM_NAME}
+        return cls.get_or_create_builtin(**kwargs)
 
     @classmethod
     def root(cls):

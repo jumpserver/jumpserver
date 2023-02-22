@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-from django.dispatch import receiver
 from django.db.models.signals import post_save, m2m_changed
 
-from common.decorator import on_transaction_commit
+from common.decorators import on_transaction_commit
 from common.utils import get_logger
 from tickets.models import Ticket
 

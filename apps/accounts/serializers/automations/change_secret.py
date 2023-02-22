@@ -4,13 +4,13 @@ from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 from accounts.const import (
-    DEFAULT_PASSWORD_RULES, SecretType, SecretStrategy, SSHKeyStrategy
+    AutomationTypes, DEFAULT_PASSWORD_RULES,
+    SecretType, SecretStrategy, SSHKeyStrategy
 )
 from accounts.models import (
     Account, ChangeSecretAutomation,
-    ChangeSecretRecord
+    ChangeSecretRecord, AutomationExecution
 )
-from accounts.models import AutomationExecution
 from accounts.serializers import AuthValidateMixin
 from assets.models import Asset
 from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
@@ -53,13 +53,17 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
             'ssh_key_change_strategy', 'passphrase', 'recipients',
         ]
         extra_kwargs = {**BaseAutomationSerializer.Meta.extra_kwargs, **{
+            'accounts': {'required': True},
             'recipients': {'label': _('Recipient'), 'help_text': _(
                 "Currently only mail sending is supported"
             )},
         }}
+    @property
+    def model_type(self):
+        return AutomationTypes.change_secret
 
     def validate_password_rules(self, password_rules):
-        secret_type = self.initial_secret_type
+        secret_type = self.initial_data['secret_type']
         if secret_type != SecretType.PASSWORD:
             return password_rules
 

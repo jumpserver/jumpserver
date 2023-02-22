@@ -35,6 +35,13 @@ class LoginTypeChoices(TextChoices):
     unknown = "U", _("Unknown")
 
 
+class ActivityChoices(TextChoices):
+    operate_log = 'O', _('Operate log')
+    session_log = 'S', _('Session log')
+    login_log = 'L', _('Login log')
+    task = 'T', _('Task')
+
+
 class MFAChoices(IntegerChoices):
     disabled = 0, _("Disabled")
     enabled = 1, _("Enabled")

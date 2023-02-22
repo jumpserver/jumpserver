@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 #
-from django.utils.translation import ugettext_lazy as _
-from django.db.models import Prefetch
-from rest_framework import serializers
-
-from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from django.db.models import Count
-from ..models import User, UserGroup
+from django.utils.translation import ugettext_lazy as _
+
+from common.serializers.mixin import ObjectRelatedField
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .. import utils
+from ..models import User, UserGroup
 
 __all__ = [
     'UserGroupSerializer',
@@ -15,9 +14,8 @@ __all__ = [
 
 
 class UserGroupSerializer(BulkOrgResourceModelSerializer):
-    users = serializers.PrimaryKeyRelatedField(
+    users = ObjectRelatedField(
         required=False, many=True, queryset=User.objects, label=_('User'),
-        # write_only=True, # group can return many to many on detail
     )
 
     class Meta:

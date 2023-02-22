@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from assets.const import AllTypes
 from assets.const import Protocol
 from common.db.fields import JsonDictTextField
+from common.db.models import JMSBaseModel
 
 __all__ = ['Platform', 'PlatformProtocol', 'PlatformAutomation']
 
@@ -61,22 +62,22 @@ class PlatformAutomation(models.Model):
     )
 
 
-class Platform(models.Model):
+class Platform(JMSBaseModel):
     """
     对资产提供 约束和默认值
     对资产进行抽象
     """
 
     class CharsetChoices(models.TextChoices):
-        utf8 = 'utf8', 'UTF-8'
+        utf8 = 'utf-8', 'UTF-8'
         gbk = 'gbk', 'GBK'
 
+    id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     name = models.SlugField(verbose_name=_("Name"), unique=True, allow_unicode=True)
     category = models.CharField(default='host', max_length=32, verbose_name=_("Category"))
     type = models.CharField(max_length=32, default='linux', verbose_name=_("Type"))
     meta = JsonDictTextField(blank=True, null=True, verbose_name=_("Meta"))
     internal = models.BooleanField(default=False, verbose_name=_("Internal"))
-    comment = models.TextField(blank=True, null=True, verbose_name=_("Comment"))
     # 资产有关的
     charset = models.CharField(
         default=CharsetChoices.utf8, choices=CharsetChoices.choices, max_length=8, verbose_name=_("Charset")

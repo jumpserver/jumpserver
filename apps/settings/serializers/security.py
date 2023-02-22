@@ -114,7 +114,7 @@ class SecurityAuthSerializer(serializers.Serializer):
     VERIFY_CODE_TTL = serializers.IntegerField(
         min_value=5, max_value=60 * 60 * 10,
         label=_("Verify code TTL"),
-        help_text=_("Unit: second")
+        help_text=_("Unit: second, reset password and send SMS code expiration time")
     )
     SECURITY_LOGIN_CHALLENGE_ENABLED = serializers.BooleanField(
         required=False, default=False,

@@ -6,10 +6,10 @@ from django.conf import settings
 from rest_framework import permissions
 
 from authentication.const import ConfirmType
-from common.exceptions import UserConfirmRequired
-from orgs.utils import tmp_to_root_org
 from authentication.models import ConnectionToken
+from common.exceptions import UserConfirmRequired
 from common.utils import get_object_or_none
+from orgs.utils import tmp_to_root_org
 
 
 class IsValidUser(permissions.IsAuthenticated, permissions.BasePermission):
@@ -17,13 +17,13 @@ class IsValidUser(permissions.IsAuthenticated, permissions.BasePermission):
 
     def has_permission(self, request, view):
         return super().has_permission(request, view) \
-               and request.user.is_valid
+            and request.user.is_valid
 
 
 class IsValidUserOrConnectionToken(IsValidUser):
     def has_permission(self, request, view):
         return super().has_permission(request, view) \
-               or self.is_valid_connection_token(request)
+            or self.is_valid_connection_token(request)
 
     @staticmethod
     def is_valid_connection_token(request):
@@ -38,13 +38,13 @@ class IsValidUserOrConnectionToken(IsValidUser):
 class OnlySuperUser(IsValidUser):
     def has_permission(self, request, view):
         return super().has_permission(request, view) \
-               and request.user.is_superuser
+            and request.user.is_superuser
 
 
 class IsServiceAccount(IsValidUser):
     def has_permission(self, request, view):
         return super().has_permission(request, view) \
-               and request.user.is_service_account
+            and request.user.is_service_account
 
 
 class WithBootstrapToken(permissions.BasePermission):

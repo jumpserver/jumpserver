@@ -1,14 +1,12 @@
-
-from rest_framework import serializers
-from rest_framework.serializers import Serializer
-from rest_framework.serializers import ModelSerializer
-from rest_framework_bulk.serializers import BulkListSerializer
-from django.utils.translation import gettext_lazy as _
 from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
 from drf_writable_nested.serializers import WritableNestedModelSerializer as NestedModelSerializer
+from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import Serializer
+from rest_framework_bulk.serializers import BulkListSerializer
 
 from .mixin import BulkListSerializerMixin, BulkSerializerMixin
-
 
 __all__ = [
     'MethodSerializer', 'EmptySerializer', 'BulkModelSerializer',

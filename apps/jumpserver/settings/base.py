@@ -92,7 +92,6 @@ INSTALLED_APPS = [
     'acls.apps.AclsConfig',
     'notifications.apps.NotificationsConfig',
     'rbac.apps.RBACConfig',
-    'common.apps.CommonConfig',
     'jms_oidc_rp',
     'rest_framework',
     'rest_framework_swagger',
@@ -102,6 +101,7 @@ INSTALLED_APPS = [
     'django_filters',
     'bootstrap3',
     'captcha',
+    'private_storage',
     'django_celery_beat',
     'django.contrib.auth',
     'django.contrib.admin',
@@ -110,6 +110,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.forms',
+    'common.apps.CommonConfig',  # 这个放到内置的最后, django ready
     'simple_history',  # 这个要放到最后，别特么瞎改顺序
 ]
 
@@ -263,10 +264,11 @@ STATICFILES_DIRS = (
 )
 
 # Media files (File, ImageField) will be save these
-
 MEDIA_URL = '/media/'
-
 MEDIA_ROOT = os.path.join(PROJECT_DIR, 'data', 'media').replace('\\', '/') + '/'
+
+PRIVATE_STORAGE_ROOT = MEDIA_ROOT
+PRIVATE_STORAGE_AUTH_FUNCTION = 'jumpserver.rewriting.storage.permissions.allow_access'
 
 # Use django-bootstrap-form to format template, input max width arg
 # BOOTSTRAP_COLUMN_COUNT = 11

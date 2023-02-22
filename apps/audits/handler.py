@@ -12,9 +12,9 @@ from common.local import encrypted_field_set
 from settings.serializers import SettingsSerializer
 from jumpserver.utils import current_request
 from orgs.utils import get_current_org_id
+from orgs.models import Organization
 
 from .backends import get_operate_log_storage
-from .const import ActionChoices
 
 
 logger = get_logger(__name__)
@@ -131,56 +131,12 @@ class OperatorLogHandler(metaclass=Singleton):
         return before, after
 
     @staticmethod
-    def _get_Session_params(resource, **kwargs):
-        # 更新会话的日志不在Activity中体现，
-        # 否则会话结束，录像文件结束操作的会话记录都会体现出来
-        params = {}
-        action = kwargs.get('data', {}).get('action', 'create')
-        detail = _(
-            '{} used account[{}], login method[{}] login the asset.'
-        ).format(
-            resource.user, resource.account, resource.login_from_display
-        )
-        if action == ActionChoices.create:
-            params = {
-                'action': ActionChoices.connect,
-                'resource_id': str(resource.asset_id),
-                'user': resource.user, 'detail': detail
-            }
-        return params
-
-    @staticmethod
-    def _get_ChangeSecretRecord_params(resource, **kwargs):
-        detail = _(
-            'User {} has executed change auth plan for this account.({})'
-        ).format(
-            resource.created_by, _(resource.status.title())
-        )
-        return {
-            'action': ActionChoices.change_auth, 'detail': detail,
-            'resource_id': str(resource.account_id),
-        }
-
-    @staticmethod
-    def _get_UserLoginLog_params(resource, **kwargs):
-        username = resource.username
-        login_status = _('Success') if resource.status else _('Failed')
-        detail = _('User {} login into this service.[{}]').format(
-            resource.username, login_status
-        )
-        user_id = User.objects.filter(username=username).\
-            values_list('id', flat=True)[0]
-        return {
-            'action': ActionChoices.login, 'detail': detail,
-            'resource_id': str(user_id),
-        }
-
-    def _activity_handle(self, data, object_name, resource):
-        param_func = getattr(self, '_get_%s_params' % object_name, None)
-        if param_func is not None:
-            params = param_func(resource, data=data)
-            data.update(params)
-        return data
+    def get_org_id(object_name):
+        system_obj = ('Role',)
+        org_id = get_current_org_id()
+        if object_name in system_obj:
+            org_id = Organization.SYSTEM_ID
+        return org_id
 
     def create_or_update_operate_log(
             self, action, resource_type, resource=None, resource_display=None,
@@ -194,20 +150,19 @@ class OperatorLogHandler(metaclass=Singleton):
         remote_addr = get_request_ip(current_request)
         if resource_display is None:
             resource_display = self.get_resource_display(resource)
-        resource_id = resource.id if resource is not None else ''
+        resource_id = getattr(resource, 'pk', '')
         before, after = self.data_processing(before, after)
         if not force and not any([before, after]):
             # 前后都没变化，没必要生成日志，除非手动强制保存
             return
 
+        org_id = self.get_org_id(object_name)
         data = {
             'id': log_id, "user": str(user), 'action': action,
-            'resource_type': str(resource_type),
+            'resource_type': str(resource_type), 'org_id': org_id,
             'resource_id': resource_id, 'resource': resource_display,
             'remote_addr': remote_addr, 'before': before, 'after': after,
-            'org_id': get_current_org_id(),
         }
-        data = self._activity_handle(data, object_name, resource=resource)
         with transaction.atomic():
             if self.log_client.ping(timeout=1):
                 client = self.log_client

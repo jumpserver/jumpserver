@@ -4,12 +4,12 @@ from celery import current_task
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from assets.models.node import Node
 from assets.models.asset import Asset
-from assets.tasks import execute_automation
-from ops.mixin import PeriodTaskModelMixin
+from assets.models.node import Node
+from assets.tasks import execute_asset_automation_task
 from common.const.choices import Trigger
 from common.db.fields import EncryptJsonDictTextField
+from ops.mixin import PeriodTaskModelMixin
 from orgs.mixins.models import OrgModelMixin, JMSOrgBaseModel
 
 
@@ -47,9 +47,13 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
         assets = self.get_all_assets().prefetch_related('platform')
         return assets.group_by_platform()
 
+    @property
+    def execute_task(self):
+        return execute_asset_automation_task
+
     def get_register_task(self):
         name = f"automation_{self.type}_strategy_period_{str(self.id)[:8]}"
-        task = execute_automation.name
+        task = self.execute_task.name
         args = (str(self.id), Trigger.timing, self.type)
         kwargs = {}
         return name, task, args, kwargs
@@ -75,6 +79,10 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
     @property
     def executed_amount(self):
         return self.executions.count()
+
+    @property
+    def latest_execution(self):
+        return self.executions.first()
 
     def execute(self, trigger=Trigger.manual):
         try:
@@ -121,12 +129,16 @@ class AutomationExecution(OrgModelMixin):
     def manager_type(self):
         return self.snapshot['type']
 
-    def get_all_assets(self):
+    def get_all_asset_ids(self):
         node_ids = self.snapshot['nodes']
         asset_ids = self.snapshot['assets']
         nodes = Node.objects.filter(id__in=node_ids)
         node_asset_ids = Node.get_nodes_all_assets(*nodes).values_list('id', flat=True)
         asset_ids = set(list(asset_ids) + list(node_asset_ids))
+        return asset_ids
+
+    def get_all_assets(self):
+        asset_ids = self.get_all_asset_ids()
         return Asset.objects.filter(id__in=asset_ids)
 
     def all_assets_group_by_platform(self):

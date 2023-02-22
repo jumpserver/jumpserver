@@ -1,19 +1,19 @@
 from django.db.models.signals import post_save, pre_delete, pre_save, post_delete
 from django.dispatch import receiver
 
-from orgs.models import Organization
-from assets.models import Node
 from accounts.models import Account
+from assets.models import Asset, Domain
+from assets.models import Node
+from common.decorators import merge_delay_run
+from common.utils import get_logger
+from orgs.caches import OrgResourceStatisticsCache
+from orgs.models import Organization
+from orgs.utils import current_org
 from perms.models import AssetPermission
-from audits.models import UserLoginLog
+from rbac.models import OrgRoleBinding, SystemRoleBinding, RoleBinding
+from terminal.models import Session
 from users.models import UserGroup, User
 from users.signals import pre_user_leave_org
-from terminal.models import Session
-from rbac.models import OrgRoleBinding, SystemRoleBinding, RoleBinding
-from assets.models import Asset, Domain
-from orgs.caches import OrgResourceStatisticsCache
-from orgs.utils import current_org
-from common.utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -30,70 +30,64 @@ def refresh_cache(name, org):
         logger.warning('refresh cache fail: {}'.format(name))
 
 
-def refresh_user_amount_cache(user):
+def refresh_all_orgs_user_amount_cache(user):
     orgs = user.orgs.distinct()
     for org in orgs:
         refresh_cache('users_amount', org)
+        refresh_cache('new_users_amount_this_week', org)
 
 
 @receiver(post_save, sender=OrgRoleBinding)
 def on_user_create_or_invite_refresh_cache(sender, instance, created, **kwargs):
     if created:
         refresh_cache('users_amount', instance.org)
+        refresh_cache('new_users_amount_this_week', instance.org)
 
 
 @receiver(post_save, sender=SystemRoleBinding)
 def on_user_global_create_refresh_cache(sender, instance, created, **kwargs):
     if created and current_org.is_root():
         refresh_cache('users_amount', current_org)
+        refresh_cache('new_users_amount_this_week', current_org)
 
 
 @receiver(pre_user_leave_org)
 def on_user_remove_refresh_cache(sender, org=None, **kwargs):
     refresh_cache('users_amount', org)
+    refresh_cache('new_users_amount_this_week', org)
 
 
 @receiver(pre_delete, sender=User)
 def on_user_delete_refresh_cache(sender, instance, **kwargs):
-    refresh_user_amount_cache(instance)
+    refresh_all_orgs_user_amount_cache(instance)
 
 
-# @receiver(m2m_changed, sender=OrganizationMember)
-# def on_org_user_changed_refresh_cache(sender, action, instance, reverse, pk_set, **kwargs):
-#     if not action.startswith(POST_PREFIX):
-#         return
-#
-#     if reverse:
-#         orgs = Organization.objects.filter(id__in=pk_set)
-#     else:
-#         orgs = [instance]
-#
-#     for org in orgs:
-#         org_cache = OrgResourceStatisticsCache(org)
-#         org_cache.expire('users_amount')
-#     OrgResourceStatisticsCache(Organization.root()).expire('users_amount')
+model_cache_field_mapper = {
+    Node: ['nodes_amount'],
+    Domain: ['domains_amount'],
+    UserGroup: ['groups_amount'],
+    Account: ['accounts_amount'],
+    RoleBinding: ['users_amount', 'new_users_amount_this_week'],
+    Asset: ['assets_amount', 'new_assets_amount_this_week'],
+    AssetPermission: ['asset_perms_amount'],
+}
 
 
 class OrgResourceStatisticsRefreshUtil:
-    model_cache_field_mapper = {
-        Node: ['nodes_amount'],
-        Domain: ['domains_amount'],
-        UserGroup: ['groups_amount'],
-        Account: ['accounts_amount'],
-        RoleBinding: ['users_amount', 'new_users_amount_this_week'],
-        Asset: ['assets_amount', 'new_assets_amount_this_week'],
-        AssetPermission: ['asset_perms_amount'],
-
-    }
+    @staticmethod
+    @merge_delay_run(ttl=5)
+    def refresh_org_fields(org_fields=()):
+        for org, cache_field_name in org_fields:
+            OrgResourceStatisticsCache(org).expire(*cache_field_name)
+            OrgResourceStatisticsCache(Organization.root()).expire(*cache_field_name)
 
     @classmethod
     def refresh_if_need(cls, instance):
-        cache_field_name = cls.model_cache_field_mapper.get(type(instance))
+        cache_field_name = model_cache_field_mapper.get(type(instance))
         if not cache_field_name:
             return
-        OrgResourceStatisticsCache(Organization.root()).expire(*cache_field_name)
-        if getattr(instance, 'org', None):
-            OrgResourceStatisticsCache(instance.org).expire(*cache_field_name)
+        org = getattr(instance, 'org', None)
+        cls.refresh_org_fields(((org, cache_field_name),))
 
 
 @receiver(post_save)
@@ -108,7 +102,7 @@ def on_post_delete_refresh_org_resource_statistics_cache(sender, instance, **kwa
 
 
 def _refresh_session_org_resource_statistics_cache(instance: Session):
-    cache_field_name = ['total_count_online_users', 'total_count_online_sessions']
+    cache_field_name = ['total_count_online_users', 'total_count_online_sessions', 'total_count_today_failed_sessions']
 
     org_cache = OrgResourceStatisticsCache(instance.org)
     org_cache.expire(*cache_field_name)

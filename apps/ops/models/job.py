@@ -1,53 +1,124 @@
-import datetime
 import json
 import logging
 import os
 import uuid
+from collections import defaultdict
 
 from celery import current_task
 from django.conf import settings
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-__all__ = ["Job", "JobExecution", "JobAuditLog"]
+__all__ = ["Job", "JobExecution", "JMSPermedInventory"]
 
 from simple_history.models import HistoricalRecords
 
+from accounts.models import Account
+from acls.models import CommandFilterACL
+from assets.models import Asset
 from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner
 from ops.mixin import PeriodTaskModelMixin
 from ops.variables import *
 from ops.const import Types, Modules, RunasPolicies, JobStatus
 from orgs.mixins.models import JMSOrgBaseModel
+from perms.models import AssetPermission
+from perms.utils import UserPermAssetUtil
+from terminal.notifications import CommandExecutionAlert
+
+
+def get_parent_keys(key, include_self=True):
+    keys = []
+    split_keys = key.split(':')
+    for i in range(len(split_keys)):
+        keys.append(':'.join(split_keys[:i + 1]))
+    if not include_self:
+        keys.pop()
+    return keys
+
+
+class JMSPermedInventory(JMSInventory):
+    def __init__(self, assets, account_policy='privileged_first',
+                 account_prefer='root,Administrator', host_callback=None, exclude_localhost=False, user=None):
+        super().__init__(assets, account_policy, account_prefer, host_callback, exclude_localhost)
+        self.user = user
+        self.assets_accounts_mapper = self.get_assets_accounts_mapper()
+
+    def get_asset_accounts(self, asset):
+        return self.assets_accounts_mapper.get(asset.id, [])
+
+    def get_assets_accounts_mapper(self):
+        mapper = defaultdict(set)
+        asset_ids = self.assets.values_list('id', flat=True)
+        asset_node_keys = Asset.nodes.through.objects \
+            .filter(asset_id__in=asset_ids) \
+            .values_list('asset_id', 'node__key')
+
+        node_asset_map = defaultdict(set)
+        for asset_id, node_key in asset_node_keys:
+            all_keys = get_parent_keys(node_key)
+            for key in all_keys:
+                node_asset_map[key].add(asset_id)
+
+        groups = self.user.groups.all()
+        perms = AssetPermission.objects \
+            .filter(date_expired__gte=timezone.now()) \
+            .filter(is_active=True) \
+            .filter(Q(users=self.user) | Q(user_groups__in=groups)) \
+            .filter(Q(assets__in=asset_ids) | Q(nodes__key__in=node_asset_map.keys())) \
+            .values_list('assets', 'nodes__key', 'accounts')
+
+        asset_permed_accounts_mapper = defaultdict(set)
+        for asset_id, node_key, accounts in perms:
+            if asset_id in asset_ids:
+                asset_permed_accounts_mapper[asset_id].update(accounts)
+            for my_asset in node_asset_map[node_key]:
+                asset_permed_accounts_mapper[my_asset].update(accounts)
+
+        accounts = Account.objects.filter(asset__in=asset_ids)
+        for account in accounts:
+            if account.asset_id not in asset_permed_accounts_mapper:
+                continue
+            permed_usernames = asset_permed_accounts_mapper[account.asset_id]
+            if "@ALL" in permed_usernames or account.username in permed_usernames:
+                mapper[account.asset_id].add(account)
+        return mapper
 
 
 class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     name = models.CharField(max_length=128, null=True, verbose_name=_('Name'))
+
     instant = models.BooleanField(default=False)
     args = models.CharField(max_length=1024, default='', verbose_name=_('Args'), null=True, blank=True)
-    module = models.CharField(max_length=128, choices=Modules.choices, default=Modules.shell,
-                              verbose_name=_('Module'), null=True)
+    module = models.CharField(max_length=128, choices=Modules.choices, default=Modules.shell, verbose_name=_('Module'),
+                              null=True)
     chdir = models.CharField(default="", max_length=1024, verbose_name=_('Chdir'), null=True, blank=True)
     timeout = models.IntegerField(default=-1, verbose_name=_('Timeout (Seconds)'))
+
     playbook = models.ForeignKey('ops.Playbook', verbose_name=_("Playbook"), null=True, on_delete=models.SET_NULL)
+
     type = models.CharField(max_length=128, choices=Types.choices, default=Types.adhoc, verbose_name=_("Type"))
     creator = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
     assets = models.ManyToManyField('assets.Asset', verbose_name=_("Assets"))
+    use_parameter_define = models.BooleanField(default=False, verbose_name=(_('Use Parameter Define')))
+    parameters_define = models.JSONField(default=dict, verbose_name=_('Parameters define'))
     runas = models.CharField(max_length=128, default='root', verbose_name=_('Runas'))
     runas_policy = models.CharField(max_length=128, choices=RunasPolicies.choices, default=RunasPolicies.skip,
                                     verbose_name=_('Runas policy'))
-    use_parameter_define = models.BooleanField(default=False, verbose_name=(_('Use Parameter Define')))
-    parameters_define = models.JSONField(default=dict, verbose_name=_('Parameters define'))
     comment = models.CharField(max_length=1024, default='', verbose_name=_('Comment'), null=True, blank=True)
     version = models.IntegerField(default=0)
     history = HistoricalRecords()
+
+    def __str__(self):
+        return self.name
 
     def get_history(self, version):
         return self.history.filter(version=version).first()
 
     @property
     def last_execution(self):
-        return self.executions.last()
+        return self.executions.first()
 
     @property
     def date_last_run(self):
@@ -74,22 +145,30 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
         return total_cost / finished_count if finished_count else 0
 
     def get_register_task(self):
-        from ..tasks import run_ops_job_execution
+        from ..tasks import run_ops_job
         name = "run_ops_job_period_{}".format(str(self.id)[:8])
-        task = run_ops_job_execution.name
+        task = run_ops_job.name
         args = (str(self.id),)
         kwargs = {}
         return name, task, args, kwargs
 
     @property
     def inventory(self):
-        return JMSInventory(self.assets.all(), self.runas_policy, self.runas)
+        return JMSPermedInventory(self.assets.all(), self.runas_policy, self.runas, user=self.creator)
+
+    @property
+    def material(self):
+        if self.type == 'adhoc':
+            return "{}:{}".format(self.module, self.args)
+        if self.type == 'playbook':
+            return "{}:{}:{}".format(self.org.name, self.creator.name, self.playbook.name)
 
     def create_execution(self):
-        return self.executions.create(job_version=self.version)
+        return self.executions.create(job_version=self.version, material=self.material, job_type=Types[self.type].value)
 
     class Meta:
         verbose_name = _("Job")
+        unique_together = [('name', 'org_id', 'creator')]
         ordering = ['date_created']
 
 
@@ -97,7 +176,7 @@ class JobExecution(JMSOrgBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     task_id = models.UUIDField(null=True)
     status = models.CharField(max_length=16, verbose_name=_('Status'), default=JobStatus.running)
-    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='executions', null=True)
+    job = models.ForeignKey(Job, on_delete=models.SET_NULL, related_name='executions', null=True)
     job_version = models.IntegerField(default=0)
     parameters = models.JSONField(default=dict, verbose_name=_('Parameters'))
     result = models.JSONField(blank=True, null=True, verbose_name=_('Result'))
@@ -107,6 +186,10 @@ class JobExecution(JMSOrgBaseModel):
     date_start = models.DateTimeField(null=True, verbose_name=_('Date start'), db_index=True)
     date_finished = models.DateTimeField(null=True, verbose_name=_("Date finished"))
 
+    material = models.CharField(max_length=1024, default='', verbose_name=_('Material'), null=True, blank=True)
+    job_type = models.CharField(max_length=128, choices=Types.choices, default=Types.adhoc,
+                                verbose_name=_("Material Type"))
+
     @property
     def current_job(self):
         if self.job.version != self.job_version:
@@ -114,53 +197,43 @@ class JobExecution(JMSOrgBaseModel):
         return self.job
 
     @property
-    def material(self):
-        if self.current_job.type == 'adhoc':
-            return "{}:{}".format(self.current_job.module, self.current_job.args)
-        if self.current_job.type == 'playbook':
-            return "{}:{}:{}".format(self.org.name, self.current_job.creator.name, self.current_job.playbook.name)
-
-    @property
     def assent_result_detail(self):
-        if self.is_finished and not self.summary.get('error', None):
-            result = {
-                "summary": self.count,
-                "detail": [],
+        if not self.is_finished or self.summary.get('error'):
+            return None
+        result = {
+            "summary": self.summary,
+            "detail": [],
+        }
+        for asset in self.current_job.assets.all():
+            asset_detail = {
+                "name": asset.name,
+                "status": "ok",
+                "tasks": [],
             }
-            for asset in self.current_job.assets.all():
-                asset_detail = {
-                    "name": asset.name,
-                    "status": "ok",
-                    "tasks": [],
-                }
-                if self.summary.get("excludes", None) and self.summary["excludes"].get(asset.name, None):
-                    asset_detail.update({"status": "excludes"})
-                    result["detail"].append(asset_detail)
-                    break
-                if self.result["dark"].get(asset.name, None):
-                    asset_detail.update({"status": "failed"})
-                    for key, task in self.result["dark"][asset.name].items():
-                        task_detail = {"name": key,
-                                       "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
-                        asset_detail["tasks"].append(task_detail)
-                if self.result["failures"].get(asset.name, None):
-                    asset_detail.update({"status": "failed"})
-                    for key, task in self.result["failures"][asset.name].items():
-                        task_detail = {"name": key,
-                                       "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
-                        asset_detail["tasks"].append(task_detail)
-
-                if self.result["ok"].get(asset.name, None):
-                    for key, task in self.result["ok"][asset.name].items():
-                        task_detail = {"name": key,
-                                       "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
-                        asset_detail["tasks"].append(task_detail)
+            if self.summary.get("excludes", None) and self.summary["excludes"].get(asset.name, None):
+                asset_detail.update({"status": "excludes"})
                 result["detail"].append(asset_detail)
-            return result
+                break
+            if self.result["dark"].get(asset.name, None):
+                asset_detail.update({"status": "failed"})
+                for key, task in self.result["dark"][asset.name].items():
+                    task_detail = {"name": key,
+                                   "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
+                    asset_detail["tasks"].append(task_detail)
+            if self.result["failures"].get(asset.name, None):
+                asset_detail.update({"status": "failed"})
+                for key, task in self.result["failures"][asset.name].items():
+                    task_detail = {"name": key,
+                                   "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
+                    asset_detail["tasks"].append(task_detail)
 
-    @property
-    def job_type(self):
-        return Types[self.job.type].label
+            if self.result["ok"].get(asset.name, None):
+                for key, task in self.result["ok"][asset.name].items():
+                    task_detail = {"name": key,
+                                   "output": "{}{}".format(task.get("stdout", ""), task.get("stderr", ""))}
+                    asset_detail["tasks"].append(task_detail)
+            result["detail"].append(asset_detail)
+        return result
 
     def compile_shell(self):
         if self.current_job.type != 'adhoc':
@@ -176,9 +249,7 @@ class JobExecution(JMSOrgBaseModel):
 
         shell = self.current_job.args
         if self.current_job.chdir:
-            if module == self.current_job.module:
-                shell += " path={}".format(self.current_job.chdir)
-            else:
+            if module == "shell":
                 shell += " chdir={}".format(self.current_job.chdir)
         if self.current_job.module in ['python']:
             shell += " executable={}".format(self.current_job.module)
@@ -237,6 +308,8 @@ class JobExecution(JMSOrgBaseModel):
 
     @property
     def time_cost(self):
+        if not self.date_start:
+            return 0
         if self.is_finished:
             return (self.date_finished - self.date_start).total_seconds()
         return (timezone.now() - self.date_start).total_seconds()
@@ -294,10 +367,68 @@ class JobExecution(JMSOrgBaseModel):
         task_id = current_task.request.root_id
         self.task_id = task_id
 
+    def match_command_group(self, acl, asset):
+        for cg in acl.command_groups.all():
+            matched, __ = cg.match(self.current_job.args)
+            if matched:
+                if acl.is_action(CommandFilterACL.ActionChoices.accept):
+                    return True
+                elif acl.is_action(CommandFilterACL.ActionChoices.reject) or acl.is_action(
+                        CommandFilterACL.ActionChoices.review):
+                    print("\033[31mcommand \'{}\' on asset {}({}) is rejected by acl {}\033[0m"
+                          .format(self.current_job.args, asset.name, asset.address, acl))
+                    CommandExecutionAlert({
+                        "assets": self.current_job.assets.all(),
+                        "input": self.material,
+                        "risk_level": 5,
+                        "user": self.creator,
+                    }).publish_async()
+                    raise Exception("command is rejected by ACL")
+        return False
+
+    def check_command_acl(self):
+        for asset in self.current_job.assets.all():
+            acls = CommandFilterACL.filter_queryset(user=self.creator,
+                                                    asset=asset,
+                                                    account_username=self.current_job.runas)
+            for acl in acls:
+                if self.match_command_group(acl, asset):
+                    break
+
+    def check_danger_keywords(self):
+        lines = self.job.playbook.check_dangerous_keywords()
+        if len(lines) > 0:
+            for line in lines:
+                print('\033[31mThe {} line of the file \'{}\' contains the '
+                      'dangerous keyword \'{}\'\033[0m'.format(line['line'], line['file'], line['keyword']))
+            raise Exception("Playbook contains dangerous keywords")
+
+    def check_assets_perms(self):
+        all_permed_assets = UserPermAssetUtil(self.creator).get_all_assets()
+        has_permed_assets = set(self.current_job.assets.all()) & set(all_permed_assets)
+
+        error_assets_count = 0
+        for asset in self.current_job.assets.all():
+            if asset not in has_permed_assets:
+                print("\033[31mAsset {}({}) has no access permission\033[0m".format(asset.name, asset.address))
+                error_assets_count += 1
+
+        if error_assets_count > 0:
+            raise Exception("You do not have access rights to {} assets".format(error_assets_count))
+
+    def before_start(self):
+        self.check_assets_perms()
+        if self.current_job.type == 'playbook':
+            self.check_danger_keywords()
+        if self.current_job.type == 'adhoc':
+            self.check_command_acl()
+
     def start(self, **kwargs):
         self.date_start = timezone.now()
         self.set_celery_id()
         self.save()
+        self.before_start()
+
         runner = self.get_runner()
         try:
             cb = runner.run(**kwargs)
@@ -310,13 +441,3 @@ class JobExecution(JMSOrgBaseModel):
     class Meta:
         verbose_name = _("Job Execution")
         ordering = ['-date_created']
-
-
-class JobAuditLog(JobExecution):
-    @property
-    def creator_name(self):
-        return self.creator.name
-
-    class Meta:
-        proxy = True
-        verbose_name = _("Job audit log")

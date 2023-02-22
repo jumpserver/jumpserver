@@ -1,14 +1,14 @@
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
-from ops.mixin import PeriodTaskSerializerMixin
+from accounts.models import AutomationExecution
 from assets.const import AutomationTypes
 from assets.models import Asset, Node, BaseAutomation
-from accounts.models import AutomationExecution
-from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from common.utils import get_logger
 from common.const.choices import Trigger
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
+from common.utils import get_logger
+from ops.mixin import PeriodTaskSerializerMixin
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 logger = get_logger(__file__)
 
@@ -36,6 +36,17 @@ class BaseAutomationSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSe
             'periodic_display': {'label': _('Periodic perform')},
             'executed_amount': {'label': _('Executed amount')},
         }
+
+    def validate_name(self, name):
+        if self.instance and self.instance.name == name:
+            return name
+        if BaseAutomation.objects.filter(name=name, type=self.model_type).exists():
+            raise serializers.ValidationError(_('Name already exists'))
+        return name
+
+    @property
+    def model_type(self):
+        raise NotImplementedError
 
 
 class AutomationExecutionSerializer(serializers.ModelSerializer):

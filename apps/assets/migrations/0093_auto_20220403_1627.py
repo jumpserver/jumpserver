@@ -90,6 +90,11 @@ class Migration(migrations.Migration):
             old_name='ip',
             new_name='address',
         ),
+        migrations.AlterField(
+            model_name='asset',
+            name='address',
+            field=models.CharField(db_index=True, max_length=1024, verbose_name='Address'),
+        ),
         migrations.AddField(
             model_name='asset',
             name='date_updated',
@@ -112,6 +117,9 @@ class Migration(migrations.Migration):
                  models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True,
                                       primary_key=True, serialize=False, to='assets.asset')),
             ],
+            options={
+                 'verbose_name': 'Host',
+            },
         ),
         migrations.CreateModel(
             name='Database',
@@ -140,6 +148,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'abstract': False,
+                'verbose_name': 'Device',
             },
             bases=('assets.asset',),
         ),
@@ -152,6 +161,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'abstract': False,
+                'verbose_name': 'Cloud',
             },
             bases=('assets.asset',),
         ),
@@ -173,6 +183,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'abstract': False,
+                'verbose_name': 'Web',
             },
             bases=('assets.asset',),
         ),

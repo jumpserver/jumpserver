@@ -34,6 +34,13 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
         data['assets'] = [i for i in assets if str(i['id']) not in gateway_ids]
         return data
 
+    def update(self, instance, validated_data):
+        assets = validated_data.pop('assets', [])
+        assets = assets + list(instance.gateways)
+        validated_data['assets'] = assets
+        instance = super().update(instance, validated_data)
+        return instance
+
 
 class DomainWithGatewaySerializer(serializers.ModelSerializer):
     gateways = GatewayWithAccountSecretSerializer(many=True, read_only=True)

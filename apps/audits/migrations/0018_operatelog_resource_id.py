@@ -15,4 +15,8 @@ class Migration(migrations.Migration):
             name='resource_id',
             field=models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Resource'),
         ),
+        migrations.AlterModelOptions(
+            name='operatelog',
+            options={'ordering': ('-datetime',), 'verbose_name': 'Operate log'},
+        ),
     ]

@@ -2,10 +2,10 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
-from common.utils import lazyproperty
-from ..const import AliasAccount, Source
 from assets.models.base import AbsConnectivity
+from common.utils import lazyproperty
 from .base import BaseAccount
+from ..const import AliasAccount, Source
 
 __all__ = ['Account', 'AccountTemplate']
 
@@ -62,10 +62,14 @@ class Account(AbsConnectivity, BaseAccount):
         ]
         permissions = [
             ('view_accountsecret', _('Can view asset account secret')),
-            ('change_accountsecret', _('Can change asset account secret')),
             ('view_historyaccount', _('Can view asset history account')),
             ('view_historyaccountsecret', _('Can view asset history account secret')),
+            ('verify_account', _('Can verify account')),
+            ('push_account', _('Can push account')),
         ]
+
+    def __str__(self):
+        return '{}'.format(self.username)
 
     @lazyproperty
     def platform(self):
@@ -77,9 +81,6 @@ class Account(AbsConnectivity, BaseAccount):
             return self.username
         return self.name
 
-    def __str__(self):
-        return '{}'.format(self.username)
-
     @lazyproperty
     def has_secret(self):
         return bool(self.secret)
@@ -89,10 +90,14 @@ class Account(AbsConnectivity, BaseAccount):
         """ @INPUT 手动登录的账号(any) """
         return cls(name=AliasAccount.INPUT.label, username=AliasAccount.INPUT.value, secret=None)
 
+    @lazyproperty
+    def versions(self):
+        return self.history.count()
+
     @classmethod
-    def get_user_account(cls, username):
+    def get_user_account(cls):
         """ @USER 动态用户的账号(self) """
-        return cls(name=AliasAccount.USER.label, username=AliasAccount.USER.value)
+        return cls(name=AliasAccount.USER.label, username=AliasAccount.USER.value, secret=None)
 
     def get_su_from_accounts(self):
         """ 排除自己和以自己为 su-from 的账号 """

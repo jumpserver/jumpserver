@@ -10,8 +10,8 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from assets import const
-from common.utils import lazyproperty
 from common.db.fields import EncryptMixin
+from common.utils import lazyproperty
 from orgs.mixins.models import OrgManager, JMSOrgBaseModel
 from ..base import AbsConnectivity
 from ..platform import Platform
@@ -21,12 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 def default_node():
-    try:
-        from assets.models import Node
-        root = Node.org_root()
-        return Node.objects.filter(id=root.id)
-    except:
-        return None
+    return []
 
 
 class AssetManager(OrgManager):
@@ -105,7 +100,7 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
     Type = const.AllTypes
 
     name = models.CharField(max_length=128, verbose_name=_('Name'))
-    address = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
+    address = models.CharField(max_length=1024, verbose_name=_('Address'), db_index=True)
     platform = models.ForeignKey(Platform, on_delete=models.PROTECT, verbose_name=_("Platform"), related_name='assets')
     domain = models.ForeignKey("assets.Domain", null=True, blank=True, related_name='assets',
                                verbose_name=_("Domain"), on_delete=models.SET_NULL)
@@ -113,45 +108,47 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
                                    verbose_name=_("Nodes"))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     labels = models.ManyToManyField('assets.Label', blank=True, related_name='assets', verbose_name=_("Labels"))
-    info = models.JSONField(verbose_name='Info', default=dict, blank=True)
+    info = models.JSONField(verbose_name='Info', default=dict, blank=True)  # 资产的一些信息，如 硬件信息
 
     objects = AssetManager.from_queryset(AssetQuerySet)()
 
     def __str__(self):
         return '{0.name}({0.address})'.format(self)
 
-    @property
-    def specific(self):
-        instance = getattr(self, self.category, None)
-        if not instance:
-            return {}
-        specific_fields = self.get_specific_fields(instance)
+    @staticmethod
+    def get_spec_values(instance, fields):
         info = {}
-        for i in specific_fields:
+        for i in fields:
             v = getattr(instance, i.name)
             if isinstance(i, models.JSONField) and not isinstance(v, (list, dict)):
                 v = json.loads(v)
             info[i.name] = v
         return info
 
-    @property
+    @lazyproperty
     def spec_info(self):
         instance = getattr(self, self.category, None)
         if not instance:
-            return []
-        specific_fields = self.get_specific_fields(instance)
-        info = [
-            {
-                'label': i.verbose_name,
-                'name': i.name,
-                'value': getattr(instance, i.name)
-            }
-            for i in specific_fields
-        ]
-        return info
+            return {}
+        spec_fields = self.get_spec_fields(instance)
+        return self.get_spec_values(instance, spec_fields)
+
+    @staticmethod
+    def get_spec_fields(instance, secret=False):
+        spec_fields = [i for i in instance._meta.local_fields if i.name != 'asset_ptr']
+        spec_fields = [i for i in spec_fields if isinstance(i, EncryptMixin) == secret]
+        return spec_fields
 
     @lazyproperty
-    def enabled_info(self):
+    def secret_info(self):
+        instance = getattr(self, self.category, None)
+        if not instance:
+            return {}
+        spec_fields = self.get_spec_fields(instance, secret=True)
+        return self.get_spec_values(instance, spec_fields)
+
+    @lazyproperty
+    def auto_info(self):
         platform = self.platform
         automation = self.platform.automation
         return {
@@ -164,12 +161,6 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
             'verify_account_enabled': automation.verify_account_enabled,
             'gather_accounts_enabled': automation.gather_accounts_enabled,
         }
-
-    @staticmethod
-    def get_specific_fields(instance):
-        specific_fields = [i for i in instance._meta.local_fields if i.name != 'asset_ptr']
-        specific_fields = [i for i in specific_fields if not isinstance(i, EncryptMixin)]
-        return specific_fields
 
     def get_target_ip(self):
         return self.address
@@ -203,7 +194,7 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
     def primary_protocol(self):
         from assets.const.types import AllTypes
         primary_protocol_name = AllTypes.get_primary_protocol_name(self.category, self.type)
-        protocol = self.protocols.get(name=primary_protocol_name)
+        protocol = self.protocols.filter(name=primary_protocol_name).first()
         return protocol
 
     @lazyproperty
@@ -238,9 +229,11 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
 
     @lazyproperty
     def gateway(self):
-        if self.domain_id:
-            return self.domain.select_gateway()
-        return None
+        if not self.domain_id:
+            return
+        if not self.platform.domain_enabled:
+            return
+        return self.domain.select_gateway()
 
     def as_node(self):
         from assets.models import Node
@@ -288,9 +281,6 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
         permissions = [
             ('refresh_assethardwareinfo', _('Can refresh asset hardware info')),
             ('test_assetconnectivity', _('Can test asset connectivity')),
-            ('push_assetaccount', _('Can push account to asset')),
-            ('test_account', _('Can verify account')),
             ('match_asset', _('Can match asset')),
-            ('add_assettonode', _('Add asset to node')),
-            ('move_assettonode', _('Move asset to node')),
+            ('change_assetnodes', _('Can change asset nodes')),
         ]

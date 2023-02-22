@@ -7,7 +7,7 @@ from django.db.models.signals import m2m_changed
 from rest_framework.response import Response
 
 from .action import RenderToJsonMixin
-from .filter import ExtraFilterFieldsMixin
+from .filter import ExtraFilterFieldsMixin, OrderingFielderFieldsMixin
 from .serializer import SerializerMixin
 
 __all__ = [
@@ -16,9 +16,6 @@ __all__ = [
 
 
 class PaginatedResponseMixin:
-    paginate_queryset: Callable
-    get_serializer: Callable
-    get_paginated_response: Callable
 
     def get_paginated_response_from_queryset(self, queryset):
         page = self.paginate_queryset(queryset)
@@ -87,14 +84,17 @@ class QuerySetMixin:
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if hasattr(self, 'action') and (self.action == 'list' or self.action == 'metadata'):
+        if not hasattr(self, 'action'):
+            return queryset
+        if self.action == 'metadata':
+            queryset = queryset.none()
+        if self.action in ['list', 'metadata']:
             serializer_class = self.get_serializer_class()
             if serializer_class and hasattr(serializer_class, 'setup_eager_loading'):
                 queryset = serializer_class.setup_eager_loading(queryset)
         return queryset
 
 
-class CommonApiMixin(SerializerMixin, ExtraFilterFieldsMixin,
-                     QuerySetMixin, RenderToJsonMixin,
-                     PaginatedResponseMixin):
+class CommonApiMixin(SerializerMixin, ExtraFilterFieldsMixin, OrderingFielderFieldsMixin,
+                     QuerySetMixin, RenderToJsonMixin, PaginatedResponseMixin):
     pass

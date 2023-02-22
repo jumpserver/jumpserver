@@ -14,11 +14,12 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
+from assets.const import CloudTypes
 from common.api import JMSModelViewSet
-from common.utils.http import is_true
-from common.utils import random_string
-from common.utils.django import get_request_os
 from common.exceptions import JMSException
+from common.utils import random_string, get_logger
+from common.utils.django import get_request_os
+from common.utils.http import is_true
 from orgs.mixins.api import RootOrgViewMixin
 from perms.models import ActionChoices
 from terminal.connect_methods import NativeClient, ConnectMethodUtil
@@ -30,6 +31,7 @@ from ..serializers import (
 )
 
 __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
+logger = get_logger(__name__)
 
 
 class RDPFileClientProtocolURLMixin:
@@ -149,7 +151,6 @@ class RDPFileClientProtocolURLMixin:
                 }
             })
         else:
-            print("Connect method: {}".format(connect_method_dict))
             endpoint = self.get_smart_endpoint(
                 protocol=connect_method_dict['endpoint_protocol'],
                 asset=token.asset
@@ -216,7 +217,7 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         'list': 'authentication.view_connectiontoken',
         'retrieve': 'authentication.view_connectiontoken',
         'create': 'authentication.add_connectiontoken',
-        'expire': 'authentication.add_connectiontoken',
+        'expire': 'authentication.change_connectiontoken',
         'get_rdp_file': 'authentication.add_connectiontoken',
         'get_client_protocol_url': 'authentication.add_connectiontoken',
     }
@@ -246,8 +247,11 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         account = self._validate_perm(user, asset, account_name)
         if account.has_secret:
             data['input_secret'] = ''
+
         if account.username != '@INPUT':
             data['input_username'] = ''
+        if account.username == '@USER':
+            data['input_username'] = user.username
 
         ticket = self._validate_acl(user, asset, account)
         if ticket:
@@ -264,7 +268,7 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
             msg = _('Account not found')
             raise JMSException(code='perm_account_invalid', detail=msg)
         if account.date_expired < timezone.now():
-            msg = _('Permission Expired')
+            msg = _('Permission expired')
             raise JMSException(code='perm_expired', detail=msg)
         return account
 
@@ -340,6 +344,11 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         token.is_valid()
         serializer = self.get_serializer(instance=token)
         expire_now = request.data.get('expire_now', True)
+
+        # TODO 暂时特殊处理 k8s 不过期
+        if token.asset.type == CloudTypes.K8S:
+            expire_now = False
+
         if expire_now:
             token.expire()
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -357,5 +366,11 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
     @action(methods=['DELETE', 'POST'], detail=False, url_path='applet-account/release')
     def release_applet_account(self, *args, **kwargs):
         account_id = self.request.data.get('id')
-        msg = ConnectionToken.release_applet_account(account_id)
-        return Response({'msg': msg})
+        released = ConnectionToken.release_applet_account(account_id)
+
+        if released:
+            logger.debug('Release applet account success: {}'.format(account_id))
+            return Response({'msg': 'released'})
+        else:
+            logger.error('Release applet account error: {}'.format(account_id))
+            return Response({'error': 'not found or expired'}, status=400)

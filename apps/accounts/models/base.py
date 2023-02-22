@@ -50,7 +50,7 @@ class BaseAccount(JMSOrgBaseModel):
         return bool(self.username)
 
     @property
-    def specific(self):
+    def spec_info(self):
         data = {}
         if self.secret_type != SecretType.SSH_KEY:
             return data
@@ -92,6 +92,9 @@ class BaseAccount(JMSOrgBaseModel):
         else:
             return ''
 
+        if not public_key:
+            return ''
+
         public_key_obj = sshpubkeys.SSHKey(public_key)
         fingerprint = public_key_obj.hash_md5()
         return fingerprint
@@ -106,7 +109,7 @@ class BaseAccount(JMSOrgBaseModel):
 
     @property
     def private_key_path(self):
-        if not self.secret_type != SecretType.SSH_KEY \
+        if self.secret_type != SecretType.SSH_KEY \
                 or not self.secret \
                 or not self.private_key:
             return None

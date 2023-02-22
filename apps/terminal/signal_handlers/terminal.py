@@ -2,7 +2,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.functional import LazyObject
 
-from common.decorator import on_transaction_commit
+from common.decorators import on_transaction_commit
 from common.utils import get_logger
 from common.utils.connection import RedisPubSub
 from ..models import Task

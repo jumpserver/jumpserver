@@ -3,23 +3,22 @@ from urllib.parse import parse_qsl
 
 from django.conf import settings
 from django.db.models import F, Value, CharField
-from rest_framework.request import Request
-from rest_framework.response import Response
+from rest_framework.exceptions import PermissionDenied, NotFound
 from rest_framework.generics import ListAPIView
 from rest_framework.generics import get_object_or_404
-from rest_framework.exceptions import PermissionDenied, NotFound
+from rest_framework.request import Request
+from rest_framework.response import Response
 
-from assets.utils import KubernetesTree
-from assets.models import Asset
 from accounts.const import AliasAccount
 from assets.api import SerializeToTreeNodeMixin
-from accounts.models import Account
+from assets.models import Asset
+from assets.utils import KubernetesTree
 from authentication.models import ConnectionToken
 from common.utils import get_object_or_none, lazyproperty
 from common.utils.common import timeit
 from perms.hands import Node
 from perms.models import PermNode
-from perms.utils import PermAccountUtil, UserPermNodeUtil, AssetPermissionUtil
+from perms.utils import PermAccountUtil, UserPermNodeUtil
 from perms.utils import UserPermAssetUtil
 from .mixin import RebuildTreeMixin
 from ..mixin import SelfOrPKUserMixin
@@ -153,16 +152,16 @@ class UserGrantedK8sAsTreeApi(SelfOrPKUserMixin, ListAPIView):
         util = PermAccountUtil()
         accounts = util.get_permed_accounts_for_user(self.user, token.asset)
         account_name = token.account
-        accounts = filter(lambda x: x.name == account_name, accounts)
-        accounts = list(accounts)
-        if not accounts:
-            raise NotFound('Account is not found')
-        account = accounts[0]
-        if account.name in [
+        if account_name in [
             AliasAccount.INPUT, AliasAccount.USER
         ]:
             return token.input_secret
         else:
+            accounts = filter(lambda x: x.name == account_name, accounts)
+            accounts = list(accounts)
+            if not accounts:
+                raise NotFound('Account is not found')
+            account = accounts[0]
             return account.secret
 
     @staticmethod

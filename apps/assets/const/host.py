@@ -62,6 +62,15 @@ class HostTypes(BaseType):
                     'ansible_connection': 'ssh',
                 },
             },
+            cls.OTHER_HOST: {
+                'ansible_enabled': False,
+                'ping_enabled': False,
+                'gather_facts_enabled': False,
+                'gather_accounts_enabled': False,
+                'verify_account_enabled': False,
+                'change_secret_enabled': False,
+                'push_account_enabled': False
+            },
         }
 
     @classmethod
@@ -71,14 +80,20 @@ class HostTypes(BaseType):
                 {'name': 'Linux'},
                 {
                     'name': GATEWAY_NAME,
-                    'domain_enabled': False,
+                    'domain_enabled': True,
                 }
             ],
             cls.UNIX: [
                 {'name': 'Unix'},
                 {'name': 'macOS'},
                 {'name': 'BSD'},
-                {'name': 'AIX'},
+                {
+                    'name': 'AIX',
+                    'automation': {
+                        'push_account_method': 'push_account_aix',
+                        'change_secret_method': 'change_secret_aix',
+                    }
+                },
             ],
             cls.WINDOWS: [
                 {'name': 'Windows'},
@@ -103,8 +118,7 @@ class HostTypes(BaseType):
                         }
                     }
                 }
-            ],
-            cls.OTHER_HOST: []
+            ]
         }
 
     @classmethod

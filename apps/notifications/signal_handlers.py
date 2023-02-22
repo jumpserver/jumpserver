@@ -7,12 +7,12 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.functional import LazyObject
 
-from common.decorator import on_transaction_commit
+from common.decorators import on_transaction_commit
 from common.utils import get_logger
 from common.utils.connection import RedisPubSub
 from notifications.backends import BACKEND
 from users.models import User
-from .models import SiteMessage, SystemMsgSubscription, UserMsgSubscription
+from .models import MessageContent, SystemMsgSubscription, UserMsgSubscription
 from .notifications import SystemMessage
 
 logger = get_logger(__name__)
@@ -26,7 +26,7 @@ class NewSiteMsgSubPub(LazyObject):
 new_site_msg_chan = NewSiteMsgSubPub()
 
 
-@receiver(post_save, sender=SiteMessage)
+@receiver(post_save, sender=MessageContent)
 @on_transaction_commit
 def on_site_message_create(sender, instance, created, **kwargs):
     if not created:

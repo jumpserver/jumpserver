@@ -1,27 +1,30 @@
 import os
 import time
-from copy import deepcopy
-from openpyxl import Workbook
 from collections import defaultdict
+from copy import deepcopy
 
 from django.conf import settings
 from django.utils import timezone
+from openpyxl import Workbook
 
-from users.models import User
+from accounts.const import AutomationTypes, SecretType, SSHKeyStrategy, SecretStrategy
 from accounts.models import ChangeSecretRecord
 from accounts.notifications import ChangeSecretExecutionTaskMsg
 from accounts.serializers import ChangeSecretRecordBackUpSerializer
-from accounts.const import AutomationTypes, SecretType, SSHKeyStrategy, SecretStrategy
+from assets.const import HostTypes
 from common.utils import get_logger, lazyproperty
 from common.utils.file import encrypt_and_compress_zip_file
 from common.utils.timezone import local_now_display
-from ...utils import SecretGenerator
+from users.models import User
 from ..base.manager import AccountBasePlaybookManager
+from ...utils import SecretGenerator
 
 logger = get_logger(__name__)
 
 
 class ChangeSecretManager(AccountBasePlaybookManager):
+    ansible_account_prefer = ''
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.method_hosts_mapper = defaultdict(list)
@@ -33,17 +36,11 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             'ssh_key_change_strategy', SSHKeyStrategy.add
         )
         self.snapshot_account_usernames = self.execution.snapshot['accounts']
-        self._password_generated = None
-        self._ssh_key_generated = None
         self.name_recorder_mapper = {}  # 做个映射，方便后面处理
 
     @classmethod
     def method_type(cls):
         return AutomationTypes.change_secret
-
-    @lazyproperty
-    def related_accounts(self):
-        pass
 
     def get_kwargs(self, account, secret):
         kwargs = {}
@@ -89,15 +86,26 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             accounts = accounts.filter(username__in=self.snapshot_account_usernames)
 
         accounts = accounts.filter(secret_type=self.secret_type)
+        if not accounts:
+            print('没有发现待改密账号: %s 用户名: %s 类型: %s' % (
+                asset.name, self.snapshot_account_usernames, self.secret_type
+            ))
+            return []
+
         method_attr = getattr(automation, self.method_type() + '_method')
         method_hosts = self.method_hosts_mapper[method_attr]
         method_hosts = [h for h in method_hosts if h != host['name']]
         inventory_hosts = []
         records = []
         host['secret_type'] = self.secret_type
+
+        if asset.type == HostTypes.WINDOWS and self.secret_type == SecretType.SSH_KEY:
+            print(f'Windows {asset} does not support ssh key push \n')
+            return inventory_hosts
+
         for account in accounts:
             h = deepcopy(host)
-            h['name'] += '_' + account.username
+            h['name'] += '(' + account.username + ')'
             new_secret = self.get_secret()
 
             recorder = ChangeSecretRecord(
@@ -135,8 +143,10 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         recorder.status = 'success'
         recorder.date_finished = timezone.now()
         recorder.save()
-
         account = recorder.account
+        if not account:
+            print("Account not found, deleted ?")
+            return
         account.secret = recorder.new_secret
         account.save(update_fields=['secret'])
 
@@ -152,7 +162,16 @@ class ChangeSecretManager(AccountBasePlaybookManager):
     def on_runner_failed(self, runner, e):
         logger.error("Change secret error: ", e)
 
+    def check_secret(self):
+        if self.secret_strategy == SecretStrategy.custom \
+                and not self.execution.snapshot['secret']:
+            print('Custom secret is empty')
+            return False
+        return True
+
     def run(self, *args, **kwargs):
+        if not self.check_secret():
+            return
         super().run(*args, **kwargs)
         recorders = self.name_recorder_mapper.values()
         recorders = list(recorders)

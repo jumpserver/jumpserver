@@ -18,6 +18,7 @@ class CeleryBaseService(BaseService):
         os.environ.setdefault('ANSIBLE_FORCE_COLOR', 'True')
         os.environ.setdefault('ANSIBLE_CONFIG', ansible_config_path)
         os.environ.setdefault('ANSIBLE_LIBRARY', ansible_modules_path)
+        os.environ.setdefault('PYTHONPATH', settings.APPS_DIR)
 
         if os.getuid() == 0:
             os.environ.setdefault('C_FORCE_ROOT', '1')

@@ -5,7 +5,8 @@ from assets.const import AllTypes
 
 
 def create_internal_platforms(apps, *args):
-    AllTypes.create_or_update_internal_platforms()
+    platform_cls = apps.get_model('assets', 'Platform')
+    AllTypes.create_or_update_internal_platforms(platform_cls)
 
 
 def update_user_platforms(apps, *args):
@@ -34,6 +35,13 @@ def migrate_macos_platform(apps, schema_editor):
     platform_model.objects.using(db_alias).filter(id=old_macos.id).delete()
 
 
+def migrate_connectivity(apps, schema_editor):
+    db_alias = schema_editor.connection.alias
+    asset_model = apps.get_model('assets', 'Asset')
+    asset_model.objects.using(db_alias).filter(connectivity='unknown').update(connectivity='-')
+    asset_model.objects.using(db_alias).filter(connectivity='failed').update(connectivity='err')
+
+
 class Migration(migrations.Migration):
     dependencies = [
         ('assets', '0096_auto_20220426_1550'),
@@ -43,4 +51,5 @@ class Migration(migrations.Migration):
         migrations.RunPython(create_internal_platforms),
         migrations.RunPython(update_user_platforms),
         migrations.RunPython(migrate_macos_platform),
+        migrations.RunPython(migrate_connectivity),
     ]

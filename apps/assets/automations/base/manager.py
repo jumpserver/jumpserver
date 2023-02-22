@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 from collections import defaultdict
@@ -8,6 +9,7 @@ import yaml
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext as _
+from sshtunnel import SSHTunnelForwarder
 
 from assets.automations.methods import platform_automation_methods
 from common.utils import get_logger, lazyproperty
@@ -25,6 +27,7 @@ class PlaybookCallback(DefaultCallback):
 class BasePlaybookManager:
     bulk_size = 100
     ansible_account_policy = 'privileged_first'
+    ansible_account_prefer = 'root,Administrator'
 
     def __init__(self, execution):
         self.execution = execution
@@ -38,6 +41,7 @@ class BasePlaybookManager:
         # 避免一个 playbook 中包含太多的主机
         self.method_hosts_mapper = defaultdict(list)
         self.playbooks = []
+        self.gateway_servers = dict()
 
     @property
     def platform_automation_methods(self):
@@ -50,8 +54,7 @@ class BasePlaybookManager:
     def get_assets_group_by_platform(self):
         return self.execution.all_assets_group_by_platform()
 
-    @lazyproperty
-    def runtime_dir(self):
+    def prepare_runtime_dir(self):
         ansible_dir = settings.ANSIBLE_DIR
         task_name = self.execution.snapshot['name']
         dir_name = '{}_{}'.format(task_name.replace(' ', '_'), self.execution.id)
@@ -61,6 +64,14 @@ class BasePlaybookManager:
         )
         if not os.path.exists(path):
             os.makedirs(path, exist_ok=True, mode=0o755)
+        return path
+
+    @lazyproperty
+    def runtime_dir(self):
+        path = self.prepare_runtime_dir()
+        if settings.DEBUG_DEV:
+            msg = 'Ansible runtime dir: {}'.format(path)
+            print(msg)
         return path
 
     @staticmethod
@@ -73,7 +84,7 @@ class BasePlaybookManager:
         if not path_dir:
             return host
 
-        specific = host.get('jms_asset', {}).get('specific', {})
+        specific = host.get('jms_asset', {}).get('secret_info', {})
         cert_fields = ('ca_cert', 'client_key', 'client_cert')
         filtered = list(filter(lambda x: specific.get(x), cert_fields))
         if not filtered:
@@ -87,7 +98,7 @@ class BasePlaybookManager:
             result = self.write_cert_to_file(
                 os.path.join(cert_dir, f), specific.get(f)
             )
-            host['jms_asset']['specific'][f] = result
+            host['jms_asset']['secret_info'][f] = result
         return host
 
     def host_callback(self, host, automation=None, **kwargs):
@@ -123,6 +134,7 @@ class BasePlaybookManager:
     def generate_inventory(self, platformed_assets, inventory_path):
         inventory = JMSInventory(
             assets=platformed_assets,
+            account_prefer=self.ansible_account_prefer,
             account_policy=self.ansible_account_policy,
             host_callback=self.host_callback,
         )
@@ -148,8 +160,12 @@ class BasePlaybookManager:
         return sub_playbook_path
 
     def get_runners(self):
+        assets_group_by_platform = self.get_assets_group_by_platform()
+        if settings.DEBUG_DEV:
+            msg = 'Assets group by platform: {}'.format(dict(assets_group_by_platform))
+            print(msg)
         runners = []
-        for platform, assets in self.get_assets_group_by_platform().items():
+        for platform, assets in assets_group_by_platform.items():
             assets_bulked = [assets[i:i + self.bulk_size] for i in range(0, len(assets), self.bulk_size)]
 
             for i, _assets in enumerate(assets_bulked, start=1):
@@ -165,6 +181,12 @@ class BasePlaybookManager:
                     self.runtime_dir,
                     callback=PlaybookCallback(),
                 )
+
+                with open(inventory_path, 'r') as f:
+                    inventory_data = json.load(f)
+                    if not inventory_data['all'].get('hosts'):
+                        continue
+
                 runners.append(runer)
         return runners
 
@@ -172,7 +194,7 @@ class BasePlaybookManager:
         pass
 
     def on_host_error(self, host, error, result):
-        pass
+        print('host error: {} -> {}'.format(host, error))
 
     def on_runner_success(self, runner, cb):
         summary = cb.summary
@@ -182,8 +204,7 @@ class BasePlaybookManager:
                 if state == 'ok':
                     self.on_host_success(host, result)
                 elif state == 'skipped':
-                    # TODO
-                    print('skipped: ', hosts)
+                    pass
                 else:
                     error = hosts.get(host)
                     self.on_host_error(host, error, result)
@@ -191,15 +212,68 @@ class BasePlaybookManager:
     def on_runner_failed(self, runner, e):
         print("Runner failed: {} {}".format(e, self))
 
+    @staticmethod
+    def file_to_json(path):
+        with open(path, 'r') as f:
+            d = json.load(f)
+        return d
+
+    @staticmethod
+    def json_dumps(data):
+        return json.dumps(data, indent=4, sort_keys=True)
+
+    @staticmethod
+    def json_to_file(path, data):
+        with open(path, 'w') as f:
+            json.dump(data, f, indent=4, sort_keys=True)
+
+    def local_gateway_prepare(self, runner):
+        info = self.file_to_json(runner.inventory)
+        servers = []
+        for k, host in info['all']['hosts'].items():
+            jms_asset, jms_gateway = host['jms_asset'], host.get('gateway')
+            if not jms_gateway:
+                continue
+            server = SSHTunnelForwarder(
+                (jms_gateway['address'], jms_gateway['port']),
+                ssh_username=jms_gateway['username'],
+                ssh_password=jms_gateway['secret'],
+                remote_bind_address=(jms_asset['address'], jms_asset['port'])
+            )
+            server.start()
+            jms_asset['address'] = '127.0.0.1'
+            jms_asset['port'] = server.local_bind_port
+            servers.append(server)
+        self.json_to_file(runner.inventory, info)
+        self.gateway_servers[runner.id] = servers
+
+    def local_gateway_clean(self, runner):
+        servers = self.gateway_servers.get(runner.id, [])
+        for s in servers:
+            try:
+                s.stop()
+            except Exception:
+                pass
+
     def before_runner_start(self, runner):
-        pass
+        self.local_gateway_prepare(runner)
+
+    def after_runner_end(self, runner):
+        self.local_gateway_clean(runner)
+
+    def delete_runtime_dir(self):
+        if settings.DEBUG_DEV:
+            return
+        shutil.rmtree(self.runtime_dir)
 
     def run(self, *args, **kwargs):
         runners = self.get_runners()
         if len(runners) > 1:
-            print("### 分批次执行开始任务, 总共 {}\n".format(len(runners)))
-        else:
+            print("### 分次执行任务, 总共 {}\n".format(len(runners)))
+        elif len(runners) == 1:
             print(">>> 开始执行任务\n")
+        else:
+            print("### 没有需要执行的任务\n")
 
         self.execution.date_start = timezone.now()
         for i, runner in enumerate(runners, start=1):
@@ -211,7 +285,10 @@ class BasePlaybookManager:
                 self.on_runner_success(runner, cb)
             except Exception as e:
                 self.on_runner_failed(runner, e)
-            print('\n')
+            finally:
+                self.after_runner_end(runner)
+                print('\n')
         self.execution.status = 'success'
         self.execution.date_finished = timezone.now()
         self.execution.save()
+        self.delete_runtime_dir()

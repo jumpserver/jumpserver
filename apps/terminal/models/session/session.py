@@ -15,6 +15,7 @@ from assets.models import Asset
 from common.utils import get_object_or_none, lazyproperty
 from orgs.mixins.models import OrgModelMixin
 from terminal.backends import get_multi_command_storage
+from terminal.const import SessionType
 from users.models import User
 
 
@@ -31,6 +32,7 @@ class Session(OrgModelMixin):
     asset = models.CharField(max_length=128, verbose_name=_("Asset"), db_index=True)
     asset_id = models.CharField(blank=True, default='', max_length=36, db_index=True)
     account = models.CharField(max_length=128, verbose_name=_("Account"), db_index=True)
+    account_id = models.CharField(max_length=128, verbose_name=_("Account id"), db_index=True)
     protocol = models.CharField(default='ssh', max_length=16, db_index=True)
     login_from = models.CharField(max_length=2, choices=LOGIN_FROM.choices, default="ST", verbose_name=_("Login from"))
     type = models.CharField(max_length=16, default='normal', db_index=True)
@@ -123,6 +125,9 @@ class Session(OrgModelMixin):
             return False
         if self.login_from == self.LOGIN_FROM.RT:
             return False
+        if self.type != SessionType.normal:
+            # 会话监控仅支持 normal，不支持 tunnel 和 command
+            return False
         if self.protocol in [
             Protocol.ssh, Protocol.vnc, Protocol.rdp,
             Protocol.telnet, Protocol.k8s
@@ -152,7 +157,7 @@ class Session(OrgModelMixin):
             return None, e
 
         if settings.SERVER_REPLAY_STORAGE:
-            from ..tasks import upload_session_replay_to_external_storage
+            from terminal.tasks import upload_session_replay_to_external_storage
             upload_session_replay_to_external_storage.delay(str(self.id))
         return name, None
 
@@ -178,14 +183,11 @@ class Session(OrgModelMixin):
     def login_from_display(self):
         return self.get_login_from_display()
 
-    def get_asset_or_application(self):
-        instance = get_object_or_none(Asset, pk=self.asset_id)
-        if not instance:
-            instance = get_object_or_none(Application, pk=self.asset_id)
-        return instance
+    def get_asset(self):
+        return get_object_or_none(Asset, pk=self.asset_id)
 
     def get_target_ip(self):
-        instance = self.get_asset_or_application()
+        instance = self.get_asset()
         target_ip = instance.get_target_ip() if instance else ''
         return target_ip
 

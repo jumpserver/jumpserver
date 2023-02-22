@@ -1,12 +1,12 @@
 # ~*~ coding: utf-8 ~*~
 #
 from collections import defaultdict
+
+from common.db.models import output_as_string
+from common.struct import Stack
 from common.utils import get_logger, dict_get_any, is_uuid, get_object_or_none, timeit
 from common.utils.http import is_true
-from common.struct import Stack
-from common.db.models import output_as_string
 from orgs.utils import ensure_in_real_or_default_org, current_org
-
 from ..locks import NodeTreeUpdateLock
 from ..models import Node, Asset
 
@@ -25,11 +25,11 @@ def check_node_assets_amount():
     for node in nodes:
         nodeid_nodekey_mapper[node.id] = node.key
 
-    for nodeid, assetid in nodeid_assetid_pairs:
-        if nodeid not in nodeid_nodekey_mapper:
+    for node_id, asset_id in nodeid_assetid_pairs:
+        if node_id not in nodeid_nodekey_mapper:
             continue
-        nodekey = nodeid_nodekey_mapper[nodeid]
-        nodekey_assetids_mapper[nodekey].add(assetid)
+        node_key = nodeid_nodekey_mapper[node_id]
+        nodekey_assetids_mapper[node_key].add(asset_id)
 
     util = NodeAssetsUtil(nodes, nodekey_assetids_mapper)
     util.generate()

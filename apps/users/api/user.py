@@ -2,27 +2,27 @@
 from collections import defaultdict
 
 from django.utils.translation import ugettext as _
-from rest_framework.decorators import action
 from rest_framework import generics
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 
 from common.api import CommonApiMixin
-from common.utils import get_logger
 from common.api import SuggestionMixin
+from common.utils import get_logger
 from orgs.utils import current_org, tmp_to_root_org
 from rbac.models import Role, RoleBinding
 from users.utils import LoginBlockUtil, MFABlockUtils
 from .mixins import UserQuerysetMixin
-from ..notifications import ResetMFAMsg
 from .. import serializers
+from ..filters import UserFilter
+from ..models import User
+from ..notifications import ResetMFAMsg
 from ..serializers import (
     UserSerializer,
     MiniUserSerializer, InviteSerializer
 )
-from ..models import User
 from ..signals import post_user_create
-from ..filters import UserFilter
 
 logger = get_logger(__name__)
 __all__ = [
@@ -39,7 +39,6 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
         'suggestion': MiniUserSerializer,
         'invite': InviteSerializer,
     }
-    ordering_fields = ('name',)
     ordering = ('name',)
     rbac_perms = {
         'match': 'users.match_user',
@@ -52,19 +51,19 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
         queryset = super().get_queryset().prefetch_related('groups')
         return queryset
 
-    def paginate_queryset(self, queryset):
-        page = super().paginate_queryset(queryset)
-
-        if page:
-            page = self.set_users_roles_for_cache(page)
-        else:
-            self.set_users_roles_for_cache(queryset)
-        return page
-
     @action(methods=['get'], detail=False, url_path='suggestions')
     def match(self, request, *args, **kwargs):
         with tmp_to_root_org():
             return super().match(request, *args, **kwargs)
+
+    def get_serializer(self, *args, **kwargs):
+        """重写 get_serializer，用于设置用户的角色缓存
+        放到 paginate_queryset 里面会导致 导出有问题， 因为导出的时候，没有 pager
+        """
+        if len(args) == 1 and kwargs.get('many'):
+            queryset = self.set_users_roles_for_cache(args[0])
+            args = (queryset,)
+        return super().get_serializer(*args, **kwargs)
 
     @staticmethod
     def set_users_roles_for_cache(queryset):

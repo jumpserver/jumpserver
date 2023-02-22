@@ -2,15 +2,13 @@
 #
 
 import datetime
-import os
-import subprocess
 
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.core.files.storage import default_storage
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
-from common.utils import get_log_keep_day
 from ops.celery.decorator import (
     register_as_period_task, after_app_ready_start,
     after_app_shutdown_clean_periodic
@@ -18,7 +16,7 @@ from ops.celery.decorator import (
 from orgs.utils import tmp_to_builtin_org
 from .backends import server_replay_storage
 from .models import (
-    Status, Session, Command, Task, AppletHostDeployment
+    Status, Session, Task, AppletHostDeployment
 )
 from .utils import find_session_replay_local
 
@@ -27,7 +25,7 @@ RUNNING = False
 logger = get_task_logger(__name__)
 
 
-@shared_task
+@shared_task(verbose_name=_('Periodic delete terminal status'))
 @register_as_period_task(interval=3600)
 @after_app_ready_start
 @after_app_shutdown_clean_periodic
@@ -36,7 +34,7 @@ def delete_terminal_status_period():
     Status.objects.filter(date_created__lt=yesterday).delete()
 
 
-@shared_task
+@shared_task(verbose_name=_('Clean orphan session'))
 @register_as_period_task(interval=600)
 @after_app_ready_start
 @after_app_shutdown_clean_periodic
@@ -55,33 +53,7 @@ def clean_orphan_session():
         session.save()
 
 
-@shared_task
-@register_as_period_task(interval=3600 * 24)
-@after_app_ready_start
-@after_app_shutdown_clean_periodic
-def clean_expired_session_period():
-    logger.info("Start clean expired session record, commands and replay")
-    days = get_log_keep_day('TERMINAL_SESSION_KEEP_DURATION')
-    expire_date = timezone.now() - timezone.timedelta(days=days)
-    expired_sessions = Session.objects.filter(date_start__lt=expire_date)
-    timestamp = expire_date.timestamp()
-    expired_commands = Command.objects.filter(timestamp__lt=timestamp)
-    replay_dir = os.path.join(default_storage.base_location, 'replay')
-
-    expired_sessions.delete()
-    logger.info("Clean session item done")
-    expired_commands.delete()
-    logger.info("Clean session command done")
-    command = "find %s -mtime +%s \\( -name '*.json' -o -name '*.tar' -o -name '*.gz' \\) -exec rm -f {} \\;" % (
-        replay_dir, days
-    )
-    subprocess.call(command, shell=True)
-    command = "find %s -type d -empty -delete;" % replay_dir
-    subprocess.call(command, shell=True)
-    logger.info("Clean session replay done")
-
-
-@shared_task
+@shared_task(verbose_name=_('Upload session replay to external storage'))
 def upload_session_replay_to_external_storage(session_id):
     logger.info(f'Start upload session to external storage: {session_id}')
     session = Session.objects.filter(id=session_id).first()
@@ -108,14 +80,14 @@ def upload_session_replay_to_external_storage(session_id):
     return
 
 
-@shared_task
+@shared_task(verbose_name=_('Run applet host deployment'), activity_callback=lambda did: ([did], ))
 def run_applet_host_deployment(did):
     with tmp_to_builtin_org(system=1):
         deployment = AppletHostDeployment.objects.get(id=did)
         deployment.start()
 
 
-@shared_task
+@shared_task(verbose_name=_('Install applet'), activity_callback=lambda did, applet_id: ([did],))
 def run_applet_host_deployment_install_applet(did, applet_id):
     with tmp_to_builtin_org(system=1):
         deployment = AppletHostDeployment.objects.get(id=did)

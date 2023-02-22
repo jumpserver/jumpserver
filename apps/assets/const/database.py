@@ -30,7 +30,7 @@ class DatabaseTypes(BaseType):
                     'ansible_connection': 'local',
                 },
                 'ping_enabled': True,
-                'gather_facts_enabled': True,
+                'gather_facts_enabled': False,
                 'gather_accounts_enabled': True,
                 'verify_account_enabled': True,
                 'change_secret_enabled': True,
@@ -38,9 +38,21 @@ class DatabaseTypes(BaseType):
             },
             cls.REDIS: {
                 'ansible_enabled': False,
+                'ping_enabled': False,
+                'gather_facts_enabled': False,
+                'gather_accounts_enabled': False,
+                'verify_account_enabled': False,
+                'change_secret_enabled': False,
+                'push_account_enabled': False,
             },
             cls.CLICKHOUSE: {
                 'ansible_enabled': False,
+                'ping_enabled': False,
+                'gather_facts_enabled': False,
+                'gather_accounts_enabled': False,
+                'verify_account_enabled': False,
+                'change_secret_enabled': False,
+                'push_account_enabled': False,
             },
         }
         return constrains
@@ -63,7 +75,20 @@ class DatabaseTypes(BaseType):
             cls.SQLSERVER: [{'name': 'SQLServer'}],
             cls.CLICKHOUSE: [{'name': 'ClickHouse'}],
             cls.MONGODB: [{'name': 'MongoDB'}],
-            cls.REDIS: [{'name': 'Redis'}],
+            cls.REDIS: [
+                {
+                    'name': 'Redis',
+                    'protocols_setting': {
+                        'redis': {'auth_username': False}
+                    }
+                },
+                {
+                    'name': 'Redis6+',
+                    'protocols_setting': {
+                        'redis': {'auth_username': True}
+                    }
+                }
+            ]
         }
 
     @classmethod

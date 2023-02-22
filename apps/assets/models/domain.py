@@ -30,11 +30,11 @@ class Domain(JMSOrgBaseModel):
 
     def random_gateway(self):
         gateways = [gw for gw in self.active_gateways if gw.is_connective]
+
         if not gateways:
-            logger.warn(f'Gateway all bad. domain={self}, gateway_num={len(gateways)}.')
             gateways = self.active_gateways
         if not gateways:
-            logger.warn(f'Not active gateway. domain={self}')
+            logger.warn(f'Not active gateway, domain={self}, pass')
             return None
         return random.choice(gateways)
 

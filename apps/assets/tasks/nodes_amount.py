@@ -30,7 +30,7 @@ def check_node_assets_amount_task(org_id=None):
             logger.error(error)
 
 
-@register_as_period_task(crontab=CRONTAB_AT_AM_TWO)
 @shared_task(verbose_name=_('Periodic check the amount of assets under the node'))
+@register_as_period_task(crontab=CRONTAB_AT_AM_TWO)
 def check_node_assets_amount_period_task():
     check_node_assets_amount_task()

@@ -15,7 +15,7 @@ from common.utils.timezone import local_now
 from perms.const import ActionChoices
 from accounts.const import AliasAccount
 
-__all__ = ['AssetPermission', 'ActionChoices']
+__all__ = ['AssetPermission', 'ActionChoices', 'AssetPermissionQuerySet']
 
 # 使用场景
 logger = logging.getLogger(__name__)
@@ -67,7 +67,7 @@ class AssetPermission(JMSOrgBaseModel):
         'assets.Node', related_name='granted_by_permissions', blank=True, verbose_name=_("Nodes")
     )
     # 特殊的账号: @ALL, @INPUT @USER 默认包含，将来在全局设置中进行控制.
-    accounts = models.JSONField(default=list, verbose_name=_("Accounts"))
+    accounts = models.JSONField(default=list, verbose_name=_("Account"))
     actions = models.IntegerField(default=ActionChoices.connect, verbose_name=_("Actions"))
     date_start = models.DateTimeField(default=timezone.now, db_index=True, verbose_name=_("Date start"))
     date_expired = models.DateTimeField(

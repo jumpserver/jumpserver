@@ -5,11 +5,13 @@ import uuid
 
 from celery import current_task
 from django.db import models
+from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
 
 from common.const.choices import Trigger
 from common.db.encoder import ModelJSONFieldEncoder
 from common.utils import get_logger
+from common.utils import lazyproperty
 from ops.mixin import PeriodTaskModelMixin
 from orgs.mixins.models import OrgModelMixin, JMSOrgBaseModel
 
@@ -34,9 +36,9 @@ class AccountBackupAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
         verbose_name = _('Account backup plan')
 
     def get_register_task(self):
-        from ...tasks import execute_account_backup_plan
+        from ...tasks import execute_account_backup_task
         name = "account_backup_plan_period_{}".format(str(self.id)[:8])
-        task = execute_account_backup_plan.name
+        task = execute_account_backup_task.name
         args = (str(self.id), Trigger.timing)
         kwargs = {}
         return name, task, args, kwargs
@@ -69,6 +71,10 @@ class AccountBackupAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
             id=hid, plan=self, plan_snapshot=self.to_attr_json(), trigger=trigger
         )
         return execution.start()
+
+    @lazyproperty
+    def latest_execution(self):
+        return self.execution.first()
 
 
 class AccountBackupExecution(OrgModelMixin):
@@ -111,6 +117,15 @@ class AccountBackupExecution(OrgModelMixin):
         if not recipients:
             return []
         return recipients.values()
+
+    @lazyproperty
+    def backup_accounts(self):
+        from accounts.models import Account
+        # TODO 可以优化一下查询 在账号上做 category 的缓存 避免数据量大时连表操作
+        qs = Account.objects.filter(
+            asset__platform__type__in=self.types
+        ).annotate(type=F('asset__platform__type'))
+        return qs
 
     @property
     def manager_type(self):

@@ -5,21 +5,21 @@ from rest_framework import serializers
 
 from audits.backends.db import OperateLogStore
 from common.serializers.fields import LabeledChoiceField
+from common.utils import reverse, i18n_trans
 from common.utils.timezone import as_current_tz
-from ops.models.job import JobAuditLog
 from ops.serializers.job import JobExecutionSerializer
 from terminal.models import Session
 from . import models
 from .const import (
     ActionChoices, OperateChoices,
     MFAChoices, LoginStatusChoices,
-    LoginTypeChoices,
+    LoginTypeChoices, ActivityChoices,
 )
 
 
-class JobAuditLogSerializer(JobExecutionSerializer):
+class JobLogSerializer(JobExecutionSerializer):
     class Meta:
-        model = JobAuditLog
+        model = models.JobLog
         read_only_fields = [
             "id", "material", "time_cost", 'date_start',
             'date_finished', 'date_created',
@@ -86,11 +86,10 @@ class OperateLogSerializer(serializers.ModelSerializer):
         fields_mini = ["id"]
         fields_small = fields_mini + [
             "user", "action", "resource_type",
-            "resource_type_display", "resource",
-            "remote_addr", "datetime", "org_id",
+            "resource", "remote_addr", "datetime",
+            "org_id",
         ]
         fields = fields_small
-        extra_kwargs = {"resource_type_display": {"label": _("Resource Type")}}
 
 
 class PasswordChangeLogSerializer(serializers.ModelSerializer):
@@ -105,19 +104,47 @@ class SessionAuditSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ActivitiesOperatorLogSerializer(serializers.Serializer):
+class ActivityUnionLogSerializer(serializers.Serializer):
+    id = serializers.CharField()
     timestamp = serializers.SerializerMethodField()
+    detail_url = serializers.SerializerMethodField()
     content = serializers.SerializerMethodField()
+    r_type = serializers.CharField(read_only=True)
 
     @staticmethod
     def get_timestamp(obj):
-        return as_current_tz(obj.datetime).strftime('%Y-%m-%d %H:%M:%S')
+        return as_current_tz(obj['datetime']).strftime('%Y-%m-%d %H:%M:%S')
 
     @staticmethod
     def get_content(obj):
-        action = obj.action.replace('_', ' ').capitalize()
-        if not obj.detail:
-            ctn = _('User {} {} this resource.').format(obj.user, _(action))
+        if not obj['r_detail']:
+            action = obj['r_action'].replace('_', ' ').capitalize()
+            ctn = _('User %s %s this resource') % (obj['r_user'], _(action))
         else:
-            ctn = obj.detail
+            ctn = i18n_trans(obj['r_detail'])
         return ctn
+
+    @staticmethod
+    def get_detail_url(obj):
+        detail_url = ''
+        detail_id, obj_type = obj['r_detail_id'], obj['r_type']
+        if not detail_id:
+            return detail_url
+
+        if obj_type == ActivityChoices.operate_log:
+            detail_url = '%s?%s' % (
+                reverse(
+                    'audits:operate-log-detail',
+                    kwargs={'pk': obj['id']},
+                ), 'type=action_detail')
+        elif obj_type == ActivityChoices.task:
+            detail_url = reverse(
+                'ops:celery-task-log', kwargs={'pk': detail_id}
+            )
+        elif obj_type == ActivityChoices.login_log:
+            detail_url = reverse(
+                'audits:login-log-detail',
+                kwargs={'pk': detail_id},
+                api_to_ui=True, is_audit=True
+            )
+        return detail_url
