@@ -407,12 +407,14 @@ class JobExecution(JMSOrgBaseModel):
         all_permed_assets = UserPermAssetUtil(self.creator).get_all_assets()
         has_permed_assets = set(self.current_job.assets.all()) & set(all_permed_assets)
 
+        error_assets_count = 0
         for asset in self.current_job.assets.all():
             if asset not in has_permed_assets:
                 print("\033[31mAsset {}({}) has no access permission\033[0m".format(asset.name, asset.address))
+                error_assets_count += 1
 
-        if self.current_job.assets.count() != len(has_permed_assets):
-            raise Exception("You do not have access rights to some assets")
+        if error_assets_count > 0:
+            raise Exception("You do not have access rights to {} assets".format(error_assets_count))
 
     def before_start(self):
         self.check_assets_perms()
