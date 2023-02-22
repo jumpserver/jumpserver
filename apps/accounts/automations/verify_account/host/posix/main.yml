@@ -1,11 +1,11 @@
 - hosts: demo
   gather_facts: no
   tasks:
-    - name: Verify account
-      ansible.builtin.ping:
+    - name: Verify account connectivity
       become: no
+      ansible.builtin.ping:
       vars:
+        ansible_become: no
         ansible_user: "{{ account.username }}"
         ansible_password: "{{ account.secret }}"
         ansible_ssh_private_key_file: "{{ account.private_key_path }}"
-        ansible_become: no

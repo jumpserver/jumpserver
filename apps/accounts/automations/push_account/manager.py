@@ -59,11 +59,11 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
 
         accounts = asset.accounts.all()
         accounts = self.get_accounts(account, accounts)
-
         inventory_hosts = []
         host['secret_type'] = self.secret_type
         if asset.type == HostTypes.WINDOWS and self.secret_type == SecretType.SSH_KEY:
-            print(f'Windows {asset} does not support ssh key push \n')
+            msg = f'Windows {asset} does not support ssh key push \n'
+            print(msg)
             return inventory_hosts
 
         for account in accounts:

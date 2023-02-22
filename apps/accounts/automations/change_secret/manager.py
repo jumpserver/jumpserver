@@ -87,7 +87,9 @@ class ChangeSecretManager(AccountBasePlaybookManager):
 
         accounts = accounts.filter(secret_type=self.secret_type)
         if not accounts:
-            print('没有发现待改密账号: %s 用户名: %s 类型: %s' % (asset.name, account.username, self.secret_type))
+            print('没有发现待改密账号: %s 用户名: %s 类型: %s' % (
+                asset.name, self.snapshot_account_usernames, self.secret_type
+            ))
             return []
 
         method_attr = getattr(automation, self.method_type() + '_method')
@@ -143,7 +145,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         recorder.save()
         account = recorder.account
         if not account:
-            print("Account not found, deleted ?", recorder)
+            print("Account not found, deleted ?")
             return
         account.secret = recorder.new_secret
         account.save(update_fields=['secret'])
