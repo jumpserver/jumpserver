@@ -139,8 +139,11 @@ class JMSInventory:
             self.make_ssh_account_vars(host, asset, account, automation, protocols, platform, gateway)
         return host
 
+    def get_asset_accounts(self, asset):
+        return list(asset.accounts.filter(is_active=True))
+
     def select_account(self, asset):
-        accounts = list(asset.accounts.filter(is_active=True))
+        accounts = self.get_asset_accounts(asset)
         if not accounts:
             return None
         account_selected = None
