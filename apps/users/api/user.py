@@ -51,10 +51,11 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
         queryset = super().get_queryset().prefetch_related('groups')
         return queryset
 
-    def paginate_queryset(self, queryset):
-        page = super().paginate_queryset(queryset)
-        self.set_users_roles_for_cache(page or queryset)
-        return page
+    def get_serializer(self, *args, **kwargs):
+        if len(args) == 0:
+            queryset = self.set_users_roles_for_cache(args[0])
+            args = (queryset,)
+        return super().get_serializer(*args, **kwargs)
 
     @action(methods=['get'], detail=False, url_path='suggestions')
     def match(self, request, *args, **kwargs):

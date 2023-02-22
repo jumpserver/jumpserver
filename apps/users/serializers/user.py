@@ -39,7 +39,7 @@ class RolesSerializerMixin(serializers.Serializer):
         label=_("System roles"), many=True, default=default_system_roles
     )
     org_roles = ObjectRelatedField(
-        queryset=Role.org_roles, attrs=('id', 'display_name'),
+        queryset=Role.org_roles, attrs=('id', 'display_name', 'name'),
         label=_("Org roles"), many=True, required=False,
         default=default_org_roles
     )
@@ -91,6 +91,8 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
     )
     login_blocked = serializers.BooleanField(read_only=True, label=_("Login blocked"))
     is_expired = serializers.BooleanField(read_only=True, label=_("Is expired"))
+    is_valid = serializers.BooleanField(read_only=True, label=_("Is valid"))
+    is_otp_secret_key_bound = serializers.BooleanField(read_only=True, label=_("Is OTP bound"))
     can_public_key_auth = serializers.BooleanField(
         source="can_use_ssh_key_login", label=_("Can public key authentication"),
         read_only=True
