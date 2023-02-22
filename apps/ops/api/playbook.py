@@ -12,6 +12,7 @@ from rbac.permissions import RBACPermission
 from ..exception import PlaybookNoValidEntry
 from ..models import Playbook
 from ..serializers.playbook import PlaybookSerializer
+from django.utils.translation import ugettext_lazy as _
 
 __all__ = ["PlaybookViewSet", "PlaybookFileBrowserAPIView"]
 
@@ -76,7 +77,10 @@ class PlaybookFileBrowserAPIView(APIView):
         if file_key:
             file_path = os.path.join(work_path, file_key)
             with open(file_path, 'r') as f:
-                content = f.read()
+                try:
+                    content = f.read()
+                except UnicodeDecodeError:
+                    content = _('Unsupported file content')
                 return Response({'content': content})
         else:
             expand_key = request.query_params.get('expand', '')
@@ -159,6 +163,8 @@ class PlaybookFileBrowserAPIView(APIView):
         # rename
         if new_name:
             new_file_path = os.path.join(os.path.dirname(file_path), new_name)
+            if new_file_path == file_path:
+                return Response(status=status.HTTP_200_OK)
             if os.path.exists(new_file_path):
                 return Response({'msg': '{} already exists'.format(new_name)}, status=status.HTTP_400_BAD_REQUEST)
             os.rename(file_path, new_file_path)
@@ -167,7 +173,7 @@ class PlaybookFileBrowserAPIView(APIView):
             if not is_directory:
                 with open(file_path, 'w') as f:
                     f.write(content)
-        return Response({'msg': 'ok'})
+        return Response(status=status.HTTP_200_OK)
 
     def delete(self, request, **kwargs):
         playbook_id = kwargs.get('pk')
