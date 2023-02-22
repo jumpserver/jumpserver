@@ -8,6 +8,7 @@ from rest_framework import status
 
 from common.exceptions import JMSException
 from orgs.mixins.api import OrgBulkModelViewSet
+from rbac.permissions import RBACPermission
 from ..exception import PlaybookNoValidEntry
 from ..models import Playbook
 from ..serializers.playbook import PlaybookSerializer
@@ -26,7 +27,7 @@ def unzip_playbook(src, dist):
 
 class PlaybookViewSet(OrgBulkModelViewSet):
     serializer_class = PlaybookSerializer
-    permission_classes = ()
+    permission_classes = (RBACPermission,)
     model = Playbook
     search_fields = ('name', 'comment')
 
@@ -58,8 +59,13 @@ class PlaybookViewSet(OrgBulkModelViewSet):
 
 class PlaybookFileBrowserAPIView(APIView):
     rbac_perms = ()
-    permission_classes = ()
-
+    permission_classes = (RBACPermission,)
+    rbac_perms = {
+        'GET': 'ops.change_playbooks',
+        'POST': 'ops.change_playbooks',
+        'DELETE': 'ops.change_playbooks',
+        'PATCH': 'ops.change_playbooks',
+    }
     protected_files = ['root', 'main.yml']
 
     def get(self, request, **kwargs):

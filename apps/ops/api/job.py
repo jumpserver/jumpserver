@@ -17,6 +17,7 @@ from ops.variables import JMS_JOB_VARIABLE_HELP
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import tmp_to_org, get_current_org
 from accounts.models import Account
+from rbac.permissions import RBACPermission
 
 
 def set_task_to_serializer_data(serializer, task):
@@ -27,7 +28,7 @@ def set_task_to_serializer_data(serializer, task):
 
 class JobViewSet(OrgBulkModelViewSet):
     serializer_class = JobSerializer
-    permission_classes = ()
+    permission_classes = (RBACPermission,)
     search_fields = ('name', 'comment')
     model = Job
 
@@ -69,7 +70,7 @@ class JobViewSet(OrgBulkModelViewSet):
 class JobExecutionViewSet(OrgBulkModelViewSet):
     serializer_class = JobExecutionSerializer
     http_method_names = ('get', 'post', 'head', 'options',)
-    permission_classes = ()
+    permission_classes = (RBACPermission,)
     model = JobExecution
     search_fields = ('material',)
 
