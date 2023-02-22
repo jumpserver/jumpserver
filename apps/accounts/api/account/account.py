@@ -45,6 +45,7 @@ class AccountViewSet(OrgBulkModelViewSet):
             accounts = asset.accounts.all()
         else:
             accounts = []
+        accounts = self.filter_queryset(accounts)
         serializer = serializers.AccountSerializer(accounts, many=True)
         return Response(data=serializer.data)
 

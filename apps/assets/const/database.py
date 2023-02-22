@@ -38,9 +38,21 @@ class DatabaseTypes(BaseType):
             },
             cls.REDIS: {
                 'ansible_enabled': False,
+                'ping_enabled': False,
+                'gather_facts_enabled': False,
+                'gather_accounts_enabled': False,
+                'verify_account_enabled': False,
+                'change_secret_enabled': False,
+                'push_account_enabled': False,
             },
             cls.CLICKHOUSE: {
                 'ansible_enabled': False,
+                'ping_enabled': False,
+                'gather_facts_enabled': False,
+                'gather_accounts_enabled': False,
+                'verify_account_enabled': False,
+                'change_secret_enabled': False,
+                'push_account_enabled': False,
             },
         }
         return constrains

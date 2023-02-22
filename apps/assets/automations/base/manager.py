@@ -173,6 +173,12 @@ class BasePlaybookManager:
                     self.runtime_dir,
                     callback=PlaybookCallback(),
                 )
+
+                with open(inventory_path, 'r') as f:
+                    inventory_data = json.load(f)
+                    if not inventory_data['all'].get('hosts'):
+                        continue
+
                 runners.append(runer)
         return runners
 
@@ -236,7 +242,6 @@ class BasePlaybookManager:
             print(">>> 开始执行任务\n")
         else:
             print("### 没有需要执行的任务\n")
-            return
 
         self.execution.date_start = timezone.now()
         for i, runner in enumerate(runners, start=1):
@@ -245,11 +250,12 @@ class BasePlaybookManager:
             self.before_runner_start(runner)
             try:
                 cb = runner.run(**kwargs)
-                self.delete_sensitive_data(runner.inventory)
                 self.on_runner_success(runner, cb)
             except Exception as e:
                 self.on_runner_failed(runner, e)
-            print('\n')
+            finally:
+                self.delete_sensitive_data(runner.inventory)
+                print('\n')
         self.execution.status = 'success'
         self.execution.date_finished = timezone.now()
         self.execution.save()

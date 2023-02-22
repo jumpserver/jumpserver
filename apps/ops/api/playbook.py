@@ -6,6 +6,7 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 
+from common.exceptions import JMSException
 from orgs.mixins.api import OrgBulkModelViewSet
 from ..exception import PlaybookNoValidEntry
 from ..models import Playbook
@@ -39,7 +40,11 @@ class PlaybookViewSet(OrgBulkModelViewSet):
         if 'multipart/form-data' in self.request.headers['Content-Type']:
             src_path = os.path.join(settings.MEDIA_ROOT, instance.path.name)
             dest_path = os.path.join(settings.DATA_DIR, "ops", "playbook", instance.id.__str__())
-            unzip_playbook(src_path, dest_path)
+            try:
+                unzip_playbook(src_path, dest_path)
+            except RuntimeError as e:
+                raise JMSException(code='invalid_playbook_file', detail={"msg": "Unzip failed"})
+
             if 'main.yml' not in os.listdir(dest_path):
                 raise PlaybookNoValidEntry
 
@@ -145,16 +150,17 @@ class PlaybookFileBrowserAPIView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         file_path = os.path.join(work_path, file_key)
 
+        # rename
         if new_name:
             new_file_path = os.path.join(os.path.dirname(file_path), new_name)
             if os.path.exists(new_file_path):
                 return Response({'msg': '{} already exists'.format(new_name)}, status=status.HTTP_400_BAD_REQUEST)
             os.rename(file_path, new_file_path)
-            file_path = new_file_path
-
-        if not is_directory and content:
-            with open(file_path, 'w') as f:
-                f.write(content)
+        # edit content
+        else:
+            if not is_directory:
+                with open(file_path, 'w') as f:
+                    f.write(content)
         return Response({'msg': 'ok'})
 
     def delete(self, request, **kwargs):
