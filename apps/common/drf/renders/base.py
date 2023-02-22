@@ -1,5 +1,7 @@
 import abc
 from datetime import datetime
+
+from rest_framework import serializers
 from rest_framework.renderers import BaseRenderer
 from rest_framework.utils import encoders, json
 
@@ -12,6 +14,7 @@ class BaseFileRenderer(BaseRenderer):
     # 渲染模版标识, 导入、导出、更新模版: ['import', 'update', 'export']
     template = 'export'
     serializer = None
+    id_name_fields = ['ObjectRelatedField']
 
     @staticmethod
     def _check_validation_data(data):
@@ -67,16 +70,75 @@ class BaseFileRenderer(BaseRenderer):
         results = json.loads(json.dumps(results, cls=encoders.JSONEncoder))
         return results
 
-    @staticmethod
-    def generate_rows(data, render_fields):
+    def to_id_name(self, value):
+        if value is None:
+            return value
+        pk = value.get('id', '')
+        name = value.get('name', '') or value.get('display_name', '')
+        return '{}__{}'.format(name, pk)
+
+    def get_LabeledChoiceField_value(self, field, value):
+        return self.to_id_name(value)
+
+    def get_ObjectRelatedField_value(self, field, value):
+        return self.to_id_name(value)
+
+    def get_BoolField_value(self, field, value):
+        return '1' if value else '0'
+
+    def get_ListSerializer_value(self, field, value):
+        if len(value) == 0:
+            return []
+        v = value[0]
+        if v.get('id') and v.get('name'):
+            value = [self.to_id_name(v) for v in value]
+            return ', '.join(value)
+        else:
+            return value
+
+    def get_ManyRelatedField_value(self, field, value):
+        if hasattr(field, 'child'):
+            child = field.child
+        elif hasattr(field, 'child_relation'):
+            child = field.child_relation
+        else:
+            return value
+        child_name = child.__class__.__name__
+        if child_name in self.id_name_fields:
+            value = [self.to_id_name(v) for v in value]
+        else:
+            return value
+
+    def get_value_by_cls_name(self, field_cls_name, field, value):
+        handler = getattr(self, 'get_{}_value'.format(field_cls_name), None)
+        if not handler:
+            return None
+        new_value = handler(field, value)
+        return new_value
+
+    def get_value_by_cls(self, field_cls, field, value):
+        if isinstance(field, serializers.Serializer) and value.get('id'):
+            value = self.to_id_name(value)
+        return value
+
+    def get_value(self, field, item):
+        value = item.get(field.field_name)
+        if value is None:
+            return value
+
+        field_cls = field.__class__
+        field_cls_name = field_cls.__name__
+
+        new_value = self.get_value_by_cls_name(field_cls_name, field, value)
+        if new_value is None:
+            new_value = self.get_value_by_cls(field_cls, field, value)
+        return new_value
+
+    def generate_rows(self, data, render_fields):
         for item in data:
             row = []
             for field in render_fields:
-                value = item.get(field.field_name)
-                if value is None:
-                    value = ''
-                else:
-                    value = str(value)
+                value = self.get_value(field, item)
                 row.append(value)
             yield row
 
@@ -134,4 +196,3 @@ class BaseFileRenderer(BaseRenderer):
             return value
 
         return value
-

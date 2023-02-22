@@ -2,6 +2,7 @@
 #
 
 import codecs
+
 import unicodecsv
 from six import BytesIO
 
