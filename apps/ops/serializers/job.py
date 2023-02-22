@@ -3,7 +3,7 @@ import uuid
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from assets.models import Node
+from assets.models import Node, Asset
 from perms.utils.user_perm import UserPermAssetUtil
 from common.serializers.fields import ReadableHiddenField
 from ops.mixin import PeriodTaskSerializerMixin
@@ -17,6 +17,8 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
     nodes = serializers.ListField(required=False, child=serializers.CharField())
     date_last_run = serializers.DateTimeField(label=_('Date last run'), read_only=True)
     name = serializers.CharField(label=_('Name'), max_length=128, allow_blank=True, required=False)
+    assets = serializers.PrimaryKeyRelatedField(label=_('Assets'), queryset=Asset.objects.all(), many=True,
+                                                required=False)
 
     def to_internal_value(self, data):
         instant = data.get('instant', False)
@@ -29,6 +31,12 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
         request = self.context.get('request')
         user = request.user if request else None
         return user
+
+    def validate_assets(self, assets):
+        permed_assets = UserPermAssetUtil(self.get_request_user()).get_all_assets()
+        if not set(assets).issubset(set(permed_assets)):
+            raise serializers.ValidationError(_('Assets not in user perm'))
+        return assets
 
     def create(self, validated_data):
         assets = validated_data.__getitem__('assets')

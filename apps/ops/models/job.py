@@ -2,24 +2,89 @@ import json
 import logging
 import os
 import uuid
+from collections import defaultdict
 
 from celery import current_task
 from django.conf import settings
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-__all__ = ["Job", "JobExecution"]
+__all__ = ["Job", "JobExecution", "JMSPermedInventory"]
 
 from simple_history.models import HistoricalRecords
 
+from accounts.models import Account
 from acls.models import CommandFilterACL
+from assets.models import Asset
 from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner
 from ops.mixin import PeriodTaskModelMixin
 from ops.variables import *
 from ops.const import Types, Modules, RunasPolicies, JobStatus
 from orgs.mixins.models import JMSOrgBaseModel
+from perms.models import AssetPermission
+from perms.utils import UserPermAssetUtil
 from terminal.notifications import CommandExecutionAlert
+
+
+def get_parent_keys(key, include_self=True):
+    keys = []
+    split_keys = key.split(':')
+    for i in range(len(split_keys)):
+        keys.append(':'.join(split_keys[:i + 1]))
+    if not include_self:
+        keys.pop()
+    return keys
+
+
+class JMSPermedInventory(JMSInventory):
+    def __init__(self, assets, account_policy='privileged_first',
+                 account_prefer='root,Administrator', host_callback=None, exclude_localhost=False, user=None):
+        super().__init__(assets, account_policy, account_prefer, host_callback, exclude_localhost)
+        self.user = user
+        self.assets_accounts_mapper = self.get_assets_accounts_mapper()
+
+    def get_asset_accounts(self, asset):
+        return self.assets_accounts_mapper.get(asset.id, [])
+
+    def get_permed_assets(self):
+        permed_assets = UserPermAssetUtil(self.user).get_all_assets()
+        return set(self.assets) & (set(permed_assets))
+
+    def get_assets_accounts_mapper(self):
+        mapper = defaultdict(set)
+        asset_ids = self.assets.values_list('id', flat=True)
+        asset_node_keys = Asset.nodes.through.objects. \
+            filter(asset_id__in=asset_ids).values_list('asset_id', 'node__key')
+
+        node_asset_map = defaultdict(set)
+        for asset_id, node_key in asset_node_keys:
+            all_keys = get_parent_keys(node_key)
+            for key in all_keys:
+                node_asset_map[key].add(asset_id)
+
+        perms = AssetPermission.objects \
+            .filter(is_active=True) \
+            .filter(Q(users=self.user) | Q(user_groups__in=self.user.groups.all())) \
+            .filter(Q(assets__in=asset_ids) | Q(nodes__key__in=[i[1] for i in asset_node_keys if len(i) == 2])) \
+            .values_list('assets', 'nodes__key', 'accounts')
+
+        asset_permed_accounts_mapper = defaultdict(set)
+        for asset_id, node_id, accounts in perms:
+            if asset_id:
+                asset_permed_accounts_mapper[asset_id].update(accounts)
+            if node_id and asset_id in node_asset_map[node_id]:
+                asset_permed_accounts_mapper[asset_id].update(accounts)
+
+        accounts = Account.objects.filter(asset__in=asset_ids)
+        for account in accounts:
+            if account.asset_id not in asset_permed_accounts_mapper:
+                continue
+            permed_usernames = asset_permed_accounts_mapper[account.asset_id]
+            if "@ALL" in permed_usernames or account.username in permed_usernames:
+                mapper[account.asset_id].add(account)
+        return mapper
 
 
 class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
@@ -90,7 +155,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
 
     @property
     def inventory(self):
-        return JMSInventory(self.assets.all(), self.runas_policy, self.runas)
+        return JMSPermedInventory(self.assets.all(), self.runas_policy, self.runas, user=self.creator)
 
     @property
     def material(self):
