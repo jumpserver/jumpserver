@@ -60,6 +60,7 @@ exclude_permissions = (
     ('accounts', 'automationexecution', '*', 'automationexecution'),
     ('accounts', 'accountbackupexecution', 'delete,change', 'accountbackupexecution'),
     ('accounts', 'changesecretrecord', 'add,delete,change', 'changesecretrecord'),
+    ('accounts', 'account', 'change', 'accountsecret'),
 
     ('perms', 'userassetgrantedtreenoderelation', '*', '*'),
     ('perms', 'permedaccount', '*', '*'),
