@@ -102,8 +102,8 @@ class AccountSerializer(AccountSerializerCreateMixin, BaseAccountSerializer):
     class Meta(BaseAccountSerializer.Meta):
         model = Account
         fields = BaseAccountSerializer.Meta.fields + [
-            'su_from', 'asset', 'template',
-            'push_now', 'source', 'connectivity'
+            'su_from', 'asset', 'template', 'version',
+            'push_now', 'source', 'connectivity',
         ]
         extra_kwargs = {
             **BaseAccountSerializer.Meta.extra_kwargs,
@@ -118,7 +118,8 @@ class AccountSerializer(AccountSerializerCreateMixin, BaseAccountSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('asset', 'asset__platform')
+        queryset = queryset \
+            .prefetch_related('asset', 'asset__platform')
         return queryset
 
 

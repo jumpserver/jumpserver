@@ -90,6 +90,10 @@ class Account(AbsConnectivity, BaseAccount):
         """ @INPUT 手动登录的账号(any) """
         return cls(name=AliasAccount.INPUT.label, username=AliasAccount.INPUT.value, secret=None)
 
+    @lazyproperty
+    def versions(self):
+        return self.history.count()
+
     @classmethod
     def get_user_account(cls):
         """ @USER 动态用户的账号(self) """
