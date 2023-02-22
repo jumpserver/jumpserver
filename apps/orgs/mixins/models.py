@@ -47,7 +47,8 @@ class OrgManager(models.Manager):
                 if not obj.org_id:
                     raise ValidationError('Please save in a org')
             else:
-                obj.org_id = org.id
+                if not getattr(obj, 'org_id', None):
+                    obj.org_id = org.id
         return super().bulk_create(objs, batch_size, ignore_conflicts)
 
 
