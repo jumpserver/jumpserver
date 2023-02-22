@@ -17,7 +17,7 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
     nodes = serializers.ListField(required=False, child=serializers.CharField())
     date_last_run = serializers.DateTimeField(label=_('Date last run'), read_only=True)
     name = serializers.CharField(label=_('Name'), max_length=128, allow_blank=True, required=False)
-    assets = serializers.PrimaryKeyRelatedField(label=_('Assets'), queryset=Asset.objects.all(), many=True,
+    assets = serializers.PrimaryKeyRelatedField(label=_('Assets'), queryset=Asset.objects, many=True,
                                                 required=False)
 
     def to_internal_value(self, data):
@@ -31,12 +31,6 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
         request = self.context.get('request')
         user = request.user if request else None
         return user
-
-    def validate_assets(self, assets):
-        permed_assets = UserPermAssetUtil(self.get_request_user()).get_all_assets()
-        if not set(assets).issubset(set(permed_assets)):
-            raise serializers.ValidationError(_('Assets not in user perm'))
-        return assets
 
     def create(self, validated_data):
         assets = validated_data.__getitem__('assets')

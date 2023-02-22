@@ -48,15 +48,12 @@ class JMSPermedInventory(JMSInventory):
     def get_asset_accounts(self, asset):
         return self.assets_accounts_mapper.get(asset.id, [])
 
-    def get_permed_assets(self):
-        permed_assets = UserPermAssetUtil(self.user).get_all_assets()
-        return set(self.assets) & (set(permed_assets))
-
     def get_assets_accounts_mapper(self):
         mapper = defaultdict(set)
         asset_ids = self.assets.values_list('id', flat=True)
-        asset_node_keys = Asset.nodes.through.objects. \
-            filter(asset_id__in=asset_ids).values_list('asset_id', 'node__key')
+        asset_node_keys = Asset.nodes.through.objects \
+            .filter(asset_id__in=asset_ids) \
+            .values_list('asset_id', 'node__key')
 
         node_asset_map = defaultdict(set)
         for asset_id, node_key in asset_node_keys:
@@ -64,18 +61,20 @@ class JMSPermedInventory(JMSInventory):
             for key in all_keys:
                 node_asset_map[key].add(asset_id)
 
+        groups = self.user.groups.all()
         perms = AssetPermission.objects \
+            .filter(date_expired__gte=timezone.now()) \
             .filter(is_active=True) \
-            .filter(Q(users=self.user) | Q(user_groups__in=self.user.groups.all())) \
-            .filter(Q(assets__in=asset_ids) | Q(nodes__key__in=[i[1] for i in asset_node_keys if len(i) == 2])) \
+            .filter(Q(users=self.user) | Q(user_groups__in=groups)) \
+            .filter(Q(assets__in=asset_ids) | Q(nodes__key__in=node_asset_map.keys())) \
             .values_list('assets', 'nodes__key', 'accounts')
 
         asset_permed_accounts_mapper = defaultdict(set)
-        for asset_id, node_id, accounts in perms:
-            if asset_id:
+        for asset_id, node_key, accounts in perms:
+            if asset_id in asset_ids:
                 asset_permed_accounts_mapper[asset_id].update(accounts)
-            if node_id and asset_id in node_asset_map[node_id]:
-                asset_permed_accounts_mapper[asset_id].update(accounts)
+            for my_asset in node_asset_map[node_key]:
+                asset_permed_accounts_mapper[my_asset].update(accounts)
 
         accounts = Account.objects.filter(asset__in=asset_ids)
         for account in accounts:
@@ -404,7 +403,19 @@ class JobExecution(JMSOrgBaseModel):
                       'dangerous keyword \'{}\'\033[0m'.format(line['line'], line['file'], line['keyword']))
             raise Exception("Playbook contains dangerous keywords")
 
+    def check_assets_perms(self):
+        all_permed_assets = UserPermAssetUtil(self.creator).get_all_assets()
+        has_permed_assets = set(self.current_job.assets.all()) & set(all_permed_assets)
+
+        for asset in self.current_job.assets.all():
+            if asset not in has_permed_assets:
+                print("\033[31mAsset {}({}) has no access permission\033[0m".format(asset.name, asset.address))
+
+        if self.current_job.assets.count() != len(has_permed_assets):
+            raise Exception("You do not have access rights to some assets")
+
     def before_start(self):
+        self.check_assets_perms()
         if self.current_job.type == 'playbook':
             self.check_danger_keywords()
         if self.current_job.type == 'adhoc':
