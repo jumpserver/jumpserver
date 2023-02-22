@@ -118,7 +118,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
 
     @property
     def last_execution(self):
-        return self.executions.last()
+        return self.executions.first()
 
     @property
     def date_last_run(self):
