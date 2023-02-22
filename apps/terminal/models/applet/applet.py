@@ -96,7 +96,7 @@ class Applet(JMSBaseModel):
 
         manifest = cls.validate_pkg(path)
         name = manifest['name']
-        if not has_valid_xpack_license() and name.lower() in ('navicat', ):
+        if not has_valid_xpack_license() and name.lower() in ('navicat',):
             return
 
         instance = cls.objects.filter(name=name).first()
@@ -112,7 +112,9 @@ class Applet(JMSBaseModel):
 
     def select_host_account(self):
         # 选择激活的发布机
-        hosts = list(self.hosts.filter(is_active=True).all())
+        hosts = [item for item in self.hosts.filter(is_active=True).all()
+                 if item.load != 'offline']
+
         if not hosts:
             return None
 
