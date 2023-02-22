@@ -43,7 +43,7 @@ class AccountSerializerCreateValidateMixin:
     def push_account(instance, push_now):
         if not push_now:
             return
-        push_accounts_to_assets_task.delay([instance.id])
+        push_accounts_to_assets_task.delay([str(instance.id)])
 
     def create(self, validated_data):
         push_now = validated_data.pop('push_now', None)

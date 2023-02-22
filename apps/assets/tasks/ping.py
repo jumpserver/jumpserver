@@ -33,7 +33,7 @@ def test_assets_connectivity_task(asset_ids, org_id, task_name=None):
 
 def test_assets_connectivity_manual(assets):
     task_name = gettext_noop("Test assets connectivity ")
-    asset_ids = [i.id for i in assets]
+    asset_ids = [str(i.id) for i in assets]
     org_id = str(current_org.id)
     return test_assets_connectivity_task.delay(asset_ids, org_id, task_name)
 
@@ -41,5 +41,6 @@ def test_assets_connectivity_manual(assets):
 def test_node_assets_connectivity_manual(node):
     task_name = gettext_noop("Test if the assets under the node are connectable ")
     asset_ids = node.get_all_asset_ids()
+    asset_ids = [str(i) for i in asset_ids]
     org_id = str(current_org.id)
     return test_assets_connectivity_task.delay(asset_ids, org_id, task_name)
