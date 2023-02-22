@@ -87,7 +87,8 @@ class ChangeSecretManager(AccountBasePlaybookManager):
 
         accounts = accounts.filter(secret_type=self.secret_type)
         if not accounts:
-            print('没有发现待改密账号: %s 用户名: %s 类型: %s' % (asset.name, account.username, self.secret_type))
+            msg = '没有发现待改密账号: %s 用户名: %s 类型: %s' % (asset.name, account.username, self.secret_type)
+            print(msg)
             return []
 
         method_attr = getattr(automation, self.method_type() + '_method')
@@ -98,7 +99,8 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         host['secret_type'] = self.secret_type
 
         if asset.type == HostTypes.WINDOWS and self.secret_type == SecretType.SSH_KEY:
-            print(f'Windows {asset} does not support ssh key push \n')
+            msg = f'Windows {asset} does not support ssh key push \n'
+            print(msg)
             return inventory_hosts
 
         for account in accounts:
@@ -143,7 +145,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         recorder.save()
         account = recorder.account
         if not account:
-            print("Account not found, deleted ?", recorder)
+            print("Account not found, deleted ?")
             return
         account.secret = recorder.new_secret
         account.save(update_fields=['secret'])
