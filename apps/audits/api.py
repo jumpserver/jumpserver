@@ -12,6 +12,7 @@ from common.plugins.es import QuerySet as ESQuerySet
 from common.utils import is_uuid
 from orgs.mixins.api import OrgReadonlyModelViewSet, OrgModelViewSet
 from orgs.utils import current_org, tmp_to_root_org
+from orgs.models import Organization
 from users.models import User
 from .backends import TYPE_ENGINE_MAPPING
 from .const import ActivityChoices
@@ -91,13 +92,13 @@ class ResourceActivityAPIView(generics.ListAPIView):
     }
 
     @staticmethod
-    def get_operate_log_qs(fields, limit=30, resource_id=None):
+    def get_operate_log_qs(fields, limit, org_q, resource_id=None):
         q, user = Q(resource_id=resource_id), None
         if is_uuid(resource_id):
             user = User.objects.filter(id=resource_id).first()
         if user is not None:
             q |= Q(user=str(user))
-        queryset = OperateLog.objects.filter(q).annotate(
+        queryset = OperateLog.objects.filter(q, org_q).annotate(
             r_type=Value(ActivityChoices.operate_log, CharField()),
             r_detail_id=F('id'), r_detail=Value(None, CharField()),
             r_user=F('user'), r_action=F('action'),
@@ -105,8 +106,8 @@ class ResourceActivityAPIView(generics.ListAPIView):
         return queryset
 
     @staticmethod
-    def get_activity_log_qs(fields, limit=30, **filters):
-        queryset = ActivityLog.objects.filter(**filters).annotate(
+    def get_activity_log_qs(fields, limit, org_q, **filters):
+        queryset = ActivityLog.objects.filter(org_q, **filters).annotate(
             r_type=F('type'), r_detail_id=F('detail_id'),
             r_detail=F('detail'), r_user=Value(None, CharField()),
             r_action=Value(None, CharField()),
@@ -120,9 +121,10 @@ class ResourceActivityAPIView(generics.ListAPIView):
             'id', 'datetime', 'r_detail', 'r_detail_id',
             'r_user', 'r_action', 'r_type'
         )
+        org_q = Q(org_id=Organization.SYSTEM_ID) | Q(org_id=current_org.id)
         with tmp_to_root_org():
-            qs1 = self.get_operate_log_qs(fields, resource_id=resource_id)
-            qs2 = self.get_activity_log_qs(fields, resource_id=resource_id)
+            qs1 = self.get_operate_log_qs(fields, limit, org_q, resource_id=resource_id)
+            qs2 = self.get_activity_log_qs(fields, limit, org_q, resource_id=resource_id)
             queryset = qs2.union(qs1)
         return queryset.order_by('-datetime')[:limit]
 
@@ -147,7 +149,9 @@ class OperateLogViewSet(OrgReadonlyModelViewSet):
         return super().get_serializer_class()
 
     def get_queryset(self):
-        qs = OperateLog.objects.all()
+        org_q = Q(org_id=Organization.SYSTEM_ID) | Q(org_id=current_org.id)
+        with tmp_to_root_org():
+            qs = OperateLog.objects.filter(org_q)
         es_config = settings.OPERATE_LOG_ELASTICSEARCH_CONFIG
         if es_config:
             engine_mod = import_module(TYPE_ENGINE_MAPPING['es'])
