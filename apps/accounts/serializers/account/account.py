@@ -101,9 +101,10 @@ class AccountSerializer(AccountSerializerCreateMixin, BaseAccountSerializer):
 
     class Meta(BaseAccountSerializer.Meta):
         model = Account
-        fields = BaseAccountSerializer.Meta.fields \
-                 + ['su_from', 'asset'] \
-                 + ['template', 'push_now', 'source']
+        fields = BaseAccountSerializer.Meta.fields + [
+            'su_from', 'asset', 'template',
+            'push_now', 'source', 'connectivity'
+        ]
         extra_kwargs = {
             **BaseAccountSerializer.Meta.extra_kwargs,
             'name': {'required': False, 'allow_null': True},

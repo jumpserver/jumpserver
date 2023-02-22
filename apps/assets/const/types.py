@@ -329,9 +329,8 @@ class AllTypes(ChoicesMixin):
                     internal_platforms.append(d['name'])
 
         user_platforms = platform_cls.objects.exclude(name__in=internal_platforms)
-        user_platforms.update(internal=False)
-
         for platform in user_platforms:
             print("\t- Update platform: {}".format(platform.name))
             platform_data = cls.get_type_default_platform(platform.category, platform.type)
             cls.create_or_update_by_platform_data(platform.name, platform_data, platform_cls=platform_cls)
+        user_platforms.update(internal=False)

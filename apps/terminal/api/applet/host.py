@@ -58,7 +58,7 @@ class AppletHostDeploymentViewSet(viewsets.ModelViewSet):
     def applets(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        applet_id = serializer.validated_data.pop('applet_id')
+        applet_id = serializer.validated_data.pop('applet_id', '')
         instance = serializer.save()
         task = run_applet_host_deployment_install_applet.delay(instance.id, applet_id)
         instance.save_task(task.id)
