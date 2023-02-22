@@ -1954,7 +1954,7 @@ msgstr "清理审计会话任务日志"
 
 #: authentication/api/confirm.py:40
 msgid "This action require verify your MFA"
-msgstr "此操作需要验证您的 MFA"
+msgstr "该操作需要验证您的 MFA, 请先开启并配置"
 
 #: authentication/api/connection_token.py:268
 msgid "Account not found"
