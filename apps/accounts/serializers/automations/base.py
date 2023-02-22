@@ -38,6 +38,8 @@ class BaseAutomationSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSe
         }
 
     def validate_name(self, name):
+        if self.instance:
+            return name
         if BaseAutomation.objects.filter(name=name, type=self.model_type).exists():
             raise serializers.ValidationError(_('Name already exists'))
         return name

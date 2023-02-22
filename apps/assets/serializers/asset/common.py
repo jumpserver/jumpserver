@@ -277,6 +277,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
 
     @atomic
     def update(self, instance, validated_data):
+        if not validated_data.get('accounts'):
+            validated_data.pop('accounts', None)
         nodes_display = validated_data.pop('nodes_display', '')
         instance = super().update(instance, validated_data)
         self.perform_nodes_display_create(instance, nodes_display)
