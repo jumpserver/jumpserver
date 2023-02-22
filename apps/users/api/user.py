@@ -51,16 +51,19 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
         queryset = super().get_queryset().prefetch_related('groups')
         return queryset
 
-    def get_serializer(self, *args, **kwargs):
-        if len(args) == 0:
-            queryset = self.set_users_roles_for_cache(args[0])
-            args = (queryset,)
-        return super().get_serializer(*args, **kwargs)
-
     @action(methods=['get'], detail=False, url_path='suggestions')
     def match(self, request, *args, **kwargs):
         with tmp_to_root_org():
             return super().match(request, *args, **kwargs)
+
+    def get_serializer(self, *args, **kwargs):
+        """重写 get_serializer，用于设置用户的角色缓存
+        放到 paginate_queryset 里面会导致 导出有问题， 因为导出的时候，没有 pager
+        """
+        if len(args) == 1 and kwargs.get('many'):
+            queryset = self.set_users_roles_for_cache(args[0])
+            args = (queryset,)
+        return super().get_serializer(*args, **kwargs)
 
     @staticmethod
     def set_users_roles_for_cache(queryset):
