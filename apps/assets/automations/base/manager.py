@@ -1,14 +1,16 @@
 import json
 import os
 import shutil
+import yaml
+
 from collections import defaultdict
 from hashlib import md5
 from socket import gethostname
 
-import yaml
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext as _
+from sshtunnel import SSHTunnelForwarder
 
 from assets.automations.methods import platform_automation_methods
 from common.utils import get_logger, lazyproperty
@@ -40,6 +42,7 @@ class BasePlaybookManager:
         # 避免一个 playbook 中包含太多的主机
         self.method_hosts_mapper = defaultdict(list)
         self.playbooks = []
+        self.gateway_servers = dict()
 
     @property
     def platform_automation_methods(self):
@@ -205,16 +208,58 @@ class BasePlaybookManager:
     def on_runner_failed(self, runner, e):
         print("Runner failed: {} {}".format(e, self))
 
-    def before_runner_start(self, runner):
-        pass
+    @staticmethod
+    def file_to_json(path):
+        with open(path, 'r') as f:
+            d = json.load(f)
+        return d
 
     @staticmethod
-    def delete_sensitive_data(path):
+    def json_to_file(path, data):
+        with open(path, 'w') as f:
+            json.dump(data, f)
+
+    def local_gateway_prepare(self, runner):
+        info = self.file_to_json(runner.inventory)
+        servers = []
+        for k, host in info['all']['hosts'].items():
+            jms_asset, jms_gateway = host['jms_asset'], host.get('gateway')
+            if not jms_gateway:
+                continue
+            server = SSHTunnelForwarder(
+                (jms_gateway['address'], jms_gateway['port']),
+                ssh_username=jms_gateway['username'],
+                ssh_password=jms_gateway['secret'],
+                remote_bind_address=(jms_asset['address'], jms_asset['port'])
+            )
+            server.start()
+            jms_asset['address'] = '127.0.0.1'
+            jms_asset['port'] = server.local_bind_port
+            servers.append(server)
+        self.json_to_file(runner.inventory, info)
+        self.gateway_servers[runner.id] = servers
+
+    def local_gateway_clean(self, runner):
+        servers = self.gateway_servers.get(runner.id, [])
+        try:
+            for s in servers:
+                print('Server down: %s' % s)
+                s.stop()
+        except Exception:
+            pass
+
+    def before_runner_start(self, runner):
+        self.local_gateway_prepare(runner)
+
+    def after_runner_end(self, runner):
+        self.delete_sensitive_data(runner.inventory)
+        self.local_gateway_clean(runner)
+
+    def delete_sensitive_data(self, path):
         if settings.DEBUG_DEV:
             return
 
-        with open(path, 'r') as f:
-            d = json.load(f)
+        d = self.file_to_json(path)
 
         def delete_keys(d, keys_to_delete):
             """
@@ -231,8 +276,7 @@ class BasePlaybookManager:
             return d
 
         d = delete_keys(d, ['secret', 'ansible_password'])
-        with open(path, 'w') as f:
-            json.dump(d, f)
+        self.json_to_file(path, d)
 
     def run(self, *args, **kwargs):
         runners = self.get_runners()
@@ -254,7 +298,7 @@ class BasePlaybookManager:
             except Exception as e:
                 self.on_runner_failed(runner, e)
             finally:
-                self.delete_sensitive_data(runner.inventory)
+                self.after_runner_end(runner)
                 print('\n')
         self.execution.status = 'success'
         self.execution.date_finished = timezone.now()

@@ -131,13 +131,10 @@ class JMSInventory:
 
         if ansible_connection == 'local':
             if gateway:
-                host['ansible_host'] = gateway.address
-                host['ansible_port'] = gateway.port
-                host['ansible_user'] = gateway.username
-                host['ansible_password'] = gateway.password
-                host['ansible_connection'] = 'smart'
-            else:
-                host['ansible_connection'] = 'local'
+                host['gateway'] = {
+                    'address': gateway.address, 'port': gateway.port,
+                    'username': gateway.username, 'secret': gateway.password
+                }
         else:
             self.make_ssh_account_vars(host, asset, account, automation, protocols, platform, gateway)
         return host

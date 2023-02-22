@@ -39,6 +39,7 @@ requests==2.28.0
 jms-storage==0.0.44
 simplejson==3.17.6
 six==1.16.0
+sshtunnel==0.4.0
 sshpubkeys==3.3.1
 uritemplate==4.1.1
 urllib3==1.26.9
