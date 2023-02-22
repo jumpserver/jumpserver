@@ -16,9 +16,6 @@ __all__ = [
 
 
 class PaginatedResponseMixin:
-    paginate_queryset: Callable
-    get_serializer: Callable
-    get_paginated_response: Callable
 
     def get_paginated_response_from_queryset(self, queryset):
         page = self.paginate_queryset(queryset)

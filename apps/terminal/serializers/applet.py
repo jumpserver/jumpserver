@@ -12,8 +12,9 @@ __all__ = [
 
 
 class AppletPublicationSerializer(serializers.ModelSerializer):
-    applet = ObjectRelatedField(attrs=('id', 'name', 'display_name', 'icon', 'version'), queryset=Applet.objects.all())
-    host = ObjectRelatedField(queryset=AppletHost.objects.all())
+    applet = ObjectRelatedField(attrs=('id', 'name', 'display_name', 'icon', 'version'), label=_("Applet"),
+                                queryset=Applet.objects.all())
+    host = ObjectRelatedField(queryset=AppletHost.objects.all(), label=_("Host"))
     status = LabeledChoiceField(choices=PublishStatus.choices, label=_("Status"), default=Status.pending)
 
     class Meta:

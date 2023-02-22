@@ -74,5 +74,17 @@ class AccountHistoriesSecretAPI(RecordViewLogMixin, ListAPIView):
         'list': 'accounts.view_accountsecret',
     }
 
+    def get_object(self):
+        return get_object_or_404(Account, pk=self.kwargs.get('pk'))
+
     def get_queryset(self):
-        return self.model.objects.filter(id=self.kwargs.get('pk'))
+        account = self.get_object()
+        histories = account.history.all()
+        last_history = account.history.first()
+        if not last_history:
+            return histories
+
+        if account.secret == last_history.secret \
+                and account.secret_type == last_history.secret_type:
+            histories = histories.exclude(history_id=last_history.history_id)
+        return histories

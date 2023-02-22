@@ -95,6 +95,7 @@ class AssetPermissionFilter(PermissionBaseFilter):
     node_name = filters.CharFilter(method='do_nothing')
     asset_id = filters.UUIDFilter(method='do_nothing')
     asset_name = filters.CharFilter(method='do_nothing')
+    address = filters.CharFilter(method='do_nothing')
     accounts = filters.CharFilter(method='do_nothing')
     ip = filters.CharFilter(method='do_nothing')
 
@@ -153,14 +154,14 @@ class AssetPermissionFilter(PermissionBaseFilter):
         is_query_all = self.get_query_param('all', True)
         asset_id = self.get_query_param('asset_id')
         asset_name = self.get_query_param('asset_name')
-        ip = self.get_query_param('address')
+        address = self.get_query_param('address')
 
         if asset_id:
             assets = Asset.objects.filter(pk=asset_id)
         elif asset_name:
             assets = Asset.objects.filter(name=asset_name)
-        elif ip:
-            assets = Asset.objects.filter(ip=ip)
+        elif address:
+            assets = Asset.objects.filter(address=address)
         else:
             return queryset
         if not assets:

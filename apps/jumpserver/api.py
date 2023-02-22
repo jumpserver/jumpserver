@@ -101,9 +101,9 @@ class DateTimeMixin:
 
     @lazyproperty
     def operate_logs_queryset(self):
+        from audits.api import OperateLogViewSet
         t = self.days_to_datetime
-        queryset = OperateLog.objects.filter(datetime__gte=t)
-        queryset = self.get_logs_queryset(queryset, 'user')
+        queryset = OperateLogViewSet().get_queryset().filter(datetime__gte=t)
         return queryset
 
     @lazyproperty
