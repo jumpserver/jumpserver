@@ -59,7 +59,6 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
 
         accounts = asset.accounts.all()
         accounts = self.get_accounts(account, accounts)
-
         inventory_hosts = []
         host['secret_type'] = self.secret_type
         if asset.type == HostTypes.WINDOWS and self.secret_type == SecretType.SSH_KEY:
