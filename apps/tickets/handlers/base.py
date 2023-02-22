@@ -1,14 +1,13 @@
 import html2text
-
-from django.utils.translation import ugettext as _
 from django.template.loader import render_to_string
+from django.utils.translation import ugettext as _
 
 from common.utils import get_logger
+from tickets.const import TicketState, TicketType
 from tickets.utils import (
     send_ticket_processed_mail_to_applicant,
     send_ticket_applied_mail_to_assignees
 )
-from tickets.const import TicketState, TicketType
 
 logger = get_logger(__name__)
 
@@ -112,4 +111,6 @@ class BaseHandler:
 
     @staticmethod
     def safe_html_script(unsafe_html):
-        return html2text.html2text(unsafe_html)
+        unsafe_html = unsafe_html.replace('\n', '')
+        html_str = html2text.html2text(unsafe_html)
+        return html_str
