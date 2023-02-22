@@ -103,7 +103,7 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
         if not account:
             return
         account.secret = new_secret
-        account.save(update_fields=['secret', 'version'])
+        account.save(update_fields=['secret'])
 
     def on_host_error(self, host, error, result):
         pass

@@ -8,7 +8,7 @@ from django.utils import timezone
 from openpyxl import Workbook
 
 from accounts.const import AutomationTypes, SecretType, SSHKeyStrategy, SecretStrategy
-from accounts.models import ChangeSecretRecord, Account
+from accounts.models import ChangeSecretRecord
 from accounts.notifications import ChangeSecretExecutionTaskMsg
 from accounts.serializers import ChangeSecretRecordBackUpSerializer
 from assets.const import HostTypes
@@ -141,12 +141,12 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         recorder.status = 'success'
         recorder.date_finished = timezone.now()
         recorder.save()
-        account = Account.objects.filter(id=recorder.account_id).first()
+        account = recorder.account
         if not account:
-            print("Account not found, deleted ?", recorder.account_id)
+            print("Account not found, deleted ?", recorder)
             return
         account.secret = recorder.new_secret
-        account.save(update_fields=['secret', 'version'])
+        account.save(update_fields=['secret'])
 
     def on_host_error(self, host, error, result):
         recorder = self.name_recorder_mapper.get(host)
