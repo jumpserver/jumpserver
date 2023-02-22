@@ -15,6 +15,7 @@ def migrate_app_perms_to_assets(apps, schema_editor):
         attrs = [
             'id', 'name', 'actions', 'is_active', 'date_start',
             'date_expired', 'created_by', 'from_ticket', 'comment',
+            'org_id',
         ]
         asset_permissions = []
 
