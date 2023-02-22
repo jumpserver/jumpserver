@@ -57,9 +57,9 @@ class VerifyAccountManager(AccountBasePlaybookManager):
                 'secret': secret,
                 'private_key_path': private_key_path
             }
+            if account.platform.type == 'oracle':
+                h['account']['mode'] = 'sysdba' if account.privileged else None
             inventory_hosts.append(h)
-        # print("Host: ")
-        # print(self.json_dumps(inventory_hosts))
         return inventory_hosts
 
     @classmethod
