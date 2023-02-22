@@ -1,9 +1,8 @@
-from jumpserver.utils import has_valid_xpack_license
+from assets.const import AllTypes
+from assets.models import Platform
+from assets.serializers import PlatformSerializer
 from common.api import JMSModelViewSet
 from common.serializers import GroupedChoiceSerializer
-from assets.models import Platform
-from assets.const import AllTypes
-from assets.serializers import PlatformSerializer
 
 __all__ = ['AssetPlatformViewSet']
 

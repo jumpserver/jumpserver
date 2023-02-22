@@ -59,6 +59,8 @@ class RoleViewSet(JMSModelViewSet):
     @staticmethod
     def set_users_amount(queryset):
         """设置角色的用户绑定数量，以减少查询"""
+        ids = [role.id for role in queryset]
+        queryset = Role.objects.filter(id__in=ids)
         org_id = current_org.id
         q = Q(role__scope=Role.Scope.system) | Q(role__scope=Role.Scope.org, org_id=org_id)
         role_bindings = RoleBinding.objects.filter(q).values_list('role_id').annotate(user_count=Count('user_id'))
@@ -69,12 +71,11 @@ class RoleViewSet(JMSModelViewSet):
             role.users_amount = role_user_amount_mapper.get(role.id, 0)
         return queryset
 
-    def paginate_queryset(self, queryset):
-        page_queryset = super().paginate_queryset(queryset)  # 返回是 list 对象
-        page_queryset_ids = [str(i.id) for i in page_queryset]
-        queryset = queryset.filter(id__in=page_queryset_ids)
-        queryset = self.set_users_amount(queryset)
-        return queryset
+    def get_serializer(self, *args, **kwargs):
+        if len(args) == 1:
+            queryset = self.set_users_amount(args[0])
+            args = (queryset,)
+        return super().get_serializer(*args, **kwargs)
 
     def perform_update(self, serializer):
         instance = serializer.instance
