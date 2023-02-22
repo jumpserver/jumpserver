@@ -8,12 +8,10 @@ from rest_framework.response import Response
 
 from accounts.tasks import push_accounts_to_assets_task, verify_accounts_connectivity_task
 from assets import serializers
+from assets.exceptions import NotSupportedTemporarilyError
 from assets.filters import IpInFilterBackend, LabelFilterBackend, NodeFilterBackend
 from assets.models import Asset, Gateway
-from assets.tasks import (
-    test_assets_connectivity_manual,
-    update_assets_hardware_info_manual
-)
+from assets.tasks import test_assets_connectivity_manual, update_assets_hardware_info_manual
 from common.api import SuggestionMixin
 from common.drf.filters import BaseFilterSet
 from common.utils import get_logger, is_uuid
@@ -154,6 +152,10 @@ class AssetsTaskMixin:
         if data["action"] == "refresh":
             task = update_assets_hardware_info_manual(assets)
         else:
+            asset = assets[0]
+            if not asset.auto_info['ansible_enabled'] or \
+                not asset.auto_info['ping_enabled']:
+                raise NotSupportedTemporarilyError()
             task = test_assets_connectivity_manual(assets)
         return task
 
@@ -205,9 +207,9 @@ class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
         asset_ids = [asset.id]
         account_ids = accounts.values_list("id", flat=True)
         if action == "push_account":
-            task = push_accounts_to_assets_task.delay(account_ids, asset_ids)
+            task = push_accounts_to_assets_task.delay(account_ids)
         elif action == "test_account":
-            task = verify_accounts_connectivity_task.delay(account_ids, asset_ids)
+            task = verify_accounts_connectivity_task.delay(account_ids)
         else:
             task = None
         return task

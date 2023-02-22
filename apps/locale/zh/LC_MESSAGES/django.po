@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-21 18:29+0800\n"
+"POT-Creation-Date: 2023-02-21 22:44+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -902,7 +902,7 @@ msgstr "应用程序"
 msgid "Can match application"
 msgstr "匹配应用"
 
-#: assets/api/asset/asset.py:144
+#: assets/api/asset/asset.py:142
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr "不能直接创建资产, 你应该创建主机或其他资产"
 
@@ -1042,6 +1042,10 @@ msgstr "基本"
 #: assets/serializers/asset/common.py:117 assets/serializers/platform.py:40
 msgid "Script"
 msgstr "脚本"
+
+#: assets/exceptions.py:12
+msgid "This function is not supported temporarily"
+msgstr "暂时不支持此功能"
 
 #: assets/models/_user.py:25
 msgid "SSH private key"

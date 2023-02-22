@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-21 18:29+0800\n"
+"POT-Creation-Date: 2023-02-21 22:44+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -908,7 +908,7 @@ msgstr "アプリケーション"
 msgid "Can match application"
 msgstr "アプリケーションを一致させることができます"
 
-#: assets/api/asset/asset.py:144
+#: assets/api/asset/asset.py:142
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr ""
 "資産を直接作成することはできません。ホストまたはその他を作成する必要がありま"
@@ -1050,6 +1050,10 @@ msgstr "基本"
 #: assets/serializers/asset/common.py:117 assets/serializers/platform.py:40
 msgid "Script"
 msgstr "脚本"
+
+#: assets/exceptions.py:12
+msgid "This function is not supported temporarily"
+msgstr "この機能は一時的にサポートされていません"
 
 #: assets/models/_user.py:25
 msgid "SSH private key"

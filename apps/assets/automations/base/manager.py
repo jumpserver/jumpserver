@@ -67,7 +67,7 @@ class BasePlaybookManager:
         if not os.path.exists(path):
             os.makedirs(path, exist_ok=True, mode=0o755)
         if settings.DEBUG_DEV:
-            logger.debug('Ansible runtime dir: {}'.format(path))
+            print(f'Ansible runtime dir: {path}')
         return path
 
     @staticmethod
@@ -156,10 +156,9 @@ class BasePlaybookManager:
         return sub_playbook_path
 
     def get_runners(self):
-        # TODO 临时打印一下 找一下打印不出日志的原因
-        print('ansible runner: 任务开始执行')
         assets_group_by_platform = self.get_assets_group_by_platform()
-        print('ansible runner: 获取资产分组', assets_group_by_platform)
+        if settings.DEBUG_DEV:
+            print("assets_group_by_platform: {}".format(assets_group_by_platform))
         runners = []
         for platform, assets in assets_group_by_platform.items():
             assets_bulked = [assets[i:i + self.bulk_size] for i in range(0, len(assets), self.bulk_size)]
@@ -213,6 +212,7 @@ class BasePlaybookManager:
     def file_to_json(path):
         with open(path, 'r') as f:
             d = json.load(f)
+
         return d
 
     @staticmethod
