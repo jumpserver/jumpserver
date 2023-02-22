@@ -10,7 +10,7 @@ from common.utils import i18n_fmt, get_logger
 from jumpserver.utils import current_request
 from ops.celery import app
 from orgs.models import Organization
-from orgs.utils import current_org
+from orgs.utils import current_org, tmp_to_org
 from terminal.models import Session
 from users.models import User
 from ..const import ActivityChoices
@@ -77,7 +77,8 @@ def create_activities(resource_ids, detail, detail_id, action, org_id):
         )
         for resource_id in resource_ids
     ]
-    ActivityLog.objects.bulk_create(activities)
+    with tmp_to_org(org_id):
+        ActivityLog.objects.bulk_create(activities)
     return activities
 
 
