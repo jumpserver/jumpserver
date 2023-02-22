@@ -72,7 +72,7 @@ class RoleViewSet(JMSModelViewSet):
         return queryset
 
     def get_serializer(self, *args, **kwargs):
-        if len(args) == 1:
+        if len(args) == 1 and kwargs.get('many', False):
             queryset = self.set_users_amount(args[0])
             args = (queryset,)
         return super().get_serializer(*args, **kwargs)
