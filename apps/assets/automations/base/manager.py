@@ -1,12 +1,11 @@
 import json
 import os
 import shutil
-import yaml
-
 from collections import defaultdict
 from hashlib import md5
 from socket import gethostname
 
+import yaml
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -55,8 +54,7 @@ class BasePlaybookManager:
     def get_assets_group_by_platform(self):
         return self.execution.all_assets_group_by_platform()
 
-    @lazyproperty
-    def runtime_dir(self):
+    def prepare_runtime_dir(self):
         ansible_dir = settings.ANSIBLE_DIR
         task_name = self.execution.snapshot['name']
         dir_name = '{}_{}'.format(task_name.replace(' ', '_'), self.execution.id)
@@ -66,8 +64,14 @@ class BasePlaybookManager:
         )
         if not os.path.exists(path):
             os.makedirs(path, exist_ok=True, mode=0o755)
+        return path
+
+    @lazyproperty
+    def runtime_dir(self):
+        path = self.prepare_runtime_dir()
         if settings.DEBUG_DEV:
-            print(f'Ansible runtime dir: {path}')
+            msg = 'Ansible runtime dir: {}'.format(path)
+            print(msg)
         return path
 
     @staticmethod
@@ -158,7 +162,8 @@ class BasePlaybookManager:
     def get_runners(self):
         assets_group_by_platform = self.get_assets_group_by_platform()
         if settings.DEBUG_DEV:
-            print("assets_group_by_platform: {}".format(assets_group_by_platform))
+            msg = 'Assets group by platform: {}'.format(dict(assets_group_by_platform))
+            print(msg)
         runners = []
         for platform, assets in assets_group_by_platform.items():
             assets_bulked = [assets[i:i + self.bulk_size] for i in range(0, len(assets), self.bulk_size)]
@@ -199,8 +204,7 @@ class BasePlaybookManager:
                 if state == 'ok':
                     self.on_host_success(host, result)
                 elif state == 'skipped':
-                    # TODO
-                    print('skipped: ', hosts)
+                    pass
                 else:
                     error = hosts.get(host)
                     self.on_host_error(host, error, result)
@@ -215,9 +219,13 @@ class BasePlaybookManager:
         return d
 
     @staticmethod
+    def json_dumps(data):
+        return json.dumps(data, indent=4, sort_keys=True)
+
+    @staticmethod
     def json_to_file(path, data):
         with open(path, 'w') as f:
-            json.dump(data, f)
+            json.dump(data, f, indent=4, sort_keys=True)
 
     def local_gateway_prepare(self, runner):
         info = self.file_to_json(runner.inventory)
@@ -241,47 +249,27 @@ class BasePlaybookManager:
 
     def local_gateway_clean(self, runner):
         servers = self.gateway_servers.get(runner.id, [])
-        try:
-            for s in servers:
-                print('Server down: %s' % s)
+        for s in servers:
+            try:
                 s.stop()
-        except Exception:
-            pass
+            except Exception:
+                pass
 
     def before_runner_start(self, runner):
         self.local_gateway_prepare(runner)
 
     def after_runner_end(self, runner):
-        self.delete_sensitive_data(runner.inventory)
         self.local_gateway_clean(runner)
 
-    def delete_sensitive_data(self, path):
+    def delete_runtime_dir(self):
         if settings.DEBUG_DEV:
             return
-
-        d = self.file_to_json(path)
-
-        def delete_keys(d, keys_to_delete):
-            """
-            递归函数：删除嵌套字典中的指定键
-            """
-            if not isinstance(d, dict):
-                return d
-            keys = list(d.keys())
-            for key in keys:
-                if key in keys_to_delete:
-                    del d[key]
-                else:
-                    delete_keys(d[key], keys_to_delete)
-            return d
-
-        d = delete_keys(d, ['secret', 'ansible_password'])
-        self.json_to_file(path, d)
+        shutil.rmtree(self.runtime_dir)
 
     def run(self, *args, **kwargs):
         runners = self.get_runners()
         if len(runners) > 1:
-            print("### 分批次执行开始任务, 总共 {}\n".format(len(runners)))
+            print("### 分次执行任务, 总共 {}\n".format(len(runners)))
         elif len(runners) == 1:
             print(">>> 开始执行任务\n")
         else:
@@ -303,3 +291,4 @@ class BasePlaybookManager:
         self.execution.status = 'success'
         self.execution.date_finished = timezone.now()
         self.execution.save()
+        self.delete_runtime_dir()

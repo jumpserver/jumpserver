@@ -100,7 +100,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         host['secret_type'] = self.secret_type
 
         if asset.type == HostTypes.WINDOWS and self.secret_type == SecretType.SSH_KEY:
-            print(f'Windows {asset} does not support ssh key push')
+            print(f'Windows {asset} does not support ssh key push \n')
             return inventory_hosts
 
         for account in accounts:
@@ -145,7 +145,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         recorder.save()
         account = recorder.account
         if not account:
-            print("Account not found, deleted ?", recorder)
+            print("Account not found, deleted ?")
             return
         account.secret = recorder.new_secret
         account.save(update_fields=['secret'])
