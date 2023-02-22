@@ -205,9 +205,9 @@ class AssetTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
         asset_ids = [asset.id]
         account_ids = accounts.values_list("id", flat=True)
         if action == "push_account":
-            task = push_accounts_to_assets_task.delay(account_ids, asset_ids)
+            task = push_accounts_to_assets_task.delay(account_ids)
         elif action == "test_account":
-            task = verify_accounts_connectivity_task.delay(account_ids, asset_ids)
+            task = verify_accounts_connectivity_task.delay(account_ids)
         else:
             task = None
         return task

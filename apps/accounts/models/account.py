@@ -68,6 +68,9 @@ class Account(AbsConnectivity, BaseAccount):
             ('push_account', _('Can push account')),
         ]
 
+    def __str__(self):
+        return '{}'.format(self.username)
+
     @lazyproperty
     def platform(self):
         return self.asset.platform
@@ -77,9 +80,6 @@ class Account(AbsConnectivity, BaseAccount):
         if self.username.startswith('@'):
             return self.username
         return self.name
-
-    def __str__(self):
-        return '{}'.format(self.username)
 
     @lazyproperty
     def has_secret(self):
@@ -100,12 +100,11 @@ class Account(AbsConnectivity, BaseAccount):
         return self.asset.accounts.exclude(id=self.id).exclude(su_from=self)
 
     def secret_changed(self):
-        history = self.history.first()
-        if not history:
-            return True
-        if history.secret != self.secret or history.secret_type != self.secret_type:
-            return True
-        return False
+        pre_secret = self.history.exclude(version=self.version) \
+            .values_list('secret', flat=True) \
+            .first()
+        print("Pre secret is: ", pre_secret)
+        return pre_secret != self.secret
 
 
 class AccountTemplate(BaseAccount):

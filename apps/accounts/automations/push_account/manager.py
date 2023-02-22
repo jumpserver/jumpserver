@@ -36,7 +36,7 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
 
     def get_accounts(self, privilege_account, accounts: QuerySet):
         if not privilege_account:
-            logger.debug(f'not privilege account')
+            print(f'not privilege account')
             return []
         snapshot_account_usernames = self.execution.snapshot['accounts']
         if '*' in snapshot_account_usernames:
@@ -103,7 +103,7 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
         if not account:
             return
         account.secret = new_secret
-        account.save(update_fields=['secret'])
+        account.save(update_fields=['secret', 'version'])
 
     def on_host_error(self, host, error, result):
         pass

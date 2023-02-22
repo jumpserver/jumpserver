@@ -8,7 +8,7 @@ from django.utils import timezone
 from openpyxl import Workbook
 
 from accounts.const import AutomationTypes, SecretType, SSHKeyStrategy, SecretStrategy
-from accounts.models import ChangeSecretRecord
+from accounts.models import ChangeSecretRecord, Account
 from accounts.notifications import ChangeSecretExecutionTaskMsg
 from accounts.serializers import ChangeSecretRecordBackUpSerializer
 from assets.const import HostTypes
@@ -86,6 +86,10 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             accounts = accounts.filter(username__in=self.snapshot_account_usernames)
 
         accounts = accounts.filter(secret_type=self.secret_type)
+        if not accounts:
+            print('没有发现待改密账号: %s 用户名: %s 类型: %s' % (asset.name, account.username, self.secret_type))
+            return []
+
         method_attr = getattr(automation, self.method_type() + '_method')
         method_hosts = self.method_hosts_mapper[method_attr]
         method_hosts = [h for h in method_hosts if h != host['name']]
@@ -137,10 +141,12 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         recorder.status = 'success'
         recorder.date_finished = timezone.now()
         recorder.save()
-        print('recorder.new_secret', recorder.new_secret)
-        account = recorder.account
+        account = Account.objects.filter(id=recorder.account_id).first()
+        if not account:
+            print("Account not found, deleted ?", recorder.account_id)
+            return
         account.secret = recorder.new_secret
-        account.save(update_fields=['secret'])
+        account.save(update_fields=['secret', 'version'])
 
     def on_host_error(self, host, error, result):
         recorder = self.name_recorder_mapper.get(host)
