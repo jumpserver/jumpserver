@@ -68,6 +68,9 @@ class Account(AbsConnectivity, BaseAccount):
             ('push_account', _('Can push account')),
         ]
 
+    def __str__(self):
+        return '{}'.format(self.username)
+
     @lazyproperty
     def platform(self):
         return self.asset.platform
@@ -77,9 +80,6 @@ class Account(AbsConnectivity, BaseAccount):
         if self.username.startswith('@'):
             return self.username
         return self.name
-
-    def __str__(self):
-        return '{}'.format(self.username)
 
     @lazyproperty
     def has_secret(self):
@@ -98,14 +98,6 @@ class Account(AbsConnectivity, BaseAccount):
     def get_su_from_accounts(self):
         """ 排除自己和以自己为 su-from 的账号 """
         return self.asset.accounts.exclude(id=self.id).exclude(su_from=self)
-
-    def secret_changed(self):
-        history = self.history.first()
-        if not history:
-            return True
-        if history.secret != self.secret or history.secret_type != self.secret_type:
-            return True
-        return False
 
 
 class AccountTemplate(BaseAccount):

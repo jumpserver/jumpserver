@@ -36,7 +36,7 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
 
     def get_accounts(self, privilege_account, accounts: QuerySet):
         if not privilege_account:
-            logger.debug(f'not privilege account')
+            print(f'not privilege account')
             return []
         snapshot_account_usernames = self.execution.snapshot['accounts']
         if '*' in snapshot_account_usernames:

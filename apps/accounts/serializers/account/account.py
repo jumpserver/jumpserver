@@ -43,7 +43,7 @@ class AccountSerializerCreateValidateMixin:
     def push_account(instance, push_now):
         if not push_now:
             return
-        push_accounts_to_assets_task.delay([instance.id], [instance.asset_id])
+        push_accounts_to_assets_task.delay([instance.id])
 
     def create(self, validated_data):
         push_now = validated_data.pop('push_now', None)
@@ -102,7 +102,7 @@ class AccountSerializer(AccountSerializerCreateMixin, BaseAccountSerializer):
     class Meta(BaseAccountSerializer.Meta):
         model = Account
         fields = BaseAccountSerializer.Meta.fields \
-                 + ['su_from', 'version', 'asset'] \
+                 + ['su_from', 'asset'] \
                  + ['template', 'push_now', 'source']
         extra_kwargs = {
             **BaseAccountSerializer.Meta.extra_kwargs,
