@@ -7,17 +7,15 @@ from accounts import serializers
 from accounts.filters import AccountFilterSet
 from accounts.models import Account
 from assets.models import Asset
-from authentication.const import ConfirmType
-from common.permissions import UserConfirmation
+from common.permissions import UserConfirmation, ConfirmType
 from common.views.mixins import RecordViewLogMixin
 from orgs.mixins.api import OrgBulkModelViewSet
+from rbac.permissions import RBACPermission
 
 __all__ = [
     'AccountViewSet', 'AccountSecretsViewSet',
     'AccountHistoriesSecretAPI'
 ]
-
-from rbac.permissions import RBACPermission
 
 
 class AccountViewSet(OrgBulkModelViewSet):
@@ -71,7 +69,7 @@ class AccountHistoriesSecretAPI(RecordViewLogMixin, ListAPIView):
     http_method_names = ['get', 'options']
     permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
     rbac_perms = {
-        'list': 'accounts.view_accountsecret',
+        'GET': 'accounts.view_accountsecret',
     }
 
     def get_object(self):
