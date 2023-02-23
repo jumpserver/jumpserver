@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-22 21:23+0800\n"
+"POT-Creation-Date: 2023-02-23 16:29+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -249,7 +249,7 @@ msgstr "アカウントバックアップ計画"
 
 #: accounts/models/automations/backup_account.py:83
 #: assets/models/automations/base.py:114 audits/models.py:55
-#: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:186
+#: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:191
 #: perms/models/asset_permission.py:72 terminal/models/applet/host.py:109
 #: terminal/models/session/session.py:45
 #: tickets/models/ticket/apply_application.py:30
@@ -371,7 +371,7 @@ msgstr "開始日"
 
 #: accounts/models/automations/change_secret.py:74
 #: assets/models/automations/base.py:115 ops/models/base.py:56
-#: ops/models/celery.py:64 ops/models/job.py:187
+#: ops/models/celery.py:64 ops/models/job.py:192
 #: terminal/models/applet/host.py:110
 msgid "Date finished"
 msgstr "終了日"
@@ -450,7 +450,7 @@ msgstr "アカウントの確認"
 #: assets/serializers/platform.py:91 assets/serializers/platform.py:136
 #: authentication/serializers/connect_token_secret.py:103 ops/mixin.py:21
 #: ops/models/adhoc.py:21 ops/models/celery.py:15 ops/models/celery.py:57
-#: ops/models/job.py:90 ops/models/playbook.py:23 ops/serializers/job.py:19
+#: ops/models/job.py:91 ops/models/playbook.py:23 ops/serializers/job.py:19
 #: orgs/models.py:69 perms/models/asset_permission.py:56 rbac/models/role.py:29
 #: settings/models.py:33 settings/serializers/sms.py:6
 #: terminal/models/applet/applet.py:27 terminal/models/component/endpoint.py:12
@@ -546,7 +546,7 @@ msgstr "カテゴリ"
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:78
 #: assets/serializers/asset/common.py:122 assets/serializers/platform.py:96
 #: audits/serializers.py:48
-#: authentication/serializers/connect_token_secret.py:116 ops/models/job.py:101
+#: authentication/serializers/connect_token_secret.py:116 ops/models/job.py:102
 #: perms/serializers/user_permission.py:26 terminal/models/applet/applet.py:31
 #: terminal/models/component/storage.py:57
 #: terminal/models/component/storage.py:146 terminal/serializers/applet.py:29
@@ -599,7 +599,7 @@ msgstr "特別情報"
 #: accounts/serializers/automations/base.py:22
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20 ops/models/base.py:17
-#: ops/models/job.py:103 ops/serializers/job.py:20
+#: ops/models/job.py:104 ops/serializers/job.py:20
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 msgid "Assets"
 msgstr "資産"
@@ -1065,7 +1065,7 @@ msgstr "SSHパブリックキー"
 
 #: assets/models/_user.py:27 assets/models/cmd_filter.py:40
 #: assets/models/cmd_filter.py:88 assets/models/group.py:23
-#: common/db/models.py:37 ops/models/adhoc.py:27 ops/models/job.py:109
+#: common/db/models.py:37 ops/models/adhoc.py:27 ops/models/job.py:110
 #: ops/models/playbook.py:26 rbac/models/role.py:37 settings/models.py:38
 #: terminal/models/applet/applet.py:36 terminal/models/applet/applet.py:158
 #: terminal/models/applet/host.py:111 terminal/models/component/endpoint.py:24
@@ -1078,7 +1078,7 @@ msgstr "コメント"
 
 #: assets/models/_user.py:28 assets/models/automations/base.py:113
 #: assets/models/cmd_filter.py:41 assets/models/group.py:22
-#: common/db/models.py:35 ops/models/base.py:54 ops/models/job.py:185
+#: common/db/models.py:35 ops/models/base.py:54 ops/models/job.py:190
 #: users/models/user.py:943
 msgid "Date created"
 msgstr "作成された日付"
@@ -1267,7 +1267,7 @@ msgid "Asset automation task"
 msgstr "アセットの自動化タスク"
 
 #: assets/models/automations/base.py:112 audits/models.py:177
-#: audits/serializers.py:49 ops/models/base.py:49 ops/models/job.py:178
+#: audits/serializers.py:49 ops/models/base.py:49 ops/models/job.py:183
 #: terminal/models/applet/applet.py:157 terminal/models/applet/host.py:108
 #: terminal/models/component/status.py:27 terminal/serializers/applet.py:18
 #: terminal/serializers/applet_host.py:93 tickets/models/ticket/general.py:283
@@ -3279,7 +3279,7 @@ msgstr "VCS"
 msgid "Adhoc"
 msgstr "コマンド＃コマンド＃"
 
-#: ops/const.py:39 ops/models/job.py:99
+#: ops/const.py:39 ops/models/job.py:100
 msgid "Playbook"
 msgstr "Playbook"
 
@@ -3340,17 +3340,17 @@ msgstr "定期的または定期的に設定を行う必要があります"
 msgid "Pattern"
 msgstr "パターン"
 
-#: ops/models/adhoc.py:24 ops/models/job.py:94
+#: ops/models/adhoc.py:24 ops/models/job.py:95
 msgid "Module"
 msgstr "モジュール"
 
-#: ops/models/adhoc.py:25 ops/models/celery.py:58 ops/models/job.py:93
+#: ops/models/adhoc.py:25 ops/models/celery.py:58 ops/models/job.py:94
 #: terminal/models/component/task.py:16
 msgid "Args"
 msgstr "アルグ"
 
 #: ops/models/adhoc.py:26 ops/models/base.py:16 ops/models/base.py:53
-#: ops/models/job.py:102 ops/models/job.py:184 ops/models/playbook.py:25
+#: ops/models/job.py:103 ops/models/job.py:189 ops/models/playbook.py:25
 #: terminal/models/session/sharing.py:23
 msgid "Creator"
 msgstr "作成者"
@@ -3367,12 +3367,12 @@ msgstr "最後の実行"
 msgid "Date last run"
 msgstr "最終実行日"
 
-#: ops/models/base.py:51 ops/models/job.py:182
+#: ops/models/base.py:51 ops/models/job.py:187
 #: xpack/plugins/cloud/models.py:170
 msgid "Result"
 msgstr "結果"
 
-#: ops/models/base.py:52 ops/models/job.py:183
+#: ops/models/base.py:52 ops/models/job.py:188
 msgid "Summary"
 msgstr "概要"
 
@@ -3412,47 +3412,47 @@ msgstr "発売日"
 msgid "Celery Task Execution"
 msgstr "Celery タスク実行"
 
-#: ops/models/job.py:96
+#: ops/models/job.py:97
 msgid "Chdir"
 msgstr "実行ディレクトリ"
 
-#: ops/models/job.py:97
+#: ops/models/job.py:98
 msgid "Timeout (Seconds)"
 msgstr "タイムアウト（秒）"
 
-#: ops/models/job.py:104
+#: ops/models/job.py:105
 msgid "Use Parameter Define"
 msgstr "パラメータ定義を使用する"
 
-#: ops/models/job.py:105
+#: ops/models/job.py:106
 msgid "Parameters define"
 msgstr "パラメータ定義"
 
-#: ops/models/job.py:106
+#: ops/models/job.py:107
 msgid "Runas"
 msgstr "ユーザーとして実行"
 
-#: ops/models/job.py:108
+#: ops/models/job.py:109
 msgid "Runas policy"
 msgstr "ユーザー ポリシー"
 
-#: ops/models/job.py:170
+#: ops/models/job.py:171
 msgid "Job"
 msgstr "ジョブ＃ジョブ＃"
 
-#: ops/models/job.py:181
+#: ops/models/job.py:186
 msgid "Parameters"
 msgstr "パラメータ"
 
-#: ops/models/job.py:189
+#: ops/models/job.py:194
 msgid "Material"
 msgstr ""
 
-#: ops/models/job.py:191
+#: ops/models/job.py:196
 msgid "Material Type"
 msgstr ""
 
-#: ops/models/job.py:442
+#: ops/models/job.py:455
 msgid "Job Execution"
 msgstr "ジョブ実行"
 
@@ -3527,6 +3527,10 @@ msgstr "定期的なタスクの作成または更新"
 #: ops/tasks.py:108
 msgid "Periodic check service performance"
 msgstr "サービスのパフォーマンスを定期的に確認する"
+
+#: ops/tasks.py:114
+msgid "Clean up unexpected jobs"
+msgstr "例外ジョブのクリーンアップ"
 
 #: ops/templates/ops/celery_task_log.html:4
 msgid "Task log"
@@ -5987,19 +5991,19 @@ msgstr ""
 "チケットのタイトル: {} チケット申請者: {} チケットプロセッサ: {} チケットID: "
 "{}"
 
-#: tickets/handlers/base.py:86
+#: tickets/handlers/base.py:85
 msgid "Change field"
 msgstr "フィールドを変更"
 
-#: tickets/handlers/base.py:86
+#: tickets/handlers/base.py:85
 msgid "Before change"
 msgstr "変更前"
 
-#: tickets/handlers/base.py:86
+#: tickets/handlers/base.py:85
 msgid "After change"
 msgstr "変更後"
 
-#: tickets/handlers/base.py:98
+#: tickets/handlers/base.py:97
 msgid "{} {} the ticket"
 msgstr "{} {} チケット"
 
@@ -6255,7 +6259,7 @@ msgstr "無効な承認アクション"
 msgid "This user is not authorized to approve this ticket"
 msgstr "このユーザーはこの作業指示を承認する権限がありません"
 
-#: users/api/user.py:179
+#: users/api/user.py:182
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "自己otpをリセットできませんでした、代わりにプロファイルリセットを使用"
 
