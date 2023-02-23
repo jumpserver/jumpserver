@@ -112,7 +112,7 @@ def check_server_performance_period():
 
 
 @shared_task(verbose_name=_("Clean up unexpected jobs"))
-@register_as_period_task(interval=600)
+@register_as_period_task(interval=3600)
 def clean_up_unexpected_jobs():
     with tmp_to_root_org():
         JobExecution.clean_unexpected_execution()
