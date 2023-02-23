@@ -5,6 +5,7 @@ import uuid
 from django.apps import apps
 from django.db.models.signals import post_save, pre_save, m2m_changed, pre_delete
 from django.dispatch import receiver
+from django.utils import translation
 
 from audits.handler import (
     get_instance_current_with_cache_diff, cache_instance_before_data,
@@ -29,38 +30,39 @@ def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
     if not instance:
         return
 
-    resource_type = instance._meta.verbose_name
-    current_instance = model_to_dict(instance, include_model_fields=False)
+    with translation.override('en'):
+        resource_type = instance._meta.verbose_name
+        current_instance = model_to_dict(instance, include_model_fields=False)
 
-    instance_id = current_instance.get('id')
-    log_id, before_instance = get_instance_dict_from_cache(instance_id)
+        instance_id = current_instance.get('id')
+        log_id, before_instance = get_instance_dict_from_cache(instance_id)
 
-    field_name = str(model._meta.verbose_name)
-    objs = model.objects.filter(pk__in=pk_set)
-    objs_display = [str(o) for o in objs]
-    action = M2M_ACTION[action]
-    changed_field = current_instance.get(field_name, [])
+        field_name = str(model._meta.verbose_name)
+        objs = model.objects.filter(pk__in=pk_set)
+        objs_display = [str(o) for o in objs]
+        action = M2M_ACTION[action]
+        changed_field = current_instance.get(field_name, [])
 
-    after, before, before_value = None, None, None
-    if action == ActionChoices.create:
-        before_value = list(set(changed_field) - set(objs_display))
-    elif action == ActionChoices.delete:
-        before_value = list(
-            set(changed_field).symmetric_difference(set(objs_display))
+        after, before, before_value = None, None, None
+        if action == ActionChoices.create:
+            before_value = list(set(changed_field) - set(objs_display))
+        elif action == ActionChoices.delete:
+            before_value = list(
+                set(changed_field).symmetric_difference(set(objs_display))
+            )
+
+        if changed_field:
+            after = {field_name: changed_field}
+        if before_value:
+            before = {field_name: before_value}
+
+        if sorted(str(before)) == sorted(str(after)):
+            return
+
+        create_or_update_operate_log(
+            ActionChoices.update, resource_type,
+            resource=instance, log_id=log_id, before=before, after=after
         )
-
-    if changed_field:
-        after = {field_name: changed_field}
-    if before_value:
-        before = {field_name: before_value}
-
-    if sorted(str(before)) == sorted(str(after)):
-        return
-
-    create_or_update_operate_log(
-        ActionChoices.update, resource_type,
-        resource=instance, log_id=log_id, before=before, after=after
-    )
 
 
 def signal_of_operate_log_whether_continue(
@@ -93,18 +95,18 @@ def on_object_pre_create_or_update(
     )
     if not ok:
         return
+    with translation.override('en'):
+        # users.PrivateToken Model 没有 id 有 pk字段
+        instance_id = getattr(instance, 'id', getattr(instance, 'pk', None))
+        instance_before_data = {'id': instance_id}
+        raw_instance = type(instance).objects.filter(pk=instance_id).first()
 
-    # users.PrivateToken Model 没有 id 有 pk字段
-    instance_id = getattr(instance, 'id', getattr(instance, 'pk', None))
-    instance_before_data = {'id': instance_id}
-    raw_instance = type(instance).objects.filter(pk=instance_id).first()
-
-    if raw_instance:
-        instance_before_data = model_to_dict(raw_instance)
-    operate_log_id = str(uuid.uuid4())
-    instance_before_data['operate_log_id'] = operate_log_id
-    setattr(instance, 'operate_log_id', operate_log_id)
-    cache_instance_before_data(instance_before_data)
+        if raw_instance:
+            instance_before_data = model_to_dict(raw_instance)
+        operate_log_id = str(uuid.uuid4())
+        instance_before_data['operate_log_id'] = operate_log_id
+        setattr(instance, 'operate_log_id', operate_log_id)
+        cache_instance_before_data(instance_before_data)
 
 
 @receiver(post_save)
@@ -116,23 +118,23 @@ def on_object_created_or_update(
     )
     if not ok:
         return
+    with translation.override('en'):
+        log_id, before, after = None, None, None
+        if created:
+            action = ActionChoices.create
+            after = model_to_dict(instance)
+            log_id = getattr(instance, 'operate_log_id', None)
+        else:
+            action = ActionChoices.update
+            current_instance = model_to_dict(instance)
+            log_id, before, after = get_instance_current_with_cache_diff(current_instance)
 
-    log_id, before, after = None, None, None
-    if created:
-        action = ActionChoices.create
-        after = model_to_dict(instance)
-        log_id = getattr(instance, 'operate_log_id', None)
-    else:
-        action = ActionChoices.update
-        current_instance = model_to_dict(instance)
-        log_id, before, after = get_instance_current_with_cache_diff(current_instance)
-
-    resource_type = sender._meta.verbose_name
-    object_name = sender._meta.object_name
-    create_or_update_operate_log(
-        action, resource_type, resource=instance, log_id=log_id,
-        before=before, after=after, object_name=object_name
-    )
+        resource_type = sender._meta.verbose_name
+        object_name = sender._meta.object_name
+        create_or_update_operate_log(
+            action, resource_type, resource=instance, log_id=log_id,
+            before=before, after=after, object_name=object_name
+        )
 
 
 @receiver(pre_delete)
@@ -141,11 +143,12 @@ def on_object_delete(sender, instance=None, **kwargs):
     if not ok:
         return
 
-    resource_type = sender._meta.verbose_name
-    create_or_update_operate_log(
-        ActionChoices.delete, resource_type,
-        resource=instance, before=model_to_dict(instance)
-    )
+    with translation.override('en'):
+        resource_type = sender._meta.verbose_name
+        create_or_update_operate_log(
+            ActionChoices.delete, resource_type,
+            resource=instance, before=model_to_dict(instance)
+        )
 
 
 @receiver(django_ready)

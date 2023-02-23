@@ -85,13 +85,12 @@ def bulk_create_with_signal(cls: models.Model, items, **kwargs):
 def get_request_os(request):
     """获取请求的操作系统"""
     agent = request.META.get('HTTP_USER_AGENT', '').lower()
-   
-    if agent is None:
-        return 'unknown'
-    if 'windows' in agent.lower():
+
+    if 'windows' in agent:
         return 'windows'
-    if 'mac' in agent.lower():
+    elif 'mac' in agent:
         return 'mac'
-    if 'linux' in agent.lower():
+    elif 'linux' in agent:
         return 'linux'
-    return 'unknown'
+    else:
+        return 'unknown'

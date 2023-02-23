@@ -45,15 +45,6 @@ def write_login_log(*args, **kwargs):
     UserLoginLog.objects.create(**kwargs)
 
 
-def get_resource_display(resource):
-    resource_display = str(resource)
-    setting_serializer = SettingsSerializer()
-    label = setting_serializer.get_field_label(resource_display)
-    if label is not None:
-        resource_display = label
-    return resource_display
-
-
 def _get_instance_field_value(
         instance, include_model_fields,
         model_need_continue_fields, exclude_fields=None

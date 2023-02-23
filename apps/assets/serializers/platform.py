@@ -87,9 +87,6 @@ class PlatformProtocolsSerializer(serializers.ModelSerializer):
 
 
 class PlatformSerializer(WritableNestedModelSerializer):
-    name = serializers.CharField(
-        label=_("Name"), max_length=50, validators=[validators.validate_unicode_slug]
-    )
     charset = LabeledChoiceField(
         choices=Platform.CharsetChoices.choices, label=_("Charset")
     )

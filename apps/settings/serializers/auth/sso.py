@@ -7,7 +7,7 @@ __all__ = [
 
 
 class SSOSettingSerializer(serializers.Serializer):
-    PREFIX_TITLE = '%s-%s' % (_('Authentication'), _('SSO'))
+    PREFIX_TITLE = _('SSO')
 
     AUTH_SSO = serializers.BooleanField(
         required=False, label=_('Enable SSO auth'),

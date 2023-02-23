@@ -5,7 +5,7 @@ from celery.exceptions import SoftTimeLimitExceeded
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import get_logger, get_object_or_none
-from orgs.utils import tmp_to_org
+from orgs.utils import tmp_to_org, tmp_to_root_org
 from .celery.decorator import (
     register_as_period_task, after_app_ready_start
 )
@@ -109,3 +109,10 @@ def create_or_update_registered_periodic_tasks():
 @register_as_period_task(interval=3600)
 def check_server_performance_period():
     ServerPerformanceCheckUtil().check_and_publish()
+
+
+@shared_task(verbose_name=_("Clean up unexpected jobs"))
+@register_as_period_task(interval=3600)
+def clean_up_unexpected_jobs():
+    with tmp_to_root_org():
+        JobExecution.clean_unexpected_execution()

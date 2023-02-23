@@ -77,7 +77,7 @@ class AccountAssetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Asset
-        fields = ['id', 'name', 'address', 'type', 'category', 'platform']
+        fields = ['id', 'name', 'address', 'type', 'category', 'platform', 'auto_info']
 
     def to_internal_value(self, data):
         if isinstance(data, dict):
@@ -119,7 +119,7 @@ class AccountSerializer(AccountSerializerCreateMixin, BaseAccountSerializer):
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
         queryset = queryset \
-            .prefetch_related('asset', 'asset__platform')
+            .prefetch_related('asset', 'asset__platform', 'asset__platform__automation')
         return queryset
 
 

@@ -11,7 +11,6 @@ from accounts.serializers import AccountSerializerCreateValidateMixin
 from accounts.serializers import AuthValidateMixin
 from common.serializers import WritableNestedModelSerializer, SecretReadableMixin, CommonModelSerializer
 from common.serializers.fields import LabeledChoiceField
-from common.utils import lazyproperty
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ...const import Category, AllTypes
 from ...models import Asset, Node, Platform, Label, Protocol
@@ -136,9 +135,11 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         read_only_fields = [
             'category', 'type', 'connectivity',
             'date_verified', 'created_by', 'date_created',
+            'auto_info',
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
         extra_kwargs = {
+            'auto_info': {'label': _('Auto info')},
             'name': {'label': _("Name")},
             'address': {'label': _('Address')},
             'nodes_display': {'label': _('Node path')},
@@ -182,10 +183,10 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('domain', 'platform') \
+        queryset = queryset.prefetch_related('domain', 'nodes', 'labels', 'protocols') \
+            .prefetch_related('platform', 'platform__automation') \
             .annotate(category=F("platform__category")) \
             .annotate(type=F("platform__type"))
-        queryset = queryset.prefetch_related('nodes', 'labels', 'protocols')
         return queryset
 
     @staticmethod
@@ -204,7 +205,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
             nodes_to_set.append(node)
         instance.nodes.set(nodes_to_set)
 
-    @lazyproperty
+    @property
     def _initial_data_platform(self):
         if self.instance:
             return self.instance.platform

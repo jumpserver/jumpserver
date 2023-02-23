@@ -18,11 +18,11 @@ __all__ = [
 
 class RoleViewSet(JMSModelViewSet):
     queryset = Role.objects.all()
-    ordering = ('-builtin', 'scope', 'name')
     serializer_classes = {
         'default': RoleSerializer,
         'users': RoleUserSerializer,
     }
+    ordering = ('-builtin', 'name')
     filterset_class = RoleFilter
     search_fields = ('name', 'scope', 'builtin')
     rbac_perms = {
@@ -56,11 +56,15 @@ class RoleViewSet(JMSModelViewSet):
             return
         instance.permissions.set(clone.get_permissions())
 
-    @staticmethod
-    def set_users_amount(queryset):
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        queryset = queryset.order_by(*self.ordering)
+        return queryset
+
+    def set_users_amount(self, queryset):
         """设置角色的用户绑定数量，以减少查询"""
         ids = [role.id for role in queryset]
-        queryset = Role.objects.filter(id__in=ids)
+        queryset = Role.objects.filter(id__in=ids).order_by(*self.ordering)
         org_id = current_org.id
         q = Q(role__scope=Role.Scope.system) | Q(role__scope=Role.Scope.org, org_id=org_id)
         role_bindings = RoleBinding.objects.filter(q).values_list('role_id').annotate(user_count=Count('user_id'))
@@ -95,14 +99,16 @@ class SystemRoleViewSet(RoleViewSet):
     perm_model = SystemRole
 
     def get_queryset(self):
-        return super().get_queryset().filter(scope='system')
+        qs = super().get_queryset().filter(scope='system')
+        return qs
 
 
 class OrgRoleViewSet(RoleViewSet):
     perm_model = OrgRole
 
     def get_queryset(self):
-        return super().get_queryset().filter(scope='org')
+        qs = super().get_queryset().filter(scope='org')
+        return qs
 
 
 class BaseRolePermissionsViewSet(PermissionViewSet):
