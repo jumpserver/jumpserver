@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-23 17:59+0800\n"
+"POT-Creation-Date: 2023-02-23 18:12+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -195,7 +195,7 @@ msgstr "ソース"
 #: accounts/serializers/automations/change_secret.py:112
 #: accounts/serializers/automations/change_secret.py:132
 #: acls/models/base.py:102 acls/serializers/base.py:57
-#: assets/serializers/asset/common.py:125 assets/serializers/gateway.py:28
+#: assets/serializers/asset/common.py:124 assets/serializers/gateway.py:28
 #: audits/models.py:49 ops/models/base.py:18
 #: perms/models/asset_permission.py:70 perms/serializers/permission.py:32
 #: terminal/backends/command/models.py:21 terminal/models/session/session.py:34
@@ -446,7 +446,7 @@ msgstr "アカウントの確認"
 #: assets/models/cmd_filter.py:21 assets/models/domain.py:18
 #: assets/models/group.py:20 assets/models/label.py:18
 #: assets/models/platform.py:21 assets/models/platform.py:76
-#: assets/serializers/asset/common.py:68 assets/serializers/asset/common.py:142
+#: assets/serializers/asset/common.py:67 assets/serializers/asset/common.py:142
 #: assets/serializers/platform.py:91 assets/serializers/platform.py:136
 #: authentication/serializers/connect_token_secret.py:103 ops/mixin.py:21
 #: ops/models/adhoc.py:21 ops/models/celery.py:15 ops/models/celery.py:57
@@ -516,12 +516,12 @@ msgstr ""
 "情報にアクセスしてください-> ファイル暗号化パスワードを設定してください"
 
 #: accounts/serializers/account/account.py:65
-#: assets/serializers/asset/common.py:66 settings/serializers/auth/sms.py:75
+#: assets/serializers/asset/common.py:65 settings/serializers/auth/sms.py:75
 msgid "Template"
 msgstr "テンプレート"
 
 #: accounts/serializers/account/account.py:68
-#: assets/serializers/asset/common.py:63
+#: assets/serializers/asset/common.py:62
 msgid "Push now"
 msgstr "今すぐプッシュ"
 
@@ -532,9 +532,9 @@ msgstr "エスクローされたパスワード"
 
 #: accounts/serializers/account/account.py:75 applications/models.py:11
 #: assets/models/label.py:21 assets/models/platform.py:77
-#: assets/serializers/asset/common.py:121 assets/serializers/cagegory.py:8
+#: assets/serializers/asset/common.py:120 assets/serializers/cagegory.py:8
 #: assets/serializers/platform.py:97 assets/serializers/platform.py:137
-#: perms/serializers/user_permission.py:25 settings/models.py:35
+#: perms/serializers/user_permission.py:26 settings/models.py:35
 #: tickets/models/ticket/apply_application.py:13
 msgid "Category"
 msgstr "カテゴリ"
@@ -544,10 +544,10 @@ msgstr "カテゴリ"
 #: acls/serializers/command_acl.py:18 applications/models.py:14
 #: assets/models/_user.py:50 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:78
-#: assets/serializers/asset/common.py:122 assets/serializers/platform.py:96
+#: assets/serializers/asset/common.py:121 assets/serializers/platform.py:96
 #: audits/serializers.py:48
 #: authentication/serializers/connect_token_secret.py:116 ops/models/job.py:102
-#: perms/serializers/user_permission.py:26 terminal/models/applet/applet.py:31
+#: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:31
 #: terminal/models/component/storage.py:57
 #: terminal/models/component/storage.py:146 terminal/serializers/applet.py:29
 #: terminal/serializers/session.py:22 terminal/serializers/storage.py:224
@@ -998,7 +998,7 @@ msgid "Device"
 msgstr "インターネット機器"
 
 #: assets/const/category.py:13 assets/models/asset/database.py:9
-#: assets/models/asset/database.py:24 assets/serializers/asset/common.py:109
+#: assets/models/asset/database.py:24 assets/serializers/asset/common.py:108
 msgid "Database"
 msgstr "データベース"
 
@@ -1041,13 +1041,12 @@ msgstr "Webサイト"
 msgid "Disabled"
 msgstr "無効"
 
-#: assets/const/web.py:60 settings/serializers/auth/base.py:10
-#: settings/serializers/basic.py:27
+#: assets/const/web.py:60 settings/serializers/basic.py:27
 msgid "Basic"
 msgstr "基本"
 
 #: assets/const/web.py:61 assets/models/asset/web.py:13
-#: assets/serializers/asset/common.py:117 assets/serializers/platform.py:40
+#: assets/serializers/asset/common.py:116 assets/serializers/platform.py:40
 msgid "Script"
 msgstr "脚本"
 
@@ -1182,14 +1181,14 @@ msgstr "アドレス"
 
 #: assets/models/asset/common.py:104 assets/models/platform.py:112
 #: authentication/serializers/connect_token_secret.py:108
-#: perms/serializers/user_permission.py:23
+#: perms/serializers/user_permission.py:24
 #: xpack/plugins/cloud/serializers/account_attrs.py:187
 msgid "Platform"
 msgstr "プラットフォーム"
 
 #: assets/models/asset/common.py:106 assets/models/domain.py:21
 #: authentication/serializers/connect_token_secret.py:126
-#: perms/serializers/user_permission.py:27
+#: perms/serializers/user_permission.py:28
 msgid "Domain"
 msgstr "ドメイン"
 
@@ -1213,7 +1212,7 @@ msgstr "アセットを一致させることができます"
 msgid "Can change asset nodes"
 msgstr "資産ノードを変更できます"
 
-#: assets/models/asset/database.py:10 assets/serializers/asset/common.py:110
+#: assets/models/asset/database.py:10 assets/serializers/asset/common.py:109
 #: settings/serializers/email.py:37
 msgid "Use SSL"
 msgstr "SSLの使用"
@@ -1230,7 +1229,7 @@ msgstr "クライアント証明書"
 msgid "Client key"
 msgstr "クライアントキー"
 
-#: assets/models/asset/database.py:14 assets/serializers/asset/common.py:111
+#: assets/models/asset/database.py:14 assets/serializers/asset/common.py:110
 msgid "Allow invalid cert"
 msgstr "証明書チェックを無視"
 
@@ -1238,17 +1237,17 @@ msgstr "証明書チェックを無視"
 msgid "Autofill"
 msgstr "自動充填"
 
-#: assets/models/asset/web.py:10 assets/serializers/asset/common.py:114
+#: assets/models/asset/web.py:10 assets/serializers/asset/common.py:113
 #: assets/serializers/platform.py:32
 msgid "Username selector"
 msgstr "ユーザー名ピッカー"
 
-#: assets/models/asset/web.py:11 assets/serializers/asset/common.py:115
+#: assets/models/asset/web.py:11 assets/serializers/asset/common.py:114
 #: assets/serializers/platform.py:35
 msgid "Password selector"
 msgstr "パスワードセレクター"
 
-#: assets/models/asset/web.py:12 assets/serializers/asset/common.py:116
+#: assets/models/asset/web.py:12 assets/serializers/asset/common.py:115
 #: assets/serializers/platform.py:38
 msgid "Submit selector"
 msgstr "ボタンセレクターを確認する"
@@ -1356,7 +1355,7 @@ msgstr "システム"
 msgid "Value"
 msgstr "値"
 
-#: assets/models/label.py:40 assets/serializers/asset/common.py:123
+#: assets/models/label.py:40 assets/serializers/asset/common.py:122
 #: assets/serializers/cagegory.py:6 assets/serializers/cagegory.py:13
 #: authentication/serializers/connect_token_secret.py:114
 #: common/serializers/common.py:79 settings/serializers/sms.py:7
@@ -1396,7 +1395,7 @@ msgstr "ノードを一致させることができます"
 msgid "Required"
 msgstr "必要"
 
-#: assets/models/platform.py:23 settings/serializers/settings.py:61
+#: assets/models/platform.py:23 settings/serializers/settings.py:65
 #: users/templates/users/reset_password.html:29
 msgid "Setting"
 msgstr "設定"
@@ -1485,14 +1484,14 @@ msgstr "オートメーション"
 msgid "%(value)s is not an even number"
 msgstr "%(value)s は偶数ではありません"
 
-#: assets/serializers/asset/common.py:113
+#: assets/serializers/asset/common.py:112
 msgid "Auto fill"
 msgstr "自動充填"
 
-#: assets/serializers/asset/common.py:124 assets/serializers/platform.py:99
+#: assets/serializers/asset/common.py:123 assets/serializers/platform.py:99
 #: authentication/serializers/connect_token_secret.py:28
 #: authentication/serializers/connect_token_secret.py:66
-#: perms/serializers/user_permission.py:24 xpack/plugins/cloud/models.py:99
+#: perms/serializers/user_permission.py:25 xpack/plugins/cloud/models.py:99
 msgid "Protocols"
 msgstr "プロトコル"
 
@@ -1824,11 +1823,12 @@ msgstr "ファイル名"
 msgid "File transfer log"
 msgstr "ファイル転送ログ"
 
-#: audits/models.py:67
+#: audits/models.py:67 audits/serializers.py:84
 msgid "Resource Type"
 msgstr "リソースタイプ"
 
 #: audits/models.py:68 audits/models.py:71 audits/models.py:117
+#: audits/serializers.py:83
 msgid "Resource"
 msgstr "リソース"
 
@@ -1902,7 +1902,7 @@ msgstr "ユーザーログインログ"
 msgid "Reason display"
 msgstr "理由表示"
 
-#: audits/serializers.py:122
+#: audits/serializers.py:132
 #, python-format
 msgid "User %s %s this resource"
 msgstr "ユーザー %s %s が現在のリソースをサブスクライブしました。"
@@ -2013,11 +2013,6 @@ msgid "Forgot password"
 msgstr "パスワードを忘れた"
 
 #: authentication/apps.py:7 settings/serializers/auth/base.py:10
-#: settings/serializers/auth/cas.py:10 settings/serializers/auth/dingtalk.py:10
-#: settings/serializers/auth/feishu.py:10 settings/serializers/auth/ldap.py:39
-#: settings/serializers/auth/oauth2.py:18 settings/serializers/auth/oidc.py:12
-#: settings/serializers/auth/radius.py:13 settings/serializers/auth/saml2.py:11
-#: settings/serializers/auth/sso.py:10 settings/serializers/auth/wecom.py:10
 msgid "Authentication"
 msgstr "認証"
 
@@ -3127,15 +3122,15 @@ msgstr "特殊文字を含むべきではない"
 msgid "The mobile phone number format is incorrect"
 msgstr "携帯電話番号の形式が正しくありません"
 
-#: common/views/mixins.py:57
+#: common/views/mixins.py:58
 msgid "Export all"
 msgstr "すべてエクスポート"
 
-#: common/views/mixins.py:59
+#: common/views/mixins.py:60
 msgid "Export only selected items"
 msgstr "選択項目のみエクスポート"
 
-#: common/views/mixins.py:64
+#: common/views/mixins.py:65
 #, python-format
 msgid "Export filtered: %s"
 msgstr "検索のエクスポート: %s"
@@ -3369,7 +3364,7 @@ msgid "Date last run"
 msgstr "最終実行日"
 
 #: ops/models/base.py:51 ops/models/job.py:187
-#: xpack/plugins/cloud/models.py:170
+#: xpack/plugins/cloud/models.py:162
 msgid "Result"
 msgstr "結果"
 
@@ -4938,6 +4933,11 @@ msgstr ""
 "システムは、ログインIPアドレスが共通のログイン都市に属しているかどうかを判断"
 "します。アカウントが共通のログイン都市からログインしている場合、システムはリ"
 "モートログインリマインダーを送信します"
+
+#: settings/serializers/settings.py:69
+#, python-format
+msgid "[%s] %s"
+msgstr ""
 
 #: settings/serializers/terminal.py:9
 msgid "Hostname"
@@ -7328,31 +7328,31 @@ msgstr "デフォルトの復元に成功しました。"
 msgid "Interface settings"
 msgstr "インターフェイスの設定"
 
-#: xpack/plugins/interface/models.py:22
+#: xpack/plugins/interface/models.py:23
 msgid "Title of login page"
 msgstr "ログインページのタイトル"
 
-#: xpack/plugins/interface/models.py:26
+#: xpack/plugins/interface/models.py:27
 msgid "Image of login page"
 msgstr "ログインページのイメージ"
 
-#: xpack/plugins/interface/models.py:30
+#: xpack/plugins/interface/models.py:31
 msgid "Website icon"
 msgstr "ウェブサイトのアイコン"
 
-#: xpack/plugins/interface/models.py:34
+#: xpack/plugins/interface/models.py:35
 msgid "Logo of management page"
 msgstr "管理ページのロゴ"
 
-#: xpack/plugins/interface/models.py:38
+#: xpack/plugins/interface/models.py:39
 msgid "Logo of logout page"
 msgstr "ログアウトページのロゴ"
 
-#: xpack/plugins/interface/models.py:40
+#: xpack/plugins/interface/models.py:41
 msgid "Theme"
 msgstr "テーマ"
 
-#: xpack/plugins/interface/models.py:43 xpack/plugins/interface/models.py:84
+#: xpack/plugins/interface/models.py:44 xpack/plugins/interface/models.py:85
 msgid "Interface setting"
 msgstr "インターフェイスの設定"
 

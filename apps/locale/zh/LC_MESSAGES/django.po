@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-23 17:59+0800\n"
+"POT-Creation-Date: 2023-02-23 18:12+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -194,7 +194,7 @@ msgstr "来源"
 #: accounts/serializers/automations/change_secret.py:112
 #: accounts/serializers/automations/change_secret.py:132
 #: acls/models/base.py:102 acls/serializers/base.py:57
-#: assets/serializers/asset/common.py:125 assets/serializers/gateway.py:28
+#: assets/serializers/asset/common.py:124 assets/serializers/gateway.py:28
 #: audits/models.py:49 ops/models/base.py:18
 #: perms/models/asset_permission.py:70 perms/serializers/permission.py:32
 #: terminal/backends/command/models.py:21 terminal/models/session/session.py:34
@@ -445,7 +445,7 @@ msgstr "账号验证"
 #: assets/models/cmd_filter.py:21 assets/models/domain.py:18
 #: assets/models/group.py:20 assets/models/label.py:18
 #: assets/models/platform.py:21 assets/models/platform.py:76
-#: assets/serializers/asset/common.py:68 assets/serializers/asset/common.py:142
+#: assets/serializers/asset/common.py:67 assets/serializers/asset/common.py:142
 #: assets/serializers/platform.py:91 assets/serializers/platform.py:136
 #: authentication/serializers/connect_token_secret.py:103 ops/mixin.py:21
 #: ops/models/adhoc.py:21 ops/models/celery.py:15 ops/models/celery.py:57
@@ -512,12 +512,12 @@ msgstr ""
 "密密码"
 
 #: accounts/serializers/account/account.py:65
-#: assets/serializers/asset/common.py:66 settings/serializers/auth/sms.py:75
+#: assets/serializers/asset/common.py:65 settings/serializers/auth/sms.py:75
 msgid "Template"
 msgstr "模板"
 
 #: accounts/serializers/account/account.py:68
-#: assets/serializers/asset/common.py:63
+#: assets/serializers/asset/common.py:62
 msgid "Push now"
 msgstr "立即推送"
 
@@ -528,9 +528,9 @@ msgstr "已托管密码"
 
 #: accounts/serializers/account/account.py:75 applications/models.py:11
 #: assets/models/label.py:21 assets/models/platform.py:77
-#: assets/serializers/asset/common.py:121 assets/serializers/cagegory.py:8
+#: assets/serializers/asset/common.py:120 assets/serializers/cagegory.py:8
 #: assets/serializers/platform.py:97 assets/serializers/platform.py:137
-#: perms/serializers/user_permission.py:25 settings/models.py:35
+#: perms/serializers/user_permission.py:26 settings/models.py:35
 #: tickets/models/ticket/apply_application.py:13
 msgid "Category"
 msgstr "类别"
@@ -540,10 +540,10 @@ msgstr "类别"
 #: acls/serializers/command_acl.py:18 applications/models.py:14
 #: assets/models/_user.py:50 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:78
-#: assets/serializers/asset/common.py:122 assets/serializers/platform.py:96
+#: assets/serializers/asset/common.py:121 assets/serializers/platform.py:96
 #: audits/serializers.py:48
 #: authentication/serializers/connect_token_secret.py:116 ops/models/job.py:102
-#: perms/serializers/user_permission.py:26 terminal/models/applet/applet.py:31
+#: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:31
 #: terminal/models/component/storage.py:57
 #: terminal/models/component/storage.py:146 terminal/serializers/applet.py:29
 #: terminal/serializers/session.py:22 terminal/serializers/storage.py:224
@@ -990,7 +990,7 @@ msgid "Device"
 msgstr "网络设备"
 
 #: assets/const/category.py:13 assets/models/asset/database.py:9
-#: assets/models/asset/database.py:24 assets/serializers/asset/common.py:109
+#: assets/models/asset/database.py:24 assets/serializers/asset/common.py:108
 msgid "Database"
 msgstr "数据库"
 
@@ -1033,13 +1033,12 @@ msgstr "网站"
 msgid "Disabled"
 msgstr "禁用"
 
-#: assets/const/web.py:60 settings/serializers/auth/base.py:10
-#: settings/serializers/basic.py:27
+#: assets/const/web.py:60 settings/serializers/basic.py:27
 msgid "Basic"
 msgstr "基本"
 
 #: assets/const/web.py:61 assets/models/asset/web.py:13
-#: assets/serializers/asset/common.py:117 assets/serializers/platform.py:40
+#: assets/serializers/asset/common.py:116 assets/serializers/platform.py:40
 msgid "Script"
 msgstr "脚本"
 
@@ -1174,14 +1173,14 @@ msgstr "地址"
 
 #: assets/models/asset/common.py:104 assets/models/platform.py:112
 #: authentication/serializers/connect_token_secret.py:108
-#: perms/serializers/user_permission.py:23
+#: perms/serializers/user_permission.py:24
 #: xpack/plugins/cloud/serializers/account_attrs.py:187
 msgid "Platform"
 msgstr "系统平台"
 
 #: assets/models/asset/common.py:106 assets/models/domain.py:21
 #: authentication/serializers/connect_token_secret.py:126
-#: perms/serializers/user_permission.py:27
+#: perms/serializers/user_permission.py:28
 msgid "Domain"
 msgstr "网域"
 
@@ -1205,7 +1204,7 @@ msgstr "可以匹配资产"
 msgid "Can change asset nodes"
 msgstr "可以修改资产节点"
 
-#: assets/models/asset/database.py:10 assets/serializers/asset/common.py:110
+#: assets/models/asset/database.py:10 assets/serializers/asset/common.py:109
 #: settings/serializers/email.py:37
 msgid "Use SSL"
 msgstr "使用 SSL"
@@ -1222,7 +1221,7 @@ msgstr "客户端证书"
 msgid "Client key"
 msgstr "客户端密钥"
 
-#: assets/models/asset/database.py:14 assets/serializers/asset/common.py:111
+#: assets/models/asset/database.py:14 assets/serializers/asset/common.py:110
 msgid "Allow invalid cert"
 msgstr "忽略证书校验"
 
@@ -1230,17 +1229,17 @@ msgstr "忽略证书校验"
 msgid "Autofill"
 msgstr "自动代填"
 
-#: assets/models/asset/web.py:10 assets/serializers/asset/common.py:114
+#: assets/models/asset/web.py:10 assets/serializers/asset/common.py:113
 #: assets/serializers/platform.py:32
 msgid "Username selector"
 msgstr "用户名选择器"
 
-#: assets/models/asset/web.py:11 assets/serializers/asset/common.py:115
+#: assets/models/asset/web.py:11 assets/serializers/asset/common.py:114
 #: assets/serializers/platform.py:35
 msgid "Password selector"
 msgstr "密码选择器"
 
-#: assets/models/asset/web.py:12 assets/serializers/asset/common.py:116
+#: assets/models/asset/web.py:12 assets/serializers/asset/common.py:115
 #: assets/serializers/platform.py:38
 msgid "Submit selector"
 msgstr "确认按钮选择器"
@@ -1348,7 +1347,7 @@ msgstr "系统"
 msgid "Value"
 msgstr "值"
 
-#: assets/models/label.py:40 assets/serializers/asset/common.py:123
+#: assets/models/label.py:40 assets/serializers/asset/common.py:122
 #: assets/serializers/cagegory.py:6 assets/serializers/cagegory.py:13
 #: authentication/serializers/connect_token_secret.py:114
 #: common/serializers/common.py:79 settings/serializers/sms.py:7
@@ -1388,7 +1387,7 @@ msgstr "可以匹配节点"
 msgid "Required"
 msgstr "必须的"
 
-#: assets/models/platform.py:23 settings/serializers/settings.py:61
+#: assets/models/platform.py:23 settings/serializers/settings.py:65
 #: users/templates/users/reset_password.html:29
 msgid "Setting"
 msgstr "设置"
@@ -1477,14 +1476,14 @@ msgstr "自动化"
 msgid "%(value)s is not an even number"
 msgstr "%(value)s is not an even number"
 
-#: assets/serializers/asset/common.py:113
+#: assets/serializers/asset/common.py:112
 msgid "Auto fill"
 msgstr "自动代填"
 
-#: assets/serializers/asset/common.py:124 assets/serializers/platform.py:99
+#: assets/serializers/asset/common.py:123 assets/serializers/platform.py:99
 #: authentication/serializers/connect_token_secret.py:28
 #: authentication/serializers/connect_token_secret.py:66
-#: perms/serializers/user_permission.py:24 xpack/plugins/cloud/models.py:99
+#: perms/serializers/user_permission.py:25 xpack/plugins/cloud/models.py:99
 msgid "Protocols"
 msgstr "协议组"
 
@@ -1814,11 +1813,12 @@ msgstr "文件名"
 msgid "File transfer log"
 msgstr "文件管理"
 
-#: audits/models.py:67
+#: audits/models.py:67 audits/serializers.py:84
 msgid "Resource Type"
 msgstr "资源类型"
 
 #: audits/models.py:68 audits/models.py:71 audits/models.py:117
+#: audits/serializers.py:83
 msgid "Resource"
 msgstr "资源"
 
@@ -1892,7 +1892,7 @@ msgstr "用户登录日志"
 msgid "Reason display"
 msgstr "原因描述"
 
-#: audits/serializers.py:122
+#: audits/serializers.py:132
 #, python-format
 msgid "User %s %s this resource"
 msgstr "用户 %s %s 了当前资源"
@@ -2001,11 +2001,6 @@ msgid "Forgot password"
 msgstr "忘记密码"
 
 #: authentication/apps.py:7 settings/serializers/auth/base.py:10
-#: settings/serializers/auth/cas.py:10 settings/serializers/auth/dingtalk.py:10
-#: settings/serializers/auth/feishu.py:10 settings/serializers/auth/ldap.py:39
-#: settings/serializers/auth/oauth2.py:18 settings/serializers/auth/oidc.py:12
-#: settings/serializers/auth/radius.py:13 settings/serializers/auth/saml2.py:11
-#: settings/serializers/auth/sso.py:10 settings/serializers/auth/wecom.py:10
 msgid "Authentication"
 msgstr "认证"
 
@@ -3097,15 +3092,15 @@ msgstr "不能包含特殊字符"
 msgid "The mobile phone number format is incorrect"
 msgstr "手机号格式不正确"
 
-#: common/views/mixins.py:57
+#: common/views/mixins.py:58
 msgid "Export all"
 msgstr "导出所有"
 
-#: common/views/mixins.py:59
+#: common/views/mixins.py:60
 msgid "Export only selected items"
 msgstr "仅导出选择项"
 
-#: common/views/mixins.py:64
+#: common/views/mixins.py:65
 #, python-format
 msgid "Export filtered: %s"
 msgstr "导出搜素: %s"
@@ -3334,7 +3329,7 @@ msgid "Date last run"
 msgstr "最后运行日期"
 
 #: ops/models/base.py:51 ops/models/job.py:187
-#: xpack/plugins/cloud/models.py:170
+#: xpack/plugins/cloud/models.py:162
 msgid "Result"
 msgstr "结果"
 
@@ -4879,6 +4874,11 @@ msgid ""
 msgstr ""
 "根据登录 IP 是否所属常用登录城市进行判断，若账号在非常用城市登录，会发送异地"
 "登录提醒"
+
+#: settings/serializers/settings.py:69
+#, python-format
+msgid "[%s] %s"
+msgstr ""
 
 #: settings/serializers/terminal.py:9
 msgid "Hostname"
@@ -7233,31 +7233,31 @@ msgstr "恢复默认成功！"
 msgid "Interface settings"
 msgstr "界面设置"
 
-#: xpack/plugins/interface/models.py:22
+#: xpack/plugins/interface/models.py:23
 msgid "Title of login page"
 msgstr "登录页面标题"
 
-#: xpack/plugins/interface/models.py:26
+#: xpack/plugins/interface/models.py:27
 msgid "Image of login page"
 msgstr "登录页面图片"
 
-#: xpack/plugins/interface/models.py:30
+#: xpack/plugins/interface/models.py:31
 msgid "Website icon"
 msgstr "网站图标"
 
-#: xpack/plugins/interface/models.py:34
+#: xpack/plugins/interface/models.py:35
 msgid "Logo of management page"
 msgstr "管理页面logo"
 
-#: xpack/plugins/interface/models.py:38
+#: xpack/plugins/interface/models.py:39
 msgid "Logo of logout page"
 msgstr "退出页面logo"
 
-#: xpack/plugins/interface/models.py:40
+#: xpack/plugins/interface/models.py:41
 msgid "Theme"
 msgstr "主题"
 
-#: xpack/plugins/interface/models.py:43 xpack/plugins/interface/models.py:84
+#: xpack/plugins/interface/models.py:44 xpack/plugins/interface/models.py:85
 msgid "Interface setting"
 msgstr "界面设置"
 
