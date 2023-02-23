@@ -173,6 +173,10 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
         ordering = ['date_created']
 
 
+zombie_task_exception = Exception(
+    'This task has been marked as a zombie task because it has not updated its status for too long')
+
+
 class JobExecution(JMSOrgBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     task_id = models.UUIDField(null=True)
@@ -192,13 +196,12 @@ class JobExecution(JMSOrgBaseModel):
                                 verbose_name=_("Material Type"))
 
     # clean up zombie execution
+
     @classmethod
     def clean_zombie_execution(cls):
         for execution in cls.objects.filter(status__in=[JobStatus.running]).all():
             if execution.date_created < timezone.now() - timedelta(minutes=30):
-                execution.set_error(Exception('This task has been marked as a'
-                                              ' zombie task because it has not updated '
-                                              'its status for too long'))
+                execution.set_error(zombie_task_exception)
 
     @property
     def current_job(self):
