@@ -1,7 +1,9 @@
 # coding: utf-8
 from django.core.cache import cache
-from django.utils.translation import ugettext_lazy as _
+from django.utils import translation
+from django.utils.translation import gettext_noop, ugettext_lazy as _
 
+from common.utils import i18n_fmt
 from .basic import BasicSettingSerializer
 from .other import OtherSettingSerializer
 from .email import EmailSettingSerializer, EmailContentSettingSerializer
@@ -55,13 +57,16 @@ class SettingsSerializer(
 
     # 单次计算量不大，搞个缓存，以防操作日志大量写入时，这里影响性能
     def get_field_label(self, field_name):
+        self.fields_label_mapping = cache.get(self.CACHE_KEY, None)
         if self.fields_label_mapping is None:
             self.fields_label_mapping = {}
-            for subclass in SettingsSerializer.__bases__:
-                prefix = getattr(subclass, 'PREFIX_TITLE', _('Setting'))
-                fields = subclass().get_fields()
-                for name, item in fields.items():
-                    label = '[%s] %s' % (prefix, getattr(item, 'label', ''))
-                    self.fields_label_mapping[name] = label
+            with translation.override('en'):
+                for subclass in SettingsSerializer.__bases__:
+                    prefix = getattr(subclass, 'PREFIX_TITLE', _('Setting'))
+                    fields = subclass().get_fields()
+                    for name, item in fields.items():
+                        label = getattr(item, 'label', '')
+                        detail = i18n_fmt(gettext_noop('[%s] %s'), prefix, label)
+                        self.fields_label_mapping[name] = detail
             cache.set(self.CACHE_KEY, self.fields_label_mapping, 3600 * 24)
         return self.fields_label_mapping.get(field_name)
