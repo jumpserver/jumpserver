@@ -11,7 +11,6 @@ from accounts.serializers import AccountSerializerCreateValidateMixin
 from accounts.serializers import AuthValidateMixin
 from common.serializers import WritableNestedModelSerializer, SecretReadableMixin, CommonModelSerializer
 from common.serializers.fields import LabeledChoiceField
-from common.utils import lazyproperty
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ...const import Category, AllTypes
 from ...models import Asset, Node, Platform, Label, Protocol
@@ -205,7 +204,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
             nodes_to_set.append(node)
         instance.nodes.set(nodes_to_set)
 
-    @lazyproperty
+    @property
     def _initial_data_platform(self):
         if self.instance:
             return self.instance.platform

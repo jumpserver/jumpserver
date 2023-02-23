@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
+from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
@@ -32,8 +33,17 @@ class AssetPermedSerializer(OrgResourceModelSerializerMixin):
             "id", "name", "address", 'domain', 'platform',
             "comment", "org_id", "is_active",
         ]
-        fields = only_fields + ['protocols', 'category', 'type', 'spec_info'] + ['org_name']
+        fields = only_fields + ['protocols', 'category', 'type'] + ['org_name']
         read_only_fields = fields
+
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        """ Perform necessary eager loading of data. """
+        queryset = queryset.prefetch_related('domain', 'nodes', 'labels') \
+            .prefetch_related('platform', 'protocols') \
+            .annotate(category=F("platform__category")) \
+            .annotate(type=F("platform__type"))
+        return queryset
 
 
 class NodePermedSerializer(serializers.ModelSerializer):
