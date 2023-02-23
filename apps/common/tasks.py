@@ -10,11 +10,11 @@ from .utils import get_logger
 logger = get_logger(__file__)
 
 
-def task_activity_callback(self, subject, message, from_email, recipient_list, **kwargs):
+def task_activity_callback(self, subject, message, recipient_list, **kwargs):
     from users.models import User
     email_list = recipient_list
     resource_ids = list(User.objects.filter(email__in=email_list).values_list('id', flat=True))
-    return resource_ids
+    return resource_ids,
 
 
 @shared_task(verbose_name=_("Send email"), activity_callback=task_activity_callback)

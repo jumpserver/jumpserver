@@ -57,8 +57,8 @@ class ActivityLogHandler:
         resource_ids, org_id, user = data + ('',) * (3 - len(data))
         if not user:
             user = str(current_request.user) if current_request else 'System'
-        if org_id is None:
-            org_id = current_org.org_id
+        if not org_id:
+            org_id = current_org.id
         task_display = getattr(task, 'verbose_name', _('Unknown'))
         detail = i18n_fmt(
             gettext_noop('User %s perform a task for this resource: %s'),
