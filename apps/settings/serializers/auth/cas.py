@@ -7,7 +7,7 @@ __all__ = [
 
 
 class CASSettingSerializer(serializers.Serializer):
-    PREFIX_TITLE = '%s-%s' % (_('Authentication'), _('CAS'))
+    PREFIX_TITLE = _('CAS')
 
     AUTH_CAS = serializers.BooleanField(required=False, label=_('Enable CAS Auth'))
     CAS_SERVER_URL = serializers.CharField(required=False, max_length=1024, label=_('Server url'))
