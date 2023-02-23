@@ -1,13 +1,12 @@
 #!/usr/bin/python
-import os
 from typing import Callable
+
+from django.apps import apps
+from django.conf import settings
+from django.db.models import F
+from django.utils.translation import gettext_lazy as _, gettext, get_language
 from treelib import Tree
 from treelib.exceptions import NodeIDAbsentError
-
-from django.utils.translation import gettext_lazy as _, gettext, get_language
-from django.conf import settings
-from django.apps import apps
-from django.db.models import F, Count
 
 from common.tree import TreeNode
 from .models import Permission, ContentType
@@ -77,6 +76,7 @@ special_pid_mapper = {
     "accounts.pushaccountautomation": "push_account_node",
     "accounts.view_pushaccountexecution": "push_account_node",
     "accounts.add_pushaccountexecution": "push_account_node",
+    "accounts.gatheredaccount": "gather_account_node",
     "accounts.gatheraccountsautomation": "gather_account_node",
     "accounts.view_gatheraccountsexecution": "gather_account_node",
     "accounts.add_gatheraccountsexecution": "gather_account_node",
