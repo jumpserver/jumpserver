@@ -27,7 +27,7 @@ JumpServer 是广受欢迎的开源堡垒机，是符合 4A 规范的专业运�
 
 ## UI 展示
 
-![UI展示](https://www.jumpserver.org/images/screenshot/1.png)
+![UI展示](https://docs.jumpserver.org/zh/v3/img/dashboard.png)
 
 ## 在线体验
 
@@ -41,8 +41,7 @@ JumpServer 是广受欢迎的开源堡垒机，是符合 4A 规范的专业运�
 
 ## 快速开始
 
-- [极速安装](https://docs.jumpserver.org/zh/master/install/setup_by_fast/)
-- [手动安装](https://github.com/jumpserver/installer)
+- [快速入门](https://docs.jumpserver.org/zh/v3/quick_start/)
 - [产品文档](https://docs.jumpserver.org)
 - [知识库](https://kb.fit2cloud.com/categories/jumpserver)
 
