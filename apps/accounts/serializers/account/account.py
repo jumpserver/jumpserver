@@ -119,7 +119,7 @@ class AccountSerializer(AccountSerializerCreateMixin, BaseAccountSerializer):
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
         queryset = queryset \
-            .prefetch_related('asset', 'asset__platform')
+            .prefetch_related('asset', 'asset__platform', 'asset__platform__automation')
         return queryset
 
 
