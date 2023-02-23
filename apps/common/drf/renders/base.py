@@ -75,6 +75,8 @@ class BaseFileRenderer(BaseRenderer):
                 value = item.get(field.field_name)
                 if value is None:
                     value = ''
+                elif isinstance(value, dict):
+                    value = json.dumps(value, ensure_ascii=False)
                 else:
                     value = str(value)
                 row.append(value)

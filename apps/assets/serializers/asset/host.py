@@ -25,7 +25,7 @@ class HostInfoSerializer(serializers.Serializer):
 
 
 class HostSerializer(AssetSerializer):
-    info = HostInfoSerializer(required=False)
+    info = HostInfoSerializer(required=False, label=_('Info'))
 
     class Meta(AssetSerializer.Meta):
         model = Host
