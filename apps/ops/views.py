@@ -13,7 +13,7 @@ class CeleryTaskLogView(PermissionsMixin, TemplateView):
     template_name = 'ops/celery_task_log.html'
     permission_classes = [RBACPermission]
     rbac_perms = {
-        'GET': 'ops.view_tasklog'
+        'GET': 'ops.view_celerytask'
     }
 
     def get_context_data(self, **kwargs):
