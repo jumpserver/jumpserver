@@ -139,6 +139,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
         extra_kwargs = {
+            'auto_info': {'label': _('Auto info')},
             'name': {'label': _("Name")},
             'address': {'label': _('Address')},
             'nodes_display': {'label': _('Node path')},

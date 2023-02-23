@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-23 18:12+0800\n"
+"POT-Creation-Date: 2023-02-23 19:11+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -164,7 +164,7 @@ msgstr "仅创建"
 #: accounts/serializers/automations/change_secret.py:111
 #: accounts/serializers/automations/change_secret.py:131
 #: acls/models/base.py:100 acls/serializers/base.py:56
-#: assets/models/asset/common.py:92 assets/models/asset/common.py:279
+#: assets/models/asset/common.py:92 assets/models/asset/common.py:280
 #: assets/models/cmd_filter.py:36 assets/serializers/domain.py:19
 #: assets/serializers/label.py:27 audits/models.py:48
 #: authentication/models/connection_token.py:33
@@ -445,7 +445,7 @@ msgstr "账号验证"
 #: assets/models/cmd_filter.py:21 assets/models/domain.py:18
 #: assets/models/group.py:20 assets/models/label.py:18
 #: assets/models/platform.py:21 assets/models/platform.py:76
-#: assets/serializers/asset/common.py:67 assets/serializers/asset/common.py:142
+#: assets/serializers/asset/common.py:67 assets/serializers/asset/common.py:143
 #: assets/serializers/platform.py:91 assets/serializers/platform.py:136
 #: authentication/serializers/connect_token_secret.py:103 ops/mixin.py:21
 #: ops/models/adhoc.py:21 ops/models/celery.py:15 ops/models/celery.py:57
@@ -588,7 +588,7 @@ msgid "Key password"
 msgstr "密钥密码"
 
 #: accounts/serializers/account/base.py:79
-#: assets/serializers/asset/common.py:290
+#: assets/serializers/asset/common.py:291
 msgid "Spec info"
 msgstr "特殊信息"
 
@@ -1167,7 +1167,7 @@ msgstr "云服务"
 msgid "Port"
 msgstr "端口"
 
-#: assets/models/asset/common.py:103 assets/serializers/asset/common.py:143
+#: assets/models/asset/common.py:103 assets/serializers/asset/common.py:144
 msgid "Address"
 msgstr "地址"
 
@@ -1188,19 +1188,19 @@ msgstr "网域"
 msgid "Labels"
 msgstr "标签管理"
 
-#: assets/models/asset/common.py:282
+#: assets/models/asset/common.py:283
 msgid "Can refresh asset hardware info"
 msgstr "可以更新资产硬件信息"
 
-#: assets/models/asset/common.py:283
+#: assets/models/asset/common.py:284
 msgid "Can test asset connectivity"
 msgstr "可以测试资产连接性"
 
-#: assets/models/asset/common.py:284
+#: assets/models/asset/common.py:285
 msgid "Can match asset"
 msgstr "可以匹配资产"
 
-#: assets/models/asset/common.py:285
+#: assets/models/asset/common.py:286
 msgid "Can change asset nodes"
 msgstr "可以修改资产节点"
 
@@ -1245,7 +1245,7 @@ msgid "Submit selector"
 msgstr "确认按钮选择器"
 
 #: assets/models/automations/base.py:17 assets/models/cmd_filter.py:38
-#: assets/serializers/asset/common.py:289 rbac/tree.py:35
+#: assets/serializers/asset/common.py:290 rbac/tree.py:35
 msgid "Accounts"
 msgstr "账号管理"
 
@@ -1487,25 +1487,26 @@ msgstr "自动代填"
 msgid "Protocols"
 msgstr "协议组"
 
-#: assets/serializers/asset/common.py:144
+#: assets/serializers/asset/common.py:142
+#: assets/serializers/asset/common.py:292
+msgid "Auto info"
+msgstr "自动化信息"
+
+#: assets/serializers/asset/common.py:145
 msgid "Node path"
 msgstr "节点路径"
 
-#: assets/serializers/asset/common.py:217
+#: assets/serializers/asset/common.py:218
 msgid "Platform not exist"
 msgstr "平台不存在"
 
-#: assets/serializers/asset/common.py:252
+#: assets/serializers/asset/common.py:253
 msgid "port out of range (1-65535)"
 msgstr "端口超出范围 (1-65535)"
 
-#: assets/serializers/asset/common.py:259
+#: assets/serializers/asset/common.py:260
 msgid "Protocol is required: {}"
 msgstr "协议是必填的: {}"
-
-#: assets/serializers/asset/common.py:291
-msgid "Auto info"
-msgstr "自动化信息"
 
 #: assets/serializers/asset/database.py:25 common/serializers/fields.py:100
 #: tickets/serializers/ticket/common.py:58
@@ -1563,6 +1564,10 @@ msgstr "系统版本"
 #: assets/serializers/asset/host.py:24
 msgid "OS arch"
 msgstr "系统架构"
+
+#: assets/serializers/asset/host.py:28
+msgid "Info"
+msgstr "信息"
 
 #: assets/serializers/cagegory.py:9
 msgid "Constraints"
