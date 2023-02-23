@@ -81,7 +81,7 @@ class OperateLogActionDetailSerializer(serializers.ModelSerializer):
 class OperateLogSerializer(serializers.ModelSerializer):
     action = LabeledChoiceField(choices=ActionChoices.choices, label=_("Action"))
     resource = serializers.SerializerMethodField(label=_("Resource"))
-    resource_type = serializers.SerializerMethodField(label=_('Resource'))
+    resource_type = serializers.SerializerMethodField(label=_('Resource Type'))
 
     class Meta:
         model = models.OperateLog
