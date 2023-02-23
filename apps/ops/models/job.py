@@ -3,6 +3,7 @@ import logging
 import os
 import uuid
 from collections import defaultdict
+from datetime import timedelta
 
 from celery import current_task
 from django.conf import settings
@@ -189,6 +190,15 @@ class JobExecution(JMSOrgBaseModel):
     material = models.CharField(max_length=1024, default='', verbose_name=_('Material'), null=True, blank=True)
     job_type = models.CharField(max_length=128, choices=Types.choices, default=Types.adhoc,
                                 verbose_name=_("Material Type"))
+
+    # clean up zombie execution
+    @classmethod
+    def clean_zombie_execution(cls):
+        for execution in cls.objects.filter(status__in=[JobStatus.running]).all():
+            if execution.date_created < timezone.now() - timedelta(minutes=30):
+                execution.set_error(Exception('This task has been marked as a'
+                                              ' zombie task because it has not updated '
+                                              'its status for too long'))
 
     @property
     def current_job(self):
