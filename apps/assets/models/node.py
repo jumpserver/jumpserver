@@ -489,7 +489,7 @@ class SomeNodesMixin:
             return cls.default_node()
 
         if ori_org and ori_org.is_root():
-            return None
+            return cls.default_node()
 
         org_roots = cls.org_root_nodes()
         org_roots_length = len(org_roots)
