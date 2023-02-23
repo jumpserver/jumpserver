@@ -29,13 +29,12 @@ class BaseUserPermedAssetsApi(SelfOrPKUserMixin, ListAPIView):
     ordering_fields = ("name", "address")
     filterset_class = AssetFilterSet
     serializer_class = serializers.AssetPermedSerializer
-    only_fields = serializers.AssetPermedSerializer.Meta.only_fields
 
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return Asset.objects.none()
         assets = self.get_assets()
-        assets = assets.prefetch_related('platform').only(*self.only_fields)
+        assets = self.serializer_class.setup_eager_loading(assets)
         return assets
 
     @abc.abstractmethod
