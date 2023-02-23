@@ -80,6 +80,8 @@ class OperateLogActionDetailSerializer(serializers.ModelSerializer):
 
 class OperateLogSerializer(serializers.ModelSerializer):
     action = LabeledChoiceField(choices=ActionChoices.choices, label=_("Action"))
+    resource = serializers.SerializerMethodField(label=_("Resource"))
+    resource_type = serializers.SerializerMethodField(label=_('Resource'))
 
     class Meta:
         model = models.OperateLog
@@ -90,6 +92,14 @@ class OperateLogSerializer(serializers.ModelSerializer):
             "org_id",
         ]
         fields = fields_small
+
+    @staticmethod
+    def get_resource_type(instance):
+        return _(instance.resource_type)
+
+    @staticmethod
+    def get_resource(instance):
+        return i18n_trans(instance.resource)
 
 
 class PasswordChangeLogSerializer(serializers.ModelSerializer):

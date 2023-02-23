@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.http.response import JsonResponse
@@ -66,8 +67,9 @@ class RecordViewLogMixin:
 
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
-        resource_display = self.get_resource_display(request)
-        resource_type = self.model._meta.verbose_name
+        with translation.override('en'):
+            resource_display = self.get_resource_display(request)
+            resource_type = self.model._meta.verbose_name
         create_or_update_operate_log(
             self.ACTION, resource_type, force=True,
             resource_display=resource_display
@@ -76,8 +78,9 @@ class RecordViewLogMixin:
 
     def retrieve(self, request, *args, **kwargs):
         response = super().retrieve(request, *args, **kwargs)
-        resource_type = self.model._meta.verbose_name
-        create_or_update_operate_log(
-            self.ACTION, resource_type, force=True, resource=self.get_object()
-        )
+        with translation.override('en'):
+            resource_type = self.model._meta.verbose_name
+            create_or_update_operate_log(
+                self.ACTION, resource_type, force=True, resource=self.get_object()
+            )
         return response

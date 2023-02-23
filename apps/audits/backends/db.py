@@ -51,7 +51,7 @@ class OperateLogStore(object):
         for k, v in raw_diff.items():
             before, after = v.split(cls.SEP, 1)
             diff_list.append({
-                'field': k,
+                'field': _(k),
                 'before': before if before else _('empty'),
                 'after': after if after else _('empty'),
             })
