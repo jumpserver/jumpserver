@@ -9,7 +9,7 @@ import yaml
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext as _
-from sshtunnel import SSHTunnelForwarder
+from sshtunnel import SSHTunnelForwarder, BaseSSHTunnelForwarderError
 
 from assets.automations.methods import platform_automation_methods
 from common.utils import get_logger, lazyproperty
@@ -229,7 +229,7 @@ class BasePlaybookManager:
 
     def local_gateway_prepare(self, runner):
         info = self.file_to_json(runner.inventory)
-        servers = []
+        servers, not_valid = [], []
         for k, host in info['all']['hosts'].items():
             jms_asset, jms_gateway = host['jms_asset'], host.get('gateway')
             if not jms_gateway:
@@ -240,10 +240,20 @@ class BasePlaybookManager:
                 ssh_password=jms_gateway['secret'],
                 remote_bind_address=(jms_asset['address'], jms_asset['port'])
             )
-            server.start()
-            jms_asset['address'] = '127.0.0.1'
-            jms_asset['port'] = server.local_bind_port
-            servers.append(server)
+            try:
+                server.start()
+            except BaseSSHTunnelForwarderError:
+                err_msg = 'Gateway is not active: %s' % jms_asset.get('name', '')
+                print('\033[31m %s \033[0m\n' % err_msg)
+                not_valid.append(k)
+            else:
+                jms_asset['address'] = '127.0.0.1'
+                jms_asset['port'] = server.local_bind_port
+                servers.append(server)
+
+        # 网域不可连接的，就不继续执行此资源的后续任务了
+        for a in set(not_valid):
+            info['all']['hosts'].pop(a)
         self.json_to_file(runner.inventory, info)
         self.gateway_servers[runner.id] = servers
 
