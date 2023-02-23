@@ -198,7 +198,7 @@ class JobExecution(JMSOrgBaseModel):
     # clean up zombie execution
 
     @classmethod
-    def clean_zombie_execution(cls):
+    def clean_unexpected_execution(cls):
         for execution in cls.objects.filter(status__in=[JobStatus.running]).all():
             if execution.date_created < timezone.now() - timedelta(minutes=30):
                 execution.set_error(zombie_task_exception)

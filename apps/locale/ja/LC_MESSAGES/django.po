@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-23 15:21+0800\n"
+"POT-Creation-Date: 2023-02-23 16:29+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -249,7 +249,7 @@ msgstr "アカウントバックアップ計画"
 
 #: accounts/models/automations/backup_account.py:83
 #: assets/models/automations/base.py:114 audits/models.py:55
-#: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:187
+#: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:191
 #: perms/models/asset_permission.py:72 terminal/models/applet/host.py:109
 #: terminal/models/session/session.py:45
 #: tickets/models/ticket/apply_application.py:30
@@ -371,7 +371,7 @@ msgstr "開始日"
 
 #: accounts/models/automations/change_secret.py:74
 #: assets/models/automations/base.py:115 ops/models/base.py:56
-#: ops/models/celery.py:64 ops/models/job.py:188
+#: ops/models/celery.py:64 ops/models/job.py:192
 #: terminal/models/applet/host.py:110
 msgid "Date finished"
 msgstr "終了日"
@@ -1078,7 +1078,7 @@ msgstr "コメント"
 
 #: assets/models/_user.py:28 assets/models/automations/base.py:113
 #: assets/models/cmd_filter.py:41 assets/models/group.py:22
-#: common/db/models.py:35 ops/models/base.py:54 ops/models/job.py:186
+#: common/db/models.py:35 ops/models/base.py:54 ops/models/job.py:190
 #: users/models/user.py:943
 msgid "Date created"
 msgstr "作成された日付"
@@ -1267,7 +1267,7 @@ msgid "Asset automation task"
 msgstr "アセットの自動化タスク"
 
 #: assets/models/automations/base.py:112 audits/models.py:177
-#: audits/serializers.py:49 ops/models/base.py:49 ops/models/job.py:179
+#: audits/serializers.py:49 ops/models/base.py:49 ops/models/job.py:183
 #: terminal/models/applet/applet.py:157 terminal/models/applet/host.py:108
 #: terminal/models/component/status.py:27 terminal/serializers/applet.py:18
 #: terminal/serializers/applet_host.py:93 tickets/models/ticket/general.py:283
@@ -3350,7 +3350,7 @@ msgid "Args"
 msgstr "アルグ"
 
 #: ops/models/adhoc.py:26 ops/models/base.py:16 ops/models/base.py:53
-#: ops/models/job.py:103 ops/models/job.py:185 ops/models/playbook.py:25
+#: ops/models/job.py:103 ops/models/job.py:189 ops/models/playbook.py:25
 #: terminal/models/session/sharing.py:23
 msgid "Creator"
 msgstr "作成者"
@@ -3367,12 +3367,12 @@ msgstr "最後の実行"
 msgid "Date last run"
 msgstr "最終実行日"
 
-#: ops/models/base.py:51 ops/models/job.py:183
+#: ops/models/base.py:51 ops/models/job.py:187
 #: xpack/plugins/cloud/models.py:170
 msgid "Result"
 msgstr "結果"
 
-#: ops/models/base.py:52 ops/models/job.py:184
+#: ops/models/base.py:52 ops/models/job.py:188
 msgid "Summary"
 msgstr "概要"
 
@@ -3440,19 +3440,19 @@ msgstr "ユーザー ポリシー"
 msgid "Job"
 msgstr "ジョブ＃ジョブ＃"
 
-#: ops/models/job.py:182
+#: ops/models/job.py:186
 msgid "Parameters"
 msgstr "パラメータ"
 
-#: ops/models/job.py:190
+#: ops/models/job.py:194
 msgid "Material"
 msgstr ""
 
-#: ops/models/job.py:192
+#: ops/models/job.py:196
 msgid "Material Type"
 msgstr ""
 
-#: ops/models/job.py:452
+#: ops/models/job.py:455
 msgid "Job Execution"
 msgstr "ジョブ実行"
 
@@ -3529,8 +3529,8 @@ msgid "Periodic check service performance"
 msgstr "サービスのパフォーマンスを定期的に確認する"
 
 #: ops/tasks.py:114
-msgid "Clean up zombie jobs"
-msgstr "ゾンビの宿題を片付ける"
+msgid "Clean up unexpected jobs"
+msgstr "例外ジョブのクリーンアップ"
 
 #: ops/templates/ops/celery_task_log.html:4
 msgid "Task log"

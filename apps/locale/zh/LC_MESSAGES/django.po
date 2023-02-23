@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-23 15:21+0800\n"
+"POT-Creation-Date: 2023-02-23 16:29+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -248,7 +248,7 @@ msgstr "账号备份计划"
 
 #: accounts/models/automations/backup_account.py:83
 #: assets/models/automations/base.py:114 audits/models.py:55
-#: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:187
+#: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:191
 #: perms/models/asset_permission.py:72 terminal/models/applet/host.py:109
 #: terminal/models/session/session.py:45
 #: tickets/models/ticket/apply_application.py:30
@@ -370,7 +370,7 @@ msgstr "开始日期"
 
 #: accounts/models/automations/change_secret.py:74
 #: assets/models/automations/base.py:115 ops/models/base.py:56
-#: ops/models/celery.py:64 ops/models/job.py:188
+#: ops/models/celery.py:64 ops/models/job.py:192
 #: terminal/models/applet/host.py:110
 msgid "Date finished"
 msgstr "结束日期"
@@ -1070,7 +1070,7 @@ msgstr "备注"
 
 #: assets/models/_user.py:28 assets/models/automations/base.py:113
 #: assets/models/cmd_filter.py:41 assets/models/group.py:22
-#: common/db/models.py:35 ops/models/base.py:54 ops/models/job.py:186
+#: common/db/models.py:35 ops/models/base.py:54 ops/models/job.py:190
 #: users/models/user.py:943
 msgid "Date created"
 msgstr "创建日期"
@@ -1259,7 +1259,7 @@ msgid "Asset automation task"
 msgstr "资产自动化任务"
 
 #: assets/models/automations/base.py:112 audits/models.py:177
-#: audits/serializers.py:49 ops/models/base.py:49 ops/models/job.py:179
+#: audits/serializers.py:49 ops/models/base.py:49 ops/models/job.py:183
 #: terminal/models/applet/applet.py:157 terminal/models/applet/host.py:108
 #: terminal/models/component/status.py:27 terminal/serializers/applet.py:18
 #: terminal/serializers/applet_host.py:93 tickets/models/ticket/general.py:283
@@ -3315,7 +3315,7 @@ msgid "Args"
 msgstr "参数"
 
 #: ops/models/adhoc.py:26 ops/models/base.py:16 ops/models/base.py:53
-#: ops/models/job.py:103 ops/models/job.py:185 ops/models/playbook.py:25
+#: ops/models/job.py:103 ops/models/job.py:189 ops/models/playbook.py:25
 #: terminal/models/session/sharing.py:23
 msgid "Creator"
 msgstr "创建者"
@@ -3332,12 +3332,12 @@ msgstr "最后执行"
 msgid "Date last run"
 msgstr "最后运行日期"
 
-#: ops/models/base.py:51 ops/models/job.py:183
+#: ops/models/base.py:51 ops/models/job.py:187
 #: xpack/plugins/cloud/models.py:170
 msgid "Result"
 msgstr "结果"
 
-#: ops/models/base.py:52 ops/models/job.py:184
+#: ops/models/base.py:52 ops/models/job.py:188
 msgid "Summary"
 msgstr "汇总"
 
@@ -3405,19 +3405,19 @@ msgstr "用户策略"
 msgid "Job"
 msgstr "作业"
 
-#: ops/models/job.py:182
+#: ops/models/job.py:186
 msgid "Parameters"
 msgstr "参数"
 
-#: ops/models/job.py:190
+#: ops/models/job.py:194
 msgid "Material"
 msgstr ""
 
-#: ops/models/job.py:192
+#: ops/models/job.py:196
 msgid "Material Type"
 msgstr ""
 
-#: ops/models/job.py:452
+#: ops/models/job.py:455
 msgid "Job Execution"
 msgstr "作业执行"
 
@@ -3494,8 +3494,8 @@ msgid "Periodic check service performance"
 msgstr "周期检测服务性能"
 
 #: ops/tasks.py:114
-msgid "Clean up zombie jobs"
-msgstr "清理僵尸作业"
+msgid "Clean up unexpected jobs"
+msgstr "清理异常作业"
 
 #: ops/templates/ops/celery_task_log.html:4
 msgid "Task log"

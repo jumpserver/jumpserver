@@ -111,8 +111,8 @@ def check_server_performance_period():
     ServerPerformanceCheckUtil().check_and_publish()
 
 
-@shared_task(verbose_name=_("Clean up zombie jobs"))
+@shared_task(verbose_name=_("Clean up unexpected jobs"))
 @register_as_period_task(interval=600)
-def clean_up_zombie_jobs():
+def clean_up_unexpected_jobs():
     with tmp_to_root_org():
-        JobExecution.clean_zombie_execution()
+        JobExecution.clean_unexpected_execution()
