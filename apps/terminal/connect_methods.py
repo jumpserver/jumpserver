@@ -148,7 +148,7 @@ class AppletMethod:
 
 
 class ConnectMethodUtil:
-    _all_methods = None
+    _all_methods = {}
 
     @classmethod
     def protocols(cls):
@@ -210,7 +210,7 @@ class ConnectMethodUtil:
 
     @classmethod
     def refresh_methods(cls):
-        cls._all_methods = None
+        cls._all_methods = {}
 
     @classmethod
     def get_filtered_protocols_connect_methods(cls, os):
@@ -245,8 +245,8 @@ class ConnectMethodUtil:
 
     @classmethod
     def get_protocols_connect_methods(cls, os):
-        if cls._all_methods is not None:
-            return cls._all_methods
+        if cls._all_methods.get('os'):
+            return cls._all_methods['os']
 
         methods = defaultdict(list)
         web_methods = WebMethod.get_methods()
@@ -298,5 +298,5 @@ class ConnectMethodUtil:
                 method['component'] = TerminalType.tinker.value
             methods[protocol].extend(applet_methods)
 
-        cls._all_methods = methods
+        cls._all_methods[os] = methods
         return methods
