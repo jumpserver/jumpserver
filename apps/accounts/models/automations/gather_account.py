@@ -1,10 +1,8 @@
-from django.utils.translation import ugettext_lazy as _
-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from orgs.mixins.models import JMSOrgBaseModel
 from accounts.const import AutomationTypes
+from orgs.mixins.models import JMSOrgBaseModel
 from .base import AccountBaseAutomation
 
 __all__ = ['GatherAccountsAutomation', 'GatheredAccount']
@@ -22,7 +20,7 @@ class GatheredAccount(JMSOrgBaseModel):
         return self.asset.address
 
     class Meta:
-        verbose_name = _('Gather account')
+        verbose_name = _('Gather account automation')
         unique_together = [
             ('username', 'asset'),
         ]
