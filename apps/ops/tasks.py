@@ -3,8 +3,10 @@
 from celery import shared_task
 from celery.exceptions import SoftTimeLimitExceeded
 from django.utils.translation import ugettext_lazy as _
+from django_celery_beat.models import PeriodicTask
 
 from common.utils import get_logger, get_object_or_none
+from ops.celery import app
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from .celery.decorator import (
     register_as_period_task, after_app_ready_start
@@ -19,7 +21,7 @@ from .notifications import ServerPerformanceCheckUtil
 logger = get_logger(__file__)
 
 
-def job_task_activity_callback(self, job_id, trigger):
+def job_task_activity_callback(self, job_id, *args, **kwargs):
     job = get_object_or_none(Job, id=job_id)
     if not job:
         return
@@ -48,7 +50,7 @@ def run_ops_job(job_id):
             logger.error("Start adhoc execution error: {}".format(e))
 
 
-def job_execution_task_activity_callback(self, execution_id, trigger):
+def job_execution_task_activity_callback(self, execution_id, *args, **kwargs):
     execution = get_object_or_none(JobExecution, id=execution_id)
     if not execution:
         return
@@ -78,16 +80,14 @@ def run_ops_job_execution(execution_id, **kwargs):
 @after_app_ready_start
 def clean_celery_periodic_tasks():
     """清除celery定时任务"""
-    need_cleaned_tasks = [
-        'handle_be_interrupted_change_auth_task_periodic',
-    ]
-    logger.info('Start clean celery periodic tasks: {}'.format(need_cleaned_tasks))
-    for task_name in need_cleaned_tasks:
-        logger.info('Start clean task: {}'.format(task_name))
-        task = get_celery_periodic_task(task_name)
-        if task is None:
-            logger.info('Task does not exist: {}'.format(task_name))
+    logger.info('Start clean celery periodic tasks.')
+    register_tasks = PeriodicTask.objects.all()
+    for task in register_tasks:
+        if task.task in app.tasks:
             continue
+
+        task_name = task.name
+        logger.info('Start clean task: {}'.format(task_name))
         disable_celery_periodic_task(task_name)
         delete_celery_periodic_task(task_name)
         task = get_celery_periodic_task(task_name)
