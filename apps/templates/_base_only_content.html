@@ -18,6 +18,10 @@
             margin: 0 auto;
             padding: 100px 20px 20px 20px;
         }
+
+        .ibox-content {
+            padding: 30px;
+        }
     </style>
     {% block custom_head_css_js %} {% endblock %}
 </head>
@@ -30,7 +34,7 @@
                     <h2 class="font-bold">
                         {% block title %}{% endblock %}
                     </h2>
-                    <div style="margin: 10px 0">
+                    <div style="margin: 20px 0 0 0">
                         {% block content %} {% endblock %}
                     </div>
                 </div>
