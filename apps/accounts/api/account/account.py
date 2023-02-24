@@ -30,6 +30,11 @@ class AccountViewSet(OrgBulkModelViewSet):
         'su_from_accounts': 'accounts.view_account',
     }
 
+    def list(self, request, *args, **kwargs):
+        from orgs.utils import current_org
+        print("Curent org: {}".format(current_org))
+        return super().list(request, *args, **kwargs)
+
     @action(methods=['get'], detail=False, url_path='su-from-accounts')
     def su_from_accounts(self, request, *args, **kwargs):
         account_id = request.query_params.get('account')

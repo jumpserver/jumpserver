@@ -2,6 +2,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from assets.api import AssetsTaskCreateApi
 from common.api import JMSBulkModelViewSet
 from common.permissions import IsServiceAccount
 from orgs.utils import tmp_to_builtin_org
@@ -12,7 +13,7 @@ from terminal.serializers import (
 )
 from terminal.tasks import run_applet_host_deployment, run_applet_host_deployment_install_applet
 
-__all__ = ['AppletHostViewSet', 'AppletHostDeploymentViewSet']
+__all__ = ['AppletHostViewSet', 'AppletHostDeploymentViewSet', 'AppletHostTaskCreateApi']
 
 
 class AppletHostViewSet(JMSBulkModelViewSet):
@@ -63,3 +64,7 @@ class AppletHostDeploymentViewSet(viewsets.ModelViewSet):
         task = run_applet_host_deployment_install_applet.delay(instance.id, applet_id)
         instance.save_task(task.id)
         return Response({'task': str(task.id)}, status=201)
+
+
+class AppletHostTaskCreateApi(AssetsTaskCreateApi):
+    pass

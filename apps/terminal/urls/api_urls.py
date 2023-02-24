@@ -2,10 +2,9 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.urls import path, re_path
+from django.urls import path
 from rest_framework_bulk.routes import BulkRouter
 
-from common import api as capi
 from .. import api
 
 app_name = 'terminal'
@@ -51,6 +50,7 @@ urlpatterns = [
     # components
     path('components/metrics/', api.ComponentsMetricsAPIView.as_view(), name='components-metrics'),
     path('components/connect-methods/', api.ConnectMethodListApi.as_view(), name='connect-methods'),
+    path('applet-hosts/<uuid:pk>/tasks/', api.AppletHostTaskCreateApi.as_view(), name='applet-task-create'),
 ]
 
 urlpatterns += router.urls

@@ -44,11 +44,12 @@ class AppletHostSerializer(HostSerializer):
     load = LabeledChoiceField(
         read_only=True, label=_('Load status'), choices=const.ComponentLoad.choices,
     )
+    spec_info = serializers.JSONField(read_only=True, label=_('Spec info'))
 
     class Meta(HostSerializer.Meta):
         model = AppletHost
         fields = HostSerializer.Meta.fields + [
-            'load', 'date_synced', 'deploy_options'
+            'load', 'date_synced', 'deploy_options', 'spec_info', 'info'
         ]
         extra_kwargs = {
             **HostSerializer.Meta.extra_kwargs,
