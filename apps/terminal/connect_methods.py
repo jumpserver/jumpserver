@@ -130,8 +130,6 @@ class AppletMethod:
         from .models import Applet, AppletHost
 
         methods = defaultdict(list)
-        if not settings.XPACK_ENABLED:
-            return methods
 
         has_applet_hosts = AppletHost.objects.all().exists()
         applets = Applet.objects.filter(is_active=True)
