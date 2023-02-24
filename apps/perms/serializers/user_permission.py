@@ -15,7 +15,7 @@ from perms.serializers.permission import ActionChoicesField
 
 __all__ = [
     'NodePermedSerializer', 'AssetPermedSerializer',
-    'AccountsPermedSerializer'
+    'AssetPermedDetailSerializer', 'AccountsPermedSerializer'
 ]
 
 
@@ -44,6 +44,12 @@ class AssetPermedSerializer(OrgResourceModelSerializerMixin):
             .annotate(category=F("platform__category")) \
             .annotate(type=F("platform__type"))
         return queryset
+
+
+class AssetPermedDetailSerializer(AssetPermedSerializer):
+    class Meta(AssetPermedSerializer.Meta):
+        fields = AssetPermedSerializer.Meta.fields + ['spec_info']
+        read_only_fields = fields
 
 
 class NodePermedSerializer(serializers.ModelSerializer):
