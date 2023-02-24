@@ -10,7 +10,7 @@ from .utils import get_logger
 logger = get_logger(__file__)
 
 
-def task_activity_callback(self, subject, message, recipient_list, **kwargs):
+def task_activity_callback(self, subject, message, recipient_list, *args, **kwargs):
     from users.models import User
     email_list = recipient_list
     resource_ids = list(User.objects.filter(email__in=email_list).values_list('id', flat=True))
