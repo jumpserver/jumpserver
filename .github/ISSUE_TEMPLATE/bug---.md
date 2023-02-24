@@ -7,7 +7,7 @@ assignees: wojiushixiaobai
 
 ---
 
-**JumpServer 版本(v1.5.9以下不再支持)**
+**JumpServer 版本( v2.28 之前的版本不再支持 )**
 
 
 **浏览器版本**
@@ -17,6 +17,6 @@ assignees: wojiushixiaobai
 
 
 **Bug 重现步骤(有截图更好)**
-1.  
-2. 
-3. 
+1.
+2.
+3.
