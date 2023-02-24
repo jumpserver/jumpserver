@@ -225,6 +225,7 @@ class MFAMixin:
         self.request.session['auth_mfa_time'] = time.time()
         self.request.session['auth_mfa_required'] = 0
         self.request.session['auth_mfa_type'] = mfa_type
+        MFABlockUtils(self.request.user.username, self.get_request_ip()).clean_failed_count()
 
     def clean_mfa_mark(self):
         keys = ['auth_mfa', 'auth_mfa_time', 'auth_mfa_required', 'auth_mfa_type']
