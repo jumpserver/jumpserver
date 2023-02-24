@@ -13,7 +13,7 @@ __all__ = [
 
 @shared_task(
     queue="ansible", verbose_name=_('Push accounts to assets'),
-    activity_callback=lambda self, account_ids, asset_ids: (account_ids, None)
+    activity_callback=lambda self, account_ids, *args, **kwargs: (account_ids, None)
 )
 def push_accounts_to_assets_task(account_ids):
     from accounts.models import PushAccountAutomation
