@@ -30,6 +30,12 @@ class BaseUserPermedAssetsApi(SelfOrPKUserMixin, ListAPIView):
     filterset_class = AssetFilterSet
     serializer_class = serializers.AssetPermedSerializer
 
+    def get_serializer_class(self):
+        serializer_class = super().get_serializer_class()
+        if self.request.query_params.get('id'):
+            serializer_class = serializers.AssetPermedDetailSerializer
+        return serializer_class
+
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return Asset.objects.none()
