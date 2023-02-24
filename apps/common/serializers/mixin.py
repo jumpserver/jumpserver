@@ -55,9 +55,11 @@ class BulkSerializerMixin(object):
             # add update_lookup_field field back to validated data
             # since super by default strips out read-only fields
             # hence id will no longer be present in validated_data
-            if all((isinstance(self.root, BulkListSerializer),
-                    id_attr,
-                    request_method in ('PUT', 'PATCH'))):
+            if all([
+                isinstance(self.root, BulkListSerializer),
+                id_attr,
+                request_method in ('PUT', 'PATCH')
+            ]):
                 id_field = self.fields.get("id") or self.fields.get('pk')
                 if data.get("id"):
                     id_value = id_field.to_internal_value(data.get("id"))
@@ -135,7 +137,7 @@ class BulkListSerializerMixin:
                     pk = item["pk"]
                 else:
                     raise ValidationError("id or pk not in data")
-                child = self.instance.get(id=pk)
+                child = self.instance.get(pk=pk)
                 self.child.instance = child
                 self.child.initial_data = item
                 # raw

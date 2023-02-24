@@ -23,7 +23,7 @@
 
         <div class="row">
             {% if has_cancel %}
-            <div class="col-sm-3">
+                <div class="col-sm-3">
                 <a href="{{ cancel_url }}" class="btn btn-default block full-width m-b">
                     {% trans 'Cancel' %}
                 </a>
@@ -43,7 +43,7 @@
 {% endblock %}
 
 {% block custom_foot_js %}
-<script>
+    <script>
     var message = ''
     var time = '{{ interval }}'
     {% if error %}
