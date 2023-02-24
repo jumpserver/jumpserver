@@ -87,7 +87,6 @@ def migrate_asset_accounts(apps, schema_editor):
             _account_history = []
 
             for ac in _accounts:
-                print("ID: {}, Secret: {}, Secret type: {}".format(ac.id, ac.secret, ac.secret_type))
                 if not ac.secret:
                     continue
                 if ac.id != _account.id and ac.secret == _account.secret:
@@ -101,19 +100,16 @@ def migrate_asset_accounts(apps, schema_editor):
                     'history_change_reason': 'from account {}'.format(_account.name),
                 }
                 _account_history.append(account_history_model(**history_data))
-
+            _account.version = len(_account_history)
             accounts_to_history.extend(_account_history)
-            if len(_account_history) > 0:
-                print("Account add _history: {}, {} len".format(_account.name, len(_account_history)), _account.id)
 
         account_model.objects.bulk_create(accounts_to_add, ignore_conflicts=True)
         account_history_model.objects.bulk_create(accounts_to_history, ignore_conflicts=True)
         print("\t  - Create asset accounts: {}-{} using: {:.2f}s".format(
             count - len(auth_books), count, time.time() - start
         ))
-        print("\t    - accounts: {}".format(len(accounts_to_add)))
-        print("\t    - histories: {}".format(len(accounts_to_history)))
-        raise ValueError(">>>>>")
+        print("\t      - accounts: {}".format(len(accounts_to_add)))
+        print("\t      - histories: {}".format(len(accounts_to_history)))
 
 
 def migrate_db_accounts(apps, schema_editor):
