@@ -206,7 +206,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         serializer = serializer_cls(recorders, many=True)
 
         header = [str(v.label) for v in serializer.child.fields.values()]
-        rows = [list(row.values()) for row in serializer.data]
+        rows = [[str(i) for i in row.values()] for row in serializer.data]
         if not rows:
             return False
 
