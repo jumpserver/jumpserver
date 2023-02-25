@@ -13,7 +13,7 @@
 
 <h2><g-emoji class="g-emoji" alias="warning" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/26a0.png">⚠️</g-emoji> 注意</h2>
 
-JumpServer [v3.0.0](https://github.com/jumpserver/jumpserver/releases/tag/v3.0.0) 正式发布，9 年时间，倾情投入，用心做好一款开源堡垒机；
+JumpServer [v3.0](https://github.com/jumpserver/jumpserver/releases/tag/v3.0.0) 正式发布。9 年时间，倾情投入，用心做好一款开源堡垒机；
 
 3.0 架构上和 2.0 变化较大，建议全新安装一套环境来体验。如需升级，请务必升级前进行备份。
 
