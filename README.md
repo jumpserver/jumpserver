@@ -12,6 +12,13 @@
 
 --------------------------
 
+JumpServer [v3.0.0](https://github.com/jumpserver/jumpserver/releases/tag/v3.0.0) 正式发布，9 年时间，倾情投入，用心做好一款开源堡垒机
+
+<h2><g-emoji class="g-emoji" alias="warning" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/26a0.png">⚠️</g-emoji> 注意</h2>
+3.0 架构上和 2.0 变化较大，建议全新安装一套环境来体验。如需升级，请务必升级前进行备份。
+
+--------------------------
+
 JumpServer 是广受欢迎的开源堡垒机，是符合 4A 规范的专业运维安全审计系统。
 
 ## 产品特色
