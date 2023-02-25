@@ -10,7 +10,10 @@
   <a href="https://github.com/jumpserver/jumpserver"><img src="https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square" alt="Stars"></a>
 </p>
 
+
+<p align="center">
 JumpServer [v3.0](https://github.com/jumpserver/jumpserver/releases/tag/v3.0.0) 正式发布。9 年时间，倾情投入，用心做好一款开源堡垒机。 
+</p>
 
 | :warning: 注意   |
 |:---------------|
