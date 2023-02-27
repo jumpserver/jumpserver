@@ -18,14 +18,18 @@ user_perms = (
     ('assets', 'asset', 'match', 'asset'),
     ('assets', 'systemuser', 'match', 'systemuser'),
     ('assets', 'node', 'match', 'node'),
+    ("ops", "adhoc", "*", "*"),
+    ("ops", "playbook", "*", "*"),
+    ("ops", "job", "*", "*"),
+    ("ops", "jobexecution", "*", "*"),
 )
 
 system_user_perms = (
-    ('authentication', 'connectiontoken', 'add,change,view', 'connectiontoken'),
-    ('authentication', 'temptoken', 'add,change,view', 'temptoken'),
-    ('authentication', 'accesskey', '*', '*'),
-    ('tickets', 'ticket', 'view', 'ticket'),
-) + user_perms + _view_all_joined_org_perms
+                        ('authentication', 'connectiontoken', 'add,change,view', 'connectiontoken'),
+                        ('authentication', 'temptoken', 'add,change,view', 'temptoken'),
+                        ('authentication', 'accesskey', '*', '*'),
+                        ('tickets', 'ticket', 'view', 'ticket'),
+                    ) + user_perms + _view_all_joined_org_perms
 
 _auditor_perms = (
     ('rbac', 'menupermission', 'view', 'audit'),
@@ -40,7 +44,6 @@ _auditor_perms = (
 auditor_perms = user_perms + _auditor_perms
 
 system_auditor_perms = system_user_perms + _auditor_perms + _view_root_perms
-
 
 app_exclude_perms = [
     ('users', 'user', 'add,delete', 'user'),
