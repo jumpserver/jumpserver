@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from accounts import serializers
 from accounts.filters import AccountFilterSet
 from accounts.models import Account
-from assets.models import Asset
+from assets.models import Asset, Node
 from common.permissions import UserConfirmation, ConfirmType
 from common.views.mixins import RecordViewLogMixin
 from orgs.mixins.api import OrgBulkModelViewSet
@@ -28,6 +28,7 @@ class AccountViewSet(OrgBulkModelViewSet):
     rbac_perms = {
         'partial_update': ['accounts.change_account'],
         'su_from_accounts': 'accounts.view_account',
+        'username_suggestions': 'accounts.view_account',
     }
 
     @action(methods=['get'], detail=False, url_path='su-from-accounts')
@@ -46,6 +47,29 @@ class AccountViewSet(OrgBulkModelViewSet):
         accounts = self.filter_queryset(accounts)
         serializer = serializers.AccountSerializer(accounts, many=True)
         return Response(data=serializer.data)
+
+    @action(methods=['get'], detail=False, url_path='username-suggestions')
+    def username_suggestions(self, request, *args, **kwargs):
+        asset_ids = request.query_params.get('assets')
+        node_keys = request.query_params.get('keys')
+        username = request.query_params.get('username')
+
+        assets = Asset.objects.all()
+        if asset_ids:
+            assets = assets.filter(id__in=asset_ids.split(','))
+        if node_keys:
+            patten = Node.get_node_all_children_key_pattern(node_keys.split(','))
+            assets = assets.filter(nodes__key__regex=patten)
+
+        accounts = Account.objects.filter(asset__in=assets)
+        if username:
+            accounts = accounts.filter(username__icontains=username)
+        usernames = list(accounts.values_list('username', flat=True).distinct()[:10])
+        usernames.sort()
+        common = [i for i in usernames if i in usernames if i.lower() in ['root', 'admin', 'administrator']]
+        others = [i for i in usernames if i not in common]
+        usernames = common + others
+        return Response(data=usernames)
 
 
 class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
