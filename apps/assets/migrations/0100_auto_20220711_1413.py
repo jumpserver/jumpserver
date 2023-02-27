@@ -70,6 +70,8 @@ def migrate_asset_accounts(apps, schema_editor):
                 auth_infos.append((username, 'password', ''))
 
             for name, secret_type, secret in auth_infos:
+                if not name:
+                    continue
                 account = account_model(**account_values, name=name, secret=secret, secret_type=secret_type)
                 accounts.append(account)
 
@@ -166,6 +168,9 @@ def migrate_db_accounts(apps, schema_editor):
                 values['name'] = name
                 values['secret_type'] = secret_type
                 values['secret'] = secret
+
+                if not name:
+                    continue
 
                 for app in apps:
                     values['asset_id'] = str(app.id)
