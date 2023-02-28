@@ -11,7 +11,7 @@
           cpu_count: "{{ ansible_processor_count }}"
           cpu_cores: "{{ ansible_processor_cores }}"
           cpu_vcpus: "{{ ansible_processor_vcpus }}"
-          memory: "{{ ansible_memtotal_mb }}"
+          memory: "{{ ansible_memtotal_mb / 1024 | round(2) }}"
           disk_total: "{{ (ansible_mounts | map(attribute='size_total') | sum / 1024 / 1024 / 1024) | round(2) }}"
           distribution: "{{ ansible_distribution }}"
           distribution_version: "{{ ansible_distribution_version }}"
