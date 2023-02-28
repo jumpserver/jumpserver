@@ -60,4 +60,6 @@ class GatherAccountsFilter:
         if not run_method_name:
             return info
 
-        return getattr(self, f'{run_method_name}_filter')(info)
+        if hasattr(self, f'{run_method_name}_filter'):
+            return getattr(self, f'{run_method_name}_filter')(info)
+        return info
