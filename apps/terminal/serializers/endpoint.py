@@ -32,7 +32,7 @@ class EndpointSerializer(BulkModelSerializer):
             'comment', 'date_created', 'date_updated', 'created_by'
         ]
         extra_kwargs = {
-            'host': {'help_text': 'Visit IP/host, if empty, use the current request instead'},
+            'host': {'help_text': _('Visit IP/Host, if empty, use the current request instead')},
         }
 
     def get_oracle_port(self, obj: Endpoint):
