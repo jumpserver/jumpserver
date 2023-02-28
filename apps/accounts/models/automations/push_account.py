@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from accounts.const import AutomationTypes
+from jumpserver.utils import has_valid_xpack_license
 from .base import AccountBaseAutomation
 from .change_secret import ChangeSecretMixin
 
@@ -27,6 +28,8 @@ class PushAccountAutomation(ChangeSecretMixin, AccountBaseAutomation):
 
     def save(self, *args, **kwargs):
         self.type = AutomationTypes.push_account
+        if not has_valid_xpack_license():
+            self.is_periodic = False
         super().save(*args, **kwargs)
 
     def to_attr_json(self):
