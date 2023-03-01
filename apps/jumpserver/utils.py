@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 #
-from functools import partial
-from werkzeug.local import LocalProxy
 from datetime import datetime
+from functools import partial
 
 from django.conf import settings
+from werkzeug.local import LocalProxy
+
 from common.local import thread_local
 
 
@@ -34,7 +35,7 @@ def get_xpack_license_info() -> dict:
         corporation = info.get('corporation', '')
     else:
         current_year = datetime.now().year
-        corporation = f'Copyright - FIT2CLOUD 飞致云 © 2014-{current_year}'
+        corporation = f'FIT2CLOUD 飞致云 © 2014-{current_year}'
     info = {
         'corporation': corporation
     }
