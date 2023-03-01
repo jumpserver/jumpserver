@@ -5724,7 +5724,7 @@ msgstr "API 仕える"
 
 #: terminal/serializers/applet_host.py:33
 msgid "RDS Licensing"
-msgstr "RDS ライセンス"
+msgstr "既存の RDS ライセンス"
 
 #: terminal/serializers/applet_host.py:34
 msgid "RDS License Server"

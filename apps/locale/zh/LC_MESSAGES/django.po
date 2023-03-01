@@ -5651,8 +5651,8 @@ msgid "API Server"
 msgstr "API 服务"
 
 #: terminal/serializers/applet_host.py:33
-msgid "RDS Licensing"
-msgstr "RDS 许可证"
+msgid "Existing RDS license"
+msgstr "已有 RDS 许可证"
 
 #: terminal/serializers/applet_host.py:34
 msgid "RDS License Server"
