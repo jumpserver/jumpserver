@@ -60,7 +60,7 @@ class KubernetesClient:
         return f'{gateway.address}:{gateway.port}'
 
     @classmethod
-    def run(cls, asset, secret, tp='namespace', *args):
+    def run(cls, asset, secret, tp, *args):
         k8s_url = f'{asset.address}'
         proxy_url = cls.get_proxy_url(asset)
         k8s = cls(k8s_url, secret, proxy=proxy_url)
