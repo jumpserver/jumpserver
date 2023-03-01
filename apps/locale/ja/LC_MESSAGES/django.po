@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-28 17:54+0800\n"
+"POT-Creation-Date: 2023-03-01 15:09+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1269,7 +1269,7 @@ msgstr "アセットの自動化タスク"
 #: audits/serializers.py:49 ops/models/base.py:49 ops/models/job.py:183
 #: terminal/models/applet/applet.py:157 terminal/models/applet/host.py:108
 #: terminal/models/component/status.py:27 terminal/serializers/applet.py:18
-#: terminal/serializers/applet_host.py:93 tickets/models/ticket/general.py:283
+#: terminal/serializers/applet_host.py:102 tickets/models/ticket/general.py:283
 #: tickets/serializers/super_ticket.py:13
 #: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:164
 #: xpack/plugins/cloud/models.py:216
@@ -5468,7 +5468,7 @@ msgstr "無効なアプレット パッケージ、ファイル {} がありま�
 msgid "Hosting"
 msgstr "ホスト マシン"
 
-#: terminal/models/applet/host.py:19 terminal/serializers/applet_host.py:43
+#: terminal/models/applet/host.py:19 terminal/serializers/applet_host.py:52
 msgid "Deploy options"
 msgstr "展開パラメーター"
 
@@ -5718,35 +5718,54 @@ msgstr "セッションごと"
 msgid "Per Device"
 msgstr "デバイスごと"
 
-#: terminal/serializers/applet_host.py:32
-msgid "API Server"
-msgstr "API 仕える"
-
 #: terminal/serializers/applet_host.py:33
-msgid "RDS Licensing"
-msgstr "既存の RDS ライセンス"
+msgid "Core API"
+msgstr "コア サービス アドレス"
 
 #: terminal/serializers/applet_host.py:34
+msgid ""
+" \n"
+"        Tip: The application release machine communicates with the Core "
+"service. \n"
+"        If the release machine and the Core service are on the same network "
+"segment, \n"
+"        it is recommended to fill in the intranet address, otherwise fill in "
+"the current site URL \n"
+"        <br> \n"
+"        eg: https://172.16.10.110 or https://dev.jumpserver.com\n"
+"        "
+msgstr ""
+"ヒント: アプリケーション リリース マシンは、コア サービスと通信します。"
+"リリース マシンとコア サービスが同じネットワーク セグメント上にある場合は、イントラネット アドレスを入力することをお勧めします。"
+"それ以外の場合は、現在のサイト URL を入力します。"
+"<br>"
+"例: https://172.16.10.110 または https://dev.jumpserver.com"
+
+#: terminal/serializers/applet_host.py:42
+msgid "Existing RDS license"
+msgstr ""
+
+#: terminal/serializers/applet_host.py:43
 msgid "RDS License Server"
 msgstr "RDS ライセンス サーバー"
 
-#: terminal/serializers/applet_host.py:35
+#: terminal/serializers/applet_host.py:44
 msgid "RDS Licensing Mode"
 msgstr "RDS 認可モード"
 
-#: terminal/serializers/applet_host.py:37
+#: terminal/serializers/applet_host.py:46
 msgid "RDS Single Session Per User"
 msgstr "RDS シングル ユーザー シングル セッション"
 
-#: terminal/serializers/applet_host.py:38
+#: terminal/serializers/applet_host.py:47
 msgid "RDS Max Disconnection Time"
 msgstr "最大切断時間"
 
-#: terminal/serializers/applet_host.py:39
+#: terminal/serializers/applet_host.py:48
 msgid "RDS Remote App Logoff Time Limit"
 msgstr "RDS 远程应用注销时间限制"
 
-#: terminal/serializers/applet_host.py:45 terminal/serializers/terminal.py:41
+#: terminal/serializers/applet_host.py:54 terminal/serializers/terminal.py:41
 msgid "Load status"
 msgstr "ロードステータス"
 
@@ -5780,7 +5799,9 @@ msgstr ""
 
 #: terminal/serializers/endpoint.py:35
 msgid "Visit IP/Host, if empty, use the current request instead"
-msgstr "IP/ホストにアクセスします。空の場合は、代わりに現在のリクエストのアドレスを使用します"
+msgstr ""
+"IP/ホストにアクセスします。空の場合は、代わりに現在のリクエストのアドレスを使"
+"用します"
 
 #: terminal/serializers/endpoint.py:58
 msgid ""
@@ -7392,6 +7413,12 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:85
 msgid "Community edition"
 msgstr "コミュニティ版"
+
+#~ msgid "API Server"
+#~ msgstr "API 仕える"
+
+#~ msgid "RDS Licensing"
+#~ msgstr "既存の RDS ライセンス"
 
 #, fuzzy
 #~| msgid "Only admin users"

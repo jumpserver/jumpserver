@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-28 17:54+0800\n"
+"POT-Creation-Date: 2023-03-01 15:09+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1261,7 +1261,7 @@ msgstr "资产自动化任务"
 #: audits/serializers.py:49 ops/models/base.py:49 ops/models/job.py:183
 #: terminal/models/applet/applet.py:157 terminal/models/applet/host.py:108
 #: terminal/models/component/status.py:27 terminal/serializers/applet.py:18
-#: terminal/serializers/applet_host.py:93 tickets/models/ticket/general.py:283
+#: terminal/serializers/applet_host.py:102 tickets/models/ticket/general.py:283
 #: tickets/serializers/super_ticket.py:13
 #: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:164
 #: xpack/plugins/cloud/models.py:216
@@ -5396,7 +5396,7 @@ msgstr "Applet pkg 无效，缺少文件 {}"
 msgid "Hosting"
 msgstr "宿主机"
 
-#: terminal/models/applet/host.py:19 terminal/serializers/applet_host.py:43
+#: terminal/models/applet/host.py:19 terminal/serializers/applet_host.py:52
 msgid "Deploy options"
 msgstr "部署参数"
 
@@ -5646,35 +5646,52 @@ msgstr "每用户"
 msgid "Per Device"
 msgstr "每设备"
 
-#: terminal/serializers/applet_host.py:32
-msgid "API Server"
-msgstr "API 服务"
-
 #: terminal/serializers/applet_host.py:33
+msgid "Core API"
+msgstr "Core 服务地址"
+
+#: terminal/serializers/applet_host.py:34
+msgid ""
+" \n"
+"        Tips: The application release machine communicates with the Core "
+"service. \n"
+"        If the release machine and the Core service are on the same network "
+"segment, \n"
+"        it is recommended to fill in the intranet address, otherwise fill in "
+"the current site URL \n"
+"        <br> \n"
+"        eg: https://172.16.10.110 or https://dev.jumpserver.com\n"
+"        "
+msgstr ""
+"提示：应用发布机和 Core 服务进行通信使用，如果发布机和 Core 服务在同一网段，建议填写内网地址，否则填写当前站点 URL"
+"<br>"
+"例如：https://172.16.10.110 or https://dev.jumpserver.com"
+
+#: terminal/serializers/applet_host.py:42
 msgid "Existing RDS license"
 msgstr "已有 RDS 许可证"
 
-#: terminal/serializers/applet_host.py:34
+#: terminal/serializers/applet_host.py:43
 msgid "RDS License Server"
 msgstr "RDS 许可服务器"
 
-#: terminal/serializers/applet_host.py:35
+#: terminal/serializers/applet_host.py:44
 msgid "RDS Licensing Mode"
 msgstr "RDS 授权模式"
 
-#: terminal/serializers/applet_host.py:37
+#: terminal/serializers/applet_host.py:46
 msgid "RDS Single Session Per User"
 msgstr "RDS 单用户单会话"
 
-#: terminal/serializers/applet_host.py:38
+#: terminal/serializers/applet_host.py:47
 msgid "RDS Max Disconnection Time"
 msgstr "RDS 最大断开时间"
 
-#: terminal/serializers/applet_host.py:39
+#: terminal/serializers/applet_host.py:48
 msgid "RDS Remote App Logoff Time Limit"
 msgstr "RDS 远程应用注销时间限制"
 
-#: terminal/serializers/applet_host.py:45 terminal/serializers/terminal.py:41
+#: terminal/serializers/applet_host.py:54 terminal/serializers/terminal.py:41
 msgid "Load status"
 msgstr "负载状态"
 
@@ -7297,6 +7314,9 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:85
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "API Server"
+#~ msgstr "API 服务"
 
 #~ msgid "Unix admin user"
 #~ msgstr "Unix 管理员"
