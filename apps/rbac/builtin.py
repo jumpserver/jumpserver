@@ -22,6 +22,7 @@ user_perms = (
     ("ops", "playbook", "*", "*"),
     ("ops", "job", "*", "*"),
     ("ops", "jobexecution", "*", "*"),
+    ("ops", "celerytaskexecution", "view", "*"),
 )
 
 system_user_perms = (
