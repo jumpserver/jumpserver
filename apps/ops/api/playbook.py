@@ -62,10 +62,10 @@ class PlaybookFileBrowserAPIView(APIView):
     rbac_perms = ()
     permission_classes = (RBACPermission,)
     rbac_perms = {
-        'GET': 'ops.change_playbooks',
-        'POST': 'ops.change_playbooks',
-        'DELETE': 'ops.change_playbooks',
-        'PATCH': 'ops.change_playbooks',
+        'GET': 'ops.change_playbook',
+        'POST': 'ops.change_playbook',
+        'DELETE': 'ops.change_playbook',
+        'PATCH': 'ops.change_playbook',
     }
     protected_files = ['root', 'main.yml']
 
