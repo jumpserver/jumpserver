@@ -132,7 +132,7 @@ class BasePlaybookManager:
             # It does not require this for old-style PEM keys.
             with open(key_path, 'w') as f:
                 f.write(secret)
-                if is_openssh_format_key(secret):
+                if is_openssh_format_key(secret.encode('utf-8')):
                     f.write("\n")
             os.chmod(key_path, 0o400)
         return key_path
