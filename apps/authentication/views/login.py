@@ -6,6 +6,7 @@ import os
 import datetime
 from typing import Callable
 
+from django.db import IntegrityError
 from django.templatetags.static import static
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.http import HttpResponse, HttpRequest
@@ -228,6 +229,16 @@ class UserLoginView(mixins.AuthMixin, UserLoginContextMixin, FormView):
                 errors.BlockGlobalIpLoginError
         ) as e:
             form.add_error('code', e.msg)
+            return super().form_invalid(form)
+        except (IntegrityError,) as e:
+            # (1062, "Duplicate entry 'youtester001@example.com' for key 'users_user.email'")
+            msg_list = e.args[1].split("'")
+            email, field = msg_list[1], msg_list[3]
+            if field == 'users_user.email':
+                error = _('User email already exists ({})').format(email)
+            else:
+                error = str(e)
+            form.add_error(None, error)
             return super().form_invalid(form)
         self.clear_rsa_key()
         return self.redirect_to_guard_view()
