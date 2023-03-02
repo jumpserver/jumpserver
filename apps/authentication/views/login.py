@@ -232,12 +232,19 @@ class UserLoginView(mixins.AuthMixin, UserLoginContextMixin, FormView):
             return super().form_invalid(form)
         except (IntegrityError,) as e:
             # (1062, "Duplicate entry 'youtester001@example.com' for key 'users_user.email'")
+            error = str(e)
+            if len(e.args) < 2:
+                form.add_error(None, error)
+                return super().form_invalid(form)
+
             msg_list = e.args[1].split("'")
+            if len(msg_list) < 4:
+                form.add_error(None, error)
+                return super().form_invalid(form)
+
             email, field = msg_list[1], msg_list[3]
             if field == 'users_user.email':
                 error = _('User email already exists ({})').format(email)
-            else:
-                error = str(e)
             form.add_error(None, error)
             return super().form_invalid(form)
         self.clear_rsa_key()
