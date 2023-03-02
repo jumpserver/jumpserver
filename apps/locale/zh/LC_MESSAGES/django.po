@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-01 15:09+0800\n"
+"POT-Creation-Date: 2023-03-02 15:34+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -737,7 +737,7 @@ msgstr "激活中"
 #: authentication/models/sso_token.py:16
 #: notifications/models/notification.py:12
 #: perms/api/user_permission/mixin.py:55 perms/models/asset_permission.py:58
-#: perms/serializers/permission.py:23 rbac/builtin.py:121
+#: perms/serializers/permission.py:23 rbac/builtin.py:122
 #: rbac/models/rolebinding.py:49 terminal/backends/command/models.py:19
 #: terminal/models/session/session.py:30 terminal/models/session/sharing.py:32
 #: terminal/notifications.py:96 terminal/notifications.py:144
@@ -823,7 +823,7 @@ msgstr ""
 "格式为逗号分隔的字符串, * 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, "
 "10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 （支持网域）"
 
-#: acls/serializers/base.py:40 assets/serializers/asset/host.py:36
+#: acls/serializers/base.py:40 assets/serializers/asset/host.py:35
 msgid "IP/Host"
 msgstr "IP/主机"
 
@@ -936,10 +936,8 @@ msgid "No account"
 msgstr "没有账号"
 
 #: assets/automations/ping_gateway/manager.py:36
-#, fuzzy
-#| msgid "Assets amount"
 msgid "Asset, {}, using account {}"
-msgstr "资产数量"
+msgstr "资产, {}, 使用账号 {}"
 
 #: assets/automations/ping_gateway/manager.py:55
 #, python-brace-format
@@ -1003,6 +1001,18 @@ msgstr "云服务"
 msgid "Web"
 msgstr "Web"
 
+#: assets/const/cloud.py:7
+msgid "Public cloud"
+msgstr "公有云"
+
+#: assets/const/cloud.py:8
+msgid "Private cloud"
+msgstr "私有云"
+
+#: assets/const/cloud.py:9
+msgid "Kubernetes"
+msgstr ""
+
 #: assets/const/device.py:7 terminal/models/applet/applet.py:24
 #: tickets/const.py:8
 msgid "General"
@@ -1019,6 +1029,10 @@ msgstr "路由器"
 #: assets/const/device.py:10
 msgid "Firewall"
 msgstr "防火墙"
+
+#: assets/const/host.py:12 rbac/tree.py:28
+msgid "Other"
+msgstr "其它"
 
 #: assets/const/types.py:200
 msgid "All types"
@@ -1516,56 +1530,56 @@ msgstr "协议是必填的: {}"
 msgid "This field is required."
 msgstr "该字段是必填项。"
 
-#: assets/serializers/asset/host.py:12
+#: assets/serializers/asset/host.py:11
 msgid "Vendor"
 msgstr "制造商"
 
-#: assets/serializers/asset/host.py:13
+#: assets/serializers/asset/host.py:12
 msgid "Model"
 msgstr "型号"
 
-#: assets/serializers/asset/host.py:14 tickets/models/ticket/general.py:299
+#: assets/serializers/asset/host.py:13 tickets/models/ticket/general.py:299
 msgid "Serial number"
 msgstr "序列号"
 
-#: assets/serializers/asset/host.py:15
+#: assets/serializers/asset/host.py:14
 msgid "CPU model"
 msgstr "CPU型号"
 
-#: assets/serializers/asset/host.py:16
+#: assets/serializers/asset/host.py:15
 msgid "CPU count"
 msgstr "CPU数量"
 
-#: assets/serializers/asset/host.py:17
+#: assets/serializers/asset/host.py:16
 msgid "CPU cores"
 msgstr "CPU核数"
 
-#: assets/serializers/asset/host.py:18
+#: assets/serializers/asset/host.py:17
 msgid "CPU vcpus"
 msgstr "CPU总数"
 
-#: assets/serializers/asset/host.py:19
+#: assets/serializers/asset/host.py:18
 msgid "Memory"
 msgstr "内存"
 
-#: assets/serializers/asset/host.py:20
+#: assets/serializers/asset/host.py:19
 msgid "Disk total"
 msgstr "硬盘大小"
 
-#: assets/serializers/asset/host.py:22
+#: assets/serializers/asset/host.py:21
 #: authentication/serializers/connect_token_secret.py:105
 msgid "OS"
 msgstr "操作系统"
 
-#: assets/serializers/asset/host.py:23
+#: assets/serializers/asset/host.py:22
 msgid "OS version"
 msgstr "系统版本"
 
-#: assets/serializers/asset/host.py:24
+#: assets/serializers/asset/host.py:23
 msgid "OS arch"
 msgstr "系统架构"
 
-#: assets/serializers/asset/host.py:28
+#: assets/serializers/asset/host.py:27
 msgid "Info"
 msgstr "信息"
 
@@ -1930,20 +1944,20 @@ msgid "Auth Token"
 msgstr "认证令牌"
 
 #: audits/signal_handlers/login_log.py:31 authentication/notifications.py:73
-#: authentication/views/login.py:73 authentication/views/wecom.py:177
+#: authentication/views/login.py:74 authentication/views/wecom.py:177
 #: notifications/backends/__init__.py:11 settings/serializers/auth/wecom.py:10
 #: users/models/user.py:778
 msgid "WeCom"
 msgstr "企业微信"
 
 #: audits/signal_handlers/login_log.py:32 authentication/views/feishu.py:144
-#: authentication/views/login.py:85 notifications/backends/__init__.py:14
+#: authentication/views/login.py:86 notifications/backends/__init__.py:14
 #: settings/serializers/auth/feishu.py:10 users/models/user.py:780
 msgid "FeiShu"
 msgstr "飞书"
 
 #: audits/signal_handlers/login_log.py:33 authentication/views/dingtalk.py:179
-#: authentication/views/login.py:79 notifications/backends/__init__.py:12
+#: authentication/views/login.py:80 notifications/backends/__init__.py:12
 #: settings/serializers/auth/dingtalk.py:10 users/models/user.py:779
 msgid "DingTalk"
 msgstr "钉钉"
@@ -2782,19 +2796,23 @@ msgstr "从飞书获取用户失败"
 msgid "Please login with a password and then bind the FeiShu"
 msgstr "请使用密码登录，然后绑定飞书"
 
-#: authentication/views/login.py:181
+#: authentication/views/login.py:182
 msgid "Redirecting"
 msgstr "跳转中"
 
-#: authentication/views/login.py:182
+#: authentication/views/login.py:183
 msgid "Redirecting to {} authentication"
 msgstr "正在跳转到 {} 认证"
 
-#: authentication/views/login.py:205
+#: authentication/views/login.py:206
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: authentication/views/login.py:307
+#: authentication/views/login.py:238
+msgid "User email already exists ({})"
+msgstr "用户邮箱已存在 ({})"
+
+#: authentication/views/login.py:318
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -2802,15 +2820,15 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:312
+#: authentication/views/login.py:323
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:348
+#: authentication/views/login.py:359
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:349
+#: authentication/views/login.py:360
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
@@ -3711,27 +3729,27 @@ msgstr "{} 至少有一个系统角色"
 msgid "RBAC"
 msgstr "RBAC"
 
-#: rbac/builtin.py:112
+#: rbac/builtin.py:113
 msgid "SystemAdmin"
 msgstr "系统管理员"
 
-#: rbac/builtin.py:115
+#: rbac/builtin.py:116
 msgid "SystemAuditor"
 msgstr "系统审计员"
 
-#: rbac/builtin.py:118
+#: rbac/builtin.py:119
 msgid "SystemComponent"
 msgstr "系统组件"
 
-#: rbac/builtin.py:124
+#: rbac/builtin.py:125
 msgid "OrgAdmin"
 msgstr "组织管理员"
 
-#: rbac/builtin.py:127
+#: rbac/builtin.py:128
 msgid "OrgAuditor"
 msgstr "组织审计员"
 
-#: rbac/builtin.py:130
+#: rbac/builtin.py:131
 msgid "OrgUser"
 msgstr "组织用户"
 
@@ -3842,10 +3860,6 @@ msgstr "审计台"
 #: rbac/tree.py:27 settings/models.py:159
 msgid "System setting"
 msgstr "系统设置"
-
-#: rbac/tree.py:28
-msgid "Other"
-msgstr "其它"
 
 #: rbac/tree.py:37
 msgid "Session audits"
@@ -5663,9 +5677,9 @@ msgid ""
 "        eg: https://172.16.10.110 or https://dev.jumpserver.com\n"
 "        "
 msgstr ""
-"提示：应用发布机和 Core 服务进行通信使用，如果发布机和 Core 服务在同一网段，建议填写内网地址，否则填写当前站点 URL"
-"<br>"
-"例如：https://172.16.10.110 or https://dev.jumpserver.com"
+"提示：应用发布机和 Core 服务进行通信使用，如果发布机和 Core 服务在同一网段，"
+"建议填写内网地址，否则填写当前站点 URL<br>例如：https://172.16.10.110 or "
+"https://dev.jumpserver.com"
 
 #: terminal/serializers/applet_host.py:42
 msgid "Existing RDS license"

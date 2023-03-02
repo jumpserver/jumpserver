@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-01 15:09+0800\n"
+"POT-Creation-Date: 2023-03-02 15:34+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -741,7 +741,7 @@ msgstr "アクティブ"
 #: authentication/models/sso_token.py:16
 #: notifications/models/notification.py:12
 #: perms/api/user_permission/mixin.py:55 perms/models/asset_permission.py:58
-#: perms/serializers/permission.py:23 rbac/builtin.py:121
+#: perms/serializers/permission.py:23 rbac/builtin.py:122
 #: rbac/models/rolebinding.py:49 terminal/backends/command/models.py:19
 #: terminal/models/session/session.py:30 terminal/models/session/sharing.py:32
 #: terminal/notifications.py:96 terminal/notifications.py:144
@@ -828,7 +828,7 @@ msgstr ""
 "192.168.10.1、192.168.1.0/24、10.1.1.1-10.1.1.20、2001:db8:2de::e13、2001:"
 "db8:1a:1110:::/64 (ドメイン名サポート)"
 
-#: acls/serializers/base.py:40 assets/serializers/asset/host.py:36
+#: acls/serializers/base.py:40 assets/serializers/asset/host.py:35
 msgid "IP/Host"
 msgstr "IP/ホスト"
 
@@ -944,10 +944,8 @@ msgid "No account"
 msgstr "アカウントなし"
 
 #: assets/automations/ping_gateway/manager.py:36
-#, fuzzy
-#| msgid "Assets amount"
 msgid "Asset, {}, using account {}"
-msgstr "資産額"
+msgstr "資産, {}, アカウントを使用 {}"
 
 #: assets/automations/ping_gateway/manager.py:55
 #, python-brace-format
@@ -1011,6 +1009,18 @@ msgstr "クラウド サービス"
 msgid "Web"
 msgstr "Web"
 
+#: assets/const/cloud.py:7
+msgid "Public cloud"
+msgstr "パブリック クラウド"
+
+#: assets/const/cloud.py:8
+msgid "Private cloud"
+msgstr "私有雲"
+
+#: assets/const/cloud.py:9
+msgid "Kubernetes"
+msgstr ""
+
 #: assets/const/device.py:7 terminal/models/applet/applet.py:24
 #: tickets/const.py:8
 msgid "General"
@@ -1027,6 +1037,10 @@ msgstr "ルーター"
 #: assets/const/device.py:10
 msgid "Firewall"
 msgstr "ファイアウォール"
+
+#: assets/const/host.py:12 rbac/tree.py:28
+msgid "Other"
+msgstr "その他"
 
 #: assets/const/types.py:200
 msgid "All types"
@@ -1524,56 +1538,56 @@ msgstr "プロトコルが必要です: {}"
 msgid "This field is required."
 msgstr "このフィールドは必須です。"
 
-#: assets/serializers/asset/host.py:12
+#: assets/serializers/asset/host.py:11
 msgid "Vendor"
 msgstr "ベンダー"
 
-#: assets/serializers/asset/host.py:13
+#: assets/serializers/asset/host.py:12
 msgid "Model"
 msgstr "モデル"
 
-#: assets/serializers/asset/host.py:14 tickets/models/ticket/general.py:299
+#: assets/serializers/asset/host.py:13 tickets/models/ticket/general.py:299
 msgid "Serial number"
 msgstr "シリアル番号"
 
-#: assets/serializers/asset/host.py:15
+#: assets/serializers/asset/host.py:14
 msgid "CPU model"
 msgstr "CPU モデル"
 
-#: assets/serializers/asset/host.py:16
+#: assets/serializers/asset/host.py:15
 msgid "CPU count"
 msgstr "CPU カウント"
 
-#: assets/serializers/asset/host.py:17
+#: assets/serializers/asset/host.py:16
 msgid "CPU cores"
 msgstr "CPU カラー"
 
-#: assets/serializers/asset/host.py:18
+#: assets/serializers/asset/host.py:17
 msgid "CPU vcpus"
 msgstr "CPU 合計"
 
-#: assets/serializers/asset/host.py:19
+#: assets/serializers/asset/host.py:18
 msgid "Memory"
 msgstr "メモリ"
 
-#: assets/serializers/asset/host.py:20
+#: assets/serializers/asset/host.py:19
 msgid "Disk total"
 msgstr "ディスクの合計"
 
-#: assets/serializers/asset/host.py:22
+#: assets/serializers/asset/host.py:21
 #: authentication/serializers/connect_token_secret.py:105
 msgid "OS"
 msgstr "OS"
 
-#: assets/serializers/asset/host.py:23
+#: assets/serializers/asset/host.py:22
 msgid "OS version"
 msgstr "システムバージョン"
 
-#: assets/serializers/asset/host.py:24
+#: assets/serializers/asset/host.py:23
 msgid "OS arch"
 msgstr "システムアーキテクチャ"
 
-#: assets/serializers/asset/host.py:28
+#: assets/serializers/asset/host.py:27
 msgid "Info"
 msgstr "情報"
 
@@ -1940,20 +1954,20 @@ msgid "Auth Token"
 msgstr "認証トークン"
 
 #: audits/signal_handlers/login_log.py:31 authentication/notifications.py:73
-#: authentication/views/login.py:73 authentication/views/wecom.py:177
+#: authentication/views/login.py:74 authentication/views/wecom.py:177
 #: notifications/backends/__init__.py:11 settings/serializers/auth/wecom.py:10
 #: users/models/user.py:778
 msgid "WeCom"
 msgstr "企業微信"
 
 #: audits/signal_handlers/login_log.py:32 authentication/views/feishu.py:144
-#: authentication/views/login.py:85 notifications/backends/__init__.py:14
+#: authentication/views/login.py:86 notifications/backends/__init__.py:14
 #: settings/serializers/auth/feishu.py:10 users/models/user.py:780
 msgid "FeiShu"
 msgstr "本を飛ばす"
 
 #: audits/signal_handlers/login_log.py:33 authentication/views/dingtalk.py:179
-#: authentication/views/login.py:79 notifications/backends/__init__.py:12
+#: authentication/views/login.py:80 notifications/backends/__init__.py:12
 #: settings/serializers/auth/dingtalk.py:10 users/models/user.py:779
 msgid "DingTalk"
 msgstr "DingTalk"
@@ -2812,19 +2826,23 @@ msgstr "本を飛ばすからユーザーを取得できませんでした"
 msgid "Please login with a password and then bind the FeiShu"
 msgstr "パスワードでログインしてから本を飛ばすをバインドしてください"
 
-#: authentication/views/login.py:181
+#: authentication/views/login.py:182
 msgid "Redirecting"
 msgstr "リダイレクト"
 
-#: authentication/views/login.py:182
+#: authentication/views/login.py:183
 msgid "Redirecting to {} authentication"
 msgstr "{} 認証へのリダイレクト"
 
-#: authentication/views/login.py:205
+#: authentication/views/login.py:206
 msgid "Please enable cookies and try again."
 msgstr "クッキーを有効にして、もう一度お試しください。"
 
-#: authentication/views/login.py:307
+#: authentication/views/login.py:238
+msgid "User email already exists ({})"
+msgstr "ユーザー メールボックスは既に存在します ({})"
+
+#: authentication/views/login.py:318
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -2832,15 +2850,15 @@ msgstr ""
 "<b>{}</b> 確認を待ちます。彼女/彼へのリンクをコピーすることもできます <br/>\n"
 "                  このページを閉じないでください"
 
-#: authentication/views/login.py:312
+#: authentication/views/login.py:323
 msgid "No ticket found"
 msgstr "チケットが見つかりません"
 
-#: authentication/views/login.py:348
+#: authentication/views/login.py:359
 msgid "Logout success"
 msgstr "ログアウト成功"
 
-#: authentication/views/login.py:349
+#: authentication/views/login.py:360
 msgid "Logout success, return login page"
 msgstr "ログアウト成功、ログインページを返す"
 
@@ -3747,27 +3765,27 @@ msgstr "{} 少なくとも1つのシステムロール"
 msgid "RBAC"
 msgstr "RBAC"
 
-#: rbac/builtin.py:112
+#: rbac/builtin.py:113
 msgid "SystemAdmin"
 msgstr "システム管理者"
 
-#: rbac/builtin.py:115
+#: rbac/builtin.py:116
 msgid "SystemAuditor"
 msgstr "システム監査人"
 
-#: rbac/builtin.py:118
+#: rbac/builtin.py:119
 msgid "SystemComponent"
 msgstr "システムコンポーネント"
 
-#: rbac/builtin.py:124
+#: rbac/builtin.py:125
 msgid "OrgAdmin"
 msgstr "組織管理者"
 
-#: rbac/builtin.py:127
+#: rbac/builtin.py:128
 msgid "OrgAuditor"
 msgstr "監査員を組織する"
 
-#: rbac/builtin.py:130
+#: rbac/builtin.py:131
 msgid "OrgUser"
 msgstr "組織ユーザー"
 
@@ -3879,10 +3897,6 @@ msgstr "監査ビュー"
 #: rbac/tree.py:27 settings/models.py:159
 msgid "System setting"
 msgstr "システム設定"
-
-#: rbac/tree.py:28
-msgid "Other"
-msgstr "その他"
 
 #: rbac/tree.py:37
 msgid "Session audits"
@@ -5725,7 +5739,7 @@ msgstr "コア サービス アドレス"
 #: terminal/serializers/applet_host.py:34
 msgid ""
 " \n"
-"        Tip: The application release machine communicates with the Core "
+"        Tips: The application release machine communicates with the Core "
 "service. \n"
 "        If the release machine and the Core service are on the same network "
 "segment, \n"
@@ -5735,15 +5749,15 @@ msgid ""
 "        eg: https://172.16.10.110 or https://dev.jumpserver.com\n"
 "        "
 msgstr ""
-"ヒント: アプリケーション リリース マシンは、コア サービスと通信します。"
-"リリース マシンとコア サービスが同じネットワーク セグメント上にある場合は、イントラネット アドレスを入力することをお勧めします。"
-"それ以外の場合は、現在のサイト URL を入力します。"
-"<br>"
-"例: https://172.16.10.110 または https://dev.jumpserver.com"
+"ヒント: アプリケーション リリース マシンは、コア サービスと通信します。リリー"
+"ス マシンとコア サービスが同じネットワーク セグメント上にある場合は、イントラ"
+"ネット アドレスを入力することをお勧めします。それ以外の場合は、現在のサイト "
+"URL を入力します。<br>例: https://172.16.10.110 または https://dev."
+"jumpserver.com"
 
 #: terminal/serializers/applet_host.py:42
 msgid "Existing RDS license"
-msgstr ""
+msgstr "既存の RDS 証明書"
 
 #: terminal/serializers/applet_host.py:43
 msgid "RDS License Server"
@@ -7413,36 +7427,3 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:85
 msgid "Community edition"
 msgstr "コミュニティ版"
-
-#~ msgid "API Server"
-#~ msgstr "API 仕える"
-
-#~ msgid "RDS Licensing"
-#~ msgstr "既存の RDS ライセンス"
-
-#, fuzzy
-#~| msgid "Only admin users"
-#~ msgid "Unix admin user"
-#~ msgstr "管理者のみ"
-
-#, fuzzy
-#~| msgid "Only admin users"
-#~ msgid "Windows admin user"
-#~ msgstr "管理者のみ"
-
-#, fuzzy
-#~| msgid "Only admin users"
-#~ msgid "Linux admin user"
-#~ msgstr "管理者のみ"
-
-#~ msgid "Can push account to asset"
-#~ msgstr "アカウントをアセットにプッシュできます"
-
-#~ msgid "Add asset to node"
-#~ msgstr "ノードにアセットを追加する"
-
-#~ msgid "Move asset to node"
-#~ msgstr "アセットをノードに移動する"
-
-#~ msgid "Remove asset from node"
-#~ msgstr "ノードからアセットを削除"
