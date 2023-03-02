@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 from common.drf.serializers import BulkModelSerializer
+from common.utils import lazyproperty
 from acls.serializers.rules import ip_group_child_validator, ip_group_help_text
 from ..utils import db_port_manager
 from ..models import Endpoint, EndpointRule
@@ -46,9 +47,12 @@ class EndpointSerializer(BulkModelSerializer):
 
 
 class EndpointRuleSerializer(BulkModelSerializer):
-    _ip_group_help_text = '{} <br> {}'.format(
-        ip_group_help_text,
-        _('If asset IP addresses under different endpoints conflict, use asset labels')
+    _ip_group_help_text = _(
+        'Format for comma-delimited string, with * indicating a match all. '
+        'Such as: '
+        '192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64'
+        '<br>'
+        'If asset IP addresses under different endpoints conflict, use asset labels'
     )
     ip_group = serializers.ListField(
         default=['*'], label=_('IP'), help_text=_ip_group_help_text,

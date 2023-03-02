@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-13 15:00+0800\n"
+"POT-Creation-Date: 2023-03-02 12:21+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -23,7 +23,7 @@ msgstr "访问控制"
 
 #: acls/models/base.py:25 acls/serializers/login_asset_acl.py:47
 #: applications/models/application.py:219 assets/models/asset.py:138
-#: assets/models/base.py:173 assets/models/cluster.py:18
+#: assets/models/base.py:177 assets/models/cluster.py:18
 #: assets/models/cmd_filter.py:27 assets/models/domain.py:23
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
 #: orgs/models.py:70 perms/models/base.py:83 rbac/models/role.py:29
@@ -54,7 +54,7 @@ msgstr "激活中"
 
 #: acls/models/base.py:32 applications/models/application.py:232
 #: assets/models/asset.py:143 assets/models/asset.py:231
-#: assets/models/backup.py:54 assets/models/base.py:178
+#: assets/models/backup.py:54 assets/models/base.py:182
 #: assets/models/cluster.py:29 assets/models/cmd_filter.py:52
 #: assets/models/cmd_filter.py:100 assets/models/domain.py:24
 #: assets/models/domain.py:65 assets/models/group.py:23
@@ -154,7 +154,7 @@ msgid "Format for comma-delimited string, with * indicating a match all. "
 msgstr "格式为逗号分隔的字符串, * 表示匹配所有. "
 
 #: acls/serializers/login_acl.py:15 acls/serializers/login_asset_acl.py:17
-#: acls/serializers/login_asset_acl.py:51 assets/models/base.py:174
+#: acls/serializers/login_asset_acl.py:51 assets/models/base.py:178
 #: assets/models/gathered_user.py:15 audits/models.py:139
 #: authentication/forms.py:25 authentication/forms.py:27
 #: authentication/models.py:260
@@ -184,7 +184,7 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
-#: settings/serializers/terminal.py:10 terminal/serializers/endpoint.py:54
+#: settings/serializers/terminal.py:10 terminal/serializers/endpoint.py:58
 msgid "IP"
 msgstr "IP"
 
@@ -348,7 +348,7 @@ msgid "Type display"
 msgstr "类型名称"
 
 #: applications/serializers/application.py:105 assets/models/asset.py:230
-#: assets/models/base.py:179 assets/models/cluster.py:26
+#: assets/models/base.py:183 assets/models/cluster.py:26
 #: assets/models/cmd_filter.py:53 assets/models/domain.py:26
 #: assets/models/gathered_user.py:19 assets/models/group.py:22
 #: assets/models/label.py:25 assets/serializers/account.py:18
@@ -362,7 +362,7 @@ msgstr "类型名称"
 msgid "Date created"
 msgstr "创建日期"
 
-#: applications/serializers/application.py:106 assets/models/base.py:180
+#: applications/serializers/application.py:106 assets/models/base.py:184
 #: assets/models/cmd_filter.py:54 assets/models/gathered_user.py:20
 #: assets/serializers/account.py:21 assets/serializers/cmd_filter.py:29
 #: assets/serializers/cmd_filter.py:49 common/db/models.py:117
@@ -643,7 +643,7 @@ msgstr "资产编号"
 msgid "Labels"
 msgstr "标签管理"
 
-#: assets/models/asset.py:229 assets/models/base.py:181
+#: assets/models/asset.py:229 assets/models/base.py:185
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:56
 #: assets/models/cmd_filter.py:103 assets/models/group.py:21
 #: common/db/models.py:114 common/mixins/models.py:49 orgs/models.py:71
@@ -779,32 +779,32 @@ msgstr "是否成功"
 msgid "Account backup execution"
 msgstr "账号备份执行"
 
-#: assets/models/base.py:28 assets/tasks/const.py:51 audits/const.py:5
+#: assets/models/base.py:29 assets/tasks/const.py:51 audits/const.py:5
 #: common/utils/ip/geoip/utils.py:31 common/utils/ip/geoip/utils.py:37
 #: common/utils/ip/utils.py:84
 msgid "Unknown"
 msgstr "未知"
 
-#: assets/models/base.py:29
+#: assets/models/base.py:30
 msgid "Ok"
 msgstr "成功"
 
-#: assets/models/base.py:30 audits/models.py:136
+#: assets/models/base.py:31 audits/models.py:136
 #: xpack/plugins/change_auth_plan/serializers/app.py:88
 #: xpack/plugins/change_auth_plan/serializers/asset.py:199
 #: xpack/plugins/cloud/const.py:41
 msgid "Failed"
 msgstr "失败"
 
-#: assets/models/base.py:36 assets/serializers/domain.py:47
+#: assets/models/base.py:37 assets/serializers/domain.py:47
 msgid "Connectivity"
 msgstr "可连接性"
 
-#: assets/models/base.py:38 authentication/models.py:263
+#: assets/models/base.py:39 authentication/models.py:263
 msgid "Date verified"
 msgstr "校验日期"
 
-#: assets/models/base.py:175 assets/serializers/base.py:14
+#: assets/models/base.py:179 assets/serializers/base.py:14
 #: assets/serializers/base.py:37 assets/serializers/system_user.py:29
 #: audits/signal_handlers.py:58 authentication/confirm/password.py:9
 #: authentication/forms.py:32
@@ -822,14 +822,14 @@ msgstr "校验日期"
 msgid "Password"
 msgstr "密码"
 
-#: assets/models/base.py:176 assets/serializers/base.py:41
+#: assets/models/base.py:180 assets/serializers/base.py:41
 #: xpack/plugins/change_auth_plan/models/asset.py:53
 #: xpack/plugins/change_auth_plan/models/asset.py:130
 #: xpack/plugins/change_auth_plan/models/asset.py:206
 msgid "SSH private key"
 msgstr "SSH密钥"
 
-#: assets/models/base.py:177 xpack/plugins/change_auth_plan/models/asset.py:56
+#: assets/models/base.py:181 xpack/plugins/change_auth_plan/models/asset.py:56
 #: xpack/plugins/change_auth_plan/models/asset.py:126
 #: xpack/plugins/change_auth_plan/models/asset.py:202
 msgid "SSH public key"
@@ -947,7 +947,7 @@ msgstr "测试网关"
 msgid "Unable to connect to port {port} on {ip}"
 msgstr "无法连接到 {ip} 上的端口 {port}"
 
-#: assets/models/domain.py:134 authentication/middleware.py:75
+#: assets/models/domain.py:134 authentication/middleware.py:87
 #: xpack/plugins/cloud/providers/fc.py:48
 msgid "Authentication failed"
 msgstr "认证失败"
@@ -1706,7 +1706,7 @@ msgid "Authentication"
 msgstr "认证"
 
 #: authentication/backends/custom.py:58
-#: authentication/backends/oauth2/backends.py:158 authentication/models.py:158
+#: authentication/backends/oauth2/backends.py:167 authentication/models.py:158
 msgid "User invalid, disabled or expired"
 msgstr "用户无效，已禁用或已过期"
 
@@ -1913,15 +1913,15 @@ msgstr "没有绑定飞书"
 msgid "Your password is invalid"
 msgstr "您的密码无效"
 
-#: authentication/errors/redirect.py:85 authentication/mixins.py:306
+#: authentication/errors/redirect.py:85 authentication/mixins.py:307
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors/redirect.py:93 authentication/mixins.py:313
+#: authentication/errors/redirect.py:93 authentication/mixins.py:314
 msgid "You should to change your password before login"
 msgstr "登录完成前，请先修改密码"
 
-#: authentication/errors/redirect.py:101 authentication/mixins.py:320
+#: authentication/errors/redirect.py:101 authentication/mixins.py:321
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
@@ -2018,15 +2018,15 @@ msgstr "设置手机号码启用"
 msgid "Clear phone number to disable"
 msgstr "清空手机号码禁用"
 
-#: authentication/middleware.py:76 settings/utils/ldap.py:652
+#: authentication/middleware.py:88 settings/utils/ldap.py:652
 msgid "Authentication failed (before login check failed): {}"
 msgstr "认证失败（登录前检查失败）: {}"
 
-#: authentication/mixins.py:256
+#: authentication/mixins.py:257
 msgid "The MFA type ({}) is not enabled"
 msgstr "该 MFA ({}) 方式没有启用"
 
-#: authentication/mixins.py:296
+#: authentication/mixins.py:297
 msgid "Please change your password"
 msgstr "请修改密码"
 
@@ -4660,13 +4660,13 @@ msgstr "过期。"
 #, python-format
 msgid ""
 "\n"
-"                Your password has expired, please click <a href="
-"\"%(user_password_update_url)s\"> this link </a> update password.\n"
+"                Your password has expired, please click <a "
+"href=\"%(user_password_update_url)s\"> this link </a> update password.\n"
 "            "
 msgstr ""
 "\n"
-"                您的密码已经过期，请点击 <a href="
-"\"%(user_password_update_url)s\"> 链接 </a> 更新密码\n"
+"                您的密码已经过期，请点击 <a "
+"href=\"%(user_password_update_url)s\"> 链接 </a> 更新密码\n"
 "        "
 
 #: templates/_message.html:30
@@ -4690,8 +4690,8 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"        Your information was incomplete. Please click <a href="
-"\"%(first_login_url)s\"> this link </a>to complete your information.\n"
+"        Your information was incomplete. Please click <a "
+"href=\"%(first_login_url)s\"> this link </a>to complete your information.\n"
 "        "
 msgstr ""
 "\n"
@@ -4703,13 +4703,13 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"        Your ssh public key not set or expired. Please click <a href="
-"\"%(user_pubkey_update)s\"> this link </a>to update\n"
+"        Your ssh public key not set or expired. Please click <a "
+"href=\"%(user_pubkey_update)s\"> this link </a>to update\n"
 "        "
 msgstr ""
 "\n"
-"                您的SSH密钥没有设置或已失效，请点击 <a href="
-"\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
+"                您的SSH密钥没有设置或已失效，请点击 <a "
+"href=\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
 "        "
 
 #: templates/_mfa_login_field.html:28
@@ -4922,7 +4922,7 @@ msgid "RDP Port"
 msgstr "RDP 端口"
 
 #: terminal/models/endpoint.py:27 terminal/models/endpoint.py:95
-#: terminal/serializers/endpoint.py:57 terminal/serializers/storage.py:38
+#: terminal/serializers/endpoint.py:61 terminal/serializers/storage.py:38
 #: terminal/serializers/storage.py:50 terminal/serializers/storage.py:80
 #: terminal/serializers/storage.py:90 terminal/serializers/storage.py:98
 msgid "Endpoint"
@@ -5113,15 +5113,15 @@ msgstr "级别"
 msgid "Batch danger command alert"
 msgstr "批量危险命令告警"
 
-#: terminal/serializers/endpoint.py:14
+#: terminal/serializers/endpoint.py:15
 msgid "Magnus listen db port"
 msgstr "Magnus 监听的数据库端口"
 
-#: terminal/serializers/endpoint.py:17
+#: terminal/serializers/endpoint.py:18
 msgid "Magnus Listen port range"
 msgstr "Magnus 监听的端口范围"
 
-#: terminal/serializers/endpoint.py:19
+#: terminal/serializers/endpoint.py:20
 msgid ""
 "The range of ports that Magnus listens on is modified in the configuration "
 "file"
@@ -5129,8 +5129,14 @@ msgstr "请在配置文件中修改 Magnus 监听的端口范围"
 
 #: terminal/serializers/endpoint.py:51
 msgid ""
-"If asset IP addresses under different endpoints conflict, use asset labels"
-msgstr "如果不同端点下的资产 IP 有冲突，使用资产标签实现"
+"Format for comma-delimited string, with * indicating a match all. Such as: "
+"192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:"
+"db8:1a:1110::/64<br>If asset IP addresses under different endpoints "
+"conflict, use asset labels"
+msgstr ""
+"格式为逗号分隔的字符串, * 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, "
+"10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64<br>如果不同端点"
+"下的资产 IP 有冲突，使用资产标签实现"
 
 #: terminal/serializers/session.py:15 terminal/serializers/session.py:42
 msgid "Terminal display"
@@ -5254,7 +5260,7 @@ msgstr "没有发现"
 msgid "view"
 msgstr "查看"
 
-#: terminal/utils/db_port_mapper.py:65
+#: terminal/utils/db_port_mapper.py:78
 msgid ""
 "No available port is matched. The number of databases may have exceeded the "
 "number of ports open to the database agent service, Contact the "
@@ -5263,13 +5269,13 @@ msgstr ""
 "未匹配到可用端口，数据库的数量可能已经超过数据库代理服务开放的端口数量，请联"
 "系管理员开放更多端口。"
 
-#: terminal/utils/db_port_mapper.py:91
+#: terminal/utils/db_port_mapper.py:104
 msgid ""
 "No ports can be used, check and modify the limit on the number of ports that "
 "Magnus listens on in the configuration file."
 msgstr "没有端口可以使用，检查并修改配置文件中 Magnus 监听的端口数量限制。"
 
-#: terminal/utils/db_port_mapper.py:93
+#: terminal/utils/db_port_mapper.py:106
 msgid "All available port count: {}, Already use port count: {}"
 msgstr "所有可用端口数量：{}，已使用端口数量：{}"
 
@@ -6969,3 +6975,7 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid ""
+#~ "If asset IP addresses under different endpoints conflict, use asset labels"
+#~ msgstr "如果不同端点下的资产 IP 有冲突，使用资产标签实现"
