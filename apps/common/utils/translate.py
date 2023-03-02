@@ -35,7 +35,10 @@ def i18n_trans(s):
     tpl, args = s.split(' % ', 1)
     args = args.split(', ')
     args = [gettext(arg) for arg in args]
-    return gettext(tpl) % tuple(args)
+    try:
+        return gettext(tpl) % tuple(args)
+    except TypeError:
+        return gettext(tpl)
 
 
 def hello():
