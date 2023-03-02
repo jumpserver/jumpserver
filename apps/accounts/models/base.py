@@ -12,7 +12,7 @@ from accounts.const import SecretType
 from common.db import fields
 from common.utils import (
     ssh_key_string_to_obj, ssh_key_gen, get_logger,
-    random_string, lazyproperty, parse_ssh_public_key_str
+    random_string, lazyproperty, parse_ssh_public_key_str, is_openssh_format_key
 )
 from orgs.mixins.models import JMSOrgBaseModel, OrgManager
 
@@ -118,7 +118,13 @@ class BaseAccount(JMSOrgBaseModel):
         key_name = '.' + md5(self.private_key.encode('utf-8')).hexdigest()
         key_path = os.path.join(tmp_dir, key_name)
         if not os.path.exists(key_path):
-            self.private_key_obj.write_private_key_file(key_path)
+            # https://github.com/ansible/ansible-runner/issues/544
+            # ssh requires OpenSSH format keys to have a full ending newline.
+            # It does not require this for old-style PEM keys.
+            with open(key_path, 'w') as f:
+                f.write(self.secret)
+                if is_openssh_format_key(self.secret):
+                    f.write("\n")
             os.chmod(key_path, 0o400)
         return key_path
 
