@@ -513,4 +513,14 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
         args = self.request.META.get('QUERY_STRING', '')
         if args:
             guard_url = "%s?%s" % (guard_url, args)
-        return redirect(guard_url)
+        response = redirect(guard_url)
+        self.set_browser_default_language_if_need(response)
+        return response
+
+    def set_browser_default_language_if_need(self, response):
+        # en, ja, zh-CN,zh;q=0.9
+        default_lang = self.request.headers.get('Accept-Language')
+        if 'zh' in default_lang:
+            default_lang = 'zh'
+        lang = response.cookies.get(settings.LANGUAGE_COOKIE_NAME) or default_lang
+        response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang)
