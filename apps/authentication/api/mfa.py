@@ -3,16 +3,17 @@
 import time
 
 from django.utils.translation import ugettext as _
-from django.conf import settings
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import AllowAny
 from rest_framework.generics import CreateAPIView
 from rest_framework.serializers import ValidationError
-from rest_framework.response import Response
+from rest_framework.views import APIView, Response
 
 from common.utils import get_logger
 from common.exceptions import UnexpectError
+from common.permissions import IsValidUser
 from users.models.user import User
+from users.utils import generate_otp_uri, get_user_or_pre_auth_user
 from .. import serializers
 from .. import errors
 from ..mixins import AuthMixin
@@ -20,7 +21,7 @@ from ..mixins import AuthMixin
 logger = get_logger(__name__)
 
 __all__ = [
-    'MFAChallengeVerifyApi', 'MFASendCodeApi'
+    'MFAChallengeVerifyApi', 'MFASendCodeApi', 'MFASettingsApi'
 ]
 
 
@@ -62,6 +63,17 @@ class MFASendCodeApi(AuthMixin, CreateAPIView):
             mfa_backend.send_challenge()
         except Exception as e:
             raise UnexpectError(str(e))
+
+
+class MFASettingsApi(APIView):
+    permission_classes = [IsValidUser]
+
+    def get(self, request):
+        user = get_user_or_pre_auth_user(self.request)
+        otp_uri, otp_secret_key = generate_otp_uri(user.username)
+        return Response({
+            'otp_uri': otp_uri, 'otp_secret_key': otp_secret_key,
+        })
 
 
 class MFAChallengeVerifyApi(AuthMixin, CreateAPIView):

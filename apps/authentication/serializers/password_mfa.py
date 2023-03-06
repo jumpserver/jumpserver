@@ -1,13 +1,21 @@
 # -*- coding: utf-8 -*-
 #
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
+from django.core.cache import cache
+from django.utils import timezone
 from rest_framework import serializers
+from captcha.models import CaptchaStore
 
 from common.serializers.fields import EncryptedField
+from common.utils import get_object_or_none, random_string
+from users.models import User
+
 
 __all__ = [
     'MFAChallengeSerializer', 'MFASelectTypeSerializer',
     'PasswordVerifySerializer', 'ResetPasswordCodeSerializer',
+    'ForgetPasswordPreviewingSerializer', 'ForgetPasswordAuthSerializer',
 ]
 
 
@@ -51,3 +59,71 @@ class MFAChallengeSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         pass
+
+
+class CaptchaSerializer(serializers.Serializer):
+    value = serializers.CharField(required=True)
+    key = serializers.CharField(required=True)
+
+
+class ForgetPasswordPreviewingSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=150, required=True, label=_("Username"))
+    code = CaptchaSerializer()
+    token = serializers.CharField(max_length=36, read_only=True)
+
+    @staticmethod
+    def custom_validate_username(username):
+        err = ''
+        user = get_object_or_none(User, username=username)
+        if not user:
+            err = _('User does not exist: {}').format(username)
+        if settings.ONLY_ALLOW_AUTH_FROM_SOURCE and not user.is_local:
+            err = _('Non-local users can log in only from third-party platforms '
+                    'and cannot change their passwords: {}').format(username)
+        return user, err
+
+    @staticmethod
+    def custom_validate_code(code_dict):
+        err = ''
+        key, value = code_dict.get('key'), code_dict.get('value')
+        if not getattr(settings, 'CAPTCHA_GET_FROM_POOL', None):
+            CaptchaStore.remove_expired()
+
+        try:
+            captcha = CaptchaStore.objects.get(
+                hashkey=key, expiration__gt=timezone.now()
+            )
+        except CaptchaStore.DoesNotExist:
+            err = _('Invalid CAPTCHA')
+        else:
+            if captcha.response != value:
+                err = _('Invalid CAPTCHA')
+            captcha.delete()
+        return err
+
+    def create(self, validated_data):
+        user, err = self.custom_validate_username(validated_data['username'])
+        if err:
+            raise serializers.ValidationError({'username': err})
+
+        err = self.custom_validate_code(validated_data.get('code', {}))
+        if err:
+            raise serializers.ValidationError({'code': err})
+
+        token = random_string(36)
+        user_map = {
+            'username': user.username, 'phone': user.phone,
+            'email': user.email, 'receive_backends': user.receive_backends
+        }
+        cache.set(token, user_map, 5 * 60)
+        validated_data['token'] = token
+        return validated_data
+
+
+class ForgetPasswordAuthSerializer(serializers.Serializer):
+    methods = serializers.CharField(label=_('Authentication backend'))
+    account = serializers.CharField(max_length=36, required=True)
+    code = serializers.CharField(max_length=36, required=True, label=_('Captcha'))
+
+    def validate(self, attrs):
+        return attrs

@@ -29,6 +29,7 @@ urlpatterns = [
     path('confirm/', api.ConfirmApi.as_view(), name='user-confirm'),
     path('confirm-oauth/', api.ConfirmBindORUNBindOAuth.as_view(), name='confirm-oauth'),
     path('tokens/', api.TokenCreateApi.as_view(), name='auth-token'),
+    path('mfa/settings/', api.MFASettingsApi.as_view(), name='mfa-settings'),
     path('mfa/verify/', api.MFAChallengeVerifyApi.as_view(), name='mfa-verify'),
     path('mfa/challenge/', api.MFAChallengeVerifyApi.as_view(), name='mfa-challenge'),
     path('mfa/select/', api.MFASendCodeApi.as_view(), name='mfa-select'),
@@ -36,6 +37,9 @@ urlpatterns = [
     path('password/reset-code/', api.UserResetPasswordSendCodeApi.as_view(), name='reset-password-code'),
     path('password/verify/', api.UserPasswordVerifyApi.as_view(), name='user-password-verify'),
     path('login-confirm-ticket/status/', api.TicketStatusApi.as_view(), name='login-confirm-ticket-status'),
+
+    path('password/forget/previewing/', api.ForgetPasswordPreviewingApi.as_view(), name='forgot-previewing'),
+    path('password/forget/auth/', api.ForgetPasswordAuthApi.as_view(), name='forgot-auth'),
 ]
 
 urlpatterns += router.urls

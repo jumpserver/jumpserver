@@ -122,6 +122,7 @@ class UserProfileSerializer(UserSerializer):
         source='get_public_key_hash_md5', required=False, read_only=True, max_length=128
     )
     mfa_level = LabeledChoiceField(choices=MFA_LEVEL_CHOICES, label=_("MFA"), required=False)
+    mfa_backends = serializers.SerializerMethodField()
     guide_url = serializers.SerializerMethodField()
     receive_backends = serializers.ListField(child=serializers.CharField(), read_only=True)
     console_orgs = UserOrgSerializer(many=True, read_only=True)
@@ -133,7 +134,7 @@ class UserProfileSerializer(UserSerializer):
         read_only_fields = [
             'date_joined', 'last_login', 'created_by', 'source',
             'console_orgs', 'audit_orgs', 'workbench_orgs',
-            'receive_backends', 'perms',
+            'receive_backends', 'perms', 'mfa_backends',
         ]
         fields = UserSerializer.Meta.fields + [
             'public_key_comment', 'public_key_hash_md5', 'guide_url',
@@ -169,6 +170,11 @@ class UserProfileSerializer(UserSerializer):
     @staticmethod
     def get_guide_url(obj):
         return settings.USER_GUIDE_URL
+
+    @staticmethod
+    def get_mfa_backends(obj):
+        backends = User.get_user_mfa_backends(obj, to_dict=True)
+        return backends
 
     def validate_mfa_level(self, mfa_level):
         if self.instance and self.instance.mfa_force_enabled:

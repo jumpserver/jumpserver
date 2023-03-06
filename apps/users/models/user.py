@@ -646,12 +646,23 @@ class MFAMixin:
         return {b.name: b for b in self.active_mfa_backends}
 
     @staticmethod
-    def get_user_mfa_backends(user):
+    def get_user_mfa_backends(user, to_dict=False):
         backends = []
         for cls in settings.MFA_BACKENDS:
-            cls = import_string(cls)
-            if cls.global_enabled():
-                backends.append(cls(user))
+            backend = import_string(cls)(user)
+            if backend.global_enabled():
+                if to_dict:
+                    backends.append({
+                        'name': backend.name,
+                        'can_disabled': backend.can_disable(),
+                        'disabled': not bool(backend.is_active()),
+                        'display_name': backend.display_name,
+                        'placeholder': backend.placeholder,
+                        'help_text_of_enable': backend.help_text_of_enable(),
+                        'help_text_of_disable': backend.help_text_of_disable(),
+                    })
+                else:
+                    backends.append(backend)
         return backends
 
     def get_active_mfa_backend_by_type(self, mfa_type):

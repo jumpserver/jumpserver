@@ -5,14 +5,18 @@ from django.utils.translation import ugettext as _
 from django.template.loader import render_to_string
 from django.core.cache import cache
 from django.shortcuts import reverse
+from django.http import Http404
+from django.conf import settings
 
 from common.utils.verify_code import SendAndVerifyCodeUtil
 from common.permissions import IsValidUser
 from common.utils.random import random_string
 from common.utils import get_object_or_none
 from authentication.serializers import (
-    PasswordVerifySerializer, ResetPasswordCodeSerializer
+    PasswordVerifySerializer, ResetPasswordCodeSerializer,
+    ForgetPasswordPreviewingSerializer, ForgetPasswordAuthSerializer
 )
+from notifications.backends import client_name_mapper
 from settings.utils import get_login_title
 from users.models import User
 from authentication.mixins import authenticate
@@ -82,3 +86,56 @@ class UserPasswordVerifyApi(AuthMixin, CreateAPIView):
 
         self.mark_password_ok(user)
         return Response()
+
+
+class ForgetPasswordPreviewingApi(CreateAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = ForgetPasswordPreviewingSerializer
+
+
+class ForgetPasswordAuthApi(CreateAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = ForgetPasswordAuthSerializer
+
+    def pre_check(self):
+        token = self.request.query_params.get('token')
+        if not token:
+            raise Http404()
+        user_info = cache.get(token)
+        if not user_info:
+            raise Http404()
+        return user_info
+
+    @staticmethod
+    def get_backends(active_backends):
+        backends = [
+            {
+                'name': _('Email'), 'is_active': True, 'value': 'email',
+                'help_text': _('Input your email account, that will send a email to your')
+            }
+        ]
+        for b in backends:
+            if b['value'] not in active_backends:
+                b['is_active'] = False
+
+        if settings.XPACK_ENABLED:
+            if settings.SMS_ENABLED:
+                is_active = True
+            else:
+                is_active = False
+            sms_backend = {
+                'name': _('SMS'), 'is_active': is_active, 'value': 'sms',
+                'help_text': _(
+                    'Enter your mobile number and a verification code will be sent to your phone'
+                ),
+            }
+            backends.append(sms_backend)
+        return backends
+
+    def get(self, request, *args, **kwargs):
+        user_info = self.pre_check()
+        backends = self.get_backends(set(user_info['receive_backends']))
+        return Response(backends)
+
+    def perform_create(self, serializer):
+        self.pre_check()

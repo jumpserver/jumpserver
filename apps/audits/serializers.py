@@ -99,7 +99,12 @@ class OperateLogSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_resource(instance):
-        return i18n_trans(instance.resource)
+        display = instance.resource
+        try:
+            display = i18n_trans(display)
+        except:
+            pass
+        return display
 
 
 class PasswordChangeLogSerializer(serializers.ModelSerializer):

@@ -18,9 +18,9 @@ from ..models import User
 from .mixins import UserQuerysetMixin
 
 __all__ = [
-    'UserResetPasswordApi', 'UserResetPKApi',
-    'UserProfileApi', 'UserPasswordApi',
-    'UserSecretKeyApi', 'UserPublicKeyApi'
+    'UserResetPasswordApi', 'UserResetPKApi', 'UserProfileApi',
+    'UserPasswordApi', 'UserSecretKeyApi', 'UserPublicKeyApi',
+    'UserMFAApi',
 ]
 
 
@@ -67,6 +67,14 @@ class UserProfileApi(generics.RetrieveUpdateAPIView):
         if not token:
             return
         return token.user
+
+
+class UserMFAApi(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = serializers.UserUpdatePasswordSerializer
+
+    def get_object(self):
+        return self.request.user
 
 
 class UserPasswordApi(generics.RetrieveUpdateAPIView):
