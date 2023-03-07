@@ -17,9 +17,9 @@ __all__ = [
 def verify_connectivity_util(assets, tp, accounts, task_name):
     if not assets or not accounts:
         return
-    account_usernames = list(accounts.values_list('username', flat=True))
+    account_ids = [str(account.id) for account in accounts]
     task_snapshot = {
-        'accounts': account_usernames,
+        'accounts': account_ids,
         'assets': [str(asset.id) for asset in assets],
     }
     quickstart_automation_by_snapshot(task_name, tp, task_snapshot)
