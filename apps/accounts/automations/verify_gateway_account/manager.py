@@ -1,6 +1,6 @@
-from common.utils import get_logger
 from accounts.const import AutomationTypes
 from assets.automations.ping_gateway.manager import PingGatewayManager
+from common.utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -16,6 +16,6 @@ class VerifyGatewayAccountManager(PingGatewayManager):
         logger.info(">>> 开始执行测试网关账号可连接性任务")
 
     def get_accounts(self, gateway):
-        usernames = self.execution.snapshot['accounts']
-        accounts = gateway.accounts.filter(username__in=usernames)
+        account_ids = self.execution.snapshot['accounts']
+        accounts = gateway.accounts.filter(id__in=account_ids)
         return accounts

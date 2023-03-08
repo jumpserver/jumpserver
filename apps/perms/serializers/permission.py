@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
+from accounts.models import AccountTemplate, Account
+from accounts.tasks import push_accounts_to_assets_task
 from assets.models import Asset, Node
 from common.serializers.fields import BitChoicesField, ObjectRelatedField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
@@ -30,6 +32,8 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
     is_valid = serializers.BooleanField(read_only=True, label=_("Is valid"))
     is_expired = serializers.BooleanField(read_only=True, label=_("Is expired"))
     accounts = serializers.ListField(label=_("Account"), required=False)
+
+    template_accounts: QuerySet
 
     class Meta:
         model = AssetPermission
@@ -73,8 +77,55 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
         actions.default = list(actions.choices.keys())
 
     @staticmethod
-    def validate_accounts(accounts):
-        return list(set(accounts))
+    def get_all_assets(nodes, assets):
+        node_asset_ids = Node.get_nodes_all_assets(*nodes).values_list('id', flat=True)
+        direct_asset_ids = [asset.id for asset in assets]
+        asset_ids = set(direct_asset_ids + list(node_asset_ids))
+        return Asset.objects.filter(id__in=asset_ids)
+
+    def create_accounts(self, assets):
+        need_create_accounts = []
+        account_attribute = [
+            'name', 'username', 'secret_type', 'secret', 'privileged', 'is_active', 'org_id'
+        ]
+        for asset in assets:
+            asset_exist_accounts = Account.objects.none()
+            for template in self.template_accounts:
+                asset_exist_accounts |= asset.accounts.filter(
+                    username=template.username,
+                    secret_type=template.secret_type,
+                )
+            username_secret_type_dict = asset_exist_accounts.values('username', 'secret_type')
+            for template in self.template_accounts:
+                condition = {
+                    'username': template.username,
+                    'secret_type': template.secret_type
+                }
+                if condition in username_secret_type_dict:
+                    continue
+                account_data = {key: getattr(template, key) for key in account_attribute}
+                account_data['name'] = f"{account_data['name']}-clone"
+                need_create_accounts.append(Account(**{'asset_id': asset.id, **account_data}))
+        return Account.objects.bulk_create(need_create_accounts)
+
+    def create_and_push_account(self, nodes, assets):
+        if not self.template_accounts:
+            return
+        assets = self.get_all_assets(nodes, assets)
+        accounts = self.create_accounts(assets)
+        push_accounts_to_assets_task.delay([str(account.id) for account in accounts])
+
+    def validate_accounts(self, usernames: list[str]):
+        template_ids = []
+        account_usernames = []
+        for username in usernames:
+            if username.startswith('%'):
+                template_ids.append(username[1:])
+            else:
+                account_usernames.append(username)
+        self.template_accounts = AccountTemplate.objects.filter(id__in=template_ids)
+        template_usernames = list(self.template_accounts.values_list('username', flat=True))
+        return list(set(account_usernames + template_usernames))
 
     @classmethod
     def setup_eager_loading(cls, queryset):
@@ -111,6 +162,13 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
             full_value__in=kwargs.get("nodes_display")
         ).distinct()
         instance.nodes.add(*nodes_to_set)
+
+    def validate(self, attrs):
+        self.create_and_push_account(
+            attrs.get("nodes", []),
+            attrs.get("assets", [])
+        )
+        return super().validate(attrs)
 
     def create(self, validated_data):
         display = {

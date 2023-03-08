@@ -12,8 +12,7 @@ from django.utils.translation import gettext as _
 from sshtunnel import SSHTunnelForwarder, BaseSSHTunnelForwarderError
 
 from assets.automations.methods import platform_automation_methods
-from common.utils import get_logger, lazyproperty
-from common.utils import ssh_pubkey_gen, is_openssh_format_key
+from common.utils import get_logger, lazyproperty, is_openssh_format_key, ssh_pubkey_gen
 from ops.ansible import JMSInventory, PlaybookRunner, DefaultCallback
 
 logger = get_logger(__name__)

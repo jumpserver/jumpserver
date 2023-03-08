@@ -23,12 +23,10 @@ def push_accounts_to_assets_task(account_ids):
     task_name = gettext_noop("Push accounts to assets")
     task_name = PushAccountAutomation.generate_unique_name(task_name)
 
-    for account in accounts:
-        task_snapshot = {
-            'secret': account.secret,
-            'secret_type': account.secret_type,
-            'accounts': [account.username],
-            'assets': [str(account.asset_id)],
-        }
-        tp = AutomationTypes.push_account
-        quickstart_automation_by_snapshot(task_name, tp, task_snapshot)
+    task_snapshot = {
+        'accounts': [str(account.id) for account in accounts],
+        'assets': [str(account.asset_id) for account in accounts],
+    }
+
+    tp = AutomationTypes.push_account
+    quickstart_automation_by_snapshot(task_name, tp, task_snapshot)

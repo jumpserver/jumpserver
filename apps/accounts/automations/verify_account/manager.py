@@ -25,6 +25,15 @@ class VerifyAccountManager(AccountBasePlaybookManager):
             f.write('ssh_args = -o ControlMaster=no -o ControlPersist=no\n')
         return path
 
+    @classmethod
+    def method_type(cls):
+        return AutomationTypes.verify_account
+
+    def get_accounts(self, privilege_account, accounts: QuerySet):
+        account_ids = self.execution.snapshot['accounts']
+        accounts = accounts.filter(id__in=account_ids)
+        return accounts
+
     def host_callback(self, host, asset=None, account=None, automation=None, path_dir=None, **kwargs):
         host = super().host_callback(
             host, asset=asset, account=account,
@@ -61,16 +70,6 @@ class VerifyAccountManager(AccountBasePlaybookManager):
                 h['account']['mode'] = 'sysdba' if account.privileged else None
             inventory_hosts.append(h)
         return inventory_hosts
-
-    @classmethod
-    def method_type(cls):
-        return AutomationTypes.verify_account
-
-    def get_accounts(self, privilege_account, accounts: QuerySet):
-        snapshot_account_usernames = self.execution.snapshot['accounts']
-        if '*' not in snapshot_account_usernames:
-            accounts = accounts.filter(username__in=snapshot_account_usernames)
-        return accounts
 
     def on_host_success(self, host, result):
         account = self.host_account_mapper.get(host)
