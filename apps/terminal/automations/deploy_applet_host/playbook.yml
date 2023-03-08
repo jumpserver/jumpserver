@@ -198,7 +198,7 @@
 
     - name: Generate tinkerd component config
       ansible.windows.win_shell:
-        "tinkerd config --hostname '{{ HOST_NAME }}'' --core_host {{ CORE_HOST }}
+        "tinkerd config --hostname {{ HOST_NAME }} --core_host {{ CORE_HOST }}
       --token {{ BOOTSTRAP_TOKEN }} --host_id {{ HOST_ID }}"
 
     - name: Install tinkerd service

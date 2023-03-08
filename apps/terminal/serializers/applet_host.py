@@ -31,13 +31,13 @@ class DeployOptionsSerializer(serializers.Serializer):
 
     CORE_HOST = serializers.CharField(
         default=settings.SITE_URL, label=_('Core API'), max_length=1024,
-        help_text=_("""
-        Tips: The application release machine communicates with the Core service.
-        If the release machine and the Core service are on the same network segment,
-        it is recommended to fill in the intranet address, otherwise fill in the current site URL
-        <br>
-        eg: https://172.16.10.110 or https://dev.jumpserver.com
-        """)
+        help_text=_(""" 
+        Tips: The application release machine communicates with the Core service. 
+        If the release machine and the Core service are on the same network segment, 
+        it is recommended to fill in the intranet address, otherwise fill in the current site URL 
+        <br> 
+        eg: https://172.16.10.110 or https://dev.jumpserver.com 
+        """) 
     )
     IGNORE_VERIFY_CERTS = serializers.BooleanField(default=True, label=_("Ignore Certificate Verification"))
     RDS_Licensing = serializers.BooleanField(default=False, label=_("Existing RDS license"))
