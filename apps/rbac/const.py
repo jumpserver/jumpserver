@@ -135,7 +135,7 @@ only_system_permissions = (
     ('xpack', 'license', '*', '*'),
     ('settings', 'setting', '*', '*'),
     ('tickets', '*', '*', '*'),
-    ('ops', 'task', 'view', 'taskmonitor'),
+    ('ops', 'celerytask', 'view', 'taskmonitor'),
     ('terminal', 'terminal', '*', '*'),
     ('terminal', 'commandstorage', '*', '*'),
     ('terminal', 'replaystorage', '*', '*'),

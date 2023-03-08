@@ -149,7 +149,7 @@ class OperateLogViewSet(OrgReadonlyModelViewSet):
         return super().get_serializer_class()
 
     def get_queryset(self):
-        org_q = Q(org_id=Organization.SYSTEM_ID) | Q(org_id=current_org.id)
+        org_q = Q(org_id=current_org.id)
         with tmp_to_root_org():
             qs = OperateLog.objects.filter(org_q)
         es_config = settings.OPERATE_LOG_ELASTICSEARCH_CONFIG
