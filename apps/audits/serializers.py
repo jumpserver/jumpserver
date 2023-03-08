@@ -2,7 +2,7 @@
 #
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
-
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from audits.backends.db import OperateLogStore
 from common.serializers.fields import LabeledChoiceField
 from common.utils import reverse, i18n_trans
@@ -78,7 +78,7 @@ class OperateLogActionDetailSerializer(serializers.ModelSerializer):
         return data
 
 
-class OperateLogSerializer(serializers.ModelSerializer):
+class OperateLogSerializer(BulkOrgResourceModelSerializer):
     action = LabeledChoiceField(choices=ActionChoices.choices, label=_("Action"))
     resource = serializers.SerializerMethodField(label=_("Resource"))
     resource_type = serializers.SerializerMethodField(label=_('Resource Type'))
