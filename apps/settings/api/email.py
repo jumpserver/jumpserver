@@ -42,7 +42,7 @@ class MailTestingAPI(APIView):
         #     if k.startswith('EMAIL'):
         #         setattr(settings, k, v)
         try:
-            subject = settings.EMAIL_SUBJECT_PREFIX + "Test"
+            subject = settings.EMAIL_SUBJECT_PREFIX or '' + "Test"
             message = "Test smtp setting"
             email_from = email_from or email_host_user
             email_recipient = email_recipient or email_from
