@@ -1,7 +1,7 @@
 from werkzeug.local import Local
 
 thread_local = Local()
-encrypted_field_set = set()
+encrypted_field_set = {'password'}
 
 
 def _find(attr):

@@ -2,13 +2,14 @@ import csv
 import codecs
 
 from itertools import chain
+from datetime import datetime
 
 from django.http import HttpResponse
 from django.db import models
 
 from settings.serializers import SettingsSerializer
+from common.utils.timezone import as_current_tz
 from common.utils import validate_ip, get_ip_city, get_logger
-from common.db import fields
 from .const import DEFAULT_CITY
 
 
@@ -78,6 +79,8 @@ def model_to_dict_for_operate_log(
             f.verbose_name = 'id'
         elif isinstance(value, list):
             value = [str(v) for v in value]
+        elif isinstance(value, datetime):
+            value = as_current_tz(value).strftime('%Y-%m-%d %H:%M:%S')
 
         if include_model_fields or getattr(f, 'primary_key', False):
             data[str(f.verbose_name)] = value
