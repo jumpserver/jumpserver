@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-02 15:34+0800\n"
+"POT-Creation-Date: 2023-03-08 18:34+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1275,7 +1275,7 @@ msgstr "资产自动化任务"
 #: audits/serializers.py:49 ops/models/base.py:49 ops/models/job.py:183
 #: terminal/models/applet/applet.py:157 terminal/models/applet/host.py:108
 #: terminal/models/component/status.py:27 terminal/serializers/applet.py:18
-#: terminal/serializers/applet_host.py:102 tickets/models/ticket/general.py:283
+#: terminal/serializers/applet_host.py:103 tickets/models/ticket/general.py:283
 #: tickets/serializers/super_ticket.py:13
 #: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:164
 #: xpack/plugins/cloud/models.py:216
@@ -1803,11 +1803,11 @@ msgstr "任务"
 msgid "-"
 msgstr "-"
 
-#: audits/handler.py:116
+#: audits/handler.py:115
 msgid "Yes"
 msgstr "是"
 
-#: audits/handler.py:116
+#: audits/handler.py:115
 msgid "No"
 msgstr "否"
 
@@ -1975,19 +1975,19 @@ msgstr "清理审计会话任务日志"
 msgid "This action require verify your MFA"
 msgstr "该操作需要验证您的 MFA, 请先开启并配置"
 
-#: authentication/api/connection_token.py:268
+#: authentication/api/connection_token.py:295
 msgid "Account not found"
 msgstr "账号未找到"
 
-#: authentication/api/connection_token.py:271
+#: authentication/api/connection_token.py:298
 msgid "Permission expired"
 msgstr "授权已过期"
 
-#: authentication/api/connection_token.py:283
+#: authentication/api/connection_token.py:310
 msgid "ACL action is reject"
 msgstr "ACL 动作是拒绝"
 
-#: authentication/api/connection_token.py:287
+#: authentication/api/connection_token.py:314
 msgid "ACL action is review"
 msgstr "ACL 动作是复核"
 
@@ -2531,7 +2531,7 @@ msgstr "显示"
 
 #: authentication/templates/authentication/_access_key_modal.html:66
 #: settings/serializers/security.py:39 users/models/user.py:601
-#: users/serializers/profile.py:115 users/templates/users/mfa_setting.html:61
+#: users/serializers/profile.py:115
 #: users/templates/users/user_verify_mfa.html:36
 msgid "Disable"
 msgstr "禁用"
@@ -2808,11 +2808,11 @@ msgstr "正在跳转到 {} 认证"
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: authentication/views/login.py:238
+#: authentication/views/login.py:247
 msgid "User email already exists ({})"
 msgstr "用户邮箱已存在 ({})"
 
-#: authentication/views/login.py:318
+#: authentication/views/login.py:325
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -2820,15 +2820,15 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:323
+#: authentication/views/login.py:330
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:359
+#: authentication/views/login.py:366
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:360
+#: authentication/views/login.py:367
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
@@ -3098,7 +3098,7 @@ msgstr "无效 IP"
 msgid "Invalid address"
 msgstr "无效地址"
 
-#: common/utils/translate.py:42
+#: common/utils/translate.py:45
 #, python-format
 msgid "Hello %s"
 msgstr "你好 %s"
@@ -5410,7 +5410,7 @@ msgstr "Applet pkg 无效，缺少文件 {}"
 msgid "Hosting"
 msgstr "宿主机"
 
-#: terminal/models/applet/host.py:19 terminal/serializers/applet_host.py:52
+#: terminal/models/applet/host.py:19 terminal/serializers/applet_host.py:53
 msgid "Deploy options"
 msgstr "部署参数"
 
@@ -5681,31 +5681,35 @@ msgstr ""
 "建议填写内网地址，否则填写当前站点 URL<br>例如：https://172.16.10.110 or "
 "https://dev.jumpserver.com"
 
-#: terminal/serializers/applet_host.py:42
+#: terminal/serializers/applet_host.py:42 terminal/serializers/storage.py:168
+msgid "Ignore Certificate Verification"
+msgstr "忽略证书认证"
+
+#: terminal/serializers/applet_host.py:43
 msgid "Existing RDS license"
 msgstr "已有 RDS 许可证"
 
-#: terminal/serializers/applet_host.py:43
+#: terminal/serializers/applet_host.py:44
 msgid "RDS License Server"
 msgstr "RDS 许可服务器"
 
-#: terminal/serializers/applet_host.py:44
+#: terminal/serializers/applet_host.py:45
 msgid "RDS Licensing Mode"
 msgstr "RDS 授权模式"
 
-#: terminal/serializers/applet_host.py:46
+#: terminal/serializers/applet_host.py:47
 msgid "RDS Single Session Per User"
 msgstr "RDS 单用户单会话"
 
-#: terminal/serializers/applet_host.py:47
+#: terminal/serializers/applet_host.py:48
 msgid "RDS Max Disconnection Time"
 msgstr "RDS 最大断开时间"
 
-#: terminal/serializers/applet_host.py:48
+#: terminal/serializers/applet_host.py:49
 msgid "RDS Remote App Logoff Time Limit"
 msgstr "RDS 远程应用注销时间限制"
 
-#: terminal/serializers/applet_host.py:54 terminal/serializers/terminal.py:41
+#: terminal/serializers/applet_host.py:55 terminal/serializers/terminal.py:41
 msgid "Load status"
 msgstr "负载状态"
 
@@ -5839,10 +5843,6 @@ msgstr "索引"
 #: terminal/serializers/storage.py:166
 msgid "Doc type"
 msgstr "文档类型"
-
-#: terminal/serializers/storage.py:168
-msgid "Ignore Certificate Verification"
-msgstr "忽略证书认证"
 
 #: terminal/serializers/terminal.py:77 terminal/serializers/terminal.py:85
 msgid "Not found"
@@ -6612,6 +6612,10 @@ msgstr "MFA 已强制启用，无法禁用"
 #: users/templates/users/mfa_setting.html:48
 msgid "MFA setting"
 msgstr "设置 MFA 多因子认证"
+
+#: users/templates/users/mfa_setting.html:61
+msgid "Reset"
+msgstr "重置"
 
 #: users/templates/users/reset_password.html:23
 msgid "Your password must satisfy"
