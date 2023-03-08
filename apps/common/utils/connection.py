@@ -108,7 +108,7 @@ class Subscription:
         try:
             self.sub.close()
         except Exception as e:
-            logger.error('Unsubscribe msg error: {}'.format(e))
+            logger.debug('Unsubscribe msg error: {}'.format(e))
 
     def retry(self, _next, error, complete):
         logger.info('Retry subscribe channel: {}'.format(self.ch))

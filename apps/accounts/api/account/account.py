@@ -43,7 +43,7 @@ class AccountViewSet(OrgBulkModelViewSet):
             asset = get_object_or_404(Asset, pk=asset_id)
             accounts = asset.accounts.all()
         else:
-            accounts = []
+            accounts = Account.objects.none()
         accounts = self.filter_queryset(accounts)
         serializer = serializers.AccountSerializer(accounts, many=True)
         return Response(data=serializer.data)
