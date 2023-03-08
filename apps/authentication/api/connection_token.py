@@ -24,7 +24,7 @@ from orgs.mixins.api import RootOrgViewMixin
 from perms.models import ActionChoices
 from terminal.connect_methods import NativeClient, ConnectMethodUtil
 from terminal.models import EndpointRule
-from ..models import ConnectionToken
+from ..models import ConnectionToken, date_expired_default
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
     SuperConnectionTokenSerializer, ConnectTokenAppletOptionSerializer
@@ -172,6 +172,7 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
     get_object: callable
     get_serializer: callable
     perform_create: callable
+    validate_exchange_token: callable
 
     @action(methods=['POST', 'GET'], detail=True, url_path='rdp-file')
     def get_rdp_file(self, *args, **kwargs):
@@ -204,6 +205,18 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
         instance.expire()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @action(methods=['POST'], detail=False)
+    def exchange(self, request, *args, **kwargs):
+        pk = request.data.get('id', None) or request.data.get('pk', None)
+        # 只能兑换自己使用的 Token
+        instance = get_object_or_404(ConnectionToken, pk=pk, user=request.user)
+        instance.id = None
+        self.validate_exchange_token(instance)
+        instance.date_expired = date_expired_default()
+        instance.save()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelViewSet):
     filterset_fields = (
@@ -217,6 +230,7 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         'list': 'authentication.view_connectiontoken',
         'retrieve': 'authentication.view_connectiontoken',
         'create': 'authentication.add_connectiontoken',
+        'exchange': 'authentication.add_connectiontoken',
         'expire': 'authentication.change_connectiontoken',
         'get_rdp_file': 'authentication.add_connectiontoken',
         'get_client_protocol_url': 'authentication.add_connectiontoken',
@@ -240,10 +254,24 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         user = self.get_user(serializer)
         asset = data.get('asset')
         account_name = data.get('account')
+        _data = self._validate(user, asset, account_name)
+        data.update(_data)
+        return serializer
+
+    def validate_exchange_token(self, token):
+        user = token.user
+        asset = token.asset
+        account_name = token.account
+        _data = self._validate(user, asset, account_name)
+        for k, v in _data.items():
+            setattr(token, k, v)
+        return token
+
+    def _validate(self, user, asset, account_name):
+        data = dict()
         data['org_id'] = asset.org_id
         data['user'] = user
         data['value'] = random_string(16)
-
         account = self._validate_perm(user, asset, account_name)
         if account.has_secret:
             data['input_secret'] = ''
@@ -257,8 +285,7 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         if ticket:
             data['from_ticket'] = ticket
             data['is_active'] = False
-
-        return account
+        return data
 
     @staticmethod
     def _validate_perm(user, asset, account_name):
