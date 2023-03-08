@@ -39,6 +39,7 @@ class DeployOptionsSerializer(serializers.Serializer):
         eg: https://172.16.10.110 or https://dev.jumpserver.com
         """)
     )
+    IGNORE_VERIFY_CERTS = serializers.BooleanField(default=True, label=_("Ignore Certificate Verification"))
     RDS_Licensing = serializers.BooleanField(default=False, label=_("Existing RDS license"))
     RDS_LicenseServer = serializers.CharField(default='127.0.0.1', label=_('RDS License Server'), max_length=1024)
     RDS_LicensingMode = serializers.ChoiceField(choices=LICENSE_MODE_CHOICES, default=2, label=_('RDS Licensing Mode'))
