@@ -38,7 +38,7 @@
       ansible.windows.win_get_url:
         url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/{{ TinkerInstaller }}"
         dest: "{{ ansible_env.TEMP }}\\{{ TinkerInstaller }}"
-        validate_certs: "{{ IGNORE_VERIFY_CERTS }}"
+        validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
 
     - name: Install JumpServer Tinker (jumpserver)
       ansible.windows.win_package:
@@ -59,7 +59,7 @@
       ansible.windows.win_get_url:
         url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/python-3.10.8-amd64.exe"
         dest: "{{ ansible_env.TEMP }}\\python-3.10.8-amd64.exe"
-        validate_certs: "{{ IGNORE_VERIFY_CERTS }}"
+        validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
 
     - name: Install the python-3.10.8
       ansible.windows.win_package:
@@ -135,7 +135,7 @@
       ansible.windows.win_get_url:
         url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/pip_packages.zip"
         dest: "{{ ansible_env.TEMP }}\\pip_packages.zip"
-        validate_certs: "{{ IGNORE_VERIFY_CERTS }}"
+        validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
 
     - name: Unzip pip_packages
       community.windows.win_unzip:
@@ -151,7 +151,7 @@
       ansible.windows.win_get_url:
         url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/chromedriver_win32.zip"
         dest: "{{ ansible_env.TEMP }}\\chromedriver_win32.zip"
-        validate_certs: "{{ IGNORE_VERIFY_CERTS }}"
+        validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
 
     - name: Unzip chromedriver (Chromium)
       community.windows.win_unzip:
@@ -162,7 +162,7 @@
       ansible.windows.win_get_url:
         url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/chrome-win.zip"
         dest: "{{ ansible_env.TEMP }}\\chrome-win.zip"
-        validate_certs: "{{ IGNORE_VERIFY_CERTS }}"
+        validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
 
     - name: Unzip Chromium (Chromium)
       community.windows.win_unzip:
@@ -187,7 +187,7 @@
       ansible.windows.win_get_url:
         url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/navicat161_premium_en_x64.exe"
         dest: "{{ ansible_env.TEMP }}\\navicat161_premium_en_x64.exe"
-        validate_certs: "{{ IGNORE_VERIFY_CERTS }}"
+        validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
 
     - name: Install navicat (navicat)
       ansible.windows.win_package:
