@@ -24,6 +24,7 @@ jobs:
         build-args: |
           APT_MIRROR=http://deb.debian.org
           PIP_MIRROR=https://pypi.org/simple
+          PIP_JMS_MIRROR=https://pypi.org/simple
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
