@@ -1,13 +1,15 @@
 import codecs
 import copy
 import csv
+
 from itertools import chain
+from datetime import datetime
 
 from django.db import models
 from django.http import HttpResponse
 
+from common.utils.timezone import as_current_tz
 from common.utils import validate_ip, get_ip_city, get_logger
-from settings.serializers import SettingsSerializer
 from .const import DEFAULT_CITY
 
 logger = get_logger(__name__)
@@ -70,6 +72,8 @@ def _get_instance_field_value(
                 f.verbose_name = 'id'
             elif isinstance(value, (list, dict)):
                 value = copy.deepcopy(value)
+            elif isinstance(value, datetime):
+                value = as_current_tz(value).strftime('%Y-%m-%d %H:%M:%S')
             elif isinstance(f, models.OneToOneField) and isinstance(value, models.Model):
                 nested_data = _get_instance_field_value(
                     value, include_model_fields, model_need_continue_fields, ('id',)
