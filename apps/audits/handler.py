@@ -4,7 +4,6 @@ from django.db import transaction
 from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
 
-from users.models import User
 from common.utils import get_request_ip, get_logger
 from common.utils.timezone import as_current_tz
 from common.utils.encode import Singleton
