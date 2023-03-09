@@ -105,9 +105,13 @@ class Session(OrgModelMixin):
     def find_ok_relative_path_in_storage(self, storage):
         session_paths = self.get_all_possible_relative_path()
         for rel_path in session_paths:
-            if storage.exists(rel_path):
-                return rel_path
-
+            # storage 为多个外部存储时, 可能会因部分不可用，
+            # 抛出异常, 影响录像的获取
+            try:
+                if storage.exists(rel_path):
+                    return rel_path
+            except:
+                pass
     @property
     def asset_obj(self):
         return Asset.objects.get(id=self.asset_id)
