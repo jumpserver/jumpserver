@@ -30,6 +30,6 @@ class GatherFactsManager(BasePlaybookManager):
         if asset and info:
             info = self.format_asset_info(asset.type, info)
             asset.info = info
-            asset.save()
+            asset.save(update_fields=['info'])
         else:
             logger.error("Not found info: {}".format(host))
