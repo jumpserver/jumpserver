@@ -18,6 +18,7 @@ class Command(Enum):
     CLICK = 'click'
     OPEN = 'open'
     CODE = 'code'
+    SELECT_FRAME = 'select_frame'
 
 
 def _execute_type(ele: WebElement, value: str):
@@ -52,6 +53,9 @@ class StepAction:
 
     def execute(self, driver: webdriver.Chrome) -> bool:
         if not self.target:
+            return True
+        if self.command == 'select_frame':
+            driver.switch_to.frame(self.target)
             return True
         target_name, target_value = self.target.split("=", 1)
         by_name = self.methods_map.get(target_name.upper(), By.NAME)
