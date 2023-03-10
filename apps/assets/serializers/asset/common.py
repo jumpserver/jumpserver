@@ -73,7 +73,7 @@ class AssetAccountSerializer(
             'is_active', 'version', 'secret_type',
         ]
         fields_write_only = [
-            'secret', 'push_now', 'template'
+            'secret', 'passphrase', 'push_now', 'template'
         ]
         fields = fields_mini + fields_write_only
         extra_kwargs = {
