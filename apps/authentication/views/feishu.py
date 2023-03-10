@@ -60,7 +60,7 @@ class FeiShuQRMixin(UserConfirmRequiredExceptionMixin, PermissionsMixin, View):
             'state': state,
             'redirect_uri': redirect_uri,
         }
-        url = URL.AUTHEN + '?' + urlencode(params)
+        url = URL().authen + '?' + urlencode(params)
         return url
 
     @staticmethod
