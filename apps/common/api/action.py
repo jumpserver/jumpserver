@@ -3,12 +3,11 @@
 from typing import Callable
 
 from django.utils.translation import ugettext as _
-from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.request import Request
+from rest_framework.response import Response
 
 from common.const.http import POST
-
 
 __all__ = ['SuggestionMixin', 'RenderToJsonMixin']
 

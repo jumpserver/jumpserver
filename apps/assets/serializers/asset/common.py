@@ -26,6 +26,13 @@ __all__ = [
 class AssetProtocolsSerializer(serializers.ModelSerializer):
     port = serializers.IntegerField(required=False, allow_null=True, max_value=65535, min_value=1)
 
+    def to_file_representation(self, data):
+        return '{name}/{port}'.format(**data)
+
+    def to_file_internal_value(self, data):
+        name, port = data.split('/')
+        return {'name': name, 'port': port}
+
     class Meta:
         model = Protocol
         fields = ['name', 'port']
@@ -121,7 +128,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
     labels = AssetLabelSerializer(many=True, required=False, label=_('Label'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'), default=())
-    accounts = AssetAccountSerializer(many=True, required=False, write_only=True, label=_('Account'))
+    accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, write_only=True, label=_('Account'))
+    nodes_display = serializers.ListField(read_only=True, label=_("Node path"))
 
     class Meta:
         model = Asset
@@ -133,11 +141,11 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
             'nodes_display', 'accounts'
         ]
         read_only_fields = [
-            'category', 'type', 'connectivity',
+            'category', 'type', 'connectivity', 'auto_info',
             'date_verified', 'created_by', 'date_created',
-            'auto_info',
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
+        fields_unexport = ['auto_info']
         extra_kwargs = {
             'auto_info': {'label': _('Auto info')},
             'name': {'label': _("Name")},
