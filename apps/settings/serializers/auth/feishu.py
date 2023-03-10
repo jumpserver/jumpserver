@@ -10,7 +10,7 @@ class FeiShuSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('FeiShu')
 
     VERSION_CHOICES = (
-        ('feishu', _('Feishu')),
+        ('feishu', _('FeiShu')),
         ('lark', 'Lark')
     )
     AUTH_FEISHU = serializers.BooleanField(default=False, label=_('Enable FeiShu Auth'))
