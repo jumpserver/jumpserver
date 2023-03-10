@@ -1,6 +1,6 @@
 from openpyxl import Workbook
-from openpyxl.writer.excel import save_virtual_workbook
 from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
+from openpyxl.writer.excel import save_virtual_workbook
 
 from .base import BaseFileRenderer
 
@@ -23,8 +23,8 @@ class ExcelFileRenderer(BaseFileRenderer):
         for cell_value in row:
             # 处理非法字符
             column_count += 1
-            cell_value = ILLEGAL_CHARACTERS_RE.sub(r'', cell_value)
-            self.ws.cell(row=self.row_count, column=column_count, value=cell_value)
+            cell_value = ILLEGAL_CHARACTERS_RE.sub(r'', str(cell_value))
+            self.ws.cell(row=self.row_count, column=column_count, value=str(cell_value))
 
     def get_rendered_value(self):
         value = save_virtual_workbook(self.wb)
