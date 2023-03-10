@@ -148,6 +148,9 @@ class BaseFileRenderer(BaseRenderer):
     def get_rendered_value(self):
         raise NotImplementedError
 
+    def after_render(self):
+        pass
+
     def render(self, data, accepted_media_type=None, renderer_context=None):
         if data is None:
             return bytes()
@@ -176,6 +179,7 @@ class BaseFileRenderer(BaseRenderer):
             self.initial_writer()
             self.write_column_titles(column_titles)
             self.write_rows(rows)
+            self.after_render()
             value = self.get_rendered_value()
         except Exception as e:
             logger.debug(e, exc_info=True)
