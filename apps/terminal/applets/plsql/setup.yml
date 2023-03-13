@@ -1,0 +1,8 @@
+type: msi # exe, zip, manual
+source: jms:///download/applets/plsqldev1207x64.msi
+arguments:
+  - /quiet
+  - /norestart
+destination: C:\Program Files\PLSQL Developer 12
+program: C:\Program Files\PLSQL Developer 12\plsqldev.exe
+md5: f8655878debaecf32212bf1379710df1

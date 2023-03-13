@@ -1,0 +1,12 @@
+name: plsql
+display_name: PL/SQL Developer 12
+comment: An Integrated Development Environment that is specifically targeted at the development of stored program units for Oracle Databases
+version: 0.1
+exec_type: python
+author: Halo
+type: general
+update_policy: always
+tags:
+  - database
+protocols:
+  - oracle
