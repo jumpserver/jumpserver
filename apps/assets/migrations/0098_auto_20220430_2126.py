@@ -34,8 +34,9 @@ def migrate_database_to_asset(apps, *args):
         _attrs = app.attrs or {}
         attrs.update(_attrs)
 
+        name = 'DB-{}'.format(app.name)
         db = db_model(
-            id=app.id, name=app.name, address=attrs['host'],
+            id=app.id, name=name, address=attrs['host'],
             protocols='{}/{}'.format(app.type, attrs['port']),
             db_name=attrs['database'] or '',
             platform=platforms_map[app.type],
@@ -61,8 +62,9 @@ def migrate_cloud_to_asset(apps, *args):
     for app in applications:
         attrs = app.attrs
         print("\t- Create cloud: {}".format(app.name))
+        name = 'Cloud-{}'.format(app.name)
         cloud = cloud_model(
-            id=app.id, name=app.name,
+            id=app.id, name=name,
             address=attrs.get('cluster', ''),
             protocols='k8s/443', platform=platform,
             org_id=app.org_id,
