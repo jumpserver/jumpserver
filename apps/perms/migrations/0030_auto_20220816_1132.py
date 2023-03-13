@@ -9,11 +9,11 @@ def migrate_system_user_to_accounts(apps, schema_editor):
     bulk_size = 10000
     while True:
         asset_permissions = asset_permission_model.objects \
-                                .prefetch_related('system_users')[count:bulk_size]
+            .prefetch_related('system_users')[count:bulk_size]
         if not asset_permissions:
             break
-        count += len(asset_permissions)
 
+        count += len(asset_permissions)
         updated = []
         for asset_permission in asset_permissions:
             asset_permission.accounts = [s.username for s in asset_permission.system_users.all()]
