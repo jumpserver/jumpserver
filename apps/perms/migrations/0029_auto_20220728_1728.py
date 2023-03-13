@@ -23,6 +23,7 @@ def migrate_app_perms_to_assets(apps, schema_editor):
             asset_permission = asset_permission_model()
             for attr in attrs:
                 setattr(asset_permission, attr, getattr(app_perm, attr))
+            asset_permission.name = f"App-{app_perm.name}"
             asset_permissions.append(asset_permission)
         asset_permission_model.objects.bulk_create(asset_permissions, ignore_conflicts=True)
 
