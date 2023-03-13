@@ -140,7 +140,11 @@ class JMSInventory:
         return host
 
     def get_asset_accounts(self, asset):
-        return list(asset.accounts.filter(is_active=True))
+        from assets.const import Connectivity
+        accounts = asset.accounts.filter(is_active=True).order_by('-privileged', '-date_updated')
+        accounts_connectivity_ok = list(accounts.filter(connectivity=Connectivity.OK))
+        accounts_connectivity_no = list(accounts.exclude(connectivity=Connectivity.OK))
+        return accounts_connectivity_ok + accounts_connectivity_no
 
     def select_account(self, asset):
         accounts = self.get_asset_accounts(asset)
@@ -161,8 +165,7 @@ class JMSInventory:
             return account_selected
 
         if self.account_policy in ['privileged_only', 'privileged_first']:
-            account_matched = list(filter(lambda account: account.privileged, accounts))
-            account_selected = account_matched[0] if account_matched else None
+            account_selected = accounts[0] if accounts else None
 
         if account_selected:
             return account_selected
