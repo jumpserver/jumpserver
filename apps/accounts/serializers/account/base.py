@@ -33,7 +33,8 @@ class AuthValidateMixin(serializers.Serializer):
             return secret
         elif secret_type == SecretType.SSH_KEY:
             passphrase = passphrase if passphrase else None
-            return validate_ssh_key(secret, passphrase)
+            secret = validate_ssh_key(secret, passphrase)
+            return secret
         else:
             return secret
 
@@ -41,8 +42,9 @@ class AuthValidateMixin(serializers.Serializer):
         secret_type = validated_data.get('secret_type')
         passphrase = validated_data.get('passphrase')
         secret = validated_data.pop('secret', None)
-        self.handle_secret(secret, secret_type, passphrase)
-        validated_data['secret'] = secret
+        validated_data['secret'] = self.handle_secret(
+            secret, secret_type, passphrase
+        )
         for field in ('secret',):
             value = validated_data.get(field)
             if not value:
