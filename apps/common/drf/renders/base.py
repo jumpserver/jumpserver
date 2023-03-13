@@ -5,7 +5,7 @@ from rest_framework import serializers
 from rest_framework.renderers import BaseRenderer
 from rest_framework.utils import encoders, json
 
-from common.serializers.fields import ObjectRelatedField
+from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from common.utils import get_logger
 
 logger = get_logger(__file__)
@@ -100,7 +100,7 @@ class BaseFileRenderer(BaseRenderer):
             value = field.to_file_representation(value)
         elif isinstance(value, bool):
             value = 'Yes' if value else 'No'
-        elif isinstance(field, serializers.ChoiceField):
+        elif isinstance(field, LabeledChoiceField):
             value = value.get('value', '')
         elif isinstance(field, ObjectRelatedField):
             if field.many:

@@ -271,6 +271,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
 
     @staticmethod
     def accounts_create(accounts_data, asset):
+        if not accounts_data:
+            return
         for data in accounts_data:
             data['asset'] = asset
             AssetAccountSerializer().create(data)
