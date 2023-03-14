@@ -1,13 +1,28 @@
+from typing import Callable
+
+from rest_framework.generics import RetrieveUpdateAPIView
+
 from assets.const import AllTypes
 from assets.models import Platform
-from assets.serializers import PlatformSerializer
+from assets.serializers import PlatformSerializer, PlatformCustomCommandsSerializer
 from common.api import JMSModelViewSet
 from common.serializers import GroupedChoiceSerializer
 
-__all__ = ['AssetPlatformViewSet']
+__all__ = ['AssetPlatformViewSet', 'PlatformCustomCommands']
 
 
-class AssetPlatformViewSet(JMSModelViewSet):
+class PlatformPermissionMixin:
+    permission_denied: Callable
+
+    def check_object_permissions(self, request, obj):
+        if request.method.lower() in ['delete', 'put', 'patch'] and obj.internal:
+            self.permission_denied(
+                request, message={"detail": "Internal platform"}
+            )
+        return super().check_object_permissions(request, obj)
+
+
+class AssetPlatformViewSet(JMSModelViewSet, PlatformPermissionMixin):
     queryset = Platform.objects.all()
     serializer_classes = {
         'default': PlatformSerializer,
@@ -32,9 +47,12 @@ class AssetPlatformViewSet(JMSModelViewSet):
             return super().get_object()
         return self.get_queryset().get(name=pk)
 
-    def check_object_permissions(self, request, obj):
-        if request.method.lower() in ['delete', 'put', 'patch'] and obj.internal:
-            self.permission_denied(
-                request, message={"detail": "Internal platform"}
-            )
-        return super().check_object_permissions(request, obj)
+
+class PlatformCustomCommands(RetrieveUpdateAPIView, PlatformPermissionMixin):
+    queryset = Platform.objects.filter(internal=False)
+    serializer_class = PlatformCustomCommandsSerializer
+    rbac_perms = {
+        'GET': 'assets.view_platform',
+        'PUT': 'assets.change_platform',
+        'PATCH': 'assets.change_platform',
+    }

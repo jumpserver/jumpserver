@@ -1,0 +1,9 @@
+id: change_secret_custom
+name: Change secret by SSH
+category:
+  - device
+  - host
+type:
+  - all
+method: change_secret
+copy_push_method: false

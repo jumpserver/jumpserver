@@ -45,6 +45,9 @@ urlpatterns = [
     path('nodes/<uuid:pk>/tasks/', api.NodeTaskCreateApi.as_view(), name='node-task-create'),
 
     path('gateways/<uuid:pk>/test-connective/', api.GatewayTestConnectionApi.as_view(), name='test-gateway-connective'),
+
+    path('platforms/<str:pk>/custom-auth-commands/', api.PlatformCustomCommands.as_view(),
+         name='platform-custom-commands'),
 ]
 
 urlpatterns += router.urls

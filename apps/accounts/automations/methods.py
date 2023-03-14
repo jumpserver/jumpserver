@@ -12,6 +12,8 @@ def copy_change_secret_to_push_account(methods):
     for method in copy_methods:
         if not method['id'].startswith(change_secret):
             continue
+        if not method.get('copy_push_method', True):
+            continue
         copy_method = copy.deepcopy(method)
         copy_method['method'] = push_account.value
         copy_method['id'] = copy_method['id'].replace(

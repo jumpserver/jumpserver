@@ -53,6 +53,12 @@ class VerifyAccountManager(AccountBasePlaybookManager):
             self.host_account_mapper[h['name']] = account
             secret = account.secret
 
+            platform = kwargs['platform']
+            if automation.verify_account_method.endswith('custom') \
+                    and account.secret_type == SecretType.SSH_KEY:
+                print(f'{platform} {asset} does not support ssh key verify.')
+                return inventory_hosts
+
             private_key_path = None
             if account.secret_type == SecretType.SSH_KEY:
                 private_key_path = self.generate_private_key_path(secret, path_dir)

@@ -105,6 +105,9 @@ class Platform(JMSBaseModel):
         primary_protocol_name = AllTypes.get_primary_protocol_name(self.category, self.type)
         return self.protocols.filter(name=primary_protocol_name).first()
 
+    def get_commands(self):
+        return self.meta.get('commands', [])
+
     def __str__(self):
         return self.name
 

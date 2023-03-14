@@ -1,4 +1,5 @@
 from assets.const import AutomationTypes, Connectivity
+from accounts.const import SecretType
 from common.utils import get_logger
 from ..base.manager import BasePlaybookManager
 
@@ -14,8 +15,15 @@ class PingManager(BasePlaybookManager):
     def method_type(cls):
         return AutomationTypes.ping
 
-    def host_callback(self, host, asset=None, account=None, **kwargs):
-        super().host_callback(host, asset=asset, account=account, **kwargs)
+    def host_callback(self, host, asset=None, account=None, automation=None, **kwargs):
+        super().host_callback(
+            host, asset=asset, account=account, automation=automation, **kwargs
+        )
+        platform = kwargs['platform']
+        if automation.ping_method.endswith('custom') \
+                and account.secret_type == SecretType.SSH_KEY:
+            print(f'{platform} {asset} does not support ssh key ping.')
+            return []
         self.host_asset_and_account_mapper[host['name']] = (asset, account)
         return host
 

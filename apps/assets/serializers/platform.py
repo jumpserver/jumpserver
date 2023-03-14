@@ -8,7 +8,10 @@ from common.serializers.fields import LabeledChoiceField
 from ..const import Category, AllTypes
 from ..models import Platform, PlatformProtocol, PlatformAutomation
 
-__all__ = ["PlatformSerializer", "PlatformOpsMethodSerializer"]
+__all__ = [
+    'PlatformSerializer', 'PlatformOpsMethodSerializer',
+    'PlatformCustomCommandsSerializer'
+]
 
 
 class ProtocolSettingSerializer(serializers.Serializer):
@@ -134,3 +137,30 @@ class PlatformOpsMethodSerializer(serializers.Serializer):
     category = serializers.CharField(max_length=50, label=_("Category"))
     type = serializers.ListSerializer(child=serializers.CharField())
     method = serializers.CharField()
+
+
+class PlatformCustomCommandsSerializer(serializers.Serializer):
+    commands = serializers.ListSerializer(child=serializers.CharField(allow_blank=True))
+
+    def to_representation(self, instance):
+        return {'commands': instance.meta.get('commands', [])}
+
+    @staticmethod
+    def validate_commands(commands):
+        has_username, has_password = False, False
+        for c in commands:
+            if not has_username and '{username}' in c:
+                has_username = True
+            if not has_password and '{password}' in c:
+                has_password = True
+        if not all([has_password, has_username]):
+            raise serializers.ValidationError(
+                _('The user-defined instruction needs to '
+                  'include the {username} and {password} fields')
+            )
+        return commands
+
+    def update(self, instance, validated_data):
+        instance.meta['commands'] = validated_data.pop('commands')
+        instance.save(update_fields=['meta'])
+        return instance
