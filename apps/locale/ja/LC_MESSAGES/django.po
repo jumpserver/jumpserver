@@ -4170,12 +4170,12 @@ msgstr ""
 "する方法、username, name,emailはjumpserverのユーザーが必要とする属性です"
 
 #: settings/serializers/auth/ldap.py:77
-msgid "Connect timeout"
-msgstr "接続タイムアウト"
+msgid "Connect timeout (s)"
+msgstr "接続タイムアウト (秒)"
 
 #: settings/serializers/auth/ldap.py:79
-msgid "Search paged size"
-msgstr "ページサイズを検索"
+msgid "Search paged size (piece)"
+msgstr "ページサイズを検索 (じょう)"
 
 #: settings/serializers/auth/ldap.py:81
 msgid "Enable LDAP auth"
@@ -4296,8 +4296,8 @@ msgid "Scopes"
 msgstr "スコープ"
 
 #: settings/serializers/auth/oidc.py:90
-msgid "Id token max age"
-msgstr "IDトークンの最大年齢"
+msgid "Id token max age (s)"
+msgstr "IDトークンの最大年齢 (秒)"
 
 #: settings/serializers/auth/oidc.py:93
 msgid "Id token include claims"

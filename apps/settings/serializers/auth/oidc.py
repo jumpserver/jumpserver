@@ -87,7 +87,7 @@ class OIDCSettingSerializer(KeycloakSettingSerializer):
     )
     AUTH_OPENID_SCOPES = serializers.CharField(required=False, max_length=1024, label=_('Scopes'))
     AUTH_OPENID_ID_TOKEN_MAX_AGE = serializers.IntegerField(
-        required=False, label=_('Id token max age')
+        required=False, label=_('Id token max age (s)')
     )
     AUTH_OPENID_ID_TOKEN_INCLUDE_CLAIMS = serializers.BooleanField(
         required=False, label=_('Id token include claims')

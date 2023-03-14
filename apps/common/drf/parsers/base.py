@@ -1,11 +1,15 @@
 import abc
-import json
 import codecs
-from rest_framework import serializers
+import json
+import re
+
 from django.utils.translation import ugettext_lazy as _
-from rest_framework.parsers import BaseParser
+from rest_framework import serializers
 from rest_framework import status
 from rest_framework.exceptions import ParseError, APIException
+from rest_framework.parsers import BaseParser
+
+from common.serializers.fields import ObjectRelatedField
 from common.utils import get_logger
 
 logger = get_logger(__file__)
@@ -18,11 +22,11 @@ class FileContentOverflowedError(APIException):
 
 
 class BaseFileParser(BaseParser):
-
     FILE_CONTENT_MAX_LENGTH = 1024 * 1024 * 10
 
     serializer_cls = None
     serializer_fields = None
+    obj_pattern = re.compile(r'^(.+)\(([a-z0-9-]+)\)$')
 
     def check_content_length(self, meta):
         content_length = int(meta.get('CONTENT_LENGTH', meta.get('HTTP_CONTENT_LENGTH', 0)))
@@ -74,7 +78,7 @@ class BaseFileParser(BaseParser):
         return s.translate(trans_table)
 
     @classmethod
-    def process_row(cls, row):
+    def load_row(cls, row):
         """
         构建json数据前的行处理
         """
@@ -84,33 +88,63 @@ class BaseFileParser(BaseParser):
             col = cls._replace_chinese_quote(col)
             # 列表/字典转换
             if isinstance(col, str) and (
-                    (col.startswith('[') and col.endswith(']'))
-                    or
+                    (col.startswith('[') and col.endswith(']')) or
                     (col.startswith("{") and col.endswith("}"))
             ):
-                col = json.loads(col)
+                try:
+                    col = json.loads(col)
+                except json.JSONDecodeError as e:
+                    logger.error('Json load error: ', e)
+                    logger.error('col: ', col)
             new_row.append(col)
         return new_row
+
+    def id_name_to_obj(self, v):
+        if not v or not isinstance(v, str):
+            return v
+        matched = self.obj_pattern.match(v)
+        if not matched:
+            return v
+        obj_name, obj_id = matched.groups()
+        if len(obj_id) < 36:
+            obj_id = int(obj_id)
+        return {'pk': obj_id, 'name': obj_name}
+
+    def parse_value(self, field, value):
+        if value is '-':
+            return None
+        elif hasattr(field, 'to_file_internal_value'):
+            value = field.to_file_internal_value(value)
+        elif isinstance(field, serializers.BooleanField):
+            value = value.lower() in ['true', '1', 'yes']
+        elif isinstance(field, serializers.ChoiceField):
+            value = value
+        elif isinstance(field, ObjectRelatedField):
+            if field.many:
+                value = [self.id_name_to_obj(v) for v in value]
+            else:
+                value = self.id_name_to_obj(value)
+        elif isinstance(field, serializers.ListSerializer):
+            value = [self.parse_value(field.child, v) for v in value]
+        elif isinstance(field, serializers.Serializer):
+            value = self.id_name_to_obj(value)
+        elif isinstance(field, serializers.ManyRelatedField):
+            value = [self.parse_value(field.child_relation, v) for v in value]
+        elif isinstance(field, serializers.ListField):
+            value = [self.parse_value(field.child, v) for v in value]
+
+        return value
 
     def process_row_data(self, row_data):
         """
         构建json数据后的行数据处理
         """
-        new_row_data = {}
-        serializer_fields = self.serializer_fields
+        new_row = {}
         for k, v in row_data.items():
-            if type(v) in [list, dict, int, bool] or (isinstance(v, str) and k.strip() and v.strip()):
-                # 处理类似disk_info为字符串的'{}'的问题
-                if not isinstance(v, str) and isinstance(serializer_fields[k], serializers.CharField):
-                    v = str(v)
-                # 处理 BooleanField 的问题, 导出是 'True', 'False'
-                if isinstance(v, str) and v.strip().lower() == 'true':
-                    v = True
-                elif isinstance(v, str) and v.strip().lower() == 'false':
-                    v = False
-
-                new_row_data[k] = v
-        return new_row_data
+            field = self.serializer_fields.get(k)
+            v = self.parse_value(field, v)
+            new_row[k] = v
+        return new_row
 
     def generate_data(self, fields_name, rows):
         data = []
@@ -118,7 +152,7 @@ class BaseFileParser(BaseParser):
             # 空行不处理
             if not any(row):
                 continue
-            row = self.process_row(row)
+            row = self.load_row(row)
             row_data = dict(zip(fields_name, row))
             row_data = self.process_row_data(row_data)
             data.append(row_data)
@@ -139,7 +173,6 @@ class BaseFileParser(BaseParser):
             raise ParseError('The resource does not support imports!')
 
         self.check_content_length(meta)
-
         try:
             stream_data = self.get_stream_data(stream)
             rows = self.generate_rows(stream_data)
@@ -148,6 +181,7 @@ class BaseFileParser(BaseParser):
 
             # 给 `common.mixins.api.RenderToJsonMixin` 提供，暂时只能耦合
             column_title_field_pairs = list(zip(column_titles, field_names))
+            column_title_field_pairs = [(k, v) for k, v in column_title_field_pairs if k and v]
             if not hasattr(request, 'jms_context'):
                 request.jms_context = {}
             request.jms_context['column_title_field_pairs'] = column_title_field_pairs
@@ -157,4 +191,3 @@ class BaseFileParser(BaseParser):
         except Exception as e:
             logger.error(e, exc_info=True)
             raise ParseError(_('Parse file error: {}').format(e))
-

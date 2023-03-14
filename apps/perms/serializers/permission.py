@@ -20,6 +20,12 @@ class ActionChoicesField(BitChoicesField):
     def __init__(self, **kwargs):
         super().__init__(choice_cls=ActionChoices, **kwargs)
 
+    def to_file_representation(self, value):
+        return [v['value'] for v in value]
+
+    def to_file_internal_value(self, data):
+        return data
+
 
 class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
     users = ObjectRelatedField(queryset=User.objects, many=True, required=False, label=_('User'))
