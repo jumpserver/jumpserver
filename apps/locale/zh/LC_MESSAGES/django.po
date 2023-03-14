@@ -4133,12 +4133,12 @@ msgstr ""
 "email 是jumpserver的用户需要属性"
 
 #: settings/serializers/auth/ldap.py:77
-msgid "Connect timeout"
-msgstr "连接超时时间"
+msgid "Connect timeout (s)"
+msgstr "连接超时时间 (秒)"
 
 #: settings/serializers/auth/ldap.py:79
-msgid "Search paged size"
-msgstr "搜索分页数量"
+msgid "Search paged size (piece)"
+msgstr "搜索分页数量 (条)"
 
 #: settings/serializers/auth/ldap.py:81
 msgid "Enable LDAP auth"
@@ -4259,8 +4259,8 @@ msgid "Scopes"
 msgstr "连接范围"
 
 #: settings/serializers/auth/oidc.py:90
-msgid "Id token max age"
-msgstr "令牌有效时间"
+msgid "Id token max age (s)"
+msgstr "令牌有效时间 (秒)"
 
 #: settings/serializers/auth/oidc.py:93
 msgid "Id token include claims"
