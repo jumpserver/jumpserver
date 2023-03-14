@@ -519,8 +519,14 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
 
     def set_browser_default_language_if_need(self, response):
         # en, ja, zh-CN,zh;q=0.9
-        default_lang = self.request.headers.get('Accept-Language')
-        if 'zh' in default_lang:
-            default_lang = 'zh'
-        lang = response.cookies.get(settings.LANGUAGE_COOKIE_NAME) or default_lang
+        browser_lang = self.request.headers.get('Accept-Language', '')
+        # 浏览器首选语言
+        if browser_lang.startswith('en'):
+            browser_lang = 'en'
+        elif browser_lang.startswith('ja'):
+            browser_lang = 'ja'
+        else:
+            browser_lang = 'zh'
+        request_lang = self.request.LANGUAGE_CODE
+        lang = request_lang or browser_lang
         response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang)
