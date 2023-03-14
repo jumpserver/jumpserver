@@ -153,7 +153,7 @@ class JMSInventory:
         account_selected = None
         account_usernames = self.account_prefer
 
-        if isinstance(self.account_prefer, str):
+        if isinstance(self.account_prefer, str) and account_usernames:
             account_usernames = self.account_prefer.split(',')
 
         # 优先使用提供的名称
