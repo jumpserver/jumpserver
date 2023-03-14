@@ -91,7 +91,11 @@ class BaseFileParser(BaseParser):
                     (col.startswith('[') and col.endswith(']')) or
                     (col.startswith("{") and col.endswith("}"))
             ):
-                col = json.loads(col)
+                try:
+                    col = json.loads(col)
+                except json.JSONDecodeError as e:
+                    logger.error('Json load error: ', e)
+                    logger.error('col: ', col)
             new_row.append(col)
         return new_row
 
