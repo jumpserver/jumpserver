@@ -32,6 +32,15 @@ class PlaybookViewSet(OrgBulkModelViewSet):
     model = Playbook
     search_fields = ('name', 'comment')
 
+    def perform_destroy(self, instance):
+        instance = self.get_object()
+        if instance.job_set.exists():
+            raise JMSException(code='playbook_has_job', detail={"msg": _("Currently playbook is being used in a job")})
+        instance_id = instance.id
+        super().perform_destroy(instance)
+        dest_path = os.path.join(settings.DATA_DIR, "ops", "playbook", instance_id.__str__())
+        shutil.rmtree(dest_path)
+
     def get_queryset(self):
         queryset = super().get_queryset()
         queryset = queryset.filter(creator=self.request.user)
