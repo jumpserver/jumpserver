@@ -6486,7 +6486,7 @@ msgstr "是否绑定了虚拟 MFA"
 
 #: users/serializers/user.py:97
 msgid "Can public key authentication"
-msgstr "公钥认证"
+msgstr "可以使用公钥认证"
 
 #: users/serializers/user.py:165
 msgid "Avatar url"
