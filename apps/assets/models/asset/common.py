@@ -108,7 +108,7 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
                                    verbose_name=_("Nodes"))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     labels = models.ManyToManyField('assets.Label', blank=True, related_name='assets', verbose_name=_("Labels"))
-    info = models.JSONField(verbose_name='Info', default=dict, blank=True)  # 资产的一些信息，如 硬件信息
+    info = models.JSONField(verbose_name=_('Info'), default=dict, blank=True)  # 资产的一些信息，如 硬件信息
 
     objects = AssetManager.from_queryset(AssetQuerySet)()
 
