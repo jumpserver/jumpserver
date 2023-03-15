@@ -1,5 +1,8 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
+from rest_framework.validators import (
+    UniqueTogetherValidator, ValidationError
+)
 
 from accounts.const import SecretType, Source
 from accounts.models import Account, AccountTemplate
@@ -8,7 +11,19 @@ from assets.const import Category, AllTypes
 from assets.models import Asset
 from common.serializers import SecretReadableMixin, BulkModelSerializer
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
+from common.utils import get_logger
 from .base import BaseAccountSerializer
+
+logger = get_logger(__name__)
+
+
+class SkipUniqueValidator(UniqueTogetherValidator):
+    def __call__(self, attrs, serializer):
+        try:
+            super().__call__(attrs, serializer)
+        except ValidationError as e:
+            logger.debug(f'{attrs.get("asset")}: {e.detail[0]}')
+            raise ValidationError({})
 
 
 class AccountSerializerCreateValidateMixin:
@@ -121,6 +136,18 @@ class AccountSerializer(AccountSerializerCreateMixin, BaseAccountSerializer):
         queryset = queryset \
             .prefetch_related('asset', 'asset__platform', 'asset__platform__automation')
         return queryset
+
+    def get_validators(self):
+        validators = []
+        data = self.context['request'].data
+        action = self.context['view'].action
+        _validators = super().get_validators()
+        ignore = action == 'create' and isinstance(data, list) and len(data) > 1
+        for v in _validators:
+            if ignore and isinstance(v, UniqueTogetherValidator):
+                v = SkipUniqueValidator(v.queryset, v.fields)
+            validators.append(v)
+        return validators
 
 
 class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
