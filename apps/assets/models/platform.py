@@ -11,7 +11,7 @@ __all__ = ['Platform', 'PlatformProtocol', 'PlatformAutomation']
 
 class PlatformProtocol(models.Model):
     SETTING_ATTRS = {
-        'console': True,
+        'console': False,
         'security': 'any,tls,rdp',
         'sftp_enabled': True,
         'sftp_home': '/tmp'
