@@ -274,4 +274,4 @@ def ensure_last_char_is_ascii(data):
 def data_to_json(data, sort_keys=True, indent=2, cls=None):
     if cls is None:
         cls = DjangoJSONEncoder
-    return json.dumps(data, sort_keys=sort_keys, indent=indent, cls=cls)
+    return json.dumps(data, ensure_ascii=False, sort_keys=sort_keys, indent=indent, cls=cls)
