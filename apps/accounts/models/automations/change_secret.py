@@ -1,11 +1,12 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from common.db import fields
-from common.db.models import JMSBaseModel
 from accounts.const import (
     AutomationTypes, SecretType, SecretStrategy, SSHKeyStrategy
 )
+from accounts.models import Account
+from common.db import fields
+from common.db.models import JMSBaseModel
 from .base import AccountBaseAutomation
 
 __all__ = ['ChangeSecretAutomation', 'ChangeSecretRecord', 'ChangeSecretMixin']
@@ -27,18 +28,35 @@ class ChangeSecretMixin(models.Model):
         default=SSHKeyStrategy.add, verbose_name=_('SSH key change strategy')
     )
 
+    accounts: list[str]  # account usernames
+    get_all_assets: callable  # get all assets
+
     class Meta:
         abstract = True
+
+    def create_nonlocal_accounts(self, usernames, asset):
+        pass
+
+    def get_account_ids(self):
+        usernames = self.accounts
+        accounts = Account.objects.none()
+        for asset in self.get_all_assets():
+            self.create_nonlocal_accounts(usernames, asset)
+            accounts = accounts | asset.accounts.all()
+        account_ids = accounts.filter(
+            username__in=usernames, secret_type=self.secret_type
+        ).values_list('id', flat=True)
+        return [str(_id) for _id in account_ids]
 
     def to_attr_json(self):
         attr_json = super().to_attr_json()
         attr_json.update({
             'secret': self.secret,
             'secret_type': self.secret_type,
-            'secret_strategy': self.secret_strategy,
+            'accounts': self.get_account_ids(),
             'password_rules': self.password_rules,
+            'secret_strategy': self.secret_strategy,
             'ssh_key_change_strategy': self.ssh_key_change_strategy,
-
         })
         return attr_json
 

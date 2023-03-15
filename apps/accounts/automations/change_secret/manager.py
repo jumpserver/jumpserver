@@ -12,7 +12,7 @@ from accounts.models import ChangeSecretRecord
 from accounts.notifications import ChangeSecretExecutionTaskMsg
 from accounts.serializers import ChangeSecretRecordBackUpSerializer
 from assets.const import HostTypes
-from common.utils import get_logger, lazyproperty
+from common.utils import get_logger
 from common.utils.file import encrypt_and_compress_zip_file
 from common.utils.timezone import local_now_display
 from users.models import User
@@ -28,23 +28,23 @@ class ChangeSecretManager(AccountBasePlaybookManager):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.method_hosts_mapper = defaultdict(list)
-        self.secret_type = self.execution.snapshot['secret_type']
+        self.secret_type = self.execution.snapshot.get('secret_type')
         self.secret_strategy = self.execution.snapshot.get(
             'secret_strategy', SecretStrategy.custom
         )
         self.ssh_key_change_strategy = self.execution.snapshot.get(
             'ssh_key_change_strategy', SSHKeyStrategy.add
         )
-        self.snapshot_account_usernames = self.execution.snapshot['accounts']
+        self.account_ids = self.execution.snapshot['accounts']
         self.name_recorder_mapper = {}  # 做个映射，方便后面处理
 
     @classmethod
     def method_type(cls):
         return AutomationTypes.change_secret
 
-    def get_kwargs(self, account, secret):
+    def get_kwargs(self, account, secret, secret_type):
         kwargs = {}
-        if self.secret_type != SecretType.SSH_KEY:
+        if secret_type != SecretType.SSH_KEY:
             return kwargs
         kwargs['strategy'] = self.ssh_key_change_strategy
         kwargs['exclusive'] = 'yes' if kwargs['strategy'] == SSHKeyStrategy.set else 'no'
@@ -54,18 +54,29 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             kwargs['regexp'] = '.*{}$'.format(secret.split()[2].strip())
         return kwargs
 
-    @lazyproperty
-    def secret_generator(self):
+    def secret_generator(self, secret_type):
         return SecretGenerator(
-            self.secret_strategy, self.secret_type,
+            self.secret_strategy, secret_type,
             self.execution.snapshot.get('password_rules')
         )
 
-    def get_secret(self):
+    def get_secret(self, secret_type):
         if self.secret_strategy == SecretStrategy.custom:
             return self.execution.snapshot['secret']
         else:
-            return self.secret_generator.get_secret()
+            return self.secret_generator(secret_type).get_secret()
+
+    def get_accounts(self, privilege_account):
+        if not privilege_account:
+            print(f'not privilege account')
+            return []
+
+        asset = privilege_account.asset
+        accounts = asset.accounts.exclude(username=privilege_account.username)
+        accounts = accounts.filter(id__in=self.account_ids)
+        if self.secret_type:
+            accounts = accounts.filter(secret_type=self.secret_type)
+        return accounts
 
     def host_callback(
             self, host, asset=None, account=None,
@@ -78,17 +89,10 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         if host.get('error'):
             return host
 
-        accounts = asset.accounts.all()
-        if account:
-            accounts = accounts.exclude(username=account.username)
-
-        if '*' not in self.snapshot_account_usernames:
-            accounts = accounts.filter(username__in=self.snapshot_account_usernames)
-
-        accounts = accounts.filter(secret_type=self.secret_type)
+        accounts = self.get_accounts(account)
         if not accounts:
-            print('没有发现待改密账号: %s 用户名: %s 类型: %s' % (
-                asset.name, self.snapshot_account_usernames, self.secret_type
+            print('没有发现待改密账号: %s 用户ID: %s 类型: %s' % (
+                asset.name, self.account_ids, self.secret_type
             ))
             return []
 
@@ -97,16 +101,16 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         method_hosts = [h for h in method_hosts if h != host['name']]
         inventory_hosts = []
         records = []
-        host['secret_type'] = self.secret_type
 
         if asset.type == HostTypes.WINDOWS and self.secret_type == SecretType.SSH_KEY:
-            print(f'Windows {asset} does not support ssh key push \n')
+            print(f'Windows {asset} does not support ssh key push')
             return inventory_hosts
 
         for account in accounts:
             h = deepcopy(host)
+            secret_type = account.secret_type
             h['name'] += '(' + account.username + ')'
-            new_secret = self.get_secret()
+            new_secret = self.get_secret(secret_type)
 
             recorder = ChangeSecretRecord(
                 asset=asset, account=account, execution=self.execution,
@@ -116,15 +120,15 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             self.name_recorder_mapper[h['name']] = recorder
 
             private_key_path = None
-            if self.secret_type == SecretType.SSH_KEY:
+            if secret_type == SecretType.SSH_KEY:
                 private_key_path = self.generate_private_key_path(new_secret, path_dir)
                 new_secret = self.generate_public_key(new_secret)
 
-            h['kwargs'] = self.get_kwargs(account, new_secret)
+            h['kwargs'] = self.get_kwargs(account, new_secret, secret_type)
             h['account'] = {
                 'name': account.name,
                 'username': account.username,
-                'secret_type': account.secret_type,
+                'secret_type': secret_type,
                 'secret': new_secret,
                 'private_key_path': private_key_path
             }
@@ -206,7 +210,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         serializer = serializer_cls(recorders, many=True)
 
         header = [str(v.label) for v in serializer.child.fields.values()]
-        rows = [list(row.values()) for row in serializer.data]
+        rows = [[str(i) for i in row.values()] for row in serializer.data]
         if not rows:
             return False
 

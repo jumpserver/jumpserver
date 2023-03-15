@@ -81,8 +81,8 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
     password_strategy = LabeledChoiceField(
         choices=PasswordStrategy.choices,
         default=PasswordStrategy.email,
+        allow_null=True,
         required=False,
-        write_only=True,
         label=_("Password strategy"),
     )
     mfa_enabled = serializers.BooleanField(read_only=True, label=_("MFA enabled"))
@@ -142,6 +142,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         # 在serializer 上定义的字段
         fields_custom = ["login_blocked", "password_strategy"]
         fields = fields_verbose + fields_fk + fields_m2m + fields_custom
+        fields_unexport = ["avatar_url", ]
 
         read_only_fields = [
             "date_joined", "last_login", "created_by",
@@ -167,6 +168,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
             "role": {"default": "User"},
             "is_otp_secret_key_bound": {"label": _("Is OTP bound")},
             "phone": {"validators": [PhoneValidator()]},
+            'mfa_level': {'label': _("MFA level")},
         }
 
     def validate_password(self, password):

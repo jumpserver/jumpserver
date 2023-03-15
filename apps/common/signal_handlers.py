@@ -32,7 +32,7 @@ class Counter:
         return self.counter == other.counter
 
 
-def on_request_finished_logging_db_query(sender, **kwargs):
+def digest_sql_query():
     queries = connection.queries
     counters = defaultdict(Counter)
     table_queries = defaultdict(list)
@@ -79,6 +79,9 @@ def on_request_finished_logging_db_query(sender, **kwargs):
             counter.counter, counter.time, name)
         )
 
+
+def on_request_finished_logging_db_query(sender, **kwargs):
+    digest_sql_query()
     on_request_finished_release_local(sender, **kwargs)
 
 

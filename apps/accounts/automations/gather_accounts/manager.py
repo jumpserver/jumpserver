@@ -22,8 +22,8 @@ class GatherAccountsManager(AccountBasePlaybookManager):
         self.host_asset_mapper[host['name']] = asset
         return host
 
-    def filter_success_result(self, host, result):
-        result = GatherAccountsFilter(host).run(self.method_id_meta_mapper, result)
+    def filter_success_result(self, tp, result):
+        result = GatherAccountsFilter(tp).run(self.method_id_meta_mapper, result)
         return result
 
     @staticmethod

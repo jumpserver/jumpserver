@@ -114,9 +114,7 @@ class OrgResourceStatisticsCache(OrgRelatedCache):
     @staticmethod
     def compute_total_count_today_active_assets():
         t = local_zero_hour()
-        return Session.objects.filter(
-            date_start__gte=t, is_success=False
-        ).values('asset_id').distinct().count()
+        return Session.objects.filter(date_start__gte=t).values('asset_id').distinct().count()
 
     @staticmethod
     def compute_total_count_today_failed_sessions():

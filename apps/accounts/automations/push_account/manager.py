@@ -1,9 +1,6 @@
 from copy import deepcopy
 
-from django.db.models import QuerySet
-
 from accounts.const import AutomationTypes, SecretType
-from accounts.models import Account
 from assets.const import HostTypes
 from common.utils import get_logger
 from ..base.manager import AccountBasePlaybookManager
@@ -19,36 +16,6 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
     def method_type(cls):
         return AutomationTypes.push_account
 
-    def create_nonlocal_accounts(self, accounts, snapshot_account_usernames, asset):
-        secret_type = self.secret_type
-        usernames = accounts.filter(secret_type=secret_type).values_list(
-            'username', flat=True
-        )
-        create_usernames = set(snapshot_account_usernames) - set(usernames)
-        create_account_objs = [
-            Account(
-                name=f'{username}-{secret_type}', username=username,
-                secret_type=secret_type, asset=asset,
-            )
-            for username in create_usernames
-        ]
-        Account.objects.bulk_create(create_account_objs)
-
-    def get_accounts(self, privilege_account, accounts: QuerySet):
-        if not privilege_account:
-            print(f'not privilege account')
-            return []
-        snapshot_account_usernames = self.execution.snapshot['accounts']
-        if '*' in snapshot_account_usernames:
-            return accounts.exclude(username=privilege_account.username)
-
-        asset = privilege_account.asset
-        self.create_nonlocal_accounts(accounts, snapshot_account_usernames, asset)
-        accounts = asset.accounts.exclude(username=privilege_account.username).filter(
-            username__in=snapshot_account_usernames, secret_type=self.secret_type
-        )
-        return accounts
-
     def host_callback(self, host, asset=None, account=None, automation=None, path_dir=None, **kwargs):
         host = super(ChangeSecretManager, self).host_callback(
             host, asset=asset, account=account, automation=automation,
@@ -57,34 +24,36 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
         if host.get('error'):
             return host
 
-        accounts = asset.accounts.all()
-        accounts = self.get_accounts(account, accounts)
+        accounts = self.get_accounts(account)
         inventory_hosts = []
-        host['secret_type'] = self.secret_type
         if asset.type == HostTypes.WINDOWS and self.secret_type == SecretType.SSH_KEY:
-            msg = f'Windows {asset} does not support ssh key push \n'
+            msg = f'Windows {asset} does not support ssh key push'
             print(msg)
             return inventory_hosts
 
         for account in accounts:
             h = deepcopy(host)
+            secret_type = account.secret_type
             h['name'] += '(' + account.username + ')'
-            new_secret = self.get_secret()
+            if self.secret_type is None:
+                new_secret = account.secret
+            else:
+                new_secret = self.get_secret(secret_type)
 
             self.name_recorder_mapper[h['name']] = {
                 'account': account, 'new_secret': new_secret,
             }
 
             private_key_path = None
-            if self.secret_type == SecretType.SSH_KEY:
+            if secret_type == SecretType.SSH_KEY:
                 private_key_path = self.generate_private_key_path(new_secret, path_dir)
                 new_secret = self.generate_public_key(new_secret)
 
-            h['kwargs'] = self.get_kwargs(account, new_secret)
+            h['kwargs'] = self.get_kwargs(account, new_secret, secret_type)
             h['account'] = {
                 'name': account.name,
                 'username': account.username,
-                'secret_type': account.secret_type,
+                'secret_type': secret_type,
                 'secret': new_secret,
                 'private_key_path': private_key_path
             }
@@ -112,9 +81,9 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
         logger.error("Pust account error: ", e)
 
     def run(self, *args, **kwargs):
-        if not self.check_secret():
+        if self.secret_type and not self.check_secret():
             return
-        super().run(*args, **kwargs)
+        super(ChangeSecretManager, self).run(*args, **kwargs)
 
     # @classmethod
     # def trigger_by_asset_create(cls, asset):

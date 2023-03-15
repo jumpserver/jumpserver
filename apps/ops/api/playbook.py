@@ -32,6 +32,15 @@ class PlaybookViewSet(OrgBulkModelViewSet):
     model = Playbook
     search_fields = ('name', 'comment')
 
+    def perform_destroy(self, instance):
+        instance = self.get_object()
+        if instance.job_set.exists():
+            raise JMSException(code='playbook_has_job', detail={"msg": _("Currently playbook is being used in a job")})
+        instance_id = instance.id
+        super().perform_destroy(instance)
+        dest_path = os.path.join(settings.DATA_DIR, "ops", "playbook", instance_id.__str__())
+        shutil.rmtree(dest_path)
+
     def get_queryset(self):
         queryset = super().get_queryset()
         queryset = queryset.filter(creator=self.request.user)
@@ -62,10 +71,10 @@ class PlaybookFileBrowserAPIView(APIView):
     rbac_perms = ()
     permission_classes = (RBACPermission,)
     rbac_perms = {
-        'GET': 'ops.change_playbooks',
-        'POST': 'ops.change_playbooks',
-        'DELETE': 'ops.change_playbooks',
-        'PATCH': 'ops.change_playbooks',
+        'GET': 'ops.change_playbook',
+        'POST': 'ops.change_playbook',
+        'DELETE': 'ops.change_playbook',
+        'PATCH': 'ops.change_playbook',
     }
     protected_files = ['root', 'main.yml']
 

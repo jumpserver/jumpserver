@@ -58,7 +58,7 @@
                                     {% if not b.can_disable %} disabled {% endif %}
                                     onclick="goTo('{{ b.get_disable_url }}')"
                             >
-                                {% trans 'Disable' %}
+                                {% trans 'Reset' %}
                             </button>
                             <span class="help-inline">{{ b.help_text_of_disable }}</span>
                         {% else %}

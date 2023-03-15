@@ -100,7 +100,7 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
     Type = const.AllTypes
 
     name = models.CharField(max_length=128, verbose_name=_('Name'))
-    address = models.CharField(max_length=1024, verbose_name=_('Address'), db_index=True)
+    address = models.CharField(max_length=767, verbose_name=_('Address'), db_index=True)
     platform = models.ForeignKey(Platform, on_delete=models.PROTECT, verbose_name=_("Platform"), related_name='assets')
     domain = models.ForeignKey("assets.Domain", null=True, blank=True, related_name='assets',
                                verbose_name=_("Domain"), on_delete=models.SET_NULL)
@@ -108,7 +108,7 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
                                    verbose_name=_("Nodes"))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     labels = models.ManyToManyField('assets.Label', blank=True, related_name='assets', verbose_name=_("Labels"))
-    info = models.JSONField(verbose_name='Info', default=dict, blank=True)  # 资产的一些信息，如 硬件信息
+    info = models.JSONField(verbose_name=_('Info'), default=dict, blank=True)  # 资产的一些信息，如 硬件信息
 
     objects = AssetManager.from_queryset(AssetQuerySet)()
 

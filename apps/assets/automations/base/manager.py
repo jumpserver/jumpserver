@@ -12,8 +12,7 @@ from django.utils.translation import gettext as _
 from sshtunnel import SSHTunnelForwarder, BaseSSHTunnelForwarderError
 
 from assets.automations.methods import platform_automation_methods
-from common.utils import get_logger, lazyproperty
-from common.utils import ssh_pubkey_gen, ssh_key_string_to_obj
+from common.utils import get_logger, lazyproperty, is_openssh_format_key, ssh_pubkey_gen
 from ops.ansible import JMSInventory, PlaybookRunner, DefaultCallback
 
 logger = get_logger(__name__)
@@ -127,7 +126,13 @@ class BasePlaybookManager:
         key_path = os.path.join(path_dir, key_name)
 
         if not os.path.exists(key_path):
-            ssh_key_string_to_obj(secret, password=None).write_private_key_file(key_path)
+            # https://github.com/ansible/ansible-runner/issues/544
+            # ssh requires OpenSSH format keys to have a full ending newline.
+            # It does not require this for old-style PEM keys.
+            with open(key_path, 'w') as f:
+                f.write(secret)
+                if is_openssh_format_key(secret.encode('utf-8')):
+                    f.write("\n")
             os.chmod(key_path, 0o400)
         return key_path
 

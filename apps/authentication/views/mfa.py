@@ -32,11 +32,14 @@ class UserLoginMFAView(mixins.AuthMixin, FormView):
         return super().get(*args, **kwargs)
 
     def form_valid(self, form):
+        from users.utils import MFABlockUtils
         code = form.cleaned_data.get('code')
         mfa_type = form.cleaned_data.get('mfa_type')
 
         try:
             self._do_check_user_mfa(code, mfa_type)
+            user, ip = self.get_user_from_session(), self.get_request_ip()
+            MFABlockUtils(user.username, ip).clean_failed_count()
             return redirect_to_guard_view('mfa_ok')
         except (errors.MFAFailedError, errors.BlockMFAError) as e:
             form.add_error('code', e.msg)

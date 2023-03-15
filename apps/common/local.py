@@ -1,7 +1,10 @@
 from werkzeug.local import Local
 
+from django.utils import translation
+
+
 thread_local = Local()
-encrypted_field_set = set()
+encrypted_field_set = {'password', 'secret'}
 
 
 def _find(attr):
@@ -10,4 +13,5 @@ def _find(attr):
 
 def add_encrypted_field_set(label):
     if label:
-        encrypted_field_set.add(str(label))
+        with translation.override('en'):
+            encrypted_field_set.add(str(label))

@@ -1,3 +1,5 @@
+from django.utils.translation import gettext_lazy as _
+
 from .base import BaseType
 
 GATEWAY_NAME = 'Gateway'
@@ -7,7 +9,7 @@ class HostTypes(BaseType):
     LINUX = 'linux', 'Linux'
     WINDOWS = 'windows', 'Windows'
     UNIX = 'unix', 'Unix'
-    OTHER_HOST = 'other', "Other"
+    OTHER_HOST = 'other', _("Other")
 
     @classmethod
     def _get_base_constrains(cls) -> dict:

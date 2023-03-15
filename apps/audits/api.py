@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from common.drf.filters import DatetimeRangeFilter
 from common.plugins.es import QuerySet as ESQuerySet
 from common.utils import is_uuid
+from common.utils import lazyproperty
 from orgs.mixins.api import OrgReadonlyModelViewSet, OrgModelViewSet
 from orgs.utils import current_org, tmp_to_root_org
 from orgs.models import Organization
@@ -143,13 +144,19 @@ class OperateLogViewSet(OrgReadonlyModelViewSet):
     search_fields = ['resource', 'user']
     ordering = ['-datetime']
 
+    @lazyproperty
+    def is_action_detail(self):
+        return self.detail and self.request.query_params.get('type') == 'action_detail'
+
     def get_serializer_class(self):
-        if self.request.query_params.get('type') == 'action_detail':
+        if self.is_action_detail:
             return OperateLogActionDetailSerializer
         return super().get_serializer_class()
 
     def get_queryset(self):
-        org_q = Q(org_id=Organization.SYSTEM_ID) | Q(org_id=current_org.id)
+        org_q = Q(org_id=current_org.id)
+        if self.is_action_detail:
+            org_q |= Q(org_id=Organization.SYSTEM_ID)
         with tmp_to_root_org():
             qs = OperateLog.objects.filter(org_q)
         es_config = settings.OPERATE_LOG_ELASTICSEARCH_CONFIG

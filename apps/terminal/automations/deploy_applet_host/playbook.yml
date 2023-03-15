@@ -3,11 +3,12 @@
 - hosts: all
   vars:
     APPLET_DOWNLOAD_HOST: https://demo.jumpserver.org
+    IGNORE_VERIFY_CERTS: true
     HOST_NAME: test
     HOST_ID: 00000000-0000-0000-0000-000000000000
     CORE_HOST: https://demo.jumpserver.org
     BOOTSTRAP_TOKEN: PleaseChangeMe
-    RDS_Licensing: true
+    RDS_Licensing: false
     RDS_LicenseServer: 127.0.0.1
     RDS_LicensingMode: 4
     RDS_fSingleSessionPerUser: 1
@@ -16,13 +17,6 @@
     TinkerInstaller: Tinker_Installer.exe
 
   tasks:
-    - name: Install RDS-Licensing (RDS)
-      ansible.windows.win_feature:
-        name: RDS-Licensing
-        state: present
-        include_management_tools: yes
-      when: RDS_Licensing
-
     - name: Install RDS-RD-Server (RDS)
       ansible.windows.win_feature:
         name: RDS-RD-Server
@@ -44,6 +38,7 @@
       ansible.windows.win_get_url:
         url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/{{ TinkerInstaller }}"
         dest: "{{ ansible_env.TEMP }}\\{{ TinkerInstaller }}"
+        validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
 
     - name: Install JumpServer Tinker (jumpserver)
       ansible.windows.win_package:
@@ -64,6 +59,7 @@
       ansible.windows.win_get_url:
         url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/python-3.10.8-amd64.exe"
         dest: "{{ ansible_env.TEMP }}\\python-3.10.8-amd64.exe"
+        validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
 
     - name: Install the python-3.10.8
       ansible.windows.win_package:
@@ -78,11 +74,23 @@
         state: present
       register: win_install_python
 
+    - name: Check pip command exists
+      ansible.windows.win_powershell:
+        script: |
+          if (Get-Command -Name 'pip' -ErrorAction SilentlyContinue) {
+            $Ansible.Changed = $false
+          }
+          else {
+           $Ansible.Changed = $true
+          }
+      register: check_pip_command
+      ignore_errors: yes
+
     - name: Reboot if installing requires it
       ansible.windows.win_reboot:
         post_reboot_delay: 10
         test_command: whoami
-      when: rds_install.reboot_required or win_install_python.reboot_required
+      when: check_pip_command.changed or rds_install.reboot_required or win_install_python.reboot_required
 
     - name: Set RDS LicenseServer (regedit)
       ansible.windows.win_regedit:
@@ -90,6 +98,7 @@
         name: LicenseServers
         data: "{{ RDS_LicenseServer }}"
         type: string
+      when: RDS_Licensing
 
     - name: Set RDS LicensingMode (regedit)
       ansible.windows.win_regedit:
@@ -97,6 +106,7 @@
         name: LicensingMode
         data: "{{ RDS_LicensingMode }}"
         type: dword
+      when: RDS_Licensing
 
     - name: Set RDS fSingleSessionPerUser (regedit)
       ansible.windows.win_regedit:
@@ -104,6 +114,7 @@
         name: fSingleSessionPerUser
         data: "{{ RDS_fSingleSessionPerUser }}"
         type: dword
+      when: RDS_Licensing
 
     - name: Set RDS MaxDisconnectionTime (regedit)
       ansible.windows.win_regedit:
@@ -124,6 +135,7 @@
       ansible.windows.win_get_url:
         url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/pip_packages.zip"
         dest: "{{ ansible_env.TEMP }}\\pip_packages.zip"
+        validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
 
     - name: Unzip pip_packages
       community.windows.win_unzip:
@@ -139,6 +151,7 @@
       ansible.windows.win_get_url:
         url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/chromedriver_win32.zip"
         dest: "{{ ansible_env.TEMP }}\\chromedriver_win32.zip"
+        validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
 
     - name: Unzip chromedriver (Chromium)
       community.windows.win_unzip:
@@ -149,6 +162,7 @@
       ansible.windows.win_get_url:
         url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/chrome-win.zip"
         dest: "{{ ansible_env.TEMP }}\\chrome-win.zip"
+        validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
 
     - name: Unzip Chromium (Chromium)
       community.windows.win_unzip:
@@ -161,7 +175,7 @@
           - 'C:\Program Files\Chrome\chrome-win'
           - 'C:\Program Files\JumpServer\drivers\chromedriver_win32'
 
-    - name: Set Chromium variables diable Google Api (Chromium)
+    - name: Set Chromium variables disable Google Api (Chromium)
       ansible.windows.win_environment:
         level: machine
         variables:
@@ -173,6 +187,7 @@
       ansible.windows.win_get_url:
         url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/navicat161_premium_en_x64.exe"
         dest: "{{ ansible_env.TEMP }}\\navicat161_premium_en_x64.exe"
+        validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
 
     - name: Install navicat (navicat)
       ansible.windows.win_package:
@@ -183,8 +198,8 @@
 
     - name: Generate tinkerd component config
       ansible.windows.win_shell:
-        "tinkerd config --hostname {{ HOST_NAME }} --core_host {{ CORE_HOST }} 
-      --token {{ BOOTSTRAP_TOKEN }} --host_id {{ HOST_ID }}"
+        "tinkerd config --hostname {{ HOST_NAME }} --core_host {{ CORE_HOST }}
+      --token {{ BOOTSTRAP_TOKEN }} --host_id {{ HOST_ID }} --ignore-verify-certs {{ IGNORE_VERIFY_CERTS }}"
 
     - name: Install tinkerd service
       ansible.windows.win_shell:
@@ -207,4 +222,3 @@
     - name: Sync all remote applets
       ansible.windows.win_shell:
         "tinkerd install all"
-

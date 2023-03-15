@@ -10,6 +10,17 @@
   <a href="https://github.com/jumpserver/jumpserver"><img src="https://img.shields.io/github/stars/jumpserver/jumpserver?color=%231890FF&style=flat-square" alt="Stars"></a>
 </p>
 
+
+<p align="center">
+    JumpServer <a href="https://github.com/jumpserver/jumpserver/releases/tag/v3.0.0">v3.0</a> 正式发布。
+    <br>
+    9 年时间，倾情投入，用心做好一款开源堡垒机。
+</p>
+
+|                                                  :warning: 注意 :warning:                                                   |
+|:-------------------------------------------------------------------------------------------------------------------------:|
+| 3.0 架构上和 2.0 变化较大，建议全新安装一套环境来体验。如需升级，请务必升级前进行备份，并[查阅文档](https://kb.fit2cloud.com/?p=06638d69-f109-4333-b5bf-65b17b297ed9) |
+
 --------------------------
 
 JumpServer 是广受欢迎的开源堡垒机，是符合 4A 规范的专业运维安全审计系统。
@@ -27,7 +38,7 @@ JumpServer 是广受欢迎的开源堡垒机，是符合 4A 规范的专业运�
 
 ## UI 展示
 
-![UI展示](https://www.jumpserver.org/images/screenshot/1.png)
+![UI展示](https://docs.jumpserver.org/zh/v3/img/dashboard.png)
 
 ## 在线体验
 
@@ -41,8 +52,7 @@ JumpServer 是广受欢迎的开源堡垒机，是符合 4A 规范的专业运�
 
 ## 快速开始
 
-- [极速安装](https://docs.jumpserver.org/zh/master/install/setup_by_fast/)
-- [手动安装](https://github.com/jumpserver/installer)
+- [快速入门](https://docs.jumpserver.org/zh/v3/quick_start/)
 - [产品文档](https://docs.jumpserver.org)
 - [知识库](https://kb.fit2cloud.com/categories/jumpserver)
 

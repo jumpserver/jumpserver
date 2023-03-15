@@ -74,9 +74,9 @@ class LDAPSettingSerializer(serializers.Serializer):
     )
     AUTH_LDAP_CONNECT_TIMEOUT = serializers.IntegerField(
         min_value=1, max_value=300,
-        required=False, label=_('Connect timeout'),
+        required=False, label=_('Connect timeout (s)'),
     )
-    AUTH_LDAP_SEARCH_PAGED_SIZE = serializers.IntegerField(required=False, label=_('Search paged size'))
+    AUTH_LDAP_SEARCH_PAGED_SIZE = serializers.IntegerField(required=False, label=_('Search paged size (piece)'))
 
     AUTH_LDAP = serializers.BooleanField(required=False, label=_('Enable LDAP auth'))
 

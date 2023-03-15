@@ -214,7 +214,7 @@ class Config(dict):
         'REDIS_DB_WS': 6,
 
         'GLOBAL_ORG_DISPLAY_NAME': '',
-        'SITE_URL': 'http://localhost:8080',
+        'SITE_URL': 'http://127.0.0.1',
         'USER_GUIDE_URL': '',
         'ANNOUNCEMENT_ENABLED': True,
         'ANNOUNCEMENT': {},
@@ -376,6 +376,7 @@ class Config(dict):
         'AUTH_FEISHU': False,
         'FEISHU_APP_ID': '',
         'FEISHU_APP_SECRET': '',
+        'FEISHU_VERSION': 'feishu',
 
         'LOGIN_REDIRECT_TO_BACKEND': '',  # 'OPENID / CAS / SAML2
         'LOGIN_REDIRECT_MSG_ENABLED': True,

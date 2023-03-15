@@ -1,10 +1,12 @@
+from django.utils.translation import gettext_lazy as _
+
 from .base import BaseType
 
 
 class CloudTypes(BaseType):
-    PUBLIC = 'public', 'Public cloud'
-    PRIVATE = 'private', 'Private cloud'
-    K8S = 'k8s', 'Kubernetes'
+    PUBLIC = 'public', _('Public cloud')
+    PRIVATE = 'private', _('Private cloud')
+    K8S = 'k8s', _('Kubernetes')
 
     @classmethod
     def _get_base_constrains(cls) -> dict:

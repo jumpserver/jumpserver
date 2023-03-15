@@ -214,10 +214,13 @@ class AllTypes(ChoicesMixin):
                 tp_node = cls.choice_to_node(tp, category_node['id'], opened=False, meta=meta)
                 tp_count = category_type_mapper.get(category + '_' + tp, 0)
                 tp_node['name'] += f'({tp_count})'
+                platforms = tp_platforms.get(category + '_' + tp, [])
+                if not platforms:
+                    tp_node['isParent'] = False
                 nodes.append(tp_node)
 
                 # Platform 格式化
-                for p in tp_platforms.get(category + '_' + tp, []):
+                for p in platforms:
                     platform_node = cls.platform_to_node(p, tp_node['id'], include_asset)
                     platform_node['name'] += f'({platform_count.get(p.id, 0)})'
                     nodes.append(platform_node)
@@ -306,10 +309,11 @@ class AllTypes(ChoicesMixin):
                     protocols_data = deepcopy(default_protocols)
                     if _protocols:
                         protocols_data = [p for p in protocols_data if p['name'] in _protocols]
+
                     for p in protocols_data:
                         setting = _protocols_setting.get(p['name'], {})
-                        p['required'] = p.pop('required', False)
-                        p['default'] = p.pop('default', False)
+                        p['required'] = setting.pop('required', False)
+                        p['default'] = setting.pop('default', False)
                         p['setting'] = {**p.get('setting', {}), **setting}
 
                     platform_data = {

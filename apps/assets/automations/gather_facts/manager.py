@@ -1,5 +1,6 @@
-from common.utils import get_logger
 from assets.const import AutomationTypes
+from common.utils import get_logger
+from .format_asset_info import FormatAssetInfo
 from ..base.manager import BasePlaybookManager
 
 logger = get_logger(__name__)
@@ -19,13 +20,16 @@ class GatherFactsManager(BasePlaybookManager):
         self.host_asset_mapper[host['name']] = asset
         return host
 
+    def format_asset_info(self, tp, info):
+        info = FormatAssetInfo(tp).run(self.method_id_meta_mapper, info)
+        return info
+
     def on_host_success(self, host, result):
         info = result.get('debug', {}).get('res', {}).get('info', {})
         asset = self.host_asset_mapper.get(host)
         if asset and info:
-            for k, v in info.items():
-                info[k] = v.strip() if isinstance(v, str) else v
+            info = self.format_asset_info(asset.type, info)
             asset.info = info
-            asset.save()
+            asset.save(update_fields=['info'])
         else:
             logger.error("Not found info: {}".format(host))

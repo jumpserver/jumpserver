@@ -26,6 +26,13 @@ __all__ = [
 class AssetProtocolsSerializer(serializers.ModelSerializer):
     port = serializers.IntegerField(required=False, allow_null=True, max_value=65535, min_value=1)
 
+    def to_file_representation(self, data):
+        return '{name}/{port}'.format(**data)
+
+    def to_file_internal_value(self, data):
+        name, port = data.split('/')
+        return {'name': name, 'port': port}
+
     class Meta:
         model = Protocol
         fields = ['name', 'port']
@@ -73,7 +80,7 @@ class AssetAccountSerializer(
             'is_active', 'version', 'secret_type',
         ]
         fields_write_only = [
-            'secret', 'push_now', 'template'
+            'secret', 'passphrase', 'push_now', 'template'
         ]
         fields = fields_mini + fields_write_only
         extra_kwargs = {
@@ -121,7 +128,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
     labels = AssetLabelSerializer(many=True, required=False, label=_('Label'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'), default=())
-    accounts = AssetAccountSerializer(many=True, required=False, write_only=True, label=_('Account'))
+    accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, write_only=True, label=_('Account'))
+    nodes_display = serializers.ListField(read_only=True, label=_("Node path"))
 
     class Meta:
         model = Asset
@@ -133,11 +141,11 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
             'nodes_display', 'accounts'
         ]
         read_only_fields = [
-            'category', 'type', 'connectivity',
+            'category', 'type', 'connectivity', 'auto_info',
             'date_verified', 'created_by', 'date_created',
-            'auto_info',
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
+        fields_unexport = ['auto_info']
         extra_kwargs = {
             'auto_info': {'label': _('Auto info')},
             'name': {'label': _("Name")},
@@ -150,7 +158,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         self._init_field_choices()
 
     def _get_protocols_required_default(self):
-        platform = self._initial_data_platform
+        platform = self._asset_platform
         platform_protocols = platform.protocols.all()
         protocols_default = [p for p in platform_protocols if p.default]
         protocols_required = [p for p in platform_protocols if p.required or p.primary]
@@ -206,20 +214,22 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         instance.nodes.set(nodes_to_set)
 
     @property
-    def _initial_data_platform(self):
-        if self.instance:
-            return self.instance.platform
-
+    def _asset_platform(self):
         platform_id = self.initial_data.get('platform')
         if isinstance(platform_id, dict):
             platform_id = platform_id.get('id') or platform_id.get('pk')
-        platform = Platform.objects.filter(id=platform_id).first()
+
+        if not platform_id and self.instance:
+            platform = self.instance.platform
+        else:
+            platform = Platform.objects.filter(id=platform_id).first()
+
         if not platform:
             raise serializers.ValidationError({'platform': _("Platform not exist")})
         return platform
 
     def validate_domain(self, value):
-        platform = self._initial_data_platform
+        platform = self._asset_platform
         if platform.domain_enabled:
             return value
         else:
@@ -263,6 +273,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
 
     @staticmethod
     def accounts_create(accounts_data, asset):
+        if not accounts_data:
+            return
         for data in accounts_data:
             data['asset'] = asset
             AssetAccountSerializer().create(data)

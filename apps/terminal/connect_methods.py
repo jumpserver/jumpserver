@@ -17,17 +17,17 @@ class WebMethod(TextChoices):
 
     @classmethod
     def get_methods(cls):
-        return {
+        methods = {
             Protocol.ssh: [cls.web_cli, cls.web_sftp],
             Protocol.telnet: [cls.web_cli],
             Protocol.rdp: [cls.web_gui],
             Protocol.vnc: [cls.web_gui],
 
-            Protocol.mysql: [cls.web_cli, cls.web_gui],
-            Protocol.mariadb: [cls.web_cli, cls.web_gui],
-            Protocol.oracle: [cls.web_cli, cls.web_gui],
-            Protocol.postgresql: [cls.web_cli, cls.web_gui],
-            Protocol.sqlserver: [cls.web_cli, cls.web_gui],
+            Protocol.mysql: [cls.web_cli],
+            Protocol.mariadb: [cls.web_cli],
+            Protocol.oracle: [cls.web_cli],
+            Protocol.postgresql: [cls.web_cli],
+            Protocol.sqlserver: [cls.web_cli],
             Protocol.redis: [cls.web_cli],
             Protocol.mongodb: [cls.web_cli],
             Protocol.clickhouse: [cls.web_cli],
@@ -35,6 +35,13 @@ class WebMethod(TextChoices):
             Protocol.k8s: [cls.web_cli],
             Protocol.http: []
         }
+        if not settings.XPACK_ENABLED:
+            return methods
+
+        web_gui_dbs = [Protocol.mysql, Protocol.mariadb, Protocol.oracle, Protocol.postgresql]
+        for db in web_gui_dbs:
+            methods[db].append(cls.web_gui)
+        return methods
 
 
 class NativeClient(TextChoices):
@@ -130,8 +137,6 @@ class AppletMethod:
         from .models import Applet, AppletHost
 
         methods = defaultdict(list)
-        if not settings.XPACK_ENABLED:
-            return methods
 
         has_applet_hosts = AppletHost.objects.all().exists()
         applets = Applet.objects.filter(is_active=True)

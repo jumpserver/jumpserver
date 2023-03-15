@@ -1,8 +1,11 @@
 import abc
 from datetime import datetime
+
+from rest_framework import serializers
 from rest_framework.renderers import BaseRenderer
 from rest_framework.utils import encoders, json
 
+from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from common.utils import get_logger
 
 logger = get_logger(__file__)
@@ -38,18 +41,27 @@ class BaseFileRenderer(BaseRenderer):
     def get_rendered_fields(self):
         fields = self.serializer.fields
         if self.template == 'import':
-            return [v for k, v in fields.items() if not v.read_only and k != "org_id" and k != 'id']
+            fields = [v for k, v in fields.items() if not v.read_only and k != "org_id" and k != 'id']
         elif self.template == 'update':
-            return [v for k, v in fields.items() if not v.read_only and k != "org_id"]
+            fields = [v for k, v in fields.items() if not v.read_only and k != "org_id"]
         else:
-            return [v for k, v in fields.items() if not v.write_only and k != "org_id"]
+            fields = [v for k, v in fields.items() if not v.write_only and k != "org_id"]
+
+        meta = getattr(self.serializer, 'Meta', None)
+        if meta:
+            fields_unexport = getattr(meta, 'fields_unexport', [])
+            fields = [v for v in fields if v.field_name not in fields_unexport]
+        return fields
 
     @staticmethod
     def get_column_titles(render_fields):
-        return [
-            '*{}'.format(field.label) if field.required else str(field.label)
-            for field in render_fields
-        ]
+        titles = []
+        for field in render_fields:
+            name = field.label
+            if field.required:
+                name = '*' + name
+            titles.append(name)
+        return titles
 
     def process_data(self, data):
         results = data['results'] if 'results' in data else data
@@ -59,7 +71,6 @@ class BaseFileRenderer(BaseRenderer):
 
         if self.template == 'import':
             results = [results[0]] if results else results
-
         else:
             # 限制数据数量
             results = results[:10000]
@@ -68,17 +79,53 @@ class BaseFileRenderer(BaseRenderer):
         return results
 
     @staticmethod
-    def generate_rows(data, render_fields):
+    def to_id_name(value):
+        if value is None:
+            return '-'
+        pk = str(value.get('id', '') or value.get('pk', ''))
+        name = value.get('name') or value.get('display_name', '')
+        return '{}({})'.format(name, pk)
+
+    @staticmethod
+    def to_choice_name(value):
+        if value is None:
+            return '-'
+        value = value.get('value', '')
+        return value
+
+    def render_value(self, field, value):
+        if value is None:
+            value = '-'
+        elif hasattr(field, 'to_file_representation'):
+            value = field.to_file_representation(value)
+        elif isinstance(value, bool):
+            value = 'Yes' if value else 'No'
+        elif isinstance(field, LabeledChoiceField):
+            value = value.get('value', '')
+        elif isinstance(field, ObjectRelatedField):
+            if field.many:
+                value = [self.to_id_name(v) for v in value]
+            else:
+                value = self.to_id_name(value)
+        elif isinstance(field, serializers.ListSerializer):
+            value = [self.render_value(field.child, v) for v in value]
+        elif isinstance(field, serializers.Serializer) and value.get('id'):
+            value = self.to_id_name(value)
+        elif isinstance(field, serializers.ManyRelatedField):
+            value = [self.render_value(field.child_relation, v) for v in value]
+        elif isinstance(field, serializers.ListField):
+            value = [self.render_value(field.child, v) for v in value]
+
+        if not isinstance(value, str):
+            value = json.dumps(value, cls=encoders.JSONEncoder, ensure_ascii=False)
+        return str(value)
+
+    def generate_rows(self, data, render_fields):
         for item in data:
             row = []
             for field in render_fields:
                 value = item.get(field.field_name)
-                if value is None:
-                    value = ''
-                elif isinstance(value, dict):
-                    value = json.dumps(value, ensure_ascii=False)
-                else:
-                    value = str(value)
+                value = self.render_value(field, value)
                 row.append(value)
             yield row
 
@@ -100,6 +147,9 @@ class BaseFileRenderer(BaseRenderer):
     @abc.abstractmethod
     def get_rendered_value(self):
         raise NotImplementedError
+
+    def after_render(self):
+        pass
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
         if data is None:
@@ -129,11 +179,10 @@ class BaseFileRenderer(BaseRenderer):
             self.initial_writer()
             self.write_column_titles(column_titles)
             self.write_rows(rows)
+            self.after_render()
             value = self.get_rendered_value()
         except Exception as e:
             logger.debug(e, exc_info=True)
             value = 'Render error! ({})'.format(self.media_type).encode('utf-8')
             return value
-
         return value
-

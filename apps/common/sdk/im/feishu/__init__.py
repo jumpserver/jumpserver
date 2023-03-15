@@ -3,6 +3,7 @@ import json
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import APIException
 
+from django.conf import settings
 from common.utils.common import get_logger
 from common.sdk.im.utils import digest
 from common.sdk.im.mixin import RequestMixin, BaseRequest
@@ -11,14 +12,30 @@ logger = get_logger(__name__)
 
 
 class URL:
-    AUTHEN = 'https://open.feishu.cn/open-apis/authen/v1/index'
-
-    GET_TOKEN = 'https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal/'
-
     # https://open.feishu.cn/document/ukTMukTMukTM/uEDO4UjLxgDO14SM4gTN
-    GET_USER_INFO_BY_CODE = 'https://open.feishu.cn/open-apis/authen/v1/access_token'
+    @property
+    def host(self):
+        if settings.FEISHU_VERSION == 'feishu':
+            h = 'https://open.feishu.cn'
+        else:
+            h = 'https://open.larksuite.com'
+        return h
 
-    SEND_MESSAGE = 'https://open.feishu.cn/open-apis/im/v1/messages'
+    @property
+    def authen(self):
+        return f'{self.host}/open-apis/authen/v1/index'
+
+    @property
+    def get_token(self):
+        return f'{self.host}/open-apis/auth/v3/tenant_access_token/internal/'
+
+    @property
+    def get_user_info_by_code(self):
+        return f'{self.host}/open-apis/authen/v1/access_token'
+
+    @property
+    def send_message(self):
+        return f'{self.host}/open-apis/im/v1/messages'
 
 
 class ErrorCode:
@@ -51,7 +68,7 @@ class FeishuRequests(BaseRequest):
 
     def request_access_token(self):
         data = {'app_id': self._app_id, 'app_secret': self._app_secret}
-        response = self.raw_request('post', url=URL.GET_TOKEN, data=data)
+        response = self.raw_request('post', url=URL().get_token, data=data)
         self.check_errcode_is_0(response)
 
         access_token = response['tenant_access_token']
@@ -86,7 +103,7 @@ class FeiShu(RequestMixin):
             'code': code
         }
 
-        data = self._requests.post(URL.GET_USER_INFO_BY_CODE, json=body, check_errcode_is_0=False)
+        data = self._requests.post(URL().get_user_info_by_code, json=body, check_errcode_is_0=False)
 
         self._requests.check_errcode_is_0(data)
         return data['data']['user_id']
@@ -107,7 +124,7 @@ class FeiShu(RequestMixin):
 
             try:
                 logger.info(f'Feishu send text: user_ids={user_ids} msg={msg}')
-                self._requests.post(URL.SEND_MESSAGE, params=params, json=body)
+                self._requests.post(URL().send_message, params=params, json=body)
             except APIException as e:
                 # 只处理可预知的错误
                 logger.exception(e)

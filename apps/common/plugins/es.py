@@ -114,26 +114,28 @@ class ES(object):
         self._ensure_index_exists()
 
     def _ensure_index_exists(self):
-        info = self.es.info()
-        version = info['version']['number'].split('.')[0]
-        if version == '6':
-            mappings = {'mappings': {'data': {'properties': self.properties}}}
-        else:
-            mappings = {'mappings': {'properties': self.properties}}
-
-        if self.is_index_by_date:
-            mappings['aliases'] = {
-                self.query_index: {}
-            }
-
         try:
-            self.es.indices.create(self.index, body=mappings)
-            return
-        except RequestError as e:
-            if e.error == 'resource_already_exists_exception':
-                logger.warning(e)
+            info = self.es.info()
+            version = info['version']['number'].split('.')[0]
+            if version == '6':
+                mappings = {'mappings': {'data': {'properties': self.properties}}}
             else:
-                logger.exception(e)
+                mappings = {'mappings': {'properties': self.properties}}
+
+            if self.is_index_by_date:
+                mappings['aliases'] = {
+                    self.query_index: {}
+                }
+
+            try:
+                self.es.indices.create(self.index, body=mappings)
+            except RequestError as e:
+                if e.error == 'resource_already_exists_exception':
+                    logger.warning(e)
+                else:
+                    logger.exception(e)
+        except Exception as e:
+            logger.error(e, exc_info=True)
 
     def make_data(self, data):
         return []

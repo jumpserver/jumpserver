@@ -102,7 +102,10 @@ def on_post_delete_refresh_org_resource_statistics_cache(sender, instance, **kwa
 
 
 def _refresh_session_org_resource_statistics_cache(instance: Session):
-    cache_field_name = ['total_count_online_users', 'total_count_online_sessions', 'total_count_today_failed_sessions']
+    cache_field_name = [
+        'total_count_online_users', 'total_count_online_sessions',
+        'total_count_today_active_assets','total_count_today_failed_sessions'
+    ]
 
     org_cache = OrgResourceStatisticsCache(instance.org)
     org_cache.expire(*cache_field_name)
