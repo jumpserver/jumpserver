@@ -82,7 +82,7 @@ class CeleryResultApi(generics.RetrieveAPIView):
 
     def get_object(self):
         pk = self.kwargs.get('pk')
-        return AsyncResult(pk)
+        return AsyncResult(str(pk))
 
 
 class CeleryPeriodTaskViewSet(CommonApiMixin, viewsets.ModelViewSet):
