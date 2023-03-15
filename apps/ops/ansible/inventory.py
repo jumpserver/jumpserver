@@ -17,7 +17,7 @@ class JMSInventory:
         :param account_policy: privileged_only, privileged_first, skip
         """
         self.assets = self.clean_assets(assets)
-        self.account_prefer = account_prefer
+        self.account_prefer = self.get_account_prefer(account_prefer)
         self.account_policy = account_policy
         self.host_callback = host_callback
         self.exclude_hosts = {}
@@ -146,33 +146,45 @@ class JMSInventory:
         accounts_connectivity_no = list(accounts.exclude(connectivity=Connectivity.OK))
         return accounts_connectivity_ok + accounts_connectivity_no
 
+    @staticmethod
+    def get_account_prefer(account_prefer):
+        account_usernames = []
+        if isinstance(account_prefer, str) and account_prefer:
+            account_usernames = list(map(lambda x: x.lower(), account_prefer.split(',')))
+        return account_usernames
+
+    def get_refer_account(self, accounts):
+        account = None
+        if accounts:
+            account = list(filter(
+                lambda a: a.username.lower() in self.account_prefer, accounts
+            ))
+            account = account[0] if account else None
+        return account
+
     def select_account(self, asset):
         accounts = self.get_asset_accounts(asset)
-        if not accounts:
+        if not accounts or self.account_policy == 'skip':
             return None
         account_selected = None
-        account_usernames = self.account_prefer
 
-        if isinstance(self.account_prefer, str) and account_usernames:
-            account_usernames = self.account_prefer.split(',')
+        # 首先找到特权账号
+        privileged_accounts = list(filter(lambda account: account.privileged, accounts))
 
-        # 优先使用提供的名称
-        if account_usernames:
-            account_matched = list(filter(lambda account: account.username in account_usernames, accounts))
-            account_selected = account_matched[0] if account_matched else None
-
-        if account_selected or self.account_policy == 'skip':
-            return account_selected
-
+        # 不同类型的账号选择，优先使用提供的名称
+        refer_privileged_account = self.get_refer_account(privileged_accounts)
         if self.account_policy in ['privileged_only', 'privileged_first']:
-            account_selected = accounts[0] if accounts else None
+            first_privileged = privileged_accounts[0] if privileged_accounts else None
+            account_selected = refer_privileged_account or first_privileged
 
-        if account_selected:
+        # 此策略不管是否匹配到账号都需强制返回
+        if self.account_policy == 'privileged_only':
             return account_selected
 
-        if self.account_policy == 'privileged_first':
-            account_selected = accounts[0] if accounts else None
-        return account_selected
+        if not account_selected:
+            account_selected = self.get_refer_account(accounts)
+
+        return account_selected or accounts[0]
 
     def generate(self, path_dir):
         hosts = []
