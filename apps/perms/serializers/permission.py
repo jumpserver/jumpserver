@@ -39,7 +39,7 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
     is_expired = serializers.BooleanField(read_only=True, label=_("Is expired"))
     accounts = serializers.ListField(label=_("Account"), required=False)
 
-    template_accounts: QuerySet
+    template_accounts = AccountTemplate.objects.none()
 
     class Meta:
         model = AssetPermission
