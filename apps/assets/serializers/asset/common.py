@@ -158,7 +158,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         self._init_field_choices()
 
     def _get_protocols_required_default(self):
-        platform = self._initial_data_platform
+        platform = self._asset_platform
         platform_protocols = platform.protocols.all()
         protocols_default = [p for p in platform_protocols if p.default]
         protocols_required = [p for p in platform_protocols if p.required or p.primary]
@@ -214,20 +214,22 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         instance.nodes.set(nodes_to_set)
 
     @property
-    def _initial_data_platform(self):
-        if self.instance:
-            return self.instance.platform
-
+    def _asset_platform(self):
         platform_id = self.initial_data.get('platform')
         if isinstance(platform_id, dict):
             platform_id = platform_id.get('id') or platform_id.get('pk')
-        platform = Platform.objects.filter(id=platform_id).first()
+
+        if not platform_id and self.instance:
+            platform = self.instance.platform
+        else:
+            platform = Platform.objects.filter(id=platform_id).first()
+
         if not platform:
             raise serializers.ValidationError({'platform': _("Platform not exist")})
         return platform
 
     def validate_domain(self, value):
-        platform = self._initial_data_platform
+        platform = self._asset_platform
         if platform.domain_enabled:
             return value
         else:
