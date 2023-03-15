@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from acls.serializers.rules import ip_group_child_validator, ip_group_help_text
 from common.serializers import BulkModelSerializer
+from common.serializers.fields import ObjectRelatedField
 from ..models import Endpoint, EndpointRule
 from ..utils import db_port_manager
 
@@ -61,13 +62,15 @@ class EndpointRuleSerializer(BulkModelSerializer):
         default=['*'], label=_('IP'), help_text=_ip_group_help_text,
         child=serializers.CharField(max_length=1024, validators=[ip_group_child_validator])
     )
-    endpoint_display = serializers.ReadOnlyField(source='endpoint.name', label=_('Endpoint'))
+    endpoint = ObjectRelatedField(
+        allow_null=True, required=False, queryset=Endpoint.objects, label=_('Endpoint')
+    )
 
     class Meta:
         model = EndpointRule
         fields_mini = ['id', 'name']
         fields_small = fields_mini + ['ip_group', 'priority']
-        fields_fk = ['endpoint', 'endpoint_display']
+        fields_fk = ['endpoint']
         fields = fields_mini + fields_small + fields_fk + [
             'comment', 'date_created', 'date_updated', 'created_by'
         ]
