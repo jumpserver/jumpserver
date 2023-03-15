@@ -39,7 +39,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
                 'port': 3389,
                 'secret_types': ['password'],
                 'setting': {
-                    'console': True,
+                    'console': False,
                     'security': 'any',
                 }
             },

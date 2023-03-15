@@ -1,6 +1,5 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
-from django.core import validators
 
 from assets.const.web import FillType
 from common.serializers import WritableNestedModelSerializer
@@ -19,7 +18,7 @@ class ProtocolSettingSerializer(serializers.Serializer):
         ("nla", "NLA"),
     ]
     # RDP
-    console = serializers.BooleanField(required=False)
+    console = serializers.BooleanField(required=False, default=False)
     security = serializers.ChoiceField(choices=SECURITY_CHOICES, default="any")
 
     # SFTP
