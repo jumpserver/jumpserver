@@ -222,9 +222,9 @@ class ConnectionToken(JMSOrgBaseModel):
                 'secret_type': account.secret_type,
                 'secret': account.secret or self.input_secret,
                 'su_from': account.su_from,
-                'org_id': account.org_id
+                'org_id': account.org_id,
+                'privileged': account.privileged
             }
-        data['privileged'] = account.privileged
         return Account(**data)
 
     @lazyproperty
