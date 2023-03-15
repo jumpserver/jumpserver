@@ -1,15 +1,39 @@
-from rbac.permissions import RBACPermission
-from common.permissions import UserConfirmation, ConfirmType
+from django_filters import rest_framework as drf_filters
 
-from common.views.mixins import RecordViewLogMixin
-from orgs.mixins.api import OrgBulkModelViewSet
+from assets.const import Protocol
 from accounts import serializers
 from accounts.models import AccountTemplate
+from orgs.mixins.api import OrgBulkModelViewSet
+from rbac.permissions import RBACPermission
+from common.permissions import UserConfirmation, ConfirmType
+from common.views.mixins import RecordViewLogMixin
+from common.drf.filters import BaseFilterSet
+
+
+class AccountTemplateFilterSet(BaseFilterSet):
+    protocols = drf_filters.CharFilter(method='filter_protocols')
+
+    class Meta:
+        model = AccountTemplate
+        fields = ('username', 'name')
+
+    @staticmethod
+    def filter_protocols(queryset, name, value):
+        secret_types = set()
+        protocols = value.split(',')
+        protocol_secret_type_map = Protocol.settings()
+        for p in protocols:
+            if p not in protocol_secret_type_map:
+                continue
+            _st = protocol_secret_type_map[p].get('secret_types', [])
+            secret_types.update(_st)
+        queryset = queryset.filter(secret_type__in=secret_types)
+        return queryset
 
 
 class AccountTemplateViewSet(OrgBulkModelViewSet):
     model = AccountTemplate
-    filterset_fields = ("username", 'name')
+    filterset_class = AccountTemplateFilterSet
     search_fields = ('username', 'name')
     serializer_classes = {
         'default': serializers.AccountTemplateSerializer
