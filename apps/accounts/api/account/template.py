@@ -23,6 +23,7 @@ class AccountTemplateFilterSet(BaseFilterSet):
         protocols = value.split(',')
         protocol_secret_type_map = Protocol.settings()
         for p in protocols:
+            # //
             if p not in protocol_secret_type_map:
                 continue
             _st = protocol_secret_type_map[p].get('secret_types', [])
