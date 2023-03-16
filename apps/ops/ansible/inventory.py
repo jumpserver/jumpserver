@@ -139,12 +139,12 @@ class JMSInventory:
             self.make_ssh_account_vars(host, asset, account, automation, protocols, platform, gateway)
         return host
 
-    def get_asset_accounts(self, asset):
-        from assets.const import Connectivity
-        accounts = asset.accounts.filter(is_active=True).order_by('-privileged', '-date_updated')
-        accounts_connectivity_ok = list(accounts.filter(connectivity=Connectivity.OK))
-        accounts_connectivity_no = list(accounts.exclude(connectivity=Connectivity.OK))
-        return accounts_connectivity_ok + accounts_connectivity_no
+    def get_asset_sorted_accounts(self, asset):
+        accounts = list(asset.accounts.filter(is_active=True))
+        connectivity_score = {'ok': 2, '-': 1, 'err': 0}
+        sort_key = lambda x: (x.privileged, connectivity_score.get(x.connectivity, 0), x.date_updated)
+        accounts_sorted = sorted(accounts, key=sort_key, reverse=True)
+        return accounts_sorted
 
     @staticmethod
     def get_account_prefer(account_prefer):
@@ -163,28 +163,23 @@ class JMSInventory:
         return account
 
     def select_account(self, asset):
-        accounts = self.get_asset_accounts(asset)
-        if not accounts or self.account_policy == 'skip':
+        accounts = self.get_asset_sorted_accounts(asset)
+        if not accounts:
             return None
-        account_selected = None
 
-        # 首先找到特权账号
-        privileged_accounts = list(filter(lambda account: account.privileged, accounts))
+        refer_account = self.get_refer_account(accounts)
+        if refer_account:
+            return refer_account
 
-        # 不同类型的账号选择，优先使用提供的名称
-        refer_privileged_account = self.get_refer_account(privileged_accounts)
-        if self.account_policy in ['privileged_only', 'privileged_first']:
-            first_privileged = privileged_accounts[0] if privileged_accounts else None
-            account_selected = refer_privileged_account or first_privileged
-
-        # 此策略不管是否匹配到账号都需强制返回
-        if self.account_policy == 'privileged_only':
+        account_selected = accounts[0]
+        if self.account_policy == 'skip':
+            return None
+        elif self.account_policy == 'privileged_first':
             return account_selected
-
-        if not account_selected:
-            account_selected = self.get_refer_account(accounts)
-
-        return account_selected or accounts[0]
+        elif self.account_policy == 'privileged_only' and account_selected.privileged:
+            return account_selected
+        else:
+            return None
 
     def generate(self, path_dir):
         hosts = []
