@@ -46,7 +46,7 @@ class JMSPermedInventory(JMSInventory):
         self.user = user
         self.assets_accounts_mapper = self.get_assets_accounts_mapper()
 
-    def get_asset_accounts(self, asset):
+    def get_asset_sorted_accounts(self, asset):
         return self.assets_accounts_mapper.get(asset.id, [])
 
     def get_assets_accounts_mapper(self):
