@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-
-from django.db.models import Q, QuerySet
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
@@ -119,7 +118,10 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
             return
         assets = self.get_all_assets(nodes, assets)
         accounts = self.create_accounts(assets)
-        push_accounts_to_assets_task.delay([str(account.id) for account in accounts])
+        account_ids = [str(account.id) for account in accounts]
+        slice_count = 20
+        for i in range(0, len(account_ids), slice_count):
+            push_accounts_to_assets_task.delay(account_ids[i:i + slice_count])
 
     def validate_accounts(self, usernames: list[str]):
         template_ids = []
