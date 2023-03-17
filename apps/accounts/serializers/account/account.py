@@ -81,7 +81,7 @@ class AccountAssetSerializer(serializers.ModelSerializer):
 
     def to_internal_value(self, data):
         if isinstance(data, dict):
-            i = data.get('id')
+            i = data.get('id') or data.get('pk')
         else:
             i = data
 
