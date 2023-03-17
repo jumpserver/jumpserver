@@ -2,14 +2,13 @@
 #
 
 from django.conf import settings
-from .ansible.inventory import BaseInventory
 
 from common.utils import get_logger
+from .ansible.inventory import BaseInventory
 
 __all__ = [
     'JMSInventory', 'JMSCustomInventory',
 ]
-
 
 logger = get_logger(__file__)
 
@@ -60,7 +59,7 @@ class JMSBaseInventory(BaseInventory):
         if gateway.private_key:
             proxy_command_list.append("-i {}".format(gateway.private_key_file))
 
-        proxy_command = "'-o ProxyCommand={}'".format(
+        proxy_command = '-o ProxyCommand="{}"'.format(
             " ".join(proxy_command_list)
         )
         return {"ansible_ssh_common_args": proxy_command}
@@ -72,6 +71,7 @@ class JMSInventory(JMSBaseInventory):
     write you own inventory, construct you inventory,
     user_info  is obtained from admin_user or asset_user
     """
+
     def __init__(self, assets, run_as_admin=False, run_as=None, become_info=None, system_user=None):
         """
         :param assets: assets
