@@ -9,7 +9,8 @@ from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth import (
     BACKEND_SESSION_KEY, load_backend,
-    PermissionDenied, user_login_failed, _clean_credentials,
+    PermissionDenied, user_login_failed,
+    _clean_credentials,
 )
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
