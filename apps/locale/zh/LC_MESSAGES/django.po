@@ -581,7 +581,7 @@ msgstr "资产类型"
 
 #: accounts/serializers/account/base.py:19
 msgid "Secret/Password"
-msgstr "密码/密钥"
+msgstr "密钥/密码"
 
 #: accounts/serializers/account/base.py:24
 msgid "Key password"
