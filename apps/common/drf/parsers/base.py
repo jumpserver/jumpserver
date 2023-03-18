@@ -111,7 +111,7 @@ class BaseFileParser(BaseParser):
         return {'pk': obj_id, 'name': obj_name}
 
     def parse_value(self, field, value):
-        if value is '-':
+        if value == '-':
             return None
         elif hasattr(field, 'to_file_internal_value'):
             value = field.to_file_internal_value(value)
