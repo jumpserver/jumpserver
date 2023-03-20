@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<drivers>
+	<provider id="mysql">
+		<driver id="mariaDB" categories="sql" name="MariaDB" class="org.mariadb.jdbc.Driver" url="jdbc:mariadb://{host}[:{port}]/[{database}]" port="3306" defaultUser="root" description="MariaDB JDBC driver" custom="false">
+			<library type="jar" path="maven:/org.mariadb.jdbc:mariadb-java-client:RELEASE" custom="false" version="3.0.7">
+				<file id="org.mariadb.jdbc:mariadb-java-client" version="3.0.7" path="${drivers_home}\maven\maven-central\org.mariadb.jdbc\mariadb-java-client-3.0.7.jar"/>
+			</library>
+			<library type="license" path="https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt" custom="false">
+				<file id="https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt" path="${drivers_home}\remote\licenses\old-licenses\lgpl-2.1.txt"/>
+			</library>
+		</driver>
+		<driver id="mysql8" categories="sql" name="MySQL" class="com.mysql.cj.jdbc.Driver" url="jdbc:mysql://{host}[:{port}]/[{database}]" port="3306" defaultUser="root" description="Driver for MySQL 8 and later" custom="false">
+			<library type="jar" path="maven:/mysql:mysql-connector-java:RELEASE" custom="false" version="8.0.29">
+				<file id="mysql:mysql-connector-java" version="8.0.29" path="${home}\AppData\Roaming\DBeaverData\drivers\maven\maven-central\mysql\mysql-connector-java-8.0.29.jar"/>
+				<file id="com.google.protobuf:protobuf-java" version="3.19.4" path="${home}\AppData\Roaming\DBeaverData\drivers\maven\maven-central\com.google.protobuf\protobuf-java-3.19.4.jar"/>
+			</library>
+			<library type="license" path="https://www.gnu.org/licenses/old-licenses/lgpl-2.0.txt" custom="false">
+				<file id="https://www.gnu.org/licenses/old-licenses/lgpl-2.0.txt" path="${home}\AppData\Roaming\DBeaverData\drivers\remote\licenses\old-licenses\lgpl-2.0.txt"/>
+			</library>
+		</driver>
+	</provider>
+	<provider id="postgresql">
+		<driver id="postgres-jdbc" categories="sql" name="PostgreSQL" class="org.postgresql.Driver" url="jdbc:postgresql://{host}[:{port}]/[{database}]" port="5432" defaultDatabase="postgres" defaultUser="postgres" description="PostgreSQL standard driver" custom="false">
+			<library type="jar" path="maven:/org.postgresql:postgresql:RELEASE" custom="false" version="42.5.0">
+				<file id="org.postgresql:postgresql" version="42.5.0" path="${drivers_home}\maven\maven-central\org.postgresql\postgresql-42.5.0.jar"/>
+				<file id="org.checkerframework:checker-qual" version="3.5.0" path="${drivers_home}\maven\maven-central\org.checkerframework\checker-qual-3.5.0.jar"/>
+			</library>
+			<library type="jar" path="maven:/net.postgis:postgis-jdbc:RELEASE" custom="false" version="2.5.0" ignore-dependencies="true">
+				<file id="net.postgis:postgis-jdbc" version="2.5.0" path="${drivers_home}\maven\maven-central\net.postgis\postgis-jdbc-2.5.0.jar"/>
+			</library>
+			<library type="jar" path="maven:/net.postgis:postgis-geometry:RELEASE" custom="false" version="2.5.0" ignore-dependencies="true">
+				<file id="net.postgis:postgis-geometry" version="2.5.0" path="${drivers_home}\maven\maven-central\net.postgis\postgis-geometry-2.5.0.jar"/>
+			</library>
+			<library type="jar" path="maven:/com.github.waffle:waffle-jna:RELEASE" custom="false" version="1.9.1">
+				<file id="com.github.waffle:waffle-jna" version="1.9.1" path="${drivers_home}\maven\maven-central\com.github.waffle\waffle-jna-1.9.1.jar"/>
+				<file id="net.java.dev.jna:jna" version="4.5.1" path="${drivers_home}\maven\maven-central\net.java.dev.jna\jna-4.5.1.jar"/>
+				<file id="net.java.dev.jna:jna-platform" version="4.5.1" path="${drivers_home}\maven\maven-central\net.java.dev.jna\jna-platform-4.5.1.jar"/>
+				<file id="org.slf4j:jcl-over-slf4j" version="1.7.25" path="${drivers_home}\maven\maven-central\org.slf4j\jcl-over-slf4j-1.7.25.jar"/>
+				<file id="org.slf4j:slf4j-api" version="1.7.25" path="${drivers_home}\maven\maven-central\org.slf4j\slf4j-api-1.7.25.jar"/>
+				<file id="com.github.ben-manes.caffeine:caffeine" version="2.6.2" path="${drivers_home}\maven\maven-central\com.github.ben-manes.caffeine\caffeine-2.6.2.jar"/>
+			</library>
+			<library type="license" path="https://raw.githubusercontent.com/pgjdbc/pgjdbc/master/LICENSE" custom="false">
+				<file id="https://raw.githubusercontent.com/pgjdbc/pgjdbc/master/LICENSE" path="${drivers_home}\remote\pgjdbc\pgjdbc\master\LICENSE"/>
+			</library>
+		</driver>
+	</provider>
+	<provider id="sqlserver">
+		<driver id="microsoft" category="MS SQL Server" categories="sql" name="SQL Server" class="com.microsoft.sqlserver.jdbc.SQLServerDriver" url="jdbc:sqlserver://{host}[:{port}][;databaseName={database}]" port="1433" defaultDatabase="master" description="Microsoft JDBC Driver for SQL Server (MSSQL)" custom="false">
+			<library type="jar" path="maven:/com.microsoft.sqlserver:mssql-jdbc:RELEASE" custom="false" version="9.2.0.jre8">
+				<file id="com.microsoft.sqlserver:mssql-jdbc" version="9.2.0.jre8" path="${home}\AppData\Roaming\DBeaverData\drivers\maven\maven-central\com.microsoft.sqlserver\mssql-jdbc-9.2.0.jre8.jar"/>
+			</library>
+			<library type="lib" path="maven:/com.microsoft.sqlserver:mssql-jdbc_auth:RELEASE" custom="false" version="9.2.0.x64">
+				<file id="com.microsoft.sqlserver:mssql-jdbc_auth" version="9.2.0.x64" path="${home}\AppData\Roaming\DBeaverData\drivers\maven\maven-central\com.microsoft.sqlserver\mssql-jdbc_auth-9.2.0.x64.dll"/>
+			</library>
+			<library type="license" path="https://raw.githubusercontent.com/microsoft/sql-server-samples/master/license.txt" custom="false">
+				<file id="https://raw.githubusercontent.com/microsoft/sql-server-samples/master/license.txt" path="${home}\AppData\Roaming\DBeaverData\drivers\remote\microsoft\sql-server-samples\master\license.txt"/>
+			</library>
+		</driver>
+	</provider>
+	<provider id="oracle">
+		<driver id="oracle_thin" categories="sql" name="Oracle" class="oracle.jdbc.OracleDriver" url="jdbc:oracle:thin:@{host}[:{port}]/{database}" port="1521" defaultDatabase="ORCL" defaultUser="system" description="Oracle JDBC driver" custom="false">
+			<library type="jar" path="maven:/com.oracle.database.jdbc:ojdbc8:RELEASE" custom="false" version="12.2.0.1">
+				<file id="com.oracle.database.jdbc:ojdbc8" version="12.2.0.1" path="${home}\AppData\Roaming\DBeaverData\drivers\maven\maven-central\com.oracle.database.jdbc\ojdbc8-12.2.0.1.jar"/>
+				<file id="com.oracle.database.jdbc:ucp" version="12.2.0.1" path="${home}\AppData\Roaming\DBeaverData\drivers\maven\maven-central\com.oracle.database.jdbc\ucp-12.2.0.1.jar"/>
+				<file id="com.oracle.database.security:oraclepki" version="12.2.0.1" path="${home}\AppData\Roaming\DBeaverData\drivers\maven\maven-central\com.oracle.database.security\oraclepki-12.2.0.1.jar"/>
+				<file id="com.oracle.database.security:osdt_cert" version="12.2.0.1" path="${home}\AppData\Roaming\DBeaverData\drivers\maven\maven-central\com.oracle.database.security\osdt_cert-12.2.0.1.jar"/>
+				<file id="com.oracle.database.security:osdt_core" version="12.2.0.1" path="${home}\AppData\Roaming\DBeaverData\drivers\maven\maven-central\com.oracle.database.security\osdt_core-12.2.0.1.jar"/>
+				<file id="com.oracle.database.ha:simplefan" version="12.2.0.1" path="${home}\AppData\Roaming\DBeaverData\drivers\maven\maven-central\com.oracle.database.ha\simplefan-12.2.0.1.jar"/>
+				<file id="com.oracle.database.ha:ons" version="12.2.0.1" path="${home}\AppData\Roaming\DBeaverData\drivers\maven\maven-central\com.oracle.database.ha\ons-12.2.0.1.jar"/>
+			</library>
+			<library type="jar" path="maven:/com.oracle.database.nls:orai18n:RELEASE" custom="false" version="12.2.0.1">
+				<file id="com.oracle.database.nls:orai18n" version="12.2.0.1" path="${home}\AppData\Roaming\DBeaverData\drivers\maven\maven-central\com.oracle.database.nls\orai18n-12.2.0.1.jar"/>
+			</library>
+			<library type="jar" path="maven:/com.oracle.database.xml:xdb6:RELEASE" custom="false" version="12.2.0.1">
+				<file id="com.oracle.database.xml:xdb6" version="12.2.0.1" path="${home}\AppData\Roaming\DBeaverData\drivers\maven\maven-central\com.oracle.database.xml\xdb6-12.2.0.1.jar"/>
+				<file id="com.oracle.database.xml:xmlparserv2" version="12.2.0.1" path="${home}\AppData\Roaming\DBeaverData\drivers\maven\maven-central\com.oracle.database.xml\xmlparserv2-12.2.0.1.jar"/>
+			</library>
+			<library type="jar" path="maven:/com.oracle.database.xml:xmlparserv2:RELEASE" custom="false" version="12.2.0.1">
+				<file id="com.oracle.database.xml:xmlparserv2" version="12.2.0.1" path="${home}\AppData\Roaming\DBeaverData\drivers\maven\maven-central\com.oracle.database.xml\xmlparserv2-12.2.0.1.jar"/>
+			</library>
+		</driver>
+	</provider>
+</drivers>
