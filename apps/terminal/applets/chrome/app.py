@@ -55,7 +55,7 @@ class StepAction:
         if not self.target:
             return True
         if self.command == 'select_frame':
-            driver.switch_to.frame(self.target)
+            self._switch_iframe(driver, self.target)
             return True
         target_name, target_value = self.target.split("=", 1)
         by_name = self.methods_map.get(target_name.upper(), By.NAME)
@@ -78,6 +78,28 @@ class StepAction:
     def _execute_command_type(self, ele, value):
         ele.send_keys(value)
 
+    def _switch_iframe(self, driver: webdriver.Chrome, target: str):
+        """
+        driver: webdriver.Chrome
+        target: str
+        target support three format str below:
+            index=1: switch to frame by index, if index < 0, switch to default frame
+            id=xxx: switch to frame by id
+            name=xxx: switch to frame by name
+        """
+        target_name, target_value = target.split("=", 1)
+        if target_name == 'id':
+            driver.switch_to.frame(target_value)
+        elif target_name == 'index':
+            index = int(target_value)
+            if index < 0:
+                driver.switch_to.default_content()
+            else:
+                driver.switch_to.frame(index)
+        elif target_name == 'name':
+            driver.switch_to.frame(target_value)
+        else:
+            driver.switch_to.frame(target)
 
 def execute_action(driver: webdriver.Chrome, step: StepAction) -> bool:
     try:
