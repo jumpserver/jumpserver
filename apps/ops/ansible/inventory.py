@@ -49,12 +49,12 @@ class JMSInventory:
 
         if gateway.password:
             proxy_command_list.insert(
-                0, "sshpass -p '{}'".format(gateway.password)
+                0, "sshpass -p {}".format(gateway.password)
             )
         if gateway.private_key:
             proxy_command_list.append("-i {}".format(gateway.private_key_path))
 
-        proxy_command = '-o ProxyCommand=\"{}\"'.format(
+        proxy_command = "-o ProxyCommand='{}'".format(
             " ".join(proxy_command_list)
         )
         return {"ansible_ssh_common_args": proxy_command}
