@@ -1,10 +1,11 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework.validators import (
-    UniqueTogetherValidator, ValidationError
+    UniqueTogetherValidator
 )
 
-from accounts.const import SecretType, Source
+from accounts import validator
+from accounts.const import SecretType, Source, BulkCreateStrategy
 from accounts.models import Account, AccountTemplate
 from accounts.tasks import push_accounts_to_assets_task
 from assets.const import Category, AllTypes
@@ -15,15 +16,6 @@ from common.utils import get_logger
 from .base import BaseAccountSerializer
 
 logger = get_logger(__name__)
-
-
-class SkipUniqueValidator(UniqueTogetherValidator):
-    def __call__(self, attrs, serializer):
-        try:
-            super().__call__(attrs, serializer)
-        except ValidationError as e:
-            logger.debug(f'{attrs.get("asset")}: {e.detail[0]}')
-            raise ValidationError({})
 
 
 class AccountSerializerCreateValidateMixin:
@@ -113,12 +105,16 @@ class AccountSerializer(AccountSerializerCreateMixin, BaseAccountSerializer):
         required=False, queryset=Account.objects, allow_null=True, allow_empty=True,
         label=_('Su from'), attrs=('id', 'name', 'username')
     )
+    strategy = LabeledChoiceField(
+        choices=BulkCreateStrategy.choices, default=BulkCreateStrategy.SKIP,
+        write_only=True, label=_('Account policy')
+    )
 
     class Meta(BaseAccountSerializer.Meta):
         model = Account
         fields = BaseAccountSerializer.Meta.fields + [
             'su_from', 'asset', 'template', 'version',
-            'push_now', 'source', 'connectivity',
+            'push_now', 'source', 'connectivity', 'strategy'
         ]
         extra_kwargs = {
             **BaseAccountSerializer.Meta.extra_kwargs,
@@ -138,16 +134,26 @@ class AccountSerializer(AccountSerializerCreateMixin, BaseAccountSerializer):
         return queryset
 
     def get_validators(self):
-        validators = []
-        data = self.context['request'].data
-        action = self.context['view'].action
+        ignore = False
+        validators = [validator.AccountSecretTypeValidator(fields=('secret_type',))]
+        view = self.context.get('view')
+        request = self.context.get('request')
+        if request and view:
+            data = request.data
+            action = view.action
+            ignore = action == 'create' and isinstance(data, list)
+
         _validators = super().get_validators()
-        ignore = action == 'create' and isinstance(data, list) and len(data) > 1
         for v in _validators:
             if ignore and isinstance(v, UniqueTogetherValidator):
-                v = SkipUniqueValidator(v.queryset, v.fields)
+                v = validator.AccountUniqueTogetherValidator(v.queryset, v.fields)
             validators.append(v)
         return validators
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        attrs.pop('strategy', None)
+        return attrs
 
 
 class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
