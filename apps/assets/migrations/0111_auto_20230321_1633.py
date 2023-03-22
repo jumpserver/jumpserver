@@ -14,6 +14,8 @@ def migrate_platform_protocol_primary(apps, schema_editor):
 
     for platform in platforms:
         p = platform.protocols.first()
+        if not p:
+            continue
         p.primary = True
         p.save()
 
