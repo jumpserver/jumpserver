@@ -72,16 +72,15 @@ class PlatformAutomationSerializer(serializers.ModelSerializer):
         }
 
 
-class PlatformProtocolsSerializer(serializers.ModelSerializer):
+class PlatformProtocolSerializer(serializers.ModelSerializer):
     setting = ProtocolSettingSerializer(required=False, allow_null=True)
-    primary = serializers.BooleanField(read_only=True, label=_("Primary"))
 
     class Meta:
         model = PlatformProtocol
         fields = [
             "id", "name", "port", "primary",
-            "default", "required", "secret_types",
-            "setting",
+            "required", "default",
+            "secret_types", "setting",
         ]
 
 
@@ -91,7 +90,7 @@ class PlatformSerializer(WritableNestedModelSerializer):
     )
     type = LabeledChoiceField(choices=AllTypes.choices(), label=_("Type"))
     category = LabeledChoiceField(choices=Category.choices, label=_("Category"))
-    protocols = PlatformProtocolsSerializer(
+    protocols = PlatformProtocolSerializer(
         label=_("Protocols"), many=True, required=False
     )
     automation = PlatformAutomationSerializer(label=_("Automation"), required=False)
@@ -125,6 +124,16 @@ class PlatformSerializer(WritableNestedModelSerializer):
             'protocols', 'automation'
         )
         return queryset
+
+    def validate_protocols(self, protocols):
+        if not protocols:
+            raise serializers.ValidationError(_("Protocols is required"))
+        primary = [p for p in protocols if p.get('primary')]
+        if not primary:
+            protocols[0]['primary'] = True
+            protocols[0]['default'] = False
+        self.initial_data['protocols'] = protocols
+        return protocols
 
 
 class PlatformOpsMethodSerializer(serializers.Serializer):

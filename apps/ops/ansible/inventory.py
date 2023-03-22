@@ -100,12 +100,19 @@ class JMSInventory:
             host.update(self.make_proxy_command(gateway))
 
     def asset_to_host(self, asset, account, automation, protocols, platform):
+        if protocols:
+            protocol = protocols[0].name
+            port = protocol[0].port
+        else:
+            protocol = 'null'
+            port = 0
+
         host = {
             'name': '{}'.format(asset.name.replace(' ', '_')),
             'jms_asset': {
                 'id': str(asset.id), 'name': asset.name, 'address': asset.address,
                 'type': asset.type, 'category': asset.category,
-                'protocol': asset.protocol, 'port': asset.port,
+                'protocol': protocol, 'port': port,
                 'spec_info': asset.spec_info, 'secret_info': asset.secret_info,
                 'protocols': [{'name': p.name, 'port': p.port} for p in protocols],
             },
