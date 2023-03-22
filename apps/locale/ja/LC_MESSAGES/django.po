@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-19 23:52+0800\n"
+"POT-Creation-Date: 2023-03-22 11:40+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -69,6 +69,22 @@ msgstr "ローカル"
 #: accounts/const/account.py:20
 msgid "Collected"
 msgstr ""
+
+#: accounts/const/account.py:24 ops/const.py:45
+msgid "Skip"
+msgstr "スキップ"
+
+#: accounts/const/account.py:25 audits/const.py:23 rbac/tree.py:229
+#: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
+msgid "Update"
+msgstr "更新"
+
+#: accounts/const/account.py:26
+#: accounts/serializers/automations/change_secret.py:155 audits/const.py:53
+#: audits/signal_handlers/activity_log.py:33 common/const/choices.py:19
+#: ops/const.py:58 terminal/const.py:60 xpack/plugins/cloud/const.py:41
+msgid "Failed"
+msgstr "失敗しました"
 
 #: accounts/const/automation.py:22 rbac/tree.py:50
 msgid "Push account"
@@ -160,7 +176,7 @@ msgstr "作成のみ"
 
 #: accounts/models/account.py:47
 #: accounts/models/automations/gather_account.py:14
-#: accounts/serializers/account/account.py:95
+#: accounts/serializers/account/account.py:102
 #: accounts/serializers/account/gathered_account.py:10
 #: accounts/serializers/automations/change_secret.py:111
 #: accounts/serializers/automations/change_secret.py:131
@@ -176,7 +192,7 @@ msgstr "作成のみ"
 msgid "Asset"
 msgstr "資産"
 
-#: accounts/models/account.py:51 accounts/serializers/account/account.py:99
+#: accounts/models/account.py:51 accounts/serializers/account/account.py:106
 #: authentication/serializers/connect_token_secret.py:50
 msgid "Su from"
 msgstr "から切り替え"
@@ -186,7 +202,7 @@ msgstr "から切り替え"
 msgid "Version"
 msgstr "バージョン"
 
-#: accounts/models/account.py:55 accounts/serializers/account/account.py:96
+#: accounts/models/account.py:55 accounts/serializers/account/account.py:103
 #: users/models/user.py:768
 msgid "Source"
 msgstr "ソース"
@@ -328,7 +344,7 @@ msgid "Can add push account execution"
 msgstr "プッシュ アカウントの作成の実行"
 
 #: accounts/models/automations/change_secret.py:18 accounts/models/base.py:36
-#: accounts/serializers/account/account.py:134
+#: accounts/serializers/account/account.py:167
 #: accounts/serializers/account/base.py:16
 #: accounts/serializers/automations/change_secret.py:46
 #: authentication/serializers/connect_token_secret.py:41
@@ -338,6 +354,7 @@ msgstr "鍵の種類"
 
 #: accounts/models/automations/change_secret.py:20
 #: accounts/models/automations/change_secret.py:90 accounts/models/base.py:38
+#: accounts/serializers/account/base.py:19
 #: authentication/models/temp_token.py:10
 #: authentication/templates/authentication/_access_key_modal.html:31
 #: settings/serializers/auth/radius.py:19
@@ -515,22 +532,22 @@ msgstr ""
 "{} -暗号化変更タスクが完了しました: 暗号化パスワードが設定されていません-個人"
 "情報にアクセスしてください-> ファイル暗号化パスワードを設定してください"
 
-#: accounts/serializers/account/account.py:65
+#: accounts/serializers/account/account.py:72
 #: assets/serializers/asset/common.py:72 settings/serializers/auth/sms.py:75
 msgid "Template"
 msgstr "テンプレート"
 
-#: accounts/serializers/account/account.py:68
+#: accounts/serializers/account/account.py:75
 #: assets/serializers/asset/common.py:69
 msgid "Push now"
 msgstr "今すぐプッシュ"
 
-#: accounts/serializers/account/account.py:70
+#: accounts/serializers/account/account.py:77
 #: accounts/serializers/account/base.py:64
 msgid "Has secret"
 msgstr "エスクローされたパスワード"
 
-#: accounts/serializers/account/account.py:75 applications/models.py:11
+#: accounts/serializers/account/account.py:82 applications/models.py:11
 #: assets/models/label.py:21 assets/models/platform.py:77
 #: assets/serializers/asset/common.py:127 assets/serializers/cagegory.py:8
 #: assets/serializers/platform.py:93 assets/serializers/platform.py:133
@@ -539,7 +556,7 @@ msgstr "エスクローされたパスワード"
 msgid "Category"
 msgstr "カテゴリ"
 
-#: accounts/serializers/account/account.py:76
+#: accounts/serializers/account/account.py:83
 #: accounts/serializers/automations/base.py:54 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:18 applications/models.py:14
 #: assets/models/_user.py:50 assets/models/automations/base.py:20
@@ -558,11 +575,15 @@ msgstr "カテゴリ"
 msgid "Type"
 msgstr "タイプ"
 
-#: accounts/serializers/account/account.py:91
+#: accounts/serializers/account/account.py:98
 msgid "Asset not found"
 msgstr "資産が存在しません"
 
-#: accounts/serializers/account/account.py:144 acls/models/base.py:98
+#: accounts/serializers/account/account.py:110 ops/models/base.py:19
+msgid "Account policy"
+msgstr "アカウント ポリシー"
+
+#: accounts/serializers/account/account.py:177 acls/models/base.py:98
 #: acls/models/login_acl.py:13 acls/serializers/base.py:55
 #: acls/serializers/login_acl.py:21 assets/models/cmd_filter.py:24
 #: assets/models/label.py:16 audits/models.py:44 audits/models.py:63
@@ -580,7 +601,7 @@ msgstr "資産が存在しません"
 msgid "User"
 msgstr "ユーザー"
 
-#: accounts/serializers/account/account.py:145
+#: accounts/serializers/account/account.py:178
 #: authentication/templates/authentication/_access_key_modal.html:33
 #: terminal/notifications.py:98 terminal/notifications.py:146
 msgid "Date"
@@ -606,10 +627,6 @@ msgstr "現在、メール送信のみがサポートされています"
 #: accounts/serializers/account/backup.py:37
 msgid "Asset type"
 msgstr "資産タイプ"
-
-#: accounts/serializers/account/base.py:19
-msgid "Secret"
-msgstr "キー/パスワード"
 
 #: accounts/serializers/account/base.py:24
 msgid "Key password"
@@ -670,12 +687,6 @@ msgstr "自動タスク実行履歴"
 msgid "Success"
 msgstr "成功"
 
-#: accounts/serializers/automations/change_secret.py:155 audits/const.py:53
-#: audits/signal_handlers/activity_log.py:33 common/const/choices.py:19
-#: ops/const.py:58 terminal/const.py:60 xpack/plugins/cloud/const.py:41
-msgid "Failed"
-msgstr "失敗しました"
-
 #: accounts/tasks/automation.py:24
 msgid "Account execute automation"
 msgstr "アカウント実行の自動化"
@@ -715,6 +726,11 @@ msgstr "パスワードには `\"` を含まない"
 #: accounts/utils.py:54
 msgid "private key invalid or passphrase error"
 msgstr "秘密鍵が無効またはpassphraseエラー"
+
+#: accounts/validator.py:41
+#, python-brace-format
+msgid "{field_name} not a legal option"
+msgstr ""
 
 #: acls/apps.py:7
 msgid "Acls"
@@ -1775,11 +1791,6 @@ msgstr "ダウンロード"
 #: audits/const.py:22 rbac/tree.py:228
 msgid "View"
 msgstr "表示"
-
-#: audits/const.py:23 rbac/tree.py:229 templates/_csv_import_export.html:18
-#: templates/_csv_update_modal.html:6
-msgid "Update"
-msgstr "更新"
 
 #: audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:22
@@ -3331,10 +3342,6 @@ msgstr "特権アカウントのみ"
 msgid "Privileged First"
 msgstr "特権アカウント優先"
 
-#: ops/const.py:45
-msgid "Skip"
-msgstr "スキップ"
-
 #: ops/const.py:50
 msgid "Powershell"
 msgstr "PowerShell"
@@ -3394,10 +3401,6 @@ msgstr "アルグ"
 #: terminal/models/session/sharing.py:23
 msgid "Creator"
 msgstr "作成者"
-
-#: ops/models/base.py:19
-msgid "Account policy"
-msgstr "アカウント ポリシー"
 
 #: ops/models/base.py:20
 msgid "Last execution"
@@ -6582,7 +6585,7 @@ msgstr "MFAフォース有効化"
 
 #: users/serializers/user.py:92
 msgid "Login blocked"
-msgstr "ログインブロック"
+msgstr "ログインがロックされました"
 
 #: users/serializers/user.py:95 users/serializers/user.py:169
 msgid "Is OTP bound"
