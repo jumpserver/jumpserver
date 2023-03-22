@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-19 23:52+0800\n"
+"POT-Creation-Date: 2023-03-22 11:40+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -68,6 +68,22 @@ msgstr "数据库"
 #: accounts/const/account.py:20
 msgid "Collected"
 msgstr "收集"
+
+#: accounts/const/account.py:24 ops/const.py:45
+msgid "Skip"
+msgstr "跳过"
+
+#: accounts/const/account.py:25 audits/const.py:23 rbac/tree.py:229
+#: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
+msgid "Update"
+msgstr "更新"
+
+#: accounts/const/account.py:26
+#: accounts/serializers/automations/change_secret.py:155 audits/const.py:53
+#: audits/signal_handlers/activity_log.py:33 common/const/choices.py:19
+#: ops/const.py:58 terminal/const.py:60 xpack/plugins/cloud/const.py:41
+msgid "Failed"
+msgstr "失败"
 
 #: accounts/const/automation.py:22 rbac/tree.py:50
 msgid "Push account"
@@ -159,7 +175,7 @@ msgstr "仅创建"
 
 #: accounts/models/account.py:47
 #: accounts/models/automations/gather_account.py:14
-#: accounts/serializers/account/account.py:95
+#: accounts/serializers/account/account.py:102
 #: accounts/serializers/account/gathered_account.py:10
 #: accounts/serializers/automations/change_secret.py:111
 #: accounts/serializers/automations/change_secret.py:131
@@ -175,7 +191,7 @@ msgstr "仅创建"
 msgid "Asset"
 msgstr "资产"
 
-#: accounts/models/account.py:51 accounts/serializers/account/account.py:99
+#: accounts/models/account.py:51 accounts/serializers/account/account.py:106
 #: authentication/serializers/connect_token_secret.py:50
 msgid "Su from"
 msgstr "切换自"
@@ -185,7 +201,7 @@ msgstr "切换自"
 msgid "Version"
 msgstr "版本"
 
-#: accounts/models/account.py:55 accounts/serializers/account/account.py:96
+#: accounts/models/account.py:55 accounts/serializers/account/account.py:103
 #: users/models/user.py:768
 msgid "Source"
 msgstr "来源"
@@ -327,7 +343,7 @@ msgid "Can add push account execution"
 msgstr "创建推送账号执行"
 
 #: accounts/models/automations/change_secret.py:18 accounts/models/base.py:36
-#: accounts/serializers/account/account.py:134
+#: accounts/serializers/account/account.py:167
 #: accounts/serializers/account/base.py:16
 #: accounts/serializers/automations/change_secret.py:46
 #: authentication/serializers/connect_token_secret.py:41
@@ -337,6 +353,7 @@ msgstr "密文类型"
 
 #: accounts/models/automations/change_secret.py:20
 #: accounts/models/automations/change_secret.py:90 accounts/models/base.py:38
+#: accounts/serializers/account/base.py:19
 #: authentication/models/temp_token.py:10
 #: authentication/templates/authentication/_access_key_modal.html:31
 #: settings/serializers/auth/radius.py:19
@@ -511,22 +528,22 @@ msgstr ""
 "{} - 改密任务已完成: 未设置加密密码 - 请前往个人信息 -> 文件加密密码中设置加"
 "密密码"
 
-#: accounts/serializers/account/account.py:65
+#: accounts/serializers/account/account.py:72
 #: assets/serializers/asset/common.py:72 settings/serializers/auth/sms.py:75
 msgid "Template"
 msgstr "模板"
 
-#: accounts/serializers/account/account.py:68
+#: accounts/serializers/account/account.py:75
 #: assets/serializers/asset/common.py:69
 msgid "Push now"
 msgstr "立即推送"
 
-#: accounts/serializers/account/account.py:70
+#: accounts/serializers/account/account.py:77
 #: accounts/serializers/account/base.py:64
 msgid "Has secret"
 msgstr "已托管密码"
 
-#: accounts/serializers/account/account.py:75 applications/models.py:11
+#: accounts/serializers/account/account.py:82 applications/models.py:11
 #: assets/models/label.py:21 assets/models/platform.py:77
 #: assets/serializers/asset/common.py:127 assets/serializers/cagegory.py:8
 #: assets/serializers/platform.py:93 assets/serializers/platform.py:133
@@ -535,7 +552,7 @@ msgstr "已托管密码"
 msgid "Category"
 msgstr "类别"
 
-#: accounts/serializers/account/account.py:76
+#: accounts/serializers/account/account.py:83
 #: accounts/serializers/automations/base.py:54 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:18 applications/models.py:14
 #: assets/models/_user.py:50 assets/models/automations/base.py:20
@@ -554,11 +571,15 @@ msgstr "类别"
 msgid "Type"
 msgstr "类型"
 
-#: accounts/serializers/account/account.py:91
+#: accounts/serializers/account/account.py:98
 msgid "Asset not found"
 msgstr "资产不存在"
 
-#: accounts/serializers/account/account.py:144 acls/models/base.py:98
+#: accounts/serializers/account/account.py:110 ops/models/base.py:19
+msgid "Account policy"
+msgstr "账号策略"
+
+#: accounts/serializers/account/account.py:177 acls/models/base.py:98
 #: acls/models/login_acl.py:13 acls/serializers/base.py:55
 #: acls/serializers/login_acl.py:21 assets/models/cmd_filter.py:24
 #: assets/models/label.py:16 audits/models.py:44 audits/models.py:63
@@ -576,7 +597,7 @@ msgstr "资产不存在"
 msgid "User"
 msgstr "用户"
 
-#: accounts/serializers/account/account.py:145
+#: accounts/serializers/account/account.py:178
 #: authentication/templates/authentication/_access_key_modal.html:33
 #: terminal/notifications.py:98 terminal/notifications.py:146
 msgid "Date"
@@ -602,10 +623,6 @@ msgstr "当前只支持邮件发送"
 #: accounts/serializers/account/backup.py:37
 msgid "Asset type"
 msgstr "资产类型"
-
-#: accounts/serializers/account/base.py:19
-msgid "Secret"
-msgstr "密文"
 
 #: accounts/serializers/account/base.py:24
 msgid "Key password"
@@ -666,12 +683,6 @@ msgstr "自动化任务执行历史"
 msgid "Success"
 msgstr "成功"
 
-#: accounts/serializers/automations/change_secret.py:155 audits/const.py:53
-#: audits/signal_handlers/activity_log.py:33 common/const/choices.py:19
-#: ops/const.py:58 terminal/const.py:60 xpack/plugins/cloud/const.py:41
-msgid "Failed"
-msgstr "失败"
-
 #: accounts/tasks/automation.py:24
 msgid "Account execute automation"
 msgstr "账号执行自动化"
@@ -711,6 +722,11 @@ msgstr "密码不能包含 `\"` 字符"
 #: accounts/utils.py:54
 msgid "private key invalid or passphrase error"
 msgstr "密钥不合法或密钥密码错误"
+
+#: accounts/validator.py:41
+#, python-brace-format
+msgid "{field_name} not a legal option"
+msgstr ""
 
 #: acls/apps.py:7
 msgid "Acls"
@@ -1763,11 +1779,6 @@ msgstr "下载文件"
 #: audits/const.py:22 rbac/tree.py:228
 msgid "View"
 msgstr "查看"
-
-#: audits/const.py:23 rbac/tree.py:229 templates/_csv_import_export.html:18
-#: templates/_csv_update_modal.html:6
-msgid "Update"
-msgstr "更新"
 
 #: audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:22
@@ -3294,10 +3305,6 @@ msgstr "仅限特权账号"
 msgid "Privileged First"
 msgstr "特权账号优先"
 
-#: ops/const.py:45
-msgid "Skip"
-msgstr "跳过"
-
 #: ops/const.py:50
 msgid "Powershell"
 msgstr "PowerShell"
@@ -3357,10 +3364,6 @@ msgstr "参数"
 #: terminal/models/session/sharing.py:23
 msgid "Creator"
 msgstr "创建者"
-
-#: ops/models/base.py:19
-msgid "Account policy"
-msgstr "账号策略"
 
 #: ops/models/base.py:20
 msgid "Last execution"
@@ -6496,7 +6499,7 @@ msgstr "强制 MFA"
 
 #: users/serializers/user.py:92
 msgid "Login blocked"
-msgstr "登录被阻塞"
+msgstr "登录被锁定"
 
 #: users/serializers/user.py:95 users/serializers/user.py:169
 msgid "Is OTP bound"
