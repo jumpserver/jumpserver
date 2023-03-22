@@ -192,25 +192,6 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
         return names
 
     @lazyproperty
-    def primary_protocol(self):
-        from assets.const.types import AllTypes
-        primary_protocol_name = AllTypes.get_primary_protocol_name(self.category, self.type)
-        protocol = self.protocols.filter(name=primary_protocol_name).first()
-        return protocol
-
-    @lazyproperty
-    def protocol(self):
-        if not self.primary_protocol:
-            return 'none'
-        return self.primary_protocol.name
-
-    @lazyproperty
-    def port(self):
-        if not self.primary_protocol:
-            return 0
-        return self.primary_protocol.port
-
-    @lazyproperty
     def type(self):
         return self.platform.type
 
