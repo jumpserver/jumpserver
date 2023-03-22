@@ -20,8 +20,8 @@ class HostTypes(BaseType):
                 'domain_enabled': True,
                 'su_enabled': True,
                 'su_methods': [
-                    {'name': 'sudo su', 'id': 'sudo su'},
-                    {'name': 'su -', 'id': 'su -'}
+                    {'name': 'sudo su -', 'id': 'sudo'},
+                    {'name': 'su -', 'id': 'su'}
                 ],
             },
             cls.WINDOWS: {
