@@ -45,7 +45,10 @@ class SecretTypeValidator:
 
     def __call__(self, attrs, serializer):
         secret_types = set()
-        asset = attrs['asset']
+        if serializer.instance:
+            asset = serializer.instance.asset
+        else:
+            asset = attrs['asset']
         secret_type = attrs['secret_type']
         platform_protocols_dict = {
             name: self.protocol_settings.get(name, {}).get('secret_types', [])
