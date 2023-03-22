@@ -15,6 +15,9 @@ class CloudTypes(BaseType):
                 'charset_enabled': False,
                 'domain_enabled': False,
                 'su_enabled': False,
+            },
+            cls.K8S: {
+                'domain_enabled': True,
             }
         }
 
