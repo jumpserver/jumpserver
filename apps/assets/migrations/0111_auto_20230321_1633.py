@@ -8,7 +8,7 @@ def migrate_platform_charset(apps, schema_editor):
     platform_model.objects.filter(charset='utf8').update(charset='utf-8')
 
 
-def migrate_platform_protocol_required(apps, schema_editor):
+def migrate_platform_protocol_primary(apps, schema_editor):
     platform_model = apps.get_model('assets', 'Platform')
     platforms = platform_model.objects.all()
 
@@ -31,5 +31,5 @@ class Migration(migrations.Migration):
             field=models.BooleanField(default=False, verbose_name='Primary'),
         ),
         migrations.RunPython(migrate_platform_charset),
-        migrations.RunPython(migrate_platform_protocol_required),
+        migrations.RunPython(migrate_platform_protocol_primary),
     ]

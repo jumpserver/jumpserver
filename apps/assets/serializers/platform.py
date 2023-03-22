@@ -132,6 +132,7 @@ class PlatformSerializer(WritableNestedModelSerializer):
         if not primary:
             protocols[0]['primary'] = True
             protocols[0]['default'] = False
+        # 这里不设置不行，write_nested 不使用 validated 中的
         self.initial_data['protocols'] = protocols
         return protocols
 
