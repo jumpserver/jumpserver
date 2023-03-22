@@ -1,8 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
-from rest_framework.validators import (
-    UniqueTogetherValidator
-)
+from rest_framework.generics import get_object_or_404
+from rest_framework.validators import UniqueTogetherValidator
 
 from accounts import validator
 from accounts.const import SecretType, Source, BulkCreateStrategy
@@ -29,16 +28,25 @@ class AccountSerializerCreateValidateMixin:
         ret = super().to_internal_value(data)
         self.from_id = from_id
         return ret
+    @staticmethod
+    def related_template_values(template: AccountTemplate, attrs):
+        ignore_fields = ['id', 'date_created', 'date_updated', 'org_id']
+        field_names = [
+            field.name for field in template._meta.fields
+            if field.name not in ignore_fields
+        ]
+        for name in field_names:
+            attrs[name] = attrs.get(name) or getattr(template, name)
 
     def set_secret(self, attrs):
         _id = self.from_id
         template = attrs.pop('template', None)
 
         if _id and template:
-            account_template = AccountTemplate.objects.get(id=_id)
-            attrs['secret'] = account_template.secret
+            account_template = get_object_or_404(AccountTemplate, id=_id)
+            self.related_template_values(account_template, attrs)
         elif _id and not template:
-            account = Account.objects.get(id=_id)
+            account = get_object_or_404(Account, id=_id)
             attrs['secret'] = account.secret
         return attrs
 

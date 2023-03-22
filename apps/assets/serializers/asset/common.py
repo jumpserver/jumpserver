@@ -6,9 +6,9 @@ from django.db.transaction import atomic
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
+from accounts.const import SecretType
 from accounts.models import Account
-from accounts.serializers import AccountSerializerCreateValidateMixin
-from accounts.serializers import AuthValidateMixin
+from accounts.serializers import AuthValidateMixin, AccountSerializerCreateValidateMixin
 from common.serializers import WritableNestedModelSerializer, SecretReadableMixin, CommonModelSerializer
 from common.serializers.fields import LabeledChoiceField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
@@ -72,7 +72,10 @@ class AssetAccountSerializer(
         default=False, label=_("Template"), write_only=True
     )
     name = serializers.CharField(max_length=128, required=False, label=_("Name"))
-    secret_type = serializers.CharField(max_length=64, default='password', label=_("Secret type"))
+    secret_type = LabeledChoiceField(
+        choices=SecretType.choices, default=SecretType.PASSWORD,
+        required=False, label=_('Secret type')
+    )
 
     class Meta:
         model = Account
