@@ -99,7 +99,8 @@ class JMSInventory:
         if gateway:
             host.update(self.make_proxy_command(gateway))
 
-    def asset_to_host(self, asset, account, automation, protocols, platform):
+    @staticmethod
+    def get_primary_protocol(protocols):
         primary_protocol = [p for p in protocols if p.primary]
         if len(primary_protocol) >= 1:
             primary = primary_protocol[0]
@@ -114,6 +115,10 @@ class JMSInventory:
         else:
             protocol = 'null'
             port = 0
+        return protocol, port
+
+    def asset_to_host(self, asset, account, automation, protocols, platform):
+        protocol, port = self.get_primary_protocol(protocols)
 
         host = {
             'name': '{}'.format(asset.name.replace(' ', '_')),
