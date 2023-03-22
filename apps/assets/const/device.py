@@ -16,9 +16,7 @@ class DeviceTypes(BaseType):
                 'charset_enabled': False,
                 'domain_enabled': True,
                 'su_enabled': True,
-                'su_methods': [
-                    {'name': 'enable', 'id': 'enable'},
-                ]
+                'su_methods': ['enable']
             }
         }
 
