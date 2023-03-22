@@ -76,6 +76,9 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         accounts = accounts.filter(id__in=self.account_ids)
         if self.secret_type:
             accounts = accounts.filter(secret_type=self.secret_type)
+
+        if settings.CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED:
+            accounts = accounts.filter(privileged=False)
         return accounts
 
     def host_callback(
