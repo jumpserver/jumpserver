@@ -101,15 +101,8 @@ class JMSInventory:
 
     @staticmethod
     def get_primary_protocol(protocols):
-        primary_protocol = [p for p in protocols if p.primary]
-        if len(primary_protocol) >= 1:
-            primary = primary_protocol[0]
-        elif protocols:
+        if protocols:
             primary = protocols[0]
-        else:
-            primary = None
-
-        if primary:
             protocol = primary.name
             port = primary.port
         else:
