@@ -133,7 +133,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
     labels = AssetLabelSerializer(many=True, required=False, label=_('Label'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'), default=())
     accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, write_only=True, label=_('Account'))
-    nodes_display = serializers.ListField(read_only=True, label=_("Node path"))
+    nodes_display = serializers.ListField(read_only=False, label=_("Node path"))
 
     class Meta:
         model = Asset
