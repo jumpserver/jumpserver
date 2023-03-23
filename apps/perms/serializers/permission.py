@@ -109,7 +109,7 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
                 if condition in username_secret_type_dict:
                     continue
                 account_data = {key: getattr(template, key) for key in account_attribute}
-                account_data['name'] = f"{account_data['name']}-clone"
+                account_data['name'] = f"{account_data['name']}-{_('Account template')}"
                 need_create_accounts.append(Account(**{'asset_id': asset.id, **account_data}))
         return Account.objects.bulk_create(need_create_accounts)
 

@@ -6,10 +6,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from accounts import serializers
-from accounts.const import AutomationTypes
-from accounts.const import Source
+from accounts.const import Source, AutomationTypes
 from accounts.filters import GatheredAccountFilterSet
-from accounts.models import GatherAccountsAutomation
+from accounts.models import GatherAccountsAutomation, Account
 from accounts.models import GatheredAccount
 from orgs.mixins.api import OrgBulkModelViewSet
 from .base import AutomationExecutionViewSet
@@ -50,22 +49,28 @@ class GatheredAccountViewSet(OrgBulkModelViewSet):
         'default': serializers.GatheredAccountSerializer,
     }
     rbac_perms = {
-        'sync_account': 'assets.add_gatheredaccount',
+        'sync_accounts': 'assets.add_gatheredaccount',
     }
 
-    @action(methods=['post'], detail=True, url_path='sync')
-    def sync_account(self, request, *args, **kwargs):
-        gathered_account = super().get_object()
-        asset = gathered_account.asset
-        username = gathered_account.username
-        accounts = asset.accounts.filter(username=username)
-
-        if accounts.exists():
-            accounts.update(source=Source.COLLECTED)
-        else:
-            asset.accounts.model.objects.create(
-                asset=asset, username=username,
-                name=f'{username}-{_("Collected")}',
-                source=Source.COLLECTED
-            )
+    @action(methods=['post'], detail=False, url_path='sync-accounts')
+    def sync_accounts(self, request, *args, **kwargs):
+        gathered_account_ids = request.data.get('gathered_account_ids')
+        gathered_accounts = self.model.objects.filter(id__in=gathered_account_ids)
+        account_objs = []
+        exists_accounts = Account.objects.none()
+        for gathered_account in gathered_accounts:
+            asset_id = gathered_account.asset_id
+            username = gathered_account.username
+            accounts = Account.objects.filter(asset_id=asset_id, username=username)
+            if accounts.exists():
+                exists_accounts |= accounts
+            else:
+                account_objs.append(
+                    Account(
+                        asset_id=asset_id, username=username,
+                        name=f'{username}-{_("Collected")}',
+                        source=Source.COLLECTED
+                    ))
+        exists_accounts.update(source=Source.COLLECTED)
+        Account.objects.bulk_create(account_objs)
         return Response(status=status.HTTP_201_CREATED)
