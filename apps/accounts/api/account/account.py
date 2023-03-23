@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
+from rest_framework.status import HTTP_200_OK
 
 from accounts import serializers
 from accounts.filters import AccountFilterSet
@@ -29,6 +30,7 @@ class AccountViewSet(OrgBulkModelViewSet):
         'partial_update': ['accounts.change_account'],
         'su_from_accounts': 'accounts.view_account',
         'username_suggestions': 'accounts.view_account',
+        'remove_secret': 'accounts.change_account',
     }
 
     @action(methods=['get'], detail=False, url_path='su-from-accounts')
@@ -71,6 +73,11 @@ class AccountViewSet(OrgBulkModelViewSet):
         usernames = common + others
         return Response(data=usernames)
 
+    @action(methods=['patch'], detail=False, url_path='remove-secret')
+    def remove_secret(self, request, *args, **kwargs):
+        account_ids = request.data.get('account_ids', [])
+        self.model.objects.filter(id__in=account_ids).update(secret=None)
+        return Response(status=HTTP_200_OK)
 
 class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
     """
