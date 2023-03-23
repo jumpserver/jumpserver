@@ -2,11 +2,10 @@
 #
 from django.utils.translation import ugettext_lazy as _
 
-from orgs.mixins.models import OrgManager
-from assets.models.platform import Platform
 from assets.const import GATEWAY_NAME
+from assets.models.platform import Platform
 from common.utils import get_logger, lazyproperty
-
+from orgs.mixins.models import OrgManager
 from .asset.host import Host
 
 logger = get_logger(__file__)
@@ -56,6 +55,14 @@ class Gateway(Host):
     def password(self):
         account = self.select_account
         return account.password if account else None
+
+    @lazyproperty
+    def port(self):
+        protocol = self.protocols.filter(name='ssh').first()
+        if protocol:
+            return protocol.port
+        else:
+            return '22'
 
     @lazyproperty
     def private_key(self):
