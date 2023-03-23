@@ -36,9 +36,6 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     token = EncryptedField(
         label=_('Token'), required=False, write_only=True, style={'base_template': 'textarea.html'}
     )
-    applications_amount = serializers.IntegerField(
-        source='apps_amount', read_only=True, label=_('Apps amount')
-    )
 
     class Meta:
         model = SystemUser
@@ -53,7 +50,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'su_enabled', 'su_from',
             'date_created', 'date_updated', 'comment', 'created_by',
         ]
-        fields_m2m = ['cmd_filters', 'assets_amount', 'applications_amount', 'nodes']
+        fields_m2m = ['cmd_filters', 'nodes']
         fields = fields_small + fields_m2m
         extra_kwargs = {
             'cmd_filters': {"required": False, 'label': _('Command filter')},
@@ -241,7 +238,6 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
         queryset = queryset \
-            .annotate(assets_amount=Count("assets")) \
             .prefetch_related('nodes', 'cmd_filters')
         return queryset
 
