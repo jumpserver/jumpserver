@@ -24,7 +24,7 @@
       "autofill": "basic",
       "username_selector": "name=username",
       "password_selector": "name=password",
-      "submit_selector": "id=longin_button",
+      "submit_selector": "id=login_button",
       "script": []
     },
     "org_id": "2925D985-A435-411D-9BC4-FEA630F105D9"
