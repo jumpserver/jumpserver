@@ -41,29 +41,27 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
     def set_initial_value(self):
         if not getattr(self, 'initial_data', None):
             return
-        self.check_asset()
-        self.from_template_if_need()
-        self.set_name_if_need()
-
-    def check_asset(self):
         if not self.initial_data.get('asset'):
             raise serializers.ValidationError({'asset': 'Asset is required'})
+        self.from_template_if_need()
+        self.set_uniq_name_if_need()
 
-    def set_name_if_need(self):
+    def set_uniq_name_if_need(self):
         initial_data = self.initial_data
-        if initial_data.get('name'):
-            return
-        name = initial_data.get('username')
+        name = initial_data.get('name')
+        if not name:
+            name = initial_data.get('username')
         if Account.objects.filter(name=name, asset=initial_data['asset']).exists():
             name = name + '_' + uuid.uuid4().hex[:4]
         initial_data['name'] = name
 
     def check_template(self, template):
         # Check if account exists
-        lookup_fields = ['username', 'secret_type']
-        lookup = {'asset': self.initial_data['asset']}
-        for field in lookup_fields:
-            lookup[field] = getattr(template, field)
+        lookup = {
+            'asset': self.initial_data['asset'],
+            'username': template.username,
+            'secret_type': template.secret_type
+        }
         exist = Account.objects.filter(**lookup).exists()
         on_exist = self.initial_data.get('on_exist', AccountExistPolicy.ERROR)
         if exist and on_exist == AccountExistPolicy.ERROR:
@@ -72,7 +70,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             })
 
     def from_template_if_need(self):
-        template_id = self.initial_data.pop('template')
+        template_id = self.initial_data.pop('template', None)
         if not template_id:
             return
         template = AccountTemplate.objects.filter(id=template_id).first()
