@@ -5,7 +5,7 @@ from rest_framework.validators import (
     UniqueTogetherValidator, ValidationError
 )
 
-from accounts.const import BulkCreateStrategy
+from accounts.const import AccountExistPolicy
 from accounts.models import Account
 from assets.const import Protocol
 
@@ -16,7 +16,7 @@ class ValidatorStrategyMixin:
 
     @staticmethod
     def get_strategy(attrs):
-        return attrs.get('strategy', BulkCreateStrategy.SKIP)
+        return attrs.get('strategy', AccountExistPolicy.SKIP)
 
     def __call__(self, attrs, serializer):
         message = None
@@ -27,9 +27,9 @@ class ValidatorStrategyMixin:
         strategy = self.get_strategy(attrs)
         if not message:
             return
-        if strategy == BulkCreateStrategy.ERROR:
+        if strategy == AccountExistPolicy.ERROR:
             raise ValidationError(message, code='error')
-        elif strategy in [BulkCreateStrategy.SKIP, BulkCreateStrategy.UPDATE]:
+        elif strategy in [AccountExistPolicy.SKIP, AccountExistPolicy.UPDATE]:
             raise ValidationError({})
         else:
             return
@@ -85,7 +85,7 @@ class UpdateAccountMixin:
             super().__call__(attrs, serializer)
         except ValidationError as e:
             strategy = self.get_strategy(attrs)
-            if strategy == BulkCreateStrategy.UPDATE:
+            if strategy == AccountExistPolicy.UPDATE:
                 self.update(attrs)
             message = e.detail[0]
             raise ValidationError(message, code='unique')

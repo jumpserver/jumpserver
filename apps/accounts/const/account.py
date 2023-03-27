@@ -20,7 +20,7 @@ class Source(TextChoices):
     COLLECTED = 'collected', _('Collected')
 
 
-class BulkCreateStrategy(TextChoices):
+class AccountExistPolicy(TextChoices):
     SKIP = 'skip', _('Skip')
     UPDATE = 'update', _('Update')
     ERROR = 'error', _('Failed')
