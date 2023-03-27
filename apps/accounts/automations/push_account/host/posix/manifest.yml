@@ -1,0 +1,36 @@
+id: push_account_posix
+name: Push account for posix
+category: host
+type:
+  - unix
+  - linux
+method: push_account
+fields:
+  - name: sudo
+    type: str
+    required: false
+    style: {'base_template': 'textarea.html'}
+    label: 'Sudo'
+    default: '/bin/whoami'
+  - name: shell
+    type: str
+    required: false
+    max_length: 64
+    label: 'Shell'
+    default: '/bin/bash'
+  - name: home
+    type: str
+    required: false
+    max_length: 4096
+    allow_blank: true
+    allow_null: true
+    label: '家目录'
+    default: ''
+  - name: groups
+    type: str
+    required: false
+    max_length: 4096
+    allow_null: true
+    allow_blank: true
+    label: '用户组'
+    default: ''

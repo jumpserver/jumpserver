@@ -1,7 +1,8 @@
-import os
-import yaml
 import json
+import os
 from functools import partial
+
+import yaml
 
 
 def check_platform_method(manifest, manifest_path):
@@ -21,6 +22,16 @@ def check_platform_methods(methods):
             raise ValueError("Duplicate id: {}".format(_id))
 
 
+def generate_serializer(data):
+    from common.serializers import DynamicSerializer
+    fields = data.get('fields')
+    if not fields:
+        return None
+    serializer_name = data['id'].title().replace('_', '') + 'Serializer'
+    dynamic_instance = DynamicSerializer(serializer_name, fields)
+    return dynamic_instance.yaml_to_serializer()
+
+
 def get_platform_automation_methods(path):
     methods = []
     for root, dirs, files in os.walk(path, topdown=False):
@@ -33,6 +44,7 @@ def get_platform_automation_methods(path):
                 manifest = yaml.safe_load(f)
                 check_platform_method(manifest, path)
                 manifest['dir'] = os.path.dirname(path)
+                manifest['serializer'] = generate_serializer(manifest)
             methods.append(manifest)
 
     check_platform_methods(methods)

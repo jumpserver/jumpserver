@@ -1,10 +1,13 @@
+from rest_framework.response import Response
+
 from assets.const import AllTypes
-from assets.models import Platform
+from assets.models import Platform, PlatformAutomation
 from assets.serializers import PlatformSerializer
 from common.api import JMSModelViewSet
 from common.serializers import GroupedChoiceSerializer
+from orgs.mixins.generics import RetrieveUpdateAPIView
 
-__all__ = ['AssetPlatformViewSet']
+__all__ = ['AssetPlatformViewSet', 'PlatformAutomationParamsApi']
 
 
 class AssetPlatformViewSet(JMSModelViewSet):
@@ -38,3 +41,35 @@ class AssetPlatformViewSet(JMSModelViewSet):
                 request, message={"detail": "Internal platform"}
             )
         return super().check_object_permissions(request, obj)
+
+
+class PlatformAutomationParamsApi(RetrieveUpdateAPIView):
+    instance = None
+    model = PlatformAutomation
+
+    @property
+    def ansible_method_id(self):
+        return self.kwargs.get('ansible_method_id')
+
+    def get_serializer_class(self):
+        return self.model.generate_params_serializer(self.instance, self.ansible_method_id)
+
+    def get_object(self):
+        self.instance = super().get_object()
+        return self.instance
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        data = instance.params.get(self.ansible_method_id, {})
+        serializer = self.get_serializer(data)
+        return Response(serializer.data)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+        instance.params.setdefault(self.ansible_method_id, {}).update(validated_data)
+        instance.save(update_fields=['params'])
+        return Response(status=200)

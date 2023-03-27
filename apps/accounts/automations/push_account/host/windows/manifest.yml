@@ -1,0 +1,14 @@
+id: push_account_local_windows
+name: Push account local account for Windows
+version: 1
+method: push_account
+category: host
+type:
+  - windows
+fields:
+  - name: groups
+    type: str
+    required: false
+    max_length: 4096
+    allow_blank: true
+    label: '用户组'

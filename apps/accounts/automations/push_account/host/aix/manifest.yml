@@ -1,0 +1,28 @@
+id: push_account_aix
+name: Push account for aix
+category: host
+type:
+  - AIX
+method: push_account
+fields:
+  - name: sudo
+    type: str
+    required: false
+    style: {'base_template': 'textarea.html'}
+  - name: shell
+    type: str
+    required: false
+    max_length: 64
+  - name: home
+    type: str
+    required: false
+    max_length: 4096
+    allow_blank: true
+    label: '家目录'
+  - name: groups
+    type: str
+    required: false
+    max_length: 4096
+    allow_blank: true
+    label: '用户组'
+
