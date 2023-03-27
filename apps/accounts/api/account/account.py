@@ -79,6 +79,7 @@ class AccountViewSet(OrgBulkModelViewSet):
         self.model.objects.filter(id__in=account_ids).update(secret=None)
         return Response(status=HTTP_200_OK)
 
+
 class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
     """
     因为可能要导出所有账号，所以单独建立了一个 viewset
