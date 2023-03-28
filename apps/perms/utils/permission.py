@@ -92,7 +92,7 @@ class AssetPermissionUtil(object):
     @staticmethod
     def convert_to_queryset_if_need(objs_or_ids, model):
         if not objs_or_ids:
-            return objs_or_ids
+            return model.objects.none()
         if isinstance(objs_or_ids, QuerySet) and isinstance(objs_or_ids.first(), model):
             return objs_or_ids
         ids = [
