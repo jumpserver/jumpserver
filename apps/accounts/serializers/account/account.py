@@ -41,13 +41,20 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
     def set_initial_value(self):
         if not getattr(self, 'initial_data', None):
             return
-        if not self.initial_data.get('asset'):
-            raise serializers.ValidationError({'asset': 'Asset is required'})
-        self.from_template_if_need()
-        self.set_uniq_name_if_need()
 
-    def set_uniq_name_if_need(self):
-        initial_data = self.initial_data
+        if isinstance(self.initial_data, dict):
+            initial_data = [self.initial_data]
+        else:
+            initial_data = self.initial_data
+
+        for data in initial_data:
+            if not self.initial_data.get('asset'):
+                raise serializers.ValidationError({'asset': 'Asset is required'})
+            self.from_template_if_need(data)
+            self.set_uniq_name_if_need(data)
+
+    @staticmethod
+    def set_uniq_name_if_need(initial_data):
         name = initial_data.get('name')
         if not name:
             name = initial_data.get('username')
@@ -55,28 +62,29 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             name = name + '_' + uuid.uuid4().hex[:4]
         initial_data['name'] = name
 
-    def check_template(self, template):
+    @staticmethod
+    def check_template(template, initial_data):
         # Check if account exists
         lookup = {
-            'asset': self.initial_data['asset'],
+            'asset': initial_data['asset'],
             'username': template.username,
             'secret_type': template.secret_type
         }
         exist = Account.objects.filter(**lookup).exists()
-        on_exist = self.initial_data.get('on_exist', AccountExistPolicy.ERROR)
+        on_exist = initial_data.get('on_exist', AccountExistPolicy.ERROR)
         if exist and on_exist == AccountExistPolicy.ERROR:
             raise serializers.ValidationError({
                 'template': 'Account already exists for username: %s' % lookup['username']
             })
 
-    def from_template_if_need(self):
-        template_id = self.initial_data.pop('template', None)
+    def from_template_if_need(self, initial_data):
+        template_id = initial_data.pop('template', None)
         if not template_id:
             return
         template = AccountTemplate.objects.filter(id=template_id).first()
         if not template:
             raise serializers.ValidationError({'template': 'Template not found'})
-        self.check_template(template)
+        self.check_template(template, initial_data)
 
         # Set initial data from template
         ignore_fields = ['id', 'name', 'date_created', 'date_updated', 'org_id']
@@ -90,7 +98,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             if value is None:
                 continue
             attrs[name] = value
-        self.initial_data.update(attrs)
+        initial_data.update(attrs)
 
     @staticmethod
     def push_account_if_need(instance, push_now, stat):
