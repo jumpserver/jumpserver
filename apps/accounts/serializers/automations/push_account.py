@@ -12,7 +12,7 @@ class PushAccountAutomationSerializer(ChangeSecretAutomationSerializer):
         fields = [
             n for n in ChangeSecretAutomationSerializer.Meta.fields
             if n not in ['recipients']
-        ]
+        ] + ['params']
 
     @property
     def model_type(self):

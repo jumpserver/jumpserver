@@ -12,9 +12,20 @@ logger = get_logger(__name__)
 class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
     ansible_account_prefer = ''
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.params = self.execution.snapshot.get('params', {})
+
     @classmethod
     def method_type(cls):
         return AutomationTypes.push_account
+
+    def get_push_kwargs(self, asset):
+        kwargs = {}
+        for k, v in self.params.items():
+            if asset.type in k.split('_'):
+                kwargs.update(v)
+        return kwargs
 
     def host_callback(self, host, asset=None, account=None, automation=None, path_dir=None, **kwargs):
         host = super(ChangeSecretManager, self).host_callback(
@@ -30,6 +41,8 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
             msg = f'Windows {asset} does not support ssh key push'
             print(msg)
             return inventory_hosts
+
+        host['kwargs'] = self.get_push_kwargs(asset)
 
         for account in accounts:
             h = deepcopy(host)
@@ -49,7 +62,7 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
                 private_key_path = self.generate_private_key_path(new_secret, path_dir)
                 new_secret = self.generate_public_key(new_secret)
 
-            h['kwargs'] = self.get_kwargs(account, new_secret, secret_type)
+            h['kwargs'].update(self.get_kwargs(account, new_secret, secret_type))
             h['account'] = {
                 'name': account.name,
                 'username': account.username,

@@ -14,6 +14,7 @@ class PushAccountAutomation(ChangeSecretMixin, AccountBaseAutomation):
     triggers = models.JSONField(max_length=16, default=list, verbose_name=_('Triggers'))
     username = models.CharField(max_length=128, verbose_name=_('Username'))
     action = models.CharField(max_length=16, verbose_name=_('Action'))
+    params = models.JSONField(default=dict, verbose_name=_("Params"))
 
     def create_nonlocal_accounts(self, usernames, asset):
         secret_type = self.secret_type
@@ -51,7 +52,8 @@ class PushAccountAutomation(ChangeSecretMixin, AccountBaseAutomation):
     def to_attr_json(self):
         attr_json = super().to_attr_json()
         attr_json.update({
-            'username': self.username
+            'username': self.username,
+            'params': self.params,
         })
         return attr_json
 
