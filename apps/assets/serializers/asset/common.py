@@ -60,12 +60,16 @@ class AssetPlatformSerializer(serializers.ModelSerializer):
 
 class AssetAccountSerializer(AccountSerializer):
     add_org_fields = False
+    asset = serializers.PrimaryKeyRelatedField(queryset=Asset.objects, required=False, write_only=True)
 
     class Meta(AccountSerializer.Meta):
         fields = [
             f for f in AccountSerializer.Meta.fields
-            if f not in ['asset', 'spec_info']
+            if f not in ['spec_info']
         ]
+        extra_kwargs = {
+            **AccountSerializer.Meta.extra_kwargs,
+        }
 
 
 class AccountSecretSerializer(SecretReadableMixin, CommonModelSerializer):
@@ -245,8 +249,11 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         if not accounts_data:
             return
         for data in accounts_data:
-            data['asset'] = asset
-            AssetAccountSerializer().create(data)
+            data['asset'] = asset.id
+
+        s = AssetAccountSerializer(data=accounts_data, many=True)
+        s.is_valid(raise_exception=True)
+        s.save()
 
     @atomic
     def create(self, validated_data):

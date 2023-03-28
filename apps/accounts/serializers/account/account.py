@@ -41,14 +41,13 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
     def set_initial_value(self):
         if not getattr(self, 'initial_data', None):
             return
-
         if isinstance(self.initial_data, dict):
             initial_data = [self.initial_data]
         else:
             initial_data = self.initial_data
 
         for data in initial_data:
-            if not self.initial_data.get('asset'):
+            if not data.get('asset'):
                 raise serializers.ValidationError({'asset': 'Asset is required'})
             self.from_template_if_need(data)
             self.set_uniq_name_if_need(data)
@@ -81,7 +80,10 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         template_id = initial_data.pop('template', None)
         if not template_id:
             return
-        template = AccountTemplate.objects.filter(id=template_id).first()
+        if isinstance(template_id, (str, uuid.UUID)):
+            template = AccountTemplate.objects.filter(id=template_id).first()
+        else:
+            template = template_id
         if not template:
             raise serializers.ValidationError({'template': 'Template not found'})
         self.check_template(template, initial_data)
