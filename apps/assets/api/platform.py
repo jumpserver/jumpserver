@@ -1,7 +1,8 @@
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from assets.const import AllTypes
-from assets.models import Platform, PlatformAutomation
+from assets.models import Platform, PlatformAutomation, Node, Asset
 from assets.serializers import PlatformSerializer
 from common.api import JMSModelViewSet
 from common.serializers import GroupedChoiceSerializer
@@ -21,7 +22,8 @@ class AssetPlatformViewSet(JMSModelViewSet):
     rbac_perms = {
         'categories': 'assets.view_platform',
         'type_constraints': 'assets.view_platform',
-        'ops_methods': 'assets.view_platform'
+        'ops_methods': 'assets.view_platform',
+        'filter_nodes_assets': 'assets.view_platform'
     }
 
     def get_queryset(self):
@@ -41,6 +43,19 @@ class AssetPlatformViewSet(JMSModelViewSet):
                 request, message={"detail": "Internal platform"}
             )
         return super().check_object_permissions(request, obj)
+    @action(methods=['post'], detail=False, url_path='filter-nodes-assets')
+    def filter_nodes_assets(self, request, *args, **kwargs):
+        node_ids = request.data.get('node_ids', [])
+        asset_ids = request.data.get('asset_ids', [])
+        nodes = Node.objects.filter(id__in=node_ids)
+        node_asset_ids = Node.get_nodes_all_assets(*nodes).values_list('id', flat=True)
+        direct_asset_ids = Asset.objects.filter(id__in=asset_ids).values_list('id', flat=True)
+        platform_ids = Asset.objects.filter(
+            id__in=set(list(direct_asset_ids) + list(node_asset_ids))
+        ).values_list('platform_id', flat=True)
+        platforms = Platform.objects.filter(id__in=platform_ids)
+        serializer = self.get_serializer(platforms, many=True)
+        return Response(serializer.data)
 
 
 class PlatformAutomationParamsApi(RetrieveUpdateAPIView):
