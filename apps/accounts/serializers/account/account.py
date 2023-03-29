@@ -1,5 +1,7 @@
 import uuid
+from collections import defaultdict
 
+from django.db import IntegrityError
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
@@ -8,7 +10,7 @@ from rest_framework.validators import UniqueTogetherValidator
 from accounts.const import SecretType, Source, AccountExistPolicy
 from accounts.models import Account, AccountTemplate
 from accounts.tasks import push_accounts_to_assets_task
-from assets.const import Category, AllTypes
+from assets.const import Category, AllTypes, Protocol
 from assets.models import Asset
 from common.serializers import SecretReadableMixin
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
@@ -62,21 +64,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         initial_data['name'] = name
 
     @staticmethod
-    def check_template(template, initial_data):
-        # Check if account exists
-        lookup = {
-            'asset': initial_data['asset'],
-            'username': template.username,
-            'secret_type': template.secret_type
-        }
-        exist = Account.objects.filter(**lookup).exists()
-        on_exist = initial_data.get('on_exist', AccountExistPolicy.ERROR)
-        if exist and on_exist == AccountExistPolicy.ERROR:
-            raise serializers.ValidationError({
-                'template': 'Account already exists for username: %s' % lookup['username']
-            })
-
-    def from_template_if_need(self, initial_data):
+    def from_template_if_need(initial_data):
         template_id = initial_data.pop('template', None)
         if not template_id:
             return
@@ -86,7 +74,6 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             template = template_id
         if not template:
             raise serializers.ValidationError({'template': 'Template not found'})
-        self.check_template(template, initial_data)
 
         # Set initial data from template
         ignore_fields = ['id', 'name', 'date_created', 'date_updated', 'org_id']
@@ -107,12 +94,6 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         if not push_now or stat != 'created':
             return
         push_accounts_to_assets_task.delay([str(instance.id)])
-
-    @staticmethod
-    def validate_name(value):
-        if not value:
-            raise serializers.ValidationError(_('Name is required'))
-        return value
 
     def get_validators(self):
         _validators = super().get_validators()
@@ -218,6 +199,99 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
             'asset__platform__automation'
         )
         return queryset
+
+
+class AssetAccountBulkSerializer(AccountCreateUpdateSerializerMixin, serializers.ModelSerializer):
+    assets = serializers.PrimaryKeyRelatedField(queryset=Asset.objects, many=True, label=_('Assets'))
+
+    class Meta:
+        model = Account
+        fields = [
+            'name', 'username', 'secret', 'secret_type',
+            'privileged', 'is_active', 'comment', 'template',
+            'on_exist', 'push_now', 'assets',
+        ]
+        extra_kwargs = {
+            'name': {'required': False},
+            'secret_type': {'required': False},
+        }
+
+    def set_initial_value(self):
+        if not getattr(self, 'initial_data', None):
+            return
+        initial_data = self.initial_data
+        self.from_template_if_need(initial_data)
+
+    @staticmethod
+    def _validate_secret_type(assets, secret_type):
+        if isinstance(assets, list):
+            asset_ids = [a.id for a in assets]
+            assets = Asset.objects.filter(id__in=asset_ids)
+        asset_protocol = assets.prefetch_related('protocols').values_list('id', 'protocols__name')
+        protocol_secret_types_map = Protocol.protocol_secret_types()
+        asset_secret_types_mapp = defaultdict(set)
+
+        for asset_id, protocol in asset_protocol:
+            secret_types = set(protocol_secret_types_map.get(protocol, []))
+            asset_secret_types_mapp[asset_id].update(secret_types)
+
+        asset_support = {
+            asset_id: secret_type in secret_types
+            for asset_id, secret_types in asset_secret_types_mapp.items()
+        }
+        return asset_support
+
+    @staticmethod
+    def perform_create_account(vd, handler):
+        lookup = {
+            'username': vd['username'],
+            'secret_type': vd.get('secret_type', 'password'),
+        }
+        if 'name' not in vd:
+            vd['name'] = vd['username']
+        try:
+            instance, value = handler(defaults=vd, **lookup)
+        except IntegrityError:
+            vd['name'] = vd['name'] + '-' + str(uuid.uuid4())[:8]
+            instance, value = handler(defaults=vd, **lookup)
+        return instance, value
+
+    def perform_bulk_create(self, validated_data):
+        on_exist = validated_data.pop('on_exist', 'skip')
+        assets = validated_data.pop('assets')
+        secret_type = validated_data.get('secret_type', 'password')
+
+        if on_exist == 'skip':
+            handler = Account.objects.get_or_create
+        else:
+            handler = Account.objects.update_or_create
+
+        result = {}
+        asset_support_map = self._validate_secret_type(assets, secret_type)
+        for asset in assets:
+            if not asset_support_map[asset.id]:
+                result[asset] = {'error': 'Asset does not support this secret type: %s' % secret_type}
+                continue
+
+            vd = validated_data.copy()
+            vd['asset'] = asset
+            try:
+                instance, value = self.perform_create_account(vd, handler)
+                result[asset] = {'changed': value}
+            except Exception as e:
+                result[asset] = {'error': str(e)}
+        return result
+
+    @staticmethod
+    def push_accounts_if_need(result, push_now):
+        pass
+
+    def create(self, validated_data):
+        push_now = validated_data.pop('push_now', False)
+        result = self.perform_bulk_create(validated_data)
+        self.push_account_if_need(result, push_now)
+        result = {str(k): v for k, v in result.items()}
+        return result
 
 
 class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
