@@ -1,4 +1,5 @@
 from django.db import models
+from django.forms.models import model_to_dict
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -63,7 +64,7 @@ class PlatformAutomation(models.Model):
         if instance is None:
             return serializer_class
 
-        info = instance.__dict__
+        info = model_to_dict(instance)
         if not instance.ansible_enabled:
             return serializer_class
         info.pop('ansible_enabled', None)

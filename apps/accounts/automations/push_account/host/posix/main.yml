@@ -4,17 +4,41 @@
     - name: Test privileged account
       ansible.builtin.ping:
 
-    - name: Change password
+    - name: Push user
+      ansible.builtin.user:
+        name: "{{ account.username }}"
+        shell: "{{ kwargs.shell }}"
+        home: "{{ kwargs.home }}"
+        groups: "{{ kwargs.groups }}"
+        expires: -1
+        state: present
+
+    - name: Add group
+      ansible.builtin.group:
+        name: "{{ account.username }}"
+        state: present
+
+    - name: Check home dir exists
+      ansible.builtin.stat:
+        path: "{{ '/home/' + account.username }}"
+      register: home_existed
+      when: kwargs.home
+
+    - name: Set home dir permission
+      ansible.builtin.file:
+        name: "{{ account.username }}"
+        state: present
+      register: home_existed
+      when:
+      - kwargs.home
+      - home_existed.stat.exists == true
+
+    - name: Push user password
       ansible.builtin.user:
         name: "{{ account.username }}"
         password: "{{ account.secret | password_hash('sha512') }}"
         update_password: always
       when: account.secret_type == "password"
-
-    - name: create user If it already exists, no operation will be performed
-      ansible.builtin.user:
-        name: "{{ account.username }}"
-      when: account.secret_type == "ssh_key"
 
     - name: remove jumpserver ssh key
       ansible.builtin.lineinfile:
@@ -25,12 +49,23 @@
         - account.secret_type == "ssh_key"
         - kwargs.strategy == "set_jms"
 
-    - name: Change SSH key
+    - name: Push SSH key
       ansible.builtin.authorized_key:
         user: "{{ account.username }}"
         key: "{{ account.secret }}"
         exclusive: "{{ kwargs.exclusive }}"
       when: account.secret_type == "ssh_key"
+
+    - name: Set sudo setting
+      ansible.builtin.lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: ^{0} ALL=
+        line: "{{ account.username + ' ALL=(ALL) NOPASSWD: ' + kwargs.sudo }}"
+        validate: visudo -cf %s
+      register: home_existed
+      when:
+        - kwargs.sudo
 
     - name: Refresh connection
       ansible.builtin.meta: reset_connection
