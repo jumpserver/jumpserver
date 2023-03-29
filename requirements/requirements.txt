@@ -65,6 +65,7 @@ pyjwkest==1.4.2
 jsonfield2==4.0.0.post0
 geoip2==4.5.0
 ipip-ipdb==1.6.1
+pywinrm==0.4.3
 # Django environment
 Django==3.2.17
 django-bootstrap3==14.2.0

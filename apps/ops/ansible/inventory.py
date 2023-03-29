@@ -72,15 +72,13 @@ class JMSInventory:
             var['ansible_ssh_private_key_file'] = account.private_key_path
         return var
 
-    def make_ssh_account_vars(self, host, asset, account, automation, protocols, platform, gateway):
+    def make_account_vars(self, host, asset, account, automation, protocol, platform, gateway):
         if not account:
             host['error'] = _("No account available")
             return host
 
-        ssh_protocol_matched = list(filter(lambda x: x.name == 'ssh', protocols))
-        ssh_protocol = ssh_protocol_matched[0] if ssh_protocol_matched else None
         host['ansible_host'] = asset.address
-        host['ansible_port'] = ssh_protocol.port if ssh_protocol else 22
+        host['ansible_port'] = protocol.port if protocol else 22
 
         su_from = account.su_from
         if platform.su_enabled and su_from:
@@ -110,6 +108,32 @@ class JMSInventory:
             port = 0
         return protocol, port
 
+    @staticmethod
+    def get_ansible_protocol(ansible_config, protocols):
+        ansible_connection = ansible_config.get('ansible_connection')
+        if ansible_connection and not ansible_config == 'smart':
+            # 数值越小，优先级越高
+            protocol_priority = {'ssh': 10, 'winrm': 9, ansible_connection: 1}
+
+        protocol_matched = list(filter(lambda x: x.name in protocol_priority, protocols))
+        protocol_sorted = sorted(protocol_matched, key=lambda x: protocol_priority[x.name])
+
+        protocol = protocol_sorted[0] if protocol_sorted else None
+        return protocol
+
+    @staticmethod
+    def fill_ansible_config(ansible_config, protocol):
+        if protocol and protocol.name == 'winrm':
+            ansible_config['ansible_connection'] = 'winrm'
+            if protocol.setting.get('use_ssl', False):
+                ansible_config['ansible_winrm_scheme'] = 'https'
+                ansible_config['ansible_winrm_transport'] = 'ssl'
+                ansible_config['ansible_winrm_server_cert_validation'] = 'ignore'
+            else:
+                ansible_config['ansible_winrm_scheme'] = 'http'
+                ansible_config['ansible_winrm_transport'] = 'plaintext'
+        return ansible_config
+
     def asset_to_host(self, asset, account, automation, protocols, platform):
         protocol, port = self.get_primary_protocol(protocols)
 
@@ -133,15 +157,18 @@ class JMSInventory:
 
         try:
             ansible_config = dict(automation.ansible_config)
-        except Exception as e:
+        except (AttributeError, TypeError):
             ansible_config = {}
-        ansible_connection = ansible_config.get('ansible_connection', 'ssh')
+
+        ansible_protocol = self.get_ansible_protocol(ansible_config, protocols)
+        ansible_config = self.fill_ansible_config(ansible_config, ansible_protocol)
         host.update(ansible_config)
 
         gateway = None
         if not asset.is_gateway and asset.domain:
             gateway = asset.domain.select_gateway()
 
+        ansible_connection = ansible_config.get('ansible_connection', 'ssh')
         if ansible_connection == 'local':
             if gateway:
                 host['gateway'] = {
@@ -149,7 +176,9 @@ class JMSInventory:
                     'username': gateway.username, 'secret': gateway.password
                 }
         else:
-            self.make_ssh_account_vars(host, asset, account, automation, protocols, platform, gateway)
+            self.make_account_vars(
+                host, asset, account, automation, ansible_protocol, platform, gateway
+            )
         return host
 
     def get_asset_sorted_accounts(self, asset):
@@ -194,14 +223,23 @@ class JMSInventory:
         else:
             return None
 
+    @staticmethod
+    def _fill_attr_from_platform(asset, platform_protocols):
+        asset_protocols = asset.protocols.all()
+        for p in asset_protocols:
+            setattr(p, 'setting', platform_protocols.get(p.name, {}))
+        return asset_protocols
+
     def generate(self, path_dir):
         hosts = []
         platform_assets = self.group_by_platform(self.assets)
         for platform, assets in platform_assets.items():
             automation = platform.automation
-
+            platform_protocols = {
+                p['name']: p['setting'] for p in platform.protocols.values('name', 'setting')
+            }
             for asset in assets:
-                protocols = asset.protocols.all()
+                protocols = self._fill_attr_from_platform(asset, platform_protocols)
                 account = self.select_account(asset)
                 host = self.asset_to_host(asset, account, automation, protocols, platform)
 
