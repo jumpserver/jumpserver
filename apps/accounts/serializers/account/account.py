@@ -289,7 +289,7 @@ class AssetAccountBulkSerializer(AccountCreateUpdateSerializerMixin, serializers
     def create(self, validated_data):
         push_now = validated_data.pop('push_now', False)
         result = self.perform_bulk_create(validated_data)
-        self.push_account_if_need(result, push_now)
+        self.push_accounts_if_need(result, push_now)
         result = {str(k): v for k, v in result.items()}
         return result
 
