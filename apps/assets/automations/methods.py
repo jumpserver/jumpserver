@@ -24,7 +24,7 @@ def check_platform_methods(methods):
 
 def generate_serializer(data):
     from common.serializers import DynamicSerializer
-    fields = data.get('fields')
+    fields = data.pop('fields', None)
     if not fields:
         return None
     serializer_name = data['id'].title().replace('_', '') + 'Serializer'

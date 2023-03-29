@@ -8,13 +8,13 @@ method: push_account
 fields:
   - name: sudo
     type: str
-    required: false
+    required: true
     style: {'base_template': 'textarea.html'}
     label: 'Sudo'
     default: '/bin/whoami'
   - name: shell
     type: str
-    required: false
+    required: true
     max_length: 64
     label: 'Shell'
     default: '/bin/bash'
