@@ -1,6 +1,7 @@
 import time
 
 from django.conf import settings
+from django.core.cache import cache
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -34,6 +35,10 @@ class TerminalStatusMixin:
         if not self.last_stat:
             return False
         return time.time() - self.last_stat.date_created.timestamp() < 150
+
+    def set_alive(self, ttl=120):
+        key = self.ALIVE_KEY.format(self.id)
+        cache.set(key, True, ttl)
 
 
 class StorageMixin:

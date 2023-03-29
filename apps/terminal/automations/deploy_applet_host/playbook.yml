@@ -183,19 +183,6 @@
           GOOGLE_DEFAULT_CLIENT_ID: ''
           GOOGLE_DEFAULT_CLIENT_SECRET: ''
 
-    - name: Download navicat161_premium_en package (navicat)
-      ansible.windows.win_get_url:
-        url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/navicat161_premium_en_x64.exe"
-        dest: "{{ ansible_env.TEMP }}\\navicat161_premium_en_x64.exe"
-        validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
-
-    - name: Install navicat (navicat)
-      ansible.windows.win_package:
-        path: "{{ ansible_env.TEMP }}\\navicat161_premium_en_x64.exe"
-        state: present
-        arguments:
-          - /SILENT
-
     - name: Generate tinkerd component config
       ansible.windows.win_shell:
         "tinkerd config --hostname {{ HOST_NAME }} --core_host {{ CORE_HOST }}
