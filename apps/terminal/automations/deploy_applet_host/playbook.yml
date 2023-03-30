@@ -143,9 +143,9 @@
         dest: "{{ ansible_env.TEMP }}\\pip_packages"
 
     - name: Install python requirements offline
-      ansible.windows.win_shell: >
-        pip install -r '{{ ansible_env.TEMP }}\pip_packages\pip_packages\requirements.txt'
-        --no-index --find-links='{{ ansible_env.TEMP }}\pip_packages\pip_packages'
+      ansible.windows.win_powershell:
+        script: |
+          pip install -r '{{ ansible_env.TEMP }}\pip_packages\pip_packages\requirements.txt' --no-index --find-links='{{ ansible_env.TEMP }}\pip_packages\pip_packages'
 
     - name: Download chromedriver (Chromium)
       ansible.windows.win_get_url:
@@ -197,17 +197,18 @@
           - /SILENT
 
     - name: Generate tinkerd component config
-      ansible.windows.win_shell:
-        "tinkerd config --hostname {{ HOST_NAME }} --core_host {{ CORE_HOST }}
-      --token {{ BOOTSTRAP_TOKEN }} --host_id {{ HOST_ID }} --ignore-verify-certs {{ IGNORE_VERIFY_CERTS }}"
+      ansible.windows.win_powershell:
+        tinkerd config --hostname {{ HOST_NAME }} --core_host {{ CORE_HOST }} --token {{ BOOTSTRAP_TOKEN }} --host_id {{ HOST_ID }} --ignore-verify-certs {{ IGNORE_VERIFY_CERTS }}
 
     - name: Install tinkerd service
-      ansible.windows.win_shell:
-        "tinkerd service install"
+      ansible.windows.win_powershell:
+        script: |
+          tinkerd service install
 
     - name: Start tinkerd service
-      ansible.windows.win_shell:
-        "tinkerd service start"
+      ansible.windows.win_powershell:
+        script: |
+          tinkerd service start
 
     - name: Wait Tinker api health
       ansible.windows.win_uri:
@@ -220,5 +221,6 @@
       delay: 5
 
     - name: Sync all remote applets
-      ansible.windows.win_shell:
-        "tinkerd install all"
+      ansible.windows.win_powershell:
+        script: |
+          tinkerd install all
