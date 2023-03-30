@@ -8,7 +8,7 @@ from accounts import serializers
 from accounts.filters import AccountFilterSet
 from accounts.models import Account
 from assets.models import Asset, Node
-from common.permissions import UserConfirmation, ConfirmType
+from common.permissions import UserConfirmation, ConfirmType, IsValidUser
 from common.views.mixins import RecordViewLogMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
@@ -29,7 +29,6 @@ class AccountViewSet(OrgBulkModelViewSet):
     rbac_perms = {
         'partial_update': ['accounts.change_account'],
         'su_from_accounts': 'accounts.view_account',
-        'username_suggestions': 'accounts.view_account',
         'clear_secret': 'accounts.change_account',
     }
 
@@ -50,7 +49,10 @@ class AccountViewSet(OrgBulkModelViewSet):
         serializer = serializers.AccountSerializer(accounts, many=True)
         return Response(data=serializer.data)
 
-    @action(methods=['get'], detail=False, url_path='username-suggestions')
+    @action(
+        methods=['get'], detail=False, url_path='username-suggestions',
+        permission_classes=[IsValidUser]
+    )
     def username_suggestions(self, request, *args, **kwargs):
         asset_ids = request.query_params.get('assets')
         node_keys = request.query_params.get('keys')
