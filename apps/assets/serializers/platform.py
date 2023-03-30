@@ -85,6 +85,14 @@ class PlatformProtocolSerializer(serializers.ModelSerializer):
 
 
 class PlatformSerializer(WritableNestedModelSerializer):
+    SU_METHOD_CHOICES = [
+        ("sudo", "sudo su -"),
+        ("su", "su - "),
+        ("enable", "enable"),
+        ("super", "super 15"),
+        ("super_level", "super level 15")
+    ]
+
     charset = LabeledChoiceField(
         choices=Platform.CharsetChoices.choices, label=_("Charset")
     )
@@ -94,10 +102,9 @@ class PlatformSerializer(WritableNestedModelSerializer):
         label=_("Protocols"), many=True, required=False
     )
     automation = PlatformAutomationSerializer(label=_("Automation"), required=False)
-    su_method = LabeledChoiceField(
-        choices=[("sudo", "sudo su -"), ("su", "su - "), ("enable", "enable")],
-        label=_("Su method"), required=False, default="sudo", allow_null=True
-    )
+    su_method = LabeledChoiceField(choices=SU_METHOD_CHOICES,
+                                   label=_("Su method"), required=False, default="sudo", allow_null=True
+                                   )
 
     class Meta:
         model = Platform
