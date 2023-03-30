@@ -252,8 +252,12 @@ class BasePlaybookManager:
                 print('\033[31m %s \033[0m\n' % err_msg)
                 not_valid.append(k)
             else:
-                jms_asset['address'] = '127.0.0.1'
-                jms_asset['port'] = server.local_bind_port
+                if host['ansible_connection'] == 'winrm':
+                    host['ansible_host'] = '127.0.0.1'
+                    host['ansible_port'] = server.local_bind_port
+                else:
+                    jms_asset['address'] = '127.0.0.1'
+                    jms_asset['port'] = server.local_bind_port
                 servers.append(server)
 
         # 网域不可连接的，就不继续执行此资源的后续任务了
