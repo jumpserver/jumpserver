@@ -8,8 +8,8 @@ logger = get_logger(__name__)
 
 
 @receiver(pre_save, sender=Account)
-def on_account_pre_save(sender, instance, created=False, **kwargs):
-    if created:
+def on_account_pre_save(sender, instance, **kwargs):
+    if instance.version == 0:
         instance.version = 1
     else:
         instance.version = instance.history.count()

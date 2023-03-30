@@ -105,7 +105,6 @@ class AssetAccountBulkCreateApi(CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.create(serializer.validated_data)
-        print("Data: ", data)
         return Response(data=data, status=HTTP_200_OK)
 
 

@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from accounts.const import SecretType, Source, AccountExistPolicy
+from accounts.const import SecretType, Source, AccountInvalidPolicy
 from accounts.models import Account, AccountTemplate
 from accounts.tasks import push_accounts_to_assets_task
 from assets.const import Category, AllTypes, Protocol
@@ -28,13 +28,13 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
     push_now = serializers.BooleanField(
         default=False, label=_("Push now"), write_only=True
     )
-    on_exist = LabeledChoiceField(
-        choices=AccountExistPolicy.choices, default=AccountExistPolicy.ERROR,
+    on_invalid = LabeledChoiceField(
+        choices=AccountInvalidPolicy.choices, default=AccountInvalidPolicy.ERROR,
         write_only=True, label=_('Exist policy')
     )
 
     class Meta:
-        fields = ['template', 'push_now', 'on_exist']
+        fields = ['template', 'push_now', 'on_invalid']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -49,17 +49,18 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             initial_data = self.initial_data
 
         for data in initial_data:
-            if not data.get('asset'):
+            if not data.get('asset') and not self.instance:
                 raise serializers.ValidationError({'asset': 'Asset is required'})
+            asset = data.get('asset') or self.instance.asset
             self.from_template_if_need(data)
-            self.set_uniq_name_if_need(data)
+            self.set_uniq_name_if_need(data, asset)
 
     @staticmethod
-    def set_uniq_name_if_need(initial_data):
+    def set_uniq_name_if_need(initial_data, asset):
         name = initial_data.get('name')
         if not name:
             name = initial_data.get('username')
-        if Account.objects.filter(name=name, asset=initial_data['asset']).exists():
+        if Account.objects.filter(name=name, asset=asset).exists():
             name = name + '_' + uuid.uuid4().hex[:4]
         initial_data['name'] = name
 
@@ -99,15 +100,15 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         _validators = super().get_validators()
         if getattr(self, 'initial_data', None) is None:
             return _validators
-        on_exist = self.initial_data.get('on_exist')
-        if on_exist == AccountExistPolicy.ERROR:
+        on_invalid = self.initial_data.get('on_invalid')
+        if on_invalid == AccountInvalidPolicy.ERROR:
             return _validators
         _validators = [v for v in _validators if not isinstance(v, UniqueTogetherValidator)]
         return _validators
 
     @staticmethod
     def do_create(vd):
-        on_exist = vd.pop('on_exist', None)
+        on_invalid = vd.pop('on_invalid', None)
 
         q = Q()
         if vd.get('name'):
@@ -121,9 +122,9 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             instance = Account.objects.create(**vd)
             return instance, 'created'
 
-        if on_exist == AccountExistPolicy.SKIP:
+        if on_invalid == AccountInvalidPolicy.SKIP:
             return instance, 'skipped'
-        elif on_exist == AccountExistPolicy.UPDATE:
+        elif on_invalid == AccountInvalidPolicy.UPDATE:
             for k, v in vd.items():
                 setattr(instance, k, v)
             instance.save()
@@ -140,7 +141,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
     def update(self, instance, validated_data):
         # account cannot be modified
         validated_data.pop('username', None)
-        validated_data.pop('on_exist', None)
+        validated_data.pop('on_invalid', None)
         push_now = validated_data.pop('push_now', None)
         instance = super().update(instance, validated_data)
         self.push_account_if_need(instance, push_now, 'updated')
@@ -209,7 +210,7 @@ class AssetAccountBulkSerializer(AccountCreateUpdateSerializerMixin, serializers
         fields = [
             'name', 'username', 'secret', 'secret_type',
             'privileged', 'is_active', 'comment', 'template',
-            'on_exist', 'push_now', 'assets',
+            'on_invalid', 'push_now', 'assets',
         ]
         extra_kwargs = {
             'name': {'required': False},
@@ -227,6 +228,7 @@ class AssetAccountBulkSerializer(AccountCreateUpdateSerializerMixin, serializers
         if isinstance(assets, list):
             asset_ids = [a.id for a in assets]
             assets = Asset.objects.filter(id__in=asset_ids)
+
         asset_protocol = assets.prefetch_related('protocols').values_list('id', 'protocols__name')
         protocol_secret_types_map = Protocol.protocol_secret_types()
         asset_secret_types_mapp = defaultdict(set)
@@ -235,20 +237,29 @@ class AssetAccountBulkSerializer(AccountCreateUpdateSerializerMixin, serializers
             secret_types = set(protocol_secret_types_map.get(protocol, []))
             asset_secret_types_mapp[asset_id].update(secret_types)
 
-        asset_support = {
+        return {
             asset_id: secret_type in secret_types
             for asset_id, secret_types in asset_secret_types_mapp.items()
         }
-        return asset_support
+
+    @staticmethod
+    def get_create_handler(on_invalid):
+        if on_invalid == 'update':
+            handler = Account.objects.update_or_create
+        else:
+            handler = Account.objects.get_or_create
+        return handler
 
     @staticmethod
     def perform_create_account(vd, handler):
+        lookup_fields = ['username', 'secret_type', 'asset']
         lookup = {
-            'username': vd['username'],
-            'secret_type': vd.get('secret_type', 'password'),
+            k: vd.get(k)
+            for k in lookup_fields if k in vd
         }
         if 'name' not in vd:
             vd['name'] = vd['username']
+
         try:
             instance, value = handler(defaults=vd, **lookup)
         except IntegrityError:
@@ -257,19 +268,16 @@ class AssetAccountBulkSerializer(AccountCreateUpdateSerializerMixin, serializers
         return instance, value
 
     def perform_bulk_create(self, validated_data):
-        on_exist = validated_data.pop('on_exist', 'skip')
         assets = validated_data.pop('assets')
+        on_invalid = validated_data.pop('on_invalid', 'skip')
         secret_type = validated_data.get('secret_type', 'password')
 
-        if on_exist == 'skip':
-            handler = Account.objects.get_or_create
-        else:
-            handler = Account.objects.update_or_create
+        handler = self.get_create_handler(on_invalid)
+        secret_type_supports = self._validate_secret_type(assets, secret_type)
 
         result = {}
-        asset_support_map = self._validate_secret_type(assets, secret_type)
         for asset in assets:
-            if not asset_support_map[asset.id]:
+            if not secret_type_supports.get(asset.id):
                 result[asset] = {'error': 'Asset does not support this secret type: %s' % secret_type}
                 continue
 
@@ -277,14 +285,22 @@ class AssetAccountBulkSerializer(AccountCreateUpdateSerializerMixin, serializers
             vd['asset'] = asset
             try:
                 instance, value = self.perform_create_account(vd, handler)
-                result[asset] = {'changed': value}
+                result[asset] = {'changed': value, 'instance': instance.id}
             except Exception as e:
+                logger.exception(e)
                 result[asset] = {'error': str(e)}
+
+        errors = {str(k): v for k, v in result.items() if v.get('error')}
+        if errors and on_invalid == 'error':
+            raise serializers.ValidationError({'errors': errors})
         return result
 
     @staticmethod
     def push_accounts_if_need(result, push_now):
-        pass
+        if not push_now:
+            return
+        accounts = [str(v['instance']) for v in result.values() if v.get('instance')]
+        push_accounts_to_assets_task.delay(accounts)
 
     def create(self, validated_data):
         push_now = validated_data.pop('push_now', False)
