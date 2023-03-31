@@ -38,7 +38,7 @@ class MailTestingAPI(APIView):
         email_recipient = serializer.validated_data.get('EMAIL_RECIPIENT')
 
         # 设置 settings 的值，会导致动态配置在当前进程失效
-        # for k, v in serializer.validated_data.items():
+        # for k, v in serializer.vd.items():
         #     if k.startswith('EMAIL'):
         #         setattr(settings, k, v)
         try:

@@ -54,7 +54,7 @@ class BulkSerializerMixin(object):
             request_method = getattr(getattr(self.context.get('view'), 'request'), 'method', '')
             # add update_lookup_field field back to validated data
             # since super by default strips out read-only fields
-            # hence id will no longer be present in validated_data
+            # hence id will no longer be present in vd
             if all([
                 isinstance(self.root, BulkListSerializer),
                 id_attr,

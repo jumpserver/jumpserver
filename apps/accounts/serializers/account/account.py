@@ -1,5 +1,5 @@
 import uuid
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 from django.db import IntegrityError
 from django.db.models import Q
@@ -224,7 +224,7 @@ class AssetAccountBulkSerializer(AccountCreateUpdateSerializerMixin, serializers
         self.from_template_if_need(initial_data)
 
     @staticmethod
-    def _validate_secret_type(assets, secret_type):
+    def _get_valid_secret_type_assets(assets, secret_type):
         if isinstance(assets, list):
             asset_ids = [a.id for a in assets]
             assets = Asset.objects.filter(id__in=asset_ids)
@@ -237,62 +237,101 @@ class AssetAccountBulkSerializer(AccountCreateUpdateSerializerMixin, serializers
             secret_types = set(protocol_secret_types_map.get(protocol, []))
             asset_secret_types_mapp[asset_id].update(secret_types)
 
+        return [
+            asset for asset in assets
+            if secret_type in asset_secret_types_mapp.get(asset.id, [])
+        ]
+
+    @staticmethod
+    def get_filter_lookup(vd):
         return {
-            asset_id: secret_type in secret_types
-            for asset_id, secret_types in asset_secret_types_mapp.items()
+            'username': vd['username'],
+            'secret_type': vd['secret_type'],
+            'asset': vd['asset'],
         }
 
     @staticmethod
-    def get_create_handler(on_invalid):
+    def get_uniq_name(vd):
+        return vd['name'] + '-' + uuid.uuid4().hex[:4]
+
+    @staticmethod
+    def _handle_update_create(vd, lookup):
+        ori = Account.objects.filter(**lookup).first()
+        if ori and ori.secret == vd['secret']:
+            return ori, False, 'skipped'
+
+        instance, value = Account.objects.update_or_create(defaults=vd, **lookup)
+        state = 'created' if value else 'updated'
+        return instance, True, state
+
+    @staticmethod
+    def _handle_skip_create(vd, lookup):
+        instance, value = Account.objects.get_or_create(defaults=vd, **lookup)
+        state = 'created' if value else 'skipped'
+        return instance, value, state
+
+    @staticmethod
+    def _handle_err_create(vd, lookup):
+        instance, value = Account.objects.get_or_create(defaults=vd, **lookup)
+        if not value:
+            raise serializers.ValidationError(
+                _('Account already exists: {}').format(instance)
+            )
+        return instance, True, 'created'
+
+    def perform_create(self, vd, handler):
+        lookup = self.get_filter_lookup(vd)
+        try:
+            instance, changed, state = handler(vd, lookup)
+        except IntegrityError:
+            vd['name'] = self.get_uniq_name(vd)
+            instance, changed, state = handler(vd, lookup)
+        return instance, changed, state
+
+    def get_create_handler(self, on_invalid):
         if on_invalid == 'update':
-            handler = Account.objects.update_or_create
+            handler = self._handle_update_create
+        elif on_invalid == 'skip':
+            handler = self._handle_skip_create
         else:
-            handler = Account.objects.get_or_create
+            handler = self._handle_err_create
         return handler
 
-    @staticmethod
-    def perform_create_account(vd, handler):
-        lookup_fields = ['username', 'secret_type', 'asset']
-        lookup = {
-            k: vd.get(k)
-            for k in lookup_fields if k in vd
-        }
-        if 'name' not in vd:
-            vd['name'] = vd['username']
+    def perform_bulk_create(self, vd):
+        assets = vd.pop('assets')
+        on_invalid = vd.pop('on_invalid', 'skip')
+        secret_type = vd.get('secret_type', 'password')
 
-        try:
-            instance, value = handler(defaults=vd, **lookup)
-        except IntegrityError:
-            vd['name'] = vd['name'] + '-' + str(uuid.uuid4())[:8]
-            instance, value = handler(defaults=vd, **lookup)
-        return instance, value
+        if not vd.get('name'):
+            vd['name'] = vd.get('username')
 
-    def perform_bulk_create(self, validated_data):
-        assets = validated_data.pop('assets')
-        on_invalid = validated_data.pop('on_invalid', 'skip')
-        secret_type = validated_data.get('secret_type', 'password')
+        create_handler = self.get_create_handler(on_invalid)
+        secret_type_supports = self._get_valid_secret_type_assets(assets, secret_type)
 
-        handler = self.get_create_handler(on_invalid)
-        secret_type_supports = self._validate_secret_type(assets, secret_type)
-
-        result = {}
+        result = OrderedDict()
         for asset in assets:
-            if not secret_type_supports.get(asset.id):
+            if asset not in secret_type_supports:
                 result[asset] = {'error': 'Asset does not support this secret type: %s' % secret_type}
                 continue
 
-            vd = validated_data.copy()
+            vd = vd.copy()
             vd['asset'] = asset
             try:
-                instance, value = self.perform_create_account(vd, handler)
-                result[asset] = {'changed': value, 'instance': instance.id}
+                instance, changed, state = self.perform_create(vd, create_handler)
+                result[asset] = {'changed': changed, 'instance': instance.id, 'state': state}
             except Exception as e:
                 logger.exception(e)
                 result[asset] = {'error': str(e)}
 
+        if on_invalid != 'error':
+            return result
+
         errors = {str(k): v for k, v in result.items() if v.get('error')}
-        if errors and on_invalid == 'error':
-            raise serializers.ValidationError({'errors': errors})
+        unchanged = {str(k): {'error': _('Account has exist')} for k, v in result.items() if not v.get('changed', None)}
+        errors.update(unchanged)
+
+        if errors:
+            raise serializers.ValidationError(errors)
         return result
 
     @staticmethod
