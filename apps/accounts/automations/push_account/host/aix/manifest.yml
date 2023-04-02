@@ -8,21 +8,21 @@ fields:
   - name: sudo
     type: str
     required: false
-    style: {'base_template': 'textarea.html'}
+    style: { 'base_template': 'textarea.html' }
+    label: 'Sudo'
+    default: "/bin/whoami"
   - name: shell
     type: str
     required: false
     max_length: 64
-  - name: home
-    type: str
-    required: false
-    max_length: 4096
-    allow_blank: true
-    label: '家目录'
+    label: 'Shell'
+    default: '/bin/bash'
   - name: groups
     type: str
     required: false
     max_length: 4096
+    allow_null: true
     allow_blank: true
     label: '用户组'
+    default: ''
 

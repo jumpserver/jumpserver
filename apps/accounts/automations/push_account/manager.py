@@ -20,11 +20,22 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
     def method_type(cls):
         return AutomationTypes.push_account
 
-    def get_push_kwargs(self, asset):
+    def get_push_kwargs(self, asset_type):
         kwargs = {}
+        serializer = None
+        for i in self.method_id_meta_mapper.values():
+            if asset_type not in i['type']:
+                continue
+            serializer = i['serializer']
+
+        if serializer is None:
+            return kwargs
+
         for k, v in self.params.items():
-            if asset.type in k.split('_'):
-                kwargs.update(v)
+            if asset_type not in k.split('_'):
+                continue
+            data = serializer(v).data
+            kwargs.update(data)
         return kwargs
 
     def host_callback(self, host, asset=None, account=None, automation=None, path_dir=None, **kwargs):
@@ -37,12 +48,13 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
 
         accounts = self.get_accounts(account)
         inventory_hosts = []
+        asset_type = asset.type
         if asset.type == HostTypes.WINDOWS and self.secret_type == SecretType.SSH_KEY:
             msg = f'Windows {asset} does not support ssh key push'
             print(msg)
             return inventory_hosts
 
-        host['kwargs'] = self.get_push_kwargs(asset)
+        host['kwargs'] = self.get_push_kwargs(asset_type)
 
         for account in accounts:
             h = deepcopy(host)

@@ -11,21 +11,11 @@ fields:
     required: true
     style: {'base_template': 'textarea.html'}
     label: 'Sudo'
-    default: '/bin/whoami'
   - name: shell
     type: str
     required: true
     max_length: 64
     label: 'Shell'
-    default: '/bin/bash'
-  - name: home
-    type: str
-    required: false
-    max_length: 4096
-    allow_blank: true
-    allow_null: true
-    label: '家目录'
-    default: ''
   - name: groups
     type: str
     required: false
