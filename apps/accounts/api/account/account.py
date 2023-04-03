@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 
@@ -15,7 +15,7 @@ from rbac.permissions import RBACPermission
 
 __all__ = [
     'AccountViewSet', 'AccountSecretsViewSet',
-    'AccountHistoriesSecretAPI'
+    'AccountHistoriesSecretAPI', 'AssetAccountBulkCreateApi',
 ]
 
 
@@ -95,6 +95,20 @@ class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
         'list': 'accounts.view_accountsecret',
         'retrieve': 'accounts.view_accountsecret',
     }
+
+
+class AssetAccountBulkCreateApi(CreateAPIView):
+    serializer_class = serializers.AssetAccountBulkSerializer
+    rbac_perms = {
+        'POST': 'accounts.add_account',
+    }
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.create(serializer.validated_data)
+        serializer = serializers.AssetAccountBulkSerializerResultSerializer(data, many=True)
+        return Response(data=serializer.data, status=HTTP_200_OK)
 
 
 class AccountHistoriesSecretAPI(RecordViewLogMixin, ListAPIView):

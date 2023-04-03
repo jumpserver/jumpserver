@@ -128,3 +128,11 @@ class Protocol(ChoicesMixin, models.TextChoices):
             **cls.database_protocols(),
             **cls.cloud_protocols()
         }
+
+    @classmethod
+    def protocol_secret_types(cls):
+        settings = cls.settings()
+        return {
+            protocol: settings[protocol]['secret_types']
+            for protocol in cls.settings()
+        }
