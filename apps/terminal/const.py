@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.db.models import TextChoices
+from django.db.models import TextChoices, IntegerChoices
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -65,3 +65,8 @@ class SessionType(TextChoices):
     normal = 'normal', _('Normal')
     tunnel = 'tunnel', _('Tunnel')
     command = 'command', _('Command')
+
+
+class ActionPermission(IntegerChoices):
+    read_only = 0, _('Read Only')
+    writable = 1, _('Writable')
