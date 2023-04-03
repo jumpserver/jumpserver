@@ -116,7 +116,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
                 'setting': {
                     'username_selector': 'name=username',
                     'password_selector': 'name=password',
-                    'submit_selector': 'id=longin_button',
+                    'submit_selector': 'id=login_button',
                 }
             },
         }

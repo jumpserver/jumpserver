@@ -136,8 +136,8 @@ class AllTypes(ChoicesMixin):
             (Category.HOST, HostTypes),
             (Category.DEVICE, DeviceTypes),
             (Category.DATABASE, DatabaseTypes),
+            (Category.CLOUD, CloudTypes),
             (Category.WEB, WebTypes),
-            (Category.CLOUD, CloudTypes)
         )
 
     @classmethod

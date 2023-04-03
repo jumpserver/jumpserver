@@ -52,7 +52,7 @@ class SerializeToTreeNodeMixin:
             {
                 'id': str(asset.id),
                 'name': asset.name,
-                'title': asset.address,
+                'title': f'{asset.address}\n{asset.comment}',
                 'pId': get_pid(asset),
                 'isParent': False,
                 'open': False,
