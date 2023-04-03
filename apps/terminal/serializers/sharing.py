@@ -16,7 +16,8 @@ class SessionSharingSerializer(OrgResourceModelSerializerMixin):
         child=serializers.CharField(max_length=36), allow_null=True, write_only=True
     )
     action_permission = LabeledChoiceField(
-        default=1, choices=ActionPermission.choices, write_only=True, label=_('Action permission')
+        default=ActionPermission.writable, choices=ActionPermission.choices,
+        write_only=True, label=_('Action permission')
     )
 
     class Meta:
