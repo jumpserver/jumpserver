@@ -4,6 +4,7 @@
 from celery import shared_task
 from django.conf import settings
 from django.utils import timezone
+from django.db import transaction
 
 from users.notifications import PasswordExpirationReminderMsg
 from ops.celery.utils import (
@@ -80,6 +81,7 @@ def check_user_expired_periodic():
 
 
 @shared_task
+@transaction.atomic
 def import_ldap_user():
     logger.info("Start import ldap user task")
     util_server = LDAPServerUtil()
