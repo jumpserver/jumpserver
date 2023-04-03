@@ -11,7 +11,7 @@ from .change_secret import (
 
 
 class PushAccountAutomationSerializer(ChangeSecretAutomationSerializer):
-    params = MethodSerializer()
+    params = MethodSerializer(required=False)
 
     class Meta(ChangeSecretAutomationSerializer.Meta):
         model = PushAccountAutomation
@@ -22,10 +22,13 @@ class PushAccountAutomationSerializer(ChangeSecretAutomationSerializer):
 
     def get_params_serializer(self):
         default_serializer = serializers.JSONField(
-            decoder=None, encoder=None, required=False, style={'base_template': 'textarea.html'}
+            required=False, style={'base_template': 'textarea.html'}
         )
-        request = self.context['request']
-        platform_types = request.query_params.get('platform_types')
+        request = self.context.get('request')
+        if request:
+            platform_types = request.query_params.get('platform_types')
+        else:
+            platform_types = None
 
         if platform_types:
             platform_types = platform_types.split(',')
