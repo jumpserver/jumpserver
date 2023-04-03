@@ -68,5 +68,5 @@ class SessionType(TextChoices):
 
 
 class ActionPermission(TextChoices):
-    read_only = "readonly", _('Read Only')
+    readonly = "readonly", _('Read Only')
     writable = "writable", _('Writable')
