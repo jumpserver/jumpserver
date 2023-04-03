@@ -32,6 +32,12 @@ class OrgRoleMixin:
             }
             self.members.through.objects.update_or_create(**defaults, defaults=defaults)
 
+    def remove_member(self, users):
+        from orgs.utils import tmp_to_org
+        with tmp_to_org(self):
+            for user in users:
+                user.remove()
+
     def get_origin_role_members(self, role_name):
         from rbac.models import OrgRoleBinding
         from rbac.builtin import BuiltinRole
