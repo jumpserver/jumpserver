@@ -31,6 +31,7 @@ from common.db.utils import close_old_connections
 from users.utils import construct_user_email
 from users.models import User, UserGroup
 from authentication.backends.ldap import LDAPAuthorizationBackend, LDAPUser
+from orgs.models import Organization
 
 logger = get_logger(__file__)
 
@@ -398,12 +399,15 @@ class LDAPImportUtil(object):
         logger.info('Start perform import ldap users, count: {}'.format(len(users)))
         errors = []
         objs = []
+        users_created = []
         group_users_mapper = defaultdict(set)
         for user in users:
             groups = user.pop('groups', [])
             try:
                 obj, created = self.update_or_create(user)
                 objs.append(obj)
+                if created:
+                    users_created.append(obj)
             except Exception as e:
                 errors.append({user['username']: str(e)})
                 logger.error(e)
@@ -423,6 +427,12 @@ class LDAPImportUtil(object):
         # add user to org
         for obj in objs:
             org.add_member(obj)
+
+        if not org.is_default():
+            # apps/orgs/signal_handlers/common.py:109
+            # remove user from default org only created
+            Organization.default().remove_member(users_created)
+
         # add user to group
         with tmp_to_org(org):
             for group_name, users in group_users_mapper.items():
