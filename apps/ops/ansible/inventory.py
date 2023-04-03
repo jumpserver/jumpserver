@@ -107,7 +107,7 @@ class JMSInventory:
                 host.update(self.make_proxy_command(gateway))
 
     @staticmethod
-    def get_ansible_protocol(ansible_config, protocols):
+    def get_primary_protocol(ansible_config, protocols):
         invalid_protocol = type('protocol', (), {'name': 'null', 'port': 0})
         ansible_connection = ansible_config.get('ansible_connection')
         # 数值越小，优先级越高，若用户在 ansible_config 中配置了，则提高用户配置方式的优先级
@@ -136,7 +136,7 @@ class JMSInventory:
         except (AttributeError, TypeError):
             ansible_config = {}
 
-        protocol = self.get_ansible_protocol(ansible_config, protocols)
+        protocol = self.get_primary_protocol(ansible_config, protocols)
 
         host = {
             'name': '{}'.format(asset.name.replace(' ', '_')),
