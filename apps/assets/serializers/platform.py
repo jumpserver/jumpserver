@@ -54,6 +54,7 @@ class PlatformAutomationSerializer(serializers.ModelSerializer):
             "change_secret_enabled", "change_secret_method",
             "verify_account_enabled", "verify_account_method",
             "gather_accounts_enabled", "gather_accounts_method",
+            "params",
         ]
         extra_kwargs = {
             # 启用资产探测
