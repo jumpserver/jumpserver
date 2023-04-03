@@ -120,7 +120,7 @@ class JMSInventory:
     def fill_ansible_config(ansible_config, protocol):
         if protocol.name in ('ssh', 'winrm'):
             ansible_config['ansible_connection'] = protocol.name
-        if protocol and protocol.name == 'winrm':
+        if protocol.name == 'winrm':
             if protocol.setting.get('use_ssl', False):
                 ansible_config['ansible_winrm_scheme'] = 'https'
                 ansible_config['ansible_winrm_transport'] = 'ssl'
@@ -211,7 +211,7 @@ class JMSInventory:
             return None
 
     @staticmethod
-    def _fill_attr_from_platform(asset, platform_protocols):
+    def set_platform_protocol_setting_to_asset(asset, platform_protocols):
         asset_protocols = asset.protocols.all()
         for p in asset_protocols:
             setattr(p, 'setting', platform_protocols.get(p.name, {}))
@@ -226,7 +226,7 @@ class JMSInventory:
                 p['name']: p['setting'] for p in platform.protocols.values('name', 'setting')
             }
             for asset in assets:
-                protocols = self._fill_attr_from_platform(asset, platform_protocols)
+                protocols = self.set_platform_protocol_setting_to_asset(asset, platform_protocols)
                 account = self.select_account(asset)
                 host = self.asset_to_host(asset, account, automation, protocols, platform)
 
