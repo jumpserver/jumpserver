@@ -146,6 +146,7 @@ class SessionJoinRecord(JMSBaseModel, OrgModelMixin):
         self.date_left = timezone.now()
         self.is_finished = True
         self.save()
+
     @property
     def action_permission(self):
         return self.sharing.action_permission
