@@ -1,5 +1,5 @@
 import uuid
-from collections import defaultdict, OrderedDict
+from collections import defaultdict
 
 from django.db import IntegrityError
 from django.db.models import Q
@@ -130,7 +130,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             instance.save()
             return instance, 'updated'
         else:
-            raise serializers.ValidationError({'non_field_error': 'Account already exists'})
+            raise serializers.ValidationError('Account already exists')
 
     def create(self, validated_data):
         push_now = validated_data.pop('push_now', None)
@@ -200,6 +200,13 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
             'asset__platform__automation'
         )
         return queryset
+
+
+class AssetAccountBulkSerializerResultSerializer(serializers.Serializer):
+    asset = serializers.CharField(read_only=True, label=_('Asset'))
+    state = serializers.CharField(read_only=True, label=_('State'))
+    error = serializers.CharField(read_only=True, label=_('Error'))
+    changed = serializers.BooleanField(read_only=True, label=_('Changed'))
 
 
 class AssetAccountBulkSerializer(AccountCreateUpdateSerializerMixin, serializers.ModelSerializer):
@@ -274,9 +281,7 @@ class AssetAccountBulkSerializer(AccountCreateUpdateSerializerMixin, serializers
     def _handle_err_create(vd, lookup):
         instance, value = Account.objects.get_or_create(defaults=vd, **lookup)
         if not value:
-            raise serializers.ValidationError(
-                _('Account already exists: {}').format(instance)
-            )
+            raise serializers.ValidationError(_('Account already exists'))
         return instance, True, 'created'
 
     def perform_create(self, vd, handler):
@@ -308,45 +313,63 @@ class AssetAccountBulkSerializer(AccountCreateUpdateSerializerMixin, serializers
         create_handler = self.get_create_handler(on_invalid)
         secret_type_supports = self._get_valid_secret_type_assets(assets, secret_type)
 
-        result = OrderedDict()
+        _results = {}
         for asset in assets:
             if asset not in secret_type_supports:
-                result[asset] = {'error': 'Asset does not support this secret type: %s' % secret_type}
+                _results[asset] = {
+                    'error': _('Asset does not support this secret type: %s') % secret_type,
+                    'state': 'error',
+                }
                 continue
 
             vd = vd.copy()
             vd['asset'] = asset
             try:
                 instance, changed, state = self.perform_create(vd, create_handler)
-                result[asset] = {'changed': changed, 'instance': instance.id, 'state': state}
+                _results[asset] = {
+                    'changed': changed, 'instance': instance.id, 'state': state
+                }
+            except serializers.ValidationError as e:
+                _results[asset] = {'error': e.detail[0], 'state': 'error'}
             except Exception as e:
                 logger.exception(e)
-                result[asset] = {'error': str(e)}
+                _results[asset] = {'error': str(e), 'state': 'error'}
+
+        results = [{'asset': asset, **result} for asset, result in _results.items()]
+        state_score = {'created': 3, 'updated': 2, 'skipped': 1, 'error': 0}
+        results = sorted(results, key=lambda x: state_score.get(x['state'], 4))
 
         if on_invalid != 'error':
-            return result
+            return results
 
-        errors = {str(k): v for k, v in result.items() if v.get('error')}
-        unchanged = {str(k): {'error': _('Account has exist')} for k, v in result.items() if not v.get('changed', None)}
-        errors.update(unchanged)
-
+        errors = []
+        errors.extend([result for result in results if result['state'] == 'error'])
+        for result in results:
+            if result['state'] != 'skipped':
+                continue
+            errors.append({
+                'error': _('Account has exist'),
+                'state': 'error',
+                'asset': str(result['asset'])
+            })
         if errors:
             raise serializers.ValidationError(errors)
-        return result
+        return results
 
     @staticmethod
-    def push_accounts_if_need(result, push_now):
+    def push_accounts_if_need(results, push_now):
         if not push_now:
             return
-        accounts = [str(v['instance']) for v in result.values() if v.get('instance')]
+        accounts = [str(v['instance']) for v in results if v.get('instance')]
         push_accounts_to_assets_task.delay(accounts)
 
     def create(self, validated_data):
         push_now = validated_data.pop('push_now', False)
-        result = self.perform_bulk_create(validated_data)
-        self.push_accounts_if_need(result, push_now)
-        result = {str(k): v for k, v in result.items()}
-        return result
+        results = self.perform_bulk_create(validated_data)
+        self.push_accounts_if_need(results, push_now)
+        for res in results:
+            res['asset'] = str(res['asset'])
+        return results
 
 
 class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
