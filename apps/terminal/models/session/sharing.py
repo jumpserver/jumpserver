@@ -31,8 +31,8 @@ class SessionSharing(JMSBaseModel, OrgModelMixin):
     )
     users = models.TextField(blank=True, verbose_name=_("User"))
 
-    action_permission = models.IntegerField(
-        default=1, verbose_name=_('Action permission')
+    action_permission = models.CharField(
+        max_length=16, verbose_name=_('Action permission'), default='writable'
     )
 
     class Meta:
