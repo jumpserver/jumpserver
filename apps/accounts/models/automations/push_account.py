@@ -57,5 +57,8 @@ class PushAccountAutomation(ChangeSecretMixin, AccountBaseAutomation):
         })
         return attr_json
 
+    def is_params(self):
+        return bool(self.params)
+
     class Meta:
         verbose_name = _("Push asset account")
