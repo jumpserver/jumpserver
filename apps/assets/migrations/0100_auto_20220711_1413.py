@@ -49,7 +49,10 @@ def migrate_asset_accounts(apps, schema_editor):
             account_values.update(auth_book_auth)
 
             auth_infos = []
-            username = account_values['username']
+            username = account_values.get('username')
+            if not username:
+                continue
+
             for attr in auth_attrs:
                 secret = account_values.pop(attr, None)
                 if not secret:
