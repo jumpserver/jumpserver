@@ -55,11 +55,12 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             self.from_template_if_need(data)
             self.set_uniq_name_if_need(data, asset)
 
-    @staticmethod
-    def set_uniq_name_if_need(initial_data, asset):
+    def set_uniq_name_if_need(self, initial_data, asset):
         name = initial_data.get('name')
         if not name:
             name = initial_data.get('username')
+        if self.instance and self.instance.name == name:
+            return
         if Account.objects.filter(name=name, asset=asset).exists():
             name = name + '_' + uuid.uuid4().hex[:4]
         initial_data['name'] = name
