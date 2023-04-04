@@ -24,7 +24,7 @@ class PlatformProtocol(models.Model):
 
     @property
     def secret_types(self):
-        return Protocol.settings().get(self.name, {}).get('secret_types')
+        return Protocol.settings().get(self.name, {}).get('secret_types', ['password'])
 
 
 class PlatformAutomation(models.Model):
@@ -69,14 +69,18 @@ class Platform(JMSBaseModel):
     internal = models.BooleanField(default=False, verbose_name=_("Internal"))
     # 资产有关的
     charset = models.CharField(
-        default=CharsetChoices.utf8, choices=CharsetChoices.choices, max_length=8, verbose_name=_("Charset")
+        default=CharsetChoices.utf8, choices=CharsetChoices.choices,
+        max_length=8, verbose_name=_("Charset")
     )
     domain_enabled = models.BooleanField(default=True, verbose_name=_("Domain enabled"))
     # 账号有关的
     su_enabled = models.BooleanField(default=False, verbose_name=_("Su enabled"))
     su_method = models.CharField(max_length=32, blank=True, null=True, verbose_name=_("Su method"))
-    automation = models.OneToOneField(PlatformAutomation, on_delete=models.CASCADE, related_name='platform',
-                                      blank=True, null=True, verbose_name=_("Automation"))
+    automation = models.OneToOneField(
+        PlatformAutomation, on_delete=models.CASCADE, related_name='platform',
+        blank=True, null=True, verbose_name=_("Automation")
+    )
+    custom_fields = models.JSONField(null=True, default=list, verbose_name=_("Custom fields"))
 
     @property
     def type_constraints(self):

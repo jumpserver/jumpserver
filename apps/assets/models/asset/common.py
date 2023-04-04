@@ -151,17 +151,23 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
     def auto_info(self):
         platform = self.platform
         automation = self.platform.automation
-        return {
+        auto_info = {
             'su_enabled': platform.su_enabled,
-            'ping_enabled': automation.ping_enabled,
             'domain_enabled': platform.domain_enabled,
+            'ansible_enabled': False
+        }
+        if not automation:
+            return auto_info
+        auto_info.update({
+            'ping_enabled': automation.ping_enabled,
             'ansible_enabled': automation.ansible_enabled,
             'push_account_enabled': automation.push_account_enabled,
             'gather_facts_enabled': automation.gather_facts_enabled,
             'change_secret_enabled': automation.change_secret_enabled,
             'verify_account_enabled': automation.verify_account_enabled,
             'gather_accounts_enabled': automation.gather_accounts_enabled,
-        }
+        })
+        return auto_info
 
     def get_target_ip(self):
         return self.address

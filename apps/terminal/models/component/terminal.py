@@ -1,4 +1,5 @@
 import time
+import uuid
 
 from django.conf import settings
 from django.core.cache import cache
@@ -141,6 +142,7 @@ class Terminal(StorageMixin, TerminalStatusMixin, JMSBaseModel):
         if self.user:
             setattr(self.user, SKIP_SIGNAL, True)
             self.user.delete()
+        self.name = self.name + '_' + uuid.uuid4().hex[:8]
         self.user = None
         self.is_deleted = True
         self.save()

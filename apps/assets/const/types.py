@@ -6,6 +6,7 @@ from django.utils.translation import gettext as _
 from common.db.models import ChoicesMixin
 from .category import Category
 from .cloud import CloudTypes
+from .custom import CustomTypes
 from .database import DatabaseTypes
 from .device import DeviceTypes
 from .host import HostTypes
@@ -16,7 +17,7 @@ class AllTypes(ChoicesMixin):
     choices: list
     includes = [
         HostTypes, DeviceTypes, DatabaseTypes,
-        CloudTypes, WebTypes,
+        CloudTypes, WebTypes, CustomTypes
     ]
     _category_constrains = {}
 
@@ -24,22 +25,29 @@ class AllTypes(ChoicesMixin):
     def choices(cls):
         choices = []
         for tp in cls.includes:
-            choices.extend(tp.choices)
+            choices.extend(tp.get_choices())
         return choices
 
     @classmethod
+    def get_choices(cls):
+        return cls.choices()
+
+    @classmethod
     def filter_choices(cls, category):
-        choices = dict(cls.category_types()).get(category, cls).choices
+        choices = dict(cls.category_types()).get(category, cls).get_choices()
         return choices() if callable(choices) else choices
 
     @classmethod
-    def get_constraints(cls, category, tp):
+    def get_constraints(cls, category, tp_name):
+        if not isinstance(tp_name, str):
+            tp_name = tp_name.value
+
         types_cls = dict(cls.category_types()).get(category)
         if not types_cls:
             return {}
         type_constraints = types_cls.get_constrains()
-        constraints = type_constraints.get(tp, {})
-        cls.set_automation_methods(category, tp, constraints)
+        constraints = type_constraints.get(tp_name, {})
+        cls.set_automation_methods(category, tp_name, constraints)
         return constraints
 
     @classmethod
@@ -56,7 +64,7 @@ class AllTypes(ChoicesMixin):
         return asset_methods + account_methods
 
     @classmethod
-    def set_automation_methods(cls, category, tp, constraints):
+    def set_automation_methods(cls, category, tp_name, constraints):
         from assets.automations import filter_platform_methods
         automation = constraints.get('automation', {})
         automation_methods = {}
@@ -66,7 +74,7 @@ class AllTypes(ChoicesMixin):
                 continue
             item_name = item.replace('_enabled', '')
             methods = filter_platform_methods(
-                category, tp, item_name, methods=platform_automation_methods
+                category, tp_name, item_name, methods=platform_automation_methods
             )
             methods = [{'name': m['name'], 'id': m['id']} for m in methods]
             automation_methods[item_name + '_methods'] = methods
@@ -113,7 +121,7 @@ class AllTypes(ChoicesMixin):
 
     @classmethod
     def grouped_choices(cls):
-        grouped_types = [(str(ca), tp.choices) for ca, tp in cls.category_types()]
+        grouped_types = [(str(ca), tp.get_choices()) for ca, tp in cls.category_types()]
         return grouped_types
 
     @classmethod
@@ -138,14 +146,20 @@ class AllTypes(ChoicesMixin):
             (Category.DATABASE, DatabaseTypes),
             (Category.CLOUD, CloudTypes),
             (Category.WEB, WebTypes),
+            (Category.CUSTOM, CustomTypes),
         )
 
     @classmethod
     def get_types(cls):
-        tps = []
+        choices = []
         for i in dict(cls.category_types()).values():
-            tps.extend(i.get_types())
-        return tps
+            choices.extend(i.get_types())
+        return choices
+
+    @classmethod
+    def get_types_values(cls):
+        choices = cls.get_types()
+        return [c.value for c in choices]
 
     @staticmethod
     def choice_to_node(choice, pid, opened=True, is_parent=True, meta=None):
