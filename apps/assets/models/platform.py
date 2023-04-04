@@ -89,11 +89,6 @@ class Platform(JMSBaseModel):
         )
         return linux.id
 
-    @property
-    def primary_protocol(self):
-        primary_protocol_name = AllTypes.get_primary_protocol_name(self.category, self.type)
-        return self.protocols.filter(name=primary_protocol_name).first()
-
     def get_commands(self):
         return self.meta.get('commands', [])
 
