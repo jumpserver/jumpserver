@@ -24,6 +24,6 @@ class WebSerializer(AssetSerializer):
                 'default': 'name=password'
             },
             'submit_selector': {
-                'default': 'id=longin_button',
+                'default': 'id=login_button',
             },
         }

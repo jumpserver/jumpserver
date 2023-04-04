@@ -19,10 +19,7 @@ class HostTypes(BaseType):
                 'charset': 'utf-8',  # default
                 'domain_enabled': True,
                 'su_enabled': True,
-                'su_methods': [
-                    {'name': 'sudo su', 'id': 'sudo su'},
-                    {'name': 'su -', 'id': 'su -'}
-                ],
+                'su_methods': ['sudo', 'su'],
             },
             cls.WINDOWS: {
                 'su_enabled': False,
@@ -39,7 +36,7 @@ class HostTypes(BaseType):
                 'choices': ['ssh', 'telnet', 'vnc', 'rdp']
             },
             cls.WINDOWS: {
-                'choices': ['rdp', 'ssh', 'vnc']
+                'choices': ['rdp', 'ssh', 'vnc', 'winrm']
             }
         }
 
@@ -61,7 +58,7 @@ class HostTypes(BaseType):
             cls.WINDOWS: {
                 'ansible_config': {
                     'ansible_shell_type': 'cmd',
-                    'ansible_connection': 'ssh',
+                    'ansible_connection': 'smart',
                 },
             },
             cls.OTHER_HOST: {

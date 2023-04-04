@@ -1,6 +1,5 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
-from django.core import validators
 
 from assets.const.web import FillType
 from common.serializers import WritableNestedModelSerializer
@@ -22,7 +21,7 @@ class ProtocolSettingSerializer(serializers.Serializer):
         ("nla", "NLA"),
     ]
     # RDP
-    console = serializers.BooleanField(required=False)
+    console = serializers.BooleanField(required=False, default=False)
     security = serializers.ChoiceField(choices=SECURITY_CHOICES, default="any")
 
     # SFTP
@@ -44,6 +43,9 @@ class ProtocolSettingSerializer(serializers.Serializer):
 
     # Redis
     auth_username = serializers.BooleanField(default=False, label=_("Auth with username"))
+
+    # WinRM
+    use_ssl = serializers.BooleanField(default=False, label=_("Use SSL"))
 
 
 class PlatformAutomationSerializer(serializers.ModelSerializer):
@@ -76,33 +78,39 @@ class PlatformAutomationSerializer(serializers.ModelSerializer):
         }
 
 
-class PlatformProtocolsSerializer(serializers.ModelSerializer):
+class PlatformProtocolSerializer(serializers.ModelSerializer):
     setting = ProtocolSettingSerializer(required=False, allow_null=True)
-    primary = serializers.BooleanField(read_only=True, label=_("Primary"))
 
     class Meta:
         model = PlatformProtocol
         fields = [
             "id", "name", "port", "primary",
-            "default", "required", "secret_types",
-            "setting",
+            "required", "default",
+            "secret_types", "setting",
         ]
 
 
 class PlatformSerializer(WritableNestedModelSerializer):
+    SU_METHOD_CHOICES = [
+        ("sudo", "sudo su -"),
+        ("su", "su - "),
+        ("enable", "enable"),
+        ("super", "super 15"),
+        ("super_level", "super level 15")
+    ]
+
     charset = LabeledChoiceField(
         choices=Platform.CharsetChoices.choices, label=_("Charset")
     )
     type = LabeledChoiceField(choices=AllTypes.choices(), label=_("Type"))
     category = LabeledChoiceField(choices=Category.choices, label=_("Category"))
-    protocols = PlatformProtocolsSerializer(
+    protocols = PlatformProtocolSerializer(
         label=_("Protocols"), many=True, required=False
     )
     automation = PlatformAutomationSerializer(label=_("Automation"), required=False)
-    su_method = LabeledChoiceField(
-        choices=[("sudo", "sudo su -"), ("su", "su - ")],
-        label=_("Su method"), required=False, default="sudo", allow_null=True
-    )
+    su_method = LabeledChoiceField(choices=SU_METHOD_CHOICES,
+                                   label=_("Su method"), required=False, default="sudo", allow_null=True
+                                   )
 
     class Meta:
         model = Platform
@@ -129,6 +137,16 @@ class PlatformSerializer(WritableNestedModelSerializer):
             'protocols', 'automation'
         )
         return queryset
+
+    def validate_protocols(self, protocols):
+        if not protocols:
+            raise serializers.ValidationError(_("Protocols is required"))
+        primary = [p for p in protocols if p.get('primary')]
+        if not primary:
+            protocols[0]['primary'] = True
+        # 这里不设置不行，write_nested 不使用 validated 中的
+        self.initial_data['protocols'] = protocols
+        return protocols
 
 
 class PlatformOpsMethodSerializer(serializers.Serializer):

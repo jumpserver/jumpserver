@@ -2,15 +2,17 @@
 #
 import django_filters
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.status import HTTP_200_OK
 
 from accounts.tasks import push_accounts_to_assets_task, verify_accounts_connectivity_task
 from assets import serializers
 from assets.exceptions import NotSupportedTemporarilyError
 from assets.filters import IpInFilterBackend, LabelFilterBackend, NodeFilterBackend
-from assets.models import Asset, Gateway
+from assets.models import Asset, Gateway, Platform
 from assets.tasks import test_assets_connectivity_manual, update_assets_hardware_info_manual
 from common.api import SuggestionMixin
 from common.drf.filters import BaseFilterSet
@@ -18,6 +20,7 @@ from common.utils import get_logger, is_uuid
 from orgs.mixins import generics
 from orgs.mixins.api import OrgBulkModelViewSet
 from ..mixin import NodeFilterMixin
+from ...notifications import BulkUpdatePlatformSkipAssetUserMsg
 
 logger = get_logger(__file__)
 __all__ = [
@@ -109,6 +112,7 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
         ("info", "assets.view_asset"),
     )
     extra_filter_backends = [LabelFilterBackend, IpInFilterBackend, NodeFilterBackend]
+    skip_assets = []
 
     def get_serializer_class(self):
         cls = super().get_serializer_class()
@@ -144,6 +148,30 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
             return Response({'error': error}, status=400)
         return super().create(request, *args, **kwargs)
 
+    def filter_bulk_update_data(self):
+        bulk_data = []
+        for data in self.request.data:
+            pk = data.get('id')
+            platform = data.get('platform')
+            if not platform:
+                bulk_data.append(data)
+                continue
+            asset = get_object_or_404(Asset, pk=pk)
+            platform = get_object_or_404(Platform, **platform)
+            if platform.type == asset.type:
+                bulk_data.append(data)
+                continue
+            self.skip_assets.append(asset)
+        return bulk_data
+    def bulk_update(self, request, *args, **kwargs):
+        bulk_data = self.filter_bulk_update_data()
+        request._full_data = bulk_data
+        response = super().bulk_update(request, *args, **kwargs)
+        if response.status_code == HTTP_200_OK and self.skip_assets:
+            user = request.user
+            BulkUpdatePlatformSkipAssetUserMsg(user, self.skip_assets).publish()
+        return response
+
 
 class AssetsTaskMixin:
     def perform_assets_task(self, serializer):
@@ -155,7 +183,7 @@ class AssetsTaskMixin:
         else:
             asset = assets[0]
             if not asset.auto_info['ansible_enabled'] or \
-                not asset.auto_info['ping_enabled']:
+                    not asset.auto_info['ping_enabled']:
                 raise NotSupportedTemporarilyError()
             task = test_assets_connectivity_manual(assets)
         return task

@@ -25,6 +25,7 @@ router.register(r'push-account-executions', api.PushAccountExecutionViewSet, 'pu
 router.register(r'push-account-records', api.PushAccountRecordViewSet, 'push-account-record')
 
 urlpatterns = [
+    path('accounts/bulk/', api.AssetAccountBulkCreateApi.as_view(), name='account-bulk-create'),
     path('accounts/tasks/', api.AccountsTaskCreateAPI.as_view(), name='account-task-create'),
     path('account-secrets/<uuid:pk>/histories/', api.AccountHistoriesSecretAPI.as_view(),
          name='account-secret-history'),

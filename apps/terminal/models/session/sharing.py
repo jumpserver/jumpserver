@@ -31,6 +31,10 @@ class SessionSharing(JMSBaseModel, OrgModelMixin):
     )
     users = models.TextField(blank=True, verbose_name=_("User"))
 
+    action_permission = models.CharField(
+        max_length=16, verbose_name=_('Action permission'), default='writable'
+    )
+
     class Meta:
         ordering = ('-date_created',)
         verbose_name = _('Session sharing')
@@ -142,3 +146,7 @@ class SessionJoinRecord(JMSBaseModel, OrgModelMixin):
         self.date_left = timezone.now()
         self.is_finished = True
         self.save()
+
+    @property
+    def action_permission(self):
+        return self.sharing.action_permission

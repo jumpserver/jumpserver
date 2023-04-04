@@ -45,7 +45,7 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
             }
 
             private_key_path = None
-            if self.secret_type == SecretType.SSH_KEY:
+            if secret_type == SecretType.SSH_KEY:
                 private_key_path = self.generate_private_key_path(new_secret, path_dir)
                 new_secret = self.generate_public_key(new_secret)
 

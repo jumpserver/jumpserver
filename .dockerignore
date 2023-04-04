@@ -8,4 +8,4 @@ celerybeat.pid
 ### Vagrant ###
 .vagrant/
 apps/xpack/.git
-
+.history/

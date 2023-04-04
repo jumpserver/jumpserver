@@ -20,4 +20,4 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.GITEE_SSH_PRIVATE_KEY }}
         with:
           source-repo: 'git@github.com:jumpserver/jumpserver.git'
-          destination-repo: 'git@gitee.com:jumpserver/jumpserver.git'
+          destination-repo: 'git@gitee.com:fit2cloud-feizhiyun/JumpServer.git'

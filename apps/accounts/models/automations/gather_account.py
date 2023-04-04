@@ -1,7 +1,9 @@
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
-from accounts.const import AutomationTypes
+from accounts.const import AutomationTypes, Source
+from accounts.models import Account
 from orgs.mixins.models import JMSOrgBaseModel
 from .base import AccountBaseAutomation
 
@@ -19,6 +21,25 @@ class GatheredAccount(JMSOrgBaseModel):
     def address(self):
         return self.asset.address
 
+    @staticmethod
+    def sync_accounts(gathered_accounts):
+        account_objs = []
+        for gathered_account in gathered_accounts:
+            asset_id = gathered_account.asset_id
+            username = gathered_account.username
+            accounts = Account.objects.filter(
+                Q(asset_id=asset_id, username=username) |
+                Q(asset_id=asset_id, name=username)
+            )
+            if accounts.exists():
+                continue
+            account = Account(
+                asset_id=asset_id, username=username,
+                name=username, source=Source.COLLECTED
+            )
+            account_objs.append(account)
+        Account.objects.bulk_create(account_objs)
+
     class Meta:
         verbose_name = _('Gather account automation')
         unique_together = [
@@ -31,6 +52,17 @@ class GatheredAccount(JMSOrgBaseModel):
 
 
 class GatherAccountsAutomation(AccountBaseAutomation):
+    is_sync_account = models.BooleanField(
+        default=False, blank=True, verbose_name=_("Is sync account")
+    )
+
+    def to_attr_json(self):
+        attr_json = super().to_attr_json()
+        attr_json.update({
+            'is_sync_account': self.is_sync_account,
+        })
+        return attr_json
+
     def save(self, *args, **kwargs):
         self.type = AutomationTypes.gather_accounts
         super().save(*args, **kwargs)

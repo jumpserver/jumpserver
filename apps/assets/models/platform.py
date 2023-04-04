@@ -10,28 +10,17 @@ __all__ = ['Platform', 'PlatformProtocol', 'PlatformAutomation']
 
 
 class PlatformProtocol(models.Model):
-    SETTING_ATTRS = {
-        'console': True,
-        'security': 'any,tls,rdp',
-        'sftp_enabled': True,
-        'sftp_home': '/tmp'
-    }
-    default = models.BooleanField(default=False, verbose_name=_('Default'))
-    required = models.BooleanField(default=False, verbose_name=_('Required'))
     name = models.CharField(max_length=32, verbose_name=_('Name'))
     port = models.IntegerField(verbose_name=_('Port'))
+    primary = models.BooleanField(default=False, verbose_name=_('Primary'))
+    required = models.BooleanField(default=False, verbose_name=_('Required'))
+    default = models.BooleanField(default=False, verbose_name=_('Default'))
+    public = models.BooleanField(default=True, verbose_name=_('Public'))
     setting = models.JSONField(verbose_name=_('Setting'), default=dict)
     platform = models.ForeignKey('Platform', on_delete=models.CASCADE, related_name='protocols')
 
     def __str__(self):
         return '{}/{}'.format(self.name, self.port)
-
-    @property
-    def primary(self):
-        primary_protocol_name = AllTypes.get_primary_protocol_name(
-            self.platform.category, self.platform.type
-        )
-        return self.name == primary_protocol_name
 
     @property
     def secret_types(self):

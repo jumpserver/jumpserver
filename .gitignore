@@ -43,3 +43,4 @@ releashe
 /apps/script.py
 data/*
 test.py
+.history/

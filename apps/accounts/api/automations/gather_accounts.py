@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 #
-from django.utils.translation import ugettext_lazy as _
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from accounts import serializers
 from accounts.const import AutomationTypes
-from accounts.const import Source
 from accounts.filters import GatheredAccountFilterSet
 from accounts.models import GatherAccountsAutomation
 from accounts.models import GatheredAccount
@@ -50,22 +48,12 @@ class GatheredAccountViewSet(OrgBulkModelViewSet):
         'default': serializers.GatheredAccountSerializer,
     }
     rbac_perms = {
-        'sync_account': 'assets.add_gatheredaccount',
+        'sync_accounts': 'assets.add_gatheredaccount',
     }
 
-    @action(methods=['post'], detail=True, url_path='sync')
-    def sync_account(self, request, *args, **kwargs):
-        gathered_account = super().get_object()
-        asset = gathered_account.asset
-        username = gathered_account.username
-        accounts = asset.accounts.filter(username=username)
-
-        if accounts.exists():
-            accounts.update(source=Source.COLLECTED)
-        else:
-            asset.accounts.model.objects.create(
-                asset=asset, username=username,
-                name=f'{username}-{_("Collected")}',
-                source=Source.COLLECTED
-            )
+    @action(methods=['post'], detail=False, url_path='sync-accounts')
+    def sync_accounts(self, request, *args, **kwargs):
+        gathered_account_ids = request.data.get('gathered_account_ids')
+        gathered_accounts = self.model.objects.filter(id__in=gathered_account_ids)
+        self.model.sync_accounts(gathered_accounts)
         return Response(status=status.HTTP_201_CREATED)

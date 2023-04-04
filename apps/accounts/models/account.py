@@ -53,6 +53,7 @@ class Account(AbsConnectivity, BaseAccount):
     version = models.IntegerField(default=0, verbose_name=_('Version'))
     history = AccountHistoricalRecords(included_fields=['id', 'secret', 'secret_type', 'version'])
     source = models.CharField(max_length=30, default=Source.LOCAL, verbose_name=_('Source'))
+    source_id = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Source ID'))
 
     class Meta:
         verbose_name = _('Account')

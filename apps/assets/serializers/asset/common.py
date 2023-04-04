@@ -7,8 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from accounts.models import Account
-from accounts.serializers import AccountSerializerCreateValidateMixin
-from accounts.serializers import AuthValidateMixin
+from accounts.serializers import AccountSerializer
 from common.serializers import WritableNestedModelSerializer, SecretReadableMixin, CommonModelSerializer
 from common.serializers.fields import LabeledChoiceField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
@@ -59,44 +58,18 @@ class AssetPlatformSerializer(serializers.ModelSerializer):
         }
 
 
-class AssetAccountSerializer(
-    AuthValidateMixin,
-    AccountSerializerCreateValidateMixin,
-    CommonModelSerializer
-):
+class AssetAccountSerializer(AccountSerializer):
     add_org_fields = False
-    push_now = serializers.BooleanField(
-        default=False, label=_("Push now"), write_only=True
-    )
-    template = serializers.BooleanField(
-        default=False, label=_("Template"), write_only=True
-    )
-    name = serializers.CharField(max_length=128, required=True, label=_("Name"))
+    asset = serializers.PrimaryKeyRelatedField(queryset=Asset.objects, required=False, write_only=True)
 
-    class Meta:
-        model = Account
-        fields_mini = [
-            'id', 'name', 'username', 'privileged',
-            'is_active', 'version', 'secret_type',
+    class Meta(AccountSerializer.Meta):
+        fields = [
+            f for f in AccountSerializer.Meta.fields
+            if f not in ['spec_info']
         ]
-        fields_write_only = [
-            'secret', 'passphrase', 'push_now', 'template'
-        ]
-        fields = fields_mini + fields_write_only
         extra_kwargs = {
-            'secret': {'write_only': True},
+            **AccountSerializer.Meta.extra_kwargs,
         }
-
-    def validate_push_now(self, value):
-        request = self.context['request']
-        if not request.user.has_perms('accounts.push_account'):
-            return False
-        return value
-
-    def validate_name(self, value):
-        if not value:
-            value = self.initial_data.get('username')
-        return value
 
 
 class AccountSecretSerializer(SecretReadableMixin, CommonModelSerializer):
@@ -128,8 +101,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
     labels = AssetLabelSerializer(many=True, required=False, label=_('Label'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'), default=())
-    accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, write_only=True, label=_('Account'))
-    nodes_display = serializers.ListField(read_only=True, label=_("Node path"))
+    accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, label=_('Account'))
+    nodes_display = serializers.ListField(read_only=False, required=False, label=_("Node path"))
 
     class Meta:
         model = Asset
@@ -158,7 +131,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         self._init_field_choices()
 
     def _get_protocols_required_default(self):
-        platform = self._initial_data_platform
+        platform = self._asset_platform
         platform_protocols = platform.protocols.all()
         protocols_default = [p for p in platform_protocols if p.default]
         protocols_required = [p for p in platform_protocols if p.required or p.primary]
@@ -214,20 +187,22 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         instance.nodes.set(nodes_to_set)
 
     @property
-    def _initial_data_platform(self):
-        if self.instance:
-            return self.instance.platform
-
+    def _asset_platform(self):
         platform_id = self.initial_data.get('platform')
         if isinstance(platform_id, dict):
             platform_id = platform_id.get('id') or platform_id.get('pk')
-        platform = Platform.objects.filter(id=platform_id).first()
+
+        if not platform_id and self.instance:
+            platform = self.instance.platform
+        else:
+            platform = Platform.objects.filter(id=platform_id).first()
+
         if not platform:
             raise serializers.ValidationError({'platform': _("Platform not exist")})
         return platform
 
     def validate_domain(self, value):
-        platform = self._initial_data_platform
+        platform = self._asset_platform
         if platform.domain_enabled:
             return value
         else:
@@ -274,8 +249,11 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         if not accounts_data:
             return
         for data in accounts_data:
-            data['asset'] = asset
-            AssetAccountSerializer().create(data)
+            data['asset'] = asset.id
+
+        s = AssetAccountSerializer(data=accounts_data, many=True)
+        s.is_valid(raise_exception=True)
+        s.save()
 
     @atomic
     def create(self, validated_data):

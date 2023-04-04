@@ -6,8 +6,10 @@ from .protocol import Protocol
 
 class BaseType(TextChoices):
     """
-    约束应该考虑代是对平台对限制，避免多余对选项，如: mysql 开启 ssh, 或者开启了也没有作用, 比如 k8s 开启了 domain，目前还不支持
+    约束应该考虑代是对平台对限制，避免多余对选项，如: mysql 开启 ssh,
+    或者开启了也没有作用, 比如 k8s 开启了 domain，目前还不支持
     """
+
     @classmethod
     def get_constrains(cls):
         constrains = {}
@@ -36,7 +38,7 @@ class BaseType(TextChoices):
         if choices == '__self__':
             choices = [tp]
         protocols = [{'name': name, **settings.get(name, {})} for name in choices]
-        protocols[0]['primary'] = True
+        protocols[0]['default'] = True
         return protocols
 
     @classmethod
@@ -74,5 +76,3 @@ class BaseType(TextChoices):
             choice for choice in cls_choices
             if choice[0] in tps
         ]
-
-
