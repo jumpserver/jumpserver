@@ -12,6 +12,7 @@ from .change_secret import (
 
 class PushAccountAutomationSerializer(ChangeSecretAutomationSerializer):
     params = MethodSerializer(required=False)
+    is_params = serializers.BooleanField(read_only=True)
 
     class Meta(ChangeSecretAutomationSerializer.Meta):
         model = PushAccountAutomation
