@@ -41,6 +41,9 @@ class ProtocolSettingSerializer(serializers.Serializer):
     # Redis
     auth_username = serializers.BooleanField(default=False, label=_("Auth with username"))
 
+    # WinRM
+    use_ssl = serializers.BooleanField(default=False, label=_("Use SSL"))
+
 
 class PlatformAutomationSerializer(serializers.ModelSerializer):
     class Meta:

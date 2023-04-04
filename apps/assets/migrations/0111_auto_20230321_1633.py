@@ -2,6 +2,8 @@
 
 from django.db import migrations, models
 
+from assets.const import AllTypes
+
 
 def migrate_platform_charset(apps, schema_editor):
     platform_model = apps.get_model('assets', 'Platform')
@@ -20,6 +22,11 @@ def migrate_platform_protocol_primary(apps, schema_editor):
         p.save()
 
 
+def migrate_internal_platforms(apps, schema_editor):
+    platform_cls = apps.get_model('assets', 'Platform')
+    AllTypes.create_or_update_internal_platforms(platform_cls)
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -34,4 +41,5 @@ class Migration(migrations.Migration):
         ),
         migrations.RunPython(migrate_platform_charset),
         migrations.RunPython(migrate_platform_protocol_primary),
+        migrations.RunPython(migrate_internal_platforms),
     ]
