@@ -8,6 +8,15 @@ from common.utils import lazyproperty, timeit
 
 
 class SerializeToTreeNodeMixin:
+    request: Request
+
+    @lazyproperty
+    def is_sync(self):
+        sync_paths = ['/api/v1/perms/users/self/nodes/all-with-assets/tree/']
+        for p in sync_paths:
+            if p == self.request.path:
+                return True
+        return False
 
     @timeit
     def serialize_nodes(self, nodes: List[Node], with_asset_amount=False):
@@ -17,6 +26,16 @@ class SerializeToTreeNodeMixin:
         else:
             def _name(node: Node):
                 return node.value
+
+        def _open(node):
+            if not self.is_sync:
+                # 异步加载资产树时，默认展开节点
+                return True
+            if not node.parent_key:
+                return True
+            else:
+                return False
+
         data = [
             {
                 'id': node.key,
@@ -24,7 +43,7 @@ class SerializeToTreeNodeMixin:
                 'title': _name(node),
                 'pId': node.parent_key,
                 'isParent': True,
-                'open': True,
+                'open': _open(node),
                 'meta': {
                     'data': {
                         "id": node.id,
