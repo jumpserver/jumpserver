@@ -1,11 +1,12 @@
 import json
 import os
 import shutil
+import yaml
+
 from collections import defaultdict
 from hashlib import md5
 from socket import gethostname
 
-import yaml
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -239,10 +240,12 @@ class BasePlaybookManager:
             jms_asset, jms_gateway = host['jms_asset'], host.get('gateway')
             if not jms_gateway:
                 continue
+
             server = SSHTunnelForwarder(
                 (jms_gateway['address'], jms_gateway['port']),
                 ssh_username=jms_gateway['username'],
                 ssh_password=jms_gateway['secret'],
+                ssh_pkey=jms_gateway['private_key_path'],
                 remote_bind_address=(jms_asset['address'], jms_asset['port'])
             )
             try:

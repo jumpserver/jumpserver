@@ -100,7 +100,8 @@ class JMSInventory:
             if ansible_connection in ('local', 'winrm'):
                 host['gateway'] = {
                     'address': gateway.address, 'port': gateway.port,
-                    'username': gateway.username, 'secret': gateway.password
+                    'username': gateway.username, 'secret': gateway.password,
+                    'private_key_path': gateway.private_key_path
                 }
                 host['jms_asset']['port'] = port
             else:
