@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-27 17:00+0800\n"
+"POT-Creation-Date: 2023-04-04 15:15+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -464,7 +464,7 @@ msgstr "账号验证"
 #: assets/models/group.py:20 assets/models/label.py:18
 #: assets/models/platform.py:13 assets/models/platform.py:64
 #: assets/serializers/asset/common.py:74 assets/serializers/asset/common.py:155
-#: assets/serializers/platform.py:141
+#: assets/serializers/platform.py:148
 #: authentication/serializers/connect_token_secret.py:103 ops/mixin.py:21
 #: ops/models/adhoc.py:21 ops/models/celery.py:15 ops/models/celery.py:57
 #: ops/models/job.py:91 ops/models/playbook.py:23 ops/serializers/job.py:19
@@ -473,7 +473,7 @@ msgstr "账号验证"
 #: terminal/models/applet/applet.py:27 terminal/models/component/endpoint.py:12
 #: terminal/models/component/endpoint.py:90
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:15
-#: terminal/models/component/terminal.py:79 users/forms/profile.py:33
+#: terminal/models/component/terminal.py:84 users/forms/profile.py:33
 #: users/models/group.py:13 users/models/user.py:717
 #: xpack/plugins/cloud/models.py:28
 msgid "Name"
@@ -547,7 +547,7 @@ msgstr "已托管密码"
 #: accounts/serializers/account/account.py:90 applications/models.py:11
 #: assets/models/label.py:21 assets/models/platform.py:65
 #: assets/serializers/asset/common.py:131 assets/serializers/cagegory.py:8
-#: assets/serializers/platform.py:92 assets/serializers/platform.py:142
+#: assets/serializers/platform.py:100 assets/serializers/platform.py:149
 #: perms/serializers/user_permission.py:26 settings/models.py:35
 #: tickets/models/ticket/apply_application.py:13
 msgid "Category"
@@ -558,14 +558,14 @@ msgstr "类别"
 #: acls/serializers/command_acl.py:18 applications/models.py:14
 #: assets/models/_user.py:50 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:66
-#: assets/serializers/asset/common.py:132 assets/serializers/platform.py:91
+#: assets/serializers/asset/common.py:132 assets/serializers/platform.py:99
 #: audits/serializers.py:48
 #: authentication/serializers/connect_token_secret.py:116 ops/models/job.py:102
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:31
 #: terminal/models/component/storage.py:57
 #: terminal/models/component/storage.py:146 terminal/serializers/applet.py:29
-#: terminal/serializers/session.py:22 terminal/serializers/storage.py:224
-#: terminal/serializers/storage.py:236 tickets/models/comment.py:26
+#: terminal/serializers/session.py:22 terminal/serializers/storage.py:230
+#: terminal/serializers/storage.py:242 tickets/models/comment.py:26
 #: tickets/models/flow.py:56 tickets/models/ticket/apply_application.py:16
 #: tickets/models/ticket/general.py:275 tickets/serializers/flow.py:53
 #: tickets/serializers/ticket/ticket.py:19
@@ -1146,7 +1146,7 @@ msgstr "用户名与用户相同"
 #: assets/models/_user.py:52 authentication/models/connection_token.py:38
 #: authentication/serializers/connect_token_secret.py:104
 #: terminal/models/applet/applet.py:34 terminal/serializers/session.py:20
-#: terminal/serializers/session.py:41 terminal/serializers/storage.py:68
+#: terminal/serializers/session.py:41 terminal/serializers/storage.py:74
 msgid "Protocol"
 msgstr "协议"
 
@@ -1301,7 +1301,7 @@ msgstr "资产自动化任务"
 #: assets/models/automations/base.py:112 audits/models.py:177
 #: audits/serializers.py:49 ops/models/base.py:49 ops/models/job.py:183
 #: terminal/models/applet/applet.py:157 terminal/models/applet/host.py:108
-#: terminal/models/component/status.py:27 terminal/serializers/applet.py:18
+#: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
 #: terminal/serializers/applet_host.py:103 tickets/models/ticket/general.py:283
 #: tickets/serializers/super_ticket.py:13
 #: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:164
@@ -1496,23 +1496,23 @@ msgstr "元数据"
 msgid "Internal"
 msgstr "内置"
 
-#: assets/models/platform.py:71 assets/serializers/platform.py:89
+#: assets/models/platform.py:71 assets/serializers/platform.py:97
 msgid "Charset"
 msgstr "编码"
 
-#: assets/models/platform.py:73 assets/serializers/platform.py:117
+#: assets/models/platform.py:73 assets/serializers/platform.py:124
 msgid "Domain enabled"
 msgstr "启用网域"
 
-#: assets/models/platform.py:75 assets/serializers/platform.py:116
+#: assets/models/platform.py:75 assets/serializers/platform.py:123
 msgid "Su enabled"
 msgstr "启用账号切换"
 
-#: assets/models/platform.py:76 assets/serializers/platform.py:99
+#: assets/models/platform.py:76 assets/serializers/platform.py:106
 msgid "Su method"
 msgstr "账号切换方式"
 
-#: assets/models/platform.py:78 assets/serializers/platform.py:96
+#: assets/models/platform.py:78 assets/serializers/platform.py:104
 msgid "Automation"
 msgstr "自动化"
 
@@ -1531,7 +1531,7 @@ msgstr "资产中批量更新平台，不符合平台类型跳过的资产"
 msgid "Auto fill"
 msgstr "自动代填"
 
-#: assets/serializers/asset/common.py:134 assets/serializers/platform.py:94
+#: assets/serializers/asset/common.py:134 assets/serializers/platform.py:102
 #: authentication/serializers/connect_token_secret.py:28
 #: authentication/serializers/connect_token_secret.py:66
 #: perms/serializers/user_permission.py:25 xpack/plugins/cloud/models.py:99
@@ -1665,7 +1665,7 @@ msgstr "启用账号收集"
 msgid "Gather accounts method"
 msgstr "收集账号方式"
 
-#: assets/serializers/platform.py:118
+#: assets/serializers/platform.py:125
 msgid "Default Domain"
 msgstr "默认网域"
 
@@ -1802,7 +1802,7 @@ msgid "Change password"
 msgstr "改密"
 
 #: audits/const.py:34 settings/serializers/terminal.py:6
-#: terminal/models/applet/host.py:25 terminal/models/component/terminal.py:156
+#: terminal/models/applet/host.py:25 terminal/models/component/terminal.py:161
 #: terminal/serializers/session.py:48
 msgid "Terminal"
 msgstr "终端"
@@ -2375,7 +2375,7 @@ msgid "Please change your password"
 msgstr "请修改密码"
 
 #: authentication/models/connection_token.py:35
-#: terminal/serializers/storage.py:111
+#: terminal/serializers/storage.py:117
 msgid "Account name"
 msgstr "账号名称"
 
@@ -3155,7 +3155,7 @@ msgstr "仅导出选择项"
 msgid "Export filtered: %s"
 msgstr "导出搜素: %s"
 
-#: common/views/mixins.py:90
+#: common/views/mixins.py:89
 #, python-format
 msgid "User %s view/export secret"
 msgstr "用户 %s 查看/导出 了密码"
@@ -5421,7 +5421,7 @@ msgstr "作者"
 msgid "Tags"
 msgstr "标签"
 
-#: terminal/models/applet/applet.py:39 terminal/serializers/storage.py:157
+#: terminal/models/applet/applet.py:39 terminal/serializers/storage.py:163
 msgid "Hosts"
 msgstr "主机"
 
@@ -5489,8 +5489,8 @@ msgstr "Redis 端口"
 #: terminal/models/component/endpoint.py:29
 #: terminal/models/component/endpoint.py:98 terminal/serializers/endpoint.py:66
 #: terminal/serializers/storage.py:38 terminal/serializers/storage.py:50
-#: terminal/serializers/storage.py:80 terminal/serializers/storage.py:90
-#: terminal/serializers/storage.py:98
+#: terminal/serializers/storage.py:86 terminal/serializers/storage.py:96
+#: terminal/serializers/storage.py:104
 msgid "Endpoint"
 msgstr "端点"
 
@@ -5502,31 +5502,31 @@ msgstr "IP 组"
 msgid "Endpoint rule"
 msgstr "端点规则"
 
-#: terminal/models/component/status.py:14
+#: terminal/models/component/status.py:15
 msgid "Session Online"
 msgstr "在线会话"
 
-#: terminal/models/component/status.py:15
+#: terminal/models/component/status.py:16
 msgid "CPU Load"
 msgstr "CPU负载"
 
-#: terminal/models/component/status.py:16
+#: terminal/models/component/status.py:17
 msgid "Memory Used"
 msgstr "内存使用"
 
-#: terminal/models/component/status.py:17
+#: terminal/models/component/status.py:18
 msgid "Disk Used"
 msgstr "磁盘使用"
 
-#: terminal/models/component/status.py:18
+#: terminal/models/component/status.py:19
 msgid "Connections"
 msgstr "连接数"
 
-#: terminal/models/component/status.py:19
+#: terminal/models/component/status.py:20
 msgid "Threads"
 msgstr "线程数"
 
-#: terminal/models/component/status.py:20
+#: terminal/models/component/status.py:21
 msgid "Boot Time"
 msgstr "运行时间"
 
@@ -5535,28 +5535,28 @@ msgid "Default storage"
 msgstr "默认存储"
 
 #: terminal/models/component/storage.py:140
-#: terminal/models/component/terminal.py:85
+#: terminal/models/component/terminal.py:90
 msgid "Command storage"
 msgstr "命令存储"
 
 #: terminal/models/component/storage.py:200
-#: terminal/models/component/terminal.py:86
+#: terminal/models/component/terminal.py:91
 msgid "Replay storage"
 msgstr "录像存储"
 
-#: terminal/models/component/terminal.py:82
+#: terminal/models/component/terminal.py:87
 msgid "type"
 msgstr "类型"
 
-#: terminal/models/component/terminal.py:84 terminal/serializers/command.py:51
+#: terminal/models/component/terminal.py:89 terminal/serializers/command.py:51
 msgid "Remote Address"
 msgstr "远端地址"
 
-#: terminal/models/component/terminal.py:87
+#: terminal/models/component/terminal.py:92
 msgid "Application User"
 msgstr "应用用户"
 
-#: terminal/models/component/terminal.py:158
+#: terminal/models/component/terminal.py:163
 msgid "Can view terminal config"
 msgstr "可以查看终端配置"
 
@@ -5705,7 +5705,7 @@ msgstr ""
 "建议填写内网地址，否则填写当前站点 URL<br>例如：https://172.16.10.110 or "
 "https://dev.jumpserver.com"
 
-#: terminal/serializers/applet_host.py:42 terminal/serializers/storage.py:168
+#: terminal/serializers/applet_host.py:42 terminal/serializers/storage.py:174
 msgid "Ignore Certificate Verification"
 msgstr "忽略证书认证"
 
@@ -5824,47 +5824,51 @@ msgstr "Access key ID(AK)"
 msgid "Access key secret"
 msgstr "Access key secret(SK)"
 
-#: terminal/serializers/storage.py:65 xpack/plugins/cloud/models.py:209
+#: terminal/serializers/storage.py:53
+msgid "Without secret"
+msgstr "无密码"
+
+#: terminal/serializers/storage.py:71 xpack/plugins/cloud/models.py:209
 msgid "Region"
 msgstr "地域"
 
-#: terminal/serializers/storage.py:109
+#: terminal/serializers/storage.py:115
 msgid "Container name"
 msgstr "容器名称"
 
-#: terminal/serializers/storage.py:112
+#: terminal/serializers/storage.py:118
 msgid "Account key"
 msgstr "账号密钥"
 
-#: terminal/serializers/storage.py:115
+#: terminal/serializers/storage.py:121
 msgid "Endpoint suffix"
 msgstr "端点后缀"
 
-#: terminal/serializers/storage.py:135
+#: terminal/serializers/storage.py:141
 msgid "The address format is incorrect"
 msgstr "地址格式不正确"
 
-#: terminal/serializers/storage.py:142
+#: terminal/serializers/storage.py:148
 msgid "Host invalid"
 msgstr "主机无效"
 
-#: terminal/serializers/storage.py:145
+#: terminal/serializers/storage.py:151
 msgid "Port invalid"
 msgstr "端口无效"
 
-#: terminal/serializers/storage.py:160
+#: terminal/serializers/storage.py:166
 msgid "Index by date"
 msgstr "按日期建索引"
 
-#: terminal/serializers/storage.py:161
+#: terminal/serializers/storage.py:167
 msgid "Whether to create an index by date"
 msgstr "是否根据日期动态建立索引"
 
-#: terminal/serializers/storage.py:164
+#: terminal/serializers/storage.py:170
 msgid "Index"
 msgstr "索引"
 
-#: terminal/serializers/storage.py:166
+#: terminal/serializers/storage.py:172
 msgid "Doc type"
 msgstr "文档类型"
 

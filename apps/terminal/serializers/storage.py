@@ -50,6 +50,12 @@ class ReplayStorageTypeS3Serializer(ReplayStorageTypeBaseSerializer):
         required=True, max_length=1024, label=_('Endpoint'), help_text=_(endpoint_help_text),
         allow_null=True,
     )
+    WITHOUT_SECRET = serializers.BooleanField(default=False, label=_('Without secret'))
+
+    def validate(self, attrs):
+        if attrs.get('WITHOUT_SECRET', False):
+            attrs['ACCESS_KEY'] = attrs['SECRET_KEY'] = None
+        return attrs
 
 
 class ReplayStorageTypeCephSerializer(ReplayStorageTypeBaseSerializer):
