@@ -6,9 +6,8 @@ from django.db.transaction import atomic
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from accounts.const import SecretType
 from accounts.models import Account
-from accounts.serializers import AuthValidateMixin, AccountSerializerCreateValidateMixin
+from accounts.serializers import AccountSerializer
 from common.serializers import WritableNestedModelSerializer, SecretReadableMixin, CommonModelSerializer
 from common.serializers.fields import LabeledChoiceField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
@@ -59,48 +58,18 @@ class AssetPlatformSerializer(serializers.ModelSerializer):
         }
 
 
-class AssetAccountSerializer(
-    AuthValidateMixin,
-    AccountSerializerCreateValidateMixin,
-    CommonModelSerializer
-):
+class AssetAccountSerializer(AccountSerializer):
     add_org_fields = False
-    push_now = serializers.BooleanField(
-        default=False, label=_("Push now"), write_only=True
-    )
-    template = serializers.BooleanField(
-        default=False, label=_("Template"), write_only=True
-    )
-    name = serializers.CharField(max_length=128, required=False, label=_("Name"))
-    secret_type = LabeledChoiceField(
-        choices=SecretType.choices, default=SecretType.PASSWORD,
-        required=False, label=_('Secret type')
-    )
+    asset = serializers.PrimaryKeyRelatedField(queryset=Asset.objects, required=False, write_only=True)
 
-    class Meta:
-        model = Account
-        fields_mini = [
-            'id', 'name', 'username', 'privileged',
-            'is_active', 'version', 'secret_type',
+    class Meta(AccountSerializer.Meta):
+        fields = [
+            f for f in AccountSerializer.Meta.fields
+            if f not in ['spec_info']
         ]
-        fields_write_only = [
-            'secret', 'passphrase', 'push_now', 'template'
-        ]
-        fields = fields_mini + fields_write_only
         extra_kwargs = {
-            'secret': {'write_only': True},
+            **AccountSerializer.Meta.extra_kwargs,
         }
-
-    def validate_push_now(self, value):
-        request = self.context['request']
-        if not request.user.has_perms('accounts.push_account'):
-            return False
-        return value
-
-    def validate_name(self, value):
-        if not value:
-            value = self.initial_data.get('username')
-        return value
 
 
 class AccountSecretSerializer(SecretReadableMixin, CommonModelSerializer):
@@ -132,7 +101,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
     labels = AssetLabelSerializer(many=True, required=False, label=_('Label'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'), default=())
-    accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, write_only=True, label=_('Account'))
+    accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, label=_('Account'))
     nodes_display = serializers.ListField(read_only=False, required=False, label=_("Node path"))
 
     class Meta:
@@ -280,8 +249,11 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         if not accounts_data:
             return
         for data in accounts_data:
-            data['asset'] = asset
-            AssetAccountSerializer().create(data)
+            data['asset'] = asset.id
+
+        s = AssetAccountSerializer(data=accounts_data, many=True)
+        s.is_valid(raise_exception=True)
+        s.save()
 
     @atomic
     def create(self, validated_data):

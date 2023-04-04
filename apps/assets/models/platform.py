@@ -15,6 +15,7 @@ class PlatformProtocol(models.Model):
     primary = models.BooleanField(default=False, verbose_name=_('Primary'))
     required = models.BooleanField(default=False, verbose_name=_('Required'))
     default = models.BooleanField(default=False, verbose_name=_('Default'))
+    public = models.BooleanField(default=True, verbose_name=_('Public'))
     setting = models.JSONField(verbose_name=_('Setting'), default=dict)
     platform = models.ForeignKey('Platform', on_delete=models.CASCADE, related_name='protocols')
 

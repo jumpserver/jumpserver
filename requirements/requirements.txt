@@ -65,6 +65,7 @@ pyjwkest==1.4.2
 jsonfield2==4.0.0.post0
 geoip2==4.5.0
 ipip-ipdb==1.6.1
+pywinrm==0.4.3
 # Django environment
 Django==3.2.17
 django-bootstrap3==14.2.0
@@ -121,7 +122,7 @@ django-mysql==3.9.0
 django-redis==5.2.0
 python-redis-lock==3.7.0
 pyOpenSSL==22.0.0
-redis==4.5.3
+redis==4.5.4
 pyOpenSSL==22.0.0
 pymongo==4.2.0
 # Debug

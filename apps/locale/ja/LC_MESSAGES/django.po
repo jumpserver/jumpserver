@@ -292,7 +292,7 @@ msgid "Trigger mode"
 msgstr "トリガーモード"
 
 #: accounts/models/automations/backup_account.py:97 audits/models.py:172
-#: terminal/models/session/sharing.py:107 xpack/plugins/cloud/models.py:168
+#: terminal/models/session/sharing.py:111 xpack/plugins/cloud/models.py:168
 msgid "Reason"
 msgstr "理由"
 
@@ -432,7 +432,13 @@ msgstr "最終ログインアドレス"
 msgid "Gather account automation"
 msgstr "自動収集アカウント"
 
-#: accounts/models/automations/gather_account.py:39
+#: accounts/models/automations/gather_account.py:56
+#, fuzzy
+#| msgid "Is service account"
+msgid "Is sync account"
+msgstr "サービスアカウントです"
+
+#: accounts/models/automations/gather_account.py:71
 #: accounts/tasks/gather_accounts.py:29
 msgid "Gather asset accounts"
 msgstr "アカウントのコレクション"
@@ -683,7 +689,7 @@ msgstr "自動タスク実行履歴"
 #: accounts/serializers/automations/change_secret.py:154 audits/const.py:52
 #: audits/models.py:54 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:18 ops/const.py:56 ops/serializers/celery.py:39
-#: terminal/const.py:59 terminal/models/session/sharing.py:103
+#: terminal/const.py:59 terminal/models/session/sharing.py:107
 #: tickets/views/approve.py:114
 msgid "Success"
 msgstr "成功"
@@ -1679,6 +1685,12 @@ msgstr "アカウントの収集方法"
 msgid "Default Domain"
 msgstr "デフォルト ドメイン"
 
+#: assets/serializers/platform.py:137
+#, fuzzy
+#| msgid "Protocol is required: {}"
+msgid "Protocols is required"
+msgstr "プロトコルが必要です: {}"
+
 #: assets/signal_handlers/asset.py:26 assets/tasks/ping.py:35
 msgid "Test assets connectivity "
 msgstr "アセット接続のテスト。"
@@ -1853,7 +1865,7 @@ msgid "Job audit log"
 msgstr "ジョブ監査ログ"
 
 #: audits/models.py:46 audits/models.py:73 audits/models.py:144
-#: terminal/models/session/session.py:39 terminal/models/session/sharing.py:95
+#: terminal/models/session/session.py:39 terminal/models/session/sharing.py:99
 msgid "Remote addr"
 msgstr "リモートaddr"
 
@@ -2685,7 +2697,7 @@ msgid "request new one"
 msgstr "新しいものを要求する"
 
 #: authentication/templates/authentication/_msg_reset_password_code.html:12
-#: terminal/models/session/sharing.py:25 terminal/models/session/sharing.py:79
+#: terminal/models/session/sharing.py:25 terminal/models/session/sharing.py:83
 #: users/forms/profile.py:104 users/templates/users/forgot_password.html:65
 msgid "Verify code"
 msgstr "コードの確認"
@@ -3448,7 +3460,7 @@ msgstr "クワーグ"
 msgid "State"
 msgstr "状態"
 
-#: ops/models/celery.py:61 terminal/models/session/sharing.py:110
+#: ops/models/celery.py:61 terminal/models/session/sharing.py:114
 #: tickets/const.py:25
 msgid "Finished"
 msgstr "終了"
@@ -5246,8 +5258,8 @@ msgstr "期限切れです。"
 #, python-format
 msgid ""
 "\n"
-"                Your password has expired, please click <a "
-"href=\"%(user_password_update_url)s\"> this link </a> update password.\n"
+"                Your password has expired, please click <a href="
+"\"%(user_password_update_url)s\"> this link </a> update password.\n"
 "            "
 msgstr ""
 "\n"
@@ -5268,34 +5280,34 @@ msgid ""
 "            "
 msgstr ""
 "\n"
-"                クリックしてください <a "
-"href=\"%(user_password_update_url)s\"> リンク </a> パスワードの更新\n"
+"                クリックしてください <a href=\"%(user_password_update_url)s"
+"\"> リンク </a> パスワードの更新\n"
 "        "
 
 #: templates/_message.html:43
 #, python-format
 msgid ""
 "\n"
-"        Your information was incomplete. Please click <a "
-"href=\"%(first_login_url)s\"> this link </a>to complete your information.\n"
+"        Your information was incomplete. Please click <a href="
+"\"%(first_login_url)s\"> this link </a>to complete your information.\n"
 "        "
 msgstr ""
 "\n"
-"                あなたの情報が不完全なので、クリックしてください。 <a "
-"href=\"%(first_login_url)s\"> リンク </a> 補完\n"
+"                あなたの情報が不完全なので、クリックしてください。 <a href="
+"\"%(first_login_url)s\"> リンク </a> 補完\n"
 "                "
 
 #: templates/_message.html:56
 #, python-format
 msgid ""
 "\n"
-"        Your ssh public key not set or expired. Please click <a "
-"href=\"%(user_pubkey_update)s\"> this link </a>to update\n"
+"        Your ssh public key not set or expired. Please click <a href="
+"\"%(user_pubkey_update)s\"> this link </a>to update\n"
 "        "
 msgstr ""
 "\n"
-"                SSHキーが設定されていないか無効になっている場合は、 <a "
-"href=\"%(user_pubkey_update)s\"> リンク </a> 更新\n"
+"                SSHキーが設定されていないか無効になっている場合は、 <a href="
+"\"%(user_pubkey_update)s\"> リンク </a> 更新\n"
 "        "
 
 #: templates/_mfa_login_field.html:28
@@ -5438,7 +5450,7 @@ msgid "Output"
 msgstr "出力"
 
 #: terminal/backends/command/models.py:24 terminal/models/session/replay.py:9
-#: terminal/models/session/sharing.py:18 terminal/models/session/sharing.py:77
+#: terminal/models/session/sharing.py:18 terminal/models/session/sharing.py:81
 #: terminal/templates/terminal/_msg_command_alert.html:10
 #: tickets/models/ticket/command_confirm.py:15
 msgid "Session"
@@ -5478,6 +5490,14 @@ msgstr "一致しない"
 #: terminal/const.py:66
 msgid "Tunnel"
 msgstr ""
+
+#: terminal/const.py:71
+msgid "Read Only"
+msgstr "読み取り専用"
+
+#: terminal/const.py:72
+msgid "Writable"
+msgstr "書き込み可能"
 
 #: terminal/exceptions.py:8
 msgid "Bulk create not support"
@@ -5654,7 +5674,7 @@ msgstr "セッション再生をダウンロードできます"
 msgid "Account id"
 msgstr "アカウント ID"
 
-#: terminal/models/session/session.py:37 terminal/models/session/sharing.py:100
+#: terminal/models/session/session.py:37 terminal/models/session/sharing.py:104
 msgid "Login from"
 msgstr "ログイン元"
 
@@ -5690,43 +5710,48 @@ msgstr "セッションアクションのパーマを検証できます"
 msgid "Expired time (min)"
 msgstr "期限切れ時間 (分)"
 
-#: terminal/models/session/sharing.py:36 terminal/models/session/sharing.py:82
+#: terminal/models/session/sharing.py:35 terminal/serializers/sharing.py:20
+#: terminal/serializers/sharing.py:52
+msgid "Action permission"
+msgstr "アクションパーミッション"
+
+#: terminal/models/session/sharing.py:40 terminal/models/session/sharing.py:86
 msgid "Session sharing"
 msgstr "セッション共有"
 
-#: terminal/models/session/sharing.py:38
+#: terminal/models/session/sharing.py:42
 msgid "Can add super session sharing"
 msgstr "スーパーセッション共有を追加できます"
 
-#: terminal/models/session/sharing.py:65
+#: terminal/models/session/sharing.py:69
 msgid "Link not active"
 msgstr "リンクがアクティブでない"
 
-#: terminal/models/session/sharing.py:67
+#: terminal/models/session/sharing.py:71
 msgid "Link expired"
 msgstr "リンク期限切れ"
 
-#: terminal/models/session/sharing.py:69
+#: terminal/models/session/sharing.py:73
 msgid "User not allowed to join"
 msgstr "ユーザーはセッションに参加できません"
 
-#: terminal/models/session/sharing.py:86 terminal/serializers/sharing.py:59
+#: terminal/models/session/sharing.py:90 terminal/serializers/sharing.py:71
 msgid "Joiner"
 msgstr "ジョイナー"
 
-#: terminal/models/session/sharing.py:89
+#: terminal/models/session/sharing.py:93
 msgid "Date joined"
 msgstr "参加日"
 
-#: terminal/models/session/sharing.py:92
+#: terminal/models/session/sharing.py:96
 msgid "Date left"
 msgstr "日付が残っています"
 
-#: terminal/models/session/sharing.py:115
+#: terminal/models/session/sharing.py:119
 msgid "Session join record"
 msgstr "セッション参加記録"
 
-#: terminal/models/session/sharing.py:131
+#: terminal/models/session/sharing.py:135
 msgid "Invalid verification code"
 msgstr "検証コードが無効"
 
