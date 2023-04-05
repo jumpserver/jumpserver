@@ -115,6 +115,7 @@ class UserProfileSerializer(UserSerializer):
     MFA_LEVEL_CHOICES = (
         (0, _('Disable')),
         (1, _('Enable')),
+        (2, _("Force enable")),
     )
     public_key_comment = serializers.CharField(
         source='get_public_key_comment', required=False, read_only=True, max_length=128
