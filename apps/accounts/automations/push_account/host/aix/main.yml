@@ -8,12 +8,12 @@
       ansible.builtin.user:
         name: "{{ account.username }}"
         shell: "{{ kwargs.shell }}"
-        home: "{{ kwargs.home }}"
+        home: "{{ '/home/' + account.username }}"
         groups: "{{ kwargs.groups }}"
         expires: -1
         state: present
 
-    - name: Add group
+    - name: "Add {{ account.username }} group"
       ansible.builtin.group:
         name: "{{ account.username }}"
         state: present
@@ -22,16 +22,21 @@
       ansible.builtin.stat:
         path: "{{ '/home/' + account.username }}"
       register: home_existed
-      when: kwargs.home
 
     - name: Set home dir permission
       ansible.builtin.file:
-        name: "{{ account.username }}"
-        state: present
-      register: home_existed
+        path: "{{ '/home/' + account.username }}"
+        owner: "{{ account.username }}"
+        group: "{{ account.username }}"
+        mode: "0700"
       when:
-      - kwargs.home
-      - home_existed.stat.exists == true
+        - home_existed.stat.exists == true
+
+    - name: Add user groups
+      ansible.builtin.user:
+        name: "{{ account.username }}"
+        groups: "{{ kwargs.groups }}"
+      when: kwargs.groups
 
     - name: Push user password
       ansible.builtin.user:
@@ -60,10 +65,9 @@
       ansible.builtin.lineinfile:
         dest: /etc/sudoers
         state: present
-        regexp: ^{0} ALL=
+        regexp: "^{{ account.username }} ALL="
         line: "{{ account.username + ' ALL=(ALL) NOPASSWD: ' + kwargs.sudo }}"
         validate: visudo -cf %s
-      register: home_existed
       when:
         - kwargs.sudo
 

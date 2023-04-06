@@ -1,3 +1,4 @@
+from rest_framework import generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -5,10 +6,11 @@ from assets.const import AllTypes
 from assets.models import Platform, PlatformAutomation, Node, Asset
 from assets.serializers import PlatformSerializer
 from common.api import JMSModelViewSet
+from common.permissions import IsValidUser
 from common.serializers import GroupedChoiceSerializer
 from orgs.mixins.generics import RetrieveUpdateAPIView
 
-__all__ = ['AssetPlatformViewSet', 'PlatformAutomationParamsApi']
+__all__ = ['AssetPlatformViewSet', 'PlatformAutomationParamsApi', 'PlatformAutomationParamsEnabledApi']
 
 
 class AssetPlatformViewSet(JMSModelViewSet):
@@ -43,6 +45,7 @@ class AssetPlatformViewSet(JMSModelViewSet):
                 request, message={"detail": "Internal platform"}
             )
         return super().check_object_permissions(request, obj)
+
     @action(methods=['post'], detail=False, url_path='filter-nodes-assets')
     def filter_nodes_assets(self, request, *args, **kwargs):
         node_ids = request.data.get('node_ids', [])
@@ -88,3 +91,12 @@ class PlatformAutomationParamsApi(RetrieveUpdateAPIView):
         instance.params.setdefault(self.ansible_method_id, {}).update(validated_data)
         instance.save(update_fields=['params'])
         return Response(status=200)
+
+
+class PlatformAutomationParamsEnabledApi(generics.ListAPIView):
+    permission_classes = (IsValidUser,)
+
+    def list(self, request, *args, **kwargs):
+        platform_automation_methods = AllTypes.get_automation_methods()
+        data = {i['id']: bool(i['serializer']) for i in platform_automation_methods}
+        return Response(data)
