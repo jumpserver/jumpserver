@@ -53,7 +53,7 @@ class Status(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
-        self.terminal.set_alive(ttl=120)
+        self.terminal.set_alive(ttl=60 * 3)
         return self.save_to_cache()
 
     def save_to_cache(self):
