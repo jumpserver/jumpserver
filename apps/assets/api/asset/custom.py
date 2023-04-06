@@ -1,5 +1,5 @@
 from assets.models import Custom, Asset
-from assets.serializers import WebSerializer
+from assets.serializers import CustomSerializer
 
 from .asset import AssetViewSet
 
@@ -12,5 +12,5 @@ class CustomViewSet(AssetViewSet):
 
     def get_serializer_classes(self):
         serializer_classes = super().get_serializer_classes()
-        serializer_classes['default'] = WebSerializer
+        serializer_classes['default'] = CustomSerializer
         return serializer_classes

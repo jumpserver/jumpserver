@@ -5,7 +5,8 @@ from accounts.const import SecretType
 from accounts.models import Account
 from acls.models import CommandGroup, CommandFilterACL
 from assets.models import Asset, Platform, Gateway, Domain
-from assets.serializers import PlatformSerializer, AssetProtocolsSerializer
+from assets.serializers.asset import AssetProtocolsSerializer
+from assets.serializers.platform import PlatformSerializer
 from common.serializers.fields import LabeledChoiceField
 from common.serializers.fields import ObjectRelatedField
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
@@ -30,14 +31,12 @@ class _ConnectionTokenAssetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Asset
         fields = [
-            'id', 'name', 'address', 'protocols',
-            'category', 'type', 'org_id', 'spec_info',
-            'secret_info',
+            'id', 'name', 'address', 'protocols', 'category',
+            'type', 'org_id', 'spec_info', 'secret_info',
         ]
 
 
 class _SimpleAccountSerializer(serializers.ModelSerializer):
-    """ Account """
     secret_type = LabeledChoiceField(choices=SecretType.choices, required=False, label=_('Secret type'))
 
     class Meta:
@@ -46,20 +45,18 @@ class _SimpleAccountSerializer(serializers.ModelSerializer):
 
 
 class _ConnectionTokenAccountSerializer(serializers.ModelSerializer):
-    """ Account """
     su_from = _SimpleAccountSerializer(required=False, label=_('Su from'))
     secret_type = LabeledChoiceField(choices=SecretType.choices, required=False, label=_('Secret type'))
 
     class Meta:
         model = Account
         fields = [
-           'id', 'name', 'username', 'secret_type', 'secret', 'su_from', 'privileged'
+            'id', 'name', 'username', 'secret_type',
+            'secret', 'su_from', 'privileged'
         ]
 
 
 class _ConnectionTokenGatewaySerializer(serializers.ModelSerializer):
-    """ Gateway """
-
     account = _SimpleAccountSerializer(
         required=False, source='select_account', read_only=True
     )
@@ -85,7 +82,8 @@ class _ConnectionTokenCommandFilterACLSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommandFilterACL
         fields = [
-            'id', 'name', 'command_groups', 'action', 'reviewers', 'priority', 'is_active'
+            'id', 'name', 'command_groups', 'action',
+            'reviewers', 'priority', 'is_active'
         ]
 
 
@@ -136,8 +134,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
             'id', 'value', 'user', 'asset', 'account',
             'platform', 'command_filter_acls', 'protocol',
             'domain', 'gateway', 'actions', 'expire_at',
-            'from_ticket',
-            'expire_now', 'connect_method',
+            'from_ticket', 'expire_now', 'connect_method',
         ]
         extra_kwargs = {
             'value': {'read_only': True},

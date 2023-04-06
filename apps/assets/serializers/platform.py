@@ -41,10 +41,6 @@ class ProtocolSettingSerializer(serializers.Serializer):
     # Redis
     auth_username = serializers.BooleanField(default=False, label=_("Auth with username"))
 
-    def get_fields(self):
-        fields = super().get_fields()
-        return fields
-
 
 class PlatformAutomationSerializer(serializers.ModelSerializer):
     class Meta:

@@ -1,9 +1,9 @@
-from rest_framework.serializers import ValidationError
 from django.utils.translation import ugettext_lazy as _
+from rest_framework.serializers import ValidationError
 
 from assets.models import Database
+from assets.serializers.gateway import GatewayWithAccountSecretSerializer
 from .common import AssetSerializer
-from ..gateway import GatewayWithAccountSecretSerializer
 
 __all__ = ['DatabaseSerializer', 'DatabaseWithGatewaySerializer']
 
