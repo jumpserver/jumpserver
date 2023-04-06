@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 example_info = [
-    {"name": "test", "label": "测试", "required": False, "default": "Yes", "type": "str"},
+    {"name": "name", "label": "姓名", "required": False, "default": "老广", "type": "str"},
     {"name": "age", "label": "年龄", "required": False, "default": 18, "type": "int"},
 ]
 
@@ -10,6 +10,7 @@ type_field_map = {
     "int": serializers.IntegerField,
     "bool": serializers.BooleanField,
     "text": serializers.CharField,
+    "choice": serializers.ChoiceField,
 }
 
 
@@ -19,24 +20,36 @@ def set_default_if_need(data, i):
 
     if not data.get('label'):
         data['label'] = field_name
+    return data
 
 
-def set_default_by_type(tp, field_info):
+def set_default_by_type(tp, data, field_info):
     if tp == 'str':
-        field_info['max_length'] = 4096
+        data['max_length'] = 4096
+    elif tp == 'choice':
+        choices = field_info.pop('choices', [])
+        if isinstance(choices, str):
+            choices = choices.split(',')
+        choices = [
+            (c, c.title()) if not isinstance(c, (tuple, list)) else c
+            for c in choices
+        ]
+        data['choices'] = choices
+    return data
 
 
 def create_serializer_class(serializer_name, fields_info):
     serializer_fields = {}
-    fields_name = ['name', 'label', 'required', 'default', 'type', 'help_text']
+    fields_name = ['name', 'label', 'default', 'type', 'help_text']
 
     for i, field_info in enumerate(fields_info):
         data = {k: field_info.get(k) for k in fields_name}
         field_type = data.pop('type', 'str')
-        set_default_by_type(field_type, data)
-        set_default_if_need(data, i)
+        data = set_default_by_type(field_type, data, field_info)
+        data = set_default_if_need(data, i)
         field_name = data.pop('name')
         field_class = type_field_map.get(field_type, serializers.CharField)
+        print("Data: ", data)
         serializer_fields[field_name] = field_class(**data)
 
     return type(serializer_name, (serializers.Serializer,), serializer_fields)

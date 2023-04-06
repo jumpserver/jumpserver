@@ -12,7 +12,7 @@ class Category(ChoicesMixin, models.TextChoices):
     DATABASE = 'database', _("Database")
     CLOUD = 'cloud', _("Cloud service")
     WEB = 'web', _("Web")
-    CUSTOM = 'custom', _("Custom")
+    CUSTOM = 'custom', _("Custom asset")
 
     @classmethod
     def filter_choices(cls, category):
