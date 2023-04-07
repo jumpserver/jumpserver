@@ -1,5 +1,3 @@
-from rest_framework import serializers
-
 from accounts.const import AutomationTypes
 from accounts.models import PushAccountAutomation
 from .change_secret import (
@@ -9,7 +7,6 @@ from .change_secret import (
 
 
 class PushAccountAutomationSerializer(ChangeSecretAutomationSerializer):
-    is_params = serializers.BooleanField(read_only=True)
 
     class Meta(ChangeSecretAutomationSerializer.Meta):
         model = PushAccountAutomation

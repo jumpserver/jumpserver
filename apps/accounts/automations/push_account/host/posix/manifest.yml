@@ -8,14 +8,17 @@ method: push_account
 fields:
   - name: sudo
     type: str
-    required: true
+    required: false
     style: {'base_template': 'textarea.html'}
     label: 'Sudo'
+    allow_null: true
+    default: '/bin/whoami'
   - name: shell
     type: str
-    required: true
+    required: false
     max_length: 64
     label: 'Shell'
+    default: '/bin/bash'
   - name: groups
     type: str
     required: false

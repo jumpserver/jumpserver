@@ -22,12 +22,17 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
 
     def get_push_kwargs(self, automation):
         method_attr = '{}_method'.format(self.__class__.method_type())
-        automation_params = automation.params.get(method_attr, {})
-        serializer = self.method_id_meta_mapper[method_attr]['serializer']
+        method_id = getattr(automation, method_attr)
+        automation_params = automation.params.get(method_id, {})
+        # TODO 兼容一下 posix 和 aix
+        method_id = 'push_account_posix' if method_id == 'push_account_aix' else method_id
+        serializer = self.method_id_meta_mapper[method_id]['serializer']
 
         if serializer is None:
             return {}
-        params = serializer(self.params.get(method_attr, {})).data
+
+        data = self.params.get(method_id, {})
+        params = serializer(data).data
         return {k: automation_params[k] if not params[k] else params[k] for k in params}
 
     def host_callback(self, host, asset=None, account=None, automation=None, path_dir=None, **kwargs):

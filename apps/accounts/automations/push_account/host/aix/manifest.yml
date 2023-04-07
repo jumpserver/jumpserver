@@ -10,7 +10,7 @@ fields:
     required: false
     style: { 'base_template': 'textarea.html' }
     label: 'Sudo'
-    default: "/bin/whoami"
+    default: '/bin/whoami'
   - name: shell
     type: str
     required: false
