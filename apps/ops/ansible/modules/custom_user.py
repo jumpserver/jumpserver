@@ -101,7 +101,6 @@ def main():
         module.fail_json(
             msg='No command found, please go to the platform details to add'
         )
-    # module.fail_json(msg='Commands: %s' % commands)
     err = ssh_client.execute(commands)
     if err:
         module.fail_json(
