@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-06 17:36+0800\n"
+"POT-Creation-Date: 2023-04-07 13:57+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -182,7 +182,7 @@ msgstr "作成のみ"
 #: accounts/serializers/automations/change_secret.py:111
 #: accounts/serializers/automations/change_secret.py:131
 #: acls/models/base.py:100 acls/serializers/base.py:56
-#: assets/models/asset/common.py:92 assets/models/asset/common.py:267
+#: assets/models/asset/common.py:92 assets/models/asset/common.py:268
 #: assets/models/cmd_filter.py:36 assets/serializers/domain.py:19
 #: assets/serializers/label.py:27 audits/models.py:48
 #: authentication/models/connection_token.py:33
@@ -218,7 +218,7 @@ msgstr "ソース"
 #: accounts/serializers/automations/change_secret.py:112
 #: accounts/serializers/automations/change_secret.py:132
 #: acls/models/base.py:102 acls/serializers/base.py:57
-#: assets/serializers/asset/common.py:104 assets/serializers/gateway.py:28
+#: assets/serializers/asset/common.py:107 assets/serializers/gateway.py:28
 #: audits/models.py:49 ops/models/base.py:18
 #: perms/models/asset_permission.py:70 perms/serializers/permission.py:39
 #: terminal/backends/command/models.py:21 terminal/models/session/session.py:34
@@ -477,7 +477,7 @@ msgstr "アカウントの確認"
 #: assets/models/cmd_filter.py:21 assets/models/domain.py:18
 #: assets/models/group.py:20 assets/models/label.py:18
 #: assets/models/platform.py:13 assets/models/platform.py:65
-#: assets/serializers/asset/common.py:124 assets/serializers/platform.py:93
+#: assets/serializers/asset/common.py:128 assets/serializers/platform.py:93
 #: assets/serializers/platform.py:184
 #: authentication/serializers/connect_token_secret.py:101 ops/mixin.py:21
 #: ops/models/adhoc.py:21 ops/models/celery.py:15 ops/models/celery.py:57
@@ -563,7 +563,7 @@ msgstr "ユーザー ポリシー"
 
 #: accounts/serializers/account/account.py:153 applications/models.py:11
 #: assets/models/label.py:21 assets/models/platform.py:66
-#: assets/serializers/asset/common.py:100 assets/serializers/cagegory.py:8
+#: assets/serializers/asset/common.py:103 assets/serializers/cagegory.py:8
 #: assets/serializers/platform.py:111 assets/serializers/platform.py:185
 #: perms/serializers/user_permission.py:26 settings/models.py:35
 #: tickets/models/ticket/apply_application.py:13
@@ -575,7 +575,7 @@ msgstr "カテゴリ"
 #: acls/serializers/command_acl.py:18 applications/models.py:14
 #: assets/models/_user.py:50 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:67
-#: assets/serializers/asset/common.py:101 assets/serializers/platform.py:95
+#: assets/serializers/asset/common.py:104 assets/serializers/platform.py:95
 #: assets/serializers/platform.py:110 audits/serializers.py:48
 #: authentication/serializers/connect_token_secret.py:114 ops/models/job.py:102
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:31
@@ -688,7 +688,7 @@ msgid "Key password"
 msgstr "キーパスワード"
 
 #: accounts/serializers/account/base.py:80
-#: assets/serializers/asset/common.py:279
+#: assets/serializers/asset/common.py:298
 msgid "Spec info"
 msgstr "特別情報"
 
@@ -1060,7 +1060,7 @@ msgid "Device"
 msgstr "インターネット機器"
 
 #: assets/const/category.py:12 assets/models/asset/database.py:9
-#: assets/models/asset/database.py:24 assets/serializers/asset/common.py:88
+#: assets/models/asset/database.py:24 assets/serializers/asset/common.py:91
 msgid "Database"
 msgstr "データベース"
 
@@ -1073,10 +1073,10 @@ msgstr "クラウド サービス"
 msgid "Web"
 msgstr "Web"
 
-#: assets/const/category.py:15 assets/models/asset/custom.py:8
+#: assets/const/category.py:15
 #, fuzzy
 #| msgid "Custom user"
-msgid "Custom asset"
+msgid "Custom type"
 msgstr "カスタムユーザー"
 
 #: assets/const/cloud.py:7
@@ -1130,7 +1130,7 @@ msgid "Basic"
 msgstr "基本"
 
 #: assets/const/web.py:61 assets/models/asset/web.py:13
-#: assets/serializers/asset/common.py:96 assets/serializers/platform.py:40
+#: assets/serializers/asset/common.py:99 assets/serializers/platform.py:40
 msgid "Script"
 msgstr "脚本"
 
@@ -1259,7 +1259,7 @@ msgstr "クラウド サービス"
 msgid "Port"
 msgstr "ポート"
 
-#: assets/models/asset/common.py:103 assets/serializers/asset/common.py:125
+#: assets/models/asset/common.py:103 assets/serializers/asset/common.py:129
 msgid "Address"
 msgstr "アドレス"
 
@@ -1280,28 +1280,42 @@ msgstr "ドメイン"
 msgid "Labels"
 msgstr "ラベル"
 
-#: assets/models/asset/common.py:111 assets/serializers/asset/custom.py:14
-#: assets/serializers/asset/host.py:27
-msgid "Info"
-msgstr "情報"
+#: assets/models/asset/common.py:111
+#, fuzzy
+#| msgid "Gather asset hardware info"
+msgid "Gathered info"
+msgstr "資産ハードウェア情報の収集"
 
-#: assets/models/asset/common.py:270
+#: assets/models/asset/common.py:112 assets/serializers/asset/common.py:109
+#: assets/serializers/asset/common.py:179
+#, fuzzy
+#| msgid "Auto info"
+msgid "Custom info"
+msgstr "自動情報"
+
+#: assets/models/asset/common.py:271
 msgid "Can refresh asset hardware info"
 msgstr "資産ハードウェア情報を更新できます"
 
-#: assets/models/asset/common.py:271
+#: assets/models/asset/common.py:272
 msgid "Can test asset connectivity"
 msgstr "資産接続をテストできます"
 
-#: assets/models/asset/common.py:272
+#: assets/models/asset/common.py:273
 msgid "Can match asset"
 msgstr "アセットを一致させることができます"
 
-#: assets/models/asset/common.py:273
+#: assets/models/asset/common.py:274
 msgid "Can change asset nodes"
 msgstr "資産ノードを変更できます"
 
-#: assets/models/asset/database.py:10 assets/serializers/asset/common.py:89
+#: assets/models/asset/custom.py:8
+#, fuzzy
+#| msgid "Custom user"
+msgid "Custom asset"
+msgstr "カスタムユーザー"
+
+#: assets/models/asset/database.py:10 assets/serializers/asset/common.py:92
 #: settings/serializers/email.py:37
 msgid "Use SSL"
 msgstr "SSLの使用"
@@ -1318,7 +1332,7 @@ msgstr "クライアント証明書"
 msgid "Client key"
 msgstr "クライアントキー"
 
-#: assets/models/asset/database.py:14 assets/serializers/asset/common.py:90
+#: assets/models/asset/database.py:14 assets/serializers/asset/common.py:93
 msgid "Allow invalid cert"
 msgstr "証明書チェックを無視"
 
@@ -1326,23 +1340,23 @@ msgstr "証明書チェックを無視"
 msgid "Autofill"
 msgstr "自動充填"
 
-#: assets/models/asset/web.py:10 assets/serializers/asset/common.py:93
+#: assets/models/asset/web.py:10 assets/serializers/asset/common.py:96
 #: assets/serializers/platform.py:32
 msgid "Username selector"
 msgstr "ユーザー名ピッカー"
 
-#: assets/models/asset/web.py:11 assets/serializers/asset/common.py:94
+#: assets/models/asset/web.py:11 assets/serializers/asset/common.py:97
 #: assets/serializers/platform.py:35
 msgid "Password selector"
 msgstr "パスワードセレクター"
 
-#: assets/models/asset/web.py:12 assets/serializers/asset/common.py:95
+#: assets/models/asset/web.py:12 assets/serializers/asset/common.py:98
 #: assets/serializers/platform.py:38
 msgid "Submit selector"
 msgstr "ボタンセレクターを確認する"
 
 #: assets/models/automations/base.py:17 assets/models/cmd_filter.py:38
-#: assets/serializers/asset/common.py:278 rbac/tree.py:35
+#: assets/serializers/asset/common.py:297 rbac/tree.py:35
 msgid "Accounts"
 msgstr "アカウント"
 
@@ -1445,7 +1459,7 @@ msgstr "システム"
 msgid "Value"
 msgstr "値"
 
-#: assets/models/label.py:40 assets/serializers/asset/common.py:102
+#: assets/models/label.py:40 assets/serializers/asset/common.py:105
 #: assets/serializers/cagegory.py:6 assets/serializers/cagegory.py:13
 #: assets/serializers/platform.py:94
 #: authentication/serializers/connect_token_secret.py:112
@@ -1599,36 +1613,36 @@ msgstr ""
 "プラットフォームタイプがスキップされた資産に合致しない、資産内の一括更新プ"
 "ラットフォーム"
 
-#: assets/serializers/asset/common.py:92
+#: assets/serializers/asset/common.py:95
 msgid "Auto fill"
 msgstr "自動充填"
 
-#: assets/serializers/asset/common.py:103 assets/serializers/platform.py:112
+#: assets/serializers/asset/common.py:106 assets/serializers/platform.py:112
 #: authentication/serializers/connect_token_secret.py:29
 #: authentication/serializers/connect_token_secret.py:63
 #: perms/serializers/user_permission.py:25 xpack/plugins/cloud/models.py:99
 msgid "Protocols"
 msgstr "プロトコル"
 
-#: assets/serializers/asset/common.py:105
-#: assets/serializers/asset/common.py:126
+#: assets/serializers/asset/common.py:108
+#: assets/serializers/asset/common.py:130
 msgid "Node path"
 msgstr "ノードパスです"
 
-#: assets/serializers/asset/common.py:123
-#: assets/serializers/asset/common.py:280
+#: assets/serializers/asset/common.py:127
+#: assets/serializers/asset/common.py:299
 msgid "Auto info"
 msgstr "自動情報"
 
-#: assets/serializers/asset/common.py:201
+#: assets/serializers/asset/common.py:220
 msgid "Platform not exist"
 msgstr "プラットフォームが存在しません"
 
-#: assets/serializers/asset/common.py:236
+#: assets/serializers/asset/common.py:255
 msgid "port out of range (1-65535)"
 msgstr "ポート番号が範囲外です (1-65535)"
 
-#: assets/serializers/asset/common.py:243
+#: assets/serializers/asset/common.py:262
 msgid "Protocol is required: {}"
 msgstr "プロトコルが必要です: {}"
 
@@ -1688,6 +1702,10 @@ msgstr "システムバージョン"
 #: assets/serializers/asset/host.py:23
 msgid "OS arch"
 msgstr "システムアーキテクチャ"
+
+#: assets/serializers/asset/host.py:27
+msgid "Info"
+msgstr "情報"
 
 #: assets/serializers/cagegory.py:9
 msgid "Constraints"

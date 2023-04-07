@@ -102,14 +102,13 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
         ("platform", serializers.PlatformSerializer),
         ("suggestion", serializers.MiniAssetSerializer),
         ("gateways", serializers.GatewaySerializer),
-        ("spec_info", serializers.SpecSerializer),
     )
     rbac_perms = (
         ("match", "assets.match_asset"),
         ("platform", "assets.view_platform"),
         ("gateways", "assets.view_gateway"),
         ("spec_info", "assets.view_asset"),
-        ("info", "assets.view_asset"),
+        ("gathered_info", "assets.view_asset"),
     )
     extra_filter_backends = [LabelFilterBackend, IpInFilterBackend, NodeFilterBackend]
     skip_assets = []
@@ -127,11 +126,6 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
         asset = super().get_object()
         serializer = super().get_serializer(instance=asset.platform)
         return Response(serializer.data)
-
-    @action(methods=["GET"], detail=True, url_path="spec-info")
-    def spec_info(self, *args, **kwargs):
-        asset = super().get_object()
-        return Response(asset.spec_info)
 
     @action(methods=["GET"], detail=True, url_path="gateways")
     def gateways(self, *args, **kwargs):
