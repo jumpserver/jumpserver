@@ -29,6 +29,7 @@ pycparser==2.21
 cryptography==38.0.4
 pycryptodome==3.15.0
 pycryptodomex==3.15.0
+phonenumbers==8.13.8
 gmssl==3.2.1
 itsdangerous==1.1.0
 pyotp==2.6.0
