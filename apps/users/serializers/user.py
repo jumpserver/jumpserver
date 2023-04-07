@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 #
+import phonenumbers
+
 from functools import partial
 
 from django.utils.translation import ugettext_lazy as _
@@ -221,6 +223,14 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         attrs = self.clean_auth_fields(attrs)
         attrs.pop("password_strategy", None)
         return attrs
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        phone = phonenumbers.parse(data['phone'], 'CN')
+        data['phone'] = {
+            'code': '+%s' % phone.country_code, 'phone': phone.national_number
+        }
+        return data
 
     def save_and_set_custom_m2m_fields(self, validated_data, save_handler, created):
         m2m_values = {}
