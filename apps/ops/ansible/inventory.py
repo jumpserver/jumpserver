@@ -150,7 +150,8 @@ class JMSInventory:
             },
             'jms_account': {
                 'id': str(account.id), 'username': account.username,
-                'secret': account.secret, 'secret_type': account.secret_type
+                'secret': account.secret, 'secret_type': account.secret_type,
+                'private_key_path': account.private_key_path
             } if account else None
         }
 

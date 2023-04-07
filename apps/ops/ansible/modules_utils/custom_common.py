@@ -2,7 +2,7 @@ import time
 
 import paramiko
 
-from paramiko import SSHException
+from paramiko.ssh_exception import SSHException, NoValidConnectionsError
 
 
 def ssh_common_argument_spec():
@@ -10,7 +10,9 @@ def ssh_common_argument_spec():
         login_host=dict(type='str', required=False, default='localhost'),
         login_port=dict(type='int', required=False, default=22),
         login_user=dict(type='str', required=False, default='root'),
-        login_password=dict(type='str', required=True, no_log=True),
+        login_password=dict(type='str', required=False, no_log=True),
+        login_secret_type=dict(type='str', required=False, default='password'),
+        login_private_key_path=dict(type='str', required=False, no_log=True),
     )
     return options
 
@@ -23,18 +25,23 @@ class SSHClient:
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
     def get_connect_params(self):
-        return {
+        params = {
             'allow_agent': False, 'look_for_keys': False,
             'hostname': self.module.params['login_host'],
             'port': self.module.params['login_port'],
             'username': self.module.params['login_user'],
-            'password': self.module.params['login_password'],
         }
+        secret_type = self.module.params['login_secret_type']
+        if secret_type == 'ssh_key':
+            params['key_filename'] = self.module.params['login_private_key_path']
+        else:
+            params['password'] = self.module.params['login_password']
+        return params
 
     def connect(self):
         try:
             self.client.connect(**self.get_connect_params())
-        except SSHException as err:
+        except (SSHException, NoValidConnectionsError) as err:
             err_msg = str(err)
         else:
             self.is_connect = True
