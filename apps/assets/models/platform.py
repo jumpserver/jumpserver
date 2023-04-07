@@ -89,8 +89,8 @@ class Platform(JMSBaseModel):
         )
         return linux.id
 
-    def get_commands(self):
-        return self.meta.get('commands', [])
+    def get_commands(self, method):
+        return self.meta.get(method, [])
 
     def __str__(self):
         return self.name

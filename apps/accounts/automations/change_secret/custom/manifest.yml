@@ -1,4 +1,4 @@
-id: change_secret_custom
+id: change_secret_by_ssh
 name: Change secret by SSH
 category:
   - device
@@ -7,3 +7,4 @@ type:
   - all
 method: change_secret
 copy_push_method: false
+can_setting: true

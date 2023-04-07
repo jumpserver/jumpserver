@@ -4,11 +4,11 @@ from rest_framework.generics import RetrieveUpdateAPIView
 
 from assets.const import AllTypes
 from assets.models import Platform
-from assets.serializers import PlatformSerializer, PlatformCustomCommandsSerializer
+from assets.serializers import PlatformSerializer, PlatformAutomationBySSHCommandsSerializer
 from common.api import JMSModelViewSet
 from common.serializers import GroupedChoiceSerializer
 
-__all__ = ['AssetPlatformViewSet', 'PlatformCustomCommands']
+__all__ = ['AssetPlatformViewSet', 'PlatformAutomationCommands']
 
 
 class PlatformPermissionMixin:
@@ -48,11 +48,19 @@ class AssetPlatformViewSet(JMSModelViewSet, PlatformPermissionMixin):
         return self.get_queryset().get(name=pk)
 
 
-class PlatformCustomCommands(RetrieveUpdateAPIView, PlatformPermissionMixin):
+class PlatformAutomationCommands(RetrieveUpdateAPIView, PlatformPermissionMixin):
     queryset = Platform.objects.filter(internal=False)
-    serializer_class = PlatformCustomCommandsSerializer
+    serializer_classes = {
+        'default': PlatformAutomationBySSHCommandsSerializer,
+        'change_secret_by_ssh': PlatformAutomationBySSHCommandsSerializer
+    }
     rbac_perms = {
         'GET': 'assets.view_platform',
         'PUT': 'assets.change_platform',
         'PATCH': 'assets.change_platform',
     }
+
+    def get_serializer_class(self):
+        method = self.request.query_params.get('method', 'default')
+        serializer = self.serializer_classes.get(method)
+        return serializer or self.serializer_classes['default']

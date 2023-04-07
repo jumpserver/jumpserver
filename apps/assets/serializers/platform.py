@@ -9,7 +9,7 @@ from ..models import Platform, PlatformProtocol, PlatformAutomation
 
 __all__ = [
     'PlatformSerializer', 'PlatformOpsMethodSerializer',
-    'PlatformCustomCommandsSerializer'
+    'PlatformAutomationBySSHCommandsSerializer'
 ]
 
 
@@ -157,11 +157,11 @@ class PlatformOpsMethodSerializer(serializers.Serializer):
     method = serializers.CharField()
 
 
-class PlatformCustomCommandsSerializer(serializers.Serializer):
+class PlatformAutomationBySSHCommandsSerializer(serializers.Serializer):
     commands = serializers.ListSerializer(child=serializers.CharField(allow_blank=True))
 
     def to_representation(self, instance):
-        return {'commands': instance.meta.get('commands', [])}
+        return {'commands': instance.get_commands('change_secret_by_ssh')}
 
     @staticmethod
     def validate_commands(commands):
@@ -179,6 +179,6 @@ class PlatformCustomCommandsSerializer(serializers.Serializer):
         return commands
 
     def update(self, instance, validated_data):
-        instance.meta['commands'] = validated_data.pop('commands')
+        instance.meta['change_secret_by_ssh'] = validated_data.pop('commands')
         instance.save(update_fields=['meta'])
         return instance

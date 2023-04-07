@@ -1,4 +1,4 @@
-id: ping_ssh_custom
+id: ping_by_ssh
 name: Ping by SSH
 category:
   - device

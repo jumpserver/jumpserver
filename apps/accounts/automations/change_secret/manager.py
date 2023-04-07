@@ -112,11 +112,11 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             return inventory_hosts
 
         platform = kwargs['platform']
-        if method_attr.endswith('custom') and self.secret_type == SecretType.SSH_KEY:
+        if method_attr == 'change_secret_by_ssh' and self.secret_type == SecretType.SSH_KEY:
             print(f'{platform} {asset} does not support ssh key push')
             return inventory_hosts
 
-        host['jms_asset']['commands'] = platform.get_commands()
+        host['jms_asset']['commands'] = platform.get_commands(method=method_attr)
 
         for account in accounts:
             h = deepcopy(host)
