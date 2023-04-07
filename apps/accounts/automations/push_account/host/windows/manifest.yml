@@ -12,3 +12,4 @@ fields:
     max_length: 4096
     allow_blank: true
     label: '用户组'
+    default: ''

@@ -33,7 +33,11 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
 
         data = self.params.get(method_id, {})
         params = serializer(data).data
-        return {k: automation_params[k] if not params[k] else params[k] for k in params}
+        return {
+            field_name: automation_params.get(field_name, '')
+            if not params[field_name] else params[field_name]
+            for field_name in params
+        }
 
     def host_callback(self, host, asset=None, account=None, automation=None, path_dir=None, **kwargs):
         host = super(ChangeSecretManager, self).host_callback(
