@@ -21,7 +21,7 @@ class HostViewSet(AssetViewSet):
     @action(methods=["GET"], detail=True, url_path="info")
     def info(self, *args, **kwargs):
         asset = super().get_object()
-        serializer = self.get_serializer(asset.info)
+        serializer = self.get_serializer(asset.gathered_info)
         data = serializer.data
         data['asset'] = {
             'id': asset.id, 'name': asset.name,

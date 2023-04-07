@@ -3,12 +3,15 @@
 
 from django.db.models import F
 from django.db.transaction import atomic
+from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from accounts.models import Account
 from accounts.serializers import AccountSerializer
-from common.serializers import WritableNestedModelSerializer, SecretReadableMixin, CommonModelSerializer
+from common.serializers import WritableNestedModelSerializer, SecretReadableMixin, CommonModelSerializer, \
+    MethodSerializer
+from common.serializers.dynamic import create_serializer_class
 from common.serializers.fields import LabeledChoiceField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ...const import Category, AllTypes
@@ -103,24 +106,25 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'), default=())
     accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, label=_('Account'))
     nodes_display = serializers.ListField(read_only=False, required=False, label=_("Node path"))
+    custom_info = MethodSerializer(label=_('Custom info'))
 
     class Meta:
         model = Asset
         fields_mini = ['id', 'name', 'address']
-        fields_small = fields_mini + ['is_active', 'comment']
+        fields_small = fields_mini + ['custom_info', 'is_active', 'comment']
         fields_fk = ['domain', 'platform']
         fields_m2m = [
             'nodes', 'labels', 'protocols',
-            'nodes_display', 'accounts'
+            'nodes_display', 'accounts',
         ]
         read_only_fields = [
-            'category', 'type', 'connectivity', 'auto_info',
+            'category', 'type', 'connectivity', 'auto_config',
             'date_verified', 'created_by', 'date_created',
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
-        fields_unexport = ['auto_info']
+        fields_unexport = ['auto_config']
         extra_kwargs = {
-            'auto_info': {'label': _('Auto info')},
+            'auto_config': {'label': _('Auto info')},
             'name': {'label': _("Name")},
             'address': {'label': _('Address')},
             'nodes_display': {'label': _('Node path')},
@@ -169,6 +173,21 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
             .annotate(category=F("platform__category")) \
             .annotate(type=F("platform__type"))
         return queryset
+
+    def get_custom_info_serializer(self):
+        request = self.context.get('request')
+        default_field = serializers.DictField(required=False, label=_('Custom info'))
+
+        if not request or not request.query_params.get('platform'):
+            return default_field
+
+        platform_id = request.query_params.get('platform')
+        platform = get_object_or_404(Platform, id=platform_id)
+        custom_fields = platform.custom_fields
+        if not custom_fields:
+            return default_field
+        name = platform.name.title() + 'CustomSerializer'
+        return create_serializer_class(name, custom_fields)()
 
     @staticmethod
     def perform_nodes_display_create(instance, nodes_display):
@@ -277,12 +296,13 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
 class DetailMixin(serializers.Serializer):
     accounts = AssetAccountSerializer(many=True, required=False, label=_('Accounts'))
     spec_info = serializers.DictField(label=_('Spec info'), read_only=True)
-    auto_info = serializers.DictField(read_only=True, label=_('Auto info'))
+    auto_config = serializers.DictField(read_only=True, label=_('Auto info'))
 
     def get_field_names(self, declared_fields, info):
         names = super().get_field_names(declared_fields, info)
         names.extend([
-            'accounts', 'info', 'spec_info', 'auto_info'
+            'accounts', 'gathered_info', 'spec_info',
+            'custom_info', 'auto_config',
         ])
         return names
 

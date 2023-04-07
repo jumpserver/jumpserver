@@ -208,10 +208,8 @@ msgid "Source"
 msgstr "来源"
 
 #: accounts/models/account.py:56
-#, fuzzy
-#| msgid "Source"
 msgid "Source ID"
-msgstr "来源"
+msgstr "来源 ID"
 
 #: accounts/models/account.py:59
 #: accounts/serializers/automations/change_secret.py:112
@@ -439,10 +437,8 @@ msgid "Gather account automation"
 msgstr "自动化收集账号"
 
 #: accounts/models/automations/gather_account.py:56
-#, fuzzy
-#| msgid "Is service account"
 msgid "Is sync account"
-msgstr "服务账号"
+msgstr "是否同步账号"
 
 #: accounts/models/automations/gather_account.py:71
 #: accounts/tasks/gather_accounts.py:29
@@ -552,10 +548,8 @@ msgid "Push now"
 msgstr "立即推送"
 
 #: accounts/serializers/account/account.py:33
-#, fuzzy
-#| msgid "Runas policy"
 msgid "Exist policy"
-msgstr "用户策略"
+msgstr "账号存在策略"
 
 #: accounts/serializers/account/account.py:153 applications/models.py:11
 #: assets/models/label.py:21 assets/models/platform.py:66
@@ -602,10 +596,8 @@ msgid "State"
 msgstr "状态"
 
 #: accounts/serializers/account/account.py:209
-#, fuzzy
-#| msgid "Change by"
 msgid "Changed"
-msgstr "修改者"
+msgstr "已修改"
 
 #: accounts/serializers/account/account.py:213
 #: accounts/serializers/automations/base.py:22
@@ -617,22 +609,17 @@ msgid "Assets"
 msgstr "资产"
 
 #: accounts/serializers/account/account.py:284
-#, fuzzy
-#| msgid "Name already exists"
 msgid "Account already exists"
-msgstr "名称已存在"
+msgstr "账号已存在"
 
 #: accounts/serializers/account/account.py:320
-#, fuzzy, python-format
-#| msgid "Current user not support mfa type: {}"
+#, python-format
 msgid "Asset does not support this secret type: %s"
-msgstr "当前用户不支持 MFA 类型: {}"
+msgstr "资产不支持账号类型: %s"
 
 #: accounts/serializers/account/account.py:351
-#, fuzzy
-#| msgid "Account name"
 msgid "Account has exist"
-msgstr "账号名称"
+msgstr "账号已存在"
 
 #: accounts/serializers/account/account.py:393 acls/models/base.py:98
 #: acls/models/login_acl.py:13 acls/serializers/base.py:55
@@ -1066,10 +1053,8 @@ msgid "Web"
 msgstr "Web"
 
 #: assets/const/category.py:15 assets/models/asset/custom.py:8
-#, fuzzy
-#| msgid "Custom user"
 msgid "Custom asset"
-msgstr "自定义用户"
+msgstr "自定义资产"
 
 #: assets/const/cloud.py:7
 msgid "Public cloud"
@@ -1483,10 +1468,8 @@ msgid "Required"
 msgstr "必须的"
 
 #: assets/models/platform.py:18
-#, fuzzy
-#| msgid "Public IP"
 msgid "Public"
-msgstr "公网IP"
+msgstr "开放的"
 
 #: assets/models/platform.py:19 settings/serializers/settings.py:65
 #: users/templates/users/reset_password.html:29
@@ -1573,10 +1556,8 @@ msgid "Automation"
 msgstr "自动化"
 
 #: assets/models/platform.py:83 assets/serializers/platform.py:118
-#, fuzzy
-#| msgid "Custom user"
 msgid "Custom fields"
-msgstr "自定义用户"
+msgstr "自定义属性"
 
 #: assets/models/utils.py:18
 #, python-format
@@ -1732,16 +1713,12 @@ msgid "Default Domain"
 msgstr "默认网域"
 
 #: assets/serializers/platform.py:143
-#, fuzzy
-#| msgid "test_phone is required"
 msgid "type is required"
-msgstr "测试手机号 该字段是必填项。"
+msgstr "类型 该字段是必填项。"
 
 #: assets/serializers/platform.py:173
-#, fuzzy
-#| msgid "Protocol is required: {}"
 msgid "Protocols is required"
-msgstr "协议是必填的: {}"
+msgstr "协议是必填的"
 
 #: assets/signal_handlers/asset.py:26 assets/tasks/ping.py:35
 msgid "Test assets connectivity "
@@ -3059,10 +3036,8 @@ msgid "Parse file error: {}"
 msgstr "解析文件错误: {}"
 
 #: common/drf/parsers/excel.py:14
-#, fuzzy
-#| msgid "Invalid zip file"
 msgid "Invalid excel file"
-msgstr "无效的 zip 文件"
+msgstr "无效的 excel 文件"
 
 #: common/exceptions.py:15
 #, python-format
@@ -6600,10 +6575,8 @@ msgid "Avatar url"
 msgstr "头像路径"
 
 #: users/serializers/user.py:171
-#, fuzzy
-#| msgid "One level"
 msgid "MFA level"
-msgstr "1 级"
+msgstr "MFA 级别"
 
 #: users/serializers/user.py:277
 msgid "Select users"

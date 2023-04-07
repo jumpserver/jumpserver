@@ -21,7 +21,6 @@ def migrate_platform_protocol_primary(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('assets', '0110_auto_20230315_1741'),
     ]
@@ -31,6 +30,11 @@ class Migration(migrations.Migration):
             model_name='platformprotocol',
             name='primary',
             field=models.BooleanField(default=False, verbose_name='Primary'),
+        ),
+        migrations.AddField(
+            model_name='platformprotocol',
+            name='public',
+            field=models.BooleanField(default=True, verbose_name='Public'),
         ),
         migrations.RunPython(migrate_platform_charset),
         migrations.RunPython(migrate_platform_protocol_primary),

@@ -49,7 +49,6 @@ def create_serializer_class(serializer_name, fields_info):
         data = set_default_if_need(data, i)
         field_name = data.pop('name')
         field_class = type_field_map.get(field_type, serializers.CharField)
-        print("Data: ", data)
         serializer_fields[field_name] = field_class(**data)
 
     return type(serializer_name, (serializers.Serializer,), serializer_fields)

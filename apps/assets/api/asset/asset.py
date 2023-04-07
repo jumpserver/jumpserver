@@ -163,6 +163,7 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
                 continue
             self.skip_assets.append(asset)
         return bulk_data
+
     def bulk_update(self, request, *args, **kwargs):
         bulk_data = self.filter_bulk_update_data()
         request._full_data = bulk_data
@@ -182,8 +183,8 @@ class AssetsTaskMixin:
             task = update_assets_hardware_info_manual(assets)
         else:
             asset = assets[0]
-            if not asset.auto_info['ansible_enabled'] or \
-                    not asset.auto_info['ping_enabled']:
+            if not asset.auto_config['ansible_enabled'] or \
+                    not asset.auto_config['ping_enabled']:
                 raise NotSupportedTemporarilyError()
             task = test_assets_connectivity_manual(assets)
         return task
