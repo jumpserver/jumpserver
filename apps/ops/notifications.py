@@ -6,7 +6,8 @@ from notifications.notifications import SystemMessage
 from notifications.models import SystemMsgSubscription
 from users.models import User
 from notifications.backends import BACKEND
-from terminal.models import Status, Terminal
+from terminal.models.component.status import Status
+from terminal.models import Terminal
 
 __all__ = ('ServerPerformanceMessage', 'ServerPerformanceCheckUtil')
 
