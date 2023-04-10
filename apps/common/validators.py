@@ -10,6 +10,7 @@ from rest_framework.validators import (
     UniqueTogetherValidator, ValidationError
 )
 from rest_framework import serializers
+from phonenumbers.phonenumberutil import NumberParseException
 
 from common.utils.strings import no_special_chars
 
@@ -47,6 +48,11 @@ class PhoneValidator:
     message = _('The mobile phone number format is incorrect')
 
     def __call__(self, value):
-        phone = phonenumbers.parse(value)
-        if not phonenumbers.is_valid_number(phone):
+        try:
+            phone = phonenumbers.parse(value)
+            valid = phonenumbers.is_valid_number(phone)
+        except NumberParseException:
+            valid = False
+
+        if valid:
             raise serializers.ValidationError(self.message)
