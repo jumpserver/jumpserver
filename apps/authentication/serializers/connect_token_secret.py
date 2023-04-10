@@ -33,7 +33,7 @@ class _ConnectionTokenAssetSerializer(serializers.ModelSerializer):
         model = Asset
         fields = [
             'id', 'name', 'address', 'protocols', 'category',
-            'type', 'org_id', 'info', 'secret_info',
+            'type', 'org_id', 'info', 'secret_info', 'spec_info'
         ]
 
 
