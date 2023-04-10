@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 
+import re
+
 from django.db.models import F
 from django.db.transaction import atomic
 from django.utils.translation import ugettext_lazy as _
@@ -8,7 +10,9 @@ from rest_framework import serializers
 
 from accounts.models import Account
 from accounts.serializers import AccountSerializer
-from common.serializers import WritableNestedModelSerializer, SecretReadableMixin, CommonModelSerializer
+from common.serializers import WritableNestedModelSerializer, SecretReadableMixin, CommonModelSerializer, \
+    MethodSerializer
+from common.serializers.dynamic import create_serializer_class
 from common.serializers.fields import LabeledChoiceField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ...const import Category, AllTypes
@@ -18,8 +22,10 @@ __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
     'AssetTaskSerializer', 'AssetsTaskSerializer', 'AssetProtocolsSerializer',
     'AssetDetailSerializer', 'DetailMixin', 'AssetAccountSerializer',
-    'AccountSecretSerializer', 'SpecSerializer'
+    'AccountSecretSerializer',
 ]
+
+uuid_pattern = re.compile(r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')
 
 
 class AssetProtocolsSerializer(serializers.ModelSerializer):
@@ -83,44 +89,32 @@ class AccountSecretSerializer(SecretReadableMixin, CommonModelSerializer):
         }
 
 
-class SpecSerializer(serializers.Serializer):
-    # 数据库
-    db_name = serializers.CharField(label=_("Database"), max_length=128, required=False)
-    use_ssl = serializers.BooleanField(label=_("Use SSL"), required=False)
-    allow_invalid_cert = serializers.BooleanField(label=_("Allow invalid cert"), required=False)
-    # Web
-    autofill = serializers.CharField(label=_("Auto fill"), required=False)
-    username_selector = serializers.CharField(label=_("Username selector"), required=False)
-    password_selector = serializers.CharField(label=_("Password selector"), required=False)
-    submit_selector = serializers.CharField(label=_("Submit selector"), required=False)
-    script = serializers.JSONField(label=_("Script"), required=False)
-
-
 class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSerializer):
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
     labels = AssetLabelSerializer(many=True, required=False, label=_('Label'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'), default=())
-    accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, label=_('Account'))
+    accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, write_only=True, label=_('Account'))
     nodes_display = serializers.ListField(read_only=False, required=False, label=_("Node path"))
+    custom_info = MethodSerializer(label=_('Custom info'))
 
     class Meta:
         model = Asset
         fields_mini = ['id', 'name', 'address']
-        fields_small = fields_mini + ['is_active', 'comment']
+        fields_small = fields_mini + ['custom_info', 'is_active', 'comment']
         fields_fk = ['domain', 'platform']
         fields_m2m = [
             'nodes', 'labels', 'protocols',
-            'nodes_display', 'accounts'
+            'nodes_display', 'accounts',
         ]
         read_only_fields = [
-            'category', 'type', 'connectivity', 'auto_info',
+            'category', 'type', 'connectivity', 'auto_config',
             'date_verified', 'created_by', 'date_created',
         ]
         fields = fields_small + fields_fk + fields_m2m + read_only_fields
-        fields_unexport = ['auto_info']
+        fields_unexport = ['auto_config']
         extra_kwargs = {
-            'auto_info': {'label': _('Auto info')},
+            'auto_config': {'label': _('Auto info')},
             'name': {'label': _("Name")},
             'address': {'label': _('Address')},
             'nodes_display': {'label': _('Node path')},
@@ -169,6 +163,36 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
             .annotate(category=F("platform__category")) \
             .annotate(type=F("platform__type"))
         return queryset
+
+    def get_custom_info_serializer(self):
+        request = self.context.get('request')
+        default_field = serializers.DictField(required=False, label=_('Custom info'))
+
+        if not request:
+            return default_field
+
+        if self.instance and isinstance(self.instance, list):
+            return default_field
+
+        if not self.instance and uuid_pattern.findall(request.path):
+            pk = uuid_pattern.findall(request.path)[0]
+            self.instance = Asset.objects.filter(id=pk).first()
+
+        platform = None
+        if self.instance:
+            platform = self.instance.platform
+        elif request.query_params.get('platform'):
+            platform_id = request.query_params.get('platform')
+            platform_id = int(platform_id) if platform_id.isdigit() else 0
+            platform = Platform.objects.filter(id=platform_id).first()
+
+        if not platform:
+            return default_field
+        custom_fields = platform.custom_fields
+        if not custom_fields:
+            return default_field
+        name = platform.name.title() + 'CustomSerializer'
+        return create_serializer_class(name, custom_fields)()
 
     @staticmethod
     def perform_nodes_display_create(instance, nodes_display):
@@ -276,15 +300,45 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
 
 class DetailMixin(serializers.Serializer):
     accounts = AssetAccountSerializer(many=True, required=False, label=_('Accounts'))
-    spec_info = serializers.DictField(label=_('Spec info'), read_only=True)
-    auto_info = serializers.DictField(read_only=True, label=_('Auto info'))
+    spec_info = MethodSerializer(label=_('Spec info'), read_only=True)
+    gathered_info = MethodSerializer(label=_('Gathered info'), read_only=True)
+    auto_config = serializers.DictField(read_only=True, label=_('Auto info'))
+
+    def get_instance(self):
+        request = self.context.get('request')
+        if not self.instance and uuid_pattern.findall(request.path):
+            pk = uuid_pattern.findall(request.path)[0]
+            self.instance = Asset.objects.filter(id=pk).first()
+        return self.instance
 
     def get_field_names(self, declared_fields, info):
         names = super().get_field_names(declared_fields, info)
         names.extend([
-            'accounts', 'info', 'spec_info', 'auto_info'
+            'accounts', 'gathered_info', 'spec_info',
+            'auto_config',
         ])
         return names
+
+    def get_category(self):
+        request = self.context.get('request')
+        if request.query_params.get('category'):
+            category = request.query_params.get('category')
+        else:
+            instance = self.get_instance()
+            category = instance.category
+        return category
+
+    def get_gathered_info_serializer(self):
+        category = self.get_category()
+        from .info.gathered import category_gathered_serializer_map
+        serializer_cls = category_gathered_serializer_map.get(category, serializers.DictField)
+        return serializer_cls()
+
+    def get_spec_info_serializer(self):
+        category = self.get_category()
+        from .info.spec import category_spec_serializer_map
+        serializer_cls = category_spec_serializer_map.get(category, serializers.DictField)
+        return serializer_cls()
 
 
 class AssetDetailSerializer(DetailMixin, AssetSerializer):

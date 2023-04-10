@@ -158,7 +158,7 @@ class AccountAssetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Asset
-        fields = ['id', 'name', 'address', 'type', 'category', 'platform', 'auto_info']
+        fields = ['id', 'name', 'address', 'type', 'category', 'platform', 'auto_config']
 
     def to_internal_value(self, data):
         if isinstance(data, dict):

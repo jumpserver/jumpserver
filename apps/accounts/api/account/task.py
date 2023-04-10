@@ -31,8 +31,8 @@ class AccountsTaskCreateAPI(CreateAPIView):
         else:
             account = accounts[0]
             asset = account.asset
-            if not asset.auto_info['ansible_enabled'] or \
-                not asset.auto_info['ping_enabled']:
+            if not asset.auto_config['ansible_enabled'] or \
+                    not asset.auto_config['ping_enabled']:
                 raise NotSupportedTemporarilyError()
             task = verify_accounts_connectivity_task.delay(account_ids)
 

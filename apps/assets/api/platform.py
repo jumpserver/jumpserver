@@ -23,7 +23,7 @@ class AssetPlatformViewSet(JMSModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.filter(type__in=AllTypes.get_types())
+        queryset = queryset.filter(type__in=AllTypes.get_types_values())
         return queryset
 
     def get_object(self):

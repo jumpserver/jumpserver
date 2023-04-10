@@ -108,7 +108,8 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
                                    verbose_name=_("Nodes"))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     labels = models.ManyToManyField('assets.Label', blank=True, related_name='assets', verbose_name=_("Labels"))
-    info = models.JSONField(verbose_name=_('Info'), default=dict, blank=True)  # 资产的一些信息，如 硬件信息
+    gathered_info = models.JSONField(verbose_name=_('Gathered info'), default=dict, blank=True)  # 资产的一些信息，如 硬件信息
+    custom_info = models.JSONField(verbose_name=_('Custom info'), default=dict)
 
     objects = AssetManager.from_queryset(AssetQuerySet)()
 
@@ -148,20 +149,26 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
         return self.get_spec_values(instance, spec_fields)
 
     @lazyproperty
-    def auto_info(self):
+    def auto_config(self):
         platform = self.platform
         automation = self.platform.automation
-        return {
+        auto_config = {
             'su_enabled': platform.su_enabled,
-            'ping_enabled': automation.ping_enabled,
             'domain_enabled': platform.domain_enabled,
+            'ansible_enabled': False
+        }
+        if not automation:
+            return auto_config
+        auto_config.update({
+            'ping_enabled': automation.ping_enabled,
             'ansible_enabled': automation.ansible_enabled,
             'push_account_enabled': automation.push_account_enabled,
             'gather_facts_enabled': automation.gather_facts_enabled,
             'change_secret_enabled': automation.change_secret_enabled,
             'verify_account_enabled': automation.verify_account_enabled,
             'gather_accounts_enabled': automation.gather_accounts_enabled,
-        }
+        })
+        return auto_config
 
     def get_target_ip(self):
         return self.address
