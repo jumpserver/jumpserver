@@ -4,7 +4,11 @@ from .base import BaseType
 class CustomTypes(BaseType):
     @classmethod
     def get_choices(cls):
-        types = cls.get_custom_platforms().values_list('type', flat=True).distinct()
+        try:
+            platforms = list(cls.get_custom_platforms())
+        except Exception:
+            return []
+        types = [p.type for p in platforms]
         return [(t, t) for t in types]
 
     @classmethod

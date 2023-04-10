@@ -32,14 +32,13 @@ class Migration(migrations.Migration):
             name='custom_info',
             field=models.JSONField(default=dict, verbose_name='Custom info'),
         ),
-        migrations.RenameField(
-            model_name='asset',
-            old_name='info',
-            new_name='gathered_info',
-        ),
-        migrations.AlterField(
+        migrations.AddField(
             model_name='asset',
             name='gathered_info',
             field=models.JSONField(blank=True, default=dict, verbose_name='Gathered info'),
+        ),
+        migrations.RemoveField(
+            model_name='asset',
+            name='info',
         ),
     ]
