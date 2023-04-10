@@ -4,13 +4,13 @@ from rest_framework.response import Response
 
 from assets.const import AllTypes
 from assets.models import Platform, PlatformAutomation, Node, Asset
-from assets.serializers import PlatformSerializer
+from assets.serializers import PlatformSerializer, AutomationMethodsSerializer
 from common.api import JMSModelViewSet
 from common.permissions import IsValidUser
 from common.serializers import GroupedChoiceSerializer
 from orgs.mixins.generics import RetrieveUpdateAPIView
 
-__all__ = ['AssetPlatformViewSet', 'PlatformAutomationParamsApi', 'PlatformAutomationParamsEnabledApi']
+__all__ = ['AssetPlatformViewSet', 'PlatformAutomationParamsApi', 'PlatformAutomationMethodsApi']
 
 
 class AssetPlatformViewSet(JMSModelViewSet):
@@ -93,10 +93,38 @@ class PlatformAutomationParamsApi(RetrieveUpdateAPIView):
         return Response(status=200)
 
 
-class PlatformAutomationParamsEnabledApi(generics.ListAPIView):
+class PlatformAutomationMethodsApi(generics.ListAPIView, generics.RetrieveAPIView):
     permission_classes = (IsValidUser,)
+    serializer_class = AutomationMethodsSerializer
+
+    @property
+    def ansible_method_id(self):
+        return self.request.query_params.get('ansible_method_id')
+
+    def filter_automation_methods(self, ansible_method_id):
+        platform_automation_methods = AllTypes.get_automation_methods()
+        if not ansible_method_id:
+            return False, platform_automation_methods
+        return True, list(
+            filter(
+                lambda x: x['id'] == self.ansible_method_id,
+                platform_automation_methods)
+        )
+
+    def get_serializer_class(self):
+        serializer = super().get_serializer_class()
+        filtered, data = self.filter_automation_methods(self.ansible_method_id)
+        if not filtered or not data:
+            return serializer
+        fields = data[0]
+        serializer_name = serializer.__name__
+        child_serializer = fields.get('serializer')() if fields.get('serializer') else None
+        return type(serializer_name, (serializer,), {'serializer': child_serializer})
 
     def list(self, request, *args, **kwargs):
-        platform_automation_methods = AllTypes.get_automation_methods()
-        data = {i['id']: bool(i['serializer']) for i in platform_automation_methods}
-        return Response(data)
+        filtered, data = self.filter_automation_methods(self.ansible_method_id)
+        if not filtered or not data:
+            serializer = self.get_serializer(data, many=True)
+        else:
+            serializer = self.get_serializer(data[0])
+        return Response(serializer.data)

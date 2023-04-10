@@ -7,7 +7,7 @@ from common.serializers.fields import LabeledChoiceField
 from ..const import Category, AllTypes
 from ..models import Platform, PlatformProtocol, PlatformAutomation
 
-__all__ = ["PlatformSerializer", "PlatformOpsMethodSerializer"]
+__all__ = ["PlatformSerializer", "PlatformOpsMethodSerializer", "AutomationMethodsSerializer"]
 
 
 class ProtocolSettingSerializer(serializers.Serializer):
@@ -143,3 +143,14 @@ class PlatformOpsMethodSerializer(serializers.Serializer):
     category = serializers.CharField(max_length=50, label=_("Category"))
     type = serializers.ListSerializer(child=serializers.CharField())
     method = serializers.CharField()
+
+
+class AutomationMethodsSerializer(serializers.Serializer):
+    id = serializers.CharField(max_length=64, read_only=True)
+    name = serializers.CharField(max_length=64, read_only=True)
+    method = serializers.CharField(max_length=64, read_only=True)
+    serializer = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_serializer(obj):
+        return bool(obj.get('serializer'))

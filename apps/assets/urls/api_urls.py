@@ -46,7 +46,7 @@ urlpatterns = [
 
     path('gateways/<uuid:pk>/test-connective/', api.GatewayTestConnectionApi.as_view(), name='test-gateway-connective'),
     path('platform-automation/<int:pk>/params/<str:ansible_method_id>/', api.PlatformAutomationParamsApi.as_view(), name='platform-automation-param'),
-    path('platform-automation-param-enabled/', api.PlatformAutomationParamsEnabledApi.as_view(), name='platform-automation-param-enabled'),
+    path('platform-automation-methods/', api.PlatformAutomationMethodsApi.as_view(), name='platform-automation-methods'),
 ]
 
 urlpatterns += router.urls
