@@ -36,7 +36,7 @@ class HostTypes(BaseType):
                 'choices': ['ssh', 'telnet', 'vnc', 'rdp']
             },
             cls.WINDOWS: {
-                'choices': ['rdp', 'ssh', 'vnc']
+                'choices': ['rdp', 'ssh', 'vnc', 'winrm']
             }
         }
 
@@ -58,7 +58,7 @@ class HostTypes(BaseType):
             cls.WINDOWS: {
                 'ansible_config': {
                     'ansible_shell_type': 'cmd',
-                    'ansible_connection': 'ssh',
+                    'ansible_connection': 'smart',
                 },
             },
             cls.OTHER_HOST: {

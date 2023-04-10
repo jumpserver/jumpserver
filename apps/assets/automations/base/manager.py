@@ -1,11 +1,12 @@
 import json
 import os
 import shutil
+import yaml
+
 from collections import defaultdict
 from hashlib import md5
 from socket import gethostname
 
-import yaml
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -239,10 +240,12 @@ class BasePlaybookManager:
             jms_asset, jms_gateway = host['jms_asset'], host.get('gateway')
             if not jms_gateway:
                 continue
+
             server = SSHTunnelForwarder(
                 (jms_gateway['address'], jms_gateway['port']),
                 ssh_username=jms_gateway['username'],
                 ssh_password=jms_gateway['secret'],
+                ssh_pkey=jms_gateway['private_key_path'],
                 remote_bind_address=(jms_asset['address'], jms_asset['port'])
             )
             try:
@@ -252,8 +255,8 @@ class BasePlaybookManager:
                 print('\033[31m %s \033[0m\n' % err_msg)
                 not_valid.append(k)
             else:
-                jms_asset['address'] = '127.0.0.1'
-                jms_asset['port'] = server.local_bind_port
+                host['ansible_host'] = jms_asset['address'] = '127.0.0.1'
+                host['ansible_port'] = jms_asset['port'] = server.local_bind_port
                 servers.append(server)
 
         # 网域不可连接的，就不继续执行此资源的后续任务了
