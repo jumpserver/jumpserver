@@ -54,5 +54,5 @@ class PhoneValidator:
         except NumberParseException:
             valid = False
 
-        if valid:
+        if not valid:
             raise serializers.ValidationError(self.message)
