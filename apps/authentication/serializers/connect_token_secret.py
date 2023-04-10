@@ -27,12 +27,13 @@ class _ConnectionTokenUserSerializer(serializers.ModelSerializer):
 
 class _ConnectionTokenAssetSerializer(serializers.ModelSerializer):
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
+    info = serializers.DictField()
 
     class Meta:
         model = Asset
         fields = [
             'id', 'name', 'address', 'protocols', 'category',
-            'type', 'org_id', 'spec_info', 'secret_info',
+            'type', 'org_id', 'info', 'secret_info',
         ]
 
 

@@ -162,7 +162,8 @@ class RDPFileClientProtocolURLMixin:
     def get_smart_endpoint(self, protocol, asset=None):
         target_ip = asset.get_target_ip() if asset else ''
         endpoint = EndpointRule.match_endpoint(
-            target_instance=asset, target_ip=target_ip, protocol=protocol, request=self.request
+            target_instance=asset, target_ip=target_ip,
+            protocol=protocol, request=self.request
         )
         return endpoint
 

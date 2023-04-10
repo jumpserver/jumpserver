@@ -149,6 +149,14 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
         return self.get_spec_values(instance, spec_fields)
 
     @lazyproperty
+    def info(self):
+        info = {}
+        info.update(self.gathered_info or {})
+        info.update(self.custom_info or {})
+        info.update(self.spec_info or {})
+        return info
+
+    @lazyproperty
     def auto_config(self):
         platform = self.platform
         automation = self.platform.automation
