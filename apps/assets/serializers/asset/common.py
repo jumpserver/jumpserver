@@ -94,7 +94,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
     labels = AssetLabelSerializer(many=True, required=False, label=_('Label'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'), default=())
-    accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, label=_('Account'))
+    accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, write_only=True, label=_('Account'))
     nodes_display = serializers.ListField(read_only=False, required=False, label=_("Node path"))
     custom_info = MethodSerializer(label=_('Custom info'))
 

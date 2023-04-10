@@ -86,15 +86,17 @@ class PlatformProtocolSerializer(serializers.ModelSerializer):
 
 class PlatformCustomField(serializers.Serializer):
     TYPE_CHOICES = [
-        ("str", "String"),
-        ("int", "Integer"),
-        ("bool", "Boolean"),
+        ("str", "str"),
+        ("int", "int"),
+        ("bool", "bool"),
+        ("choice", "choice"),
     ]
-    name = serializers.CharField(label=_("Name"))
-    label = serializers.CharField(label=_("Label"))
+    name = serializers.CharField(label=_("Name"), max_length=128)
+    label = serializers.CharField(label=_("Label"), max_length=128)
     type = serializers.ChoiceField(choices=TYPE_CHOICES, label=_("Type"), default='str')
-    required = serializers.BooleanField(default=False)
-    default = serializers.CharField(default="", allow_blank=True, label=_("Default"))
+    default = serializers.CharField(default="", allow_blank=True, label=_("Default"), max_length=1024)
+    help_text = serializers.CharField(default="", allow_blank=True, label=_("Help text"), max_length=1024)
+    choices = serializers.ListField(default=list, label=_("Choices"), required=False)
 
 
 class PlatformSerializer(WritableNestedModelSerializer):
@@ -105,12 +107,11 @@ class PlatformSerializer(WritableNestedModelSerializer):
         ("super", "super 15"),
         ("super_level", "super level 15")
     ]
-
-    charset = LabeledChoiceField(choices=Platform.CharsetChoices.choices, label=_("Charset"))
+    charset = LabeledChoiceField(choices=Platform.CharsetChoices.choices, label=_("Charset"), default='utf-8')
     type = LabeledChoiceField(choices=AllTypes.choices(), label=_("Type"))
     category = LabeledChoiceField(choices=Category.choices, label=_("Category"))
     protocols = PlatformProtocolSerializer(label=_("Protocols"), many=True, required=False)
-    automation = PlatformAutomationSerializer(label=_("Automation"), required=False)
+    automation = PlatformAutomationSerializer(label=_("Automation"), required=False, default=dict)
     su_method = LabeledChoiceField(
         choices=SU_METHOD_CHOICES, label=_("Su method"),
         required=False, default="sudo", allow_null=True
@@ -123,7 +124,10 @@ class PlatformSerializer(WritableNestedModelSerializer):
         fields_small = fields_mini + [
             "category", "type", "charset",
         ]
-        read_only_fields = ['internal', 'date_created', 'date_updated', 'created_by', 'updated_by']
+        read_only_fields = [
+            'internal', 'date_created', 'date_updated',
+            'created_by', 'updated_by'
+        ]
         fields = fields_small + [
             "protocols", "domain_enabled", "su_enabled",
             "su_method", "automation", "comment", "custom_fields",
@@ -142,6 +146,12 @@ class PlatformSerializer(WritableNestedModelSerializer):
             return self.initial_data.get('category'), self.initial_data.get('type')
         raise serializers.ValidationError({'type': _("type is required")})
 
+    def add_type_choices(self, name, label):
+        tp = self.fields['type']
+        tp.choices[name] = label
+        tp.choice_mapper[name] = label
+        tp.choice_strings_to_values[name] = label
+
     @lazyproperty
     def constraints(self):
         category, tp = self.platform_category_type
@@ -159,6 +169,7 @@ class PlatformSerializer(WritableNestedModelSerializer):
             'su_enabled': su_enabled,
             'automation': automation,
         })
+        self.initial_data['automation'] = automation
         return attrs
 
     @classmethod
