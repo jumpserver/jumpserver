@@ -106,7 +106,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         allow_null=True, max_length=1024,
     )
     phone = PhoneField(
-        validators=[PhoneValidator()], required=False, allow_null=True, label=_("Phone")
+        validators=[PhoneValidator()], required=False, allow_blank=True, allow_null=True, label=_("Phone")
     )
     custom_m2m_fields = {
         "system_roles": [BuiltinRole.system_user],
