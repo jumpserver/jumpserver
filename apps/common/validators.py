@@ -49,7 +49,7 @@ class PhoneValidator:
 
     def __call__(self, value):
         try:
-            phone = phonenumbers.parse(value)
+            phone = phonenumbers.parse(value, 'CN')
             valid = phonenumbers.is_valid_number(phone)
         except NumberParseException:
             valid = False
