@@ -28,6 +28,7 @@ class AccountSerializerCreateValidateMixin:
         ret = super().to_internal_value(data)
         self.from_id = from_id
         return ret
+
     @staticmethod
     def related_template_values(template: AccountTemplate, attrs):
         ignore_fields = ['id', 'date_created', 'date_updated', 'org_id']
@@ -55,23 +56,29 @@ class AccountSerializerCreateValidateMixin:
         return self.set_secret(attrs)
 
     @staticmethod
-    def push_account(instance, push_now):
+    def push_account(instance, push_now, params):
         if not push_now:
             return
-        push_accounts_to_assets_task.delay([str(instance.id)])
+        push_accounts_to_assets_task.delay([str(instance.id)], params)
+
+    def create_or_update(self, validated_data, instance=None):
+        push_now = validated_data.pop('push_now', None)
+        params = validated_data.pop('params', {})
+        if instance is None:
+            instance = super().create(validated_data)
+        else:
+            instance = super().update(instance, validated_data)
+        self.push_account(instance, push_now, params)
+        return instance
 
     def create(self, validated_data):
-        push_now = validated_data.pop('push_now', None)
-        instance = super().create(validated_data)
-        self.push_account(instance, push_now)
+        instance = self.create_or_update(validated_data)
         return instance
 
     def update(self, instance, validated_data):
         # account cannot be modified
         validated_data.pop('username', None)
-        push_now = validated_data.pop('push_now', None)
-        instance = super().update(instance, validated_data)
-        self.push_account(instance, push_now)
+        instance = self.create_or_update(validated_data, instance)
         return instance
 
 

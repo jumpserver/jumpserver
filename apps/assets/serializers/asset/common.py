@@ -68,6 +68,10 @@ class AssetAccountSerializer(
     push_now = serializers.BooleanField(
         default=False, label=_("Push now"), write_only=True
     )
+    params = serializers.JSONField(
+        decoder=None, encoder=None, required=False,
+        style={'base_template': 'textarea.html'}
+    )
     template = serializers.BooleanField(
         default=False, label=_("Template"), write_only=True
     )
@@ -84,7 +88,7 @@ class AssetAccountSerializer(
             'is_active', 'version', 'secret_type',
         ]
         fields_write_only = [
-            'secret', 'passphrase', 'push_now', 'template'
+            'secret', 'passphrase', 'push_now', 'params', 'template'
         ]
         fields = fields_mini + fields_write_only
         extra_kwargs = {

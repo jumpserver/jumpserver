@@ -146,11 +146,4 @@ class PlatformOpsMethodSerializer(serializers.Serializer):
 
 
 class AutomationMethodsSerializer(serializers.Serializer):
-    id = serializers.CharField(max_length=64, read_only=True)
-    name = serializers.CharField(max_length=64, read_only=True)
-    method = serializers.CharField(max_length=64, read_only=True)
-    serializer = serializers.SerializerMethodField()
-
-    @staticmethod
-    def get_serializer(obj):
-        return bool(obj.get('serializer'))
+    pass

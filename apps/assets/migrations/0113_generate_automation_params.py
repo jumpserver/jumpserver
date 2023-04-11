@@ -9,7 +9,7 @@ def migrate_automation_push_account_params(apps, schema_editor):
     platform_automation_model = apps.get_model('assets', 'PlatformAutomation')
     platform_automation_methods = AllTypes.get_automation_methods()
     methods_id_data_map = {
-        i['id']: '' if i['serializer'] is None else i['serializer']({}).data
+        i['id']: None if i['serializer'] is None else i['serializer']({}).data
         for i in platform_automation_methods
         if i['method'] == 'push_account'
     }
@@ -18,9 +18,10 @@ def migrate_automation_push_account_params(apps, schema_editor):
         push_account_method = automation.push_account_method
         if not push_account_method:
             continue
-        automation.params = {
-            push_account_method: methods_id_data_map.get(push_account_method, {})
-        }
+        value = methods_id_data_map.get(push_account_method)
+        if value is None:
+            continue
+        automation.params = {push_account_method: value}
         automation_objs.append(automation)
     platform_automation_model.objects.bulk_update(automation_objs, ['params'])
 

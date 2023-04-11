@@ -14,7 +14,8 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.params = self.execution.snapshot.get('params', {})
+        params = self.execution.snapshot.get('params')
+        self.params = params if params else {}
 
     @classmethod
     def method_type(cls):
@@ -24,8 +25,6 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
         method_attr = '{}_method'.format(self.__class__.method_type())
         method_id = getattr(automation, method_attr)
         automation_params = automation.params.get(method_id, {})
-        # TODO 兼容一下 posix 和 aix
-        method_id = 'push_account_posix' if method_id == 'push_account_aix' else method_id
         serializer = self.method_id_meta_mapper[method_id]['serializer']
 
         if serializer is None:

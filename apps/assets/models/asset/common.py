@@ -7,6 +7,7 @@ import logging
 from collections import defaultdict
 
 from django.db import models
+from django.forms import model_to_dict
 from django.utils.translation import ugettext_lazy as _
 
 from assets import const
@@ -151,17 +152,14 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
     def auto_info(self):
         platform = self.platform
         automation = self.platform.automation
-        return {
+        model_to_dict(automation)
+        info = {
             'su_enabled': platform.su_enabled,
-            'ping_enabled': automation.ping_enabled,
             'domain_enabled': platform.domain_enabled,
-            'ansible_enabled': automation.ansible_enabled,
-            'push_account_enabled': automation.push_account_enabled,
-            'gather_facts_enabled': automation.gather_facts_enabled,
-            'change_secret_enabled': automation.change_secret_enabled,
-            'verify_account_enabled': automation.verify_account_enabled,
-            'gather_accounts_enabled': automation.gather_accounts_enabled,
         }
+        automation_info = model_to_dict(automation)
+        info.update(automation_info)
+        return info
 
     def get_target_ip(self):
         return self.address

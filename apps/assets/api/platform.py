@@ -97,34 +97,27 @@ class PlatformAutomationMethodsApi(generics.ListAPIView, generics.RetrieveAPIVie
     permission_classes = (IsValidUser,)
     serializer_class = AutomationMethodsSerializer
 
-    @property
-    def ansible_method_id(self):
-        return self.request.query_params.get('ansible_method_id')
-
-    def filter_automation_methods(self, ansible_method_id):
-        platform_automation_methods = AllTypes.get_automation_methods()
-        if not ansible_method_id:
-            return False, platform_automation_methods
-        return True, list(
-            filter(
-                lambda x: x['id'] == self.ansible_method_id,
-                platform_automation_methods)
-        )
+    @staticmethod
+    def automation_methods():
+        return AllTypes.get_automation_methods()
 
     def get_serializer_class(self):
         serializer = super().get_serializer_class()
-        filtered, data = self.filter_automation_methods(self.ansible_method_id)
-        if not filtered or not data:
-            return serializer
-        fields = data[0]
+        data = self.automation_methods()
+        fields = {
+            i['id']: i['serializer']()
+            if i['serializer'] else None
+            for i in data
+        }
         serializer_name = serializer.__name__
-        child_serializer = fields.get('serializer')() if fields.get('serializer') else None
-        return type(serializer_name, (serializer,), {'serializer': child_serializer})
+        return type(serializer_name, (serializer,), fields)
 
     def list(self, request, *args, **kwargs):
-        filtered, data = self.filter_automation_methods(self.ansible_method_id)
-        if not filtered or not data:
-            serializer = self.get_serializer(data, many=True)
-        else:
-            serializer = self.get_serializer(data[0])
+        data = self.automation_methods()
+        data = {
+            i['id']: i['serializer']({})
+            if i['serializer'] else None
+            for i in data
+        }
+        serializer = self.get_serializer(data)
         return Response(serializer.data)
