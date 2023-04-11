@@ -4,6 +4,15 @@ from jumpserver.utils import has_valid_xpack_license
 from .protocol import Protocol
 
 
+class Type:
+    def __init__(self, label, value):
+        self.label = label
+        self.value = value
+
+    def __str__(self):
+        return self.value
+
+
 class BaseType(TextChoices):
     """
     约束应该考虑代是对平台对限制，避免多余对选项，如: mysql 开启 ssh,
@@ -22,7 +31,7 @@ class BaseType(TextChoices):
         protocols_default = protocols.pop('*', {})
         automation_default = automation.pop('*', {})
 
-        for k, v in cls.choices:
+        for k, v in cls.get_choices():
             tp_base = {**base_default, **base.get(k, {})}
             tp_auto = {**automation_default, **automation.get(k, {})}
             tp_protocols = {**protocols_default, **protocols.get(k, {})}
@@ -37,8 +46,12 @@ class BaseType(TextChoices):
         choices = protocol.get('choices', [])
         if choices == '__self__':
             choices = [tp]
-        protocols = [{'name': name, **settings.get(name, {})} for name in choices]
-        protocols[0]['default'] = True
+        protocols = [
+            {'name': name, **settings.get(name, {})}
+            for name in choices
+        ]
+        if protocols:
+            protocols[0]['default'] = True
         return protocols
 
     @classmethod
@@ -58,21 +71,21 @@ class BaseType(TextChoices):
         raise NotImplementedError
 
     @classmethod
-    def get_community_types(cls):
-        raise NotImplementedError
+    def _get_choices_to_types(cls):
+        choices = cls.get_choices()
+        return [Type(label, value) for value, label in choices]
 
     @classmethod
     def get_types(cls):
-        tps = [tp for tp in cls]
+        tps = cls._get_choices_to_types()
         if not has_valid_xpack_license():
             tps = cls.get_community_types()
         return tps
 
     @classmethod
+    def get_community_types(cls):
+        return cls._get_choices_to_types()
+
+    @classmethod
     def get_choices(cls):
-        tps = cls.get_types()
-        cls_choices = cls.choices
-        return [
-            choice for choice in cls_choices
-            if choice[0] in tps
-        ]
+        return cls.choices

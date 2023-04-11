@@ -4,7 +4,7 @@ from rest_framework.generics import ListAPIView
 
 from assets.api.asset.asset import AssetFilterSet
 from assets.models import Asset, Node
-from common.utils import get_logger, lazyproperty
+from common.utils import get_logger, lazyproperty, is_uuid
 from perms import serializers
 from perms.pagination import AllPermedAssetPagination
 from perms.pagination import NodePermedAssetPagination
@@ -58,7 +58,12 @@ class UserAllPermedAssetsApi(BaseUserPermedAssetsApi):
     pagination_class = AllPermedAssetPagination
 
     def get_assets(self):
-        return self.query_asset_util.get_all_assets()
+        node_id = self.request.query_params.get('node_id')
+        if is_uuid(node_id):
+            __, assets = self.query_asset_util.get_node_all_assets(node_id)
+        else:
+            assets = self.query_asset_util.get_all_assets()
+        return assets
 
 
 class UserDirectPermedAssetsApi(BaseUserPermedAssetsApi):

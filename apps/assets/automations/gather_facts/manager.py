@@ -29,7 +29,7 @@ class GatherFactsManager(BasePlaybookManager):
         asset = self.host_asset_mapper.get(host)
         if asset and info:
             info = self.format_asset_info(asset.type, info)
-            asset.info = info
-            asset.save(update_fields=['info'])
+            asset.gathered_info = info
+            asset.save(update_fields=['gathered_info'])
         else:
             logger.error("Not found info: {}".format(host))

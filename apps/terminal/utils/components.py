@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-import time
 from itertools import groupby
 
 from common.utils import get_logger
@@ -40,7 +39,7 @@ class ComputeLoadUtil:
 
     @classmethod
     def compute_load(cls, stat):
-        if not stat or time.time() - stat.date_created.timestamp() > 150:
+        if not stat:
             return ComponentLoad.offline
         system_status_values = cls._compute_system_stat_status(stat).values()
         if ComponentLoad.critical in system_status_values:

@@ -23,13 +23,12 @@ def check_platform_methods(methods):
 
 
 def generate_serializer(data):
-    from common.serializers import DynamicSerializer
-    fields = data.pop('fields', None)
-    if not fields:
+    from common.serializers import create_serializer_class
+    params = data.pop('params', None)
+    if not params:
         return None
     serializer_name = data['id'].title().replace('_', '') + 'Serializer'
-    dynamic_instance = DynamicSerializer(serializer_name, fields)
-    return dynamic_instance.yaml_to_serializer()
+    return create_serializer_class(serializer_name, params)
 
 
 def get_platform_automation_methods(path):
@@ -44,7 +43,7 @@ def get_platform_automation_methods(path):
                 manifest = yaml.safe_load(f)
                 check_platform_method(manifest, path)
                 manifest['dir'] = os.path.dirname(path)
-                manifest['serializer'] = generate_serializer(manifest)
+                manifest['params_serializer'] = generate_serializer(manifest)
             methods.append(manifest)
 
     check_platform_methods(methods)
@@ -58,12 +57,12 @@ def filter_key(manifest, attr, value):
     return value in manifest_value or 'all' in manifest_value
 
 
-def filter_platform_methods(category, tp, method=None, methods=None):
+def filter_platform_methods(category, tp_name, method=None, methods=None):
     methods = platform_automation_methods if methods is None else methods
     if category:
         methods = filter(partial(filter_key, attr='category', value=category), methods)
-    if tp:
-        methods = filter(partial(filter_key, attr='type', value=tp), methods)
+    if tp_name:
+        methods = filter(partial(filter_key, attr='type', value=tp_name), methods)
     if method:
         methods = filter(lambda x: x['method'] == method, methods)
     return methods

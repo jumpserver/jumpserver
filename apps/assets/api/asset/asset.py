@@ -102,14 +102,13 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
         ("platform", serializers.PlatformSerializer),
         ("suggestion", serializers.MiniAssetSerializer),
         ("gateways", serializers.GatewaySerializer),
-        ("spec_info", serializers.SpecSerializer),
     )
     rbac_perms = (
         ("match", "assets.match_asset"),
         ("platform", "assets.view_platform"),
         ("gateways", "assets.view_gateway"),
         ("spec_info", "assets.view_asset"),
-        ("info", "assets.view_asset"),
+        ("gathered_info", "assets.view_asset"),
     )
     extra_filter_backends = [LabelFilterBackend, IpInFilterBackend, NodeFilterBackend]
     skip_assets = []
@@ -127,11 +126,6 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
         asset = super().get_object()
         serializer = super().get_serializer(instance=asset.platform)
         return Response(serializer.data)
-
-    @action(methods=["GET"], detail=True, url_path="spec-info")
-    def spec_info(self, *args, **kwargs):
-        asset = super().get_object()
-        return Response(asset.spec_info)
 
     @action(methods=["GET"], detail=True, url_path="gateways")
     def gateways(self, *args, **kwargs):
@@ -163,6 +157,7 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
                 continue
             self.skip_assets.append(asset)
         return bulk_data
+
     def bulk_update(self, request, *args, **kwargs):
         bulk_data = self.filter_bulk_update_data()
         request._full_data = bulk_data
@@ -182,8 +177,8 @@ class AssetsTaskMixin:
             task = update_assets_hardware_info_manual(assets)
         else:
             asset = assets[0]
-            if not asset.auto_info['ansible_enabled'] or \
-                    not asset.auto_info['ping_enabled']:
+            if not asset.auto_config['ansible_enabled'] or \
+                    not asset.auto_config['ping_enabled']:
                 raise NotSupportedTemporarilyError()
             task = test_assets_connectivity_manual(assets)
         return task

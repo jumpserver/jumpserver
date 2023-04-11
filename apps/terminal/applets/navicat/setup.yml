@@ -1,6 +1,0 @@
-type: manual # exe, zip, manual
-# 从这里下载的: https://www.navicat.com.cn/download/direct-download?product=navicat_premium_en_x64.exe
-source:
-destination: C:\Program Files\PremiumSoft\Navicat Premium 16
-program: C:\Program Files\PremiumSoft\Navicat Premium 16\navicat.exe
-md5: 6c2c25fa56c75254c6bbcba043000063

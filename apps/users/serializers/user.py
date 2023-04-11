@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 #
+import phonenumbers
+
 from functools import partial
 
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers import CommonBulkSerializerMixin
-from common.serializers.fields import EncryptedField, ObjectRelatedField, LabeledChoiceField
+from common.serializers.fields import (
+    EncryptedField, ObjectRelatedField, LabeledChoiceField, PhoneField
+)
 from common.utils import pretty_string, get_logger
 from common.validators import PhoneValidator
 from rbac.builtin import BuiltinRole
@@ -101,6 +105,9 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         label=_("Password"), required=False, allow_blank=True,
         allow_null=True, max_length=1024,
     )
+    phone = PhoneField(
+        validators=[PhoneValidator()], required=False, allow_blank=True, allow_null=True, label=_("Phone")
+    )
     custom_m2m_fields = {
         "system_roles": [BuiltinRole.system_user],
         "org_roles": [BuiltinRole.org_user],
@@ -167,7 +174,6 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
             "created_by": {"read_only": True, "allow_blank": True},
             "role": {"default": "User"},
             "is_otp_secret_key_bound": {"label": _("Is OTP bound")},
-            "phone": {"validators": [PhoneValidator()]},
             'mfa_level': {'label': _("MFA level")},
         }
 

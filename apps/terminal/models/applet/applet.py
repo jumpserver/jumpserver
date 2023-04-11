@@ -12,7 +12,6 @@ from rest_framework.serializers import ValidationError
 
 from common.db.models import JMSBaseModel
 from common.utils import lazyproperty, get_logger
-from jumpserver.utils import has_valid_xpack_license
 
 logger = get_logger(__name__)
 
@@ -91,29 +90,55 @@ class Applet(JMSBaseModel):
         return manifest
 
     @classmethod
-    def install_from_dir(cls, path):
+    def load_platform_if_need(cls, d):
+        from assets.serializers import PlatformSerializer
+
+        if not os.path.exists(os.path.join(d, 'platform.yml')):
+            return
+        try:
+            with open(os.path.join(d, 'platform.yml')) as f:
+                data = yaml.safe_load(f)
+        except Exception as e:
+            raise ValidationError({'error': _('Load platform.yml failed: {}').format(e)})
+
+        if data['category'] != 'custom':
+            raise ValidationError({'error': _('Only support custom platform')})
+
+        try:
+            tp = data['type']
+        except KeyError:
+            raise ValidationError({'error': _('Missing type in platform.yml')})
+
+        s = PlatformSerializer(data=data)
+        s.add_type_choices(tp, tp)
+        s.is_valid(raise_exception=True)
+        s.save()
+
+    @classmethod
+    def install_from_dir(cls, path, builtin=True):
         from terminal.serializers import AppletSerializer
 
         manifest = cls.validate_pkg(path)
         name = manifest['name']
-        if not has_valid_xpack_license() and name.lower() in ('navicat',):
-            return
-
         instance = cls.objects.filter(name=name).first()
         serializer = AppletSerializer(instance=instance, data=manifest)
         serializer.is_valid()
-        serializer.save(builtin=True)
-        pkg_path = default_storage.path('applets/{}'.format(name))
+        serializer.save(builtin=builtin)
 
+        cls.load_platform_if_need(path)
+
+        pkg_path = default_storage.path('applets/{}'.format(name))
         if os.path.exists(pkg_path):
             shutil.rmtree(pkg_path)
         shutil.copytree(path, pkg_path)
-        return instance
+        return instance, serializer
 
     def select_host_account(self):
         # 选择激活的发布机
-        hosts = [item for item in self.hosts.filter(is_active=True).all()
-                 if item.load != 'offline']
+        hosts = [
+            host for host in self.hosts.filter(is_active=True)
+            if host.load != 'offline'
+        ]
 
         if not hosts:
             return None

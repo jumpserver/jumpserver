@@ -58,10 +58,11 @@ class UserUpdatePasswordSerializer(serializers.ModelSerializer):
 class UserUpdateSecretKeySerializer(serializers.ModelSerializer):
     new_secret_key = EncryptedField(required=True, max_length=128)
     new_secret_key_again = EncryptedField(required=True, max_length=128)
+    has_secret_key = serializers.BooleanField(read_only=True, source='secret_key')
 
     class Meta:
         model = User
-        fields = ['new_secret_key', 'new_secret_key_again']
+        fields = ['has_secret_key', 'new_secret_key', 'new_secret_key_again']
 
     def validate(self, values):
         new_secret_key = values.get('new_secret_key', '')
@@ -114,6 +115,7 @@ class UserProfileSerializer(UserSerializer):
     MFA_LEVEL_CHOICES = (
         (0, _('Disable')),
         (1, _('Enable')),
+        (2, _("Force enable")),
     )
     public_key_comment = serializers.CharField(
         source='get_public_key_comment', required=False, read_only=True, max_length=128

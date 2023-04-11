@@ -1,50 +1,54 @@
-from copy import deepcopy
-from typing import Dict
-
 from rest_framework import serializers
 
-__all__ = [
-    'DynamicSerializer'
+example_info = [
+    {"name": "name", "label": "姓名", "required": False, "default": "广州老广", "type": "str"},
+    {"name": "age", "label": "年龄", "required": False, "default": 18, "type": "int"},
 ]
 
+type_field_map = {
+    "str": serializers.CharField,
+    "int": serializers.IntegerField,
+    "bool": serializers.BooleanField,
+    "text": serializers.CharField,
+    "choice": serializers.ChoiceField,
+}
 
-class DynamicSerializer:
-    serializer_field_dict = {
-        "str": serializers.CharField,
-        "dict": serializers.DictField,
-        "int": serializers.IntegerField,
-        "float": serializers.FloatField,
-        "bool": serializers.BooleanField,
-        "list": serializers.ListSerializer,
-        "datetime": serializers.DateTimeField,
-    }
 
-    def __init__(self, name, fields):
-        self.name = name
-        self.fields = deepcopy(fields)
+def set_default_if_need(data, i):
+    field_name = data.pop('name', 'Attr{}'.format(i + 1))
+    data['name'] = field_name
 
-    @staticmethod
-    def generate_field_kwargs(field: dict) -> dict:
-        return {k: v for k, v in field.items()}
+    if not data.get('label'):
+        data['label'] = field_name
+    return data
 
-    def generate_field(self, data_type: str, field_data=None):
-        if field_data is None:
-            field_data = {}
 
-        serializer_field_dict = self.serializer_field_dict
-        field_kwargs = self.generate_field_kwargs(field_data)
-        if "[" in data_type:
-            type_name, arg_str = data_type[:-1].split("[")
-            arg_type = self.generate_field(arg_str)
-            serializer_class = self.serializer_field_dict.get(type_name)
-            return serializer_class(child=arg_type, **field_kwargs)
-        else:
-            return serializer_field_dict.get(data_type)(**field_kwargs)
+def set_default_by_type(tp, data, field_info):
+    if tp == 'str':
+        data['max_length'] = 4096
+    elif tp == 'choice':
+        choices = field_info.pop('choices', [])
+        if isinstance(choices, str):
+            choices = choices.split(',')
+        choices = [
+            (c, c.title()) if not isinstance(c, (tuple, list)) else c
+            for c in choices
+        ]
+        data['choices'] = choices
+    return data
 
-    def yaml_to_serializer(self):
-        fields: Dict[str, serializers.Field] = {}
-        for field_data in self.fields:
-            field_name = field_data.pop('name')
-            data_type = field_data.pop('type', 'str')
-            fields[field_name] = self.generate_field(data_type, field_data)
-        return type(self.name, (serializers.Serializer,), fields)
+
+def create_serializer_class(serializer_name, fields_info):
+    serializer_fields = {}
+    fields_name = ['name', 'label', 'default', 'type', 'help_text']
+
+    for i, field_info in enumerate(fields_info):
+        data = {k: field_info.get(k) for k in fields_name}
+        field_type = data.pop('type', 'str')
+        data = set_default_by_type(field_type, data, field_info)
+        data = set_default_if_need(data, i)
+        field_name = data.pop('name')
+        field_class = type_field_map.get(field_type, serializers.CharField)
+        serializer_fields[field_name] = field_class(**data)
+
+    return type(serializer_name, (serializers.Serializer,), serializer_fields)

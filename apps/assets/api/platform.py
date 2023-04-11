@@ -30,7 +30,7 @@ class AssetPlatformViewSet(JMSModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.filter(type__in=AllTypes.get_types())
+        queryset = queryset.filter(type__in=AllTypes.get_types_values())
         return queryset
 
     def get_object(self):
@@ -105,8 +105,8 @@ class PlatformAutomationMethodsApi(generics.ListAPIView, generics.RetrieveAPIVie
         serializer = super().get_serializer_class()
         data = self.automation_methods()
         fields = {
-            i['id']: i['serializer']()
-            if i['serializer'] else None
+            i['id']: i['params_serializer']()
+            if i['params_serializer'] else None
             for i in data
         }
         serializer_name = serializer.__name__
@@ -115,8 +115,8 @@ class PlatformAutomationMethodsApi(generics.ListAPIView, generics.RetrieveAPIVie
     def list(self, request, *args, **kwargs):
         data = self.automation_methods()
         data = {
-            i['id']: i['serializer']({})
-            if i['serializer'] else None
+            i['id']: i['params_serializer']({})
+            if i['params_serializer'] else None
             for i in data
         }
         serializer = self.get_serializer(data)

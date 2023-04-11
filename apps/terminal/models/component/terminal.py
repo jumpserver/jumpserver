@@ -1,6 +1,7 @@
 import time
-
+import uuid
 from django.conf import settings
+from django.core.cache import cache
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -10,6 +11,7 @@ from common.utils import get_logger, lazyproperty
 from orgs.utils import tmp_to_root_org
 from terminal.const import TerminalType as TypeChoices
 from users.models import User
+from .status import Status
 from ..session import Session
 
 logger = get_logger(__file__)
@@ -22,7 +24,7 @@ class TerminalStatusMixin:
 
     @lazyproperty
     def last_stat(self):
-        return self.status_set.order_by('date_created').last()
+        return Status.get_terminal_latest_stat(self)
 
     @lazyproperty
     def load(self):
@@ -31,9 +33,12 @@ class TerminalStatusMixin:
 
     @property
     def is_alive(self):
-        if not self.last_stat:
-            return False
-        return time.time() - self.last_stat.date_created.timestamp() < 150
+        key = self.ALIVE_KEY.format(self.id)
+        return cache.get(key, False)
+
+    def set_alive(self, ttl=60 * 3):
+        key = self.ALIVE_KEY.format(self.id)
+        cache.set(key, True, ttl)
 
 
 class StorageMixin:
@@ -136,6 +141,7 @@ class Terminal(StorageMixin, TerminalStatusMixin, JMSBaseModel):
         if self.user:
             setattr(self.user, SKIP_SIGNAL, True)
             self.user.delete()
+        self.name = self.name + '_' + uuid.uuid4().hex[:8]
         self.user = None
         self.is_deleted = True
         self.save()

@@ -10,6 +10,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
     rdp = 'rdp', 'RDP'
     telnet = 'telnet', 'Telnet'
     vnc = 'vnc', 'VNC'
+    winrm = 'winrm', 'WinRM'
 
     mysql = 'mysql', 'MySQL'
     mariadb = 'mariadb', 'MariaDB'
@@ -50,6 +51,13 @@ class Protocol(ChoicesMixin, models.TextChoices):
             cls.telnet: {
                 'port': 23,
                 'secret_types': ['password'],
+            },
+            cls.winrm: {
+                'port': 5985,
+                'secret_types': ['password'],
+                'setting': {
+                    'use_ssl': False,
+                }
             },
         }
 
@@ -127,4 +135,12 @@ class Protocol(ChoicesMixin, models.TextChoices):
             **cls.device_protocols(),
             **cls.database_protocols(),
             **cls.cloud_protocols()
+        }
+
+    @classmethod
+    def protocol_secret_types(cls):
+        settings = cls.settings()
+        return {
+            protocol: settings[protocol]['secret_types'] or ['password']
+            for protocol in cls.settings()
         }

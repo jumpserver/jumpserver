@@ -16,7 +16,7 @@ class DeviceTypes(BaseType):
                 'charset_enabled': False,
                 'domain_enabled': True,
                 'su_enabled': True,
-                'su_methods': ['enable']
+                'su_methods': ['enable', 'super', 'super_level']
             }
         }
 

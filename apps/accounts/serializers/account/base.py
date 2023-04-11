@@ -13,7 +13,7 @@ __all__ = ['AuthValidateMixin', 'BaseAccountSerializer']
 
 class AuthValidateMixin(serializers.Serializer):
     secret_type = LabeledChoiceField(
-        choices=SecretType.choices, required=True, label=_('Secret type')
+        choices=SecretType.choices, label=_('Secret type'), default='password'
     )
     secret = EncryptedField(
         label=_('Secret'), required=False, max_length=40960, allow_blank=True,
@@ -77,6 +77,5 @@ class BaseAccountSerializer(AuthValidateMixin, BulkOrgResourceModelSerializer):
             'date_verified', 'created_by', 'date_created',
         ]
         extra_kwargs = {
-            'name': {'required': True},
             'spec_info': {'label': _('Spec info')},
         }
