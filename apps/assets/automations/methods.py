@@ -1,7 +1,8 @@
-import os
-import yaml
 import json
+import os
 from functools import partial
+
+import yaml
 
 
 def check_platform_method(manifest, manifest_path):
@@ -46,12 +47,12 @@ def filter_key(manifest, attr, value):
     return value in manifest_value or 'all' in manifest_value
 
 
-def filter_platform_methods(category, tp, method=None, methods=None):
+def filter_platform_methods(category, tp_name, method=None, methods=None):
     methods = platform_automation_methods if methods is None else methods
     if category:
         methods = filter(partial(filter_key, attr='category', value=category), methods)
-    if tp:
-        methods = filter(partial(filter_key, attr='type', value=tp), methods)
+    if tp_name:
+        methods = filter(partial(filter_key, attr='type', value=tp_name), methods)
     if method:
         methods = filter(lambda x: x['method'] == method, methods)
     return methods

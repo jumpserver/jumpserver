@@ -141,6 +141,6 @@ class Protocol(ChoicesMixin, models.TextChoices):
     def protocol_secret_types(cls):
         settings = cls.settings()
         return {
-            protocol: settings[protocol]['secret_types']
+            protocol: settings[protocol]['secret_types'] or ['password']
             for protocol in cls.settings()
         }
