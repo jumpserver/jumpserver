@@ -21,6 +21,8 @@ __all__ = [
 
 class AssetPermedSerializer(OrgResourceModelSerializerMixin):
     """ 被授权资产的数据结构 """
+    NOT_SERIALIZER_PROTOCOL = ('winrm',)
+
     platform = ObjectRelatedField(required=False, queryset=Platform.objects, label=_('Platform'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
@@ -44,6 +46,16 @@ class AssetPermedSerializer(OrgResourceModelSerializerMixin):
             .annotate(category=F("platform__category")) \
             .annotate(type=F("platform__type"))
         return queryset
+
+    def filter_protocols(self, protocols):
+        return [
+            p for p in protocols if p['name'] not in self.NOT_SERIALIZER_PROTOCOL
+        ]
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['protocols'] = self.filter_protocols(data['protocols'])
+        return data
 
 
 class AssetPermedDetailSerializer(AssetPermedSerializer):
