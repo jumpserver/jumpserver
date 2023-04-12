@@ -24,8 +24,8 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
     def get_push_kwargs(self, automation):
         method_attr = '{}_method'.format(self.__class__.method_type())
         method_id = getattr(automation, method_attr)
-        automation_params = automation.params.get(method_id, {})
-        serializer = self.method_id_meta_mapper[method_id]['serializer']
+        automation_params = automation.push_account_params
+        serializer = self.method_id_meta_mapper[method_id]['params_serializer']
 
         if serializer is None:
             return {}
