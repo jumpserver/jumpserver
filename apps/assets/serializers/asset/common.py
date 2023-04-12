@@ -40,7 +40,7 @@ class AssetProtocolsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Protocol
-        fields = ['name', 'port']
+        fields = ['name', 'port', 'public', 'setting']
 
 
 class AssetLabelSerializer(serializers.ModelSerializer):
