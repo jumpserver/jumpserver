@@ -1,5 +1,4 @@
 import uuid
-from collections import defaultdict
 
 from django.db import IntegrityError
 from django.db.models import Q
@@ -10,7 +9,7 @@ from rest_framework.validators import UniqueTogetherValidator
 from accounts.const import SecretType, Source, AccountInvalidPolicy
 from accounts.models import Account, AccountTemplate
 from accounts.tasks import push_accounts_to_assets_task
-from assets.const import Category, AllTypes, Protocol
+from assets.const import Category, AllTypes
 from assets.models import Asset
 from common.serializers import SecretReadableMixin
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
@@ -80,12 +79,12 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             raise serializers.ValidationError({'template': 'Template not found'})
 
         # Set initial data from template
-        ignore_fields = ['id', 'name', 'date_created', 'date_updated', 'org_id']
+        ignore_fields = ['id', 'date_created', 'date_updated', 'org_id']
         field_names = [
             field.name for field in template._meta.fields
             if field.name not in ignore_fields
         ]
-        attrs = {'source': 'template', 'source_id': template.id}
+        attrs = {'source': Source.TEMPLATE, 'source_id': str(template.id)}
         for name in field_names:
             value = getattr(template, name, None)
             if value is None:
@@ -135,6 +134,16 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         else:
             raise serializers.ValidationError('Account already exists')
 
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        if self.instance:
+            return attrs
+
+        if 'source' in self.initial_data:
+            attrs['source'] = self.initial_data['source']
+            attrs['source_id'] = self.initial_data['source_id']
+        return attrs
+
     def create(self, validated_data):
         push_now = validated_data.pop('push_now', None)
         instance, stat = self.do_create(validated_data)
@@ -146,6 +155,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         validated_data.pop('username', None)
         validated_data.pop('on_invalid', None)
         push_now = validated_data.pop('push_now', None)
+        validated_data['source_id'] = None
         instance = super().update(instance, validated_data)
         self.push_account_if_need(instance, push_now, 'updated')
         return instance
@@ -234,25 +244,6 @@ class AssetAccountBulkSerializer(AccountCreateUpdateSerializerMixin, serializers
         self.from_template_if_need(initial_data)
 
     @staticmethod
-    def _get_valid_secret_type_assets(assets, secret_type):
-        if isinstance(assets, list):
-            asset_ids = [a.id for a in assets]
-            assets = Asset.objects.filter(id__in=asset_ids)
-
-        asset_protocol = assets.prefetch_related('protocols').values_list('id', 'protocols__name')
-        protocol_secret_types_map = Protocol.protocol_secret_types()
-        asset_secret_types_mapp = defaultdict(set)
-
-        for asset_id, protocol in asset_protocol:
-            secret_types = set(protocol_secret_types_map.get(protocol, []))
-            asset_secret_types_mapp[asset_id].update(secret_types)
-
-        return [
-            asset for asset in assets
-            if secret_type in asset_secret_types_mapp.get(asset.id, [])
-        ]
-
-    @staticmethod
     def get_filter_lookup(vd):
         return {
             'username': vd['username'],
@@ -314,7 +305,8 @@ class AssetAccountBulkSerializer(AccountCreateUpdateSerializerMixin, serializers
             vd['name'] = vd.get('username')
 
         create_handler = self.get_create_handler(on_invalid)
-        secret_type_supports = self._get_valid_secret_type_assets(assets, secret_type)
+        asset_ids = [asset.id for asset in assets]
+        secret_type_supports = Asset.get_secret_type_assets(asset_ids, secret_type)
 
         _results = {}
         for asset in assets:

@@ -271,6 +271,22 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
         tree_node = TreeNode(**data)
         return tree_node
 
+    @staticmethod
+    def get_secret_type_assets(asset_ids, secret_type):
+        assets = Asset.objects.filter(id__in=asset_ids)
+        asset_protocol = assets.prefetch_related('protocols').values_list('id', 'protocols__name')
+        protocol_secret_types_map = const.Protocol.protocol_secret_types()
+        asset_secret_types_mapp = defaultdict(set)
+
+        for asset_id, protocol in asset_protocol:
+            secret_types = set(protocol_secret_types_map.get(protocol, []))
+            asset_secret_types_mapp[asset_id].update(secret_types)
+
+        return [
+            asset for asset in assets
+            if secret_type in asset_secret_types_mapp.get(asset.id, [])
+        ]
+
     class Meta:
         unique_together = [('org_id', 'name')]
         verbose_name = _("Asset")
