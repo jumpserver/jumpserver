@@ -106,7 +106,7 @@ class Protocol(models.Model):
 
     @property
     def public(self):
-        return self.protocol.get('public', True)
+        return self.protocol.get('public', False)
 
 
 class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
