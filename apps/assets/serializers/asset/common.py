@@ -44,7 +44,6 @@ class AssetProtocolsSerializer(serializers.ModelSerializer):
 
 
 class AssetProtocolsPermsSerializer(serializers.ModelSerializer):
-
     class Meta(AssetProtocolsSerializer.Meta):
         fields = AssetProtocolsSerializer.Meta.fields + ['public', 'setting']
 
