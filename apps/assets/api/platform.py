@@ -1,16 +1,16 @@
 from rest_framework import generics
+from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from assets.const import AllTypes
-from assets.models import Platform, PlatformAutomation, Node, Asset
-from assets.serializers import PlatformSerializer, AutomationMethodsSerializer
+from assets.models import Platform, Node, Asset
+from assets.serializers import PlatformSerializer
 from common.api import JMSModelViewSet
 from common.permissions import IsValidUser
 from common.serializers import GroupedChoiceSerializer
-from orgs.mixins.generics import RetrieveUpdateAPIView
 
-__all__ = ['AssetPlatformViewSet', 'PlatformAutomationParamsApi', 'PlatformAutomationMethodsApi']
+__all__ = ['AssetPlatformViewSet', 'PlatformAutomationMethodsApi']
 
 
 class AssetPlatformViewSet(JMSModelViewSet):
@@ -61,63 +61,28 @@ class AssetPlatformViewSet(JMSModelViewSet):
         return Response(serializer.data)
 
 
-class PlatformAutomationParamsApi(RetrieveUpdateAPIView):
-    instance = None
-    model = PlatformAutomation
-
-    @property
-    def ansible_method_id(self):
-        return self.kwargs.get('ansible_method_id')
-
-    def get_serializer_class(self):
-        return self.model.generate_params_serializer(self.instance, self.ansible_method_id)
-
-    def get_object(self):
-        self.instance = super().get_object()
-        return self.instance
-
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        data = instance.params.get(self.ansible_method_id, {})
-        serializer = self.get_serializer(data)
-        return Response(serializer.data)
-
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        validated_data = serializer.validated_data
-        instance.params.setdefault(self.ansible_method_id, {}).update(validated_data)
-        instance.save(update_fields=['params'])
-        return Response(status=200)
-
-
-class PlatformAutomationMethodsApi(generics.ListAPIView, generics.RetrieveAPIView):
+class PlatformAutomationMethodsApi(generics.ListAPIView):
     permission_classes = (IsValidUser,)
-    serializer_class = AutomationMethodsSerializer
 
     @staticmethod
     def automation_methods():
         return AllTypes.get_automation_methods()
 
-    def get_serializer_class(self):
-        serializer = super().get_serializer_class()
+    def generate_serializer_fields(self):
         data = self.automation_methods()
         fields = {
             i['id']: i['params_serializer']()
             if i['params_serializer'] else None
             for i in data
         }
-        serializer_name = serializer.__name__
-        return type(serializer_name, (serializer,), fields)
+        return fields
+
+    def get_serializer_class(self):
+        fields = self.generate_serializer_fields()
+        serializer_name = 'AutomationMethodsSerializer'
+        return type(serializer_name, (serializers.Serializer,), fields)
 
     def list(self, request, *args, **kwargs):
-        data = self.automation_methods()
-        data = {
-            i['id']: i['params_serializer']({})
-            if i['params_serializer'] else None
-            for i in data
-        }
+        data = self.generate_serializer_fields()
         serializer = self.get_serializer(data)
         return Response(serializer.data)

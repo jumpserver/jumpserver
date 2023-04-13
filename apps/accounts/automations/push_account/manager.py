@@ -12,31 +12,9 @@ logger = get_logger(__name__)
 class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
     ansible_account_prefer = ''
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        params = self.execution.snapshot.get('params')
-        self.params = params if params else {}
-
     @classmethod
     def method_type(cls):
         return AutomationTypes.push_account
-
-    def get_push_kwargs(self, automation):
-        method_attr = '{}_method'.format(self.__class__.method_type())
-        method_id = getattr(automation, method_attr)
-        automation_params = automation.push_account_params
-        serializer = self.method_id_meta_mapper[method_id]['params_serializer']
-
-        if serializer is None:
-            return {}
-
-        data = self.params.get(method_id, {})
-        params = serializer(data).data
-        return {
-            field_name: automation_params.get(field_name, '')
-            if not params[field_name] else params[field_name]
-            for field_name in params
-        }
 
     def host_callback(self, host, asset=None, account=None, automation=None, path_dir=None, **kwargs):
         host = super(ChangeSecretManager, self).host_callback(
@@ -53,8 +31,7 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
             print(msg)
             return inventory_hosts
 
-        host['kwargs'] = self.get_push_kwargs(automation)
-
+        host['ssh_params'] = {}
         for account in accounts:
             h = deepcopy(host)
             secret_type = account.secret_type
@@ -73,7 +50,7 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
                 private_key_path = self.generate_private_key_path(new_secret, path_dir)
                 new_secret = self.generate_public_key(new_secret)
 
-            h['kwargs'].update(self.get_kwargs(account, new_secret, secret_type))
+            h['ssh_params'].update(self.get_ssh_params(account, new_secret, secret_type))
             h['account'] = {
                 'name': account.name,
                 'username': account.username,

@@ -8,7 +8,7 @@ from common.utils import lazyproperty
 from ..const import Category, AllTypes
 from ..models import Platform, PlatformProtocol, PlatformAutomation
 
-__all__ = ["PlatformSerializer", "PlatformOpsMethodSerializer", "AutomationMethodsSerializer"]
+__all__ = ["PlatformSerializer", "PlatformOpsMethodSerializer"]
 
 
 class ProtocolSettingSerializer(serializers.Serializer):
@@ -199,7 +199,3 @@ class PlatformOpsMethodSerializer(serializers.Serializer):
     category = serializers.CharField(max_length=50, label=_("Category"))
     type = serializers.ListSerializer(child=serializers.CharField())
     method = serializers.CharField()
-
-
-class AutomationMethodsSerializer(serializers.Serializer):
-    pass

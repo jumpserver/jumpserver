@@ -28,13 +28,16 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
     push_now = serializers.BooleanField(
         default=False, label=_("Push now"), write_only=True
     )
+    params = serializers.JSONField(
+        decoder=None, encoder=None, required=False, style={'base_template': 'textarea.html'}
+    )
     on_invalid = LabeledChoiceField(
         choices=AccountInvalidPolicy.choices, default=AccountInvalidPolicy.ERROR,
         write_only=True, label=_('Exist policy')
     )
 
     class Meta:
-        fields = ['template', 'push_now', 'on_invalid']
+        fields = ['template', 'push_now', 'params', 'on_invalid']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -94,10 +97,10 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         initial_data.update(attrs)
 
     @staticmethod
-    def push_account_if_need(instance, push_now, stat):
+    def push_account_if_need(instance, push_now, params, stat):
         if not push_now or stat != 'created':
             return
-        push_accounts_to_assets_task.delay([str(instance.id)])
+        push_accounts_to_assets_task.delay([str(instance.id)], params)
 
     def get_validators(self):
         _validators = super().get_validators()
@@ -137,8 +140,9 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
 
     def create(self, validated_data):
         push_now = validated_data.pop('push_now', None)
+        params = validated_data.pop('params', None)
         instance, stat = self.do_create(validated_data)
-        self.push_account_if_need(instance, push_now, stat)
+        self.push_account_if_need(instance, push_now, params, stat)
         return instance
 
     def update(self, instance, validated_data):
@@ -146,8 +150,9 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         validated_data.pop('username', None)
         validated_data.pop('on_invalid', None)
         push_now = validated_data.pop('push_now', None)
+        params = validated_data.pop('params', None)
         instance = super().update(instance, validated_data)
-        self.push_account_if_need(instance, push_now, 'updated')
+        self.push_account_if_need(instance, push_now, params, 'updated')
         return instance
 
 

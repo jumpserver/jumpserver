@@ -7,9 +7,9 @@
     - name: Push user
       ansible.builtin.user:
         name: "{{ account.username }}"
-        shell: "{{ kwargs.shell }}"
+        shell: "{{ params.shell }}"
         home: "{{ '/home/' + account.username }}"
-        groups: "{{ kwargs.groups }}"
+        groups: "{{ params.groups }}"
         expires: -1
         state: present
 
@@ -35,8 +35,8 @@
     - name: Add user groups
       ansible.builtin.user:
         name: "{{ account.username }}"
-        groups: "{{ kwargs.groups }}"
-      when: kwargs.groups
+        groups: "{{ params.groups }}"
+      when: params.groups
 
     - name: Push user password
       ansible.builtin.user:
@@ -47,18 +47,18 @@
 
     - name: remove jumpserver ssh key
       ansible.builtin.lineinfile:
-        dest: "{{ kwargs.dest }}"
-        regexp: "{{ kwargs.regexp }}"
+        dest: "{{ ssh_params.dest }}"
+        regexp: "{{ ssh_params.regexp }}"
         state: absent
       when:
         - account.secret_type == "ssh_key"
-        - kwargs.strategy == "set_jms"
+        - ssh_params.strategy == "set_jms"
 
     - name: Push SSH key
       ansible.builtin.authorized_key:
         user: "{{ account.username }}"
         key: "{{ account.secret }}"
-        exclusive: "{{ kwargs.exclusive }}"
+        exclusive: "{{ ssh_params.exclusive }}"
       when: account.secret_type == "ssh_key"
 
     - name: Set sudo setting
@@ -66,10 +66,10 @@
         dest: /etc/sudoers
         state: present
         regexp: "^{{ account.username }} ALL="
-        line: "{{ account.username + ' ALL=(ALL) NOPASSWD: ' + kwargs.sudo }}"
+        line: "{{ account.username + ' ALL=(ALL) NOPASSWD: ' + params.sudo }}"
         validate: visudo -cf %s
       when:
-        - kwargs.sudo
+        - params.sudo
 
     - name: Refresh connection
       ansible.builtin.meta: reset_connection

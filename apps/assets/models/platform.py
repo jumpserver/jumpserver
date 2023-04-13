@@ -1,7 +1,5 @@
 from django.db import models
-from django.forms.models import model_to_dict
 from django.utils.translation import gettext_lazy as _
-from rest_framework import serializers
 
 from assets.const import AllTypes
 from assets.const import Protocol
@@ -66,42 +64,6 @@ class PlatformAutomation(models.Model):
         max_length=32, blank=True, null=True, verbose_name=_("Gather facts method")
     )
     gather_accounts_params = models.JSONField(default=dict, verbose_name=_("Gather facts params"))
-
-    @staticmethod
-    def get_empty_serializer():
-        serializer_name = 'EmptySerializer'
-        return type(serializer_name, (serializers.Serializer,), {})
-
-    @classmethod
-    def generate_params_serializer(cls, instance, ansible_method_id):
-        serializer_class = cls.get_empty_serializer()
-
-        if instance is None:
-            return serializer_class
-
-        info = model_to_dict(instance)
-        if not instance.ansible_enabled:
-            return serializer_class
-        info.pop('ansible_enabled', None)
-
-        allow_ansible_method_ids = []
-        for k, v in info.items():
-            if k.endswith('_enabled') and info[k]:
-                allow_ansible_method_ids.append(info[k.strip('_enabled') + '_method'])
-
-        if ansible_method_id not in allow_ansible_method_ids:
-            return serializer_class
-        return cls.get_ansible_serializer(ansible_method_id)
-
-    @classmethod
-    def get_ansible_serializer(cls, ansible_method_id):
-        serializer_class = cls.get_empty_serializer()
-        platform_automation_methods = AllTypes.get_automation_methods()
-        for i in platform_automation_methods:
-            if i['id'] != ansible_method_id:
-                continue
-            return i['serializer'] if i['serializer'] else serializer_class
-        return serializer_class
 
 
 class Platform(JMSBaseModel):

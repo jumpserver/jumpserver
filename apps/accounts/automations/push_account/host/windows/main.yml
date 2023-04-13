@@ -14,7 +14,7 @@
         name: "{{ account.username }}"
         password: "{{ account.secret }}"
         password_never_expires: yes
-        groups: "{{ kwargs.groups }}"
+        groups: "{{ params.groups }}"
         groups_action: add
         update_password: always
       when: account.secret_type == "password"

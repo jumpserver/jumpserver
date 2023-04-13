@@ -19,6 +19,7 @@ class BaseAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
     assets = models.ManyToManyField('assets.Asset', blank=True, verbose_name=_("Assets"))
     type = models.CharField(max_length=16, verbose_name=_('Type'))
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
+    params = models.JSONField(default=dict, verbose_name=_("Params"))
 
     def __str__(self):
         return self.name + '@' + str(self.created_by)

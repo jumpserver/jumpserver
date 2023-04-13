@@ -1,12 +1,11 @@
 import json
 import os
 import shutil
-import yaml
-
 from collections import defaultdict
 from hashlib import md5
 from socket import gethostname
 
+import yaml
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -42,6 +41,26 @@ class BasePlaybookManager:
         self.method_hosts_mapper = defaultdict(list)
         self.playbooks = []
         self.gateway_servers = dict()
+        params = self.execution.snapshot.get('params')
+        self.params = params or {}
+
+    def get_params(self, automation, method_type):
+        method_attr = '{}_method'.format(method_type)
+        method_params = '{}_params'.format(method_type)
+        method_id = getattr(automation, method_attr)
+        automation_params = getattr(automation, method_params)
+        serializer = self.method_id_meta_mapper[method_id]['params_serializer']
+
+        if serializer is None:
+            return {}
+
+        data = self.params.get(method_id, {})
+        params = serializer(data).data
+        return {
+            field_name: automation_params.get(field_name, '')
+            if not params[field_name] else params[field_name]
+            for field_name in params
+        }
 
     @property
     def platform_automation_methods(self):
@@ -102,8 +121,9 @@ class BasePlaybookManager:
         return host
 
     def host_callback(self, host, automation=None, **kwargs):
-        enabled_attr = '{}_enabled'.format(self.__class__.method_type())
-        method_attr = '{}_method'.format(self.__class__.method_type())
+        method_type = self.__class__.method_type()
+        enabled_attr = '{}_enabled'.format(method_type)
+        method_attr = '{}_method'.format(method_type)
 
         method_enabled = automation and \
                          getattr(automation, enabled_attr) and \
@@ -115,6 +135,7 @@ class BasePlaybookManager:
             return host
 
         host = self.convert_cert_to_file(host, kwargs.get('path_dir'))
+        host['params'] = self.get_params(automation, method_type)
         return host
 
     @staticmethod

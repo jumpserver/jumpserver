@@ -46,7 +46,6 @@ urlpatterns = [
     path('nodes/<uuid:pk>/tasks/', api.NodeTaskCreateApi.as_view(), name='node-task-create'),
 
     path('gateways/<uuid:pk>/test-connective/', api.GatewayTestConnectionApi.as_view(), name='test-gateway-connective'),
-    path('platform-automation/<int:pk>/params/<str:ansible_method_id>/', api.PlatformAutomationParamsApi.as_view(), name='platform-automation-param'),
     path('platform-automation-methods/', api.PlatformAutomationMethodsApi.as_view(), name='platform-automation-methods'),
 ]
 
