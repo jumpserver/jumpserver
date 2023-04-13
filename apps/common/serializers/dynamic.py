@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 example_info = [
-    {"name": "name", "label": "姓名", "required": False, "default": "老广", "type": "str"},
+    {"name": "name", "label": "姓名", "required": False, "default": "广州老广", "type": "str"},
     {"name": "age", "label": "年龄", "required": False, "default": 18, "type": "int"},
 ]
 

@@ -1,0 +1,6 @@
+id: push_account_postgresql
+name: Push account for PostgreSQL
+category: database
+type:
+  - postgresql
+method: push_account

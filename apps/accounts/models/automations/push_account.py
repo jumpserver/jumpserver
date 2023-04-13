@@ -51,7 +51,8 @@ class PushAccountAutomation(ChangeSecretMixin, AccountBaseAutomation):
     def to_attr_json(self):
         attr_json = super().to_attr_json()
         attr_json.update({
-            'username': self.username
+            'username': self.username,
+            'params': self.params,
         })
         return attr_json
 

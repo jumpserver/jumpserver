@@ -38,25 +38,40 @@ class PlatformProtocol(models.Model):
 class PlatformAutomation(models.Model):
     ansible_enabled = models.BooleanField(default=False, verbose_name=_("Enabled"))
     ansible_config = models.JSONField(default=dict, verbose_name=_("Ansible config"))
+
     ping_enabled = models.BooleanField(default=False, verbose_name=_("Ping enabled"))
     ping_method = models.CharField(max_length=32, blank=True, null=True, verbose_name=_("Ping method"))
+    ping_params = models.JSONField(default=dict, verbose_name=_("Ping params"))
+
     gather_facts_enabled = models.BooleanField(default=False, verbose_name=_("Gather facts enabled"))
-    gather_facts_method = models.TextField(max_length=32, blank=True, null=True, verbose_name=_("Gather facts method"))
+    gather_facts_method = models.TextField(
+        max_length=32, blank=True, null=True, verbose_name=_("Gather facts method")
+    )
+    gather_facts_params = models.JSONField(default=dict, verbose_name=_("Gather facts params"))
+
     change_secret_enabled = models.BooleanField(default=False, verbose_name=_("Change secret enabled"))
     change_secret_method = models.TextField(
         max_length=32, blank=True, null=True, verbose_name=_("Change secret method")
     )
+    change_secret_params = models.JSONField(default=dict, verbose_name=_("Change secret params"))
+
     push_account_enabled = models.BooleanField(default=False, verbose_name=_("Push account enabled"))
     push_account_method = models.TextField(
         max_length=32, blank=True, null=True, verbose_name=_("Push account method")
     )
+    push_account_params = models.JSONField(default=dict, verbose_name=_("Push account params"))
+
     verify_account_enabled = models.BooleanField(default=False, verbose_name=_("Verify account enabled"))
     verify_account_method = models.TextField(
-        max_length=32, blank=True, null=True, verbose_name=_("Verify account method"))
+        max_length=32, blank=True, null=True, verbose_name=_("Verify account method")
+    )
+    verify_account_params = models.JSONField(default=dict, verbose_name=_("Verify account params"))
+
     gather_accounts_enabled = models.BooleanField(default=False, verbose_name=_("Gather facts enabled"))
     gather_accounts_method = models.TextField(
         max_length=32, blank=True, null=True, verbose_name=_("Gather facts method")
     )
+    gather_accounts_params = models.JSONField(default=dict, verbose_name=_("Gather facts params"))
 
 
 class Platform(JMSBaseModel):

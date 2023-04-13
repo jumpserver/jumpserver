@@ -42,7 +42,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
     def method_type(cls):
         return AutomationTypes.change_secret
 
-    def get_kwargs(self, account, secret, secret_type):
+    def get_ssh_params(self, account, secret, secret_type):
         kwargs = {}
         if secret_type != SecretType.SSH_KEY:
             return kwargs
@@ -111,6 +111,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             print(f'Windows {asset} does not support ssh key push')
             return inventory_hosts
 
+        host['ssh_params'] = {}
         for account in accounts:
             h = deepcopy(host)
             secret_type = account.secret_type
@@ -129,7 +130,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
                 private_key_path = self.generate_private_key_path(new_secret, path_dir)
                 new_secret = self.generate_public_key(new_secret)
 
-            h['kwargs'] = self.get_kwargs(account, new_secret, secret_type)
+            h['ssh_params'].update(self.get_ssh_params(account, new_secret, secret_type))
             h['account'] = {
                 'name': account.name,
                 'username': account.username,
