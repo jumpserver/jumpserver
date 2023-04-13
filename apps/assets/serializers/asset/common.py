@@ -22,7 +22,7 @@ __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
     'AssetTaskSerializer', 'AssetsTaskSerializer', 'AssetProtocolsSerializer',
     'AssetDetailSerializer', 'DetailMixin', 'AssetAccountSerializer',
-    'AccountSecretSerializer',
+    'AccountSecretSerializer', 'AssetProtocolsPermsSerializer'
 ]
 
 uuid_pattern = re.compile(r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')
@@ -41,6 +41,11 @@ class AssetProtocolsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Protocol
         fields = ['name', 'port']
+
+
+class AssetProtocolsPermsSerializer(AssetProtocolsSerializer):
+    class Meta(AssetProtocolsSerializer.Meta):
+        fields = AssetProtocolsSerializer.Meta.fields + ['public', 'setting']
 
 
 class AssetLabelSerializer(serializers.ModelSerializer):

@@ -94,6 +94,20 @@ class Protocol(models.Model):
     def __str__(self):
         return '{}/{}'.format(self.name, self.port)
 
+    @lazyproperty
+    def asset_platform_protocol(self):
+        protocols = self.asset.platform.protocols.values('name', 'public', 'setting')
+        protocols = list(filter(lambda p: p['name'] == self.name, protocols))
+        return protocols[0] if len(protocols) > 0 else {}
+
+    @property
+    def setting(self):
+        return self.asset_platform_protocol.get('setting', {})
+
+    @property
+    def public(self):
+        return self.asset_platform_protocol.get('public', True)
+
 
 class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
     Category = const.Category
