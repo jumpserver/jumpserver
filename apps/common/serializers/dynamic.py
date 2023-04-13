@@ -11,6 +11,7 @@ type_field_map = {
     "bool": serializers.BooleanField,
     "text": serializers.CharField,
     "choice": serializers.ChoiceField,
+    "list": serializers.ListField,
 }
 
 

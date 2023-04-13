@@ -94,6 +94,20 @@ class Protocol(models.Model):
     def __str__(self):
         return '{}/{}'.format(self.name, self.port)
 
+    @lazyproperty
+    def asset_platform_protocol(self):
+        protocols = self.asset.platform.protocols.values('name', 'public', 'setting')
+        protocols = list(filter(lambda p: p['name'] == self.name, protocols))
+        return protocols[0] if len(protocols) > 0 else {}
+
+    @property
+    def setting(self):
+        return self.asset_platform_protocol.get('setting', {})
+
+    @property
+    def public(self):
+        return self.asset_platform_protocol.get('public', True)
+
 
 class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
     Category = const.Category
@@ -263,6 +277,22 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
         }
         tree_node = TreeNode(**data)
         return tree_node
+
+    @staticmethod
+    def get_secret_type_assets(asset_ids, secret_type):
+        assets = Asset.objects.filter(id__in=asset_ids)
+        asset_protocol = assets.prefetch_related('protocols').values_list('id', 'protocols__name')
+        protocol_secret_types_map = const.Protocol.protocol_secret_types()
+        asset_secret_types_mapp = defaultdict(set)
+
+        for asset_id, protocol in asset_protocol:
+            secret_types = set(protocol_secret_types_map.get(protocol, []))
+            asset_secret_types_mapp[asset_id].update(secret_types)
+
+        return [
+            asset for asset in assets
+            if secret_type in asset_secret_types_mapp.get(asset.id, [])
+        ]
 
     class Meta:
         unique_together = [('org_id', 'name')]

@@ -10,6 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import PermissionDenied
 
 from assets.const import Protocol
+from assets.const.host import GATEWAY_NAME
 from common.db.fields import EncryptTextField
 from common.exceptions import JMSException
 from common.utils import lazyproperty, pretty_string, bulk_get
@@ -231,12 +232,14 @@ class ConnectionToken(JMSOrgBaseModel):
     def domain(self):
         if not self.asset.platform.domain_enabled:
             return
-        domain = self.asset.domain if self.asset else None
+        if self.asset.platform.name == GATEWAY_NAME:
+            return
+        domain = self.asset.domain if self.asset.domain else None
         return domain
 
     @lazyproperty
     def gateway(self):
-        if not self.asset:
+        if not self.asset or not self.domain:
             return
         return self.asset.gateway
 

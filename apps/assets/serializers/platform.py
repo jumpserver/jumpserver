@@ -90,9 +90,11 @@ class PlatformProtocolSerializer(serializers.ModelSerializer):
 class PlatformCustomField(serializers.Serializer):
     TYPE_CHOICES = [
         ("str", "str"),
+        ("text", "text"),
         ("int", "int"),
         ("bool", "bool"),
         ("choice", "choice"),
+        ("list", "list"),
     ]
     name = serializers.CharField(label=_("Name"), max_length=128)
     label = serializers.CharField(label=_("Label"), max_length=128)
