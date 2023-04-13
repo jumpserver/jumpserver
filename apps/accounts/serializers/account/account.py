@@ -68,7 +68,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
 
     @staticmethod
     def from_template_if_need(initial_data):
-        template_id = initial_data.pop('template', None)
+        template_id = initial_data.get('template')
         if not template_id:
             return
         if isinstance(template_id, (str, uuid.UUID)):
@@ -84,7 +84,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             field.name for field in template._meta.fields
             if field.name not in ignore_fields
         ]
-        attrs = {'source': Source.TEMPLATE, 'source_id': str(template.id)}
+        attrs = {}
         for name in field_names:
             value = getattr(template, name, None)
             if value is None:
@@ -139,9 +139,10 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         if self.instance:
             return attrs
 
-        if 'source' in self.initial_data:
-            attrs['source'] = self.initial_data['source']
-            attrs['source_id'] = self.initial_data['source_id']
+        template = attrs.pop('template', None)
+        if template:
+            attrs['source'] = Source.TEMPLATE
+            attrs['source_id'] = str(template.id)
         return attrs
 
     def create(self, validated_data):
