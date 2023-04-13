@@ -43,10 +43,9 @@ class AssetProtocolsSerializer(serializers.ModelSerializer):
         fields = ['name', 'port']
 
 
-class AssetProtocolsPermsSerializer(AssetProtocolsSerializer):
+class AssetProtocolsPermsSerializer(serializers.ModelSerializer):
 
-    class Meta:
-        model = Protocol
+    class Meta(AssetProtocolsSerializer.Meta):
         fields = AssetProtocolsSerializer.Meta.fields + ['public', 'setting']
 
 
