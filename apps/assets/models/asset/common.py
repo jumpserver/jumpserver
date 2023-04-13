@@ -89,24 +89,12 @@ class NodesRelationMixin:
 class Protocol(models.Model):
     name = models.CharField(max_length=32, verbose_name=_("Name"))
     port = models.IntegerField(verbose_name=_("Port"))
+    setting = models.JSONField(verbose_name=_('Setting'), default=dict)
+    public = models.BooleanField(default=True, verbose_name=_('Public'))
     asset = models.ForeignKey('Asset', on_delete=models.CASCADE, related_name='protocols', verbose_name=_("Asset"))
 
     def __str__(self):
         return '{}/{}'.format(self.name, self.port)
-
-    @lazyproperty
-    def protocol(self):
-        protocols = self.asset.platform.protocols.values('name', 'public', 'setting')
-        protocols = list(filter(lambda p: p['name'] == self.name, protocols))
-        return protocols[0] if len(protocols) > 0 else {}
-
-    @property
-    def setting(self):
-        return self.protocol.get('setting', {})
-
-    @property
-    def public(self):
-        return self.protocol.get('public', False)
 
 
 class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
