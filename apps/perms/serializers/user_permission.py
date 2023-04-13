@@ -8,7 +8,7 @@ from rest_framework import serializers
 from accounts.models import Account
 from assets.const import Category, AllTypes
 from assets.models import Node, Asset, Platform
-from assets.serializers.asset.common import AssetProtocolsSerializer
+from assets.serializers.asset.common import AssetProtocolsPermsSerializer
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from perms.serializers.permission import ActionChoicesField
@@ -22,7 +22,7 @@ __all__ = [
 class AssetPermedSerializer(OrgResourceModelSerializerMixin):
     """ 被授权资产的数据结构 """
     platform = ObjectRelatedField(required=False, queryset=Platform.objects, label=_('Platform'))
-    protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'))
+    protocols = AssetProtocolsPermsSerializer(many=True, required=False, label=_('Protocols'))
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
     domain = ObjectRelatedField(required=False, queryset=Node.objects, label=_('Domain'))
