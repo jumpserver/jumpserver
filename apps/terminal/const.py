@@ -65,3 +65,8 @@ class SessionType(TextChoices):
     normal = 'normal', _('Normal')
     tunnel = 'tunnel', _('Tunnel')
     command = 'command', _('Command')
+
+
+class ActionPermission(TextChoices):
+    readonly = "readonly", _('Read Only')
+    writable = "writable", _('Writable')

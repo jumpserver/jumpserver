@@ -1,0 +1,7 @@
+id: push_account_mysql
+name: Push account for MySQL
+category: database
+type:
+  - mysql
+  - mariadb
+method: push_account

@@ -54,6 +54,7 @@ JumpServer 是广受欢迎的开源堡垒机，是符合 4A 规范的专业运�
 
 - [快速入门](https://docs.jumpserver.org/zh/v3/quick_start/)
 - [产品文档](https://docs.jumpserver.org)
+- [在线学习](https://edu.fit2cloud.com/page/2635362)
 - [知识库](https://kb.fit2cloud.com/categories/jumpserver)
 
 ## 案例研究

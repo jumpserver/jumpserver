@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+import phonenumbers
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -17,6 +18,7 @@ __all__ = [
     "BitChoicesField",
     "TreeChoicesField",
     "LabeledMultipleChoiceField",
+    "PhoneField",
 ]
 
 
@@ -200,4 +202,12 @@ class BitChoicesField(TreeChoicesField):
             return data
         value = self.to_internal_value(data)
         self.run_validators(value)
+        return value
+
+
+class PhoneField(serializers.CharField):
+    def to_representation(self, value):
+        if value:
+            phone = phonenumbers.parse(value, 'CN')
+            value = {'code': '+%s' % phone.country_code, 'phone': phone.national_number}
         return value

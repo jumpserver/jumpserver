@@ -14,6 +14,7 @@ router.register(r'devices', api.DeviceViewSet, 'device')
 router.register(r'databases', api.DatabaseViewSet, 'database')
 router.register(r'webs', api.WebViewSet, 'web')
 router.register(r'clouds', api.CloudViewSet, 'cloud')
+router.register(r'customs', api.CustomViewSet, 'custom')
 router.register(r'platforms', api.AssetPlatformViewSet, 'platform')
 router.register(r'labels', api.LabelViewSet, 'label')
 router.register(r'nodes', api.NodeViewSet, 'node')
@@ -45,6 +46,7 @@ urlpatterns = [
     path('nodes/<uuid:pk>/tasks/', api.NodeTaskCreateApi.as_view(), name='node-task-create'),
 
     path('gateways/<uuid:pk>/test-connective/', api.GatewayTestConnectionApi.as_view(), name='test-gateway-connective'),
+    path('platform-automation-methods/', api.PlatformAutomationMethodsApi.as_view(), name='platform-automation-methods'),
 ]
 
 urlpatterns += router.urls

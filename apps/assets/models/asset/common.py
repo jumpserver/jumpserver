@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-
 import json
 import logging
 from collections import defaultdict
 
 from django.db import models
+from django.forms import model_to_dict
 from django.utils.translation import ugettext_lazy as _
 
 from assets import const
@@ -94,6 +94,20 @@ class Protocol(models.Model):
     def __str__(self):
         return '{}/{}'.format(self.name, self.port)
 
+    @lazyproperty
+    def asset_platform_protocol(self):
+        protocols = self.asset.platform.protocols.values('name', 'public', 'setting')
+        protocols = list(filter(lambda p: p['name'] == self.name, protocols))
+        return protocols[0] if len(protocols) > 0 else {}
+
+    @property
+    def setting(self):
+        return self.asset_platform_protocol.get('setting', {})
+
+    @property
+    def public(self):
+        return self.asset_platform_protocol.get('public', True)
+
 
 class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
     Category = const.Category
@@ -108,7 +122,8 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
                                    verbose_name=_("Nodes"))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     labels = models.ManyToManyField('assets.Label', blank=True, related_name='assets', verbose_name=_("Labels"))
-    info = models.JSONField(verbose_name=_('Info'), default=dict, blank=True)  # 资产的一些信息，如 硬件信息
+    gathered_info = models.JSONField(verbose_name=_('Gathered info'), default=dict, blank=True)  # 资产的一些信息，如 硬件信息
+    custom_info = models.JSONField(verbose_name=_('Custom info'), default=dict)
 
     objects = AssetManager.from_queryset(AssetQuerySet)()
 
@@ -148,20 +163,27 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
         return self.get_spec_values(instance, spec_fields)
 
     @lazyproperty
-    def auto_info(self):
+    def info(self):
+        info = {}
+        info.update(self.gathered_info or {})
+        info.update(self.custom_info or {})
+        info.update(self.spec_info or {})
+        return info
+
+    @lazyproperty
+    def auto_config(self):
         platform = self.platform
         automation = self.platform.automation
-        return {
+        auto_config = {
             'su_enabled': platform.su_enabled,
-            'ping_enabled': automation.ping_enabled,
             'domain_enabled': platform.domain_enabled,
-            'ansible_enabled': automation.ansible_enabled,
-            'push_account_enabled': automation.push_account_enabled,
-            'gather_facts_enabled': automation.gather_facts_enabled,
-            'change_secret_enabled': automation.change_secret_enabled,
-            'verify_account_enabled': automation.verify_account_enabled,
-            'gather_accounts_enabled': automation.gather_accounts_enabled,
+            'ansible_enabled': False
         }
+        if not automation:
+            return auto_config
+
+        auto_config.update(model_to_dict(automation))
+        return auto_config
 
     def get_target_ip(self):
         return self.address
@@ -190,25 +212,6 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
         for n in self.labels.all():
             names.append(n.name + ':' + n.value)
         return names
-
-    @lazyproperty
-    def primary_protocol(self):
-        from assets.const.types import AllTypes
-        primary_protocol_name = AllTypes.get_primary_protocol_name(self.category, self.type)
-        protocol = self.protocols.filter(name=primary_protocol_name).first()
-        return protocol
-
-    @lazyproperty
-    def protocol(self):
-        if not self.primary_protocol:
-            return 'none'
-        return self.primary_protocol.name
-
-    @lazyproperty
-    def port(self):
-        if not self.primary_protocol:
-            return 0
-        return self.primary_protocol.port
 
     @lazyproperty
     def type(self):
@@ -274,6 +277,22 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
         }
         tree_node = TreeNode(**data)
         return tree_node
+
+    @staticmethod
+    def get_secret_type_assets(asset_ids, secret_type):
+        assets = Asset.objects.filter(id__in=asset_ids)
+        asset_protocol = assets.prefetch_related('protocols').values_list('id', 'protocols__name')
+        protocol_secret_types_map = const.Protocol.protocol_secret_types()
+        asset_secret_types_mapp = defaultdict(set)
+
+        for asset_id, protocol in asset_protocol:
+            secret_types = set(protocol_secret_types_map.get(protocol, []))
+            asset_secret_types_mapp[asset_id].update(secret_types)
+
+        return [
+            asset for asset in assets
+            if secret_type in asset_secret_types_mapp.get(asset.id, [])
+        ]
 
     class Meta:
         unique_together = [('org_id', 'name')]

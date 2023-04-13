@@ -168,9 +168,6 @@ class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSeri
     SECURITY_LUNA_REMEMBER_AUTH = serializers.BooleanField(
         label=_("Remember manual auth")
     )
-    CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED = serializers.BooleanField(
-        label=_("Enable change auth secure mode")
-    )
     SECURITY_INSECURE_COMMAND = serializers.BooleanField(
         required=False, label=_('Insecure command alert')
     )

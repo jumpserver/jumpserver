@@ -1,0 +1,24 @@
+id: push_account_aix
+name: Push account for aix
+category: host
+type:
+  - AIX
+method: push_account
+params:
+  - name: sudo
+    type: str
+    label: 'Sudo'
+    default: '/bin/whoami'
+    help_text: '使用逗号分隔多个命令，如: /bin/whoami,/sbin/ifconfig'
+
+  - name: shell
+    type: str
+    label: 'Shell'
+    default: '/bin/bash'
+
+  - name: groups
+    type: str
+    label: '用户组'
+    default: ''
+    help_text: '请输入用户组，多个用户组使用逗号分隔（需填写已存在的用户组）'
+

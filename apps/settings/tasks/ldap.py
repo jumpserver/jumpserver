@@ -1,8 +1,9 @@
 # coding: utf-8
-# 
+#
 from celery import shared_task
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
+from django.db import transaction
 
 from common.utils import get_logger
 from ops.celery.decorator import after_app_ready_start
@@ -22,6 +23,7 @@ def sync_ldap_user():
 
 
 @shared_task(verbose_name=_('Import ldap user'))
+@transaction.atomic
 def import_ldap_user():
     logger.info("Start import ldap user task")
     util_server = LDAPServerUtil()

@@ -1,8 +1,5 @@
-from rest_framework.decorators import action
-from rest_framework.response import Response
-
 from assets.models import Host, Asset
-from assets.serializers import HostSerializer, HostInfoSerializer
+from assets.serializers import HostSerializer
 from .asset import AssetViewSet
 
 __all__ = ['HostViewSet']
@@ -15,16 +12,4 @@ class HostViewSet(AssetViewSet):
     def get_serializer_classes(self):
         serializer_classes = super().get_serializer_classes()
         serializer_classes['default'] = HostSerializer
-        serializer_classes['info'] = HostInfoSerializer
         return serializer_classes
-
-    @action(methods=["GET"], detail=True, url_path="info")
-    def info(self, *args, **kwargs):
-        asset = super().get_object()
-        serializer = self.get_serializer(asset.info)
-        data = serializer.data
-        data['asset'] = {
-            'id': asset.id, 'name': asset.name,
-            'address': asset.address
-        }
-        return Response(data)

@@ -1,0 +1,93 @@
+- hosts: demo
+  gather_facts: no
+  tasks:
+    - name: Test privileged account
+      ansible.builtin.ping:
+
+    - name: Push user
+      ansible.builtin.user:
+        name: "{{ account.username }}"
+        shell: "{{ params.shell }}"
+        home: "{{ '/home/' + account.username }}"
+        groups: "{{ params.groups }}"
+        expires: -1
+        state: present
+
+    - name: "Add {{ account.username }} group"
+      ansible.builtin.group:
+        name: "{{ account.username }}"
+        state: present
+
+    - name: Check home dir exists
+      ansible.builtin.stat:
+        path: "{{ '/home/' + account.username }}"
+      register: home_existed
+
+    - name: Set home dir permission
+      ansible.builtin.file:
+        path: "{{ '/home/' + account.username }}"
+        owner: "{{ account.username }}"
+        group: "{{ account.username }}"
+        mode: "0700"
+      when:
+        - home_existed.stat.exists == true
+
+    - name: Add user groups
+      ansible.builtin.user:
+        name: "{{ account.username }}"
+        groups: "{{ params.groups }}"
+      when: params.groups
+
+    - name: Push user password
+      ansible.builtin.user:
+        name: "{{ account.username }}"
+        password: "{{ account.secret | password_hash('sha512') }}"
+        update_password: always
+      when: account.secret_type == "password"
+
+    - name: remove jumpserver ssh key
+      ansible.builtin.lineinfile:
+        dest: "{{ ssh_params.dest }}"
+        regexp: "{{ ssh_params.regexp }}"
+        state: absent
+      when:
+        - account.secret_type == "ssh_key"
+        - ssh_params.strategy == "set_jms"
+
+    - name: Push SSH key
+      ansible.builtin.authorized_key:
+        user: "{{ account.username }}"
+        key: "{{ account.secret }}"
+        exclusive: "{{ ssh_params.exclusive }}"
+      when: account.secret_type == "ssh_key"
+
+    - name: Set sudo setting
+      ansible.builtin.lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: "^{{ account.username }} ALL="
+        line: "{{ account.username + ' ALL=(ALL) NOPASSWD: ' + params.sudo }}"
+        validate: visudo -cf %s
+      when:
+        - params.sudo
+
+    - name: Refresh connection
+      ansible.builtin.meta: reset_connection
+
+    - name: Verify password
+      ansible.builtin.ping:
+      become: no
+      vars:
+        ansible_user: "{{ account.username }}"
+        ansible_password: "{{ account.secret }}"
+        ansible_become: no
+      when: account.secret_type == "password"
+
+    - name: Verify SSH key
+      ansible.builtin.ping:
+      become: no
+      vars:
+        ansible_user: "{{ account.username }}"
+        ansible_ssh_private_key_file: "{{ account.private_key_path }}"
+        ansible_become: no
+      when: account.secret_type == "ssh_key"

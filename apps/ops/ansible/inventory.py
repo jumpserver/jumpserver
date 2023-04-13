@@ -49,12 +49,12 @@ class JMSInventory:
 
         if gateway.password:
             proxy_command_list.insert(
-                0, "sshpass -p '{}'".format(gateway.password)
+                0, "sshpass -p {}".format(gateway.password)
             )
         if gateway.private_key:
             proxy_command_list.append("-i {}".format(gateway.private_key_path))
 
-        proxy_command = '-o ProxyCommand=\"{}\"'.format(
+        proxy_command = "-o ProxyCommand='{}'".format(
             " ".join(proxy_command_list)
         )
         return {"ansible_ssh_common_args": proxy_command}
@@ -72,15 +72,14 @@ class JMSInventory:
             var['ansible_ssh_private_key_file'] = account.private_key_path
         return var
 
-    def make_ssh_account_vars(self, host, asset, account, automation, protocols, platform, gateway):
+    def make_account_vars(self, host, asset, account, automation, protocol, platform, gateway):
         if not account:
             host['error'] = _("No account available")
             return host
 
-        ssh_protocol_matched = list(filter(lambda x: x.name == 'ssh', protocols))
-        ssh_protocol = ssh_protocol_matched[0] if ssh_protocol_matched else None
+        port = protocol.port if protocol else 22
         host['ansible_host'] = asset.address
-        host['ansible_port'] = ssh_protocol.port if ssh_protocol else 22
+        host['ansible_port'] = port
 
         su_from = account.su_from
         if platform.su_enabled and su_from:
@@ -97,15 +96,55 @@ class JMSInventory:
             host.update(self.make_account_ansible_vars(account))
 
         if gateway:
-            host.update(self.make_proxy_command(gateway))
+            ansible_connection = host.get('ansible_connection', 'ssh')
+            if ansible_connection in ('local', 'winrm'):
+                host['gateway'] = {
+                    'address': gateway.address, 'port': gateway.port,
+                    'username': gateway.username, 'secret': gateway.password,
+                    'private_key_path': gateway.private_key_path
+                }
+                host['jms_asset']['port'] = port
+            else:
+                host.update(self.make_proxy_command(gateway))
+
+    @staticmethod
+    def get_primary_protocol(ansible_config, protocols):
+        invalid_protocol = type('protocol', (), {'name': 'null', 'port': 0})
+        ansible_connection = ansible_config.get('ansible_connection')
+        # 数值越小，优先级越高，若用户在 ansible_config 中配置了，则提高用户配置方式的优先级
+        protocol_priority = {'ssh': 10, 'winrm': 9, ansible_connection: 1}
+        protocol_sorted = sorted(protocols, key=lambda x: protocol_priority.get(x.name, 999))
+        protocol = protocol_sorted[0] if protocol_sorted else invalid_protocol
+        return protocol
+
+    @staticmethod
+    def fill_ansible_config(ansible_config, protocol):
+        if protocol.name in ('ssh', 'winrm'):
+            ansible_config['ansible_connection'] = protocol.name
+        if protocol.name == 'winrm':
+            if protocol.setting.get('use_ssl', False):
+                ansible_config['ansible_winrm_scheme'] = 'https'
+                ansible_config['ansible_winrm_transport'] = 'ssl'
+                ansible_config['ansible_winrm_server_cert_validation'] = 'ignore'
+            else:
+                ansible_config['ansible_winrm_scheme'] = 'http'
+                ansible_config['ansible_winrm_transport'] = 'plaintext'
+        return ansible_config
 
     def asset_to_host(self, asset, account, automation, protocols, platform):
+        try:
+            ansible_config = dict(automation.ansible_config)
+        except (AttributeError, TypeError):
+            ansible_config = {}
+
+        protocol = self.get_primary_protocol(ansible_config, protocols)
+
         host = {
             'name': '{}'.format(asset.name.replace(' ', '_')),
             'jms_asset': {
                 'id': str(asset.id), 'name': asset.name, 'address': asset.address,
                 'type': asset.type, 'category': asset.category,
-                'protocol': asset.protocol, 'port': asset.port,
+                'protocol': protocol.name, 'port': protocol.port,
                 'spec_info': asset.spec_info, 'secret_info': asset.secret_info,
                 'protocols': [{'name': p.name, 'port': p.port} for p in protocols],
             },
@@ -118,33 +157,24 @@ class JMSInventory:
         if host['jms_account'] and asset.platform.type == 'oracle':
             host['jms_account']['mode'] = 'sysdba' if account.privileged else None
 
-        try:
-            ansible_config = dict(automation.ansible_config)
-        except Exception as e:
-            ansible_config = {}
-        ansible_connection = ansible_config.get('ansible_connection', 'ssh')
+        ansible_config = self.fill_ansible_config(ansible_config, protocol)
         host.update(ansible_config)
 
         gateway = None
         if not asset.is_gateway and asset.domain:
             gateway = asset.domain.select_gateway()
 
-        if ansible_connection == 'local':
-            if gateway:
-                host['gateway'] = {
-                    'address': gateway.address, 'port': gateway.port,
-                    'username': gateway.username, 'secret': gateway.password
-                }
-        else:
-            self.make_ssh_account_vars(host, asset, account, automation, protocols, platform, gateway)
+        self.make_account_vars(
+            host, asset, account, automation, protocol, platform, gateway
+        )
         return host
 
-    def get_asset_accounts(self, asset):
-        from assets.const import Connectivity
-        accounts = asset.accounts.filter(is_active=True).order_by('-privileged', '-date_updated')
-        accounts_connectivity_ok = list(accounts.filter(connectivity=Connectivity.OK))
-        accounts_connectivity_no = list(accounts.exclude(connectivity=Connectivity.OK))
-        return accounts_connectivity_ok + accounts_connectivity_no
+    def get_asset_sorted_accounts(self, asset):
+        accounts = list(asset.accounts.filter(is_active=True))
+        connectivity_score = {'ok': 2, '-': 1, 'err': 0}
+        sort_key = lambda x: (x.privileged, connectivity_score.get(x.connectivity, 0), x.date_updated)
+        accounts_sorted = sorted(accounts, key=sort_key, reverse=True)
+        return accounts_sorted
 
     @staticmethod
     def get_account_prefer(account_prefer):
@@ -163,37 +193,41 @@ class JMSInventory:
         return account
 
     def select_account(self, asset):
-        accounts = self.get_asset_accounts(asset)
-        if not accounts or self.account_policy == 'skip':
+        accounts = self.get_asset_sorted_accounts(asset)
+        if not accounts:
             return None
-        account_selected = None
 
-        # 首先找到特权账号
-        privileged_accounts = list(filter(lambda account: account.privileged, accounts))
+        refer_account = self.get_refer_account(accounts)
+        if refer_account:
+            return refer_account
 
-        # 不同类型的账号选择，优先使用提供的名称
-        refer_privileged_account = self.get_refer_account(privileged_accounts)
-        if self.account_policy in ['privileged_only', 'privileged_first']:
-            first_privileged = privileged_accounts[0] if privileged_accounts else None
-            account_selected = refer_privileged_account or first_privileged
-
-        # 此策略不管是否匹配到账号都需强制返回
-        if self.account_policy == 'privileged_only':
+        account_selected = accounts[0]
+        if self.account_policy == 'skip':
+            return None
+        elif self.account_policy == 'privileged_first':
             return account_selected
+        elif self.account_policy == 'privileged_only' and account_selected.privileged:
+            return account_selected
+        else:
+            return None
 
-        if not account_selected:
-            account_selected = self.get_refer_account(accounts)
-
-        return account_selected or accounts[0]
+    @staticmethod
+    def set_platform_protocol_setting_to_asset(asset, platform_protocols):
+        asset_protocols = asset.protocols.all()
+        for p in asset_protocols:
+            setattr(p, 'setting', platform_protocols.get(p.name, {}))
+        return asset_protocols
 
     def generate(self, path_dir):
         hosts = []
         platform_assets = self.group_by_platform(self.assets)
         for platform, assets in platform_assets.items():
             automation = platform.automation
-
+            platform_protocols = {
+                p['name']: p['setting'] for p in platform.protocols.values('name', 'setting')
+            }
             for asset in assets:
-                protocols = asset.protocols.all()
+                protocols = self.set_platform_protocol_setting_to_asset(asset, platform_protocols)
                 account = self.select_account(asset)
                 host = self.asset_to_host(asset, account, automation, protocols, platform)
 

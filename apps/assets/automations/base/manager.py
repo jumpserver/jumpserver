@@ -41,6 +41,26 @@ class BasePlaybookManager:
         self.method_hosts_mapper = defaultdict(list)
         self.playbooks = []
         self.gateway_servers = dict()
+        params = self.execution.snapshot.get('params')
+        self.params = params or {}
+
+    def get_params(self, automation, method_type):
+        method_attr = '{}_method'.format(method_type)
+        method_params = '{}_params'.format(method_type)
+        method_id = getattr(automation, method_attr)
+        automation_params = getattr(automation, method_params)
+        serializer = self.method_id_meta_mapper[method_id]['params_serializer']
+
+        if serializer is None:
+            return {}
+
+        data = self.params.get(method_id, {})
+        params = serializer(data).data
+        return {
+            field_name: automation_params.get(field_name, '')
+            if not params[field_name] else params[field_name]
+            for field_name in params
+        }
 
     @property
     def platform_automation_methods(self):
@@ -101,8 +121,9 @@ class BasePlaybookManager:
         return host
 
     def host_callback(self, host, automation=None, **kwargs):
-        enabled_attr = '{}_enabled'.format(self.__class__.method_type())
-        method_attr = '{}_method'.format(self.__class__.method_type())
+        method_type = self.__class__.method_type()
+        enabled_attr = '{}_enabled'.format(method_type)
+        method_attr = '{}_method'.format(method_type)
 
         method_enabled = automation and \
                          getattr(automation, enabled_attr) and \
@@ -114,6 +135,7 @@ class BasePlaybookManager:
             return host
 
         host = self.convert_cert_to_file(host, kwargs.get('path_dir'))
+        host['params'] = self.get_params(automation, method_type)
         return host
 
     @staticmethod
@@ -239,10 +261,12 @@ class BasePlaybookManager:
             jms_asset, jms_gateway = host['jms_asset'], host.get('gateway')
             if not jms_gateway:
                 continue
+
             server = SSHTunnelForwarder(
                 (jms_gateway['address'], jms_gateway['port']),
                 ssh_username=jms_gateway['username'],
                 ssh_password=jms_gateway['secret'],
+                ssh_pkey=jms_gateway['private_key_path'],
                 remote_bind_address=(jms_asset['address'], jms_asset['port'])
             )
             try:
@@ -252,8 +276,8 @@ class BasePlaybookManager:
                 print('\033[31m %s \033[0m\n' % err_msg)
                 not_valid.append(k)
             else:
-                jms_asset['address'] = '127.0.0.1'
-                jms_asset['port'] = server.local_bind_port
+                host['ansible_host'] = jms_asset['address'] = '127.0.0.1'
+                host['ansible_port'] = jms_asset['port'] = server.local_bind_port
                 servers.append(server)
 
         # 网域不可连接的，就不继续执行此资源的后续任务了

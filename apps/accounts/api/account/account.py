@@ -1,20 +1,21 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.response import Response
+from rest_framework.status import HTTP_200_OK
 
 from accounts import serializers
 from accounts.filters import AccountFilterSet
 from accounts.models import Account
 from assets.models import Asset, Node
-from common.permissions import UserConfirmation, ConfirmType
+from common.permissions import UserConfirmation, ConfirmType, IsValidUser
 from common.views.mixins import RecordViewLogMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
 
 __all__ = [
     'AccountViewSet', 'AccountSecretsViewSet',
-    'AccountHistoriesSecretAPI'
+    'AccountHistoriesSecretAPI', 'AssetAccountBulkCreateApi',
 ]
 
 
@@ -28,7 +29,7 @@ class AccountViewSet(OrgBulkModelViewSet):
     rbac_perms = {
         'partial_update': ['accounts.change_account'],
         'su_from_accounts': 'accounts.view_account',
-        'username_suggestions': 'accounts.view_account',
+        'clear_secret': 'accounts.change_account',
     }
 
     @action(methods=['get'], detail=False, url_path='su-from-accounts')
@@ -48,7 +49,10 @@ class AccountViewSet(OrgBulkModelViewSet):
         serializer = serializers.AccountSerializer(accounts, many=True)
         return Response(data=serializer.data)
 
-    @action(methods=['get'], detail=False, url_path='username-suggestions')
+    @action(
+        methods=['get'], detail=False, url_path='username-suggestions',
+        permission_classes=[IsValidUser]
+    )
     def username_suggestions(self, request, *args, **kwargs):
         asset_ids = request.query_params.get('assets')
         node_keys = request.query_params.get('keys')
@@ -71,6 +75,12 @@ class AccountViewSet(OrgBulkModelViewSet):
         usernames = common + others
         return Response(data=usernames)
 
+    @action(methods=['patch'], detail=False, url_path='clear-secret')
+    def clear_secret(self, request, *args, **kwargs):
+        account_ids = request.data.get('account_ids', [])
+        self.model.objects.filter(id__in=account_ids).update(secret=None)
+        return Response(status=HTTP_200_OK)
+
 
 class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
     """
@@ -85,6 +95,20 @@ class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
         'list': 'accounts.view_accountsecret',
         'retrieve': 'accounts.view_accountsecret',
     }
+
+
+class AssetAccountBulkCreateApi(CreateAPIView):
+    serializer_class = serializers.AssetAccountBulkSerializer
+    rbac_perms = {
+        'POST': 'accounts.add_account',
+    }
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.create(serializer.validated_data)
+        serializer = serializers.AssetAccountBulkSerializerResultSerializer(data, many=True)
+        return Response(data=serializer.data, status=HTTP_200_OK)
 
 
 class AccountHistoriesSecretAPI(RecordViewLogMixin, ListAPIView):

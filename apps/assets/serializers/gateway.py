@@ -3,8 +3,8 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from .asset import HostSerializer
 from .asset.common import AccountSecretSerializer
+from .asset.host import HostSerializer
 from ..models import Gateway, Asset
 
 __all__ = ['GatewaySerializer', 'GatewayWithAccountSecretSerializer']

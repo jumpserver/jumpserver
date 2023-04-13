@@ -46,8 +46,9 @@ class JMSPermedInventory(JMSInventory):
         self.user = user
         self.assets_accounts_mapper = self.get_assets_accounts_mapper()
 
-    def get_asset_accounts(self, asset):
-        return self.assets_accounts_mapper.get(asset.id, [])
+    def get_asset_sorted_accounts(self, asset):
+        accounts = self.assets_accounts_mapper.get(asset.id, [])
+        return list(accounts)
 
     def get_assets_accounts_mapper(self):
         mapper = defaultdict(set)
@@ -91,7 +92,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     name = models.CharField(max_length=128, null=True, verbose_name=_('Name'))
 
     instant = models.BooleanField(default=False)
-    args = models.CharField(max_length=1024, default='', verbose_name=_('Args'), null=True, blank=True)
+    args = models.CharField(max_length=8192, default='', verbose_name=_('Args'), null=True, blank=True)
     module = models.CharField(max_length=128, choices=Modules.choices, default=Modules.shell, verbose_name=_('Module'),
                               null=True)
     chdir = models.CharField(default="", max_length=1024, verbose_name=_('Chdir'), null=True, blank=True)
@@ -191,7 +192,7 @@ class JobExecution(JMSOrgBaseModel):
     date_start = models.DateTimeField(null=True, verbose_name=_('Date start'), db_index=True)
     date_finished = models.DateTimeField(null=True, verbose_name=_("Date finished"))
 
-    material = models.CharField(max_length=1024, default='', verbose_name=_('Material'), null=True, blank=True)
+    material = models.CharField(max_length=8192, default='', verbose_name=_('Material'), null=True, blank=True)
     job_type = models.CharField(max_length=128, choices=Types.choices, default=Types.adhoc,
                                 verbose_name=_("Material Type"))
 

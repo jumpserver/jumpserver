@@ -15,7 +15,7 @@ __all__ = [
     queue="ansible", verbose_name=_('Push accounts to assets'),
     activity_callback=lambda self, account_ids, *args, **kwargs: (account_ids, None)
 )
-def push_accounts_to_assets_task(account_ids):
+def push_accounts_to_assets_task(account_ids, params=None):
     from accounts.models import PushAccountAutomation
     from accounts.models import Account
 
@@ -26,6 +26,7 @@ def push_accounts_to_assets_task(account_ids):
     task_snapshot = {
         'accounts': [str(account.id) for account in accounts],
         'assets': [str(account.asset_id) for account in accounts],
+        'params': params or {},
     }
 
     tp = AutomationTypes.push_account
