@@ -67,6 +67,26 @@ class AssetPlatformSerializer(serializers.ModelSerializer):
 class AssetAccountSerializer(AccountSerializer):
     add_org_fields = False
     asset = serializers.PrimaryKeyRelatedField(queryset=Asset.objects, required=False, write_only=True)
+    clone_id: str
+
+    def to_internal_value(self, data):
+        clone_id = data.pop('id', None)
+        ret = super().to_internal_value(data)
+        self.clone_id = clone_id
+        return ret
+
+    def set_secret(self, attrs):
+        _id = self.clone_id
+        if not _id:
+            return attrs
+
+        account = Account.objects.get(id=_id)
+        attrs['secret'] = account.secret
+        return attrs
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        return self.set_secret(attrs)
 
     class Meta(AccountSerializer.Meta):
         fields = [
