@@ -22,7 +22,7 @@ class AdHoc(JMSOrgBaseModel):
     pattern = models.CharField(max_length=1024, verbose_name=_("Pattern"), default='all')
     module = models.CharField(max_length=128, choices=Modules.choices, default=Modules.shell,
                               verbose_name=_('Module'))
-    args = models.CharField(max_length=1024, default='', verbose_name=_('Args'))
+    args = models.CharField(max_length=8192, default='', verbose_name=_('Args'))
     creator = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
     comment = models.CharField(max_length=1024, default='', verbose_name=_('Comment'), null=True, blank=True)
 
