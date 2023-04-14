@@ -4,6 +4,7 @@ from urllib.parse import urlencode
 from kubernetes import client
 from kubernetes.client import api_client
 from kubernetes.client.api import core_v1_api
+from kubernetes.client.exceptions import ApiException
 
 from common.utils import get_logger
 from ..const import CloudTypes, Category
@@ -65,9 +66,13 @@ class KubernetesClient:
         proxy_url = cls.get_proxy_url(asset)
         k8s = cls(k8s_url, secret, proxy=proxy_url)
         func_name = f'get_{tp}s'
+        data = []
         if hasattr(k8s, func_name):
-            return getattr(k8s, func_name)(*args)
-        return []
+            try:
+                data = getattr(k8s, func_name)(*args)
+            except ApiException as e:
+                logger.error(e.reason)
+        return data
 
 
 class KubernetesTree:

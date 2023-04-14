@@ -24,10 +24,11 @@ class AccountsTaskCreateAPI(CreateAPIView):
     def perform_create(self, serializer):
         data = serializer.validated_data
         accounts = data.get('accounts', [])
+        params = data.get('params')
         account_ids = [str(a.id) for a in accounts]
 
         if data['action'] == 'push':
-            task = push_accounts_to_assets_task.delay(account_ids)
+            task = push_accounts_to_assets_task.delay(account_ids, params)
         else:
             account = accounts[0]
             asset = account.asset
