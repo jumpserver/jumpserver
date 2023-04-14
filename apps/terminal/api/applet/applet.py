@@ -64,7 +64,7 @@ class DownloadUploadMixin:
         if instance and not update:
             return Response({'error': 'Applet already exists: {}'.format(name)}, status=400)
 
-        applet, serializer = Applet.install_from_dir(tmp_dir)
+        applet, serializer = Applet.install_from_dir(tmp_dir, builtin=False)
         return Response(serializer.data, status=201)
 
     @action(detail=True, methods=['get'])
