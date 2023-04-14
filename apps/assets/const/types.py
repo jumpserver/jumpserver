@@ -76,10 +76,7 @@ class AllTypes(ChoicesMixin):
             methods = filter_platform_methods(
                 category, tp_name, item_name, methods=platform_automation_methods
             )
-            methods = [{
-                'name': m['name'], 'id': m['id'],
-                'can_setting': m.get('can_setting', False)
-            } for m in methods]
+            methods = [{'name': m['name'], 'id': m['id']} for m in methods]
             automation_methods[item_name + '_methods'] = methods
         automation.update(automation_methods)
         constraints['automation'] = automation

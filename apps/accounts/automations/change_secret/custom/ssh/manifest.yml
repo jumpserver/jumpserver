@@ -1,0 +1,14 @@
+id: change_secret_by_ssh
+name: Change secret by SSH
+category:
+  - device
+  - host
+type:
+  - all
+method: change_secret
+params:
+  - name: commands
+    type: list
+    label: '自定义命令'
+    default: ['']
+    help_text: '平台配置命令后，执行改密自动化任务时将执行配置命令进行改密'

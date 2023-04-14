@@ -9,8 +9,7 @@ from ..const import Category, AllTypes
 from ..models import Platform, PlatformProtocol, PlatformAutomation
 
 __all__ = [
-    'PlatformSerializer', 'PlatformOpsMethodSerializer',
-    'PlatformAutomationBySSHCommandsSerializer'
+    'PlatformSerializer', 'PlatformOpsMethodSerializer'
 ]
 
 
@@ -171,7 +170,8 @@ class PlatformSerializer(WritableNestedModelSerializer):
         su_enabled = attrs.get('su_enabled', False) and self.constraints.get('su_enabled', False)
         automation = attrs.get('automation', {})
         automation['ansible_enabled'] = automation.get('ansible_enabled', False) \
-                                        and self.constraints.get('ansible_enabled', False)
+            and self.constraints.get('automation', {}).get('ansible_enabled', False)
+
         attrs.update({
             'domain_enabled': domain_enabled,
             'su_enabled': su_enabled,
@@ -204,30 +204,3 @@ class PlatformOpsMethodSerializer(serializers.Serializer):
     category = serializers.CharField(max_length=50, label=_("Category"))
     type = serializers.ListSerializer(child=serializers.CharField())
     method = serializers.CharField()
-
-
-class PlatformAutomationBySSHCommandsSerializer(serializers.Serializer):
-    commands = serializers.ListSerializer(child=serializers.CharField(allow_blank=True))
-
-    def to_representation(self, instance):
-        return {'commands': instance.get_commands('change_secret_by_ssh')}
-
-    @staticmethod
-    def validate_commands(commands):
-        has_username, has_password = False, False
-        for c in commands:
-            if not has_username and '{username}' in c:
-                has_username = True
-            if not has_password and '{password}' in c:
-                has_password = True
-        if not all([has_password, has_username]):
-            raise serializers.ValidationError(
-                _('The user-defined instruction needs to '
-                  'include the {username} and {password} fields')
-            )
-        return commands
-
-    def update(self, instance, validated_data):
-        instance.meta['change_secret_by_ssh'] = validated_data.pop('commands')
-        instance.save(update_fields=['meta'])
-        return instance

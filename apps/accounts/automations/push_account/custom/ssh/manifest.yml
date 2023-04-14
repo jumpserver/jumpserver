@@ -1,0 +1,14 @@
+id: push_account_by_ssh
+name: Push account by SSH
+category:
+  - device
+  - host
+type:
+  - all
+method: push_account
+params:
+  - name: commands
+    type: list
+    label: '自定义命令'
+    default: ['']
+    help_text: '平台配置命令后，执行推送自动化任务时将执行配置命令进行推送'

@@ -7,7 +7,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: custom_user
+module: custom_command
 short_description: Adds or removes a user with custom commands by ssh
 description:
     - You can add or edit users using ssh with custom commands.
@@ -44,7 +44,7 @@ options:
 
 EXAMPLES = '''
 - name: Create user with name 'jms' and password '123456'.
-  custom_user:
+  custom_command:
     login_host: "localhost"
     login_port: 22
     login_user: "admin"
