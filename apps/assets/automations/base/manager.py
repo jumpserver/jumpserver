@@ -54,7 +54,9 @@ class BasePlaybookManager:
         if serializer is None:
             return {}
 
-        data = self.params.get(method_id, {})
+        data = self.params.get(method_id)
+        if not data:
+            data = automation_params.get(method_id, {})
         params = serializer(data).data
         return {
             field_name: automation_params.get(field_name, '')

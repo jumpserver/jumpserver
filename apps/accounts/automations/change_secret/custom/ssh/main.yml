@@ -24,8 +24,8 @@
         login_private_key_path: "{{ jms_account.private_key_path }}"
         name: "{{ account.username }}"
         password: "{{ account.secret }}"
-        commands: "{{ jms_asset.commands }}"
-        first_conn_delay_time: "{{ first_conn_delay_time }}"
+        commands: "{{ params.commands }}"
+        first_conn_delay_time: "{{ first_conn_delay_time | default(0.5) }}"
       when: ping_info is succeeded
       register: change_info
 

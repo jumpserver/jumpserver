@@ -11,4 +11,4 @@ params:
     type: list
     label: '自定义命令'
     default: ['']
-    help_text: '平台配置命令后，执行改密自动化任务时将执行配置命令进行改密'
+    help_text: '自定义指令中需包含 `&#123;username&#125;` 和 `&#123;password&#125;` 字段，改密时将会进行相应账号和密码的替换。<br />如 linux 改密：<br />passwd &#123;username&#125; <br />&#123;password&#125; <br />&#123;password&#125;'
