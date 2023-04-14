@@ -8,9 +8,7 @@ from common.utils import lazyproperty
 from ..const import Category, AllTypes
 from ..models import Platform, PlatformProtocol, PlatformAutomation
 
-__all__ = [
-    'PlatformSerializer', 'PlatformOpsMethodSerializer'
-]
+__all__ = ["PlatformSerializer", "PlatformOpsMethodSerializer"]
 
 
 class ProtocolSettingSerializer(serializers.Serializer):
