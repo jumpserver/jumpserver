@@ -69,7 +69,7 @@ EXAMPLES = '''
   oracle_user:
     hostname: "remote server"
     login_database: "helowin"
-    login_username: "system"
+    login_user: "system"
     login_password: "123456"
     name: "jms"
     password: "123456"
@@ -78,7 +78,7 @@ EXAMPLES = '''
   oracle_user:
     hostname: "remote server"
     login_database: "helowin"
-    login_username: "system"
+    login_user: "system"
     login_password: "123456"
     name: "jms"
     state: "absent"

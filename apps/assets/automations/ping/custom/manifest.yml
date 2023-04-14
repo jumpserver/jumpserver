@@ -1,0 +1,8 @@
+id: ping_by_ssh
+name: Ping by SSH
+category:
+  - device
+  - host
+type:
+  - all
+method: ping

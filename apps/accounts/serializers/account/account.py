@@ -97,7 +97,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
 
     @staticmethod
     def push_account_if_need(instance, push_now, params, stat):
-        if not push_now or stat != 'created':
+        if not push_now or stat not in ['created', 'updated']:
             return
         push_accounts_to_assets_task.delay([str(instance.id)], params)
 
@@ -407,3 +407,7 @@ class AccountTaskSerializer(serializers.Serializer):
         queryset=Account.objects, required=False, allow_empty=True, many=True
     )
     task = serializers.CharField(read_only=True)
+    params = serializers.JSONField(
+        decoder=None, encoder=None, required=False,
+        style={'base_template': 'textarea.html'}
+    )

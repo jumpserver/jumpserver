@@ -6,11 +6,26 @@ from .protocol import Protocol
 
 class Type:
     def __init__(self, label, value):
+        self.name = value
         self.label = label
         self.value = value
 
     def __str__(self):
         return self.value
+
+    def __add__(self, other):
+        if isinstance(other, str):
+            return str(str(self) + other)
+        raise TypeError("unsupported operand type(s) for +: '{}' and '{}'".format(
+            type(self), type(other))
+        )
+
+    def __radd__(self, other):
+        if isinstance(other, str):
+            return str(other + str(self))
+        raise TypeError("unsupported operand type(s) for +(r): '{}' and '{}'".format(
+            type(self), type(other))
+        )
 
 
 class BaseType(TextChoices):
@@ -77,10 +92,7 @@ class BaseType(TextChoices):
 
     @classmethod
     def get_types(cls):
-        tps = cls._get_choices_to_types()
-        if not has_valid_xpack_license():
-            tps = cls.get_community_types()
-        return tps
+        return cls._get_choices_to_types()
 
     @classmethod
     def get_community_types(cls):
@@ -88,4 +100,9 @@ class BaseType(TextChoices):
 
     @classmethod
     def get_choices(cls):
+        if not has_valid_xpack_license():
+            return [
+                (tp.value, tp.label)
+                for tp in cls.get_community_types()
+            ]
         return cls.choices

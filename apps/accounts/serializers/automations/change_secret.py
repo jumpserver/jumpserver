@@ -58,6 +58,7 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
                 "Currently only mail sending is supported"
             )},
         }}
+
     @property
     def model_type(self):
         return AutomationTypes.change_secret

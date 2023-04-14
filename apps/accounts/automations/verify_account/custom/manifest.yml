@@ -1,0 +1,8 @@
+id: verify_account_by_ssh
+name: Verify account by SSH
+category:
+  - device
+  - host
+type:
+  - all
+method: verify_account
