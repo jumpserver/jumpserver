@@ -168,7 +168,7 @@ class PlatformSerializer(WritableNestedModelSerializer):
         su_enabled = attrs.get('su_enabled', False) and self.constraints.get('su_enabled', False)
         automation = attrs.get('automation', {})
         automation['ansible_enabled'] = automation.get('ansible_enabled', False) \
-                                        and self.constraints.get('ansible_enabled', False)
+                                        and self.constraints['automation'].get('ansible_enabled', False)
         attrs.update({
             'domain_enabled': domain_enabled,
             'su_enabled': su_enabled,
