@@ -18,18 +18,18 @@
 
     - name: remove jumpserver ssh key
       ansible.builtin.lineinfile:
-        dest: "{{ kwargs.dest }}"
-        regexp: "{{ kwargs.regexp }}"
+        dest: "{{ ssh_params.dest }}"
+        regexp: "{{ ssh_params.regexp }}"
         state: absent
       when:
       - account.secret_type == "ssh_key"
-      - kwargs.strategy == "set_jms"
+      - ssh_params.strategy == "set_jms"
 
     - name: Change SSH key
       ansible.builtin.authorized_key:
         user: "{{ account.username }}"
         key: "{{ account.secret }}"
-        exclusive: "{{ kwargs.exclusive }}"
+        exclusive: "{{ ssh_params.exclusive }}"
       when: account.secret_type == "ssh_key"
 
     - name: Refresh connection

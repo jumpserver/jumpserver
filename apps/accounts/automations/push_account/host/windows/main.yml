@@ -1,0 +1,30 @@
+- hosts: demo
+  gather_facts: no
+  tasks:
+    - name: Test privileged account
+      ansible.windows.win_ping:
+
+#    - name: Print variables
+#      debug:
+#        msg: "Username: {{ account.username }}, Password: {{ account.secret }}"
+
+    - name: Push user password
+      ansible.windows.win_user:
+        fullname: "{{ account.username}}"
+        name: "{{ account.username }}"
+        password: "{{ account.secret }}"
+        password_never_expires: yes
+        groups: "{{ params.groups }}"
+        groups_action: add
+        update_password: always
+      when: account.secret_type == "password"
+
+    - name: Refresh connection
+      ansible.builtin.meta: reset_connection
+
+    - name: Verify password
+      ansible.windows.win_ping:
+      vars:
+        ansible_user: "{{ account.username }}"
+        ansible_password: "{{ account.secret }}"
+      when: account.secret_type == "password"

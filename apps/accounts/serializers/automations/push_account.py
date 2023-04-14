@@ -7,9 +7,10 @@ from .change_secret import (
 
 
 class PushAccountAutomationSerializer(ChangeSecretAutomationSerializer):
+
     class Meta(ChangeSecretAutomationSerializer.Meta):
         model = PushAccountAutomation
-        fields = [
+        fields = ['params'] + [
             n for n in ChangeSecretAutomationSerializer.Meta.fields
             if n not in ['recipients']
         ]

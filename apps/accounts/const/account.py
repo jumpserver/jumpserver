@@ -18,6 +18,7 @@ class AliasAccount(TextChoices):
 class Source(TextChoices):
     LOCAL = 'local', _('Local')
     COLLECTED = 'collected', _('Collected')
+    TEMPLATE = 'template', _('Template')
 
 
 class AccountInvalidPolicy(TextChoices):

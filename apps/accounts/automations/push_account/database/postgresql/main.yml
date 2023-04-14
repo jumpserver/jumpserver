@@ -1,0 +1,46 @@
+- hosts: postgre
+  gather_facts: no
+  vars:
+    ansible_python_interpreter: /usr/local/bin/python
+
+  tasks:
+    - name: Test PostgreSQL connection
+      community.postgresql.postgresql_ping:
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        login_db: "{{ jms_asset.spec_info.db_name }}"
+      register: result
+      failed_when: not result.is_available
+
+    - name: Display PostgreSQL version
+      debug:
+        var: result.server_version.full
+      when: result is succeeded
+
+    - name: Change PostgreSQL password
+      community.postgresql.postgresql_user:
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        db: "{{ jms_asset.spec_info.db_name }}"
+        name: "{{ account.username }}"
+        password: "{{ account.secret }}"
+        role_attr_flags: LOGIN
+      when: result is succeeded
+      register: change_info
+
+    - name: Verify password
+      community.postgresql.postgresql_ping:
+        login_user: "{{ account.username }}"
+        login_password: "{{ account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        db: "{{ jms_asset.spec_info.db_name }}"
+      when:
+        - result is succeeded
+        - change_info is succeeded
+      register: result
+      failed_when: not result.is_available

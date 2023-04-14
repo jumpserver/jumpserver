@@ -1,0 +1,43 @@
+- hosts: mysql
+  gather_facts: no
+  vars:
+    ansible_python_interpreter: /usr/local/bin/python
+    db_name: "{{ jms_asset.spec_info.db_name }}"
+
+  tasks:
+    - name: Test MySQL connection
+      community.mysql.mysql_info:
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        filter: version
+      register: db_info
+
+    - name: MySQL version
+      debug:
+        var: db_info.version.full
+
+    - name: Change MySQL password
+      community.mysql.mysql_user:
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        name: "{{ account.username }}"
+        password: "{{ account.secret }}"
+        host: "%"
+        priv: "{{ account.username + '.*:USAGE' if db_name == '' else db_name + '.*:ALL' }}"
+      when: db_info is succeeded
+      register: change_info
+
+    - name: Verify password
+      community.mysql.mysql_info:
+        login_user: "{{ account.username }}"
+        login_password: "{{ account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        filter: version
+      when:
+        - db_info is succeeded
+        - change_info is succeeded

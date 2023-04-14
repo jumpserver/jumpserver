@@ -1,0 +1,13 @@
+id: push_account_local_windows
+name: Push account local account for Windows
+version: 1
+method: push_account
+category: host
+type:
+  - windows
+params:
+  - name: groups
+    type: str
+    label: '用户组'
+    default: 'Users,Remote Desktop Users'
+    help_text: '请输入用户组，多个用户组使用逗号分隔（需填写已存在的用户组）'

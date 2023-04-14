@@ -1,0 +1,6 @@
+id: push_account_mongodb
+name: Push account for MongoDB
+category: database
+type:
+  - mongodb
+method: push_account

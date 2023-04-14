@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-
 import json
 import logging
 from collections import defaultdict
 
 from django.db import models
+from django.forms import model_to_dict
 from django.utils.translation import ugettext_lazy as _
 
 from assets import const
@@ -94,6 +94,20 @@ class Protocol(models.Model):
     def __str__(self):
         return '{}/{}'.format(self.name, self.port)
 
+    @lazyproperty
+    def asset_platform_protocol(self):
+        protocols = self.asset.platform.protocols.values('name', 'public', 'setting')
+        protocols = list(filter(lambda p: p['name'] == self.name, protocols))
+        return protocols[0] if len(protocols) > 0 else {}
+
+    @property
+    def setting(self):
+        return self.asset_platform_protocol.get('setting', {})
+
+    @property
+    def public(self):
+        return self.asset_platform_protocol.get('public', True)
+
 
 class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
     Category = const.Category
@@ -167,15 +181,8 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
         }
         if not automation:
             return auto_config
-        auto_config.update({
-            'ping_enabled': automation.ping_enabled,
-            'ansible_enabled': automation.ansible_enabled,
-            'push_account_enabled': automation.push_account_enabled,
-            'gather_facts_enabled': automation.gather_facts_enabled,
-            'change_secret_enabled': automation.change_secret_enabled,
-            'verify_account_enabled': automation.verify_account_enabled,
-            'gather_accounts_enabled': automation.gather_accounts_enabled,
-        })
+
+        auto_config.update(model_to_dict(automation))
         return auto_config
 
     def get_target_ip(self):
@@ -270,6 +277,22 @@ class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):
         }
         tree_node = TreeNode(**data)
         return tree_node
+
+    @staticmethod
+    def get_secret_type_assets(asset_ids, secret_type):
+        assets = Asset.objects.filter(id__in=asset_ids)
+        asset_protocol = assets.prefetch_related('protocols').values_list('id', 'protocols__name')
+        protocol_secret_types_map = const.Protocol.protocol_secret_types()
+        asset_secret_types_mapp = defaultdict(set)
+
+        for asset_id, protocol in asset_protocol:
+            secret_types = set(protocol_secret_types_map.get(protocol, []))
+            asset_secret_types_mapp[asset_id].update(secret_types)
+
+        return [
+            asset for asset in assets
+            if secret_type in asset_secret_types_mapp.get(asset.id, [])
+        ]
 
     class Meta:
         unique_together = [('org_id', 'name')]

@@ -22,6 +22,15 @@ def check_platform_methods(methods):
             raise ValueError("Duplicate id: {}".format(_id))
 
 
+def generate_serializer(data):
+    from common.serializers import create_serializer_class
+    params = data.pop('params', None)
+    if not params:
+        return None
+    serializer_name = data['id'].title().replace('_', '') + 'Serializer'
+    return create_serializer_class(serializer_name, params)
+
+
 def get_platform_automation_methods(path):
     methods = []
     for root, dirs, files in os.walk(path, topdown=False):
@@ -34,6 +43,7 @@ def get_platform_automation_methods(path):
                 manifest = yaml.safe_load(f)
                 check_platform_method(manifest, path)
                 manifest['dir'] = os.path.dirname(path)
+                manifest['params_serializer'] = generate_serializer(manifest)
             methods.append(manifest)
 
     check_platform_methods(methods)

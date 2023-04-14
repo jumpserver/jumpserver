@@ -54,12 +54,12 @@ class PlatformAutomationSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "ansible_enabled", "ansible_config",
-            "ping_enabled", "ping_method",
-            "push_account_enabled", "push_account_method",
-            "gather_facts_enabled", "gather_facts_method",
-            "change_secret_enabled", "change_secret_method",
-            "verify_account_enabled", "verify_account_method",
-            "gather_accounts_enabled", "gather_accounts_method",
+            "ping_enabled", "ping_method", "ping_params",
+            "push_account_enabled", "push_account_method", "push_account_params",
+            "gather_facts_enabled", "gather_facts_method", "gather_facts_params",
+            "change_secret_enabled", "change_secret_method", "change_secret_params",
+            "verify_account_enabled", "verify_account_method", "verify_account_params",
+            "gather_accounts_enabled", "gather_accounts_method", "gather_accounts_params",
         ]
         extra_kwargs = {
             # 启用资产探测
@@ -93,9 +93,11 @@ class PlatformProtocolSerializer(serializers.ModelSerializer):
 class PlatformCustomField(serializers.Serializer):
     TYPE_CHOICES = [
         ("str", "str"),
+        ("text", "text"),
         ("int", "int"),
         ("bool", "bool"),
         ("choice", "choice"),
+        ("list", "list"),
     ]
     name = serializers.CharField(label=_("Name"), max_length=128)
     label = serializers.CharField(label=_("Label"), max_length=128)
