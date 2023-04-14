@@ -90,6 +90,7 @@ class Protocol(models.Model):
     name = models.CharField(max_length=32, verbose_name=_("Name"))
     port = models.IntegerField(verbose_name=_("Port"))
     asset = models.ForeignKey('Asset', on_delete=models.CASCADE, related_name='protocols', verbose_name=_("Asset"))
+    _setting = None
 
     def __str__(self):
         return '{}/{}'.format(self.name, self.port)
@@ -102,7 +103,13 @@ class Protocol(models.Model):
 
     @property
     def setting(self):
+        if self._setting is not None:
+            return self._setting
         return self.asset_platform_protocol.get('setting', {})
+
+    @setting.setter
+    def setting(self, value):
+        self._setting = value
 
     @property
     def public(self):
