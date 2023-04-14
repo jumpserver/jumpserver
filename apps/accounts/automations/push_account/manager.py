@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from accounts.const import AutomationTypes, SecretType
+from accounts.const import AutomationTypes, SecretType, Connectivity
 from assets.const import HostTypes
 from common.utils import get_logger
 from ..base.manager import AccountBasePlaybookManager
@@ -74,6 +74,7 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
             return
         account.secret = new_secret
         account.save(update_fields=['secret'])
+        account.set_connectivity(Connectivity.OK)
 
     def on_host_error(self, host, error, result):
         pass
