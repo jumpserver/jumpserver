@@ -14,8 +14,10 @@ class PingManager(BasePlaybookManager):
     def method_type(cls):
         return AutomationTypes.ping
 
-    def host_callback(self, host, asset=None, account=None, **kwargs):
-        super().host_callback(host, asset=asset, account=account, **kwargs)
+    def host_callback(self, host, asset=None, account=None, automation=None, **kwargs):
+        super().host_callback(
+            host, asset=asset, account=account, automation=automation, **kwargs
+        )
         self.host_asset_and_account_mapper[host['name']] = (asset, account)
         return host
 

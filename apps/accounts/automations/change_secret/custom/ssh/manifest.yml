@@ -1,0 +1,14 @@
+id: change_secret_by_ssh
+name: Change secret by SSH
+category:
+  - device
+  - host
+type:
+  - all
+method: change_secret
+params:
+  - name: commands
+    type: list
+    label: '自定义命令'
+    default: ['']
+    help_text: '自定义命令中如需包含账号的 username 和 password 字段，请使用 &#123;username&#125;、&#123;password&#125;格式，执行任务时会进行替换 。<br />比如针对 Linux 主机进行改密，一般需要配置三条命令：<br />1.passwd &#123;username&#125; <br />2.&#123;password&#125; <br />3.&#123;password&#125;'

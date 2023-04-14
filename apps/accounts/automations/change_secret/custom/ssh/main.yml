@@ -1,0 +1,40 @@
+- hosts: custom
+  gather_facts: no
+  vars:
+    ansible_connection: local
+
+  tasks:
+    - name: Test privileged account
+      ssh_ping:
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_secret_type: "{{ jms_account.secret_type }}"
+        login_private_key_path: "{{ jms_account.private_key_path }}"
+      register: ping_info
+
+    - name: Change asset password
+      custom_command:
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        login_secret_type: "{{ jms_account.secret_type }}"
+        login_private_key_path: "{{ jms_account.private_key_path }}"
+        name: "{{ account.username }}"
+        password: "{{ account.secret }}"
+        commands: "{{ params.commands }}"
+        first_conn_delay_time: "{{ first_conn_delay_time | default(0.5) }}"
+      when: ping_info is succeeded
+      register: change_info
+
+    - name: Verify password
+      ssh_ping:
+        login_user: "{{ account.username }}"
+        login_password: "{{ account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+      when:
+        - ping_info is succeeded
+        - change_info is succeeded
