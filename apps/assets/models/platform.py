@@ -116,6 +116,11 @@ class Platform(JMSBaseModel):
         )
         return linux.id
 
+    def delete(self, using=None, keep_parents=False):
+        if self.automation:
+            self.automation.delete()
+        return super().delete(using, keep_parents)
+
     def __str__(self):
         return self.name
 
