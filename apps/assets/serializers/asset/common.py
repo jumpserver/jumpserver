@@ -176,8 +176,12 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
             return
         category = request.path.strip('/').split('/')[-1].rstrip('s')
         field_category = self.fields.get('category')
+        if not field_category:
+            return
         field_category.choices = Category.filter_choices(category)
         field_type = self.fields.get('type')
+        if not field_type:
+            return
         field_type.choices = AllTypes.filter_choices(category)
 
     @classmethod
