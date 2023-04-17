@@ -101,7 +101,6 @@ class Platform(JMSBaseModel):
     su_enabled = models.BooleanField(default=False, verbose_name=_("Su enabled"))
     su_method = models.CharField(max_length=32, blank=True, null=True, verbose_name=_("Su method"))
     custom_fields = models.JSONField(null=True, default=list, verbose_name=_("Custom fields"))
-    _automation_id = models.UUIDField(null=True, editable=False)
 
     @property
     def type_constraints(self):

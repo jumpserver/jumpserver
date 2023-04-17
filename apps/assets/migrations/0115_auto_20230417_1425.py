@@ -24,12 +24,6 @@ def migrate_automation_platform(apps, schema_editor):
         automation.save(update_fields=['platform'])
 
 
-def migrate_null_platform_automation(apps, schema_editor):
-    automation_model = apps.get_model('assets', 'PlatformAutomation')
-    null_platform_automations = automation_model.objects.filter(platform__isnull=True)
-    null_platform_automations.delete()
-
-
 class Migration(migrations.Migration):
     dependencies = [
         ('assets', '0114_baseautomation_params'),
@@ -50,4 +44,5 @@ class Migration(migrations.Migration):
                                        related_name='automation', to='assets.platform'),
         ),
         migrations.RunPython(migrate_automation_platform),
+        migrations.RemoveField(model_name='platform', name='_automation_id'),
     ]
