@@ -3,7 +3,7 @@
 
 import re
 
-from django.db.models import F
+from django.db.models import F, QuerySet
 from django.db.transaction import atomic
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
@@ -200,7 +200,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         if not request:
             return default_field
 
-        if self.instance and isinstance(self.instance, list):
+        if self.instance and isinstance(self.instance, (QuerySet, list)):
             return default_field
 
         if not self.instance and uuid_pattern.findall(request.path):
