@@ -14,7 +14,7 @@ from assets.models import Asset
 from common.serializers import SecretReadableMixin
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from common.utils import get_logger
-from .base import BaseAccountSerializer
+from .base import BaseAccountSerializer, AuthValidateMixin
 
 logger = get_logger(__name__)
 
@@ -228,7 +228,9 @@ class AssetAccountBulkSerializerResultSerializer(serializers.Serializer):
     changed = serializers.BooleanField(read_only=True, label=_('Changed'))
 
 
-class AssetAccountBulkSerializer(AccountCreateUpdateSerializerMixin, serializers.ModelSerializer):
+class AssetAccountBulkSerializer(
+    AccountCreateUpdateSerializerMixin, AuthValidateMixin, serializers.ModelSerializer
+):
     assets = serializers.PrimaryKeyRelatedField(queryset=Asset.objects, many=True, label=_('Assets'))
 
     class Meta:
