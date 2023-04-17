@@ -72,6 +72,7 @@ class PlatformAutomation(models.Model):
         max_length=32, blank=True, null=True, verbose_name=_("Gather facts method")
     )
     gather_accounts_params = models.JSONField(default=dict, verbose_name=_("Gather facts params"))
+    platform = models.OneToOneField('Platform', on_delete=models.CASCADE, related_name='automation', null=True)
 
 
 class Platform(JMSBaseModel):
@@ -99,11 +100,8 @@ class Platform(JMSBaseModel):
     # 账号有关的
     su_enabled = models.BooleanField(default=False, verbose_name=_("Su enabled"))
     su_method = models.CharField(max_length=32, blank=True, null=True, verbose_name=_("Su method"))
-    automation = models.OneToOneField(
-        PlatformAutomation, on_delete=models.CASCADE, related_name='platform',
-        blank=True, null=True, verbose_name=_("Automation")
-    )
     custom_fields = models.JSONField(null=True, default=list, verbose_name=_("Custom fields"))
+    _automation_id = models.UUIDField(null=True, editable=False)
 
     @property
     def type_constraints(self):
