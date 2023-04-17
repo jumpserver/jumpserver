@@ -270,7 +270,7 @@ class AllTypes(ChoicesMixin):
         return data
 
     @classmethod
-    def create_or_update_by_platform_data(cls, name, platform_data, platform_cls=None):
+    def create_or_update_by_platform_data(cls, platform_data, platform_cls=None):
         # 不直接用 Platform 是因为可能在 migrations 中使用
         from assets.models import Platform
         if platform_cls is None:
@@ -279,6 +279,7 @@ class AllTypes(ChoicesMixin):
         automation_data = platform_data.pop('automation', {})
         protocols_data = platform_data.pop('protocols', [])
 
+        name = platform_data['name']
         platform, created = platform_cls.objects.update_or_create(
             defaults=platform_data, name=name
         )
@@ -294,7 +295,6 @@ class AllTypes(ChoicesMixin):
 
         platform.protocols.all().delete()
         for p in protocols_data:
-            p.pop('primary', None)
             platform.protocols.create(**p)
 
     @classmethod
@@ -335,7 +335,7 @@ class AllTypes(ChoicesMixin):
                         'automation': {**default_automation, **_automation},
                         'protocols': protocols_data
                     }
-                    cls.create_or_update_by_platform_data(name, platform_data, platform_cls=platform_cls)
+                    cls.create_or_update_by_platform_data(platform_data, platform_cls=platform_cls)
 
     @classmethod
     def update_user_create_platforms(cls, platform_cls):
@@ -350,5 +350,5 @@ class AllTypes(ChoicesMixin):
         for platform in user_platforms:
             print("\t- Update platform: {}".format(platform.name))
             platform_data = cls.get_type_default_platform(platform.category, platform.type)
-            cls.create_or_update_by_platform_data(platform.name, platform_data, platform_cls=platform_cls)
+            cls.create_or_update_by_platform_data(platform_data, platform_cls=platform_cls)
         user_platforms.update(internal=False)

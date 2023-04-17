@@ -15,6 +15,9 @@ def migrate_platform_protocol_primary(apps, schema_editor):
     platforms = platform_model.objects.all()
 
     for platform in platforms:
+        p = platform.protocols.filter(primary=True).first()
+        if p:
+            continue
         p = platform.protocols.first()
         if not p:
             continue
@@ -45,5 +48,4 @@ class Migration(migrations.Migration):
         ),
         migrations.RunPython(migrate_platform_charset),
         migrations.RunPython(migrate_platform_protocol_primary),
-        migrations.RunPython(migrate_internal_platforms),
     ]
