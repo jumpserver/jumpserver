@@ -1,3 +1,4 @@
+import json
 from collections import defaultdict
 from copy import deepcopy
 
@@ -302,20 +303,20 @@ class AllTypes(ChoicesMixin):
         if platform_cls is None:
             platform_cls = cls
 
-        print("\n\tCreate internal platforms")
+        # print("\n\tCreate internal platforms")
         for category, type_cls in cls.category_types():
-            print("\t## Category: {}".format(category.label))
+            # print("\t## Category: {}".format(category.label))
             data = type_cls.internal_platforms()
 
             for tp, platform_datas in data.items():
-                print("\t  >> Type: {}".format(tp.label))
+                # print("\t  >> Type: {}".format(tp.label))
                 default_platform_data = cls.get_type_default_platform(category, tp)
                 default_automation = default_platform_data.pop('automation', {})
                 default_protocols = default_platform_data.pop('protocols', [])
 
                 for d in platform_datas:
                     name = d['name']
-                    print("\t    - Platform: {}".format(name))
+                    # print("\t    - Platform: {}".format(name))
                     _automation = d.pop('automation', {})
                     _protocols = d.pop('_protocols', [])
                     _protocols_setting = d.pop('protocols_setting', {})
@@ -335,7 +336,8 @@ class AllTypes(ChoicesMixin):
                         'automation': {**default_automation, **_automation},
                         'protocols': protocols_data
                     }
-                    cls.create_or_update_by_platform_data(platform_data, platform_cls=platform_cls)
+                    print(json.dumps(platform_data, indent=4))
+                    # cls.create_or_update_by_platform_data(platform_data, platform_cls=platform_cls)
 
     @classmethod
     def update_user_create_platforms(cls, platform_cls):

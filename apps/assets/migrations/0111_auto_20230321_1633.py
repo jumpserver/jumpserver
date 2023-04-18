@@ -2,8 +2,6 @@
 
 from django.db import migrations, models
 
-from assets.const import AllTypes
-
 
 def migrate_platform_charset(apps, schema_editor):
     platform_model = apps.get_model('assets', 'Platform')
@@ -25,9 +23,46 @@ def migrate_platform_protocol_primary(apps, schema_editor):
         p.save()
 
 
-def migrate_internal_platforms(apps, schema_editor):
+def migrate_winrm_for_win(apps, *args):
     platform_cls = apps.get_model('assets', 'Platform')
-    AllTypes.create_or_update_internal_platforms(platform_cls)
+    windows_name = ['Windows', 'Windows-TLS', 'Windows-RDP']
+    windows = platform_cls.objects.filter(name__in=windows_name)
+    for platform in windows:
+        if platform.protocols.filter(name='winrm').exists():
+            continue
+        data = {
+            'name': 'winrm',
+            'port': 5985,
+            'primary': False,
+            'public': False,
+            'required': False,
+            'default': False,
+            'setting': {"use_ssl": False}
+        }
+        platform.protocols.create(**data)
+
+
+def migrate_device_platform_automation(apps, *args):
+    platform_cls = apps.get_model('assets', 'Platform')
+    names = ['General', 'Cisco', 'H3C', 'Huawei']
+    platforms = platform_cls.objects.filter(name__in=names, category='device')
+
+    for platform in platforms:
+        automation = getattr(platform, 'automation', None)
+        if not automation:
+            continue
+        automation.ansible_config = {
+            "ansible_connection": "local",
+            "first_connect_delay": 0.5,
+        }
+        automation.ansible_enable = True
+        automation.change_secret_enabled = True
+        automation.change_secret_method = "change_secret_by_ssh"
+        automation.ping_enabled = True
+        automation.ping_method = "ping_by_ssh"
+        automation.verify_account_enabled = True
+        automation.verify_account_method = "verify_account_by_ssh"
+        automation.save()
 
 
 class Migration(migrations.Migration):
@@ -48,4 +83,6 @@ class Migration(migrations.Migration):
         ),
         migrations.RunPython(migrate_platform_charset),
         migrations.RunPython(migrate_platform_protocol_primary),
+        migrations.RunPython(migrate_winrm_for_win),
+        migrations.RunPython(migrate_device_platform_automation),
     ]
