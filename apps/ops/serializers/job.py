@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from assets.models import Node, Asset
+from perms.models import PermNode
 from perms.utils.user_perm import UserPermAssetUtil
 from common.serializers.fields import ReadableHiddenField
 from ops.mixin import PeriodTaskSerializerMixin
@@ -39,9 +40,9 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
             user = self.get_request_user()
             perm_util = UserPermAssetUtil(user=user)
             for node_id in node_ids:
-                if node_id == 'favorite':
+                if node_id == PermNode.FAVORITE_NODE_KEY:
                     node_assets = perm_util.get_favorite_assets()
-                elif node_id == 'ungroup':
+                elif node_id == PermNode.UNGROUPED_NODE_KEY:
                     node_assets = perm_util.get_ungroup_assets()
                 else:
                     node, node_assets = perm_util.get_node_all_assets(node_id)
