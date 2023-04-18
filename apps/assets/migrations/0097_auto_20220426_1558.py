@@ -26,7 +26,6 @@ platforms_data_json = '''[
             "verify_account_enabled": true,
             "change_secret_enabled": true,
             "push_account_enabled": true,
-            "ansible_config_methods": [],
             "ping_method": "posix_ping",
             "gather_facts_method": "gather_facts_posix",
             "gather_accounts_method": "gather_accounts_posix",
@@ -91,7 +90,6 @@ platforms_data_json = '''[
             "verify_account_enabled": true,
             "change_secret_enabled": true,
             "push_account_enabled": true,
-            "ansible_config_methods": [],
             "ping_method": "posix_ping",
             "gather_facts_method": "gather_facts_posix",
             "gather_accounts_method": "gather_accounts_posix",
@@ -156,7 +154,6 @@ platforms_data_json = '''[
             "verify_account_enabled": true,
             "change_secret_enabled": true,
             "push_account_enabled": true,
-            "ansible_config_methods": [],
             "ping_method": "posix_ping",
             "gather_facts_method": "gather_facts_posix",
             "gather_accounts_method": "gather_accounts_posix",
@@ -221,7 +218,6 @@ platforms_data_json = '''[
             "verify_account_enabled": true,
             "change_secret_enabled": true,
             "push_account_enabled": true,
-            "ansible_config_methods": [],
             "ping_method": "posix_ping",
             "gather_facts_method": "gather_facts_posix",
             "gather_accounts_method": "gather_accounts_posix",
@@ -286,7 +282,6 @@ platforms_data_json = '''[
             "verify_account_enabled": true,
             "change_secret_enabled": true,
             "push_account_enabled": true,
-            "ansible_config_methods": [],
             "ping_method": "posix_ping",
             "gather_facts_method": "gather_facts_posix",
             "gather_accounts_method": "gather_accounts_posix",
@@ -351,7 +346,6 @@ platforms_data_json = '''[
             "verify_account_enabled": true,
             "change_secret_enabled": true,
             "push_account_enabled": true,
-            "ansible_config_methods": [],
             "ping_method": "posix_ping",
             "gather_facts_method": "gather_facts_posix",
             "gather_accounts_method": "gather_accounts_posix",
@@ -417,7 +411,6 @@ platforms_data_json = '''[
             "verify_account_enabled": true,
             "change_secret_enabled": true,
             "push_account_enabled": true,
-            "ansible_config_methods": [],
             "ping_method": "win_ping",
             "gather_facts_method": "gather_facts_windows",
             "gather_accounts_method": "gather_accounts_windows",
@@ -476,7 +469,6 @@ platforms_data_json = '''[
             "verify_account_enabled": true,
             "change_secret_enabled": true,
             "push_account_enabled": true,
-            "ansible_config_methods": [],
             "ping_method": "win_ping",
             "gather_facts_method": "gather_facts_windows",
             "gather_accounts_method": "gather_accounts_windows",
@@ -535,7 +527,6 @@ platforms_data_json = '''[
             "verify_account_enabled": true,
             "change_secret_enabled": true,
             "push_account_enabled": true,
-            "ansible_config_methods": [],
             "ping_method": "win_ping",
             "gather_facts_method": "gather_facts_windows",
             "gather_accounts_method": "gather_accounts_windows",
@@ -594,7 +585,6 @@ platforms_data_json = '''[
             "verify_account_enabled": true,
             "change_secret_enabled": true,
             "push_account_enabled": true,
-            "ansible_config_methods": [],
             "ping_method": "win_ping",
             "gather_facts_method": "gather_facts_windows",
             "gather_accounts_method": "gather_accounts_windows",
@@ -644,8 +634,7 @@ platforms_data_json = '''[
             "gather_accounts_enabled": false,
             "verify_account_enabled": false,
             "change_secret_enabled": false,
-            "push_account_enabled": false,
-            "ansible_config_methods": []
+            "push_account_enabled": false
         },
         "protocols": [
             {
@@ -686,8 +675,7 @@ platforms_data_json = '''[
             "gather_accounts_enabled": false,
             "verify_account_enabled": false,
             "change_secret_enabled": false,
-            "push_account_enabled": false,
-            "ansible_config_methods": []
+            "push_account_enabled": false
         },
         "protocols": [
             {
@@ -728,8 +716,7 @@ platforms_data_json = '''[
             "gather_accounts_enabled": false,
             "verify_account_enabled": false,
             "change_secret_enabled": false,
-            "push_account_enabled": false,
-            "ansible_config_methods": []
+            "push_account_enabled": false
         },
         "protocols": [
             {
@@ -770,8 +757,7 @@ platforms_data_json = '''[
             "gather_accounts_enabled": false,
             "verify_account_enabled": false,
             "change_secret_enabled": false,
-            "push_account_enabled": false,
-            "ansible_config_methods": []
+            "push_account_enabled": false
         },
         "protocols": [
             {
@@ -813,7 +799,6 @@ platforms_data_json = '''[
             "verify_account_enabled": true,
             "change_secret_enabled": true,
             "push_account_enabled": true,
-            "ansible_config_methods": [],
             "ping_method": "mysql_ping",
             "gather_accounts_method": "gather_accounts_mysql",
             "verify_account_method": "verify_account_mysql",
@@ -850,7 +835,6 @@ platforms_data_json = '''[
             "verify_account_enabled": true,
             "change_secret_enabled": true,
             "push_account_enabled": true,
-            "ansible_config_methods": [],
             "ping_method": "mysql_ping",
             "gather_accounts_method": "gather_accounts_mysql",
             "verify_account_method": "verify_account_mysql",
@@ -887,7 +871,6 @@ platforms_data_json = '''[
             "verify_account_enabled": true,
             "change_secret_enabled": true,
             "push_account_enabled": true,
-            "ansible_config_methods": [],
             "ping_method": "ping_postgresql",
             "gather_accounts_method": "gather_accounts_postgresql",
             "verify_account_method": "verify_account_postgresql",
@@ -924,7 +907,6 @@ platforms_data_json = '''[
             "verify_account_enabled": true,
             "change_secret_enabled": true,
             "push_account_enabled": true,
-            "ansible_config_methods": [],
             "ping_method": "oracle_ping",
             "gather_accounts_method": "gather_accounts_oracle",
             "verify_account_method": "verify_account_oracle",
@@ -961,7 +943,6 @@ platforms_data_json = '''[
             "verify_account_enabled": true,
             "change_secret_enabled": true,
             "push_account_enabled": true,
-            "ansible_config_methods": [],
             "ping_method": "sqlserver_ping",
             "verify_account_method": "verify_account_sqlserver",
             "change_secret_method": "change_secret_sqlserver",
@@ -996,8 +977,7 @@ platforms_data_json = '''[
             "gather_accounts_enabled": false,
             "verify_account_enabled": false,
             "change_secret_enabled": false,
-            "push_account_enabled": false,
-            "ansible_config_methods": []
+            "push_account_enabled": false
         },
         "protocols": [
             {
@@ -1029,7 +1009,6 @@ platforms_data_json = '''[
             "verify_account_enabled": true,
             "change_secret_enabled": true,
             "push_account_enabled": true,
-            "ansible_config_methods": [],
             "ping_method": "mongodb_ping",
             "gather_accounts_method": "gather_accounts_mongodb",
             "verify_account_method": "verify_account_mongodb",
@@ -1065,8 +1044,7 @@ platforms_data_json = '''[
             "gather_accounts_enabled": false,
             "verify_account_enabled": false,
             "change_secret_enabled": false,
-            "push_account_enabled": false,
-            "ansible_config_methods": []
+            "push_account_enabled": false
         },
         "protocols": [
             {
@@ -1099,8 +1077,7 @@ platforms_data_json = '''[
             "gather_accounts_enabled": false,
             "verify_account_enabled": false,
             "change_secret_enabled": false,
-            "push_account_enabled": false,
-            "ansible_config_methods": []
+            "push_account_enabled": false
         },
         "protocols": [
             {
