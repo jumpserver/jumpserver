@@ -58,6 +58,10 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             self.from_template_if_need(data)
             self.set_uniq_name_if_need(data, asset)
 
+    def to_internal_value(self, data):
+        self.from_template_if_need(data)
+        return super().to_internal_value(data)
+
     def set_uniq_name_if_need(self, initial_data, asset):
         name = initial_data.get('name')
         if name is not None:
@@ -74,6 +78,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         template_id = initial_data.pop('template', None)
         if not template_id:
             return
+
         if isinstance(template_id, (str, uuid.UUID)):
             template = AccountTemplate.objects.filter(id=template_id).first()
         else:
