@@ -1,12 +1,12 @@
 import json
-import uuid
 import logging
+import uuid
 from datetime import datetime
 
-from django.utils.translation import ugettext_lazy as _
-from django.utils import timezone as dj_timezone
-from django.db import models
 from django.conf import settings
+from django.db import models
+from django.utils import timezone as dj_timezone
+from django.utils.translation import ugettext_lazy as _
 
 lazy_type = type(_('ugettext_lazy'))
 
@@ -28,5 +28,5 @@ class ModelJSONFieldEncoder(json.JSONEncoder):
             try:
                 return super().default(obj)
             except TypeError:
-                logging.error('Type error: ', type(obj))
+                logging.error(f'Type error: {type(obj)}')
                 return str(obj)

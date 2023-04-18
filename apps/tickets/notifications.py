@@ -3,16 +3,16 @@ from urllib.parse import urljoin
 
 from django.conf import settings
 from django.core.cache import cache
-from django.shortcuts import reverse
 from django.forms import model_to_dict
+from django.shortcuts import reverse
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 
-from notifications.notifications import UserMessage
-from common.utils import get_logger, random_string
 from common.db.encoder import ModelJSONFieldEncoder
-from .models import Ticket
+from common.utils import get_logger, random_string
+from notifications.notifications import UserMessage
 from . import const
+from .models import Ticket
 
 logger = get_logger(__file__)
 
