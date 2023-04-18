@@ -39,7 +39,12 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
             user = self.get_request_user()
             perm_util = UserPermAssetUtil(user=user)
             for node_id in node_ids:
-                node, node_assets = perm_util.get_node_all_assets(node_id)
+                if node_id == 'favorite':
+                    node_assets = perm_util.get_favorite_assets()
+                elif node_id == 'ungroup':
+                    node_assets = perm_util.get_ungroup_assets()
+                else:
+                    node, node_assets = perm_util.get_node_all_assets(node_id)
                 assets.extend(node_assets.exclude(id__in=[asset.id for asset in assets]))
         return super().create(validated_data)
 
