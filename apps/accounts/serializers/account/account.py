@@ -111,8 +111,9 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         _validators = super().get_validators()
         if getattr(self, 'initial_data', None) is None:
             return _validators
+
         on_invalid = self.initial_data.get('on_invalid')
-        if on_invalid == AccountInvalidPolicy.ERROR:
+        if on_invalid == AccountInvalidPolicy.ERROR and not self.parent:
             return _validators
         _validators = [v for v in _validators if not isinstance(v, UniqueTogetherValidator)]
         return _validators
