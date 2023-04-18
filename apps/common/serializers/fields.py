@@ -63,7 +63,7 @@ class LabeledChoiceField(ChoiceField):
     def to_representation(self, key):
         if key is None:
             return key
-        label = self.choice_mapper.get(key)
+        label = self.choice_mapper.get(key, key)
         return {"value": key, "label": label}
 
     def to_internal_value(self, data):
