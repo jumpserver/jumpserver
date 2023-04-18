@@ -1,3 +1,5 @@
+import logging
+
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from drf_writable_nested.serializers import WritableNestedModelSerializer as NestedModelSerializer
@@ -35,7 +37,11 @@ class MethodSerializer(serializers.Serializer):
     @cached_property
     def serializer(self) -> serializers.Serializer:
         method = getattr(self.parent, self.method_name)
-        _serializer = method()
+        try:
+            _serializer = method()
+        except Exception as e:
+            logging.error(e, exc_info=True)
+            raise e
         # 设置serializer的parent值，否则在serializer实例中获取parent会出现断层
         setattr(_serializer, 'parent', self.parent)
         return _serializer
