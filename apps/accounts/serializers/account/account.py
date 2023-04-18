@@ -34,6 +34,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         choices=AccountInvalidPolicy.choices, default=AccountInvalidPolicy.ERROR,
         write_only=True, label=_('Exist policy')
     )
+    _template = None
 
     class Meta:
         fields = ['template', 'push_now', 'params', 'on_invalid']
@@ -69,9 +70,8 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             name = name + '_' + uuid.uuid4().hex[:4]
         initial_data['name'] = name
 
-    @staticmethod
-    def from_template_if_need(initial_data):
-        template_id = initial_data.get('template')
+    def from_template_if_need(self, initial_data):
+        template_id = initial_data.pop('template', None)
         if not template_id:
             return
         if isinstance(template_id, (str, uuid.UUID)):
@@ -81,6 +81,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         if not template:
             raise serializers.ValidationError({'template': 'Template not found'})
 
+        self._template = template
         # Set initial data from template
         ignore_fields = ['id', 'date_created', 'date_updated', 'org_id']
         field_names = [
@@ -137,20 +138,17 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         else:
             raise serializers.ValidationError('Account already exists')
 
-    def validate(self, attrs):
-        attrs = super().validate(attrs)
-        if self.instance:
-            return attrs
-
-        template = attrs.pop('template', None)
-        if template:
-            attrs['source'] = Source.TEMPLATE
-            attrs['source_id'] = str(template.id)
-        return attrs
+    def generate_source_data(self, validated_data):
+        template = self._template
+        if template is None:
+            return
+        validated_data['source'] = Source.TEMPLATE
+        validated_data['source_id'] = str(template.id)
 
     def create(self, validated_data):
         push_now = validated_data.pop('push_now', None)
         params = validated_data.pop('params', None)
+        self.generate_source_data(validated_data)
         instance, stat = self.do_create(validated_data)
         self.push_account_if_need(instance, push_now, params, stat)
         return instance
@@ -368,6 +366,7 @@ class AssetAccountBulkSerializer(
 
     def create(self, validated_data):
         push_now = validated_data.pop('push_now', False)
+        self.generate_source_data(validated_data)
         results = self.perform_bulk_create(validated_data)
         self.push_accounts_if_need(results, push_now)
         for res in results:
