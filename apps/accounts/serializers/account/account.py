@@ -59,7 +59,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
 
     def set_uniq_name_if_need(self, initial_data, asset):
         name = initial_data.get('name')
-        if name is None:
+        if name is not None:
             return
         if not name:
             name = initial_data.get('username')

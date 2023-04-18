@@ -267,12 +267,13 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         nodes_display = self.initial_data.get('nodes_display')
         if nodes_display:
             return nodes
+        default_node = Node.org_root()
         request = self.context.get('request')
         if not request:
-            return []
+            return [default_node]
         node_id = request.query_params.get('node_id')
         if not node_id:
-            return []
+            return [default_node]
         nodes = Node.objects.filter(id=node_id)
         return nodes
 
