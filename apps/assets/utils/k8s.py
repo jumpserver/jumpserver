@@ -16,7 +16,7 @@ logger = get_logger(__file__)
 class KubernetesClient:
     def __init__(self, asset, token):
         self.url = asset.address
-        self.token = token
+        self.token = token or ''
         self.server = self.get_gateway_server(asset)
 
     @property
