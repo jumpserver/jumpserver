@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse
 
 from kubernetes import client
 from kubernetes.client import api_client
 from kubernetes.client.api import core_v1_api
 from kubernetes.client.exceptions import ApiException
+from sshtunnel import SSHTunnelForwarder, BaseSSHTunnelForwarderError
 
 from common.utils import get_logger
 from ..const import CloudTypes, Category
@@ -13,16 +14,15 @@ logger = get_logger(__file__)
 
 
 class KubernetesClient:
-    def __init__(self, url, token, proxy=None):
-        self.url = url
+    def __init__(self, asset, token):
+        self.url = asset.address
         self.token = token
-        self.proxy = proxy
+        self.server = self.get_gateway_server(asset)
 
     @property
     def api(self):
         configuration = client.Configuration()
         configuration.host = self.url
-        configuration.proxy = self.proxy
         configuration.verify_ssl = False
         configuration.api_key = {"authorization": "Bearer " + self.token}
         c = api_client.ApiClient(configuration=configuration)
@@ -51,27 +51,43 @@ class KubernetesClient:
         return containers
 
     @staticmethod
-    def get_proxy_url(asset):
-        if not asset.domain:
-            return None
+    def get_gateway_server(asset):
+        gateway = None
+        if not asset.is_gateway and asset.domain:
+            gateway = asset.domain.select_gateway()
 
-        gateway = asset.domain.select_gateway()
         if not gateway:
-            return None
-        return f'{gateway.address}:{gateway.port}'
+            return
 
-    @classmethod
-    def run(cls, asset, secret, tp, *args):
-        k8s_url = f'{asset.address}'
-        proxy_url = cls.get_proxy_url(asset)
-        k8s = cls(k8s_url, secret, proxy=proxy_url)
+        remote_bind_address = (
+            urlparse(asset.address).hostname,
+            urlparse(asset.address).port
+        )
+        server = SSHTunnelForwarder(
+            (gateway.address, gateway.port),
+            ssh_username=gateway.username,
+            ssh_password=gateway.password,
+            ssh_pkey=gateway.private_key_path,
+            remote_bind_address=remote_bind_address
+        )
+        try:
+            server.start()
+        except BaseSSHTunnelForwarderError:
+            err_msg = 'Gateway is not active: %s' % asset.get('name', '')
+            print('\033[31m %s \033[0m\n' % err_msg)
+        return server
+
+    def run(self, tp, *args):
         func_name = f'get_{tp}s'
         data = []
-        if hasattr(k8s, func_name):
+        if hasattr(self, func_name):
             try:
-                data = getattr(k8s, func_name)(*args)
+                data = getattr(self, func_name)(*args)
             except ApiException as e:
                 logger.error(e.reason)
+
+        if self.server:
+            self.server.stop()
         return data
 
 
@@ -131,10 +147,11 @@ class KubernetesTree:
 
     def async_tree_node(self, namespace, pod):
         tree = []
+        k8s_client = KubernetesClient(self.asset, self.secret)
         if pod:
             tp = 'container'
-            containers = KubernetesClient.run(
-                self.asset, self.secret, tp, namespace, pod
+            containers = k8s_client.run(
+                tp, namespace, pod
             )
             for container in containers:
                 container_node = self.as_container_tree_node(
@@ -143,13 +160,13 @@ class KubernetesTree:
                 tree.append(container_node)
         elif namespace:
             tp = 'pod'
-            pods = KubernetesClient.run(self.asset, self.secret, tp, namespace)
+            pods = k8s_client.run(tp, namespace)
             for pod in pods:
                 pod_node = self.as_pod_tree_node(namespace, pod, tp)
                 tree.append(pod_node)
         else:
             tp = 'namespace'
-            namespaces = KubernetesClient.run(self.asset, self.secret, tp)
+            namespaces = k8s_client.run(tp)
             for namespace in namespaces:
                 namespace_node = self.as_namespace_node(namespace, tp)
                 tree.append(namespace_node)
