@@ -352,5 +352,6 @@ class AllTypes(ChoicesMixin):
         for platform in user_platforms:
             print("\t- Update platform: {}".format(platform.name))
             platform_data = cls.get_type_default_platform(platform.category, platform.type)
+            platform_data['name'] = platform.name
             cls.create_or_update_by_platform_data(platform_data, platform_cls=platform_cls)
         user_platforms.update(internal=False)

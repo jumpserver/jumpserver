@@ -55,7 +55,7 @@ def migrate_device_platform_automation(apps, *args):
             "ansible_connection": "local",
             "first_connect_delay": 0.5,
         }
-        automation.ansible_enable = True
+        automation.ansible_enabled = True
         automation.change_secret_enabled = True
         automation.change_secret_method = "change_secret_by_ssh"
         automation.ping_enabled = True
@@ -63,6 +63,17 @@ def migrate_device_platform_automation(apps, *args):
         automation.verify_account_enabled = True
         automation.verify_account_method = "verify_account_by_ssh"
         automation.save()
+
+
+def migrate_web_login_button_error(apps, *args):
+    protocol_cls = apps.get_model('assets', 'PlatformProtocol')
+    protocols = protocol_cls.objects.filter(name='http')
+
+    for protocol in protocols:
+        submit_selector = protocol.setting.get('submit_selector', '')
+        submit_selector = submit_selector.replace('id=longin_button', 'id=login_button')
+        protocol.setting['submit_selector'] = submit_selector
+        protocol.save()
 
 
 class Migration(migrations.Migration):
@@ -85,4 +96,5 @@ class Migration(migrations.Migration):
         migrations.RunPython(migrate_platform_protocol_primary),
         migrations.RunPython(migrate_winrm_for_win),
         migrations.RunPython(migrate_device_platform_automation),
+        migrations.RunPython(migrate_web_login_button_error),
     ]

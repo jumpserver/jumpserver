@@ -70,7 +70,7 @@ platforms_data_json = '''[
                 "default": false
             }
         ]
-    }
+    },
     {
         "category": "host",
         "type": "linux",
@@ -134,7 +134,7 @@ platforms_data_json = '''[
                 "default": false
             }
         ]
-    }
+    },
     {
         "category": "host",
         "type": "unix",
@@ -198,7 +198,7 @@ platforms_data_json = '''[
                 "default": false
             }
         ]
-    }
+    },
     {
         "category": "host",
         "type": "unix",
@@ -262,7 +262,7 @@ platforms_data_json = '''[
                 "default": false
             }
         ]
-    }
+    },
     {
         "category": "host",
         "type": "unix",
@@ -326,7 +326,7 @@ platforms_data_json = '''[
                 "default": false
             }
         ]
-    }
+    },
     {
         "category": "host",
         "type": "unix",
@@ -390,7 +390,7 @@ platforms_data_json = '''[
                 "default": false
             }
         ]
-    }
+    },
     {
         "category": "host",
         "type": "windows",
@@ -448,7 +448,7 @@ platforms_data_json = '''[
                 "setting": {}
             }
         ]
-    }
+    },
     {
         "category": "host",
         "type": "windows",
@@ -506,7 +506,7 @@ platforms_data_json = '''[
                 "setting": {}
             }
         ]
-    }
+    },
     {
         "category": "host",
         "type": "windows",
@@ -564,7 +564,7 @@ platforms_data_json = '''[
                 "setting": {}
             }
         ]
-    }
+    },
     {
         "category": "host",
         "type": "windows",
@@ -615,7 +615,7 @@ platforms_data_json = '''[
                 "default": false
             }
         ]
-    }
+    },
     {
         "category": "device",
         "type": "general",
@@ -656,7 +656,7 @@ platforms_data_json = '''[
                 "setting": {}
             }
         ]
-    }
+    },
     {
         "category": "device",
         "type": "general",
@@ -697,7 +697,7 @@ platforms_data_json = '''[
                 "setting": {}
             }
         ]
-    }
+    },
     {
         "category": "device",
         "type": "general",
@@ -738,7 +738,7 @@ platforms_data_json = '''[
                 "setting": {}
             }
         ]
-    }
+    },
     {
         "category": "device",
         "type": "general",
@@ -779,7 +779,7 @@ platforms_data_json = '''[
                 "setting": {}
             }
         ]
-    }
+    },
     {
         "category": "database",
         "type": "mysql",
@@ -815,7 +815,7 @@ platforms_data_json = '''[
                 "default": false
             }
         ]
-    }
+    },
     {
         "category": "database",
         "type": "mariadb",
@@ -851,7 +851,7 @@ platforms_data_json = '''[
                 "setting": {}
             }
         ]
-    }
+    },
     {
         "category": "database",
         "type": "postgresql",
@@ -887,7 +887,7 @@ platforms_data_json = '''[
                 "setting": {}
             }
         ]
-    }
+    },
     {
         "category": "database",
         "type": "oracle",
@@ -923,7 +923,7 @@ platforms_data_json = '''[
                 "setting": {}
             }
         ]
-    }
+    },
     {
         "category": "database",
         "type": "sqlserver",
@@ -958,7 +958,7 @@ platforms_data_json = '''[
                 "setting": {}
             }
         ]
-    }
+    },
     {
         "category": "database",
         "type": "clickhouse",
@@ -989,7 +989,7 @@ platforms_data_json = '''[
                 "setting": {}
             }
         ]
-    }
+    },
     {
         "category": "database",
         "type": "mongodb",
@@ -1025,7 +1025,7 @@ platforms_data_json = '''[
                 "setting": {}
             }
         ]
-    }
+    },
     {
         "category": "database",
         "type": "redis",
@@ -1058,7 +1058,7 @@ platforms_data_json = '''[
                 "default": false
             }
         ]
-    }
+    },
     {
         "category": "database",
         "type": "redis",
@@ -1091,7 +1091,7 @@ platforms_data_json = '''[
                 "default": false
             }
         ]
-    }
+    },
     {
         "category": "web",
         "type": "website",
@@ -1123,7 +1123,7 @@ platforms_data_json = '''[
                 "default": false
             }
         ]
-    }
+    },
     {
         "category": "cloud",
         "type": "private",
@@ -1155,7 +1155,7 @@ platforms_data_json = '''[
                 "default": false
             }
         ]
-    }
+    },
     {
         "category": "cloud",
         "type": "k8s",
