@@ -53,7 +53,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
 
         for data in initial_data:
             if not data.get('asset') and not self.instance:
-                raise serializers.ValidationError({'asset': 'Asset is required'})
+                raise serializers.ValidationError({'asset': UniqueTogetherValidator.missing_message})
             asset = data.get('asset') or self.instance.asset
             self.from_template_if_need(data)
             self.set_uniq_name_if_need(data, asset)
@@ -111,8 +111,9 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         _validators = super().get_validators()
         if getattr(self, 'initial_data', None) is None:
             return _validators
+
         on_invalid = self.initial_data.get('on_invalid')
-        if on_invalid == AccountInvalidPolicy.ERROR:
+        if on_invalid == AccountInvalidPolicy.ERROR and not self.parent:
             return _validators
         _validators = [v for v in _validators if not isinstance(v, UniqueTogetherValidator)]
         return _validators
