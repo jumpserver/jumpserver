@@ -134,7 +134,7 @@ def check_migrations_file_prefix_conflict(*args, **kwargs):
         return
 
     from jumpserver.const import BASE_DIR
-    print('>>> Check migrations file prefix conflict')
+    print('>>> Check migrations file prefix conflict.', end=' ')
     # 指定 app 目录
     _dir = BASE_DIR
     # 获取所有子目录
@@ -167,8 +167,12 @@ def check_migrations_file_prefix_conflict(*args, **kwargs):
             else:
                 prefix_file_map[file_prefix] = file
 
+    conflict_count = len(conflict_files)
+    print(f'Conflict count:({conflict_count})')
+    if not conflict_count:
+        return
+
     print('='*80)
-    print(f'Conflict count:({len(conflict_files)})')
     for conflict_file in conflict_files:
         msg_dir = '{:<15}'.format(conflict_file[0])
         msg_split = '=> '
