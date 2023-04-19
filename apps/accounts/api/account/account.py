@@ -8,6 +8,7 @@ from accounts import serializers
 from accounts.filters import AccountFilterSet
 from accounts.models import Account
 from assets.models import Asset, Node
+from common.api import ExtraFilterFieldsMixin
 from common.permissions import UserConfirmation, ConfirmType, IsValidUser
 from common.views.mixins import RecordViewLogMixin
 from orgs.mixins.api import OrgBulkModelViewSet
@@ -111,7 +112,7 @@ class AssetAccountBulkCreateApi(CreateAPIView):
         return Response(data=serializer.data, status=HTTP_200_OK)
 
 
-class AccountHistoriesSecretAPI(RecordViewLogMixin, ListAPIView):
+class AccountHistoriesSecretAPI(ExtraFilterFieldsMixin, RecordViewLogMixin, ListAPIView):
     model = Account.history.model
     serializer_class = serializers.AccountHistorySerializer
     http_method_names = ['get', 'options']
@@ -122,6 +123,10 @@ class AccountHistoriesSecretAPI(RecordViewLogMixin, ListAPIView):
 
     def get_object(self):
         return get_object_or_404(Account, pk=self.kwargs.get('pk'))
+
+    @staticmethod
+    def filter_spm_queryset(resource_ids, queryset):
+        return queryset.filter(history_id__in=resource_ids)
 
     def get_queryset(self):
         account = self.get_object()

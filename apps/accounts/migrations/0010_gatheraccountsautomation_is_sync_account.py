@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('accounts', '0009_account_usernames_to_ids'),
     ]
@@ -14,5 +13,10 @@ class Migration(migrations.Migration):
             model_name='gatheraccountsautomation',
             name='is_sync_account',
             field=models.BooleanField(blank=True, default=False, verbose_name='Is sync account'),
+        ),
+        migrations.AddField(
+            model_name='account',
+            name='source_id',
+            field=models.CharField(max_length=128, null=True, blank=True, verbose_name='Source ID'),
         ),
     ]
