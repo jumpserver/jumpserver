@@ -72,9 +72,10 @@ def get_commands(module):
     username = module.params['name']
     password = module.params['password']
     commands = module.params['commands'] or []
+    login_password = module.params['login_password']
     for index, command in enumerate(commands):
         commands[index] = command.format(
-            username=username, password=password
+            username=username, password=password, login_password=login_password
         )
     return commands
 
