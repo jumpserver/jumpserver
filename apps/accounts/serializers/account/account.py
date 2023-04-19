@@ -75,6 +75,9 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         initial_data['name'] = name
 
     def from_template_if_need(self, initial_data):
+        if isinstance(initial_data, str):
+            return
+
         template_id = initial_data.pop('template', None)
         if not template_id:
             return
