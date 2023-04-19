@@ -70,9 +70,13 @@ class AssetPlatformSerializer(serializers.ModelSerializer):
 class AssetAccountSerializer(AccountSerializer):
     add_org_fields = False
     asset = serializers.PrimaryKeyRelatedField(queryset=Asset.objects, required=False, write_only=True)
-    clone_id: str
+    clone_id = None
 
     def to_internal_value(self, data):
+        # 导入时，data有时为str
+        if isinstance(data, str):
+            return super().to_internal_value(data)
+
         clone_id = data.pop('id', None)
         ret = super().to_internal_value(data)
         self.clone_id = clone_id
