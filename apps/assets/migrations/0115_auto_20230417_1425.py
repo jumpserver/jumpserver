@@ -3,14 +3,15 @@
 from django.db import migrations, models
 
 
-def migrate_platform_automation_id(apps, schema_editor):
+def migrate_platform_automation_id(apps, *args):
     platform_model = apps.get_model('assets', 'Platform')
     for platform in platform_model.objects.all():
-        platform._automation_id = platform.automation.id
-        platform.save(update_fields=['_automation_id'])
+        if platform.automation:
+            platform._automation_id = platform.automation.id
+            platform.save(update_fields=['_automation_id'])
 
 
-def migrate_automation_platform(apps, schema_editor):
+def migrate_automation_platform(apps, *args):
     platform_model = apps.get_model('assets', 'Platform')
     automation_model = apps.get_model('assets', 'PlatformAutomation')
     platforms = platform_model.objects.all()
