@@ -96,7 +96,7 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
     model = Asset
     filterset_class = AssetFilterSet
     search_fields = ("name", "address")
-    ordering = ("name", "connectivity")
+    ordering_fields = ('name', 'connectivity', 'platform')
     serializer_classes = (
         ("default", serializers.AssetSerializer),
         ("platform", serializers.PlatformSerializer),
