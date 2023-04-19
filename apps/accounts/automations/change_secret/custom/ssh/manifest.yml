@@ -11,4 +11,4 @@ params:
     type: list
     label: '自定义命令'
     default: ['']
-    help_text: '自定义命令中如需包含账号的 username 和 password 字段，请使用 &#123;username&#125;、&#123;password&#125;格式，执行任务时会进行替换 。<br />比如针对 Linux 主机进行改密，一般需要配置三条命令：<br />1.passwd &#123;username&#125; <br />2.&#123;password&#125; <br />3.&#123;password&#125;'
+    help_text: '自定义命令中如需包含账号的 账号、密码、SSH 连接的用户密码 字段，<br />请使用 &#123;username&#125;、&#123;password&#125;、&#123;login_password&#125;格式，执行任务时会进行替换 。<br />比如针对 Cisco 主机进行改密，一般需要配置五条命令：<br />1. enable<br />2. &#123;login_password&#125;<br />3. configure terminal<br />4. username &#123;username&#125; privilege 0 password &#123;password&#125; <br />5. end'
