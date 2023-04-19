@@ -392,6 +392,7 @@ class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
 
 class AccountHistorySerializer(serializers.ModelSerializer):
     secret_type = LabeledChoiceField(choices=SecretType.choices, label=_('Secret type'))
+    id = serializers.IntegerField(label=_('ID'), source='history_id', read_only=True)
 
     class Meta:
         model = Account.history.model
