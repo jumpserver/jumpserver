@@ -96,3 +96,17 @@ class WritableNestedModelSerializer(NestedModelSerializer):
 
 class FileSerializer(serializers.Serializer):
     file = serializers.FileField(label=_("File"))
+
+
+class DictSerializer(serializers.Serializer):
+
+    def to_representation(self, instance):
+        # 返回一个包含所有提交字段的 Python 字典
+        return instance
+
+    def to_internal_value(self, data):
+        # 确保从请求中得到的输入是 Python 字典
+        if isinstance(data, dict):
+            return data
+        else:
+            raise serializers.ValidationError("无法转换为dict类型")

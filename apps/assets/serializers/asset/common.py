@@ -13,6 +13,7 @@ from common.serializers import (
     WritableNestedModelSerializer, SecretReadableMixin,
     CommonModelSerializer, MethodSerializer
 )
+from common.serializers.common import DictSerializer
 from common.serializers.fields import LabeledChoiceField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ...const import Category, AllTypes
@@ -326,19 +327,19 @@ class DetailMixin(serializers.Serializer):
             category = request.query_params.get('category')
         else:
             instance = self.get_instance()
-            category = instance.category
+            category = instance.category if instance else 'host'
         return category
 
     def get_gathered_info_serializer(self):
         category = self.get_category()
         from .info.gathered import category_gathered_serializer_map
-        serializer_cls = category_gathered_serializer_map.get(category, serializers.DictField)
+        serializer_cls = category_gathered_serializer_map.get(category, DictSerializer)
         return serializer_cls()
 
     def get_spec_info_serializer(self):
         category = self.get_category()
         from .info.spec import category_spec_serializer_map
-        serializer_cls = category_spec_serializer_map.get(category, serializers.DictField)
+        serializer_cls = category_spec_serializer_map.get(category, DictSerializer)
         return serializer_cls()
 
 

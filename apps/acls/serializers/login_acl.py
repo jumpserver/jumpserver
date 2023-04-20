@@ -1,12 +1,13 @@
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
-from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from common.serializers import BulkModelSerializer, MethodSerializer
+from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from jumpserver.utils import has_valid_xpack_license
 from users.models import User
 from .rules import RuleSerializer
 from ..models import LoginACL
+from ..models.base import ActionChoices
 
 __all__ = [
     "LoginACLSerializer",
@@ -22,7 +23,7 @@ class LoginACLSerializer(BulkModelSerializer):
     reviewers = ObjectRelatedField(
         queryset=User.objects, label=_("Reviewers"), many=True, required=False
     )
-    action = LabeledChoiceField(choices=LoginACL.ActionChoices.choices, label=_('Action'))
+    action = LabeledChoiceField(choices=ActionChoices.choices, label=_('Action'))
     reviewers_amount = serializers.IntegerField(
         read_only=True, source="reviewers.count", label=_("Reviewers amount")
     )
@@ -55,7 +56,7 @@ class LoginACLSerializer(BulkModelSerializer):
         choices = action.choices
         if not has_valid_xpack_license():
             choices.pop(LoginACL.ActionChoices.review, None)
-        action.choices = choices
+        action._choices = choices
 
     def get_rules_serializer(self):
         return RuleSerializer()
