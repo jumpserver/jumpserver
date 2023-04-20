@@ -1,6 +1,11 @@
 id: sqlserver_ping
-name: Ping SQLServer
+name: "{{ 'Ping SQLServer' | trans }}"
 category: database
 type:
   - sqlserver
 method: ping
+i18n:
+  Ping SQLServer:
+    zh: 测试 SQLServer 可连接性
+    en: Ping SQLServer
+    ja: SQLServerにPingする

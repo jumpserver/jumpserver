@@ -1,7 +1,12 @@
 id: gather_facts_mysql
-name: Gather facts from MySQL
+name: "{{ 'Gather facts from MySQL' | trans }}"
 category: database
 type:
   - mysql
   - mariadb
 method: gather_facts
+i18n:
+  Gather facts from MySQL:
+    zh: 从 MySQL 获取信息
+    en: Gather facts from MySQL
+    ja: MySQLから事実を取得する
