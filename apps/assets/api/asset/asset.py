@@ -111,7 +111,6 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
         ("gathered_info", "assets.view_asset"),
     )
     extra_filter_backends = [LabelFilterBackend, IpInFilterBackend, NodeFilterBackend]
-    skip_assets = []
 
     def get_serializer_class(self):
         cls = super().get_serializer_class()
@@ -144,6 +143,7 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
 
     def filter_bulk_update_data(self):
         bulk_data = []
+        skip_assets = []
         for data in self.request.data:
             pk = data.get('id')
             platform = data.get('platform')
@@ -155,16 +155,16 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
             if platform.type == asset.type:
                 bulk_data.append(data)
                 continue
-            self.skip_assets.append(asset)
-        return bulk_data
+            skip_assets.append(asset)
+        return bulk_data, skip_assets
 
     def bulk_update(self, request, *args, **kwargs):
-        bulk_data = self.filter_bulk_update_data()
+        bulk_data, skip_assets = self.filter_bulk_update_data()
         request._full_data = bulk_data
         response = super().bulk_update(request, *args, **kwargs)
-        if response.status_code == HTTP_200_OK and self.skip_assets:
+        if response.status_code == HTTP_200_OK and skip_assets:
             user = request.user
-            BulkUpdatePlatformSkipAssetUserMsg(user, self.skip_assets).publish()
+            BulkUpdatePlatformSkipAssetUserMsg(user, skip_assets).publish()
         return response
 
 
