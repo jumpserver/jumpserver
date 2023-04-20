@@ -1,7 +1,12 @@
 id: push_account_mysql
-name: Push account for MySQL
+name: "{{ 'MySQL account push' | trans }}"
 category: database
 type:
   - mysql
   - mariadb
 method: push_account
+
+i18n:
+  MySQL account push:
+    zh: MySQL 账号推送
+    ja: MySQL アカウントのプッシュ

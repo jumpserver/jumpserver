@@ -1,5 +1,5 @@
 id: gather_accounts_mysql
-name: "{{ 'Gather account from MySQL' | trans }}"
+name: "{{ 'MySQL account gather' | trans }}"
 category: database
 type:
   - mysql
@@ -7,9 +7,6 @@ type:
 method: gather_accounts
 
 i18n:
-  en:
-    Gather account from MySQL: Gather account from MySQL
-  zh:
-    Gather account from MySQL: 从MySQL获取账号
-  ja:
-    Gather account from MySQL: MySQLからアカウントを取得する
+  MySQL account gather:
+    zh: MySQL 账号收集
+    ja: MySQL アカウントの収集

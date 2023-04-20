@@ -1,6 +1,11 @@
 id: change_secret_sqlserver
-name: Change secret for SQLServer
+name: "{{ 'SQLServer account change secret' | trans }}"
 category: database
 type:
   - sqlserver
 method: change_secret
+
+i18n:
+  SQLServer account change secret:
+    zh: SQLServer 账号改密
+    ja: SQLServer アカウントのパスワード変更

@@ -1,7 +1,12 @@
 id: change_secret_local_windows
-name: Change secret local account for Windows
+name: "{{ 'Windows account change secret' | trans }}"
 version: 1
 method: change_secret
 category: host
 type:
   - windows
+
+i18n:
+  Windows account change secret:
+    zh: Windows 账号改密
+    ja: Windows アカウントのパスワード変更

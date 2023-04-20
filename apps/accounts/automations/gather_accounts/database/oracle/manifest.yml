@@ -1,6 +1,11 @@
 id: gather_accounts_oracle
-name: Gather account from Oracle
+name: "{{ 'Oracle account gather' | trans }}"
 category: database
 type:
   - oracle
 method: gather_accounts
+
+i18n:
+  Oracle account gather:
+    zh: Oracle 账号收集
+    ja: Oracle アカウントの収集
