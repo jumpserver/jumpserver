@@ -3,18 +3,6 @@
 from django.db import migrations, models
 
 
-def update_asset_protocol(apps, schema_editor):
-    asset_protocol_cls = apps.get_model('assets', 'Protocol')
-    asset_protocols = asset_protocol_cls.objects.all()
-
-    for protocol in asset_protocols:
-        platform_protocol = protocol.asset.platform.protocols.filter(name=protocol.name).first()
-        if platform_protocol:
-            protocol.setting = platform_protocol.setting
-            protocol.public = platform_protocol.public
-            protocol.save()
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -37,5 +25,4 @@ class Migration(migrations.Migration):
             name='params',
             field=models.JSONField(default=dict, verbose_name='Parameters'),
         ),
-        migrations.RunPython(update_asset_protocol)
     ]
