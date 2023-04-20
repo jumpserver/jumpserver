@@ -12,6 +12,7 @@ from rest_framework.serializers import ValidationError
 
 from common.db.models import JMSBaseModel
 from common.utils import lazyproperty, get_logger
+from common.utils.yml import yaml_load_with_i18n
 
 logger = get_logger(__name__)
 
@@ -76,14 +77,14 @@ class Applet(JMSBaseModel):
 
     @staticmethod
     def validate_pkg(d):
-        files = ['manifest.yml', 'icon.png', 'i18n.yml', 'setup.yml']
+        files = ['manifest.yml', 'icon.png', 'setup.yml']
         for name in files:
             path = os.path.join(d, name)
             if not os.path.exists(path):
                 raise ValidationError({'error': _('Applet pkg not valid, Missing file {}').format(name)})
 
         with open(os.path.join(d, 'manifest.yml')) as f:
-            manifest = yaml.safe_load(f)
+            manifest = yaml_load_with_i18n(f)
 
         if not manifest.get('name', ''):
             raise ValidationError({'error': 'Missing name in manifest.yml'})
