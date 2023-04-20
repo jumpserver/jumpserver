@@ -123,7 +123,7 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
         for i in range(0, len(account_ids), slice_count):
             push_accounts_to_assets_task.delay(account_ids[i:i + slice_count])
 
-    def validate_accounts(self, usernames: list[str]):
+    def validate_accounts(self, usernames):
         template_ids = []
         account_usernames = []
         for username in usernames:

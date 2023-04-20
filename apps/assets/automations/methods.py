@@ -40,7 +40,6 @@ def get_platform_automation_methods(path):
                 continue
 
             with open(path, 'r') as f:
-                print("path: ", path)
                 manifest = yaml_load_with_i18n(f)
                 check_platform_method(manifest, path)
                 manifest['dir'] = os.path.dirname(path)
