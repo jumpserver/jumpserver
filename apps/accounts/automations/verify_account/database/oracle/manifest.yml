@@ -1,6 +1,11 @@
 id: verify_account_oracle
-name: Verify account from Oracle
+name: "{{ 'Oracle account verify' | trans }}"
 category: database
 type:
   - oracle
 method: verify_account
+
+i18n:
+  Oracle account verify:
+    zh: Oracle 账号验证
+    ja: Oracle アカウントの検証

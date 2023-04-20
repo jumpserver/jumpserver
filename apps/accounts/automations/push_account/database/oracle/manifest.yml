@@ -1,6 +1,11 @@
 id: push_account_oracle
-name: Push account for Oracle
+name: "{{ 'Oracle account push' | trans }}"
 category: database
 type:
   - oracle
 method: push_account
+
+i18n:
+  Oracle account push:
+    zh: Oracle 账号推送
+    ja: Oracle アカウントのプッシュ

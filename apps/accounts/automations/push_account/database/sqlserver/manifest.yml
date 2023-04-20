@@ -1,6 +1,11 @@
 id: push_account_sqlserver
-name: Push account for SQLServer
+name: "{{ 'SQLServer account push' | trans }}"
 category: database
 type:
   - sqlserver
 method: push_account
+
+i18n:
+  SQLServer account push:
+    zh: SQLServer 账号推送
+    ja: SQLServer アカウントのプッシュ

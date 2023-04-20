@@ -71,7 +71,7 @@ class PlatformAutomationMethodsApi(generics.ListAPIView):
     def generate_serializer_fields(self):
         data = self.automation_methods()
         fields = {
-            i['id']: i['params_serializer']()
+            i['id']: i['params_serializer'](label=i['name'])
             if i['params_serializer'] else None
             for i in data
         }

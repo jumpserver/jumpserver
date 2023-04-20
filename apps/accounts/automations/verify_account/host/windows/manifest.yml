@@ -1,7 +1,12 @@
 id: verify_account_windows
-name: Verify account windows
+name: "{{ 'Windows account verify' | trans }}"
 version: 1
 method: verify_account
 category: host
 type:
   - windows
+
+i18n:
+    Windows account verify:
+        zh: Windows 账号验证
+        ja: Windows アカウントの検証

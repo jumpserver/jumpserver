@@ -1,6 +1,11 @@
 id: verify_account_postgresql
-name: Verify account for PostgreSQL
+name: "{{ 'PostgreSQL account verify' | trans }}"
 category: database
 type:
   - postgresql
 method: verify_account
+
+i18n:
+  PostgreSQL account verify:
+    zh: PostgreSQL 账号验证
+    ja: PostgreSQL アカウントの検証
