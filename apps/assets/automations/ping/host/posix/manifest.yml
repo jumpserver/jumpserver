@@ -7,9 +7,7 @@ type:
 method: ping
 
 i18n:
-  zh:
-    Posix ping: Posix 测试
-  ja:
-    Posix ping: Posix ピング
-  en:
-    Posix ping: Posix ping
+  Posix ping:
+    zh: Posix ping
+    en: Posix ping
+    ja: Posix ピング

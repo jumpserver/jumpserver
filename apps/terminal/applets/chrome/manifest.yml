@@ -12,12 +12,11 @@ protocols:
   - http
 
 i18n:
-  en:
-    Chrome Browser: Chrome Browser
-    Chrome Browser Open URL Page Address: Chrome Browser Open URL Page Address
-  zh:
-    Chrome Browser: Chrome 浏览器
-    Chrome Browser Open URL Page Address: Chrome 浏览器打开网页地址
-  ja:
-    Chrome Browser: Chrome ブラウザ
-    Chrome Browser Open URL Page Address: Chrome ブラウザでウェブページを開く
+  Chrome Browser:
+    en: Chrome Browser
+    zh: Chrome 浏览器
+    ja: Chrome ブラウザ
+  Chrome Browser Open URL Page Address:
+    en: Chrome Browser Open URL Page Address
+    zh: Chrome 浏览器打开网页地址
+    ja: Chrome ブラウザでウェブページを開く

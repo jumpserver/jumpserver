@@ -7,8 +7,8 @@ from jinja2 import Environment
 
 def translate(i18n, key):
     lang = get_language()[:2]
-    lang_data = i18n.get(lang, {})
-    return lang_data.get(key, key)
+    lang_data = i18n.get(key, {})
+    return lang_data.get(lang, key)
 
 
 def yaml_load_with_i18n(stream):
