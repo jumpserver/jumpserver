@@ -1,5 +1,8 @@
 - hosts: windows
   gather_facts: no
   tasks:
+    - name: Refresh connection
+      ansible.builtin.meta: reset_connection
+
     - name: Windows ping
       ansible.builtin.win_ping:
