@@ -2,6 +2,7 @@
 #
 import phonenumbers
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Model
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.fields import ChoiceField, empty
@@ -118,11 +119,15 @@ class ObjectRelatedField(serializers.RelatedField):
         return data
 
     def to_internal_value(self, data):
+        queryset = self.get_queryset()
+        if isinstance(data, Model):
+            return queryset.get(pk=data.pk)
+
         if not isinstance(data, dict):
             pk = data
         else:
             pk = data.get("id") or data.get("pk") or data.get(self.attrs[0])
-        queryset = self.get_queryset()
+
         try:
             if isinstance(data, bool):
                 raise TypeError
