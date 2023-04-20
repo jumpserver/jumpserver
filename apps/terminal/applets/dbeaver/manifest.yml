@@ -1,6 +1,6 @@
 name: dbeaver
-display_name: DBeaver Community
-comment: Free multi-platform database tool for developers, database administrators, analysts and all people who need to work with databases.
+display_name: "{{ 'DBeaver Community' | trans }}"
+comment: "{{ 'Free multi-platform database tool for developers, database administrators, analysts and all people who need to work with databases.' | trans }}"
 version: 0.1
 exec_type: python
 author: JumpServer Team
@@ -14,3 +14,14 @@ protocols:
   - postgresql
   - sqlserver
   - oracle
+
+i18n:
+  en:
+    DBeaver Community: DBeaver Community
+    Free multi-platform database tool for developers, database administrators, analysts and all people who need to work with databases.: Free multi-platform database tool for developers, database administrators, analysts and all people who need to work with databases.
+  zh:
+    DBeaver Community: DBeaver 社区版
+    Free multi-platform database tool for developers, database administrators, analysts and all people who need to work with databases.: 免费的多平台数据库工具，供开发人员、数据库管理员、分析师和所有需要使用数据库的人使用。
+  ja:
+    DBeaver Community: DBeaver コミュニティ
+    Free multi-platform database tool for developers, database administrators, analysts and all people who need to work with databases.: 開発者、データベース管理者、分析家、およびデータベースを使用する必要があるすべての人のための無料のマルチプラットフォームデータベースツール。
