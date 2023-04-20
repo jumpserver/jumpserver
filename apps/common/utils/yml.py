@@ -1,12 +1,12 @@
 import io
 
 import yaml
-from django.utils.translation import get_language
+from django.conf import settings
 from jinja2 import Environment
 
 
 def translate(i18n, key):
-    lang = get_language()[:2]
+    lang = settings.LANGUAGE_CODE[:2]
     lang_data = i18n.get(key, {})
     return lang_data.get(lang, key)
 
