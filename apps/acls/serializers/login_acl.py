@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 common_help_text = _(
-    "Format for comma-delimited string, with * indicating a match all. "
+    "With * indicating a match all. "
 )
 
 
