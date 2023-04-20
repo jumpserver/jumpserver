@@ -76,8 +76,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     && pip install --upgrade setuptools wheel \
     && pip install https://download.jumpserver.org/pypi/simple/cryptography/cryptography-38.0.4-cp39-cp39-linux_loongarch64.whl \
     && pip install https://download.jumpserver.org/pypi/simple/greenlet/greenlet-1.1.2-cp39-cp39-linux_loongarch64.whl \
-    && pip install $(grep 'PyNaCl' requirements/requirements.txt) \
-    && GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=true pip install grpcio \
+    && pip install https://download.jumpserver.org/pypi/simple/PyNaCl/PyNaCl-1.5.0-cp39-cp39-linux_loongarch64.whl \
+    && pip install https://download.jumpserver.org/pypi/simple/grpcio/grpcio-1.54.0-cp39-cp39-linux_loongarch64.whl \
     && pip install $(grep -E 'jms|jumpserver' requirements/requirements.txt) -i ${PIP_JMS_MIRROR} \
     && pip install -r requirements/requirements.txt
 
