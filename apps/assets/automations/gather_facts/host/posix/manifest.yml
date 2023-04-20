@@ -1,7 +1,12 @@
 id: gather_facts_posix
-name: Gather posix facts
+name: "{{ 'Gather posix facts' | trans }}"
 category: host
 type:
   - linux
   - unix
 method: gather_facts
+i18n:
+  Gather posix facts:
+    zh: 从 Posix 主机获取信息
+    en: Gather posix facts
+    ja: Posixから事実を取得する

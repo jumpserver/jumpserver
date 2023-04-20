@@ -22,7 +22,7 @@ def ip_group_child_validator(ip_group_child):
 
 
 ip_group_help_text = _(
-    'Format for comma-delimited string, with * indicating a match all. '
+    'With * indicating a match all. '
     'Such as: '
     '192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 '
 )

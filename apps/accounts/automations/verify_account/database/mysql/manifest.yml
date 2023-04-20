@@ -1,7 +1,12 @@
 id: verify_account_mysql
-name: Verify account from MySQL
+name: "{{ 'MySQL account verify' | trans }}"
 category: database
 type:
   - mysql
   - mariadb
 method: verify_account
+
+i18n:
+  MySQL account verify:
+    zh: MySQL 账号验证
+    ja: MySQL アカウントの検証

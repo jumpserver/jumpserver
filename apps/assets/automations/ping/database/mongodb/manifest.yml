@@ -1,6 +1,11 @@
 id: mongodb_ping
-name: Ping MongoDB
+name: "{{ 'Ping MongoDB' | trans }}"
 category: database
 type:
   - mongodb
 method: ping
+i18n:
+  Ping MongoDB:
+    zh: 测试 MongoDB 可连接性
+    en: Ping MongoDB
+    ja: MongoDBにPingする

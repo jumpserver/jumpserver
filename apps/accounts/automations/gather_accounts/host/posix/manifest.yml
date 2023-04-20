@@ -1,7 +1,12 @@
 id: gather_accounts_posix
-name: Gather posix account
+name: "{{ 'Posix account gather' | trans }}"
 category: host
 type:
   - linux
   - unix
 method: gather_accounts
+
+i18n:
+  Posix account gather:
+    zh: Posix 账号收集
+    ja: Posix アカウントの収集

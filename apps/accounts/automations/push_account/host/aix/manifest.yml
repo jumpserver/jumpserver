@@ -1,5 +1,5 @@
 id: push_account_aix
-name: Push account for aix
+name: "{{ 'Aix account push' | trans }}"
 category: host
 type:
   - AIX
@@ -21,4 +21,9 @@ params:
     label: '用户组'
     default: ''
     help_text: '请输入用户组，多个用户组使用逗号分隔（需填写已存在的用户组）'
+
+i18n:
+  Aix account push:
+    zh: Aix 账号推送
+    ja: Aix アカウントのプッシュ
 

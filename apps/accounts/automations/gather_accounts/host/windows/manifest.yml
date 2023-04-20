@@ -1,7 +1,12 @@
 id: gather_accounts_windows
-name: Gather account windows
+name: "{{ 'Windows account gather' | trans }}"
 version: 1
 method: gather_accounts
 category: host
 type:
   - windows
+
+i18n:
+  Windows account gather:
+    zh: Windows 账号收集
+    ja: Windows アカウントの収集

@@ -1,5 +1,5 @@
 id: push_account_local_windows
-name: Push account local account for Windows
+name: "{{ 'Windows account push' | trans }}"
 version: 1
 method: push_account
 category: host
@@ -11,3 +11,8 @@ params:
     label: '用户组'
     default: 'Users,Remote Desktop Users'
     help_text: '请输入用户组，多个用户组使用逗号分隔（需填写已存在的用户组）'
+
+i18n:
+  Windows account push:
+    zh: Windows 账号推送
+    ja: Windows アカウントのプッシュ

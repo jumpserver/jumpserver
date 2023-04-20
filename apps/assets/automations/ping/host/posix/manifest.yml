@@ -1,7 +1,13 @@
 id: posix_ping
-name: Posix ping
+name: "{{ 'Posix ping' | trans }}"
 category: host
 type:
   - linux
   - unix
 method: ping
+
+i18n:
+  Posix ping:
+    zh: 测试 Posix 可连接性
+    en: Posix ping
+    ja: Posix ピング

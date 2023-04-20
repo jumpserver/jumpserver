@@ -1,7 +1,12 @@
 id: gather_facts_windows
-name: Gather facts windows
+name: "{{ 'Gather facts windows' | trans }}"
 version: 1
 method: gather_facts
 category: host
 type:
   - windows
+i18n:
+  Gather facts windows:
+    zh: 从 Windows 获取信息
+    en: Gather facts windows
+    ja: Windowsから事実を取得する

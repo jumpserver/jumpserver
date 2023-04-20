@@ -1,6 +1,11 @@
 id: push_account_mongodb
-name: Push account for MongoDB
+name: "{{ 'MongoDB account push' | trans }}"
 category: database
 type:
   - mongodb
 method: push_account
+
+i18n:
+  MongoDB account push:
+    zh: MongoDB 账号推送
+    ja: MongoDB アカウントのプッシュ

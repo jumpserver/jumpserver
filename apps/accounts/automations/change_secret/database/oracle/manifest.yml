@@ -1,6 +1,11 @@
 id: change_secret_oracle
-name: Change secret for Oracle
+name: "{{ 'Oracle account change secret' | trans }}"
 category: database
 type:
   - oracle
 method: change_secret
+
+i18n:
+  Oracle account change secret:
+    zh: Oracle 账号改密
+    ja: Oracle アカウントのパスワード変更

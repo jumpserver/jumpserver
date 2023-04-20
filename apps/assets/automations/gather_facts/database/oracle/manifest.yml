@@ -1,6 +1,11 @@
 id: gather_facts_oracle
-name: Gather facts from Oracle
+name: "{{ 'Gather facts from Oracle' | trans }}"
 category: database
 type:
   - oracle
 method: gather_facts
+i18n:
+  Gather facts from Oracle:
+    zh: 从 Oracle 获取信息
+    en: Gather facts from Oracle
+    ja: Oracleから事実を取得する

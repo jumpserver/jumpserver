@@ -14,7 +14,7 @@ from assets.models import Asset
 from common.serializers import SecretReadableMixin
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from common.utils import get_logger
-from .base import BaseAccountSerializer
+from .base import BaseAccountSerializer, AuthValidateMixin
 
 logger = get_logger(__name__)
 
@@ -34,6 +34,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         choices=AccountInvalidPolicy.choices, default=AccountInvalidPolicy.ERROR,
         write_only=True, label=_('Exist policy')
     )
+    _template = None
 
     class Meta:
         fields = ['template', 'push_now', 'params', 'on_invalid']
@@ -52,14 +53,18 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
 
         for data in initial_data:
             if not data.get('asset') and not self.instance:
-                raise serializers.ValidationError({'asset': 'Asset is required'})
+                raise serializers.ValidationError({'asset': UniqueTogetherValidator.missing_message})
             asset = data.get('asset') or self.instance.asset
             self.from_template_if_need(data)
             self.set_uniq_name_if_need(data, asset)
 
+    def to_internal_value(self, data):
+        self.from_template_if_need(data)
+        return super().to_internal_value(data)
+
     def set_uniq_name_if_need(self, initial_data, asset):
         name = initial_data.get('name')
-        if name is None:
+        if name is not None:
             return
         if not name:
             name = initial_data.get('username')
@@ -69,11 +74,14 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             name = name + '_' + uuid.uuid4().hex[:4]
         initial_data['name'] = name
 
-    @staticmethod
-    def from_template_if_need(initial_data):
-        template_id = initial_data.get('template')
+    def from_template_if_need(self, initial_data):
+        if isinstance(initial_data, str):
+            return
+
+        template_id = initial_data.pop('template', None)
         if not template_id:
             return
+
         if isinstance(template_id, (str, uuid.UUID)):
             template = AccountTemplate.objects.filter(id=template_id).first()
         else:
@@ -81,6 +89,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         if not template:
             raise serializers.ValidationError({'template': 'Template not found'})
 
+        self._template = template
         # Set initial data from template
         ignore_fields = ['id', 'date_created', 'date_updated', 'org_id']
         field_names = [
@@ -105,8 +114,9 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         _validators = super().get_validators()
         if getattr(self, 'initial_data', None) is None:
             return _validators
+
         on_invalid = self.initial_data.get('on_invalid')
-        if on_invalid == AccountInvalidPolicy.ERROR:
+        if on_invalid == AccountInvalidPolicy.ERROR and not self.parent:
             return _validators
         _validators = [v for v in _validators if not isinstance(v, UniqueTogetherValidator)]
         return _validators
@@ -137,20 +147,17 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         else:
             raise serializers.ValidationError('Account already exists')
 
-    def validate(self, attrs):
-        attrs = super().validate(attrs)
-        if self.instance:
-            return attrs
-
-        template = attrs.pop('template', None)
-        if template:
-            attrs['source'] = Source.TEMPLATE
-            attrs['source_id'] = str(template.id)
-        return attrs
+    def generate_source_data(self, validated_data):
+        template = self._template
+        if template is None:
+            return
+        validated_data['source'] = Source.TEMPLATE
+        validated_data['source_id'] = str(template.id)
 
     def create(self, validated_data):
         push_now = validated_data.pop('push_now', None)
         params = validated_data.pop('params', None)
+        self.generate_source_data(validated_data)
         instance, stat = self.do_create(validated_data)
         self.push_account_if_need(instance, push_now, params, stat)
         return instance
@@ -228,7 +235,9 @@ class AssetAccountBulkSerializerResultSerializer(serializers.Serializer):
     changed = serializers.BooleanField(read_only=True, label=_('Changed'))
 
 
-class AssetAccountBulkSerializer(AccountCreateUpdateSerializerMixin, serializers.ModelSerializer):
+class AssetAccountBulkSerializer(
+    AccountCreateUpdateSerializerMixin, AuthValidateMixin, serializers.ModelSerializer
+):
     assets = serializers.PrimaryKeyRelatedField(queryset=Asset.objects, many=True, label=_('Assets'))
 
     class Meta:
@@ -264,7 +273,7 @@ class AssetAccountBulkSerializer(AccountCreateUpdateSerializerMixin, serializers
     @staticmethod
     def _handle_update_create(vd, lookup):
         ori = Account.objects.filter(**lookup).first()
-        if ori and ori.secret == vd['secret']:
+        if ori and ori.secret == vd.get('secret'):
             return ori, False, 'skipped'
 
         instance, value = Account.objects.update_or_create(defaults=vd, **lookup)
@@ -366,6 +375,7 @@ class AssetAccountBulkSerializer(AccountCreateUpdateSerializerMixin, serializers
 
     def create(self, validated_data):
         push_now = validated_data.pop('push_now', False)
+        self.generate_source_data(validated_data)
         results = self.perform_bulk_create(validated_data)
         self.push_accounts_if_need(results, push_now)
         for res in results:
@@ -382,6 +392,7 @@ class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
 
 class AccountHistorySerializer(serializers.ModelSerializer):
     secret_type = LabeledChoiceField(choices=SecretType.choices, label=_('Secret type'))
+    id = serializers.IntegerField(label=_('ID'), source='history_id', read_only=True)
 
     class Meta:
         model = Account.history.model

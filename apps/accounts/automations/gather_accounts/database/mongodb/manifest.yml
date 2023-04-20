@@ -1,6 +1,11 @@
 id: gather_accounts_mongodb
-name: Gather account from MongoDB
+name: "{{ 'MongoDB account gather' | trans }}"
 category: database
 type:
   - mongodb
 method: gather_accounts
+
+i18n:
+  MongoDB account gather:
+    zh: MongoDB 账号收集
+    ja: MongoDB アカウントの収集

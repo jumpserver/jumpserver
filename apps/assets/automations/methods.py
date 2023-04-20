@@ -2,7 +2,7 @@ import json
 import os
 from functools import partial
 
-import yaml
+from common.utils.yml import yaml_load_with_i18n
 
 
 def check_platform_method(manifest, manifest_path):
@@ -40,7 +40,8 @@ def get_platform_automation_methods(path):
                 continue
 
             with open(path, 'r') as f:
-                manifest = yaml.safe_load(f)
+                print("path: ", path)
+                manifest = yaml_load_with_i18n(f)
                 check_platform_method(manifest, path)
                 manifest['dir'] = os.path.dirname(path)
                 manifest['params_serializer'] = generate_serializer(manifest)

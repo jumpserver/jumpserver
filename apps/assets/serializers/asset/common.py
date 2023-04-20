@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 
-import re
-
 from django.db.models import F
 from django.db.transaction import atomic
 from django.utils.translation import ugettext_lazy as _
@@ -10,9 +8,12 @@ from rest_framework import serializers
 
 from accounts.models import Account
 from accounts.serializers import AccountSerializer
-from common.serializers import WritableNestedModelSerializer, SecretReadableMixin, CommonModelSerializer, \
-    MethodSerializer
-from common.serializers.dynamic import create_serializer_class
+from common.const import UUID_PATTERN
+from common.serializers import (
+    WritableNestedModelSerializer, SecretReadableMixin,
+    CommonModelSerializer, MethodSerializer
+)
+from common.serializers.common import DictSerializer
 from common.serializers.fields import LabeledChoiceField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ...const import Category, AllTypes
@@ -24,8 +25,6 @@ __all__ = [
     'AssetDetailSerializer', 'DetailMixin', 'AssetAccountSerializer',
     'AccountSecretSerializer', 'AssetProtocolsPermsSerializer'
 ]
-
-uuid_pattern = re.compile(r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')
 
 
 class AssetProtocolsSerializer(serializers.ModelSerializer):
@@ -72,9 +71,13 @@ class AssetPlatformSerializer(serializers.ModelSerializer):
 class AssetAccountSerializer(AccountSerializer):
     add_org_fields = False
     asset = serializers.PrimaryKeyRelatedField(queryset=Asset.objects, required=False, write_only=True)
-    clone_id: str
+    clone_id = None
 
     def to_internal_value(self, data):
+        # 导入时，data有时为str
+        if isinstance(data, str):
+            return super().to_internal_value(data)
+
         clone_id = data.pop('id', None)
         ret = super().to_internal_value(data)
         self.clone_id = clone_id
@@ -121,12 +124,11 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'), default=())
     accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, write_only=True, label=_('Account'))
     nodes_display = serializers.ListField(read_only=False, required=False, label=_("Node path"))
-    custom_info = MethodSerializer(label=_('Custom info'))
 
     class Meta:
         model = Asset
         fields_mini = ['id', 'name', 'address']
-        fields_small = fields_mini + ['custom_info', 'is_active', 'comment']
+        fields_small = fields_mini + ['is_active', 'comment']
         fields_fk = ['domain', 'platform']
         fields_m2m = [
             'nodes', 'labels', 'protocols',
@@ -176,8 +178,12 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
             return
         category = request.path.strip('/').split('/')[-1].rstrip('s')
         field_category = self.fields.get('category')
+        if not field_category:
+            return
         field_category.choices = Category.filter_choices(category)
         field_type = self.fields.get('type')
+        if not field_type:
+            return
         field_type.choices = AllTypes.filter_choices(category)
 
     @classmethod
@@ -188,36 +194,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
             .annotate(category=F("platform__category")) \
             .annotate(type=F("platform__type"))
         return queryset
-
-    def get_custom_info_serializer(self):
-        request = self.context.get('request')
-        default_field = serializers.DictField(required=False, label=_('Custom info'))
-
-        if not request:
-            return default_field
-
-        if self.instance and isinstance(self.instance, list):
-            return default_field
-
-        if not self.instance and uuid_pattern.findall(request.path):
-            pk = uuid_pattern.findall(request.path)[0]
-            self.instance = Asset.objects.filter(id=pk).first()
-
-        platform = None
-        if self.instance:
-            platform = self.instance.platform
-        elif request.query_params.get('platform'):
-            platform_id = request.query_params.get('platform')
-            platform_id = int(platform_id) if platform_id.isdigit() else 0
-            platform = Platform.objects.filter(id=platform_id).first()
-
-        if not platform:
-            return default_field
-        custom_fields = platform.custom_fields
-        if not custom_fields:
-            return default_field
-        name = platform.name.title() + 'CustomSerializer'
-        return create_serializer_class(name, custom_fields)()
 
     @staticmethod
     def perform_nodes_display_create(instance, nodes_display):
@@ -263,12 +239,13 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         nodes_display = self.initial_data.get('nodes_display')
         if nodes_display:
             return nodes
+        default_node = Node.org_root()
         request = self.context.get('request')
         if not request:
-            return []
+            return [default_node]
         node_id = request.query_params.get('node_id')
         if not node_id:
-            return []
+            return [default_node]
         nodes = Node.objects.filter(id=node_id)
         return nodes
 
@@ -331,8 +308,8 @@ class DetailMixin(serializers.Serializer):
 
     def get_instance(self):
         request = self.context.get('request')
-        if not self.instance and uuid_pattern.findall(request.path):
-            pk = uuid_pattern.findall(request.path)[0]
+        if not self.instance and UUID_PATTERN.findall(request.path):
+            pk = UUID_PATTERN.findall(request.path)[0]
             self.instance = Asset.objects.filter(id=pk).first()
         return self.instance
 
@@ -350,19 +327,19 @@ class DetailMixin(serializers.Serializer):
             category = request.query_params.get('category')
         else:
             instance = self.get_instance()
-            category = instance.category
+            category = instance.category if instance else 'host'
         return category
 
     def get_gathered_info_serializer(self):
         category = self.get_category()
         from .info.gathered import category_gathered_serializer_map
-        serializer_cls = category_gathered_serializer_map.get(category, serializers.DictField)
+        serializer_cls = category_gathered_serializer_map.get(category, DictSerializer)
         return serializer_cls()
 
     def get_spec_info_serializer(self):
         category = self.get_category()
         from .info.spec import category_spec_serializer_map
-        serializer_cls = category_spec_serializer_map.get(category, serializers.DictField)
+        serializer_cls = category_spec_serializer_map.get(category, DictSerializer)
         return serializer_cls()
 
 

@@ -1,7 +1,12 @@
 id: gather_accounts_mysql
-name: Gather account from MySQL
+name: "{{ 'MySQL account gather' | trans }}"
 category: database
 type:
   - mysql
   - mariadb
 method: gather_accounts
+
+i18n:
+  MySQL account gather:
+    zh: MySQL 账号收集
+    ja: MySQL アカウントの収集

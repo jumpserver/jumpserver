@@ -1,7 +1,12 @@
 id: change_secret_posix
-name: Change secret for posix
+name: "{{ 'Posix account change secret' | trans }}"
 category: host
 type:
   - unix
   - linux
 method: change_secret
+
+i18n:
+  Posix account change secret:
+    zh: Posix 账号改密
+    ja: Posix アカウントのパスワード変更

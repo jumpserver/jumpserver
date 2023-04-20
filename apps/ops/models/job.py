@@ -402,9 +402,11 @@ class JobExecution(JMSOrgBaseModel):
 
     def check_command_acl(self):
         for asset in self.current_job.assets.all():
-            acls = CommandFilterACL.filter_queryset(user=self.creator,
-                                                    asset=asset,
-                                                    account_username=self.current_job.runas)
+            acls = CommandFilterACL.filter_queryset(
+                user=self.creator,
+                asset=asset,
+                is_active=True,
+                account_username=self.current_job.runas)
             for acl in acls:
                 if self.match_command_group(acl, asset):
                     break
