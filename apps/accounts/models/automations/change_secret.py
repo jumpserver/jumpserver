@@ -28,7 +28,6 @@ class ChangeSecretMixin(models.Model):
         default=SSHKeyStrategy.add, verbose_name=_('SSH key change strategy')
     )
 
-    accounts: list[str]  # account usernames
     get_all_assets: callable  # get all assets
 
     class Meta:
