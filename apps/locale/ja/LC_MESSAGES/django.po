@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-19 12:58+0800\n"
+"POT-Creation-Date: 2023-04-20 17:31+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,7 +68,7 @@ msgstr "ローカル"
 
 #: accounts/const/account.py:20
 msgid "Collected"
-msgstr ""
+msgstr "集めました"
 
 #: accounts/const/account.py:21 accounts/serializers/account/account.py:25
 #: settings/serializers/auth/sms.py:75
@@ -204,7 +204,7 @@ msgid "Su from"
 msgstr "から切り替え"
 
 #: accounts/models/account.py:53 settings/serializers/auth/cas.py:20
-#: settings/serializers/auth/feishu.py:20 terminal/models/applet/applet.py:28
+#: settings/serializers/auth/feishu.py:20 terminal/models/applet/applet.py:29
 msgid "Version"
 msgstr "バージョン"
 
@@ -214,10 +214,8 @@ msgid "Source"
 msgstr "ソース"
 
 #: accounts/models/account.py:56
-#, fuzzy
-#| msgid "Source"
 msgid "Source ID"
-msgstr "ソース"
+msgstr "ソース ID"
 
 #: accounts/models/account.py:59
 #: accounts/serializers/automations/change_secret.py:113
@@ -445,10 +443,8 @@ msgid "Gather account automation"
 msgstr "自動収集アカウント"
 
 #: accounts/models/automations/gather_account.py:56
-#, fuzzy
-#| msgid "Is service account"
 msgid "Is sync account"
-msgstr "サービスアカウントです"
+msgstr "アカウントを同期するかどうか"
 
 #: accounts/models/automations/gather_account.py:71
 #: accounts/tasks/gather_accounts.py:29
@@ -489,7 +485,7 @@ msgstr "アカウントの確認"
 #: ops/models/job.py:92 ops/models/playbook.py:23 ops/serializers/job.py:20
 #: orgs/models.py:69 perms/models/asset_permission.py:56 rbac/models/role.py:29
 #: settings/models.py:33 settings/serializers/sms.py:6
-#: terminal/models/applet/applet.py:26 terminal/models/component/endpoint.py:12
+#: terminal/models/applet/applet.py:27 terminal/models/component/endpoint.py:12
 #: terminal/models/component/endpoint.py:90
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:15
 #: terminal/models/component/terminal.py:84 users/forms/profile.py:33
@@ -506,7 +502,7 @@ msgstr "特権アカウント"
 #: assets/models/automations/base.py:21 assets/models/cmd_filter.py:39
 #: assets/models/label.py:22
 #: authentication/serializers/connect_token_secret.py:106
-#: terminal/models/applet/applet.py:31 users/serializers/user.py:169
+#: terminal/models/applet/applet.py:32 users/serializers/user.py:169
 msgid "Is active"
 msgstr "アクティブです。"
 
@@ -556,10 +552,8 @@ msgid "Push now"
 msgstr "今すぐプッシュ"
 
 #: accounts/serializers/account/account.py:35
-#, fuzzy
-#| msgid "Runas policy"
 msgid "Exist policy"
-msgstr "ユーザー ポリシー"
+msgstr "アカウントの存在ポリシー"
 
 #: accounts/serializers/account/account.py:179 applications/models.py:11
 #: assets/models/label.py:21 assets/models/platform.py:90
@@ -578,7 +572,7 @@ msgstr "カテゴリ"
 #: assets/serializers/asset/common.py:121 assets/serializers/platform.py:101
 #: assets/serializers/platform.py:116 audits/serializers.py:48
 #: authentication/serializers/connect_token_secret.py:115 ops/models/job.py:103
-#: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:30
+#: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:31
 #: terminal/models/component/storage.py:57
 #: terminal/models/component/storage.py:146 terminal/serializers/applet.py:29
 #: terminal/serializers/session.py:22 terminal/serializers/storage.py:224
@@ -606,10 +600,8 @@ msgid "State"
 msgstr "状態"
 
 #: accounts/serializers/account/account.py:235
-#, fuzzy
-#| msgid "Change by"
 msgid "Changed"
-msgstr "による変更"
+msgstr "編集済み"
 
 #: accounts/serializers/account/account.py:241
 #: accounts/serializers/automations/base.py:22
@@ -621,24 +613,26 @@ msgid "Assets"
 msgstr "資産"
 
 #: accounts/serializers/account/account.py:293
-#, fuzzy
-#| msgid "Name already exists"
 msgid "Account already exists"
-msgstr "名前は既に存在します。"
+msgstr "アカウントはすでに存在しています"
 
 #: accounts/serializers/account/account.py:330
-#, fuzzy, python-format
-#| msgid "Current user not support mfa type: {}"
+#, python-format
 msgid "Asset does not support this secret type: %s"
-msgstr "現在のユーザーはmfaタイプをサポートしていません: {}"
+msgstr "アセットはアカウント タイプをサポートしていません: %s"
 
 #: accounts/serializers/account/account.py:361
-#, fuzzy
-#| msgid "Account name"
 msgid "Account has exist"
-msgstr "アカウント名"
+msgstr "アカウントはすでに存在しています"
 
-#: accounts/serializers/account/account.py:401 acls/models/base.py:98
+#: accounts/serializers/account/account.py:395
+#: authentication/serializers/connect_token_secret.py:146
+#: authentication/templates/authentication/_access_key_modal.html:30
+#: perms/models/perm_node.py:21 users/serializers/group.py:33
+msgid "ID"
+msgstr "ID"
+
+#: accounts/serializers/account/account.py:402 acls/models/base.py:98
 #: acls/models/login_acl.py:13 acls/serializers/base.py:55
 #: acls/serializers/login_acl.py:21 assets/models/cmd_filter.py:24
 #: assets/models/label.py:16 audits/models.py:44 audits/models.py:63
@@ -656,7 +650,7 @@ msgstr "アカウント名"
 msgid "User"
 msgstr "ユーザー"
 
-#: accounts/serializers/account/account.py:402
+#: accounts/serializers/account/account.py:403
 #: authentication/templates/authentication/_access_key_modal.html:33
 #: terminal/notifications.py:98 terminal/notifications.py:146
 msgid "Date"
@@ -879,18 +873,18 @@ msgid "Login asset confirm"
 msgstr "ログイン資産の確認"
 
 #: acls/serializers/base.py:10 acls/serializers/login_acl.py:16
-msgid "Format for comma-delimited string, with * indicating a match all. "
-msgstr "コンマ区切り文字列の形式。* はすべて一致することを示します。"
+msgid "With * indicating a match all. "
+msgstr "* はすべて一致することを示します。"
 
 #: acls/serializers/base.py:25
 msgid ""
-"Format for comma-delimited string, with * indicating a match all. Such as: "
-"192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:"
-"db8:1a:1110::/64 (Domain name support)"
+"With * indicating a match all. Such as: 192.168.10.1, 192.168.1.0/24, "
+"10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 (Domain name "
+"support)"
 msgstr ""
-"コンマ区切り文字列の形式。* はすべて一致することを示します。例: "
-"192.168.10.1、192.168.1.0/24、10.1.1.1-10.1.1.20、2001:db8:2de::e13、2001:"
-"db8:1a:1110:::/64 (ドメイン名サポート)"
+"* はすべて一致することを示します。例: 192.168.10.1、192.168.1.0/24、"
+"10.1.1.1-10.1.1.20、2001:db8:2de::e13、2001:db8:1a:1110:::/64 (ドメイン名サ"
+"ポート)"
 
 #: acls/serializers/base.py:40 assets/serializers/asset/host.py:19
 msgid "IP/Host"
@@ -935,13 +929,11 @@ msgstr "IPアドレスが無効: '{}'"
 
 #: acls/serializers/rules/rules.py:25
 msgid ""
-"Format for comma-delimited string, with * indicating a match all. Such as: "
-"192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:"
-"db8:1a:1110::/64 "
+"With * indicating a match all. Such as: 192.168.10.1, 192.168.1.0/24, "
+"10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 "
 msgstr ""
-"コンマ区切り文字列の形式。* はすべて一致することを示します。例: "
-"192.168.10.1、192.168.1.0/24、10.1.1.1-10.1.1.20、2001:db8:2de::e13、2001:"
-"db8:1a:1110::/64"
+"* はすべて一致することを示します。例: 192.168.10.1、192.168.1.0/24、"
+"10.1.1.1-10.1.1.20、2001:db8:2de::e13、2001:db8:1a:1110::/64"
 
 #: acls/serializers/rules/rules.py:33
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
@@ -1069,15 +1061,13 @@ msgid "Cloud service"
 msgstr "クラウド サービス"
 
 #: assets/const/category.py:14 assets/models/asset/web.py:16 audits/const.py:33
-#: terminal/models/applet/applet.py:24
+#: terminal/models/applet/applet.py:25
 msgid "Web"
 msgstr "Web"
 
 #: assets/const/category.py:15
-#, fuzzy
-#| msgid "Custom user"
 msgid "Custom type"
-msgstr "カスタムユーザー"
+msgstr "カスタムタイプ"
 
 #: assets/const/cloud.py:7
 msgid "Public cloud"
@@ -1091,7 +1081,7 @@ msgstr "私有雲"
 msgid "Kubernetes"
 msgstr ""
 
-#: assets/const/device.py:7 terminal/models/applet/applet.py:23
+#: assets/const/device.py:7 terminal/models/applet/applet.py:24
 #: tickets/const.py:8
 msgid "General"
 msgstr "一般"
@@ -1150,7 +1140,7 @@ msgstr "SSHパブリックキー"
 #: assets/models/cmd_filter.py:88 assets/models/group.py:23
 #: common/db/models.py:37 ops/models/adhoc.py:27 ops/models/job.py:111
 #: ops/models/playbook.py:26 rbac/models/role.py:37 settings/models.py:38
-#: terminal/models/applet/applet.py:35 terminal/models/applet/applet.py:183
+#: terminal/models/applet/applet.py:36 terminal/models/applet/applet.py:184
 #: terminal/models/applet/host.py:111 terminal/models/component/endpoint.py:24
 #: terminal/models/component/endpoint.py:100
 #: terminal/models/session/session.py:47 tickets/models/comment.py:32
@@ -1200,7 +1190,7 @@ msgstr "ユーザーと同じユーザー名"
 
 #: assets/models/_user.py:52 authentication/models/connection_token.py:39
 #: authentication/serializers/connect_token_secret.py:103
-#: terminal/models/applet/applet.py:33 terminal/serializers/session.py:20
+#: terminal/models/applet/applet.py:34 terminal/serializers/session.py:20
 #: terminal/serializers/session.py:41 terminal/serializers/storage.py:68
 msgid "Protocol"
 msgstr "プロトコル"
@@ -1266,7 +1256,7 @@ msgstr "アドレス"
 #: assets/models/asset/common.py:125 assets/models/platform.py:120
 #: authentication/serializers/connect_token_secret.py:107
 #: perms/serializers/user_permission.py:24
-#: xpack/plugins/cloud/serializers/account_attrs.py:197
+#: xpack/plugins/cloud/serializers/account_attrs.py:196
 msgid "Platform"
 msgstr "プラットフォーム"
 
@@ -1282,17 +1272,13 @@ msgstr "ラベル"
 
 #: assets/models/asset/common.py:132 assets/serializers/asset/common.py:305
 #: assets/serializers/asset/host.py:11
-#, fuzzy
-#| msgid "Gather asset hardware info"
 msgid "Gathered info"
 msgstr "資産ハードウェア情報の収集"
 
 #: assets/models/asset/common.py:133 assets/serializers/asset/custom.py:14
 #: assets/serializers/asset/custom.py:22
-#, fuzzy
-#| msgid "Auto info"
 msgid "Custom info"
-msgstr "自動情報"
+msgstr "自动化信息"
 
 #: assets/models/asset/common.py:309
 msgid "Can refresh asset hardware info"
@@ -1311,10 +1297,8 @@ msgid "Can change asset nodes"
 msgstr "資産ノードを変更できます"
 
 #: assets/models/asset/custom.py:8
-#, fuzzy
-#| msgid "Custom user"
 msgid "Custom asset"
-msgstr "カスタムユーザー"
+msgstr "カスタム アセット"
 
 #: assets/models/asset/database.py:10 assets/serializers/platform.py:45
 #: settings/serializers/email.py:37
@@ -1372,7 +1356,7 @@ msgstr "アセットの自動化タスク"
 
 #: assets/models/automations/base.py:113 audits/models.py:177
 #: audits/serializers.py:49 ops/models/base.py:49 ops/models/job.py:184
-#: terminal/models/applet/applet.py:182 terminal/models/applet/host.py:108
+#: terminal/models/applet/applet.py:183 terminal/models/applet/host.py:108
 #: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
 #: terminal/serializers/applet_host.py:103 tickets/models/ticket/general.py:283
 #: tickets/serializers/super_ticket.py:13
@@ -1507,10 +1491,8 @@ msgid "Required"
 msgstr "必要"
 
 #: assets/models/platform.py:18
-#, fuzzy
-#| msgid "Public IP"
 msgid "Public"
-msgstr "パブリックIP"
+msgstr "開ける"
 
 #: assets/models/platform.py:19 settings/serializers/settings.py:65
 #: users/templates/users/reset_password.html:29
@@ -1658,7 +1640,7 @@ msgstr "ポート番号が範囲外です (1-65535)"
 msgid "Protocol is required: {}"
 msgstr "プロトコルが必要です: {}"
 
-#: assets/serializers/asset/database.py:25 common/serializers/fields.py:102
+#: assets/serializers/asset/database.py:25 common/serializers/fields.py:103
 #: tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 #: xpack/plugins/cloud/serializers/account_attrs.py:79
@@ -1765,8 +1747,6 @@ msgid "Gather accounts method"
 msgstr "アカウントの収集方法"
 
 #: assets/serializers/platform.py:103
-#, fuzzy
-#| msgid "Help"
 msgid "Help text"
 msgstr "ヘルプ"
 
@@ -1783,16 +1763,12 @@ msgid "Default Domain"
 msgstr "デフォルト ドメイン"
 
 #: assets/serializers/platform.py:152
-#, fuzzy
-#| msgid "test_phone is required"
 msgid "type is required"
-msgstr "携帯番号をテストこのフィールドは必須です"
+msgstr "タイプ このフィールドは必須です."
 
 #: assets/serializers/platform.py:189
-#, fuzzy
-#| msgid "Protocol is required: {}"
 msgid "Protocols is required"
-msgstr "プロトコルが必要です: {}"
+msgstr "同意が必要です"
 
 #: assets/signal_handlers/asset.py:26 assets/tasks/ping.py:35
 msgid "Test assets connectivity "
@@ -2620,12 +2596,6 @@ msgstr "コンポーネント"
 msgid "Expired now"
 msgstr "すぐに期限切れ"
 
-#: authentication/serializers/connect_token_secret.py:146
-#: authentication/templates/authentication/_access_key_modal.html:30
-#: perms/models/perm_node.py:21 users/serializers/group.py:33
-msgid "ID"
-msgstr "ID"
-
 #: authentication/serializers/connection_token.py:15
 msgid "Expired time"
 msgstr "期限切れ時間"
@@ -3051,7 +3021,7 @@ msgstr "未定"
 
 #: common/const/choices.py:17 ops/const.py:55
 msgid "Running"
-msgstr ""
+msgstr "ランニング"
 
 #: common/const/choices.py:21
 msgid "Canceled"
@@ -3113,7 +3083,7 @@ msgstr "によって更新"
 
 #: common/db/validators.py:9
 msgid "Invalid port range, should be like and within {}-{}"
-msgstr ""
+msgstr "無効なポート範囲です。{}-{} のような範囲内である必要があります"
 
 #: common/drf/exc_handlers.py:26
 msgid "Object"
@@ -3132,10 +3102,8 @@ msgid "Parse file error: {}"
 msgstr "解析ファイルエラー: {}"
 
 #: common/drf/parsers/excel.py:14
-#, fuzzy
-#| msgid "Invalid zip file"
 msgid "Invalid excel file"
-msgstr "zip ファイルが無効です"
+msgstr "無効 excel 書類"
 
 #: common/exceptions.py:15
 #, python-format
@@ -3238,21 +3206,21 @@ msgstr ""
 msgid "File"
 msgstr "書類"
 
-#: common/serializers/fields.py:103
+#: common/serializers/fields.py:104
 #, python-brace-format
 msgid "Invalid pk \"{pk_value}\" - object does not exist."
 msgstr "無効な pk \"{pk_value}\" - オブジェクトが存在しません"
 
-#: common/serializers/fields.py:104
+#: common/serializers/fields.py:105
 #, python-brace-format
 msgid "Incorrect type. Expected pk value, received {data_type}."
 msgstr "エラータイプ。 予想される pk 値、受信 {data_type}。"
 
-#: common/serializers/fields.py:174
+#: common/serializers/fields.py:179
 msgid "Invalid data type, should be list"
 msgstr "間違ったデータ タイプです。リストにする必要があります"
 
-#: common/serializers/fields.py:189
+#: common/serializers/fields.py:194
 msgid "Invalid choice: {}"
 msgstr "無効なオプション: {}"
 
@@ -3609,7 +3577,7 @@ msgstr ""
 msgid "Material Type"
 msgstr ""
 
-#: ops/models/job.py:456
+#: ops/models/job.py:458
 msgid "Job Execution"
 msgstr "ジョブ実行"
 
@@ -3759,7 +3727,7 @@ msgstr "組織"
 msgid "Org name"
 msgstr "組織名"
 
-#: orgs/models.py:70 rbac/models/role.py:36 terminal/models/applet/applet.py:32
+#: orgs/models.py:70 rbac/models/role.py:36 terminal/models/applet/applet.py:33
 msgid "Builtin"
 msgstr "ビルトイン"
 
@@ -4004,7 +3972,7 @@ msgstr "パーマ"
 msgid "Users amount"
 msgstr "ユーザー数"
 
-#: rbac/serializers/role.py:28 terminal/models/applet/applet.py:27
+#: rbac/serializers/role.py:28 terminal/models/applet/applet.py:28
 msgid "Display name"
 msgstr "表示名"
 
@@ -4068,8 +4036,8 @@ msgstr "タスクセンター"
 msgid "My assets"
 msgstr "私の資産"
 
-#: rbac/tree.py:56 terminal/models/applet/applet.py:42
-#: terminal/models/applet/applet.py:179 terminal/models/applet/host.py:28
+#: rbac/tree.py:56 terminal/models/applet/applet.py:43
+#: terminal/models/applet/applet.py:180 terminal/models/applet/host.py:28
 #: terminal/serializers/applet.py:15
 msgid "Applet"
 msgstr "リモートアプリケーション"
@@ -4569,7 +4537,7 @@ msgid "SSO auth key TTL"
 msgstr "Token有効期間"
 
 #: settings/serializers/auth/sso.py:17
-#: xpack/plugins/cloud/serializers/account_attrs.py:194
+#: xpack/plugins/cloud/serializers/account_attrs.py:193
 msgid "Unit: second"
 msgstr "単位: 秒"
 
@@ -5603,35 +5571,35 @@ msgstr "一括作成非サポート"
 msgid "Storage is invalid"
 msgstr "ストレージが無効です"
 
-#: terminal/models/applet/applet.py:29
+#: terminal/models/applet/applet.py:30
 msgid "Author"
 msgstr "著者"
 
-#: terminal/models/applet/applet.py:34
+#: terminal/models/applet/applet.py:35
 msgid "Tags"
 msgstr "ラベル"
 
-#: terminal/models/applet/applet.py:38 terminal/serializers/storage.py:157
+#: terminal/models/applet/applet.py:39 terminal/serializers/storage.py:157
 msgid "Hosts"
 msgstr "ホスト"
 
-#: terminal/models/applet/applet.py:83
+#: terminal/models/applet/applet.py:84
 msgid "Applet pkg not valid, Missing file {}"
 msgstr "無効なアプレット パッケージ、ファイル {} がありません"
 
-#: terminal/models/applet/applet.py:102
+#: terminal/models/applet/applet.py:103
 msgid "Load platform.yml failed: {}"
 msgstr ""
 
-#: terminal/models/applet/applet.py:105
+#: terminal/models/applet/applet.py:106
 msgid "Only support custom platform"
 msgstr ""
 
-#: terminal/models/applet/applet.py:110
+#: terminal/models/applet/applet.py:111
 msgid "Missing type in platform.yml"
 msgstr ""
 
-#: terminal/models/applet/applet.py:181 terminal/models/applet/host.py:34
+#: terminal/models/applet/applet.py:182 terminal/models/applet/host.py:34
 #: terminal/models/applet/host.py:106
 msgid "Hosting"
 msgstr "ホスト マシン"
@@ -6735,10 +6703,8 @@ msgid "Avatar url"
 msgstr "アバターURL"
 
 #: users/serializers/user.py:177
-#, fuzzy
-#| msgid "One level"
 msgid "MFA level"
-msgstr "1つのレベル"
+msgstr "MFA レベル"
 
 #: users/serializers/user.py:283
 msgid "Select users"
@@ -7166,7 +7132,7 @@ msgstr "クラウドアカウント"
 msgid "Test cloud account"
 msgstr "クラウドアカウントのテスト"
 
-#: xpack/plugins/cloud/models.py:88 xpack/plugins/cloud/serializers/task.py:37
+#: xpack/plugins/cloud/models.py:88 xpack/plugins/cloud/serializers/task.py:36
 msgid "Regions"
 msgstr "リージョン"
 
@@ -7174,15 +7140,15 @@ msgstr "リージョン"
 msgid "Hostname strategy"
 msgstr "ホスト名戦略"
 
-#: xpack/plugins/cloud/models.py:102 xpack/plugins/cloud/serializers/task.py:40
+#: xpack/plugins/cloud/models.py:102 xpack/plugins/cloud/serializers/task.py:39
 msgid "IP network segment group"
 msgstr "IPネットワークセグメントグループ"
 
-#: xpack/plugins/cloud/models.py:105 xpack/plugins/cloud/serializers/task.py:45
+#: xpack/plugins/cloud/models.py:105 xpack/plugins/cloud/serializers/task.py:44
 msgid "Sync IP type"
 msgstr "同期IPタイプ"
 
-#: xpack/plugins/cloud/models.py:108 xpack/plugins/cloud/serializers/task.py:62
+#: xpack/plugins/cloud/models.py:108 xpack/plugins/cloud/serializers/task.py:61
 msgid "Always update"
 msgstr "常に更新"
 
@@ -7468,12 +7434,10 @@ msgid "IP address invalid `{}`, {}"
 msgstr "IPアドレスが無効: '{}', {}"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:172
-msgid ""
-"Format for comma-delimited string,Such as: 192.168.1.0/24, "
-"10.0.0.0-10.0.0.255"
-msgstr "形式はコンマ区切りの文字列です，例：192.168.1.0/24,10.0.0.0-10.0.0.255"
+msgid "Such as: 192.168.1.0/24, 10.0.0.0-10.0.0.255"
+msgstr "例：192.168.1.0/24,10.0.0.0-10.0.0.255"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:176
+#: xpack/plugins/cloud/serializers/account_attrs.py:175
 msgid ""
 "The port is used to detect the validity of the IP address. When the "
 "synchronization task is executed, only the valid IP address will be "
@@ -7483,19 +7447,19 @@ msgstr ""
 "実行されると、有効な IP アドレスのみが同期されます。 <br>ポートが0の場合、す"
 "べてのIPアドレスが有効です。"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:184
+#: xpack/plugins/cloud/serializers/account_attrs.py:183
 msgid "Hostname prefix"
 msgstr "ホスト名プレフィックス"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:187
+#: xpack/plugins/cloud/serializers/account_attrs.py:186
 msgid "IP segment"
 msgstr "IP セグメント"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:191
+#: xpack/plugins/cloud/serializers/account_attrs.py:190
 msgid "Test port"
 msgstr "テストポート"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:194
+#: xpack/plugins/cloud/serializers/account_attrs.py:193
 msgid "Test timeout"
 msgstr "テストタイムアウト"
 
@@ -7504,20 +7468,19 @@ msgid ""
 "Only instances matching the IP range will be synced. <br>If the instance "
 "contains multiple IP addresses, the first IP address that matches will be "
 "used as the IP for the created asset. <br>The default value of * means sync "
-"all instances and randomly match IP addresses. <br>Format for comma-"
-"delimited string, Such as: 192.168.1.0/24, 10.1.1.1-10.1.1.20"
+"all instances and randomly match IP addresses. <br>Such as: 192.168.1.0/24, "
+"10.1.1.1-10.1.1.20"
 msgstr ""
 "IP範囲に一致するインスタンスのみが同期されます。<br>インスタンスに複数のIPア"
 "ドレスが含まれている場合、一致する最初のIPアドレスが作成されたアセットのIPと"
 "して使用されます。 <br>デフォルト値の*は、すべてのインスタンスを同期し、IPア"
-"ドレスをランダムに一致させることを意味します。 <br>形式はコンマ区切りの文字列"
-"です。例：192.168.1.0/24,10.1.1.1-10.1.1.20"
+"ドレスをランダムに一致させることを意味します。 <br>例：192.168.1.0/24,10.1.1.1-10.1.1.20"
 
-#: xpack/plugins/cloud/serializers/task.py:35
+#: xpack/plugins/cloud/serializers/task.py:34
 msgid "History count"
 msgstr "実行回数"
 
-#: xpack/plugins/cloud/serializers/task.py:36
+#: xpack/plugins/cloud/serializers/task.py:35
 msgid "Instance count"
 msgstr "インスタンス数"
 
@@ -7596,19 +7559,3 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:86
 msgid "Community edition"
 msgstr "コミュニティ版"
-
-#, fuzzy
-#~| msgid "Parameters"
-#~ msgid "Params"
-#~ msgstr "パラメータ"
-
-#~ msgid "Auto fill"
-#~ msgstr "自動充填"
-
-#~ msgid "Info"
-#~ msgstr "情報"
-
-#, fuzzy
-#~| msgid "Custom user"
-#~ msgid "Custom"
-#~ msgstr "カスタムユーザー"

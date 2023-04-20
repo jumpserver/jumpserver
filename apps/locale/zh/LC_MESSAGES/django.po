@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-19 12:58+0800\n"
+"POT-Creation-Date: 2023-04-20 17:31+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -203,7 +203,7 @@ msgid "Su from"
 msgstr "切换自"
 
 #: accounts/models/account.py:53 settings/serializers/auth/cas.py:20
-#: settings/serializers/auth/feishu.py:20 terminal/models/applet/applet.py:28
+#: settings/serializers/auth/feishu.py:20 terminal/models/applet/applet.py:29
 msgid "Version"
 msgstr "版本"
 
@@ -484,7 +484,7 @@ msgstr "账号验证"
 #: ops/models/job.py:92 ops/models/playbook.py:23 ops/serializers/job.py:20
 #: orgs/models.py:69 perms/models/asset_permission.py:56 rbac/models/role.py:29
 #: settings/models.py:33 settings/serializers/sms.py:6
-#: terminal/models/applet/applet.py:26 terminal/models/component/endpoint.py:12
+#: terminal/models/applet/applet.py:27 terminal/models/component/endpoint.py:12
 #: terminal/models/component/endpoint.py:90
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:15
 #: terminal/models/component/terminal.py:84 users/forms/profile.py:33
@@ -501,7 +501,7 @@ msgstr "特权账号"
 #: assets/models/automations/base.py:21 assets/models/cmd_filter.py:39
 #: assets/models/label.py:22
 #: authentication/serializers/connect_token_secret.py:106
-#: terminal/models/applet/applet.py:31 users/serializers/user.py:169
+#: terminal/models/applet/applet.py:32 users/serializers/user.py:169
 msgid "Is active"
 msgstr "激活"
 
@@ -568,7 +568,7 @@ msgstr "类别"
 #: assets/serializers/asset/common.py:121 assets/serializers/platform.py:101
 #: assets/serializers/platform.py:116 audits/serializers.py:48
 #: authentication/serializers/connect_token_secret.py:115 ops/models/job.py:103
-#: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:30
+#: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:31
 #: terminal/models/component/storage.py:57
 #: terminal/models/component/storage.py:146 terminal/serializers/applet.py:29
 #: terminal/serializers/session.py:22 terminal/serializers/storage.py:224
@@ -621,7 +621,14 @@ msgstr "资产不支持账号类型: %s"
 msgid "Account has exist"
 msgstr "账号已存在"
 
-#: accounts/serializers/account/account.py:401 acls/models/base.py:98
+#: accounts/serializers/account/account.py:395
+#: authentication/serializers/connect_token_secret.py:146
+#: authentication/templates/authentication/_access_key_modal.html:30
+#: perms/models/perm_node.py:21 users/serializers/group.py:33
+msgid "ID"
+msgstr "ID"
+
+#: accounts/serializers/account/account.py:402 acls/models/base.py:98
 #: acls/models/login_acl.py:13 acls/serializers/base.py:55
 #: acls/serializers/login_acl.py:21 assets/models/cmd_filter.py:24
 #: assets/models/label.py:16 audits/models.py:44 audits/models.py:63
@@ -639,7 +646,7 @@ msgstr "账号已存在"
 msgid "User"
 msgstr "用户"
 
-#: accounts/serializers/account/account.py:402
+#: accounts/serializers/account/account.py:403
 #: authentication/templates/authentication/_access_key_modal.html:33
 #: terminal/notifications.py:98 terminal/notifications.py:146
 msgid "Date"
@@ -862,17 +869,17 @@ msgid "Login asset confirm"
 msgstr "登录资产复核"
 
 #: acls/serializers/base.py:10 acls/serializers/login_acl.py:16
-msgid "Format for comma-delimited string, with * indicating a match all. "
-msgstr "格式为逗号分隔的字符串, * 表示匹配所有. "
+msgid "With * indicating a match all. "
+msgstr "* 表示匹配所有. "
 
 #: acls/serializers/base.py:25
 msgid ""
-"Format for comma-delimited string, with * indicating a match all. Such as: "
-"192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:"
-"db8:1a:1110::/64 (Domain name support)"
+"With * indicating a match all. Such as: 192.168.10.1, 192.168.1.0/24, "
+"10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 (Domain name "
+"support)"
 msgstr ""
-"格式为逗号分隔的字符串, * 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, "
-"10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 （支持网域）"
+"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:"
+"db8:2de::e13, 2001:db8:1a:1110::/64 （支持网域）"
 
 #: acls/serializers/base.py:40 assets/serializers/asset/host.py:19
 msgid "IP/Host"
@@ -917,12 +924,11 @@ msgstr "IP 地址无效: `{}`"
 
 #: acls/serializers/rules/rules.py:25
 msgid ""
-"Format for comma-delimited string, with * indicating a match all. Such as: "
-"192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:"
-"db8:1a:1110::/64 "
+"With * indicating a match all. Such as: 192.168.10.1, 192.168.1.0/24, "
+"10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64 "
 msgstr ""
-"格式为逗号分隔的字符串, * 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, "
-"10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:db8:1a:1110::/64"
+"* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:"
+"db8:2de::e13, 2001:db8:1a:1110::/64"
 
 #: acls/serializers/rules/rules.py:33
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
@@ -1048,7 +1054,7 @@ msgid "Cloud service"
 msgstr "云服务"
 
 #: assets/const/category.py:14 assets/models/asset/web.py:16 audits/const.py:33
-#: terminal/models/applet/applet.py:24
+#: terminal/models/applet/applet.py:25
 msgid "Web"
 msgstr "Web"
 
@@ -1068,7 +1074,7 @@ msgstr "私有云"
 msgid "Kubernetes"
 msgstr ""
 
-#: assets/const/device.py:7 terminal/models/applet/applet.py:23
+#: assets/const/device.py:7 terminal/models/applet/applet.py:24
 #: tickets/const.py:8
 msgid "General"
 msgstr "一般"
@@ -1127,7 +1133,7 @@ msgstr "SSH公钥"
 #: assets/models/cmd_filter.py:88 assets/models/group.py:23
 #: common/db/models.py:37 ops/models/adhoc.py:27 ops/models/job.py:111
 #: ops/models/playbook.py:26 rbac/models/role.py:37 settings/models.py:38
-#: terminal/models/applet/applet.py:35 terminal/models/applet/applet.py:183
+#: terminal/models/applet/applet.py:36 terminal/models/applet/applet.py:184
 #: terminal/models/applet/host.py:111 terminal/models/component/endpoint.py:24
 #: terminal/models/component/endpoint.py:100
 #: terminal/models/session/session.py:47 tickets/models/comment.py:32
@@ -1177,7 +1183,7 @@ msgstr "用户名与用户相同"
 
 #: assets/models/_user.py:52 authentication/models/connection_token.py:39
 #: authentication/serializers/connect_token_secret.py:103
-#: terminal/models/applet/applet.py:33 terminal/serializers/session.py:20
+#: terminal/models/applet/applet.py:34 terminal/serializers/session.py:20
 #: terminal/serializers/session.py:41 terminal/serializers/storage.py:68
 msgid "Protocol"
 msgstr "协议"
@@ -1243,7 +1249,7 @@ msgstr "地址"
 #: assets/models/asset/common.py:125 assets/models/platform.py:120
 #: authentication/serializers/connect_token_secret.py:107
 #: perms/serializers/user_permission.py:24
-#: xpack/plugins/cloud/serializers/account_attrs.py:197
+#: xpack/plugins/cloud/serializers/account_attrs.py:196
 msgid "Platform"
 msgstr "系统平台"
 
@@ -1343,7 +1349,7 @@ msgstr "资产自动化任务"
 
 #: assets/models/automations/base.py:113 audits/models.py:177
 #: audits/serializers.py:49 ops/models/base.py:49 ops/models/job.py:184
-#: terminal/models/applet/applet.py:182 terminal/models/applet/host.py:108
+#: terminal/models/applet/applet.py:183 terminal/models/applet/host.py:108
 #: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
 #: terminal/serializers/applet_host.py:103 tickets/models/ticket/general.py:283
 #: tickets/serializers/super_ticket.py:13
@@ -1625,7 +1631,7 @@ msgstr "端口超出范围 (1-65535)"
 msgid "Protocol is required: {}"
 msgstr "协议是必填的: {}"
 
-#: assets/serializers/asset/database.py:25 common/serializers/fields.py:102
+#: assets/serializers/asset/database.py:25 common/serializers/fields.py:103
 #: tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 #: xpack/plugins/cloud/serializers/account_attrs.py:79
@@ -1732,8 +1738,6 @@ msgid "Gather accounts method"
 msgstr "收集账号方式"
 
 #: assets/serializers/platform.py:103
-#, fuzzy
-#| msgid "Help"
 msgid "Help text"
 msgstr "帮助"
 
@@ -1973,7 +1977,7 @@ msgstr "详情 ID"
 
 #: audits/models.py:130
 msgid "Activity log"
-msgstr ""
+msgstr "活动日志"
 
 #: audits/models.py:142
 msgid "Change by"
@@ -2568,12 +2572,6 @@ msgstr "组件"
 #: authentication/serializers/connect_token_secret.py:127
 msgid "Expired now"
 msgstr "立刻过期"
-
-#: authentication/serializers/connect_token_secret.py:146
-#: authentication/templates/authentication/_access_key_modal.html:30
-#: perms/models/perm_node.py:21 users/serializers/group.py:33
-msgid "ID"
-msgstr "ID"
 
 #: authentication/serializers/connection_token.py:15
 msgid "Expired time"
@@ -3177,21 +3175,21 @@ msgstr "节点"
 msgid "File"
 msgstr "文件"
 
-#: common/serializers/fields.py:103
+#: common/serializers/fields.py:104
 #, python-brace-format
 msgid "Invalid pk \"{pk_value}\" - object does not exist."
 msgstr "错误的 pk \"{pk_value}\" - 对象不存在"
 
-#: common/serializers/fields.py:104
+#: common/serializers/fields.py:105
 #, python-brace-format
 msgid "Incorrect type. Expected pk value, received {data_type}."
 msgstr "错误类型。期望 pk 值，收到 {data_type}。"
 
-#: common/serializers/fields.py:174
+#: common/serializers/fields.py:179
 msgid "Invalid data type, should be list"
 msgstr "错误的数据类型，应该是列表"
 
-#: common/serializers/fields.py:189
+#: common/serializers/fields.py:194
 msgid "Invalid choice: {}"
 msgstr "无效选项: {}"
 
@@ -3543,7 +3541,7 @@ msgstr ""
 msgid "Material Type"
 msgstr ""
 
-#: ops/models/job.py:456
+#: ops/models/job.py:458
 msgid "Job Execution"
 msgstr "作业执行"
 
@@ -3692,7 +3690,7 @@ msgstr "组织"
 msgid "Org name"
 msgstr "组织名称"
 
-#: orgs/models.py:70 rbac/models/role.py:36 terminal/models/applet/applet.py:32
+#: orgs/models.py:70 rbac/models/role.py:36 terminal/models/applet/applet.py:33
 msgid "Builtin"
 msgstr "内置的"
 
@@ -3936,7 +3934,7 @@ msgstr "权限"
 msgid "Users amount"
 msgstr "用户数量"
 
-#: rbac/serializers/role.py:28 terminal/models/applet/applet.py:27
+#: rbac/serializers/role.py:28 terminal/models/applet/applet.py:28
 msgid "Display name"
 msgstr "显示名称"
 
@@ -4000,8 +3998,8 @@ msgstr "任务中心"
 msgid "My assets"
 msgstr "我的资产"
 
-#: rbac/tree.py:56 terminal/models/applet/applet.py:42
-#: terminal/models/applet/applet.py:179 terminal/models/applet/host.py:28
+#: rbac/tree.py:56 terminal/models/applet/applet.py:43
+#: terminal/models/applet/applet.py:180 terminal/models/applet/host.py:28
 #: terminal/serializers/applet.py:15
 msgid "Applet"
 msgstr "远程应用"
@@ -4499,7 +4497,7 @@ msgid "SSO auth key TTL"
 msgstr "令牌有效期"
 
 #: settings/serializers/auth/sso.py:17
-#: xpack/plugins/cloud/serializers/account_attrs.py:194
+#: xpack/plugins/cloud/serializers/account_attrs.py:193
 msgid "Unit: second"
 msgstr "单位: 秒"
 
@@ -5500,35 +5498,35 @@ msgstr "不支持批量创建"
 msgid "Storage is invalid"
 msgstr "存储无效"
 
-#: terminal/models/applet/applet.py:29
+#: terminal/models/applet/applet.py:30
 msgid "Author"
 msgstr "作者"
 
-#: terminal/models/applet/applet.py:34
+#: terminal/models/applet/applet.py:35
 msgid "Tags"
 msgstr "标签"
 
-#: terminal/models/applet/applet.py:38 terminal/serializers/storage.py:157
+#: terminal/models/applet/applet.py:39 terminal/serializers/storage.py:157
 msgid "Hosts"
 msgstr "主机"
 
-#: terminal/models/applet/applet.py:83
+#: terminal/models/applet/applet.py:84
 msgid "Applet pkg not valid, Missing file {}"
 msgstr "Applet pkg 无效，缺少文件 {}"
 
-#: terminal/models/applet/applet.py:102
+#: terminal/models/applet/applet.py:103
 msgid "Load platform.yml failed: {}"
 msgstr ""
 
-#: terminal/models/applet/applet.py:105
+#: terminal/models/applet/applet.py:106
 msgid "Only support custom platform"
 msgstr ""
 
-#: terminal/models/applet/applet.py:110
+#: terminal/models/applet/applet.py:111
 msgid "Missing type in platform.yml"
 msgstr ""
 
-#: terminal/models/applet/applet.py:181 terminal/models/applet/host.py:34
+#: terminal/models/applet/applet.py:182 terminal/models/applet/host.py:34
 #: terminal/models/applet/host.py:106
 msgid "Hosting"
 msgstr "宿主机"
@@ -6033,7 +6031,7 @@ msgstr "打开"
 
 #: tickets/const.py:18 tickets/const.py:31
 msgid "Reopen"
-msgstr ""
+msgstr "重新打开"
 
 #: tickets/const.py:19 tickets/const.py:32
 msgid "Approved"
@@ -7037,7 +7035,7 @@ msgstr "云账号"
 msgid "Test cloud account"
 msgstr "测试云账号"
 
-#: xpack/plugins/cloud/models.py:88 xpack/plugins/cloud/serializers/task.py:37
+#: xpack/plugins/cloud/models.py:88 xpack/plugins/cloud/serializers/task.py:36
 msgid "Regions"
 msgstr "地域"
 
@@ -7045,15 +7043,15 @@ msgstr "地域"
 msgid "Hostname strategy"
 msgstr "主机名策略"
 
-#: xpack/plugins/cloud/models.py:102 xpack/plugins/cloud/serializers/task.py:40
+#: xpack/plugins/cloud/models.py:102 xpack/plugins/cloud/serializers/task.py:39
 msgid "IP network segment group"
 msgstr "IP网段组"
 
-#: xpack/plugins/cloud/models.py:105 xpack/plugins/cloud/serializers/task.py:45
+#: xpack/plugins/cloud/models.py:105 xpack/plugins/cloud/serializers/task.py:44
 msgid "Sync IP type"
 msgstr "同步IP类型"
 
-#: xpack/plugins/cloud/models.py:108 xpack/plugins/cloud/serializers/task.py:62
+#: xpack/plugins/cloud/models.py:108 xpack/plugins/cloud/serializers/task.py:61
 msgid "Always update"
 msgstr "总是更新"
 
@@ -7339,12 +7337,10 @@ msgid "IP address invalid `{}`, {}"
 msgstr "IP 地址无效: `{}`, {}"
 
 #: xpack/plugins/cloud/serializers/account_attrs.py:172
-msgid ""
-"Format for comma-delimited string,Such as: 192.168.1.0/24, "
-"10.0.0.0-10.0.0.255"
-msgstr "格式为逗号分隔的字符串，如：192.168.1.0/24,10.0.0.0-10.0.0.255"
+msgid "Such as: 192.168.1.0/24, 10.0.0.0-10.0.0.255"
+msgstr "如：192.168.1.0/24,10.0.0.0-10.0.0.255"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:176
+#: xpack/plugins/cloud/serializers/account_attrs.py:175
 msgid ""
 "The port is used to detect the validity of the IP address. When the "
 "synchronization task is executed, only the valid IP address will be "
@@ -7353,19 +7349,19 @@ msgstr ""
 "端口用来检测 IP 地址的有效性，在同步任务执行时，只会同步有效的 IP 地址。 <br>"
 "如果端口为 0，则表示所有 IP 地址均有效。"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:184
+#: xpack/plugins/cloud/serializers/account_attrs.py:183
 msgid "Hostname prefix"
 msgstr "主机名前缀"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:187
+#: xpack/plugins/cloud/serializers/account_attrs.py:186
 msgid "IP segment"
 msgstr "IP 网段"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:191
+#: xpack/plugins/cloud/serializers/account_attrs.py:190
 msgid "Test port"
 msgstr "测试端口"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:194
+#: xpack/plugins/cloud/serializers/account_attrs.py:193
 msgid "Test timeout"
 msgstr "测试超时时间"
 
@@ -7374,18 +7370,18 @@ msgid ""
 "Only instances matching the IP range will be synced. <br>If the instance "
 "contains multiple IP addresses, the first IP address that matches will be "
 "used as the IP for the created asset. <br>The default value of * means sync "
-"all instances and randomly match IP addresses. <br>Format for comma-"
-"delimited string, Such as: 192.168.1.0/24, 10.1.1.1-10.1.1.20"
+"all instances and randomly match IP addresses. <br>Such as: 192.168.1.0/24, "
+"10.1.1.1-10.1.1.20"
 msgstr ""
 "只有匹配到 IP 段的实例会被同步。<br>如果实例包含多个 IP 地址，那么第一个匹配"
 "到的 IP 地址将被用作创建的资产的 IP。<br>默认值 * 表示同步所有实例和随机匹配 "
-"IP 地址。<br>格式为以逗号分隔的字符串，例如:192.168.1.0/24,10.1.1.1-10.1.1.20"
+"IP 地址。<br>例如:192.168.1.0/24,10.1.1.1-10.1.1.20"
 
-#: xpack/plugins/cloud/serializers/task.py:35
+#: xpack/plugins/cloud/serializers/task.py:34
 msgid "History count"
 msgstr "执行次数"
 
-#: xpack/plugins/cloud/serializers/task.py:36
+#: xpack/plugins/cloud/serializers/task.py:35
 msgid "Instance count"
 msgstr "实例个数"
 
@@ -7464,109 +7460,3 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:86
 msgid "Community edition"
 msgstr "社区版"
-
-#~ msgid "Auto fill"
-#~ msgstr "自动代填"
-
-#~ msgid "Info"
-#~ msgstr "信息"
-
-#, fuzzy
-#~| msgid "Custom user"
-#~ msgid "Custom"
-#~ msgstr "自定义用户"
-
-#~ msgid "API Server"
-#~ msgstr "API 服务"
-
-#~ msgid "Unix admin user"
-#~ msgstr "Unix 管理员"
-
-#~ msgid "Windows admin user"
-#~ msgstr "Windows 管理员"
-
-#~ msgid "Linux admin user"
-#~ msgstr "Linux 管理员"
-
-#~ msgid "Can push account to asset"
-#~ msgstr "可以推送账号到资产"
-
-#~ msgid "Add asset to node"
-#~ msgstr "添加资产到节点"
-
-#~ msgid "Move asset to node"
-#~ msgstr "移动资产到节点"
-
-#~ msgid "Remove asset from node"
-#~ msgstr "从节点移除资产"
-
-#~ msgid "Clean audits log"
-#~ msgstr "清理审计日志"
-
-#~ msgid ""
-#~ "Typically, the port is 9000，the HTTP interface and the native interface "
-#~ "use different ports"
-#~ msgstr "默认端口为9000, HTTP接口和本机接口使用不同的端口"
-
-#~ msgid "CMD"
-#~ msgstr "CMD"
-
-#~ msgid "PowerShell"
-#~ msgstr "PowerShell"
-
-#~ msgid "Shell (Windows)"
-#~ msgstr "Windows shell"
-
-#~ msgid "The shell type used when Windows assets perform ansible tasks"
-#~ msgstr "windows 资产执行 Ansible 任务时，使用的 Shell 类型。"
-
-#~ msgid "Can change asset account secret"
-#~ msgstr "可以更改资产账号密码"
-
-#~ msgid "Periodic clear celery tasks"
-#~ msgstr "周期清理不可用任务"
-
-#~ msgid "Clean celery log period"
-#~ msgstr "定期清除任务日志"
-
-#~ msgid "Periodic clean expired session"
-#~ msgstr "周期清理过期会话"
-
-#~ msgid "AdHoc"
-#~ msgstr "任务各版本"
-
-#~ msgid "Terminal ID"
-#~ msgstr "终端 ID"
-
-#~ msgid "{} used account[{}], login method[{}] login the asset."
-#~ msgstr "{} 使用账户[{}], 登录方式[{}]登录了这个资产."
-
-#~ msgid "User {} has executed change auth plan for this account.({})"
-#~ msgstr "用户 {} 为这个账号执行了改密计划.({})"
-
-#~ msgid "User {} login into this service.[{}]"
-#~ msgstr "用户 {} 登录了服务.[{}]"
-
-#~ msgid "Update some assets hardware info. "
-#~ msgstr "更新资产硬件信息. "
-
-#~ msgid "Manually update the hardware information of assets"
-#~ msgstr "手动更新资产信息"
-
-#~ msgid "Manually update the hardware information of assets under a node"
-#~ msgstr "手动更新节点下资产信息"
-
-#~ msgid "Manually test the connectivity of a asset"
-#~ msgstr "手动测试资产连接性"
-
-#~ msgid "Manually test the connectivity of assets under a node"
-#~ msgstr "手动测试节点下资产连接性"
-
-#~ msgid "Disk info"
-#~ msgstr "硬盘信息"
-
-#~ msgid "Hostname raw"
-#~ msgstr "主机名原始"
-
-#~ msgid "Asset number"
-#~ msgstr "资产编号"
