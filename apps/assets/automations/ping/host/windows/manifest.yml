@@ -1,7 +1,12 @@
 id: win_ping
-name: Windows ping
+name: "{{ 'Windows ping' | trans }}"
 version: 1
 method: ping
 category: host
 type:
   - windows
+i18n:
+  Windows ping:
+    zh: 测试 Windows 可连接性
+    en: Windows ping
+    ja: Windows ピング

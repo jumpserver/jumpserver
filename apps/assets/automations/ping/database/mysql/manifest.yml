@@ -1,7 +1,12 @@
 id: mysql_ping
-name: Ping MySQL
+name: "{{ 'Ping MySQL' | trans }}"
 category: database
 type:
   - mysql
   - mariadb
 method: ping
+i18n:
+  Ping MySQL:
+    zh: 测试 MySQL 可连接性
+    en: Ping MySQL
+    ja: MySQLにPingする
