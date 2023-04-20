@@ -75,12 +75,12 @@ class AccountTemplateSerializer(BaseAccountSerializer):
         return [asset.id for asset in secret_type_supports]
 
     def update(self, instance, validated_data):
-        diff = {
-            k: v for k, v in validated_data.items()
-            if getattr(instance, k) != v
-        }
+        # diff = {
+        #     k: v for k, v in validated_data.items()
+        #     if getattr(instance, k) != v
+        # }
         instance = super().update(instance, validated_data)
-        self.bulk_update_accounts(instance, diff)
+        # self.bulk_update_accounts(instance, diff)
         return instance
 
 
