@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from common.api import JMSGenericViewSet
+from common.permissions import IsValidUser
 from assets.serializers import CategorySerializer, TypeSerializer
 from assets.const import AllTypes
 
@@ -14,7 +15,7 @@ class CategoryViewSet(ListModelMixin, JMSGenericViewSet):
         'default': CategorySerializer,
         'types': TypeSerializer
     }
-    permission_classes = ()
+    permission_classes = (IsValidUser,)
 
     def get_queryset(self):
         return AllTypes.categories()
