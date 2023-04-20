@@ -212,23 +212,13 @@ class JMSInventory:
         else:
             return None
 
-    @staticmethod
-    def set_platform_protocol_setting_to_asset(asset, platform_protocols):
-        asset_protocols = asset.protocols.all()
-        for p in asset_protocols:
-            setattr(p, 'setting', platform_protocols.get(p.name, {}))
-        return asset_protocols
-
     def generate(self, path_dir):
         hosts = []
         platform_assets = self.group_by_platform(self.assets)
         for platform, assets in platform_assets.items():
             automation = platform.automation
-            platform_protocols = {
-                p['name']: p['setting'] for p in platform.protocols.values('name', 'setting')
-            }
             for asset in assets:
-                protocols = self.set_platform_protocol_setting_to_asset(asset, platform_protocols)
+                protocols = asset.protocols.all()
                 account = self.select_account(asset)
                 host = self.asset_to_host(asset, account, automation, protocols, platform)
 

@@ -6,16 +6,18 @@ from assets.const import Protocol
 from common.db.fields import JsonDictTextField
 from common.db.models import JMSBaseModel
 
+from .base import PublicMixin
+
+
 __all__ = ['Platform', 'PlatformProtocol', 'PlatformAutomation']
 
 
-class PlatformProtocol(models.Model):
+class PlatformProtocol(PublicMixin, models.Model):
     name = models.CharField(max_length=32, verbose_name=_('Name'))
     port = models.IntegerField(verbose_name=_('Port'))
     primary = models.BooleanField(default=False, verbose_name=_('Primary'))
     required = models.BooleanField(default=False, verbose_name=_('Required'))
     default = models.BooleanField(default=False, verbose_name=_('Default'))
-    public = models.BooleanField(default=True, verbose_name=_('Public'))
     setting = models.JSONField(verbose_name=_('Setting'), default=dict)
     platform = models.ForeignKey('Platform', on_delete=models.CASCADE, related_name='protocols')
 
@@ -25,14 +27,6 @@ class PlatformProtocol(models.Model):
     @property
     def secret_types(self):
         return Protocol.settings().get(self.name, {}).get('secret_types', ['password'])
-
-    def set_public(self):
-        private_protocol_set = ('winrm',)
-        self.public = self.name not in private_protocol_set
-
-    def save(self, **kwargs):
-        self.set_public()
-        return super().save(**kwargs)
 
 
 class PlatformAutomation(models.Model):

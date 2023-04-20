@@ -13,7 +13,7 @@ from assets import const
 from common.db.fields import EncryptMixin
 from common.utils import lazyproperty
 from orgs.mixins.models import OrgManager, JMSOrgBaseModel
-from ..base import AbsConnectivity
+from ..base import AbsConnectivity, PublicMixin
 from ..platform import Platform
 
 __all__ = ['Asset', 'AssetQuerySet', 'default_node', 'Protocol']
@@ -86,34 +86,14 @@ class NodesRelationMixin:
         return nodes
 
 
-class Protocol(models.Model):
+class Protocol(PublicMixin, models.Model):
     name = models.CharField(max_length=32, verbose_name=_("Name"))
     port = models.IntegerField(verbose_name=_("Port"))
+    setting = models.JSONField(verbose_name=_('Setting'), default=dict)
     asset = models.ForeignKey('Asset', on_delete=models.CASCADE, related_name='protocols', verbose_name=_("Asset"))
-    _setting = None
 
     def __str__(self):
         return '{}/{}'.format(self.name, self.port)
-
-    @lazyproperty
-    def asset_platform_protocol(self):
-        protocols = self.asset.platform.protocols.values('name', 'public', 'setting')
-        protocols = list(filter(lambda p: p['name'] == self.name, protocols))
-        return protocols[0] if len(protocols) > 0 else {}
-
-    @property
-    def setting(self):
-        if self._setting is not None:
-            return self._setting
-        return self.asset_platform_protocol.get('setting', {})
-
-    @setting.setter
-    def setting(self, value):
-        self._setting = value
-
-    @property
-    def public(self):
-        return self.asset_platform_protocol.get('public', True)
 
 
 class Asset(NodesRelationMixin, AbsConnectivity, JMSOrgBaseModel):

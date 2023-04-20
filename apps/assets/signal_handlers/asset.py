@@ -6,7 +6,10 @@ from django.db.models.signals import (
 from django.dispatch import receiver
 from django.utils.translation import gettext_noop
 
-from assets.models import Asset, Node, Host, Database, Device, Web, Cloud
+from assets.models import (
+    Asset, Node, Host, Database, Device, Web, Cloud,
+    Protocol, PlatformProtocol
+)
 from assets.tasks import test_assets_connectivity_task, gather_assets_facts_task
 from common.const.signals import POST_REMOVE, PRE_REMOVE
 from common.decorators import on_transaction_commit, merge_delay_run, key_by_org
@@ -100,6 +103,23 @@ def on_asset_post_delete(instance: Asset, using, **kwargs):
             sender=Asset.nodes.through, instance=instance, reverse=False,
             model=Node, pk_set=node_ids, using=using, action=POST_REMOVE
         )
+
+
+@receiver(post_save, sender=PlatformProtocol)
+def on_platform_protocol_post_save(sender, instance=None, created=False, **kwargs):
+    if not instance:
+        return
+
+    protocol = Protocol.objects.filter(
+        asset__platform=instance.platform, name=instance.name
+    ).first()
+    if not protocol:
+        return
+
+    need_update_attr = ('public', 'setting')
+    for attr in need_update_attr:
+        setattr(protocol, attr, getattr(instance, attr))
+    protocol.save()
 
 
 @on_transaction_commit

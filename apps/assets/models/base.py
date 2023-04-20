@@ -41,3 +41,18 @@ class AbsConnectivity(models.Model):
 
     class Meta:
         abstract = True
+
+
+class PublicMixin(models.Model):
+    public = models.BooleanField(default=True, verbose_name=_('Public'))
+
+    def set_public(self):
+        private_protocol_set = ('winrm',)
+        self.public = self.name not in private_protocol_set
+
+    def save(self, **kwargs):
+        self.set_public()
+        return super().save(**kwargs)
+
+    class Meta:
+        abstract = True
