@@ -1,6 +1,11 @@
 id: change_secret_postgresql
-name: Change secret for PostgreSQL
+name: "{{ 'PostgreSQL account change secret' | trans }}"
 category: database
 type:
   - postgresql
 method: change_secret
+
+i18n:
+  PostgreSQL account change secret:
+    zh: PostgreSQL 账号改密
+    ja: PostgreSQL アカウントのパスワード変更

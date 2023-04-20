@@ -1,6 +1,11 @@
 id: verify_account_sqlserver
-name: Verify account from SQLServer
+name: "{{ 'SQLServer account verify' | trans }}"
 category: database
 type:
   - sqlserver
 method: verify_account
+
+i18n:
+  SQLServer account verify:
+    zh: SQLServer 账号验证
+    ja: SQLServer アカウントの検証

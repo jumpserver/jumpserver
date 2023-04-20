@@ -1,3 +1,4 @@
+from django.db.transaction import atomic
 from django.db.utils import IntegrityError
 
 from accounts.models import AccountTemplate, Account
@@ -20,6 +21,7 @@ class AccountTemplateSerializer(BaseAccountSerializer):
             pass
 
     # TODO 数据库访问的太多了 后期优化
+    @atomic()
     def bulk_update_accounts(self, instance, diff):
         accounts = Account.objects.filter(source_id=instance.id)
         if not accounts:

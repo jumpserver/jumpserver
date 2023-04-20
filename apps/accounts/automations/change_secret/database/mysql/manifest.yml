@@ -1,7 +1,12 @@
 id: change_secret_mysql
-name: Change secret for MySQL
+name: "{{ 'MySQL account change secret' | trans }}"
 category: database
 type:
   - mysql
   - mariadb
 method: change_secret
+
+i18n:
+  MySQL account change secret:
+    zh: MySQL 账号改密
+    ja: MySQL アカウントのパスワード変更

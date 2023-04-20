@@ -1,6 +1,11 @@
 id: gather_facts_postgresql
-name: Gather facts for PostgreSQL
+name: "{{ 'Gather facts for PostgreSQL' | trans }}"
 category: database
 type:
   - postgresql
 method: gather_facts
+i18n:
+  Gather facts for PostgreSQL:
+    zh: 从 PostgreSQL 获取信息
+    en: Gather facts for PostgreSQL
+    ja: PostgreSQLから事実を取得する

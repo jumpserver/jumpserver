@@ -1,6 +1,11 @@
 id: verify_account_mongodb
-name: Verify account from MongoDB
+name: "{{ 'MongoDB account verify' | trans }}"
 category: database
 type:
   - mongodb
 method: verify_account
+
+i18n:
+  MongoDB account verify:
+    zh: MongoDB 账号验证
+    ja: MongoDB アカウントの検証

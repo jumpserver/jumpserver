@@ -1,6 +1,11 @@
 id: oracle_ping
-name: Ping Oracle
+name: "{{ 'Ping Oracle' | trans }}"
 category: database
 type:
   - oracle
 method: ping
+i18n:
+  Ping Oracle:
+    zh: 测试 Oracle 可连接性
+    en: Ping Oracle
+    ja: OracleにPingする

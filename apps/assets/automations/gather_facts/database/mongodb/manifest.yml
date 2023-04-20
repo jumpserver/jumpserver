@@ -1,6 +1,11 @@
 id: gather_facts_mongodb
-name: Gather facts from MongoDB
+name: "{{ 'Gather facts from MongoDB' | trans }}"
 category: database
 type:
   - mongodb
 method: gather_facts
+i18n:
+  Gather facts from MongoDB:
+    zh: 从 MongoDB 获取信息
+    en: Gather facts from MongoDB
+    ja: MongoDBから事実を取得する

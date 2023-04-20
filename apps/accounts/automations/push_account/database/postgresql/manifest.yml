@@ -1,6 +1,11 @@
 id: push_account_postgresql
-name: Push account for PostgreSQL
+name: "{{ 'PostgreSQL account push' | trans }}"
 category: database
 type:
   - postgresql
 method: push_account
+
+i18n:
+  PostgreSQL account push:
+    zh: PostgreSQL 账号推送
+    ja: PostgreSQL アカウントのプッシュ

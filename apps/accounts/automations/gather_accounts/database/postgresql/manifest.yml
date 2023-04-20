@@ -1,6 +1,11 @@
 id: gather_accounts_postgresql
-name: Gather account for PostgreSQL
+name: "{{ 'PostgreSQL account gather' | trans }}"
 category: database
 type:
   - postgresql
 method: gather_accounts
+
+i18n:
+  PostgreSQL account gather:
+    zh: PostgreSQL 账号收集
+    ja: PostgreSQL アカウントの収集

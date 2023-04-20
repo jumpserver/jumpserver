@@ -1,10 +1,10 @@
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
-from rest_framework import serializers
 
 from assets.models import Custom, Platform, Asset
 from common.const import UUID_PATTERN
 from common.serializers import MethodSerializer, create_serializer_class
+from common.serializers.common import DictSerializer
 from .common import AssetSerializer
 
 __all__ = ['CustomSerializer']
@@ -19,7 +19,7 @@ class CustomSerializer(AssetSerializer):
 
     def get_custom_info_serializer(self):
         request = self.context.get('request')
-        default_field = serializers.DictField(required=False, label=_('Custom info'))
+        default_field = DictSerializer()
 
         if not request:
             return default_field

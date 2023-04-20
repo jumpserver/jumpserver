@@ -1,6 +1,11 @@
 id: change_secret_mongodb
-name: Change secret for MongoDB
+name: "{{ 'MongoDB account change secret' | trans }}"
 category: database
 type:
   - mongodb
 method: change_secret
+
+i18n:
+  MongoDB account change secret:
+    zh: MongoDB 账号改密
+    ja: MongoDB アカウントのパスワード変更

@@ -1,6 +1,11 @@
 id: ping_postgresql
-name: Ping PostgreSQL
+name: "{{ 'Ping PostgreSQL' | trans }}"
 category: database
 type:
   - postgresql
 method: ping
+i18n:
+  Ping PostgreSQL:
+    zh: 测试 PostgreSQL 可连接性
+    en: Ping PostgreSQL
+    ja: PostgreSQLにPingする

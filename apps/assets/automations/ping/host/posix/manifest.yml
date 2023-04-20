@@ -8,6 +8,6 @@ method: ping
 
 i18n:
   Posix ping:
-    zh: Posix ping
+    zh: 测试 Posix 可连接性
     en: Posix ping
     ja: Posix ピング

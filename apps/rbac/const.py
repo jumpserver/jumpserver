@@ -146,6 +146,8 @@ only_system_permissions = (
     ('authentication', '*', '*', '*'),
     ('tickets', '*', '*', '*'),
     ('orgs', 'organization', 'view', 'rootorg'),
+    ('terminal', 'applet', '*', '*'),
+    ('terminal', 'applethost', '*', '*'),
 )
 
 only_org_permissions = (

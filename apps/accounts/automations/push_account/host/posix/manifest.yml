@@ -1,5 +1,5 @@
 id: push_account_posix
-name: Push account for posix
+name: "{{ 'Posix account push' | trans }}"
 category: host
 type:
   - unix
@@ -23,3 +23,8 @@ params:
     label: '用户组'
     default: ''
     help_text: '请输入用户组，多个用户组使用逗号分隔（需填写已存在的用户组）'
+
+i18n:
+  Posix account push:
+    zh: Posix 账号推送
+    ja: Posix アカウントのプッシュ
