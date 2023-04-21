@@ -1060,7 +1060,7 @@ msgstr "Web"
 
 #: assets/const/category.py:15
 msgid "Custom type"
-msgstr "自定义类型"
+msgstr "自定义"
 
 #: assets/const/cloud.py:7
 msgid "Public cloud"

@@ -57,11 +57,23 @@ class SerializeToTreeNodeMixin:
         ]
         return data
 
+    @lazyproperty
+    def support_types(self):
+        from assets.const import AllTypes
+        return AllTypes.get_types_values(exclude_custom=True)
+
+    def get_icon(self, asset):
+        if asset.type in self.support_types:
+            return asset.type
+        else:
+            return 'file'
+
     @timeit
     def serialize_assets(self, assets, node_key=None):
         sftp_enabled_platform = PlatformProtocol.objects \
             .filter(name='ssh', setting__sftp_enabled=True) \
-            .values_list('platform', flat=True).distinct()
+            .values_list('platform', flat=True) \
+            .distinct()
         if node_key is None:
             get_pid = lambda asset: getattr(asset, 'parent_key', '')
         else:
@@ -75,7 +87,7 @@ class SerializeToTreeNodeMixin:
                 'pId': get_pid(asset),
                 'isParent': False,
                 'open': False,
-                'iconSkin': asset.type,
+                'iconSkin': self.get_icon(asset),
                 'chkDisabled': not asset.is_active,
                 'meta': {
                     'type': 'asset',
