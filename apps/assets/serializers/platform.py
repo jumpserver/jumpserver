@@ -2,7 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from assets.const.web import FillType
-from common.serializers import WritableNestedModelSerializer
+from common.serializers import WritableNestedModelSerializer, type_field_map
 from common.serializers.fields import LabeledChoiceField
 from common.utils import lazyproperty
 from ..const import Category, AllTypes
@@ -88,14 +88,7 @@ class PlatformProtocolSerializer(serializers.ModelSerializer):
 
 
 class PlatformCustomField(serializers.Serializer):
-    TYPE_CHOICES = [
-        ("str", "str"),
-        ("text", "text"),
-        ("int", "int"),
-        ("bool", "bool"),
-        ("choice", "choice"),
-        ("list", "list"),
-    ]
+    TYPE_CHOICES = [(t, t) for t, c in type_field_map.items()]
     name = serializers.CharField(label=_("Name"), max_length=128)
     label = serializers.CharField(label=_("Label"), max_length=128)
     type = serializers.ChoiceField(choices=TYPE_CHOICES, label=_("Type"), default='str')

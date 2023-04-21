@@ -151,15 +151,18 @@ class AllTypes(ChoicesMixin):
         )
 
     @classmethod
-    def get_types(cls):
+    def get_types(cls, exclude_custom=False):
         choices = []
-        for i in dict(cls.category_types()).values():
-            choices.extend(i.get_types())
+
+        for name, tp in dict(cls.category_types()).items():
+            if name == Category.CUSTOM and exclude_custom:
+                continue
+            choices.extend(tp.get_types())
         return choices
 
     @classmethod
-    def get_types_values(cls):
-        choices = cls.get_types()
+    def get_types_values(cls, exclude_custom=False):
+        choices = cls.get_types(exclude_custom=exclude_custom)
         return [c.value for c in choices]
 
     @staticmethod
