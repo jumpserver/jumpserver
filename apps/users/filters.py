@@ -10,11 +10,12 @@ from users.models.user import User
 class UserFilter(BaseFilterSet):
     system_roles = filters.CharFilter(method='filter_system_roles')
     org_roles = filters.CharFilter(method='filter_org_roles')
+    groups = filters.CharFilter(field_name="groups__name", lookup_expr='exact')
 
     class Meta:
         model = User
         fields = (
-            'id', 'username', 'email', 'name', 'source',
+            'id', 'username', 'email', 'name', 'groups', 'source',
             'org_roles', 'system_roles', 'is_active',
         )
 
