@@ -8,7 +8,7 @@ class CustomTypes(BaseType):
             platforms = list(cls.get_custom_platforms())
         except Exception:
             return []
-        types = [p.type for p in platforms]
+        types = set([p.type for p in platforms])
         return [(t, t) for t in types]
 
     @classmethod
