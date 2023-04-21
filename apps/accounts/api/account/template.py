@@ -1,13 +1,13 @@
 from django_filters import rest_framework as drf_filters
 
-from assets.const import Protocol
 from accounts import serializers
 from accounts.models import AccountTemplate
-from orgs.mixins.api import OrgBulkModelViewSet
-from rbac.permissions import RBACPermission
+from assets.const import Protocol
+from common.drf.filters import BaseFilterSet
 from common.permissions import UserConfirmation, ConfirmType
 from common.views.mixins import RecordViewLogMixin
-from common.drf.filters import BaseFilterSet
+from orgs.mixins.api import OrgBulkModelViewSet
+from rbac.permissions import RBACPermission
 
 
 class AccountTemplateFilterSet(BaseFilterSet):
@@ -27,6 +27,8 @@ class AccountTemplateFilterSet(BaseFilterSet):
                 continue
             _st = protocol_secret_type_map[p].get('secret_types', [])
             secret_types.update(_st)
+        if not secret_types:
+            secret_types = ['password']
         queryset = queryset.filter(secret_type__in=secret_types)
         return queryset
 
