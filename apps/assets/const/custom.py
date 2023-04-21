@@ -48,11 +48,7 @@ class CustomTypes(BaseType):
 
     @classmethod
     def internal_platforms(cls):
-        return {
-            # cls.PUBLIC: [],
-            # cls.PRIVATE: [{'name': 'Vmware-vSphere'}],
-            # cls.K8S: [{'name': 'Kubernetes'}],
-        }
+        return {}
 
     @classmethod
     def get_custom_platforms(cls):
