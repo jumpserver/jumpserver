@@ -85,6 +85,11 @@ def clean_db_content_types():
         ('assets', 'systemuser', 'view_systemuserasset'),
         ('assets', 'systemuser', 'add_systemuserasset'),
         ('assets', 'systemuser', 'remove_systemuserasset'),
+
+        ('ops', 'jobauditlog', 'view_jobauditlog'),
+        ('ops', 'jobauditlog', 'add_jobauditlog'),
+        ('ops', 'jobauditlog', 'change_jobauditlog'),
+        ('ops', 'jobauditlog', 'delete_jobauditlog'),
     ]
     for app, model, codename in permissions_delete_required:
         print('delete {}.{} ({})'.format(app, codename, model))
