@@ -98,7 +98,7 @@ class Applet(JMSBaseModel):
             return
         try:
             with open(os.path.join(d, 'platform.yml')) as f:
-                data = yaml.safe_load(f)
+                data = yaml_load_with_i18n(f)
         except Exception as e:
             raise ValidationError({'error': _('Load platform.yml failed: {}').format(e)})
 
