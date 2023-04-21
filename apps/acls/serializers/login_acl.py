@@ -2,12 +2,11 @@ from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 from common.serializers import BulkModelSerializer, MethodSerializer
-from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
-from jumpserver.utils import has_valid_xpack_license
+from common.serializers.fields import ObjectRelatedField
 from users.models import User
+from .base import ActionAclSerializer
 from .rules import RuleSerializer
 from ..models import LoginACL
-from ..models.base import ActionChoices
 
 __all__ = [
     "LoginACLSerializer",
@@ -18,12 +17,11 @@ common_help_text = _(
 )
 
 
-class LoginACLSerializer(BulkModelSerializer):
+class LoginACLSerializer(ActionAclSerializer, BulkModelSerializer):
     user = ObjectRelatedField(queryset=User.objects, label=_("User"))
     reviewers = ObjectRelatedField(
         queryset=User.objects, label=_("Reviewers"), many=True, required=False
     )
-    action = LabeledChoiceField(choices=ActionChoices.choices, label=_('Action'))
     reviewers_amount = serializers.IntegerField(
         read_only=True, source="reviewers.count", label=_("Reviewers amount")
     )
@@ -44,19 +42,6 @@ class LoginACLSerializer(BulkModelSerializer):
             "priority": {"default": 50},
             "is_active": {"default": True},
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.set_action_choices()
-
-    def set_action_choices(self):
-        action = self.fields.get("action")
-        if not action:
-            return
-        choices = action.choices
-        if not has_valid_xpack_license():
-            choices.pop(LoginACL.ActionChoices.review, None)
-        action._choices = choices
 
     def get_rules_serializer(self):
         return RuleSerializer()
