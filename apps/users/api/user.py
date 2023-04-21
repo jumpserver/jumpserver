@@ -12,12 +12,14 @@ from common.api import SuggestionMixin
 from common.utils import get_logger
 from orgs.utils import current_org, tmp_to_root_org
 from rbac.models import Role, RoleBinding
+from rbac.permissions import RBACPermission
 from users.utils import LoginBlockUtil, MFABlockUtils
 from .mixins import UserQuerysetMixin
 from .. import serializers
 from ..filters import UserFilter
 from ..models import User
 from ..notifications import ResetMFAMsg
+from ..permissions import UserObjectPermission
 from ..serializers import (
     UserSerializer,
     MiniUserSerializer, InviteSerializer
@@ -34,6 +36,7 @@ __all__ = [
 class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelViewSet):
     filterset_class = UserFilter
     search_fields = ('username', 'email', 'name')
+    permission_classes = [RBACPermission, UserObjectPermission]
     serializer_classes = {
         'default': UserSerializer,
         'suggestion': MiniUserSerializer,
