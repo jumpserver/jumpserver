@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from acls.models.base import ActionChoices
 from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
+from jumpserver.utils import has_valid_xpack_license
 from orgs.models import Organization
 from users.models import User
 
@@ -51,7 +52,26 @@ class ACLAccountsSerializer(serializers.Serializer):
     )
 
 
-class BaseUserAssetAccountACLSerializerMixin(serializers.Serializer):
+class ActionAclSerializer(serializers.Serializer):
+    action = LabeledChoiceField(
+        choices=ActionChoices.choices, default=ActionChoices.reject, label=_("Action")
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_action_choices()
+
+    def set_action_choices(self):
+        action = self.fields.get("action")
+        if not action:
+            return
+        choices = action.choices
+        if not has_valid_xpack_license():
+            choices.pop(ActionChoices.review, None)
+        action._choices = choices
+
+
+class BaseUserAssetAccountACLSerializerMixin(ActionAclSerializer, serializers.Serializer):
     users = ACLUsersSerializer(label=_('User'))
     assets = ACLAssestsSerializer(label=_('Asset'))
     accounts = ACLAccountsSerializer(label=_('Account'))
@@ -76,9 +96,6 @@ class BaseUserAssetAccountACLSerializerMixin(serializers.Serializer):
     )
     reviewers_amount = serializers.IntegerField(
         read_only=True, source="reviewers.count", label=_('Reviewers amount')
-    )
-    action = LabeledChoiceField(
-        choices=ActionChoices.choices, default=ActionChoices.reject, label=_("Action")
     )
 
     class Meta:
