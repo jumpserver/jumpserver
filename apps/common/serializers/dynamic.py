@@ -7,6 +7,7 @@ example_info = [
 
 type_field_map = {
     "str": serializers.CharField,
+    "password": serializers.CharField,
     "int": serializers.IntegerField,
     "bool": serializers.BooleanField,
     "text": serializers.CharField,
@@ -27,6 +28,8 @@ def set_default_if_need(data, i):
 def set_default_by_type(tp, data, field_info):
     if tp == 'str':
         data['max_length'] = 4096
+    elif tp == 'password':
+        data['write_only'] = True
     elif tp == 'choice':
         choices = field_info.pop('choices', [])
         if isinstance(choices, str):
