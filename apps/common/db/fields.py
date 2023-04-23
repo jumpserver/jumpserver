@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-import json
 
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
@@ -32,6 +31,7 @@ __all__ = [
     "PortRangeField",
     "BitChoices",
     "TreeChoices",
+    "JSONManyToManyField",
 ]
 
 
@@ -274,3 +274,105 @@ class PortRangeField(models.CharField):
         kwargs['max_length'] = 16
         super().__init__(**kwargs)
         self.validators.append(PortRangeValidator())
+
+
+from django.db.models import Q
+from django.apps import apps
+
+from django.db import models
+from django.core.exceptions import ValidationError
+import json
+
+
+class JSONManyToManyDescriptor:
+    def __init__(self, field):
+        self.field = field
+        self._is_setting = False
+
+    def __get__(self, instance, owner=None):
+        if instance is None:
+            return self
+
+        if not hasattr(instance, "_related_manager_cache"):
+            instance._related_manager_cache = {}
+
+        current_value = getattr(instance, self.field.attname, {})
+
+        if self.field.name not in instance._related_manager_cache or instance._related_manager_cache[
+            self.field.name]._is_value_stale(current_value):
+            manager = RelatedManager(instance, self.field)
+            instance._related_manager_cache[self.field.name] = manager
+
+        return instance._related_manager_cache[self.field.name]
+
+    def __set__(self, instance, value):
+        if instance is None:
+            return
+
+        if not hasattr(instance, "_is_setting"):
+            instance._is_setting = {}
+
+        if self.field.name not in instance._is_setting or not instance._is_setting[self.field.name]:
+            instance._is_setting[self.field.name] = True
+            manager = self.__get__(instance, instance.__class__)
+            manager.set(value)
+            serialized_value = manager.serialize()
+            instance.__dict__[self.field.attname] = serialized_value
+            instance._is_setting[self.field.name] = False
+
+
+class JSONManyToManyField(models.JSONField):
+    def __init__(self, related_model, *args, **kwargs):
+        self.related_model = related_model
+        super().__init__(*args, **kwargs)
+
+    def contribute_to_class(self, cls, name, **kwargs):
+        super().contribute_to_class(cls, name, **kwargs)
+        setattr(cls, self.name, JSONManyToManyDescriptor(self))
+
+    def deconstruct(self):
+        name, path, args, kwargs = super().deconstruct()
+        kwargs['related_model'] = self.related_model
+        return name, path, args, kwargs
+
+    def validate(self, value, model_instance):
+        super().validate(value, model_instance)
+        if not isinstance(value, list) or not all(isinstance(item, int) for item in value):
+            raise ValidationError("Invalid JSON data for JSONManyToManyField.")
+
+
+class RelatedManager:
+    def __init__(self, instance, field):
+        self.instance = instance
+        self.field = field
+
+    def _is_value_stale(self, current_value):
+        return self.serialize() != current_value
+
+    def set(self, value):
+        self.field.value = value
+
+    def serialize(self):
+        return self.field.value
+
+    def _get_queryset(self):
+        model = apps.get_model(self.field.to)
+        value = self.field.value
+
+        if value["type"] == "all":
+            return model.objects.all()
+        elif value["type"] == "ids":
+            return model.objects.filter(id__in=value["ids"])
+        elif value["type"] == "attrs":
+            filters = Q()
+            for attr in value["attrs"]:
+                if attr["match"] == "exact":
+                    filters &= Q(**{attr["attr"]: attr["value"]})
+            return model.objects.filter(filters)
+
+    def all(self):
+        return self._get_queryset()
+
+    def filter(self, *args, **kwargs):
+        queryset = self._get_queryset()
+        return queryset.filter(*args, **kwargs)
