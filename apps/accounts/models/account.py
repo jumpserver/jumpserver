@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models import Count
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
@@ -118,3 +120,45 @@ class AccountTemplate(BaseAccount):
 
     def __str__(self):
         return self.username
+
+    @staticmethod
+    def bulk_update_accounts(accounts, data):
+        history_model = Account.history.model
+        account_ids = accounts.values_list('id', flat=True)
+        history_accounts = history_model.objects.filter(id__in=account_ids)
+        account_id_count_map = {
+            str(i['id']): i['count']
+            for i in history_accounts.values('id').order_by('id')
+            .annotate(count=Count(1)).values('id', 'count')
+        }
+
+        for account in accounts:
+            account_id = str(account.id)
+            account.version = account_id_count_map.get(account_id) + 1
+            for k, v in data.items():
+                setattr(account, k, v)
+        Account.objects.bulk_update(accounts, ['version', 'secret'])
+
+    @staticmethod
+    def bulk_create_history_accounts(accounts, user_id):
+        history_model = Account.history.model
+        history_account_objs = []
+        for account in accounts:
+            history_account_objs.append(
+                history_model(
+                    id=account.id,
+                    version=account.version,
+                    secret=account.secret,
+                    secret_type=account.secret_type,
+                    history_user_id=user_id,
+                    history_date=timezone.now()
+                )
+            )
+        history_model.objects.bulk_create(history_account_objs)
+
+    def bulk_sync_account_secret(self, accounts, user_id):
+        """ 批量同步账号密码 """
+        if not accounts:
+            return
+        self.bulk_update_accounts(accounts, {'secret': self.secret})
+        self.bulk_create_history_accounts(accounts, user_id)
