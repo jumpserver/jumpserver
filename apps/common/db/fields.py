@@ -287,25 +287,21 @@ class RelatedManager:
     def __init__(self, instance, field):
         self.instance = instance
         self.field = field
+        self.value = None
 
     def _is_value_stale(self, current_value):
-        return self.field.value != current_value
+        return self.value != current_value
 
     def set(self, value):
-        print("set value: {} [{}] ({})".format(self, self.field, value))
-        self._set_value(value)
-
-    def _set_value(self, value):
-        self.field.value = value
-        if self.instance:
-            self.instance.__dict__[self.field.name] = value
+        self.value = value
+        self.instance.__dict__[self.field.name] = value
 
     def serialize(self):
-        return self.field.value
+        return self.value
 
     def _get_queryset(self):
         model = apps.get_model(self.field.to)
-        value = self.field.value
+        value = self.value
 
         if value["type"] == "all":
             return model.objects.all()
@@ -328,12 +324,10 @@ class RelatedManager:
 
 class JSONManyToManyDescriptor:
     def __init__(self, field):
-        print("DES Call __init__: ", field)
         self.field = field
         self._is_setting = False
 
     def __get__(self, instance, owner=None):
-        print("Call __get__: ", instance, id(instance))
         if instance is None:
             return self
 
@@ -342,7 +336,13 @@ class JSONManyToManyDescriptor:
         if self.field.name not in instance._related_manager_cache:
             manager = RelatedManager(instance, self.field)
             instance._related_manager_cache[self.field.name] = manager
-        return instance._related_manager_cache[self.field.name]
+        manager = instance._related_manager_cache[self.field.name]
+        # if self.field.name == 'users':
+        #     print(">>> Call __get__: ", manager)
+        #     print("Field: ", self.field)
+        #     print("Instance: ", instance.__dict__)
+        #     print("Current value: ", manager.value)
+        return manager
 
     def __set__(self, instance, value):
         if instance is None:
@@ -356,10 +356,12 @@ class JSONManyToManyDescriptor:
         else:
             manager = instance._related_manager_cache[self.field.name]
 
-        print("manager: ", manager)
-        print("Call __set__: ", id(instance), value)
+        # if self.field.name == 'users':
+        #     print(">>> Call __set__: ", manager, value)
+        #     print("Field: ", self.field.name)
+        #     print("Instance: ", instance.__dict__)
         if isinstance(value, RelatedManager):
-            value = value.field.value
+            value = value.value
         manager.set(value)
 
 
@@ -380,8 +382,9 @@ class JSONManyToManyField(models.JSONField):
     def get_db_prep_value(self, value, connection, prepared=False):
         if value is None:
             return None
-        v = value.field.value
-        print("get_db_prep_value: ", value, v)
+        v = value.value
+        print("$$$ Get_db_prep_value: ", self.to, value, v)
+        print("Value field: ", value.__dict__)
         return json.dumps(v)
 
     def get_prep_value(self, value):
