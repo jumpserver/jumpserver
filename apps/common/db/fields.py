@@ -278,67 +278,9 @@ class PortRangeField(models.CharField):
 
 from django.db.models import Q
 from django.apps import apps
-
 from django.db import models
 from django.core.exceptions import ValidationError
 import json
-
-
-class JSONManyToManyDescriptor:
-    def __init__(self, field):
-        self.field = field
-        self._is_setting = False
-
-    def __get__(self, instance, owner=None):
-        if instance is None:
-            return self
-
-        if not hasattr(instance, "_related_manager_cache"):
-            instance._related_manager_cache = {}
-
-        current_value = getattr(instance, self.field.attname, {})
-
-        if self.field.name not in instance._related_manager_cache or instance._related_manager_cache[
-            self.field.name]._is_value_stale(current_value):
-            manager = RelatedManager(instance, self.field)
-            instance._related_manager_cache[self.field.name] = manager
-
-        return instance._related_manager_cache[self.field.name]
-
-    def __set__(self, instance, value):
-        if instance is None:
-            return
-
-        if not hasattr(instance, "_is_setting"):
-            instance._is_setting = {}
-
-        if self.field.name not in instance._is_setting or not instance._is_setting[self.field.name]:
-            instance._is_setting[self.field.name] = True
-            manager = self.__get__(instance, instance.__class__)
-            manager.set(value)
-            serialized_value = manager.serialize()
-            instance.__dict__[self.field.attname] = serialized_value
-            instance._is_setting[self.field.name] = False
-
-
-class JSONManyToManyField(models.JSONField):
-    def __init__(self, related_model, *args, **kwargs):
-        self.related_model = related_model
-        super().__init__(*args, **kwargs)
-
-    def contribute_to_class(self, cls, name, **kwargs):
-        super().contribute_to_class(cls, name, **kwargs)
-        setattr(cls, self.name, JSONManyToManyDescriptor(self))
-
-    def deconstruct(self):
-        name, path, args, kwargs = super().deconstruct()
-        kwargs['related_model'] = self.related_model
-        return name, path, args, kwargs
-
-    def validate(self, value, model_instance):
-        super().validate(value, model_instance)
-        if not isinstance(value, list) or not all(isinstance(item, int) for item in value):
-            raise ValidationError("Invalid JSON data for JSONManyToManyField.")
 
 
 class RelatedManager:
@@ -347,10 +289,16 @@ class RelatedManager:
         self.field = field
 
     def _is_value_stale(self, current_value):
-        return self.serialize() != current_value
+        return self.field.value != current_value
 
     def set(self, value):
+        print("set value: {} [{}] ({})".format(self, self.field, value))
+        self._set_value(value)
+
+    def _set_value(self, value):
         self.field.value = value
+        if self.instance:
+            self.instance.__dict__[self.field.name] = value
 
     def serialize(self):
         return self.field.value
@@ -376,3 +324,74 @@ class RelatedManager:
     def filter(self, *args, **kwargs):
         queryset = self._get_queryset()
         return queryset.filter(*args, **kwargs)
+
+
+class JSONManyToManyDescriptor:
+    def __init__(self, field):
+        print("DES Call __init__: ", field)
+        self.field = field
+        self._is_setting = False
+
+    def __get__(self, instance, owner=None):
+        print("Call __get__: ", instance, id(instance))
+        if instance is None:
+            return self
+
+        if not hasattr(instance, "_related_manager_cache"):
+            instance._related_manager_cache = {}
+        if self.field.name not in instance._related_manager_cache:
+            manager = RelatedManager(instance, self.field)
+            instance._related_manager_cache[self.field.name] = manager
+        return instance._related_manager_cache[self.field.name]
+
+    def __set__(self, instance, value):
+        if instance is None:
+            return
+
+        if not hasattr(instance, "_related_manager_cache"):
+            instance._related_manager_cache = {}
+
+        if self.field.name not in instance._related_manager_cache:
+            manager = self.__get__(instance, instance.__class__)
+        else:
+            manager = instance._related_manager_cache[self.field.name]
+
+        print("manager: ", manager)
+        print("Call __set__: ", id(instance), value)
+        if isinstance(value, RelatedManager):
+            value = value.field.value
+        manager.set(value)
+
+
+class JSONManyToManyField(models.JSONField):
+    def __init__(self, to, *args, **kwargs):
+        self.to = to
+        super().__init__(*args, **kwargs)
+
+    def contribute_to_class(self, cls, name, **kwargs):
+        super().contribute_to_class(cls, name, **kwargs)
+        setattr(cls, self.name, JSONManyToManyDescriptor(self))
+
+    def deconstruct(self):
+        name, path, args, kwargs = super().deconstruct()
+        kwargs['to'] = self.to
+        return name, path, args, kwargs
+
+    def get_db_prep_value(self, value, connection, prepared=False):
+        if value is None:
+            return None
+        v = value.field.value
+        print("get_db_prep_value: ", value, v)
+        return json.dumps(v)
+
+    def get_prep_value(self, value):
+        if value is None:
+            return value
+        v = value.field.value
+        print("get_prep_value: ", value, v)
+        return json.dumps(v)
+
+    def validate(self, value, model_instance):
+        super().validate(value, model_instance)
+        if not isinstance(value, dict):
+            raise ValidationError("Invalid JSON data for JSONManyToManyField.")
