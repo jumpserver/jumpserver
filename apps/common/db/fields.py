@@ -337,11 +337,6 @@ class JSONManyToManyDescriptor:
             manager = RelatedManager(instance, self.field)
             instance._related_manager_cache[self.field.name] = manager
         manager = instance._related_manager_cache[self.field.name]
-        # if self.field.name == 'users':
-        #     print(">>> Call __get__: ", manager)
-        #     print("Field: ", self.field)
-        #     print("Instance: ", instance.__dict__)
-        #     print("Current value: ", manager.value)
         return manager
 
     def __set__(self, instance, value):
