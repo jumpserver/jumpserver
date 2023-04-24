@@ -356,10 +356,6 @@ class JSONManyToManyDescriptor:
         else:
             manager = instance._related_manager_cache[self.field.name]
 
-        # if self.field.name == 'users':
-        #     print(">>> Call __set__: ", manager, value)
-        #     print("Field: ", self.field.name)
-        #     print("Instance: ", instance.__dict__)
         if isinstance(value, RelatedManager):
             value = value.value
         manager.set(value)
@@ -379,19 +375,16 @@ class JSONManyToManyField(models.JSONField):
         kwargs['to'] = self.to
         return name, path, args, kwargs
 
-    def get_db_prep_value(self, value, connection, prepared=False):
-        if value is None:
+    def get_db_prep_value(self, manager, connection, prepared=False):
+        if manager is None:
             return None
-        v = value.value
-        print("$$$ Get_db_prep_value: ", self.to, value, v)
-        print("Value field: ", value.__dict__)
+        v = manager.value
         return json.dumps(v)
 
-    def get_prep_value(self, value):
-        if value is None:
-            return value
-        v = value.field.value
-        print("get_prep_value: ", value, v)
+    def get_prep_value(self, manager):
+        if manager is None:
+            return manager
+        v = manager.value
         return json.dumps(v)
 
     def validate(self, value, model_instance):
