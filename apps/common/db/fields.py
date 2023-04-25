@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 #
 
+import json
+
+from django.apps import apps
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.db.models import Q
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.utils.encoders import JSONEncoder
@@ -276,13 +281,6 @@ class PortRangeField(models.CharField):
         self.validators.append(PortRangeValidator())
 
 
-from django.db.models import Q
-from django.apps import apps
-from django.db import models
-from django.core.exceptions import ValidationError
-import json
-
-
 class RelatedManager:
     def __init__(self, instance, field):
         self.instance = instance
@@ -296,17 +294,31 @@ class RelatedManager:
     def _get_queryset(self):
         model = apps.get_model(self.field.to)
         value = self.value
+        if not value or not isinstance(value, dict):
+            return model.objects.none()
 
         if value["type"] == "all":
             return model.objects.all()
-        elif value["type"] == "ids":
+        elif value["type"] == "ids" and isinstance(value.get("ids"), list):
             return model.objects.filter(id__in=value["ids"])
-        elif value["type"] == "attrs":
+        elif value["type"] == "attrs" and isinstance(value.get("attrs"), list):
             filters = Q()
             for attr in value["attrs"]:
-                if attr["match"] == "exact":
-                    filters &= Q(**{attr["attr"]: attr["value"]})
+                if not isinstance(attr, dict):
+                    continue
+                name = attr.get('name')
+                val = attr.get('value')
+                match = attr.get('match', 'exact')
+                if name is None or val is None:
+                    continue
+
+                lookup = name
+                if match in ("exact", "contains", "startswith", "endswith", "regex"):
+                    lookup = "{}__{}".format(name, match)
+                filters &= Q(**{lookup: val})
             return model.objects.filter(filters)
+        else:
+            return model.objects.none()
 
     def all(self):
         return self._get_queryset()
@@ -364,16 +376,43 @@ class JSONManyToManyField(models.JSONField):
         kwargs['to'] = self.to
         return name, path, args, kwargs
 
+    @staticmethod
+    def _check_value(val):
+        if not val:
+            return val
+        e = ValueError(
+            'Invalid JSON data for JSONManyToManyField, should be like '
+            '{"type": "all"} or {"type": "ids", "ids": []} '
+            'or {"type": "attrs", "attrs": [{"name": "ip", "match": "exact", "value": "value"}'
+        )
+        if not isinstance(val, dict):
+            raise e
+        if val["type"] not in ["all", "ids", "attrs"]:
+            raise e
+        if val["type"] == "ids":
+            if not isinstance(val["ids"], list):
+                raise e
+        elif val["type"] == "attrs":
+            if not isinstance(val["attrs"], list):
+                raise e
+            for attr in val["attrs"]:
+                if not isinstance(attr, dict):
+                    raise e
+                if 'name' not in attr or 'value' not in attr:
+                    raise e
+
     def get_db_prep_value(self, manager, connection, prepared=False):
         if manager is None:
             return None
         v = manager.value
+        self._check_value(v)
         return json.dumps(v)
 
     def get_prep_value(self, manager):
         if manager is None:
             return manager
         v = manager.value
+        self._check_value(v)
         return json.dumps(v)
 
     def validate(self, value, model_instance):

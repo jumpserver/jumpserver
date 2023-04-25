@@ -4,15 +4,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from accounts.models import Account
 from assets.models import Asset, Node, FamilyMixin
-from common.db.fields import JSONManyToManyField
 from common.utils import lazyproperty
 from orgs.mixins.models import JMSOrgBaseModel
-
-
-class TestPermission2(models.Model):
-    name = models.CharField(max_length=128, verbose_name=_('Name'))
-    users = JSONManyToManyField("users.User")
-    assets = JSONManyToManyField("assets.Asset")
 
 
 class NodeFrom(TextChoices):
