@@ -1,35 +1,35 @@
 # -*- coding: utf-8 -*-
 #
-import urllib.parse
-import json
-from typing import Callable
-import os
 import base64
 import ctypes
+import json
+import os
+import urllib.parse
+from typing import Callable
 
 from django.core.cache import cache
-from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.translation import ugettext as _
-from rest_framework.response import Response
-from rest_framework.request import Request
-from rest_framework.viewsets import GenericViewSet
+from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
-from rest_framework import serializers
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
 
 from applications.models import Application
 from authentication.signals import post_auth_failed
-from common.utils import get_logger, random_string
+from common.const.http import PATCH
+from common.http import is_true
 from common.mixins.api import SerializerMixin
+from common.utils import get_logger, random_string
 from common.utils.common import get_file_by_arch
 from orgs.mixins.api import RootOrgViewMixin
-from common.http import is_true
 from perms.models.base import Action
 from perms.utils.application.permission import get_application_actions
 from perms.utils.asset.permission import get_asset_actions
-from common.const.http import PATCH
 from terminal.models import EndpointRule
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer, SuperConnectionTokenSerializer
@@ -151,6 +151,8 @@ class ClientProtocolMixin:
 
         if asset:
             name = asset.hostname
+            if asset.platform.meta.get('console', None) == 'true':
+                options['administrative session:i:'] = '1'
         elif application:
             name = application.name
             application.get_rdp_remote_app_setting()
