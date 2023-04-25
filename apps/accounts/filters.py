@@ -5,7 +5,6 @@ from django_filters import rest_framework as drf_filters
 
 from assets.models import Node
 from common.drf.filters import BaseFilterSet
-
 from .models import Account, GatheredAccount
 
 
@@ -46,7 +45,7 @@ class AccountFilterSet(BaseFilterSet):
 
     class Meta:
         model = Account
-        fields = ['id', 'asset_id']
+        fields = ['id', 'asset_id', 'source_id']
 
 
 class GatheredAccountFilterSet(BaseFilterSet):
