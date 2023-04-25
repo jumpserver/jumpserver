@@ -289,15 +289,9 @@ class RelatedManager:
         self.field = field
         self.value = None
 
-    def _is_value_stale(self, current_value):
-        return self.value != current_value
-
     def set(self, value):
         self.value = value
         self.instance.__dict__[self.field.name] = value
-
-    def serialize(self):
-        return self.value
 
     def _get_queryset(self):
         model = apps.get_model(self.field.to)
