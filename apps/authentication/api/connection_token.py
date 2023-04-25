@@ -99,6 +99,10 @@ class RDPFileClientProtocolURLMixin:
             remote_app_options = token.get_remote_app_option()
             rdp_options.update(remote_app_options)
 
+        rdp = token.asset.platform.protocols.filter(name='rdp').first()
+        if rdp and rdp.setting.get('console'):
+            rdp_options['administrative session:i:'] = '1'
+
         # 文件名
         name = token.asset.name
         prefix_name = f'{token.user.username}-{name}'
