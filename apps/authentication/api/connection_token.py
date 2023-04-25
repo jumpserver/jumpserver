@@ -1,26 +1,27 @@
 import abc
-import os
-import json
 import base64
+import json
+import os
 import urllib.parse
+
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from rest_framework.exceptions import PermissionDenied
-from rest_framework.decorators import action
-from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.request import Request
+from rest_framework.response import Response
 
 from common.drf.api import JMSModelViewSet
 from common.http import is_true
 from orgs.mixins.api import RootOrgViewMixin
 from perms.models.base import Action
 from terminal.models import EndpointRule
+from ..models import ConnectionToken
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
     SuperConnectionTokenSerializer, ConnectionTokenDisplaySerializer,
 )
-from ..models import ConnectionToken
 
 __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
 
@@ -152,6 +153,9 @@ class ConnectionTokenMixin:
         rdp_options['username:s'] = '{}|{}'.format(token.user.username, str(token.id))
         if token.system_user.ad_domain:
             rdp_options['domain:s'] = token.system_user.ad_domain
+
+        if token.asset.platform.meta.get('console', False):
+            rdp_options['administrative session:i:'] = '1'
 
         # 设置宽高
         height = self.request.query_params.get('height')
