@@ -59,8 +59,6 @@ def expire_user_orgs(*args):
 
 @receiver(post_save, sender=Organization)
 def on_org_create(sender, instance, created=False, **kwargs):
-    if not created:
-        return
     expire_user_orgs()
 
 
