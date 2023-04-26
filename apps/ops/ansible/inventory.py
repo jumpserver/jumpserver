@@ -5,12 +5,17 @@ from collections import defaultdict
 
 from django.utils.translation import gettext as _
 
+from accounts.const import AutomationTypes
+
 __all__ = ['JMSInventory']
 
 
 class JMSInventory:
-    def __init__(self, assets, account_policy='privileged_first',
-                 account_prefer='root,Administrator', host_callback=None, exclude_localhost=False):
+    def __init__(
+            self, assets, account_policy='privileged_first',
+            account_prefer='root,Administrator', host_callback=None,
+            exclude_localhost=False, task_type=None
+    ):
         """
         :param assets:
         :param account_prefer: account username name if not set use account_policy
@@ -22,6 +27,7 @@ class JMSInventory:
         self.host_callback = host_callback
         self.exclude_hosts = {}
         self.exclude_localhost = exclude_localhost
+        self.task_type = task_type
 
     @staticmethod
     def clean_assets(assets):
@@ -92,6 +98,12 @@ class JMSInventory:
                 host['ansible_become_password'] = su_from.secret
             else:
                 host['ansible_become_password'] = account.secret
+        elif platform.su_enabled and not su_from and \
+                self.task_type in (AutomationTypes.change_secret, AutomationTypes.push_account):
+            host.update(self.make_account_ansible_vars(account))
+            host['ansible_become'] = True
+            host['ansible_become_user'] = 'root'
+            host['ansible_become_password'] = account.secret
         else:
             host.update(self.make_account_ansible_vars(account))
 
