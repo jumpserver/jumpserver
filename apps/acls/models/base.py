@@ -3,6 +3,7 @@ from django.db import models
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
+from common.db.fields import JSONManyToManyField
 from common.db.models import JMSBaseModel
 from common.utils import contains_ip
 from orgs.mixins.models import OrgModelMixin, OrgManager
@@ -95,11 +96,11 @@ class BaseACL(JMSBaseModel):
 
 class UserAssetAccountBaseACL(BaseACL, OrgModelMixin):
     # username_group
-    users = models.JSONField(verbose_name=_('User'))
+    users = JSONManyToManyField('users.User', default=dict, verbose_name=_('Users'))
     # name_group, address_group
-    assets = models.JSONField(verbose_name=_('Asset'))
+    assets = JSONManyToManyField('assets.Asset', default=dict, verbose_name=_('Assets'))
     # username_group
-    accounts = models.JSONField(verbose_name=_('Account'))
+    accounts = JSONManyToManyField('assets.Account', default=dict, verbose_name=_('Accounts'))
 
     objects = OrgACLManager.from_queryset(UserAssetAccountACLQuerySet)()
 

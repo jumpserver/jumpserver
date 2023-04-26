@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
+import ipaddress
 import json
 
 from django.apps import apps
@@ -291,6 +292,34 @@ class RelatedManager:
         self.value = value
         self.instance.__dict__[self.field.name] = value
 
+    @staticmethod
+    def get_ip_in_q(name, val):
+        q = Q()
+        if isinstance(val, str):
+            val = [val]
+        for ip in val:
+            if not ip:
+                continue
+            try:
+                if ip == '*':
+                    return Q()
+                elif '/' in ip:
+                    network = ipaddress.ip_network(ip)
+                    ips = network.hosts()
+                    q |= Q(**{"{}__in".format(name): ips})
+                elif '-' in ip:
+                    start_ip, end_ip = ip.split('-')
+                    start_ip = ipaddress.ip_address(start_ip)
+                    end_ip = ipaddress.ip_address(end_ip)
+                    q |= Q(**{"{}__range".format(name): (start_ip, end_ip)})
+                elif len(ip.split('.')) == 4:
+                    q |= Q(**{"{}__exact".format(name): ip})
+                else:
+                    q |= Q(**{"{}__startswith".format(name): ip})
+            except ValueError:
+                continue
+        return q
+
     def _get_queryset(self):
         model = apps.get_model(self.field.to)
         value = self.value
@@ -303,20 +332,43 @@ class RelatedManager:
             return model.objects.filter(id__in=value["ids"])
         elif value["type"] == "attrs" and isinstance(value.get("attrs"), list):
             filters = Q()
+            excludes = Q()
             for attr in value["attrs"]:
                 if not isinstance(attr, dict):
                     continue
+
                 name = attr.get('name')
                 val = attr.get('value')
                 match = attr.get('match', 'exact')
+                rel = attr.get('rel', 'and')
                 if name is None or val is None:
                     continue
 
-                lookup = name
-                if match in ("exact", "contains", "startswith", "endswith", "regex"):
+                if val == '*':
+                    filters = Q()
+                    break
+
+                if match == 'ip_in':
+                    q = self.get_ip_in_q(name, val)
+                elif match in ("exact", "contains", "startswith", "endswith", "regex"):
                     lookup = "{}__{}".format(name, match)
-                filters &= Q(**{lookup: val})
-            return model.objects.filter(filters)
+                    q = Q(**{lookup: val})
+                elif match == "in" and isinstance(val, list):
+                    if '*' not in val:
+                        lookup = "{}__in".format(name)
+                        q = Q(**{lookup: val})
+                    else:
+                        q = Q()
+                else:
+                    q = Q(**{name: val})
+
+                if rel == 'or':
+                    filters |= q
+                elif rel == 'not':
+                    excludes |= q
+                else:
+                    filters &= q
+            return model.objects.filter(filters).exclude(excludes)
         else:
             return model.objects.none()
 
@@ -401,19 +453,16 @@ class JSONManyToManyField(models.JSONField):
                 if 'name' not in attr or 'value' not in attr:
                     raise e
 
-    def get_db_prep_value(self, manager, connection, prepared=False):
-        if manager is None:
-            return None
-        v = manager.value
-        self._check_value(v)
-        return json.dumps(v)
+    def get_db_prep_value(self, value, connection, prepared=False):
+        return self.get_prep_value(value)
 
-    def get_prep_value(self, manager):
-        if manager is None:
-            return manager
-        v = manager.value
-        self._check_value(v)
-        return json.dumps(v)
+    def get_prep_value(self, value):
+        if value is None:
+            return None
+        if isinstance(value, RelatedManager):
+            value = value.value
+        self._check_value(value)
+        return json.dumps(value)
 
     def validate(self, value, model_instance):
         super().validate(value, model_instance)
