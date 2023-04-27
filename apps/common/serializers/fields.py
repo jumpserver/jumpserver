@@ -220,8 +220,17 @@ class PhoneField(serializers.CharField):
 
 
 class JSONManyToManyField(serializers.JSONField):
-    def to_representation(self, value):
-        return value.value
+    def to_representation(self, manager):
+        if manager is None:
+            return manager
+        value = manager.value
+        if not isinstance(value, dict):
+            return {"type": "ids", "ids": []}
+        if value.get("type") == "ids":
+            valid_ids = manager.all().values_list("id", flat=True)
+            valid_ids = [str(i) for i in valid_ids]
+            return {"type": "ids", "ids": valid_ids}
+        return value
 
     def to_internal_value(self, data):
         if not data:
