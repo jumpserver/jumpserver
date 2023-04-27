@@ -175,6 +175,8 @@ def _parse_ssh_private_key(text, password=None):
                 dsa.DSAPrivateKey,
                 ed25519.Ed25519PrivateKey,
     """
+    if not bool(password):
+        password = None
     if isinstance(text, str):
         try:
             text = text.encode("utf-8")
