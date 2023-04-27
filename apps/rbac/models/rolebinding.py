@@ -1,9 +1,9 @@
-from django.utils.translation import gettext_lazy as _
-from django.db import models
-from django.db.models import Q
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db import models
+from django.db.models import Q
 from django.db.models.signals import post_save
+from django.utils.translation import gettext_lazy as _
 from rest_framework.serializers import ValidationError
 
 from common.db.models import JMSBaseModel, CASCADE_SIGNAL_SKIP
@@ -109,6 +109,13 @@ class RoleBinding(JMSBaseModel):
     def is_scope_org(self):
         return self.scope == Scope.org
 
+    @staticmethod
+    def orgs_order_by_name(orgs):
+        from orgs.models import Organization
+        default_system_org_ids = [Organization.DEFAULT_ID, Organization.SYSTEM_ID]
+        default_system_orgs = orgs.filter(id__in=default_system_org_ids)
+        return default_system_orgs | orgs.exclude(id__in=default_system_org_ids).order_by('name')
+
     @classmethod
     def get_user_has_the_perm_orgs(cls, perm, user):
         from orgs.models import Organization
@@ -134,6 +141,7 @@ class RoleBinding(JMSBaseModel):
             org_ids = [b.org.id for b in bindings if b.org]
             orgs = all_orgs.filter(id__in=org_ids)
 
+        orgs = cls.orgs_order_by_name(orgs)
         workbench_perm = 'rbac.view_workbench'
         # 全局组织
         if orgs and perm != workbench_perm and user.has_perm('orgs.view_rootorg'):
@@ -183,7 +191,7 @@ class OrgRoleBinding(RoleBinding):
 
 class SystemRoleBindingManager(RoleBindingManager):
     def get_queryset(self):
-        queryset = super(RoleBindingManager, self).get_queryset()\
+        queryset = super(RoleBindingManager, self).get_queryset() \
             .filter(scope=Scope.system)
         return queryset
 
