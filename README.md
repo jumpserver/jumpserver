@@ -74,10 +74,9 @@ JumpServer 是广受欢迎的开源堡垒机，是符合 4A 规范的专业运�
 
 ## 社区
 
-如果您在使用过程中有任何疑问或对建议，欢迎提交 [GitHub Issue](https://github.com/jumpserver/jumpserver/issues/new/choose)
-或加入到我们的社区当中进行进一步交流沟通。
+如果您在使用过程中有任何疑问或对建议，欢迎提交 [GitHub Issue](https://github.com/jumpserver/jumpserver/issues/new/choose)。您也可以到我们的 [社区论坛](https://bbs.fit2cloud.com/c/js/5) 及微信交流群当中进行交流沟通。
 
-### 微信交流群
+**微信交流群**
 
 <img src="https://download.jumpserver.org/images/wecom-group.jpeg" alt="微信群二维码" width="200"/>
 
