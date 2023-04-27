@@ -429,29 +429,29 @@ class JSONManyToManyField(models.JSONField):
         return name, path, args, kwargs
 
     @staticmethod
-    def _check_value(val):
+    def check_value(val):
         if not val:
             return val
-        e = ValueError(
-            'Invalid JSON data for JSONManyToManyField, should be like '
-            '{"type": "all"} or {"type": "ids", "ids": []} '
-            'or {"type": "attrs", "attrs": [{"name": "ip", "match": "exact", "value": "value"}'
-        )
+        e = ValueError(_(
+            "Invalid JSON data for JSONManyToManyField, should be like "
+            "{'type': 'all'} or {'type': 'ids', 'ids': []} "
+            "or {'type': 'attrs', 'attrs': [{'name': 'ip', 'match': 'exact', 'value': 'value'}"
+        ))
         if not isinstance(val, dict):
             raise e
         if val["type"] not in ["all", "ids", "attrs"]:
-            raise e
+            raise ValueError(_('Invalid type, should be "all", "ids" or "attrs"'))
         if val["type"] == "ids":
             if not isinstance(val["ids"], list):
-                raise e
+                raise ValueError(_("Invalid ids for ids, should be a list"))
         elif val["type"] == "attrs":
             if not isinstance(val["attrs"], list):
-                raise e
+                raise ValueError(_("Invalid attrs, should be a list of dict"))
             for attr in val["attrs"]:
                 if not isinstance(attr, dict):
-                    raise e
+                    raise ValueError(_("Invalid attrs, should be a list of dict"))
                 if 'name' not in attr or 'value' not in attr:
-                    raise e
+                    raise ValueError(_("Invalid attrs, should be has name and value"))
 
     def get_db_prep_value(self, value, connection, prepared=False):
         return self.get_prep_value(value)
@@ -461,7 +461,7 @@ class JSONManyToManyField(models.JSONField):
             return None
         if isinstance(value, RelatedManager):
             value = value.value
-        self._check_value(value)
+        self.check_value(value)
         return json.dumps(value)
 
     def validate(self, value, model_instance):

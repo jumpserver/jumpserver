@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.fields import ChoiceField, empty
 
-from common.db.fields import TreeChoices
+from common.db.fields import TreeChoices, JSONManyToManyField as ModelJSONManyToManyField
 from common.local import add_encrypted_field_set
 from common.utils import decrypt_password
 
@@ -20,6 +20,7 @@ __all__ = [
     "TreeChoicesField",
     "LabeledMultipleChoiceField",
     "PhoneField",
+    "JSONManyToManyField"
 ]
 
 
@@ -216,3 +217,17 @@ class PhoneField(serializers.CharField):
             phone = phonenumbers.parse(value, 'CN')
             value = {'code': '+%s' % phone.country_code, 'phone': phone.national_number}
         return value
+
+
+class JSONManyToManyField(serializers.JSONField):
+    def to_representation(self, value):
+        return value.value
+
+    def to_internal_value(self, data):
+        if not data:
+            data = {}
+        try:
+            ModelJSONManyToManyField.check_value(data)
+        except ValueError as e:
+            raise serializers.ValidationError(e)
+        return super().to_internal_value(data)
