@@ -1,6 +1,10 @@
 import abc
+import io
+import re
 from datetime import datetime
 
+import pyzipper
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework.renderers import BaseRenderer
 from rest_framework.utils import encoders, json
@@ -180,9 +184,39 @@ class BaseFileRenderer(BaseRenderer):
             self.write_column_titles(column_titles)
             self.write_rows(rows)
             self.after_render()
-            value = self.get_rendered_value()
+            value = self.compress_into_zip_file(view, request, response)
         except Exception as e:
             logger.debug(e, exc_info=True)
             value = 'Render error! ({})'.format(self.media_type).encode('utf-8')
             return value
         return value
+
+    def compress_into_zip_file(self, view, request, response):
+        value = self.get_rendered_value()
+        from accounts.models import Account
+        if str(view.model) not in (str(Account),) or self.template != 'export':
+            return value
+
+        filename_pattern = re.compile(r'filename="([^"]+)"')
+        content_disposition = response['Content-Disposition']
+        match = filename_pattern.search(content_disposition)
+        filename = match.group(1)
+        response['Content-Disposition'] = content_disposition.replace(self.format, 'zip')
+
+        contents_io = io.BytesIO()
+        secret_key = request.user.secret_key
+        if not secret_key:
+            content = _("{} - The encryption password has not been set - "
+                        "please go to personal information -> file encryption password "
+                        "to set the encryption password").format(request.user.name)
+
+            response['Content-Disposition'] = content_disposition.replace(self.format, 'txt')
+            contents_io.write(content.encode('utf-8'))
+            return contents_io.getvalue()
+
+        with pyzipper.AESZipFile(
+                contents_io, 'w', compression=pyzipper.ZIP_LZMA, encryption=pyzipper.WZ_AES
+        ) as zf:
+            zf.setpassword(secret_key.encode('utf8'))
+            zf.writestr(filename, value)
+        return contents_io.getvalue()
