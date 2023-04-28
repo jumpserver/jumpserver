@@ -122,6 +122,7 @@ class PlatformSerializer(WritableNestedModelSerializer):
         fields_small = fields_mini + [
             "category", "type", "charset",
         ]
+        fields_unexport = ['automation']
         read_only_fields = [
             'internal', 'date_created', 'date_updated',
             'created_by', 'updated_by'
