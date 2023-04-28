@@ -72,12 +72,13 @@ JumpServer 是广受欢迎的开源堡垒机，是符合 4A 规范的专业运�
 - [东方明珠：JumpServer高效管控异构化、分布式云端资产](https://blog.fit2cloud.com/?p=687)
 - [江苏农信：JumpServer堡垒机助力行业云安全运维](https://blog.fit2cloud.com/?p=666)
 
-## 社区
+## 社区交流
 
-如果您在使用过程中有任何疑问或对建议，欢迎提交 [GitHub Issue](https://github.com/jumpserver/jumpserver/issues/new/choose)
-或加入到我们的社区当中进行进一步交流沟通。
+如果您在使用过程中有任何疑问或对建议，欢迎提交 [GitHub Issue](https://github.com/jumpserver/jumpserver/issues/new/choose)。
 
-### 微信交流群
+您也可以到我们的 [社区论坛](https://bbs.fit2cloud.com/c/js/5) 及微信交流群当中进行交流沟通。
+
+**微信交流群**
 
 <img src="https://download.jumpserver.org/images/wecom-group.jpeg" alt="微信群二维码" width="200"/>
 
@@ -107,7 +108,7 @@ JumpServer是一款安全产品，请参考 [基本安全建议](https://docs.ju
 - 邮箱：support@fit2cloud.com
 - 电话：400-052-0755
 
-## 致谢
+## 致谢开源
 
 - [Apache Guacamole](https://guacamole.apache.org/)： Web 页面连接 RDP、SSH、VNC 等协议资产，JumpServer Lion 组件使用到该项目；
 - [OmniDB](https://omnidb.org/)： Web 页面连接使用数据库，JumpServer Web 数据库组件使用到该项目。
