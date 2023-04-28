@@ -24,7 +24,7 @@ class BaseLoginCallbackView(AuthMixin, FlashMessageMixin, View):
         super().__init__()
         self.client_type = None
         self.client_auth_params = {}
-        self.user_type = None
+        self.user_type = ''
         self.auth_backend = None
         self.create_user_if_not_exist_setting = ''
         # 提示信息
