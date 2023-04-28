@@ -30,7 +30,7 @@ class URL:
         return f'{self.host}/open-apis/auth/v3/tenant_access_token/internal/'
 
     @property
-    def get_userinfo_by_code(self):
+    def get_user_info_by_code(self):
         return f'{self.host}/open-apis/authen/v1/access_token'
 
     @property
@@ -106,7 +106,7 @@ class FeiShu(RequestMixin):
             'code': code
         }
 
-        data = self._requests.post(URL().get_userinfo_by_code, json=body, check_errcode_is_0=False)
+        data = self._requests.post(URL().get_user_info_by_code, json=body, check_errcode_is_0=False)
 
         self._requests.check_errcode_is_0(data)
         return data['data']['user_id'], data['data']
