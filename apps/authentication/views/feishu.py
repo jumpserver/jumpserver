@@ -9,7 +9,6 @@ from django.views import View
 from rest_framework.exceptions import APIException
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from authentication import errors
 from authentication.const import ConfirmType
 from authentication.mixins import AuthMixin
 from authentication.notifications import OAuthBindMessage
@@ -18,10 +17,11 @@ from common.permissions import UserConfirmation
 from common.sdk.im.feishu import URL, FeiShu
 from common.utils import FlashMessageUtil, get_logger
 from common.utils.common import get_request_ip
-from common.utils.django import get_object_or_none, reverse
+from common.utils.django import reverse
 from common.utils.random import random_string
-from users.models import User
 from users.views import UserVerifyPasswordView
+
+from .mixins import QRLoginCallbackMixin
 
 logger = get_logger(__file__)
 
@@ -123,7 +123,7 @@ class FeiShuQRBindCallbackView(FeiShuQRMixin, View):
             app_id=settings.FEISHU_APP_ID,
             app_secret=settings.FEISHU_APP_SECRET
         )
-        user_id = feishu.get_user_id_by_code(code)
+        user_id, __ = feishu.get_user_id_by_code(code)
 
         if not user_id:
             msg = _('FeiShu query user failed')
@@ -176,41 +176,17 @@ class FeiShuQRLoginView(FeiShuQRMixin, View):
         return HttpResponseRedirect(url)
 
 
-class FeiShuQRLoginCallbackView(AuthMixin, FeiShuQRMixin, View):
+class FeiShuQRLoginCallbackView(QRLoginCallbackMixin, AuthMixin, FeiShuQRMixin, View):
     permission_classes = (AllowAny,)
 
-    def get(self, request: HttpRequest):
-        code = request.GET.get('code')
-        redirect_url = request.GET.get('redirect_url')
-        login_url = reverse('authentication:login')
+    CLIENT_INFO = (
+        FeiShu, {'app_id': 'FEISHU_APP_ID', 'app_secret': 'FEISHU_APP_SECRET'}
+    )
+    USER_TYPE = 'feishu'
+    AUTH_BACKEND = 'AUTH_BACKEND_FEISHU'
+    CREATE_USER_IF_NOT_EXIST = 'FEISHU_CREATE_USER_IF_NOT_EXIST'
 
-        if not self.verify_state():
-            return self.get_verify_state_failed_response(redirect_url)
-
-        feishu = FeiShu(
-            app_id=settings.FEISHU_APP_ID,
-            app_secret=settings.FEISHU_APP_SECRET
-        )
-        user_id = feishu.get_user_id_by_code(code)
-        if not user_id:
-            # 正常流程不会出这个错误，hack 行为
-            msg = _('Failed to get user from FeiShu')
-            response = self.get_failed_response(login_url, title=msg, msg=msg)
-            return response
-
-        user = get_object_or_none(User, feishu_id=user_id)
-        if user is None:
-            title = _('FeiShu is not bound')
-            msg = _('Please login with a password and then bind the FeiShu')
-            response = self.get_failed_response(login_url, title=title, msg=msg)
-            return response
-
-        try:
-            self.check_oauth2_auth(user, settings.AUTH_BACKEND_FEISHU)
-        except errors.AuthFailedError as e:
-            self.set_login_failed_mark()
-            msg = e.msg
-            response = self.get_failed_response(login_url, title=msg, msg=msg)
-            return response
-
-        return self.redirect_to_guard_view()
+    MSG_CLIENT_ERR = _('FeiShu Error')
+    MSG_USER_NOT_BOUND_ERR = _('FeiShu is not bound')
+    MSG_USER_NEED_BOUND_WARNING = _('Please login with a password and then bind the FeiShu')
+    MSG_NOT_FOUND_USER_FROM_CLIENT_ERR = _('Failed to get user from FeiShu')

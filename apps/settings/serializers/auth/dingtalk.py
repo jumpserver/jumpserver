@@ -13,3 +13,6 @@ class DingTalkSettingSerializer(serializers.Serializer):
     DINGTALK_APPKEY = serializers.CharField(max_length=256, required=True, label='AppKey')
     DINGTALK_APPSECRET = EncryptedField(max_length=256, required=False, label='AppSecret')
     AUTH_DINGTALK = serializers.BooleanField(default=False, label=_('Enable DingTalk Auth'))
+    DINGTALK_CREATE_USER_IF_NOT_EXIST = serializers.BooleanField(
+        default=False, label=_('Create user if not')
+    )
