@@ -10,25 +10,25 @@ from rest_framework.exceptions import APIException
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from authentication.const import ConfirmType
-from authentication.mixins import AuthMixin
 from authentication.notifications import OAuthBindMessage
 from common.views.mixins import PermissionsMixin, UserConfirmRequiredExceptionMixin
 from common.permissions import UserConfirmation
 from common.sdk.im.feishu import URL, FeiShu
-from common.utils import FlashMessageUtil, get_logger
+from common.utils import get_logger
 from common.utils.common import get_request_ip
 from common.utils.django import reverse
 from common.utils.random import random_string
 from users.views import UserVerifyPasswordView
 
-from .mixins import QRLoginCallbackMixin
+from .base import BaseLoginCallbackView
+from .mixins import FlashMessageMixin
 
 logger = get_logger(__file__)
 
 FEISHU_STATE_SESSION_KEY = '_feishu_state'
 
 
-class FeiShuQRMixin(UserConfirmRequiredExceptionMixin, PermissionsMixin, View):
+class FeiShuQRMixin(UserConfirmRequiredExceptionMixin, PermissionsMixin, FlashMessageMixin, View):
     def dispatch(self, request, *args, **kwargs):
         try:
             return super().dispatch(request, *args, **kwargs)
@@ -63,26 +63,6 @@ class FeiShuQRMixin(UserConfirmRequiredExceptionMixin, PermissionsMixin, View):
         url = URL().authen + '?' + urlencode(params)
         return url
 
-    @staticmethod
-    def get_success_response(redirect_url, title, msg):
-        message_data = {
-            'title': title,
-            'message': msg,
-            'interval': 5,
-            'redirect_url': redirect_url,
-        }
-        return FlashMessageUtil.gen_and_redirect_to(message_data)
-
-    @staticmethod
-    def get_failed_response(redirect_url, title, msg):
-        message_data = {
-            'title': title,
-            'error': msg,
-            'interval': 5,
-            'redirect_url': redirect_url,
-        }
-        return FlashMessageUtil.gen_and_redirect_to(message_data)
-
     def get_already_bound_response(self, redirect_url):
         msg = _('FeiShu is already bound')
         response = self.get_failed_response(redirect_url, msg, msg)
@@ -93,7 +73,6 @@ class FeiShuQRBindView(FeiShuQRMixin, View):
     permission_classes = (IsAuthenticated, UserConfirmation.require(ConfirmType.ReLogin))
 
     def get(self, request: HttpRequest):
-        user = request.user
         redirect_url = request.GET.get('redirect_url')
 
         redirect_uri = reverse('authentication:feishu-qr-bind-callback', external=True)
@@ -176,17 +155,18 @@ class FeiShuQRLoginView(FeiShuQRMixin, View):
         return HttpResponseRedirect(url)
 
 
-class FeiShuQRLoginCallbackView(QRLoginCallbackMixin, AuthMixin, FeiShuQRMixin, View):
+class FeiShuQRLoginCallbackView(FeiShuQRMixin, BaseLoginCallbackView):
     permission_classes = (AllowAny,)
 
-    CLIENT_INFO = (
-        FeiShu, {'app_id': 'FEISHU_APP_ID', 'app_secret': 'FEISHU_APP_SECRET'}
-    )
-    USER_TYPE = 'feishu'
-    AUTH_BACKEND = 'AUTH_BACKEND_FEISHU'
-    CREATE_USER_IF_NOT_EXIST = 'FEISHU_CREATE_USER_IF_NOT_EXIST'
+    def __init__(self):
+        super(FeiShuQRLoginCallbackView, self).__init__()
+        self.client_type = FeiShu
+        self.client_auth_params = {'app_id': 'FEISHU_APP_ID', 'app_secret': 'FEISHU_APP_SECRET'}
+        self.user_type = 'feishu'
+        self.auth_backend = 'AUTH_BACKEND_FEISHU'
+        self.create_user_if_not_exist_setting = 'FEISHU_CREATE_USER_IF_NOT_EXIST'
 
-    MSG_CLIENT_ERR = _('FeiShu Error')
-    MSG_USER_NOT_BOUND_ERR = _('FeiShu is not bound')
-    MSG_USER_NEED_BOUND_WARNING = _('Please login with a password and then bind the FeiShu')
-    MSG_NOT_FOUND_USER_FROM_CLIENT_ERR = _('Failed to get user from FeiShu')
+        self.msg_client_err = _('FeiShu Error')
+        self.msg_user_not_bound_err = _('FeiShu is not bound')
+        self.msg_user_need_bound_warning = _('Please login with a password and then bind the FeiShu')
+        self.msg_not_found_user_from_client_err = _('Failed to get user from FeiShu')

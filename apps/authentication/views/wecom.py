@@ -23,14 +23,15 @@ from authentication.mixins import AuthMixin
 from authentication.const import ConfirmType
 from authentication.notifications import OAuthBindMessage
 
-from .mixins import METAMixin, QRLoginCallbackMixin
+from .base import BaseLoginCallbackView
+from .mixins import METAMixin, FlashMessageMixin
 
 logger = get_logger(__file__)
 
 WECOM_STATE_SESSION_KEY = '_wecom_state'
 
 
-class WeComBaseMixin(UserConfirmRequiredExceptionMixin, PermissionsMixin, View):
+class WeComBaseMixin(UserConfirmRequiredExceptionMixin, PermissionsMixin, FlashMessageMixin, View):
     def dispatch(self, request, *args, **kwargs):
         try:
             return super().dispatch(request, *args, **kwargs)
@@ -55,26 +56,6 @@ class WeComBaseMixin(UserConfirmRequiredExceptionMixin, PermissionsMixin, View):
     def get_verify_state_failed_response(self, redirect_uri):
         msg = _("The system configuration is incorrect. Please contact your administrator")
         return self.get_failed_response(redirect_uri, msg, msg)
-
-    @staticmethod
-    def get_success_response(redirect_url, title, msg):
-        message_data = {
-            'title': title,
-            'message': msg,
-            'interval': 5,
-            'redirect_url': redirect_url,
-        }
-        return FlashMessageUtil.gen_and_redirect_to(message_data)
-
-    @staticmethod
-    def get_failed_response(redirect_url, title, msg):
-        message_data = {
-            'title': title,
-            'error': msg,
-            'interval': 5,
-            'redirect_url': redirect_url,
-        }
-        return FlashMessageUtil.gen_and_redirect_to(message_data)
 
     def get_already_bound_response(self, redirect_url):
         msg = _('WeCom is already bound')
@@ -209,20 +190,21 @@ class WeComQRLoginView(WeComQRMixin, METAMixin, View):
         return HttpResponseRedirect(url)
 
 
-class WeComQRLoginCallbackView(QRLoginCallbackMixin, AuthMixin, WeComQRMixin, View):
+class WeComQRLoginCallbackView(WeComQRMixin, BaseLoginCallbackView):
     permission_classes = (AllowAny,)
 
-    CLIENT_INFO = (
-        WeCom, {'corpid': 'WECOM_CORPID', 'corpsecret': 'WECOM_SECRET', 'agentid': 'WECOM_AGENTID'}
-    )
-    USER_TYPE = 'wecom'
-    AUTH_BACKEND = 'AUTH_BACKEND_WECOM'
-    CREATE_USER_IF_NOT_EXIST = 'WECOM_CREATE_USER_IF_NOT_EXIST'
+    def __init__(self):
+        super(WeComQRLoginCallbackView, self).__init__()
+        self.client_type = WeCom
+        self.client_auth_params = {'corpid': 'WECOM_CORPID', 'corpsecret': 'WECOM_SECRET', 'agentid': 'WECOM_AGENTID'}
+        self.user_type = 'wecom'
+        self.auth_backend = 'AUTH_BACKEND_WECOM'
+        self.create_user_if_not_exist_setting = 'WECOM_CREATE_USER_IF_NOT_EXIST'
 
-    MSG_CLIENT_ERR = _('WeCom Error')
-    MSG_USER_NOT_BOUND_ERR = _('WeCom is not bound')
-    MSG_USER_NEED_BOUND_WARNING = _('Please login with a password and then bind the WeCom')
-    MSG_NOT_FOUND_USER_FROM_CLIENT_ERR = _('Failed to get user from WeCom')
+        self.msg_client_err = _('WeCom Error')
+        self.msg_user_not_bound_err = _('WeCom is not bound')
+        self.msg_user_need_bound_warning = _('Please login with a password and then bind the WeCom')
+        self.msg_not_found_user_from_client_err = _('Failed to get user from WeCom')
 
 
 class WeComOAuthLoginView(WeComOAuthMixin, View):
