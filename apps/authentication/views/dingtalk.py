@@ -16,7 +16,7 @@ from authentication.notifications import OAuthBindMessage
 from common.views.mixins import PermissionsMixin, UserConfirmRequiredExceptionMixin
 from common.permissions import UserConfirmation
 from common.sdk.im.dingtalk import URL, DingTalk
-from common.utils import FlashMessageUtil, get_logger
+from common.utils import get_logger
 from common.utils.common import get_request_ip
 from common.utils.django import get_object_or_none, reverse
 from common.utils.random import random_string
