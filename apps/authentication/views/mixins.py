@@ -21,7 +21,7 @@ class FlashMessageMixin:
         return FlashMessageUtil.gen_and_redirect_to(message_data)
 
     def get_success_response(self, redirect_url, title, msg):
-        self.get_response(redirect_url, title, msg)
+        return self.get_response(redirect_url, title, msg)
 
     def get_failed_response(self, redirect_url, title, msg):
-        self.get_response(redirect_url, title, msg, 'error')
+        return self.get_response(redirect_url, title, msg, 'error')
