@@ -10,7 +10,7 @@ from rest_framework.exceptions import APIException
 
 from users.models import User
 from users.views import UserVerifyPasswordView
-from common.utils import get_logger, FlashMessageUtil
+from common.utils import get_logger
 from common.utils.random import random_string
 from common.utils.django import reverse, get_object_or_none
 from common.sdk.im.wecom import URL
