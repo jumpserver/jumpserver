@@ -19,3 +19,6 @@ class FeiShuSettingSerializer(serializers.Serializer):
     FEISHU_VERSION = serializers.ChoiceField(
         choices=VERSION_CHOICES, default='feishu', label=_('Version')
     )
+    FEISHU_CREATE_USER_IF_NOT_EXIST = serializers.BooleanField(
+        default=False, label=_('Create user if not')
+    )
