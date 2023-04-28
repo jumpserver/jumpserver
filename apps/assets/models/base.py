@@ -89,8 +89,7 @@ class AuthMixin:
     def private_key_file(self):
         if not self.private_key:
             return None
-        private_key_str = parse_ssh_private_key_str(self.private_key,
-                                                    password=self.password)
+        private_key_str = self.get_private_key()
         if not private_key_str:
             return None
         project_dir = settings.PROJECT_DIR
@@ -106,8 +105,11 @@ class AuthMixin:
     def get_private_key(self):
         if not self.private_key:
             return None
-        return parse_ssh_private_key_str(self.private_key,
-                                         password=self.password)
+        private_key_str = parse_ssh_private_key_str(self.private_key, password=self.password)
+        if not private_key_str and self.password:
+            # 由于历史原因，密码可能是真实的密码，而非私钥的 passphrase，所以这里再尝试一次
+            private_key_str = parse_ssh_private_key_str(self.private_key)
+        return private_key_str
 
     @property
     def public_key_obj(self):
