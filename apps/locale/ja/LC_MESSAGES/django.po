@@ -6058,7 +6058,7 @@ msgstr "端末の状態を定期的にクリーンアップする"
 
 #: terminal/tasks.py:37
 msgid "Clean orphan session"
-msgstr "孤立したセッションをクリアする"
+msgstr "オフライン セッションをクリアする"
 
 #: terminal/tasks.py:56
 msgid "Upload session replay to external storage"
