@@ -161,11 +161,12 @@ def migrate_db_accounts(apps, schema_editor):
                     name = f'{username}(token)'
                 else:
                     secret_type = attr
-                    name = username
+                    name = username or f'{username}(password)'
                 auth_infos.append((name, secret_type, secret))
 
             if not auth_infos:
-                auth_infos.append((username, 'password', ''))
+                name = username or f'{username}(password)'
+                auth_infos.append((name, 'password', ''))
 
             for name, secret_type, secret in auth_infos:
                 values['name'] = name
