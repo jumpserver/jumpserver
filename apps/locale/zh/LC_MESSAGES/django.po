@@ -5979,7 +5979,7 @@ msgstr "周期清理终端状态"
 
 #: terminal/tasks.py:37
 msgid "Clean orphan session"
-msgstr "清除孤儿会话"
+msgstr "清除离线会话"
 
 #: terminal/tasks.py:56
 msgid "Upload session replay to external storage"
