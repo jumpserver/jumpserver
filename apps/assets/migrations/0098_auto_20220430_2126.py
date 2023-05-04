@@ -26,7 +26,7 @@ def migrate_database_to_asset(apps, *args):
     platform_model = apps.get_model('assets', 'Platform')
 
     applications = app_model.objects.filter(category='db')
-    platforms = platform_model.objects.all().filter(internal=True)
+    platforms = platform_model.objects.all().filter(internal=True).exclude(name='Redis6+')
     platforms_map = {p.type: p for p in platforms}
     print()
 
