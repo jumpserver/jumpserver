@@ -1,4 +1,6 @@
 import abc
+import re
+from collections import defaultdict
 from urllib.parse import parse_qsl
 
 from django.conf import settings
@@ -11,6 +13,7 @@ from rest_framework.response import Response
 
 from accounts.const import AliasAccount
 from assets.api import SerializeToTreeNodeMixin
+from assets.const import AllTypes
 from assets.models import Asset
 from assets.utils import KubernetesTree
 from authentication.models import ConnectionToken
@@ -26,7 +29,8 @@ from ..mixin import SelfOrPKUserMixin
 __all__ = [
     'UserGrantedK8sAsTreeApi',
     'UserPermedNodesWithAssetsAsTreeApi',
-    'UserPermedNodeChildrenWithAssetsAsTreeApi'
+    'UserPermedNodeChildrenWithAssetsAsTreeApi',
+    'UserPermedNodeChildrenWithAssetsAsCategoryTreeApi',
 ]
 
 
@@ -135,6 +139,75 @@ class UserPermedNodeChildrenWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
     @lazyproperty
     def node_key_for_serialize_assets(self):
         return self.query_node_key or self.default_unfolded_node_key
+
+
+class UserPermedNodeChildrenWithAssetsAsCategoryTreeApi(
+    SelfOrPKUserMixin, SerializeToTreeNodeMixin, ListAPIView
+):
+    @property
+    def is_sync(self):
+        sync = self.request.query_params.get('sync', 0)
+        return int(sync) == 1
+
+    @property
+    def tp(self):
+        return self.request.query_params.get('type')
+
+    def get_assets(self):
+        query_asset_util = UserPermAssetUtil(self.user)
+        node = PermNode.objects.filter(
+            granted_node_rels__user=self.user, parent_key='').first()
+        if node:
+            __, assets = query_asset_util.get_node_all_assets(node.id)
+        else:
+            assets = Asset.objects.none()
+        return assets
+
+    def to_tree_nodes(self, assets):
+        if not assets:
+            return []
+        assets = assets.annotate(tp=F('platform__type'))
+        asset_type_map = defaultdict(list)
+        for asset in assets:
+            asset_type_map[asset.tp].append(asset)
+        tp = self.tp
+        if tp:
+            assets = asset_type_map.get(tp, [])
+            if not assets:
+                return []
+            pid = f'ROOT_{str(assets[0].category).upper()}_{tp}'
+            return self.serialize_assets(assets, pid=pid)
+
+        resource_platforms = assets.values_list('platform_id', flat=True)
+        node_all = AllTypes.get_tree_nodes(resource_platforms)
+        pattern = re.compile(r'\(0\)?')
+        nodes = []
+        for node in node_all:
+            meta = node.get('meta', {})
+            if pattern.search(node['name']) or meta.get('type') == 'platform':
+                continue
+            _type = meta.get('_type')
+            if _type:
+                node['type'] = _type
+            nodes.append(node)
+
+        if not self.is_sync:
+            return nodes
+
+        asset_nodes = []
+        for node in nodes:
+            node['open'] = True
+            tp = node.get('meta', {}).get('_type')
+            if not tp:
+                continue
+            assets = asset_type_map.get(tp, [])
+            asset_nodes += self.serialize_assets(assets, pid=node['id'])
+        return nodes + asset_nodes
+
+    def list(self, request, *args, **kwargs):
+        assets = self.get_assets()
+        nodes = self.to_tree_nodes(assets)
+        return Response(data=nodes)
 
 
 class UserGrantedK8sAsTreeApi(SelfOrPKUserMixin, ListAPIView):

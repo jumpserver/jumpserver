@@ -1,14 +1,10 @@
-from assets.models import FavoriteAsset, Asset
-
 from django.conf import settings
 from django.db.models import Q
 
+from assets.models import FavoriteAsset, Asset
 from common.utils.common import timeit
-
 from perms.models import AssetPermission, PermNode, UserAssetGrantedTreeNodeRelation
-
 from .permission import AssetPermissionUtil
-
 
 __all__ = ['AssetPermissionPermAssetUtil', 'UserPermAssetUtil', 'UserPermNodeUtil']
 
