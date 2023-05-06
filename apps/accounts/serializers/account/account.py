@@ -91,7 +91,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
 
         self._template = template
         # Set initial data from template
-        ignore_fields = ['id', 'date_created', 'date_updated', 'org_id']
+        ignore_fields = ['id', 'date_created', 'date_updated', 'su_from', 'org_id']
         field_names = [
             field.name for field in template._meta.fields
             if field.name not in ignore_fields
@@ -151,6 +151,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         template = self._template
         if template is None:
             return
+
         validated_data['source'] = Source.TEMPLATE
         validated_data['source_id'] = str(template.id)
 
@@ -238,6 +239,9 @@ class AssetAccountBulkSerializerResultSerializer(serializers.Serializer):
 class AssetAccountBulkSerializer(
     AccountCreateUpdateSerializerMixin, AuthValidateMixin, serializers.ModelSerializer
 ):
+    su_from_username = serializers.CharField(
+        max_length=128, required=False, write_only=True, allow_null=True, label=_("Su from")
+    )
     assets = serializers.PrimaryKeyRelatedField(queryset=Asset.objects, many=True, label=_('Assets'))
 
     class Meta:
@@ -245,7 +249,7 @@ class AssetAccountBulkSerializer(
         fields = [
             'name', 'username', 'secret', 'secret_type',
             'privileged', 'is_active', 'comment', 'template',
-            'on_invalid', 'push_now', 'assets',
+            'on_invalid', 'push_now', 'assets', 'su_from_username'
         ]
         extra_kwargs = {
             'name': {'required': False},
@@ -293,8 +297,20 @@ class AssetAccountBulkSerializer(
             raise serializers.ValidationError(_('Account already exists'))
         return instance, True, 'created'
 
+    def generate_su_from_data(self, validated_data):
+        template = self._template
+        asset = validated_data['asset']
+        su_from = validated_data.get('su_from')
+        su_from_username = validated_data.pop('su_from_username', None)
+        if template:
+            su_from = template.get_su_from_account()
+        elif su_from_username:
+            su_from = asset.accounts.filter(username=su_from_username).first()
+        validated_data['su_from'] = su_from
+
     def perform_create(self, vd, handler):
         lookup = self.get_filter_lookup(vd)
+        self.generate_su_from_data(vd)
         try:
             instance, changed, state = handler(vd, lookup)
         except IntegrityError:
