@@ -44,25 +44,12 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
         model = AssetPermission
         fields_mini = ["id", "name"]
         fields_generic = [
-            "accounts",
-            "actions",
-            "created_by",
-            "date_created",
-            "date_start",
-            "date_expired",
-            "is_active",
-            "is_expired",
-            "is_valid",
-            "comment",
-            "from_ticket",
+            "accounts", "actions", "created_by", "date_created",
+            "date_start", "date_expired", "is_active", "is_expired",
+            "is_valid", "comment", "from_ticket",
         ]
         fields_small = fields_mini + fields_generic
-        fields_m2m = [
-            "users",
-            "user_groups",
-            "assets",
-            "nodes",
-        ]
+        fields_m2m = ["users", "user_groups", "assets", "nodes"]
         fields = fields_mini + fields_m2m + fields_generic
         read_only_fields = ["created_by", "date_created", "from_ticket"]
         extra_kwargs = {
@@ -91,7 +78,8 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
     def create_accounts(self, assets):
         need_create_accounts = []
         account_attribute = [
-            'name', 'username', 'secret_type', 'secret', 'privileged', 'is_active', 'org_id'
+            'name', 'username', 'secret_type', 'secret',
+            'privileged', 'is_active', 'org_id'
         ]
         for asset in assets:
             asset_exist_accounts = Account.objects.none()
@@ -139,10 +127,7 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
     def setup_eager_loading(cls, queryset):
         """Perform necessary eager loading of data."""
         queryset = queryset.prefetch_related(
-            "users",
-            "user_groups",
-            "assets",
-            "nodes",
+            "users", "user_groups", "assets", "nodes",
         )
         return queryset
 

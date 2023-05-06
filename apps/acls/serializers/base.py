@@ -20,7 +20,7 @@ class ACLUsersSerializer(serializers.Serializer):
     )
 
 
-class ACLAssestsSerializer(serializers.Serializer):
+class ACLAssetsSerializer(serializers.Serializer):
     address_group_help_text = _(
         "With * indicating a match all. "
         "Such as: "
@@ -54,7 +54,7 @@ class ACLAccountsSerializer(serializers.Serializer):
 class BaseUserAssetAccountACLSerializerMixin(serializers.Serializer):
     users = JSONManyToManyField(label=_('User'))
     assets = JSONManyToManyField(label=_('Asset'))
-    accounts = JSONManyToManyField(label=_('Account'))
+    accounts = serializers.ListField(label=_('Account'))
     reviewers = ObjectRelatedField(
         queryset=User.objects, many=True, required=False, label=_('Reviewers')
     )

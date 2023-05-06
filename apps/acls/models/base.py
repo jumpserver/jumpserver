@@ -95,35 +95,12 @@ class BaseACL(JMSBaseModel):
 
 
 class UserAssetAccountBaseACL(BaseACL, OrgModelMixin):
-    # username_group
     users = JSONManyToManyField('users.User', default=dict, verbose_name=_('Users'))
-    # name_group, address_group
     assets = JSONManyToManyField('assets.Asset', default=dict, verbose_name=_('Assets'))
-    # username_group
-    accounts = JSONManyToManyField('assets.Account', default=dict, verbose_name=_('Accounts'))
+    accounts = models.JSONField(default=list, verbose_name=_("Account"))
 
     objects = OrgACLManager.from_queryset(UserAssetAccountACLQuerySet)()
 
     class Meta(BaseACL.Meta):
         unique_together = ('name', 'org_id')
         abstract = True
-
-    @classmethod
-    def filter_queryset(cls, user=None, asset=None, account=None, account_username=None, **kwargs):
-        queryset = cls.objects.all()
-        org_id = None
-        if user:
-            queryset = queryset.filter_user(user.username)
-        if account:
-            org_id = account.org_id
-            queryset = queryset.filter_account(account.username)
-        if account_username:
-            queryset = queryset.filter_account(username=account_username)
-        if asset:
-            org_id = asset.org_id
-            queryset = queryset.filter_asset(asset.name, asset.address)
-        if org_id:
-            kwargs['org_id'] = org_id
-        if kwargs:
-            queryset = queryset.filter(**kwargs)
-        return queryset

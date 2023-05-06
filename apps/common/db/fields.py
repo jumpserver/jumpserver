@@ -353,6 +353,8 @@ class RelatedManager:
                 elif match in ("exact", "contains", "startswith", "endswith", "regex"):
                     lookup = "{}__{}".format(name, match)
                     q = Q(**{lookup: val})
+                elif match == "not":
+                    q = ~Q(**{name: val})
                 elif match == "in" and isinstance(val, list):
                     if '*' not in val:
                         lookup = "{}__in".format(name)
@@ -435,7 +437,7 @@ class JSONManyToManyField(models.JSONField):
         e = ValueError(_(
             "Invalid JSON data for JSONManyToManyField, should be like "
             "{'type': 'all'} or {'type': 'ids', 'ids': []} "
-            "or {'type': 'attrs', 'attrs': [{'name': 'ip', 'match': 'exact', 'value': 'value'}"
+            "or {'type': 'attrs', 'attrs': [{'name': 'ip', 'match': 'exact', 'value': 'value', 'rel': 'and|or|not'}}"
         ))
         if not isinstance(val, dict):
             raise e
