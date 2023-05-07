@@ -48,8 +48,8 @@ class Session(OrgModelMixin):
 
     upload_to = 'replay'
     ACTIVE_CACHE_KEY_PREFIX = 'SESSION_ACTIVE_{}'
-    SUFFIX_MAP = {1: '.gz', 2: '.replay.gz', 3: '.cast.gz'}
-    DEFAULT_SUFFIXES = ['.replay.gz', '.cast.gz', '.gz']
+    SUFFIX_MAP = {1: '.gz', 2: '.replay.gz', 3: '.cast.gz', 4: '.replay.mp4'}
+    DEFAULT_SUFFIXES = ['.replay.gz', '.cast.gz', '.gz', '.replay.mp4']
 
     # Todo: 将来干掉 local_path, 使用 default storage 实现
     def get_all_possible_local_path(self):
