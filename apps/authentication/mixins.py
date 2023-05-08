@@ -225,6 +225,7 @@ class MFAMixin:
         self.request.session['auth_mfa_time'] = time.time()
         self.request.session['auth_mfa_required'] = 0
         self.request.session['auth_mfa_type'] = mfa_type
+        MFABlockUtils(self.request.user.username, self.get_request_ip()).clean_failed_count()
 
     def clean_mfa_mark(self):
         keys = ['auth_mfa', 'auth_mfa_time', 'auth_mfa_required', 'auth_mfa_type']
@@ -369,7 +370,7 @@ class AuthACLMixin:
     def check_user_login_confirm(self):
         ticket = self.get_ticket()
         if not ticket:
-            raise errors.LoginConfirmOtherError('', "Not found")
+            raise errors.LoginConfirmOtherError('', "Not found", '')
         elif ticket.is_state(ticket.State.approved):
             self.request.session["auth_confirm_required"] = ''
             return
@@ -512,4 +513,20 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
         args = self.request.META.get('QUERY_STRING', '')
         if args:
             guard_url = "%s?%s" % (guard_url, args)
-        return redirect(guard_url)
+        response = redirect(guard_url)
+        self.set_browser_default_language_if_need(response)
+        return response
+
+    def set_browser_default_language_if_need(self, response):
+        # en, ja, zh-CN,zh;q=0.9
+        browser_lang = self.request.headers.get('Accept-Language', '')
+        # 浏览器首选语言
+        if browser_lang.startswith('en'):
+            browser_lang = 'en'
+        elif browser_lang.startswith('ja'):
+            browser_lang = 'ja'
+        else:
+            browser_lang = 'zh'
+        request_lang = self.request.LANGUAGE_CODE
+        lang = request_lang or browser_lang
+        response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang)

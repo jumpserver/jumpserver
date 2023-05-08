@@ -61,6 +61,18 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
             return response
         if not request.session.get('auth_third_party_required'):
             return response
+
+        white_urls = [
+            'jsi18n/', '/static/',
+            'login/guard', 'login/wait-confirm',
+            'login-confirm-ticket/status',
+            'settings/public/open',
+            'core/auth/login', 'core/auth/logout'
+        ]
+        for url in white_urls:
+            if request.path.find(url) > -1:
+                return response
+
         ip = get_request_ip(request)
         try:
             self.request = request
@@ -88,7 +100,6 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
                 guard_url = "%s?%s" % (guard_url, args)
             response = redirect(guard_url)
         finally:
-            request.session.pop('auth_third_party_required', '')
             return response
 
 

@@ -119,7 +119,7 @@ class OAuth2Backend(JMSModelBackend):
 
         headers = {
             'Accept': 'application/json',
-            'Authorization': 'token {}'.format(response_data.get('access_token', ''))
+            'Authorization': 'Bearer {}'.format(response_data.get('access_token', ''))
         }
 
         logger.debug(log_prompt.format('Get userinfo endpoint'))

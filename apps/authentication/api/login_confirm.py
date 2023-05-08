@@ -20,6 +20,7 @@ class TicketStatusApi(mixins.AuthMixin, APIView):
         try:
             self.check_user_login_confirm()
             self.request.session['auth_third_party_done'] = 1
+            self.request.session.pop('auth_third_party_required', '')
             return Response({"msg": "ok"})
         except errors.LoginConfirmOtherError as e:
             reason = e.msg

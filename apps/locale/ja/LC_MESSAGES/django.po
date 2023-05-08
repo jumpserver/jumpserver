@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-13 15:01+0800\n"
+"POT-Creation-Date: 2023-03-02 12:21+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,7 +24,7 @@ msgstr "Acls"
 
 #: acls/models/base.py:25 acls/serializers/login_asset_acl.py:47
 #: applications/models/application.py:219 assets/models/asset.py:138
-#: assets/models/base.py:173 assets/models/cluster.py:18
+#: assets/models/base.py:177 assets/models/cluster.py:18
 #: assets/models/cmd_filter.py:27 assets/models/domain.py:23
 #: assets/models/group.py:20 assets/models/label.py:18 ops/mixin.py:24
 #: orgs/models.py:70 perms/models/base.py:83 rbac/models/role.py:29
@@ -55,7 +55,7 @@ msgstr "アクティブ"
 
 #: acls/models/base.py:32 applications/models/application.py:232
 #: assets/models/asset.py:143 assets/models/asset.py:231
-#: assets/models/backup.py:54 assets/models/base.py:178
+#: assets/models/backup.py:54 assets/models/base.py:182
 #: assets/models/cluster.py:29 assets/models/cmd_filter.py:52
 #: assets/models/cmd_filter.py:100 assets/models/domain.py:24
 #: assets/models/domain.py:65 assets/models/group.py:23
@@ -155,7 +155,7 @@ msgid "Format for comma-delimited string, with * indicating a match all. "
 msgstr "コンマ区切り文字列の形式。* はすべて一致することを示します。"
 
 #: acls/serializers/login_acl.py:15 acls/serializers/login_asset_acl.py:17
-#: acls/serializers/login_asset_acl.py:51 assets/models/base.py:174
+#: acls/serializers/login_asset_acl.py:51 assets/models/base.py:178
 #: assets/models/gathered_user.py:15 audits/models.py:139
 #: authentication/forms.py:25 authentication/forms.py:27
 #: authentication/models.py:260
@@ -186,7 +186,7 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
-#: settings/serializers/terminal.py:10 terminal/serializers/endpoint.py:54
+#: settings/serializers/terminal.py:10 terminal/serializers/endpoint.py:58
 msgid "IP"
 msgstr "IP"
 
@@ -353,7 +353,7 @@ msgid "Type display"
 msgstr "タイプ表示"
 
 #: applications/serializers/application.py:105 assets/models/asset.py:230
-#: assets/models/base.py:179 assets/models/cluster.py:26
+#: assets/models/base.py:183 assets/models/cluster.py:26
 #: assets/models/cmd_filter.py:53 assets/models/domain.py:26
 #: assets/models/gathered_user.py:19 assets/models/group.py:22
 #: assets/models/label.py:25 assets/serializers/account.py:18
@@ -367,7 +367,7 @@ msgstr "タイプ表示"
 msgid "Date created"
 msgstr "作成された日付"
 
-#: applications/serializers/application.py:106 assets/models/base.py:180
+#: applications/serializers/application.py:106 assets/models/base.py:184
 #: assets/models/cmd_filter.py:54 assets/models/gathered_user.py:20
 #: assets/serializers/account.py:21 assets/serializers/cmd_filter.py:29
 #: assets/serializers/cmd_filter.py:49 common/db/models.py:117
@@ -650,7 +650,7 @@ msgstr "資産番号"
 msgid "Labels"
 msgstr "ラベル"
 
-#: assets/models/asset.py:229 assets/models/base.py:181
+#: assets/models/asset.py:229 assets/models/base.py:185
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:56
 #: assets/models/cmd_filter.py:103 assets/models/group.py:21
 #: common/db/models.py:114 common/mixins/models.py:49 orgs/models.py:71
@@ -786,32 +786,32 @@ msgstr "成功は"
 msgid "Account backup execution"
 msgstr "アカウントバックアップの実行"
 
-#: assets/models/base.py:28 assets/tasks/const.py:51 audits/const.py:5
+#: assets/models/base.py:29 assets/tasks/const.py:51 audits/const.py:5
 #: common/utils/ip/geoip/utils.py:31 common/utils/ip/geoip/utils.py:37
 #: common/utils/ip/utils.py:84
 msgid "Unknown"
 msgstr "不明"
 
-#: assets/models/base.py:29
+#: assets/models/base.py:30
 msgid "Ok"
 msgstr "OK"
 
-#: assets/models/base.py:30 audits/models.py:136
+#: assets/models/base.py:31 audits/models.py:136
 #: xpack/plugins/change_auth_plan/serializers/app.py:88
 #: xpack/plugins/change_auth_plan/serializers/asset.py:199
 #: xpack/plugins/cloud/const.py:41
 msgid "Failed"
 msgstr "失敗しました"
 
-#: assets/models/base.py:36 assets/serializers/domain.py:47
+#: assets/models/base.py:37 assets/serializers/domain.py:47
 msgid "Connectivity"
 msgstr "接続性"
 
-#: assets/models/base.py:38 authentication/models.py:263
+#: assets/models/base.py:39 authentication/models.py:263
 msgid "Date verified"
 msgstr "確認済みの日付"
 
-#: assets/models/base.py:175 assets/serializers/base.py:14
+#: assets/models/base.py:179 assets/serializers/base.py:14
 #: assets/serializers/base.py:37 assets/serializers/system_user.py:29
 #: audits/signal_handlers.py:58 authentication/confirm/password.py:9
 #: authentication/forms.py:32
@@ -829,14 +829,14 @@ msgstr "確認済みの日付"
 msgid "Password"
 msgstr "パスワード"
 
-#: assets/models/base.py:176 assets/serializers/base.py:41
+#: assets/models/base.py:180 assets/serializers/base.py:41
 #: xpack/plugins/change_auth_plan/models/asset.py:53
 #: xpack/plugins/change_auth_plan/models/asset.py:130
 #: xpack/plugins/change_auth_plan/models/asset.py:206
 msgid "SSH private key"
 msgstr "SSH秘密鍵"
 
-#: assets/models/base.py:177 xpack/plugins/change_auth_plan/models/asset.py:56
+#: assets/models/base.py:181 xpack/plugins/change_auth_plan/models/asset.py:56
 #: xpack/plugins/change_auth_plan/models/asset.py:126
 #: xpack/plugins/change_auth_plan/models/asset.py:202
 msgid "SSH public key"
@@ -954,7 +954,7 @@ msgstr "テストゲートウェイ"
 msgid "Unable to connect to port {port} on {ip}"
 msgstr "{ip} でポート {port} に接続できません"
 
-#: assets/models/domain.py:134 authentication/middleware.py:75
+#: assets/models/domain.py:134 authentication/middleware.py:87
 #: xpack/plugins/cloud/providers/fc.py:48
 msgid "Authentication failed"
 msgstr "認証に失敗しました"
@@ -1722,7 +1722,7 @@ msgid "Authentication"
 msgstr "認証"
 
 #: authentication/backends/custom.py:58
-#: authentication/backends/oauth2/backends.py:158 authentication/models.py:158
+#: authentication/backends/oauth2/backends.py:167 authentication/models.py:158
 msgid "User invalid, disabled or expired"
 msgstr "ユーザーが無効、無効、または期限切れです"
 
@@ -1937,15 +1937,15 @@ msgstr "本を飛ばすは拘束されていません"
 msgid "Your password is invalid"
 msgstr "パスワードが無効です"
 
-#: authentication/errors/redirect.py:85 authentication/mixins.py:306
+#: authentication/errors/redirect.py:85 authentication/mixins.py:307
 msgid "Your password is too simple, please change it for security"
 msgstr "パスワードがシンプルすぎるので、セキュリティのために変更してください"
 
-#: authentication/errors/redirect.py:93 authentication/mixins.py:313
+#: authentication/errors/redirect.py:93 authentication/mixins.py:314
 msgid "You should to change your password before login"
 msgstr "ログインする前にパスワードを変更する必要があります"
 
-#: authentication/errors/redirect.py:101 authentication/mixins.py:320
+#: authentication/errors/redirect.py:101 authentication/mixins.py:321
 msgid "Your password has expired, please reset before logging in"
 msgstr ""
 "パスワードの有効期限が切れました。ログインする前にリセットしてください。"
@@ -2044,15 +2044,15 @@ msgstr "電話番号を設定して有効にする"
 msgid "Clear phone number to disable"
 msgstr "無効にする電話番号をクリアする"
 
-#: authentication/middleware.py:76 settings/utils/ldap.py:652
+#: authentication/middleware.py:88 settings/utils/ldap.py:652
 msgid "Authentication failed (before login check failed): {}"
 msgstr "認証に失敗しました (ログインチェックが失敗する前): {}"
 
-#: authentication/mixins.py:256
+#: authentication/mixins.py:257
 msgid "The MFA type ({}) is not enabled"
 msgstr "MFAタイプ ({}) が有効になっていない"
 
-#: authentication/mixins.py:296
+#: authentication/mixins.py:297
 msgid "Please change your password"
 msgstr "パスワードを変更してください"
 
@@ -4739,8 +4739,8 @@ msgstr "期限切れです。"
 #, python-format
 msgid ""
 "\n"
-"                Your password has expired, please click <a href="
-"\"%(user_password_update_url)s\"> this link </a> update password.\n"
+"                Your password has expired, please click <a "
+"href=\"%(user_password_update_url)s\"> this link </a> update password.\n"
 "            "
 msgstr ""
 "\n"
@@ -4761,34 +4761,34 @@ msgid ""
 "            "
 msgstr ""
 "\n"
-"                クリックしてください <a href=\"%(user_password_update_url)s"
-"\"> リンク </a> パスワードの更新\n"
+"                クリックしてください <a "
+"href=\"%(user_password_update_url)s\"> リンク </a> パスワードの更新\n"
 "        "
 
 #: templates/_message.html:43
 #, python-format
 msgid ""
 "\n"
-"        Your information was incomplete. Please click <a href="
-"\"%(first_login_url)s\"> this link </a>to complete your information.\n"
+"        Your information was incomplete. Please click <a "
+"href=\"%(first_login_url)s\"> this link </a>to complete your information.\n"
 "        "
 msgstr ""
 "\n"
-"                あなたの情報が不完全なので、クリックしてください。 <a href="
-"\"%(first_login_url)s\"> リンク </a> 補完\n"
+"                あなたの情報が不完全なので、クリックしてください。 <a "
+"href=\"%(first_login_url)s\"> リンク </a> 補完\n"
 "                "
 
 #: templates/_message.html:56
 #, python-format
 msgid ""
 "\n"
-"        Your ssh public key not set or expired. Please click <a href="
-"\"%(user_pubkey_update)s\"> this link </a>to update\n"
+"        Your ssh public key not set or expired. Please click <a "
+"href=\"%(user_pubkey_update)s\"> this link </a>to update\n"
 "        "
 msgstr ""
 "\n"
-"                SSHキーが設定されていないか無効になっている場合は、 <a href="
-"\"%(user_pubkey_update)s\"> リンク </a> 更新\n"
+"                SSHキーが設定されていないか無効になっている場合は、 <a "
+"href=\"%(user_pubkey_update)s\"> リンク </a> 更新\n"
 "        "
 
 #: templates/_mfa_login_field.html:28
@@ -5008,7 +5008,7 @@ msgid "RDP Port"
 msgstr "RDP ポート"
 
 #: terminal/models/endpoint.py:27 terminal/models/endpoint.py:95
-#: terminal/serializers/endpoint.py:57 terminal/serializers/storage.py:38
+#: terminal/serializers/endpoint.py:61 terminal/serializers/storage.py:38
 #: terminal/serializers/storage.py:50 terminal/serializers/storage.py:80
 #: terminal/serializers/storage.py:90 terminal/serializers/storage.py:98
 msgid "Endpoint"
@@ -5199,15 +5199,15 @@ msgstr "レベル"
 msgid "Batch danger command alert"
 msgstr "一括危険コマンド警告"
 
-#: terminal/serializers/endpoint.py:14
+#: terminal/serializers/endpoint.py:15
 msgid "Magnus listen db port"
 msgstr "Magnus がリッスンするデータベース ポート"
 
-#: terminal/serializers/endpoint.py:17
+#: terminal/serializers/endpoint.py:18
 msgid "Magnus Listen port range"
 msgstr "Magnus がリッスンするポート範囲"
 
-#: terminal/serializers/endpoint.py:19
+#: terminal/serializers/endpoint.py:20
 msgid ""
 "The range of ports that Magnus listens on is modified in the configuration "
 "file"
@@ -5215,10 +5215,15 @@ msgstr "Magnus がリッスンするポート範囲を構成ファイルで変�
 
 #: terminal/serializers/endpoint.py:51
 msgid ""
-"If asset IP addresses under different endpoints conflict, use asset labels"
+"Format for comma-delimited string, with * indicating a match all. Such as: "
+"192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:db8:2de::e13, 2001:"
+"db8:1a:1110::/64<br>If asset IP addresses under different endpoints "
+"conflict, use asset labels"
 msgstr ""
-"異なるエンドポイントの下に競合するアセットIPがある場合は、アセットタグを使用"
-"して実装します"
+"コンマ区切り文字列の形式。* はすべて一致することを示します。例: "
+"192.168.10.1、192.168.1.0/24、10.1.1.1-10.1.1.20、2001:db8:2de::e13、2001:"
+"db8:1a:1110:::/64<br>異なるエンドポイントの下に競合するアセットIPがある場合"
+"は、アセットタグを使用して実装します"
 
 #: terminal/serializers/session.py:15 terminal/serializers/session.py:42
 msgid "Terminal display"
@@ -5342,7 +5347,7 @@ msgstr "見つかりません"
 msgid "view"
 msgstr "表示"
 
-#: terminal/utils/db_port_mapper.py:65
+#: terminal/utils/db_port_mapper.py:78
 msgid ""
 "No available port is matched. The number of databases may have exceeded the "
 "number of ports open to the database agent service, Contact the "
@@ -5352,7 +5357,7 @@ msgstr ""
 "サービスによって開かれたポートの数を超えた可能性があります。さらにポートを開"
 "くには、管理者に連絡してください。"
 
-#: terminal/utils/db_port_mapper.py:91
+#: terminal/utils/db_port_mapper.py:104
 msgid ""
 "No ports can be used, check and modify the limit on the number of ports that "
 "Magnus listens on in the configuration file."
@@ -5360,7 +5365,7 @@ msgstr ""
 "使用できるポートがありません。設定ファイルで Magnus がリッスンするポート数の"
 "制限を確認して変更してください. "
 
-#: terminal/utils/db_port_mapper.py:93
+#: terminal/utils/db_port_mapper.py:106
 msgid "All available port count: {}, Already use port count: {}"
 msgstr "使用可能なすべてのポート数: {}、すでに使用しているポート数: {}"
 
@@ -7079,3 +7084,9 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:77
 msgid "Community edition"
 msgstr "コミュニティ版"
+
+#~ msgid ""
+#~ "If asset IP addresses under different endpoints conflict, use asset labels"
+#~ msgstr ""
+#~ "異なるエンドポイントの下に競合するアセットIPがある場合は、アセットタグを使"
+#~ "用して実装します"

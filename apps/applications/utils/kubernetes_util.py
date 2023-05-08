@@ -1,18 +1,14 @@
 # -*- coding: utf-8 -*-
-from urllib3.exceptions import MaxRetryError
 from urllib.parse import urlencode
 
+from kubernetes import client
 from kubernetes.client import api_client
 from kubernetes.client.api import core_v1_api
-from kubernetes import client
-from kubernetes.client.exceptions import ApiException
-
 from rest_framework.generics import get_object_or_404
 
-from common.utils import get_logger
-from common.tree import TreeNode
 from assets.models import SystemUser
-
+from common.tree import TreeNode
+from common.utils import get_logger
 from .. import const
 
 logger = get_logger(__file__)
@@ -23,7 +19,8 @@ class KubernetesClient:
         self.url = url
         self.token = token
 
-    def get_api(self):
+    @property
+    def api(self):
         configuration = client.Configuration()
         configuration.host = self.url
         configuration.verify_ssl = False
@@ -32,63 +29,46 @@ class KubernetesClient:
         api = core_v1_api.CoreV1Api(c)
         return api
 
-    def get_namespace_list(self):
-        api = self.get_api()
-        namespace_list = []
-        for ns in api.list_namespace().items:
-            namespace_list.append(ns.metadata.name)
-        return namespace_list
+    def get_namespaces(self):
+        namespaces = []
+        resp = self.api.list_namespace()
+        for ns in resp.items:
+            namespaces.append(ns.metadata.name)
+        return namespaces
 
-    def get_services(self):
-        api = self.get_api()
-        ret = api.list_service_for_all_namespaces(watch=False)
-        for i in ret.items:
-            print("%s \t%s \t%s \t%s \t%s \n" % (
-                i.kind, i.metadata.namespace, i.metadata.name, i.spec.cluster_ip, i.spec.ports))
+    def get_pods(self, namespace):
+        pods = []
+        resp = self.api.list_namespaced_pod(namespace)
+        for pd in resp.items:
+            pods.append(pd.metadata.name)
+        return pods
 
-    def get_pod_info(self, namespace, pod):
-        api = self.get_api()
-        resp = api.read_namespaced_pod(namespace=namespace, name=pod)
-        return resp
+    def get_containers(self, namespace, pod_name):
+        containers = []
+        resp = self.api.read_namespaced_pod(pod_name, namespace)
+        for container in resp.spec.containers:
+            containers.append(container.name)
+        return containers
 
-    def get_pod_logs(self, namespace, pod):
-        api = self.get_api()
-        log_content = api.read_namespaced_pod_log(pod, namespace, pretty=True, tail_lines=200)
-        return log_content
+    @classmethod
+    def run(cls, asset, secret, tp='namespace'):
+        k8s_url = f'{asset.address}'
+        k8s = cls(k8s_url, secret)
+        func_name = f'get_{tp}s'
+        if hasattr(k8s, func_name):
+            return getattr(k8s, func_name)()
+        return []
 
-    def get_pods(self):
-        api = self.get_api()
-        try:
-            ret = api.list_pod_for_all_namespaces(watch=False, _request_timeout=(3, 3))
-        except MaxRetryError:
-            logger.warning('Kubernetes connection timed out')
-            return
-        except ApiException as e:
-            if e.status == 401:
-                logger.warning('Kubernetes User not authenticated')
-            else:
-                logger.warning(e)
-            return
-        data = {}
-        for i in ret.items:
-            namespace = i.metadata.namespace
-            pod_info = {
-                'pod_name': i.metadata.name,
-                'containers': [j.name for j in i.spec.containers]
-            }
-            if namespace in data:
-                data[namespace].append(pod_info)
-            else:
-                data[namespace] = [pod_info, ]
-        return data
-
-    @staticmethod
-    def get_kubernetes_data(app_id, system_user_id):
+    @classmethod
+    def get_kubernetes_data(cls, app_id, system_user_id, tp, *args):
         from ..models import Application
         app = get_object_or_404(Application, id=app_id)
         system_user = get_object_or_404(SystemUser, id=system_user_id)
-        k8s = KubernetesClient(app.attrs['cluster'], system_user.token)
-        return k8s.get_pods()
+        k8s = cls(app.attrs['cluster'], system_user.token)
+        func_name = f'get_{tp}s'
+        if hasattr(k8s, func_name):
+            return getattr(k8s, func_name)(*args)
+        return []
 
 
 class KubernetesTree:
@@ -118,11 +98,10 @@ class KubernetesTree:
         )
         return node
 
-    def as_namespace_pod_tree_node(self, name, meta, type, counts=0, is_container=False):
+    def as_namespace_pod_tree_node(self, name, meta, type, is_container=False):
         from ..models import ApplicationTreeNodeMixin
         i = ApplicationTreeNodeMixin.create_tree_id(self.tree_id, type, name)
         meta.update({type: name})
-        name = name if is_container else f'{name}({counts})'
         node = self.create_tree_node(
             i, self.tree_id, name, type, meta, icon='cloud', is_container=is_container
         )
@@ -157,30 +136,30 @@ class KubernetesTree:
         system_user_id = parent_info.get('system_user_id')
 
         tree_nodes = []
-        data = KubernetesClient.get_kubernetes_data(app_id, system_user_id)
-        if not data:
-            return tree_nodes
-
         if pod_name:
-            for container in next(
-                    filter(
-                        lambda x: x['pod_name'] == pod_name, data[namespace]
-                    )
-            )['containers']:
+            tp = 'container'
+            containers = KubernetesClient.get_kubernetes_data(
+                app_id, system_user_id, tp, namespace, pod_name
+            )
+            for container in containers:
                 container_node = self.as_namespace_pod_tree_node(
-                    container, parent_info, 'container', is_container=True
+                    container, parent_info, tp, is_container=True
                 )
                 tree_nodes.append(container_node)
         elif namespace:
-            for pod in data[namespace]:
-                pod_nodes = self.as_namespace_pod_tree_node(
-                    pod['pod_name'], parent_info, 'pod', len(pod['containers'])
+            tp = 'pod'
+            pods = KubernetesClient.get_kubernetes_data(app_id, system_user_id, tp, namespace)
+            for pod in pods:
+                pod_node = self.as_namespace_pod_tree_node(
+                    pod, parent_info, tp
                 )
-                tree_nodes.append(pod_nodes)
+                tree_nodes.append(pod_node)
         elif system_user_id:
-            for namespace, pods in data.items():
+            tp = 'namespace'
+            namespaces = KubernetesClient.get_kubernetes_data(app_id, system_user_id, tp)
+            for namespace in namespaces:
                 namespace_node = self.as_namespace_pod_tree_node(
-                    namespace, parent_info, 'namespace', len(pods)
+                    namespace, parent_info, tp
                 )
                 tree_nodes.append(namespace_node)
         return tree_nodes
