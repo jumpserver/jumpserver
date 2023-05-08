@@ -162,10 +162,8 @@ class FeiShuQRLoginCallbackView(FeiShuQRMixin, BaseLoginCallbackView):
     client_auth_params = {'app_id': 'FEISHU_APP_ID', 'app_secret': 'FEISHU_APP_SECRET'}
     user_type = 'feishu'
     auth_backend = 'AUTH_BACKEND_FEISHU'
-    create_user_if_not_exist_setting = 'FEISHU_CREATE_USER_IF_NOT_EXIST'
 
     msg_client_err = _('FeiShu Error')
     msg_user_not_bound_err = _('FeiShu is not bound')
-    msg_user_need_bound_warning = _('Please login with a password and then bind the FeiShu')
     msg_not_found_user_from_client_err = _('Failed to get user from FeiShu')
 

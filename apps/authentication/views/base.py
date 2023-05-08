@@ -25,11 +25,9 @@ class BaseLoginCallbackView(AuthMixin, FlashMessageMixin, View):
     client_auth_params = {}
     user_type = ''
     auth_backend = None
-    create_user_if_not_exist_setting = ''
     # 提示信息
     msg_client_err = _('Error')
     msg_user_not_bound_err = _('Error')
-    msg_user_need_bound_warning = _('Error')
     msg_not_found_user_from_client_err = _('Error')
 
     def verify_state(self):
@@ -49,11 +47,6 @@ class BaseLoginCallbackView(AuthMixin, FlashMessageMixin, View):
 
     def create_user_if_not_exist(self, user_id, **kwargs):
         user = None
-        if not getattr(settings, self.create_user_if_not_exist_setting):
-            title = self.msg_client_err
-            msg = self.msg_user_need_bound_warning
-            return user, (title, msg)
-
         user_attr = self.client.get_user_detail(user_id, **kwargs)
         try:
             user, create = User.objects.get_or_create(

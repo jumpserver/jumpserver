@@ -13,6 +13,3 @@ class WeComSettingSerializer(serializers.Serializer):
     WECOM_AGENTID = serializers.CharField(max_length=256, required=True, label='agentid')
     WECOM_SECRET = EncryptedField(max_length=256, required=False, label='secret')
     AUTH_WECOM = serializers.BooleanField(default=False, label=_('Enable WeCom Auth'))
-    WECOM_CREATE_USER_IF_NOT_EXIST = serializers.BooleanField(
-        default=False, label=_('Create user if not')
-    )

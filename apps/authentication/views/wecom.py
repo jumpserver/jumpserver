@@ -197,11 +197,9 @@ class WeComQRLoginCallbackView(WeComQRMixin, BaseLoginCallbackView):
     client_auth_params = {'corpid': 'WECOM_CORPID', 'corpsecret': 'WECOM_SECRET', 'agentid': 'WECOM_AGENTID'}
     user_type = 'wecom'
     auth_backend = 'AUTH_BACKEND_WECOM'
-    create_user_if_not_exist_setting = 'WECOM_CREATE_USER_IF_NOT_EXIST'
 
     msg_client_err = _('WeCom Error')
     msg_user_not_bound_err = _('WeCom is not bound')
-    msg_user_need_bound_warning = _('Please login with a password and then bind the WeCom')
     msg_not_found_user_from_client_err = _('Failed to get user from WeCom')
 
 
