@@ -2,9 +2,9 @@
 #
 
 from django.conf import settings
-from .ansible.inventory import BaseInventory
 
 from common.utils import get_logger
+from .ansible.inventory import BaseInventory
 
 __all__ = [
     'JMSInventory', 'JMSCustomInventory',
@@ -110,7 +110,10 @@ class JMSInventory(JMSBaseInventory):
 
         if self.system_user:
             self.system_user.load_asset_special_auth(asset=asset, username=self.run_as)
-            return self.system_user._to_secret_json()
+            info = self.system_user._to_secret_json()
+            if self.run_as:
+                info['username'] = self.run_as
+            return info
         else:
             return {}
 
