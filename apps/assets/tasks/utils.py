@@ -51,7 +51,7 @@ def clean_ansible_task_hosts(assets, system_user=None):
         if not check_asset_can_run_ansible(asset):
             continue
         # 资产平台不包含系统用户的协议, 不推送
-        if system_user.protocol not in asset.protocols_as_dict:
+        if system_user and system_user.protocol not in asset.protocols_as_dict:
             logger.info(_('Asset protocol not support system user protocol, skipped: {}').format(system_user.protocol))
             continue
         cleaned_assets.append(asset)
