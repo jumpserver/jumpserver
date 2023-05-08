@@ -12,10 +12,11 @@ from accounts.tasks import push_accounts_to_assets_task, verify_accounts_connect
 from assets import serializers
 from assets.exceptions import NotSupportedTemporarilyError
 from assets.filters import IpInFilterBackend, LabelFilterBackend, NodeFilterBackend
-from assets.models import Asset, Gateway, Platform
+from assets.models import Asset, Gateway, Platform, AutomationExecution
 from assets.tasks import test_assets_connectivity_manual, update_assets_hardware_info_manual
 from common.api import SuggestionMixin
 from common.drf.filters import BaseFilterSet
+from common.permissions import IsValidUser
 from common.utils import get_logger, is_uuid
 from orgs.mixins import generics
 from orgs.mixins.api import OrgBulkModelViewSet
@@ -25,7 +26,8 @@ from ...notifications import BulkUpdatePlatformSkipAssetUserMsg
 logger = get_logger(__file__)
 __all__ = [
     "AssetViewSet", "AssetTaskCreateApi",
-    "AssetsTaskCreateApi", 'AssetFilterSet'
+    "AssetsTaskCreateApi", 'AssetFilterSet',
+    "AutomationExecutionRetrieveApi",
 ]
 
 
@@ -258,3 +260,9 @@ class AssetsTaskCreateApi(AssetsTaskMixin, generics.CreateAPIView):
         has = self.request.user.has_perm(perm_required)
         if not has:
             self.permission_denied(request)
+
+
+class AutomationExecutionRetrieveApi(generics.RetrieveAPIView):
+    permission_classes = (IsValidUser,)
+    model = AutomationExecution
+    serializer_class = serializers.AutomationExecutionSerializer
