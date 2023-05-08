@@ -198,18 +198,19 @@ class DingTalkQRLoginView(DingTalkQRMixin, METAMixin, View):
 class DingTalkQRLoginCallbackView(DingTalkQRMixin, BaseLoginCallbackView):
     permission_classes = (AllowAny,)
 
-    def __init__(self):
-        super(DingTalkQRLoginCallbackView, self).__init__()
-        self.client_type = DingTalk
-        self.client_auth_params = {'appid': 'DINGTALK_APPKEY', 'appsecret': 'DINGTALK_APPSECRET', 'agentid': 'DINGTALK_AGENTID'}
-        self.user_type = 'dingtalk'
-        self.auth_backend = 'AUTH_BACKEND_DINGTALK'
-        self.create_user_if_not_exist_setting = 'DINGTALK_CREATE_USER_IF_NOT_EXIST'
+    client_type_path = 'common.sdk.im.dingtalk.DingTalk'
+    client_auth_params = {
+        'appid': 'DINGTALK_APPKEY', 'appsecret': 'DINGTALK_APPSECRET',
+        'agentid': 'DINGTALK_AGENTID'
+    }
+    user_type = 'dingtalk'
+    auth_backend = 'AUTH_BACKEND_DINGTALK'
+    create_user_if_not_exist_setting = 'DINGTALK_CREATE_USER_IF_NOT_EXIST'
 
-        self.msg_client_err = _('DingTalk Error')
-        self.msg_user_not_bound_err = _('DingTalk is not bound')
-        self.msg_user_need_bound_warning = _('Please login with a password and then bind the DingTalk')
-        self.msg_not_found_user_from_client_err = _('Failed to get user from DingTalk')
+    msg_client_err = _('DingTalk Error')
+    msg_user_not_bound_err = _('DingTalk is not bound')
+    msg_user_need_bound_warning = _('Please login with a password and then bind the DingTalk')
+    msg_not_found_user_from_client_err = _('Failed to get user from DingTalk')
 
 
 class DingTalkOAuthLoginView(DingTalkOAuthMixin, View):
