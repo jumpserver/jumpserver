@@ -37,7 +37,8 @@ class LoginAssetCheckAPI(CreateAPIView):
                 'account_username': self.serializer.validated_data.get('account_username'),
                 'action': LoginAssetACL.ActionChoices.review
             }
-            acl = LoginAssetACL.filter_queryset(**kwargs).valid().first()
+            acl = LoginAssetACL.objects.filter(**kwargs).valid().first()
+
         if acl:
             need_review = True
             response_data = self._get_response_data_of_need_review(acl)
