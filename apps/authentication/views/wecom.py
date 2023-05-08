@@ -193,18 +193,16 @@ class WeComQRLoginView(WeComQRMixin, METAMixin, View):
 class WeComQRLoginCallbackView(WeComQRMixin, BaseLoginCallbackView):
     permission_classes = (AllowAny,)
 
-    def __init__(self):
-        super(WeComQRLoginCallbackView, self).__init__()
-        self.client_type = WeCom
-        self.client_auth_params = {'corpid': 'WECOM_CORPID', 'corpsecret': 'WECOM_SECRET', 'agentid': 'WECOM_AGENTID'}
-        self.user_type = 'wecom'
-        self.auth_backend = 'AUTH_BACKEND_WECOM'
-        self.create_user_if_not_exist_setting = 'WECOM_CREATE_USER_IF_NOT_EXIST'
+    client_type_path = 'common.sdk.im.wecom.WeCom'
+    client_auth_params = {'corpid': 'WECOM_CORPID', 'corpsecret': 'WECOM_SECRET', 'agentid': 'WECOM_AGENTID'}
+    user_type = 'wecom'
+    auth_backend = 'AUTH_BACKEND_WECOM'
+    create_user_if_not_exist_setting = 'WECOM_CREATE_USER_IF_NOT_EXIST'
 
-        self.msg_client_err = _('WeCom Error')
-        self.msg_user_not_bound_err = _('WeCom is not bound')
-        self.msg_user_need_bound_warning = _('Please login with a password and then bind the WeCom')
-        self.msg_not_found_user_from_client_err = _('Failed to get user from WeCom')
+    msg_client_err = _('WeCom Error')
+    msg_user_not_bound_err = _('WeCom is not bound')
+    msg_user_need_bound_warning = _('Please login with a password and then bind the WeCom')
+    msg_not_found_user_from_client_err = _('Failed to get user from WeCom')
 
 
 class WeComOAuthLoginView(WeComOAuthMixin, View):

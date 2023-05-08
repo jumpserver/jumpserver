@@ -2,6 +2,7 @@ from functools import lru_cache
 
 from rest_framework.request import Request
 from django.utils.translation import ugettext_lazy as _
+from django.utils.module_loading import import_string
 from django.conf import settings
 from django.db.utils import IntegrityError
 from django.views import View
@@ -20,18 +21,16 @@ logger = get_logger(__file__)
 
 class BaseLoginCallbackView(AuthMixin, FlashMessageMixin, View):
 
-    def __init__(self):
-        super().__init__()
-        self.client_type = None
-        self.client_auth_params = {}
-        self.user_type = ''
-        self.auth_backend = None
-        self.create_user_if_not_exist_setting = ''
-        # 提示信息
-        self.msg_client_err = _('Error')
-        self.msg_user_not_bound_err = _('Error')
-        self.msg_user_need_bound_warning = _('Error')
-        self.msg_not_found_user_from_client_err = _('Error')
+    client_type_path = ''
+    client_auth_params = {}
+    user_type = ''
+    auth_backend = None
+    create_user_if_not_exist_setting = ''
+    # 提示信息
+    msg_client_err = _('Error')
+    msg_user_not_bound_err = _('Error')
+    msg_user_need_bound_warning = _('Error')
+    msg_not_found_user_from_client_err = _('Error')
 
     def verify_state(self):
         raise NotImplementedError
@@ -42,10 +41,11 @@ class BaseLoginCallbackView(AuthMixin, FlashMessageMixin, View):
     @property
     @lru_cache(maxsize=1)
     def client(self):
-        if self.client_type is None or not self.client_auth_params:
+        if not all([self.client_type_path, self.client_auth_params]):
             raise NotImplementedError
         client_init = {k: getattr(settings, v) for k, v in self.client_auth_params.items()}
-        return self.client_type(**client_init)
+        client_type = import_string(self.client_type_path)
+        return client_type(**client_init)
 
     def create_user_if_not_exist(self, user_id, **kwargs):
         user = None
