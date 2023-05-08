@@ -47,6 +47,7 @@ urlpatterns = [
 
     path('gateways/<uuid:pk>/test-connective/', api.GatewayTestConnectionApi.as_view(), name='test-gateway-connective'),
     path('platform-automation-methods/', api.PlatformAutomationMethodsApi.as_view(), name='platform-automation-methods'),
+    path('automations-execution/<uuid:pk>/', api.AutomationExecutionRetrieveApi.as_view(), name='automation-execution'),
 ]
 
 urlpatterns += router.urls
