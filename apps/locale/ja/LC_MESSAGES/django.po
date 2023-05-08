@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-02 12:21+0800\n"
+"POT-Creation-Date: 2023-05-08 18:10+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -131,7 +131,7 @@ msgstr "システムユーザー"
 #: assets/models/asset.py:386 assets/models/authbook.py:19
 #: assets/models/backup.py:31 assets/models/cmd_filter.py:42
 #: assets/models/gathered_user.py:14 assets/serializers/label.py:30
-#: assets/serializers/system_user.py:268 audits/models.py:40
+#: assets/serializers/system_user.py:264 audits/models.py:40
 #: authentication/models.py:66 authentication/models.py:90
 #: perms/models/asset_permission.py:23 terminal/backends/command/models.py:21
 #: terminal/backends/command/serializers.py:14 terminal/models/session.py:47
@@ -269,7 +269,7 @@ msgid "Application"
 msgstr "アプリケーション"
 
 #: applications/models/account.py:15 assets/models/authbook.py:20
-#: assets/models/cmd_filter.py:46 assets/models/user.py:343 audits/models.py:41
+#: assets/models/cmd_filter.py:46 assets/models/user.py:354 audits/models.py:41
 #: authentication/models.py:83 perms/models/application_permission.py:33
 #: perms/models/asset_permission.py:25 terminal/backends/command/models.py:22
 #: terminal/backends/command/serializers.py:36 terminal/models/session.py:49
@@ -280,7 +280,7 @@ msgid "System user"
 msgstr "システムユーザー"
 
 #: applications/models/account.py:17 assets/models/authbook.py:21
-#: settings/serializers/auth/cas.py:20
+#: settings/serializers/auth/cas.py:20 settings/serializers/auth/feishu.py:20
 msgid "Version"
 msgstr "バージョン"
 
@@ -445,7 +445,7 @@ msgid "Application path"
 msgstr "アプリケーションパス"
 
 #: applications/serializers/attrs/application_category/remote_app.py:44
-#: assets/serializers/system_user.py:167
+#: assets/serializers/system_user.py:164
 #: tickets/serializers/ticket/apply_application.py:38
 #: tickets/serializers/ticket/common.py:59
 #: xpack/plugins/change_auth_plan/serializers/asset.py:67
@@ -634,7 +634,7 @@ msgid "Is active"
 msgstr "アクティブです。"
 
 #: assets/models/asset.py:222 assets/models/cluster.py:19
-#: assets/models/user.py:240 assets/models/user.py:395
+#: assets/models/user.py:240 assets/models/user.py:406
 msgid "Admin user"
 msgstr "管理ユーザー"
 
@@ -889,7 +889,7 @@ msgstr "デフォルトクラスター"
 msgid "User group"
 msgstr "ユーザーグループ"
 
-#: assets/models/cmd_filter.py:64 assets/serializers/system_user.py:59
+#: assets/models/cmd_filter.py:64 assets/serializers/system_user.py:56
 msgid "Command filter"
 msgstr "コマンドフィルター"
 
@@ -1015,7 +1015,7 @@ msgstr "フルバリュー"
 msgid "Parent key"
 msgstr "親キー"
 
-#: assets/models/node.py:566 assets/serializers/system_user.py:267
+#: assets/models/node.py:566 assets/serializers/system_user.py:263
 #: xpack/plugins/cloud/models.py:95 xpack/plugins/cloud/serializers/task.py:75
 msgid "Node"
 msgstr "ノード"
@@ -1095,7 +1095,7 @@ msgstr "ユーザースイッチ"
 msgid "Switch from"
 msgstr "から切り替え"
 
-#: assets/models/user.py:345
+#: assets/models/user.py:356
 msgid "Can match system user"
 msgstr "システムユーザーに一致できます"
 
@@ -1205,7 +1205,7 @@ msgid "Pattern"
 msgstr "パターン"
 
 #: assets/serializers/domain.py:14 assets/serializers/label.py:12
-#: assets/serializers/system_user.py:63
+#: assets/serializers/system_user.py:60
 #: perms/serializers/asset/permission.py:49
 msgid "Assets amount"
 msgstr "資産額"
@@ -1234,74 +1234,69 @@ msgstr "同じレベルのノード名を同じにすることはできません
 msgid "SSH key fingerprint"
 msgstr "SSHキー指紋"
 
-#: assets/serializers/system_user.py:40
-#: perms/serializers/application/permission.py:46
-msgid "Apps amount"
-msgstr "アプリの量"
-
-#: assets/serializers/system_user.py:62
+#: assets/serializers/system_user.py:59
 #: perms/serializers/asset/permission.py:50
 msgid "Nodes amount"
 msgstr "ノード量"
 
-#: assets/serializers/system_user.py:64 assets/serializers/system_user.py:269
+#: assets/serializers/system_user.py:61 assets/serializers/system_user.py:265
 msgid "Login mode display"
 msgstr "ログインモード表示"
 
-#: assets/serializers/system_user.py:66
+#: assets/serializers/system_user.py:63
 msgid "Ad domain"
 msgstr "広告ドメイン"
 
-#: assets/serializers/system_user.py:67
+#: assets/serializers/system_user.py:64
 msgid "Is asset protocol"
 msgstr "資産プロトコルです"
 
-#: assets/serializers/system_user.py:68
+#: assets/serializers/system_user.py:65
 msgid "Only ssh and automatic login system users are supported"
 msgstr "sshと自動ログインシステムのユーザーのみがサポートされています"
 
-#: assets/serializers/system_user.py:108
+#: assets/serializers/system_user.py:105
 msgid "Username same with user with protocol {} only allow 1"
 msgstr "プロトコル {} のユーザーと同じユーザー名は1のみ許可します"
 
-#: assets/serializers/system_user.py:121 common/validators.py:14
+#: assets/serializers/system_user.py:118 common/validators.py:14
 msgid "Special char not allowed"
 msgstr "特別なcharは許可されていません"
 
-#: assets/serializers/system_user.py:131
+#: assets/serializers/system_user.py:128
 msgid "* Automatic login mode must fill in the username."
 msgstr "* 自動ログインモードはユーザー名を入力する必要があります。"
 
-#: assets/serializers/system_user.py:146
+#: assets/serializers/system_user.py:143
 msgid "Path should starts with /"
 msgstr "パスは/で始まる必要があります"
 
-#: assets/serializers/system_user.py:158
+#: assets/serializers/system_user.py:155
 msgid "Password or private key required"
 msgstr "パスワードまたは秘密鍵が必要"
 
-#: assets/serializers/system_user.py:172
+#: assets/serializers/system_user.py:169
 msgid "Only ssh protocol system users are allowed"
 msgstr "Sshプロトコルシステムユーザーのみが許可されています"
 
-#: assets/serializers/system_user.py:176
+#: assets/serializers/system_user.py:173
 msgid "The protocol must be consistent with the current user: {}"
 msgstr "プロトコルは現在のユーザーと一致している必要があります: {}"
 
-#: assets/serializers/system_user.py:180
+#: assets/serializers/system_user.py:177
 msgid "Only system users with automatic login are allowed"
 msgstr "自動ログインを持つシステムユーザーのみが許可されます"
 
-#: assets/serializers/system_user.py:288
+#: assets/serializers/system_user.py:284
 msgid "System user name"
 msgstr "システムユーザー名"
 
-#: assets/serializers/system_user.py:289 orgs/mixins/serializers.py:26
+#: assets/serializers/system_user.py:285 orgs/mixins/serializers.py:26
 #: rbac/serializers/rolebinding.py:23
 msgid "Org name"
 msgstr "組織名"
 
-#: assets/serializers/system_user.py:298
+#: assets/serializers/system_user.py:294
 msgid "Asset hostname"
 msgstr "資産ホスト名"
 
@@ -1429,6 +1424,10 @@ msgid "For security, do not push user {}"
 msgstr "セキュリティのために、ユーザー {} をプッシュしないでください"
 
 #: assets/tasks/utils.py:55
+msgid "Asset protocol not support system user protocol, skipped: {}"
+msgstr "アセット プロトコルはシステム ユーザー プロトコルをサポートしていません。次をスキップします: {}"
+
+#: assets/tasks/utils.py:59
 msgid "No assets matched, stop task"
 msgstr "一致する資産がない、タスクを停止"
 
@@ -1664,7 +1663,8 @@ msgstr "企業微信"
 
 #: audits/signal_handlers.py:62 authentication/views/feishu.py:144
 #: authentication/views/login.py:85 notifications/backends/__init__.py:14
-#: settings/serializers/auth/feishu.py:10 users/models/user.py:736
+#: settings/serializers/auth/feishu.py:10
+#: settings/serializers/auth/feishu.py:13 users/models/user.py:736
 msgid "FeiShu"
 msgstr "本を飛ばす"
 
@@ -2263,7 +2263,7 @@ msgstr "コードエラー"
 #: authentication/templates/authentication/_msg_reset_password_code.html:9
 #: authentication/templates/authentication/_msg_rest_password_success.html:2
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:2
-#: jumpserver/conf.py:416 ops/tasks.py:145 ops/tasks.py:148
+#: jumpserver/conf.py:417 ops/tasks.py:145 ops/tasks.py:148
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: perms/templates/perms/_msg_permed_items_expire.html:3
 #: tickets/templates/tickets/approve_check_password.html:33
@@ -2747,11 +2747,11 @@ msgstr "特殊文字を含むべきではない"
 msgid "The mobile phone number format is incorrect"
 msgstr "携帯電話番号の形式が正しくありません"
 
-#: jumpserver/conf.py:415
+#: jumpserver/conf.py:416
 msgid "Create account successfully"
 msgstr "アカウントを正常に作成"
 
-#: jumpserver/conf.py:417
+#: jumpserver/conf.py:418
 msgid "Your account has been created successfully"
 msgstr "アカウントが正常に作成されました"
 
@@ -3198,6 +3198,10 @@ msgstr "ユーザーグループの量"
 msgid "System users amount"
 msgstr "システムユーザー数"
 
+#: perms/serializers/application/permission.py:46
+msgid "Apps amount"
+msgstr "アプリの量"
+
 #: perms/serializers/application/permission.py:79
 msgid ""
 "The application list contains applications that are different from the "
@@ -3636,7 +3640,7 @@ msgstr "そうでない場合はユーザーを作成"
 msgid "Enable DingTalk Auth"
 msgstr "ピン認証の有効化"
 
-#: settings/serializers/auth/feishu.py:14
+#: settings/serializers/auth/feishu.py:16
 msgid "Enable FeiShu Auth"
 msgstr "飛本認証の有効化"
 
@@ -5046,23 +5050,23 @@ msgstr "リプレイ"
 msgid "Date end"
 msgstr "終了日"
 
-#: terminal/models/session.py:261
+#: terminal/models/session.py:265
 msgid "Session record"
 msgstr "セッション記録"
 
-#: terminal/models/session.py:263
+#: terminal/models/session.py:267
 msgid "Can monitor session"
 msgstr "セッションを監視できます"
 
-#: terminal/models/session.py:264
+#: terminal/models/session.py:268
 msgid "Can share session"
 msgstr "セッションを共有できます"
 
-#: terminal/models/session.py:265
+#: terminal/models/session.py:269
 msgid "Can terminate session"
 msgstr "セッションを終了できます"
 
-#: terminal/models/session.py:266
+#: terminal/models/session.py:270
 msgid "Can validate session action perm"
 msgstr "セッションアクションのパーマを検証できます"
 

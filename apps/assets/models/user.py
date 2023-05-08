@@ -9,7 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.cache import cache
 
-from common.utils import signer, get_object_or_none
+from common.utils import signer, get_object_or_none, is_uuid
 from .base import BaseUser
 from .asset import Asset
 from .authbook import AuthBook
@@ -322,9 +322,20 @@ class SystemUser(ProtocolMixin, AuthMixin, BaseUser):
         assets = Asset.objects.filter(id__in=asset_ids)
         return assets
 
+    def filter_contain_protocol_assets(self, assets_or_ids):
+        if not assets_or_ids:
+            return assets_or_ids
+        if is_uuid(assets_or_ids[0]):
+            assets = Asset.objects.filter(id__in=assets_or_ids)
+        else:
+            assets = assets_or_ids
+        assets = [asset for asset in assets if self.protocol in asset.protocols_as_dict]
+        return assets
+
     def add_related_assets(self, assets_or_ids):
-        self.assets.add(*tuple(assets_or_ids))
-        self.add_related_assets_to_su_from_if_need(assets_or_ids)
+        assets = self.filter_contain_protocol_assets(assets_or_ids)
+        self.assets.add(*tuple(assets))
+        self.add_related_assets_to_su_from_if_need(assets)
 
     def add_related_assets_to_su_from_if_need(self, assets_or_ids):
         if self.protocol not in [self.Protocol.ssh.value]:
