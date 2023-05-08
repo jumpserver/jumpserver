@@ -365,21 +365,18 @@ class Config(dict):
         'WECOM_CORPID': '',
         'WECOM_AGENTID': '',
         'WECOM_SECRET': '',
-        'WECOM_CREATE_USER_IF_NOT_EXIST': False,
 
         # 钉钉
         'AUTH_DINGTALK': False,
         'DINGTALK_AGENTID': '',
         'DINGTALK_APPKEY': '',
         'DINGTALK_APPSECRET': '',
-        'DINGTALK_CREATE_USER_IF_NOT_EXIST': False,
 
         # 飞书
         'AUTH_FEISHU': False,
         'FEISHU_APP_ID': '',
         'FEISHU_APP_SECRET': '',
         'FEISHU_VERSION': 'feishu',
-        'FEISHU_CREATE_USER_IF_NOT_EXIST': False,
 
         'LOGIN_REDIRECT_TO_BACKEND': '',  # 'OPENID / CAS / SAML2
         'LOGIN_REDIRECT_MSG_ENABLED': True,
