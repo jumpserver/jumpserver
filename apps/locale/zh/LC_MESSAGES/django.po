@@ -524,6 +524,13 @@ msgstr ""
 "{} - 账号备份任务已完成: 未设置加密密码 - 请前往个人信息 -> 文件加密密码中设"
 "置加密密码"
 
+msgid ""
+"{} - The encryption password has not been set - please go to personal information -> file "
+"encryption password to set the encryption password"
+msgstr ""
+"{} - 未设置加密密码 - 请前往个人信息 -> 文件加密密码中设"
+"置加密密码"
+
 #: accounts/notifications.py:33
 msgid "Notification of implementation result of encryption change plan"
 msgstr "改密计划任务结果通知"

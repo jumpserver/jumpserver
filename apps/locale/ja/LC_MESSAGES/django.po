@@ -547,6 +547,12 @@ msgstr ""
 "{} -暗号化変更タスクが完了しました: 暗号化パスワードが設定されていません-個人"
 "情報にアクセスしてください-> ファイル暗号化パスワードを設定してください"
 
+msgid ""
+"{} - The encryption password has not been set - please go to personal information -> file encryption "
+"password to set the encryption password"
+msgstr ""
+"{} - 暗号化パスワードが設定されていません-個人情報->ファイル暗号化パスワードに暗号化パスワードを設定してください"
+
 #: accounts/serializers/account/account.py:28
 msgid "Push now"
 msgstr "今すぐプッシュ"
