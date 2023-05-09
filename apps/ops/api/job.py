@@ -73,6 +73,7 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
     http_method_names = ('get', 'post', 'head', 'options',)
     model = JobExecution
     search_fields = ('material',)
+    filterset_fields = ['status', 'job_id']
 
     @atomic
     def perform_create(self, serializer):
@@ -88,9 +89,6 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         queryset = queryset.filter(creator=self.request.user)
-        job_id = self.request.query_params.get('job_id')
-        if job_id:
-            queryset = queryset.filter(job_id=job_id)
         return queryset
 
 
