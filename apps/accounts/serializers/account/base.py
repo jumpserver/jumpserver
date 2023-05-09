@@ -78,4 +78,5 @@ class BaseAccountSerializer(AuthValidateMixin, BulkOrgResourceModelSerializer):
         ]
         extra_kwargs = {
             'spec_info': {'label': _('Spec info')},
+            'username': {'help_text': _("Tip: If no username is required for authentication, fill in `null`")}
         }
