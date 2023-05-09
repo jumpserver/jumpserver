@@ -48,3 +48,4 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     ANNOUNCEMENT = serializers.DictField()
 
     TICKETS_ENABLED = serializers.BooleanField()
+    CONNECTION_TOKEN_REUSABLE = serializers.BooleanField()
