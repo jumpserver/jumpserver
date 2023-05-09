@@ -7,9 +7,11 @@
     <script src="{% static 'js/plugins/xterm/addons/fit/fit.js' %}"></script>
     <link rel="stylesheet" href="{% static 'js/plugins/xterm/xterm.css' %}" />
     <link rel="shortcut icon" href="{{ INTERFACE.favicon }}" type="image/x-icon">
+    <script src="{% static "js/jumpserver.js" %}?_=9"></script>
     <style>
         body {
             background-color: black;
+            margin: 0;
         }
 
         .xterm-rows {
@@ -37,8 +39,45 @@
             background-color: #494141;
             border-radius: 6px;
         }
+        #term {
+            padding: 0 8px;
+        }
+        .info {
+            display: flex;
+            flex-wrap: wrap;
+            width: 100%;
+            padding: 6px 8px;
+            margin: 0;
+            background-color: #F3F3F5;
+        }
+        .info .item {
+            flex: auto;
+            list-style: none;
+            font-size: 14px;
+        }
+        .info .item .value {
+            color: #313132;
+        }
     </style>
 </head>
+<ul class="info">
+    <li class="item">
+        <span>ID:</span>
+        <span class="value task-id"></span>
+    </li>
+    <li class="item">
+        <span>{% trans 'Task type' %}:</span>
+        <span class="value task-type"></span>
+    </li>
+    <li class="item">
+        <span>{% trans 'Trigger type' %}:</span>
+        <span class="value trigger-type"></span>
+    </li>
+    <li class="item">
+        <span>{% trans 'Date start' %}:</span>
+        <span class="value date-start"></span>
+    </li>
+</ul>
 <div id="term" style="height: 100%;width: 100%">
 </div>
 
@@ -85,7 +124,24 @@
                 term.write("Connect websocket server error")
             }
         }
+        getAutomationExecutionInfo();
     }).on('resize', window, function () {
         window.fit.fit(term);
     });
+    function getAutomationExecutionInfo() {
+        var url = "{% url 'api-assets:automation-execution' pk=task_id %}";
+
+        requestApi({
+            url: url,
+            method: "GET",
+            flash_message: false,
+            success(data) {
+                const dateStart = new Date(data.date_start).toLocaleString();
+                $('.task-id').html(data.id);
+                $('.task-type').html(data.snapshot.type.label);
+                $('.trigger-type').html(data.trigger.label);
+                $('.date-start').html(dateStart);
+            }
+        })
+    }
 </script>
