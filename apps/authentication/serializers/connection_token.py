@@ -1,13 +1,17 @@
+from django.conf import settings
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from perms.serializers.permission import ActionChoicesField
-from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from common.serializers.fields import EncryptedField
+from common.utils import lazyproperty
+from orgs.mixins.serializers import OrgResourceModelSerializerMixin
+from perms.serializers.permission import ActionChoicesField
 from ..models import ConnectionToken
 
 __all__ = [
     'ConnectionTokenSerializer', 'SuperConnectionTokenSerializer',
+    'ConnectionTokenUpdateSerializer',
 ]
 
 
@@ -25,13 +29,13 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         fields_small = fields_mini + [
             'user', 'asset', 'account', 'input_username',
             'input_secret', 'connect_method', 'protocol', 'actions',
-            'is_active', 'from_ticket', 'from_ticket_info',
+            'is_active', 'is_reusable', 'from_ticket', 'from_ticket_info',
             'date_expired', 'date_created', 'date_updated', 'created_by',
             'updated_by', 'org_id', 'org_name',
         ]
         read_only_fields = [
             # 普通 Token 不支持指定 user
-            'user', 'expire_time', 'is_expired',
+            'user', 'expire_time', 'is_expired', 'date_expired',
             'user_display', 'asset_display',
         ]
         fields = fields_small + read_only_fields
@@ -55,6 +59,33 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         user = self.get_request_user()
         info = instance.from_ticket.get_extra_info_of_review(user=user)
         return info
+
+
+class ConnectionTokenUpdateSerializer(ConnectionTokenSerializer):
+    class Meta(ConnectionTokenSerializer.Meta):
+        can_update_fields = ['is_reusable']
+        read_only_fields = list(set(ConnectionTokenSerializer.Meta.fields) - set(can_update_fields))
+
+    @lazyproperty
+    def date_expired_max(self):
+        delta = self.instance.date_expired - self.instance.date_created
+        if delta.total_seconds() > 3600 * 24:
+            return self.instance.date_expired
+
+        seconds = settings.CONNECTION_TOKEN_EXPIRATION_MAX
+        return timezone.now() + timezone.timedelta(seconds=seconds)
+
+    @staticmethod
+    def validate_is_reusable(value):
+        if value and not settings.CONNECTION_TOKEN_REUSABLE:
+            raise serializers.ValidationError(_('Reusable connection token is not allowed, global setting not enabled'))
+        return value
+
+    def validate(self, attrs):
+        reusable = attrs.get('is_reusable', False)
+        if reusable:
+            attrs['date_expired'] = self.date_expired_max
+        return attrs
 
 
 class SuperConnectionTokenSerializer(ConnectionTokenSerializer):

@@ -40,6 +40,7 @@ class ConnectionToken(JMSOrgBaseModel):
     connect_method = models.CharField(max_length=32, verbose_name=_("Connect method"))
     user_display = models.CharField(max_length=128, default='', verbose_name=_("User display"))
     asset_display = models.CharField(max_length=128, default='', verbose_name=_("Asset display"))
+    is_reusable = models.BooleanField(default=False, verbose_name=_("Reusable"))
     date_expired = models.DateTimeField(default=date_expired_default, verbose_name=_("Date expired"))
     from_ticket = models.OneToOneField(
         'tickets.ApplyLoginAssetTicket', related_name='connection_token',
@@ -74,7 +75,7 @@ class ConnectionToken(JMSOrgBaseModel):
 
     def expire(self):
         self.date_expired = timezone.now()
-        self.save()
+        self.save(update_fields=['date_expired'])
 
     def renewal(self):
         """ 续期 Token，将来支持用户自定义创建 token 后，续期策略要修改 """
@@ -108,9 +109,8 @@ class ConnectionToken(JMSOrgBaseModel):
             error = _('No user or invalid user')
             raise PermissionDenied(error)
         if not self.asset or not self.asset.is_active:
-            is_valid = False
             error = _('No asset or inactive asset')
-            return is_valid, error
+            raise PermissionDenied(error)
         if not self.account:
             error = _('No account')
             raise PermissionDenied(error)
