@@ -161,7 +161,9 @@ class Applet(JMSBaseModel):
             return None
         prefer_host_account_key = 'applet_host_prefer_account_{}_{}'.format(user.id, host.id)
         prefer_account_id = cache.get(prefer_host_account_key, None)
-        prefer_account = accounts.filter(id=prefer_account_id).first()
+        prefer_account = None
+        if prefer_account_id:
+            prefer_account = accounts.filter(id=prefer_account_id).first()
         if prefer_account:
             account = prefer_account
         else:
