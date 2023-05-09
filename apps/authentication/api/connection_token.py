@@ -25,7 +25,8 @@ from terminal.models import EndpointRule
 from ..models import ConnectionToken, date_expired_default
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
-    SuperConnectionTokenSerializer, ConnectTokenAppletOptionSerializer, ConnectionTokenUpdateSerializer
+    SuperConnectionTokenSerializer, ConnectTokenAppletOptionSerializer,
+    ConnectionTokenUpdateSerializer
 )
 
 __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
