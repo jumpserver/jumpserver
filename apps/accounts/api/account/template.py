@@ -1,4 +1,6 @@
 from django_filters import rest_framework as drf_filters
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from accounts import serializers
 from accounts.models import AccountTemplate
@@ -38,8 +40,20 @@ class AccountTemplateViewSet(OrgBulkModelViewSet):
     filterset_class = AccountTemplateFilterSet
     search_fields = ('username', 'name')
     serializer_classes = {
-        'default': serializers.AccountTemplateSerializer
+        'default': serializers.AccountTemplateSerializer,
     }
+    rbac_perms = {
+        'su_from_account_templates': 'accounts.view_accounttemplate',
+    }
+
+    @action(methods=['get'], detail=False, url_path='su-from-account-templates')
+    def su_from_account_templates(self, request, *args, **kwargs):
+        pk = request.query_params.get('template_id')
+        template = AccountTemplate.objects.filter(pk=pk).first()
+        templates = AccountTemplate.get_su_from_account_templates(template)
+        templates = self.filter_queryset(templates)
+        serializer = self.get_serializer(templates, many=True)
+        return Response(data=serializer.data)
 
 
 class AccountTemplateSecretsViewSet(RecordViewLogMixin, AccountTemplateViewSet):

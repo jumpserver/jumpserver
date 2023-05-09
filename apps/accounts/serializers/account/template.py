@@ -1,7 +1,9 @@
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from accounts.models import AccountTemplate, Account
 from common.serializers import SecretReadableMixin
+from common.serializers.fields import ObjectRelatedField
 from .base import BaseAccountSerializer
 
 
@@ -9,9 +11,14 @@ class AccountTemplateSerializer(BaseAccountSerializer):
     is_sync_account = serializers.BooleanField(default=False, write_only=True)
     _is_sync_account = False
 
+    su_from = ObjectRelatedField(
+        required=False, queryset=AccountTemplate.objects, allow_null=True,
+        allow_empty=True, label=_('Su from'), attrs=('id', 'name', 'username')
+    )
+
     class Meta(BaseAccountSerializer.Meta):
         model = AccountTemplate
-        fields = BaseAccountSerializer.Meta.fields + ['is_sync_account']
+        fields = BaseAccountSerializer.Meta.fields + ['is_sync_account', 'su_from']
 
     def sync_accounts_secret(self, instance, diff):
         if not self._is_sync_account or 'secret' not in diff:

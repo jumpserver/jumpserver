@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
@@ -108,6 +108,11 @@ class Account(AbsConnectivity, BaseAccount):
 
 
 class AccountTemplate(BaseAccount):
+    su_from = models.ForeignKey(
+        'self', related_name='su_to', null=True,
+        on_delete=models.SET_NULL, verbose_name=_("Su from")
+    )
+
     class Meta:
         verbose_name = _('Account template')
         unique_together = (
@@ -117,6 +122,21 @@ class AccountTemplate(BaseAccount):
             ('view_accounttemplatesecret', _('Can view asset account template secret')),
             ('change_accounttemplatesecret', _('Can change asset account template secret')),
         ]
+
+    @classmethod
+    def get_su_from_account_templates(cls, instance=None):
+        if not instance:
+            return cls.objects.all()
+        return cls.objects.exclude(Q(id=instance.id) | Q(su_from=instance))
+
+    def get_su_from_account(self, asset):
+        su_from = self.su_from
+        if su_from and asset.platform.su_enabled:
+            account = asset.accounts.filter(
+                username=su_from.username,
+                secret_type=su_from.secret_type
+            ).first()
+            return account
 
     def __str__(self):
         return self.username
