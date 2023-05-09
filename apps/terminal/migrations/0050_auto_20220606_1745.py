@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('terminal', '0049_endpoint_redis_port'),
     ]
@@ -13,10 +12,10 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='terminal',
             name='type',
-            field=models.CharField(choices=[
-                ('koko', 'KoKo'), ('guacamole', 'Guacamole'), ('omnidb', 'OmniDB'),
-                ('xrdp', 'Xrdp'), ('lion', 'Lion'), ('core', 'Core'), ('celery', 'Celery'),
-                ('magnus', 'Magnus'), ('razor', 'Razor'), ('tinker', 'Tinker'),
-            ], default='koko', max_length=64, verbose_name='type'),
+            field=models.CharField(
+                choices=[('koko', 'KoKo'), ('guacamole', 'Guacamole'), ('omnidb', 'OmniDB'), ('xrdp', 'Xrdp'),
+                         ('lion', 'Lion'), ('core', 'Core'), ('celery', 'Celery'), ('magnus', 'Magnus'),
+                         ('razor', 'Razor'), ('tinker', 'Tinker'), ('video_worker', 'Video Worker')], default='koko',
+                max_length=64, verbose_name='type'),
         ),
     ]
