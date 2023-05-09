@@ -2,11 +2,14 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.utils.functional import LazyObject
 
+from accounts.models import Account
 from common.signals import django_ready
 from common.utils import get_logger
 from common.utils.connection import RedisPubSub
 from orgs.utils import tmp_to_builtin_org
+from users.models import User
 from ..models import Applet, AppletHost
+from ..tasks import applet_host_generate_accounts
 from ..utils import DBPortManager
 
 db_port_manager: DBPortManager
@@ -19,10 +22,28 @@ def on_applet_host_create(sender, instance, created=False, **kwargs):
         return
     applets = Applet.objects.all()
     instance.applets.set(applets)
-    with tmp_to_builtin_org(system=1):
-        instance.generate_accounts()
 
+    applet_host_generate_accounts.delay(instance.id)
     applet_host_change_pub_sub.publish(True)
+
+
+@receiver(post_save, sender=User)
+def on_user_create_create_account(sender, instance, created=False, **kwargs):
+    if not created:
+        return
+
+    with tmp_to_builtin_org(system=1):
+        applet_hosts = AppletHost.objects.all()
+        for host in applet_hosts:
+            host.generate_private_accounts_by_usernames([instance.username])
+
+
+@receiver(post_delete, sender=User)
+def on_user_delete_remove_account(sender, instance, **kwargs):
+    with tmp_to_builtin_org(system=1):
+        applet_hosts = AppletHost.objects.all().values_list('id', flat=True)
+        accounts = Account.objects.filter(asset_id__in=applet_hosts, username=instance.username)
+        accounts.delete()
 
 
 @receiver(post_delete, sender=AppletHost)

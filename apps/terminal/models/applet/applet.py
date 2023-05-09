@@ -32,6 +32,7 @@ class Applet(JMSBaseModel):
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     builtin = models.BooleanField(default=False, verbose_name=_('Builtin'))
     protocols = models.JSONField(default=list, verbose_name=_('Protocol'))
+    can_concurrent = models.BooleanField(default=True, verbose_name=_('Can concurrent'))
     tags = models.JSONField(default=list, verbose_name=_('Tags'))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
     hosts = models.ManyToManyField(
@@ -134,37 +135,68 @@ class Applet(JMSBaseModel):
         shutil.copytree(path, pkg_path)
         return instance, serializer
 
-    def select_host_account(self):
-        # 选择激活的发布机
+    def select_host(self, user):
         hosts = [
             host for host in self.hosts.filter(is_active=True)
             if host.load != 'offline'
         ]
-
         if not hosts:
             return None
 
-        key_tmpl = 'applet_host_accounts_{}_{}'
-        host = random.choice(hosts)
-        using_keys = cache.keys(key_tmpl.format(host.id, '*')) or []
-        accounts_username_used = list(cache.get_many(using_keys).values())
-        logger.debug('Applet host account using: {}: {}'.format(host.name, accounts_username_used))
-        accounts = host.accounts.all() \
-            .filter(is_active=True, privileged=False) \
-            .exclude(username__in=accounts_username_used)
+        prefer_key = 'applet_host_prefer_{}'.format(user.id)
+        prefer_host_id = cache.get(prefer_key, None)
+        pref_host = [host for host in hosts if host.id == prefer_host_id]
+        if pref_host:
+            host = pref_host[0]
+        else:
+            host = random.choice(hosts)
+            cache.set(prefer_key, host.id, timeout=None)
+        return host
 
-        msg = 'Applet host remain accounts: {}: {}'.format(host.name, len(accounts))
+    @staticmethod
+    def random_select_prefer_account(user, host, accounts):
+        msg = 'Applet host remain public accounts: {}: {}'.format(host.name, len(accounts))
         if len(accounts) == 0:
             logger.error(msg)
-        else:
-            logger.debug(msg)
-
-        if not accounts:
             return None
+        prefer_host_account_key = 'applet_host_prefer_account_{}_{}'.format(user.id, host.id)
+        prefer_account_id = cache.get(prefer_host_account_key, None)
+        prefer_account = accounts.filter(id=prefer_account_id).first()
+        if prefer_account:
+            account = prefer_account
+        else:
+            account = random.choice(accounts)
+            cache.set(prefer_host_account_key, account.id, timeout=None)
+        return account
 
-        account = random.choice(accounts)
+    def select_host_account(self, user):
+        # 选择激活的发布机
+        host = self.select_host(user)
+        if not host:
+            return None
+        can_concurrent = self.can_concurrent and self.type == 'general'
+
+        accounts = host.accounts.all().filter(is_active=True, privileged=False)
+        private_account = accounts.filter(username='js_{}'.format(user.username)).first()
+        accounts_using_key_tmpl = 'applet_host_accounts_{}_{}'
+
+        if private_account and can_concurrent:
+            account = private_account
+        else:
+            using_keys = cache.keys(accounts_using_key_tmpl.format(host.id, '*')) or []
+            accounts_username_used = list(cache.get_many(using_keys).values())
+            logger.debug('Applet host account using: {}: {}'.format(host.name, accounts_username_used))
+
+            # 优先使用 private account
+            if private_account and private_account.username not in accounts_username_used:
+                account = private_account
+            else:
+                accounts = accounts.exclude(username__in=accounts_username_used)
+                account = self.random_select_prefer_account(user, host, accounts)
+                if not account:
+                    return
         ttl = 60 * 60 * 24
-        lock_key = key_tmpl.format(host.id, account.username)
+        lock_key = accounts_using_key_tmpl.format(host.id, account.username)
         cache.set(lock_key, account.username, ttl)
 
         return {

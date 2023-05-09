@@ -16,7 +16,7 @@ from ops.celery.decorator import (
 from orgs.utils import tmp_to_builtin_org
 from .backends import server_replay_storage
 from .models import (
-    Status, Session, Task, AppletHostDeployment
+    Status, Session, Task, AppletHostDeployment, AppletHost
 )
 from .utils import find_session_replay_local
 
@@ -82,7 +82,7 @@ def upload_session_replay_to_external_storage(session_id):
 
 @shared_task(
     verbose_name=_('Run applet host deployment'),
-    activity_callback=lambda self, did, *args, **kwargs: ([did], )
+    activity_callback=lambda self, did, *args, **kwargs: ([did],)
 )
 def run_applet_host_deployment(did):
     with tmp_to_builtin_org(system=1):
@@ -98,3 +98,16 @@ def run_applet_host_deployment_install_applet(did, applet_id):
     with tmp_to_builtin_org(system=1):
         deployment = AppletHostDeployment.objects.get(id=did)
         deployment.install_applet(applet_id)
+
+
+@shared_task(
+    verbose_name=_('Generate applet host accounts'),
+    activity_callback=lambda self, host_id, *args, **kwargs: ([host_id],)
+)
+def applet_host_generate_accounts(host_id):
+    applet_host = AppletHost.objects.filter(id=host_id).first()
+    if not applet_host:
+        return
+
+    with tmp_to_builtin_org(system=1):
+        applet_host.generate_accounts()
