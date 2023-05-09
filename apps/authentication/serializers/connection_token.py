@@ -4,7 +4,6 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers.fields import EncryptedField
-from common.utils import lazyproperty
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from perms.serializers.permission import ActionChoicesField
 from ..models import ConnectionToken
@@ -66,8 +65,7 @@ class ConnectionTokenUpdateSerializer(ConnectionTokenSerializer):
         can_update_fields = ['is_reusable']
         read_only_fields = list(set(ConnectionTokenSerializer.Meta.fields) - set(can_update_fields))
 
-    @lazyproperty
-    def date_expired_max(self):
+    def _get_date_expired(self):
         delta = self.instance.date_expired - self.instance.date_created
         if delta.total_seconds() > 3600 * 24:
             return self.instance.date_expired
@@ -84,7 +82,7 @@ class ConnectionTokenUpdateSerializer(ConnectionTokenSerializer):
     def validate(self, attrs):
         reusable = attrs.get('is_reusable', False)
         if reusable:
-            attrs['date_expired'] = self.date_expired_max
+            attrs['date_expired'] = self._get_date_expired()
         return attrs
 
 
