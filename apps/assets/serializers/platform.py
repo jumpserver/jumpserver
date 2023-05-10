@@ -82,7 +82,7 @@ class PlatformProtocolSerializer(serializers.ModelSerializer):
         model = PlatformProtocol
         fields = [
             "id", "name", "port", "primary",
-            "required", "default",
+            "required", "default", "public",
             "secret_types", "setting",
         ]
 
