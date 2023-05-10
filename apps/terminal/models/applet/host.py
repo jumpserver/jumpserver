@@ -125,6 +125,7 @@ class AppletHost(Host):
             .filter(is_active=True, is_service_account=False) \
             .values_list('username', flat=True)
         account_usernames = self.accounts.all().values_list('username', flat=True)
+        account_usernames = [username[3:] for username in account_usernames if username.startswith('js_')]
         not_exist_users = set(usernames) - set(account_usernames)
         self.generate_private_accounts_by_usernames(not_exist_users)
 
