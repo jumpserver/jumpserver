@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from assets.models import Asset
 from common.permissions import IsValidUser
 from ops.const import Types
 from ops.models import Job, JobExecution
@@ -12,7 +13,7 @@ from ops.serializers.job import JobSerializer, JobExecutionSerializer
 
 __all__ = [
     'JobViewSet', 'JobExecutionViewSet', 'JobRunVariableHelpAPIView',
-    'JobAssetDetail', 'JobExecutionTaskDetail', 'FrequentUsernames'
+    'JobAssetDetail', 'JobExecutionTaskDetail', 'UsernameHintsAPI'
 ]
 
 from ops.tasks import run_ops_job_execution
@@ -20,12 +21,28 @@ from ops.variables import JMS_JOB_VARIABLE_HELP
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import tmp_to_org, get_current_org
 from accounts.models import Account
+from perms.models import PermNode
+from perms.utils import UserPermAssetUtil
 
 
 def set_task_to_serializer_data(serializer, task):
     data = getattr(serializer, "_data", {})
     data["task_id"] = task.id
     setattr(serializer, "_data", data)
+
+
+def merge_nodes_and_assets(nodes, assets, user):
+    if nodes:
+        perm_util = UserPermAssetUtil(user=user)
+        for node_id in nodes:
+            if node_id == PermNode.FAVORITE_NODE_KEY:
+                node_assets = perm_util.get_favorite_assets()
+            elif node_id == PermNode.UNGROUPED_NODE_KEY:
+                node_assets = perm_util.get_ungroup_assets()
+            else:
+                node, node_assets = perm_util.get_node_all_assets(node_id)
+            assets.extend(node_assets.exclude(id__in=[asset.id for asset in assets]))
+    return assets
 
 
 class JobViewSet(OrgBulkModelViewSet):
@@ -50,6 +67,10 @@ class JobViewSet(OrgBulkModelViewSet):
 
     def perform_create(self, serializer):
         run_after_save = serializer.validated_data.pop('run_after_save', False)
+        node_ids = serializer.validated_data.pop('nodes', [])
+        assets = serializer.validated_data.__getitem__('assets')
+        assets = merge_nodes_and_assets(node_ids, assets, self.request.user)
+        serializer.validated_data.__setitem__('assets', assets)
         instance = serializer.save()
         if instance.instant or run_after_save:
             self.run_job(instance, serializer)
@@ -105,7 +126,7 @@ class JobAssetDetail(APIView):
 
 class JobExecutionTaskDetail(APIView):
     rbac_perms = {
-        'get': ['ops.view_jobexecution'],
+        'GET': ['ops.view_jobexecution'],
     }
 
     def get(self, request, **kwargs):
@@ -131,13 +152,20 @@ class JobRunVariableHelpAPIView(APIView):
         return Response(data=JMS_JOB_VARIABLE_HELP)
 
 
-class FrequentUsernames(APIView):
+class UsernameHintsAPI(APIView):
     permission_classes = [IsValidUser]
 
-    def get(self, request, **kwargs):
+    def post(self, request, **kwargs):
+        node_ids = request.data.get('nodes', None)
+        asset_ids = request.data.get('assets', [])
+        assets = list(Asset.objects.filter(id__in=asset_ids).all())
+
+        assets = merge_nodes_and_assets(node_ids, assets, request.user)
+
         top_accounts = Account.objects.exclude(username='root') \
                            .exclude(username__startswith='jms_') \
+                           .filter(asset__in=assets) \
                            .values('username') \
                            .annotate(total=Count('username')) \
-                           .order_by('total')[:5]
+                           .order_by('total')[:10]
         return Response(data=top_accounts)
