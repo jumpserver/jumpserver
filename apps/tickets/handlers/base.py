@@ -1,14 +1,13 @@
-from html import escape
-
-from django.utils.translation import ugettext as _
+import html2text
 from django.template.loader import render_to_string
+from django.utils.translation import ugettext as _
 
 from common.utils import get_logger
+from tickets.const import TicketState, TicketType
 from tickets.utils import (
     send_ticket_processed_mail_to_applicant,
     send_ticket_applied_mail_to_assignees
 )
-from tickets.const import TicketState, TicketType
 
 logger = get_logger(__name__)
 
@@ -98,7 +97,7 @@ class BaseHandler:
         approve_info = _('{} {} the ticket').format(user_display, state_display)
         context = self._diff_prev_approve_context(state)
         context.update({'approve_info': approve_info})
-        body = self.reject_html_script(
+        body = self.safe_html_script(
             render_to_string('tickets/ticket_approve_diff.html', context)
         )
         data = {
@@ -111,6 +110,7 @@ class BaseHandler:
         return self.ticket.comments.create(**data)
 
     @staticmethod
-    def reject_html_script(unsafe_html):
-        safe_html = escape(unsafe_html)
-        return safe_html
+    def safe_html_script(unsafe_html):
+        unsafe_html = unsafe_html.replace('\n', '')
+        html_str = html2text.html2text(unsafe_html)
+        return html_str
