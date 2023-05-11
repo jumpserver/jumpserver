@@ -7,6 +7,7 @@
     <script src="{% static 'js/plugins/xterm/addons/fit/fit.js' %}"></script>
     <link rel="stylesheet" href="{% static 'js/plugins/xterm/xterm.css' %}" />
     <link rel="shortcut icon" href="{{ INTERFACE.favicon }}" type="image/x-icon">
+    <script src="{% url 'javascript-catalog' %}"></script>
     <script src="{% static "js/jumpserver.js" %}?_=9"></script>
     <style>
         body {
@@ -46,17 +47,18 @@
             display: flex;
             flex-wrap: wrap;
             width: 100%;
-            padding: 6px 8px;
+            padding: 6px 8px 6px 24px;
             margin: 0;
             background-color: #F3F3F5;
         }
         .info .item {
             flex: auto;
-            list-style: none;
+            list-style-type: square;
             font-size: 14px;
+            color: #585757;
         }
         .info .item .value {
-            color: #313132;
+            color: black;
         }
     </style>
 </head>
