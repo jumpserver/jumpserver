@@ -69,7 +69,7 @@ class SerializeToTreeNodeMixin:
             return 'file'
 
     @timeit
-    def serialize_assets(self, assets, node_key=None):
+    def serialize_assets(self, assets, node_key=None, pid=None):
         sftp_enabled_platform = PlatformProtocol.objects \
             .filter(name='ssh', setting__sftp_enabled=True) \
             .values_list('platform', flat=True) \
@@ -83,8 +83,10 @@ class SerializeToTreeNodeMixin:
             {
                 'id': str(asset.id),
                 'name': asset.name,
-                'title': f'{asset.address}\n{asset.comment}',
-                'pId': get_pid(asset),
+                'title':
+                    f'{asset.address}\n{asset.comment}'
+                    if asset.comment else asset.address,
+                'pId': pid or get_pid(asset),
                 'isParent': False,
                 'open': False,
                 'iconSkin': self.get_icon(asset),
