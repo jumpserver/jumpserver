@@ -26,14 +26,6 @@ class PlatformProtocol(models.Model):
     def secret_types(self):
         return Protocol.settings().get(self.name, {}).get('secret_types', ['password'])
 
-    def set_public(self):
-        private_protocol_set = ('winrm',)
-        self.public = self.name not in private_protocol_set
-
-    def save(self, **kwargs):
-        self.set_public()
-        return super().save(**kwargs)
-
 
 class PlatformAutomation(models.Model):
     ansible_enabled = models.BooleanField(default=False, verbose_name=_("Enabled"))
