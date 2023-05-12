@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 #
 from django.conf import settings
-from django.core.exceptions import PermissionDenied
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils.translation import ugettext_lazy as _
 from django_auth_ldap.backend import populate_user
 from django_cas_ng.signals import cas_user_authenticated
 
@@ -12,16 +12,29 @@ from authentication.backends.oidc.signals import openid_create_or_update_user
 from authentication.backends.saml2.signals import saml2_create_or_update_user
 from common.decorators import on_transaction_commit
 from common.utils import get_logger
+from jumpserver.utils import get_current_request
 from .models import User, UserPasswordHistory
 from .signals import post_user_create
 
 logger = get_logger(__file__)
 
 
-def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
+def third_party_login_acl(created):
     if created and settings.ONLY_ALLOW_EXIST_USER_AUTH:
-        user.delete()
-        raise PermissionDenied(f'Not allow non-exist user auth: {user.username}')
+        request = get_current_request()
+        request.user_need_delete = True
+        request.error_message = _(
+            '''The administrator has enabled "Only allow existing users to log in", 
+            and the current user is not in the user list. Please contact the administrator.'''
+        )
+        return False
+    return True
+
+
+def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
+    if not third_party_login_acl(created):
+        return
+
     if created:
         user.source = source
         user.save()
@@ -122,9 +135,8 @@ def on_ldap_create_user(sender, user, ldap_user, **kwargs):
 
 @receiver(openid_create_or_update_user)
 def on_openid_create_or_update_user(sender, request, user, created, name, username, email, **kwargs):
-    if created and settings.ONLY_ALLOW_EXIST_USER_AUTH:
-        user.delete()
-        raise PermissionDenied(f'Not allow non-exist user auth: {username}')
+    if not third_party_login_acl(created):
+        return
 
     if created:
         logger.debug(

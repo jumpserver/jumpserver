@@ -1,17 +1,16 @@
 import base64
-import time
 
+from django.conf import settings
+from django.contrib.auth import logout as auth_logout
+from django.http import HttpResponse
 from django.shortcuts import redirect, reverse, render
 from django.utils.deprecation import MiddlewareMixin
-from django.http import HttpResponse
-from django.conf import settings
 from django.utils.translation import ugettext as _
-from django.contrib.auth import logout as auth_logout
 
 from apps.authentication import mixins
+from authentication.signals import post_auth_failed
 from common.utils import gen_key_pair
 from common.utils import get_request_ip
-from .signals import post_auth_failed
 
 
 class MFAMiddleware:
@@ -76,12 +75,18 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
         ip = get_request_ip(request)
         try:
             self.request = request
+            self._check_third_party_login_acl()
             self._check_login_acl(request.user, ip)
         except Exception as e:
-            post_auth_failed.send(
-                sender=self.__class__, username=request.user.username,
-                request=self.request, reason=e.msg
-            )
+            if getattr(request, 'user_need_delete', False):
+                request.user.delete()
+            else:
+                error_message = getattr(e, 'msg', None)
+                error_message = error_message or str(e)
+                post_auth_failed.send(
+                    sender=self.__class__, username=request.user.username,
+                    request=self.request, reason=error_message
+                )
             auth_logout(request)
             context = {
                 'title': _('Authentication failed'),

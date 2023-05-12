@@ -54,6 +54,7 @@ def authenticate(request=None, **credentials):
     """
     username = credentials.get('username')
 
+    temp_user = None
     for backend, backend_path in _get_backends(return_tuples=True):
         # 检查用户名是否允许认证 (预先检查，不浪费认证时间)
         logger.info('Try using auth backend: {}'.format(str(backend)))
@@ -77,11 +78,19 @@ def authenticate(request=None, **credentials):
 
         # 检查用户是否允许认证
         if not backend.user_allow_authenticate(user):
+            temp_user = user
+            temp_user.backend = backend_path
             continue
 
         # Annotate the user object with the path of the backend.
         user.backend = backend_path
         return user
+    else:
+        if temp_user is not None:
+            source_display = temp_user.source_display
+            request.error_message = '''The administrator has enabled 'Only allow login from user source'. 
+            The current user source is {}. Please contact the administrator.'''.format(source_display)
+            return temp_user
 
     # The credentials supplied are invalid to all backends, fire signal
     user_login_failed.send(sender=__name__, credentials=_clean_credentials(credentials), request=request)
@@ -344,6 +353,13 @@ class AuthACLMixin:
             self.request.session['auth_confirm_required'] = '1'
             self.request.session['auth_acl_id'] = str(acl.id)
             return
+
+    def _check_third_party_login_acl(self):
+        request = self.request
+        error_message = getattr(request, 'error_message', None)
+        if not error_message:
+            return
+        raise ValueError(error_message)
 
     def check_user_login_confirm_if_need(self, user):
         if not self.request.session.get("auth_confirm_required"):
