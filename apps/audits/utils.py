@@ -1,15 +1,20 @@
 import codecs
 import copy
 import csv
+import os
+
+import jms_storage
 
 from itertools import chain
 from datetime import datetime
 
+from django.conf import settings
 from django.db import models
 from django.http import HttpResponse
 
 from common.utils.timezone import as_current_tz
 from common.utils import validate_ip, get_ip_city, get_logger
+from terminal.models import default_storage, ReplayStorage
 from .const import DEFAULT_CITY
 
 logger = get_logger(__name__)
@@ -117,3 +122,60 @@ def model_to_dict_for_operate_log(
             except:
                 pass
     return data
+
+
+def find_ftp_log_file_local(ftp_log):
+    local_path = ftp_log.get_file_local_path()
+
+    # 去default storage中查找
+    if default_storage.exists(local_path):
+        url = default_storage.url(local_path)
+        return local_path, url
+    return None, None
+
+
+def download_file(remote_path, local_path):
+    replay_storages = ReplayStorage.objects.all()
+    configs = {
+        storage.name: storage.config
+        for storage in replay_storages
+        if not storage.type_null_or_server
+    }
+    if settings.SERVER_REPLAY_STORAGE:
+        storages = ReplayStorage.objects.filter(id=settings.SERVER_REPLAY_STORAGE)
+        if len(storages) == 0:
+            logger.warn('Cannot find replayStorage: ' + settings.SERVER_REPLAY_STORAGE)
+        else:
+            storage = storages[0].meta
+            storage['TYPE'] = storages[0].type
+            configs['SERVER_REPLAY_STORAGE'] = storage
+    if not configs:
+        msg = "Not found FTP file, and not remote storage set"
+        return None, msg
+
+    # 保存到storage的路径
+    target_path = os.path.join(default_storage.base_location, local_path)
+    target_dir = os.path.dirname(target_path)
+    if not os.path.isdir(target_dir):
+        os.makedirs(target_dir, exist_ok=True)
+    storage = jms_storage.get_multi_object_storage(configs)
+    ok, err = storage.download(remote_path, target_path)
+    if not ok:
+        msg = "Failed download file from {} to {}: {}".format(remote_path, target_path, err)
+        logger.error(msg)
+        return None, "Failed download file: {}".format(err)
+    url = default_storage.url(local_path)
+    return local_path, url
+
+
+def download_ftp_log_file(ftp_log):
+    remote_path = ftp_log.get_file_remote_path()
+    local_path = ftp_log.get_file_local_path()
+    return download_file(remote_path, local_path)
+
+
+def get_ftp_log_file_url(ftp_log):
+    local_path, url = find_ftp_log_file_local(ftp_log)
+    if local_path is None:
+        local_path, url = download_ftp_log_file(ftp_log)
+    return local_path, url

@@ -1,7 +1,9 @@
+import os
 import uuid
 
 from django.db import models
 from django.db.models import Q
+from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext, ugettext_lazy as _
 
@@ -10,6 +12,7 @@ from common.utils import lazyproperty
 from ops.models import JobExecution
 from orgs.mixins.models import OrgModelMixin, Organization
 from orgs.utils import current_org
+from terminal.models import default_storage
 from .const import (
     OperateChoices,
     ActionChoices,
@@ -40,6 +43,8 @@ class JobLog(JobExecution):
 
 
 class FTPLog(OrgModelMixin):
+    upload_to = 'FTP_FILES'
+
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=128, verbose_name=_("User"))
     remote_addr = models.CharField(
@@ -53,9 +58,30 @@ class FTPLog(OrgModelMixin):
     filename = models.CharField(max_length=1024, verbose_name=_("Filename"))
     is_success = models.BooleanField(default=True, verbose_name=_("Success"))
     date_start = models.DateTimeField(auto_now_add=True, verbose_name=_("Date start"))
+    has_file = models.BooleanField(default=False, verbose_name=_("File Record"))
 
     class Meta:
         verbose_name = _("File transfer log")
+
+    def get_file_local_path(self):
+        local_path = os.path.join(self.upload_to, self.date_start.strftime('%Y-%m-%d'), str(self.id))
+        return local_path
+
+    def get_file_remote_path(self):
+        local_path = os.path.join(self.upload_to, self.date_start.strftime('%Y-%m-%d'), str(self.id))
+        return local_path
+
+    def save_file_to_storage(self, file):
+        local_path = self.get_file_local_path()
+        try:
+            name = default_storage.save(local_path, file)
+        except OSError as e:
+            return None, e
+
+        if settings.SERVER_REPLAY_STORAGE:
+            from .tasks import upload_ftp_file_to_external_storage
+            upload_ftp_file_to_external_storage.delay(str(self.id), file.name)
+        return name, None
 
 
 class OperateLog(OrgModelMixin):
