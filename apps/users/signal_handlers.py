@@ -19,7 +19,7 @@ from .signals import post_user_create
 logger = get_logger(__file__)
 
 
-def third_party_login_acl(created):
+def check_only_allow_exist_user_auth(created):
     if created and settings.ONLY_ALLOW_EXIST_USER_AUTH:
         request = get_current_request()
         request.user_need_delete = True
@@ -32,7 +32,7 @@ def third_party_login_acl(created):
 
 
 def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
-    if not third_party_login_acl(created):
+    if not check_only_allow_exist_user_auth(created):
         return
 
     if created:
@@ -135,7 +135,7 @@ def on_ldap_create_user(sender, user, ldap_user, **kwargs):
 
 @receiver(openid_create_or_update_user)
 def on_openid_create_or_update_user(sender, request, user, created, name, username, email, **kwargs):
-    if not third_party_login_acl(created):
+    if not check_only_allow_exist_user_auth(created):
         return
 
     if created:
