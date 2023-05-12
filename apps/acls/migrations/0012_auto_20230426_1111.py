@@ -21,7 +21,7 @@ def migrate_base_acl_users_assets_accounts(apps, *args):
                 asset_attrs.append({"name": "name", "value": asset_names, "match": "in"})
             asset_address = (obj.assets or {}).get('address_group', [])
             if asset_address:
-                asset_attrs.append({"name": "address", "value": asset_address, "match": "ip_in", "rel": "or"})
+                asset_attrs.append({"name": "address", "value": asset_address, "match": "ip_in"})
             obj.new_assets = {"type": "attrs", "attrs": asset_attrs}
 
             account_usernames = (obj.accounts or {}).get('username_group', [])

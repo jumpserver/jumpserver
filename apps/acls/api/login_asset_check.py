@@ -1,6 +1,7 @@
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 
+from common.db.fields import JSONManyToManyField
 from common.utils import reverse, lazyproperty
 from orgs.utils import tmp_to_org
 from .. import serializers
@@ -30,14 +31,20 @@ class LoginAssetCheckAPI(CreateAPIView):
         return serializer
 
     def check_review(self):
+        user = self.serializer.user
+        asset = self.serializer.asset
+
+        # 用户满足的 acls
+        queryset = LoginAssetACL.objects.all()
+        q = JSONManyToManyField.get_filter_q(LoginAssetACL, 'users', user)
+        queryset = queryset.filter(q)
+        q = JSONManyToManyField.get_filter_q(LoginAssetACL, 'assets', asset)
+        queryset = queryset.filter(q)
+        account_username = self.serializer.validated_data.get('account_username')
+        queryset = queryset.filter(accounts__contains=account_username)
+
         with tmp_to_org(self.serializer.asset.org):
-            kwargs = {
-                'user': self.serializer.user,
-                'asset': self.serializer.asset,
-                'account_username': self.serializer.validated_data.get('account_username'),
-                'action': LoginAssetACL.ActionChoices.review
-            }
-            acl = LoginAssetACL.objects.filter(**kwargs).valid().first()
+            acl = queryset.order_by('priority').valid().first()
 
         if acl:
             need_review = True

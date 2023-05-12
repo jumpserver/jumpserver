@@ -3,6 +3,7 @@
 
 import ipaddress
 import json
+import re
 
 from django.apps import apps
 from django.core.exceptions import ValidationError
@@ -344,10 +345,6 @@ class RelatedManager:
                 if name is None or val is None:
                     continue
 
-                if val == '*':
-                    filters = Q()
-                    break
-
                 if match == 'ip_in':
                     q = self.get_ip_in_q(name, val)
                 elif match in ("exact", "contains", "startswith", "endswith", "regex"):
@@ -362,7 +359,10 @@ class RelatedManager:
                     else:
                         q = Q()
                 else:
-                    q = Q(**{name: val})
+                    if val == '*':
+                        q = Q()
+                    else:
+                        q = Q(**{name: val})
 
                 if rel == 'or':
                     filters |= q
@@ -415,6 +415,59 @@ class JSONManyToManyDescriptor:
             value = value.value
         manager.set(value)
 
+    def test_is(self):
+        print("Self.field is", self.field)
+        print("Self.field to", self.field.to)
+        print("Self.field model", self.field.model)
+        print("Self.field column", self.field.column)
+        print("Self.field to", self.field.__dict__)
+
+    @staticmethod
+    def attr_to_regex(attr):
+        """将属性规则转换为正则表达式"""
+        name, value, match = attr['name'], attr['value'], attr['match']
+        if match == 'contains':
+            return r'.*{}.*'.format(escape_regex(value))
+        elif match == 'startswith':
+            return r'^{}.*'.format(escape_regex(value))
+        elif match == 'endswith':
+            return r'.*{}$'.format(escape_regex(value))
+        elif match == 'regex':
+            return value
+        elif match == 'not':
+            return r'^(?!^{}$)'.format(escape_regex(value))
+        elif match == 'in':
+            values = '|'.join(map(escape_regex, value))
+            return r'^(?:{})$'.format(values)
+        else:
+            return r'^{}$'.format(escape_regex(value))
+
+    def is_match(self, attr_dict, attr_rules):
+        for rule in attr_rules:
+            value = attr_dict.get(rule['name'], '')
+            regex = self.attr_to_regex(rule)
+            if not re.match(regex, value):
+                return False
+        return True
+
+    def get_filter_q(self, instance):
+        model_cls = self.field.model
+        field_name = self.field.column
+        q = Q(users__type='all') | Q(users__type='ids', users__ids__contains=[str(instance.id)])
+        queryset_id_attrs = model_cls.objects \
+            .filter(**{'{}__type'.format(field_name): 'attrs'}) \
+            .values_list('id', '{}__attrs'.format(field_name))
+        instance_attr = {k: v for k, v in instance.__dict__.items() if not k.startswith('_')}
+        ids = [str(_id) for _id, attr_rules in queryset_id_attrs if self.is_match(instance_attr, attr_rules)]
+        if ids:
+            q |= Q(id__in=ids)
+        return q
+
+
+def escape_regex(s):
+    """转义字符串中的正则表达式特殊字符"""
+    return re.sub('[.*+?^${}()|[\\]]', r'\\\g<0>', s)
+
 
 class JSONManyToManyField(models.JSONField):
     def __init__(self, to, *args, **kwargs):
@@ -455,18 +508,15 @@ class JSONManyToManyField(models.JSONField):
                 if 'name' not in attr or 'value' not in attr:
                     raise ValueError(_("Invalid attrs, should be has name and value"))
 
-    def get_db_prep_value(self, value, connection, prepared=False):
-        return self.get_prep_value(value)
-
     def get_prep_value(self, value):
         if value is None:
             return None
         if isinstance(value, RelatedManager):
             value = value.value
-        self.check_value(value)
         return json.dumps(value)
 
     def validate(self, value, model_instance):
         super().validate(value, model_instance)
         if not isinstance(value, dict):
             raise ValidationError("Invalid JSON data for JSONManyToManyField.")
+        self.check_value(value)
