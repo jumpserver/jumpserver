@@ -23,14 +23,14 @@
 
 --------------------------
 
-JumpServer 是广受欢迎的开源堡垒机，是符合 4A 规范的专业运维安全审计系统。JumpServer 堡垒机帮助企业以更安全的方式管控和登录所有类型的资产，包括：
+JumpServer 是广受欢迎的开源堡垒机，是符合 4A 规范的专业运维安全审计系统。JumpServer 堡垒机帮助企业以更安全的方式管控和登录各种类型的资产，包括：
 
-- **SSH**: Linux / Unix / 网络设备 等
-- **Windows**: Web 方式连接 / 原生 RDP 连接
-- **数据库**: MySQL / Oracle / SQLServer / PostgreSQL 等
-- **Kubernetes**: 支持连接到 K8s 集群中的 Pods
-- **Web 站点**: 各类系统的 Web 管理后台
-- **应用**: 通过 Remote App 连接各类应用
+- **SSH**: Linux / Unix / 网络设备 等；
+- **Windows**: Web 方式连接 / 原生 RDP 连接；
+- **数据库**: MySQL / Oracle / SQLServer / PostgreSQL 等；
+- **Kubernetes**: 支持连接到 K8s 集群中的 Pods；
+- **Web 站点**: 各类系统的 Web 管理后台；
+- **应用**: 通过 Remote App 连接各类应用。
 
 ## 产品特色
 
@@ -40,8 +40,6 @@ JumpServer 是广受欢迎的开源堡垒机，是符合 4A 规范的专业运�
 - **多云支持**: 一套系统，同时管理不同云上面的资产；
 - **多租户**: 一套系统，多个子公司或部门同时使用；
 - **云端存储**: 审计录像云端存储，永不丢失；
-- **多应用支持**: 全面支持各类资产，包括服务器、数据库、Windows RemoteApp、Kubernetes 等;
-- **安全可靠**: 被广泛使用、验证和信赖，连续 9 年的持续研发投入和产品更新升级。
 
 ## UI 展示
 
