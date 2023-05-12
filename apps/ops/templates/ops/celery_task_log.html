@@ -143,6 +143,9 @@
                 $('.task-type').html(data.snapshot.type.label);
                 $('.trigger-type').html(data.trigger.label);
                 $('.date-start').html(dateStart);
+            },
+            error(error) {
+                $('.info').hide();
             }
         })
     }
