@@ -303,7 +303,7 @@ class AssetAccountBulkSerializer(
         su_from = validated_data.get('su_from')
         su_from_username = validated_data.pop('su_from_username', None)
         if template:
-            su_from = template.get_su_from_account()
+            su_from = template.get_su_from_account(asset)
         elif su_from_username:
             su_from = asset.accounts.filter(username=su_from_username).first()
         validated_data['su_from'] = su_from
