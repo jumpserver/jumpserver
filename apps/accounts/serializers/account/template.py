@@ -35,7 +35,7 @@ class AccountTemplateSerializer(BaseAccountSerializer):
     def update(self, instance, validated_data):
         diff = {
             k: v for k, v in validated_data.items()
-            if getattr(instance, k) != v
+            if getattr(instance, k, None) != v
         }
         instance = super().update(instance, validated_data)
         self.sync_accounts_secret(instance, diff)
