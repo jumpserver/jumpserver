@@ -5,7 +5,7 @@ azure-identity==1.5.0
 azure-mgmt-compute==4.6.2
 azure-mgmt-network==2.7.0
 google-cloud-compute==0.5.0
-grpcio=1.54.2
+grpcio==1.54.2
 alibabacloud_dysmsapi20170525==2.0.2
 python-novaclient==11.0.1
 python-keystoneclient==4.3.0
