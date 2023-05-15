@@ -11,7 +11,7 @@ class FlowerService(BaseService):
 
     @property
     def db_file(self):
-        return os.path.join(BASE_DIR, 'data', 'flower')
+        return os.path.join(BASE_DIR, 'data', 'flower.db')
 
     @property
     def cmd(self):
