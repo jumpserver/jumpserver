@@ -93,6 +93,7 @@
     var failOverWsURL = scheme + "://" + document.location.hostname + ':' + failOverPort + url;
     var term;
     var ws;
+    var extraQuery = Object.fromEntries(new URLSearchParams(window.location.search));
 
     $(document).ready(function () {
         term = new Terminal({
@@ -131,7 +132,10 @@
         window.fit.fit(term);
     });
     function getAutomationExecutionInfo() {
-        var url = "{% url 'api-assets:automation-execution' pk=task_id %}";
+        let url =  "{% url 'api-assets:automation-execution' pk=task_id %}";
+        if (extraQuery.isAppletHostDeployment) {
+            url = "{% url 'api-terminal:applet-host-deployment-detail' pk=task_id %}";
+        }
 
         requestApi({
             url: url,
