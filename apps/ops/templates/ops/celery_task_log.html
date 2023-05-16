@@ -72,10 +72,6 @@
         <span class="value task-type"></span>
     </li>
     <li class="item">
-        <span>{% trans 'Trigger type' %}:</span>
-        <span class="value trigger-type"></span>
-    </li>
-    <li class="item">
         <span>{% trans 'Date start' %}:</span>
         <span class="value date-start"></span>
     </li>
@@ -132,10 +128,7 @@
         window.fit.fit(term);
     });
     function getAutomationExecutionInfo() {
-        let url =  "{% url 'api-assets:automation-execution' pk=task_id %}";
-        if (extraQuery.isAppletHostDeployment) {
-            url = "{% url 'api-terminal:applet-host-deployment-detail' pk=task_id %}";
-        }
+        let url =  "{% url 'api-ops:task-executions-detail' pk=task_id %}";
 
         requestApi({
             url: url,
@@ -144,8 +137,7 @@
             success(data) {
                 const dateStart = new Date(data.date_start).toLocaleString();
                 $('.task-id').html(data.id);
-                $('.task-type').html(data.snapshot.type.label);
-                $('.trigger-type').html(data.trigger.label);
+                $('.task-type').html(data.task_name);
                 $('.date-start').html(dateStart);
             }
         })
