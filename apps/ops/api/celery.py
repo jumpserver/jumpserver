@@ -4,19 +4,19 @@ import os
 import re
 
 from celery.result import AsyncResult
-from rest_framework import generics, viewsets, mixins, status
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
 from django_celery_beat.models import PeriodicTask
+from rest_framework import generics, viewsets, mixins, status
 from rest_framework.response import Response
 
+from common.api import LogTailApi, CommonApiMixin
 from common.exceptions import JMSException
 from common.permissions import IsValidUser
-from common.api import LogTailApi, CommonApiMixin
 from ops.celery import app
-from ..models import CeleryTaskExecution, CeleryTask
-from ..celery.utils import get_celery_task_log_path
 from ..ansible.utils import get_ansible_task_log_path
+from ..celery.utils import get_celery_task_log_path
+from ..models import CeleryTaskExecution, CeleryTask
 from ..serializers import CeleryResultSerializer, CeleryPeriodTaskSerializer
 from ..serializers.celery import CeleryTaskSerializer, CeleryTaskExecutionSerializer
 

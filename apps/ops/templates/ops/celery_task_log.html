@@ -72,10 +72,6 @@
         <span class="value task-type"></span>
     </li>
     <li class="item">
-        <span>{% trans 'Trigger type' %}:</span>
-        <span class="value trigger-type"></span>
-    </li>
-    <li class="item">
         <span>{% trans 'Date start' %}:</span>
         <span class="value date-start"></span>
     </li>
@@ -93,6 +89,7 @@
     var failOverWsURL = scheme + "://" + document.location.hostname + ':' + failOverPort + url;
     var term;
     var ws;
+    var extraQuery = Object.fromEntries(new URLSearchParams(window.location.search));
 
     $(document).ready(function () {
         term = new Terminal({
@@ -131,7 +128,7 @@
         window.fit.fit(term);
     });
     function getAutomationExecutionInfo() {
-        var url = "{% url 'api-assets:automation-execution' pk=task_id %}";
+        let url =  "{% url 'api-ops:task-executions-detail' pk=task_id %}";
 
         requestApi({
             url: url,
@@ -140,8 +137,7 @@
             success(data) {
                 const dateStart = new Date(data.date_start).toLocaleString();
                 $('.task-id').html(data.id);
-                $('.task-type').html(data.snapshot.type.label);
-                $('.trigger-type').html(data.trigger.label);
+                $('.task-type').html(data.task_name);
                 $('.date-start').html(dateStart);
             }
         })
