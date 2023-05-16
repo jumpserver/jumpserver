@@ -224,7 +224,8 @@ class BasePlaybookManager:
         pass
 
     def on_host_error(self, host, error, result):
-        print('host error: {} -> {}'.format(host, error))
+        if settings.DEBUG_DEV:
+            print('host error: {} -> {}'.format(host, error))
 
     def on_runner_success(self, runner, cb):
         summary = cb.summary
