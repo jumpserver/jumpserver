@@ -94,15 +94,15 @@ class SecurityAuthSerializer(serializers.Serializer):
     )
     USER_LOGIN_SINGLE_MACHINE_ENABLED = serializers.BooleanField(
         required=False, default=False, label=_("Only single device login"),
-        help_text=_("Next device login, pre login will be logout")
+        help_text=_("After the user logs in on the new device, other logged-in devices will automatically log out")
     )
     ONLY_ALLOW_EXIST_USER_AUTH = serializers.BooleanField(
         required=False, default=False, label=_("Only exist user login"),
-        help_text=_("If enable, CAS、OIDC auth will be failed, if user not exist yet")
+        help_text=_("If enabled, non-existent users will not be allowed to log in; if disabled, users of other authentication methods except local authentication methods are allowed to log in and automatically create users (if the user does not exist)")
     )
     ONLY_ALLOW_AUTH_FROM_SOURCE = serializers.BooleanField(
         required=False, default=False, label=_("Only from source login"),
-        help_text=_("Only log in from the user source property")
+        help_text=_("If it is enabled, the user will only authenticate to the source when logging in; if it is disabled, the user will authenticate all the enabled authentication methods in a certain order when logging in, and as long as one of the authentication methods is successful, they can log in directly")
     )
     SECURITY_MFA_VERIFY_TTL = serializers.IntegerField(
         min_value=5, max_value=60 * 60 * 10,
