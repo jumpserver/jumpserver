@@ -1,4 +1,5 @@
 import uuid
+from copy import deepcopy
 
 from django.db import IntegrityError
 from django.db.models import Q
@@ -310,6 +311,7 @@ class AssetAccountBulkSerializer(
 
     def perform_create(self, vd, handler):
         lookup = self.get_filter_lookup(vd)
+        vd = deepcopy(vd)
         self.generate_su_from_data(vd)
         try:
             instance, changed, state = handler(vd, lookup)
