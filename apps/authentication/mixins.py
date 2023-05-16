@@ -88,8 +88,8 @@ def authenticate(request=None, **credentials):
     else:
         if temp_user is not None:
             source_display = temp_user.source_display
-            request.error_message = '''The administrator has enabled 'Only allow login from user source'. 
-            The current user source is {}. Please contact the administrator.'''.format(source_display)
+            request.error_message = _('''The administrator has enabled 'Only allow login from user source'. 
+            The current user source is {}. Please contact the administrator.''').format(source_display)
             return temp_user
 
     # The credentials supplied are invalid to all backends, fire signal
