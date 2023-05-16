@@ -13,8 +13,8 @@ class GatherAccountsFilter:
     def mysql_filter(info):
         result = {}
         for _, user_dict in info.items():
-            for username, data in user_dict.items():
-                if data.get('account_locked') == 'N':
+            for username, _ in user_dict.items():
+                if len(username.split('.')) == 1:
                     result[username] = {}
         return result
 
