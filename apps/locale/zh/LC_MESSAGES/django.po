@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-16 15:15+0800\n"
+"POT-Creation-Date: 2023-05-16 18:32+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -69,7 +69,7 @@ msgstr "数据库"
 msgid "Collected"
 msgstr "收集"
 
-#: accounts/const/account.py:21 accounts/serializers/account/account.py:25
+#: accounts/const/account.py:21 accounts/serializers/account/account.py:26
 #: settings/serializers/auth/sms.py:75
 msgid "Template"
 msgstr "模板"
@@ -180,8 +180,8 @@ msgstr "仅创建"
 
 #: accounts/models/account.py:49
 #: accounts/models/automations/gather_account.py:16
-#: accounts/serializers/account/account.py:200
-#: accounts/serializers/account/account.py:233
+#: accounts/serializers/account/account.py:201
+#: accounts/serializers/account/account.py:234
 #: accounts/serializers/account/gathered_account.py:10
 #: accounts/serializers/automations/change_secret.py:112
 #: accounts/serializers/automations/change_secret.py:132
@@ -198,8 +198,8 @@ msgid "Asset"
 msgstr "资产"
 
 #: accounts/models/account.py:53 accounts/models/account.py:113
-#: accounts/serializers/account/account.py:205
-#: accounts/serializers/account/account.py:243
+#: accounts/serializers/account/account.py:206
+#: accounts/serializers/account/account.py:244
 #: accounts/serializers/account/template.py:16
 #: authentication/serializers/connect_token_secret.py:49
 msgid "Su from"
@@ -210,7 +210,7 @@ msgstr "切换自"
 msgid "Version"
 msgstr "版本"
 
-#: accounts/models/account.py:57 accounts/serializers/account/account.py:201
+#: accounts/models/account.py:57 accounts/serializers/account/account.py:202
 #: users/models/user.py:778
 msgid "Source"
 msgstr "来源"
@@ -278,7 +278,7 @@ msgstr "账号备份计划"
 #: accounts/models/automations/backup_account.py:83
 #: assets/models/automations/base.py:115 audits/models.py:55
 #: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:192
-#: ops/templates/ops/celery_task_log.html:79
+#: ops/templates/ops/celery_task_log.html:75
 #: perms/models/asset_permission.py:72 terminal/models/applet/host.py:137
 #: terminal/models/session/session.py:45
 #: tickets/models/ticket/apply_application.py:30
@@ -357,7 +357,7 @@ msgid "Can add push account execution"
 msgstr "创建推送账号执行"
 
 #: accounts/models/automations/change_secret.py:18 accounts/models/base.py:36
-#: accounts/serializers/account/account.py:410
+#: accounts/serializers/account/account.py:412
 #: accounts/serializers/account/base.py:16
 #: accounts/serializers/automations/change_secret.py:46
 #: authentication/serializers/connect_token_secret.py:41
@@ -407,7 +407,7 @@ msgid "Date finished"
 msgstr "结束日期"
 
 #: accounts/models/automations/change_secret.py:93
-#: accounts/serializers/account/account.py:235 assets/const/automation.py:8
+#: accounts/serializers/account/account.py:236 assets/const/automation.py:8
 #: authentication/views/base.py:29 authentication/views/base.py:30
 #: authentication/views/base.py:31 common/const/choices.py:20
 msgid "Error"
@@ -548,15 +548,15 @@ msgstr ""
 "{} - 改密任务已完成: 未设置加密密码 - 请前往个人信息 -> 文件加密密码中设置加"
 "密密码"
 
-#: accounts/serializers/account/account.py:28
+#: accounts/serializers/account/account.py:29
 msgid "Push now"
 msgstr "立即推送"
 
-#: accounts/serializers/account/account.py:35
+#: accounts/serializers/account/account.py:36
 msgid "Exist policy"
 msgstr "账号存在策略"
 
-#: accounts/serializers/account/account.py:180 applications/models.py:11
+#: accounts/serializers/account/account.py:181 applications/models.py:11
 #: assets/models/label.py:21 assets/models/platform.py:82
 #: assets/serializers/asset/common.py:121 assets/serializers/cagegory.py:8
 #: assets/serializers/platform.py:110 assets/serializers/platform.py:195
@@ -565,7 +565,7 @@ msgstr "账号存在策略"
 msgid "Category"
 msgstr "类别"
 
-#: accounts/serializers/account/account.py:181
+#: accounts/serializers/account/account.py:182
 #: accounts/serializers/automations/base.py:54 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:18 applications/models.py:14
 #: assets/models/_user.py:50 assets/models/automations/base.py:20
@@ -584,27 +584,27 @@ msgstr "类别"
 msgid "Type"
 msgstr "类型"
 
-#: accounts/serializers/account/account.py:196
+#: accounts/serializers/account/account.py:197
 msgid "Asset not found"
 msgstr "资产不存在"
 
-#: accounts/serializers/account/account.py:202
+#: accounts/serializers/account/account.py:203
 #: accounts/serializers/account/base.py:64
 msgid "Has secret"
 msgstr "已托管密码"
 
-#: accounts/serializers/account/account.py:234 ops/models/celery.py:60
+#: accounts/serializers/account/account.py:235 ops/models/celery.py:60
 #: tickets/models/comment.py:13 tickets/models/ticket/general.py:45
 #: tickets/models/ticket/general.py:279 tickets/serializers/super_ticket.py:14
 #: tickets/serializers/ticket/ticket.py:21
 msgid "State"
 msgstr "状态"
 
-#: accounts/serializers/account/account.py:236
+#: accounts/serializers/account/account.py:237
 msgid "Changed"
 msgstr "已修改"
 
-#: accounts/serializers/account/account.py:245
+#: accounts/serializers/account/account.py:246
 #: accounts/serializers/automations/base.py:22
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20 ops/models/base.py:17
@@ -613,27 +613,27 @@ msgstr "已修改"
 msgid "Assets"
 msgstr "资产"
 
-#: accounts/serializers/account/account.py:297
+#: accounts/serializers/account/account.py:298
 msgid "Account already exists"
 msgstr "账号已存在"
 
-#: accounts/serializers/account/account.py:346
+#: accounts/serializers/account/account.py:348
 #, python-format
 msgid "Asset does not support this secret type: %s"
 msgstr "资产不支持账号类型: %s"
 
-#: accounts/serializers/account/account.py:377
+#: accounts/serializers/account/account.py:379
 msgid "Account has exist"
 msgstr "账号已存在"
 
-#: accounts/serializers/account/account.py:411
+#: accounts/serializers/account/account.py:413
 #: authentication/serializers/connect_token_secret.py:146
 #: authentication/templates/authentication/_access_key_modal.html:30
 #: perms/models/perm_node.py:21 users/serializers/group.py:33
 msgid "ID"
 msgstr "ID"
 
-#: accounts/serializers/account/account.py:418 acls/models/base.py:98
+#: accounts/serializers/account/account.py:420 acls/models/base.py:98
 #: acls/models/login_acl.py:13 acls/serializers/base.py:75
 #: acls/serializers/login_acl.py:21 assets/models/cmd_filter.py:24
 #: assets/models/label.py:16 audits/models.py:44 audits/models.py:63
@@ -651,7 +651,7 @@ msgstr "ID"
 msgid "User"
 msgstr "用户"
 
-#: accounts/serializers/account/account.py:419
+#: accounts/serializers/account/account.py:421
 #: authentication/templates/authentication/_access_key_modal.html:33
 #: terminal/notifications.py:98 terminal/notifications.py:146
 msgid "Date"
@@ -727,7 +727,7 @@ msgstr "自动化任务执行历史"
 
 #: accounts/serializers/automations/change_secret.py:155 audits/const.py:52
 #: audits/models.py:54 audits/signal_handlers/activity_log.py:33
-#: common/const/choices.py:18 ops/const.py:56 ops/serializers/celery.py:39
+#: common/const/choices.py:18 ops/const.py:56 ops/serializers/celery.py:40
 #: terminal/const.py:60 terminal/models/session/sharing.py:107
 #: tickets/views/approve.py:114
 msgid "Success"
@@ -968,7 +968,7 @@ msgstr "应用程序"
 msgid "Can match application"
 msgstr "匹配应用"
 
-#: assets/api/asset/asset.py:142
+#: assets/api/asset/asset.py:140
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr "不能直接创建资产, 你应该创建主机或其他资产"
 
@@ -2475,6 +2475,12 @@ msgstr "清空手机号码禁用"
 msgid "Authentication failed (before login check failed): {}"
 msgstr "认证失败（登录前检查失败）: {}"
 
+#: authentication/mixins.py:91
+msgid ""
+"The administrator has enabled 'Only allow login from user source'. \n"
+"            The current user source is {}. Please contact the administrator."
+msgstr "管理员已开启'仅允许从用户来源登录'，当前用户来源为{}，请联系管理员。"
+
 #: authentication/mixins.py:266
 msgid "The MFA type ({}) is not enabled"
 msgstr "该 MFA ({}) 方式没有启用"
@@ -3660,16 +3666,8 @@ msgid "Task log"
 msgstr "任务列表"
 
 #: ops/templates/ops/celery_task_log.html:71
-#, fuzzy
-#| msgid "Task Center"
-msgid "Task type"
-msgstr "任务中心"
-
-#: ops/templates/ops/celery_task_log.html:75
-#, fuzzy
-#| msgid "Trigger mode"
-msgid "Trigger type"
-msgstr "触发模式"
+msgid "Task name"
+msgstr "任务名称"
 
 #: ops/variables.py:24
 msgid "The current user`s username of JumpServer"
@@ -6707,6 +6705,7 @@ msgid ""
 "            and the current user is not in the user list. Please contact the "
 "administrator."
 msgstr ""
+"管理员已开启'仅允许已存在用户登录'，当前用户不在用户列表中，请联系管理员。"
 
 #: users/tasks.py:21
 msgid "Check password expired"
@@ -7535,6 +7534,11 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:86
 msgid "Community edition"
 msgstr "社区版"
+
+#, fuzzy
+#~| msgid "Trigger mode"
+#~ msgid "Trigger type"
+#~ msgstr "触发模式"
 
 #~ msgid "Please login with a password and then bind the FeiShu"
 #~ msgstr "请使用密码登录，然后绑定飞书"

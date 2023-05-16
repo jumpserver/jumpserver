@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-16 15:15+0800\n"
+"POT-Creation-Date: 2023-05-16 18:32+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -70,7 +70,7 @@ msgstr "ローカル"
 msgid "Collected"
 msgstr "集めました"
 
-#: accounts/const/account.py:21 accounts/serializers/account/account.py:25
+#: accounts/const/account.py:21 accounts/serializers/account/account.py:26
 #: settings/serializers/auth/sms.py:75
 msgid "Template"
 msgstr "テンプレート"
@@ -181,8 +181,8 @@ msgstr "作成のみ"
 
 #: accounts/models/account.py:49
 #: accounts/models/automations/gather_account.py:16
-#: accounts/serializers/account/account.py:200
-#: accounts/serializers/account/account.py:233
+#: accounts/serializers/account/account.py:201
+#: accounts/serializers/account/account.py:234
 #: accounts/serializers/account/gathered_account.py:10
 #: accounts/serializers/automations/change_secret.py:112
 #: accounts/serializers/automations/change_secret.py:132
@@ -199,8 +199,8 @@ msgid "Asset"
 msgstr "資産"
 
 #: accounts/models/account.py:53 accounts/models/account.py:113
-#: accounts/serializers/account/account.py:205
-#: accounts/serializers/account/account.py:243
+#: accounts/serializers/account/account.py:206
+#: accounts/serializers/account/account.py:244
 #: accounts/serializers/account/template.py:16
 #: authentication/serializers/connect_token_secret.py:49
 msgid "Su from"
@@ -211,7 +211,7 @@ msgstr "から切り替え"
 msgid "Version"
 msgstr "バージョン"
 
-#: accounts/models/account.py:57 accounts/serializers/account/account.py:201
+#: accounts/models/account.py:57 accounts/serializers/account/account.py:202
 #: users/models/user.py:778
 msgid "Source"
 msgstr "ソース"
@@ -279,7 +279,7 @@ msgstr "アカウントバックアップ計画"
 #: accounts/models/automations/backup_account.py:83
 #: assets/models/automations/base.py:115 audits/models.py:55
 #: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:192
-#: ops/templates/ops/celery_task_log.html:79
+#: ops/templates/ops/celery_task_log.html:75
 #: perms/models/asset_permission.py:72 terminal/models/applet/host.py:137
 #: terminal/models/session/session.py:45
 #: tickets/models/ticket/apply_application.py:30
@@ -358,7 +358,7 @@ msgid "Can add push account execution"
 msgstr "プッシュ アカウントの作成の実行"
 
 #: accounts/models/automations/change_secret.py:18 accounts/models/base.py:36
-#: accounts/serializers/account/account.py:410
+#: accounts/serializers/account/account.py:412
 #: accounts/serializers/account/base.py:16
 #: accounts/serializers/automations/change_secret.py:46
 #: authentication/serializers/connect_token_secret.py:41
@@ -408,7 +408,7 @@ msgid "Date finished"
 msgstr "終了日"
 
 #: accounts/models/automations/change_secret.py:93
-#: accounts/serializers/account/account.py:235 assets/const/automation.py:8
+#: accounts/serializers/account/account.py:236 assets/const/automation.py:8
 #: authentication/views/base.py:29 authentication/views/base.py:30
 #: authentication/views/base.py:31 common/const/choices.py:20
 msgid "Error"
@@ -552,15 +552,15 @@ msgstr ""
 "{} -暗号化変更タスクが完了しました: 暗号化パスワードが設定されていません-個人"
 "情報にアクセスしてください-> ファイル暗号化パスワードを設定してください"
 
-#: accounts/serializers/account/account.py:28
+#: accounts/serializers/account/account.py:29
 msgid "Push now"
 msgstr "今すぐプッシュ"
 
-#: accounts/serializers/account/account.py:35
+#: accounts/serializers/account/account.py:36
 msgid "Exist policy"
 msgstr "アカウントの存在ポリシー"
 
-#: accounts/serializers/account/account.py:180 applications/models.py:11
+#: accounts/serializers/account/account.py:181 applications/models.py:11
 #: assets/models/label.py:21 assets/models/platform.py:82
 #: assets/serializers/asset/common.py:121 assets/serializers/cagegory.py:8
 #: assets/serializers/platform.py:110 assets/serializers/platform.py:195
@@ -569,7 +569,7 @@ msgstr "アカウントの存在ポリシー"
 msgid "Category"
 msgstr "カテゴリ"
 
-#: accounts/serializers/account/account.py:181
+#: accounts/serializers/account/account.py:182
 #: accounts/serializers/automations/base.py:54 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:18 applications/models.py:14
 #: assets/models/_user.py:50 assets/models/automations/base.py:20
@@ -588,27 +588,27 @@ msgstr "カテゴリ"
 msgid "Type"
 msgstr "タイプ"
 
-#: accounts/serializers/account/account.py:196
+#: accounts/serializers/account/account.py:197
 msgid "Asset not found"
 msgstr "資産が存在しません"
 
-#: accounts/serializers/account/account.py:202
+#: accounts/serializers/account/account.py:203
 #: accounts/serializers/account/base.py:64
 msgid "Has secret"
 msgstr "エスクローされたパスワード"
 
-#: accounts/serializers/account/account.py:234 ops/models/celery.py:60
+#: accounts/serializers/account/account.py:235 ops/models/celery.py:60
 #: tickets/models/comment.py:13 tickets/models/ticket/general.py:45
 #: tickets/models/ticket/general.py:279 tickets/serializers/super_ticket.py:14
 #: tickets/serializers/ticket/ticket.py:21
 msgid "State"
 msgstr "状態"
 
-#: accounts/serializers/account/account.py:236
+#: accounts/serializers/account/account.py:237
 msgid "Changed"
 msgstr "編集済み"
 
-#: accounts/serializers/account/account.py:245
+#: accounts/serializers/account/account.py:246
 #: accounts/serializers/automations/base.py:22
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20 ops/models/base.py:17
@@ -617,27 +617,27 @@ msgstr "編集済み"
 msgid "Assets"
 msgstr "資産"
 
-#: accounts/serializers/account/account.py:297
+#: accounts/serializers/account/account.py:298
 msgid "Account already exists"
 msgstr "アカウントはすでに存在しています"
 
-#: accounts/serializers/account/account.py:346
+#: accounts/serializers/account/account.py:348
 #, python-format
 msgid "Asset does not support this secret type: %s"
 msgstr "アセットはアカウント タイプをサポートしていません: %s"
 
-#: accounts/serializers/account/account.py:377
+#: accounts/serializers/account/account.py:379
 msgid "Account has exist"
 msgstr "アカウントはすでに存在しています"
 
-#: accounts/serializers/account/account.py:411
+#: accounts/serializers/account/account.py:413
 #: authentication/serializers/connect_token_secret.py:146
 #: authentication/templates/authentication/_access_key_modal.html:30
 #: perms/models/perm_node.py:21 users/serializers/group.py:33
 msgid "ID"
 msgstr "ID"
 
-#: accounts/serializers/account/account.py:418 acls/models/base.py:98
+#: accounts/serializers/account/account.py:420 acls/models/base.py:98
 #: acls/models/login_acl.py:13 acls/serializers/base.py:75
 #: acls/serializers/login_acl.py:21 assets/models/cmd_filter.py:24
 #: assets/models/label.py:16 audits/models.py:44 audits/models.py:63
@@ -655,7 +655,7 @@ msgstr "ID"
 msgid "User"
 msgstr "ユーザー"
 
-#: accounts/serializers/account/account.py:419
+#: accounts/serializers/account/account.py:421
 #: authentication/templates/authentication/_access_key_modal.html:33
 #: terminal/notifications.py:98 terminal/notifications.py:146
 msgid "Date"
@@ -731,7 +731,7 @@ msgstr "自動タスク実行履歴"
 
 #: accounts/serializers/automations/change_secret.py:155 audits/const.py:52
 #: audits/models.py:54 audits/signal_handlers/activity_log.py:33
-#: common/const/choices.py:18 ops/const.py:56 ops/serializers/celery.py:39
+#: common/const/choices.py:18 ops/const.py:56 ops/serializers/celery.py:40
 #: terminal/const.py:60 terminal/models/session/sharing.py:107
 #: tickets/views/approve.py:114
 msgid "Success"
@@ -973,7 +973,7 @@ msgstr "アプリケーション"
 msgid "Can match application"
 msgstr "アプリケーションを一致させることができます"
 
-#: assets/api/asset/asset.py:142
+#: assets/api/asset/asset.py:140
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr ""
 "資産を直接作成することはできません。ホストまたはその他を作成する必要がありま"
@@ -2498,6 +2498,14 @@ msgstr "無効にする電話番号をクリアする"
 msgid "Authentication failed (before login check failed): {}"
 msgstr "認証に失敗しました (ログインチェックが失敗する前): {}"
 
+#: authentication/mixins.py:91
+msgid ""
+"The administrator has enabled 'Only allow login from user source'. \n"
+"            The current user source is {}. Please contact the administrator."
+msgstr ""
+"管理者は「ユーザーソースからのみログインを許可」をオンにしており、現在のユー"
+"ザーソースは {} です。管理者に連絡してください。"
+
 #: authentication/mixins.py:266
 msgid "The MFA type ({}) is not enabled"
 msgstr "MFAタイプ ({}) が有効になっていない"
@@ -3698,16 +3706,8 @@ msgid "Task log"
 msgstr "タスクログ"
 
 #: ops/templates/ops/celery_task_log.html:71
-#, fuzzy
-#| msgid "Task Center"
-msgid "Task type"
-msgstr "タスクセンター"
-
-#: ops/templates/ops/celery_task_log.html:75
-#, fuzzy
-#| msgid "Trigger mode"
-msgid "Trigger type"
-msgstr "トリガーモード"
+msgid "Task name"
+msgstr "タスク名"
 
 #: ops/variables.py:24
 msgid "The current user`s username of JumpServer"
@@ -6798,6 +6798,8 @@ msgid ""
 "            and the current user is not in the user list. Please contact the "
 "administrator."
 msgstr ""
+"管理者は「既存のユーザーのみログインを許可」をオンにしており、現在のユーザー"
+"はユーザーリストにありません。管理者に連絡してください。"
 
 #: users/tasks.py:21
 msgid "Check password expired"
@@ -7641,6 +7643,11 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:86
 msgid "Community edition"
 msgstr "コミュニティ版"
+
+#, fuzzy
+#~| msgid "Trigger mode"
+#~ msgid "Trigger type"
+#~ msgstr "トリガーモード"
 
 #~ msgid "Please login with a password and then bind the FeiShu"
 #~ msgstr "パスワードでログインしてから本を飛ばすをバインドしてください"
