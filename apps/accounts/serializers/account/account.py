@@ -241,7 +241,8 @@ class AssetAccountBulkSerializer(
     AccountCreateUpdateSerializerMixin, AuthValidateMixin, serializers.ModelSerializer
 ):
     su_from_username = serializers.CharField(
-        max_length=128, required=False, write_only=True, allow_null=True, label=_("Su from")
+        max_length=128, required=False, write_only=True, allow_null=True, label=_("Su from"),
+        allow_blank=True,
     )
     assets = serializers.PrimaryKeyRelatedField(queryset=Asset.objects, many=True, label=_('Assets'))
 
