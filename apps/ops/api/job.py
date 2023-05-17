@@ -167,5 +167,5 @@ class UsernameHintsAPI(APIView):
                            .filter(asset__in=assets) \
                            .values('username') \
                            .annotate(total=Count('username')) \
-                           .order_by('total')[:10]
+                           .order_by('total', 'username')[:10]
         return Response(data=top_accounts)
