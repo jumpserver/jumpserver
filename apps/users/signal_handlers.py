@@ -135,9 +135,6 @@ def on_ldap_create_user(sender, user, ldap_user, **kwargs):
 
 @receiver(openid_create_or_update_user)
 def on_openid_create_or_update_user(sender, request, user, created, name, username, email, **kwargs):
-    if not check_only_allow_exist_user_auth(created):
-        return
-
     if created:
         logger.debug(
             "Receive OpenID user created signal: {}, "
@@ -145,7 +142,11 @@ def on_openid_create_or_update_user(sender, request, user, created, name, userna
         )
         user.source = User.Source.openid.value
         user.save()
-    elif not created and settings.AUTH_OPENID_ALWAYS_UPDATE_USER:
+
+    if not check_only_allow_exist_user_auth(created):
+        return
+
+    if not created and settings.AUTH_OPENID_ALWAYS_UPDATE_USER:
         logger.debug(
             "Receive OpenID user updated signal: {}, "
             "Update user info: {}"
