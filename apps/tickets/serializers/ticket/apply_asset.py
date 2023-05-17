@@ -40,6 +40,8 @@ class ApplyAssetSerializer(BaseApplyAssetSerializer, TicketApplySerializer):
         ticket_extra_kwargs = TicketApplySerializer.Meta.extra_kwargs
         extra_kwargs = {
             'apply_accounts': {'required': False},
+            'apply_date_start': {'allow_null': False},
+            'apply_date_expired': {'allow_null': False},
         }
         extra_kwargs.update(ticket_extra_kwargs)
 

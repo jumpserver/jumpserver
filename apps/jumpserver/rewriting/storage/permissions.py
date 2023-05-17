@@ -2,6 +2,7 @@
 
 path_perms_map = {
     'xpack': '*',
+    'settings': '*',
     'replay': 'default',
     'applets': 'terminal.view_applet',
     'playbooks': 'ops.view_playbook'
