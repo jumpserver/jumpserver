@@ -32,12 +32,12 @@ def check_only_allow_exist_user_auth(created):
 
 
 def user_authenticated_handle(user, created, source, attrs=None, **kwargs):
-    if not check_only_allow_exist_user_auth(created):
-        return
-
     if created:
         user.source = source
         user.save()
+
+    if not check_only_allow_exist_user_auth(created):
+        return
 
     if not attrs:
         return
