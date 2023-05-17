@@ -158,14 +158,17 @@ class UsernameHintsAPI(APIView):
     def post(self, request, **kwargs):
         node_ids = request.data.get('nodes', None)
         asset_ids = request.data.get('assets', [])
+        query = request.data.get('query', None)
+
         assets = list(Asset.objects.filter(id__in=asset_ids).all())
 
         assets = merge_nodes_and_assets(node_ids, assets, request.user)
 
-        top_accounts = Account.objects.exclude(username='root') \
+        top_accounts = Account.objects \
                            .exclude(username__startswith='jms_') \
+                           .filter(username__icontains=query) \
                            .filter(asset__in=assets) \
                            .values('username') \
                            .annotate(total=Count('username')) \
-                           .order_by('total', 'username')[:10]
+                           .order_by('total', '-username')[:10]
         return Response(data=top_accounts)
