@@ -315,6 +315,7 @@ class RelatedManager:
         else:
             queryset = to_model.objects.all()
         q = cls.get_filter_q(value, to_model)
+        print("Q: ", q)
         return queryset.filter(q)
 
     @staticmethod

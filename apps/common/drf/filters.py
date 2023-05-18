@@ -189,7 +189,7 @@ class NumberInFilter(drf_filters.BaseInFilter, drf_filters.NumberFilter):
     pass
 
 
-class AttrRulesFilter(filters.BaseFilterBackend):
+class AttrRulesFilterBackend(filters.BaseFilterBackend):
     def get_schema_fields(self, view):
         return [
             coreapi.Field(
@@ -204,7 +204,15 @@ class AttrRulesFilter(filters.BaseFilterBackend):
         if not attr_rules:
             return queryset
 
-        attr_rules = base64.b64decode(attr_rules.encode('utf-8'))
-        attr_rules = json.loads(attr_rules)
+        try:
+            attr_rules = base64.b64decode(attr_rules.encode('utf-8'))
+        except Exception:
+            raise ValidationError({'attr_rules': 'attr_rules should be base64'})
+        try:
+            attr_rules = json.loads(attr_rules)
+        except Exception:
+            raise ValidationError({'attr_rules': 'attr_rules should be json'})
+
+        logging.debug('attr_rules: %s', attr_rules)
         q = RelatedManager.get_filter_q(attr_rules, queryset.model)
-        return queryset.filter(q)
+        return queryset.filter(q).distinct()
