@@ -36,6 +36,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         write_only=True, label=_('Exist policy')
     )
     _template = None
+    clean_auth_fields: callable
 
     class Meta:
         fields = ['template', 'push_now', 'params', 'on_invalid']
@@ -159,6 +160,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
     def create(self, validated_data):
         push_now = validated_data.pop('push_now', None)
         params = validated_data.pop('params', None)
+        self.clean_auth_fields(validated_data)
         self.generate_source_data(validated_data)
         instance, stat = self.do_create(validated_data)
         self.push_account_if_need(instance, push_now, params, stat)
@@ -249,7 +251,7 @@ class AssetAccountBulkSerializer(
     class Meta:
         model = Account
         fields = [
-            'name', 'username', 'secret', 'secret_type',
+            'name', 'username', 'secret', 'secret_type', 'passphrase',
             'privileged', 'is_active', 'comment', 'template',
             'on_invalid', 'push_now', 'assets', 'su_from_username'
         ]
@@ -354,6 +356,7 @@ class AssetAccountBulkSerializer(
             vd = vd.copy()
             vd['asset'] = asset
             try:
+                self.clean_auth_fields(vd)
                 instance, changed, state = self.perform_create(vd, create_handler)
                 _results[asset] = {
                     'changed': changed, 'instance': instance.id, 'state': state
