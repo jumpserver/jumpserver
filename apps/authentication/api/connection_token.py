@@ -3,6 +3,7 @@ import json
 import os
 import urllib.parse
 
+from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -379,19 +380,18 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
 
         expire_now = request.data.get('expire_now', None)
         asset_type = token.asset.type
-        asset_category = token.asset.category
         # 设置默认值
         if expire_now is None:
             # TODO 暂时特殊处理 k8s 不过期
             if asset_type in ['k8s', 'kubernetes']:
                 expire_now = False
-            elif asset_category in ['database', 'db']:
-                expire_now = False
             else:
-                expire_now = True
+                expire_now = not settings.CONNECTION_TOKEN_REUSABLE
 
-        if is_false(expire_now) or token.is_reusable:
-            logger.debug('Token is reusable or specify, not expire')
+        if is_false(expire_now):
+            logger.debug('Api specified, now expire now')
+        elif token.is_reusable and settings.CONNECTION_TOKEN_REUSABLE:
+            logger.debug('Token is reusable, not expire now')
         else:
             token.expire()
 
