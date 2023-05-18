@@ -160,6 +160,7 @@ class ConnectionToken(JMSOrgBaseModel):
             'remoteapplicationname:s': app,
             'alternate shell:s': app,
             'remoteapplicationcmdline:s': cmdline_b64,
+            'disableconnectionsharing:i': '1',
         }
         return options
 
