@@ -19,6 +19,9 @@ class AppletHostViewSet(JMSBulkModelViewSet):
     serializer_class = AppletHostSerializer
     queryset = AppletHost.objects.all()
     search_fields = ['asset_ptr__name', 'asset_ptr__address', ]
+    rbac_perms = {
+        'generate_accounts': 'terminal.change_applethost',
+    }
 
     def dispatch(self, request, *args, **kwargs):
         with tmp_to_builtin_org(system=1):
@@ -35,6 +38,12 @@ class AppletHostViewSet(JMSBulkModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         instance.check_terminal_binding(request)
+        return Response({'msg': 'ok'})
+
+    @action(methods=['put'], detail=True, url_path='generate-accounts')
+    def generate_accounts(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.generate_accounts()
         return Response({'msg': 'ok'})
 
 

@@ -8,7 +8,7 @@ class CustomTypes(BaseType):
             platforms = list(cls.get_custom_platforms())
         except Exception:
             return []
-        types = [p.type for p in platforms]
+        types = set([p.type for p in platforms])
         return [(t, t) for t in types]
 
     @classmethod
@@ -48,11 +48,7 @@ class CustomTypes(BaseType):
 
     @classmethod
     def internal_platforms(cls):
-        return {
-            # cls.PUBLIC: [],
-            # cls.PRIVATE: [{'name': 'Vmware-vSphere'}],
-            # cls.K8S: [{'name': 'Kubernetes'}],
-        }
+        return {}
 
     @classmethod
     def get_custom_platforms(cls):

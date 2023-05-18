@@ -151,15 +151,18 @@ class AllTypes(ChoicesMixin):
         )
 
     @classmethod
-    def get_types(cls):
+    def get_types(cls, exclude_custom=False):
         choices = []
-        for i in dict(cls.category_types()).values():
-            choices.extend(i.get_types())
+
+        for name, tp in dict(cls.category_types()).items():
+            if name == Category.CUSTOM and exclude_custom:
+                continue
+            choices.extend(tp.get_types())
         return choices
 
     @classmethod
-    def get_types_values(cls):
-        choices = cls.get_types()
+    def get_types_values(cls, exclude_custom=False):
+        choices = cls.get_types(exclude_custom=exclude_custom)
         return [c.value for c in choices]
 
     @staticmethod
@@ -190,15 +193,38 @@ class AllTypes(ChoicesMixin):
         }
         return node
 
-    @classmethod
-    def to_tree_nodes(cls, include_asset, count_resource='asset'):
-        from accounts.models import Account
-        from ..models import Asset, Platform
-        if count_resource == 'account':
-            resource_platforms = Account.objects.all().values_list('asset__platform_id', flat=True)
-        else:
-            resource_platforms = Asset.objects.all().values_list('platform_id', flat=True)
 
+    @classmethod
+    def asset_to_node(cls, asset, pid):
+        node = {
+            'id': '{}'.format(asset.id),
+            'name': asset.name,
+            'title': f'{asset.address}\n{asset.comment}',
+            'pId': pid,
+            'isParent': False,
+            'open': False,
+            'iconSkin': asset.type,
+            'chkDisabled': not asset.is_active,
+            'meta': {
+                'type': 'platform',
+                'data': {
+                    'platform_type': asset.platform.type,
+                    'org_name': asset.org_name,
+                    # 'sftp': asset.platform_id in sftp_enabled_platform,
+                    'name': asset.name,
+                    'address': asset.address
+                },
+            }
+        }
+        return node
+
+    @classmethod
+    def get_root_nodes(cls):
+        return dict(id='ROOT', name=_('All types'), title=_('All types'), open=True, isParent=True)
+
+    @classmethod
+    def get_tree_nodes(cls, resource_platforms, include_asset=False):
+        from ..models import Platform
         platform_count = defaultdict(int)
         for platform_id in resource_platforms:
             platform_count[platform_id] += 1
@@ -212,8 +238,7 @@ class AllTypes(ChoicesMixin):
             category_type_mapper[p.category] += platform_count[p.id]
             tp_platforms[p.category + '_' + p.type].append(p)
 
-        root = dict(id='ROOT', name=_('All types'), title=_('All types'), open=True, isParent=True)
-        nodes = [root]
+        nodes = [cls.get_root_nodes()]
         for category, type_cls in cls.category_types():
             # Category 格式化
             meta = {'type': 'category', 'category': category.value}
@@ -240,6 +265,16 @@ class AllTypes(ChoicesMixin):
                     platform_node['name'] += f'({platform_count.get(p.id, 0)})'
                     nodes.append(platform_node)
         return nodes
+
+    @classmethod
+    def to_tree_nodes(cls, include_asset, count_resource='asset'):
+        from accounts.models import Account
+        from ..models import Asset
+        if count_resource == 'account':
+            resource_platforms = Account.objects.all().values_list('asset__platform_id', flat=True)
+        else:
+            resource_platforms = Asset.objects.all().values_list('platform_id', flat=True)
+        return cls.get_tree_nodes(resource_platforms, include_asset)
 
     @classmethod
     def get_type_default_platform(cls, category, tp):

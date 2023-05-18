@@ -23,7 +23,7 @@ __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
     'AssetTaskSerializer', 'AssetsTaskSerializer', 'AssetProtocolsSerializer',
     'AssetDetailSerializer', 'DetailMixin', 'AssetAccountSerializer',
-    'AccountSecretSerializer', 'AssetProtocolsPermsSerializer'
+    'AccountSecretSerializer', 'AssetProtocolsPermsSerializer', 'AssetLabelSerializer'
 ]
 
 
@@ -145,6 +145,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
             'name': {'label': _("Name")},
             'address': {'label': _('Address')},
             'nodes_display': {'label': _('Node path')},
+            'nodes': {'allow_empty': True},
         }
 
     def __init__(self, *args, **kwargs):

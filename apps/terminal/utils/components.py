@@ -140,7 +140,7 @@ class ComponentsPrometheusMetricsUtil(TypedComponentsStatusMetricsUtil):
             for component in self.components:
                 if not component.is_alive:
                     continue
-                component_stat = component.latest_stat
+                component_stat = component.last_stat
                 if not component_stat:
                     continue
                 metric_text = state_metric_text % (

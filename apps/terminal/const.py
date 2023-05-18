@@ -48,6 +48,7 @@ class TerminalType(TextChoices):
     magnus = 'magnus', 'Magnus'
     razor = 'razor', 'Razor'
     tinker = 'tinker', 'Tinker'
+    video_worker = 'video_worker', 'Video Worker'
 
     @classmethod
     def types(cls):

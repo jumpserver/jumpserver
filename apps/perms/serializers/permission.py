@@ -109,6 +109,7 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
                 if condition in username_secret_type_dict:
                     continue
                 account_data = {key: getattr(template, key) for key in account_attribute}
+                account_data['su_from'] = template.get_su_from_account(asset)
                 account_data['name'] = f"{account_data['name']}-{_('Account template')}"
                 need_create_accounts.append(Account(**{'asset_id': asset.id, **account_data}))
         return Account.objects.bulk_create(need_create_accounts)
@@ -123,7 +124,7 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
         for i in range(0, len(account_ids), slice_count):
             push_accounts_to_assets_task.delay(account_ids[i:i + slice_count])
 
-    def validate_accounts(self, usernames: list[str]):
+    def validate_accounts(self, usernames):
         template_ids = []
         account_usernames = []
         for username in usernames:

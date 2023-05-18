@@ -2,7 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from assets.const.web import FillType
-from common.serializers import WritableNestedModelSerializer
+from common.serializers import WritableNestedModelSerializer, type_field_map
 from common.serializers.fields import LabeledChoiceField
 from common.utils import lazyproperty
 from ..const import Category, AllTypes
@@ -82,20 +82,13 @@ class PlatformProtocolSerializer(serializers.ModelSerializer):
         model = PlatformProtocol
         fields = [
             "id", "name", "port", "primary",
-            "required", "default",
+            "required", "default", "public",
             "secret_types", "setting",
         ]
 
 
 class PlatformCustomField(serializers.Serializer):
-    TYPE_CHOICES = [
-        ("str", "str"),
-        ("text", "text"),
-        ("int", "int"),
-        ("bool", "bool"),
-        ("choice", "choice"),
-        ("list", "list"),
-    ]
+    TYPE_CHOICES = [(t, t) for t, c in type_field_map.items()]
     name = serializers.CharField(label=_("Name"), max_length=128)
     label = serializers.CharField(label=_("Label"), max_length=128)
     type = serializers.ChoiceField(choices=TYPE_CHOICES, label=_("Type"), default='str')
@@ -129,6 +122,7 @@ class PlatformSerializer(WritableNestedModelSerializer):
         fields_small = fields_mini + [
             "category", "type", "charset",
         ]
+        fields_unexport = ['automation']
         read_only_fields = [
             'internal', 'date_created', 'date_updated',
             'created_by', 'updated_by'
@@ -163,20 +157,6 @@ class PlatformSerializer(WritableNestedModelSerializer):
         constraints = AllTypes.get_constraints(category, tp)
         return constraints
 
-    def validate(self, attrs):
-        domain_enabled = attrs.get('domain_enabled', False) and self.constraints.get('domain_enabled', False)
-        su_enabled = attrs.get('su_enabled', False) and self.constraints.get('su_enabled', False)
-        automation = attrs.get('automation', {})
-        automation['ansible_enabled'] = automation.get('ansible_enabled', False) \
-                                        and self.constraints['automation'].get('ansible_enabled', False)
-        attrs.update({
-            'domain_enabled': domain_enabled,
-            'su_enabled': su_enabled,
-            'automation': automation,
-        })
-        self.initial_data['automation'] = automation
-        return attrs
-
     @classmethod
     def setup_eager_loading(cls, queryset):
         queryset = queryset.prefetch_related(
@@ -193,6 +173,18 @@ class PlatformSerializer(WritableNestedModelSerializer):
         # 这里不设置不行，write_nested 不使用 validated 中的
         self.initial_data['protocols'] = protocols
         return protocols
+
+    def validate_su_enabled(self, su_enabled):
+        return su_enabled and self.constraints.get('su_enabled', False)
+
+    def validate_domain_enabled(self, domain_enabled):
+        return domain_enabled and self.constraints.get('domain_enabled', False)
+
+    def validate_automation(self, automation):
+        automation = automation or {}
+        automation = automation.get('ansible_enabled', False) \
+                     and self.constraints['automation'].get('ansible_enabled', False)
+        return automation
 
 
 class PlatformOpsMethodSerializer(serializers.Serializer):

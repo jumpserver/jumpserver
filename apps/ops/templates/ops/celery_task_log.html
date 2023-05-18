@@ -7,9 +7,12 @@
     <script src="{% static 'js/plugins/xterm/addons/fit/fit.js' %}"></script>
     <link rel="stylesheet" href="{% static 'js/plugins/xterm/xterm.css' %}" />
     <link rel="shortcut icon" href="{{ INTERFACE.favicon }}" type="image/x-icon">
+    <script src="{% url 'javascript-catalog' %}"></script>
+    <script src="{% static "js/jumpserver.js" %}?_=9"></script>
     <style>
         body {
             background-color: black;
+            margin: 0;
         }
 
         .xterm-rows {
@@ -37,8 +40,42 @@
             background-color: #494141;
             border-radius: 6px;
         }
+        #term {
+            padding: 0 8px;
+        }
+        .info {
+            display: flex;
+            flex-wrap: wrap;
+            width: 100%;
+            padding: 6px 8px 6px 24px;
+            margin: 0;
+            background-color: #F3F3F5;
+        }
+        .info .item {
+            flex: auto;
+            list-style-type: square;
+            font-size: 14px;
+            color: #585757;
+        }
+        .info .item .value {
+            color: black;
+        }
     </style>
 </head>
+<ul class="info">
+    <li class="item">
+        <span>ID:</span>
+        <span class="value task-id"></span>
+    </li>
+    <li class="item">
+        <span>{% trans 'Task name' %}:</span>
+        <span class="value task-type"></span>
+    </li>
+    <li class="item">
+        <span>{% trans 'Date start' %}:</span>
+        <span class="value date-start"></span>
+    </li>
+</ul>
 <div id="term" style="height: 100%;width: 100%">
 </div>
 
@@ -52,6 +89,7 @@
     var failOverWsURL = scheme + "://" + document.location.hostname + ':' + failOverPort + url;
     var term;
     var ws;
+    var extraQuery = Object.fromEntries(new URLSearchParams(window.location.search));
 
     $(document).ready(function () {
         term = new Terminal({
@@ -85,7 +123,23 @@
                 term.write("Connect websocket server error")
             }
         }
+        getAutomationExecutionInfo();
     }).on('resize', window, function () {
         window.fit.fit(term);
     });
+    function getAutomationExecutionInfo() {
+        let url =  "{% url 'api-ops:task-executions-detail' pk=task_id %}";
+
+        requestApi({
+            url: url,
+            method: "GET",
+            flash_message: false,
+            success(data) {
+                const dateStart = new Date(data.date_start).toLocaleString();
+                $('.task-id').html(data.id);
+                $('.task-type').html(data.task_name);
+                $('.date-start').html(dateStart);
+            }
+        })
+    }
 </script>

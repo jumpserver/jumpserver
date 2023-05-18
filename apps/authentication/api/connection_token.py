@@ -12,14 +12,12 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.serializers import ValidationError
 
-from assets.const import CloudTypes
 from common.api import JMSModelViewSet
 from common.exceptions import JMSException
 from common.utils import random_string, get_logger
 from common.utils.django import get_request_os
-from common.utils.http import is_true
+from common.utils.http import is_true, is_false
 from orgs.mixins.api import RootOrgViewMixin
 from perms.models import ActionChoices
 from terminal.connect_methods import NativeClient, ConnectMethodUtil
@@ -27,7 +25,8 @@ from terminal.models import EndpointRule
 from ..models import ConnectionToken, date_expired_default
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
-    SuperConnectionTokenSerializer, ConnectTokenAppletOptionSerializer
+    SuperConnectionTokenSerializer, ConnectTokenAppletOptionSerializer,
+    ConnectionTokenUpdateSerializer
 )
 
 __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
@@ -88,7 +87,8 @@ class RDPFileClientProtocolURLMixin:
         if width and height:
             rdp_options['desktopwidth:i'] = width
             rdp_options['desktopheight:i'] = height
-            rdp_options['winposstr:s:'] = f'0,1,0,0,{width},{height}'
+            rdp_options['winposstr:s'] = f'0,1,0,0,{width},{height}'
+            rdp_options['dynamic resolution:i'] = '0'
 
         # 设置其他选项
         rdp_options['session bpp:i'] = os.getenv('JUMPSERVER_COLOR_DEPTH', '32')
@@ -98,6 +98,10 @@ class RDPFileClientProtocolURLMixin:
         if token.connect_method != NativeClient.mstsc:
             remote_app_options = token.get_remote_app_option()
             rdp_options.update(remote_app_options)
+
+        rdp = token.asset.platform.protocols.filter(name='rdp').first()
+        if rdp and rdp.setting.get('console'):
+            rdp_options['administrative session:i:'] = '1'
 
         # 文件名
         name = token.asset.name
@@ -226,10 +230,14 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
     search_fields = filterset_fields
     serializer_classes = {
         'default': ConnectionTokenSerializer,
+        'update': ConnectionTokenUpdateSerializer,
+        'partial_update': ConnectionTokenUpdateSerializer,
     }
+    http_method_names = ['get', 'post', 'patch', 'head', 'options', 'trace']
     rbac_perms = {
         'list': 'authentication.view_connectiontoken',
         'retrieve': 'authentication.view_connectiontoken',
+        'update': 'authentication.change_connectiontoken',
         'create': 'authentication.add_connectiontoken',
         'exchange': 'authentication.add_connectiontoken',
         'expire': 'authentication.change_connectiontoken',
@@ -366,19 +374,27 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
 
         token_id = request.data.get('id') or ''
         token = get_object_or_404(ConnectionToken, pk=token_id)
-        if token.is_expired:
-            raise ValidationError({'id': 'Token is expired'})
-
         token.is_valid()
         serializer = self.get_serializer(instance=token)
-        expire_now = request.data.get('expire_now', True)
 
-        # TODO 暂时特殊处理 k8s 不过期
-        if token.asset.type == CloudTypes.K8S:
-            expire_now = False
+        expire_now = request.data.get('expire_now', None)
+        asset_type = token.asset.type
+        asset_category = token.asset.category
+        # 设置默认值
+        if expire_now is None:
+            # TODO 暂时特殊处理 k8s 不过期
+            if asset_type in ['k8s', 'kubernetes']:
+                expire_now = False
+            elif asset_category in ['database', 'db']:
+                expire_now = False
+            else:
+                expire_now = True
 
-        if expire_now:
+        if is_false(expire_now) or token.is_reusable:
+            logger.debug('Token is reusable or specify, not expire')
+        else:
             token.expire()
+
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(methods=['POST'], detail=False, url_path='applet-option')

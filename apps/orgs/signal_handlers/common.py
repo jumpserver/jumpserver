@@ -59,8 +59,6 @@ def expire_user_orgs(*args):
 
 @receiver(post_save, sender=Organization)
 def on_org_create(sender, instance, created=False, **kwargs):
-    if not created:
-        return
     expire_user_orgs()
 
 
@@ -80,7 +78,7 @@ def on_org_create_or_update(sender, instance, **kwargs):
 
 
 @receiver(pre_delete, sender=Organization)
-def on_org_delete(sender, instance, **kwargs):
+def delete_org_root_node_on_org_delete(sender, instance, **kwargs):
     expire_orgs_mapping_for_memory(instance.id)
 
     # 删除该组织下所有 节点
@@ -91,7 +89,7 @@ def on_org_delete(sender, instance, **kwargs):
 
 
 @receiver(post_delete, sender=Organization)
-def on_org_delete(sender, instance, **kwargs):
+def expire_user_orgs_on_org_delete(sender, instance, **kwargs):
     expire_user_orgs()
 
 

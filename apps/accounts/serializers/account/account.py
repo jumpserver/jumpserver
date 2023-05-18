@@ -1,4 +1,5 @@
 import uuid
+from copy import deepcopy
 
 from django.db import IntegrityError
 from django.db.models import Q
@@ -35,6 +36,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         write_only=True, label=_('Exist policy')
     )
     _template = None
+    clean_auth_fields: callable
 
     class Meta:
         fields = ['template', 'push_now', 'params', 'on_invalid']
@@ -91,7 +93,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
 
         self._template = template
         # Set initial data from template
-        ignore_fields = ['id', 'date_created', 'date_updated', 'org_id']
+        ignore_fields = ['id', 'date_created', 'date_updated', 'su_from', 'org_id']
         field_names = [
             field.name for field in template._meta.fields
             if field.name not in ignore_fields
@@ -151,12 +153,14 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         template = self._template
         if template is None:
             return
+
         validated_data['source'] = Source.TEMPLATE
         validated_data['source_id'] = str(template.id)
 
     def create(self, validated_data):
         push_now = validated_data.pop('push_now', None)
         params = validated_data.pop('params', None)
+        self.clean_auth_fields(validated_data)
         self.generate_source_data(validated_data)
         instance, stat = self.do_create(validated_data)
         self.push_account_if_need(instance, push_now, params, stat)
@@ -238,14 +242,18 @@ class AssetAccountBulkSerializerResultSerializer(serializers.Serializer):
 class AssetAccountBulkSerializer(
     AccountCreateUpdateSerializerMixin, AuthValidateMixin, serializers.ModelSerializer
 ):
+    su_from_username = serializers.CharField(
+        max_length=128, required=False, write_only=True, allow_null=True, label=_("Su from"),
+        allow_blank=True,
+    )
     assets = serializers.PrimaryKeyRelatedField(queryset=Asset.objects, many=True, label=_('Assets'))
 
     class Meta:
         model = Account
         fields = [
-            'name', 'username', 'secret', 'secret_type',
+            'name', 'username', 'secret', 'secret_type', 'passphrase',
             'privileged', 'is_active', 'comment', 'template',
-            'on_invalid', 'push_now', 'assets',
+            'on_invalid', 'push_now', 'assets', 'su_from_username'
         ]
         extra_kwargs = {
             'name': {'required': False},
@@ -293,8 +301,21 @@ class AssetAccountBulkSerializer(
             raise serializers.ValidationError(_('Account already exists'))
         return instance, True, 'created'
 
+    def generate_su_from_data(self, validated_data):
+        template = self._template
+        asset = validated_data['asset']
+        su_from = validated_data.get('su_from')
+        su_from_username = validated_data.pop('su_from_username', None)
+        if template:
+            su_from = template.get_su_from_account(asset)
+        elif su_from_username:
+            su_from = asset.accounts.filter(username=su_from_username).first()
+        validated_data['su_from'] = su_from
+
     def perform_create(self, vd, handler):
         lookup = self.get_filter_lookup(vd)
+        vd = deepcopy(vd)
+        self.generate_su_from_data(vd)
         try:
             instance, changed, state = handler(vd, lookup)
         except IntegrityError:
@@ -335,6 +356,7 @@ class AssetAccountBulkSerializer(
             vd = vd.copy()
             vd['asset'] = asset
             try:
+                self.clean_auth_fields(vd)
                 instance, changed, state = self.perform_create(vd, create_handler)
                 _results[asset] = {
                     'changed': changed, 'instance': instance.id, 'state': state

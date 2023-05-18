@@ -1,13 +1,15 @@
 from django_filters import rest_framework as drf_filters
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
-from assets.const import Protocol
 from accounts import serializers
 from accounts.models import AccountTemplate
-from orgs.mixins.api import OrgBulkModelViewSet
-from rbac.permissions import RBACPermission
+from assets.const import Protocol
+from common.drf.filters import BaseFilterSet
 from common.permissions import UserConfirmation, ConfirmType
 from common.views.mixins import RecordViewLogMixin
-from common.drf.filters import BaseFilterSet
+from orgs.mixins.api import OrgBulkModelViewSet
+from rbac.permissions import RBACPermission
 
 
 class AccountTemplateFilterSet(BaseFilterSet):
@@ -27,6 +29,8 @@ class AccountTemplateFilterSet(BaseFilterSet):
                 continue
             _st = protocol_secret_type_map[p].get('secret_types', [])
             secret_types.update(_st)
+        if not secret_types:
+            secret_types = ['password']
         queryset = queryset.filter(secret_type__in=secret_types)
         return queryset
 
@@ -36,8 +40,20 @@ class AccountTemplateViewSet(OrgBulkModelViewSet):
     filterset_class = AccountTemplateFilterSet
     search_fields = ('username', 'name')
     serializer_classes = {
-        'default': serializers.AccountTemplateSerializer
+        'default': serializers.AccountTemplateSerializer,
     }
+    rbac_perms = {
+        'su_from_account_templates': 'accounts.view_accounttemplate',
+    }
+
+    @action(methods=['get'], detail=False, url_path='su-from-account-templates')
+    def su_from_account_templates(self, request, *args, **kwargs):
+        pk = request.query_params.get('template_id')
+        template = AccountTemplate.objects.filter(pk=pk).first()
+        templates = AccountTemplate.get_su_from_account_templates(template)
+        templates = self.filter_queryset(templates)
+        serializer = self.get_serializer(templates, many=True)
+        return Response(data=serializer.data)
 
 
 class AccountTemplateSecretsViewSet(RecordViewLogMixin, AccountTemplateViewSet):

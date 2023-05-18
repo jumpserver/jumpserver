@@ -45,3 +45,7 @@ def get_remote_addr(request):
 
 def is_true(value):
     return value in BooleanField.TRUE_VALUES
+
+
+def is_false(value):
+    return value in BooleanField.FALSE_VALUES

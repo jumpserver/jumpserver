@@ -1,9 +1,9 @@
 import json
 
-from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import APIException
 
 from django.conf import settings
+from users.utils import construct_user_email
 from common.utils.common import get_logger
 from common.sdk.im.utils import digest
 from common.sdk.im.mixin import RequestMixin, BaseRequest
@@ -36,6 +36,9 @@ class URL:
     @property
     def send_message(self):
         return f'{self.host}/open-apis/im/v1/messages'
+
+    def get_user_detail(self, user_id):
+        return f'{self.host}/open-apis/contact/v3/users/{user_id}'
 
 
 class ErrorCode:
@@ -106,7 +109,7 @@ class FeiShu(RequestMixin):
         data = self._requests.post(URL().get_user_info_by_code, json=body, check_errcode_is_0=False)
 
         self._requests.check_errcode_is_0(data)
-        return data['data']['user_id']
+        return data['data']['user_id'], data['data']
 
     def send_text(self, user_ids, msg):
         params = {
@@ -130,3 +133,15 @@ class FeiShu(RequestMixin):
                 logger.exception(e)
                 invalid_users.append(user_id)
         return invalid_users
+
+    @staticmethod
+    def get_user_detail(user_id, **kwargs):
+        # get_user_id_by_code 已经返回个人信息，这里直接解析
+        data = kwargs['other_info']
+        username = user_id
+        name = data.get('name', username)
+        email = data.get('email') or data.get('enterprise_email')
+        email = construct_user_email(username, email)
+        return {
+            'username': username, 'name': name, 'email': email
+        }

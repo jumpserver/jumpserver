@@ -186,6 +186,8 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
             tp = 'guacamole'
         if url.endswith('.cast.gz'):
             tp = 'asciicast'
+        if url.endswith('.replay.mp4'):
+            tp = 'mp4'
 
         download_url = reverse('api-terminal:session-replay-download', kwargs={'pk': session.id})
         data = {

@@ -25,7 +25,7 @@ from ...notifications import BulkUpdatePlatformSkipAssetUserMsg
 logger = get_logger(__file__)
 __all__ = [
     "AssetViewSet", "AssetTaskCreateApi",
-    "AssetsTaskCreateApi", 'AssetFilterSet'
+    "AssetsTaskCreateApi", 'AssetFilterSet',
 ]
 
 
