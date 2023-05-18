@@ -184,19 +184,16 @@ class BaseFileRenderer(BaseRenderer):
             self.write_column_titles(column_titles)
             self.write_rows(rows)
             self.after_render()
-            value = self.compress_into_zip_file(view, request, response)
+            value = self.get_rendered_value()
+            if getattr(view, 'export_as_zip', False) and self.template == 'export':
+                value = self.compress_into_zip_file(value, request, response)
         except Exception as e:
             logger.debug(e, exc_info=True)
             value = 'Render error! ({})'.format(self.media_type).encode('utf-8')
             return value
         return value
 
-    def compress_into_zip_file(self, view, request, response):
-        value = self.get_rendered_value()
-        from accounts.models import Account
-        if str(view.model) not in (str(Account),) or self.template != 'export':
-            return value
-
+    def compress_into_zip_file(self, value, request, response):
         filename_pattern = re.compile(r'filename="([^"]+)"')
         content_disposition = response['Content-Disposition']
         match = filename_pattern.search(content_disposition)
