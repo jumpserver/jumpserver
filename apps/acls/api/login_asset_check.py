@@ -1,7 +1,6 @@
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 
-from common.db.fields import JSONManyToManyField
 from common.utils import reverse, lazyproperty
 from orgs.utils import tmp_to_org
 from .. import serializers
@@ -36,9 +35,9 @@ class LoginAssetCheckAPI(CreateAPIView):
 
         # 用户满足的 acls
         queryset = LoginAssetACL.objects.all()
-        q = JSONManyToManyField.get_filter_q(LoginAssetACL, 'users', user)
+        q = LoginAssetACL.users.get_filter_q(LoginAssetACL, 'users', user)
         queryset = queryset.filter(q)
-        q = JSONManyToManyField.get_filter_q(LoginAssetACL, 'assets', asset)
+        q = LoginAssetACL.assets.get_filter_q(LoginAssetACL, 'assets', asset)
         queryset = queryset.filter(q)
         account_username = self.serializer.validated_data.get('account_username')
         queryset = queryset.filter(accounts__contains=account_username)

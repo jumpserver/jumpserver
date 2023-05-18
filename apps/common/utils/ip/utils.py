@@ -1,3 +1,4 @@
+import ipaddress
 import socket
 from ipaddress import ip_network, ip_address
 
@@ -73,6 +74,23 @@ def contains_ip(ip, ip_group):
                 return True
 
     return False
+
+
+def is_ip(self, ip, rule_value):
+    if rule_value == '*':
+        return True
+    elif '/' in rule_value:
+        network = ipaddress.ip_network(rule_value)
+        return ip in network.hosts()
+    elif '-' in rule_value:
+        start_ip, end_ip = rule_value.split('-')
+        start_ip = ipaddress.ip_address(start_ip)
+        end_ip = ipaddress.ip_address(end_ip)
+        return start_ip <= ip <= end_ip
+    elif len(rule_value.split('.')) == 4:
+        return ip == rule_value
+    else:
+        return ip.startswith(rule_value)
 
 
 def get_ip_city(ip):
