@@ -213,7 +213,7 @@ class MFAMixin:
 
     def check_user_mfa_if_need(self, user):
         if self.request.session.get('auth_mfa') and \
-            self.request.session.get('auth_mfa_username') == user.username:
+                self.request.session.get('auth_mfa_username') == user.username:
             return
         if not user.mfa_enabled:
             return
