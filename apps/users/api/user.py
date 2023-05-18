@@ -7,8 +7,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 
-from common.api import CommonApiMixin
-from common.api import SuggestionMixin
+from common.api import CommonApiMixin, SuggestionMixin
+from common.drf.filters import AttrRulesFilter
 from common.utils import get_logger
 from orgs.utils import current_org, tmp_to_root_org
 from rbac.models import Role, RoleBinding
@@ -18,10 +18,7 @@ from .. import serializers
 from ..filters import UserFilter
 from ..models import User
 from ..notifications import ResetMFAMsg
-from ..serializers import (
-    UserSerializer,
-    MiniUserSerializer, InviteSerializer
-)
+from ..serializers import UserSerializer, MiniUserSerializer, InviteSerializer
 from ..signals import post_user_create
 
 logger = get_logger(__name__)
@@ -33,6 +30,7 @@ __all__ = [
 
 class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelViewSet):
     filterset_class = UserFilter
+    extra_filter_backends = [AttrRulesFilter]
     search_fields = ('username', 'email', 'name')
     serializer_classes = {
         'default': UserSerializer,

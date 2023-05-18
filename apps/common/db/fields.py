@@ -294,6 +294,29 @@ class RelatedManager:
         self.value = value
         self.instance.__dict__[self.field.name] = value
 
+    @classmethod
+    def get_filter_q(cls, value, to_model):
+        if not value or not isinstance(value, dict):
+            return Q()
+
+        if value["type"] == "all":
+            return Q()
+        elif value["type"] == "ids" and isinstance(value.get("ids"), list):
+            return Q(id__in=value["ids"])
+        elif value["type"] == "attrs" and isinstance(value.get("attrs"), list):
+            return cls._get_filter_attrs_q(value, to_model)
+        else:
+            return Q()
+
+    @classmethod
+    def filter_queryset_by_model(cls, value, to_model):
+        if hasattr(to_model, "get_queryset"):
+            queryset = to_model.get_queryset()
+        else:
+            queryset = to_model.objects.all()
+        q = cls.get_filter_q(value, to_model)
+        return queryset.filter(q)
+
     @staticmethod
     def get_ip_in_q(name, val):
         q = Q()
@@ -322,7 +345,8 @@ class RelatedManager:
                 continue
         return q
 
-    def _get_filter_attrs_q(self, value, to_model):
+    @classmethod
+    def _get_filter_attrs_q(cls, value, to_model):
         filters = Q()
         # 特殊情况有这几种，
         # 1. 像 资产中的 type 和 category，集成自 Platform。所以不能直接查询
@@ -340,16 +364,14 @@ class RelatedManager:
             if name is None or val is None:
                 continue
 
-            print("Has custom filter: {}".format(custom_attr_filter))
             if custom_attr_filter:
                 custom_filter_q = custom_attr_filter(name, val, match)
-                print("Custom filter: {}".format(custom_filter_q))
                 if custom_filter_q:
                     filters &= custom_filter_q
                     continue
 
             if match == 'ip_in':
-                q = self.get_ip_in_q(name, val)
+                q = cls.get_ip_in_q(name, val)
             elif match in ("exact", "contains", "startswith", "endswith", "regex", "gte", "lte", "gt", "lt"):
                 lookup = "{}__{}".format(name, match)
                 q = Q(**{lookup: val})
@@ -377,26 +399,10 @@ class RelatedManager:
     def _get_queryset(self):
         to_model = apps.get_model(self.field.to)
         value = self.value
-        if hasattr(to_model, "get_queryset"):
-            queryset = to_model.get_queryset()
-        else:
-            queryset = to_model.objects.all()
-
-        if not value or not isinstance(value, dict):
-            return queryset.none()
-
-        if value["type"] == "all":
-            return queryset
-        elif value["type"] == "ids" and isinstance(value.get("ids"), list):
-            return queryset.filter(id__in=value["ids"])
-        elif value["type"] == "attrs" and isinstance(value.get("attrs"), list):
-            q = self._get_filter_attrs_q(value, to_model)
-            return queryset.filter(q)
-        else:
-            return queryset.none()
+        return self.filter_queryset_by_model(value, to_model)
 
     def get_attr_q(self):
-        q = self._get_filter_attrs_q(self.value)
+        q = self._get_filter_attrs_q(self.value, apps.get_model(self.field.to))
         return q
 
     def all(self):
