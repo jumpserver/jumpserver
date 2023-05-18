@@ -17,11 +17,7 @@ class UserObjectPermission(permissions.BasePermission):
         if view.action not in ['update', 'partial_update', 'destroy']:
             return True
 
-        user = request.user
-        if user.is_superuser:
-            return True
+        if not request.user.is_superuser and obj.is_superuser:
+            return False
 
-        system_admin_id = BuiltinRole.system_admin.id
-        return system_admin_id not in [
-            str(r.id) for r in obj.system_roles.all()
-        ]
+        return True
