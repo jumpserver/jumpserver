@@ -177,8 +177,7 @@ class UserPermedNodeChildrenWithAssetsAsCategoryTreeApi(
                 return []
             pid = f'ROOT_{str(assets[0].category).upper()}_{tp}'
             return self.serialize_assets(assets, pid=pid)
-
-        resource_platforms = assets.values_list('platform_id', flat=True)
+        resource_platforms = assets.order_by('id').values_list('platform_id', flat=True)
         node_all = AllTypes.get_tree_nodes(resource_platforms)
         pattern = re.compile(r'\(0\)?')
         nodes = []
