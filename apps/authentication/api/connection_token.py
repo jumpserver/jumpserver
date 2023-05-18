@@ -87,7 +87,8 @@ class RDPFileClientProtocolURLMixin:
         if width and height:
             rdp_options['desktopwidth:i'] = width
             rdp_options['desktopheight:i'] = height
-            rdp_options['winposstr:s:'] = f'0,1,0,0,{width},{height}'
+            rdp_options['winposstr:s'] = f'0,1,0,0,{width},{height}'
+            rdp_options['dynamic resolution:i'] = '0'
 
         # 设置其他选项
         rdp_options['session bpp:i'] = os.getenv('JUMPSERVER_COLOR_DEPTH', '32')
