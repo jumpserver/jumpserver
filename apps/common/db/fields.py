@@ -315,8 +315,7 @@ class RelatedManager:
         else:
             queryset = to_model.objects.all()
         q = cls.get_filter_q(value, to_model)
-        print("Q: ", q)
-        return queryset.filter(q)
+        return queryset.filter(q).distinct()
 
     @staticmethod
     def get_ip_in_q(name, val):
@@ -378,22 +377,12 @@ class RelatedManager:
                 q = Q(**{lookup: val})
             elif match == "not":
                 q = ~Q(**{name: val})
-            elif match == "m2m":
+            elif match in ['m2m', 'in']:
                 if not isinstance(val, list):
                     val = [val]
-                q = Q(**{"{}__in".format(name): val})
-            elif match == "in" and isinstance(val, list):
-                if '*' not in val:
-                    lookup = "{}__in".format(name)
-                    q = Q(**{lookup: val})
-                else:
-                    q = Q()
+                q = Q() if '*' in val else Q(**{"{}__in".format(name): val})
             else:
-                if val == '*':
-                    q = Q()
-                else:
-                    q = Q(**{name: val})
-
+                q = Q() if val == '*' else Q(**{name: val})
             filters &= q
         return filters
 
