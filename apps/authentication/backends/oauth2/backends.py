@@ -104,7 +104,10 @@ class OAuth2Backend(JMSModelBackend):
         headers = {
             'Accept': 'application/json'
         }
-        access_token_response = requests_func(access_token_url, headers=headers)
+        if token_method == 'post':
+            access_token_response = requests_func(access_token_url, headers=headers, json=query_dict)
+        else:
+            access_token_response = requests_func(access_token_url, headers=headers)
         try:
             access_token_response.raise_for_status()
             access_token_response_data = access_token_response.json()
