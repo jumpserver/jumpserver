@@ -193,7 +193,7 @@ class Applet(JMSBaseModel):
             if private_account and private_account.username not in accounts_username_used:
                 account = private_account
             else:
-                accounts = accounts.exclude(username__in=accounts_username_used)
+                accounts = accounts.exclude(username__in=accounts_username_used).filter(username__startswith='jms_')
                 account = self.random_select_prefer_account(user, host, accounts)
                 if not account:
                     return
