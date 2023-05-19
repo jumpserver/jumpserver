@@ -166,6 +166,7 @@ class UsernameHintsAPI(APIView):
 
         top_accounts = Account.objects \
                            .exclude(username__startswith='jms_') \
+                           .exclude(username__startswith='js_') \
                            .filter(username__icontains=query) \
                            .filter(asset__in=assets) \
                            .values('username') \
