@@ -43,6 +43,7 @@
         name: "{{ account.username }}"
         password: "{{ account.secret | password_hash('sha512') }}"
         update_password: always
+      ignore_errors: true
       when: account.secret_type == "password"
 
     - name: remove jumpserver ssh key

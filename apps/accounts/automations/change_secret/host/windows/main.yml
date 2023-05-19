@@ -21,6 +21,7 @@
         groups: "{{ user_info.groups[0].name }}"
         groups_action: add
         update_password: always
+      ignore_errors: true
       when: account.secret_type == "password"
 
     - name: Refresh connection
