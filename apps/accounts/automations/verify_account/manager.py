@@ -34,6 +34,16 @@ class VerifyAccountManager(AccountBasePlaybookManager):
         accounts = accounts.filter(id__in=account_ids)
         return accounts
 
+    @staticmethod
+    def remove_redundant_host_params(host):
+        deepcopy_host = deepcopy(host)
+        delete_params = [
+            'ansible_user', 'ansible_password', 'ansible_ssh_private_key_file'
+        ]
+        for name in deepcopy_host.keys():
+            if name.startswith('ansible_become') or name in delete_params:
+                host.pop(name, None)
+
     def host_callback(self, host, asset=None, account=None, automation=None, path_dir=None, **kwargs):
         host = super().host_callback(
             host, asset=asset, account=account,
@@ -46,6 +56,7 @@ class VerifyAccountManager(AccountBasePlaybookManager):
         accounts = asset.accounts.all()
         accounts = self.get_accounts(account, accounts)
         inventory_hosts = []
+        self.remove_redundant_host_params(host)
 
         for account in accounts:
             h = deepcopy(host)
