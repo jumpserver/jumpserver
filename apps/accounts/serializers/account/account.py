@@ -22,8 +22,8 @@ logger = get_logger(__name__)
 
 class AccountCreateUpdateSerializerMixin(serializers.Serializer):
     template = serializers.PrimaryKeyRelatedField(
-        queryset=AccountTemplate.objects,
-        required=False, label=_("Template"), write_only=True
+        queryset=AccountTemplate.objects, required=False,
+        label=_("Template"), write_only=True, allow_null=True
     )
     push_now = serializers.BooleanField(
         default=False, label=_("Push now"), write_only=True
@@ -33,7 +33,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
     )
     on_invalid = LabeledChoiceField(
         choices=AccountInvalidPolicy.choices, default=AccountInvalidPolicy.ERROR,
-        write_only=True, label=_('Exist policy')
+        write_only=True, allow_null=True, label=_('Exist policy'),
     )
     _template = None
     clean_auth_fields: callable
