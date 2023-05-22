@@ -70,8 +70,10 @@ def _get_instance_field_value(
 
             if getattr(f, 'primary_key', False):
                 f.verbose_name = 'id'
-            elif isinstance(value, (list, dict)):
+            elif isinstance(value, list):
                 value = copy.deepcopy(value)
+            elif isinstance(value, dict):
+                value = dict(copy.deepcopy(value))
             elif isinstance(value, datetime):
                 value = as_current_tz(value).strftime('%Y-%m-%d %H:%M:%S')
             elif isinstance(f, models.OneToOneField) and isinstance(value, models.Model):
