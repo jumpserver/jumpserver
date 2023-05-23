@@ -101,6 +101,7 @@ class StepAction:
         else:
             driver.switch_to.frame(target)
 
+
 def execute_action(driver: webdriver.Chrome, step: StepAction) -> bool:
     try:
         return step.execute(driver)
@@ -185,9 +186,9 @@ class WebAPP(object):
 
 def default_chrome_driver_options():
     options = webdriver.ChromeOptions()
-    options.add_argument("start-maximized")
-    # 禁用 扩展
-    options.add_argument("--disable-extensions")
+    options.add_argument("--start-maximized")
+    options.add_argument("--new-window")
+
     # 忽略证书错误相关
     options.add_argument('--ignore-ssl-errors')
     options.add_argument('--ignore-certificate-errors')
@@ -197,8 +198,10 @@ def default_chrome_driver_options():
     # 禁用开发者工具
     options.add_argument("--disable-dev-tools")
     # 禁用 密码管理器弹窗
-    prefs = {"credentials_enable_service": False,
-             "profile.password_manager_enabled": False}
+    prefs = {
+        "credentials_enable_service": False,
+        "profile.password_manager_enabled": False
+    }
     options.add_experimental_option("prefs", prefs)
     options.add_experimental_option("excludeSwitches", ['enable-automation'])
     return options
@@ -212,6 +215,7 @@ class AppletApplication(BaseApplication):
         self.app = WebAPP(app_name=self.app_name, user=self.user,
                           account=self.account, asset=self.asset, platform=self.platform)
         self._chrome_options = default_chrome_driver_options()
+        self._chrome_options.add_argument("--app={}".format(self.asset.address))
 
     def run(self):
         service = Service()
@@ -220,7 +224,6 @@ class AppletApplication(BaseApplication):
         self.driver = webdriver.Chrome(options=self._chrome_options, service=service)
         self.driver.implicitly_wait(10)
         if self.app.asset.address != "":
-            self.driver.get(self.app.asset.address)
             ok = self.app.execute(self.driver)
             if not ok:
                 print("执行失败")
