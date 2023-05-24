@@ -4576,6 +4576,19 @@ msgstr "テンプレートには{code}を含める必要があります"
 msgid "Signature + Template must not exceed 65 words"
 msgstr "署名+テンプレートの長さは65文字以内"
 
+#: settings/serializers/auth/sms.py:98
+msgid "URL"
+msgstr ""
+
+#: settings/serializers/auth/sms.py:103
+msgid "Request method"
+msgstr "請求方法です"
+
+#: settings/serializers/auth/sms.py:112
+#, python-format
+msgid "The value in the parameter must contain %s"
+msgstr "パラメータの値には必ず %s が含まれます"
+
 #: settings/serializers/auth/sso.py:13
 msgid "Enable SSO auth"
 msgstr "SSO Token認証の有効化"
@@ -6596,7 +6609,11 @@ msgstr "パスワードの確認"
 msgid "Password does not match"
 msgstr "パスワードが一致しない"
 
-#: users/forms/profile.py:118
+#: users/forms/profile.py:105
+msgid "The phone number must contain an area code, for example, +86"
+msgstr "電話番号には市外局番が必要です例えば「+86」"
+
+#: users/forms/profile.py:121
 msgid "Old password"
 msgstr "古いパスワード"
 

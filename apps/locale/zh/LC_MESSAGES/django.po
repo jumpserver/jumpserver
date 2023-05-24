@@ -4533,6 +4533,19 @@ msgstr "模板需要包含 {code}"
 msgid "Signature + Template must not exceed 65 words"
 msgstr "模板+签名不能超过65个字"
 
+#: settings/serializers/auth/sms.py:98
+msgid "URL"
+msgstr ""
+
+#: settings/serializers/auth/sms.py:103
+msgid "Request method"
+msgstr "请求方式"
+
+#: settings/serializers/auth/sms.py:112
+#, python-format
+msgid "The value in the parameter must contain %s"
+msgstr "参数中的值必须包含 %s"
+
 #: settings/serializers/auth/sso.py:13
 msgid "Enable SSO auth"
 msgstr "启用 SSO 令牌认证"
@@ -6503,7 +6516,11 @@ msgstr "确认密码"
 msgid "Password does not match"
 msgstr "密码不一致"
 
-#: users/forms/profile.py:118
+#: users/forms/profile.py:105
+msgid "The phone number must contain an area code, for example, +86"
+msgstr "手机号码必须包含区号，例如 +86"
+
+#: users/forms/profile.py:121
 msgid "Old password"
 msgstr "原来密码"
 
