@@ -1,11 +1,9 @@
 from django.utils.translation import ugettext_lazy as _
 
-
 from .base import UserAssetAccountBaseACL
 
 
 class LoginAssetACL(UserAssetAccountBaseACL):
-
     class Meta(UserAssetAccountBaseACL.Meta):
         verbose_name = _('Login asset acl')
         abstract = False

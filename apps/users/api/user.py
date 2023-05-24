@@ -7,8 +7,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 
-from common.api import CommonApiMixin
-from common.api import SuggestionMixin
+from common.api import CommonApiMixin, SuggestionMixin
+from common.drf.filters import AttrRulesFilterBackend
 from common.utils import get_logger
 from orgs.utils import current_org, tmp_to_root_org
 from rbac.models import Role, RoleBinding
@@ -35,6 +35,7 @@ __all__ = [
 
 class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelViewSet):
     filterset_class = UserFilter
+    extra_filter_backends = [AttrRulesFilterBackend]
     search_fields = ('username', 'email', 'name')
     permission_classes = [RBACPermission, UserObjectPermission]
     serializer_classes = {

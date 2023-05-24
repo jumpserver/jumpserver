@@ -10,7 +10,6 @@
 """
 
 import uuid
-from functools import reduce
 
 from django.db import models
 from django.db import transaction
@@ -55,7 +54,6 @@ def output_as_string(field_name):
 
 
 class MultiTableChildQueryset(QuerySet):
-
     def bulk_create(self, objs, batch_size=None):
         assert batch_size is None or batch_size > 0
         if not objs:

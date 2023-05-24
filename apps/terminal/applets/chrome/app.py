@@ -101,6 +101,7 @@ class StepAction:
         else:
             driver.switch_to.frame(target)
 
+
 def execute_action(driver: webdriver.Chrome, step: StepAction) -> bool:
     try:
         return step.execute(driver)
@@ -197,8 +198,10 @@ def default_chrome_driver_options():
     # 禁用开发者工具
     options.add_argument("--disable-dev-tools")
     # 禁用 密码管理器弹窗
-    prefs = {"credentials_enable_service": False,
-             "profile.password_manager_enabled": False}
+    prefs = {
+        "credentials_enable_service": False,
+        "profile.password_manager_enabled": False
+    }
     options.add_experimental_option("prefs", prefs)
     options.add_experimental_option("excludeSwitches", ['enable-automation'])
     return options
