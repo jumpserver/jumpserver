@@ -166,6 +166,7 @@ class BasePlaybookManager:
             account_prefer=self.ansible_account_prefer,
             account_policy=self.ansible_account_policy,
             host_callback=self.host_callback,
+            task_type=self.__class__.method_type(),
         )
         inventory.write_to_file(inventory_path)
 
@@ -223,7 +224,8 @@ class BasePlaybookManager:
         pass
 
     def on_host_error(self, host, error, result):
-        print('host error: {} -> {}'.format(host, error))
+        if settings.DEBUG_DEV:
+            print('host error: {} -> {}'.format(host, error))
 
     def on_runner_success(self, runner, cb):
         summary = cb.summary

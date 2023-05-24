@@ -16,7 +16,7 @@ user = User.objects.filter(username="${username}")
 if not user:
     print("No user found")
     sys.exit(1)
-user.update(otp_level=0)
+user.update(mfa_level=0)
 print("Disable user ${username} success")
 EOF
 }

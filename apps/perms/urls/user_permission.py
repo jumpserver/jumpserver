@@ -37,6 +37,9 @@ user_permission_urlpatterns = [
     path('<str:user>/nodes/children-with-assets/tree/',
          api.UserPermedNodeChildrenWithAssetsAsTreeApi.as_view(),
          name='user-node-children-with-assets-as-tree'),
+    path('<str:user>/nodes/children-with-assets/category/tree/',
+         api.UserPermedNodeChildrenWithAssetsAsCategoryTreeApi.as_view(),
+         name='user-node-children-with-assets-as-category-tree'),
     # 同步树
     path('<str:user>/nodes/all-with-assets/tree/',
          api.UserPermedNodesWithAssetsAsTreeApi.as_view(),

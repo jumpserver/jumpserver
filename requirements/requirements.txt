@@ -1,6 +1,6 @@
 aiofiles==22.1.0
 amqp==5.0.9
-git+https://gitee.com/jumpserver/ansible@master#egg=ansible-core
+git+https://github.com/jumpserver/ansible@master#egg=ansible-core
 ansible==7.1.0
 ansible-runner==2.2.1
 asn1crypto==0.24.0
@@ -68,7 +68,7 @@ geoip2==4.5.0
 ipip-ipdb==1.6.1
 pywinrm==0.4.3
 # Django environment
-Django==3.2.17
+Django==3.2.19
 django-bootstrap3==14.2.0
 django-filter==2.4.0
 django-formtools==2.2

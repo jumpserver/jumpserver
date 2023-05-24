@@ -703,14 +703,15 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
         cas = 'cas', 'CAS'
         saml2 = 'saml2', 'SAML2'
         oauth2 = 'oauth2', 'OAuth2'
+        wecom = 'wecom', _('WeCom')
+        dingtalk = 'dingtalk', _('DingTalk')
+        feishu = 'feishu', _('FeiShu')
         custom = 'custom', 'Custom'
 
     SOURCE_BACKEND_MAPPING = {
         Source.local: [
             settings.AUTH_BACKEND_MODEL,
             settings.AUTH_BACKEND_PUBKEY,
-            settings.AUTH_BACKEND_WECOM,
-            settings.AUTH_BACKEND_DINGTALK,
         ],
         Source.ldap: [
             settings.AUTH_BACKEND_LDAP
@@ -730,6 +731,15 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
         ],
         Source.oauth2: [
             settings.AUTH_BACKEND_OAUTH2
+        ],
+        Source.wecom: [
+            settings.AUTH_BACKEND_WECOM
+        ],
+        Source.feishu: [
+            settings.AUTH_BACKEND_FEISHU
+        ],
+        Source.dingtalk: [
+            settings.AUTH_BACKEND_DINGTALK
         ],
         Source.custom: [
             settings.AUTH_BACKEND_CUSTOM

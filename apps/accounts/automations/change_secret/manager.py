@@ -72,14 +72,14 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             return []
 
         asset = privilege_account.asset
-        accounts = asset.accounts.exclude(username=privilege_account.username)
+        accounts = asset.accounts.all()
         accounts = accounts.filter(id__in=self.account_ids)
         if self.secret_type:
             accounts = accounts.filter(secret_type=self.secret_type)
 
         if settings.CHANGE_AUTH_PLAN_SECURE_MODE_ENABLED:
             accounts = accounts.filter(privileged=False).exclude(
-                username__in=['root', 'administrator']
+                username__in=['root', 'administrator', privilege_account.username]
             )
         return accounts
 

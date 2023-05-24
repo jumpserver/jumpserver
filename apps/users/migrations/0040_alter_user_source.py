@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='user',
             name='source',
-            field=models.CharField(choices=[('local', 'Local'), ('ldap', 'LDAP/AD'), ('openid', 'OpenID'), ('radius', 'Radius'), ('cas', 'CAS'), ('saml2', 'SAML2'), ('oauth2', 'OAuth2'), ('custom', 'Custom')], default='local', max_length=30, verbose_name='Source'),
+            field=models.CharField(choices=[('local', 'Local'), ('ldap', 'LDAP/AD'), ('openid', 'OpenID'), ('radius', 'Radius'), ('cas', 'CAS'), ('saml2', 'SAML2'), ('oauth2', 'OAuth2'), ('wecom', 'WeCom'), ('dingtalk', 'DingTalk'), ('feishu', 'FeiShu'), ('custom', 'Custom')], default='local', max_length=30, verbose_name='Source'),
         ),
     ]

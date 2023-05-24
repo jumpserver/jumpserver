@@ -8,7 +8,7 @@ from rest_framework import serializers
 from accounts.models import Account
 from assets.const import Category, AllTypes
 from assets.models import Node, Asset, Platform
-from assets.serializers.asset.common import AssetProtocolsPermsSerializer
+from assets.serializers.asset.common import AssetProtocolsPermsSerializer, AssetLabelSerializer
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from perms.serializers.permission import ActionChoicesField
@@ -25,13 +25,15 @@ class AssetPermedSerializer(OrgResourceModelSerializerMixin):
     protocols = AssetProtocolsPermsSerializer(many=True, required=False, label=_('Protocols'))
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
+    labels = AssetLabelSerializer(many=True, required=False, label=_('Label'))
     domain = ObjectRelatedField(required=False, queryset=Node.objects, label=_('Domain'))
 
     class Meta:
         model = Asset
         only_fields = [
-            "id", "name", "address", 'domain', 'platform',
-            "comment", "org_id", "is_active",
+            'id', 'name', 'address', 'domain', 'platform',
+            'comment', 'org_id', 'is_active', 'date_verified',
+            'created_by', 'date_created', 'connectivity', 'nodes', 'labels'
         ]
         fields = only_fields + ['protocols', 'category', 'type'] + ['org_name']
         read_only_fields = fields

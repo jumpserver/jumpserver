@@ -54,6 +54,7 @@ def authenticate(request=None, **credentials):
     """
     username = credentials.get('username')
 
+    temp_user = None
     for backend, backend_path in _get_backends(return_tuples=True):
         # 检查用户名是否允许认证 (预先检查，不浪费认证时间)
         logger.info('Try using auth backend: {}'.format(str(backend)))
@@ -77,11 +78,19 @@ def authenticate(request=None, **credentials):
 
         # 检查用户是否允许认证
         if not backend.user_allow_authenticate(user):
+            temp_user = user
+            temp_user.backend = backend_path
             continue
 
         # Annotate the user object with the path of the backend.
         user.backend = backend_path
         return user
+    else:
+        if temp_user is not None:
+            source_display = temp_user.source_display
+            request.error_message = _('''The administrator has enabled 'Only allow login from user source'. 
+            The current user source is {}. Please contact the administrator.''').format(source_display)
+            return temp_user
 
     # The credentials supplied are invalid to all backends, fire signal
     user_login_failed.send(sender=__name__, credentials=_clean_credentials(credentials), request=request)
@@ -212,7 +221,8 @@ class MFAMixin:
         self._do_check_user_mfa(code, mfa_type, user=user)
 
     def check_user_mfa_if_need(self, user):
-        if self.request.session.get('auth_mfa'):
+        if self.request.session.get('auth_mfa') and \
+                self.request.session.get('auth_mfa_username') == user.username:
             return
         if not user.mfa_enabled:
             return
@@ -220,15 +230,16 @@ class MFAMixin:
         active_mfa_names = user.active_mfa_backends_mapper.keys()
         raise errors.MFARequiredError(mfa_types=tuple(active_mfa_names))
 
-    def mark_mfa_ok(self, mfa_type):
+    def mark_mfa_ok(self, mfa_type, user):
         self.request.session['auth_mfa'] = 1
+        self.request.session['auth_mfa_username'] = user.username
         self.request.session['auth_mfa_time'] = time.time()
         self.request.session['auth_mfa_required'] = 0
         self.request.session['auth_mfa_type'] = mfa_type
-        MFABlockUtils(self.request.user.username, self.get_request_ip()).clean_failed_count()
+        MFABlockUtils(user.username, self.get_request_ip()).clean_failed_count()
 
     def clean_mfa_mark(self):
-        keys = ['auth_mfa', 'auth_mfa_time', 'auth_mfa_required', 'auth_mfa_type']
+        keys = ['auth_mfa', 'auth_mfa_time', 'auth_mfa_required', 'auth_mfa_type', 'auth_mfa_username']
         for k in keys:
             self.request.session.pop(k, '')
 
@@ -263,7 +274,7 @@ class MFAMixin:
             ok, msg = mfa_backend.check_code(code)
 
         if ok:
-            self.mark_mfa_ok(mfa_type)
+            self.mark_mfa_ok(mfa_type, user)
             return
 
         raise errors.MFAFailedError(
@@ -344,6 +355,13 @@ class AuthACLMixin:
             self.request.session['auth_confirm_required'] = '1'
             self.request.session['auth_acl_id'] = str(acl.id)
             return
+
+    def _check_third_party_login_acl(self):
+        request = self.request
+        error_message = getattr(request, 'error_message', None)
+        if not error_message:
+            return
+        raise ValueError(error_message)
 
     def check_user_login_confirm_if_need(self, user):
         if not self.request.session.get("auth_confirm_required"):

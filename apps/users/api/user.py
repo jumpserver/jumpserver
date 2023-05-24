@@ -12,13 +12,18 @@ from common.drf.filters import AttrRulesFilterBackend
 from common.utils import get_logger
 from orgs.utils import current_org, tmp_to_root_org
 from rbac.models import Role, RoleBinding
+from rbac.permissions import RBACPermission
 from users.utils import LoginBlockUtil, MFABlockUtils
 from .mixins import UserQuerysetMixin
 from .. import serializers
 from ..filters import UserFilter
 from ..models import User
 from ..notifications import ResetMFAMsg
-from ..serializers import UserSerializer, MiniUserSerializer, InviteSerializer
+from ..permissions import UserObjectPermission
+from ..serializers import (
+    UserSerializer,
+    MiniUserSerializer, InviteSerializer
+)
 from ..signals import post_user_create
 
 logger = get_logger(__name__)
@@ -32,6 +37,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
     filterset_class = UserFilter
     extra_filter_backends = [AttrRulesFilterBackend]
     search_fields = ('username', 'email', 'name')
+    permission_classes = [RBACPermission, UserObjectPermission]
     serializer_classes = {
         'default': UserSerializer,
         'suggestion': MiniUserSerializer,

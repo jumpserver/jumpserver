@@ -33,22 +33,6 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
         user = request.user if request else None
         return user
 
-    def create(self, validated_data):
-        assets = validated_data.__getitem__('assets')
-        node_ids = validated_data.pop('nodes', None)
-        if node_ids:
-            user = self.get_request_user()
-            perm_util = UserPermAssetUtil(user=user)
-            for node_id in node_ids:
-                if node_id == PermNode.FAVORITE_NODE_KEY:
-                    node_assets = perm_util.get_favorite_assets()
-                elif node_id == PermNode.UNGROUPED_NODE_KEY:
-                    node_assets = perm_util.get_ungroup_assets()
-                else:
-                    node, node_assets = perm_util.get_node_all_assets(node_id)
-                assets.extend(node_assets.exclude(id__in=[asset.id for asset in assets]))
-        return super().create(validated_data)
-
     class Meta:
         model = Job
         read_only_fields = [

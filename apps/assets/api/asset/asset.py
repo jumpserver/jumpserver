@@ -25,7 +25,7 @@ from ...notifications import BulkUpdatePlatformSkipAssetUserMsg
 logger = get_logger(__file__)
 __all__ = [
     "AssetViewSet", "AssetTaskCreateApi",
-    "AssetsTaskCreateApi", 'AssetFilterSet'
+    "AssetsTaskCreateApi", 'AssetFilterSet',
 ]
 
 
@@ -95,7 +95,7 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
     """
     model = Asset
     filterset_class = AssetFilterSet
-    search_fields = ("name", "address")
+    search_fields = ("name", "address", "comment")
     ordering_fields = ('name', 'connectivity', 'platform', 'date_updated')
     serializer_classes = (
         ("default", serializers.AssetSerializer),

@@ -45,10 +45,8 @@ class OperatorLogHandler(metaclass=Singleton):
             pre_value, value = self._consistent_type_to_str(pre_value, value)
             if sorted(str(value)) == sorted(str(pre_value)):
                 continue
-            if pre_value:
-                before[key] = pre_value
-            if value:
-                after[key] = value
+            before[key] = pre_value
+            after[key] = value
         return before, after
 
     def cache_instance_before_data(self, instance_dict):

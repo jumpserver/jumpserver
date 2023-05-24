@@ -10,7 +10,7 @@ from rest_framework.exceptions import APIException
 
 from users.models import User
 from users.views import UserVerifyPasswordView
-from common.utils import get_logger, FlashMessageUtil
+from common.utils import get_logger
 from common.utils.random import random_string
 from common.utils.django import reverse, get_object_or_none
 from common.sdk.im.wecom import URL
@@ -22,14 +22,16 @@ from authentication import errors
 from authentication.mixins import AuthMixin
 from authentication.const import ConfirmType
 from authentication.notifications import OAuthBindMessage
-from .mixins import METAMixin
+
+from .base import BaseLoginCallbackView
+from .mixins import METAMixin, FlashMessageMixin
 
 logger = get_logger(__file__)
 
 WECOM_STATE_SESSION_KEY = '_wecom_state'
 
 
-class WeComBaseMixin(UserConfirmRequiredExceptionMixin, PermissionsMixin, View):
+class WeComBaseMixin(UserConfirmRequiredExceptionMixin, PermissionsMixin, FlashMessageMixin, View):
     def dispatch(self, request, *args, **kwargs):
         try:
             return super().dispatch(request, *args, **kwargs)
@@ -54,26 +56,6 @@ class WeComBaseMixin(UserConfirmRequiredExceptionMixin, PermissionsMixin, View):
     def get_verify_state_failed_response(self, redirect_uri):
         msg = _("The system configuration is incorrect. Please contact your administrator")
         return self.get_failed_response(redirect_uri, msg, msg)
-
-    @staticmethod
-    def get_success_response(redirect_url, title, msg):
-        message_data = {
-            'title': title,
-            'message': msg,
-            'interval': 5,
-            'redirect_url': redirect_url,
-        }
-        return FlashMessageUtil.gen_and_redirect_to(message_data)
-
-    @staticmethod
-    def get_failed_response(redirect_url, title, msg):
-        message_data = {
-            'title': title,
-            'error': msg,
-            'interval': 5,
-            'redirect_url': redirect_url,
-        }
-        return FlashMessageUtil.gen_and_redirect_to(message_data)
 
     def get_already_bound_response(self, redirect_url):
         msg = _('WeCom is already bound')
@@ -208,45 +190,17 @@ class WeComQRLoginView(WeComQRMixin, METAMixin, View):
         return HttpResponseRedirect(url)
 
 
-class WeComQRLoginCallbackView(AuthMixin, WeComQRMixin, View):
+class WeComQRLoginCallbackView(WeComQRMixin, BaseLoginCallbackView):
     permission_classes = (AllowAny,)
 
-    def get(self, request: HttpRequest):
-        code = request.GET.get('code')
-        redirect_url = request.GET.get('redirect_url')
-        login_url = reverse('authentication:login')
+    client_type_path = 'common.sdk.im.wecom.WeCom'
+    client_auth_params = {'corpid': 'WECOM_CORPID', 'corpsecret': 'WECOM_SECRET', 'agentid': 'WECOM_AGENTID'}
+    user_type = 'wecom'
+    auth_backend = 'AUTH_BACKEND_WECOM'
 
-        if not self.verify_state():
-            return self.get_verify_state_failed_response(redirect_url)
-
-        wecom = WeCom(
-            corpid=settings.WECOM_CORPID,
-            corpsecret=settings.WECOM_SECRET,
-            agentid=settings.WECOM_AGENTID
-        )
-        wecom_userid, __ = wecom.get_user_id_by_code(code)
-        if not wecom_userid:
-            # 正常流程不会出这个错误，hack 行为
-            msg = _('Failed to get user from WeCom')
-            response = self.get_failed_response(login_url, title=msg, msg=msg)
-            return response
-
-        user = get_object_or_none(User, wecom_id=wecom_userid)
-        if user is None:
-            title = _('WeCom is not bound')
-            msg = _('Please login with a password and then bind the WeCom')
-            response = self.get_failed_response(login_url, title=title, msg=msg)
-            return response
-
-        try:
-            self.check_oauth2_auth(user, settings.AUTH_BACKEND_WECOM)
-        except errors.AuthFailedError as e:
-            self.set_login_failed_mark()
-            msg = e.msg
-            response = self.get_failed_response(login_url, title=msg, msg=msg)
-            return response
-
-        return self.redirect_to_guard_view()
+    msg_client_err = _('WeCom Error')
+    msg_user_not_bound_err = _('WeCom is not bound')
+    msg_not_found_user_from_client_err = _('Failed to get user from WeCom')
 
 
 class WeComOAuthLoginView(WeComOAuthMixin, View):

@@ -1,6 +1,10 @@
 import abc
+import io
+import re
 from datetime import datetime
 
+import pyzipper
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework.renderers import BaseRenderer
 from rest_framework.utils import encoders, json
@@ -181,8 +185,35 @@ class BaseFileRenderer(BaseRenderer):
             self.write_rows(rows)
             self.after_render()
             value = self.get_rendered_value()
+            if getattr(view, 'export_as_zip', False) and self.template == 'export':
+                value = self.compress_into_zip_file(value, request, response)
         except Exception as e:
             logger.debug(e, exc_info=True)
             value = 'Render error! ({})'.format(self.media_type).encode('utf-8')
             return value
         return value
+
+    def compress_into_zip_file(self, value, request, response):
+        filename_pattern = re.compile(r'filename="([^"]+)"')
+        content_disposition = response['Content-Disposition']
+        match = filename_pattern.search(content_disposition)
+        filename = match.group(1)
+        response['Content-Disposition'] = content_disposition.replace(self.format, 'zip')
+
+        contents_io = io.BytesIO()
+        secret_key = request.user.secret_key
+        if not secret_key:
+            content = _("{} - The encryption password has not been set - "
+                        "please go to personal information -> file encryption password "
+                        "to set the encryption password").format(request.user.name)
+
+            response['Content-Disposition'] = content_disposition.replace(self.format, 'txt')
+            contents_io.write(content.encode('utf-8'))
+            return contents_io.getvalue()
+
+        with pyzipper.AESZipFile(
+                contents_io, 'w', compression=pyzipper.ZIP_LZMA, encryption=pyzipper.WZ_AES
+        ) as zf:
+            zf.setpassword(secret_key.encode('utf8'))
+            zf.writestr(filename, value)
+        return contents_io.getvalue()

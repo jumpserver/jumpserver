@@ -5,6 +5,7 @@ import base64
 from common.utils import get_logger
 from common.sdk.im.utils import digest, as_request
 from common.sdk.im.mixin import BaseRequest
+from users.utils import construct_user_email
 
 logger = get_logger(__file__)
 
@@ -35,6 +36,7 @@ class URL:
     SEND_MESSAGE = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2'
     GET_SEND_MSG_PROGRESS = 'https://oapi.dingtalk.com/topapi/message/corpconversation/getsendprogress'
     GET_USERID_BY_UNIONID = 'https://oapi.dingtalk.com/topapi/user/getbyunionid'
+    GET_USER_INFO_BY_USER_ID = 'https://oapi.dingtalk.com/topapi/v2/user/get'
 
 
 class DingTalkRequests(BaseRequest):
@@ -129,11 +131,11 @@ class DingTalk:
         data = self._request.post(URL.GET_USER_INFO_BY_CODE, json=body, with_sign=True)
         return data['user_info']
 
-    def get_userid_by_code(self, code):
+    def get_user_id_by_code(self, code):
         user_info = self.get_userinfo_bycode(code)
         unionid = user_info['unionid']
         userid = self.get_userid_by_unionid(unionid)
-        return userid
+        return userid, None
 
     def get_userid_by_unionid(self, unionid):
         body = {
@@ -195,3 +197,18 @@ class DingTalk:
 
         data = self._request.post(URL.GET_SEND_MSG_PROGRESS, json=body, with_token=True)
         return data
+
+    def get_user_detail(self, user_id, **kwargs):
+        # https://open.dingtalk.com/document/orgapp/query-user-details
+        body = {'userid': user_id}
+        data = self._request.post(
+            URL.GET_USER_INFO_BY_USER_ID, json=body, with_token=True
+        )
+        data = data['result']
+        username = user_id
+        name = data.get('name', username)
+        email = data.get('email') or data.get('org_email')
+        email = construct_user_email(username, email)
+        return {
+            'username': username, 'name': name, 'email': email
+        }
