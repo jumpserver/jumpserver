@@ -2,25 +2,26 @@
 #
 
 import threading
+
+from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import generics
 from rest_framework.views import Response, APIView
-from orgs.models import Organization
-from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
 
+from common.utils import get_logger
+from orgs.models import Organization
+from orgs.utils import current_org
+from users.models import User
 from ..models import Setting
-from ..utils import (
-    LDAPServerUtil, LDAPCacheUtil, LDAPImportUtil, LDAPSyncUtil,
-    LDAP_USE_CACHE_FLAGS, LDAPTestUtil
-)
-from ..tasks import sync_ldap_user
-from common.utils import get_logger, is_uuid
 from ..serializers import (
     LDAPTestConfigSerializer, LDAPUserSerializer,
     LDAPTestLoginSerializer
 )
-from orgs.utils import current_org
-from users.models import User
+from ..tasks import sync_ldap_user
+from ..utils import (
+    LDAPServerUtil, LDAPCacheUtil, LDAPImportUtil, LDAPSyncUtil,
+    LDAP_USE_CACHE_FLAGS, LDAPTestUtil
+)
 
 logger = get_logger(__file__)
 
@@ -184,13 +185,13 @@ class LDAPUserImportAPI(APIView):
         'POST': 'settings.change_auth'
     }
 
-    def get_org(self):
-        org_id = self.request.data.get('org_id')
-        if is_uuid(org_id):
-            org = Organization.objects.get(id=org_id)
+    def get_orgs(self):
+        org_ids = self.request.data.get('org_ids')
+        if org_ids:
+            orgs = list(Organization.objects.filter(id__in=org_ids))
         else:
-            org = current_org
-        return org
+            orgs = [current_org]
+        return orgs
 
     def get_ldap_users(self):
         username_list = self.request.data.get('username_list', [])
@@ -212,14 +213,15 @@ class LDAPUserImportAPI(APIView):
         if users is None:
             return Response({'msg': _('Get ldap users is None')}, status=400)
 
-        org = self.get_org()
-        errors = LDAPImportUtil().perform_import(users, org)
+        orgs = self.get_orgs()
+        errors = LDAPImportUtil().perform_import(users, orgs)
         if errors:
             return Response({'errors': errors}, status=400)
 
         count = users if users is None else len(users)
+        orgs_name = ', '.join([str(org) for org in orgs])
         return Response({
-            'msg': _('Imported {} users successfully (Organization: {})').format(count, org)
+            'msg': _('Imported {} users successfully (Organization: {})').format(count, orgs_name)
         })
 
 
