@@ -133,6 +133,13 @@ class SessionJoinRecord(JMSBaseModel, OrgModelMixin):
         # self
         if self.verify_code != self.sharing.verify_code:
             return False, _('Invalid verification code')
+
+        # Link can only be joined once by the same user.
+        queryset = SessionJoinRecord.objects.filter(
+            verify_code=self.verify_code, sharing=self.sharing,
+            joiner=self.joiner, date_joined__lt=self.date_joined)
+        if queryset.exists():
+            return False, _('You have already joined this session')
         return True, ''
 
     def join_failed(self, reason):
