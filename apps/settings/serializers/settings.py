@@ -12,7 +12,8 @@ from .auth import (
     CASSettingSerializer, RadiusSettingSerializer, FeiShuSettingSerializer,
     WeComSettingSerializer, DingTalkSettingSerializer, AlibabaSMSSettingSerializer,
     TencentSMSSettingSerializer, CMPP2SMSSettingSerializer, AuthSettingSerializer,
-    SAML2SettingSerializer, OAuth2SettingSerializer, SSOSettingSerializer
+    SAML2SettingSerializer, OAuth2SettingSerializer, SSOSettingSerializer,
+    CustomSMSSettingSerializer,
 )
 from .terminal import TerminalSettingSerializer
 from .security import SecuritySettingSerializer
@@ -47,6 +48,7 @@ class SettingsSerializer(
     AlibabaSMSSettingSerializer,
     TencentSMSSettingSerializer,
     CMPP2SMSSettingSerializer,
+    CustomSMSSettingSerializer,
 ):
     CACHE_KEY = 'SETTING_FIELDS_MAPPING'
 
