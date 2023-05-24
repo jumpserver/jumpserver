@@ -79,7 +79,7 @@ class Endpoint(JMSModel):
             return None
         endpoints = cls.objects.filter(name__in=values).order_by('-date_updated')
         for endpoint in endpoints:
-            if endpoint.is_valid_for(protocol):
+            if endpoint.is_valid_for(instance, protocol):
                 return endpoint
 
 
