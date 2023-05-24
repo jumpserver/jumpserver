@@ -1,4 +1,5 @@
 from django.utils.translation import ugettext_lazy as _
+from django.db import models
 from rest_framework import serializers
 
 from common.serializers.fields import EncryptedField
@@ -7,7 +8,7 @@ from common.sdk.sms import BACKENDS
 
 __all__ = [
     'SMSSettingSerializer', 'AlibabaSMSSettingSerializer', 'TencentSMSSettingSerializer',
-    'HuaweiSMSSettingSerializer', 'CMPP2SMSSettingSerializer'
+    'HuaweiSMSSettingSerializer', 'CMPP2SMSSettingSerializer', 'CustomSMSSettingSerializer',
 ]
 
 
@@ -86,4 +87,28 @@ class CMPP2SMSSettingSerializer(BaseSMSSettingSerializer):
         if len(sign_name + template_code) > 65:
             # 保证验证码内容在一条短信中(长度小于70字), 签名两边的括号和空格占3个字，再减去2个即可(验证码占用4个但占位符6个
             raise serializers.ValidationError(_('Signature + Template must not exceed 65 words'))
+        return attrs
+
+
+class CustomSMSSettingSerializer(BaseSMSSettingSerializer):
+    class RequestType(models.TextChoices):
+        get = 'get', 'Get'
+        post = 'post', 'Post'
+
+    CUSTOM_SMS_URL = serializers.URLField(required=True, label=_("URL"))
+    CUSTOM_SMS_API_PARAMS = serializers.DictField(
+        label=_('Parameters'), default={'phone_number': '{phone_number}', 'code': '{code}'}
+    )
+    CUSTOM_SMS_REQUEST_METHOD = serializers.ChoiceField(
+        default=RequestType.get, choices=RequestType.choices, label=_("Request method")
+    )
+
+    @staticmethod
+    def validate(attrs):
+        need_params = {'{phone_numbers}', '{code}'}
+        params = attrs.get('CUSTOM_SMS_API_PARAMS', {})
+        if len(set(params.values()) & need_params) != len(need_params):
+            raise serializers.ValidationError(
+                _('The value in the parameter must contain %s') % ','.join(need_params)
+            )
         return attrs
