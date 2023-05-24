@@ -16,6 +16,12 @@ params:
     label: 'Shell'
     default: '/bin/bash'
 
+  - name: home
+    type: str
+    label: '家目录'
+    default: ''
+    help_text: '默认家目录 /home/系统用户名: /home/username'
+
   - name: groups
     type: str
     label: '用户组'
