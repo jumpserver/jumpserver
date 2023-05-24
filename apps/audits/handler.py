@@ -1,20 +1,19 @@
+import json
 from datetime import datetime
 
-from django.db import transaction
 from django.core.cache import cache
+from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import get_request_ip, get_logger
-from common.utils.timezone import as_current_tz
-from common.utils.encode import Singleton
 from common.local import encrypted_field_set
-from settings.serializers import SettingsSerializer
+from common.utils import get_request_ip, get_logger
+from common.utils.encode import Singleton
+from common.utils.timezone import as_current_tz
 from jumpserver.utils import current_request
-from orgs.utils import get_current_org_id
 from orgs.models import Organization
-
+from orgs.utils import get_current_org_id
+from settings.serializers import SettingsSerializer
 from .backends import get_operate_log_storage
-
 
 logger = get_logger(__name__)
 
@@ -104,7 +103,9 @@ class OperatorLogHandler(metaclass=Singleton):
             return ''
         if isinstance(value[0], str):
             return ','.join(value)
-        return ','.join([i['value'] for i in value if i.get('value')])
+        if isinstance(value[0], dict) and value[0].get('value') and isinstance(value[0]['value'], str):
+            return ','.join([str(i['value']) for i in value])
+        return json.dumps(value)
 
     def __data_processing(self, dict_item, loop=True):
         encrypt_value = '******'

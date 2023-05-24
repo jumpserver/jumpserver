@@ -64,6 +64,19 @@ class FamilyMixin:
         return pattern
 
     @classmethod
+    def get_nodes_children_key_pattern(cls, nodes, with_self=True):
+        keys = [i.key for i in nodes]
+        keys = cls.clean_children_keys(keys)
+        patterns = [cls.get_node_all_children_key_pattern(key) for key in keys]
+        patterns = '|'.join(patterns)
+        return patterns
+
+    @classmethod
+    def get_nodes_all_children(cls, nodes, with_self=True):
+        pattern = cls.get_nodes_children_key_pattern(nodes, with_self=with_self)
+        return Node.objects.filter(key__iregex=pattern)
+
+    @classmethod
     def get_node_children_key_pattern(cls, key, with_self=True):
         pattern = r'^{0}:[0-9]+$'.format(key)
         if with_self:

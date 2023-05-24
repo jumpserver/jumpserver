@@ -668,7 +668,33 @@ class MFAMixin:
         return backend
 
 
-class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
+class JSONFilterMixin:
+    """
+    users = JSONManyToManyField('users.User', blank=True, null=True)
+    """
+
+    @staticmethod
+    def get_json_filter_attr_q(name, value, match):
+        from rbac.models import RoleBinding
+        from orgs.utils import current_org
+
+        if name == 'system_roles':
+            user_id = RoleBinding.objects \
+                .filter(role__in=value, scope='system') \
+                .values_list('user_id', flat=True)
+            return models.Q(id__in=user_id)
+        elif name == 'org_roles':
+            kwargs = dict(role__in=value, scope='org')
+            if not current_org.is_root():
+                kwargs['org_id'] = current_org.id
+
+            user_id = RoleBinding.objects.filter(**kwargs) \
+                .values_list('user_id', flat=True)
+            return models.Q(id__in=user_id)
+        return None
+
+
+class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, AbstractUser):
     class Source(models.TextChoices):
         local = 'local', _('Local')
         ldap = 'ldap', 'LDAP/AD'

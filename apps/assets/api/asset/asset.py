@@ -15,7 +15,7 @@ from assets.filters import IpInFilterBackend, LabelFilterBackend, NodeFilterBack
 from assets.models import Asset, Gateway, Platform
 from assets.tasks import test_assets_connectivity_manual, update_assets_hardware_info_manual
 from common.api import SuggestionMixin
-from common.drf.filters import BaseFilterSet
+from common.drf.filters import BaseFilterSet, AttrRulesFilterBackend
 from common.utils import get_logger, is_uuid
 from orgs.mixins import generics
 from orgs.mixins.api import OrgBulkModelViewSet
@@ -110,7 +110,10 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
         ("spec_info", "assets.view_asset"),
         ("gathered_info", "assets.view_asset"),
     )
-    extra_filter_backends = [LabelFilterBackend, IpInFilterBackend, NodeFilterBackend]
+    extra_filter_backends = [
+        LabelFilterBackend, IpInFilterBackend,
+        NodeFilterBackend, AttrRulesFilterBackend
+    ]
 
     def get_serializer_class(self):
         cls = super().get_serializer_class()

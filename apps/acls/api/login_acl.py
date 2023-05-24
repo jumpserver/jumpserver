@@ -1,7 +1,7 @@
 from common.api import JMSBulkModelViewSet
-from ..models import LoginACL
 from .. import serializers
 from ..filters import LoginAclFilter
+from ..models import LoginACL
 
 __all__ = ['LoginACLViewSet']
 
@@ -11,4 +11,3 @@ class LoginACLViewSet(JMSBulkModelViewSet):
     filterset_class = LoginAclFilter
     search_fields = ('name',)
     serializer_class = serializers.LoginACLSerializer
-
