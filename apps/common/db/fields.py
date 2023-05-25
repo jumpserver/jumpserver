@@ -502,7 +502,8 @@ class JSONManyToManyDescriptor:
     def get_filter_q(self, instance):
         model_cls = self.field.model
         field_name = self.field.column
-        q = Q(users__type='all') | Q(users__type='ids', users__ids__contains=[str(instance.id)])
+        q = Q(**{f'{field_name}__type': 'all'}) | \
+            Q(**{f'{field_name}__type': 'ids', f'{field_name}__ids__contains': [str(instance.id)]})
         queryset_id_attrs = model_cls.objects \
             .filter(**{'{}__type'.format(field_name): 'attrs'}) \
             .values_list('id', '{}__attrs'.format(field_name))
