@@ -1,6 +1,9 @@
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
+from common.drf.filters import BaseFilterSet
 from orgs.mixins.api import OrgBulkModelViewSet
+from .common import ACLFiltersetMixin
 from .. import models, serializers
 
 __all__ = ['CommandFilterACLViewSet', 'CommandGroupViewSet']
@@ -13,10 +16,16 @@ class CommandGroupViewSet(OrgBulkModelViewSet):
     serializer_class = serializers.CommandGroupSerializer
 
 
+class CommandACLFilter(ACLFiltersetMixin, BaseFilterSet):
+    class Meta:
+        model = models.CommandFilterACL
+        fields = ['name', 'users', 'assets']
+
+
 class CommandFilterACLViewSet(OrgBulkModelViewSet):
     model = models.CommandFilterACL
-    filterset_fields = ('name',)
-    search_fields = filterset_fields
+    filterset_class = CommandACLFilter
+    search_fields = ['name']
     serializer_class = serializers.CommandFilterACLSerializer
     rbac_perms = {
         'command_review': 'tickets.add_superticket'
