@@ -38,7 +38,7 @@ class CustomSMS(BaseSMSClient):
             action = requests.get
             kwargs = {'params': params}
         try:
-            response = action(url=settings.CUSTOM_SMS_URL, **kwargs)
+            response = action(url=settings.CUSTOM_SMS_URL, verify=False, **kwargs)
             if response.reason != 'OK':
                 raise JMSException(detail=response.text, code=response.status_code)
         except Exception as exc:
