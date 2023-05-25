@@ -1856,7 +1856,7 @@ msgstr "删除"
 
 #: audits/const.py:15 perms/const.py:13
 msgid "Upload"
-msgstr "上传文件"
+msgstr "上传"
 
 #: audits/const.py:16
 msgid "Rename"
@@ -1868,7 +1868,7 @@ msgstr "建立软链接"
 
 #: audits/const.py:18 perms/const.py:14
 msgid "Download"
-msgstr "下载文件"
+msgstr "下载"
 
 #: audits/const.py:22 rbac/tree.py:228
 msgid "View"

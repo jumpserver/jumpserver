@@ -61,3 +61,28 @@ class UserAssetAccountBaseACL(BaseACL, OrgModelMixin):
     class Meta(BaseACL.Meta):
         unique_together = ('name', 'org_id')
         abstract = True
+
+    @classmethod
+    def filter_queryset(cls, user=None, asset=None, account=None, account_username=None, **kwargs):
+        queryset = cls.objects.all()
+        org_id = None
+
+        if user:
+            q = cls.users.get_filter_q(user)
+            queryset = queryset.filter(q)
+        if asset:
+            org_id = asset.org_id
+            q = cls.assets.get_filter_q(asset)
+            queryset = queryset.filter(q)
+        if account and not account_username:
+            account_username = account.username
+        if account_username:
+            q = models.Q(accounts__contains=account_username) | \
+                models.Q(accounts__contains='*') | \
+                models.Q(accounts__contains='@ALL')
+            queryset = queryset.filter(q)
+        if org_id:
+            kwargs['org_id'] = org_id
+        if kwargs:
+            queryset = queryset.filter(**kwargs)
+        return queryset.distinct()
