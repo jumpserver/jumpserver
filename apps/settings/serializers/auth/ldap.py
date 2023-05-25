@@ -59,7 +59,7 @@ class LDAPSettingSerializer(serializers.Serializer):
         help_text=_('User attr map present how to map LDAP user attr to '
                     'jumpserver, username,name,email is jumpserver attr')
     )
-    AUTH_LDAP_SYNC_ORG_ID = serializers.CharField(
+    AUTH_LDAP_SYNC_ORG_IDS = serializers.ListField(
         required=False, label=_('Organization'), max_length=36
     )
     AUTH_LDAP_SYNC_IS_PERIODIC = serializers.BooleanField(
