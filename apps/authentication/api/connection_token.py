@@ -317,7 +317,7 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         if acl.is_action(acl.ActionChoices.accept):
             return
         if acl.is_action(acl.ActionChoices.reject):
-            msg = _('ACL action is reject')
+            msg = _('ACL action is reject: {}({})'.format(acl.name, acl.id))
             raise JMSException(code='acl_reject', detail=msg)
         if acl.is_action(acl.ActionChoices.review):
             if not self.request.query_params.get('create_ticket'):

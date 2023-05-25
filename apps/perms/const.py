@@ -14,6 +14,7 @@ class ActionChoices(BitChoices):
     download = bit(3), _("Download")
     copy = bit(4), _("Copy")
     paste = bit(5), _("Paste")
+    delete = bit(6), _("Delete")
 
     @classmethod
     def is_tree(cls):
@@ -23,13 +24,13 @@ class ActionChoices(BitChoices):
     def branches(cls):
         return (
             cls.connect,
-            (_("Transfer"), [cls.upload, cls.download]),
+            (_("Transfer"), [cls.upload, cls.download, cls.delete]),
             (_("Clipboard"), [cls.copy, cls.paste]),
         )
 
     @classmethod
     def transfer(cls):
-        return cls.upload | cls.download
+        return cls.upload | cls.download | cls.delete
 
     @classmethod
     def clipboard(cls):
