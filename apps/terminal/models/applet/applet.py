@@ -94,6 +94,7 @@ class Applet(JMSBaseModel):
     @classmethod
     def load_platform_if_need(cls, d):
         from assets.serializers import PlatformSerializer
+        from assets.const import CustomTypes
 
         if not os.path.exists(os.path.join(d, 'platform.yml')):
             return
@@ -110,6 +111,9 @@ class Applet(JMSBaseModel):
             tp = data['type']
         except KeyError:
             raise ValidationError({'error': _('Missing type in platform.yml')})
+
+        if not data.get('automation'):
+            data['automation'] = CustomTypes._get_automation_constrains()['*']
 
         s = PlatformSerializer(data=data)
         s.add_type_choices(tp, tp)
