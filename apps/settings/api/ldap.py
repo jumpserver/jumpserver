@@ -6,9 +6,11 @@ import threading
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import generics
+from rest_framework.generics import CreateAPIView
 from rest_framework.views import Response, APIView
 
-from common.utils import get_logger
+from common.api import AsyncApiMixin
+from common.utils import get_logger, is_uuid
 from orgs.models import Organization
 from orgs.utils import current_org
 from users.models import User
@@ -26,14 +28,18 @@ from ..utils import (
 logger = get_logger(__file__)
 
 
-class LDAPTestingConfigAPI(APIView):
+class LDAPTestingConfigAPI(AsyncApiMixin, CreateAPIView):
     serializer_class = LDAPTestConfigSerializer
     perm_model = Setting
     rbac_perms = {
-        'POST': 'settings.change_auth'
+        'POST': 'settings.change_auth',
+        'create': 'settings.change_auth',
     }
 
-    def post(self, request):
+    def is_need_async(self):
+        return True
+
+    def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if not serializer.is_valid():
             return Response({"error": str(serializer.errors)}, status=400)

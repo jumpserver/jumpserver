@@ -414,6 +414,10 @@ class Config(dict):
         'CMPP2_VERIFY_SIGN_NAME': '',
         'CMPP2_VERIFY_TEMPLATE_CODE': '{code}',
 
+        'CUSTOM_SMS_URL': '',
+        'CUSTOM_SMS_API_PARAMS': {'phone_numbers': '{phone_numbers}', 'code': '{code}'},
+        'CUSTOM_SMS_REQUEST_METHOD': 'get',
+
         # Email
         'EMAIL_CUSTOM_USER_CREATED_SUBJECT': _('Create account successfully'),
         'EMAIL_CUSTOM_USER_CREATED_HONORIFIC': _('Hello'),

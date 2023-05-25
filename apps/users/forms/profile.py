@@ -100,7 +100,10 @@ class UserTokenResetPasswordForm(forms.Form):
 
 class UserForgotPasswordForm(forms.Form):
     email = forms.CharField(label=_("Email"), required=False)
-    sms = forms.CharField(label=_('SMS'), required=False, max_length=11)
+    sms = forms.CharField(
+        label=_('SMS'), required=False,
+        help_text=_('The phone number must contain an area code, for example, +86')
+    )
     code = forms.CharField(label=_('Verify code'), max_length=6, required=False)
     form_type = forms.ChoiceField(
         choices=[('sms', _('SMS')), ('email', _('Email'))],
