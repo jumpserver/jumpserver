@@ -15,6 +15,6 @@ class PhoneNotSet(JMSException):
     default_detail = _('Phone not set')
 
 
-class MFAMethodNotSupport(JMSException):
-    default_code = 'mfa_not_support'
-    default_detail = _('MFA method not support')
+class UnableToDeleteAllUsers(JMSException):
+    default_code = 'unable_to_delete_all_users'
+    default_detail = _('Unable to delete all users')
