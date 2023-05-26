@@ -33,7 +33,12 @@ class EndpointSerializer(BulkModelSerializer):
             'comment', 'date_created', 'date_updated', 'created_by'
         ]
         extra_kwargs = {
-            'host': {'help_text': _('Visit IP/Host, if empty, use the current request instead')},
+            'host': {'help_text': _(
+                'The host address accessed when connecting to assets, if it is empty, '
+                'the access address of the current browser will be used '
+                '(the default endpoint does not allow modification of the host)'
+            )
+            },
         }
 
     def get_oracle_port(self, obj: Endpoint):
