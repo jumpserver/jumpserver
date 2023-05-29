@@ -15,7 +15,7 @@ class ApplyAssetTicket(Ticket):
     # 申请信息
     apply_assets = models.ManyToManyField('assets.Asset', verbose_name=_('Asset'))
     apply_accounts = models.JSONField(default=list, verbose_name=_('Apply accounts'))
-    apply_actions = models.IntegerField(verbose_name=_('Actions'), default=ActionChoices.all())
+    apply_actions = models.IntegerField(verbose_name=_('Actions'), default=ActionChoices.connect)
     apply_date_start = models.DateTimeField(verbose_name=_('Date start'), null=True)
     apply_date_expired = models.DateTimeField(verbose_name=_('Date expired'), null=True)
 

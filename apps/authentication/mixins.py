@@ -340,15 +340,14 @@ class AuthACLMixin:
 
     def _check_login_acl(self, user, ip):
         # ACL 限制用户登录
-        acl = LoginACL.match(user, ip)
+        acl = LoginACL.get_match_rule_acls(user, ip)
         if not acl:
             return
 
-        acl: LoginACL
-        if acl.is_action(acl.ActionChoices.accept):
+        if acl.is_action(LoginACL.ActionChoices.accept):
             return
 
-        if acl.is_action(acl.ActionChoices.reject):
+        if acl.is_action(LoginACL.ActionChoices.reject):
             raise errors.LoginACLIPAndTimePeriodNotAllowed(user.username, request=self.request)
 
         if acl.is_action(acl.ActionChoices.review):
