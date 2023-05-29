@@ -1,4 +1,4 @@
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from acls.serializers.rules import ip_group_child_validator, ip_group_help_text
@@ -17,7 +17,8 @@ class EndpointSerializer(BulkModelSerializer):
         max_length=128, default=db_port_manager.oracle_port_range, read_only=True,
         label=_('Oracle port range'),
         help_text=_(
-            'Oracle proxy server listen port is dynamic, Each additional Oracle database instance adds a port listener'
+            'Oracle proxy server listen port is dynamic, Each additional Oracle '
+            'database instance adds a port listener'
         )
     )
 
@@ -59,12 +60,13 @@ class EndpointSerializer(BulkModelSerializer):
 
 
 class EndpointRuleSerializer(BulkModelSerializer):
-    _ip_group_help_text = '{} <br> {}'.format(
+    _ip_group_help_text = '{}, {} <br>{}'.format(
+        _('The assets within this IP range, the following endpoint will be used for the connection'),
+        _('If asset IP addresses under different endpoints conflict, use asset labels'),
         ip_group_help_text,
-        _('If asset IP addresses under different endpoints conflict, use asset labels')
     )
     ip_group = serializers.ListField(
-        default=['*'], label=_('IP'), help_text=_ip_group_help_text,
+        default=['*'], label=_('Asset IP'), help_text=_ip_group_help_text,
         child=serializers.CharField(max_length=1024, validators=[ip_group_child_validator])
     )
     endpoint = ObjectRelatedField(
@@ -80,4 +82,5 @@ class EndpointRuleSerializer(BulkModelSerializer):
             'comment', 'date_created', 'date_updated', 'created_by'
         ]
         extra_kwargs = {
+            'priority': {'default': 50}
         }

@@ -7,6 +7,6 @@ type:
   - windows
 i18n:
   Gather facts windows:
-    zh: 从 Windows 获取信息
+    zh: 从 Windows 获取硬件信息
     en: Gather facts windows
     ja: Windowsから事実を取得する

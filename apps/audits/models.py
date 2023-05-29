@@ -158,7 +158,7 @@ class UserLoginLog(models.Model):
     type = models.CharField(
         choices=LoginTypeChoices.choices, max_length=2, verbose_name=_("Login type")
     )
-    ip = models.GenericIPAddressField(verbose_name=_("Login ip"))
+    ip = models.GenericIPAddressField(verbose_name=_("Login IP"))
     city = models.CharField(
         max_length=254, blank=True, null=True, verbose_name=_("Login city")
     )

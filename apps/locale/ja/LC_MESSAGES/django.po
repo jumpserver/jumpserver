@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-26 17:11+0800\n"
+"POT-Creation-Date: 2023-05-26 16:18+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -221,7 +221,7 @@ msgstr "ソース ID"
 
 #: accounts/models/account.py:61
 #: accounts/serializers/automations/change_secret.py:113
-#: accounts/serializers/automations/change_secret.py:133 acls/models/base.py:59
+#: accounts/serializers/automations/change_secret.py:133
 #: acls/serializers/base.py:77 assets/serializers/asset/common.py:125
 #: assets/serializers/gateway.py:28 audits/models.py:49 ops/models/base.py:18
 #: perms/models/asset_permission.py:70 perms/serializers/permission.py:39
@@ -820,6 +820,12 @@ msgstr "アクティブ"
 msgid "Users"
 msgstr "ユーザー"
 
+#: acls/models/base.py:59 assets/models/automations/base.py:17
+#: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:305
+#: rbac/tree.py:35
+msgid "Accounts"
+msgstr "アカウント"
+
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
 #: ops/serializers/job.py:55 terminal/const.py:68
 #: terminal/models/session/session.py:43 terminal/serializers/command.py:18
@@ -833,7 +839,7 @@ msgid "Regex"
 msgstr "正規情報"
 
 #: acls/models/command_acl.py:26 assets/models/cmd_filter.py:79
-#: settings/serializers/basic.py:10 xpack/plugins/license/models.py:30
+#: settings/serializers/basic.py:10 xpack/plugins/license/models.py:29
 msgid "Content"
 msgstr "コンテンツ"
 
@@ -876,10 +882,16 @@ msgid "Login confirm"
 msgstr "ログイン確認"
 
 #: acls/models/login_asset_acl.py:8
+#, fuzzy
+#| msgid "User ID"
+msgid "User IP"
+msgstr "ユーザーID"
+
+#: acls/models/login_asset_acl.py:11
 msgid "Login asset acl"
 msgstr "ログインasset acl"
 
-#: acls/models/login_asset_acl.py:18 tickets/const.py:12
+#: acls/models/login_asset_acl.py:21 tickets/const.py:12
 msgid "Login asset confirm"
 msgstr "ログイン資産の確認"
 
@@ -916,6 +928,11 @@ msgstr "いずれのレビューアも組織 '{}' に属していません"
 #: acls/serializers/command_acl.py:31
 msgid "Command group amount"
 msgstr "コマンドグループ数"
+
+#: acls/serializers/login_asset_acl.py:12 audits/models.py:161
+#: tickets/models/ticket/login_confirm.py:10
+msgid "Login IP"
+msgstr "ログインIP"
 
 #: acls/serializers/rules/rules.py:20
 #: xpack/plugins/cloud/serializers/task.py:22
@@ -1251,7 +1268,7 @@ msgstr "アドレス"
 #: assets/models/asset/common.py:151 assets/models/platform.py:112
 #: authentication/serializers/connect_token_secret.py:115
 #: perms/serializers/user_permission.py:24
-#: xpack/plugins/cloud/serializers/account_attrs.py:196
+#: xpack/plugins/cloud/serializers/account_attrs.py:187
 msgid "Platform"
 msgstr "プラットフォーム"
 
@@ -1330,11 +1347,6 @@ msgstr "パスワードセレクター"
 #: assets/models/asset/web.py:12 assets/serializers/platform.py:38
 msgid "Submit selector"
 msgstr "ボタンセレクターを確認する"
-
-#: assets/models/automations/base.py:17 assets/models/cmd_filter.py:38
-#: assets/serializers/asset/common.py:305 rbac/tree.py:35
-msgid "Accounts"
-msgstr "アカウント"
 
 #: assets/models/automations/base.py:22 ops/models/job.py:187
 #: settings/serializers/auth/sms.py:100
@@ -2003,10 +2015,6 @@ msgstr "パスワード変更ログ"
 #: audits/models.py:159
 msgid "Login type"
 msgstr "ログインタイプ"
-
-#: audits/models.py:161 tickets/models/ticket/login_confirm.py:10
-msgid "Login ip"
-msgstr "ログインIP"
 
 #: audits/models.py:163
 #: authentication/templates/authentication/_msg_different_city.html:11
@@ -4606,7 +4614,7 @@ msgid "SSO auth key TTL"
 msgstr "Token有効期間"
 
 #: settings/serializers/auth/sso.py:17
-#: xpack/plugins/cloud/serializers/account_attrs.py:193
+#: xpack/plugins/cloud/serializers/account_attrs.py:184
 msgid "Unit: second"
 msgstr "単位: 秒"
 
@@ -5750,7 +5758,7 @@ msgid "Redis port"
 msgstr "Redis ポート"
 
 #: terminal/models/component/endpoint.py:29
-#: terminal/models/component/endpoint.py:98 terminal/serializers/endpoint.py:71
+#: terminal/models/component/endpoint.py:98 terminal/serializers/endpoint.py:68
 #: terminal/serializers/storage.py:38 terminal/serializers/storage.py:50
 #: terminal/serializers/storage.py:80 terminal/serializers/storage.py:90
 #: terminal/serializers/storage.py:98
@@ -6051,10 +6059,20 @@ msgstr ""
 
 #: terminal/serializers/endpoint.py:64
 msgid ""
+"The assets within this IP range, the following endpoint will be used for the "
+"connection"
+msgstr "このIP範囲内のアセットは、以下のエンドポイントを使用して接続されます"
+
+#: terminal/serializers/endpoint.py:60
+msgid ""
 "If asset IP addresses under different endpoints conflict, use asset labels"
 msgstr ""
 "異なるエンドポイントの下に競合するアセットIPがある場合は、アセットタグを使用"
 "して実装します"
+
+#: terminal/serializers/endpoint.py:64
+msgid "Asset IP"
+msgstr "資産 IP"
 
 #: terminal/serializers/session.py:24 terminal/serializers/session.py:46
 msgid "Can replay"
@@ -7248,7 +7266,7 @@ msgstr "クラウドアカウント"
 msgid "Test cloud account"
 msgstr "クラウドアカウントのテスト"
 
-#: xpack/plugins/cloud/models.py:88 xpack/plugins/cloud/serializers/task.py:36
+#: xpack/plugins/cloud/models.py:88 xpack/plugins/cloud/serializers/task.py:37
 msgid "Regions"
 msgstr "リージョン"
 
@@ -7256,15 +7274,15 @@ msgstr "リージョン"
 msgid "Hostname strategy"
 msgstr "ホスト名戦略"
 
-#: xpack/plugins/cloud/models.py:102 xpack/plugins/cloud/serializers/task.py:39
+#: xpack/plugins/cloud/models.py:102 xpack/plugins/cloud/serializers/task.py:40
 msgid "IP network segment group"
 msgstr "IPネットワークセグメントグループ"
 
-#: xpack/plugins/cloud/models.py:105 xpack/plugins/cloud/serializers/task.py:44
+#: xpack/plugins/cloud/models.py:105 xpack/plugins/cloud/serializers/task.py:45
 msgid "Sync IP type"
 msgstr "同期IPタイプ"
 
-#: xpack/plugins/cloud/models.py:108 xpack/plugins/cloud/serializers/task.py:61
+#: xpack/plugins/cloud/models.py:108 xpack/plugins/cloud/serializers/task.py:62
 msgid "Always update"
 msgstr "常に更新"
 
@@ -7549,11 +7567,15 @@ msgstr "ファイルはJSON形式です。"
 msgid "IP address invalid `{}`, {}"
 msgstr "IPアドレスが無効: '{}', {}"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:172
-msgid "Such as: 192.168.1.0/24, 10.0.0.0-10.0.0.255"
+#: xpack/plugins/cloud/serializers/account_attrs.py:162
+#, fuzzy
+#| msgid "Such as: 192.168.1.0/24, 10.0.0.0-10.0.0.255"
+msgid ""
+"Format for comma-delimited string,Such as: 192.168.1.0/24, "
+"10.0.0.0-10.0.0.255"
 msgstr "例：192.168.1.0/24,10.0.0.0-10.0.0.255"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:175
+#: xpack/plugins/cloud/serializers/account_attrs.py:166
 msgid ""
 "The port is used to detect the validity of the IP address. When the "
 "synchronization task is executed, only the valid IP address will be "
@@ -7563,29 +7585,36 @@ msgstr ""
 "実行されると、有効な IP アドレスのみが同期されます。 <br>ポートが0の場合、す"
 "べてのIPアドレスが有効です。"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:183
+#: xpack/plugins/cloud/serializers/account_attrs.py:174
 msgid "Hostname prefix"
 msgstr "ホスト名プレフィックス"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:186
+#: xpack/plugins/cloud/serializers/account_attrs.py:177
 msgid "IP segment"
 msgstr "IP セグメント"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:190
+#: xpack/plugins/cloud/serializers/account_attrs.py:181
 msgid "Test port"
 msgstr "テストポート"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:193
+#: xpack/plugins/cloud/serializers/account_attrs.py:184
 msgid "Test timeout"
 msgstr "テストタイムアウト"
 
 #: xpack/plugins/cloud/serializers/task.py:28
+#, fuzzy
+#| msgid ""
+#| "Only instances matching the IP range will be synced. <br>If the instance "
+#| "contains multiple IP addresses, the first IP address that matches will be "
+#| "used as the IP for the created asset. <br>The default value of * means "
+#| "sync all instances and randomly match IP addresses. <br>Such as: "
+#| "192.168.1.0/24, 10.1.1.1-10.1.1.20"
 msgid ""
 "Only instances matching the IP range will be synced. <br>If the instance "
 "contains multiple IP addresses, the first IP address that matches will be "
 "used as the IP for the created asset. <br>The default value of * means sync "
-"all instances and randomly match IP addresses. <br>Such as: 192.168.1.0/24, "
-"10.1.1.1-10.1.1.20"
+"all instances and randomly match IP addresses. <br>Format for comma-"
+"delimited string, Such as: 192.168.1.0/24, 10.1.1.1-10.1.1.20"
 msgstr ""
 "IP範囲に一致するインスタンスのみが同期されます。<br>インスタンスに複数のIPア"
 "ドレスが含まれている場合、一致する最初のIPアドレスが作成されたアセットのIPと"
@@ -7593,11 +7622,11 @@ msgstr ""
 "ドレスをランダムに一致させることを意味します。 <br>例："
 "192.168.1.0/24,10.1.1.1-10.1.1.20"
 
-#: xpack/plugins/cloud/serializers/task.py:34
+#: xpack/plugins/cloud/serializers/task.py:35
 msgid "History count"
 msgstr "実行回数"
 
-#: xpack/plugins/cloud/serializers/task.py:35
+#: xpack/plugins/cloud/serializers/task.py:36
 msgid "Instance count"
 msgstr "インスタンス数"
 
@@ -7657,23 +7686,23 @@ msgstr "ライセンスのインポートに成功"
 msgid "License is invalid"
 msgstr "ライセンスが無効です"
 
-#: xpack/plugins/license/meta.py:11 xpack/plugins/license/models.py:138
+#: xpack/plugins/license/meta.py:11 xpack/plugins/license/models.py:135
 msgid "License"
 msgstr "ライセンス"
 
-#: xpack/plugins/license/models.py:80
+#: xpack/plugins/license/models.py:79
 msgid "Standard edition"
 msgstr "標準版"
 
-#: xpack/plugins/license/models.py:82
+#: xpack/plugins/license/models.py:81
 msgid "Enterprise edition"
 msgstr "エンタープライズ版"
 
-#: xpack/plugins/license/models.py:84
+#: xpack/plugins/license/models.py:83
 msgid "Ultimate edition"
 msgstr "究極のエディション"
 
-#: xpack/plugins/license/models.py:86
+#: xpack/plugins/license/models.py:85
 msgid "Community edition"
 msgstr "コミュニティ版"
 

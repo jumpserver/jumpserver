@@ -1,9 +1,13 @@
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from .base import UserAssetAccountBaseACL
 
 
 class LoginAssetACL(UserAssetAccountBaseACL):
+    # 规则, ip_group, time_period
+    rules = models.JSONField(default=dict, verbose_name=_('Rule'))
+
     class Meta(UserAssetAccountBaseACL.Meta):
         verbose_name = _('Login asset acl')
         abstract = False

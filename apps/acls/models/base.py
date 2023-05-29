@@ -4,6 +4,8 @@ from django.utils.translation import gettext_lazy as _
 
 from common.db.fields import JSONManyToManyField
 from common.db.models import JMSBaseModel
+from common.utils import contains_ip
+from common.utils.time_period import contains_time_period
 from orgs.mixins.models import OrgModelMixin
 
 __all__ = [
@@ -52,11 +54,35 @@ class BaseACL(JMSBaseModel):
     def is_action(self, action):
         return self.action == action
 
+    @classmethod
+    def get_user_acls(cls, user):
+        return cls.objects.none()
+
+    @classmethod
+    def get_match_rule_acls(cls, user, ip, acl_qs=None):
+        if acl_qs is None:
+            acl_qs = cls.get_user_acls(user)
+        if not acl_qs:
+            return
+
+        for acl in acl_qs:
+            if acl.is_action(ActionChoices.review) and not acl.reviewers.exists():
+                continue
+            ip_group = acl.rules.get('ip_group')
+            time_periods = acl.rules.get('time_period')
+            is_contain_ip = contains_ip(ip, ip_group) if ip_group else True
+            is_contain_time_period = contains_time_period(time_periods) if time_periods else True
+
+            if is_contain_ip and is_contain_time_period:
+                # 满足条件，则返回
+                return acl
+        return None
+
 
 class UserAssetAccountBaseACL(BaseACL, OrgModelMixin):
     users = JSONManyToManyField('users.User', default=dict, verbose_name=_('Users'))
     assets = JSONManyToManyField('assets.Asset', default=dict, verbose_name=_('Assets'))
-    accounts = models.JSONField(default=list, verbose_name=_("Account"))
+    accounts = models.JSONField(default=list, verbose_name=_("Accounts"))
 
     class Meta(BaseACL.Meta):
         unique_together = ('name', 'org_id')
@@ -85,4 +111,4 @@ class UserAssetAccountBaseACL(BaseACL, OrgModelMixin):
             kwargs['org_id'] = org_id
         if kwargs:
             queryset = queryset.filter(**kwargs)
-        return queryset.distinct()
+        return queryset.valid().distinct().order_by('priority', 'date_created')

@@ -97,7 +97,7 @@ class Migration(migrations.Migration):
                 ('username', models.CharField(max_length=20, verbose_name='Username')),
                 ('type',
                  models.CharField(choices=[('W', 'Web'), ('T', 'Terminal')], max_length=2, verbose_name='Login type')),
-                ('ip', models.GenericIPAddressField(verbose_name='Login ip')),
+                ('ip', models.GenericIPAddressField(verbose_name='Login IP')),
                 ('city', models.CharField(blank=True, max_length=254, null=True, verbose_name='Login city')),
                 ('user_agent', models.CharField(blank=True, max_length=254, null=True, verbose_name='User agent')),
                 ('datetime', models.DateTimeField(auto_now_add=True, verbose_name='Date login')),
