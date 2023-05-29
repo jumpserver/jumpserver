@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-26 17:11+0800\n"
+"POT-Creation-Date: 2023-05-29 18:19+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -829,7 +829,7 @@ msgid "Regex"
 msgstr "正则表达式"
 
 #: acls/models/command_acl.py:26 assets/models/cmd_filter.py:79
-#: settings/serializers/basic.py:10 xpack/plugins/license/models.py:30
+#: settings/serializers/basic.py:10 xpack/plugins/license/models.py:29
 msgid "Content"
 msgstr "内容"
 
@@ -1244,7 +1244,7 @@ msgstr "地址"
 #: assets/models/asset/common.py:151 assets/models/platform.py:112
 #: authentication/serializers/connect_token_secret.py:115
 #: perms/serializers/user_permission.py:24
-#: xpack/plugins/cloud/serializers/account_attrs.py:196
+#: xpack/plugins/cloud/serializers/account_attrs.py:187
 msgid "Platform"
 msgstr "系统平台"
 
@@ -2547,7 +2547,7 @@ msgstr "没有用户或用户失效"
 msgid "No asset or inactive asset"
 msgstr "没有资产或资产未激活"
 
-#: authentication/models/connection_token.py:262
+#: authentication/models/connection_token.py:264
 msgid "Super connection token"
 msgstr "超级连接令牌"
 
@@ -3778,6 +3778,10 @@ msgstr "刷新组织缓存"
 msgid "App permissions"
 msgstr "授权管理"
 
+#: perms/const.py:12
+msgid "All protocols"
+msgstr "所有协议"
+
 #: perms/const.py:15
 msgid "Copy"
 msgstr "复制"
@@ -4562,7 +4566,7 @@ msgid "SSO auth key TTL"
 msgstr "令牌有效期"
 
 #: settings/serializers/auth/sso.py:17
-#: xpack/plugins/cloud/serializers/account_attrs.py:193
+#: xpack/plugins/cloud/serializers/account_attrs.py:184
 msgid "Unit: second"
 msgstr "单位: 秒"
 
@@ -7143,7 +7147,7 @@ msgstr "云账号"
 msgid "Test cloud account"
 msgstr "测试云账号"
 
-#: xpack/plugins/cloud/models.py:88 xpack/plugins/cloud/serializers/task.py:36
+#: xpack/plugins/cloud/models.py:88 xpack/plugins/cloud/serializers/task.py:37
 msgid "Regions"
 msgstr "地域"
 
@@ -7151,15 +7155,15 @@ msgstr "地域"
 msgid "Hostname strategy"
 msgstr "主机名策略"
 
-#: xpack/plugins/cloud/models.py:102 xpack/plugins/cloud/serializers/task.py:39
+#: xpack/plugins/cloud/models.py:102 xpack/plugins/cloud/serializers/task.py:40
 msgid "IP network segment group"
 msgstr "IP网段组"
 
-#: xpack/plugins/cloud/models.py:105 xpack/plugins/cloud/serializers/task.py:44
+#: xpack/plugins/cloud/models.py:105 xpack/plugins/cloud/serializers/task.py:45
 msgid "Sync IP type"
 msgstr "同步IP类型"
 
-#: xpack/plugins/cloud/models.py:108 xpack/plugins/cloud/serializers/task.py:61
+#: xpack/plugins/cloud/models.py:108 xpack/plugins/cloud/serializers/task.py:62
 msgid "Always update"
 msgstr "总是更新"
 
@@ -7444,11 +7448,15 @@ msgstr "JSON 格式的文件"
 msgid "IP address invalid `{}`, {}"
 msgstr "IP 地址无效: `{}`, {}"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:172
-msgid "Such as: 192.168.1.0/24, 10.0.0.0-10.0.0.255"
+#: xpack/plugins/cloud/serializers/account_attrs.py:162
+#, fuzzy
+#| msgid "Such as: 192.168.1.0/24, 10.0.0.0-10.0.0.255"
+msgid ""
+"Format for comma-delimited string,Such as: 192.168.1.0/24, "
+"10.0.0.0-10.0.0.255"
 msgstr "如：192.168.1.0/24,10.0.0.0-10.0.0.255"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:175
+#: xpack/plugins/cloud/serializers/account_attrs.py:166
 msgid ""
 "The port is used to detect the validity of the IP address. When the "
 "synchronization task is executed, only the valid IP address will be "
@@ -7457,39 +7465,46 @@ msgstr ""
 "端口用来检测 IP 地址的有效性，在同步任务执行时，只会同步有效的 IP 地址。 <br>"
 "如果端口为 0，则表示所有 IP 地址均有效。"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:183
+#: xpack/plugins/cloud/serializers/account_attrs.py:174
 msgid "Hostname prefix"
 msgstr "主机名前缀"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:186
+#: xpack/plugins/cloud/serializers/account_attrs.py:177
 msgid "IP segment"
 msgstr "IP 网段"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:190
+#: xpack/plugins/cloud/serializers/account_attrs.py:181
 msgid "Test port"
 msgstr "测试端口"
 
-#: xpack/plugins/cloud/serializers/account_attrs.py:193
+#: xpack/plugins/cloud/serializers/account_attrs.py:184
 msgid "Test timeout"
 msgstr "测试超时时间"
 
 #: xpack/plugins/cloud/serializers/task.py:28
+#, fuzzy
+#| msgid ""
+#| "Only instances matching the IP range will be synced. <br>If the instance "
+#| "contains multiple IP addresses, the first IP address that matches will be "
+#| "used as the IP for the created asset. <br>The default value of * means "
+#| "sync all instances and randomly match IP addresses. <br>Such as: "
+#| "192.168.1.0/24, 10.1.1.1-10.1.1.20"
 msgid ""
 "Only instances matching the IP range will be synced. <br>If the instance "
 "contains multiple IP addresses, the first IP address that matches will be "
 "used as the IP for the created asset. <br>The default value of * means sync "
-"all instances and randomly match IP addresses. <br>Such as: 192.168.1.0/24, "
-"10.1.1.1-10.1.1.20"
+"all instances and randomly match IP addresses. <br>Format for comma-"
+"delimited string, Such as: 192.168.1.0/24, 10.1.1.1-10.1.1.20"
 msgstr ""
 "只有匹配到 IP 段的实例会被同步。<br>如果实例包含多个 IP 地址，那么第一个匹配"
 "到的 IP 地址将被用作创建的资产的 IP。<br>默认值 * 表示同步所有实例和随机匹配 "
 "IP 地址。<br>例如:192.168.1.0/24,10.1.1.1-10.1.1.20"
 
-#: xpack/plugins/cloud/serializers/task.py:34
+#: xpack/plugins/cloud/serializers/task.py:35
 msgid "History count"
 msgstr "执行次数"
 
-#: xpack/plugins/cloud/serializers/task.py:35
+#: xpack/plugins/cloud/serializers/task.py:36
 msgid "Instance count"
 msgstr "实例个数"
 
@@ -7549,25 +7564,43 @@ msgstr "许可证导入成功"
 msgid "License is invalid"
 msgstr "无效的许可证"
 
-#: xpack/plugins/license/meta.py:11 xpack/plugins/license/models.py:138
+#: xpack/plugins/license/meta.py:11 xpack/plugins/license/models.py:135
 msgid "License"
 msgstr "许可证"
 
-#: xpack/plugins/license/models.py:80
+#: xpack/plugins/license/models.py:79
 msgid "Standard edition"
 msgstr "标准版"
 
-#: xpack/plugins/license/models.py:82
+#: xpack/plugins/license/models.py:81
 msgid "Enterprise edition"
 msgstr "企业版"
 
-#: xpack/plugins/license/models.py:84
+#: xpack/plugins/license/models.py:83
 msgid "Ultimate edition"
 msgstr "旗舰版"
 
-#: xpack/plugins/license/models.py:86
+#: xpack/plugins/license/models.py:85
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Connect (All Protocols)"
+#~ msgstr "连接 (所以协议)"
+
+#~ msgid "Upload (RDP, SFTP)"
+#~ msgstr "上传 (RDP, SFTP)"
+
+#~ msgid "Download (RDP, SFTP)"
+#~ msgstr "下载 (RDP, SFTP)"
+
+#~ msgid "Copy (RDP, VNC)"
+#~ msgstr "复制 (RDP, VNC)"
+
+#~ msgid "Paste (RDP, VNC)"
+#~ msgstr "粘贴 (RDP, VNC)"
+
+#~ msgid "Delete (SFTP)"
+#~ msgstr "删除 (SFTP)"
 
 #~ msgid "User (username)"
 #~ msgstr "用户（用户名）"
