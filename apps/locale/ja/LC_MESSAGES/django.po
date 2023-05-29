@@ -951,7 +951,7 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
-#: settings/serializers/terminal.py:10
+#: settings/serializers/terminal.py:10 terminal/serializers/endpoint.py:67
 msgid "IP"
 msgstr "IP"
 
@@ -6048,12 +6048,16 @@ msgstr ""
 "ベースインスタンスはポートリスナーを追加します"
 
 #: terminal/serializers/endpoint.py:37
-msgid "Visit IP/Host, if empty, use the current request instead"
+msgid ""
+"The host address accessed when connecting to assets, if it is empty, the "
+"access address of the current browser will be used (the default endpoint "
+"does not allow modification of the host)"
 msgstr ""
-"IP/ホストにアクセスします。空の場合は、代わりに現在のリクエストのアドレスを使"
-"用します"
+"アセットに接続するときにアクセスされるホスト アドレス。空の場合は、現在のブラ"
+"ウザのアクセス アドレスが使用されます (デフォルトのエンドポイントではホストの"
+"変更は許可されません)。"
 
-#: terminal/serializers/endpoint.py:59
+#: terminal/serializers/endpoint.py:64
 msgid ""
 "The assets within this IP range, the following endpoint will be used for the "
 "connection"

@@ -215,7 +215,8 @@ class ConnectionToken(JMSOrgBaseModel):
                 'secret_type': 'password',
                 'secret': self.input_secret,
                 'su_from': None,
-                'org_id': self.asset.org_id
+                'org_id': self.asset.org_id,
+                'asset': self.asset
             }
         else:
             data = {
@@ -225,7 +226,8 @@ class ConnectionToken(JMSOrgBaseModel):
                 'secret': account.secret or self.input_secret,
                 'su_from': account.su_from,
                 'org_id': account.org_id,
-                'privileged': account.privileged
+                'privileged': account.privileged,
+                'asset': self.asset
             }
         return Account(**data)
 

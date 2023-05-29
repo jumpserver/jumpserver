@@ -5965,10 +5965,15 @@ msgstr ""
 "端口监听"
 
 #: terminal/serializers/endpoint.py:37
-msgid "Visit IP/Host, if empty, use the current request instead"
-msgstr "访问IP/Host，如果为空，则使用当前请求的地址代替"
+msgid ""
+"The host address accessed when connecting to assets, if it is empty, the "
+"access address of the current browser will be used (the default endpoint "
+"does not allow modification of the host)"
+msgstr ""
+"连接资产时访问的主机地址，如果为空则使用当前浏览器的访问地址（默认端点不允许"
+"修改主机）"
 
-#: terminal/serializers/endpoint.py:59
+#: terminal/serializers/endpoint.py:64
 msgid ""
 "The assets within this IP range, the following endpoint will be used for the "
 "connection"

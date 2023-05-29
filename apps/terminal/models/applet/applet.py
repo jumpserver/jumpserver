@@ -84,7 +84,7 @@ class Applet(JMSBaseModel):
             if not os.path.exists(path):
                 raise ValidationError({'error': _('Applet pkg not valid, Missing file {}').format(name)})
 
-        with open(os.path.join(d, 'manifest.yml')) as f:
+        with open(os.path.join(d, 'manifest.yml'), encoding='utf8') as f:
             manifest = yaml_load_with_i18n(f)
 
         if not manifest.get('name', ''):
@@ -99,7 +99,7 @@ class Applet(JMSBaseModel):
         if not os.path.exists(os.path.join(d, 'platform.yml')):
             return
         try:
-            with open(os.path.join(d, 'platform.yml')) as f:
+            with open(os.path.join(d, 'platform.yml'), encoding='utf8') as f:
                 data = yaml_load_with_i18n(f)
         except Exception as e:
             raise ValidationError({'error': _('Load platform.yml failed: {}').format(e)})

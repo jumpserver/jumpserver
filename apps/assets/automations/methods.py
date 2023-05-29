@@ -39,7 +39,7 @@ def get_platform_automation_methods(path):
             if not path.endswith('manifest.yml'):
                 continue
 
-            with open(path, 'r') as f:
+            with open(path, 'r', encoding='utf8') as f:
                 manifest = yaml_load_with_i18n(f)
                 check_platform_method(manifest, path)
                 manifest['dir'] = os.path.dirname(path)

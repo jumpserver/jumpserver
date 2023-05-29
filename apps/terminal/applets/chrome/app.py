@@ -1,3 +1,5 @@
+import os
+import tempfile
 import time
 from enum import Enum
 from subprocess import CREATE_NO_WINDOW
@@ -184,10 +186,16 @@ class WebAPP(object):
         return True
 
 
+def load_extensions():
+    extensions_root = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'extensions')
+    extension_names = os.listdir(extensions_root)
+    extension_paths = [os.path.join(extensions_root, name) for name in extension_names]
+    return extension_paths
+
+
 def default_chrome_driver_options():
     options = webdriver.ChromeOptions()
     options.add_argument("--start-maximized")
-    options.add_argument("--new-window")
 
     # 忽略证书错误相关
     options.add_argument('--ignore-ssl-errors')
@@ -195,6 +203,10 @@ def default_chrome_driver_options():
     options.add_argument('--ignore-certificate-errors-spki-list')
     options.add_argument('--allow-running-insecure-content')
 
+    # 加载 extensions
+    extension_paths = load_extensions()
+    for extension_path in extension_paths:
+        options.add_argument('--load-extension={}'.format(extension_path))
     # 禁用开发者工具
     options.add_argument("--disable-dev-tools")
     # 禁用 密码管理器弹窗
@@ -214,8 +226,10 @@ class AppletApplication(BaseApplication):
         self.driver = None
         self.app = WebAPP(app_name=self.app_name, user=self.user,
                           account=self.account, asset=self.asset, platform=self.platform)
+        self._tmp_user_dir = tempfile.TemporaryDirectory()
         self._chrome_options = default_chrome_driver_options()
         self._chrome_options.add_argument("--app={}".format(self.asset.address))
+        self._chrome_options.add_argument("--user-data-dir={}".format(self._tmp_user_dir.name))
 
     def run(self):
         service = Service()
@@ -253,3 +267,7 @@ class AppletApplication(BaseApplication):
                 self.driver.quit()
             except Exception as e:
                 print(e)
+        try:
+            self._tmp_user_dir.cleanup()
+        except Exception as e:
+            print(e)
