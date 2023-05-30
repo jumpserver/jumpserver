@@ -14,9 +14,9 @@ from common.utils.random import random_string
 from common.utils import get_object_or_none
 from authentication.serializers import (
     PasswordVerifySerializer, ResetPasswordCodeSerializer,
-    ForgetPasswordPreviewingSerializer, ForgetPasswordAuthSerializer
+    ForgetPasswordPreviewingSerializer, ForgetPasswordAuthSerializer,
+    LoginSerializer
 )
-from notifications.backends import client_name_mapper
 from settings.utils import get_login_title
 from users.models import User
 from authentication.mixins import authenticate
@@ -139,3 +139,9 @@ class ForgetPasswordAuthApi(CreateAPIView):
 
     def perform_create(self, serializer):
         self.pre_check()
+
+
+class LoginApi(CreateAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = LoginSerializer
+

@@ -40,6 +40,7 @@ urlpatterns = [
 
     path('password/forget/previewing/', api.ForgetPasswordPreviewingApi.as_view(), name='forgot-previewing'),
     path('password/forget/auth/', api.ForgetPasswordAuthApi.as_view(), name='forgot-auth'),
+    path('login/', api.LoginApi.as_view(), name='login'),
 ]
 
 urlpatterns += router.urls

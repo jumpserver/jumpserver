@@ -9,6 +9,7 @@ __all__ = ['PublicSettingSerializer', 'PrivateSettingSerializer']
 class PublicSettingSerializer(serializers.Serializer):
     XPACK_ENABLED = serializers.BooleanField()
     INTERFACE = serializers.DictField()
+    LOGIN_INFO = serializers.DictField()
 
 
 class PrivateSettingSerializer(PublicSettingSerializer):

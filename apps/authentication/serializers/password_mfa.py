@@ -16,6 +16,7 @@ __all__ = [
     'MFAChallengeSerializer', 'MFASelectTypeSerializer',
     'PasswordVerifySerializer', 'ResetPasswordCodeSerializer',
     'ForgetPasswordPreviewingSerializer', 'ForgetPasswordAuthSerializer',
+    'LoginSerializer',
 ]
 
 
@@ -125,5 +126,14 @@ class ForgetPasswordAuthSerializer(serializers.Serializer):
     account = serializers.CharField(max_length=36, required=True)
     code = serializers.CharField(max_length=36, required=True, label=_('Captcha'))
 
-    def validate(self, attrs):
-        return attrs
+
+def get_auto_login_label():
+    days_auto_login = int(settings.SESSION_COOKIE_AGE / 3600 / 24)
+    return _("{} days auto login").format(days_auto_login or 1)
+
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=128, required=True, label=_('Username'))
+    password = serializers.CharField(max_length=128, required=True, label=_('Password'))
+    auto_login = serializers.BooleanField(default=False, label=get_auto_login_label())
+
