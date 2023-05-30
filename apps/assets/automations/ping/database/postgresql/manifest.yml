@@ -6,6 +6,6 @@ type:
 method: ping
 i18n:
   Ping PostgreSQL:
-    zh: 测试 PostgreSQL 可连接性
-    en: Ping PostgreSQL
-    ja: PostgreSQLにPingする
+    zh: 使用 Ansible 模块 postgresql 来测试 PostgreSQL 连接性
+    en: Ping PostgreSQL using ansible postgresql module
+    ja: ansible postgresql モジュールを使用して PostgreSQL に ping を送信する

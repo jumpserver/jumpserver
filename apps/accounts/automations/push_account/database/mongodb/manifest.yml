@@ -7,5 +7,6 @@ method: push_account
 
 i18n:
   MongoDB account push:
-    zh: MongoDB 账号推送
-    ja: MongoDB アカウントのプッシュ
+    zh: 使用 Ansible 模块 mongodb 执行 MongoDB 账号推送
+    ja: Ansible mongodb モジュールを使用してアカウントをプッシュする
+    en: Using Ansible module mongodb to push account

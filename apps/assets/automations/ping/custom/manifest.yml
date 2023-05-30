@@ -1,8 +1,13 @@
 id: ping_by_ssh
-name: Ping by SSH
+name: "{{ 'Ping by paramiko' | trans }}"
 category:
   - device
   - host
 type:
   - all
 method: ping
+i18n:
+  Ping by paramiko:
+    zh: 使用 Python 模块 paramiko 测试主机可连接性
+    en: Ping by paramiko module
+    ja: Paramikoモジュールを使用してホストにPingする

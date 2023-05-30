@@ -7,6 +7,6 @@ type:
 method: gather_facts
 i18n:
   Gather posix facts:
-    zh: 从 Posix 主机获取信息
-    en: Gather posix facts
-    ja: Posixから事実を取得する
+    zh: 使用 Ansible 指令 gather_facts 从主机获取设备信息
+    en: Gather facts from asset using gather_facts
+    ja: gather_factsを使用してPosixから情報を収集する

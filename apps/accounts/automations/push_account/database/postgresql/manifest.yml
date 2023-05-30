@@ -7,5 +7,6 @@ method: push_account
 
 i18n:
   PostgreSQL account push:
-    zh: PostgreSQL 账号推送
-    ja: PostgreSQL アカウントのプッシュ
+    zh: 使用 Ansible 模块 postgresql 执行 PostgreSQL 账号推送
+    ja: Ansible postgresql モジュールを使用してアカウントをプッシュする
+    en: Using Ansible module postgresql to push account

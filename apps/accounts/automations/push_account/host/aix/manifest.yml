@@ -30,6 +30,7 @@ params:
 
 i18n:
   Aix account push:
-    zh: Aix 账号推送
-    ja: Aix アカウントのプッシュ
+    zh: 使用 Ansible 模块 user 执行 Aix 账号推送 (DES)
+    ja: Ansible user モジュールを使用して Aix アカウントをプッシュする (DES)
+    en: Using Ansible module user to push account (DES)
 

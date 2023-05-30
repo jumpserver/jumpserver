@@ -7,6 +7,6 @@ type:
   - windows
 i18n:
   Windows ping:
-    zh: 测试 Windows 可连接性
-    en: Windows ping
-    ja: Windows ピング
+    zh: 使用 Ansible 模块 内置模块 win_ping 来测试可连接性
+    en: Use Ansible builtin module win_ping to test Windows
+    ja: Ansible 組み込みモジュール win_ping を使用してテストする Windows
