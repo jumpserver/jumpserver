@@ -6,6 +6,6 @@ type:
 method: ping
 i18n:
   Ping SQLServer:
-    zh: 测试 SQLServer 可连接性
-    en: Ping SQLServer
-    ja: SQLServerにPingする
+    zh: 使用 Ansible 模块 mssql 来测试 SQLServer 连接性
+    en: Ping SQLServer using ansible mssql module
+    ja: ansible mssql モジュールを使用して SQLServer に ping を送信する

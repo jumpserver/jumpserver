@@ -6,6 +6,6 @@ type:
 method: ping
 i18n:
   Ping Oracle:
-    zh: 测试 Oracle 可连接性
-    en: Ping Oracle
-    ja: OracleにPingする
+    zh: 使用 python oracledb 模块来测试 Oracle 可连接性
+    en: Use python oracledb module to test Oracle
+    ja: Python oracledbモジュールを使用してテストする Oracle

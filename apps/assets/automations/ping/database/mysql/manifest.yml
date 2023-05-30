@@ -7,6 +7,6 @@ type:
 method: ping
 i18n:
   Ping MySQL:
-    zh: 测试 MySQL 可连接性
-    en: Ping MySQL
-    ja: MySQLにPingする
+    zh: 使用 Ansible 模块 mysql 来测试 MySQL 可连接性
+    en: Use ansible mysql module to test MySQL
+    ja: Ansible mysqlモジュールを使用してテストする MySQL

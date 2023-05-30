@@ -6,6 +6,6 @@ type:
 method: gather_facts
 i18n:
   Gather facts from Oracle:
-    zh: 从 Oracle 获取信息
-    en: Gather facts from Oracle
-    ja: Oracleから事実を取得する
+    zh: 使用 oracledb 模块获取 Oracle 信息
+    en: Gather facts from Oracle using oracledb module
+    ja: oracledbモジュールを使用して Oracleから情報を収集する

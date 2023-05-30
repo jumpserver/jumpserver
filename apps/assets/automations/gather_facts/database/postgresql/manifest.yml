@@ -6,6 +6,6 @@ type:
 method: gather_facts
 i18n:
   Gather facts for PostgreSQL:
-    zh: 从 PostgreSQL 获取信息
-    en: Gather facts for PostgreSQL
-    ja: PostgreSQLから事実を取得する
+    zh: 使用 Ansible 模块 postgresql 获取 PostgreSQL 信息
+    en: Gather facts for PostgreSQL using postgresql module
+    ja: postgresqlモジュールを使用して PostgreSQLから情報を収集する

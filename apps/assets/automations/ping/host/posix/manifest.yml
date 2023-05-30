@@ -8,6 +8,6 @@ method: ping
 
 i18n:
   Posix ping:
-    zh: 测试 Posix 可连接性
-    en: Posix ping
-    ja: Posix ピング
+    zh: 使用 Ansible 模块 ping 来测试可连接性
+    en: Use Ansible builtin module ping to test Posix
+    ja: Ansible 組み込みモジュール ping を使用してテストする Posix
