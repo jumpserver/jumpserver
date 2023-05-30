@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from common.utils import get_log_keep_day, get_logger
+from common.storage.ftp_file import FTPFileStorage
 from ops.celery.decorator import (
     register_as_period_task, after_app_shutdown_clean_periodic
 )
@@ -18,7 +19,7 @@ from ops.models import CeleryTaskExecution
 from terminal.models import Session, Command
 from terminal.backends import server_replay_storage
 from .models import UserLoginLog, OperateLog, FTPLog, ActivityLog
-from .utils import find_ftp_log_file_local
+
 
 logger = get_logger(__name__)
 
@@ -117,13 +118,13 @@ def upload_ftp_file_to_external_storage(ftp_log_id, file_name):
     if not ftp_log:
         logger.error(f'FTP db item not found: {ftp_log_id}')
         return
-    local_path, foobar = find_ftp_log_file_local(ftp_log)
+    ftp_storage = FTPFileStorage(ftp_log)
+    local_path, url_or_err = ftp_storage.find_local()
     if not local_path:
         logger.error(f'FTP file record not found, may be upload error. file name: {file_name}')
         return
     abs_path = default_storage.path(local_path)
-    remote_path = ftp_log.get_file_remote_path()
-    ok, err = server_replay_storage.upload(abs_path, remote_path)
+    ok, err = server_replay_storage.upload(abs_path, ftp_log.filepath)
     if not ok:
         logger.error(f'Session file record upload to external error: {err}')
         return

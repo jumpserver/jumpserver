@@ -63,18 +63,13 @@ class FTPLog(OrgModelMixin):
     class Meta:
         verbose_name = _("File transfer log")
 
-    def get_file_local_path(self):
-        local_path = os.path.join(self.upload_to, self.date_start.strftime('%Y-%m-%d'), str(self.id))
-        return local_path
-
-    def get_file_remote_path(self):
-        local_path = os.path.join(self.upload_to, self.date_start.strftime('%Y-%m-%d'), str(self.id))
-        return local_path
+    @property
+    def filepath(self):
+        return os.path.join(self.upload_to, self.date_start.strftime('%Y-%m-%d'), str(self.id))
 
     def save_file_to_storage(self, file):
-        local_path = self.get_file_local_path()
         try:
-            name = default_storage.save(local_path, file)
+            name = default_storage.save(self.filepath, file)
         except OSError as e:
             return None, e
 

@@ -18,7 +18,6 @@ router.register(r'my-login-logs', api.MyLoginLogViewSet, 'my-login-log')
 
 urlpatterns = [
     path('activities/', api.ResourceActivityAPIView.as_view(), name='resource-activities'),
-    path('ftp-logs/<uuid:pk>/file/', api.FTPLogFileAPI.as_view(), name='ftp-log-file'),
 ]
 
 urlpatterns += router.urls

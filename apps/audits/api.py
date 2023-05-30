@@ -13,13 +13,15 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.decorators import action
 
 from common.api import AsyncApiMixin
 from common.drf.filters import DatetimeRangeFilter
 from common.permissions import IsServiceAccount
 from common.plugins.es import QuerySet as ESQuerySet
-from common.utils import is_uuid, get_logger
-from common.utils import lazyproperty
+from common.utils import is_uuid, get_logger, lazyproperty
+from common.const.http import GET, POST
+from common.storage.ftp_file import FTPFileStorage
 from orgs.mixins.api import OrgReadonlyModelViewSet, OrgModelViewSet
 from orgs.utils import current_org, tmp_to_root_org
 from orgs.models import Organization
@@ -29,7 +31,6 @@ from users.models import User
 from .backends import TYPE_ENGINE_MAPPING
 from .const import ActivityChoices
 from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog, ActivityLog, JobLog
-from .utils import get_ftp_log_file_url
 from .serializers import (
     FTPLogSerializer, UserLoginLogSerializer, JobLogSerializer,
     OperateLogSerializer, OperateLogActionDetailSerializer,
@@ -64,46 +65,35 @@ class FTPLogViewSet(OrgModelViewSet):
     search_fields = filterset_fields
     ordering = ['-date_start']
     http_method_names = ['post', 'get', 'head', 'options', 'patch']
+    rbac_perms = {
+        'download': 'audits.view_ftplog',
+    }
 
+    def get_storage(self):
+        return FTPFileStorage(self.get_object())
 
-class FTPLogFileAPI(AsyncApiMixin, APIView):
-    ftp_log = None
-    download_cache_key = "FTP_LOG_FILE_DOWNLOAD_{}"
-    rbac_perms = (
-        ('GET', 'audits.view_ftplog'),
+    @action(
+        methods=[GET], detail=True, permission_classes=[RBACPermission, ],
+        url_path='file/download'
     )
-
-    def is_need_async(self):
-        return False
-
-    def get_permissions(self):
-        if self.request.method.lower() == 'get':
-            return [RBACPermission()]
-        else:
-            return [IsServiceAccount()]
-
-    def get_object(self):
-        return get_object_or_404(FTPLog, pk=self.kwargs.get('pk'))
-
-    def get(self, request, *args, **kwargs):
+    def download(self, request, *args, **kwargs):
         ftp_log = self.get_object()
-        local_path, url = get_ftp_log_file_url(ftp_log)
+        ftp_storage = self.get_storage()
+        local_path, url_or_err = ftp_storage.get_file_path_url()
         if local_path is None:
-            error = url
-            return HttpResponse(error)
-        file = open(default_storage.path(local_path), 'rb')
+            return HttpResponse(url_or_err)
 
+        file = open(default_storage.path(local_path), 'rb')
         response = FileResponse(file)
         response['Content-Type'] = 'application/octet-stream'
         filename = escape_uri_path(ftp_log.filename)
-        filename = os.path.split(filename)[-1]
-        disposition = "attachment; filename*=UTF-8''{}".format(filename)
-        response["Content-Disposition"] = disposition
+        response["Content-Disposition"] = "attachment; filename*=UTF-8''{}".format(filename)
         return response
 
-    def post(self, request, *args, **kwargs):
+    @action(methods=[POST], detail=True, permission_classes=[IsServiceAccount, ], serializer_class=FileSerializer)
+    def upload(self, request, *args, **kwargs):
         ftp_log = self.get_object()
-        serializer = FileSerializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             file = serializer.validated_data['file']
             name, err = ftp_log.save_file_to_storage(file)
