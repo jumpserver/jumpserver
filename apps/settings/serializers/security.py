@@ -28,7 +28,7 @@ class SecurityPasswordRuleSerializer(serializers.Serializer):
 
 
 login_ip_limit_time_help_text = _(
-    'Unit: minute, If the user has failed to log in for a limited number of times, '
+    'If the user has failed to log in for a limited number of times, '
     'no login is allowed during this time interval.'
 )
 
@@ -53,7 +53,7 @@ class SecurityAuthSerializer(serializers.Serializer):
     )
     SECURITY_LOGIN_LIMIT_TIME = serializers.IntegerField(
         min_value=5, max_value=99999, required=True,
-        label=_('Block user login interval'),
+        label=_('Block user login interval (minute)'),
         help_text=login_ip_limit_time_help_text
     )
     SECURITY_LOGIN_IP_LIMIT_COUNT = serializers.IntegerField(
@@ -62,7 +62,7 @@ class SecurityAuthSerializer(serializers.Serializer):
     )
     SECURITY_LOGIN_IP_LIMIT_TIME = serializers.IntegerField(
         min_value=5, max_value=99999, required=True,
-        label=_('Block IP login interval'),
+        label=_('Block IP login interval (minute)'),
         help_text=login_ip_limit_time_help_text
     )
     SECURITY_LOGIN_IP_WHITE_LIST = serializers.ListField(
@@ -77,9 +77,9 @@ class SecurityAuthSerializer(serializers.Serializer):
     )
     SECURITY_PASSWORD_EXPIRATION_TIME = serializers.IntegerField(
         min_value=1, max_value=99999, required=True,
-        label=_('User password expiration'),
+        label=_('User password expiration (day)'),
         help_text=_(
-            'Unit: day, If the user does not update the password during the time, '
+            'If the user does not update the password during the time, '
             'the user password will expire failure;The password expiration reminder mail will be '
             'automatic sent to the user by system within 5 days (daily) before the password expires'
         )
@@ -106,9 +106,9 @@ class SecurityAuthSerializer(serializers.Serializer):
     )
     SECURITY_MFA_VERIFY_TTL = serializers.IntegerField(
         min_value=5, max_value=60 * 60 * 10,
-        label=_("MFA verify TTL"),
+        label=_("MFA verify TTL (secend)"),
         help_text=_(
-            "Unit: second, The verification MFA takes effect only when you view the account password"
+            "The verification MFA takes effect only when you view the account password"
         )
     )
     VERIFY_CODE_TTL = serializers.IntegerField(
@@ -162,8 +162,8 @@ class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSeri
     )
     SECURITY_MAX_IDLE_TIME = serializers.IntegerField(
         min_value=1, max_value=99999, required=False,
-        label=_('Connection max idle time'),
-        help_text=_('If idle time more than it, disconnect connection Unit: minute')
+        label=_('Connection max idle time (minute)'),
+        help_text=_('If idle time more than it, disconnect connection.')
     )
     SECURITY_LUNA_REMEMBER_AUTH = serializers.BooleanField(
         label=_("Remember manual auth")
