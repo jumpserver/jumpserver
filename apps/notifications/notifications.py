@@ -1,17 +1,17 @@
-import traceback
-from html2text import HTML2Text
-from typing import Iterable
-from itertools import chain
 import textwrap
+import traceback
+from itertools import chain
+from typing import Iterable
 
 from celery import shared_task
 from django.utils.translation import gettext_lazy as _
+from html2text import HTML2Text
 
-from common.utils.timezone import local_now
 from common.utils import lazyproperty
+from common.utils.timezone import local_now
+from notifications.backends import BACKEND
 from settings.utils import get_login_title
 from users.models import User
-from notifications.backends import BACKEND
 from .models import SystemMsgSubscription, UserMsgSubscription
 
 __all__ = ('SystemMessage', 'UserMessage', 'system_msgs', 'Message')
