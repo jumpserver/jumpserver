@@ -4683,46 +4683,38 @@ msgid "Period clean"
 msgstr "定時清掃"
 
 #: settings/serializers/cleaning.py:12
-msgid "Login log keep days"
-msgstr "ログインログは日数を保持します"
-
-#: settings/serializers/cleaning.py:12 settings/serializers/cleaning.py:16
-#: settings/serializers/cleaning.py:20 settings/serializers/cleaning.py:24
-#: settings/serializers/cleaning.py:28 settings/serializers/cleaning.py:36
-msgid "Unit: day"
-msgstr "単位: 日"
+msgid "Login log keep days (day)"
+msgstr "ログインログは日数を保持します（天）"
 
 #: settings/serializers/cleaning.py:16
-msgid "Task log keep days"
-msgstr "タスクログは日数を保持します"
+msgid "Task log keep days (day)"
+msgstr "タスクログは日数を保持します（天）"
 
 #: settings/serializers/cleaning.py:20
-msgid "Operate log keep days"
-msgstr "ログ管理日を操作する"
+msgid "Operate log keep days (day)"
+msgstr "ログ管理日を操作する（天）"
 
 #: settings/serializers/cleaning.py:24
-msgid "FTP log keep days"
-msgstr "ダウンロードのアップロード"
+msgid "FTP log keep days (day)"
+msgstr "ダウンロードのアップロード（天）"
 
 #: settings/serializers/cleaning.py:28
-msgid "Cloud sync record keep days"
-msgstr "クラウド同期レコードは日数を保持します"
+msgid "Cloud sync record keep days (day)"
+msgstr "クラウド同期レコードは日数を保持します（天）"
 
 #: settings/serializers/cleaning.py:31
-msgid "Session keep duration"
-msgstr "セッション維持期間"
+msgid "Session keep duration (day)"
+msgstr "セッション維持期間（天）"
 
 #: settings/serializers/cleaning.py:32
 msgid ""
-"Unit: days, Session, record, command will be delete if more than duration, "
-"only in database"
+"Session, record, command will be delete if more than duration, only in database, OSS will not be affected."
 msgstr ""
-"単位:日。セッション、録画、コマンドレコードがそれを超えると削除されます(デー"
-"タベースストレージにのみ影響します。ossなどは影響しません」影響を受ける)"
+"この期間を超えるセッション、録音、およびコマンド レコードは削除されます (データベースのバックアップに影響し、OSS などには影響しません)"
 
 #: settings/serializers/cleaning.py:36
-msgid "Activity log keep days"
-msgstr "活動ログは日数を保持します"
+msgid "Activity log keep days (day)"
+msgstr "活動ログは日数を保持します（天）"
 
 #: settings/serializers/email.py:21
 msgid "SMTP host"
@@ -4906,10 +4898,10 @@ msgstr "特別な"
 
 #: settings/serializers/security.py:31
 msgid ""
-"Unit: minute, If the user has failed to log in for a limited number of "
+"If the user has failed to log in for a limited number of "
 "times, no login is allowed during this time interval."
 msgstr ""
-"単位: 分。ユーザーが限られた回数だけログインできなかった場合、この時間間隔で"
+"ユーザーが限られた回数だけログインできなかった場合、この時間間隔で"
 "はログインはできません。"
 
 #: settings/serializers/security.py:40
@@ -4937,16 +4929,16 @@ msgid "Limit the number of user login failures"
 msgstr "ユーザーログインの失敗数を制限する"
 
 #: settings/serializers/security.py:56
-msgid "Block user login interval"
-msgstr "ユーザーのログイン間隔をブロックする"
+msgid "Block user login interval (minute)"
+msgstr "ユーザーのログイン間隔をブロックする（分）"
 
 #: settings/serializers/security.py:61
 msgid "Limit the number of IP login failures"
 msgstr "IPログイン失敗の数を制限する"
 
 #: settings/serializers/security.py:65
-msgid "Block IP login interval"
-msgstr "IPログイン間隔をブロックする"
+msgid "Block IP login interval (minute)"
+msgstr "IPログイン間隔をブロックする（分）"
 
 #: settings/serializers/security.py:69
 msgid "Login IP White List"
@@ -4957,17 +4949,17 @@ msgid "Login IP Black List"
 msgstr "ログインIPブラックリスト"
 
 #: settings/serializers/security.py:80
-msgid "User password expiration"
-msgstr "ユーザーパスワードの有効期限"
+msgid "User password expiration (day)"
+msgstr "ユーザーパスワードの有効期限（天）"
 
 #: settings/serializers/security.py:82
 msgid ""
-"Unit: day, If the user does not update the password during the time, the "
+"If the user does not update the password during the time, the "
 "user password will expire failure;The password expiration reminder mail will "
 "be automatic sent to the user by system within 5 days (daily) before the "
 "password expires"
 msgstr ""
-"単位: 日。ユーザーがその期間中にパスワードを更新しなかった場合、ユーザーパス"
+"ユーザーがその期間中にパスワードを更新しなかった場合、ユーザーパス"
 "ワードの有効期限が切れます。パスワードの有効期限が切れる前の5日 (毎日) 以内"
 "に、パスワードの有効期限が切れるリマインダーメールがシステムからユーザーに自"
 "動的に送信されます。"
@@ -5027,15 +5019,15 @@ msgstr ""
 "ての認証方法を特定の順序で認証します。 、直接ログインできます"
 
 #: settings/serializers/security.py:109
-msgid "MFA verify TTL"
-msgstr "MFAはTTLを確認します"
+msgid "MFA verify TTL (secend)"
+msgstr "MFAはTTLを確認します（秒）"
 
 #: settings/serializers/security.py:111
 msgid ""
-"Unit: second, The verification MFA takes effect only when you view the "
+"The verification MFA takes effect only when you view the "
 "account password"
 msgstr ""
-"単位: 2番目に、検証MFAはアカウントのパスワードを表示したときにのみ有効になり"
+"検証MFAはアカウントのパスワードを表示したときにのみ有効になり"
 "ます。"
 
 #: settings/serializers/security.py:116
@@ -5044,7 +5036,7 @@ msgstr "認証コード有効時間"
 
 #: settings/serializers/security.py:117
 msgid "Unit: second, reset password and send SMS code expiration time"
-msgstr "単位: 2番目に、パスワードをリセットしてSMSコードの有効期限を送信します"
+msgstr "パスワードをリセットしてSMSコードの有効期限を送信します"
 
 #: settings/serializers/security.py:121
 msgid "Enable Login dynamic code"
@@ -5100,12 +5092,12 @@ msgid "Enabled, the web session and replay contains watermark information"
 msgstr "Webセッションとリプレイには透かし情報が含まれています。"
 
 #: settings/serializers/security.py:165
-msgid "Connection max idle time"
-msgstr "接続最大アイドル時間"
+msgid "Connection max idle time (minute)"
+msgstr "接続最大アイドル時間（分）"
 
 #: settings/serializers/security.py:166
-msgid "If idle time more than it, disconnect connection Unit: minute"
-msgstr "アイドル時間がそれ以上の場合は、接続単位を切断します: 分"
+msgid "If idle time more than it, disconnect connection."
+msgstr "この設定以上の操作がない場合、接続は切断されます"
 
 #: settings/serializers/security.py:169
 msgid "Remember manual auth"

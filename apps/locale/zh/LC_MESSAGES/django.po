@@ -4639,46 +4639,38 @@ msgid "Period clean"
 msgstr "定時清掃"
 
 #: settings/serializers/cleaning.py:12
-msgid "Login log keep days"
-msgstr "登录日志"
-
-#: settings/serializers/cleaning.py:12 settings/serializers/cleaning.py:16
-#: settings/serializers/cleaning.py:20 settings/serializers/cleaning.py:24
-#: settings/serializers/cleaning.py:28 settings/serializers/cleaning.py:36
-msgid "Unit: day"
-msgstr "单位: 天"
+msgid "Login log keep days (day)"
+msgstr "登录日志（天）"
 
 #: settings/serializers/cleaning.py:16
-msgid "Task log keep days"
-msgstr "任务日志"
+msgid "Task log keep days (day)"
+msgstr "任务日志（天）"
 
 #: settings/serializers/cleaning.py:20
-msgid "Operate log keep days"
-msgstr "操作日志"
+msgid "Operate log keep days (day)"
+msgstr "操作日志（天）"
 
 #: settings/serializers/cleaning.py:24
-msgid "FTP log keep days"
-msgstr "上传下载"
+msgid "FTP log keep days (day)"
+msgstr "上传下载（天）"
 
 #: settings/serializers/cleaning.py:28
-msgid "Cloud sync record keep days"
-msgstr "云同步记录"
+msgid "Cloud sync record keep days (day)"
+msgstr "云同步记录（天）"
 
 #: settings/serializers/cleaning.py:31
-msgid "Session keep duration"
-msgstr "会话日志"
+msgid "Session keep duration (day)"
+msgstr "会话日志（天）"
 
 #: settings/serializers/cleaning.py:32
 msgid ""
-"Unit: days, Session, record, command will be delete if more than duration, "
-"only in database"
+"Session, record, command will be delete if more than duration, only in database, OSS will not be affected."
 msgstr ""
-"单位：天。 会话、录像、命令记录超过该时长将会被删除(仅影响数据库存储, oss等不"
-"受影响)"
+"会话、录像，命令记录超过该时长将会被洲除（影响数据库存備，OSS 等不受影响）"
 
 #: settings/serializers/cleaning.py:36
-msgid "Activity log keep days"
-msgstr "活动记录"
+msgid "Activity log keep days (day)"
+msgstr "活动记录（天）"
 
 #: settings/serializers/email.py:21
 msgid "SMTP host"
@@ -4855,9 +4847,9 @@ msgstr "必须包含特殊字符"
 
 #: settings/serializers/security.py:31
 msgid ""
-"Unit: minute, If the user has failed to log in for a limited number of "
+"If the user has failed to log in for a limited number of "
 "times, no login is allowed during this time interval."
-msgstr "单位：分, 当用户登录失败次数达到限制后，那么在此时间间隔内禁止登录"
+msgstr "当用户登录失败次数达到限制后，那么在此时间间隔内禁止登录"
 
 #: settings/serializers/security.py:40
 msgid "All users"
@@ -4884,16 +4876,16 @@ msgid "Limit the number of user login failures"
 msgstr "限制用户登录失败次数"
 
 #: settings/serializers/security.py:56
-msgid "Block user login interval"
-msgstr "禁止用户登录时间间隔"
+msgid "Block user login interval (minute)"
+msgstr "禁止用户登录时间间隔（分）"
 
 #: settings/serializers/security.py:61
 msgid "Limit the number of IP login failures"
 msgstr "限制 IP 登录失败次数"
 
 #: settings/serializers/security.py:65
-msgid "Block IP login interval"
-msgstr "禁止 IP 登录时间间隔"
+msgid "Block IP login interval (minute)"
+msgstr "禁止 IP 登录时间间隔（分）"
 
 #: settings/serializers/security.py:69
 msgid "Login IP White List"
@@ -4904,17 +4896,17 @@ msgid "Login IP Black List"
 msgstr "IP 登录黑名单"
 
 #: settings/serializers/security.py:80
-msgid "User password expiration"
-msgstr "用户密码过期时间"
+msgid "User password expiration (day)"
+msgstr "用户密码过期时间（天）"
 
 #: settings/serializers/security.py:82
 msgid ""
-"Unit: day, If the user does not update the password during the time, the "
+"If the user does not update the password during the time, the "
 "user password will expire failure;The password expiration reminder mail will "
 "be automatic sent to the user by system within 5 days (daily) before the "
 "password expires"
 msgstr ""
-"单位：天, 如果用户在此期间没有更新密码，用户密码将过期失效； 密码过期提醒邮件"
+"如果用户在此期间没有更新密码，用户密码将过期失效； 密码过期提醒邮件"
 "将在密码过期前5天内由系统（每天）自动发送给用户"
 
 #: settings/serializers/security.py:89
@@ -4966,14 +4958,14 @@ msgstr ""
 "序对所有已开启的认证方式进行顺序认证，只要有一个认证成功就可以直接登录"
 
 #: settings/serializers/security.py:109
-msgid "MFA verify TTL"
-msgstr "MFA 校验有效期"
+msgid "MFA verify TTL (secend)"
+msgstr "MFA 校验有效期（秒）"
 
 #: settings/serializers/security.py:111
 msgid ""
-"Unit: second, The verification MFA takes effect only when you view the "
+"The verification MFA takes effect only when you view the "
 "account password"
-msgstr "单位: 秒, 目前仅在查看账号密码校验 MFA 时生效"
+msgstr "目前仅在查看账号密码校验 MFA 时生效"
 
 #: settings/serializers/security.py:116
 msgid "Verify code TTL"
@@ -4981,7 +4973,7 @@ msgstr "验证码有效时间"
 
 #: settings/serializers/security.py:117
 msgid "Unit: second, reset password and send SMS code expiration time"
-msgstr "单位: 秒, 重置密码的验证码及发送短信的验证码过期时间"
+msgstr "重置密码的验证码及发送短信的验证码过期时间"
 
 #: settings/serializers/security.py:121
 msgid "Enable Login dynamic code"
@@ -5034,12 +5026,12 @@ msgid "Enabled, the web session and replay contains watermark information"
 msgstr "启用后，Web 会话和录像将包含水印信息"
 
 #: settings/serializers/security.py:165
-msgid "Connection max idle time"
-msgstr "连接最大空闲时间"
+msgid "Connection max idle time (minute)"
+msgstr "连接最大空闲时间（分）"
 
 #: settings/serializers/security.py:166
-msgid "If idle time more than it, disconnect connection Unit: minute"
-msgstr "提示：如果超过该配置没有操作，连接会被断开 （单位：分）"
+msgid "If idle time more than it, disconnect connection."
+msgstr "提示：如果超过该配置没有操作，连接会被断开）"
 
 #: settings/serializers/security.py:169
 msgid "Remember manual auth"
