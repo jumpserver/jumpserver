@@ -221,7 +221,7 @@ msgstr "ソース ID"
 
 #: accounts/models/account.py:61
 #: accounts/serializers/automations/change_secret.py:113
-#: accounts/serializers/automations/change_secret.py:133 acls/models/base.py:59
+#: accounts/serializers/automations/change_secret.py:133
 #: acls/serializers/base.py:77 assets/serializers/asset/common.py:125
 #: assets/serializers/gateway.py:28 audits/models.py:49 ops/models/base.py:18
 #: perms/models/asset_permission.py:70 perms/serializers/permission.py:39
@@ -820,6 +820,12 @@ msgstr "アクティブ"
 msgid "Users"
 msgstr "ユーザー"
 
+#: acls/models/base.py:59 assets/models/automations/base.py:17
+#: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:305
+#: rbac/tree.py:35
+msgid "Accounts"
+msgstr "アカウント"
+
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
 #: ops/serializers/job.py:55 terminal/const.py:68
 #: terminal/models/session/session.py:43 terminal/serializers/command.py:18
@@ -876,10 +882,16 @@ msgid "Login confirm"
 msgstr "ログイン確認"
 
 #: acls/models/login_asset_acl.py:8
+#, fuzzy
+#| msgid "User ID"
+msgid "User IP"
+msgstr "ユーザーID"
+
+#: acls/models/login_asset_acl.py:11
 msgid "Login asset acl"
 msgstr "ログインasset acl"
 
-#: acls/models/login_asset_acl.py:18 tickets/const.py:12
+#: acls/models/login_asset_acl.py:21 tickets/const.py:12
 msgid "Login asset confirm"
 msgstr "ログイン資産の確認"
 
@@ -916,6 +928,11 @@ msgstr "いずれのレビューアも組織 '{}' に属していません"
 #: acls/serializers/command_acl.py:31
 msgid "Command group amount"
 msgstr "コマンドグループ数"
+
+#: acls/serializers/login_asset_acl.py:12 audits/models.py:161
+#: tickets/models/ticket/login_confirm.py:10
+msgid "Login IP"
+msgstr "ログインIP"
 
 #: acls/serializers/rules/rules.py:20
 #: xpack/plugins/cloud/serializers/task.py:22
@@ -1330,11 +1347,6 @@ msgstr "パスワードセレクター"
 #: assets/models/asset/web.py:12 assets/serializers/platform.py:38
 msgid "Submit selector"
 msgstr "ボタンセレクターを確認する"
-
-#: assets/models/automations/base.py:17 assets/models/cmd_filter.py:38
-#: assets/serializers/asset/common.py:305 rbac/tree.py:35
-msgid "Accounts"
-msgstr "アカウント"
 
 #: assets/models/automations/base.py:22 ops/models/job.py:187
 #: settings/serializers/auth/sms.py:100
@@ -2003,10 +2015,6 @@ msgstr "パスワード変更ログ"
 #: audits/models.py:159
 msgid "Login type"
 msgstr "ログインタイプ"
-
-#: audits/models.py:161 tickets/models/ticket/login_confirm.py:10
-msgid "Login ip"
-msgstr "ログインIP"
 
 #: audits/models.py:163
 #: authentication/templates/authentication/_msg_different_city.html:11
@@ -5754,7 +5762,7 @@ msgid "Redis port"
 msgstr "Redis ポート"
 
 #: terminal/models/component/endpoint.py:29
-#: terminal/models/component/endpoint.py:98 terminal/serializers/endpoint.py:71
+#: terminal/models/component/endpoint.py:98 terminal/serializers/endpoint.py:68
 #: terminal/serializers/storage.py:38 terminal/serializers/storage.py:50
 #: terminal/serializers/storage.py:80 terminal/serializers/storage.py:90
 #: terminal/serializers/storage.py:98
@@ -6055,10 +6063,20 @@ msgstr ""
 
 #: terminal/serializers/endpoint.py:64
 msgid ""
+"The assets within this IP range, the following endpoint will be used for the "
+"connection"
+msgstr "このIP範囲内のアセットは、以下のエンドポイントを使用して接続されます"
+
+#: terminal/serializers/endpoint.py:60
+msgid ""
 "If asset IP addresses under different endpoints conflict, use asset labels"
 msgstr ""
 "異なるエンドポイントの下に競合するアセットIPがある場合は、アセットタグを使用"
 "して実装します"
+
+#: terminal/serializers/endpoint.py:64
+msgid "Asset IP"
+msgstr "資産 IP"
 
 #: terminal/serializers/session.py:24 terminal/serializers/session.py:46
 msgid "Can replay"

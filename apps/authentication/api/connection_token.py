@@ -16,7 +16,7 @@ from rest_framework.response import Response
 
 from common.api import JMSModelViewSet
 from common.exceptions import JMSException
-from common.utils import random_string, get_logger
+from common.utils import random_string, get_logger, get_request_ip
 from common.utils.django import get_request_os
 from common.utils.http import is_true, is_false
 from orgs.mixins.api import RootOrgViewMixin
@@ -311,7 +311,9 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
 
     def _validate_acl(self, user, asset, account):
         from acls.models import LoginAssetACL
-        acl = LoginAssetACL.filter_queryset(user, asset, account).valid().first()
+        acls = LoginAssetACL.filter_queryset(user, asset, account)
+        ip = get_request_ip(self.request)
+        acl = LoginAssetACL.get_match_rule_acls(user, ip, acls)
         if not acl:
             return
         if acl.is_action(acl.ActionChoices.accept):

@@ -220,7 +220,7 @@ msgstr "来源 ID"
 
 #: accounts/models/account.py:61
 #: accounts/serializers/automations/change_secret.py:113
-#: accounts/serializers/automations/change_secret.py:133 acls/models/base.py:59
+#: accounts/serializers/automations/change_secret.py:133
 #: acls/serializers/base.py:77 assets/serializers/asset/common.py:125
 #: assets/serializers/gateway.py:28 audits/models.py:49 ops/models/base.py:18
 #: perms/models/asset_permission.py:70 perms/serializers/permission.py:39
@@ -816,6 +816,12 @@ msgstr "激活中"
 msgid "Users"
 msgstr "用户管理"
 
+#: acls/models/base.py:59 assets/models/automations/base.py:17
+#: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:305
+#: rbac/tree.py:35
+msgid "Accounts"
+msgstr "账号管理"
+
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
 #: ops/serializers/job.py:55 terminal/const.py:68
 #: terminal/models/session/session.py:43 terminal/serializers/command.py:18
@@ -872,10 +878,16 @@ msgid "Login confirm"
 msgstr "登录复核"
 
 #: acls/models/login_asset_acl.py:8
+#, fuzzy
+#| msgid "User ID"
+msgid "User IP"
+msgstr "用户 ID"
+
+#: acls/models/login_asset_acl.py:11
 msgid "Login asset acl"
 msgstr "登录资产访问控制"
 
-#: acls/models/login_asset_acl.py:18 tickets/const.py:12
+#: acls/models/login_asset_acl.py:21 tickets/const.py:12
 msgid "Login asset confirm"
 msgstr "登录资产复核"
 
@@ -912,6 +924,11 @@ msgstr "所有复核人都不属于组织 `{}`"
 msgid "Command group amount"
 msgstr "命令组数量"
 
+#: acls/serializers/login_asset_acl.py:12 audits/models.py:161
+#: tickets/models/ticket/login_confirm.py:10
+msgid "Login IP"
+msgstr "登录 IP"
+
 #: acls/serializers/rules/rules.py:20
 #: xpack/plugins/cloud/serializers/task.py:22
 msgid "IP address invalid: `{}`"
@@ -929,7 +946,7 @@ msgstr ""
 #: authentication/templates/authentication/_msg_oauth_bind.html:12
 #: authentication/templates/authentication/_msg_rest_password_success.html:8
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:8
-#: settings/serializers/terminal.py:10 terminal/serializers/endpoint.py:67
+#: settings/serializers/terminal.py:10
 msgid "IP"
 msgstr "IP"
 
@@ -1323,11 +1340,6 @@ msgstr "密码选择器"
 #: assets/models/asset/web.py:12 assets/serializers/platform.py:38
 msgid "Submit selector"
 msgstr "确认按钮选择器"
-
-#: assets/models/automations/base.py:17 assets/models/cmd_filter.py:38
-#: assets/serializers/asset/common.py:305 rbac/tree.py:35
-msgid "Accounts"
-msgstr "账号管理"
 
 #: assets/models/automations/base.py:22 ops/models/job.py:187
 #: settings/serializers/auth/sms.py:100
@@ -1992,10 +2004,6 @@ msgstr "改密日志"
 #: audits/models.py:159
 msgid "Login type"
 msgstr "登录方式"
-
-#: audits/models.py:161 tickets/models/ticket/login_confirm.py:10
-msgid "Login ip"
-msgstr "登录IP"
 
 #: audits/models.py:163
 #: authentication/templates/authentication/_msg_different_city.html:11
@@ -5673,7 +5681,7 @@ msgid "Redis port"
 msgstr "Redis 端口"
 
 #: terminal/models/component/endpoint.py:29
-#: terminal/models/component/endpoint.py:98 terminal/serializers/endpoint.py:71
+#: terminal/models/component/endpoint.py:98 terminal/serializers/endpoint.py:68
 #: terminal/serializers/storage.py:38 terminal/serializers/storage.py:50
 #: terminal/serializers/storage.py:80 terminal/serializers/storage.py:90
 #: terminal/serializers/storage.py:98
@@ -5971,8 +5979,18 @@ msgstr ""
 
 #: terminal/serializers/endpoint.py:64
 msgid ""
+"The assets within this IP range, the following endpoint will be used for the "
+"connection"
+msgstr "该 IP 范围内的资产，将使用下面的端点进行连接"
+
+#: terminal/serializers/endpoint.py:60
+msgid ""
 "If asset IP addresses under different endpoints conflict, use asset labels"
 msgstr "如果不同端点下的资产 IP 有冲突，使用资产标签实现"
+
+#: terminal/serializers/endpoint.py:64
+msgid "Asset IP"
+msgstr "资产 IP"
 
 #: terminal/serializers/session.py:24 terminal/serializers/session.py:46
 msgid "Can replay"
