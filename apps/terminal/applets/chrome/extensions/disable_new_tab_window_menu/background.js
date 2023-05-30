@@ -11,6 +11,13 @@ chrome.tabs.onCreated.addListener(function (tab) {
     });
 });
 
-document.addEventListener("contextmenu", function (event) {
-    event.preventDefault();
+// 监听窗口的创建事件
+chrome.windows.onCreated.addListener(function (window) {
+// 获取当前所有窗口
+    chrome.windows.getAll(function (windows) {
+        // 如果当前窗口数量大于1，则关闭新创建的窗口
+        if (windows.length > 1) {
+            chrome.windows.remove(window.id);
+        }
+    });
 });
