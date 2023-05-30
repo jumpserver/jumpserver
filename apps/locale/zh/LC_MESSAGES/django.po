@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-26 16:18+0800\n"
+"POT-Creation-Date: 2023-05-29 18:19+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -2555,7 +2555,7 @@ msgstr "没有用户或用户失效"
 msgid "No asset or inactive asset"
 msgstr "没有资产或资产未激活"
 
-#: authentication/models/connection_token.py:262
+#: authentication/models/connection_token.py:264
 msgid "Super connection token"
 msgstr "超级连接令牌"
 
@@ -3785,6 +3785,10 @@ msgstr "刷新组织缓存"
 #: perms/apps.py:9
 msgid "App permissions"
 msgstr "授权管理"
+
+#: perms/const.py:12
+msgid "All protocols"
+msgstr "所有协议"
 
 #: perms/const.py:15
 msgid "Copy"
@@ -7597,6 +7601,24 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:85
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Connect (All Protocols)"
+#~ msgstr "连接 (所以协议)"
+
+#~ msgid "Upload (RDP, SFTP)"
+#~ msgstr "上传 (RDP, SFTP)"
+
+#~ msgid "Download (RDP, SFTP)"
+#~ msgstr "下载 (RDP, SFTP)"
+
+#~ msgid "Copy (RDP, VNC)"
+#~ msgstr "复制 (RDP, VNC)"
+
+#~ msgid "Paste (RDP, VNC)"
+#~ msgstr "粘贴 (RDP, VNC)"
+
+#~ msgid "Delete (SFTP)"
+#~ msgstr "删除 (SFTP)"
 
 #~ msgid "User (username)"
 #~ msgstr "用户（用户名）"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-26 16:18+0800\n"
+"POT-Creation-Date: 2023-05-29 18:19+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2580,7 +2580,7 @@ msgstr "ユーザーなしまたは期限切れのユーザー"
 msgid "No asset or inactive asset"
 msgstr "アセットがないか、有効化されていないアセット"
 
-#: authentication/models/connection_token.py:262
+#: authentication/models/connection_token.py:264
 msgid "Super connection token"
 msgstr "スーパー接続トークン"
 
@@ -3826,6 +3826,10 @@ msgstr "組織キャッシュを更新する"
 #: perms/apps.py:9
 msgid "App permissions"
 msgstr "アプリの権限"
+
+#: perms/const.py:12
+msgid "All protocols"
+msgstr "すべてのプロトコル"
 
 #: perms/const.py:15
 msgid "Copy"
@@ -7705,6 +7709,11 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:85
 msgid "Community edition"
 msgstr "コミュニティ版"
+
+#, fuzzy
+#~| msgid "Delete"
+#~ msgid "Delete (SFTP)"
+#~ msgstr "削除"
 
 #~ msgid "User (username)"
 #~ msgstr "ユーザー (ユーザー名)"
