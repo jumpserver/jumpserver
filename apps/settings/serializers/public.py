@@ -21,6 +21,7 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     SECURITY_VIEW_AUTH_NEED_MFA = serializers.BooleanField()
     SECURITY_MFA_VERIFY_TTL = serializers.IntegerField()
     SECURITY_COMMAND_EXECUTION = serializers.BooleanField()
+    SECURITY_COMMAND_BLACKLIST = serializers.ListField()
     SECURITY_PASSWORD_EXPIRATION_TIME = serializers.IntegerField()
     SECURITY_LUNA_REMEMBER_AUTH = serializers.BooleanField()
     SECURITY_WATERMARK_ENABLED = serializers.BooleanField()
