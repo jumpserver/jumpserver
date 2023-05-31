@@ -179,6 +179,11 @@ class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSeri
         required=False, label=_('Operation center'),
         help_text=_('Allow user run batch command or not using ansible')
     )
+    SECURITY_COMMAND_BLACKLIST = serializers.ListField(
+        child=serializers.CharField(max_length=1024, ),
+        label=_('Operation center command blacklist'),
+        help_text=_("Commands that are not allowed execute.")
+    )
     SECURITY_SESSION_SHARE = serializers.BooleanField(
         required=True, label=_('Session share'),
         help_text=_("Enabled, Allows user active session to be shared with other users")
