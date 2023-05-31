@@ -6,7 +6,7 @@ ansible-runner==2.2.1
 asn1crypto==0.24.0
 bcrypt==3.1.4
 billiard==3.6.4.0
-certifi==2018.1.18
+certifi==2022.12.7
 cffi==1.15.1
 chardet==3.0.4
 configparser==3.5.0
