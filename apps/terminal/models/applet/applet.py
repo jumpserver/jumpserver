@@ -109,7 +109,6 @@ class Applet(JMSBaseModel):
 
         try:
             tp = data['type']
-            platform_name = data['name']
         except KeyError:
             raise ValidationError({'error': _('Missing type in platform.yml')})
 
@@ -117,7 +116,7 @@ class Applet(JMSBaseModel):
             data['automation'] = CustomTypes._get_automation_constrains()['*']
 
         created_by = 'Applet:{}'.format(self.name)
-        instance = Platform.objects.filter(name=platform_name, created_by=created_by).first()
+        instance = self.get_related_platform()
         s = PlatformSerializer(data=data, instance=instance)
         s.add_type_choices(tp, tp)
         s.is_valid(raise_exception=True)
