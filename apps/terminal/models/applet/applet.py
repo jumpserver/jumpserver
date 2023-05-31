@@ -180,7 +180,7 @@ class Applet(JMSBaseModel):
         host = self.select_host(user)
         if not host:
             return None
-        can_concurrent = self.can_concurrent and self.type == 'general'
+        can_concurrent = self.can_concurrent or self.type == 'web'
 
         accounts = host.accounts.all().filter(is_active=True, privileged=False)
         private_account = accounts.filter(username='js_{}'.format(user.username)).first()

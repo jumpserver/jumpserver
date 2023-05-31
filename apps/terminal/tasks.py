@@ -2,6 +2,7 @@
 #
 
 import datetime
+from itertools import chain
 
 from celery import shared_task
 from celery.utils.log import get_task_logger
@@ -14,10 +15,14 @@ from ops.celery.decorator import (
     after_app_shutdown_clean_periodic
 )
 from orgs.utils import tmp_to_builtin_org
+from orgs.utils import tmp_to_root_org
 from .backends import server_replay_storage
+from .const import ReplayStorageType, CommandStorageType
 from .models import (
-    Status, Session, Task, AppletHostDeployment, AppletHost
+    Status, Session, Task, AppletHostDeployment,
+    AppletHost, ReplayStorage, CommandStorage
 )
+from .notifications import StorageConnectivityMessage
 from .utils import find_session_replay_local
 
 CACHE_REFRESH_INTERVAL = 10
@@ -111,3 +116,36 @@ def applet_host_generate_accounts(host_id):
 
     with tmp_to_builtin_org(system=1):
         applet_host.generate_accounts()
+
+
+@shared_task(verbose_name=_('Check command replay storage connectivity'))
+@register_as_period_task(crontab='0 0 * * *')
+@tmp_to_root_org()
+def check_command_replay_storage_connectivity():
+    errors = []
+    replays = ReplayStorage.objects.exclude(
+        type__in=[ReplayStorageType.server, ReplayStorageType.null]
+    )
+    commands = CommandStorage.objects.exclude(
+        type__in=[CommandStorageType.server, CommandStorageType.null]
+    )
+
+    for instance in chain(replays, commands):
+        msg = None
+        try:
+            is_valid = instance.is_valid()
+        except Exception as e:
+            is_valid = False
+            msg = _("Test failure: {}".format(str(e)))
+        if is_valid:
+            continue
+        errors.append({
+            'msg': msg or _("Test failure: Account invalid"),
+            'type': instance.get_type_display(),
+            'name': instance.name
+        })
+
+    if not errors:
+        return
+
+    StorageConnectivityMessage(errors).publish_async()
