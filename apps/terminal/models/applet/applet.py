@@ -10,6 +10,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from rest_framework.serializers import ValidationError
 
+from assets.models import Platform
 from common.db.models import JMSBaseModel
 from common.utils import lazyproperty, get_logger
 from common.utils.yml import yaml_load_with_i18n
@@ -91,8 +92,7 @@ class Applet(JMSBaseModel):
             raise ValidationError({'error': 'Missing name in manifest.yml'})
         return manifest
 
-    @classmethod
-    def load_platform_if_need(cls, d):
+    def load_platform_if_need(self, d):
         from assets.serializers import PlatformSerializer
         from assets.const import CustomTypes
 
@@ -109,16 +109,21 @@ class Applet(JMSBaseModel):
 
         try:
             tp = data['type']
+            platform_name = data['name']
         except KeyError:
             raise ValidationError({'error': _('Missing type in platform.yml')})
 
         if not data.get('automation'):
             data['automation'] = CustomTypes._get_automation_constrains()['*']
 
-        s = PlatformSerializer(data=data)
+        created_by = 'Applet:{}'.format(self.name)
+        instance = Platform.objects.filter(name=platform_name, created_by=created_by).first()
+        s = PlatformSerializer(data=data, instance=instance)
         s.add_type_choices(tp, tp)
         s.is_valid(raise_exception=True)
-        s.save()
+        p = s.save()
+        p.created_by = created_by
+        p.save(update_fields=['created_by'])
 
     @classmethod
     def install_from_dir(cls, path, builtin=True):
@@ -129,9 +134,8 @@ class Applet(JMSBaseModel):
         instance = cls.objects.filter(name=name).first()
         serializer = AppletSerializer(instance=instance, data=manifest)
         serializer.is_valid()
-        serializer.save(builtin=builtin)
-
-        cls.load_platform_if_need(path)
+        instance = serializer.save(builtin=builtin)
+        instance.load_platform_if_need(path)
 
         pkg_path = default_storage.path('applets/{}'.format(name))
         if os.path.exists(pkg_path):
@@ -156,6 +160,11 @@ class Applet(JMSBaseModel):
             host = random.choice(hosts)
             cache.set(prefer_key, host.id, timeout=None)
         return host
+
+    def get_related_platform(self):
+        created_by = 'Applet:{}'.format(self.name)
+        platform = Platform.objects.filter(created_by=created_by).first()
+        return platform
 
     @staticmethod
     def random_select_prefer_account(user, host, accounts):
@@ -197,7 +206,8 @@ class Applet(JMSBaseModel):
             if private_account and private_account.username not in accounts_username_used:
                 account = private_account
             else:
-                accounts = accounts.exclude(username__in=accounts_username_used).filter(username__startswith='jms_')
+                accounts = accounts.exclude(username__in=accounts_username_used) \
+                    .filter(username__startswith='jms_')
                 account = self.random_select_prefer_account(user, host, accounts)
                 if not account:
                     return
@@ -211,6 +221,12 @@ class Applet(JMSBaseModel):
             'lock_key': lock_key,
             'ttl': ttl
         }
+
+    def delete(self, using=None, keep_parents=False):
+        platform = self.get_related_platform()
+        if platform and platform.assets.count() == 0:
+            platform.delete()
+        return super().delete(using, keep_parents)
 
 
 class AppletPublication(JMSBaseModel):

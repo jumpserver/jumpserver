@@ -28,7 +28,7 @@ __all__ = [
 
 
 class AssetProtocolsSerializer(serializers.ModelSerializer):
-    port = serializers.IntegerField(required=False, allow_null=True, max_value=65535, min_value=1)
+    port = serializers.IntegerField(required=False, allow_null=True, max_value=65535, min_value=0)
 
     def to_file_representation(self, data):
         return '{name}/{port}'.format(**data)
@@ -259,8 +259,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         protocols_data_map = {p['name']: p for p in protocols_data}
         for p in protocols_data:
             port = p.get('port', 0)
-            if port < 1 or port > 65535:
-                error = p.get('name') + ': ' + _("port out of range (1-65535)")
+            if port < 0 or port > 65535:
+                error = p.get('name') + ': ' + _("port out of range (0-65535)")
                 raise serializers.ValidationError(error)
 
         protocols_required, protocols_default = self._get_protocols_required_default()
