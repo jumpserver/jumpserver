@@ -2,6 +2,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from acls.serializers.rules import ip_group_help_text, ip_group_child_validator
+# from common.db.fields import JsonListMixin
 
 
 class SecurityPasswordRuleSerializer(serializers.Serializer):
@@ -178,6 +179,13 @@ class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSeri
     SECURITY_COMMAND_EXECUTION = serializers.BooleanField(
         required=False, label=_('Operation center'),
         help_text=_('Allow user run batch command or not using ansible')
+    )
+    SECURITY_COMMAND_BLACKLIST = serializers.ListField(
+        child=serializers.CharField(max_length=1024, ),
+        label=_('Command blacklist'),
+        help_text=_(
+            "Commands that are not allowed execute."
+        )
     )
     SECURITY_SESSION_SHARE = serializers.BooleanField(
         required=True, label=_('Session share'),
