@@ -1,6 +1,5 @@
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
-from rest_framework import serializers
 
 from assets.models import Custom, Platform, Asset
 from common.const import UUID_PATTERN
@@ -9,10 +8,6 @@ from common.serializers.common import DictSerializer, MethodSerializer
 from .common import AssetSerializer
 
 __all__ = ['CustomSerializer']
-
-
-class CustomInfoSerializer(serializers.Serializer):
-    name = serializers.CharField(required=False)
 
 
 class CustomSerializer(AssetSerializer):
