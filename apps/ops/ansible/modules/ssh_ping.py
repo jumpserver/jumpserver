@@ -40,7 +40,7 @@ conn_err_msg:
 from ansible.module_utils.basic import AnsibleModule
 
 from ops.ansible.modules_utils.custom_common import (
-    SSHClient, ssh_common_argument_spec
+    SSHClient, common_argument_spec
 )
 
 
@@ -50,7 +50,7 @@ from ops.ansible.modules_utils.custom_common import (
 
 
 def main():
-    options = ssh_common_argument_spec()
+    options = common_argument_spec()
     module = AnsibleModule(argument_spec=options, supports_check_mode=True,)
 
     result = {
