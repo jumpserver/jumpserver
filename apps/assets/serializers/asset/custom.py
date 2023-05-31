@@ -1,21 +1,31 @@
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers
 
 from assets.models import Custom, Platform, Asset
 from common.const import UUID_PATTERN
-from common.serializers import MethodSerializer, create_serializer_class
-from common.serializers.common import DictSerializer
+from common.serializers import create_serializer_class
+from common.serializers.common import DictSerializer, MethodSerializer
 from .common import AssetSerializer
 
 __all__ = ['CustomSerializer']
 
 
+class CustomInfoSerializer(serializers.Serializer):
+    name = serializers.CharField(required=False)
+
+
 class CustomSerializer(AssetSerializer):
-    custom_info = MethodSerializer(label=_('Custom info'))
+    custom_info = MethodSerializer(label=_('Custom info'), required=False, allow_null=True)
 
     class Meta(AssetSerializer.Meta):
         model = Custom
         fields = AssetSerializer.Meta.fields + ['custom_info']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if hasattr(self, 'initial_data') and not self.initial_data.get('custom_info'):
+            self.initial_data['custom_info'] = {}
 
     def get_custom_info_serializer(self):
         request = self.context.get('request')

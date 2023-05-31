@@ -14,7 +14,7 @@ __all__ = [
     'MethodSerializer', 'EmptySerializer', 'BulkModelSerializer',
     'AdaptedBulkListSerializer', 'CeleryTaskExecutionSerializer',
     'WritableNestedModelSerializer', 'GroupedChoiceSerializer',
-    'FileSerializer'
+    'FileSerializer', 'DictSerializer'
 ]
 
 
