@@ -12,6 +12,20 @@ class NodesGenerator(FakeDataGenerator):
     resource = 'node'
 
     def do_generate(self, batch, batch_size):
+        if Node.objects.all().count() is 1:
+            Node.objects.create(
+                **{
+                    'pk': 1,
+                    'value': 'value',
+                    'child_mark': 1,
+                    'org_id': 1,
+                    'assets_amount': 1,
+                    'parent_key': 1,
+                    'full_value': 'key',
+                    'comment': 'key',
+                    'date_created': '2023-01-01 00:01:00.000000',
+                }
+            )
         nodes_to_generate_children = list(Node.objects.all())
         for i in batch:
             parent = random.choice(nodes_to_generate_children)
