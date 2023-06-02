@@ -1,14 +1,13 @@
 import os
-import time
-import win32api
 import shutil
 import subprocess
-
+import time
 from xml.etree import ElementTree
 from xml.sax import SAXException
 
-from common import wait_pid, BaseApplication
+import win32api
 
+from common import wait_pid, BaseApplication
 
 _default_path = r'C:\Program Files\DBeaver\dbeaver-cli.exe'
 
@@ -22,6 +21,10 @@ class AppletApplication(BaseApplication):
         self.privileged = self.account.privileged
         self.host = self.asset.address
         self.port = self.asset.get_protocol_port(self.protocol)
+        if self.tinker_forward:
+            self.host = self.tinker_forward.host
+            self.port = self.tinker_forward.port
+
         self.db = self.asset.spec_info.db_name
         self.name = '%s-%s-%s' % (self.host, self.db, int(time.time()))
         self.app_work_path = self.get_app_work_path()
