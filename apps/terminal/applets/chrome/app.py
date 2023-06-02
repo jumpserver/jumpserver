@@ -21,6 +21,7 @@ class Command(Enum):
     OPEN = 'open'
     CODE = 'code'
     SELECT_FRAME = 'select_frame'
+    SLEEP = 'sleep'
 
 
 def _execute_type(ele: WebElement, value: str):
@@ -58,6 +59,9 @@ class StepAction:
             return True
         if self.command == 'select_frame':
             self._switch_iframe(driver, self.target)
+            return True
+        elif self.command == 'sleep':
+            self._sleep(driver, self.target)
             return True
         target_name, target_value = self.target.split("=", 1)
         by_name = self.methods_map.get(target_name.upper(), By.NAME)
@@ -102,6 +106,14 @@ class StepAction:
             driver.switch_to.frame(target_value)
         else:
             driver.switch_to.frame(target)
+
+    def _sleep(self, driver: webdriver.Chrome, target: str):
+        try:
+            sleep_time = int(target)
+        except Exception as e:
+            # at least sleep 1 second
+            sleep_time = 1
+        time.sleep(sleep_time)
 
 
 def execute_action(driver: webdriver.Chrome, step: StepAction) -> bool:
