@@ -134,6 +134,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     command_filter_acls = _ConnectionTokenCommandFilterACLSerializer(read_only=True, many=True)
     expire_now = serializers.BooleanField(label=_('Expired now'), write_only=True, default=True)
     connect_method = _ConnectTokenConnectMethodSerializer(read_only=True, source='connect_method_object')
+    connect_options = serializers.JSONField(read_only=True)
     actions = ActionChoicesField()
     expire_at = serializers.IntegerField()
 
@@ -144,6 +145,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
             'platform', 'command_filter_acls', 'protocol',
             'domain', 'gateway', 'actions', 'expire_at',
             'from_ticket', 'expire_now', 'connect_method',
+            'connect_options',
         ]
         extra_kwargs = {
             'value': {'read_only': True},
