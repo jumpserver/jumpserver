@@ -17,8 +17,9 @@ logger = get_logger(__file__)
 @ensure_in_real_or_default_org
 def check_node_assets_amount():
     logger.info(f'Check node assets amount {current_org}')
+    m2m_model = Asset.nodes.through
     nodes = list(Node.objects.all().only('id', 'key', 'assets_amount'))
-    nodeid_assetid_pairs = list(Asset.nodes.through.objects.all().values_list('node_id', 'asset_id'))
+    nodeid_assetid_pairs = list(m2m_model.objects.all().values_list('node_id', 'asset_id'))
 
     nodekey_assetids_mapper = defaultdict(set)
     nodeid_nodekey_mapper = {}
