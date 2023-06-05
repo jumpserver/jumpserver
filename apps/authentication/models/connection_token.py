@@ -38,6 +38,7 @@ class ConnectionToken(JMSOrgBaseModel):
     input_secret = EncryptTextField(max_length=64, default='', blank=True, verbose_name=_("Input secret"))
     protocol = models.CharField(max_length=16, default=Protocol.ssh, verbose_name=_("Protocol"))
     connect_method = models.CharField(max_length=32, verbose_name=_("Connect method"))
+    connect_options = models.JSONField(default=dict, verbose_name=_("Connect options"))
     user_display = models.CharField(max_length=128, default='', verbose_name=_("User display"))
     asset_display = models.CharField(max_length=128, default='', verbose_name=_("Asset display"))
     is_reusable = models.BooleanField(default=False, verbose_name=_("Reusable"))
