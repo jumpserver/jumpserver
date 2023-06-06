@@ -5923,7 +5923,7 @@ msgstr "検証コードが無効"
 
 #: terminal/models/session/sharing.py:142
 msgid "You have already joined this session"
-msgstr ""
+msgstr "すでにこのセッションに参加しています"
 
 #: terminal/notifications.py:21
 msgid "Sessions"
