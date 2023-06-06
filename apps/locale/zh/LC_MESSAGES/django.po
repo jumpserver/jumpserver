@@ -5843,7 +5843,7 @@ msgstr "验证码不正确"
 
 #: terminal/models/session/sharing.py:142
 msgid "You have already joined this session"
-msgstr "您已经加入了这个会话"
+msgstr "您已经加入过此会话"
 
 #: terminal/notifications.py:21
 msgid "Sessions"
