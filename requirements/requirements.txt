@@ -126,6 +126,7 @@ pyOpenSSL==22.0.0
 redis==4.5.4
 pyOpenSSL==22.0.0
 pymongo==4.2.0
+pyfreerdp==0.0.1
 # Debug
 ipython==8.10.0
 ForgeryPy3==0.3.1
