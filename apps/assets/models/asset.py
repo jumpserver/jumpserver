@@ -2,9 +2,8 @@
 # -*- coding: utf-8 -*-
 #
 
-import uuid
 import logging
-from functools import reduce
+import uuid
 from collections import OrderedDict
 
 from django.db import models
@@ -14,7 +13,6 @@ from rest_framework.exceptions import ValidationError
 from common.db.fields import JsonDictTextField
 from common.utils import lazyproperty
 from orgs.mixins.models import OrgModelMixin, OrgManager
-
 from .base import AbsConnectivity
 
 __all__ = ['Asset', 'ProtocolsMixin', 'Platform', 'AssetQuerySet']
@@ -294,7 +292,7 @@ class Asset(AbsConnectivity, AbsHardwareInfo, ProtocolsMixin, NodesRelationMixin
             auth_user = self.admin_user
             become_user = None
 
-        auth_user.load_asset_special_auth(self)
+        auth_user.load_asset_special_auth(self, run_as_admin=True)
         info = {
             'username': auth_user.username,
             'password': auth_user.password,
