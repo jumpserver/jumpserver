@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+import itertools
 from collections import defaultdict
 
 from django.conf import settings
@@ -51,11 +52,7 @@ class NativeClient(TextChoices):
     xshell = 'xshell', 'Xshell'
 
     # Magnus
-    mysql = 'db_client_mysql', _('DB Client')
-    psql = 'db_client_psql', _('DB Client')
-    sqlplus = 'db_client_sqlplus', _('DB Client')
-    redis = 'db_client_redis', _('DB Client')
-    mongodb = 'db_client_mongodb', _('DB Client')
+    db_client = 'db_client', _('DB Client')
 
     # Razor
     mstsc = 'mstsc', 'Remote Desktop'
@@ -70,12 +67,12 @@ class NativeClient(TextChoices):
                 'windows': [cls.putty],
             },
             Protocol.rdp: [cls.mstsc],
-            Protocol.mysql: [cls.mysql],
-            Protocol.mariadb: [cls.mysql],
-            Protocol.oracle: [cls.sqlplus],
-            Protocol.postgresql: [cls.psql],
-            Protocol.redis: [cls.redis],
-            Protocol.mongodb: [cls.mongodb],
+            Protocol.mysql: [cls.db_client],
+            Protocol.mariadb: [cls.db_client],
+            Protocol.oracle: [cls.db_client],
+            Protocol.postgresql: [cls.db_client],
+            Protocol.redis: [cls.db_client],
+            Protocol.mongodb: [cls.db_client],
         }
         return clients
 
@@ -83,7 +80,10 @@ class NativeClient(TextChoices):
     def get_target_protocol(cls, name, os):
         for protocol, clients in cls.get_native_clients().items():
             if isinstance(clients, dict):
-                clients = clients.get(os) or clients.get('default')
+                if os == 'all':
+                    clients = list(itertools.chain(*clients.values()))
+                else:
+                    clients = clients.get(os) or clients.get('default')
             if name in clients:
                 return protocol
         return None
@@ -99,7 +99,10 @@ class NativeClient(TextChoices):
 
         for protocol, _clients in clients_map.items():
             if isinstance(_clients, dict):
-                _clients = _clients.get(os, _clients['default'])
+                if os == 'all':
+                    _clients = list(itertools.chain(*_clients.values()))
+                else:
+                    _clients = _clients.get(os, _clients['default'])
             for client in _clients:
                 if not settings.XPACK_ENABLED and client in cls.xpack_methods():
                     continue
@@ -245,11 +248,10 @@ class ConnectMethodUtil:
         if not getattr(settings, 'TERMINAL_KOKO_SSH_ENABLED'):
             protocol = Protocol.ssh
             methods[protocol] = [m for m in methods[protocol] if m['type'] != 'native']
-
         return methods
 
     @classmethod
-    def get_protocols_connect_methods(cls, os):
+    def get_protocols_connect_methods(cls, os='windows'):
         if cls._all_methods.get('os'):
             return cls._all_methods['os']
 
@@ -264,7 +266,7 @@ class ConnectMethodUtil:
 
             for protocol in support:
                 # Web 方式
-                methods[protocol.value].extend([
+                methods[str(protocol)].extend([
                     {
                         'component': component.value,
                         'type': 'web',
@@ -286,7 +288,7 @@ class ConnectMethodUtil:
                     if component == TerminalType.koko and protocol.value != Protocol.ssh:
                         # koko 仅支持 ssh 的 native 方式，其他数据库的 native 方式不提供
                         continue
-                    methods[protocol.value].extend([
+                    methods[str(protocol)].extend([
                         {
                             'component': component.value,
                             'type': 'native',

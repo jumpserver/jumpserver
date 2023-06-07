@@ -9,7 +9,7 @@ from common.utils.time_period import contains_time_period
 from orgs.mixins.models import OrgModelMixin
 
 __all__ = [
-    'BaseACL', 'UserAssetAccountBaseACL',
+    'BaseACL', 'UserBaseACL', 'UserAssetAccountBaseACL',
 ]
 
 
@@ -34,7 +34,7 @@ class BaseACLQuerySet(models.QuerySet):
 
 
 class BaseACL(JMSBaseModel):
-    name = models.CharField(max_length=128, verbose_name=_('Name'))
+    name = models.CharField(max_length=128, verbose_name=_('Name'), unique=True)
     priority = models.IntegerField(
         default=50, verbose_name=_("Priority"),
         help_text=_("1-100, the lower the value will be match first"),
@@ -79,13 +79,27 @@ class BaseACL(JMSBaseModel):
         return None
 
 
-class UserAssetAccountBaseACL(BaseACL, OrgModelMixin):
+class UserBaseACL(BaseACL):
     users = JSONManyToManyField('users.User', default=dict, verbose_name=_('Users'))
+
+    class Meta:
+        abstract = True
+
+    @classmethod
+    def get_user_acls(cls, user):
+        queryset = cls.objects.all()
+        q = cls.users.get_filter_q(user)
+        queryset = queryset.filter(q)
+        return queryset.valid().distinct()
+
+
+class UserAssetAccountBaseACL(UserBaseACL, OrgModelMixin):
+    name = models.CharField(max_length=128, verbose_name=_('Name'))
     assets = JSONManyToManyField('assets.Asset', default=dict, verbose_name=_('Assets'))
     accounts = models.JSONField(default=list, verbose_name=_("Accounts"))
 
-    class Meta(BaseACL.Meta):
-        unique_together = ('name', 'org_id')
+    class Meta(UserBaseACL.Meta):
+        unique_together = [('name', 'org_id')]
         abstract = True
 
     @classmethod

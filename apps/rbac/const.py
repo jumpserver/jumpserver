@@ -148,6 +148,8 @@ only_system_permissions = (
     ('orgs', 'organization', 'view', 'rootorg'),
     ('terminal', 'applet', '*', '*'),
     ('terminal', 'applethost', '*', '*'),
+    ('acls', 'loginacl', '*', '*'),
+    ('acls', 'connectmethodacl', '*', '*')
 )
 
 only_org_permissions = (

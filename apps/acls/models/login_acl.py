@@ -3,18 +3,14 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.utils import get_request_ip, get_ip_city
 from common.utils.timezone import local_now_display
-from .base import BaseACL
+from .base import UserBaseACL
 
 
-class LoginACL(BaseACL):
-    user = models.ForeignKey(
-        'users.User', on_delete=models.CASCADE,
-        related_name='login_acls', verbose_name=_('User')
-    )
+class LoginACL(UserBaseACL):
     # 规则, ip_group, time_period
     rules = models.JSONField(default=dict, verbose_name=_('Rule'))
 
-    class Meta(BaseACL.Meta):
+    class Meta(UserBaseACL.Meta):
         verbose_name = _('Login acl')
         abstract = False
 
@@ -27,10 +23,6 @@ class LoginACL(BaseACL):
     @classmethod
     def filter_acl(cls, user):
         return user.login_acls.all().valid().distinct()
-
-    @classmethod
-    def get_user_acls(cls, user):
-        return cls.filter_acl(user)
 
     def create_confirm_ticket(self, request):
         from tickets import const

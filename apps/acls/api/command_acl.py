@@ -1,9 +1,8 @@
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from common.drf.filters import BaseFilterSet
 from orgs.mixins.api import OrgBulkModelViewSet
-from .common import ACLFiltersetMixin
+from .common import ACLUserAssetFilterMixin
 from .. import models, serializers
 
 __all__ = ['CommandFilterACLViewSet', 'CommandGroupViewSet']
@@ -16,10 +15,10 @@ class CommandGroupViewSet(OrgBulkModelViewSet):
     serializer_class = serializers.CommandGroupSerializer
 
 
-class CommandACLFilter(ACLFiltersetMixin, BaseFilterSet):
+class CommandACLFilter(ACLUserAssetFilterMixin):
     class Meta:
         model = models.CommandFilterACL
-        fields = ['name', 'users', 'assets']
+        fields = ['name', ]
 
 
 class CommandFilterACLViewSet(OrgBulkModelViewSet):
