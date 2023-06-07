@@ -895,6 +895,14 @@ var rules_short_map_id = {
     'special': 'id_security_password_special_char'
 };
 
+var rules_id_map_label = {
+    'id_security_password_min_length': gettext('Password minimum length {N} bits'),
+    'id_security_password_upper_case': gettext('Must contain capital letters'),
+    'id_security_password_lower_case': gettext('Must contain lowercase letters'),
+    'id_security_password_number': gettext('Must contain numeric characters'),
+    'id_security_password_special_char': gettext('Must contain special characters')
+};
+
 function getRuleLabel(rule) {
     var label = '';
     if (rule.key === rules_short_map_id['min']) {
