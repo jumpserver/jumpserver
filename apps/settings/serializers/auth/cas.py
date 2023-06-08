@@ -25,5 +25,5 @@ class CASSettingSerializer(serializers.Serializer):
     CAS_APPLY_ATTRIBUTES_TO_USER = serializers.BooleanField(
         required=False, label=_('Enable attributes map')
     )
-    CAS_RENAME_ATTRIBUTES = serializers.DictField(required=False, label=_('Rename attr'))
+    CAS_RENAME_ATTRIBUTES = serializers.JSONField(required=False, label=_('Rename attr'))
     CAS_CREATE_USER = serializers.BooleanField(required=False, label=_('Create user if not'))

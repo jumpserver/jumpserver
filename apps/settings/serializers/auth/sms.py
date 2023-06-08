@@ -96,7 +96,7 @@ class CustomSMSSettingSerializer(BaseSMSSettingSerializer):
         post = 'post', 'Post'
 
     CUSTOM_SMS_URL = serializers.URLField(required=True, label=_("URL"))
-    CUSTOM_SMS_API_PARAMS = serializers.DictField(
+    CUSTOM_SMS_API_PARAMS = serializers.JSONField(
         label=_('Parameters'), default={'phone_number': '{phone_number}', 'code': '{code}'}
     )
     CUSTOM_SMS_REQUEST_METHOD = serializers.ChoiceField(
