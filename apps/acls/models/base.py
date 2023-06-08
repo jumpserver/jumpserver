@@ -82,7 +82,7 @@ class BaseACL(JMSBaseModel):
 class UserBaseACL(BaseACL):
     users = JSONManyToManyField('users.User', default=dict, verbose_name=_('Users'))
 
-    class Meta:
+    class Meta(BaseACL.Meta):
         abstract = True
 
     @classmethod
@@ -93,7 +93,7 @@ class UserBaseACL(BaseACL):
         return queryset.valid().distinct()
 
 
-class UserAssetAccountBaseACL(UserBaseACL, OrgModelMixin):
+class UserAssetAccountBaseACL(OrgModelMixin, UserBaseACL):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     assets = JSONManyToManyField('assets.Asset', default=dict, verbose_name=_('Assets'))
     accounts = models.JSONField(default=list, verbose_name=_("Accounts"))
