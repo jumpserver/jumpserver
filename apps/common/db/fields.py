@@ -10,7 +10,7 @@ from django.apps import apps
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models import Q, Manager
+from django.db.models import Q, Manager, QuerySet
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.utils.encoders import JSONEncoder
@@ -486,6 +486,10 @@ class JSONManyToManyDescriptor:
             elif rule['match'] == 'm2m':
                 if isinstance(value, Manager):
                     value = value.values_list('id', flat=True)
+                elif isinstance(value, QuerySet):
+                    value = value.values_list('id', flat=True)
+                elif isinstance(value, models.Model):
+                    value = [value.id]
                 value = set(map(str, value))
                 rule_value = set(map(str, rule_value))
                 res &= rule_value.issubset(value)

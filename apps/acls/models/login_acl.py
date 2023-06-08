@@ -20,10 +20,6 @@ class LoginACL(UserBaseACL):
     def is_action(self, action):
         return self.action == action
 
-    @classmethod
-    def filter_acl(cls, user):
-        return user.login_acls.all().valid().distinct()
-
     def create_confirm_ticket(self, request):
         from tickets import const
         from tickets.models import ApplyLoginTicket
