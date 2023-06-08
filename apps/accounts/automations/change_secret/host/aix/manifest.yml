@@ -7,5 +7,6 @@ method: change_secret
 
 i18n:
   AIX account change secret:
-    zh: AIX 账号改密
-    ja: AIX アカウントのパスワード変更
+    zh: 使用 Ansible 模块 user 执行账号改密 (DES)
+    ja: Ansible user モジュールを使用してアカウントのパスワード変更 (DES)
+    en: Using Ansible module user to change account secret (DES)

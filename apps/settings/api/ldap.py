@@ -2,37 +2,44 @@
 #
 
 import threading
-from rest_framework import generics
-from rest_framework.views import Response, APIView
-from orgs.models import Organization
-from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
 
-from ..models import Setting
-from ..utils import (
-    LDAPServerUtil, LDAPCacheUtil, LDAPImportUtil, LDAPSyncUtil,
-    LDAP_USE_CACHE_FLAGS, LDAPTestUtil
-)
-from ..tasks import sync_ldap_user
+from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
+from rest_framework import generics
+from rest_framework.generics import CreateAPIView
+from rest_framework.views import Response, APIView
+
+from common.api import AsyncApiMixin
 from common.utils import get_logger, is_uuid
+from orgs.models import Organization
+from orgs.utils import current_org
+from users.models import User
+from ..models import Setting
 from ..serializers import (
     LDAPTestConfigSerializer, LDAPUserSerializer,
     LDAPTestLoginSerializer
 )
-from orgs.utils import current_org
-from users.models import User
+from ..tasks import sync_ldap_user
+from ..utils import (
+    LDAPServerUtil, LDAPCacheUtil, LDAPImportUtil, LDAPSyncUtil,
+    LDAP_USE_CACHE_FLAGS, LDAPTestUtil
+)
 
 logger = get_logger(__file__)
 
 
-class LDAPTestingConfigAPI(APIView):
+class LDAPTestingConfigAPI(AsyncApiMixin, CreateAPIView):
     serializer_class = LDAPTestConfigSerializer
     perm_model = Setting
     rbac_perms = {
-        'POST': 'settings.change_auth'
+        'POST': 'settings.change_auth',
+        'create': 'settings.change_auth',
     }
 
-    def post(self, request):
+    def is_need_async(self):
+        return True
+
+    def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if not serializer.is_valid():
             return Response({"error": str(serializer.errors)}, status=400)
@@ -184,13 +191,13 @@ class LDAPUserImportAPI(APIView):
         'POST': 'settings.change_auth'
     }
 
-    def get_org(self):
-        org_id = self.request.data.get('org_id')
-        if is_uuid(org_id):
-            org = Organization.objects.get(id=org_id)
+    def get_orgs(self):
+        org_ids = self.request.data.get('org_ids')
+        if org_ids:
+            orgs = list(Organization.objects.filter(id__in=org_ids))
         else:
-            org = current_org
-        return org
+            orgs = [current_org]
+        return orgs
 
     def get_ldap_users(self):
         username_list = self.request.data.get('username_list', [])
@@ -212,14 +219,15 @@ class LDAPUserImportAPI(APIView):
         if users is None:
             return Response({'msg': _('Get ldap users is None')}, status=400)
 
-        org = self.get_org()
-        errors = LDAPImportUtil().perform_import(users, org)
+        orgs = self.get_orgs()
+        errors = LDAPImportUtil().perform_import(users, orgs)
         if errors:
             return Response({'errors': errors}, status=400)
 
         count = users if users is None else len(users)
+        orgs_name = ', '.join([str(org) for org in orgs])
         return Response({
-            'msg': _('Imported {} users successfully (Organization: {})').format(count, org)
+            'msg': _('Imported {} users successfully (Organization: {})').format(count, orgs_name)
         })
 
 

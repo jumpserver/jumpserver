@@ -5,8 +5,6 @@ from collections import defaultdict
 
 from django.utils.translation import gettext as _
 
-from accounts.const import AutomationTypes
-
 __all__ = ['JMSInventory']
 
 
@@ -79,6 +77,7 @@ class JMSInventory:
         return var
 
     def make_account_vars(self, host, asset, account, automation, protocol, platform, gateway):
+        from accounts.const import AutomationTypes
         if not account:
             host['error'] = _("No account available")
             return host

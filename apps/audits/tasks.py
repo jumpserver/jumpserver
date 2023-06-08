@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from common.utils import get_log_keep_day, get_logger
-from common.storage.ftp_file import FTPFileStorage
+from common.storage.ftp_file import FTPFileStorageHandler
 from ops.celery.decorator import (
     register_as_period_task, after_app_shutdown_clean_periodic
 )
@@ -118,7 +118,7 @@ def upload_ftp_file_to_external_storage(ftp_log_id, file_name):
     if not ftp_log:
         logger.error(f'FTP db item not found: {ftp_log_id}')
         return
-    ftp_storage = FTPFileStorage(ftp_log)
+    ftp_storage = FTPFileStorageHandler(ftp_log)
     local_path, url_or_err = ftp_storage.find_local()
     if not local_path:
         logger.error(f'FTP file record not found, may be upload error. file name: {file_name}')

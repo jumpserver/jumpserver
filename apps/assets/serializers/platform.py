@@ -157,20 +157,6 @@ class PlatformSerializer(WritableNestedModelSerializer):
         constraints = AllTypes.get_constraints(category, tp)
         return constraints
 
-    def validate(self, attrs):
-        domain_enabled = attrs.get('domain_enabled', False) and self.constraints.get('domain_enabled', False)
-        su_enabled = attrs.get('su_enabled', False) and self.constraints.get('su_enabled', False)
-        automation = attrs.get('automation', {})
-        automation['ansible_enabled'] = automation.get('ansible_enabled', False) \
-                                        and self.constraints['automation'].get('ansible_enabled', False)
-        attrs.update({
-            'domain_enabled': domain_enabled,
-            'su_enabled': su_enabled,
-            'automation': automation,
-        })
-        self.initial_data['automation'] = automation
-        return attrs
-
     @classmethod
     def setup_eager_loading(cls, queryset):
         queryset = queryset.prefetch_related(
@@ -187,6 +173,18 @@ class PlatformSerializer(WritableNestedModelSerializer):
         # 这里不设置不行，write_nested 不使用 validated 中的
         self.initial_data['protocols'] = protocols
         return protocols
+
+    def validate_su_enabled(self, su_enabled):
+        return su_enabled and self.constraints.get('su_enabled', False)
+
+    def validate_domain_enabled(self, domain_enabled):
+        return domain_enabled and self.constraints.get('domain_enabled', False)
+
+    def validate_automation(self, automation):
+        automation = automation or {}
+        automation = automation.get('ansible_enabled', False) \
+                     and self.constraints['automation'].get('ansible_enabled', False)
+        return automation
 
 
 class PlatformOpsMethodSerializer(serializers.Serializer):

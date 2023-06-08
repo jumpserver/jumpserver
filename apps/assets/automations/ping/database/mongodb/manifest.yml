@@ -6,6 +6,6 @@ type:
 method: ping
 i18n:
   Ping MongoDB:
-    zh: 测试 MongoDB 可连接性
-    en: Ping MongoDB
-    ja: MongoDBにPingする
+    zh: 使用 Ansible 模块 mongodb 来测试 MongoDB 可连接性
+    en: Use ansible mongodb module to test MongoDB
+    ja: Ansible mongodbモジュールを使用してテストする MongoDB

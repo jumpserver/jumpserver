@@ -2,15 +2,14 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import get_request_ip, get_ip_city
-from common.utils.ip import contains_ip
-from common.utils.time_period import contains_time_period
 from common.utils.timezone import local_now_display
 from .base import BaseACL
 
 
 class LoginACL(BaseACL):
     user = models.ForeignKey(
-        'users.User', on_delete=models.CASCADE, related_name='login_acls', verbose_name=_('User')
+        'users.User', on_delete=models.CASCADE,
+        related_name='login_acls', verbose_name=_('User')
     )
     # 规则, ip_group, time_period
     rules = models.JSONField(default=dict, verbose_name=_('Rule'))
@@ -29,23 +28,9 @@ class LoginACL(BaseACL):
     def filter_acl(cls, user):
         return user.login_acls.all().valid().distinct()
 
-    @staticmethod
-    def match(user, ip):
-        acl_qs = LoginACL.filter_acl(user)
-        if not acl_qs:
-            return
-
-        for acl in acl_qs:
-            if acl.is_action(LoginACL.ActionChoices.review) and \
-                    not acl.reviewers.exists():
-                continue
-            ip_group = acl.rules.get('ip_group')
-            time_periods = acl.rules.get('time_period')
-            is_contain_ip = contains_ip(ip, ip_group)
-            is_contain_time_period = contains_time_period(time_periods)
-            if is_contain_ip and is_contain_time_period:
-                # 满足条件，则返回
-                return acl
+    @classmethod
+    def get_user_acls(cls, user):
+        return cls.filter_acl(user)
 
     def create_confirm_ticket(self, request):
         from tickets import const

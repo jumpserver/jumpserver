@@ -17,6 +17,7 @@ class BACKENDS(TextChoices):
     TENCENT = 'tencent', _('Tencent cloud')
     HUAWEI = 'huawei', _('Huawei Cloud')
     CMPP2 = 'cmpp2', _('CMPP v2.0')
+    Custom = 'custom', _('Custom type')
 
 
 class SMS:
@@ -42,8 +43,9 @@ class SMS:
         )
 
     def send_verify_code(self, phone_number, code):
-        sign_name = getattr(settings, f'{self.client.SIGN_AND_TMPL_SETTING_FIELD_PREFIX}_VERIFY_SIGN_NAME')
-        template_code = getattr(settings, f'{self.client.SIGN_AND_TMPL_SETTING_FIELD_PREFIX}_VERIFY_TEMPLATE_CODE')
+        prefix = getattr(self.client, 'SIGN_AND_TMPL_SETTING_FIELD_PREFIX', '')
+        sign_name = getattr(settings, f'{prefix}_VERIFY_SIGN_NAME', None)
+        template_code = getattr(settings, f'{prefix}_VERIFY_TEMPLATE_CODE', None)
 
         if self.client.need_pre_check() and not (sign_name and template_code):
             raise JMSException(

@@ -11,7 +11,7 @@ from common.utils import get_logger, make_dirs
 logger = get_logger(__name__)
 
 
-class BaseStorage(object):
+class BaseStorageHandler(object):
     NAME = ''
 
     def __init__(self, obj):

@@ -14,5 +14,6 @@ params:
 
 i18n:
   Windows account push:
-    zh: Windows 账号推送
-    ja: Windows アカウントのプッシュ
+    zh: 使用 Ansible 模块 win_user 执行 Windows 账号推送
+    ja: Ansible win_user モジュールを使用して Windows アカウントをプッシュする
+    en: Using Ansible module win_user to push account

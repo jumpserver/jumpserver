@@ -7,5 +7,6 @@ method: verify_account
 
 i18n:
   Oracle account verify:
-    zh: Oracle 账号验证
-    ja: Oracle アカウントの検証
+    zh: 使用 Python 模块 oracledb 验证账号
+    ja: Python モジュール oracledb を使用してアカウントを検証する
+    en: Using Python module oracledb to verify account

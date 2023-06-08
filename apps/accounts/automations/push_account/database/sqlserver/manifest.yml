@@ -7,5 +7,6 @@ method: push_account
 
 i18n:
   SQLServer account push:
-    zh: SQLServer 账号推送
-    ja: SQLServer アカウントのプッシュ
+    zh: 使用 Ansible 模块 mssql 执行 SQLServer 账号推送
+    ja: Ansible mssql モジュールを使用してアカウントをプッシュする
+    en: Using Ansible module mssql to push account

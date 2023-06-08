@@ -64,7 +64,7 @@ name:
 from ansible.module_utils.basic import AnsibleModule
 
 from ops.ansible.modules_utils.custom_common import (
-    SSHClient, ssh_common_argument_spec
+    SSHClient, common_argument_spec
 )
 
 
@@ -85,7 +85,7 @@ def get_commands(module):
 
 
 def main():
-    argument_spec = ssh_common_argument_spec()
+    argument_spec = common_argument_spec()
     argument_spec.update(
         name=dict(required=True, aliases=['user']),
         password=dict(aliases=['pass'], no_log=True),

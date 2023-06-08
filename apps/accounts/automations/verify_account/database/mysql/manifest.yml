@@ -8,5 +8,7 @@ method: verify_account
 
 i18n:
   MySQL account verify:
-    zh: MySQL 账号验证
-    ja: MySQL アカウントの検証
+    zh: 使用 Ansible 模块 mysql 验证账号
+    ja: Ansible mysql モジュールを使用してアカウントを検証する
+    en: Using Ansible module mysql to verify account
+

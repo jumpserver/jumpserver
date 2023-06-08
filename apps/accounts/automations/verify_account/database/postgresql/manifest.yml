@@ -7,5 +7,6 @@ method: verify_account
 
 i18n:
   PostgreSQL account verify:
-    zh: PostgreSQL 账号验证
-    ja: PostgreSQL アカウントの検証
+    zh: 使用 Ansible 模块 postgresql 验证账号
+    ja: Ansible postgresql モジュールを使用してアカウントを検証する
+    en: Using Ansible module postgresql to verify account

@@ -255,7 +255,7 @@ class Config(dict):
         'AUTH_LDAP_SYNC_IS_PERIODIC': False,
         'AUTH_LDAP_SYNC_INTERVAL': None,
         'AUTH_LDAP_SYNC_CRONTAB': None,
-        'AUTH_LDAP_SYNC_ORG_ID': '00000000-0000-0000-0000-000000000002',
+        'AUTH_LDAP_SYNC_ORG_IDS': ['00000000-0000-0000-0000-000000000002'],
         'AUTH_LDAP_USER_LOGIN_ONLY_IN_USERS': False,
         'AUTH_LDAP_OPTIONS_OPT_REFERRALS': -1,
 
@@ -414,6 +414,10 @@ class Config(dict):
         'CMPP2_VERIFY_SIGN_NAME': '',
         'CMPP2_VERIFY_TEMPLATE_CODE': '{code}',
 
+        'CUSTOM_SMS_URL': '',
+        'CUSTOM_SMS_API_PARAMS': {'phone_numbers': '{phone_numbers}', 'code': '{code}'},
+        'CUSTOM_SMS_REQUEST_METHOD': 'get',
+
         # Email
         'EMAIL_CUSTOM_USER_CREATED_SUBJECT': _('Create account successfully'),
         'EMAIL_CUSTOM_USER_CREATED_HONORIFIC': _('Hello'),
@@ -448,6 +452,9 @@ class Config(dict):
         'SECURITY_MFA_AUTH': 0,  # 0 不开启 1 全局开启 2 管理员开启
         'SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY': True,
         'SECURITY_COMMAND_EXECUTION': True,
+        'SECURITY_COMMAND_BLACKLIST': [
+            'reboot', 'shutdown', 'poweroff', 'halt', 'dd', 'half', 'top'
+        ],
         'SECURITY_SERVICE_ACCOUNT_REGISTRATION': True,
         'SECURITY_VIEW_AUTH_NEED_MFA': True,
         'SECURITY_MAX_IDLE_TIME': 30,

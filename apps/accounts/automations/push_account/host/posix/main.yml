@@ -8,7 +8,7 @@
       ansible.builtin.user:
         name: "{{ account.username }}"
         shell: "{{ params.shell }}"
-        home: "{{ '/home/' + account.username }}"
+        home: "{{ params.home | default('/home/' + account.username, true) }}"
         groups: "{{ params.groups }}"
         expires: -1
         state: present
@@ -17,20 +17,6 @@
       ansible.builtin.group:
         name: "{{ account.username }}"
         state: present
-
-    - name: Check home dir exists
-      ansible.builtin.stat:
-        path: "{{ '/home/' + account.username }}"
-      register: home_existed
-
-    - name: Set home dir permission
-      ansible.builtin.file:
-        path: "{{ '/home/' + account.username }}"
-        owner: "{{ account.username }}"
-        group: "{{ account.username }}"
-        mode: "0700"
-      when:
-        - home_existed.stat.exists == true
 
     - name: Add user groups
       ansible.builtin.user:
@@ -43,6 +29,7 @@
         name: "{{ account.username }}"
         password: "{{ account.secret | password_hash('sha512') }}"
         update_password: always
+      ignore_errors: true
       when: account.secret_type == "password"
 
     - name: remove jumpserver ssh key

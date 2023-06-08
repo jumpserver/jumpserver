@@ -21,7 +21,7 @@ from common.permissions import IsServiceAccount
 from common.plugins.es import QuerySet as ESQuerySet
 from common.utils import is_uuid, get_logger, lazyproperty
 from common.const.http import GET, POST
-from common.storage.ftp_file import FTPFileStorage
+from common.storage.ftp_file import FTPFileStorageHandler
 from orgs.mixins.api import OrgReadonlyModelViewSet, OrgModelViewSet
 from orgs.utils import current_org, tmp_to_root_org
 from orgs.models import Organization
@@ -70,7 +70,7 @@ class FTPLogViewSet(OrgModelViewSet):
     }
 
     def get_storage(self):
-        return FTPFileStorage(self.get_object())
+        return FTPFileStorageHandler(self.get_object())
 
     @action(
         methods=[GET], detail=True, permission_classes=[RBACPermission, ],

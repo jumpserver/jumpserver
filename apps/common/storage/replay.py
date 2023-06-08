@@ -1,10 +1,10 @@
 from itertools import chain
 
 from terminal.models import default_storage
-from .base import BaseStorage
+from .base import BaseStorageHandler
 
 
-class ReplayStorage(BaseStorage):
+class ReplayStorageHandler(BaseStorageHandler):
     NAME = 'REPLAY'
 
     def get_file_path(self, **kwargs):

@@ -7,5 +7,6 @@ method: verify_account
 
 i18n:
   SQLServer account verify:
-    zh: SQLServer 账号验证
-    ja: SQLServer アカウントの検証
+    zh: 使用 Ansible 模块 mssql 验证账号
+    ja: Ansible mssql モジュールを使用してアカウントを検証する
+    en: Using Ansible module mssql to verify account

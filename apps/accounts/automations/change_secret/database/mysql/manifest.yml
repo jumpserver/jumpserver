@@ -8,5 +8,6 @@ method: change_secret
 
 i18n:
   MySQL account change secret:
-    zh: MySQL 账号改密
-    ja: MySQL アカウントのパスワード変更
+    zh: 使用 Ansible 模块 mysql 执行 MySQL 账号改密
+    ja: Ansible mysql モジュールを使用して MySQL アカウントのパスワード変更
+    en: Using Ansible module mysql to change MySQL account secret

@@ -22,7 +22,7 @@ __all__ = [
 
 class AccountViewSet(OrgBulkModelViewSet):
     model = Account
-    search_fields = ('username', 'asset__address', 'name')
+    search_fields = ('username', 'name', 'asset__name', 'asset__address')
     filterset_class = AccountFilterSet
     serializer_classes = {
         'default': serializers.AccountSerializer,
@@ -32,6 +32,7 @@ class AccountViewSet(OrgBulkModelViewSet):
         'su_from_accounts': 'accounts.view_account',
         'clear_secret': 'accounts.change_account',
     }
+    export_as_zip = True
 
     @action(methods=['get'], detail=False, url_path='su-from-accounts')
     def su_from_accounts(self, request, *args, **kwargs):

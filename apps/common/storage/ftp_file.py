@@ -1,8 +1,8 @@
 from terminal.models import default_storage
-from .base import BaseStorage
+from .base import BaseStorageHandler
 
 
-class FTPFileStorage(BaseStorage):
+class FTPFileStorageHandler(BaseStorageHandler):
     NAME = 'FTP'
 
     def get_file_path(self, **kwargs):

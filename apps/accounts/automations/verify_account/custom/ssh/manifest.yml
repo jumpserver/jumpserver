@@ -1,0 +1,14 @@
+id: verify_account_by_ssh
+name: "{{ 'SSH account verify' | trans }}"
+category:
+  - device
+  - host
+type:
+  - all
+method: verify_account
+
+i18n:
+  SSH account verify:
+    zh: 使用 Python 模块 paramiko 验证账号
+    ja: Python モジュール paramiko を使用してアカウントを検証する
+    en: Using Python module paramiko to verify account

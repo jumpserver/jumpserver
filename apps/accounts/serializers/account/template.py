@@ -23,8 +23,12 @@ class AccountTemplateSerializer(BaseAccountSerializer):
     def sync_accounts_secret(self, instance, diff):
         if not self._is_sync_account or 'secret' not in diff:
             return
-
-        accounts = Account.objects.filter(source_id=instance.id)
+        query_data = {
+            'source_id': instance.id,
+            'username': instance.username,
+            'secret_type': instance.secret_type
+        }
+        accounts = Account.objects.filter(**query_data)
         instance.bulk_sync_account_secret(accounts, self.context['request'].user.id)
 
     def validate(self, attrs):
@@ -35,10 +39,13 @@ class AccountTemplateSerializer(BaseAccountSerializer):
     def update(self, instance, validated_data):
         diff = {
             k: v for k, v in validated_data.items()
-            if getattr(instance, k) != v
+            if getattr(instance, k, None) != v
         }
         instance = super().update(instance, validated_data)
-        self.sync_accounts_secret(instance, diff)
+        if {'username', 'secret_type'} & set(diff.keys()):
+            Account.objects.filter(source_id=instance.id).update(source_id=None)
+        else:
+            self.sync_accounts_secret(instance, diff)
         return instance
 
 

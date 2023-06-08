@@ -27,6 +27,16 @@
     - name: Stop Tinker before install (jumpserver)
       ansible.windows.win_powershell:
         script: |
+          if (Get-Process -Name 'tinker' -ErrorAction SilentlyContinue) {
+            TASKKILL /F /IM tinker.exe /T
+          }
+          else {
+           $Ansible.Changed = $false
+          }
+
+    - name: Stop Tinkerd before install (jumpserver)
+      ansible.windows.win_powershell:
+        script: |
           if (Get-Service -Name 'JumpServer Tinker' -ErrorAction SilentlyContinue) {
             Stop-Service -Name 'JumpServer Tinker' -Force
           }
@@ -172,7 +182,7 @@
     - name: Set chromium and driver on the global system path (Chromium)
       ansible.windows.win_path:
         elements:
-          - 'C:\Program Files\Chrome\chrome-win'
+          - 'C:\Program Files\Chrome\chrome-win32'
           - 'C:\Program Files\JumpServer\drivers\chromedriver_win32'
 
     - name: Set Chromium variables disable Google Api (Chromium)

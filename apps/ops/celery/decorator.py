@@ -36,7 +36,7 @@ def register_as_period_task(
         args=(), kwargs=None,
         description=''):
     """
-    Warning: Task must be have not any args and kwargs
+    Warning: Task must have not any args and kwargs
     :param crontab:  "* * * * *"
     :param interval:  60*60*60
     :param args: ()

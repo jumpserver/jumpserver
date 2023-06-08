@@ -7,5 +7,6 @@ method: push_account
 
 i18n:
   Oracle account push:
-    zh: Oracle 账号推送
-    ja: Oracle アカウントのプッシュ
+    zh: 使用 Python 模块 oracledb 执行 Oracle 账号推送
+    ja: Python oracledb モジュールを使用してアカウントをプッシュする
+    en: Using Python module oracledb to push account
