@@ -7,7 +7,7 @@ import logging
 from django.core.cache import cache
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models import F, Q
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import signer, get_object_or_none, is_uuid
@@ -166,44 +166,7 @@ class AuthMixin:
         if asset:
             self.load_asset_more_auth(asset_id=asset.id, username=username, user_id=user_id)
 
-    @staticmethod
-    def _load_run_as_admin_auth(authbook, not_stu_qs, stu_qs):
-        if not authbook.password:
-            password_query = not_stu_qs.values('password')
-            password = next((i['password'] for i in password_query if i['password']), None)
-
-            if not password:
-                password_query = stu_qs.values('password', stu_password=F('systemuser__password'))
-                password = next(
-                    (
-                        i['password'] or i['stu_password'] for i in password_query if
-                        i['password'] or i['stu_password']
-                    ), ''
-                )
-            authbook.password = password
-        elif not authbook.private_key:
-            key_query = not_stu_qs.values('private_key', 'public_key')
-            key_data = next((i for i in key_query if i['private_key']), None)
-
-            if not key_data:
-                key_query = stu_qs.values(
-                    'private_key', 'public_key',
-                    stu_private_key=F('systemuser__private_key'),
-                    stu_public_key=F('systemuser__public_key')
-                )
-                key_data = next(
-                    (
-                        {
-                            'private_key': i['private_key'] or i['stu_private_key'],
-                            'public_key': i['public_key'] or i['stu_public_key']
-                        } for i in key_query if i['private_key'] or i['stu_private_key']
-                    ), {'private_key': '', 'public_key': ''}
-                )
-
-            authbook.private_key = key_data['private_key']
-            authbook.public_key = key_data['public_key']
-
-    def load_asset_special_auth(self, asset, username='', run_as_admin=False):
+    def load_asset_special_auth(self, asset, username=''):
         """
         AuthBook 的数据状态
             | asset | systemuser | username |
@@ -237,12 +200,9 @@ class AuthMixin:
             return None
         authbook.load_auth()
 
-        if run_as_admin:
-            self._load_run_as_admin_auth(authbook, not_stu_qs, stu_qs)
-
-        self.password = authbook.password
-        self.private_key = authbook.private_key
-        self.public_key = authbook.public_key
+        self.password = authbook.password or self.password or ''
+        self.private_key = authbook.private_key or self.private_key or ''
+        self.public_key = authbook.public_key or self.public_key or ''
 
     def load_asset_more_auth(self, asset_id=None, username=None, user_id=None):
         from users.models import User
