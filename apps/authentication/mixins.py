@@ -369,7 +369,7 @@ class AuthACLMixin:
         logger.debug('Login confirm acl id: {}'.format(acl_id))
         if not acl_id:
             return
-        acl = LoginACL.filter_acl(user).filter(id=acl_id).first()
+        acl = LoginACL.get_user_acls(user).filter(id=acl_id).first()
         if not acl:
             return
         if not acl.is_action(acl.ActionChoices.review):

@@ -90,7 +90,7 @@ class UserBaseACL(BaseACL):
         queryset = cls.objects.all()
         q = cls.users.get_filter_q(user)
         queryset = queryset.filter(q)
-        return queryset.valid().distinct()
+        return queryset.filter(is_active=True).distinct()
 
 
 class UserAssetAccountBaseACL(OrgModelMixin, UserBaseACL):
@@ -125,4 +125,4 @@ class UserAssetAccountBaseACL(OrgModelMixin, UserBaseACL):
             kwargs['org_id'] = org_id
         if kwargs:
             queryset = queryset.filter(**kwargs)
-        return queryset.valid().distinct().order_by('priority', 'date_created')
+        return queryset.filter(is_active=True).distinct().order_by('priority', 'date_created')
