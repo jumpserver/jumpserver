@@ -28,6 +28,7 @@ ARG DEPENDENCIES="                    \
         libxml2-dev                   \
         libxmlsec1-dev                \
         libxmlsec1-openssl            \
+        freerdp2-dev                  \
         libaio-dev"
 
 ARG TOOLS="                           \
