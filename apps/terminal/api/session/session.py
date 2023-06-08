@@ -22,7 +22,7 @@ from common.drf.renders import PassthroughRenderer
 from common.api import AsyncApiMixin
 from common.utils import data_to_json, is_uuid
 from common.utils import get_logger, get_object_or_none
-from common.storage.replay import ReplayStorage
+from common.storage.replay import ReplayStorageHandler
 from rbac.permissions import RBACPermission
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import tmp_to_root_org, tmp_to_org
@@ -111,7 +111,7 @@ class SessionViewSet(OrgBulkModelViewSet):
         return file
 
     def get_storage(self):
-        return ReplayStorage(self.get_object())
+        return ReplayStorageHandler(self.get_object())
 
     @action(methods=[GET], detail=True, renderer_classes=(PassthroughRenderer,), url_path='replay/download',
             url_name='replay-download')
@@ -210,7 +210,7 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
         session_id = kwargs.get('pk')
         session = get_object_or_404(Session, id=session_id)
 
-        storage = ReplayStorage(session)
+        storage = ReplayStorageHandler(session)
         local_path, url_or_err = storage.get_file_path_url()
         if url_or_err:
             return Response({"error": url_or_err}, status=404)
