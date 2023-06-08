@@ -16,6 +16,7 @@ class OperateChoices(TextChoices):
     rename = "rename", _("Rename")
     symlink = "symlink", _("Symlink")
     download = "download", _("Download")
+    rename_dir = "rename_dir", _("Rename dir")
 
 
 class ActionChoices(TextChoices):

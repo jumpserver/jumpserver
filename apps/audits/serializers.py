@@ -37,8 +37,8 @@ class FTPLogSerializer(serializers.ModelSerializer):
         fields_mini = ["id"]
         fields_small = fields_mini + [
             "user", "remote_addr", "asset", "account",
-            "org_id", "operate", "filename", "is_success",
-            "date_start",
+            "org_id", "operate", "filename", "date_start",
+            "is_success", "has_file",
         ]
         fields = fields_small
 
@@ -158,3 +158,7 @@ class ActivityUnionLogSerializer(serializers.Serializer):
                 api_to_ui=True, is_audit=True
             )
         return detail_url
+
+
+class FileSerializer(serializers.Serializer):
+    file = serializers.FileField(allow_empty_file=True)

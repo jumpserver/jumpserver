@@ -1,7 +1,5 @@
 import codecs
 import copy
-import csv
-
 from itertools import chain
 from datetime import datetime
 

@@ -10,6 +10,7 @@ from django.core.files.storage import default_storage
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from common.storage.replay import ReplayStorageHandler
 from ops.celery.decorator import (
     register_as_period_task, after_app_ready_start,
     after_app_shutdown_clean_periodic
@@ -23,7 +24,6 @@ from .models import (
     AppletHost, ReplayStorage, CommandStorage
 )
 from .notifications import StorageConnectivityMessage
-from .utils import find_session_replay_local
 
 CACHE_REFRESH_INTERVAL = 10
 RUNNING = False
@@ -66,7 +66,8 @@ def upload_session_replay_to_external_storage(session_id):
         logger.error(f'Session db item not found: {session_id}')
         return
 
-    local_path, foobar = find_session_replay_local(session)
+    replay_storage = ReplayStorageHandler(session)
+    local_path, url_or_err = replay_storage.find_local()
     if not local_path:
         logger.error(f'Session replay not found, may be upload error: {local_path}')
         return

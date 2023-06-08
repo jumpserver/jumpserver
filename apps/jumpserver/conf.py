@@ -548,6 +548,9 @@ class Config(dict):
 
         # Applet 等软件的下载地址
         'APPLET_DOWNLOAD_HOST': '',
+
+        # FTP 文件上传下载备份阈值，单位(M)，当值小于等于0时，不备份
+        'FTP_FILE_MAX_STORE': 100,
     }
 
     def __init__(self, *args):

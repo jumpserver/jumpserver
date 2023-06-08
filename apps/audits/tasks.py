@@ -11,12 +11,15 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from common.utils import get_log_keep_day, get_logger
+from common.storage.ftp_file import FTPFileStorageHandler
 from ops.celery.decorator import (
     register_as_period_task, after_app_shutdown_clean_periodic
 )
 from ops.models import CeleryTaskExecution
 from terminal.models import Session, Command
+from terminal.backends import server_replay_storage
 from .models import UserLoginLog, OperateLog, FTPLog, ActivityLog
+
 
 logger = get_logger(__name__)
 
@@ -46,7 +49,15 @@ def clean_ftp_log_period():
     now = timezone.now()
     days = get_log_keep_day('FTP_LOG_KEEP_DAYS')
     expired_day = now - datetime.timedelta(days=days)
+    file_store_dir = os.path.join(default_storage.base_location, 'ftp_file')
     FTPLog.objects.filter(date_start__lt=expired_day).delete()
+    command = "find %s -mtime +%s -exec rm -f {} \\;" % (
+        file_store_dir, days
+    )
+    subprocess.call(command, shell=True)
+    command = "find %s -type d -empty -delete;" % file_store_dir
+    subprocess.call(command, shell=True)
+    logger.info("Clean FTP file done")
 
 
 def clean_celery_tasks_period():
@@ -98,3 +109,27 @@ def clean_audits_log_period():
     clean_activity_log_period()
     clean_celery_tasks_period()
     clean_expired_session_period()
+
+
+@shared_task(verbose_name=_('Upload FTP file to external storage'))
+def upload_ftp_file_to_external_storage(ftp_log_id, file_name):
+    logger.info(f'Start upload FTP file record to external storage: {ftp_log_id} - {file_name}')
+    ftp_log = FTPLog.objects.filter(id=ftp_log_id).first()
+    if not ftp_log:
+        logger.error(f'FTP db item not found: {ftp_log_id}')
+        return
+    ftp_storage = FTPFileStorageHandler(ftp_log)
+    local_path, url_or_err = ftp_storage.find_local()
+    if not local_path:
+        logger.error(f'FTP file record not found, may be upload error. file name: {file_name}')
+        return
+    abs_path = default_storage.path(local_path)
+    ok, err = server_replay_storage.upload(abs_path, ftp_log.filepath)
+    if not ok:
+        logger.error(f'Session file record upload to external error: {err}')
+        return
+    try:
+        default_storage.delete(local_path)
+    except:
+        pass
+    return
