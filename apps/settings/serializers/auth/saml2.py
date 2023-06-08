@@ -30,6 +30,6 @@ class SAML2SettingSerializer(serializers.Serializer):
         allow_blank=True, required=False,
         write_only=True, label=_('SP cert')
     )
-    SAML2_RENAME_ATTRIBUTES = serializers.DictField(required=False, label=_('Rename attr'))
+    SAML2_RENAME_ATTRIBUTES = serializers.JSONField(required=False, label=_('Rename attr'))
     SAML2_LOGOUT_COMPLETELY = serializers.BooleanField(required=False, label=_('Logout completely'))
     AUTH_SAML2_ALWAYS_UPDATE_USER = serializers.BooleanField(required=False, label=_('Always update user'))
