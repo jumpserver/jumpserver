@@ -292,7 +292,7 @@ class Asset(AbsConnectivity, AbsHardwareInfo, ProtocolsMixin, NodesRelationMixin
             auth_user = self.admin_user
             become_user = None
 
-        auth_user.load_asset_special_auth(self, run_as_admin=True)
+        auth_user.load_asset_special_auth(self)
         info = {
             'username': auth_user.username,
             'password': auth_user.password,
