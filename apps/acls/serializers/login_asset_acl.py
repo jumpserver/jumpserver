@@ -2,7 +2,7 @@ from django.utils.translation import gettext_lazy as _
 
 from common.serializers import MethodSerializer
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from .base import BaseUserAssetAccountACLSerializerMixin as BaseSerializer
+from .base import BaseUserAssetAccountACLSerializer as BaseSerializer
 from .rules import RuleSerializer
 from ..models import LoginAssetACL
 
