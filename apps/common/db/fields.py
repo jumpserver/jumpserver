@@ -468,7 +468,12 @@ class JSONManyToManyDescriptor:
             elif rule_match == 'endswith':
                 res &= str(value).endswith(str(rule_value))
             elif rule_match == 'regex':
-                res &= re.match(rule_value, value)
+                try:
+                    matched = bool(re.match(rule_value, value))
+                except Exception as e:
+                    logging.error('Error regex match: %s', e)
+                    matched = False
+                res &= matched
             elif rule_match == 'not':
                 res &= value != rule_value
             elif rule['match'] == 'gte':
