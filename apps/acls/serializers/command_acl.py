@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
@@ -7,9 +8,12 @@ from common.utils import lazyproperty, get_object_or_none
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from orgs.utils import tmp_to_root_org
 from terminal.models import Session
+from assets.models import Asset
 from .base import BaseUserAssetAccountACLSerializer as BaseSerializer
 
-__all__ = ["CommandFilterACLSerializer", "CommandGroupSerializer", "CommandReviewSerializer"]
+
+__all__ = ["CommandFilterACLSerializer", "CommandGroupSerializer", "CommandReviewSerializer", 
+           "CommandWarnningSerializer"]
 
 
 class CommandGroupSerializer(BulkOrgResourceModelSerializer):
@@ -66,3 +70,10 @@ class CommandReviewSerializer(serializers.Serializer):
             return obj
         error = '{} Model object does not exist'.format(model.__name__)
         raise serializers.ValidationError(error)
+
+
+class CommandWarnningSerializer(CommandReviewSerializer):
+    
+    @lazyproperty
+    def asset(self):
+        return get_object_or_404(Asset, pk=self.session.asset_id)

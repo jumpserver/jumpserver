@@ -17,6 +17,7 @@ class ActionChoices(models.TextChoices):
     reject = 'reject', _('Reject')
     accept = 'accept', _('Accept')
     review = 'review', _('Review')
+    warn = 'warn', _('Warn')
 
 
 class BaseACLQuerySet(models.QuerySet):

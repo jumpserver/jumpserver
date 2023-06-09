@@ -1,0 +1,13 @@
+{% load i18n %}
+
+<div>
+    <b>{% trans 'Command acl warning' %}</b><br /><br />
+    <b>{% trans 'Operate account' %}: </b>
+    <span>{{ account }}</span><br />
+    <b>{% trans 'Organization ID' %}:</b>
+    <span>{{ org_id }}</span><br />
+    <b>{% trans 'Asset' %}:</b>
+    <span><a href="{{ asset_url }}" target="_blank">{{ asset }}</a></span><br />
+    <b> {% trans 'Command' %}: </b>
+    <code><pre>{{ run_command }}</pre></code>
+</div>
