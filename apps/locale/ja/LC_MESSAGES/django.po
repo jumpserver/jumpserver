@@ -794,7 +794,7 @@ msgstr "レビュー担当者"
 
 #: acls/models/base.py:20
 msgid "Warn"
-msgstr "告警"
+msgstr "警告"
 
 #: acls/models/base.py:40 assets/models/_user.py:51
 #: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:93
