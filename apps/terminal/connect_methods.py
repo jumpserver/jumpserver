@@ -228,6 +228,19 @@ class ConnectMethodUtil:
         return methods
 
     @classmethod
+    def get_user_allowed_connect_methods(cls, os, user):
+        from acls.models import ConnectMethodACL
+        methods = cls.get_filtered_protocols_connect_methods(os)
+        acls = ConnectMethodACL.get_user_acls(user)
+        disabled_connect_methods = acls.values_list('connect_methods', flat=True)
+        disabled_connect_methods = set(itertools.chain.from_iterable(disabled_connect_methods))
+
+        new_queryset = {}
+        for protocol, methods in methods.items():
+            new_queryset[protocol] = [x for x in methods if x['value'] not in disabled_connect_methods]
+        return new_queryset
+
+    @classmethod
     def _filter_disable_components_connect_methods(cls, methods):
         component_setting = {
             'razor': 'TERMINAL_RAZOR_ENABLED',
