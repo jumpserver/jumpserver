@@ -28,8 +28,8 @@
         password: "{{ account.secret }}"
         host: "%"
         priv: "{{ account.username + '.*:USAGE' if db_name == '' else db_name + '.*:ALL' }}"
+      ignore_errors: true
       when: db_info is succeeded
-      register: change_info
 
     - name: Verify password
       community.mysql.mysql_info:
@@ -38,6 +38,3 @@
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         filter: version
-      when:
-        - db_info is succeeded
-        - change_info is succeeded
