@@ -38,8 +38,8 @@
         db: "{{ jms_asset.spec_info.db_name }}"
         name: "{{ account.username }}"
         password: "{{ account.secret }}"
+      ignore_errors: true
       when: db_info is succeeded
-      register: change_info
 
     - name: Verify password
       mongodb_ping:
@@ -53,6 +53,3 @@
         ssl_certfile: "{{ jms_asset.secret_info.client_key }}"
         connection_options:
           - tlsAllowInvalidHostnames: "{{ jms_asset.spec_info.allow_invalid_cert}}"
-      when:
-        - db_info is succeeded
-        - change_info is succeeded
