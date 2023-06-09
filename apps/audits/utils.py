@@ -8,6 +8,7 @@ from django.http import HttpResponse
 
 from common.utils.timezone import as_current_tz
 from common.utils import validate_ip, get_ip_city, get_logger
+from common.db.fields import RelatedManager
 from .const import DEFAULT_CITY
 
 logger = get_logger(__name__)
@@ -74,6 +75,8 @@ def _get_instance_field_value(
                 value = dict(copy.deepcopy(value))
             elif isinstance(value, datetime):
                 value = as_current_tz(value).strftime('%Y-%m-%d %H:%M:%S')
+            elif isinstance(value, RelatedManager):
+                value = value.value
             elif isinstance(f, models.OneToOneField) and isinstance(value, models.Model):
                 nested_data = _get_instance_field_value(
                     value, include_model_fields, model_need_continue_fields, ('id',)
