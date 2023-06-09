@@ -103,8 +103,6 @@ class OperatorLogHandler(metaclass=Singleton):
             return ''
         if isinstance(value[0], str):
             return ','.join(value)
-        if isinstance(value[0], dict) and value[0].get('value') and isinstance(value[0]['value'], str):
-            return ','.join([str(i['value']) for i in value])
         return json.dumps(value)
 
     def __data_processing(self, dict_item, loop=True):
