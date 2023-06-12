@@ -254,7 +254,7 @@ class ConnectionToken(JMSOrgBaseModel):
         kwargs = {
             'user': self.user,
             'asset': self.asset,
-            'account_username': self.account,
+            'account': self.account_object,
         }
         with tmp_to_org(self.asset.org_id):
             acls = CommandFilterACL.filter_queryset(**kwargs).valid()
