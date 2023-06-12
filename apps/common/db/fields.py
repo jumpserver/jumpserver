@@ -392,7 +392,8 @@ class RelatedManager:
         return self.filter_queryset_by_model(value, to_model)
 
     def get_attr_q(self):
-        q = self._get_filter_attrs_q(self.value, apps.get_model(self.field.to))
+        to_model = apps.get_model(self.field.to)
+        q = self._get_filter_attrs_q(self.value, to_model)
         return q
 
     def all(self):
