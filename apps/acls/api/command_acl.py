@@ -61,6 +61,5 @@ class CommandFilterACLViewSet(OrgBulkModelViewSet):
             'org_id': serializer.org.id
         }
         for user in reviewers:
-            AclWarnningMessage(user, context).publish()
-            # AclWarnningMessage(user, context).publish_async()
+            AclWarnningMessage(user, context).publish_async()
         return Response({'detail': 'ok'})
