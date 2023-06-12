@@ -214,7 +214,7 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
         local_path, url_or_err = storage.get_file_path_url()
         if local_path is None:
             return Response({"error": url_or_err}, status=404)
-        data = self.get_replay_data(session, url_or_err)
+        data = self.get_replay_data(session, local_path)
         return Response(data)
 
 
