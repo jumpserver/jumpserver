@@ -18,7 +18,7 @@ class UserGroupViewSet(OrgBulkModelViewSet):
     serializer_class = UserGroupSerializer
     ordering = ('name',)
     rbac_perms = (
-        ("add_all_users", "users.change_usergroup"),
+        ("add_all_users", "users.add_usergroup"),
     )
 
     @action(methods=['post'], detail=True, url_path='add-all-users')
