@@ -552,9 +552,13 @@ class JSONManyToManyField(models.JSONField):
         if val["type"] == "ids":
             if not isinstance(val["ids"], list):
                 raise ValueError(_("Invalid ids for ids, should be a list"))
+            if not val["ids"]:
+                raise ValueError(_("This field is required."))
         elif val["type"] == "attrs":
             if not isinstance(val["attrs"], list):
                 raise ValueError(_("Invalid attrs, should be a list of dict"))
+            if not val["attrs"]:
+                raise ValueError(_("This field is required."))
             for attr in val["attrs"]:
                 if not isinstance(attr, dict):
                     raise ValueError(_("Invalid attrs, should be a list of dict"))
