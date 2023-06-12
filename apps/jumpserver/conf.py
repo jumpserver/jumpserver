@@ -219,9 +219,11 @@ class Config(dict):
         'ANNOUNCEMENT_ENABLED': True,
         'ANNOUNCEMENT': {},
 
+        # 未使用的配置
         'CAPTCHA_TEST_MODE': None,
-        'TOKEN_EXPIRATION': 3600 * 24,
         'DISPLAY_PER_PAGE': 25,
+
+        'TOKEN_EXPIRATION': 3600 * 24,
         'DEFAULT_EXPIRED_YEARS': 70,
         'SESSION_COOKIE_DOMAIN': None,
         'CSRF_COOKIE_DOMAIN': None,
@@ -240,6 +242,9 @@ class Config(dict):
         # Custom Config
         'MFA_CUSTOM': False,
         'MFA_CUSTOM_FILE_MD5': '',
+
+        # 临时密码
+        'AUTH_TEMP_TOKEN': False,
 
         # Auth LDAP settings
         'AUTH_LDAP': False,
@@ -359,8 +364,6 @@ class Config(dict):
         'AUTH_OAUTH2_USER_ATTR_MAP': {
             'name': 'name', 'username': 'username', 'email': 'email'
         },
-
-        'AUTH_TEMP_TOKEN': False,
 
         # 企业微信
         'AUTH_WECOM': False,
@@ -495,9 +498,11 @@ class Config(dict):
         'HTTP_BIND_HOST': '0.0.0.0',
         'HTTP_LISTEN_PORT': 8080,
         'WS_LISTEN_PORT': 8070,
+
         'SYSLOG_ADDR': '',  # '192.168.0.1:514'
         'SYSLOG_FACILITY': 'user',
         'SYSLOG_SOCKTYPE': 2,
+
         'PERM_EXPIRED_CHECK_PERIODIC': 60 * 60,
         'FLOWER_URL': "127.0.0.1:5555",
         'LANGUAGE_CODE': 'zh',
