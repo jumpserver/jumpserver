@@ -21,7 +21,7 @@ jobs:
           TAG=$(basename ${GITHUB_REF})
           VERSION=${TAG/v/}
           wget https://raw.githubusercontent.com/jumpserver/installer/master/quick_start.sh
-          sed -i "s@Version=.*@Version=v${VERSION}@g" quick_start.sh
+          sed -i "s@VERSION=dev@VERSION=v${VERSION}@g" quick_start.sh
           echo "::set-output name=TAG::$TAG"
           echo "::set-output name=VERSION::$VERSION"
       - name: Create Release
