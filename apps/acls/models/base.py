@@ -99,6 +99,8 @@ class UserAssetAccountBaseACL(OrgModelMixin, UserBaseACL):
     accounts = models.JSONField(default=list, verbose_name=_("Accounts"))
     objects = OrgManager.from_queryset(BaseACLQuerySet)()
 
+    objects = OrgManager.from_queryset(BaseACLQuerySet)()
+
     class Meta(UserBaseACL.Meta):
         unique_together = [('name', 'org_id')]
         abstract = True
