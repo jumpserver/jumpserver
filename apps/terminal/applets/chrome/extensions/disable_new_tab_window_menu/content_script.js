@@ -40,9 +40,9 @@ document.addEventListener("contextmenu", function (event) {
     event.preventDefault();
 });
 
-var AllowedKeys = ['P', 'F', 'p', 'f']
+var AllowedKeys = ['P', 'F', 'C', 'V']
 window.addEventListener("keydown", function (e) {
-    if (e.key === "F12" || (e.ctrlKey && !AllowedKeys.includes(e.key))) {
+    if (e.key === "F12" || (e.ctrlKey && !AllowedKeys.includes(e.key.toUpperCase()))) {
         e.preventDefault();
         e.stopPropagation();
         console.log('Press key: ', e.ctrlKey ? 'Ctrl' : '', e.shiftKey ? ' Shift' : '', e.key)
