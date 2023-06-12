@@ -63,7 +63,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'verbose_name': 'Command acl',
-                'ordering': ('priority', '-date_updated', 'name'),
+                'ordering': ('priority', 'name'),
                 'unique_together': {('name', 'org_id')},
             },
         ),

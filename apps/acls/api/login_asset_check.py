@@ -43,7 +43,7 @@ class LoginAssetCheckAPI(CreateAPIView):
         queryset = queryset.filter(accounts__contains=account_username)
 
         with tmp_to_org(self.serializer.asset.org):
-            acl = queryset.order_by('priority').valid().first()
+            acl = queryset.valid().first()
 
         if acl:
             need_review = True

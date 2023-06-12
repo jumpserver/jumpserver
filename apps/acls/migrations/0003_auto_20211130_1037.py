@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('acls', '0002_auto_20210926_1047'),
     ]
@@ -12,10 +11,10 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='loginacl',
-            options={'ordering': ('priority', '-date_updated', 'name'), 'verbose_name': 'Login acl'},
+            options={'ordering': ('priority', 'name'), 'verbose_name': 'Login acl'},
         ),
         migrations.AlterModelOptions(
             name='loginassetacl',
-            options={'ordering': ('priority', '-date_updated', 'name'), 'verbose_name': 'Login asset acl'},
+            options={'ordering': ('priority', 'name'), 'verbose_name': 'Login asset acl'},
         ),
     ]
