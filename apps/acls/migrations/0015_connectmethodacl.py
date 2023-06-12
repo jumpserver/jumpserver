@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
                     models.ManyToManyField(blank=True, to=settings.AUTH_USER_MODEL, verbose_name='Reviewers')),
             ],
             options={
-                'ordering': ('priority', 'date_updated', 'name'),
+                'ordering': ('priority', 'name'),
                 'abstract': False,
             },
         ),

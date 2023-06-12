@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('terminal', '0061_applet_can_concurrent'),
     ]
@@ -13,6 +12,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='applet',
             name='edition',
-            field=models.CharField(default='community', max_length=128, verbose_name='Edition'),
+            field=models.CharField(choices=[('community', 'Community'), ('enterprise', 'Enterprise')],
+                                   default='community', max_length=128, verbose_name='Edition'),
         ),
     ]
