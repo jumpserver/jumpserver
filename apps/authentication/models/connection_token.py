@@ -16,6 +16,7 @@ from common.exceptions import JMSException
 from common.utils import lazyproperty, pretty_string, bulk_get
 from common.utils.timezone import as_current_tz
 from orgs.mixins.models import JMSOrgBaseModel
+from orgs.utils import tmp_to_org
 from terminal.models import Applet
 
 
@@ -253,9 +254,10 @@ class ConnectionToken(JMSOrgBaseModel):
         kwargs = {
             'user': self.user,
             'asset': self.asset,
-            'account': self.account_object,
+            'account_username': self.account,
         }
-        acls = CommandFilterACL.filter_queryset(**kwargs).valid()
+        with tmp_to_org(self.asset.org_id):
+            acls = CommandFilterACL.filter_queryset(**kwargs).valid()
         return acls
 
 
