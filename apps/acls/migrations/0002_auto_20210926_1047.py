@@ -2,7 +2,6 @@
 import django
 from django.conf import settings
 from django.db import migrations, models, transaction
-from acls.models import LoginACL
 
 LOGIN_CONFIRM_ZH = '登录复核'
 LOGIN_CONFIRM_EN = 'Login confirm'
@@ -90,10 +89,10 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelOptions(
             name='loginacl',
-            options={'ordering': ('priority', '-date_updated', 'name'), 'verbose_name': 'Login acl'},
+            options={'ordering': ('priority', 'name'), 'verbose_name': 'Login acl'},
         ),
         migrations.AlterModelOptions(
             name='loginassetacl',
-            options={'ordering': ('priority', '-date_updated', 'name'), 'verbose_name': 'Login asset acl'},
+            options={'ordering': ('priority', 'name'), 'verbose_name': 'Login asset acl'},
         ),
     ]

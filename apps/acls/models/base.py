@@ -6,7 +6,7 @@ from common.db.fields import JSONManyToManyField
 from common.db.models import JMSBaseModel
 from common.utils import contains_ip
 from common.utils.time_period import contains_time_period
-from orgs.mixins.models import OrgModelMixin
+from orgs.mixins.models import OrgModelMixin, OrgManager
 
 __all__ = [
     'BaseACL', 'UserBaseACL', 'UserAssetAccountBaseACL',
@@ -48,7 +48,7 @@ class BaseACL(JMSBaseModel):
     objects = BaseACLQuerySet.as_manager()
 
     class Meta:
-        ordering = ('priority', 'date_updated', 'name')
+        ordering = ('priority', 'name')
         abstract = True
 
     def is_action(self, action):
@@ -97,6 +97,7 @@ class UserAssetAccountBaseACL(OrgModelMixin, UserBaseACL):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     assets = JSONManyToManyField('assets.Asset', default=dict, verbose_name=_('Assets'))
     accounts = models.JSONField(default=list, verbose_name=_("Accounts"))
+    objects = OrgManager.from_queryset(BaseACLQuerySet)()
 
     class Meta(UserBaseACL.Meta):
         unique_together = [('name', 'org_id')]
@@ -125,4 +126,4 @@ class UserAssetAccountBaseACL(OrgModelMixin, UserBaseACL):
             kwargs['org_id'] = org_id
         if kwargs:
             queryset = queryset.filter(**kwargs)
-        return queryset.filter(is_active=True).distinct().order_by('priority', 'date_created')
+        return queryset.valid().distinct()
