@@ -12,6 +12,8 @@ __all__ = [
     'BaseACL', 'UserBaseACL', 'UserAssetAccountBaseACL',
 ]
 
+from orgs.utils import tmp_to_org
+
 
 class ActionChoices(models.TextChoices):
     reject = 'reject', _('Reject')
@@ -115,7 +117,8 @@ class UserAssetAccountBaseACL(OrgModelMixin, UserBaseACL):
             queryset = queryset.filter(q)
         if asset:
             org_id = asset.org_id
-            q = cls.assets.get_filter_q(asset)
+            with tmp_to_org(org_id):
+                q = cls.assets.get_filter_q(asset)
             queryset = queryset.filter(q)
         if account and not account_username:
             account_username = account.username
