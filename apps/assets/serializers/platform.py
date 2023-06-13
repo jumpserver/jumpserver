@@ -86,6 +86,13 @@ class PlatformProtocolSerializer(serializers.ModelSerializer):
             "secret_types", "setting",
         ]
 
+    def to_file_representation(self, data):
+        return '{name}/{port}'.format(**data)
+
+    def to_file_internal_value(self, data):
+        name, port = data.split('/')
+        return {'name': name, 'port': port}
+
 
 class PlatformCustomField(serializers.Serializer):
     TYPE_CHOICES = [(t, t) for t, c in type_field_map.items()]
