@@ -20,18 +20,18 @@ class LoginACL(UserBaseACL):
     def is_action(self, action):
         return self.action == action
 
-    def create_confirm_ticket(self, request):
+    def create_confirm_ticket(self, request, user):
         from tickets import const
         from tickets.models import ApplyLoginTicket
         from orgs.models import Organization
-        title = _('Login confirm') + ' {}'.format(request.user)
+        title = _('Login confirm') + ' {}'.format(user)
         login_ip = get_request_ip(request) if request else ''
         login_ip = login_ip or '0.0.0.0'
         login_city = get_ip_city(login_ip)
         login_datetime = local_now_display()
         data = {
             'title': title,
-            'applicant': request.user,
+            'applicant': user,
             'apply_login_ip': login_ip,
             'org_id': Organization.ROOT_ID,
             'apply_login_city': login_city,

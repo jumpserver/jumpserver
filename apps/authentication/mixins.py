@@ -375,13 +375,13 @@ class AuthACLMixin:
             return
         if not acl.is_action(acl.ActionChoices.review):
             return
-        self.get_ticket_or_create(acl)
+        self.get_ticket_or_create(acl, user)
         self.check_user_login_confirm()
 
-    def get_ticket_or_create(self, acl):
+    def get_ticket_or_create(self, acl, user):
         ticket = self.get_ticket()
         if not ticket or ticket.is_state(ticket.State.closed):
-            ticket = acl.create_confirm_ticket(self.request)
+            ticket = acl.create_confirm_ticket(self.request, user)
             self.request.session['auth_ticket_id'] = str(ticket.id)
         return ticket
 
