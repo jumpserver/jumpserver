@@ -72,7 +72,12 @@ class OperatorLogHandler(metaclass=Singleton):
         if instance_id is None:
             return log_id, before, after
 
-        log_id, cache_instance = self.get_instance_dict_from_cache(instance_id)
+        try:
+            log_id, cache_instance = self.get_instance_dict_from_cache(instance_id)
+        except Exception as err:
+            logger.error('Get instance diff from cache error: %s' % err)
+            return log_id, before, after
+
         if not cache_instance:
             return log_id, before, after
 
