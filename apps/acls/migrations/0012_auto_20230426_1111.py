@@ -25,10 +25,9 @@ def migrate_base_acl_users_assets_accounts(apps, *args):
             obj.new_assets = {"type": "attrs", "attrs": asset_attrs}
 
             account_usernames = (obj.accounts or {}).get('username_group', [])
-            obj.new_accounts = {
-                "type": "attrs",
-                "attrs": [{"name": "username", "value": account_usernames, "match": "in"}]
-            }
+            if '*' in account_usernames:
+                account_usernames = ['@ALL']
+            obj.new_accounts = account_usernames
             obj.save()
 
 
