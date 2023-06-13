@@ -119,7 +119,7 @@ def upload_ftp_file_to_external_storage(ftp_log_id, file_name):
         logger.error(f'FTP db item not found: {ftp_log_id}')
         return
     ftp_storage = FTPFileStorageHandler(ftp_log)
-    local_path, url_or_err = ftp_storage.find_local()
+    local_path, url = ftp_storage.find_local()
     if not local_path:
         logger.error(f'FTP file record not found, may be upload error. file name: {file_name}')
         return
