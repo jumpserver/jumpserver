@@ -58,7 +58,7 @@ class FTPLog(OrgModelMixin):
     filename = models.CharField(max_length=1024, verbose_name=_("Filename"))
     is_success = models.BooleanField(default=True, verbose_name=_("Success"))
     date_start = models.DateTimeField(auto_now_add=True, verbose_name=_("Date start"))
-    has_file = models.BooleanField(default=False, verbose_name=_("File Record"))
+    has_file = models.BooleanField(default=False, verbose_name=_("File"))
     session = models.CharField(max_length=36, verbose_name=_("Session"), default=uuid.uuid4)
 
     class Meta:

@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='ftplog',
             name='has_file',
-            field=models.BooleanField(default=False, verbose_name='File Record'),
+            field=models.BooleanField(default=False, verbose_name='File'),
         ),
         migrations.AddField(
             model_name='ftplog',
