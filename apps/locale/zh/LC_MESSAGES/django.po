@@ -1953,10 +1953,6 @@ msgstr "操作"
 msgid "Filename"
 msgstr "文件名"
 
-#: audits/models.py:61
-msgid "File Record"
-msgstr ""
-
 #: audits/models.py:62 terminal/backends/command/models.py:24
 #: terminal/models/session/replay.py:9 terminal/models/session/sharing.py:18
 #: terminal/models/session/sharing.py:81
