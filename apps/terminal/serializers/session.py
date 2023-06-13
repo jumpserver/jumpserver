@@ -4,6 +4,7 @@ from rest_framework import serializers
 from assets.const import Protocol
 from common.serializers.fields import LabeledChoiceField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+from .terminal import TerminalSmallSerializer
 from ..const import SessionType
 from ..models import Session
 
@@ -54,6 +55,7 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
 
 class SessionDisplaySerializer(SessionSerializer):
     command_amount = serializers.IntegerField(read_only=True, label=_('Command amount'))
+    terminal = TerminalSmallSerializer(read_only=True, label=_('Terminal'))
 
     class Meta(SessionSerializer.Meta):
         fields = SessionSerializer.Meta.fields + ['command_amount', ]
