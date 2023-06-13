@@ -442,9 +442,7 @@ class JSONManyToManyDescriptor:
         # 自定义的情况：比如 nodes, category
         res = True
         to_model = apps.get_model(self.field.to)
-        src_model = self.field.model
-        field_name = self.field.name
-        custom_attr_filter = getattr(src_model, "get_filter_{}_attr_q".format(field_name), None)
+        custom_attr_filter = getattr(to_model, "get_json_filter_attr_q", None)
 
         custom_q = Q()
         for rule in attr_rules:
@@ -510,14 +508,23 @@ class JSONManyToManyDescriptor:
         return res
 
     def get_filter_q(self, instance):
+        """
+        这个是某个 instance 获取 关联 资源的 filter q
+        :param instance:
+        :return:
+        """
         model_cls = self.field.model
         field_name = self.field.column
         q = Q(**{f'{field_name}__type': 'all'}) | \
-            Q(**{f'{field_name}__type': 'ids', f'{field_name}__ids__contains': [str(instance.id)]})
+            Q(**{
+                f'{field_name}__type': 'ids',
+                f'{field_name}__ids__contains': [str(instance.id)]
+            })
         queryset_id_attrs = model_cls.objects \
             .filter(**{'{}__type'.format(field_name): 'attrs'}) \
             .values_list('id', '{}__attrs'.format(field_name))
-        ids = [str(_id) for _id, attr_rules in queryset_id_attrs if self.is_match(instance, attr_rules)]
+        ids = [str(_id) for _id, attr_rules in queryset_id_attrs
+               if self.is_match(instance, attr_rules)]
         if ids:
             q |= Q(id__in=ids)
         return q
