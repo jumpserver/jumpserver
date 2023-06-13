@@ -138,7 +138,7 @@ class Applet(JMSBaseModel):
         name = manifest['name']
         instance = cls.objects.filter(name=name).first()
         serializer = AppletSerializer(instance=instance, data=manifest)
-        serializer.is_valid()
+        serializer.is_valid(raise_exception=True)
         instance = serializer.save(builtin=builtin)
         instance.load_platform_if_need(path)
 
