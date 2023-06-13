@@ -25,8 +25,8 @@ class DeployOptionsSerializer(serializers.Serializer):
         (2, _('Per Device')),
     )
     SESSION_PER_USER = (
-        (1, _("Disabled")),
-        (0, _("Enabled")),
+        (0, _("Disabled")),
+        (1, _("Enabled")),
     )
 
     CORE_HOST = serializers.CharField(
