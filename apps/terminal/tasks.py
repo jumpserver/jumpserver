@@ -67,7 +67,7 @@ def upload_session_replay_to_external_storage(session_id):
         return
 
     replay_storage = ReplayStorageHandler(session)
-    local_path, url_or_err = replay_storage.find_local()
+    local_path, url = replay_storage.find_local()
     if not local_path:
         logger.error(f'Session replay not found, may be upload error: {local_path}')
         return

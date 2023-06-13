@@ -117,9 +117,10 @@ class SessionViewSet(OrgBulkModelViewSet):
             url_name='replay-download')
     def download(self, request, *args, **kwargs):
         storage = self.get_storage()
-        local_path, url_or_err = storage.get_file_path_url()
+        local_path, url = storage.get_file_path_url()
         if local_path is None:
-            return Response({'error': url_or_err}, status=404)
+            # url => error message
+            return Response({'error': url}, status=404)
 
         file = self.prepare_offline_file(storage.obj, local_path)
         response = FileResponse(file)
@@ -211,10 +212,11 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
         session = get_object_or_404(Session, id=session_id)
 
         storage = ReplayStorageHandler(session)
-        local_path, url_or_err = storage.get_file_path_url()
+        local_path, url = storage.get_file_path_url()
         if local_path is None:
-            return Response({"error": url_or_err}, status=404)
-        data = self.get_replay_data(session, url_or_err)
+            # url => error message
+            return Response({"error": url}, status=404)
+        data = self.get_replay_data(session, url)
         return Response(data)
 
 
