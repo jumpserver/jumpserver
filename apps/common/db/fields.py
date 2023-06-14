@@ -295,7 +295,7 @@ class RelatedManager:
         self.instance.__dict__[self.field.name] = value
 
     @classmethod
-    def _get_filter_q(cls, value, to_model):
+    def get_to_filter_q(cls, value, to_model):
         """
         这个是 instance 去查找 to_model 的 queryset 的 Q
         :param value:
@@ -320,7 +320,7 @@ class RelatedManager:
             queryset = to_model.get_queryset()
         else:
             queryset = to_model.objects.all()
-        q = cls._get_filter_q(value, to_model)
+        q = cls.get_to_filter_q(value, to_model)
         return queryset.filter(q).distinct()
 
     @staticmethod
