@@ -32,7 +32,8 @@ class AdHocRunner:
         if self.module not in self.cmd_modules_choices:
             return
         if self.module_args and self.module_args.split()[0] in settings.SECURITY_COMMAND_BLACKLIST:
-            raise CommandInBlackListException("command not allowed:{}".format(self.module_args.split()[0]))
+            raise CommandInBlackListException(
+                "Command is rejected by black list: {}".format(self.module_args.split()[0]))
 
     def run(self, verbosity=0, **kwargs):
         self.check_module()

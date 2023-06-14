@@ -451,7 +451,7 @@ class JobExecution(JMSOrgBaseModel):
             self.set_result(cb)
             return cb
         except CommandInBlackListException as e:
-            print("command is rejected by black list: {}".format(e))
+            print(e)
         except Exception as e:
             logging.error(e, exc_info=True)
             self.set_error(e)
