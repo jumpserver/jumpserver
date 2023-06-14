@@ -27,13 +27,10 @@ class CommandFilterACLSerializer(BaseSerializer, BulkOrgResourceModelSerializer)
     command_groups = ObjectRelatedField(
         queryset=CommandGroup.objects, many=True, required=False, label=_('Command group')
     )
-    command_groups_amount = serializers.IntegerField(
-        source='command_groups.count', read_only=True, label=_('Command group amount')
-    )
 
     class Meta(BaseSerializer.Meta):
         model = CommandFilterACL
-        fields = BaseSerializer.Meta.fields + ['command_groups', 'command_groups_amount']
+        fields = BaseSerializer.Meta.fields + ['command_groups']
 
 
 class CommandReviewSerializer(serializers.Serializer):
