@@ -686,7 +686,7 @@ msgstr "特殊信息"
 
 #: accounts/serializers/account/base.py:81
 msgid "Tip: If no username is required for authentication, fill in `null`"
-msgstr "提示: 如果认证时不需要用户名，则填写为 null"
+msgstr "提示: 如果认证时不需要用户名，可填写为 null"
 
 #: accounts/serializers/automations/base.py:23
 #: assets/models/asset/common.py:155 assets/models/automations/base.py:18

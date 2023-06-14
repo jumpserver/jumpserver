@@ -69,10 +69,11 @@ class NativeClient(TextChoices):
             Protocol.rdp: [cls.mstsc],
             Protocol.mysql: [cls.db_client],
             Protocol.mariadb: [cls.db_client],
-            Protocol.oracle: [cls.db_client],
-            Protocol.postgresql: [cls.db_client],
             Protocol.redis: [cls.db_client],
             Protocol.mongodb: [cls.db_client],
+
+            Protocol.oracle: [cls.db_client],
+            Protocol.postgresql: [cls.db_client],
         }
         return clients
 
@@ -90,12 +91,17 @@ class NativeClient(TextChoices):
 
     @classmethod
     def xpack_methods(cls):
-        return [cls.sqlplus, cls.mstsc]
+        return [cls.mstsc]
+
+    @classmethod
+    def xpack_protocols(cls):
+        return [Protocol.rdp, Protocol.oracle, Protocol.clickhouse, Protocol.sqlserver]
 
     @classmethod
     def get_methods(cls, os='windows'):
         clients_map = cls.get_native_clients()
         methods = defaultdict(list)
+        xpack_protocols = cls.xpack_protocols()
 
         for protocol, _clients in clients_map.items():
             if isinstance(_clients, dict):
@@ -103,6 +109,8 @@ class NativeClient(TextChoices):
                     _clients = list(itertools.chain(*_clients.values()))
                 else:
                     _clients = _clients.get(os, _clients['default'])
+            if protocol in xpack_protocols:
+                continue
             for client in _clients:
                 if not settings.XPACK_ENABLED and client in cls.xpack_methods():
                     continue
