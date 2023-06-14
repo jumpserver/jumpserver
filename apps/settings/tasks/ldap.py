@@ -22,7 +22,7 @@ def sync_ldap_user():
     LDAPSyncUtil().perform_sync()
 
 
-@shared_task(verbose_name=_('Import ldap user'))
+@shared_task(verbose_name=_('Periodic import ldap user'))
 @transaction.atomic
 def import_ldap_user():
     logger.info("Start import ldap user task")
@@ -44,7 +44,7 @@ def import_ldap_user():
         logger.info('Imported {} users successfully'.format(len(users)))
 
 
-@shared_task(verbose_name=_('Periodic import ldap user'))
+@shared_task(verbose_name=_('Registration periodic import ldap user task'))
 @after_app_ready_start
 def import_ldap_user_periodic():
     if not settings.AUTH_LDAP:
