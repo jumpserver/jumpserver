@@ -295,7 +295,13 @@ class RelatedManager:
         self.instance.__dict__[self.field.name] = value
 
     @classmethod
-    def get_filter_q(cls, value, to_model):
+    def _get_filter_q(cls, value, to_model):
+        """
+        这个是 instance 去查找 to_model 的 queryset 的 Q
+        :param value:
+        :param to_model:
+        :return:
+        """
         if not value or not isinstance(value, dict):
             return Q()
 
@@ -314,7 +320,7 @@ class RelatedManager:
             queryset = to_model.get_queryset()
         else:
             queryset = to_model.objects.all()
-        q = cls.get_filter_q(value, to_model)
+        q = cls._get_filter_q(value, to_model)
         return queryset.filter(q).distinct()
 
     @staticmethod
@@ -442,9 +448,7 @@ class JSONManyToManyDescriptor:
         # 自定义的情况：比如 nodes, category
         res = True
         to_model = apps.get_model(self.field.to)
-        src_model = self.field.model
-        field_name = self.field.name
-        custom_attr_filter = getattr(src_model, "get_filter_{}_attr_q".format(field_name), None)
+        custom_attr_filter = getattr(to_model, "get_json_filter_attr_q", None)
 
         custom_q = Q()
         for rule in attr_rules:
@@ -513,7 +517,10 @@ class JSONManyToManyDescriptor:
         model_cls = self.field.model
         field_name = self.field.column
         q = Q(**{f'{field_name}__type': 'all'}) | \
-            Q(**{f'{field_name}__type': 'ids', f'{field_name}__ids__contains': [str(instance.id)]})
+            Q(**{
+                f'{field_name}__type': 'ids',
+                f'{field_name}__ids__contains': [str(instance.id)]
+            })
         queryset_id_attrs = model_cls.objects \
             .filter(**{'{}__type'.format(field_name): 'attrs'}) \
             .values_list('id', '{}__attrs'.format(field_name))

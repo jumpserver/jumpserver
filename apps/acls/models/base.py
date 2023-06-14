@@ -110,11 +110,11 @@ class UserAssetAccountBaseACL(OrgModelMixin, UserBaseACL):
     @classmethod
     def filter_queryset(cls, user=None, asset=None, account=None, account_username=None, **kwargs):
         queryset = cls.objects.all()
-        org_id = None
 
         if user:
             q = cls.users.get_filter_q(user)
             queryset = queryset.filter(q)
+
         if asset:
             org_id = asset.org_id
             with tmp_to_org(org_id):
@@ -127,8 +127,6 @@ class UserAssetAccountBaseACL(OrgModelMixin, UserBaseACL):
                 models.Q(accounts__contains='*') | \
                 models.Q(accounts__contains='@ALL')
             queryset = queryset.filter(q)
-        if org_id:
-            kwargs['org_id'] = org_id
         if kwargs:
             queryset = queryset.filter(**kwargs)
         return queryset.valid().distinct()
