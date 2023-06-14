@@ -92,7 +92,7 @@ class RecordViewLogMixin:
         activities = [
             ActivityLog(
                 resource_id=getattr(resource_id, 'pk', resource_id),
-                type=ActivityChoices.operate_log, detail=detail, org_id=current_org,
+                type=ActivityChoices.operate_log, detail=detail, org_id=current_org.id,
             )
             for resource_id in ids
         ]
