@@ -10,7 +10,6 @@ from rest_framework.request import Request
 from common.exceptions import UserConfirmRequired
 from common.utils import i18n_fmt
 from orgs.utils import current_org
-from orgs.models import Organization
 from audits.handler import create_or_update_operate_log
 from audits.const import ActionChoices, ActivityChoices
 from audits.models import ActivityLog
@@ -93,8 +92,7 @@ class RecordViewLogMixin:
         activities = [
             ActivityLog(
                 resource_id=getattr(resource_id, 'pk', resource_id),
-                type=ActivityChoices.operate_log, detail=detail,
-                org_id=Organization.ROOT_ID if current_org.is_root() else None,
+                type=ActivityChoices.operate_log, detail=detail, org_id=current_org,
             )
             for resource_id in ids
         ]
