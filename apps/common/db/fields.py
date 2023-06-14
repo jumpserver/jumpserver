@@ -474,7 +474,7 @@ class JSONManyToManyDescriptor:
                 res &= str(value).endswith(str(rule_value))
             elif rule_match == 'regex':
                 try:
-                    matched = bool(re.match(rule_value, value))
+                    matched = bool(re.search(r'{}'.format(rule_value), value))
                 except Exception as e:
                     logging.error('Error regex match: %s', e)
                     matched = False
