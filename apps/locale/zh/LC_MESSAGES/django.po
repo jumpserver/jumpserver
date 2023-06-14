@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-14 10:57+0800\n"
+"POT-Creation-Date: 2023-06-14 20:40+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -627,7 +627,7 @@ msgstr "账号已存在"
 #: accounts/serializers/account/account.py:420
 #: authentication/serializers/connect_token_secret.py:156
 #: authentication/templates/authentication/_access_key_modal.html:30
-#: perms/models/perm_node.py:21 users/serializers/group.py:33
+#: perms/models/perm_node.py:21 users/serializers/group.py:31
 msgid "ID"
 msgstr "ID"
 
@@ -917,10 +917,6 @@ msgstr "组织 `{}` 不存在"
 msgid "None of the reviewers belong to Organization `{}`"
 msgstr "所有复核人都不属于组织 `{}`"
 
-#: acls/serializers/command_acl.py:31
-msgid "Command group amount"
-msgstr "命令组数量"
-
 #: acls/serializers/rules/rules.py:20
 #: xpack/plugins/cloud/serializers/task.py:22
 msgid "IP address invalid: `{}`"
@@ -1080,7 +1076,7 @@ msgstr "私有云"
 
 #: assets/const/cloud.py:9
 msgid "Kubernetes"
-msgstr ""
+msgstr "Kubernetes"
 
 #: assets/const/device.py:7 terminal/models/applet/applet.py:25
 #: tickets/const.py:8
@@ -1112,7 +1108,7 @@ msgid "Website"
 msgstr "网站"
 
 #: assets/const/web.py:59 audits/const.py:47
-#: terminal/serializers/applet_host.py:28
+#: terminal/serializers/applet_host.py:32
 msgid "Disabled"
 msgstr "禁用"
 
@@ -1165,7 +1161,7 @@ msgstr "更新日期"
 #: assets/models/_user.py:30 assets/models/cmd_filter.py:44
 #: assets/models/cmd_filter.py:91 assets/models/group.py:21
 #: common/db/models.py:32 users/models/user.py:799
-#: users/serializers/group.py:31
+#: users/serializers/group.py:29
 msgid "Created by"
 msgstr "创建者"
 
@@ -1321,7 +1317,8 @@ msgstr "客户端密钥"
 msgid "Allow invalid cert"
 msgstr "忽略证书校验"
 
-#: assets/models/asset/web.py:9 assets/serializers/platform.py:30
+#: assets/models/asset/web.py:9 assets/serializers/asset/info/spec.py:16
+#: assets/serializers/platform.py:30
 msgid "Autofill"
 msgstr "自动代填"
 
@@ -1354,7 +1351,7 @@ msgstr "资产自动化任务"
 #: audits/serializers.py:49 ops/models/base.py:49 ops/models/job.py:184
 #: terminal/models/applet/applet.py:243 terminal/models/applet/host.py:136
 #: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
-#: terminal/serializers/applet_host.py:103 tickets/models/ticket/general.py:283
+#: terminal/serializers/applet_host.py:107 tickets/models/ticket/general.py:283
 #: tickets/serializers/super_ticket.py:13
 #: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:164
 #: xpack/plugins/cloud/models.py:216
@@ -1497,7 +1494,7 @@ msgid "Setting"
 msgstr "设置"
 
 #: assets/models/platform.py:31 audits/const.py:48 settings/models.py:37
-#: terminal/serializers/applet_host.py:29
+#: terminal/serializers/applet_host.py:33
 msgid "Enabled"
 msgstr "启用"
 
@@ -1639,8 +1636,8 @@ msgstr "协议是必填的: {}"
 msgid "Default database"
 msgstr "默认数据库"
 
-#: assets/serializers/asset/database.py:28 common/db/fields.py:564
-#: common/db/fields.py:569 common/serializers/fields.py:104
+#: assets/serializers/asset/database.py:28 common/db/fields.py:570
+#: common/db/fields.py:575 common/serializers/fields.py:104
 #: tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 #: xpack/plugins/cloud/serializers/account_attrs.py:79
@@ -1748,7 +1745,7 @@ msgstr "帮助"
 
 #: assets/serializers/platform.py:104
 msgid "Choices"
-msgstr ""
+msgstr "选择"
 
 #: assets/serializers/platform.py:119
 msgid "Automation"
@@ -2638,7 +2635,7 @@ msgstr "已过期"
 
 #: authentication/serializers/connection_token.py:79
 msgid "Reusable connection token is not allowed, global setting not enabled"
-msgstr ""
+msgstr "不允许使用可重复使用的连接令牌，未启用全局设置"
 
 #: authentication/serializers/password_mfa.py:16
 #: authentication/serializers/password_mfa.py:24
@@ -3084,26 +3081,29 @@ msgstr "编码数据为 text"
 msgid "Encrypt field using Secret Key"
 msgstr "加密的字段"
 
-#: common/db/fields.py:552
+#: common/db/fields.py:558
 msgid ""
 "Invalid JSON data for JSONManyToManyField, should be like {'type': 'all'} or "
 "{'type': 'ids', 'ids': []} or {'type': 'attrs', 'attrs': [{'name': 'ip', "
 "'match': 'exact', 'value': '1.1.1.1'}}"
 msgstr ""
+"JSON 多对多字段无效，应为 {'type': 'all'} 或 {'type': 'ids', 'ids': []} 或 "
+"{'type': 'attrs', 'attrs': [{'name': 'ip', 'match': 'exact', 'value': "
+"'1.1.1.1'}}"
 
-#: common/db/fields.py:559
+#: common/db/fields.py:565
 msgid "Invalid type, should be \"all\", \"ids\" or \"attrs\""
 msgstr "无效类型，应为 all、ids 或 attrs"
 
-#: common/db/fields.py:562
+#: common/db/fields.py:568
 msgid "Invalid ids for ids, should be a list"
 msgstr "无效的ID，应为列表"
 
-#: common/db/fields.py:567 common/db/fields.py:572
+#: common/db/fields.py:573 common/db/fields.py:578
 msgid "Invalid attrs, should be a list of dict"
 msgstr "无效的属性，应为dict列表"
 
-#: common/db/fields.py:574
+#: common/db/fields.py:580
 msgid "Invalid attrs, should be has name and value"
 msgstr "无效属性，应具有名称和值"
 
@@ -3297,20 +3297,20 @@ msgstr "不能包含特殊字符"
 msgid "The mobile phone number format is incorrect"
 msgstr "手机号格式不正确"
 
-#: common/views/mixins.py:73
+#: common/views/mixins.py:74
 msgid "Export all"
 msgstr "导出所有"
 
-#: common/views/mixins.py:75
+#: common/views/mixins.py:76
 msgid "Export only selected items"
 msgstr "仅导出选择项"
 
-#: common/views/mixins.py:80
+#: common/views/mixins.py:81
 #, python-format
 msgid "Export filtered: %s"
 msgstr "导出搜素: %s"
 
-#: common/views/mixins.py:89
+#: common/views/mixins.py:90
 #, python-format
 msgid "User %s view/export secret"
 msgstr "用户 %s 查看/导出 了密码"
@@ -3472,7 +3472,7 @@ msgstr "PowerShell"
 
 #: ops/const.py:51
 msgid "Python"
-msgstr ""
+msgstr "Python"
 
 #: ops/const.py:57
 msgid "Timeout"
@@ -3606,13 +3606,13 @@ msgstr "作业"
 
 #: ops/models/job.py:195
 msgid "Material"
-msgstr ""
+msgstr "Material"
 
 #: ops/models/job.py:197
 msgid "Material Type"
-msgstr ""
+msgstr "Material 类型"
 
-#: ops/models/job.py:458
+#: ops/models/job.py:460
 msgid "Job Execution"
 msgstr "作业执行"
 
@@ -3622,7 +3622,7 @@ msgstr "创建方式"
 
 #: ops/models/playbook.py:29
 msgid "VCS URL"
-msgstr ""
+msgstr "VCS URL"
 
 #: ops/notifications.py:18
 msgid "Server performance"
@@ -3676,19 +3676,19 @@ msgstr "运行 Ansible 任务"
 msgid "Run ansible task execution"
 msgstr "开始执行 Ansible 任务"
 
-#: ops/tasks.py:79
+#: ops/tasks.py:85
 msgid "Clear celery periodic tasks"
 msgstr "清理周期任务"
 
-#: ops/tasks.py:100
+#: ops/tasks.py:106
 msgid "Create or update periodic tasks"
 msgstr "创建或更新周期任务"
 
-#: ops/tasks.py:108
+#: ops/tasks.py:114
 msgid "Periodic check service performance"
 msgstr "周期检测服务性能"
 
-#: ops/tasks.py:114
+#: ops/tasks.py:120
 msgid "Clean up unexpected jobs"
 msgstr "清理异常作业"
 
@@ -4005,7 +4005,7 @@ msgstr "系统角色绑定"
 msgid "Perms"
 msgstr "权限"
 
-#: rbac/serializers/role.py:27 users/serializers/group.py:32
+#: rbac/serializers/role.py:27 users/serializers/group.py:30
 msgid "Users amount"
 msgstr "用户数量"
 
@@ -4561,7 +4561,7 @@ msgstr "模板+签名不能超过65个字"
 
 #: settings/serializers/auth/sms.py:97
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: settings/serializers/auth/sms.py:102
 msgid "Request method"
@@ -5099,7 +5099,7 @@ msgstr ""
 #: settings/serializers/settings.py:71
 #, python-format
 msgid "[%s] %s"
-msgstr ""
+msgstr "[%s] %s"
 
 #: settings/serializers/terminal.py:9
 msgid "Hostname"
@@ -5170,10 +5170,8 @@ msgid "Periodic import ldap user"
 msgstr "周期导入 LDAP 用户"
 
 #: settings/tasks/ldap.py:47
-#, fuzzy
-#| msgid "Periodic import ldap user"
 msgid "Registration periodic import ldap user task"
-msgstr "周期导入 LDAP 用户"
+msgstr "注册周期导入 LDAP 用户 任务"
 
 #: settings/utils/ldap.py:472
 msgid "ldap:// or ldaps:// protocol is used."
@@ -5627,22 +5625,22 @@ msgstr "Applet pkg 无效，缺少文件 {}"
 
 #: terminal/models/applet/applet.py:111
 msgid "Load platform.yml failed: {}"
-msgstr ""
+msgstr "加载 platform.yml 失败: {}"
 
 #: terminal/models/applet/applet.py:114
 msgid "Only support custom platform"
-msgstr ""
+msgstr "只支持自定义平台"
 
 #: terminal/models/applet/applet.py:119
 msgid "Missing type in platform.yml"
-msgstr ""
+msgstr "在 platform.yml 中缺少类型"
 
 #: terminal/models/applet/applet.py:242 terminal/models/applet/host.py:34
 #: terminal/models/applet/host.py:134
 msgid "Hosting"
 msgstr "宿主机"
 
-#: terminal/models/applet/host.py:19 terminal/serializers/applet_host.py:53
+#: terminal/models/applet/host.py:19 terminal/serializers/applet_host.py:57
 msgid "Deploy options"
 msgstr "部署参数"
 
@@ -5898,6 +5896,7 @@ msgid "Connectivity alarm"
 msgstr "可连接性告警"
 
 #: terminal/notifications.py:189
+#: terminal/templates/terminal/_msg_check_command_replay_storage_connectivity.html:4
 msgid "Invalid storage"
 msgstr "无效的存储"
 
@@ -5913,11 +5912,11 @@ msgstr "每用户"
 msgid "Per Device"
 msgstr "每设备"
 
-#: terminal/serializers/applet_host.py:33
+#: terminal/serializers/applet_host.py:37
 msgid "Core API"
 msgstr "Core 服务地址"
 
-#: terminal/serializers/applet_host.py:34
+#: terminal/serializers/applet_host.py:38
 msgid ""
 " \n"
 "        Tips: The application release machine communicates with the Core "
@@ -5934,35 +5933,35 @@ msgstr ""
 "建议填写内网地址，否则填写当前站点 URL<br>例如：https://172.16.10.110 or "
 "https://dev.jumpserver.com"
 
-#: terminal/serializers/applet_host.py:42 terminal/serializers/storage.py:168
+#: terminal/serializers/applet_host.py:46 terminal/serializers/storage.py:168
 msgid "Ignore Certificate Verification"
 msgstr "忽略证书认证"
 
-#: terminal/serializers/applet_host.py:43
+#: terminal/serializers/applet_host.py:47
 msgid "Existing RDS license"
 msgstr "已有 RDS 许可证"
 
-#: terminal/serializers/applet_host.py:44
+#: terminal/serializers/applet_host.py:48
 msgid "RDS License Server"
 msgstr "RDS 许可服务器"
 
-#: terminal/serializers/applet_host.py:45
+#: terminal/serializers/applet_host.py:49
 msgid "RDS Licensing Mode"
 msgstr "RDS 授权模式"
 
-#: terminal/serializers/applet_host.py:47
+#: terminal/serializers/applet_host.py:51
 msgid "RDS Single Session Per User"
 msgstr "RDS 单用户单会话"
 
-#: terminal/serializers/applet_host.py:48
+#: terminal/serializers/applet_host.py:52
 msgid "RDS Max Disconnection Time"
 msgstr "RDS 最大断开时间"
 
-#: terminal/serializers/applet_host.py:49
+#: terminal/serializers/applet_host.py:53
 msgid "RDS Remote App Logoff Time Limit"
 msgstr "RDS 远程应用注销时间限制"
 
-#: terminal/serializers/applet_host.py:55 terminal/serializers/terminal.py:47
+#: terminal/serializers/applet_host.py:59 terminal/serializers/terminal.py:47
 msgid "Load status"
 msgstr "负载状态"
 
@@ -6144,13 +6143,6 @@ msgstr "收集远程应用上的账号"
 msgid "Check command replay storage connectivity"
 msgstr "检查命令及录像存储可连接性 "
 
-#: terminal/templates/terminal/_msg_check_command_replay_storage_connectivity.html:4
-msgid ""
-"\n"
-"        Invalid storage\n"
-"    "
-msgstr ""
-
 #: terminal/templates/terminal/_msg_command_alert.html:10
 msgid "view"
 msgstr "查看"
@@ -6259,7 +6251,7 @@ msgstr "{} {} 工单"
 
 #: tickets/models/comment.py:14
 msgid "common"
-msgstr ""
+msgstr "常见的"
 
 #: tickets/models/comment.py:23
 msgid "User display name"
@@ -7142,7 +7134,7 @@ msgstr "谷歌云"
 
 #: xpack/plugins/cloud/const.py:26
 msgid "Fusion Compute"
-msgstr ""
+msgstr "融合计算"
 
 #: xpack/plugins/cloud/const.py:31
 msgid "Private IP"
@@ -7625,9 +7617,3 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:86
 msgid "Community edition"
 msgstr "社区版"
-
-#~ msgid "Import ldap user"
-#~ msgstr "导入 LDAP 用户"
-
-#~ msgid "Reviewers amount"
-#~ msgstr "审批人数量"
