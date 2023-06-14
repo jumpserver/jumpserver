@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-14 10:57+0800\n"
+"POT-Creation-Date: 2023-06-14 20:40+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -631,7 +631,7 @@ msgstr "アカウントはすでに存在しています"
 #: accounts/serializers/account/account.py:420
 #: authentication/serializers/connect_token_secret.py:156
 #: authentication/templates/authentication/_access_key_modal.html:30
-#: perms/models/perm_node.py:21 users/serializers/group.py:33
+#: perms/models/perm_node.py:21 users/serializers/group.py:31
 msgid "ID"
 msgstr "ID"
 
@@ -922,10 +922,6 @@ msgstr "組織 '{}'は存在しません"
 msgid "None of the reviewers belong to Organization `{}`"
 msgstr "いずれのレビューアも組織 '{}' に属していません"
 
-#: acls/serializers/command_acl.py:31
-msgid "Command group amount"
-msgstr "コマンドグループ数"
-
 #: acls/serializers/rules/rules.py:20
 #: xpack/plugins/cloud/serializers/task.py:22
 msgid "IP address invalid: `{}`"
@@ -1087,7 +1083,7 @@ msgstr "私有雲"
 
 #: assets/const/cloud.py:9
 msgid "Kubernetes"
-msgstr ""
+msgstr "Kubernetes"
 
 #: assets/const/device.py:7 terminal/models/applet/applet.py:25
 #: tickets/const.py:8
@@ -1119,7 +1115,7 @@ msgid "Website"
 msgstr "Webサイト"
 
 #: assets/const/web.py:59 audits/const.py:47
-#: terminal/serializers/applet_host.py:28
+#: terminal/serializers/applet_host.py:32
 msgid "Disabled"
 msgstr "無効"
 
@@ -1172,7 +1168,7 @@ msgstr "更新日"
 #: assets/models/_user.py:30 assets/models/cmd_filter.py:44
 #: assets/models/cmd_filter.py:91 assets/models/group.py:21
 #: common/db/models.py:32 users/models/user.py:799
-#: users/serializers/group.py:31
+#: users/serializers/group.py:29
 msgid "Created by"
 msgstr "によって作成された"
 
@@ -1328,7 +1324,8 @@ msgstr "クライアントキー"
 msgid "Allow invalid cert"
 msgstr "証明書チェックを無視"
 
-#: assets/models/asset/web.py:9 assets/serializers/platform.py:30
+#: assets/models/asset/web.py:9 assets/serializers/asset/info/spec.py:16
+#: assets/serializers/platform.py:30
 msgid "Autofill"
 msgstr "自動充填"
 
@@ -1361,7 +1358,7 @@ msgstr "アセットの自動化タスク"
 #: audits/serializers.py:49 ops/models/base.py:49 ops/models/job.py:184
 #: terminal/models/applet/applet.py:243 terminal/models/applet/host.py:136
 #: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
-#: terminal/serializers/applet_host.py:103 tickets/models/ticket/general.py:283
+#: terminal/serializers/applet_host.py:107 tickets/models/ticket/general.py:283
 #: tickets/serializers/super_ticket.py:13
 #: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:164
 #: xpack/plugins/cloud/models.py:216
@@ -1504,7 +1501,7 @@ msgid "Setting"
 msgstr "設定"
 
 #: assets/models/platform.py:31 audits/const.py:48 settings/models.py:37
-#: terminal/serializers/applet_host.py:29
+#: terminal/serializers/applet_host.py:33
 msgid "Enabled"
 msgstr "有効化"
 
@@ -1648,8 +1645,8 @@ msgstr "プロトコルが必要です: {}"
 msgid "Default database"
 msgstr "デフォルト・データベース"
 
-#: assets/serializers/asset/database.py:28 common/db/fields.py:564
-#: common/db/fields.py:569 common/serializers/fields.py:104
+#: assets/serializers/asset/database.py:28 common/db/fields.py:570
+#: common/db/fields.py:575 common/serializers/fields.py:104
 #: tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 #: xpack/plugins/cloud/serializers/account_attrs.py:79
@@ -1757,7 +1754,7 @@ msgstr "ヘルプ"
 
 #: assets/serializers/platform.py:104
 msgid "Choices"
-msgstr ""
+msgstr "せんたく"
 
 #: assets/serializers/platform.py:119
 msgid "Automation"
@@ -2664,6 +2661,8 @@ msgstr "期限切れです"
 #: authentication/serializers/connection_token.py:79
 msgid "Reusable connection token is not allowed, global setting not enabled"
 msgstr ""
+"再使用可能な接続トークンの使用は許可されていません。グローバル設定は有効に"
+"なっていません"
 
 #: authentication/serializers/password_mfa.py:16
 #: authentication/serializers/password_mfa.py:24
@@ -3117,26 +3116,29 @@ msgstr "テキストフィールドへのマーシャルデータ"
 msgid "Encrypt field using Secret Key"
 msgstr "Secret Keyを使用したフィールドの暗号化"
 
-#: common/db/fields.py:552
+#: common/db/fields.py:558
 msgid ""
 "Invalid JSON data for JSONManyToManyField, should be like {'type': 'all'} or "
 "{'type': 'ids', 'ids': []} or {'type': 'attrs', 'attrs': [{'name': 'ip', "
 "'match': 'exact', 'value': '1.1.1.1'}}"
 msgstr ""
+"JSON言語多对多字段无效，应为 ＃「タイプ」：「すべて」＃「すべて」或 "
+"｛'type'：'ids'，'ids':[]｝或 ＃タイプ：属性、属性：[＃名前：ip、照合：正確、"
+"値：1.1.1.1｝"
 
-#: common/db/fields.py:559
+#: common/db/fields.py:565
 msgid "Invalid type, should be \"all\", \"ids\" or \"attrs\""
 msgstr "無効なタイプです。all、ids、またはattrsでなければなりません"
 
-#: common/db/fields.py:562
+#: common/db/fields.py:568
 msgid "Invalid ids for ids, should be a list"
 msgstr "無効なID、リストでなければなりません"
 
-#: common/db/fields.py:567 common/db/fields.py:572
+#: common/db/fields.py:573 common/db/fields.py:578
 msgid "Invalid attrs, should be a list of dict"
 msgstr "無効な属性、dictリストでなければなりません"
 
-#: common/db/fields.py:574
+#: common/db/fields.py:580
 msgid "Invalid attrs, should be has name and value"
 msgstr "名前と値が必要な無効な属性"
 
@@ -3332,20 +3334,20 @@ msgstr "特殊文字を含むべきではない"
 msgid "The mobile phone number format is incorrect"
 msgstr "携帯電話番号の形式が正しくありません"
 
-#: common/views/mixins.py:73
+#: common/views/mixins.py:74
 msgid "Export all"
 msgstr "すべてエクスポート"
 
-#: common/views/mixins.py:75
+#: common/views/mixins.py:76
 msgid "Export only selected items"
 msgstr "選択項目のみエクスポート"
 
-#: common/views/mixins.py:80
+#: common/views/mixins.py:81
 #, python-format
 msgid "Export filtered: %s"
 msgstr "検索のエクスポート: %s"
 
-#: common/views/mixins.py:89
+#: common/views/mixins.py:90
 #, python-format
 msgid "User %s view/export secret"
 msgstr "ユーザー %s がパスワードを閲覧/導き出しました"
@@ -3512,7 +3514,7 @@ msgstr "PowerShell"
 
 #: ops/const.py:51
 msgid "Python"
-msgstr ""
+msgstr "Python"
 
 #: ops/const.py:57
 msgid "Timeout"
@@ -3646,13 +3648,13 @@ msgstr "ジョブ＃ジョブ＃"
 
 #: ops/models/job.py:195
 msgid "Material"
-msgstr ""
+msgstr "Material"
 
 #: ops/models/job.py:197
 msgid "Material Type"
-msgstr ""
+msgstr "Material を選択してオプションを設定します。"
 
-#: ops/models/job.py:458
+#: ops/models/job.py:460
 msgid "Job Execution"
 msgstr "ジョブ実行"
 
@@ -3662,7 +3664,7 @@ msgstr "创建方式"
 
 #: ops/models/playbook.py:29
 msgid "VCS URL"
-msgstr ""
+msgstr "VCS URL"
 
 #: ops/notifications.py:18
 msgid "Server performance"
@@ -3716,19 +3718,19 @@ msgstr "Ansible タスクを実行する"
 msgid "Run ansible task execution"
 msgstr "Ansible タスクの実行を開始する"
 
-#: ops/tasks.py:79
+#: ops/tasks.py:85
 msgid "Clear celery periodic tasks"
 msgstr "タスクログを定期的にクリアする"
 
-#: ops/tasks.py:100
+#: ops/tasks.py:106
 msgid "Create or update periodic tasks"
 msgstr "定期的なタスクの作成または更新"
 
-#: ops/tasks.py:108
+#: ops/tasks.py:114
 msgid "Periodic check service performance"
 msgstr "サービスのパフォーマンスを定期的に確認する"
 
-#: ops/tasks.py:114
+#: ops/tasks.py:120
 msgid "Clean up unexpected jobs"
 msgstr "例外ジョブのクリーンアップ"
 
@@ -4047,7 +4049,7 @@ msgstr "システムロールバインディング"
 msgid "Perms"
 msgstr "パーマ"
 
-#: rbac/serializers/role.py:27 users/serializers/group.py:32
+#: rbac/serializers/role.py:27 users/serializers/group.py:30
 msgid "Users amount"
 msgstr "ユーザー数"
 
@@ -4604,7 +4606,7 @@ msgstr "署名+テンプレートの長さは65文字以内"
 
 #: settings/serializers/auth/sms.py:97
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: settings/serializers/auth/sms.py:102
 msgid "Request method"
@@ -5166,7 +5168,7 @@ msgstr ""
 #: settings/serializers/settings.py:71
 #, python-format
 msgid "[%s] %s"
-msgstr ""
+msgstr "[%s] %s"
 
 #: settings/serializers/terminal.py:9
 msgid "Hostname"
@@ -5240,10 +5242,8 @@ msgid "Periodic import ldap user"
 msgstr "LDAP ユーザーを定期的にインポートする"
 
 #: settings/tasks/ldap.py:47
-#, fuzzy
-#| msgid "Periodic import ldap user"
 msgid "Registration periodic import ldap user task"
-msgstr "LDAP ユーザーを定期的にインポートする"
+msgstr "登録サイクルLDAPユーザータスクのインポート"
 
 #: settings/utils/ldap.py:472
 msgid "ldap:// or ldaps:// protocol is used."
@@ -5707,22 +5707,22 @@ msgstr "無効なアプレット パッケージ、ファイル {} がありま�
 
 #: terminal/models/applet/applet.py:111
 msgid "Load platform.yml failed: {}"
-msgstr ""
+msgstr "platform.ymlのロードに失敗しました:{}"
 
 #: terminal/models/applet/applet.py:114
 msgid "Only support custom platform"
-msgstr ""
+msgstr "カスタムプラットフォームのみをサポート"
 
 #: terminal/models/applet/applet.py:119
 msgid "Missing type in platform.yml"
-msgstr ""
+msgstr "platform.ymlにタイプがありません"
 
 #: terminal/models/applet/applet.py:242 terminal/models/applet/host.py:34
 #: terminal/models/applet/host.py:134
 msgid "Hosting"
 msgstr "ホスト マシン"
 
-#: terminal/models/applet/host.py:19 terminal/serializers/applet_host.py:53
+#: terminal/models/applet/host.py:19 terminal/serializers/applet_host.py:57
 msgid "Deploy options"
 msgstr "展開パラメーター"
 
@@ -5978,6 +5978,7 @@ msgid "Connectivity alarm"
 msgstr "接続性アラーム"
 
 #: terminal/notifications.py:189
+#: terminal/templates/terminal/_msg_check_command_replay_storage_connectivity.html:4
 msgid "Invalid storage"
 msgstr "無効なストレージ"
 
@@ -5993,11 +5994,11 @@ msgstr "セッションごと"
 msgid "Per Device"
 msgstr "デバイスごと"
 
-#: terminal/serializers/applet_host.py:33
+#: terminal/serializers/applet_host.py:37
 msgid "Core API"
 msgstr "コア サービス アドレス"
 
-#: terminal/serializers/applet_host.py:34
+#: terminal/serializers/applet_host.py:38
 msgid ""
 " \n"
 "        Tips: The application release machine communicates with the Core "
@@ -6016,35 +6017,35 @@ msgstr ""
 "URL を入力します。<br>例: https://172.16.10.110 または https://dev."
 "jumpserver.com"
 
-#: terminal/serializers/applet_host.py:42 terminal/serializers/storage.py:168
+#: terminal/serializers/applet_host.py:46 terminal/serializers/storage.py:168
 msgid "Ignore Certificate Verification"
 msgstr "証明書の検証を無視する"
 
-#: terminal/serializers/applet_host.py:43
+#: terminal/serializers/applet_host.py:47
 msgid "Existing RDS license"
 msgstr "既存の RDS 証明書"
 
-#: terminal/serializers/applet_host.py:44
+#: terminal/serializers/applet_host.py:48
 msgid "RDS License Server"
 msgstr "RDS ライセンス サーバー"
 
-#: terminal/serializers/applet_host.py:45
+#: terminal/serializers/applet_host.py:49
 msgid "RDS Licensing Mode"
 msgstr "RDS 認可モード"
 
-#: terminal/serializers/applet_host.py:47
+#: terminal/serializers/applet_host.py:51
 msgid "RDS Single Session Per User"
 msgstr "RDS シングル ユーザー シングル セッション"
 
-#: terminal/serializers/applet_host.py:48
+#: terminal/serializers/applet_host.py:52
 msgid "RDS Max Disconnection Time"
 msgstr "最大切断時間"
 
-#: terminal/serializers/applet_host.py:49
+#: terminal/serializers/applet_host.py:53
 msgid "RDS Remote App Logoff Time Limit"
 msgstr "RDS 远程应用注销时间限制"
 
-#: terminal/serializers/applet_host.py:55 terminal/serializers/terminal.py:47
+#: terminal/serializers/applet_host.py:59 terminal/serializers/terminal.py:47
 msgid "Load status"
 msgstr "ロードステータス"
 
@@ -6229,13 +6230,6 @@ msgstr "リモートアプリケーション上のアカウントを収集する
 msgid "Check command replay storage connectivity"
 msgstr "チェックコマンドと録画ストレージの接続性"
 
-#: terminal/templates/terminal/_msg_check_command_replay_storage_connectivity.html:4
-msgid ""
-"\n"
-"        Invalid storage\n"
-"    "
-msgstr ""
-
 #: terminal/templates/terminal/_msg_command_alert.html:10
 msgid "view"
 msgstr "表示"
@@ -6348,7 +6342,7 @@ msgstr "{} {} チケット"
 
 #: tickets/models/comment.py:14
 msgid "common"
-msgstr ""
+msgstr "ありふれた"
 
 #: tickets/models/comment.py:23
 msgid "User display name"
@@ -7246,7 +7240,7 @@ msgstr "谷歌雲"
 
 #: xpack/plugins/cloud/const.py:26
 msgid "Fusion Compute"
-msgstr ""
+msgstr "融合計算"
 
 #: xpack/plugins/cloud/const.py:31
 msgid "Private IP"
@@ -7732,9 +7726,3 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:86
 msgid "Community edition"
 msgstr "コミュニティ版"
-
-#~ msgid "Import ldap user"
-#~ msgstr "LDAP ユーザーのインポート"
-
-#~ msgid "Reviewers amount"
-#~ msgstr "承認者数"
