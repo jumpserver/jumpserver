@@ -214,5 +214,5 @@ class AttrRulesFilterBackend(filters.BaseFilterBackend):
             raise ValidationError({'attr_rules': 'attr_rules should be json'})
 
         logging.debug('attr_rules: %s', attr_rules)
-        q = RelatedManager.get_filter_q(attr_rules, queryset.model)
+        q = RelatedManager.get_to_filter_q(attr_rules, queryset.model)
         return queryset.filter(q).distinct()
