@@ -19,7 +19,7 @@ from simple_history.models import HistoricalRecords
 from accounts.models import Account
 from acls.models import CommandFilterACL
 from assets.models import Asset
-from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner
+from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner, CommandInBlackListException
 from ops.mixin import PeriodTaskModelMixin
 from ops.variables import *
 from ops.const import Types, Modules, RunasPolicies, JobStatus
@@ -450,6 +450,8 @@ class JobExecution(JMSOrgBaseModel):
             cb = runner.run(**kwargs)
             self.set_result(cb)
             return cb
+        except CommandInBlackListException as e:
+            print("command is rejected by black list: {}".format(e))
         except Exception as e:
             logging.error(e, exc_info=True)
             self.set_error(e)
