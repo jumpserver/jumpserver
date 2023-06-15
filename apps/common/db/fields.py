@@ -378,9 +378,16 @@ class RelatedManager:
 
             if match == 'ip_in':
                 q = cls.get_ip_in_q(name, val)
-            elif match in ("exact", "contains", "startswith", "endswith", "regex", "gte", "lte", "gt", "lt"):
+            elif match in ("exact", "contains", "startswith", "endswith", "gte", "lte", "gt", "lt"):
                 lookup = "{}__{}".format(name, match)
                 q = Q(**{lookup: val})
+            elif match == 'regex':
+                try:
+                    re.compile(val)
+                    lookup = "{}__{}".format(name, match)
+                    q = Q(**{lookup: val})
+                except re.error:
+                    q = ~Q()
             elif match == "not":
                 q = ~Q(**{name: val})
             elif match in ['m2m', 'in']:
