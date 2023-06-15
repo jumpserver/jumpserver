@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-14 20:40+0800\n"
+"POT-Creation-Date: 2023-06-15 15:35+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,7 +28,7 @@ msgstr "パラメータ 'action' は [{}] でなければなりません。"
 #: authentication/confirm/password.py:9 authentication/forms.py:32
 #: authentication/templates/authentication/login.html:274
 #: settings/serializers/auth/ldap.py:25 settings/serializers/auth/ldap.py:47
-#: users/forms/profile.py:22 users/serializers/user.py:105
+#: users/forms/profile.py:22 users/serializers/user.py:104
 #: users/templates/users/_msg_user_created.html:13
 #: users/templates/users/user_password_verify.html:18
 #: xpack/plugins/cloud/serializers/account_attrs.py:28
@@ -505,7 +505,7 @@ msgstr "特権アカウント"
 #: assets/models/automations/base.py:21 assets/models/cmd_filter.py:39
 #: assets/models/label.py:22
 #: authentication/serializers/connect_token_secret.py:114
-#: terminal/models/applet/applet.py:39 users/serializers/user.py:170
+#: terminal/models/applet/applet.py:39 users/serializers/user.py:169
 msgid "Is active"
 msgstr "アクティブです。"
 
@@ -1281,7 +1281,7 @@ msgstr "資産ハードウェア情報の収集"
 
 #: assets/models/asset/common.py:159 assets/serializers/asset/custom.py:14
 msgid "Custom info"
-msgstr "自动化信息"
+msgstr "カスタム属性"
 
 #: assets/models/asset/common.py:335
 msgid "Can refresh asset hardware info"
@@ -1645,8 +1645,8 @@ msgstr "プロトコルが必要です: {}"
 msgid "Default database"
 msgstr "デフォルト・データベース"
 
-#: assets/serializers/asset/database.py:28 common/db/fields.py:570
-#: common/db/fields.py:575 common/serializers/fields.py:104
+#: assets/serializers/asset/database.py:28 common/db/fields.py:579
+#: common/db/fields.py:584 common/serializers/fields.py:104
 #: tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 #: xpack/plugins/cloud/serializers/account_attrs.py:79
@@ -2654,7 +2654,7 @@ msgstr "アクション"
 
 #: authentication/serializers/connection_token.py:44
 #: perms/serializers/permission.py:38 perms/serializers/permission.py:57
-#: users/serializers/user.py:97 users/serializers/user.py:173
+#: users/serializers/user.py:96 users/serializers/user.py:172
 msgid "Is expired"
 msgstr "期限切れです"
 
@@ -2680,8 +2680,8 @@ msgid "The {} cannot be empty"
 msgstr "{} 空にしてはならない"
 
 #: authentication/serializers/token.py:79 perms/serializers/permission.py:37
-#: perms/serializers/permission.py:58 users/serializers/user.py:98
-#: users/serializers/user.py:171
+#: perms/serializers/permission.py:58 users/serializers/user.py:97
+#: users/serializers/user.py:170
 msgid "Is valid"
 msgstr "有効です"
 
@@ -3116,7 +3116,7 @@ msgstr "テキストフィールドへのマーシャルデータ"
 msgid "Encrypt field using Secret Key"
 msgstr "Secret Keyを使用したフィールドの暗号化"
 
-#: common/db/fields.py:558
+#: common/db/fields.py:567
 msgid ""
 "Invalid JSON data for JSONManyToManyField, should be like {'type': 'all'} or "
 "{'type': 'ids', 'ids': []} or {'type': 'attrs', 'attrs': [{'name': 'ip', "
@@ -3126,19 +3126,19 @@ msgstr ""
 "｛'type'：'ids'，'ids':[]｝或 ＃タイプ：属性、属性：[＃名前：ip、照合：正確、"
 "値：1.1.1.1｝"
 
-#: common/db/fields.py:565
+#: common/db/fields.py:574
 msgid "Invalid type, should be \"all\", \"ids\" or \"attrs\""
 msgstr "無効なタイプです。all、ids、またはattrsでなければなりません"
 
-#: common/db/fields.py:568
+#: common/db/fields.py:577
 msgid "Invalid ids for ids, should be a list"
 msgstr "無効なID、リストでなければなりません"
 
-#: common/db/fields.py:573 common/db/fields.py:578
+#: common/db/fields.py:582 common/db/fields.py:587
 msgid "Invalid attrs, should be a list of dict"
 msgstr "無効な属性、dictリストでなければなりません"
 
-#: common/db/fields.py:580
+#: common/db/fields.py:589
 msgid "Invalid attrs, should be has name and value"
 msgstr "名前と値が必要な無効な属性"
 
@@ -3654,7 +3654,7 @@ msgstr "Material"
 msgid "Material Type"
 msgstr "Material を選択してオプションを設定します。"
 
-#: ops/models/job.py:460
+#: ops/models/job.py:461
 msgid "Job Execution"
 msgstr "ジョブ実行"
 
@@ -6711,7 +6711,7 @@ msgstr "公開キー"
 msgid "Force enable"
 msgstr "強制有効"
 
-#: users/models/user.py:765 users/serializers/user.py:172
+#: users/models/user.py:765 users/serializers/user.py:171
 msgid "Is service account"
 msgstr "サービスアカウントです"
 
@@ -6723,7 +6723,7 @@ msgstr "アバター"
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user.py:773 users/serializers/user.py:109
+#: users/models/user.py:773 users/serializers/user.py:108
 msgid "Phone"
 msgstr "電話"
 
@@ -6740,7 +6740,7 @@ msgid "Secret key"
 msgstr "秘密キー"
 
 #: users/models/user.py:794 users/serializers/profile.py:149
-#: users/serializers/user.py:169
+#: users/serializers/user.py:168
 msgid "Is first login"
 msgstr "最初のログインです"
 
@@ -6823,55 +6823,55 @@ msgstr "新しいパスワードを最後の {} 個のパスワードにする�
 msgid "The newly set password is inconsistent"
 msgstr "新しく設定されたパスワードが一致しない"
 
-#: users/serializers/user.py:43
+#: users/serializers/user.py:42
 msgid "System roles"
 msgstr "システムの役割"
 
-#: users/serializers/user.py:47
+#: users/serializers/user.py:46
 msgid "Org roles"
 msgstr "組織ロール"
 
-#: users/serializers/user.py:90
+#: users/serializers/user.py:89
 msgid "Password strategy"
 msgstr "パスワード戦略"
 
-#: users/serializers/user.py:92
+#: users/serializers/user.py:91
 msgid "MFA enabled"
 msgstr "MFA有効化"
 
-#: users/serializers/user.py:94
+#: users/serializers/user.py:93
 msgid "MFA force enabled"
 msgstr "MFAフォース有効化"
 
-#: users/serializers/user.py:96
+#: users/serializers/user.py:95
 msgid "Login blocked"
 msgstr "ログインがロックされました"
 
-#: users/serializers/user.py:99 users/serializers/user.py:177
+#: users/serializers/user.py:98 users/serializers/user.py:176
 msgid "Is OTP bound"
 msgstr "仮想MFAがバインドされているか"
 
-#: users/serializers/user.py:101
+#: users/serializers/user.py:100
 msgid "Can public key authentication"
 msgstr "公開鍵認証が可能"
 
-#: users/serializers/user.py:174
+#: users/serializers/user.py:173
 msgid "Avatar url"
 msgstr "アバターURL"
 
-#: users/serializers/user.py:178
+#: users/serializers/user.py:177
 msgid "MFA level"
 msgstr "MFA レベル"
 
-#: users/serializers/user.py:284
+#: users/serializers/user.py:283
 msgid "Select users"
 msgstr "ユーザーの選択"
 
-#: users/serializers/user.py:285
+#: users/serializers/user.py:284
 msgid "For security, only list several users"
 msgstr "セキュリティのために、複数のユーザーのみをリストします"
 
-#: users/serializers/user.py:318
+#: users/serializers/user.py:317
 msgid "name not unique"
 msgstr "名前が一意ではない"
 
