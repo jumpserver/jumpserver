@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-import phonenumbers
 
 from functools import partial
 
@@ -132,7 +131,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
             "last_login", "date_updated"  # 日期字段
         ]
         fields_bool = [
-            "is_superuser",
+            "is_superuser", "is_org_admin",
             "is_service_account", "is_valid",
             "is_expired", "is_active",  # 布尔字段
             "is_otp_secret_key_bound", "can_public_key_auth",
