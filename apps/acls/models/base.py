@@ -51,7 +51,7 @@ class BaseACL(JMSBaseModel):
     objects = BaseACLQuerySet.as_manager()
 
     class Meta:
-        ordering = ('priority', 'name')
+        ordering = ('priority', '-is_active', 'name')
         abstract = True
 
     def is_action(self, action):

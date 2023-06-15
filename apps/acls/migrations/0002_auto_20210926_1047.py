@@ -89,10 +89,10 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelOptions(
             name='loginacl',
-            options={'ordering': ('priority', 'name'), 'verbose_name': 'Login acl'},
+            options={'ordering': ('priority', '-is_active', 'name'), 'verbose_name': 'Login acl'},
         ),
         migrations.AlterModelOptions(
             name='loginassetacl',
-            options={'ordering': ('priority', 'name'), 'verbose_name': 'Login asset acl'},
+            options={'ordering': ('priority', '-is_active', 'name'), 'verbose_name': 'Login asset acl'},
         ),
     ]

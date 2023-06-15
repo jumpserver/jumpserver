@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
                                            to=settings.AUTH_USER_MODEL, verbose_name='User')),
             ],
             options={
-                'ordering': ('priority', 'name'),
+                'ordering': ('priority', '-is_active', 'name'),
             },
         ),
         migrations.CreateModel(
@@ -68,7 +68,7 @@ class Migration(migrations.Migration):
                                         verbose_name='Reviewers')),
             ],
             options={
-                'ordering': ('priority', 'name'),
+                'ordering': ('priority', '-is_active', 'name'),
                 'unique_together': {('name', 'org_id')},
             },
         ),
