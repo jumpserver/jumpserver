@@ -1,14 +1,15 @@
 # ~*~ coding: utf-8 ~*~
+from functools import reduce
 
 from django.db.models import Q
+from django.utils.translation import gettext_lazy as _
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
-from django.utils.translation import gettext_lazy as _
 
 from assets.locks import NodeAddChildrenLock
+from common.exceptions import JMSException
 from common.tree import TreeNodeSerializer
 from common.utils import get_logger
-from common.exceptions import JMSException
 from orgs.mixins import generics
 from orgs.utils import current_org
 from .mixin import SerializeToTreeNodeMixin
@@ -139,13 +140,34 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
             assets = assets.filter(q)
         return assets
 
+    @property
+    def key(self):
+        return self.request.query_params.get("key")
+
     def list(self, request, *args, **kwargs):
-        nodes = self.filter_queryset(self.get_queryset()).order_by('value')
-        nodes = self.serialize_nodes(nodes, with_asset_amount=True)
+        nodes = Node.objects.none()
         assets = self.filter_queryset_for_assets(self.get_queryset_for_assets())
-        node_key = self.instance.key if self.instance else None
-        assets = self.serialize_assets(assets, node_key=node_key)
-        data = [*nodes, *assets]
+
+        if not self.key:
+            nodes = reduce(lambda x, y: x | y, [asset.nodes.all() for asset in assets], nodes)
+        nodes = self.filter_queryset((self.get_queryset() | nodes).distinct()).order_by('value')
+
+        node_asset_map = {}
+        for key, asset_id in assets.values_list('nodes__key', 'id'):
+            node_asset_map.setdefault(key, []).append(str(asset_id))
+        asset_id_map = {str(asset.id): asset for asset in assets}
+
+        assets_tree = [
+            *(
+                self.serialize_assets(
+                    [asset_id_map.get(asset_id) for asset_id in asset_ids],
+                    pid=key
+                )
+                for key, asset_ids in node_asset_map.items()
+            )
+        ]
+        nodes_tree = self.serialize_nodes(nodes, with_asset_amount=True)
+        data = [*nodes_tree, *assets_tree]
         return Response(data=data)
 
 
