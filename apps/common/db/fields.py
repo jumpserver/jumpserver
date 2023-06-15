@@ -500,6 +500,8 @@ class JSONManyToManyDescriptor:
                     value = value.values_list('id', flat=True)
                 elif isinstance(value, models.Model):
                     value = [value.id]
+                if isinstance(rule_value, (str, int)):
+                    rule_value = [rule_value]
                 value = set(map(str, value))
                 rule_value = set(map(str, rule_value))
                 res &= bool(value & rule_value)
