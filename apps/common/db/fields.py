@@ -502,7 +502,7 @@ class JSONManyToManyDescriptor:
                     value = [value.id]
                 value = set(map(str, value))
                 rule_value = set(map(str, rule_value))
-                res &= value & rule_value
+                res &= bool(value & rule_value)
             else:
                 logging.error("unknown match: {}".format(rule['match']))
                 res &= False
