@@ -1,11 +1,12 @@
 - hosts: custom
   gather_facts: no
   vars:
+    ansible_shell_type: sh
     ansible_connection: local
 
   tasks:
-    - name: Test asset connection
-      ssh_ping:
+    - name: Test asset connection (pyfreerdp)
+      rdp_ping:
         login_user: "{{ jms_account.username }}"
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"

@@ -1,11 +1,12 @@
 - hosts: custom
   gather_facts: no
   vars:
+    ansible_shell_type: sh
     ansible_connection: local
 
   tasks:
-    - name: Verify account
-      ssh_ping:
+    - name: Verify account (pyfreerdp)
+      rdp_ping:
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         login_user: "{{ account.username }}"
