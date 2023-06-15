@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('acls', '0016_auto_20230606_1857'),
     ]
@@ -12,6 +11,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='connectmethodacl',
-            options={'ordering': ('priority', 'name'), 'verbose_name': 'Connect method acl'},
+            options={'ordering': ('priority', '-is_active', 'name'), 'verbose_name': 'Connect method acl'},
         ),
     ]
