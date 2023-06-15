@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.fields import ChoiceField, empty
 
-from common.db.fields import TreeChoices
+from common.db.fields import TreeChoices, JSONManyToManyField as ModelJSONManyToManyField
 from common.local import add_encrypted_field_set
 from common.utils import decrypt_password
 
@@ -20,6 +20,7 @@ __all__ = [
     "TreeChoicesField",
     "LabeledMultipleChoiceField",
     "PhoneField",
+    "JSONManyToManyField"
 ]
 
 
@@ -213,6 +214,32 @@ class BitChoicesField(TreeChoicesField):
 class PhoneField(serializers.CharField):
     def to_representation(self, value):
         if value:
-            phone = phonenumbers.parse(value, 'CN')
-            value = {'code': '+%s' % phone.country_code, 'phone': phone.national_number}
+            try:
+                phone = phonenumbers.parse(value, 'CN')
+                value = {'code': '+%s' % phone.country_code, 'phone': phone.national_number}
+            except phonenumbers.NumberParseException:
+                value = {'code': '+86', 'phone': value}
         return value
+
+
+class JSONManyToManyField(serializers.JSONField):
+    def to_representation(self, manager):
+        if manager is None:
+            return manager
+        value = manager.value
+        if not isinstance(value, dict):
+            return {"type": "ids", "ids": []}
+        if value.get("type") == "ids":
+            valid_ids = manager.all().values_list("id", flat=True)
+            valid_ids = [str(i) for i in valid_ids]
+            return {"type": "ids", "ids": valid_ids}
+        return value
+
+    def to_internal_value(self, data):
+        if not data:
+            data = {}
+        try:
+            ModelJSONManyToManyField.check_value(data)
+        except ValueError as e:
+            raise serializers.ValidationError(e)
+        return super().to_internal_value(data)

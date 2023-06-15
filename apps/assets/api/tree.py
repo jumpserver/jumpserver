@@ -3,10 +3,12 @@
 from django.db.models import Q
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
+from django.utils.translation import gettext_lazy as _
 
 from assets.locks import NodeAddChildrenLock
 from common.tree import TreeNodeSerializer
 from common.utils import get_logger
+from common.exceptions import JMSException
 from orgs.mixins import generics
 from orgs.utils import current_org
 from .mixin import SerializeToTreeNodeMixin
@@ -41,7 +43,11 @@ class NodeChildrenApi(generics.ListCreateAPIView):
             data = serializer.validated_data
             _id = data.get("id")
             value = data.get("value")
-            if not value:
+            if value:
+                children = self.instance.get_children()
+                if children.filter(value=value).exists():
+                    raise JMSException(_('The same level node name cannot be the same'))
+            else:
                 value = self.instance.get_next_child_preset_name()
             node = self.instance.create_child(value=value, _id=_id)
             # 避免查询 full value

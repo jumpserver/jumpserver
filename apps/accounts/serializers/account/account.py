@@ -5,6 +5,7 @@ from django.db import IntegrityError
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
+from rest_framework.generics import get_object_or_404
 from rest_framework.validators import UniqueTogetherValidator
 
 from accounts.const import SecretType, Source, AccountInvalidPolicy
@@ -22,8 +23,8 @@ logger = get_logger(__name__)
 
 class AccountCreateUpdateSerializerMixin(serializers.Serializer):
     template = serializers.PrimaryKeyRelatedField(
-        queryset=AccountTemplate.objects,
-        required=False, label=_("Template"), write_only=True
+        queryset=AccountTemplate.objects, required=False,
+        label=_("Template"), write_only=True, allow_null=True
     )
     push_now = serializers.BooleanField(
         default=False, label=_("Push now"), write_only=True
@@ -33,7 +34,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
     )
     on_invalid = LabeledChoiceField(
         choices=AccountInvalidPolicy.choices, default=AccountInvalidPolicy.ERROR,
-        write_only=True, label=_('Exist policy')
+        write_only=True, allow_null=True, label=_('Exist policy'),
     )
     _template = None
     clean_auth_fields: callable
@@ -59,10 +60,6 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             asset = data.get('asset') or self.instance.asset
             self.from_template_if_need(data)
             self.set_uniq_name_if_need(data, asset)
-
-    def to_internal_value(self, data):
-        self.from_template_if_need(data)
-        return super().to_internal_value(data)
 
     def set_uniq_name_if_need(self, initial_data, asset):
         name = initial_data.get('name')
@@ -105,6 +102,15 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
                 continue
             attrs[name] = value
         initial_data.update(attrs)
+        initial_data.update({
+            'source': Source.TEMPLATE,
+            'source_id': str(template.id)
+        })
+        asset_id = initial_data.get('asset')
+        if isinstance(asset_id, list) or not asset_id:
+            return
+        asset = get_object_or_404(Asset, pk=asset_id)
+        initial_data['su_from'] = template.get_su_from_account(asset)
 
     @staticmethod
     def push_account_if_need(instance, push_now, params, stat):
@@ -149,19 +155,10 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         else:
             raise serializers.ValidationError('Account already exists')
 
-    def generate_source_data(self, validated_data):
-        template = self._template
-        if template is None:
-            return
-
-        validated_data['source'] = Source.TEMPLATE
-        validated_data['source_id'] = str(template.id)
-
     def create(self, validated_data):
         push_now = validated_data.pop('push_now', None)
         params = validated_data.pop('params', None)
         self.clean_auth_fields(validated_data)
-        self.generate_source_data(validated_data)
         instance, stat = self.do_create(validated_data)
         self.push_account_if_need(instance, push_now, params, stat)
         return instance
@@ -201,8 +198,11 @@ class AccountAssetSerializer(serializers.ModelSerializer):
 
 class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerializer):
     asset = AccountAssetSerializer(label=_('Asset'))
-    source = LabeledChoiceField(choices=Source.choices, label=_("Source"), read_only=True)
     has_secret = serializers.BooleanField(label=_("Has secret"), read_only=True)
+    source = LabeledChoiceField(
+        choices=Source.choices, label=_("Source"), required=False,
+        allow_null=True, default=Source.LOCAL
+    )
     su_from = ObjectRelatedField(
         required=False, queryset=Account.objects, allow_null=True, allow_empty=True,
         label=_('Su from'), attrs=('id', 'name', 'username')
@@ -215,11 +215,12 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
             'source', 'source_id', 'connectivity',
         ] + AccountCreateUpdateSerializerMixin.Meta.fields
         read_only_fields = BaseAccountSerializer.Meta.read_only_fields + [
-            'source', 'source_id', 'connectivity'
+            'connectivity'
         ]
         extra_kwargs = {
             **BaseAccountSerializer.Meta.extra_kwargs,
             'name': {'required': False},
+            'source_id': {'required': False, 'allow_null': True},
         }
 
     @classmethod
@@ -253,11 +254,14 @@ class AssetAccountBulkSerializer(
         fields = [
             'name', 'username', 'secret', 'secret_type', 'passphrase',
             'privileged', 'is_active', 'comment', 'template',
-            'on_invalid', 'push_now', 'assets', 'su_from_username'
+            'on_invalid', 'push_now', 'assets', 'su_from_username',
+            'source', 'source_id',
         ]
         extra_kwargs = {
             'name': {'required': False},
             'secret_type': {'required': False},
+            'source': {'required': False, 'allow_null': True},
+            'source_id': {'required': False, 'allow_null': True},
         }
 
     def set_initial_value(self):
@@ -397,7 +401,6 @@ class AssetAccountBulkSerializer(
 
     def create(self, validated_data):
         push_now = validated_data.pop('push_now', False)
-        self.generate_source_data(validated_data)
         results = self.perform_bulk_create(validated_data)
         self.push_accounts_if_need(results, push_now)
         for res in results:

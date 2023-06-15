@@ -1,0 +1,11 @@
+{% load i18n %}
+
+<p>
+    {% blocktranslate %}Invalid storage{% endblocktranslate %}
+</p>
+
+<ul>
+    {% for item in items %}
+        <li>{{ item.name }}({{ item.type }}): {{ item.msg }}</li>
+    {% endfor %}
+</ul>

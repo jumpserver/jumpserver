@@ -219,9 +219,11 @@ class Config(dict):
         'ANNOUNCEMENT_ENABLED': True,
         'ANNOUNCEMENT': {},
 
+        # 未使用的配置
         'CAPTCHA_TEST_MODE': None,
-        'TOKEN_EXPIRATION': 3600 * 24,
         'DISPLAY_PER_PAGE': 25,
+
+        'TOKEN_EXPIRATION': 3600 * 24,
         'DEFAULT_EXPIRED_YEARS': 70,
         'SESSION_COOKIE_DOMAIN': None,
         'CSRF_COOKIE_DOMAIN': None,
@@ -241,6 +243,9 @@ class Config(dict):
         'MFA_CUSTOM': False,
         'MFA_CUSTOM_FILE_MD5': '',
 
+        # 临时密码
+        'AUTH_TEMP_TOKEN': False,
+
         # Auth LDAP settings
         'AUTH_LDAP': False,
         'AUTH_LDAP_SERVER_URI': 'ldap://localhost:389',
@@ -255,7 +260,7 @@ class Config(dict):
         'AUTH_LDAP_SYNC_IS_PERIODIC': False,
         'AUTH_LDAP_SYNC_INTERVAL': None,
         'AUTH_LDAP_SYNC_CRONTAB': None,
-        'AUTH_LDAP_SYNC_ORG_ID': '00000000-0000-0000-0000-000000000002',
+        'AUTH_LDAP_SYNC_ORG_IDS': ['00000000-0000-0000-0000-000000000002'],
         'AUTH_LDAP_USER_LOGIN_ONLY_IN_USERS': False,
         'AUTH_LDAP_OPTIONS_OPT_REFERRALS': -1,
 
@@ -360,8 +365,6 @@ class Config(dict):
             'name': 'name', 'username': 'username', 'email': 'email'
         },
 
-        'AUTH_TEMP_TOKEN': False,
-
         # 企业微信
         'AUTH_WECOM': False,
         'WECOM_CORPID': '',
@@ -414,6 +417,10 @@ class Config(dict):
         'CMPP2_VERIFY_SIGN_NAME': '',
         'CMPP2_VERIFY_TEMPLATE_CODE': '{code}',
 
+        'CUSTOM_SMS_URL': '',
+        'CUSTOM_SMS_API_PARAMS': {'phone_numbers': '{phone_numbers}', 'code': '{code}'},
+        'CUSTOM_SMS_REQUEST_METHOD': 'get',
+
         # Email
         'EMAIL_CUSTOM_USER_CREATED_SUBJECT': _('Create account successfully'),
         'EMAIL_CUSTOM_USER_CREATED_HONORIFIC': _('Hello'),
@@ -448,6 +455,9 @@ class Config(dict):
         'SECURITY_MFA_AUTH': 0,  # 0 不开启 1 全局开启 2 管理员开启
         'SECURITY_MFA_AUTH_ENABLED_FOR_THIRD_PARTY': True,
         'SECURITY_COMMAND_EXECUTION': True,
+        'SECURITY_COMMAND_BLACKLIST': [
+            'reboot', 'shutdown', 'poweroff', 'halt', 'dd', 'half', 'top'
+        ],
         'SECURITY_SERVICE_ACCOUNT_REGISTRATION': True,
         'SECURITY_VIEW_AUTH_NEED_MFA': True,
         'SECURITY_MAX_IDLE_TIME': 30,
@@ -488,9 +498,11 @@ class Config(dict):
         'HTTP_BIND_HOST': '0.0.0.0',
         'HTTP_LISTEN_PORT': 8080,
         'WS_LISTEN_PORT': 8070,
+
         'SYSLOG_ADDR': '',  # '192.168.0.1:514'
         'SYSLOG_FACILITY': 'user',
         'SYSLOG_SOCKTYPE': 2,
+
         'PERM_EXPIRED_CHECK_PERIODIC': 60 * 60,
         'FLOWER_URL': "127.0.0.1:5555",
         'LANGUAGE_CODE': 'zh',
@@ -541,6 +553,9 @@ class Config(dict):
 
         # Applet 等软件的下载地址
         'APPLET_DOWNLOAD_HOST': '',
+
+        # FTP 文件上传下载备份阈值，单位(M)，当值小于等于0时，不备份
+        'FTP_FILE_MAX_STORE': 100,
     }
 
     def __init__(self, *args):

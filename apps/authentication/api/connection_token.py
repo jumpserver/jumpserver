@@ -3,6 +3,7 @@ import json
 import os
 import urllib.parse
 
+from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -15,7 +16,7 @@ from rest_framework.response import Response
 
 from common.api import JMSModelViewSet
 from common.exceptions import JMSException
-from common.utils import random_string, get_logger
+from common.utils import random_string, get_logger, get_request_ip
 from common.utils.django import get_request_os
 from common.utils.http import is_true, is_false
 from orgs.mixins.api import RootOrgViewMixin
@@ -310,13 +311,15 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
 
     def _validate_acl(self, user, asset, account):
         from acls.models import LoginAssetACL
-        acl = LoginAssetACL.filter_queryset(user, asset, account).valid().first()
+        acls = LoginAssetACL.filter_queryset(user, asset, account)
+        ip = get_request_ip(self.request)
+        acl = LoginAssetACL.get_match_rule_acls(user, ip, acls)
         if not acl:
             return
         if acl.is_action(acl.ActionChoices.accept):
             return
         if acl.is_action(acl.ActionChoices.reject):
-            msg = _('ACL action is reject')
+            msg = _('ACL action is reject: {}({})'.format(acl.name, acl.id))
             raise JMSException(code='acl_reject', detail=msg)
         if acl.is_action(acl.ActionChoices.review):
             if not self.request.query_params.get('create_ticket'):
@@ -379,19 +382,18 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
 
         expire_now = request.data.get('expire_now', None)
         asset_type = token.asset.type
-        asset_category = token.asset.category
         # 设置默认值
         if expire_now is None:
             # TODO 暂时特殊处理 k8s 不过期
             if asset_type in ['k8s', 'kubernetes']:
                 expire_now = False
-            elif asset_category in ['database', 'db']:
-                expire_now = False
             else:
-                expire_now = True
+                expire_now = not settings.CONNECTION_TOKEN_REUSABLE
 
-        if is_false(expire_now) or token.is_reusable:
-            logger.debug('Token is reusable or specify, not expire')
+        if is_false(expire_now):
+            logger.debug('Api specified, now expire now')
+        elif token.is_reusable and settings.CONNECTION_TOKEN_REUSABLE:
+            logger.debug('Token is reusable, not expire now')
         else:
             token.expire()
 

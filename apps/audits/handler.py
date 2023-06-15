@@ -1,20 +1,19 @@
+import json
 from datetime import datetime
 
-from django.db import transaction
 from django.core.cache import cache
+from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import get_request_ip, get_logger
-from common.utils.timezone import as_current_tz
-from common.utils.encode import Singleton
 from common.local import encrypted_field_set
-from settings.serializers import SettingsSerializer
+from common.utils import get_request_ip, get_logger
+from common.utils.encode import Singleton
+from common.utils.timezone import as_current_tz
 from jumpserver.utils import current_request
-from orgs.utils import get_current_org_id
 from orgs.models import Organization
-
+from orgs.utils import get_current_org_id
+from settings.serializers import SettingsSerializer
 from .backends import get_operate_log_storage
-
 
 logger = get_logger(__name__)
 
@@ -46,10 +45,8 @@ class OperatorLogHandler(metaclass=Singleton):
             pre_value, value = self._consistent_type_to_str(pre_value, value)
             if sorted(str(value)) == sorted(str(pre_value)):
                 continue
-            if pre_value:
-                before[key] = pre_value
-            if value:
-                after[key] = value
+            before[key] = pre_value
+            after[key] = value
         return before, after
 
     def cache_instance_before_data(self, instance_dict):
@@ -75,7 +72,12 @@ class OperatorLogHandler(metaclass=Singleton):
         if instance_id is None:
             return log_id, before, after
 
-        log_id, cache_instance = self.get_instance_dict_from_cache(instance_id)
+        try:
+            log_id, cache_instance = self.get_instance_dict_from_cache(instance_id)
+        except Exception as err:
+            logger.error('Get instance diff from cache error: %s' % err)
+            return log_id, before, after
+
         if not cache_instance:
             return log_id, before, after
 
@@ -106,7 +108,7 @@ class OperatorLogHandler(metaclass=Singleton):
             return ''
         if isinstance(value[0], str):
             return ','.join(value)
-        return ','.join([i['value'] for i in value if i.get('value')])
+        return json.dumps(value)
 
     def __data_processing(self, dict_item, loop=True):
         encrypt_value = '******'

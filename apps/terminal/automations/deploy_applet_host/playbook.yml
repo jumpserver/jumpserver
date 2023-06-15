@@ -182,7 +182,7 @@
     - name: Set chromium and driver on the global system path (Chromium)
       ansible.windows.win_path:
         elements:
-          - 'C:\Program Files\Chrome\chrome-win'
+          - 'C:\Program Files\Chrome\chrome-win32'
           - 'C:\Program Files\JumpServer\drivers\chromedriver_win32'
 
     - name: Set Chromium variables disable Google Api (Chromium)

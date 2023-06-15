@@ -90,8 +90,10 @@ def create_app_nodes(apps, org_id):
         next_value = max([int(k[1]) for k in node_key_split]) + 1
         parent_key = node_key_split[0][0]
     else:
-        root_node = node_model.objects.filter(org_id=org_id)\
-            .filter(parent_key='', key__regex=r'^[0-9]+$').exclude(key__startswith='-').first()
+        root_node = node_model.objects.filter(org_id=org_id) \
+            .filter(parent_key='', key__regex=r'^[0-9]+$') \
+            .exclude(key__startswith='-') \
+            .first()
         if not root_node:
             return
         parent_key = root_node.key

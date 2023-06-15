@@ -15,5 +15,6 @@ params:
 
 i18n:
   SSH account change secret:
-    zh: SSH 账号改密
-    ja: SSH アカウントのパスワード変更
+    zh: 使用 SSH 命令行自定义改密
+    ja: SSH コマンドライン方式でカスタムパスワード変更
+    en: Custom password change by SSH command line

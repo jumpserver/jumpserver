@@ -15,7 +15,7 @@ from assets.filters import IpInFilterBackend, LabelFilterBackend, NodeFilterBack
 from assets.models import Asset, Gateway, Platform
 from assets.tasks import test_assets_connectivity_manual, update_assets_hardware_info_manual
 from common.api import SuggestionMixin
-from common.drf.filters import BaseFilterSet
+from common.drf.filters import BaseFilterSet, AttrRulesFilterBackend
 from common.utils import get_logger, is_uuid
 from orgs.mixins import generics
 from orgs.mixins.api import OrgBulkModelViewSet
@@ -35,6 +35,7 @@ class AssetFilterSet(BaseFilterSet):
     domain = django_filters.CharFilter(method='filter_domain')
     type = django_filters.CharFilter(field_name="platform__type", lookup_expr="exact")
     category = django_filters.CharFilter(field_name="platform__category", lookup_expr="exact")
+    protocols = django_filters.CharFilter(method='filter_protocols')
     domain_enabled = django_filters.BooleanFilter(
         field_name="platform__domain_enabled", lookup_expr="exact"
     )
@@ -79,6 +80,11 @@ class AssetFilterSet(BaseFilterSet):
             return queryset.filter(domain__name__contains=value)
 
     @staticmethod
+    def filter_protocols(queryset, name, value):
+        value = value.split(',')
+        return queryset.filter(protocols__name__in=value)
+
+    @staticmethod
     def filter_labels(queryset, name, value):
         if ':' in value:
             n, v = value.split(':', 1)
@@ -95,7 +101,7 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
     """
     model = Asset
     filterset_class = AssetFilterSet
-    search_fields = ("name", "address")
+    search_fields = ("name", "address", "comment")
     ordering_fields = ('name', 'connectivity', 'platform', 'date_updated')
     serializer_classes = (
         ("default", serializers.AssetSerializer),
@@ -110,7 +116,10 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
         ("spec_info", "assets.view_asset"),
         ("gathered_info", "assets.view_asset"),
     )
-    extra_filter_backends = [LabelFilterBackend, IpInFilterBackend, NodeFilterBackend]
+    extra_filter_backends = [
+        LabelFilterBackend, IpInFilterBackend,
+        NodeFilterBackend, AttrRulesFilterBackend
+    ]
 
     def get_serializer_class(self):
         cls = super().get_serializer_class()

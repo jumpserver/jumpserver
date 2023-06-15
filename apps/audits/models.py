@@ -1,7 +1,9 @@
+import os
 import uuid
 
 from django.db import models
 from django.db.models import Q
+from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext, ugettext_lazy as _
 
@@ -10,6 +12,7 @@ from common.utils import lazyproperty
 from ops.models import JobExecution
 from orgs.mixins.models import OrgModelMixin, Organization
 from orgs.utils import current_org
+from terminal.models import default_storage
 from .const import (
     OperateChoices,
     ActionChoices,
@@ -40,6 +43,8 @@ class JobLog(JobExecution):
 
 
 class FTPLog(OrgModelMixin):
+    upload_to = 'FTP_FILES'
+
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=128, verbose_name=_("User"))
     remote_addr = models.CharField(
@@ -53,9 +58,26 @@ class FTPLog(OrgModelMixin):
     filename = models.CharField(max_length=1024, verbose_name=_("Filename"))
     is_success = models.BooleanField(default=True, verbose_name=_("Success"))
     date_start = models.DateTimeField(auto_now_add=True, verbose_name=_("Date start"))
+    has_file = models.BooleanField(default=False, verbose_name=_("File"))
+    session = models.CharField(max_length=36, verbose_name=_("Session"), default=uuid.uuid4)
 
     class Meta:
         verbose_name = _("File transfer log")
+
+    @property
+    def filepath(self):
+        return os.path.join(self.upload_to, self.date_start.strftime('%Y-%m-%d'), str(self.id))
+
+    def save_file_to_storage(self, file):
+        try:
+            name = default_storage.save(self.filepath, file)
+        except OSError as e:
+            return None, e
+
+        if settings.SERVER_REPLAY_STORAGE:
+            from .tasks import upload_ftp_file_to_external_storage
+            upload_ftp_file_to_external_storage.delay(str(self.id), file.name)
+        return name, None
 
 
 class OperateLog(OrgModelMixin):
@@ -158,7 +180,7 @@ class UserLoginLog(models.Model):
     type = models.CharField(
         choices=LoginTypeChoices.choices, max_length=2, verbose_name=_("Login type")
     )
-    ip = models.GenericIPAddressField(verbose_name=_("Login ip"))
+    ip = models.GenericIPAddressField(verbose_name=_("Login IP"))
     city = models.CharField(
         max_length=254, blank=True, null=True, verbose_name=_("Login city")
     )

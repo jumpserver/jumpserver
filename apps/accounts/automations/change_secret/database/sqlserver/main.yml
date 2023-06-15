@@ -41,8 +41,8 @@
         login_port: "{{ jms_asset.port }}"
         name: '{{ jms_asset.spec_info.db_name }}'
         script: "ALTER LOGIN {{ account.username }} WITH PASSWORD = '{{ account.secret }}'; select @@version"
+      ignore_errors: true
       when: user_exist.query_results[0] | length != 0
-      register: change_info
 
     - name: Add SQLServer user
       community.general.mssql_script:
@@ -52,8 +52,8 @@
         login_port: "{{ jms_asset.port }}"
         name: '{{ jms_asset.spec_info.db_name }}'
         script: "CREATE LOGIN {{ account.username }} WITH PASSWORD = '{{ account.secret }}'; select @@version"
+      ignore_errors: true
       when: user_exist.query_results[0] | length == 0
-      register: change_info
 
     - name: Verify password
       community.general.mssql_script:
@@ -64,6 +64,3 @@
         name: '{{ jms_asset.spec_info.db_name }}'
         script: |
           SELECT @@version
-      when:
-        - db_info is succeeded
-        - change_info is succeeded

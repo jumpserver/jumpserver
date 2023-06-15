@@ -129,7 +129,8 @@ class Terminal(StorageMixin, TerminalStatusMixin, JMSBaseModel):
         configs.update(self.get_login_title_setting())
         configs.update({
             'SECURITY_MAX_IDLE_TIME': settings.SECURITY_MAX_IDLE_TIME,
-            'SECURITY_SESSION_SHARE': settings.SECURITY_SESSION_SHARE
+            'SECURITY_SESSION_SHARE': settings.SECURITY_SESSION_SHARE,
+            'FTP_FILE_MAX_STORE': settings.FTP_FILE_MAX_STORE,
         })
         return configs
 

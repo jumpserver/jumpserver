@@ -46,7 +46,7 @@ class _SimpleAccountSerializer(serializers.ModelSerializer):
 
 
 class _ConnectionTokenAccountSerializer(serializers.ModelSerializer):
-    su_from = _SimpleAccountSerializer(required=False, label=_('Su from'))
+    su_from = serializers.SerializerMethodField(label=_('Su from'))
     secret_type = LabeledChoiceField(choices=SecretType.choices, required=False, label=_('Secret type'))
 
     class Meta:
@@ -55,6 +55,14 @@ class _ConnectionTokenAccountSerializer(serializers.ModelSerializer):
             'id', 'name', 'username', 'secret_type',
             'secret', 'su_from', 'privileged'
         ]
+
+    @staticmethod
+    def get_su_from(account):
+        su_enabled = account.asset.platform.su_enabled
+        su_from = account.su_from
+        if not su_from or not su_enabled:
+            return
+        return _SimpleAccountSerializer(su_from).data
 
 
 class _ConnectionTokenGatewaySerializer(serializers.ModelSerializer):
@@ -126,6 +134,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
     command_filter_acls = _ConnectionTokenCommandFilterACLSerializer(read_only=True, many=True)
     expire_now = serializers.BooleanField(label=_('Expired now'), write_only=True, default=True)
     connect_method = _ConnectTokenConnectMethodSerializer(read_only=True, source='connect_method_object')
+    connect_options = serializers.JSONField(read_only=True)
     actions = ActionChoicesField()
     expire_at = serializers.IntegerField()
 
@@ -136,6 +145,7 @@ class ConnectionTokenSecretSerializer(OrgResourceModelSerializerMixin):
             'platform', 'command_filter_acls', 'protocol',
             'domain', 'gateway', 'actions', 'expire_at',
             'from_ticket', 'expire_now', 'connect_method',
+            'connect_options',
         ]
         extra_kwargs = {
             'value': {'read_only': True},

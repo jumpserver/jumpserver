@@ -49,10 +49,15 @@ def create_serializer_class(serializer_name, fields_info):
     for i, field_info in enumerate(fields_info):
         data = {k: field_info.get(k) for k in fields_name}
         field_type = data.pop('type', 'str')
+
+        if data.get('default') is None:
+            data.pop('default', None)
+            data['required'] = field_info.get('required', True)
         data = set_default_by_type(field_type, data, field_info)
         data = set_default_if_need(data, i)
+        if data.get('default', None) is not None:
+            data['required'] = False
         field_name = data.pop('name')
         field_class = type_field_map.get(field_type, serializers.CharField)
         serializer_fields[field_name] = field_class(**data)
-
     return type(serializer_name, (serializers.Serializer,), serializer_fields)

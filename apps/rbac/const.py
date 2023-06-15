@@ -91,7 +91,7 @@ exclude_permissions = (
     ('audits', 'activitylog', 'add,delete,change', 'activitylog'),
     ('audits', 'passwordchangelog', 'add,change,delete', 'passwordchangelog'),
     ('audits', 'userloginlog', 'add,change,delete,change', 'userloginlog'),
-    ('audits', 'ftplog', 'change,delete', 'ftplog'),
+    ('audits', 'ftplog', 'delete', 'ftplog'),
     ('tickets', 'ticketassignee', '*', 'ticketassignee'),
     ('tickets', 'ticketflow', 'add,delete', 'ticketflow'),
     ('tickets', 'comment', '*', '*'),
@@ -148,6 +148,8 @@ only_system_permissions = (
     ('orgs', 'organization', 'view', 'rootorg'),
     ('terminal', 'applet', '*', '*'),
     ('terminal', 'applethost', '*', '*'),
+    ('acls', 'loginacl', '*', '*'),
+    ('acls', 'connectmethodacl', '*', '*')
 )
 
 only_org_permissions = (

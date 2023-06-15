@@ -16,6 +16,7 @@ from common.exceptions import JMSException
 from common.utils import lazyproperty, pretty_string, bulk_get
 from common.utils.timezone import as_current_tz
 from orgs.mixins.models import JMSOrgBaseModel
+from orgs.utils import tmp_to_org
 from terminal.models import Applet
 
 
@@ -38,6 +39,7 @@ class ConnectionToken(JMSOrgBaseModel):
     input_secret = EncryptTextField(max_length=64, default='', blank=True, verbose_name=_("Input secret"))
     protocol = models.CharField(max_length=16, default=Protocol.ssh, verbose_name=_("Protocol"))
     connect_method = models.CharField(max_length=32, verbose_name=_("Connect method"))
+    connect_options = models.JSONField(default=dict, verbose_name=_("Connect options"))
     user_display = models.CharField(max_length=128, default='', verbose_name=_("User display"))
     asset_display = models.CharField(max_length=128, default='', verbose_name=_("Asset display"))
     is_reusable = models.BooleanField(default=False, verbose_name=_("Reusable"))
@@ -215,7 +217,8 @@ class ConnectionToken(JMSOrgBaseModel):
                 'secret_type': 'password',
                 'secret': self.input_secret,
                 'su_from': None,
-                'org_id': self.asset.org_id
+                'org_id': self.asset.org_id,
+                'asset': self.asset
             }
         else:
             data = {
@@ -225,7 +228,8 @@ class ConnectionToken(JMSOrgBaseModel):
                 'secret': account.secret or self.input_secret,
                 'su_from': account.su_from,
                 'org_id': account.org_id,
-                'privileged': account.privileged
+                'privileged': account.privileged,
+                'asset': self.asset
             }
         return Account(**data)
 
@@ -252,7 +256,8 @@ class ConnectionToken(JMSOrgBaseModel):
             'asset': self.asset,
             'account': self.account_object,
         }
-        acls = CommandFilterACL.filter_queryset(**kwargs).valid()
+        with tmp_to_org(self.asset.org_id):
+            acls = CommandFilterACL.filter_queryset(**kwargs).valid()
         return acls
 
 

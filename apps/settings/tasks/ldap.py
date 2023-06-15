@@ -2,8 +2,8 @@
 #
 from celery import shared_task
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
 from django.db import transaction
+from django.utils.translation import ugettext_lazy as _
 
 from common.utils import get_logger
 from ops.celery.decorator import after_app_ready_start
@@ -22,7 +22,7 @@ def sync_ldap_user():
     LDAPSyncUtil().perform_sync()
 
 
-@shared_task(verbose_name=_('Import ldap user'))
+@shared_task(verbose_name=_('Periodic import ldap user'))
 @transaction.atomic
 def import_ldap_user():
     logger.info("Start import ldap user task")
@@ -30,21 +30,21 @@ def import_ldap_user():
     util_import = LDAPImportUtil()
     users = util_server.search()
     if settings.XPACK_ENABLED:
-        org_id = settings.AUTH_LDAP_SYNC_ORG_ID
+        org_ids = settings.AUTH_LDAP_SYNC_ORG_IDS
         default_org = None
     else:
         # 社区版默认导入Default组织
-        org_id = Organization.DEFAULT_ID
+        org_ids = [Organization.DEFAULT_ID]
         default_org = Organization.default()
-    org = Organization.get_instance(org_id, default=default_org)
-    errors = util_import.perform_import(users, org)
+    orgs = list(set([Organization.get_instance(org_id, default=default_org) for org_id in org_ids]))
+    errors = util_import.perform_import(users, orgs)
     if errors:
         logger.error("Imported LDAP users errors: {}".format(errors))
     else:
         logger.info('Imported {} users successfully'.format(len(users)))
 
 
-@shared_task(verbose_name=_('Periodic import ldap user'))
+@shared_task(verbose_name=_('Registration periodic import ldap user task'))
 @after_app_ready_start
 def import_ldap_user_periodic():
     if not settings.AUTH_LDAP:

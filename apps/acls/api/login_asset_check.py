@@ -30,14 +30,21 @@ class LoginAssetCheckAPI(CreateAPIView):
         return serializer
 
     def check_review(self):
+        user = self.serializer.user
+        asset = self.serializer.asset
+
+        # 用户满足的 acls
+        queryset = LoginAssetACL.objects.all()
+        q = LoginAssetACL.users.get_filter_q(LoginAssetACL, 'users', user)
+        queryset = queryset.filter(q)
+        q = LoginAssetACL.assets.get_filter_q(LoginAssetACL, 'assets', asset)
+        queryset = queryset.filter(q)
+        account_username = self.serializer.validated_data.get('account_username')
+        queryset = queryset.filter(accounts__contains=account_username)
+
         with tmp_to_org(self.serializer.asset.org):
-            kwargs = {
-                'user': self.serializer.user,
-                'asset': self.serializer.asset,
-                'account_username': self.serializer.validated_data.get('account_username'),
-                'action': LoginAssetACL.ActionChoices.review
-            }
-            acl = LoginAssetACL.filter_queryset(**kwargs).valid().first()
+            acl = queryset.valid().first()
+
         if acl:
             need_review = True
             response_data = self._get_response_data_of_need_review(acl)

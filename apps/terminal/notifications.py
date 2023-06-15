@@ -15,7 +15,7 @@ from users.models import User
 
 logger = get_logger(__name__)
 
-__all__ = ('CommandAlertMessage', 'CommandExecutionAlert')
+__all__ = ('CommandAlertMessage', 'CommandExecutionAlert', 'StorageConnectivityMessage')
 
 CATEGORY = 'terminal'
 CATEGORY_LABEL = _('Sessions')
@@ -154,5 +154,43 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
         message = render_to_string('terminal/_msg_command_execute_alert.html', context)
         return {
             'subject': self.subject,
+            'message': message
+        }
+
+
+class StorageConnectivityMessage(SystemMessage):
+    category = 'storage'
+    category_label = _('Command and replay storage')
+    message_type_label = _('Connectivity alarm')
+
+    def __init__(self, errors):
+        self.errors = errors
+
+    @classmethod
+    def post_insert_to_db(cls, subscription: SystemMsgSubscription):
+        subscription.receive_backends = [b for b in BACKEND if b.is_enable]
+        subscription.save()
+
+    @classmethod
+    def gen_test_msg(cls):
+        from terminal.models import ReplayStorage
+        replay = ReplayStorage.objects.first()
+        errors = [{
+            'msg': str(_("Test failure: Account invalid")),
+            'type': replay.get_type_display(),
+            'name': replay.name
+        }]
+        return cls(errors)
+
+    def get_html_msg(self) -> dict:
+        context = {
+            'items': self.errors,
+        }
+        subject = str(_("Invalid storage"))
+        message = render_to_string(
+            'terminal/_msg_check_command_replay_storage_connectivity.html', context
+        )
+        return {
+            'subject': subject,
             'message': message
         }

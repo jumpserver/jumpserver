@@ -2,6 +2,7 @@
 #
 import os
 import tarfile
+
 from django.core.files.storage import default_storage
 from django.db.models import F
 from django.http import FileResponse
@@ -15,23 +16,22 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from common.drf.filters import BaseFilterSet
+from common.api import AsyncApiMixin
 from common.const.http import GET
+from common.drf.filters import BaseFilterSet
 from common.drf.filters import DatetimeRangeFilter
 from common.drf.renders import PassthroughRenderer
-from common.api import AsyncApiMixin
+from common.storage.replay import ReplayStorageHandler
 from common.utils import data_to_json, is_uuid
 from common.utils import get_logger, get_object_or_none
-from rbac.permissions import RBACPermission
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import tmp_to_root_org, tmp_to_org
+from rbac.permissions import RBACPermission
 from terminal import serializers
+from terminal.const import TerminalType
 from terminal.models import Session
-from terminal.utils import (
-    find_session_replay_local, download_session_replay,
-    is_session_approver, get_session_replay_url
-)
 from terminal.permissions import IsSessionAssignee
+from terminal.utils import is_session_approver
 from users.models import User
 
 __all__ = [
@@ -112,20 +112,24 @@ class SessionViewSet(OrgBulkModelViewSet):
         os.chdir(current_dir)
         return file
 
+    def get_storage(self):
+        return ReplayStorageHandler(self.get_object())
+
     @action(methods=[GET], detail=True, renderer_classes=(PassthroughRenderer,), url_path='replay/download',
             url_name='replay-download')
     def download(self, request, *args, **kwargs):
-        session = self.get_object()
-        local_path, url = get_session_replay_url(session)
+        storage = self.get_storage()
+        local_path, url = storage.get_file_path_url()
         if local_path is None:
-            return Response({"error": url}, status=404)
-        file = self.prepare_offline_file(session, local_path)
+            # url => error message
+            return Response({'error': url}, status=404)
 
+        file = self.prepare_offline_file(storage.obj, local_path)
         response = FileResponse(file)
         response['Content-Type'] = 'application/octet-stream'
         # 这里要注意哦，网上查到的方法都是response['Content-Disposition']='attachment;filename="filename.py"',
         # 但是如果文件名是英文名没问题，如果文件名包含中文，下载下来的文件名会被改为url中的path。
-        filename = escape_uri_path('{}.tar'.format(session.id))
+        filename = escape_uri_path('{}.tar'.format(storage.obj.id))
         disposition = "attachment; filename*=UTF-8''{}".format(filename)
         response["Content-Disposition"] = disposition
         return response
@@ -180,14 +184,20 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
 
     @staticmethod
     def get_replay_data(session, url):
-        tp = 'json'
-        if session.protocol in ('rdp', 'vnc'):
-            # 需要考虑录像播放和离线播放器的约定，暂时不处理
-            tp = 'guacamole'
+        all_guacamole_types = (
+            TerminalType.lion, TerminalType.guacamole,
+            TerminalType.razor, TerminalType.xrdp
+        )
+
         if url.endswith('.cast.gz'):
             tp = 'asciicast'
-        if url.endswith('.replay.mp4'):
+        elif url.endswith('.replay.mp4'):
             tp = 'mp4'
+        elif (getattr(session.terminal, 'type', None) in all_guacamole_types) or \
+                (session.protocol in ('rdp', 'vnc')):
+            tp = 'guacamole'
+        else:
+            tp = 'json'
 
         download_url = reverse('api-terminal:session-replay-download', kwargs={'pk': session.id})
         data = {
@@ -208,12 +218,12 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
     def retrieve(self, request, *args, **kwargs):
         session_id = kwargs.get('pk')
         session = get_object_or_404(Session, id=session_id)
-        local_path, url = find_session_replay_local(session)
 
-        if not local_path:
-            local_path, url = download_session_replay(session)
-            if not local_path:
-                return Response({"error": url}, status=404)
+        storage = ReplayStorageHandler(session)
+        local_path, url = storage.get_file_path_url()
+        if local_path is None:
+            # url => error message
+            return Response({"error": url}, status=404)
         data = self.get_replay_data(session, url)
         return Response(data)
 

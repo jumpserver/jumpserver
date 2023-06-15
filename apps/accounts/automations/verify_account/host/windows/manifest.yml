@@ -7,6 +7,7 @@ type:
   - windows
 
 i18n:
-    Windows account verify:
-        zh: Windows 账号验证
-        ja: Windows アカウントの検証
+  Windows account verify:
+    zh: 使用 Ansible 模块 win_ping 验证账号
+    ja: Ansible win_ping モジュールを使用してアカウントを検証する
+    en: Using Ansible module win_ping to verify account

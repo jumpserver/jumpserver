@@ -221,7 +221,8 @@ class MFAMixin:
         self._do_check_user_mfa(code, mfa_type, user=user)
 
     def check_user_mfa_if_need(self, user):
-        if self.request.session.get('auth_mfa'):
+        if self.request.session.get('auth_mfa') and \
+                self.request.session.get('auth_mfa_username') == user.username:
             return
         if not user.mfa_enabled:
             return
@@ -229,15 +230,16 @@ class MFAMixin:
         active_mfa_names = user.active_mfa_backends_mapper.keys()
         raise errors.MFARequiredError(mfa_types=tuple(active_mfa_names))
 
-    def mark_mfa_ok(self, mfa_type):
+    def mark_mfa_ok(self, mfa_type, user):
         self.request.session['auth_mfa'] = 1
+        self.request.session['auth_mfa_username'] = user.username
         self.request.session['auth_mfa_time'] = time.time()
         self.request.session['auth_mfa_required'] = 0
         self.request.session['auth_mfa_type'] = mfa_type
-        MFABlockUtils(self.request.user.username, self.get_request_ip()).clean_failed_count()
+        MFABlockUtils(user.username, self.get_request_ip()).clean_failed_count()
 
     def clean_mfa_mark(self):
-        keys = ['auth_mfa', 'auth_mfa_time', 'auth_mfa_required', 'auth_mfa_type']
+        keys = ['auth_mfa', 'auth_mfa_time', 'auth_mfa_required', 'auth_mfa_type', 'auth_mfa_username']
         for k in keys:
             self.request.session.pop(k, '')
 
@@ -272,7 +274,7 @@ class MFAMixin:
             ok, msg = mfa_backend.check_code(code)
 
         if ok:
-            self.mark_mfa_ok(mfa_type)
+            self.mark_mfa_ok(mfa_type, user)
             return
 
         raise errors.MFAFailedError(
@@ -338,15 +340,14 @@ class AuthACLMixin:
 
     def _check_login_acl(self, user, ip):
         # ACL 限制用户登录
-        acl = LoginACL.match(user, ip)
+        acl = LoginACL.get_match_rule_acls(user, ip)
         if not acl:
             return
 
-        acl: LoginACL
-        if acl.is_action(acl.ActionChoices.accept):
+        if acl.is_action(LoginACL.ActionChoices.accept):
             return
 
-        if acl.is_action(acl.ActionChoices.reject):
+        if acl.is_action(LoginACL.ActionChoices.reject):
             raise errors.LoginACLIPAndTimePeriodNotAllowed(user.username, request=self.request)
 
         if acl.is_action(acl.ActionChoices.review):
@@ -368,18 +369,19 @@ class AuthACLMixin:
         logger.debug('Login confirm acl id: {}'.format(acl_id))
         if not acl_id:
             return
-        acl = LoginACL.filter_acl(user).filter(id=acl_id).first()
+
+        acl = LoginACL.get_user_acls(user).filter(id=acl_id).first()
         if not acl:
             return
         if not acl.is_action(acl.ActionChoices.review):
             return
-        self.get_ticket_or_create(acl)
+        self.get_ticket_or_create(acl, user)
         self.check_user_login_confirm()
 
-    def get_ticket_or_create(self, acl):
+    def get_ticket_or_create(self, acl, user):
         ticket = self.get_ticket()
         if not ticket or ticket.is_state(ticket.State.closed):
-            ticket = acl.create_confirm_ticket(self.request)
+            ticket = acl.create_confirm_ticket(self.request, user)
             self.request.session['auth_ticket_id'] = str(ticket.id)
         return ticket
 

@@ -1,37 +1,15 @@
-import codecs
 import copy
-import csv
-
 from itertools import chain
 from datetime import datetime
 
 from django.db import models
-from django.http import HttpResponse
 
 from common.utils.timezone import as_current_tz
 from common.utils import validate_ip, get_ip_city, get_logger
+from common.db.fields import RelatedManager
 from .const import DEFAULT_CITY
 
 logger = get_logger(__name__)
-
-
-def get_excel_response(filename):
-    excel_response = HttpResponse(content_type='text/csv')
-    excel_response[
-        'Content-Disposition'] = 'attachment; filename="%s"' % filename
-    excel_response.write(codecs.BOM_UTF8)
-    return excel_response
-
-
-def write_content_to_excel(response, header=None, login_logs=None, fields=None):
-    writer = csv.writer(response, dialect='excel', quoting=csv.QUOTE_MINIMAL)
-    if header:
-        writer.writerow(header)
-    if login_logs:
-        for log in login_logs:
-            data = [getattr(log, field.name) for field in fields]
-            writer.writerow(data)
-    return response
 
 
 def write_login_log(*args, **kwargs):
@@ -70,10 +48,14 @@ def _get_instance_field_value(
 
             if getattr(f, 'primary_key', False):
                 f.verbose_name = 'id'
-            elif isinstance(value, (list, dict)):
+            elif isinstance(value, list):
                 value = copy.deepcopy(value)
+            elif isinstance(value, dict):
+                value = dict(copy.deepcopy(value))
             elif isinstance(value, datetime):
                 value = as_current_tz(value).strftime('%Y-%m-%d %H:%M:%S')
+            elif isinstance(value, RelatedManager):
+                value = value.value
             elif isinstance(f, models.OneToOneField) and isinstance(value, models.Model):
                 nested_data = _get_instance_field_value(
                     value, include_model_fields, model_need_continue_fields, ('id',)

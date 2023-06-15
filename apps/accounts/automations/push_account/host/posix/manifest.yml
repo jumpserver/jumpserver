@@ -18,6 +18,12 @@ params:
     default: '/bin/bash'
     help_text: ''
 
+  - name: home
+    type: str
+    label: '家目录'
+    default: ''
+    help_text: '默认家目录 /home/系统用户名: /home/username'
+
   - name: groups
     type: str
     label: '用户组'
@@ -26,5 +32,6 @@ params:
 
 i18n:
   Posix account push:
-    zh: Posix 账号推送
-    ja: Posix アカウントのプッシュ
+    zh: 使用 Ansible 模块 user 执行账号推送 (sha512)
+    ja: Ansible user モジュールを使用してアカウントをプッシュする (sha512)
+    en: Using Ansible module user to push account (sha512)

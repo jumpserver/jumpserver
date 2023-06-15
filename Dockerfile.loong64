@@ -1,4 +1,4 @@
-FROM python:3.9-slim as stage-build
+FROM python:3.9-slim-buster as stage-build
 ARG TARGETARCH
 
 ARG VERSION
@@ -8,7 +8,7 @@ WORKDIR /opt/jumpserver
 ADD . .
 RUN cd utils && bash -ixeu build.sh
 
-FROM python:3.9-slim
+FROM python:3.9-slim-buster
 ARG TARGETARCH
 MAINTAINER JumpServer Team <ibuler@qq.com>
 
@@ -28,6 +28,7 @@ ARG DEPENDENCIES="                    \
         libxml2-dev                   \
         libxmlsec1-dev                \
         libxmlsec1-openssl            \
+        freerdp2-dev                  \
         libaio-dev"
 
 ARG TOOLS="                           \

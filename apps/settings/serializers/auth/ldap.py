@@ -54,12 +54,12 @@ class LDAPSettingSerializer(serializers.Serializer):
         max_length=1024, required=True, label=_('User search filter'),
         help_text=_('Choice may be (cn|uid|sAMAccountName)=%(user)s)')
     )
-    AUTH_LDAP_USER_ATTR_MAP = serializers.DictField(
+    AUTH_LDAP_USER_ATTR_MAP = serializers.JSONField(
         required=True, label=_('User attr map'),
         help_text=_('User attr map present how to map LDAP user attr to '
                     'jumpserver, username,name,email is jumpserver attr')
     )
-    AUTH_LDAP_SYNC_ORG_ID = serializers.CharField(
+    AUTH_LDAP_SYNC_ORG_IDS = serializers.ListField(
         required=False, label=_('Organization'), max_length=36
     )
     AUTH_LDAP_SYNC_IS_PERIODIC = serializers.BooleanField(

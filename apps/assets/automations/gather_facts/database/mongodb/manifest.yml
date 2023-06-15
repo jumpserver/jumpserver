@@ -6,6 +6,6 @@ type:
 method: gather_facts
 i18n:
   Gather facts from MongoDB:
-    zh: 从 MongoDB 获取信息
-    en: Gather facts from MongoDB
-    ja: MongoDBから事実を取得する
+    zh: 使用 Ansible 模块 mongodb 获取 mongodb 信息
+    en: Gather facts from MongoDB using mongodb module
+    ja: mongodbモジュールを使用して MongoDBから情報を収集する

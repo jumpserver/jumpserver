@@ -16,6 +16,12 @@ params:
     label: 'Shell'
     default: '/bin/bash'
 
+  - name: home
+    type: str
+    label: '家目录'
+    default: ''
+    help_text: '默认家目录 /home/系统用户名: /home/username'
+
   - name: groups
     type: str
     label: '用户组'
@@ -24,6 +30,7 @@ params:
 
 i18n:
   Aix account push:
-    zh: Aix 账号推送
-    ja: Aix アカウントのプッシュ
+    zh: 使用 Ansible 模块 user 执行 Aix 账号推送 (DES)
+    ja: Ansible user モジュールを使用して Aix アカウントをプッシュする (DES)
+    en: Using Ansible module user to push account (DES)
 

@@ -9,6 +9,7 @@
         name: "{{ account.username }}"
         password: "{{ account.secret | password_hash('des') }}"
         update_password: always
+      ignore_errors: true
       when: account.secret_type == "password"
 
     - name: create user If it already exists, no operation will be performed

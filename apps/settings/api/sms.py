@@ -39,7 +39,8 @@ class SMSTestingAPI(GenericAPIView):
         'alibaba': serializers.AlibabaSMSSettingSerializer,
         'tencent': serializers.TencentSMSSettingSerializer,
         'huawei': serializers.HuaweiSMSSettingSerializer,
-        'cmpp2': serializers.CMPP2SMSSettingSerializer
+        'cmpp2': serializers.CMPP2SMSSettingSerializer,
+        'custom': serializers.CustomSMSSettingSerializer,
     }
     rbac_perms = {
         'POST': 'settings.change_sms'
@@ -113,6 +114,12 @@ class SMSTestingAPI(GenericAPIView):
             'template_code': data['CMPP2_VERIFY_TEMPLATE_CODE'],
             'template_param': OrderedDict(code='666666')
         }
+        return init_params, send_sms_params
+
+    @staticmethod
+    def get_custom_params(data):
+        init_params = {}
+        send_sms_params = {'template_param': OrderedDict(code='666666')}
         return init_params, send_sms_params
 
     def get_params_by_backend(self, backend, data):

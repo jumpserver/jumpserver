@@ -22,7 +22,7 @@ __all__ = [
 
 class AccountViewSet(OrgBulkModelViewSet):
     model = Account
-    search_fields = ('username', 'asset__address', 'name')
+    search_fields = ('username', 'name', 'asset__name', 'asset__address')
     filterset_class = AccountFilterSet
     serializer_classes = {
         'default': serializers.AccountSerializer,

@@ -1,0 +1,14 @@
+- hosts: custom
+  gather_facts: no
+  vars:
+    ansible_connection: local
+
+  tasks:
+    - name: Verify account
+      ssh_ping:
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        login_user: "{{ account.username }}"
+        login_password: "{{ account.secret }}"
+        login_secret_type: "{{ account.secret_type }}"
+        login_private_key_path: "{{ account.private_key_path }}"

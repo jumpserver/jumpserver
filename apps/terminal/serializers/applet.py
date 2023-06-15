@@ -27,6 +27,8 @@ class AppletPublicationSerializer(serializers.ModelSerializer):
 class AppletSerializer(serializers.ModelSerializer):
     icon = serializers.ReadOnlyField(label=_("Icon"))
     type = LabeledChoiceField(choices=Applet.Type.choices, label=_("Type"))
+    edition = LabeledChoiceField(choices=Applet.Edition.choices, label=_("Edition"), required=False,
+                                 default=Applet.Edition.community)
 
     class Meta:
         model = Applet
@@ -35,6 +37,6 @@ class AppletSerializer(serializers.ModelSerializer):
             'icon', 'readme', 'date_created', 'date_updated',
         ]
         fields = fields_mini + [
-            'version', 'author', 'type', 'protocols',
-            'tags', 'comment'
+            'version', 'author', 'type', 'edition',
+            'can_concurrent', 'protocols', 'tags', 'comment',
         ] + read_only_fields

@@ -1,0 +1,26 @@
+{
+  "manifest_version": 2,
+  "name": "禁止新标签窗口菜单",
+  "version": "1.0",
+  "description": "将所有链接替换为当前窗口打开, 并禁止新窗口和标签，隐藏右击菜单",
+  "background": {
+    "scripts": [
+      "background.js"
+    ],
+    "persistent": false
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*/*"
+      ],
+      "js": [
+        "content_script.js"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  "permissions": [
+    "tabs"
+  ]
+}

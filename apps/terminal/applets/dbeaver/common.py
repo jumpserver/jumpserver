@@ -152,6 +152,20 @@ class Platform(DictObj):
     type: LabelValue
 
 
+class Gateway(DictObj):
+    id: str
+    name: str
+    address: str
+    port: int
+    protocols: list[Protocol]
+    account: Account
+
+
+class TinkerForward(DictObj):
+    host: str
+    port: int
+
+
 class Manifest(DictObj):
     name: str
     version: str
@@ -199,6 +213,14 @@ class BaseApplication(abc.ABC):
         self.asset = Asset(kwargs.get('asset', {}))
         self.account = Account(kwargs.get('account', {}))
         self.platform = Platform(kwargs.get('platform', {}))
+        self.gateway = None
+        self.tinker_forward = None
+        gateway = kwargs.get('gateway')
+        tinker_forward = kwargs.get('tinker_forward')
+        if gateway:
+            self.gateway = Gateway(gateway)
+        if tinker_forward:
+            self.tinker_forward = TinkerForward(tinker_forward)
 
     @abc.abstractmethod
     def run(self):

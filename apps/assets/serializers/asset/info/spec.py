@@ -1,6 +1,9 @@
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from assets.const.web import FillType
 from assets.models import Database, Web
+from common.serializers.fields import LabeledChoiceField
 
 
 class DatabaseSpecSerializer(serializers.ModelSerializer):
@@ -10,6 +13,7 @@ class DatabaseSpecSerializer(serializers.ModelSerializer):
 
 
 class WebSpecSerializer(serializers.ModelSerializer):
+    autofill = LabeledChoiceField(choices=FillType.choices, label=_('Autofill'))
     class Meta:
         model = Web
         fields = [

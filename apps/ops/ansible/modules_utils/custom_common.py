@@ -1,11 +1,10 @@
 import time
 
 import paramiko
-
 from paramiko.ssh_exception import SSHException, NoValidConnectionsError
 
 
-def ssh_common_argument_spec():
+def common_argument_spec():
     options = dict(
         login_host=dict(type='str', required=False, default='localhost'),
         login_port=dict(type='int', required=False, default=22),

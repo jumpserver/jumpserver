@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='applyassetticket',
             name='apply_actions',
-            field=models.IntegerField(default=31, verbose_name='Actions'),
+            field=models.IntegerField(default=1, verbose_name='Actions'),
         ),
         migrations.AlterField(
             model_name='approvalrule',

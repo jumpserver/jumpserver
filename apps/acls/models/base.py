@@ -1,19 +1,19 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
+from common.db.fields import JSONManyToManyField
 from common.db.models import JMSBaseModel
 from common.utils import contains_ip
+from common.utils.time_period import contains_time_period
 from orgs.mixins.models import OrgModelMixin, OrgManager
 
 __all__ = [
-    'ACLManager',
-    'BaseACL',
-    'BaseACLQuerySet',
-    'UserAssetAccountBaseACL',
-    'UserAssetAccountACLQuerySet'
+    'BaseACL', 'UserBaseACL', 'UserAssetAccountBaseACL',
 ]
+
+from orgs.utils import tmp_to_root_org
+from orgs.utils import tmp_to_org
 
 
 class ActionChoices(models.TextChoices):
@@ -36,43 +36,8 @@ class BaseACLQuerySet(models.QuerySet):
         return self.inactive()
 
 
-class UserAssetAccountACLQuerySet(BaseACLQuerySet):
-    def filter_user(self, username):
-        q = Q(users__username_group__contains=username) | \
-            Q(users__username_group__contains='*')
-        return self.filter(q)
-
-    def filter_asset(self, name=None, address=None):
-        queryset = self.filter()
-        if name:
-            q = Q(assets__name_group__contains=name) | \
-                Q(assets__name_group__contains='*')
-            queryset = queryset.filter(q)
-        if address:
-            ids = [
-                q.id for q in queryset
-                if contains_ip(address, q.assets.get('address_group', []))
-            ]
-            queryset = queryset.filter(id__in=ids)
-        return queryset
-
-    def filter_account(self, username):
-        q = Q(accounts__username_group__contains=username) | \
-            Q(accounts__username_group__contains='*')
-        return self.filter(q)
-
-
-class ACLManager(models.Manager):
-    def valid(self):
-        return self.get_queryset().valid()
-
-
-class OrgACLManager(OrgManager, ACLManager):
-    pass
-
-
 class BaseACL(JMSBaseModel):
-    name = models.CharField(max_length=128, verbose_name=_('Name'))
+    name = models.CharField(max_length=128, verbose_name=_('Name'), unique=True)
     priority = models.IntegerField(
         default=50, verbose_name=_("Priority"),
         help_text=_("1-100, the lower the value will be match first"),
@@ -83,46 +48,85 @@ class BaseACL(JMSBaseModel):
     is_active = models.BooleanField(default=True, verbose_name=_("Active"))
 
     ActionChoices = ActionChoices
-    objects = ACLManager.from_queryset(BaseACLQuerySet)()
+    objects = BaseACLQuerySet.as_manager()
 
     class Meta:
-        ordering = ('priority', 'date_updated', 'name')
+        ordering = ('priority', '-is_active', 'name')
         abstract = True
 
     def is_action(self, action):
         return self.action == action
 
+    @classmethod
+    def get_user_acls(cls, user):
+        return cls.objects.none()
 
-class UserAssetAccountBaseACL(BaseACL, OrgModelMixin):
-    # username_group
-    users = models.JSONField(verbose_name=_('User'))
-    # name_group, address_group
-    assets = models.JSONField(verbose_name=_('Asset'))
-    # username_group
-    accounts = models.JSONField(verbose_name=_('Account'))
+    @classmethod
+    def get_match_rule_acls(cls, user, ip, acl_qs=None):
+        if acl_qs is None:
+            acl_qs = cls.get_user_acls(user)
+        if not acl_qs:
+            return
 
-    objects = OrgACLManager.from_queryset(UserAssetAccountACLQuerySet)()
+        for acl in acl_qs:
+            if acl.is_action(ActionChoices.review) and not acl.reviewers.exists():
+                continue
+            ip_group = acl.rules.get('ip_group')
+            time_periods = acl.rules.get('time_period')
+            is_contain_ip = contains_ip(ip, ip_group) if ip_group else True
+            is_contain_time_period = contains_time_period(time_periods) if time_periods else True
+
+            if is_contain_ip and is_contain_time_period:
+                # 满足条件，则返回
+                return acl
+        return None
+
+
+class UserBaseACL(BaseACL):
+    users = JSONManyToManyField('users.User', default=dict, verbose_name=_('Users'))
 
     class Meta(BaseACL.Meta):
-        unique_together = ('name', 'org_id')
+        abstract = True
+
+    @classmethod
+    def get_user_acls(cls, user):
+        queryset = cls.objects.all()
+        with tmp_to_root_org():
+            q = cls.users.get_filter_q(user)
+        queryset = queryset.filter(q)
+        return queryset.filter(is_active=True).distinct()
+
+
+class UserAssetAccountBaseACL(OrgModelMixin, UserBaseACL):
+    name = models.CharField(max_length=128, verbose_name=_('Name'))
+    assets = JSONManyToManyField('assets.Asset', default=dict, verbose_name=_('Assets'))
+    accounts = models.JSONField(default=list, verbose_name=_("Accounts"))
+    objects = OrgManager.from_queryset(BaseACLQuerySet)()
+
+    class Meta(UserBaseACL.Meta):
+        unique_together = [('name', 'org_id')]
         abstract = True
 
     @classmethod
     def filter_queryset(cls, user=None, asset=None, account=None, account_username=None, **kwargs):
         queryset = cls.objects.all()
-        org_id = None
+
         if user:
-            queryset = queryset.filter_user(user.username)
-        if account:
-            org_id = account.org_id
-            queryset = queryset.filter_account(account.username)
-        if account_username:
-            queryset = queryset.filter_account(username=account_username)
+            q = cls.users.get_filter_q(user)
+            queryset = queryset.filter(q)
+
         if asset:
             org_id = asset.org_id
-            queryset = queryset.filter_asset(asset.name, asset.address)
-        if org_id:
-            kwargs['org_id'] = org_id
+            with tmp_to_org(org_id):
+                q = cls.assets.get_filter_q(asset)
+            queryset = queryset.filter(q)
+        if account and not account_username:
+            account_username = account.username
+        if account_username:
+            q = models.Q(accounts__contains=account_username) | \
+                models.Q(accounts__contains='*') | \
+                models.Q(accounts__contains='@ALL')
+            queryset = queryset.filter(q)
         if kwargs:
             queryset = queryset.filter(**kwargs)
-        return queryset
+        return queryset.valid().distinct()

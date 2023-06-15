@@ -7,8 +7,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 
-from common.api import CommonApiMixin
-from common.api import SuggestionMixin
+from common.api import CommonApiMixin, SuggestionMixin
+from common.drf.filters import AttrRulesFilterBackend
 from common.utils import get_logger
 from orgs.utils import current_org, tmp_to_root_org
 from rbac.models import Role, RoleBinding
@@ -16,6 +16,7 @@ from rbac.permissions import RBACPermission
 from users.utils import LoginBlockUtil, MFABlockUtils
 from .mixins import UserQuerysetMixin
 from .. import serializers
+from ..exceptions import UnableToDeleteAllUsers
 from ..filters import UserFilter
 from ..models import User
 from ..notifications import ResetMFAMsg
@@ -35,6 +36,7 @@ __all__ = [
 
 class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelViewSet):
     filterset_class = UserFilter
+    extra_filter_backends = [AttrRulesFilterBackend]
     search_fields = ('username', 'email', 'name')
     permission_classes = [RBACPermission, UserObjectPermission]
     serializer_classes = {
@@ -53,6 +55,12 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
     def get_queryset(self):
         queryset = super().get_queryset().prefetch_related('groups')
         return queryset
+
+    def allow_bulk_destroy(self, qs, filtered):
+        is_valid = filtered.count() < qs.count()
+        if not is_valid:
+            raise UnableToDeleteAllUsers()
+        return True
 
     @action(methods=['get'], detail=False, url_path='suggestions')
     def match(self, request, *args, **kwargs):
@@ -110,8 +118,6 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
             self.check_object_permissions(self.request, user)
         return super().perform_bulk_update(serializer)
 
-    def allow_bulk_destroy(self, qs, filtered):
-        return filtered.count() < qs.count()
 
     def perform_bulk_destroy(self, objects):
         for obj in objects:

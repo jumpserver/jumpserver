@@ -24,9 +24,13 @@ class DeployOptionsSerializer(serializers.Serializer):
         (4, _('Per Session')),
         (2, _('Per Device')),
     )
+
+    # 单用户单会话，
+    # 默认值为1，表示启用状态（组策略默认值），此时单用户只能有一个会话连接
+    # 如果改为 0 ，表示禁用状态，此时可以单用户多会话连接
     SESSION_PER_USER = (
-        (1, _("Disabled")),
-        (0, _("Enabled")),
+        (0, _("Disabled")),
+        (1, _("Enabled")),
     )
 
     CORE_HOST = serializers.CharField(
