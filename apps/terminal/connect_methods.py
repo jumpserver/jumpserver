@@ -104,13 +104,15 @@ class NativeClient(TextChoices):
         xpack_protocols = cls.xpack_protocols()
 
         for protocol, _clients in clients_map.items():
+            if not settings.XPACK_ENABLED and protocol in xpack_protocols:
+                continue
+
             if isinstance(_clients, dict):
                 if os == 'all':
                     _clients = list(itertools.chain(*_clients.values()))
                 else:
                     _clients = _clients.get(os, _clients['default'])
-            if protocol in xpack_protocols:
-                continue
+
             for client in _clients:
                 if not settings.XPACK_ENABLED and client in cls.xpack_methods():
                     continue
