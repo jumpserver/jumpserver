@@ -328,13 +328,13 @@ class RelatedManager:
         q = Q()
         if isinstance(val, str):
             val = [val]
+        if ['*'] in val:
+            return Q()
         for ip in val:
             if not ip:
                 continue
             try:
-                if ip == '*':
-                    return Q()
-                elif '/' in ip:
+                if '/' in ip:
                     network = ipaddress.ip_network(ip)
                     ips = network.hosts()
                     q |= Q(**{"{}__in".format(name): ips})
@@ -378,7 +378,7 @@ class RelatedManager:
 
             if match == 'ip_in':
                 q = cls.get_ip_in_q(name, val)
-            elif match in ("exact", "contains", "startswith", "endswith", "gte", "lte", "gt", "lt"):
+            elif match in ("contains", "startswith", "endswith", "gte", "lte", "gt", "lt"):
                 lookup = "{}__{}".format(name, match)
                 q = Q(**{lookup: val})
             elif match == 'regex':
@@ -470,9 +470,9 @@ class JSONManyToManyDescriptor:
                     continue
 
             if rule_match == 'in':
-                res &= value in rule_value
+                res &= value in rule_value or '*' in rule_value
             elif rule_match == 'exact':
-                res &= value == rule_value
+                res &= value == rule_value or rule_value == '*'
             elif rule_match == 'contains':
                 res &= rule_value in value
             elif rule_match == 'startswith':
@@ -499,7 +499,7 @@ class JSONManyToManyDescriptor:
             elif rule['match'] == 'ip_in':
                 if isinstance(rule_value, str):
                     rule_value = [rule_value]
-                res &= contains_ip(value, rule_value)
+                res &= '*' in rule_value or contains_ip(value, rule_value)
             elif rule['match'] == 'm2m':
                 if isinstance(value, Manager):
                     value = value.values_list('id', flat=True)
