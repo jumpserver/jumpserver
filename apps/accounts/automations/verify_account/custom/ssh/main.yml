@@ -4,7 +4,7 @@
     ansible_connection: local
 
   tasks:
-    - name: Verify account
+    - name: Verify account (paramiko)
       ssh_ping:
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"

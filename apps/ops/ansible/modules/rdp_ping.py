@@ -39,10 +39,6 @@ import pyfreerdp
 from typing import NamedTuple
 from ansible.module_utils.basic import AnsibleModule
 
-from ops.ansible.modules_utils.custom_common import (
-    common_argument_spec
-)
-
 
 # =========================================
 # Module execution.
@@ -53,6 +49,18 @@ class Param(NamedTuple):
     port: int
     username: str
     password: str
+
+
+def common_argument_spec():
+    options = dict(
+        login_host=dict(type='str', required=False, default='localhost'),
+        login_port=dict(type='int', required=False, default=22),
+        login_user=dict(type='str', required=False, default='root'),
+        login_password=dict(type='str', required=False, no_log=True),
+        login_secret_type=dict(type='str', required=False, default='password'),
+        login_private_key_path=dict(type='str', required=False, no_log=True),
+    )
+    return options
 
 
 def main():
