@@ -4,7 +4,7 @@ import json
 from typing import Callable
 
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Prefetch
 from django.db.models.fields import related
 from django.db.utils import IntegrityError
 from django.forms import model_to_dict
@@ -326,7 +326,7 @@ class Ticket(StatusMixin, JMSBaseModel):
     @classmethod
     def get_user_related_tickets(cls, user):
         queries = Q(applicant=user) | Q(ticket_steps__ticket_assignees__assignee=user)
-        tickets = cls.objects.filter(queries).distinct()
+        tickets = cls.objects.prefetch_related(Prefetch('ticket_steps__ticket_assignees', queryset=TicketAssignee.objects.select_related('assignee'))).select_related('applicant').filter(queries).distinct()
         return tickets
 
     def get_current_ticket_flow_approve(self):

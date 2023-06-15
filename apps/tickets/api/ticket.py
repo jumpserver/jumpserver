@@ -4,6 +4,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
+from django.db import reset_queries
 
 from common.api import CommonApiMixin
 from common.const.http import POST, PUT, PATCH
@@ -60,6 +61,7 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     def get_queryset(self):
         with tmp_to_root_org():
             queryset = self.model.get_user_related_tickets(self.request.user)
+        reset_queries()
         return queryset
 
     def perform_create(self, serializer):
