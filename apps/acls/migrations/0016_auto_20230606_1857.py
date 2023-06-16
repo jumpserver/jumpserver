@@ -10,15 +10,19 @@ def migrate_users_login_acls(apps, schema_editor):
     login_acl_model = apps.get_model('acls', 'LoginACL')
     name_used = defaultdict(int)
 
+    login_acls = []
     for login_acl in login_acl_model.objects.all():
-        name = login_acl.name
+        name = login_acl.name.lower()
         if name_used[name] > 0:
-            login_acl.name += "_{}".format(name_used[name])
+            name += "_{}".format(name_used[name])
         name_used[name] += 1
+        login_acl.name = name
         login_acl.users = {
             "type": "ids", "ids": [str(login_acl.user_id)]
         }
-        login_acl.save()
+        login_acls.append(login_acl)
+
+    login_acl_model.objects.bulk_update(login_acls, ['name', 'users'])
 
 
 class Migration(migrations.Migration):
