@@ -2,15 +2,19 @@
 #
 
 from __future__ import unicode_literals
-import os
+
 import datetime
+import os
 from typing import Callable
 
-from django.db import IntegrityError
-from django.templatetags.static import static
+from django.conf import settings
+from django.contrib.auth import BACKEND_SESSION_KEY
 from django.contrib.auth import login as auth_login, logout as auth_logout
-from django.http import HttpResponse, HttpRequest
+from django.db import IntegrityError
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import reverse, redirect
+from django.templatetags.static import static
+from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.cache import never_cache
@@ -18,16 +22,13 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import FormView
-from django.conf import settings
-from django.urls import reverse_lazy
-from django.contrib.auth import BACKEND_SESSION_KEY
 
 from common.utils import FlashMessageUtil, static_or_direct
 from users.utils import (
     redirect_user_first_login_or_index
 )
-from ..const import RSA_PRIVATE_KEY, RSA_PUBLIC_KEY
 from .. import mixins, errors
+from ..const import RSA_PRIVATE_KEY, RSA_PUBLIC_KEY
 from ..forms import get_user_login_form_cls
 
 __all__ = [
