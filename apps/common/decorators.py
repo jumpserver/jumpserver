@@ -6,6 +6,7 @@ import inspect
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
+from functools import wraps
 
 from django.db import transaction
 
@@ -217,3 +218,24 @@ def do_test():
     end = time.time()
     using = end - s
     print("end : %s, using: %s" % (end, using))
+
+
+def cached_method(ttl=20):
+    _cache = {}
+
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            key = (func, args, tuple(sorted(kwargs.items())))
+            # 检查缓存是否存在且未过期
+            if key in _cache and time.time() - _cache[key]['timestamp'] < ttl:
+                return _cache[key]['result']
+
+            # 缓存过期或不存在，执行方法并缓存结果
+            result = func(*args, **kwargs)
+            _cache[key] = {'result': result, 'timestamp': time.time()}
+            return result
+
+        return wrapper
+
+    return decorator

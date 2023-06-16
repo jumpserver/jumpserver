@@ -193,7 +193,6 @@ class AllTypes(ChoicesMixin):
         }
         return node
 
-
     @classmethod
     def asset_to_node(cls, asset, pid):
         node = {
