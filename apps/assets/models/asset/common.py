@@ -206,15 +206,14 @@ class Asset(NodesRelationMixin, AbsConnectivity, JSONFilterMixin, JMSOrgBaseMode
     @lazyproperty
     def auto_config(self):
         platform = self.platform
-        automation = self.platform.automation
         auto_config = {
             'su_enabled': platform.su_enabled,
             'domain_enabled': platform.domain_enabled,
             'ansible_enabled': False
         }
+        automation = getattr(self.platform, 'automation', None)
         if not automation:
             return auto_config
-
         auto_config.update(model_to_dict(automation))
         return auto_config
 
