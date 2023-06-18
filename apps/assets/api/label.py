@@ -38,5 +38,6 @@ class LabelViewSet(OrgBulkModelViewSet):
         return super().list(request, *args, **kwargs)
 
     def get_queryset(self):
-        self.queryset = Label.objects.annotate(asset_count=Count("assets"))
+        self.queryset = Label.objects.prefetch_related(
+            'assets').annotate(asset_count=Count("assets"))
         return self.queryset
