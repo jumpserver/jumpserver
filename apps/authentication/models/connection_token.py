@@ -21,7 +21,7 @@ from terminal.models import Applet
 
 
 def date_expired_default():
-    return timezone.now() + timedelta(seconds=settings.CONNECTION_TOKEN_EXPIRATION)
+    return timezone.now() + timedelta(seconds=settings.CONNECTION_TOKEN_ONETIME_EXPIRATION)
 
 
 class ConnectionToken(JMSOrgBaseModel):

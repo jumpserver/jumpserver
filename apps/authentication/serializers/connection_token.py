@@ -70,7 +70,7 @@ class ConnectionTokenUpdateSerializer(ConnectionTokenSerializer):
         if delta.total_seconds() > 3600 * 24:
             return self.instance.date_expired
 
-        seconds = settings.CONNECTION_TOKEN_EXPIRATION_MAX
+        seconds = settings.CONNECTION_TOKEN_REUSABLE_EXPIRATION
         return timezone.now() + timezone.timedelta(seconds=seconds)
 
     @staticmethod
