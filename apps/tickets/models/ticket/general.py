@@ -327,9 +327,11 @@ class Ticket(StatusMixin, JMSBaseModel):
     def get_user_related_tickets(cls, user):
         queries = Q(applicant=user) | Q(ticket_steps__ticket_assignees__assignee=user)
         # TODO: 与 StatusMixin.process_map 内连表查询有部分重叠 有优化空间 待验证排除是否不影响其它调用
+        queryset=TicketAssignee.objects.select_related('assignee')
         tickets = cls.objects.prefetch_related(Prefetch(
-            'ticket_steps__ticket_assignees', queryset=TicketAssignee.objects.select_related(
-                'assignee'))).select_related('applicant').filter(queries).distinct()
+            'ticket_steps__ticket_assignees', 
+            queryset=queryset,
+        )).select_related('applicant').filter(queries).distinct()
         return tickets
 
     def get_current_ticket_flow_approve(self):
