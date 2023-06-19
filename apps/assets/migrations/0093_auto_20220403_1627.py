@@ -2,6 +2,7 @@
 
 import django.db
 from django.db import migrations, models
+
 import common.db.fields
 
 
@@ -118,7 +119,7 @@ class Migration(migrations.Migration):
                                       primary_key=True, serialize=False, to='assets.asset')),
             ],
             options={
-                 'verbose_name': 'Host',
+                'verbose_name': 'Host',
             },
         ),
         migrations.CreateModel(
