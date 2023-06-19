@@ -183,12 +183,12 @@ class ConnectMethodUtil:
                 ],
                 'match': 'm2m'
             },
-            TerminalType.omnidb: {
+            TerminalType.chen: {
                 'web_methods': [WebMethod.web_gui],
                 'listen': [Protocol.http],
                 'support': [
                     Protocol.mysql, Protocol.postgresql,
-                    Protocol.oracle, Protocol.mariadb
+                    Protocol.oracle
                 ],
                 'match': 'm2m'
             },
@@ -213,14 +213,6 @@ class ConnectMethodUtil:
                 'listen': [Protocol.rdp],
                 'support': [Protocol.rdp],
                 'match': 'map'
-            },
-            TerminalType.chen: {
-                'web_methods': [WebMethod.web_gui],
-                'listen': [Protocol.http],
-                'support': [
-                    Protocol.mysql, Protocol.postgresql, Protocol.oracle,
-                ],
-                'match': 'm2m'
             },
         }
         return protocols
