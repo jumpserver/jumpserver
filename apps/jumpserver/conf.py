@@ -231,8 +231,8 @@ class Config(dict):
         'SESSION_COOKIE_AGE': 3600 * 24,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE': False,
         'LOGIN_URL': reverse_lazy('authentication:login'),
-        'CONNECTION_TOKEN_EXPIRATION': 5 * 60,  # 默认
-        'CONNECTION_TOKEN_EXPIRATION_MAX': 60 * 60 * 24 * 30,  # 最大
+        'CONNECTION_TOKEN_ONETIME_EXPIRATION': 5 * 60,  # 默认
+        'CONNECTION_TOKEN_REUSABLE_EXPIRATION': 60 * 60 * 24 * 30,  # 最大
         'CONNECTION_TOKEN_REUSABLE': False,
 
         # Custom Config
@@ -558,6 +558,11 @@ class Config(dict):
         'FTP_FILE_MAX_STORE': 100,
     }
 
+    old_config_map = {
+        'CONNECTION_TOKEN_ONETIME_EXPIRATION': 'CONNECTION_TOKEN_EXPIRATION',
+        'CONNECTION_TOKEN_REUSABLE_EXPIRATION': 'CONNECTION_TOKEN_EXPIRATION_MAX',
+    }
+
     def __init__(self, *args):
         super().__init__(*args)
         self.secret_encryptor = ConfigCrypto.get_secret_encryptor()
@@ -698,13 +703,19 @@ class Config(dict):
             value = self.convert_type(item, value)
         return value
 
-    def get(self, item):
+    def get(self, item, default=None):
         # 再从配置文件中获取
         value = self.get_from_config(item)
         if value is None:
             value = self.get_from_env(item)
+
+        # 因为要递归，所以优先从上次返回的递归中获取
+        if default is None:
+            default = self.defaults.get(item)
+        if value is None and item in self.old_config_map:
+            return self.get(self.old_config_map[item], default)
         if value is None:
-            value = self.defaults.get(item)
+            value = default
         if self.secret_encryptor:
             value = self.secret_encryptor.decrypt_if_need(value, item)
         return value
