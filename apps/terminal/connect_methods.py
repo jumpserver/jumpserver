@@ -214,6 +214,14 @@ class ConnectMethodUtil:
                 'support': [Protocol.rdp],
                 'match': 'map'
             },
+            TerminalType.chen: {
+                'web_methods': [WebMethod.web_gui],
+                'listen': [Protocol.http],
+                'support': [
+                    Protocol.mysql, Protocol.postgresql, Protocol.oracle,
+                ],
+                'match': 'm2m'
+            },
         }
         return protocols
 
