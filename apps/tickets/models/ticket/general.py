@@ -4,7 +4,7 @@ import json
 from typing import Callable
 
 from django.db import models
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 from django.db.models.fields import related
 from django.db.utils import IntegrityError
 from django.forms import model_to_dict
@@ -326,7 +326,13 @@ class Ticket(StatusMixin, JMSBaseModel):
     @classmethod
     def get_user_related_tickets(cls, user):
         queries = Q(applicant=user) | Q(ticket_steps__ticket_assignees__assignee=user)
-        tickets = cls.objects.filter(queries).distinct()
+        # TODO: 与 StatusMixin.process_map 内连表查询有部分重叠 有优化空间 待验证排除是否不影响其它调用
+        prefetch_ticket_assignee = Prefetch('ticket_steps__ticket_assignees',
+            queryset=TicketAssignee.objects.select_related('assignee'), )
+        tickets = cls.objects.prefetch_related(prefetch_ticket_assignee)\
+            .select_related('applicant')\
+            .filter(queries)\
+            .distinct()
         return tickets
 
     def get_current_ticket_flow_approve(self):
