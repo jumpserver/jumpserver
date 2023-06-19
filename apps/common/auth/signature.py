@@ -40,7 +40,7 @@ class SignatureAuthentication(authentication.BaseAuthentication):
     required_headers = ["(request-target)", "date"]
 
     def fetch_user_data(self, key_id, algorithm=None):
-        """Retuns a tuple (User, secret) or (None, None)."""
+        """Returns a tuple (User, secret) or (None, None)."""
         raise NotImplementedError()
 
     def authenticate_header(self, request):
