@@ -175,7 +175,7 @@ class ConnectionToken(JMSOrgBaseModel):
         if not applet:
             return None
 
-        host_account = applet.select_host_account(self.user)
+        host_account = applet.select_host_account(self.user, self.asset)
         if not host_account:
             raise JMSException({'error': 'No host account available'})
 
