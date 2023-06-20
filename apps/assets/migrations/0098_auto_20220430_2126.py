@@ -145,6 +145,7 @@ def migrate_ori_host_to_devices(apps, *args):
     assets = asset_model.objects.filter(id__in=hosts_need_migrate_to_device.values_list('asset_ptr_id', flat=True))
     assets_map = {asset.id: asset for asset in assets}
 
+    print("\t- Migrate ori host to device: ", len(hosts_need_migrate_to_device))
     for host in hosts_need_migrate_to_device:
         asset = assets_map.get(host.asset_ptr_id)
         if not asset:
