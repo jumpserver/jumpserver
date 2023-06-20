@@ -148,13 +148,17 @@ class Applet(JMSBaseModel):
         shutil.copytree(path, pkg_path)
         return instance, serializer
 
-    def select_host(self, user):
-        hosts = [
-            host for host in self.hosts.filter(is_active=True)
-            if host.load != 'offline'
-        ]
+    def select_host(self, user, asset):
+        hosts = self.hosts.filter(is_active=True)
+        hosts = [host for host in hosts if host.load != 'offline']
         if not hosts:
             return None
+
+        spec_label = asset.labels.filter(name__in=['AppletHost', '发布机']).first()
+        if spec_label:
+            host = [host for host in hosts if host.name == spec_label.value]
+            if host:
+                return host[0]
 
         prefer_key = 'applet_host_prefer_{}'.format(user.id)
         prefer_host_id = cache.get(prefer_key, None)
@@ -189,9 +193,9 @@ class Applet(JMSBaseModel):
             cache.set(prefer_host_account_key, account.id, timeout=None)
         return account
 
-    def select_host_account(self, user):
+    def select_host_account(self, user, asset):
         # 选择激活的发布机
-        host = self.select_host(user)
+        host = self.select_host(user, asset)
         if not host:
             return None
         host_concurrent = str(host.deploy_options.get('RDS_fSingleSessionPerUser', 0)) == '0'
