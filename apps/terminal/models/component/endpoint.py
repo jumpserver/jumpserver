@@ -98,6 +98,7 @@ class EndpointRule(JMSBaseModel):
         on_delete=models.SET_NULL, verbose_name=_("Endpoint"),
     )
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
+    is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
 
     class Meta:
         verbose_name = _('Endpoint rule')
@@ -108,7 +109,7 @@ class EndpointRule(JMSBaseModel):
 
     @classmethod
     def match(cls, target_instance, target_ip, protocol):
-        for endpoint_rule in cls.objects.all().prefetch_related('endpoint'):
+        for endpoint_rule in cls.objects.prefetch_related('endpoint').filter(is_active=True):
             if not contains_ip(target_ip, endpoint_rule.ip_group):
                 continue
             if not endpoint_rule.endpoint:

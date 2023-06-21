@@ -79,7 +79,7 @@ class EndpointRuleSerializer(BulkModelSerializer):
         fields_small = fields_mini + ['ip_group', 'priority']
         fields_fk = ['endpoint']
         fields = fields_mini + fields_small + fields_fk + [
-            'comment', 'date_created', 'date_updated', 'created_by'
+            'comment', 'date_created', 'date_updated', 'created_by', 'is_active'
         ]
         extra_kwargs = {
             'priority': {'default': 50}
