@@ -110,7 +110,7 @@ class SQLCountMiddleware:
     def __call__(self, request):
         from django.db import connection
         response = self.get_response(request)
-        response['X-JMS-SQL-COUNT'] = len(connection.queries)
+        response['X-JMS-SQL-COUNT'] = len(connection.queries) - 2
         return response
 
 
