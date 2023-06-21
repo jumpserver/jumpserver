@@ -5,20 +5,20 @@ from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from users.models import User
-from assets.models import Asset
+from accounts.const import AliasAccount
 from accounts.models import Account
-from orgs.mixins.models import JMSOrgBaseModel
-from orgs.mixins.models import OrgManager
+from assets.models import Asset
 from common.utils import date_expired_default
 from common.utils.timezone import local_now
+from orgs.mixins.models import JMSOrgBaseModel
+from orgs.mixins.models import OrgManager
 from perms.const import ActionChoices
-from accounts.const import AliasAccount
+from users.models import User
 
 __all__ = ['AssetPermission', 'ActionChoices', 'AssetPermissionQuerySet']
 
 # 使用场景
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('jumpserver.permissions')
 
 
 class AssetPermissionQuerySet(models.QuerySet):

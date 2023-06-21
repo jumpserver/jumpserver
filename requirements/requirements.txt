@@ -16,7 +16,7 @@ ecdsa==0.13.3
 enum-compat==0.0.2
 ephem==3.7.6.0
 future==0.16.0
-idna==2.6
+idna==2.8
 itypes==1.2.0
 Jinja2==3.1.2
 jmespath==1.0.1
@@ -37,7 +37,7 @@ PyNaCl==1.5.0
 python-dateutil==2.8.2
 PyYAML==6.0
 requests==2.31.0
-jms-storage==0.0.46
+jms-storage==0.0.47
 simplejson==3.17.6
 six==1.16.0
 sshtunnel==0.4.0
