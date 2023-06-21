@@ -46,6 +46,6 @@ def add_celery_logger_handler(sender=None, logger=None, loglevel=None, format=No
         return
     task_handler = CeleryThreadTaskFileHandler()
     task_handler.setLevel(loglevel)
-    formatter = logging.Formatter('abc: ' + format)
+    formatter = logging.Formatter(format)
     task_handler.setFormatter(formatter)
     logger.addHandler(task_handler)
