@@ -10,6 +10,8 @@ from common.drf.filters import IDSpmFilter, CustomFilter, IDInFilter
 
 __all__ = ['ExtraFilterFieldsMixin', 'OrderingFielderFieldsMixin']
 
+logger = logging.getLogger('jumpserver.common')
+
 
 class ExtraFilterFieldsMixin:
     """
@@ -54,7 +56,9 @@ class OrderingFielderFieldsMixin:
         try:
             valid_fields = self.get_valid_ordering_fields()
         except Exception as e:
-            logging.debug('get_valid_ordering_fields error: %s' % e)
+            logger.debug('get_valid_ordering_fields error: %s' % e)
+            # 这里千万不要这么用，会让 logging 重复，至于为什么，我也不知道
+            # logging.debug('get_valid_ordering_fields error: %s' % e)
             valid_fields = []
 
         fields = list(chain(

@@ -2,11 +2,11 @@
 #
 import logging
 
-from django.core.cache import cache
 from celery import subtask
 from celery.signals import (
     worker_ready, worker_shutdown, after_setup_logger
 )
+from django.core.cache import cache
 from django_celery_beat.models import PeriodicTask
 
 from common.utils import get_logger
@@ -46,6 +46,6 @@ def add_celery_logger_handler(sender=None, logger=None, loglevel=None, format=No
         return
     task_handler = CeleryThreadTaskFileHandler()
     task_handler.setLevel(loglevel)
-    formatter = logging.Formatter(format)
+    formatter = logging.Formatter('abc: ' + format)
     task_handler.setFormatter(formatter)
     logger.addHandler(task_handler)

@@ -1,20 +1,20 @@
 # ~*~ coding: utf-8 ~*~
 #
-import os
-import re
-import pyotp
 import base64
 import logging
+import os
+import re
 import time
 
+import pyotp
 from django.conf import settings
 from django.core.cache import cache
 
 from common.tasks import send_mail_async
-from common.utils import reverse, get_object_or_none, ip, pretty_string
+from common.utils import reverse, get_object_or_none, ip
 from .models import User
 
-logger = logging.getLogger('jumpserver')
+logger = logging.getLogger('jumpserver.users')
 
 
 def send_user_created_mail(user):
