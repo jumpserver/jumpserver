@@ -102,7 +102,7 @@ class EndpointRule(JMSBaseModel):
 
     class Meta:
         verbose_name = _('Endpoint rule')
-        ordering = ('priority', 'name')
+        ordering = ('priority', 'is_active', 'name')
 
     def __str__(self):
         return f'{self.name}({self.priority})'
