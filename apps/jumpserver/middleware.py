@@ -101,6 +101,19 @@ class RefererCheckMiddleware:
         return response
 
 
+class SQLCountMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+        if not settings.DEBUG_DEV:
+            raise MiddlewareNotUsed
+
+    def __call__(self, request):
+        from django.db import connection
+        response = self.get_response(request)
+        response['X-JMS-SQL-COUNT'] = len(connection.queries)
+        return response
+
+
 class StartMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
