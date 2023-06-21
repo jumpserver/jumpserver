@@ -42,7 +42,7 @@ def _get_instance_field_value(
             if getattr(f, 'attname', None) in model_need_continue_fields:
                 continue
 
-            value = getattr(instance, f.name) or getattr(instance, f.attname)
+            value = getattr(instance, f.name, None) or getattr(instance, f.attname, None)
             if not isinstance(value, bool) and not value:
                 continue
 
