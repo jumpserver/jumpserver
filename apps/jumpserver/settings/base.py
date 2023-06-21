@@ -128,6 +128,7 @@ MIDDLEWARE = [
     'jumpserver.middleware.DemoMiddleware',
     'jumpserver.middleware.RequestMiddleware',
     'jumpserver.middleware.RefererCheckMiddleware',
+    'jumpserver.middleware.SQLCountMiddleware',
     'orgs.middleware.OrgMiddleware',
     'authentication.backends.oidc.middleware.OIDCRefreshIDTokenMiddleware',
     'authentication.backends.cas.middleware.CASMiddleware',
