@@ -10,12 +10,11 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from assets.const import Protocol
 from assets.models import Asset
 from common.utils import get_object_or_none, lazyproperty
 from orgs.mixins.models import OrgModelMixin
 from terminal.backends import get_multi_command_storage
-from terminal.const import SessionType
+from terminal.const import SessionType, TerminalType
 from users.models import User
 
 
@@ -112,6 +111,7 @@ class Session(OrgModelMixin):
                     return rel_path
             except:
                 pass
+
     @property
     def asset_obj(self):
         return Asset.objects.get(id=self.asset_id)
@@ -132,10 +132,7 @@ class Session(OrgModelMixin):
         if self.type != SessionType.normal:
             # 会话监控仅支持 normal，不支持 tunnel 和 command
             return False
-        if self.protocol in [
-            Protocol.ssh, Protocol.vnc, Protocol.rdp,
-            Protocol.telnet, Protocol.k8s
-        ]:
+        if self.terminal.type in [TerminalType.lion, TerminalType.koko]:
             return True
         else:
             return False
