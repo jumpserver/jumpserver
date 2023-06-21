@@ -106,7 +106,7 @@ LOGGING = {
             'propagate': False,
         },
         'jumpserver': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file'],
             'level': LOG_LEVEL,
         },
         'drf_exception': {
