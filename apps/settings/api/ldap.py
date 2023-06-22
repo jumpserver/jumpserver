@@ -10,7 +10,7 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.views import Response, APIView
 
 from common.api import AsyncApiMixin
-from common.utils import get_logger, is_uuid
+from common.utils import get_logger
 from orgs.models import Organization
 from orgs.utils import current_org
 from users.models import User
@@ -166,6 +166,9 @@ class LDAPUserListApi(generics.ListAPIView):
         sync_util = LDAPSyncUtil()
         # 还没有同步任务
         if sync_util.task_no_start:
+            ok, msg = LDAPTestUtil().test_config()
+            if not ok:
+                return Response(data={'msg': msg}, status=400)
             # 任务外部设置 task running 状态
             sync_util.set_task_status(sync_util.TASK_STATUS_IS_RUNNING)
             t = threading.Thread(target=sync_ldap_user)
