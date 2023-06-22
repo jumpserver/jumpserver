@@ -61,13 +61,11 @@ class AuthValidateMixin(serializers.Serializer):
 
 
 class BaseAccountSerializer(AuthValidateMixin, BulkOrgResourceModelSerializer):
-    has_secret = serializers.BooleanField(label=_("Has secret"), read_only=True)
-
     class Meta:
         model = BaseAccount
         fields_mini = ['id', 'name', 'username']
         fields_small = fields_mini + [
-            'secret_type', 'secret', 'has_secret', 'passphrase',
+            'secret_type', 'secret', 'passphrase',
             'privileged', 'is_active', 'spec_info',
         ]
         fields_other = ['created_by', 'date_created', 'date_updated', 'comment']
@@ -80,3 +78,12 @@ class BaseAccountSerializer(AuthValidateMixin, BulkOrgResourceModelSerializer):
             'spec_info': {'label': _('Spec info')},
             'username': {'help_text': _("Tip: If no username is required for authentication, fill in `null`")}
         }
+
+
+class AccountDetailMixin(serializers.Serializer):
+    has_secret = serializers.BooleanField(label=_("Has secret"), read_only=True)
+
+    def get_field_names(self, declared_fields, info):
+        names = super().get_field_names(declared_fields, info)
+        names.extend(['has_secret'])
+        return names

@@ -3,10 +3,10 @@ from typing import Iterable, AnyStr
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import APIException
 
-from users.utils import construct_user_email
-from common.utils.common import get_logger
-from common.sdk.im.utils import digest, update_values
 from common.sdk.im.mixin import RequestMixin, BaseRequest
+from common.sdk.im.utils import digest, update_values
+from common.utils.common import get_logger
+from users.utils import construct_user_email
 
 logger = get_logger(__name__)
 

@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 
 from accounts import serializers
+from accounts.backends import get_vault_client
 from accounts.filters import AccountFilterSet
 from accounts.models import Account
 from assets.models import Asset, Node
@@ -115,6 +116,7 @@ class AssetAccountBulkCreateApi(CreateAPIView):
 
 class AccountHistoriesSecretAPI(ExtraFilterFieldsMixin, RecordViewLogMixin, ListAPIView):
     model = Account.history.model
+    perm_model = model
     serializer_class = serializers.AccountHistorySerializer
     http_method_names = ['get', 'options']
     permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
@@ -127,16 +129,22 @@ class AccountHistoriesSecretAPI(ExtraFilterFieldsMixin, RecordViewLogMixin, List
 
     @staticmethod
     def filter_spm_queryset(resource_ids, queryset):
+        if isinstance(queryset, list):
+            return [i for i in queryset if i.get('id') in resource_ids]
         return queryset.filter(history_id__in=resource_ids)
 
     def get_queryset(self):
         account = self.get_object()
-        histories = account.history.all()
-        last_history = account.history.first()
-        if not last_history:
-            return histories
+        vault_client = get_vault_client(account)
+        return vault_client.get_history_data()
 
-        if account.secret == last_history.secret \
-                and account.secret_type == last_history.secret_type:
-            histories = histories.exclude(history_id=last_history.history_id)
-        return histories
+    def list(self, request, *args, **kwargs):
+        data = self.filter_queryset(self.get_queryset())
+        return Response(
+            {
+                'count': len(data),
+                'next': None,
+                'previous': None,
+                'results': data,
+            }
+        )

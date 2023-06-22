@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 #
 import uuid
-from inspect import signature
-from functools import wraps
-from werkzeug.local import LocalProxy
 from contextlib import contextmanager
+from functools import wraps
+from inspect import signature
+
+from werkzeug.local import LocalProxy
 
 from common.local import thread_local
 from .models import Organization
@@ -133,6 +134,7 @@ def org_aware_func(org_arg_name):
     :param org_arg_name: 函数中包含org_id的对象是哪个参数
     :return:
     """
+
     def decorate(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -149,7 +151,9 @@ def org_aware_func(org_arg_name):
             with tmp_to_org(org_aware_resource.org_id):
                 # print("Current org id: {}".format(org_aware_resource.org_id))
                 return func(*args, **kwargs)
+
         return wrapper
+
     return decorate
 
 
@@ -162,4 +166,5 @@ def ensure_in_real_or_default_org(func):
         if not current_org or current_org.is_root():
             raise ValueError('You must in a real or default org!')
         return func(*args, **kwargs)
+
     return wrapper

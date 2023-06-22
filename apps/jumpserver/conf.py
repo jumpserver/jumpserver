@@ -246,6 +246,12 @@ class Config(dict):
         # 临时密码
         'AUTH_TEMP_TOKEN': False,
 
+        # Vault
+        'VAULT_TYPE': 'local',
+        'HCP_VAULT_HOST': '',
+        'HCP_VAULT_TOKEN': '',
+        'HCP_VAULT_MOUNT_POINT': 'jumpserver',
+
         # Auth LDAP settings
         'AUTH_LDAP': False,
         'AUTH_LDAP_SERVER_URI': 'ldap://localhost:389',

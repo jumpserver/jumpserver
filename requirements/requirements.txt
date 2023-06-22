@@ -132,3 +132,5 @@ ipython==8.10.0
 ForgeryPy3==0.3.1
 django-debug-toolbar==3.5
 Pympler==1.0.1
+hvac==1.1.1
+pyhcl==0.4.4

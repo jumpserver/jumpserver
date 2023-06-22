@@ -1,9 +1,11 @@
+from django.conf import settings
 from django.db import models
 from django.db.models import Count, Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
+from accounts.const import VaultType
 from assets.models.base import AbsConnectivity
 from common.utils import lazyproperty
 from .base import BaseAccount
@@ -18,6 +20,9 @@ class AccountHistoricalRecords(HistoricalRecords):
         super().__init__(*args, **kwargs)
 
     def post_save(self, instance, created, using=None, **kwargs):
+        if settings.VAULT_TYPE != VaultType.LOCAL:
+            return
+
         if not self.included_fields:
             return super().post_save(instance, created, using=using, **kwargs)
 
@@ -53,7 +58,7 @@ class Account(AbsConnectivity, BaseAccount):
         on_delete=models.SET_NULL, verbose_name=_("Su from")
     )
     version = models.IntegerField(default=0, verbose_name=_('Version'))
-    history = AccountHistoricalRecords(included_fields=['id', 'secret', 'secret_type', 'version'])
+    history = AccountHistoricalRecords(included_fields=['id', '_secret', 'secret_type', 'version'])
     source = models.CharField(max_length=30, default=Source.LOCAL, verbose_name=_('Source'))
     source_id = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Source ID'))
 
