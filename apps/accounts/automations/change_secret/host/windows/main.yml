@@ -8,17 +8,13 @@
 #      debug:
 #        msg: "Username: {{ account.username }}, Password: {{ account.secret }}"
 
-
-    - name: Get groups of a Windows user
-      ansible.windows.win_user:
-        name: "{{ jms_account.username }}"
-      register: user_info
-
     - name: Change password
       ansible.windows.win_user:
+        fullname: "{{ account.username}}"
         name: "{{ account.username }}"
         password: "{{ account.secret }}"
-        groups: "{{ user_info.groups[0].name }}"
+        password_never_expires: yes
+        groups: "{{ params.groups }}"
         groups_action: add
         update_password: always
       ignore_errors: true
