@@ -109,21 +109,21 @@ class DefaultCallback:
         pass
 
     def playbook_on_stats(self, event_data, **kwargs):
-        failed = []
         error_func = lambda err, task_detail: err + f"{task_detail[0]}: {task_detail[1]['stderr']};"
         for tp in ['dark', 'failures']:
             for host, tasks in self.result[tp].items():
-                failed.append(host)
                 error = reduce(error_func, tasks.items(), '').strip(';')
                 self.summary[tp][host] = error
+        failures = list(self.result['failures'].keys())
+        dark_or_failures = list(self.result['dark'].keys()) + failures
 
         for host, tasks in self.result.get('ignored', {}).items():
             ignore_errors = reduce(error_func, tasks.items(), '').strip(';')
-            if host in failed:
+            if host in failures:
                 self.summary['failures'][host] += {ignore_errors}
 
-        self.summary['ok'] = list(set(self.result['ok'].keys()) - set(failed))
-        self.summary['skipped'] = list(set(self.result['skipped'].keys()) - set(failed))
+        self.summary['ok'] = list(set(self.result['ok'].keys()) - set(dark_or_failures))
+        self.summary['skipped'] = list(set(self.result['skipped'].keys()) - set(dark_or_failures))
 
     def playbook_on_include(self, event_data, **kwargs):
         pass
