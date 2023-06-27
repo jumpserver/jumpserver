@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-27 10:17+0800\n"
+"POT-Creation-Date: 2023-06-27 16:02+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -193,7 +193,7 @@ msgstr "作成のみ"
 #: acls/serializers/base.py:118 assets/models/asset/common.py:93
 #: assets/models/asset/common.py:331 assets/models/cmd_filter.py:36
 #: assets/serializers/domain.py:19 assets/serializers/label.py:27
-#: audits/models.py:53 authentication/models/connection_token.py:35
+#: audits/models.py:53 authentication/models/connection_token.py:36
 #: perms/models/asset_permission.py:64 perms/serializers/permission.py:34
 #: terminal/backends/command/models.py:20 terminal/models/session/session.py:31
 #: terminal/notifications.py:95 terminal/serializers/command.py:17
@@ -201,7 +201,7 @@ msgstr "作成のみ"
 msgid "Asset"
 msgstr "資産"
 
-#: accounts/models/account.py:53 accounts/models/account.py:117
+#: accounts/models/account.py:53 accounts/models/account.py:126
 #: accounts/serializers/account/account.py:208
 #: accounts/serializers/account/account.py:247
 #: accounts/serializers/account/template.py:16
@@ -254,15 +254,15 @@ msgstr "アカウントを確認できます"
 msgid "Can push account"
 msgstr "アカウントをプッシュできます"
 
-#: accounts/models/account.py:121
+#: accounts/models/account.py:130
 msgid "Account template"
 msgstr "アカウント テンプレート"
 
-#: accounts/models/account.py:126
+#: accounts/models/account.py:135
 msgid "Can view asset account template secret"
 msgstr "アセット アカウント テンプレートのパスワードを表示できます"
 
-#: accounts/models/account.py:127
+#: accounts/models/account.py:136
 msgid "Can change asset account template secret"
 msgstr "アセット アカウント テンプレートのパスワードを変更できます"
 
@@ -643,7 +643,7 @@ msgstr "ID"
 #: accounts/serializers/account/account.py:427 acls/serializers/base.py:111
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:49
 #: audits/models.py:85 audits/models.py:163
-#: authentication/models/connection_token.py:31
+#: authentication/models/connection_token.py:32
 #: authentication/models/sso_token.py:16
 #: notifications/models/notification.py:12
 #: perms/api/user_permission/mixin.py:55 perms/models/asset_permission.py:58
@@ -812,7 +812,7 @@ msgid "Reviewers"
 msgstr "レビュー担当者"
 
 #: acls/models/base.py:48 authentication/models/access_key.py:17
-#: authentication/models/connection_token.py:52
+#: authentication/models/connection_token.py:53
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/asset_permission.py:76 terminal/models/session/sharing.py:27
 #: tickets/const.py:37
@@ -1004,7 +1004,7 @@ msgid "{} disabled"
 msgstr "{} 無効"
 
 #: assets/automations/ping_gateway/manager.py:33
-#: authentication/models/connection_token.py:117
+#: authentication/models/connection_token.py:118
 msgid "No account"
 msgstr "アカウントなし"
 
@@ -1197,7 +1197,7 @@ msgstr "管理ユーザー"
 msgid "Username same with user"
 msgstr "ユーザーと同じユーザー名"
 
-#: assets/models/_user.py:52 authentication/models/connection_token.py:40
+#: assets/models/_user.py:52 authentication/models/connection_token.py:41
 #: authentication/serializers/connect_token_secret.py:111
 #: terminal/models/applet/applet.py:41 terminal/serializers/session.py:21
 #: terminal/serializers/session.py:42 terminal/serializers/storage.py:68
@@ -1444,7 +1444,7 @@ msgstr "システム"
 
 #: assets/models/label.py:19 assets/models/node.py:557
 #: assets/serializers/cagegory.py:7 assets/serializers/cagegory.py:14
-#: authentication/models/connection_token.py:28
+#: authentication/models/connection_token.py:29
 #: authentication/serializers/connect_token_secret.py:122
 #: common/serializers/common.py:86 settings/models.py:34
 msgid "Value"
@@ -2133,19 +2133,23 @@ msgstr "外部ストレージへのFTPファイルのアップロード"
 msgid "This action require verify your MFA"
 msgstr "この操作には、MFAを検証する必要があります"
 
-#: authentication/api/connection_token.py:305
+#: authentication/api/connection_token.py:288
+msgid "Anonymous account is not supported for this asset"
+msgstr "匿名アカウントはこのプロパティではサポートされていません"
+
+#: authentication/api/connection_token.py:310
 msgid "Account not found"
 msgstr "アカウントが見つかりません"
 
-#: authentication/api/connection_token.py:308
+#: authentication/api/connection_token.py:313
 msgid "Permission expired"
 msgstr "承認の有効期限が切れています"
 
-#: authentication/api/connection_token.py:322
+#: authentication/api/connection_token.py:327
 msgid "ACL action is reject: {}({})"
 msgstr "ACL アクションは拒否です: {}({})"
 
-#: authentication/api/connection_token.py:326
+#: authentication/api/connection_token.py:331
 msgid "ACL action is review"
 msgstr "ACL アクションはレビューです"
 
@@ -2526,78 +2530,78 @@ msgstr "MFAタイプ ({}) が有効になっていない"
 msgid "Please change your password"
 msgstr "パスワードを変更してください"
 
-#: authentication/models/connection_token.py:37
+#: authentication/models/connection_token.py:38
 #: terminal/serializers/storage.py:111
 msgid "Account name"
 msgstr "アカウント名"
 
-#: authentication/models/connection_token.py:38
+#: authentication/models/connection_token.py:39
 msgid "Input username"
 msgstr "カスタム ユーザー名"
 
-#: authentication/models/connection_token.py:39
+#: authentication/models/connection_token.py:40
 #: authentication/serializers/connection_token.py:20
 msgid "Input secret"
 msgstr "カスタムパスワード"
 
-#: authentication/models/connection_token.py:41
+#: authentication/models/connection_token.py:42
 msgid "Connect method"
 msgstr "接続方法"
 
-#: authentication/models/connection_token.py:42
+#: authentication/models/connection_token.py:43
 msgid "Connect options"
 msgstr "接続アイテム"
 
-#: authentication/models/connection_token.py:43
+#: authentication/models/connection_token.py:44
 #: rbac/serializers/rolebinding.py:21
 msgid "User display"
 msgstr "ユーザー表示"
 
-#: authentication/models/connection_token.py:44
+#: authentication/models/connection_token.py:45
 msgid "Asset display"
 msgstr "アセット名"
 
-#: authentication/models/connection_token.py:45
+#: authentication/models/connection_token.py:46
 msgid "Reusable"
 msgstr "再利用可能"
 
-#: authentication/models/connection_token.py:46
+#: authentication/models/connection_token.py:47
 #: authentication/models/temp_token.py:13 perms/models/asset_permission.py:74
 #: tickets/models/ticket/apply_application.py:31
 #: tickets/models/ticket/apply_asset.py:20 users/models/user.py:797
 msgid "Date expired"
 msgstr "期限切れの日付"
 
-#: authentication/models/connection_token.py:50
+#: authentication/models/connection_token.py:51
 #: perms/models/asset_permission.py:77
 msgid "From ticket"
 msgstr "チケットから"
 
-#: authentication/models/connection_token.py:56
+#: authentication/models/connection_token.py:57
 msgid "Connection token"
 msgstr "接続トークン"
 
-#: authentication/models/connection_token.py:58
+#: authentication/models/connection_token.py:59
 msgid "Can view connection token secret"
 msgstr "接続トークンの秘密を表示できます"
 
-#: authentication/models/connection_token.py:105
+#: authentication/models/connection_token.py:106
 msgid "Connection token inactive"
 msgstr "接続トークンがアクティブ化されていません"
 
-#: authentication/models/connection_token.py:108
+#: authentication/models/connection_token.py:109
 msgid "Connection token expired at: {}"
 msgstr "接続トークンの有効期限: {}"
 
-#: authentication/models/connection_token.py:111
+#: authentication/models/connection_token.py:112
 msgid "No user or invalid user"
 msgstr "ユーザーなしまたは期限切れのユーザー"
 
-#: authentication/models/connection_token.py:114
+#: authentication/models/connection_token.py:115
 msgid "No asset or inactive asset"
 msgstr "アセットがないか、有効化されていないアセット"
 
-#: authentication/models/connection_token.py:267
+#: authentication/models/connection_token.py:258
 msgid "Super connection token"
 msgstr "スーパー接続トークン"
 
