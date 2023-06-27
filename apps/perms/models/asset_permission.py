@@ -113,14 +113,11 @@ class AssetPermission(JMSOrgBaseModel):
 
     def get_all_assets(self, flat=False):
         from assets.models import Node
-        nodes_keys = self.nodes.all().values_list('key', flat=True)
-        asset_ids = set(self.assets.all().values_list('id', flat=True))
-        nodes_asset_ids = Node.get_nodes_all_asset_ids_by_keys(nodes_keys)
-        asset_ids.update(nodes_asset_ids)
+        nodes_asset_qs = Node.get_nodes_all_assets(self.nodes.all())
+        qs = self.assets.all() | nodes_asset_qs
         if flat:
-            return asset_ids
-        assets = Asset.objects.filter(id__in=asset_ids)
-        return assets
+            return qs.values_list('id', flat=True)
+        return qs
 
     def get_all_accounts(self, flat=False):
         """
