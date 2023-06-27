@@ -89,9 +89,22 @@ class Account(AbsConnectivity, BaseAccount):
         return bool(self.secret)
 
     @classmethod
+    def get_special_account(cls, name):
+        if name == AliasAccount.INPUT.value:
+            return cls.get_manual_account()
+        elif name == AliasAccount.ANON.value:
+            return cls.get_anonymous_account()
+        else:
+            return cls(name=name, username=name, secret=None)
+
+    @classmethod
     def get_manual_account(cls):
         """ @INPUT 手动登录的账号(any) """
         return cls(name=AliasAccount.INPUT.label, username=AliasAccount.INPUT.value, secret=None)
+
+    @classmethod
+    def get_anonymous_account(cls):
+        return cls(name=AliasAccount.ANON.label, username=AliasAccount.ANON.value, secret=None)
 
     @lazyproperty
     def versions(self):
