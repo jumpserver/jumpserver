@@ -81,5 +81,4 @@ class PermAccountUtil(AssetPermissionUtil):
             account.actions = action_bit
             account.date_expired = max(cleaned_accounts_expired[account])
             accounts.append(account)
-        print("Accounts: ", accounts)
         return accounts

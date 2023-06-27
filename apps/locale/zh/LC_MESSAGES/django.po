@@ -62,7 +62,7 @@ msgid "Dynamic user"
 msgstr "同名账号"
 
 #: accounts/const/account.py:16
-msgid "Anonymous user"
+msgid "Anonymous account"
 msgstr "匿名用户"
 
 #: accounts/const/account.py:20 users/models/user.py:699

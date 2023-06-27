@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import PermissionDenied
 
+from accounts.const import AliasAccount
 from assets.const import Protocol
 from assets.const.host import GATEWAY_NAME
 from common.db.fields import EncryptTextField
@@ -209,7 +210,7 @@ class ConnectionToken(JMSOrgBaseModel):
         if not self.asset:
             return None
 
-        if self.account == '@ANON' and self.asset.category not in ['web', 'custom']:
+        if self.account == AliasAccount.ANON and self.asset.category not in ['web', 'custom']:
             raise JMSException({'error': 'Anonymous account is not supported in {}'.format(self.asset.category)})
 
         if self.account.startswith('@'):
