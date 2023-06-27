@@ -63,7 +63,7 @@ msgstr "同名账号"
 
 #: accounts/const/account.py:16
 msgid "Anonymous account"
-msgstr "匿名用户"
+msgstr "匿名账号"
 
 #: accounts/const/account.py:20 users/models/user.py:699
 msgid "Local"
