@@ -11,7 +11,7 @@ from django.conf import settings
 from django.contrib.auth import BACKEND_SESSION_KEY
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.db import IntegrityError
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest
 from django.shortcuts import reverse, redirect
 from django.templatetags.static import static
 from django.urls import reverse_lazy
@@ -204,7 +204,9 @@ class UserLoginView(mixins.AuthMixin, UserLoginContextMixin, FormView):
 
     def form_valid(self, form):
         if not self.request.session.test_cookie_worked():
-            return HttpResponse(_("Please enable cookies and try again."))
+            form.add_error(None, _("Login timeout, please try again."))
+            return self.form_invalid(form)
+
         # https://docs.djangoproject.com/en/3.1/topics/http/sessions/#setting-test-cookies
         self.request.session.delete_test_cookie()
 
