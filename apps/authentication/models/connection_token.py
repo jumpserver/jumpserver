@@ -210,16 +210,18 @@ class ConnectionToken(JMSOrgBaseModel):
         if not self.asset:
             return None
 
-        if self.account == AliasAccount.ANON and self.asset.category not in ['web', 'custom']:
-            raise JMSException({'error': 'Anonymous account is not supported in {}'.format(self.asset.category)})
-
         if self.account.startswith('@'):
             account = Account.get_special_account(self.account)
+            account.asset = self.asset
+            account.org_id = self.asset.org_id
+
+            if self.account == AliasAccount.INPUT:
+                account.username = self.input_username
+                account.secret = self.input_secret
         else:
             account = self.asset.accounts.filter(name=self.account).first()
-
-        account.asset = self.asset
-        account.secret = account.secret or self.input_secret
+            if not account.secret and self.input_secret:
+                account.secret = self.input_secret
         return account
 
     @lazyproperty
