@@ -148,14 +148,16 @@ class DatesLoginMetricMixin:
     password_change_logs_queryset: PasswordChangeLog.objects
 
     def get_dates_metrics_total_count_login(self):
-        queryset = UserLoginLog.objects.filter(datetime__range=(self.date_start_end)) \
+        queryset = UserLoginLog.objects \
+            .filter(datetime__range=(self.date_start_end)) \
             .values('datetime__date').annotate(id__count=Count(id)) \
             .order_by('datetime__date')
         map_date_logincount = {i['datetime__date']: i['id__count'] for i in queryset}
         return [map_date_logincount.get(d, 0) for d in self.dates_list]
 
     def get_dates_metrics_total_count_active_users(self):
-        queryset = Session.objects.filter(date_start__range=(self.date_start_end)) \
+        queryset = Session.objects \
+            .filter(date_start__range=(self.date_start_end)) \
             .values('date_start__date') \
             .annotate(id__count=Count('user_id', distinct=True)) \
             .order_by('date_start__date')
@@ -163,7 +165,8 @@ class DatesLoginMetricMixin:
         return [map_date_usercount.get(d, 0) for d in self.dates_list]
 
     def get_dates_metrics_total_count_active_assets(self):
-        queryset = Session.objects.filter(date_start__range=(self.date_start_end)) \
+        queryset = Session.objects \
+            .filter(date_start__range=(self.date_start_end)) \
             .values('date_start__date') \
             .annotate(id__count=Count('asset_id', distinct=True)) \
             .order_by('date_start__date')
@@ -171,7 +174,8 @@ class DatesLoginMetricMixin:
         return [map_date_assetcount.get(d, 0) for d in self.dates_list]
 
     def get_dates_metrics_total_count_sessions(self):
-        queryset = Session.objects.filter(date_start__range=(self.date_start_end)) \
+        queryset = Session.objects \
+            .filter(date_start__range=(self.date_start_end)) \
             .values('date_start__date') \
             .annotate(id__count=Count(id)) \
             .order_by('date_start__date')
