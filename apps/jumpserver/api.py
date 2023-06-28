@@ -51,6 +51,10 @@ class DateTimeMixin:
         return t
 
     @lazyproperty
+    def date_start_end(self):
+        return self.days_to_datetime.date(), local_now().date()
+
+    @lazyproperty
     def dates_list(self):
         now = local_now()
         dates = [(now - timezone.timedelta(days=i)).date() for i in range(self.days)]
@@ -143,101 +147,36 @@ class DatesLoginMetricMixin:
     operate_logs_queryset: OperateLog.objects
     password_change_logs_queryset: PasswordChangeLog.objects
 
-    @staticmethod
-    def get_cache_key(date, tp):
-        date_str = date.strftime("%Y%m%d")
-        key = "SESSION_DATE_{}_{}_{}".format(current_org.id, tp, date_str)
-        return key
-
-    def __get_data_from_cache(self, date, tp):
-        if date == timezone.now().date():
-            return None
-        cache_key = self.get_cache_key(date, tp)
-        count = cache.get(cache_key)
-        return count
-
-    def __set_data_to_cache(self, date, tp, count):
-        cache_key = self.get_cache_key(date, tp)
-        cache.set(cache_key, count, 3600)
-
-    @staticmethod
-    def get_date_start_2_end(d):
-        time_min = timezone.datetime.min.time()
-        time_max = timezone.datetime.max.time()
-        tz = timezone.get_current_timezone()
-        ds = timezone.datetime.combine(d, time_min).replace(tzinfo=tz)
-        de = timezone.datetime.combine(d, time_max).replace(tzinfo=tz)
-        return ds, de
-
-    def get_date_login_count(self, date):
-        tp = "LOGIN-USER"
-        count = self.__get_data_from_cache(date, tp)
-        if count is not None:
-            return count
-        ds, de = self.get_date_start_2_end(date)
-        count = UserLoginLog.objects.filter(datetime__range=(ds, de)).count()
-        self.__set_data_to_cache(date, tp, count)
-        return count
-
     def get_dates_metrics_total_count_login(self):
-        data = []
-        for d in self.dates_list:
-            count = self.get_date_login_count(d)
-            data.append(count)
-        if len(data) == 0:
-            data = [0]
-        return data
-
-    def get_date_user_count(self, date):
-        tp = "USER"
-        count = self.__get_data_from_cache(date, tp)
-        if count is not None:
-            return count
-        ds, de = self.get_date_start_2_end(date)
-        count = len(set(Session.objects.filter(date_start__range=(ds, de)).values_list('user_id', flat=True)))
-        self.__set_data_to_cache(date, tp, count)
-        return count
+        queryset = UserLoginLog.objects.filter(datetime__range=(self.date_start_end)) \
+            .values('datetime__date').annotate(id__count=Count(id)) \
+            .order_by('datetime__date')
+        map_date_logincount = {i['datetime__date']: i['id__count'] for i in queryset}
+        return [map_date_logincount.get(d, 0) for d in self.dates_list]
 
     def get_dates_metrics_total_count_active_users(self):
-        data = []
-        for d in self.dates_list:
-            count = self.get_date_user_count(d)
-            data.append(count)
-        return data
-
-    def get_date_asset_count(self, date):
-        tp = "ASSET"
-        count = self.__get_data_from_cache(date, tp)
-        if count is not None:
-            return count
-        ds, de = self.get_date_start_2_end(date)
-        count = len(set(Session.objects.filter(date_start__range=(ds, de)).values_list('asset', flat=True)))
-        self.__set_data_to_cache(date, tp, count)
-        return count
+        queryset = Session.objects.filter(date_start__range=(self.date_start_end)) \
+            .values('date_start__date') \
+            .annotate(id__count=Count('user_id', distinct=True)) \
+            .order_by('date_start__date')
+        map_date_usercount = {i['date_start__date']: i['id__count'] for i in queryset}
+        return [map_date_usercount.get(d, 0) for d in self.dates_list]
 
     def get_dates_metrics_total_count_active_assets(self):
-        data = []
-        for d in self.dates_list:
-            count = self.get_date_asset_count(d)
-            data.append(count)
-        return data
-
-    def get_date_session_count(self, date):
-        tp = "SESSION"
-        count = self.__get_data_from_cache(date, tp)
-        if count is not None:
-            return count
-        ds, de = self.get_date_start_2_end(date)
-        count = Session.objects.filter(date_start__range=(ds, de)).count()
-        self.__set_data_to_cache(date, tp, count)
-        return count
+        queryset = Session.objects.filter(date_start__range=(self.date_start_end)) \
+            .values('date_start__date') \
+            .annotate(id__count=Count('asset_id', distinct=True)) \
+            .order_by('date_start__date')
+        map_date_assetcount = {i['date_start__date']: i['id__count'] for i in queryset}
+        return [map_date_assetcount.get(d, 0) for d in self.dates_list]
 
     def get_dates_metrics_total_count_sessions(self):
-        data = []
-        for d in self.dates_list:
-            count = self.get_date_session_count(d)
-            data.append(count)
-        return data
+        queryset = Session.objects.filter(date_start__range=(self.date_start_end)) \
+            .values('date_start__date') \
+            .annotate(id__count=Count(id)) \
+            .order_by('date_start__date')
+        map_date_usercount = {i['date_start__date']: i['id__count'] for i in queryset}
+        return [map_date_usercount.get(d, 0) for d in self.dates_list]
 
     @lazyproperty
     def get_type_to_assets(self):
