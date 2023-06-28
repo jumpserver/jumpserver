@@ -56,6 +56,9 @@ class Account(AbsConnectivity, BaseAccount):
     history = AccountHistoricalRecords(included_fields=['id', 'secret', 'secret_type', 'version'])
     source = models.CharField(max_length=30, default=Source.LOCAL, verbose_name=_('Source'))
     source_id = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Source ID'))
+    configs = models.ManyToManyField(
+        'accounts.ProtocolConfig', through='accounts.AccountProtocolConfig', related_name='accounts'
+    )
 
     class Meta:
         verbose_name = _('Account')
@@ -111,6 +114,10 @@ class AccountTemplate(BaseAccount):
     su_from = models.ForeignKey(
         'self', related_name='su_to', null=True,
         on_delete=models.SET_NULL, verbose_name=_("Su from")
+    )
+    configs = models.ManyToManyField(
+        'accounts.ProtocolConfig', through='accounts.AccountTemplateProtocolConfig',
+        related_name='account_templates'
     )
 
     class Meta:
