@@ -38,7 +38,7 @@ jobs:
       - name: Process developers data
         # 将 developers 中的数据转化为 login 字段的列表并输出
         id: developer_names
-        run: echo "::set-output name=data::$(echo '${{ steps.developers.outputs.data }}' | jq -r '.[].login')"
+        run: echo "::set-output name=data::$(echo '${{ steps.developers.outputs.data }}' | jq '{login}' | jq 'keys'"
 
       - run: "echo developers: '${{ steps.developers.outputs.data }}'"
       - run: "echo developer names: '${{ steps.developer_names.outputs.data }}'"
