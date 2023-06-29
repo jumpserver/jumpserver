@@ -21,7 +21,7 @@ jobs:
           actions: 'remove-labels'
           labels: '状态:待反馈'
 
-  add-label-if-is-developers:
+  add-label-if-is-member:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -31,33 +31,33 @@ jobs:
         id: org_name
         run: echo "::set-output name=data::$(echo '${{ github.repository }}' | cut -d '/' -f 1)"
 
-      - name: Get Project Developers
+      - name: Get Organization public members
         uses: octokit/request-action@v2.x
-        id: developers
+        id: members
         with:
           route: GET /orgs/${{ steps.org_name.outputs.data }}/public_members
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Process developers data
-        # 将 developers 中的数据转化为 login 字段的拼接字符串
-        id: developer_names
-        run: echo "::set-output name=data::$(echo '${{ steps.developers.outputs.data }}' | jq '[.[].login] | join(",")')"
+      - name: Process public members data
+        # 将 members 中的数据转化为 login 字段的拼接字符串
+        id: member_names
+        run: echo "::set-output name=data::$(echo '${{ steps.members.outputs.data }}' | jq '[.[].login] | join(",")')"
 
-      - run: "echo developers: '${{ steps.developers.outputs.data }}'"
-      - run: "echo developer names: '${{ steps.developer_names.outputs.data }}'"
+      - run: "echo members: '${{ steps.members.outputs.data }}'"
+      - run: "echo member names: '${{ steps.member_names.outputs.data }}'"
       - run: "echo comment user: '${{ github.event.comment.user.login }}'"
-      - run: "echo contains? : '${{ contains(steps.developer_names.outputs.data, github.event.comment.user.login) }}'"
+      - run: "echo contains? : '${{ contains(steps.member_names.outputs.data, github.event.comment.user.login) }}'"
 
       - name: Add require replay label
-        if: contains(steps.developer_names.outputs.data, github.event.comment.user.login)
+        if: contains(steps.member_names.outputs.data, github.event.comment.user.login)
         uses: actions-cool/issues-helper@v2
         with:
           actions: 'add-labels'
           labels: '状态:待反馈'
 
       - name: Remove require handle label
-        if: contains(steps.developer_names.outputs.data, github.event.comment.user.login)
+        if: contains(steps.member_names.outputs.data, github.event.comment.user.login)
         uses: actions-cool/issues-helper@v2
         with:
           actions: 'remove-labels'
