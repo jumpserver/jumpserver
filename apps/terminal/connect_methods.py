@@ -48,8 +48,7 @@ class WebMethod(TextChoices):
 class NativeClient(TextChoices):
     # Koko
     ssh = 'ssh', 'SSH'
-    putty = 'putty', 'PuTTY'
-    xshell = 'xshell', 'Xshell'
+    ssh_client = 'ssh_client', _('SSH Client')
 
     # Magnus
     db_client = 'db_client', _('DB Client')
@@ -64,7 +63,7 @@ class NativeClient(TextChoices):
         clients = {
             Protocol.ssh: {
                 'default': [cls.ssh],
-                'windows': [cls.putty],
+                'windows': [cls.ssh_client],
             },
             Protocol.rdp: [cls.mstsc],
             Protocol.mysql: [cls.db_client],
@@ -128,15 +127,7 @@ class NativeClient(TextChoices):
         username = f'JMS-{token.id}'
         commands = {
             cls.ssh: f'ssh {username}@{endpoint.host} -p {endpoint.ssh_port}',
-            cls.putty: f'putty.exe -ssh {username}@{endpoint.host} -P {endpoint.ssh_port}',
-            cls.xshell: f'xshell.exe -url ssh://{username}:{token.value}@{endpoint.host}:{endpoint.ssh_port}',
-            # cls.mysql: 'mysql -h {hostname} -P {port} -u {username} -p',
-            # cls.psql: {
-            #     'default': 'psql -h {hostname} -p {port} -U {username} -W',
-            #     'windows': 'psql /h {hostname} /p {port} /U {username} -W',
-            # },
-            # cls.sqlplus: 'sqlplus {username}/{password}@{hostname}:{port}',
-            # cls.redis: 'redis-cli -h {hostname} -p {port} -a {password}',
+            cls.ssh_client: f'putty.exe -ssh {username}@{endpoint.host} -P {endpoint.ssh_port}',
         }
         command = commands.get(name)
         if isinstance(command, dict):
