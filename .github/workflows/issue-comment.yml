@@ -27,20 +27,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Get Repository Collaborators
-        id: collaborators
+      - name: Get Project Developers
         uses: octokit/request-action@v2.x
+        id: developers
         with:
-          route: GET /repos/{owner}/{repo}/collaborators
-          owner: ${{ github.repository_owner }}
-          repo: ${{ github.repository }}
+          route: GET /repos/${{ github.repository }}/collaborators
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - run: "echo Collaborators: '${{ steps.collaborators.outputs.data }}'"
+
+      - run: "echo Collaborators: '${{ steps.developers.outputs.data }}'"
 
       - name: Add require replay label
-        if: contains(steps.collaborators.outputs.data, github.event.comment.user.id)
+        if: contains(steps.developers.outputs.data, github.event.comment.user.id)
         uses: actions-cool/issues-helper@v2
         with:
           actions: 'add-labels'
