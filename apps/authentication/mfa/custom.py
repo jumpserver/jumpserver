@@ -42,9 +42,6 @@ class MFACustom(BaseMFA):
     def global_enabled():
         return settings.MFA_CUSTOM and callable(mfa_custom_method)
 
-    def get_enable_url(self) -> str:
-        return ''
-
     def can_disable(self):
         return False
 
@@ -54,6 +51,3 @@ class MFACustom(BaseMFA):
     @staticmethod
     def help_text_of_disable():
         return _("MFA custom global enabled, cannot disable")
-
-    def get_disable_url(self) -> str:
-        return ''

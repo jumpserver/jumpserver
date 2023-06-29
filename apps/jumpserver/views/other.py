@@ -2,7 +2,7 @@
 #
 import re
 
-from django.http import HttpResponseRedirect, JsonResponse, Http404
+from django.http import JsonResponse, Http404
 from django.conf import settings
 from django.views.generic import View, TemplateView
 from django.shortcuts import redirect
@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 from common.views.http import HttpResponseTemporaryRedirect
 
 __all__ = [
-    'LunaView', 'I18NView', 'KokoView', 'WsView',
+    'LunaView', 'KokoView', 'WsView',
     'redirect_format_api', 'redirect_old_apps_view', 'UIView',
     'ResourceDownload',
 ]
@@ -26,14 +26,6 @@ class LunaView(View):
             "<div>Luna is a separately deployed program, you need to deploy Luna, koko, configure nginx for url distribution,</div> "
             "</div>If you see this page, prove that you are not accessing the nginx listening port. Good luck.</div>")
         return HttpResponse(msg)
-
-
-class I18NView(View):
-    def get(self, request, lang):
-        referer_url = request.META.get('HTTP_REFERER', '/')
-        response = HttpResponseRedirect(referer_url)
-        response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang)
-        return response
 
 
 api_url_pattern = re.compile(r'^/api/(?P<app>\w+)/(?P<version>v\d)/(?P<extra>.*)$')

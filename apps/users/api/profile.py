@@ -3,7 +3,7 @@ import uuid
 
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from common.permissions import IsValidUserOrConnectionToken
+from common.permissions import IsValidUserOrConnectionTokenOrSessionUser
 from common.utils import get_object_or_none
 from orgs.utils import tmp_to_root_org
 from authentication.models import ConnectionToken
@@ -48,15 +48,16 @@ class UserResetPKApi(UserQuerysetMixin, generics.UpdateAPIView):
 
 
 class UserProfileApi(generics.RetrieveUpdateAPIView):
-    permission_classes = (IsValidUserOrConnectionToken,)
+    permission_classes = (IsValidUserOrConnectionTokenOrSessionUser,)
     serializer_class = serializers.UserProfileSerializer
 
     def get_object(self):
+        user = None
         if self.request.user.is_anonymous:
             user = self.get_connection_token_user()
-            if user:
-                return user
-        return self.request.user
+            if not user:
+                user = self.get_session_user()
+        return user or self.request.user
 
     def get_connection_token_user(self):
         token_id = self.request.query_params.get('token')
@@ -67,6 +68,12 @@ class UserProfileApi(generics.RetrieveUpdateAPIView):
         if not token:
             return
         return token.user
+
+    def get_session_user(self):
+        user_id = self.request.session.get('user_id')
+        if not user_id:
+            return
+        return get_object_or_none(User, pk=user_id)
 
 
 class UserMFAApi(generics.RetrieveUpdateAPIView):

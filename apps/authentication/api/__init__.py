@@ -13,3 +13,4 @@ from .dingtalk import *
 from .feishu import *
 from .password import *
 from .temp_token import *
+from .otp import *

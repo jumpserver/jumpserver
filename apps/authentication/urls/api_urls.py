@@ -1,6 +1,6 @@
 # coding:utf-8
 #
-from django.urls import path
+from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from .. import api
@@ -38,9 +38,14 @@ urlpatterns = [
     path('password/verify/', api.UserPasswordVerifyApi.as_view(), name='user-password-verify'),
     path('login-confirm-ticket/status/', api.TicketStatusApi.as_view(), name='login-confirm-ticket-status'),
 
+    path('password/forgot/', api.UserForgotPasswordApi.as_view(), name='forgot-password'),
     path('password/forget/previewing/', api.ForgetPasswordPreviewingApi.as_view(), name='forgot-previewing'),
     path('password/forget/auth/', api.ForgetPasswordAuthApi.as_view(), name='forgot-auth'),
+    path('password/reset/', api.UserResetPasswordApi.as_view(), name='reset-password'),
     path('login/', api.LoginApi.as_view(), name='login'),
+    path('otp/', api.UserOtpEnableBindApi.as_view(), name='user-otp'),
+
+    path('captcha/', include('captcha.urls')),
 ]
 
 urlpatterns += router.urls

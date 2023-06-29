@@ -1,10 +1,6 @@
 from django.utils.translation import gettext_lazy as _
-from django.shortcuts import reverse
 
 from .base import BaseMFA
-
-
-otp_failed_msg = _("OTP code invalid, or server time error")
 
 
 class MFAOtp(BaseMFA):
@@ -17,7 +13,8 @@ class MFAOtp(BaseMFA):
         assert self.is_authenticated()
 
         ok = check_otp_code(self.user.otp_secret_key, code)
-        msg = '' if ok else otp_failed_msg
+        from authentication.const import OTP_FAILED_MSG
+        msg = '' if ok else OTP_FAILED_MSG
         return ok, msg
 
     def is_active(self):
@@ -29,9 +26,6 @@ class MFAOtp(BaseMFA):
     def global_enabled():
         return True
 
-    def get_enable_url(self) -> str:
-        return reverse('authentication:user-otp-enable-start')
-
     def disable(self):
         assert self.is_authenticated()
         self.user.otp_secret_key = ''
@@ -39,9 +33,6 @@ class MFAOtp(BaseMFA):
 
     def can_disable(self) -> bool:
         return True
-
-    def get_disable_url(self):
-        return reverse('authentication:user-otp-disable')
 
     @staticmethod
     def help_text_of_enable():

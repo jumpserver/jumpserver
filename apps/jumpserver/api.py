@@ -1,6 +1,7 @@
 import time
 
 from django.core.cache import cache
+from django.conf import settings
 from django.db.models import Count, Max, F
 from django.http.response import JsonResponse, HttpResponse
 from django.utils import timezone
@@ -24,7 +25,7 @@ from terminal.models import Session, Command
 from terminal.utils import ComponentsPrometheusMetricsUtil
 from users.models import User
 
-__all__ = ['IndexApi']
+__all__ = ['IndexApi', 'I18NApi']
 
 
 class DateTimeMixin:
@@ -544,3 +545,14 @@ class PrometheusMetricsApi(HealthApiMixin):
         util = ComponentsPrometheusMetricsUtil()
         metrics_text = util.get_prometheus_metrics_text()
         return HttpResponse(metrics_text, content_type='text/plain; version=0.0.4; charset=utf-8')
+
+
+class I18NApi(APIView):
+    permission_classes = (AllowAny,)
+
+    @staticmethod
+    def get(request, lang):
+        referer_url = request.META.get('HTTP_REFERER', '/')
+        response = Response(data={'redirect': referer_url}, status=200)
+        response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang)
+        return response

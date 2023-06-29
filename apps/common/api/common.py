@@ -9,14 +9,15 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics, serializers
+from rest_framework.permissions import AllowAny
 
 from common.permissions import IsValidUser
 from common.views.http import HttpResponseTemporaryRedirect
-from common.utils import get_logger
+from common.utils import get_logger, FlashMessageUtil, bulk_get
 from common.const import KEY_CACHE_RESOURCE_IDS
 
 __all__ = [
-    'LogTailApi', 'ResourcesIDCacheApi'
+    'LogTailApi', 'ResourcesIDCacheApi', 'FlashMessageMsgApi'
 ]
 
 logger = get_logger(__file__)
@@ -103,3 +104,36 @@ def redirect_plural_name_api(request, *args, **kwargs):
     full_path = org_full_path.replace(resource, resource + "s", 1)
     logger.debug("Redirect {} => {}".format(org_full_path, full_path))
     return HttpResponseTemporaryRedirect(full_path)
+
+
+class FlashMessageMsgApi(APIView):
+    permission_classes = (AllowAny,)
+
+    @staticmethod
+    def get(request, *args, **kwargs):
+        code = request.GET.get('code')
+        if not code:
+            return Response(data={'error': 'Not found the code'}, status=404)
+
+        message_data = FlashMessageUtil.get_message_by_code(code)
+        if not message_data:
+            return Response(data={'error': 'Message code error'}, status=400)
+
+        items = ('title', 'message', 'error', 'redirect_url', 'confirm_button', 'cancel_url')
+        title, msg, error, redirect_url, confirm_btn, cancel_url = bulk_get(message_data, items)
+
+        interval = message_data.get('interval', 3)
+        auto_redirect = message_data.get('auto_redirect', True)
+        has_cancel = message_data.get('has_cancel', False)
+        context = {
+            'title': title,
+            'message': msg,
+            'error': error,
+            'interval': interval,
+            'redirect_url': redirect_url,
+            'auto_redirect': auto_redirect,
+            'confirm_button': confirm_btn,
+            'has_cancel': has_cancel,
+            'cancel_url': cancel_url,
+        }
+        return Response(data=context, status=200)

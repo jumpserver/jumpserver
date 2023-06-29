@@ -1,7 +1,4 @@
 # ~*~ coding: utf-8 ~*~
-import time
-
-from django.conf import settings
 from django.contrib.auth import authenticate
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
@@ -10,7 +7,7 @@ from django.views.generic.edit import FormView
 from authentication.mixins import AuthMixin
 from authentication import errors
 
-from common.utils import get_logger
+from common.utils import get_logger, reverse
 from ... import forms
 from ...utils import (
     get_user_or_pre_auth_user,

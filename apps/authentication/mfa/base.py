@@ -47,14 +47,6 @@ class BaseMFA(abc.ABC):
         return False
 
     @abc.abstractmethod
-    def get_enable_url(self) -> str:
-        return ''
-
-    @abc.abstractmethod
-    def get_disable_url(self) -> str:
-        return ''
-
-    @abc.abstractmethod
     def disable(self):
         pass
 

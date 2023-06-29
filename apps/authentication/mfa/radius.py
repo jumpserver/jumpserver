@@ -30,9 +30,6 @@ class MFARadius(BaseMFA):
     def global_enabled():
         return settings.OTP_IN_RADIUS
 
-    def get_enable_url(self) -> str:
-        return ''
-
     def can_disable(self):
         return False
 
@@ -42,6 +39,3 @@ class MFARadius(BaseMFA):
     @staticmethod
     def help_text_of_disable():
         return _("Radius global enabled, cannot disable")
-
-    def get_disable_url(self) -> str:
-        return ''

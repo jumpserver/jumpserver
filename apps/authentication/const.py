@@ -1,4 +1,5 @@
 from django.db.models import TextChoices
+from django.utils.translation import gettext_lazy as _
 
 from authentication.confirm import CONFIRM_BACKENDS
 from .confirm import ConfirmMFA, ConfirmPassword, ConfirmReLogin
@@ -36,3 +37,9 @@ class MFAType(TextChoices):
     SMS = MFASms.name, MFASms.display_name
     Radius = MFARadius.name, MFARadius.display_name
     Custom = MFACustom.name, MFACustom.display_name
+
+
+PROFILE_USER_MFA_URL = '/ui/#/profile/setting?activeTab=UserMFA'
+PROFILE_USER_MFA_NO_LOGIN_URL = '/ui/#/mfa/setting'
+
+OTP_FAILED_MSG = _("OTP code invalid, or server time error")

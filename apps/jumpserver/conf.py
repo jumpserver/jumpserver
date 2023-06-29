@@ -16,13 +16,14 @@ import os
 import re
 import sys
 import types
+import yaml
+
 from importlib import import_module
 from urllib.parse import urljoin, urlparse
 
-import yaml
-from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from gmssl.sm4 import CryptSM4, SM4_ENCRYPT, SM4_DECRYPT
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
@@ -228,7 +229,7 @@ class Config(dict):
         'SESSION_COOKIE_NAME_PREFIX': None,
         'SESSION_COOKIE_AGE': 3600 * 24,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE': False,
-        'LOGIN_URL': reverse_lazy('authentication:login'),
+        'LOGIN_URL': '/ui/#/authentication/login/',
         'CONNECTION_TOKEN_EXPIRATION': 5 * 60,
 
         # Custom Config

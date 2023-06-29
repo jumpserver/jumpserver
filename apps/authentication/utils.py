@@ -4,7 +4,9 @@ import ipaddress
 from urllib.parse import urljoin, urlparse
 
 from django.conf import settings
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from captcha.models import CaptchaStore
 
 from common.utils import validate_ip, get_ip_city, get_request_ip
 from common.utils import get_logger
@@ -56,3 +58,22 @@ def build_absolute_uri_for_oidc(request, path=None):
         redirect_uri = urljoin(settings.BASE_SITE_URL, path)
         return redirect_uri
     return build_absolute_uri(request, path=path)
+
+
+def check_captcha_is_valid(attrs):
+    err = None
+    key, value = attrs.get('key'), attrs.get('value')
+    if not getattr(settings, 'CAPTCHA_GET_FROM_POOL', None):
+        CaptchaStore.remove_expired()
+
+    try:
+        captcha = CaptchaStore.objects.get(
+            hashkey=key, expiration__gt=timezone.now()
+        )
+    except CaptchaStore.DoesNotExist:
+        err = _('Invalid CAPTCHA')
+    else:
+        if captcha.response != value:
+            err = _('Invalid CAPTCHA')
+        captcha.delete()
+    return err

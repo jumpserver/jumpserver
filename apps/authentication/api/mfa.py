@@ -66,10 +66,12 @@ class MFASendCodeApi(AuthMixin, CreateAPIView):
 
 
 class MFASettingsApi(APIView):
-    permission_classes = [IsValidUser]
+    permission_classes = [AllowAny]
 
     def get(self, request):
         user = get_user_or_pre_auth_user(self.request)
+        if not user:
+            return Response(data={'error': 'User not found'}, status=404)
         otp_uri, otp_secret_key = generate_otp_uri(user.username)
         return Response({
             'otp_uri': otp_uri, 'otp_secret_key': otp_secret_key,

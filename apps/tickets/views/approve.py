@@ -3,7 +3,7 @@
 
 from __future__ import unicode_literals
 from django.core.cache import cache
-from django.shortcuts import redirect, reverse
+from django.shortcuts import redirect
 from django.views.generic.base import TemplateView
 from django.utils.translation import ugettext as _
 
@@ -14,7 +14,7 @@ from tickets.models import (
     Ticket, ApplyAssetTicket,
     ApplyLoginTicket, ApplyLoginAssetTicket, ApplyCommandTicket
 )
-from common.utils import get_logger, FlashMessageUtil
+from common.utils import get_logger, FlashMessageUtil, reverse
 
 logger = get_logger(__name__)
 

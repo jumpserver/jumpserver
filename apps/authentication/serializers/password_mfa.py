@@ -3,10 +3,9 @@
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core.cache import cache
-from django.utils import timezone
 from rest_framework import serializers
-from captcha.models import CaptchaStore
 
+from authentication.utils import check_captcha_is_valid
 from common.serializers.fields import EncryptedField
 from common.utils import get_object_or_none, random_string
 from users.models import User
@@ -16,7 +15,7 @@ __all__ = [
     'MFAChallengeSerializer', 'MFASelectTypeSerializer',
     'PasswordVerifySerializer', 'ResetPasswordCodeSerializer',
     'ForgetPasswordPreviewingSerializer', 'ForgetPasswordAuthSerializer',
-    'LoginSerializer',
+    'LoginSerializer', 'LoginCaptchaSerializer', 'ResetPasswordSerializer'
 ]
 
 
@@ -67,6 +66,16 @@ class CaptchaSerializer(serializers.Serializer):
     key = serializers.CharField(required=True)
 
 
+class ResetPasswordSerializer(serializers.Serializer):
+    new_password = EncryptedField(max_length=1024, required=True, label=_('New password'))
+    confirm_password = EncryptedField(max_length=1024, required=True, label=_('Confirm password'))
+
+    def validate(self, attrs):
+        if attrs['new_password'] != attrs['confirm_password']:
+            raise serializers.ValidationError({'error': _('Password does not match')})
+        return attrs
+
+
 class ForgetPasswordPreviewingSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=150, required=True, label=_("Username"))
     code = CaptchaSerializer()
@@ -85,22 +94,7 @@ class ForgetPasswordPreviewingSerializer(serializers.Serializer):
 
     @staticmethod
     def custom_validate_code(code_dict):
-        err = ''
-        key, value = code_dict.get('key'), code_dict.get('value')
-        if not getattr(settings, 'CAPTCHA_GET_FROM_POOL', None):
-            CaptchaStore.remove_expired()
-
-        try:
-            captcha = CaptchaStore.objects.get(
-                hashkey=key, expiration__gt=timezone.now()
-            )
-        except CaptchaStore.DoesNotExist:
-            err = _('Invalid CAPTCHA')
-        else:
-            if captcha.response != value:
-                err = _('Invalid CAPTCHA')
-            captcha.delete()
-        return err
+        return check_captcha_is_valid(code_dict)
 
     def create(self, validated_data):
         user, err = self.custom_validate_username(validated_data['username'])
@@ -134,6 +128,17 @@ def get_auto_login_label():
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=128, required=True, label=_('Username'))
-    password = serializers.CharField(max_length=128, required=True, label=_('Password'))
+    password = EncryptedField(max_length=1024, required=True, label=_('Password'))
     auto_login = serializers.BooleanField(default=False, label=get_auto_login_label())
+
+
+class LoginCaptchaSerializer(LoginSerializer):
+    has_captcha = serializers.BooleanField(default=True)
+    captcha = CaptchaSerializer()
+
+    def validate(self, attrs):
+        err = check_captcha_is_valid(attrs['captcha'])
+        if err:
+            raise serializers.ValidationError({'captcha': err})
+        return attrs
 

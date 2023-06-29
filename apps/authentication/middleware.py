@@ -1,7 +1,6 @@
 import base64
-import time
 
-from django.shortcuts import redirect, reverse, render
+from django.shortcuts import redirect, render
 from django.utils.deprecation import MiddlewareMixin
 from django.http import HttpResponse
 from django.conf import settings
@@ -9,8 +8,7 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth import logout as auth_logout
 
 from apps.authentication import mixins
-from common.utils import gen_key_pair
-from common.utils import get_request_ip
+from common.utils import gen_key_pair, get_request_ip, reverse
 from .signals import post_auth_failed
 
 

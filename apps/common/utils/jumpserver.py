@@ -40,7 +40,7 @@ class FlashMessageUtil:
     @classmethod
     def gen_message_url(cls, message_data):
         code = cls.get_message_code(message_data)
-        return reverse('common:flash-message') + f'?code={code}'
+        return reverse('common:flash-message') + f'?code={code}&type=flash'
 
     @classmethod
     def gen_and_redirect_to(cls, message_data):

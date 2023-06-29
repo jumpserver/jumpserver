@@ -74,6 +74,8 @@ class SimpleMetadataWithFilters(SimpleMetadata):
             child_relation_class_name = field.child_relation.__class__.__name__
             if child_relation_class_name == "ObjectRelatedField":
                 tp = "m2m_related_field"
+        elif class_name == 'CaptchaSerializer':
+            tp = 'captcha'
         return tp
 
     @staticmethod

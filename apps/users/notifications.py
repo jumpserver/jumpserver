@@ -214,7 +214,7 @@ class ResetMFAMsg(UserMessage):
         subject = _('Reset MFA')
         context = {
             'name': self.user.name,
-            'url': reverse('authentication:user-otp-enable-start', external=True),
+            'url': reverse('authentication:user-otp-enable-start', external=True), # TODO 这里换成用户设置MFA的地方
         }
         message = render_to_string('users/_msg_reset_mfa.html', context)
         return {

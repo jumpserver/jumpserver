@@ -13,13 +13,16 @@ from django.contrib.auth import (
 )
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
-from django.shortcuts import reverse, redirect, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
 from rest_framework.request import Request
+from rest_framework.response import Response
 
 from acls.models import LoginACL
-from common.utils import get_request_ip, get_logger, bulk_get, FlashMessageUtil
+from common.utils import (
+    get_request_ip, get_logger, bulk_get, FlashMessageUtil, reverse
+)
 from users.models import User
 from users.utils import LoginBlockUtil, MFABlockUtils, LoginIpBlockUtil
 from . import errors
@@ -193,8 +196,9 @@ class MFAMixin:
     def _check_if_no_active_mfa(self, user):
         active_mfa_mapper = user.active_mfa_backends_mapper
         if not active_mfa_mapper:
-            set_url = reverse('authentication:user-otp-enable-start')
-            raise errors.MFAUnsetError(set_url, user, self.request)
+            from authentication.const import PROFILE_USER_MFA_NO_LOGIN_URL
+            self.request.session['user_id'] = user.id
+            raise errors.MFAUnsetError(PROFILE_USER_MFA_NO_LOGIN_URL, user, self.request)
 
     def _check_login_page_mfa_if_need(self, user):
         if not settings.SECURITY_MFA_IN_LOGIN_PAGE:
@@ -287,7 +291,7 @@ class MFAMixin:
 class AuthPostCheckMixin:
     @classmethod
     def generate_reset_password_url_with_flash_msg(cls, user, message):
-        reset_passwd_url = reverse('authentication:reset-password')
+        reset_passwd_url = reverse('api-auth:reset-password', api_to_ui=True)
         query_str = urlencode({
             'token': user.generate_reset_token()
         })
@@ -305,7 +309,7 @@ class AuthPostCheckMixin:
     def _check_passwd_is_too_simple(cls, user: User, password):
         if user.is_superuser and password == 'admin':
             message = _('Your password is too simple, please change it for security')
-            url = cls.generate_reset_password_url_with_flash_msg(user, message=message)
+            url = cls.generate_reset_password_url_with_flash_msg(user, message)
             raise errors.PasswordTooSimple(url)
 
     @classmethod
@@ -513,4 +517,4 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
         args = self.request.META.get('QUERY_STRING', '')
         if args:
             guard_url = "%s?%s" % (guard_url, args)
-        return redirect(guard_url)
+        return Response({'redirect': guard_url}, status=200)

@@ -10,7 +10,7 @@ from django.db import IntegrityError
 from django.templatetags.static import static
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.http import HttpResponse, HttpRequest
-from django.shortcuts import reverse, redirect
+from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.cache import never_cache
@@ -22,7 +22,7 @@ from django.conf import settings
 from django.urls import reverse_lazy
 from django.contrib.auth import BACKEND_SESSION_KEY
 
-from common.utils import FlashMessageUtil, static_or_direct
+from common.utils import FlashMessageUtil, static_or_direct, reverse
 from users.utils import (
     redirect_user_first_login_or_index
 )
@@ -184,7 +184,7 @@ class UserLoginView(mixins.AuthMixin, UserLoginContextMixin, FormView):
                 'redirect_url': redirect_url,
                 'interval': 3,
                 'has_cancel': True,
-                'cancel_url': reverse('authentication:login') + '?admin=1'
+                'cancel_url': reverse('api-auth:login', api_to_ui=True) + '?admin=1'
             }
             redirect_url = FlashMessageUtil.gen_message_url(message_data)
         return redirect_url
@@ -366,7 +366,7 @@ class UserLogoutView(TemplateView):
             'title': _('Logout success'),
             'message': _('Logout success, return login page'),
             'interval': 3,
-            'redirect_url': reverse('authentication:login'),
+            'redirect_url': reverse('api-auth:login', api_to_ui=True),
             'auto_redirect': True,
         }
         kwargs.update(context)

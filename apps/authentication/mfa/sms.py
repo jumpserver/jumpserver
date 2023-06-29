@@ -43,11 +43,8 @@ class MFASms(BaseMFA):
     def global_enabled():
         return settings.SMS_ENABLED
 
-    def get_enable_url(self) -> str:
-        return '/ui/#/profile/setting?activeTab=ProfileUpdate'
-
     def can_disable(self) -> bool:
-        return True
+        return False
 
     def disable(self):
         return '/ui/#/profile/setting?activeTab=ProfileUpdate'
@@ -59,6 +56,3 @@ class MFASms(BaseMFA):
     @staticmethod
     def help_text_of_disable():
         return _("Clear phone number to disable")
-
-    def get_disable_url(self) -> str:
-        return '/ui/#/profile/setting?activeTab=ProfileUpdate'

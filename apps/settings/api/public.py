@@ -1,12 +1,12 @@
 from django.conf import settings
-from django.shortcuts import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import get_language
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 
-from common.permissions import IsValidUserOrConnectionToken
-from common.utils import get_logger, lazyproperty, static_or_direct
+from common.permissions import IsValidUserOrConnectionTokenOrSessionUser
+from common.utils import get_logger, lazyproperty, reverse
 from jumpserver.utils import has_valid_xpack_license, get_xpack_license_info
+from users.mixins import UserLoginContextMixin
 from .. import serializers
 from ..utils import get_interface_setting_or_default
 
@@ -15,7 +15,7 @@ logger = get_logger(__name__)
 __all__ = ['PublicSettingApi', 'OpenPublicSettingApi']
 
 
-class OpenPublicSettingApi(generics.RetrieveAPIView):
+class OpenPublicSettingApi(UserLoginContextMixin, generics.RetrieveAPIView):
     permission_classes = (AllowAny,)
     serializer_class = serializers.PublicSettingSerializer
 
@@ -24,56 +24,13 @@ class OpenPublicSettingApi(generics.RetrieveAPIView):
         return get_interface_setting_or_default()
 
     @staticmethod
-    def get_support_auth_methods():
-        auth_methods = [
-            {
-                'name': 'OpenID',
-                'enabled': settings.AUTH_OPENID,
-                'url': reverse('authentication:openid:login'),
-                'logo': static_or_direct('img/login_oidc_logo.png'),
-                'auto_redirect': True  # 是否支持自动重定向
-            },
-            {
-                'name': 'CAS',
-                'enabled': settings.AUTH_CAS,
-                'url': reverse('authentication:cas:cas-login'),
-                'logo': static_or_direct('img/login_cas_logo.png'),
-                'auto_redirect': True
-            },
-            {
-                'name': 'SAML2',
-                'enabled': settings.AUTH_SAML2,
-                'url': reverse('authentication:saml2:saml2-login'),
-                'logo': static_or_direct('img/login_saml2_logo.png'),
-                'auto_redirect': True
-            },
-            {
-                'name': settings.AUTH_OAUTH2_PROVIDER,
-                'enabled': settings.AUTH_OAUTH2,
-                'url': reverse('authentication:oauth2:login'),
-                'logo': static_or_direct(settings.AUTH_OAUTH2_LOGO_PATH),
-                'auto_redirect': True
-            },
-            {
-                'name': _('WeCom'),
-                'enabled': settings.AUTH_WECOM,
-                'url': reverse('authentication:wecom-qr-login'),
-                'logo': static_or_direct('img/login_wecom_logo.png'),
-            },
-            {
-                'name': _('DingTalk'),
-                'enabled': settings.AUTH_DINGTALK,
-                'url': reverse('authentication:dingtalk-qr-login'),
-                'logo': static_or_direct('img/login_dingtalk_logo.png')
-            },
-            {
-                'name': _('FeiShu'),
-                'enabled': settings.AUTH_FEISHU,
-                'url': reverse('authentication:feishu-qr-login'),
-                'logo': static_or_direct('img/login_feishu_logo.png')
-            }
+    def get_not_request_profile_url():
+        url_name = [
+            'api-auth:forgot-password', 'api-auth:reset-password', 'users:user-profile',
+            'api-auth:captcha-refresh', 'api-auth:login', 'api-common:flash-message',
+            'api-settings:open-public-setting', 'api-auth:mfa-settings',
         ]
-        return [method for method in auth_methods if method['enabled']]
+        return [reverse(url) for url in url_name]
 
     @lazyproperty
     def login_page_setting(self):
@@ -83,7 +40,9 @@ class OpenPublicSettingApi(generics.RetrieveAPIView):
         return {
             'AUTO_LOGIN_DAYS': auto_login_days,
             'FORGOT_PASSWORD_URL': settings.FORGOT_PASSWORD_URL,
-            'AUTH_METHODS': self.get_support_auth_methods()
+            'AUTH_METHODS': self.get_support_auth_methods(),
+            'LANGUAGE_CODE': get_language(),
+            'NOT_PROFILE_URL_WHITELIST': self.get_not_request_profile_url()
         }
 
     def get_object(self):
@@ -95,7 +54,7 @@ class OpenPublicSettingApi(generics.RetrieveAPIView):
 
 
 class PublicSettingApi(OpenPublicSettingApi):
-    permission_classes = (IsValidUserOrConnectionToken,)
+    permission_classes = (IsValidUserOrConnectionTokenOrSessionUser,)
     serializer_class = serializers.PrivateSettingSerializer
 
     def get_object(self):
