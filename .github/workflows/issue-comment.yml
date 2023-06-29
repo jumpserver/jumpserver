@@ -21,7 +21,7 @@ jobs:
           actions: 'remove-labels'
           labels: '状态:待反馈'
 
-  add-label-if-is-rd-members:
+  add-label-if-is-developers:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -35,18 +35,25 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Process developers data
+        # 将 developers 中的数据转化为 login 字段的列表并输出
+        id: developer_names
+        run: echo "::set-output name=data::$(echo '${{ steps.developers.outputs.data }}' | jq -r '.[] | .login')"
 
-      - run: "echo Collaborators: '${{ steps.developers.outputs.data }}'"
+      - run: "echo developers: '${{ steps.developer.outputs.data }}' '${{github.event.comment.user.id}}'"
+      - run: "echo developer names: '${{ steps.developer_names.outputs.data }}'"
+      - run: "echo comment user: '${{ github.event.comment.user.id }}'"
+      - run: "echo contains? : '${{ contains(steps.developer_names.outputs.data, github.event.comment.user.id) }}'"
 
       - name: Add require replay label
-        if: contains(steps.developers.outputs.data, github.event.comment.user.id)
+        if: contains(steps.developer_names.outputs.data, github.event.comment.user.id)
         uses: actions-cool/issues-helper@v2
         with:
           actions: 'add-labels'
           labels: '状态:待反馈'
 
       - name: Remove require handle label
-        if: contains(steps.collaborators.outputs.data, github.event.comment.user.id)
+        if: contains(steps.developer_names.outputs.data, github.event.comment.user.id)
         uses: actions-cool/issues-helper@v2
         with:
           actions: 'remove-labels'
