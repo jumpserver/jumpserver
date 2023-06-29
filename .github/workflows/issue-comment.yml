@@ -29,7 +29,7 @@ jobs:
 
       - name: Get Organization name
         id: org_name
-        run: echo "::set-output name=data::$(echo '${{ github.repository }}' | cut -d '/' -f 1)"
+        run: echo "{data}=$(echo '${{ github.repository }}' | cut -d '/' -f 1)" >> $GITHUB_OUTPUT
 
       - name: Get Organization public members
         uses: octokit/request-action@v2.x
@@ -42,7 +42,8 @@ jobs:
       - name: Process public members data
         # 将 members 中的数据转化为 login 字段的拼接字符串
         id: member_names
-        run: echo "::set-output name=data::$(echo '${{ steps.members.outputs.data }}' | jq '[.[].login] | join(",")')"
+        run: echo "{data}=$(echo '${{ steps.members.outputs.data }}' | jq '[.[].login] | join(",")')" >> $GITHUB_OUTPUT
+
 
       - run: "echo members: '${{ steps.members.outputs.data }}'"
       - run: "echo member names: '${{ steps.member_names.outputs.data }}'"
