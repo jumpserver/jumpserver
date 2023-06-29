@@ -31,7 +31,7 @@ jobs:
         uses: octokit/request-action@v2.x
         id: developers
         with:
-          route: GET /repos/${{ github.repository }}/collaborators
+          route: GET /repos/${${{ github.repository }}%%/*}/collaborators
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
