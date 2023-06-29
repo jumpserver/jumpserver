@@ -35,12 +35,12 @@ jobs:
         uses: octokit/request-action@v2.x
         id: developers
         with:
-          route: GET /orgs/${{ steps.org_name.outputs.data }}/members
+          route: GET /orgs/${{ steps.org_name.outputs.data }}/public_members
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Process developers data
-        # 将 developers 中的数据转化为 login 字段的列表并输出
+        # 将 developers 中的数据转化为 login 字段的拼接字符串
         id: developer_names
         run: echo "::set-output name=data::$(echo '${{ steps.developers.outputs.data }}' | jq '[.[].login] | join(",")')"
 
