@@ -23,15 +23,31 @@ jobs:
 
   add-label-if-not-author:
     runs-on: ubuntu-latest
-    if: (github.event.issue.user.id != github.event.comment.user.id) && !github.event.issue.pull_request && (github.event.issue.state == 'open')
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Get Repository Collaborators
+        id: collaborators
+        uses: octokit/request-action@v2.x
+        with:
+          route: GET /repos/{owner}/{repo}/collaborators
+          owner: ${{ github.repository_owner }}
+          repo: ${{ github.repository }}
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: "echo Collaborators: '${{ steps.collaborators.outputs.data }}'"
+
       - name: Add require replay label
+        if: contains(steps.collaborators.outputs.data, github.event.comment.user.id)
         uses: actions-cool/issues-helper@v2
         with:
           actions: 'add-labels'
           labels: '状态:待反馈'
 
       - name: Remove require handle label
+        if: contains(steps.collaborators.outputs.data, github.event.comment.user.id)
         uses: actions-cool/issues-helper@v2
         with:
           actions: 'remove-labels'
