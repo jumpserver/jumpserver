@@ -156,6 +156,7 @@ class RDPFileClientProtocolURLMixin:
 
         if connect_method_name == NativeClient.mstsc or connect_method_dict['type'] == 'applet':
             filename, content = self.get_rdp_file_info(token)
+            filename = urllib.parse.unquote(filename)
             data.update({
                 'protocol': 'rdp',
                 'file': {
