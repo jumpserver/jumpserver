@@ -27,11 +27,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Get Organization name
+        id: org_name
+        run: echo "::set-output name=data::$(echo '${{ github.repository }}' | cut -d '/' -f 1)"
+
       - name: Get Project Developers
         uses: octokit/request-action@v2.x
         id: developers
         with:
-          route: GET /repos/${${{ github.repository }}%%/*}/collaborators
+          route: GET /orgs/${{ steps.org_name.outputs.data }}/members
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
