@@ -21,7 +21,7 @@ jobs:
           actions: 'remove-labels'
           labels: '状态:待反馈'
 
-  add-label-if-not-author:
+  add-label-if-is-rd-members:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -34,8 +34,8 @@ jobs:
           route: GET /repos/{owner}/{repo}/collaborators
           owner: ${{ github.repository_owner }}
           repo: ${{ github.repository }}
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - run: "echo Collaborators: '${{ steps.collaborators.outputs.data }}'"
 
