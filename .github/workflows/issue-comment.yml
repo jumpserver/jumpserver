@@ -40,20 +40,20 @@ jobs:
         id: developer_names
         run: echo "::set-output name=data::$(echo '${{ steps.developers.outputs.data }}' | jq -r '.[] | .login')"
 
-      - run: "echo developers: '${{ steps.developer.outputs.data }}' '${{github.event.comment.user.id}}'"
+      - run: "echo developers: '${{ steps.developers.outputs.data }}'"
       - run: "echo developer names: '${{ steps.developer_names.outputs.data }}'"
-      - run: "echo comment user: '${{ github.event.comment.user.id }}'"
-      - run: "echo contains? : '${{ contains(steps.developer_names.outputs.data, github.event.comment.user.id) }}'"
+      - run: "echo comment user: '${{ github.event.comment.user.login }}'"
+      - run: "echo contains? : '${{ contains(steps.developer_names.outputs.data, github.event.comment.user.login) }}'"
 
       - name: Add require replay label
-        if: contains(steps.developer_names.outputs.data, github.event.comment.user.id)
+        if: contains(steps.developer_names.outputs.data, github.event.comment.user.login)
         uses: actions-cool/issues-helper@v2
         with:
           actions: 'add-labels'
           labels: '状态:待反馈'
 
       - name: Remove require handle label
-        if: contains(steps.developer_names.outputs.data, github.event.comment.user.id)
+        if: contains(steps.developer_names.outputs.data, github.event.comment.user.login)
         uses: actions-cool/issues-helper@v2
         with:
           actions: 'remove-labels'
