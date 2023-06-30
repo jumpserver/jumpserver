@@ -65,15 +65,15 @@
           - '%USERPROFILE%\AppData\Local\Programs\Tinker\'
         scope: user
 
-    - name: Download python-3.10.8
+    - name: Download python-3.10.11
       ansible.windows.win_get_url:
-        url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/python-3.10.8-amd64.exe"
-        dest: "{{ ansible_env.TEMP }}\\python-3.10.8-amd64.exe"
+        url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/python-3.10.11-amd64.exe"
+        dest: "{{ ansible_env.TEMP }}\\python-3.10.11-amd64.exe"
         validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
 
-    - name: Install the python-3.10.8
+    - name: Install the python-3.10.11
       ansible.windows.win_package:
-        path: "{{ ansible_env.TEMP }}\\python-3.10.8-amd64.exe"
+        path: "{{ ansible_env.TEMP }}\\python-3.10.11-amd64.exe"
         product_id: '{371d0d73-d418-4ffe-b280-58c3e7987525}'
         arguments:
           - /quiet
