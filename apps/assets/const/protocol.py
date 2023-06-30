@@ -60,7 +60,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
                         'choices': [('any', _('Any')), ('rdp', 'RDP'), ('tls', 'TLS'), ('nla', 'NLA')],
                         'default': 'any',
                         'label': _('Security'),
-                        'help_text': "Security layer to use for the connection"
+                        'help_text': _("Security layer to use for the connection")
                     },
                     # 'ad_domain': {
                     #     'type': 'str',
