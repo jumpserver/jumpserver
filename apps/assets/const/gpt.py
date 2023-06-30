@@ -35,7 +35,7 @@ class GPTTypes(BaseType):
     def _get_protocol_constrains(cls) -> dict:
         return {
             '*': {
-                'choices': ['http'],
+                'choices': '__self__',
             }
         }
 

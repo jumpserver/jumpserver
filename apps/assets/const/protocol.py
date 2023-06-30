@@ -187,7 +187,20 @@ class Protocol(ChoicesMixin, models.TextChoices):
             cls.chatgpt: {
                 'port': 443,
                 'required': True,
-                'secret_types': ['token'],
+                'secret_types': ['api_key'],
+                'setting': {
+                    'api_mode': {
+                        'type': 'choice',
+                        'default': 'gpt-3.5-turbo',
+                        'label': _('API mode'),
+                        'choices': [
+                            ('gpt-3.5-turbo', 'GPT-3.5 Turbo'),
+                            ('gpt-3.5-turbo-16k', 'GPT-3.5 Turbo 16K'),
+                            ('gpt-4', 'GPT-4'),
+                            ('gpt-4-32k', 'GPT-4 32K'),
+                        ]
+                    }
+                }
             }
         }
 
