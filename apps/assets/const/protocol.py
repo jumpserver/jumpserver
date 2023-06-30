@@ -26,6 +26,8 @@ class Protocol(ChoicesMixin, models.TextChoices):
     k8s = 'k8s', 'K8S'
     http = 'http', 'HTTP(s)'
 
+    chatgpt = 'chatgpt', 'ChatGPT'
+
     @classmethod
     def device_protocols(cls):
         return {
@@ -154,7 +156,6 @@ class Protocol(ChoicesMixin, models.TextChoices):
             cls.http: {
                 'port': 80,
                 'secret_types': ['password'],
-                'label': 'HTTP(s)',
                 'setting': {
                     'autofill': {
                         'type': 'choice',
@@ -181,11 +182,22 @@ class Protocol(ChoicesMixin, models.TextChoices):
         }
 
     @classmethod
+    def gpt_protocols(cls):
+        return {
+            cls.chatgpt: {
+                'port': 443,
+                'required': True,
+                'secret_types': ['token'],
+            }
+        }
+
+    @classmethod
     def settings(cls):
         return {
             **cls.device_protocols(),
             **cls.database_protocols(),
-            **cls.cloud_protocols()
+            **cls.cloud_protocols(),
+            **cls.gpt_protocols(),
         }
 
     @classmethod
