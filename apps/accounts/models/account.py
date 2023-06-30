@@ -7,7 +7,7 @@ from simple_history.models import HistoricalRecords
 from assets.models.base import AbsConnectivity
 from common.utils import lazyproperty
 from .base import BaseAccount
-from ..const import AliasAccount, Source, SecretStrategy
+from ..const import AliasAccount, Source
 
 __all__ = ['Account', 'AccountTemplate']
 
@@ -108,16 +108,10 @@ class Account(AbsConnectivity, BaseAccount):
 
 
 class AccountTemplate(BaseAccount):
-    secret_strategy = models.CharField(
-        choices=SecretStrategy.choices, max_length=16,
-        default=SecretStrategy.custom, verbose_name=_('Secret strategy')
-    )
     su_from = models.ForeignKey(
         'self', related_name='su_to', null=True,
         on_delete=models.SET_NULL, verbose_name=_("Su from")
     )
-    auto_push = models.BooleanField(default=False, verbose_name=_('Auto push'))
-    push_params = models.JSONField(default=dict, verbose_name=_('Push params'))
 
     class Meta:
         verbose_name = _('Account template')

@@ -52,19 +52,21 @@ class Protocol(ChoicesMixin, models.TextChoices):
                     'console': {
                         'type': 'bool',
                         'default': False,
-                        'label': _('Console')
+                        'label': _('Console'),
+                        'help_text': _("Connect to console session")
                     },
                     'security': {
                         'type': 'choice',
-                        'choices': ['any', 'rdp', 'tls', 'nla'],
+                        'choices': [('any', _('Any')), ('rdp', 'RDP'), ('tls', 'TLS'), ('nla', 'NLA')],
                         'default': 'any',
-                        'label': _('Security')
+                        'label': _('Security'),
+                        'help_text': "Security layer to use for the connection"
                     },
-                    'ad_domain': {
-                        'type': 'str',
-                        "required": False,
-                        'label': _('AD domain')
-                    }
+                    # 'ad_domain': {
+                    #     'type': 'str',
+                    #     "required": False,
+                    #     'label': _('AD domain')
+                    # }
                 }
             },
             cls.vnc: {
