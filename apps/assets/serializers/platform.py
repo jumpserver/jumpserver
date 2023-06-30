@@ -1,48 +1,17 @@
+from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from assets.const.web import FillType
-from common.serializers import WritableNestedModelSerializer, type_field_map
+from common.serializers import (
+    WritableNestedModelSerializer, type_field_map, MethodSerializer,
+    DictSerializer, create_serializer_class
+)
 from common.serializers.fields import LabeledChoiceField
 from common.utils import lazyproperty
-from ..const import Category, AllTypes
+from ..const import Category, AllTypes, Protocol
 from ..models import Platform, PlatformProtocol, PlatformAutomation
 
-__all__ = ["PlatformSerializer", "PlatformOpsMethodSerializer"]
-
-
-class ProtocolSettingSerializer(serializers.Serializer):
-    SECURITY_CHOICES = [
-        ("any", "Any"),
-        ("rdp", "RDP"),
-        ("tls", "TLS"),
-        ("nla", "NLA"),
-    ]
-    # RDP
-    console = serializers.BooleanField(required=False, default=False)
-    security = serializers.ChoiceField(choices=SECURITY_CHOICES, default="any")
-
-    # SFTP
-    sftp_enabled = serializers.BooleanField(default=True, label=_("SFTP enabled"))
-    sftp_home = serializers.CharField(default="/tmp", label=_("SFTP home"))
-
-    # HTTP
-    autofill = serializers.ChoiceField(default='basic', choices=FillType.choices, label=_("Autofill"))
-    username_selector = serializers.CharField(
-        default="", allow_blank=True, label=_("Username selector")
-    )
-    password_selector = serializers.CharField(
-        default="", allow_blank=True, label=_("Password selector")
-    )
-    submit_selector = serializers.CharField(
-        default="", allow_blank=True, label=_("Submit selector")
-    )
-    script = serializers.JSONField(default=list, label=_("Script"))
-    # Redis
-    auth_username = serializers.BooleanField(default=False, label=_("Auth with username"))
-
-    # WinRM
-    use_ssl = serializers.BooleanField(default=False, label=_("Use SSL"))
+__all__ = ["PlatformSerializer", "PlatformOpsMethodSerializer", "PlatformProtocolSerializer"]
 
 
 class PlatformAutomationSerializer(serializers.ModelSerializer):
@@ -76,7 +45,7 @@ class PlatformAutomationSerializer(serializers.ModelSerializer):
 
 
 class PlatformProtocolSerializer(serializers.ModelSerializer):
-    setting = ProtocolSettingSerializer(required=False, allow_null=True)
+    setting = MethodSerializer(required=False, label=_("Setting"))
 
     class Meta:
         model = PlatformProtocol
@@ -85,6 +54,47 @@ class PlatformProtocolSerializer(serializers.ModelSerializer):
             "required", "default", "public",
             "secret_types", "setting",
         ]
+        extra_kwargs = {
+            "primary": {
+                "help_text": _(
+                    "This protocol is primary, and it must be set when adding assets. "
+                    "Additionally, there can only be one primary protocol."
+                )
+            },
+            "required": {
+                "help_text": _("This protocol is required, and it must be set when adding assets.")
+            },
+            "default": {
+                "help_text": _("This protocol is default, when adding assets, it will be displayed by default.")
+            },
+            "public": {
+                "help_text": _("This protocol is public, asset will show this protocol to user")
+            },
+        }
+
+    def get_setting_serializer(self):
+        request = self.context.get('request')
+        default_field = DictSerializer()
+
+        if not request:
+            return default_field
+
+        if self.instance and isinstance(self.instance, (QuerySet, list)):
+            instance = self.instance[0]
+        else:
+            instance = self.instance
+
+        protocol = request.query_params.get('name', '')
+        if instance and not protocol:
+            protocol = instance.name
+
+        protocol_settings = Protocol.settings()
+        setting_fields = protocol_settings.get(protocol, {}).get('setting')
+        if not setting_fields:
+            return default_field
+        setting_fields = [{'name': k, **v} for k, v in setting_fields.items()]
+        name = '{}ProtocolSettingSerializer'.format(protocol.capitalize())
+        return create_serializer_class(name, setting_fields)()
 
     def to_file_representation(self, data):
         return '{name}/{port}'.format(**data)

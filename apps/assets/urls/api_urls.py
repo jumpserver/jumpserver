@@ -21,6 +21,7 @@ router.register(r'nodes', api.NodeViewSet, 'node')
 router.register(r'domains', api.DomainViewSet, 'domain')
 router.register(r'gateways', api.GatewayViewSet, 'gateway')
 router.register(r'favorite-assets', api.FavoriteAssetViewSet, 'favorite-asset')
+router.register(r'protocol-settings', api.PlatformProtocolViewSet, 'protocol-setting')
 
 urlpatterns = [
     # path('assets/<uuid:pk>/gateways/', api.AssetGatewayListApi.as_view(), name='asset-gateway-list'),
@@ -46,7 +47,8 @@ urlpatterns = [
     path('nodes/<uuid:pk>/tasks/', api.NodeTaskCreateApi.as_view(), name='node-task-create'),
 
     path('gateways/<uuid:pk>/test-connective/', api.GatewayTestConnectionApi.as_view(), name='test-gateway-connective'),
-    path('platform-automation-methods/', api.PlatformAutomationMethodsApi.as_view(), name='platform-automation-methods'),
+    path('platform-automation-methods/', api.PlatformAutomationMethodsApi.as_view(),
+         name='platform-automation-methods'),
 ]
 
 urlpatterns += router.urls
