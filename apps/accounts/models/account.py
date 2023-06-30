@@ -7,7 +7,7 @@ from simple_history.models import HistoricalRecords
 from assets.models.base import AbsConnectivity
 from common.utils import lazyproperty
 from .base import BaseAccount
-from ..const import AliasAccount, Source
+from ..const import AliasAccount, Source, SecretStrategy
 
 __all__ = ['Account', 'AccountTemplate']
 
@@ -56,9 +56,6 @@ class Account(AbsConnectivity, BaseAccount):
     history = AccountHistoricalRecords(included_fields=['id', 'secret', 'secret_type', 'version'])
     source = models.CharField(max_length=30, default=Source.LOCAL, verbose_name=_('Source'))
     source_id = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Source ID'))
-    configs = models.ManyToManyField(
-        'accounts.ProtocolConfig', through='accounts.AccountProtocolConfig', related_name='accounts'
-    )
 
     class Meta:
         verbose_name = _('Account')
@@ -111,14 +108,16 @@ class Account(AbsConnectivity, BaseAccount):
 
 
 class AccountTemplate(BaseAccount):
+    secret_strategy = models.CharField(
+        choices=SecretStrategy.choices, max_length=16,
+        default=SecretStrategy.custom, verbose_name=_('Secret strategy')
+    )
     su_from = models.ForeignKey(
         'self', related_name='su_to', null=True,
         on_delete=models.SET_NULL, verbose_name=_("Su from")
     )
-    configs = models.ManyToManyField(
-        'accounts.ProtocolConfig', through='accounts.AccountTemplateProtocolConfig',
-        related_name='account_templates'
-    )
+    auto_push = models.BooleanField(default=False, verbose_name=_('Auto push'))
+    push_params = models.JSONField(default=dict, verbose_name=_('Push params'))
 
     class Meta:
         verbose_name = _('Account template')

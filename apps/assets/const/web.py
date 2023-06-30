@@ -1,4 +1,3 @@
-from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from .base import BaseType
@@ -53,9 +52,3 @@ class WebTypes(BaseType):
         return [
             cls.WEBSITE,
         ]
-
-
-class FillType(models.TextChoices):
-    no = 'no', _('Disabled')
-    basic = 'basic', _('Basic')
-    script = 'script', _('Script')
