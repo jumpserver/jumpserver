@@ -22,6 +22,7 @@ class WebMethod(TextChoices):
             Protocol.ssh: [cls.web_cli, cls.web_sftp],
             Protocol.telnet: [cls.web_cli],
             Protocol.rdp: [cls.web_gui],
+            Protocol.rdp7: [cls.web_gui],
             Protocol.vnc: [cls.web_gui],
 
             Protocol.mysql: [cls.web_cli],
@@ -67,6 +68,7 @@ class NativeClient(TextChoices):
                 'windows': [cls.putty],
             },
             Protocol.rdp: [cls.mstsc],
+            Protocol.rdp7: [cls.mstsc],
             Protocol.mysql: [cls.db_client],
             Protocol.mariadb: [cls.db_client],
             Protocol.redis: [cls.db_client],
@@ -212,6 +214,12 @@ class ConnectMethodUtil:
                 'web_methods': [],
                 'listen': [Protocol.rdp],
                 'support': [Protocol.rdp],
+                'match': 'map'
+            },
+            TerminalType.xrdp: {
+                'web_methods': [],
+                'listen': [Protocol.rdp7],
+                'support': [Protocol.rdp7],
                 'match': 'map'
             },
         }
