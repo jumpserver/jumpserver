@@ -75,9 +75,10 @@ class RDPFileClientProtocolURLMixin:
         rdp_options['screen mode id:i'] = '2' if full_screen else '1'
 
         # 设置 RDP Server 地址
-        endpoint = self.get_smart_endpoint(protocol=token.protocol, asset=token.asset)
+        protocol = 'rdp7' if token.protocol == 'rdp7' else 'rdp'
+        endpoint = self.get_smart_endpoint(protocol=protocol, asset=token.asset)
         # 由于 remoteapp 使用 mstsc 客户端连接的时候，都是 rdp 端口， 这里特殊判断 rdp7 端口
-        protocol_port = endpoint.rdp7_port if token.protocol == 'rdp7' else endpoint.rdp_port
+        protocol_port = endpoint.get_protocol_port(protocol, default=3389)
         rdp_options['full address:s'] = f'{endpoint.host}:{protocol_port}'
 
         # 设置用户名
