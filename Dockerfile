@@ -1,4 +1,4 @@
-FROM python:3.9-slim-bullseye as stage-build
+FROM jumpserver/python:3.9-slim-buster as stage-build
 ARG TARGETARCH
 
 ARG VERSION
@@ -8,7 +8,7 @@ WORKDIR /opt/jumpserver
 ADD . .
 RUN cd utils && bash -ixeu build.sh
 
-FROM python:3.9-slim-bullseye
+FROM jumpserver/python:3.9-slim-buster
 ARG TARGETARCH
 MAINTAINER JumpServer Team <ibuler@qq.com>
 
@@ -24,6 +24,7 @@ ARG DEPENDENCIES="                    \
         libjpeg-dev                   \
         libldap2-dev                  \
         libsasl2-dev                  \
+        libssl-dev                    \
         libxml2-dev                   \
         libxmlsec1-dev                \
         libxmlsec1-openssl            \
@@ -66,27 +67,35 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
 
 ARG DOWNLOAD_URL=https://download.jumpserver.org
 
-RUN mkdir -p /opt/oracle/ \
-    && cd /opt/oracle/ \
-    && wget ${DOWNLOAD_URL}/public/instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip \
-    && unzip instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip \
-    && sh -c "echo /opt/oracle/instantclient_19_10 > /etc/ld.so.conf.d/oracle-instantclient.conf" \
-    && ldconfig \
-    && rm -f instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip
+RUN set -ex \
+    && \
+    if [ "${TARGETARCH}" == "amd64" ] || [ "${TARGETARCH}" == "arm64" ]; then \
+        mkdir -p /opt/oracle; \
+        wget ${DOWNLOAD_URL}/public/instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip; \
+        unzip instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip; \
+        echo "/opt/oracle/instantclient_19_10" > /etc/ld.so.conf.d/oracle-instantclient.conf; \
+        ldconfig; \
+        rm -f instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip; \
+    fi
 
 WORKDIR /tmp/build
 COPY ./requirements ./requirements
 
 ARG PIP_MIRROR=https://pypi.douban.com/simple
-ENV PIP_MIRROR=$PIP_MIRROR
 ARG PIP_JMS_MIRROR=https://pypi.douban.com/simple
-ENV PIP_JMS_MIRROR=$PIP_JMS_MIRROR
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     set -ex \
     && pip config set global.index-url ${PIP_MIRROR} \
     && pip install --upgrade pip \
     && pip install --upgrade setuptools wheel \
+    && \
+    if [ "${TARGETARCH}" == "loong64" ]; then \
+        pip install https://download.jumpserver.org/pypi/simple/cryptography/cryptography-38.0.4-cp39-cp39-linux_loongarch64.whl; \
+        pip install https://download.jumpserver.org/pypi/simple/greenlet/greenlet-1.1.2-cp39-cp39-linux_loongarch64.whl; \
+        pip install https://download.jumpserver.org/pypi/simple/PyNaCl/PyNaCl-1.5.0-cp39-cp39-linux_loongarch64.whl; \
+        pip install https://download.jumpserver.org/pypi/simple/grpcio/grpcio-1.54.2-cp39-cp39-linux_loongarch64.whl; \
+    fi \
     && pip install $(grep -E 'jms|jumpserver' requirements/requirements.txt) -i ${PIP_JMS_MIRROR} \
     && pip install -r requirements/requirements.txt
 
