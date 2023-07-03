@@ -24,12 +24,9 @@ class AssetPermissionPermAssetUtil:
 
     def get_perm_nodes_assets(self, flat=False):
         """ 获取所有授权节点下的资产 """
-        node_ids = AssetPermission.nodes.through.objects \
-            .filter(assetpermission_id__in=self.perm_ids) \
-            .values_list('node_id', flat=True) \
-            .distinct()
-        node_ids = list(node_ids)
-        nodes = PermNode.objects.filter(id__in=node_ids).only('id', 'key')
+        from assets.models import Node
+        nodes = Node.objects.prefetch_related('granted_by_permissions').filter(
+            granted_by_permissions__in=self.perm_ids).only('id', 'key')
         assets = PermNode.get_nodes_all_assets(*nodes)
         if flat:
             return assets.values_list('id', flat=True)
