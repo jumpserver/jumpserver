@@ -71,6 +71,7 @@ RUN set -ex \
     && \
     if [ "${TARGETARCH}" == "amd64" ] || [ "${TARGETARCH}" == "arm64" ]; then \
         mkdir -p /opt/oracle; \
+        cd /opt/oracle; \
         wget ${DOWNLOAD_URL}/public/instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip; \
         unzip instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip; \
         echo "/opt/oracle/instantclient_19_10" > /etc/ld.so.conf.d/oracle-instantclient.conf; \
