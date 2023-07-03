@@ -23,3 +23,4 @@ psycopg2-binary==2.9.1
 pymssql==2.2.5
 IPy==1.1
 psycopg2==2.9.4
+ucloud-sdk-python3==0.11.47
