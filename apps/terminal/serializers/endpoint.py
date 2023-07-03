@@ -26,7 +26,7 @@ class EndpointSerializer(BulkModelSerializer):
         model = Endpoint
         fields_mini = ['id', 'name']
         fields_small = [
-            'host', 'https_port', 'http_port', 'ssh_port', 'rdp_port',
+            'host', 'https_port', 'http_port', 'ssh_port', 'rdp_port', 'rdp7_port',
             'mysql_port', 'mariadb_port', 'postgresql_port', 'redis_port',
             'oracle_port_range', 'oracle_port',
         ]
