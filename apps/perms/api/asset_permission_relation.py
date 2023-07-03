@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 #
+from functools import lru_cache
+
 from rest_framework import generics
 from django.db.models import F
 from django.shortcuts import get_object_or_404
@@ -93,6 +95,7 @@ class AssetPermissionAllAssetListApi(generics.ListAPIView):
     filterset_fields = ("name", "address")
     search_fields = filterset_fields
 
+    @lru_cache(maxsize=2)
     def get_queryset(self):
         pk = self.kwargs.get("pk")
         assets = AssetPermissionPermAssetUtil(perm_ids=[pk]).get_all_assets()
