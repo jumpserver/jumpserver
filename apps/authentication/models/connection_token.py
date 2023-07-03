@@ -222,6 +222,7 @@ class ConnectionToken(JMSOrgBaseModel):
             }
         else:
             data = {
+                'id': account.id,
                 'name': account.name,
                 'username': account.username,
                 'secret_type': account.secret_type,
