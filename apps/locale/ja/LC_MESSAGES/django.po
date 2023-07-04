@@ -1162,8 +1162,6 @@ msgid "Use SSL"
 msgstr "SSLの使用"
 
 #: assets/const/protocol.py:140
-#, fuzzy
-#| msgid "Auth with username"
 msgid "Auth username"
 msgstr "ユーザー名で認証する"
 
@@ -5713,8 +5711,6 @@ msgid "Tunnel"
 msgstr ""
 
 #: terminal/const.py:70
-#, fuzzy
-#| msgid "SFTP home"
 msgid "SFTP"
 msgstr "SFTP"
 

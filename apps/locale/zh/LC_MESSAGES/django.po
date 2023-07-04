@@ -5624,8 +5624,6 @@ msgid "Tunnel"
 msgstr "隧道"
 
 #: terminal/const.py:70
-#, fuzzy
-#| msgid "SFTP home"
 msgid "SFTP"
 msgstr "SFTP"
 
