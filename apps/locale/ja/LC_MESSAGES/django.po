@@ -5716,7 +5716,7 @@ msgstr ""
 #, fuzzy
 #| msgid "SFTP home"
 msgid "SFTP"
-msgstr "SFTP ルート パス"
+msgstr "SFTP"
 
 #: terminal/const.py:74
 msgid "Read Only"
