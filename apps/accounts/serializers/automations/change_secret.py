@@ -50,7 +50,7 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
         read_only_fields = BaseAutomationSerializer.Meta.read_only_fields
         fields = BaseAutomationSerializer.Meta.fields + read_only_fields + [
             'secret_type', 'secret_strategy', 'secret', 'password_rules',
-            'ssh_key_change_strategy', 'passphrase', 'recipients',
+            'ssh_key_change_strategy', 'passphrase', 'recipients', 'params'
         ]
         extra_kwargs = {**BaseAutomationSerializer.Meta.extra_kwargs, **{
             'accounts': {'required': True},
