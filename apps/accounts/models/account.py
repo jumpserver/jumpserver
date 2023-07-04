@@ -108,6 +108,9 @@ class Account(AbsConnectivity, BaseAccount):
 
 
 class AccountTemplate(BaseAccount):
+    """
+    账号模板生成账号和推送账号
+    """
     secret_strategy = models.CharField(
         choices=SecretStrategy.choices, max_length=16,
         default=SecretStrategy.custom, verbose_name=_('Secret strategy')
@@ -117,6 +120,7 @@ class AccountTemplate(BaseAccount):
         on_delete=models.SET_NULL, verbose_name=_("Su from")
     )
     auto_push = models.BooleanField(default=False, verbose_name=_('Auto push'))
+    platforms = models.ManyToManyField('assets.Platform', related_name='account_templates', verbose_name=_('Platforms'))
     push_params = models.JSONField(default=dict, verbose_name=_('Push params'))
 
     class Meta:

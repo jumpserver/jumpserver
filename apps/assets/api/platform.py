@@ -50,12 +50,15 @@ class AssetPlatformViewSet(JMSModelViewSet):
     def filter_nodes_assets(self, request, *args, **kwargs):
         node_ids = request.data.get('node_ids', [])
         asset_ids = request.data.get('asset_ids', [])
+        _platform_ids = request.data.get('platform_ids', [])
         nodes = Node.objects.filter(id__in=node_ids)
         node_asset_ids = Node.get_nodes_all_assets(*nodes).values_list('id', flat=True)
         direct_asset_ids = Asset.objects.filter(id__in=asset_ids).values_list('id', flat=True)
-        platform_ids = Asset.objects.filter(
-            id__in=set(list(direct_asset_ids) + list(node_asset_ids))
-        ).values_list('platform_id', flat=True)
+        all_asset_ids = set(direct_asset_ids) | set(node_asset_ids)
+        platform_ids = Asset.objects.filter(id__in=all_asset_ids) \
+            .values_list('platform_id', flat=True)
+        if _platform_ids:
+            platform_ids = set(platform_ids) | set(_platform_ids)
         platforms = Platform.objects.filter(id__in=platform_ids)
         serializer = self.get_serializer(platforms, many=True)
         return Response(serializer.data)

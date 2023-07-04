@@ -36,12 +36,14 @@ class Protocol(ChoicesMixin, models.TextChoices):
                     'sftp_enabled': {
                         'type': 'bool',
                         'default': True,
-                        'label': _('SFTP enabled')
+                        'label': _('SFTP enabled'),
                     },
                     'sftp_home': {
                         'type': 'str',
                         'default': '/tmp',
-                        'label': _('SFTP home')
+                        'label': _('SFTP home'),
+                        'help_text': _('SFTP root dir, default is /tmp, Set to HOME to use user home dir. <br/> '
+                                       'Support vars: ${ACCOUNT} the account username connected, ${USER} the staff username')
                     },
                 }
             },
