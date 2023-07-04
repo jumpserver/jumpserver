@@ -16,6 +16,7 @@ class Endpoint(JMSBaseModel):
     http_port = PortField(default=80, verbose_name=_('HTTP port'))
     ssh_port = PortField(default=2222, verbose_name=_('SSH port'))
     rdp_port = PortField(default=3389, verbose_name=_('RDP port'))
+    rdp7_port = PortField(default=3390, verbose_name=_('RDP7 port'))
     mysql_port = PortField(default=33061, verbose_name=_('MySQL port'))
     mariadb_port = PortField(default=33062, verbose_name=_('MariaDB port'))
     postgresql_port = PortField(default=54320, verbose_name=_('PostgreSQL port'))
@@ -41,6 +42,9 @@ class Endpoint(JMSBaseModel):
         else:
             port = getattr(self, f'{protocol}_port', 0)
         return port
+
+    def get_protocol_port(self, protocol, default=0):
+        return getattr(self, f'{protocol}_port', default)
 
     def is_default(self):
         return str(self.id) == self.default_id
