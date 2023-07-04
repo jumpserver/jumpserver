@@ -1,7 +1,6 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from assets.const import Protocol
 from common.serializers.fields import LabeledChoiceField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .terminal import TerminalSmallSerializer
@@ -14,11 +13,9 @@ __all__ = [
 ]
 
 
-
-
 class SessionSerializer(BulkOrgResourceModelSerializer):
     org_id = serializers.CharField(allow_blank=True)
-    protocol = serializers.ChoiceField(choices=Protocol.choices, label=_("Protocol"))
+    protocol = serializers.CharField(max_length=128, label=_("Protocol"))
     type = LabeledChoiceField(
         choices=SessionType.choices, label=_("Type"), default=SessionType.normal
     )

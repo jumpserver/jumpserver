@@ -39,7 +39,7 @@ class WebMethod(TextChoices):
         if not settings.XPACK_ENABLED:
             return methods
 
-        web_gui_dbs = [Protocol.mysql, Protocol.mariadb, Protocol.oracle, Protocol.postgresql]
+        web_gui_dbs = [Protocol.mysql, Protocol.mariadb, Protocol.oracle, Protocol.postgresql, Protocol.sqlserver]
         for db in web_gui_dbs:
             methods[db].append(cls.web_gui)
         return methods
@@ -188,7 +188,7 @@ class ConnectMethodUtil:
                 'listen': [Protocol.http],
                 'support': [
                     Protocol.mysql, Protocol.postgresql,
-                    Protocol.oracle
+                    Protocol.oracle, Protocol.sqlserver,
                 ],
                 'match': 'm2m'
             },

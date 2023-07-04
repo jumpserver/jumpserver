@@ -1,7 +1,8 @@
+from django.db import models
 from django.db.models import TextChoices
+from django.utils.translation import gettext_lazy as _
 
 from jumpserver.utils import has_valid_xpack_license
-from .protocol import Protocol
 
 
 class Type:
@@ -26,6 +27,12 @@ class Type:
         raise TypeError("unsupported operand type(s) for +(r): '{}' and '{}'".format(
             type(self), type(other))
         )
+
+
+class FillType(models.TextChoices):
+    no = 'no', _('Disabled')
+    basic = 'basic', _('Basic')
+    script = 'script', _('Script')
 
 
 class BaseType(TextChoices):
@@ -57,6 +64,7 @@ class BaseType(TextChoices):
 
     @classmethod
     def _parse_protocols(cls, protocol, tp):
+        from .protocol import Protocol
         settings = Protocol.settings()
         choices = protocol.get('choices', [])
         if choices == '__self__':
