@@ -1,8 +1,8 @@
 from collections import defaultdict
 
-from orgs.utils import tmp_to_org
-from accounts.models import Account
 from accounts.const import AliasAccount
+from accounts.models import Account
+from orgs.utils import tmp_to_org
 from .permission import AssetPermissionUtil
 
 __all__ = ['PermAccountUtil']
@@ -31,14 +31,14 @@ class PermAccountUtil(AssetPermissionUtil):
 
     @staticmethod
     def get_permed_accounts_from_perms(perms, user, asset):
-        # alias: is a collection of account usernames and special accounts [@ALL, @INPUT, @USER]
+        # alias: is a collection of account usernames and special accounts [@ALL, @INPUT, @USER, @ANON]
         alias_action_bit_mapper = defaultdict(int)
-        alias_expired_mapper = defaultdict(list)
+        alias_date_expired_mapper = defaultdict(list)
 
         for perm in perms:
             for alias in perm.accounts:
                 alias_action_bit_mapper[alias] |= perm.actions
-                alias_expired_mapper[alias].append(perm.date_expired)
+                alias_date_expired_mapper[alias].append(perm.date_expired)
 
         asset_accounts = asset.accounts.all().active()
         username_account_mapper = {account.username: account for account in asset_accounts}
@@ -52,7 +52,7 @@ class PermAccountUtil(AssetPermissionUtil):
             for account in asset_accounts:
                 cleaned_accounts_action_bit[account] |= all_action_bit
                 cleaned_accounts_expired[account].extend(
-                    alias_expired_mapper[AliasAccount.ALL]
+                    alias_date_expired_mapper[AliasAccount.ALL]
                 )
 
         for alias, action_bit in alias_action_bit_mapper.items():
@@ -63,6 +63,10 @@ class PermAccountUtil(AssetPermissionUtil):
                     account = Account.get_user_account()
             elif alias == AliasAccount.INPUT:
                 account = Account.get_manual_account()
+            elif alias == AliasAccount.ANON:
+                account = Account.get_anonymous_account()
+            elif alias.startswith('@'):
+                continue
             elif alias in username_account_mapper:
                 account = username_account_mapper[alias]
             else:
@@ -70,7 +74,7 @@ class PermAccountUtil(AssetPermissionUtil):
 
             if account:
                 cleaned_accounts_action_bit[account] |= action_bit
-                cleaned_accounts_expired[account].extend(alias_expired_mapper[alias])
+                cleaned_accounts_expired[account].extend(alias_date_expired_mapper[alias])
 
         accounts = []
         for account, action_bit in cleaned_accounts_action_bit.items():
