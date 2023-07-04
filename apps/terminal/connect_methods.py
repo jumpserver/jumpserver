@@ -195,7 +195,7 @@ class ConnectMethodUtil:
             TerminalType.lion: {
                 'web_methods': [WebMethod.web_gui],
                 'listen': [Protocol.http],
-                'support': [Protocol.rdp, Protocol.rdp7, Protocol.vnc],
+                'support': [Protocol.rdp, Protocol.vnc],
                 'match': 'm2m'
             },
             TerminalType.magnus: {
