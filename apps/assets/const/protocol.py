@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from common.db.models import ChoicesMixin
+from common.decorators import cached_method
 from .base import FillType
 
 __all__ = ['Protocol']
@@ -150,11 +151,13 @@ class Protocol(ChoicesMixin, models.TextChoices):
         return {
             cls.k8s: {
                 'port': 443,
+                'port_from_addr': True,
                 'required': True,
                 'secret_types': ['token'],
             },
             cls.http: {
                 'port': 80,
+                'port_from_addr': True,
                 'secret_types': ['password'],
                 'setting': {
                     'autofill': {
@@ -187,6 +190,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
             cls.chatgpt: {
                 'port': 443,
                 'required': True,
+                'port_from_addr': True,
                 'secret_types': ['api_key'],
                 'setting': {
                     'api_mode': {
@@ -205,6 +209,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
         }
 
     @classmethod
+    @cached_method(ttl=600)
     def settings(cls):
         return {
             **cls.device_protocols(),
