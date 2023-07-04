@@ -33,10 +33,10 @@ class HostTypes(BaseType):
     def _get_protocol_constrains(cls) -> dict:
         return {
             '*': {
-                'choices': ['ssh', 'telnet', 'vnc', 'rdp', 'rdp7']
+                'choices': ['ssh', 'telnet', 'vnc', 'rdp']
             },
             cls.WINDOWS: {
-                'choices': ['rdp', 'rdp7', 'ssh', 'vnc', 'winrm']
+                'choices': ['rdp', 'ssh', 'vnc', 'winrm']
             }
         }
 
@@ -116,10 +116,6 @@ class HostTypes(BaseType):
                             'required': True
                         }
                     }
-                },
-                {
-                    'name': 'Windows-RDP7',
-                    '_protocols': ['rdp7',],
                 }
             ]
         }

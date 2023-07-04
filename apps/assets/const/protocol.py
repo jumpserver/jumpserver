@@ -10,7 +10,6 @@ __all__ = ['Protocol']
 class Protocol(ChoicesMixin, models.TextChoices):
     ssh = 'ssh', 'SSH'
     rdp = 'rdp', 'RDP'
-    rdp7 = 'rdp7', 'RDP7'
     telnet = 'telnet', 'Telnet'
     vnc = 'vnc', 'VNC'
     winrm = 'winrm', 'WinRM'
@@ -68,25 +67,6 @@ class Protocol(ChoicesMixin, models.TextChoices):
                     #     "required": False,
                     #     'label': _('AD domain')
                     # }
-                }
-            },
-            cls.rdp7: {
-                'port': 3390,
-                'secret_types': ['password'],
-                'setting': {
-                    'console': {
-                        'type': 'bool',
-                        'default': False,
-                        'label': _('Console'),
-                        'help_text': _("Connect to console session")
-                    },
-                    'security': {
-                        'type': 'choice',
-                        'choices': [('any', _('Any')), ('rdp', 'RDP'), ('tls', 'TLS'), ('nla', 'NLA')],
-                        'default': 'any',
-                        'label': _('Security'),
-                        'help_text': _("Security layer to use for the connection")
-                    },
                 }
             },
             cls.vnc: {
