@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-27 16:02+0800\n"
+"POT-Creation-Date: 2023-07-04 18:28+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1464,8 +1464,8 @@ msgstr "ゲートウェイ"
 msgid "Asset group"
 msgstr "資産グループ"
 
-#: assets/models/group.py:34 assets/models/platform.py:17
-#: assets/serializers/platform.py:102
+#: assets/models/group.py:31 assets/models/platform.py:17
+#: assets/serializers/platform.py:112
 #: xpack/plugins/cloud/providers/nutanix.py:30
 msgid "Default"
 msgstr "デフォルト"
@@ -1478,7 +1478,7 @@ msgstr "デフォルトアセットグループ"
 msgid "System"
 msgstr "システム"
 
-#: assets/models/label.py:19 assets/models/node.py:557
+#: assets/models/label.py:19 assets/models/node.py:545
 #: assets/serializers/cagegory.py:7 assets/serializers/cagegory.py:14
 #: authentication/models/connection_token.py:29
 #: authentication/serializers/connect_token_secret.py:122
@@ -1499,28 +1499,28 @@ msgstr "ラベル"
 msgid "New node"
 msgstr "新しいノード"
 
-#: assets/models/node.py:485 audits/backends/db.py:55 audits/backends/db.py:56
+#: assets/models/node.py:473 audits/backends/db.py:55 audits/backends/db.py:56
 msgid "empty"
 msgstr "空"
 
-#: assets/models/node.py:556 perms/models/perm_node.py:28
+#: assets/models/node.py:544 perms/models/perm_node.py:28
 msgid "Key"
 msgstr "キー"
 
-#: assets/models/node.py:558 assets/serializers/node.py:20
+#: assets/models/node.py:546 assets/serializers/node.py:20
 msgid "Full value"
 msgstr "フルバリュー"
 
-#: assets/models/node.py:562 perms/models/perm_node.py:30
+#: assets/models/node.py:550 perms/models/perm_node.py:30
 msgid "Parent key"
 msgstr "親キー"
 
-#: assets/models/node.py:571 perms/serializers/permission.py:35
+#: assets/models/node.py:559 perms/serializers/permission.py:35
 #: tickets/models/ticket/apply_asset.py:14 xpack/plugins/cloud/models.py:96
 msgid "Node"
 msgstr "ノード"
 
-#: assets/models/node.py:574
+#: assets/models/node.py:562
 msgid "Can match node"
 msgstr "ノードを一致させることができます"
 
@@ -3049,17 +3049,14 @@ msgid "Redirecting to {} authentication"
 msgstr "{} 認証へのリダイレクト"
 
 #: authentication/views/login.py:207
-msgid "Please enable cookies and try again."
-msgstr "クッキーを有効にして、もう一度お試しください。"
-#: authentication/views/login.py:207
 msgid "Login timeout, please try again."
 msgstr "ログインタイムアウト、もう一度お試しください"
 
-#: authentication/views/login.py:248
+#: authentication/views/login.py:250
 msgid "User email already exists ({})"
 msgstr "ユーザー メールボックスは既に存在します ({})"
 
-#: authentication/views/login.py:326
+#: authentication/views/login.py:328
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -3067,15 +3064,15 @@ msgstr ""
 "<b>{}</b> 確認を待ちます。彼女/彼へのリンクをコピーすることもできます <br/>\n"
 "                  このページを閉じないでください"
 
-#: authentication/views/login.py:331
+#: authentication/views/login.py:333
 msgid "No ticket found"
 msgstr "チケットが見つかりません"
 
-#: authentication/views/login.py:367
+#: authentication/views/login.py:369
 msgid "Logout success"
 msgstr "ログアウト成功"
 
-#: authentication/views/login.py:368
+#: authentication/views/login.py:370
 msgid "Logout success, return login page"
 msgstr "ログアウト成功、ログインページを返す"
 
@@ -5490,8 +5487,8 @@ msgstr "期限切れです。"
 #, python-format
 msgid ""
 "\n"
-"                Your password has expired, please click <a "
-"href=\"%(user_password_update_url)s\"> this link </a> update password.\n"
+"                Your password has expired, please click <a href="
+"\"%(user_password_update_url)s\"> this link </a> update password.\n"
 "            "
 msgstr ""
 "\n"
@@ -5512,34 +5509,34 @@ msgid ""
 "            "
 msgstr ""
 "\n"
-"                クリックしてください <a "
-"href=\"%(user_password_update_url)s\"> リンク </a> パスワードの更新\n"
+"                クリックしてください <a href=\"%(user_password_update_url)s"
+"\"> リンク </a> パスワードの更新\n"
 "        "
 
 #: templates/_message.html:43
 #, python-format
 msgid ""
 "\n"
-"        Your information was incomplete. Please click <a "
-"href=\"%(first_login_url)s\"> this link </a>to complete your information.\n"
+"        Your information was incomplete. Please click <a href="
+"\"%(first_login_url)s\"> this link </a>to complete your information.\n"
 "        "
 msgstr ""
 "\n"
-"                あなたの情報が不完全なので、クリックしてください。 <a "
-"href=\"%(first_login_url)s\"> リンク </a> 補完\n"
+"                あなたの情報が不完全なので、クリックしてください。 <a href="
+"\"%(first_login_url)s\"> リンク </a> 補完\n"
 "                "
 
 #: templates/_message.html:56
 #, python-format
 msgid ""
 "\n"
-"        Your ssh public key not set or expired. Please click <a "
-"href=\"%(user_pubkey_update)s\"> this link </a>to update\n"
+"        Your ssh public key not set or expired. Please click <a href="
+"\"%(user_pubkey_update)s\"> this link </a>to update\n"
 "        "
 msgstr ""
 "\n"
-"                SSHキーが設定されていないか無効になっている場合は、 <a "
-"href=\"%(user_pubkey_update)s\"> リンク </a> 更新\n"
+"                SSHキーが設定されていないか無効になっている場合は、 <a href="
+"\"%(user_pubkey_update)s\"> リンク </a> 更新\n"
 "        "
 
 #: templates/_mfa_login_field.html:28
@@ -5715,11 +5712,17 @@ msgstr "一致しない"
 msgid "Tunnel"
 msgstr ""
 
-#: terminal/const.py:73
+#: terminal/const.py:70
+#, fuzzy
+#| msgid "SFTP home"
+msgid "SFTP"
+msgstr "SFTP ルート パス"
+
+#: terminal/const.py:74
 msgid "Read Only"
 msgstr "読み取り専用"
 
-#: terminal/const.py:74
+#: terminal/const.py:75
 msgid "Writable"
 msgstr "書き込み可能"
 
