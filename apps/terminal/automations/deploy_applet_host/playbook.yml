@@ -166,7 +166,7 @@
     - name: Unzip chromedriver (Chrome)
       community.windows.win_unzip:
         src: "{{ ansible_env.TEMP }}\\chromedriver_win32.zip"
-        dest: C:\Program Files\JumpServer\drivers
+        dest: C:\Program Files\JumpServer\drivers\chromedriver_win32
 
     - name: Download Chrome zip package (Chrome)
       ansible.windows.win_get_url:
