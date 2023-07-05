@@ -55,13 +55,8 @@ class BasePlaybookManager:
             return {}
 
         data = self.params.get(method_id)
-        default_data = serializer().data
         if not data:
-            data = automation_params.get(method_id, default_data)
-
-        for k, v in default_data.items():
-            data.setdefault(k, v)
-
+            data = automation_params.get(method_id, {})
         params = serializer(data).data
         return {
             field_name: automation_params.get(field_name, '')
