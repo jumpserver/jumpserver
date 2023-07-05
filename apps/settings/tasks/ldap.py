@@ -23,7 +23,6 @@ def sync_ldap_user():
 
 
 @shared_task(verbose_name=_('Periodic import ldap user'))
-@transaction.atomic
 def import_ldap_user():
     logger.info("Start import ldap user task")
     util_server = LDAPServerUtil()
