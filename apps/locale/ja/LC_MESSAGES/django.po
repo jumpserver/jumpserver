@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-04 19:25+0800\n"
+"POT-Creation-Date: 2023-07-05 11:15+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -261,16 +261,12 @@ msgid "Auto push"
 msgstr "オートプッシュ"
 
 #: accounts/models/account.py:123
-#, fuzzy
-#| msgid "Platform"
 msgid "Platforms"
 msgstr "プラットフォーム"
 
 #: accounts/models/account.py:124
-#, fuzzy
-#| msgid "Push account params"
 msgid "Push params"
-msgstr "アカウントプッシュパラメータ"
+msgstr "パラメータをプッシュしてください"
 
 #: accounts/models/account.py:127
 msgid "Account template"
@@ -707,26 +703,24 @@ msgid "Spec info"
 msgstr "特別情報"
 
 #: accounts/serializers/account/base.py:82
-#, fuzzy
-#| msgid "Tip: If no username is required for authentication, fill in `null`"
 msgid ""
 "Tip: If no username is required for authentication, fill in `null`, If AD "
 "account, like `username@domain`"
-msgstr "ヒント: 認証にユーザー名が必要ない場合は、null を入力してください"
+msgstr "ヒント: 認証にユーザー名が必要ない場合は、null を入力してください, AD アカウントの場合は、`username@domain` のように入力してください"
 
 #: accounts/serializers/account/template.py:27
 msgid "Secret generation strategy for account creation"
-msgstr ""
+msgstr "アカウント作成時のシークレット生成戦略"
 
 #: accounts/serializers/account/template.py:28
 msgid "Whether to automatically push the account to the asset"
-msgstr ""
+msgstr "アセットにアカウントを自動的にプッシュするかどうか"
 
 #: accounts/serializers/account/template.py:30
 msgid ""
 "Associated platform, you can configure push parameters. If not associated, "
 "default parameters will be used"
-msgstr ""
+msgstr "関連プラットフォーム、プッシュパラメータを設定できます。関連付けされていない場合は、デフォルトのパラメータが使用されます"
 
 #: accounts/serializers/automations/base.py:23
 #: assets/models/asset/common.py:155 assets/models/automations/base.py:18
@@ -1164,11 +1158,16 @@ msgid "SFTP home"
 msgstr "SFTP ルート パス"
 
 #: assets/const/protocol.py:45
+#, python-brace-format
 msgid ""
 "SFTP root dir, default is /tmp, Set to HOME to use user home dir. <br/> "
 "Support vars: ${ACCOUNT} the account username connected, ${USER} the staff "
 "username"
-msgstr "SFTPのルートディレクトリはデフォルトで/tmpです。ユーザのホームディレクトリを使用する場合は、HOMEに設定してください。<br/>いくつかの変数をサポートしています：${ACCOUNT}は接続したアカウントのユーザ名で、${USER}はスタッフのユーザ名です。"
+msgstr ""
+"SFTPのルートディレクトリはデフォルトで/tmpです。ユーザのホームディレクトリを"
+"使用する場合は、HOMEに設定してください。<br/>いくつかの変数をサポートしていま"
+"す：${ACCOUNT}は接続したアカウントのユーザ名で、${USER}はスタッフのユーザ名で"
+"す。"
 
 #: assets/const/protocol.py:57
 msgid "Console"
@@ -3058,10 +3057,8 @@ msgid "Redirecting to {} authentication"
 msgstr "{} 認証へのリダイレクト"
 
 #: authentication/views/login.py:207
-#, fuzzy
-#| msgid "Login time has exceeded {} minutes, please login again"
 msgid "Login timeout, please try again."
-msgstr "ログイン時間が {} 分を超えました。もう一度ログインしてください"
+msgstr "ログインタイムアウト、もう一度お試しください。"
 
 #: authentication/views/login.py:250
 msgid "User email already exists ({})"

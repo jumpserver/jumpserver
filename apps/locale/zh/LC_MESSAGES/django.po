@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-04 19:25+0800\n"
+"POT-Creation-Date: 2023-07-05 11:15+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -260,16 +260,12 @@ msgid "Auto push"
 msgstr "自动推送"
 
 #: accounts/models/account.py:123
-#, fuzzy
-#| msgid "Platform"
 msgid "Platforms"
 msgstr "系统平台"
 
 #: accounts/models/account.py:124
-#, fuzzy
-#| msgid "Push account params"
 msgid "Push params"
-msgstr "账号推送参数"
+msgstr "推送参数"
 
 #: accounts/models/account.py:127
 msgid "Account template"
@@ -703,26 +699,24 @@ msgid "Spec info"
 msgstr "特殊信息"
 
 #: accounts/serializers/account/base.py:82
-#, fuzzy
-#| msgid "Tip: If no username is required for authentication, fill in `null`"
 msgid ""
 "Tip: If no username is required for authentication, fill in `null`, If AD "
 "account, like `username@domain`"
-msgstr "提示: 如果认证时不需要用户名，可填写为 null"
+msgstr "提示: 如果认证时不需要用户名，可填写为 null, 如果是AD账号，格式为 username@domain"
 
 #: accounts/serializers/account/template.py:27
 msgid "Secret generation strategy for account creation"
-msgstr ""
+msgstr "创建账号时的密文生成策略"
 
 #: accounts/serializers/account/template.py:28
 msgid "Whether to automatically push the account to the asset"
-msgstr ""
+msgstr "是否自动推送账号到资产"
 
 #: accounts/serializers/account/template.py:30
 msgid ""
 "Associated platform, you can configure push parameters. If not associated, "
 "default parameters will be used"
-msgstr ""
+msgstr "关联平台，可以设置推送参数，如果不关联，将使用默认参数"
 
 #: accounts/serializers/automations/base.py:23
 #: assets/models/asset/common.py:155 assets/models/automations/base.py:18
@@ -1157,11 +1151,14 @@ msgid "SFTP home"
 msgstr "SFTP 根路径"
 
 #: assets/const/protocol.py:45
+#, python-brace-format
 msgid ""
 "SFTP root dir, default is /tmp, Set to HOME to use user home dir. <br/> "
 "Support vars: ${ACCOUNT} the account username connected, ${USER} the staff "
 "username"
-msgstr "SFTP 的起始路径，家目录可以填: HOME. <br/> 支持变量: ${ACCOUNT} 连接的账号用户名, ${USER} 当前用户用户名, 如 /tmp/${ACCOUNT}"
+msgstr ""
+"SFTP 的起始路径，家目录可以填: HOME. <br/> 支持变量: ${ACCOUNT} 连接的账号用"
+"户名, ${USER} 当前用户用户名, 如 /tmp/${ACCOUNT}"
 
 #: assets/const/protocol.py:57
 msgid "Console"
@@ -1172,10 +1169,8 @@ msgid "Security"
 msgstr "安全"
 
 #: assets/const/protocol.py:68
-#, fuzzy
-#| msgid "Domain"
 msgid "AD domain"
-msgstr "网域"
+msgstr "AD 域"
 
 #: assets/const/protocol.py:87 assets/models/asset/database.py:10
 #: settings/serializers/email.py:37
@@ -1183,8 +1178,6 @@ msgid "Use SSL"
 msgstr "使用 SSL"
 
 #: assets/const/protocol.py:140
-#, fuzzy
-#| msgid "Auth with username"
 msgid "Auth username"
 msgstr "使用用户名认证"
 
@@ -3027,10 +3020,8 @@ msgid "Redirecting to {} authentication"
 msgstr "正在跳转到 {} 认证"
 
 #: authentication/views/login.py:207
-#, fuzzy
-#| msgid "Login time has exceeded {} minutes, please login again"
 msgid "Login timeout, please try again."
-msgstr "登录时长已超过 {} 分钟，请重新登录"
+msgstr "登录超时，请重新登录"
 
 #: authentication/views/login.py:250
 msgid "User email already exists ({})"
