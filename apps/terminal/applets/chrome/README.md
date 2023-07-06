@@ -7,4 +7,4 @@
 
 ## ChangeLog
 
-一些重要的更新记录参考 [ChangeLog](./ChangeLog.md)
+一些重要的更新记录参考 [ChangeLog](./ChangeLog)
