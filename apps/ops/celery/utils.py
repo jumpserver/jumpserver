@@ -134,3 +134,4 @@ def get_beat_status():
         return locked
     except redis.ConnectionError:
         return False
+
