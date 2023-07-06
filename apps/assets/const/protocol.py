@@ -64,7 +64,8 @@ class Protocol(ChoicesMixin, models.TextChoices):
                     },
                     'ad_domain': {
                         'type': 'str',
-                        "required": False,
+                        'required': False,
+                        'default': '',
                         'label': _('AD domain')
                     }
                 }
