@@ -12,7 +12,8 @@ from accounts.const import SecretType
 from common.db import fields
 from common.utils import (
     ssh_key_string_to_obj, ssh_key_gen, get_logger,
-    random_string, lazyproperty, parse_ssh_public_key_str, is_openssh_format_key
+    random_string, lazyproperty, parse_ssh_public_key_str,
+    is_openssh_format_key
 )
 from orgs.mixins.models import JMSOrgBaseModel, OrgManager
 

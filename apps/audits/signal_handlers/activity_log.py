@@ -13,7 +13,7 @@ from orgs.models import Organization
 from orgs.utils import current_org, tmp_to_org
 from terminal.models import Session
 from users.models import User
-from ..const import ActivityChoices
+from ..const import ActivityAction
 from ..models import UserLoginLog
 
 logger = get_logger(__name__)
@@ -26,7 +26,7 @@ class ActivityLogHandler:
             gettext_noop('User %s use account %s login asset %s'),
             obj.user, obj.account, obj.asset
         )
-        return [obj.asset_id, obj.user_id, obj.account_id], detail, ActivityChoices.session_log, obj.org_id
+        return [obj.asset_id, obj.user_id, obj.account_id], detail, ActivityAction.session_log, obj.org_id
 
     @staticmethod
     def login_log_for_activity(obj):
@@ -39,7 +39,7 @@ class ActivityLogHandler:
         resource_list = []
         if user_id:
             resource_list = [user_id]
-        return resource_list, detail, ActivityChoices.login_log, Organization.SYSTEM_ID
+        return resource_list, detail, ActivityAction.login_log, Organization.SYSTEM_ID
 
     @staticmethod
     def task_log_for_celery(headers, body):
@@ -92,7 +92,7 @@ def after_task_publish_for_activity_log(headers=None, body=None, **kwargs):
         logger.error(f'Get celery task info error: {e}', exc_info=True)
     else:
         logger.debug(f'Create activity log for celery task: {task_id}')
-        create_activities(resource_ids, detail, task_id, action=ActivityChoices.task, org_id=org_id)
+        create_activities(resource_ids, detail, task_id, action=ActivityAction.task, org_id=org_id)
 
 
 model_activity_handler_map = {

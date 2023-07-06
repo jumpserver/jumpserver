@@ -1,35 +1,31 @@
 # -*- coding: utf-8 -*-
 #
-import os
 
 from importlib import import_module
 
 from django.conf import settings
-from django.shortcuts import get_object_or_404
 from django.db.models import F, Value, CharField, Q
 from django.http import HttpResponse, FileResponse
 from django.utils.encoding import escape_uri_path
 from rest_framework import generics
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.decorators import action
 
-from common.api import AsyncApiMixin
+from common.const.http import GET, POST
 from common.drf.filters import DatetimeRangeFilter
 from common.permissions import IsServiceAccount
 from common.plugins.es import QuerySet as ESQuerySet
-from common.utils import is_uuid, get_logger, lazyproperty
-from common.const.http import GET, POST
 from common.storage.ftp_file import FTPFileStorageHandler
+from common.utils import is_uuid, get_logger, lazyproperty
 from orgs.mixins.api import OrgReadonlyModelViewSet, OrgModelViewSet
-from orgs.utils import current_org, tmp_to_root_org
 from orgs.models import Organization
+from orgs.utils import current_org, tmp_to_root_org
 from rbac.permissions import RBACPermission
 from terminal.models import default_storage
 from users.models import User
 from .backends import TYPE_ENGINE_MAPPING
-from .const import ActivityChoices
+from .const import ActivityAction
 from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog, ActivityLog, JobLog
 from .serializers import (
     FTPLogSerializer, UserLoginLogSerializer, JobLogSerializer,
@@ -37,7 +33,6 @@ from .serializers import (
     PasswordChangeLogSerializer, ActivityUnionLogSerializer,
     FileSerializer
 )
-
 
 logger = get_logger(__name__)
 
@@ -160,7 +155,7 @@ class ResourceActivityAPIView(generics.ListAPIView):
         if user is not None:
             q |= Q(user=str(user))
         queryset = OperateLog.objects.filter(q, org_q).annotate(
-            r_type=Value(ActivityChoices.operate_log, CharField()),
+            r_type=Value(ActivityAction.operate_log, CharField()),
             r_detail_id=F('id'), r_detail=Value(None, CharField()),
             r_user=F('user'), r_action=F('action'),
         ).values(*fields)[:limit]

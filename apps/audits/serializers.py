@@ -2,18 +2,19 @@
 #
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
-from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+
 from audits.backends.db import OperateLogStore
 from common.serializers.fields import LabeledChoiceField
 from common.utils import reverse, i18n_trans
 from common.utils.timezone import as_current_tz
 from ops.serializers.job import JobExecutionSerializer
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from terminal.models import Session
 from . import models
 from .const import (
     ActionChoices, OperateChoices,
     MFAChoices, LoginStatusChoices,
-    LoginTypeChoices, ActivityChoices,
+    LoginTypeChoices, ActivityAction,
 )
 
 
@@ -141,17 +142,17 @@ class ActivityUnionLogSerializer(serializers.Serializer):
         if not detail_id:
             return detail_url
 
-        if obj_type == ActivityChoices.operate_log:
+        if obj_type == ActivityAction.operate_log:
             detail_url = '%s?%s' % (
                 reverse(
                     'audits:operate-log-detail',
                     kwargs={'pk': obj['id']},
                 ), 'type=action_detail')
-        elif obj_type == ActivityChoices.task:
+        elif obj_type == ActivityAction.task:
             detail_url = reverse(
                 'ops:celery-task-log', kwargs={'pk': detail_id}
             )
-        elif obj_type == ActivityChoices.login_log:
+        elif obj_type == ActivityAction.login_log:
             detail_url = reverse(
                 'audits:login-log-detail',
                 kwargs={'pk': detail_id},

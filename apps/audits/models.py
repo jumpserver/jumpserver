@@ -1,9 +1,9 @@
 import os
 import uuid
 
+from django.conf import settings
 from django.db import models
 from django.db.models import Q
-from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext, ugettext_lazy as _
 
@@ -16,7 +16,7 @@ from terminal.models import default_storage
 from .const import (
     OperateChoices,
     ActionChoices,
-    ActivityChoices,
+    ActivityAction,
     LoginTypeChoices,
     MFAChoices,
     LoginStatusChoices,
@@ -131,7 +131,7 @@ class OperateLog(OrgModelMixin):
 class ActivityLog(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     type = models.CharField(
-        choices=ActivityChoices.choices, max_length=2,
+        choices=ActivityAction.choices, max_length=2,
         null=True, default=None, verbose_name=_("Activity type"),
     )
     resource_id = models.CharField(

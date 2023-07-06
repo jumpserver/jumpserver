@@ -22,12 +22,14 @@ params:
     type: str
     label: '家目录'
     default: ''
-    help_text: '默认家目录 /home/系统用户名: /home/username'
+    required: false
+    help_text: 'useradd 时设置的家目录，默认值和操作系统有关，也就是 useradd 的默认家目录, 支持变量 ${ACCOUNT}'
 
   - name: groups
     type: str
     label: '用户组'
     default: ''
+    required: false
     help_text: '请输入用户组，多个用户组使用逗号分隔（需填写已存在的用户组）'
 
 i18n:

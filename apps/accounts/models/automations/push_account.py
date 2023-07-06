@@ -4,8 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from accounts.const import AutomationTypes
 from accounts.models import Account
 from jumpserver.utils import has_valid_xpack_license
-from .base import AccountBaseAutomation
-from .change_secret import ChangeSecretMixin
+from .base import AccountBaseAutomation, ChangeSecretMixin
 
 __all__ = ['PushAccountAutomation']
 
@@ -17,9 +16,9 @@ class PushAccountAutomation(ChangeSecretMixin, AccountBaseAutomation):
 
     def create_nonlocal_accounts(self, usernames, asset):
         secret_type = self.secret_type
-        account_usernames = asset.accounts.filter(secret_type=self.secret_type).values_list(
-            'username', flat=True
-        )
+        account_usernames = asset.accounts \
+            .filter(secret_type=self.secret_type) \
+            .values_list('username', flat=True)
         create_usernames = set(usernames) - set(account_usernames)
         create_account_objs = [
             Account(
@@ -28,7 +27,7 @@ class PushAccountAutomation(ChangeSecretMixin, AccountBaseAutomation):
             )
             for username in create_usernames
         ]
-        Account.objects.bulk_create(create_account_objs)
+        Account.objects.bulk_create(create_account_objs, ignore_conflicts=True)
 
     def set_period_schedule(self):
         pass

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-from django.utils.translation import ugettext_lazy as _
 from django.db.models import TextChoices, IntegerChoices
+from django.utils.translation import ugettext_lazy as _
 
 DEFAULT_CITY = _("Unknown")
 
@@ -36,7 +36,7 @@ class LoginTypeChoices(TextChoices):
     unknown = "U", _("Unknown")
 
 
-class ActivityChoices(TextChoices):
+class ActivityAction(TextChoices):
     operate_log = 'O', _('Operate log')
     session_log = 'S', _('Session log')
     login_log = 'L', _('Login log')
