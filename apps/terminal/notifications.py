@@ -64,7 +64,7 @@ class CommandAlertMixin:
             subscription.save()
 
 
-class CommandWarnningMessage(CommandAlertMixin, UserMessage):
+class CommandWarningMessage(CommandAlertMixin, UserMessage):
     message_type_label = _('Danger command warning')
 
     def __init__(self, user, command):
@@ -84,14 +84,19 @@ class CommandWarnningMessage(CommandAlertMixin, UserMessage):
             api_to_ui=True, external=True, is_console=True
         ) + '?oid={}'.format(self.command.get('org_id'))
 
+        cmd_filter_acl = self.command.get('cmd_filter_acl')
+        cmd_group = self.command.get('cmd_group')
+
         context = {
             "command": self.command['input'],
             'asset_url': asset_url,
             'session_url': session_url.replace(
                 '/terminal/sessions/', '/audit/sessions/sessions/'
             ),
+            'cmd_filter_acl_url': settings.SITE_URL + '/ui/#/console/perms/cmd-acls/%s/' % cmd_filter_acl,
+            'cmd_group_url': settings.SITE_URL + '/ui/#/console/perms/cmd-groups/%s/' % cmd_group,
         }
-        message = render_to_string('terminal/_msg_command_warnning.html', context)
+        message = render_to_string('terminal/_msg_command_warning.html', context)
         return {
             'subject': self.subject,
             'message': message

@@ -6,6 +6,7 @@ from rest_framework import generics
 from rest_framework.fields import DateTimeField
 from rest_framework.response import Response
 
+from acls.models import CommandFilterACL
 from terminal.models import CommandStorage, Session, Command
 from terminal.filters import CommandFilter
 from orgs.utils import current_org
@@ -18,7 +19,8 @@ from terminal.exceptions import StorageInvalid
 from terminal.backends import (
     get_command_storage, get_multi_command_storage
 )
-from terminal.notifications import CommandAlertMessage, CommandWarnningMessage
+from terminal.notifications import CommandAlertMessage, CommandWarningMessage
+from terminal.const import RiskLevelChoices
 
 logger = get_logger(__name__)
 __all__ = ['CommandViewSet', 'InsecureCommandAlertAPI']
@@ -199,10 +201,18 @@ class InsecureCommandAlertAPI(generics.CreateAPIView):
         serializer = InsecureCommandAlertSerializer(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)
         commands = serializer.validated_data
+        acls_ids = [command['cmd_filter_acl'] for command in commands]
+        acls = CommandFilterACL.objects.filter(id__in=acls_ids)
+        map_id_acl = {str(acl.id): acl for acl in acls}
+
         for command in commands:
-            if command['action'] == 'warning':
-                CommandWarnningMessage(request.user, command).publish_async()
-                continue
-            if command['risk_level'] >= settings.SECURITY_INSECURE_COMMAND_LEVEL:
+            risk_level = command['risk_level']
+            if risk_level in [RiskLevelChoices.reject, RiskLevelChoices.review_reject]:
                 CommandAlertMessage(command).publish_async()
+            if risk_level == RiskLevelChoices.warning:
+                acl = map_id_acl.get(command['cmd_filter_acl'])
+                for reviewer in acl.reviewers.all():
+                    CommandWarningMessage(reviewer, command).publish_async()
+            else:
+                logger.info('risk_level ignore: %s' % risk_level)
         return Response()
