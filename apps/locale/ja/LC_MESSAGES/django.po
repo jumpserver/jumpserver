@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-04 18:28+0800\n"
+"POT-Creation-Date: 2023-07-07 14:54+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -196,7 +196,8 @@ msgstr "作成のみ"
 #: audits/models.py:53 authentication/models/connection_token.py:36
 #: perms/models/asset_permission.py:64 perms/serializers/permission.py:34
 #: terminal/backends/command/models.py:20 terminal/models/session/session.py:31
-#: terminal/notifications.py:95 terminal/serializers/command.py:17
+#: terminal/notifications.py:129 terminal/serializers/command.py:18
+#: terminal/templates/terminal/_msg_command_warnning.html:4
 #: tickets/models/ticket/apply_asset.py:16 xpack/plugins/cloud/models.py:212
 msgid "Asset"
 msgstr "資産"
@@ -462,11 +463,12 @@ msgstr "アカウントのコレクション"
 msgid "Triggers"
 msgstr "トリガー方式"
 
-#: accounts/models/automations/push_account.py:16 acls/models/base.py:46
+#: accounts/models/automations/push_account.py:16 acls/models/base.py:48
 #: acls/serializers/base.py:56 assets/models/cmd_filter.py:81
 #: audits/models.py:87 audits/serializers.py:82
 #: authentication/serializers/connect_token_secret.py:116
 #: authentication/templates/authentication/_access_key_modal.html:34
+#: terminal/serializers/command.py:43
 msgid "Action"
 msgstr "アクション"
 
@@ -478,7 +480,7 @@ msgstr "アカウントプッシュ"
 msgid "Verify asset account"
 msgstr "アカウントの確認"
 
-#: accounts/models/base.py:33 acls/models/base.py:40 acls/models/base.py:101
+#: accounts/models/base.py:33 acls/models/base.py:42 acls/models/base.py:103
 #: acls/models/command_acl.py:21 acls/serializers/base.py:34
 #: applications/models.py:9 assets/models/_user.py:22
 #: assets/models/asset/common.py:91 assets/models/asset/common.py:149
@@ -612,7 +614,7 @@ msgid "Changed"
 msgstr "編集済み"
 
 #: accounts/serializers/account/account.py:250
-#: accounts/serializers/automations/base.py:22 acls/models/base.py:102
+#: accounts/serializers/automations/base.py:22 acls/models/base.py:104
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20 ops/models/base.py:17
 #: ops/models/job.py:105 ops/serializers/job.py:21
@@ -650,8 +652,8 @@ msgstr "ID"
 #: perms/serializers/permission.py:30 rbac/builtin.py:122
 #: rbac/models/rolebinding.py:49 terminal/backends/command/models.py:19
 #: terminal/models/session/session.py:29 terminal/models/session/sharing.py:32
-#: terminal/notifications.py:96 terminal/notifications.py:144
-#: terminal/serializers/command.py:16 tickets/models/comment.py:21
+#: terminal/notifications.py:130 terminal/notifications.py:178
+#: terminal/serializers/command.py:17 tickets/models/comment.py:21
 #: users/const.py:14 users/models/user.py:947 users/models/user.py:978
 #: users/serializers/group.py:18
 msgid "User"
@@ -659,7 +661,7 @@ msgstr "ユーザー"
 
 #: accounts/serializers/account/account.py:428
 #: authentication/templates/authentication/_access_key_modal.html:33
-#: terminal/notifications.py:98 terminal/notifications.py:146
+#: terminal/notifications.py:132 terminal/notifications.py:180
 msgid "Date"
 msgstr "日付"
 
@@ -787,35 +789,39 @@ msgstr "秘密鍵が無効またはpassphraseエラー"
 msgid "Acls"
 msgstr "Acls"
 
-#: acls/models/base.py:20 tickets/const.py:45
+#: acls/models/base.py:21 tickets/const.py:45
 #: tickets/templates/tickets/approve_check_password.html:49
 msgid "Reject"
 msgstr "拒否"
 
-#: acls/models/base.py:21
+#: acls/models/base.py:22
 msgid "Accept"
 msgstr "受け入れられる"
 
-#: acls/models/base.py:22
+#: acls/models/base.py:23
 msgid "Review"
 msgstr "レビュー担当者"
 
-#: acls/models/base.py:42 assets/models/_user.py:51
+#: acls/models/base.py:24
+msgid "Warning"
+msgstr "警告"
+
+#: acls/models/base.py:44 assets/models/_user.py:51
 #: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:93
 msgid "Priority"
 msgstr "優先順位"
 
-#: acls/models/base.py:43 assets/models/_user.py:51
+#: acls/models/base.py:45 assets/models/_user.py:51
 #: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:94
 msgid "1-100, the lower the value will be match first"
 msgstr "1-100、低い値は最初に一致します"
 
-#: acls/models/base.py:47 assets/models/cmd_filter.py:86
+#: acls/models/base.py:49 assets/models/cmd_filter.py:86
 #: authentication/serializers/connect_token_secret.py:88
 msgid "Reviewers"
 msgstr "レビュー担当者"
 
-#: acls/models/base.py:48 authentication/models/access_key.py:17
+#: acls/models/base.py:50 authentication/models/access_key.py:17
 #: authentication/models/connection_token.py:53
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/asset_permission.py:76 terminal/models/session/sharing.py:27
@@ -823,11 +829,11 @@ msgstr "レビュー担当者"
 msgid "Active"
 msgstr "アクティブ"
 
-#: acls/models/base.py:86 users/apps.py:9
+#: acls/models/base.py:88 users/apps.py:9
 msgid "Users"
 msgstr "ユーザー"
 
-#: acls/models/base.py:103 assets/models/automations/base.py:17
+#: acls/models/base.py:105 assets/models/automations/base.py:17
 #: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:305
 #: rbac/tree.py:35
 msgid "Accounts"
@@ -835,9 +841,10 @@ msgstr "アカウント"
 
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
 #: ops/serializers/job.py:55 terminal/const.py:69
-#: terminal/models/session/session.py:42 terminal/serializers/command.py:18
+#: terminal/models/session/session.py:42 terminal/serializers/command.py:19
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
+#: terminal/templates/terminal/_msg_command_warnning.html:10
 msgid "Command"
 msgstr "コマンド"
 
@@ -2023,6 +2030,7 @@ msgstr "書類"
 #: terminal/models/session/replay.py:9 terminal/models/session/sharing.py:18
 #: terminal/models/session/sharing.py:81
 #: terminal/templates/terminal/_msg_command_alert.html:10
+#: terminal/templates/terminal/_msg_command_warnning.html:7
 #: tickets/models/ticket/command_confirm.py:15
 msgid "Session"
 msgstr "セッション"
@@ -2041,7 +2049,7 @@ msgid "Resource"
 msgstr "リソース"
 
 #: audits/models.py:96 audits/models.py:142 audits/models.py:168
-#: terminal/serializers/command.py:50
+#: terminal/serializers/command.py:58
 msgid "Datetime"
 msgstr "時間"
 
@@ -5294,7 +5302,7 @@ msgstr ""
 msgid "Periodic import ldap user"
 msgstr "LDAP ユーザーを定期的にインポートする"
 
-#: settings/tasks/ldap.py:47
+#: settings/tasks/ldap.py:46
 msgid "Registration periodic import ldap user task"
 msgstr "登録サイクルLDAPユーザータスクのインポート"
 
@@ -5485,8 +5493,8 @@ msgstr "期限切れです。"
 #, python-format
 msgid ""
 "\n"
-"                Your password has expired, please click <a href="
-"\"%(user_password_update_url)s\"> this link </a> update password.\n"
+"                Your password has expired, please click <a "
+"href=\"%(user_password_update_url)s\"> this link </a> update password.\n"
 "            "
 msgstr ""
 "\n"
@@ -5507,34 +5515,34 @@ msgid ""
 "            "
 msgstr ""
 "\n"
-"                クリックしてください <a href=\"%(user_password_update_url)s"
-"\"> リンク </a> パスワードの更新\n"
+"                クリックしてください <a "
+"href=\"%(user_password_update_url)s\"> リンク </a> パスワードの更新\n"
 "        "
 
 #: templates/_message.html:43
 #, python-format
 msgid ""
 "\n"
-"        Your information was incomplete. Please click <a href="
-"\"%(first_login_url)s\"> this link </a>to complete your information.\n"
+"        Your information was incomplete. Please click <a "
+"href=\"%(first_login_url)s\"> this link </a>to complete your information.\n"
 "        "
 msgstr ""
 "\n"
-"                あなたの情報が不完全なので、クリックしてください。 <a href="
-"\"%(first_login_url)s\"> リンク </a> 補完\n"
+"                あなたの情報が不完全なので、クリックしてください。 <a "
+"href=\"%(first_login_url)s\"> リンク </a> 補完\n"
 "                "
 
 #: templates/_message.html:56
 #, python-format
 msgid ""
 "\n"
-"        Your ssh public key not set or expired. Please click <a href="
-"\"%(user_pubkey_update)s\"> this link </a>to update\n"
+"        Your ssh public key not set or expired. Please click <a "
+"href=\"%(user_pubkey_update)s\"> this link </a>to update\n"
 "        "
 msgstr ""
 "\n"
-"                SSHキーが設定されていないか無効になっている場合は、 <a href="
-"\"%(user_pubkey_update)s\"> リンク </a> 更新\n"
+"                SSHキーが設定されていないか無効になっている場合は、 <a "
+"href=\"%(user_pubkey_update)s\"> リンク </a> 更新\n"
 "        "
 
 #: templates/_mfa_login_field.html:28
@@ -5632,7 +5640,7 @@ msgstr "テスト失敗: {}"
 msgid "Test successful"
 msgstr "テスト成功"
 
-#: terminal/api/component/storage.py:124 terminal/notifications.py:179
+#: terminal/api/component/storage.py:124 terminal/notifications.py:213
 #: terminal/tasks.py:144
 msgid "Test failure: Account invalid"
 msgstr "テスト失敗: アカウントが無効"
@@ -5673,11 +5681,11 @@ msgstr "危険"
 msgid "Input"
 msgstr "入力"
 
-#: terminal/backends/command/models.py:23 terminal/serializers/command.py:48
+#: terminal/backends/command/models.py:23 terminal/serializers/command.py:56
 msgid "Output"
 msgstr "出力"
 
-#: terminal/backends/command/models.py:27 terminal/serializers/command.py:22
+#: terminal/backends/command/models.py:27 terminal/serializers/command.py:23
 msgid "Risk level"
 msgstr "リスクレベル"
 
@@ -5893,7 +5901,7 @@ msgstr "再生ストレージ"
 msgid "type"
 msgstr "タイプ"
 
-#: terminal/models/component/terminal.py:89 terminal/serializers/command.py:51
+#: terminal/models/component/terminal.py:89 terminal/serializers/command.py:59
 msgid "Remote Address"
 msgstr "リモートアドレス"
 
@@ -6014,27 +6022,31 @@ msgstr "すでにこのセッションに参加しています"
 msgid "Sessions"
 msgstr "セッション"
 
-#: terminal/notifications.py:67
+#: terminal/notifications.py:68
+msgid "Danger command warning"
+msgstr "危険コマンドアラート"
+
+#: terminal/notifications.py:104
 msgid "Danger command alert"
 msgstr "危険コマンドアラート"
 
-#: terminal/notifications.py:97 terminal/notifications.py:145
+#: terminal/notifications.py:131 terminal/notifications.py:179
 msgid "Level"
 msgstr "レベル"
 
-#: terminal/notifications.py:115
+#: terminal/notifications.py:149
 msgid "Batch danger command alert"
 msgstr "一括危険コマンド警告"
 
-#: terminal/notifications.py:163
+#: terminal/notifications.py:197
 msgid "Command and replay storage"
 msgstr "コマンド及び録画記憶"
 
-#: terminal/notifications.py:164
+#: terminal/notifications.py:198
 msgid "Connectivity alarm"
 msgstr "接続性アラーム"
 
-#: terminal/notifications.py:189
+#: terminal/notifications.py:223
 #: terminal/templates/terminal/_msg_check_command_replay_storage_connectivity.html:4
 msgid "Invalid storage"
 msgstr "無効なストレージ"
@@ -6106,15 +6118,15 @@ msgstr "RDS 远程应用注销时间限制"
 msgid "Load status"
 msgstr "ロードステータス"
 
-#: terminal/serializers/command.py:19
+#: terminal/serializers/command.py:20
 msgid "Session ID"
 msgstr "セッションID"
 
-#: terminal/serializers/command.py:47
+#: terminal/serializers/command.py:55
 msgid "Account "
 msgstr "アカウント"
 
-#: terminal/serializers/command.py:49
+#: terminal/serializers/command.py:57
 msgid "Timestamp"
 msgstr "タイムスタンプ"
 
@@ -6288,6 +6300,8 @@ msgid "Check command replay storage connectivity"
 msgstr "チェックコマンドと録画ストレージの接続性"
 
 #: terminal/templates/terminal/_msg_command_alert.html:10
+#: terminal/templates/terminal/_msg_command_warnning.html:5
+#: terminal/templates/terminal/_msg_command_warnning.html:8
 msgid "view"
 msgstr "表示"
 

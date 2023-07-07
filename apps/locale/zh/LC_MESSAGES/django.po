@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-04 18:28+0800\n"
+"POT-Creation-Date: 2023-07-07 14:54+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -195,7 +195,8 @@ msgstr "仅创建"
 #: audits/models.py:53 authentication/models/connection_token.py:36
 #: perms/models/asset_permission.py:64 perms/serializers/permission.py:34
 #: terminal/backends/command/models.py:20 terminal/models/session/session.py:31
-#: terminal/notifications.py:95 terminal/serializers/command.py:17
+#: terminal/notifications.py:129 terminal/serializers/command.py:18
+#: terminal/templates/terminal/_msg_command_warnning.html:4
 #: tickets/models/ticket/apply_asset.py:16 xpack/plugins/cloud/models.py:212
 msgid "Asset"
 msgstr "资产"
@@ -461,11 +462,12 @@ msgstr "收集账号"
 msgid "Triggers"
 msgstr "触发方式"
 
-#: accounts/models/automations/push_account.py:16 acls/models/base.py:46
+#: accounts/models/automations/push_account.py:16 acls/models/base.py:48
 #: acls/serializers/base.py:56 assets/models/cmd_filter.py:81
 #: audits/models.py:87 audits/serializers.py:82
 #: authentication/serializers/connect_token_secret.py:116
 #: authentication/templates/authentication/_access_key_modal.html:34
+#: terminal/serializers/command.py:43
 msgid "Action"
 msgstr "动作"
 
@@ -477,7 +479,7 @@ msgstr "账号推送"
 msgid "Verify asset account"
 msgstr "账号验证"
 
-#: accounts/models/base.py:33 acls/models/base.py:40 acls/models/base.py:101
+#: accounts/models/base.py:33 acls/models/base.py:42 acls/models/base.py:103
 #: acls/models/command_acl.py:21 acls/serializers/base.py:34
 #: applications/models.py:9 assets/models/_user.py:22
 #: assets/models/asset/common.py:91 assets/models/asset/common.py:149
@@ -608,7 +610,7 @@ msgid "Changed"
 msgstr "已修改"
 
 #: accounts/serializers/account/account.py:250
-#: accounts/serializers/automations/base.py:22 acls/models/base.py:102
+#: accounts/serializers/automations/base.py:22 acls/models/base.py:104
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20 ops/models/base.py:17
 #: ops/models/job.py:105 ops/serializers/job.py:21
@@ -646,8 +648,8 @@ msgstr "ID"
 #: perms/serializers/permission.py:30 rbac/builtin.py:122
 #: rbac/models/rolebinding.py:49 terminal/backends/command/models.py:19
 #: terminal/models/session/session.py:29 terminal/models/session/sharing.py:32
-#: terminal/notifications.py:96 terminal/notifications.py:144
-#: terminal/serializers/command.py:16 tickets/models/comment.py:21
+#: terminal/notifications.py:130 terminal/notifications.py:178
+#: terminal/serializers/command.py:17 tickets/models/comment.py:21
 #: users/const.py:14 users/models/user.py:947 users/models/user.py:978
 #: users/serializers/group.py:18
 msgid "User"
@@ -655,7 +657,7 @@ msgstr "用户"
 
 #: accounts/serializers/account/account.py:428
 #: authentication/templates/authentication/_access_key_modal.html:33
-#: terminal/notifications.py:98 terminal/notifications.py:146
+#: terminal/notifications.py:132 terminal/notifications.py:180
 msgid "Date"
 msgstr "日期"
 
@@ -783,35 +785,39 @@ msgstr "密钥不合法或密钥密码错误"
 msgid "Acls"
 msgstr "访问控制"
 
-#: acls/models/base.py:20 tickets/const.py:45
+#: acls/models/base.py:21 tickets/const.py:45
 #: tickets/templates/tickets/approve_check_password.html:49
 msgid "Reject"
 msgstr "拒绝"
 
-#: acls/models/base.py:21
+#: acls/models/base.py:22
 msgid "Accept"
 msgstr "接受"
 
-#: acls/models/base.py:22
+#: acls/models/base.py:23
 msgid "Review"
 msgstr "审批"
 
-#: acls/models/base.py:42 assets/models/_user.py:51
+#: acls/models/base.py:24
+msgid "Warning"
+msgstr "告警"
+
+#: acls/models/base.py:44 assets/models/_user.py:51
 #: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:93
 msgid "Priority"
 msgstr "优先级"
 
-#: acls/models/base.py:43 assets/models/_user.py:51
+#: acls/models/base.py:45 assets/models/_user.py:51
 #: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:94
 msgid "1-100, the lower the value will be match first"
 msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 
-#: acls/models/base.py:47 assets/models/cmd_filter.py:86
+#: acls/models/base.py:49 assets/models/cmd_filter.py:86
 #: authentication/serializers/connect_token_secret.py:88
 msgid "Reviewers"
 msgstr "审批人"
 
-#: acls/models/base.py:48 authentication/models/access_key.py:17
+#: acls/models/base.py:50 authentication/models/access_key.py:17
 #: authentication/models/connection_token.py:53
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/asset_permission.py:76 terminal/models/session/sharing.py:27
@@ -819,11 +825,11 @@ msgstr "审批人"
 msgid "Active"
 msgstr "激活中"
 
-#: acls/models/base.py:86 users/apps.py:9
+#: acls/models/base.py:88 users/apps.py:9
 msgid "Users"
 msgstr "用户管理"
 
-#: acls/models/base.py:103 assets/models/automations/base.py:17
+#: acls/models/base.py:105 assets/models/automations/base.py:17
 #: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:305
 #: rbac/tree.py:35
 msgid "Accounts"
@@ -831,9 +837,10 @@ msgstr "账号管理"
 
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
 #: ops/serializers/job.py:55 terminal/const.py:69
-#: terminal/models/session/session.py:42 terminal/serializers/command.py:18
+#: terminal/models/session/session.py:42 terminal/serializers/command.py:19
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
+#: terminal/templates/terminal/_msg_command_warnning.html:10
 msgid "Command"
 msgstr "命令"
 
@@ -2007,6 +2014,7 @@ msgstr "文件"
 #: terminal/models/session/replay.py:9 terminal/models/session/sharing.py:18
 #: terminal/models/session/sharing.py:81
 #: terminal/templates/terminal/_msg_command_alert.html:10
+#: terminal/templates/terminal/_msg_command_warnning.html:7
 #: tickets/models/ticket/command_confirm.py:15
 msgid "Session"
 msgstr "会话"
@@ -2025,7 +2033,7 @@ msgid "Resource"
 msgstr "资源"
 
 #: audits/models.py:96 audits/models.py:142 audits/models.py:168
-#: terminal/serializers/command.py:50
+#: terminal/serializers/command.py:58
 msgid "Datetime"
 msgstr "日期"
 
@@ -5217,7 +5225,7 @@ msgstr "提示：在Luna 页面中连接图形化资产时默认使用的分辨�
 msgid "Periodic import ldap user"
 msgstr "周期导入 LDAP 用户"
 
-#: settings/tasks/ldap.py:47
+#: settings/tasks/ldap.py:46
 msgid "Registration periodic import ldap user task"
 msgstr "注册周期导入 LDAP 用户 任务"
 
@@ -5403,13 +5411,13 @@ msgstr "过期。"
 #, python-format
 msgid ""
 "\n"
-"                Your password has expired, please click <a href="
-"\"%(user_password_update_url)s\"> this link </a> update password.\n"
+"                Your password has expired, please click <a "
+"href=\"%(user_password_update_url)s\"> this link </a> update password.\n"
 "            "
 msgstr ""
 "\n"
-"                您的密码已经过期，请点击 <a href="
-"\"%(user_password_update_url)s\"> 链接 </a> 更新密码\n"
+"                您的密码已经过期，请点击 <a "
+"href=\"%(user_password_update_url)s\"> 链接 </a> 更新密码\n"
 "        "
 
 #: templates/_message.html:30
@@ -5433,8 +5441,8 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"        Your information was incomplete. Please click <a href="
-"\"%(first_login_url)s\"> this link </a>to complete your information.\n"
+"        Your information was incomplete. Please click <a "
+"href=\"%(first_login_url)s\"> this link </a>to complete your information.\n"
 "        "
 msgstr ""
 "\n"
@@ -5446,13 +5454,13 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"        Your ssh public key not set or expired. Please click <a href="
-"\"%(user_pubkey_update)s\"> this link </a>to update\n"
+"        Your ssh public key not set or expired. Please click <a "
+"href=\"%(user_pubkey_update)s\"> this link </a>to update\n"
 "        "
 msgstr ""
 "\n"
-"                您的SSH密钥没有设置或已失效，请点击 <a href="
-"\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
+"                您的SSH密钥没有设置或已失效，请点击 <a "
+"href=\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
 "        "
 
 #: templates/_mfa_login_field.html:28
@@ -5545,7 +5553,7 @@ msgstr "测试失败: {}"
 msgid "Test successful"
 msgstr "测试成功"
 
-#: terminal/api/component/storage.py:124 terminal/notifications.py:179
+#: terminal/api/component/storage.py:124 terminal/notifications.py:213
 #: terminal/tasks.py:144
 msgid "Test failure: Account invalid"
 msgstr "测试失败: 账号无效"
@@ -5586,11 +5594,11 @@ msgstr "危险"
 msgid "Input"
 msgstr "输入"
 
-#: terminal/backends/command/models.py:23 terminal/serializers/command.py:48
+#: terminal/backends/command/models.py:23 terminal/serializers/command.py:56
 msgid "Output"
 msgstr "输出"
 
-#: terminal/backends/command/models.py:27 terminal/serializers/command.py:22
+#: terminal/backends/command/models.py:27 terminal/serializers/command.py:23
 msgid "Risk level"
 msgstr "风险等级"
 
@@ -5806,7 +5814,7 @@ msgstr "录像存储"
 msgid "type"
 msgstr "类型"
 
-#: terminal/models/component/terminal.py:89 terminal/serializers/command.py:51
+#: terminal/models/component/terminal.py:89 terminal/serializers/command.py:59
 msgid "Remote Address"
 msgstr "远端地址"
 
@@ -5927,27 +5935,31 @@ msgstr "您已经加入过此会话"
 msgid "Sessions"
 msgstr "会话管理"
 
-#: terminal/notifications.py:67
+#: terminal/notifications.py:68
+msgid "Danger command warning"
+msgstr "危险命令告警"
+
+#: terminal/notifications.py:104
 msgid "Danger command alert"
 msgstr "危险命令告警"
 
-#: terminal/notifications.py:97 terminal/notifications.py:145
+#: terminal/notifications.py:131 terminal/notifications.py:179
 msgid "Level"
 msgstr "级别"
 
-#: terminal/notifications.py:115
+#: terminal/notifications.py:149
 msgid "Batch danger command alert"
 msgstr "批量危险命令告警"
 
-#: terminal/notifications.py:163
+#: terminal/notifications.py:197
 msgid "Command and replay storage"
 msgstr "命令及录像存储"
 
-#: terminal/notifications.py:164
+#: terminal/notifications.py:198
 msgid "Connectivity alarm"
 msgstr "可连接性告警"
 
-#: terminal/notifications.py:189
+#: terminal/notifications.py:223
 #: terminal/templates/terminal/_msg_check_command_replay_storage_connectivity.html:4
 msgid "Invalid storage"
 msgstr "无效的存储"
@@ -6017,15 +6029,15 @@ msgstr "RDS 远程应用注销时间限制"
 msgid "Load status"
 msgstr "负载状态"
 
-#: terminal/serializers/command.py:19
+#: terminal/serializers/command.py:20
 msgid "Session ID"
 msgstr "会话ID"
 
-#: terminal/serializers/command.py:47
+#: terminal/serializers/command.py:55
 msgid "Account "
 msgstr "账号"
 
-#: terminal/serializers/command.py:49
+#: terminal/serializers/command.py:57
 msgid "Timestamp"
 msgstr "时间戳"
 
@@ -6196,6 +6208,8 @@ msgid "Check command replay storage connectivity"
 msgstr "检查命令及录像存储可连接性 "
 
 #: terminal/templates/terminal/_msg_command_alert.html:10
+#: terminal/templates/terminal/_msg_command_warnning.html:5
+#: terminal/templates/terminal/_msg_command_warnning.html:8
 msgid "view"
 msgstr "查看"
 

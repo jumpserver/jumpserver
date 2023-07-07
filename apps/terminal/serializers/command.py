@@ -6,6 +6,7 @@ from common.utils import pretty_string
 from common.serializers.fields import LabeledChoiceField
 from terminal.backends.command.models import AbstractSessionCommand
 from terminal.models import Command
+from acls.models import ActionChoices
 
 __all__ = ['SessionCommandSerializer', 'InsecureCommandAlertSerializer']
 
@@ -37,7 +38,14 @@ class SimpleSessionCommandSerializer(serializers.ModelSerializer):
 
 
 class InsecureCommandAlertSerializer(SimpleSessionCommandSerializer):
-    pass
+    action = serializers.ChoiceField(
+        choices=ActionChoices.choices,
+        required=False, write_only=True, label=_("Action")
+    )
+
+    class Meta(SimpleSessionCommandSerializer.Meta):
+        fields = ['user', 'asset', 'input', 'session', 'risk_level', 'org_id',
+                  'action']
 
 
 class SessionCommandSerializerMixin(serializers.Serializer):

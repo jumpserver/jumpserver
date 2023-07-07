@@ -18,7 +18,7 @@ from terminal.exceptions import StorageInvalid
 from terminal.backends import (
     get_command_storage, get_multi_command_storage
 )
-from terminal.notifications import CommandAlertMessage
+from terminal.notifications import CommandAlertMessage, CommandWarnningMessage
 
 logger = get_logger(__name__)
 __all__ = ['CommandViewSet', 'InsecureCommandAlertAPI']
@@ -200,6 +200,9 @@ class InsecureCommandAlertAPI(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         commands = serializer.validated_data
         for command in commands:
+            if command['action'] == 'warning':
+                CommandWarnningMessage(request.user, command).publish_async()
+                continue
             if command['risk_level'] >= settings.SECURITY_INSECURE_COMMAND_LEVEL:
                 CommandAlertMessage(command).publish_async()
         return Response()
