@@ -135,6 +135,14 @@ class WebAPP(object):
         self.account = account
         self.platform = platform
         self._steps = list()
+        # 确保 account_username 和 account_secret 不为 None
+        self._account_username = account.username if account.username else ''
+        self._account_secret = account.secret if account.secret else ''
+
+        # 如果是匿名账号，account_username 和 account_secret 为空
+        if account.username == "@ANON":
+            self._account_username = ''
+            self._account_secret = ''
 
         extra_data = self.asset.spec_info
         autofill_type = extra_data.autofill
@@ -153,23 +161,22 @@ class WebAPP(object):
             for item in steps:
                 val = item.value
                 if val:
-                    val = val.replace("{USERNAME}", self.account.username)
-                    val = val.replace("{SECRET}", self.account.secret)
+                    val = val.replace("{USERNAME}", self._account_username)
+                    val = val.replace("{SECRET}", self._account_secret)
                 item.value = val
                 self._steps.append(item)
 
     def _default_custom_steps(self, spec_info) -> list:
-        account = self.account
-        default_steps = [
+        return [
             Step({
                 "step": 1,
-                "value": account.username,
+                "value": self._account_username,
                 "target": spec_info.username_selector,
                 "command": "type"
             }),
             Step({
                 "step": 2,
-                "value": account.secret,
+                "value": self._account_secret,
                 "target": spec_info.password_selector,
                 "command": "type"
             }),
@@ -180,7 +187,6 @@ class WebAPP(object):
                 "command": "click"
             })
         ]
-        return default_steps
 
     def execute(self, driver: webdriver.Chrome) -> bool:
         if not self.asset.address:

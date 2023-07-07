@@ -53,7 +53,7 @@ class Endpoint(JMSBaseModel):
     def is_valid_for(self, target_instance, protocol):
         if self.is_default():
             return True
-        if self.host and self.get_port(target_instance, protocol) != 0:
+        if self.get_port(target_instance, protocol) != 0:
             return True
         return False
 

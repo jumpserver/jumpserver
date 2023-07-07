@@ -55,10 +55,21 @@ class PlatformProtocolSerializer(serializers.ModelSerializer):
             "secret_types", "setting",
         ]
         extra_kwargs = {
-            "primary": {"help_text": _("Primary protocol, asset must set this protocol, only one primary protocol")},
-            "required": {"help_text": _("This protocol is required, asset must set this protocol")},
-            "default": {"help_text": _("This protocol is default, asset will set this protocol if no protocol set")},
-            "public": {"help_text": _("This protocol is public, asset will show this protocol to user")},
+            "primary": {
+                "help_text": _(
+                    "This protocol is primary, and it must be set when adding assets. "
+                    "Additionally, there can only be one primary protocol."
+                )
+            },
+            "required": {
+                "help_text": _("This protocol is required, and it must be set when adding assets.")
+            },
+            "default": {
+                "help_text": _("This protocol is default, when adding assets, it will be displayed by default.")
+            },
+            "public": {
+                "help_text": _("This protocol is public, asset will show this protocol to user")
+            },
         }
 
     def get_setting_serializer(self):

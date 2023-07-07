@@ -350,7 +350,7 @@ class AllTypes(ChoicesMixin):
 
                 for d in platform_datas:
                     name = d['name']
-                    # print("\t    - Platform: {}".format(name))
+                    print("\t    - Platform: {}".format(name))
                     _automation = d.pop('automation', {})
                     _protocols = d.pop('_protocols', [])
                     _protocols_setting = d.pop('protocols_setting', {})
@@ -363,7 +363,7 @@ class AllTypes(ChoicesMixin):
                         setting = _protocols_setting.get(p['name'], {})
                         p['required'] = setting.pop('required', False)
                         p['default'] = setting.pop('default', False)
-                        p['setting'] = {**p.get('setting', {}), **setting}
+                        p['setting'] = {**p.get('setting', {}).get('default', ''), **setting}
 
                     platform_data = {
                         **default_platform_data, **d,
