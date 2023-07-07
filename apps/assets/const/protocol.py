@@ -62,11 +62,12 @@ class Protocol(ChoicesMixin, models.TextChoices):
                         'label': _('Security'),
                         'help_text': _("Security layer to use for the connection")
                     },
-                    # 'ad_domain': {
-                    #     'type': 'str',
-                    #     "required": False,
-                    #     'label': _('AD domain')
-                    # }
+                    'ad_domain': {
+                        'type': 'str',
+                        'required': False,
+                        'default': '',
+                        'label': _('AD domain')
+                    }
                 }
             },
             cls.vnc: {
