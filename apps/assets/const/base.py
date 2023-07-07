@@ -69,10 +69,15 @@ class BaseType(TextChoices):
         choices = protocol.get('choices', [])
         if choices == '__self__':
             choices = [tp]
-        protocols = [
-            {'name': name, **settings.get(name, {})}
-            for name in choices
-        ]
+
+        protocols = []
+        for name in choices:
+            protocol = {'name': name, **settings.get(name, {})}
+            setting = protocol.pop('setting', {})
+            setting_values = {k: v.get('default', None) for k, v in setting.items()}
+            protocol['setting'] = setting_values
+            protocols.append(protocol)
+
         if protocols:
             protocols[0]['default'] = True
         return protocols
