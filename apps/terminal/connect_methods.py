@@ -49,6 +49,7 @@ class NativeClient(TextChoices):
     # Koko
     ssh = 'ssh', 'SSH'
     ssh_client = 'ssh_client', _('SSH Client')
+    sftp_client = 'sftp_client', _('SFTP Client')
 
     # Magnus
     db_client = 'db_client', _('DB Client')
@@ -63,7 +64,7 @@ class NativeClient(TextChoices):
         clients = {
             Protocol.ssh: {
                 'default': [cls.ssh],
-                'windows': [cls.ssh_client],
+                'windows': [cls.ssh_client, cls.sftp_client],
             },
             Protocol.rdp: [cls.mstsc],
             Protocol.mysql: [cls.db_client],
@@ -129,7 +130,7 @@ class NativeClient(TextChoices):
             cls.ssh: f'ssh {username}@{endpoint.host} -p {endpoint.ssh_port}',
             cls.ssh_client: f'putty.exe -ssh {username}@{endpoint.host} -P {endpoint.ssh_port}',
         }
-        command = commands.get(name)
+        command = commands.get(name, '')
         if isinstance(command, dict):
             command = command.get(os, command.get('default'))
         return command

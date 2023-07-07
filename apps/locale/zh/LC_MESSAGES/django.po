@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-04 18:28+0800\n"
+"POT-Creation-Date: 2023-07-07 18:22+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -2165,23 +2165,23 @@ msgstr "上传 FTP 文件到外部存储"
 msgid "This action require verify your MFA"
 msgstr "该操作需要验证您的 MFA, 请先开启并配置"
 
-#: authentication/api/connection_token.py:288
+#: authentication/api/connection_token.py:295
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名账号不支持当前资产"
 
-#: authentication/api/connection_token.py:310
+#: authentication/api/connection_token.py:317
 msgid "Account not found"
 msgstr "账号未找到"
 
-#: authentication/api/connection_token.py:313
+#: authentication/api/connection_token.py:320
 msgid "Permission expired"
 msgstr "授权已过期"
 
-#: authentication/api/connection_token.py:327
+#: authentication/api/connection_token.py:334
 msgid "ACL action is reject: {}({})"
 msgstr "ACL 动作是拒绝: {}({})"
 
-#: authentication/api/connection_token.py:331
+#: authentication/api/connection_token.py:338
 msgid "ACL action is review"
 msgstr "ACL 动作是复核"
 
@@ -5217,7 +5217,7 @@ msgstr "提示：在Luna 页面中连接图形化资产时默认使用的分辨�
 msgid "Periodic import ldap user"
 msgstr "周期导入 LDAP 用户"
 
-#: settings/tasks/ldap.py:47
+#: settings/tasks/ldap.py:46
 msgid "Registration periodic import ldap user task"
 msgstr "注册周期导入 LDAP 用户 任务"
 
@@ -5593,6 +5593,18 @@ msgstr "输出"
 #: terminal/backends/command/models.py:27 terminal/serializers/command.py:22
 msgid "Risk level"
 msgstr "风险等级"
+
+#: terminal/connect_methods.py:51
+#, fuzzy
+#| msgid "Client"
+msgid "SSH Client"
+msgstr "SSH 客户端"
+
+#: terminal/connect_methods.py:52
+#, fuzzy
+#| msgid "Client"
+msgid "SFTP Client"
+msgstr "SFTP 客户端"
 
 #: terminal/connect_methods.py:55
 msgid "DB Client"

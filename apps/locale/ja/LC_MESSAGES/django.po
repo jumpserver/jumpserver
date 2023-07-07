@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-04 18:28+0800\n"
+"POT-Creation-Date: 2023-07-07 18:22+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2181,23 +2181,23 @@ msgstr "外部ストレージへのFTPファイルのアップロード"
 msgid "This action require verify your MFA"
 msgstr "この操作には、MFAを検証する必要があります"
 
-#: authentication/api/connection_token.py:288
+#: authentication/api/connection_token.py:295
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名アカウントはこのプロパティではサポートされていません"
 
-#: authentication/api/connection_token.py:310
+#: authentication/api/connection_token.py:317
 msgid "Account not found"
 msgstr "アカウントが見つかりません"
 
-#: authentication/api/connection_token.py:313
+#: authentication/api/connection_token.py:320
 msgid "Permission expired"
 msgstr "承認の有効期限が切れています"
 
-#: authentication/api/connection_token.py:327
+#: authentication/api/connection_token.py:334
 msgid "ACL action is reject: {}({})"
 msgstr "ACL アクションは拒否です: {}({})"
 
-#: authentication/api/connection_token.py:331
+#: authentication/api/connection_token.py:338
 msgid "ACL action is review"
 msgstr "ACL アクションはレビューです"
 
@@ -5294,7 +5294,7 @@ msgstr ""
 msgid "Periodic import ldap user"
 msgstr "LDAP ユーザーを定期的にインポートする"
 
-#: settings/tasks/ldap.py:47
+#: settings/tasks/ldap.py:46
 msgid "Registration periodic import ldap user task"
 msgstr "登録サイクルLDAPユーザータスクのインポート"
 
@@ -5680,6 +5680,18 @@ msgstr "出力"
 #: terminal/backends/command/models.py:27 terminal/serializers/command.py:22
 msgid "Risk level"
 msgstr "リスクレベル"
+
+#: terminal/connect_methods.py:51
+#, fuzzy
+#| msgid "Client"
+msgid "SSH Client"
+msgstr "SSH クライアント"
+
+#: terminal/connect_methods.py:52
+#, fuzzy
+#| msgid "Client"
+msgid "SFTP Client"
+msgstr "SFTP クライアント"
 
 #: terminal/connect_methods.py:55
 msgid "DB Client"
