@@ -51,7 +51,7 @@ def create_serializer_class(serializer_name, fields_info):
         field_type = data.pop('type', 'str')
 
         # 用户定义 default 和 required 可能会冲突, 所以要处理一下
-        default = data.get('default', '')
+        default = data.get('default', None)
         if default is not None:
             data['required'] = False
         else:
