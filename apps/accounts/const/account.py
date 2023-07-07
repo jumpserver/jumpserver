@@ -13,6 +13,7 @@ class AliasAccount(TextChoices):
     ALL = '@ALL', _('All')
     INPUT = '@INPUT', _('Manual input')
     USER = '@USER', _('Dynamic user')
+    ANON = '@ANON', _('Anonymous account')
 
 
 class Source(TextChoices):

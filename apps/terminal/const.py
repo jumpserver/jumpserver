@@ -67,6 +67,7 @@ class SessionType(TextChoices):
     normal = 'normal', _('Normal')
     tunnel = 'tunnel', _('Tunnel')
     command = 'command', _('Command')
+    sftp = 'sftp', _('SFTP')
 
 
 class ActionPermission(TextChoices):

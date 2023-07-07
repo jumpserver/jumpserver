@@ -1,6 +1,8 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from common.db.models import ChoicesMixin
+from .base import FillType
 
 __all__ = ['Protocol']
 
@@ -22,8 +24,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
     mongodb = 'mongodb', 'MongoDB'
 
     k8s = 'k8s', 'K8S'
-    http = 'http', 'HTTP'
-    _settings = None
+    http = 'http', 'HTTP(s)'
 
     @classmethod
     def device_protocols(cls):
@@ -32,16 +33,40 @@ class Protocol(ChoicesMixin, models.TextChoices):
                 'port': 22,
                 'secret_types': ['password', 'ssh_key'],
                 'setting': {
-                    'sftp_enabled': True,
-                    'sftp_home': '/tmp',
+                    'sftp_enabled': {
+                        'type': 'bool',
+                        'default': True,
+                        'label': _('SFTP enabled')
+                    },
+                    'sftp_home': {
+                        'type': 'str',
+                        'default': '/tmp',
+                        'label': _('SFTP home')
+                    },
                 }
             },
             cls.rdp: {
                 'port': 3389,
                 'secret_types': ['password'],
                 'setting': {
-                    'console': False,
-                    'security': 'any',
+                    'console': {
+                        'type': 'bool',
+                        'default': False,
+                        'label': _('Console'),
+                        'help_text': _("Connect to console session")
+                    },
+                    'security': {
+                        'type': 'choice',
+                        'choices': [('any', _('Any')), ('rdp', 'RDP'), ('tls', 'TLS'), ('nla', 'NLA')],
+                        'default': 'any',
+                        'label': _('Security'),
+                        'help_text': _("Security layer to use for the connection")
+                    },
+                    # 'ad_domain': {
+                    #     'type': 'str',
+                    #     "required": False,
+                    #     'label': _('AD domain')
+                    # }
                 }
             },
             cls.vnc: {
@@ -56,7 +81,11 @@ class Protocol(ChoicesMixin, models.TextChoices):
                 'port': 5985,
                 'secret_types': ['password'],
                 'setting': {
-                    'use_ssl': False,
+                    'use_ssl': {
+                        'type': 'bool',
+                        'default': False,
+                        'label': _('Use SSL')
+                    },
                 }
             },
         }
@@ -105,7 +134,11 @@ class Protocol(ChoicesMixin, models.TextChoices):
                 'required': True,
                 'secret_types': ['password'],
                 'setting': {
-                    'auth_username': True,
+                    'auth_username': {
+                        'type': 'bool',
+                        'default': False,
+                        'label': _('Auth username')
+                    },
                 }
             },
         }
@@ -121,10 +154,28 @@ class Protocol(ChoicesMixin, models.TextChoices):
             cls.http: {
                 'port': 80,
                 'secret_types': ['password'],
+                'label': 'HTTP(s)',
                 'setting': {
-                    'username_selector': 'name=username',
-                    'password_selector': 'name=password',
-                    'submit_selector': 'id=login_button',
+                    'autofill': {
+                        'type': 'choice',
+                        'choices': FillType.choices,
+                        'default': 'basic',
+                    },
+                    'username_selector': {
+                        'type': 'str',
+                        'default': 'name=username',
+                        'label': _('Username selector')
+                    },
+                    'password_selector': {
+                        'type': 'str',
+                        'default': 'name=password',
+                        'label': _('Password selector')
+                    },
+                    'submit_selector': {
+                        'type': 'str',
+                        'default': 'type=submit',
+                        'label': _('Submit selector')
+                    }
                 }
             },
         }
