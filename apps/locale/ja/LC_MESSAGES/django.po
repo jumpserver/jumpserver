@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-07 20:55+0800\n"
+"POT-Creation-Date: 2023-07-10 10:55+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -190,7 +190,7 @@ msgstr "作成のみ"
 #: accounts/serializers/account/gathered_account.py:10
 #: accounts/serializers/automations/change_secret.py:112
 #: accounts/serializers/automations/change_secret.py:132
-#: acls/serializers/base.py:118 assets/models/asset/common.py:93
+#: acls/serializers/base.py:119 assets/models/asset/common.py:93
 #: assets/models/asset/common.py:331 assets/models/cmd_filter.py:36
 #: assets/serializers/domain.py:19 assets/serializers/label.py:27
 #: audits/models.py:53 authentication/models/connection_token.py:36
@@ -227,7 +227,7 @@ msgstr "ソース ID"
 #: accounts/models/account.py:61
 #: accounts/serializers/automations/change_secret.py:113
 #: accounts/serializers/automations/change_secret.py:133
-#: acls/serializers/base.py:119 assets/serializers/asset/common.py:125
+#: acls/serializers/base.py:120 assets/serializers/asset/common.py:125
 #: assets/serializers/gateway.py:28 audits/models.py:54 ops/models/base.py:18
 #: perms/models/asset_permission.py:70 perms/serializers/permission.py:39
 #: terminal/backends/command/models.py:19 terminal/models/session/session.py:33
@@ -641,7 +641,7 @@ msgstr "アカウントはすでに存在しています"
 msgid "ID"
 msgstr "ID"
 
-#: accounts/serializers/account/account.py:427 acls/serializers/base.py:111
+#: accounts/serializers/account/account.py:427 acls/serializers/base.py:112
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:49
 #: audits/models.py:85 audits/models.py:163
 #: authentication/models/connection_token.py:32
@@ -930,11 +930,15 @@ msgstr ""
 msgid "IP/Host"
 msgstr "IP/ホスト"
 
-#: acls/serializers/base.py:98 tickets/serializers/ticket/ticket.py:77
+#: acls/serializers/base.py:87
+msgid "Recerivers"
+msgstr "受信者"
+
+#: acls/serializers/base.py:99 tickets/serializers/ticket/ticket.py:77
 msgid "The organization `{}` does not exist"
 msgstr "組織 '{}'は存在しません"
 
-#: acls/serializers/base.py:104
+#: acls/serializers/base.py:105
 msgid "None of the reviewers belong to Organization `{}`"
 msgstr "いずれのレビューアも組織 '{}' に属していません"
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-07 20:55+0800\n"
+"POT-Creation-Date: 2023-07-10 10:55+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -189,7 +189,7 @@ msgstr "仅创建"
 #: accounts/serializers/account/gathered_account.py:10
 #: accounts/serializers/automations/change_secret.py:112
 #: accounts/serializers/automations/change_secret.py:132
-#: acls/serializers/base.py:118 assets/models/asset/common.py:93
+#: acls/serializers/base.py:119 assets/models/asset/common.py:93
 #: assets/models/asset/common.py:331 assets/models/cmd_filter.py:36
 #: assets/serializers/domain.py:19 assets/serializers/label.py:27
 #: audits/models.py:53 authentication/models/connection_token.py:36
@@ -226,7 +226,7 @@ msgstr "来源 ID"
 #: accounts/models/account.py:61
 #: accounts/serializers/automations/change_secret.py:113
 #: accounts/serializers/automations/change_secret.py:133
-#: acls/serializers/base.py:119 assets/serializers/asset/common.py:125
+#: acls/serializers/base.py:120 assets/serializers/asset/common.py:125
 #: assets/serializers/gateway.py:28 audits/models.py:54 ops/models/base.py:18
 #: perms/models/asset_permission.py:70 perms/serializers/permission.py:39
 #: terminal/backends/command/models.py:19 terminal/models/session/session.py:33
@@ -637,7 +637,7 @@ msgstr "账号已存在"
 msgid "ID"
 msgstr "ID"
 
-#: accounts/serializers/account/account.py:427 acls/serializers/base.py:111
+#: accounts/serializers/account/account.py:427 acls/serializers/base.py:112
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:49
 #: audits/models.py:85 audits/models.py:163
 #: authentication/models/connection_token.py:32
@@ -925,11 +925,15 @@ msgstr ""
 msgid "IP/Host"
 msgstr "IP/主机"
 
-#: acls/serializers/base.py:98 tickets/serializers/ticket/ticket.py:77
+#: acls/serializers/base.py:87
+msgid "Recerivers"
+msgstr "接收人"
+
+#: acls/serializers/base.py:99 tickets/serializers/ticket/ticket.py:77
 msgid "The organization `{}` does not exist"
 msgstr "组织 `{}` 不存在"
 
-#: acls/serializers/base.py:104
+#: acls/serializers/base.py:105
 msgid "None of the reviewers belong to Organization `{}`"
 msgstr "所有复核人都不属于组织 `{}`"
 
