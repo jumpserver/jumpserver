@@ -54,7 +54,7 @@ else:
     connection_params['port'] = settings.REDIS_PORT
     redis_client = Redis(**connection_params)
 
-scheduler = "django_celery_beat.schedulers:DatabaseScheduler"
+scheduler = "ops.celery.beat.schedulers:DatabaseScheduler"
 processes = []
 cmd = [
     'celery',
