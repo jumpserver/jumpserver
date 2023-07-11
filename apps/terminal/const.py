@@ -50,6 +50,7 @@ class TerminalType(TextChoices):
     tinker = 'tinker', 'Tinker'
     video_worker = 'video_worker', 'Video Worker'
     chen = 'chen', 'Chen'
+    kael = 'kael', 'Kael'
 
     @classmethod
     def types(cls):
