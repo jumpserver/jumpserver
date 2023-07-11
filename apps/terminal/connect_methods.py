@@ -17,32 +17,10 @@ class WebMethod(TextChoices):
     web_sftp = 'web_sftp', 'Web SFTP'
 
     @classmethod
-    def get_methods(cls):
+    def get_spec_methods(cls):
         methods = {
             Protocol.ssh: [cls.web_cli, cls.web_sftp],
-            Protocol.telnet: [cls.web_cli],
-            Protocol.rdp: [cls.web_gui],
-            Protocol.vnc: [cls.web_gui],
-
-            Protocol.mysql: [cls.web_cli],
-            Protocol.mariadb: [cls.web_cli],
-            Protocol.oracle: [cls.web_cli],
-            Protocol.postgresql: [cls.web_cli],
-            Protocol.sqlserver: [cls.web_cli],
-            Protocol.redis: [cls.web_cli],
-            Protocol.mongodb: [cls.web_cli],
-            Protocol.clickhouse: [cls.web_cli],
-
-            Protocol.k8s: [cls.web_cli],
-            Protocol.chatgpt: [cls.web_gui],
-            Protocol.http: []
         }
-        if not settings.XPACK_ENABLED:
-            return methods
-
-        web_gui_dbs = [Protocol.mysql, Protocol.mariadb, Protocol.oracle, Protocol.postgresql, Protocol.sqlserver]
-        for db in web_gui_dbs:
-            methods[db].append(cls.web_gui)
         return methods
 
 
@@ -95,14 +73,10 @@ class NativeClient(TextChoices):
         return [cls.mstsc]
 
     @classmethod
-    def xpack_protocols(cls):
-        return [Protocol.rdp, Protocol.oracle, Protocol.clickhouse, Protocol.sqlserver]
-
-    @classmethod
     def get_methods(cls, os='windows'):
         clients_map = cls.get_native_clients()
         methods = defaultdict(list)
-        xpack_protocols = cls.xpack_protocols()
+        xpack_protocols = Protocol.xpack_protocols()
 
         for protocol, _clients in clients_map.items():
             if not settings.XPACK_ENABLED and protocol in xpack_protocols:
@@ -170,10 +144,10 @@ class ConnectMethodUtil:
     _all_methods = {}
 
     @classmethod
-    def protocols(cls):
+    def components(cls):
         protocols = {
             TerminalType.koko: {
-                'web_methods': [WebMethod.web_cli, WebMethod.web_sftp],
+                'web_methods': [WebMethod.web_cli],
                 'listen': [Protocol.http, Protocol.ssh],
                 'support': [
                     Protocol.ssh, Protocol.telnet,
@@ -286,16 +260,20 @@ class ConnectMethodUtil:
             return cls._all_methods['os']
 
         methods = defaultdict(list)
-        web_methods = WebMethod.get_methods()
+        spec_web_methods = WebMethod.get_spec_methods()
         native_methods = NativeClient.get_methods(os)
         applet_methods = AppletMethod.get_methods()
 
-        for component, component_protocol in cls.protocols().items():
+        for component, component_protocol in cls.components().items():
             support = component_protocol['support']
             component_web_methods = component_protocol.get('web_methods', [])
 
             for protocol in support:
                 # Web 方式
+                web_methods = spec_web_methods.get(protocol, None)
+                if web_methods is None:
+                    web_methods = component_web_methods
+
                 methods[str(protocol)].extend([
                     {
                         'component': component.value,
@@ -304,8 +282,7 @@ class ConnectMethodUtil:
                         'value': method.value,
                         'label': method.label,
                     }
-                    for method in web_methods.get(protocol, [])
-                    if method in component_web_methods
+                    for method in web_methods
                 ])
 
                 # 客户端方式
@@ -313,6 +290,7 @@ class ConnectMethodUtil:
                     listen = [protocol]
                 else:
                     listen = component_protocol['listen']
+
                 for listen_protocol in listen:
                     # Native method
                     if component == TerminalType.koko and protocol.value != Protocol.ssh:
@@ -328,7 +306,7 @@ class ConnectMethodUtil:
                         for method in native_methods[listen_protocol]
                     ])
 
-        # 远程应用方式，这个只有 tinker 提供
+        # 远程应用方式，这个只有 tinker 提供，并且协议可能是自定义的
         for protocol, applet_methods in applet_methods.items():
             for method in applet_methods:
                 method['listen'] = 'rdp'
