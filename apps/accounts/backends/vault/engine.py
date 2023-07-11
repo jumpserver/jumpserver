@@ -70,6 +70,7 @@ class VaultKVEngine(BaseVault):
         return data
 
     def patch(self, path, data: dict):
+        """ 未更新的数据不会被删除 """
         try:
             self.client.secrets.kv.v2.patch(
                 path=path, secret=data, mount_point=self.mount_point
@@ -77,16 +78,17 @@ class VaultKVEngine(BaseVault):
         except exceptions.InvalidPath as e:
             logger.error('Patch secret error: {}'.format(e))
 
-    def update_or_create(self, path, data: dict):
+    def _update_or_create(self, path, data: dict):
         self.client.secrets.kv.v2.create_or_update_secret(
             path=path, secret=data, mount_point=self.mount_point
         )
 
     def create(self, path, data: dict):
-        self.update_or_create(path=path, data=data)
+        self._update_or_create(path=path, data=data)
 
     def update(self, path, data: dict):
-        self.update_or_create(path=path, data=data)
+        """ 未更新的数据会被删除 """
+        self._update_or_create(path=path, data=data)
 
     def delete(self, path):
         self.client.secrets.kv.v2.delete_metadata_and_all_versions(

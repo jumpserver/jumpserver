@@ -36,10 +36,14 @@ class BaseVaultClient:
         raise NotImplementedError
 
     @abstractmethod
-    def sync_basic_info(self):
+    def _sync_basic_info(self, info):
         raise NotImplementedError
 
-    def get_instance_basic_info(self):
+    @abstractmethod
+    def get_history_data(self):
+        raise NotImplementedError
+
+    def _get_instance_basic_info(self):
         instance_data = model_to_dict(
             self.instance, exclude=['id']
         )
@@ -50,7 +54,11 @@ class BaseVaultClient:
             data[field] = str(value)
         return data
 
-    def clear_local_secret(self):
+    def sync_basic_info(self):
+        info = self._get_instance_basic_info()
+        return self._sync_basic_info(info)
+
+    def clean_local_secret(self):
         self.instance.is_sync_secret = False
         self.instance._secret = None
         self.instance.save()

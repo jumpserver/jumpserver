@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.db.utils import Encryptor
 from common.exceptions import JMSException
-from common.utils import get_logger
+from common.utils import get_logger, lazyproperty
 from common.utils.timezone import as_current_tz
 from .base import BaseVault as PingVault
 from .engine import VaultKVEngine
@@ -36,12 +36,12 @@ class HCPVaultClient(BaseVaultClient, ABC):
                 detail=_('Initialization vault fail')
             )
 
-    @property
+    @lazyproperty
     def path(self):
         from accounts.models import Account, AccountTemplate
         instance = self.instance
         pk = instance.pk
-        org_id = instance.org_id
+        org_id = getattr(instance, 'org_id', '')
         model_name = _MODEL_NAME_PATTERN.sub('_', instance._meta.object_name).lower()
         if isinstance(instance, Account):
             path = f'orgs/{org_id}/assets/{instance.asset_id}/{model_name}s/{pk}'
@@ -61,14 +61,14 @@ class HCPVaultClient(BaseVaultClient, ABC):
         secret = getattr(instance, '_secret', None)
         self.client.create(self.path, {'secret': secret})
         self.sync_basic_info()
-        self.clear_local_secret()
+        self.clean_local_secret()
 
     def update(self):
         instance = self.instance
         secret = getattr(instance, '_secret', None)
         self.client.patch(self.path, {'secret': secret})
         self.sync_basic_info()
-        self.clear_local_secret()
+        self.clean_local_secret()
 
     def delete(self):
         self.client.delete(self.path)
@@ -106,6 +106,5 @@ class HCPVaultClient(BaseVaultClient, ABC):
             })
         return history_data
 
-    def sync_basic_info(self):
-        data = self.get_instance_basic_info()
-        self.client.update_metadata(self.path, data)
+    def _sync_basic_info(self, info):
+        self.client.update_metadata(self.path, info)

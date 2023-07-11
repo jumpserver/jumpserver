@@ -25,7 +25,8 @@ class LocalVaultClient(BaseVaultClient, ABC):
         pass
 
     def get(self):
-        return {'secret': self.instance._secret}
+        secret = getattr(self.instance, '_secret', '')
+        return {'secret': secret}
 
     def get_history_data(self):
         from accounts.models import Account
@@ -46,13 +47,14 @@ class LocalVaultClient(BaseVaultClient, ABC):
         for i in histories:
             history_date = as_current_tz(i.history_date)
             history_date = history_date.strftime('%Y-%m-%d %H:%M:%S')
+            secret = getattr(i, '_secret', '')
             data.append({
                 'id': str(i.id),
                 'version': str(i.version),
                 'history_date': history_date,
-                'secret': Encryptor(i._secret).decrypt(),
+                'secret': Encryptor(secret).decrypt(),
             })
         return data
 
-    def sync_basic_info(self):
+    def _sync_basic_info(self, info):
         pass
