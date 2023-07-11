@@ -8,12 +8,10 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.utils.common import lazyproperty
 from orgs.mixins.models import OrgModelMixin
+from terminal.const import RiskLevelChoices
 
 
 class AbstractSessionCommand(OrgModelMixin):
-    class RiskLevelChoices(models.IntegerChoices):
-        ordinary = 0, _('Ordinary')
-        dangerous = 5, _('Dangerous')
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=64, db_index=True, verbose_name=_("User"))
@@ -23,7 +21,7 @@ class AbstractSessionCommand(OrgModelMixin):
     output = models.CharField(max_length=1024, blank=True, verbose_name=_("Output"))
     session = models.CharField(max_length=36, db_index=True, verbose_name=_("Session"))
     risk_level = models.SmallIntegerField(
-        default=RiskLevelChoices.ordinary, choices=RiskLevelChoices.choices, db_index=True,
+        default=RiskLevelChoices.accept, choices=RiskLevelChoices.choices, db_index=True,
         verbose_name=_("Risk level")
     )
     timestamp = models.IntegerField(db_index=True)

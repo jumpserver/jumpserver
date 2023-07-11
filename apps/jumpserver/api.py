@@ -22,6 +22,7 @@ from orgs.utils import current_org
 from terminal.models import Session, Command
 from terminal.utils import ComponentsPrometheusMetricsUtil
 from users.models import User
+from terminal.const import RiskLevelChoices
 
 __all__ = ['IndexApi']
 
@@ -248,7 +249,7 @@ class DatesLoginMetricMixin:
 
     @lazyproperty
     def commands_danger_amount(self):
-        return self.command_queryset.filter(risk_level=Command.RiskLevelChoices.dangerous).count()
+        return self.command_queryset.filter(risk_level=RiskLevelChoices.reject).count()
 
     @lazyproperty
     def job_logs_running_amount(self):
