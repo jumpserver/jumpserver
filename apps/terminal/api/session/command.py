@@ -11,7 +11,7 @@ from terminal.models import CommandStorage, Session, Command
 from terminal.filters import CommandFilter
 from orgs.utils import current_org
 from common.api import JMSBulkModelViewSet
-from common.utils import get_logger
+from common.utils import get_logger, is_uuid
 from terminal.serializers import (
     SessionCommandSerializer,  InsecureCommandAlertSerializer
 )
@@ -201,18 +201,30 @@ class InsecureCommandAlertAPI(generics.CreateAPIView):
         serializer = InsecureCommandAlertSerializer(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)
         commands = serializer.validated_data
-        acls_ids = [command['cmd_filter_acl'] for command in commands]
-        acls = CommandFilterACL.objects.filter(id__in=acls_ids)
-        map_id_acl = {str(acl.id): acl for acl in acls}
+
+        acl_ids = []
+        for cmd in commands:
+            acl_id = cmd.get('cmd_filter_acl')
+            if not is_uuid(acl_id):
+                continue
+            acl_ids.append(acl_id)
+
+        acls = CommandFilterACL.objects.filter(id__in=acl_ids)
+        acls_mapper = {str(acl.id): acl for acl in acls}
 
         for command in commands:
-            risk_level = command['risk_level']
+            risk_level = command.get('risk_level')
+
             if risk_level in [RiskLevelChoices.reject, RiskLevelChoices.review_reject]:
                 CommandAlertMessage(command).publish_async()
-            if risk_level == RiskLevelChoices.warning:
-                acl = map_id_acl.get(command['cmd_filter_acl'])
+            elif risk_level in [RiskLevelChoices.warning]:
+                acl_id = command.get('cmd_filter_acl')
+                acl = acls_mapper.get(acl_id)
+                if not acl:
+                    logger.info(f'ACL not found: {acl_id}')
+                    continue
                 for reviewer in acl.reviewers.all():
                     CommandWarningMessage(reviewer, command).publish_async()
             else:
-                logger.info('risk_level ignore: %s' % risk_level)
-        return Response()
+                logger.info(f'Risk level ignore: {risk_level}')
+        return Response({'msg': 'ok'})

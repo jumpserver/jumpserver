@@ -38,9 +38,8 @@ class SimpleSessionCommandSerializer(serializers.ModelSerializer):
 
 
 class InsecureCommandAlertSerializer(SimpleSessionCommandSerializer):
-
     cmd_filter_acl = serializers.CharField(
-        max_length=128, required=False,label=_("Command Filter ACL")
+        max_length=128, required=False, label=_("Command Filter ACL")
     )
     cmd_group = serializers.CharField(
         max_length=128, required=True, label=_("Command Group")
