@@ -185,7 +185,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
                     },
                     'script': {
                         'type': 'text',
-                        'default': '',
+                        'default': [],
                         'label': _('Script'),
                     }
                 }
