@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -187,7 +188,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
 
     @classmethod
     def gpt_protocols(cls):
-        return {
+        protocols = {
             cls.chatgpt: {
                 'port': 443,
                 'required': True,
@@ -201,13 +202,18 @@ class Protocol(ChoicesMixin, models.TextChoices):
                         'choices': [
                             ('gpt-3.5-turbo', 'GPT-3.5 Turbo'),
                             ('gpt-3.5-turbo-16k', 'GPT-3.5 Turbo 16K'),
-                            ('gpt-4', 'GPT-4'),
-                            ('gpt-4-32k', 'GPT-4 32K'),
                         ]
                     }
                 }
             }
         }
+        if settings.XPACK_ENABLED:
+            choices = protocols[cls.chatgpt]['setting']['api_mode']['choices']
+            choices.extend([
+                ('gpt-4', 'GPT-4'),
+                ('gpt-4-32k', 'GPT-4 32K'),
+            ])
+        return protocols
 
     @classmethod
     @cached_method(ttl=600)
