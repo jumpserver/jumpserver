@@ -46,13 +46,13 @@ class PlatformAutomationSerializer(serializers.ModelSerializer):
 
 class PlatformProtocolSerializer(serializers.ModelSerializer):
     setting = MethodSerializer(required=False, label=_("Setting"))
+    port_from_addr = serializers.BooleanField(label=_("Port from addr"), read_only=True)
 
     class Meta:
         model = PlatformProtocol
         fields = [
-            "id", "name", "port", "primary",
-            "required", "default", "public",
-            "secret_types", "setting",
+            "id", "name", "port", "port_from_addr", "primary",
+            "required", "default", "public", "secret_types", "setting",
         ]
         extra_kwargs = {
             "primary": {
