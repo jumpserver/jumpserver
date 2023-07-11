@@ -1399,7 +1399,7 @@ msgstr "忽略证书校验"
 
 #: assets/models/asset/gpt.py:8
 msgid "Proxy"
-msgstr ""
+msgstr "代理"
 
 #: assets/models/asset/web.py:9 assets/serializers/asset/info/spec.py:16
 msgid "Autofill"
@@ -1727,7 +1727,7 @@ msgstr ""
 
 #: assets/serializers/asset/gpt.py:23
 msgid "HTTP proxy"
-msgstr "HTTP 代理"
+msgstr "HTTP(s) 代理"
 
 #: assets/serializers/asset/info/gathered.py:6
 msgid "Vendor"

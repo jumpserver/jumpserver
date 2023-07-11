@@ -163,6 +163,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
                 'secret_types': ['password'],
                 'setting': {
                     'autofill': {
+                        'label': _('Autofill'),
                         'type': 'choice',
                         'choices': FillType.choices,
                         'default': 'basic',
@@ -181,6 +182,11 @@ class Protocol(ChoicesMixin, models.TextChoices):
                         'type': 'str',
                         'default': 'type=submit',
                         'label': _('Submit selector')
+                    },
+                    'script': {
+                        'type': 'text',
+                        'default': '',
+                        'label': _('Script'),
                     }
                 }
             },
