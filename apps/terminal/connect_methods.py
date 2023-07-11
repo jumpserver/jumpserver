@@ -34,6 +34,7 @@ class WebMethod(TextChoices):
             Protocol.clickhouse: [cls.web_cli],
 
             Protocol.k8s: [cls.web_cli],
+            Protocol.chatgpt: [cls.web_gui],
             Protocol.http: []
         }
         if not settings.XPACK_ENABLED:
