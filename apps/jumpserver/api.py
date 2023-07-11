@@ -17,7 +17,6 @@ from audits.models import UserLoginLog, PasswordChangeLog, OperateLog, FTPLog, J
 from common.utils import lazyproperty
 from common.utils.timezone import local_now, local_zero_hour
 from ops.const import JobStatus
-from ops.models import JobExecution
 from orgs.caches import OrgResourceStatisticsCache
 from orgs.utils import current_org
 from terminal.models import Session, Command
@@ -128,12 +127,6 @@ class DateTimeMixin:
     def job_logs_queryset(self):
         t = self.days_to_datetime
         queryset = JobLog.objects.filter(date_created__gte=t)
-        return queryset
-
-    @lazyproperty
-    def jobs_executed_queryset(self):
-        t = self.days_to_datetime
-        queryset = JobExecution.objects.filter(date_created__gte=t)
         return queryset
 
 
