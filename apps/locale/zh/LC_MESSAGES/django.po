@@ -926,7 +926,7 @@ msgid "IP/Host"
 msgstr "IP/主机"
 
 #: acls/serializers/base.py:87
-msgid "Recerivers"
+msgid "Recipients"
 msgstr "接收人"
 
 #: acls/serializers/base.py:99 tickets/serializers/ticket/ticket.py:77
