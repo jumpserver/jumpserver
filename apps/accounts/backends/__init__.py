@@ -1,17 +1,17 @@
 from django.conf import settings
 
-from .local import LocalVaultClient
-from .vault import HCPVaultClient
+from .local import LocalVault
+from .vault import HCPVault
 from ..const import VaultType
 
 VAULT_CLIENT_MAPPER = {
-    VaultType.LOCAL: LocalVaultClient,
-    VaultType.HCP: HCPVaultClient,
+    VaultType.LOCAL: LocalVault,
+    VaultType.HCP: HCPVault,
 }
 
 
 def get_vault_client(instance=None):
     client_cls = VAULT_CLIENT_MAPPER.get(
-        settings.VAULT_TYPE, LocalVaultClient
+        settings.VAULT_TYPE, LocalVault
     )
-    return client_cls(instance)
+    return client_cls()

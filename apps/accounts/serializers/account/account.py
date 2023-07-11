@@ -8,7 +8,7 @@ from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 from rest_framework.validators import UniqueTogetherValidator
 
-from accounts.const import Source, AccountInvalidPolicy
+from accounts.const import SecretType, Source, AccountInvalidPolicy
 from accounts.models import Account, AccountTemplate
 from accounts.tasks import push_accounts_to_assets_task
 from assets.const import Category, AllTypes
@@ -414,11 +414,18 @@ class AccountSecretSerializer(SecretReadableMixin, AccountSerializer):
         }
 
 
-class AccountHistorySerializer(serializers.Serializer):
-    id = serializers.IntegerField(label=_('ID'), read_only=True)
-    secret = serializers.CharField(label=_('Secret'), read_only=True)
-    version = serializers.CharField(label=_('Version'), read_only=True)
-    history_date = serializers.CharField(label=_('History date'), read_only=True)
+class AccountHistorySerializer(serializers.ModelSerializer):
+    secret_type = LabeledChoiceField(choices=SecretType.choices, label=_('Secret type'))
+    id = serializers.IntegerField(label=_('ID'), source='history_id', read_only=True)
+
+    class Meta:
+        model = Account.history.model
+        fields = ['id', 'secret', 'secret_type', 'version', 'history_date', 'history_user']
+        read_only_fields = fields
+        extra_kwargs = {
+            'history_user': {'label': _('User')},
+            'history_date': {'label': _('Date')},
+        }
 
 
 class AccountTaskSerializer(serializers.Serializer):

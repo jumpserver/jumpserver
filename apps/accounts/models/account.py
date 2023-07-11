@@ -11,7 +11,7 @@ from common.utils import lazyproperty
 from .base import BaseAccount
 from ..const import AliasAccount, Source
 
-__all__ = ['Account', 'AccountTemplate']
+__all__ = ['Account', 'AccountTemplate', 'AccountHistoricalRecords']
 
 
 class AccountHistoricalRecords(HistoricalRecords):

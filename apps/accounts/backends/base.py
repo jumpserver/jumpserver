@@ -1,64 +1,66 @@
-from abc import ABCMeta, abstractmethod
-
-from django.db.models import Model
+from abc import ABC, abstractmethod
 from django.forms.models import model_to_dict
 
+__all__ = ['BaseVault']
 
-class BaseVaultClient:
-    __metaclass__ = ABCMeta
 
-    def __init__(self, instance: Model):
-        self.instance = instance
+class BaseVault(ABC):
+    def create(self, instance):
+        self._create(instance)
+        self.save_metadata(instance)
+        self._clean_db_secret(instance)
+
+    def update(self, instance):
+        self._update(instance)
+        self.save_metadata(instance)
+        self._clean_db_secret(instance)
+
+    def delete(self, instance):
+        self._delete(instance)
+
+    def get(self, instance):
+        return self._get(instance)
+
+    def save_metadata(self, instance):
+        metadata = model_to_dict(instance, exclude=['id'])
+        metadata = {field: str(value) for field, value in metadata.items()}
+        return self._save_metadata(instance, metadata)
 
     @staticmethod
+    def _clean_db_secret(instance):
+        instance.is_sync_secret = False
+        instance._secret = None
+        instance.save()
+
+    def get_histories(self, instance):
+        self._get_histories(instance)
+
+    # -------- abstractmethod -------- #
+
     @abstractmethod
-    def is_active(*args, **kwargs):
+    def is_active(self, *args, **kwargs):
         raise NotImplementedError
 
     @abstractmethod
-    def create(self):
+    def _create(self, instance):
         raise NotImplementedError
 
     @abstractmethod
-    def update(self):
+    def _update(self, instance):
         raise NotImplementedError
 
     @abstractmethod
-    def delete(self):
+    def _delete(self, instance):
         raise NotImplementedError
 
     @abstractmethod
-    def get(self):
+    def _get(self, instance):
         raise NotImplementedError
 
     @abstractmethod
-    def set_secret(self, value):
+    def _save_metadata(self, instance, metadata):
         raise NotImplementedError
 
     @abstractmethod
-    def _sync_basic_info(self, info):
+    def _get_histories(self, instance):
         raise NotImplementedError
-
-    @abstractmethod
-    def get_history_data(self):
-        raise NotImplementedError
-
-    def _get_instance_basic_info(self):
-        instance_data = model_to_dict(
-            self.instance, exclude=['id']
-        )
-        data = {}
-        for field, value in instance_data.items():
-            if not value:
-                continue
-            data[field] = str(value)
-        return data
-
-    def sync_basic_info(self):
-        info = self._get_instance_basic_info()
-        return self._sync_basic_info(info)
-
-    def clean_local_secret(self):
-        self.instance.is_sync_secret = False
-        self.instance._secret = None
-        self.instance.save()
