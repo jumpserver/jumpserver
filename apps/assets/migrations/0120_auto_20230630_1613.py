@@ -12,7 +12,7 @@ def add_chatgpt_platform(apps, schema_editor):
         domain_enabled=False, su_enabled=False, comment='ChatGPT',
         created_by='System', updated_by='System',
     )
-    platform.protocols.create(name='chatgpt', port=443, primary=True)
+    platform.protocols.create(name='chatgpt', port=443, primary=True, setting={'api_mode': 'gpt-3.5-turbo'})
     automation_cls.objects.create(ansible_enabled=False, platform=platform)
 
 

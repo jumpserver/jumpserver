@@ -214,6 +214,12 @@ class ConnectMethodUtil:
                 'support': [Protocol.rdp],
                 'match': 'map'
             },
+            TerminalType.kael: {
+                'web_methods': [WebMethod.web_gui],
+                'listen': [Protocol.http],
+                'support': [Protocol.chatgpt],
+                'match': 'm2m'
+            }
         }
         return protocols
 
