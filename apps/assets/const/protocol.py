@@ -113,21 +113,25 @@ class Protocol(ChoicesMixin, models.TextChoices):
                 'port': 5432,
                 'required': True,
                 'secret_types': ['password'],
+                'xpack': True
             },
             cls.oracle: {
                 'port': 1521,
                 'required': True,
                 'secret_types': ['password'],
+                'xpack': True
             },
             cls.sqlserver: {
                 'port': 1433,
                 'required': True,
                 'secret_types': ['password'],
+                'xpack': True,
             },
             cls.clickhouse: {
                 'port': 9000,
                 'required': True,
                 'secret_types': ['password'],
+                'xpack': True,
             },
             cls.mongodb: {
                 'port': 27017,
@@ -232,9 +236,18 @@ class Protocol(ChoicesMixin, models.TextChoices):
         }
 
     @classmethod
+    @cached_method(ttl=600)
+    def xpack_protocols(cls):
+        return [
+            protocol
+            for protocol, config in cls.settings().items()
+            if config.get('xpack', False)
+        ]
+
+    @classmethod
     def protocol_secret_types(cls):
-        settings = cls.settings()
+        configs = cls.settings()
         return {
-            protocol: settings[protocol]['secret_types'] or ['password']
-            for protocol in cls.settings()
+            protocol: configs[protocol]['secret_types'] or ['password']
+            for protocol in configs
         }
