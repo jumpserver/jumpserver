@@ -5,12 +5,15 @@ from .entries import build_entry
 from .service import VaultKVClient
 
 
+__all__ = ['HCPVault']
+
+
 class HCPVault(BaseVault):
     def __init__(self):
         self.client = VaultKVClient(
-            url=settings.HCP_VAULT_HOST,
-            token=settings.HCP_VAULT_TOKEN,
-            mount_point=settings.HCP_VAULT_MOUNT_POINT,
+            url=settings.VAULT_HCP_HOST,
+            token=settings.VAULT_HCP_TOKEN,
+            mount_point=settings.VAULT_HCP_MOUNT_POINT,
         )
 
     def is_active(self, *args, **kwargs):

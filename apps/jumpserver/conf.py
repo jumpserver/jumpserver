@@ -248,9 +248,9 @@ class Config(dict):
 
         # Vault
         'VAULT_TYPE': 'local',
-        'HCP_VAULT_HOST': '',
-        'HCP_VAULT_TOKEN': '',
-        'HCP_VAULT_MOUNT_POINT': 'jumpserver',
+        'VAULT_HCP_HOST': '',
+        'VAULT_HCP_TOKEN': '',
+        'VAULT_HCP_MOUNT_POINT': 'jumpserver',
 
         # Auth LDAP settings
         'AUTH_LDAP': False,

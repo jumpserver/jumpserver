@@ -20,11 +20,11 @@ class VaultTestingAPI(GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         vault_type = serializer.validated_data['VAULT_TYPE']
-        hcp_vault_host = serializer.validated_data['HCP_VAULT_HOST']
-        hcp_vault_token = serializer.validated_data.get('HCP_VAULT_TOKEN')
+        hcp_vault_host = serializer.validated_data['VAULT_HCP_HOST']
+        hcp_vault_token = serializer.validated_data.get('VAULT_HCP_TOKEN')
 
         if not hcp_vault_token:
-            token = Setting.objects.filter(name='HCP_VAULT_TOKEN').first()
+            token = Setting.objects.filter(name='VAULT_HCP_TOKEN').first()
             if token:
                 hcp_vault_token = token.value
 
