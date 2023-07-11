@@ -163,6 +163,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
                 'secret_types': ['password'],
                 'setting': {
                     'autofill': {
+                        'label': _('Autofill'),
                         'type': 'choice',
                         'choices': FillType.choices,
                         'default': 'basic',
