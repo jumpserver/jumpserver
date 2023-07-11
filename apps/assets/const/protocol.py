@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from common.db.models import ChoicesMixin
+from common.decorators import cached_method
 from .base import FillType
 
 __all__ = ['Protocol']
@@ -25,6 +26,8 @@ class Protocol(ChoicesMixin, models.TextChoices):
 
     k8s = 'k8s', 'K8S'
     http = 'http', 'HTTP(s)'
+
+    chatgpt = 'chatgpt', 'ChatGPT'
 
     @classmethod
     def device_protocols(cls):
@@ -149,13 +152,14 @@ class Protocol(ChoicesMixin, models.TextChoices):
         return {
             cls.k8s: {
                 'port': 443,
+                'port_from_addr': True,
                 'required': True,
                 'secret_types': ['token'],
             },
             cls.http: {
                 'port': 80,
+                'port_from_addr': True,
                 'secret_types': ['password'],
-                'label': 'HTTP(s)',
                 'setting': {
                     'autofill': {
                         'type': 'choice',
@@ -182,11 +186,37 @@ class Protocol(ChoicesMixin, models.TextChoices):
         }
 
     @classmethod
+    def gpt_protocols(cls):
+        return {
+            cls.chatgpt: {
+                'port': 443,
+                'required': True,
+                'port_from_addr': True,
+                'secret_types': ['api_key'],
+                'setting': {
+                    'api_mode': {
+                        'type': 'choice',
+                        'default': 'gpt-3.5-turbo',
+                        'label': _('API mode'),
+                        'choices': [
+                            ('gpt-3.5-turbo', 'GPT-3.5 Turbo'),
+                            ('gpt-3.5-turbo-16k', 'GPT-3.5 Turbo 16K'),
+                            ('gpt-4', 'GPT-4'),
+                            ('gpt-4-32k', 'GPT-4 32K'),
+                        ]
+                    }
+                }
+            }
+        }
+
+    @classmethod
+    @cached_method(ttl=600)
     def settings(cls):
         return {
             **cls.device_protocols(),
             **cls.database_protocols(),
-            **cls.cloud_protocols()
+            **cls.cloud_protocols(),
+            **cls.gpt_protocols(),
         }
 
     @classmethod
