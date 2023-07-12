@@ -91,7 +91,8 @@ class UserListSerializer(serializers.ListSerializer):
                 roles_or_val = attrs.pop(field, None)
                 default_roles = self.child.custom_m2m_fields.get(field)
                 if not roles_or_val and default_roles:
-                    roles_or_val = Role.objects.filter(id__in=[role.id for role in default_roles])
+                    roles_or_val = Role.objects\
+                        .filter(id__in=[role.id for role in default_roles])
                 m2m_values[field] = roles_or_val
             instance = ModelClass(**attrs)
             to_create[instance] = m2m_values
