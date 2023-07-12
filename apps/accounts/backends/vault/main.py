@@ -21,32 +21,25 @@ class HCPVault(BaseVault):
 
     def _get(self, instance):
         entry = build_entry(instance)
-        data = self.client.get(path=entry.path).get('data', {})
+        # TODO: get data 是不是层数太多了
+        data = self.client.get(path=entry.full_path).get('data', {})
+        data = entry.to_external_data(data)
         return data
 
     def _create(self, instance):
         entry = build_entry(instance)
         data = entry.to_internal_data()
-        self.client.create(path=entry.path, data=data)
+        self.client.create(path=entry.full_path, data=data)
 
     def _update(self, instance):
         entry = build_entry(instance)
         data = entry.to_internal_data()
-        self.client.patch(path=entry.path, data=data)
+        self.client.patch(path=entry.full_path, data=data)
 
     def _delete(self, instance):
         entry = build_entry(instance)
-        self.client.delete(path=entry.path)
-
-    def _get_histories(self, instance):
-        histories = []
-        entry = build_entry(instance)
-        paths = entry.get_histories_paths()
-        for path in paths:
-            history = self.client.get(path=path).get('data', {})
-            histories.append(history)
-        return histories
+        self.client.delete(path=entry.full_path)
 
     def _save_metadata(self, instance, metadata):
         entry = build_entry(instance)
-        self.client.update_metadata(path=entry.path, metadata=metadata)
+        self.client.update_metadata(path=entry.full_path, metadata=metadata)

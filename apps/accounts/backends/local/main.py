@@ -1,8 +1,5 @@
-from abc import ABC
-
 from common.utils import get_logger
 from ..base import BaseVault
-from .entries import build_entry
 
 logger = get_logger(__name__)
 
@@ -39,8 +36,3 @@ class LocalVault(BaseVault):
     def _clean_db_secret(instance):
         """ *重要* 不能删除本地 secret """
         pass
-
-    def _get_histories(self, instance):
-        entry = build_entry(instance)
-        histories = entry.get_histories()
-        return histories

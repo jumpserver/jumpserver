@@ -6,14 +6,14 @@ from accounts.backends import get_vault_client
 from accounts.models import Account, AccountTemplate
 from common.utils import get_logger
 from orgs.utils import tmp_to_root_org
-from ..const import VaultType
+from ..const import VaultTypeChoices
 
 logger = get_logger(__name__)
 
 
 @shared_task(verbose_name=_('Sync account vault data'), )
 def sync_account_vault_data():
-    if settings.VAULT_TYPE == VaultType.LOCAL:
+    if settings.VAULT_TYPE == VaultTypeChoices.local:
         print('\033[35m>>> 当前类型为本地数据库，跳过同步逻辑')
         return
 

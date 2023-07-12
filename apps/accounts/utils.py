@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from accounts.const import SecretType, DEFAULT_PASSWORD_RULES
-from accounts.const import VaultType
+from accounts.const import VaultTypeChoices
 from common.utils import gen_key_pair, random_string
 from common.utils import validate_ssh_private_key, parse_ssh_private_key_str
 
@@ -60,6 +60,6 @@ def validate_ssh_key(ssh_key, passphrase=None):
 @contextmanager
 def tmp_to_safe_type_local():
     current_safe_type = settings.VAULT_TYPE
-    settings.VAULT_TYPE = VaultType.LOCAL
+    settings.VAULT_TYPE = VaultTypeChoices.local
     yield
     settings.VAULT_TYPE = current_safe_type

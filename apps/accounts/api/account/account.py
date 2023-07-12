@@ -116,7 +116,6 @@ class AssetAccountBulkCreateApi(CreateAPIView):
 
 class AccountHistoriesSecretAPI(ExtraFilterFieldsMixin, RecordViewLogMixin, ListAPIView):
     model = Account.history.model
-    perm_model = model
     serializer_class = serializers.AccountHistorySerializer
     http_method_names = ['get', 'options']
     permission_classes = [RBACPermission, UserConfirmation.require(ConfirmType.MFA)]
@@ -129,22 +128,18 @@ class AccountHistoriesSecretAPI(ExtraFilterFieldsMixin, RecordViewLogMixin, List
 
     @staticmethod
     def filter_spm_queryset(resource_ids, queryset):
-        if isinstance(queryset, list):
-            return [i for i in queryset if i.get('id') in resource_ids]
         return queryset.filter(history_id__in=resource_ids)
 
     def get_queryset(self):
         account = self.get_object()
-        vault_client = get_vault_client(account)
-        return vault_client.get_history_data()
+        histories = account.history.all()
+        latest_history = account.history.first()
+        if not latest_history:
+            return histories
+        if account.secret != latest_history.secret:
+            return histories
+        if account.secret_type != latest_history.secret_type:
+            return histories
+        histories = histories.exclude(history_id=latest_history.history_id)
+        return histories
 
-    def list(self, request, *args, **kwargs):
-        data = self.filter_queryset(self.get_queryset())
-        return Response(
-            {
-                'count': len(data),
-                'next': None,
-                'previous': None,
-                'results': data,
-            }
-        )

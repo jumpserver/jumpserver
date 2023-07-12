@@ -7,13 +7,13 @@ __all__ = ['BaseVault']
 class BaseVault(ABC):
     def create(self, instance):
         self._create(instance)
-        self.save_metadata(instance)
         self._clean_db_secret(instance)
+        self.save_metadata(instance)
 
     def update(self, instance):
         self._update(instance)
-        self.save_metadata(instance)
         self._clean_db_secret(instance)
+        self.save_metadata(instance)
 
     def delete(self, instance):
         self._delete(instance)
@@ -28,12 +28,7 @@ class BaseVault(ABC):
 
     @staticmethod
     def _clean_db_secret(instance):
-        instance.is_sync_secret = False
-        instance._secret = None
-        instance.save()
-
-    def get_histories(self, instance):
-        self._get_histories(instance)
+        instance.mark_secret_save_to_vault()
 
     # -------- abstractmethod -------- #
 
@@ -59,8 +54,4 @@ class BaseVault(ABC):
 
     @abstractmethod
     def _save_metadata(self, instance, metadata):
-        raise NotImplementedError
-
-    @abstractmethod
-    def _get_histories(self, instance):
         raise NotImplementedError
