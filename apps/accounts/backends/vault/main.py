@@ -9,14 +9,15 @@ __all__ = ['HCPVault']
 
 
 class HCPVault(BaseVault):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.client = VaultKVClient(
-            url=settings.VAULT_HCP_HOST,
-            token=settings.VAULT_HCP_TOKEN,
-            mount_point=settings.VAULT_HCP_MOUNT_POINT,
+            url=kwargs.get('VAULT_HCP_HOST'),
+            token=kwargs.get('VAULT_HCP_TOKEN'),
+            mount_point=kwargs.get('VAULT_HCP_MOUNT_POINT')
         )
 
-    def is_active(self, *args, **kwargs):
+    def is_active(self):
         return self.client.is_active()
 
     def _get(self, instance):

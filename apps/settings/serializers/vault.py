@@ -8,10 +8,14 @@ __all__ = ['VaultSettingSerializer']
 
 
 class VaultSettingSerializer(serializers.Serializer):
-    VAULT_HCP_MOUNT_POINT = serializers.CharField(max_length=256, required=False, label=_('HCP Vault mount point'))
-    VAULT_HCP_HOST = serializers.CharField(max_length=256, required=False, label=_('HCP Vault host'))
-    VAULT_HCP_TOKEN = EncryptedField(max_length=256, required=False, label=_('HCP Vault token'))
     VAULT_TYPE = serializers.ChoiceField(
         default=VaultTypeChoices.local, choices=VaultTypeChoices.choices,
         required=False, label=_('Vault type')
     )
+    VAULT_HCP_MOUNT_POINT = serializers.CharField(
+        max_length=256, required=False, label=_('HCP Vault mount point')
+    )
+    VAULT_HCP_HOST = serializers.CharField(
+        max_length=256, required=False, label=_('HCP Vault host')
+    )
+    VAULT_HCP_TOKEN = EncryptedField(max_length=256, required=False, label=_('HCP Vault token'))

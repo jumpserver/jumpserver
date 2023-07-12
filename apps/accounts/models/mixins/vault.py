@@ -3,6 +3,7 @@ from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
 
 from common.db import fields
+from common.utils import lazyproperty
 
 
 __all__ = ['VaultQuerySetMixin', 'VaultManagerMixin', 'VaultModelMixin']
@@ -53,14 +54,19 @@ class VaultModelMixin(models.Model):
     class Meta:
         abstract = True
 
+    # 缓存 secret 值, lazy-property 不能用
+    __secret = False
+
     @property
     def secret(self):
-        """ 先通过 vault_client 获取，如果获取不到再从 self._secret 获取 """
-        from accounts.backends import vault_client
-        secret = vault_client.get(self).get('secret')
-        if not secret:
-            secret = self._secret
-        return secret
+        if self.__secret is False:
+            from accounts.backends import vault_client
+            secret = vault_client.get(self)
+            if not secret and not self.secret_has_save_to_vault:
+                # vault_client 获取不到, 并且 secret 没有保存到 vault, 就从 self._secret 获取
+                secret = self._secret
+            self.__secret = secret
+        return self.__secret
 
     @secret.setter
     def secret(self, value):
@@ -70,15 +76,15 @@ class VaultModelMixin(models.Model):
         """
         self._secret = value
 
-    secret_save_to_vault_mark = '# Secret-has-been-saved-to-vault #'
+    _secret_save_to_vault_mark = '# Secret-has-been-saved-to-vault #'
 
     def mark_secret_save_to_vault(self):
-        self._secret = self.secret_save_to_vault_mark
+        self._secret = self._secret_save_to_vault_mark
         self.save()
 
     @property
-    def secret_need_save_to_vault(self):
-        return self._secret == self.secret_save_to_vault_mark
+    def secret_has_save_to_vault(self):
+        return self._secret == self._secret_save_to_vault_mark
 
     def save(self, *args, **kwargs):
         """ 通过 post_save signal 处理 _secret 数据 """

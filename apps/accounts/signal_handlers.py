@@ -3,7 +3,7 @@ from django.dispatch import receiver
 
 from common.utils import get_logger
 from accounts.backends import vault_client
-from .models import Account, AccountTemplate, AccountHistoricalRecords
+from .models import Account, AccountTemplate
 
 logger = get_logger(__name__)
 
@@ -30,6 +30,6 @@ class VaultSignalHandler(object):
         vault_client.delete(instance)
 
 
-for model in (Account, AccountTemplate, AccountHistoricalRecords):
+for model in (Account, AccountTemplate, Account.history.model):
     post_save.connect(VaultSignalHandler.save_to_vault, sender=model)
     post_delete.connect(VaultSignalHandler.delete_to_vault, sender=model)

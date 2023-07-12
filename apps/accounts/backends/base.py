@@ -5,7 +5,15 @@ __all__ = ['BaseVault']
 
 
 class BaseVault(ABC):
+
+    def __init__(self, *args, **kwargs):
+        self.type = kwargs.get('VAULT_TYPE')
+
+    def is_type(self, tp):
+        return self.type == tp
+
     def get(self, instance):
+        """ 返回 secret 值 """
         return self._get(instance)
 
     def create(self, instance):
@@ -46,13 +54,13 @@ class BaseVault(ABC):
 
     @abstractmethod
     def _clean_db_secret(self, instance):
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def _save_metadata(self, instance, metadata):
         raise NotImplementedError
 
     @abstractmethod
-    def is_active(self, *args, **kwargs):
+    def is_active(self, *args, **kwargs) -> (bool, str):
         raise NotImplementedError
 

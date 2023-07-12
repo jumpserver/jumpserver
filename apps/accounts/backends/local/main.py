@@ -8,13 +8,12 @@ __all__ = ['LocalVault']
 
 class LocalVault(BaseVault):
 
-    def is_active(self, *args, **kwargs):
-        return True
+    def is_active(self):
+        return True, ''
 
     def _get(self, instance):
-        secret = getattr(instance, '_secret', '')
-        data = {'secret': secret}
-        return data
+        secret = getattr(instance, '_secret', None)
+        return secret
 
     def _create(self, instance):
         """ Ignore """

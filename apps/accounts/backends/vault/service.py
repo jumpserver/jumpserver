@@ -25,16 +25,16 @@ class VaultKVClient(object):
     def is_active(self):
         try:
             if not self.client.sys.is_initialized():
-                return False
+                return False, 'Vault is not initialized'
             if self.client.sys.is_sealed():
-                return False
+                return False, 'Vault is sealed'
             if not self.client.is_authenticated():
-                return False
+                return False, 'Vault is not authenticated'
         except ConnectionError as e:
             logger.error(str(e))
-            return False
+            return False, f'Vault is not reachable: {e}'
         else:
-            return True
+            return True, ''
 
     def enable_secrets_engine_if_need(self):
         secrets_engines = self.client.sys.list_mounted_secrets_engines()

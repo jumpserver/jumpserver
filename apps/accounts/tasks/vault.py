@@ -1,8 +1,9 @@
+import datetime
 from celery import shared_task
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
-from accounts.backends import get_vault_client
+from accounts.backends import vault_client
 from accounts.models import Account, AccountTemplate
 from common.utils import get_logger
 from orgs.utils import tmp_to_root_org
@@ -11,24 +12,45 @@ from ..const import VaultTypeChoices
 logger = get_logger(__name__)
 
 
-@shared_task(verbose_name=_('Sync account vault data'), )
-def sync_account_vault_data():
-    if settings.VAULT_TYPE == VaultTypeChoices.local:
-        print('\033[35m>>> 当前类型为本地数据库，跳过同步逻辑')
+@shared_task(verbose_name=_('Sync secret to vault'))
+def sync_secret_to_vault():
+    if vault_client.is_type(VaultTypeChoices.local):
+        # 这里不能判断 settings.VAULT_TYPE, 必须判断当前 vault_client 的类型
+        print('\033[35m>>> 当前 Vault 类型为本地数据库, 不需要同步')
         return
 
-    print('\033[33m>>> 开始同步账号密钥数据到 Vault')
+    print('\033[33m>>> 开始同步密钥数据到 Vault ({})'.format(datetime.datetime.now()))
     with tmp_to_root_org():
-        accounts = Account.objects.exclude(_secret__isnull=True)
-        account_templates = AccountTemplate.objects.exclude(_secret__isnull=True)
+        to_sync_models = [Account, AccountTemplate, Account.history.model]
+        for model in to_sync_models:
+            print(f'\033[33m>>> 开始同步: {model.__module__}')
+            succeeded = []
+            failed = []
+            skipped = []
+            instances = model.objects.all()
+            for instance in instances:
+                instance_desc = f'[{instance}]'
+                if instance.secret_has_save_to_vault:
+                    print(f'\033[32m- 跳过同步: {instance_desc}, 原因: [已同步]')
+                    skipped.append(instance)
+                    continue
+                try:
+                    vault_client.create(instance)
+                except Exception as e:
+                    failed.append(instance)
+                    print(f'\033[31m- 同步失败: {instance_desc}, 原因: [{e}]')
+                else:
+                    succeeded.append(instance)
+                    print(f'\033[32m- 同步成功: {instance_desc}')
 
-        for instance in list(accounts) + list(account_templates):
-            vault_client = get_vault_client(instance)
-            try:
-                vault_client.create()
-                print(f'\033[32m- {instance} 已同步')
-            except Exception as e:
-                print(f'\033[31m- {instance} 同步失败，原因：{e}')
+            total = len(succeeded) + len(failed) + len(skipped)
+            print(
+                f'\033[33m>>> 同步完成: {model.__module__}, '
+                f'共计: {total}, '
+                f'成功: {len(succeeded)}, '
+                f'失败: {len(failed)}, '
+                f'跳过: {len(skipped)}'
+            )
 
-    print('\033[33m>>> 同步完成')
+    print('\033[33m>>> 全部同步完成 ({})'.format(datetime.datetime.now()))
     print('\033[0m')

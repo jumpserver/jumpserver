@@ -13,10 +13,8 @@ from common.utils import (
     ssh_key_string_to_obj, ssh_key_gen, get_logger,
     random_string, lazyproperty, parse_ssh_public_key_str, is_openssh_format_key
 )
-from orgs.mixins.models import (
-    JMSOrgBaseModel, OrgManager, VaultModelMixin,
-    VaultManagerMixin, VaultQuerySetMixin
-)
+from accounts.models.mixins import VaultModelMixin, VaultManagerMixin, VaultQuerySetMixin
+from orgs.mixins.models import JMSOrgBaseModel, OrgManager
 
 logger = get_logger(__file__)
 

@@ -43,8 +43,7 @@ class BaseEntry(ABC):
         secret = data.pop('secret', None)
         if secret is not None:
             secret = Encryptor(secret).decrypt()
-            data.update({'secret': secret})
-        return data
+        return secret
 
 
 class AccountEntry(BaseEntry):
@@ -63,7 +62,7 @@ class AccountTemplateEntry(BaseEntry):
         return path
 
 
-class AccountHistoricalRecordsEntry(BaseEntry):
+class HistoricalAccountEntry(BaseEntry):
 
     @property
     def path_spec(self):

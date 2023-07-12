@@ -1,10 +1,11 @@
 from django.utils.translation import gettext_lazy as _
+from django.conf import settings
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.views import Response, APIView
 
-from accounts.backends import VAULT_CLIENT_MAPPER
-from accounts.tasks.vault import sync_account_vault_data
+from accounts.tasks.vault import sync_secret_to_vault
+from accounts.backends import get_vault_client
 from settings.models import Setting
 from .. import serializers
 
@@ -18,22 +19,22 @@ class VaultTestingAPI(GenericAPIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        for k, v in data.items():
+            if v:
+                continue
+            # 页面没有传递值, 从配置文件中获取
+            data[k] = getattr(settings, k, None)
 
-        vault_type = serializer.validated_data['VAULT_TYPE']
-        hcp_vault_host = serializer.validated_data['VAULT_HCP_HOST']
-        hcp_vault_token = serializer.validated_data.get('VAULT_HCP_TOKEN')
-
-        if not hcp_vault_token:
-            token = Setting.objects.filter(name='VAULT_HCP_TOKEN').first()
-            if token:
-                hcp_vault_token = token.value
-
-        vault_token = hcp_vault_token or ''
-        vault_client = VAULT_CLIENT_MAPPER.get(vault_type)
-        if vault_client.is_active(hcp_vault_host, vault_token):
-            return Response(status=status.HTTP_200_OK, data={'msg': _('Test success')})
+        vault_client = get_vault_client(**data)
+        ok, error = vault_client.is_active()
+        if ok:
+            _status = status.HTTP_200_OK
+            _data = {'msg': _('Test success')}
         else:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'Test failed'})
+            _status = status.HTTP_400_BAD_REQUEST
+            _data = {'error': error}
+        return Response(status=_status, data=_data)
 
 
 class VaultSyncDataAPI(APIView):
@@ -43,5 +44,11 @@ class VaultSyncDataAPI(APIView):
     }
 
     def post(self, request, *args, **kwargs):
-        task = sync_account_vault_data.delay()
+        task = self._run_task()
         return Response({'task': task.id}, status=status.HTTP_201_CREATED)
+
+    @staticmethod
+    def _run_task():
+        task = sync_secret_to_vault.delay()
+        return task
+
