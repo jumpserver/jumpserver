@@ -25,19 +25,4 @@ class Migration(migrations.Migration):
             old_name='secret',
             new_name='_secret',
         ),
-        migrations.AlterField(
-            model_name='account',
-            name='_secret',
-            field=models.TextField(blank=True, null=True, verbose_name='Secret'),
-        ),
-        migrations.AlterField(
-            model_name='accounttemplate',
-            name='_secret',
-            field=models.TextField(blank=True, null=True, verbose_name='Secret'),
-        ),
-        migrations.AlterField(
-            model_name='historicalaccount',
-            name='_secret',
-            field=models.TextField(blank=True, null=True, verbose_name='Secret'),
-        ),
     ]
