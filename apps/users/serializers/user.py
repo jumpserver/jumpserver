@@ -266,7 +266,8 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         for f, default_roles in self.custom_m2m_fields.items():
             roles = validated_data.pop(f, None)
             if created and not roles:
-                roles = Role.objects.filter(id__in=[role.id for role in default_roles])
+                roles = Role.objects\
+                    .filter(id__in=[role.id for role in default_roles])
             m2m_key_val[f] = roles
 
         instance = save_handler(validated_data)
