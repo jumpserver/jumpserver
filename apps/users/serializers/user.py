@@ -80,6 +80,29 @@ class RolesSerializerMixin(serializers.Serializer):
         return fields
 
 
+class UserListSerializer(serializers.ListSerializer):
+
+    def create(self, validated_data):
+        ModelClass = self.child.Meta.model
+        to_create = dict()
+        for attrs in validated_data:
+            m2m_values = {}
+            for field in self.child.Meta.fields_m2m:
+                roles_or_val = attrs.pop(field, None)
+                default_roles = self.child.custom_m2m_fields.get(field)
+                if not roles_or_val and default_roles:
+                    roles_or_val = Role.objects.filter(id__in=[role.id for role in default_roles])
+                m2m_values[field] = roles_or_val
+            instance = ModelClass(**attrs)
+            to_create[instance] = m2m_values
+
+        instances = ModelClass._default_manager.bulk_create(to_create.keys())
+        for instance in instances:
+            m2m_values = to_create[instance]
+            self.child.set_custom_m2m_fields(instance, m2m_values)
+        return instances
+
+
 class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializers.ModelSerializer):
     password_strategy = LabeledChoiceField(
         choices=PasswordStrategy.choices,
@@ -114,6 +137,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
 
     class Meta:
         model = User
+        list_serializer_class = UserListSerializer
         # mini 是指能识别对象的最小单元
         fields_mini = ["id", "name", "username"]
         # 只能写的字段, 这个虽然无法在框架上生效，但是更多对我们是提醒
@@ -228,22 +252,24 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         attrs.pop("password_strategy", None)
         return attrs
 
-    def save_and_set_custom_m2m_fields(self, validated_data, save_handler, created):
-        m2m_values = {}
-        for f, default_roles in self.custom_m2m_fields.items():
-            roles = validated_data.pop(f, None)
-            if created and not roles:
-                roles = [
-                    Role.objects.filter(id=role.id).first() for role in default_roles
-                ]
-            m2m_values[f] = roles
-
-        instance = save_handler(validated_data)
-        for field_name, value in m2m_values.items():
+    @staticmethod
+    def set_custom_m2m_fields(instance, m2m_key_val):
+        for field_name, value in m2m_key_val.items():
             if value is None:
                 continue
             field = getattr(instance, field_name)
             field.set(value)
+
+    def save_and_set_custom_m2m_fields(self, validated_data, save_handler, created):
+        m2m_key_val = {}
+        for f, default_roles in self.custom_m2m_fields.items():
+            roles = validated_data.pop(f, None)
+            if created and not roles:
+                roles = Role.objects.filter(id__in=[role.id for role in default_roles])
+            m2m_key_val[f] = roles
+
+        instance = save_handler(validated_data)
+        self.set_custom_m2m_fields(instance, m2m_key_val)
         return instance
 
     def update(self, instance, validated_data):
