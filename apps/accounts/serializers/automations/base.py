@@ -63,15 +63,17 @@ class AutomationExecutionSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_snapshot(obj):
-        tp = obj.snapshot['type']
+        tp = obj.snapshot.get('type', '')
+        type_display = tp if not hasattr(AutomationTypes, tp) \
+            else getattr(AutomationTypes, tp).label
         snapshot = {
             'type': tp,
-            'name': obj.snapshot['name'],
-            'comment': obj.snapshot['comment'],
-            'accounts': obj.snapshot['accounts'],
-            'node_amount': len(obj.snapshot['nodes']),
-            'asset_amount': len(obj.snapshot['assets']),
-            'type_display': getattr(AutomationTypes, tp).label,
+            'name': obj.snapshot.get('name'),
+            'comment': obj.snapshot.get('comment'),
+            'accounts': obj.snapshot.get('accounts'),
+            'node_amount': len(obj.snapshot.get('nodes', [])),
+            'asset_amount': len(obj.snapshot.get('assets', [])),
+            'type_display': type_display,
         }
         return snapshot
 

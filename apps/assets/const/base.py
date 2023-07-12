@@ -1,7 +1,8 @@
+from django.db import models
 from django.db.models import TextChoices
+from django.utils.translation import gettext_lazy as _
 
 from jumpserver.utils import has_valid_xpack_license
-from .protocol import Protocol
 
 
 class Type:
@@ -28,6 +29,12 @@ class Type:
         )
 
 
+class FillType(models.TextChoices):
+    no = 'no', _('Disabled')
+    basic = 'basic', _('Basic')
+    script = 'script', _('Script')
+
+
 class BaseType(TextChoices):
     """
     约束应该考虑代是对平台对限制，避免多余对选项，如: mysql 开启 ssh,
@@ -49,7 +56,7 @@ class BaseType(TextChoices):
         for k, v in cls.get_choices():
             tp_base = {**base_default, **base.get(k, {})}
             tp_auto = {**automation_default, **automation.get(k, {})}
-            tp_protocols = {**protocols_default, **protocols.get(k, {})}
+            tp_protocols = {**protocols_default, **{'port_from_addr': False}, **protocols.get(k, {})}
             tp_protocols = cls._parse_protocols(tp_protocols, k)
             tp_constrains = {**tp_base, 'protocols': tp_protocols, 'automation': tp_auto}
             constrains[k] = tp_constrains
@@ -57,14 +64,20 @@ class BaseType(TextChoices):
 
     @classmethod
     def _parse_protocols(cls, protocol, tp):
+        from .protocol import Protocol
         settings = Protocol.settings()
         choices = protocol.get('choices', [])
         if choices == '__self__':
             choices = [tp]
-        protocols = [
-            {'name': name, **settings.get(name, {})}
-            for name in choices
-        ]
+
+        protocols = []
+        for name in choices:
+            protocol = {'name': name, **settings.get(name, {})}
+            setting = protocol.pop('setting', {})
+            setting_values = {k: v.get('default', None) for k, v in setting.items()}
+            protocol['setting'] = setting_values
+            protocols.append(protocol)
+
         if protocols:
             protocols[0]['default'] = True
         return protocols

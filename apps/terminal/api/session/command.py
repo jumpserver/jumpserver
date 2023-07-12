@@ -6,11 +6,12 @@ from rest_framework import generics
 from rest_framework.fields import DateTimeField
 from rest_framework.response import Response
 
+from acls.models import CommandFilterACL
 from terminal.models import CommandStorage, Session, Command
 from terminal.filters import CommandFilter
 from orgs.utils import current_org
 from common.api import JMSBulkModelViewSet
-from common.utils import get_logger
+from common.utils import get_logger, is_uuid
 from terminal.serializers import (
     SessionCommandSerializer,  InsecureCommandAlertSerializer
 )
@@ -18,7 +19,8 @@ from terminal.exceptions import StorageInvalid
 from terminal.backends import (
     get_command_storage, get_multi_command_storage
 )
-from terminal.notifications import CommandAlertMessage
+from terminal.notifications import CommandAlertMessage, CommandWarningMessage
+from terminal.const import RiskLevelChoices
 
 logger = get_logger(__name__)
 __all__ = ['CommandViewSet', 'InsecureCommandAlertAPI']
@@ -199,7 +201,30 @@ class InsecureCommandAlertAPI(generics.CreateAPIView):
         serializer = InsecureCommandAlertSerializer(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)
         commands = serializer.validated_data
+
+        acl_ids = []
+        for cmd in commands:
+            acl_id = cmd.get('cmd_filter_acl')
+            if not is_uuid(acl_id):
+                continue
+            acl_ids.append(acl_id)
+
+        acls = CommandFilterACL.objects.filter(id__in=acl_ids)
+        acls_mapper = {str(acl.id): acl for acl in acls}
+
         for command in commands:
-            if command['risk_level'] >= settings.SECURITY_INSECURE_COMMAND_LEVEL:
+            risk_level = command.get('risk_level')
+
+            if risk_level in [RiskLevelChoices.reject, RiskLevelChoices.review_reject]:
                 CommandAlertMessage(command).publish_async()
-        return Response()
+            elif risk_level in [RiskLevelChoices.warning]:
+                acl_id = command.get('cmd_filter_acl')
+                acl = acls_mapper.get(acl_id)
+                if not acl:
+                    logger.info(f'ACL not found: {acl_id}')
+                    continue
+                for reviewer in acl.reviewers.all():
+                    CommandWarningMessage(reviewer, command).publish_async()
+            else:
+                logger.info(f'Risk level ignore: {risk_level}')
+        return Response({'msg': 'ok'})

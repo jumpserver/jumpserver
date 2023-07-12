@@ -84,6 +84,7 @@ class BaserACLSerializer(ActionAclSerializer, serializers.Serializer):
         extra_kwargs = {
             "priority": {"default": 50},
             "is_active": {"default": True},
+            'reviewers': {'label': _('Recipients')},
         }
 
     def validate_reviewers(self, reviewers):

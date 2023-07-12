@@ -10,6 +10,7 @@ from orgs.mixins.models import OrgModelMixin, OrgManager
 
 __all__ = [
     'BaseACL', 'UserBaseACL', 'UserAssetAccountBaseACL',
+    'ActionChoices',
 ]
 
 from orgs.utils import tmp_to_root_org
@@ -20,6 +21,7 @@ class ActionChoices(models.TextChoices):
     reject = 'reject', _('Reject')
     accept = 'accept', _('Accept')
     review = 'review', _('Review')
+    warning = 'warning', _('Warning')
 
 
 class BaseACLQuerySet(models.QuerySet):

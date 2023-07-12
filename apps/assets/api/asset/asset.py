@@ -121,6 +121,10 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
         NodeFilterBackend, AttrRulesFilterBackend
     ]
 
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related('nodes', 'protocols')\
+            .select_related('platform', 'domain')
+
     def get_serializer_class(self):
         cls = super().get_serializer_class()
         if self.action == "retrieve":

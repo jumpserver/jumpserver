@@ -45,7 +45,7 @@ class AccountFilterSet(BaseFilterSet):
 
     class Meta:
         model = Account
-        fields = ['id', 'asset_id', 'source_id']
+        fields = ['id', 'asset_id', 'source_id', 'secret_type']
 
 
 class GatheredAccountFilterSet(BaseFilterSet):

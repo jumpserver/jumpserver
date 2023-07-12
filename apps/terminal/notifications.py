@@ -9,7 +9,7 @@ from common.utils import lazyproperty
 from common.utils.timezone import local_now_display
 from notifications.backends import BACKEND
 from notifications.models import SystemMsgSubscription
-from notifications.notifications import SystemMessage
+from notifications.notifications import SystemMessage, UserMessage
 from terminal.models import Session, Command
 from users.models import User
 
@@ -26,13 +26,16 @@ class CommandAlertMixin:
     _get_message: Callable
     message_type_label: str
 
+    def __str__(self):
+        return str(self.message_type_label)
+
     @lazyproperty
     def subject(self):
         _input = self.command['input']
         if isinstance(_input, str):
             _input = _input.replace('\r\n', ' ').replace('\r', ' ').replace('\n', ' ')
 
-        subject = self.message_type_label + "%(cmd)s" % {
+        subject = self.message_type_label + ": %(cmd)s" % {
             'cmd': _input
         }
         return subject
@@ -61,6 +64,45 @@ class CommandAlertMixin:
             subscription.save()
 
 
+class CommandWarningMessage(CommandAlertMixin, UserMessage):
+    message_type_label = _('Danger command warning')
+
+    def __init__(self, user, command):
+        super().__init__(user)
+        self.command = command
+    
+    def get_html_msg(self) -> dict:
+        session = self.command.get('session')
+        session_url = reverse(
+            'api-terminal:session-detail', kwargs={'pk': session},
+            external=True, api_to_ui=True
+        ) + '?oid={}'.format(self.command['org_id'])
+
+        asset = self.command.get('asset')
+        asset_url = reverse(
+            'assets:asset-detail', kwargs={'pk': asset},
+            api_to_ui=True, external=True, is_console=True
+        ) + '?oid={}'.format(self.command.get('org_id'))
+
+        cmd_filter_acl = self.command.get('cmd_filter_acl')
+        cmd_group = self.command.get('cmd_group')
+
+        context = {
+            "command": self.command['input'],
+            'asset_url': asset_url,
+            'session_url': session_url.replace(
+                '/terminal/sessions/', '/audit/sessions/sessions/'
+            ),
+            'cmd_filter_acl_url': settings.SITE_URL + '/ui/#/console/perms/cmd-acls/%s/' % cmd_filter_acl,
+            'cmd_group_url': settings.SITE_URL + '/ui/#/console/perms/cmd-groups/%s/' % cmd_group,
+        }
+        message = render_to_string('terminal/_msg_command_warning.html', context)
+        return {
+            'subject': self.subject,
+            'message': message
+        }
+
+
 class CommandAlertMessage(CommandAlertMixin, SystemMessage):
     category = CATEGORY
     category_label = CATEGORY_LABEL
@@ -68,9 +110,6 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
 
     def __init__(self, command):
         self.command = command
-
-    def __str__(self):
-        return str(self.message_type_label)
 
     @classmethod
     def gen_test_msg(cls):

@@ -6,6 +6,7 @@ from common.utils import pretty_string
 from common.serializers.fields import LabeledChoiceField
 from terminal.backends.command.models import AbstractSessionCommand
 from terminal.models import Command
+from terminal.const import RiskLevelChoices
 
 __all__ = ['SessionCommandSerializer', 'InsecureCommandAlertSerializer']
 
@@ -18,7 +19,7 @@ class SimpleSessionCommandSerializer(serializers.ModelSerializer):
     input = serializers.CharField(max_length=2048, label=_("Command"))
     session = serializers.CharField(max_length=36, label=_("Session ID"))
     risk_level = LabeledChoiceField(
-        choices=AbstractSessionCommand.RiskLevelChoices.choices,
+        choices=RiskLevelChoices.choices,
         required=False, label=_("Risk level"),
     )
     org_id = serializers.CharField(
@@ -37,7 +38,17 @@ class SimpleSessionCommandSerializer(serializers.ModelSerializer):
 
 
 class InsecureCommandAlertSerializer(SimpleSessionCommandSerializer):
-    pass
+    cmd_filter_acl = serializers.CharField(
+        max_length=128, required=False, label=_("Command Filter ACL")
+    )
+    cmd_group = serializers.CharField(
+        max_length=128, required=True, label=_("Command Group")
+    )
+
+    class Meta(SimpleSessionCommandSerializer.Meta):
+        fields = SimpleSessionCommandSerializer.Meta.fields + [
+            'cmd_filter_acl', 'cmd_group'
+        ]
 
 
 class SessionCommandSerializerMixin(serializers.Serializer):

@@ -1,0 +1,23 @@
+{% load i18n %}
+
+<div>
+    <b>{% trans 'Asset' %}:</b>
+    <span><a href="{{ asset_url }}" target="_blank">{% trans 'view' %}</a></span>
+    <br />
+    <b>{% trans 'Session' %}:</b>
+    <a href="{{ session_url }}" target="_blank">{% trans 'view' %}</a>
+    <br />
+    <b>{% trans 'Command acl' %}:</b>
+    <a href="{{ cmd_filter_acl_url }}" target="_blank">{% trans 'view' %}</a>
+    <br />
+    <b>{% trans 'Command acl group' %}:</b>
+    <a href="{{ cmd_group_url }}" target="_blank">{% trans 'view' %}</a>
+    <br />
+    <b>{% trans 'Command' %}: </b><br />
+    <code>
+        <pre style="
+            background-color: hsl(0,0%,96.5%);
+            border-radius: 5px;
+        "> {{ command }} </pre>
+    </code>
+</div>

@@ -10,10 +10,11 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from accounts.const import AliasAccount
 from common.api import JMSModelViewSet
 from common.exceptions import JMSException
 from common.utils import random_string, get_logger, get_request_ip
@@ -282,13 +283,17 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         data['org_id'] = asset.org_id
         data['user'] = user
         data['value'] = random_string(16)
+
+        if account_name == AliasAccount.ANON and asset.category not in ['web', 'custom']:
+            raise ValidationError(_('Anonymous account is not supported for this asset'))
+
         account = self._validate_perm(user, asset, account_name)
         if account.has_secret:
             data['input_secret'] = ''
 
-        if account.username != '@INPUT':
+        if account.username != AliasAccount.INPUT:
             data['input_username'] = ''
-        if account.username == '@USER':
+        elif account.username == AliasAccount.USER:
             data['input_username'] = user.username
 
         ticket = self._validate_acl(user, asset, account)

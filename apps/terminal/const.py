@@ -1,8 +1,17 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.db.models import TextChoices
+from django.db.models import TextChoices, IntegerChoices
 from django.utils.translation import ugettext_lazy as _
+
+
+class RiskLevelChoices(IntegerChoices):
+    accept = 0, _('Accept')
+    warning = 4, _('Warning')
+    reject = 5, _('Reject')
+    review_reject = 6, _('Review & Reject')
+    review_accept = 7, _('Review & Accept')
+    review_cancel = 8, _('Review & Cancel')
 
 
 class ReplayStorageType(TextChoices):
@@ -50,6 +59,7 @@ class TerminalType(TextChoices):
     tinker = 'tinker', 'Tinker'
     video_worker = 'video_worker', 'Video Worker'
     chen = 'chen', 'Chen'
+    kael = 'kael', 'Kael'
 
     @classmethod
     def types(cls):
@@ -67,6 +77,7 @@ class SessionType(TextChoices):
     normal = 'normal', _('Normal')
     tunnel = 'tunnel', _('Tunnel')
     command = 'command', _('Command')
+    sftp = 'sftp', _('SFTP')
 
 
 class ActionPermission(TextChoices):

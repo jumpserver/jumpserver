@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from assets.const.web import FillType
+from assets.const import FillType
 from .common import Asset
 
 
