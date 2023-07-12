@@ -16,25 +16,31 @@ class VaultTestingAPI(GenericAPIView):
         'POST': 'settings.change_vault'
     }
 
-    def post(self, request):
+    def get_config(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         for k, v in data.items():
             if v:
                 continue
-            # 页面没有传递值, 从配置文件中获取
+            # 页面没有传递值, 从 settings 中获取
             data[k] = getattr(settings, k, None)
+        return data
 
-        vault_client = get_vault_client(**data)
-        ok, error = vault_client.is_active()
+    def post(self, request):
+        config = self.get_config(request)
+        try:
+            client = get_vault_client(raise_exception=True, **config)
+            ok, error = client.is_active()
+        except Exception as e:
+            ok, error = False, str(e)
+
         if ok:
-            _status = status.HTTP_200_OK
-            _data = {'msg': _('Test success')}
+            _status, msg = status.HTTP_200_OK, _('Test success')
         else:
-            _status = status.HTTP_400_BAD_REQUEST
-            _data = {'error': error}
-        return Response(status=_status, data=_data)
+            _status, msg = status.HTTP_400_BAD_REQUEST, error
+
+        return Response(status=_status, data={'msg': msg})
 
 
 class VaultSyncDataAPI(APIView):

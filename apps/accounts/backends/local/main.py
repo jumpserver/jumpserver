@@ -3,10 +3,10 @@ from ..base import BaseVault
 
 logger = get_logger(__name__)
 
-__all__ = ['LocalVault']
+__all__ = ['Vault']
 
 
-class LocalVault(BaseVault):
+class Vault(BaseVault):
 
     def is_active(self):
         return True, ''

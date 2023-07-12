@@ -1,24 +1,41 @@
-from django.conf import settings
+import os
+from django.utils.functional import LazyObject
+from importlib import import_module
 
+from common.utils import get_logger
 from ..const import VaultTypeChoices
-from .local import LocalVault
-from .vault import HCPVault
 
 __all__ = ['vault_client', 'get_vault_client']
 
 
-vault_client_mapper = {
-    VaultTypeChoices.local: LocalVault,
-    VaultTypeChoices.hcp: HCPVault,
-}
+logger = get_logger(__file__)
 
 
-def get_vault_client(**kwargs):
-    tp = kwargs.get('VAULT_TYPE')
-    vault_class = vault_client_mapper.get(tp, LocalVault)
-    return vault_class(**kwargs)
+def get_vault_client(raise_exception=False, **kwargs):
+    try:
+        tp = kwargs.get('VAULT_TYPE')
+        module_path = f'apps.accounts.backends.{tp}.main'
+        client = import_module(module_path).Vault(**kwargs)
+    except Exception as e:
+        logger.error(f'Init vault client failed: {e}')
+        if raise_exception:
+            raise
+        tp = VaultTypeChoices.local
+        module_path = f'apps.accounts.backends.{tp}.main'
+        kwargs['VAULT_TYPE'] = tp
+        client = import_module(module_path).Vault(**kwargs)
+    return client
+
+
+class VaultClient(LazyObject):
+
+    def _setup(self):
+        from jumpserver import settings as js_settings
+        from django.conf import settings
+        vault_config_names = [k for k in js_settings.__dict__.keys() if k.startswith('VAULT_')]
+        vault_configs = {name: getattr(settings, name, None) for name in vault_config_names}
+        self._wrapped = get_vault_client(**vault_configs)
 
 
 """ 为了安全, 页面修改配置, 重启服务后才会重新初始化 vault_client """
-vault_configs = {k: v for k, v in settings.__dict__.items() if k.startswith('VAULT_')}
-vault_client = get_vault_client(**vault_configs)
+vault_client = VaultClient()

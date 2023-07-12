@@ -5,10 +5,10 @@ from .entries import build_entry
 from .service import VaultKVClient
 
 
-__all__ = ['HCPVault']
+__all__ = ['Vault']
 
 
-class HCPVault(BaseVault):
+class Vault(BaseVault):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.client = VaultKVClient(
