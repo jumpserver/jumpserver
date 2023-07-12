@@ -5,6 +5,9 @@ __all__ = ['BaseVault']
 
 
 class BaseVault(ABC):
+    def get(self, instance):
+        return self._get(instance)
+
     def create(self, instance):
         self._create(instance)
         self._clean_db_secret(instance)
@@ -18,22 +21,15 @@ class BaseVault(ABC):
     def delete(self, instance):
         self._delete(instance)
 
-    def get(self, instance):
-        return self._get(instance)
-
     def save_metadata(self, instance):
-        metadata = model_to_dict(instance, exclude=['id'])
+        metadata = model_to_dict(instance)
         metadata = {field: str(value) for field, value in metadata.items()}
         return self._save_metadata(instance, metadata)
-
-    @staticmethod
-    def _clean_db_secret(instance):
-        instance.mark_secret_save_to_vault()
 
     # -------- abstractmethod -------- #
 
     @abstractmethod
-    def is_active(self, *args, **kwargs):
+    def _get(self, instance):
         raise NotImplementedError
 
     @abstractmethod
@@ -49,9 +45,14 @@ class BaseVault(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def _get(self, instance):
-        raise NotImplementedError
+    def _clean_db_secret(self, instance):
+        pass
 
     @abstractmethod
     def _save_metadata(self, instance, metadata):
         raise NotImplementedError
+
+    @abstractmethod
+    def is_active(self, *args, **kwargs):
+        raise NotImplementedError
+

@@ -32,7 +32,6 @@ class LocalVault(BaseVault):
         """ Ignore """
         pass
 
-    @staticmethod
-    def _clean_db_secret(instance):
-        """ *重要* 不能删除本地 secret """
+    def _clean_db_secret(self, instance):
+        """ Ignore *重要* 不能删除本地 secret """
         pass

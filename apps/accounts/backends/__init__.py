@@ -13,5 +13,5 @@ vault_client_mapper = {
 }
 
 
-""" 为了安全, 页面修改后，重启服务后才会重新初始化 vault_client """
+""" 为了安全, 页面修改配置, 重启服务后才会重新初始化 vault_client """
 vault_client = vault_client_mapper.get(settings.VAULT_TYPE, LocalVault)()
