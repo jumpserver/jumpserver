@@ -1,20 +1,18 @@
-from django.conf import settings
-from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
+from common.serializers import CommonModelSerializer
 from common.serializers.fields import EncryptedField
-from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from perms.serializers.permission import ActionChoicesField
 from ..models import ConnectionToken
 
 __all__ = [
     'ConnectionTokenSerializer', 'SuperConnectionTokenSerializer',
-    'ConnectionTokenUpdateSerializer',
+    'ConnectionTokenReusableSerializer',
 ]
 
 
-class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
+class ConnectionTokenSerializer(CommonModelSerializer):
     expire_time = serializers.IntegerField(read_only=True, label=_('Expired time'))
     input_secret = EncryptedField(
         label=_("Input secret"), max_length=40960, required=False, allow_blank=True
@@ -60,30 +58,12 @@ class ConnectionTokenSerializer(OrgResourceModelSerializerMixin):
         return info
 
 
-class ConnectionTokenUpdateSerializer(ConnectionTokenSerializer):
-    class Meta(ConnectionTokenSerializer.Meta):
+class ConnectionTokenReusableSerializer(CommonModelSerializer):
+    class Meta:
+        model = ConnectionToken
+        fields = ['id', 'date_expired', 'is_reusable']
         can_update_fields = ['is_reusable']
-        read_only_fields = list(set(ConnectionTokenSerializer.Meta.fields) - set(can_update_fields))
-
-    def _get_date_expired(self):
-        delta = self.instance.date_expired - self.instance.date_created
-        if delta.total_seconds() > 3600 * 24:
-            return self.instance.date_expired
-
-        seconds = settings.CONNECTION_TOKEN_REUSABLE_EXPIRATION
-        return timezone.now() + timezone.timedelta(seconds=seconds)
-
-    @staticmethod
-    def validate_is_reusable(value):
-        if value and not settings.CONNECTION_TOKEN_REUSABLE:
-            raise serializers.ValidationError(_('Reusable connection token is not allowed, global setting not enabled'))
-        return value
-
-    def validate(self, attrs):
-        reusable = attrs.get('is_reusable', False)
-        if reusable:
-            attrs['date_expired'] = self._get_date_expired()
-        return attrs
+        read_only_fields = list(set(fields) - set(can_update_fields))
 
 
 class SuperConnectionTokenSerializer(ConnectionTokenSerializer):

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-11 12:03+0800\n"
+"POT-Creation-Date: 2023-07-13 15:56+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -87,7 +87,7 @@ msgstr "テンプレート"
 msgid "Skip"
 msgstr "スキップ"
 
-#: accounts/const/account.py:28 audits/const.py:24 rbac/tree.py:229
+#: accounts/const/account.py:28 audits/const.py:24 rbac/tree.py:230
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "更新"
@@ -652,7 +652,7 @@ msgstr "ID"
 #: authentication/models/sso_token.py:16
 #: notifications/models/notification.py:12
 #: perms/api/user_permission/mixin.py:55 perms/models/asset_permission.py:58
-#: perms/serializers/permission.py:30 rbac/builtin.py:122
+#: perms/serializers/permission.py:30 rbac/builtin.py:123
 #: rbac/models/rolebinding.py:49 terminal/backends/command/models.py:17
 #: terminal/models/session/session.py:29 terminal/models/session/sharing.py:32
 #: terminal/notifications.py:135 terminal/notifications.py:183
@@ -1023,7 +1023,7 @@ msgid "{} disabled"
 msgstr "{} 無効"
 
 #: assets/automations/ping_gateway/manager.py:33
-#: authentication/models/connection_token.py:118
+#: authentication/models/connection_token.py:128
 msgid "No account"
 msgstr "アカウントなし"
 
@@ -1077,7 +1077,8 @@ msgstr "無効"
 msgid "Basic"
 msgstr "基本"
 
-#: assets/const/base.py:35 assets/models/asset/web.py:13
+#: assets/const/base.py:35 assets/const/protocol.py:193
+#: assets/models/asset/web.py:13
 msgid "Script"
 msgstr "脚本"
 
@@ -1185,23 +1186,28 @@ msgstr "AD ドメイン"
 msgid "Use SSL"
 msgstr "SSLの使用"
 
-#: assets/const/protocol.py:145
+#: assets/const/protocol.py:149
 msgid "Auth username"
 msgstr "ユーザー名で認証する"
 
-#: assets/const/protocol.py:173 assets/models/asset/web.py:10
+#: assets/const/protocol.py:170 assets/models/asset/web.py:9
+#: assets/serializers/asset/info/spec.py:16
+msgid "Autofill"
+msgstr "自動充填"
+
+#: assets/const/protocol.py:178 assets/models/asset/web.py:10
 msgid "Username selector"
 msgstr "ユーザー名ピッカー"
 
-#: assets/const/protocol.py:178 assets/models/asset/web.py:11
+#: assets/const/protocol.py:183 assets/models/asset/web.py:11
 msgid "Password selector"
 msgstr "パスワードセレクター"
 
-#: assets/const/protocol.py:183 assets/models/asset/web.py:12
+#: assets/const/protocol.py:188 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr "ボタンセレクターを確認する"
 
-#: assets/const/protocol.py:201
+#: assets/const/protocol.py:211
 msgid "API mode"
 msgstr "APIモード"
 
@@ -1407,10 +1413,6 @@ msgstr "証明書チェックを無視"
 #: assets/models/asset/gpt.py:8
 msgid "Proxy"
 msgstr ""
-
-#: assets/models/asset/web.py:9 assets/serializers/asset/info/spec.py:16
-msgid "Autofill"
-msgstr "自動充填"
 
 #: assets/models/automations/base.py:22 ops/models/job.py:187
 #: settings/serializers/auth/sms.py:99
@@ -1963,7 +1965,7 @@ msgstr "Rmdir"
 
 #: audits/const.py:14 audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: perms/const.py:17 rbac/tree.py:230
+#: perms/const.py:17 rbac/tree.py:231
 msgid "Delete"
 msgstr "削除"
 
@@ -1987,13 +1989,13 @@ msgstr "ダウンロード"
 msgid "Rename dir"
 msgstr "マップディレクトリ"
 
-#: audits/const.py:23 rbac/tree.py:228
+#: audits/const.py:23 rbac/tree.py:229
 msgid "View"
 msgstr "表示"
 
 #: audits/const.py:26
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:227
+#: rbac/tree.py:228
 msgid "Create"
 msgstr "作成"
 
@@ -2230,23 +2232,29 @@ msgstr "外部ストレージへのFTPファイルのアップロード"
 msgid "This action require verify your MFA"
 msgstr "この操作には、MFAを検証する必要があります"
 
-#: authentication/api/connection_token.py:288
+#: authentication/api/connection_token.py:219
+msgid "Reusable connection token is not allowed, global setting not enabled"
+msgstr ""
+"再使用可能な接続トークンの使用は許可されていません。グローバル設定は有効に"
+"なっていません"
+
+#: authentication/api/connection_token.py:298
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名アカウントはこのプロパティではサポートされていません"
 
-#: authentication/api/connection_token.py:310
+#: authentication/api/connection_token.py:320
 msgid "Account not found"
 msgstr "アカウントが見つかりません"
 
-#: authentication/api/connection_token.py:313
+#: authentication/api/connection_token.py:323
 msgid "Permission expired"
 msgstr "承認の有効期限が切れています"
 
-#: authentication/api/connection_token.py:327
+#: authentication/api/connection_token.py:337
 msgid "ACL action is reject: {}({})"
 msgstr "ACL アクションは拒否です: {}({})"
 
-#: authentication/api/connection_token.py:331
+#: authentication/api/connection_token.py:341
 msgid "ACL action is review"
 msgstr "ACL アクションはレビューです"
 
@@ -2637,7 +2645,7 @@ msgid "Input username"
 msgstr "カスタム ユーザー名"
 
 #: authentication/models/connection_token.py:40
-#: authentication/serializers/connection_token.py:20
+#: authentication/serializers/connection_token.py:18
 msgid "Input secret"
 msgstr "カスタムパスワード"
 
@@ -2674,31 +2682,39 @@ msgstr "期限切れの日付"
 msgid "From ticket"
 msgstr "チケットから"
 
-#: authentication/models/connection_token.py:57
+#: authentication/models/connection_token.py:58
+msgid "Can expire connection token"
+msgstr "接続トークンの有効期限を設定できます"
+
+#: authentication/models/connection_token.py:59
+msgid "Can reuse connection token"
+msgstr "接続トークンを再利用できます"
+
+#: authentication/models/connection_token.py:61
 msgid "Connection token"
 msgstr "接続トークン"
 
-#: authentication/models/connection_token.py:59
-msgid "Can view connection token secret"
-msgstr "接続トークンの秘密を表示できます"
-
-#: authentication/models/connection_token.py:106
+#: authentication/models/connection_token.py:116
 msgid "Connection token inactive"
 msgstr "接続トークンがアクティブ化されていません"
 
-#: authentication/models/connection_token.py:109
+#: authentication/models/connection_token.py:119
 msgid "Connection token expired at: {}"
 msgstr "接続トークンの有効期限: {}"
 
-#: authentication/models/connection_token.py:112
+#: authentication/models/connection_token.py:122
 msgid "No user or invalid user"
 msgstr "ユーザーなしまたは期限切れのユーザー"
 
-#: authentication/models/connection_token.py:115
+#: authentication/models/connection_token.py:125
 msgid "No asset or inactive asset"
 msgstr "アセットがないか、有効化されていないアセット"
 
-#: authentication/models/connection_token.py:258
+#: authentication/models/connection_token.py:269
+msgid "Can view super connection token secret"
+msgstr "スーパー接続トークンのシークレットを表示できます"
+
+#: authentication/models/connection_token.py:271
 msgid "Super connection token"
 msgstr "スーパー接続トークン"
 
@@ -2742,15 +2758,15 @@ msgstr "コンポーネント"
 msgid "Expired now"
 msgstr "すぐに期限切れ"
 
-#: authentication/serializers/connection_token.py:18
+#: authentication/serializers/connection_token.py:16
 msgid "Expired time"
 msgstr "期限切れ時間"
 
-#: authentication/serializers/connection_token.py:22
+#: authentication/serializers/connection_token.py:20
 msgid "Ticket info"
 msgstr "作業指示情報"
 
-#: authentication/serializers/connection_token.py:23
+#: authentication/serializers/connection_token.py:21
 #: perms/models/asset_permission.py:71 perms/serializers/permission.py:36
 #: perms/serializers/permission.py:56
 #: tickets/models/ticket/apply_application.py:28
@@ -2758,17 +2774,11 @@ msgstr "作業指示情報"
 msgid "Actions"
 msgstr "アクション"
 
-#: authentication/serializers/connection_token.py:44
+#: authentication/serializers/connection_token.py:42
 #: perms/serializers/permission.py:38 perms/serializers/permission.py:57
 #: users/serializers/user.py:96 users/serializers/user.py:172
 msgid "Is expired"
 msgstr "期限切れです"
-
-#: authentication/serializers/connection_token.py:79
-msgid "Reusable connection token is not allowed, global setting not enabled"
-msgstr ""
-"再使用可能な接続トークンの使用は許可されていません。グローバル設定は有効に"
-"なっていません"
 
 #: authentication/serializers/password_mfa.py:16
 #: authentication/serializers/password_mfa.py:24
@@ -3899,7 +3909,7 @@ msgstr ""
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "組織のリソース ({}) は削除できません"
 
-#: orgs/apps.py:7 rbac/tree.py:118
+#: orgs/apps.py:7 rbac/tree.py:119
 msgid "App organizations"
 msgstr "アプリ組織"
 
@@ -4058,27 +4068,27 @@ msgstr "{} 少なくとも1つのシステムロール"
 msgid "RBAC"
 msgstr "RBAC"
 
-#: rbac/builtin.py:113
+#: rbac/builtin.py:114
 msgid "SystemAdmin"
 msgstr "システム管理者"
 
-#: rbac/builtin.py:116
+#: rbac/builtin.py:117
 msgid "SystemAuditor"
 msgstr "システム監査人"
 
-#: rbac/builtin.py:119
+#: rbac/builtin.py:120
 msgid "SystemComponent"
 msgstr "システムコンポーネント"
 
-#: rbac/builtin.py:125
+#: rbac/builtin.py:126
 msgid "OrgAdmin"
 msgstr "組織管理者"
 
-#: rbac/builtin.py:128
+#: rbac/builtin.py:129
 msgid "OrgAuditor"
 msgstr "監査員を組織する"
 
-#: rbac/builtin.py:131
+#: rbac/builtin.py:132
 msgid "OrgUser"
 msgstr "組織ユーザー"
 
@@ -4229,19 +4239,19 @@ msgstr "私の資産"
 msgid "Applet"
 msgstr "リモートアプリケーション"
 
-#: rbac/tree.py:119
+#: rbac/tree.py:120
 msgid "Ticket comment"
 msgstr "チケットコメント"
 
-#: rbac/tree.py:120 tickets/models/ticket/general.py:307
+#: rbac/tree.py:121 tickets/models/ticket/general.py:307
 msgid "Ticket"
 msgstr "チケット"
 
-#: rbac/tree.py:121
+#: rbac/tree.py:122
 msgid "Common setting"
 msgstr "共通設定"
 
-#: rbac/tree.py:122
+#: rbac/tree.py:123
 msgid "View permission tree"
 msgstr "権限ツリーの表示"
 
@@ -5722,7 +5732,7 @@ msgstr "出力"
 msgid "Risk level"
 msgstr "リスクレベル"
 
-#: terminal/connect_methods.py:55
+#: terminal/connect_methods.py:34
 msgid "DB Client"
 msgstr "データベース クライアント"
 
