@@ -54,10 +54,11 @@ class ConnectionToken(JMSOrgBaseModel):
 
     class Meta:
         ordering = ('-date_expired',)
-        verbose_name = _('Connection token')
         permissions = [
-            ('view_connectiontokensecret', _('Can view connection token secret'))
+            ('expire_connectiontoken', _('Can expire connection token')),
+            ('reuse_connectiontoken', _('Can reuse connection token')),
         ]
+        verbose_name = _('Connection token')
 
     @property
     def is_expired(self):
@@ -79,6 +80,15 @@ class ConnectionToken(JMSOrgBaseModel):
     def expire(self):
         self.date_expired = timezone.now()
         self.save(update_fields=['date_expired'])
+
+    def set_reusable(self, is_reusable):
+        self.is_reusable = is_reusable
+        if self.is_reusable:
+            seconds = settings.CONNECTION_TOKEN_REUSABLE_EXPIRATION
+        else:
+            seconds = settings.CONNECTION_TOKEN_ONETIME_EXPIRATION
+        self.date_expired = timezone.now() + timedelta(seconds=seconds)
+        self.save(update_fields=['is_reusable', 'date_expired'])
 
     def renewal(self):
         """ 续期 Token，将来支持用户自定义创建 token 后，续期策略要修改 """
@@ -255,4 +265,7 @@ class ConnectionToken(JMSOrgBaseModel):
 class SuperConnectionToken(ConnectionToken):
     class Meta:
         proxy = True
+        permissions = [
+            ('view_superconnectiontokensecret', _('Can view super connection token secret'))
+        ]
         verbose_name = _("Super connection token")
