@@ -1,5 +1,7 @@
 // content_script.js
 
+const debug = console.log
+
 // 创建一个 Mutation Observer 实例
 const observer = new MutationObserver(function (mutationsList) {
     // 遍历每个发生变化的 mutation
@@ -10,7 +12,7 @@ const observer = new MutationObserver(function (mutationsList) {
             const links = document.getElementsByTagName('a');
 
             // 遍历 <a> 标签元素并修改链接属性
-            console.log("开始替换标签")
+            debug("开始替换标签")
             for (let i = 0; i < links.length; i++) {
                 links[i].target = '_self'; // 将 target 属性设置为 _self，当前窗口打开
             }
@@ -27,43 +29,26 @@ const observer = new MutationObserver(function (mutationsList) {
 // 开始观察 document.body 的子节点变化
 observer.observe(document.body, {childList: true, subtree: true});
 
-chrome.runtime.onMessage.addListener(
-    function (request, sender, sendResponse) {
-        console.log(request.url);
-        $("iframe").attr("src", request.url);
-        sendResponse({farewell: "goodbye"});
-    }
-)
-
 document.addEventListener("contextmenu", function (event) {
-    console.log('On context')
+    debug('On context')
     event.preventDefault();
 });
 
-var AllowedKeys = ['P', 'F', 'C', 'V']
+const AllowedKeys = ['P', 'F', 'C', 'V']
 window.addEventListener("keydown", function (e) {
     if (e.key === "F12" || (e.ctrlKey && !AllowedKeys.includes(e.key.toUpperCase()))) {
         e.preventDefault();
         e.stopPropagation();
-        console.log('Press key: ', e.ctrlKey ? 'Ctrl' : '', e.shiftKey ? ' Shift' : '', e.key)
+        debug('Press key: ', e.ctrlKey ? 'Ctrl' : '', e.shiftKey ? ' Shift' : '', e.key)
     }
 }, true);
-
-// 保存原始的 window.open 函数引用
-var originalOpen = window.open;
 
 // 修改 window.open 函数
 window.open = function (url, target, features) {
     // 将 target 强制设置为 "_self"，使得新页面在当前标签页中打开
     target = "_self";
-
-    // 修改当前页面的 URL
-    location.href = url;
-
+    debug('Open url: ', url, target, features)
     // 调用原始的 window.open 函数
-    return originalOpen.call(this, url, target, features);
+    window.href = url
+    // return originalOpen.call(this, url, target, features);
 };
-
-
-chrome.runtime.sendMessage({greeting: "hello"}, function (response) {
-});

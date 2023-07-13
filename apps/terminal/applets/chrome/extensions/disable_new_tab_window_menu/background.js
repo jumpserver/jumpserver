@@ -1,23 +1,54 @@
 // background.js
 
+const tabs = []
+const debug = console.log
+
 // 监听标签页的创建事件
 chrome.tabs.onCreated.addListener(function (tab) {
     // 获取当前窗口的所有标签页
-    chrome.tabs.query({currentWindow: true}, function (tabs) {
-        // 如果当前窗口的标签页数量大于1，则关闭新创建的标签页
-        if (tabs.length > 1) {
-            chrome.tabs.remove(tab.id);
-        }
-    });
+    debug('New tab add, tabs : ', tabs)
+    tabs.push(tab)
 });
 
-// 监听窗口的创建事件
-chrome.windows.onCreated.addListener(function (window) {
-// 获取当前所有窗口
-    chrome.windows.getAll(function (windows) {
-        // 如果当前窗口数量大于1，则关闭新创建的窗口
-        if (windows.length > 1) {
-            chrome.windows.remove(window.id);
-        }
-    });
-});
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    debug('Tab changed xx: ', tabId, changeInfo, tab)
+    if (changeInfo.status !== 'loading') {
+        return
+    }
+    const tabFind = tabs.findIndex(t => t.id === tabId)
+    if (tabFind === -1) {
+        debug('Tab not found: ', tabId, tabs)
+        return
+    }
+    Object.assign(tabs[tabFind], tab)
+
+    const blockUrls = ['chrome://newtab/']
+    if (!tab.url || blockUrls.includes(tab.url) || tab.url.startsWith('chrome://')) {
+        debug('Blocked url, destroy: ', tab.url)
+        chrome.tabs.remove(tabId);
+        return
+    }
+
+    // 第一个 tab 不做限制
+    // 修改初始 tab 的状态，因为第一个 tab 没有地址栏，可以允许它自由跳转
+    if (tabs.length === 1) {
+        debug('First tab, pass')
+        return
+    }
+
+    const firstUrl = tabs[0].url
+    const curUrl = tab.url
+    if (!firstUrl.startsWith('http') || !curUrl.startsWith('http')) {
+        debug('First tab url empty, or current empty, pass ', firstUrl, curUrl)
+        return
+    }
+
+    const firstTabHost = new URL(firstUrl).host
+    const curHost = new URL(curUrl).host
+    const firstDomain = firstTabHost.split('.').slice(-2).join('.')
+    const curDomain = curHost.split('.').slice(-2).join('.')
+    if (firstDomain !== curDomain) {
+        debug('Not same domain, destroy: ', firstTabHost, ' current: ', curHost)
+        chrome.tabs.remove(tabId);
+    }
+})
