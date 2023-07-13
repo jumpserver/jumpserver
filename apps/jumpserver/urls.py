@@ -1,12 +1,12 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import unicode_literals
+
 import os
 
 import private_storage.urls
-
-from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.urls import path, include, re_path
 from django.views.i18n import JavaScriptCatalog
 
 from . import views, api
@@ -64,6 +64,9 @@ urlpatterns += [
     # Protect media
     path('media/', include(private_storage.urls)),
 ]
+if settings.DEBUG:
+    urlpatterns += static('/luna/', document_root=(settings.DATA_DIR + '/luna'))
+    urlpatterns += static('/lina/', document_root=(settings.DATA_DIR + '/lina'))
 
 # js i18n 路由文件
 urlpatterns += [

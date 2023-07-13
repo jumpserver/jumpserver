@@ -35,7 +35,6 @@ celerybeat-schedule.db
 docs/_build/
 xpack
 xpack.bak
-logs/*
 ### Vagrant ###
 .vagrant/
 release/*
