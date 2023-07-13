@@ -49,6 +49,7 @@ def send_mail_attachment_async(subject, message, recipient_list, attachment_list
     if attachment_list is None:
         attachment_list = []
     from_email = settings.EMAIL_FROM or settings.EMAIL_HOST_USER
+    subject = (settings.EMAIL_SUBJECT_PREFIX or '') + subject
     email = EmailMultiAlternatives(
         subject=subject,
         body=message,
