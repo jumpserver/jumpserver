@@ -98,6 +98,9 @@ JumpServer 是广受欢迎的开源堡垒机，是符合 4A 规范的专业运�
 | [KoKo](https://github.com/jumpserver/koko)             | <a href="https://github.com/jumpserver/koko/releases"><img alt="Koko release" src="https://img.shields.io/github/release/jumpserver/koko.svg" /></a>                   | JumpServer 字符协议 Connector 项目，替代原来 Python 版本的 [Coco](https://github.com/jumpserver/coco) |
 | [Lion](https://github.com/jumpserver/lion-release)     | <a href="https://github.com/jumpserver/lion-release/releases"><img alt="Lion release" src="https://img.shields.io/github/release/jumpserver/lion-release.svg" /></a>   | JumpServer 图形协议 Connector 项目，依赖 [Apache Guacamole](https://guacamole.apache.org/)       |
 | [Magnus](https://github.com/jumpserver/magnus-release) | <a href="https://github.com/jumpserver/magnus-release/releases"><img alt="Magnus release" src="https://img.shields.io/github/release/jumpserver/magnus-release.svg" /> | JumpServer 数据库代理 Connector 项目                                                           |
+| [Chen](https://github.com/jumpserver/chen-release) | <a href="https://github.com/jumpserver/chen-release/releases"><img alt="Chen release" src="https://img.shields.io/github/release/jumpserver/chen-release.svg" /> | JumpServer Web DB 项目，替代原来的 OmniDB                                                           |
+| [Kael](https://github.com/jumpserver/kael) | <a href="https://github.com/jumpserver/kael/releases"><img alt="Kael release" src="https://img.shields.io/github/release/jumpserver/kael.svg" /> |  JumpServer 连接 GPT 资产的组件项目                                                           |
+| [Wisp](https://github.com/jumpserver/wisp) | <a href="https://github.com/jumpserver/wisp/releases"><img alt="Magnus release" src="https://img.shields.io/github/release/jumpserver/wisp.svg" /> | JumpServer 各系统终端组件和 Core Api 通信的组件项目                                                           |
 | [Clients](https://github.com/jumpserver/clients)       | <a href="https://github.com/jumpserver/clients/releases"><img alt="Clients release" src="https://img.shields.io/github/release/jumpserver/clients.svg" />              | JumpServer 客户端 项目                                                                       |
 | [Installer](https://github.com/jumpserver/installer)   | <a href="https://github.com/jumpserver/installer/releases"><img alt="Installer release" src="https://img.shields.io/github/release/jumpserver/installer.svg" />        | JumpServer 安装包 项目                                                                       |
 
@@ -109,10 +112,6 @@ JumpServer是一款安全产品，请参考 [基本安全建议](https://docs.ju
 - 邮箱：support@fit2cloud.com
 - 电话：400-052-0755
 
-## 致谢开源
-
-- [Apache Guacamole](https://guacamole.apache.org/)： Web 页面连接 RDP、SSH、VNC 等协议资产，JumpServer Lion 组件使用到该项目；
-- [OmniDB](https://omnidb.org/)： Web 页面连接使用数据库，JumpServer Web 数据库组件使用到该项目。
 
 ## License & Copyright
 
