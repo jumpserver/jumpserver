@@ -187,7 +187,7 @@ class Config(dict):
         'DEBUG': False,
         'DEBUG_DEV': False,
         'LOG_LEVEL': 'DEBUG',
-        'LOG_DIR': os.path.join(PROJECT_DIR, 'logs'),
+        'LOG_DIR': os.path.join(PROJECT_DIR, 'data', 'logs'),
         'DB_ENGINE': 'mysql',
         'DB_NAME': 'jumpserver',
         'DB_HOST': '127.0.0.1',

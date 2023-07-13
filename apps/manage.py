@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 import os
 import sys
-import errno
 
 if __name__ == "__main__":
     try:
-        os.makedirs('../logs')
+        os.makedirs('../data/logs')
     except:
         pass
 
