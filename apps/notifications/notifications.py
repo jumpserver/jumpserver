@@ -5,6 +5,7 @@ from typing import Iterable
 
 from celery import shared_task
 from django.utils.translation import gettext_lazy as _
+from django.utils import translation
 from html2text import HTML2Text
 
 from common.utils import lazyproperty
@@ -65,7 +66,9 @@ class Message(metaclass=MessageType):
         return cls.__name__
 
     def publish_async(self):
-        return publish_task.delay(self)
+        lang = translation.get_language()
+        with translation.override(lang):
+            return publish_task.delay(self)
 
     @classmethod
     def gen_test_msg(cls):

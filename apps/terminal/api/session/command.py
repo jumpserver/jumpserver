@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 #
-from django.conf import settings
+from django.utils import translation
 from django.utils import timezone
 from rest_framework import generics
 from rest_framework.fields import DateTimeField
 from rest_framework.response import Response
 
-from acls.models import CommandFilterACL
 from terminal.models import CommandStorage, Session, Command
 from terminal.filters import CommandFilter
 from orgs.utils import current_org
 from common.api import JMSBulkModelViewSet
-from common.utils import get_logger, is_uuid
+from common.utils import get_logger
 from terminal.serializers import (
     SessionCommandSerializer,  InsecureCommandAlertSerializer
 )
@@ -200,31 +199,22 @@ class InsecureCommandAlertAPI(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         serializer = InsecureCommandAlertSerializer(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)
-        commands = serializer.validated_data
+        commands = serializer.data
 
-        acl_ids = []
-        for cmd in commands:
-            acl_id = cmd.get('cmd_filter_acl')
-            if not is_uuid(acl_id):
-                continue
-            acl_ids.append(acl_id)
+        lang = request.stream.COOKIES.get('django_language', 'en')
+        with translation.override(lang):
+            for command in commands:
+                risk_level = command.get('risk_level')
+                session_id = command.get('session')
+                context = serializer.msg_context_mapper.get(session_id)
+                acl = context.get('acl', {}).get('instance')
 
-        acls = CommandFilterACL.objects.filter(id__in=acl_ids)
-        acls_mapper = {str(acl.id): acl for acl in acls}
+                if risk_level in [RiskLevelChoices.reject, RiskLevelChoices.review_reject]:
+                    CommandAlertMessage(command).publish_async()
+                elif risk_level in [RiskLevelChoices.warning]:
+                    for reviewer in acl.reviewers.all():
+                        CommandWarningMessage(reviewer, command).publish_async()
+                else:
+                    logger.info(f'Risk level ignore: {risk_level}')
 
-        for command in commands:
-            risk_level = command.get('risk_level')
-
-            if risk_level in [RiskLevelChoices.reject, RiskLevelChoices.review_reject]:
-                CommandAlertMessage(command).publish_async()
-            elif risk_level in [RiskLevelChoices.warning]:
-                acl_id = command.get('cmd_filter_acl')
-                acl = acls_mapper.get(acl_id)
-                if not acl:
-                    logger.info(f'ACL not found: {acl_id}')
-                    continue
-                for reviewer in acl.reviewers.all():
-                    CommandWarningMessage(reviewer, command).publish_async()
-            else:
-                logger.info(f'Risk level ignore: {risk_level}')
         return Response({'msg': 'ok'})

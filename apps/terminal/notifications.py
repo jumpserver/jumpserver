@@ -70,33 +70,9 @@ class CommandWarningMessage(CommandAlertMixin, UserMessage):
     def __init__(self, user, command):
         super().__init__(user)
         self.command = command
-    
+
     def get_html_msg(self) -> dict:
-        session = self.command.get('session')
-        session_url = reverse(
-            'api-terminal:session-detail', kwargs={'pk': session},
-            external=True, api_to_ui=True
-        ) + '?oid={}'.format(self.command['org_id'])
-
-        asset = self.command.get('asset')
-        asset_url = reverse(
-            'assets:asset-detail', kwargs={'pk': asset},
-            api_to_ui=True, external=True, is_console=True
-        ) + '?oid={}'.format(self.command.get('org_id'))
-
-        cmd_filter_acl = self.command.get('cmd_filter_acl')
-        cmd_group = self.command.get('cmd_group')
-
-        context = {
-            "command": self.command['input'],
-            'asset_url': asset_url,
-            'session_url': session_url.replace(
-                '/terminal/sessions/', '/audit/sessions/sessions/'
-            ),
-            'cmd_filter_acl_url': settings.SITE_URL + '/ui/#/console/perms/cmd-acls/%s/' % cmd_filter_acl,
-            'cmd_group_url': settings.SITE_URL + '/ui/#/console/perms/cmd-groups/%s/' % cmd_group,
-        }
-        message = render_to_string('terminal/_msg_command_warning.html', context)
+        message = render_to_string('terminal/_msg_command_warning.html', self.command)
         return {
             'subject': self.subject,
             'message': message

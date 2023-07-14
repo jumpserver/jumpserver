@@ -1,23 +1,51 @@
 {% load i18n %}
 
 <div>
-    <b>{% trans 'Asset' %}:</b>
-    <span><a href="{{ asset_url }}" target="_blank">{% trans 'view' %}</a></span>
-    <br />
-    <b>{% trans 'Session' %}:</b>
-    <a href="{{ session_url }}" target="_blank">{% trans 'view' %}</a>
-    <br />
-    <b>{% trans 'Command acl' %}:</b>
-    <a href="{{ cmd_filter_acl_url }}" target="_blank">{% trans 'view' %}</a>
-    <br />
-    <b>{% trans 'Command acl group' %}:</b>
-    <a href="{{ cmd_group_url }}" target="_blank">{% trans 'view' %}</a>
-    <br />
-    <b>{% trans 'Command' %}: </b><br />
-    <code>
-        <pre style="
-            background-color: hsl(0,0%,96.5%);
-            border-radius: 5px;
-        "> {{ command }} </pre>
-    </code>
+    <p>
+        {% blocktranslate %}Danger command warning{% endblocktranslate %}
+    </p>
+    <table style="
+    display: inline-block;
+    margin: .6em 0;
+    max-width: 100%;
+    min-width: 60%;
+    white-space: nowrap;">
+        <thead>
+            <tr style="
+            text-align: left;
+            text-transform: uppercase;
+            background: rgb(249, 238, 181);
+            border: 1px solid #d9d7ce;">
+                <th style="
+                padding: 0 .6em;">
+                    {% trans 'Item' %}
+                </th>
+                <th style="
+                padding: 0 .6em;">
+                    {% trans 'Url' %}
+                </th>
+            </tr>
+        </thead>
+        <tbody style="
+        background: #fbfbf9;
+        border: 1px solid #d9d7ce;">
+            {% for name, item in msg_context.items %}
+            <tr>
+                <td style="
+                padding: 0 .6em;">
+                    {% trans item.label %}
+                </td>
+                <td style="
+                white-space: normal;
+                padding: 0 .6em;">
+                    {% if item.url %}
+                    <a href="{{ item.url }}" target="_blank">{{ item.name }}</a>
+                    {% else %}
+                    <span>{{ item.name }}</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
