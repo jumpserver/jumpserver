@@ -2,7 +2,10 @@
 #
 
 from django.conf import settings
+from django.http import HttpResponse
+from django.views.static import serve
 from rest_framework import generics
+from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 
@@ -148,7 +151,6 @@ class SettingsLogoApi(APIView):
     permission_classes = (AllowAny,)
 
     def get(self, request, *args, **kwargs):
-        from django.views.static import serve
         size = request.GET.get('size', 'small')
         interface_data = get_interface_setting_or_default()
         if size == 'small':
@@ -156,5 +158,12 @@ class SettingsLogoApi(APIView):
         else:
             logo_path = interface_data['logo_index']
 
-        logo_path = logo_path.replace('/static/', '/')
-        return serve(request, logo_path, document_root=settings.STATIC_ROOT)
+        if logo_path.startswith('/media/'):
+            logo_path = logo_path.replace('/media/', '')
+            document_root = settings.MEDIA_ROOT
+        elif logo_path.startswith('/static/'):
+            logo_path = logo_path.replace('/static/', '/')
+            document_root = settings.STATIC_ROOT
+        else:
+            return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+        return serve(request, logo_path, document_root=document_root)
