@@ -86,7 +86,7 @@ msgstr "模板"
 msgid "Skip"
 msgstr "跳过"
 
-#: accounts/const/account.py:28 audits/const.py:24 rbac/tree.py:229
+#: accounts/const/account.py:28 audits/const.py:24 rbac/tree.py:230
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "更新"
@@ -647,7 +647,7 @@ msgstr "ID"
 #: authentication/models/sso_token.py:16
 #: notifications/models/notification.py:12
 #: perms/api/user_permission/mixin.py:55 perms/models/asset_permission.py:58
-#: perms/serializers/permission.py:30 rbac/builtin.py:122
+#: perms/serializers/permission.py:30 rbac/builtin.py:123
 #: rbac/models/rolebinding.py:49 terminal/backends/command/models.py:17
 #: terminal/models/session/session.py:29 terminal/models/session/sharing.py:32
 #: terminal/notifications.py:111 terminal/notifications.py:159
@@ -1013,7 +1013,7 @@ msgid "{} disabled"
 msgstr "{} 已禁用"
 
 #: assets/automations/ping_gateway/manager.py:33
-#: authentication/models/connection_token.py:118
+#: authentication/models/connection_token.py:128
 msgid "No account"
 msgstr "没有账号"
 
@@ -1946,7 +1946,7 @@ msgstr "删除目录"
 
 #: audits/const.py:14 audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: perms/const.py:17 rbac/tree.py:230
+#: perms/const.py:17 rbac/tree.py:231
 msgid "Delete"
 msgstr "删除"
 
@@ -1970,13 +1970,13 @@ msgstr "下载"
 msgid "Rename dir"
 msgstr "映射目录"
 
-#: audits/const.py:23 rbac/tree.py:228
+#: audits/const.py:23 rbac/tree.py:229
 msgid "View"
 msgstr "查看"
 
 #: audits/const.py:26
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:227
+#: rbac/tree.py:228
 msgid "Create"
 msgstr "创建"
 
@@ -2212,23 +2212,27 @@ msgstr "上传 FTP 文件到外部存储"
 msgid "This action require verify your MFA"
 msgstr "该操作需要验证您的 MFA, 请先开启并配置"
 
-#: authentication/api/connection_token.py:288
+#: authentication/api/connection_token.py:219
+msgid "Reusable connection token is not allowed, global setting not enabled"
+msgstr "不允许使用可重复使用的连接令牌，未启用全局设置"
+
+#: authentication/api/connection_token.py:298
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名账号不支持当前资产"
 
-#: authentication/api/connection_token.py:310
+#: authentication/api/connection_token.py:320
 msgid "Account not found"
 msgstr "账号未找到"
 
-#: authentication/api/connection_token.py:313
+#: authentication/api/connection_token.py:323
 msgid "Permission expired"
 msgstr "授权已过期"
 
-#: authentication/api/connection_token.py:327
+#: authentication/api/connection_token.py:337
 msgid "ACL action is reject: {}({})"
 msgstr "ACL 动作是拒绝: {}({})"
 
-#: authentication/api/connection_token.py:331
+#: authentication/api/connection_token.py:341
 msgid "ACL action is review"
 msgstr "ACL 动作是复核"
 
@@ -2605,7 +2609,7 @@ msgid "Input username"
 msgstr "自定义用户名"
 
 #: authentication/models/connection_token.py:40
-#: authentication/serializers/connection_token.py:20
+#: authentication/serializers/connection_token.py:18
 msgid "Input secret"
 msgstr "自定义密码"
 
@@ -2642,31 +2646,39 @@ msgstr "失效日期"
 msgid "From ticket"
 msgstr "来自工单"
 
-#: authentication/models/connection_token.py:57
+#: authentication/models/connection_token.py:58
+msgid "Can expire connection token"
+msgstr "可以失效连接令牌"
+
+#: authentication/models/connection_token.py:59
+msgid "Can reuse connection token"
+msgstr "可以复用连接令牌"
+
+#: authentication/models/connection_token.py:61
 msgid "Connection token"
 msgstr "连接令牌"
 
-#: authentication/models/connection_token.py:59
-msgid "Can view connection token secret"
-msgstr "可以查看连接令牌密文"
-
-#: authentication/models/connection_token.py:106
+#: authentication/models/connection_token.py:116
 msgid "Connection token inactive"
 msgstr "连接令牌未激活"
 
-#: authentication/models/connection_token.py:109
+#: authentication/models/connection_token.py:119
 msgid "Connection token expired at: {}"
 msgstr "连接令牌过期: {}"
 
-#: authentication/models/connection_token.py:112
+#: authentication/models/connection_token.py:122
 msgid "No user or invalid user"
 msgstr "没有用户或用户失效"
 
-#: authentication/models/connection_token.py:115
+#: authentication/models/connection_token.py:125
 msgid "No asset or inactive asset"
 msgstr "没有资产或资产未激活"
 
-#: authentication/models/connection_token.py:258
+#: authentication/models/connection_token.py:269
+msgid "Can view super connection token secret"
+msgstr "可以查看超级连接令牌密文"
+
+#: authentication/models/connection_token.py:271
 msgid "Super connection token"
 msgstr "超级连接令牌"
 
@@ -2710,15 +2722,15 @@ msgstr "组件"
 msgid "Expired now"
 msgstr "立刻过期"
 
-#: authentication/serializers/connection_token.py:18
+#: authentication/serializers/connection_token.py:16
 msgid "Expired time"
 msgstr "过期时间"
 
-#: authentication/serializers/connection_token.py:22
+#: authentication/serializers/connection_token.py:20
 msgid "Ticket info"
 msgstr "工单信息"
 
-#: authentication/serializers/connection_token.py:23
+#: authentication/serializers/connection_token.py:21
 #: perms/models/asset_permission.py:71 perms/serializers/permission.py:36
 #: perms/serializers/permission.py:56
 #: tickets/models/ticket/apply_application.py:28
@@ -2726,15 +2738,11 @@ msgstr "工单信息"
 msgid "Actions"
 msgstr "动作"
 
-#: authentication/serializers/connection_token.py:44
+#: authentication/serializers/connection_token.py:42
 #: perms/serializers/permission.py:38 perms/serializers/permission.py:57
 #: users/serializers/user.py:96 users/serializers/user.py:172
 msgid "Is expired"
 msgstr "已过期"
-
-#: authentication/serializers/connection_token.py:79
-msgid "Reusable connection token is not allowed, global setting not enabled"
-msgstr "不允许使用可重复使用的连接令牌，未启用全局设置"
 
 #: authentication/serializers/password_mfa.py:16
 #: authentication/serializers/password_mfa.py:24
@@ -3849,7 +3857,7 @@ msgstr "LDAP 同步设置组织为当前组织，请切换其他组织后再进�
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "组织存在资源 ({}) 不能被删除"
 
-#: orgs/apps.py:7 rbac/tree.py:118
+#: orgs/apps.py:7 rbac/tree.py:119
 msgid "App organizations"
 msgstr "组织管理"
 
@@ -4008,27 +4016,27 @@ msgstr "{} 至少有一个系统角色"
 msgid "RBAC"
 msgstr "RBAC"
 
-#: rbac/builtin.py:113
+#: rbac/builtin.py:114
 msgid "SystemAdmin"
 msgstr "系统管理员"
 
-#: rbac/builtin.py:116
+#: rbac/builtin.py:117
 msgid "SystemAuditor"
 msgstr "系统审计员"
 
-#: rbac/builtin.py:119
+#: rbac/builtin.py:120
 msgid "SystemComponent"
 msgstr "系统组件"
 
-#: rbac/builtin.py:125
+#: rbac/builtin.py:126
 msgid "OrgAdmin"
 msgstr "组织管理员"
 
-#: rbac/builtin.py:128
+#: rbac/builtin.py:129
 msgid "OrgAuditor"
 msgstr "组织审计员"
 
-#: rbac/builtin.py:131
+#: rbac/builtin.py:132
 msgid "OrgUser"
 msgstr "组织用户"
 
@@ -4178,19 +4186,19 @@ msgstr "我的资产"
 msgid "Applet"
 msgstr "远程应用"
 
-#: rbac/tree.py:119
+#: rbac/tree.py:120
 msgid "Ticket comment"
 msgstr "工单评论"
 
-#: rbac/tree.py:120 tickets/models/ticket/general.py:307
+#: rbac/tree.py:121 tickets/models/ticket/general.py:307
 msgid "Ticket"
 msgstr "工单管理"
 
-#: rbac/tree.py:121
+#: rbac/tree.py:122
 msgid "Common setting"
 msgstr "一般设置"
 
-#: rbac/tree.py:122
+#: rbac/tree.py:123
 msgid "View permission tree"
 msgstr "查看授权树"
 

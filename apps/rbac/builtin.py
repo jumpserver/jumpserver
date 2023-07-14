@@ -26,11 +26,12 @@ user_perms = (
 )
 
 system_user_perms = (
-                        ('authentication', 'connectiontoken', 'add,change,view', 'connectiontoken'),
-                        ('authentication', 'temptoken', 'add,change,view', 'temptoken'),
-                        ('authentication', 'accesskey', '*', '*'),
-                        ('tickets', 'ticket', 'view', 'ticket'),
-                    ) + user_perms + _view_all_joined_org_perms
+    ('authentication', 'connectiontoken', 'add,view,reuse,expire', 'connectiontoken'),
+    ('authentication', 'temptoken', 'add,change,view', 'temptoken'),
+    ('authentication', 'accesskey', '*', '*'),
+    ('tickets', 'ticket', 'view', 'ticket'),
+)
+system_user_perms += (user_perms + _view_all_joined_org_perms)
 
 _auditor_perms = (
     ('rbac', 'menupermission', 'view', 'audit'),
