@@ -19,10 +19,10 @@ from common.utils.timezone import local_now, local_zero_hour
 from ops.const import JobStatus
 from orgs.caches import OrgResourceStatisticsCache
 from orgs.utils import current_org
+from terminal.const import RiskLevelChoices
 from terminal.models import Session, Command
 from terminal.utils import ComponentsPrometheusMetricsUtil
 from users.models import User
-from terminal.const import RiskLevelChoices
 
 __all__ = ['IndexApi']
 
