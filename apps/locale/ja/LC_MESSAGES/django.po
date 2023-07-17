@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-14 18:19+0800\n"
+"POT-Creation-Date: 2023-07-17 17:12+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -200,7 +200,8 @@ msgstr "作成のみ"
 #: audits/models.py:53 authentication/models/connection_token.py:36
 #: perms/models/asset_permission.py:64 perms/serializers/permission.py:34
 #: terminal/backends/command/models.py:18 terminal/models/session/session.py:31
-#: terminal/notifications.py:110 terminal/serializers/command.py:20
+#: terminal/notifications.py:147 terminal/serializers/command.py:18
+#: terminal/templates/terminal/_msg_command_warning.html:39
 #: tickets/models/ticket/apply_asset.py:16 xpack/plugins/cloud/models.py:212
 msgid "Asset"
 msgstr "資産"
@@ -234,6 +235,7 @@ msgstr "ソース ID"
 #: assets/serializers/gateway.py:28 audits/models.py:54 ops/models/base.py:18
 #: perms/models/asset_permission.py:70 perms/serializers/permission.py:39
 #: terminal/backends/command/models.py:19 terminal/models/session/session.py:33
+#: terminal/templates/terminal/_msg_command_warning.html:45
 #: tickets/models/ticket/command_confirm.py:13 xpack/plugins/cloud/models.py:85
 msgid "Account"
 msgstr "アカウント"
@@ -654,16 +656,17 @@ msgstr "ID"
 #: perms/serializers/permission.py:30 rbac/builtin.py:123
 #: rbac/models/rolebinding.py:49 terminal/backends/command/models.py:17
 #: terminal/models/session/session.py:29 terminal/models/session/sharing.py:32
-#: terminal/notifications.py:111 terminal/notifications.py:159
-#: terminal/serializers/command.py:19 tickets/models/comment.py:21
-#: users/const.py:14 users/models/user.py:947 users/models/user.py:978
-#: users/serializers/group.py:18
+#: terminal/notifications.py:148 terminal/notifications.py:196
+#: terminal/serializers/command.py:17
+#: terminal/templates/terminal/_msg_command_warning.html:33
+#: tickets/models/comment.py:21 users/const.py:14 users/models/user.py:947
+#: users/models/user.py:978 users/serializers/group.py:18
 msgid "User"
 msgstr "ユーザー"
 
 #: accounts/serializers/account/account.py:428
 #: authentication/templates/authentication/_access_key_modal.html:33
-#: terminal/notifications.py:113 terminal/notifications.py:161
+#: terminal/notifications.py:150 terminal/notifications.py:198
 msgid "Date"
 msgstr "日付"
 
@@ -843,9 +846,10 @@ msgstr "アカウント"
 
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
 #: ops/serializers/job.py:55 terminal/const.py:84
-#: terminal/models/session/session.py:42 terminal/serializers/command.py:21
+#: terminal/models/session/session.py:42 terminal/serializers/command.py:19
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
+#: terminal/templates/terminal/_msg_command_warning.html:51
 msgid "Command"
 msgstr "コマンド"
 
@@ -877,6 +881,7 @@ msgid "The generated regular expression is incorrect: {}"
 msgstr "生成された正規表現が正しくありません: {}"
 
 #: acls/models/command_acl.py:100
+#: terminal/templates/terminal/_msg_command_warning.html:57
 msgid "Command acl"
 msgstr "コマンドフィルタリング"
 
@@ -1987,6 +1992,7 @@ msgid "Rename dir"
 msgstr "マップディレクトリ"
 
 #: audits/const.py:23 rbac/tree.py:229
+#: terminal/templates/terminal/_msg_command_warning.html:71
 msgid "View"
 msgstr "表示"
 
@@ -2070,6 +2076,7 @@ msgstr "書類"
 #: terminal/models/session/replay.py:9 terminal/models/session/sharing.py:18
 #: terminal/models/session/sharing.py:81
 #: terminal/templates/terminal/_msg_command_alert.html:10
+#: terminal/templates/terminal/_msg_command_warning.html:69
 #: tickets/models/ticket/command_confirm.py:15
 msgid "Session"
 msgstr "セッション"
@@ -2088,7 +2095,7 @@ msgid "Resource"
 msgstr "リソース"
 
 #: audits/models.py:96 audits/models.py:142 audits/models.py:168
-#: terminal/serializers/command.py:193
+#: terminal/serializers/command.py:76
 msgid "Datetime"
 msgstr "時間"
 
@@ -3912,6 +3919,7 @@ msgstr "アプリ組織"
 #: orgs/mixins/models.py:57 orgs/mixins/serializers.py:25 orgs/models.py:89
 #: rbac/const.py:7 rbac/models/rolebinding.py:56
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:63
+#: terminal/templates/terminal/_msg_command_warning.html:75
 #: tickets/models/ticket/general.py:302 tickets/serializers/ticket/ticket.py:60
 msgid "Organization"
 msgstr "組織"
@@ -5687,7 +5695,7 @@ msgstr "テスト失敗: {}"
 msgid "Test successful"
 msgstr "テスト成功"
 
-#: terminal/api/component/storage.py:124 terminal/notifications.py:194
+#: terminal/api/component/storage.py:124 terminal/notifications.py:231
 #: terminal/tasks.py:144
 msgid "Test failure: Account invalid"
 msgstr "テスト失敗: アカウントが無効"
@@ -5720,11 +5728,11 @@ msgstr "ターミナル管理"
 msgid "Input"
 msgstr "入力"
 
-#: terminal/backends/command/models.py:21 terminal/serializers/command.py:191
+#: terminal/backends/command/models.py:21 terminal/serializers/command.py:74
 msgid "Output"
 msgstr "出力"
 
-#: terminal/backends/command/models.py:25 terminal/serializers/command.py:25
+#: terminal/backends/command/models.py:25 terminal/serializers/command.py:23
 msgid "Risk level"
 msgstr "リスクレベル"
 
@@ -5952,7 +5960,7 @@ msgstr "再生ストレージ"
 msgid "type"
 msgstr "タイプ"
 
-#: terminal/models/component/terminal.py:89 terminal/serializers/command.py:194
+#: terminal/models/component/terminal.py:89 terminal/serializers/command.py:77
 msgid "Remote Address"
 msgstr "リモートアドレス"
 
@@ -6069,36 +6077,36 @@ msgstr "検証コードが無効"
 msgid "You have already joined this session"
 msgstr "すでにこのセッションに参加しています"
 
-#: terminal/notifications.py:21
+#: terminal/notifications.py:22
 msgid "Sessions"
 msgstr "セッション"
 
-#: terminal/notifications.py:68
+#: terminal/notifications.py:69
 #: terminal/templates/terminal/_msg_command_warning.html:5
 msgid "Danger command warning"
 msgstr "危険コマンドアラート"
 
-#: terminal/notifications.py:85
+#: terminal/notifications.py:122
 msgid "Danger command alert"
 msgstr "危険コマンドアラート"
 
-#: terminal/notifications.py:112 terminal/notifications.py:160
+#: terminal/notifications.py:149 terminal/notifications.py:197
 msgid "Level"
 msgstr "レベル"
 
-#: terminal/notifications.py:130
+#: terminal/notifications.py:167
 msgid "Batch danger command alert"
 msgstr "一括危険コマンド警告"
 
-#: terminal/notifications.py:178
+#: terminal/notifications.py:215
 msgid "Command and replay storage"
 msgstr "コマンド及び録画記憶"
 
-#: terminal/notifications.py:179
+#: terminal/notifications.py:216
 msgid "Connectivity alarm"
 msgstr "接続性アラーム"
 
-#: terminal/notifications.py:204
+#: terminal/notifications.py:241
 #: terminal/templates/terminal/_msg_check_command_replay_storage_connectivity.html:4
 msgid "Invalid storage"
 msgstr "無効なストレージ"
@@ -6170,35 +6178,35 @@ msgstr "RDS 远程应用注销时间限制"
 msgid "Load status"
 msgstr "ロードステータス"
 
-#: terminal/serializers/command.py:22
+#: terminal/serializers/command.py:20
 msgid "Session ID"
 msgstr "セッションID"
 
-#: terminal/serializers/command.py:158
+#: terminal/serializers/command.py:42
 msgid "Command Filter ACL"
 msgstr "コマンドフィルター"
 
-#: terminal/serializers/command.py:161
+#: terminal/serializers/command.py:45
 msgid "Command Group"
 msgstr "コマンドグループ"
 
-#: terminal/serializers/command.py:173
+#: terminal/serializers/command.py:56
 msgid "Invalid command filter ACL id"
 msgstr "無効なコマンドフィルターID"
 
-#: terminal/serializers/command.py:177
+#: terminal/serializers/command.py:60
 msgid "Invalid command group id"
 msgstr "無効なコマンドグループID"
 
-#: terminal/serializers/command.py:181
+#: terminal/serializers/command.py:64
 msgid "Invalid session id"
 msgstr "無効なセッションID"
 
-#: terminal/serializers/command.py:190
+#: terminal/serializers/command.py:73
 msgid "Account "
 msgstr "アカウント"
 
-#: terminal/serializers/command.py:192
+#: terminal/serializers/command.py:75
 msgid "Timestamp"
 msgstr "タイムスタンプ"
 
@@ -6382,6 +6390,10 @@ msgstr "アイテム"
 #: terminal/templates/terminal/_msg_command_warning.html:25
 msgid "Url"
 msgstr "リンク"
+
+#: terminal/templates/terminal/_msg_command_warning.html:63
+msgid "Command acl group"
+msgstr "コマンドフィルタリンググループ"
 
 #: terminal/utils/db_port_mapper.py:84
 msgid ""
@@ -7875,6 +7887,3 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:86
 msgid "Community edition"
 msgstr "コミュニティ版"
-
-msgid "Command acl group"
-msgstr "コマンドフィルタリンググループ"

@@ -11,6 +11,7 @@ from notifications.backends import BACKEND
 from notifications.models import SystemMsgSubscription
 from notifications.notifications import SystemMessage, UserMessage
 from terminal.models import Session, Command
+from acls.models import CommandFilterACL, CommandGroup
 from users.models import User
 
 logger = get_logger(__name__)
@@ -72,7 +73,43 @@ class CommandWarningMessage(CommandAlertMixin, UserMessage):
         self.command = command
 
     def get_html_msg(self) -> dict:
-        message = render_to_string('terminal/_msg_command_warning.html', self.command)
+        session = self.command.get('_session')
+        assert isinstance(session, Session)
+        acl = self.command.get('_cmd_filter_acl')
+        assert isinstance(acl, CommandFilterACL)
+        cmd_group = self.command.get('_cmd_group')
+        assert isinstance(cmd_group, CommandGroup)
+        org_id = session.org_id
+        context = {
+            'user': session.user,
+            'user_url': reverse(
+                'users:user-detail', kwargs={'pk': session.user_id},
+                api_to_ui=True, external=True, is_console=True
+            ) + '?oid={}'.format(org_id),
+            'asset': session.asset,
+            'asset_url': reverse(
+                'assets:asset-detail', kwargs={'pk': session.asset_id},
+                api_to_ui=True, external=True, is_console=True
+            ) + '?oid={}'.format(org_id),
+            'account': session.account,
+            'account_url': reverse(
+                'accounts:account-detail', kwargs={'pk': session.account_id},
+                api_to_ui=True, external=True, is_console=True
+            ) + '?oid={}'.format(org_id),
+            'command': self.command['input'],
+            'cmd_filter_acl': acl.name,
+            'cmd_filter_acl_url': settings.SITE_URL + f'/ui/#/console/perms/cmd-acls/{acl.id}/',
+            'cmd_group': cmd_group.name,
+            'cmd_group_url': settings.SITE_URL + f'/ui/#/console/perms/cmd-groups/{cmd_group.id}/',
+            'session_id': session.id,
+            'session_url': reverse(
+                'api-terminal:session-detail', kwargs={'pk': session.id},
+                external=True, api_to_ui=True
+            ) + '?oid={}'.format(org_id)
+                .replace('/terminal/sessions/', '/audit/sessions/sessions/'),
+            'org': session.org.name,
+        }
+        message = render_to_string('terminal/_msg_command_warning.html', context)
         return {
             'subject': self.subject,
             'message': message

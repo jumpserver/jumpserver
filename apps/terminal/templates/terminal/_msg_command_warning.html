@@ -29,23 +29,54 @@
         <tbody style="
         background: #fbfbf9;
         border: 1px solid #d9d7ce;">
-            {% for name, item in msg_context.items %}
             <tr>
-                <td style="
-                padding: 0 .6em;">
-                    {% trans item.label %}
-                </td>
-                <td style="
-                white-space: normal;
-                padding: 0 .6em;">
-                    {% if item.url %}
-                    <a href="{{ item.url }}" target="_blank">{% trans item.name %}</a>
-                    {% else %}
-                    <span>{% trans item.name %}</span>
-                    {% endif %}
+                <td style="padding: 0 .6em;">{% trans 'User' %}</td>
+                <td style="white-space: normal; padding: 0 .6em;">
+                    <a href="{{ user_url }}" target="_blank">{{ user }}</a>
                 </td>
             </tr>
-            {% endfor %}
+            <tr>
+                <td style="padding: 0 .6em;">{% trans 'Asset' %}</td>
+                <td style="white-space: normal; padding: 0 .6em;">
+                    <a href="{{ asset_url }}" target="_blank">{{ asset }}</a>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 0 .6em;">{% trans 'Account' %}</td>
+                <td style="white-space: normal; padding: 0 .6em;">
+                    <a href="{{ account_url }}" target="_blank">{{ account }}</a>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 0 .6em;">{% trans 'Command' %}</td>
+                <td style="white-space: normal; padding: 0 .6em;">
+                    <span>{{ command }}</span>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 0 .6em;">{% trans 'Command acl' %}</td>
+                <td style="white-space: normal; padding: 0 .6em;">
+                    <a href="{{ cmd_filter_acl_url }}" target="_blank">{{ cmd_filter_acl }}</a>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 0 .6em;">{% trans 'Command acl group' %}</td>
+                <td style="white-space: normal; padding: 0 .6em;">
+                    <a href="{{ cmd_group_url }}" target="_blank">{{ cmd_group }}</a>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 0 .6em;">{% trans 'Session' %}</td>
+                <td style="white-space: normal; padding: 0 .6em;">
+                    <a href="{{ session_url }}" target="_blank">{% trans 'View' %}</a>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 0 .6em;">{% trans 'Organization' %}</td>
+                <td style="white-space: normal; padding: 0 .6em;">
+                    <span>{{ org }}</span>
+                </td>
+            </tr>
         </tbody>
     </table>
 </div>

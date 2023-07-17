@@ -6,6 +6,7 @@ from rest_framework import generics
 from rest_framework.fields import DateTimeField
 from rest_framework.response import Response
 
+from acls.models import CommandFilterACL, CommandGroup
 from terminal.models import CommandStorage, Session, Command
 from terminal.filters import CommandFilter
 from orgs.utils import current_org
@@ -199,16 +200,49 @@ class InsecureCommandAlertAPI(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         serializer = InsecureCommandAlertSerializer(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)
-        commands = serializer.data
+        commands = serializer.validated_data
+        session_ids, acl_ids, cmd_group_ids = set(), set(), set()
+        for command in commands:
+            session_ids.add(command.get('session'))
+            acl_ids.add(command.get('cmd_filter_acl'))
+            cmd_group_ids.add(command.get('cmd_group'))
 
-        lang = request.stream.COOKIES.get('django_language', 'en')
+        sessions = Session.objects \
+            .filter(id__in=session_ids) \
+            .only('id', 'org_id', 'asset', 'asset_id', 'user',
+                  'user_id', 'account', 'account_id')
+        session_mapper = {str(i.id): i for i in sessions}
+        acls = CommandFilterACL.objects \
+            .filter(id__in=acl_ids) \
+            .only('id', 'name', 'reviewers')
+        acl_mapper = {str(i.id): i for i in acls}
+        cmd_groups = CommandGroup.objects \
+            .filter(id__in=cmd_group_ids) \
+            .only('id', 'name')
+        cmd_group_mapper = {str(i.id): i for i in cmd_groups}
+
+        lang = request.stream.COOKIES.get('django_language', 'zh')
         with translation.override(lang):
             for command in commands:
-                risk_level = command.get('risk_level')
                 session_id = command.get('session')
-                context = serializer.msg_context_mapper.get(session_id)
-                acl = context.get('acl', {}).get('instance')
+                session = session_mapper.get(session_id)
+                if session is None:
+                    logger.info('Session not found: %s', session_id)
+                command['_session'] = session
 
+                cmd_filter_acl_id = command.get('cmd_filter_acl')
+                acl = acl_mapper.get(cmd_filter_acl_id)
+                if acl is None:
+                    logger.info('ACL not found: %s', cmd_filter_acl_id)
+                command['_cmd_filter_acl'] = acl
+
+                cmd_group_id = command.get('cmd_group')
+                cmd_group = cmd_group_mapper.get(cmd_group_id)
+                if cmd_group is None:
+                    logger.info('ACL group not found: %s', cmd_group_id)
+                command['_cmd_group'] = cmd_group
+
+                risk_level = command.get('risk_level')
                 if risk_level in [RiskLevelChoices.reject, RiskLevelChoices.review_reject]:
                     CommandAlertMessage(command).publish_async()
                 elif risk_level in [RiskLevelChoices.warning]:
