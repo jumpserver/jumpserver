@@ -78,9 +78,7 @@ class SendAndVerifyCodeUtil(object):
     def __send_with_email(self):
         subject = self.other_args.get('subject')
         message = self.other_args.get('message')
-        from_email = settings.EMAIL_FROM or settings.EMAIL_HOST_USER
-        subject = (settings.EMAIL_SUBJECT_PREFIX or '') + subject
-        send_mail_async.delay(subject, message, from_email, [self.target], html_message=message)
+        send_mail_async(subject, message, [self.target], html_message=message)
 
     def __send(self, code):
         """
