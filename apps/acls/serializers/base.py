@@ -1,4 +1,5 @@
 from django.utils.translation import ugettext_lazy as _
+from django.db import models
 from rest_framework import serializers
 
 from acls.models.base import ActionChoices, BaseACL
@@ -52,13 +53,30 @@ class ACLAccountsSerializer(serializers.Serializer):
 
 
 class ActionAclSerializer(serializers.Serializer):
-    action = LabeledChoiceField(
-        choices=ActionChoices.choices, default=ActionChoices.reject, label=_("Action")
-    )
+
+    __default_action_choices_mapper = {
+        'reject': ('reject', _('Reject')),
+        'accept': ('accept', _('Accept')),
+        'review': ('review', _('Review')),
+    }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.init_action()
         self.set_action_choices()
+
+    def init_action(self):
+        self.Meta.action_choices = models.TextChoices(
+            'ActionChoices',
+            getattr(
+                self.Meta, 'action_choices_mapper',
+                self.__default_action_choices_mapper,
+            ),
+        ) # type: ignore
+        self.fields['action'] = LabeledChoiceField(
+            choices=self.Meta.action_choices.choices,
+            default=self.Meta.action_choices.reject, label=_("Action")
+        )
 
     def set_action_choices(self):
         action = self.fields.get("action")
@@ -66,8 +84,11 @@ class ActionAclSerializer(serializers.Serializer):
             return
         choices = action.choices
         if not has_valid_xpack_license():
-            choices.pop(ActionChoices.review, None)
+            choices.pop(self.Meta.action_choices.review, None)
         action._choices = choices
+
+    class Meta:
+        action_choices: models.TextChoices
 
 
 class BaserACLSerializer(ActionAclSerializer, serializers.Serializer):

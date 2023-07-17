@@ -31,6 +31,12 @@ class CommandFilterACLSerializer(BaseSerializer, BulkOrgResourceModelSerializer)
     class Meta(BaseSerializer.Meta):
         model = CommandFilterACL
         fields = BaseSerializer.Meta.fields + ['command_groups']
+        action_choices_mapper = {
+            'reject': ('reject', _('Reject')),
+            'accept': ('accept', _('Accept')),
+            'review': ('review', _('Review')),
+            'warning': ('warning', _('Warning')),
+        }
 
 
 class CommandReviewSerializer(serializers.Serializer):
