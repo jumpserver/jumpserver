@@ -1,14 +1,14 @@
-from django.core.cache import cache
-from django.conf import settings
-from django.core.mail import send_mail
 from celery import shared_task
-
-from common.sdk.sms.exceptions import CodeError, CodeExpired, CodeSendTooFrequently
-from common.sdk.sms.endpoint import SMS
-from common.exceptions import JMSException
-from common.utils.random import random_string
-from common.utils import get_logger
+from django.conf import settings
+from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
+
+from common.exceptions import JMSException
+from common.sdk.sms.endpoint import SMS
+from common.sdk.sms.exceptions import CodeError, CodeExpired, CodeSendTooFrequently
+from common.tasks import send_mail_async
+from common.utils import get_logger
+from common.utils.random import random_string
 
 logger = get_logger(__file__)
 
@@ -79,7 +79,8 @@ class SendAndVerifyCodeUtil(object):
         subject = self.other_args.get('subject')
         message = self.other_args.get('message')
         from_email = settings.EMAIL_FROM or settings.EMAIL_HOST_USER
-        send_mail(subject, message, from_email, [self.target], html_message=message)
+        subject = (settings.EMAIL_SUBJECT_PREFIX or '') + subject
+        send_mail_async.delay(subject, message, from_email, [self.target], html_message=message)
 
     def __send(self, code):
         """
