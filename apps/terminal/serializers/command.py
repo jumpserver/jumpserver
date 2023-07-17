@@ -125,7 +125,7 @@ class InsecureCommandAlertListSerializer(serializers.ListSerializer):
                 },
                 'session': {
                     'id': str(session.id),
-                    'name': '',
+                    'name': 'View',
                     'label': 'Session',
                     'url': reverse(
                         'api-terminal:session-detail', kwargs={'pk': session.id},
