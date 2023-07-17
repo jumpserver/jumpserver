@@ -39,15 +39,9 @@
                 white-space: normal;
                 padding: 0 .6em;">
                     {% if item.url %}
-                    <a href="{{ item.url }}" target="_blank">
-                        {% if item.name %}
-                        {{ item.name }}
-                        {% else %}
-                        {% trans 'View' %}
-                        {% endif %}
-                    </a>
+                    <a href="{{ item.url }}" target="_blank">{% trans item.name %}</a>
                     {% else %}
-                    <span>{{ item.name }}</span>
+                    <span>{% trans item.name %}</span>
                     {% endif %}
                 </td>
             </tr>
