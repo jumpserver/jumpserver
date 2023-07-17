@@ -53,6 +53,8 @@ BOOTSTRAP_TOKEN = CONFIG.BOOTSTRAP_TOKEN
 DEBUG = CONFIG.DEBUG
 # SECURITY WARNING: If you run with debug turned on, more debug msg with be log
 DEBUG_DEV = CONFIG.DEBUG_DEV
+# SECURITY WARNING: If you run ansible task with debug turned on, more debug msg with be log
+DEBUG_ANSIBLE = CONFIG.DEBUG_ANSIBLE
 
 # Absolute url for some case, for example email link
 SITE_URL = CONFIG.SITE_URL
