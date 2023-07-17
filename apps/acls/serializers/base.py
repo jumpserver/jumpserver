@@ -1,10 +1,11 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from acls.models.base import ActionChoices, BaseACL
+from acls.models.base import BaseACL
 from common.serializers.fields import JSONManyToManyField, LabeledChoiceField
 from jumpserver.utils import has_valid_xpack_license
 from orgs.models import Organization
+from ..const import ActionChoices
 
 common_help_text = _(
     "With * indicating a match all. "
@@ -60,18 +61,21 @@ class ActionAclSerializer(serializers.Serializer):
         super().__init__(*args, **kwargs)
         self.set_action_choices()
 
-    def set_action_choices(self):
-        action = self.fields.get("action")
-        if not action:
-            return
-        choices = action.choices
-        if not has_valid_xpack_license():
-            choices.pop(ActionChoices.review, None)
-        action._choices = choices
-
-
-class BaserACLSerializer(ActionAclSerializer, serializers.Serializer):
     class Meta:
+        action_choices_exclude = [ActionChoices.warning]
+
+    def set_action_choices(self):
+        field_action = self.fields.get("action")
+        if not field_action:
+            return
+        if not has_valid_xpack_license():
+            field_action._choices.pop(ActionChoices.review, None)
+        for choice in self.Meta.action_choices_exclude:
+            field_action._choices.pop(choice, None)
+
+
+class BaseACLSerializer(ActionAclSerializer, serializers.Serializer):
+    class Meta(ActionAclSerializer.Meta):
         model = BaseACL
         fields_mini = ["id", "name"]
         fields_small = fields_mini + [
@@ -108,16 +112,16 @@ class BaserACLSerializer(ActionAclSerializer, serializers.Serializer):
         return valid_reviewers
 
 
-class BaserUserACLSerializer(BaserACLSerializer):
+class BaseUserACLSerializer(BaseACLSerializer):
     users = JSONManyToManyField(label=_('User'))
 
-    class Meta(BaserACLSerializer.Meta):
-        fields = BaserACLSerializer.Meta.fields + ['users']
+    class Meta(BaseACLSerializer.Meta):
+        fields = BaseACLSerializer.Meta.fields + ['users']
 
 
-class BaseUserAssetAccountACLSerializer(BaserUserACLSerializer):
+class BaseUserAssetAccountACLSerializer(BaseUserACLSerializer):
     assets = JSONManyToManyField(label=_('Asset'))
     accounts = serializers.ListField(label=_('Account'))
 
-    class Meta(BaserUserACLSerializer.Meta):
-        fields = BaserUserACLSerializer.Meta.fields + ['assets', 'accounts']
+    class Meta(BaseUserACLSerializer.Meta):
+        fields = BaseUserACLSerializer.Meta.fields + ['assets', 'accounts']
