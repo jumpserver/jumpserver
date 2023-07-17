@@ -44,7 +44,7 @@ class AbstractSessionCommand(OrgModelMixin):
 
     @classmethod
     def get_risk_level_str(cls, risk_level):
-        risk_mapper = dict(cls.RiskLevelChoices.choices)
+        risk_mapper = dict(RiskLevelChoices.choices)
         return risk_mapper.get(risk_level)
 
     def to_dict(self):

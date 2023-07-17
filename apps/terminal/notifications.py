@@ -11,11 +11,15 @@ from notifications.backends import BACKEND
 from notifications.models import SystemMsgSubscription
 from notifications.notifications import SystemMessage, UserMessage
 from terminal.models import Session, Command
+from acls.models import CommandFilterACL, CommandGroup
 from users.models import User
 
 logger = get_logger(__name__)
 
-__all__ = ('CommandAlertMessage', 'CommandExecutionAlert', 'StorageConnectivityMessage')
+__all__ = (
+    'CommandAlertMessage', 'CommandExecutionAlert', 'StorageConnectivityMessage',
+    'CommandWarningMessage'
+)
 
 CATEGORY = 'terminal'
 CATEGORY_LABEL = _('Sessions')
@@ -70,32 +74,72 @@ class CommandWarningMessage(CommandAlertMixin, UserMessage):
     def __init__(self, user, command):
         super().__init__(user)
         self.command = command
-    
+
     def get_html_msg(self) -> dict:
-        session = self.command.get('session')
-        session_url = reverse(
-            'api-terminal:session-detail', kwargs={'pk': session},
-            external=True, api_to_ui=True
-        ) + '?oid={}'.format(self.command['org_id'])
+        command = self.command
 
-        asset = self.command.get('asset')
-        asset_url = reverse(
-            'assets:asset-detail', kwargs={'pk': asset},
-            api_to_ui=True, external=True, is_console=True
-        ) + '?oid={}'.format(self.command.get('org_id'))
+        command_input = command['input']
+        user = command['user']
+        user_id = command.get('_user_id', '')
+        asset = command['asset']
+        asset_id = command.get('_asset_id', '')
+        account = command['account']
+        account_id = command.get('_account_id', '')
+        cmd_acl = command.get('_cmd_filter_acl')
+        cmd_group = command.get('_cmd_group')
+        session_id = command['session']
+        org_id = command['org_id']
+        org_name = command.get('_org_name') or org_id
 
-        cmd_filter_acl = self.command.get('cmd_filter_acl')
-        cmd_group = self.command.get('cmd_group')
+        user_url = asset_url = account_url = session_url = ''
+        if user_id:
+            user_url = reverse(
+                'users:user-detail', kwargs={'pk': user_id},
+                api_to_ui=True, external=True, is_console=True
+            ) + '?oid={}'.format(org_id)
+        if asset_id:
+            asset_url = reverse(
+                'assets:asset-detail', kwargs={'pk': asset_id},
+                api_to_ui=True, external=True, is_console=True
+            ) + '?oid={}'.format(org_id)
+        if account_id:
+            account_url = reverse(
+                'accounts:account-detail', kwargs={'pk': account_id},
+                api_to_ui=True, external=True, is_console=True
+            ) + '?oid={}'.format(org_id)
+        if session_id:
+            session_url = reverse(
+                'api-terminal:session-detail', kwargs={'pk': session_id},
+                external=True, api_to_ui=True
+            ) + '?oid={}'.format(org_id)
+            session_url = session_url.replace('/terminal/sessions/', '/audit/sessions/sessions/')
+
+        # Command ACL
+        cmd_acl_url = cmd_group_url = ''
+        cmd_acl_name = cmd_group_name = ''
+        if cmd_acl:
+            cmd_acl_name = cmd_acl.name
+            cmd_acl_url = settings.SITE_URL + f'/ui/#/console/perms/cmd-acls/{cmd_acl.id}/'
+        if cmd_group:
+            cmd_group_name = cmd_group.name
+            cmd_group_url = settings.SITE_URL + f'/ui/#/console/perms/cmd-groups/{cmd_group.id}/'
 
         context = {
-            "command": self.command['input'],
+            'command': command_input,
+            'user': user,
+            'user_url': user_url,
+            'asset': asset,
             'asset_url': asset_url,
-            'session_url': session_url.replace(
-                '/terminal/sessions/', '/audit/sessions/sessions/'
-            ),
-            'cmd_filter_acl_url': settings.SITE_URL + '/ui/#/console/perms/cmd-acls/%s/' % cmd_filter_acl,
-            'cmd_group_url': settings.SITE_URL + '/ui/#/console/perms/cmd-groups/%s/' % cmd_group,
+            'account': account,
+            'account_url': account_url,
+            'cmd_filter_acl': cmd_acl_name,
+            'cmd_filter_acl_url': cmd_acl_url,
+            'cmd_group': cmd_group_name,
+            'cmd_group_url': cmd_group_url,
+            'session_url': session_url,
+            'org': org_name,
         }
+
         message = render_to_string('terminal/_msg_command_warning.html', context)
         return {
             'subject': self.subject,
