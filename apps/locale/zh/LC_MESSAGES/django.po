@@ -7762,5 +7762,7 @@ msgstr "旗舰版"
 msgid "Community edition"
 msgstr "社区版"
 
+#: terminal/templates/terminal/_msg_command_warning.html:42
+#: terminal/templates/terminal/_msg_command_warning.html:44
 msgid "Command acl group"
 msgstr "命令过滤组"
