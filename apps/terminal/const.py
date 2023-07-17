@@ -13,11 +13,6 @@ class RiskLevelChoices(IntegerChoices):
     review_accept = 7, _('Review & Accept')
     review_cancel = 8, _('Review & Cancel')
 
-    def __eq__(self, value: IntegerChoices) -> bool:
-        if isinstance(value, dict):
-            return self.value == value.get('value')
-        return super().__eq__(value)
-
 
 class ReplayStorageType(TextChoices):
     null = 'null', 'Null',

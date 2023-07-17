@@ -73,42 +73,70 @@ class CommandWarningMessage(CommandAlertMixin, UserMessage):
         self.command = command
 
     def get_html_msg(self) -> dict:
-        session = self.command.get('_session')
-        assert isinstance(session, Session)
-        acl = self.command.get('_cmd_filter_acl')
-        assert isinstance(acl, CommandFilterACL)
-        cmd_group = self.command.get('_cmd_group')
-        assert isinstance(cmd_group, CommandGroup)
-        org_id = session.org_id
+        org_id = self.command.get('org_id')
         context = {
-            'user': session.user,
-            'user_url': reverse(
-                'users:user-detail', kwargs={'pk': session.user_id},
-                api_to_ui=True, external=True, is_console=True
-            ) + '?oid={}'.format(org_id),
-            'asset': session.asset,
-            'asset_url': reverse(
-                'assets:asset-detail', kwargs={'pk': session.asset_id},
-                api_to_ui=True, external=True, is_console=True
-            ) + '?oid={}'.format(org_id),
-            'account': session.account,
-            'account_url': reverse(
-                'accounts:account-detail', kwargs={'pk': session.account_id},
-                api_to_ui=True, external=True, is_console=True
-            ) + '?oid={}'.format(org_id),
-            'command': self.command['input'],
-            'cmd_filter_acl': acl.name,
-            'cmd_filter_acl_url': settings.SITE_URL + f'/ui/#/console/perms/cmd-acls/{acl.id}/',
-            'cmd_group': cmd_group.name,
-            'cmd_group_url': settings.SITE_URL + f'/ui/#/console/perms/cmd-groups/{cmd_group.id}/',
-            'session_id': session.id,
-            'session_url': reverse(
-                'api-terminal:session-detail', kwargs={'pk': session.id},
-                external=True, api_to_ui=True
-            ) + '?oid={}'.format(org_id)
-                .replace('/terminal/sessions/', '/audit/sessions/sessions/'),
-            'org': session.org.name,
+            'command': self.command.get('input'),
         }
+        session = self.command.get('_session')
+        if isinstance(session, Session):
+            org_id = session.org_id
+            user_id = session.user_id
+            context['user'] = session.user
+            context['user_url'] = reverse(
+                'users:user-detail', kwargs={'pk': user_id},
+                api_to_ui=True, external=True, is_console=True
+            ) + '?oid={}'.format(org_id),
+            asset_id = session.asset_id
+            context['asset'] = session.asset
+            account_id = session.account_id
+            context['account'] = session.account
+            session_id = session.id
+            context['session_id'] = session_id
+            context['org'] = session.org.name
+        else:
+            user_id = self.command.get('user')
+            context['user'] = user_id
+            context['user_url'] = ''
+            asset_id = self.command.get('asset')
+            context['asset'] = asset_id
+            account_id = self.command.get('account')
+            context['account'] = account_id
+            session_id = self.command.get('session')
+            context['session_id'] = session_id
+            context['org'] = org_id
+
+        context['asset_url'] = reverse(
+            'assets:asset-detail', kwargs={'pk': asset_id},
+            api_to_ui=True, external=True, is_console=True
+        ) + '?oid={}'.format(org_id),
+        context['account_url'] = reverse(
+            'accounts:account-detail', kwargs={'pk': account_id},
+            api_to_ui=True, external=True, is_console=True
+        ) + '?oid={}'.format(org_id),
+        context['session_url'] = reverse(
+            'api-terminal:session-detail', kwargs={'pk': session_id},
+            external=True, api_to_ui=True
+        ) + '?oid={}'.format(org_id) \
+            .replace('/terminal/sessions/', '/audit/sessions/sessions/'),
+
+        acl = self.command.get('_cmd_filter_acl')
+        if isinstance(acl, CommandFilterACL):
+            context['cmd_filter_acl'] = acl.name
+            cmd_filter_acl_id = acl.id
+        else:
+            cmd_filter_acl_id = self.command.get('cmd_filter_acl')
+            context['cmd_filter_acl'] = cmd_filter_acl_id
+        context['cmd_filter_acl_url'] = settings.SITE_URL + f'/ui/#/console/perms/cmd-acls/{cmd_filter_acl_id}/'
+
+        cmd_group = self.command.get('_cmd_group')
+        if isinstance(cmd_group, CommandGroup):
+            context['cmd_group'] = cmd_group.name
+            cmd_group_id = cmd_group.id
+        else:
+            cmd_group_id = self.command.get('cmd_group')
+            context['cmd_group'] = cmd_group_id
+        context['cmd_group_url'] = settings.SITE_URL + f'/ui/#/console/perms/cmd-groups/{cmd_group_id}/'
+
         message = render_to_string('terminal/_msg_command_warning.html', context)
         return {
             'subject': self.subject,
