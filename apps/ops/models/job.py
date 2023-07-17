@@ -27,6 +27,7 @@ from orgs.mixins.models import JMSOrgBaseModel
 from perms.models import AssetPermission
 from perms.utils import UserPermAssetUtil
 from terminal.notifications import CommandExecutionAlert
+from terminal.notifications import CommandWarningMessage
 
 
 def get_parent_keys(key, include_self=True):
@@ -398,6 +399,16 @@ class JobExecution(JMSOrgBaseModel):
                         "user": self.creator,
                     }).publish_async()
                     raise Exception("command is rejected by ACL")
+                elif acl.is_action(CommandFilterACL.ActionChoices.warning):
+                    # TODO: warning message
+                    # user = ''
+                    # command = {
+                    #     'user': '',
+                    #     'user_id': ''
+                    # }
+                    # CommandWarningMessage(user, command).publish_async()
+                    return True
+
         return False
 
     def check_command_acl(self):
