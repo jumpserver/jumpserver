@@ -459,7 +459,7 @@ class JSONManyToManyDescriptor:
 
         custom_q = Q()
         for rule in attr_rules:
-            value = getattr(obj, rule['name'], '')
+            value = getattr(obj, rule['name'], None) or ''
             rule_value = rule.get('value', '')
             rule_match = rule.get('match', 'exact')
 
@@ -474,7 +474,7 @@ class JSONManyToManyDescriptor:
             elif rule_match == 'exact':
                 res &= value == rule_value or rule_value == '*'
             elif rule_match == 'contains':
-                res &= rule_value in value
+                res &= (rule_value in value)
             elif rule_match == 'startswith':
                 res &= str(value).startswith(str(rule_value))
             elif rule_match == 'endswith':
