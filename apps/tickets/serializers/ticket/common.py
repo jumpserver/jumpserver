@@ -1,5 +1,5 @@
-from django.db.transaction import atomic
 from django.db.models import Model
+from django.db.transaction import atomic
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
@@ -69,8 +69,6 @@ class BaseApplyAssetApplicationSerializer(serializers.Serializer):
             error = _('The expiration date should be greater than the start date')
             raise serializers.ValidationError({'apply_date_expired': error})
 
-        attrs['apply_date_start'] = apply_date_start
-        attrs['apply_date_expired'] = apply_date_expired
         return attrs
 
     @atomic
