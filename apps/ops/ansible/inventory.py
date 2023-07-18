@@ -139,7 +139,7 @@ class JMSInventory:
                 ansible_config['ansible_winrm_server_cert_validation'] = 'ignore'
             else:
                 ansible_config['ansible_winrm_scheme'] = 'http'
-                ansible_config['ansible_winrm_transport'] = 'plaintext'
+                ansible_config['ansible_winrm_transport'] = 'ntlm'
         return ansible_config
 
     def asset_to_host(self, asset, account, automation, protocols, platform):

@@ -56,7 +56,7 @@ class BaseType(TextChoices):
         for k, v in cls.get_choices():
             tp_base = {**base_default, **base.get(k, {})}
             tp_auto = {**automation_default, **automation.get(k, {})}
-            tp_protocols = {**protocols_default, **protocols.get(k, {})}
+            tp_protocols = {**protocols_default, **{'port_from_addr': False}, **protocols.get(k, {})}
             tp_protocols = cls._parse_protocols(tp_protocols, k)
             tp_constrains = {**tp_base, 'protocols': tp_protocols, 'automation': tp_auto}
             constrains[k] = tp_constrains
@@ -69,10 +69,15 @@ class BaseType(TextChoices):
         choices = protocol.get('choices', [])
         if choices == '__self__':
             choices = [tp]
-        protocols = [
-            {'name': name, **settings.get(name, {})}
-            for name in choices
-        ]
+
+        protocols = []
+        for name in choices:
+            protocol = {'name': name, **settings.get(name, {})}
+            setting = protocol.pop('setting', {})
+            setting_values = {k: v.get('default', None) for k, v in setting.items()}
+            protocol['setting'] = setting_values
+            protocols.append(protocol)
+
         if protocols:
             protocols[0]['default'] = True
         return protocols

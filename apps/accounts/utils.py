@@ -4,7 +4,7 @@ from rest_framework import serializers
 from accounts.const import (
     SecretType, DEFAULT_PASSWORD_RULES
 )
-from common.utils import gen_key_pair, random_string
+from common.utils import ssh_key_gen, random_string
 from common.utils import validate_ssh_private_key, parse_ssh_private_key_str
 
 
@@ -16,7 +16,7 @@ class SecretGenerator:
 
     @staticmethod
     def generate_ssh_key():
-        private_key, public_key = gen_key_pair()
+        private_key, public_key = ssh_key_gen()
         return private_key
 
     def generate_password(self):

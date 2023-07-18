@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             field=models.CharField(
                 choices=[('koko', 'KoKo'), ('guacamole', 'Guacamole'), ('omnidb', 'OmniDB'), ('xrdp', 'Xrdp'),
                          ('lion', 'Lion'), ('core', 'Core'), ('celery', 'Celery'), ('magnus', 'Magnus'),
-                         ('razor', 'Razor'), ('tinker', 'Tinker'), ('video_worker', 'Video Worker'), ('chen', 'Chen')],
-                default='koko', max_length=64, verbose_name='type'),
+                         ('razor', 'Razor'), ('tinker', 'Tinker'), ('video_worker', 'Video Worker'), ('chen', 'Chen'),
+                         ('kael', 'Kael')], default='koko', max_length=64, verbose_name='type'),
         ),
     ]

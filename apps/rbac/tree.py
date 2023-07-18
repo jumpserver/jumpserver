@@ -65,6 +65,7 @@ special_pid_mapper = {
     'acls.commandgroup': 'perms',
     'acls.loginacl': 'perms',
     'acls.loginassetacl': 'perms',
+    'acls.connectmethodacl': 'perms',
     'xpack.account': 'cloud_import',
     'xpack.syncinstancedetail': 'cloud_import',
     'xpack.syncinstancetask': 'cloud_import',
@@ -390,7 +391,7 @@ class PermissionTreeUtil:
             'chkDisabled': self.check_disabled,
             'checked': checked,
             'meta': {
-                'type':  tp,
+                'type': tp,
             },
             **data
         }

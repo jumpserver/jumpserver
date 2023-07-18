@@ -8,12 +8,13 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from rest_framework import status
+from rest_framework import status, serializers
 from rest_framework.decorators import action
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from accounts.const import AliasAccount
 from common.api import JMSModelViewSet
 from common.exceptions import JMSException
 from common.utils import random_string, get_logger, get_request_ip
@@ -27,7 +28,7 @@ from ..models import ConnectionToken, date_expired_default
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
     SuperConnectionTokenSerializer, ConnectTokenAppletOptionSerializer,
-    ConnectionTokenUpdateSerializer
+    ConnectionTokenReusableSerializer,
 )
 
 __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
@@ -211,6 +212,17 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
         instance.expire()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @action(methods=['PATCH'], detail=True, url_path='reuse')
+    def reuse(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if not settings.CONNECTION_TOKEN_REUSABLE:
+            raise serializers.ValidationError(_('Reusable connection token is not allowed, global setting not enabled'))
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        is_reusable = serializer.validated_data.get('is_reusable', False)
+        instance.set_reusable(is_reusable)
+        return Response(data=serializer.data)
+
     @action(methods=['POST'], detail=False)
     def exchange(self, request, *args, **kwargs):
         pk = request.data.get('id', None) or request.data.get('pk', None)
@@ -231,17 +243,16 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
     search_fields = filterset_fields
     serializer_classes = {
         'default': ConnectionTokenSerializer,
-        'update': ConnectionTokenUpdateSerializer,
-        'partial_update': ConnectionTokenUpdateSerializer,
+        'reuse': ConnectionTokenReusableSerializer,
     }
     http_method_names = ['get', 'post', 'patch', 'head', 'options', 'trace']
     rbac_perms = {
         'list': 'authentication.view_connectiontoken',
         'retrieve': 'authentication.view_connectiontoken',
-        'update': 'authentication.change_connectiontoken',
         'create': 'authentication.add_connectiontoken',
         'exchange': 'authentication.add_connectiontoken',
-        'expire': 'authentication.change_connectiontoken',
+        'reuse': 'authentication.reuse_connectiontoken',
+        'expire': 'authentication.expire_connectiontoken',
         'get_rdp_file': 'authentication.add_connectiontoken',
         'get_client_protocol_url': 'authentication.add_connectiontoken',
     }
@@ -282,13 +293,17 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         data['org_id'] = asset.org_id
         data['user'] = user
         data['value'] = random_string(16)
+
+        if account_name == AliasAccount.ANON and asset.category not in ['web', 'custom']:
+            raise ValidationError(_('Anonymous account is not supported for this asset'))
+
         account = self._validate_perm(user, asset, account_name)
         if account.has_secret:
             data['input_secret'] = ''
 
-        if account.username != '@INPUT':
+        if account.username != AliasAccount.INPUT:
             data['input_username'] = ''
-        if account.username == '@USER':
+        elif account.username == AliasAccount.USER:
             data['input_username'] = user.username
 
         ticket = self._validate_acl(user, asset, account)
@@ -341,7 +356,7 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
     rbac_perms = {
         'create': 'authentication.add_superconnectiontoken',
         'renewal': 'authentication.add_superconnectiontoken',
-        'get_secret_detail': 'authentication.view_connectiontokensecret',
+        'get_secret_detail': 'authentication.view_superconnectiontokensecret',
         'get_applet_info': 'authentication.view_superconnectiontoken',
         'release_applet_account': 'authentication.view_superconnectiontoken',
     }
@@ -371,7 +386,7 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
     @action(methods=['POST'], detail=False, url_path='secret')
     def get_secret_detail(self, request, *args, **kwargs):
         """ 非常重要的 api, 在逻辑层再判断一下 rbac 权限, 双重保险 """
-        rbac_perm = 'authentication.view_connectiontokensecret'
+        rbac_perm = 'authentication.view_superconnectiontokensecret'
         if not request.user.has_perm(rbac_perm):
             raise PermissionDenied('Not allow to view secret')
 

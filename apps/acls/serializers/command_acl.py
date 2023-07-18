@@ -31,6 +31,8 @@ class CommandFilterACLSerializer(BaseSerializer, BulkOrgResourceModelSerializer)
     class Meta(BaseSerializer.Meta):
         model = CommandFilterACL
         fields = BaseSerializer.Meta.fields + ['command_groups']
+        # 默认都支持所有的 actions
+        action_choices_exclude = []
 
 
 class CommandReviewSerializer(serializers.Serializer):

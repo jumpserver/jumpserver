@@ -17,9 +17,9 @@ from audits.models import UserLoginLog, PasswordChangeLog, OperateLog, FTPLog, J
 from common.utils import lazyproperty
 from common.utils.timezone import local_now, local_zero_hour
 from ops.const import JobStatus
-from ops.models import JobExecution
 from orgs.caches import OrgResourceStatisticsCache
 from orgs.utils import current_org
+from terminal.const import RiskLevelChoices
 from terminal.models import Session, Command
 from terminal.utils import ComponentsPrometheusMetricsUtil
 from users.models import User
@@ -128,12 +128,6 @@ class DateTimeMixin:
     def job_logs_queryset(self):
         t = self.days_to_datetime
         queryset = JobLog.objects.filter(date_created__gte=t)
-        return queryset
-
-    @lazyproperty
-    def jobs_executed_queryset(self):
-        t = self.days_to_datetime
-        queryset = JobExecution.objects.filter(date_created__gte=t)
         return queryset
 
 
@@ -255,7 +249,7 @@ class DatesLoginMetricMixin:
 
     @lazyproperty
     def commands_danger_amount(self):
-        return self.command_queryset.filter(risk_level=Command.RiskLevelChoices.dangerous).count()
+        return self.command_queryset.filter(risk_level=RiskLevelChoices.reject).count()
 
     @lazyproperty
     def job_logs_running_amount(self):

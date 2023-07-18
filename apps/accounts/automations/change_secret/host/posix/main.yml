@@ -4,6 +4,26 @@
     - name: Test privileged account
       ansible.builtin.ping:
 
+    - name: Check user
+      ansible.builtin.user:
+        name: "{{ account.username }}"
+        shell: "{{ params.shell }}"
+        home: "{{ params.home | default('/home/' + account.username, true) }}"
+        groups: "{{ params.groups }}"
+        expires: -1
+        state: present
+
+    - name: "Add {{ account.username }} group"
+      ansible.builtin.group:
+        name: "{{ account.username }}"
+        state: present
+
+    - name: Add user groups
+      ansible.builtin.user:
+        name: "{{ account.username }}"
+        groups: "{{ params.groups }}"
+      when: params.groups
+
     - name: Change password
       ansible.builtin.user:
         name: "{{ account.username }}"
@@ -32,6 +52,16 @@
         key: "{{ account.secret }}"
         exclusive: "{{ ssh_params.exclusive }}"
       when: account.secret_type == "ssh_key"
+
+    - name: Set sudo setting
+      ansible.builtin.lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: "^{{ account.username }} ALL="
+        line: "{{ account.username + ' ALL=(ALL) NOPASSWD: ' + params.sudo }}"
+        validate: visudo -cf %s
+      when:
+        - params.sudo
 
     - name: Refresh connection
       ansible.builtin.meta: reset_connection

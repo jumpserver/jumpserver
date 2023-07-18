@@ -1,5 +1,4 @@
 .git
-logs/*
 data/*
 .github
 tmp/*
