@@ -81,7 +81,6 @@ def check_user_expired_periodic():
 
 
 @shared_task
-@transaction.atomic
 def import_ldap_user():
     logger.info("Start import ldap user task")
     util_server = LDAPServerUtil()
