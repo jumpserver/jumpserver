@@ -83,7 +83,7 @@ class CommandWarningMessage(CommandAlertMixin, UserMessage):
         user_id = command.get('_user_id', '')
         asset = command['asset']
         asset_id = command.get('_asset_id', '')
-        account = command['_account']
+        account = command.get('_account', '')
         account_id = command.get('_account_id', '')
         cmd_acl = command.get('_cmd_filter_acl')
         cmd_group = command.get('_cmd_group')
