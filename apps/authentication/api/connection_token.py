@@ -125,6 +125,7 @@ class ConnectionTokenMixin:
             'bookmarktype:i': '3',
             'use redirection server name:i': '0',
             'smart sizing:i': '1',
+            'disableconnectionsharing:i': '1',
             # 'drivestoredirect:s': '*',
             # 'domain:s': ''
             # 'alternate shell:s:': '||MySQLWorkbench',
