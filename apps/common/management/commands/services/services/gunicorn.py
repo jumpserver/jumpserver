@@ -22,7 +22,8 @@ class GunicornService(BaseService):
             '-b', bind,
             '-k', 'uvicorn.workers.UvicornWorker',
             '-w', str(self.worker),
-            '--max-requests', '40960',
+            '--max-requests', '10240',
+            '--max-requests-jitter', '5120',
             '--access-logformat', log_format,
             '--access-logfile', '-'
         ]
