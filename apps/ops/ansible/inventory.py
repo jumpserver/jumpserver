@@ -268,6 +268,7 @@ class JMSInventory:
         data = {'all': {'hosts': {}}}
         for host in hosts:
             name = host.pop('name')
+            name = name.replace('[', '_').replace(']', '_')
             data['all']['hosts'][name] = host
         if self.exclude_localhost and data['all']['hosts'].__contains__('localhost'):
             data['all']['hosts'].update({'localhost': {'ansible_host': '255.255.255.255'}})
