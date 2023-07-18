@@ -23,23 +23,33 @@
 
 --------------------------
 
-JumpServer 是广受欢迎的开源堡垒机，是符合 4A 规范的专业运维安全审计系统。JumpServer 堡垒机帮助企业以更安全的方式管控和登录各种类型的资产，包括：
+JumpServer 是广受欢迎的开源堡垒机，是符合 4A 规范的专业运维安全审计系统。JumpServer 堡垒机帮助企业以更安全的方式管控和登录各种类型的资产。
 
-- **SSH**: Linux / Unix / 网络设备 等；
-- **Windows**: Web 方式连接 / 原生 RDP 连接；
-- **数据库**: MySQL / Oracle / SQLServer / PostgreSQL 等；
-- **Kubernetes**: 支持连接到 K8s 集群中的 Pods；
-- **Web 站点**: 各类系统的 Web 管理后台；
-- **应用**: 通过 Remote App 连接各类应用。
+
+|     资产类型     | 描述                                                                                          |
+|:------------:|:--------------------------------------------------------------------------------------------|
+|    Linux     | 支持通过 Web 终端、SSH 终端、远程应用 等方式连接 Linux、Unix 主机                                                 |
+|   Windows    | 支持通过 Web 终端、原生 RDP 客户端、远程应用 等方式连接 Windows 主机                                                |
+|     网络设备     | 支持通过 Web 终端、 SSH 终端、远程应用 等方式连接                                                              |
+|     数据库      | 支持通过 Web 终端、SSH 终端、原生数据库客户端、远程应用 等方式连接 MySQL、Oracle、SQLServer、PostgreSQL、Redis、MongoDB、ClickHouse 数据库 |
+|  Kubernetes  | 支持通过 Web 终端、SSH 终端 等方式连接到 K8s 集群中的 Pods                                                     |
+|    Web 站点    | 支持通过 Web 终端、原生 RDP 客户端工具、远程应用 等方式连接到各类系统的 Web 管理后台                                          |
+|     自定义      | 支持通过 远程应用 方式连接到各种自定义类型的资产                                                                   |
+
+[//]: # (| ChatGPT    | 支持通过 Web 终端 方式连接到 ChatGPT 服务                                                      |)
+
 
 ## 产品特色
 
-- **开源**: 零门槛，线上快速获取和安装；
-- **无插件**: 仅需浏览器，极致的 Web Terminal 使用体验；
-- **分布式**: 支持分布式部署和横向扩展，轻松支持大规模并发访问；
-- **多云支持**: 一套系统，同时管理不同云上面的资产；
-- **多租户**: 一套系统，多个子公司或部门同时使用；
-- **云端存储**: 审计录像云端存储，永不丢失；
+|  特色  | 描述  |
+|:----:|:----|
+|  开源  |零门槛，线上快速获取和安装|
+| 无插件  |仅需浏览器，极致的 Web Terminal 使用体验|
+| 分布式  |支持分布式部署和横向扩展，轻松支持大规模并发访问|
+| 多云支持 |一套系统，同时管理不同云上面的资产|
+| 多租户  |一套系统，多个子公司或部门同时使用|
+| 云端存储 |审计录像云端存储，永不丢失|
+
 
 ## UI 展示
 
@@ -64,18 +74,20 @@ JumpServer 是广受欢迎的开源堡垒机，是符合 4A 规范的专业运�
 
 ## 案例研究
 
-- [腾讯海外游戏：基于JumpServer构建游戏安全运营能力](https://blog.fit2cloud.com/?p=3704)
-- [万华化学：通过JumpServer管理全球化分布式IT资产，并且实现与云管平台的联动](https://blog.fit2cloud.com/?p=3504)
-- [雪花啤酒：JumpServer堡垒机使用体会](https://blog.fit2cloud.com/?p=3412)
-- [顺丰科技：JumpServer 堡垒机护航顺丰科技超大规模资产安全运维](https://blog.fit2cloud.com/?p=1147)
-- [沐瞳游戏：通过JumpServer管控多项目分布式资产](https://blog.fit2cloud.com/?p=3213)
-- [携程：JumpServer 堡垒机部署与运营实战](https://blog.fit2cloud.com/?p=851)
-- [大智慧：JumpServer 堡垒机让“大智慧”的混合 IT 运维更智慧](https://blog.fit2cloud.com/?p=882)
-- [小红书：JumpServer 堡垒机大规模资产跨版本迁移之路](https://blog.fit2cloud.com/?p=516)
-- [中手游：JumpServer堡垒机助力中手游提升多云环境下安全运维能力](https://blog.fit2cloud.com/?p=732)
-- [中通快递：JumpServer主机安全运维实践](https://blog.fit2cloud.com/?p=708)
-- [东方明珠：JumpServer高效管控异构化、分布式云端资产](https://blog.fit2cloud.com/?p=687)
-- [江苏农信：JumpServer堡垒机助力行业云安全运维](https://blog.fit2cloud.com/?p=666)
+|公司| 描述                                                                          |
+|:---:|:----------------------------------------------------------------------------|
+|腾讯海外游戏| [基于 JumpServer 构建游戏安全运营能力](https://blog.fit2cloud.com/?p=3704)              |
+|万华化学| [通过JumpServer管理全球化分布式IT资产，并且实现与云管平台的联动](https://blog.fit2cloud.com/?p=3504) |
+|雪花啤酒| [JumpServer堡垒机使用体会](https://blog.fit2cloud.com/?p=3412)                     |
+|顺丰科技| [JumpServer 堡垒机护航顺丰科技超大规模资产安全运维](https://blog.fit2cloud.com/?p=1147)        |
+|沐瞳游戏| [通过JumpServer管控多项目分布式资产](https://blog.fit2cloud.com/?p=3213)                |
+|携程| [JumpServer 堡垒机部署与运营实战](https://blog.fit2cloud.com/?p=851)|
+|大智慧| [JumpServer 堡垒机让“大智慧”的混合 IT 运维更智慧](https://blog.fit2cloud.com/?p=882)|
+|小红书| [JumpServer 堡垒机大规模资产跨版本迁移之路](https://blog.fit2cloud.com/?p=516)|
+|中手游| [JumpServer堡垒机助力中手游提升多云环境下安全运维能力](https://blog.fit2cloud.com/?p=732)|
+|中通快递| [JumpServer主机安全运维实践](https://blog.fit2cloud.com/?p=708)|
+|东方明珠| [JumpServer高效管控异构化、分布式云端资产](https://blog.fit2cloud.com/?p=687)|
+|江苏农信| [JumpServer堡垒机助力行业云安全运维](https://blog.fit2cloud.com/?p=666)|
 
 ## 社区交流
 
