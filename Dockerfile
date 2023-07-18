@@ -43,6 +43,7 @@ ARG TOOLS="                           \
         unzip                         \
         vim                           \
         git                           \
+        nmap                          \
         wget"
 
 ARG APT_MIRROR=http://mirrors.ustc.edu.cn
