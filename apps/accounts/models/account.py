@@ -106,14 +106,14 @@ class Account(AbsConnectivity, BaseAccount):
     def get_anonymous_account(cls):
         return cls(name=AliasAccount.ANON.label, username=AliasAccount.ANON.value, secret=None)
 
-    @lazyproperty
-    def versions(self):
-        return self.history.count()
-
     @classmethod
     def get_user_account(cls):
         """ @USER 动态用户的账号(self) """
         return cls(name=AliasAccount.USER.label, username=AliasAccount.USER.value, secret=None)
+
+    @lazyproperty
+    def versions(self):
+        return self.history.count()
 
     def get_su_from_accounts(self):
         """ 排除自己和以自己为 su-from 的账号 """
