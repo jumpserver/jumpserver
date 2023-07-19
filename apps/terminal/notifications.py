@@ -11,7 +11,6 @@ from notifications.backends import BACKEND
 from notifications.models import SystemMsgSubscription
 from notifications.notifications import SystemMessage, UserMessage
 from terminal.models import Session, Command
-from acls.models import CommandFilterACL, CommandGroup
 from users.models import User
 
 logger = get_logger(__name__)
@@ -69,7 +68,7 @@ class CommandAlertMixin:
 
 
 class CommandWarningMessage(CommandAlertMixin, UserMessage):
-    message_type_label = _('Danger command warning')
+    message_type_label = _('Command warning')
 
     def __init__(self, user, command):
         super().__init__(user)
@@ -88,6 +87,7 @@ class CommandWarningMessage(CommandAlertMixin, UserMessage):
         cmd_acl = command.get('_cmd_filter_acl')
         cmd_group = command.get('_cmd_group')
         session_id = command['session']
+        risk_level = command['_risk_level']
         org_id = command['org_id']
         org_name = command.get('_org_name') or org_id
 
@@ -137,6 +137,7 @@ class CommandWarningMessage(CommandAlertMixin, UserMessage):
             'cmd_group': cmd_group_name,
             'cmd_group_url': cmd_group_url,
             'session_url': session_url,
+            'risk_level': risk_level,
             'org': org_name,
         }
 
@@ -150,7 +151,7 @@ class CommandWarningMessage(CommandAlertMixin, UserMessage):
 class CommandAlertMessage(CommandAlertMixin, SystemMessage):
     category = CATEGORY
     category_label = CATEGORY_LABEL
-    message_type_label = _('Danger command alert')
+    message_type_label = _('Command reject')
 
     def __init__(self, command):
         self.command = command
