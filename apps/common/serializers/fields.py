@@ -232,7 +232,7 @@ class PhoneField(serializers.CharField):
     def to_representation(self, value):
         if value:
             try:
-                phone = phonenumbers.parse(value, 'CN')
+                phone = phonenumbers.parse(str(value), 'CN')
                 value = {'code': '+%s' % phone.country_code, 'phone': phone.national_number}
             except phonenumbers.NumberParseException:
                 value = {'code': '+86', 'phone': value}
