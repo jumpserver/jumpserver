@@ -12,6 +12,7 @@ from notifications.models import SystemMsgSubscription
 from notifications.notifications import SystemMessage, UserMessage
 from terminal.models import Session, Command
 from users.models import User
+from terminal.const import RiskLevelChoices
 
 logger = get_logger(__name__)
 
@@ -86,8 +87,8 @@ class CommandWarningMessage(CommandAlertMixin, UserMessage):
         account_id = command.get('_account_id', '')
         cmd_acl = command.get('_cmd_filter_acl')
         cmd_group = command.get('_cmd_group')
-        session_id = command['session']
-        risk_level = command['_risk_level']
+        session_id = command.get('session', '')
+        risk_level = command['risk_level']
         org_id = command['org_id']
         org_name = command.get('_org_name') or org_id
 
@@ -137,7 +138,7 @@ class CommandWarningMessage(CommandAlertMixin, UserMessage):
             'cmd_group': cmd_group_name,
             'cmd_group_url': cmd_group_url,
             'session_url': session_url,
-            'risk_level': risk_level,
+            'risk_level': RiskLevelChoices.get_label(risk_level),
             'org': org_name,
         }
 
@@ -174,7 +175,7 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
         session_detail_url = session_detail_url.replace(
             '/terminal/sessions/', '/audit/sessions/sessions/'
         )
-        level = Command.get_risk_level_str(command['risk_level'])
+        level = RiskLevelChoices.get_label(command['risk_level'])
         items = {
             _("Asset"): command['asset'],
             _("User"): command['user'],
@@ -223,7 +224,8 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
             ) + '?oid={}'.format(asset.org_id)
             assets_with_url.append([asset, url])
 
-        level = Command.get_risk_level_str(command['risk_level'])
+        level = RiskLevelChoices.get_label(command['risk_level'])
+
         items = {
             _("User"): command['user'],
             _("Level"): level,

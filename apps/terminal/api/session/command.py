@@ -216,31 +216,29 @@ class InsecureCommandAlertAPI(generics.CreateAPIView):
         cmd_groups = CommandGroup.objects.filter(id__in=cmd_group_ids).only('id', 'name')
         cmd_group_mapper = {str(i.id): i for i in cmd_groups}
 
-        lang = request.stream.COOKIES.get('django_language', 'zh')
-        with translation.override(lang):
-            for command in commands:
-                cmd_acl = acl_mapper.get(command['cmd_filter_acl'])
-                command['_cmd_filter_acl'] = cmd_acl
-                cmd_group = cmd_group_mapper.get(command['cmd_group'])
-                command['_cmd_group'] = cmd_group
-                session = session_mapper.get(command['session'])
-                risk_level = command.get('risk_level')
-                if session:
-                    command.update({
-                        '_user_id': session.user_id,
-                        '_asset_id': session.asset_id,
-                        '_account': session.account,
-                        '_account_id': session.account_id,
-                        '_org_name': session.org.name,
-                        '_risk_level': RiskLevelChoices.get_risk_level_str(risk_level),
-                    })
+        for command in commands:
+            cmd_acl = acl_mapper.get(command['cmd_filter_acl'])
+            command['_cmd_filter_acl'] = cmd_acl
+            cmd_group = cmd_group_mapper.get(command['cmd_group'])
+            command['_cmd_group'] = cmd_group
+            session = session_mapper.get(command['session'])
+            risk_level = command.get('risk_level')
 
-                if risk_level in [RiskLevelChoices.reject, RiskLevelChoices.review_reject]:
-                    CommandAlertMessage(command).publish_async()
-                elif risk_level in [RiskLevelChoices.warning]:
-                    for reviewer in cmd_acl.reviewers.all():
-                        CommandWarningMessage(reviewer, command).publish_async()
-                else:
-                    logger.info(f'Risk level ignore: {risk_level}')
+            if session:
+                command.update({
+                    '_user_id': session.user_id,
+                    '_asset_id': session.asset_id,
+                    '_account': session.account,
+                    '_account_id': session.account_id,
+                    '_org_name': session.org.name,
+                })
+
+            if risk_level in [RiskLevelChoices.reject, RiskLevelChoices.review_reject]:
+                CommandAlertMessage(command).publish_async()
+            elif risk_level in [RiskLevelChoices.warning]:
+                for reviewer in cmd_acl.reviewers.all():
+                    CommandWarningMessage(reviewer, command).publish_async()
+            else:
+                logger.info(f'Risk level ignore: {RiskLevelChoices.get_label(risk_level)}({risk_level})')
 
         return Response({'msg': 'ok'})

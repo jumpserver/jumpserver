@@ -396,29 +396,29 @@ class JobExecution(JMSOrgBaseModel):
                     CommandExecutionAlert({
                         "assets": self.current_job.assets.all(),
                         "input": self.material,
-                        "risk_level": 5,
+                        "risk_level": RiskLevelChoices.reject,
                         "user": self.creator,
                     }).publish_async()
                     raise Exception("command is rejected by ACL")
                 elif acl.is_action(CommandFilterACL.ActionChoices.warning):
-                    user = self.creator
                     command = {
                         'input': self.material,
-                        'user': user.name,
-                        '_user_id': user.id,
+                        'user': self.creator.name,
                         'asset': asset.name,
+                        'cmd_filter_acl': str(acl.id),
+                        'cmd_group': str(cg.id),
+                        'risk_level': RiskLevelChoices.warning,
+                        'org_id': self.org_id,
+                        '_user_id': self.creator.id,
                         '_asset_id': asset.id,
                         '_account': self.current_job.runas,
                         '_cmd_filter_acl': acl,
                         '_cmd_group': cg,
-                        'session': '',
-                        '_risk_level': RiskLevelChoices.warning.label,
-                        'org_id': self.org.id,
-                        '_org_name': self.org.name or self.org.id,
+                        '_org_name': self.org_name,
                     }
-                    CommandWarningMessage(user, command).publish_async()
+                    for reviewer in acl.reviewers.all():
+                        CommandWarningMessage(reviewer, command).publish_async()
                     return True
-
         return False
 
     def check_command_acl(self):
