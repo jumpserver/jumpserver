@@ -167,10 +167,9 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
             return
 
         protocols_required, protocols_default = self._get_protocols_required_default()
-        protocols_data = [
-            {'name': p.name, 'port': p.port}
-            for p in protocols_required + protocols_default
-        ]
+        protocol_map = {str(protocol.id): protocol for protocol in protocols_required + protocols_default}
+        protocols = list(protocol_map.values())
+        protocols_data = [{'name': p.name, 'port': p.port} for p in protocols]
         self.initial_data['protocols'] = protocols_data
 
     def _init_field_choices(self):
@@ -263,7 +262,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
                 error = p.get('name') + ': ' + _("port out of range (0-65535)")
                 raise serializers.ValidationError(error)
 
-        protocols_required, protocols_default = self._get_protocols_required_default()
+        protocols_required, __ = self._get_protocols_required_default()
         protocols_not_found = [p.name for p in protocols_required if p.name not in protocols_data_map]
         if protocols_not_found:
             raise serializers.ValidationError({
