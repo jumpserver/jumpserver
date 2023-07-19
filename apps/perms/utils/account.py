@@ -41,7 +41,10 @@ class PermAccountUtil(AssetPermissionUtil):
                 alias_date_expired_mapper[alias].append(perm.date_expired)
 
         asset_accounts = asset.accounts.all().active()
-        username_account_mapper = {account.username: account for account in asset_accounts}
+        # username_accounts_mapper = {account.username: account for account in asset_accounts}
+        username_accounts_mapper = defaultdict(list)
+        for account in asset_accounts:
+            username_accounts_mapper[account.username].append(account)
 
         cleaned_accounts_action_bit = defaultdict(int)
         cleaned_accounts_expired = defaultdict(list)
@@ -56,9 +59,10 @@ class PermAccountUtil(AssetPermissionUtil):
                 )
 
         for alias, action_bit in alias_action_bit_mapper.items():
+            account = None
             if alias == AliasAccount.USER:
-                if user.username in username_account_mapper:
-                    account = username_account_mapper[user.username]
+                if user.username in username_accounts_mapper:
+                    account = username_accounts_mapper[user.username]
                 else:
                     account = Account.get_user_account()
             elif alias == AliasAccount.INPUT:
@@ -67,12 +71,14 @@ class PermAccountUtil(AssetPermissionUtil):
                 account = Account.get_anonymous_account()
             elif alias.startswith('@'):
                 continue
-            elif alias in username_account_mapper:
-                account = username_account_mapper[alias]
-            else:
-                account = None
 
+            accounts = []
             if account:
+                accounts.append(account)
+            if alias in username_accounts_mapper:
+                accounts += username_accounts_mapper[alias]
+
+            for account in accounts:
                 cleaned_accounts_action_bit[account] |= action_bit
                 cleaned_accounts_expired[account].extend(alias_date_expired_mapper[alias])
 
