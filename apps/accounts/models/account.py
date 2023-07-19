@@ -140,7 +140,10 @@ class AccountTemplate(BaseAccount):
     def get_su_from_account_templates(cls, pk=None):
         if pk is None:
             return cls.objects.all()
-        return cls.objects.exclude(Q(id=pk) | Q(_id=pk))
+        return cls.objects.exclude(Q(id=pk) | Q(su_from_id=pk))
+
+    def __str__(self):
+        return f'{self.name}({self.username})'
 
     def get_su_from_account(self, asset):
         su_from = self.su_from
