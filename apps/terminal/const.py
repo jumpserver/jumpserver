@@ -14,9 +14,9 @@ class RiskLevelChoices(IntegerChoices):
     review_cancel = 8, _('Review & Cancel')
 
     @classmethod
-    def get_risk_level_str(cls, risk_level):
-        risk_mapper = dict(cls.choices)
-        return risk_mapper.get(risk_level)
+    def get_label(cls, level):
+        label = dict(cls.choices).get(level)
+        return label
 
 
 class ReplayStorageType(TextChoices):
