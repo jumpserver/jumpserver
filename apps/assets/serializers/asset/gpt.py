@@ -1,4 +1,5 @@
 from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers
 
 from assets.models import GPT
 from .common import AssetSerializer
@@ -18,7 +19,17 @@ class GPTSerializer(AssetSerializer):
                 'help_text': _(
                     'If the server cannot directly connect to the API address, '
                     'you need set up an HTTP proxy. '
-                    'e.g. http(s)://host:port'
+                    'e.g. http(s)://host:port socks5://host:port'
                 ),
-                'label': _('HTTP proxy')}
+                'label': _('Proxy')}
         }
+
+    @staticmethod
+    def validate_proxy(value):
+        if value and not value.startswith(
+                ("http://", "https://", "socks5://")
+        ):
+            raise serializers.ValidationError(
+                _('Proxy must start with http:// or https:// or socks5://')
+            )
+        return value
