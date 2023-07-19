@@ -152,10 +152,14 @@ def start_services():
     start_args = []
     if args.daemon:
         start_args.append('--daemon')
-    if args.worker:
-        start_args.extend(['--worker', str(args.worker)])
     if args.force:
         start_args.append('--force')
+    if args.worker:
+        start_args.extend(['--worker', str(args.worker)])
+    else:
+        worker = os.environ.get('CORE_WORKER')
+        if isinstance(worker, str) and worker.isdigit():
+            start_args.extend(['--worker', worker])
 
     try:
         management.call_command(action, *services, *start_args)

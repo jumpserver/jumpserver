@@ -94,15 +94,11 @@ class BaseActionCommand(BaseCommand):
         super().__init__(*args, **kwargs)
 
     def add_arguments(self, parser):
-        cores = 10
-        if (multiprocessing.cpu_count() * 2 + 1) < cores:
-            cores = multiprocessing.cpu_count() * 2 + 1
-
         parser.add_argument(
             'services', nargs='+', choices=Services.export_services_values(), help='Service',
         )
         parser.add_argument('-d', '--daemon', nargs="?", const=True)
-        parser.add_argument('-w', '--worker', type=int, nargs="?", default=cores)
+        parser.add_argument('-w', '--worker', type=int, nargs="?", default=4)
         parser.add_argument('-f', '--force', nargs="?", const=True)
 
     def initial_util(self, *args, **options):
