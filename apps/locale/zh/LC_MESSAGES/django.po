@@ -6307,11 +6307,6 @@ msgstr "项目"
 msgid "Url"
 msgstr "链接"
 
-#: terminal/templates/terminal/_msg_command_warning.html:60
-#: terminal/templates/terminal/_msg_command_warning.html:93
-msgid "Command acl group"
-msgstr "命令过滤组"
-
 #: terminal/utils/db_port_mapper.py:84
 msgid ""
 "No available port is matched. The number of databases may have exceeded the "

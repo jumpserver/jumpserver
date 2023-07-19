@@ -1,23 +1,25 @@
 {% load i18n %}
 
 <div>
-    <b>{% trans 'Asset' %}: </b> <a href="{{ asset_url }}" target="_blank">{{ asset }}</a><br />
-    <b>{% trans 'User' %}: </b> <a href="{{ user_url }}" target="_blank">{{ user }}</a><br />
-    <b>{% trans 'Account' %}: </b>
-        {% if account_url %}
-            <a href="{{ account_url }}" target="_blank">{{ account }}</a>
-        {% else %}
-            <span>{{ account }}</span>
-        {% endif %}
-    <br />
-    <b>{% trans 'Risk level' %}: </b><span>{{ risk_level }}</span><br />
-    <b>{% trans 'Command acl' %}: </b> <a href="{{ cmd_filter_acl_url }}" target="_blank">{{ user }}</a><br />
-    <b>{% trans 'Command acl group' %}: </b> <a href="{{ cmd_group_url }}" target="_blank">{{ user }}</a><br />
+    <b>{% trans 'Asset' %}: </b> <span>{{ asset }}</span>
+    <br/>
+    <b>{% trans 'User' %}: </b> <span>{{ user }}</span>
+    <br/>
+    <b>{% trans 'Account' %}: </b> <span>{{ account }}</span>
+    <br/>
+    <b>{% trans 'Risk level' %}: </b><span>{{ risk_level }}</span>
+    <br/>
+    <b>{% trans 'Command acl' %}: </b> <span>{{ cmd_filter_acl }}</span>
+    <br/>
+    <b>{% trans 'Command group' %}: </b> <span>{{ cmd_group}}</span>
+    <br/>
     {% if session_url %}
         <b>{% trans 'Session' %}: </b>
-        <a href="{{ session_url }}" target="_blank">{% trans 'View' %}</a><br />
+        <a href="{{ session_url }}" target="_blank">{% trans 'View' %}</a>
+        <br/>
     {% endif %}
-    <b>{% trans 'Organization' %}: </b> <span>{{ org }}</span><br />
-    <b>{% trans 'Command' %}: </b><span>{{ command }}</span><br />
-
+    <b>{% trans 'Organization' %}: </b> <span>{{ org }}</span>
+    <br/>
+    <b>{% trans 'Command' %}: </b><span>{{ command }}</span>
+    <br/>
 </div>
