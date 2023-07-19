@@ -51,8 +51,9 @@ class PlatformProtocolSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlatformProtocol
         fields = [
-            "id", "name", "port", "port_from_addr", "primary",
-            "required", "default", "public", "secret_types", "setting",
+            "id", "name", "port", "port_from_addr",
+            "primary", "required", "default", "public",
+            "secret_types", "setting",
         ]
         extra_kwargs = {
             "primary": {
@@ -154,6 +155,18 @@ class PlatformSerializer(WritableNestedModelSerializer):
             "domain_default": {"label": _('Default Domain')},
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_initial_value()
+
+    def set_initial_value(self):
+        if not hasattr(self, 'initial_data'):
+            return
+        if self.instance:
+            return
+        if not self.initial_data.get('automation'):
+            self.initial_data['automation'] = {}
+
     @property
     def platform_category_type(self):
         if self.instance:
@@ -199,8 +212,9 @@ class PlatformSerializer(WritableNestedModelSerializer):
 
     def validate_automation(self, automation):
         automation = automation or {}
-        automation = automation.get('ansible_enabled', False) \
-                     and self.constraints['automation'].get('ansible_enabled', False)
+        ansible_enabled = automation.get('ansible_enabled', False) \
+            and self.constraints['automation'].get('ansible_enabled', False)
+        automation['ansible_enable'] = ansible_enabled
         return automation
 
 
