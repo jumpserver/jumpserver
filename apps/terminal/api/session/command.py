@@ -224,16 +224,17 @@ class InsecureCommandAlertAPI(generics.CreateAPIView):
                 cmd_group = cmd_group_mapper.get(command['cmd_group'])
                 command['_cmd_group'] = cmd_group
                 session = session_mapper.get(command['session'])
+                risk_level = command.get('risk_level')
                 if session:
                     command.update({
                         '_user_id': session.user_id,
                         '_asset_id': session.asset_id,
                         '_account': session.account,
                         '_account_id': session.account_id,
-                        '_org_name': session.org.name
+                        '_org_name': session.org.name,
+                        '_risk_level': RiskLevelChoices.get_risk_level_str(risk_level),
                     })
 
-                risk_level = command.get('risk_level')
                 if risk_level in [RiskLevelChoices.reject, RiskLevelChoices.review_reject]:
                     CommandAlertMessage(command).publish_async()
                 elif risk_level in [RiskLevelChoices.warning]:

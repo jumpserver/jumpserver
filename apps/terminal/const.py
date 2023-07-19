@@ -13,6 +13,11 @@ class RiskLevelChoices(IntegerChoices):
     review_accept = 7, _('Review & Accept')
     review_cancel = 8, _('Review & Cancel')
 
+    @classmethod
+    def get_risk_level_str(cls, risk_level):
+        risk_mapper = dict(cls.choices)
+        return risk_mapper.get(risk_level)
+
 
 class ReplayStorageType(TextChoices):
     null = 'null', 'Null',

@@ -1,10 +1,7 @@
 {% load i18n %}
 
 <div>
-    <p>
-        {% blocktranslate %}Danger command warning{% endblocktranslate %}
-    </p>
-    <table style="
+    <!-- <table style="
     display: inline-block;
     margin: .6em 0;
     max-width: 100%;
@@ -78,5 +75,26 @@
                 </td>
             </tr>
         </tbody>
-    </table>
+    </table> -->
+
+
+    <b>{% trans 'User' %}:</b> <a href="{{ user_url }}" target="_blank">{{ user }}</a><br />
+    <b>{% trans 'Asset' %}:</b> <a href="{{ asset_url }}" target="_blank">{{ asset }}</a><br />
+    <b>{% trans 'Account' %}:</b>
+    {% if account_url %}
+    <a href="{{ account_url }}" target="_blank">{{ account }}</a>
+    {% else %}
+    <span>{{ account }}</span>
+    {% endif %}
+    <br />
+    <b>{% trans 'Command' %}: </b><span>{{ command }}</span><br />
+    <b>{% trans 'Risk level' %}: </b><span>{{ risk_level }}</span><br />
+    <b>{% trans 'Command acl' %}:</b> <a href="{{ cmd_filter_acl_url }}" target="_blank">{{ user }}</a><br />
+    <b>{% trans 'Command acl group' %}:</b> <a href="{{ cmd_group_url }}" target="_blank">{{ user }}</a><br />
+    {% if session_url %}
+    <b>{% trans 'Session' %}:</b>
+    <a href="{{ session_url }}" target="_blank">{% trans 'View' %}</a><br />
+    {% endif %}
+    <b>{% trans 'Organization' %}:</b> <span>{{ org }}</span><br />
+
 </div>
