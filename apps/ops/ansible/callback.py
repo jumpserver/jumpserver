@@ -120,7 +120,7 @@ class DefaultCallback:
         for host, tasks in self.result.get('ignored', {}).items():
             ignore_errors = reduce(error_func, tasks.items(), '').strip(';')
             if host in failures:
-                self.summary['failures'][host] += {ignore_errors}
+                self.summary['failures'][host] += ignore_errors
 
         self.summary['ok'] = list(set(self.result['ok'].keys()) - set(dark_or_failures))
         self.summary['skipped'] = list(set(self.result['skipped'].keys()) - set(dark_or_failures))

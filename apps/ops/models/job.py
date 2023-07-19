@@ -28,6 +28,7 @@ from perms.models import AssetPermission
 from perms.utils import UserPermAssetUtil
 from terminal.notifications import CommandExecutionAlert
 from terminal.notifications import CommandWarningMessage
+from terminal.const import RiskLevelChoices
 
 
 def get_parent_keys(key, include_self=True):
@@ -395,20 +396,27 @@ class JobExecution(JMSOrgBaseModel):
                     CommandExecutionAlert({
                         "assets": self.current_job.assets.all(),
                         "input": self.material,
-                        "risk_level": 5,
+                        "risk_level": RiskLevelChoices.reject,
                         "user": self.creator,
                     }).publish_async()
                     raise Exception("command is rejected by ACL")
                 elif acl.is_action(CommandFilterACL.ActionChoices.warning):
-                    # TODO: warning message
-                    # user = ''
-                    # command = {
-                    #     'user': '',
-                    #     'user_id': ''
-                    # }
-                    # CommandWarningMessage(user, command).publish_async()
+                    command = {
+                        'input': self.material,
+                        'user': self.creator.name,
+                        'asset': asset.name,
+                        'cmd_filter_acl': str(acl.id),
+                        'cmd_group': str(cg.id),
+                        'risk_level': RiskLevelChoices.warning,
+                        'org_id': self.org_id,
+                        '_account': self.current_job.runas,
+                        '_cmd_filter_acl': acl,
+                        '_cmd_group': cg,
+                        '_org_name': self.org_name,
+                    }
+                    for reviewer in acl.reviewers.all():
+                        CommandWarningMessage(reviewer, command).publish_async()
                     return True
-
         return False
 
     def check_command_acl(self):

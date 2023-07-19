@@ -11,8 +11,8 @@ from notifications.backends import BACKEND
 from notifications.models import SystemMsgSubscription
 from notifications.notifications import SystemMessage, UserMessage
 from terminal.models import Session, Command
-from acls.models import CommandFilterACL, CommandGroup
 from users.models import User
+from terminal.const import RiskLevelChoices
 
 logger = get_logger(__name__)
 
@@ -69,7 +69,7 @@ class CommandAlertMixin:
 
 
 class CommandWarningMessage(CommandAlertMixin, UserMessage):
-    message_type_label = _('Danger command warning')
+    message_type_label = _('Command warning')
 
     def __init__(self, user, command):
         super().__init__(user)
@@ -80,63 +80,40 @@ class CommandWarningMessage(CommandAlertMixin, UserMessage):
 
         command_input = command['input']
         user = command['user']
-        user_id = command.get('_user_id', '')
         asset = command['asset']
-        asset_id = command.get('_asset_id', '')
         account = command.get('_account', '')
-        account_id = command.get('_account_id', '')
         cmd_acl = command.get('_cmd_filter_acl')
         cmd_group = command.get('_cmd_group')
-        session_id = command['session']
+        session_id = command.get('session', '')
+        risk_level = command['risk_level']
         org_id = command['org_id']
         org_name = command.get('_org_name') or org_id
 
-        user_url = asset_url = account_url = session_url = ''
-        if user_id:
-            user_url = reverse(
-                'users:user-detail', kwargs={'pk': user_id},
-                api_to_ui=True, external=True, is_console=True
-            ) + '?oid={}'.format(org_id)
-        if asset_id:
-            asset_url = reverse(
-                'assets:asset-detail', kwargs={'pk': asset_id},
-                api_to_ui=True, external=True, is_console=True
-            ) + '?oid={}'.format(org_id)
-        if account_id:
-            account_url = reverse(
-                'accounts:account-detail', kwargs={'pk': account_id},
-                api_to_ui=True, external=True, is_console=True
-            ) + '?oid={}'.format(org_id)
         if session_id:
             session_url = reverse(
                 'api-terminal:session-detail', kwargs={'pk': session_id},
                 external=True, api_to_ui=True
             ) + '?oid={}'.format(org_id)
             session_url = session_url.replace('/terminal/sessions/', '/audit/sessions/sessions/')
+        else:
+            session_url = ''
 
         # Command ACL
-        cmd_acl_url = cmd_group_url = ''
         cmd_acl_name = cmd_group_name = ''
         if cmd_acl:
             cmd_acl_name = cmd_acl.name
-            cmd_acl_url = settings.SITE_URL + f'/ui/#/console/perms/cmd-acls/{cmd_acl.id}/'
         if cmd_group:
             cmd_group_name = cmd_group.name
-            cmd_group_url = settings.SITE_URL + f'/ui/#/console/perms/cmd-groups/{cmd_group.id}/'
 
         context = {
             'command': command_input,
             'user': user,
-            'user_url': user_url,
             'asset': asset,
-            'asset_url': asset_url,
             'account': account,
-            'account_url': account_url,
             'cmd_filter_acl': cmd_acl_name,
-            'cmd_filter_acl_url': cmd_acl_url,
             'cmd_group': cmd_group_name,
-            'cmd_group_url': cmd_group_url,
             'session_url': session_url,
+            'risk_level': RiskLevelChoices.get_label(risk_level),
             'org': org_name,
         }
 
@@ -150,7 +127,7 @@ class CommandWarningMessage(CommandAlertMixin, UserMessage):
 class CommandAlertMessage(CommandAlertMixin, SystemMessage):
     category = CATEGORY
     category_label = CATEGORY_LABEL
-    message_type_label = _('Danger command alert')
+    message_type_label = _('Command reject')
 
     def __init__(self, command):
         self.command = command
@@ -173,7 +150,7 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
         session_detail_url = session_detail_url.replace(
             '/terminal/sessions/', '/audit/sessions/sessions/'
         )
-        level = Command.get_risk_level_str(command['risk_level'])
+        level = RiskLevelChoices.get_label(command['risk_level'])
         items = {
             _("Asset"): command['asset'],
             _("User"): command['user'],
@@ -222,7 +199,8 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
             ) + '?oid={}'.format(asset.org_id)
             assets_with_url.append([asset, url])
 
-        level = Command.get_risk_level_str(command['risk_level'])
+        level = RiskLevelChoices.get_label(command['risk_level'])
+
         items = {
             _("User"): command['user'],
             _("Level"): level,

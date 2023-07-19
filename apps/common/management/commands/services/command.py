@@ -1,8 +1,10 @@
 import multiprocessing
-from django.core.management.base import BaseCommand, CommandError
+
+from django.core.management.base import BaseCommand
 from django.db.models import TextChoices
-from .utils import ServicesUtil
+
 from .hands import *
+from .utils import ServicesUtil
 
 
 class Services(TextChoices):
@@ -97,7 +99,7 @@ class BaseActionCommand(BaseCommand):
             cores = multiprocessing.cpu_count() * 2 + 1
 
         parser.add_argument(
-            'services',  nargs='+', choices=Services.export_services_values(), help='Service',
+            'services', nargs='+', choices=Services.export_services_values(), help='Service',
         )
         parser.add_argument('-d', '--daemon', nargs="?", const=True)
         parser.add_argument('-w', '--worker', type=int, nargs="?", default=cores)

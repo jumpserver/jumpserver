@@ -1,82 +1,25 @@
 {% load i18n %}
 
 <div>
-    <p>
-        {% blocktranslate %}Danger command warning{% endblocktranslate %}
-    </p>
-    <table style="
-    display: inline-block;
-    margin: .6em 0;
-    max-width: 100%;
-    min-width: 60%;
-    white-space: nowrap;">
-        <thead>
-            <tr style="
-            text-align: left;
-            text-transform: uppercase;
-            background: rgb(249, 238, 181);
-            border: 1px solid #d9d7ce;">
-                <th style="
-                padding: 0 .6em;">
-                    {% trans 'Item' %}
-                </th>
-                <th style="
-                padding: 0 .6em;">
-                    {% trans 'Url' %}
-                </th>
-            </tr>
-        </thead>
-        <tbody style="
-        background: #fbfbf9;
-        border: 1px solid #d9d7ce;">
-            <tr>
-                <td style="padding: 0 .6em;">{% trans 'User' %}</td>
-                <td style="white-space: normal; padding: 0 .6em;">
-                    <a href="{{ user_url }}" target="_blank">{{ user }}</a>
-                </td>
-            </tr>
-            <tr>
-                <td style="padding: 0 .6em;">{% trans 'Asset' %}</td>
-                <td style="white-space: normal; padding: 0 .6em;">
-                    <a href="{{ asset_url }}" target="_blank">{{ asset }}</a>
-                </td>
-            </tr>
-            <tr>
-                <td style="padding: 0 .6em;">{% trans 'Account' %}</td>
-                <td style="white-space: normal; padding: 0 .6em;">
-                    <a href="{{ account_url }}" target="_blank">{{ account }}</a>
-                </td>
-            </tr>
-            <tr>
-                <td style="padding: 0 .6em;">{% trans 'Command' %}</td>
-                <td style="white-space: normal; padding: 0 .6em;">
-                    <span>{{ command }}</span>
-                </td>
-            </tr>
-            <tr>
-                <td style="padding: 0 .6em;">{% trans 'Command acl' %}</td>
-                <td style="white-space: normal; padding: 0 .6em;">
-                    <a href="{{ cmd_filter_acl_url }}" target="_blank">{{ cmd_filter_acl }}</a>
-                </td>
-            </tr>
-            <tr>
-                <td style="padding: 0 .6em;">{% trans 'Command acl group' %}</td>
-                <td style="white-space: normal; padding: 0 .6em;">
-                    <a href="{{ cmd_group_url }}" target="_blank">{{ cmd_group }}</a>
-                </td>
-            </tr>
-            <tr>
-                <td style="padding: 0 .6em;">{% trans 'Session' %}</td>
-                <td style="white-space: normal; padding: 0 .6em;">
-                    <a href="{{ session_url }}" target="_blank">{% trans 'View' %}</a>
-                </td>
-            </tr>
-            <tr>
-                <td style="padding: 0 .6em;">{% trans 'Organization' %}</td>
-                <td style="white-space: normal; padding: 0 .6em;">
-                    <span>{{ org }}</span>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <b>{% trans 'Asset' %}: </b> <span>{{ asset }}</span>
+    <br/>
+    <b>{% trans 'User' %}: </b> <span>{{ user }}</span>
+    <br/>
+    <b>{% trans 'Account' %}: </b> <span>{{ account }}</span>
+    <br/>
+    <b>{% trans 'Risk level' %}: </b><span>{{ risk_level }}</span>
+    <br/>
+    <b>{% trans 'Command acl' %}: </b> <span>{{ cmd_filter_acl }}</span>
+    <br/>
+    <b>{% trans 'Command group' %}: </b> <span>{{ cmd_group}}</span>
+    <br/>
+    {% if session_url %}
+        <b>{% trans 'Session' %}: </b>
+        <a href="{{ session_url }}" target="_blank">{% trans 'View' %}</a>
+        <br/>
+    {% endif %}
+    <b>{% trans 'Organization' %}: </b> <span>{{ org }}</span>
+    <br/>
+    <b>{% trans 'Command' %}: </b><span>{{ command }}</span>
+    <br/>
 </div>
