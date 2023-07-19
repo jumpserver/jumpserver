@@ -23,7 +23,7 @@ from common.utils.http import is_true, is_false
 from orgs.mixins.api import RootOrgViewMixin
 from perms.models import ActionChoices
 from terminal.connect_methods import NativeClient, ConnectMethodUtil
-from terminal.models import EndpointRule
+from terminal.models import EndpointRule, Endpoint
 from ..models import ConnectionToken, date_expired_default
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
@@ -166,11 +166,13 @@ class RDPFileClientProtocolURLMixin:
         return data
 
     def get_smart_endpoint(self, protocol, asset=None):
-        target_ip = asset.get_target_ip() if asset else ''
-        endpoint = EndpointRule.match_endpoint(
-            target_instance=asset, target_ip=target_ip,
-            protocol=protocol, request=self.request
-        )
+        endpoint = Endpoint.match_by_instance_label(asset, protocol)
+        if not endpoint:
+            target_ip = asset.get_target_ip() if asset else ''
+            endpoint = EndpointRule.match_endpoint(
+                target_instance=asset, target_ip=target_ip,
+                protocol=protocol, request=self.request
+            )
         return endpoint
 
 
