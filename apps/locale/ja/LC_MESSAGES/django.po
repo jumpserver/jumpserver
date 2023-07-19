@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-19 09:58+0800\n"
+"POT-Creation-Date: 2023-07-19 16:59+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -95,7 +95,7 @@ msgstr "更新"
 #: accounts/const/account.py:29
 #: accounts/serializers/automations/change_secret.py:156 audits/const.py:54
 #: audits/signal_handlers/activity_log.py:33 common/const/choices.py:19
-#: ops/const.py:58 terminal/const.py:77 xpack/plugins/cloud/const.py:41
+#: ops/const.py:58 terminal/const.py:77 xpack/plugins/cloud/const.py:43
 msgid "Failed"
 msgstr "失敗しました"
 
@@ -200,9 +200,8 @@ msgstr "作成のみ"
 #: audits/models.py:53 authentication/models/connection_token.py:36
 #: perms/models/asset_permission.py:64 perms/serializers/permission.py:34
 #: terminal/backends/command/models.py:18 terminal/models/session/session.py:31
-#: terminal/notifications.py:179 terminal/serializers/command.py:18
-#: terminal/templates/terminal/_msg_command_warning.html:36
-#: terminal/templates/terminal/_msg_command_warning.html:82
+#: terminal/notifications.py:155 terminal/serializers/command.py:18
+#: terminal/templates/terminal/_msg_command_warning.html:4
 #: tickets/models/ticket/apply_asset.py:16 xpack/plugins/cloud/models.py:212
 msgid "Asset"
 msgstr "資産"
@@ -236,8 +235,7 @@ msgstr "ソース ID"
 #: assets/serializers/gateway.py:28 audits/models.py:54 ops/models/base.py:18
 #: perms/models/asset_permission.py:70 perms/serializers/permission.py:39
 #: terminal/backends/command/models.py:19 terminal/models/session/session.py:33
-#: terminal/templates/terminal/_msg_command_warning.html:42
-#: terminal/templates/terminal/_msg_command_warning.html:83
+#: terminal/templates/terminal/_msg_command_warning.html:8
 #: tickets/models/ticket/command_confirm.py:13 xpack/plugins/cloud/models.py:85
 msgid "Account"
 msgstr "アカウント"
@@ -658,10 +656,9 @@ msgstr "ID"
 #: perms/serializers/permission.py:30 rbac/builtin.py:123
 #: rbac/models/rolebinding.py:49 terminal/backends/command/models.py:17
 #: terminal/models/session/session.py:29 terminal/models/session/sharing.py:32
-#: terminal/notifications.py:180 terminal/notifications.py:228
+#: terminal/notifications.py:156 terminal/notifications.py:205
 #: terminal/serializers/command.py:17
-#: terminal/templates/terminal/_msg_command_warning.html:30
-#: terminal/templates/terminal/_msg_command_warning.html:81
+#: terminal/templates/terminal/_msg_command_warning.html:6
 #: tickets/models/comment.py:21 users/const.py:14 users/models/user.py:947
 #: users/models/user.py:978 users/serializers/group.py:18
 msgid "User"
@@ -669,7 +666,7 @@ msgstr "ユーザー"
 
 #: accounts/serializers/account/account.py:428
 #: authentication/templates/authentication/_access_key_modal.html:33
-#: terminal/notifications.py:182 terminal/notifications.py:230
+#: terminal/notifications.py:158 terminal/notifications.py:207
 msgid "Date"
 msgstr "日付"
 
@@ -852,8 +849,7 @@ msgstr "アカウント"
 #: terminal/models/session/session.py:42 terminal/serializers/command.py:19
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
-#: terminal/templates/terminal/_msg_command_warning.html:48
-#: terminal/templates/terminal/_msg_command_warning.html:90
+#: terminal/templates/terminal/_msg_command_warning.html:23
 msgid "Command"
 msgstr "コマンド"
 
@@ -877,6 +873,7 @@ msgstr "家を無視する"
 #: acls/models/command_acl.py:33 acls/models/command_acl.py:96
 #: acls/serializers/command_acl.py:28
 #: authentication/serializers/connect_token_secret.py:85
+#: terminal/templates/terminal/_msg_command_warning.html:14
 msgid "Command group"
 msgstr "コマンドグループ"
 
@@ -885,8 +882,7 @@ msgid "The generated regular expression is incorrect: {}"
 msgstr "生成された正規表現が正しくありません: {}"
 
 #: acls/models/command_acl.py:100
-#: terminal/templates/terminal/_msg_command_warning.html:54
-#: terminal/templates/terminal/_msg_command_warning.html:92
+#: terminal/templates/terminal/_msg_command_warning.html:12
 msgid "Command acl"
 msgstr "コマンドフィルタリング"
 
@@ -983,7 +979,7 @@ msgid "Applications"
 msgstr "アプリケーション"
 
 #: applications/models.py:16 xpack/plugins/cloud/models.py:33
-#: xpack/plugins/cloud/serializers/account.py:62
+#: xpack/plugins/cloud/serializers/account.py:63
 msgid "Attrs"
 msgstr "ツールバーの"
 
@@ -1735,7 +1731,7 @@ msgstr "デフォルト・データベース"
 msgid "This field is required."
 msgstr "このフィールドは必須です。"
 
-#: assets/serializers/asset/gpt.py:19
+#: assets/serializers/asset/gpt.py:20
 msgid ""
 "If the server cannot directly connect to the API address, you need set up an "
 "HTTP proxy. e.g. http(s)://host:port"
@@ -1743,9 +1739,13 @@ msgstr ""
 "サーバーが API アドレスに直接接続できない場合は、HTTP プロキシを設定する必要"
 "があります。例: http(s)://host:port"
 
-#: assets/serializers/asset/gpt.py:23
+#: assets/serializers/asset/gpt.py:24
 msgid "HTTP proxy"
 msgstr "HTTP プロキシ"
+
+#: assets/serializers/asset/gpt.py:31
+msgid "Proxy must start with http:// or https://"
+msgstr "エージェントはhttp://またはhttps://で始まる必要があります"
 
 #: assets/serializers/asset/info/gathered.py:6
 msgid "Vendor"
@@ -1997,8 +1997,7 @@ msgid "Rename dir"
 msgstr "マップディレクトリ"
 
 #: audits/const.py:23 rbac/tree.py:229
-#: terminal/templates/terminal/_msg_command_warning.html:68
-#: terminal/templates/terminal/_msg_command_warning.html:96
+#: terminal/templates/terminal/_msg_command_warning.html:18
 msgid "View"
 msgstr "表示"
 
@@ -2082,8 +2081,7 @@ msgstr "書類"
 #: terminal/models/session/replay.py:9 terminal/models/session/sharing.py:18
 #: terminal/models/session/sharing.py:81
 #: terminal/templates/terminal/_msg_command_alert.html:10
-#: terminal/templates/terminal/_msg_command_warning.html:66
-#: terminal/templates/terminal/_msg_command_warning.html:95
+#: terminal/templates/terminal/_msg_command_warning.html:17
 #: tickets/models/ticket/command_confirm.py:15
 msgid "Session"
 msgstr "セッション"
@@ -3032,7 +3030,7 @@ msgid "Copy success"
 msgstr "コピー成功"
 
 #: authentication/utils.py:28 common/utils/ip/geoip/utils.py:24
-#: xpack/plugins/cloud/const.py:27
+#: xpack/plugins/cloud/const.py:29
 msgid "LAN"
 msgstr "ローカルエリアネットワーク"
 
@@ -3780,7 +3778,7 @@ msgstr "Material"
 msgid "Material Type"
 msgstr "Material を選択してオプションを設定します。"
 
-#: ops/models/job.py:482
+#: ops/models/job.py:480
 msgid "Job Execution"
 msgstr "ジョブ実行"
 
@@ -3926,8 +3924,7 @@ msgstr "アプリ組織"
 #: orgs/mixins/models.py:57 orgs/mixins/serializers.py:25 orgs/models.py:89
 #: rbac/const.py:7 rbac/models/rolebinding.py:56
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:63
-#: terminal/templates/terminal/_msg_command_warning.html:72
-#: terminal/templates/terminal/_msg_command_warning.html:98
+#: terminal/templates/terminal/_msg_command_warning.html:21
 #: tickets/models/ticket/general.py:302 tickets/serializers/ticket/ticket.py:60
 msgid "Organization"
 msgstr "組織"
@@ -5703,7 +5700,7 @@ msgstr "テスト失敗: {}"
 msgid "Test successful"
 msgstr "テスト成功"
 
-#: terminal/api/component/storage.py:124 terminal/notifications.py:263
+#: terminal/api/component/storage.py:124 terminal/notifications.py:240
 #: terminal/tasks.py:144
 msgid "Test failure: Account invalid"
 msgstr "テスト失敗: アカウントが無効"
@@ -5741,7 +5738,7 @@ msgid "Output"
 msgstr "出力"
 
 #: terminal/backends/command/models.py:25 terminal/serializers/command.py:23
-#: terminal/templates/terminal/_msg_command_warning.html:91
+#: terminal/templates/terminal/_msg_command_warning.html:10
 msgid "Risk level"
 msgstr "リスクレベル"
 
@@ -6086,35 +6083,35 @@ msgstr "検証コードが無効"
 msgid "You have already joined this session"
 msgstr "すでにこのセッションに参加しています"
 
-#: terminal/notifications.py:24
+#: terminal/notifications.py:25
 msgid "Sessions"
 msgstr "セッション"
 
-#: terminal/notifications.py:71
+#: terminal/notifications.py:72
 msgid "Command warning"
 msgstr "コマンド警告"
 
-#: terminal/notifications.py:154
+#: terminal/notifications.py:130
 msgid "Command reject"
 msgstr "コマンド拒否"
 
-#: terminal/notifications.py:181 terminal/notifications.py:229
+#: terminal/notifications.py:157 terminal/notifications.py:206
 msgid "Level"
 msgstr "レベル"
 
-#: terminal/notifications.py:199
+#: terminal/notifications.py:175
 msgid "Batch danger command alert"
 msgstr "一括危険コマンド警告"
 
-#: terminal/notifications.py:247
+#: terminal/notifications.py:224
 msgid "Command and replay storage"
 msgstr "コマンド及び録画記憶"
 
-#: terminal/notifications.py:248
+#: terminal/notifications.py:225
 msgid "Connectivity alarm"
 msgstr "接続性アラーム"
 
-#: terminal/notifications.py:273
+#: terminal/notifications.py:250
 #: terminal/templates/terminal/_msg_check_command_replay_storage_connectivity.html:4
 msgid "Invalid storage"
 msgstr "無効なストレージ"
@@ -6390,14 +6387,6 @@ msgstr "チェックコマンドと録画ストレージの接続性"
 #: terminal/templates/terminal/_msg_command_alert.html:10
 msgid "view"
 msgstr "表示"
-
-#: terminal/templates/terminal/_msg_command_warning.html:18
-msgid "Item"
-msgstr "アイテム"
-
-#: terminal/templates/terminal/_msg_command_warning.html:22
-msgid "Url"
-msgstr "リンク"
 
 #: terminal/utils/db_port_mapper.py:84
 msgid ""
@@ -6693,7 +6682,7 @@ msgid "Apply actions"
 msgstr "申請アクション"
 
 #: tickets/serializers/ticket/common.py:15
-#: tickets/serializers/ticket/common.py:77
+#: tickets/serializers/ticket/common.py:75
 msgid "Created by ticket ({}-{})"
 msgstr "チケットで作成 ({}-{})"
 
@@ -6701,7 +6690,7 @@ msgstr "チケットで作成 ({}-{})"
 msgid "The expiration date should be greater than the start date"
 msgstr "有効期限は開始日より大きくする必要があります"
 
-#: tickets/serializers/ticket/common.py:84
+#: tickets/serializers/ticket/common.py:82
 msgid "Permission named `{}` already exists"
 msgstr "'{}'という名前の権限は既に存在します"
 
@@ -6869,6 +6858,7 @@ msgid "Not a valid ssh public key"
 msgstr "有効なssh公開鍵ではありません"
 
 #: users/forms/profile.py:173 users/models/user.py:786
+#: xpack/plugins/cloud/serializers/account_attrs.py:206
 msgid "Public key"
 msgstr "公開キー"
 
@@ -6897,6 +6887,7 @@ msgid "OTP secret key"
 msgstr "OTP 秘密"
 
 #: users/models/user.py:783
+#: xpack/plugins/cloud/serializers/account_attrs.py:209
 msgid "Private key"
 msgstr "ssh秘密鍵"
 
@@ -7376,70 +7367,74 @@ msgid "Tencent Cloud (Lighthouse)"
 msgstr "テンセント雲(軽量アプリケーション)"
 
 #: xpack/plugins/cloud/const.py:19
-msgid "VMware"
-msgstr "VMware"
-
-#: xpack/plugins/cloud/const.py:20 xpack/plugins/cloud/providers/nutanix.py:13
-msgid "Nutanix"
-msgstr "Nutanix"
-
-#: xpack/plugins/cloud/const.py:21
-msgid "Huawei Private Cloud"
-msgstr "華為私有雲"
-
-#: xpack/plugins/cloud/const.py:22
-msgid "Qingyun Private Cloud"
-msgstr "青雲私有雲"
-
-#: xpack/plugins/cloud/const.py:23
-msgid "CTYun Private Cloud"
-msgstr "スカイウィング私有雲"
-
-#: xpack/plugins/cloud/const.py:24
-msgid "OpenStack"
-msgstr "OpenStack"
-
-#: xpack/plugins/cloud/const.py:25
 msgid "Google Cloud Platform"
 msgstr "谷歌雲"
 
+#: xpack/plugins/cloud/const.py:20
+msgid "UCloud"
+msgstr "ucloud"
+
+#: xpack/plugins/cloud/const.py:22
+msgid "VMware"
+msgstr "VMware"
+
+#: xpack/plugins/cloud/const.py:23 xpack/plugins/cloud/providers/nutanix.py:13
+msgid "Nutanix"
+msgstr "Nutanix"
+
+#: xpack/plugins/cloud/const.py:24
+msgid "Huawei Private Cloud"
+msgstr "華為私有雲"
+
+#: xpack/plugins/cloud/const.py:25
+msgid "Qingyun Private Cloud"
+msgstr "青雲私有雲"
+
 #: xpack/plugins/cloud/const.py:26
+msgid "CTYun Private Cloud"
+msgstr "スカイウィング私有雲"
+
+#: xpack/plugins/cloud/const.py:27
+msgid "OpenStack"
+msgstr "OpenStack"
+
+#: xpack/plugins/cloud/const.py:28
 msgid "Fusion Compute"
 msgstr "融合計算"
 
-#: xpack/plugins/cloud/const.py:31
+#: xpack/plugins/cloud/const.py:33
 msgid "Private IP"
 msgstr "プライベートIP"
 
-#: xpack/plugins/cloud/const.py:32
+#: xpack/plugins/cloud/const.py:34
 msgid "Public IP"
 msgstr "パブリックIP"
 
-#: xpack/plugins/cloud/const.py:36
+#: xpack/plugins/cloud/const.py:38
 msgid "Instance name"
 msgstr "インスタンス名"
 
-#: xpack/plugins/cloud/const.py:37
+#: xpack/plugins/cloud/const.py:39
 msgid "Instance name and Partial IP"
 msgstr "インスタンス名と部分IP"
 
-#: xpack/plugins/cloud/const.py:42
+#: xpack/plugins/cloud/const.py:44
 msgid "Succeed"
 msgstr "成功"
 
-#: xpack/plugins/cloud/const.py:46
+#: xpack/plugins/cloud/const.py:48
 msgid "Unsync"
 msgstr "同期していません"
 
-#: xpack/plugins/cloud/const.py:47
+#: xpack/plugins/cloud/const.py:49
 msgid "New Sync"
 msgstr "新しい同期"
 
-#: xpack/plugins/cloud/const.py:48
+#: xpack/plugins/cloud/const.py:50
 msgid "Synced"
 msgstr "同期済み"
 
-#: xpack/plugins/cloud/const.py:49
+#: xpack/plugins/cloud/const.py:51
 msgid "Released"
 msgstr "リリース済み"
 
@@ -7705,11 +7700,11 @@ msgstr "華南-広州-友好ユーザー環境"
 msgid "CN East-Suqian"
 msgstr "華東-宿遷"
 
-#: xpack/plugins/cloud/serializers/account.py:63
+#: xpack/plugins/cloud/serializers/account.py:64
 msgid "Validity display"
 msgstr "有効表示"
 
-#: xpack/plugins/cloud/serializers/account.py:64
+#: xpack/plugins/cloud/serializers/account.py:65
 msgid "Provider display"
 msgstr "プロバイダ表示"
 
@@ -7729,6 +7724,7 @@ msgstr "サブスクリプションID"
 #: xpack/plugins/cloud/serializers/account_attrs.py:103
 #: xpack/plugins/cloud/serializers/account_attrs.py:119
 #: xpack/plugins/cloud/serializers/account_attrs.py:149
+#: xpack/plugins/cloud/serializers/account_attrs.py:202
 msgid "API Endpoint"
 msgstr "APIエンドポイント"
 
@@ -7793,6 +7789,10 @@ msgstr "テストポート"
 #: xpack/plugins/cloud/serializers/account_attrs.py:193
 msgid "Test timeout"
 msgstr "テストタイムアウト"
+
+#: xpack/plugins/cloud/serializers/account_attrs.py:212
+msgid "Project"
+msgstr "project"
 
 #: xpack/plugins/cloud/serializers/task.py:28
 msgid ""
@@ -7891,6 +7891,12 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:86
 msgid "Community edition"
 msgstr "コミュニティ版"
+
+#~ msgid "Item"
+#~ msgstr "アイテム"
+
+#~ msgid "Url"
+#~ msgstr "リンク"
 
 #~ msgid "Danger command alert"
 #~ msgstr "危険コマンドアラート"
