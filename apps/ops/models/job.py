@@ -409,8 +409,6 @@ class JobExecution(JMSOrgBaseModel):
                         'cmd_group': str(cg.id),
                         'risk_level': RiskLevelChoices.warning,
                         'org_id': self.org_id,
-                        '_user_id': self.creator.id,
-                        '_asset_id': asset.id,
                         '_account': self.current_job.runas,
                         '_cmd_filter_acl': acl,
                         '_cmd_group': cg,

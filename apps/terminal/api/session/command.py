@@ -226,10 +226,7 @@ class InsecureCommandAlertAPI(generics.CreateAPIView):
 
             if session:
                 command.update({
-                    '_user_id': session.user_id,
-                    '_asset_id': session.asset_id,
                     '_account': session.account,
-                    '_account_id': session.account_id,
                     '_org_name': session.org.name,
                 })
 

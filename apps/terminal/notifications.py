@@ -80,11 +80,8 @@ class CommandWarningMessage(CommandAlertMixin, UserMessage):
 
         command_input = command['input']
         user = command['user']
-        user_id = command.get('_user_id', '')
         asset = command['asset']
-        asset_id = command.get('_asset_id', '')
         account = command.get('_account', '')
-        account_id = command.get('_account_id', '')
         cmd_acl = command.get('_cmd_filter_acl')
         cmd_group = command.get('_cmd_group')
         session_id = command.get('session', '')
@@ -92,51 +89,29 @@ class CommandWarningMessage(CommandAlertMixin, UserMessage):
         org_id = command['org_id']
         org_name = command.get('_org_name') or org_id
 
-        user_url = asset_url = account_url = session_url = ''
-        if user_id:
-            user_url = reverse(
-                'users:user-detail', kwargs={'pk': user_id},
-                api_to_ui=True, external=True, is_console=True
-            ) + '?oid={}'.format(org_id)
-        if asset_id:
-            asset_url = reverse(
-                'assets:asset-detail', kwargs={'pk': asset_id},
-                api_to_ui=True, external=True, is_console=True
-            ) + '?oid={}'.format(org_id)
-        if account_id:
-            account_url = reverse(
-                'accounts:account-detail', kwargs={'pk': account_id},
-                api_to_ui=True, external=True, is_console=True
-            ) + '?oid={}'.format(org_id)
         if session_id:
             session_url = reverse(
                 'api-terminal:session-detail', kwargs={'pk': session_id},
                 external=True, api_to_ui=True
             ) + '?oid={}'.format(org_id)
             session_url = session_url.replace('/terminal/sessions/', '/audit/sessions/sessions/')
+        else:
+            session_url = ''
 
         # Command ACL
-        cmd_acl_url = cmd_group_url = ''
         cmd_acl_name = cmd_group_name = ''
         if cmd_acl:
             cmd_acl_name = cmd_acl.name
-            cmd_acl_url = settings.SITE_URL + f'/ui/#/console/perms/cmd-acls/{cmd_acl.id}/'
         if cmd_group:
             cmd_group_name = cmd_group.name
-            cmd_group_url = settings.SITE_URL + f'/ui/#/console/perms/cmd-groups/{cmd_group.id}/'
 
         context = {
             'command': command_input,
             'user': user,
-            'user_url': user_url,
             'asset': asset,
-            'asset_url': asset_url,
             'account': account,
-            'account_url': account_url,
             'cmd_filter_acl': cmd_acl_name,
-            'cmd_filter_acl_url': cmd_acl_url,
             'cmd_group': cmd_group_name,
-            'cmd_group_url': cmd_group_url,
             'session_url': session_url,
             'risk_level': RiskLevelChoices.get_label(risk_level),
             'org': org_name,
