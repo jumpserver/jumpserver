@@ -34,9 +34,11 @@ class Endpoint(JMSBaseModel):
 
     def get_port(self, target_instance, protocol):
         from terminal.utils import db_port_manager
-        from assets.const import DatabaseTypes
+        from assets.const import DatabaseTypes, Protocol
+
         if isinstance(target_instance, Asset) and \
-                target_instance.is_type(DatabaseTypes.ORACLE):
+                target_instance.is_type(DatabaseTypes.ORACLE) and \
+                protocol == Protocol.oracle:
             port = db_port_manager.get_port_by_db(target_instance)
         else:
             port = getattr(self, f'{protocol}_port', 0)
