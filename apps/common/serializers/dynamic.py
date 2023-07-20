@@ -52,11 +52,14 @@ def create_serializer_class(serializer_name, fields_info):
 
         # 用户定义 default 和 required 可能会冲突, 所以要处理一下
         default = data.get('default', None)
-        if default is not None:
-            data['required'] = False
-        else:
+        if default is None:
             data.pop('default', None)
             data['required'] = True
+        elif default == '':
+            data['required'] = False
+            data['allow_blank'] = True
+        else:
+            data['required'] = False
         data = set_default_by_type(field_type, data, field_info)
         data = set_default_if_need(data, i)
         field_name = data.pop('name')
