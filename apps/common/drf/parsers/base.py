@@ -59,8 +59,9 @@ class BaseFileParser(BaseParser):
                 v.label: k,
                 k: k
             })
+        lowercase_fields_map = {k.lower(): v for k, v in fields_map.items()}
         field_names = [
-            fields_map.get(column_title.strip('*').lower(), '')
+            lowercase_fields_map.get(column_title.strip('*').lower(), '')
             for column_title in column_titles
         ]
         return field_names
