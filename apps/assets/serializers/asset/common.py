@@ -124,6 +124,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'), default=())
     accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, write_only=True, label=_('Account'))
     nodes_display = serializers.ListField(read_only=False, required=False, label=_("Node path"))
+    _accounts = None
 
     class Meta:
         model = Asset
@@ -151,6 +152,13 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._init_field_choices()
+        self._extract_accounts()
+
+    def _extract_accounts(self):
+        if not getattr(self, 'initial_data', None):
+            return
+        accounts = self.initial_data.pop('accounts', None)
+        self._accounts = accounts
 
     def _get_protocols_required_default(self):
         platform = self._asset_platform
@@ -276,7 +284,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
             return
         for data in accounts_data:
             data['asset'] = asset.id
-
         s = AssetAccountSerializer(data=accounts_data, many=True)
         s.is_valid(raise_exception=True)
         s.save()
@@ -284,16 +291,13 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
     @atomic
     def create(self, validated_data):
         nodes_display = validated_data.pop('nodes_display', '')
-        accounts = validated_data.pop('accounts', [])
         instance = super().create(validated_data)
-        self.accounts_create(accounts, instance)
+        self.accounts_create(self._accounts, instance)
         self.perform_nodes_display_create(instance, nodes_display)
         return instance
 
     @atomic
     def update(self, instance, validated_data):
-        if not validated_data.get('accounts'):
-            validated_data.pop('accounts', None)
         nodes_display = validated_data.pop('nodes_display', '')
         instance = super().update(instance, validated_data)
         self.perform_nodes_display_create(instance, nodes_display)
