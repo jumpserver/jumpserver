@@ -137,6 +137,25 @@ def migrate_to_nodes(apps, *args):
         parent.save()
 
 
+def migrate_ori_host_to_devices(apps, *args):
+    device_model = apps.get_model('assets', 'Device')
+    asset_model = apps.get_model('assets', 'Asset')
+    host_model = apps.get_model('assets', 'Host')
+    hosts_need_migrate_to_device = host_model.objects.filter(asset_ptr__platform__category='device')
+    assets = asset_model.objects.filter(id__in=hosts_need_migrate_to_device.values_list('asset_ptr_id', flat=True))
+    assets_map = {asset.id: asset for asset in assets}
+
+    print("\t- Migrate ori host to device: ", len(hosts_need_migrate_to_device))
+    for host in hosts_need_migrate_to_device:
+        asset = assets_map.get(host.asset_ptr_id)
+        if not asset:
+            continue
+        device = device_model(asset_ptr_id=asset.id)
+        device.__dict__.update(asset.__dict__)
+        device.save()
+        host.delete(keep_parents=True)
+
+
 class Migration(migrations.Migration):
     dependencies = [
         ('assets', '0097_auto_20220426_1558'),
@@ -146,5 +165,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(migrate_database_to_asset),
         migrations.RunPython(migrate_cloud_to_asset),
-        migrations.RunPython(migrate_to_nodes)
+        migrations.RunPython(migrate_to_nodes),
+        migrations.RunPython(migrate_ori_host_to_devices),
     ]

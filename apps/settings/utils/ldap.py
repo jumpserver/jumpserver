@@ -28,6 +28,7 @@ from authentication.backends.ldap import LDAPAuthorizationBackend, LDAPUser
 from common.const import LDAP_AD_ACCOUNT_DISABLE
 from common.db.utils import close_old_connections
 from common.utils import timeit, get_logger
+from common.utils.http import is_true
 from orgs.utils import tmp_to_org
 from users.models import User, UserGroup
 from users.utils import construct_user_email
@@ -185,9 +186,12 @@ class LDAPServerUtil(object):
             if not hasattr(entry, mapping):
                 continue
             value = getattr(entry, mapping).value or ''
-            if attr == 'is_active' and mapping.lower() == 'useraccountcontrol' \
-                    and value:
-                value = int(value) & LDAP_AD_ACCOUNT_DISABLE != LDAP_AD_ACCOUNT_DISABLE
+            if attr == 'is_active':
+                if mapping.lower() == 'useraccountcontrol' and value:
+                    value = int(value) & LDAP_AD_ACCOUNT_DISABLE != LDAP_AD_ACCOUNT_DISABLE
+                else:
+                    value = is_true(value)
+
             if attr == 'groups' and mapping.lower() == 'memberof':
                 # AD: {'groups': 'memberOf'}
                 if isinstance(value, str) and value:

@@ -52,14 +52,16 @@ class BaseFileParser(BaseParser):
         fields_map = {}
         fields = self.serializer_fields
         for k, v in fields.items():
-            if v.read_only:
+            # 资产平台的 id 是只读的, 导入更新资产平台会失败
+            if v.read_only and k not in ['id', 'pk']:
                 continue
             fields_map.update({
                 v.label: k,
                 k: k
             })
+        lowercase_fields_map = {k.lower(): v for k, v in fields_map.items()}
         field_names = [
-            fields_map.get(column_title.strip('*'), '')
+            lowercase_fields_map.get(column_title.strip('*').lower(), '')
             for column_title in column_titles
         ]
         return field_names

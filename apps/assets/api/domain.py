@@ -26,6 +26,8 @@ class DomainViewSet(OrgBulkModelViewSet):
             return serializers.DomainWithGatewaySerializer
         return serializers.DomainSerializer
 
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related('assets')
 
 class GatewayViewSet(HostViewSet):
     perm_model = Gateway

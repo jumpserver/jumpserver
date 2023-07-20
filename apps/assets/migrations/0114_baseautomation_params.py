@@ -2,16 +2,13 @@
 
 from django.db import migrations, models
 
-from assets.const import AllTypes
-
 
 def migrate_automation_push_account_params(apps, schema_editor):
     platform_automation_model = apps.get_model('assets', 'PlatformAutomation')
-    platform_automation_methods = AllTypes.get_automation_methods()
     methods_id_data_map = {
-        i['id']: None if i['params_serializer'] is None else i['params_serializer']({}).data
-        for i in platform_automation_methods
-        if i['method'] == 'push_account'
+        'push_account_aix': {'sudo': '/bin/whoami', 'shell': '/bin/bash', 'home': '', 'groups': ''},
+        'push_account_posix': {'sudo': '/bin/whoami', 'shell': '/bin/bash', 'home': '', 'groups': ''},
+        'push_account_local_windows': {'groups': 'Users,Remote Desktop Users'},
     }
     automation_objs = []
     for automation in platform_automation_model.objects.all():

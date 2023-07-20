@@ -127,10 +127,13 @@ class NodeChildrenAsTreeApi(SerializeToTreeNodeMixin, NodeChildrenApi):
         if not self.instance or not include_assets:
             return Asset.objects.none()
         if query_all:
-            assets = self.instance.get_all_assets_for_tree()
+            assets = self.instance.get_all_assets()
         else:
-            assets = self.instance.get_assets_for_tree()
-        return assets
+            assets = self.instance.get_assets()
+        return assets.only(
+            "id", "name", "address", "platform_id",
+            "org_id", "is_active", 'comment'
+        ).prefetch_related('platform')
 
     def filter_queryset_for_assets(self, assets):
         search = self.request.query_params.get('search')

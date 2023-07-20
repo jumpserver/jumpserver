@@ -7,12 +7,14 @@ class SecretType(TextChoices):
     SSH_KEY = 'ssh_key', _('SSH key')
     ACCESS_KEY = 'access_key', _('Access key')
     TOKEN = 'token', _('Token')
+    API_KEY = 'api_key', _("API key")
 
 
 class AliasAccount(TextChoices):
     ALL = '@ALL', _('All')
     INPUT = '@INPUT', _('Manual input')
     USER = '@USER', _('Dynamic user')
+    ANON = '@ANON', _('Anonymous account')
 
 
 class Source(TextChoices):

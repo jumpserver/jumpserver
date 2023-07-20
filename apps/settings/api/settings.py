@@ -2,7 +2,12 @@
 #
 
 from django.conf import settings
+from django.http import HttpResponse
+from django.views.static import serve
 from rest_framework import generics
+from rest_framework import status
+from rest_framework.permissions import AllowAny
+from rest_framework.views import APIView
 
 from common.utils import get_logger
 from jumpserver.conf import Config
@@ -10,6 +15,7 @@ from rbac.permissions import RBACPermission
 from .. import serializers
 from ..models import Setting
 from ..signals import category_setting_updated
+from ..utils import get_interface_setting_or_default
 
 logger = get_logger(__file__)
 
@@ -139,3 +145,25 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         if hasattr(serializer, 'post_save'):
             serializer.post_save()
         self.send_signal(serializer)
+
+
+class SettingsLogoApi(APIView):
+    permission_classes = (AllowAny,)
+
+    def get(self, request, *args, **kwargs):
+        size = request.GET.get('size', 'small')
+        interface_data = get_interface_setting_or_default()
+        if size == 'small':
+            logo_path = interface_data['logo_logout']
+        else:
+            logo_path = interface_data['logo_index']
+
+        if logo_path.startswith('/media/'):
+            logo_path = logo_path.replace('/media/', '')
+            document_root = settings.MEDIA_ROOT
+        elif logo_path.startswith('/static/'):
+            logo_path = logo_path.replace('/static/', '/')
+            document_root = settings.STATIC_ROOT
+        else:
+            return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+        return serve(request, logo_path, document_root=document_root)

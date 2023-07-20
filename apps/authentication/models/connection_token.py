@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import PermissionDenied
 
+from accounts.const import AliasAccount
 from assets.const import Protocol
 from assets.const.host import GATEWAY_NAME
 from common.db.fields import EncryptTextField
@@ -21,7 +22,7 @@ from terminal.models import Applet
 
 
 def date_expired_default():
-    return timezone.now() + timedelta(seconds=settings.CONNECTION_TOKEN_EXPIRATION)
+    return timezone.now() + timedelta(seconds=settings.CONNECTION_TOKEN_ONETIME_EXPIRATION)
 
 
 class ConnectionToken(JMSOrgBaseModel):
@@ -53,10 +54,11 @@ class ConnectionToken(JMSOrgBaseModel):
 
     class Meta:
         ordering = ('-date_expired',)
-        verbose_name = _('Connection token')
         permissions = [
-            ('view_connectiontokensecret', _('Can view connection token secret'))
+            ('expire_connectiontoken', _('Can expire connection token')),
+            ('reuse_connectiontoken', _('Can reuse connection token')),
         ]
+        verbose_name = _('Connection token')
 
     @property
     def is_expired(self):
@@ -78,6 +80,15 @@ class ConnectionToken(JMSOrgBaseModel):
     def expire(self):
         self.date_expired = timezone.now()
         self.save(update_fields=['date_expired'])
+
+    def set_reusable(self, is_reusable):
+        self.is_reusable = is_reusable
+        if self.is_reusable:
+            seconds = settings.CONNECTION_TOKEN_REUSABLE_EXPIRATION
+        else:
+            seconds = settings.CONNECTION_TOKEN_ONETIME_EXPIRATION
+        self.date_expired = timezone.now() + timedelta(seconds=seconds)
+        self.save(update_fields=['is_reusable', 'date_expired'])
 
     def renewal(self):
         """ 续期 Token，将来支持用户自定义创建 token 后，续期策略要修改 """
@@ -175,7 +186,7 @@ class ConnectionToken(JMSOrgBaseModel):
         if not applet:
             return None
 
-        host_account = applet.select_host_account(self.user)
+        host_account = applet.select_host_account(self.user, self.asset)
         if not host_account:
             raise JMSException({'error': 'No host account available'})
 
@@ -209,29 +220,19 @@ class ConnectionToken(JMSOrgBaseModel):
         if not self.asset:
             return None
 
-        account = self.asset.accounts.filter(name=self.account).first()
-        if self.account == '@INPUT' or not account:
-            data = {
-                'name': self.account,
-                'username': self.input_username,
-                'secret_type': 'password',
-                'secret': self.input_secret,
-                'su_from': None,
-                'org_id': self.asset.org_id,
-                'asset': self.asset
-            }
+        if self.account.startswith('@'):
+            account = Account.get_special_account(self.account)
+            account.asset = self.asset
+            account.org_id = self.asset.org_id
+
+            if self.account in [AliasAccount.INPUT, AliasAccount.USER]:
+                account.username = self.input_username
+                account.secret = self.input_secret
         else:
-            data = {
-                'name': account.name,
-                'username': account.username,
-                'secret_type': account.secret_type,
-                'secret': account.secret or self.input_secret,
-                'su_from': account.su_from,
-                'org_id': account.org_id,
-                'privileged': account.privileged,
-                'asset': self.asset
-            }
-        return Account(**data)
+            account = self.asset.accounts.filter(name=self.account).first()
+            if not account.secret and self.input_secret:
+                account.secret = self.input_secret
+        return account
 
     @lazyproperty
     def domain(self):
@@ -264,4 +265,7 @@ class ConnectionToken(JMSOrgBaseModel):
 class SuperConnectionToken(ConnectionToken):
     class Meta:
         proxy = True
+        permissions = [
+            ('view_superconnectiontokensecret', _('Can view super connection token secret'))
+        ]
         verbose_name = _("Super connection token")

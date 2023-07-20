@@ -10,7 +10,7 @@ class PushAccountAutomationSerializer(ChangeSecretAutomationSerializer):
 
     class Meta(ChangeSecretAutomationSerializer.Meta):
         model = PushAccountAutomation
-        fields = ['params'] + [
+        fields = [
             n for n in ChangeSecretAutomationSerializer.Meta.fields
             if n not in ['recipients']
         ]

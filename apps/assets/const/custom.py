@@ -1,3 +1,6 @@
+from collections import defaultdict
+
+from common.decorators import cached_method
 from .base import BaseType
 
 
@@ -9,7 +12,8 @@ class CustomTypes(BaseType):
         except Exception:
             return []
         types = set([p.type for p in platforms])
-        return [(t, t) for t in types]
+        choices = [(t, t) for t in types]
+        return choices
 
     @classmethod
     def _get_base_constrains(cls) -> dict:
@@ -37,13 +41,20 @@ class CustomTypes(BaseType):
         return constrains
 
     @classmethod
+    @cached_method(5)
     def _get_protocol_constrains(cls) -> dict:
-        constrains = {}
-        for platform in cls.get_custom_platforms():
-            choices = list(platform.protocols.values_list('name', flat=True))
-            if platform.type in constrains:
-                choices = constrains[platform.type]['choices'] + choices
-            constrains[platform.type] = {'choices': choices}
+        from assets.models import PlatformProtocol
+        _constrains = defaultdict(set)
+        protocols = PlatformProtocol.objects \
+            .filter(platform__category='custom') \
+            .values_list('name', 'platform__type')
+        for name, tp in protocols:
+            _constrains[tp].add(name)
+
+        constrains = {
+            tp: {'choices': list(choices)}
+            for tp, choices in _constrains.items()
+        }
         return constrains
 
     @classmethod
@@ -51,6 +62,8 @@ class CustomTypes(BaseType):
         return {}
 
     @classmethod
+    @cached_method(5)
     def get_custom_platforms(cls):
         from assets.models import Platform
-        return Platform.objects.filter(category='custom')
+        platforms = Platform.objects.filter(category='custom')
+        return platforms

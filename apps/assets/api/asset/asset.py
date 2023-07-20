@@ -82,7 +82,7 @@ class AssetFilterSet(BaseFilterSet):
     @staticmethod
     def filter_protocols(queryset, name, value):
         value = value.split(',')
-        return queryset.filter(protocols__name__in=value)
+        return queryset.filter(protocols__name__in=value).distinct()
 
     @staticmethod
     def filter_labels(queryset, name, value):
@@ -91,7 +91,7 @@ class AssetFilterSet(BaseFilterSet):
             queryset = queryset.filter(labels__name=n, labels__value=v)
         else:
             q = Q(labels__name__contains=value) | Q(labels__value__contains=value)
-            queryset = queryset.filter(q)
+            queryset = queryset.filter(q).distinct()
         return queryset
 
 
@@ -120,6 +120,14 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
         LabelFilterBackend, IpInFilterBackend,
         NodeFilterBackend, AttrRulesFilterBackend
     ]
+
+    def get_queryset(self):
+        queryset = super().get_queryset() \
+            .prefetch_related('nodes', 'protocols') \
+            .select_related('platform', 'domain')
+        if queryset.model is not Asset:
+            queryset = queryset.select_related('asset_ptr')
+        return queryset
 
     def get_serializer_class(self):
         cls = super().get_serializer_class()

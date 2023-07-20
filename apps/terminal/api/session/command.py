@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 #
-from django.conf import settings
+from django.utils import translation
 from django.utils import timezone
 from rest_framework import generics
 from rest_framework.fields import DateTimeField
 from rest_framework.response import Response
 
+from acls.models import CommandFilterACL, CommandGroup
 from terminal.models import CommandStorage, Session, Command
 from terminal.filters import CommandFilter
 from orgs.utils import current_org
@@ -18,7 +19,8 @@ from terminal.exceptions import StorageInvalid
 from terminal.backends import (
     get_command_storage, get_multi_command_storage
 )
-from terminal.notifications import CommandAlertMessage
+from terminal.notifications import CommandAlertMessage, CommandWarningMessage
+from terminal.const import RiskLevelChoices
 
 logger = get_logger(__name__)
 __all__ = ['CommandViewSet', 'InsecureCommandAlertAPI']
@@ -199,7 +201,41 @@ class InsecureCommandAlertAPI(generics.CreateAPIView):
         serializer = InsecureCommandAlertSerializer(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)
         commands = serializer.validated_data
+        session_ids, acl_ids, cmd_group_ids = set(), set(), set()
         for command in commands:
-            if command['risk_level'] >= settings.SECURITY_INSECURE_COMMAND_LEVEL:
+            session_ids.add(command.get('session'))
+            acl_ids.add(command.get('cmd_filter_acl'))
+            cmd_group_ids.add(command.get('cmd_group'))
+
+        sessions = Session.objects.filter(id__in=session_ids).only(
+            'id', 'org_id', 'asset', 'asset_id', 'user', 'user_id', 'account', 'account_id'
+        )
+        session_mapper = {str(i.id): i for i in sessions}
+        acls = CommandFilterACL.objects.filter(id__in=acl_ids).only('id', 'name', 'reviewers')
+        acl_mapper = {str(i.id): i for i in acls}
+        cmd_groups = CommandGroup.objects.filter(id__in=cmd_group_ids).only('id', 'name')
+        cmd_group_mapper = {str(i.id): i for i in cmd_groups}
+
+        for command in commands:
+            cmd_acl = acl_mapper.get(command['cmd_filter_acl'])
+            command['_cmd_filter_acl'] = cmd_acl
+            cmd_group = cmd_group_mapper.get(command['cmd_group'])
+            command['_cmd_group'] = cmd_group
+            session = session_mapper.get(command['session'])
+            risk_level = command.get('risk_level')
+
+            if session:
+                command.update({
+                    '_account': session.account,
+                    '_org_name': session.org.name,
+                })
+
+            if risk_level in [RiskLevelChoices.reject, RiskLevelChoices.review_reject]:
                 CommandAlertMessage(command).publish_async()
-        return Response()
+            elif risk_level in [RiskLevelChoices.warning]:
+                for reviewer in cmd_acl.reviewers.all():
+                    CommandWarningMessage(reviewer, command).publish_async()
+            else:
+                logger.info(f'Risk level ignore: {RiskLevelChoices.get_label(risk_level)}({risk_level})')
+
+        return Response({'msg': 'ok'})

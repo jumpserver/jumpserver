@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='command',
             name='risk_level',
-            field=models.SmallIntegerField(choices=[(0, 'Ordinary'), (5, 'Dangerous')], db_index=True, default=0, verbose_name='Risk level'),
+            field=models.SmallIntegerField(choices=[(0, 'Accept'), (4, 'Warning'), (5, 'Reject'), (6, 'Review & Reject'), (7, 'Review & Accept'), (8, 'Review & Cancel')], db_index=True, default=0, verbose_name='Risk level'),
         ),
     ]

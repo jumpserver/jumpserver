@@ -89,18 +89,31 @@ class Account(AbsConnectivity, BaseAccount):
         return bool(self.secret)
 
     @classmethod
+    def get_special_account(cls, name):
+        if name == AliasAccount.INPUT.value:
+            return cls.get_manual_account()
+        elif name == AliasAccount.ANON.value:
+            return cls.get_anonymous_account()
+        else:
+            return cls(name=name, username=name, secret=None)
+
+    @classmethod
     def get_manual_account(cls):
         """ @INPUT 手动登录的账号(any) """
         return cls(name=AliasAccount.INPUT.label, username=AliasAccount.INPUT.value, secret=None)
 
-    @lazyproperty
-    def versions(self):
-        return self.history.count()
+    @classmethod
+    def get_anonymous_account(cls):
+        return cls(name=AliasAccount.ANON.label, username=AliasAccount.ANON.value, secret=None)
 
     @classmethod
     def get_user_account(cls):
         """ @USER 动态用户的账号(self) """
         return cls(name=AliasAccount.USER.label, username=AliasAccount.USER.value, secret=None)
+
+    @lazyproperty
+    def versions(self):
+        return self.history.count()
 
     def get_su_from_accounts(self):
         """ 排除自己和以自己为 su-from 的账号 """
@@ -124,10 +137,13 @@ class AccountTemplate(BaseAccount):
         ]
 
     @classmethod
-    def get_su_from_account_templates(cls, instance=None):
-        if not instance:
+    def get_su_from_account_templates(cls, pk=None):
+        if pk is None:
             return cls.objects.all()
-        return cls.objects.exclude(Q(id=instance.id) | Q(su_from=instance))
+        return cls.objects.exclude(Q(id=pk) | Q(su_from_id=pk))
+
+    def __str__(self):
+        return f'{self.name}({self.username})'
 
     def get_su_from_account(self, asset):
         su_from = self.su_from

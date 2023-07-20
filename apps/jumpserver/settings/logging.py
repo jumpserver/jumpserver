@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 #
 import os
+
 from ..const import PROJECT_DIR, CONFIG
 
-LOG_DIR = os.path.join(PROJECT_DIR, 'logs')
+LOG_DIR = os.path.join(PROJECT_DIR, 'data', 'logs')
 JUMPSERVER_LOG_FILE = os.path.join(LOG_DIR, 'jumpserver.log')
 DRF_EXCEPTION_LOG_FILE = os.path.join(LOG_DIR, 'drf_exception.log')
 UNEXPECTED_EXCEPTION_LOG_FILE = os.path.join(LOG_DIR, 'unexpected_exception.log')
@@ -132,7 +133,6 @@ LOGGING = {
             'handlers': ['null'],
             'level': 'ERROR'
         }
-
     }
 }
 

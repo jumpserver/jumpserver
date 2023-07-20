@@ -124,6 +124,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'), default=())
     accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, write_only=True, label=_('Account'))
     nodes_display = serializers.ListField(read_only=False, required=False, label=_("Node path"))
+    _accounts = None
 
     class Meta:
         model = Asset
@@ -151,6 +152,13 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._init_field_choices()
+        self._extract_accounts()
+
+    def _extract_accounts(self):
+        if not getattr(self, 'initial_data', None):
+            return
+        accounts = self.initial_data.pop('accounts', None)
+        self._accounts = accounts
 
     def _get_protocols_required_default(self):
         platform = self._asset_platform
@@ -167,10 +175,9 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
             return
 
         protocols_required, protocols_default = self._get_protocols_required_default()
-        protocols_data = [
-            {'name': p.name, 'port': p.port}
-            for p in protocols_required + protocols_default
-        ]
+        protocol_map = {str(protocol.id): protocol for protocol in protocols_required + protocols_default}
+        protocols = list(protocol_map.values())
+        protocols_data = [{'name': p.name, 'port': p.port} for p in protocols]
         self.initial_data['protocols'] = protocols_data
 
     def _init_field_choices(self):
@@ -263,7 +270,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
                 error = p.get('name') + ': ' + _("port out of range (0-65535)")
                 raise serializers.ValidationError(error)
 
-        protocols_required, protocols_default = self._get_protocols_required_default()
+        protocols_required, __ = self._get_protocols_required_default()
         protocols_not_found = [p.name for p in protocols_required if p.name not in protocols_data_map]
         if protocols_not_found:
             raise serializers.ValidationError({
@@ -277,7 +284,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
             return
         for data in accounts_data:
             data['asset'] = asset.id
-
         s = AssetAccountSerializer(data=accounts_data, many=True)
         s.is_valid(raise_exception=True)
         s.save()
@@ -285,16 +291,13 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
     @atomic
     def create(self, validated_data):
         nodes_display = validated_data.pop('nodes_display', '')
-        accounts = validated_data.pop('accounts', [])
         instance = super().create(validated_data)
-        self.accounts_create(accounts, instance)
+        self.accounts_create(self._accounts, instance)
         self.perform_nodes_display_create(instance, nodes_display)
         return instance
 
     @atomic
     def update(self, instance, validated_data):
-        if not validated_data.get('accounts'):
-            validated_data.pop('accounts', None)
         nodes_display = validated_data.pop('nodes_display', '')
         instance = super().update(instance, validated_data)
         self.perform_nodes_display_create(instance, nodes_display)

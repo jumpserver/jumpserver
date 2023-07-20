@@ -26,11 +26,12 @@ user_perms = (
 )
 
 system_user_perms = (
-                        ('authentication', 'connectiontoken', 'add,change,view', 'connectiontoken'),
-                        ('authentication', 'temptoken', 'add,change,view', 'temptoken'),
-                        ('authentication', 'accesskey', '*', '*'),
-                        ('tickets', 'ticket', 'view', 'ticket'),
-                    ) + user_perms + _view_all_joined_org_perms
+    ('authentication', 'connectiontoken', 'add,view,reuse,expire', 'connectiontoken'),
+    ('authentication', 'temptoken', 'add,change,view', 'temptoken'),
+    ('authentication', 'accesskey', '*', '*'),
+    ('tickets', 'ticket', 'view', 'ticket'),
+)
+system_user_perms += (user_perms + _view_all_joined_org_perms)
 
 _auditor_perms = (
     ('rbac', 'menupermission', 'view', 'audit'),
@@ -151,7 +152,7 @@ class BuiltinRole:
                 'User': cls.system_user.get_role(),
                 'Auditor': cls.system_auditor.get_role()
             }
-        return cls.system_role_mapper[name]
+        return cls.system_role_mapper.get(name, cls.system_role_mapper['User'])
 
     @classmethod
     def get_org_role_by_old_name(cls, name):
@@ -161,7 +162,7 @@ class BuiltinRole:
                 'User': cls.org_user.get_role(),
                 'Auditor': cls.org_auditor.get_role(),
             }
-        return cls.org_role_mapper[name]
+        return cls.org_role_mapper.get(name, cls.org_role_mapper['User'])
 
     @classmethod
     def sync_to_db(cls, show_msg=False):
