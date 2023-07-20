@@ -87,6 +87,10 @@ class ConnectionToken(JMSOrgBaseModel):
             seconds = settings.CONNECTION_TOKEN_REUSABLE_EXPIRATION
         else:
             seconds = settings.CONNECTION_TOKEN_ONETIME_EXPIRATION
+        if seconds and seconds.isdigit():
+            seconds = int(seconds)
+        else:
+            seconds = 3600
         self.date_expired = timezone.now() + timedelta(seconds=seconds)
         self.save(update_fields=['is_reusable', 'date_expired'])
 
