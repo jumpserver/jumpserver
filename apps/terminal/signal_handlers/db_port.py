@@ -29,8 +29,7 @@ def on_db_created(sender, instance: Database, created, **kwargs):
     db_port_manager.check()
 
 
-@receiver(post_delete, sender=Asset)
-@on_transaction_commit
+@receiver(post_delete, sender=Database)
 def on_db_delete(sender, instance, **kwargs):
     if instance.type != 'oracle':
         return
