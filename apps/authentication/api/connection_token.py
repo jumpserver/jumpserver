@@ -218,7 +218,8 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
     def reuse(self, request, *args, **kwargs):
         instance = self.get_object()
         if not settings.CONNECTION_TOKEN_REUSABLE:
-            raise serializers.ValidationError(_('Reusable connection token is not allowed, global setting not enabled'))
+            error = _('Reusable connection token is not allowed, global setting not enabled')
+            raise serializers.ValidationError(error)
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         is_reusable = serializer.validated_data.get('is_reusable', False)
