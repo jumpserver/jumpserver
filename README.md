@@ -17,18 +17,16 @@
     9 年时间，倾情投入，用心做好一款开源堡垒机。
 </p>
 
-|                                                  :warning: 注意 :warning:                                                   |
-|:-------------------------------------------------------------------------------------------------------------------------:|
-| 3.0 架构上和 2.0 变化较大，建议全新安装一套环境来体验。如需升级，请务必升级前进行备份，并[查阅文档](https://kb.fit2cloud.com/?p=06638d69-f109-4333-b5bf-65b17b297ed9) |
+JumpServer 是广受欢迎的开源堡垒机，是符合 4A 规范的专业运维安全审计系统。
 
---------------------------
-
-JumpServer 是广受欢迎的开源堡垒机，是符合 4A 规范的专业运维安全审计系统。JumpServer 堡垒机帮助企业以更安全的方式管控和登录各种类型的资产，包括：
+JumpServer 堡垒机帮助企业以更安全的方式管控和登录各种类型的资产，包括：
 
 - **SSH**: Linux / Unix / 网络设备 等；
 - **Windows**: Web 方式连接 / 原生 RDP 连接；
-- **数据库**: MySQL / Oracle / SQLServer / PostgreSQL 等；
-- **Kubernetes**: 支持连接到 K8s 集群中的 Pods；
+- **数据库**: MySQL / MariaDB / PostgreSQL / Oracle / SQLServer / ClickHouse 等；
+- **NoSQL**: Redis / MongoDB 等；
+- **GPT**: ChatGPT 等;
+- **云服务**: Kubernetes / VMware vSphere 等;
 - **Web 站点**: 各类系统的 Web 管理后台；
 - **应用**: 通过 Remote App 连接各类应用。
 
