@@ -84,9 +84,7 @@ JumpServer 堡垒机帮助企业以更安全的方式管控和登录各种类型
 
 ### 参与贡献
 
-欢迎提交 PR 参与贡献。感谢以下贡献者，他们让 JumpServer 变的越来越好。
-
-<a href="https://github.com/jumpserver/jumpserver/graphs/contributors"><img src="https://opencollective.com/jumpserver/contributors.svg?width=890&button=false" /></a>
+欢迎提交 PR 参与贡献。 参考 [CONTRIBUTING.md](https://github.com/jumpserver/jumpserver/blob/dev/CONTRIBUTING.md)
 
 ## 组件项目
 
