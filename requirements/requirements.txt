@@ -119,7 +119,7 @@ botocore==1.27.12
 s3transfer==0.6.0
 kubernetes==21.7.0
 # DB requirements
-mysqlclient==2.1.0
+mysqlclient==2.2.0
 PyMySQL==1.0.2
 pymssql==2.2.7
 django-mysql==3.9.0
