@@ -158,6 +158,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         ]
         disallow_self_update_fields = ["is_active"]
         extra_kwargs = {
+            'name': {'label': _("User Name")},
             "password": {
                 "write_only": True,
                 "required": False,

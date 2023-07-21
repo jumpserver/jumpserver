@@ -26,6 +26,7 @@ class UserGroupSerializer(BulkOrgResourceModelSerializer):
         ]
         fields = fields_mini + fields_small + ['users']
         extra_kwargs = {
+            'name': {'label': _("User Name")},
             'created_by': {'label': _('Created by'), 'read_only': True},
             'users_amount': {'label': _('Users amount')},
             'id': {'label': _('ID')},

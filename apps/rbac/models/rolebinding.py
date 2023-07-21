@@ -4,6 +4,7 @@ from django.db import models
 from django.db.models import Q
 from django.db.models.signals import post_save
 from django.utils.translation import gettext_lazy as _
+from django.utils.functional import cached_property
 from rest_framework.serializers import ValidationError
 
 from common.db.models import JMSBaseModel, CASCADE_SIGNAL_SKIP
@@ -98,9 +99,17 @@ class RoleBinding(JMSBaseModel):
         roles_id = bindings.values_list('role', flat=True).distinct()
         return Role.objects.filter(id__in=roles_id)
 
-    @lazyproperty
-    def user_display(self):
+    @cached_property
+    def user_name(self):
         return self.user.name
+
+    @cached_property
+    def user_username(self):
+        return self.user.username
+
+    @cached_property
+    def user_display(self):
+        return '%s(%s)' % (self.user.name, self.user.username)
 
     @lazyproperty
     def role_display(self):

@@ -13,14 +13,15 @@ class RoleBindingSerializer(serializers.ModelSerializer):
     class Meta:
         model = RoleBinding
         fields = [
-            'id', 'user',  'user_display', 'role', 'role_display',
+            'id', 'user', 'user_name', 'user_username', 'role', 'role_display',
             'scope', 'org', 'org_name',
         ]
         read_only_fields = ['scope']
         extra_kwargs = {
-            'user_display': {'label': _('User display')},
+            'user_name': {'label': _("User Name")},
+            'user_username': {'label': _("Username")},
             'role_display': {'label': _('Role display')},
-            'org_name': {'label': _("Org name")}
+            'org_name': {'label': _("Org name")},
         }
 
 
