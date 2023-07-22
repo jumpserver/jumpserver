@@ -62,6 +62,8 @@ def create_serializer_class(serializer_name, fields_info):
             data['required'] = False
         data = set_default_by_type(field_type, data, field_info)
         data = set_default_if_need(data, i)
+        if field_type in ['int', 'bool', 'list'] and "allow_blank" in data.keys():
+            data.pop('allow_blank')
         field_name = data.pop('name')
         field_class = type_field_map.get(field_type, serializers.CharField)
         serializer_fields[field_name] = field_class(**data)
