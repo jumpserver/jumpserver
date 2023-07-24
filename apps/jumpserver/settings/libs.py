@@ -116,7 +116,8 @@ else:
         host=CONFIG.REDIS_HOST, port=CONFIG.REDIS_PORT, db=CONFIG.REDIS_DB_WS
     )
     REDIS_LAYERS_SSL_PARAMS.pop('ssl', None)
-    REDIS_LAYERS_HOST['address'] = '{}?{}'.format(REDIS_LAYERS_ADDRESS, urlencode(REDIS_LAYERS_SSL_PARAMS))
+    REDIS_LAYERS_HOST['address'] = '{}?{}'.format(REDIS_LAYERS_ADDRESS,
+                                                  urlencode(REDIS_LAYERS_SSL_PARAMS))
 
 CHANNEL_LAYERS = {
     'default': {
@@ -127,7 +128,7 @@ CHANNEL_LAYERS = {
     },
 }
 
-ASGI_APPLICATION = 'jumpserver.asgi.application'
+ASGI_APPLICATION = 'jumpserver.routing.application'
 
 # Dump all celery log to here
 CELERY_LOG_DIR = os.path.join(PROJECT_DIR, 'data', 'celery')
