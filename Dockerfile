@@ -88,9 +88,9 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     && pip install --upgrade pip \
     && pip install --upgrade setuptools wheel \
     && pip install Cython==0.29.35 \
-    && pip install --no-build-isolation pymssql==2.1.5 \
+#    && pip install --no-build-isolation pymssql==2.1.5 \
     && pip install $(grep -E 'jms|jumpserver' requirements/requirements.txt) -i ${PIP_JMS_MIRROR} \
-    && pip install -r requirements/requirements.txt --use-deprecated=legacy-resolver
+    && pip install -r requirements/requirements.txt
 
 COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
 RUN echo > /opt/jumpserver/config.yml \
