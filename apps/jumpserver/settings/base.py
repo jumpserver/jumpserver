@@ -65,14 +65,22 @@ APPLET_DOWNLOAD_HOST = CONFIG.APPLET_DOWNLOAD_HOST
 # https://docs.djangoproject.com/en/4.1/ref/settings/
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# https://docs.djangoproject.com/en/4.1/ref/settings/#std-setting-CSRF_TRUSTED_ORIGINS
-CSRF_TRUSTED_ORIGINS = CONFIG.CSRF_TRUSTED_ORIGINS.split(',') if CONFIG.CSRF_TRUSTED_ORIGINS \
-    else ['https://*', 'https://.*', 'http://localhost:9528']
-
 # LOG LEVEL
 LOG_LEVEL = CONFIG.LOG_LEVEL
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = CONFIG.ALLOWED_HOSTS.split(',') if CONFIG.ALLOWED_HOSTS else ['localhost', '127.0.0.1']
+
+# https://docs.djangoproject.com/en/4.1/ref/settings/#std-setting-CSRF_TRUSTED_ORIGINS
+CSRF_TRUSTED_ORIGINS = []
+for origin in ALLOWED_HOSTS:
+    # 避免错误 先判断一下吧
+    if origin.startswith('http'):
+        CSRF_TRUSTED_ORIGINS.append(origin)
+        continue
+    if origin.startswith('.'):
+        origin = '*.'
+    for schema in ['https', 'http']:
+        CSRF_TRUSTED_ORIGINS.append('{}://{}'.format(schema, origin))
 
 # Max post update field num
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000

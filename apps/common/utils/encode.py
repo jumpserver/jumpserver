@@ -45,7 +45,7 @@ class Signer(metaclass=Singleton):
 
     def sign(self, value):
         s = JSONWebSignatureSerializer(self.secret_key, algorithm_name='HS256')
-        return self.json_serializer.dumps(value).decode()
+        return s.dumps(value).decode()
 
     def unsign(self, value):
         if value is None:

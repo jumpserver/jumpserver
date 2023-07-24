@@ -514,6 +514,7 @@ class Config(dict):
         'TIME_ZONE': 'Asia/Shanghai',
         'FORCE_SCRIPT_NAME': '',
         'SESSION_COOKIE_SECURE': False,
+        'ALLOWED_HOSTS': '',
         'CSRF_COOKIE_SECURE': False,
         'REFERER_CHECK_ENABLED': False,
         'CSRF_TRUSTED_ORIGINS': '',
