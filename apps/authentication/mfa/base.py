@@ -1,6 +1,6 @@
 import abc
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class BaseMFA(abc.ABC):
@@ -69,4 +69,3 @@ class BaseMFA(abc.ABC):
     @staticmethod
     def help_text_of_disable():
         return ''
-

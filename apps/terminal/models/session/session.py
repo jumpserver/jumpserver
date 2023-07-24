@@ -8,7 +8,7 @@ from django.core.cache import cache
 from django.core.files.storage import default_storage
 from django.db import models
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from assets.models import Asset
 from common.utils import get_object_or_none, lazyproperty

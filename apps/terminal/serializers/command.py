@@ -1,18 +1,17 @@
 # ~*~ coding: utf-8 ~*~
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from common.utils import pretty_string, is_uuid, get_logger
 from common.serializers.fields import LabeledChoiceField
-from terminal.models import Command
+from common.utils import pretty_string, is_uuid, get_logger
 from terminal.const import RiskLevelChoices
+from terminal.models import Command
 
 logger = get_logger(__name__)
 __all__ = ['SessionCommandSerializer', 'InsecureCommandAlertSerializer']
 
 
 class SimpleSessionCommandSerializer(serializers.ModelSerializer):
-
     """ 简单Session命令序列类, 用来提取公共字段 """
     user = serializers.CharField(label=_("User"))  # 限制 64 字符，见 validate_user
     asset = serializers.CharField(max_length=128, label=_("Asset"))

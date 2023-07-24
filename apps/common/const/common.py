@@ -1,6 +1,6 @@
 import re
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 create_success_msg = _("%(name)s was created successfully")
 update_success_msg = _("%(name)s was updated successfully")

@@ -1,21 +1,19 @@
 # ~*~ coding: utf-8 ~*~
-import time
 
+from django.contrib.auth import logout as auth_logout
+from django.http.response import HttpResponseRedirect
+from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
-from django.contrib.auth import logout as auth_logout
-from django.shortcuts import redirect
-from django.http.response import HttpResponseRedirect
 
-from authentication.mixins import AuthMixin
-from authentication.mfa import MFAOtp, otp_failed_msg
 from authentication.errors import SessionEmptyError
+from authentication.mfa import MFAOtp, otp_failed_msg
+from authentication.mixins import AuthMixin
+from common.permissions import IsValidUser
 from common.utils import get_logger, FlashMessageUtil
 from common.views.mixins import PermissionsMixin
-from common.permissions import IsValidUser
-from .password import UserVerifyPasswordView
 from ... import forms
 from ...utils import (
     generate_otp_uri, check_otp_code,

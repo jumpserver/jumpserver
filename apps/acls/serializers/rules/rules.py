@@ -1,7 +1,7 @@
 # coding: utf-8
 #
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
-from django.utils.translation import ugettext_lazy as _
 
 from common.utils import get_logger
 from common.utils.ip import is_ip_address, is_ip_network, is_ip_segment

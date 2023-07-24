@@ -6,7 +6,7 @@ from redis.sentinel import SentinelManagedSSLConnection
 if platform.system() == 'Darwin' and platform.machine() == 'arm64':
     import pymysql
 
-    pymysql.version_info = (1, 4, 2, "final", 0)
+    # pymysql.version_info = (1, 4, 2, "final", 0)
     pymysql.install_as_MySQLdb()
 
 from django.urls import reverse_lazy
@@ -65,14 +65,38 @@ APPLET_DOWNLOAD_HOST = CONFIG.APPLET_DOWNLOAD_HOST
 # https://docs.djangoproject.com/en/4.1/ref/settings/
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# https://docs.djangoproject.com/en/4.1/ref/settings/#std-setting-CSRF_TRUSTED_ORIGINS
-CSRF_TRUSTED_ORIGINS = CONFIG.CSRF_TRUSTED_ORIGINS.split(',') if CONFIG.CSRF_TRUSTED_ORIGINS else []
-
 # LOG LEVEL
 LOG_LEVEL = CONFIG.LOG_LEVEL
+DOMAINS = CONFIG.DOMAINS or CONFIG.SITE_URL
+ALLOWED_DOMAINS = DOMAINS.split(',') if DOMAINS else ['localhost:8080']
+ALLOWED_DOMAINS = [host.strip() for host in ALLOWED_DOMAINS]
+ALLOWED_DOMAINS = [host.replace('http://', '').replace('https://', '') for host in ALLOWED_DOMAINS if host]
+ALLOWED_DOMAINS = [host.split('/')[0] for host in ALLOWED_DOMAINS if host]
 
-ALLOWED_HOSTS = ['*']
+DEBUG_HOSTS = ['127.0.0.1', 'localhost']
+DEBUG_PORT = ['8080', '80', '443', '4200', '9528']
+if DEBUG:
+    DEBUG_HOST_PORTS = ['{}:{}'.format(host, port) for host in DEBUG_HOSTS for port in DEBUG_PORT]
+    ALLOWED_DOMAINS.extend(DEBUG_HOST_PORTS)
 
+ALLOWED_HOSTS = list(set(['.' + host.split(':')[0] for host in ALLOWED_DOMAINS]))
+print("ALLOWED_HOSTS: ", ALLOWED_HOSTS)
+
+# https://docs.djangoproject.com/en/4.1/ref/settings/#std-setting-CSRF_TRUSTED_ORIGINS
+CSRF_TRUSTED_ORIGINS = []
+
+for host in ALLOWED_DOMAINS:
+    host = host.strip('.')
+    if host.startswith('http'):
+        CSRF_TRUSTED_ORIGINS.append(host)
+        continue
+    for schema in ['https', 'http']:
+        # CSRF_TRUSTED_ORIGINS.append('{}://{}'.format(schema, host))
+        CSRF_TRUSTED_ORIGINS.append('{}://*.{}'.format(schema, host))
+
+print("CSRF_TRUSTED_ORIGINS: ")
+for origin in CSRF_TRUSTED_ORIGINS:
+    print('  - ' + origin)
 # Max post update field num
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
 
@@ -140,6 +164,9 @@ MIDDLEWARE = [
     'simple_history.middleware.HistoryRequestMiddleware',
     'jumpserver.middleware.EndMiddleware',
 ]
+
+if DEBUG or DEBUG_DEV:
+    INSTALLED_APPS.insert(0, 'daphne')
 
 ROOT_URLCONF = 'jumpserver.urls'
 

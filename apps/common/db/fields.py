@@ -11,8 +11,8 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import Q, Manager, QuerySet
-from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import force_str
+from django.utils.translation import gettext_lazy as _
 from rest_framework.utils.encoders import JSONEncoder
 
 from common.local import add_encrypted_field_set
@@ -146,7 +146,7 @@ class EncryptMixin:
         if value is None:
             return value
 
-        value = force_text(value)
+        value = force_str(value)
         plain_value = crypto.decrypt(value)
 
         # 如果没有解开，使用原来的signer解密
@@ -167,7 +167,7 @@ class EncryptMixin:
         sp = super()
         if hasattr(sp, "get_prep_value"):
             value = sp.get_prep_value(value)
-        value = force_text(value)
+        value = force_str(value)
         # 替换新的加密方式
         return crypto.encrypt(value)
 
