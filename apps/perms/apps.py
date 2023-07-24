@@ -9,4 +9,7 @@ class PermsConfig(AppConfig):
     verbose_name = _('App permissions')
 
     def ready(self):
+        from . import signal_handlers  # noqa
+        from . import tasks  # noqa
+        from . import notifications  # noqa
         super().ready()

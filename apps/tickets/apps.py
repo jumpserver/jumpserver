@@ -7,4 +7,6 @@ class TicketsConfig(AppConfig):
     verbose_name = _('Tickets')
 
     def ready(self):
+        from . import signal_handlers  # noqa
+        from . import notifications  # noqa
         return super().ready()

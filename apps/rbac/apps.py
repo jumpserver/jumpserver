@@ -7,4 +7,5 @@ class RBACConfig(AppConfig):
     verbose_name = _('RBAC')
 
     def ready(self):
+        from . import signal_handlers  # noqa
         super().ready()

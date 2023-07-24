@@ -12,4 +12,6 @@ class AssetsConfig(AppConfig):
         super().__init__(*args, **kwargs)
 
     def ready(self):
+        from . import signal_handlers  # noqa
+        from . import tasks  # noqa
         super().ready()

@@ -9,7 +9,8 @@ class AuditsConfig(AppConfig):
     verbose_name = _('Audits')
 
     def ready(self):
-        from . import signal_handlers
+        from . import signal_handlers  # noqa
+        from . import tasks  # noqa
 
         if settings.SYSLOG_ENABLE:
             post_save.connect(signal_handlers.on_audits_log_create)

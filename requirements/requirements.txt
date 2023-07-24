@@ -2,7 +2,7 @@
 cython==3.0.0
 aiofiles==23.1.0
 amqp==5.1.1
-#git+https://github.com/jumpserver/ansible@master#egg=ansible-core
+git+https://github.com/jumpserver/ansible@master#egg=ansible-core
 ansible==7.1.0
 ansible-runner==2.3.3
 asn1crypto==1.5.1
@@ -108,7 +108,7 @@ websockets==11.0.3
 python-ldap==3.4.3
 ldap3==2.9.1
 #django-radius==1.5.0
-#git+https://github.com/robgolding/django-radius@develop#egg=django-radius
+git+https://github.com/robgolding/django-radius@develop#egg=django-radius
 django-cas-ng==4.3.0
 python-cas==1.6.0
 django-auth-ldap==4.4.0

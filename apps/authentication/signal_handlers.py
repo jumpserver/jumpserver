@@ -10,7 +10,6 @@ from apps.jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
 from .signals import post_auth_success, post_auth_failed, user_auth_failed, user_auth_success
 
 
-@receiver(user_logged_in)
 def on_user_auth_login_success(sender, user, request, **kwargs):
     # 失效 perms 缓存
     user.expire_rbac_perms_cache()
@@ -52,3 +51,6 @@ def on_user_login_success(sender, request, user, backend, create=False, **kwargs
 def on_user_login_failed(sender, username, request, reason, backend, **kwargs):
     request.session['auth_backend'] = backend
     post_auth_failed.send(sender, username=username, request=request, reason=reason)
+
+
+user_logged_in.connect(on_user_auth_login_success)

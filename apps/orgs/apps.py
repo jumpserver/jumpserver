@@ -7,4 +7,6 @@ class OrgsConfig(AppConfig):
     verbose_name = _('App organizations')
 
     def ready(self):
-        pass
+        from . import signal_handlers  # noqa
+        from . import tasks  # noqa
+        super().ready()

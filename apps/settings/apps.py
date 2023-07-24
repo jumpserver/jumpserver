@@ -7,4 +7,5 @@ class SettingsConfig(AppConfig):
     verbose_name = _('Settings')
 
     def ready(self):
-        pass
+        from . import signal_handlers  # noqa
+        from . import tasks  # noqa
