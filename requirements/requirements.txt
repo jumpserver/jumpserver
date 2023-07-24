@@ -130,8 +130,7 @@ mysqlclient==2.1.0
 PyMySQL==1.0.2
 oracledb==1.2.2
 psycopg2-binary==2.9.1
-# pymssql==2.2.7
-git+https://github.com/marcwimmer/pymssql@fix_cython_compiler_version
+pymssql==2.2.7
 django-mysql==3.9.0
 django-redis==5.2.0
 python-redis-lock==3.7.0
