@@ -1,6 +1,6 @@
 aiofiles==22.1.0
 amqp==5.0.9
-#git+https://github.com/jumpserver/ansible@master#egg=ansible-core
+git+https://github.com/jumpserver/ansible@master#egg=ansible-core
 ansible==7.1.0
 ansible-runner==2.2.1
 asn1crypto==0.24.0
@@ -118,7 +118,7 @@ kubernetes==21.7.0
 # DB requirements
 mysqlclient==2.1.0
 PyMySQL==1.0.2
-#pymssql==2.2.5
+pymssql==2.2.5
 django-mysql==3.9.0
 django-redis==5.2.0
 python-redis-lock==3.7.0
