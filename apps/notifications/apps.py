@@ -1,5 +1,5 @@
 from django.apps import AppConfig
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class NotificationsConfig(AppConfig):
@@ -7,6 +7,4 @@ class NotificationsConfig(AppConfig):
     verbose_name = _('Notifications')
 
     def ready(self):
-        from . import signal_handlers
-        from . import notifications
         super().ready()

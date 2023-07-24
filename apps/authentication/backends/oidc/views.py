@@ -11,8 +11,8 @@
 
 import base64
 import hashlib
-import time
 import secrets
+import time
 
 from django.conf import settings
 from django.contrib import auth
@@ -20,12 +20,11 @@ from django.core.exceptions import SuspiciousOperation
 from django.http import HttpResponseRedirect, QueryDict
 from django.urls import reverse
 from django.utils.crypto import get_random_string
-from django.utils.http import is_safe_url, urlencode
+from django.utils.http import url_has_allowed_host_and_scheme, urlencode
 from django.views.generic import View
 
 from authentication.utils import build_absolute_uri_for_oidc
 from .utils import get_logger
-
 
 logger = get_logger(__file__)
 
@@ -102,7 +101,7 @@ class OIDCAuthRequestView(View):
         logger.debug(log_prompt.format('Stores next url in the session'))
         next_url = request.GET.get('next')
         request.session['oidc_auth_next_url'] = next_url \
-            if is_safe_url(url=next_url, allowed_hosts=(request.get_host(), )) else None
+            if url_has_allowed_host_and_scheme(url=next_url, allowed_hosts=(request.get_host(),)) else None
 
         # Redirects the user to authorization endpoint.
         logger.debug(log_prompt.format('Construct redirect url'))
@@ -145,15 +144,15 @@ class OIDCAuthCallbackView(View):
         # missing or if no state can be retrieved from the current session.
 
         if (
-            ((nonce and settings.AUTH_OPENID_USE_NONCE) or not settings.AUTH_OPENID_USE_NONCE)
-            and
-            (
-                (state and settings.AUTH_OPENID_USE_STATE and 'state' in callback_params)
-                or
-                (not settings.AUTH_OPENID_USE_STATE)
-            )
-            and
-            ('code' in callback_params)
+                ((nonce and settings.AUTH_OPENID_USE_NONCE) or not settings.AUTH_OPENID_USE_NONCE)
+                and
+                (
+                        (state and settings.AUTH_OPENID_USE_STATE and 'state' in callback_params)
+                        or
+                        (not settings.AUTH_OPENID_USE_STATE)
+                )
+                and
+                ('code' in callback_params)
         ):
             # Ensures that the passed state values is the same as the one that was previously
             # generated when forging the authorization request. This is necessary to mitigate

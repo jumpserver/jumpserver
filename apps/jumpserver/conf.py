@@ -21,7 +21,7 @@ from urllib.parse import urljoin, urlparse
 
 import yaml
 from django.urls import reverse_lazy
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from gmssl.sm4 import CryptSM4, SM4_ENCRYPT, SM4_DECRYPT
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -234,7 +234,7 @@ class Config(dict):
         'LOGIN_URL': reverse_lazy('authentication:login'),
 
         'CONNECTION_TOKEN_ONETIME_EXPIRATION': 5 * 60,  # 默认(new)
-        'CONNECTION_TOKEN_EXPIRATION':  5 * 60,  # 默认(old)
+        'CONNECTION_TOKEN_EXPIRATION': 5 * 60,  # 默认(old)
 
         'CONNECTION_TOKEN_REUSABLE_EXPIRATION': 60 * 60 * 24 * 30,  # 最大(new)
         'CONNECTION_TOKEN_EXPIRATION_MAX': 60 * 60 * 24 * 30,  # 最大(old)

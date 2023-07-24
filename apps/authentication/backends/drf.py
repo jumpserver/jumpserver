@@ -1,22 +1,20 @@
 # -*- coding: utf-8 -*-
 #
 
-import uuid
 import time
+import uuid
 
-from django.core.cache import cache
-from django.utils.translation import ugettext as _
-from six import text_type
 from django.contrib.auth import get_user_model
-
+from django.core.cache import cache
+from django.utils.translation import gettext as _
 from rest_framework import HTTP_HEADER_ENCODING
 from rest_framework import authentication, exceptions
+from six import text_type
+
 from common.auth import signature
-
 from common.utils import get_object_or_none, make_signature, http_to_unixtime
+from .base import JMSBaseAuthBackend
 from ..models import AccessKey, PrivateToken
-from .base import JMSBaseAuthBackend, JMSModelBackend
-
 
 UserModel = get_user_model()
 
@@ -200,4 +198,3 @@ class SignatureAuthentication(signature.SignatureAuthentication):
             return user, secret
         except (AccessKey.DoesNotExist, exceptions.ValidationError):
             return None, None
-

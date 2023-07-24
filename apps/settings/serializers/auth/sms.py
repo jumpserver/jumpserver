@@ -1,10 +1,10 @@
-from django.utils.translation import ugettext_lazy as _
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from common.sdk.sms import BACKENDS
 from common.serializers.fields import EncryptedField, PhoneField
 from common.validators import PhoneValidator
-from common.sdk.sms import BACKENDS
 
 __all__ = [
     'SMSSettingSerializer', 'AlibabaSMSSettingSerializer', 'TencentSMSSettingSerializer',
@@ -26,7 +26,7 @@ class SignTmplPairSerializer(serializers.Serializer):
 
 class BaseSMSSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('SMS')
-    
+
     SMS_TEST_PHONE = PhoneField(
         validators=[PhoneValidator()], required=False, allow_blank=True, allow_null=True, label=_('Test phone')
     )

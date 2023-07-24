@@ -1,6 +1,6 @@
 import html2text
 from django.template.loader import render_to_string
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from common.utils import get_logger
 from tickets.const import TicketState, TicketType

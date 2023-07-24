@@ -10,8 +10,7 @@ from django.core.cache import cache
 from django.db import models, transaction
 from django.db.models import Q, Manager
 from django.db.transaction import atomic
-from django.utils.translation import ugettext
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _, gettext
 
 from common.db.models import output_as_string
 from common.utils import get_logger
@@ -163,7 +162,7 @@ class FamilyMixin:
         return key
 
     def get_next_child_preset_name(self):
-        name = ugettext("New node")
+        name = gettext("New node")
         values = [
             child.value[child.value.rfind(' '):]
             for child in self.get_children()

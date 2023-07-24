@@ -5,7 +5,7 @@ from django.contrib.auth import logout as auth_logout
 from django.http import HttpResponse
 from django.shortcuts import redirect, reverse, render
 from django.utils.deprecation import MiddlewareMixin
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from apps.authentication import mixins
 from authentication.signals import post_auth_failed

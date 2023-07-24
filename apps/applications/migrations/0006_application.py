@@ -127,7 +127,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=128, verbose_name='Name')),
                 ('category', models.CharField(choices=[('db', 'Database'), ('remote_app', 'Remote app'), ('cloud', 'Cloud')], max_length=16, verbose_name='Category')),
                 ('type', models.CharField(choices=[('mysql', 'MySQL'), ('oracle', 'Oracle'), ('postgresql', 'PostgreSQL'), ('mariadb', 'MariaDB'), ('chrome', 'Chrome'), ('mysql_workbench', 'MySQL Workbench'), ('vmware_client', 'vSphere Client'), ('custom', 'Custom'), ('k8s', 'Kubernetes')], max_length=16, verbose_name='Type')),
-                ('attrs', django_mysql.models.JSONField(default=dict)),
+                ('attrs', models.JSONField(default=dict)),
                 ('comment', models.TextField(blank=True, default='', max_length=128, verbose_name='Comment')),
                 ('domain', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='applications', to='assets.Domain', verbose_name='Domain')),
             ],
