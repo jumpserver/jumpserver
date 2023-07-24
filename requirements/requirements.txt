@@ -1,10 +1,12 @@
+# 临时解决 cython 3.0 造成的错误
+cython==0.29.36
 aiofiles==22.1.0
 amqp==5.0.9
 git+https://github.com/jumpserver/ansible@master#egg=ansible-core
 ansible==7.1.0
 ansible-runner==2.2.1
 asn1crypto==0.24.0
-bcrypt==3.1.4
+bcrypt==4.0.1
 billiard==3.6.4.0
 certifi==2022.12.7
 cffi==1.15.1
@@ -94,7 +96,7 @@ django-proxy==1.2.1
 channels-redis==4.0.0
 python-daemon==2.3.0
 eventlet==0.33.1
-greenlet==1.1.2
+greenlet==2.0.2
 gunicorn==20.1.0
 celery==5.2.7
 flower==1.2.0
@@ -105,7 +107,8 @@ websockets==10.4
 # Auth
 python-ldap==3.4.0
 ldap3==2.9.1
-django-radius==1.5.0
+#django-radius==1.5.0
+git+https://github.com/robgolding/django-radius@develop#egg=django-radius
 jumpserver-django-oidc-rp==0.3.7.8
 django-cas-ng==4.0.1
 python-cas==1.5.0
@@ -116,9 +119,9 @@ botocore==1.27.12
 s3transfer==0.6.0
 kubernetes==21.7.0
 # DB requirements
-mysqlclient==2.1.0
+mysqlclient==2.2.0
 PyMySQL==1.0.2
-pymssql==2.2.5
+pymssql==2.2.7
 django-mysql==3.9.0
 django-redis==5.2.0
 python-redis-lock==3.7.0
