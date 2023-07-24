@@ -82,22 +82,13 @@ RUN set -ex \
 WORKDIR /tmp/build
 COPY ./requirements ./requirements
 
+ARG ANSIBLE_CORE_VERSION=2.14.1
 ARG PIP_MIRROR=https://pypi.douban.com/simple
-ARG PIP_JMS_MIRROR=https://pypi.douban.com/simple
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     set -ex \
     && pip config set global.index-url ${PIP_MIRROR} \
-    && pip install --upgrade pip \
-    && pip install --upgrade setuptools wheel \
-    && \
-    if [ "${TARGETARCH}" == "loong64" ]; then \
-        pip install https://download.jumpserver.org/pypi/simple/cryptography/cryptography-38.0.4-cp39-cp39-linux_loongarch64.whl; \
-        pip install https://download.jumpserver.org/pypi/simple/greenlet/greenlet-1.1.2-cp39-cp39-linux_loongarch64.whl; \
-        pip install https://download.jumpserver.org/pypi/simple/PyNaCl/PyNaCl-1.5.0-cp39-cp39-linux_loongarch64.whl; \
-        pip install https://download.jumpserver.org/pypi/simple/grpcio/grpcio-1.54.2-cp39-cp39-linux_loongarch64.whl; \
-    fi \
-    && pip install $(grep -E 'jms|jumpserver' requirements/requirements.txt) -i ${PIP_JMS_MIRROR} \
+    && pip install https://github.com/jumpserver/ansible/releases/download/v${ANSIBLE_CORE_VERSION}/ansible_core-${ANSIBLE_CORE_VERSION}-py3-none-any.whl \
     && pip install -r requirements/requirements.txt
 
 COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
