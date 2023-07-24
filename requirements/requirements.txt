@@ -1,10 +1,12 @@
+# 临时解决 cython 3.0 造成的错误
+cython==0.29.36
 aiofiles==22.1.0
 amqp==5.0.9
 git+https://github.com/jumpserver/ansible@master#egg=ansible-core
 ansible==7.1.0
 ansible-runner==2.2.1
 asn1crypto==0.24.0
-bcrypt==3.1.4
+bcrypt==4.0.1
 billiard==3.6.4.0
 certifi==2022.12.7
 cffi==1.15.1
@@ -14,7 +16,7 @@ decorator==4.1.2
 docutils==0.14
 ecdsa==0.13.3
 enum-compat==0.0.2
-ephem==3.7.6.0
+ephem==4.1.4
 future==0.16.0
 idna==2.8
 itypes==1.2.0
@@ -27,15 +29,15 @@ passlib==1.7.4
 pyasn1==0.4.8
 pycparser==2.21
 cryptography==38.0.4
-pycryptodome==3.15.0
-pycryptodomex==3.15.0
+pycryptodome==3.18.0
+pycryptodomex==3.18.0
 phonenumbers==8.13.8
 gmssl==3.2.1
 itsdangerous==1.1.0
 pyotp==2.6.0
 PyNaCl==1.5.0
 python-dateutil==2.8.2
-PyYAML==6.0
+PyYAML==6.0.1
 requests==2.31.0
 jms-storage==0.0.47
 simplejson==3.17.6
@@ -60,7 +62,7 @@ pyvmomi==7.0.1
 termcolor==1.1.0
 html2text==2020.1.16
 pyzipper==0.3.5
-python3-saml==1.12.0
+python3-saml==1.15.0
 websocket-client==1.2.3
 pyjwkest==1.4.2
 jsonfield2==4.0.0.post0
@@ -94,7 +96,7 @@ django-proxy==1.2.1
 channels-redis==4.0.0
 python-daemon==2.3.0
 eventlet==0.33.1
-greenlet==1.1.2
+greenlet==2.0.2
 gunicorn==20.1.0
 celery==5.2.7
 flower==1.2.0
@@ -105,7 +107,8 @@ websockets==10.4
 # Auth
 python-ldap==3.4.0
 ldap3==2.9.1
-django-radius==1.5.0
+#django-radius==1.5.0
+git+https://github.com/robgolding/django-radius@develop#egg=django-radius
 jumpserver-django-oidc-rp==0.3.7.8
 django-cas-ng==4.0.1
 python-cas==1.5.0
@@ -116,9 +119,9 @@ botocore==1.27.12
 s3transfer==0.6.0
 kubernetes==21.7.0
 # DB requirements
-mysqlclient==2.1.0
+mysqlclient==2.2.0
 PyMySQL==1.0.2
-pymssql==2.2.5
+pymssql==2.2.7
 django-mysql==3.9.0
 django-redis==5.2.0
 python-redis-lock==3.7.0

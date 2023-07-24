@@ -811,9 +811,9 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
         default=False, verbose_name=_('Need update password')
     )
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_('Date updated'))
-    wecom_id = models.CharField(null=True, default=None, unique=True, max_length=128, verbose_name=_('WeCom'))
-    dingtalk_id = models.CharField(null=True, default=None, unique=True, max_length=128, verbose_name=_('DingTalk'))
-    feishu_id = models.CharField(null=True, default=None, unique=True, max_length=128, verbose_name=_('FeiShu'))
+    wecom_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('WeCom'))
+    dingtalk_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('DingTalk'))
+    feishu_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('FeiShu'))
 
     DATE_EXPIRED_WARNING_DAYS = 5
 
@@ -945,6 +945,11 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
     class Meta:
         ordering = ['username']
         verbose_name = _("User")
+        unique_together = (
+            ('dingtalk_id',),
+            ('wecom_id',),
+            ('feishu_id',),
+        )
         permissions = [
             ('invite_user', _('Can invite user')),
             ('remove_user', _('Can remove user')),
