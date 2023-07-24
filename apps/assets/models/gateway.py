@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from assets.const import GATEWAY_NAME
 from assets.models.platform import Platform

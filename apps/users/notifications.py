@@ -1,10 +1,10 @@
-from urllib.parse import urljoin
 from collections import defaultdict
+from urllib.parse import urljoin
 
-from django.utils import timezone
-from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.template.loader import render_to_string
+from django.utils import timezone
+from django.utils.translation import gettext as _
 
 from common.utils import reverse, get_request_ip_or_data, get_request_user_agent
 from notifications.notifications import UserMessage

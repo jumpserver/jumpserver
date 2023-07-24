@@ -5,7 +5,7 @@ import re
 
 from celery.result import AsyncResult
 from django.shortcuts import get_object_or_404
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django_celery_beat.models import PeriodicTask
 from rest_framework import generics, viewsets, mixins, status
 from rest_framework.response import Response

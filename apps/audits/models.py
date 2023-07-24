@@ -1,11 +1,11 @@
 import os
 import uuid
 
+from django.conf import settings
 from django.db import models
 from django.db.models import Q
-from django.conf import settings
 from django.utils import timezone
-from django.utils.translation import gettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from common.db.encoder import ModelJSONFieldEncoder
 from common.utils import lazyproperty

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 #
 from django.shortcuts import get_object_or_404
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework.request import Request
 
-from users.models import User
-from rbac.permissions import RBACPermission
-from common.utils import is_uuid
 from common.exceptions import JMSObjectDoesNotExist
+from common.utils import is_uuid
+from rbac.permissions import RBACPermission
+from users.models import User
 
 __all__ = ['SelfOrPKUserMixin']
 
@@ -57,4 +57,3 @@ class SelfOrPKUserMixin:
 
     def request_user_is_self(self):
         return self.kwargs.get('user') in ['my', 'self']
-

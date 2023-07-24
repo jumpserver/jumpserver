@@ -1,9 +1,9 @@
-import time
 import uuid
+
 from django.conf import settings
 from django.core.cache import cache
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from common.const.signals import SKIP_SIGNAL
 from common.db.models import JMSBaseModel

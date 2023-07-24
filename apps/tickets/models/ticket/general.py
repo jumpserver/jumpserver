@@ -8,7 +8,7 @@ from django.db.models import Prefetch, Q
 from django.db.models.fields import related
 from django.db.utils import IntegrityError
 from django.forms import model_to_dict
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from common.db.encoder import ModelJSONFieldEncoder
 from common.db.models import JMSBaseModel

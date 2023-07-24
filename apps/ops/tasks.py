@@ -2,7 +2,7 @@
 
 from celery import shared_task
 from celery.exceptions import SoftTimeLimitExceeded
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django_celery_beat.models import PeriodicTask
 
 from common.utils import get_logger, get_object_or_none

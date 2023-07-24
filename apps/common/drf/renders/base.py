@@ -4,7 +4,7 @@ import re
 from datetime import datetime
 
 import pyzipper
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.renderers import BaseRenderer
 from rest_framework.utils import encoders, json

@@ -1,7 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 from collections import defaultdict
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework import generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -117,7 +117,6 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
         for user in users:
             self.check_object_permissions(self.request, user)
         return super().perform_bulk_update(serializer)
-
 
     def perform_bulk_destroy(self, objects):
         for obj in objects:

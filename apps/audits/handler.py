@@ -3,7 +3,7 @@ from datetime import datetime
 
 from django.core.cache import cache
 from django.db import transaction
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from common.local import encrypted_field_set
 from common.utils import get_request_ip, get_logger

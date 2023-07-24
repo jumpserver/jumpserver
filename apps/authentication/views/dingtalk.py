@@ -4,7 +4,7 @@ from django.conf import settings
 from django.db.utils import IntegrityError
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseRedirect
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views import View
 from rest_framework.exceptions import APIException
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -13,16 +13,15 @@ from authentication import errors
 from authentication.const import ConfirmType
 from authentication.mixins import AuthMixin
 from authentication.notifications import OAuthBindMessage
-from common.views.mixins import PermissionsMixin, UserConfirmRequiredExceptionMixin
 from common.permissions import UserConfirmation
 from common.sdk.im.dingtalk import URL, DingTalk
 from common.utils import get_logger
 from common.utils.common import get_request_ip
 from common.utils.django import get_object_or_none, reverse
 from common.utils.random import random_string
+from common.views.mixins import PermissionsMixin, UserConfirmRequiredExceptionMixin
 from users.models import User
 from users.views import UserVerifyPasswordView
-
 from .base import BaseLoginCallbackView
 from .mixins import METAMixin, FlashMessageMixin
 
