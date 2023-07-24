@@ -102,7 +102,7 @@ celery==5.3.1
 flower==2.0.0
 django-celery-beat==2.5.0
 kombu==5.3.1
-uvicorn==0.23.1
+uvicorn==0.22.0
 uvicorn[standard]==0.22.0
 websockets==11.0.3
 # Auth
