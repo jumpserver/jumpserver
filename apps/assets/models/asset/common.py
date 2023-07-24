@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#
+import re
 import json
 import logging
 from collections import defaultdict
@@ -9,6 +9,8 @@ from django.db import models
 from django.db.models import Q
 from django.forms import model_to_dict
 from django.utils.translation import gettext_lazy as _
+from django.core.validators import RegexValidator, validate_ipv46_address
+from django.core.exceptions import ValidationError
 
 from assets import const
 from common.db.fields import EncryptMixin
@@ -19,6 +21,27 @@ from ..platform import Platform
 
 __all__ = ['Asset', 'AssetQuerySet', 'default_node', 'Protocol']
 logger = logging.getLogger(__name__)
+
+
+class IpOrHostValidator(RegexValidator):
+    regex_domain = '((?:www\.|(?!www))[a-zA-Z][a-zA-Z0-9-]+[a-zA-Z0-9]\. \
+        [^\s]{2,}|^www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,})'
+    regex_port = '^.+?:[\\d$]'
+
+    def __init__(self, message=None, code=None):
+        self.message = message or _('Invalid IP/Host')
+        self.code = code or 'invalid'
+
+    def __call__(self, value: str) -> None:
+        if re.match(self.regex_port, value):    # 禁止填写端口号
+            raise ValidationError(self.message, code=self.code, params={'value': value})
+        if re.match(self.regex_domain, value):  # 要求符合域名规则
+            return
+        try:
+            validate_ipv46_address(value)   # 要求符合ip规则
+            return
+        except Exception:
+            raise ValidationError(self.message, code=self.code, params={'value': value})
 
 
 def default_node():
@@ -147,7 +170,10 @@ class Asset(NodesRelationMixin, AbsConnectivity, JSONFilterMixin, JMSOrgBaseMode
     Type = const.AllTypes
 
     name = models.CharField(max_length=128, verbose_name=_('Name'))
-    address = models.CharField(max_length=767, verbose_name=_('Address'), db_index=True)
+    address = models.CharField(
+        max_length=767, verbose_name=_('Address'), db_index=True,
+        validators=[IpOrHostValidator(message=_('Invalid IP/Host'))], help_text=_('IP/Host'),
+    )
     platform = models.ForeignKey(Platform, on_delete=models.PROTECT, verbose_name=_("Platform"), related_name='assets')
     domain = models.ForeignKey("assets.Domain", null=True, blank=True, related_name='assets',
                                verbose_name=_("Domain"), on_delete=models.SET_NULL)
