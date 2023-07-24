@@ -4,7 +4,7 @@ PROJECT_DIR=$(dirname "$BASE_DIR")
 
 echo "1. 安装依赖"
 brew install libtiff libjpeg webp little-cms2 openssl gettext git \
-   git-lfs mysql libxml2 libxmlsec1 pkg-config postgresql freetds openssl \
+   git-lfs libxml2 libxmlsec1 pkg-config postgresql freetds openssl \
    libffi freerdp
 
 echo "2. 下载 IP 数据库"
