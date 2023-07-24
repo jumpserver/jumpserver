@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.db import models
 from django.db.models import Count, Q
 from django.utils import timezone
@@ -8,6 +7,7 @@ from simple_history.models import HistoricalRecords
 from assets.models.base import AbsConnectivity
 from common.utils import lazyproperty
 from .base import BaseAccount
+from .mixins import VaultModelMixin
 from ..const import AliasAccount, Source
 
 __all__ = ['Account', 'AccountTemplate', 'AccountHistoricalRecords']
@@ -196,3 +196,21 @@ class AccountTemplate(BaseAccount):
             return
         self.bulk_update_accounts(accounts, {'secret': self.secret})
         self.bulk_create_history_accounts(accounts, user_id)
+
+
+def replace_history_model_with_mixin():
+    """
+    替换历史模型中的父类为指定的Mixin类。
+
+    Parameters:
+        model (class): 历史模型类，例如 Account.history.model
+        mixin_class (class): 要替换为的Mixin类
+
+    Returns:
+        None
+    """
+    model = Account.history.model
+    model.__bases__ = (VaultModelMixin,) + model.__bases__
+
+
+replace_history_model_with_mixin()

@@ -3,8 +3,6 @@ from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
 
 from common.db import fields
-from common.utils import lazyproperty
-
 
 __all__ = ['VaultQuerySetMixin', 'VaultManagerMixin', 'VaultModelMixin']
 
@@ -89,5 +87,3 @@ class VaultModelMixin(models.Model):
     def save(self, *args, **kwargs):
         """ 通过 post_save signal 处理 _secret 数据 """
         return super().save(*args, **kwargs)
-
-

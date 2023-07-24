@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from django.forms.models import model_to_dict
 
 __all__ = ['BaseVault']
@@ -17,20 +18,25 @@ class BaseVault(ABC):
         return self._get(instance)
 
     def create(self, instance):
-        self._create(instance)
-        self._clean_db_secret(instance)
+        if not instance.secret_has_save_to_vault:
+            self._create(instance)
+            self._clean_db_secret(instance)
         self.save_metadata(instance)
 
     def update(self, instance):
-        self._update(instance)
-        self._clean_db_secret(instance)
+        if not instance.secret_has_save_to_vault:
+            self._update(instance)
+            self._clean_db_secret(instance)
         self.save_metadata(instance)
 
     def delete(self, instance):
         self._delete(instance)
 
     def save_metadata(self, instance):
-        metadata = model_to_dict(instance)
+        metadata = model_to_dict(instance, fields=[
+            'name', 'username', 'secret_type',
+            'connectivity', 'su_from', 'privileged'
+        ])
         metadata = {field: str(value) for field, value in metadata.items()}
         return self._save_metadata(instance, metadata)
 

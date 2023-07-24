@@ -1,9 +1,6 @@
-from django.conf import settings
-
-from ..base import BaseVault
 from .entries import build_entry
 from .service import VaultKVClient
-
+from ..base import BaseVault
 
 __all__ = ['Vault']
 

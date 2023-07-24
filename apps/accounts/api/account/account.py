@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 
 from accounts import serializers
-from accounts.backends import get_vault_client
 from accounts.filters import AccountFilterSet
 from accounts.models import Account
 from assets.models import Asset, Node

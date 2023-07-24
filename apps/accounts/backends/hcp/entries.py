@@ -1,7 +1,8 @@
 import sys
-from abc import ABC, abstractmethod
-from common.utils import lazyproperty
+from abc import ABC
+
 from common.db.utils import Encryptor
+from common.utils import lazyproperty
 
 current_module = sys.modules[__name__]
 
@@ -16,7 +17,7 @@ class BaseEntry(ABC):
     @lazyproperty
     def full_path(self):
         path_base = self.path_base
-        path_spec = self.path_spec()
+        path_spec = self.path_spec
         path = f'{path_base}/{path_spec}'
         return path
 
@@ -25,17 +26,14 @@ class BaseEntry(ABC):
         path = f'orgs/{self.instance.org_id}'
         return path
 
-    @abstractmethod
+    @property
     def path_spec(self):
         raise NotImplementedError
 
     def to_internal_data(self):
-        if self.instance.secret_need_save_to_vault():
-            secret = getattr(self.instance, '_secret', '')
-            secret = Encryptor(secret).encrypt()
-            data = {'secret': secret}
-        else:
-            data = {}
+        secret = getattr(self.instance, '_secret', '')
+        secret = Encryptor(secret).encrypt()
+        data = {'secret': secret}
         return data
 
     @staticmethod
@@ -65,11 +63,15 @@ class AccountTemplateEntry(BaseEntry):
 class HistoricalAccountEntry(BaseEntry):
 
     @property
+    def path_base(self):
+        account = self.instance.instance
+        path = f'accounts/{account.id}/'
+        return path
+
+    @property
     def path_spec(self):
-        account_entry = AccountEntry(self.instance.account)
-        path_histories = f'{account_entry.full_path}/histories'
-        path_history = f'{path_histories}/{self.instance.id}'
-        return path_history
+        path = f'histories/{self.instance.id}'
+        return path
 
 
 def build_entry(instance) -> BaseEntry:

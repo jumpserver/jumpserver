@@ -1,8 +1,8 @@
 from django.db.models.signals import pre_save, post_save, post_delete
 from django.dispatch import receiver
 
-from common.utils import get_logger
 from accounts.backends import vault_client
+from common.utils import get_logger
 from .models import Account, AccountTemplate
 
 logger = get_logger(__name__)
@@ -18,6 +18,7 @@ def on_account_pre_save(sender, instance, **kwargs):
 
 class VaultSignalHandler(object):
     """ 处理 Vault 相关的信号 """
+
     @staticmethod
     def save_to_vault(sender, instance, created, **kwargs):
         if created:
