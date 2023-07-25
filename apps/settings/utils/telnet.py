@@ -18,21 +18,21 @@ def telnet(dest_addr, port_number=23, timeout=10):
     return True, output.decode('utf-8', 'ignore')
 
 
-def verbose_telnet(dest_addr, port_number=23, timeout=10, display=None):
+def verbose_telnet(dest_ip, dest_port=23, timeout=10, display=None):
     if display is None:
         display = print
-    ip = lookup_domain(dest_addr)
+    ip = lookup_domain(dest_ip)
     if not ip:
         return
-    msg = 'Trying %s (%s:%s)' % (dest_addr, ip, port_number)
+    msg = 'Trying %s (%s:%s)' % (dest_ip, ip, dest_port)
     display(msg)
     try:
-        is_connective, resp = telnet(dest_addr, port_number, timeout)
+        is_connective, resp = telnet(dest_ip, dest_port, timeout)
         if is_connective:
             template = 'Connected to {0} {1}.\r\n{2}Connection closed by foreign host.'
         else:
             template = 'telnet: connect to {0} {1} {2}\r\ntelnet: Unable to connect to remote host'
-        msg = template.format(dest_addr, port_number, resp)
+        msg = template.format(dest_ip, dest_port, resp)
     except Exception as e:
         msg = 'Error: %s' % e
     display(msg)
