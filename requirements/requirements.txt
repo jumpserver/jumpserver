@@ -70,7 +70,7 @@ geoip2==4.7.0
 ipip-ipdb==1.6.1
 pywinrm==0.4.3
 # Django environment
-Django==4.2.3
+Django==4.1.10
 django-bootstrap3==23.4
 django-filter==23.2
 django-formtools==2.4.1
