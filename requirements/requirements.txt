@@ -2,7 +2,7 @@
 cython==3.0.0
 aiofiles==23.1.0
 amqp==5.1.1
-#git+https://github.com/jumpserver/ansible@master#egg=ansible-core
+ansible-core@https://github.com/jumpserver/ansible/archive/refs/tags/v2.14.1.zip
 ansible==7.1.0
 ansible-runner==2.3.3
 asn1crypto==1.5.1
@@ -70,7 +70,7 @@ geoip2==4.7.0
 ipip-ipdb==1.6.1
 pywinrm==0.4.3
 # Django environment
-Django==4.2.3
+Django==4.1.10
 django-bootstrap3==23.4
 django-filter==23.2
 django-formtools==2.4.1
@@ -108,8 +108,7 @@ websockets==11.0.3
 # Auth
 python-ldap==3.4.3
 ldap3==2.9.1
-#django-radius==1.5.0
-git+https://github.com/robgolding/django-radius@develop#egg=django-radius
+django-radius@https://github.com/ibuler/django-radius/archive/refs/tags/1.5.0.zip
 django-cas-ng==4.3.0
 python-cas==1.6.0
 django-auth-ldap==4.4.0
@@ -121,8 +120,6 @@ kubernetes==27.2.0
 # DB requirements
 mysqlclient==2.2.0
 PyMySQL==1.1.0
-pymssql==2.2.7
-django-mysql==4.11.0
 django-redis==5.3.0
 python-redis-lock==4.0.0
 pyOpenSSL==23.2.0

@@ -82,13 +82,11 @@ RUN set -ex \
 WORKDIR /tmp/build
 COPY ./requirements ./requirements
 
-ARG ANSIBLE_CORE_VERSION=2.14.1
 ARG PIP_MIRROR=https://pypi.douban.com/simple
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     set -ex \
     && pip config set global.index-url ${PIP_MIRROR} \
-    && pip install https://github.com/jumpserver/ansible/releases/download/v${ANSIBLE_CORE_VERSION}/ansible_core-${ANSIBLE_CORE_VERSION}-py3-none-any.whl \
     && pip install -r requirements/requirements.txt
 
 COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
