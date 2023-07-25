@@ -119,7 +119,15 @@ class Protocol(ChoicesMixin, models.TextChoices):
                 'port': 1521,
                 'required': True,
                 'secret_types': ['password'],
-                'xpack': True
+                'xpack': True,
+                'setting': {
+                    'sysdba': {
+                        'type': 'bool',
+                        'default': False,
+                        'label': _('SYSDBA'),
+                        'help_text': _('Connect as SYSDBA')
+                    },
+                }
             },
             cls.sqlserver: {
                 'port': 1433,
