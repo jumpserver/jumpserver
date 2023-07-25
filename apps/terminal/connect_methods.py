@@ -153,8 +153,6 @@ class ConnectMethodUtil:
                 'listen': [Protocol.http, Protocol.ssh],
                 'support': [
                     Protocol.ssh, Protocol.sftp, Protocol.telnet,
-                    Protocol.mysql, Protocol.postgresql,
-                    Protocol.sqlserver, Protocol.mariadb,
                     Protocol.redis, Protocol.mongodb,
                     Protocol.k8s, Protocol.clickhouse,
                 ],
