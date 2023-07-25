@@ -3,7 +3,7 @@
 import random
 
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from common.utils import get_logger
 from orgs.mixins.models import JMSOrgBaseModel

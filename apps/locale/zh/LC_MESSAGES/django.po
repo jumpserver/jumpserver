@@ -3169,8 +3169,8 @@ msgid "%(name)s was updated successfully"
 msgstr "%(name)s 更新成功"
 
 #: common/db/encoder.py:11
-msgid "ugettext_lazy"
-msgstr "ugettext_lazy"
+msgid "gettext_lazy"
+msgstr "gettext_lazy"
 
 #: common/db/fields.py:106
 msgid "Marshal dict data to char field"

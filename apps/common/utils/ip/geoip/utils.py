@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 #
-import os
 import ipaddress
+import os
 
 import geoip2.database
-from geoip2.errors import GeoIP2Error
-from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
+from geoip2.errors import GeoIP2Error
 
 __all__ = ['get_ip_city_by_geoip']
 reader = None
@@ -36,5 +36,3 @@ def get_ip_city_by_geoip(ip):
         lang = 'zh-CN'
     city = city_names.get(lang, _("Unknown"))
     return city
-
-

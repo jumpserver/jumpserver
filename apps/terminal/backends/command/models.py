@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from common.utils.common import lazyproperty
 from orgs.mixins.models import OrgModelMixin
@@ -12,7 +12,6 @@ from terminal.const import RiskLevelChoices
 
 
 class AbstractSessionCommand(OrgModelMixin):
-
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=64, db_index=True, verbose_name=_("User"))
     asset = models.CharField(max_length=128, db_index=True, verbose_name=_("Asset"))

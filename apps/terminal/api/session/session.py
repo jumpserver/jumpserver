@@ -8,7 +8,7 @@ from django.db.models import F
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404, reverse
 from django.utils.encoding import escape_uri_path
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework import viewsets, views

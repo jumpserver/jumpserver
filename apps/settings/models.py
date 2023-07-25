@@ -1,13 +1,12 @@
-import os
 import json
 
+from django.conf import settings
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import models
 from django.db.utils import ProgrammingError, OperationalError
-from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
-from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.utils.translation import gettext_lazy as _
 
 from common.utils import signer, get_logger
 

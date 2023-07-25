@@ -1,4 +1,4 @@
-from django.utils.translation import ugettext_noop
+from django.utils.translation import gettext_noop
 
 from .const import Scope, system_exclude_permissions, org_exclude_permissions
 
@@ -111,25 +111,25 @@ class PredefineRole:
 
 class BuiltinRole:
     system_admin = PredefineRole(
-        '1', ugettext_noop('SystemAdmin'), Scope.system, []
+        '1', gettext_noop('SystemAdmin'), Scope.system, []
     )
     system_auditor = PredefineRole(
-        '2', ugettext_noop('SystemAuditor'), Scope.system, system_auditor_perms
+        '2', gettext_noop('SystemAuditor'), Scope.system, system_auditor_perms
     )
     system_component = PredefineRole(
-        '4', ugettext_noop('SystemComponent'), Scope.system, app_exclude_perms, 'exclude'
+        '4', gettext_noop('SystemComponent'), Scope.system, app_exclude_perms, 'exclude'
     )
     system_user = PredefineRole(
-        '3', ugettext_noop('User'), Scope.system, system_user_perms
+        '3', gettext_noop('User'), Scope.system, system_user_perms
     )
     org_admin = PredefineRole(
-        '5', ugettext_noop('OrgAdmin'), Scope.org, []
+        '5', gettext_noop('OrgAdmin'), Scope.org, []
     )
     org_auditor = PredefineRole(
-        '6', ugettext_noop('OrgAuditor'), Scope.org, auditor_perms
+        '6', gettext_noop('OrgAuditor'), Scope.org, auditor_perms
     )
     org_user = PredefineRole(
-        '7', ugettext_noop('OrgUser'), Scope.org, user_perms
+        '7', gettext_noop('OrgUser'), Scope.org, user_perms
     )
     system_role_mapper = None
     org_role_mapper = None

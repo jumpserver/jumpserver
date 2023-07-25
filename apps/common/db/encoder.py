@@ -6,9 +6,9 @@ from datetime import datetime
 from django.conf import settings
 from django.db import models
 from django.utils import timezone as dj_timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
-lazy_type = type(_('ugettext_lazy'))
+lazy_type = type(_('gettext_lazy'))
 
 
 class ModelJSONFieldEncoder(json.JSONEncoder):

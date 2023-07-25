@@ -1,10 +1,10 @@
 from django.conf import settings
-from django.utils.module_loading import import_string
-from django.utils.translation import ugettext_lazy as _
-from common.utils import get_logger
 from django.contrib.auth import get_user_model
-from authentication.signals import user_auth_failed, user_auth_success
+from django.utils.module_loading import import_string
+from django.utils.translation import gettext_lazy as _
 
+from authentication.signals import user_auth_failed, user_auth_success
+from common.utils import get_logger
 from .base import JMSModelBackend
 
 logger = get_logger(__file__)

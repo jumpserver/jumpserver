@@ -7,8 +7,8 @@ from collections import OrderedDict
 
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
-from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import force_str
+from django.utils.translation import gettext_lazy as _
 from rest_framework import exceptions, serializers
 from rest_framework.fields import empty
 from rest_framework.metadata import SimpleMetadata
@@ -81,7 +81,7 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         field_info["choices"] = [
             {
                 "value": choice_value,
-                "label": force_text(choice_label, strings_only=True),
+                "label": force_str(choice_label, strings_only=True),
             }
             for choice_value, choice_label in dict(field.choices).items()
         ]
@@ -109,7 +109,7 @@ class SimpleMetadataWithFilters(SimpleMetadata):
         for attr in self.attrs:
             value = getattr(field, attr, None)
             if value is not None and value != "":
-                field_info[attr] = force_text(value, strings_only=True)
+                field_info[attr] = force_str(value, strings_only=True)
 
         if getattr(field, "child", None):
             field_info["child"] = self.get_field_info(field.child)

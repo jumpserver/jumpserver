@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 #
+from urllib.parse import urlparse
+
+from django.db.models import TextChoices
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from urllib.parse import urlparse
-from django.utils.translation import ugettext_lazy as _
-from django.db.models import TextChoices
-from common.serializers.fields import LabeledChoiceField
+
 from common.serializers import MethodSerializer
+from common.serializers.fields import LabeledChoiceField
 from common.serializers.fields import ReadableHiddenField, EncryptedField
-from ..models import ReplayStorage, CommandStorage
 from .. import const
+from ..models import ReplayStorage, CommandStorage
 
 
 # Replay storage serializers

@@ -1,6 +1,6 @@
 from django.db import models
 from django.db.models import F, TextChoices
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from accounts.models import Account
 from assets.models import Asset, Node, FamilyMixin

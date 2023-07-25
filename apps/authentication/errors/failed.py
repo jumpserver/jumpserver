@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 #
-from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 
 from users.utils import LoginBlockUtil, MFABlockUtils, LoginIpBlockUtil
-from ..signals import post_auth_failed
 from . import const
+from ..signals import post_auth_failed
 
 
 class AuthFailedNeedLogMixin:

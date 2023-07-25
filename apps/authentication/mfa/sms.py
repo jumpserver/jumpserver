@@ -1,8 +1,8 @@
-from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 
-from .base import BaseMFA
 from common.utils.verify_code import SendAndVerifyCodeUtil
+from .base import BaseMFA
 
 sms_failed_msg = _("SMS verify code invalid")
 

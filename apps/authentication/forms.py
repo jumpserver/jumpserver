@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 #
+from captcha.fields import CaptchaField, CaptchaTextInput
 from django import forms
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
-from captcha.fields import CaptchaField, CaptchaTextInput
+from django.utils.translation import gettext_lazy as _
 
 from common.utils import get_logger, decrypt_password
 

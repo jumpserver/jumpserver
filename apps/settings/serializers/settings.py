@@ -1,12 +1,9 @@
 # coding: utf-8
 from django.core.cache import cache
 from django.utils import translation
-from django.utils.translation import gettext_noop, ugettext_lazy as _
+from django.utils.translation import gettext_noop, gettext_lazy as _
 
 from common.utils import i18n_fmt
-from .basic import BasicSettingSerializer
-from .other import OtherSettingSerializer
-from .email import EmailSettingSerializer, EmailContentSettingSerializer
 from .auth import (
     LDAPSettingSerializer, OIDCSettingSerializer, KeycloakSettingSerializer,
     CASSettingSerializer, RadiusSettingSerializer, FeiShuSettingSerializer,
@@ -15,10 +12,12 @@ from .auth import (
     SAML2SettingSerializer, OAuth2SettingSerializer, SSOSettingSerializer,
     CustomSMSSettingSerializer,
 )
-from .terminal import TerminalSettingSerializer
-from .security import SecuritySettingSerializer
+from .basic import BasicSettingSerializer
 from .cleaning import CleaningSerializer
-
+from .email import EmailSettingSerializer, EmailContentSettingSerializer
+from .other import OtherSettingSerializer
+from .security import SecuritySettingSerializer
+from .terminal import TerminalSettingSerializer
 
 __all__ = [
     'SettingsSerializer',

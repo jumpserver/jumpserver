@@ -5,7 +5,7 @@ from collections import defaultdict
 
 from django.conf import settings
 from django.db.models import TextChoices
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from assets.const import Protocol
 from .const import TerminalType
