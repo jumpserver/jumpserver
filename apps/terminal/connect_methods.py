@@ -19,14 +19,15 @@ class WebMethod(TextChoices):
     @classmethod
     def get_spec_methods(cls):
         methods = {
-            Protocol.ssh: [cls.web_cli, cls.web_sftp],
+            Protocol.sftp: [cls.web_sftp]
         }
         return methods
 
 
 class NativeClient(TextChoices):
     # Koko
-    ssh = 'ssh', 'SSH'
+    ssh = 'ssh', 'SSH CLI'
+    sftp = 'sftp', 'SFTP CLI'
     putty = 'putty', 'PuTTY'
     xshell = 'xshell', 'Xshell'
 
@@ -45,6 +46,7 @@ class NativeClient(TextChoices):
                 'default': [cls.ssh],
                 'windows': [cls.putty],
             },
+            Protocol.sftp: [cls.sftp],
             Protocol.rdp: [cls.mstsc],
             Protocol.mysql: [cls.db_client],
             Protocol.mariadb: [cls.db_client],
@@ -81,13 +83,11 @@ class NativeClient(TextChoices):
         for protocol, _clients in clients_map.items():
             if not settings.XPACK_ENABLED and protocol in xpack_protocols:
                 continue
-
             if isinstance(_clients, dict):
                 if os == 'all':
                     _clients = list(itertools.chain(*_clients.values()))
                 else:
                     _clients = _clients.get(os, _clients['default'])
-
             for client in _clients:
                 if not settings.XPACK_ENABLED and client in cls.xpack_methods():
                     continue
@@ -96,6 +96,7 @@ class NativeClient(TextChoices):
                     'label': client.label,
                     'type': 'native',
                 })
+        print("Methods: ", methods)
         return methods
 
     @classmethod
@@ -103,8 +104,10 @@ class NativeClient(TextChoices):
         username = f'JMS-{token.id}'
         commands = {
             cls.ssh: f'ssh {username}@{endpoint.host} -p {endpoint.ssh_port}',
+            cls.sftp: f'sftp {username}@{endpoint.host} -P {endpoint.ssh_port}',
             cls.putty: f'putty.exe -ssh {username}@{endpoint.host} -P {endpoint.ssh_port}',
             cls.xshell: f'xshell.exe -url ssh://{username}:{token.value}@{endpoint.host}:{endpoint.ssh_port}',
+            # 前端自己处理了
             # cls.mysql: 'mysql -h {hostname} -P {port} -u {username} -p',
             # cls.psql: {
             #     'default': 'psql -h {hostname} -p {port} -U {username} -W',
@@ -125,7 +128,6 @@ class AppletMethod:
         from .models import Applet, AppletHost
 
         methods = defaultdict(list)
-
         has_applet_hosts = AppletHost.objects.all().exists()
         applets = Applet.objects.filter(is_active=True)
         for applet in applets:
@@ -150,7 +152,7 @@ class ConnectMethodUtil:
                 'web_methods': [WebMethod.web_cli],
                 'listen': [Protocol.http, Protocol.ssh],
                 'support': [
-                    Protocol.ssh, Protocol.telnet,
+                    Protocol.ssh, Protocol.sftp, Protocol.telnet,
                     Protocol.mysql, Protocol.postgresql,
                     Protocol.sqlserver, Protocol.mariadb,
                     Protocol.redis, Protocol.mongodb,
@@ -294,7 +296,7 @@ class ConnectMethodUtil:
 
                 for listen_protocol in listen:
                     # Native method
-                    if component == TerminalType.koko and protocol.value != Protocol.ssh:
+                    if component == TerminalType.koko and protocol.value not in [Protocol.ssh, Protocol.sftp]:
                         # koko 仅支持 ssh 的 native 方式，其他数据库的 native 方式不提供
                         continue
                     methods[str(protocol)].extend([
