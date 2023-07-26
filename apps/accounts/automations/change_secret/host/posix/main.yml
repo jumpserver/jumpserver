@@ -53,16 +53,6 @@
         exclusive: "{{ ssh_params.exclusive }}"
       when: account.secret_type == "ssh_key"
 
-    - name: Set sudo setting
-      ansible.builtin.lineinfile:
-        dest: /etc/sudoers
-        state: present
-        regexp: "^{{ account.username }} ALL="
-        line: "{{ account.username + ' ALL=(ALL) NOPASSWD: ' + params.sudo }}"
-        validate: visudo -cf %s
-      when:
-        - params.sudo
-
     - name: Refresh connection
       ansible.builtin.meta: reset_connection
 

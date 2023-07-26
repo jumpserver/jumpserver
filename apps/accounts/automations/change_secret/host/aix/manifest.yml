@@ -5,12 +5,6 @@ type:
   - AIX
 method: change_secret
 params:
-  - name: sudo
-    type: str
-    label: 'Sudo'
-    default: '/bin/whoami'
-    help_text: "{{ 'Params sudo help text' | trans }}"
-
   - name: shell
     type: str
     label: 'Shell'
