@@ -5,9 +5,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.utils.functional import cached_property
 
-from common.utils.random import random_string
 from common.db.models import JMSBaseModel
-from common.db.fields import JsonListTextField
 from orgs.mixins.models import OrgModelMixin
 from orgs.utils import tmp_to_root_org
 from users.models import User
