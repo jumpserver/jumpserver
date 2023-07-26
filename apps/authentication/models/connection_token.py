@@ -225,9 +225,20 @@ class ConnectionToken(JMSOrgBaseModel):
             account.asset = self.asset
             account.org_id = self.asset.org_id
 
-            if self.account in [AliasAccount.INPUT, AliasAccount.USER]:
+            # 手动账号
+            if self.account == AliasAccount.INPUT:
                 account.username = self.input_username
                 account.secret = self.input_secret
+
+            # 同名账号
+            elif self.account == AliasAccount.USER:
+                account.username = self.user.username
+                account.secret = self.input_secret
+
+            # 匿名账号
+            elif self.account == AliasAccount.ANON:
+                account.username = ''
+                account.secret = ''
         else:
             account = self.asset.accounts.filter(name=self.account).first()
             if not account.secret and self.input_secret:
