@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-20 18:40+0800\n"
+"POT-Creation-Date: 2023-07-26 19:26+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -642,7 +642,7 @@ msgstr "账号已存在"
 msgid "ID"
 msgstr "ID"
 
-#: accounts/serializers/account/account.py:427 acls/serializers/base.py:116
+#: accounts/serializers/account/account.py:430 acls/serializers/base.py:116
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:49
 #: audits/models.py:85 audits/models.py:163
 #: authentication/models/connection_token.py:32
@@ -660,7 +660,7 @@ msgstr "ID"
 msgid "User"
 msgstr "用户"
 
-#: accounts/serializers/account/account.py:428
+#: accounts/serializers/account/account.py:431
 #: authentication/templates/authentication/_access_key_modal.html:33
 #: terminal/notifications.py:158 terminal/notifications.py:207
 msgid "Date"
@@ -4798,7 +4798,7 @@ msgid ""
 "Session, record, command will be delete if more than duration, only in "
 "database, OSS will not be affected."
 msgstr ""
-"会话、录像，命令记录超过该时长将会被洲除（影响数据库存備，OSS 等不受影响）"
+"会话、录像，命令记录超过该时长将会被清除（影响数据库存储，OSS 等不受影响）"
 
 #: settings/serializers/cleaning.py:36
 msgid "Activity log keep days (day)"
