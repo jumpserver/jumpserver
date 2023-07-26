@@ -69,7 +69,7 @@ class AccountsPermedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
         fields = [
-            'alias', 'name', 'username', 'has_username',
+            'id', 'alias', 'name', 'username', 'has_username',
             'has_secret', 'secret_type', 'actions'
         ]
         read_only_fields = fields
