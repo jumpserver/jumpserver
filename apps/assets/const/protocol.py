@@ -11,6 +11,7 @@ __all__ = ['Protocol']
 
 class Protocol(ChoicesMixin, models.TextChoices):
     ssh = 'ssh', 'SSH'
+    sftp = 'sftp', 'SFTP'
     rdp = 'rdp', 'RDP'
     telnet = 'telnet', 'Telnet'
     vnc = 'vnc', 'VNC'
@@ -36,17 +37,16 @@ class Protocol(ChoicesMixin, models.TextChoices):
             cls.ssh: {
                 'port': 22,
                 'secret_types': ['password', 'ssh_key'],
+            },
+            cls.sftp: {
+                'port': 22,
+                'secret_types': ['password', 'ssh_key'],
                 'setting': {
-                    'sftp_enabled': {
-                        'type': 'bool',
-                        'default': True,
-                        'label': _('SFTP enabled')
-                    },
                     'sftp_home': {
                         'type': 'str',
                         'default': '/tmp',
                         'label': _('SFTP home')
-                    },
+                    }
                 }
             },
             cls.rdp: {
