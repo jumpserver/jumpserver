@@ -306,9 +306,6 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
 
         if account.username != AliasAccount.INPUT:
             data['input_username'] = ''
-        elif account.username == AliasAccount.USER:
-            data['input_username'] = user.username
-
         ticket = self._validate_acl(user, asset, account)
         if ticket:
             data['from_ticket'] = ticket
