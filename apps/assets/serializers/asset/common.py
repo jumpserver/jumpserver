@@ -157,6 +157,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
     def _extract_accounts(self):
         if not getattr(self, 'initial_data', None):
             return
+        if isinstance(self.initial_data, list):
+            return
         accounts = self.initial_data.pop('accounts', None)
         self._accounts = accounts
 
