@@ -91,7 +91,7 @@ class ES(object):
 
         try:
             # 获取索引信息，如果没有定义，直接返回
-            data = self.es.indices.get_mapping(self.index)
+            data = self.es.indices.get_mapping(index=self.index)
         except NotFoundError:
             return False
 
