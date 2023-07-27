@@ -174,8 +174,6 @@ class RDPFileClientProtocolURLMixin:
                     'content': content,
                 }
             })
-        elif connect_method_name == NativeClient.sftp_client:
-            data.update({'protocol': 'sftp', 'command': ''})
         else:
             cmd = NativeClient.get_launch_command(connect_method_name, token, endpoint)
             data.update({'command': cmd})
