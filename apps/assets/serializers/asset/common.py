@@ -261,7 +261,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
 
     def is_valid(self, raise_exception=False):
         self._set_protocols_default()
-        return super().is_valid(raise_exception)
+        return super().is_valid(raise_exception=raise_exception)
 
     def validate_protocols(self, protocols_data):
         # 目的是去重
