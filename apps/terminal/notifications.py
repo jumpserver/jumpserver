@@ -270,7 +270,7 @@ class SessionSharingMessage(UserMessage):
             'asset': instance.session.asset,
             'created_by': instance.created_by,
             'account': instance.session.account,
-            'session_url': '%s/koko/share/%s/' % (instance.origin, instance.id),
+            'url': instance.url,
             'verify_code': instance.verify_code,
             'org': instance.org_name,
         }

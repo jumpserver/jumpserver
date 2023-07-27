@@ -47,6 +47,10 @@ class SessionSharing(JMSBaseModel, OrgModelMixin):
         return 'Creator: {}'.format(self.creator)
 
     @cached_property
+    def url(self):
+        return '%s/koko/share/%s/' % (self.origin, self.id)
+
+    @cached_property
     def users_display(self):
         if not self.users:
             return []

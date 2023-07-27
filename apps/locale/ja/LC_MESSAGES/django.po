@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-26 19:15+0800\n"
+"POT-Creation-Date: 2023-07-27 11:11+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -316,7 +316,7 @@ msgid "Trigger mode"
 msgstr "トリガーモード"
 
 #: accounts/models/automations/backup_account.py:97 audits/models.py:194
-#: terminal/models/session/sharing.py:119 xpack/plugins/cloud/models.py:168
+#: terminal/models/session/sharing.py:117 xpack/plugins/cloud/models.py:168
 msgid "Reason"
 msgstr "理由"
 
@@ -657,7 +657,7 @@ msgstr "ID"
 #: perms/api/user_permission/mixin.py:55 perms/models/asset_permission.py:58
 #: perms/serializers/permission.py:30 rbac/builtin.py:123
 #: rbac/models/rolebinding.py:49 terminal/backends/command/models.py:16
-#: terminal/models/session/session.py:29 terminal/models/session/sharing.py:35
+#: terminal/models/session/session.py:29 terminal/models/session/sharing.py:33
 #: terminal/notifications.py:156 terminal/notifications.py:205
 #: terminal/serializers/command.py:16
 #: terminal/templates/terminal/_msg_command_warning.html:6
@@ -748,7 +748,7 @@ msgstr "自動タスク実行履歴"
 #: accounts/serializers/automations/change_secret.py:155 audits/const.py:53
 #: audits/models.py:59 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:18 ops/const.py:56 ops/serializers/celery.py:40
-#: terminal/const.py:76 terminal/models/session/sharing.py:115
+#: terminal/const.py:76 terminal/models/session/sharing.py:113
 #: tickets/views/approve.py:115
 msgid "Success"
 msgstr "成功"
@@ -832,7 +832,7 @@ msgstr "レビュー担当者"
 #: acls/models/base.py:43 authentication/models/access_key.py:17
 #: authentication/models/connection_token.py:53
 #: authentication/templates/authentication/_access_key_modal.html:32
-#: perms/models/asset_permission.py:76 terminal/models/session/sharing.py:30
+#: perms/models/asset_permission.py:76 terminal/models/session/sharing.py:28
 #: tickets/const.py:37
 msgid "Active"
 msgstr "アクティブ"
@@ -2061,7 +2061,7 @@ msgid "Job audit log"
 msgstr "ジョブ監査ログ"
 
 #: audits/models.py:51 audits/models.py:95 audits/models.py:166
-#: terminal/models/session/session.py:38 terminal/models/session/sharing.py:107
+#: terminal/models/session/session.py:38 terminal/models/session/sharing.py:105
 msgid "Remote addr"
 msgstr "リモートaddr"
 
@@ -2078,8 +2078,8 @@ msgid "File"
 msgstr "書類"
 
 #: audits/models.py:62 terminal/backends/command/models.py:21
-#: terminal/models/session/replay.py:9 terminal/models/session/sharing.py:21
-#: terminal/models/session/sharing.py:89
+#: terminal/models/session/replay.py:9 terminal/models/session/sharing.py:19
+#: terminal/models/session/sharing.py:87
 #: terminal/templates/terminal/_msg_command_alert.html:10
 #: terminal/templates/terminal/_msg_command_warning.html:17
 #: tickets/models/ticket/command_confirm.py:15
@@ -2940,7 +2940,7 @@ msgid "request new one"
 msgstr "新しいものを要求する"
 
 #: authentication/templates/authentication/_msg_reset_password_code.html:12
-#: terminal/models/session/sharing.py:28 terminal/models/session/sharing.py:91
+#: terminal/models/session/sharing.py:26 terminal/models/session/sharing.py:89
 #: terminal/templates/terminal/_msg_session_sharing.html:12
 #: users/forms/profile.py:107 users/templates/users/forgot_password.html:66
 msgid "Verify code"
@@ -3689,7 +3689,7 @@ msgstr "アルグ"
 
 #: ops/models/adhoc.py:25 ops/models/base.py:16 ops/models/base.py:53
 #: ops/models/job.py:106 ops/models/job.py:192 ops/models/playbook.py:25
-#: terminal/models/session/sharing.py:26
+#: terminal/models/session/sharing.py:24
 msgid "Creator"
 msgstr "作成者"
 
@@ -3730,7 +3730,7 @@ msgstr "タスクモニターを表示できます"
 msgid "Kwargs"
 msgstr "クワーグ"
 
-#: ops/models/celery.py:61 terminal/models/session/sharing.py:122
+#: ops/models/celery.py:61 terminal/models/session/sharing.py:120
 #: tickets/const.py:25
 msgid "Finished"
 msgstr "終了"
@@ -6000,7 +6000,7 @@ msgstr "セッション再生をダウンロードできます"
 msgid "Account id"
 msgstr "アカウント ID"
 
-#: terminal/models/session/session.py:36 terminal/models/session/sharing.py:112
+#: terminal/models/session/session.py:36 terminal/models/session/sharing.py:110
 msgid "Login from"
 msgstr "ログイン元"
 
@@ -6032,61 +6032,61 @@ msgstr "セッションを終了できます"
 msgid "Can validate session action perm"
 msgstr "セッションアクションのパーマを検証できます"
 
-#: terminal/models/session/sharing.py:33
+#: terminal/models/session/sharing.py:31
 msgid "Expired time (min)"
 msgstr "期限切れ時間 (分)"
 
-#: terminal/models/session/sharing.py:37 terminal/serializers/sharing.py:20
+#: terminal/models/session/sharing.py:35 terminal/serializers/sharing.py:20
 #: terminal/serializers/sharing.py:52
 msgid "Action permission"
 msgstr "アクションパーミッション"
 
-#: terminal/models/session/sharing.py:39
+#: terminal/models/session/sharing.py:37
 msgid "Origin"
-msgstr ""
+msgstr "ソース"
 
-#: terminal/models/session/sharing.py:43 terminal/models/session/sharing.py:94
+#: terminal/models/session/sharing.py:41 terminal/models/session/sharing.py:92
 #: terminal/notifications.py:261
 msgid "Session sharing"
 msgstr "セッション共有"
 
-#: terminal/models/session/sharing.py:45
+#: terminal/models/session/sharing.py:43
 msgid "Can add super session sharing"
 msgstr "スーパーセッション共有を追加できます"
 
-#: terminal/models/session/sharing.py:77
+#: terminal/models/session/sharing.py:75
 msgid "Link not active"
 msgstr "リンクがアクティブでない"
 
-#: terminal/models/session/sharing.py:79
+#: terminal/models/session/sharing.py:77
 msgid "Link expired"
 msgstr "リンク期限切れ"
 
-#: terminal/models/session/sharing.py:81
+#: terminal/models/session/sharing.py:79
 msgid "User not allowed to join"
 msgstr "ユーザーはセッションに参加できません"
 
-#: terminal/models/session/sharing.py:98 terminal/serializers/sharing.py:71
+#: terminal/models/session/sharing.py:96 terminal/serializers/sharing.py:71
 msgid "Joiner"
 msgstr "ジョイナー"
 
-#: terminal/models/session/sharing.py:101
+#: terminal/models/session/sharing.py:99
 msgid "Date joined"
 msgstr "参加日"
 
-#: terminal/models/session/sharing.py:104
+#: terminal/models/session/sharing.py:102
 msgid "Date left"
 msgstr "日付が残っています"
 
-#: terminal/models/session/sharing.py:127
+#: terminal/models/session/sharing.py:125
 msgid "Session join record"
 msgstr "セッション参加記録"
 
-#: terminal/models/session/sharing.py:143
+#: terminal/models/session/sharing.py:141
 msgid "Invalid verification code"
 msgstr "検証コードが無効"
 
-#: terminal/models/session/sharing.py:150
+#: terminal/models/session/sharing.py:148
 msgid "You have already joined this session"
 msgstr "すでにこのセッションに参加しています"
 
