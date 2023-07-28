@@ -5,6 +5,12 @@ type:
   - AIX
 method: change_secret
 params:
+  - name: sudo
+    type: str
+    label: 'Sudo'
+    default: '/bin/whoami'
+    help_text: '使用逗号分隔多个命令，如: /bin/whoami,/sbin/ifconfig'
+
   - name: shell
     type: str
     label: 'Shell'
