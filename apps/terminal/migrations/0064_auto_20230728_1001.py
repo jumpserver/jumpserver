@@ -20,4 +20,9 @@ class Migration(migrations.Migration):
             name='auto_create_accounts',
             field=models.BooleanField(default=True, verbose_name='Auto create accounts'),
         ),
+        migrations.AddField(
+            model_name='sessionsharing',
+            name='origin',
+            field=models.URLField(blank=True, null=True, verbose_name='Origin'),
+        ),
     ]
