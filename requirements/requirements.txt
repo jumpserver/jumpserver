@@ -69,6 +69,7 @@ jsonfield2==4.0.0.post0
 geoip2==4.7.0
 ipip-ipdb==1.6.1
 pywinrm==0.4.3
+python-nmap==0.7.1
 # Django environment
 Django==4.1.10
 django-bootstrap3==23.4
