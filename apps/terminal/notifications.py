@@ -255,3 +255,27 @@ class StorageConnectivityMessage(SystemMessage):
             'subject': subject,
             'message': message
         }
+
+
+class SessionSharingMessage(UserMessage):
+    message_type_label = _('Session sharing')
+
+    def __init__(self, user, instance):
+        super().__init__(user)
+        self.instance = instance
+
+    def get_html_msg(self) -> dict:
+        instance = self.instance
+        context = {
+            'asset': instance.session.asset,
+            'created_by': instance.created_by,
+            'account': instance.session.account,
+            'url': instance.url,
+            'verify_code': instance.verify_code,
+            'org': instance.org_name,
+        }
+        message = render_to_string('terminal/_msg_session_sharing.html', context)
+        return {
+            'subject': self.message_type_label + ' ' + self.instance.created_by,
+            'message': message
+        }

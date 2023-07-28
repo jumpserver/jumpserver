@@ -3,6 +3,7 @@ import datetime
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.utils.functional import cached_property
 
 from common.db.models import JMSBaseModel
 from orgs.mixins.models import OrgModelMixin
@@ -30,10 +31,10 @@ class SessionSharing(JMSBaseModel, OrgModelMixin):
         default=0, verbose_name=_('Expired time (min)'), db_index=True
     )
     users = models.TextField(blank=True, verbose_name=_("User"))
-
     action_permission = models.CharField(
         max_length=16, verbose_name=_('Action permission'), default='writable'
     )
+    origin = models.URLField(blank=True, null=True, verbose_name=_('Origin'))
 
     class Meta:
         ordering = ('-date_created',)
@@ -45,14 +46,23 @@ class SessionSharing(JMSBaseModel, OrgModelMixin):
     def __str__(self):
         return 'Creator: {}'.format(self.creator)
 
+    @cached_property
+    def url(self):
+        return '%s/koko/share/%s/' % (self.origin, self.id)
+
+    @cached_property
     def users_display(self):
         if not self.users:
             return []
         with tmp_to_root_org():
-            user_ids = self.users.split(',')
-            users = User.objects.filter(id__in=user_ids)
+            users = self.users_queryset
             users = [str(user) for user in users]
         return users
+
+    @cached_property
+    def users_queryset(self):
+        user_ids = self.users.split(',')
+        return User.objects.filter(id__in=user_ids)
 
     @property
     def date_expired(self):

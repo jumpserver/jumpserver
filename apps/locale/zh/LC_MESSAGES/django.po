@@ -201,6 +201,7 @@ msgstr "仅创建"
 #: terminal/backends/command/models.py:17 terminal/models/session/session.py:31
 #: terminal/notifications.py:155 terminal/serializers/command.py:17
 #: terminal/templates/terminal/_msg_command_warning.html:4
+#: terminal/templates/terminal/_msg_session_sharing.html:4
 #: tickets/models/ticket/apply_asset.py:16 xpack/plugins/cloud/models.py:212
 msgid "Asset"
 msgstr "资产"
@@ -235,6 +236,7 @@ msgstr "来源 ID"
 #: perms/models/asset_permission.py:70 perms/serializers/permission.py:39
 #: terminal/backends/command/models.py:18 terminal/models/session/session.py:33
 #: terminal/templates/terminal/_msg_command_warning.html:8
+#: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:13 xpack/plugins/cloud/models.py:85
 msgid "Account"
 msgstr "账号"
@@ -313,7 +315,7 @@ msgid "Trigger mode"
 msgstr "触发模式"
 
 #: accounts/models/automations/backup_account.py:97 audits/models.py:194
-#: terminal/models/session/sharing.py:111 xpack/plugins/cloud/models.py:168
+#: terminal/models/session/sharing.py:117 xpack/plugins/cloud/models.py:168
 msgid "Reason"
 msgstr "原因"
 
@@ -651,10 +653,11 @@ msgstr "ID"
 #: perms/api/user_permission/mixin.py:55 perms/models/asset_permission.py:58
 #: perms/serializers/permission.py:30 rbac/builtin.py:123
 #: rbac/models/rolebinding.py:49 terminal/backends/command/models.py:16
-#: terminal/models/session/session.py:29 terminal/models/session/sharing.py:32
+#: terminal/models/session/session.py:29 terminal/models/session/sharing.py:33
 #: terminal/notifications.py:156 terminal/notifications.py:205
 #: terminal/serializers/command.py:16
 #: terminal/templates/terminal/_msg_command_warning.html:6
+#: terminal/templates/terminal/_msg_session_sharing.html:6
 #: tickets/models/comment.py:21 users/const.py:14 users/models/user.py:947
 #: users/models/user.py:983 users/serializers/group.py:18
 msgid "User"
@@ -741,7 +744,7 @@ msgstr "自动化任务执行历史"
 #: accounts/serializers/automations/change_secret.py:155 audits/const.py:53
 #: audits/models.py:59 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:18 ops/const.py:56 ops/serializers/celery.py:40
-#: terminal/const.py:76 terminal/models/session/sharing.py:107
+#: terminal/const.py:76 terminal/models/session/sharing.py:113
 #: tickets/views/approve.py:115
 msgid "Success"
 msgstr "成功"
@@ -825,7 +828,7 @@ msgstr "审批人"
 #: acls/models/base.py:43 authentication/models/access_key.py:17
 #: authentication/models/connection_token.py:53
 #: authentication/templates/authentication/_access_key_modal.html:32
-#: perms/models/asset_permission.py:76 terminal/models/session/sharing.py:27
+#: perms/models/asset_permission.py:76 terminal/models/session/sharing.py:28
 #: tickets/const.py:37
 msgid "Active"
 msgstr "激活中"
@@ -1180,11 +1183,11 @@ msgstr "使用 SSL"
 
 #: assets/const/protocol.py:127
 msgid "SYSDBA"
-msgstr ""
+msgstr "SYSDBA"
 
 #: assets/const/protocol.py:128
 msgid "Connect as SYSDBA"
-msgstr ""
+msgstr "以 SYSDBA 角色连接"
 
 #: assets/const/protocol.py:157
 msgid "Auth username"
@@ -1986,6 +1989,7 @@ msgstr "映射目录"
 
 #: audits/const.py:23 rbac/tree.py:229
 #: terminal/templates/terminal/_msg_command_warning.html:18
+#: terminal/templates/terminal/_msg_session_sharing.html:10
 msgid "View"
 msgstr "查看"
 
@@ -2049,7 +2053,7 @@ msgid "Job audit log"
 msgstr "作业审计日志"
 
 #: audits/models.py:51 audits/models.py:95 audits/models.py:166
-#: terminal/models/session/session.py:38 terminal/models/session/sharing.py:99
+#: terminal/models/session/session.py:38 terminal/models/session/sharing.py:105
 msgid "Remote addr"
 msgstr "远端地址"
 
@@ -2066,8 +2070,8 @@ msgid "File"
 msgstr "文件"
 
 #: audits/models.py:62 terminal/backends/command/models.py:21
-#: terminal/models/session/replay.py:9 terminal/models/session/sharing.py:18
-#: terminal/models/session/sharing.py:81
+#: terminal/models/session/replay.py:9 terminal/models/session/sharing.py:19
+#: terminal/models/session/sharing.py:87
 #: terminal/templates/terminal/_msg_command_alert.html:10
 #: terminal/templates/terminal/_msg_command_warning.html:17
 #: tickets/models/ticket/command_confirm.py:15
@@ -2908,7 +2912,8 @@ msgid "request new one"
 msgstr "重新申请"
 
 #: authentication/templates/authentication/_msg_reset_password_code.html:12
-#: terminal/models/session/sharing.py:25 terminal/models/session/sharing.py:83
+#: terminal/models/session/sharing.py:26 terminal/models/session/sharing.py:89
+#: terminal/templates/terminal/_msg_session_sharing.html:12
 #: users/forms/profile.py:107 users/templates/users/forgot_password.html:66
 msgid "Verify code"
 msgstr "验证码"
@@ -3645,7 +3650,7 @@ msgstr "参数"
 
 #: ops/models/adhoc.py:25 ops/models/base.py:16 ops/models/base.py:53
 #: ops/models/job.py:106 ops/models/job.py:192 ops/models/playbook.py:25
-#: terminal/models/session/sharing.py:23
+#: terminal/models/session/sharing.py:24
 msgid "Creator"
 msgstr "创建者"
 
@@ -3686,7 +3691,7 @@ msgstr "可以查看任务监控"
 msgid "Kwargs"
 msgstr "其它参数"
 
-#: ops/models/celery.py:61 terminal/models/session/sharing.py:114
+#: ops/models/celery.py:61 terminal/models/session/sharing.py:120
 #: tickets/const.py:25
 msgid "Finished"
 msgstr "结束"
@@ -3881,6 +3886,7 @@ msgstr "组织管理"
 #: rbac/const.py:7 rbac/models/rolebinding.py:56
 #: rbac/serializers/rolebinding.py:40 settings/serializers/auth/ldap.py:63
 #: terminal/templates/terminal/_msg_command_warning.html:21
+#: terminal/templates/terminal/_msg_session_sharing.html:14
 #: tickets/models/ticket/general.py:302 tickets/serializers/ticket/ticket.py:60
 msgid "Organization"
 msgstr "组织"
@@ -5923,7 +5929,7 @@ msgstr "可以下载会话录像"
 msgid "Account id"
 msgstr "账号 ID"
 
-#: terminal/models/session/session.py:36 terminal/models/session/sharing.py:104
+#: terminal/models/session/session.py:36 terminal/models/session/sharing.py:110
 msgid "Login from"
 msgstr "登录来源"
 
@@ -5955,7 +5961,7 @@ msgstr "可以终断会话"
 msgid "Can validate session action perm"
 msgstr "可以验证会话动作权限"
 
-#: terminal/models/session/sharing.py:30
+#: terminal/models/session/sharing.py:31
 msgid "Expired time (min)"
 msgstr "过期时间 (分)"
 
@@ -5964,47 +5970,52 @@ msgstr "过期时间 (分)"
 msgid "Action permission"
 msgstr "操作权限"
 
-#: terminal/models/session/sharing.py:40 terminal/models/session/sharing.py:86
+#: terminal/models/session/sharing.py:37
+msgid "Origin"
+msgstr "来源"
+
+#: terminal/models/session/sharing.py:41 terminal/models/session/sharing.py:92
+#: terminal/notifications.py:261
 msgid "Session sharing"
 msgstr "会话分享"
 
-#: terminal/models/session/sharing.py:42
+#: terminal/models/session/sharing.py:43
 msgid "Can add super session sharing"
 msgstr "可以创建超级会话分享"
 
-#: terminal/models/session/sharing.py:69
+#: terminal/models/session/sharing.py:75
 msgid "Link not active"
 msgstr "链接失效"
 
-#: terminal/models/session/sharing.py:71
+#: terminal/models/session/sharing.py:77
 msgid "Link expired"
 msgstr "链接过期"
 
-#: terminal/models/session/sharing.py:73
+#: terminal/models/session/sharing.py:79
 msgid "User not allowed to join"
 msgstr "该用户无权加入会话"
 
-#: terminal/models/session/sharing.py:90 terminal/serializers/sharing.py:71
+#: terminal/models/session/sharing.py:96 terminal/serializers/sharing.py:71
 msgid "Joiner"
 msgstr "加入者"
 
-#: terminal/models/session/sharing.py:93
+#: terminal/models/session/sharing.py:99
 msgid "Date joined"
 msgstr "加入日期"
 
-#: terminal/models/session/sharing.py:96
+#: terminal/models/session/sharing.py:102
 msgid "Date left"
 msgstr "结束日期"
 
-#: terminal/models/session/sharing.py:119
+#: terminal/models/session/sharing.py:125
 msgid "Session join record"
 msgstr "会话加入记录"
 
-#: terminal/models/session/sharing.py:135
+#: terminal/models/session/sharing.py:141
 msgid "Invalid verification code"
 msgstr "验证码不正确"
 
-#: terminal/models/session/sharing.py:142
+#: terminal/models/session/sharing.py:148
 msgid "You have already joined this session"
 msgstr "您已经加入过此会话"
 
@@ -6307,6 +6318,10 @@ msgstr "检查命令及录像存储可连接性 "
 #: terminal/templates/terminal/_msg_command_alert.html:10
 msgid "view"
 msgstr "查看"
+
+#: terminal/templates/terminal/_msg_session_sharing.html:10
+msgid "Session sharing URL"
+msgstr "会话分享 URL"
 
 #: terminal/utils/db_port_mapper.py:85
 msgid ""
