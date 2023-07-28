@@ -1,10 +1,17 @@
 - hosts: demo
   gather_facts: no
   tasks:
-    - name: Test privileged account
+    - name: "Test privileged {{ jms_account.username }} account"
       ansible.builtin.ping:
 
-    - name: Push user
+    - name: "Check if {{ account.username }} user exists"
+      getent:
+        database: passwd
+        key: "{{ account.username }}"
+      register: user_info
+      ignore_errors: yes  # 忽略错误，如果用户不存在时不会导致playbook失败
+
+    - name: "Add {{ account.username }} user"
       ansible.builtin.user:
         name: "{{ account.username }}"
         shell: "{{ params.shell }}"
@@ -12,19 +19,23 @@
         groups: "{{ params.groups }}"
         expires: -1
         state: present
+      when: user_info.failed
 
     - name: "Add {{ account.username }} group"
       ansible.builtin.group:
         name: "{{ account.username }}"
         state: present
+      when: user_info.failed
 
-    - name: Add user groups
+    - name: "Add {{ account.username }} user to group"
       ansible.builtin.user:
         name: "{{ account.username }}"
         groups: "{{ params.groups }}"
-      when: params.groups
+      when:
+        - user_info.failed
+        - params.groups
 
-    - name: Push user password
+    - name: "Change {{ account.username }} password"
       ansible.builtin.user:
         name: "{{ account.username }}"
         password: "{{ account.secret | password_hash('sha512') }}"
@@ -41,14 +52,14 @@
         - account.secret_type == "ssh_key"
         - ssh_params.strategy == "set_jms"
 
-    - name: Push SSH key
+    - name: "Change {{ account.username }} SSH key"
       ansible.builtin.authorized_key:
         user: "{{ account.username }}"
         key: "{{ account.secret }}"
         exclusive: "{{ ssh_params.exclusive }}"
       when: account.secret_type == "ssh_key"
 
-    - name: Set sudo setting
+    - name: "Set {{ account.username }} sudo setting"
       ansible.builtin.lineinfile:
         dest: /etc/sudoers
         state: present
@@ -56,12 +67,13 @@
         line: "{{ account.username + ' ALL=(ALL) NOPASSWD: ' + params.sudo }}"
         validate: visudo -cf %s
       when:
+        - user_info.failed
         - params.sudo
 
     - name: Refresh connection
       ansible.builtin.meta: reset_connection
 
-    - name: Verify password
+    - name: "Verify {{ account.username }} password"
       ansible.builtin.ping:
       become: no
       vars:
@@ -70,7 +82,7 @@
         ansible_become: no
       when: account.secret_type == "password"
 
-    - name: Verify SSH key
+    - name: "Verify {{ account.username }} SSH key"
       ansible.builtin.ping:
       become: no
       vars:
