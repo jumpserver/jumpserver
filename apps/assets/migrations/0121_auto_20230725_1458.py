@@ -6,7 +6,10 @@ from django.db import migrations
 def migrate_platforms_sftp_protocol(apps, schema_editor):
     platform_protocol_cls = apps.get_model('assets', 'PlatformProtocol')
     platform_cls = apps.get_model('assets', 'Platform')
-    ssh_protocols = platform_protocol_cls.objects.filter(name='ssh', setting__sftp_enabled=True)
+    ssh_protocols = platform_protocol_cls.objects \
+        .filter(name='ssh', setting__sftp_enabled=True) \
+        .exclude(name__in=('Gateway', 'RemoteAppHost')) \
+        .filter(type='linux')
     platforms_has_sftp = platform_cls.objects.filter(protocols__name='sftp')
 
     new_protocols = []

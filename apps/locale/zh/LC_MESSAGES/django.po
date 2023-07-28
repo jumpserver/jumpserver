@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-27 11:11+0800\n"
+"POT-Creation-Date: 2023-07-28 10:57+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -289,7 +289,7 @@ msgstr "账号备份计划"
 #: assets/models/automations/base.py:115 audits/models.py:60
 #: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:194
 #: ops/templates/ops/celery_task_log.html:75
-#: perms/models/asset_permission.py:72 terminal/models/applet/host.py:137
+#: perms/models/asset_permission.py:72 terminal/models/applet/host.py:139
 #: terminal/models/session/session.py:44
 #: tickets/models/ticket/apply_application.py:30
 #: tickets/models/ticket/apply_asset.py:19
@@ -315,7 +315,7 @@ msgid "Trigger mode"
 msgstr "触发模式"
 
 #: accounts/models/automations/backup_account.py:97 audits/models.py:194
-#: terminal/models/session/sharing.py:117 xpack/plugins/cloud/models.py:168
+#: terminal/models/session/sharing.py:121 xpack/plugins/cloud/models.py:168
 msgid "Reason"
 msgstr "原因"
 
@@ -412,7 +412,7 @@ msgstr "开始日期"
 #: accounts/models/automations/change_secret.py:91
 #: assets/models/automations/base.py:116 ops/models/base.py:56
 #: ops/models/celery.py:64 ops/models/job.py:195
-#: terminal/models/applet/host.py:138
+#: terminal/models/applet/host.py:140
 msgid "Date finished"
 msgstr "结束日期"
 
@@ -744,7 +744,7 @@ msgstr "自动化任务执行历史"
 #: accounts/serializers/automations/change_secret.py:155 audits/const.py:53
 #: audits/models.py:59 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:18 ops/const.py:56 ops/serializers/celery.py:40
-#: terminal/const.py:76 terminal/models/session/sharing.py:113
+#: terminal/const.py:76 terminal/models/session/sharing.py:117
 #: tickets/views/approve.py:115
 msgid "Success"
 msgstr "成功"
@@ -1076,7 +1076,7 @@ msgstr "禁用"
 msgid "Basic"
 msgstr "基本"
 
-#: assets/const/base.py:35 assets/const/protocol.py:193
+#: assets/const/base.py:35 assets/const/protocol.py:201
 #: assets/models/asset/web.py:13
 msgid "Script"
 msgstr "脚本"
@@ -1181,28 +1181,36 @@ msgstr "AD 网域"
 msgid "Use SSL"
 msgstr "使用 SSL"
 
-#: assets/const/protocol.py:149
+#: assets/const/protocol.py:127
+msgid "SYSDBA"
+msgstr "SYSDBA"
+
+#: assets/const/protocol.py:128
+msgid "Connect as SYSDBA"
+msgstr "以 SYSDBA 角色连接"
+
+#: assets/const/protocol.py:157
 msgid "Auth username"
 msgstr "使用用户名认证"
 
-#: assets/const/protocol.py:170 assets/models/asset/web.py:9
+#: assets/const/protocol.py:178 assets/models/asset/web.py:9
 #: assets/serializers/asset/info/spec.py:16
 msgid "Autofill"
 msgstr "自动代填"
 
-#: assets/const/protocol.py:178 assets/models/asset/web.py:10
+#: assets/const/protocol.py:186 assets/models/asset/web.py:10
 msgid "Username selector"
 msgstr "用户名选择器"
 
-#: assets/const/protocol.py:183 assets/models/asset/web.py:11
+#: assets/const/protocol.py:191 assets/models/asset/web.py:11
 msgid "Password selector"
 msgstr "密码选择器"
 
-#: assets/const/protocol.py:188 assets/models/asset/web.py:12
+#: assets/const/protocol.py:196 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr "确认按钮选择器"
 
-#: assets/const/protocol.py:211
+#: assets/const/protocol.py:219
 msgid "API mode"
 msgstr "API 模式"
 
@@ -1231,7 +1239,7 @@ msgstr "SSH公钥"
 #: common/db/models.py:36 ops/models/adhoc.py:26 ops/models/job.py:113
 #: ops/models/playbook.py:26 rbac/models/role.py:37 settings/models.py:37
 #: terminal/models/applet/applet.py:44 terminal/models/applet/applet.py:248
-#: terminal/models/applet/host.py:139 terminal/models/component/endpoint.py:24
+#: terminal/models/applet/host.py:141 terminal/models/component/endpoint.py:24
 #: terminal/models/component/endpoint.py:102
 #: terminal/models/session/session.py:46 tickets/models/comment.py:32
 #: tickets/models/ticket/general.py:297 users/models/user.py:792
@@ -1424,9 +1432,9 @@ msgstr "资产自动化任务"
 
 #: assets/models/automations/base.py:113 audits/models.py:199
 #: audits/serializers.py:50 ops/models/base.py:49 ops/models/job.py:186
-#: terminal/models/applet/applet.py:247 terminal/models/applet/host.py:136
+#: terminal/models/applet/applet.py:247 terminal/models/applet/host.py:138
 #: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
-#: terminal/serializers/applet_host.py:107 tickets/models/ticket/general.py:283
+#: terminal/serializers/applet_host.py:115 tickets/models/ticket/general.py:283
 #: tickets/serializers/super_ticket.py:13
 #: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:164
 #: xpack/plugins/cloud/models.py:216
@@ -2006,7 +2014,7 @@ msgid "Change password"
 msgstr "改密"
 
 #: audits/const.py:35 settings/serializers/terminal.py:6
-#: terminal/models/applet/host.py:25 terminal/models/component/terminal.py:163
+#: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:163
 #: terminal/serializers/session.py:46 terminal/serializers/session.py:55
 msgid "Terminal"
 msgstr "终端"
@@ -2023,7 +2031,7 @@ msgstr "会话日志"
 msgid "Login log"
 msgstr "登录日志"
 
-#: audits/const.py:43 terminal/models/applet/host.py:140
+#: audits/const.py:43 terminal/models/applet/host.py:142
 #: terminal/models/component/task.py:24
 msgid "Task"
 msgstr "任务"
@@ -2045,7 +2053,7 @@ msgid "Job audit log"
 msgstr "作业审计日志"
 
 #: audits/models.py:51 audits/models.py:95 audits/models.py:166
-#: terminal/models/session/session.py:38 terminal/models/session/sharing.py:105
+#: terminal/models/session/session.py:38 terminal/models/session/sharing.py:109
 msgid "Remote addr"
 msgstr "远端地址"
 
@@ -2063,7 +2071,7 @@ msgstr "文件"
 
 #: audits/models.py:62 terminal/backends/command/models.py:21
 #: terminal/models/session/replay.py:9 terminal/models/session/sharing.py:19
-#: terminal/models/session/sharing.py:87
+#: terminal/models/session/sharing.py:91
 #: terminal/templates/terminal/_msg_command_alert.html:10
 #: terminal/templates/terminal/_msg_command_warning.html:17
 #: tickets/models/ticket/command_confirm.py:15
@@ -2232,19 +2240,19 @@ msgstr "不允许使用可重复使用的连接令牌，未启用全局设置"
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名账号不支持当前资产"
 
-#: authentication/api/connection_token.py:323
+#: authentication/api/connection_token.py:320
 msgid "Account not found"
 msgstr "账号未找到"
 
-#: authentication/api/connection_token.py:326
+#: authentication/api/connection_token.py:323
 msgid "Permission expired"
 msgstr "授权已过期"
 
-#: authentication/api/connection_token.py:340
+#: authentication/api/connection_token.py:337
 msgid "ACL action is reject: {}({})"
 msgstr "ACL 动作是拒绝: {}({})"
 
-#: authentication/api/connection_token.py:344
+#: authentication/api/connection_token.py:341
 msgid "ACL action is review"
 msgstr "ACL 动作是复核"
 
@@ -2686,11 +2694,11 @@ msgstr "没有用户或用户失效"
 msgid "No asset or inactive asset"
 msgstr "没有资产或资产未激活"
 
-#: authentication/models/connection_token.py:269
+#: authentication/models/connection_token.py:280
 msgid "Can view super connection token secret"
 msgstr "可以查看超级连接令牌密文"
 
-#: authentication/models/connection_token.py:271
+#: authentication/models/connection_token.py:282
 msgid "Super connection token"
 msgstr "超级连接令牌"
 
@@ -2904,7 +2912,7 @@ msgid "request new one"
 msgstr "重新申请"
 
 #: authentication/templates/authentication/_msg_reset_password_code.html:12
-#: terminal/models/session/sharing.py:26 terminal/models/session/sharing.py:89
+#: terminal/models/session/sharing.py:26 terminal/models/session/sharing.py:93
 #: terminal/templates/terminal/_msg_session_sharing.html:12
 #: users/forms/profile.py:107 users/templates/users/forgot_password.html:66
 msgid "Verify code"
@@ -3683,7 +3691,7 @@ msgstr "可以查看任务监控"
 msgid "Kwargs"
 msgstr "其它参数"
 
-#: ops/models/celery.py:61 terminal/models/session/sharing.py:120
+#: ops/models/celery.py:61 terminal/models/session/sharing.py:124
 #: tickets/const.py:25
 msgid "Finished"
 msgstr "结束"
@@ -4196,7 +4204,7 @@ msgid "My assets"
 msgstr "我的资产"
 
 #: rbac/tree.py:56 terminal/models/applet/applet.py:51
-#: terminal/models/applet/applet.py:244 terminal/models/applet/host.py:28
+#: terminal/models/applet/applet.py:244 terminal/models/applet/host.py:29
 #: terminal/serializers/applet.py:15
 msgid "Applet"
 msgstr "远程应用"
@@ -5762,28 +5770,36 @@ msgstr "只支持自定义平台"
 msgid "Missing type in platform.yml"
 msgstr "在 platform.yml 中缺少类型"
 
-#: terminal/models/applet/applet.py:246 terminal/models/applet/host.py:34
-#: terminal/models/applet/host.py:134
+#: terminal/models/applet/applet.py:246 terminal/models/applet/host.py:35
+#: terminal/models/applet/host.py:136
 msgid "Hosting"
 msgstr "宿主机"
 
-#: terminal/models/applet/host.py:19 terminal/serializers/applet_host.py:57
+#: terminal/models/applet/host.py:18 terminal/serializers/applet_host.py:57
 msgid "Deploy options"
 msgstr "部署参数"
 
+#: terminal/models/applet/host.py:19
+msgid "Auto create accounts"
+msgstr "自动创建账号"
+
 #: terminal/models/applet/host.py:20
+msgid "Accounts create amount"
+msgstr "创建账号数量"
+
+#: terminal/models/applet/host.py:21
 msgid "Inited"
 msgstr "已初始化"
 
-#: terminal/models/applet/host.py:21
+#: terminal/models/applet/host.py:22
 msgid "Date inited"
 msgstr "初始化日期"
 
-#: terminal/models/applet/host.py:22
+#: terminal/models/applet/host.py:23
 msgid "Date synced"
 msgstr "同步日期"
 
-#: terminal/models/applet/host.py:135
+#: terminal/models/applet/host.py:137
 msgid "Initial"
 msgstr "初始化"
 
@@ -5913,7 +5929,7 @@ msgstr "可以下载会话录像"
 msgid "Account id"
 msgstr "账号 ID"
 
-#: terminal/models/session/session.py:36 terminal/models/session/sharing.py:110
+#: terminal/models/session/session.py:36 terminal/models/session/sharing.py:114
 msgid "Login from"
 msgstr "登录来源"
 
@@ -5958,7 +5974,7 @@ msgstr "操作权限"
 msgid "Origin"
 msgstr "来源"
 
-#: terminal/models/session/sharing.py:41 terminal/models/session/sharing.py:92
+#: terminal/models/session/sharing.py:41 terminal/models/session/sharing.py:96
 #: terminal/notifications.py:261
 msgid "Session sharing"
 msgstr "会话分享"
@@ -5967,39 +5983,39 @@ msgstr "会话分享"
 msgid "Can add super session sharing"
 msgstr "可以创建超级会话分享"
 
-#: terminal/models/session/sharing.py:75
+#: terminal/models/session/sharing.py:79
 msgid "Link not active"
 msgstr "链接失效"
 
-#: terminal/models/session/sharing.py:77
+#: terminal/models/session/sharing.py:81
 msgid "Link expired"
 msgstr "链接过期"
 
-#: terminal/models/session/sharing.py:79
+#: terminal/models/session/sharing.py:83
 msgid "User not allowed to join"
 msgstr "该用户无权加入会话"
 
-#: terminal/models/session/sharing.py:96 terminal/serializers/sharing.py:71
+#: terminal/models/session/sharing.py:100 terminal/serializers/sharing.py:71
 msgid "Joiner"
 msgstr "加入者"
 
-#: terminal/models/session/sharing.py:99
+#: terminal/models/session/sharing.py:103
 msgid "Date joined"
 msgstr "加入日期"
 
-#: terminal/models/session/sharing.py:102
+#: terminal/models/session/sharing.py:106
 msgid "Date left"
 msgstr "结束日期"
 
-#: terminal/models/session/sharing.py:125
+#: terminal/models/session/sharing.py:129
 msgid "Session join record"
 msgstr "会话加入记录"
 
-#: terminal/models/session/sharing.py:141
+#: terminal/models/session/sharing.py:145
 msgid "Invalid verification code"
 msgstr "验证码不正确"
 
-#: terminal/models/session/sharing.py:148
+#: terminal/models/session/sharing.py:152
 msgid "You have already joined this session"
 msgstr "您已经加入过此会话"
 
@@ -6100,6 +6116,20 @@ msgstr "RDS 远程应用注销时间限制"
 #: terminal/serializers/applet_host.py:59 terminal/serializers/terminal.py:47
 msgid "Load status"
 msgstr "负载状态"
+
+#: terminal/serializers/applet_host.py:72
+msgid ""
+"These accounts are used to connect to the published application, the account "
+"is now divided into two types, one is dedicated to each account, each user "
+"has a private account, the other is public, when the application does not "
+"support multiple open and the special has been used, the public account will "
+"be used to connect"
+msgstr "这些账号用于连接发布的应用，账号现在分为两种类型，一种是专用的，每个用户都有一个专用账号。 "
+"另一种是公共的，当应用不支持多开且专用的已经被使用时，会使用公共账号连接"
+
+#: terminal/serializers/applet_host.py:77
+msgid "The number of public accounts created automatically"
+msgstr "公用账号自动创建的数量"
 
 #: terminal/serializers/command.py:19
 msgid "Session ID"
