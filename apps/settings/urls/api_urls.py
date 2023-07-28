@@ -23,4 +23,5 @@ urlpatterns = [
     path('logo/', api.SettingsLogoApi.as_view(), name='settings-logo'),
     path('public/', api.PublicSettingApi.as_view(), name='public-setting'),
     path('public/open/', api.OpenPublicSettingApi.as_view(), name='open-public-setting'),
+    path('server-info/', api.ServerInfoApi.as_view(), name='server-info'),
 ]
