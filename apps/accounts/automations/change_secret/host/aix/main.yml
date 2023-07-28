@@ -1,10 +1,41 @@
 - hosts: demo
   gather_facts: no
   tasks:
-    - name: Test privileged account
+    - name: "Test privileged {{ jms_account.username }} account"
       ansible.builtin.ping:
 
-    - name: Change password
+    - name: "Check if {{ account.username }} user exists"
+      getent:
+        database: passwd
+        key: "{{ account.username }}"
+      register: user_info
+      ignore_errors: yes  # 忽略错误，如果用户不存在时不会导致playbook失败
+
+    - name: "Add {{ account.username }} user"
+      ansible.builtin.user:
+        name: "{{ account.username }}"
+        shell: "{{ params.shell }}"
+        home: "{{ params.home | default('/home/' + account.username, true) }}"
+        groups: "{{ params.groups }}"
+        expires: -1
+        state: present
+      when: user_info.failed
+
+    - name: "Add {{ account.username }} group"
+      ansible.builtin.group:
+        name: "{{ account.username }}"
+        state: present
+      when: user_info.failed
+
+    - name: "Add {{ account.username }} user to group"
+      ansible.builtin.user:
+        name: "{{ account.username }}"
+        groups: "{{ params.groups }}"
+      when:
+        - user_info.failed
+        - params.groups
+
+    - name: "Change {{ account.username }} password"
       ansible.builtin.user:
         name: "{{ account.username }}"
         password: "{{ account.secret | password_hash('des') }}"
@@ -12,31 +43,37 @@
       ignore_errors: true
       when: account.secret_type == "password"
 
-    - name: create user If it already exists, no operation will be performed
-      ansible.builtin.user:
-        name: "{{ account.username }}"
-      when: account.secret_type == "ssh_key"
-
     - name: remove jumpserver ssh key
       ansible.builtin.lineinfile:
         dest: "{{ ssh_params.dest }}"
         regexp: "{{ ssh_params.regexp }}"
         state: absent
       when:
-      - account.secret_type == "ssh_key"
-      - ssh_params.strategy == "set_jms"
+        - account.secret_type == "ssh_key"
+        - ssh_params.strategy == "set_jms"
 
-    - name: Change SSH key
+    - name: "Change {{ account.username }} SSH key"
       ansible.builtin.authorized_key:
         user: "{{ account.username }}"
         key: "{{ account.secret }}"
         exclusive: "{{ ssh_params.exclusive }}"
       when: account.secret_type == "ssh_key"
 
+    - name: "Set {{ account.username }} sudo setting"
+      ansible.builtin.lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: "^{{ account.username }} ALL="
+        line: "{{ account.username + ' ALL=(ALL) NOPASSWD: ' + params.sudo }}"
+        validate: visudo -cf %s
+      when:
+        - user_info.failed
+        - params.sudo
+
     - name: Refresh connection
       ansible.builtin.meta: reset_connection
 
-    - name: Verify password
+    - name: "Verify {{ account.username }} password"
       ansible.builtin.ping:
       become: no
       vars:
@@ -45,7 +82,7 @@
         ansible_become: no
       when: account.secret_type == "password"
 
-    - name: Verify SSH key
+    - name: "Verify {{ account.username }} SSH key"
       ansible.builtin.ping:
       become: no
       vars:
