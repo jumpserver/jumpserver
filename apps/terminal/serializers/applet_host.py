@@ -67,7 +67,14 @@ class AppletHostSerializer(HostSerializer):
         ]
         extra_kwargs = {
             **HostSerializer.Meta.extra_kwargs,
-            'date_synced': {'read_only': True}
+            'date_synced': {'read_only': True},
+            'auto_create_accounts': {'help_text': _(
+                'These accounts are used to connect to the published application, '
+                'the account is now divided into two types, one is dedicated to each account, '
+                'each user has a private account, the other is public, '
+                'when the application does not support multiple open and the special has been used, '
+                'the public account will be used to connect')},
+            'accounts_create_amount': {'help_text': _('The number of public accounts created automatically')},
         }
 
     def __init__(self, *args, data=None, **kwargs):

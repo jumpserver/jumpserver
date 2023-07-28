@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-28 10:38+0800\n"
+"POT-Creation-Date: 2023-07-28 10:57+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -315,7 +315,7 @@ msgid "Trigger mode"
 msgstr "触发模式"
 
 #: accounts/models/automations/backup_account.py:97 audits/models.py:194
-#: terminal/models/session/sharing.py:117 xpack/plugins/cloud/models.py:168
+#: terminal/models/session/sharing.py:121 xpack/plugins/cloud/models.py:168
 msgid "Reason"
 msgstr "原因"
 
@@ -744,7 +744,7 @@ msgstr "自动化任务执行历史"
 #: accounts/serializers/automations/change_secret.py:155 audits/const.py:53
 #: audits/models.py:59 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:18 ops/const.py:56 ops/serializers/celery.py:40
-#: terminal/const.py:76 terminal/models/session/sharing.py:113
+#: terminal/const.py:76 terminal/models/session/sharing.py:117
 #: tickets/views/approve.py:115
 msgid "Success"
 msgstr "成功"
@@ -1434,7 +1434,7 @@ msgstr "资产自动化任务"
 #: audits/serializers.py:50 ops/models/base.py:49 ops/models/job.py:186
 #: terminal/models/applet/applet.py:247 terminal/models/applet/host.py:138
 #: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
-#: terminal/serializers/applet_host.py:108 tickets/models/ticket/general.py:283
+#: terminal/serializers/applet_host.py:115 tickets/models/ticket/general.py:283
 #: tickets/serializers/super_ticket.py:13
 #: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:164
 #: xpack/plugins/cloud/models.py:216
@@ -2053,7 +2053,7 @@ msgid "Job audit log"
 msgstr "作业审计日志"
 
 #: audits/models.py:51 audits/models.py:95 audits/models.py:166
-#: terminal/models/session/session.py:38 terminal/models/session/sharing.py:105
+#: terminal/models/session/session.py:38 terminal/models/session/sharing.py:109
 msgid "Remote addr"
 msgstr "远端地址"
 
@@ -2071,7 +2071,7 @@ msgstr "文件"
 
 #: audits/models.py:62 terminal/backends/command/models.py:21
 #: terminal/models/session/replay.py:9 terminal/models/session/sharing.py:19
-#: terminal/models/session/sharing.py:87
+#: terminal/models/session/sharing.py:91
 #: terminal/templates/terminal/_msg_command_alert.html:10
 #: terminal/templates/terminal/_msg_command_warning.html:17
 #: tickets/models/ticket/command_confirm.py:15
@@ -2912,7 +2912,7 @@ msgid "request new one"
 msgstr "重新申请"
 
 #: authentication/templates/authentication/_msg_reset_password_code.html:12
-#: terminal/models/session/sharing.py:26 terminal/models/session/sharing.py:89
+#: terminal/models/session/sharing.py:26 terminal/models/session/sharing.py:93
 #: terminal/templates/terminal/_msg_session_sharing.html:12
 #: users/forms/profile.py:107 users/templates/users/forgot_password.html:66
 msgid "Verify code"
@@ -3691,7 +3691,7 @@ msgstr "可以查看任务监控"
 msgid "Kwargs"
 msgstr "其它参数"
 
-#: ops/models/celery.py:61 terminal/models/session/sharing.py:120
+#: ops/models/celery.py:61 terminal/models/session/sharing.py:124
 #: tickets/const.py:25
 msgid "Finished"
 msgstr "结束"
@@ -5929,7 +5929,7 @@ msgstr "可以下载会话录像"
 msgid "Account id"
 msgstr "账号 ID"
 
-#: terminal/models/session/session.py:36 terminal/models/session/sharing.py:110
+#: terminal/models/session/session.py:36 terminal/models/session/sharing.py:114
 msgid "Login from"
 msgstr "登录来源"
 
@@ -5974,7 +5974,7 @@ msgstr "操作权限"
 msgid "Origin"
 msgstr "来源"
 
-#: terminal/models/session/sharing.py:41 terminal/models/session/sharing.py:92
+#: terminal/models/session/sharing.py:41 terminal/models/session/sharing.py:96
 #: terminal/notifications.py:261
 msgid "Session sharing"
 msgstr "会话分享"
@@ -5983,39 +5983,39 @@ msgstr "会话分享"
 msgid "Can add super session sharing"
 msgstr "可以创建超级会话分享"
 
-#: terminal/models/session/sharing.py:75
+#: terminal/models/session/sharing.py:79
 msgid "Link not active"
 msgstr "链接失效"
 
-#: terminal/models/session/sharing.py:77
+#: terminal/models/session/sharing.py:81
 msgid "Link expired"
 msgstr "链接过期"
 
-#: terminal/models/session/sharing.py:79
+#: terminal/models/session/sharing.py:83
 msgid "User not allowed to join"
 msgstr "该用户无权加入会话"
 
-#: terminal/models/session/sharing.py:96 terminal/serializers/sharing.py:71
+#: terminal/models/session/sharing.py:100 terminal/serializers/sharing.py:71
 msgid "Joiner"
 msgstr "加入者"
 
-#: terminal/models/session/sharing.py:99
+#: terminal/models/session/sharing.py:103
 msgid "Date joined"
 msgstr "加入日期"
 
-#: terminal/models/session/sharing.py:102
+#: terminal/models/session/sharing.py:106
 msgid "Date left"
 msgstr "结束日期"
 
-#: terminal/models/session/sharing.py:125
+#: terminal/models/session/sharing.py:129
 msgid "Session join record"
 msgstr "会话加入记录"
 
-#: terminal/models/session/sharing.py:141
+#: terminal/models/session/sharing.py:145
 msgid "Invalid verification code"
 msgstr "验证码不正确"
 
-#: terminal/models/session/sharing.py:148
+#: terminal/models/session/sharing.py:152
 msgid "You have already joined this session"
 msgstr "您已经加入过此会话"
 
@@ -6116,6 +6116,20 @@ msgstr "RDS 远程应用注销时间限制"
 #: terminal/serializers/applet_host.py:59 terminal/serializers/terminal.py:47
 msgid "Load status"
 msgstr "负载状态"
+
+#: terminal/serializers/applet_host.py:72
+msgid ""
+"These accounts are used to connect to the published application, the account "
+"is now divided into two types, one is dedicated to each account, each user "
+"has a private account, the other is public, when the application does not "
+"support multiple open and the special has been used, the public account will "
+"be used to connect"
+msgstr "这些账号用于连接发布的应用，账号现在分为两种类型，一种是专用的，每个用户都有一个专用账号。 "
+"另一种是公共的，当应用不支持多开且专用的已经被使用时，会使用公共账号连接"
+
+#: terminal/serializers/applet_host.py:77
+msgid "The number of public accounts created automatically"
+msgstr "公用账号自动创建的数量"
 
 #: terminal/serializers/command.py:19
 msgid "Session ID"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-25 15:37+0800\n"
+"POT-Creation-Date: 2023-07-28 10:57+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -316,7 +316,7 @@ msgid "Trigger mode"
 msgstr "トリガーモード"
 
 #: accounts/models/automations/backup_account.py:97 audits/models.py:194
-#: terminal/models/session/sharing.py:117 xpack/plugins/cloud/models.py:168
+#: terminal/models/session/sharing.py:121 xpack/plugins/cloud/models.py:168
 msgid "Reason"
 msgstr "理由"
 
@@ -748,7 +748,7 @@ msgstr "自動タスク実行履歴"
 #: accounts/serializers/automations/change_secret.py:155 audits/const.py:53
 #: audits/models.py:59 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:18 ops/const.py:56 ops/serializers/celery.py:40
-#: terminal/const.py:76 terminal/models/session/sharing.py:113
+#: terminal/const.py:76 terminal/models/session/sharing.py:117
 #: tickets/views/approve.py:115
 msgid "Success"
 msgstr "成功"
@@ -1441,7 +1441,7 @@ msgstr "アセットの自動化タスク"
 #: audits/serializers.py:50 ops/models/base.py:49 ops/models/job.py:186
 #: terminal/models/applet/applet.py:247 terminal/models/applet/host.py:138
 #: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
-#: terminal/serializers/applet_host.py:108 tickets/models/ticket/general.py:283
+#: terminal/serializers/applet_host.py:115 tickets/models/ticket/general.py:283
 #: tickets/serializers/super_ticket.py:13
 #: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:164
 #: xpack/plugins/cloud/models.py:216
@@ -2069,7 +2069,7 @@ msgid "Job audit log"
 msgstr "ジョブ監査ログ"
 
 #: audits/models.py:51 audits/models.py:95 audits/models.py:166
-#: terminal/models/session/session.py:38 terminal/models/session/sharing.py:105
+#: terminal/models/session/session.py:38 terminal/models/session/sharing.py:109
 msgid "Remote addr"
 msgstr "リモートaddr"
 
@@ -2087,7 +2087,7 @@ msgstr "書類"
 
 #: audits/models.py:62 terminal/backends/command/models.py:21
 #: terminal/models/session/replay.py:9 terminal/models/session/sharing.py:19
-#: terminal/models/session/sharing.py:87
+#: terminal/models/session/sharing.py:91
 #: terminal/templates/terminal/_msg_command_alert.html:10
 #: terminal/templates/terminal/_msg_command_warning.html:17
 #: tickets/models/ticket/command_confirm.py:15
@@ -2948,7 +2948,7 @@ msgid "request new one"
 msgstr "新しいものを要求する"
 
 #: authentication/templates/authentication/_msg_reset_password_code.html:12
-#: terminal/models/session/sharing.py:26 terminal/models/session/sharing.py:89
+#: terminal/models/session/sharing.py:26 terminal/models/session/sharing.py:93
 #: terminal/templates/terminal/_msg_session_sharing.html:12
 #: users/forms/profile.py:107 users/templates/users/forgot_password.html:66
 msgid "Verify code"
@@ -3738,7 +3738,7 @@ msgstr "タスクモニターを表示できます"
 msgid "Kwargs"
 msgstr "クワーグ"
 
-#: ops/models/celery.py:61 terminal/models/session/sharing.py:120
+#: ops/models/celery.py:61 terminal/models/session/sharing.py:124
 #: tickets/const.py:25
 msgid "Finished"
 msgstr "終了"
@@ -6016,7 +6016,7 @@ msgstr "セッション再生をダウンロードできます"
 msgid "Account id"
 msgstr "アカウント ID"
 
-#: terminal/models/session/session.py:36 terminal/models/session/sharing.py:110
+#: terminal/models/session/session.py:36 terminal/models/session/sharing.py:114
 msgid "Login from"
 msgstr "ログイン元"
 
@@ -6061,7 +6061,7 @@ msgstr "アクションパーミッション"
 msgid "Origin"
 msgstr "ソース"
 
-#: terminal/models/session/sharing.py:41 terminal/models/session/sharing.py:92
+#: terminal/models/session/sharing.py:41 terminal/models/session/sharing.py:96
 #: terminal/notifications.py:261
 msgid "Session sharing"
 msgstr "セッション共有"
@@ -6070,39 +6070,39 @@ msgstr "セッション共有"
 msgid "Can add super session sharing"
 msgstr "スーパーセッション共有を追加できます"
 
-#: terminal/models/session/sharing.py:75
+#: terminal/models/session/sharing.py:79
 msgid "Link not active"
 msgstr "リンクがアクティブでない"
 
-#: terminal/models/session/sharing.py:77
+#: terminal/models/session/sharing.py:81
 msgid "Link expired"
 msgstr "リンク期限切れ"
 
-#: terminal/models/session/sharing.py:79
+#: terminal/models/session/sharing.py:83
 msgid "User not allowed to join"
 msgstr "ユーザーはセッションに参加できません"
 
-#: terminal/models/session/sharing.py:96 terminal/serializers/sharing.py:71
+#: terminal/models/session/sharing.py:100 terminal/serializers/sharing.py:71
 msgid "Joiner"
 msgstr "ジョイナー"
 
-#: terminal/models/session/sharing.py:99
+#: terminal/models/session/sharing.py:103
 msgid "Date joined"
 msgstr "参加日"
 
-#: terminal/models/session/sharing.py:102
+#: terminal/models/session/sharing.py:106
 msgid "Date left"
 msgstr "日付が残っています"
 
-#: terminal/models/session/sharing.py:125
+#: terminal/models/session/sharing.py:129
 msgid "Session join record"
 msgstr "セッション参加記録"
 
-#: terminal/models/session/sharing.py:141
+#: terminal/models/session/sharing.py:145
 msgid "Invalid verification code"
 msgstr "検証コードが無効"
 
-#: terminal/models/session/sharing.py:148
+#: terminal/models/session/sharing.py:152
 msgid "You have already joined this session"
 msgstr "すでにこのセッションに参加しています"
 
@@ -6205,6 +6205,19 @@ msgstr "RDS 远程应用注销时间限制"
 #: terminal/serializers/applet_host.py:59 terminal/serializers/terminal.py:47
 msgid "Load status"
 msgstr "ロードステータス"
+
+#: terminal/serializers/applet_host.py:72
+msgid ""
+"These accounts are used to connect to the published application, the account "
+"is now divided into two types, one is dedicated to each account, each user "
+"has a private account, the other is public, when the application does not "
+"support multiple open and the special has been used, the public account will "
+"be used to connect"
+msgstr "これらのアカウントは、公開されたアプリケーションに接続するために使用されます。アカウントは現在、2つのタイプに分類されています。1つは、各アカウントに専用のアカウントで、各ユーザーにはプライベートアカウントがあります。もう1つは公開されています。アプリケーションが複数のオープンをサポートしていない場合、および特別なものが使用されている場合、公開アカウントが使用されます。"
+
+#: terminal/serializers/applet_host.py:77
+msgid "The number of public accounts created automatically"
+msgstr "自動的に作成される公開アカウントの数"
 
 #: terminal/serializers/command.py:19
 msgid "Session ID"
