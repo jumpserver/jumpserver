@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+from django.utils.translation import gettext_lazy as _
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import MethodNotAllowed
@@ -38,8 +39,8 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     ordering = ('-date_created',)
     rbac_perms = {
         'open': 'tickets.view_ticket',
+        'bulk': 'tickets.change_ticket',
     }
-
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -56,6 +57,10 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         raise MethodNotAllowed(self.action)
+
+    def ticket_not_allowed(self):
+        if self.model == Ticket:
+            raise MethodNotAllowed(self.action)
 
     def get_queryset(self):
         with tmp_to_root_org():
@@ -74,6 +79,8 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
 
     @action(detail=True, methods=[PUT, PATCH], permission_classes=[IsAssignee, ])
     def approve(self, request, *args, **kwargs):
+        self.ticket_not_allowed()
+
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
@@ -93,6 +100,27 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     def close(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.close()
+        return Response('ok')
+
+    @action(detail=False, methods=[PUT], permission_classes=[RBACPermission, ])
+    def bulk(self, request, *args, **kwargs):
+        self.ticket_not_allowed()
+
+        allow_action = ('approve', 'reject')
+        action_ = request.query_params.get('action')
+        if action_ not in allow_action:
+            msg = _("The parameter 'action' must be [{}]").format(','.join(allow_action))
+            return Response({'error': msg}, status=400)
+
+        ticket_ids = request.data.get('tickets', [])
+        queryset = self.get_queryset().filter(state='pending').filter(id__in=ticket_ids)
+        for obj in queryset:
+            if not obj.has_current_assignee(request.user):
+                return Response(
+                    {'error': f"{_('User does not have permission')}: {obj}"}, status=400
+                )
+            handler = getattr(obj, action_)
+            handler(processor=request.user)
         return Response('ok')
 
 
