@@ -5880,7 +5880,7 @@ msgstr "初期化された"
 
 #: terminal/models/applet/host.py:22
 msgid "Date inited"
-msgstr ""
+msgstr "初期化日"
 
 #: terminal/models/applet/host.py:23
 msgid "Date synced"
