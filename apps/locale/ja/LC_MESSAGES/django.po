@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-28 10:57+0800\n"
+"POT-Creation-Date: 2023-07-28 16:44+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: accounts/api/automations/base.py:79
+#: accounts/api/automations/base.py:79 tickets/api/ticket.py:112
 msgid "The parameter 'action' must be [{}]"
 msgstr "パラメータ 'action' は [{}] でなければなりません。"
 
@@ -323,7 +323,7 @@ msgstr "理由"
 #: accounts/models/automations/backup_account.py:99
 #: accounts/serializers/automations/change_secret.py:111
 #: accounts/serializers/automations/change_secret.py:134
-#: ops/serializers/job.py:56 terminal/serializers/session.py:43
+#: ops/serializers/job.py:56 terminal/serializers/session.py:44
 msgid "Is success"
 msgstr "成功は"
 
@@ -1245,7 +1245,7 @@ msgstr "SSHパブリックキー"
 #: assets/models/cmd_filter.py:88 assets/models/group.py:20
 #: common/db/models.py:36 ops/models/adhoc.py:26 ops/models/job.py:113
 #: ops/models/playbook.py:26 rbac/models/role.py:37 settings/models.py:37
-#: terminal/models/applet/applet.py:44 terminal/models/applet/applet.py:248
+#: terminal/models/applet/applet.py:44 terminal/models/applet/applet.py:250
 #: terminal/models/applet/host.py:141 terminal/models/component/endpoint.py:24
 #: terminal/models/component/endpoint.py:102
 #: terminal/models/session/session.py:46 tickets/models/comment.py:32
@@ -1296,7 +1296,7 @@ msgstr "ユーザーと同じユーザー名"
 #: assets/models/_user.py:52 authentication/models/connection_token.py:41
 #: authentication/serializers/connect_token_secret.py:111
 #: terminal/models/applet/applet.py:41 terminal/serializers/session.py:18
-#: terminal/serializers/session.py:39 terminal/serializers/storage.py:70
+#: terminal/serializers/session.py:40 terminal/serializers/storage.py:70
 msgid "Protocol"
 msgstr "プロトコル"
 
@@ -1439,7 +1439,7 @@ msgstr "アセットの自動化タスク"
 
 #: assets/models/automations/base.py:113 audits/models.py:199
 #: audits/serializers.py:50 ops/models/base.py:49 ops/models/job.py:186
-#: terminal/models/applet/applet.py:247 terminal/models/applet/host.py:138
+#: terminal/models/applet/applet.py:249 terminal/models/applet/host.py:138
 #: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
 #: terminal/serializers/applet_host.py:115 tickets/models/ticket/general.py:283
 #: tickets/serializers/super_ticket.py:13
@@ -2031,7 +2031,7 @@ msgstr "パスワードを変更する"
 
 #: audits/const.py:35 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:163
-#: terminal/serializers/session.py:46 terminal/serializers/session.py:55
+#: terminal/serializers/session.py:47 terminal/serializers/session.py:56
 msgid "Terminal"
 msgstr "ターミナル"
 
@@ -3835,7 +3835,7 @@ msgstr "保存後に実行"
 msgid "Job type"
 msgstr "タスクの種類"
 
-#: ops/serializers/job.py:57 terminal/serializers/session.py:47
+#: ops/serializers/job.py:57 terminal/serializers/session.py:48
 msgid "Is finished"
 msgstr "終了しました"
 
@@ -4253,7 +4253,7 @@ msgid "My assets"
 msgstr "私の資産"
 
 #: rbac/tree.py:56 terminal/models/applet/applet.py:51
-#: terminal/models/applet/applet.py:244 terminal/models/applet/host.py:29
+#: terminal/models/applet/applet.py:246 terminal/models/applet/host.py:29
 #: terminal/serializers/applet.py:15
 msgid "Applet"
 msgstr "リモートアプリケーション"
@@ -5857,7 +5857,7 @@ msgstr "カスタムプラットフォームのみをサポート"
 msgid "Missing type in platform.yml"
 msgstr "platform.ymlにタイプがありません"
 
-#: terminal/models/applet/applet.py:246 terminal/models/applet/host.py:35
+#: terminal/models/applet/applet.py:248 terminal/models/applet/host.py:35
 #: terminal/models/applet/host.py:136
 msgid "Hosting"
 msgstr "ホスト マシン"
@@ -6028,23 +6028,27 @@ msgstr "リプレイ"
 msgid "Date end"
 msgstr "終了日"
 
-#: terminal/models/session/session.py:240
+#: terminal/models/session/session.py:47
+msgid "Command count"
+msgstr "コマンド量"
+
+#: terminal/models/session/session.py:241
 msgid "Session record"
 msgstr "セッション記録"
 
-#: terminal/models/session/session.py:242
+#: terminal/models/session/session.py:243
 msgid "Can monitor session"
 msgstr "セッションを監視できます"
 
-#: terminal/models/session/session.py:243
+#: terminal/models/session/session.py:244
 msgid "Can share session"
 msgstr "セッションを共有できます"
 
-#: terminal/models/session/session.py:244
+#: terminal/models/session/session.py:245
 msgid "Can terminate session"
 msgstr "セッションを終了できます"
 
-#: terminal/models/session/session.py:245
+#: terminal/models/session/session.py:246
 msgid "Can validate session action perm"
 msgstr "セッションアクションのパーマを検証できます"
 
@@ -6213,7 +6217,12 @@ msgid ""
 "has a private account, the other is public, when the application does not "
 "support multiple open and the special has been used, the public account will "
 "be used to connect"
-msgstr "これらのアカウントは、公開されたアプリケーションに接続するために使用されます。アカウントは現在、2つのタイプに分類されています。1つは、各アカウントに専用のアカウントで、各ユーザーにはプライベートアカウントがあります。もう1つは公開されています。アプリケーションが複数のオープンをサポートしていない場合、および特別なものが使用されている場合、公開アカウントが使用されます。"
+msgstr ""
+"これらのアカウントは、公開されたアプリケーションに接続するために使用されま"
+"す。アカウントは現在、2つのタイプに分類されています。1つは、各アカウントに専"
+"用のアカウントで、各ユーザーにはプライベートアカウントがあります。もう1つは公"
+"開されています。アプリケーションが複数のオープンをサポートしていない場合、お"
+"よび特別なものが使用されている場合、公開アカウントが使用されます。"
 
 #: terminal/serializers/applet_host.py:77
 msgid "The number of public accounts created automatically"
@@ -6294,35 +6303,35 @@ msgstr ""
 msgid "Asset IP"
 msgstr "資産 IP"
 
-#: terminal/serializers/session.py:22 terminal/serializers/session.py:44
+#: terminal/serializers/session.py:22 terminal/serializers/session.py:45
 msgid "Can replay"
 msgstr "再生できます"
 
-#: terminal/serializers/session.py:23 terminal/serializers/session.py:45
+#: terminal/serializers/session.py:23 terminal/serializers/session.py:46
 msgid "Can join"
 msgstr "参加できます"
 
-#: terminal/serializers/session.py:24 terminal/serializers/session.py:48
+#: terminal/serializers/session.py:24 terminal/serializers/session.py:49
 msgid "Can terminate"
 msgstr "終了できます"
 
-#: terminal/serializers/session.py:40
+#: terminal/serializers/session.py:41
 msgid "User ID"
 msgstr "ユーザーID"
 
-#: terminal/serializers/session.py:41
+#: terminal/serializers/session.py:42
 msgid "Asset ID"
 msgstr "資産ID"
 
-#: terminal/serializers/session.py:42
+#: terminal/serializers/session.py:43
 msgid "Login from display"
 msgstr "表示からのログイン"
 
-#: terminal/serializers/session.py:49
+#: terminal/serializers/session.py:50
 msgid "Terminal display"
 msgstr "ターミナルディスプレイ"
 
-#: terminal/serializers/session.py:54
+#: terminal/serializers/session.py:55
 msgid "Command amount"
 msgstr "コマンド量"
 

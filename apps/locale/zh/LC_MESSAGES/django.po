@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-28 10:57+0800\n"
+"POT-Creation-Date: 2023-07-28 16:44+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 2.4.3\n"
 
-#: accounts/api/automations/base.py:79
+#: accounts/api/automations/base.py:79 tickets/api/ticket.py:112
 msgid "The parameter 'action' must be [{}]"
 msgstr "参数 'action' 必须是 [{}]"
 
@@ -322,7 +322,7 @@ msgstr "原因"
 #: accounts/models/automations/backup_account.py:99
 #: accounts/serializers/automations/change_secret.py:111
 #: accounts/serializers/automations/change_secret.py:134
-#: ops/serializers/job.py:56 terminal/serializers/session.py:43
+#: ops/serializers/job.py:56 terminal/serializers/session.py:44
 msgid "Is success"
 msgstr "是否成功"
 
@@ -1238,7 +1238,7 @@ msgstr "SSH公钥"
 #: assets/models/cmd_filter.py:88 assets/models/group.py:20
 #: common/db/models.py:36 ops/models/adhoc.py:26 ops/models/job.py:113
 #: ops/models/playbook.py:26 rbac/models/role.py:37 settings/models.py:37
-#: terminal/models/applet/applet.py:44 terminal/models/applet/applet.py:248
+#: terminal/models/applet/applet.py:44 terminal/models/applet/applet.py:250
 #: terminal/models/applet/host.py:141 terminal/models/component/endpoint.py:24
 #: terminal/models/component/endpoint.py:102
 #: terminal/models/session/session.py:46 tickets/models/comment.py:32
@@ -1289,7 +1289,7 @@ msgstr "用户名与用户相同"
 #: assets/models/_user.py:52 authentication/models/connection_token.py:41
 #: authentication/serializers/connect_token_secret.py:111
 #: terminal/models/applet/applet.py:41 terminal/serializers/session.py:18
-#: terminal/serializers/session.py:39 terminal/serializers/storage.py:70
+#: terminal/serializers/session.py:40 terminal/serializers/storage.py:70
 msgid "Protocol"
 msgstr "协议"
 
@@ -1432,7 +1432,7 @@ msgstr "资产自动化任务"
 
 #: assets/models/automations/base.py:113 audits/models.py:199
 #: audits/serializers.py:50 ops/models/base.py:49 ops/models/job.py:186
-#: terminal/models/applet/applet.py:247 terminal/models/applet/host.py:138
+#: terminal/models/applet/applet.py:249 terminal/models/applet/host.py:138
 #: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
 #: terminal/serializers/applet_host.py:115 tickets/models/ticket/general.py:283
 #: tickets/serializers/super_ticket.py:13
@@ -2015,7 +2015,7 @@ msgstr "改密"
 
 #: audits/const.py:35 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:163
-#: terminal/serializers/session.py:46 terminal/serializers/session.py:55
+#: terminal/serializers/session.py:47 terminal/serializers/session.py:56
 msgid "Terminal"
 msgstr "终端"
 
@@ -3788,7 +3788,7 @@ msgstr "保存后执行"
 msgid "Job type"
 msgstr "任务类型"
 
-#: ops/serializers/job.py:57 terminal/serializers/session.py:47
+#: ops/serializers/job.py:57 terminal/serializers/session.py:48
 msgid "Is finished"
 msgstr "是否完成"
 
@@ -4204,7 +4204,7 @@ msgid "My assets"
 msgstr "我的资产"
 
 #: rbac/tree.py:56 terminal/models/applet/applet.py:51
-#: terminal/models/applet/applet.py:244 terminal/models/applet/host.py:29
+#: terminal/models/applet/applet.py:246 terminal/models/applet/host.py:29
 #: terminal/serializers/applet.py:15
 msgid "Applet"
 msgstr "远程应用"
@@ -5770,7 +5770,7 @@ msgstr "只支持自定义平台"
 msgid "Missing type in platform.yml"
 msgstr "在 platform.yml 中缺少类型"
 
-#: terminal/models/applet/applet.py:246 terminal/models/applet/host.py:35
+#: terminal/models/applet/applet.py:248 terminal/models/applet/host.py:35
 #: terminal/models/applet/host.py:136
 msgid "Hosting"
 msgstr "宿主机"
@@ -5941,23 +5941,27 @@ msgstr "回放"
 msgid "Date end"
 msgstr "结束日期"
 
-#: terminal/models/session/session.py:240
+#: terminal/models/session/session.py:47
+msgid "Command count"
+msgstr "命令数量"
+
+#: terminal/models/session/session.py:241
 msgid "Session record"
 msgstr "会话记录"
 
-#: terminal/models/session/session.py:242
+#: terminal/models/session/session.py:243
 msgid "Can monitor session"
 msgstr "可以监控会话"
 
-#: terminal/models/session/session.py:243
+#: terminal/models/session/session.py:244
 msgid "Can share session"
 msgstr "可以分享会话"
 
-#: terminal/models/session/session.py:244
+#: terminal/models/session/session.py:245
 msgid "Can terminate session"
 msgstr "可以终断会话"
 
-#: terminal/models/session/session.py:245
+#: terminal/models/session/session.py:246
 msgid "Can validate session action perm"
 msgstr "可以验证会话动作权限"
 
@@ -6124,8 +6128,10 @@ msgid ""
 "has a private account, the other is public, when the application does not "
 "support multiple open and the special has been used, the public account will "
 "be used to connect"
-msgstr "这些账号用于连接发布的应用，账号现在分为两种类型，一种是专用的，每个用户都有一个专用账号。 "
-"另一种是公共的，当应用不支持多开且专用的已经被使用时，会使用公共账号连接"
+msgstr ""
+"这些账号用于连接发布的应用，账号现在分为两种类型，一种是专用的，每个用户都有"
+"一个专用账号。 另一种是公共的，当应用不支持多开且专用的已经被使用时，会使用公"
+"共账号连接"
 
 #: terminal/serializers/applet_host.py:77
 msgid "The number of public accounts created automatically"
@@ -6203,35 +6209,35 @@ msgstr "如果不同端点下的资产 IP 有冲突，使用资产标签实现"
 msgid "Asset IP"
 msgstr "资产 IP"
 
-#: terminal/serializers/session.py:22 terminal/serializers/session.py:44
+#: terminal/serializers/session.py:22 terminal/serializers/session.py:45
 msgid "Can replay"
 msgstr "是否可重放"
 
-#: terminal/serializers/session.py:23 terminal/serializers/session.py:45
+#: terminal/serializers/session.py:23 terminal/serializers/session.py:46
 msgid "Can join"
 msgstr "是否可加入"
 
-#: terminal/serializers/session.py:24 terminal/serializers/session.py:48
+#: terminal/serializers/session.py:24 terminal/serializers/session.py:49
 msgid "Can terminate"
 msgstr "是否可中断"
 
-#: terminal/serializers/session.py:40
+#: terminal/serializers/session.py:41
 msgid "User ID"
 msgstr "用户 ID"
 
-#: terminal/serializers/session.py:41
+#: terminal/serializers/session.py:42
 msgid "Asset ID"
 msgstr "资产 ID"
 
-#: terminal/serializers/session.py:42
+#: terminal/serializers/session.py:43
 msgid "Login from display"
 msgstr "登录来源名称"
 
-#: terminal/serializers/session.py:49
+#: terminal/serializers/session.py:50
 msgid "Terminal display"
 msgstr "终端显示"
 
-#: terminal/serializers/session.py:54
+#: terminal/serializers/session.py:55
 msgid "Command amount"
 msgstr "命令数量"
 
