@@ -13,7 +13,7 @@ class AccountFilterSet(BaseFilterSet):
     hostname = drf_filters.CharFilter(field_name='name', lookup_expr='exact')
     username = drf_filters.CharFilter(field_name="username", lookup_expr='exact')
     address = drf_filters.CharFilter(field_name="asset__address", lookup_expr='exact')
-    asset = drf_filters.CharFilter(field_name="asset_id", lookup_expr='exact')
+    asset_id = drf_filters.CharFilter(field_name="asset", lookup_expr='exact')
     assets = drf_filters.CharFilter(field_name='asset_id', lookup_expr='exact')
     nodes = drf_filters.CharFilter(method='filter_nodes')
     node_id = drf_filters.CharFilter(method='filter_nodes')
@@ -45,7 +45,7 @@ class AccountFilterSet(BaseFilterSet):
 
     class Meta:
         model = Account
-        fields = ['id', 'asset_id', 'source_id', 'secret_type']
+        fields = ['id', 'asset', 'source_id', 'secret_type']
 
 
 class GatheredAccountFilterSet(BaseFilterSet):

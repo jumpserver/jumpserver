@@ -103,8 +103,12 @@ def on_user_created_set_default_org(sender, instance, created, **kwargs):
         return
     if instance.orgs.count() > 0:
         return
-    with tmp_to_org(Organization.default()):
-        Organization.default().add_member(instance)
+    default_org = Organization.default()
+    with tmp_to_org(default_org):
+        default_org.add_member(instance)
+        default_group = UserGroup.objects.filter(name='Default').first()
+        if default_group:
+            default_group.users.add(instance)
 
 
 def _remove_user_resource(model, users, org, user_field_name='users'):
