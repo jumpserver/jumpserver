@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-25 15:37+0800\n"
+"POT-Creation-Date: 2023-07-28 10:38+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -288,7 +288,7 @@ msgstr "アカウントバックアップ計画"
 #: assets/models/automations/base.py:115 audits/models.py:60
 #: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:194
 #: ops/templates/ops/celery_task_log.html:75
-#: perms/models/asset_permission.py:72 terminal/models/applet/host.py:137
+#: perms/models/asset_permission.py:72 terminal/models/applet/host.py:139
 #: terminal/models/session/session.py:44
 #: tickets/models/ticket/apply_application.py:30
 #: tickets/models/ticket/apply_asset.py:19
@@ -411,7 +411,7 @@ msgstr "開始日"
 #: accounts/models/automations/change_secret.py:91
 #: assets/models/automations/base.py:116 ops/models/base.py:56
 #: ops/models/celery.py:64 ops/models/job.py:195
-#: terminal/models/applet/host.py:138
+#: terminal/models/applet/host.py:140
 msgid "Date finished"
 msgstr "終了日"
 
@@ -696,7 +696,7 @@ msgid "Key password"
 msgstr "キーパスワード"
 
 #: accounts/serializers/account/base.py:80
-#: assets/serializers/asset/common.py:309
+#: assets/serializers/asset/common.py:311
 msgid "Spec info"
 msgstr "特別情報"
 
@@ -839,7 +839,7 @@ msgid "Users"
 msgstr "ユーザー"
 
 #: acls/models/base.py:98 assets/models/automations/base.py:17
-#: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:308
+#: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:310
 #: rbac/tree.py:35
 msgid "Accounts"
 msgstr "アカウント"
@@ -1080,7 +1080,7 @@ msgstr "無効"
 msgid "Basic"
 msgstr "基本"
 
-#: assets/const/base.py:35 assets/const/protocol.py:193
+#: assets/const/base.py:35 assets/const/protocol.py:201
 #: assets/models/asset/web.py:13
 msgid "Script"
 msgstr "脚本"
@@ -1152,10 +1152,6 @@ msgstr ""
 msgid "Other"
 msgstr "その他"
 
-#: assets/const/protocol.py:43
-msgid "SFTP enabled"
-msgstr "SFTP が有効"
-
 #: assets/const/protocol.py:48
 msgid "SFTP home"
 msgstr "SFTP ルート パス"
@@ -1189,28 +1185,36 @@ msgstr "AD ドメイン"
 msgid "Use SSL"
 msgstr "SSLの使用"
 
-#: assets/const/protocol.py:149
+#: assets/const/protocol.py:127
+msgid "SYSDBA"
+msgstr ""
+
+#: assets/const/protocol.py:128
+msgid "Connect as SYSDBA"
+msgstr ""
+
+#: assets/const/protocol.py:157
 msgid "Auth username"
 msgstr "ユーザー名で認証する"
 
-#: assets/const/protocol.py:170 assets/models/asset/web.py:9
+#: assets/const/protocol.py:178 assets/models/asset/web.py:9
 #: assets/serializers/asset/info/spec.py:16
 msgid "Autofill"
 msgstr "自動充填"
 
-#: assets/const/protocol.py:178 assets/models/asset/web.py:10
+#: assets/const/protocol.py:186 assets/models/asset/web.py:10
 msgid "Username selector"
 msgstr "ユーザー名ピッカー"
 
-#: assets/const/protocol.py:183 assets/models/asset/web.py:11
+#: assets/const/protocol.py:191 assets/models/asset/web.py:11
 msgid "Password selector"
 msgstr "パスワードセレクター"
 
-#: assets/const/protocol.py:188 assets/models/asset/web.py:12
+#: assets/const/protocol.py:196 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr "ボタンセレクターを確認する"
 
-#: assets/const/protocol.py:211
+#: assets/const/protocol.py:219
 msgid "API mode"
 msgstr "APIモード"
 
@@ -1239,7 +1243,7 @@ msgstr "SSHパブリックキー"
 #: common/db/models.py:36 ops/models/adhoc.py:26 ops/models/job.py:113
 #: ops/models/playbook.py:26 rbac/models/role.py:37 settings/models.py:37
 #: terminal/models/applet/applet.py:44 terminal/models/applet/applet.py:248
-#: terminal/models/applet/host.py:139 terminal/models/component/endpoint.py:24
+#: terminal/models/applet/host.py:141 terminal/models/component/endpoint.py:24
 #: terminal/models/component/endpoint.py:102
 #: terminal/models/session/session.py:46 tickets/models/comment.py:32
 #: tickets/models/ticket/general.py:297 users/models/user.py:792
@@ -1368,7 +1372,7 @@ msgstr "ドメイン"
 msgid "Labels"
 msgstr "ラベル"
 
-#: assets/models/asset/common.py:158 assets/serializers/asset/common.py:310
+#: assets/models/asset/common.py:158 assets/serializers/asset/common.py:312
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr "資産ハードウェア情報の収集"
@@ -1432,9 +1436,9 @@ msgstr "アセットの自動化タスク"
 
 #: assets/models/automations/base.py:113 audits/models.py:199
 #: audits/serializers.py:50 ops/models/base.py:49 ops/models/job.py:186
-#: terminal/models/applet/applet.py:247 terminal/models/applet/host.py:136
+#: terminal/models/applet/applet.py:247 terminal/models/applet/host.py:138
 #: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
-#: terminal/serializers/applet_host.py:107 tickets/models/ticket/general.py:283
+#: terminal/serializers/applet_host.py:108 tickets/models/ticket/general.py:283
 #: tickets/serializers/super_ticket.py:13
 #: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:164
 #: xpack/plugins/cloud/models.py:216
@@ -1702,19 +1706,19 @@ msgid "Node path"
 msgstr "ノードパスです"
 
 #: assets/serializers/asset/common.py:145
-#: assets/serializers/asset/common.py:311
+#: assets/serializers/asset/common.py:313
 msgid "Auto info"
 msgstr "自動情報"
 
-#: assets/serializers/asset/common.py:234
+#: assets/serializers/asset/common.py:236
 msgid "Platform not exist"
 msgstr "プラットフォームが存在しません"
 
-#: assets/serializers/asset/common.py:270
+#: assets/serializers/asset/common.py:272
 msgid "port out of range (0-65535)"
 msgstr "ポート番号が範囲外です (0-65535)"
 
-#: assets/serializers/asset/common.py:277
+#: assets/serializers/asset/common.py:279
 msgid "Protocol is required: {}"
 msgstr "プロトコルが必要です: {}"
 
@@ -2022,7 +2026,7 @@ msgid "Change password"
 msgstr "パスワードを変更する"
 
 #: audits/const.py:35 settings/serializers/terminal.py:6
-#: terminal/models/applet/host.py:25 terminal/models/component/terminal.py:163
+#: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:163
 #: terminal/serializers/session.py:46 terminal/serializers/session.py:55
 msgid "Terminal"
 msgstr "ターミナル"
@@ -2039,7 +2043,7 @@ msgstr "セッションログ"
 msgid "Login log"
 msgstr "ログインログ"
 
-#: audits/const.py:43 terminal/models/applet/host.py:140
+#: audits/const.py:43 terminal/models/applet/host.py:142
 #: terminal/models/component/task.py:24
 msgid "Task"
 msgstr "タスク"
@@ -2250,19 +2254,19 @@ msgstr ""
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名アカウントはこのプロパティではサポートされていません"
 
-#: authentication/api/connection_token.py:323
+#: authentication/api/connection_token.py:320
 msgid "Account not found"
 msgstr "アカウントが見つかりません"
 
-#: authentication/api/connection_token.py:326
+#: authentication/api/connection_token.py:323
 msgid "Permission expired"
 msgstr "承認の有効期限が切れています"
 
-#: authentication/api/connection_token.py:340
+#: authentication/api/connection_token.py:337
 msgid "ACL action is reject: {}({})"
 msgstr "ACL アクションは拒否です: {}({})"
 
-#: authentication/api/connection_token.py:344
+#: authentication/api/connection_token.py:341
 msgid "ACL action is review"
 msgstr "ACL アクションはレビューです"
 
@@ -2718,11 +2722,11 @@ msgstr "ユーザーなしまたは期限切れのユーザー"
 msgid "No asset or inactive asset"
 msgstr "アセットがないか、有効化されていないアセット"
 
-#: authentication/models/connection_token.py:269
+#: authentication/models/connection_token.py:280
 msgid "Can view super connection token secret"
 msgstr "スーパー接続トークンのシークレットを表示できます"
 
-#: authentication/models/connection_token.py:271
+#: authentication/models/connection_token.py:282
 msgid "Super connection token"
 msgstr "スーパー接続トークン"
 
@@ -4243,7 +4247,7 @@ msgid "My assets"
 msgstr "私の資産"
 
 #: rbac/tree.py:56 terminal/models/applet/applet.py:51
-#: terminal/models/applet/applet.py:244 terminal/models/applet/host.py:28
+#: terminal/models/applet/applet.py:244 terminal/models/applet/host.py:29
 #: terminal/serializers/applet.py:15
 msgid "Applet"
 msgstr "リモートアプリケーション"
@@ -5742,7 +5746,7 @@ msgstr "出力"
 msgid "Risk level"
 msgstr "リスクレベル"
 
-#: terminal/connect_methods.py:34
+#: terminal/connect_methods.py:35
 msgid "DB Client"
 msgstr "データベース クライアント"
 
@@ -5847,28 +5851,36 @@ msgstr "カスタムプラットフォームのみをサポート"
 msgid "Missing type in platform.yml"
 msgstr "platform.ymlにタイプがありません"
 
-#: terminal/models/applet/applet.py:246 terminal/models/applet/host.py:34
-#: terminal/models/applet/host.py:134
+#: terminal/models/applet/applet.py:246 terminal/models/applet/host.py:35
+#: terminal/models/applet/host.py:136
 msgid "Hosting"
 msgstr "ホスト マシン"
 
-#: terminal/models/applet/host.py:19 terminal/serializers/applet_host.py:57
+#: terminal/models/applet/host.py:18 terminal/serializers/applet_host.py:57
 msgid "Deploy options"
 msgstr "展開パラメーター"
 
+#: terminal/models/applet/host.py:19
+msgid "Auto create accounts"
+msgstr "アカウントの自動作成"
+
 #: terminal/models/applet/host.py:20
+msgid "Accounts create amount"
+msgstr "作成するアカウント数"
+
+#: terminal/models/applet/host.py:21
 msgid "Inited"
 msgstr "初期化された"
 
-#: terminal/models/applet/host.py:21
+#: terminal/models/applet/host.py:22
 msgid "Date inited"
 msgstr ""
 
-#: terminal/models/applet/host.py:22
+#: terminal/models/applet/host.py:23
 msgid "Date synced"
 msgstr "同期日"
 
-#: terminal/models/applet/host.py:135
+#: terminal/models/applet/host.py:137
 msgid "Initial"
 msgstr "初期化"
 
@@ -7891,6 +7903,9 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:86
 msgid "Community edition"
 msgstr "コミュニティ版"
+
+#~ msgid "SFTP enabled"
+#~ msgstr "SFTP が有効"
 
 #~ msgid "Item"
 #~ msgstr "アイテム"

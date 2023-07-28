@@ -62,6 +62,7 @@ class AppletHostSerializer(HostSerializer):
     class Meta(HostSerializer.Meta):
         model = AppletHost
         fields = HostSerializer.Meta.fields + [
+            'auto_create_accounts', 'accounts_create_amount',
             'load', 'date_synced', 'deploy_options'
         ]
         extra_kwargs = {

@@ -23,8 +23,9 @@ def on_applet_host_create(sender, instance, created=False, **kwargs):
     applets = Applet.objects.all()
     instance.applets.set(applets)
 
-    applet_host_generate_accounts.delay(instance.id)
     applet_host_change_pub_sub.publish(True)
+    if instance.auto_create_accounts:
+        applet_host_generate_accounts.delay(instance.id)
 
 
 @receiver(post_save, sender=User)
@@ -35,6 +36,8 @@ def on_user_create_create_account(sender, instance, created=False, **kwargs):
     with tmp_to_builtin_org(system=1):
         applet_hosts = AppletHost.objects.all()
         for host in applet_hosts:
+            if not host.auto_create_accounts:
+                continue
             host.generate_private_accounts_by_usernames([instance.username])
 
 
@@ -57,7 +60,6 @@ def on_applet_create(sender, instance, created=False, **kwargs):
         return
     hosts = AppletHost.objects.all()
     instance.hosts.set(hosts)
-
     applet_host_change_pub_sub.publish(True)
 
 
