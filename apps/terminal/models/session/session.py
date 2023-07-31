@@ -44,7 +44,7 @@ class Session(OrgModelMixin):
     date_start = models.DateTimeField(verbose_name=_("Date start"), db_index=True, default=timezone.now)
     date_end = models.DateTimeField(verbose_name=_("Date end"), null=True)
     comment = models.TextField(blank=True, null=True, verbose_name=_("Comment"))
-    command_amount = models.IntegerField(default=-1, verbose_name=_("Command amount"))
+    cmd_amount = models.IntegerField(default=-1, verbose_name=_("Command amount"))
 
     upload_to = 'replay'
     ACTIVE_CACHE_KEY_PREFIX = 'SESSION_ACTIVE_{}'
@@ -175,8 +175,15 @@ class Session(OrgModelMixin):
     def is_active(self):
         key = self.ACTIVE_CACHE_KEY_PREFIX.format(self.id)
         return bool(cache.get(key))
+    
+    @property
+    def command_amount(self):
+        if self.cmd_amount == 0:
+            self.cmd_amount = self.compute_command_amount()
+            self.save(update_fields=['cmd_amount'])
+        return self.cmd_amount
 
-    def get_command_amount(self):
+    def compute_command_amount(self):
         command_store = get_multi_command_storage()
         return command_store.count(session=str(self.id))
 
