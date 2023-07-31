@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 
 from django.db import connections
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 from common.utils import get_logger, signer, crypto
 
@@ -60,7 +60,7 @@ def safe_db_connection():
 
 class Encryptor:
     def __init__(self, value):
-        self.value = force_text(value)
+        self.value = force_str(value)
 
     def decrypt(self):
         plain_value = crypto.decrypt(self.value)
