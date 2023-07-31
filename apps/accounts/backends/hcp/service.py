@@ -52,11 +52,15 @@ class VaultKVClient(object):
         )
 
     def get(self, path, version=None):
-        response = self.client.secrets.kv.v2.read_secret_version(
-            path=path,
-            version=version,
-            mount_point=self.mount_point
-        )
+        try:
+            response = self.client.secrets.kv.v2.read_secret_version(
+                path=path,
+                version=version,
+                mount_point=self.mount_point
+            )
+        except exceptions.InvalidPath as e:
+            logger.error('Get secret error: {}'.format(e))
+            return {}
         data = response.get('data', {})
         return data
 

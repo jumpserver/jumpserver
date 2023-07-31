@@ -61,8 +61,6 @@ class AuthValidateMixin(serializers.Serializer):
 
 
 class BaseAccountSerializer(AuthValidateMixin, BulkOrgResourceModelSerializer):
-    # TODO: Add `has_secret` field to DetailSerializer
-    has_secret = serializers.BooleanField(label=_("Has secret"), read_only=True)
 
     class Meta:
         model = BaseAccount
@@ -70,13 +68,11 @@ class BaseAccountSerializer(AuthValidateMixin, BulkOrgResourceModelSerializer):
         fields_small = fields_mini + [
             'secret_type', 'secret', 'passphrase',
             'privileged', 'is_active', 'spec_info',
-            'has_secret',
         ]
         fields_other = ['created_by', 'date_created', 'date_updated', 'comment']
         fields = fields_small + fields_other
         read_only_fields = [
-            'has_secret', 'spec_info',
-            'date_verified', 'created_by', 'date_created',
+            'spec_info', 'date_verified', 'created_by', 'date_created',
         ]
         extra_kwargs = {
             'spec_info': {'label': _('Spec info')},

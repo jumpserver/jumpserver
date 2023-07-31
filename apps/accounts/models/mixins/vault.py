@@ -14,11 +14,9 @@ class VaultQuerySetMixin(models.QuerySet):
            1. 替换 secret 为 _secret
            2. 触发 post_save 信号
         """
-        secret = kwargs.pop('secret', None)
-        if secret:
-            # 替换 _secret 值
+        if 'secret' in kwargs:
             kwargs.update({
-                '_secret': secret
+                '_secret': kwargs.pop('secret')
             })
         rows = super().update(**kwargs)
 
@@ -48,6 +46,7 @@ class VaultManagerMixin(models.Manager):
 
 class VaultModelMixin(models.Model):
     _secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Secret'))
+    is_sync_metadata = True
 
     class Meta:
         abstract = True

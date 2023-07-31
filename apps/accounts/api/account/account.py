@@ -26,6 +26,7 @@ class AccountViewSet(OrgBulkModelViewSet):
     filterset_class = AccountFilterSet
     serializer_classes = {
         'default': serializers.AccountSerializer,
+        'retrieve': serializers.AccountDetailSerializer,
     }
     rbac_perms = {
         'partial_update': ['accounts.change_account'],

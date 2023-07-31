@@ -39,6 +39,7 @@ class Vault(BaseVault):
         self.client.delete(path=entry.full_path)
 
     def _clean_db_secret(self, instance):
+        instance.is_sync_metadata = False
         instance.mark_secret_save_to_vault()
 
     def _save_metadata(self, instance, metadata):

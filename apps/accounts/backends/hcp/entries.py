@@ -31,8 +31,9 @@ class BaseEntry(ABC):
         raise NotImplementedError
 
     def to_internal_data(self):
-        secret = getattr(self.instance, '_secret', '')
-        secret = Encryptor(secret).encrypt()
+        secret = getattr(self.instance, '_secret', None)
+        if secret is not None:
+            secret = Encryptor(secret).encrypt()
         data = {'secret': secret}
         return data
 
@@ -70,7 +71,7 @@ class HistoricalAccountEntry(BaseEntry):
 
     @property
     def path_spec(self):
-        path = f'histories/{self.instance.id}'
+        path = f'histories/{self.instance.history_id}'
         return path
 
 

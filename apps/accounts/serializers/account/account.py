@@ -232,6 +232,15 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
         return queryset
 
 
+class AccountDetailSerializer(AccountSerializer):
+    has_secret = serializers.BooleanField(label=_("Has secret"), read_only=True)
+
+    class Meta(AccountSerializer.Meta):
+        model = Account
+        fields = AccountSerializer.Meta.fields + ['has_secret']
+        read_only_fields = AccountSerializer.Meta.read_only_fields + ['has_secret']
+
+
 class AssetAccountBulkSerializerResultSerializer(serializers.Serializer):
     asset = serializers.CharField(read_only=True, label=_('Asset'))
     state = serializers.CharField(read_only=True, label=_('State'))

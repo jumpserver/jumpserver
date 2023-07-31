@@ -21,13 +21,19 @@ class BaseVault(ABC):
         if not instance.secret_has_save_to_vault:
             self._create(instance)
             self._clean_db_secret(instance)
-        self.save_metadata(instance)
+            self.save_metadata(instance)
+
+        if instance.is_sync_metadata:
+            self.save_metadata(instance)
 
     def update(self, instance):
         if not instance.secret_has_save_to_vault:
             self._update(instance)
             self._clean_db_secret(instance)
-        self.save_metadata(instance)
+            self.save_metadata(instance)
+
+        if instance.is_sync_metadata:
+            self.save_metadata(instance)
 
     def delete(self, instance):
         self._delete(instance)
@@ -69,4 +75,3 @@ class BaseVault(ABC):
     @abstractmethod
     def is_active(self, *args, **kwargs) -> (bool, str):
         raise NotImplementedError
-
