@@ -7,8 +7,8 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
-from rest_framework import status
+from django.utils.translation import gettext_lazy as _
+from rest_framework import status, serializers
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.request import Request
@@ -23,12 +23,12 @@ from common.utils.http import is_true, is_false
 from orgs.mixins.api import RootOrgViewMixin
 from perms.models import ActionChoices
 from terminal.connect_methods import NativeClient, ConnectMethodUtil
-from terminal.models import EndpointRule
+from terminal.models import EndpointRule, Endpoint
 from ..models import ConnectionToken, date_expired_default
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
     SuperConnectionTokenSerializer, ConnectTokenAppletOptionSerializer,
-    ConnectionTokenUpdateSerializer
+    ConnectionTokenReusableSerializer,
 )
 
 __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
@@ -64,6 +64,15 @@ class RDPFileClientProtocolURLMixin:
             'use redirection server name:i': '0',
             'smart sizing:i': '1',
         }
+        # 设置多屏显示
+        multi_mon = is_true(self.request.query_params.get('multi_mon'))
+        if multi_mon:
+            rdp_options['use multimon:i'] = '1'
+
+        # 设置多屏显示
+        multi_mon = is_true(self.request.query_params.get('multi_mon'))
+        if multi_mon:
+            rdp_options['use multimon:i'] = '1'
 
         # 设置磁盘挂载
         drives_redirect = is_true(self.request.query_params.get('drives_redirect'))
@@ -166,11 +175,13 @@ class RDPFileClientProtocolURLMixin:
         return data
 
     def get_smart_endpoint(self, protocol, asset=None):
-        target_ip = asset.get_target_ip() if asset else ''
-        endpoint = EndpointRule.match_endpoint(
-            target_instance=asset, target_ip=target_ip,
-            protocol=protocol, request=self.request
-        )
+        endpoint = Endpoint.match_by_instance_label(asset, protocol)
+        if not endpoint:
+            target_ip = asset.get_target_ip() if asset else ''
+            endpoint = EndpointRule.match_endpoint(
+                target_instance=asset, target_ip=target_ip,
+                protocol=protocol, request=self.request
+            )
         return endpoint
 
 
@@ -212,6 +223,18 @@ class ExtraActionApiMixin(RDPFileClientProtocolURLMixin):
         instance.expire()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @action(methods=['PATCH'], detail=True, url_path='reuse')
+    def reuse(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if not settings.CONNECTION_TOKEN_REUSABLE:
+            error = _('Reusable connection token is not allowed, global setting not enabled')
+            raise serializers.ValidationError(error)
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        is_reusable = serializer.validated_data.get('is_reusable', False)
+        instance.set_reusable(is_reusable)
+        return Response(data=serializer.data)
+
     @action(methods=['POST'], detail=False)
     def exchange(self, request, *args, **kwargs):
         pk = request.data.get('id', None) or request.data.get('pk', None)
@@ -232,17 +255,16 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
     search_fields = filterset_fields
     serializer_classes = {
         'default': ConnectionTokenSerializer,
-        'update': ConnectionTokenUpdateSerializer,
-        'partial_update': ConnectionTokenUpdateSerializer,
+        'reuse': ConnectionTokenReusableSerializer,
     }
     http_method_names = ['get', 'post', 'patch', 'head', 'options', 'trace']
     rbac_perms = {
         'list': 'authentication.view_connectiontoken',
         'retrieve': 'authentication.view_connectiontoken',
-        'update': 'authentication.change_connectiontoken',
         'create': 'authentication.add_connectiontoken',
         'exchange': 'authentication.add_connectiontoken',
-        'expire': 'authentication.change_connectiontoken',
+        'reuse': 'authentication.reuse_connectiontoken',
+        'expire': 'authentication.expire_connectiontoken',
         'get_rdp_file': 'authentication.add_connectiontoken',
         'get_client_protocol_url': 'authentication.add_connectiontoken',
     }
@@ -293,9 +315,6 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
 
         if account.username != AliasAccount.INPUT:
             data['input_username'] = ''
-        elif account.username == AliasAccount.USER:
-            data['input_username'] = user.username
-
         ticket = self._validate_acl(user, asset, account)
         if ticket:
             data['from_ticket'] = ticket
@@ -346,7 +365,7 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
     rbac_perms = {
         'create': 'authentication.add_superconnectiontoken',
         'renewal': 'authentication.add_superconnectiontoken',
-        'get_secret_detail': 'authentication.view_connectiontokensecret',
+        'get_secret_detail': 'authentication.view_superconnectiontokensecret',
         'get_applet_info': 'authentication.view_superconnectiontoken',
         'release_applet_account': 'authentication.view_superconnectiontoken',
     }
@@ -376,7 +395,7 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
     @action(methods=['POST'], detail=False, url_path='secret')
     def get_secret_detail(self, request, *args, **kwargs):
         """ 非常重要的 api, 在逻辑层再判断一下 rbac 权限, 双重保险 """
-        rbac_perm = 'authentication.view_connectiontokensecret'
+        rbac_perm = 'authentication.view_superconnectiontokensecret'
         if not request.user.has_perm(rbac_perm):
             raise PermissionDenied('Not allow to view secret')
 

@@ -1,5 +1,5 @@
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class Scope(models.TextChoices):
@@ -22,7 +22,8 @@ exclude_permissions = (
     ('common', 'setting', '*', '*'),
 
     ('authentication', 'privatetoken', '*', '*'),
-    ('authentication', 'connectiontoken', 'delete', 'connectiontoken'),
+    ('authentication', 'connectiontoken', 'delete,change', 'connectiontoken'),
+    ('authentication', 'connectiontoken', 'view', 'connectiontokensecret'),
     ('authentication', 'ssotoken', '*', '*'),
     ('authentication', 'superconnectiontoken', 'change,delete', 'superconnectiontoken'),
     ('authentication', 'temptoken', 'delete', 'temptoken'),

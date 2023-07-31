@@ -4,12 +4,12 @@ import ipaddress
 from urllib.parse import urljoin, urlparse
 
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
-from common.utils import validate_ip, get_ip_city, get_request_ip
-from common.utils import get_logger
-from audits.models import UserLoginLog
 from audits.const import DEFAULT_CITY
+from audits.models import UserLoginLog
+from common.utils import get_logger
+from common.utils import validate_ip, get_ip_city, get_request_ip
 from .notifications import DifferentCityLoginMessage
 
 logger = get_logger(__file__)

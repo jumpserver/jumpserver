@@ -1,28 +1,28 @@
-from django.http.response import HttpResponseRedirect
-from django.utils.translation import ugettext_lazy as _
 from urllib.parse import urlencode
-from django.views import View
-from django.conf import settings
-from django.http.request import HttpRequest
-from django.db.utils import IntegrityError
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.exceptions import APIException
 
-from users.models import User
-from users.views import UserVerifyPasswordView
-from common.utils import get_logger
-from common.utils.random import random_string
-from common.utils.django import reverse, get_object_or_none
+from django.conf import settings
+from django.db.utils import IntegrityError
+from django.http.request import HttpRequest
+from django.http.response import HttpResponseRedirect
+from django.utils.translation import gettext_lazy as _
+from django.views import View
+from rest_framework.exceptions import APIException
+from rest_framework.permissions import IsAuthenticated, AllowAny
+
+from authentication import errors
+from authentication.const import ConfirmType
+from authentication.mixins import AuthMixin
+from authentication.notifications import OAuthBindMessage
+from common.permissions import UserConfirmation
 from common.sdk.im.wecom import URL
 from common.sdk.im.wecom import WeCom
-from common.views.mixins import UserConfirmRequiredExceptionMixin, PermissionsMixin
+from common.utils import get_logger
 from common.utils.common import get_request_ip
-from common.permissions import UserConfirmation
-from authentication import errors
-from authentication.mixins import AuthMixin
-from authentication.const import ConfirmType
-from authentication.notifications import OAuthBindMessage
-
+from common.utils.django import reverse, get_object_or_none
+from common.utils.random import random_string
+from common.views.mixins import UserConfirmRequiredExceptionMixin, PermissionsMixin
+from users.models import User
+from users.views import UserVerifyPasswordView
 from .base import BaseLoginCallbackView
 from .mixins import METAMixin, FlashMessageMixin
 

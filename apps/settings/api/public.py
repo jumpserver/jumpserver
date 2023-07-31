@@ -4,13 +4,14 @@ from rest_framework.permissions import AllowAny
 
 from common.permissions import IsValidUserOrConnectionToken
 from common.utils import get_logger, lazyproperty
+from common.utils.timezone import local_now
 from jumpserver.utils import has_valid_xpack_license, get_xpack_license_info
 from .. import serializers
 from ..utils import get_interface_setting_or_default
 
 logger = get_logger(__name__)
 
-__all__ = ['PublicSettingApi', 'OpenPublicSettingApi']
+__all__ = ['PublicSettingApi', 'OpenPublicSettingApi', 'ServerInfoApi']
 
 
 class OpenPublicSettingApi(generics.RetrieveAPIView):
@@ -55,3 +56,13 @@ class PublicSettingApi(OpenPublicSettingApi):
             # 提前把异常爆出来
             values[name] = getattr(settings, name)
         return values
+
+
+class ServerInfoApi(generics.RetrieveAPIView):
+    permission_classes = (IsValidUserOrConnectionToken,)
+    serializer_class = serializers.ServerInfoSerializer
+
+    def get_object(self):
+        return {
+            "CURRENT_TIME": local_now(),
+        }

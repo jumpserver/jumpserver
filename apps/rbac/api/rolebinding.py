@@ -1,10 +1,10 @@
-from django.utils.translation import ugettext as _
 from django.db.models import F, Value
 from django.db.models.functions import Concat
+from django.utils.translation import gettext as _
 
+from common.exceptions import JMSException
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import current_org
-from common.exceptions import JMSException
 from .. import serializers
 from ..models import RoleBinding, SystemRoleBinding, OrgRoleBinding
 
@@ -26,15 +26,15 @@ class RoleBindingViewSet(OrgBulkModelViewSet):
     ]
 
     def get_queryset(self):
-        queryset = self._get_queryset()\
+        queryset = self._get_queryset() \
             .prefetch_related('user', 'role', 'org') \
             .annotate(
-                user_display=Concat(
-                    F('user__name'), Value('('),
-                    F('user__username'), Value(')')
-                ),
-                role_display=F('role__name')
-            )
+            user_display=Concat(
+                F('user__name'), Value('('),
+                F('user__username'), Value(')')
+            ),
+            role_display=F('role__name')
+        )
         return queryset
 
     def _get_queryset(self):

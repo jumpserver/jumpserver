@@ -14,12 +14,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='assetpermission',
             name='user_groups',
-            field=models.ManyToManyField(blank=True, related_name='assetpermissions', to='users.UserGroup', verbose_name='User group'),
+            field=models.ManyToManyField(blank=True, related_name='%(class)ss', to='users.usergroup', verbose_name='User group'),
         ),
         migrations.AlterField(
             model_name='assetpermission',
             name='users',
-            field=models.ManyToManyField(blank=True, related_name='assetpermissions', to=settings.AUTH_USER_MODEL, verbose_name='User'),
+            field=models.ManyToManyField(blank=True, related_name='%(class)ss', to=settings.AUTH_USER_MODEL, verbose_name='User'),
         ),
         migrations.AlterField(
             model_name='databaseapppermission',

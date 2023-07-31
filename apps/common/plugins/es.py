@@ -2,8 +2,12 @@
 #
 import datetime
 import inspect
+import sys
 
-from collections.abc import Iterable
+if sys.version_info.major == 3 and sys.version_info.minor >= 10:
+    from collections.abc import Iterable
+else:
+    from collections import Iterable
 from functools import reduce, partial
 from itertools import groupby
 from uuid import UUID
@@ -18,7 +22,6 @@ from common.utils.common import lazyproperty
 from common.utils import get_logger
 from common.utils.timezone import local_now_date_display
 from common.exceptions import JMSException
-
 
 logger = get_logger(__file__)
 
@@ -88,7 +91,7 @@ class ES(object):
 
         try:
             # 获取索引信息，如果没有定义，直接返回
-            data = self.es.indices.get_mapping(self.index)
+            data = self.es.indices.get_mapping(index=self.index)
         except NotFoundError:
             return False
 

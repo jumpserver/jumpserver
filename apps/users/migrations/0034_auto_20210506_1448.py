@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('users', '0033_user_need_update_password'),
     ]
@@ -13,11 +12,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='user',
             name='dingtalk_id',
-            field=models.CharField(default=None, max_length=128, null=True, unique=True, verbose_name='DingTalk'),
+            field=models.CharField(default=None, max_length=128, null=True, verbose_name='DingTalk'),
         ),
         migrations.AddField(
             model_name='user',
             name='wecom_id',
-            field=models.CharField(default=None, max_length=128, null=True, unique=True, verbose_name='WeCom'),
+            field=models.CharField(default=None, max_length=128, null=True, verbose_name='WeCom'),
         ),
     ]

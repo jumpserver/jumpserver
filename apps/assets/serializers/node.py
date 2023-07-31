@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
+from django.utils.translation import gettext as _
 from rest_framework import serializers
-from django.utils.translation import ugettext as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import Asset, Node

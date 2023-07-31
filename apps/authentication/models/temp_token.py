@@ -1,7 +1,7 @@
-from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
-
 from django.db import models
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+
 from common.db.models import JMSBaseModel
 
 

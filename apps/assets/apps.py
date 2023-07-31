@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
-from django.utils.translation import ugettext_lazy as _
 
 from django.apps import AppConfig
+from django.utils.translation import gettext_lazy as _
 
 
 class AssetsConfig(AppConfig):
@@ -12,7 +12,6 @@ class AssetsConfig(AppConfig):
         super().__init__(*args, **kwargs)
 
     def ready(self):
+        from . import signal_handlers  # noqa
+        from . import tasks  # noqa
         super().ready()
-        from . import signal_handlers
-        from . import tasks
-

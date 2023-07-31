@@ -5,6 +5,7 @@ import ansible_runner
 from django.conf import settings
 
 from .callback import DefaultCallback
+from ..utils import get_ansible_log_verbosity
 
 
 class CommandInBlackListException(Exception):
@@ -37,8 +38,7 @@ class AdHocRunner:
 
     def run(self, verbosity=0, **kwargs):
         self.check_module()
-        if verbosity is None and settings.DEBUG:
-            verbosity = 1
+        verbosity = get_ansible_log_verbosity(verbosity)
 
         if not os.path.exists(self.project_dir):
             os.mkdir(self.project_dir, 0o755)
@@ -70,8 +70,7 @@ class PlaybookRunner:
         self.cb = callback
 
     def run(self, verbosity=0, **kwargs):
-        if verbosity is None and settings.DEBUG:
-            verbosity = 1
+        verbosity = get_ansible_log_verbosity(verbosity)
 
         ansible_runner.run(
             private_data_dir=self.project_dir,

@@ -7,21 +7,14 @@ from common.db.models import JMSBaseModel
 from common.utils import contains_ip
 from common.utils.time_period import contains_time_period
 from orgs.mixins.models import OrgModelMixin, OrgManager
+from ..const import ActionChoices
 
 __all__ = [
     'BaseACL', 'UserBaseACL', 'UserAssetAccountBaseACL',
-    'ActionChoices',
 ]
 
 from orgs.utils import tmp_to_root_org
 from orgs.utils import tmp_to_org
-
-
-class ActionChoices(models.TextChoices):
-    reject = 'reject', _('Reject')
-    accept = 'accept', _('Accept')
-    review = 'review', _('Review')
-    warning = 'warning', _('Warning')
 
 
 class BaseACLQuerySet(models.QuerySet):

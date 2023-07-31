@@ -1,13 +1,13 @@
-from rest_framework import serializers
 from django.db.transaction import atomic
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers
 
+from common.serializers.fields import LabeledChoiceField
+from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from orgs.models import Organization
 from orgs.utils import get_current_org_id
-from orgs.mixins.serializers import OrgResourceModelSerializerMixin
-from common.serializers.fields import LabeledChoiceField
-from tickets.models import TicketFlow, ApprovalRule
 from tickets.const import TicketApprovalStrategy, TicketType
+from tickets.models import TicketFlow, ApprovalRule
 
 __all__ = ['TicketFlowSerializer']
 

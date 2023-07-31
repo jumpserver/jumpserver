@@ -15,16 +15,18 @@ def atomic(using=None, savepoint=False):
     return db_atomic(using=using, savepoint=savepoint)
 
 
-class OneToOneField(models.OneToOneField):
+class OneToOneField(models.OneToOneField, ForeignKey):
     def __init__(self, *args, **kwargs):
-        kwargs['db_constraint'] = False
-        super().__init__(*args, **kwargs)
+        kwargs['unique'] = False
+        if os.getenv('DB_CONSTRAINT', '1') == '0':
+            kwargs['db_constraint'] = False
+        ForeignKey.__init__(self, *args, **kwargs)
 
 
 def set_db_constraint():
     if os.getenv('DB_CONSTRAINT', '1') != '0':
         return
-    if sys.argv == 2 and sys.argv[1] == 'makemigrations':
+    if len(sys.argv) == 2 and sys.argv[1] == 'makemigrations':
         return
     print("Set foreignkey db constraint False")
     transaction.atomic = atomic

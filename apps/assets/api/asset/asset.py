@@ -122,8 +122,12 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
     ]
 
     def get_queryset(self):
-        return super().get_queryset().prefetch_related('nodes', 'protocols')\
+        queryset = super().get_queryset() \
+            .prefetch_related('nodes', 'protocols') \
             .select_related('platform', 'domain')
+        if queryset.model is not Asset:
+            queryset = queryset.select_related('asset_ptr')
+        return queryset
 
     def get_serializer_class(self):
         cls = super().get_serializer_class()

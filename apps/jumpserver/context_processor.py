@@ -2,7 +2,7 @@
 #
 from django.conf import settings
 from django.templatetags.static import static
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 default_interface = dict((
     ('logo_logout', static('img/logo.png')),

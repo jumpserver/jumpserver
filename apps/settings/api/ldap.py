@@ -4,7 +4,7 @@
 import threading
 
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework import generics
 from rest_framework.generics import CreateAPIView
 from rest_framework.views import Response, APIView

@@ -1,6 +1,6 @@
 from typing import Iterable, AnyStr
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import APIException
 
 from common.sdk.im.mixin import RequestMixin, BaseRequest
@@ -112,13 +112,13 @@ class WeCom(RequestMixin):
         update_values(extra_params, kwargs)
 
         body = {
-           "touser": '|'.join(users),
-           "msgtype": "text",
-           "agentid": self._agentid,
-           "text": {
-               "content": msg
-           },
-           **extra_params
+            "touser": '|'.join(users),
+            "msgtype": "text",
+            "agentid": self._agentid,
+            "text": {
+                "content": msg
+            },
+            **extra_params
         }
         if markdown:
             body['msgtype'] = 'markdown'
@@ -184,4 +184,3 @@ class WeCom(RequestMixin):
         return {
             'username': username, 'name': name, 'email': email
         }
-

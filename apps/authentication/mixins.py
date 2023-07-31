@@ -15,7 +15,7 @@ from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import reverse, redirect, get_object_or_404
 from django.utils.http import urlencode
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework.request import Request
 
 from acls.models import LoginACL

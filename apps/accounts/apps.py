@@ -6,6 +6,5 @@ class AccountsConfig(AppConfig):
     name = 'accounts'
 
     def ready(self):
-        from . import signal_handlers
-        from . import tasks
-        __all__ = signal_handlers
+        from . import signal_handlers  # noqa
+        from . import tasks  # noqa

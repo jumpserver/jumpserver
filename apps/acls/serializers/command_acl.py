@@ -1,4 +1,4 @@
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from acls.models import CommandGroup, CommandFilterACL
@@ -31,6 +31,8 @@ class CommandFilterACLSerializer(BaseSerializer, BulkOrgResourceModelSerializer)
     class Meta(BaseSerializer.Meta):
         model = CommandFilterACL
         fields = BaseSerializer.Meta.fields + ['command_groups']
+        # 默认都支持所有的 actions
+        action_choices_exclude = []
 
 
 class CommandReviewSerializer(serializers.Serializer):

@@ -2,7 +2,7 @@
 #
 
 from django.db.models import TextChoices, IntegerChoices
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class RiskLevelChoices(IntegerChoices):
@@ -12,6 +12,11 @@ class RiskLevelChoices(IntegerChoices):
     review_reject = 6, _('Review & Reject')
     review_accept = 7, _('Review & Accept')
     review_cancel = 8, _('Review & Cancel')
+
+    @classmethod
+    def get_label(cls, level):
+        label = dict(cls.choices).get(level)
+        return label
 
 
 class ReplayStorageType(TextChoices):

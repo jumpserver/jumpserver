@@ -2,7 +2,7 @@ from typing import Callable
 
 from django.conf import settings
 from django.template.loader import render_to_string
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from common.utils import get_logger, reverse
 from common.utils import lazyproperty
@@ -10,12 +10,16 @@ from common.utils.timezone import local_now_display
 from notifications.backends import BACKEND
 from notifications.models import SystemMsgSubscription
 from notifications.notifications import SystemMessage, UserMessage
+from terminal.const import RiskLevelChoices
 from terminal.models import Session, Command
 from users.models import User
 
 logger = get_logger(__name__)
 
-__all__ = ('CommandAlertMessage', 'CommandExecutionAlert', 'StorageConnectivityMessage')
+__all__ = (
+    'CommandAlertMessage', 'CommandExecutionAlert', 'StorageConnectivityMessage',
+    'CommandWarningMessage'
+)
 
 CATEGORY = 'terminal'
 CATEGORY_LABEL = _('Sessions')
@@ -65,37 +69,54 @@ class CommandAlertMixin:
 
 
 class CommandWarningMessage(CommandAlertMixin, UserMessage):
-    message_type_label = _('Danger command warning')
+    message_type_label = _('Command warning')
 
     def __init__(self, user, command):
         super().__init__(user)
         self.command = command
-    
+
     def get_html_msg(self) -> dict:
-        session = self.command.get('session')
-        session_url = reverse(
-            'api-terminal:session-detail', kwargs={'pk': session},
-            external=True, api_to_ui=True
-        ) + '?oid={}'.format(self.command['org_id'])
+        command = self.command
 
-        asset = self.command.get('asset')
-        asset_url = reverse(
-            'assets:asset-detail', kwargs={'pk': asset},
-            api_to_ui=True, external=True, is_console=True
-        ) + '?oid={}'.format(self.command.get('org_id'))
+        command_input = command['input']
+        user = command['user']
+        asset = command['asset']
+        account = command.get('_account', '')
+        cmd_acl = command.get('_cmd_filter_acl')
+        cmd_group = command.get('_cmd_group')
+        session_id = command.get('session', '')
+        risk_level = command['risk_level']
+        org_id = command['org_id']
+        org_name = command.get('_org_name') or org_id
 
-        cmd_filter_acl = self.command.get('cmd_filter_acl')
-        cmd_group = self.command.get('cmd_group')
+        if session_id:
+            session_url = reverse(
+                'api-terminal:session-detail', kwargs={'pk': session_id},
+                external=True, api_to_ui=True
+            ) + '?oid={}'.format(org_id)
+            session_url = session_url.replace('/terminal/sessions/', '/audit/sessions/sessions/')
+        else:
+            session_url = ''
+
+        # Command ACL
+        cmd_acl_name = cmd_group_name = ''
+        if cmd_acl:
+            cmd_acl_name = cmd_acl.name
+        if cmd_group:
+            cmd_group_name = cmd_group.name
 
         context = {
-            "command": self.command['input'],
-            'asset_url': asset_url,
-            'session_url': session_url.replace(
-                '/terminal/sessions/', '/audit/sessions/sessions/'
-            ),
-            'cmd_filter_acl_url': settings.SITE_URL + '/ui/#/console/perms/cmd-acls/%s/' % cmd_filter_acl,
-            'cmd_group_url': settings.SITE_URL + '/ui/#/console/perms/cmd-groups/%s/' % cmd_group,
+            'command': command_input,
+            'user': user,
+            'asset': asset,
+            'account': account,
+            'cmd_filter_acl': cmd_acl_name,
+            'cmd_group': cmd_group_name,
+            'session_url': session_url,
+            'risk_level': RiskLevelChoices.get_label(risk_level),
+            'org': org_name,
         }
+
         message = render_to_string('terminal/_msg_command_warning.html', context)
         return {
             'subject': self.subject,
@@ -106,7 +127,7 @@ class CommandWarningMessage(CommandAlertMixin, UserMessage):
 class CommandAlertMessage(CommandAlertMixin, SystemMessage):
     category = CATEGORY
     category_label = CATEGORY_LABEL
-    message_type_label = _('Danger command alert')
+    message_type_label = _('Command reject')
 
     def __init__(self, command):
         self.command = command
@@ -129,7 +150,7 @@ class CommandAlertMessage(CommandAlertMixin, SystemMessage):
         session_detail_url = session_detail_url.replace(
             '/terminal/sessions/', '/audit/sessions/sessions/'
         )
-        level = Command.get_risk_level_str(command['risk_level'])
+        level = RiskLevelChoices.get_label(command['risk_level'])
         items = {
             _("Asset"): command['asset'],
             _("User"): command['user'],
@@ -178,7 +199,8 @@ class CommandExecutionAlert(CommandAlertMixin, SystemMessage):
             ) + '?oid={}'.format(asset.org_id)
             assets_with_url.append([asset, url])
 
-        level = Command.get_risk_level_str(command['risk_level'])
+        level = RiskLevelChoices.get_label(command['risk_level'])
+
         items = {
             _("User"): command['user'],
             _("Level"): level,
@@ -231,5 +253,29 @@ class StorageConnectivityMessage(SystemMessage):
         )
         return {
             'subject': subject,
+            'message': message
+        }
+
+
+class SessionSharingMessage(UserMessage):
+    message_type_label = _('Session sharing')
+
+    def __init__(self, user, instance):
+        super().__init__(user)
+        self.instance = instance
+
+    def get_html_msg(self) -> dict:
+        instance = self.instance
+        context = {
+            'asset': instance.session.asset,
+            'created_by': instance.created_by,
+            'account': instance.session.account,
+            'url': instance.url,
+            'verify_code': instance.verify_code,
+            'org': instance.org_name,
+        }
+        message = render_to_string('terminal/_msg_session_sharing.html', context)
+        return {
+            'subject': self.message_type_label + ' ' + self.instance.created_by,
             'message': message
         }

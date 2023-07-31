@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('users', '0035_auto_20210526_1100'),
     ]
@@ -13,6 +12,10 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='user',
             name='feishu_id',
-            field=models.CharField(default=None, max_length=128, null=True, unique=True, verbose_name='FeiShu'),
+            field=models.CharField(default=None, max_length=128, null=True, verbose_name='FeiShu'),
+        ),
+        migrations.AlterUniqueTogether(
+            name='user',
+            unique_together={('feishu_id',), ('wecom_id',), ('dingtalk_id',)},
         ),
     ]

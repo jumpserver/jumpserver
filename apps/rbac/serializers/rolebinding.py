@@ -1,11 +1,11 @@
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
-from django.utils.translation import ugettext_lazy as _
 
 from orgs.serializers import CurrentOrgDefault
 from ..models import RoleBinding, SystemRoleBinding, OrgRoleBinding
 
 __all__ = [
-    'RoleBindingSerializer', 'OrgRoleBindingSerializer',  'SystemRoleBindingSerializer'
+    'RoleBindingSerializer', 'OrgRoleBindingSerializer', 'SystemRoleBindingSerializer'
 ]
 
 
@@ -13,7 +13,7 @@ class RoleBindingSerializer(serializers.ModelSerializer):
     class Meta:
         model = RoleBinding
         fields = [
-            'id', 'user',  'user_display', 'role', 'role_display',
+            'id', 'user', 'user_display', 'role', 'role_display',
             'scope', 'org', 'org_name',
         ]
         read_only_fields = ['scope']
@@ -55,6 +55,3 @@ class OrgRoleBindingSerializer(RoleBindingSerializer):
             if not self.instance and role_bindings.exists():
                 raise serializers.ValidationError({'role': _('Has bound this role')})
         return attrs
-
-
-

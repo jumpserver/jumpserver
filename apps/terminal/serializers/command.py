@@ -1,18 +1,17 @@
 # ~*~ coding: utf-8 ~*~
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from common.utils import pretty_string
 from common.serializers.fields import LabeledChoiceField
-from terminal.backends.command.models import AbstractSessionCommand
-from terminal.models import Command
+from common.utils import pretty_string, is_uuid, get_logger
 from terminal.const import RiskLevelChoices
+from terminal.models import Command
 
+logger = get_logger(__name__)
 __all__ = ['SessionCommandSerializer', 'InsecureCommandAlertSerializer']
 
 
 class SimpleSessionCommandSerializer(serializers.ModelSerializer):
-
     """ 简单Session命令序列类, 用来提取公共字段 """
     user = serializers.CharField(label=_("User"))  # 限制 64 字符，见 validate_user
     asset = serializers.CharField(max_length=128, label=_("Asset"))
@@ -39,16 +38,31 @@ class SimpleSessionCommandSerializer(serializers.ModelSerializer):
 
 class InsecureCommandAlertSerializer(SimpleSessionCommandSerializer):
     cmd_filter_acl = serializers.CharField(
-        max_length=128, required=False, label=_("Command Filter ACL")
+        max_length=36, required=False, label=_("Command Filter ACL")
     )
     cmd_group = serializers.CharField(
-        max_length=128, required=True, label=_("Command Group")
+        max_length=36, required=True, label=_("Command Group")
     )
 
     class Meta(SimpleSessionCommandSerializer.Meta):
         fields = SimpleSessionCommandSerializer.Meta.fields + [
-            'cmd_filter_acl', 'cmd_group'
+            'cmd_filter_acl', 'cmd_group',
         ]
+
+    def validate(self, attrs):
+        if not is_uuid(attrs['cmd_filter_acl']):
+            raise serializers.ValidationError(
+                _("Invalid command filter ACL id")
+            )
+        if not is_uuid(attrs['cmd_group']):
+            raise serializers.ValidationError(
+                _("Invalid command group id")
+            )
+        if not is_uuid(attrs['session']):
+            raise serializers.ValidationError(
+                _("Invalid session id")
+            )
+        return super().validate(attrs)
 
 
 class SessionCommandSerializerMixin(serializers.Serializer):
@@ -74,4 +88,3 @@ class SessionCommandSerializer(SessionCommandSerializerMixin, SimpleSessionComma
         fields = SimpleSessionCommandSerializer.Meta.fields + [
             'id', 'account', 'output', 'timestamp', 'timestamp_display', 'remote_addr'
         ]
-
