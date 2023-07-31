@@ -110,7 +110,7 @@ websockets==11.0.3
 python-ldap==3.4.3
 ldap3==2.9.1
 django-radius@https://github.com/ibuler/django-radius/archive/refs/tags/1.5.0.zip
-django-cas-ng==4.3.0
+django-cas-ng@https://github.com/ibuler/django-cas-ng/releases/download/v4.3.1/django-cas-ng-4.3.1.zip
 python-cas==1.6.0
 django-auth-ldap==4.4.0
 # Cloud req
