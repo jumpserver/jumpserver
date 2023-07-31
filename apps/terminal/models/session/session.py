@@ -175,7 +175,7 @@ class Session(OrgModelMixin):
     def is_active(self):
         key = self.ACTIVE_CACHE_KEY_PREFIX.format(self.id)
         return bool(cache.get(key))
-    
+
     @property
     def command_amount(self):
         if self.cmd_amount == 0:
