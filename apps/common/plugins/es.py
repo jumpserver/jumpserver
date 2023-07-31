@@ -131,10 +131,7 @@ class ES(object):
                 }
 
             try:
-                if version == '6':
-                    self.es.indices.create(self.index, body=mappings)
-                else:
-                    self.es.indices.create(index=self.index, body=mappings)
+                self.es.indices.create(index=self.index, body=mappings)
             except RequestError as e:
                 if e.error == 'resource_already_exists_exception':
                     logger.warning(e)
