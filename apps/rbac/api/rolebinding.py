@@ -27,14 +27,7 @@ class RoleBindingViewSet(OrgBulkModelViewSet):
 
     def get_queryset(self):
         queryset = self._get_queryset() \
-            .prefetch_related('user', 'role', 'org') \
-            .annotate(
-            user_display=Concat(
-                F('user__name'), Value('('),
-                F('user__username'), Value(')')
-            ),
-            role_display=F('role__name')
-        )
+            .prefetch_related('user', 'role', 'org')
         return queryset
 
     def _get_queryset(self):
