@@ -67,10 +67,16 @@ class EventLoopThread(threading.Thread):
 _loop_thread = EventLoopThread()
 _loop_thread.setDaemon(True)
 _loop_thread.start()
-executor = ThreadPoolExecutor(max_workers=10,
-                              thread_name_prefix='debouncer')
+executor = ThreadPoolExecutor(
+    max_workers=10,
+    thread_name_prefix='debouncer'
+)
 _loop_debouncer_func_task_cache = {}
 _loop_debouncer_func_args_cache = {}
+
+
+def get_loop():
+    return _loop_thread.get_loop()
 
 
 def cancel_or_remove_debouncer_task(cache_key):

@@ -26,6 +26,7 @@ class AccountViewSet(OrgBulkModelViewSet):
     filterset_class = AccountFilterSet
     serializer_classes = {
         'default': serializers.AccountSerializer,
+        'retrieve': serializers.AccountDetailSerializer,
     }
     rbac_perms = {
         'partial_update': ['accounts.change_account'],
@@ -133,11 +134,13 @@ class AccountHistoriesSecretAPI(ExtraFilterFieldsMixin, RecordViewLogMixin, List
     def get_queryset(self):
         account = self.get_object()
         histories = account.history.all()
-        last_history = account.history.first()
-        if not last_history:
+        latest_history = account.history.first()
+        if not latest_history:
             return histories
-
-        if account.secret == last_history.secret \
-                and account.secret_type == last_history.secret_type:
-            histories = histories.exclude(history_id=last_history.history_id)
+        if account.secret != latest_history.secret:
+            return histories
+        if account.secret_type != latest_history.secret_type:
+            return histories
+        histories = histories.exclude(history_id=latest_history.history_id)
         return histories
+

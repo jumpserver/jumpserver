@@ -7,9 +7,10 @@ from simple_history.models import HistoricalRecords
 from assets.models.base import AbsConnectivity
 from common.utils import lazyproperty
 from .base import BaseAccount
+from .mixins import VaultModelMixin
 from ..const import AliasAccount, Source
 
-__all__ = ['Account', 'AccountTemplate']
+__all__ = ['Account', 'AccountTemplate', 'AccountHistoricalRecords']
 
 
 class AccountHistoricalRecords(HistoricalRecords):
@@ -32,7 +33,7 @@ class AccountHistoricalRecords(HistoricalRecords):
         diff = attrs - history_attrs
         if not diff:
             return
-        super().post_save(instance, created, using=using, **kwargs)
+        return super().post_save(instance, created, using=using, **kwargs)
 
     def create_history_model(self, model, inherited):
         if self.included_fields and not self.excluded_fields:
@@ -53,7 +54,7 @@ class Account(AbsConnectivity, BaseAccount):
         on_delete=models.SET_NULL, verbose_name=_("Su from")
     )
     version = models.IntegerField(default=0, verbose_name=_('Version'))
-    history = AccountHistoricalRecords(included_fields=['id', 'secret', 'secret_type', 'version'])
+    history = AccountHistoricalRecords(included_fields=['id', '_secret', 'secret_type', 'version'])
     source = models.CharField(max_length=30, default=Source.LOCAL, verbose_name=_('Source'))
     source_id = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Source ID'))
 
@@ -198,3 +199,21 @@ class AccountTemplate(BaseAccount):
             return
         self.bulk_update_accounts(accounts, {'secret': self.secret})
         self.bulk_create_history_accounts(accounts, user_id)
+
+
+def replace_history_model_with_mixin():
+    """
+    替换历史模型中的父类为指定的Mixin类。
+
+    Parameters:
+        model (class): 历史模型类，例如 Account.history.model
+        mixin_class (class): 要替换为的Mixin类
+
+    Returns:
+        None
+    """
+    model = Account.history.model
+    model.__bases__ = (VaultModelMixin,) + model.__bases__
+
+
+replace_history_model_with_mixin()

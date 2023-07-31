@@ -198,7 +198,6 @@ class AccountAssetSerializer(serializers.ModelSerializer):
 
 class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerializer):
     asset = AccountAssetSerializer(label=_('Asset'))
-    has_secret = serializers.BooleanField(label=_("Has secret"), read_only=True)
     source = LabeledChoiceField(
         choices=Source.choices, label=_("Source"), required=False,
         allow_null=True, default=Source.LOCAL
@@ -231,6 +230,15 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
             'asset__platform__automation'
         )
         return queryset
+
+
+class AccountDetailSerializer(AccountSerializer):
+    has_secret = serializers.BooleanField(label=_("Has secret"), read_only=True)
+
+    class Meta(AccountSerializer.Meta):
+        model = Account
+        fields = AccountSerializer.Meta.fields + ['has_secret']
+        read_only_fields = AccountSerializer.Meta.read_only_fields + ['has_secret']
 
 
 class AssetAccountBulkSerializerResultSerializer(serializers.Serializer):

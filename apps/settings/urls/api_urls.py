@@ -18,6 +18,8 @@ urlpatterns = [
     path('feishu/testing/', api.FeiShuTestingAPI.as_view(), name='feishu-testing'),
     path('sms/<str:backend>/testing/', api.SMSTestingAPI.as_view(), name='sms-testing'),
     path('sms/backend/', api.SMSBackendAPI.as_view(), name='sms-backend'),
+    path('vault/testing/', api.VaultTestingAPI.as_view(), name='vault-testing'),
+    path('vault/sync/', api.VaultSyncDataAPI.as_view(), name='vault-sync'),
 
     path('setting/', api.SettingsApi.as_view(), name='settings-setting'),
     path('logo/', api.SettingsLogoApi.as_view(), name='settings-logo'),

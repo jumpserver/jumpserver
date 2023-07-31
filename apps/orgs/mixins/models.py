@@ -119,3 +119,4 @@ class OrgModelMixin(models.Model):
 class JMSOrgBaseModel(JMSBaseModel, OrgModelMixin):
     class Meta:
         abstract = True
+

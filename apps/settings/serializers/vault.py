@@ -1,0 +1,23 @@
+from django.utils.translation import ugettext_lazy as _
+from rest_framework import serializers
+
+from accounts.const import VaultTypeChoices
+from common.serializers.fields import EncryptedField
+
+__all__ = ['VaultSettingSerializer']
+
+
+class VaultSettingSerializer(serializers.Serializer):
+    VAULT_TYPE = serializers.ChoiceField(
+        default=VaultTypeChoices.local, choices=VaultTypeChoices.choices,
+        required=False, label=_('Type')
+    )
+    VAULT_HCP_HOST = serializers.CharField(
+        max_length=256, allow_blank=True, required=False, label=_('Host')
+    )
+    VAULT_HCP_TOKEN = EncryptedField(
+        max_length=256, allow_blank=True, required=False, label=_('Token')
+    )
+    VAULT_HCP_MOUNT_POINT = serializers.CharField(
+        max_length=256, allow_blank=True, required=False, label=_('Mount Point')
+    )
