@@ -43,8 +43,8 @@ def get_parent_keys(key, include_self=True):
 
 class JMSPermedInventory(JMSInventory):
     def __init__(self, assets, account_policy='privileged_first',
-                 account_prefer='root,Administrator', host_callback=None, exclude_localhost=False, user=None):
-        super().__init__(assets, account_policy, account_prefer, host_callback, exclude_localhost)
+                 account_prefer='root,Administrator', host_callback=None, user=None):
+        super().__init__(assets, account_policy, account_prefer, host_callback, exclude_localhost=True)
         self.user = user
         self.assets_accounts_mapper = self.get_assets_accounts_mapper()
 
