@@ -1,8 +1,22 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.db.models import TextChoices
-from django.utils.translation import ugettext_lazy as _
+from django.db.models import TextChoices, IntegerChoices
+from django.utils.translation import gettext_lazy as _
+
+
+class RiskLevelChoices(IntegerChoices):
+    accept = 0, _('Accept')
+    warning = 4, _('Warning')
+    reject = 5, _('Reject')
+    review_reject = 6, _('Review & Reject')
+    review_accept = 7, _('Review & Accept')
+    review_cancel = 8, _('Review & Cancel')
+
+    @classmethod
+    def get_label(cls, level):
+        label = dict(cls.choices).get(level)
+        return label
 
 
 class ReplayStorageType(TextChoices):
@@ -50,6 +64,7 @@ class TerminalType(TextChoices):
     tinker = 'tinker', 'Tinker'
     video_worker = 'video_worker', 'Video Worker'
     chen = 'chen', 'Chen'
+    kael = 'kael', 'Kael'
 
     @classmethod
     def types(cls):
@@ -73,3 +88,9 @@ class SessionType(TextChoices):
 class ActionPermission(TextChoices):
     readonly = "readonly", _('Read Only')
     writable = "writable", _('Writable')
+
+
+class TaskNameType(TextChoices):
+    kill_session = "kill_session", _('Kill Session')
+    lock_session = "lock_session", _('Lock Session')
+    unlock_session = "unlock_session", _('Unlock Session')

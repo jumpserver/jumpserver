@@ -128,30 +128,37 @@ def ping(dest_addr, timeout, psize, flag=0):
     return delay
 
 
-def verbose_ping(dest_addr, timeout=2, count=5, psize=64, display=None):
+def verbose_ping(dest_ip, timeout=2, count=5, psize=64, display=None):
     """
     Send `count' ping with `psize' size to `dest_addr' with
     the given `timeout' and display the result.
     """
-    ip = lookup_domain(dest_addr)
+    ip = lookup_domain(dest_ip)
     if not ip:
         return
     if display is None:
         display = print
-    display("PING %s (%s): 56 data bytes" % (dest_addr, ip))
+    error_count = 0
+    display("PING %s (%s): 56 data bytes" % (dest_ip, ip))
     for i in range(count):
         try:
-            delay = ping(dest_addr, timeout, psize)
+            delay = ping(dest_ip, timeout, psize)
         except socket.gaierror as e:
             display("failed. (socket error: '%s')" % str(e))
+            error_count += 1
             break
 
         if delay is None:
             display("Request timeout for icmp_seq %i" % i)
+            error_count += 1
         else:
-            delay = delay * 1000
+            delay *= 1000
             display("64 bytes from %s: icmp_seq=0 ttl=115 time=%.3f ms" % (ip, delay))
         time.sleep(1)
+    display(f'--- {dest_ip} ping statistics ---')
+    display(f'{count} packets transmitted, '
+            f'{count - error_count} packets received, '
+            f'{(error_count / count) * 100}% packet loss')
     print()
 
 

@@ -1,4 +1,4 @@
-FROM jumpserver/python:3.9-slim-buster as stage-build
+FROM python:3.11.4-slim-bullseye as stage-build
 ARG TARGETARCH
 
 ARG VERSION
@@ -8,7 +8,7 @@ WORKDIR /opt/jumpserver
 ADD . .
 RUN cd utils && bash -ixeu build.sh
 
-FROM jumpserver/python:3.9-slim-buster
+FROM python:3.11.4-slim-bullseye
 ARG TARGETARCH
 MAINTAINER JumpServer Team <ibuler@qq.com>
 
@@ -44,6 +44,7 @@ ARG TOOLS="                           \
         unzip                         \
         vim                           \
         git                           \
+        nmap                          \
         wget"
 
 ARG APT_MIRROR=http://mirrors.ustc.edu.cn
@@ -83,21 +84,10 @@ WORKDIR /tmp/build
 COPY ./requirements ./requirements
 
 ARG PIP_MIRROR=https://pypi.douban.com/simple
-ARG PIP_JMS_MIRROR=https://pypi.douban.com/simple
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     set -ex \
     && pip config set global.index-url ${PIP_MIRROR} \
-    && pip install --upgrade pip \
-    && pip install --upgrade setuptools wheel \
-    && \
-    if [ "${TARGETARCH}" == "loong64" ]; then \
-        pip install https://download.jumpserver.org/pypi/simple/cryptography/cryptography-38.0.4-cp39-cp39-linux_loongarch64.whl; \
-        pip install https://download.jumpserver.org/pypi/simple/greenlet/greenlet-1.1.2-cp39-cp39-linux_loongarch64.whl; \
-        pip install https://download.jumpserver.org/pypi/simple/PyNaCl/PyNaCl-1.5.0-cp39-cp39-linux_loongarch64.whl; \
-        pip install https://download.jumpserver.org/pypi/simple/grpcio/grpcio-1.54.2-cp39-cp39-linux_loongarch64.whl; \
-    fi \
-    && pip install $(grep -E 'jms|jumpserver' requirements/requirements.txt) -i ${PIP_JMS_MIRROR} \
     && pip install -r requirements/requirements.txt
 
 COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver

@@ -8,7 +8,7 @@ from django.core.cache import cache
 from django.core.files.storage import default_storage
 from django.db import models
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from assets.models import Asset
 from common.utils import get_object_or_none, lazyproperty
@@ -44,9 +44,11 @@ class Session(OrgModelMixin):
     date_start = models.DateTimeField(verbose_name=_("Date start"), db_index=True, default=timezone.now)
     date_end = models.DateTimeField(verbose_name=_("Date end"), null=True)
     comment = models.TextField(blank=True, null=True, verbose_name=_("Comment"))
+    cmd_amount = models.IntegerField(default=-1, verbose_name=_("Command amount"))
 
     upload_to = 'replay'
     ACTIVE_CACHE_KEY_PREFIX = 'SESSION_ACTIVE_{}'
+    LOCK_CACHE_KEY_PREFIX = 'TOGGLE_LOCKED_SESSION_{}'
     SUFFIX_MAP = {1: '.gz', 2: '.replay.gz', 3: '.cast.gz', 4: '.replay.mp4'}
     DEFAULT_SUFFIXES = ['.replay.gz', '.cast.gz', '.gz', '.replay.mp4']
 
@@ -144,6 +146,26 @@ class Session(OrgModelMixin):
         else:
             return True
 
+    @property
+    def is_locked(self):
+        if self.is_finished:
+            return False
+        key = self.LOCK_CACHE_KEY_PREFIX.format(self.id)
+        return bool(cache.get(key))
+
+    @classmethod
+    def lock_session(cls, session_id):
+        key = cls.LOCK_CACHE_KEY_PREFIX.format(session_id)
+        # 会话锁定时间为 None，表示永不过期
+        # You can set TIMEOUT to None so that, by default, cache keys never expire.
+        # https://docs.djangoproject.com/en/4.1/topics/cache/
+        cache.set(key, True, timeout=None)
+
+    @classmethod
+    def unlock_session(cls, session_id):
+        key = cls.LOCK_CACHE_KEY_PREFIX.format(session_id)
+        cache.delete(key)
+
     @lazyproperty
     def terminal_display(self):
         display = self.terminal.name if self.terminal else ''
@@ -177,6 +199,25 @@ class Session(OrgModelMixin):
 
     @property
     def command_amount(self):
+        if self.need_update_cmd_amount:
+            cmd_amount = self.compute_command_amount()
+            self.cmd_amount = cmd_amount
+            self.save()
+        elif self.need_compute_cmd_amount:
+            cmd_amount = self.compute_command_amount()
+        else:
+            cmd_amount = self.cmd_amount
+        return cmd_amount
+
+    @property
+    def need_update_cmd_amount(self):
+        return self.is_finished and self.need_compute_cmd_amount
+
+    @property
+    def need_compute_cmd_amount(self):
+        return self.cmd_amount == -1
+
+    def compute_command_amount(self):
         command_store = get_multi_command_storage()
         return command_store.count(session=str(self.id))
 

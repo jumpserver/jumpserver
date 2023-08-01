@@ -16,7 +16,7 @@ from django.shortcuts import reverse, redirect
 from django.templatetags.static import static
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext as _, get_language
+from django.utils.translation import gettext as _, get_language
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters

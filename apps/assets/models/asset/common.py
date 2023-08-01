@@ -8,7 +8,7 @@ from collections import defaultdict
 from django.db import models
 from django.db.models import Q
 from django.forms import model_to_dict
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from assets import const
 from common.db.fields import EncryptMixin

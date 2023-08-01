@@ -1,5 +1,5 @@
 from django.db.models import TextChoices
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class SecretType(TextChoices):
@@ -7,6 +7,7 @@ class SecretType(TextChoices):
     SSH_KEY = 'ssh_key', _('SSH key')
     ACCESS_KEY = 'access_key', _('Access key')
     TOKEN = 'token', _('Token')
+    API_KEY = 'api_key', _("API key")
 
 
 class AliasAccount(TextChoices):

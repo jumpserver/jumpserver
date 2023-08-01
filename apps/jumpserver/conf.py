@@ -21,7 +21,7 @@ from urllib.parse import urljoin, urlparse
 
 import yaml
 from django.urls import reverse_lazy
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from gmssl.sm4 import CryptSM4, SM4_ENCRYPT, SM4_DECRYPT
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -186,8 +186,9 @@ class Config(dict):
         'BOOTSTRAP_TOKEN': '',
         'DEBUG': False,
         'DEBUG_DEV': False,
+        'DEBUG_ANSIBLE': False,
         'LOG_LEVEL': 'DEBUG',
-        'LOG_DIR': os.path.join(PROJECT_DIR, 'logs'),
+        'LOG_DIR': os.path.join(PROJECT_DIR, 'data', 'logs'),
         'DB_ENGINE': 'mysql',
         'DB_NAME': 'jumpserver',
         'DB_HOST': '127.0.0.1',
@@ -231,8 +232,12 @@ class Config(dict):
         'SESSION_COOKIE_AGE': 3600 * 24,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE': False,
         'LOGIN_URL': reverse_lazy('authentication:login'),
-        'CONNECTION_TOKEN_ONETIME_EXPIRATION': 5 * 60,  # 默认
-        'CONNECTION_TOKEN_REUSABLE_EXPIRATION': 60 * 60 * 24 * 30,  # 最大
+
+        'CONNECTION_TOKEN_ONETIME_EXPIRATION': 5 * 60,  # 默认(new)
+        'CONNECTION_TOKEN_EXPIRATION': 5 * 60,  # 默认(old)
+
+        'CONNECTION_TOKEN_REUSABLE_EXPIRATION': 60 * 60 * 24 * 30,  # 最大(new)
+        'CONNECTION_TOKEN_EXPIRATION_MAX': 60 * 60 * 24 * 30,  # 最大(old)
         'CONNECTION_TOKEN_REUSABLE': False,
 
         # Custom Config
@@ -245,6 +250,12 @@ class Config(dict):
 
         # 临时密码
         'AUTH_TEMP_TOKEN': False,
+
+        # Vault
+        'VAULT_TYPE': 'local',
+        'VAULT_HCP_HOST': '',
+        'VAULT_HCP_TOKEN': '',
+        'VAULT_HCP_MOUNT_POINT': 'jumpserver',
 
         # Auth LDAP settings
         'AUTH_LDAP': False,
@@ -509,9 +520,9 @@ class Config(dict):
         'TIME_ZONE': 'Asia/Shanghai',
         'FORCE_SCRIPT_NAME': '',
         'SESSION_COOKIE_SECURE': False,
+        'DOMAINS': '',
         'CSRF_COOKIE_SECURE': False,
         'REFERER_CHECK_ENABLED': False,
-        'CSRF_TRUSTED_ORIGINS': '',
         'SESSION_ENGINE': 'cache',
         'SESSION_SAVE_EVERY_REQUEST': True,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE': False,

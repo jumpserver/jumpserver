@@ -1,10 +1,10 @@
-import time
-import hmac
 import base64
+import hmac
+import time
 
-from common.utils import get_logger
-from common.sdk.im.utils import digest, as_request
 from common.sdk.im.mixin import BaseRequest
+from common.sdk.im.utils import digest, as_request
+from common.utils import get_logger
 from users.utils import construct_user_email
 
 logger = get_logger(__file__)

@@ -1,6 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 from celery import shared_task
-from django.utils.translation import gettext_noop, ugettext_lazy as _
+from django.utils.translation import gettext_noop, gettext_lazy as _
 
 from assets.const import AutomationTypes
 from common.utils import get_logger

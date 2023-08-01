@@ -1,4 +1,3 @@
-import os
 from collections import defaultdict
 
 from django.db import models
@@ -17,6 +16,8 @@ __all__ = ['AppletHost', 'AppletHostDeployment']
 
 class AppletHost(Host):
     deploy_options = models.JSONField(default=dict, verbose_name=_('Deploy options'))
+    auto_create_accounts = models.BooleanField(default=True, verbose_name=_('Auto create accounts'))
+    accounts_create_amount = models.IntegerField(default=100, verbose_name=_('Accounts create amount'))
     inited = models.BooleanField(default=False, verbose_name=_('Inited'))
     date_inited = models.DateTimeField(null=True, blank=True, verbose_name=_('Date inited'))
     date_synced = models.DateTimeField(null=True, blank=True, verbose_name=_('Date synced'))
@@ -84,13 +85,14 @@ class AppletHost(Host):
         return random_string(16, special_char=True)
 
     def generate_accounts(self):
+        if not self.auto_create_accounts:
+            return
         self.generate_public_accounts()
         self.generate_private_accounts()
 
     def generate_public_accounts(self):
-        public_amount = int(os.getenv('TERMINAL_ACCOUNTS_AMOUNT', 100))
         now_count = self.accounts.filter(privileged=False, username__startswith='jms').count()
-        need = public_amount - now_count
+        need = self.accounts_create_amount - now_count
 
         accounts = []
         account_model = self.accounts.model

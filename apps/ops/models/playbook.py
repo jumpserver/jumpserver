@@ -11,10 +11,15 @@ from ops.exception import PlaybookNoValidEntry
 from orgs.mixins.models import JMSOrgBaseModel
 
 dangerous_keywords = (
+    'hosts:localhost',
+    'hosts:127.0.0.1',
+    'hosts:::1',
     'delegate_to:localhost',
     'delegate_to:127.0.0.1',
+    'delegate_to:::1',
     'local_action',
     'connection:local',
+    'ansible_connection'
 )
 
 
@@ -48,7 +53,14 @@ class Playbook(JMSOrgBaseModel):
         with open(file, 'r') as f:
             for line_num, line in enumerate(f):
                 for keyword in dangerous_keywords:
-                    if keyword in line.replace(' ', ''):
+                    clear_line = line.replace(' ', '')\
+                        .replace('\n', '')\
+                        .replace('\r', '')\
+                        .replace('\t', '') \
+                        .replace('\'', '') \
+                        .replace('\"', '')\
+                        .replace('\v', '')
+                    if keyword in clear_line:
                         result.append((line_num, keyword))
             return result
 

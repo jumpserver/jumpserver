@@ -1,6 +1,6 @@
 import uuid
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 
@@ -52,4 +52,3 @@ class BasicSettingSerializer(serializers.Serializer):
         if not s:
             return 'http://127.0.0.1'
         return s.strip('/')
-

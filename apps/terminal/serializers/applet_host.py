@@ -15,7 +15,7 @@ from ..models import AppletHost, AppletHostDeployment
 __all__ = [
     'AppletHostSerializer', 'AppletHostDeploymentSerializer',
     'AppletHostAccountSerializer', 'AppletHostAppletReportSerializer',
-    'AppletHostStartupSerializer', 'AppletHostDeployAppletSerializer'
+    'AppletHostStartupSerializer'
 ]
 
 
@@ -62,11 +62,19 @@ class AppletHostSerializer(HostSerializer):
     class Meta(HostSerializer.Meta):
         model = AppletHost
         fields = HostSerializer.Meta.fields + [
+            'auto_create_accounts', 'accounts_create_amount',
             'load', 'date_synced', 'deploy_options'
         ]
         extra_kwargs = {
             **HostSerializer.Meta.extra_kwargs,
-            'date_synced': {'read_only': True}
+            'date_synced': {'read_only': True},
+            'auto_create_accounts': {'help_text': _(
+                'These accounts are used to connect to the published application, '
+                'the account is now divided into two types, one is dedicated to each account, '
+                'each user has a private account, the other is public, '
+                'when the application does not support multiple open and the special has been used, '
+                'the public account will be used to connect')},
+            'accounts_create_amount': {'help_text': _('The number of public accounts created automatically')},
         }
 
     def __init__(self, *args, data=None, **kwargs):
@@ -114,13 +122,6 @@ class AppletHostDeploymentSerializer(serializers.ModelSerializer):
             'date_start', 'date_finished'
         ]
         fields = fields_mini + ['comment'] + read_only_fields
-
-
-class AppletHostDeployAppletSerializer(AppletHostDeploymentSerializer):
-    applet_id = serializers.UUIDField(write_only=True, allow_null=True, required=False)
-
-    class Meta(AppletHostDeploymentSerializer.Meta):
-        fields = AppletHostDeploymentSerializer.Meta.fields + ['applet_id']
 
 
 class AppletHostAccountSerializer(serializers.ModelSerializer):

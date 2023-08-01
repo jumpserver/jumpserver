@@ -5,7 +5,7 @@ from django.contrib.auth import BACKEND_SESSION_KEY
 from django.dispatch import receiver
 from django.utils import timezone, translation
 from django.utils.functional import LazyObject
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework.request import Request
 
 from authentication.signals import post_auth_failed, post_auth_success

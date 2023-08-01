@@ -1,5 +1,10 @@
-from collections import Iterable, defaultdict, OrderedDict
+import sys
+from collections import defaultdict, OrderedDict
 
+if sys.version_info.major >= 3 and sys.version_info.minor >= 10:
+    from collections.abc import Iterable
+else:
+    from collections import Iterable
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import NOT_PROVIDED
 from rest_framework import serializers

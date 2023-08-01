@@ -1,9 +1,9 @@
-from django.utils.translation import ugettext as _
 from django.template.loader import render_to_string
+from django.utils.translation import gettext as _
 
-from notifications.notifications import UserMessage
 from common.utils import get_logger
 from common.utils.timezone import local_now_display
+from notifications.notifications import UserMessage
 
 logger = get_logger(__file__)
 

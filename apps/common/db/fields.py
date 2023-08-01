@@ -11,12 +11,12 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import Q, Manager, QuerySet
-from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework.utils.encoders import JSONEncoder
 
 from common.local import add_encrypted_field_set
-from common.utils import signer, crypto, contains_ip
+from common.utils import contains_ip
+from .utils import Encryptor
 from .validators import PortRangeValidator
 
 __all__ = [
@@ -139,20 +139,11 @@ class EncryptMixin:
     EncryptMixin要放在最前面
     """
 
-    def decrypt_from_signer(self, value):
-        return signer.unsign(value) or ""
-
     def from_db_value(self, value, expression, connection, context=None):
         if value is None:
             return value
 
-        value = force_text(value)
-        plain_value = crypto.decrypt(value)
-
-        # 如果没有解开，使用原来的signer解密
-        if not plain_value:
-            plain_value = self.decrypt_from_signer(value)
-
+        plain_value = Encryptor(value).decrypt()
         # 可能和Json mix，所以要先解密，再json
         sp = super()
         if hasattr(sp, "from_db_value"):
@@ -167,9 +158,9 @@ class EncryptMixin:
         sp = super()
         if hasattr(sp, "get_prep_value"):
             value = sp.get_prep_value(value)
-        value = force_text(value)
+
         # 替换新的加密方式
-        return crypto.encrypt(value)
+        return Encryptor(value).encrypt()
 
 
 class EncryptTextField(EncryptMixin, models.TextField):
@@ -387,7 +378,7 @@ class RelatedManager:
                     lookup = "{}__{}".format(name, match)
                     q = Q(**{lookup: val})
                 except re.error:
-                    q = ~Q()
+                    q = Q(pk__isnull=True)
             elif match == "not":
                 q = ~Q(**{name: val})
             elif match in ['m2m', 'in']:
@@ -459,7 +450,7 @@ class JSONManyToManyDescriptor:
 
         custom_q = Q()
         for rule in attr_rules:
-            value = getattr(obj, rule['name'], '')
+            value = getattr(obj, rule['name'], None) or ''
             rule_value = rule.get('value', '')
             rule_match = rule.get('match', 'exact')
 
@@ -474,7 +465,7 @@ class JSONManyToManyDescriptor:
             elif rule_match == 'exact':
                 res &= value == rule_value or rule_value == '*'
             elif rule_match == 'contains':
-                res &= rule_value in value
+                res &= (rule_value in value)
             elif rule_match == 'startswith':
                 res &= str(value).startswith(str(rule_value))
             elif rule_match == 'endswith':

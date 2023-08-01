@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.core.cache import cache
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from assets.const import DatabaseTypes
 from assets.models import Database
@@ -79,6 +79,7 @@ class DBPortManager(object):
         for port, db_id in mapper.items():
             if db_id == str(db.id):
                 return port
+
         if raise_exception:
             error = _(
                 'No available port is matched. '

@@ -4,22 +4,21 @@ from django.conf import settings
 from django.db.utils import IntegrityError
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseRedirect
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views import View
 from rest_framework.exceptions import APIException
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from authentication.const import ConfirmType
 from authentication.notifications import OAuthBindMessage
-from common.views.mixins import PermissionsMixin, UserConfirmRequiredExceptionMixin
 from common.permissions import UserConfirmation
 from common.sdk.im.feishu import URL, FeiShu
 from common.utils import get_logger
 from common.utils.common import get_request_ip
 from common.utils.django import reverse
 from common.utils.random import random_string
+from common.views.mixins import PermissionsMixin, UserConfirmRequiredExceptionMixin
 from users.views import UserVerifyPasswordView
-
 from .base import BaseLoginCallbackView
 from .mixins import FlashMessageMixin
 
@@ -166,4 +165,3 @@ class FeiShuQRLoginCallbackView(FeiShuQRMixin, BaseLoginCallbackView):
     msg_client_err = _('FeiShu Error')
     msg_user_not_bound_err = _('FeiShu is not bound')
     msg_not_found_user_from_client_err = _('Failed to get user from FeiShu')
-

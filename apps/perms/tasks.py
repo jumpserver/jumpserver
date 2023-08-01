@@ -1,25 +1,25 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import absolute_import, unicode_literals
-from datetime import timedelta
+
 from collections import defaultdict
+from datetime import timedelta
 
-from django.db.transaction import atomic
-from django.conf import settings
 from celery import shared_task
+from django.conf import settings
+from django.db.transaction import atomic
+from django.utils.translation import gettext_lazy as _
 
-from ops.celery.decorator import register_as_period_task
-from orgs.utils import tmp_to_root_org
+from common.const.crontab import CRONTAB_AT_AM_TEN
 from common.utils import get_logger
 from common.utils.timezone import local_now, dt_parser
-from common.const.crontab import CRONTAB_AT_AM_TEN
-
+from ops.celery.decorator import register_as_period_task
+from orgs.utils import tmp_to_root_org
 from perms.models import AssetPermission
-from perms.utils import UserPermTreeExpireUtil
 from perms.notifications import (
     PermedAssetsWillExpireUserMsg,
     AssetPermsWillExpireForOrgAdminMsg,
 )
-from django.utils.translation import gettext_lazy as _
+from perms.utils import UserPermTreeExpireUtil
 
 logger = get_logger(__file__)
 
@@ -32,7 +32,8 @@ def check_asset_permission_expired():
     """ 这里的任务要足够短，不要影响周期任务 """
     perms = AssetPermission.objects.get_expired_permissions()
     perm_ids = list(perms.distinct().values_list('id', flat=True))
-    logger.info(f'Checking expired permissions: {perm_ids}')
+    show_perm_ids = perm_ids[:5]
+    logger.info(f'Checking expired permissions: {show_perm_ids} ...')
     UserPermTreeExpireUtil().expire_perm_tree_for_perms(perm_ids)
 
 

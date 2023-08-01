@@ -1,12 +1,11 @@
-from django_filters import rest_framework as filters
-from django.utils.translation import ugettext_lazy as _
 from django.db.models import QuerySet, Q
+from django_filters import rest_framework as filters
 
-from common.drf.filters import BaseFilterSet
-from common.utils import get_object_or_none, is_uuid
-from users.models import User, UserGroup
 from assets.models import Node, Asset
+from common.drf.filters import BaseFilterSet
+from common.utils import get_object_or_none
 from perms.models import AssetPermission, AssetPermissionQuerySet
+from users.models import User, UserGroup
 
 
 class PermissionBaseFilter(BaseFilterSet):
@@ -64,7 +63,8 @@ class PermissionBaseFilter(BaseFilterSet):
         groups = list(user.groups.all().values_list('id', flat=True))
 
         user_asset_perm_ids = AssetPermission.objects.filter(users=user).distinct().values_list('id', flat=True)
-        group_asset_perm_ids = AssetPermission.objects.filter(user_groups__in=groups).distinct().values_list('id', flat=True)
+        group_asset_perm_ids = AssetPermission.objects.filter(user_groups__in=groups).distinct().values_list('id',
+                                                                                                             flat=True)
 
         asset_perm_ids = {*user_asset_perm_ids, *group_asset_perm_ids}
 

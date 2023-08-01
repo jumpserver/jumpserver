@@ -5,7 +5,7 @@ from collections import defaultdict
 
 from django.conf import settings
 from django.db.models import TextChoices
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from assets.const import Protocol
 from .const import TerminalType
@@ -17,39 +17,19 @@ class WebMethod(TextChoices):
     web_sftp = 'web_sftp', 'Web SFTP'
 
     @classmethod
-    def get_methods(cls):
+    def get_spec_methods(cls):
         methods = {
-            Protocol.ssh: [cls.web_cli, cls.web_sftp],
-            Protocol.telnet: [cls.web_cli],
-            Protocol.rdp: [cls.web_gui],
-            Protocol.vnc: [cls.web_gui],
-
-            Protocol.mysql: [cls.web_cli],
-            Protocol.mariadb: [cls.web_cli],
-            Protocol.oracle: [cls.web_cli],
-            Protocol.postgresql: [cls.web_cli],
-            Protocol.sqlserver: [cls.web_cli],
-            Protocol.redis: [cls.web_cli],
-            Protocol.mongodb: [cls.web_cli],
-            Protocol.clickhouse: [cls.web_cli],
-
-            Protocol.k8s: [cls.web_cli],
-            Protocol.http: []
+            Protocol.sftp: [cls.web_sftp]
         }
-        if not settings.XPACK_ENABLED:
-            return methods
-
-        web_gui_dbs = [Protocol.mysql, Protocol.mariadb, Protocol.oracle, Protocol.postgresql, Protocol.sqlserver]
-        for db in web_gui_dbs:
-            methods[db].append(cls.web_gui)
         return methods
 
 
 class NativeClient(TextChoices):
     # Koko
-    ssh = 'ssh', 'SSH'
-    ssh_client = 'ssh_client', _('SSH Client')
-    sftp_client = 'sftp_client', _('SFTP Client')
+    ssh = 'ssh', 'SSH CLI'
+    sftp = 'sftp', 'SFTP CLI'
+    putty = 'putty', 'PuTTY'
+    xshell = 'xshell', 'Xshell'
 
     # Magnus
     db_client = 'db_client', _('DB Client')
@@ -64,14 +44,14 @@ class NativeClient(TextChoices):
         clients = {
             Protocol.ssh: {
                 'default': [cls.ssh],
-                'windows': [cls.ssh_client, cls.sftp_client],
+                'windows': [cls.putty],
             },
+            Protocol.sftp: [cls.sftp],
             Protocol.rdp: [cls.mstsc],
             Protocol.mysql: [cls.db_client],
             Protocol.mariadb: [cls.db_client],
             Protocol.redis: [cls.db_client],
             Protocol.mongodb: [cls.db_client],
-
             Protocol.oracle: [cls.db_client],
             Protocol.postgresql: [cls.db_client],
         }
@@ -94,25 +74,19 @@ class NativeClient(TextChoices):
         return [cls.mstsc]
 
     @classmethod
-    def xpack_protocols(cls):
-        return [Protocol.rdp, Protocol.oracle, Protocol.clickhouse, Protocol.sqlserver]
-
-    @classmethod
     def get_methods(cls, os='windows'):
         clients_map = cls.get_native_clients()
         methods = defaultdict(list)
-        xpack_protocols = cls.xpack_protocols()
+        xpack_protocols = Protocol.xpack_protocols()
 
         for protocol, _clients in clients_map.items():
             if not settings.XPACK_ENABLED and protocol in xpack_protocols:
                 continue
-
             if isinstance(_clients, dict):
                 if os == 'all':
                     _clients = list(itertools.chain(*_clients.values()))
                 else:
                     _clients = _clients.get(os, _clients['default'])
-
             for client in _clients:
                 if not settings.XPACK_ENABLED and client in cls.xpack_methods():
                     continue
@@ -128,9 +102,19 @@ class NativeClient(TextChoices):
         username = f'JMS-{token.id}'
         commands = {
             cls.ssh: f'ssh {username}@{endpoint.host} -p {endpoint.ssh_port}',
-            cls.ssh_client: f'putty.exe -ssh {username}@{endpoint.host} -P {endpoint.ssh_port}',
+            cls.sftp: f'sftp {username}@{endpoint.host} -P {endpoint.ssh_port}',
+            cls.putty: f'putty.exe -ssh {username}@{endpoint.host} -P {endpoint.ssh_port}',
+            cls.xshell: f'xshell.exe -url ssh://{username}:{token.value}@{endpoint.host}:{endpoint.ssh_port}',
+            # 前端自己处理了
+            # cls.mysql: 'mysql -h {hostname} -P {port} -u {username} -p',
+            # cls.psql: {
+            #     'default': 'psql -h {hostname} -p {port} -U {username} -W',
+            #     'windows': 'psql /h {hostname} /p {port} /U {username} -W',
+            # },
+            # cls.sqlplus: 'sqlplus {username}/{password}@{hostname}:{port}',
+            # cls.redis: 'redis-cli -h {hostname} -p {port} -a {password}',
         }
-        command = commands.get(name, '')
+        command = commands.get(name)
         if isinstance(command, dict):
             command = command.get(os, command.get('default'))
         return command
@@ -142,7 +126,6 @@ class AppletMethod:
         from .models import Applet, AppletHost
 
         methods = defaultdict(list)
-
         has_applet_hosts = AppletHost.objects.all().exists()
         applets = Applet.objects.filter(is_active=True)
         for applet in applets:
@@ -161,18 +144,22 @@ class ConnectMethodUtil:
     _all_methods = {}
 
     @classmethod
-    def protocols(cls):
+    def components(cls):
         protocols = {
             TerminalType.koko: {
-                'web_methods': [WebMethod.web_cli, WebMethod.web_sftp],
-                'listen': [Protocol.http, Protocol.ssh],
+                'web_methods': [WebMethod.web_cli],
+                'listen': [Protocol.http, Protocol.ssh, Protocol.sftp],
                 'support': [
-                    Protocol.ssh, Protocol.telnet,
-                    Protocol.mysql, Protocol.postgresql,
-                    Protocol.sqlserver, Protocol.mariadb,
+                    Protocol.ssh, Protocol.telnet, Protocol.sftp,
                     Protocol.redis, Protocol.mongodb,
                     Protocol.k8s, Protocol.clickhouse,
                 ],
+                # 限制客户端的协议，比如 koko 虽然也支持 数据库的 ssh 连接，但是不再这里拉起
+                # Listen协议: [Asset协议]
+                'client_limits': {
+                    Protocol.sftp: [Protocol.sftp],
+                    Protocol.ssh: [Protocol.ssh, Protocol.telnet],
+                },
                 'match': 'm2m'
             },
             TerminalType.chen: {
@@ -181,6 +168,7 @@ class ConnectMethodUtil:
                 'support': [
                     Protocol.mysql, Protocol.postgresql,
                     Protocol.oracle, Protocol.sqlserver,
+                    Protocol.mariadb
                 ],
                 'match': 'm2m'
             },
@@ -206,6 +194,12 @@ class ConnectMethodUtil:
                 'support': [Protocol.rdp],
                 'match': 'map'
             },
+            TerminalType.kael: {
+                'web_methods': [WebMethod.web_gui],
+                'listen': [Protocol.http],
+                'support': [Protocol.chatgpt],
+                'match': 'm2m'
+            }
         }
         return protocols
 
@@ -271,17 +265,21 @@ class ConnectMethodUtil:
             return cls._all_methods['os']
 
         methods = defaultdict(list)
-        web_methods = WebMethod.get_methods()
-        native_methods = NativeClient.get_methods(os)
+        spec_web_methods = WebMethod.get_spec_methods()
         applet_methods = AppletMethod.get_methods()
+        native_methods = NativeClient.get_methods(os=os)
 
-        for component, component_protocol in cls.protocols().items():
+        for component, component_protocol in cls.components().items():
             support = component_protocol['support']
-            component_web_methods = component_protocol.get('web_methods', [])
+            default_web_methods = component_protocol.get('web_methods', [])
+            client_limits = component_protocol.get('client_limits', {})
 
-            for protocol in support:
+            for asset_protocol in support:
                 # Web 方式
-                methods[str(protocol)].extend([
+                web_methods = spec_web_methods.get(asset_protocol, [])
+                if not web_methods:
+                    web_methods = default_web_methods
+                methods[str(asset_protocol)].extend([
                     {
                         'component': component.value,
                         'type': 'web',
@@ -289,36 +287,37 @@ class ConnectMethodUtil:
                         'value': method.value,
                         'label': method.label,
                     }
-                    for method in web_methods.get(protocol, [])
-                    if method in component_web_methods
+                    for method in web_methods
                 ])
 
                 # 客户端方式
                 if component_protocol['match'] == 'map':
-                    listen = [protocol]
+                    listen = [asset_protocol]
                 else:
                     listen = component_protocol['listen']
+
                 for listen_protocol in listen:
-                    # Native method
-                    if component == TerminalType.koko and protocol.value != Protocol.ssh:
-                        # koko 仅支持 ssh 的 native 方式，其他数据库的 native 方式不提供
+                    limits = client_limits.get(listen_protocol, [])
+                    if limits and asset_protocol not in limits:
                         continue
-                    methods[str(protocol)].extend([
+                    # Native method
+                    client_methods = native_methods.get(listen_protocol, [])
+                    methods[str(asset_protocol)].extend([
                         {
                             'component': component.value,
                             'type': 'native',
                             'endpoint_protocol': listen_protocol,
                             **method
                         }
-                        for method in native_methods[listen_protocol]
+                        for method in client_methods
                     ])
 
-        # 远程应用方式，这个只有 tinker 提供
-        for protocol, applet_methods in applet_methods.items():
+        # 远程应用方式，这个只有 tinker 提供，并且协议可能是自定义的
+        for asset_protocol, applet_methods in applet_methods.items():
             for method in applet_methods:
                 method['listen'] = 'rdp'
                 method['component'] = TerminalType.tinker.value
-            methods[protocol].extend(applet_methods)
+            methods[asset_protocol].extend(applet_methods)
 
         cls._all_methods[os] = methods
         return methods
