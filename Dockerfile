@@ -22,6 +22,7 @@ ARG DEPENDENCIES="                    \
         libpq-dev                     \
         libffi-dev                    \
         libjpeg-dev                   \
+        libkrb5-dev                   \
         libldap2-dev                  \
         libsasl2-dev                  \
         libssl-dev                    \
@@ -95,7 +96,6 @@ RUN --mount=type=cache,target=/root/.cache/pip \
         pip install https://download.jumpserver.org/pypi/simple/cryptography/cryptography-38.0.4-cp39-cp39-linux_loongarch64.whl; \
         pip install https://download.jumpserver.org/pypi/simple/greenlet/greenlet-1.1.2-cp39-cp39-linux_loongarch64.whl; \
         pip install https://download.jumpserver.org/pypi/simple/PyNaCl/PyNaCl-1.5.0-cp39-cp39-linux_loongarch64.whl; \
-        pip install https://download.jumpserver.org/pypi/simple/grpcio/grpcio-1.54.2-cp39-cp39-linux_loongarch64.whl; \
     fi \
     && pip install $(grep -E 'jms|jumpserver' requirements/requirements.txt) -i ${PIP_JMS_MIRROR} \
     && pip install -r requirements/requirements.txt
