@@ -20,7 +20,7 @@ keystoneauth1==3.4.0
 # DB requirements
 oracledb==1.0.1
 psycopg2-binary==2.9.1
-pymssql==2.2.5
+pymssql==2.2.8
 IPy==1.1
 psycopg2==2.9.4
 ucloud-sdk-python3==0.11.47
