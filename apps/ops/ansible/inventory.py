@@ -270,8 +270,13 @@ class JMSInventory:
             name = host.pop('name')
             name = name.replace('[', '_').replace(']', '_')
             data['all']['hosts'][name] = host
-        if self.exclude_localhost and data['all']['hosts'].__contains__('localhost'):
-            data['all']['hosts'].update({'localhost': {'ansible_host': '255.255.255.255'}})
+        if not self.exclude_localhost:
+            data['all']['hosts'].update({
+                'localhost': {
+                    'ansible_host': '127.0.0.1',
+                    'ansible_connection': 'local'
+                }
+            })
         return data
 
     def write_to_file(self, path):
