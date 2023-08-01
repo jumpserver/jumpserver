@@ -1,10 +1,21 @@
 ARG VERSION
 FROM registry.fit2cloud.com/jumpserver/xpack:${VERSION} as build-xpack
 FROM jumpserver/core:${VERSION}
+ARG TARGETARCH
+
 COPY --from=build-xpack /opt/xpack /opt/jumpserver/apps/xpack
 
 WORKDIR /opt/jumpserver
+ARG ORACLE_VERSION=1.4.0b1
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     set -ex \
+    && \
+    if [ "${TARGETARCH}" == "amd64" ] || [ "${TARGETARCH}" == "arm64" ] || [ "${TARGETARCH}" == "loong64" ]; then \
+        pip install https://download.jumpserver.org/pypi/simple/oracledb/oracledb-${ORACLE_VERSION}-cp39-cp39-linux_$(uname -m).whl; \
+    fi \
+    && \
+    if [ "${TARGETARCH}" == "loong64" ]; then \
+        pip install https://download.jumpserver.org/pypi/simple/grpcio/grpcio-1.54.2-cp39-cp39-linux_loongarch64.whl; \
+    fi \
     && pip install -r requirements/requirements_xpack.txt
