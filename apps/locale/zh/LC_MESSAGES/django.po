@@ -5724,11 +5724,11 @@ msgstr "终断会话"
 
 #: terminal/const.py:95
 msgid "Lock Session"
-msgstr "会话锁定"
+msgstr "锁定会话"
 
 #: terminal/const.py:96
 msgid "Unlock Session"
-msgstr "会话解锁"
+msgstr "解锁会话"
 
 #: terminal/exceptions.py:8
 msgid "Bulk create not support"

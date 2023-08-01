@@ -68,8 +68,7 @@ class TerminalTaskWebsocket(JsonWebsocketConsumer):
             logger.debug('New component task msg recv: {}'.format(msg))
             msg_type = msg.get('type')
             payload = msg.get('payload')
-            task_names = [name for name, _ in TaskNameType.choices]
-            if msg_type in task_names:
+            if msg_type in TaskNameType.names:
                 ws.send_tasks_msg(payload.get('id'))
 
         return component_event_chan.subscribe(handle_task_msg_recv)
