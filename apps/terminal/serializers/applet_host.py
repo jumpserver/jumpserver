@@ -15,7 +15,7 @@ from ..models import AppletHost, AppletHostDeployment
 __all__ = [
     'AppletHostSerializer', 'AppletHostDeploymentSerializer',
     'AppletHostAccountSerializer', 'AppletHostAppletReportSerializer',
-    'AppletHostStartupSerializer', 'AppletHostDeployAppletSerializer'
+    'AppletHostStartupSerializer'
 ]
 
 
@@ -122,13 +122,6 @@ class AppletHostDeploymentSerializer(serializers.ModelSerializer):
             'date_start', 'date_finished'
         ]
         fields = fields_mini + ['comment'] + read_only_fields
-
-
-class AppletHostDeployAppletSerializer(AppletHostDeploymentSerializer):
-    applet_id = serializers.UUIDField(write_only=True, allow_null=True, required=False)
-
-    class Meta(AppletHostDeploymentSerializer.Meta):
-        fields = AppletHostDeploymentSerializer.Meta.fields + ['applet_id']
 
 
 class AppletHostAccountSerializer(serializers.ModelSerializer):
