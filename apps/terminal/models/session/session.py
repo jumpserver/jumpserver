@@ -48,6 +48,7 @@ class Session(OrgModelMixin):
 
     upload_to = 'replay'
     ACTIVE_CACHE_KEY_PREFIX = 'SESSION_ACTIVE_{}'
+    LOCK_CACHE_KEY_PREFIX = 'TOGGLE_LOCKED_SESSION_{}'
     SUFFIX_MAP = {1: '.gz', 2: '.replay.gz', 3: '.cast.gz', 4: '.replay.mp4'}
     DEFAULT_SUFFIXES = ['.replay.gz', '.cast.gz', '.gz', '.replay.mp4']
 
@@ -144,6 +145,26 @@ class Session(OrgModelMixin):
             return False
         else:
             return True
+
+    @property
+    def is_locked(self):
+        if self.is_finished:
+            return False
+        key = self.LOCK_CACHE_KEY_PREFIX.format(self.id)
+        return bool(cache.get(key))
+
+    @classmethod
+    def lock_session(cls, session_id):
+        key = cls.LOCK_CACHE_KEY_PREFIX.format(session_id)
+        # 会话锁定时间为 None，表示永不过期
+        # You can set TIMEOUT to None so that, by default, cache keys never expire.
+        # https://docs.djangoproject.com/en/4.1/topics/cache/
+        cache.set(key, True, timeout=None)
+
+    @classmethod
+    def unlock_session(cls, session_id):
+        key = cls.LOCK_CACHE_KEY_PREFIX.format(session_id)
+        cache.delete(key)
 
     @lazyproperty
     def terminal_display(self):

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-28 10:57+0800\n"
+"POT-Creation-Date: 2023-07-31 16:39+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: accounts/api/automations/base.py:79
+#: accounts/api/automations/base.py:79 tickets/api/ticket.py:112
 msgid "The parameter 'action' must be [{}]"
 msgstr "パラメータ 'action' は [{}] でなければなりません。"
 
@@ -502,7 +502,7 @@ msgstr "アカウントの確認"
 #: settings/models.py:32 settings/serializers/sms.py:6
 #: terminal/models/applet/applet.py:32 terminal/models/component/endpoint.py:12
 #: terminal/models/component/endpoint.py:92
-#: terminal/models/component/storage.py:26 terminal/models/component/task.py:15
+#: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:84 users/forms/profile.py:33
 #: users/models/group.py:13 users/models/user.py:753
 #: xpack/plugins/cloud/models.py:28
@@ -1245,7 +1245,7 @@ msgstr "SSHパブリックキー"
 #: assets/models/cmd_filter.py:88 assets/models/group.py:20
 #: common/db/models.py:36 ops/models/adhoc.py:26 ops/models/job.py:113
 #: ops/models/playbook.py:26 rbac/models/role.py:37 settings/models.py:37
-#: terminal/models/applet/applet.py:44 terminal/models/applet/applet.py:248
+#: terminal/models/applet/applet.py:44 terminal/models/applet/applet.py:250
 #: terminal/models/applet/host.py:141 terminal/models/component/endpoint.py:24
 #: terminal/models/component/endpoint.py:102
 #: terminal/models/session/session.py:46 tickets/models/comment.py:32
@@ -1439,7 +1439,7 @@ msgstr "アセットの自動化タスク"
 
 #: assets/models/automations/base.py:113 audits/models.py:199
 #: audits/serializers.py:50 ops/models/base.py:49 ops/models/job.py:186
-#: terminal/models/applet/applet.py:247 terminal/models/applet/host.py:138
+#: terminal/models/applet/applet.py:249 terminal/models/applet/host.py:138
 #: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
 #: terminal/serializers/applet_host.py:115 tickets/models/ticket/general.py:283
 #: tickets/serializers/super_ticket.py:13
@@ -2048,7 +2048,7 @@ msgid "Login log"
 msgstr "ログインログ"
 
 #: audits/const.py:43 terminal/models/applet/host.py:142
-#: terminal/models/component/task.py:24
+#: terminal/models/component/task.py:22
 msgid "Task"
 msgstr "タスク"
 
@@ -2248,29 +2248,29 @@ msgstr "外部ストレージへのFTPファイルのアップロード"
 msgid "This action require verify your MFA"
 msgstr "この操作には、MFAを検証する必要があります"
 
-#: authentication/api/connection_token.py:221
+#: authentication/api/connection_token.py:230
 msgid "Reusable connection token is not allowed, global setting not enabled"
 msgstr ""
 "再使用可能な接続トークンの使用は許可されていません。グローバル設定は有効に"
 "なっていません"
 
-#: authentication/api/connection_token.py:301
+#: authentication/api/connection_token.py:310
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名アカウントはこのプロパティではサポートされていません"
 
-#: authentication/api/connection_token.py:320
+#: authentication/api/connection_token.py:329
 msgid "Account not found"
 msgstr "アカウントが見つかりません"
 
-#: authentication/api/connection_token.py:323
+#: authentication/api/connection_token.py:332
 msgid "Permission expired"
 msgstr "承認の有効期限が切れています"
 
-#: authentication/api/connection_token.py:337
+#: authentication/api/connection_token.py:346
 msgid "ACL action is reject: {}({})"
 msgstr "ACL アクションは拒否です: {}({})"
 
-#: authentication/api/connection_token.py:341
+#: authentication/api/connection_token.py:350
 msgid "ACL action is review"
 msgstr "ACL アクションはレビューです"
 
@@ -3691,7 +3691,7 @@ msgid "Module"
 msgstr "モジュール"
 
 #: ops/models/adhoc.py:24 ops/models/celery.py:58 ops/models/job.py:97
-#: terminal/models/component/task.py:16
+#: terminal/models/component/task.py:14
 msgid "Args"
 msgstr "アルグ"
 
@@ -3734,7 +3734,7 @@ msgstr "Celery タスク＃タスク＃"
 msgid "Can view task monitor"
 msgstr "タスクモニターを表示できます"
 
-#: ops/models/celery.py:59 terminal/models/component/task.py:17
+#: ops/models/celery.py:59 terminal/models/component/task.py:15
 msgid "Kwargs"
 msgstr "クワーグ"
 
@@ -3871,7 +3871,7 @@ msgstr "例外ジョブのクリーンアップ"
 msgid "Task log"
 msgstr "タスクログ"
 
-#: ops/templates/ops/celery_task_log.html:71
+#: ops/templates/ops/celery_task_log.html:71 terminal/serializers/task.py:10
 msgid "Task name"
 msgstr "タスク名"
 
@@ -4253,7 +4253,7 @@ msgid "My assets"
 msgstr "私の資産"
 
 #: rbac/tree.py:56 terminal/models/applet/applet.py:51
-#: terminal/models/applet/applet.py:244 terminal/models/applet/host.py:29
+#: terminal/models/applet/applet.py:246 terminal/models/applet/host.py:29
 #: terminal/serializers/applet.py:15
 msgid "Applet"
 msgstr "リモートアプリケーション"
@@ -5563,8 +5563,8 @@ msgstr "期限切れです。"
 #, python-format
 msgid ""
 "\n"
-"                Your password has expired, please click <a "
-"href=\"%(user_password_update_url)s\"> this link </a> update password.\n"
+"                Your password has expired, please click <a href="
+"\"%(user_password_update_url)s\"> this link </a> update password.\n"
 "            "
 msgstr ""
 "\n"
@@ -5585,34 +5585,34 @@ msgid ""
 "            "
 msgstr ""
 "\n"
-"                クリックしてください <a "
-"href=\"%(user_password_update_url)s\"> リンク </a> パスワードの更新\n"
+"                クリックしてください <a href=\"%(user_password_update_url)s"
+"\"> リンク </a> パスワードの更新\n"
 "        "
 
 #: templates/_message.html:43
 #, python-format
 msgid ""
 "\n"
-"        Your information was incomplete. Please click <a "
-"href=\"%(first_login_url)s\"> this link </a>to complete your information.\n"
+"        Your information was incomplete. Please click <a href="
+"\"%(first_login_url)s\"> this link </a>to complete your information.\n"
 "        "
 msgstr ""
 "\n"
-"                あなたの情報が不完全なので、クリックしてください。 <a "
-"href=\"%(first_login_url)s\"> リンク </a> 補完\n"
+"                あなたの情報が不完全なので、クリックしてください。 <a href="
+"\"%(first_login_url)s\"> リンク </a> 補完\n"
 "                "
 
 #: templates/_message.html:56
 #, python-format
 msgid ""
 "\n"
-"        Your ssh public key not set or expired. Please click <a "
-"href=\"%(user_pubkey_update)s\"> this link </a>to update\n"
+"        Your ssh public key not set or expired. Please click <a href="
+"\"%(user_pubkey_update)s\"> this link </a>to update\n"
 "        "
 msgstr ""
 "\n"
-"                SSHキーが設定されていないか無効になっている場合は、 <a "
-"href=\"%(user_pubkey_update)s\"> リンク </a> 更新\n"
+"                SSHキーが設定されていないか無効になっている場合は、 <a href="
+"\"%(user_pubkey_update)s\"> リンク </a> 更新\n"
 "        "
 
 #: templates/_mfa_login_field.html:28
@@ -5805,6 +5805,18 @@ msgstr "読み取り専用"
 msgid "Writable"
 msgstr "書き込み可能"
 
+#: terminal/const.py:94
+msgid "Kill Session"
+msgstr "セッションを終了する"
+
+#: terminal/const.py:95
+msgid "Lock Session"
+msgstr "セッションをロックする"
+
+#: terminal/const.py:96
+msgid "Unlock Session"
+msgstr "セッションのロックを解除する"
+
 #: terminal/exceptions.py:8
 msgid "Bulk create not support"
 msgstr "一括作成非サポート"
@@ -5857,7 +5869,7 @@ msgstr "カスタムプラットフォームのみをサポート"
 msgid "Missing type in platform.yml"
 msgstr "platform.ymlにタイプがありません"
 
-#: terminal/models/applet/applet.py:246 terminal/models/applet/host.py:35
+#: terminal/models/applet/applet.py:248 terminal/models/applet/host.py:35
 #: terminal/models/applet/host.py:136
 msgid "Hosting"
 msgstr "ホスト マシン"
@@ -6028,23 +6040,23 @@ msgstr "リプレイ"
 msgid "Date end"
 msgstr "終了日"
 
-#: terminal/models/session/session.py:240
+#: terminal/models/session/session.py:261
 msgid "Session record"
 msgstr "セッション記録"
 
-#: terminal/models/session/session.py:242
+#: terminal/models/session/session.py:263
 msgid "Can monitor session"
 msgstr "セッションを監視できます"
 
-#: terminal/models/session/session.py:243
+#: terminal/models/session/session.py:264
 msgid "Can share session"
 msgstr "セッションを共有できます"
 
-#: terminal/models/session/session.py:244
+#: terminal/models/session/session.py:265
 msgid "Can terminate session"
 msgstr "セッションを終了できます"
 
-#: terminal/models/session/session.py:245
+#: terminal/models/session/session.py:266
 msgid "Can validate session action perm"
 msgstr "セッションアクションのパーマを検証できます"
 
@@ -6213,7 +6225,12 @@ msgid ""
 "has a private account, the other is public, when the application does not "
 "support multiple open and the special has been used, the public account will "
 "be used to connect"
-msgstr "これらのアカウントは、公開されたアプリケーションに接続するために使用されます。アカウントは現在、2つのタイプに分類されています。1つは、各アカウントに専用のアカウントで、各ユーザーにはプライベートアカウントがあります。もう1つは公開されています。アプリケーションが複数のオープンをサポートしていない場合、および特別なものが使用されている場合、公開アカウントが使用されます。"
+msgstr ""
+"これらのアカウントは、公開されたアプリケーションに接続するために使用されま"
+"す。アカウントは現在、2つのタイプに分類されています。1つは、各アカウントに専"
+"用のアカウントで、各ユーザーにはプライベートアカウントがあります。もう1つは公"
+"開されています。アプリケーションが複数のオープンをサポートしていない場合、お"
+"よび特別なものが使用されている場合、公開アカウントが使用されます。"
 
 #: terminal/serializers/applet_host.py:77
 msgid "The number of public accounts created automatically"
@@ -6387,6 +6404,10 @@ msgstr "インデックス"
 #: terminal/serializers/storage.py:168
 msgid "Doc type"
 msgstr "Docタイプ"
+
+#: terminal/serializers/task.py:9
+msgid "Session id"
+msgstr "セッション"
 
 #: terminal/serializers/terminal.py:83 terminal/serializers/terminal.py:91
 msgid "Not found"

@@ -4,15 +4,13 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from common.db.models import JMSBaseModel
+from terminal.const import TaskNameType as SessionTaskChoices
 from .terminal import Terminal
 
 
 class Task(JMSBaseModel):
-    NAME_CHOICES = (
-        ("kill_session", "Kill Session"),
-    )
 
-    name = models.CharField(max_length=128, choices=NAME_CHOICES, verbose_name=_("Name"))
+    name = models.CharField(max_length=128, choices=SessionTaskChoices.choices, verbose_name=_("Name"))
     args = models.CharField(max_length=1024, verbose_name=_("Args"))
     kwargs = models.JSONField(default=dict, verbose_name=_("Kwargs"))
     terminal = models.ForeignKey(Terminal, null=True, on_delete=models.SET_NULL)

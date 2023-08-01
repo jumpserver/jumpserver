@@ -2,10 +2,9 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.urls import path, re_path
+from django.urls import path
 from rest_framework_bulk.routes import BulkRouter
 
-from common import api as capi
 from .. import api
 
 app_name = 'terminal'
