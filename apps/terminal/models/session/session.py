@@ -178,9 +178,23 @@ class Session(OrgModelMixin):
 
     @property
     def command_amount(self):
-        if self.cmd_amount == -1:
-            self.save(update_fields=['cmd_amount'])
-        return self.cmd_amount
+        if self.need_update_cmd_amount:
+            cmd_amount = self.compute_command_amount()
+            self.cmd_amount = cmd_amount
+            self.save()
+        elif self.need_compute_cmd_amount:
+            cmd_amount = self.compute_command_amount()
+        else:
+            cmd_amount = self.cmd_amount
+        return cmd_amount
+
+    @property
+    def need_update_cmd_amount(self):
+        return self.is_finished and self.need_compute_cmd_amount
+
+    @property
+    def need_compute_cmd_amount(self):
+        return self.cmd_amount == -1
 
     def compute_command_amount(self):
         command_store = get_multi_command_storage()
