@@ -16,6 +16,10 @@ class AliasAccount(TextChoices):
     USER = '@USER', _('Dynamic user')
     ANON = '@ANON', _('Anonymous account')
 
+    @classmethod
+    def virtual_choices(cls):
+        return [(k, v) for k, v in cls.choices if k not in (cls.ALL,)]
+
 
 class Source(TextChoices):
     LOCAL = 'local', _('Local')
