@@ -89,7 +89,9 @@ ARG PIP_MIRROR=https://pypi.douban.com/simple
 RUN --mount=type=cache,target=/root/.cache/pip \
     set -ex \
     && pip install poetry==1.5.1 -i ${PIP_MIRROR} \
-    && poetry install --only=main
+    && poetry config virtualenvs.create false \
+    && poetry install --only=main \
+    && rm -rf /root/.cache/pip
 
 COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
 RUN echo > /opt/jumpserver/config.yml \
