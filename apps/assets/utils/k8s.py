@@ -22,7 +22,12 @@ class KubernetesClient:
     @property
     def api(self):
         configuration = client.Configuration()
-        configuration.host = self.url
+        scheme = urlparse(self.url).scheme
+        if not self.server:
+            host = self.url
+        else:
+            host = f'{scheme}://127.0.0.1:{self.server.local_bind_port}'
+        configuration.host = host
         configuration.verify_ssl = False
         configuration.api_key = {"authorization": "Bearer " + self.token}
         c = api_client.ApiClient(configuration=configuration)
