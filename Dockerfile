@@ -81,14 +81,16 @@ RUN set -ex \
     fi
 
 WORKDIR /tmp/build
-COPY ./requirements ./requirements
+COPY ./pyproject.toml ./pyproject.toml
+COPY ./poetry.lock ./poetry.lock
 
 ARG PIP_MIRROR=https://pypi.douban.com/simple
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     set -ex \
     && pip config set global.index-url ${PIP_MIRROR} \
-    && pip install -r requirements/requirements.txt
+    && pip install poetry==1.5.1 \
+    && poetry install --only=main
 
 COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
 RUN echo > /opt/jumpserver/config.yml \
