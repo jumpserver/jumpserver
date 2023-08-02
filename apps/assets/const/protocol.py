@@ -81,6 +81,26 @@ class Protocol(ChoicesMixin, models.TextChoices):
             cls.telnet: {
                 'port': 23,
                 'secret_types': ['password'],
+                'setting': {
+                    'username_prompt': {
+                        'type': 'str',
+                        'default': 'username:|login:',
+                        'label': _('Username prompt'),
+                        'help_text': _('We will send username when we see this prompt')
+                    },
+                    'password_prompt': {
+                        'type': 'str',
+                        'default': 'password:',
+                        'label': _('Password prompt'),
+                        'help_text': _('We will send password when we see this prompt')
+                    },
+                    'success_prompt': {
+                        'type': 'str',
+                        'default': 'success|成功|#|>|\$',
+                        'label': _('Success prompt'),
+                        'help_text': _('We will consider login success when we see this prompt')
+                    }
+                }
             },
             cls.winrm: {
                 'port': 5985,
