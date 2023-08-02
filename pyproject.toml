@@ -166,6 +166,11 @@ pymssql = "2.2.7"
 psycopg2 = "2.9.6"
 ucloud-sdk-python3 = "0.11.50"
 
+[[tool.poetry.source]]
+name = "tsinghua"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
+priority = "primary"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

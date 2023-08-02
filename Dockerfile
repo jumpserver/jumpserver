@@ -88,8 +88,7 @@ ARG PIP_MIRROR=https://pypi.douban.com/simple
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     set -ex \
-    && pip config set global.index-url ${PIP_MIRROR} \
-    && pip install poetry==1.5.1 \
+    && pip install poetry==1.5.1 -i ${PIP_MIRROR} \
     && poetry install --only=main
 
 COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
