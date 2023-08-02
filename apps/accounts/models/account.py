@@ -155,9 +155,6 @@ class AccountTemplate(BaseAccount):
             ).first()
             return account
 
-    def __str__(self):
-        return self.username
-
     @staticmethod
     def bulk_update_accounts(accounts, data):
         history_model = Account.history.model

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-28 10:57+0800\n"
+"POT-Creation-Date: 2023-07-31 16:39+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 2.4.3\n"
 
-#: accounts/api/automations/base.py:79
+#: accounts/api/automations/base.py:79 tickets/api/ticket.py:112
 msgid "The parameter 'action' must be [{}]"
 msgstr "参数 'action' 必须是 [{}]"
 
@@ -501,7 +501,7 @@ msgstr "账号验证"
 #: settings/models.py:32 settings/serializers/sms.py:6
 #: terminal/models/applet/applet.py:32 terminal/models/component/endpoint.py:12
 #: terminal/models/component/endpoint.py:92
-#: terminal/models/component/storage.py:26 terminal/models/component/task.py:15
+#: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:84 users/forms/profile.py:33
 #: users/models/group.py:13 users/models/user.py:753
 #: xpack/plugins/cloud/models.py:28
@@ -1238,7 +1238,7 @@ msgstr "SSH公钥"
 #: assets/models/cmd_filter.py:88 assets/models/group.py:20
 #: common/db/models.py:36 ops/models/adhoc.py:26 ops/models/job.py:113
 #: ops/models/playbook.py:26 rbac/models/role.py:37 settings/models.py:37
-#: terminal/models/applet/applet.py:44 terminal/models/applet/applet.py:248
+#: terminal/models/applet/applet.py:44 terminal/models/applet/applet.py:250
 #: terminal/models/applet/host.py:141 terminal/models/component/endpoint.py:24
 #: terminal/models/component/endpoint.py:102
 #: terminal/models/session/session.py:46 tickets/models/comment.py:32
@@ -1432,7 +1432,7 @@ msgstr "资产自动化任务"
 
 #: assets/models/automations/base.py:113 audits/models.py:199
 #: audits/serializers.py:50 ops/models/base.py:49 ops/models/job.py:186
-#: terminal/models/applet/applet.py:247 terminal/models/applet/host.py:138
+#: terminal/models/applet/applet.py:249 terminal/models/applet/host.py:138
 #: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
 #: terminal/serializers/applet_host.py:115 tickets/models/ticket/general.py:283
 #: tickets/serializers/super_ticket.py:13
@@ -2032,7 +2032,7 @@ msgid "Login log"
 msgstr "登录日志"
 
 #: audits/const.py:43 terminal/models/applet/host.py:142
-#: terminal/models/component/task.py:24
+#: terminal/models/component/task.py:22
 msgid "Task"
 msgstr "任务"
 
@@ -2232,27 +2232,27 @@ msgstr "上传 FTP 文件到外部存储"
 msgid "This action require verify your MFA"
 msgstr "该操作需要验证您的 MFA, 请先开启并配置"
 
-#: authentication/api/connection_token.py:221
+#: authentication/api/connection_token.py:230
 msgid "Reusable connection token is not allowed, global setting not enabled"
 msgstr "不允许使用可重复使用的连接令牌，未启用全局设置"
 
-#: authentication/api/connection_token.py:301
+#: authentication/api/connection_token.py:310
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名账号不支持当前资产"
 
-#: authentication/api/connection_token.py:320
+#: authentication/api/connection_token.py:329
 msgid "Account not found"
 msgstr "账号未找到"
 
-#: authentication/api/connection_token.py:323
+#: authentication/api/connection_token.py:332
 msgid "Permission expired"
 msgstr "授权已过期"
 
-#: authentication/api/connection_token.py:337
+#: authentication/api/connection_token.py:346
 msgid "ACL action is reject: {}({})"
 msgstr "ACL 动作是拒绝: {}({})"
 
-#: authentication/api/connection_token.py:341
+#: authentication/api/connection_token.py:350
 msgid "ACL action is review"
 msgstr "ACL 动作是复核"
 
@@ -3644,7 +3644,7 @@ msgid "Module"
 msgstr "模块"
 
 #: ops/models/adhoc.py:24 ops/models/celery.py:58 ops/models/job.py:97
-#: terminal/models/component/task.py:16
+#: terminal/models/component/task.py:14
 msgid "Args"
 msgstr "参数"
 
@@ -3687,7 +3687,7 @@ msgstr "Celery 任务"
 msgid "Can view task monitor"
 msgstr "可以查看任务监控"
 
-#: ops/models/celery.py:59 terminal/models/component/task.py:17
+#: ops/models/celery.py:59 terminal/models/component/task.py:15
 msgid "Kwargs"
 msgstr "其它参数"
 
@@ -3824,7 +3824,7 @@ msgstr "清理异常作业"
 msgid "Task log"
 msgstr "任务列表"
 
-#: ops/templates/ops/celery_task_log.html:71
+#: ops/templates/ops/celery_task_log.html:71 terminal/serializers/task.py:10
 msgid "Task name"
 msgstr "任务名称"
 
@@ -4204,7 +4204,7 @@ msgid "My assets"
 msgstr "我的资产"
 
 #: rbac/tree.py:56 terminal/models/applet/applet.py:51
-#: terminal/models/applet/applet.py:244 terminal/models/applet/host.py:29
+#: terminal/models/applet/applet.py:246 terminal/models/applet/host.py:29
 #: terminal/serializers/applet.py:15
 msgid "Applet"
 msgstr "远程应用"
@@ -5481,13 +5481,13 @@ msgstr "过期。"
 #, python-format
 msgid ""
 "\n"
-"                Your password has expired, please click <a "
-"href=\"%(user_password_update_url)s\"> this link </a> update password.\n"
+"                Your password has expired, please click <a href="
+"\"%(user_password_update_url)s\"> this link </a> update password.\n"
 "            "
 msgstr ""
 "\n"
-"                您的密码已经过期，请点击 <a "
-"href=\"%(user_password_update_url)s\"> 链接 </a> 更新密码\n"
+"                您的密码已经过期，请点击 <a href="
+"\"%(user_password_update_url)s\"> 链接 </a> 更新密码\n"
 "        "
 
 #: templates/_message.html:30
@@ -5511,8 +5511,8 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"        Your information was incomplete. Please click <a "
-"href=\"%(first_login_url)s\"> this link </a>to complete your information.\n"
+"        Your information was incomplete. Please click <a href="
+"\"%(first_login_url)s\"> this link </a>to complete your information.\n"
 "        "
 msgstr ""
 "\n"
@@ -5524,13 +5524,13 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"        Your ssh public key not set or expired. Please click <a "
-"href=\"%(user_pubkey_update)s\"> this link </a>to update\n"
+"        Your ssh public key not set or expired. Please click <a href="
+"\"%(user_pubkey_update)s\"> this link </a>to update\n"
 "        "
 msgstr ""
 "\n"
-"                您的SSH密钥没有设置或已失效，请点击 <a "
-"href=\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
+"                您的SSH密钥没有设置或已失效，请点击 <a href="
+"\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
 "        "
 
 #: templates/_mfa_login_field.html:28
@@ -5718,6 +5718,18 @@ msgstr "只读"
 msgid "Writable"
 msgstr "读写"
 
+#: terminal/const.py:94
+msgid "Kill Session"
+msgstr "终断会话"
+
+#: terminal/const.py:95
+msgid "Lock Session"
+msgstr "锁定会话"
+
+#: terminal/const.py:96
+msgid "Unlock Session"
+msgstr "解锁会话"
+
 #: terminal/exceptions.py:8
 msgid "Bulk create not support"
 msgstr "不支持批量创建"
@@ -5770,7 +5782,7 @@ msgstr "只支持自定义平台"
 msgid "Missing type in platform.yml"
 msgstr "在 platform.yml 中缺少类型"
 
-#: terminal/models/applet/applet.py:246 terminal/models/applet/host.py:35
+#: terminal/models/applet/applet.py:248 terminal/models/applet/host.py:35
 #: terminal/models/applet/host.py:136
 msgid "Hosting"
 msgstr "宿主机"
@@ -5941,23 +5953,23 @@ msgstr "回放"
 msgid "Date end"
 msgstr "结束日期"
 
-#: terminal/models/session/session.py:240
+#: terminal/models/session/session.py:261
 msgid "Session record"
 msgstr "会话记录"
 
-#: terminal/models/session/session.py:242
+#: terminal/models/session/session.py:263
 msgid "Can monitor session"
 msgstr "可以监控会话"
 
-#: terminal/models/session/session.py:243
+#: terminal/models/session/session.py:264
 msgid "Can share session"
 msgstr "可以分享会话"
 
-#: terminal/models/session/session.py:244
+#: terminal/models/session/session.py:265
 msgid "Can terminate session"
 msgstr "可以终断会话"
 
-#: terminal/models/session/session.py:245
+#: terminal/models/session/session.py:266
 msgid "Can validate session action perm"
 msgstr "可以验证会话动作权限"
 
@@ -6124,8 +6136,10 @@ msgid ""
 "has a private account, the other is public, when the application does not "
 "support multiple open and the special has been used, the public account will "
 "be used to connect"
-msgstr "这些账号用于连接发布的应用，账号现在分为两种类型，一种是专用的，每个用户都有一个专用账号。 "
-"另一种是公共的，当应用不支持多开且专用的已经被使用时，会使用公共账号连接"
+msgstr ""
+"这些账号用于连接发布的应用，账号现在分为两种类型，一种是专用的，每个用户都有"
+"一个专用账号。 另一种是公共的，当应用不支持多开且专用的已经被使用时，会使用公"
+"共账号连接"
 
 #: terminal/serializers/applet_host.py:77
 msgid "The number of public accounts created automatically"
@@ -6296,6 +6310,10 @@ msgstr "索引"
 #: terminal/serializers/storage.py:168
 msgid "Doc type"
 msgstr "文档类型"
+
+#: terminal/serializers/task.py:9
+msgid "Session id"
+msgstr "会话 ID"
 
 #: terminal/serializers/terminal.py:83 terminal/serializers/terminal.py:91
 msgid "Not found"
