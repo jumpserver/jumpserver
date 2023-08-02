@@ -26,8 +26,8 @@ class AccountBackupPlanViewSet(OrgBulkModelViewSet):
 
 class AccountBackupPlanExecutionViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.AccountBackupPlanExecutionSerializer
-    search_fields = ('trigger',)
-    filterset_fields = ('trigger', 'plan_id')
+    search_fields = ('trigger', 'plan__name')
+    filterset_fields = ('trigger', 'plan_id', 'plan__name')
     http_method_names = ['get', 'post', 'options']
 
     def get_queryset(self):
