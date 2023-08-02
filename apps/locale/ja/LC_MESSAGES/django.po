@@ -1200,34 +1200,28 @@ msgid "AD domain"
 msgstr "AD ドメイン"
 
 #: assets/const/protocol.py:88
-#, fuzzy
-#| msgid "Username attr"
 msgid "Username prompt"
-msgstr "ユーザー名のプロパティ"
+msgstr "ユーザー名プロンプト"
 
 #: assets/const/protocol.py:89
 msgid "We will send username when we see this prompt"
-msgstr ""
+msgstr "このプロンプトが表示されたらユーザー名を送信します"
 
 #: assets/const/protocol.py:94
-#, fuzzy
-#| msgid "Password auth"
 msgid "Password prompt"
-msgstr "パスワード認証"
+msgstr "パスワードプロンプト"
 
 #: assets/const/protocol.py:95
 msgid "We will send password when we see this prompt"
-msgstr ""
+msgstr "このプロンプトが表示されたらパスワードを送信します"
 
 #: assets/const/protocol.py:100
-#, fuzzy
-#| msgid "Success"
 msgid "Success prompt"
-msgstr "成功"
+msgstr "成功プロンプト"
 
 #: assets/const/protocol.py:101
 msgid "We will consider login success when we see this prompt"
-msgstr ""
+msgstr "このプロンプトが表示されたらログイン成功とみなします"
 
 #: assets/const/protocol.py:112 assets/models/asset/database.py:10
 #: settings/serializers/email.py:37

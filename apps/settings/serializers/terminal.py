@@ -30,11 +30,6 @@ class TerminalSettingSerializer(serializers.Serializer):
     TERMINAL_ASSET_LIST_PAGE_SIZE = serializers.ChoiceField(
         PAGE_SIZE_CHOICES, required=False, label=_('List page size')
     )
-    TERMINAL_TELNET_REGEX = serializers.CharField(
-        allow_blank=True, max_length=1024, required=False, label=_('Telnet login regex'),
-        help_text=_("Tips: The login success message varies with devices. "
-                    "if you cannot log in to the device through Telnet, set this parameter")
-    )
     TERMINAL_MAGNUS_ENABLED = serializers.BooleanField(label=_("Enable database proxy"))
     TERMINAL_RAZOR_ENABLED = serializers.BooleanField(label=_("Enable Razor"))
     TERMINAL_KOKO_SSH_ENABLED = serializers.BooleanField(label=_("Enable SSH Client"))

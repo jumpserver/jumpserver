@@ -1193,34 +1193,28 @@ msgid "AD domain"
 msgstr "AD 网域"
 
 #: assets/const/protocol.py:88
-#, fuzzy
-#| msgid "Username attr"
 msgid "Username prompt"
-msgstr "用户名属性"
+msgstr "用户名提示"
 
 #: assets/const/protocol.py:89
 msgid "We will send username when we see this prompt"
-msgstr ""
+msgstr "当我们看到这个提示时，我们将发送用户名"
 
 #: assets/const/protocol.py:94
-#, fuzzy
-#| msgid "Password auth"
 msgid "Password prompt"
-msgstr "密码认证"
+msgstr "密码提示"
 
 #: assets/const/protocol.py:95
 msgid "We will send password when we see this prompt"
-msgstr ""
+msgstr "当我们看到这个提示时，我们将发送密码"
 
 #: assets/const/protocol.py:100
-#, fuzzy
-#| msgid "Success"
 msgid "Success prompt"
-msgstr "成功"
+msgstr "成功提示"
 
 #: assets/const/protocol.py:101
 msgid "We will consider login success when we see this prompt"
-msgstr ""
+msgstr "当我们看到这个提示时，我们将认为登录成功"
 
 #: assets/const/protocol.py:112 assets/models/asset/database.py:10
 #: settings/serializers/email.py:37
