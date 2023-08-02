@@ -449,7 +449,6 @@ class Config(dict):
         'TERMINAL_ASSET_LIST_PAGE_SIZE': 'auto',
         'TERMINAL_SESSION_KEEP_DURATION': 200,
         'TERMINAL_HOST_KEY': '',
-        'TERMINAL_TELNET_REGEX': '',
         'TERMINAL_COMMAND_STORAGE': {},
         # Luna 页面
         # 默认图形化分辨率
@@ -554,6 +553,7 @@ class Config(dict):
         'TICKET_AUTHORIZE_DEFAULT_TIME': 7,
         'TICKET_AUTHORIZE_DEFAULT_TIME_UNIT': 'day',
         'PERIOD_TASK_ENABLED': True,
+        'TERMINAL_TELNET_REGEX': '',
 
         # 导航栏 帮助
         'HELP_DOCUMENT_URL': 'https://docs.jumpserver.org/zh/v3/',
