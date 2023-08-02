@@ -7,4 +7,4 @@ WORKDIR /opt/jumpserver
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     set -ex \
-    && pip install -r requirements/requirements_xpack.txt
+    && poetry install --only=xpack
