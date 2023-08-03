@@ -2,6 +2,7 @@
   gather_facts: no
   vars:
     ansible_connection: local
+    ansible_become: false
 
   tasks:
     - name: Verify account (paramiko)
@@ -12,3 +13,8 @@
         login_password: "{{ account.secret }}"
         login_secret_type: "{{ account.secret_type }}"
         login_private_key_path: "{{ account.private_key_path }}"
+        become: "{{ custom_become | default(False) }}"
+        become_method: "{{ custom_become_method | default('su') }}"
+        become_user: "{{ custom_become_user | default('') }}"
+        become_password: "{{ custom_become_password | default('') }}"
+        become_private_key_path: "{{ custom_become_private_key_path | default(None) }}"
