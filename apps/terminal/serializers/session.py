@@ -2,6 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers.fields import LabeledChoiceField
+from common.utils import pretty_string
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .terminal import TerminalSmallSerializer
 from ..const import SessionType
@@ -22,6 +23,7 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
     can_replay = serializers.BooleanField(read_only=True, label=_("Can replay"))
     can_join = serializers.BooleanField(read_only=True, label=_("Can join"))
     can_terminate = serializers.BooleanField(read_only=True, label=_("Can terminate"))
+    asset = serializers.CharField(label=_("Asset"), style={'base_template': 'textarea.html'})
 
     class Meta:
         model = Session
@@ -49,6 +51,11 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
             'can_terminate': {'label': _('Can terminate')},
             'terminal_display': {'label': _('Terminal display')},
         }
+
+    def validate_asset(self, value):
+        max_length = self.Meta.model.asset.field.max_length
+        value = pretty_string(value, max_length=max_length)
+        return value
 
 
 class SessionDisplaySerializer(SessionSerializer):
