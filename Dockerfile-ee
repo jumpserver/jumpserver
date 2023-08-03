@@ -1,10 +1,12 @@
 ARG VERSION
 FROM registry.fit2cloud.com/jumpserver/xpack:${VERSION} as build-xpack
 FROM jumpserver/core:${VERSION}
+ARG TARGETARCH
+
 COPY --from=build-xpack /opt/xpack /opt/jumpserver/apps/xpack
 
 WORKDIR /opt/jumpserver
 
-RUN --mount=type=cache,target=/root/.cache/pip \
+RUN --mount=type=cache,target=/root/.cache \
     set -ex \
     && poetry install --only=xpack
