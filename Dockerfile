@@ -1,16 +1,5 @@
-FROM python:3.11.4-slim-bullseye as stage-build
+FROM jumpserver/python:3.11-slim-buster as stage-build
 ARG TARGETARCH
-
-ARG VERSION
-ENV VERSION=$VERSION
-
-WORKDIR /opt/jumpserver
-ADD . .
-RUN cd utils && bash -ixeu build.sh
-
-FROM python:3.11.4-slim-bullseye
-ARG TARGETARCH
-MAINTAINER JumpServer Team <ibuler@qq.com>
 
 ARG BUILD_DEPENDENCIES="              \
         g++                           \
@@ -22,6 +11,7 @@ ARG DEPENDENCIES="                    \
         libpq-dev                     \
         libffi-dev                    \
         libjpeg-dev                   \
+        libkrb5-dev                   \
         libldap2-dev                  \
         libsasl2-dev                  \
         libssl-dev                    \
@@ -36,15 +26,10 @@ ARG TOOLS="                           \
         curl                          \
         default-libmysqlclient-dev    \
         default-mysql-client          \
-        locales                       \
-        openssh-client                \
-        procps                        \
-        sshpass                       \
-        telnet                        \
-        unzip                         \
-        vim                           \
         git                           \
-        nmap                          \
+        git-lfs                       \
+        unzip                         \
+        xz-utils                      \
         wget"
 
 ARG APT_MIRROR=http://mirrors.ustc.edu.cn
@@ -55,6 +40,73 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && apt-get update \
     && apt-get -y install --no-install-recommends ${BUILD_DEPENDENCIES} \
+    && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
+    && apt-get -y install --no-install-recommends ${TOOLS} \
+    && echo "no" | dpkg-reconfigure dash \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN set -ex \
+    && cd /opt \
+    && \
+    if [ "${TARGETARCH}" == "loong64" ]; then \
+        mkdir -p /opt/rust-install; \
+        wget -O /opt/rust.tar.gz https://rust-lang.loongnix.cn/dist/2022-11-03/rust-1.65.0-loongarch64-unknown-linux-gnu.tar.xz; \
+        tar -xf /opt/rust.tar.gz -C /opt/rust-install --strip-components=1; \
+        cd /opt/rust-install && ./install.sh; \
+        rm -rf /opt/rust.tar.gz /opt/rust-install; \
+    fi
+
+ARG VERSION
+ENV VERSION=$VERSION
+
+WORKDIR /opt/jumpserver
+ADD . .
+RUN cd utils && bash -ixeu build.sh
+
+ARG PIP_MIRROR=https://pypi.tuna.tsinghua.edu.cn/simple
+RUN --mount=type=cache,target=/root/.cache \
+    set -ex \
+    && \
+    if [ "${TARGETARCH}" == "loong64" ]; then \
+        pip install https://download.jumpserver.org/pypi/simple/rpds_py/rpds_py-0.9.2-cp311-cp311-linux_loongarch64.whl; \
+        pip install https://download.jumpserver.org/pypi/simple/cryptography/cryptography-41.0.2-cp311-cp311-linux_loongarch64.whl; \
+    fi \
+    && pip install poetry -i ${PIP_MIRROR}
+
+RUN --mount=type=cache,target=/root/.cache \
+    --mount=type=cache,target=/root/.cargo \
+    set -ex \
+    && poetry config virtualenvs.create false \
+    && poetry install
+
+FROM jumpserver/python:3.11-slim-buster
+ARG TARGETARCH
+
+ARG DEPENDENCIES="                    \
+        libxmlsec1-openssl"
+
+ARG TOOLS="                           \
+        ca-certificates               \
+        curl                          \
+        default-libmysqlclient-dev    \
+        default-mysql-client          \
+        inetutils-ping                \
+        locales                       \
+        openssh-client                \
+        procps                        \
+        sshpass                       \
+        telnet                        \
+        unzip                         \
+        vim                           \
+        wget"
+
+ARG APT_MIRROR=http://mirrors.ustc.edu.cn
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
+    sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
+    && rm -f /etc/apt/apt.conf.d/docker-clean \
+    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && apt-get update \
     && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
     && apt-get -y install --no-install-recommends ${TOOLS} \
     && mkdir -p /root/.ssh/ \
@@ -80,23 +132,17 @@ RUN set -ex \
         rm -f instantclient-basiclite-linux.${TARGETARCH}-19.10.0.0.0.zip; \
     fi
 
-WORKDIR /tmp/build
-COPY ./pyproject.toml ./pyproject.toml
-COPY ./poetry.lock ./poetry.lock
+COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
+WORKDIR /opt/jumpserver
 
 ARG PIP_MIRROR=https://pypi.douban.com/simple
-
-RUN --mount=type=cache,target=/root/.cache/poetry \
+RUN --mount=type=cache,target=/root/.cache \
     set -ex \
-    && pip install poetry==1.5.1 -i ${PIP_MIRROR} \
+    && echo > /opt/jumpserver/config.yml \
+    && pip install poetry -i ${PIP_MIRROR} \
     && poetry config virtualenvs.create false \
     && poetry install --only=main
 
-COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
-RUN echo > /opt/jumpserver/config.yml \
-    && rm -rf /tmp/build
-
-WORKDIR /opt/jumpserver
 VOLUME /opt/jumpserver/data
 VOLUME /opt/jumpserver/logs
 
