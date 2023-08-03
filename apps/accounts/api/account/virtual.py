@@ -12,7 +12,7 @@ class VirtualAccountViewSet(OrgBulkModelViewSet):
     filterset_fields = ('username',)
 
     def get_queryset(self):
-        return VirtualAccount.objects.all()
+        return VirtualAccount.get_or_create_queryset()
 
     def get_object(self, ):
         pk = self.kwargs.get('pk')
@@ -22,4 +22,3 @@ class VirtualAccountViewSet(OrgBulkModelViewSet):
         else:
             kwargs['username'] = pk
         return get_object_or_404(VirtualAccount, **kwargs)
-

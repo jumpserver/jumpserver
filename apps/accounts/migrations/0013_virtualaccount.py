@@ -18,14 +18,13 @@ class Migration(migrations.Migration):
                 ('updated_by', models.CharField(blank=True, max_length=128, null=True, verbose_name='Updated by')),
                 ('date_created', models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date created')),
                 ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
-                ('comment', models.TextField(blank=True, default='', verbose_name='Comment')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
-                ('username', models.CharField(choices=[('@INPUT', 'Manual input'), ('@USER', 'Dynamic user'), ('@ANON', 'Anonymous account')], max_length=128, verbose_name='Username')),
+                ('alias', models.CharField(choices=[('@INPUT', 'Manual input'), ('@USER', 'Dynamic user'), ('@ANON', 'Anonymous account')], max_length=128, verbose_name='Alias')),
                 ('secret_from_login', models.BooleanField(default=None, null=True, verbose_name='Secret from login')),
             ],
             options={
-                'unique_together': {('username', 'org_id')},
+                'unique_together': {('alias', 'org_id')},
             },
         ),
     ]
