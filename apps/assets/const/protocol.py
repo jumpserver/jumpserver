@@ -196,7 +196,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
                 'setting': {
                     'safe_mode': {
                         'type': 'bool',
-                        'default': True,
+                        'default': False,
                         'label': _('Safe mode'),
                         'help_text': _(
                             'When safe mode is enabled, some operations will be disabled, such as: '
