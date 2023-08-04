@@ -71,8 +71,22 @@ class AssetAccountHandler(BaseAccountHandler):
         )
         return filename
 
+    @staticmethod
+    def handler_secret(data, section):
+        for account_data in data:
+            secret = account_data.get('secret')
+            if not secret:
+                continue
+            length = len(secret)
+            index = length // 2
+            if section == "front":
+                secret = secret[:index] + '*' * (length - index)
+            elif section == "back":
+                secret = '*' * (length - index) + secret[index:]
+            account_data['secret'] = secret
+
     @classmethod
-    def create_data_map(cls, accounts):
+    def create_data_map(cls, accounts, section):
         data_map = defaultdict(list)
 
         if not accounts.exists():
@@ -92,6 +106,7 @@ class AssetAccountHandler(BaseAccountHandler):
         for tp, _accounts in account_type_map.items():
             sheet_name = type_dict.get(tp, tp)
             data = AccountSecretSerializer(_accounts, many=True).data
+            cls.handler_secret(data, section)
             data_map.update(cls.add_rows(data, header_fields, sheet_name))
 
         print('\n\033[33m- 共备份 {} 条账号\033[0m'.format(accounts.count()))
@@ -104,7 +119,7 @@ class AccountBackupHandler:
         self.plan_name = self.execution.plan.name
         self.is_frozen = False  # 任务状态冻结标志
 
-    def create_excel(self):
+    def create_excel(self, section='complete'):
         print(
             '\n'
             '\033[32m>>> 正在生成资产或应用相关备份信息文件\033[0m'
@@ -114,7 +129,7 @@ class AccountBackupHandler:
         time_start = time.time()
         files = []
         accounts = self.execution.backup_accounts
-        data_map = AssetAccountHandler.create_data_map(accounts)
+        data_map = AssetAccountHandler.create_data_map(accounts, section)
         if not data_map:
             return files
 
@@ -160,7 +175,8 @@ class AccountBackupHandler:
         self.execution.save()
         print('已完成对任务状态的更新')
 
-    def step_finished(self, is_success):
+    @staticmethod
+    def step_finished(is_success):
         if is_success:
             print('任务执行成功')
         else:
@@ -170,14 +186,22 @@ class AccountBackupHandler:
         is_success = False
         error = '-'
         try:
-            recipients = self.execution.plan_snapshot.get('recipients')
-            if not recipients:
+            recipients_part_one = self.execution.snapshot.get('recipients_part_one', [])
+            recipients_part_two = self.execution.snapshot.get('recipients_part_two', [])
+            if not recipients_part_one and not recipients_part_two:
                 print(
                     '\n'
                     '\033[32m>>> 该备份任务未分配收件人\033[0m'
                     ''
                 )
+            if recipients_part_one and recipients_part_two:
+                files = self.create_excel(section='front')
+                self.send_backup_mail(files, recipients_part_one)
+
+                files = self.create_excel(section='back')
+                self.send_backup_mail(files, recipients_part_two)
             else:
+                recipients = recipients_part_one or recipients_part_two
                 files = self.create_excel()
                 self.send_backup_mail(files, recipients)
         except Exception as e:
