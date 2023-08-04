@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-03 14:28+0800\n"
+"POT-Creation-Date: 2023-08-04 16:12+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -58,7 +58,7 @@ msgstr ""
 msgid "All"
 msgstr "すべて"
 
-#: accounts/const/account.py:15
+#: accounts/const/account.py:15 accounts/models/virtual.py:24
 msgid "Manual input"
 msgstr "手動入力"
 
@@ -436,7 +436,7 @@ msgstr "最終ログイン日"
 
 #: accounts/models/automations/gather_account.py:17
 #: accounts/models/automations/push_account.py:15 accounts/models/base.py:34
-#: accounts/models/virtual.py:11 acls/serializers/base.py:19
+#: accounts/serializers/account/virtual.py:21 acls/serializers/base.py:19
 #: acls/serializers/base.py:50 assets/models/_user.py:23 audits/models.py:179
 #: authentication/forms.py:25 authentication/forms.py:27
 #: authentication/models/temp_token.py:9
@@ -485,15 +485,15 @@ msgstr "アカウントプッシュ"
 msgid "Verify asset account"
 msgstr "アカウントの確認"
 
-#: accounts/models/base.py:33 acls/models/base.py:35 acls/models/base.py:96
-#: acls/models/command_acl.py:21 acls/serializers/base.py:35
-#: applications/models.py:9 assets/models/_user.py:22
-#: assets/models/asset/common.py:91 assets/models/asset/common.py:149
-#: assets/models/cmd_filter.py:21 assets/models/domain.py:18
-#: assets/models/group.py:17 assets/models/label.py:18
-#: assets/models/platform.py:15 assets/models/platform.py:88
-#: assets/serializers/asset/common.py:146 assets/serializers/platform.py:110
-#: assets/serializers/platform.py:223
+#: accounts/models/base.py:33 accounts/serializers/account/virtual.py:20
+#: acls/models/base.py:35 acls/models/base.py:96 acls/models/command_acl.py:21
+#: acls/serializers/base.py:35 applications/models.py:9
+#: assets/models/_user.py:22 assets/models/asset/common.py:91
+#: assets/models/asset/common.py:149 assets/models/cmd_filter.py:21
+#: assets/models/domain.py:18 assets/models/group.py:17
+#: assets/models/label.py:18 assets/models/platform.py:15
+#: assets/models/platform.py:88 assets/serializers/asset/common.py:146
+#: assets/serializers/platform.py:110 assets/serializers/platform.py:223
 #: authentication/serializers/connect_token_secret.py:110 ops/mixin.py:21
 #: ops/models/adhoc.py:20 ops/models/celery.py:15 ops/models/celery.py:57
 #: ops/models/job.py:94 ops/models/playbook.py:28 ops/serializers/job.py:20
@@ -533,19 +533,29 @@ msgstr "アセット アカウント テンプレートのパスワードを表�
 msgid "Can change asset account template secret"
 msgstr "アセット アカウント テンプレートのパスワードを変更できます"
 
+#: accounts/models/virtual.py:11
+msgid "Alias"
+msgstr ""
+
 #: accounts/models/virtual.py:12
 msgid "Secret from login"
 msgstr ""
 
-#: accounts/models/virtual.py:24
+#: accounts/models/virtual.py:25
+#, fuzzy
+#| msgid "Username same with user"
+msgid "Same with user"
+msgstr "ユーザーと同じユーザー名"
+
+#: accounts/models/virtual.py:34
 msgid "Non-asset account, Input username/password on connect"
 msgstr ""
 
-#: accounts/models/virtual.py:25
+#: accounts/models/virtual.py:35
 msgid "The account username name same with user on connect"
 msgstr ""
 
-#: accounts/models/virtual.py:26
+#: accounts/models/virtual.py:36
 msgid ""
 "Connect asset without using a username and password, and it only supports "
 "web-based and custom-type assets"

@@ -18,4 +18,5 @@ class VirtualAccountSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'comment': {'label': _('Comment')},
             'name': {'label': _('Name')},
+            'username': {'label': _('Username')},
         }
