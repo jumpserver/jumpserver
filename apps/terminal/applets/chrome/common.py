@@ -160,6 +160,7 @@ class ProtocolSetting(DictObj):
     password_selector: str
     submit_selector: str
     script: list[Step]
+    safe_mode: bool
 
 
 class PlatformProtocolSetting(DictObj):
