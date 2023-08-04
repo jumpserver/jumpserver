@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-02 16:52+0800\n"
+"POT-Creation-Date: 2023-08-03 15:51+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -211,6 +211,7 @@ msgstr ""
 #: perms/models/asset_permission.py:64 perms/serializers/permission.py:34
 #: terminal/backends/command/models.py:17 terminal/models/session/session.py:31
 #: terminal/notifications.py:155 terminal/serializers/command.py:17
+#: terminal/serializers/session.py:26
 #: terminal/templates/terminal/_msg_command_warning.html:4
 #: terminal/templates/terminal/_msg_session_sharing.html:4
 #: tickets/models/ticket/apply_asset.py:16 xpack/plugins/cloud/models.py:212
@@ -333,7 +334,7 @@ msgstr "理由"
 #: accounts/models/automations/backup_account.py:99
 #: accounts/serializers/automations/change_secret.py:111
 #: accounts/serializers/automations/change_secret.py:134
-#: ops/serializers/job.py:56 terminal/serializers/session.py:44
+#: ops/serializers/job.py:56 terminal/serializers/session.py:46
 msgid "Is success"
 msgstr "成功は"
 
@@ -601,7 +602,7 @@ msgstr "カテゴリ"
 #: perms/serializers/user_permission.py:27 settings/serializers/vault.py:13
 #: terminal/models/applet/applet.py:38 terminal/models/component/storage.py:57
 #: terminal/models/component/storage.py:146 terminal/serializers/applet.py:29
-#: terminal/serializers/session.py:20 terminal/serializers/storage.py:226
+#: terminal/serializers/session.py:21 terminal/serializers/storage.py:226
 #: terminal/serializers/storage.py:238 tickets/models/comment.py:26
 #: tickets/models/flow.py:56 tickets/models/ticket/apply_application.py:16
 #: tickets/models/ticket/general.py:275 tickets/serializers/flow.py:53
@@ -1098,7 +1099,7 @@ msgstr "無効"
 msgid "Basic"
 msgstr "基本"
 
-#: assets/const/base.py:35 assets/const/protocol.py:221
+#: assets/const/base.py:35 assets/const/protocol.py:230
 #: assets/models/asset/web.py:13
 msgid "Script"
 msgstr "脚本"
@@ -1240,24 +1241,34 @@ msgstr "SYSDBA として接続"
 msgid "Auth username"
 msgstr "ユーザー名で認証する"
 
-#: assets/const/protocol.py:198 assets/models/asset/web.py:9
+#: assets/const/protocol.py:200
+msgid "Safe mode"
+msgstr "安全モード"
+
+#: assets/const/protocol.py:202
+msgid ""
+"When safe mode is enabled, some operations will be disabled, such as: New "
+"tab, right click, visit other website, etc."
+msgstr "安全モードが有効になっている場合、新しいタブ、右クリック、他のウェブサイトへのアクセスなど、一部の操作が無効になります"
+
+#: assets/const/protocol.py:207 assets/models/asset/web.py:9
 #: assets/serializers/asset/info/spec.py:16
 msgid "Autofill"
 msgstr "自動充填"
 
-#: assets/const/protocol.py:206 assets/models/asset/web.py:10
+#: assets/const/protocol.py:215 assets/models/asset/web.py:10
 msgid "Username selector"
 msgstr "ユーザー名ピッカー"
 
-#: assets/const/protocol.py:211 assets/models/asset/web.py:11
+#: assets/const/protocol.py:220 assets/models/asset/web.py:11
 msgid "Password selector"
 msgstr "パスワードセレクター"
 
-#: assets/const/protocol.py:216 assets/models/asset/web.py:12
+#: assets/const/protocol.py:225 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr "ボタンセレクターを確認する"
 
-#: assets/const/protocol.py:239
+#: assets/const/protocol.py:248
 msgid "API mode"
 msgstr "APIモード"
 
@@ -1335,8 +1346,8 @@ msgstr "ユーザーと同じユーザー名"
 
 #: assets/models/_user.py:52 authentication/models/connection_token.py:41
 #: authentication/serializers/connect_token_secret.py:111
-#: terminal/models/applet/applet.py:41 terminal/serializers/session.py:18
-#: terminal/serializers/session.py:40 terminal/serializers/storage.py:70
+#: terminal/models/applet/applet.py:41 terminal/serializers/session.py:19
+#: terminal/serializers/session.py:42 terminal/serializers/storage.py:70
 msgid "Protocol"
 msgstr "プロトコル"
 
@@ -2071,7 +2082,7 @@ msgstr "パスワードを変更する"
 
 #: audits/const.py:35 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:163
-#: terminal/serializers/session.py:47 terminal/serializers/session.py:56
+#: terminal/serializers/session.py:49 terminal/serializers/session.py:63
 msgid "Terminal"
 msgstr "ターミナル"
 
@@ -3596,15 +3607,15 @@ msgstr "システムメッセージ"
 msgid "Publish the station message"
 msgstr "投稿サイトニュース"
 
-#: ops/ansible/inventory.py:82
+#: ops/ansible/inventory.py:92
 msgid "No account available"
 msgstr "利用可能なアカウントがありません"
 
-#: ops/ansible/inventory.py:247
+#: ops/ansible/inventory.py:258
 msgid "Ansible disabled"
 msgstr "Ansible 無効"
 
-#: ops/ansible/inventory.py:263
+#: ops/ansible/inventory.py:274
 msgid "Skip hosts below:"
 msgstr "次のホストをスキップします: "
 
@@ -3874,7 +3885,7 @@ msgstr "保存後に実行"
 msgid "Job type"
 msgstr "タスクの種類"
 
-#: ops/serializers/job.py:57 terminal/serializers/session.py:48
+#: ops/serializers/job.py:57 terminal/serializers/session.py:50
 msgid "Is finished"
 msgstr "終了しました"
 
@@ -5374,35 +5385,23 @@ msgstr "リストの並べ替え"
 msgid "List page size"
 msgstr "ページサイズを一覧表示"
 
-#: settings/serializers/terminal.py:34
-msgid "Telnet login regex"
-msgstr "Telnetログインregex"
-
-#: settings/serializers/terminal.py:35
-msgid ""
-"Tips: The login success message varies with devices. if you cannot log in to "
-"the device through Telnet, set this parameter"
-msgstr ""
-"ヒント: ログイン成功メッセージはデバイスによって異なります。Telnet経由でデバ"
-"イスにログインできない場合は、このパラメーターを設定します。"
-
-#: settings/serializers/terminal.py:38
+#: settings/serializers/terminal.py:33
 msgid "Enable database proxy"
 msgstr "属性マップの有効化"
 
-#: settings/serializers/terminal.py:39
+#: settings/serializers/terminal.py:34
 msgid "Enable Razor"
 msgstr "Razor の有効化"
 
-#: settings/serializers/terminal.py:40
+#: settings/serializers/terminal.py:35
 msgid "Enable SSH Client"
 msgstr "SSH Clientの有効化"
 
-#: settings/serializers/terminal.py:51
+#: settings/serializers/terminal.py:46
 msgid "Default graphics resolution"
 msgstr "デフォルトのグラフィック解像度"
 
-#: settings/serializers/terminal.py:52
+#: settings/serializers/terminal.py:47
 msgid ""
 "Tip: Default resolution to use when connecting graphical assets in Luna pages"
 msgstr ""
@@ -6085,7 +6084,7 @@ msgstr "リプレイ"
 msgid "Date end"
 msgstr "終了日"
 
-#: terminal/models/session/session.py:47 terminal/serializers/session.py:55
+#: terminal/models/session/session.py:47 terminal/serializers/session.py:62
 msgid "Command amount"
 msgstr "コマンド量"
 
@@ -6360,31 +6359,31 @@ msgstr ""
 msgid "Asset IP"
 msgstr "資産 IP"
 
-#: terminal/serializers/session.py:22 terminal/serializers/session.py:45
+#: terminal/serializers/session.py:23 terminal/serializers/session.py:47
 msgid "Can replay"
 msgstr "再生できます"
 
-#: terminal/serializers/session.py:23 terminal/serializers/session.py:46
+#: terminal/serializers/session.py:24 terminal/serializers/session.py:48
 msgid "Can join"
 msgstr "参加できます"
 
-#: terminal/serializers/session.py:24 terminal/serializers/session.py:49
+#: terminal/serializers/session.py:25 terminal/serializers/session.py:51
 msgid "Can terminate"
 msgstr "終了できます"
 
-#: terminal/serializers/session.py:41
+#: terminal/serializers/session.py:43
 msgid "User ID"
 msgstr "ユーザーID"
 
-#: terminal/serializers/session.py:42
+#: terminal/serializers/session.py:44
 msgid "Asset ID"
 msgstr "資産ID"
 
-#: terminal/serializers/session.py:43
+#: terminal/serializers/session.py:45
 msgid "Login from display"
 msgstr "表示からのログイン"
 
-#: terminal/serializers/session.py:50
+#: terminal/serializers/session.py:52
 msgid "Terminal display"
 msgstr "ターミナルディスプレイ"
 
@@ -7997,6 +7996,16 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:86
 msgid "Community edition"
 msgstr "コミュニティ版"
+
+#~ msgid "Telnet login regex"
+#~ msgstr "Telnetログインregex"
+
+#~ msgid ""
+#~ "Tips: The login success message varies with devices. if you cannot log in "
+#~ "to the device through Telnet, set this parameter"
+#~ msgstr ""
+#~ "ヒント: ログイン成功メッセージはデバイスによって異なります。Telnet経由でデ"
+#~ "バイスにログインできない場合は、このパラメーターを設定します。"
 
 #~ msgid "Role display"
 #~ msgstr "ロール表示"
