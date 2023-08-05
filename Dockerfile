@@ -45,6 +45,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
     && echo "no" | dpkg-reconfigure dash \
     && rm -rf /var/lib/apt/lists/*
 
+WORKDIR /opt
 RUN set -ex \
     && cd /opt \
     && \
@@ -53,6 +54,7 @@ RUN set -ex \
         wget -O /opt/rust.tar.gz https://rust-lang.loongnix.cn/dist/2022-11-03/rust-1.65.0-loongarch64-unknown-linux-gnu.tar.xz; \
         tar -xf /opt/rust.tar.gz -C /opt/rust-install --strip-components=1; \
         cd /opt/rust-install && ./install.sh; \
+        cd /opt; \
         rm -rf /opt/rust.tar.gz /opt/rust-install; \
     fi
 
@@ -66,16 +68,7 @@ RUN cd utils && bash -ixeu build.sh
 ARG PIP_MIRROR=https://pypi.tuna.tsinghua.edu.cn/simple
 RUN --mount=type=cache,target=/root/.cache \
     set -ex \
-    && \
-    if [ "${TARGETARCH}" == "loong64" ]; then \
-        pip install https://download.jumpserver.org/pypi/simple/rpds_py/rpds_py-0.9.2-cp311-cp311-linux_loongarch64.whl; \
-        pip install https://download.jumpserver.org/pypi/simple/cryptography/cryptography-41.0.2-cp311-cp311-linux_loongarch64.whl; \
-    fi \
-    && pip install poetry -i ${PIP_MIRROR}
-
-RUN --mount=type=cache,target=/root/.cache \
-    --mount=type=cache,target=/root/.cargo \
-    set -ex \
+    && pip install poetry -i ${PIP_MIRROR} \
     && poetry config virtualenvs.create false \
     && poetry install
 
