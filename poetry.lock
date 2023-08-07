@@ -463,7 +463,9 @@ version = "2.14.1"
 description = "Radically simple IT automation"
 optional = false
 python-versions = ">=3.9"
-files = []
+files = [
+    {file = "ansible-2.14.1.2.zip", hash = "sha256:813b39d8e03d5ea23b47703b3ba4d0372f68141b33e2b1be28deb6ad28b31c73"},
+]
 
 [package.dependencies]
 cryptography = "*"
@@ -1821,7 +1823,9 @@ version = "4.3.0"
 description = ""
 optional = false
 python-versions = ">=3.7"
-files = []
+files = [
+    {file = "django-cas-ng-4.3.1.zip", hash = "sha256:c3c068b979927333475fb82b8f3597210384ca9ba764496874fc532463d40e3d"},
+]
 
 [package.dependencies]
 Django = ">=2.2"
@@ -1953,7 +1957,9 @@ version = "1.4.0"
 description = "Django authentication backend for RADIUS"
 optional = false
 python-versions = "*"
-files = []
+files = [
+    {file = "1.5.0.zip", hash = "sha256:b50680dd1c577a099f90d510856b3e55aa496d8c876beabb5b0a79fc94fcfae9"},
+]
 
 [package.dependencies]
 pyrad = ">=1.2,<2.2 || >2.2"
@@ -5141,13 +5147,13 @@ reference = "tsinghua"
 
 [[package]]
 name = "pygments"
-version = "2.15.1"
+version = "2.16.1"
 description = "Pygments is a syntax highlighting package written in Python."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "Pygments-2.15.1-py3-none-any.whl", hash = "sha256:db2db3deb4b4179f399a09054b023b6a586b76499d36965813c71aa8ed7b5fd1"},
-    {file = "Pygments-2.15.1.tar.gz", hash = "sha256:8ace4d3c1dd481894b2005f560ead0f9f19ee64fe983366be1a21e171d12775c"},
+    {file = "Pygments-2.16.1-py3-none-any.whl", hash = "sha256:13fc09fa63bc8d8671a6d247e1eb303c4b343eaee81d861f3404db2935653692"},
+    {file = "Pygments-2.16.1.tar.gz", hash = "sha256:1daff0494820c69bc8941e407aa20f577374ee88364ee10a98fdbe0aece96e29"},
 ]
 
 [package.extras]
