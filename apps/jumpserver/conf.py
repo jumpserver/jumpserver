@@ -453,7 +453,6 @@ class Config(dict):
         'TERMINAL_ASSET_LIST_PAGE_SIZE': 'auto',
         'TERMINAL_SESSION_KEEP_DURATION': 200,
         'TERMINAL_HOST_KEY': '',
-        'TERMINAL_TELNET_REGEX': '',
         'TERMINAL_COMMAND_STORAGE': {},
         # Luna 页面
         # 默认图形化分辨率
@@ -492,6 +491,7 @@ class Config(dict):
         'SECURITY_LUNA_REMEMBER_AUTH': True,
         'SECURITY_WATERMARK_ENABLED': True,
         'SECURITY_MFA_VERIFY_TTL': 3600,
+        'SECURITY_UNCOMMON_USERS_TTL': 30,
         'VERIFY_CODE_TTL': 60,
         'SECURITY_SESSION_SHARE': True,
         'SECURITY_CHECK_DIFFERENT_CITY_LOGIN': True,
@@ -558,6 +558,7 @@ class Config(dict):
         'TICKET_AUTHORIZE_DEFAULT_TIME': 7,
         'TICKET_AUTHORIZE_DEFAULT_TIME_UNIT': 'day',
         'PERIOD_TASK_ENABLED': True,
+        'TERMINAL_TELNET_REGEX': '',
 
         # 导航栏 帮助
         'HELP_DOCUMENT_URL': 'https://docs.jumpserver.org/zh/v3/',
@@ -571,6 +572,9 @@ class Config(dict):
 
         # FTP 文件上传下载备份阈值，单位(M)，当值小于等于0时，不备份
         'FTP_FILE_MAX_STORE': 100,
+
+        # API 请求次数限制
+        'MAX_LIMIT_PER_PAGE': 100
     }
 
     old_config_map = {

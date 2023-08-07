@@ -88,3 +88,9 @@ class SessionType(TextChoices):
 class ActionPermission(TextChoices):
     readonly = "readonly", _('Read Only')
     writable = "writable", _('Writable')
+
+
+class TaskNameType(TextChoices):
+    kill_session = "kill_session", _('Kill Session')
+    lock_session = "lock_session", _('Lock Session')
+    unlock_session = "unlock_session", _('Unlock Session')

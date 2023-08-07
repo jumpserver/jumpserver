@@ -22,9 +22,13 @@ logger = get_logger(__file__)
 
 class AccountBackupAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
     types = models.JSONField(default=list)
-    recipients = models.ManyToManyField(
-        'users.User', related_name='recipient_escape_route_plans', blank=True,
-        verbose_name=_("Recipient")
+    recipients_part_one = models.ManyToManyField(
+        'users.User', related_name='recipient_part_one_plans', blank=True,
+        verbose_name=_("Recipient part one")
+    )
+    recipients_part_two = models.ManyToManyField(
+        'users.User', related_name='recipient_part_two_plans', blank=True,
+        verbose_name=_("Recipient part two")
     )
 
     def __str__(self):
@@ -52,9 +56,13 @@ class AccountBackupAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
             'org_id': self.org_id,
             'created_by': self.created_by,
             'types': self.types,
-            'recipients': {
-                str(recipient.id): (str(recipient), bool(recipient.secret_key))
-                for recipient in self.recipients.all()
+            'recipients_part_one': {
+                str(user.id): (str(user), bool(user.secret_key))
+                for user in self.recipients_part_one.all()
+            },
+            'recipients_part_two': {
+                str(user.id): (str(user), bool(user.secret_key))
+                for user in self.recipients_part_two.all()
             }
         }
 
@@ -68,7 +76,7 @@ class AccountBackupAutomation(PeriodTaskModelMixin, JMSOrgBaseModel):
         except AttributeError:
             hid = str(uuid.uuid4())
         execution = AccountBackupExecution.objects.create(
-            id=hid, plan=self, plan_snapshot=self.to_attr_json(), trigger=trigger
+            id=hid, plan=self, snapshot=self.to_attr_json(), trigger=trigger
         )
         return execution.start()
 
@@ -85,7 +93,7 @@ class AccountBackupExecution(OrgModelMixin):
     timedelta = models.FloatField(
         default=0.0, verbose_name=_('Time'), null=True
     )
-    plan_snapshot = models.JSONField(
+    snapshot = models.JSONField(
         encoder=ModelJSONFieldEncoder, default=dict,
         blank=True, null=True, verbose_name=_('Account backup snapshot')
     )
@@ -108,15 +116,8 @@ class AccountBackupExecution(OrgModelMixin):
 
     @property
     def types(self):
-        types = self.plan_snapshot.get('types')
+        types = self.snapshot.get('types')
         return types
-
-    @property
-    def recipients(self):
-        recipients = self.plan_snapshot.get('recipients')
-        if not recipients:
-            return []
-        return recipients.values()
 
     @lazyproperty
     def backup_accounts(self):

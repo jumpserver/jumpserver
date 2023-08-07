@@ -85,4 +85,8 @@ class VaultModelMixin(models.Model):
 
     def save(self, *args, **kwargs):
         """ 通过 post_save signal 处理 _secret 数据 """
+        update_fields = kwargs.get('update_fields')
+        if update_fields and 'secret' in update_fields:
+            update_fields.remove('secret')
+            update_fields.append('_secret')
         return super().save(*args, **kwargs)

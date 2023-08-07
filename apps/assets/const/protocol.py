@@ -81,6 +81,26 @@ class Protocol(ChoicesMixin, models.TextChoices):
             cls.telnet: {
                 'port': 23,
                 'secret_types': ['password'],
+                'setting': {
+                    'username_prompt': {
+                        'type': 'str',
+                        'default': 'username:|login:',
+                        'label': _('Username prompt'),
+                        'help_text': _('We will send username when we see this prompt')
+                    },
+                    'password_prompt': {
+                        'type': 'str',
+                        'default': 'password:',
+                        'label': _('Password prompt'),
+                        'help_text': _('We will send password when we see this prompt')
+                    },
+                    'success_prompt': {
+                        'type': 'str',
+                        'default': 'success|成功|#|>|\$',
+                        'label': _('Success prompt'),
+                        'help_text': _('We will consider login success when we see this prompt')
+                    }
+                }
             },
             cls.winrm: {
                 'port': 5985,
@@ -174,6 +194,15 @@ class Protocol(ChoicesMixin, models.TextChoices):
                 'port_from_addr': True,
                 'secret_types': ['password'],
                 'setting': {
+                    'safe_mode': {
+                        'type': 'bool',
+                        'default': False,
+                        'label': _('Safe mode'),
+                        'help_text': _(
+                            'When safe mode is enabled, some operations will be disabled, such as: '
+                            'New tab, right click, visit other website, etc.'
+                        )
+                    },
                     'autofill': {
                         'label': _('Autofill'),
                         'type': 'choice',

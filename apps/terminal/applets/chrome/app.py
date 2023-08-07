@@ -221,10 +221,6 @@ def default_chrome_driver_options():
     options.add_argument('--ignore-certificate-errors-spki-list')
     options.add_argument('--allow-running-insecure-content')
 
-    # 加载 extensions
-    extension_paths = load_extensions()
-    for extension_path in extension_paths:
-        options.add_argument('--load-extension={}'.format(extension_path))
     # 禁用开发者工具
     options.add_argument("--disable-dev-tools")
     # 禁用 密码管理器弹窗
@@ -248,6 +244,12 @@ class AppletApplication(BaseApplication):
         self._chrome_options = default_chrome_driver_options()
         self._chrome_options.add_argument("--app={}".format(self.asset.address))
         self._chrome_options.add_argument("--user-data-dir={}".format(self._tmp_user_dir.name))
+        protocol_setting = self.platform.get_protocol_setting(self.protocol)
+        if protocol_setting and protocol_setting.safe_mode:
+            # 加载 extensions
+            extension_paths = load_extensions()
+            for extension_path in extension_paths:
+                self._chrome_options.add_argument('--load-extension={}'.format(extension_path))
 
     @wrapper_progress_bar
     def run(self):

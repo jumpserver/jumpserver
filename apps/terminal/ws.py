@@ -7,8 +7,8 @@ from rest_framework.renderers import JSONRenderer
 from common.db.utils import safe_db_connection
 from common.utils import get_logger
 from common.utils.connection import Subscription
-from terminal.models import Terminal
-from terminal.models import Session
+from terminal.const import TaskNameType
+from terminal.models import Session, Terminal
 from terminal.serializers import TaskSerializer, StatSerializer
 from .signal_handlers import component_event_chan
 
@@ -45,7 +45,7 @@ class TerminalTaskWebsocket(JsonWebsocketConsumer):
         with safe_db_connection():
             serializer.save()
 
-    def send_kill_tasks_msg(self, task_id=None):
+    def send_tasks_msg(self, task_id=None):
         content = self.get_terminal_tasks(task_id)
         self.send(bytes_data=content)
 
@@ -60,7 +60,7 @@ class TerminalTaskWebsocket(JsonWebsocketConsumer):
 
     def watch_component_event(self):
         # 先发一次已有的任务
-        self.send_kill_tasks_msg()
+        self.send_tasks_msg()
 
         ws = self
 
@@ -68,8 +68,8 @@ class TerminalTaskWebsocket(JsonWebsocketConsumer):
             logger.debug('New component task msg recv: {}'.format(msg))
             msg_type = msg.get('type')
             payload = msg.get('payload')
-            if msg_type == "kill_session":
-                ws.send_kill_tasks_msg(payload.get('id'))
+            if msg_type in TaskNameType.names:
+                ws.send_tasks_msg(payload.get('id'))
 
         return component_event_chan.subscribe(handle_task_msg_recv)
 

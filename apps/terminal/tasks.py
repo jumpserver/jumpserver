@@ -98,12 +98,13 @@ def run_applet_host_deployment(did):
 
 @shared_task(
     verbose_name=_('Install applet'),
-    activity_callback=lambda self, did, applet_id, *args, **kwargs: ([did],)
+    activity_callback=lambda self, ids, applet_id, *args, **kwargs: (ids,)
 )
-def run_applet_host_deployment_install_applet(did, applet_id):
+def run_applet_host_deployment_install_applet(ids, applet_id):
     with tmp_to_builtin_org(system=1):
-        deployment = AppletHostDeployment.objects.get(id=did)
-        deployment.install_applet(applet_id)
+        for did in ids:
+            deployment = AppletHostDeployment.objects.get(id=did)
+            deployment.install_applet(applet_id)
 
 
 @shared_task(

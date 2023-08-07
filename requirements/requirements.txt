@@ -68,6 +68,7 @@ pyjwkest==1.4.2
 jsonfield2==4.0.0.post0
 geoip2==4.7.0
 ipip-ipdb==1.6.1
+IPy==1.1
 pywinrm==0.4.3
 python-nmap==0.7.1
 # Django environment
@@ -93,6 +94,7 @@ openapi-codec==1.3.2
 Pillow==10.0.0
 pytz==2023.3
 # Runtime
+netifaces==0.11.0
 django-proxy==1.2.2
 channels-redis==4.1.0
 python-daemon==3.0.1
@@ -104,7 +106,6 @@ flower==2.0.0
 django-celery-beat==2.5.0
 kombu==5.3.1
 uvicorn==0.22.0
-uvicorn[standard]==0.22.0
 websockets==11.0.3
 # Auth
 python-ldap==3.4.3
