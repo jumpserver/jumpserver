@@ -140,6 +140,7 @@ pympler = "1.0.1"
 hvac = "1.1.1"
 pyhcl = "0.4.4"
 ipy = "1.1"
+netifaces = "^0.11.0"
 
 
 [tool.poetry.group.dev.dependencies]
