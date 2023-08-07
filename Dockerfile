@@ -30,7 +30,6 @@ ARG TOOLS="                           \
         git-lfs                       \
         unzip                         \
         xz-utils                      \
-        nmap                          \
         wget"
 
 ARG APT_MIRROR=http://mirrors.ustc.edu.cn
@@ -92,6 +91,7 @@ ARG TOOLS="                           \
         telnet                        \
         unzip                         \
         vim                           \
+        nmap                          \
         wget"
 
 ARG APT_MIRROR=http://mirrors.ustc.edu.cn
