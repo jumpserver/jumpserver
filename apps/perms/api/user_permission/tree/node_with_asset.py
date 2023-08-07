@@ -188,6 +188,8 @@ class UserPermedNodeChildrenWithAssetsAsCategoryTreeApi(
             _type = meta.get('_type')
             if _type:
                 node['type'] = _type
+            meta.setdefault('data', {})
+            node['meta'] = meta
             nodes.append(node)
 
         if not self.is_sync:
