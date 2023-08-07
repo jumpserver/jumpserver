@@ -8,6 +8,7 @@ import string
 import uuid
 from typing import Callable
 
+import sshpubkeys
 from django.conf import settings
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import AbstractUser
@@ -105,7 +106,6 @@ class AuthMixin:
                 return ''
 
         if self.public_key:
-            import sshpubkeys
             try:
                 return sshpubkeys.SSHKey(self.public_key)
             except (TabError, TypeError):
@@ -153,21 +153,21 @@ class AuthMixin:
         return False
 
     @staticmethod
-    def get_public_key_body(key):
-        for i in key.split():
-            if len(i) > 256:
-                return i
-        return key
+    def get_public_key_md5(key):
+        try:
+            key_obj = sshpubkeys.SSHKey(key)
+            return key_obj.hash_md5()
+        except Exception as e:
+            return ''
 
     def check_public_key(self, key):
         if not self.public_key:
             return False
-        key = self.get_public_key_body(key)
-        key_saved = self.get_public_key_body(self.public_key)
-        if key == key_saved:
-            return True
-        else:
+        key_md5 = self.get_public_key_md5(key)
+        if not key_md5:
             return False
+        self_key_md5 = self.get_public_key_md5(self.public_key)
+        return key_md5 == self_key_md5
 
 
 class RoleManager(models.Manager):
