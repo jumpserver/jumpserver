@@ -190,6 +190,11 @@ class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSeri
         required=True, label=_('Session share'),
         help_text=_("Enabled, Allows user active session to be shared with other users")
     )
+    SECURITY_UNCOMMON_USERS_TTL = serializers.IntegerField(
+        min_value=30, max_value=99999, required=False,
+        label=_('Unused user timeout (day)'),
+        help_text=_("Detect infrequent users daily and disable them if they exceed the predetermined time limit.")
+    )
     SECURITY_CHECK_DIFFERENT_CITY_LOGIN = serializers.BooleanField(
         required=False, label=_('Remote Login Protection'),
         help_text=_(
