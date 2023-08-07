@@ -117,6 +117,14 @@ class RoleBinding(JMSBaseModel):
         return default_system_orgs | orgs.exclude(id__in=default_system_org_ids).order_by('name')
 
     @classmethod
+    def get_user_joined_orgs(cls, user):
+        from orgs.models import Organization
+        org_ids = cls.objects.filter(user=user, scope=Scope.org) \
+            .values_list('org', flat=True) \
+            .distinct()
+        return Organization.objects.filter(id__in=org_ids)
+
+    @classmethod
     def get_user_has_the_perm_orgs(cls, perm, user):
         from orgs.models import Organization
 

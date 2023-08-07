@@ -6,7 +6,7 @@ from assets.models.base import AbsConnectivity
 from common.utils import lazyproperty
 from .base import BaseAccount
 from .mixins import VaultModelMixin
-from ..const import AliasAccount, Source
+from ..const import Source
 
 __all__ = ['Account', 'AccountHistoricalRecords']
 
@@ -86,29 +86,6 @@ class Account(AbsConnectivity, BaseAccount):
     @lazyproperty
     def has_secret(self):
         return bool(self.secret)
-
-    @classmethod
-    def get_special_account(cls, name):
-        if name == AliasAccount.INPUT.value:
-            return cls.get_manual_account()
-        elif name == AliasAccount.ANON.value:
-            return cls.get_anonymous_account()
-        else:
-            return cls(name=name, username=name, secret=None)
-
-    @classmethod
-    def get_manual_account(cls):
-        """ @INPUT 手动登录的账号(any) """
-        return cls(name=AliasAccount.INPUT.label, username=AliasAccount.INPUT.value, secret=None)
-
-    @classmethod
-    def get_anonymous_account(cls):
-        return cls(name=AliasAccount.ANON.label, username=AliasAccount.ANON.value, secret=None)
-
-    @classmethod
-    def get_user_account(cls):
-        """ @USER 动态用户的账号(self) """
-        return cls(name=AliasAccount.USER.label, username=AliasAccount.USER.value, secret=None)
 
     @lazyproperty
     def versions(self):

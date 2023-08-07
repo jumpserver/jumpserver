@@ -6,6 +6,8 @@ from orgs.mixins.models import JMSOrgBaseModel
 
 __all__ = ['VirtualAccount']
 
+from orgs.utils import tmp_to_org
+
 
 class VirtualAccount(JMSOrgBaseModel):
     alias = models.CharField(max_length=128, choices=AliasAccount.virtual_choices(), verbose_name=_('Alias'), )
@@ -49,3 +51,53 @@ class VirtualAccount(JMSOrgBaseModel):
             accounts = [cls(alias=alias) for alias in need_created]
             cls.objects.bulk_create(accounts, ignore_conflicts=True)
         return cls.objects.all()
+
+    @classmethod
+    def get_special_account(cls, alias, user, asset, input_username='', input_secret='', from_permed=True):
+        if alias == AliasAccount.INPUT.value:
+            account = cls.get_manual_account(input_username, input_secret, from_permed)
+        elif alias == AliasAccount.ANON.value:
+            account = cls.get_anonymous_account()
+        elif alias == AliasAccount.USER.value:
+            account = cls.get_same_account(user, asset, input_secret=input_secret, from_permed=from_permed)
+        else:
+            account = cls(name=alias, username=alias, secret=None)
+        account.alias = alias
+        if asset:
+            account.asset = asset
+            account.org_id = asset.org_id
+        return account
+
+    @classmethod
+    def get_manual_account(cls, input_username='', input_secret='', from_permed=True):
+        """ @INPUT 手动登录的账号(any) """
+        from .account import Account
+        if from_permed:
+            username = AliasAccount.INPUT.value
+            secret = ''
+        else:
+            username = input_username
+            secret = input_secret
+        return Account(name=AliasAccount.INPUT.label, username=username, secret=secret)
+
+    @classmethod
+    def get_anonymous_account(cls):
+        from .account import Account
+        return Account(name=AliasAccount.ANON.label, username=AliasAccount.ANON.value, secret=None)
+
+    @classmethod
+    def get_same_account(cls, user, asset, input_secret='', from_permed=True):
+        """ @USER 动态用户的账号(self) """
+        from .account import Account
+        username = user.username
+
+        with tmp_to_org(asset.org):
+            same_account = cls.objects.filter(alias='@USER').first()
+
+        secret = ''
+        if same_account and same_account.secret_from_login:
+            secret = user.get_cached_password_if_has()
+
+        if not secret and not from_permed:
+            secret = input_secret
+        return Account(name=AliasAccount.USER.label, username=username, secret=secret)

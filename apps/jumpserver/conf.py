@@ -257,6 +257,10 @@ class Config(dict):
         'VAULT_HCP_TOKEN': '',
         'VAULT_HCP_MOUNT_POINT': 'jumpserver',
 
+        # Cache login password
+        'CACHE_LOGIN_PASSWORD_ENABLED': False,
+        'CACHE_LOGIN_PASSWORD_TTL': 60 * 60 * 24,
+
         # Auth LDAP settings
         'AUTH_LDAP': False,
         'AUTH_LDAP_SERVER_URI': 'ldap://localhost:389',

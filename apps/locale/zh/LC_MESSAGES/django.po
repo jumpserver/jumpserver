@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-04 16:12+0800\n"
+"POT-Creation-Date: 2023-08-07 10:17+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -757,6 +757,10 @@ msgstr ""
 #: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:111
 msgid "Comment"
 msgstr "备注"
+
+#: accounts/serializers/account/virtual.py:22
+msgid "Current only support login from AD/LDAP"
+msgstr "当前仅支持 AD/LDAP 方式登录的用户"
 
 #: accounts/serializers/automations/base.py:23
 #: assets/models/asset/common.py:155 assets/models/automations/base.py:18

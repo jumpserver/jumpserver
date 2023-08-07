@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-04 16:12+0800\n"
+"POT-Creation-Date: 2023-08-07 10:17+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -762,6 +762,10 @@ msgstr ""
 #: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:111
 msgid "Comment"
 msgstr "コメント"
+
+#: accounts/serializers/account/virtual.py:22
+msgid "Current only support login from AD/LDAP"
+msgstr "現在、AD/LDAPからのログインのみサポートしています"
 
 #: accounts/serializers/automations/base.py:23
 #: assets/models/asset/common.py:155 assets/models/automations/base.py:18
