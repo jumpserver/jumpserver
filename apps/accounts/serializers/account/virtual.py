@@ -14,10 +14,11 @@ class VirtualAccountSerializer(serializers.ModelSerializer):
         fields = field_mini + [
             'secret_from_login',
         ] + common_fields
-        read_only_fields = ['username'] + common_fields
+        read_only_fields = common_fields + common_fields
         extra_kwargs = {
             'comment': {'label': _('Comment')},
             'name': {'label': _('Name')},
             'username': {'label': _('Username')},
             'secret_from_login': {'help_text': _('Current only support login from AD/LDAP')},
+            'alias': {'required': False},
         }
