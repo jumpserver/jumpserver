@@ -167,6 +167,11 @@ class SecuritySettingSerializer(SecurityPasswordRuleSerializer, SecurityAuthSeri
         label=_('Connection max idle time (minute)'),
         help_text=_('If idle time more than it, disconnect connection.')
     )
+    SECURITY_MAX_SESSION_TIME = serializers.IntegerField(
+        min_value=1, max_value=99999, required=False,
+        label=_('Session max connection time (hour)'),
+        help_text=_('If session connection time more than it, disconnect connection.')
+    )
     SECURITY_LUNA_REMEMBER_AUTH = serializers.BooleanField(
         label=_("Remember manual auth")
     )
