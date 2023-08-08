@@ -12,7 +12,7 @@ class VirtualAccountViewSet(OrgBulkModelViewSet):
     filterset_fields = ('alias',)
 
     def get_queryset(self):
-        return VirtualAccount.get_or_create_queryset()
+        return VirtualAccount.get_or_init_queryset()
 
     def get_object(self, ):
         pk = self.kwargs.get('pk')

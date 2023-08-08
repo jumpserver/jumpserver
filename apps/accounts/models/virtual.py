@@ -32,17 +32,17 @@ class VirtualAccount(JMSOrgBaseModel):
 
     @property
     def comment(self):
-        comments = {
+        comments_map = {
             AliasAccount.INPUT: _('Non-asset account, Input username/password on connect'),
             AliasAccount.USER: _('The account username name same with user on connect'),
             AliasAccount.ANON: _('Connect asset without using a username and password, '
                                  'and it only supports web-based and custom-type assets'),
         }
-        comments = {str(k): v for k, v in comments.items()}
-        return comments.get(self.alias, '')
+        comments_map = {str(k): v for k, v in comments_map.items()}
+        return comments_map.get(self.alias, '')
 
     @classmethod
-    def get_or_create_queryset(cls):
+    def get_or_init_queryset(cls):
         aliases = [i[0] for i in AliasAccount.virtual_choices()]
         alias_created = cls.objects.all().values_list('alias', flat=True)
         need_created = set(aliases) - set(alias_created)
