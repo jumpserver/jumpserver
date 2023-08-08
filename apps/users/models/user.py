@@ -44,6 +44,8 @@ class AuthMixin:
     set_password: Callable
     save: Callable
     history_passwords: models.Manager
+    sect_cache_tpl = 'user_sect_{}'
+    id: str | uuid.UUID
 
     @property
     def password_raw(self):
@@ -168,6 +170,33 @@ class AuthMixin:
             return False
         self_key_md5 = self.get_public_key_md5(self.public_key)
         return key_md5 == self_key_md5
+
+    def cache_login_password_if_need(self, password):
+        from common.utils import signer
+        if not settings.CACHE_LOGIN_PASSWORD_ENABLED:
+            return
+        backend = getattr(self, 'backend', '')
+        if backend.lower().find('ldap') < 0:
+            return
+        if not password:
+            return
+        key = self.sect_cache_tpl.format(self.id)
+        ttl = settings.CACHE_LOGIN_PASSWORD_TTL
+        if not isinstance(ttl, int) or ttl <= 0:
+            return
+        secret = signer.sign(password)
+        cache.set(key, secret, ttl)
+
+    def get_cached_password_if_has(self):
+        from common.utils import signer
+        if not settings.CACHE_LOGIN_PASSWORD_ENABLED:
+            return ''
+        key = self.sect_cache_tpl.format(self.id)
+        secret = cache.get(key)
+        if not secret:
+            return ''
+        password = signer.unsign(secret)
+        return password
 
 
 class RoleManager(models.Manager):
@@ -358,6 +387,11 @@ class RoleMixin:
     @lazyproperty
     def workbench_orgs(self):
         return self.cached_orgs['workbench_orgs']
+
+    @lazyproperty
+    def joined_orgs(self):
+        from rbac.models import RoleBinding
+        return RoleBinding.get_user_joined_orgs(self)
 
     @lazyproperty
     def cached_orgs(self):

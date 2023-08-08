@@ -169,6 +169,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
             "is_active": {"label": _("Is active")},
             "is_valid": {"label": _("Is valid")},
             "is_service_account": {"label": _("Is service account")},
+            "is_org_admin": {"label": _("Is org admin")},
             "is_expired": {"label": _("Is expired")},
             "avatar_url": {"label": _("Avatar url")},
             "created_by": {"read_only": True, "allow_blank": True},

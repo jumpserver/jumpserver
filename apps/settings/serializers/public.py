@@ -52,6 +52,7 @@ class PrivateSettingSerializer(PublicSettingSerializer):
 
     TICKETS_ENABLED = serializers.BooleanField()
     CONNECTION_TOKEN_REUSABLE = serializers.BooleanField()
+    CACHE_LOGIN_PASSWORD_ENABLED = serializers.BooleanField()
 
 
 class ServerInfoSerializer(serializers.Serializer):

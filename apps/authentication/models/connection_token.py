@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import PermissionDenied
 
-from accounts.const import AliasAccount
+from accounts.models import VirtualAccount
 from assets.const import Protocol
 from assets.const.host import GATEWAY_NAME
 from common.db.fields import EncryptTextField
@@ -216,29 +216,14 @@ class ConnectionToken(JMSOrgBaseModel):
 
     @lazyproperty
     def account_object(self):
-        from accounts.models import Account
         if not self.asset:
             return None
 
         if self.account.startswith('@'):
-            account = Account.get_special_account(self.account)
-            account.asset = self.asset
-            account.org_id = self.asset.org_id
-
-            # 手动账号
-            if self.account == AliasAccount.INPUT:
-                account.username = self.input_username
-                account.secret = self.input_secret
-
-            # 同名账号
-            elif self.account == AliasAccount.USER:
-                account.username = self.user.username
-                account.secret = self.input_secret
-
-            # 匿名账号
-            elif self.account == AliasAccount.ANON:
-                account.username = ''
-                account.secret = ''
+            account = VirtualAccount.get_special_account(
+                self.account, self.user, self.asset, input_username=self.input_username,
+                input_secret=self.input_secret, from_permed=False
+            )
         else:
             account = self.asset.accounts.filter(name=self.account).first()
             if not account.secret and self.input_secret:

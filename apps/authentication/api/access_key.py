@@ -2,12 +2,13 @@
 #
 
 from rest_framework.viewsets import ModelViewSet
-from .. import serializers
+
 from rbac.permissions import RBACPermission
+from ..serializers import AccessKeySerializer
 
 
 class AccessKeyViewSet(ModelViewSet):
-    serializer_class = serializers.AccessKeySerializer
+    serializer_class = AccessKeySerializer
     search_fields = ['^id', '^secret']
     permission_classes = [RBACPermission]
 
