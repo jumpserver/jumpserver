@@ -19,6 +19,8 @@ class VirtualAccountSerializer(serializers.ModelSerializer):
             'comment': {'label': _('Comment')},
             'name': {'label': _('Name')},
             'username': {'label': _('Username')},
-            'secret_from_login': {'help_text': _('Current only support login from AD/LDAP')},
+            'secret_from_login': {'help_text': _('Current only support login from AD/LDAP. Secret priority: '
+                                                 'Same account in asset secret > Login secret > Manual input')
+                                  },
             'alias': {'required': False},
         }

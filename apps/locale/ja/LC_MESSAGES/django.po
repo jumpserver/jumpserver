@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-07 19:41+0800\n"
+"POT-Creation-Date: 2023-08-08 10:08+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -776,8 +776,10 @@ msgid "Comment"
 msgstr "コメント"
 
 #: accounts/serializers/account/virtual.py:22
-msgid "Current only support login from AD/LDAP"
-msgstr "現在、AD/LDAPからのログインのみサポートしています"
+msgid ""
+"Current only support login from AD/LDAP. Secret priority: Same account in "
+"asset secret > Login secret > Manual input"
+msgstr "現在、AD/LDAPからのログインのみをサポートしています。シークレットの優先順位: 資産シークレット内の同じアカウント > ログインシークレット > 手動入力"
 
 #: accounts/serializers/automations/base.py:23
 #: assets/models/asset/common.py:155 assets/models/automations/base.py:18
@@ -8054,6 +8056,9 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:86
 msgid "Community edition"
 msgstr "コミュニティ版"
+
+#~ msgid "Current only support login from AD/LDAP"
+#~ msgstr "現在、AD/LDAPからのログインのみサポートしています"
 
 #~ msgid "SFTP enabled"
 #~ msgstr "SFTP が有効"

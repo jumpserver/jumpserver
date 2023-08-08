@@ -176,8 +176,8 @@ class AuthMixin:
         if not settings.CACHE_LOGIN_PASSWORD_ENABLED:
             return
         backend = getattr(self, 'backend', '')
-        # if backend.lower().find('ldap') < 0:
-        #     return
+        if backend.lower().find('ldap') < 0:
+            return
         if not password:
             return
         key = self.sect_cache_tpl.format(self.id)

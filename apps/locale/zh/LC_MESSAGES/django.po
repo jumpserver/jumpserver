@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-07 19:42+0800\n"
+"POT-Creation-Date: 2023-08-08 10:08+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -776,8 +776,10 @@ msgid "Comment"
 msgstr "备注"
 
 #: accounts/serializers/account/virtual.py:22
-msgid "Current only support login from AD/LDAP"
-msgstr "当前仅支持 AD/LDAP 方式登录的用户"
+msgid ""
+"Current only support login from AD/LDAP. Secret priority: Same account in "
+"asset secret > Login secret > Manual input"
+msgstr "当前仅支持 AD/LDAP 登录方式用户。 同名账号密码生效顺序: 资产上存在的同名账号密码 > 登录密码 > 手动输入"
 
 #: accounts/serializers/automations/base.py:23
 #: assets/models/asset/common.py:155 assets/models/automations/base.py:18
@@ -7944,6 +7946,9 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:86
 msgid "Community edition"
 msgstr "社区版"
+
+#~ msgid "Current only support login from AD/LDAP"
+#~ msgstr "当前仅支持 AD/LDAP 方式登录的用户"
 
 #~ msgid "SFTP enabled"
 #~ msgstr "SFTP 已启用"
