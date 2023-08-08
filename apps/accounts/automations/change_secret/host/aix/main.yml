@@ -73,20 +73,24 @@
     - name: Refresh connection
       ansible.builtin.meta: reset_connection
 
-    - name: "Verify {{ account.username }} password"
-      ansible.builtin.ping:
-      become: no
-      vars:
-        ansible_user: "{{ account.username }}"
-        ansible_password: "{{ account.secret }}"
-        ansible_become: no
+    - name: "Verify {{ account.username }} password (paramiko)"
+      ssh_ping:
+        login_user: "{{ account.username }}"
+        login_password: "{{ account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        gateway_args: "{{ jms_asset.ansible_ssh_common_args | default('') }}"
+        become: false
       when: account.secret_type == "password"
+      delegate_to: localhost
 
-    - name: "Verify {{ account.username }} SSH key"
-      ansible.builtin.ping:
-      become: no
-      vars:
-        ansible_user: "{{ account.username }}"
-        ansible_ssh_private_key_file: "{{ account.private_key_path }}"
-        ansible_become: no
+    - name: "Verify {{ account.username }} SSH KEY (paramiko)"
+      ssh_ping:
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        login_user: "{{ account.username }}"
+        login_private_key_path: "{{ account.private_key_path  }}"
+        gateway_args: "{{ jms_asset.ansible_ssh_common_args | default('') }}"
+        become: false
       when: account.secret_type == "ssh_key"
+      delegate_to: localhost

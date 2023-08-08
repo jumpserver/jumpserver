@@ -1,6 +1,8 @@
+import re
 import time
 
 import paramiko
+from sshtunnel import SSHTunnelForwarder
 
 
 def common_argument_spec():
@@ -12,6 +14,7 @@ def common_argument_spec():
         login_secret_type=dict(type='str', required=False, default='password'),
         login_private_key_path=dict(type='str', required=False, no_log=True),
         first_conn_delay_time=dict(type='float', required=False, default=0.5),
+        gateway_args=dict(type='str', required=False, default=''),
 
         become=dict(type='bool', default=False, required=False),
         become_method=dict(type='str', required=False),
@@ -27,8 +30,10 @@ class SSHClient:
         self.module = module
         self.channel = None
         self.is_connect = False
+        self.gateway_server = None
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        self.connect_params = self.get_connect_params()
 
     def get_connect_params(self):
         params = {
@@ -90,11 +95,56 @@ class SSHClient:
             err_msg = su_output
         return err_msg
 
+    def local_gateway_prepare(self):
+        gateway_args = self.module.params['gateway_args'] or ''
+        pattern = r"(?:sshpass -p ([\w@]+))?\s*ssh -o Port=(\d+)\s+-o StrictHostKeyChecking=no\s+([\w@]+)@([" \
+                  r"\d.]+)\s+-W %h:%p -q(?: -i (.+))?'"
+        match = re.search(pattern, gateway_args)
+
+        if not match:
+            return
+
+        password, port, username, address, private_key_path = match.groups()
+        password = password if password else None
+        private_key_path = private_key_path if private_key_path else None
+        remote_hostname = self.module.params['login_host']
+        remote_port = self.module.params['login_port']
+
+        server = SSHTunnelForwarder(
+            (address, int(port)),
+            ssh_username=username,
+            ssh_password=password,
+            ssh_pkey=private_key_path,
+            remote_bind_address=(remote_hostname, remote_port)
+        )
+
+        server.start()
+        self.connect_params['hostname'] = '127.0.0.1'
+        self.connect_params['port'] = server.local_bind_port
+        self.gateway_server = server
+
+    def local_gateway_clean(self):
+        gateway_server = self.gateway_server
+        if not gateway_server:
+            return
+        try:
+            gateway_server.stop()
+        except Exception:
+            pass
+
+    def before_runner_start(self):
+        self.local_gateway_prepare()
+
+    def after_runner_end(self):
+        self.local_gateway_clean()
+
     def connect(self):
         try:
-            self.client.connect(**self.get_connect_params())
+            self.before_runner_start()
+            self.client.connect(**self.connect_params)
             self.is_connect = True
             err_msg = self.switch_user()
+            self.after_runner_end()
         except Exception as err:
             err_msg = str(err)
         return err_msg
