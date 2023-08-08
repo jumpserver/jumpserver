@@ -14,6 +14,7 @@ class AccountFilterSet(BaseFilterSet):
     username = drf_filters.CharFilter(field_name="username", lookup_expr='exact')
     address = drf_filters.CharFilter(field_name="asset__address", lookup_expr='exact')
     asset_id = drf_filters.CharFilter(field_name="asset", lookup_expr='exact')
+    asset = drf_filters.CharFilter(field_name='asset', lookup_expr='exact')
     assets = drf_filters.CharFilter(field_name='asset_id', lookup_expr='exact')
     nodes = drf_filters.CharFilter(method='filter_nodes')
     node_id = drf_filters.CharFilter(method='filter_nodes')
