@@ -127,7 +127,9 @@ class JMSInventory:
                 }
                 host['jms_asset']['port'] = port
             else:
-                host.update(self.make_proxy_command(gateway))
+                ansible_ssh_common_args = self.make_proxy_command(gateway)
+                host['jms_asset'].update(ansible_ssh_common_args)
+                host.update(ansible_ssh_common_args)
 
     @staticmethod
     def get_primary_protocol(ansible_config, protocols):
