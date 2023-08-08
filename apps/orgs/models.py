@@ -16,7 +16,7 @@ class OrgRoleMixin:
     DEFAULT_NAME = _('DEFAULT')
     SYSTEM_ID = '00000000-0000-0000-0000-000000000004'
     SYSTEM_NAME = _('SYSTEM')
-    VIRTUAL_IDS = [ROOT_ID, DEFAULT_ID, SYSTEM_ID]
+    INTERNAL_IDS = [ROOT_ID, DEFAULT_ID, SYSTEM_ID]
     members: models.Manager
     id: str
 
@@ -175,7 +175,7 @@ class Organization(OrgRoleMixin, JMSBaseModel):
 
     @property
     def internal(self):
-        return str(self.id) in self.VIRTUAL_IDS
+        return str(self.id) in self.INTERNAL_IDS
 
     def change_to(self):
         from .utils import set_current_org
@@ -229,7 +229,7 @@ class Organization(OrgRoleMixin, JMSBaseModel):
             TicketFlow.objects.filter(org_id=self.id).delete()
 
     def delete(self, *args, **kwargs):
-        if str(self.id) in self.VIRTUAL_IDS:
+        if str(self.id) in self.INTERNAL_IDS:
             raise ValidationError(_('Can not delete virtual org'))
         self.delete_related_models()
         return super().delete(*args, **kwargs)
