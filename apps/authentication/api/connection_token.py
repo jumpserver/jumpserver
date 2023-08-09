@@ -148,16 +148,25 @@ class RDPFileClientProtocolURLMixin:
         if connect_method_dict is None:
             raise ValueError('Connect method not support: {}'.format(connect_method_name))
 
+        endpoint = self.get_smart_endpoint(
+            protocol=connect_method_dict['endpoint_protocol'],
+            asset=token.asset
+        )
         data = {
             'id': str(token.id),
-            'value': token.value,
+            'name': f'{endpoint.host}-{str(token.id)[:18]}',
             'protocol': token.protocol,
+            'host': endpoint.host,
+            'port': endpoint.get_port(token.asset, token.protocol),
+            'username': f'JMS-{str(token.id)}',
+            'value': token.value,
             'command': '',
             'file': {}
         }
 
         if connect_method_name == NativeClient.mstsc or connect_method_dict['type'] == 'applet':
             filename, content = self.get_rdp_file_info(token)
+            filename = urllib.parse.unquote(filename)
             data.update({
                 'protocol': 'rdp',
                 'file': {
@@ -166,10 +175,6 @@ class RDPFileClientProtocolURLMixin:
                 }
             })
         else:
-            endpoint = self.get_smart_endpoint(
-                protocol=connect_method_dict['endpoint_protocol'],
-                asset=token.asset
-            )
             cmd = NativeClient.get_launch_command(connect_method_name, token, endpoint)
             data.update({'command': cmd})
         return data
