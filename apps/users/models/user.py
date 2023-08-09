@@ -45,7 +45,7 @@ class AuthMixin:
     save: Callable
     history_passwords: models.Manager
     sect_cache_tpl = 'user_sect_{}'
-    id: str | uuid.UUID
+    id: str
 
     @property
     def password_raw(self):
