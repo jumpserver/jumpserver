@@ -126,12 +126,16 @@ class RDPFileClientProtocolURLMixin:
         return filename, content
 
     @staticmethod
-    def get_connect_filename(prefix_name):
-        prefix_name = prefix_name.replace('/', '_')
-        prefix_name = prefix_name.replace('\\', '_')
-        prefix_name = prefix_name.replace('.', '_')
+    def escape_name(name):
+        name = name.replace('/', '_')
+        name = name.replace('\\', '_')
+        name = name.replace('.', '_')
+        name = urllib.parse.quote(name)
+        return name
+
+    def get_connect_filename(self, prefix_name):
         filename = f'{prefix_name}-jumpserver'
-        filename = urllib.parse.quote(filename)
+        filename = self.escape_name(filename)
         return filename
 
     @staticmethod
@@ -145,28 +149,29 @@ class RDPFileClientProtocolURLMixin:
         connect_method_dict = ConnectMethodUtil.get_connect_method(
             token.connect_method, token.protocol, _os
         )
+        asset = token.asset
         if connect_method_dict is None:
             raise ValueError('Connect method not support: {}'.format(connect_method_name))
 
-        endpoint = self.get_smart_endpoint(
-            protocol=connect_method_dict['endpoint_protocol'],
-            asset=token.asset
-        )
+        account = token.account or token.input_username
+        datetime = timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H:%M:%S')
+        name = account + '@' + str(asset) + '[' + datetime + ']'
         data = {
-            'id': str(token.id),
-            'name': f'{endpoint.host}-{str(token.id)[:18]}',
+            'version': 2,
+            'id': str(token.id),  # 兼容老的，未来几个版本删掉
+            'value': token.value,  # 兼容老的，未来几个版本删掉
+            'name': self.escape_name(name),
             'protocol': token.protocol,
-            'host': endpoint.host,
-            'port': endpoint.get_port(token.asset, token.protocol),
-            'username': f'JMS-{str(token.id)}',
-            'value': token.value,
-            'command': '',
-            'file': {}
+            'token': {
+                'id': str(token.id),
+                'value': token.value,
+            },
+            'file': {},
+            'command': ''
         }
 
         if connect_method_name == NativeClient.mstsc or connect_method_dict['type'] == 'applet':
             filename, content = self.get_rdp_file_info(token)
-            filename = urllib.parse.unquote(filename)
             data.update({
                 'protocol': 'rdp',
                 'file': {
@@ -175,8 +180,26 @@ class RDPFileClientProtocolURLMixin:
                 }
             })
         else:
-            cmd = NativeClient.get_launch_command(connect_method_name, token, endpoint)
-            data.update({'command': cmd})
+            endpoint = self.get_smart_endpoint(
+                protocol=connect_method_dict['endpoint_protocol'],
+                asset=asset
+            )
+            data.update({
+                'asset': {
+                    'id': str(asset.id),
+                    'category': asset.category,
+                    'type': asset.type,
+                    'name': asset.name,
+                    'address': asset.address,
+                    'info': {
+                        **asset.spec_info,
+                    }
+                },
+                'endpoint': {
+                    'host': endpoint.host,
+                    'port': endpoint.get_port(token.asset, token.protocol),
+                }
+            })
         return data
 
     def get_smart_endpoint(self, protocol, asset=None):

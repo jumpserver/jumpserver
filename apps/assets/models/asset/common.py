@@ -221,8 +221,11 @@ class Asset(NodesRelationMixin, AbsConnectivity, JSONFilterMixin, JMSOrgBaseMode
         return self.address
 
     def get_target_ssh_port(self):
-        protocol = self.protocols.all().filter(name='ssh').first()
-        return protocol.port if protocol else 22
+        return self.get_protocol_port('ssh')
+
+    def get_protocol_port(self, protocol):
+        protocol = self.protocols.all().filter(name=protocol).first()
+        return protocol.port if protocol else 0
 
     @property
     def is_valid(self):

@@ -26,34 +26,29 @@ class WebMethod(TextChoices):
 
 class NativeClient(TextChoices):
     # Koko
-    ssh = 'ssh', 'SSH CLI'
-    sftp = 'sftp', 'SFTP CLI'
-    putty = 'putty', 'PuTTY'
-    xshell = 'xshell', 'Xshell'
-
+    ssh_client = 'ssh_client', _('SSH Client')
+    ssh_guide = 'ssh_guide', _('SSH Guide')
+    sftp_client = 'sftp_client', _('SFTP Client')
     # Magnus
+    db_guide = 'db_guide', _('DB Guide')
     db_client = 'db_client', _('DB Client')
-
     # Razor
-    mstsc = 'mstsc', 'Remote Desktop'
+    mstsc = 'mstsc', _('Remote Desktop')
 
     @classmethod
     def get_native_clients(cls):
         # native client 关注的是 endpoint 的 protocol,
         # 比如 telnet mysql, koko 都支持，到那时暴露的是 ssh 协议
         clients = {
-            Protocol.ssh: {
-                'default': [cls.ssh],
-                'windows': [cls.putty],
-            },
-            Protocol.sftp: [cls.sftp],
+            Protocol.ssh: [cls.ssh_client, cls.ssh_guide],
+            Protocol.sftp: [cls.sftp_client],
             Protocol.rdp: [cls.mstsc],
-            Protocol.mysql: [cls.db_client],
-            Protocol.mariadb: [cls.db_client],
-            Protocol.redis: [cls.db_client],
-            Protocol.mongodb: [cls.db_client],
-            Protocol.oracle: [cls.db_client],
-            Protocol.postgresql: [cls.db_client],
+            Protocol.mysql: [cls.db_client, cls.db_guide],
+            Protocol.mariadb: [cls.db_client, cls.db_guide],
+            Protocol.redis: [cls.db_client, cls.db_guide],
+            Protocol.mongodb: [cls.db_client, cls.db_guide],
+            Protocol.oracle: [cls.db_client, cls.db_guide],
+            Protocol.postgresql: [cls.db_client, cls.db_guide],
         }
         return clients
 
@@ -96,28 +91,6 @@ class NativeClient(TextChoices):
                     'type': 'native',
                 })
         return methods
-
-    @classmethod
-    def get_launch_command(cls, name, token, endpoint, os='windows'):
-        username = f'JMS-{token.id}'
-        commands = {
-            cls.ssh: f'ssh {username}@{endpoint.host} -p {endpoint.ssh_port}',
-            cls.sftp: f'sftp {username}@{endpoint.host} -P {endpoint.ssh_port}',
-            cls.putty: f'putty.exe -ssh {username}@{endpoint.host} -P {endpoint.ssh_port}',
-            cls.xshell: f'xshell.exe -url ssh://{username}:{token.value}@{endpoint.host}:{endpoint.ssh_port}',
-            # 前端自己处理了
-            # cls.mysql: 'mysql -h {hostname} -P {port} -u {username} -p',
-            # cls.psql: {
-            #     'default': 'psql -h {hostname} -p {port} -U {username} -W',
-            #     'windows': 'psql /h {hostname} /p {port} /U {username} -W',
-            # },
-            # cls.sqlplus: 'sqlplus {username}/{password}@{hostname}:{port}',
-            # cls.redis: 'redis-cli -h {hostname} -p {port} -a {password}',
-        }
-        command = commands.get(name)
-        if isinstance(command, dict):
-            command = command.get(os, command.get('default'))
-        return command
 
 
 class AppletMethod:
