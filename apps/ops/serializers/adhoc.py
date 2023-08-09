@@ -17,7 +17,7 @@ class AdHocExecutionSerializer(serializers.ModelSerializer):
         fields_mini = ['id']
         fields_small = fields_mini + [
             'hosts_amount', 'timedelta', 'result', 'summary', 'short_id',
-            'is_finished', 'is_success',
+            'is_finished', 'is_success', 'celery_task_id',
             'date_start', 'date_finished',
         ]
         fields_fk = ['task', 'task_display', 'adhoc', 'adhoc_short_id',]
