@@ -49,6 +49,9 @@ class Modules(models.TextChoices):
     shell = 'shell', _('Shell')
     winshell = 'win_shell', _('Powershell')
     python = 'python', _('Python')
+    mysql = 'mysql', _('MySQL')
+    postgresql = 'postgresql', _('PostgreSQL')
+    sqlserver = 'sqlserver', _('SQLServer')
 
 
 class JobStatus(models.TextChoices):
