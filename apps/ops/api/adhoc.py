@@ -24,7 +24,7 @@ __all__ = [
 
 class TaskViewSet(OrgBulkModelViewSet):
     model = Task
-    filterset_fields = ("name",)
+    filterset_fields = ("name", "adhoc__execution__celery_task_id")
     search_fields = filterset_fields
     serializer_class = TaskSerializer
 
@@ -54,6 +54,7 @@ class TaskRun(generics.RetrieveAPIView):
 
 class AdHocViewSet(viewsets.ModelViewSet):
     queryset = AdHoc.objects.all()
+    filterset_fields = ('execution__celery_task_id', )
     serializer_class = AdHocSerializer
 
     def get_serializer_class(self):
