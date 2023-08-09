@@ -19,6 +19,7 @@ from simple_history.models import HistoricalRecords
 from accounts.models import Account
 from acls.models import CommandFilterACL
 from assets.models import Asset
+from common.db.encoder import ModelJSONFieldEncoder
 from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner, CommandInBlackListException
 from ops.mixin import PeriodTaskModelMixin
 from ops.variables import *
@@ -42,11 +43,35 @@ def get_parent_keys(key, include_self=True):
 
 
 class JMSPermedInventory(JMSInventory):
-    def __init__(self, assets, account_policy='privileged_first',
-                 account_prefer='root,Administrator', host_callback=None, user=None):
+    def __init__(self,
+                 assets,
+                 account_policy='privileged_first',
+                 account_prefer='root,Administrator',
+                 module=None,
+                 host_callback=None,
+                 user=None):
         super().__init__(assets, account_policy, account_prefer, host_callback, exclude_localhost=True)
         self.user = user
+        self.module = module
         self.assets_accounts_mapper = self.get_assets_accounts_mapper()
+
+    def make_account_vars(self, host, asset, account, automation, protocol, platform, gateway):
+        if not account:
+            host['error'] = _("No account available")
+            return host
+
+        if protocol.name != self.module:
+            host['error'] = "Module {} is not suitable for this asset".format(self.module)
+            return host
+
+        if protocol.name in ('mysql', 'postgresql', 'sqlserver'):
+            host['login_host'] = asset.address
+            host['login_port'] = protocol.port
+            host['login_user'] = account.username
+            host['login_password'] = account.secret
+            host['login_db'] = asset.spec_info.get('db_name', '')
+            return host
+        return super().make_account_vars(host, asset, account, automation, protocol, platform, gateway)
 
     def get_asset_sorted_accounts(self, asset):
         accounts = self.assets_accounts_mapper.get(asset.id, [])
@@ -158,7 +183,9 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
 
     @property
     def inventory(self):
-        return JMSPermedInventory(self.assets.all(), self.runas_policy, self.runas, user=self.creator)
+        return JMSPermedInventory(self.assets.all(),
+                                  self.runas_policy, self.runas,
+                                  user=self.creator, module=self.module)
 
     @property
     def material(self):
@@ -187,8 +214,8 @@ class JobExecution(JMSOrgBaseModel):
     job = models.ForeignKey(Job, on_delete=models.SET_NULL, related_name='executions', null=True)
     job_version = models.IntegerField(default=0)
     parameters = models.JSONField(default=dict, verbose_name=_('Parameters'))
-    result = models.JSONField(blank=True, null=True, verbose_name=_('Result'))
-    summary = models.JSONField(default=dict, verbose_name=_('Summary'))
+    result = models.JSONField(encoder=ModelJSONFieldEncoder, blank=True, null=True, verbose_name=_('Result'))
+    summary = models.JSONField(encoder=ModelJSONFieldEncoder, default=dict, verbose_name=_('Summary'))
     creator = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
     date_start = models.DateTimeField(null=True, verbose_name=_('Date start'), db_index=True)
@@ -256,7 +283,28 @@ class JobExecution(JMSOrgBaseModel):
             return
 
         module = self.current_job.module
-        # replace win_shell
+
+        db_modules = ('mysql', 'postgresql', 'sqlserver', 'oracle')
+        db_module_name_map = {
+            'mysql': 'community.mysql.mysql_query',
+            'postgresql': 'community.postgresql.postgresql_query',
+            'sqlserver': 'community.general.mssql_script:',
+        }
+
+        if module in db_modules:
+            module = db_module_name_map.get(module, None)
+            if not module:
+                print('not support db module: {}'.format(module))
+                raise Exception('not support db module: {}'.format(module))
+
+            login_args = "login_host={{login_host}} " \
+                         "login_user={{login_user}} " \
+                         "login_password={{login_password}} " \
+                         "login_port={{login_port}} " \
+                         "login_db={{login_db}}"
+            shell = "{} query=\"{}\" ".format(login_args, self.current_job.args)
+            return module, shell
+
         if module == 'win_shell':
             module = 'ansible.windows.win_shell'
 
@@ -284,12 +332,10 @@ class JobExecution(JMSOrgBaseModel):
             extra_vars = json.loads(self.parameters)
         else:
             extra_vars = {}
-
         static_variables = self.gather_static_variables()
         extra_vars.update(static_variables)
 
         if self.current_job.type == 'adhoc':
-
             module, args = self.compile_shell()
 
             runner = AdHocRunner(
