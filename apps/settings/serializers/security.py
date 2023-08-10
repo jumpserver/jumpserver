@@ -36,7 +36,7 @@ login_ip_limit_time_help_text = _(
 class SecurityAuthSerializer(serializers.Serializer):
     SECURITY_MFA_AUTH = serializers.ChoiceField(
         choices=(
-            [0, _('Disable')],
+            [0, _('Not enabled')],
             [1, _('All users')],
             [2, _('Only admin users')],
         ),
