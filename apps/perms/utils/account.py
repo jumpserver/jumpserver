@@ -62,7 +62,7 @@ class PermAccountUtil(AssetPermissionUtil):
             account = None
             _accounts = []
             if alias == AliasAccount.USER and user.username in username_accounts_mapper:
-                account = username_accounts_mapper[user.username]
+                _accounts = username_accounts_mapper[user.username]
             elif alias in username_accounts_mapper:
                 _accounts = username_accounts_mapper[alias]
             elif alias in ['@INPUT', '@ANON', '@USER']:
