@@ -33,7 +33,8 @@ class Applet(JMSBaseModel):
     display_name = models.CharField(max_length=128, verbose_name=_('Display name'))
     version = models.CharField(max_length=16, verbose_name=_('Version'))
     author = models.CharField(max_length=128, verbose_name=_('Author'))
-    enterprise = models.BooleanField(default=False, verbose_name=_('Enterprise'))
+    edition = models.CharField(max_length=128, choices=Edition.choices, default=Edition.community,
+                               verbose_name=_('Edition'))
     type = models.CharField(max_length=16, verbose_name=_('Type'), default='general', choices=Type.choices)
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     builtin = models.BooleanField(default=False, verbose_name=_('Builtin'))

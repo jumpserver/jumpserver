@@ -35,6 +35,6 @@ class AppletSerializer(serializers.ModelSerializer):
             'icon', 'readme', 'date_created', 'date_updated',
         ]
         fields = fields_mini + [
-            'version', 'author', 'type', 'enterprise',
+            'version', 'author', 'type', 'edition',
             'can_concurrent', 'protocols', 'tags', 'comment',
         ] + read_only_fields
