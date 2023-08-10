@@ -25,4 +25,14 @@ class Migration(migrations.Migration):
             name='origin',
             field=models.URLField(blank=True, null=True, verbose_name='Origin'),
         ),
+        migrations.AddField(
+            model_name='session',
+            name='cmd_amount',
+            field=models.IntegerField(default=-1, verbose_name='Command amount'),
+        ),
+        migrations.AlterField(
+            model_name='task',
+            name='name',
+            field=models.CharField(choices=[('kill_session', 'Kill Session'), ('lock_session', 'Lock Session'), ('unlock_session', 'Unlock Session')], max_length=128, verbose_name='Name'),
+        ),
     ]
