@@ -78,7 +78,7 @@ ALLOWED_DOMAINS = [host.strip() for host in ALLOWED_DOMAINS]
 ALLOWED_DOMAINS = [host.replace('http://', '').replace('https://', '') for host in ALLOWED_DOMAINS if host]
 ALLOWED_DOMAINS = [host.split('/')[0] for host in ALLOWED_DOMAINS if host]
 
-DEBUG_HOSTS = ('127.0.0.1', 'localhost')
+DEBUG_HOSTS = ('127.0.0.1', 'localhost', 'core')
 DEBUG_PORT = ['8080', '80', ]
 if DEBUG:
     DEBUG_PORT.extend(['4200', '9528'])
@@ -88,7 +88,7 @@ ALLOWED_DOMAINS.extend(DEBUG_HOST_PORTS)
 ALLOWED_HOSTS = list(set(['.' + host.split(':')[0] for host in ALLOWED_DOMAINS]))
 print("ALLOWED_HOSTS: ", )
 for host in ALLOWED_HOSTS:
-    print('  - ' + host)
+    print('  - ' + host.lstrip('.'))
 
 # https://docs.djangoproject.com/en/4.1/ref/settings/#std-setting-CSRF_TRUSTED_ORIGINS
 CSRF_TRUSTED_ORIGINS = []
@@ -103,9 +103,9 @@ for host_port in ALLOWED_DOMAINS:
             continue
         CSRF_TRUSTED_ORIGINS.append('{}://*.{}'.format(schema, origin))
 
-print("CSRF_TRUSTED_ORIGINS: ")
-for origin in CSRF_TRUSTED_ORIGINS:
-    print('  - ' + origin)
+# print("CSRF_TRUSTED_ORIGINS: ")
+# for origin in CSRF_TRUSTED_ORIGINS:
+# print('  - ' + origin)
 # Max post update field num
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
 
