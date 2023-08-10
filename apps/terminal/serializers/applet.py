@@ -27,6 +27,10 @@ class AppletPublicationSerializer(serializers.ModelSerializer):
 class AppletSerializer(serializers.ModelSerializer):
     icon = serializers.ReadOnlyField(label=_("Icon"))
     type = LabeledChoiceField(choices=Applet.Type.choices, label=_("Type"))
+    edition = LabeledChoiceField(
+        choices=Applet.Edition.choices, label=_("Edition"), required=False,
+        default=Applet.Edition.community
+    )
 
     class Meta:
         model = Applet
