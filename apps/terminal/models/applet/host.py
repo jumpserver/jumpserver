@@ -125,6 +125,7 @@ class AppletHost(Host):
         from users.models import User
         usernames = User.objects \
             .filter(is_active=True, is_service_account=False) \
+            .exclude(username__startswith='[') \
             .values_list('username', flat=True)
         account_usernames = self.accounts.all().values_list('username', flat=True)
         account_usernames = [username[3:] for username in account_usernames if username.startswith('js_')]

@@ -47,11 +47,9 @@ class UserGroupGrantedAssetsApi(ListAPIView):
 
         granted_q |= Q(granted_by_permissions__id__in=asset_perm_ids)
 
-        assets = Asset.objects.filter(
-            granted_q
-        ).distinct().only(
-            *self.only_fields
-        )
+        assets = Asset.objects.filter(granted_q) \
+            .only(*self.only_fields) \
+            .distinct()
         return assets
 
 
