@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-10 11:06+0800\n"
+"POT-Creation-Date: 2023-08-10 17:27+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -523,7 +523,7 @@ msgstr "特権アカウント"
 #: assets/models/automations/base.py:21 assets/models/cmd_filter.py:39
 #: assets/models/label.py:22
 #: authentication/serializers/connect_token_secret.py:114
-#: terminal/models/applet/applet.py:38
+#: terminal/models/applet/applet.py:39
 #: terminal/models/component/endpoint.py:105 users/serializers/user.py:169
 msgid "Is active"
 msgstr "アクティブです。"
@@ -636,7 +636,7 @@ msgstr "カテゴリ"
 #: assets/serializers/platform.py:127 audits/serializers.py:49
 #: authentication/serializers/connect_token_secret.py:123 ops/models/job.py:130
 #: perms/serializers/user_permission.py:27 settings/serializers/vault.py:13
-#: terminal/models/applet/applet.py:37 terminal/models/component/storage.py:57
+#: terminal/models/applet/applet.py:38 terminal/models/component/storage.py:57
 #: terminal/models/component/storage.py:146 terminal/serializers/applet.py:29
 #: terminal/serializers/session.py:21 terminal/serializers/storage.py:226
 #: terminal/serializers/storage.py:238 tickets/models/comment.py:26
@@ -761,8 +761,8 @@ msgstr ""
 #: assets/models/cmd_filter.py:40 assets/models/cmd_filter.py:88
 #: assets/models/group.py:20 common/db/models.py:36 ops/models/adhoc.py:26
 #: ops/models/job.py:138 ops/models/playbook.py:31 rbac/models/role.py:37
-#: settings/models.py:37 terminal/models/applet/applet.py:43
-#: terminal/models/applet/applet.py:283 terminal/models/applet/host.py:141
+#: settings/models.py:37 terminal/models/applet/applet.py:44
+#: terminal/models/applet/applet.py:284 terminal/models/applet/host.py:141
 #: terminal/models/component/endpoint.py:24
 #: terminal/models/component/endpoint.py:104
 #: terminal/models/session/session.py:46 tickets/models/comment.py:32
@@ -1386,7 +1386,7 @@ msgstr "ユーザーと同じユーザー名"
 
 #: assets/models/_user.py:52 authentication/models/connection_token.py:41
 #: authentication/serializers/connect_token_secret.py:111
-#: terminal/models/applet/applet.py:40 terminal/serializers/session.py:19
+#: terminal/models/applet/applet.py:41 terminal/serializers/session.py:19
 #: terminal/serializers/session.py:42 terminal/serializers/storage.py:70
 msgid "Protocol"
 msgstr "プロトコル"
@@ -1530,7 +1530,7 @@ msgstr "アセットの自動化タスク"
 
 #: assets/models/automations/base.py:113 audits/models.py:199
 #: audits/serializers.py:50 ops/models/base.py:49 ops/models/job.py:213
-#: terminal/models/applet/applet.py:282 terminal/models/applet/host.py:138
+#: terminal/models/applet/applet.py:283 terminal/models/applet/host.py:138
 #: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
 #: terminal/serializers/applet_host.py:115 tickets/models/ticket/general.py:283
 #: tickets/serializers/super_ticket.py:13
@@ -4062,7 +4062,7 @@ msgstr "デフォルト組織"
 msgid "SYSTEM"
 msgstr "システム組織"
 
-#: orgs/models.py:83 rbac/models/role.py:36 terminal/models/applet/applet.py:39
+#: orgs/models.py:83 rbac/models/role.py:36 terminal/models/applet/applet.py:40
 msgid "Builtin"
 msgstr "ビルトイン"
 
@@ -4359,8 +4359,8 @@ msgstr "タスクセンター"
 msgid "My assets"
 msgstr "私の資産"
 
-#: rbac/tree.py:56 terminal/models/applet/applet.py:50
-#: terminal/models/applet/applet.py:279 terminal/models/applet/host.py:29
+#: rbac/tree.py:56 terminal/models/applet/applet.py:51
+#: terminal/models/applet/applet.py:280 terminal/models/applet/host.py:29
 #: terminal/serializers/applet.py:15
 msgid "Applet"
 msgstr "リモートアプリケーション"
@@ -5760,7 +5760,7 @@ msgstr "確認コードが送信されました"
 msgid "Home page"
 msgstr "ホームページ"
 
-#: templates/resource_download.html:18 templates/resource_download.html:32
+#: templates/resource_download.html:18 templates/resource_download.html:33
 msgid "Client"
 msgstr "クライアント"
 
@@ -5773,15 +5773,15 @@ msgstr ""
 "るために使用されており、現在はRDP SSHクライアントのみをサポートしています。"
 "「Telnetは将来的にサポートする"
 
-#: templates/resource_download.html:32
+#: templates/resource_download.html:33
 msgid "Microsoft"
 msgstr "マイクロソフト"
 
-#: templates/resource_download.html:32
+#: templates/resource_download.html:33
 msgid "Official"
 msgstr "公式"
 
-#: templates/resource_download.html:34
+#: templates/resource_download.html:35
 msgid ""
 "macOS needs to download the client to connect RDP asset, which comes with "
 "Windows"
@@ -5789,11 +5789,11 @@ msgstr ""
 "MacOSは、Windowsに付属のRDPアセットを接続するためにクライアントをダウンロード"
 "する必要があります"
 
-#: templates/resource_download.html:43
+#: templates/resource_download.html:44
 msgid "Windows Remote application publisher tools"
 msgstr "Windowsリモートアプリケーション発行者ツール"
 
-#: templates/resource_download.html:44
+#: templates/resource_download.html:45
 msgid ""
 "OpenSSH is a program used to connect remote applications in the Windows "
 "Remote Application Publisher"
@@ -5801,7 +5801,7 @@ msgstr ""
 "OpenSSHはリモートアプリケーションをWindowsリモートアプリケーションで接続する"
 "プログラムです"
 
-#: templates/resource_download.html:52
+#: templates/resource_download.html:53
 msgid "Offline video player"
 msgstr "オフラインビデオプレーヤー"
 
@@ -5984,7 +5984,7 @@ msgstr "ストレージが無効です"
 msgid "Community"
 msgstr "コミュニティ版"
 
-#: terminal/models/applet/applet.py:30 terminal/models/applet/applet.py:36
+#: terminal/models/applet/applet.py:30
 msgid "Enterprise"
 msgstr "エンタープライズ版"
 
@@ -5992,35 +5992,39 @@ msgstr "エンタープライズ版"
 msgid "Author"
 msgstr "著者"
 
-#: terminal/models/applet/applet.py:41
+#: terminal/models/applet/applet.py:37 terminal/serializers/applet.py:31
+msgid "Edition"
+msgstr "バージョン"
+
+#: terminal/models/applet/applet.py:42
 msgid "Can concurrent"
 msgstr "同時実行可能"
 
-#: terminal/models/applet/applet.py:42
+#: terminal/models/applet/applet.py:43
 msgid "Tags"
 msgstr "ラベル"
 
-#: terminal/models/applet/applet.py:46 terminal/serializers/storage.py:159
+#: terminal/models/applet/applet.py:47 terminal/serializers/storage.py:159
 msgid "Hosts"
 msgstr "ホスト"
 
-#: terminal/models/applet/applet.py:91
+#: terminal/models/applet/applet.py:92
 msgid "Applet pkg not valid, Missing file {}"
 msgstr "無効なアプレット パッケージ、ファイル {} がありません"
 
-#: terminal/models/applet/applet.py:110
+#: terminal/models/applet/applet.py:111
 msgid "Load platform.yml failed: {}"
 msgstr "platform.ymlのロードに失敗しました:{}"
 
-#: terminal/models/applet/applet.py:113
+#: terminal/models/applet/applet.py:114
 msgid "Only support custom platform"
 msgstr "カスタムプラットフォームのみをサポート"
 
-#: terminal/models/applet/applet.py:118
+#: terminal/models/applet/applet.py:119
 msgid "Missing type in platform.yml"
 msgstr "platform.ymlにタイプがありません"
 
-#: terminal/models/applet/applet.py:281 terminal/models/applet/host.py:35
+#: terminal/models/applet/applet.py:282 terminal/models/applet/host.py:35
 #: terminal/models/applet/host.py:136
 msgid "Hosting"
 msgstr "ホスト マシン"
@@ -8111,9 +8115,6 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:86
 msgid "Community edition"
 msgstr "コミュニティ版"
-
-#~ msgid "Edition"
-#~ msgstr "バージョン"
 
 #~ msgid "Strategy"
 #~ msgstr "戦略"
