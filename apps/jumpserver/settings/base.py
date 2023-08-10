@@ -68,8 +68,11 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # LOG LEVEL
 LOG_LEVEL = CONFIG.LOG_LEVEL
 DOMAINS = CONFIG.DOMAINS or 'localhost'
-if os.environ.get('SERVER_NAME'):
-    DOMAINS += ',{}'.format(os.environ.get('SERVER_NAME'))
+for name in ['SERVER_NAME', 'CORE_HOST']:
+    env = os.environ.get(name)
+    if not env:
+        continue
+    DOMAINS += ',{}'.format(env)
 if CONFIG.SITE_URL:
     DOMAINS += ',{}'.format(CONFIG.SITE_URL)
 
