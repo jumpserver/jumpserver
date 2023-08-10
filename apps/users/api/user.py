@@ -136,6 +136,10 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
 
         users = validated_data['users']
         org_roles = validated_data['org_roles']
+        has_self = any([str(u.id) == str(request.user.id) for u in users])
+        if has_self and not request.user.is_superuser:
+            error = {"error": _("Can not invite self")}
+            return Response(error, status=400)
         for user in users:
             user.org_roles.set(org_roles)
         return Response(serializer.data, status=201)

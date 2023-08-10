@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-10 17:27+0800\n"
+"POT-Creation-Date: 2023-08-10 18:22+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -289,7 +289,7 @@ msgstr "アカウントバックアップ計画"
 #: assets/models/automations/base.py:115 audits/models.py:60
 #: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:221
 #: ops/templates/ops/celery_task_log.html:75
-#: perms/models/asset_permission.py:72 terminal/models/applet/host.py:139
+#: perms/models/asset_permission.py:72 terminal/models/applet/host.py:140
 #: terminal/models/session/session.py:44
 #: tickets/models/ticket/apply_application.py:30
 #: tickets/models/ticket/apply_asset.py:19
@@ -418,7 +418,7 @@ msgstr "開始日"
 #: accounts/models/automations/change_secret.py:91
 #: assets/models/automations/base.py:116 ops/models/base.py:56
 #: ops/models/celery.py:64 ops/models/job.py:222
-#: terminal/models/applet/host.py:140
+#: terminal/models/applet/host.py:141
 msgid "Date finished"
 msgstr "終了日"
 
@@ -762,7 +762,7 @@ msgstr ""
 #: assets/models/group.py:20 common/db/models.py:36 ops/models/adhoc.py:26
 #: ops/models/job.py:138 ops/models/playbook.py:31 rbac/models/role.py:37
 #: settings/models.py:37 terminal/models/applet/applet.py:44
-#: terminal/models/applet/applet.py:284 terminal/models/applet/host.py:141
+#: terminal/models/applet/applet.py:284 terminal/models/applet/host.py:142
 #: terminal/models/component/endpoint.py:24
 #: terminal/models/component/endpoint.py:104
 #: terminal/models/session/session.py:46 tickets/models/comment.py:32
@@ -1530,7 +1530,7 @@ msgstr "アセットの自動化タスク"
 
 #: assets/models/automations/base.py:113 audits/models.py:199
 #: audits/serializers.py:50 ops/models/base.py:49 ops/models/job.py:213
-#: terminal/models/applet/applet.py:283 terminal/models/applet/host.py:138
+#: terminal/models/applet/applet.py:283 terminal/models/applet/host.py:139
 #: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
 #: terminal/serializers/applet_host.py:115 tickets/models/ticket/general.py:283
 #: tickets/serializers/super_ticket.py:13
@@ -2138,7 +2138,7 @@ msgstr "セッションログ"
 msgid "Login log"
 msgstr "ログインログ"
 
-#: audits/const.py:43 terminal/models/applet/host.py:142
+#: audits/const.py:43 terminal/models/applet/host.py:143
 #: terminal/models/component/task.py:22
 msgid "Task"
 msgstr "タスク"
@@ -6025,7 +6025,7 @@ msgid "Missing type in platform.yml"
 msgstr "platform.ymlにタイプがありません"
 
 #: terminal/models/applet/applet.py:282 terminal/models/applet/host.py:35
-#: terminal/models/applet/host.py:136
+#: terminal/models/applet/host.py:137
 msgid "Hosting"
 msgstr "ホスト マシン"
 
@@ -6053,7 +6053,7 @@ msgstr "初期化日"
 msgid "Date synced"
 msgstr "同期日"
 
-#: terminal/models/applet/host.py:137
+#: terminal/models/applet/host.py:138
 msgid "Initial"
 msgstr "初期化"
 
@@ -6962,7 +6962,11 @@ msgstr "無効な承認アクション"
 msgid "This user is not authorized to approve this ticket"
 msgstr "このユーザーはこの作業指示を承認する権限がありません"
 
-#: users/api/user.py:190
+#: users/api/user.py:141
+msgid "Can not invite self"
+msgstr "自分自身を招待することはできません"
+
+#: users/api/user.py:194
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "自己otpをリセットできませんでした、代わりにプロファイルリセットを使用"
 

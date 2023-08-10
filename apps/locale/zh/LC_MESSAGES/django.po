@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-10 17:27+0800\n"
+"POT-Creation-Date: 2023-08-10 18:22+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -288,7 +288,7 @@ msgstr "账号备份计划"
 #: assets/models/automations/base.py:115 audits/models.py:60
 #: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:221
 #: ops/templates/ops/celery_task_log.html:75
-#: perms/models/asset_permission.py:72 terminal/models/applet/host.py:139
+#: perms/models/asset_permission.py:72 terminal/models/applet/host.py:140
 #: terminal/models/session/session.py:44
 #: tickets/models/ticket/apply_application.py:30
 #: tickets/models/ticket/apply_asset.py:19
@@ -417,7 +417,7 @@ msgstr "开始日期"
 #: accounts/models/automations/change_secret.py:91
 #: assets/models/automations/base.py:116 ops/models/base.py:56
 #: ops/models/celery.py:64 ops/models/job.py:222
-#: terminal/models/applet/host.py:140
+#: terminal/models/applet/host.py:141
 msgid "Date finished"
 msgstr "结束日期"
 
@@ -762,7 +762,7 @@ msgstr ""
 #: assets/models/group.py:20 common/db/models.py:36 ops/models/adhoc.py:26
 #: ops/models/job.py:138 ops/models/playbook.py:31 rbac/models/role.py:37
 #: settings/models.py:37 terminal/models/applet/applet.py:44
-#: terminal/models/applet/applet.py:284 terminal/models/applet/host.py:141
+#: terminal/models/applet/applet.py:284 terminal/models/applet/host.py:142
 #: terminal/models/component/endpoint.py:24
 #: terminal/models/component/endpoint.py:104
 #: terminal/models/session/session.py:46 tickets/models/comment.py:32
@@ -1528,7 +1528,7 @@ msgstr "资产自动化任务"
 
 #: assets/models/automations/base.py:113 audits/models.py:199
 #: audits/serializers.py:50 ops/models/base.py:49 ops/models/job.py:213
-#: terminal/models/applet/applet.py:283 terminal/models/applet/host.py:138
+#: terminal/models/applet/applet.py:283 terminal/models/applet/host.py:139
 #: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
 #: terminal/serializers/applet_host.py:115 tickets/models/ticket/general.py:283
 #: tickets/serializers/super_ticket.py:13
@@ -2127,7 +2127,7 @@ msgstr "会话日志"
 msgid "Login log"
 msgstr "登录日志"
 
-#: audits/const.py:43 terminal/models/applet/host.py:142
+#: audits/const.py:43 terminal/models/applet/host.py:143
 #: terminal/models/component/task.py:22
 msgid "Task"
 msgstr "任务"
@@ -5928,7 +5928,7 @@ msgid "Missing type in platform.yml"
 msgstr "在 platform.yml 中缺少类型"
 
 #: terminal/models/applet/applet.py:282 terminal/models/applet/host.py:35
-#: terminal/models/applet/host.py:136
+#: terminal/models/applet/host.py:137
 msgid "Hosting"
 msgstr "宿主机"
 
@@ -5956,7 +5956,7 @@ msgstr "初始化日期"
 msgid "Date synced"
 msgstr "同步日期"
 
-#: terminal/models/applet/host.py:137
+#: terminal/models/applet/host.py:138
 msgid "Initial"
 msgstr "初始化"
 
@@ -6853,7 +6853,11 @@ msgstr "无效的审批动作"
 msgid "This user is not authorized to approve this ticket"
 msgstr "此用户无权审批此工单"
 
-#: users/api/user.py:190
+#: users/api/user.py:141
+msgid "Can not invite self"
+msgstr "不能邀请自己"
+
+#: users/api/user.py:194
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "不能在该页面重置 MFA 多因子认证, 请去个人信息页面重置"
 
