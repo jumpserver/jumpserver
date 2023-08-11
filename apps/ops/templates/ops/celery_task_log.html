@@ -135,7 +135,7 @@
             method: "GET",
             flash_message: false,
             success(data) {
-                const dateStart = new Date(data.date_start).toLocaleString();
+                const dateStart = data.date_start ? new Date(data.date_start).toLocaleString() : '';
                 $('.task-id').html(data.id);
                 $('.task-type').html(data.task_name);
                 $('.date-start').html(dateStart);
