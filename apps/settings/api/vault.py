@@ -1,11 +1,11 @@
-from django.utils.translation import gettext_lazy as _
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.views import Response, APIView
 
-from accounts.tasks.vault import sync_secret_to_vault
 from accounts.backends import get_vault_client
+from accounts.tasks.vault import sync_secret_to_vault
 from settings.models import Setting
 from .. import serializers
 
@@ -29,6 +29,7 @@ class VaultTestingAPI(GenericAPIView):
 
     def post(self, request):
         config = self.get_config(request)
+        config['VAULT_TYPE'] = settings.VAULT_TYPE
         try:
             client = get_vault_client(raise_exception=True, **config)
             ok, error = client.is_active()

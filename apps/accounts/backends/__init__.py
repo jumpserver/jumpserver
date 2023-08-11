@@ -1,6 +1,6 @@
-import os
-from django.utils.functional import LazyObject
 from importlib import import_module
+
+from django.utils.functional import LazyObject
 
 from common.utils import get_logger
 from ..const import VaultTypeChoices
