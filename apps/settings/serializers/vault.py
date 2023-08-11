@@ -16,8 +16,12 @@ class VaultSettingSerializer(serializers.Serializer):
         max_length=256, allow_blank=True, required=False, label=_('Host')
     )
     VAULT_HCP_TOKEN = EncryptedField(
-        max_length=256, allow_blank=True, required=False, label=_('Token')
+        max_length=256, allow_blank=True, required=False, label=_('Token'), default=''
     )
     VAULT_HCP_MOUNT_POINT = serializers.CharField(
         max_length=256, allow_blank=True, required=False, label=_('Mount Point')
     )
+
+    def validate(self, attrs):
+        attrs.pop('VAULT_TYPE', None)
+        return attrs
