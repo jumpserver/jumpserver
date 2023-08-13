@@ -159,7 +159,9 @@ google-cloud-compute = "1.13.0"
 # grpcio = "1.56.2"
 grpcio = [
     { url = "https://download.jumpserver.org/pypi/simple/grpcio/grpcio-1.56.2-cp311-cp311-linux_loongarch64.whl", markers = "sys_platform == 'linux' and platform_machine == 'loongarch64'" },
-    { version = "1.56.2", source = "tsinghua", markers = "platform_machine != 'loongarch64'" }
+    { url = "https://download.jumpserver.org/pypi/simple/grpcio/grpcio-1.56.2-cp311-cp311-linux_s390x.whl", markers = "sys_platform == 'linux' and platform_machine == 's390x'" },
+    { url = "https://download.jumpserver.org/pypi/simple/grpcio/grpcio-1.56.2-cp311-cp311-linux_ppc64le.whl", markers = "sys_platform == 'linux' and platform_machine == 'ppc64le'" },
+    { version = "1.56.2", source = "tsinghua", markers = "platform_machine != 'loongarch64' and platform_machine != 's390x' and platform_machine != 'ppc64le'" }
 ]
 alibabacloud-dysmsapi20170525 = "2.0.24"
 python-novaclient = "18.3.0"
@@ -171,9 +173,8 @@ aliyun-python-sdk-ecs = "4.24.64"
 keystoneauth1 = "5.2.1"
 # oracledb = "1.4.0"
 oracledb = { git = "https://github.com/oracle/python-oracledb.git", branch = "main" }
-psycopg2-binary = "2.9.6"
 pymssql = "2.2.8"
-psycopg2 = "2.9.6"
+psycopg2 = "2.9.7"
 ucloud-sdk-python3 = "0.11.50"
 huaweicloudsdkecs = "3.1.52"
 huaweicloudsdkcore = "3.1.52"
