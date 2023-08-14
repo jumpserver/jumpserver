@@ -52,7 +52,11 @@ class UserResetPasswordSendCodeApi(CreateAPIView):
         other_args = {}
 
         target = serializer.validated_data[form_type]
-        query_key = 'phone' if form_type == 'sms' else form_type
+        if form_type == 'sms':
+            query_key = 'phone'
+            target = target.lstrip('+')
+        else:
+            query_key = form_type
         user, err = self.is_valid_user(username=username, **{query_key: target})
         if not user:
             return Response({'error': err}, status=400)
