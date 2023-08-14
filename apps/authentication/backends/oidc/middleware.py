@@ -1,15 +1,14 @@
 import time
+
 import requests
 import requests.exceptions
-
-from django.core.exceptions import MiddlewareNotUsed
 from django.conf import settings
 from django.contrib import auth
+from django.core.exceptions import MiddlewareNotUsed
+
 from common.utils import get_logger
-
-from .utils import validate_and_return_id_token
 from .decorator import ssl_verification
-
+from .utils import validate_and_return_id_token
 
 logger = get_logger(__file__)
 
@@ -25,10 +24,15 @@ class OIDCRefreshIDTokenMiddleware:
 
     def __call__(self, request):
         # Refreshes tokens only in the applicable cases.
-        if request.method == 'GET' and not request.is_ajax() and request.user.is_authenticated and settings.AUTH_OPENID:
+        if request.method == 'GET' and not self.is_ajax(request) and \
+                request.user.is_authenticated and settings.AUTH_OPENID:
             self.refresh_token(request)
         response = self.get_response(request)
         return response
+
+    @staticmethod
+    def is_ajax(request):
+        return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
     @ssl_verification
     def refresh_token(self, request):
