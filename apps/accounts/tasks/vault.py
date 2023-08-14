@@ -28,8 +28,9 @@ def sync_secret_to_vault():
             failed = []
             skipped = []
             instances = model.objects.all()
+            verbose_name = model._meta.original_attrs['verbose_name']
             for instance in instances:
-                instance_desc = f'[{instance}]'
+                instance_desc = f'[{verbose_name}-{instance.id}-{instance}]'
                 if instance.secret_has_save_to_vault:
                     print(f'\033[32m- 跳过同步: {instance_desc}, 原因: [已同步]')
                     skipped.append(instance)
