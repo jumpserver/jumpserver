@@ -7747,7 +7747,7 @@ msgstr "同期インスタンスの詳細"
 
 #: xpack/plugins/cloud/models.py:281
 msgid "Task strategy"
-msgstr "タスク戦略"
+msgstr "ミッション戦略です"
 
 #: xpack/plugins/cloud/models.py:285
 msgid "Exact"
