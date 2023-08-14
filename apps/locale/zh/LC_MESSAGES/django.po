@@ -7641,7 +7641,7 @@ msgstr "同步实例详情"
 
 #: xpack/plugins/cloud/models.py:281
 msgid "Task strategy"
-msgstr "密码策略"
+msgstr "任务策略"
 
 #: xpack/plugins/cloud/models.py:285
 msgid "Exact"
