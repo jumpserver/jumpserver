@@ -177,8 +177,10 @@ class UserPermedNodeChildrenWithAssetsAsCategoryTreeApi(
                 return []
             pid = f'ROOT_{str(assets[0].category).upper()}_{tp}'
             return self.serialize_assets(assets, pid=pid)
+        params = self.request.query_params
+        get_root = not list(filter(lambda x: params.get(x), ('type', 'n')))
         resource_platforms = assets.order_by('id').values_list('platform_id', flat=True)
-        node_all = AllTypes.get_tree_nodes(resource_platforms)
+        node_all = AllTypes.get_tree_nodes(resource_platforms, get_root=get_root)
         pattern = re.compile(r'\(0\)?')
         nodes = []
         for node in node_all:
