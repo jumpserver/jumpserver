@@ -1,8 +1,11 @@
+from common.db.utils import get_logger
 from .entries import build_entry
 from .service import VaultKVClient
 from ..base import BaseVault
 
 __all__ = ['Vault']
+
+logger = get_logger(__name__)
 
 
 class Vault(BaseVault):
@@ -43,5 +46,8 @@ class Vault(BaseVault):
         instance.mark_secret_save_to_vault()
 
     def _save_metadata(self, instance, metadata):
-        entry = build_entry(instance)
-        self.client.update_metadata(path=entry.full_path, metadata=metadata)
+        try:
+            entry = build_entry(instance)
+            self.client.update_metadata(path=entry.full_path, metadata=metadata)
+        except Exception as e:
+            logger.error(f'save metadata error: {e}')

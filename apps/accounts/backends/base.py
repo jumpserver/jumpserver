@@ -43,7 +43,7 @@ class BaseVault(ABC):
             'name', 'username', 'secret_type',
             'connectivity', 'su_from', 'privileged'
         ])
-        metadata = {field: str(value) for field, value in metadata.items()}
+        metadata = {k: str(v)[:500] for k, v in metadata.items() if v}
         return self._save_metadata(instance, metadata)
 
     # -------- abstractmethod -------- #
