@@ -37,6 +37,7 @@ ARG TOOLS="                           \
         default-libmysqlclient-dev    \
         default-mysql-client          \
         locales                       \
+        nmap                          \
         openssh-client                \
         sshpass                       \
         telnet                        \
