@@ -5,19 +5,6 @@ from rest_framework import serializers
 class OtherSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('More...')
 
-    EMAIL_SUFFIX = serializers.CharField(
-        required=False, max_length=1024, label=_("Email suffix"),
-        help_text=_('This is used by default if no email is returned during SSO authentication')
-    )
-
-    OTP_ISSUER_NAME = serializers.CharField(
-        required=False, max_length=16, label=_('OTP issuer name'),
-    )
-    OTP_VALID_WINDOW = serializers.IntegerField(
-        min_value=1, max_value=10,
-        label=_("OTP valid window")
-    )
-
     PERM_SINGLE_ASSET_TO_UNGROUP_NODE = serializers.BooleanField(
         required=False, label=_("Perm ungroup node"),
         help_text=_("Perm single to ungroup node")
