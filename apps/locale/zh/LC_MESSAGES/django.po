@@ -5262,13 +5262,13 @@ msgstr "开启验证码，防止机器人登录"
 
 #: settings/serializers/security.py:163
 msgid "Enable terminal register"
-msgstr "终端注册"
+msgstr "组件注册"
 
 #: settings/serializers/security.py:165
 msgid ""
 "Allow terminal register, after all terminal setup, you should disable this "
 "for security"
-msgstr "是否允许终端注册，当所有终端启动后，为了安全应该关闭"
+msgstr "是否允许组件注册，当所有终端启动后，为了安全应该关闭"
 
 #: settings/serializers/security.py:169
 msgid "Enable watermark"
