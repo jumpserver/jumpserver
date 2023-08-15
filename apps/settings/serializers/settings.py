@@ -9,12 +9,12 @@ from .auth import (
     CASSettingSerializer, RadiusSettingSerializer, FeiShuSettingSerializer,
     WeComSettingSerializer, DingTalkSettingSerializer, AlibabaSMSSettingSerializer,
     TencentSMSSettingSerializer, CMPP2SMSSettingSerializer, AuthSettingSerializer,
-    SAML2SettingSerializer, OAuth2SettingSerializer, SSOSettingSerializer,
+    SAML2SettingSerializer, OAuth2SettingSerializer,
     CustomSMSSettingSerializer,
 )
 from .basic import BasicSettingSerializer
 from .cleaning import CleaningSerializer
-from .email import EmailSettingSerializer, EmailContentSettingSerializer
+from .msg import EmailSettingSerializer, EmailContentSettingSerializer
 from .other import OtherSettingSerializer
 from .security import SecuritySettingSerializer
 from .terminal import TerminalSettingSerializer
@@ -42,7 +42,6 @@ class SettingsSerializer(
     KeycloakSettingSerializer,
     CASSettingSerializer,
     RadiusSettingSerializer,
-    SSOSettingSerializer,
     CleaningSerializer,
     AlibabaSMSSettingSerializer,
     TencentSMSSettingSerializer,
