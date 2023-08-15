@@ -1,5 +1,5 @@
-import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime
 
 from celery import shared_task
 from django.utils.translation import gettext_lazy as _
@@ -38,7 +38,7 @@ def sync_secret_to_vault():
 
     failed, skipped, succeeded = 0, 0, 0
     to_sync_models = [Account, AccountTemplate, Account.history.model]
-    print('\033[33m>>> 开始同步密钥数据到 Vault ({})'.format(datetime.datetime.now()))
+    print(f'\033[33m>>> 开始同步密钥数据到 Vault ({datetime.now().strftime("%Y-%m-%d %H:%M:%S")})')
     with tmp_to_root_org():
         instances = []
         for model in to_sync_models:
@@ -65,5 +65,5 @@ def sync_secret_to_vault():
         f'失败: {failed}, '
         f'跳过: {skipped}'
     )
-    print('\033[33m>>> 全部同步完成 ({})'.format(datetime.datetime.now()))
+    print(f'\033[33m>>> 全部同步完成 ({datetime.now().strftime("%Y-%m-%d %H:%M:%S")})')
     print('\033[0m')
