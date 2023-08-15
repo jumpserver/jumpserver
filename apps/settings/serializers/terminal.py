@@ -18,6 +18,12 @@ class TerminalSettingSerializer(serializers.Serializer):
         ('25', '25'),
         ('50', '50'),
     )
+    SECURITY_SERVICE_ACCOUNT_REGISTRATION = serializers.BooleanField(
+        required=True, label=_('Enable terminal register'),
+        help_text=_(
+            "Allow terminal register, after all terminal setup, you should disable this for security"
+        )
+    )
     TERMINAL_PASSWORD_AUTH = serializers.BooleanField(required=False, label=_('Password auth'))
     TERMINAL_PUBLIC_KEY_AUTH = serializers.BooleanField(
         required=False, label=_('Public key auth'),

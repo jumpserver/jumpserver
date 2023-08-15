@@ -28,6 +28,11 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'basic': serializers.BasicSettingSerializer,
         'terminal': serializers.TerminalSettingSerializer,
         'security': serializers.SecuritySettingSerializer,
+        'security_auth': serializers.SecurityAuthSerializer,
+        'security_basic': serializers.SecurityBasicSerializer,
+        'security_session': serializers.SecuritySessionSerializer,
+        'security_password': serializers.SecurityPasswordRuleSerializer,
+        'security_login_limit': serializers.SecurityLoginLimitSerializer,
         'ldap': serializers.LDAPSettingSerializer,
         'email': serializers.EmailSettingSerializer,
         'email_content': serializers.EmailContentSettingSerializer,
@@ -51,6 +56,9 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'cmpp2': serializers.CMPP2SMSSettingSerializer,
         'custom': serializers.CustomSMSSettingSerializer,
         'vault': serializers.VaultSettingSerializer,
+        'announcement': serializers.AnnouncementSettingSerializer,
+        'ticket': serializers.TicketSettingSerializer,
+
     }
 
     rbac_category_permissions = {

@@ -1,26 +1,5 @@
-import uuid
-
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
-
-
-class AnnouncementSerializer(serializers.Serializer):
-    ID = serializers.CharField(required=False, allow_blank=True, allow_null=True)
-    SUBJECT = serializers.CharField(required=True, max_length=1024, label=_("Subject"))
-    CONTENT = serializers.CharField(label=_("Content"))
-    LINK = serializers.URLField(
-        required=False, allow_null=True, allow_blank=True,
-        label=_("More url"), default='',
-    )
-
-    def to_representation(self, instance):
-        defaults = {'ID': '', 'SUBJECT': '', 'CONTENT': '', 'LINK': '', 'ENABLED': False}
-        data = {**defaults, **instance}
-        return super().to_representation(data)
-
-    def to_internal_value(self, data):
-        data['ID'] = str(uuid.uuid4())
-        return super().to_internal_value(data)
 
 
 class BasicSettingSerializer(serializers.Serializer):
@@ -43,9 +22,14 @@ class BasicSettingSerializer(serializers.Serializer):
         required=False, max_length=1024, allow_blank=True, allow_null=True, label=_("Global organization name"),
         help_text=_('The name of global organization to display')
     )
-    ANNOUNCEMENT_ENABLED = serializers.BooleanField(label=_('Enable announcement'), default=True)
-    ANNOUNCEMENT = AnnouncementSerializer(label=_("Announcement"))
-    TICKETS_ENABLED = serializers.BooleanField(required=False, default=True, label=_("Enable tickets"))
+    HELP_DOCUMENT_URL = serializers.URLField(
+        required=False, allow_blank=True, allow_null=True, label=_("Help Docs URL"),
+        help_text=_('default: http://docs.jumpserver.org')
+    )
+    HELP_SUPPORT_URL = serializers.URLField(
+        required=False, allow_blank=True, allow_null=True, label=_("Help Support URL"),
+        help_text=_('default: http://www.jumpserver.org/support/')
+    )
 
     @staticmethod
     def validate_SITE_URL(s):

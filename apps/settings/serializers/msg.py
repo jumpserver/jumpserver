@@ -6,7 +6,10 @@ from rest_framework import serializers
 
 from common.serializers.fields import EncryptedField
 
-__all__ = ['MailTestSerializer', 'EmailSettingSerializer', 'EmailContentSettingSerializer']
+__all__ = [
+    'MailTestSerializer', 'EmailSettingSerializer',
+    'EmailContentSettingSerializer', 'SMSBackendSerializer',
+]
 
 
 class MailTestSerializer(serializers.Serializer):
@@ -73,3 +76,8 @@ class EmailContentSettingSerializer(serializers.Serializer):
         max_length=512, allow_blank=True, required=False, label=_('Signature'),
         help_text=_('Tips: Email signature (eg:jumpserver)')
     )
+
+
+class SMSBackendSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=256, required=True, label=_('Name'))
+    label = serializers.CharField(max_length=256, required=True, label=_('Label'))

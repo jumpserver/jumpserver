@@ -1,18 +1,16 @@
 import importlib
-
 from collections import OrderedDict
 
+from django.utils.translation import gettext_lazy as _
+from rest_framework import status
+from rest_framework.exceptions import APIException
 from rest_framework.generics import ListAPIView, GenericAPIView
 from rest_framework.response import Response
-from rest_framework.exceptions import APIException
-from rest_framework import status
-from django.utils.translation import gettext_lazy as _
 
-from common.sdk.sms import BACKENDS
 from common.exceptions import JMSException
-from settings.serializers.sms import SMSBackendSerializer
+from common.sdk.sms import BACKENDS
 from settings.models import Setting
-
+from settings.serializers import SMSBackendSerializer
 from .. import serializers
 
 
