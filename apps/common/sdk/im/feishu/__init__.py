@@ -117,8 +117,8 @@ class FeiShu(RequestMixin):
         }
 
         body = {
-            'msg_type': 'text',
-            'content': json.dumps({'text': msg})
+            'msg_type': 'interactive',
+            'content': json.dumps({'elements':[{'tag':'markdown','content': msg}]})
         }
 
         invalid_users = []
