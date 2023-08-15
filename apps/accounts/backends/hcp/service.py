@@ -59,7 +59,6 @@ class VaultKVClient(object):
                 mount_point=self.mount_point
             )
         except exceptions.InvalidPath as e:
-            logger.error('Get secret error: {}'.format(e))
             return {}
         data = response.get('data', {})
         return data
