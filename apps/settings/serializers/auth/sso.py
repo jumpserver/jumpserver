@@ -7,6 +7,9 @@ __all__ = [
 
 
 class SSOSettingSerializer(serializers.Serializer):
+    """
+    不对外开放了，只能通过配置文件修改，比较这个稍微有点危险
+    """
     PREFIX_TITLE = _('SSO')
 
     AUTH_SSO = serializers.BooleanField(
