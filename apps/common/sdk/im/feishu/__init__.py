@@ -116,9 +116,13 @@ class FeiShu(RequestMixin):
             'receive_id_type': 'user_id'
         }
 
+        """ 
+        https://open.feishu.cn/document/common-capabilities/message-card/message-cards-content
+        /using-markdown-tags
+        """
         body = {
-            'msg_type': 'text',
-            'content': json.dumps({'text': msg})
+            'msg_type': 'interactive',
+            'content': json.dumps({'elements': [{'tag': 'markdown', 'content': msg}]})
         }
 
         invalid_users = []

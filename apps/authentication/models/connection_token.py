@@ -191,7 +191,7 @@ class ConnectionToken(JMSOrgBaseModel):
             raise JMSException({'error': 'No host account available'})
 
         host, account, lock_key, ttl = bulk_get(host_account, ('host', 'account', 'lock_key', 'ttl'))
-        gateway = host.gateway.select_gateway() if host.domain else None
+        gateway = host.domain.select_gateway() if host.domain else None
 
         data = {
             'id': account.id,

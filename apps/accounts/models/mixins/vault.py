@@ -52,17 +52,18 @@ class VaultModelMixin(models.Model):
         abstract = True
 
     # 缓存 secret 值, lazy-property 不能用
-    __secret = False
+    __secret = None
 
     @property
     def secret(self):
-        if self.__secret is False:
-            from accounts.backends import vault_client
-            secret = vault_client.get(self)
-            if not secret and not self.secret_has_save_to_vault:
-                # vault_client 获取不到, 并且 secret 没有保存到 vault, 就从 self._secret 获取
-                secret = self._secret
-            self.__secret = secret
+        if self.__secret:
+            return self.__secret
+        from accounts.backends import vault_client
+        secret = vault_client.get(self)
+        if not secret and not self.secret_has_save_to_vault:
+            # vault_client 获取不到, 并且 secret 没有保存到 vault, 就从 self._secret 获取
+            secret = self._secret
+        self.__secret = secret
         return self.__secret
 
     @secret.setter
@@ -72,6 +73,7 @@ class VaultModelMixin(models.Model):
         先保存到 db, 再保存到 vault 同时删除本地 db _secret 值
         """
         self._secret = value
+        self.__secret = value
 
     _secret_save_to_vault_mark = '# Secret-has-been-saved-to-vault #'
 
