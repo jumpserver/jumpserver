@@ -14,7 +14,7 @@ from .auth import (
 )
 from .basic import BasicSettingSerializer
 from .cleaning import CleaningSerializer
-from .email import EmailSettingSerializer, EmailContentSettingSerializer
+from .msg import EmailSettingSerializer, EmailContentSettingSerializer
 from .other import OtherSettingSerializer
 from .security import SecuritySettingSerializer
 from .terminal import TerminalSettingSerializer

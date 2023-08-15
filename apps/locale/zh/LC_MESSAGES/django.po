@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-14 14:39+0800\n"
+"POT-Creation-Date: 2023-08-10 18:22+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1012,7 +1012,7 @@ msgid ""
 "support)"
 msgstr ""
 "* 表示匹配所有。例如: 192.168.10.1, 192.168.1.0/24, 10.1.1.1-10.1.1.20, 2001:"
-"db8:2de::e13, 2001:db8:1a:1110::/64 （支持网域）"
+"db8:2de::e13, 2001:db8:1a:1110::/64  (支持网域)"
 
 #: acls/serializers/base.py:41 assets/serializers/asset/host.py:19
 msgid "IP/Host"
@@ -1243,7 +1243,7 @@ msgstr "连接到控制台会话"
 msgid "Any"
 msgstr "任意"
 
-#: assets/const/protocol.py:66 settings/serializers/security.py:153
+#: assets/const/protocol.py:66 settings/serializers/security.py:160
 msgid "Security"
 msgstr "安全"
 
@@ -2514,20 +2514,20 @@ msgid ""
 "You can also try {times_try} times (The account will be temporarily locked "
 "for {block_time} minutes)"
 msgstr ""
-"您输入的用户名或密码不正确，请重新输入。 您还可以尝试 {times_try} 次（账号将"
-"被临时 锁定 {block_time} 分钟）"
+"您输入的用户名或密码不正确，请重新输入。 您还可以尝试 {times_try} 次 (账号将"
+"被临时 锁定 {block_time} 分钟)"
 
 #: authentication/errors/const.py:47 authentication/errors/const.py:55
 msgid ""
 "The account has been locked (please contact admin to unlock it or try again "
 "after {} minutes)"
-msgstr "账号已被锁定（请联系管理员解锁或{}分钟后重试）"
+msgstr "账号已被锁定 (请联系管理员解锁或{}分钟后重试)"
 
 #: authentication/errors/const.py:51
 msgid ""
 "The address has been locked (please contact admin to unlock it or try again "
 "after {} minutes)"
-msgstr "IP 已被锁定（请联系管理员解锁或 {} 分钟后重试）"
+msgstr "IP 已被锁定 (请联系管理员解锁或 {} 分钟后重试)"
 
 #: authentication/errors/const.py:59
 #, python-brace-format
@@ -2535,7 +2535,7 @@ msgid ""
 "{error}, You can also try {times_try} times (The account will be temporarily "
 "locked for {block_time} minutes)"
 msgstr ""
-"{error}，您还可以尝试 {times_try} 次（账号将被临时锁定 {block_time} 分钟）"
+"{error}，您还可以尝试 {times_try} 次 (账号将被临时锁定 {block_time} 分钟)"
 
 #: authentication/errors/const.py:63
 msgid "MFA required"
@@ -2706,7 +2706,7 @@ msgstr "清空手机号码禁用"
 
 #: authentication/middleware.py:93 settings/utils/ldap.py:661
 msgid "Authentication failed (before login check failed): {}"
-msgstr "认证失败（登录前检查失败）: {}"
+msgstr "认证失败 (登录前检查失败): {}"
 
 #: authentication/mixins.py:91
 msgid ""
@@ -3823,7 +3823,7 @@ msgstr "运行目录"
 
 #: ops/models/job.py:126
 msgid "Timeout (Seconds)"
-msgstr "超时时间（秒）"
+msgstr "超时时间 (秒)"
 
 #: ops/models/job.py:133
 msgid "Use Parameter Define"
@@ -4850,11 +4850,13 @@ msgstr "更多信息 URL"
 
 #: settings/serializers/basic.py:30
 msgid "Site url"
-msgstr "当前站点URL"
+msgstr "当前站点 URL"
 
 #: settings/serializers/basic.py:31
-msgid "eg: http://dev.jumpserver.org:8080"
-msgstr "如: http://dev.jumpserver.org:8080"
+msgid ""
+"Email links or other system callbacks are used to access it, eg: http://dev."
+"jumpserver.org:8080"
+msgstr ""
 
 #: settings/serializers/basic.py:34
 msgid "User guide url"
@@ -4898,38 +4900,38 @@ msgstr "定時清掃"
 
 #: settings/serializers/cleaning.py:12
 msgid "Login log keep days (day)"
-msgstr "登录日志（天）"
+msgstr "登录日志 (天)"
 
 #: settings/serializers/cleaning.py:16
 msgid "Task log keep days (day)"
-msgstr "任务日志（天）"
+msgstr "任务日志 (天)"
 
 #: settings/serializers/cleaning.py:20
 msgid "Operate log keep days (day)"
-msgstr "操作日志（天）"
+msgstr "操作日志 (天)"
 
 #: settings/serializers/cleaning.py:24
 msgid "FTP log keep days (day)"
-msgstr "上传下载（天）"
+msgstr "上传下载 (天)"
 
 #: settings/serializers/cleaning.py:28
 msgid "Cloud sync record keep days (day)"
-msgstr "云同步记录（天）"
+msgstr "云同步记录 (天)"
 
 #: settings/serializers/cleaning.py:31
 msgid "Session keep duration (day)"
-msgstr "会话日志（天）"
+msgstr "会话日志 (天)"
 
 #: settings/serializers/cleaning.py:33
 msgid ""
 "Session, record, command will be delete if more than duration, only in "
 "database, OSS will not be affected."
 msgstr ""
-"会话、录像，命令记录超过该时长将会被清除（影响数据库存储，OSS 等不受影响）"
+"会话、录像，命令记录超过该时长将会被清除 (影响数据库存储，OSS 等不受影响)"
 
 #: settings/serializers/cleaning.py:37
 msgid "Activity log keep days (day)"
-msgstr "活动记录（天）"
+msgstr "活动记录 (天)"
 
 #: settings/serializers/email.py:21
 msgid "SMTP host"
@@ -5108,7 +5110,7 @@ msgstr "必须包含特殊字符"
 msgid ""
 "If the user has failed to log in for a limited number of times, no login is "
 "allowed during this time interval."
-msgstr "当用户登录失败次数达到限制后，那么在此时间间隔内禁止登录"
+msgstr "当用户登录失败次数达到限制后，那么在此间隔内禁止登录"
 
 #: settings/serializers/security.py:39
 msgid "Not enabled"
@@ -5128,7 +5130,7 @@ msgstr "全局启用 MFA 认证"
 
 #: settings/serializers/security.py:47
 msgid "Third-party login users perform MFA authentication"
-msgstr "第三方登录用户进行MFA认证"
+msgstr "第三方认证开启 MFA"
 
 #: settings/serializers/security.py:48
 msgid "The third-party login modes include OIDC, CAS, and SAML2"
@@ -5140,7 +5142,7 @@ msgstr "限制用户登录失败次数"
 
 #: settings/serializers/security.py:56
 msgid "Block user login interval (minute)"
-msgstr "禁止用户登录时间间隔（分）"
+msgstr "禁止用户登录间隔 (分)"
 
 #: settings/serializers/security.py:61
 msgid "Limit the number of IP login failures"
@@ -5148,7 +5150,7 @@ msgstr "限制 IP 登录失败次数"
 
 #: settings/serializers/security.py:65
 msgid "Block IP login interval (minute)"
-msgstr "禁止 IP 登录时间间隔（分）"
+msgstr "禁止 IP 登录间隔 (分)"
 
 #: settings/serializers/security.py:69
 msgid "Login IP White List"
@@ -5160,7 +5162,7 @@ msgstr "IP 登录黑名单"
 
 #: settings/serializers/security.py:80
 msgid "User password expiration (day)"
-msgstr "用户密码过期时间（天）"
+msgstr "用户密码过期时间 (天)"
 
 #: settings/serializers/security.py:82
 msgid ""
@@ -5169,7 +5171,7 @@ msgid ""
 "sent to the user by system within 5 days (daily) before the password expires"
 msgstr ""
 "如果用户在此期间没有更新密码，用户密码将过期失效； 密码过期提醒邮件将在密码过"
-"期前5天内由系统（每天）自动发送给用户"
+"期前5天内由系统 (每天)自动发送给用户"
 
 #: settings/serializers/security.py:89
 msgid "Number of repeated historical passwords"
@@ -5203,13 +5205,13 @@ msgid ""
 "exist)"
 msgstr ""
 "如果开启，不存在的用户将不被允许登录；如果关闭，除本地认证方式外，其他认证方"
-"式的用户都允许登录并自动创建用户（如果用户不存在）"
+"式的用户都允许登录并自动创建用户 (如果用户不存在)"
 
-#: settings/serializers/security.py:105
+#: settings/serializers/security.py:108
 msgid "Only from source login"
 msgstr "仅从用户来源登录"
 
-#: settings/serializers/security.py:107
+#: settings/serializers/security.py:110
 msgid ""
 "If it is enabled, the user will only authenticate to the source when logging "
 "in; if it is disabled, the user will authenticate all the enabled "
@@ -5219,28 +5221,29 @@ msgstr ""
 "如果开启，用户登录时仅会向来源端进行认证；如果关闭，用户登录时会按照一定的顺"
 "序对所有已开启的认证方式进行顺序认证，只要有一个认证成功就可以直接登录"
 
-#: settings/serializers/security.py:111
-msgid "MFA verify TTL (secend)"
-msgstr "MFA 校验有效期（秒）"
-
-#: settings/serializers/security.py:113
-msgid ""
-"The verification MFA takes effect only when you view the account password"
-msgstr "目前仅在查看账号密码校验 MFA 时生效"
-
 #: settings/serializers/security.py:118
-msgid "Verify code TTL"
-msgstr "验证码有效时间"
+msgid "MFA verify TTL"
+msgstr "MFA 校验有效期"
 
-#: settings/serializers/security.py:119
-msgid "Unit: second, reset password and send SMS code expiration time"
+#: settings/serializers/security.py:120
+msgid ""
+"Unit: second, The verification MFA takes effect only when you view the "
+"account password"
+msgstr "单位：秒，目前仅在查看账号密码校验 MFA 时生效"
+
+#: settings/serializers/security.py:125
+msgid "Verify code TTL (second)"
+msgstr "验证码有效时间 (分)"
+
+#: settings/serializers/security.py:126
+msgid "Reset password and send SMS code expiration time"
 msgstr "重置密码的验证码及发送短信的验证码过期时间"
 
-#: settings/serializers/security.py:123
+#: settings/serializers/security.py:130
 msgid "Enable Login dynamic code"
 msgstr "启用登录附加码"
 
-#: settings/serializers/security.py:124
+#: settings/serializers/security.py:131
 msgid ""
 "The password and additional code are sent to a third party authentication "
 "system for verification"
@@ -5248,111 +5251,111 @@ msgstr ""
 "密码和附加码一并发送给第三方认证系统进行校验, 如：有的第三方认证系统，需要 密"
 "码+6位数字 完成认证"
 
-#: settings/serializers/security.py:129
+#: settings/serializers/security.py:136
 msgid "MFA in login page"
 msgstr "MFA 在登录页面输入"
 
-#: settings/serializers/security.py:130
+#: settings/serializers/security.py:137
 msgid "Eu security regulations(GDPR) require MFA to be on the login page"
 msgstr "欧盟数据安全法规(GDPR) 要求 MFA 在登录页面，来确保系统登录安全"
 
-#: settings/serializers/security.py:133
+#: settings/serializers/security.py:140
 msgid "Enable Login captcha"
 msgstr "启用登录验证码"
 
-#: settings/serializers/security.py:134
+#: settings/serializers/security.py:141
 msgid "Enable captcha to prevent robot authentication"
 msgstr "开启验证码，防止机器人登录"
 
-#: settings/serializers/security.py:156
+#: settings/serializers/security.py:163
 msgid "Enable terminal register"
-msgstr "终端注册"
+msgstr "组件注册"
 
-#: settings/serializers/security.py:158
+#: settings/serializers/security.py:165
 msgid ""
 "Allow terminal register, after all terminal setup, you should disable this "
 "for security"
-msgstr "是否允许终端注册，当所有终端启动后，为了安全应该关闭"
+msgstr "是否允许组件注册，当所有终端启动后，为了安全应该关闭"
 
-#: settings/serializers/security.py:162
+#: settings/serializers/security.py:169
 msgid "Enable watermark"
 msgstr "开启水印"
 
-#: settings/serializers/security.py:163
+#: settings/serializers/security.py:170
 msgid "Enabled, the web session and replay contains watermark information"
 msgstr "启用后，Web 会话和录像将包含水印信息"
 
-#: settings/serializers/security.py:167
+#: settings/serializers/security.py:174
 msgid "Connection max idle time (minute)"
-msgstr "连接最大空闲时间（分）"
+msgstr "连接最大空闲时间 (分)"
 
-#: settings/serializers/security.py:168
+#: settings/serializers/security.py:175
 msgid "If idle time more than it, disconnect connection."
 msgstr "提示：如果超过该配置没有操作，连接会被断开"
 
-#: settings/serializers/security.py:172
+#: settings/serializers/security.py:179
 msgid "Session max connection time (hour)"
-msgstr "会话连接最大时间（时）"
+msgstr "会话连接最大时间 (时)"
 
-#: settings/serializers/security.py:173
+#: settings/serializers/security.py:180
 msgid "If session connection time more than it, disconnect connection."
 msgstr "提示：如果会话连接超过该配置，连接会被断开"
 
-#: settings/serializers/security.py:176
+#: settings/serializers/security.py:183
 msgid "Remember manual auth"
 msgstr "保存手动输入密码"
 
-#: settings/serializers/security.py:179
+#: settings/serializers/security.py:186
 msgid "Insecure command alert"
 msgstr "危险命令告警"
 
-#: settings/serializers/security.py:182
+#: settings/serializers/security.py:189
 msgid "Email recipient"
 msgstr "邮件收件人"
 
-#: settings/serializers/security.py:183
+#: settings/serializers/security.py:190
 msgid "Multiple user using , split"
 msgstr "多个用户，使用 , 分割"
 
-#: settings/serializers/security.py:186
+#: settings/serializers/security.py:193
 msgid "Operation center"
 msgstr "作业中心"
 
-#: settings/serializers/security.py:187
+#: settings/serializers/security.py:194
 msgid "Allow user run batch command or not using ansible"
 msgstr "是否允许用户使用 ansible 执行批量命令"
 
-#: settings/serializers/security.py:191
+#: settings/serializers/security.py:198
 msgid "Operation center command blacklist"
 msgstr "作业中心命令黑名单"
 
-#: settings/serializers/security.py:192
+#: settings/serializers/security.py:199
 msgid "Commands that are not allowed execute."
 msgstr "不允许执行的命令"
 
-#: settings/serializers/security.py:195
+#: settings/serializers/security.py:202
 msgid "Session share"
 msgstr "会话分享"
 
-#: settings/serializers/security.py:196
+#: settings/serializers/security.py:203
 msgid "Enabled, Allows user active session to be shared with other users"
 msgstr "开启后允许用户分享已连接的资产会话给他人，协同工作"
 
-#: settings/serializers/security.py:200
+#: settings/serializers/security.py:207
 msgid "Unused user timeout (day)"
-msgstr ""
+msgstr "不活跃用户自动禁用 (天)"
 
-#: settings/serializers/security.py:201
+#: settings/serializers/security.py:208
 msgid ""
 "Detect infrequent users daily and disable them if they exceed the "
 "predetermined time limit."
-msgstr ""
+msgstr "每天检测一次，超过预设时间的用户自动禁用"
 
-#: settings/serializers/security.py:204
+#: settings/serializers/security.py:211
 msgid "Remote Login Protection"
-msgstr "异地登录保护"
+msgstr "异地登录通知"
 
-#: settings/serializers/security.py:206
+#: settings/serializers/security.py:213
 msgid ""
 "The system determines whether the login IP address belongs to a common login "
 "city. If the account is logged in from a common login city, the system sends "
@@ -5486,27 +5489,27 @@ msgstr "LDAP认证没有启用"
 
 #: settings/utils/ldap.py:613
 msgid "Error (Invalid LDAP server): {}"
-msgstr "错误 （不合法的LDAP服务器地址）: {}"
+msgstr "错误  (不合法的LDAP服务器地址): {}"
 
 #: settings/utils/ldap.py:615
 msgid "Error (Invalid Bind DN): {}"
-msgstr "错误（不合法的绑定DN）: {}"
+msgstr "错误 (不合法的绑定DN): {}"
 
 #: settings/utils/ldap.py:617
 msgid "Error (Invalid LDAP User attr map): {}"
-msgstr "错误（不合法的LDAP属性映射）: {}"
+msgstr "错误 (不合法的LDAP属性映射): {}"
 
 #: settings/utils/ldap.py:619
 msgid "Error (Invalid User OU or User search filter): {}"
-msgstr "错误（不合法的用户OU或用户过滤器）: {}"
+msgstr "错误 (不合法的用户OU或用户过滤器): {}"
 
 #: settings/utils/ldap.py:621
 msgid "Error (Not enabled LDAP authentication): {}"
-msgstr "错误（没有启用LDAP认证）: {}"
+msgstr "错误 (没有启用LDAP认证): {}"
 
 #: settings/utils/ldap.py:623
 msgid "Error (Unknown): {}"
-msgstr "错误（未知）: {}"
+msgstr "错误 (未知): {}"
 
 #: settings/utils/ldap.py:626
 msgid "Succeed: Match {} s user"
@@ -5514,7 +5517,7 @@ msgstr "成功匹配 {} 个用户"
 
 #: settings/utils/ldap.py:659
 msgid "Authentication failed (configuration incorrect): {}"
-msgstr "认证失败（配置错误）: {}"
+msgstr "认证失败 (配置错误): {}"
 
 #: settings/utils/ldap.py:663
 msgid "Authentication failed (username or password incorrect): {}"
@@ -6356,8 +6359,8 @@ msgid ""
 "access address of the current browser will be used (the default endpoint "
 "does not allow modification of the host)"
 msgstr ""
-"连接资产时访问的主机地址，如果为空则使用当前浏览器的访问地址（默认端点不允许"
-"修改主机）"
+"连接资产时访问的主机地址，如果为空则使用当前浏览器的访问地址 (默认端点不允许"
+"修改主机)"
 
 #: terminal/serializers/endpoint.py:64
 msgid ""
@@ -6906,8 +6909,8 @@ msgid ""
 "in. you can also directly bind in \"personal information -> quick "
 "modification -> change MFA Settings\"!"
 msgstr ""
-"启用之后您将会在下次登录时进入多因子认证绑定流程；您也可以在（个人信息->快速"
-"修改->设置 MFA 多因子认证）中直接绑定！"
+"启用之后您将会在下次登录时进入多因子认证绑定流程；您也可以在 (个人信息->快速"
+"修改->设置 MFA 多因子认证)中直接绑定！"
 
 #: users/forms/profile.py:61
 msgid "* Enable MFA to make the account more secure."
@@ -6919,8 +6922,8 @@ msgid ""
 "and key sensitive information properly. (for example: setting complex "
 "password, enabling MFA)"
 msgstr ""
-"为了保护您和公司的安全，请妥善保管您的账号、密码和密钥等重要敏感信息；（如："
-"设置复杂密码，并启用 MFA 多因子认证）"
+"为了保护您和公司的安全，请妥善保管您的账号、密码和密钥等重要敏感信息； (如："
+"设置复杂密码，并启用 MFA 多因子认证)"
 
 #: users/forms/profile.py:77
 msgid "Finish"
@@ -7348,7 +7351,7 @@ msgstr "iPhone手机下载"
 msgid ""
 "After installation, click the next step to enter the binding page (if "
 "installed, go to the next step directly)."
-msgstr "安装完成后点击下一步进入绑定页面（如已安装，直接进入下一步）"
+msgstr "安装完成后点击下一步进入绑定页面 (如已安装，直接进入下一步)"
 
 #: users/templates/users/user_password_verify.html:8
 #: users/templates/users/user_password_verify.html:9
@@ -7705,95 +7708,95 @@ msgstr "策略动作"
 
 #: xpack/plugins/cloud/providers/aws_international.py:18
 msgid "China (Beijing)"
-msgstr "中国（北京）"
+msgstr "中国 (北京)"
 
 #: xpack/plugins/cloud/providers/aws_international.py:19
 msgid "China (Ningxia)"
-msgstr "中国（宁夏）"
+msgstr "中国 (宁夏)"
 
 #: xpack/plugins/cloud/providers/aws_international.py:22
 msgid "US East (Ohio)"
-msgstr "美国东部（俄亥俄州）"
+msgstr "美国东部 (俄亥俄州)"
 
 #: xpack/plugins/cloud/providers/aws_international.py:23
 msgid "US East (N. Virginia)"
-msgstr "美国东部（弗吉尼亚北部）"
+msgstr "美国东部 (弗吉尼亚北部)"
 
 #: xpack/plugins/cloud/providers/aws_international.py:24
 msgid "US West (N. California)"
-msgstr "美国西部（加利福尼亚北部）"
+msgstr "美国西部 (加利福尼亚北部)"
 
 #: xpack/plugins/cloud/providers/aws_international.py:25
 msgid "US West (Oregon)"
-msgstr "美国西部（俄勒冈）"
+msgstr "美国西部 (俄勒冈)"
 
 #: xpack/plugins/cloud/providers/aws_international.py:26
 msgid "Africa (Cape Town)"
-msgstr "非洲（开普敦）"
+msgstr "非洲 (开普敦)"
 
 #: xpack/plugins/cloud/providers/aws_international.py:27
 msgid "Asia Pacific (Hong Kong)"
-msgstr "亚太地区（香港）"
+msgstr "亚太地区 (香港)"
 
 #: xpack/plugins/cloud/providers/aws_international.py:28
 msgid "Asia Pacific (Mumbai)"
-msgstr "亚太地区（孟买）"
+msgstr "亚太地区 (孟买)"
 
 #: xpack/plugins/cloud/providers/aws_international.py:29
 msgid "Asia Pacific (Osaka-Local)"
-msgstr "亚太区域（大阪当地）"
+msgstr "亚太区域 (大阪当地)"
 
 #: xpack/plugins/cloud/providers/aws_international.py:30
 msgid "Asia Pacific (Seoul)"
-msgstr "亚太区域（首尔）"
+msgstr "亚太区域 (首尔)"
 
 #: xpack/plugins/cloud/providers/aws_international.py:31
 msgid "Asia Pacific (Singapore)"
-msgstr "亚太区域（新加坡）"
+msgstr "亚太区域 (新加坡)"
 
 #: xpack/plugins/cloud/providers/aws_international.py:32
 msgid "Asia Pacific (Sydney)"
-msgstr "亚太区域（悉尼）"
+msgstr "亚太区域 (悉尼)"
 
 #: xpack/plugins/cloud/providers/aws_international.py:33
 msgid "Asia Pacific (Tokyo)"
-msgstr "亚太区域（东京）"
+msgstr "亚太区域 (东京)"
 
 #: xpack/plugins/cloud/providers/aws_international.py:34
 msgid "Canada (Central)"
-msgstr "加拿大（中部）"
+msgstr "加拿大 (中部)"
 
 #: xpack/plugins/cloud/providers/aws_international.py:35
 msgid "Europe (Frankfurt)"
-msgstr "欧洲（法兰克福）"
+msgstr "欧洲 (法兰克福)"
 
 #: xpack/plugins/cloud/providers/aws_international.py:36
 msgid "Europe (Ireland)"
-msgstr "欧洲（爱尔兰）"
+msgstr "欧洲 (爱尔兰)"
 
 #: xpack/plugins/cloud/providers/aws_international.py:37
 msgid "Europe (London)"
-msgstr "欧洲（伦敦）"
+msgstr "欧洲 (伦敦)"
 
 #: xpack/plugins/cloud/providers/aws_international.py:38
 msgid "Europe (Milan)"
-msgstr "欧洲（米兰）"
+msgstr "欧洲 (米兰)"
 
 #: xpack/plugins/cloud/providers/aws_international.py:39
 msgid "Europe (Paris)"
-msgstr "欧洲（巴黎）"
+msgstr "欧洲 (巴黎)"
 
 #: xpack/plugins/cloud/providers/aws_international.py:40
 msgid "Europe (Stockholm)"
-msgstr "欧洲（斯德哥尔摩）"
+msgstr "欧洲 (斯德哥尔摩)"
 
 #: xpack/plugins/cloud/providers/aws_international.py:41
 msgid "Middle East (Bahrain)"
-msgstr "中东（巴林）"
+msgstr "中东 (巴林)"
 
 #: xpack/plugins/cloud/providers/aws_international.py:42
 msgid "South America (São Paulo)"
-msgstr "南美洲（圣保罗）"
+msgstr "南美洲 (圣保罗)"
 
 #: xpack/plugins/cloud/providers/baiducloud.py:54
 #: xpack/plugins/cloud/providers/jdcloud.py:125
@@ -8078,8 +8081,53 @@ msgstr "旗舰版"
 msgid "Community edition"
 msgstr "社区版"
 
-#~ msgid "EU-Paris"
-#~ msgstr "欧洲-巴黎"
+#~ msgid "Strategy"
+#~ msgstr "策略"
+
+#~ msgid "Sync instance snapshot"
+#~ msgstr "同步实例快照"
+
+#~ msgid "Task strategy"
+#~ msgstr "密码策略"
+
+#~ msgid "Not"
+#~ msgstr "否"
+
+#~ msgid "In"
+#~ msgstr "在..里面"
+
+#~ msgid "Contains"
+#~ msgstr "包含"
+
+#~ msgid "Startswith"
+#~ msgstr "以..开头"
+
+#~ msgid "Endswith"
+#~ msgstr "以..结尾"
+
+#~ msgid "Instance platform"
+#~ msgstr "实例平台"
+
+#~ msgid "Instance address"
+#~ msgstr "实例地址"
+
+#~ msgid "Rule attr"
+#~ msgstr "规则属性"
+
+#~ msgid "Rule match"
+#~ msgstr "规则匹配"
+
+#~ msgid "Rule value"
+#~ msgstr "规则值"
+
+#~ msgid "Strategy rule"
+#~ msgstr "策略规则"
+
+#~ msgid "Action attr"
+#~ msgstr "动作属性"
+
+#~ msgid "Action value"
+#~ msgstr "动作值"
 
 #~ msgid "CN Northeast-Dalian"
 #~ msgstr "华北-大连"
