@@ -95,6 +95,8 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             field.name for field in template._meta.fields
             if field.name not in ignore_fields
         ]
+        field_names = [name if name != '_secret' else 'secret' for name in field_names]
+
         attrs = {}
         for name in field_names:
             value = getattr(template, name, None)

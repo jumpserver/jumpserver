@@ -96,3 +96,6 @@ REDIS_PORT: 6379
 # 仅允许已存在的用户登录，不允许第三方认证后，自动创建用户
 # ONLY_ALLOW_EXIST_USER_AUTH: False
 
+# 当前存储的类型，默认 local，新增类型 hcp 为远端 vault 存储
+# VAULT_TYPE: local
+
