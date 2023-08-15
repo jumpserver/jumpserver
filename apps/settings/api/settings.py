@@ -44,7 +44,6 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'keycloak': serializers.KeycloakSettingSerializer,
         'radius': serializers.RadiusSettingSerializer,
         'cas': serializers.CASSettingSerializer,
-        'sso': serializers.SSOSettingSerializer,
         'saml2': serializers.SAML2SettingSerializer,
         'oauth2': serializers.OAuth2SettingSerializer,
         'clean': serializers.CleaningSerializer,
@@ -58,7 +57,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'vault': serializers.VaultSettingSerializer,
         'announcement': serializers.AnnouncementSettingSerializer,
         'ticket': serializers.TicketSettingSerializer,
-
+        'ops': serializers.OpsSettingSerializer,
     }
 
     rbac_category_permissions = {

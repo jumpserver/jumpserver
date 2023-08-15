@@ -7,7 +7,7 @@ from accounts.const import VaultTypeChoices
 from common.serializers.fields import EncryptedField
 
 __all__ = [
-    'AnnouncementSettingSerializer',
+    'AnnouncementSettingSerializer', 'OpsSettingSerializer',
     'VaultSettingSerializer', 'TicketSettingSerializer'
 ]
 
@@ -32,11 +32,15 @@ class AnnouncementSerializer(serializers.Serializer):
 
 
 class AnnouncementSettingSerializer(serializers.Serializer):
+    PREFIX_TITLE = _('Announcement')
+
     ANNOUNCEMENT_ENABLED = serializers.BooleanField(label=_('Enable announcement'), default=True)
     ANNOUNCEMENT = AnnouncementSerializer(label=_("Announcement"))
 
 
 class VaultSettingSerializer(serializers.Serializer):
+    PREFIX_TITLE = _('Vault')
+
     VAULT_TYPE = serializers.ChoiceField(
         default=VaultTypeChoices.local, choices=VaultTypeChoices.choices,
         required=False, label=_('Type')
@@ -57,6 +61,8 @@ class VaultSettingSerializer(serializers.Serializer):
 
 
 class TicketSettingSerializer(serializers.Serializer):
+    PREFIX_TITLE = _('Ticket')
+
     TICKETS_ENABLED = serializers.BooleanField(required=False, default=True, label=_("Enable tickets"))
     TICKET_AUTHORIZE_DEFAULT_TIME = serializers.IntegerField(
         min_value=1, max_value=999999, required=False,
@@ -69,6 +75,8 @@ class TicketSettingSerializer(serializers.Serializer):
 
 
 class OpsSettingSerializer(serializers.Serializer):
+    PREFIX_TITLE = _('Feature')
+
     SECURITY_COMMAND_EXECUTION = serializers.BooleanField(
         required=False, label=_('Operation center'),
         help_text=_('Allow user run batch command or not using ansible')
