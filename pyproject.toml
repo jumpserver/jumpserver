@@ -103,11 +103,7 @@ django-proxy = "1.2.2"
 channels-redis = "4.1.0"
 python-daemon = "3.0.1"
 eventlet = "0.33.3"
-# greenlet = "2.0.2"
-greenlet = [
-    { url = "https://download.jumpserver.org/pypi/simple/greenlet/greenlet-2.0.2-cp311-cp311-linux_loongarch64.whl", markers = "sys_platform == 'linux' and platform_machine == 'loongarch64'" },
-    { version = "2.0.2", source = "tsinghua", markers = "platform_machine != 'loongarch64'" }
-]
+greenlet = "2.0.2"
 gunicorn = "21.2.0"
 celery = "5.3.1"
 flower = "2.0.0"
@@ -142,12 +138,10 @@ pyhcl = "0.4.4"
 ipy = "1.1"
 netifaces = "^0.11.0"
 
-
 [tool.poetry.group.dev.dependencies]
 daphne = "4.0.0"
 channels = "^4.0.0"
 channels-redis = "^4.1.0"
-
 
 [tool.poetry.group.xpack.dependencies]
 qingcloud-sdk = "1.2.15"
@@ -156,11 +150,7 @@ azure-identity = "1.13.0"
 azure-mgmt-compute = "30.0.0"
 azure-mgmt-network = "23.1.0"
 google-cloud-compute = "1.13.0"
-# grpcio = "1.56.2"
-grpcio = [
-    { url = "https://download.jumpserver.org/pypi/simple/grpcio/grpcio-1.56.2-cp311-cp311-linux_loongarch64.whl", markers = "sys_platform == 'linux' and platform_machine == 'loongarch64'" },
-    { version = "1.56.2", source = "tsinghua", markers = "platform_machine != 'loongarch64'" }
-]
+grpcio = "1.56.2"
 alibabacloud-dysmsapi20170525 = "2.0.24"
 python-novaclient = "18.3.0"
 python-keystoneclient = "5.1.0"
@@ -182,7 +172,6 @@ huaweicloudsdkcore = "3.1.52"
 name = "tsinghua"
 url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
 priority = "primary"
-
 
 [[tool.poetry.source]]
 name = "PyPI"
