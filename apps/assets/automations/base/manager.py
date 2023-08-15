@@ -9,7 +9,7 @@ import yaml
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext as _
-from sshtunnel import SSHTunnelForwarder, BaseSSHTunnelForwarderError
+from sshtunnel import SSHTunnelForwarder
 
 from assets.automations.methods import platform_automation_methods
 from common.utils import get_logger, lazyproperty, is_openssh_format_key, ssh_pubkey_gen
@@ -265,19 +265,18 @@ class BasePlaybookManager:
             jms_asset, jms_gateway = host.get('jms_asset'), host.get('gateway')
             if not jms_gateway:
                 continue
-
-            server = SSHTunnelForwarder(
-                (jms_gateway['address'], jms_gateway['port']),
-                ssh_username=jms_gateway['username'],
-                ssh_password=jms_gateway['secret'],
-                ssh_pkey=jms_gateway['private_key_path'],
-                remote_bind_address=(jms_asset['address'], jms_asset['port'])
-            )
             try:
+                server = SSHTunnelForwarder(
+                    (jms_gateway['address'], jms_gateway['port']),
+                    ssh_username=jms_gateway['username'],
+                    ssh_password=jms_gateway['secret'],
+                    ssh_pkey=jms_gateway['private_key_path'],
+                    remote_bind_address=(jms_asset['address'], jms_asset['port'])
+                )
                 server.start()
-            except BaseSSHTunnelForwarderError:
+            except Exception as e:
                 err_msg = 'Gateway is not active: %s' % jms_asset.get('name', '')
-                print('\033[31m %s \033[0m\n' % err_msg)
+                print(f'\033[31m {err_msg} 原因: {e} \033[0m\n')
                 not_valid.append(k)
             else:
                 host['ansible_host'] = jms_asset['address'] = '127.0.0.1'
