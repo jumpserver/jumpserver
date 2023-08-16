@@ -60,7 +60,14 @@ class JMSPermedInventory(JMSInventory):
             host['error'] = _("No account available")
             return host
 
-        if protocol.name != self.module:
+        protocol_supported_modules_mapping = {
+            'mysql': ['mysql'],
+            'postgresql': ['postgresql'],
+            'sqlserver': ['sqlserver'],
+            'ssh': ['shell', 'python', 'win_shell'],
+        }
+
+        if self.module not in protocol_supported_modules_mapping.get(protocol.name, []):
             host['error'] = "Module {} is not suitable for this asset".format(self.module)
             return host
 
