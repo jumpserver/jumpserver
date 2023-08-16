@@ -36,7 +36,7 @@ class HostTypes(BaseType):
                 'choices': ['ssh', 'sftp', 'telnet', 'vnc', 'rdp']
             },
             cls.WINDOWS: {
-                'choices': ['rdp', 'ssh', 'vnc', 'winrm']
+                'choices': ['rdp', 'ssh', 'sftp', 'vnc', 'winrm']
             }
         }
 
