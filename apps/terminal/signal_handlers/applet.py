@@ -29,10 +29,11 @@ def on_applet_host_create(sender, instance, created=False, **kwargs):
 
 
 @receiver(post_save, sender=User)
-def on_user_create_create_account(sender, instance, created=False, **kwargs):
+def on_user_create_create_account(sender, instance: User, created=False, **kwargs):
     if not created:
         return
-
+    if instance.is_service_account:
+        return
     with tmp_to_builtin_org(system=1):
         applet_hosts = AppletHost.objects.all()
         for host in applet_hosts:
