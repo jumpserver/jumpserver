@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -58,7 +59,8 @@ class AppletHostDeploymentViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        instance = serializer.save()
+        with transaction.atomic():
+            instance = serializer.save()
         task = run_applet_host_deployment.delay(instance.id)
         instance.save_task(task.id)
         return Response({'task': str(task.id)}, status=201)
