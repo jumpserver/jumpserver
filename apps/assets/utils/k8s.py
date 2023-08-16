@@ -105,7 +105,7 @@ class KubernetesTree:
         i = str(self.asset.id)
         name = str(self.asset)
         node = self.create_tree_node(
-            i, i, name, 'asset', is_open=True,
+            i, i, name, 'asset', icon='k8s', is_open=True,
         )
         return node
 
