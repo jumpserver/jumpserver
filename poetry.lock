@@ -1824,7 +1824,7 @@ description = ""
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "django-cas-ng-4.3.1.zip", hash = "sha256:aeea96ad7958e3cb40d9bb5ef6a1add66f720835dfe87cc1dfe163f92d084690"},
+    {file = "django-cas-ng-4.3.2.zip", hash = "sha256:3539eae7ca857017cefa962782c99cbd35cc15ea741655b10c3417fa7e86807a"},
 ]
 
 [package.dependencies]
@@ -1833,7 +1833,7 @@ python-cas = ">=1.6.0"
 
 [package.source]
 type = "url"
-url = "https://github.com/ibuler/django-cas-ng/releases/download/v4.3.1/django-cas-ng-4.3.1.zip"
+url = "https://github.com/ibuler/django-cas-ng/releases/download/v4.3.2/django-cas-ng-4.3.2.zip"
 
 [[package]]
 name = "django-celery-beat"
@@ -7223,4 +7223,4 @@ reference = "tsinghua"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "0bc2878f163c8b2f48d1103d96314c56f722f10d8f8adf6dfaba0452e6eac368"
+content-hash = "6772c51033ce0b8cc877596f541cef0b902fe81d7495367cf4f7febec2bc260b"
