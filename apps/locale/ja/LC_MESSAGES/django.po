@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-17 15:30+0800\n"
+"POT-Creation-Date: 2023-08-17 18:24+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -857,15 +857,19 @@ msgstr "アカウント接続のテスト"
 msgid "Password can not contains `{{` "
 msgstr "パスワードには '{{' を含まない"
 
-#: accounts/utils.py:44
+#: accounts/utils.py:43
+msgid "Password can not contains `{%` "
+msgstr "パスワードには '{%' を含まない"
+
+#: accounts/utils.py:46
 msgid "Password can not contains `'` "
 msgstr "パスワードには `'` を含まない"
 
-#: accounts/utils.py:46
+#: accounts/utils.py:48
 msgid "Password can not contains `\"` "
 msgstr "パスワードには `\"` を含まない"
 
-#: accounts/utils.py:52
+#: accounts/utils.py:54
 msgid "private key invalid or passphrase error"
 msgstr "秘密鍵が無効またはpassphraseエラー"
 
@@ -1032,7 +1036,7 @@ msgid "None of the reviewers belong to Organization `{}`"
 msgstr "いずれのレビューアも組織 '{}' に属していません"
 
 #: acls/serializers/rules/rules.py:20
-#: xpack/plugins/cloud/serializers/task.py:133
+#: xpack/plugins/cloud/serializers/task.py:137
 msgid "IP address invalid: `{}`"
 msgstr "IPアドレスが無効: '{}'"
 
@@ -7696,7 +7700,7 @@ msgstr "クラウドアカウント"
 msgid "Test cloud account"
 msgstr "クラウドアカウントのテスト"
 
-#: xpack/plugins/cloud/models.py:92 xpack/plugins/cloud/serializers/task.py:147
+#: xpack/plugins/cloud/models.py:92 xpack/plugins/cloud/serializers/task.py:151
 msgid "Regions"
 msgstr "リージョン"
 
@@ -7705,17 +7709,17 @@ msgid "Hostname strategy"
 msgstr "ホスト名戦略"
 
 #: xpack/plugins/cloud/models.py:100
-#: xpack/plugins/cloud/serializers/task.py:150
+#: xpack/plugins/cloud/serializers/task.py:154
 msgid "IP network segment group"
 msgstr "IPネットワークセグメントグループ"
 
 #: xpack/plugins/cloud/models.py:103
-#: xpack/plugins/cloud/serializers/task.py:155
+#: xpack/plugins/cloud/serializers/task.py:159
 msgid "Sync IP type"
 msgstr "同期IPタイプ"
 
 #: xpack/plugins/cloud/models.py:106
-#: xpack/plugins/cloud/serializers/task.py:173
+#: xpack/plugins/cloud/serializers/task.py:177
 msgid "Always update"
 msgstr "常に更新"
 
@@ -7808,7 +7812,7 @@ msgstr "ルール一致"
 msgid "Rule value"
 msgstr "ルール値"
 
-#: xpack/plugins/cloud/models.py:317
+#: xpack/plugins/cloud/models.py:317 xpack/plugins/cloud/serializers/task.py:70
 msgid "Strategy rule"
 msgstr "戦略ルール"
 
@@ -7820,7 +7824,7 @@ msgstr "アクション属性"
 msgid "Action value"
 msgstr "アクション値"
 
-#: xpack/plugins/cloud/models.py:341
+#: xpack/plugins/cloud/models.py:341 xpack/plugins/cloud/serializers/task.py:73
 msgid "Strategy action"
 msgstr "戦略アクション"
 
@@ -8108,7 +8112,7 @@ msgstr "テストタイムアウト"
 msgid "Project"
 msgstr "project"
 
-#: xpack/plugins/cloud/serializers/task.py:139
+#: xpack/plugins/cloud/serializers/task.py:143
 msgid ""
 "Only instances matching the IP range will be synced. <br>If the instance "
 "contains multiple IP addresses, the first IP address that matches will be "
@@ -8122,11 +8126,11 @@ msgstr ""
 "ドレスをランダムに一致させることを意味します。 <br> 例: "
 "192.168.1.0/24,10.1.1.1-10.1.1.20。"
 
-#: xpack/plugins/cloud/serializers/task.py:145
+#: xpack/plugins/cloud/serializers/task.py:149
 msgid "History count"
 msgstr "実行回数"
 
-#: xpack/plugins/cloud/serializers/task.py:146
+#: xpack/plugins/cloud/serializers/task.py:150
 msgid "Instance count"
 msgstr "インスタンス数"
 
