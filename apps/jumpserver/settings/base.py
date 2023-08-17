@@ -334,6 +334,8 @@ AUTH_USER_MODEL = 'users.User'
 FILE_UPLOAD_PERMISSIONS = 0o644
 FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755
 
+X_FRAME_OPTIONS = CONFIG.X_FRAME_OPTIONS
+
 # Cache use redis
 REDIS_SSL_KEY = exist_or_default(os.path.join(CERTS_DIR, 'redis_client.key'), None)
 REDIS_SSL_CERT = exist_or_default(os.path.join(CERTS_DIR, 'redis_client.crt'), None)
