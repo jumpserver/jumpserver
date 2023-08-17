@@ -60,6 +60,10 @@ class DownloadUploadMixin:
         name = manifest['name']
         update = request.query_params.get('update')
 
+        is_enterprise = manifest.get('edition') == Applet.Edition.enterprise
+        if is_enterprise and not settings.XPACK_ENABLED:
+            raise ValidationError({'error': _('This is enterprise edition applet')})
+
         instance = Applet.objects.filter(name=name).first()
         if instance and not update:
             return Response({'error': 'Applet already exists: {}'.format(name)}, status=400)
