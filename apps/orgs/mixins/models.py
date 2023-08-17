@@ -3,7 +3,7 @@
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from common.db.models import JMSBaseModel
 from common.utils import get_logger, lazyproperty
@@ -119,3 +119,4 @@ class OrgModelMixin(models.Model):
 class JMSOrgBaseModel(JMSBaseModel, OrgModelMixin):
     class Meta:
         abstract = True
+

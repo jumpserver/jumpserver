@@ -28,7 +28,6 @@ def fill_ticket_serial_number(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('tickets', '0012_ticketsession'),
     ]
@@ -37,7 +36,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='ticket',
             name='serial_num',
-            field=models.CharField(max_length=128, null=True, unique=True, verbose_name='Serial number'),
+            field=models.CharField(max_length=128, null=True, verbose_name='Serial number'),
         ),
         migrations.RunPython(fill_ticket_serial_number),
+        migrations.AlterUniqueTogether(
+            name='ticket',
+            unique_together={('serial_num',)},
+        ),
     ]

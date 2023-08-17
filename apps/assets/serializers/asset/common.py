@@ -3,7 +3,7 @@
 
 from django.db.models import F
 from django.db.transaction import atomic
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from accounts.models import Account
@@ -157,6 +157,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
     def _extract_accounts(self):
         if not getattr(self, 'initial_data', None):
             return
+        if isinstance(self.initial_data, list):
+            return
         accounts = self.initial_data.pop('accounts', None)
         self._accounts = accounts
 
@@ -259,7 +261,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
 
     def is_valid(self, raise_exception=False):
         self._set_protocols_default()
-        return super().is_valid(raise_exception)
+        return super().is_valid(raise_exception=raise_exception)
 
     def validate_protocols(self, protocols_data):
         # 目的是去重

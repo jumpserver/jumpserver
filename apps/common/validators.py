@@ -3,14 +3,13 @@
 import re
 
 import phonenumbers
-
 from django.core.validators import RegexValidator
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
+from phonenumbers.phonenumberutil import NumberParseException
+from rest_framework import serializers
 from rest_framework.validators import (
     UniqueTogetherValidator, ValidationError
 )
-from rest_framework import serializers
-from phonenumbers.phonenumberutil import NumberParseException
 
 from common.utils.strings import no_special_chars
 

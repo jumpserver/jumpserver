@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework import status, mixins, viewsets
 from rest_framework.response import Response
 
@@ -95,8 +95,8 @@ class AutomationExecutionViewSet(
     mixins.CreateModelMixin, mixins.ListModelMixin,
     mixins.RetrieveModelMixin, viewsets.GenericViewSet
 ):
-    search_fields = ('trigger',)
-    filterset_fields = ('trigger', 'automation_id')
+    search_fields = ('trigger', 'automation__name')
+    filterset_fields = ('trigger', 'automation_id', 'automation__name')
     serializer_class = serializers.AutomationExecutionSerializer
 
     tp: str

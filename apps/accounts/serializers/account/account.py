@@ -3,7 +3,7 @@ from copy import deepcopy
 
 from django.db import IntegrityError
 from django.db.models import Q
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 from rest_framework.validators import UniqueTogetherValidator
@@ -95,6 +95,8 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             field.name for field in template._meta.fields
             if field.name not in ignore_fields
         ]
+        field_names = [name if name != '_secret' else 'secret' for name in field_names]
+
         attrs = {}
         for name in field_names:
             value = getattr(template, name, None)
@@ -198,7 +200,6 @@ class AccountAssetSerializer(serializers.ModelSerializer):
 
 class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerializer):
     asset = AccountAssetSerializer(label=_('Asset'))
-    has_secret = serializers.BooleanField(label=_("Has secret"), read_only=True)
     source = LabeledChoiceField(
         choices=Source.choices, label=_("Source"), required=False,
         allow_null=True, default=Source.LOCAL
@@ -231,6 +232,15 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
             'asset__platform__automation'
         )
         return queryset
+
+
+class AccountDetailSerializer(AccountSerializer):
+    has_secret = serializers.BooleanField(label=_("Has secret"), read_only=True)
+
+    class Meta(AccountSerializer.Meta):
+        model = Account
+        fields = AccountSerializer.Meta.fields + ['has_secret']
+        read_only_fields = AccountSerializer.Meta.read_only_fields + ['has_secret']
 
 
 class AssetAccountBulkSerializerResultSerializer(serializers.Serializer):

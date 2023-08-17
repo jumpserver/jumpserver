@@ -2,7 +2,7 @@
 #
 
 from django.db.models import F
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from accounts.models import Account
@@ -69,7 +69,7 @@ class AccountsPermedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
         fields = [
-            'alias', 'name', 'username', 'has_username',
+            'id', 'alias', 'name', 'username', 'has_username',
             'has_secret', 'secret_type', 'actions'
         ]
         read_only_fields = fields

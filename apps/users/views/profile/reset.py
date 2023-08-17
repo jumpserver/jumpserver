@@ -2,16 +2,16 @@
 
 from __future__ import unicode_literals
 
-from common.utils import FlashMessageUtil, get_object_or_none, random_string
-from common.utils.verify_code import SendAndVerifyCodeUtil
 from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import redirect, reverse
 from django.urls import reverse_lazy
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.generic import FormView, RedirectView
-from users.notifications import ResetPasswordSuccessMsg
 
+from common.utils import FlashMessageUtil, get_object_or_none, random_string
+from common.utils.verify_code import SendAndVerifyCodeUtil
+from users.notifications import ResetPasswordSuccessMsg
 from ... import forms
 from ...models import User
 from ...utils import check_password_rules, get_password_check_rules

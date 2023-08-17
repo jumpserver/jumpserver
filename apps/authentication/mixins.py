@@ -15,7 +15,7 @@ from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import reverse, redirect, get_object_or_404
 from django.utils.http import urlencode
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework.request import Request
 
 from acls.models import LoginACL
@@ -460,6 +460,7 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
         self._check_password_require_reset_or_not(user)
         self._check_passwd_is_too_simple(user, password)
         self._check_passwd_need_update(user)
+        user.cache_login_password_if_need(password)
 
         # 校验login-mfa, 如果登录页面上显示 mfa 的话
         self._check_login_page_mfa_if_need(user)

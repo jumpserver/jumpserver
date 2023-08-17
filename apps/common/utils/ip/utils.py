@@ -113,7 +113,6 @@ def get_ip_city(ip):
 
 def lookup_domain(domain):
     try:
-        return socket.gethostbyname(domain)
+        return socket.gethostbyname(domain), ''
     except Exception as e:
-        print("Cannot resolve %s: Unknown host, %s" % (domain, e))
-        return None
+        return None, f'Cannot resolve {domain}: Unknown host, {e}'

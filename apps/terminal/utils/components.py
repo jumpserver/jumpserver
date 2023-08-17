@@ -68,11 +68,16 @@ class TypedComponentsStatusMetricsUtil(object):
         metrics = []
         for _tp, components in self.grouped_components:
             metric = {
-                'normal': 0, 'high': 0, 'critical': 0, 'offline': 0,
-                'total': 0, 'session_active': 0, 'type': _tp
+                'total': 0,
+                'type': _tp,
+                'session_active': 0,
+                ComponentLoad.high: [],
+                ComponentLoad.normal: [],
+                ComponentLoad.offline: [],
+                ComponentLoad.critical: [],
             }
             for component in components:
-                metric[component.load] += 1
+                metric[component.load].append(component.name)
                 metric['total'] += 1
                 metric['session_active'] += component.get_online_session_count()
             metrics.append(metric)

@@ -21,7 +21,7 @@ from urllib.parse import urljoin, urlparse
 
 import yaml
 from django.urls import reverse_lazy
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from gmssl.sm4 import CryptSM4, SM4_ENCRYPT, SM4_DECRYPT
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -220,6 +220,9 @@ class Config(dict):
         'ANNOUNCEMENT_ENABLED': True,
         'ANNOUNCEMENT': {},
 
+        # Security
+        'X_FRAME_OPTIONS': 'DENY',
+
         # 未使用的配置
         'CAPTCHA_TEST_MODE': None,
         'DISPLAY_PER_PAGE': 25,
@@ -234,7 +237,7 @@ class Config(dict):
         'LOGIN_URL': reverse_lazy('authentication:login'),
 
         'CONNECTION_TOKEN_ONETIME_EXPIRATION': 5 * 60,  # 默认(new)
-        'CONNECTION_TOKEN_EXPIRATION':  5 * 60,  # 默认(old)
+        'CONNECTION_TOKEN_EXPIRATION': 5 * 60,  # 默认(old)
 
         'CONNECTION_TOKEN_REUSABLE_EXPIRATION': 60 * 60 * 24 * 30,  # 最大(new)
         'CONNECTION_TOKEN_EXPIRATION_MAX': 60 * 60 * 24 * 30,  # 最大(old)
@@ -250,6 +253,16 @@ class Config(dict):
 
         # 临时密码
         'AUTH_TEMP_TOKEN': False,
+
+        # Vault
+        'VAULT_ENABLED': False,
+        'VAULT_HCP_HOST': '',
+        'VAULT_HCP_TOKEN': '',
+        'VAULT_HCP_MOUNT_POINT': 'jumpserver',
+
+        # Cache login password
+        'CACHE_LOGIN_PASSWORD_ENABLED': False,
+        'CACHE_LOGIN_PASSWORD_TTL': 60 * 60 * 24,
 
         # Auth LDAP settings
         'AUTH_LDAP': False,
@@ -443,7 +456,6 @@ class Config(dict):
         'TERMINAL_ASSET_LIST_PAGE_SIZE': 'auto',
         'TERMINAL_SESSION_KEEP_DURATION': 200,
         'TERMINAL_HOST_KEY': '',
-        'TERMINAL_TELNET_REGEX': '',
         'TERMINAL_COMMAND_STORAGE': {},
         # Luna 页面
         # 默认图形化分辨率
@@ -466,6 +478,7 @@ class Config(dict):
         'SECURITY_SERVICE_ACCOUNT_REGISTRATION': True,
         'SECURITY_VIEW_AUTH_NEED_MFA': True,
         'SECURITY_MAX_IDLE_TIME': 30,
+        'SECURITY_MAX_SESSION_TIME': 24,
         'SECURITY_PASSWORD_EXPIRATION_TIME': 9999,
         'SECURITY_PASSWORD_MIN_LENGTH': 6,
         'SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH': 6,
@@ -482,6 +495,7 @@ class Config(dict):
         'SECURITY_LUNA_REMEMBER_AUTH': True,
         'SECURITY_WATERMARK_ENABLED': True,
         'SECURITY_MFA_VERIFY_TTL': 3600,
+        'SECURITY_UNCOMMON_USERS_TTL': 30,
         'VERIFY_CODE_TTL': 60,
         'SECURITY_SESSION_SHARE': True,
         'SECURITY_CHECK_DIFFERENT_CITY_LOGIN': True,
@@ -514,9 +528,9 @@ class Config(dict):
         'TIME_ZONE': 'Asia/Shanghai',
         'FORCE_SCRIPT_NAME': '',
         'SESSION_COOKIE_SECURE': False,
+        'DOMAINS': '',
         'CSRF_COOKIE_SECURE': False,
         'REFERER_CHECK_ENABLED': False,
-        'CSRF_TRUSTED_ORIGINS': '',
         'SESSION_ENGINE': 'cache',
         'SESSION_SAVE_EVERY_REQUEST': True,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE': False,
@@ -548,6 +562,7 @@ class Config(dict):
         'TICKET_AUTHORIZE_DEFAULT_TIME': 7,
         'TICKET_AUTHORIZE_DEFAULT_TIME_UNIT': 'day',
         'PERIOD_TASK_ENABLED': True,
+        'TERMINAL_TELNET_REGEX': '',
 
         # 导航栏 帮助
         'HELP_DOCUMENT_URL': 'https://docs.jumpserver.org/zh/v3/',
@@ -561,6 +576,9 @@ class Config(dict):
 
         # FTP 文件上传下载备份阈值，单位(M)，当值小于等于0时，不备份
         'FTP_FILE_MAX_STORE': 100,
+
+        # API 请求次数限制
+        'MAX_LIMIT_PER_PAGE': 100
     }
 
     old_config_map = {

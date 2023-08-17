@@ -116,7 +116,8 @@ else:
         host=CONFIG.REDIS_HOST, port=CONFIG.REDIS_PORT, db=CONFIG.REDIS_DB_WS
     )
     REDIS_LAYERS_SSL_PARAMS.pop('ssl', None)
-    REDIS_LAYERS_HOST['address'] = '{}?{}'.format(REDIS_LAYERS_ADDRESS, urlencode(REDIS_LAYERS_SSL_PARAMS))
+    REDIS_LAYERS_HOST['address'] = '{}?{}'.format(REDIS_LAYERS_ADDRESS,
+                                                  urlencode(REDIS_LAYERS_SSL_PARAMS))
 
 CHANNEL_LAYERS = {
     'default': {

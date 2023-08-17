@@ -1,9 +1,9 @@
 import os
 
-from django.utils.translation import ugettext_lazy as _
-from django.core.mail import send_mail, EmailMultiAlternatives
-from django.conf import settings
 from celery import shared_task
+from django.conf import settings
+from django.core.mail import send_mail, EmailMultiAlternatives
+from django.utils.translation import gettext_lazy as _
 
 from .utils import get_logger
 

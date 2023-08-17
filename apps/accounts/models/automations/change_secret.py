@@ -1,5 +1,5 @@
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from accounts.const import (
     AutomationTypes, SecretType, SecretStrategy, SSHKeyStrategy
@@ -86,7 +86,7 @@ class ChangeSecretRecord(JMSBaseModel):
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, null=True)
     account = models.ForeignKey('accounts.Account', on_delete=models.CASCADE, null=True)
     old_secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Old secret'))
-    new_secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Secret'))
+    new_secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('New secret'))
     date_started = models.DateTimeField(blank=True, null=True, verbose_name=_('Date started'))
     date_finished = models.DateTimeField(blank=True, null=True, verbose_name=_('Date finished'))
     status = models.CharField(max_length=16, default='pending')

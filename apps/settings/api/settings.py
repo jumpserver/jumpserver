@@ -28,6 +28,11 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'basic': serializers.BasicSettingSerializer,
         'terminal': serializers.TerminalSettingSerializer,
         'security': serializers.SecuritySettingSerializer,
+        'security_auth': serializers.SecurityAuthSerializer,
+        'security_basic': serializers.SecurityBasicSerializer,
+        'security_session': serializers.SecuritySessionSerializer,
+        'security_password': serializers.SecurityPasswordRuleSerializer,
+        'security_login_limit': serializers.SecurityLoginLimitSerializer,
         'ldap': serializers.LDAPSettingSerializer,
         'email': serializers.EmailSettingSerializer,
         'email_content': serializers.EmailContentSettingSerializer,
@@ -39,7 +44,6 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'keycloak': serializers.KeycloakSettingSerializer,
         'radius': serializers.RadiusSettingSerializer,
         'cas': serializers.CASSettingSerializer,
-        'sso': serializers.SSOSettingSerializer,
         'saml2': serializers.SAML2SettingSerializer,
         'oauth2': serializers.OAuth2SettingSerializer,
         'clean': serializers.CleaningSerializer,
@@ -50,6 +54,10 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'huawei': serializers.HuaweiSMSSettingSerializer,
         'cmpp2': serializers.CMPP2SMSSettingSerializer,
         'custom': serializers.CustomSMSSettingSerializer,
+        'vault': serializers.VaultSettingSerializer,
+        'announcement': serializers.AnnouncementSettingSerializer,
+        'ticket': serializers.TicketSettingSerializer,
+        'ops': serializers.OpsSettingSerializer,
     }
 
     rbac_category_permissions = {
@@ -75,6 +83,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'sms': 'settings.change_sms',
         'alibaba': 'settings.change_sms',
         'tencent': 'settings.change_sms',
+        'vault': 'settings.change_vault',
     }
 
     def get_queryset(self):

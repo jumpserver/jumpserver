@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from accounts.models import AccountBackupAutomation, AccountBackupExecution
@@ -24,7 +24,7 @@ class AccountBackupSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSer
         ]
         fields = read_only_fields + [
             'id', 'name', 'is_periodic', 'interval', 'crontab',
-            'comment', 'recipients', 'types'
+            'comment', 'types', 'recipients_part_one', 'recipients_part_two'
         ]
         extra_kwargs = {
             'name': {'required': True},
@@ -44,7 +44,7 @@ class AccountBackupPlanExecutionSerializer(serializers.ModelSerializer):
     class Meta:
         model = AccountBackupExecution
         read_only_fields = [
-            'id', 'date_start', 'timedelta', 'plan_snapshot',
-            'trigger', 'reason', 'is_success', 'org_id', 'recipients'
+            'id', 'date_start', 'timedelta', 'snapshot',
+            'trigger', 'reason', 'is_success', 'org_id'
         ]
         fields = read_only_fields + ['plan']

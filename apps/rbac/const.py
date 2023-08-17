@@ -1,5 +1,5 @@
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class Scope(models.TextChoices):
@@ -144,7 +144,9 @@ only_system_permissions = (
     ('terminal', 'task', '*', '*'),
     ('terminal', 'endpoint', '*', '*'),
     ('terminal', 'endpointrule', '*', '*'),
-    ('authentication', '*', '*', '*'),
+    ('authentication', 'accesskey', '*', '*'),
+    ('authentication', 'superconnectiontoken', '*', '*'),
+    ('authentication', 'temptoken', '*', '*'),
     ('tickets', '*', '*', '*'),
     ('orgs', 'organization', 'view', 'rootorg'),
     ('terminal', 'applet', '*', '*'),

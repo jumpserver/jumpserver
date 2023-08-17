@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 #
-from django.http import HttpResponse
 from django.conf import settings
-from django.utils.translation import ugettext as _
+from django.http import HttpResponse
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
-
 from proxy.views import proxy_view
 
 flower_url = settings.FLOWER_URL
@@ -24,4 +23,3 @@ def celery_flower_view(request, path):
               '<br><br> <div>{}</div>'.format(e)
         response = HttpResponse(msg)
     return response
-

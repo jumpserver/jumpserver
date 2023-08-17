@@ -7,7 +7,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework import status, serializers
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -64,6 +64,15 @@ class RDPFileClientProtocolURLMixin:
             'use redirection server name:i': '0',
             'smart sizing:i': '1',
         }
+        # 设置多屏显示
+        multi_mon = is_true(self.request.query_params.get('multi_mon'))
+        if multi_mon:
+            rdp_options['use multimon:i'] = '1'
+
+        # 设置多屏显示
+        multi_mon = is_true(self.request.query_params.get('multi_mon'))
+        if multi_mon:
+            rdp_options['use multimon:i'] = '1'
 
         # 设置磁盘挂载
         drives_redirect = is_true(self.request.query_params.get('drives_redirect'))
@@ -117,12 +126,16 @@ class RDPFileClientProtocolURLMixin:
         return filename, content
 
     @staticmethod
-    def get_connect_filename(prefix_name):
-        prefix_name = prefix_name.replace('/', '_')
-        prefix_name = prefix_name.replace('\\', '_')
-        prefix_name = prefix_name.replace('.', '_')
+    def escape_name(name):
+        name = name.replace('/', '_')
+        name = name.replace('\\', '_')
+        name = name.replace('.', '_')
+        name = urllib.parse.quote(name)
+        return name
+
+    def get_connect_filename(self, prefix_name):
         filename = f'{prefix_name}-jumpserver'
-        filename = urllib.parse.quote(filename)
+        filename = self.escape_name(filename)
         return filename
 
     @staticmethod
@@ -136,15 +149,25 @@ class RDPFileClientProtocolURLMixin:
         connect_method_dict = ConnectMethodUtil.get_connect_method(
             token.connect_method, token.protocol, _os
         )
+        asset = token.asset
         if connect_method_dict is None:
             raise ValueError('Connect method not support: {}'.format(connect_method_name))
 
+        account = token.account or token.input_username
+        datetime = timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H:%M:%S')
+        name = account + '@' + str(asset) + '[' + datetime + ']'
         data = {
-            'id': str(token.id),
-            'value': token.value,
+            'version': 2,
+            'id': str(token.id),  # 兼容老的，未来几个版本删掉
+            'value': token.value,  # 兼容老的，未来几个版本删掉
+            'name': self.escape_name(name),
             'protocol': token.protocol,
-            'command': '',
-            'file': {}
+            'token': {
+                'id': str(token.id),
+                'value': token.value,
+            },
+            'file': {},
+            'command': ''
         }
 
         if connect_method_name == NativeClient.mstsc or connect_method_dict['type'] == 'applet':
@@ -159,10 +182,24 @@ class RDPFileClientProtocolURLMixin:
         else:
             endpoint = self.get_smart_endpoint(
                 protocol=connect_method_dict['endpoint_protocol'],
-                asset=token.asset
+                asset=asset
             )
-            cmd = NativeClient.get_launch_command(connect_method_name, token, endpoint)
-            data.update({'command': cmd})
+            data.update({
+                'asset': {
+                    'id': str(asset.id),
+                    'category': asset.category,
+                    'type': asset.type,
+                    'name': asset.name,
+                    'address': asset.address,
+                    'info': {
+                        **asset.spec_info,
+                    }
+                },
+                'endpoint': {
+                    'host': endpoint.host,
+                    'port': endpoint.get_port(token.asset, token.protocol),
+                }
+            })
         return data
 
     def get_smart_endpoint(self, protocol, asset=None):
@@ -306,9 +343,6 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
 
         if account.username != AliasAccount.INPUT:
             data['input_username'] = ''
-        elif account.username == AliasAccount.USER:
-            data['input_username'] = user.username
-
         ticket = self._validate_acl(user, asset, account)
         if ticket:
             data['from_ticket'] = ticket

@@ -56,7 +56,7 @@ class OracleClient(object):
     def cursor(self):
         if self._cursor is None:
             try:
-                oracledb.init_oracle_client(lib_dir='/opt/oracle/instantclient_19_10')
+                # oracledb.init_oracle_client(lib_dir='/opt/oracle/instantclient_19_10')
                 self._conn = oracledb.connect(**self.connect_params)
                 self._cursor = self._conn.cursor()
             except DatabaseError as err:

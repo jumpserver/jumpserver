@@ -5,7 +5,7 @@ from smtplib import SMTPSenderRefused
 
 from django.conf import settings
 from django.core.mail import send_mail, get_connection
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework.views import Response, APIView
 
 from common.utils import get_logger

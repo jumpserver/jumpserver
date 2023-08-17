@@ -8,6 +8,7 @@ import string
 import uuid
 from typing import Callable
 
+import sshpubkeys
 from django.conf import settings
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import AbstractUser
@@ -16,7 +17,7 @@ from django.db import models
 from django.shortcuts import reverse
 from django.utils import timezone
 from django.utils.module_loading import import_string
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from common.db import fields, models as jms_models
 from common.utils import (
@@ -43,6 +44,8 @@ class AuthMixin:
     set_password: Callable
     save: Callable
     history_passwords: models.Manager
+    sect_cache_tpl = 'user_sect_{}'
+    id: str
 
     @property
     def password_raw(self):
@@ -105,7 +108,6 @@ class AuthMixin:
                 return ''
 
         if self.public_key:
-            import sshpubkeys
             try:
                 return sshpubkeys.SSHKey(self.public_key)
             except (TabError, TypeError):
@@ -153,21 +155,48 @@ class AuthMixin:
         return False
 
     @staticmethod
-    def get_public_key_body(key):
-        for i in key.split():
-            if len(i) > 256:
-                return i
-        return key
+    def get_public_key_md5(key):
+        try:
+            key_obj = sshpubkeys.SSHKey(key)
+            return key_obj.hash_md5()
+        except Exception as e:
+            return ''
 
     def check_public_key(self, key):
         if not self.public_key:
             return False
-        key = self.get_public_key_body(key)
-        key_saved = self.get_public_key_body(self.public_key)
-        if key == key_saved:
-            return True
-        else:
+        key_md5 = self.get_public_key_md5(key)
+        if not key_md5:
             return False
+        self_key_md5 = self.get_public_key_md5(self.public_key)
+        return key_md5 == self_key_md5
+
+    def cache_login_password_if_need(self, password):
+        from common.utils import signer
+        if not settings.CACHE_LOGIN_PASSWORD_ENABLED:
+            return
+        backend = getattr(self, 'backend', '')
+        if backend.lower().find('ldap') < 0:
+            return
+        if not password:
+            return
+        key = self.sect_cache_tpl.format(self.id)
+        ttl = settings.CACHE_LOGIN_PASSWORD_TTL
+        if not isinstance(ttl, int) or ttl <= 0:
+            return
+        secret = signer.sign(password)
+        cache.set(key, secret, ttl)
+
+    def get_cached_password_if_has(self):
+        from common.utils import signer
+        if not settings.CACHE_LOGIN_PASSWORD_ENABLED:
+            return ''
+        key = self.sect_cache_tpl.format(self.id)
+        secret = cache.get(key)
+        if not secret:
+            return ''
+        password = signer.unsign(secret)
+        return password
 
 
 class RoleManager(models.Manager):
@@ -358,6 +387,11 @@ class RoleMixin:
     @lazyproperty
     def workbench_orgs(self):
         return self.cached_orgs['workbench_orgs']
+
+    @lazyproperty
+    def joined_orgs(self):
+        from rbac.models import RoleBinding
+        return RoleBinding.get_user_joined_orgs(self)
 
     @lazyproperty
     def cached_orgs(self):
@@ -811,9 +845,9 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
         default=False, verbose_name=_('Need update password')
     )
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_('Date updated'))
-    wecom_id = models.CharField(null=True, default=None, unique=True, max_length=128, verbose_name=_('WeCom'))
-    dingtalk_id = models.CharField(null=True, default=None, unique=True, max_length=128, verbose_name=_('DingTalk'))
-    feishu_id = models.CharField(null=True, default=None, unique=True, max_length=128, verbose_name=_('FeiShu'))
+    wecom_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('WeCom'))
+    dingtalk_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('DingTalk'))
+    feishu_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('FeiShu'))
 
     DATE_EXPIRED_WARNING_DAYS = 5
 
@@ -945,6 +979,11 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
     class Meta:
         ordering = ['username']
         verbose_name = _("User")
+        unique_together = (
+            ('dingtalk_id',),
+            ('wecom_id',),
+            ('feishu_id',),
+        )
         permissions = [
             ('invite_user', _('Can invite user')),
             ('remove_user', _('Can remove user')),

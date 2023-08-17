@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-from django.utils.translation import ugettext_lazy as _
 from django.db.models import TextChoices, IntegerChoices
+from django.utils.translation import gettext_lazy as _
 
 DEFAULT_CITY = _("Unknown")
 

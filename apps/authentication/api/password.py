@@ -1,24 +1,24 @@
-from django.http import HttpResponseRedirect
-from rest_framework.generics import CreateAPIView
-from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
-from django.utils.translation import ugettext as _
-from django.template.loader import render_to_string
 from django.core.cache import cache
+from django.http import HttpResponseRedirect
 from django.shortcuts import reverse
+from django.template.loader import render_to_string
+from django.utils.translation import gettext as _
+from rest_framework.generics import CreateAPIView
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 
-from common.utils.verify_code import SendAndVerifyCodeUtil
-from common.permissions import IsValidUser
-from common.utils.random import random_string
-from common.utils import get_object_or_none
+from authentication.errors import PasswordInvalid
+from authentication.mixins import AuthMixin
+from authentication.mixins import authenticate
 from authentication.serializers import (
     PasswordVerifySerializer, ResetPasswordCodeSerializer
 )
+from common.permissions import IsValidUser
+from common.utils import get_object_or_none
+from common.utils.random import random_string
+from common.utils.verify_code import SendAndVerifyCodeUtil
 from settings.utils import get_login_title
 from users.models import User
-from authentication.mixins import authenticate
-from authentication.errors import PasswordInvalid
-from authentication.mixins import AuthMixin
 
 
 class UserResetPasswordSendCodeApi(CreateAPIView):
@@ -52,7 +52,11 @@ class UserResetPasswordSendCodeApi(CreateAPIView):
         other_args = {}
 
         target = serializer.validated_data[form_type]
-        query_key = 'phone' if form_type == 'sms' else form_type
+        if form_type == 'sms':
+            query_key = 'phone'
+            target = target.lstrip('+')
+        else:
+            query_key = form_type
         user, err = self.is_valid_user(username=username, **{query_key: target})
         if not user:
             return Response({'error': err}, status=400)

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from accounts.const import SecretType
@@ -61,20 +61,18 @@ class AuthValidateMixin(serializers.Serializer):
 
 
 class BaseAccountSerializer(AuthValidateMixin, BulkOrgResourceModelSerializer):
-    has_secret = serializers.BooleanField(label=_("Has secret"), read_only=True)
 
     class Meta:
         model = BaseAccount
         fields_mini = ['id', 'name', 'username']
         fields_small = fields_mini + [
-            'secret_type', 'secret', 'has_secret', 'passphrase',
+            'secret_type', 'secret', 'passphrase',
             'privileged', 'is_active', 'spec_info',
         ]
         fields_other = ['created_by', 'date_created', 'date_updated', 'comment']
         fields = fields_small + fields_other
         read_only_fields = [
-            'has_secret', 'spec_info',
-            'date_verified', 'created_by', 'date_created',
+            'spec_info', 'date_verified', 'created_by', 'date_created',
         ]
         extra_kwargs = {
             'spec_info': {'label': _('Spec info')},

@@ -1,7 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 from collections import defaultdict
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework import generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -118,7 +118,6 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
             self.check_object_permissions(self.request, user)
         return super().perform_bulk_update(serializer)
 
-
     def perform_bulk_destroy(self, objects):
         for obj in objects:
             self.check_object_permissions(self.request, obj)
@@ -137,6 +136,10 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
 
         users = validated_data['users']
         org_roles = validated_data['org_roles']
+        has_self = any([str(u.id) == str(request.user.id) for u in users])
+        if has_self and not request.user.is_superuser:
+            error = {"error": _("Can not invite self")}
+            return Response(error, status=400)
         for user in users:
             user.org_roles.set(org_roles)
         return Response(serializer.data, status=201)

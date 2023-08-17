@@ -177,8 +177,10 @@ class UserPermedNodeChildrenWithAssetsAsCategoryTreeApi(
                 return []
             pid = f'ROOT_{str(assets[0].category).upper()}_{tp}'
             return self.serialize_assets(assets, pid=pid)
+        params = self.request.query_params
+        get_root = not list(filter(lambda x: params.get(x), ('type', 'n')))
         resource_platforms = assets.order_by('id').values_list('platform_id', flat=True)
-        node_all = AllTypes.get_tree_nodes(resource_platforms)
+        node_all = AllTypes.get_tree_nodes(resource_platforms, get_root=get_root)
         pattern = re.compile(r'\(0\)?')
         nodes = []
         for node in node_all:
@@ -188,6 +190,8 @@ class UserPermedNodeChildrenWithAssetsAsCategoryTreeApi(
             _type = meta.get('_type')
             if _type:
                 node['type'] = _type
+            meta.setdefault('data', {})
+            node['meta'] = meta
             nodes.append(node)
 
         if not self.is_sync:
@@ -224,9 +228,8 @@ class UserGrantedK8sAsTreeApi(SelfOrPKUserMixin, ListAPIView):
         util = PermAccountUtil()
         accounts = util.get_permed_accounts_for_user(self.user, token.asset)
         account_name = token.account
-        if account_name in [
-            AliasAccount.INPUT, AliasAccount.USER
-        ]:
+
+        if account_name in [AliasAccount.INPUT, AliasAccount.USER]:
             return token.input_secret
         else:
             accounts = filter(lambda x: x.name == account_name, accounts)

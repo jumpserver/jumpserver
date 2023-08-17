@@ -1,8 +1,8 @@
-from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
 
-from .utils import get_current_org
 from .models import Organization
+from .utils import get_current_org
 
 
 class ResourceStatisticsSerializer(serializers.Serializer):
@@ -25,7 +25,7 @@ class OrgSerializer(ModelSerializer):
         fields_mini = ['id', 'name']
         fields_small = fields_mini + [
             'resource_statistics',
-            'is_default', 'is_root',
+            'is_default', 'is_root', 'internal',
             'date_created', 'created_by',
             'comment', 'created_by',
         ]

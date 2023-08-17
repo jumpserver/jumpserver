@@ -46,9 +46,10 @@ class HostMixin:
     @property
     def host(self):
         if self.kwargs.get('host'):
-            return self.pk_host()
+            host = self.pk_host()
         else:
-            return self.self_host()
+            host = self.self_host()
+        return host
 
 
 class AppletHostAccountsViewSet(HostMixin, JMSModelViewSet):

@@ -1,6 +1,6 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from assets.models import Asset
 from common.db.fields import PortField
@@ -41,6 +41,8 @@ class Endpoint(JMSBaseModel):
                 protocol == Protocol.oracle:
             port = db_port_manager.get_port_by_db(target_instance)
         else:
+            if protocol == Protocol.sftp:
+                protocol = Protocol.ssh
             port = getattr(self, f'{protocol}_port', 0)
         return port
 

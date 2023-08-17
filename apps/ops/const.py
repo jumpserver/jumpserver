@@ -1,5 +1,5 @@
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class StrategyChoice(models.TextChoices):
@@ -49,6 +49,9 @@ class Modules(models.TextChoices):
     shell = 'shell', _('Shell')
     winshell = 'win_shell', _('Powershell')
     python = 'python', _('Python')
+    mysql = 'mysql', _('MySQL')
+    postgresql = 'postgresql', _('PostgreSQL')
+    sqlserver = 'sqlserver', _('SQLServer')
 
 
 class JobStatus(models.TextChoices):

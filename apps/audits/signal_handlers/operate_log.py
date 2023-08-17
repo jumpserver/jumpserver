@@ -14,6 +14,7 @@ from audits.handler import (
 from audits.utils import model_to_dict_for_operate_log as model_to_dict
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR, SKIP_SIGNAL
 from common.signals import django_ready
+from jumpserver.utils import current_request
 from ..const import MODELS_NEED_RECORD, ActionChoices
 
 M2M_ACTION = {
@@ -72,6 +73,10 @@ def signal_of_operate_log_whether_continue(
     if not instance:
         condition = False
     if instance and getattr(instance, SKIP_SIGNAL, False):
+        condition = False
+    # 不记录组件的操作日志
+    user = current_request.user if current_request else None
+    if not user or getattr(user, 'is_service_account', False):
         condition = False
     # 终端模型的 create 事件由系统产生，不记录
     if instance._meta.object_name == 'Terminal' and created:

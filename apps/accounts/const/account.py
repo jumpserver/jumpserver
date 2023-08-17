@@ -1,5 +1,5 @@
 from django.db.models import TextChoices
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class SecretType(TextChoices):
@@ -15,6 +15,10 @@ class AliasAccount(TextChoices):
     INPUT = '@INPUT', _('Manual input')
     USER = '@USER', _('Dynamic user')
     ANON = '@ANON', _('Anonymous account')
+
+    @classmethod
+    def virtual_choices(cls):
+        return [(k, v) for k, v in cls.choices if k not in (cls.ALL,)]
 
 
 class Source(TextChoices):

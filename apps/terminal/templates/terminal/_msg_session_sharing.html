@@ -1,0 +1,16 @@
+{% load i18n %}
+
+<div>
+    <b>{% trans 'Asset' %}: </b> <span>{{ asset }}</span>
+    <br/>
+    <b>{% trans 'User' %}: </b> <span>{{ created_by }}</span>
+    <br/>
+    <b>{% trans 'Account' %}: </b> <span>{{ account }}</span>
+    <br/>
+    <b>{% trans 'Session share' %}: </b><a href="{{ url }}" target="_blank">{% trans 'View' %}</a>
+    <br/>
+    <b>{% trans 'Verify code' %}: </b> <span>{{ verify_code }}</span>
+    <br/>
+    <b>{% trans 'Organization' %}: </b> <span>{{ org }}</span>
+    <br/>
+</div>

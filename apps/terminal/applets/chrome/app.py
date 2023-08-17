@@ -9,7 +9,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 
-from code_dialog import CodeDialog
+from code_dialog import CodeDialog, wrapper_progress_bar
 from common import (Asset, User, Account, Platform, Step)
 from common import (BaseApplication)
 from common import (notify_err_message, block_input, unblock_input)
@@ -121,7 +121,6 @@ def execute_action(driver: webdriver.Chrome, step: StepAction) -> bool:
         return step.execute(driver)
     except Exception as e:
         print(e)
-        notify_err_message(str(e))
         return False
 
 
@@ -221,10 +220,6 @@ def default_chrome_driver_options():
     options.add_argument('--ignore-certificate-errors-spki-list')
     options.add_argument('--allow-running-insecure-content')
 
-    # 加载 extensions
-    extension_paths = load_extensions()
-    for extension_path in extension_paths:
-        options.add_argument('--load-extension={}'.format(extension_path))
     # 禁用开发者工具
     options.add_argument("--disable-dev-tools")
     # 禁用 密码管理器弹窗
@@ -248,7 +243,14 @@ class AppletApplication(BaseApplication):
         self._chrome_options = default_chrome_driver_options()
         self._chrome_options.add_argument("--app={}".format(self.asset.address))
         self._chrome_options.add_argument("--user-data-dir={}".format(self._tmp_user_dir.name))
+        protocol_setting = self.platform.get_protocol_setting(self.protocol)
+        if protocol_setting and protocol_setting.safe_mode:
+            # 加载 extensions
+            extension_paths = load_extensions()
+            for extension_path in extension_paths:
+                self._chrome_options.add_argument('--load-extension={}'.format(extension_path))
 
+    @wrapper_progress_bar
     def run(self):
         service = Service()
         #  driver 的 console 终端框不显示
@@ -256,11 +258,11 @@ class AppletApplication(BaseApplication):
         self.driver = webdriver.Chrome(options=self._chrome_options, service=service)
         self.driver.implicitly_wait(10)
         if self.app.asset.address != "":
+            self.driver.minimize_window()
             ok = self.app.execute(self.driver)
             if not ok:
                 print("执行失败")
         self.driver.maximize_window()
-
     def wait(self):
         disconnected_msg = "Unable to evaluate script: disconnected: not connected to DevTools\n"
         closed_msg = "Unable to evaluate script: no such window: target window already closed"

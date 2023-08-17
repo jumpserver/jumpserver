@@ -33,10 +33,10 @@ class HostTypes(BaseType):
     def _get_protocol_constrains(cls) -> dict:
         return {
             '*': {
-                'choices': ['ssh', 'telnet', 'vnc', 'rdp']
+                'choices': ['ssh', 'sftp', 'telnet', 'vnc', 'rdp']
             },
             cls.WINDOWS: {
-                'choices': ['rdp', 'ssh', 'vnc', 'winrm']
+                'choices': ['rdp', 'ssh', 'sftp', 'vnc', 'winrm']
             }
         }
 
