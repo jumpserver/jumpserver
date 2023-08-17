@@ -76,7 +76,7 @@ def signal_of_operate_log_whether_continue(
         condition = False
     # 不记录组件的操作日志
     user = current_request.user if current_request else None
-    if not user or user.is_service_account:
+    if not user or getattr(user, 'is_service_account', False):
         condition = False
     # 终端模型的 create 事件由系统产生，不记录
     if instance._meta.object_name == 'Terminal' and created:
