@@ -8,7 +8,6 @@ from accounts.backends import vault_client
 from accounts.models import Account, AccountTemplate
 from common.utils import get_logger
 from orgs.utils import tmp_to_root_org
-from ..const import VaultTypeChoices
 
 logger = get_logger(__name__)
 
@@ -31,9 +30,9 @@ def sync_instance(instance):
 
 @shared_task(verbose_name=_('Sync secret to vault'))
 def sync_secret_to_vault():
-    if vault_client.is_type(VaultTypeChoices.local):
-        # 这里不能判断 settings.VAULT_TYPE, 必须判断当前 vault_client 的类型
-        print('\033[35m>>> 当前 Vault 类型为本地数据库, 不需要同步')
+    if not vault_client.enabled:
+        # 这里不能判断 settings.VAULT_ENABLED, 必须判断当前 vault_client 的类型
+        print('\033[35m>>> 当前 Vault 功能未开启, 不需要同步')
         return
 
     failed, skipped, succeeded = 0, 0, 0

@@ -3,7 +3,6 @@ import uuid
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from accounts.const import VaultTypeChoices
 from common.serializers.fields import EncryptedField
 
 __all__ = [
@@ -41,9 +40,8 @@ class AnnouncementSettingSerializer(serializers.Serializer):
 class VaultSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Vault')
 
-    VAULT_TYPE = serializers.ChoiceField(
-        default=VaultTypeChoices.local, choices=VaultTypeChoices.choices,
-        required=False, label=_('Type')
+    VAULT_ENABLED = serializers.BooleanField(
+        required=False, label=_('Enable Vault'), read_only=True
     )
     VAULT_HCP_HOST = serializers.CharField(
         max_length=256, allow_blank=True, required=False, label=_('Host')
@@ -54,10 +52,6 @@ class VaultSettingSerializer(serializers.Serializer):
     VAULT_HCP_MOUNT_POINT = serializers.CharField(
         max_length=256, allow_blank=True, required=False, label=_('Mount Point')
     )
-
-    def validate(self, attrs):
-        attrs.pop('VAULT_TYPE', None)
-        return attrs
 
 
 class TicketSettingSerializer(serializers.Serializer):

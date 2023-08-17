@@ -255,7 +255,7 @@ class Config(dict):
         'AUTH_TEMP_TOKEN': False,
 
         # Vault
-        'VAULT_TYPE': 'local',
+        'VAULT_ENABLED': False,
         'VAULT_HCP_HOST': '',
         'VAULT_HCP_TOKEN': '',
         'VAULT_HCP_MOUNT_POINT': 'jumpserver',
