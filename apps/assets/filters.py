@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 #
 from django.db.models import Q
-from django_filters import rest_framework as drf_filters
 from rest_framework import filters
 from rest_framework.compat import coreapi, coreschema
 
 from assets.utils import get_node_from_request, is_query_node_all_assets
-from common.drf.filters import BaseFilterSet
-
-from .models import Label, Node
+from .models import Label
 
 
 class AssetByNodeFilterBackend(filters.BaseFilterBackend):
