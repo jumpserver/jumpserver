@@ -23,7 +23,7 @@ def task_activity_callback(self, pid, trigger, *args, **kwargs):
 
 
 @shared_task(verbose_name=_('Execute account backup plan'), activity_callback=task_activity_callback)
-def execute_account_backup_task(pid, trigger):
+def execute_account_backup_task(pid, trigger, **kwargs):
     from accounts.models import AccountBackupAutomation
     with tmp_to_root_org():
         plan = get_object_or_none(AccountBackupAutomation, pk=pid)
