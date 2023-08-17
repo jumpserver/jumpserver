@@ -29,7 +29,7 @@ class VaultTestingAPI(GenericAPIView):
 
     def post(self, request):
         config = self.get_config(request)
-        config['VAULT_TYPE'] = settings.VAULT_TYPE
+        config['VAULT_ENABLED'] = settings.VAULT_ENABLED
         try:
             client = get_vault_client(raise_exception=True, **config)
             ok, error = client.is_active()
