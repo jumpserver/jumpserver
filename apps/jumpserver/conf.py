@@ -220,6 +220,9 @@ class Config(dict):
         'ANNOUNCEMENT_ENABLED': True,
         'ANNOUNCEMENT': {},
 
+        # Security
+        'X_FRAME_OPTIONS': 'DENY',
+
         # 未使用的配置
         'CAPTCHA_TEST_MODE': None,
         'DISPLAY_PER_PAGE': 25,
