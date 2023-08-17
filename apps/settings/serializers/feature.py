@@ -38,7 +38,7 @@ class AnnouncementSettingSerializer(serializers.Serializer):
 
 
 class VaultSettingSerializer(serializers.Serializer):
-    PREFIX_TITLE = _('Vault')
+    PREFIX_TITLE = _('HCP Vault')
 
     VAULT_ENABLED = serializers.BooleanField(
         required=False, label=_('Enable Vault'), read_only=True
