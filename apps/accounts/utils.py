@@ -39,6 +39,8 @@ def validate_password_for_ansible(password):
     # Ansible 推送的时候不支持
     if '{{' in password:
         raise serializers.ValidationError(_('Password can not contains `{{` '))
+    if '{%' in password:
+        raise serializers.ValidationError(_('Password can not contains `{%` '))
     # Ansible Windows 推送的时候不支持
     if "'" in password:
         raise serializers.ValidationError(_("Password can not contains `'` "))

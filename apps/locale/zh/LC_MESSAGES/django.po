@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-17 15:30+0800\n"
+"POT-Creation-Date: 2023-08-17 18:24+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -857,15 +857,19 @@ msgstr "测试账号可连接性"
 msgid "Password can not contains `{{` "
 msgstr "密码不能包含 `{{` 字符"
 
-#: accounts/utils.py:44
+#: accounts/utils.py:43
+msgid "Password can not contains `{%` "
+msgstr "密码不能包含 `{%` 字符"
+
+#: accounts/utils.py:46
 msgid "Password can not contains `'` "
 msgstr "密码不能包含 `'` 字符"
 
-#: accounts/utils.py:46
+#: accounts/utils.py:48
 msgid "Password can not contains `\"` "
 msgstr "密码不能包含 `\"` 字符"
 
-#: accounts/utils.py:52
+#: accounts/utils.py:54
 msgid "private key invalid or passphrase error"
 msgstr "密钥不合法或密钥密码错误"
 
@@ -1031,7 +1035,7 @@ msgid "None of the reviewers belong to Organization `{}`"
 msgstr "所有复核人都不属于组织 `{}`"
 
 #: acls/serializers/rules/rules.py:20
-#: xpack/plugins/cloud/serializers/task.py:133
+#: xpack/plugins/cloud/serializers/task.py:137
 msgid "IP address invalid: `{}`"
 msgstr "IP 地址无效: `{}`"
 
@@ -7588,7 +7592,7 @@ msgstr "云账号"
 msgid "Test cloud account"
 msgstr "测试云账号"
 
-#: xpack/plugins/cloud/models.py:92 xpack/plugins/cloud/serializers/task.py:147
+#: xpack/plugins/cloud/models.py:92 xpack/plugins/cloud/serializers/task.py:151
 msgid "Regions"
 msgstr "地域"
 
@@ -7597,17 +7601,17 @@ msgid "Hostname strategy"
 msgstr "主机名策略"
 
 #: xpack/plugins/cloud/models.py:100
-#: xpack/plugins/cloud/serializers/task.py:150
+#: xpack/plugins/cloud/serializers/task.py:154
 msgid "IP network segment group"
 msgstr "IP网段组"
 
 #: xpack/plugins/cloud/models.py:103
-#: xpack/plugins/cloud/serializers/task.py:155
+#: xpack/plugins/cloud/serializers/task.py:159
 msgid "Sync IP type"
 msgstr "同步IP类型"
 
 #: xpack/plugins/cloud/models.py:106
-#: xpack/plugins/cloud/serializers/task.py:173
+#: xpack/plugins/cloud/serializers/task.py:177
 msgid "Always update"
 msgstr "总是更新"
 
@@ -7700,7 +7704,7 @@ msgstr "规则匹配"
 msgid "Rule value"
 msgstr "规则值"
 
-#: xpack/plugins/cloud/models.py:317
+#: xpack/plugins/cloud/models.py:317 xpack/plugins/cloud/serializers/task.py:70
 msgid "Strategy rule"
 msgstr "策略规则"
 
@@ -7712,7 +7716,7 @@ msgstr "动作属性"
 msgid "Action value"
 msgstr "动作值"
 
-#: xpack/plugins/cloud/models.py:341
+#: xpack/plugins/cloud/models.py:341 xpack/plugins/cloud/serializers/task.py:73
 msgid "Strategy action"
 msgstr "策略动作"
 
@@ -7999,7 +8003,7 @@ msgstr "测试超时时间"
 msgid "Project"
 msgstr "project"
 
-#: xpack/plugins/cloud/serializers/task.py:139
+#: xpack/plugins/cloud/serializers/task.py:143
 msgid ""
 "Only instances matching the IP range will be synced. <br>If the instance "
 "contains multiple IP addresses, the first IP address that matches will be "
@@ -8011,11 +8015,11 @@ msgstr ""
 "到的 IP 地址将被用作创建的资产的 IP。<br>默认值 * 表示同步所有实例和随机匹配 "
 "IP 地址。<br> 例如: 192.168.1.0/24,10.1.1.1-10.1.1.20。"
 
-#: xpack/plugins/cloud/serializers/task.py:145
+#: xpack/plugins/cloud/serializers/task.py:149
 msgid "History count"
 msgstr "执行次数"
 
-#: xpack/plugins/cloud/serializers/task.py:146
+#: xpack/plugins/cloud/serializers/task.py:150
 msgid "Instance count"
 msgstr "实例个数"
 
