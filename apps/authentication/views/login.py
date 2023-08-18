@@ -134,6 +134,16 @@ class UserLoginContextMixin:
             count += 1
         return count
 
+    def origin_is_allowed(self):
+        from urllib.parse import urlparse
+        http_referer = self.request.META.get('HTTP_REFERER')
+        try:
+            referer = urlparse(http_referer)
+        except ValueError:
+            return False
+        allowed_domains = settings.ALLOWED_DOMAINS
+        return referer.netloc in allowed_domains
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
@@ -143,6 +153,7 @@ class UserLoginContextMixin:
             'current_lang': self.get_current_lang(),
             'forgot_password_url': self.get_forgot_password_url(),
             'extra_fields_count': self.get_extra_fields_count(context),
+            'origin_is_allowed': self.origin_is_allowed(),
             **self.get_user_mfa_context(self.request.user)
         })
         return context
