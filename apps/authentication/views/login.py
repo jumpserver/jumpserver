@@ -19,7 +19,7 @@ from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _, get_language
 from django.views.decorators.cache import never_cache
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import FormView
@@ -136,8 +136,24 @@ class UserLoginContextMixin:
             count += 1
         return count
 
+    def set_csrf_error_if_need(self, context):
+        if not self.request.GET.get('csrf_failure'):
+            return context
+
+        http_referer = self.request.META.get('HTTP_REFERER')
+        if not http_referer:
+            return context
+
+        try:
+            referer = urlparse(http_referer)
+            context['error_origin'] = str(referer.netloc)
+        except ValueError:
+            pass
+        return context
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        self.set_csrf_error_if_need(context)
         context.update({
             'demo_mode': os.environ.get("DEMO_MODE"),
             'auth_methods': self.get_support_auth_methods(),
@@ -145,19 +161,17 @@ class UserLoginContextMixin:
             'current_lang': self.get_current_lang(),
             'forgot_password_url': self.get_forgot_password_url(),
             'extra_fields_count': self.get_extra_fields_count(context),
-            'error_origin': self.error_origin,
             **self.get_user_mfa_context(self.request.user)
         })
         return context
 
 
 @method_decorator(sensitive_post_parameters(), name='dispatch')
+@method_decorator(csrf_protect, name='dispatch')
 @method_decorator(never_cache, name='dispatch')
-@method_decorator(csrf_exempt, name='dispatch')
 class UserLoginView(mixins.AuthMixin, UserLoginContextMixin, FormView):
     redirect_field_name = 'next'
     template_name = 'authentication/login.html'
-    error_origin = ''
 
     def redirect_third_party_auth_if_need(self, request):
         # show jumpserver login page if request http://{JUMP-SERVER}/?admin=1
@@ -206,30 +220,9 @@ class UserLoginView(mixins.AuthMixin, UserLoginContextMixin, FormView):
         request.session.set_test_cookie()
         return super().get(request, *args, **kwargs)
 
-    def check_origin_is_allowed(self, request):
-        http_referer = request.META.get('HTTP_REFERER')
-        if not http_referer:
-            return False, ''
-        referer = urlparse(http_referer)
-        netloc = str(referer.netloc)
-        allowed_domains = settings.ALLOWED_DOMAINS
-        allowed = netloc in allowed_domains
-
-        if not allowed and ':' not in netloc:
-            suffix = ':80' if referer.scheme == 'http' else ':443'
-            netloc += suffix
-            allowed = netloc in allowed_domains
-        return allowed, netloc
-
     def form_valid(self, form):
         if not self.request.session.test_cookie_worked():
             form.add_error(None, _("Login timeout, please try again."))
-            return self.form_invalid(form)
-
-        origin_allowed, origin = self.check_origin_is_allowed(self.request)
-        if not origin_allowed:
-            self.error_origin = origin
-            form.add_error(None, '当前域不在信任域中，拒绝登录')
             return self.form_invalid(form)
 
         # https://docs.djangoproject.com/en/3.1/topics/http/sessions/#setting-test-cookies

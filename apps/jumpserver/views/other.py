@@ -88,3 +88,9 @@ class KokoView(View):
 
 class ResourceDownload(TemplateView):
     template_name = 'resource_download.html'
+
+
+def csrf_failure(request, reason=""):
+    from django.shortcuts import reverse
+    login_url = reverse('authentication:login') + '?csrf_failure=1'
+    return redirect(login_url)
