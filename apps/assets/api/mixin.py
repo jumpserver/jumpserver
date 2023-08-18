@@ -42,7 +42,7 @@ class SerializeToTreeNodeMixin:
                 'name': _name(node),
                 'title': _name(node),
                 'pId': node.parent_key,
-                'isParent': node.assets_amount > 0,
+                'isParent': True,
                 'open': _open(node),
                 'meta': {
                     'data': {
