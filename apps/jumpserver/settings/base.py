@@ -107,6 +107,7 @@ for host_port in ALLOWED_DOMAINS:
             continue
         CSRF_TRUSTED_ORIGINS.append('{}://*.{}'.format(schema, origin))
 
+CSRF_FAILURE_VIEW = 'jumpserver.views.other.csrf_failure'
 # print("CSRF_TRUSTED_ORIGINS: ")
 # for origin in CSRF_TRUSTED_ORIGINS:
 # print('  - ' + origin)
