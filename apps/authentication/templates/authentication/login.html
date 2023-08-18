@@ -235,7 +235,8 @@
 {% if not origin_is_allowed %}
     <div class='alert alert-danger error-info'>
         配置文件存在问题，无法完成登录，请联系管理员解决，或查看最新更新说明 <br/>
-        Configuration file has problems and cannot be logged in. Please contact the administrator
+        Configuration file has problems and cannot be logged in. Please contact the administrator  <br/>
+        - {{ origin }} -
     </div>
 {% endif %}
 <div class="login-content extra-fields-{{ extra_fields_count }}">

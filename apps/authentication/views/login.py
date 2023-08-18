@@ -140,12 +140,13 @@ class UserLoginContextMixin:
         try:
             referer = urlparse(http_referer)
         except ValueError:
-            return False
+            return False, None
         allowed_domains = settings.ALLOWED_DOMAINS
-        return referer.netloc in allowed_domains
+        return referer.netloc in allowed_domains, referer.netloc
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        origin_allowed, origin = self.origin_is_allowed()
         context.update({
             'demo_mode': os.environ.get("DEMO_MODE"),
             'auth_methods': self.get_support_auth_methods(),
@@ -153,7 +154,8 @@ class UserLoginContextMixin:
             'current_lang': self.get_current_lang(),
             'forgot_password_url': self.get_forgot_password_url(),
             'extra_fields_count': self.get_extra_fields_count(context),
-            'origin_is_allowed': self.origin_is_allowed(),
+            'origin_is_allowed': origin_allowed,
+            'origin': origin,
             **self.get_user_mfa_context(self.request.user)
         })
         return context
