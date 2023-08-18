@@ -100,7 +100,6 @@ openapi-codec = "1.3.2"
 pillow = "10.0.0"
 pytz = "2023.3"
 django-proxy = "1.2.2"
-channels-redis = "4.1.0"
 python-daemon = "3.0.1"
 eventlet = "0.33.3"
 greenlet = "2.0.2"
@@ -114,7 +113,7 @@ websockets = "11.0.3"
 python-ldap = "3.4.3"
 ldap3 = "2.9.1"
 django-radius = { url = "https://github.com/ibuler/django-radius/archive/refs/tags/1.5.0.zip" }
-django-cas-ng = {url = "https://github.com/ibuler/django-cas-ng/releases/download/v4.3.2/django-cas-ng-4.3.2.zip"}
+django-cas-ng = { url = "https://github.com/ibuler/django-cas-ng/releases/download/v4.3.2/django-cas-ng-4.3.2.zip" }
 python-cas = "1.6.0"
 django-auth-ldap = "4.4.0"
 boto3 = "1.28.9"
@@ -137,11 +136,10 @@ hvac = "1.1.1"
 pyhcl = "0.4.4"
 ipy = "1.1"
 netifaces = "^0.11.0"
-
-[tool.poetry.group.dev.dependencies]
 daphne = "4.0.0"
 channels = "^4.0.0"
-channels-redis = "^4.1.0"
+channels-redis = "4.1.0"
+
 
 [tool.poetry.group.xpack.dependencies]
 qingcloud-sdk = "1.2.15"
