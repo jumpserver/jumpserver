@@ -88,10 +88,11 @@ if DEBUG:
 DEBUG_HOST_PORTS = ['{}:{}'.format(host, port) for host in DEBUG_HOSTS for port in DEBUG_PORT]
 ALLOWED_DOMAINS.extend(DEBUG_HOST_PORTS)
 
-ALLOWED_HOSTS = list(set(['.' + host.split(':')[0] for host in ALLOWED_DOMAINS]))
 print("ALLOWED_HOSTS: ", )
-for host in ALLOWED_HOSTS:
+for host in ALLOWED_DOMAINS:
     print('  - ' + host.lstrip('.'))
+
+ALLOWED_HOSTS = ['*']
 
 # https://docs.djangoproject.com/en/4.1/ref/settings/#std-setting-CSRF_TRUSTED_ORIGINS
 CSRF_TRUSTED_ORIGINS = []
