@@ -223,10 +223,21 @@
             height: 13px;
             cursor: pointer;
         }
+
+        .error-info {
+            font-size: 16px;
+            text-align: center;
+        }
     </style>
 </head>
 
 <body>
+{% if not origin_is_allowed %}
+    <div class='alert alert-danger error-info'>
+        配置文件存在问题，无法完成登录，请联系管理员解决，或查看最新更新说明 <br/>
+        Configuration file has problems and cannot be logged in. Please contact the administrator
+    </div>
+{% endif %}
 <div class="login-content extra-fields-{{ extra_fields_count }}">
     <div class="right-image-box">
         <a href="{% if not XPACK_ENABLED %}https://github.com/jumpserver/jumpserver.git{% endif %}">
@@ -309,7 +320,8 @@
                     </div>
 
                     <div class="form-group">
-                        <button type="submit" class="btn btn-transparent" onclick="doLogin();return false;">
+                        <button type="submit" class="btn btn-transparent" onclick="doLogin();return false;"
+                                {% if not origin_is_allowed %} disabled {% endif %}>
                             {% trans 'Login' %}
                         </button>
                     </div>
