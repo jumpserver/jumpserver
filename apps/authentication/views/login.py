@@ -140,13 +140,16 @@ class UserLoginContextMixin:
         if not self.request.GET.get('csrf_failure'):
             return context
 
+        http_origin = self.request.META.get('HTTP_ORIGIN')
         http_referer = self.request.META.get('HTTP_REFERER')
-        if not http_referer:
+        http_origin = http_origin or http_referer
+
+        if not http_origin:
             return context
 
         try:
-            referer = urlparse(http_referer)
-            context['error_origin'] = str(referer.netloc)
+            origin = urlparse(http_origin)
+            context['error_origin'] = str(origin.netloc)
         except ValueError:
             pass
         return context
