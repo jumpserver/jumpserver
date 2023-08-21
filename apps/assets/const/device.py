@@ -24,7 +24,7 @@ class DeviceTypes(BaseType):
     def _get_protocol_constrains(cls) -> dict:
         return {
             '*': {
-                'choices': ['ssh', 'telnet']
+                'choices': ['ssh', 'telnet', 'sftp']
             }
         }
 
