@@ -154,6 +154,15 @@ class Protocol(ChoicesMixin, models.TextChoices):
                 'required': True,
                 'secret_types': ['password'],
                 'xpack': True,
+                'setting': {
+                    'version': {
+                        'type': 'choice',
+                        'choices': [('>=2014', '>= 2014'), ('<2014', '< 2014')],
+                        'default': '>=2014',
+                        'label': _('Version'),
+                        'help_text': _('SQL Server version, Different versions have different connection drivers')
+                    }
+                }
             },
             cls.clickhouse: {
                 'port': 9000,
