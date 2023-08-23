@@ -14,7 +14,7 @@ class UserUserGroupRelationViewSet(JMSBulkRelationModelViewSet):
     perm_model = UserGroup
     filterset_fields = ('user', 'usergroup')
     search_fields = filterset_fields
-    serializer_class = serializers.UserUserGroupRelationSerializer
+    serializer_class = serializers.User2GroupRelationSerializer
     m2m_field = User.groups.field
 
     def get_queryset(self):

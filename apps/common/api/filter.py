@@ -6,7 +6,7 @@ from itertools import chain
 from django.db import models
 from rest_framework.settings import api_settings
 
-from common.drf.filters import IDSpmFilter, CustomFilter, IDInFilter
+from common.drf.filters import IDSpmFilter, CustomFilter, IDInFilter, IDNotFilter
 
 __all__ = ['ExtraFilterFieldsMixin', 'OrderingFielderFieldsMixin']
 
@@ -17,7 +17,7 @@ class ExtraFilterFieldsMixin:
     """
     额外的 api filter
     """
-    default_added_filters = [CustomFilter, IDSpmFilter, IDInFilter]
+    default_added_filters = [CustomFilter, IDSpmFilter, IDInFilter, IDNotFilter]
     filter_backends = api_settings.DEFAULT_FILTER_BACKENDS
     extra_filter_fields = []
     extra_filter_backends = []
