@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-22 13:39+0800\n"
+"POT-Creation-Date: 2023-08-17 18:24+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4909,41 +4909,41 @@ msgstr "企業微信認証の有効化"
 msgid "Site url"
 msgstr "サイトURL"
 
-#: settings/serializers/basic.py:10
+#: settings/serializers/basic.py:11
 msgid ""
-"Email links or other system callbacks are used to access it, eg: http://dev."
-"jumpserver.org:8080"
-msgstr ""
+"External URL, email links or other system callbacks are used to access it, "
+"eg: http://dev.jumpserver.org:8080"
+msgstr "外部URL、メールリンクまたは他のシステムコールバックにアクセスするには、http://dev.jumpserver.org:8080などを使用します"
 
-#: settings/serializers/basic.py:13
+#: settings/serializers/basic.py:16
 msgid "User guide url"
 msgstr "ユーザーガイドurl"
 
-#: settings/serializers/basic.py:14
+#: settings/serializers/basic.py:17
 msgid "User first login update profile done redirect to it"
 msgstr "ユーザーの最初のログイン更新プロファイルがリダイレクトされました"
 
-#: settings/serializers/basic.py:17
+#: settings/serializers/basic.py:20
 msgid "Global organization name"
 msgstr "グローバル組織名"
 
-#: settings/serializers/basic.py:18
+#: settings/serializers/basic.py:21
 msgid "The name of global organization to display"
 msgstr "表示するグローバル組織の名前"
 
-#: settings/serializers/basic.py:21
+#: settings/serializers/basic.py:24
 msgid "Help Docs URL"
 msgstr "ドキュメントリンク"
 
-#: settings/serializers/basic.py:22
+#: settings/serializers/basic.py:25
 msgid "default: http://docs.jumpserver.org"
 msgstr "デフォルト: http://docs.jumpserver.org"
 
-#: settings/serializers/basic.py:25
+#: settings/serializers/basic.py:28
 msgid "Help Support URL"
 msgstr "サポートリンク"
 
-#: settings/serializers/basic.py:26
+#: settings/serializers/basic.py:29
 msgid "default: http://www.jumpserver.org/support/"
 msgstr "デフォルト: http://www.jumpserver.org/support/"
 
@@ -8211,3 +8211,8 @@ msgstr "究極のエディション"
 #: xpack/plugins/license/models.py:86
 msgid "Community edition"
 msgstr "コミュニティ版"
+
+#, fuzzy
+#~| msgid "Internal"
+#~ msgid "External url"
+#~ msgstr "ビルトイン"
