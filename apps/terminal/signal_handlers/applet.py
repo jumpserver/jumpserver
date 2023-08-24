@@ -20,6 +20,9 @@ logger = get_logger(__file__)
 def on_applet_host_create(sender, instance, created=False, **kwargs):
     if not created:
         return
+    # 新建时，清除原来的首选，避免一直调度到一个上面
+    Applet.clear_host_prefer()
+
     applets = Applet.objects.all()
     instance.applets.set(applets)
 

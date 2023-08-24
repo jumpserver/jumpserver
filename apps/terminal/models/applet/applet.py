@@ -1,6 +1,7 @@
 import os.path
 import random
 import shutil
+from collections import defaultdict
 
 import yaml
 from django.conf import settings
@@ -148,6 +149,22 @@ class Applet(JMSBaseModel):
         shutil.copytree(path, pkg_path)
         return instance, serializer
 
+    host_prefer_key_tpl = 'applet_host_prefer_{}'
+
+    @classmethod
+    def clear_host_prefer(cls):
+        cache.delete_pattern(cls.host_prefer_key_tpl.format('*'))
+
+    def _select_by_load(self, hosts):
+        using_keys = cache.keys(self.host_prefer_key_tpl.format('*'))
+        using_host_ids = cache.get_many(using_keys)
+        counts = defaultdict(int)
+        for host_id in using_host_ids.values():
+            counts[host_id] += 1
+
+        hosts = list(sorted(hosts, key=lambda h: counts[h.id]))
+        return hosts[0]
+
     def select_host(self, user, asset):
         hosts = self.hosts.filter(is_active=True)
         hosts = [host for host in hosts if host.load != 'offline']
@@ -161,14 +178,15 @@ class Applet(JMSBaseModel):
                 return matched[0]
 
         hosts = [h for h in hosts if h.auto_create_accounts]
-        prefer_key = 'applet_host_prefer_{}'.format(user.id)
+        prefer_key = self.host_prefer_key_tpl.format(user.id)
         prefer_host_id = cache.get(prefer_key, None)
         pref_host = [host for host in hosts if host.id == prefer_host_id]
+
         if pref_host:
             host = pref_host[0]
         else:
-            host = random.choice(hosts)
-            cache.set(prefer_key, host.id, timeout=None)
+            host = self._select_by_load(hosts)
+            cache.set(prefer_key, str(host.id), timeout=None)
         return host
 
     def get_related_platform(self):
@@ -241,9 +259,9 @@ class Applet(JMSBaseModel):
     def select_host_account(self, user, asset):
         # 选择激活的发布机
         host = self.select_host(user, asset)
-        logger.info('Select applet host: {}'.format(host.name))
         if not host:
             return None
+        logger.info('Select applet host: {}'.format(host.name))
 
         valid_accounts = host.accounts.all().filter(is_active=True, privileged=False)
         account = self.try_to_use_private_account(user, host, valid_accounts)
