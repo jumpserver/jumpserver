@@ -146,7 +146,9 @@ class PrepareRequestMixin:
                 },
                 'singleLogoutService': {
                     'url': f"{sp_host}{reverse('authentication:saml2:saml2-logout')}"
-                }
+                },
+                'privateKey': getattr(settings, 'SAML2_SP_KEY_CONTENT', ''),
+                'x509cert': getattr(settings, 'SAML2_SP_CERT_CONTENT', ''),
             }
         }
         sp_settings['sp'].update(attrs)
