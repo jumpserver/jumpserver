@@ -66,7 +66,7 @@ class KubernetesClient:
 
         remote_bind_address = (
             urlparse(asset.address).hostname,
-            urlparse(asset.address).port
+            urlparse(asset.address).port or 443
         )
         server = SSHTunnelForwarder(
             (gateway.address, gateway.port),
