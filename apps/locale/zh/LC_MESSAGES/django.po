@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-24 10:34+0800\n"
+"POT-Creation-Date: 2023-08-17 18:24+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -224,8 +224,9 @@ msgstr "资产"
 msgid "Su from"
 msgstr "切换自"
 
-#: accounts/models/account.py:54 settings/serializers/auth/cas.py:20
-#: settings/serializers/auth/feishu.py:20 terminal/models/applet/applet.py:34
+#: accounts/models/account.py:54 assets/const/protocol.py:162
+#: settings/serializers/auth/cas.py:20 settings/serializers/auth/feishu.py:20
+#: terminal/models/applet/applet.py:34
 msgid "Version"
 msgstr "版本"
 
@@ -1163,7 +1164,7 @@ msgstr "禁用"
 msgid "Basic"
 msgstr "基本"
 
-#: assets/const/base.py:35 assets/const/protocol.py:230
+#: assets/const/base.py:35 assets/const/protocol.py:239
 #: assets/models/asset/web.py:13
 msgid "Script"
 msgstr "脚本"
@@ -1296,39 +1297,44 @@ msgstr "SYSDBA"
 msgid "Connect as SYSDBA"
 msgstr "以 SYSDBA 角色连接"
 
-#: assets/const/protocol.py:177
+#: assets/const/protocol.py:163
+msgid ""
+"SQL Server version, Different versions have different connection drivers"
+msgstr "SQL Server 版本，不同版本有不同的连接驱动"
+
+#: assets/const/protocol.py:186
 msgid "Auth username"
 msgstr "使用用户名认证"
 
-#: assets/const/protocol.py:200
+#: assets/const/protocol.py:209
 msgid "Safe mode"
 msgstr "安全模式"
 
-#: assets/const/protocol.py:202
+#: assets/const/protocol.py:211
 msgid ""
 "When safe mode is enabled, some operations will be disabled, such as: New "
 "tab, right click, visit other website, etc."
 msgstr ""
 "当安全模式启用时，一些操作将被禁用，例如：新建标签页、右键、访问其它网站 等"
 
-#: assets/const/protocol.py:207 assets/models/asset/web.py:9
+#: assets/const/protocol.py:216 assets/models/asset/web.py:9
 #: assets/serializers/asset/info/spec.py:16
 msgid "Autofill"
 msgstr "自动代填"
 
-#: assets/const/protocol.py:215 assets/models/asset/web.py:10
+#: assets/const/protocol.py:224 assets/models/asset/web.py:10
 msgid "Username selector"
 msgstr "用户名选择器"
 
-#: assets/const/protocol.py:220 assets/models/asset/web.py:11
+#: assets/const/protocol.py:229 assets/models/asset/web.py:11
 msgid "Password selector"
 msgstr "密码选择器"
 
-#: assets/const/protocol.py:225 assets/models/asset/web.py:12
+#: assets/const/protocol.py:234 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr "确认按钮选择器"
 
-#: assets/const/protocol.py:248
+#: assets/const/protocol.py:257
 msgid "API mode"
 msgstr "API 模式"
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-24 10:34+0800\n"
+"POT-Creation-Date: 2023-08-17 18:24+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -225,8 +225,9 @@ msgstr "資産"
 msgid "Su from"
 msgstr "から切り替え"
 
-#: accounts/models/account.py:54 settings/serializers/auth/cas.py:20
-#: settings/serializers/auth/feishu.py:20 terminal/models/applet/applet.py:34
+#: accounts/models/account.py:54 assets/const/protocol.py:162
+#: settings/serializers/auth/cas.py:20 settings/serializers/auth/feishu.py:20
+#: terminal/models/applet/applet.py:34
 msgid "Version"
 msgstr "バージョン"
 
@@ -1166,7 +1167,7 @@ msgstr "無効"
 msgid "Basic"
 msgstr "基本"
 
-#: assets/const/base.py:35 assets/const/protocol.py:230
+#: assets/const/base.py:35 assets/const/protocol.py:239
 #: assets/models/asset/web.py:13
 msgid "Script"
 msgstr "脚本"
@@ -1299,15 +1300,20 @@ msgstr "SYSDBA"
 msgid "Connect as SYSDBA"
 msgstr "SYSDBA として接続"
 
-#: assets/const/protocol.py:177
+#: assets/const/protocol.py:163
+msgid ""
+"SQL Server version, Different versions have different connection drivers"
+msgstr "SQL Server のバージョン。バージョンによって接続ドライバが異なります"
+
+#: assets/const/protocol.py:186
 msgid "Auth username"
 msgstr "ユーザー名で認証する"
 
-#: assets/const/protocol.py:200
+#: assets/const/protocol.py:209
 msgid "Safe mode"
 msgstr "安全モード"
 
-#: assets/const/protocol.py:202
+#: assets/const/protocol.py:211
 msgid ""
 "When safe mode is enabled, some operations will be disabled, such as: New "
 "tab, right click, visit other website, etc."
@@ -1315,24 +1321,24 @@ msgstr ""
 "安全モードが有効になっている場合、新しいタブ、右クリック、他のウェブサイトへ"
 "のアクセスなど、一部の操作が無効になります"
 
-#: assets/const/protocol.py:207 assets/models/asset/web.py:9
+#: assets/const/protocol.py:216 assets/models/asset/web.py:9
 #: assets/serializers/asset/info/spec.py:16
 msgid "Autofill"
 msgstr "自動充填"
 
-#: assets/const/protocol.py:215 assets/models/asset/web.py:10
+#: assets/const/protocol.py:224 assets/models/asset/web.py:10
 msgid "Username selector"
 msgstr "ユーザー名ピッカー"
 
-#: assets/const/protocol.py:220 assets/models/asset/web.py:11
+#: assets/const/protocol.py:229 assets/models/asset/web.py:11
 msgid "Password selector"
 msgstr "パスワードセレクター"
 
-#: assets/const/protocol.py:225 assets/models/asset/web.py:12
+#: assets/const/protocol.py:234 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr "ボタンセレクターを確認する"
 
-#: assets/const/protocol.py:248
+#: assets/const/protocol.py:257
 msgid "API mode"
 msgstr "APIモード"
 

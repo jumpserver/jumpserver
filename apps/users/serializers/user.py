@@ -56,14 +56,15 @@ class RolesSerializerMixin(serializers.Serializer):
         if request.user.is_anonymous:
             return fields
 
-        action = view.action or "list"
-        if action in ("partial_bulk_update", "bulk_update", "partial_update", "update"):
-            action = "create"
-
         model_cls_field_mapper = {
             SystemRoleBinding: ["system_roles"],
             OrgRoleBinding: ["org_roles"],
         }
+
+        update_actions = ("partial_bulk_update", "bulk_update", "partial_update", "update")
+        action = view.action or "list"
+        if action in update_actions:
+            action = "create"
 
         for model_cls, fields_names in model_cls_field_mapper.items():
             perms = RBACPermission.parse_action_model_perms(action, model_cls)
@@ -156,7 +157,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
             "is_first_login", "wecom_id", "dingtalk_id",
             "feishu_id",
         ]
-        disallow_self_update_fields = ["is_active"]
+        disallow_self_update_fields = ["is_active", "system_roles", "org_roles"]
         extra_kwargs = {
             "password": {
                 "write_only": True,

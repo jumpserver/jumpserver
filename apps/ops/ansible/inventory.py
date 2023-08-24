@@ -163,8 +163,9 @@ class JMSInventory:
 
         protocol = self.get_primary_protocol(ansible_config, protocols)
 
+        name = asset.name.replace(' ', '_').replace('[', '_').replace(']', '_')
         host = {
-            'name': '{}'.format(asset.name.replace(' ', '_')),
+            'name': name,
             'jms_asset': {
                 'id': str(asset.id), 'name': asset.name, 'address': asset.address,
                 'type': asset.type, 'category': asset.category,
@@ -281,7 +282,6 @@ class JMSInventory:
         data = {'all': {'hosts': {}}}
         for host in hosts:
             name = host.pop('name')
-            name = name.replace('[', '_').replace(']', '_')
             data['all']['hosts'][name] = host
         if not self.exclude_localhost:
             data['all']['hosts'].update({

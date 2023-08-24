@@ -20,7 +20,7 @@ logger = logging.getLogger('jumpserver.common')
 __all__ = [
     "DatetimeRangeFilter", "IDSpmFilter",
     'IDInFilter', "CustomFilter",
-    "BaseFilterSet"
+    "BaseFilterSet", 'IDNotFilter'
 ]
 
 
@@ -145,6 +145,25 @@ class IDInFilter(filters.BaseFilterBackend):
             return queryset
         id_list = [i.strip() for i in ids.split(',')]
         queryset = queryset.filter(id__in=id_list)
+        return queryset
+
+
+class IDNotFilter(filters.BaseFilterBackend):
+    def get_schema_fields(self, view):
+        return [
+            coreapi.Field(
+                name='id!', location='query', required=False,
+                type='string', example='/api/v1/users/users?id!=1,2,3',
+                description='Exclude by id set'
+            )
+        ]
+
+    def filter_queryset(self, request, queryset, view):
+        ids = request.query_params.get('id!')
+        if not ids:
+            return queryset
+        id_list = [i.strip() for i in ids.split(',')]
+        queryset = queryset.exclude(id__in=id_list)
         return queryset
 
 
