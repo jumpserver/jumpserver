@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-17 18:24+0800\n"
+"POT-Creation-Date: 2023-08-24 10:34+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -25,7 +25,7 @@ msgstr "参数 'action' 必须是 [{}]"
 #: accounts/serializers/automations/change_secret.py:33
 #: assets/models/_user.py:24 audits/signal_handlers/login_log.py:28
 #: authentication/confirm/password.py:9 authentication/forms.py:32
-#: authentication/templates/authentication/login.html:274
+#: authentication/templates/authentication/login.html:286
 #: settings/serializers/auth/ldap.py:25 settings/serializers/auth/ldap.py:47
 #: users/forms/profile.py:22 users/serializers/user.py:104
 #: users/templates/users/_msg_user_created.html:13
@@ -314,7 +314,7 @@ msgid "Trigger mode"
 msgstr "触发模式"
 
 #: accounts/models/automations/backup_account.py:105 audits/models.py:194
-#: terminal/models/session/sharing.py:121 xpack/plugins/cloud/models.py:205
+#: terminal/models/session/sharing.py:125 xpack/plugins/cloud/models.py:205
 msgid "Reason"
 msgstr "原因"
 
@@ -708,7 +708,7 @@ msgstr "ID"
 #: perms/serializers/permission.py:30 rbac/builtin.py:123
 #: rbac/models/rolebinding.py:49 rbac/serializers/rolebinding.py:17
 #: terminal/backends/command/models.py:16 terminal/models/session/session.py:29
-#: terminal/models/session/sharing.py:33 terminal/notifications.py:156
+#: terminal/models/session/sharing.py:34 terminal/notifications.py:156
 #: terminal/notifications.py:205 terminal/serializers/command.py:16
 #: terminal/templates/terminal/_msg_command_warning.html:6
 #: terminal/templates/terminal/_msg_session_sharing.html:6
@@ -820,7 +820,7 @@ msgstr "自动化任务执行历史"
 #: accounts/serializers/automations/change_secret.py:155 audits/const.py:53
 #: audits/models.py:59 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:18 ops/const.py:59 ops/serializers/celery.py:40
-#: terminal/const.py:76 terminal/models/session/sharing.py:117
+#: terminal/const.py:76 terminal/models/session/sharing.py:121
 #: tickets/views/approve.py:115
 msgid "Success"
 msgstr "成功"
@@ -914,7 +914,7 @@ msgstr "审批人"
 #: acls/models/base.py:43 authentication/models/access_key.py:17
 #: authentication/models/connection_token.py:53
 #: authentication/templates/authentication/_access_key_modal.html:32
-#: perms/models/asset_permission.py:76 terminal/models/session/sharing.py:28
+#: perms/models/asset_permission.py:76 terminal/models/session/sharing.py:29
 #: tickets/const.py:37
 msgid "Active"
 msgstr "激活中"
@@ -2110,8 +2110,8 @@ msgstr "创建"
 msgid "Connect"
 msgstr "连接"
 
-#: audits/const.py:29 authentication/templates/authentication/login.html:240
-#: authentication/templates/authentication/login.html:313
+#: audits/const.py:29 authentication/templates/authentication/login.html:252
+#: authentication/templates/authentication/login.html:325
 #: templates/_header_bar.html:89
 msgid "Login"
 msgstr "登录"
@@ -2160,7 +2160,7 @@ msgid "Job audit log"
 msgstr "作业审计日志"
 
 #: audits/models.py:51 audits/models.py:95 audits/models.py:166
-#: terminal/models/session/session.py:38 terminal/models/session/sharing.py:109
+#: terminal/models/session/session.py:38 terminal/models/session/sharing.py:113
 msgid "Remote addr"
 msgstr "远端地址"
 
@@ -2177,8 +2177,8 @@ msgid "File"
 msgstr "文件"
 
 #: audits/models.py:62 terminal/backends/command/models.py:21
-#: terminal/models/session/replay.py:9 terminal/models/session/sharing.py:19
-#: terminal/models/session/sharing.py:91
+#: terminal/models/session/replay.py:9 terminal/models/session/sharing.py:20
+#: terminal/models/session/sharing.py:95
 #: terminal/templates/terminal/_msg_command_alert.html:10
 #: terminal/templates/terminal/_msg_command_warning.html:17
 #: tickets/models/ticket/command_confirm.py:15
@@ -2301,14 +2301,14 @@ msgid "Auth Token"
 msgstr "认证令牌"
 
 #: audits/signal_handlers/login_log.py:31 authentication/notifications.py:73
-#: authentication/views/login.py:75 authentication/views/wecom.py:159
+#: authentication/views/login.py:77 authentication/views/wecom.py:159
 #: notifications/backends/__init__.py:11 settings/serializers/auth/wecom.py:10
 #: users/models/user.py:740 users/models/user.py:848
 msgid "WeCom"
 msgstr "企业微信"
 
 #: audits/signal_handlers/login_log.py:32 authentication/views/feishu.py:122
-#: authentication/views/login.py:87 notifications/backends/__init__.py:14
+#: authentication/views/login.py:89 notifications/backends/__init__.py:14
 #: settings/serializers/auth/feishu.py:10
 #: settings/serializers/auth/feishu.py:13 users/models/user.py:742
 #: users/models/user.py:850
@@ -2316,7 +2316,7 @@ msgid "FeiShu"
 msgstr "飞书"
 
 #: audits/signal_handlers/login_log.py:33 authentication/views/dingtalk.py:159
-#: authentication/views/login.py:81 notifications/backends/__init__.py:12
+#: authentication/views/login.py:83 notifications/backends/__init__.py:12
 #: settings/serializers/auth/dingtalk.py:10 users/models/user.py:741
 #: users/models/user.py:849
 msgid "DingTalk"
@@ -2383,7 +2383,7 @@ msgid ""
 msgstr "用户来自 {} 请去相应系统修改密码"
 
 #: authentication/api/password.py:64
-#: authentication/templates/authentication/login.html:305
+#: authentication/templates/authentication/login.html:317
 #: users/templates/users/forgot_password.html:27
 #: users/templates/users/forgot_password.html:28
 #: users/templates/users/forgot_password_previewing.html:13
@@ -3017,7 +3017,7 @@ msgid "request new one"
 msgstr "重新申请"
 
 #: authentication/templates/authentication/_msg_reset_password_code.html:12
-#: terminal/models/session/sharing.py:26 terminal/models/session/sharing.py:93
+#: terminal/models/session/sharing.py:27 terminal/models/session/sharing.py:97
 #: terminal/templates/terminal/_msg_session_sharing.html:12
 #: users/forms/profile.py:107 users/templates/users/forgot_password.html:66
 msgid "Verify code"
@@ -3067,7 +3067,7 @@ msgstr "如果这次公钥更新不是由你发起的，那么你的账号可能
 msgid "Cancel"
 msgstr "取消"
 
-#: authentication/templates/authentication/login.html:320
+#: authentication/templates/authentication/login.html:332
 msgid "More login options"
 msgstr "其他方式登录"
 
@@ -3179,23 +3179,23 @@ msgstr "绑定 飞书 成功"
 msgid "Failed to get user from FeiShu"
 msgstr "从飞书获取用户失败"
 
-#: authentication/views/login.py:183
+#: authentication/views/login.py:204
 msgid "Redirecting"
 msgstr "跳转中"
 
-#: authentication/views/login.py:184
+#: authentication/views/login.py:205
 msgid "Redirecting to {} authentication"
 msgstr "正在跳转到 {} 认证"
 
-#: authentication/views/login.py:207
+#: authentication/views/login.py:228
 msgid "Login timeout, please try again."
 msgstr "登录超时，请重新登录"
 
-#: authentication/views/login.py:250
+#: authentication/views/login.py:271
 msgid "User email already exists ({})"
 msgstr "用户邮箱已存在 ({})"
 
-#: authentication/views/login.py:328
+#: authentication/views/login.py:349
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -3203,15 +3203,15 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:333
+#: authentication/views/login.py:354
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:369
+#: authentication/views/login.py:390
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:370
+#: authentication/views/login.py:391
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
@@ -3767,7 +3767,7 @@ msgstr "参数"
 
 #: ops/models/adhoc.py:25 ops/models/base.py:16 ops/models/base.py:53
 #: ops/models/job.py:138 ops/models/job.py:226 ops/models/playbook.py:30
-#: terminal/models/session/sharing.py:24
+#: terminal/models/session/sharing.py:25
 msgid "Creator"
 msgstr "创建者"
 
@@ -3808,7 +3808,7 @@ msgstr "可以查看任务监控"
 msgid "Kwargs"
 msgstr "其它参数"
 
-#: ops/models/celery.py:61 terminal/models/session/sharing.py:124
+#: ops/models/celery.py:61 terminal/models/session/sharing.py:128
 #: tickets/const.py:25
 msgid "Finished"
 msgstr "结束"
@@ -4857,41 +4857,41 @@ msgstr "启用企业微信认证"
 msgid "Site url"
 msgstr "当前站点 URL"
 
-#: settings/serializers/basic.py:10
+#: settings/serializers/basic.py:11
 msgid ""
-"Email links or other system callbacks are used to access it, eg: http://dev."
-"jumpserver.org:8080"
-msgstr ""
+"External URL, email links or other system callbacks are used to access it, "
+"eg: http://dev.jumpserver.org:8080"
+msgstr "外部可访问的 URL, 用于邮件链接或其它系统回调, 例如: http://dev.jumpserver.org:8080"
 
-#: settings/serializers/basic.py:13
+#: settings/serializers/basic.py:16
 msgid "User guide url"
 msgstr "用户向导URL"
 
-#: settings/serializers/basic.py:14
+#: settings/serializers/basic.py:17
 msgid "User first login update profile done redirect to it"
 msgstr "用户第一次登录，修改profile后重定向到地址, 可以是 wiki 或 其他说明文档"
 
-#: settings/serializers/basic.py:17
+#: settings/serializers/basic.py:20
 msgid "Global organization name"
 msgstr "全局组织名"
 
-#: settings/serializers/basic.py:18
+#: settings/serializers/basic.py:21
 msgid "The name of global organization to display"
 msgstr "全局组织的显示名称，默认为 全局组织"
 
-#: settings/serializers/basic.py:21
+#: settings/serializers/basic.py:24
 msgid "Help Docs URL"
 msgstr "文档链接"
 
-#: settings/serializers/basic.py:22
+#: settings/serializers/basic.py:25
 msgid "default: http://docs.jumpserver.org"
 msgstr "默认: http://dev.jumpserver.org:8080"
 
-#: settings/serializers/basic.py:25
+#: settings/serializers/basic.py:28
 msgid "Help Support URL"
 msgstr "支持链接"
 
-#: settings/serializers/basic.py:26
+#: settings/serializers/basic.py:29
 msgid "default: http://www.jumpserver.org/support/"
 msgstr "默认: http://www.jumpserver.org/support/"
 
@@ -6114,7 +6114,7 @@ msgstr "可以下载会话录像"
 msgid "Account id"
 msgstr "账号 ID"
 
-#: terminal/models/session/session.py:36 terminal/models/session/sharing.py:114
+#: terminal/models/session/session.py:36 terminal/models/session/sharing.py:118
 msgid "Login from"
 msgstr "登录来源"
 
@@ -6150,61 +6150,61 @@ msgstr "可以终断会话"
 msgid "Can validate session action perm"
 msgstr "可以验证会话动作权限"
 
-#: terminal/models/session/sharing.py:31
+#: terminal/models/session/sharing.py:32
 msgid "Expired time (min)"
 msgstr "过期时间 (分)"
 
-#: terminal/models/session/sharing.py:35 terminal/serializers/sharing.py:20
+#: terminal/models/session/sharing.py:36 terminal/serializers/sharing.py:20
 #: terminal/serializers/sharing.py:52
 msgid "Action permission"
 msgstr "操作权限"
 
-#: terminal/models/session/sharing.py:37
+#: terminal/models/session/sharing.py:38
 msgid "Origin"
 msgstr "来源"
 
-#: terminal/models/session/sharing.py:41 terminal/models/session/sharing.py:96
+#: terminal/models/session/sharing.py:42 terminal/models/session/sharing.py:100
 #: terminal/notifications.py:261
 msgid "Session sharing"
 msgstr "会话分享"
 
-#: terminal/models/session/sharing.py:43
+#: terminal/models/session/sharing.py:44
 msgid "Can add super session sharing"
 msgstr "可以创建超级会话分享"
 
-#: terminal/models/session/sharing.py:79
+#: terminal/models/session/sharing.py:83
 msgid "Link not active"
 msgstr "链接失效"
 
-#: terminal/models/session/sharing.py:81
+#: terminal/models/session/sharing.py:85
 msgid "Link expired"
 msgstr "链接过期"
 
-#: terminal/models/session/sharing.py:83
+#: terminal/models/session/sharing.py:87
 msgid "User not allowed to join"
 msgstr "该用户无权加入会话"
 
-#: terminal/models/session/sharing.py:100 terminal/serializers/sharing.py:71
+#: terminal/models/session/sharing.py:104 terminal/serializers/sharing.py:71
 msgid "Joiner"
 msgstr "加入者"
 
-#: terminal/models/session/sharing.py:103
+#: terminal/models/session/sharing.py:107
 msgid "Date joined"
 msgstr "加入日期"
 
-#: terminal/models/session/sharing.py:106
+#: terminal/models/session/sharing.py:110
 msgid "Date left"
 msgstr "结束日期"
 
-#: terminal/models/session/sharing.py:129
+#: terminal/models/session/sharing.py:133
 msgid "Session join record"
 msgstr "会话加入记录"
 
-#: terminal/models/session/sharing.py:145
+#: terminal/models/session/sharing.py:149
 msgid "Invalid verification code"
 msgstr "验证码不正确"
 
-#: terminal/models/session/sharing.py:152
+#: terminal/models/session/sharing.py:156
 msgid "You have already joined this session"
 msgstr "您已经加入过此会话"
 
@@ -8094,3 +8094,7 @@ msgstr "旗舰版"
 #: xpack/plugins/license/models.py:86
 msgid "Community edition"
 msgstr "社区版"
+
+#~| msgid "Internal"
+#~ msgid "External url"
+#~ msgstr "内置"

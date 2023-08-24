@@ -13,6 +13,7 @@ from rest_framework.fields import DateTimeField
 from rest_framework.serializers import ValidationError
 
 from common import const
+from common.db.fields import RelatedManager
 
 logger = logging.getLogger('jumpserver.common')
 
@@ -21,8 +22,6 @@ __all__ = [
     'IDInFilter', "CustomFilter",
     "BaseFilterSet"
 ]
-
-from common.db.fields import RelatedManager
 
 
 class BaseFilterSet(drf_filters.FilterSet):

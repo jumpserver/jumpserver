@@ -143,4 +143,3 @@ class AccountHistoriesSecretAPI(ExtraFilterFieldsMixin, RecordViewLogMixin, List
             return histories
         histories = histories.exclude(history_id=latest_history.history_id)
         return histories
-

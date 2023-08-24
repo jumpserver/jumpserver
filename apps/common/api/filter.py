@@ -22,7 +22,15 @@ class ExtraFilterFieldsMixin:
     extra_filter_fields = []
     extra_filter_backends = []
 
+    def set_compatible_fields(self):
+        """
+        兼容老的 filter_fields
+        """
+        if not hasattr(self, 'filter_fields') and hasattr(self, 'filterset_fields'):
+            self.filter_fields = self.filterset_fields
+
     def get_filter_backends(self):
+        self.set_compatible_fields()
         if self.filter_backends != self.__class__.filter_backends:
             return self.filter_backends
         backends = list(chain(

@@ -7,7 +7,10 @@ class BasicSettingSerializer(serializers.Serializer):
 
     SITE_URL = serializers.URLField(
         required=True, label=_("Site url"),
-        help_text=_('Email links or other system callbacks are used to access it, eg: http://dev.jumpserver.org:8080')
+        help_text=_(
+            'External URL, email links or other system callbacks are used to access it, '
+            'eg: http://dev.jumpserver.org:8080'
+        )
     )
     USER_GUIDE_URL = serializers.URLField(
         required=False, allow_blank=True, allow_null=True, label=_("User guide url"),
