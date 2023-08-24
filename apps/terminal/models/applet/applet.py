@@ -148,6 +148,11 @@ class Applet(JMSBaseModel):
         shutil.copytree(path, pkg_path)
         return instance, serializer
 
+    @classmethod
+    def clear_host_prefer(cls):
+        prefer_key = 'applet_host_prefer_{}'.format("*")
+        cache.delete_pattern(prefer_key)
+
     def select_host(self, user, asset):
         hosts = self.hosts.filter(is_active=True)
         hosts = [host for host in hosts if host.load != 'offline']
