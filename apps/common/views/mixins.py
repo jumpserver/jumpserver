@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 #
-from django.utils import translation
-from django.utils.translation import gettext_noop
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.http.response import JsonResponse
+from django.utils import translation
+from django.utils.translation import gettext_noop
 from rest_framework import permissions
 from rest_framework.request import Request
 
+from audits.const import ActionChoices, ActivityChoices
+from audits.handler import create_or_update_operate_log
+from audits.models import ActivityLog
 from common.exceptions import UserConfirmRequired
 from common.utils import i18n_fmt
 from orgs.utils import current_org
-from audits.handler import create_or_update_operate_log
-from audits.const import ActionChoices, ActivityChoices
-from audits.models import ActivityLog
 
 __all__ = [
     "PermissionsMixin",

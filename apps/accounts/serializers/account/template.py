@@ -18,7 +18,19 @@ class AccountTemplateSerializer(BaseAccountSerializer):
 
     class Meta(BaseAccountSerializer.Meta):
         model = AccountTemplate
-        fields = BaseAccountSerializer.Meta.fields + ['is_sync_account', 'su_from']
+        fields = BaseAccountSerializer.Meta.fields + [
+            'secret_strategy',
+            'auto_push', 'push_params', 'platforms',
+            'is_sync_account', 'su_from'
+        ]
+        extra_kwargs = {
+            'secret_strategy': {'help_text': _('Secret generation strategy for account creation')},
+            'auto_push': {'help_text': _('Whether to automatically push the account to the asset')},
+            'platforms': {'help_text': _(
+                'Associated platform, you can configure push parameters. '
+                'If not associated, default parameters will be used'
+            )},
+        }
 
     def sync_accounts_secret(self, instance, diff):
         if not self._is_sync_account or 'secret' not in diff:

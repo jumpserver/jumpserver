@@ -8,12 +8,24 @@ from .base import BaseAccount
 
 __all__ = ['AccountTemplate', ]
 
+from ..const import SecretStrategy
+
 
 class AccountTemplate(BaseAccount):
     su_from = models.ForeignKey(
         'self', related_name='su_to', null=True,
         on_delete=models.SET_NULL, verbose_name=_("Su from")
     )
+    secret_strategy = models.CharField(
+        choices=SecretStrategy.choices, max_length=16,
+        default=SecretStrategy.custom, verbose_name=_('Secret strategy')
+    )
+    auto_push = models.BooleanField(default=False, verbose_name=_('Auto push'))
+    platforms = models.ManyToManyField(
+        'assets.Platform', related_name='account_templates',
+        verbose_name=_('Platforms')
+    )
+    push_params = models.JSONField(default=dict, verbose_name=_('Push params'))
 
     class Meta:
         verbose_name = _('Account template')
@@ -25,14 +37,14 @@ class AccountTemplate(BaseAccount):
             ('change_accounttemplatesecret', _('Can change asset account template secret')),
         ]
 
+    def __str__(self):
+        return f'{self.name}({self.username})'
+
     @classmethod
     def get_su_from_account_templates(cls, pk=None):
         if pk is None:
             return cls.objects.all()
         return cls.objects.exclude(Q(id=pk) | Q(su_from_id=pk))
-
-    def __str__(self):
-        return f'{self.name}({self.username})'
 
     def get_su_from_account(self, asset):
         su_from = self.su_from
