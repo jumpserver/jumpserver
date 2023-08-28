@@ -10,8 +10,7 @@ from audits.const import ActivityChoices
 from audits.signal_handlers import create_activities
 from common.decorators import merge_delay_run
 from common.utils import get_logger, i18n_fmt
-from .models import Account
-from .models import AccountTemplate
+from .models import Account, AccountTemplate
 from .tasks.push_account import push_accounts_to_assets_task
 
 logger = get_logger(__name__)

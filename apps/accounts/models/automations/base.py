@@ -8,10 +8,9 @@ from assets.models.automations import (
     BaseAutomation as AssetBaseAutomation,
     AutomationExecution as AssetAutomationExecution
 )
-
-__all__ = ['AccountBaseAutomation', 'AutomationExecution']
-
 from common.db import fields
+
+__all__ = ['AccountBaseAutomation', 'AutomationExecution', 'ChangeSecretMixin']
 
 
 class AccountBaseAutomation(AssetBaseAutomation):
