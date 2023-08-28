@@ -19,7 +19,7 @@ from rest_framework.response import Response
 from common.api import AsyncApiMixin
 from common.const.http import GET
 from common.drf.filters import BaseFilterSet
-from common.drf.filters import DatetimeRangeFilter
+from common.drf.filters import DatetimeRangeFilterBackend
 from common.drf.renders import PassthroughRenderer
 from common.storage.replay import ReplayStorageHandler
 from common.utils import data_to_json, is_uuid
@@ -84,7 +84,7 @@ class SessionViewSet(OrgBulkModelViewSet):
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
     ]
-    extra_filter_backends = [DatetimeRangeFilter]
+    extra_filter_backends = [DatetimeRangeFilterBackend]
     rbac_perms = {
         'download': ['terminal.download_sessionreplay']
     }

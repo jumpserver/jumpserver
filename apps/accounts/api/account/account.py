@@ -8,7 +8,7 @@ from accounts import serializers
 from accounts.filters import AccountFilterSet
 from accounts.models import Account
 from assets.models import Asset, Node
-from common.api import ExtraFilterFieldsMixin
+from common.api.mixin import ExtraFilterFieldsMixin
 from common.permissions import UserConfirmation, ConfirmType, IsValidUser
 from common.views.mixins import RecordViewLogMixin
 from orgs.mixins.api import OrgBulkModelViewSet
