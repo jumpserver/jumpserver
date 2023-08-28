@@ -49,11 +49,11 @@ def migrate_assets_sftp_protocol(apps, schema_editor):
 
     count = 0
     print("\nAsset add sftp protocol: ")
-    asset_ids = asset_cls.objects\
+    asset_ids = list(asset_cls.objects\
         .filter(platform__in=sftp_platforms)\
         .exclude(protocols__name='sftp')\
         .distinct()\
-        .values_list('id', flat=True)
+        .values_list('id', flat=True))
     while True:
         _asset_ids = asset_ids[count:count + 1000]
         if not _asset_ids:
