@@ -8,6 +8,7 @@ import struct
 import time
 
 from common.utils import lookup_domain
+from settings.utils import generate_ips
 
 # From /usr/include/linux/icmp.h; your milage may vary.
 ICMP_ECHO_REQUEST = 8  # Seems to be the same on Solaris.
@@ -128,7 +129,7 @@ def ping(dest_addr, timeout, psize, flag=0):
     return delay
 
 
-async def verbose_ping(dest_ip, timeout=2, count=5, psize=64, display=None):
+async def verbose_ping(dest_ips, timeout=2, count=5, psize=64, display=None):
     """
     Send `count' ping with `psize' size to `dest_addr' with
     the given `timeout' and display the result.
@@ -136,34 +137,38 @@ async def verbose_ping(dest_ip, timeout=2, count=5, psize=64, display=None):
     if not display:
         return
 
-    ip, err = lookup_domain(dest_ip)
-    if not ip:
-        await display(err)
-        return
+    result = {}
+    ips = generate_ips(dest_ips)
+    await display(f'Total valid address: {len(ips)}\r\n')
+    for dest_ip in ips:
+        await display(f'PING {dest_ip}: 56 data bytes')
+        # 切换异步协程
+        await asyncio.sleep(0.1)
+        error_count = 0
+        for i in range(count):
+            try:
+                delay = ping(dest_ip, timeout, psize)
+            except socket.gaierror as e:
+                await display("Failed (socket error: '%s')" % str(e))
+                error_count += 1
+                break
 
-    await display("PING %s (%s): 56 data bytes" % (dest_ip, ip))
-    await asyncio.sleep(0.1)
-    error_count = 0
-    for i in range(count):
-        try:
-            delay = ping(dest_ip, timeout, psize)
-        except socket.gaierror as e:
-            await display("Failed (socket error: '%s')" % str(e))
-            error_count += 1
-            break
+            if delay is None:
+                await display("Request timeout for icmp_seq %i" % i)
+                error_count += 1
+            else:
+                delay *= 1000
+                await display("64 bytes from %s: time=%.3f ms" % (dest_ip, delay))
+            await asyncio.sleep(1)
+        # 只要有包通过，就认为address是通的
+        result[dest_ip] = 'failed' if error_count == count else 'ok'
+        await display(f'{count} packets transmitted, '
+                      f'{count - error_count} packets received, '
+                      f'{(error_count / count) * 100}% packet loss\r\n')
 
-        if delay is None:
-            await display("Request timeout for icmp_seq %i" % i)
-            error_count += 1
-        else:
-            delay *= 1000
-            await display("64 bytes from %s: icmp_seq=0 ttl=115 time=%.3f ms" % (ip, delay))
-        await asyncio.sleep(1)
-
-    await display(f'--- {dest_ip} ping statistics ---')
-    await display(f'{count} packets transmitted, '
-                  f'{count - error_count} packets received, '
-                  f'{(error_count / count) * 100}% packet loss')
+    await display(f'----- Ping statistics -----')
+    for k, v in result.items():
+        await display(f'{k}: {v}')
 
 
 if __name__ == "__main__":
