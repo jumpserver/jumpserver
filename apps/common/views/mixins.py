@@ -3,6 +3,7 @@
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.http.response import JsonResponse
 from django.db.models import Model
+from django.utils import translation
 from rest_framework import permissions
 from rest_framework.request import Request
 
@@ -50,16 +51,17 @@ class RecordViewLogMixin:
     model: Model
 
     def record_logs(self, ids, action, detail, model=None, **kwargs):
-        model = model or self.model
-        resource_type = model._meta.verbose_name
-        create_or_update_operate_log(
-            action, resource_type, force=True, **kwargs
-        )
-        activities = [
-            ActivityLog(
-                resource_id=resource_id, type=ActivityChoices.operate_log,
-                detail=detail, org_id=current_org.id,
+        with translation.override('en'):
+            model = model or self.model
+            resource_type = model._meta.verbose_name
+            create_or_update_operate_log(
+                action, resource_type, force=True, **kwargs
             )
-            for resource_id in ids
-        ]
-        ActivityLog.objects.bulk_create(activities)
+            activities = [
+                ActivityLog(
+                    resource_id=resource_id, type=ActivityChoices.operate_log,
+                    detail=detail, org_id=current_org.id,
+                )
+                for resource_id in ids
+            ]
+            ActivityLog.objects.bulk_create(activities)

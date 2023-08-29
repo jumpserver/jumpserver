@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-28 10:55+0800\n"
+"POT-Creation-Date: 2023-08-29 15:14+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -93,7 +93,7 @@ msgid "Update"
 msgstr "更新"
 
 #: accounts/const/account.py:33
-#: accounts/serializers/automations/change_secret.py:156 audits/const.py:54
+#: accounts/serializers/automations/change_secret.py:156 audits/const.py:55
 #: audits/signal_handlers/activity_log.py:33 common/const/choices.py:19
 #: ops/const.py:61 terminal/const.py:77 xpack/plugins/cloud/const.py:43
 msgid "Failed"
@@ -227,7 +227,7 @@ msgstr "から切り替え"
 
 #: accounts/models/account.py:54 assets/const/protocol.py:162
 #: settings/serializers/auth/cas.py:20 settings/serializers/auth/feishu.py:20
-#: terminal/models/applet/applet.py:34
+#: terminal/models/applet/applet.py:35
 msgid "Version"
 msgstr "バージョン"
 
@@ -331,56 +331,56 @@ msgstr "成功は"
 msgid "Account backup execution"
 msgstr "アカウントバックアップの実行"
 
-#: accounts/models/automations/base.py:20
+#: accounts/models/automations/base.py:19
 msgid "Account automation task"
 msgstr "アカウント自動化タスク"
 
-#: accounts/models/automations/base.py:34
+#: accounts/models/automations/base.py:33
 msgid "Automation execution"
 msgstr "自動実行"
 
-#: accounts/models/automations/base.py:35
+#: accounts/models/automations/base.py:34
 msgid "Automation executions"
 msgstr "自動実行"
 
-#: accounts/models/automations/base.py:37
+#: accounts/models/automations/base.py:36
 msgid "Can view change secret execution"
 msgstr "改密実行の表示"
 
-#: accounts/models/automations/base.py:38
+#: accounts/models/automations/base.py:37
 msgid "Can add change secret execution"
 msgstr "改密実行の作成"
 
-#: accounts/models/automations/base.py:40
+#: accounts/models/automations/base.py:39
 msgid "Can view gather accounts execution"
 msgstr "コレクションアカウントの実行を表示"
 
-#: accounts/models/automations/base.py:41
+#: accounts/models/automations/base.py:40
 msgid "Can add gather accounts execution"
 msgstr "回収口座作成の実行"
 
-#: accounts/models/automations/base.py:43
+#: accounts/models/automations/base.py:42
 msgid "Can view push account execution"
 msgstr "プッシュ アカウントの実行を表示する"
 
-#: accounts/models/automations/base.py:44
+#: accounts/models/automations/base.py:43
 msgid "Can add push account execution"
 msgstr "プッシュ アカウントの作成の実行"
 
-#: accounts/models/automations/base.py:56 accounts/models/template.py:21
+#: accounts/models/automations/base.py:55 accounts/models/template.py:21
 #: accounts/serializers/automations/change_secret.py:40
 msgid "Secret strategy"
 msgstr "鍵ポリシー"
 
-#: accounts/models/automations/base.py:58
+#: accounts/models/automations/base.py:57
 msgid "Password rules"
 msgstr "パスワードルール"
 
-#: accounts/models/automations/base.py:61
+#: accounts/models/automations/base.py:60
 msgid "SSH key change strategy"
 msgstr "SSHキープッシュ方式"
 
-#: accounts/models/automations/base.py:71 accounts/models/base.py:36
+#: accounts/models/automations/base.py:70 accounts/models/base.py:36
 #: accounts/serializers/account/account.py:429
 #: accounts/serializers/account/base.py:16
 #: accounts/serializers/automations/change_secret.py:46
@@ -389,7 +389,7 @@ msgstr "SSHキープッシュ方式"
 msgid "Secret type"
 msgstr "鍵の種類"
 
-#: accounts/models/automations/base.py:73 accounts/models/mixins/vault.py:48
+#: accounts/models/automations/base.py:72 accounts/models/mixins/vault.py:48
 #: accounts/serializers/account/base.py:19
 #: authentication/models/temp_token.py:10
 #: authentication/templates/authentication/_access_key_modal.html:31
@@ -510,7 +510,7 @@ msgstr "アカウントの確認"
 #: ops/models/job.py:126 ops/models/playbook.py:28 ops/serializers/job.py:20
 #: orgs/models.py:82 perms/models/asset_permission.py:56 rbac/models/role.py:29
 #: settings/models.py:32 settings/serializers/msg.py:82
-#: terminal/models/applet/applet.py:32 terminal/models/component/endpoint.py:12
+#: terminal/models/applet/applet.py:33 terminal/models/component/endpoint.py:12
 #: terminal/models/component/endpoint.py:94
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:84 users/forms/profile.py:33
@@ -528,7 +528,7 @@ msgstr "特権アカウント"
 #: assets/models/automations/base.py:21 assets/models/cmd_filter.py:39
 #: assets/models/label.py:22
 #: authentication/serializers/connect_token_secret.py:114
-#: terminal/models/applet/applet.py:39
+#: terminal/models/applet/applet.py:40
 #: terminal/models/component/endpoint.py:105 users/serializers/user.py:170
 msgid "Is active"
 msgstr "アクティブです。"
@@ -652,7 +652,7 @@ msgstr "カテゴリ"
 #: assets/serializers/asset/common.py:122 assets/serializers/platform.py:112
 #: assets/serializers/platform.py:127 audits/serializers.py:49
 #: authentication/serializers/connect_token_secret.py:123 ops/models/job.py:137
-#: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:38
+#: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:39
 #: terminal/models/component/storage.py:57
 #: terminal/models/component/storage.py:146 terminal/serializers/applet.py:29
 #: terminal/serializers/session.py:21 terminal/serializers/storage.py:226
@@ -792,8 +792,8 @@ msgstr "关联平台，可以配置推送参数，如果不关联，则使用默
 #: assets/models/cmd_filter.py:40 assets/models/cmd_filter.py:88
 #: assets/models/group.py:20 common/db/models.py:36 ops/models/adhoc.py:26
 #: ops/models/job.py:145 ops/models/playbook.py:31 rbac/models/role.py:37
-#: settings/models.py:37 terminal/models/applet/applet.py:44
-#: terminal/models/applet/applet.py:284 terminal/models/applet/host.py:142
+#: settings/models.py:37 terminal/models/applet/applet.py:45
+#: terminal/models/applet/applet.py:302 terminal/models/applet/host.py:142
 #: terminal/models/component/endpoint.py:24
 #: terminal/models/component/endpoint.py:104
 #: terminal/models/session/session.py:46 tickets/models/comment.py:32
@@ -844,7 +844,7 @@ msgstr "* パスワードの長さの範囲6-30ビット"
 msgid "Automation task execution"
 msgstr "自動タスク実行履歴"
 
-#: accounts/serializers/automations/change_secret.py:155 audits/const.py:53
+#: accounts/serializers/automations/change_secret.py:155 audits/const.py:54
 #: audits/models.py:59 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:18 ops/const.py:59 ops/serializers/celery.py:40
 #: terminal/const.py:76 terminal/models/session/sharing.py:121
@@ -852,7 +852,8 @@ msgstr "自動タスク実行履歴"
 msgid "Success"
 msgstr "成功"
 
-#: accounts/signal_handlers.py:47
+#: accounts/signal_handlers.py:46
+#, python-format
 msgid "Push related accounts to assets: %s, by system"
 msgstr "関連するアカウントをアセットにプッシュ: %s, by system"
 
@@ -1166,7 +1167,7 @@ msgstr "認証に失敗しました"
 msgid "Connect failed"
 msgstr "接続に失敗しました"
 
-#: assets/const/automation.py:6 audits/const.py:6 audits/const.py:36
+#: assets/const/automation.py:6 audits/const.py:6 audits/const.py:37
 #: audits/signal_handlers/activity_log.py:62 common/utils/ip/geoip/utils.py:31
 #: common/utils/ip/geoip/utils.py:37 common/utils/ip/utils.py:104
 msgid "Unknown"
@@ -1188,7 +1189,7 @@ msgstr "テストゲートウェイ"
 msgid "Gather facts"
 msgstr "資産情報の収集"
 
-#: assets/const/base.py:33 audits/const.py:47
+#: assets/const/base.py:33 audits/const.py:48
 #: terminal/serializers/applet_host.py:32
 msgid "Disabled"
 msgstr "無効"
@@ -1219,8 +1220,8 @@ msgid "Cloud service"
 msgstr "クラウド サービス"
 
 #: assets/const/category.py:14 assets/models/asset/gpt.py:11
-#: assets/models/asset/web.py:16 audits/const.py:34
-#: terminal/models/applet/applet.py:26
+#: assets/models/asset/web.py:16 audits/const.py:35
+#: terminal/models/applet/applet.py:27
 msgid "Web"
 msgstr "Web"
 
@@ -1240,7 +1241,7 @@ msgstr "私有雲"
 msgid "Kubernetes"
 msgstr "Kubernetes"
 
-#: assets/const/device.py:7 terminal/models/applet/applet.py:25
+#: assets/const/device.py:7 terminal/models/applet/applet.py:26
 #: tickets/const.py:8
 msgid "General"
 msgstr "一般"
@@ -1433,7 +1434,7 @@ msgstr "ユーザーと同じユーザー名"
 
 #: assets/models/_user.py:52 authentication/models/connection_token.py:41
 #: authentication/serializers/connect_token_secret.py:111
-#: terminal/models/applet/applet.py:41 terminal/serializers/session.py:19
+#: terminal/models/applet/applet.py:42 terminal/serializers/session.py:19
 #: terminal/serializers/session.py:42 terminal/serializers/storage.py:70
 msgid "Protocol"
 msgstr "プロトコル"
@@ -1572,7 +1573,7 @@ msgstr "アセットの自動化タスク"
 
 #: assets/models/automations/base.py:113 audits/models.py:199
 #: audits/serializers.py:50 ops/models/base.py:49 ops/models/job.py:220
-#: terminal/models/applet/applet.py:283 terminal/models/applet/host.py:139
+#: terminal/models/applet/applet.py:301 terminal/models/applet/host.py:139
 #: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
 #: terminal/serializers/applet_host.py:115 tickets/models/ticket/general.py:283
 #: tickets/serializers/super_ticket.py:13
@@ -1717,7 +1718,7 @@ msgstr "開ける"
 msgid "Setting"
 msgstr "設定"
 
-#: assets/models/platform.py:38 audits/const.py:48 settings/models.py:36
+#: assets/models/platform.py:38 audits/const.py:49 settings/models.py:36
 #: terminal/serializers/applet_host.py:33
 msgid "Enabled"
 msgstr "有効化"
@@ -2129,7 +2130,8 @@ msgstr "名前の変更"
 msgid "Symlink"
 msgstr "Symlink"
 
-#: audits/const.py:18 perms/const.py:14
+#: audits/const.py:18 audits/const.py:28 perms/const.py:14
+#: terminal/api/session/session.py:141
 msgid "Download"
 msgstr "ダウンロード"
 
@@ -2137,7 +2139,7 @@ msgstr "ダウンロード"
 msgid "Rename dir"
 msgstr "マップディレクトリ"
 
-#: audits/const.py:23 rbac/tree.py:232
+#: audits/const.py:23 rbac/tree.py:232 terminal/api/session/session.py:234
 #: terminal/templates/terminal/_msg_command_warning.html:18
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 msgid "View"
@@ -2149,44 +2151,44 @@ msgstr "表示"
 msgid "Create"
 msgstr "作成"
 
-#: audits/const.py:28 perms/const.py:12
+#: audits/const.py:29 perms/const.py:12
 msgid "Connect"
 msgstr "接続"
 
-#: audits/const.py:29 authentication/templates/authentication/login.html:252
+#: audits/const.py:30 authentication/templates/authentication/login.html:252
 #: authentication/templates/authentication/login.html:325
 #: templates/_header_bar.html:89
 msgid "Login"
 msgstr "ログイン"
 
-#: audits/const.py:30 ops/const.py:9
+#: audits/const.py:31 ops/const.py:9
 msgid "Change password"
 msgstr "パスワードを変更する"
 
-#: audits/const.py:35 settings/serializers/terminal.py:6
+#: audits/const.py:36 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:164
 #: terminal/serializers/session.py:49 terminal/serializers/session.py:63
 msgid "Terminal"
 msgstr "ターミナル"
 
-#: audits/const.py:40 audits/models.py:127
+#: audits/const.py:41 audits/models.py:127
 msgid "Operate log"
 msgstr "ログの操作"
 
-#: audits/const.py:41
+#: audits/const.py:42
 msgid "Session log"
 msgstr "セッションログ"
 
-#: audits/const.py:42
+#: audits/const.py:43
 msgid "Login log"
 msgstr "ログインログ"
 
-#: audits/const.py:43 terminal/models/applet/host.py:143
+#: audits/const.py:44 terminal/models/applet/host.py:143
 #: terminal/models/component/task.py:22
 msgid "Task"
 msgstr "タスク"
 
-#: audits/const.py:49
+#: audits/const.py:50
 msgid "-"
 msgstr "-"
 
@@ -2412,7 +2414,7 @@ msgstr "ACL アクションはレビューです"
 msgid "Current user not support mfa type: {}"
 msgstr "現在のユーザーはmfaタイプをサポートしていません: {}"
 
-#: authentication/api/password.py:32 terminal/api/session/session.py:259
+#: authentication/api/password.py:32 terminal/api/session/session.py:282
 #: users/views/profile/reset.py:44
 msgid "User does not exist: {}"
 msgstr "ユーザーが存在しない: {}"
@@ -4099,7 +4101,7 @@ msgstr "デフォルト組織"
 msgid "SYSTEM"
 msgstr "システム組織"
 
-#: orgs/models.py:83 rbac/models/role.py:36 terminal/models/applet/applet.py:40
+#: orgs/models.py:83 rbac/models/role.py:36 terminal/models/applet/applet.py:41
 msgid "Builtin"
 msgstr "ビルトイン"
 
@@ -4336,7 +4338,7 @@ msgstr "パーマ"
 msgid "Users amount"
 msgstr "ユーザー数"
 
-#: rbac/serializers/role.py:28 terminal/models/applet/applet.py:33
+#: rbac/serializers/role.py:28 terminal/models/applet/applet.py:34
 msgid "Display name"
 msgstr "表示名"
 
@@ -4396,8 +4398,8 @@ msgstr "タスクセンター"
 msgid "My assets"
 msgstr "私の資産"
 
-#: rbac/tree.py:56 terminal/models/applet/applet.py:51
-#: terminal/models/applet/applet.py:280 terminal/models/applet/host.py:29
+#: rbac/tree.py:56 terminal/models/applet/applet.py:52
+#: terminal/models/applet/applet.py:298 terminal/models/applet/host.py:29
 #: terminal/serializers/applet.py:15
 msgid "Applet"
 msgstr "リモートアプリケーション"
@@ -5902,15 +5904,20 @@ msgstr "テスト失敗: アカウントが無効"
 msgid "Have online sessions"
 msgstr "オンラインセッションを持つ"
 
-#: terminal/api/session/session.py:251
+#: terminal/api/session/session.py:46
+#, python-format
+msgid "User %s %s session %s replay"
+msgstr "ユーザー%s %sこのセッション %s の録画です"
+
+#: terminal/api/session/session.py:274
 msgid "Session does not exist: {}"
 msgstr "セッションが存在しません: {}"
 
-#: terminal/api/session/session.py:254
+#: terminal/api/session/session.py:277
 msgid "Session is finished or the protocol not supported"
 msgstr "セッションが終了したか、プロトコルがサポートされていません"
 
-#: terminal/api/session/session.py:267
+#: terminal/api/session/session.py:290
 msgid "User does not have permission"
 msgstr "ユーザーに権限がありません"
 
@@ -6028,51 +6035,51 @@ msgstr "一括作成非サポート"
 msgid "Storage is invalid"
 msgstr "ストレージが無効です"
 
-#: terminal/models/applet/applet.py:29
+#: terminal/models/applet/applet.py:30
 msgid "Community"
 msgstr "コミュニティ版"
 
-#: terminal/models/applet/applet.py:30
+#: terminal/models/applet/applet.py:31
 msgid "Enterprise"
 msgstr "エンタープライズ版"
 
-#: terminal/models/applet/applet.py:35
+#: terminal/models/applet/applet.py:36
 msgid "Author"
 msgstr "著者"
 
-#: terminal/models/applet/applet.py:37 terminal/serializers/applet.py:31
+#: terminal/models/applet/applet.py:38 terminal/serializers/applet.py:31
 msgid "Edition"
 msgstr "バージョン"
 
-#: terminal/models/applet/applet.py:42
+#: terminal/models/applet/applet.py:43
 msgid "Can concurrent"
 msgstr "同時実行可能"
 
-#: terminal/models/applet/applet.py:43
+#: terminal/models/applet/applet.py:44
 msgid "Tags"
 msgstr "ラベル"
 
-#: terminal/models/applet/applet.py:47 terminal/serializers/storage.py:159
+#: terminal/models/applet/applet.py:48 terminal/serializers/storage.py:159
 msgid "Hosts"
 msgstr "ホスト"
 
-#: terminal/models/applet/applet.py:92
+#: terminal/models/applet/applet.py:93
 msgid "Applet pkg not valid, Missing file {}"
 msgstr "無効なアプレット パッケージ、ファイル {} がありません"
 
-#: terminal/models/applet/applet.py:111
+#: terminal/models/applet/applet.py:112
 msgid "Load platform.yml failed: {}"
 msgstr "platform.ymlのロードに失敗しました:{}"
 
-#: terminal/models/applet/applet.py:114
+#: terminal/models/applet/applet.py:115
 msgid "Only support custom platform"
 msgstr "カスタムプラットフォームのみをサポート"
 
-#: terminal/models/applet/applet.py:119
+#: terminal/models/applet/applet.py:120
 msgid "Missing type in platform.yml"
 msgstr "platform.ymlにタイプがありません"
 
-#: terminal/models/applet/applet.py:282 terminal/models/applet/host.py:35
+#: terminal/models/applet/applet.py:300 terminal/models/applet/host.py:35
 #: terminal/models/applet/host.py:137
 msgid "Hosting"
 msgstr "ホスト マシン"

@@ -43,6 +43,8 @@ __all__ = [
 
 logger = get_logger(__name__)
 
+REPLAY_OP = gettext_noop('User %s %s session %s replay')
+
 
 class MySessionAPIView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
@@ -136,8 +138,7 @@ class SessionViewSet(RecordViewLogMixin, OrgBulkModelViewSet):
         response["Content-Disposition"] = disposition
 
         detail = i18n_fmt(
-            gettext_noop(f'User %s %s session %s replay'), self.request.user,
-            gettext_noop(ActionChoices.download), str(storage.obj)
+            REPLAY_OP, self.request.user, _('Download'), str(storage.obj)
         )
         self.record_logs(
             [storage.obj.asset_id], ActionChoices.download, detail,
@@ -230,8 +231,7 @@ class SessionReplayViewSet(AsyncApiMixin, RecordViewLogMixin, viewsets.ViewSet):
         session_id = kwargs.get('pk')
         session = get_object_or_404(Session, id=session_id)
         detail = i18n_fmt(
-            gettext_noop(f'User %s %s session %s replay'), self.request.user,
-            gettext_noop(ActionChoices.view), str(session)
+            REPLAY_OP, self.request.user, _('View'), str(session)
         )
         self.record_logs(
             [session.asset_id], ActionChoices.download, detail,
