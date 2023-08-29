@@ -22,19 +22,19 @@ class ToolsWebsocket(AsyncJsonWebsocketConsumer):
             await self.close()
 
     async def send_msg(self, msg=''):
-        await self.send_json({'msg': msg + '\r\n'})
+        await self.send_json({'msg': f'{msg}\r\n'})
 
-    async def imitate_ping(self, dest_ip, timeout=3, count=5, psize=64):
+    async def imitate_ping(self, dest_ips, timeout=3, count=5, psize=64):
         params = {
-            'dest_ip': dest_ip, 'timeout': timeout,
+            'dest_ips': dest_ips, 'timeout': timeout,
             'count': count, 'psize': psize
         }
         logger.info(f'Receive request ping: {params}')
         await verbose_ping(display=self.send_msg, **params)
 
-    async def imitate_telnet(self, dest_ip, dest_port=23, timeout=10):
+    async def imitate_telnet(self, dest_ips, dest_port=23, timeout=10):
         params = {
-            'dest_ip': dest_ip, 'dest_port': dest_port, 'timeout': timeout,
+            'dest_ips': dest_ips, 'dest_port': dest_port, 'timeout': timeout,
         }
         logger.info(f'Receive request telnet: {params}')
         await verbose_telnet(display=self.send_msg, **params)
