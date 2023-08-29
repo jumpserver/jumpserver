@@ -4,10 +4,10 @@ from rest_framework.response import Response
 
 from accounts import serializers
 from accounts.models import AccountTemplate
+from accounts.mixins import AccountRecordViewLogMixin
 from assets.const import Protocol
 from common.drf.filters import BaseFilterSet
 from common.permissions import UserConfirmation, ConfirmType
-from common.views.mixins import RecordViewLogMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
 
@@ -55,7 +55,7 @@ class AccountTemplateViewSet(OrgBulkModelViewSet):
         return Response(data=serializer.data)
 
 
-class AccountTemplateSecretsViewSet(RecordViewLogMixin, AccountTemplateViewSet):
+class AccountTemplateSecretsViewSet(AccountRecordViewLogMixin, AccountTemplateViewSet):
     serializer_classes = {
         'default': serializers.AccountTemplateSecretSerializer,
     }
