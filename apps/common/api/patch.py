@@ -99,7 +99,7 @@ class AsyncApiMixin(InterceptMixin):
     def is_need_async(self):
         return False
 
-    def async_callback(self, params):
+    def async_callback(self, *args, **kwargs):
         pass
 
     def do_async(self, handler, *args, **kwargs):
