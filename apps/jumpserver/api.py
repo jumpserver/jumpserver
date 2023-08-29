@@ -1,4 +1,5 @@
 import time
+from collections import defaultdict
 
 from django.core.cache import cache
 from django.db.models import Count, Max, F
@@ -141,40 +142,35 @@ class DatesLoginMetricMixin:
     operate_logs_queryset: OperateLog.objects
     password_change_logs_queryset: PasswordChangeLog.objects
 
+    def filter_date_start_end(self, queryset, field_name):
+        query = {f'{field_name}__range': self.date_start_end}
+        return queryset.filter(**query)
+
+    def get_date_metrics(self, queryset, field_name, count_field):
+        queryset = self.filter_date_start_end(queryset, field_name)
+        queryset = queryset.values_list(field_name, count_field)
+
+        date_group_map = defaultdict(set)
+        for datetime, count_field in queryset:
+            date_str = str(datetime.date())
+            date_group_map[date_str].add(count_field)
+
+        return [
+            len(date_group_map.get(str(d), set()))
+            for d in self.dates_list
+        ]
+
     def get_dates_metrics_total_count_login(self):
-        queryset = UserLoginLog.objects \
-            .filter(datetime__range=(self.date_start_end)) \
-            .values('datetime__date').annotate(id__count=Count(id)) \
-            .order_by('datetime__date')
-        map_date_logincount = {i['datetime__date']: i['id__count'] for i in queryset}
-        return [map_date_logincount.get(d, 0) for d in self.dates_list]
+        return self.get_date_metrics(UserLoginLog.objects, 'datetime', 'id')
 
     def get_dates_metrics_total_count_active_users(self):
-        queryset = Session.objects \
-            .filter(date_start__range=(self.date_start_end)) \
-            .values('date_start__date') \
-            .annotate(id__count=Count('user_id', distinct=True)) \
-            .order_by('date_start__date')
-        map_date_usercount = {i['date_start__date']: i['id__count'] for i in queryset}
-        return [map_date_usercount.get(d, 0) for d in self.dates_list]
+        return self.get_date_metrics(Session.objects, 'date_start', 'user_id')
 
     def get_dates_metrics_total_count_active_assets(self):
-        queryset = Session.objects \
-            .filter(date_start__range=(self.date_start_end)) \
-            .values('date_start__date') \
-            .annotate(id__count=Count('asset_id', distinct=True)) \
-            .order_by('date_start__date')
-        map_date_assetcount = {i['date_start__date']: i['id__count'] for i in queryset}
-        return [map_date_assetcount.get(d, 0) for d in self.dates_list]
+        return self.get_date_metrics(Session.objects, 'date_start', 'asset_id')
 
     def get_dates_metrics_total_count_sessions(self):
-        queryset = Session.objects \
-            .filter(date_start__range=(self.date_start_end)) \
-            .values('date_start__date') \
-            .annotate(id__count=Count(id)) \
-            .order_by('date_start__date')
-        map_date_usercount = {i['date_start__date']: i['id__count'] for i in queryset}
-        return [map_date_usercount.get(d, 0) for d in self.dates_list]
+        return self.get_date_metrics(Session.objects, 'date_start', 'id')
 
     @lazyproperty
     def get_type_to_assets(self):
