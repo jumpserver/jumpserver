@@ -7,10 +7,10 @@ from rest_framework.status import HTTP_200_OK
 from accounts import serializers
 from accounts.filters import AccountFilterSet
 from accounts.models import Account
+from accounts.mixins import AccountRecordViewLogMixin
 from assets.models import Asset, Node
 from common.api.mixin import ExtraFilterFieldsMixin
 from common.permissions import UserConfirmation, ConfirmType, IsValidUser
-from common.views.mixins import RecordViewLogMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
 
@@ -86,7 +86,7 @@ class AccountViewSet(OrgBulkModelViewSet):
         return Response(status=HTTP_200_OK)
 
 
-class AccountSecretsViewSet(RecordViewLogMixin, AccountViewSet):
+class AccountSecretsViewSet(AccountRecordViewLogMixin, AccountViewSet):
     """
     因为可能要导出所有账号，所以单独建立了一个 viewset
     """
@@ -115,7 +115,7 @@ class AssetAccountBulkCreateApi(CreateAPIView):
         return Response(data=serializer.data, status=HTTP_200_OK)
 
 
-class AccountHistoriesSecretAPI(ExtraFilterFieldsMixin, RecordViewLogMixin, ListAPIView):
+class AccountHistoriesSecretAPI(ExtraFilterFieldsMixin, AccountRecordViewLogMixin, ListAPIView):
     model = Account.history.model
     serializer_class = serializers.AccountHistorySerializer
     http_method_names = ['get', 'options']
