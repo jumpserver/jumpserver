@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-29 15:14+0800\n"
+"POT-Creation-Date: 2023-08-30 15:59+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -195,6 +195,24 @@ msgstr "データベース"
 #: accounts/const/vault.py:9 settings/serializers/feature.py:41
 msgid "HCP Vault"
 msgstr "HashiCorp Vault"
+
+#: accounts/mixins.py:35
+msgid "Export all"
+msgstr "すべてエクスポート"
+
+#: accounts/mixins.py:37
+msgid "Export only selected items"
+msgstr "選択項目のみエクスポート"
+
+#: accounts/mixins.py:42
+#, python-format
+msgid "Export filtered: %s"
+msgstr "検索のエクスポート: %s"
+
+#: accounts/mixins.py:48
+#, python-format
+msgid "User %s view/export secret"
+msgstr "ユーザー %s がパスワードを閲覧/導き出しました"
 
 #: accounts/models/account.py:48
 #: accounts/models/automations/gather_account.py:16
@@ -802,13 +820,15 @@ msgstr "关联平台，可以配置推送参数，如果不关联，则使用默
 msgid "Comment"
 msgstr "コメント"
 
-#: accounts/serializers/account/virtual.py:22
+#: accounts/serializers/account/virtual.py:24
 msgid ""
 "Current only support login from AD/LDAP. Secret priority: Same account in "
-"asset secret > Login secret > Manual input"
+"asset secret > Login secret > Manual input. For security, please set config "
+"CACHE_LOGIN_PASSWORD_ENABLED to true"
 msgstr ""
 "現在、AD/LDAPからのログインのみをサポートしています。シークレットの優先順位: "
-"資産シークレット内の同じアカウント > ログインシークレット > 手動入力"
+"資産シークレット内の同じアカウント > ログインシークレット > 手動入力, セキュ"
+"リティのために、コンフィギュレーション項目CACHE _LOGIN_PASSWORD_ENABLEDはtrue"
 
 #: accounts/serializers/automations/base.py:23
 #: assets/models/asset/common.py:155 assets/models/automations/base.py:18
@@ -3601,24 +3621,6 @@ msgstr "特殊文字を含むべきではない"
 msgid "The mobile phone number format is incorrect"
 msgstr "携帯電話番号の形式が正しくありません"
 
-#: common/views/mixins.py:74
-msgid "Export all"
-msgstr "すべてエクスポート"
-
-#: common/views/mixins.py:76
-msgid "Export only selected items"
-msgstr "選択項目のみエクスポート"
-
-#: common/views/mixins.py:81
-#, python-format
-msgid "Export filtered: %s"
-msgstr "検索のエクスポート: %s"
-
-#: common/views/mixins.py:90
-#, python-format
-msgid "User %s view/export secret"
-msgstr "ユーザー %s がパスワードを閲覧/導き出しました"
-
 #: jumpserver/conf.py:443
 msgid "Create account successfully"
 msgstr "アカウントを正常に作成"
@@ -3695,11 +3697,11 @@ msgstr "投稿サイトニュース"
 msgid "No account available"
 msgstr "利用可能なアカウントがありません"
 
-#: ops/ansible/inventory.py:261
+#: ops/ansible/inventory.py:262
 msgid "Ansible disabled"
 msgstr "Ansible 無効"
 
-#: ops/ansible/inventory.py:277
+#: ops/ansible/inventory.py:278
 msgid "Skip hosts below:"
 msgstr "次のホストをスキップします: "
 
@@ -6035,8 +6037,8 @@ msgstr "一括作成非サポート"
 msgid "Storage is invalid"
 msgstr "ストレージが無効です"
 
-#: terminal/models/applet/applet.py:30
-msgid "Community"
+#: terminal/models/applet/applet.py:30 xpack/plugins/license/models.py:86
+msgid "Community Edition"
 msgstr "コミュニティ版"
 
 #: terminal/models/applet/applet.py:31
@@ -8232,22 +8234,13 @@ msgid "License"
 msgstr "ライセンス"
 
 #: xpack/plugins/license/models.py:80
-msgid "Standard edition"
-msgstr "標準版"
+msgid "Enterprise Basic Edition"
+msgstr "エンタープライズ基本版"
 
 #: xpack/plugins/license/models.py:82
-msgid "Enterprise edition"
-msgstr "エンタープライズ版"
+msgid "Enterprise Standard Edition"
+msgstr "エンタープライズ標準版"
 
 #: xpack/plugins/license/models.py:84
-msgid "Ultimate edition"
-msgstr "究極のエディション"
-
-#: xpack/plugins/license/models.py:86
-msgid "Community edition"
-msgstr "コミュニティ版"
-
-#, fuzzy
-#~| msgid "Internal"
-#~ msgid "External url"
-#~ msgstr "ビルトイン"
+msgid "Enterprise Flagship Edition"
+msgstr "エンタープライズ旗艦版"
