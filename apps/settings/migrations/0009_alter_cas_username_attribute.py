@@ -11,7 +11,7 @@ def migrate_cas_setting(apps, schema_editor):
         try:
             value = json.loads(obj.value)
         except Exception:
-            print("Invalid telnet regex setting, skip")
+            print("Invalid CAS_RENAME_ATTRIBUTES setting, skip")
             return
 
         if value.pop('uid', None):
