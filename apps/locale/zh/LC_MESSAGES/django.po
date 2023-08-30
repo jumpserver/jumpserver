@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-28 10:55+0800\n"
+"POT-Creation-Date: 2023-08-29 14:58+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -226,7 +226,7 @@ msgstr "切换自"
 
 #: accounts/models/account.py:54 assets/const/protocol.py:162
 #: settings/serializers/auth/cas.py:20 settings/serializers/auth/feishu.py:20
-#: terminal/models/applet/applet.py:34
+#: terminal/models/applet/applet.py:35
 msgid "Version"
 msgstr "版本"
 
@@ -330,56 +330,56 @@ msgstr "是否成功"
 msgid "Account backup execution"
 msgstr "账号备份执行"
 
-#: accounts/models/automations/base.py:20
+#: accounts/models/automations/base.py:19
 msgid "Account automation task"
 msgstr "账号自动化任务"
 
-#: accounts/models/automations/base.py:34
+#: accounts/models/automations/base.py:33
 msgid "Automation execution"
 msgstr "自动化执行"
 
-#: accounts/models/automations/base.py:35
+#: accounts/models/automations/base.py:34
 msgid "Automation executions"
 msgstr "自动化执行"
 
-#: accounts/models/automations/base.py:37
+#: accounts/models/automations/base.py:36
 msgid "Can view change secret execution"
 msgstr "查看改密执行"
 
-#: accounts/models/automations/base.py:38
+#: accounts/models/automations/base.py:37
 msgid "Can add change secret execution"
 msgstr "创建改密执行"
 
-#: accounts/models/automations/base.py:40
+#: accounts/models/automations/base.py:39
 msgid "Can view gather accounts execution"
 msgstr "查看收集账号执行"
 
-#: accounts/models/automations/base.py:41
+#: accounts/models/automations/base.py:40
 msgid "Can add gather accounts execution"
 msgstr "创建收集账号执行"
 
-#: accounts/models/automations/base.py:43
+#: accounts/models/automations/base.py:42
 msgid "Can view push account execution"
 msgstr "查看推送账号执行"
 
-#: accounts/models/automations/base.py:44
+#: accounts/models/automations/base.py:43
 msgid "Can add push account execution"
 msgstr "创建推送账号执行"
 
-#: accounts/models/automations/base.py:56 accounts/models/template.py:21
+#: accounts/models/automations/base.py:55 accounts/models/template.py:21
 #: accounts/serializers/automations/change_secret.py:40
 msgid "Secret strategy"
 msgstr "密文策略"
 
-#: accounts/models/automations/base.py:58
+#: accounts/models/automations/base.py:57
 msgid "Password rules"
 msgstr "密码规则"
 
-#: accounts/models/automations/base.py:61
+#: accounts/models/automations/base.py:60
 msgid "SSH key change strategy"
 msgstr "SSH 密钥推送方式"
 
-#: accounts/models/automations/base.py:71 accounts/models/base.py:36
+#: accounts/models/automations/base.py:70 accounts/models/base.py:36
 #: accounts/serializers/account/account.py:429
 #: accounts/serializers/account/base.py:16
 #: accounts/serializers/automations/change_secret.py:46
@@ -388,7 +388,7 @@ msgstr "SSH 密钥推送方式"
 msgid "Secret type"
 msgstr "密文类型"
 
-#: accounts/models/automations/base.py:73 accounts/models/mixins/vault.py:48
+#: accounts/models/automations/base.py:72 accounts/models/mixins/vault.py:48
 #: accounts/serializers/account/base.py:19
 #: authentication/models/temp_token.py:10
 #: authentication/templates/authentication/_access_key_modal.html:31
@@ -509,7 +509,7 @@ msgstr "账号验证"
 #: ops/models/job.py:126 ops/models/playbook.py:28 ops/serializers/job.py:20
 #: orgs/models.py:82 perms/models/asset_permission.py:56 rbac/models/role.py:29
 #: settings/models.py:32 settings/serializers/msg.py:82
-#: terminal/models/applet/applet.py:32 terminal/models/component/endpoint.py:12
+#: terminal/models/applet/applet.py:33 terminal/models/component/endpoint.py:12
 #: terminal/models/component/endpoint.py:94
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:84 users/forms/profile.py:33
@@ -527,7 +527,7 @@ msgstr "特权账号"
 #: assets/models/automations/base.py:21 assets/models/cmd_filter.py:39
 #: assets/models/label.py:22
 #: authentication/serializers/connect_token_secret.py:114
-#: terminal/models/applet/applet.py:39
+#: terminal/models/applet/applet.py:40
 #: terminal/models/component/endpoint.py:105 users/serializers/user.py:170
 msgid "Is active"
 msgstr "激活"
@@ -650,7 +650,7 @@ msgstr "类别"
 #: assets/serializers/asset/common.py:122 assets/serializers/platform.py:112
 #: assets/serializers/platform.py:127 audits/serializers.py:49
 #: authentication/serializers/connect_token_secret.py:123 ops/models/job.py:137
-#: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:38
+#: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:39
 #: terminal/models/component/storage.py:57
 #: terminal/models/component/storage.py:146 terminal/serializers/applet.py:29
 #: terminal/serializers/session.py:21 terminal/serializers/storage.py:226
@@ -790,8 +790,8 @@ msgstr "关联平台，可配置推送参数，如果不关联，将使用默认
 #: assets/models/cmd_filter.py:40 assets/models/cmd_filter.py:88
 #: assets/models/group.py:20 common/db/models.py:36 ops/models/adhoc.py:26
 #: ops/models/job.py:145 ops/models/playbook.py:31 rbac/models/role.py:37
-#: settings/models.py:37 terminal/models/applet/applet.py:44
-#: terminal/models/applet/applet.py:284 terminal/models/applet/host.py:142
+#: settings/models.py:37 terminal/models/applet/applet.py:45
+#: terminal/models/applet/applet.py:302 terminal/models/applet/host.py:142
 #: terminal/models/component/endpoint.py:24
 #: terminal/models/component/endpoint.py:104
 #: terminal/models/session/session.py:46 tickets/models/comment.py:32
@@ -800,13 +800,14 @@ msgstr "关联平台，可配置推送参数，如果不关联，将使用默认
 msgid "Comment"
 msgstr "备注"
 
-#: accounts/serializers/account/virtual.py:22
+#: accounts/serializers/account/virtual.py:24
 msgid ""
 "Current only support login from AD/LDAP. Secret priority: Same account in "
-"asset secret > Login secret > Manual input"
+"asset secret > Login secret > Manual input. <br/ >For security, please set "
+"config CACHE_LOGIN_PASSWORD_ENABLED to true"
 msgstr ""
 "当前仅支持 AD/LDAP 登录方式用户。 同名账号密码生效顺序: 资产上存在的同名账号"
-"密码 > 登录密码 > 手动输入"
+"密码 > 登录密码 > 手动输入 <br/> 为了安全起见，请设置配置项 CACHE_LOGIN_PASSWORD_ENABLED=true，重启服务才能开启"
 
 #: accounts/serializers/automations/base.py:23
 #: assets/models/asset/common.py:155 assets/models/automations/base.py:18
@@ -850,8 +851,8 @@ msgstr "自动化任务执行历史"
 msgid "Success"
 msgstr "成功"
 
-#: accounts/signal_handlers.py:47
-#, fpython-format
+#: accounts/signal_handlers.py:46
+#, python-format
 msgid "Push related accounts to assets: %s, by system"
 msgstr "推送账号到资产: %s, 由系统执行"
 
@@ -1216,7 +1217,7 @@ msgstr "云服务"
 
 #: assets/const/category.py:14 assets/models/asset/gpt.py:11
 #: assets/models/asset/web.py:16 audits/const.py:34
-#: terminal/models/applet/applet.py:26
+#: terminal/models/applet/applet.py:27
 msgid "Web"
 msgstr "Web"
 
@@ -1236,7 +1237,7 @@ msgstr "私有云"
 msgid "Kubernetes"
 msgstr "Kubernetes"
 
-#: assets/const/device.py:7 terminal/models/applet/applet.py:25
+#: assets/const/device.py:7 terminal/models/applet/applet.py:26
 #: tickets/const.py:8
 msgid "General"
 msgstr "一般"
@@ -1430,7 +1431,7 @@ msgstr "用户名与用户相同"
 
 #: assets/models/_user.py:52 authentication/models/connection_token.py:41
 #: authentication/serializers/connect_token_secret.py:111
-#: terminal/models/applet/applet.py:41 terminal/serializers/session.py:19
+#: terminal/models/applet/applet.py:42 terminal/serializers/session.py:19
 #: terminal/serializers/session.py:42 terminal/serializers/storage.py:70
 msgid "Protocol"
 msgstr "协议"
@@ -1569,7 +1570,7 @@ msgstr "资产自动化任务"
 
 #: assets/models/automations/base.py:113 audits/models.py:199
 #: audits/serializers.py:50 ops/models/base.py:49 ops/models/job.py:220
-#: terminal/models/applet/applet.py:283 terminal/models/applet/host.py:139
+#: terminal/models/applet/applet.py:301 terminal/models/applet/host.py:139
 #: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
 #: terminal/serializers/applet_host.py:115 tickets/models/ticket/general.py:283
 #: tickets/serializers/super_ticket.py:13
@@ -4055,7 +4056,7 @@ msgstr "默认组织"
 msgid "SYSTEM"
 msgstr "系统组织"
 
-#: orgs/models.py:83 rbac/models/role.py:36 terminal/models/applet/applet.py:40
+#: orgs/models.py:83 rbac/models/role.py:36 terminal/models/applet/applet.py:41
 msgid "Builtin"
 msgstr "内置的"
 
@@ -4291,7 +4292,7 @@ msgstr "权限"
 msgid "Users amount"
 msgstr "用户数量"
 
-#: rbac/serializers/role.py:28 terminal/models/applet/applet.py:33
+#: rbac/serializers/role.py:28 terminal/models/applet/applet.py:34
 msgid "Display name"
 msgstr "显示名称"
 
@@ -4351,8 +4352,8 @@ msgstr "任务中心"
 msgid "My assets"
 msgstr "我的资产"
 
-#: rbac/tree.py:56 terminal/models/applet/applet.py:51
-#: terminal/models/applet/applet.py:280 terminal/models/applet/host.py:29
+#: rbac/tree.py:56 terminal/models/applet/applet.py:52
+#: terminal/models/applet/applet.py:298 terminal/models/applet/host.py:29
 #: terminal/serializers/applet.py:15
 msgid "Applet"
 msgstr "远程应用"
@@ -5944,51 +5945,51 @@ msgstr "不支持批量创建"
 msgid "Storage is invalid"
 msgstr "存储无效"
 
-#: terminal/models/applet/applet.py:29
+#: terminal/models/applet/applet.py:30
 msgid "Community"
 msgstr "社区版"
 
-#: terminal/models/applet/applet.py:30
+#: terminal/models/applet/applet.py:31
 msgid "Enterprise"
 msgstr "企业版"
 
-#: terminal/models/applet/applet.py:35
+#: terminal/models/applet/applet.py:36
 msgid "Author"
 msgstr "作者"
 
-#: terminal/models/applet/applet.py:37 terminal/serializers/applet.py:31
+#: terminal/models/applet/applet.py:38 terminal/serializers/applet.py:31
 msgid "Edition"
 msgstr "版本"
 
-#: terminal/models/applet/applet.py:42
+#: terminal/models/applet/applet.py:43
 msgid "Can concurrent"
 msgstr "可以并发"
 
-#: terminal/models/applet/applet.py:43
+#: terminal/models/applet/applet.py:44
 msgid "Tags"
 msgstr "标签"
 
-#: terminal/models/applet/applet.py:47 terminal/serializers/storage.py:159
+#: terminal/models/applet/applet.py:48 terminal/serializers/storage.py:159
 msgid "Hosts"
 msgstr "主机"
 
-#: terminal/models/applet/applet.py:92
+#: terminal/models/applet/applet.py:93
 msgid "Applet pkg not valid, Missing file {}"
 msgstr "Applet pkg 无效，缺少文件 {}"
 
-#: terminal/models/applet/applet.py:111
+#: terminal/models/applet/applet.py:112
 msgid "Load platform.yml failed: {}"
 msgstr "加载 platform.yml 失败: {}"
 
-#: terminal/models/applet/applet.py:114
+#: terminal/models/applet/applet.py:115
 msgid "Only support custom platform"
 msgstr "只支持自定义平台"
 
-#: terminal/models/applet/applet.py:119
+#: terminal/models/applet/applet.py:120
 msgid "Missing type in platform.yml"
 msgstr "在 platform.yml 中缺少类型"
 
-#: terminal/models/applet/applet.py:282 terminal/models/applet/host.py:35
+#: terminal/models/applet/applet.py:300 terminal/models/applet/host.py:35
 #: terminal/models/applet/host.py:137
 msgid "Hosting"
 msgstr "宿主机"
@@ -7739,7 +7740,7 @@ msgstr "规则值"
 
 #: xpack/plugins/cloud/models.py:317 xpack/plugins/cloud/serializers/task.py:70
 msgid "Strategy rule"
-msgstr "策略规则"
+msgstr "条件"
 
 #: xpack/plugins/cloud/models.py:332
 msgid "Action attr"
@@ -7751,7 +7752,7 @@ msgstr "动作值"
 
 #: xpack/plugins/cloud/models.py:341 xpack/plugins/cloud/serializers/task.py:73
 msgid "Strategy action"
-msgstr "策略动作"
+msgstr "动作"
 
 #: xpack/plugins/cloud/providers/aws_international.py:18
 msgid "China (Beijing)"

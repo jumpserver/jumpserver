@@ -2,6 +2,7 @@
 #
 import os
 import tarfile
+from collections import defaultdict
 
 from django.core.files.storage import default_storage
 from django.db.models import F
@@ -86,7 +87,7 @@ class SessionViewSet(OrgBulkModelViewSet):
     ]
     extra_filter_backends = [DatetimeRangeFilterBackend]
     rbac_perms = {
-        'download': ['terminal.download_sessionreplay']
+        'download': ['terminal.download_sessionreplay'],
     }
     permission_classes = [RBACPermission | IsSessionAssignee]
 
@@ -133,6 +134,25 @@ class SessionViewSet(OrgBulkModelViewSet):
         disposition = "attachment; filename*=UTF-8''{}".format(filename)
         response["Content-Disposition"] = disposition
         return response
+
+    @action(methods=[GET], detail=False, permission_classes=[IsAuthenticated])
+    def online(self, request, *args, **kwargs):
+        asset = self.request.query_params.get('asset')
+        if asset is None:
+            return Response({'count': -1})
+
+        queryset = Session.objects.filter(is_finished=True).filter(asset_id=asset)
+        # if '(' in account and ')' in account:
+        #     queryset = queryset.filter(account=account)
+        # else:
+        #     queryset = queryset.filter(account__endswith='({})'.format(account))
+
+        counts = defaultdict(int)
+        for session in queryset:
+            username = session.account.split('(')[0].strip(')')
+            counts[username] += 1
+        counts['total'] = len(queryset)
+        return Response(counts)
 
     def get_queryset(self):
         queryset = super().get_queryset().prefetch_related('terminal') \
