@@ -163,12 +163,13 @@ class JMSInventory:
 
         protocol = self.get_primary_protocol(ansible_config, protocols)
 
+        tp, category = asset.type, asset.category
         name = asset.name.replace(' ', '_').replace('[', '_').replace(']', '_')
         host = {
             'name': name,
             'jms_asset': {
                 'id': str(asset.id), 'name': asset.name, 'address': asset.address,
-                'type': asset.type, 'category': asset.category,
+                'type': tp, 'category': category,
                 'protocol': protocol.name, 'port': protocol.port,
                 'spec_info': asset.spec_info, 'secret_info': asset.secret_info,
                 'protocols': [{'name': p.name, 'port': p.port} for p in protocols],
@@ -180,7 +181,7 @@ class JMSInventory:
             } if account else None
         }
 
-        if host['jms_account'] and asset.platform.type == 'oracle':
+        if host['jms_account'] and tp == 'oracle':
             host['jms_account']['mode'] = 'sysdba' if account.privileged else None
 
         ansible_config = self.fill_ansible_config(ansible_config, protocol)
