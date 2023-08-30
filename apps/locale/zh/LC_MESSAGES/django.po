@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-29 14:45+0800\n"
+"POT-Creation-Date: 2023-08-30 15:59+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -194,6 +194,24 @@ msgstr "数据库"
 #: accounts/const/vault.py:9 settings/serializers/feature.py:41
 msgid "HCP Vault"
 msgstr "HashiCorp Vault"
+
+#: accounts/mixins.py:35
+msgid "Export all"
+msgstr "导出所有"
+
+#: accounts/mixins.py:37
+msgid "Export only selected items"
+msgstr "仅导出选择项"
+
+#: accounts/mixins.py:42
+#, python-format
+msgid "Export filtered: %s"
+msgstr "导出搜素: %s"
+
+#: accounts/mixins.py:48
+#, python-format
+msgid "User %s view/export secret"
+msgstr "用户 %s 查看/导出 了密码"
 
 #: accounts/models/account.py:48
 #: accounts/models/automations/gather_account.py:16
@@ -800,13 +818,15 @@ msgstr "关联平台，可配置推送参数，如果不关联，将使用默认
 msgid "Comment"
 msgstr "备注"
 
-#: accounts/serializers/account/virtual.py:22
+#: accounts/serializers/account/virtual.py:24
 msgid ""
 "Current only support login from AD/LDAP. Secret priority: Same account in "
-"asset secret > Login secret > Manual input"
+"asset secret > Login secret > Manual input. For security, please set config "
+"CACHE_LOGIN_PASSWORD_ENABLED to true"
 msgstr ""
 "当前仅支持 AD/LDAP 登录方式用户。 同名账号密码生效顺序: 资产上存在的同名账号"
-"密码 > 登录密码 > 手动输入"
+"密码 > 登录密码 > 手动输入, 为了安全起见，请设置配置项 "
+"CACHE_LOGIN_PASSWORD_ENABLED 为 true"
 
 #: accounts/serializers/automations/base.py:23
 #: assets/models/asset/common.py:155 assets/models/automations/base.py:18
@@ -2118,6 +2138,7 @@ msgid "Symlink"
 msgstr "建立软链接"
 
 #: audits/const.py:18 audits/const.py:28 perms/const.py:14
+#: terminal/api/session/session.py:141
 msgid "Download"
 msgstr "下载"
 
@@ -2125,7 +2146,7 @@ msgstr "下载"
 msgid "Rename dir"
 msgstr "映射目录"
 
-#: audits/const.py:23 rbac/tree.py:232
+#: audits/const.py:23 rbac/tree.py:232 terminal/api/session/session.py:234
 #: terminal/templates/terminal/_msg_command_warning.html:18
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 msgid "View"
@@ -2398,7 +2419,7 @@ msgstr "ACL 动作是复核"
 msgid "Current user not support mfa type: {}"
 msgstr "当前用户不支持 MFA 类型: {}"
 
-#: authentication/api/password.py:32 terminal/api/session/session.py:284
+#: authentication/api/password.py:32 terminal/api/session/session.py:282
 #: users/views/profile/reset.py:44
 msgid "User does not exist: {}"
 msgstr "用户不存在: {}"
@@ -3561,24 +3582,6 @@ msgstr "不能包含特殊字符"
 msgid "The mobile phone number format is incorrect"
 msgstr "手机号格式不正确"
 
-#: common/views/mixins.py:74
-msgid "Export all"
-msgstr "导出所有"
-
-#: common/views/mixins.py:76
-msgid "Export only selected items"
-msgstr "仅导出选择项"
-
-#: common/views/mixins.py:81
-#, python-format
-msgid "Export filtered: %s"
-msgstr "导出搜素: %s"
-
-#: common/views/mixins.py:90
-#, python-format
-msgid "User %s view/export secret"
-msgstr "用户 %s 查看/导出 了密码"
-
 #: jumpserver/conf.py:443
 msgid "Create account successfully"
 msgstr "创建账号成功"
@@ -3650,11 +3653,11 @@ msgstr "发布站内消息"
 msgid "No account available"
 msgstr "无可用账号"
 
-#: ops/ansible/inventory.py:261
+#: ops/ansible/inventory.py:262
 msgid "Ansible disabled"
 msgstr "Ansible 已禁用"
 
-#: ops/ansible/inventory.py:277
+#: ops/ansible/inventory.py:278
 msgid "Skip hosts below:"
 msgstr "跳过以下主机: "
 
@@ -5818,20 +5821,20 @@ msgstr "测试失败: 账号无效"
 msgid "Have online sessions"
 msgstr "有在线会话"
 
-#: terminal/api/session/session.py:47
+#: terminal/api/session/session.py:46
 #, python-format
 msgid "User %s %s session %s replay"
 msgstr "用户 %s %s 了会话 %s 的录像"
 
-#: terminal/api/session/session.py:276
+#: terminal/api/session/session.py:274
 msgid "Session does not exist: {}"
 msgstr "会话不存在: {}"
 
-#: terminal/api/session/session.py:279
+#: terminal/api/session/session.py:277
 msgid "Session is finished or the protocol not supported"
 msgstr "会话已经完成或协议不支持"
 
-#: terminal/api/session/session.py:292
+#: terminal/api/session/session.py:290
 msgid "User does not have permission"
 msgstr "用户没有权限"
 
@@ -5949,8 +5952,8 @@ msgstr "不支持批量创建"
 msgid "Storage is invalid"
 msgstr "存储无效"
 
-#: terminal/models/applet/applet.py:30
-msgid "Community"
+#: terminal/models/applet/applet.py:30 xpack/plugins/license/models.py:86
+msgid "Community Edition"
 msgstr "社区版"
 
 #: terminal/models/applet/applet.py:31
@@ -8118,21 +8121,13 @@ msgid "License"
 msgstr "许可证"
 
 #: xpack/plugins/license/models.py:80
-msgid "Standard edition"
-msgstr "标准版"
+msgid "Enterprise Basic Edition"
+msgstr "企业基础版"
 
 #: xpack/plugins/license/models.py:82
-msgid "Enterprise edition"
-msgstr "企业版"
+msgid "Enterprise Standard Edition"
+msgstr "企业标准版"
 
 #: xpack/plugins/license/models.py:84
-msgid "Ultimate edition"
-msgstr "旗舰版"
-
-#: xpack/plugins/license/models.py:86
-msgid "Community edition"
-msgstr "社区版"
-
-#~| msgid "Internal"
-#~ msgid "External url"
-#~ msgstr "内置"
+msgid "Enterprise Flagship Edition"
+msgstr "企业旗舰版"
