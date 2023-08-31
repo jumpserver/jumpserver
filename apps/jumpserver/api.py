@@ -2,7 +2,8 @@ import time
 from collections import defaultdict
 
 from django.core.cache import cache
-from django.db.models import Count, Max, F
+from django.db.models import Count, Max, F, CharField
+from django.db.models.functions import Cast
 from django.http.response import JsonResponse, HttpResponse
 from django.utils import timezone
 from django.utils.timesince import timesince
@@ -13,6 +14,7 @@ from rest_framework.views import APIView
 
 from assets.const import AllTypes
 from assets.models import Asset
+from audits.api import OperateLogViewSet
 from audits.const import LoginStatusChoices
 from audits.models import UserLoginLog, PasswordChangeLog, OperateLog, FTPLog, JobLog
 from common.utils import lazyproperty
@@ -57,83 +59,78 @@ class DateTimeMixin:
 
     @lazyproperty
     def dates_list(self):
-        now = local_now()
-        dates = [(now - timezone.timedelta(days=i)).date() for i in range(self.days)]
-        dates.reverse()
-        return dates
+        return [
+            (local_now() - timezone.timedelta(days=i)).date()
+            for i in range(self.days - 1, -1, -1)
+        ]
 
     def get_dates_metrics_date(self):
-        dates_metrics_date = [d.strftime('%m-%d') for d in self.dates_list] or ['0']
-        return dates_metrics_date
+        return [d.strftime('%m-%d') for d in self.dates_list] or ['0']
 
-    @lazyproperty
-    def users(self):
-        return self.org.get_members()
-
-    @lazyproperty
-    def sessions_queryset(self):
-        t = self.days_to_datetime
-        sessions_queryset = Session.objects.filter(date_start__gte=t)
-        return sessions_queryset
+    def get_logs_queryset_filter(self, qs, query_field, is_timestamp=False):
+        dt = self.days_to_datetime
+        t = dt.timestamp() if is_timestamp else dt
+        query = {f'{query_field}__gte': t}
+        return qs.filter(**query)
 
     def get_logs_queryset(self, queryset, query_params):
         query = {}
+        users = self.org.get_members()
         if not self.org.is_root():
             if query_params == 'username':
                 query = {
-                    f'{query_params}__in': self.users.values_list('username', flat=True)
+                    f'{query_params}__in': users.values_list('username', flat=True)
                 }
             else:
                 query = {
-                    f'{query_params}__in': [str(user) for user in self.users]
+                    f'{query_params}__in': [str(user) for user in users]
                 }
         queryset = queryset.filter(**query)
         return queryset
 
     @lazyproperty
+    def sessions_queryset(self):
+        return self.get_logs_queryset_filter(Session.objects, 'date_start')
+
+    @lazyproperty
     def login_logs_queryset(self):
-        t = self.days_to_datetime
-        queryset = UserLoginLog.objects.filter(datetime__gte=t)
-        queryset = self.get_logs_queryset(queryset, 'username')
+        qs = UserLoginLog.objects.all()
+        qs = self.get_logs_queryset_filter(qs, 'datetime')
+        queryset = self.get_logs_queryset(qs, 'username')
         return queryset
 
     @lazyproperty
     def password_change_logs_queryset(self):
-        t = self.days_to_datetime
-        queryset = PasswordChangeLog.objects.filter(datetime__gte=t)
-        queryset = self.get_logs_queryset(queryset, 'user')
+        qs = PasswordChangeLog.objects.all()
+        qs = self.get_logs_queryset_filter(qs, 'datetime')
+        queryset = self.get_logs_queryset(qs, 'user')
         return queryset
 
     @lazyproperty
     def operate_logs_queryset(self):
-        from audits.api import OperateLogViewSet
-        t = self.days_to_datetime
-        queryset = OperateLogViewSet().get_queryset().filter(datetime__gte=t)
-        return queryset
+        qs = OperateLogViewSet().get_queryset()
+        return self.get_logs_queryset_filter(qs, 'datetime')
 
     @lazyproperty
     def ftp_logs_queryset(self):
-        t = self.days_to_datetime
-        queryset = FTPLog.objects.filter(date_start__gte=t)
-        queryset = self.get_logs_queryset(queryset, 'user')
-        return queryset
+        qs = FTPLog.objects.all()
+        qs = self.get_logs_queryset_filter(qs, 'date_start')
+        return self.get_logs_queryset(qs, 'user')
 
     @lazyproperty
     def command_queryset(self):
-        t = self.days_to_datetime
-        t = t.timestamp()
-        queryset = Command.objects.filter(timestamp__gte=t)
-        return queryset
+        qs = Command.objects.all()
+        return self.get_logs_queryset_filter(qs, 'timestamp', is_timestamp=True)
 
     @lazyproperty
     def job_logs_queryset(self):
-        t = self.days_to_datetime
-        queryset = JobLog.objects.filter(date_created__gte=t)
-        return queryset
+        qs = JobLog.objects.all()
+        return self.get_logs_queryset_filter(qs, 'date_start')
 
 
 class DatesLoginMetricMixin:
     dates_list: list
+    date_start_end: tuple
     command_queryset: Command.objects
     sessions_queryset: Session.objects
     ftp_logs_queryset: OperateLog.objects
@@ -141,6 +138,17 @@ class DatesLoginMetricMixin:
     login_logs_queryset: UserLoginLog.objects
     operate_logs_queryset: OperateLog.objects
     password_change_logs_queryset: PasswordChangeLog.objects
+
+    @lazyproperty
+    def get_type_to_assets(self):
+        result = Asset.objects.annotate(type=F('platform__type')). \
+            values('type').order_by('type').annotate(total=Count(1))
+        all_types_dict = dict(AllTypes.choices())
+        result = list(result)
+        for i in result:
+            tp = i['type']
+            i['label'] = all_types_dict.get(tp, tp)
+        return result
 
     def filter_date_start_end(self, queryset, field_name):
         query = {f'{field_name}__range': self.date_start_end}
@@ -172,41 +180,23 @@ class DatesLoginMetricMixin:
     def get_dates_metrics_total_count_sessions(self):
         return self.get_date_metrics(Session.objects, 'date_start', 'id')
 
-    @lazyproperty
-    def get_type_to_assets(self):
-        result = Asset.objects.annotate(type=F('platform__type')). \
-            values('type').order_by('type').annotate(total=Count(1))
-        all_types_dict = dict(AllTypes.choices())
-        result = list(result)
-        for i in result:
-            tp = i['type']
-            i['label'] = all_types_dict.get(tp, tp)
-        return result
-
     def get_dates_login_times_assets(self):
         assets = self.sessions_queryset.values("asset") \
             .annotate(total=Count("asset")) \
-            .annotate(last=Max("date_start")).order_by("-total")
-        assets = assets[:10]
-        for asset in assets:
-            asset['last'] = str(asset['last'])
-        return list(assets)
+            .annotate(last=Cast(Max("date_start"), output_field=CharField())) \
+            .order_by("-total")
+        return list(assets[:10])
 
     def get_dates_login_times_users(self):
         users = self.sessions_queryset.values("user_id") \
             .annotate(total=Count("user_id")) \
             .annotate(user=Max('user')) \
-            .annotate(last=Max("date_start")).order_by("-total")
-        users = users[:10]
-        for user in users:
-            user['last'] = str(user['last'])
-        return list(users)
+            .annotate(last=Cast(Max("date_start"), output_field=CharField())) \
+            .order_by("-total")
+        return list(users[:10])
 
     def get_dates_login_record_sessions(self):
         sessions = self.sessions_queryset.order_by('-date_start')
-        sessions = sessions[:10]
-        for session in sessions:
-            session.avatar_url = User.get_avatar_url("")
         sessions = [
             {
                 'user': session.user,
@@ -215,7 +205,7 @@ class DatesLoginMetricMixin:
                 'date_start': str(session.date_start),
                 'timesince': timesince(session.date_start)
             }
-            for session in sessions
+            for session in sessions[:10]
         ]
         return sessions
 
@@ -249,12 +239,13 @@ class DatesLoginMetricMixin:
 
     @lazyproperty
     def job_logs_running_amount(self):
-        return self.job_logs_queryset.filter(status__in=[JobStatus.running]).count()
+        return self.job_logs_queryset.filter(status=JobStatus.running).count()
 
     @lazyproperty
     def job_logs_failed_amount(self):
         return self.job_logs_queryset.filter(
-            status__in=[JobStatus.failed, JobStatus.timeout]).count()
+            status__in=[JobStatus.failed, JobStatus.timeout]
+        ).count()
 
     @lazyproperty
     def job_logs_amount(self):
@@ -263,6 +254,10 @@ class DatesLoginMetricMixin:
     @lazyproperty
     def sessions_amount(self):
         return self.sessions_queryset.count()
+
+    @lazyproperty
+    def online_sessions_amount(self):
+        return self.sessions_queryset.filter(is_finished=False).count()
 
     @lazyproperty
     def ftp_logs_amount(self):
@@ -360,9 +355,8 @@ class IndexApi(DateTimeMixin, DatesLoginMetricMixin, APIView):
             })
 
         if _all or query_params.get('total_count') or query_params.get('total_count_history_sessions'):
-            count = self.sessions_amount - caches.total_count_online_sessions
             data.update({
-                'total_count_history_sessions': count if count > 0 else 0,
+                'total_count_history_sessions': self.sessions_amount - self.online_sessions_amount,
             })
 
         if _all or query_params.get('total_count') or query_params.get('total_count_ftp_logs'):
