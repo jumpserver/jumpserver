@@ -153,7 +153,7 @@ class SessionViewSet(RecordViewLogMixin, OrgBulkModelViewSet):
         if asset is None or account is None:
             return Response({'count': None})
 
-        queryset = Session.objects.filter(is_finished=True) \
+        queryset = Session.objects.filter(is_finished=False) \
             .filter(asset_id=asset) \
             .filter(protocol='rdp')  # 当前只统计 rdp 协议的会话
         if '(' in account and ')' in account:
