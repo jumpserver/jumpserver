@@ -30,9 +30,6 @@ class PushAccountAutomation(ChangeSecretMixin, AccountBaseAutomation):
         ]
         Account.objects.bulk_create(create_account_objs)
 
-    def set_period_schedule(self):
-        pass
-
     @property
     def dynamic_username(self):
         return self.username == '@USER'
