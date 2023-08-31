@@ -15,4 +15,4 @@
         ssl_ca_certs: "{{ jms_asset.secret_info.ca_cert }}"
         ssl_certfile: "{{ jms_asset.secret_info.client_key }}"
         connection_options:
-          - tlsAllowInvalidHostnames: "{{ jms_asset.spec_info.allow_invalid_cert}}"
+          - tlsAllowInvalidHostnames: "{{ jms_asset.spec_info.allow_invalid_cert }}"

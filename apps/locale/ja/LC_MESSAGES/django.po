@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-29 14:58+0800\n"
+"POT-Creation-Date: 2023-08-28 10:55+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -93,7 +93,7 @@ msgid "Update"
 msgstr "更新"
 
 #: accounts/const/account.py:33
-#: accounts/serializers/automations/change_secret.py:156 audits/const.py:54
+#: accounts/serializers/automations/change_secret.py:156 audits/const.py:55
 #: audits/signal_handlers/activity_log.py:33 common/const/choices.py:19
 #: ops/const.py:61 terminal/const.py:77 xpack/plugins/cloud/const.py:43
 msgid "Failed"
@@ -195,6 +195,24 @@ msgstr "データベース"
 #: accounts/const/vault.py:9 settings/serializers/feature.py:41
 msgid "HCP Vault"
 msgstr "HashiCorp Vault"
+
+#: accounts/mixins.py:35
+msgid "Export all"
+msgstr "すべてエクスポート"
+
+#: accounts/mixins.py:37
+msgid "Export only selected items"
+msgstr "選択項目のみエクスポート"
+
+#: accounts/mixins.py:42
+#, python-format
+msgid "Export filtered: %s"
+msgstr "検索のエクスポート: %s"
+
+#: accounts/mixins.py:48
+#, python-format
+msgid "User %s view/export secret"
+msgstr "ユーザー %s がパスワードを閲覧/導き出しました"
 
 #: accounts/models/account.py:48
 #: accounts/models/automations/gather_account.py:16
@@ -846,7 +864,7 @@ msgstr "* パスワードの長さの範囲6-30ビット"
 msgid "Automation task execution"
 msgstr "自動タスク実行履歴"
 
-#: accounts/serializers/automations/change_secret.py:155 audits/const.py:53
+#: accounts/serializers/automations/change_secret.py:155 audits/const.py:54
 #: audits/models.py:59 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:18 ops/const.py:59 ops/serializers/celery.py:40
 #: terminal/const.py:76 terminal/models/session/sharing.py:121
@@ -1169,7 +1187,7 @@ msgstr "認証に失敗しました"
 msgid "Connect failed"
 msgstr "接続に失敗しました"
 
-#: assets/const/automation.py:6 audits/const.py:6 audits/const.py:36
+#: assets/const/automation.py:6 audits/const.py:6 audits/const.py:37
 #: audits/signal_handlers/activity_log.py:62 common/utils/ip/geoip/utils.py:31
 #: common/utils/ip/geoip/utils.py:37 common/utils/ip/utils.py:104
 msgid "Unknown"
@@ -1191,7 +1209,7 @@ msgstr "テストゲートウェイ"
 msgid "Gather facts"
 msgstr "資産情報の収集"
 
-#: assets/const/base.py:33 audits/const.py:47
+#: assets/const/base.py:33 audits/const.py:48
 #: terminal/serializers/applet_host.py:32
 msgid "Disabled"
 msgstr "無効"
@@ -1223,7 +1241,7 @@ msgstr "クラウド サービス"
 
 #: assets/const/category.py:14 assets/models/asset/gpt.py:11
 #: assets/models/asset/web.py:16 audits/const.py:34
-#: terminal/models/applet/applet.py:27
+#: terminal/models/applet/applet.py:26
 msgid "Web"
 msgstr "Web"
 
@@ -1720,7 +1738,7 @@ msgstr "開ける"
 msgid "Setting"
 msgstr "設定"
 
-#: assets/models/platform.py:38 audits/const.py:48 settings/models.py:36
+#: assets/models/platform.py:38 audits/const.py:49 settings/models.py:36
 #: terminal/serializers/applet_host.py:33
 msgid "Enabled"
 msgstr "有効化"
@@ -2132,7 +2150,8 @@ msgstr "名前の変更"
 msgid "Symlink"
 msgstr "Symlink"
 
-#: audits/const.py:18 perms/const.py:14
+#: audits/const.py:18 audits/const.py:28 perms/const.py:14
+#: terminal/api/session/session.py:141
 msgid "Download"
 msgstr "ダウンロード"
 
@@ -2140,7 +2159,7 @@ msgstr "ダウンロード"
 msgid "Rename dir"
 msgstr "マップディレクトリ"
 
-#: audits/const.py:23 rbac/tree.py:232
+#: audits/const.py:23 rbac/tree.py:232 terminal/api/session/session.py:234
 #: terminal/templates/terminal/_msg_command_warning.html:18
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 msgid "View"
@@ -2152,44 +2171,44 @@ msgstr "表示"
 msgid "Create"
 msgstr "作成"
 
-#: audits/const.py:28 perms/const.py:12
+#: audits/const.py:29 perms/const.py:12
 msgid "Connect"
 msgstr "接続"
 
-#: audits/const.py:29 authentication/templates/authentication/login.html:252
+#: audits/const.py:30 authentication/templates/authentication/login.html:252
 #: authentication/templates/authentication/login.html:325
 #: templates/_header_bar.html:89
 msgid "Login"
 msgstr "ログイン"
 
-#: audits/const.py:30 ops/const.py:9
+#: audits/const.py:31 ops/const.py:9
 msgid "Change password"
 msgstr "パスワードを変更する"
 
-#: audits/const.py:35 settings/serializers/terminal.py:6
+#: audits/const.py:36 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:164
 #: terminal/serializers/session.py:49 terminal/serializers/session.py:63
 msgid "Terminal"
 msgstr "ターミナル"
 
-#: audits/const.py:40 audits/models.py:127
+#: audits/const.py:41 audits/models.py:127
 msgid "Operate log"
 msgstr "ログの操作"
 
-#: audits/const.py:41
+#: audits/const.py:42
 msgid "Session log"
 msgstr "セッションログ"
 
-#: audits/const.py:42
+#: audits/const.py:43
 msgid "Login log"
 msgstr "ログインログ"
 
-#: audits/const.py:43 terminal/models/applet/host.py:143
+#: audits/const.py:44 terminal/models/applet/host.py:143
 #: terminal/models/component/task.py:22
 msgid "Task"
 msgstr "タスク"
 
-#: audits/const.py:49
+#: audits/const.py:50
 msgid "-"
 msgstr "-"
 
@@ -2415,7 +2434,7 @@ msgstr "ACL アクションはレビューです"
 msgid "Current user not support mfa type: {}"
 msgstr "現在のユーザーはmfaタイプをサポートしていません: {}"
 
-#: authentication/api/password.py:32 terminal/api/session/session.py:259
+#: authentication/api/password.py:32 terminal/api/session/session.py:282
 #: users/views/profile/reset.py:44
 msgid "User does not exist: {}"
 msgstr "ユーザーが存在しない: {}"
@@ -3602,24 +3621,6 @@ msgstr "特殊文字を含むべきではない"
 msgid "The mobile phone number format is incorrect"
 msgstr "携帯電話番号の形式が正しくありません"
 
-#: common/views/mixins.py:74
-msgid "Export all"
-msgstr "すべてエクスポート"
-
-#: common/views/mixins.py:76
-msgid "Export only selected items"
-msgstr "選択項目のみエクスポート"
-
-#: common/views/mixins.py:81
-#, python-format
-msgid "Export filtered: %s"
-msgstr "検索のエクスポート: %s"
-
-#: common/views/mixins.py:90
-#, python-format
-msgid "User %s view/export secret"
-msgstr "ユーザー %s がパスワードを閲覧/導き出しました"
-
 #: jumpserver/conf.py:443
 msgid "Create account successfully"
 msgstr "アカウントを正常に作成"
@@ -3696,11 +3697,11 @@ msgstr "投稿サイトニュース"
 msgid "No account available"
 msgstr "利用可能なアカウントがありません"
 
-#: ops/ansible/inventory.py:261
+#: ops/ansible/inventory.py:262
 msgid "Ansible disabled"
 msgstr "Ansible 無効"
 
-#: ops/ansible/inventory.py:277
+#: ops/ansible/inventory.py:278
 msgid "Skip hosts below:"
 msgstr "次のホストをスキップします: "
 
@@ -5905,15 +5906,20 @@ msgstr "テスト失敗: アカウントが無効"
 msgid "Have online sessions"
 msgstr "オンラインセッションを持つ"
 
-#: terminal/api/session/session.py:251
+#: terminal/api/session/session.py:46
+#, python-format
+msgid "User %s %s session %s replay"
+msgstr "ユーザー%s %sこのセッション %s の録画です"
+
+#: terminal/api/session/session.py:274
 msgid "Session does not exist: {}"
 msgstr "セッションが存在しません: {}"
 
-#: terminal/api/session/session.py:254
+#: terminal/api/session/session.py:277
 msgid "Session is finished or the protocol not supported"
 msgstr "セッションが終了したか、プロトコルがサポートされていません"
 
-#: terminal/api/session/session.py:267
+#: terminal/api/session/session.py:290
 msgid "User does not have permission"
 msgstr "ユーザーに権限がありません"
 
@@ -6031,7 +6037,7 @@ msgstr "一括作成非サポート"
 msgid "Storage is invalid"
 msgstr "ストレージが無効です"
 
-#: terminal/models/applet/applet.py:30
+#: terminal/models/applet/applet.py:29
 msgid "Community"
 msgstr "コミュニティ版"
 
@@ -8228,22 +8234,13 @@ msgid "License"
 msgstr "ライセンス"
 
 #: xpack/plugins/license/models.py:80
-msgid "Standard edition"
-msgstr "標準版"
+msgid "Enterprise Basic Edition"
+msgstr "エンタープライズ基本版"
 
 #: xpack/plugins/license/models.py:82
-msgid "Enterprise edition"
-msgstr "エンタープライズ版"
+msgid "Enterprise Standard Edition"
+msgstr "エンタープライズ標準版"
 
 #: xpack/plugins/license/models.py:84
-msgid "Ultimate edition"
-msgstr "究極のエディション"
-
-#: xpack/plugins/license/models.py:86
-msgid "Community edition"
-msgstr "コミュニティ版"
-
-#, fuzzy
-#~| msgid "Internal"
-#~ msgid "External url"
-#~ msgstr "ビルトイン"
+msgid "Enterprise Flagship Edition"
+msgstr "エンタープライズ旗艦版"

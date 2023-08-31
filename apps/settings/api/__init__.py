@@ -3,6 +3,7 @@ from .email import *
 from .feishu import *
 from .ldap import *
 from .public import *
+from .security import *
 from .settings import *
 from .sms import *
 from .vault import *

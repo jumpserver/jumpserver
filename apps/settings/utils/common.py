@@ -3,6 +3,8 @@ from jumpserver.context_processor import default_interface
 from django.conf import settings
 from IPy import IP
 
+from common.utils import lookup_domain
+
 
 def get_interface_setting_or_default():
     if not settings.XPACK_ENABLED:
@@ -15,21 +17,23 @@ def get_login_title():
     return get_interface_setting_or_default()['login_title']
 
 
-def generate_ips(ip_string):
+def generate_ips(address_string):
     # 支持的格式
     # 192.168.1.1,192.168.1.2
     # 192.168.1.1-12 | 192.168.1.1-192.168.1.12 | 192.168.1.0/30 | 192.168.1.1
     ips = []
-    ip_list = ip_string.split(',')
+    ip_list = address_string.split(',')
     if len(ip_list) > 1:
         for ip in ip_list:
             try:
                 ips.append(str(IP(ip)))
             except ValueError:
-                pass
+                ip, err = lookup_domain(ip)
+                if not err:
+                    ips.append(ip)
         return ips
 
-    ip_list = ip_string.split('-')
+    ip_list = address_string.split('-')
     try:
         if len(ip_list) == 2:
             start_ip, end_ip = ip_list
