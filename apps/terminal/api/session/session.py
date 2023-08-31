@@ -2,7 +2,6 @@
 #
 import os
 import tarfile
-from collections import defaultdict
 
 from django.core.files.storage import default_storage
 from django.db.models import F
@@ -135,27 +134,24 @@ class SessionViewSet(OrgBulkModelViewSet):
         response["Content-Disposition"] = disposition
         return response
 
-    @action(methods=[GET], detail=False, permission_classes=[IsAuthenticated])
-    def online(self, request, *args, **kwargs):
-        asset = self.request.query_params.get('asset')
-        if asset is None:
-            return Response({'count': -1})
+    @action(methods=[GET], detail=False, permission_classes=[IsAuthenticated], url_path='online-info', )
+    def online_info(self, request, *args, **kwargs):
+        asset = self.request.query_params.get('asset_id')
+        account = self.request.query_params.get('account')
+        if asset is None or account is None:
+            return Response({'count': None})
 
-        queryset = Session.objects.filter(is_finished=True).filter(asset_id=asset)
-        # if '(' in account and ')' in account:
-        #     queryset = queryset.filter(account=account)
-        # else:
-        #     queryset = queryset.filter(account__endswith='({})'.format(account))
-
-        counts = defaultdict(int)
-        for session in queryset:
-            username = session.account.split('(')[0].strip(')')
-            counts[username] += 1
-        counts['total'] = len(queryset)
-        return Response(counts)
+        queryset = Session.objects.filter(is_finished=True).filter(asset_id=asset).filter(protocol='rdp')
+        if '(' in account and ')' in account:
+            queryset = queryset.filter(account=account)
+        else:
+            queryset = queryset.filter(account__endswith='({})'.format(account))
+        count = queryset.count()
+        return Response({'count': count})
 
     def get_queryset(self):
-        queryset = super().get_queryset().prefetch_related('terminal') \
+        queryset = super().get_queryset() \
+            .prefetch_related('terminal') \
             .annotate(terminal_display=F('terminal__name'))
         return queryset
 
