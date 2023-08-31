@@ -126,6 +126,9 @@ class ConnectMethodUtil:
                     Protocol.ssh, Protocol.telnet, Protocol.sftp,
                     Protocol.redis, Protocol.mongodb,
                     Protocol.k8s, Protocol.clickhouse,
+
+                    Protocol.mysql, Protocol.mariadb,
+                    Protocol.sqlserver, Protocol.postgresql,
                 ],
                 # 限制客户端的协议，比如 koko 虽然也支持 数据库的 ssh 连接，但是不再这里拉起
                 # Listen协议: [Asset协议]
