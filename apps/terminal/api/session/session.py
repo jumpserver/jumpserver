@@ -90,7 +90,7 @@ class SessionViewSet(RecordViewLogMixin, OrgBulkModelViewSet):
     ]
     extra_filter_backends = [DatetimeRangeFilterBackend]
     rbac_perms = {
-        'download': ['terminal.download_sessionreplay']
+        'download': ['terminal.download_sessionreplay'],
     }
     permission_classes = [RBACPermission | IsSessionAssignee]
 
@@ -146,8 +146,26 @@ class SessionViewSet(RecordViewLogMixin, OrgBulkModelViewSet):
         )
         return response
 
+    @action(methods=[GET], detail=False, permission_classes=[IsAuthenticated], url_path='online-info', )
+    def online_info(self, request, *args, **kwargs):
+        asset = self.request.query_params.get('asset_id')
+        account = self.request.query_params.get('account')
+        if asset is None or account is None:
+            return Response({'count': None})
+
+        queryset = Session.objects.filter(is_finished=True) \
+            .filter(asset_id=asset) \
+            .filter(protocol='rdp')  # 当前只统计 rdp 协议的会话
+        if '(' in account and ')' in account:
+            queryset = queryset.filter(account=account)
+        else:
+            queryset = queryset.filter(account__endswith='({})'.format(account))
+        count = queryset.count()
+        return Response({'count': count})
+
     def get_queryset(self):
-        queryset = super().get_queryset().prefetch_related('terminal') \
+        queryset = super().get_queryset() \
+            .prefetch_related('terminal') \
             .annotate(terminal_display=F('terminal__name'))
         return queryset
 

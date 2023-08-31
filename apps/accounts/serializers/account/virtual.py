@@ -22,7 +22,7 @@ class VirtualAccountSerializer(serializers.ModelSerializer):
             'secret_from_login': {
                 'help_text': _(
                     'Current only support login from AD/LDAP. Secret priority: '
-                    'Same account in asset secret > Login secret > Manual input. '
+                    'Same account in asset secret > Login secret > Manual input. <br/ >'
                     'For security, please set config CACHE_LOGIN_PASSWORD_ENABLED to true'
                 )
             },

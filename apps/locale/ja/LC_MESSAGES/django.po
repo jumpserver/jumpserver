@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-30 15:59+0800\n"
+"POT-Creation-Date: 2023-08-28 10:55+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -823,12 +823,12 @@ msgstr "コメント"
 #: accounts/serializers/account/virtual.py:24
 msgid ""
 "Current only support login from AD/LDAP. Secret priority: Same account in "
-"asset secret > Login secret > Manual input. For security, please set config "
-"CACHE_LOGIN_PASSWORD_ENABLED to true"
+"asset secret > Login secret > Manual input. <br/ >For security, please set "
+"config CACHE_LOGIN_PASSWORD_ENABLED to true"
 msgstr ""
 "現在、AD/LDAPからのログインのみをサポートしています。シークレットの優先順位: "
-"資産シークレット内の同じアカウント > ログインシークレット > 手動入力, セキュ"
-"リティのために、コンフィギュレーション項目CACHE _LOGIN_PASSWORD_ENABLEDはtrue"
+"資産シークレット内の同じアカウント > ログインシークレット > 手動入力. <br/> "
+"セキュリティのために、「config CACHE_LOGIN_PASSWORD_ENABLED」をtrueに設定してください。 "
 
 #: accounts/serializers/automations/base.py:23
 #: assets/models/asset/common.py:155 assets/models/automations/base.py:18
@@ -1240,8 +1240,8 @@ msgid "Cloud service"
 msgstr "クラウド サービス"
 
 #: assets/const/category.py:14 assets/models/asset/gpt.py:11
-#: assets/models/asset/web.py:16 audits/const.py:35
-#: terminal/models/applet/applet.py:27
+#: assets/models/asset/web.py:16 audits/const.py:34
+#: terminal/models/applet/applet.py:26
 msgid "Web"
 msgstr "Web"
 
@@ -6037,8 +6037,8 @@ msgstr "一括作成非サポート"
 msgid "Storage is invalid"
 msgstr "ストレージが無効です"
 
-#: terminal/models/applet/applet.py:30 xpack/plugins/license/models.py:86
-msgid "Community Edition"
+#: terminal/models/applet/applet.py:29
+msgid "Community"
 msgstr "コミュニティ版"
 
 #: terminal/models/applet/applet.py:31
