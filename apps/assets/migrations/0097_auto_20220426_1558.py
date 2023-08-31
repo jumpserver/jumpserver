@@ -1231,6 +1231,7 @@ def migrate_connectivity(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
+    atomic = False
     dependencies = [
         ('assets', '0096_auto_20220426_1550'),
     ]
