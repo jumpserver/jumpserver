@@ -360,8 +360,9 @@ class IndexApi(DateTimeMixin, DatesLoginMetricMixin, APIView):
             })
 
         if _all or query_params.get('total_count') or query_params.get('total_count_history_sessions'):
+            count = self.sessions_amount - caches.total_count_online_sessions
             data.update({
-                'total_count_history_sessions': self.sessions_amount - caches.total_count_online_sessions,
+                'total_count_history_sessions': count if count > 0 else 0,
             })
 
         if _all or query_params.get('total_count') or query_params.get('total_count_ftp_logs'):
