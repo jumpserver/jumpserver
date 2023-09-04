@@ -5,7 +5,6 @@ title: "[Bug] "
 labels: 类型:bug
 assignees: 
    - baijiangjie
-
 ---
 
 **JumpServer 版本( v2.28 之前的版本不再支持 )**
