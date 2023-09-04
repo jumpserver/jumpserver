@@ -4,7 +4,6 @@ about: 提交产品缺陷帮助我们更好的改进
 title: "[Bug] "
 labels: 类型:bug
 assignees: 
-   - wojiushixiaobai
    - baijiangjie
 
 ---
