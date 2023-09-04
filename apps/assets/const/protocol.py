@@ -45,7 +45,13 @@ class Protocol(ChoicesMixin, models.TextChoices):
                     'sftp_home': {
                         'type': 'str',
                         'default': '/tmp',
-                        'label': _('SFTP home')
+                        'label': _('SFTP root'),
+                        'help_text': _(
+                            'SFTP root directory, Support variable: <br>'
+                            '- ${ACCOUNT} The connected account username <br>'
+                            '- ${HOME} The home directory of the connected account <br>'
+                            '- ${USER} The username of the user'
+                        )
                     }
                 }
             },
