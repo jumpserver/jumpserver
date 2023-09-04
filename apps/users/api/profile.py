@@ -3,24 +3,23 @@ import uuid
 
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
+
+from authentication.models import ConnectionToken
 from common.permissions import IsValidUserOrConnectionToken
 from common.utils import get_object_or_none
 from orgs.utils import tmp_to_root_org
-from authentication.models import ConnectionToken
-
 from users.notifications import (
     ResetPasswordMsg, ResetPasswordSuccessMsg, ResetSSHKeyMsg,
     ResetPublicKeySuccessMsg,
 )
-
+from .mixins import UserQuerysetMixin
 from .. import serializers
 from ..models import User
-from .mixins import UserQuerysetMixin
 
 __all__ = [
     'UserResetPasswordApi', 'UserResetPKApi',
     'UserProfileApi', 'UserPasswordApi',
-    'UserSecretKeyApi', 'UserPublicKeyApi'
+    'UserPublicKeyApi'
 ]
 
 
@@ -80,14 +79,6 @@ class UserPasswordApi(generics.RetrieveUpdateAPIView):
         resp = super().update(request, *args, **kwargs)
         ResetPasswordSuccessMsg(self.request.user, request).publish_async()
         return resp
-
-
-class UserSecretKeyApi(generics.RetrieveUpdateAPIView):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = serializers.UserUpdateSecretKeySerializer
-
-    def get_object(self):
-        return self.request.user
 
 
 class UserPublicKeyApi(generics.RetrieveUpdateAPIView):

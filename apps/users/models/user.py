@@ -819,9 +819,6 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
     public_key = fields.EncryptTextField(
         blank=True, null=True, verbose_name=_('Public key')
     )
-    secret_key = fields.EncryptCharField(
-        max_length=256, blank=True, null=True, verbose_name=_('Secret key')
-    )
     comment = models.TextField(
         blank=True, null=True, verbose_name=_('Comment')
     )
@@ -853,6 +850,13 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
+
+    @property
+    def secret_key(self):
+        instance = self.preferences.filter(name='secret_key').first()
+        if not instance:
+            return
+        return instance.decrypt_value
 
     @property
     def receive_backends(self):
