@@ -234,9 +234,9 @@
 <body>
 {% if error_origin %}
     <div class='alert alert-danger error-info'>
-        配置文件存在问题，无法完成登录，请联系管理员解决，或查看最新更新说明 <br/>
-        Configuration file has problems and cannot be logged in. Please contact the administrator  <br/>
-        - {{ error_origin }} -
+        {% trans 'Configuration file has problems and cannot be logged in. Please contact the administrator or view latest docs' %}<br/>
+        {% trans 'If you are administrator, you can update the config resolve it, set' %} <br/>
+        DOMAINS={{ error_origin }}
     </div>
 {% endif %}
 <div class="login-content extra-fields-{{ extra_fields_count }}">
