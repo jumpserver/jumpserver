@@ -143,7 +143,7 @@ async def verbose_ping(dest_ips, timeout=2, count=5, psize=64, display=None):
     for dest_ip in ips:
         await display(f'PING {dest_ip}: 56 data bytes')
         # 切换异步协程
-        await asyncio.sleep(0.1)
+        await asyncio.sleep(0.01)
         error_count = 0
         for i in range(count):
             try:

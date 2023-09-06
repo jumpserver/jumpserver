@@ -18,20 +18,22 @@ def get_login_title():
 
 
 def generate_ips(address_string):
+    def transform(_ip):
+        real_ip, err_msg = lookup_domain(_ip)
+        return _ip if err_msg else real_ip
     # 支持的格式
     # 192.168.1.1,192.168.1.2
     # 192.168.1.1-12 | 192.168.1.1-192.168.1.12 | 192.168.1.0/30 | 192.168.1.1
     ips = []
     ip_list = address_string.split(',')
-    if len(ip_list) > 1:
+    if len(ip_list) >= 1:
         for ip in ip_list:
             try:
-                ips.append(str(IP(ip)))
+                ips.append(str(IP(transform(ip))))
             except ValueError:
-                ip, err = lookup_domain(ip)
-                if not err:
-                    ips.append(ip)
-        return ips
+                pass
+        if ips:
+            return ips
 
     ip_list = address_string.split('-')
     try:
@@ -57,6 +59,7 @@ def is_valid_port(port):
     except (TypeError, ValueError):
         valid = False
     return valid
+
 
 def generate_ports(ports):
     port_list = []

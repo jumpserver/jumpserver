@@ -6,7 +6,10 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 from common.db.utils import close_old_connections
 from common.utils import get_logger
-from .tools import verbose_ping, verbose_telnet, verbose_nmap, verbose_tcpdump
+from .tools import (
+    verbose_ping, verbose_telnet, verbose_nmap,
+    verbose_tcpdump, verbose_traceroute
+)
 
 
 logger = get_logger(__name__)
@@ -56,6 +59,10 @@ class ToolsWebsocket(AsyncJsonWebsocketConsumer):
         }
         logger.info(f'Receive request tcpdump: {params}')
         await verbose_tcpdump(display=self.send_msg, **params)
+
+    async def imitate_traceroute(self,dest_ips):
+        params = {'dest_ips': dest_ips}
+        await verbose_traceroute(display=self.send_msg, **params)
 
     async def receive(self, text_data=None, bytes_data=None, **kwargs):
         data = json.loads(text_data)
