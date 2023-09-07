@@ -139,6 +139,9 @@ netifaces = "^0.11.0"
 daphne = "4.0.0"
 channels = "^4.0.0"
 channels-redis = "4.1.0"
+fido2 = "^1.1.2"
+ua-parser = "^0.18.0"
+user-agents = "^2.2.0"
 
 
 [tool.poetry.group.xpack.dependencies]

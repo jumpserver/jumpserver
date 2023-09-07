@@ -90,6 +90,12 @@ class UserLoginContextMixin:
                 'enabled': settings.AUTH_FEISHU,
                 'url': reverse('authentication:feishu-qr-login'),
                 'logo': static('img/login_feishu_logo.png')
+            },
+            {
+                'name': _("Passkey"),
+                'enabled': True,
+                'url': reverse('api-auth:passkey-auth'),
+                'logo': static('img/login_feishu_logo.png')
             }
         ]
         return [method for method in auth_methods if method['enabled']]
