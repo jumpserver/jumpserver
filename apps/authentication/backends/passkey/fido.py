@@ -1,16 +1,16 @@
 import json
-from urllib.parse import urlparse
 
 import fido2.features
 from django.conf import settings
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from fido2.server import Fido2Server
 from fido2.utils import websafe_decode, websafe_encode
 from fido2.webauthn import PublicKeyCredentialRpEntity, AttestedCredentialData, PublicKeyCredentialUserEntity
 from rest_framework.serializers import ValidationError
 from user_agents.parsers import parse as ua_parse
 
-from .models import UserPasskey
+from .models import Passkey
 
 try:
     fido2.features.webauthn_json_mapping.enabled = True
@@ -48,22 +48,17 @@ def get_server(request=None):
     return Fido2Server(rp)
 
 
-def get_user_credentials(user):
-    user_passkeys = UserPasskey.objects.filter(user=user)
+def get_user_credentials(username):
+    user_passkeys = Passkey.objects.filter(user__username=username)
     return [AttestedCredentialData(websafe_decode(uk.token)) for uk in user_passkeys]
 
 
 def register_begin(request):
     server = get_server(request)
     user = request.user
-    user_credentials = get_user_credentials(user)
+    user_credentials = get_user_credentials(user.username)
 
-    try:
-        site_url = urlparse(settings.SITE_URL)
-        prefix = site_url.netloc.split('.')[0]
-    except:
-        prefix = 'JumpServer'
-
+    prefix = request.query_params.get('name', '')
     prefix = '(' + prefix + ')'
     user_entity = PublicKeyCredentialUserEntity(
         id=str(user.id).encode('utf8'),
@@ -91,7 +86,7 @@ def register_complete(request):
     encoded = websafe_encode(auth_data.credential_data)
     platform = get_current_platform(request)
     name = data.pop("key_name", '') or platform
-    passkey = UserPasskey.objects.create(
+    passkey = Passkey.objects.create(
         user=request.user,
         token=encoded,
         name=name,
@@ -104,9 +99,8 @@ def register_complete(request):
 def auth_begin(request):
     server = get_server(request)
     credentials = []
+
     username = None
-    if "base_username" in request.session:
-        username = request.session["base_username"]
     if request.user.is_authenticated:
         username = request.user.username
     if username:
@@ -120,29 +114,17 @@ def auth_complete(request):
     server = get_server(request)
     data = request.data.get("passkeys")
     data = json.loads(data)
-    credential_id = data['id']
+    cid = data['id']
 
-    keys = UserPasskey.objects.filter(credential_id=credential_id, enabled=1)
-    if not keys.exists():
-        raise ValidationError("No key found")
+    key = Passkey.objects.filter(credential_id=cid, is_active=True).first()
+    if not key:
+        raise ValueError(_("This key is not registered"))
 
-    key = keys[0]
     credentials = [AttestedCredentialData(websafe_decode(key.token))]
+    state = request.session.get('fido2_state')
+    server.authenticate_complete(state, credentials=credentials, response=data)
 
-    server.authenticate_complete(
-        request.session.pop('fido2_state'),
-        credentials=credentials,
-        response=data
-    )
-
-    key.last_used = timezone.now()
-    cross_platform = get_current_platform(request) != key.platform
-    request.session["passkey"] = {
-        'passkey': True,
-        'name': key.name,
-        'id': key.id,
-        'platform': key.platform,
-        'cross_platform': cross_platform
-    }
-    key.save()
+    request.session["passkey"] = '{}_{}'.format(key.id, key.name)
+    key.date_last_used = timezone.now()
+    key.save(update_fields=['date_last_used'])
     return key.user

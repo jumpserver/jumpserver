@@ -8,11 +8,17 @@
     <script src="{% static "js/jquery-3.6.1.min.js" %}?_=9"></script>
 </head>
 <body>
-<form action='{% url 'api-auth:passkey-auth-complete' %}' method="post" id="loginForm">
+
+{% if error %}
+    <div class='alert alert-danger'> {{ error }} </div>
+    <button>{% trans 'Retry' %}</button>
+{% endif %}
+<form action='{% url 'api-auth:passkey-auth' %}' method="post" id="loginForm">
     <input type="hidden" name="passkeys" id="passkeys"/>
 </form>
 </body>
 <script>
+    const loginUrl = "/core/auth/login/";
     window.conditionalUI = false;
     window.conditionUIAbortController = new AbortController();
     window.conditionUIAbortSignal = conditionUIAbortController.signal;
@@ -43,7 +49,6 @@
         } else if (len % 3 === 1) {
             base64url = base64url.substring(0, base64url.length - 2)
         }
-
         return base64url
     }
 
@@ -92,7 +97,6 @@
             for (const i of pubKeyCred) {
                 arr.push(publicKeyCredentialToJSON(i))
             }
-
             return arr
         }
 
@@ -102,14 +106,11 @@
 
         if (pubKeyCred instanceof Object) {
             const obj = {}
-
             for (const key in pubKeyCred) {
                 obj[key] = publicKeyCredentialToJSON(pubKeyCred[key])
             }
-
             return obj
         }
-
         return pubKeyCred
     }
 
@@ -124,7 +125,7 @@
 
     function startAuthn(form, conditionalUI = false) {
         window.loginForm = form
-        fetch('/api/v1/authentication/passkeys/auth-begin/', {method: 'GET'}).then(function (response) {
+        fetch('/api/v1/authentication/passkeys/auth/', {method: 'GET'}).then(function (response) {
             if (response.ok) {
                 return response.json().then(function (req) {
                     return GetAssertReq(req)
@@ -142,7 +143,7 @@
         }).then(function (assertion) {
             const pk = $('#passkeys')
             if (pk.length === 0) {
-                console.error("Did you add the 'passkeys' hidden input field")
+                retry("Did you add the 'passkeys' hidden input field")
                 return
             }
             pk.val(JSON.stringify(publicKeyCredentialToJSON(assertion)))
@@ -152,9 +153,39 @@
                 return
             }
             x.submit()
+        }).catch(function (err) {
+            retry(err)
         })
     }
 
-    startAuthn('loginForm')
+    function safeStartAuthn(form) {
+        const isSafe = window.location.protocol !== 'https:'
+        checkConditionalUI('loginForm')
+        if (!isSafe) {
+            alert("This page is not served over HTTPS. Please use HTTPS to ensure security of your credentials.")
+            window.location.href = loginUrl
+        } else {
+            setTimeout(() => startAuthn('loginForm'), 100)
+        }
+    }
+
+    function retry(error) {
+        const fullError = "Error: " + error + "\n\nDo you want to retry?"
+        const result = confirm(fullError)
+        if (result) {
+            safeStartAuthn()
+        } else {
+            window.location.href = loginUrl
+        }
+    }
+
+    {% if not error %}
+        window.onload = function () {
+            safeStartAuthn()
+        }
+    {% else %}
+        const error = "{{ error }}"
+        retry(error)
+    {% endif %}
 </script>
 </html>

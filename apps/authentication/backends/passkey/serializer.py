@@ -1,15 +1,13 @@
 from rest_framework import serializers
 
-from .models import UserPasskey
+from .models import Passkey
 
 
 class PassKeySerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserPasskey
-        fields = '__all__'
-        read_only_fields = ('user', 'credential_id', 'token', 'added_on', 'last_used')
-        extra_kwargs = {
-            'name': {'required': True},
-            'enabled': {'required': True},
-            'platform': {'required': True},
-        }
+        model = Passkey
+        fields = [
+            'id', 'name', 'is_active', 'created_by',
+            'date_last_used', 'date_created',
+        ]
+        read_only_fields = list(set(fields) - {'is_active'})

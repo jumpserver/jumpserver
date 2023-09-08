@@ -1,9 +1,9 @@
 from django.conf import settings
 
-from ..base import JMSBaseAuthBackend
+from ..base import JMSModelBackend
 
 
-class PasskeyAuthBackend(JMSBaseAuthBackend):
+class PasskeyAuthBackend(JMSModelBackend):
     @staticmethod
     def is_enabled():
         return settings.AUTH_PASSKEY

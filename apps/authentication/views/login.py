@@ -93,9 +93,9 @@ class UserLoginContextMixin:
             },
             {
                 'name': _("Passkey"),
-                'enabled': True,
-                'url': reverse('api-auth:passkey-auth'),
-                'logo': static('img/login_feishu_logo.png')
+                'enabled': settings.AUTH_PASSKEY,
+                'url': reverse('api-auth:passkey-login'),
+                'logo': static('img/login_passkey.png')
             }
         ]
         return [method for method in auth_methods if method['enabled']]
@@ -309,6 +309,12 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
         if self.request.session.get('auto_login'):
             age = self.request.session.get_expiry_age()
             self.request.session.set_expiry(age)
+
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        if request.user.is_authenticated:
+            response.set_cookie('jms_username', request.user.username)
+        return response
 
     def get_redirect_url(self, *args, **kwargs):
         try:
