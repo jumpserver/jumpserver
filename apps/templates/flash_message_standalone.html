@@ -12,7 +12,7 @@
     </style>
     <div>
         <p>
-            <div class="alert alert-msg" id="messages">
+            <div class="alert {% if error %} alert-danger {% else %} alert-info {% endif %}" id="messages">
             {% if error %}
                 {{ error }}
             {% else %}
@@ -44,6 +44,7 @@
 
 {% block custom_foot_js %}
     <script>
+    var ttl = 2
     var message = ''
     var time = '{{ interval }}'
     {% if error %}
@@ -56,8 +57,8 @@
         if (time >= 0) {
             var msg = message + '， <b>' + time + '</b> ...';
             $('#messages').html(msg);
-            time--;
-            setTimeout(redirect_page, 1000);
+            time -= ttl;
+            setTimeout(redirect_page, ttl * 1000);
         } else {
             window.location.href = "{{ redirect_url }}";
         }

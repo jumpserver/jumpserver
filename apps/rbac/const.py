@@ -147,6 +147,7 @@ only_system_permissions = (
     ('authentication', 'accesskey', '*', '*'),
     ('authentication', 'superconnectiontoken', '*', '*'),
     ('authentication', 'temptoken', '*', '*'),
+    ('authentication', 'passkey', '*', '*'),
     ('tickets', '*', '*', '*'),
     ('orgs', 'organization', 'view', 'rootorg'),
     ('terminal', 'applet', '*', '*'),

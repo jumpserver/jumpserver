@@ -1,7 +1,7 @@
 #
+from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
-from django.http import HttpResponse
 from django.views.generic.base import TemplateView
 
 from common.utils import bulk_get, FlashMessageUtil

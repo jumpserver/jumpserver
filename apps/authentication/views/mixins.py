@@ -16,12 +16,19 @@ class METAMixin:
 
 class FlashMessageMixin:
     @staticmethod
-    def get_response(redirect_url, title, msg, m_type='message'):
-        message_data = {'title': title, 'interval': 5, 'redirect_url': redirect_url, m_type: msg}
+    def get_response(redirect_url='', title='', msg='', m_type='message', interval=5):
+        message_data = {
+            'title': title, 'interval': interval,
+            'redirect_url': redirect_url,
+        }
+        if m_type == 'error':
+            message_data['error'] = msg
+        else:
+            message_data['message'] = msg
         return FlashMessageUtil.gen_and_redirect_to(message_data)
 
-    def get_success_response(self, redirect_url, title, msg):
-        return self.get_response(redirect_url, title, msg)
+    def get_success_response(self, redirect_url, title, msg, **kwargs):
+        return self.get_response(redirect_url, title, msg, m_type='success', **kwargs)
 
-    def get_failed_response(self, redirect_url, title, msg):
-        return self.get_response(redirect_url, title, msg, 'error')
+    def get_failed_response(self, redirect_url, title, msg, interval=10):
+        return self.get_response(redirect_url, title, msg, 'error', interval)
