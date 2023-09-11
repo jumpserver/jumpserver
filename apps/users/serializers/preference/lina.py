@@ -7,11 +7,13 @@ from common.serializers.fields import EncryptedField
 class BasicSerializer(serializers.Serializer):
     secret_key = EncryptedField(
         required=False, max_length=1024,
-        write_only=True, allow_blank=True, label=_('Secret Key')
+        write_only=True, allow_blank=True,
+        label=_('New file encryption password')
     )
     secret_key_again = EncryptedField(
         required=False, max_length=1024,
-        write_only=True, allow_blank=True, label=_('Secret Key Again')
+        write_only=True, allow_blank=True,
+        label=_('Confirm file encryption password')
     )
 
     def validate(self, attrs):

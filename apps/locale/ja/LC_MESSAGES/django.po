@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-04 13:26+0800\n"
+"POT-Creation-Date: 2023-09-11 15:24+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -250,7 +250,7 @@ msgid "Version"
 msgstr "バージョン"
 
 #: accounts/models/account.py:56 accounts/serializers/account/account.py:204
-#: users/models/user.py:838
+#: users/models/user.py:835
 msgid "Source"
 msgstr "ソース"
 
@@ -532,9 +532,9 @@ msgstr "アカウントの確認"
 #: terminal/models/component/endpoint.py:94
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:84 users/forms/profile.py:33
-#: users/models/group.py:13 users/models/user.py:787
-#: xpack/plugins/cloud/models.py:32 xpack/plugins/cloud/models.py:273
-#: xpack/plugins/cloud/serializers/task.py:68
+#: users/models/group.py:13 users/models/preference.py:11
+#: users/models/user.py:787 xpack/plugins/cloud/models.py:32
+#: xpack/plugins/cloud/models.py:273 xpack/plugins/cloud/serializers/task.py:68
 msgid "Name"
 msgstr "名前"
 
@@ -658,7 +658,7 @@ msgstr "アカウントの存在ポリシー"
 #: assets/serializers/asset/common.py:121 assets/serializers/cagegory.py:8
 #: assets/serializers/platform.py:128 assets/serializers/platform.py:224
 #: perms/serializers/user_permission.py:26 settings/models.py:34
-#: tickets/models/ticket/apply_application.py:13
+#: tickets/models/ticket/apply_application.py:13 users/models/preference.py:12
 msgid "Category"
 msgstr "カテゴリ"
 
@@ -743,8 +743,8 @@ msgstr "ID"
 #: terminal/notifications.py:205 terminal/serializers/command.py:16
 #: terminal/templates/terminal/_msg_command_warning.html:6
 #: terminal/templates/terminal/_msg_session_sharing.html:6
-#: tickets/models/comment.py:21 users/const.py:14 users/models/user.py:981
-#: users/models/user.py:1017 users/serializers/group.py:18
+#: tickets/models/comment.py:21 users/const.py:14 users/models/user.py:985
+#: users/models/user.py:1021 users/serializers/group.py:18
 msgid "User"
 msgstr "ユーザー"
 
@@ -815,7 +815,7 @@ msgstr "关联平台，可以配置推送参数，如果不关联，则使用默
 #: terminal/models/component/endpoint.py:24
 #: terminal/models/component/endpoint.py:104
 #: terminal/models/session/session.py:46 tickets/models/comment.py:32
-#: tickets/models/ticket/general.py:297 users/models/user.py:826
+#: tickets/models/ticket/general.py:297 users/models/user.py:823
 #: xpack/plugins/cloud/models.py:39 xpack/plugins/cloud/models.py:109
 msgid "Comment"
 msgstr "コメント"
@@ -972,7 +972,7 @@ msgstr "レビュー担当者"
 msgid "Active"
 msgstr "アクティブ"
 
-#: acls/models/base.py:81 users/apps.py:9
+#: acls/models/base.py:81 users/apps.py:9 users/models/preference.py:16
 msgid "Users"
 msgstr "ユーザー"
 
@@ -1216,6 +1216,9 @@ msgid "Disabled"
 msgstr "無効"
 
 #: assets/const/base.py:34 settings/serializers/basic.py:6
+#: users/serializers/preference/koko.py:15
+#: users/serializers/preference/lina.py:32
+#: users/serializers/preference/luna.py:60
 msgid "Basic"
 msgstr "基本"
 
@@ -1242,7 +1245,7 @@ msgstr "クラウド サービス"
 
 #: assets/const/category.py:14 assets/models/asset/gpt.py:11
 #: assets/models/asset/web.py:16 audits/const.py:35
-#: terminal/models/applet/applet.py:27
+#: terminal/models/applet/applet.py:27 users/const.py:47
 msgid "Web"
 msgstr "Web"
 
@@ -1281,7 +1284,7 @@ msgstr "ファイアウォール"
 
 #: assets/const/gpt.py:7
 msgid "ChatGPT"
-msgstr ""
+msgstr "ChatGPT"
 
 #: assets/const/host.py:12 rbac/tree.py:28
 msgid "Other"
@@ -1427,18 +1430,18 @@ msgstr "SSHパブリックキー"
 #: assets/models/_user.py:28 assets/models/automations/base.py:114
 #: assets/models/cmd_filter.py:41 assets/models/group.py:19
 #: common/db/models.py:34 ops/models/base.py:54 ops/models/job.py:227
-#: users/models/user.py:1018
+#: users/models/user.py:1022
 msgid "Date created"
 msgstr "作成された日付"
 
 #: assets/models/_user.py:29 assets/models/cmd_filter.py:42
-#: common/db/models.py:35 users/models/user.py:847
+#: common/db/models.py:35 users/models/user.py:844
 msgid "Date updated"
 msgstr "更新日"
 
 #: assets/models/_user.py:30 assets/models/cmd_filter.py:44
 #: assets/models/cmd_filter.py:91 assets/models/group.py:18
-#: common/db/models.py:32 users/models/user.py:833
+#: common/db/models.py:32 users/models/user.py:830
 #: users/serializers/group.py:29
 msgid "Created by"
 msgstr "によって作成された"
@@ -1681,7 +1684,7 @@ msgstr "デフォルト"
 msgid "Default asset group"
 msgstr "デフォルトアセットグループ"
 
-#: assets/models/label.py:15 rbac/const.py:6 users/models/user.py:1003
+#: assets/models/label.py:15 rbac/const.py:6 users/models/user.py:1007
 msgid "System"
 msgstr "システム"
 
@@ -1690,6 +1693,7 @@ msgstr "システム"
 #: authentication/models/connection_token.py:29
 #: authentication/serializers/connect_token_secret.py:122
 #: common/serializers/common.py:86 settings/models.py:33
+#: users/models/preference.py:13
 msgid "Value"
 msgstr "値"
 
@@ -2324,7 +2328,7 @@ msgstr "ユーザーエージェント"
 #: audits/models.py:191 audits/serializers.py:48
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
 #: users/forms/profile.py:65 users/models/user.py:810
-#: users/serializers/profile.py:126
+#: users/serializers/profile.py:102
 msgid "MFA"
 msgstr "MFA"
 
@@ -2379,7 +2383,7 @@ msgstr "認証トークン"
 #: audits/signal_handlers/login_log.py:31 authentication/notifications.py:73
 #: authentication/views/login.py:77 authentication/views/wecom.py:159
 #: notifications/backends/__init__.py:11 settings/serializers/auth/wecom.py:10
-#: users/models/user.py:740 users/models/user.py:848
+#: users/models/user.py:740 users/models/user.py:845
 msgid "WeCom"
 msgstr "企業微信"
 
@@ -2387,14 +2391,14 @@ msgstr "企業微信"
 #: authentication/views/login.py:89 notifications/backends/__init__.py:14
 #: settings/serializers/auth/feishu.py:10
 #: settings/serializers/auth/feishu.py:13 users/models/user.py:742
-#: users/models/user.py:850
+#: users/models/user.py:847
 msgid "FeiShu"
 msgstr "本を飛ばす"
 
 #: audits/signal_handlers/login_log.py:33 authentication/views/dingtalk.py:159
 #: authentication/views/login.py:83 notifications/backends/__init__.py:12
 #: settings/serializers/auth/dingtalk.py:10 users/models/user.py:741
-#: users/models/user.py:849
+#: users/models/user.py:846
 msgid "DingTalk"
 msgstr "DingTalk"
 
@@ -2855,7 +2859,7 @@ msgstr "再利用可能"
 #: authentication/models/connection_token.py:47
 #: authentication/models/temp_token.py:13 perms/models/asset_permission.py:74
 #: tickets/models/ticket/apply_application.py:31
-#: tickets/models/ticket/apply_asset.py:20 users/models/user.py:831
+#: tickets/models/ticket/apply_asset.py:20 users/models/user.py:828
 msgid "Date expired"
 msgstr "期限切れの日付"
 
@@ -3004,13 +3008,13 @@ msgid "Show"
 msgstr "表示"
 
 #: authentication/templates/authentication/_access_key_modal.html:66
-#: users/models/user.py:635 users/serializers/profile.py:116
+#: users/models/user.py:635 users/serializers/profile.py:92
 #: users/templates/users/user_verify_mfa.html:36
 msgid "Disable"
 msgstr "無効化"
 
 #: authentication/templates/authentication/_access_key_modal.html:67
-#: users/models/user.py:636 users/serializers/profile.py:117
+#: users/models/user.py:636 users/serializers/profile.py:93
 #: users/templates/users/mfa_setting.html:26
 #: users/templates/users/mfa_setting.html:68
 msgid "Enable"
@@ -3171,7 +3175,9 @@ msgstr "キャンセル"
 msgid ""
 "Configuration file has problems and cannot be logged in. Please contact the "
 "administrator or view latest docs"
-msgstr "設定ファイルに問題があり、ログインできません。管理者に連絡するか、最新のドキュメントを参照してください。"
+msgstr ""
+"設定ファイルに問題があり、ログインできません。管理者に連絡するか、最新のド"
+"キュメントを参照してください。"
 
 #: authentication/templates/authentication/login.html:238
 msgid "If you are administrator, you can update the config resolve it, set"
@@ -3458,7 +3464,7 @@ msgstr "は破棄されます"
 msgid "discard time"
 msgstr "時間を捨てる"
 
-#: common/db/models.py:33 users/models/user.py:834
+#: common/db/models.py:33 users/models/user.py:831
 msgid "Updated by"
 msgstr "によって更新"
 
@@ -3589,7 +3595,7 @@ msgstr "{} 秒待ってから送信してください"
 
 #: common/serializers/common.py:90
 msgid "Children"
-msgstr ""
+msgstr "ノード"
 
 #: common/serializers/fields.py:105
 #, python-brace-format
@@ -4138,7 +4144,7 @@ msgstr "参加しているすべての組織を表示できます"
 
 #: orgs/models.py:233
 msgid "Can not delete virtual org"
-msgstr ""
+msgstr "仮想組織を削除できませんでした"
 
 #: orgs/tasks.py:9
 msgid "Refresh organization cache"
@@ -4353,7 +4359,7 @@ msgstr "組織の役割バインディング"
 msgid "System role binding"
 msgstr "システムロールバインディング"
 
-#: rbac/serializers/permission.py:25 users/serializers/profile.py:132
+#: rbac/serializers/permission.py:25 users/serializers/profile.py:108
 msgid "Perms"
 msgstr "パーマ"
 
@@ -4485,7 +4491,7 @@ msgstr "携帯番号をテストこのフィールドは必須です"
 msgid "Settings"
 msgstr "設定"
 
-#: settings/models.py:35
+#: settings/models.py:35 users/models/preference.py:14
 msgid "Encrypted"
 msgstr "暗号化された"
 
@@ -5561,17 +5567,6 @@ msgstr "Razor の有効化"
 msgid "Enable SSH Client"
 msgstr "SSH Clientの有効化"
 
-#: settings/serializers/terminal.py:52
-msgid "Default graphics resolution"
-msgstr "デフォルトのグラフィック解像度"
-
-#: settings/serializers/terminal.py:53
-msgid ""
-"Tip: Default resolution to use when connecting graphical assets in Luna pages"
-msgstr ""
-"ヒント: Luna ページでグラフィック アセットを接続するときに使用するデフォルト"
-"の解像度"
-
 #: settings/tasks/ldap.py:24
 msgid "Periodic import ldap user"
 msgstr "LDAP ユーザーを定期的にインポートする"
@@ -5838,6 +5833,7 @@ msgid "Home page"
 msgstr "ホームページ"
 
 #: templates/resource_download.html:18 templates/resource_download.html:33
+#: users/const.py:48
 msgid "Client"
 msgstr "クライアント"
 
@@ -5979,7 +5975,7 @@ msgstr "SFTP クライアント"
 
 #: terminal/connect_methods.py:33
 msgid "DB Guide"
-msgstr ""
+msgstr "DB 接続ウィザード"
 
 #: terminal/connect_methods.py:34
 msgid "DB Client"
@@ -6024,7 +6020,7 @@ msgstr "一致しない"
 
 #: terminal/const.py:83
 msgid "Tunnel"
-msgstr ""
+msgstr "ちかチャネル"
 
 #: terminal/const.py:85
 msgid "SFTP"
@@ -6058,10 +6054,8 @@ msgstr "一括作成非サポート"
 msgid "Storage is invalid"
 msgstr "ストレージが無効です"
 
-#: terminal/models/applet/applet.py:30
-#, fuzzy
-#| msgid "Community"
-msgid "Community Edition"
+#: terminal/models/applet/applet.py:30 xpack/plugins/license/models.py:86
+msgid "Community edition"
 msgstr "コミュニティ版"
 
 #: terminal/models/applet/applet.py:31
@@ -6716,7 +6710,7 @@ msgstr "オープン"
 
 #: tickets/const.py:18 tickets/const.py:31
 msgid "Reopen"
-msgstr ""
+msgstr "再オープン"
 
 #: tickets/const.py:19 tickets/const.py:32
 msgid "Approved"
@@ -7070,6 +7064,30 @@ msgstr "リセットリンクが生成され、ユーザーに送信されます
 msgid "Set password"
 msgstr "パスワードの設定"
 
+#: users/const.py:23
+msgid "AUTO"
+msgstr "自動"
+
+#: users/const.py:31
+msgid "Full screen"
+msgstr "フルスクリーン"
+
+#: users/const.py:32
+msgid "Multi screen"
+msgstr "マルチスクリーンディスプレイ"
+
+#: users/const.py:33
+msgid "Drives redirect"
+msgstr "ディスクマウント"
+
+#: users/const.py:52
+msgid "Replace"
+msgstr "置換"
+
+#: users/const.py:53
+msgid "Suffix"
+msgstr "接尾辞を付ける"
+
 #: users/exceptions.py:10
 msgid "MFA not enabled"
 msgstr "MFAが有効化されていません"
@@ -7148,8 +7166,8 @@ msgstr "ここにid_rsa.pubを貼り付けます。"
 msgid "Public key should not be the same as your old one."
 msgstr "公開鍵は古いものと同じであってはなりません。"
 
-#: users/forms/profile.py:162 users/serializers/profile.py:100
-#: users/serializers/profile.py:183 users/serializers/profile.py:210
+#: users/forms/profile.py:162 users/serializers/profile.py:76
+#: users/serializers/profile.py:159 users/serializers/profile.py:186
 msgid "Not a valid ssh public key"
 msgstr "有効なssh公開鍵ではありません"
 
@@ -7158,7 +7176,11 @@ msgstr "有効なssh公開鍵ではありません"
 msgid "Public key"
 msgstr "公開キー"
 
-#: users/models/user.py:637 users/serializers/profile.py:118
+#: users/models/preference.py:38
+msgid "Preference"
+msgstr "のようにふるまう"
+
+#: users/models/user.py:637 users/serializers/profile.py:94
 msgid "Force enable"
 msgstr "強制有効"
 
@@ -7187,44 +7209,40 @@ msgstr "OTP 秘密"
 msgid "Private key"
 msgstr "ssh秘密鍵"
 
-#: users/models/user.py:823
-msgid "Secret key"
-msgstr "秘密キー"
-
-#: users/models/user.py:828 users/serializers/profile.py:149
+#: users/models/user.py:825 users/serializers/profile.py:125
 #: users/serializers/user.py:169
 msgid "Is first login"
 msgstr "最初のログインです"
 
-#: users/models/user.py:842
+#: users/models/user.py:839
 msgid "Date password last updated"
 msgstr "最終更新日パスワード"
 
-#: users/models/user.py:845
+#: users/models/user.py:842
 msgid "Need update password"
 msgstr "更新パスワードが必要"
 
-#: users/models/user.py:988
+#: users/models/user.py:992
 msgid "Can invite user"
 msgstr "ユーザーを招待できます"
 
-#: users/models/user.py:989
+#: users/models/user.py:993
 msgid "Can remove user"
 msgstr "ユーザーを削除できます"
 
-#: users/models/user.py:990
+#: users/models/user.py:994
 msgid "Can match user"
 msgstr "ユーザーに一致できます"
 
-#: users/models/user.py:999
+#: users/models/user.py:1003
 msgid "Administrator"
 msgstr "管理者"
 
-#: users/models/user.py:1002
+#: users/models/user.py:1006
 msgid "Administrator is the super user of system"
 msgstr "管理者はシステムのスーパーユーザーです"
 
-#: users/models/user.py:1027
+#: users/models/user.py:1031
 msgid "User password history"
 msgstr "ユーザーパスワード履歴"
 
@@ -7259,21 +7277,73 @@ msgstr "SSHキーのリセット"
 msgid "Reset MFA"
 msgstr "MFAのリセット"
 
+#: users/serializers/preference/koko.py:10
+msgid "File name conflict resolution"
+msgstr "ファイル名競合ソリューション"
+
+#: users/serializers/preference/lina.py:11
+msgid "New file encryption password"
+msgstr "新しいファイルの暗号化パスワード"
+
+#: users/serializers/preference/lina.py:16
+msgid "Confirm file encryption password"
+msgstr "ファイルの暗号化パスワードを確認する"
+
+#: users/serializers/preference/lina.py:24 users/serializers/profile.py:48
+msgid "The newly set password is inconsistent"
+msgstr "新しく設定されたパスワードが一致しない"
+
+#: users/serializers/preference/luna.py:23
+msgid "Async loading of asset tree"
+msgstr "非同期ロード資産ツリー"
+
+#: users/serializers/preference/luna.py:30
+msgid "RDP resolution"
+msgstr "RDP 解像度"
+
+#: users/serializers/preference/luna.py:34
+msgid "Keyboard layout"
+msgstr "キーボードレイアウト"
+
+#: users/serializers/preference/luna.py:38
+msgid "RDP client option"
+msgstr "RDPクライアントオプション"
+
+#: users/serializers/preference/luna.py:42
+msgid "Remote application connection method"
+msgstr "リモートアプリケーション接続方式"
+
+#: users/serializers/preference/luna.py:49
+msgid "Character terminal font size"
+msgstr "文字終端フォントサイズ"
+
+#: users/serializers/preference/luna.py:52
+msgid "Backspace as Ctrl+H"
+msgstr "文字終端Backspace As Ctrl+H"
+
+#: users/serializers/preference/luna.py:55
+msgid "Right click quickly paste"
+msgstr "右クリックでクイック貼り付け"
+
+#: users/serializers/preference/luna.py:61
+msgid "Graphics"
+msgstr "図形化"
+
+#: users/serializers/preference/luna.py:62
+msgid "Command line"
+msgstr "コマンドライン"
+
 #: users/serializers/profile.py:29
 msgid "The old password is incorrect"
 msgstr "古いパスワードが正しくありません"
 
-#: users/serializers/profile.py:36 users/serializers/profile.py:197
+#: users/serializers/profile.py:36 users/serializers/profile.py:173
 msgid "Password does not match security rules"
 msgstr "パスワードがセキュリティルールと一致しない"
 
 #: users/serializers/profile.py:40
 msgid "The new password cannot be the last {} passwords"
 msgstr "新しいパスワードを最後の {} 個のパスワードにすることはできません"
-
-#: users/serializers/profile.py:48 users/serializers/profile.py:71
-msgid "The newly set password is inconsistent"
-msgstr "新しく設定されたパスワードが一致しない"
 
 #: users/serializers/user.py:42
 msgid "System roles"
@@ -8257,29 +8327,13 @@ msgid "License"
 msgstr "ライセンス"
 
 #: xpack/plugins/license/models.py:80
-#, fuzzy
-#| msgid "Enterprise Standard Edition"
 msgid "Standard edition"
 msgstr "エンタープライズ標準版"
 
 #: xpack/plugins/license/models.py:82
-#, fuzzy
-#| msgid "Enterprise Basic Edition"
 msgid "Enterprise edition"
 msgstr "エンタープライズ基本版"
 
 #: xpack/plugins/license/models.py:84
 msgid "Ultimate edition"
-msgstr ""
-
-#: xpack/plugins/license/models.py:86
-#, fuzzy
-#| msgid "Community"
-msgid "Community edition"
-msgstr "コミュニティ版"
-
-#~ msgid "SFTP home"
-#~ msgstr "SFTP ルート パス"
-
-#~ msgid "Enterprise Flagship Edition"
-#~ msgstr "エンタープライズ旗艦版"
+msgstr "エンタープライズ・フラッグシップ・エディション"
