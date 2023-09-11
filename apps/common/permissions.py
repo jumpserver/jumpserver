@@ -12,7 +12,7 @@ from common.utils import get_object_or_none
 from orgs.utils import tmp_to_root_org
 
 
-class IsValidUser(permissions.IsAuthenticated, permissions.BasePermission):
+class IsValidUser(permissions.IsAuthenticated):
     """Allows access to valid user, is active and not expired"""
 
     def has_permission(self, request, view):

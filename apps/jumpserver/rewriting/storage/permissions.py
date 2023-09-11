@@ -16,6 +16,8 @@ def allow_access(private_file):
     path_base = path_list[1] if len(path_list) > 1 else None
     path_perm = path_perms_map.get(path_base, None)
 
+    if ".." in request_path:
+        return False
     if not path_perm:
         return False
     if path_perm == '*' or request.user.has_perms([path_perm]):
