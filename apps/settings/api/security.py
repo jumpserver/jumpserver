@@ -26,7 +26,6 @@ class BlockIPSecurityAPI(ListAPIView):
 
         white_list = settings.SECURITY_LOGIN_IP_WHITE_LIST
         ips = list(set(ips) - set(white_list))
-        ips = settings.SECURITY_LOGIN_IP_BLACK_LIST
         ips = [ip for ip in ips if ip != '*']
         return ips
 

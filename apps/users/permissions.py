@@ -1,6 +1,5 @@
 from rest_framework import permissions
 
-from rbac.builtin import BuiltinRole
 from .utils import is_auth_password_time_valid
 
 
@@ -11,7 +10,7 @@ class IsAuthPasswdTimeValid(permissions.IsAuthenticated):
             and is_auth_password_time_valid(request.session)
 
 
-class UserObjectPermission(permissions.BasePermission):
+class UserObjectPermission(permissions.IsAuthenticated):
 
     def has_object_permission(self, request, view, obj):
         if view.action not in ['update', 'partial_update', 'destroy']:

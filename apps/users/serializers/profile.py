@@ -55,30 +55,6 @@ class UserUpdatePasswordSerializer(serializers.ModelSerializer):
         return instance
 
 
-class UserUpdateSecretKeySerializer(serializers.ModelSerializer):
-    new_secret_key = EncryptedField(required=True, max_length=128)
-    new_secret_key_again = EncryptedField(required=True, max_length=128)
-    has_secret_key = serializers.BooleanField(read_only=True, source='secret_key')
-
-    class Meta:
-        model = User
-        fields = ['has_secret_key', 'new_secret_key', 'new_secret_key_again']
-
-    def validate(self, values):
-        new_secret_key = values.get('new_secret_key', '')
-        new_secret_key_again = values.get('new_secret_key_again', '')
-        if new_secret_key != new_secret_key_again:
-            msg = _('The newly set password is inconsistent')
-            raise serializers.ValidationError({'new_secret_key_again': msg})
-        return values
-
-    def update(self, instance, validated_data):
-        new_secret_key = self.validated_data.get('new_secret_key')
-        instance.secret_key = new_secret_key
-        instance.save()
-        return instance
-
-
 class UserUpdatePublicKeySerializer(serializers.ModelSerializer):
     public_key_comment = serializers.CharField(
         source='get_public_key_comment', required=False, read_only=True, max_length=128

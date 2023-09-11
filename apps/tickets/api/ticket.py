@@ -86,7 +86,7 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         with tmp_to_root_org():
             serializer.is_valid(raise_exception=True)
-        instance = serializer.save()
+            instance = serializer.save()
         instance.approve(processor=request.user)
         return Response('ok')
 
