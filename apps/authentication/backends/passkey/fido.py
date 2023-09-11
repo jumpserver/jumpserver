@@ -1,4 +1,5 @@
 import json
+from urllib.parse import urlparse
 
 import fido2.features
 from django.conf import settings
@@ -10,7 +11,10 @@ from fido2.webauthn import PublicKeyCredentialRpEntity, AttestedCredentialData, 
 from rest_framework.serializers import ValidationError
 from user_agents.parsers import parse as ua_parse
 
+from common.utils import get_logger
 from .models import Passkey
+
+logger = get_logger(__name__)
 
 try:
     fido2.features.webauthn_json_mapping.enabled = True
@@ -32,13 +36,34 @@ def get_current_platform(request):
         return "Key"
 
 
+def get_server_id_from_request(request, allowed=()):
+    origin = request.META.get('HTTP_REFERER')
+    if not origin:
+        origin = request.get_host()
+    p = urlparse(origin)
+    if p.netloc in allowed or p.hostname in allowed:
+        return p.hostname
+    else:
+        return 'localhost'
+
+
+def default_server_id(request):
+    domains = settings.ALLOWED_DOMAINS
+    return get_server_id_from_request(request, allowed=domains)
+
+
 def get_server(request=None):
     """Get Server Info from settings and returns a Fido2Server"""
-    if callable(settings.FIDO_SERVER_ID):
-        fido_server_id = settings.FIDO_SERVER_ID(request)
-    else:
-        fido_server_id = settings.FIDO_SERVER_ID
 
+    server_id = settings.FIDO_SERVER_ID or default_server_id(request)
+    if callable(server_id):
+        fido_server_id = settings.FIDO_SERVER_ID(request)
+    elif ',' in server_id:
+        fido_server_id = get_server_id_from_request(request, allowed=server_id.split(','))
+    else:
+        fido_server_id = server_id
+
+    logger.debug('Fido server id: {}'.format(fido_server_id))
     if callable(settings.FIDO_SERVER_NAME):
         fido_server_name = settings.FIDO_SERVER_NAME(request)
     else:

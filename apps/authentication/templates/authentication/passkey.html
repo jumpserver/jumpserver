@@ -78,6 +78,10 @@
     }
 
     function checkConditionalUI(form) {
+        if (!navigator.credentials) {
+            alert('WebAuthn is not supported in this browser')
+            return
+        }
         if (window.PublicKeyCredential && PublicKeyCredential.isConditionalMediationAvailable) {
             // Check if conditional mediation is available.
             PublicKeyCredential.isConditionalMediationAvailable().then((result) => {
@@ -159,8 +163,8 @@
     }
 
     function safeStartAuthn(form) {
-        const isSafe = window.location.protocol !== 'https:'
         checkConditionalUI('loginForm')
+        const isSafe = window.location.protocol === 'https:'
         if (!isSafe) {
             alert("This page is not served over HTTPS. Please use HTTPS to ensure security of your credentials.")
             window.location.href = loginUrl

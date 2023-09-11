@@ -382,8 +382,8 @@ class Config(dict):
         'AUTH_OAUTH2_USER_ATTR_MAP': {
             'name': 'name', 'username': 'username', 'email': 'email'
         },
-        'AUTH_PASSKEY': True,
-        'FIDO_SERVER_ID': 'localhost',
+        'AUTH_PASSKEY': False,
+        'FIDO_SERVER_ID': '',
         'FIDO_SERVER_NAME': 'JumpServer',
 
         # 企业微信

@@ -266,9 +266,9 @@ class DatesLoginMetricMixin:
 
 class IndexApi(DateTimeMixin, DatesLoginMetricMixin, APIView):
     http_method_names = ['get']
-
-    def check_permissions(self, request):
-        return request.user.has_perm('rbac.view_audit | rbac.view_console')
+    rbac_perms = {
+        'GET': ['rbac.view_audit | rbac.view_console'],
+    }
 
     def get(self, request, *args, **kwargs):
         data = {}
