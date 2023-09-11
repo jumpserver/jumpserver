@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-11 17:16+0800\n"
+"POT-Creation-Date: 2023-09-11 17:52+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -446,6 +446,7 @@ msgstr "结束日期"
 
 #: accounts/models/automations/change_secret.py:44
 #: accounts/serializers/account/account.py:249 assets/const/automation.py:8
+#: authentication/templates/authentication/passkey.html:173
 #: authentication/views/base.py:26 authentication/views/base.py:27
 #: authentication/views/base.py:28 common/const/choices.py:20
 msgid "Error"
@@ -2522,15 +2523,17 @@ msgstr "无效的令牌头。符号字符串不应包含无效字符。"
 msgid "Invalid token or cache refreshed."
 msgstr "刷新的令牌或缓存无效。"
 
+#: authentication/backends/passkey/api.py:52
+msgid "Auth failed"
+msgstr "认证失败"
+
 #: authentication/backends/passkey/fido.py:146
-#, fuzzy
-#| msgid "This field is required."
 msgid "This key is not registered"
-msgstr "该字段是必填项。"
+msgstr "此密钥未注册"
 
 #: authentication/backends/passkey/models.py:13
 msgid "Added on"
-msgstr ""
+msgstr "附加"
 
 #: authentication/backends/passkey/models.py:14
 msgid "Date last used"
@@ -3202,9 +3205,15 @@ msgstr "返回"
 msgid "Copy success"
 msgstr "复制成功"
 
-#: authentication/templates/authentication/passkey.html:14
-msgid "Retry"
-msgstr ""
+#: authentication/templates/authentication/passkey.html:162
+msgid ""
+"This page is not served over HTTPS. Please use HTTPS to ensure security of "
+"your credentials."
+msgstr "本页面未使用 HTTPS 协议，请使用 HTTPS 协议以确保您的凭据安全。"
+
+#: authentication/templates/authentication/passkey.html:173
+msgid "Do you want to retry ?"
+msgstr "是否重试 ？"
 
 #: authentication/utils.py:28 common/utils/ip/geoip/utils.py:24
 #: xpack/plugins/cloud/const.py:29

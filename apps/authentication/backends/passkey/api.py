@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.utils.translation import gettext as _
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.viewsets import ModelViewSet
@@ -8,12 +9,12 @@ from rest_framework.viewsets import ModelViewSet
 from authentication.mixins import AuthMixin
 from .fido import register_begin, register_complete, auth_begin, auth_complete
 from .models import Passkey
-from .serializer import PassKeySerializer
+from .serializer import PasskeySerializer
 from ...views import FlashMessageMixin
 
 
-class PassKeyViewSet(AuthMixin, FlashMessageMixin, ModelViewSet):
-    serializer_class = PassKeySerializer
+class PasskeyViewSet(AuthMixin, FlashMessageMixin, ModelViewSet):
+    serializer_class = PasskeySerializer
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
@@ -48,7 +49,7 @@ class PassKeyViewSet(AuthMixin, FlashMessageMixin, ModelViewSet):
             return self.redirect_to_error(str(e))
 
         if not user:
-            return self.redirect_to_error('认证失败')
+            return self.redirect_to_error(_('Auth failed'))
 
         try:
             self.check_oauth2_auth(user, settings.AUTH_BACKEND_PASSKEY)

@@ -3,7 +3,7 @@ from rest_framework import serializers
 from .models import Passkey
 
 
-class PassKeySerializer(serializers.ModelSerializer):
+class PasskeySerializer(serializers.ModelSerializer):
     class Meta:
         model = Passkey
         fields = [

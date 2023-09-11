@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-11 17:16+0800\n"
+"POT-Creation-Date: 2023-09-11 17:52+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -447,6 +447,7 @@ msgstr "終了日"
 
 #: accounts/models/automations/change_secret.py:44
 #: accounts/serializers/account/account.py:249 assets/const/automation.py:8
+#: authentication/templates/authentication/passkey.html:173
 #: authentication/views/base.py:26 authentication/views/base.py:27
 #: authentication/views/base.py:28 common/const/choices.py:20
 msgid "Error"
@@ -2540,6 +2541,12 @@ msgstr ""
 msgid "Invalid token or cache refreshed."
 msgstr "無効なトークンまたはキャッシュの更新。"
 
+#: authentication/backends/passkey/api.py:52
+#, fuzzy
+#| msgid "MFA failed"
+msgid "Auth failed"
+msgstr "MFAに失敗しました"
+
 #: authentication/backends/passkey/fido.py:146
 msgid "This key is not registered"
 msgstr "このキーは登録されていません"
@@ -3238,9 +3245,17 @@ msgstr "返品"
 msgid "Copy success"
 msgstr "コピー成功"
 
-#: authentication/templates/authentication/passkey.html:14
-msgid "Retry"
+#: authentication/templates/authentication/passkey.html:162
+msgid ""
+"This page is not served over HTTPS. Please use HTTPS to ensure security of "
+"your credentials."
 msgstr ""
+"このページはHTTPSで提供されていません。HTTPSを使用して、資格情報のセキュリ"
+"ティを確保してください。"
+
+#: authentication/templates/authentication/passkey.html:173
+msgid "Do you want to retry ?"
+msgstr "再試行しますか？"
 
 #: authentication/utils.py:28 common/utils/ip/geoip/utils.py:24
 #: xpack/plugins/cloud/const.py:29
@@ -4859,7 +4874,9 @@ msgstr "FIDOサーバーID"
 msgid ""
 "The hostname can using passkey auth, If not set, will use request host, If "
 "multiple domains, use comma to separate"
-msgstr "ホスト名はパスキー認証を使用できます。設定されていない場合は、リクエストホストを使用します。複数のドメインの場合は、コンマで区切ってください。"
+msgstr ""
+"ホスト名はパスキー認証を使用できます。設定されていない場合は、リクエストホス"
+"トを使用します。複数のドメインの場合は、コンマで区切ってください。"
 
 #: settings/serializers/auth/passkey.py:19
 msgid "FIDO server name"

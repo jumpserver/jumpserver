@@ -8,11 +8,6 @@
     <script src="{% static "js/jquery-3.6.1.min.js" %}?_=9"></script>
 </head>
 <body>
-
-{% if error %}
-    <div class='alert alert-danger'> {{ error }} </div>
-    <button>{% trans 'Retry' %}</button>
-{% endif %}
 <form action='{% url 'api-auth:passkey-auth' %}' method="post" id="loginForm">
     <input type="hidden" name="passkeys" id="passkeys"/>
 </form>
@@ -164,9 +159,10 @@
 
     function safeStartAuthn(form) {
         checkConditionalUI('loginForm')
+        const errorMsg = "{% trans 'This page is not served over HTTPS. Please use HTTPS to ensure security of your credentials.' %}"
         const isSafe = window.location.protocol === 'https:'
-        if (!isSafe) {
-            alert("This page is not served over HTTPS. Please use HTTPS to ensure security of your credentials.")
+        if (!isSafe && location.hostname !== 'localhost') {
+            alert(errorMsg)
             window.location.href = loginUrl
         } else {
             setTimeout(() => startAuthn('loginForm'), 100)
@@ -174,7 +170,7 @@
     }
 
     function retry(error) {
-        const fullError = "Error: " + error + "\n\nDo you want to retry?"
+        const fullError = "{% trans 'Error' %}" + ': ' + error + "\n\n " + "{% trans 'Do you want to retry ?' %}"
         const result = confirm(fullError)
         if (result) {
             safeStartAuthn()
