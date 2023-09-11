@@ -2453,6 +2453,28 @@ url = "https://pypi.tuna.tsinghua.edu.cn/simple"
 reference = "tsinghua"
 
 [[package]]
+name = "fido2"
+version = "1.1.2"
+description = "FIDO2/WebAuthn library for implementing clients and servers."
+optional = false
+python-versions = ">=3.7,<4.0"
+files = [
+    {file = "fido2-1.1.2-py3-none-any.whl", hash = "sha256:a3b7d7d233dec3a4fa0d6178fc34d1cce17b820005a824f6ab96917a1e3be8d8"},
+    {file = "fido2-1.1.2.tar.gz", hash = "sha256:6110d913106f76199201b32d262b2857562cc46ba1d0b9c51fbce30dc936c573"},
+]
+
+[package.dependencies]
+cryptography = ">=2.6,<35 || >35,<44"
+
+[package.extras]
+pcsc = ["pyscard (>=1.9,<3)"]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+reference = "tsinghua"
+
+[[package]]
 name = "flower"
 version = "2.0.0"
 description = "Celery Flower"
@@ -6683,6 +6705,22 @@ url = "https://pypi.tuna.tsinghua.edu.cn/simple"
 reference = "tsinghua"
 
 [[package]]
+name = "ua-parser"
+version = "0.18.0"
+description = "Python port of Browserscope's user agent parser"
+optional = false
+python-versions = "*"
+files = [
+    {file = "ua-parser-0.18.0.tar.gz", hash = "sha256:db51f1b59bfaa82ed9e2a1d99a54d3e4153dddf99ac1435d51828165422e624e"},
+    {file = "ua_parser-0.18.0-py2.py3-none-any.whl", hash = "sha256:9d94ac3a80bcb0166823956a779186c746b50ea4c9fd9bf30fdb758553c38950"},
+]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+reference = "tsinghua"
+
+[[package]]
 name = "ucloud-sdk-python3"
 version = "0.11.50"
 description = "UCloud Service Development Kit - Python"
@@ -6753,6 +6791,25 @@ files = [
 brotli = ["brotli (>=1.0.9)", "brotlicffi (>=0.8.0)", "brotlipy (>=0.6.0)"]
 secure = ["certifi", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "ipaddress", "pyOpenSSL (>=0.14)", "urllib3-secure-extra"]
 socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+reference = "tsinghua"
+
+[[package]]
+name = "user-agents"
+version = "2.2.0"
+description = "A library to identify devices (phones, tablets) and their capabilities by parsing browser user agent strings."
+optional = false
+python-versions = "*"
+files = [
+    {file = "user-agents-2.2.0.tar.gz", hash = "sha256:d36d25178db65308d1458c5fa4ab39c9b2619377010130329f3955e7626ead26"},
+    {file = "user_agents-2.2.0-py3-none-any.whl", hash = "sha256:a98c4dc72ecbc64812c4534108806fb0a0b3a11ec3fd1eafe807cee5b0a942e7"},
+]
+
+[package.dependencies]
+ua-parser = ">=0.10.0"
 
 [package.source]
 type = "legacy"
@@ -7223,4 +7280,4 @@ reference = "tsinghua"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "f5bef179ee92691490abd486fd53596156e8af343ae8461a306c4fd8c174e348"
+content-hash = "64818ed074beae46501d024a8d24d80cc3c38dc699a4befb3ec7c33abf6a82ce"

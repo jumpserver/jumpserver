@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-11 15:24+0800\n"
+"POT-Creation-Date: 2023-09-04 13:26+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -44,6 +44,7 @@ msgid "Access key"
 msgstr "Access key"
 
 #: accounts/const/account.py:9 assets/models/_user.py:48
+#: authentication/backends/passkey/models.py:16
 #: authentication/models/sso_token.py:14 settings/serializers/feature.py:50
 msgid "Token"
 msgstr "Token"
@@ -445,6 +446,7 @@ msgstr "结束日期"
 
 #: accounts/models/automations/change_secret.py:44
 #: accounts/serializers/account/account.py:249 assets/const/automation.py:8
+#: authentication/templates/authentication/passkey.html:173
 #: authentication/views/base.py:26 authentication/views/base.py:27
 #: authentication/views/base.py:28 common/const/choices.py:20
 msgid "Error"
@@ -522,6 +524,7 @@ msgstr "账号验证"
 #: assets/models/label.py:18 assets/models/platform.py:15
 #: assets/models/platform.py:88 assets/serializers/asset/common.py:146
 #: assets/serializers/platform.py:110 assets/serializers/platform.py:223
+#: authentication/backends/passkey/models.py:10
 #: authentication/serializers/connect_token_secret.py:110 ops/mixin.py:21
 #: ops/models/adhoc.py:20 ops/models/celery.py:15 ops/models/celery.py:57
 #: ops/models/job.py:126 ops/models/playbook.py:28 ops/serializers/job.py:20
@@ -734,7 +737,7 @@ msgstr "ID"
 #: authentication/models/sso_token.py:16
 #: notifications/models/notification.py:12
 #: perms/api/user_permission/mixin.py:55 perms/models/asset_permission.py:58
-#: perms/serializers/permission.py:30 rbac/builtin.py:123
+#: perms/serializers/permission.py:30 rbac/builtin.py:124
 #: rbac/models/rolebinding.py:49 rbac/serializers/rolebinding.py:17
 #: terminal/backends/command/models.py:16 terminal/models/session/session.py:29
 #: terminal/models/session/sharing.py:34 terminal/notifications.py:156
@@ -1523,6 +1526,7 @@ msgid "Address"
 msgstr "地址"
 
 #: assets/models/asset/common.py:151 assets/models/platform.py:119
+#: authentication/backends/passkey/models.py:12
 #: authentication/serializers/connect_token_secret.py:115
 #: perms/serializers/user_permission.py:24 xpack/plugins/cloud/models.py:321
 msgid "Platform"
@@ -1743,12 +1747,13 @@ msgid "Public"
 msgstr "开放的"
 
 #: assets/models/platform.py:21 assets/serializers/platform.py:48
-#: settings/serializers/settings.py:65
+#: settings/serializers/settings.py:66
 #: users/templates/users/reset_password.html:29
 msgid "Setting"
 msgstr "设置"
 
-#: assets/models/platform.py:38 audits/const.py:49 settings/models.py:36
+#: assets/models/platform.py:38 audits/const.py:49
+#: authentication/backends/passkey/models.py:11 settings/models.py:36
 #: terminal/serializers/applet_host.py:33
 msgid "Enabled"
 msgstr "启用"
@@ -2178,7 +2183,7 @@ msgstr "连接"
 
 #: audits/const.py:30 authentication/templates/authentication/login.html:252
 #: authentication/templates/authentication/login.html:325
-#: templates/_header_bar.html:89
+#: templates/_header_bar.html:95
 msgid "Login"
 msgstr "登录"
 
@@ -2393,6 +2398,11 @@ msgstr "钉钉"
 msgid "Temporary token"
 msgstr "临时密码"
 
+#: audits/signal_handlers/login_log.py:35 authentication/views/login.py:95
+#: settings/serializers/auth/passkey.py:8
+msgid "Passkey"
+msgstr ""
+
 #: audits/tasks.py:101
 msgid "Clean audits session task log"
 msgstr "清理审计会话任务日志"
@@ -2516,6 +2526,26 @@ msgstr "无效的令牌头。符号字符串不应包含无效字符。"
 #: authentication/backends/drf.py:146
 msgid "Invalid token or cache refreshed."
 msgstr "刷新的令牌或缓存无效。"
+
+#: authentication/backends/passkey/api.py:52
+msgid "Auth failed"
+msgstr "认证失败"
+
+#: authentication/backends/passkey/fido.py:146
+msgid "This key is not registered"
+msgstr "此密钥未注册"
+
+#: authentication/backends/passkey/models.py:13
+msgid "Added on"
+msgstr "附加"
+
+#: authentication/backends/passkey/models.py:14
+msgid "Date last used"
+msgstr "最后使用日期"
+
+#: authentication/backends/passkey/models.py:15
+msgid "Credential ID"
+msgstr "凭证 ID"
 
 #: authentication/confirm/password.py:16
 msgid "Authentication failed password incorrect"
@@ -3029,7 +3059,7 @@ msgstr "代码错误"
 #: authentication/templates/authentication/_msg_reset_password_code.html:9
 #: authentication/templates/authentication/_msg_rest_password_success.html:2
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:2
-#: jumpserver/conf.py:444
+#: jumpserver/conf.py:447
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: perms/templates/perms/_msg_permed_items_expire.html:3
 #: tickets/templates/tickets/approve_check_password.html:33
@@ -3179,6 +3209,16 @@ msgstr "返回"
 msgid "Copy success"
 msgstr "复制成功"
 
+#: authentication/templates/authentication/passkey.html:162
+msgid ""
+"This page is not served over HTTPS. Please use HTTPS to ensure security of "
+"your credentials."
+msgstr "本页面未使用 HTTPS 协议，请使用 HTTPS 协议以确保您的凭据安全。"
+
+#: authentication/templates/authentication/passkey.html:173
+msgid "Do you want to retry ?"
+msgstr "是否重试 ？"
+
 #: authentication/utils.py:28 common/utils/ip/geoip/utils.py:24
 #: xpack/plugins/cloud/const.py:29
 msgid "LAN"
@@ -3255,23 +3295,23 @@ msgstr "绑定 飞书 成功"
 msgid "Failed to get user from FeiShu"
 msgstr "从飞书获取用户失败"
 
-#: authentication/views/login.py:204
+#: authentication/views/login.py:210
 msgid "Redirecting"
 msgstr "跳转中"
 
-#: authentication/views/login.py:205
+#: authentication/views/login.py:211
 msgid "Redirecting to {} authentication"
 msgstr "正在跳转到 {} 认证"
 
-#: authentication/views/login.py:228
+#: authentication/views/login.py:234
 msgid "Login timeout, please try again."
 msgstr "登录超时，请重新登录"
 
-#: authentication/views/login.py:271
+#: authentication/views/login.py:277
 msgid "User email already exists ({})"
 msgstr "用户邮箱已存在 ({})"
 
-#: authentication/views/login.py:349
+#: authentication/views/login.py:361
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -3279,15 +3319,15 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:354
+#: authentication/views/login.py:366
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:390
+#: authentication/views/login.py:402
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:391
+#: authentication/views/login.py:403
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
@@ -3606,11 +3646,11 @@ msgstr "不能包含特殊字符"
 msgid "The mobile phone number format is incorrect"
 msgstr "手机号格式不正确"
 
-#: jumpserver/conf.py:443
+#: jumpserver/conf.py:446
 msgid "Create account successfully"
 msgstr "创建账号成功"
 
-#: jumpserver/conf.py:445
+#: jumpserver/conf.py:448
 msgid "Your account has been created successfully"
 msgstr "你的账号已创建成功"
 
@@ -4218,27 +4258,27 @@ msgstr "{} 至少有一个系统角色"
 msgid "RBAC"
 msgstr "RBAC"
 
-#: rbac/builtin.py:114
+#: rbac/builtin.py:115
 msgid "SystemAdmin"
 msgstr "系统管理员"
 
-#: rbac/builtin.py:117
+#: rbac/builtin.py:118
 msgid "SystemAuditor"
 msgstr "系统审计员"
 
-#: rbac/builtin.py:120
+#: rbac/builtin.py:121
 msgid "SystemComponent"
 msgstr "系统组件"
 
-#: rbac/builtin.py:126
+#: rbac/builtin.py:127
 msgid "OrgAdmin"
 msgstr "组织管理员"
 
-#: rbac/builtin.py:129
+#: rbac/builtin.py:130
 msgid "OrgAuditor"
 msgstr "组织审计员"
 
-#: rbac/builtin.py:132
+#: rbac/builtin.py:133
 msgid "OrgUser"
 msgstr "组织用户"
 
@@ -4770,6 +4810,30 @@ msgstr "使用状态"
 #: settings/serializers/auth/oidc.py:96
 msgid "Use nonce"
 msgstr "临时使用"
+
+#: settings/serializers/auth/passkey.py:11
+msgid "Enable passkey Auth"
+msgstr "启用 Passkey 认证"
+
+#: settings/serializers/auth/passkey.py:12
+msgid "Only SSL domain can use passkey auth"
+msgstr "只有 SSL 域名可以使用 Passkey(通行密钥)认证"
+
+#: settings/serializers/auth/passkey.py:15
+msgid "FIDO server ID"
+msgstr "Passkey 服务 ID"
+
+#: settings/serializers/auth/passkey.py:16
+msgid ""
+"The hostname can using passkey auth, If not set, will use request host, If "
+"multiple domains, use comma to separate"
+msgstr ""
+"可以使用 Passkey 认证的域名，如果不设置，将使用请求主机, 如果有多个域名，使用"
+"逗号分隔, 不需要端口号"
+
+#: settings/serializers/auth/passkey.py:19
+msgid "FIDO server name"
+msgstr "Passkey 服务名称"
 
 #: settings/serializers/auth/radius.py:13
 msgid "Radius"
@@ -5432,7 +5496,7 @@ msgstr "邮件收件人"
 msgid "Multiple user using , split"
 msgstr "多个用户，使用 , 分割"
 
-#: settings/serializers/settings.py:69
+#: settings/serializers/settings.py:70
 #, python-format
 msgid "[%s] %s"
 msgstr "[%s] %s"
@@ -5636,27 +5700,27 @@ msgstr "帮助"
 msgid "Docs"
 msgstr "文档"
 
-#: templates/_header_bar.html:25
+#: templates/_header_bar.html:27
 msgid "Commercial support"
 msgstr "商业支持"
 
-#: templates/_header_bar.html:76 users/forms/profile.py:44
+#: templates/_header_bar.html:79 users/forms/profile.py:44
 msgid "Profile"
 msgstr "个人信息"
 
-#: templates/_header_bar.html:79
+#: templates/_header_bar.html:83
 msgid "Admin page"
 msgstr "管理页面"
 
-#: templates/_header_bar.html:81
+#: templates/_header_bar.html:86
 msgid "User page"
 msgstr "用户页面"
 
-#: templates/_header_bar.html:84
+#: templates/_header_bar.html:90
 msgid "API Key"
 msgstr "API Key"
 
-#: templates/_header_bar.html:85
+#: templates/_header_bar.html:91
 msgid "Logout"
 msgstr "注销登录"
 

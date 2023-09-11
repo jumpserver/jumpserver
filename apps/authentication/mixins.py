@@ -132,11 +132,11 @@ class CommonMixin:
             return user
 
         user_id = self.request.session.get('user_id')
-        auth_password = self.request.session.get('auth_password')
+        auth_ok = self.request.session.get('auth_password')
         auth_expired_at = self.request.session.get('auth_password_expired_at')
         auth_expired = auth_expired_at < time.time() if auth_expired_at else False
 
-        if not user_id or not auth_password or auth_expired:
+        if not user_id or not auth_ok or auth_expired:
             raise errors.SessionEmptyError()
 
         user = get_object_or_404(User, pk=user_id)
@@ -479,6 +479,7 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
         request.session['auto_login'] = auto_login
         if not auth_backend:
             auth_backend = getattr(user, 'backend', settings.AUTH_BACKEND_MODEL)
+
         request.session['auth_backend'] = auth_backend
 
     def check_oauth2_auth(self, user: User, auth_backend):
@@ -511,7 +512,8 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
 
     def clear_auth_mark(self):
         keys = [
-            'auth_password', 'user_id', 'auth_confirm_required', 'auth_ticket_id', 'auth_acl_id'
+            'auth_password', 'user_id', 'auth_confirm_required',
+            'auth_ticket_id', 'auth_acl_id'
         ]
         for k in keys:
             self.request.session.pop(k, '')
