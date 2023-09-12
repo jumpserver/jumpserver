@@ -13,7 +13,10 @@ class PasskeySettingSerializer(serializers.Serializer):
     )
     FIDO_SERVER_ID = serializers.CharField(
         max_length=255, label=_('FIDO server ID'), required=False, allow_blank=True,
-        help_text=_('The hostname can using passkey auth, If not set, will use request host, '
-                    'If multiple domains, use comma to separate')
+        help_text=_(
+            'The hostname can using passkey auth, If not set, '
+            'will use request host and the request host in DOMAINS, '
+            'If multiple domains, use comma to separate'
+        )
     )
     FIDO_SERVER_NAME = serializers.CharField(max_length=255, label=_('FIDO server name'))

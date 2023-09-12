@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-04 13:26+0800\n"
+"POT-Creation-Date: 2023-09-12 15:41+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2427,29 +2427,29 @@ msgstr "外部ストレージへのFTPファイルのアップロード"
 msgid "This action require verify your MFA"
 msgstr "この操作には、MFAを検証する必要があります"
 
-#: authentication/api/connection_token.py:258
+#: authentication/api/connection_token.py:260
 msgid "Reusable connection token is not allowed, global setting not enabled"
 msgstr ""
 "再使用可能な接続トークンの使用は許可されていません。グローバル設定は有効に"
 "なっていません"
 
-#: authentication/api/connection_token.py:338
+#: authentication/api/connection_token.py:351
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名アカウントはこのプロパティではサポートされていません"
 
-#: authentication/api/connection_token.py:357
+#: authentication/api/connection_token.py:370
 msgid "Account not found"
 msgstr "アカウントが見つかりません"
 
-#: authentication/api/connection_token.py:360
+#: authentication/api/connection_token.py:373
 msgid "Permission expired"
 msgstr "承認の有効期限が切れています"
 
-#: authentication/api/connection_token.py:374
+#: authentication/api/connection_token.py:387
 msgid "ACL action is reject: {}({})"
 msgstr "ACL アクションは拒否です: {}({})"
 
-#: authentication/api/connection_token.py:378
+#: authentication/api/connection_token.py:391
 msgid "ACL action is review"
 msgstr "ACL アクションはレビューです"
 
@@ -2551,7 +2551,7 @@ msgstr "無効なトークンまたはキャッシュの更新。"
 msgid "Auth failed"
 msgstr "MFAに失敗しました"
 
-#: authentication/backends/passkey/fido.py:146
+#: authentication/backends/passkey/fido.py:148
 msgid "This key is not registered"
 msgstr "このキーは登録されていません"
 
@@ -4874,15 +4874,15 @@ msgstr "SSLドメインのみがパスキー認証を使用できます"
 msgid "FIDO server ID"
 msgstr "FIDOサーバーID"
 
-#: settings/serializers/auth/passkey.py:16
+#: settings/serializers/auth/passkey.py:17
 msgid ""
-"The hostname can using passkey auth, If not set, will use request host, If "
-"multiple domains, use comma to separate"
+"The hostname can using passkey auth, If not set, will use request host and "
+"the request host in DOMAINS, If multiple domains, use comma to separate"
 msgstr ""
-"ホスト名はパスキー認証を使用できます。設定されていない場合は、リクエストホス"
-"トを使用します。複数のドメインの場合は、コンマで区切ってください。"
+"パスキー認証を使用できるホスト名、設定されていない場合は、リクエストホストと"
+"DOMAINSのリクエストホストを使用します。複数のドメインの場合は、カンマで区切ります"
 
-#: settings/serializers/auth/passkey.py:19
+#: settings/serializers/auth/passkey.py:22
 msgid "FIDO server name"
 msgstr "FIDOサーバー名"
 

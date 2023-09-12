@@ -48,7 +48,9 @@ def get_server_id_from_request(request, allowed=()):
 
 
 def default_server_id(request):
-    domains = settings.ALLOWED_DOMAINS
+    domains = list(settings.ALLOWED_DOMAINS)
+    if settings.SITE_URL:
+        domains.append(urlparse(settings.SITE_URL).hostname)
     return get_server_id_from_request(request, allowed=domains)
 
 
