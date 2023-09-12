@@ -43,7 +43,7 @@ class KeyboardLayout(TextChoices):
     TR_TR_QWERTY = 'tr-tr-qwerty', 'Turkish-Q (Qwerty)'
 
 
-class RemoteApplicationConnectionMethod(TextChoices):
+class AppletConnectionMethod(TextChoices):
     WEB = 'web', _('Web')
     CLIENT = 'client', _('Client')
 

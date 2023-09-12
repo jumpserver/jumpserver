@@ -41,7 +41,6 @@ class PermAccountUtil(AssetPermissionUtil):
                 alias_date_expired_mapper[alias].append(perm.date_expired)
 
         asset_accounts = asset.accounts.all().active()
-        # username_accounts_mapper = {account.username: account for account in asset_accounts}
         username_accounts_mapper = defaultdict(list)
         for account in asset_accounts:
             username_accounts_mapper[account.username].append(account)

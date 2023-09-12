@@ -3,7 +3,7 @@ import json
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from users.const import RDPResolution, KeyboardLayout, RDPClientOption, RemoteApplicationConnectionMethod
+from users.const import RDPResolution, KeyboardLayout, RDPClientOption, AppletConnectionMethod
 
 
 class MultipleChoiceField(serializers.MultipleChoiceField):
@@ -37,8 +37,8 @@ class GraphicsSerializer(serializers.Serializer):
         choices=RDPClientOption.choices, default={RDPClientOption.FULL_SCREEN},
         label=_('RDP client option'), required=False
     )
-    remote_application_connection_method = serializers.ChoiceField(
-        RemoteApplicationConnectionMethod.choices, default=RemoteApplicationConnectionMethod.WEB,
+    applet_connection_method = serializers.ChoiceField(
+        AppletConnectionMethod.choices, default=AppletConnectionMethod.WEB,
         required=False, label=_('Remote application connection method')
     )
 
