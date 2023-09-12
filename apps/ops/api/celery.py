@@ -9,10 +9,12 @@ from django.utils.translation import gettext as _
 from django_celery_beat.models import PeriodicTask
 from rest_framework import generics, viewsets, mixins, status
 from rest_framework.response import Response
+from django_filters import rest_framework as drf_filters
 
 from common.api import LogTailApi, CommonApiMixin
 from common.exceptions import JMSException
 from common.permissions import IsValidUser
+from common.drf.filters import BaseFilterSet
 from ops.celery import app
 from ..ansible.utils import get_ansible_task_log_path
 from ..celery.utils import get_celery_task_log_path
@@ -102,13 +104,35 @@ class CelerySummaryAPIView(generics.RetrieveAPIView):
         pass
 
 
+class CeleryTaskFilterSet(BaseFilterSet):
+    id = drf_filters.CharFilter(field_name='id', lookup_expr='exact')
+    name = drf_filters.CharFilter(method='filter_name')
+
+    @staticmethod
+    def filter_name(queryset, name, value):
+        _ids = []
+        for task in queryset:
+            comment = task.meta.get('comment')
+            if not comment:
+                continue
+            if value not in comment:
+                continue
+            _ids.append(task.id)
+        queryset = queryset.filter(id__in=_ids)
+        return queryset
+
+    class Meta:
+        model = CeleryTask
+        fields = ['id', 'name']
+
+
 class CeleryTaskViewSet(
     CommonApiMixin, mixins.RetrieveModelMixin,
     mixins.ListModelMixin, mixins.DestroyModelMixin,
     viewsets.GenericViewSet
 ):
-    filterset_fields = ('id', 'name')
-    search_fields = filterset_fields
+    search_fields = ('id', 'name')
+    filterset_class = CeleryTaskFilterSet
     serializer_class = CeleryTaskSerializer
 
     def get_queryset(self):
