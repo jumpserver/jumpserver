@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-04 13:26+0800\n"
+"POT-Creation-Date: 2023-09-12 15:41+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -2415,27 +2415,27 @@ msgstr "上传 FTP 文件到外部存储"
 msgid "This action require verify your MFA"
 msgstr "该操作需要验证您的 MFA, 请先开启并配置"
 
-#: authentication/api/connection_token.py:258
+#: authentication/api/connection_token.py:260
 msgid "Reusable connection token is not allowed, global setting not enabled"
 msgstr "不允许使用可重复使用的连接令牌，未启用全局设置"
 
-#: authentication/api/connection_token.py:338
+#: authentication/api/connection_token.py:351
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名账号不支持当前资产"
 
-#: authentication/api/connection_token.py:357
+#: authentication/api/connection_token.py:370
 msgid "Account not found"
 msgstr "账号未找到"
 
-#: authentication/api/connection_token.py:360
+#: authentication/api/connection_token.py:373
 msgid "Permission expired"
 msgstr "授权已过期"
 
-#: authentication/api/connection_token.py:374
+#: authentication/api/connection_token.py:387
 msgid "ACL action is reject: {}({})"
 msgstr "ACL 动作是拒绝: {}({})"
 
-#: authentication/api/connection_token.py:378
+#: authentication/api/connection_token.py:391
 msgid "ACL action is review"
 msgstr "ACL 动作是复核"
 
@@ -2531,7 +2531,7 @@ msgstr "刷新的令牌或缓存无效。"
 msgid "Auth failed"
 msgstr "认证失败"
 
-#: authentication/backends/passkey/fido.py:146
+#: authentication/backends/passkey/fido.py:148
 msgid "This key is not registered"
 msgstr "此密钥未注册"
 
@@ -4823,15 +4823,15 @@ msgstr "只有 SSL 域名可以使用 Passkey(通行密钥)认证"
 msgid "FIDO server ID"
 msgstr "Passkey 服务 ID"
 
-#: settings/serializers/auth/passkey.py:16
+#: settings/serializers/auth/passkey.py:17
 msgid ""
-"The hostname can using passkey auth, If not set, will use request host, If "
-"multiple domains, use comma to separate"
+"The hostname can using passkey auth, If not set, will use request host and "
+"the request host in DOMAINS, If multiple domains, use comma to separate"
 msgstr ""
-"可以使用 Passkey 认证的域名，如果不设置，将使用请求主机, 如果有多个域名，使用"
+"可以使用 Passkey 认证的域名，如果不设置，将使用请求主机(主机名在可信域 DOMAINS中), 如果有多个域名，使用"
 "逗号分隔, 不需要端口号"
 
-#: settings/serializers/auth/passkey.py:19
+#: settings/serializers/auth/passkey.py:22
 msgid "FIDO server name"
 msgstr "Passkey 服务名称"
 
