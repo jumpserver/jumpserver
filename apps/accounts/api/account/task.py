@@ -9,12 +9,9 @@ __all__ = [
     'AccountsTaskCreateAPI',
 ]
 
-from rbac.permissions import RBACPermission
-
 
 class AccountsTaskCreateAPI(CreateAPIView):
     serializer_class = serializers.AccountTaskSerializer
-    permission_classes = [RBACPermission]
 
     def check_permissions(self, request):
         act = request.data.get('action')
