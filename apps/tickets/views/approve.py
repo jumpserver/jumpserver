@@ -4,6 +4,7 @@
 from __future__ import unicode_literals
 
 from django.core.cache import cache
+from django.http import HttpResponse
 from django.shortcuts import redirect, reverse
 from django.utils.translation import gettext as _
 from django.views.generic.base import TemplateView
@@ -79,6 +80,9 @@ class TicketDirectApproveView(TemplateView):
         return super().get_context_data(**kwargs)
 
     def get(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return HttpResponse(status=401)
+
         token = kwargs.get('token')
         ticket_info = cache.get(token)
         if not ticket_info:
