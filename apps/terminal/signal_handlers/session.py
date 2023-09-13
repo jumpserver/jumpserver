@@ -16,3 +16,4 @@ def on_session_finished(sender, instance: Session, created, **kwargs):
         return
     # 清理一次可能因 task 未执行的缓存数据
     Session.unlock_session(instance.id)
+

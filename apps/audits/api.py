@@ -26,7 +26,10 @@ from terminal.models import default_storage
 from users.models import User
 from .backends import TYPE_ENGINE_MAPPING
 from .const import ActivityChoices
-from .models import FTPLog, UserLoginLog, OperateLog, PasswordChangeLog, ActivityLog, JobLog
+from .models import (
+    FTPLog, UserLoginLog, OperateLog, PasswordChangeLog,
+    ActivityLog, JobLog,
+)
 from .serializers import (
     FTPLogSerializer, UserLoginLogSerializer, JobLogSerializer,
     OperateLogSerializer, OperateLogActionDetailSerializer,
