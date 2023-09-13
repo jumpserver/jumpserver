@@ -106,14 +106,21 @@ class Command(BaseCommand):
                 errors[url] = str(e)
                 error_urls.append(url)
 
-        print("\nNo auth urls:")
-        for url in set(unauth_urls) - set(known_unauth_urls):
+        unauth_urls = set(unauth_urls) - set(known_unauth_urls)
+        print("\nUnauthorized urls:")
+        if not unauth_urls:
+            print("  Empty, very good!")
+        for url in unauth_urls:
             print('"{}", {}'.format(url, errors.get(url, '')))
 
         print("\nError urls:")
+        if not error_urls:
+            print("  Empty, very good!")
         for url in set(error_urls):
             print(url, ': ' + errors.get(url))
 
         print("\nUnformat urls:")
+        if not unformat_urls:
+            print("  Empty, very good!")
         for url in unformat_urls:
             print(url)
