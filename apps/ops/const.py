@@ -52,6 +52,7 @@ class Modules(models.TextChoices):
     mysql = 'mysql', _('MySQL')
     postgresql = 'postgresql', _('PostgreSQL')
     sqlserver = 'sqlserver', _('SQLServer')
+    raw = 'raw', _('Raw')
 
 
 class JobStatus(models.TextChoices):
