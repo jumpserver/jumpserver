@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-from django.views.generic import TemplateView
 from django.conf import settings
+from django.http import HttpResponse
+from django.views.generic import TemplateView
 
 from common.views.mixins import PermissionsMixin
 from rbac.permissions import RBACPermission
@@ -15,6 +16,11 @@ class CeleryTaskLogView(PermissionsMixin, TemplateView):
     rbac_perms = {
         'GET': 'ops.view_celerytaskexecution'
     }
+
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return HttpResponse(status=401)
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

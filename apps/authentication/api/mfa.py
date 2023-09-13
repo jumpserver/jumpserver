@@ -3,6 +3,7 @@
 
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
+from rest_framework import exceptions
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -13,6 +14,7 @@ from common.utils import get_logger
 from users.models.user import User
 from .. import errors
 from .. import serializers
+from ..errors import SessionEmptyError
 from ..mixins import AuthMixin
 
 logger = get_logger(__name__)
@@ -56,6 +58,7 @@ class MFASendCodeApi(AuthMixin, CreateAPIView):
         if not mfa_backend or not mfa_backend.challenge_required:
             error = _('Current user not support mfa type: {}').format(mfa_type)
             raise ValidationError({'error': error})
+
         try:
             mfa_backend.send_challenge()
         except Exception as e:
@@ -65,6 +68,15 @@ class MFASendCodeApi(AuthMixin, CreateAPIView):
 class MFAChallengeVerifyApi(AuthMixin, CreateAPIView):
     permission_classes = (AllowAny,)
     serializer_class = serializers.MFAChallengeSerializer
+
+    def initial(self, request, *args, **kwargs):
+        super().initial(request, *args, **kwargs)
+        try:
+            user = self.get_user_from_session()
+        except SessionEmptyError:
+            user = None
+        if not user:
+            raise exceptions.NotAuthenticated()
 
     def perform_create(self, serializer):
         user = self.get_user_from_session()

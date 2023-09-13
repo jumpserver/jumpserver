@@ -96,6 +96,8 @@ def get_all_test_messages(request):
     import textwrap
     from ..notifications import Message
     from django.shortcuts import HttpResponse
+    if not request.user.is_superuser:
+        return HttpResponse('没有权限', status=401)
 
     msgs_cls = Message.get_all_sub_messages()
     html_data = '<h3>HTML 格式 </h3>'
