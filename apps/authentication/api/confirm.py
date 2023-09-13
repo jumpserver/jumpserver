@@ -13,7 +13,7 @@ from ..serializers import ConfirmSerializer
 
 
 class ConfirmBindORUNBindOAuth(RetrieveAPIView):
-    permission_classes = (UserConfirmation.require(ConfirmType.ReLogin),)
+    permission_classes = (IsValidUser, UserConfirmation.require(ConfirmType.ReLogin),)
 
     def retrieve(self, request, *args, **kwargs):
         return Response('ok')
