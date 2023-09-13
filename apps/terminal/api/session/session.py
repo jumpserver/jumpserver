@@ -38,7 +38,7 @@ from users.models import User
 
 __all__ = [
     'SessionViewSet', 'SessionReplayViewSet',
-    'SessionJoinValidateAPI', 'MySessionAPIView',
+    'SessionJoinValidateAPI', 'MySessionAPIView'
 ]
 
 logger = get_logger(__name__)

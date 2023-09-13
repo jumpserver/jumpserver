@@ -98,6 +98,7 @@ special_pid_mapper = {
     'terminal.endpoint': 'terminal_node',
     'terminal.endpointrule': 'terminal_node',
     'audits.ftplog': 'terminal',
+    'users.usersession': 'terminal',
     'perms.view_myassets': 'my_assets',
     'ops.celerytask': 'task_center',
     'ops.view_celerytaskexecution': 'task_center',
