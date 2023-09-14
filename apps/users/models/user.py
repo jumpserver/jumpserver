@@ -400,10 +400,17 @@ class RoleMixin:
         data = cache.get(key)
         if data:
             return data
+        console_orgs = RoleBinding.get_user_has_the_perm_orgs('rbac.view_console', self)
+        audit_orgs = RoleBinding.get_user_has_the_perm_orgs('rbac.view_audit', self)
+        workbench_orgs = RoleBinding.get_user_has_the_perm_orgs('rbac.view_workbench', self)
+
+        if settings.LIMIT_SUPER_PRIV:
+            audit_orgs = list(set(audit_orgs) - set(console_orgs))
+
         data = {
-            'console_orgs': RoleBinding.get_user_has_the_perm_orgs('rbac.view_console', self),
-            'audit_orgs': RoleBinding.get_user_has_the_perm_orgs('rbac.view_audit', self),
-            'workbench_orgs': RoleBinding.get_user_has_the_perm_orgs('rbac.view_workbench', self),
+            'console_orgs': console_orgs,
+            'audit_orgs': audit_orgs,
+            'workbench_orgs': workbench_orgs,
         }
         cache.set(key, data, 60 * 60)
         return data
@@ -541,6 +548,9 @@ class RoleMixin:
     def get_all_permissions(self):
         from rbac.models import RoleBinding
         perms = RoleBinding.get_user_perms(self)
+
+        if settings.LIMIT_SUPER_PRIV and 'view_console' in perms:
+            perms = [p for p in perms if p != "view_audit"]
         return perms
 
 

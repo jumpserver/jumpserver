@@ -578,7 +578,9 @@ class Config(dict):
         'FTP_FILE_MAX_STORE': 100,
 
         # API 请求次数限制
-        'MAX_LIMIT_PER_PAGE': 100
+        'MAX_LIMIT_PER_PAGE': 100,
+
+        'LIMIT_SUPER_PRIV': False,
     }
 
     old_config_map = {
