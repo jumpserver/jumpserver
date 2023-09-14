@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db import transaction
 from django.db.models import Count
 from django.db.transaction import atomic
 from django.shortcuts import get_object_or_404
@@ -96,14 +97,14 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
     search_fields = ('material',)
     filterset_fields = ['status', 'job_id']
 
-    @atomic
     def perform_create(self, serializer):
-        instance = serializer.save()
-        instance.job_version = instance.job.version
-        instance.material = instance.job.material
-        instance.job_type = Types[instance.job.type].value
-        instance.creator = self.request.user
-        instance.save()
+        with transaction.atomic():
+            instance = serializer.save()
+            instance.job_version = instance.job.version
+            instance.material = instance.job.material
+            instance.job_type = Types[instance.job.type].value
+            instance.creator = self.request.user
+            instance.save()
         task = run_ops_job_execution.delay(str(instance.id))
         set_task_to_serializer_data(serializer, task)
 
