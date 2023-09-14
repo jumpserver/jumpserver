@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-12 15:41+0800\n"
+"POT-Creation-Date: 2023-09-14 11:18+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -96,7 +96,7 @@ msgstr "更新"
 #: accounts/const/account.py:33
 #: accounts/serializers/automations/change_secret.py:156 audits/const.py:55
 #: audits/signal_handlers/activity_log.py:33 common/const/choices.py:19
-#: ops/const.py:61 terminal/const.py:77 xpack/plugins/cloud/const.py:43
+#: ops/const.py:62 terminal/const.py:77 xpack/plugins/cloud/const.py:43
 msgid "Failed"
 msgstr "失敗しました"
 
@@ -870,9 +870,9 @@ msgstr "自動タスク実行履歴"
 
 #: accounts/serializers/automations/change_secret.py:155 audits/const.py:54
 #: audits/models.py:59 audits/signal_handlers/activity_log.py:33
-#: common/const/choices.py:18 ops/const.py:59 ops/serializers/celery.py:40
+#: common/const/choices.py:18 ops/const.py:60 ops/serializers/celery.py:40
 #: terminal/const.py:76 terminal/models/session/sharing.py:121
-#: tickets/views/approve.py:115
+#: tickets/views/approve.py:119
 msgid "Success"
 msgstr "成功"
 
@@ -2453,7 +2453,7 @@ msgstr "ACL アクションは拒否です: {}({})"
 msgid "ACL action is review"
 msgstr "ACL アクションはレビューです"
 
-#: authentication/api/mfa.py:57
+#: authentication/api/mfa.py:59
 msgid "Current user not support mfa type: {}"
 msgstr "現在のユーザーはmfaタイプをサポートしていません: {}"
 
@@ -3422,7 +3422,7 @@ msgstr "の準備を"
 msgid "Pending"
 msgstr "未定"
 
-#: common/const/choices.py:17 ops/const.py:58
+#: common/const/choices.py:17 ops/const.py:59
 msgid "Running"
 msgstr "ランニング"
 
@@ -3774,15 +3774,15 @@ msgstr "Ansible 無効"
 msgid "Skip hosts below:"
 msgstr "次のホストをスキップします: "
 
-#: ops/api/celery.py:62 ops/api/celery.py:77
+#: ops/api/celery.py:64 ops/api/celery.py:79
 msgid "Waiting task start"
 msgstr "タスク開始待ち"
 
-#: ops/api/celery.py:138
+#: ops/api/celery.py:162
 msgid "Task {} not found"
 msgstr "タスクは存在しません"
 
-#: ops/api/celery.py:143
+#: ops/api/celery.py:167
 msgid "Task {} args or kwargs error"
 msgstr "タスク実行パラメータエラー"
 
@@ -3866,7 +3866,11 @@ msgstr "PostgreSQL"
 msgid "SQLServer"
 msgstr "SQLServer"
 
-#: ops/const.py:60
+#: ops/const.py:55
+msgid "Raw"
+msgstr ""
+
+#: ops/const.py:61
 msgid "Timeout"
 msgstr "タイムアウト"
 
@@ -4880,7 +4884,8 @@ msgid ""
 "the request host in DOMAINS, If multiple domains, use comma to separate"
 msgstr ""
 "パスキー認証を使用できるホスト名、設定されていない場合は、リクエストホストと"
-"DOMAINSのリクエストホストを使用します。複数のドメインの場合は、カンマで区切ります"
+"DOMAINSのリクエストホストを使用します。複数のドメインの場合は、カンマで区切り"
+"ます"
 
 #: settings/serializers/auth/passkey.py:22
 msgid "FIDO server name"
@@ -6120,7 +6125,7 @@ msgstr "一括作成非サポート"
 msgid "Storage is invalid"
 msgstr "ストレージが無効です"
 
-#: terminal/models/applet/applet.py:30 xpack/plugins/license/models.py:86
+#: terminal/models/applet/applet.py:30 xpack/plugins/license/models.py:88
 msgid "Community edition"
 msgstr "コミュニティ版"
 
@@ -7063,7 +7068,7 @@ msgid "Ticket information"
 msgstr "作業指示情報"
 
 #: tickets/templates/tickets/approve_check_password.html:29
-#: tickets/views/approve.py:39
+#: tickets/views/approve.py:40
 msgid "Ticket approval"
 msgstr "作業指示の承認"
 
@@ -7075,26 +7080,26 @@ msgstr "承認"
 msgid "Go Login"
 msgstr "ログイン"
 
-#: tickets/views/approve.py:40
+#: tickets/views/approve.py:41
 msgid ""
 "This ticket does not exist, the process has ended, or this link has expired"
 msgstr ""
 "このワークシートが存在しないか、ワークシートが終了したか、このリンクが無効に"
 "なっています"
 
-#: tickets/views/approve.py:69
+#: tickets/views/approve.py:70
 msgid "Click the button below to approve or reject"
 msgstr "下のボタンをクリックして同意または拒否。"
 
-#: tickets/views/approve.py:71
+#: tickets/views/approve.py:72
 msgid "After successful authentication, this ticket can be approved directly"
 msgstr "認証に成功した後、作業指示書は直接承認することができる。"
 
-#: tickets/views/approve.py:93
+#: tickets/views/approve.py:97
 msgid "Illegal approval action"
 msgstr "無効な承認アクション"
 
-#: tickets/views/approve.py:106
+#: tickets/views/approve.py:110
 msgid "This user is not authorized to approve this ticket"
 msgstr "このユーザーはこの作業指示を承認する権限がありません"
 
@@ -8388,18 +8393,25 @@ msgstr "ライセンスのインポートに成功"
 msgid "License is invalid"
 msgstr "ライセンスが無効です"
 
-#: xpack/plugins/license/meta.py:10 xpack/plugins/license/models.py:138
+#: xpack/plugins/license/meta.py:10 xpack/plugins/license/models.py:140
 msgid "License"
 msgstr "ライセンス"
 
 #: xpack/plugins/license/models.py:80
+msgid "Basic edition"
+msgstr "エンタープライズ基本版"
+
+#: xpack/plugins/license/models.py:82
 msgid "Standard edition"
 msgstr "エンタープライズ標準版"
 
-#: xpack/plugins/license/models.py:82
-msgid "Enterprise edition"
-msgstr "エンタープライズ基本版"
-
 #: xpack/plugins/license/models.py:84
+msgid "Professional edition"
+msgstr "エンタープライズプロフェッショナル版"
+
+#: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "エンタープライズ・フラッグシップ・エディション"
+
+#~ msgid "Enterprise edition"
+#~ msgstr "エンタープライズ基本版"
