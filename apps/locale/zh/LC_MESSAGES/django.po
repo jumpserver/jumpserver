@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-12 15:41+0800\n"
+"POT-Creation-Date: 2023-09-14 11:18+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -95,7 +95,7 @@ msgstr "更新"
 #: accounts/const/account.py:33
 #: accounts/serializers/automations/change_secret.py:156 audits/const.py:55
 #: audits/signal_handlers/activity_log.py:33 common/const/choices.py:19
-#: ops/const.py:61 terminal/const.py:77 xpack/plugins/cloud/const.py:43
+#: ops/const.py:62 terminal/const.py:77 xpack/plugins/cloud/const.py:43
 msgid "Failed"
 msgstr "失败"
 
@@ -867,9 +867,9 @@ msgstr "自动化任务执行历史"
 
 #: accounts/serializers/automations/change_secret.py:155 audits/const.py:54
 #: audits/models.py:59 audits/signal_handlers/activity_log.py:33
-#: common/const/choices.py:18 ops/const.py:59 ops/serializers/celery.py:40
+#: common/const/choices.py:18 ops/const.py:60 ops/serializers/celery.py:40
 #: terminal/const.py:76 terminal/models/session/sharing.py:121
-#: tickets/views/approve.py:115
+#: tickets/views/approve.py:119
 msgid "Success"
 msgstr "成功"
 
@@ -2439,7 +2439,7 @@ msgstr "ACL 动作是拒绝: {}({})"
 msgid "ACL action is review"
 msgstr "ACL 动作是复核"
 
-#: authentication/api/mfa.py:57
+#: authentication/api/mfa.py:59
 msgid "Current user not support mfa type: {}"
 msgstr "当前用户不支持 MFA 类型: {}"
 
@@ -3380,7 +3380,7 @@ msgstr "准备"
 msgid "Pending"
 msgstr "待定的"
 
-#: common/const/choices.py:17 ops/const.py:58
+#: common/const/choices.py:17 ops/const.py:59
 msgid "Running"
 msgstr "运行中"
 
@@ -3725,15 +3725,15 @@ msgstr "Ansible 已禁用"
 msgid "Skip hosts below:"
 msgstr "跳过以下主机: "
 
-#: ops/api/celery.py:62 ops/api/celery.py:77
+#: ops/api/celery.py:64 ops/api/celery.py:79
 msgid "Waiting task start"
 msgstr "等待任务开始"
 
-#: ops/api/celery.py:138
+#: ops/api/celery.py:162
 msgid "Task {} not found"
 msgstr "任务 {} 不存在"
 
-#: ops/api/celery.py:143
+#: ops/api/celery.py:167
 msgid "Task {} args or kwargs error"
 msgstr "任务 {} 执行参数错误"
 
@@ -3817,7 +3817,11 @@ msgstr "PostgreSQL"
 msgid "SQLServer"
 msgstr "SQLServer"
 
-#: ops/const.py:60
+#: ops/const.py:55
+msgid "Raw"
+msgstr ""
+
+#: ops/const.py:61
 msgid "Timeout"
 msgstr "超时"
 
@@ -4828,8 +4832,8 @@ msgid ""
 "The hostname can using passkey auth, If not set, will use request host and "
 "the request host in DOMAINS, If multiple domains, use comma to separate"
 msgstr ""
-"可以使用 Passkey 认证的域名，如果不设置，将使用请求主机(主机名在可信域 DOMAINS中), 如果有多个域名，使用"
-"逗号分隔, 不需要端口号"
+"可以使用 Passkey 认证的域名，如果不设置，将使用请求主机(主机名在可信域 "
+"DOMAINS中), 如果有多个域名，使用逗号分隔, 不需要端口号"
 
 #: settings/serializers/auth/passkey.py:22
 msgid "FIDO server name"
@@ -6032,7 +6036,7 @@ msgstr "不支持批量创建"
 msgid "Storage is invalid"
 msgstr "存储无效"
 
-#: terminal/models/applet/applet.py:30 xpack/plugins/license/models.py:86
+#: terminal/models/applet/applet.py:30 xpack/plugins/license/models.py:88
 msgid "Community edition"
 msgstr "社区版"
 
@@ -6965,7 +6969,7 @@ msgid "Ticket information"
 msgstr "工单信息"
 
 #: tickets/templates/tickets/approve_check_password.html:29
-#: tickets/views/approve.py:39
+#: tickets/views/approve.py:40
 msgid "Ticket approval"
 msgstr "工单审批"
 
@@ -6977,24 +6981,24 @@ msgstr "同意"
 msgid "Go Login"
 msgstr "去登录"
 
-#: tickets/views/approve.py:40
+#: tickets/views/approve.py:41
 msgid ""
 "This ticket does not exist, the process has ended, or this link has expired"
 msgstr "工单不存在，或者工单流程已经结束，或者此链接已经过期"
 
-#: tickets/views/approve.py:69
+#: tickets/views/approve.py:70
 msgid "Click the button below to approve or reject"
 msgstr "点击下方按钮同意或者拒绝"
 
-#: tickets/views/approve.py:71
+#: tickets/views/approve.py:72
 msgid "After successful authentication, this ticket can be approved directly"
 msgstr "认证成功后，工单可直接审批"
 
-#: tickets/views/approve.py:93
+#: tickets/views/approve.py:97
 msgid "Illegal approval action"
 msgstr "无效的审批动作"
 
-#: tickets/views/approve.py:106
+#: tickets/views/approve.py:110
 msgid "This user is not authorized to approve this ticket"
 msgstr "此用户无权审批此工单"
 
@@ -8272,18 +8276,22 @@ msgstr "许可证导入成功"
 msgid "License is invalid"
 msgstr "无效的许可证"
 
-#: xpack/plugins/license/meta.py:10 xpack/plugins/license/models.py:138
+#: xpack/plugins/license/meta.py:10 xpack/plugins/license/models.py:140
 msgid "License"
 msgstr "许可证"
 
 #: xpack/plugins/license/models.py:80
+msgid "Basic edition"
+msgstr "企业基础版"
+
+#: xpack/plugins/license/models.py:82
 msgid "Standard edition"
 msgstr "企业标准版"
 
-#: xpack/plugins/license/models.py:82
-msgid "Enterprise edition"
-msgstr "企业基础版"
-
 #: xpack/plugins/license/models.py:84
+msgid "Professional edition"
+msgstr "企业专业版"
+
+#: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
