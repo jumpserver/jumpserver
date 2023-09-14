@@ -4825,7 +4825,7 @@ msgstr "只有 SSL 域名可以使用 Passkey(通行密钥)认证"
 
 #: settings/serializers/auth/passkey.py:15
 msgid "FIDO server ID"
-msgstr "Passkey 服务 ID"
+msgstr "Passkey 服务域名"
 
 #: settings/serializers/auth/passkey.py:17
 msgid ""
