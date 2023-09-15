@@ -9,7 +9,6 @@ from tickets import serializers
 from tickets.models import Ticket, Comment
 from tickets.permissions.comment import IsAssignee, IsApplicant, IsSwagger
 
-
 __all__ = ['CommentViewSet']
 
 

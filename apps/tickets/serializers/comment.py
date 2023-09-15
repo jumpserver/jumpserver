@@ -6,14 +6,14 @@ from ..models import Comment
 __all__ = ['CommentSerializer']
 
 
-class CurrentTicket(object):
-    ticket = None
+class CurrentTicket:
+    requires_context = True
 
-    def set_context(self, serializer_field):
-        self.ticket = serializer_field.context['ticket']
+    def __call__(self, serializer_field):
+        return serializer_field.context['ticket']
 
-    def __call__(self):
-        return self.ticket
+    def __repr__(self):
+        return '%s()' % self.__class__.__name__
 
 
 class CommentSerializer(serializers.ModelSerializer):
