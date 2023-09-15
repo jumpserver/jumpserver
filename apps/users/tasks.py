@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 #
+from datetime import timedelta
 
 from celery import shared_task
 from django.conf import settings
-from django.db.models import Max
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from audits.models import UserLoginLog
 from common.const.crontab import CRONTAB_AT_AM_TEN, CRONTAB_AT_PM_TWO
 from common.utils import get_logger
 from common.utils.timezone import utc_now
@@ -84,17 +83,7 @@ def check_user_expired_periodic():
 @register_as_period_task(crontab=CRONTAB_AT_PM_TWO)
 @tmp_to_root_org()
 def check_unused_users():
-    now = utc_now()
-    unused_usernames = []
-    usernames_max_datetime = UserLoginLog.objects.values('username').annotate(max_datetime=Max('datetime'))
-    for i in usernames_max_datetime:
-        username = i['username']
-        max_datetime = i['max_datetime']
-        uncommon_users_ttl = settings.SECURITY_UNCOMMON_USERS_TTL
-        if (now - max_datetime).seconds > uncommon_users_ttl * 24 * 60 * 60:
-            unused_usernames.append(username)
-
-    if not unused_usernames:
-        return
-
-    User.objects.filter(username__in=unused_usernames).update(is_active=False)
+    uncommon_users_ttl = settings.SECURITY_UNCOMMON_USERS_TTL
+    seconds_to_subtract = uncommon_users_ttl * 24 * 60 * 60
+    t = utc_now() - timedelta(seconds=seconds_to_subtract)
+    User.objects.filter(last_login__lte=t).update(is_active=False)
