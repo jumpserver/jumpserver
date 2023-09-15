@@ -9,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from django_auth_ldap.backend import populate_user
 from django_cas_ng.signals import cas_user_authenticated
 
+from audits.models import UserSession
 from authentication.backends.oauth2.signals import oauth2_create_or_update_user
 from authentication.backends.oidc.signals import openid_create_or_update_user
 from authentication.backends.saml2.signals import saml2_create_or_update_user
@@ -17,7 +18,7 @@ from common.decorators import on_transaction_commit
 from common.utils import get_logger
 from jumpserver.utils import get_current_request
 from ops.celery.decorator import register_as_period_task
-from .models import User, UserPasswordHistory, UserSession
+from .models import User, UserPasswordHistory
 from .signals import post_user_create
 
 logger = get_logger(__file__)

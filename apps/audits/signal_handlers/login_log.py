@@ -16,8 +16,9 @@ from audits.models import UserLoginLog
 from authentication.signals import post_auth_failed, post_auth_success
 from authentication.utils import check_different_city_login_if_need
 from common.utils import get_request_ip, get_logger
-from users.models import User, UserSession
+from users.models import User
 from ..const import LoginTypeChoices
+from ..models import UserSession
 from ..utils import write_login_log
 
 logger = get_logger(__name__)
