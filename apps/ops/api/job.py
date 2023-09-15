@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db import transaction
 from django.db.models import Count
 from django.db.transaction import atomic
 from django.shortcuts import get_object_or_404
@@ -25,9 +26,9 @@ from perms.models import PermNode
 from perms.utils import UserPermAssetUtil
 
 
-def set_task_to_serializer_data(serializer, task):
+def set_task_to_serializer_data(serializer, task_id):
     data = getattr(serializer, "_data", {})
-    data["task_id"] = task.id
+    data["task_id"] = task_id
     setattr(serializer, "_data", data)
 
 
@@ -85,8 +86,10 @@ class JobViewSet(OrgBulkModelViewSet):
         execution = job.create_execution()
         execution.creator = self.request.user
         execution.save()
-        task = run_ops_job_execution.delay(str(execution.id))
-        set_task_to_serializer_data(serializer, task)
+
+        set_task_to_serializer_data(serializer, execution.id)
+        transaction.on_commit(
+            lambda: run_ops_job_execution.apply_async((str(execution.id),), task_id=str(execution.id)))
 
 
 class JobExecutionViewSet(OrgBulkModelViewSet):
@@ -96,7 +99,10 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
     search_fields = ('material',)
     filterset_fields = ['status', 'job_id']
 
-    @atomic
+    @staticmethod
+    def start_deploy(instance, serializer):
+        task = run_ops_job_execution.apply_async((str(instance.id),), task_id=str(instance.id))
+
     def perform_create(self, serializer):
         instance = serializer.save()
         instance.job_version = instance.job.version
@@ -104,8 +110,10 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
         instance.job_type = Types[instance.job.type].value
         instance.creator = self.request.user
         instance.save()
-        task = run_ops_job_execution.delay(str(instance.id))
-        set_task_to_serializer_data(serializer, task)
+
+        set_task_to_serializer_data(serializer, instance.id)
+        transaction.on_commit(
+            lambda: run_ops_job_execution.apply_async((str(instance.id),), task_id=str(instance.id)))
 
     def get_queryset(self):
         queryset = super().get_queryset()
