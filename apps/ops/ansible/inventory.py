@@ -165,13 +165,14 @@ class JMSInventory:
 
         tp, category = asset.type, asset.category
         name = asset.name.replace(' ', '_').replace('[', '_').replace(']', '_')
+        secret_info = {k: v for k, v in asset.secret_info.items() if v}
         host = {
             'name': name,
             'jms_asset': {
                 'id': str(asset.id), 'name': asset.name, 'address': asset.address,
                 'type': tp, 'category': category,
                 'protocol': protocol.name, 'port': protocol.port,
-                'spec_info': asset.spec_info, 'secret_info': asset.secret_info,
+                'spec_info': asset.spec_info, 'secret_info': secret_info,
                 'protocols': [{'name': p.name, 'port': p.port} for p in protocols],
             },
             'jms_account': {

@@ -11,9 +11,9 @@
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         check_hostname: "{{ jms_asset.spec_info.use_ssl and not jms_asset.spec_info.allow_invalid_cert }}"
-        ca_cert: "{{ jms_asset.secret_info.ca_cert }}"
-        client_cert: "{{ jms_asset.secret_info.client_cert }}"
-        client_key: "{{ jms_asset.secret_info.client_key }}"
+        ca_cert: "{{ jms_asset.secret_info.ca_cert | default(omit) }}"
+        client_cert: "{{ jms_asset.secret_info.client_cert | default(omit) }}"
+        client_key: "{{ jms_asset.secret_info.client_key  | default(omit) }}"
         filter: users
       register: db_info
 

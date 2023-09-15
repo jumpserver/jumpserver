@@ -11,9 +11,9 @@
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         login_database: "{{ jms_asset.spec_info.db_name }}"
-        ssl: "{{ jms_asset.spec_info.use_ssl }}"
-        ssl_ca_certs: "{{ jms_asset.secret_info.ca_cert }}"
-        ssl_certfile: "{{ jms_asset.secret_info.client_key }}"
+        ssl: "{{ jms_asset.spec_info.use_ssl | default('') }}"
+        ssl_ca_certs: "{{ jms_asset.secret_info.ca_cert | default('') }}"
+        ssl_certfile: "{{ jms_asset.secret_info.client_key | default('') }}"
         connection_options:
           - tlsAllowInvalidHostnames: "{{ jms_asset.spec_info.allow_invalid_cert}}"
       register: db_info
@@ -31,8 +31,8 @@
         login_port: "{{ jms_asset.port }}"
         login_database: "{{ jms_asset.spec_info.db_name }}"
         ssl: "{{ jms_asset.spec_info.use_ssl }}"
-        ssl_ca_certs: "{{ jms_asset.secret_info.ca_cert }}"
-        ssl_certfile: "{{ jms_asset.secret_info.client_key }}"
+        ssl_ca_certs: "{{ jms_asset.secret_info.ca_cert | default('') }}"
+        ssl_certfile: "{{ jms_asset.secret_info.client_key | default('') }}"
         connection_options:
           - tlsAllowInvalidHostnames: "{{ jms_asset.spec_info.allow_invalid_cert}}"
         db: "{{ jms_asset.spec_info.db_name }}"
@@ -49,7 +49,7 @@
         login_port: "{{ jms_asset.port }}"
         login_database: "{{ jms_asset.spec_info.db_name }}"
         ssl: "{{ jms_asset.spec_info.use_ssl }}"
-        ssl_ca_certs: "{{ jms_asset.secret_info.ca_cert }}"
-        ssl_certfile: "{{ jms_asset.secret_info.client_key }}"
+        ssl_ca_certs: "{{ jms_asset.secret_info.ca_cert | default('') }}"
+        ssl_certfile: "{{ jms_asset.secret_info.client_key | default('') }}"
         connection_options:
           - tlsAllowInvalidHostnames: "{{ jms_asset.spec_info.allow_invalid_cert}}"
