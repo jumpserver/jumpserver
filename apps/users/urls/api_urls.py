@@ -17,7 +17,6 @@ router.register(r'groups', api.UserGroupViewSet, 'user-group')
 router.register(r'users-groups-relations', api.UserUserGroupRelationViewSet, 'users-groups-relation')
 router.register(r'service-account-registrations', api.ServiceAccountRegistrationViewSet, 'service-account-registration')
 router.register(r'connection-token', auth_api.ConnectionTokenViewSet, 'connection-token')
-router.register(r'user-sessions', api.UserSessionViewSet, 'user-session')
 
 
 urlpatterns = [

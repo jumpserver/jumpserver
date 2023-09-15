@@ -36,7 +36,6 @@ system_user_perms += (user_perms + _view_all_joined_org_perms)
 
 _auditor_perms = (
     ('rbac', 'menupermission', 'view', 'audit'),
-    ('users', 'usersession', '*', '*'),
     ('audits', '*', '*', '*'),
     ('audits', 'joblog', '*', '*'),
     ('terminal', 'commandstorage', 'view', 'commandstorage'),
