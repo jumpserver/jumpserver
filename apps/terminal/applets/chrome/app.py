@@ -258,11 +258,11 @@ class AppletApplication(BaseApplication):
         self.driver = webdriver.Chrome(options=self._chrome_options, service=service)
         self.driver.implicitly_wait(10)
         if self.app.asset.address != "":
-            self.driver.minimize_window()
             ok = self.app.execute(self.driver)
             if not ok:
                 print("执行失败")
         self.driver.maximize_window()
+
     def wait(self):
         disconnected_msg = "Unable to evaluate script: disconnected: not connected to DevTools\n"
         closed_msg = "Unable to evaluate script: no such window: target window already closed"
