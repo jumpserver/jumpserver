@@ -82,7 +82,8 @@ def generate_data(username, request, login_type=None):
     return data
 
 
-def create_user_session(session_key, user_id, instance: UserLoginLog):
+def create_user_session(request, user_id, instance: UserLoginLog):
+    session_key = request.session.session_key
     session_store_cls = import_module(settings.SESSION_ENGINE).SessionStore
     session_store = session_store_cls(session_key=session_key)
     cache_key = session_store.cache_key
@@ -99,7 +100,8 @@ def create_user_session(session_key, user_id, instance: UserLoginLog):
         'date_created': instance.datetime,
         'date_expired': instance.datetime + timedelta(seconds=ttl),
     }
-    UserSession.objects.create(**online_session_data)
+    user_session = UserSession.objects.create(**online_session_data)
+    request.session['user_session_id'] = user_session.id
 
 
 @receiver(post_auth_success)
@@ -116,7 +118,7 @@ def on_user_auth_success(sender, user, request, login_type=None, **kwargs):
     # TODO 目前只记录 web 登录的 session
     if not session_key or instance.type != LoginTypeChoices.web:
         return
-    create_user_session(session_key, user.id, instance)
+    create_user_session(request, user.id, instance)
 
 
 @receiver(post_auth_failed)
