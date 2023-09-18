@@ -34,7 +34,7 @@ def random_string(length: int, lower=True, upper=True, digit=True, special_char=
     password = list(random.choice(chars) for i in range(length))
 
     if special_char:
-        special_num = length // 10 + 1
+        special_num = length // 16 + 1
         special_index = []
         for i in range(special_num):
             index = random.randint(1, length - 1)
