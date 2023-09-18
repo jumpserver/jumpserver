@@ -4,14 +4,13 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from accounts.const import (
-    AutomationTypes, DEFAULT_PASSWORD_RULES,
-    SecretType, SecretStrategy, SSHKeyStrategy
+    AutomationTypes, SecretType, SecretStrategy, SSHKeyStrategy
 )
 from accounts.models import (
     Account, ChangeSecretAutomation,
     ChangeSecretRecord, AutomationExecution
 )
-from accounts.serializers import AuthValidateMixin
+from accounts.serializers import AuthValidateMixin, PasswordRulesSerializer
 from assets.models import Asset
 from common.serializers.fields import LabeledChoiceField, ObjectRelatedField
 from common.utils import get_logger
@@ -42,7 +41,7 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
     ssh_key_change_strategy = LabeledChoiceField(
         choices=SSHKeyStrategy.choices, required=False, label=_('SSH Key strategy')
     )
-    password_rules = serializers.DictField(default=DEFAULT_PASSWORD_RULES)
+    password_rules = PasswordRulesSerializer(required=False, label=_('Password rules'))
     secret_type = LabeledChoiceField(choices=get_secret_types(), required=True, label=_('Secret type'))
 
     class Meta:

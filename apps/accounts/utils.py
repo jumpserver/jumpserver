@@ -10,7 +10,7 @@ class SecretGenerator:
     def __init__(self, secret_strategy, secret_type, password_rules=None):
         self.secret_strategy = secret_strategy
         self.secret_type = secret_type
-        self.password_rules = password_rules
+        self.password_rules = password_rules or DEFAULT_PASSWORD_RULES
 
     @staticmethod
     def generate_ssh_key():
@@ -18,11 +18,14 @@ class SecretGenerator:
         return private_key
 
     def generate_password(self):
-        if self.password_rules:
-            length = int(self.password_rules.get('length', 0))
-        else:
-            length = DEFAULT_PASSWORD_RULES['length']
-        return random_string(length, special_char=True)
+        rules = {
+            'length': self.password_rules.get('length', 16),
+            'lower': self.password_rules.get('lowercase', True),
+            'upper': self.password_rules.get('uppercase', True),
+            'digit': self.password_rules.get('digit', True),
+            'special_char': self.password_rules.get('special_char', True),
+        }
+        return random_string(**rules)
 
     def get_secret(self):
         if self.secret_type == SecretType.SSH_KEY:

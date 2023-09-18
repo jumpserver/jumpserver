@@ -3,6 +3,7 @@ from django.db.models import Count, Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from common.utils import lazyproperty
 from .account import Account
 from .base import BaseAccount
 
@@ -21,6 +22,7 @@ class AccountTemplate(BaseAccount):
         choices=SecretStrategy.choices, max_length=16,
         default=SecretStrategy.custom, verbose_name=_('Secret strategy')
     )
+    password_rules = models.JSONField(default=dict, verbose_name=_('Password rules'))
     auto_push = models.BooleanField(default=False, verbose_name=_('Auto push'))
     platforms = models.ManyToManyField(
         'assets.Platform', related_name='account_templates',
@@ -56,14 +58,15 @@ class AccountTemplate(BaseAccount):
             ).first()
             return account
 
+    @lazyproperty
     def secret_generator(self):
         return SecretGenerator(
-            self.secret_strategy, self.secret_type,
+            self.secret_strategy, self.secret_type, self.password_rules,
         )
 
     def get_secret(self):
         if self.secret_strategy == 'random':
-            return self.secret_generator().get_secret()
+            return self.secret_generator.get_secret()
         else:
             return self.secret
 
