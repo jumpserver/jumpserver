@@ -18,6 +18,7 @@ from django.shortcuts import reverse
 from django.utils import timezone
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext_lazy as _
+from rest_framework.exceptions import PermissionDenied
 
 from common.db import fields, models as jms_models
 from common.utils import (
@@ -973,7 +974,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
 
     def delete(self, using=None, keep_parents=False):
         if self.pk == 1 or self.username == 'admin':
-            return
+            raise PermissionDenied(_('Can not delete admin user'))
         return super(User, self).delete(using=using, keep_parents=keep_parents)
 
     @classmethod
