@@ -14,17 +14,17 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='adhoc',
             name='module',
-            field=models.CharField(choices=[('shell', 'Shell'), ('win_shell', 'Powershell'), ('python', 'Python'), ('mysql', 'MySQL'), ('postgresql', 'PostgreSQL'), ('sqlserver', 'SQLServer')], default='shell', max_length=128, verbose_name='Module'),
+            field=models.CharField(choices=[('shell', 'Shell'), ('win_shell', 'Powershell'), ('python', 'Python'), ('mysql', 'MySQL'), ('postgresql', 'PostgreSQL'), ('sqlserver', 'SQLServer'), ('raw', 'Raw')], default='shell', max_length=128, verbose_name='Module'),
         ),
         migrations.AlterField(
             model_name='historicaljob',
             name='module',
-            field=models.CharField(choices=[('shell', 'Shell'), ('win_shell', 'Powershell'), ('python', 'Python'), ('mysql', 'MySQL'), ('postgresql', 'PostgreSQL'), ('sqlserver', 'SQLServer')], default='shell', max_length=128, null=True, verbose_name='Module'),
+            field=models.CharField(choices=[('shell', 'Shell'), ('win_shell', 'Powershell'), ('python', 'Python'), ('mysql', 'MySQL'), ('postgresql', 'PostgreSQL'), ('sqlserver', 'SQLServer'), ('raw', 'Raw')], default='shell', max_length=128, null=True, verbose_name='Module'),
         ),
         migrations.AlterField(
             model_name='job',
             name='module',
-            field=models.CharField(choices=[('shell', 'Shell'), ('win_shell', 'Powershell'), ('python', 'Python'), ('mysql', 'MySQL'), ('postgresql', 'PostgreSQL'), ('sqlserver', 'SQLServer')], default='shell', max_length=128, null=True, verbose_name='Module'),
+            field=models.CharField(choices=[('shell', 'Shell'), ('win_shell', 'Powershell'), ('python', 'Python'), ('mysql', 'MySQL'), ('postgresql', 'PostgreSQL'), ('sqlserver', 'SQLServer'), ('raw', 'Raw')], default='shell', max_length=128, null=True, verbose_name='Module'),
         ),
         migrations.AlterField(
             model_name='jobexecution',
