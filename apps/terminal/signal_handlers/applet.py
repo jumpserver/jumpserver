@@ -47,9 +47,10 @@ def on_user_create_create_account(sender, instance: User, created=False, **kwarg
 
 @receiver(post_delete, sender=User)
 def on_user_delete_remove_account(sender, instance, **kwargs):
+    account_username = 'js_{}'.format(instance.username)
     with tmp_to_builtin_org(system=1):
         applet_hosts = AppletHost.objects.all().values_list('id', flat=True)
-        accounts = Account.objects.filter(asset_id__in=applet_hosts, username=instance.username)
+        accounts = Account.objects.filter(asset_id__in=applet_hosts, username=account_username)
         accounts.delete()
 
 
