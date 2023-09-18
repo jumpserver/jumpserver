@@ -9,6 +9,7 @@ from .base import BaseAccount
 __all__ = ['AccountTemplate', ]
 
 from ..const import SecretStrategy
+from ..utils import SecretGenerator
 
 
 class AccountTemplate(BaseAccount):
@@ -54,6 +55,17 @@ class AccountTemplate(BaseAccount):
                 secret_type=su_from.secret_type
             ).first()
             return account
+
+    def secret_generator(self):
+        return SecretGenerator(
+            self.secret_strategy, self.secret_type,
+        )
+
+    def get_secret(self):
+        if self.secret_strategy == 'random':
+            return self.secret_generator().get_secret()
+        else:
+            return self.secret
 
     @staticmethod
     def bulk_update_accounts(accounts, data):

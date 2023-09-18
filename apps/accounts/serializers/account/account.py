@@ -73,6 +73,22 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             name = name + '_' + uuid.uuid4().hex[:4]
         initial_data['name'] = name
 
+    @staticmethod
+    def get_template_attr_for_account(template):
+        # Set initial data from template
+        field_names = [
+            'username', 'secret', 'secret_type', 'privileged', 'is_active'
+        ]
+
+        attrs = {}
+        for name in field_names:
+            value = getattr(template, name, None)
+            if value is None:
+                continue
+            attrs[name] = value
+        attrs['secret'] = template.get_secret()
+        return attrs
+
     def from_template_if_need(self, initial_data):
         if isinstance(initial_data, str):
             return
@@ -89,20 +105,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             raise serializers.ValidationError({'template': 'Template not found'})
 
         self._template = template
-        # Set initial data from template
-        ignore_fields = ['id', 'date_created', 'date_updated', 'su_from', 'org_id']
-        field_names = [
-            field.name for field in template._meta.fields
-            if field.name not in ignore_fields
-        ]
-        field_names = [name if name != '_secret' else 'secret' for name in field_names]
-
-        attrs = {}
-        for name in field_names:
-            value = getattr(template, name, None)
-            if value is None:
-                continue
-            attrs[name] = value
+        attrs = self.get_template_attr_for_account(template)
         initial_data.update(attrs)
         initial_data.update({
             'source': Source.TEMPLATE,
