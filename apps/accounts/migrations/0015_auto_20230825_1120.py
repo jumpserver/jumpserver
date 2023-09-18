@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='accounttemplate',
             name='platforms',
-            field=models.ManyToManyField(related_name='account_templates', to='assets.platform', verbose_name='Platforms'),
+            field=models.ManyToManyField(related_name='account_templates', to='assets.platform', verbose_name='Platforms', blank=True),
         ),
         migrations.AddField(
             model_name='accounttemplate',

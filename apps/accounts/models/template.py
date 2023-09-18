@@ -23,7 +23,7 @@ class AccountTemplate(BaseAccount):
     auto_push = models.BooleanField(default=False, verbose_name=_('Auto push'))
     platforms = models.ManyToManyField(
         'assets.Platform', related_name='account_templates',
-        verbose_name=_('Platforms')
+        verbose_name=_('Platforms'), blank=True,
     )
     push_params = models.JSONField(default=dict, verbose_name=_('Push params'))
 
