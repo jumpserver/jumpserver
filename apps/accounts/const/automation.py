@@ -43,8 +43,8 @@ class AutomationTypes(models.TextChoices):
 
 
 class SecretStrategy(models.TextChoices):
-    custom = 'specific', _('Specific password')
-    random = 'random', _('Random')
+    custom = 'specific', _('Specific secret')
+    random = 'random', _('Random generate')
 
 
 class SSHKeyStrategy(models.TextChoices):
