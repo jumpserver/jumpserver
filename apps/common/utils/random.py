@@ -18,6 +18,7 @@ def random_ip():
 
 
 def random_string(length: int, lower=True, upper=True, digit=True, special_char=False, symbols=string_punctuation):
+    random.seed()
     args_names = ['lower', 'upper', 'digit']
     args_values = [lower, upper, digit]
     args_string = [string.ascii_lowercase, string.ascii_uppercase, string.digits]
