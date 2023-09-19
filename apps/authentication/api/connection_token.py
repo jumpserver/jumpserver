@@ -312,11 +312,11 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         self.validate_serializer(serializer)
         return super().perform_create(serializer)
 
-    def _insert_connect_options(self, data):
+    def _insert_connect_options(self, data, user):
         name = 'file_name_conflict_resolution'
         connect_options = data.pop('connect_options', {})
         preference = Preference.objects.filter(
-            name=name, user=self.request.user, category='koko'
+            name=name, user=user, category='koko'
         ).first()
         value = preference.value if preference else FileNameConflictResolution.REPLACE
         connect_options[name] = value
@@ -325,7 +325,7 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
     def validate_serializer(self, serializer):
         data = serializer.validated_data
         user = self.get_user(serializer)
-        self._insert_connect_options(data)
+        self._insert_connect_options(data, user)
         asset = data.get('asset')
         account_name = data.get('account')
         _data = self._validate(user, asset, account_name)
