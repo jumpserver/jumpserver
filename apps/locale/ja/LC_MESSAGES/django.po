@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 18:39+0800\n"
+"POT-Creation-Date: 2023-09-19 10:25+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1304,7 +1304,7 @@ msgid ""
 "SFTP root directory, Support variable: <br>- ${ACCOUNT} The connected "
 "account username <br>- ${HOME} The home directory of the connected account "
 "<br>- ${USER} The username of the user"
-msgstr ""
+msgstr "SFTPルートディレクトリ、サポート変数：<br>-${ACCOUNT}接続されたアカウントのユーザー名<br>-${HOME}接続されたアカウントのホームディレクトリ<br>-${USER}ユーザーのユーザー名"
 
 #: assets/const/protocol.py:65
 msgid "Console"
@@ -6142,11 +6142,9 @@ msgstr "一括作成非サポート"
 msgid "Storage is invalid"
 msgstr "ストレージが無効です"
 
-#: terminal/models/applet/applet.py:30
-#, fuzzy
-#| msgid "Comment"
-msgid "Community"
-msgstr "コメント"
+#: terminal/models/applet/applet.py:30 xpack/plugins/license/models.py:88
+msgid "Community edition"
+msgstr "コミュニティ版"
 
 #: terminal/models/applet/applet.py:31
 msgid "Enterprise"
@@ -7268,7 +7266,7 @@ msgstr "公開キー"
 
 #: users/models/preference.py:38
 msgid "Preference"
-msgstr "のようにふるまう"
+msgstr "ユーザー設定"
 
 #: users/models/user.py:648 users/serializers/profile.py:94
 msgid "Force enable"
@@ -7312,6 +7310,7 @@ msgstr "最終更新日パスワード"
 msgid "Need update password"
 msgstr "更新パスワードが必要"
 
+#: users/models/user.py:977
 msgid "Can not delete admin user"
 msgstr "管理者ユーザーを削除できませんでした"
 
@@ -8434,10 +8433,6 @@ msgstr "エンタープライズプロフェッショナル版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "エンタープライズ・フラッグシップ・エディション"
-
-#: xpack/plugins/license/models.py:88
-msgid "Community edition"
-msgstr "コミュニティ版"
 
 #~ msgid "Enterprise edition"
 #~ msgstr "エンタープライズ基本版"
