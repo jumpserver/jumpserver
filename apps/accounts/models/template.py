@@ -3,26 +3,17 @@ from django.db.models import Count, Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from common.utils import lazyproperty
 from .account import Account
-from .base import BaseAccount
+from .base import BaseAccount, SecretWithRandomMixin
 
 __all__ = ['AccountTemplate', ]
 
-from ..const import SecretStrategy
-from ..utils import SecretGenerator
 
-
-class AccountTemplate(BaseAccount):
+class AccountTemplate(BaseAccount, SecretWithRandomMixin):
     su_from = models.ForeignKey(
         'self', related_name='su_to', null=True,
         on_delete=models.SET_NULL, verbose_name=_("Su from")
     )
-    secret_strategy = models.CharField(
-        choices=SecretStrategy.choices, max_length=16,
-        default=SecretStrategy.custom, verbose_name=_('Secret strategy')
-    )
-    password_rules = models.JSONField(default=dict, verbose_name=_('Password rules'))
     auto_push = models.BooleanField(default=False, verbose_name=_('Auto push'))
     platforms = models.ManyToManyField(
         'assets.Platform', related_name='account_templates',
@@ -57,18 +48,6 @@ class AccountTemplate(BaseAccount):
                 secret_type=su_from.secret_type
             ).first()
             return account
-
-    @lazyproperty
-    def secret_generator(self):
-        return SecretGenerator(
-            self.secret_strategy, self.secret_type, self.password_rules,
-        )
-
-    def get_secret(self):
-        if self.secret_strategy == 'random':
-            return self.secret_generator.get_secret()
-        else:
-            return self.secret
 
     @staticmethod
     def bulk_update_accounts(accounts, data):
