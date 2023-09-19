@@ -1,3 +1,5 @@
+import copy
+
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -21,14 +23,14 @@ class SecretGenerator:
         password_rules = self.password_rules
         if not password_rules or not isinstance(password_rules, dict):
             password_rules = {}
-
-        DR = DEFAULT_PASSWORD_RULES
+        rules = copy.deepcopy(DEFAULT_PASSWORD_RULES)
+        rules.update(password_rules)
         rules = {
-            'length': password_rules.get('length', DR['length']),
-            'lower': password_rules.get('lowercase', DR['lowercase']),
-            'upper': password_rules.get('uppercase', DR['uppercase']),
-            'digit': password_rules.get('digit', DR['digit']),
-            'special_char': password_rules.get('special_char', DR['special_char']),
+            'length': rules['length'],
+            'lower': rules['lowercase'],
+            'upper': rules['uppercase'],
+            'digit': rules['digit'],
+            'special_char': rules['special_char']
         }
         return random_string(**rules)
 
