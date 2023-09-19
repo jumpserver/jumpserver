@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 #
-import struct
 import random
 import socket
 import string
-
+import struct
 
 string_punctuation = '!#$%&()*+,-.:;<=>?@[]^_~'
 
@@ -19,6 +18,7 @@ def random_ip():
 
 
 def random_string(length: int, lower=True, upper=True, digit=True, special_char=False):
+    random.seed(None)
     args_names = ['lower', 'upper', 'digit', 'special_char']
     args_values = [lower, upper, digit, special_char]
     args_string = [string.ascii_lowercase, string.ascii_uppercase, string.digits, string_punctuation]
