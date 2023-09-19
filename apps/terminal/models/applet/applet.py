@@ -27,7 +27,7 @@ class Applet(JMSBaseModel):
         web = 'web', _('Web')
 
     class Edition(models.TextChoices):
-        community = 'community', _('Community')
+        community = 'community', _('Community edition')
         enterprise = 'enterprise', _('Enterprise')
 
     name = models.SlugField(max_length=128, verbose_name=_('Name'), unique=True)

@@ -1329,7 +1329,7 @@ msgid ""
 "SFTP root directory, Support variable: <br>- ${ACCOUNT} The connected "
 "account username <br>- ${HOME} The home directory of the connected account "
 "<br>- ${USER} The username of the user"
-msgstr ""
+msgstr "SFTPルートディレクトリ、サポート変数：<br>-${ACCOUNT}接続されたアカウントのユーザー名<br>-${HOME}接続されたアカウントのホームディレクトリ<br>-${USER}ユーザーのユーザー名"
 
 #: assets/const/protocol.py:65
 msgid "Console"
@@ -6167,11 +6167,9 @@ msgstr "一括作成非サポート"
 msgid "Storage is invalid"
 msgstr "ストレージが無効です"
 
-#: terminal/models/applet/applet.py:30
-#, fuzzy
-#| msgid "Comment"
-msgid "Community"
-msgstr "コメント"
+#: terminal/models/applet/applet.py:30 xpack/plugins/license/models.py:88
+msgid "Community edition"
+msgstr "コミュニティ版"
 
 #: terminal/models/applet/applet.py:31
 msgid "Enterprise"
@@ -7293,7 +7291,7 @@ msgstr "公開キー"
 
 #: users/models/preference.py:38
 msgid "Preference"
-msgstr "のようにふるまう"
+msgstr "ユーザー設定"
 
 #: users/models/user.py:648 users/serializers/profile.py:94
 msgid "Force enable"
@@ -8460,10 +8458,6 @@ msgstr "エンタープライズプロフェッショナル版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "エンタープライズ・フラッグシップ・エディション"
-
-#: xpack/plugins/license/models.py:88
-msgid "Community edition"
-msgstr "コミュニティ版"
 
 #~ msgid "Random"
 #~ msgstr "ランダム"
