@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-19 10:39+0800\n"
+"POT-Creation-Date: 2023-09-19 15:41+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -907,6 +907,16 @@ msgstr "成功"
 msgid "Push related accounts to assets: %s, by system"
 msgstr "関連するアカウントをアセットにプッシュ: %s, by system"
 
+#: accounts/signal_handlers.py:55
+#, python-format
+msgid "Add account: %s"
+msgstr "アカウントを追加: %s"
+
+#: accounts/signal_handlers.py:57
+#, python-format
+msgid "Delete account: %s"
+msgstr "アカウントを削除: %s"
+
 #: accounts/tasks/automation.py:24
 msgid "Account execute automation"
 msgstr "アカウント実行の自動化"
@@ -935,23 +945,23 @@ msgstr "アセット アカウントの可用性を確認する"
 msgid "Verify accounts connectivity"
 msgstr "アカウント接続のテスト"
 
-#: accounts/utils.py:46
+#: accounts/utils.py:53
 msgid "Password can not contains `{{` "
 msgstr "パスワードには '{{' を含まない"
 
-#: accounts/utils.py:48
+#: accounts/utils.py:55
 msgid "Password can not contains `{%` "
 msgstr "パスワードには '{%' を含まない"
 
-#: accounts/utils.py:51
+#: accounts/utils.py:58
 msgid "Password can not contains `'` "
 msgstr "パスワードには `'` を含まない"
 
-#: accounts/utils.py:53
+#: accounts/utils.py:60
 msgid "Password can not contains `\"` "
 msgstr "パスワードには `\"` を含まない"
 
-#: accounts/utils.py:59
+#: accounts/utils.py:66
 msgid "private key invalid or passphrase error"
 msgstr "秘密鍵が無効またはpassphraseエラー"
 
@@ -1193,6 +1203,10 @@ msgstr "アプリ資産"
 msgid "{} disabled"
 msgstr "{} 無効"
 
+#: assets/automations/base/manager.py:202
+msgid "  - Platform {} ansible disabled"
+msgstr "  - プラットフォーム {} ansible 無効"
+
 #: assets/automations/ping_gateway/manager.py:33
 #: authentication/models/connection_token.py:128
 msgid "No account"
@@ -1329,7 +1343,10 @@ msgid ""
 "SFTP root directory, Support variable: <br>- ${ACCOUNT} The connected "
 "account username <br>- ${HOME} The home directory of the connected account "
 "<br>- ${USER} The username of the user"
-msgstr "SFTPルートディレクトリ、サポート変数：<br>-${ACCOUNT}接続されたアカウントのユーザー名<br>-${HOME}接続されたアカウントのホームディレクトリ<br>-${USER}ユーザーのユーザー名"
+msgstr ""
+"SFTPルートディレクトリ、サポート変数：<br>-${ACCOUNT}接続されたアカウントの"
+"ユーザー名<br>-${HOME}接続されたアカウントのホームディレクトリ<br>-${USER}"
+"ユーザーのユーザー名"
 
 #: assets/const/protocol.py:65
 msgid "Console"

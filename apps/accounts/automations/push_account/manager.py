@@ -80,7 +80,7 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
         pass
 
     def on_runner_failed(self, runner, e):
-        logger.error("Pust account error: ", e)
+        logger.error("Pust account error: {}".format(e))
 
     def run(self, *args, **kwargs):
         if self.secret_type and not self.check_secret():

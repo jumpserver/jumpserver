@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-19 10:39+0800\n"
+"POT-Creation-Date: 2023-09-19 15:41+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -904,6 +904,16 @@ msgstr "成功"
 msgid "Push related accounts to assets: %s, by system"
 msgstr "推送账号到资产: %s, 由系统执行"
 
+#: accounts/signal_handlers.py:55
+#, python-format
+msgid "Add account: %s"
+msgstr "添加账号: %s"
+
+#: accounts/signal_handlers.py:57
+#, python-format
+msgid "Delete account: %s"
+msgstr "删除账号: %s"
+
 #: accounts/tasks/automation.py:24
 msgid "Account execute automation"
 msgstr "账号执行自动化"
@@ -932,23 +942,23 @@ msgstr "验证资产账号可用性"
 msgid "Verify accounts connectivity"
 msgstr "测试账号可连接性"
 
-#: accounts/utils.py:46
+#: accounts/utils.py:53
 msgid "Password can not contains `{{` "
 msgstr "密码不能包含 `{{` 字符"
 
-#: accounts/utils.py:48
+#: accounts/utils.py:55
 msgid "Password can not contains `{%` "
 msgstr "密码不能包含 `{%` 字符"
 
-#: accounts/utils.py:51
+#: accounts/utils.py:58
 msgid "Password can not contains `'` "
 msgstr "密码不能包含 `'` 字符"
 
-#: accounts/utils.py:53
+#: accounts/utils.py:60
 msgid "Password can not contains `\"` "
 msgstr "密码不能包含 `\"` 字符"
 
-#: accounts/utils.py:59
+#: accounts/utils.py:66
 msgid "private key invalid or passphrase error"
 msgstr "密钥不合法或密钥密码错误"
 
@@ -1186,6 +1196,10 @@ msgstr "资产管理"
 #: assets/automations/base/manager.py:136
 msgid "{} disabled"
 msgstr "{} 已禁用"
+
+#: assets/automations/base/manager.py:202
+msgid "  - Platform {} ansible disabled"
+msgstr "  - 平台 {} Ansible 已禁用, 无法执行任务"
 
 #: assets/automations/ping_gateway/manager.py:33
 #: authentication/models/connection_token.py:128
@@ -8343,7 +8357,6 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
-
 
 #~ msgid "Random"
 #~ msgstr "随机"
