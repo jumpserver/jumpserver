@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 18:39+0800\n"
+"POT-Creation-Date: 2023-09-19 10:33+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1289,10 +1289,8 @@ msgid "Other"
 msgstr "其它"
 
 #: assets/const/protocol.py:48
-#, fuzzy
-#| msgid "SFTP Root"
 msgid "SFTP root"
-msgstr "SFTP根路径"
+msgstr "SFTP 根路径"
 
 #: assets/const/protocol.py:50
 #, python-brace-format
@@ -1301,6 +1299,8 @@ msgid ""
 "account username <br>- ${HOME} The home directory of the connected account "
 "<br>- ${USER} The username of the user"
 msgstr ""
+"SFTP根目录，支持变量：<br>-${ACCOUNT}已连接帐户用户名<br>-${HOME}连接帐户的主"
+"目录<br>-${USER}用户的用户名"
 
 #: assets/const/protocol.py:65
 msgid "Console"
@@ -6055,11 +6055,9 @@ msgstr "不支持批量创建"
 msgid "Storage is invalid"
 msgstr "存储无效"
 
-#: terminal/models/applet/applet.py:30
-#, fuzzy
-#| msgid "Comment"
-msgid "Community"
-msgstr "备注"
+#: terminal/models/applet/applet.py:30 xpack/plugins/license/models.py:88
+msgid "Community edition"
+msgstr "社区版"
 
 #: terminal/models/applet/applet.py:31
 msgid "Enterprise"
@@ -7169,7 +7167,7 @@ msgstr "SSH公钥"
 
 #: users/models/preference.py:38
 msgid "Preference"
-msgstr "爱好"
+msgstr "用户设置"
 
 #: users/models/user.py:648 users/serializers/profile.py:94
 msgid "Force enable"
@@ -7213,6 +7211,7 @@ msgstr "最后更新密码日期"
 msgid "Need update password"
 msgstr "需要更新密码"
 
+#: users/models/user.py:977
 msgid "Can not delete admin user"
 msgstr "无法删除管理员用户"
 
@@ -8319,7 +8318,3 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
-
-#: xpack/plugins/license/models.py:88
-msgid "Community edition"
-msgstr "社区版"
