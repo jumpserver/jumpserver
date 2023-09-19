@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import transaction
 from rest_framework import status
 from rest_framework import viewsets
@@ -80,8 +82,12 @@ class AppletHostDeploymentViewSet(viewsets.ModelViewSet):
         objs = [model(host=host) for host in hosts_qs]
         applet_host_deployments = model.objects.bulk_create(objs)
         applet_host_deployment_ids = [str(obj.id) for obj in applet_host_deployments]
-
-        task = run_applet_host_deployment_install_applet.delay(applet_host_deployment_ids, applet_id)
-        task_id = str(task.id)
+        task_id = str(uuid.uuid4())
         model.objects.filter(id__in=applet_host_deployment_ids).update(task=task_id)
+        transaction.on_commit(lambda: self.start_install_applet(applet_host_deployment_ids, applet_id, task_id))
         return Response({'task': task_id}, status=201)
+
+    @staticmethod
+    def start_install_applet(applet_host_deployment_ids, applet_id, task_id):
+        run_applet_host_deployment_install_applet.apply_async((applet_host_deployment_ids, applet_id),
+                                                              task_id=str(task_id))
