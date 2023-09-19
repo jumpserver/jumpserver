@@ -30,7 +30,7 @@ class SecretGenerator:
             'lower': rules['lowercase'],
             'upper': rules['uppercase'],
             'digit': rules['digit'],
-            'special_char': rules['special_char']
+            'special_char': rules['symbol']
         }
         return random_string(**rules)
 
