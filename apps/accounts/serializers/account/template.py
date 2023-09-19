@@ -35,10 +35,13 @@ class AccountTemplateSerializer(BaseAccountSerializer):
         extra_kwargs = {
             'secret_strategy': {'help_text': _('Secret generation strategy for account creation')},
             'auto_push': {'help_text': _('Whether to automatically push the account to the asset')},
-            'platforms': {'help_text': _(
-                'Associated platform, you can configure push parameters. '
-                'If not associated, default parameters will be used'
-            )},
+            'platforms': {
+                'help_text': _(
+                    'Associated platform, you can configure push parameters. '
+                    'If not associated, default parameters will be used'
+                ),
+                'required': False
+            },
         }
 
     def sync_accounts_secret(self, instance, diff):
