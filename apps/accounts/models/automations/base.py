@@ -1,14 +1,13 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from accounts.const import SecretStrategy, SSHKeyStrategy, SecretType
-from accounts.models import Account
+from accounts.const import SSHKeyStrategy
+from accounts.models import Account, SecretWithRandomMixin
 from accounts.tasks import execute_account_automation_task
 from assets.models.automations import (
     BaseAutomation as AssetBaseAutomation,
     AutomationExecution as AssetAutomationExecution
 )
-from common.db import fields
 
 __all__ = ['AccountBaseAutomation', 'AutomationExecution', 'ChangeSecretMixin']
 
@@ -49,27 +48,11 @@ class AutomationExecution(AssetAutomationExecution):
         return manager.run()
 
 
-class ChangeSecretRuleMixin(models.Model):
-    secret_strategy = models.CharField(
-        choices=SecretStrategy.choices, max_length=16,
-        default=SecretStrategy.custom, verbose_name=_('Secret strategy')
-    )
-    password_rules = models.JSONField(default=dict, verbose_name=_('Password rules'))
+class ChangeSecretMixin(SecretWithRandomMixin):
     ssh_key_change_strategy = models.CharField(
         choices=SSHKeyStrategy.choices, max_length=16,
         default=SSHKeyStrategy.add, verbose_name=_('SSH key change strategy')
     )
-
-    class Meta:
-        abstract = True
-
-
-class ChangeSecretMixin(ChangeSecretRuleMixin):
-    secret_type = models.CharField(
-        choices=SecretType.choices, max_length=16,
-        default=SecretType.PASSWORD, verbose_name=_('Secret type')
-    )
-    secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Secret'))
     get_all_assets: callable  # get all assets
 
     class Meta:

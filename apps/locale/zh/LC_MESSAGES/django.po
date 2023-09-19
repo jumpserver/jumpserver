@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-19 10:33+0800\n"
+"POT-Creation-Date: 2023-09-19 10:39+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -22,7 +22,7 @@ msgid "The parameter 'action' must be [{}]"
 msgstr "参数 'action' 必须是 [{}]"
 
 #: accounts/const/account.py:6
-#: accounts/serializers/automations/change_secret.py:33
+#: accounts/serializers/automations/change_secret.py:32
 #: assets/models/_user.py:24 audits/signal_handlers/login_log.py:35
 #: authentication/confirm/password.py:9 authentication/forms.py:32
 #: authentication/templates/authentication/login.html:286
@@ -35,7 +35,7 @@ msgid "Password"
 msgstr "密码"
 
 #: accounts/const/account.py:7
-#: accounts/serializers/automations/change_secret.py:34
+#: accounts/serializers/automations/change_secret.py:33
 msgid "SSH key"
 msgstr "SSH 密钥"
 
@@ -93,97 +93,97 @@ msgid "Update"
 msgstr "更新"
 
 #: accounts/const/account.py:33
-#: accounts/serializers/automations/change_secret.py:156 audits/const.py:55
+#: accounts/serializers/automations/change_secret.py:155 audits/const.py:55
 #: audits/signal_handlers/activity_log.py:33 common/const/choices.py:19
 #: ops/const.py:62 terminal/const.py:77 xpack/plugins/cloud/const.py:43
 msgid "Failed"
 msgstr "失败"
 
-#: accounts/const/automation.py:22 rbac/tree.py:50
+#: accounts/const/automation.py:24 rbac/tree.py:50
 msgid "Push account"
 msgstr "账号推送"
 
-#: accounts/const/automation.py:23
+#: accounts/const/automation.py:25
 msgid "Change secret"
 msgstr "更改密码"
 
-#: accounts/const/automation.py:24
+#: accounts/const/automation.py:26
 msgid "Verify account"
 msgstr "验证账号"
 
-#: accounts/const/automation.py:25
+#: accounts/const/automation.py:27
 msgid "Gather accounts"
 msgstr "收集账号"
 
-#: accounts/const/automation.py:26
+#: accounts/const/automation.py:28
 msgid "Verify gateway account"
 msgstr "验证网关账号"
 
-#: accounts/const/automation.py:44
-msgid "Specific password"
+#: accounts/const/automation.py:46
+msgid "Specific secret"
 msgstr "指定"
 
-#: accounts/const/automation.py:45
-msgid "Random"
-msgstr "随机"
+#: accounts/const/automation.py:47
+msgid "Random generate"
+msgstr "随机生成"
 
-#: accounts/const/automation.py:49 ops/const.py:13
+#: accounts/const/automation.py:51 ops/const.py:13
 msgid "Append SSH KEY"
 msgstr "追加"
 
-#: accounts/const/automation.py:50 ops/const.py:14
+#: accounts/const/automation.py:52 ops/const.py:14
 msgid "Empty and append SSH KEY"
 msgstr "清空所有并添加"
 
-#: accounts/const/automation.py:51 ops/const.py:15
+#: accounts/const/automation.py:53 ops/const.py:15
 msgid "Replace (Replace only keys pushed by JumpServer) "
 msgstr "替换 (只替换由 JumpServer 推送的密钥)"
 
-#: accounts/const/automation.py:56
+#: accounts/const/automation.py:58
 msgid "On asset create"
 msgstr "资产创建时"
 
-#: accounts/const/automation.py:59
+#: accounts/const/automation.py:61
 msgid "On perm add user"
 msgstr "授权变更时添加用户"
 
-#: accounts/const/automation.py:61
+#: accounts/const/automation.py:63
 msgid "On perm add user group"
 msgstr "授权变更时添加用户组"
 
-#: accounts/const/automation.py:63
+#: accounts/const/automation.py:65
 msgid "On perm add asset"
 msgstr "授权变更时添加资产"
 
-#: accounts/const/automation.py:65
+#: accounts/const/automation.py:67
 msgid "On perm add node"
 msgstr "授权变更时添加节点"
 
-#: accounts/const/automation.py:67
+#: accounts/const/automation.py:69
 msgid "On perm add account"
 msgstr "授权变更时添加账号"
 
-#: accounts/const/automation.py:69
+#: accounts/const/automation.py:71
 msgid "On asset join node"
 msgstr "资产变更时添加到节点"
 
-#: accounts/const/automation.py:71
+#: accounts/const/automation.py:73
 msgid "On user join group"
 msgstr "用户变更时添加到用户组"
 
-#: accounts/const/automation.py:79
+#: accounts/const/automation.py:81
 msgid "On perm change"
 msgstr "授权变更时"
 
-#: accounts/const/automation.py:86
+#: accounts/const/automation.py:88
 msgid "Inherit from group or node"
 msgstr "继承自用户组或资产节点"
 
-#: accounts/const/automation.py:94
+#: accounts/const/automation.py:96
 msgid "Create and push"
 msgstr "创建并推送"
 
-#: accounts/const/automation.py:95
+#: accounts/const/automation.py:97
 msgid "Only create"
 msgstr "仅创建"
 
@@ -216,11 +216,11 @@ msgstr "用户 %s 查看/导出 了密码"
 
 #: accounts/models/account.py:48
 #: accounts/models/automations/gather_account.py:16
-#: accounts/serializers/account/account.py:202
-#: accounts/serializers/account/account.py:247
+#: accounts/serializers/account/account.py:205
+#: accounts/serializers/account/account.py:250
 #: accounts/serializers/account/gathered_account.py:10
-#: accounts/serializers/automations/change_secret.py:112
-#: accounts/serializers/automations/change_secret.py:132
+#: accounts/serializers/automations/change_secret.py:111
+#: accounts/serializers/automations/change_secret.py:131
 #: acls/serializers/base.py:123 assets/models/asset/common.py:93
 #: assets/models/asset/common.py:334 assets/models/cmd_filter.py:36
 #: assets/serializers/domain.py:19 assets/serializers/label.py:27
@@ -235,10 +235,10 @@ msgstr "用户 %s 查看/导出 了密码"
 msgid "Asset"
 msgstr "资产"
 
-#: accounts/models/account.py:52 accounts/models/template.py:17
-#: accounts/serializers/account/account.py:209
-#: accounts/serializers/account/account.py:257
-#: accounts/serializers/account/template.py:16
+#: accounts/models/account.py:52 accounts/models/template.py:15
+#: accounts/serializers/account/account.py:212
+#: accounts/serializers/account/account.py:260
+#: accounts/serializers/account/template.py:25
 #: authentication/serializers/connect_token_secret.py:49
 msgid "Su from"
 msgstr "切换自"
@@ -249,7 +249,7 @@ msgstr "切换自"
 msgid "Version"
 msgstr "版本"
 
-#: accounts/models/account.py:56 accounts/serializers/account/account.py:204
+#: accounts/models/account.py:56 accounts/serializers/account/account.py:207
 #: users/models/user.py:846
 msgid "Source"
 msgstr "来源"
@@ -259,8 +259,8 @@ msgid "Source ID"
 msgstr "来源 ID"
 
 #: accounts/models/account.py:60
-#: accounts/serializers/automations/change_secret.py:113
-#: accounts/serializers/automations/change_secret.py:133
+#: accounts/serializers/automations/change_secret.py:112
+#: accounts/serializers/automations/change_secret.py:132
 #: acls/serializers/base.py:124 assets/serializers/asset/common.py:125
 #: assets/serializers/gateway.py:28 audits/models.py:55 ops/models/base.py:18
 #: perms/models/asset_permission.py:70 perms/serializers/permission.py:39
@@ -339,8 +339,8 @@ msgid "Reason"
 msgstr "原因"
 
 #: accounts/models/automations/backup_account.py:107
-#: accounts/serializers/automations/change_secret.py:111
-#: accounts/serializers/automations/change_secret.py:134
+#: accounts/serializers/automations/change_secret.py:110
+#: accounts/serializers/automations/change_secret.py:133
 #: ops/serializers/job.py:56 terminal/serializers/session.py:46
 msgid "Is success"
 msgstr "是否成功"
@@ -349,75 +349,49 @@ msgstr "是否成功"
 msgid "Account backup execution"
 msgstr "账号备份执行"
 
-#: accounts/models/automations/base.py:19
+#: accounts/models/automations/base.py:18
 msgid "Account automation task"
 msgstr "账号自动化任务"
 
-#: accounts/models/automations/base.py:33
+#: accounts/models/automations/base.py:32
 msgid "Automation execution"
 msgstr "自动化执行"
 
-#: accounts/models/automations/base.py:34
+#: accounts/models/automations/base.py:33
 msgid "Automation executions"
 msgstr "自动化执行"
 
-#: accounts/models/automations/base.py:36
+#: accounts/models/automations/base.py:35
 msgid "Can view change secret execution"
 msgstr "查看改密执行"
 
-#: accounts/models/automations/base.py:37
+#: accounts/models/automations/base.py:36
 msgid "Can add change secret execution"
 msgstr "创建改密执行"
 
-#: accounts/models/automations/base.py:39
+#: accounts/models/automations/base.py:38
 msgid "Can view gather accounts execution"
 msgstr "查看收集账号执行"
 
-#: accounts/models/automations/base.py:40
+#: accounts/models/automations/base.py:39
 msgid "Can add gather accounts execution"
 msgstr "创建收集账号执行"
 
-#: accounts/models/automations/base.py:42
+#: accounts/models/automations/base.py:41
 msgid "Can view push account execution"
 msgstr "查看推送账号执行"
 
-#: accounts/models/automations/base.py:43
+#: accounts/models/automations/base.py:42
 msgid "Can add push account execution"
 msgstr "创建推送账号执行"
 
-#: accounts/models/automations/base.py:55 accounts/models/template.py:21
-#: accounts/serializers/automations/change_secret.py:40
-msgid "Secret strategy"
-msgstr "密文策略"
-
-#: accounts/models/automations/base.py:57
-msgid "Password rules"
-msgstr "密码规则"
-
-#: accounts/models/automations/base.py:60
+#: accounts/models/automations/base.py:54
 msgid "SSH key change strategy"
 msgstr "SSH 密钥推送方式"
 
-#: accounts/models/automations/base.py:70 accounts/models/base.py:36
-#: accounts/serializers/account/account.py:429
-#: accounts/serializers/account/base.py:16
-#: accounts/serializers/automations/change_secret.py:46
-#: authentication/serializers/connect_token_secret.py:41
-#: authentication/serializers/connect_token_secret.py:50
-msgid "Secret type"
-msgstr "密文类型"
-
-#: accounts/models/automations/base.py:72 accounts/models/mixins/vault.py:48
-#: accounts/serializers/account/base.py:19
-#: authentication/models/temp_token.py:10
-#: authentication/templates/authentication/_access_key_modal.html:31
-#: settings/serializers/auth/radius.py:19
-msgid "Secret"
-msgstr "密钥"
-
 #: accounts/models/automations/change_secret.py:15
 #: accounts/serializers/account/backup.py:34
-#: accounts/serializers/automations/change_secret.py:57
+#: accounts/serializers/automations/change_secret.py:56
 msgid "Recipient"
 msgstr "收件人"
 
@@ -445,7 +419,7 @@ msgid "Date finished"
 msgstr "结束日期"
 
 #: accounts/models/automations/change_secret.py:44
-#: accounts/serializers/account/account.py:249 assets/const/automation.py:8
+#: accounts/serializers/account/account.py:252 assets/const/automation.py:8
 #: authentication/templates/authentication/passkey.html:173
 #: authentication/views/base.py:26 authentication/views/base.py:27
 #: authentication/views/base.py:28 common/const/choices.py:20
@@ -465,7 +439,7 @@ msgid "Date last login"
 msgstr "最后登录日期"
 
 #: accounts/models/automations/gather_account.py:17
-#: accounts/models/automations/push_account.py:15 accounts/models/base.py:34
+#: accounts/models/automations/push_account.py:15 accounts/models/base.py:65
 #: accounts/serializers/account/virtual.py:21 acls/serializers/base.py:19
 #: acls/serializers/base.py:50 assets/models/_user.py:23 audits/models.py:180
 #: authentication/forms.py:25 authentication/forms.py:27
@@ -515,7 +489,34 @@ msgstr "账号推送"
 msgid "Verify asset account"
 msgstr "账号验证"
 
-#: accounts/models/base.py:33 accounts/serializers/account/virtual.py:20
+#: accounts/models/base.py:37 accounts/models/base.py:67
+#: accounts/serializers/account/account.py:432
+#: accounts/serializers/account/base.py:16
+#: accounts/serializers/automations/change_secret.py:45
+#: authentication/serializers/connect_token_secret.py:41
+#: authentication/serializers/connect_token_secret.py:50
+msgid "Secret type"
+msgstr "密文类型"
+
+#: accounts/models/base.py:39 accounts/models/mixins/vault.py:48
+#: accounts/serializers/account/base.py:19
+#: authentication/models/temp_token.py:10
+#: authentication/templates/authentication/_access_key_modal.html:31
+#: settings/serializers/auth/radius.py:19
+msgid "Secret"
+msgstr "密钥"
+
+#: accounts/models/base.py:42
+#: accounts/serializers/automations/change_secret.py:39
+msgid "Secret strategy"
+msgstr "密文策略"
+
+#: accounts/models/base.py:44 accounts/serializers/account/template.py:22
+#: accounts/serializers/automations/change_secret.py:44
+msgid "Password rules"
+msgstr "密码规则"
+
+#: accounts/models/base.py:64 accounts/serializers/account/virtual.py:20
 #: acls/models/base.py:35 acls/models/base.py:96 acls/models/command_acl.py:21
 #: acls/serializers/base.py:35 applications/models.py:9
 #: assets/models/_user.py:22 assets/models/asset/common.py:91
@@ -540,11 +541,11 @@ msgstr "账号验证"
 msgid "Name"
 msgstr "名称"
 
-#: accounts/models/base.py:38
+#: accounts/models/base.py:69
 msgid "Privileged"
 msgstr "特权账号"
 
-#: accounts/models/base.py:39 assets/models/asset/common.py:156
+#: accounts/models/base.py:70 assets/models/asset/common.py:156
 #: assets/models/automations/base.py:21 assets/models/cmd_filter.py:39
 #: assets/models/label.py:22
 #: authentication/serializers/connect_token_secret.py:114
@@ -553,27 +554,27 @@ msgstr "特权账号"
 msgid "Is active"
 msgstr "激活"
 
-#: accounts/models/template.py:23 assets/models/_user.py:53
+#: accounts/models/template.py:17 assets/models/_user.py:53
 msgid "Auto push"
 msgstr "自动推送"
 
-#: accounts/models/template.py:26
+#: accounts/models/template.py:20
 msgid "Platforms"
 msgstr "系统平台"
 
-#: accounts/models/template.py:28
+#: accounts/models/template.py:22
 msgid "Push params"
 msgstr "账号推送参数"
 
-#: accounts/models/template.py:31 xpack/plugins/cloud/models.py:325
+#: accounts/models/template.py:25 xpack/plugins/cloud/models.py:325
 msgid "Account template"
 msgstr "账号模版"
 
-#: accounts/models/template.py:36
+#: accounts/models/template.py:30
 msgid "Can view asset account template secret"
 msgstr "可以查看资产账号模版密码"
 
-#: accounts/models/template.py:37
+#: accounts/models/template.py:31
 msgid "Can change asset account template secret"
 msgstr "可以更改资产账号模版密码"
 
@@ -654,7 +655,7 @@ msgstr "立即推送"
 msgid "Exist policy"
 msgstr "账号存在策略"
 
-#: accounts/serializers/account/account.py:182 applications/models.py:11
+#: accounts/serializers/account/account.py:185 applications/models.py:11
 #: assets/models/label.py:21 assets/models/platform.py:89
 #: assets/serializers/asset/common.py:121 assets/serializers/cagegory.py:8
 #: assets/serializers/platform.py:133 assets/serializers/platform.py:229
@@ -663,7 +664,7 @@ msgstr "账号存在策略"
 msgid "Category"
 msgstr "类别"
 
-#: accounts/serializers/account/account.py:183
+#: accounts/serializers/account/account.py:186
 #: accounts/serializers/automations/base.py:54 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:18 applications/models.py:14
 #: assets/models/_user.py:50 assets/models/automations/base.py:20
@@ -683,26 +684,26 @@ msgstr "类别"
 msgid "Type"
 msgstr "类型"
 
-#: accounts/serializers/account/account.py:198
+#: accounts/serializers/account/account.py:201
 msgid "Asset not found"
 msgstr "资产不存在"
 
-#: accounts/serializers/account/account.py:238
+#: accounts/serializers/account/account.py:241
 msgid "Has secret"
 msgstr "已托管密码"
 
-#: accounts/serializers/account/account.py:248 ops/models/celery.py:60
+#: accounts/serializers/account/account.py:251 ops/models/celery.py:60
 #: tickets/models/comment.py:13 tickets/models/ticket/general.py:45
 #: tickets/models/ticket/general.py:279 tickets/serializers/super_ticket.py:14
 #: tickets/serializers/ticket/ticket.py:21
 msgid "State"
 msgstr "状态"
 
-#: accounts/serializers/account/account.py:250
+#: accounts/serializers/account/account.py:253
 msgid "Changed"
 msgstr "已修改"
 
-#: accounts/serializers/account/account.py:260
+#: accounts/serializers/account/account.py:263
 #: accounts/serializers/automations/base.py:22 acls/models/base.py:97
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20 ops/models/base.py:17
@@ -711,27 +712,27 @@ msgstr "已修改"
 msgid "Assets"
 msgstr "资产"
 
-#: accounts/serializers/account/account.py:315
+#: accounts/serializers/account/account.py:318
 msgid "Account already exists"
 msgstr "账号已存在"
 
-#: accounts/serializers/account/account.py:365
+#: accounts/serializers/account/account.py:368
 #, python-format
 msgid "Asset does not support this secret type: %s"
 msgstr "资产不支持账号类型: %s"
 
-#: accounts/serializers/account/account.py:397
+#: accounts/serializers/account/account.py:400
 msgid "Account has exist"
 msgstr "账号已存在"
 
-#: accounts/serializers/account/account.py:430
+#: accounts/serializers/account/account.py:433
 #: authentication/serializers/connect_token_secret.py:156
 #: authentication/templates/authentication/_access_key_modal.html:30
 #: perms/models/perm_node.py:21 users/serializers/group.py:31
 msgid "ID"
 msgstr "ID"
 
-#: accounts/serializers/account/account.py:437 acls/serializers/base.py:116
+#: accounts/serializers/account/account.py:440 acls/serializers/base.py:116
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:50
 #: audits/models.py:86 audits/models.py:164 audits/models.py:262
 #: audits/serializers.py:171 authentication/models/connection_token.py:32
@@ -750,7 +751,7 @@ msgstr "ID"
 msgid "User"
 msgstr "用户"
 
-#: accounts/serializers/account/account.py:438
+#: accounts/serializers/account/account.py:441
 #: authentication/templates/authentication/_access_key_modal.html:33
 #: terminal/notifications.py:158 terminal/notifications.py:207
 msgid "Date"
@@ -769,7 +770,7 @@ msgid "Executed amount"
 msgstr "执行次数"
 
 #: accounts/serializers/account/backup.py:35
-#: accounts/serializers/automations/change_secret.py:58
+#: accounts/serializers/automations/change_secret.py:57
 msgid "Currently only mail sending is supported"
 msgstr "当前只支持邮件发送"
 
@@ -794,15 +795,39 @@ msgstr ""
 "提示: 如果认证时不需要用户名，可填写为 null, 如果是 AD 账号，格式为 "
 "username@domain"
 
-#: accounts/serializers/account/template.py:27
+#: accounts/serializers/account/template.py:11
+#, fuzzy
+#| msgid "Password strength"
+msgid "Password length"
+msgstr "密码强度："
+
+#: accounts/serializers/account/template.py:12
+#, fuzzy
+#| msgid "Powershell"
+msgid "Lowercase"
+msgstr "PowerShell"
+
+#: accounts/serializers/account/template.py:13
+msgid "Uppercase"
+msgstr ""
+
+#: accounts/serializers/account/template.py:14
+msgid "Digit"
+msgstr ""
+
+#: accounts/serializers/account/template.py:15
+msgid "Special symbol"
+msgstr ""
+
+#: accounts/serializers/account/template.py:36
 msgid "Secret generation strategy for account creation"
 msgstr "密码生成策略，用于账号创建时，设置密码"
 
-#: accounts/serializers/account/template.py:28
+#: accounts/serializers/account/template.py:37
 msgid "Whether to automatically push the account to the asset"
 msgstr "是否自动推送账号到资产"
 
-#: accounts/serializers/account/template.py:30
+#: accounts/serializers/account/template.py:40
 msgid ""
 "Associated platform, you can configure push parameters. If not associated, "
 "default parameters will be used"
@@ -849,24 +874,24 @@ msgstr "名称已存在"
 msgid "Automation snapshot"
 msgstr "自动化快照"
 
-#: accounts/serializers/automations/change_secret.py:43
+#: accounts/serializers/automations/change_secret.py:42
 msgid "SSH Key strategy"
 msgstr "SSH 密钥更改方式"
 
-#: accounts/serializers/automations/change_secret.py:81
+#: accounts/serializers/automations/change_secret.py:80
 msgid "* Please enter the correct password length"
 msgstr "* 请输入正确的密码长度"
 
-#: accounts/serializers/automations/change_secret.py:85
+#: accounts/serializers/automations/change_secret.py:84
 msgid "* Password length range 6-30 bits"
 msgstr "* 密码长度范围 6-30 位"
 
-#: accounts/serializers/automations/change_secret.py:115
+#: accounts/serializers/automations/change_secret.py:114
 #: assets/models/automations/base.py:127
 msgid "Automation task execution"
 msgstr "自动化任务执行历史"
 
-#: accounts/serializers/automations/change_secret.py:155 audits/const.py:54
+#: accounts/serializers/automations/change_secret.py:154 audits/const.py:54
 #: audits/models.py:60 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:18 ops/const.py:60 ops/serializers/celery.py:40
 #: terminal/const.py:76 terminal/models/session/sharing.py:121
@@ -907,23 +932,23 @@ msgstr "验证资产账号可用性"
 msgid "Verify accounts connectivity"
 msgstr "测试账号可连接性"
 
-#: accounts/utils.py:41
+#: accounts/utils.py:46
 msgid "Password can not contains `{{` "
 msgstr "密码不能包含 `{{` 字符"
 
-#: accounts/utils.py:43
+#: accounts/utils.py:48
 msgid "Password can not contains `{%` "
 msgstr "密码不能包含 `{%` 字符"
 
-#: accounts/utils.py:46
+#: accounts/utils.py:51
 msgid "Password can not contains `'` "
 msgstr "密码不能包含 `'` 字符"
 
-#: accounts/utils.py:48
+#: accounts/utils.py:53
 msgid "Password can not contains `\"` "
 msgstr "密码不能包含 `\"` 字符"
 
-#: accounts/utils.py:54
+#: accounts/utils.py:59
 msgid "private key invalid or passphrase error"
 msgstr "密钥不合法或密钥密码错误"
 
@@ -8318,3 +8343,7 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
+
+
+#~ msgid "Random"
+#~ msgstr "随机"

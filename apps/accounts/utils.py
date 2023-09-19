@@ -1,3 +1,5 @@
+import copy
+
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -18,9 +20,19 @@ class SecretGenerator:
         return private_key
 
     def generate_password(self):
-        length = int(self.password_rules.get('length', 0))
-        length = length if length else DEFAULT_PASSWORD_RULES['length']
-        return random_string(length, special_char=True)
+        password_rules = self.password_rules
+        if not password_rules or not isinstance(password_rules, dict):
+            password_rules = {}
+        rules = copy.deepcopy(DEFAULT_PASSWORD_RULES)
+        rules.update(password_rules)
+        rules = {
+            'length': rules['length'],
+            'lower': rules['lowercase'],
+            'upper': rules['uppercase'],
+            'digit': rules['digit'],
+            'special_char': rules['symbol']
+        }
+        return random_string(**rules)
 
     def get_secret(self):
         if self.secret_type == SecretType.SSH_KEY:

@@ -8,8 +8,10 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from accounts.const import SecretType
+from accounts.const import SecretType, SecretStrategy
 from accounts.models.mixins import VaultModelMixin, VaultManagerMixin, VaultQuerySetMixin
+from accounts.utils import SecretGenerator
+from common.db import fields
 from common.utils import (
     ssh_key_string_to_obj, ssh_key_gen, get_logger,
     random_string, lazyproperty, parse_ssh_public_key_str, is_openssh_format_key
@@ -27,6 +29,35 @@ class BaseAccountQuerySet(VaultQuerySetMixin, models.QuerySet):
 class BaseAccountManager(VaultManagerMixin, OrgManager):
     def active(self):
         return self.get_queryset().active()
+
+
+class SecretWithRandomMixin(models.Model):
+    secret_type = models.CharField(
+        choices=SecretType.choices, max_length=16,
+        default=SecretType.PASSWORD, verbose_name=_('Secret type')
+    )
+    secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Secret'))
+    secret_strategy = models.CharField(
+        choices=SecretStrategy.choices, max_length=16,
+        default=SecretStrategy.custom, verbose_name=_('Secret strategy')
+    )
+    password_rules = models.JSONField(default=dict, verbose_name=_('Password rules'))
+
+    class Meta:
+        abstract = True
+
+    @lazyproperty
+    def secret_generator(self):
+        return SecretGenerator(
+            self.secret_strategy, self.secret_type,
+            self.password_rules,
+        )
+
+    def get_secret(self):
+        if self.secret_strategy == 'random':
+            return self.secret_generator.get_secret()
+        else:
+            return self.secret
 
 
 class BaseAccount(VaultModelMixin, JMSOrgBaseModel):

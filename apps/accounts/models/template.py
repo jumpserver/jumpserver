@@ -4,21 +4,15 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from .account import Account
-from .base import BaseAccount
+from .base import BaseAccount, SecretWithRandomMixin
 
 __all__ = ['AccountTemplate', ]
 
-from ..const import SecretStrategy
 
-
-class AccountTemplate(BaseAccount):
+class AccountTemplate(BaseAccount, SecretWithRandomMixin):
     su_from = models.ForeignKey(
         'self', related_name='su_to', null=True,
         on_delete=models.SET_NULL, verbose_name=_("Su from")
-    )
-    secret_strategy = models.CharField(
-        choices=SecretStrategy.choices, max_length=16,
-        default=SecretStrategy.custom, verbose_name=_('Secret strategy')
     )
     auto_push = models.BooleanField(default=False, verbose_name=_('Auto push'))
     platforms = models.ManyToManyField(

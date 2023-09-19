@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-19 10:25+0800\n"
+"POT-Creation-Date: 2023-09-19 10:39+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,7 +23,7 @@ msgid "The parameter 'action' must be [{}]"
 msgstr "パラメータ 'action' は [{}] でなければなりません。"
 
 #: accounts/const/account.py:6
-#: accounts/serializers/automations/change_secret.py:33
+#: accounts/serializers/automations/change_secret.py:32
 #: assets/models/_user.py:24 audits/signal_handlers/login_log.py:35
 #: authentication/confirm/password.py:9 authentication/forms.py:32
 #: authentication/templates/authentication/login.html:286
@@ -36,7 +36,7 @@ msgid "Password"
 msgstr "パスワード"
 
 #: accounts/const/account.py:7
-#: accounts/serializers/automations/change_secret.py:34
+#: accounts/serializers/automations/change_secret.py:33
 msgid "SSH key"
 msgstr "SSH キー"
 
@@ -94,97 +94,97 @@ msgid "Update"
 msgstr "更新"
 
 #: accounts/const/account.py:33
-#: accounts/serializers/automations/change_secret.py:156 audits/const.py:55
+#: accounts/serializers/automations/change_secret.py:155 audits/const.py:55
 #: audits/signal_handlers/activity_log.py:33 common/const/choices.py:19
 #: ops/const.py:62 terminal/const.py:77 xpack/plugins/cloud/const.py:43
 msgid "Failed"
 msgstr "失敗しました"
 
-#: accounts/const/automation.py:22 rbac/tree.py:50
+#: accounts/const/automation.py:24 rbac/tree.py:50
 msgid "Push account"
 msgstr "アカウントプッシュ"
 
-#: accounts/const/automation.py:23
+#: accounts/const/automation.py:25
 msgid "Change secret"
 msgstr "パスワードを変更する"
 
-#: accounts/const/automation.py:24
+#: accounts/const/automation.py:26
 msgid "Verify account"
 msgstr "アカウントを確認"
 
-#: accounts/const/automation.py:25
+#: accounts/const/automation.py:27
 msgid "Gather accounts"
 msgstr "アカウントのコレクション"
 
-#: accounts/const/automation.py:26
+#: accounts/const/automation.py:28
 msgid "Verify gateway account"
 msgstr "ゲートウェイ アカウントを確認する"
 
-#: accounts/const/automation.py:44
-msgid "Specific password"
+#: accounts/const/automation.py:46
+msgid "Specific secret"
 msgstr "特定"
 
-#: accounts/const/automation.py:45
-msgid "Random"
-msgstr "ランダム"
+#: accounts/const/automation.py:47
+msgid "Random generate"
+msgstr "ランダム生成"
 
-#: accounts/const/automation.py:49 ops/const.py:13
+#: accounts/const/automation.py:51 ops/const.py:13
 msgid "Append SSH KEY"
 msgstr "追加"
 
-#: accounts/const/automation.py:50 ops/const.py:14
+#: accounts/const/automation.py:52 ops/const.py:14
 msgid "Empty and append SSH KEY"
 msgstr "すべてクリアして追加"
 
-#: accounts/const/automation.py:51 ops/const.py:15
+#: accounts/const/automation.py:53 ops/const.py:15
 msgid "Replace (Replace only keys pushed by JumpServer) "
 msgstr "置換（JumpServer によってプッシュされたキーのみを置換）"
 
-#: accounts/const/automation.py:56
+#: accounts/const/automation.py:58
 msgid "On asset create"
 msgstr "アセットが作成されたとき"
 
-#: accounts/const/automation.py:59
+#: accounts/const/automation.py:61
 msgid "On perm add user"
 msgstr "承認が変更されたときにユーザーを追加する"
 
-#: accounts/const/automation.py:61
+#: accounts/const/automation.py:63
 msgid "On perm add user group"
 msgstr "権限変更時にユーザーグループを追加"
 
-#: accounts/const/automation.py:63
+#: accounts/const/automation.py:65
 msgid "On perm add asset"
 msgstr "変更の承認時にアセットを追加する"
 
-#: accounts/const/automation.py:65
+#: accounts/const/automation.py:67
 msgid "On perm add node"
 msgstr "承認変更時のノードの追加"
 
-#: accounts/const/automation.py:67
+#: accounts/const/automation.py:69
 msgid "On perm add account"
 msgstr "承認が変更されたときにアカウントを追加する"
 
-#: accounts/const/automation.py:69
+#: accounts/const/automation.py:71
 msgid "On asset join node"
 msgstr "アセットの変更時にノードに追加"
 
-#: accounts/const/automation.py:71
+#: accounts/const/automation.py:73
 msgid "On user join group"
 msgstr "ユーザー変更時にユーザーグループに追加"
 
-#: accounts/const/automation.py:79
+#: accounts/const/automation.py:81
 msgid "On perm change"
 msgstr "権限が変更されたとき"
 
-#: accounts/const/automation.py:86
+#: accounts/const/automation.py:88
 msgid "Inherit from group or node"
 msgstr "ユーザーグループまたはアセットノードから継承"
 
-#: accounts/const/automation.py:94
+#: accounts/const/automation.py:96
 msgid "Create and push"
 msgstr "作成してプッシュ"
 
-#: accounts/const/automation.py:95
+#: accounts/const/automation.py:97
 msgid "Only create"
 msgstr "作成のみ"
 
@@ -217,11 +217,11 @@ msgstr "ユーザー %s がパスワードを閲覧/導き出しました"
 
 #: accounts/models/account.py:48
 #: accounts/models/automations/gather_account.py:16
-#: accounts/serializers/account/account.py:202
-#: accounts/serializers/account/account.py:247
+#: accounts/serializers/account/account.py:205
+#: accounts/serializers/account/account.py:250
 #: accounts/serializers/account/gathered_account.py:10
-#: accounts/serializers/automations/change_secret.py:112
-#: accounts/serializers/automations/change_secret.py:132
+#: accounts/serializers/automations/change_secret.py:111
+#: accounts/serializers/automations/change_secret.py:131
 #: acls/serializers/base.py:123 assets/models/asset/common.py:93
 #: assets/models/asset/common.py:334 assets/models/cmd_filter.py:36
 #: assets/serializers/domain.py:19 assets/serializers/label.py:27
@@ -236,10 +236,10 @@ msgstr "ユーザー %s がパスワードを閲覧/導き出しました"
 msgid "Asset"
 msgstr "資産"
 
-#: accounts/models/account.py:52 accounts/models/template.py:17
-#: accounts/serializers/account/account.py:209
-#: accounts/serializers/account/account.py:257
-#: accounts/serializers/account/template.py:16
+#: accounts/models/account.py:52 accounts/models/template.py:15
+#: accounts/serializers/account/account.py:212
+#: accounts/serializers/account/account.py:260
+#: accounts/serializers/account/template.py:25
 #: authentication/serializers/connect_token_secret.py:49
 msgid "Su from"
 msgstr "から切り替え"
@@ -250,7 +250,7 @@ msgstr "から切り替え"
 msgid "Version"
 msgstr "バージョン"
 
-#: accounts/models/account.py:56 accounts/serializers/account/account.py:204
+#: accounts/models/account.py:56 accounts/serializers/account/account.py:207
 #: users/models/user.py:846
 msgid "Source"
 msgstr "ソース"
@@ -260,8 +260,8 @@ msgid "Source ID"
 msgstr "ソース ID"
 
 #: accounts/models/account.py:60
-#: accounts/serializers/automations/change_secret.py:113
-#: accounts/serializers/automations/change_secret.py:133
+#: accounts/serializers/automations/change_secret.py:112
+#: accounts/serializers/automations/change_secret.py:132
 #: acls/serializers/base.py:124 assets/serializers/asset/common.py:125
 #: assets/serializers/gateway.py:28 audits/models.py:55 ops/models/base.py:18
 #: perms/models/asset_permission.py:70 perms/serializers/permission.py:39
@@ -340,8 +340,8 @@ msgid "Reason"
 msgstr "理由"
 
 #: accounts/models/automations/backup_account.py:107
-#: accounts/serializers/automations/change_secret.py:111
-#: accounts/serializers/automations/change_secret.py:134
+#: accounts/serializers/automations/change_secret.py:110
+#: accounts/serializers/automations/change_secret.py:133
 #: ops/serializers/job.py:56 terminal/serializers/session.py:46
 msgid "Is success"
 msgstr "成功は"
@@ -350,75 +350,49 @@ msgstr "成功は"
 msgid "Account backup execution"
 msgstr "アカウントバックアップの実行"
 
-#: accounts/models/automations/base.py:19
+#: accounts/models/automations/base.py:18
 msgid "Account automation task"
 msgstr "アカウント自動化タスク"
 
-#: accounts/models/automations/base.py:33
+#: accounts/models/automations/base.py:32
 msgid "Automation execution"
 msgstr "自動実行"
 
-#: accounts/models/automations/base.py:34
+#: accounts/models/automations/base.py:33
 msgid "Automation executions"
 msgstr "自動実行"
 
-#: accounts/models/automations/base.py:36
+#: accounts/models/automations/base.py:35
 msgid "Can view change secret execution"
 msgstr "改密実行の表示"
 
-#: accounts/models/automations/base.py:37
+#: accounts/models/automations/base.py:36
 msgid "Can add change secret execution"
 msgstr "改密実行の作成"
 
-#: accounts/models/automations/base.py:39
+#: accounts/models/automations/base.py:38
 msgid "Can view gather accounts execution"
 msgstr "コレクションアカウントの実行を表示"
 
-#: accounts/models/automations/base.py:40
+#: accounts/models/automations/base.py:39
 msgid "Can add gather accounts execution"
 msgstr "回収口座作成の実行"
 
-#: accounts/models/automations/base.py:42
+#: accounts/models/automations/base.py:41
 msgid "Can view push account execution"
 msgstr "プッシュ アカウントの実行を表示する"
 
-#: accounts/models/automations/base.py:43
+#: accounts/models/automations/base.py:42
 msgid "Can add push account execution"
 msgstr "プッシュ アカウントの作成の実行"
 
-#: accounts/models/automations/base.py:55 accounts/models/template.py:21
-#: accounts/serializers/automations/change_secret.py:40
-msgid "Secret strategy"
-msgstr "鍵ポリシー"
-
-#: accounts/models/automations/base.py:57
-msgid "Password rules"
-msgstr "パスワードルール"
-
-#: accounts/models/automations/base.py:60
+#: accounts/models/automations/base.py:54
 msgid "SSH key change strategy"
 msgstr "SSHキープッシュ方式"
 
-#: accounts/models/automations/base.py:70 accounts/models/base.py:36
-#: accounts/serializers/account/account.py:429
-#: accounts/serializers/account/base.py:16
-#: accounts/serializers/automations/change_secret.py:46
-#: authentication/serializers/connect_token_secret.py:41
-#: authentication/serializers/connect_token_secret.py:50
-msgid "Secret type"
-msgstr "鍵の種類"
-
-#: accounts/models/automations/base.py:72 accounts/models/mixins/vault.py:48
-#: accounts/serializers/account/base.py:19
-#: authentication/models/temp_token.py:10
-#: authentication/templates/authentication/_access_key_modal.html:31
-#: settings/serializers/auth/radius.py:19
-msgid "Secret"
-msgstr "ひみつ"
-
 #: accounts/models/automations/change_secret.py:15
 #: accounts/serializers/account/backup.py:34
-#: accounts/serializers/automations/change_secret.py:57
+#: accounts/serializers/automations/change_secret.py:56
 msgid "Recipient"
 msgstr "受信者"
 
@@ -446,7 +420,7 @@ msgid "Date finished"
 msgstr "終了日"
 
 #: accounts/models/automations/change_secret.py:44
-#: accounts/serializers/account/account.py:249 assets/const/automation.py:8
+#: accounts/serializers/account/account.py:252 assets/const/automation.py:8
 #: authentication/templates/authentication/passkey.html:173
 #: authentication/views/base.py:26 authentication/views/base.py:27
 #: authentication/views/base.py:28 common/const/choices.py:20
@@ -466,7 +440,7 @@ msgid "Date last login"
 msgstr "最終ログイン日"
 
 #: accounts/models/automations/gather_account.py:17
-#: accounts/models/automations/push_account.py:15 accounts/models/base.py:34
+#: accounts/models/automations/push_account.py:15 accounts/models/base.py:65
 #: accounts/serializers/account/virtual.py:21 acls/serializers/base.py:19
 #: acls/serializers/base.py:50 assets/models/_user.py:23 audits/models.py:180
 #: authentication/forms.py:25 authentication/forms.py:27
@@ -516,7 +490,34 @@ msgstr "アカウントプッシュ"
 msgid "Verify asset account"
 msgstr "アカウントの確認"
 
-#: accounts/models/base.py:33 accounts/serializers/account/virtual.py:20
+#: accounts/models/base.py:37 accounts/models/base.py:67
+#: accounts/serializers/account/account.py:432
+#: accounts/serializers/account/base.py:16
+#: accounts/serializers/automations/change_secret.py:45
+#: authentication/serializers/connect_token_secret.py:41
+#: authentication/serializers/connect_token_secret.py:50
+msgid "Secret type"
+msgstr "鍵の種類"
+
+#: accounts/models/base.py:39 accounts/models/mixins/vault.py:48
+#: accounts/serializers/account/base.py:19
+#: authentication/models/temp_token.py:10
+#: authentication/templates/authentication/_access_key_modal.html:31
+#: settings/serializers/auth/radius.py:19
+msgid "Secret"
+msgstr "ひみつ"
+
+#: accounts/models/base.py:42
+#: accounts/serializers/automations/change_secret.py:39
+msgid "Secret strategy"
+msgstr "鍵ポリシー"
+
+#: accounts/models/base.py:44 accounts/serializers/account/template.py:22
+#: accounts/serializers/automations/change_secret.py:44
+msgid "Password rules"
+msgstr "パスワードルール"
+
+#: accounts/models/base.py:64 accounts/serializers/account/virtual.py:20
 #: acls/models/base.py:35 acls/models/base.py:96 acls/models/command_acl.py:21
 #: acls/serializers/base.py:35 applications/models.py:9
 #: assets/models/_user.py:22 assets/models/asset/common.py:91
@@ -541,11 +542,11 @@ msgstr "アカウントの確認"
 msgid "Name"
 msgstr "名前"
 
-#: accounts/models/base.py:38
+#: accounts/models/base.py:69
 msgid "Privileged"
 msgstr "特権アカウント"
 
-#: accounts/models/base.py:39 assets/models/asset/common.py:156
+#: accounts/models/base.py:70 assets/models/asset/common.py:156
 #: assets/models/automations/base.py:21 assets/models/cmd_filter.py:39
 #: assets/models/label.py:22
 #: authentication/serializers/connect_token_secret.py:114
@@ -554,27 +555,27 @@ msgstr "特権アカウント"
 msgid "Is active"
 msgstr "アクティブです。"
 
-#: accounts/models/template.py:23 assets/models/_user.py:53
+#: accounts/models/template.py:17 assets/models/_user.py:53
 msgid "Auto push"
 msgstr "オートプッシュ"
 
-#: accounts/models/template.py:26
+#: accounts/models/template.py:20
 msgid "Platforms"
 msgstr "プラットフォーム"
 
-#: accounts/models/template.py:28
+#: accounts/models/template.py:22
 msgid "Push params"
 msgstr "パラメータをプッシュする"
 
-#: accounts/models/template.py:31 xpack/plugins/cloud/models.py:325
+#: accounts/models/template.py:25 xpack/plugins/cloud/models.py:325
 msgid "Account template"
 msgstr "アカウント テンプレート"
 
-#: accounts/models/template.py:36
+#: accounts/models/template.py:30
 msgid "Can view asset account template secret"
 msgstr "アセット アカウント テンプレートのパスワードを表示できます"
 
-#: accounts/models/template.py:37
+#: accounts/models/template.py:31
 msgid "Can change asset account template secret"
 msgstr "アセット アカウント テンプレートのパスワードを変更できます"
 
@@ -656,7 +657,7 @@ msgstr "今すぐプッシュ"
 msgid "Exist policy"
 msgstr "アカウントの存在ポリシー"
 
-#: accounts/serializers/account/account.py:182 applications/models.py:11
+#: accounts/serializers/account/account.py:185 applications/models.py:11
 #: assets/models/label.py:21 assets/models/platform.py:89
 #: assets/serializers/asset/common.py:121 assets/serializers/cagegory.py:8
 #: assets/serializers/platform.py:133 assets/serializers/platform.py:229
@@ -665,7 +666,7 @@ msgstr "アカウントの存在ポリシー"
 msgid "Category"
 msgstr "カテゴリ"
 
-#: accounts/serializers/account/account.py:183
+#: accounts/serializers/account/account.py:186
 #: accounts/serializers/automations/base.py:54 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:18 applications/models.py:14
 #: assets/models/_user.py:50 assets/models/automations/base.py:20
@@ -685,26 +686,26 @@ msgstr "カテゴリ"
 msgid "Type"
 msgstr "タイプ"
 
-#: accounts/serializers/account/account.py:198
+#: accounts/serializers/account/account.py:201
 msgid "Asset not found"
 msgstr "資産が存在しません"
 
-#: accounts/serializers/account/account.py:238
+#: accounts/serializers/account/account.py:241
 msgid "Has secret"
 msgstr "エスクローされたパスワード"
 
-#: accounts/serializers/account/account.py:248 ops/models/celery.py:60
+#: accounts/serializers/account/account.py:251 ops/models/celery.py:60
 #: tickets/models/comment.py:13 tickets/models/ticket/general.py:45
 #: tickets/models/ticket/general.py:279 tickets/serializers/super_ticket.py:14
 #: tickets/serializers/ticket/ticket.py:21
 msgid "State"
 msgstr "状態"
 
-#: accounts/serializers/account/account.py:250
+#: accounts/serializers/account/account.py:253
 msgid "Changed"
 msgstr "編集済み"
 
-#: accounts/serializers/account/account.py:260
+#: accounts/serializers/account/account.py:263
 #: accounts/serializers/automations/base.py:22 acls/models/base.py:97
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20 ops/models/base.py:17
@@ -713,27 +714,27 @@ msgstr "編集済み"
 msgid "Assets"
 msgstr "資産"
 
-#: accounts/serializers/account/account.py:315
+#: accounts/serializers/account/account.py:318
 msgid "Account already exists"
 msgstr "アカウントはすでに存在しています"
 
-#: accounts/serializers/account/account.py:365
+#: accounts/serializers/account/account.py:368
 #, python-format
 msgid "Asset does not support this secret type: %s"
 msgstr "アセットはアカウント タイプをサポートしていません: %s"
 
-#: accounts/serializers/account/account.py:397
+#: accounts/serializers/account/account.py:400
 msgid "Account has exist"
 msgstr "アカウントはすでに存在しています"
 
-#: accounts/serializers/account/account.py:430
+#: accounts/serializers/account/account.py:433
 #: authentication/serializers/connect_token_secret.py:156
 #: authentication/templates/authentication/_access_key_modal.html:30
 #: perms/models/perm_node.py:21 users/serializers/group.py:31
 msgid "ID"
 msgstr "ID"
 
-#: accounts/serializers/account/account.py:437 acls/serializers/base.py:116
+#: accounts/serializers/account/account.py:440 acls/serializers/base.py:116
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:50
 #: audits/models.py:86 audits/models.py:164 audits/models.py:262
 #: audits/serializers.py:171 authentication/models/connection_token.py:32
@@ -752,7 +753,7 @@ msgstr "ID"
 msgid "User"
 msgstr "ユーザー"
 
-#: accounts/serializers/account/account.py:438
+#: accounts/serializers/account/account.py:441
 #: authentication/templates/authentication/_access_key_modal.html:33
 #: terminal/notifications.py:158 terminal/notifications.py:207
 msgid "Date"
@@ -771,7 +772,7 @@ msgid "Executed amount"
 msgstr "実行回数"
 
 #: accounts/serializers/account/backup.py:35
-#: accounts/serializers/automations/change_secret.py:58
+#: accounts/serializers/automations/change_secret.py:57
 msgid "Currently only mail sending is supported"
 msgstr "現在、メール送信のみがサポートされています"
 
@@ -796,15 +797,39 @@ msgstr ""
 "ヒント: 認証にユーザー名が必要ない場合は、`null`を入力します。ADアカウントの"
 "場合は、`username@domain`のようになります。"
 
-#: accounts/serializers/account/template.py:27
+#: accounts/serializers/account/template.py:11
+#, fuzzy
+#| msgid "Password strength"
+msgid "Password length"
+msgstr "パスワードの強さ"
+
+#: accounts/serializers/account/template.py:12
+#, fuzzy
+#| msgid "Powershell"
+msgid "Lowercase"
+msgstr "PowerShell"
+
+#: accounts/serializers/account/template.py:13
+msgid "Uppercase"
+msgstr ""
+
+#: accounts/serializers/account/template.py:14
+msgid "Digit"
+msgstr ""
+
+#: accounts/serializers/account/template.py:15
+msgid "Special symbol"
+msgstr ""
+
+#: accounts/serializers/account/template.py:36
 msgid "Secret generation strategy for account creation"
 msgstr "账号创建时，密文生成策略"
 
-#: accounts/serializers/account/template.py:28
+#: accounts/serializers/account/template.py:37
 msgid "Whether to automatically push the account to the asset"
 msgstr "是否自动推送账号到资产"
 
-#: accounts/serializers/account/template.py:30
+#: accounts/serializers/account/template.py:40
 msgid ""
 "Associated platform, you can configure push parameters. If not associated, "
 "default parameters will be used"
@@ -852,24 +877,24 @@ msgstr "名前は既に存在します。"
 msgid "Automation snapshot"
 msgstr "自動スナップショット"
 
-#: accounts/serializers/automations/change_secret.py:43
+#: accounts/serializers/automations/change_secret.py:42
 msgid "SSH Key strategy"
 msgstr "SSHキー戦略"
 
-#: accounts/serializers/automations/change_secret.py:81
+#: accounts/serializers/automations/change_secret.py:80
 msgid "* Please enter the correct password length"
 msgstr "* 正しいパスワードの長さを入力してください"
 
-#: accounts/serializers/automations/change_secret.py:85
+#: accounts/serializers/automations/change_secret.py:84
 msgid "* Password length range 6-30 bits"
 msgstr "* パスワードの長さの範囲6-30ビット"
 
-#: accounts/serializers/automations/change_secret.py:115
+#: accounts/serializers/automations/change_secret.py:114
 #: assets/models/automations/base.py:127
 msgid "Automation task execution"
 msgstr "自動タスク実行履歴"
 
-#: accounts/serializers/automations/change_secret.py:155 audits/const.py:54
+#: accounts/serializers/automations/change_secret.py:154 audits/const.py:54
 #: audits/models.py:60 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:18 ops/const.py:60 ops/serializers/celery.py:40
 #: terminal/const.py:76 terminal/models/session/sharing.py:121
@@ -910,23 +935,23 @@ msgstr "アセット アカウントの可用性を確認する"
 msgid "Verify accounts connectivity"
 msgstr "アカウント接続のテスト"
 
-#: accounts/utils.py:41
+#: accounts/utils.py:46
 msgid "Password can not contains `{{` "
 msgstr "パスワードには '{{' を含まない"
 
-#: accounts/utils.py:43
+#: accounts/utils.py:48
 msgid "Password can not contains `{%` "
 msgstr "パスワードには '{%' を含まない"
 
-#: accounts/utils.py:46
+#: accounts/utils.py:51
 msgid "Password can not contains `'` "
 msgstr "パスワードには `'` を含まない"
 
-#: accounts/utils.py:48
+#: accounts/utils.py:53
 msgid "Password can not contains `\"` "
 msgstr "パスワードには `\"` を含まない"
 
-#: accounts/utils.py:54
+#: accounts/utils.py:59
 msgid "private key invalid or passphrase error"
 msgstr "秘密鍵が無効またはpassphraseエラー"
 
@@ -8433,6 +8458,9 @@ msgstr "エンタープライズプロフェッショナル版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "エンタープライズ・フラッグシップ・エディション"
+
+#~ msgid "Random"
+#~ msgstr "ランダム"
 
 #~ msgid "Enterprise edition"
 #~ msgstr "エンタープライズ基本版"

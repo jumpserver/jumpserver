@@ -7,10 +7,19 @@ from common.serializers.fields import ObjectRelatedField
 from .base import BaseAccountSerializer
 
 
+class PasswordRulesSerializer(serializers.Serializer):
+    length = serializers.IntegerField(min_value=8, max_value=30, default=16, label=_('Password length'))
+    lowercase = serializers.BooleanField(default=True, label=_('Lowercase'))
+    uppercase = serializers.BooleanField(default=True, label=_('Uppercase'))
+    digit = serializers.BooleanField(default=True, label=_('Digit'))
+    symbol = serializers.BooleanField(default=True, label=_('Special symbol'))
+
+
 class AccountTemplateSerializer(BaseAccountSerializer):
     is_sync_account = serializers.BooleanField(default=False, write_only=True)
     _is_sync_account = False
 
+    password_rules = PasswordRulesSerializer(required=False, label=_('Password rules'))
     su_from = ObjectRelatedField(
         required=False, queryset=AccountTemplate.objects, allow_null=True,
         allow_empty=True, label=_('Su from'), attrs=('id', 'name', 'username')
@@ -19,17 +28,20 @@ class AccountTemplateSerializer(BaseAccountSerializer):
     class Meta(BaseAccountSerializer.Meta):
         model = AccountTemplate
         fields = BaseAccountSerializer.Meta.fields + [
-            'secret_strategy',
+            'secret_strategy', 'password_rules',
             'auto_push', 'push_params', 'platforms',
             'is_sync_account', 'su_from'
         ]
         extra_kwargs = {
             'secret_strategy': {'help_text': _('Secret generation strategy for account creation')},
             'auto_push': {'help_text': _('Whether to automatically push the account to the asset')},
-            'platforms': {'help_text': _(
-                'Associated platform, you can configure push parameters. '
-                'If not associated, default parameters will be used'
-            )},
+            'platforms': {
+                'help_text': _(
+                    'Associated platform, you can configure push parameters. '
+                    'If not associated, default parameters will be used'
+                ),
+                'required': False
+            },
         }
 
     def sync_accounts_secret(self, instance, diff):
