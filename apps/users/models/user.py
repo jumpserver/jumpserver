@@ -1,30 +1,27 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-import uuid
 import base64
-import string
-import random
 import datetime
+import uuid
 from typing import Callable
 
-from django.db import models
 from django.conf import settings
-from django.utils import timezone
-from django.core.cache import cache
-from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.hashers import check_password
-from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth.models import AbstractUser
+from django.core.cache import cache
+from django.db import models
 from django.shortcuts import reverse
+from django.utils import timezone
 from django.utils.module_loading import import_string
+from django.utils.translation import ugettext_lazy as _
 
-from orgs.utils import current_org
-from orgs.models import Organization
-from rbac.const import Scope
 from common.db import fields, models as jms_models
 from common.utils import (
     date_expired_default, get_logger, lazyproperty, random_string, bulk_create_with_signal
 )
+from orgs.utils import current_org
+from rbac.const import Scope
 from ..signals import post_user_change_password, post_user_leave_org, pre_user_leave_org
 
 __all__ = ['User', 'UserPasswordHistory']
@@ -518,8 +515,7 @@ class TokenMixin:
         return self.access_keys.first()
 
     def generate_reset_token(self):
-        letter = string.ascii_letters + string.digits
-        token = ''.join([random.choice(letter) for _ in range(50)])
+        token = random_string(50)
         self.set_cache(token)
         return token
 
