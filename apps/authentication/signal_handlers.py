@@ -7,6 +7,7 @@ from django.dispatch import receiver
 from django_cas_ng.signals import cas_user_authenticated
 
 from apps.jumpserver.settings.auth import AUTHENTICATION_BACKENDS_THIRD_PARTY
+from audits.models import UserSession
 from .signals import post_auth_success, post_auth_failed, user_auth_failed, user_auth_success
 
 
@@ -23,6 +24,9 @@ def on_user_auth_login_success(sender, user, request, **kwargs):
     if not request.session.get("auth_third_party_done") and \
             request.session.get('auth_backend') in AUTHENTICATION_BACKENDS_THIRD_PARTY:
         request.session['auth_third_party_required'] = 1
+
+    user_session_id = request.session.get('user_session_id')
+    UserSession.objects.filter(id=user_session_id).update(key=request.session.session_key)
     # 单点登录，超过了自动退出
     if settings.USER_LOGIN_SINGLE_MACHINE_ENABLED:
         lock_key = 'single_machine_login_' + str(user.id)
@@ -30,6 +34,7 @@ def on_user_auth_login_success(sender, user, request, **kwargs):
         if session_key and session_key != request.session.session_key:
             session = import_module(settings.SESSION_ENGINE).SessionStore(session_key)
             session.delete()
+            UserSession.objects.filter(key=session_key).delete()
         cache.set(lock_key, request.session.session_key, None)
 
     # 标记登录，设置 cookie，前端可以控制刷新, Middleware 会拦截这个生成 cookie
