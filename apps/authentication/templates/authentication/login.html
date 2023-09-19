@@ -228,6 +228,39 @@
             font-size: 16px;
             text-align: center;
         }
+
+        .mobile-logo {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                background-color: #ffffff;
+            }
+
+            .login-content {
+                width: 100%;
+            }
+
+            .left-form-box {
+                width: 100%;
+                border-right: none;
+            }
+
+            .right-image-box {
+                display: none;
+            }
+
+            .navbar-top-links {
+                display: inline;
+                float: right;
+            }
+
+            .mobile-logo {
+                display: block;
+                padding: 20px 30px 0 30px;
+            }
+        }
     </style>
 </head>
 
@@ -246,6 +279,11 @@
         </a>
     </div>
     <div class="left-form-box {% if not form.challenge and not form.captcha %} no-captcha-challenge {% endif %}">
+        <div class="mobile-logo">
+            <a href="{% if not XPACK_ENABLED %}https://github.com/jumpserver/jumpserver.git{% endif %}">
+                <img src="{% static 'img/logo_text_green.png' %}" class="right-image" alt="screen-image"/>
+            </a>
+        </div>
         <div style="position: relative;top: 50%;transform: translateY(-50%);">
             <div style='padding: 15px 60px; text-align: left'>
                 <h2 style='font-weight: 400;display: inline'>
@@ -306,13 +344,13 @@
                     {% endif %}
                     <div class="form-group auto-login" style="margin-bottom: 10px">
                         <div class="row" style="overflow: hidden;">
-                            <div class="col-md-6" style="text-align: left">
+                            <div class="col-md-6 col-xs-6" style="text-align: left">
                                 {% if form.auto_login %}
                                     {% bootstrap_field form.auto_login form_group_class='auto_login_box' %}
                                 {% endif %}
                             </div>
 
-                            <div class="col-md-6" style="line-height: 25px">
+                            <div class="col-md-6 col-xs-6" style="line-height: 25px">
                                 <a id="forgot_password" href="{{ forgot_password_url }}" style="float: right">
                                     <small>{% trans 'Forgot password' %}?</small>
                                 </a>
