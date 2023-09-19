@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-19 10:39+0800\n"
+"POT-Creation-Date: 2023-09-19 15:26+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -678,8 +678,8 @@ msgstr "カテゴリ"
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:39
 #: terminal/models/component/storage.py:57
 #: terminal/models/component/storage.py:146 terminal/serializers/applet.py:29
-#: terminal/serializers/session.py:21 terminal/serializers/storage.py:226
-#: terminal/serializers/storage.py:238 tickets/models/comment.py:26
+#: terminal/serializers/session.py:21 terminal/serializers/storage.py:228
+#: terminal/serializers/storage.py:240 tickets/models/comment.py:26
 #: tickets/models/flow.py:56 tickets/models/ticket/apply_application.py:16
 #: tickets/models/ticket/general.py:275 tickets/serializers/flow.py:53
 #: tickets/serializers/ticket/ticket.py:19
@@ -935,23 +935,23 @@ msgstr "アセット アカウントの可用性を確認する"
 msgid "Verify accounts connectivity"
 msgstr "アカウント接続のテスト"
 
-#: accounts/utils.py:46
+#: accounts/utils.py:53
 msgid "Password can not contains `{{` "
 msgstr "パスワードには '{{' を含まない"
 
-#: accounts/utils.py:48
+#: accounts/utils.py:55
 msgid "Password can not contains `{%` "
 msgstr "パスワードには '{%' を含まない"
 
-#: accounts/utils.py:51
+#: accounts/utils.py:58
 msgid "Password can not contains `'` "
 msgstr "パスワードには `'` を含まない"
 
-#: accounts/utils.py:53
+#: accounts/utils.py:60
 msgid "Password can not contains `\"` "
 msgstr "パスワードには `\"` を含まない"
 
-#: accounts/utils.py:59
+#: accounts/utils.py:66
 msgid "private key invalid or passphrase error"
 msgstr "秘密鍵が無効またはpassphraseエラー"
 
@@ -1329,7 +1329,10 @@ msgid ""
 "SFTP root directory, Support variable: <br>- ${ACCOUNT} The connected "
 "account username <br>- ${HOME} The home directory of the connected account "
 "<br>- ${USER} The username of the user"
-msgstr "SFTPルートディレクトリ、サポート変数：<br>-${ACCOUNT}接続されたアカウントのユーザー名<br>-${HOME}接続されたアカウントのホームディレクトリ<br>-${USER}ユーザーのユーザー名"
+msgstr ""
+"SFTPルートディレクトリ、サポート変数：<br>-${ACCOUNT}接続されたアカウントの"
+"ユーザー名<br>-${HOME}接続されたアカウントのホームディレクトリ<br>-${USER}"
+"ユーザーのユーザー名"
 
 #: assets/const/protocol.py:65
 msgid "Console"
@@ -6191,7 +6194,7 @@ msgstr "同時実行可能"
 msgid "Tags"
 msgstr "ラベル"
 
-#: terminal/models/applet/applet.py:48 terminal/serializers/storage.py:159
+#: terminal/models/applet/applet.py:48 terminal/serializers/storage.py:161
 msgid "Hosts"
 msgstr "ホスト"
 
@@ -6532,7 +6535,7 @@ msgstr ""
 "URL を入力します。<br>例: https://172.16.10.110 または https://dev."
 "jumpserver.com"
 
-#: terminal/serializers/applet_host.py:46 terminal/serializers/storage.py:170
+#: terminal/serializers/applet_host.py:46 terminal/serializers/storage.py:172
 msgid "Ignore Certificate Verification"
 msgstr "証明書の検証を無視する"
 
@@ -6720,30 +6723,34 @@ msgid "Endpoint suffix"
 msgstr "エンドポイントサフィックス"
 
 #: terminal/serializers/storage.py:137
+msgid "The address cannot contain the special character `#`"
+msgstr "アドレスには特殊文字「#」を含めることはできません"
+
+#: terminal/serializers/storage.py:139
 msgid "The address format is incorrect"
 msgstr "アドレス形式が正しくありません"
 
-#: terminal/serializers/storage.py:144
+#: terminal/serializers/storage.py:146
 msgid "Host invalid"
 msgstr "ホスト無効"
 
-#: terminal/serializers/storage.py:147
+#: terminal/serializers/storage.py:149
 msgid "Port invalid"
 msgstr "ポートが無効"
 
-#: terminal/serializers/storage.py:162
+#: terminal/serializers/storage.py:164
 msgid "Index by date"
 msgstr "日付による索引付け"
 
-#: terminal/serializers/storage.py:163
+#: terminal/serializers/storage.py:165
 msgid "Whether to create an index by date"
 msgstr "現在の日付に基づいてインデックスを動的に作成するかどうか"
 
-#: terminal/serializers/storage.py:166
+#: terminal/serializers/storage.py:168
 msgid "Index"
 msgstr "インデックス"
 
-#: terminal/serializers/storage.py:168
+#: terminal/serializers/storage.py:170
 msgid "Doc type"
 msgstr "Docタイプ"
 
