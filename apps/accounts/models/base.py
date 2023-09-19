@@ -32,16 +32,16 @@ class BaseAccountManager(VaultManagerMixin, OrgManager):
 
 
 class SecretWithRandomMixin(models.Model):
-    secret_strategy = models.CharField(
-        choices=SecretStrategy.choices, max_length=16,
-        default=SecretStrategy.custom, verbose_name=_('Secret strategy')
-    )
-    password_rules = models.JSONField(default=dict, verbose_name=_('Password rules'))
     secret_type = models.CharField(
         choices=SecretType.choices, max_length=16,
         default=SecretType.PASSWORD, verbose_name=_('Secret type')
     )
     secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('Secret'))
+    secret_strategy = models.CharField(
+        choices=SecretStrategy.choices, max_length=16,
+        default=SecretStrategy.custom, verbose_name=_('Secret strategy')
+    )
+    password_rules = models.JSONField(default=dict, verbose_name=_('Password rules'))
 
     class Meta:
         abstract = True
