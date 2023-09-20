@@ -50,11 +50,25 @@ def push_accounts_if_need(accounts=()):
         logger.debug("Push accounts to source: %s, task: %s", source_id, task)
 
 
+def create_accounts_activities(account, action='create'):
+    if action == 'create':
+        detail = i18n_fmt(gettext_noop('Add account: %s'), str(account))
+    else:
+        detail = i18n_fmt(gettext_noop('Delete account: %s'), str(account))
+    create_activities([account.asset_id], detail, None, ActivityChoices.operate_log, account.org_id)
+
+
 @receiver(post_save, sender=Account)
 def on_account_create_by_template(sender, instance, created=False, **kwargs):
     if not created or instance.source != 'template':
         return
     push_accounts_if_need(accounts=(instance,))
+    create_accounts_activities(instance, action='create')
+
+
+@receiver(post_delete, sender=Account)
+def on_account_delete(sender, instance, **kwargs):
+    create_accounts_activities(instance, action='delete')
 
 
 class VaultSignalHandler(object):
