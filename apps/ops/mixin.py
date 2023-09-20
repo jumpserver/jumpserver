@@ -48,7 +48,8 @@ class PeriodTaskModelMixin(models.Model):
 
     def set_period_schedule(self):
         name, task, args, kwargs = self.get_register_task()
-        if not self.is_periodic:
+        is_active = self.is_active if hasattr(self, 'is_active') else True
+        if not self.is_periodic or not is_active:
             disable_celery_periodic_task(name)
             return
 
