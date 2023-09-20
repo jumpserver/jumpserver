@@ -35,7 +35,12 @@ def job_task_activity_callback(self, job_id, *args, **kwargs):
     activity_callback=job_task_activity_callback
 )
 def run_ops_job(job_id):
-    job = get_object_or_none(Job, id=job_id)
+    with tmp_to_root_org():
+        job = get_object_or_none(Job, id=job_id)
+    if not job:
+        logger.error("Did not get the execution: {}".format(job_id))
+        return
+
     with tmp_to_org(job.org):
         execution = job.create_execution()
         execution.creator = job.creator
