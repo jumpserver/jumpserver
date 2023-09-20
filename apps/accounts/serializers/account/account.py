@@ -2,6 +2,7 @@ import uuid
 from copy import deepcopy
 
 from django.db import IntegrityError
+from django.db import transaction
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -117,10 +118,13 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         asset = get_object_or_404(Asset, pk=asset_id)
         initial_data['su_from'] = template.get_su_from_account(asset)
 
-    @staticmethod
-    def push_account_if_need(instance, push_now, params, stat):
+    def push_account_if_need(self, instance, push_now, params, stat):
         if not push_now or stat not in ['created', 'updated']:
             return
+        transaction.on_commit(lambda: self.start_push(instance, params))
+
+    @staticmethod
+    def start_push(instance, params):
         push_accounts_to_assets_task.delay([str(instance.id)], params)
 
     def get_validators(self):

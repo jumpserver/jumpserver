@@ -3,8 +3,6 @@
 #
 import base64
 import datetime
-import random
-import string
 import uuid
 from typing import Callable
 
@@ -607,8 +605,7 @@ class TokenMixin:
         return self.access_keys.first()
 
     def generate_reset_token(self):
-        letter = string.ascii_letters + string.digits
-        token = ''.join([random.choice(letter) for _ in range(50)])
+        token = random_string(50)
         self.set_cache(token)
         return token
 

@@ -133,6 +133,8 @@ replay_storage_type_serializer_classes_mapping = {
 # Command storage serializers
 # ---------------------------
 def command_storage_es_host_format_validator(host):
+    if '#' in host:
+        raise serializers.ValidationError(_('The address cannot contain the special character `#`'))
     h = urlparse(host)
     default_error_msg = _('The address format is incorrect')
     if h.scheme not in ['http', 'https']:

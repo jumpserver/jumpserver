@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-19 15:41+0800\n"
+"POT-Creation-Date: 2023-09-19 10:39+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -676,8 +676,8 @@ msgstr "类别"
 #: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:39
 #: terminal/models/component/storage.py:57
 #: terminal/models/component/storage.py:146 terminal/serializers/applet.py:29
-#: terminal/serializers/session.py:21 terminal/serializers/storage.py:226
-#: terminal/serializers/storage.py:238 tickets/models/comment.py:26
+#: terminal/serializers/session.py:21 terminal/serializers/storage.py:228
+#: terminal/serializers/storage.py:240 tickets/models/comment.py:26
 #: tickets/models/flow.py:56 tickets/models/ticket/apply_application.py:16
 #: tickets/models/ticket/general.py:275 tickets/serializers/flow.py:53
 #: tickets/serializers/ticket/ticket.py:19
@@ -6118,7 +6118,7 @@ msgstr "可以并发"
 msgid "Tags"
 msgstr "标签"
 
-#: terminal/models/applet/applet.py:48 terminal/serializers/storage.py:159
+#: terminal/models/applet/applet.py:48 terminal/serializers/storage.py:161
 msgid "Hosts"
 msgstr "主机"
 
@@ -6457,7 +6457,7 @@ msgstr ""
 "建议填写内网地址，否则填写当前站点 URL<br>例如：https://172.16.10.110 or "
 "https://dev.jumpserver.com"
 
-#: terminal/serializers/applet_host.py:46 terminal/serializers/storage.py:170
+#: terminal/serializers/applet_host.py:46 terminal/serializers/storage.py:172
 msgid "Ignore Certificate Verification"
 msgstr "忽略证书认证"
 
@@ -6641,30 +6641,34 @@ msgid "Endpoint suffix"
 msgstr "端点后缀"
 
 #: terminal/serializers/storage.py:137
+msgid "The address cannot contain the special character `#`"
+msgstr "地址中不能包含特殊字符 `#`"
+
+#: terminal/serializers/storage.py:139
 msgid "The address format is incorrect"
 msgstr "地址格式不正确"
 
-#: terminal/serializers/storage.py:144
+#: terminal/serializers/storage.py:146
 msgid "Host invalid"
 msgstr "主机无效"
 
-#: terminal/serializers/storage.py:147
+#: terminal/serializers/storage.py:149
 msgid "Port invalid"
 msgstr "端口无效"
 
-#: terminal/serializers/storage.py:162
+#: terminal/serializers/storage.py:164
 msgid "Index by date"
 msgstr "按日期建索引"
 
-#: terminal/serializers/storage.py:163
+#: terminal/serializers/storage.py:165
 msgid "Whether to create an index by date"
 msgstr "是否根据日期动态建立索引"
 
-#: terminal/serializers/storage.py:166
+#: terminal/serializers/storage.py:168
 msgid "Index"
 msgstr "索引"
 
-#: terminal/serializers/storage.py:168
+#: terminal/serializers/storage.py:170
 msgid "Doc type"
 msgstr "文档类型"
 

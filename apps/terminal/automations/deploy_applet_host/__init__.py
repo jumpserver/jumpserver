@@ -1,5 +1,6 @@
 import datetime
 import os
+import shutil
 
 import yaml
 from django.conf import settings
@@ -116,6 +117,11 @@ class DeployAppletHostManager:
         )
         return runner.run(**kwargs)
 
+    def delete_runtime_dir(self):
+        if settings.DEBUG_DEV:
+            return
+        shutil.rmtree(self.run_dir)
+
     def _run(self, cb_func: callable, **kwargs):
         try:
             self.deployment.date_start = timezone.now()
@@ -128,3 +134,4 @@ class DeployAppletHostManager:
             self.deployment.date_finished = timezone.now()
             with safe_db_connection():
                 self.deployment.save()
+        self.delete_runtime_dir()

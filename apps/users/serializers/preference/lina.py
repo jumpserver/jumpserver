@@ -2,9 +2,11 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers.fields import EncryptedField
+from ...models import Preference
 
 
 class BasicSerializer(serializers.Serializer):
+    has_secret_key = serializers.SerializerMethodField()
     secret_key = EncryptedField(
         required=False, max_length=1024,
         write_only=True, allow_blank=True,
@@ -15,6 +17,11 @@ class BasicSerializer(serializers.Serializer):
         write_only=True, allow_blank=True,
         label=_('Confirm file encryption password')
     )
+
+    def get_has_secret_key(self, obj):
+        user = self.context['request'].user
+        query = {'user': user, 'name': 'secret_key', 'category': 'lina'}
+        return Preference.objects.filter(**query).exists()
 
     def validate(self, attrs):
         secret_key = attrs.pop('secret_key', None)
