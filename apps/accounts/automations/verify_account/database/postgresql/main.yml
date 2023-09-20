@@ -3,7 +3,6 @@
   vars:
     ansible_python_interpreter: /usr/local/bin/python
 
-
   tasks:
     - name: Verify account
       community.postgresql.postgresql_ping:
