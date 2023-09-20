@@ -40,7 +40,7 @@
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         name: '{{ jms_asset.spec_info.db_name }}'
-        script: "ALTER LOGIN {{ account.username }} WITH PASSWORD = '{{ account.secret }}'; select @@version"
+        script: "ALTER LOGIN {{ account.username }} WITH PASSWORD = '{{ account.secret }}', DEFAULT_DATABASE = {{ jms_asset.spec_info.db_name }}; select @@version"
       ignore_errors: true
       when: user_exist.query_results[0] | length != 0
       register: change_info
@@ -52,7 +52,7 @@
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         name: '{{ jms_asset.spec_info.db_name }}'
-        script: "CREATE LOGIN {{ account.username }} WITH PASSWORD = '{{ account.secret }}'; select @@version"
+        script: "CREATE LOGIN [{{ account.username }}] WITH PASSWORD = '{{ account.secret }}'; CREATE USER [{{ account.username }}] FOR LOGIN [{{ account.username }}]; select @@version"
       ignore_errors: true
       when: user_exist.query_results[0] | length == 0
       register: change_info
