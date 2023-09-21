@@ -8,7 +8,7 @@ from common.utils import get_logger
 
 __all__ = ["AdHoc"]
 
-from ops.const import Modules
+from ops.const import  AdHocModules
 
 from orgs.mixins.models import JMSOrgBaseModel
 
@@ -19,7 +19,7 @@ class AdHoc(JMSOrgBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     pattern = models.CharField(max_length=1024, verbose_name=_("Pattern"), default='all')
-    module = models.CharField(max_length=128, choices=Modules.choices, default=Modules.shell,
+    module = models.CharField(max_length=128, choices=AdHocModules.choices, default=AdHocModules.shell,
                               verbose_name=_('Module'))
     args = models.CharField(max_length=8192, default='', verbose_name=_('Args'))
     creator = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
