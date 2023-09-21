@@ -39,6 +39,7 @@ ARG TOOLS="                           \
         locales                       \
         nmap                          \
         openssh-client                \
+        patch                         \
         sshpass                       \
         telnet                        \
         vim                           \
