@@ -3,6 +3,7 @@ from django.dispatch import receiver
 from django.utils.functional import LazyObject
 
 from accounts.models import Account
+from common.decorators import on_transaction_commit
 from common.signals import django_ready
 from common.utils import get_logger
 from common.utils.connection import RedisPubSub
@@ -17,6 +18,7 @@ logger = get_logger(__file__)
 
 
 @receiver(post_save, sender=AppletHost)
+@on_transaction_commit
 def on_applet_host_create(sender, instance, created=False, **kwargs):
     if not created:
         return
