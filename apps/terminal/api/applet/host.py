@@ -1,6 +1,5 @@
 import uuid
 
-from django.db import transaction
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -58,17 +57,13 @@ class AppletHostDeploymentViewSet(viewsets.ModelViewSet):
         ('applets', 'terminal.view_AppletHostDeployment'),
     )
 
-    @staticmethod
-    def start_deploy(instance):
-        task = run_applet_host_deployment.apply_async((instance.id,), task_id=str(instance.id))
-
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
+        task = run_applet_host_deployment.delay(instance.id)
         instance.save_task(instance.id)
-        transaction.on_commit(lambda: self.start_deploy(instance))
-        return Response({'task': str(instance.id)}, status=201)
+        return Response({'task': str(task.id)}, status=201)
 
     @action(methods=['post'], detail=False)
     def applets(self, request, *args, **kwargs):
@@ -84,10 +79,5 @@ class AppletHostDeploymentViewSet(viewsets.ModelViewSet):
         applet_host_deployment_ids = [str(obj.id) for obj in applet_host_deployments]
         task_id = str(uuid.uuid4())
         model.objects.filter(id__in=applet_host_deployment_ids).update(task=task_id)
-        transaction.on_commit(lambda: self.start_install_applet(applet_host_deployment_ids, applet_id, task_id))
+        run_applet_host_deployment_install_applet.delay(applet_host_deployment_ids, applet_id)
         return Response({'task': task_id}, status=201)
-
-    @staticmethod
-    def start_install_applet(applet_host_deployment_ids, applet_id, task_id):
-        run_applet_host_deployment_install_applet.apply_async((applet_host_deployment_ids, applet_id),
-                                                              task_id=str(task_id))

@@ -3,6 +3,7 @@ from django.utils.translation import gettext_noop, gettext_lazy as _
 
 from accounts.const import AutomationTypes
 from accounts.tasks.common import quickstart_automation_by_snapshot
+from common.decorators import on_transaction_commit
 from common.utils import get_logger
 
 logger = get_logger(__file__)
@@ -15,6 +16,7 @@ __all__ = [
     queue="ansible", verbose_name=_('Push accounts to assets'),
     activity_callback=lambda self, account_ids, *args, **kwargs: (account_ids, None)
 )
+@on_transaction_commit
 def push_accounts_to_assets_task(account_ids, params=None):
     from accounts.models import PushAccountAutomation
     from accounts.models import Account

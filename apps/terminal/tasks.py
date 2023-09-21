@@ -10,6 +10,7 @@ from django.core.files.storage import default_storage
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from common.decorators import on_transaction_commit
 from common.storage.replay import ReplayStorageHandler
 from ops.celery.decorator import (
     register_as_period_task, after_app_ready_start,
@@ -90,6 +91,7 @@ def upload_session_replay_to_external_storage(session_id):
     verbose_name=_('Run applet host deployment'),
     activity_callback=lambda self, did, *args, **kwargs: ([did],)
 )
+@on_transaction_commit
 def run_applet_host_deployment(did):
     with tmp_to_builtin_org(system=1):
         deployment = AppletHostDeployment.objects.get(id=did)
@@ -100,6 +102,7 @@ def run_applet_host_deployment(did):
     verbose_name=_('Install applet'),
     activity_callback=lambda self, ids, applet_id, *args, **kwargs: (ids,)
 )
+@on_transaction_commit
 def run_applet_host_deployment_install_applet(ids, applet_id):
     with tmp_to_builtin_org(system=1):
         for did in ids:
