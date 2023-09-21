@@ -19,7 +19,9 @@ class AccountsTaskCreateAPI(CreateAPIView):
             code = 'accounts.push_account'
         else:
             code = 'accounts.verify_account'
-        return request.user.has_perm(code)
+        has = request.user.has_perm(code)
+        if not has:
+            self.permission_denied(request)
 
     def perform_create(self, serializer):
         data = serializer.validated_data
@@ -44,6 +46,6 @@ class AccountsTaskCreateAPI(CreateAPIView):
 
     def get_exception_handler(self):
         def handler(e, context):
-            return Response({"error": str(e)}, status=400)
+            return Response({"error": str(e)}, status=401)
 
         return handler

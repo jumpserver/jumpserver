@@ -90,4 +90,4 @@ class SendAndVerifyCodeUtil(object):
             self.__send_with_email()
 
         cache.set(self.key, self.code, self.timeout)
-        logger.info(f'Send verify code to {self.target}: {code}')
+        logger.debug(f'Send verify code to {self.target}')

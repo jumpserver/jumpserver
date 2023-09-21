@@ -4,9 +4,7 @@ about: 提出针对本项目安装部署、使用及其他方面的相关问题
 title: "[Question] "
 labels: 类型:提问
 assignees: 
-  - wojiushixiaobai
   - baijiangjie
-
 ---
 
 **请描述您的问题.**

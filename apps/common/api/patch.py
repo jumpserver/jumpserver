@@ -88,6 +88,7 @@ class AsyncApiMixin(InterceptMixin):
         if not self.is_need_async():
             return handler(*args, **kwargs)
         resp = self.do_async(handler, *args, **kwargs)
+        self.async_callback(*args, **kwargs)
         return resp
 
     def is_need_refresh(self):
@@ -97,6 +98,9 @@ class AsyncApiMixin(InterceptMixin):
 
     def is_need_async(self):
         return False
+
+    def async_callback(self, *args, **kwargs):
+        pass
 
     def do_async(self, handler, *args, **kwargs):
         data = self.get_cache_data()

@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 import datetime
 import os
 from typing import Callable
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.contrib.auth import BACKEND_SESSION_KEY
@@ -40,6 +41,7 @@ __all__ = [
 class UserLoginContextMixin:
     get_user_mfa_context: Callable
     request: HttpRequest
+    error_origin: str
 
     def get_support_auth_methods(self):
         auth_methods = [
@@ -88,6 +90,12 @@ class UserLoginContextMixin:
                 'enabled': settings.AUTH_FEISHU,
                 'url': reverse('authentication:feishu-qr-login'),
                 'logo': static('img/login_feishu_logo.png')
+            },
+            {
+                'name': _("Passkey"),
+                'enabled': settings.AUTH_PASSKEY,
+                'url': reverse('api-auth:passkey-login'),
+                'logo': static('img/login_passkey.png')
             }
         ]
         return [method for method in auth_methods if method['enabled']]
@@ -134,8 +142,27 @@ class UserLoginContextMixin:
             count += 1
         return count
 
+    def set_csrf_error_if_need(self, context):
+        if not self.request.GET.get('csrf_failure'):
+            return context
+
+        http_origin = self.request.META.get('HTTP_ORIGIN')
+        http_referer = self.request.META.get('HTTP_REFERER')
+        http_origin = http_origin or http_referer
+
+        if not http_origin:
+            return context
+
+        try:
+            origin = urlparse(http_origin)
+            context['error_origin'] = str(origin.netloc)
+        except ValueError:
+            pass
+        return context
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        self.set_csrf_error_if_need(context)
         context.update({
             'demo_mode': os.environ.get("DEMO_MODE"),
             'auth_methods': self.get_support_auth_methods(),
@@ -282,6 +309,12 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
         if self.request.session.get('auto_login'):
             age = self.request.session.get_expiry_age()
             self.request.session.set_expiry(age)
+
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        if request.user.is_authenticated:
+            response.set_cookie('jms_username', request.user.username)
+        return response
 
     def get_redirect_url(self, *args, **kwargs):
         try:

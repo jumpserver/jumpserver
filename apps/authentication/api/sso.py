@@ -1,26 +1,27 @@
-from uuid import UUID
 from urllib.parse import urlencode
+from uuid import UUID
 
-from django.contrib.auth import login
 from django.conf import settings
+from django.contrib.auth import login
 from django.http.response import HttpResponseRedirect
+from rest_framework import serializers
 from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.request import Request
 from rest_framework.permissions import AllowAny
+from rest_framework.request import Request
+from rest_framework.response import Response
 
-from common.utils.timezone import utc_now
-from common.const.http import POST, GET
 from common.api import JMSGenericViewSet
-from common.serializers import EmptySerializer
+from common.const.http import POST, GET
 from common.permissions import OnlySuperUser
+from common.serializers import EmptySerializer
 from common.utils import reverse
+from common.utils.timezone import utc_now
 from users.models import User
-from ..serializers import SSOTokenSerializer
-from ..models import SSOToken
+from ..errors import SSOAuthClosed
 from ..filters import AuthKeyQueryDeclaration
 from ..mixins import AuthMixin
-from ..errors import SSOAuthClosed
+from ..models import SSOToken
+from ..serializers import SSOTokenSerializer
 
 NEXT_URL = 'next'
 AUTH_KEY = 'authkey'
@@ -66,6 +67,9 @@ class SSOViewSet(AuthMixin, JMSGenericViewSet):
         next_url = request.query_params.get(NEXT_URL)
         if not next_url or not next_url.startswith('/'):
             next_url = reverse('index')
+
+        if not authkey:
+            raise serializers.ValidationError("authkey is required")
 
         try:
             authkey = UUID(authkey)

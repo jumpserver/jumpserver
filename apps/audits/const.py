@@ -25,6 +25,7 @@ class ActionChoices(TextChoices):
     delete = "delete", _("Delete")
     create = "create", _("Create")
     # Activities action
+    download = "download", _("Download")
     connect = "connect", _("Connect")
     login = "login", _("Login")
     change_auth = "change_password", _("Change password")

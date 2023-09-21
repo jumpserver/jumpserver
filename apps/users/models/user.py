@@ -3,8 +3,6 @@
 #
 import base64
 import datetime
-import random
-import string
 import uuid
 from typing import Callable
 
@@ -18,6 +16,7 @@ from django.shortcuts import reverse
 from django.utils import timezone
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext_lazy as _
+from rest_framework.exceptions import PermissionDenied
 
 from common.db import fields, models as jms_models
 from common.utils import (
@@ -400,10 +399,17 @@ class RoleMixin:
         data = cache.get(key)
         if data:
             return data
+        console_orgs = RoleBinding.get_user_has_the_perm_orgs('rbac.view_console', self)
+        audit_orgs = RoleBinding.get_user_has_the_perm_orgs('rbac.view_audit', self)
+        workbench_orgs = RoleBinding.get_user_has_the_perm_orgs('rbac.view_workbench', self)
+
+        if settings.LIMIT_SUPER_PRIV:
+            audit_orgs = list(set(audit_orgs) - set(console_orgs))
+
         data = {
-            'console_orgs': RoleBinding.get_user_has_the_perm_orgs('rbac.view_console', self),
-            'audit_orgs': RoleBinding.get_user_has_the_perm_orgs('rbac.view_audit', self),
-            'workbench_orgs': RoleBinding.get_user_has_the_perm_orgs('rbac.view_workbench', self),
+            'console_orgs': console_orgs,
+            'audit_orgs': audit_orgs,
+            'workbench_orgs': workbench_orgs,
         }
         cache.set(key, data, 60 * 60)
         return data
@@ -541,6 +547,9 @@ class RoleMixin:
     def get_all_permissions(self):
         from rbac.models import RoleBinding
         perms = RoleBinding.get_user_perms(self)
+
+        if settings.LIMIT_SUPER_PRIV and 'view_console' in perms:
+            perms = [p for p in perms if p != "view_audit"]
         return perms
 
 
@@ -596,8 +605,7 @@ class TokenMixin:
         return self.access_keys.first()
 
     def generate_reset_token(self):
-        letter = string.ascii_letters + string.digits
-        token = ''.join([random.choice(letter) for _ in range(50)])
+        token = random_string(50)
         self.set_cache(token)
         return token
 
@@ -819,9 +827,6 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
     public_key = fields.EncryptTextField(
         blank=True, null=True, verbose_name=_('Public key')
     )
-    secret_key = fields.EncryptCharField(
-        max_length=256, blank=True, null=True, verbose_name=_('Secret key')
-    )
     comment = models.TextField(
         blank=True, null=True, verbose_name=_('Comment')
     )
@@ -853,6 +858,13 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
+
+    @property
+    def secret_key(self):
+        instance = self.preferences.filter(name='secret_key').first()
+        if not instance:
+            return
+        return instance.decrypt_value
 
     @property
     def receive_backends(self):
@@ -959,7 +971,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
 
     def delete(self, using=None, keep_parents=False):
         if self.pk == 1 or self.username == 'admin':
-            return
+            raise PermissionDenied(_('Can not delete admin user'))
         return super(User, self).delete(using=using, keep_parents=keep_parents)
 
     @classmethod

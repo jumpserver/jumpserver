@@ -35,6 +35,7 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     HELP_DOCUMENT_URL = serializers.CharField()
     HELP_SUPPORT_URL = serializers.CharField()
 
+    AUTH_PASSKEY = serializers.BooleanField()
     AUTH_WECOM = serializers.BooleanField()
     AUTH_DINGTALK = serializers.BooleanField()
     AUTH_FEISHU = serializers.BooleanField()
@@ -44,8 +45,6 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     TERMINAL_MAGNUS_ENABLED = serializers.BooleanField()
     TERMINAL_KOKO_SSH_ENABLED = serializers.BooleanField()
     TERMINAL_OMNIDB_ENABLED = serializers.BooleanField()
-
-    TERMINAL_GRAPHICAL_RESOLUTION = serializers.CharField()
 
     ANNOUNCEMENT_ENABLED = serializers.BooleanField()
     ANNOUNCEMENT = serializers.DictField()

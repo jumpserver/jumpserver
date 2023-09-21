@@ -2,6 +2,7 @@ import uuid
 from copy import deepcopy
 
 from django.db import IntegrityError
+from django.db import transaction
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -73,6 +74,22 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             name = name + '_' + uuid.uuid4().hex[:4]
         initial_data['name'] = name
 
+    @staticmethod
+    def get_template_attr_for_account(template):
+        # Set initial data from template
+        field_names = [
+            'username', 'secret', 'secret_type', 'privileged', 'is_active'
+        ]
+
+        attrs = {}
+        for name in field_names:
+            value = getattr(template, name, None)
+            if value is None:
+                continue
+            attrs[name] = value
+        attrs['secret'] = template.get_secret()
+        return attrs
+
     def from_template_if_need(self, initial_data):
         if isinstance(initial_data, str):
             return
@@ -89,20 +106,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
             raise serializers.ValidationError({'template': 'Template not found'})
 
         self._template = template
-        # Set initial data from template
-        ignore_fields = ['id', 'date_created', 'date_updated', 'su_from', 'org_id']
-        field_names = [
-            field.name for field in template._meta.fields
-            if field.name not in ignore_fields
-        ]
-        field_names = [name if name != '_secret' else 'secret' for name in field_names]
-
-        attrs = {}
-        for name in field_names:
-            value = getattr(template, name, None)
-            if value is None:
-                continue
-            attrs[name] = value
+        attrs = self.get_template_attr_for_account(template)
         initial_data.update(attrs)
         initial_data.update({
             'source': Source.TEMPLATE,
@@ -114,10 +118,13 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         asset = get_object_or_404(Asset, pk=asset_id)
         initial_data['su_from'] = template.get_su_from_account(asset)
 
-    @staticmethod
-    def push_account_if_need(instance, push_now, params, stat):
+    def push_account_if_need(self, instance, push_now, params, stat):
         if not push_now or stat not in ['created', 'updated']:
             return
+        transaction.on_commit(lambda: self.start_push(instance, params))
+
+    @staticmethod
+    def start_push(instance, params):
         push_accounts_to_assets_task.delay([str(instance.id)], params)
 
     def get_validators(self):

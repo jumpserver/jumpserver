@@ -1,13 +1,13 @@
-from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from users.models import User
-from common.utils import get_logger
-from common.permissions import UserConfirmation
-from common.api import RoleUserMixin, RoleAdminMixin
-from authentication.const import ConfirmType
 from authentication import errors
+from authentication.const import ConfirmType
+from common.api import RoleUserMixin, RoleAdminMixin
+from common.permissions import UserConfirmation, IsValidUser
+from common.utils import get_logger
+from users.models import User
 
 logger = get_logger(__file__)
 
@@ -27,7 +27,7 @@ class WeComQRUnBindBase(APIView):
 
 
 class WeComQRUnBindForUserApi(RoleUserMixin, WeComQRUnBindBase):
-    permission_classes = (UserConfirmation.require(ConfirmType.ReLogin),)
+    permission_classes = (IsValidUser, UserConfirmation.require(ConfirmType.ReLogin),)
 
 
 class WeComQRUnBindForAdminApi(RoleAdminMixin, WeComQRUnBindBase):

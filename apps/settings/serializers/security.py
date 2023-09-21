@@ -7,6 +7,7 @@ __all__ = [
     'SecurityPasswordRuleSerializer', 'SecuritySessionSerializer',
     'SecurityAuthSerializer', 'SecuritySettingSerializer',
     'SecurityLoginLimitSerializer', 'SecurityBasicSerializer',
+    'SecurityBlockIPSerializer'
 ]
 
 
@@ -225,3 +226,8 @@ class SecuritySettingSerializer(
     SecurityLoginLimitSerializer,
 ):
     PREFIX_TITLE = _('Security')
+
+
+class SecurityBlockIPSerializer(serializers.Serializer):
+    id = serializers.UUIDField(required=False)
+    ip = serializers.CharField(max_length=1024, required=False, allow_blank=True)

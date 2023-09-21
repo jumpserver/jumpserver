@@ -1,14 +1,14 @@
 # ~*~ coding: utf-8 ~*~
 
 from django.db.models import Q
+from django.utils.translation import gettext_lazy as _
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
-from django.utils.translation import gettext_lazy as _
 
 from assets.locks import NodeAddChildrenLock
+from common.exceptions import JMSException
 from common.tree import TreeNodeSerializer
 from common.utils import get_logger
-from common.exceptions import JMSException
 from orgs.mixins import generics
 from orgs.utils import current_org
 from .mixin import SerializeToTreeNodeMixin
@@ -35,8 +35,8 @@ class NodeChildrenApi(generics.ListCreateAPIView):
     is_initial = False
 
     def initial(self, request, *args, **kwargs):
+        super().initial(request, *args, **kwargs)
         self.instance = self.get_object()
-        return super().initial(request, *args, **kwargs)
 
     def perform_create(self, serializer):
         with NodeAddChildrenLock(self.instance):

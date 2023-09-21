@@ -19,13 +19,11 @@ class AuthSettingSerializer(serializers.Serializer):
     AUTH_FEISHU = serializers.BooleanField(default=False, label=_('FeiShu Auth'))
     AUTH_WECOM = serializers.BooleanField(default=False, label=_('WeCom Auth'))
     AUTH_SSO = serializers.BooleanField(default=False, label=_("SSO Auth"))
+    AUTH_PASSKEY = serializers.BooleanField(default=False, label=_("Passkey Auth"))
     FORGOT_PASSWORD_URL = serializers.CharField(
         required=False, allow_blank=True, max_length=1024,
         label=_("Forgot password url")
     )
-    # HEALTH_CHECK_TOKEN = serializers.CharField(
-    #     required=False, max_length=1024, label=_("Health check token")
-    # )
     LOGIN_REDIRECT_MSG_ENABLED = serializers.BooleanField(
         required=False, label=_("Enable login redirect msg")
     )

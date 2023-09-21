@@ -1,18 +1,23 @@
 # -*- coding: utf-8 -*-
 #
+from celery import shared_task
 from django.conf import settings
+from django.contrib.auth.signals import user_logged_out
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from django_auth_ldap.backend import populate_user
 from django_cas_ng.signals import cas_user_authenticated
 
+from audits.models import UserSession
 from authentication.backends.oauth2.signals import oauth2_create_or_update_user
 from authentication.backends.oidc.signals import openid_create_or_update_user
 from authentication.backends.saml2.signals import saml2_create_or_update_user
+from common.const.crontab import CRONTAB_AT_PM_TWO
 from common.decorators import on_transaction_commit
 from common.utils import get_logger
 from jumpserver.utils import get_current_request
+from ops.celery.decorator import register_as_period_task
 from .models import User, UserPasswordHistory
 from .signals import post_user_create
 
@@ -156,3 +161,15 @@ def on_openid_create_or_update_user(sender, request, user, created, name, userna
         user.username = username
         user.email = email
         user.save()
+
+
+@shared_task(verbose_name=_('Clean audits session task log'))
+@register_as_period_task(crontab=CRONTAB_AT_PM_TWO)
+def clean_audits_log_period():
+    UserSession.clear_expired_sessions()
+
+
+@receiver(user_logged_out)
+def user_logged_out_callback(sender, request, user, **kwargs):
+    session_key = request.session.session_key
+    UserSession.objects.filter(key=session_key).delete()

@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.functional import cached_property
 
 from common.db.models import JMSBaseModel
+from common.utils import is_uuid
 from orgs.mixins.models import OrgModelMixin
 from orgs.utils import tmp_to_root_org
 from users.models import User
@@ -62,6 +63,9 @@ class SessionSharing(JMSBaseModel, OrgModelMixin):
     @cached_property
     def users_queryset(self):
         user_ids = self.users.split(',')
+        user_ids = [user_id for user_id in user_ids if is_uuid(user_id)]
+        if not user_ids:
+            return User.objects.none()
         return User.objects.filter(id__in=user_ids)
 
     @property

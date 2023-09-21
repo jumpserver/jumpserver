@@ -31,6 +31,7 @@
         role_attr_flags: LOGIN
       ignore_errors: true
       when: result is succeeded
+      register: change_info
 
     - name: Verify password
       community.postgresql.postgresql_ping:
@@ -42,3 +43,5 @@
       when:
         - result is succeeded
         - change_info is succeeded
+      register: result
+      failed_when: not result.is_available

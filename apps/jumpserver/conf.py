@@ -333,9 +333,9 @@ class Config(dict):
         'CAS_ROOT_PROXIED_AS': 'https://example.com',
         'CAS_LOGOUT_COMPLETELY': True,
         'CAS_VERSION': 3,
-        'CAS_USERNAME_ATTRIBUTE': 'uid',
+        'CAS_USERNAME_ATTRIBUTE': 'cas:user',
         'CAS_APPLY_ATTRIBUTES_TO_USER': False,
-        'CAS_RENAME_ATTRIBUTES': {'uid': 'username'},
+        'CAS_RENAME_ATTRIBUTES': {'cas:user': 'username'},
         'CAS_CREATE_USER': True,
 
         'AUTH_SSO': False,
@@ -382,6 +382,9 @@ class Config(dict):
         'AUTH_OAUTH2_USER_ATTR_MAP': {
             'name': 'name', 'username': 'username', 'email': 'email'
         },
+        'AUTH_PASSKEY': False,
+        'FIDO_SERVER_ID': '',
+        'FIDO_SERVER_NAME': 'JumpServer',
 
         # 企业微信
         'AUTH_WECOM': False,
@@ -457,9 +460,6 @@ class Config(dict):
         'TERMINAL_SESSION_KEEP_DURATION': 200,
         'TERMINAL_HOST_KEY': '',
         'TERMINAL_COMMAND_STORAGE': {},
-        # Luna 页面
-        # 默认图形化分辨率
-        'TERMINAL_GRAPHICAL_RESOLUTION': 'Auto',
         # 未来废弃(目前迁移会用)
         'TERMINAL_RDP_ADDR': '',
         # 保留(Luna还在用)
@@ -578,7 +578,9 @@ class Config(dict):
         'FTP_FILE_MAX_STORE': 100,
 
         # API 请求次数限制
-        'MAX_LIMIT_PER_PAGE': 100
+        'MAX_LIMIT_PER_PAGE': 100,
+
+        'LIMIT_SUPER_PRIV': False,
     }
 
     old_config_map = {

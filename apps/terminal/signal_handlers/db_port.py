@@ -16,7 +16,8 @@ def check_db_port_mapper(sender, **kwargs):
     try:
         db_port_manager.check()
     except Exception as e:
-        logger.error(e)
+        # 新部署会显示 assets_database 表不存在
+        logger.warning('(Ignore) {}'.format(e))
 
 
 @receiver(post_save, sender=Database)

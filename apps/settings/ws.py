@@ -6,7 +6,10 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 from common.db.utils import close_old_connections
 from common.utils import get_logger
-from .tools import verbose_ping, verbose_telnet, verbose_nmap, verbose_tcpdump
+from .tools import (
+    verbose_ping, verbose_telnet, verbose_nmap,
+    verbose_tcpdump, verbose_traceroute
+)
 
 
 logger = get_logger(__name__)
@@ -22,19 +25,19 @@ class ToolsWebsocket(AsyncJsonWebsocketConsumer):
             await self.close()
 
     async def send_msg(self, msg=''):
-        await self.send_json({'msg': msg + '\r\n'})
+        await self.send_json({'msg': f'{msg}\r\n'})
 
-    async def imitate_ping(self, dest_ip, timeout=3, count=5, psize=64):
+    async def imitate_ping(self, dest_ips, timeout=3, count=5, psize=64):
         params = {
-            'dest_ip': dest_ip, 'timeout': timeout,
+            'dest_ips': dest_ips, 'timeout': timeout,
             'count': count, 'psize': psize
         }
         logger.info(f'Receive request ping: {params}')
         await verbose_ping(display=self.send_msg, **params)
 
-    async def imitate_telnet(self, dest_ip, dest_port=23, timeout=10):
+    async def imitate_telnet(self, dest_ips, dest_port=23, timeout=10):
         params = {
-            'dest_ip': dest_ip, 'dest_port': dest_port, 'timeout': timeout,
+            'dest_ips': dest_ips, 'dest_port': dest_port, 'timeout': timeout,
         }
         logger.info(f'Receive request telnet: {params}')
         await verbose_telnet(display=self.send_msg, **params)
@@ -56,6 +59,10 @@ class ToolsWebsocket(AsyncJsonWebsocketConsumer):
         }
         logger.info(f'Receive request tcpdump: {params}')
         await verbose_tcpdump(display=self.send_msg, **params)
+
+    async def imitate_traceroute(self,dest_ips):
+        params = {'dest_ips': dest_ips}
+        await verbose_traceroute(display=self.send_msg, **params)
 
     async def receive(self, text_data=None, bytes_data=None, **kwargs):
         data = json.loads(text_data)

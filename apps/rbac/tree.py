@@ -112,6 +112,7 @@ special_pid_mapper = {
     "settings.view_setting": "view_setting",
     "rbac.view_console": "view_console",
     "rbac.view_audit": "view_audit",
+    'audits.usersession': 'view_audit',
     "rbac.view_workbench": "view_workbench",
     "rbac.view_webterminal": "view_workbench",
     "rbac.view_filemanager": "view_workbench",

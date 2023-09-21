@@ -8,7 +8,7 @@ from django.db.models import F
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404, reverse
 from django.utils.encoding import escape_uri_path
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_noop, gettext as _
 from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework import viewsets, views
@@ -16,14 +16,16 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from audits.const import ActionChoices
 from common.api import AsyncApiMixin
 from common.const.http import GET
 from common.drf.filters import BaseFilterSet
-from common.drf.filters import DatetimeRangeFilter
+from common.drf.filters import DatetimeRangeFilterBackend
 from common.drf.renders import PassthroughRenderer
 from common.storage.replay import ReplayStorageHandler
-from common.utils import data_to_json, is_uuid
+from common.utils import data_to_json, is_uuid, i18n_fmt
 from common.utils import get_logger, get_object_or_none
+from common.views.mixins import RecordViewLogMixin
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import tmp_to_root_org, tmp_to_org
 from rbac.permissions import RBACPermission
@@ -36,10 +38,12 @@ from users.models import User
 
 __all__ = [
     'SessionViewSet', 'SessionReplayViewSet',
-    'SessionJoinValidateAPI', 'MySessionAPIView',
+    'SessionJoinValidateAPI', 'MySessionAPIView'
 ]
 
 logger = get_logger(__name__)
+
+REPLAY_OP = gettext_noop('User %s %s session %s replay')
 
 
 class MySessionAPIView(generics.ListAPIView):
@@ -70,7 +74,7 @@ class SessionFilterSet(BaseFilterSet):
             return queryset.filter(terminal__name=value)
 
 
-class SessionViewSet(OrgBulkModelViewSet):
+class SessionViewSet(RecordViewLogMixin, OrgBulkModelViewSet):
     model = Session
     serializer_classes = {
         'default': serializers.SessionSerializer,
@@ -84,9 +88,9 @@ class SessionViewSet(OrgBulkModelViewSet):
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
     ]
-    extra_filter_backends = [DatetimeRangeFilter]
+    extra_filter_backends = [DatetimeRangeFilterBackend]
     rbac_perms = {
-        'download': ['terminal.download_sessionreplay']
+        'download': ['terminal.download_sessionreplay'],
     }
     permission_classes = [RBACPermission | IsSessionAssignee]
 
@@ -132,10 +136,36 @@ class SessionViewSet(OrgBulkModelViewSet):
         filename = escape_uri_path('{}.tar'.format(storage.obj.id))
         disposition = "attachment; filename*=UTF-8''{}".format(filename)
         response["Content-Disposition"] = disposition
+
+        detail = i18n_fmt(
+            REPLAY_OP, self.request.user, _('Download'), str(storage.obj)
+        )
+        self.record_logs(
+            [storage.obj.asset_id], ActionChoices.download, detail,
+            model=Session, resource_display=str(storage.obj)
+        )
         return response
 
+    @action(methods=[GET], detail=False, permission_classes=[IsAuthenticated], url_path='online-info', )
+    def online_info(self, request, *args, **kwargs):
+        asset = self.request.query_params.get('asset_id')
+        account = self.request.query_params.get('account')
+        if asset is None or account is None:
+            return Response({'count': None})
+
+        queryset = Session.objects.filter(is_finished=False) \
+            .filter(asset_id=asset) \
+            .filter(protocol='rdp')  # 当前只统计 rdp 协议的会话
+        if '(' in account and ')' in account:
+            queryset = queryset.filter(account=account)
+        else:
+            queryset = queryset.filter(account__endswith='({})'.format(account))
+        count = queryset.count()
+        return Response({'count': count})
+
     def get_queryset(self):
-        queryset = super().get_queryset().prefetch_related('terminal') \
+        queryset = super().get_queryset() \
+            .prefetch_related('terminal') \
             .annotate(terminal_display=F('terminal__name'))
         return queryset
 
@@ -152,7 +182,7 @@ class SessionViewSet(OrgBulkModelViewSet):
         return super().perform_create(serializer)
 
 
-class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
+class SessionReplayViewSet(AsyncApiMixin, RecordViewLogMixin, viewsets.ViewSet):
     serializer_class = serializers.ReplaySerializer
     download_cache_key = "SESSION_REPLAY_DOWNLOAD_{}"
     session = None
@@ -214,6 +244,17 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
         if self.action != 'retrieve':
             return False
         return True
+
+    def async_callback(self, *args, **kwargs):
+        session_id = kwargs.get('pk')
+        session = get_object_or_404(Session, id=session_id)
+        detail = i18n_fmt(
+            REPLAY_OP, self.request.user, _('View'), str(session)
+        )
+        self.record_logs(
+            [session.asset_id], ActionChoices.download, detail,
+            model=Session, resource_display=str(session)
+        )
 
     def retrieve(self, request, *args, **kwargs):
         session_id = kwargs.get('pk')

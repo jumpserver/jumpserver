@@ -20,6 +20,8 @@ urlpatterns = [
     path('sms/backend/', api.SMSBackendAPI.as_view(), name='sms-backend'),
     path('vault/testing/', api.VaultTestingAPI.as_view(), name='vault-testing'),
     path('vault/sync/', api.VaultSyncDataAPI.as_view(), name='vault-sync'),
+    path('security/block-ip/', api.BlockIPSecurityAPI.as_view(), name='block-ip'),
+    path('security/unlock-ip/', api.UnlockIPSecurityAPI.as_view(), name='unlock-ip'),
 
     path('setting/', api.SettingsApi.as_view(), name='settings-setting'),
     path('logo/', api.SettingsLogoApi.as_view(), name='settings-logo'),

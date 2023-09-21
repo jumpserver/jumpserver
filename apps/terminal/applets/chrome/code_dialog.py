@@ -35,15 +35,23 @@ class CodeDialog(object):
 
 
 class TkProgressBar(object):
+    # 30s
+    wait_max_time = 3000 * 10
+
     def __init__(self, wait_func=None):
         self._wait_func = wait_func
         self._done = threading.Event()
         self._root = None
+        self._wait_time = 0
 
     def _check(self):
         if self._done.isSet():
             self._root.destroy()
             return
+        if self._wait_time >= self.wait_max_time:
+            self._root.destroy()
+            return
+        self._wait_time += 100
         self._root.after(100, self._check)
 
     def stop(self):
