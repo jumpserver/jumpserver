@@ -38,6 +38,7 @@ ARG TOOLS="                           \
         default-mysql-client          \
         iputils-ping                  \
         locales                       \
+        patch                         \
         procps                        \
         redis-tools                   \
         telnet                        \
