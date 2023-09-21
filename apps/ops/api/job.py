@@ -1,7 +1,5 @@
 from django.conf import settings
-from django.db import transaction
 from django.db.models import Count
-from django.db.transaction import atomic
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -88,8 +86,7 @@ class JobViewSet(OrgBulkModelViewSet):
         execution.save()
 
         set_task_to_serializer_data(serializer, execution.id)
-        transaction.on_commit(
-            lambda: run_ops_job_execution.apply_async((str(execution.id),), task_id=str(execution.id)))
+        run_ops_job_execution.apply_async((str(execution.id),), task_id=str(execution.id))
 
 
 class JobExecutionViewSet(OrgBulkModelViewSet):
@@ -112,8 +109,7 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
         instance.save()
 
         set_task_to_serializer_data(serializer, instance.id)
-        transaction.on_commit(
-            lambda: run_ops_job_execution.apply_async((str(instance.id),), task_id=str(instance.id)))
+        run_ops_job_execution.apply_async((str(instance.id),), task_id=str(instance.id))
 
     def get_queryset(self):
         queryset = super().get_queryset()

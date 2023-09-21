@@ -5,6 +5,7 @@ from celery.exceptions import SoftTimeLimitExceeded
 from django.utils.translation import gettext_lazy as _
 from django_celery_beat.models import PeriodicTask
 
+from common.decorators import on_transaction_commit
 from common.utils import get_logger, get_object_or_none
 from ops.celery import app
 from orgs.utils import tmp_to_org, tmp_to_root_org
@@ -68,6 +69,7 @@ def job_execution_task_activity_callback(self, execution_id, *args, **kwargs):
     soft_time_limit=60, queue="ansible", verbose_name=_("Run ansible task execution"),
     activity_callback=job_execution_task_activity_callback
 )
+@on_transaction_commit
 def run_ops_job_execution(execution_id, **kwargs):
     with tmp_to_root_org():
         execution = get_object_or_none(JobExecution, id=execution_id)
