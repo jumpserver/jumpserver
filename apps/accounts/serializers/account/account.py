@@ -438,7 +438,10 @@ class AccountHistorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account.history.model
-        fields = ['id', 'secret', 'secret_type', 'version', 'history_date', 'history_user']
+        fields = [
+            'id', 'secret', 'secret_type', 'version', 'history_date',
+            'history_user'
+        ]
         read_only_fields = fields
         extra_kwargs = {
             'history_user': {'label': _('User')},
