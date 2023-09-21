@@ -268,7 +268,10 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
         return user_ids
 
     def get_queryset(self):
-        queryset = UserSession.objects.filter(date_expired__gt=timezone.now())
+        keys = UserSession.get_keys()
+        queryset = UserSession.objects.filter(
+            date_expired__gt=timezone.now(), key__in=keys
+        )
         if current_org.is_root():
             return queryset
         user_ids = self.org_user_ids

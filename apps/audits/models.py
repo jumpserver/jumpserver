@@ -1,7 +1,9 @@
 import os
 import uuid
+from importlib import import_module
 
 from django.conf import settings
+from django.core.cache import caches
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
@@ -269,9 +271,17 @@ class UserSession(models.Model):
     def backend_display(self):
         return gettext(self.backend)
 
+    @staticmethod
+    def get_keys():
+        session_store_cls = import_module(settings.SESSION_ENGINE).SessionStore
+        cache_key_prefix = session_store_cls.cache_key_prefix
+        keys = caches[settings.SESSION_CACHE_ALIAS].keys('*')
+        return [k.replace(cache_key_prefix, '') for k in keys]
+
     @classmethod
     def clear_expired_sessions(cls):
         cls.objects.filter(date_expired__lt=timezone.now()).delete()
+        cls.objects.exclude(key__in=cls.get_keys()).delete()
 
     class Meta:
         ordering = ['-date_created']

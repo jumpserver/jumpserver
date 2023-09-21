@@ -5,7 +5,6 @@ from importlib import import_module
 
 from django.conf import settings
 from django.contrib.auth import BACKEND_SESSION_KEY
-from django.core.cache import caches
 from django.dispatch import receiver
 from django.utils import timezone, translation
 from django.utils.functional import LazyObject
@@ -83,11 +82,10 @@ def generate_data(username, request, login_type=None):
 
 
 def create_user_session(request, user_id, instance: UserLoginLog):
-    session_key = request.session.session_key
+    session_key = request.session.session_key or '-'
     session_store_cls = import_module(settings.SESSION_ENGINE).SessionStore
     session_store = session_store_cls(session_key=session_key)
-    cache_key = session_store.cache_key
-    ttl = caches[settings.SESSION_CACHE_ALIAS].ttl(cache_key)
+    ttl = session_store.get_expiry_age()
 
     online_session_data = {
         'user_id': user_id,
@@ -114,9 +112,8 @@ def on_user_auth_success(sender, user, request, login_type=None, **kwargs):
     request.session['login_time'] = data['datetime'].strftime("%Y-%m-%d %H:%M:%S")
     data.update({'mfa': int(user.mfa_enabled), 'status': True})
     instance = write_login_log(**data)
-    session_key = request.session.session_key
     # TODO 目前只记录 web 登录的 session
-    if not session_key or instance.type != LoginTypeChoices.web:
+    if instance.type != LoginTypeChoices.web:
         return
     create_user_session(request, user.id, instance)
 
