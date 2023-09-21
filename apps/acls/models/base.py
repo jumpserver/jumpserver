@@ -103,25 +103,27 @@ class UserAssetAccountBaseACL(OrgModelMixin, UserBaseACL):
         abstract = True
 
     @classmethod
-    def filter_queryset(cls, user=None, asset=None, account=None, account_username=None, **kwargs):
+    def _get_filter_queryset(cls, user=None, asset=None, account=None, account_username=None, **kwargs):
         queryset = cls.objects.all()
-
-        if user:
-            q = cls.users.get_filter_q(user)
-            queryset = queryset.filter(q)
+        q = models.Q()
 
         if asset:
-            org_id = asset.org_id
-            with tmp_to_org(org_id):
-                q = cls.assets.get_filter_q(asset)
-            queryset = queryset.filter(q)
+            q &= cls.assets.get_filter_q(asset)
+        if user:
+            q &= cls.users.get_filter_q(user)
         if account and not account_username:
             account_username = account.username
         if account_username:
-            q = models.Q(accounts__contains=account_username) | \
-                models.Q(accounts__contains='*') | \
-                models.Q(accounts__contains='@ALL')
-            queryset = queryset.filter(q)
+            q &= models.Q(accounts__contains=account_username) | \
+                 models.Q(accounts__contains='*') | \
+                 models.Q(accounts__contains='@ALL')
         if kwargs:
-            queryset = queryset.filter(**kwargs)
+            q &= models.Q(**kwargs)
+        queryset = queryset.filter(q)
         return queryset.valid().distinct()
+
+    @classmethod
+    def filter_queryset(cls, asset=None, **kwargs):
+        org_id = asset.org_id if asset else ''
+        with tmp_to_org(org_id):
+            return cls._get_filter_queryset(asset=asset, **kwargs)
