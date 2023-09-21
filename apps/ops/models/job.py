@@ -23,7 +23,7 @@ from common.db.encoder import ModelJSONFieldEncoder
 from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner, CommandInBlackListException
 from ops.mixin import PeriodTaskModelMixin
 from ops.variables import *
-from ops.const import Types, Modules, RunasPolicies, JobStatus
+from ops.const import Types, RunasPolicies, JobStatus, JobModules
 from orgs.mixins.models import JMSOrgBaseModel
 from perms.models import AssetPermission
 from perms.utils import UserPermAssetUtil
@@ -127,7 +127,7 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
 
     instant = models.BooleanField(default=False)
     args = models.CharField(max_length=8192, default='', verbose_name=_('Args'), null=True, blank=True)
-    module = models.CharField(max_length=128, choices=Modules.choices, default=Modules.shell, verbose_name=_('Module'),
+    module = models.CharField(max_length=128, choices=JobModules.choices, default=JobModules.shell, verbose_name=_('Module'),
                               null=True)
     chdir = models.CharField(default="", max_length=1024, verbose_name=_('Chdir'), null=True, blank=True)
     timeout = models.IntegerField(default=-1, verbose_name=_('Timeout (Seconds)'))

@@ -36,4 +36,12 @@ class Migration(migrations.Migration):
             name='summary',
             field=models.JSONField(default=dict, encoder=common.db.encoder.ModelJSONFieldEncoder, verbose_name='Summary'),
         ),
+        migrations.AlterField(
+            model_name='adhoc',
+            name='module',
+            field=models.CharField(
+                choices=[('shell', 'Shell'), ('win_shell', 'Powershell'), ('python', 'Python'), ('mysql', 'MySQL'),
+                         ('mariadb', 'MariaDB'), ('postgresql', 'PostgreSQL'), ('sqlserver', 'SQLServer'),
+                         ('oracle', 'Oracle'), ('raw', 'Raw')], default='shell', max_length=128, verbose_name='Module'),
+        ),
     ]
