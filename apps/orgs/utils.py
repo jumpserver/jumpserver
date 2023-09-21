@@ -87,7 +87,8 @@ def tmp_to_root_org():
 @contextmanager
 def tmp_to_org(org):
     ori_org = get_current_org()
-    set_current_org(org)
+    if org:
+        set_current_org(org)
     yield
     if ori_org is not None:
         set_current_org(ori_org)
