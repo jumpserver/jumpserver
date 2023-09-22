@@ -36,6 +36,7 @@ ARG TOOLS="                           \
         curl                          \
         default-libmysqlclient-dev    \
         default-mysql-client          \
+        iputils-ping                  \
         locales                       \
         nmap                          \
         openssh-client                \
