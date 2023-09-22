@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 #
-import uuid
 import os
+import uuid
 
-from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from ops.celery import app
 
@@ -83,4 +83,5 @@ class CeleryTaskExecution(models.Model):
         return "{}: {}".format(self.name, self.id)
 
     class Meta:
+        ordering = ['-date_start']
         verbose_name = _("Celery Task Execution")
