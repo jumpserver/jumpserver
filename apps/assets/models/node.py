@@ -402,12 +402,7 @@ class NodeAssetsMixin(NodeAllAssetsMappingMixin):
         return Asset.objects.filter(q).distinct()
 
     def get_assets_amount(self):
-        q = Q(node__key__startswith=f'{self.key}:') | Q(node__key=self.key)
-        return self.assets.through.objects.filter(q).count()
-
-    def get_assets_account_by_children(self):
-        children = self.get_all_children().values_list()
-        return self.assets.through.objects.filter(node_id__in=children).count()
+        return self.get_all_assets().count()
 
     @classmethod
     def get_node_all_assets_by_key_v2(cls, key):
