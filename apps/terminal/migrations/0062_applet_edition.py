@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='applet',
             name='edition',
-            field=models.CharField(choices=[('community', 'Community'), ('enterprise', 'Enterprise')],
+            field=models.CharField(choices=[('community', 'Community edition'), ('enterprise', 'Enterprise')],
                                    default='community', max_length=128, verbose_name='Edition'),
         ),
     ]

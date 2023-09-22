@@ -13,11 +13,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='changesecretautomation',
             name='secret_strategy',
-            field=models.CharField(choices=[('specific', 'Specific password'), ('random', 'Random')], default='specific', max_length=16, verbose_name='Secret strategy'),
+            field=models.CharField(choices=[('specific', 'Specific secret'), ('random', 'Random generate')], default='specific', max_length=16, verbose_name='Secret strategy'),
         ),
         migrations.AlterField(
             model_name='pushaccountautomation',
             name='secret_strategy',
-            field=models.CharField(choices=[('specific', 'Specific password'), ('random', 'Random')], default='specific', max_length=16, verbose_name='Secret strategy'),
+            field=models.CharField(choices=[('specific', 'Specific secret'), ('random', 'Random generate')], default='specific', max_length=16, verbose_name='Secret strategy'),
         ),
     ]

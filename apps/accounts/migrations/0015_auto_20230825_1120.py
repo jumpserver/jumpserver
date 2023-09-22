@@ -29,6 +29,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='accounttemplate',
             name='secret_strategy',
-            field=models.CharField(choices=[('specific', 'Specific password'), ('random', 'Random')], default='specific', max_length=16, verbose_name='Secret strategy'),
+            field=models.CharField(choices=[('specific', 'Specific secret'), ('random', 'Random generate')], default='specific', max_length=16, verbose_name='Secret strategy'),
         ),
     ]
