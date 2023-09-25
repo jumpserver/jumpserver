@@ -26,6 +26,7 @@ class SendAndVerifyCodeUtil(object):
         self.target = target
         self.backend = backend
         self.key = key or self.KEY_TMPL.format(target)
+        self.verify_key = self.key + '_verify'
         self.timeout = settings.VERIFY_CODE_TTL if timeout is None else timeout
         self.other_args = kwargs
 
@@ -47,6 +48,11 @@ class SendAndVerifyCodeUtil(object):
             raise
 
     def verify(self, code):
+        times = cache.get(self.verify_key, 0)
+        if times >= 3:
+            self.__clear()
+            raise CodeError
+        cache.set(self.verify_key, times + 1, timeout=self.timeout)
         right = cache.get(self.key)
         if not right:
             raise CodeExpired
