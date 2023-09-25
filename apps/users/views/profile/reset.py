@@ -114,6 +114,11 @@ class UserForgotPasswordView(FormView):
         target = form.cleaned_data[form_type]
         code = form.cleaned_data['code']
 
+        query_key = form_type
+        if form_type == 'sms':
+            query_key = 'phone'
+            target = target.lstrip('+')
+
         try:
             sender_util = SendAndVerifyCodeUtil(target, backend=form_type)
             sender_util.verify(code)
@@ -121,7 +126,6 @@ class UserForgotPasswordView(FormView):
             form.add_error('code', str(e))
             return super().form_invalid(form)
 
-        query_key = 'phone' if form_type == 'sms' else form_type
         user = get_object_or_none(User, **{'username': username, query_key: target})
         if not user:
             form.add_error('code', _('No user matched'))
