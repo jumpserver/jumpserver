@@ -51,7 +51,7 @@ class SendAndVerifyCodeUtil(object):
         times = cache.get(self.verify_key, 0)
         if times >= 3:
             self.__clear()
-            raise CodeError
+            raise CodeExpired
         cache.set(self.verify_key, times + 1, timeout=self.timeout)
         right = cache.get(self.key)
         if not right:
@@ -65,6 +65,7 @@ class SendAndVerifyCodeUtil(object):
 
     def __clear(self):
         cache.delete(self.key)
+        cache.delete(self.verify_key)
 
     def __ttl(self):
         return cache.ttl(self.key)
