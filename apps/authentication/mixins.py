@@ -424,18 +424,12 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
     key_prefix_captcha = "_LOGIN_INVALID_{}"
 
     def _check_auth_user_is_valid(self, username, password, public_key):
-        from common.permissions import ServiceAccountSignaturePermission
         user = authenticate(
             self.request, username=username,
             password=password, public_key=public_key
         )
         if not user:
             self.raise_credential_error(errors.reason_password_failed)
-
-        if public_key:
-            permission = ServiceAccountSignaturePermission()
-            if not permission.has_permission(self.request, self):
-                self.raise_credential_error(errors.reason_password_failed)
 
         self.request.session['auth_backend'] = getattr(user, 'backend', settings.AUTH_BACKEND_MODEL)
 
