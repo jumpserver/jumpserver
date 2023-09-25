@@ -7,3 +7,4 @@ class ActionChoices(models.TextChoices):
     accept = 'accept', _('Accept')
     review = 'review', _('Review')
     warning = 'warning', _('Warning')
+    notice = 'notice', _('Notifications')
