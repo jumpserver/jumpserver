@@ -25,7 +25,6 @@ class UserLoginReminderMsg(UserMessage):
         }
         message = render_to_string('acls/user_login_reminder.html', context)
 
-        print('message', message)
         return {
             'subject': str(self.subject),
             'message': message
