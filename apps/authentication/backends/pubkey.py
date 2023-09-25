@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 #
-from django.contrib.auth import get_user_model
 from django.conf import settings
+from django.contrib.auth import get_user_model
 
+from common.permissions import ServiceAccountSignaturePermission
 from .base import JMSBaseAuthBackend
 
 UserModel = get_user_model()
@@ -18,6 +19,10 @@ class PublicKeyAuthBackend(JMSBaseAuthBackend):
     def authenticate(self, request, username=None, public_key=None, **kwargs):
         if not public_key:
             return None
+
+        permission = ServiceAccountSignaturePermission()
+        if not permission.has_permission(request, None):
+            return None
         if username is None:
             username = kwargs.get(UserModel.USERNAME_FIELD)
         try:
@@ -26,7 +31,7 @@ class PublicKeyAuthBackend(JMSBaseAuthBackend):
             return None
         else:
             if user.check_public_key(public_key) and \
-                  self.user_can_authenticate(user):
+                    self.user_can_authenticate(user):
                 return user
 
     def get_user(self, user_id):
