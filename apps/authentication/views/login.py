@@ -310,12 +310,6 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
             age = self.request.session.get_expiry_age()
             self.request.session.set_expiry(age)
 
-    def get(self, request, *args, **kwargs):
-        response = super().get(request, *args, **kwargs)
-        if request.user.is_authenticated:
-            response.set_cookie('jms_username', request.user.username)
-        return response
-
     def get_redirect_url(self, *args, **kwargs):
         try:
             user = self.get_user_from_session()
