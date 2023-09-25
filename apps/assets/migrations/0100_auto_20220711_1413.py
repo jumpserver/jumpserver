@@ -25,7 +25,7 @@ def migrate_asset_accounts(apps, schema_editor):
         count += len(auth_books)
         # auth book 和 account 相同的属性
         same_attrs = [
-            'id', 'username', 'comment', 'date_created', 'date_updated',
+            'username', 'comment', 'date_created', 'date_updated',
             'created_by', 'asset_id', 'org_id',
         ]
         # 认证的属性，可能是 auth_book 的，可能是 system_user 的
