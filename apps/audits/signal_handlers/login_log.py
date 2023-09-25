@@ -11,6 +11,9 @@ from django.utils.functional import LazyObject
 from django.utils.translation import gettext_lazy as _
 from rest_framework.request import Request
 
+from acls.const import ActionChoices
+from acls.models import LoginACL
+from acls.notifications import UserLoginReminderMsg
 from audits.models import UserLoginLog
 from authentication.signals import post_auth_failed, post_auth_success
 from authentication.utils import check_different_city_login_if_need
@@ -102,20 +105,36 @@ def create_user_session(request, user_id, instance: UserLoginLog):
     request.session['user_session_id'] = user_session.id
 
 
+def send_login_info_to_reviewers(instance: UserLoginLog, reviewers):
+    for reviewer in reviewers:
+        UserLoginReminderMsg(reviewer, instance).publish_async()
+
+
 @receiver(post_auth_success)
 def on_user_auth_success(sender, user, request, login_type=None, **kwargs):
     logger.debug('User login success: {}'.format(user.username))
     check_different_city_login_if_need(user, request)
-    data = generate_data(
-        user.username, request, login_type=login_type
-    )
-    request.session['login_time'] = data['datetime'].strftime("%Y-%m-%d %H:%M:%S")
+    data = generate_data(user.username, request, login_type=login_type)
+    request.session['login_time'] = data['datetime'].strftime('%Y-%m-%d %H:%M:%S')
     data.update({'mfa': int(user.mfa_enabled), 'status': True})
     instance = write_login_log(**data)
+
     # TODO 目前只记录 web 登录的 session
     if instance.type != LoginTypeChoices.web:
         return
     create_user_session(request, user.id, instance)
+
+    auth_notice_required = request.session.get('auth_notice_required')
+    if not auth_notice_required:
+        return
+
+    auth_acl_id = request.session.get('auth_acl_id')
+    acl = LoginACL.objects.filter(id=auth_acl_id, action=ActionChoices.notice).first()
+    if not acl or not acl.reviewers.exists():
+        return
+
+    reviewers = acl.reviewers.all()
+    send_login_info_to_reviewers(instance, reviewers)
 
 
 @receiver(post_auth_failed)

@@ -98,7 +98,7 @@ class BaseHandler:
         context = self._diff_prev_approve_context(state)
         context.update({'approve_info': approve_info})
         body = self.safe_html_script(
-            render_to_string('tickets/ticket_approve_diff.html', context)
+            render_to_string('tickets/user_login_reminder.html', context)
         )
         data = {
             'body': body,

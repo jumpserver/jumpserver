@@ -355,6 +355,11 @@ class AuthACLMixin:
             self.request.session['auth_acl_id'] = str(acl.id)
             return
 
+        if acl.is_action(acl.ActionChoices.notice):
+            self.request.session['auth_notice_required'] = '1'
+            self.request.session['auth_acl_id'] = str(acl.id)
+            return
+
     def _check_third_party_login_acl(self):
         request = self.request
         error_message = getattr(request, 'error_message', None)
@@ -513,7 +518,7 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
     def clear_auth_mark(self):
         keys = [
             'auth_password', 'user_id', 'auth_confirm_required',
-            'auth_ticket_id', 'auth_acl_id'
+            'auth_notice_required', 'auth_ticket_id', 'auth_acl_id'
         ]
         for k in keys:
             self.request.session.pop(k, '')
