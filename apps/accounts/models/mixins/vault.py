@@ -37,8 +37,8 @@ class VaultManagerMixin(models.Manager):
             post_save.send(obj.__class__, instance=obj, created=True)
         return objs
 
-    def bulk_update(self, objs, batch_size=None, ignore_conflicts=False):
-        objs = super().bulk_update(objs, batch_size=batch_size, ignore_conflicts=ignore_conflicts)
+    def bulk_update(self, objs, fields, batch_size=None):
+        objs = super().bulk_update(objs, fields, batch_size=batch_size)
         for obj in objs:
             post_save.send(obj.__class__, instance=obj, created=False)
         return objs
