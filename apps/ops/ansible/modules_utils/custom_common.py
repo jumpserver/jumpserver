@@ -63,13 +63,13 @@ class SSHClient:
     @staticmethod
     def _is_match_user(user, content):
         # 正常命令切割后是[命令，用户名，交互前缀]
-        remote_user = content.split()[1] if len(content.split()) >= 3 else None
-        return remote_user and remote_user == user
+        content_list = content.split() if len(content.split()) >= 3 else None
+        return content_list and user in content_list
 
     def switch_user(self):
         self._get_channel()
         if not self.module.params['become']:
-            return None
+            return
         method = self.module.params['become_method']
         username = self.module.params['login_user']
         if method == 'sudo':
@@ -85,7 +85,7 @@ class SSHClient:
         su_output, err_msg = self.execute(commands)
         if err_msg:
             return err_msg
-        i_output, err_msg = self.execute(['whoami'])
+        i_output, err_msg = self.execute(['whoami'], delay_time=1)
         if err_msg:
             return err_msg
 
@@ -153,14 +153,14 @@ class SSHClient:
         output = self.channel.recv(size).decode(encoding)
         return output
 
-    def execute(self, commands):
+    def execute(self, commands, delay_time=0.3):
         if not self.is_connect:
             self.connect()
         output, error_msg = '', ''
         try:
             for command in commands:
                 self.channel.send(command + '\n')
-                time.sleep(0.3)
+                time.sleep(delay_time)
                 output = self._get_recv()
         except Exception as e:
             error_msg = str(e)
@@ -170,5 +170,5 @@ class SSHClient:
         try:
             self.channel.close()
             self.client.close()
-        except:
+        except Exception:
             pass
