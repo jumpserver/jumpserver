@@ -6,8 +6,8 @@ from rest_framework.status import HTTP_200_OK
 
 from accounts import serializers
 from accounts.filters import AccountFilterSet
-from accounts.models import Account
 from accounts.mixins import AccountRecordViewLogMixin
+from accounts.models import Account
 from assets.models import Asset, Node
 from common.api.mixin import ExtraFilterFieldsMixin
 from common.permissions import UserConfirmation, ConfirmType, IsValidUser
@@ -57,19 +57,27 @@ class AccountViewSet(OrgBulkModelViewSet):
         permission_classes=[IsValidUser]
     )
     def username_suggestions(self, request, *args, **kwargs):
-        asset_ids = request.data.get('assets')
-        node_ids = request.data.get('nodes')
-        username = request.data.get('username')
+        asset_ids = request.data.get('assets', [])
+        node_ids = request.data.get('nodes', [])
+        username = request.data.get('username', '')
 
-        assets = Asset.objects.all()
-        if asset_ids:
-            assets = assets.filter(id__in=asset_ids)
-        if node_ids:
-            nodes = Node.objects.filter(id__in=node_ids)
-            node_asset_ids = Node.get_nodes_all_assets(*nodes).values_list('id', flat=True)
-            assets = assets.filter(id__in=set(list(asset_ids) + list(node_asset_ids)))
+        if not asset_ids and not node_ids:
+            accounts = Account.objects.all()
+        else:
+            node_asset_ids = []
 
-        accounts = Account.objects.filter(asset__in=assets)
+            if node_ids:
+                nodes = Node.objects.filter(id__in=node_ids)
+                node_asset_ids = Node.get_nodes_all_assets(*nodes).values_list('id', flat=True)
+
+            asset_ids.extend(node_asset_ids)
+            asset_ids = list(set(asset_ids))
+
+            if not asset_ids:
+                accounts = Account.objects.all()
+            else:
+                accounts = Account.objects.filter(asset_id__in=asset_ids)
+
         if username:
             accounts = accounts.filter(username__icontains=username)
         usernames = list(accounts.values_list('username', flat=True).distinct()[:10])
