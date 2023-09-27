@@ -61,22 +61,14 @@ class AccountViewSet(OrgBulkModelViewSet):
         node_ids = request.data.get('nodes', [])
         username = request.data.get('username', '')
 
-        if not asset_ids and not node_ids:
-            accounts = Account.objects.all()
-        else:
-            node_asset_ids = []
-
-            if node_ids:
-                nodes = Node.objects.filter(id__in=node_ids)
-                node_asset_ids = Node.get_nodes_all_assets(*nodes).values_list('id', flat=True)
-
+        accounts = Account.objects.all()
+        if node_ids:
+            nodes = Node.objects.filter(id__in=node_ids)
+            node_asset_ids = Node.get_nodes_all_assets(*nodes).values_list('id', flat=True)
             asset_ids.extend(node_asset_ids)
-            asset_ids = list(set(asset_ids))
 
-            if not asset_ids:
-                accounts = Account.objects.all()
-            else:
-                accounts = Account.objects.filter(asset_id__in=asset_ids)
+        if asset_ids:
+            accounts = accounts.filter(asset_id__in=list(set(asset_ids)))
 
         if username:
             accounts = accounts.filter(username__icontains=username)
