@@ -37,9 +37,7 @@ def send_mail_async(*args, **kwargs):
         from_email = settings.EMAIL_FROM or settings.EMAIL_HOST_USER
         args.insert(2, from_email)
 
-    args[3] = [mail for mail in args[3] if mail != 'admin@mycomany.com']
     args = tuple(args)
-
     try:
         return send_mail(*args, **kwargs)
     except Exception as e:
@@ -52,7 +50,6 @@ def send_mail_attachment_async(subject, message, recipient_list, attachment_list
         attachment_list = []
     from_email = settings.EMAIL_FROM or settings.EMAIL_HOST_USER
     subject = (settings.EMAIL_SUBJECT_PREFIX or '') + subject
-    recipient_list = [mail for mail in recipient_list if mail != 'admin@mycomany.com']
     email = EmailMultiAlternatives(
         subject=subject,
         body=message,
