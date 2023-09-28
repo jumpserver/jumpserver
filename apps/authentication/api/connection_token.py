@@ -374,6 +374,17 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
             raise JMSException(code='perm_expired', detail=msg)
         return account
 
+    @staticmethod
+    def _record_operate_log(acl, asset):
+        from audits.handler import create_or_update_operate_log
+        after = {str(_('Assets')): str(asset)}
+        object_name = acl._meta.object_name
+        resource_type = acl._meta.verbose_name
+        create_or_update_operate_log(
+            acl.action, resource_type, resource=acl,
+            after=after, object_name=object_name
+        )
+
     def _validate_acl(self, user, asset, account):
         from acls.models import LoginAssetACL
         acls = LoginAssetACL.filter_queryset(user=user, asset=asset, account=account)
@@ -382,15 +393,17 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         if not acl:
             return
         if acl.is_action(acl.ActionChoices.accept):
+            self._record_operate_log(acl, asset)
             return
         if acl.is_action(acl.ActionChoices.reject):
+            self._record_operate_log(acl, asset)
             msg = _('ACL action is reject: {}({})'.format(acl.name, acl.id))
             raise JMSException(code='acl_reject', detail=msg)
         if acl.is_action(acl.ActionChoices.review):
             if not self.request.query_params.get('create_ticket'):
                 msg = _('ACL action is review')
                 raise JMSException(code='acl_review', detail=msg)
-
+            self._record_operate_log(acl, asset)
             ticket = LoginAssetACL.create_login_asset_review_ticket(
                 user=user, asset=asset, account_username=account.username,
                 assignees=acl.reviewers.all(), org_id=asset.org_id
