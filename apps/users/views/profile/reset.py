@@ -2,6 +2,8 @@
 
 from __future__ import unicode_literals
 
+import time
+
 from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import redirect, reverse
@@ -9,6 +11,7 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic import FormView, RedirectView
 
+from authentication.errors import IntervalTooShort
 from common.utils import FlashMessageUtil, get_object_or_none, random_string
 from common.utils.verify_code import SendAndVerifyCodeUtil
 from users.notifications import ResetPasswordSuccessMsg
@@ -37,6 +40,20 @@ class UserForgotPasswordPreviewingView(FormView):
     def get_redirect_url(token):
         return reverse('authentication:forgot-password') + '?token=%s' % token
 
+    @staticmethod
+    def generate_previewing_token(user):
+        sent_ttl = 60
+        token_sent_at_key = '{}_send_at'.format(user.username)
+        token_sent_at = cache.get(token_sent_at_key, 0)
+
+        if token_sent_at:
+            raise IntervalTooShort(sent_ttl)
+        token = random_string(36)
+        user_info = {'username': user.username, 'phone': user.phone, 'email': user.email}
+        cache.set(token, user_info, 5 * 60)
+        cache.set(token_sent_at_key, time.time(), sent_ttl)
+        return token
+
     def form_valid(self, form):
         username = form.cleaned_data['username']
         user = get_object_or_none(User, username=username)
@@ -49,9 +66,11 @@ class UserForgotPasswordPreviewingView(FormView):
             form.add_error('username', error)
             return super().form_invalid(form)
 
-        token = random_string(36)
-        user_map = {'username': user.username, 'phone': user.phone, 'email': user.email}
-        cache.set(token, user_map, 5 * 60)
+        try:
+            token = self.generate_previewing_token(user)
+        except IntervalTooShort as e:
+            form.add_error('username', e)
+            return super().form_invalid(form)
         return redirect(self.get_redirect_url(token))
 
 
@@ -103,13 +122,25 @@ class UserForgotPasswordView(FormView):
         reset_password_url = reverse('authentication:reset-password')
         return reset_password_url + query_params
 
+    @staticmethod
+    def safe_verify_code(token, target, form_type, code):
+        token_verified_key = '{}_verified'.format(token)
+        token_verified_times = cache.get(token_verified_key, 0)
+
+        if token_verified_times >= 3:
+            cache.delete(token)
+            raise ValueError('Verification code has been used more than 3 times, please re-verify')
+        cache.set(token_verified_key, token_verified_times + 1, 5 * 60)
+        sender_util = SendAndVerifyCodeUtil(target, backend=form_type)
+        return sender_util.verify(code)
+
     def form_valid(self, form):
         token = self.request.GET.get('token')
-        userinfo = cache.get(token)
-        if not userinfo:
+        user_info = cache.get(token)
+        if not user_info:
             return redirect(self.get_redirect_url(return_previewing=True))
 
-        username = userinfo.get('username')
+        username = user_info.get('username')
         form_type = form.cleaned_data['form_type']
         target = form.cleaned_data[form_type]
         code = form.cleaned_data['code']
@@ -120,8 +151,9 @@ class UserForgotPasswordView(FormView):
             target = target.lstrip('+')
 
         try:
-            sender_util = SendAndVerifyCodeUtil(target, backend=form_type)
-            sender_util.verify(code)
+            self.safe_verify_code(token, target, form_type, code)
+        except ValueError as e:
+            return redirect(self.get_redirect_url(return_previewing=True))
         except Exception as e:
             form.add_error('code', str(e))
             return super().form_invalid(form)
