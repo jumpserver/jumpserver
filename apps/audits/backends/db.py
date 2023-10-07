@@ -58,7 +58,7 @@ class OperateLogStore(object):
         return diff_list
 
     def save(self, **kwargs):
-        log_id = kwargs.get('id', '')
+        log_id = kwargs.get('id')
         before = kwargs.pop('before') or {}
         after = kwargs.pop('after') or {}
 
