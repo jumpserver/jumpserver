@@ -18,6 +18,20 @@ def random_ip():
     return socket.inet_ntoa(struct.pack('>I', random.randint(1, 0xffffffff)))
 
 
+def random_replace_char(s, chars, length):
+    using_index = set()
+    seq = list(s)
+
+    while length > 0:
+        index = secrets.randbelow(len(seq) - 1)
+        if index in using_index or index == 0:
+            continue
+        seq[index] = secrets.choice(chars)
+        using_index.add(index)
+        length -= 1
+    return ''.join(seq)
+
+
 def random_string(length: int, lower=True, upper=True, digit=True, special_char=False, symbols=string_punctuation):
     if not any([lower, upper, digit]):
         raise ValueError('At least one of `lower`, `upper`, `digit` must be `True`')
@@ -31,12 +45,10 @@ def random_string(length: int, lower=True, upper=True, digit=True, special_char=
     )
     chars = ''.join([i[1] for i in chars_map if i[0]])
     texts = list(secrets.choice(chars) for __ in range(length))
+    texts = ''.join(texts)
 
+    # 控制一下特殊字符的数量, 别随机出来太多
     if special_char:
         symbol_num = length // 16 + 1
-        symbol_index = random.choices(list(range(1, length - 1)), k=symbol_num)
-        for i in symbol_index:
-            texts[i] = secrets.choice(symbols)
-
-    text = ''.join(texts)
-    return text
+        texts = random_replace_char(texts, symbols, symbol_num)
+    return texts
