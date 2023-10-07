@@ -50,14 +50,13 @@ class TaskViewSet(JMSBulkModelViewSet):
         serializer.is_valid(raise_exception=True)
         session_id = serializer.validated_data['session_id']
         task_name = serializer.validated_data['task_name']
-        session_ids = [session_id, ]
         user_id = request.user.id
-        for session_id in session_ids:
-            if not is_session_approver(session_id, user_id):
-                return Response({}, status=status.HTTP_403_FORBIDDEN)
-        with tmp_to_root_org():
-            validated_session = create_sessions_tasks(session_ids, request.user, task_name=task_name)
 
+        if not is_session_approver(session_id, user_id):
+            return Response({}, status=status.HTTP_403_FORBIDDEN)
+
+        with tmp_to_root_org():
+            validated_session = create_sessions_tasks([session_id], request.user, task_name=task_name)
         return Response({"ok": validated_session})
 
 

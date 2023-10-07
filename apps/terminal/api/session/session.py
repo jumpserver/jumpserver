@@ -92,7 +92,12 @@ class SessionViewSet(RecordViewLogMixin, OrgBulkModelViewSet):
     rbac_perms = {
         'download': ['terminal.download_sessionreplay'],
     }
-    permission_classes = [RBACPermission | IsSessionAssignee]
+    permission_classes = [RBACPermission]
+
+    def get_permissions(self):
+        if self.action == 'retrieve':
+            self.permission_classes = [RBACPermission | IsSessionAssignee]
+        return super().get_permissions()
 
     @staticmethod
     def prepare_offline_file(session, local_path):
