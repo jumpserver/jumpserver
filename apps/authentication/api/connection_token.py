@@ -15,6 +15,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from accounts.const import AliasAccount
+from acls.notifications import AssetLoginReminderMsg
 from common.api import JMSModelViewSet
 from common.exceptions import JMSException
 from common.utils import random_string, get_logger, get_request_ip
@@ -409,6 +410,10 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
                 assignees=acl.reviewers.all(), org_id=asset.org_id
             )
             return ticket
+        if acl.is_action(acl.ActionChoices.notice):
+            reviewers = acl.reviewers.all()
+            for reviewer in reviewers:
+                AssetLoginReminderMsg(reviewer, asset, user).publish_async()
 
 
 class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
