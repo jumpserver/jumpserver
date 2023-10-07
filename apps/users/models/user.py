@@ -606,7 +606,8 @@ class TokenMixin:
 
     def generate_reset_token(self):
         token = random_string(50)
-        self.set_cache(token)
+        key = self.CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
+        cache.set(key, {'id': self.id, 'email': self.email}, 3600)
         return token
 
     @classmethod
@@ -625,10 +626,6 @@ class TokenMixin:
         except (AttributeError, cls.DoesNotExist) as e:
             logger.error(e, exc_info=True)
             return None
-
-    def set_cache(self, token):
-        key = self.CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
-        cache.set(key, {'id': self.id, 'email': self.email}, 3600)
 
     @classmethod
     def expired_reset_password_token(cls, token):
