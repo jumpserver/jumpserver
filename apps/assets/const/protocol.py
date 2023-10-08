@@ -22,6 +22,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
     oracle = 'oracle', 'Oracle'
     postgresql = 'postgresql', 'PostgreSQL'
     sqlserver = 'sqlserver', 'SQLServer'
+    db2 = 'db2', 'DB2'
     clickhouse = 'clickhouse', 'ClickHouse'
     redis = 'redis', 'Redis'
     mongodb = 'mongodb', 'MongoDB'
@@ -169,6 +170,12 @@ class Protocol(ChoicesMixin, models.TextChoices):
                         'help_text': _('SQL Server version, Different versions have different connection drivers')
                     }
                 }
+            },
+            cls.db2: {
+                'port': 5000,
+                'required': True,
+                'secret_types': ['password'],
+                'xpack': True,
             },
             cls.clickhouse: {
                 'port': 9000,
