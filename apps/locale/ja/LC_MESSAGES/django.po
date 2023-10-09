@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-09 17:52+0800\n"
+"POT-Creation-Date: 2023-10-09 18:32+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -94,7 +94,7 @@ msgid "Update"
 msgstr "更新"
 
 #: accounts/const/account.py:33
-#: accounts/serializers/automations/change_secret.py:155 audits/const.py:59
+#: accounts/serializers/automations/change_secret.py:155 audits/const.py:60
 #: audits/signal_handlers/activity_log.py:33 common/const/choices.py:19
 #: ops/const.py:74 terminal/const.py:77 xpack/plugins/cloud/const.py:43
 msgid "Failed"
@@ -893,7 +893,7 @@ msgstr "* パスワードの長さの範囲6-30ビット"
 msgid "Automation task execution"
 msgstr "自動タスク実行履歴"
 
-#: accounts/serializers/automations/change_secret.py:154 audits/const.py:58
+#: accounts/serializers/automations/change_secret.py:154 audits/const.py:59
 #: audits/models.py:62 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:18 ops/const.py:72 ops/serializers/celery.py:40
 #: terminal/const.py:76 terminal/models/session/sharing.py:121
@@ -985,7 +985,7 @@ msgstr "レビュー担当者"
 msgid "Warning"
 msgstr "警告"
 
-#: acls/const.py:10 notifications/apps.py:7
+#: acls/const.py:10 audits/const.py:36 notifications/apps.py:7
 msgid "Notifications"
 msgstr "通知"
 
@@ -1284,7 +1284,7 @@ msgstr "認証に失敗しました"
 msgid "Connect failed"
 msgstr "接続に失敗しました"
 
-#: assets/const/automation.py:6 audits/const.py:6 audits/const.py:41
+#: assets/const/automation.py:6 audits/const.py:6 audits/const.py:42
 #: audits/signal_handlers/activity_log.py:62 common/utils/ip/geoip/utils.py:31
 #: common/utils/ip/geoip/utils.py:37 common/utils/ip/utils.py:104
 msgid "Unknown"
@@ -1306,7 +1306,7 @@ msgstr "テストゲートウェイ"
 msgid "Gather facts"
 msgstr "資産情報の収集"
 
-#: assets/const/base.py:33 audits/const.py:52
+#: assets/const/base.py:33 audits/const.py:53
 #: terminal/serializers/applet_host.py:32
 msgid "Disabled"
 msgstr "無効"
@@ -1340,7 +1340,7 @@ msgid "Cloud service"
 msgstr "クラウド サービス"
 
 #: assets/const/category.py:14 assets/models/asset/gpt.py:11
-#: assets/models/asset/web.py:16 audits/const.py:39
+#: assets/models/asset/web.py:16 audits/const.py:40
 #: terminal/models/applet/applet.py:27 users/const.py:47
 msgid "Web"
 msgstr "Web"
@@ -1851,7 +1851,7 @@ msgstr "開ける"
 msgid "Setting"
 msgstr "設定"
 
-#: assets/models/platform.py:38 audits/const.py:53
+#: assets/models/platform.py:38 audits/const.py:54
 #: authentication/backends/passkey/models.py:11 settings/models.py:36
 #: terminal/serializers/applet_host.py:33
 msgid "Enabled"
@@ -2299,30 +2299,30 @@ msgstr "ログイン"
 msgid "Change password"
 msgstr "パスワードを変更する"
 
-#: audits/const.py:40 settings/serializers/terminal.py:6
+#: audits/const.py:41 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:164
 #: terminal/serializers/session.py:49 terminal/serializers/session.py:63
 msgid "Terminal"
 msgstr "ターミナル"
 
-#: audits/const.py:45 audits/models.py:130
+#: audits/const.py:46 audits/models.py:130
 msgid "Operate log"
 msgstr "ログの操作"
 
-#: audits/const.py:46
+#: audits/const.py:47
 msgid "Session log"
 msgstr "セッションログ"
 
-#: audits/const.py:47
+#: audits/const.py:48
 msgid "Login log"
 msgstr "ログインログ"
 
-#: audits/const.py:48 terminal/models/applet/host.py:143
+#: audits/const.py:49 terminal/models/applet/host.py:143
 #: terminal/models/component/task.py:22
 msgid "Task"
 msgstr "タスク"
 
-#: audits/const.py:54
+#: audits/const.py:55
 msgid "-"
 msgstr "-"
 
@@ -2947,7 +2947,7 @@ msgid "Authentication failed (before login check failed): {}"
 msgstr "認証に失敗しました (ログインチェックが失敗する前): {}"
 
 #: authentication/mixins.py:82
-msgid "User is not valid"
+msgid "User is invalid"
 msgstr "無効なユーザーです"
 
 #: authentication/mixins.py:97
