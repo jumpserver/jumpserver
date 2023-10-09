@@ -1,7 +1,7 @@
 import ipaddress
 import socket
 from ipaddress import ip_network, ip_address
-from fuzzywuzzy import fuzz
+from thefuzz import fuzz
 
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -120,7 +120,7 @@ def lookup_domain(domain):
 
 def is_same_city(city, city_names):
     for _city in city_names:
-        similarity = fuzz.token_set_ratio(_city, city)
+        similarity = fuzz.ratio(_city, city)
         if similarity >= 50:
             return True
     return False

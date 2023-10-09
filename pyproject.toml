@@ -142,7 +142,7 @@ channels-redis = "4.1.0"
 fido2 = "^1.1.2"
 ua-parser = "^0.18.0"
 user-agents = "^2.2.0"
-fuzzywuzzy = "^0.18.0"
+thefuzz = "^0.20.0"
 
 
 [tool.poetry.group.xpack.dependencies]
