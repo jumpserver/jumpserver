@@ -10,7 +10,9 @@ class BasicSerializer(serializers.Serializer):
         required=False, label=_('File name conflict resolution')
     )
     terminal_theme_name = serializers.CharField(
-        max_length=128, required=False, default='Default', label=_('Terminal theme name'))
+        max_length=128, required=False, default='Default',
+        label=_('Terminal theme name')
+    )
 
 
 class KokoSerializer(serializers.Serializer):
