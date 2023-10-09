@@ -412,6 +412,9 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
             return ticket
         if acl.is_action(acl.ActionChoices.notice):
             reviewers = acl.reviewers.all()
+            if not reviewers:
+                return
+            self._record_operate_log(acl, asset)
             for reviewer in reviewers:
                 AssetLoginReminderMsg(reviewer, asset, user).publish_async()
 

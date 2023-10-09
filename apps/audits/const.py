@@ -33,6 +33,7 @@ class ActionChoices(TextChoices):
     reject = 'reject', _('Reject')
     accept = 'accept', _('Accept')
     review = 'review', _('Review')
+    notice = 'notice', _('Notifications')
 
 
 class LoginTypeChoices(TextChoices):
