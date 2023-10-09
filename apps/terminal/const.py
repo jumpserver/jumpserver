@@ -94,3 +94,9 @@ class TaskNameType(TextChoices):
     kill_session = "kill_session", _('Kill Session')
     lock_session = "lock_session", _('Lock Session')
     unlock_session = "unlock_session", _('Unlock Session')
+
+
+class SessionErrorReason(TextChoices):
+    connect_failed = 'connect_failed', _('Connect Failed')
+    replay_create_failed = 'replay_create_failed', _('Replay Create Failed')
+    replay_upload_failed = 'replay_upload_failed', _('Replay Upload Failed')

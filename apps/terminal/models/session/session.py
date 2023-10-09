@@ -45,6 +45,7 @@ class Session(OrgModelMixin):
     date_end = models.DateTimeField(verbose_name=_("Date end"), null=True)
     comment = models.TextField(blank=True, null=True, verbose_name=_("Comment"))
     cmd_amount = models.IntegerField(default=-1, verbose_name=_("Command amount"))
+    error_reason = models.CharField(max_length=128, blank=True, verbose_name=_("Error reason"))
 
     upload_to = 'replay'
     ACTIVE_CACHE_KEY_PREFIX = 'SESSION_ACTIVE_{}'
