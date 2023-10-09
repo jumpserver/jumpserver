@@ -27,7 +27,7 @@ class DingTalkQRUnBindBase(APIView):
 
 
 class DingTalkQRUnBindForUserApi(RoleUserMixin, DingTalkQRUnBindBase):
-    permission_classes = (IsValidUser, UserConfirmation.require(ConfirmType.ReLogin),)
+    permission_classes = (IsValidUser, UserConfirmation.require(ConfirmType.RELOGIN),)
 
 
 class DingTalkQRUnBindForAdminApi(RoleAdminMixin, DingTalkQRUnBindBase):

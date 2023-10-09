@@ -59,7 +59,7 @@ class WithBootstrapToken(permissions.BasePermission):
 class UserConfirmation(permissions.BasePermission):
     ttl = 60 * 5
     min_level = 1
-    confirm_type = ConfirmType.ReLogin
+    confirm_type = ConfirmType.RELOGIN
 
     def has_permission(self, request, view):
         if not settings.SECURITY_VIEW_AUTH_NEED_MFA:
@@ -82,7 +82,7 @@ class UserConfirmation(permissions.BasePermission):
         return ttl
 
     @classmethod
-    def require(cls, confirm_type=ConfirmType.ReLogin, ttl=60 * 5):
+    def require(cls, confirm_type=ConfirmType.RELOGIN, ttl=60 * 5):
         min_level = ConfirmType.values.index(confirm_type) + 1
         name = 'UserConfirmationLevel{}TTL{}'.format(min_level, ttl)
         return type(name, (cls,), {'min_level': min_level, 'ttl': ttl, 'confirm_type': confirm_type})

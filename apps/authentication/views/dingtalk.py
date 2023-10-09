@@ -99,7 +99,7 @@ class DingTalkOAuthMixin(DingTalkBaseMixin, View):
 
 
 class DingTalkQRBindView(DingTalkQRMixin, View):
-    permission_classes = (IsAuthenticated, UserConfirmation.require(ConfirmType.ReLogin))
+    permission_classes = (IsAuthenticated, UserConfirmation.require(ConfirmType.RELOGIN))
 
     def get(self, request: HttpRequest):
         user = request.user

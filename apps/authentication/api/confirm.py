@@ -13,7 +13,7 @@ from ..serializers import ConfirmSerializer
 
 
 class ConfirmBindORUNBindOAuth(RetrieveAPIView):
-    permission_classes = (IsValidUser, UserConfirmation.require(ConfirmType.ReLogin),)
+    permission_classes = (IsValidUser, UserConfirmation.require(ConfirmType.RELOGIN),)
 
     def retrieve(self, request, *args, **kwargs):
         return Response('ok')
@@ -24,7 +24,7 @@ class ConfirmApi(RetrieveAPIView, CreateAPIView):
     serializer_class = ConfirmSerializer
 
     def get_confirm_backend(self, confirm_type):
-        backend_classes = ConfirmType.get_can_confirm_backend_classes(confirm_type)
+        backend_classes = ConfirmType.get_prop_backends(confirm_type)
         if not backend_classes:
             return
         for backend_cls in backend_classes:
