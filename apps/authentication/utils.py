@@ -9,7 +9,8 @@ from django.utils.translation import gettext_lazy as _
 from audits.const import DEFAULT_CITY
 from audits.models import UserLoginLog
 from common.utils import get_logger
-from common.utils import validate_ip, get_ip_city, get_request_ip
+from common.utils import validate_ip, get_ip_city, get_request_ip, is_same_city
+from common.utils.ip.geoip import get_ip_city_names_by_geoip
 from .notifications import DifferentCityLoginMessage
 
 logger = get_logger(__file__)
@@ -20,19 +21,32 @@ def check_different_city_login_if_need(user, request):
         return
 
     ip = get_request_ip(request) or '0.0.0.0'
-    if not (ip and validate_ip(ip)):
-        city = DEFAULT_CITY
-    else:
-        city = get_ip_city(ip) or DEFAULT_CITY
 
     city_white = [_('LAN'), 'LAN']
     is_private = ipaddress.ip_address(ip).is_private
-    if not is_private:
-        last_user_login = UserLoginLog.objects.exclude(city__in=city_white) \
-            .filter(username=user.username, status=True).first()
+    if is_private:
+        return
 
-        if last_user_login and last_user_login.city != city:
-            DifferentCityLoginMessage(user, ip, city).publish_async()
+    last_user_login = UserLoginLog.objects.exclude(
+        city__in=city_white
+    ).filter(username=user.username, status=True).first()
+    if not last_user_login:
+        return
+
+    last_city = last_user_login.city
+
+    # 获取所有语言的 ip 城市名
+    city_names = None
+    if ip and validate_ip(ip):
+        city_names = get_ip_city_names_by_geoip(ip)
+        city_names = list(city_names.values())
+    city_names = city_names or [DEFAULT_CITY]
+
+    if not is_same_city(city=last_city, city_names=city_names):
+        return
+
+    city = get_ip_city(ip)
+    DifferentCityLoginMessage(user, ip, city).publish_async()
 
 
 def build_absolute_uri(request, path=None):

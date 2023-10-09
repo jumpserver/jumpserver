@@ -1,6 +1,7 @@
 import ipaddress
 import socket
 from ipaddress import ip_network, ip_address
+from fuzzywuzzy import fuzz
 
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -72,7 +73,6 @@ def contains_ip(ip, ip_group):
             # address / host
             if ip == _ip:
                 return True
-
     return False
 
 
@@ -116,3 +116,11 @@ def lookup_domain(domain):
         return socket.gethostbyname(domain), ''
     except Exception as e:
         return None, f'Cannot resolve {domain}: Unknown host, {e}'
+
+
+def is_same_city(city, city_names):
+    for _city in city_names:
+        similarity = fuzz.token_set_ratio(_city, city)
+        if similarity >= 50:
+            return True
+    return False
