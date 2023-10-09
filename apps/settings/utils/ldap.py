@@ -426,7 +426,21 @@ class LDAPImportUtil(object):
         return errors
 
     @staticmethod
-    def bind_org(org, users, group_users_mapper):
+    def exit_user_group(user_groups_mapper):
+        # 通过对比查询本次导入用户需要移除的用户组
+        group_remove_users_mapper = defaultdict(set)
+        for user, current_groups in user_groups_mapper.items():
+            old_groups = set(user.groups.all())
+            exit_groups = old_groups - current_groups
+            logger.debug(f'Ldap user {user} exits user groups {exit_groups}')
+            for g in exit_groups:
+                group_remove_users_mapper[g].add(user)
+
+        # 根据用户组统一移除用户
+        for g, rm_users in group_remove_users_mapper.items():
+            g.users.remove(*rm_users)
+
+    def bind_org(self, org, users, group_users_mapper):
         if not org:
             return
         if org.is_root():
@@ -436,11 +450,15 @@ class LDAPImportUtil(object):
             org.add_member(user)
         # add user to group
         with tmp_to_org(org):
+            user_groups_mapper = defaultdict(set)
             for group_name, users in group_users_mapper.items():
                 group, created = UserGroup.objects.get_or_create(
                     name=group_name, defaults={'name': group_name}
                 )
+                for user in users:
+                    user_groups_mapper[user].add(group)
                 group.users.add(*users)
+            self.exit_user_group(user_groups_mapper)
 
 
 class LDAPTestUtil(object):
