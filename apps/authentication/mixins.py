@@ -76,6 +76,12 @@ def authenticate(request=None, **credentials):
         if user is None:
             continue
 
+        if not user.is_valid:
+            temp_user = user
+            temp_user.backend = backend_path
+            request.error_message = _('User is not valid')
+            return temp_user
+
         # 检查用户是否允许认证
         if not backend.user_allow_authenticate(user):
             temp_user = user
