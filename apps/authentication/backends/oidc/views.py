@@ -166,7 +166,7 @@ class OIDCAuthCallbackView(View):
             code_verifier = request.session.get('oidc_auth_code_verifier', None)
             logger.debug(log_prompt.format('Process authenticate'))
             user = auth.authenticate(nonce=nonce, request=request, code_verifier=code_verifier)
-            if user and user.is_valid:
+            if user:
                 logger.debug(log_prompt.format('Login: {}'.format(user)))
                 auth.login(self.request, user)
                 # Stores an expiration timestamp in the user's session. This value will be used if

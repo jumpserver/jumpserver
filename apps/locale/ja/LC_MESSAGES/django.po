@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-07 17:56+0800\n"
+"POT-Creation-Date: 2023-10-09 17:52+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -244,7 +244,7 @@ msgstr "資産"
 msgid "Su from"
 msgstr "から切り替え"
 
-#: accounts/models/account.py:54 assets/const/protocol.py:168
+#: accounts/models/account.py:54 assets/const/protocol.py:169
 #: settings/serializers/auth/cas.py:20 settings/serializers/auth/feishu.py:20
 #: terminal/models/applet/applet.py:35
 msgid "Version"
@@ -500,7 +500,7 @@ msgstr "アカウントの確認"
 msgid "Secret type"
 msgstr "鍵の種類"
 
-#: accounts/models/base.py:39 accounts/models/mixins/vault.py:48
+#: accounts/models/base.py:39 accounts/models/mixins/vault.py:49
 #: accounts/serializers/account/base.py:19
 #: authentication/models/temp_token.py:10
 #: authentication/templates/authentication/_access_key_modal.html:31
@@ -1318,7 +1318,7 @@ msgstr "無効"
 msgid "Basic"
 msgstr "基本"
 
-#: assets/const/base.py:35 assets/const/protocol.py:245
+#: assets/const/base.py:35 assets/const/protocol.py:252
 #: assets/models/asset/web.py:13
 msgid "Script"
 msgstr "脚本"
@@ -1386,11 +1386,11 @@ msgstr "ChatGPT"
 msgid "Other"
 msgstr "その他"
 
-#: assets/const/protocol.py:48
+#: assets/const/protocol.py:49
 msgid "SFTP root"
 msgstr "SFTPルート"
 
-#: assets/const/protocol.py:50
+#: assets/const/protocol.py:51
 #, python-brace-format
 msgid ""
 "SFTP root directory, Support variable: <br>- ${ACCOUNT} The connected "
@@ -1401,81 +1401,81 @@ msgstr ""
 "ユーザー名<br>-${HOME}接続されたアカウントのホームディレクトリ<br>-${USER}"
 "ユーザーのユーザー名"
 
-#: assets/const/protocol.py:65
+#: assets/const/protocol.py:66
 msgid "Console"
 msgstr "Console"
 
-#: assets/const/protocol.py:66
+#: assets/const/protocol.py:67
 msgid "Connect to console session"
 msgstr "コンソールセッションに接続"
 
-#: assets/const/protocol.py:70
+#: assets/const/protocol.py:71
 msgid "Any"
 msgstr "任意"
 
-#: assets/const/protocol.py:72 settings/serializers/security.py:228
+#: assets/const/protocol.py:73 settings/serializers/security.py:228
 msgid "Security"
 msgstr "セキュリティ"
 
-#: assets/const/protocol.py:73
+#: assets/const/protocol.py:74
 msgid "Security layer to use for the connection"
 msgstr "接続に使用するセキュリティ レイヤー"
 
-#: assets/const/protocol.py:79
+#: assets/const/protocol.py:80
 msgid "AD domain"
 msgstr "AD ドメイン"
 
-#: assets/const/protocol.py:94
+#: assets/const/protocol.py:95
 msgid "Username prompt"
 msgstr "ユーザー名プロンプト"
 
-#: assets/const/protocol.py:95
+#: assets/const/protocol.py:96
 msgid "We will send username when we see this prompt"
 msgstr "このプロンプトが表示されたらユーザー名を送信します"
 
-#: assets/const/protocol.py:100
+#: assets/const/protocol.py:101
 msgid "Password prompt"
 msgstr "パスワードプロンプト"
 
-#: assets/const/protocol.py:101
+#: assets/const/protocol.py:102
 msgid "We will send password when we see this prompt"
 msgstr "このプロンプトが表示されたらパスワードを送信します"
 
-#: assets/const/protocol.py:106
+#: assets/const/protocol.py:107
 msgid "Success prompt"
 msgstr "成功プロンプト"
 
-#: assets/const/protocol.py:107
+#: assets/const/protocol.py:108
 msgid "We will consider login success when we see this prompt"
 msgstr "このプロンプトが表示されたらログイン成功とみなします"
 
-#: assets/const/protocol.py:118 assets/models/asset/database.py:10
+#: assets/const/protocol.py:119 assets/models/asset/database.py:10
 #: settings/serializers/msg.py:40
 msgid "Use SSL"
 msgstr "SSLの使用"
 
-#: assets/const/protocol.py:153
+#: assets/const/protocol.py:154
 msgid "SYSDBA"
 msgstr "SYSDBA"
 
-#: assets/const/protocol.py:154
+#: assets/const/protocol.py:155
 msgid "Connect as SYSDBA"
 msgstr "SYSDBA として接続"
 
-#: assets/const/protocol.py:169
+#: assets/const/protocol.py:170
 msgid ""
 "SQL Server version, Different versions have different connection drivers"
 msgstr "SQL Server のバージョン。バージョンによって接続ドライバが異なります"
 
-#: assets/const/protocol.py:192
+#: assets/const/protocol.py:199
 msgid "Auth username"
 msgstr "ユーザー名で認証する"
 
-#: assets/const/protocol.py:215
+#: assets/const/protocol.py:222
 msgid "Safe mode"
 msgstr "安全モード"
 
-#: assets/const/protocol.py:217
+#: assets/const/protocol.py:224
 msgid ""
 "When safe mode is enabled, some operations will be disabled, such as: New "
 "tab, right click, visit other website, etc."
@@ -1483,24 +1483,24 @@ msgstr ""
 "安全モードが有効になっている場合、新しいタブ、右クリック、他のウェブサイトへ"
 "のアクセスなど、一部の操作が無効になります"
 
-#: assets/const/protocol.py:222 assets/models/asset/web.py:9
+#: assets/const/protocol.py:229 assets/models/asset/web.py:9
 #: assets/serializers/asset/info/spec.py:16
 msgid "Autofill"
 msgstr "自動充填"
 
-#: assets/const/protocol.py:230 assets/models/asset/web.py:10
+#: assets/const/protocol.py:237 assets/models/asset/web.py:10
 msgid "Username selector"
 msgstr "ユーザー名ピッカー"
 
-#: assets/const/protocol.py:235 assets/models/asset/web.py:11
+#: assets/const/protocol.py:242 assets/models/asset/web.py:11
 msgid "Password selector"
 msgstr "パスワードセレクター"
 
-#: assets/const/protocol.py:240 assets/models/asset/web.py:12
+#: assets/const/protocol.py:247 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr "ボタンセレクターを確認する"
 
-#: assets/const/protocol.py:263
+#: assets/const/protocol.py:270
 msgid "API mode"
 msgstr "APIモード"
 
@@ -2835,15 +2835,15 @@ msgstr "パスワードが無効です"
 msgid "Please wait for %s seconds before retry"
 msgstr "%s 秒後に再試行してください"
 
-#: authentication/errors/redirect.py:85 authentication/mixins.py:318
+#: authentication/errors/redirect.py:85 authentication/mixins.py:324
 msgid "Your password is too simple, please change it for security"
 msgstr "パスワードがシンプルすぎるので、セキュリティのために変更してください"
 
-#: authentication/errors/redirect.py:93 authentication/mixins.py:325
+#: authentication/errors/redirect.py:93 authentication/mixins.py:331
 msgid "You should to change your password before login"
 msgstr "ログインする前にパスワードを変更する必要があります"
 
-#: authentication/errors/redirect.py:101 authentication/mixins.py:332
+#: authentication/errors/redirect.py:101 authentication/mixins.py:338
 msgid "Your password has expired, please reset before logging in"
 msgstr ""
 "パスワードの有効期限が切れました。ログインする前にリセットしてください。"
@@ -2946,7 +2946,11 @@ msgstr "無効にする電話番号をクリアする"
 msgid "Authentication failed (before login check failed): {}"
 msgstr "認証に失敗しました (ログインチェックが失敗する前): {}"
 
-#: authentication/mixins.py:91
+#: authentication/mixins.py:82
+msgid "User is not valid"
+msgstr "無効なユーザーです"
+
+#: authentication/mixins.py:97
 msgid ""
 "The administrator has enabled 'Only allow login from user source'. \n"
 "            The current user source is {}. Please contact the administrator."
@@ -2954,11 +2958,11 @@ msgstr ""
 "管理者は「ユーザーソースからのみログインを許可」をオンにしており、現在のユー"
 "ザーソースは {} です。管理者に連絡してください。"
 
-#: authentication/mixins.py:268
+#: authentication/mixins.py:274
 msgid "The MFA type ({}) is not enabled"
 msgstr "MFAタイプ ({}) が有効になっていない"
 
-#: authentication/mixins.py:308
+#: authentication/mixins.py:314
 msgid "Please change your password"
 msgstr "パスワードを変更してください"
 
@@ -3364,7 +3368,7 @@ msgstr ""
 msgid "Do you want to retry ?"
 msgstr "再試行しますか？"
 
-#: authentication/utils.py:28 common/utils/ip/geoip/utils.py:24
+#: authentication/utils.py:23 common/utils/ip/geoip/utils.py:24
 #: xpack/plugins/cloud/const.py:29
 msgid "LAN"
 msgstr "ローカルエリアネットワーク"
@@ -3861,15 +3865,15 @@ msgstr "システムメッセージ"
 msgid "Publish the station message"
 msgstr "投稿サイトニュース"
 
-#: ops/ansible/inventory.py:92 ops/models/job.py:60
+#: ops/ansible/inventory.py:95 ops/models/job.py:60
 msgid "No account available"
 msgstr "利用可能なアカウントがありません"
 
-#: ops/ansible/inventory.py:263
+#: ops/ansible/inventory.py:259
 msgid "Ansible disabled"
 msgstr "Ansible 無効"
 
-#: ops/ansible/inventory.py:279
+#: ops/ansible/inventory.py:275
 msgid "Skip hosts below:"
 msgstr "次のホストをスキップします: "
 
@@ -5208,49 +5212,45 @@ msgstr "サポートリンク"
 msgid "default: http://www.jumpserver.org/support/"
 msgstr "デフォルト: http://www.jumpserver.org/support/"
 
-#: settings/serializers/cleaning.py:10
+#: settings/serializers/cleaning.py:11
 msgid "Period clean"
 msgstr "定時清掃"
 
-#: settings/serializers/cleaning.py:14
+#: settings/serializers/cleaning.py:15
 msgid "Login log keep days (day)"
 msgstr "ログインログは日数を保持します（天）"
 
-#: settings/serializers/cleaning.py:18
+#: settings/serializers/cleaning.py:19
 msgid "Task log keep days (day)"
 msgstr "タスクログは日数を保持します（天）"
 
-#: settings/serializers/cleaning.py:22
+#: settings/serializers/cleaning.py:23
 msgid "Operate log keep days (day)"
 msgstr "ログ管理日を操作する（天）"
 
-#: settings/serializers/cleaning.py:26
+#: settings/serializers/cleaning.py:27
 msgid "FTP log keep days (day)"
 msgstr "ダウンロードのアップロード（天）"
 
-#: settings/serializers/cleaning.py:30
+#: settings/serializers/cleaning.py:31
 msgid "Cloud sync record keep days (day)"
 msgstr "クラウド同期レコードは日数を保持します（天）"
 
-#: settings/serializers/cleaning.py:34
+#: settings/serializers/cleaning.py:35
 msgid "Activity log keep days (day)"
 msgstr "活動ログは日数を保持します（天）"
 
-#: settings/serializers/cleaning.py:37
+#: settings/serializers/cleaning.py:38
 msgid "Session keep duration (day)"
 msgstr "セッション維持期間（天）"
 
-#: settings/serializers/cleaning.py:39
+#: settings/serializers/cleaning.py:40
 msgid ""
 "Session, record, command will be delete if more than duration, only in "
 "database, OSS will not be affected."
 msgstr ""
 "この期間を超えるセッション、録音、およびコマンド レコードは削除されます (デー"
 "タベースのバックアップに影響し、OSS などには影響しません)"
-
-#: settings/serializers/cleaning.py:53
-msgid "must be greater than {} days."
-msgstr ""
 
 #: settings/serializers/feature.py:16
 msgid "Subject"
@@ -6260,7 +6260,7 @@ msgstr "一括作成非サポート"
 msgid "Storage is invalid"
 msgstr "ストレージが無効です"
 
-#: terminal/models/applet/applet.py:30 xpack/plugins/license/models.py:88
+#: terminal/models/applet/applet.py:30 xpack/plugins/license/models.py:86
 msgid "Community edition"
 msgstr "コミュニティ版"
 
@@ -8536,7 +8536,7 @@ msgstr "ライセンスのインポートに成功"
 msgid "License is invalid"
 msgstr "ライセンスが無効です"
 
-#: xpack/plugins/license/meta.py:10 xpack/plugins/license/models.py:140
+#: xpack/plugins/license/meta.py:10 xpack/plugins/license/models.py:138
 msgid "License"
 msgstr "ライセンス"
 

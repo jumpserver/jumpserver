@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-07 17:56+0800\n"
+"POT-Creation-Date: 2023-10-09 17:52+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1428,69 +1428,69 @@ msgstr "当我们看到这个提示时，我们将发送用户名"
 msgid "Password prompt"
 msgstr "密码提示"
 
-#: assets/const/protocol.py:101
+#: assets/const/protocol.py:102
 msgid "We will send password when we see this prompt"
 msgstr "当我们看到这个提示时，我们将发送密码"
 
-#: assets/const/protocol.py:106
+#: assets/const/protocol.py:107
 msgid "Success prompt"
 msgstr "成功提示"
 
-#: assets/const/protocol.py:107
+#: assets/const/protocol.py:108
 msgid "We will consider login success when we see this prompt"
 msgstr "当我们看到这个提示时，我们将认为登录成功"
 
-#: assets/const/protocol.py:118 assets/models/asset/database.py:10
+#: assets/const/protocol.py:119 assets/models/asset/database.py:10
 #: settings/serializers/msg.py:40
 msgid "Use SSL"
 msgstr "使用 SSL"
 
-#: assets/const/protocol.py:153
+#: assets/const/protocol.py:154
 msgid "SYSDBA"
 msgstr "SYSDBA"
 
-#: assets/const/protocol.py:154
+#: assets/const/protocol.py:155
 msgid "Connect as SYSDBA"
 msgstr "以 SYSDBA 角色连接"
 
-#: assets/const/protocol.py:169
+#: assets/const/protocol.py:170
 msgid ""
 "SQL Server version, Different versions have different connection drivers"
 msgstr "SQL Server 版本，不同版本有不同的连接驱动"
 
-#: assets/const/protocol.py:192
+#: assets/const/protocol.py:199
 msgid "Auth username"
 msgstr "使用用户名认证"
 
-#: assets/const/protocol.py:215
+#: assets/const/protocol.py:222
 msgid "Safe mode"
 msgstr "安全模式"
 
-#: assets/const/protocol.py:217
+#: assets/const/protocol.py:224
 msgid ""
 "When safe mode is enabled, some operations will be disabled, such as: New "
 "tab, right click, visit other website, etc."
 msgstr ""
 "当安全模式启用时，一些操作将被禁用，例如：新建标签页、右键、访问其它网站 等"
 
-#: assets/const/protocol.py:222 assets/models/asset/web.py:9
+#: assets/const/protocol.py:229 assets/models/asset/web.py:9
 #: assets/serializers/asset/info/spec.py:16
 msgid "Autofill"
 msgstr "自动代填"
 
-#: assets/const/protocol.py:230 assets/models/asset/web.py:10
+#: assets/const/protocol.py:237 assets/models/asset/web.py:10
 msgid "Username selector"
 msgstr "用户名选择器"
 
-#: assets/const/protocol.py:235 assets/models/asset/web.py:11
+#: assets/const/protocol.py:242 assets/models/asset/web.py:11
 msgid "Password selector"
 msgstr "密码选择器"
 
-#: assets/const/protocol.py:240 assets/models/asset/web.py:12
+#: assets/const/protocol.py:247 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr "确认按钮选择器"
 
-#: assets/const/protocol.py:263
+#: assets/const/protocol.py:270
 msgid "API mode"
 msgstr "API 模式"
 
@@ -2806,15 +2806,15 @@ msgstr "您的密码无效"
 msgid "Please wait for %s seconds before retry"
 msgstr "请在 %s 秒后重试"
 
-#: authentication/errors/redirect.py:85 authentication/mixins.py:318
+#: authentication/errors/redirect.py:85 authentication/mixins.py:324
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors/redirect.py:93 authentication/mixins.py:325
+#: authentication/errors/redirect.py:93 authentication/mixins.py:331
 msgid "You should to change your password before login"
 msgstr "登录完成前，请先修改密码"
 
-#: authentication/errors/redirect.py:101 authentication/mixins.py:332
+#: authentication/errors/redirect.py:101 authentication/mixins.py:338
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
@@ -2915,17 +2915,21 @@ msgstr "清空手机号码禁用"
 msgid "Authentication failed (before login check failed): {}"
 msgstr "认证失败 (登录前检查失败): {}"
 
-#: authentication/mixins.py:91
+#: authentication/mixins.py:82
+msgid "User is not valid"
+msgstr "无效的用户"
+
+#: authentication/mixins.py:97
 msgid ""
 "The administrator has enabled 'Only allow login from user source'. \n"
 "            The current user source is {}. Please contact the administrator."
 msgstr "管理员已开启'仅允许从用户来源登录'，当前用户来源为{}，请联系管理员。"
 
-#: authentication/mixins.py:268
+#: authentication/mixins.py:274
 msgid "The MFA type ({}) is not enabled"
 msgstr "该 MFA ({}) 方式没有启用"
 
-#: authentication/mixins.py:308
+#: authentication/mixins.py:314
 msgid "Please change your password"
 msgstr "请修改密码"
 
@@ -3319,7 +3323,7 @@ msgstr "本页面未使用 HTTPS 协议，请使用 HTTPS 协议以确保您的�
 msgid "Do you want to retry ?"
 msgstr "是否重试 ？"
 
-#: authentication/utils.py:28 common/utils/ip/geoip/utils.py:24
+#: authentication/utils.py:23 common/utils/ip/geoip/utils.py:24
 #: xpack/plugins/cloud/const.py:29
 msgid "LAN"
 msgstr "局域网"
@@ -3809,15 +3813,15 @@ msgstr "系统信息"
 msgid "Publish the station message"
 msgstr "发布站内消息"
 
-#: ops/ansible/inventory.py:92 ops/models/job.py:60
+#: ops/ansible/inventory.py:95 ops/models/job.py:60
 msgid "No account available"
 msgstr "无可用账号"
 
-#: ops/ansible/inventory.py:263
+#: ops/ansible/inventory.py:259
 msgid "Ansible disabled"
 msgstr "Ansible 已禁用"
 
-#: ops/ansible/inventory.py:279
+#: ops/ansible/inventory.py:275
 msgid "Skip hosts below:"
 msgstr "跳过以下主机: "
 
@@ -5151,48 +5155,44 @@ msgstr "支持链接"
 msgid "default: http://www.jumpserver.org/support/"
 msgstr "默认: http://www.jumpserver.org/support/"
 
-#: settings/serializers/cleaning.py:10
+#: settings/serializers/cleaning.py:11
 msgid "Period clean"
 msgstr "定時清掃"
 
-#: settings/serializers/cleaning.py:14
+#: settings/serializers/cleaning.py:15
 msgid "Login log keep days (day)"
 msgstr "登录日志 (天)"
 
-#: settings/serializers/cleaning.py:18
+#: settings/serializers/cleaning.py:19
 msgid "Task log keep days (day)"
 msgstr "任务日志 (天)"
 
-#: settings/serializers/cleaning.py:22
+#: settings/serializers/cleaning.py:23
 msgid "Operate log keep days (day)"
 msgstr "操作日志 (天)"
 
-#: settings/serializers/cleaning.py:26
+#: settings/serializers/cleaning.py:27
 msgid "FTP log keep days (day)"
 msgstr "上传下载 (天)"
 
-#: settings/serializers/cleaning.py:30
+#: settings/serializers/cleaning.py:31
 msgid "Cloud sync record keep days (day)"
 msgstr "云同步记录 (天)"
 
-#: settings/serializers/cleaning.py:34
+#: settings/serializers/cleaning.py:35
 msgid "Activity log keep days (day)"
 msgstr "活动记录 (天)"
 
-#: settings/serializers/cleaning.py:37
+#: settings/serializers/cleaning.py:38
 msgid "Session keep duration (day)"
 msgstr "会话日志 (天)"
 
-#: settings/serializers/cleaning.py:39
+#: settings/serializers/cleaning.py:40
 msgid ""
 "Session, record, command will be delete if more than duration, only in "
 "database, OSS will not be affected."
 msgstr ""
 "会话、录像，命令记录超过该时长将会被清除 (影响数据库存储，OSS 等不受影响)"
-
-#: settings/serializers/cleaning.py:53
-msgid "must be greater than {} days."
-msgstr ""
 
 #: settings/serializers/feature.py:16
 msgid "Subject"
@@ -6168,7 +6168,7 @@ msgstr "不支持批量创建"
 msgid "Storage is invalid"
 msgstr "存储无效"
 
-#: terminal/models/applet/applet.py:30 xpack/plugins/license/models.py:88
+#: terminal/models/applet/applet.py:30 xpack/plugins/license/models.py:86
 msgid "Community edition"
 msgstr "社区版"
 
@@ -8416,7 +8416,7 @@ msgstr "许可证导入成功"
 msgid "License is invalid"
 msgstr "无效的许可证"
 
-#: xpack/plugins/license/meta.py:10 xpack/plugins/license/models.py:140
+#: xpack/plugins/license/meta.py:10 xpack/plugins/license/models.py:138
 msgid "License"
 msgstr "许可证"
 
@@ -8435,6 +8435,12 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
+
+#~ msgid "Basic edition"
+#~ msgstr "企业基础版"
+
+#~ msgid "Professional edition"
+#~ msgstr "企业专业版"
 
 #~ msgid "Random"
 #~ msgstr "随机"
