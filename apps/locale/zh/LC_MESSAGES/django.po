@@ -8436,11 +8436,5 @@ msgstr "企业专业版"
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
 
-#~ msgid "Basic edition"
-#~ msgstr "企业基础版"
-
-#~ msgid "Professional edition"
-#~ msgstr "企业专业版"
-
 #~ msgid "Random"
 #~ msgstr "随机"
