@@ -5,7 +5,7 @@ from common.serializers.fields import LabeledChoiceField
 from common.utils import pretty_string
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .terminal import TerminalSmallSerializer
-from ..const import SessionType
+from ..const import SessionType, SessionErrorReason
 from ..models import Session
 
 __all__ = [
@@ -24,6 +24,9 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
     can_join = serializers.BooleanField(read_only=True, label=_("Can join"))
     can_terminate = serializers.BooleanField(read_only=True, label=_("Can terminate"))
     asset = serializers.CharField(label=_("Asset"), style={'base_template': 'textarea.html'})
+    error_reason = LabeledChoiceField(
+        choices=SessionErrorReason.choices, label=_("Error reason"), required=False
+    )
 
     class Meta:
         model = Session
@@ -33,7 +36,7 @@ class SessionSerializer(BulkOrgResourceModelSerializer):
             "protocol", 'type', "login_from", "remote_addr",
             "is_success", "is_finished", "has_replay", "has_command",
             "date_start", "date_end", "comment", "terminal_display", "is_locked",
-            'command_amount',
+            'command_amount', 'error_reason'
         ]
         fields_fk = ["terminal", ]
         fields_custom = ["can_replay", "can_join", "can_terminate"]
