@@ -77,9 +77,11 @@ class JMSInventory:
         return var
 
     @staticmethod
-    def make_custom_become_ansible_vars(account, platform):
+    def make_custom_become_ansible_vars(account, su_from_auth):
+        su_method = su_from_auth['ansible_become_method']
         var = {
-            'custom_become': True, 'custom_become_method': platform.su_method,
+            'custom_become': True,
+            'custom_become_method': su_method,
             'custom_become_user': account.su_from.username,
             'custom_become_password': account.su_from.secret,
             'custom_become_private_key_path': account.su_from.private_key_path
@@ -98,16 +100,9 @@ class JMSInventory:
 
         su_from = account.su_from
         if platform.su_enabled and su_from:
-            host.update(self.make_account_ansible_vars(su_from))
-            host.update(self.make_custom_become_ansible_vars(account, platform))
-            become_method = 'sudo' if platform.su_method != 'su' else 'su'
-            host['ansible_become'] = True
-            host['ansible_become_method'] = 'sudo'
-            host['ansible_become_user'] = account.username
-            if become_method == 'sudo':
-                host['ansible_become_password'] = su_from.secret
-            else:
-                host['ansible_become_password'] = account.secret
+            su_from_auth = account.get_ansible_become_auth()
+            host.update(su_from_auth)
+            host.update(self.make_custom_become_ansible_vars(account, su_from_auth))
         elif platform.su_enabled and not su_from and \
                 self.task_type in (AutomationTypes.change_secret, AutomationTypes.push_account):
             host.update(self.make_account_ansible_vars(account))

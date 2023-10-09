@@ -80,7 +80,11 @@
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
         gateway_args: "{{ jms_asset.ansible_ssh_common_args | default('') }}"
-        become: false
+        become: "{{ account.become.ansible_become | default(False) }}"
+        become_method: su
+        become_user: "{{ account.become.ansible_user | default('') }}"
+        become_password: "{{ account.become.ansible_password | default('') }}"
+        become_private_key_path: "{{ account.become.ansible_ssh_private_key_file | default(None) }}"
       when: account.secret_type == "password"
       delegate_to: localhost
 
@@ -91,6 +95,5 @@
         login_user: "{{ account.username }}"
         login_private_key_path: "{{ account.private_key_path  }}"
         gateway_args: "{{ jms_asset.ansible_ssh_common_args | default('') }}"
-        become: false
       when: account.secret_type == "ssh_key"
       delegate_to: localhost
