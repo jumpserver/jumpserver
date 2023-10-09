@@ -92,7 +92,7 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
                 'title': _('Authentication failed'),
                 'message': _('Authentication failed (before login check failed): {}').format(e),
                 'interval': 10,
-                'redirect_url': reverse('authentication:login') + '?admin=0',
+                'redirect_url': reverse('authentication:login') + '?admin=1',
                 'auto_redirect': True,
             }
             response = render(request, 'authentication/auth_fail_flash_message_standalone.html', context)
