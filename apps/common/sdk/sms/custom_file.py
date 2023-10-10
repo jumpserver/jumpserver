@@ -44,7 +44,7 @@ class CustomFileSMS(BaseSMSClient):
             logger.info(f'Custom file sms send: phone_numbers={phone_numbers}, param={template_param}')
             custom_sms_method(phone_numbers, template_param, **kwargs)
         except Exception as err:
-            raise JMSException(_('Custom file sms error: %s') % err)
+            raise JMSException(_('SMS sending failed[%s]: %s') % (f"{_('Custom type')}({_('File')})", err))
 
 
 client = CustomFileSMS

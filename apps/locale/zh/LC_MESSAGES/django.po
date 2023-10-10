@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-09 18:33+0800\n"
+"POT-Creation-Date: 2023-10-10 16:19+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -79,7 +79,7 @@ msgid "Collected"
 msgstr "收集"
 
 #: accounts/const/account.py:27 accounts/serializers/account/account.py:28
-#: settings/serializers/auth/sms.py:75
+#: settings/serializers/auth/sms.py:79
 msgid "Template"
 msgstr "模板"
 
@@ -709,7 +709,7 @@ msgstr "已修改"
 #: acls/templates/acls/asset_login_reminder.html:6
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20
-#: authentication/api/connection_token.py:381 ops/models/base.py:17
+#: authentication/api/connection_token.py:386 ops/models/base.py:17
 #: ops/models/job.py:139 ops/serializers/job.py:21
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 msgid "Assets"
@@ -1304,7 +1304,7 @@ msgid "Disabled"
 msgstr "禁用"
 
 #: assets/const/base.py:34 settings/serializers/basic.py:6
-#: users/serializers/preference/koko.py:15
+#: users/serializers/preference/koko.py:19
 #: users/serializers/preference/lina.py:39
 #: users/serializers/preference/luna.py:60
 msgid "Basic"
@@ -1316,7 +1316,7 @@ msgid "Script"
 msgstr "脚本"
 
 #: assets/const/category.py:10 assets/models/asset/host.py:8
-#: settings/serializers/auth/radius.py:16 settings/serializers/auth/sms.py:67
+#: settings/serializers/auth/radius.py:16 settings/serializers/auth/sms.py:71
 #: settings/serializers/feature.py:47 terminal/models/component/endpoint.py:13
 #: terminal/serializers/applet.py:17
 #: xpack/plugins/cloud/serializers/account_attrs.py:72
@@ -1607,7 +1607,7 @@ msgid "Cloud"
 msgstr "云服务"
 
 #: assets/models/asset/common.py:92 assets/models/platform.py:16
-#: settings/serializers/auth/radius.py:17 settings/serializers/auth/sms.py:68
+#: settings/serializers/auth/radius.py:17 settings/serializers/auth/sms.py:72
 #: xpack/plugins/cloud/serializers/account_attrs.py:73
 msgid "Port"
 msgstr "端口"
@@ -1683,7 +1683,7 @@ msgid "Proxy"
 msgstr "代理"
 
 #: assets/models/automations/base.py:22 ops/models/job.py:223
-#: settings/serializers/auth/sms.py:99
+#: settings/serializers/auth/sms.py:103
 msgid "Parameters"
 msgstr "参数"
 
@@ -2521,23 +2521,23 @@ msgstr "该操作需要验证您的 MFA, 请先开启并配置"
 msgid "Reusable connection token is not allowed, global setting not enabled"
 msgstr "不允许使用可重复使用的连接令牌，未启用全局设置"
 
-#: authentication/api/connection_token.py:352
+#: authentication/api/connection_token.py:357
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名账号不支持当前资产"
 
-#: authentication/api/connection_token.py:371
+#: authentication/api/connection_token.py:376
 msgid "Account not found"
 msgstr "账号未找到"
 
-#: authentication/api/connection_token.py:374
+#: authentication/api/connection_token.py:379
 msgid "Permission expired"
 msgstr "授权已过期"
 
-#: authentication/api/connection_token.py:401
+#: authentication/api/connection_token.py:406
 msgid "ACL action is reject: {}({})"
 msgstr "ACL 动作是拒绝: {}({})"
 
-#: authentication/api/connection_token.py:405
+#: authentication/api/connection_token.py:410
 msgid "ACL action is review"
 msgstr "ACL 动作是复核"
 
@@ -2893,7 +2893,7 @@ msgstr "短信验证码校验失败"
 
 #: authentication/mfa/sms.py:12 authentication/serializers/password_mfa.py:16
 #: authentication/serializers/password_mfa.py:24
-#: settings/serializers/auth/sms.py:28 users/forms/profile.py:104
+#: settings/serializers/auth/sms.py:32 users/forms/profile.py:104
 #: users/forms/profile.py:109 users/templates/users/forgot_password.html:112
 #: users/views/profile/reset.py:98
 msgid "SMS"
@@ -3163,7 +3163,7 @@ msgstr "代码错误"
 #: authentication/templates/authentication/_msg_reset_password_code.html:9
 #: authentication/templates/authentication/_msg_rest_password_success.html:2
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:2
-#: jumpserver/conf.py:447
+#: jumpserver/conf.py:449
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: perms/templates/perms/_msg_permed_items_expire.html:3
 #: tickets/templates/tickets/approve_check_password.html:33
@@ -3659,6 +3659,15 @@ msgstr "SP_id 为6位"
 msgid "Failed to connect to the CMPP gateway server, err: {}"
 msgstr "连接网关服务器错误，错误：{}"
 
+#: common/sdk/sms/custom_file.py:41
+msgid "The custom sms file is invalid"
+msgstr "自定义短信文件无效"
+
+#: common/sdk/sms/custom_file.py:47
+#, python-format
+msgid "SMS sending failed[%s]: %s"
+msgstr "短信发送失败[%s]: %s"
+
 #: common/sdk/sms/endpoint.py:16
 msgid "Alibaba cloud"
 msgstr "阿里云"
@@ -3675,11 +3684,11 @@ msgstr "华为云"
 msgid "CMPP v2.0"
 msgstr "CMPP v2.0"
 
-#: common/sdk/sms/endpoint.py:31
+#: common/sdk/sms/endpoint.py:32
 msgid "SMS provider not support: {}"
 msgstr "短信服务商不支持：{}"
 
-#: common/sdk/sms/endpoint.py:53
+#: common/sdk/sms/endpoint.py:54
 msgid "SMS verification code signature or template invalid"
 msgstr "短信验证码签名或模版无效"
 
@@ -3750,11 +3759,15 @@ msgstr "不能包含特殊字符"
 msgid "The mobile phone number format is incorrect"
 msgstr "手机号格式不正确"
 
-#: jumpserver/conf.py:446
+#: jumpserver/conf.py:444
+msgid "The verification code is: {code}"
+msgstr "验证码为: {code}"
+
+#: jumpserver/conf.py:448
 msgid "Create account successfully"
 msgstr "创建账号成功"
 
-#: jumpserver/conf.py:448
+#: jumpserver/conf.py:450
 msgid "Your account has been created successfully"
 msgstr "你的账号已创建成功"
 
@@ -4574,7 +4587,7 @@ msgid "View permission tree"
 msgstr "查看授权树"
 
 #: settings/api/dingtalk.py:31 settings/api/feishu.py:36
-#: settings/api/sms.py:153 settings/api/vault.py:40 settings/api/wecom.py:37
+#: settings/api/sms.py:160 settings/api/vault.py:40 settings/api/wecom.py:37
 msgid "Test success"
 msgstr "测试成功"
 
@@ -4602,11 +4615,11 @@ msgstr "获取 LDAP 用户为 None"
 msgid "Imported {} users successfully (Organization: {})"
 msgstr "成功导入 {} 个用户 ( 组织: {} )"
 
-#: settings/api/sms.py:135
+#: settings/api/sms.py:142
 msgid "Invalid SMS platform"
 msgstr "无效的短信平台"
 
-#: settings/api/sms.py:141
+#: settings/api/sms.py:148
 msgid "test_phone is required"
 msgstr "测试手机号 该字段是必填项。"
 
@@ -5011,54 +5024,58 @@ msgstr "SP 密钥"
 msgid "SP cert"
 msgstr "SP 证书"
 
-#: settings/serializers/auth/sms.py:16
+#: settings/serializers/auth/sms.py:17
 msgid "Enable SMS"
 msgstr "启用 SMS"
 
-#: settings/serializers/auth/sms.py:18
+#: settings/serializers/auth/sms.py:19
 msgid "SMS provider / Protocol"
 msgstr "短信服务商 / 协议"
 
-#: settings/serializers/auth/sms.py:23 settings/serializers/auth/sms.py:45
-#: settings/serializers/auth/sms.py:53 settings/serializers/auth/sms.py:62
-#: settings/serializers/auth/sms.py:73 settings/serializers/msg.py:76
+#: settings/serializers/auth/sms.py:22
+msgid "SMS code length"
+msgstr "验证码长度"
+
+#: settings/serializers/auth/sms.py:27 settings/serializers/auth/sms.py:49
+#: settings/serializers/auth/sms.py:57 settings/serializers/auth/sms.py:66
+#: settings/serializers/auth/sms.py:77 settings/serializers/msg.py:76
 msgid "Signature"
 msgstr "签名"
 
-#: settings/serializers/auth/sms.py:24 settings/serializers/auth/sms.py:46
-#: settings/serializers/auth/sms.py:54 settings/serializers/auth/sms.py:63
+#: settings/serializers/auth/sms.py:28 settings/serializers/auth/sms.py:50
+#: settings/serializers/auth/sms.py:58 settings/serializers/auth/sms.py:67
 msgid "Template code"
 msgstr "模板"
 
-#: settings/serializers/auth/sms.py:31
+#: settings/serializers/auth/sms.py:35
 msgid "Test phone"
 msgstr "测试手机号"
 
-#: settings/serializers/auth/sms.py:60
+#: settings/serializers/auth/sms.py:64
 msgid "App Access Address"
 msgstr "应用地址"
 
-#: settings/serializers/auth/sms.py:61
+#: settings/serializers/auth/sms.py:65
 msgid "Signature channel number"
 msgstr "签名通道号"
 
-#: settings/serializers/auth/sms.py:69
+#: settings/serializers/auth/sms.py:73
 msgid "Enterprise code(SP id)"
 msgstr "企业代码(SP id)"
 
-#: settings/serializers/auth/sms.py:70
+#: settings/serializers/auth/sms.py:74
 msgid "Shared secret(Shared secret)"
 msgstr "共享密码(Shared secret)"
 
-#: settings/serializers/auth/sms.py:71
+#: settings/serializers/auth/sms.py:75
 msgid "Original number(Src id)"
 msgstr "原始号码(Src id)"
 
-#: settings/serializers/auth/sms.py:72
+#: settings/serializers/auth/sms.py:76
 msgid "Business type(Service id)"
 msgstr "业务类型(Service id)"
 
-#: settings/serializers/auth/sms.py:76
+#: settings/serializers/auth/sms.py:80
 #, python-brace-format
 msgid ""
 "Template need contain {code} and Signature + template length does not exceed "
@@ -5068,24 +5085,24 @@ msgstr ""
 "模板需要包含 {code}，并且模板+签名长度不能超过67个字。例如, 您的验证码是 "
 "{code}, 有效期为5分钟。请不要泄露给其他人。"
 
-#: settings/serializers/auth/sms.py:85
+#: settings/serializers/auth/sms.py:89
 #, python-brace-format
 msgid "The template needs to contain {code}"
 msgstr "模板需要包含 {code}"
 
-#: settings/serializers/auth/sms.py:88
+#: settings/serializers/auth/sms.py:92
 msgid "Signature + Template must not exceed 65 words"
 msgstr "模板+签名不能超过65个字"
 
-#: settings/serializers/auth/sms.py:97
+#: settings/serializers/auth/sms.py:101
 msgid "URL"
 msgstr "URL"
 
-#: settings/serializers/auth/sms.py:102
+#: settings/serializers/auth/sms.py:106
 msgid "Request method"
 msgstr "请求方式"
 
-#: settings/serializers/auth/sms.py:111
+#: settings/serializers/auth/sms.py:117
 #, python-format
 msgid "The value in the parameter must contain %s"
 msgstr "参数中的值必须包含 %s"
