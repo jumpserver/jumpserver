@@ -95,6 +95,33 @@ class Account(AbsConnectivity, BaseAccount):
         """ 排除自己和以自己为 su-from 的账号 """
         return self.asset.accounts.exclude(id=self.id).exclude(su_from=self)
 
+    @staticmethod
+    def make_account_ansible_vars(su_from):
+        var = {
+            'ansible_user': su_from.username,
+        }
+        if not su_from.secret:
+            return var
+        var['ansible_password'] = su_from.secret
+        var['ansible_ssh_private_key_file'] = su_from.private_key_path
+        return var
+
+    def get_ansible_become_auth(self):
+        su_from = self.su_from
+        platform = self.platform
+        auth = {'ansible_become': False}
+        if not (platform.su_enabled and su_from):
+            return auth
+
+        auth.update(self.make_account_ansible_vars(su_from))
+        become_method = 'sudo' if platform.su_method != 'su' else 'su'
+        password = su_from.secret if become_method == 'sudo' else self.secret
+        auth['ansible_become'] = True
+        auth['ansible_become_method'] = become_method
+        auth['ansible_become_user'] = self.username
+        auth['ansible_become_password'] = password
+        return auth
+
 
 def replace_history_model_with_mixin():
     """

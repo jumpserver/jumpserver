@@ -314,13 +314,18 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         return super().perform_create(serializer)
 
     def _insert_connect_options(self, data, user):
-        name = 'file_name_conflict_resolution'
         connect_options = data.pop('connect_options', {})
-        preference = Preference.objects.filter(
-            name=name, user=user, category='koko'
-        ).first()
-        value = preference.value if preference else FileNameConflictResolution.REPLACE
-        connect_options[name] = value
+        default_name_opts = {
+            'file_name_conflict_resolution': FileNameConflictResolution.REPLACE,
+            'terminal_theme_name': 'Default',
+        }
+        preferences_query = Preference.objects.filter(
+            user=user, category='koko', name__in=default_name_opts.keys()
+        ).values_list('name', 'value')
+        preferences = dict(preferences_query)
+        for name in default_name_opts.keys():
+            value = preferences.get(name, default_name_opts[name])
+            connect_options[name] = value
         data['connect_options'] = connect_options
 
     def validate_serializer(self, serializer):
@@ -412,6 +417,9 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
             return ticket
         if acl.is_action(acl.ActionChoices.notice):
             reviewers = acl.reviewers.all()
+            if not reviewers:
+                return
+            self._record_operate_log(acl, asset)
             for reviewer in reviewers:
                 AssetLoginReminderMsg(reviewer, asset, user).publish_async()
 

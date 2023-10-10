@@ -144,7 +144,7 @@ class ConnectMethodUtil:
                 'support': [
                     Protocol.mysql, Protocol.postgresql,
                     Protocol.oracle, Protocol.sqlserver,
-                    Protocol.mariadb
+                    Protocol.mariadb, Protocol.db2
                 ],
                 'match': 'm2m'
             },

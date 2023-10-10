@@ -1,11 +1,23 @@
 - hosts: demo
   gather_facts: no
   tasks:
-    - name: Verify account connectivity
-      become: no
+    - name: Verify account connectivity(Do not switch)
       ansible.builtin.ping:
       vars:
         ansible_become: no
         ansible_user: "{{ account.username }}"
         ansible_password: "{{ account.secret }}"
         ansible_ssh_private_key_file: "{{ account.private_key_path }}"
+      when: not account.become.ansible_become
+
+    - name: Verify account connectivity(Switch)
+      ansible.builtin.ping:
+      vars:
+        ansible_become: yes
+        ansible_user: "{{ account.become.ansible_user }}"
+        ansible_password: "{{ account.become.ansible_password }}"
+        ansible_ssh_private_key_file: "{{ account.become.ansible_ssh_private_key_file }}"
+        ansible_become_method: "{{ account.become.ansible_become_method }}"
+        ansible_become_user: "{{ account.become.ansible_become_user }}"
+        ansible_become_password: "{{ account.become.ansible_become_password }}"
+      when: account.become.ansible_become

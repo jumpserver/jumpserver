@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-08 14:52+0800\n"
+"POT-Creation-Date: 2023-10-10 11:13+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -24,7 +24,8 @@ msgstr "参数 'action' 必须是 [{}]"
 #: accounts/const/account.py:6
 #: accounts/serializers/automations/change_secret.py:32
 #: assets/models/_user.py:24 audits/signal_handlers/login_log.py:37
-#: authentication/confirm/password.py:9 authentication/forms.py:32
+#: authentication/confirm/password.py:9 authentication/confirm/password.py:24
+#: authentication/confirm/password.py:26 authentication/forms.py:32
 #: authentication/templates/authentication/login.html:324
 #: settings/serializers/auth/ldap.py:25 settings/serializers/auth/ldap.py:47
 #: users/forms/profile.py:22 users/serializers/user.py:104
@@ -39,7 +40,7 @@ msgstr "密码"
 msgid "SSH key"
 msgstr "SSH 密钥"
 
-#: accounts/const/account.py:8 authentication/models/access_key.py:32
+#: accounts/const/account.py:8 authentication/models/access_key.py:37
 msgid "Access key"
 msgstr "Access key"
 
@@ -93,7 +94,7 @@ msgid "Update"
 msgstr "更新"
 
 #: accounts/const/account.py:33
-#: accounts/serializers/automations/change_secret.py:155 audits/const.py:59
+#: accounts/serializers/automations/change_secret.py:155 audits/const.py:60
 #: audits/signal_handlers/activity_log.py:33 common/const/choices.py:19
 #: ops/const.py:74 terminal/const.py:77 xpack/plugins/cloud/const.py:43
 msgid "Failed"
@@ -243,7 +244,7 @@ msgstr "资产"
 msgid "Su from"
 msgstr "切换自"
 
-#: accounts/models/account.py:54 assets/const/protocol.py:168
+#: accounts/models/account.py:54 assets/const/protocol.py:169
 #: settings/serializers/auth/cas.py:20 settings/serializers/auth/feishu.py:20
 #: terminal/models/applet/applet.py:35
 msgid "Version"
@@ -499,7 +500,7 @@ msgstr "账号验证"
 msgid "Secret type"
 msgstr "密文类型"
 
-#: accounts/models/base.py:39 accounts/models/mixins/vault.py:48
+#: accounts/models/base.py:39 accounts/models/mixins/vault.py:49
 #: accounts/serializers/account/base.py:19
 #: authentication/models/temp_token.py:10
 #: authentication/templates/authentication/_access_key_modal.html:31
@@ -709,7 +710,7 @@ msgstr "已修改"
 #: acls/templates/acls/asset_login_reminder.html:6
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20
-#: authentication/api/connection_token.py:381 ops/models/base.py:17
+#: authentication/api/connection_token.py:386 ops/models/base.py:17
 #: ops/models/job.py:139 ops/serializers/job.py:21
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 msgid "Assets"
@@ -890,7 +891,7 @@ msgstr "* 密码长度范围 6-30 位"
 msgid "Automation task execution"
 msgstr "自动化任务执行历史"
 
-#: accounts/serializers/automations/change_secret.py:154 audits/const.py:58
+#: accounts/serializers/automations/change_secret.py:154 audits/const.py:59
 #: audits/models.py:62 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:18 ops/const.py:72 ops/serializers/celery.py:40
 #: terminal/const.py:76 terminal/models/session/sharing.py:121
@@ -982,7 +983,7 @@ msgstr "审批"
 msgid "Warning"
 msgstr "告警"
 
-#: acls/const.py:10 notifications/apps.py:7
+#: acls/const.py:10 audits/const.py:36 notifications/apps.py:7
 msgid "Notifications"
 msgstr "通知"
 
@@ -1003,7 +1004,7 @@ msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 msgid "Reviewers"
 msgstr "审批人"
 
-#: acls/models/base.py:43 authentication/models/access_key.py:15
+#: acls/models/base.py:43 authentication/models/access_key.py:20
 #: authentication/models/connection_token.py:53
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/asset_permission.py:76 terminal/models/session/sharing.py:29
@@ -1276,7 +1277,7 @@ msgstr "认证失败"
 msgid "Connect failed"
 msgstr "连接失败"
 
-#: assets/const/automation.py:6 audits/const.py:6 audits/const.py:41
+#: assets/const/automation.py:6 audits/const.py:6 audits/const.py:42
 #: audits/signal_handlers/activity_log.py:62 common/utils/ip/geoip/utils.py:31
 #: common/utils/ip/geoip/utils.py:37 common/utils/ip/utils.py:104
 msgid "Unknown"
@@ -1298,19 +1299,19 @@ msgstr "测试网关"
 msgid "Gather facts"
 msgstr "收集资产信息"
 
-#: assets/const/base.py:33 audits/const.py:52
+#: assets/const/base.py:33 audits/const.py:53
 #: terminal/serializers/applet_host.py:32
 msgid "Disabled"
 msgstr "禁用"
 
 #: assets/const/base.py:34 settings/serializers/basic.py:6
-#: users/serializers/preference/koko.py:15
+#: users/serializers/preference/koko.py:19
 #: users/serializers/preference/lina.py:39
 #: users/serializers/preference/luna.py:60
 msgid "Basic"
 msgstr "基本"
 
-#: assets/const/base.py:35 assets/const/protocol.py:245
+#: assets/const/base.py:35 assets/const/protocol.py:252
 #: assets/models/asset/web.py:13
 msgid "Script"
 msgstr "脚本"
@@ -1332,7 +1333,7 @@ msgid "Cloud service"
 msgstr "云服务"
 
 #: assets/const/category.py:14 assets/models/asset/gpt.py:11
-#: assets/models/asset/web.py:16 audits/const.py:39
+#: assets/models/asset/web.py:16 audits/const.py:40
 #: terminal/models/applet/applet.py:27 users/const.py:47
 msgid "Web"
 msgstr "Web"
@@ -1378,11 +1379,11 @@ msgstr "ChatGPT"
 msgid "Other"
 msgstr "其它"
 
-#: assets/const/protocol.py:48
+#: assets/const/protocol.py:49
 msgid "SFTP root"
 msgstr "SFTP 根路径"
 
-#: assets/const/protocol.py:50
+#: assets/const/protocol.py:51
 #, python-brace-format
 msgid ""
 "SFTP root directory, Support variable: <br>- ${ACCOUNT} The connected "
@@ -1392,105 +1393,105 @@ msgstr ""
 "SFTP根目录，支持变量：<br>-${ACCOUNT}已连接帐户用户名<br>-${HOME}连接帐户的主"
 "目录<br>-${USER}用户的用户名"
 
-#: assets/const/protocol.py:65
+#: assets/const/protocol.py:66
 msgid "Console"
 msgstr "控制台"
 
-#: assets/const/protocol.py:66
+#: assets/const/protocol.py:67
 msgid "Connect to console session"
 msgstr "连接到控制台会话"
 
-#: assets/const/protocol.py:70
+#: assets/const/protocol.py:71
 msgid "Any"
 msgstr "任意"
 
-#: assets/const/protocol.py:72 settings/serializers/security.py:228
+#: assets/const/protocol.py:73 settings/serializers/security.py:228
 msgid "Security"
 msgstr "安全"
 
-#: assets/const/protocol.py:73
+#: assets/const/protocol.py:74
 msgid "Security layer to use for the connection"
 msgstr "连接 RDP 使用的安全层"
 
-#: assets/const/protocol.py:79
+#: assets/const/protocol.py:80
 msgid "AD domain"
 msgstr "AD 网域"
 
-#: assets/const/protocol.py:94
+#: assets/const/protocol.py:95
 msgid "Username prompt"
 msgstr "用户名提示"
 
-#: assets/const/protocol.py:95
+#: assets/const/protocol.py:96
 msgid "We will send username when we see this prompt"
 msgstr "当我们看到这个提示时，我们将发送用户名"
 
-#: assets/const/protocol.py:100
+#: assets/const/protocol.py:101
 msgid "Password prompt"
 msgstr "密码提示"
 
-#: assets/const/protocol.py:101
+#: assets/const/protocol.py:102
 msgid "We will send password when we see this prompt"
 msgstr "当我们看到这个提示时，我们将发送密码"
 
-#: assets/const/protocol.py:106
+#: assets/const/protocol.py:107
 msgid "Success prompt"
 msgstr "成功提示"
 
-#: assets/const/protocol.py:107
+#: assets/const/protocol.py:108
 msgid "We will consider login success when we see this prompt"
 msgstr "当我们看到这个提示时，我们将认为登录成功"
 
-#: assets/const/protocol.py:118 assets/models/asset/database.py:10
+#: assets/const/protocol.py:119 assets/models/asset/database.py:10
 #: settings/serializers/msg.py:40
 msgid "Use SSL"
 msgstr "使用 SSL"
 
-#: assets/const/protocol.py:153
+#: assets/const/protocol.py:154
 msgid "SYSDBA"
 msgstr "SYSDBA"
 
-#: assets/const/protocol.py:154
+#: assets/const/protocol.py:155
 msgid "Connect as SYSDBA"
 msgstr "以 SYSDBA 角色连接"
 
-#: assets/const/protocol.py:169
+#: assets/const/protocol.py:170
 msgid ""
 "SQL Server version, Different versions have different connection drivers"
 msgstr "SQL Server 版本，不同版本有不同的连接驱动"
 
-#: assets/const/protocol.py:192
+#: assets/const/protocol.py:199
 msgid "Auth username"
 msgstr "使用用户名认证"
 
-#: assets/const/protocol.py:215
+#: assets/const/protocol.py:222
 msgid "Safe mode"
 msgstr "安全模式"
 
-#: assets/const/protocol.py:217
+#: assets/const/protocol.py:224
 msgid ""
 "When safe mode is enabled, some operations will be disabled, such as: New "
 "tab, right click, visit other website, etc."
 msgstr ""
 "当安全模式启用时，一些操作将被禁用，例如：新建标签页、右键、访问其它网站 等"
 
-#: assets/const/protocol.py:222 assets/models/asset/web.py:9
+#: assets/const/protocol.py:229 assets/models/asset/web.py:9
 #: assets/serializers/asset/info/spec.py:16
 msgid "Autofill"
 msgstr "自动代填"
 
-#: assets/const/protocol.py:230 assets/models/asset/web.py:10
+#: assets/const/protocol.py:237 assets/models/asset/web.py:10
 msgid "Username selector"
 msgstr "用户名选择器"
 
-#: assets/const/protocol.py:235 assets/models/asset/web.py:11
+#: assets/const/protocol.py:242 assets/models/asset/web.py:11
 msgid "Password selector"
 msgstr "密码选择器"
 
-#: assets/const/protocol.py:240 assets/models/asset/web.py:12
+#: assets/const/protocol.py:247 assets/models/asset/web.py:12
 msgid "Submit selector"
 msgstr "确认按钮选择器"
 
-#: assets/const/protocol.py:263
+#: assets/const/protocol.py:270
 msgid "API mode"
 msgstr "API 模式"
 
@@ -1843,7 +1844,7 @@ msgstr "开放的"
 msgid "Setting"
 msgstr "设置"
 
-#: assets/models/platform.py:38 audits/const.py:53
+#: assets/models/platform.py:38 audits/const.py:54
 #: authentication/backends/passkey/models.py:11 settings/models.py:36
 #: terminal/serializers/applet_host.py:33
 msgid "Enabled"
@@ -2282,30 +2283,30 @@ msgstr "登录"
 msgid "Change password"
 msgstr "改密"
 
-#: audits/const.py:40 settings/serializers/terminal.py:6
+#: audits/const.py:41 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:164
 #: terminal/serializers/session.py:49 terminal/serializers/session.py:63
 msgid "Terminal"
 msgstr "终端"
 
-#: audits/const.py:45 audits/models.py:130
+#: audits/const.py:46 audits/models.py:130
 msgid "Operate log"
 msgstr "操作日志"
 
-#: audits/const.py:46
+#: audits/const.py:47
 msgid "Session log"
 msgstr "会话日志"
 
-#: audits/const.py:47
+#: audits/const.py:48
 msgid "Login log"
 msgstr "登录日志"
 
-#: audits/const.py:48 terminal/models/applet/host.py:143
+#: audits/const.py:49 terminal/models/applet/host.py:143
 #: terminal/models/component/task.py:22
 msgid "Task"
 msgstr "任务"
 
-#: audits/const.py:54
+#: audits/const.py:55
 msgid "-"
 msgstr "-"
 
@@ -2521,23 +2522,23 @@ msgstr "该操作需要验证您的 MFA, 请先开启并配置"
 msgid "Reusable connection token is not allowed, global setting not enabled"
 msgstr "不允许使用可重复使用的连接令牌，未启用全局设置"
 
-#: authentication/api/connection_token.py:352
+#: authentication/api/connection_token.py:357
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名账号不支持当前资产"
 
-#: authentication/api/connection_token.py:371
+#: authentication/api/connection_token.py:376
 msgid "Account not found"
 msgstr "账号未找到"
 
-#: authentication/api/connection_token.py:374
+#: authentication/api/connection_token.py:379
 msgid "Permission expired"
 msgstr "授权已过期"
 
-#: authentication/api/connection_token.py:401
+#: authentication/api/connection_token.py:406
 msgid "ACL action is reject: {}({})"
 msgstr "ACL 动作是拒绝: {}({})"
 
-#: authentication/api/connection_token.py:405
+#: authentication/api/connection_token.py:410
 msgid "ACL action is review"
 msgstr "ACL 动作是复核"
 
@@ -2608,7 +2609,7 @@ msgid "Added on"
 msgstr "附加"
 
 #: authentication/backends/passkey/models.py:14
-#: authentication/models/access_key.py:16
+#: authentication/models/access_key.py:21
 #: authentication/models/private_token.py:8
 msgid "Date last used"
 msgstr "最后使用日期"
@@ -2774,15 +2775,15 @@ msgstr "您的密码无效"
 msgid "Please wait for %s seconds before retry"
 msgstr "请在 %s 秒后重试"
 
-#: authentication/errors/redirect.py:85 authentication/mixins.py:318
+#: authentication/errors/redirect.py:85 authentication/mixins.py:324
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors/redirect.py:93 authentication/mixins.py:325
+#: authentication/errors/redirect.py:93 authentication/mixins.py:331
 msgid "You should to change your password before login"
 msgstr "登录完成前，请先修改密码"
 
-#: authentication/errors/redirect.py:101 authentication/mixins.py:332
+#: authentication/errors/redirect.py:101 authentication/mixins.py:338
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
@@ -2883,17 +2884,21 @@ msgstr "清空手机号码禁用"
 msgid "Authentication failed (before login check failed): {}"
 msgstr "认证失败 (登录前检查失败): {}"
 
-#: authentication/mixins.py:91
+#: authentication/mixins.py:82
+msgid "User is invalid"
+msgstr "无效的用户"
+
+#: authentication/mixins.py:97
 msgid ""
 "The administrator has enabled 'Only allow login from user source'. \n"
 "            The current user source is {}. Please contact the administrator."
 msgstr "管理员已开启'仅允许从用户来源登录'，当前用户来源为{}，请联系管理员。"
 
-#: authentication/mixins.py:268
+#: authentication/mixins.py:274
 msgid "The MFA type ({}) is not enabled"
 msgstr "该 MFA ({}) 方式没有启用"
 
-#: authentication/mixins.py:308
+#: authentication/mixins.py:314
 msgid "Please change your password"
 msgstr "请修改密码"
 
@@ -3287,7 +3292,7 @@ msgstr "本页面未使用 HTTPS 协议，请使用 HTTPS 协议以确保您的�
 msgid "Do you want to retry ?"
 msgstr "是否重试 ？"
 
-#: authentication/utils.py:28 common/utils/ip/geoip/utils.py:24
+#: authentication/utils.py:23 common/utils/ip/geoip/utils.py:24
 #: xpack/plugins/cloud/const.py:29
 msgid "LAN"
 msgstr "局域网"
@@ -3777,15 +3782,15 @@ msgstr "系统信息"
 msgid "Publish the station message"
 msgstr "发布站内消息"
 
-#: ops/ansible/inventory.py:92 ops/models/job.py:60
+#: ops/ansible/inventory.py:95 ops/models/job.py:60
 msgid "No account available"
 msgstr "无可用账号"
 
-#: ops/ansible/inventory.py:263
+#: ops/ansible/inventory.py:259
 msgid "Ansible disabled"
 msgstr "Ansible 已禁用"
 
-#: ops/ansible/inventory.py:279
+#: ops/ansible/inventory.py:275
 msgid "Skip hosts below:"
 msgstr "跳过以下主机: "
 
@@ -5119,48 +5124,44 @@ msgstr "支持链接"
 msgid "default: http://www.jumpserver.org/support/"
 msgstr "默认: http://www.jumpserver.org/support/"
 
-#: settings/serializers/cleaning.py:10
+#: settings/serializers/cleaning.py:11
 msgid "Period clean"
 msgstr "定時清掃"
 
-#: settings/serializers/cleaning.py:14
+#: settings/serializers/cleaning.py:15
 msgid "Login log keep days (day)"
 msgstr "登录日志 (天)"
 
-#: settings/serializers/cleaning.py:18
+#: settings/serializers/cleaning.py:19
 msgid "Task log keep days (day)"
 msgstr "任务日志 (天)"
 
-#: settings/serializers/cleaning.py:22
+#: settings/serializers/cleaning.py:23
 msgid "Operate log keep days (day)"
 msgstr "操作日志 (天)"
 
-#: settings/serializers/cleaning.py:26
+#: settings/serializers/cleaning.py:27
 msgid "FTP log keep days (day)"
 msgstr "上传下载 (天)"
 
-#: settings/serializers/cleaning.py:30
+#: settings/serializers/cleaning.py:31
 msgid "Cloud sync record keep days (day)"
 msgstr "云同步记录 (天)"
 
-#: settings/serializers/cleaning.py:34
+#: settings/serializers/cleaning.py:35
 msgid "Activity log keep days (day)"
 msgstr "活动记录 (天)"
 
-#: settings/serializers/cleaning.py:37
+#: settings/serializers/cleaning.py:38
 msgid "Session keep duration (day)"
 msgstr "会话日志 (天)"
 
-#: settings/serializers/cleaning.py:39
+#: settings/serializers/cleaning.py:40
 msgid ""
 "Session, record, command will be delete if more than duration, only in "
 "database, OSS will not be affected."
 msgstr ""
 "会话、录像，命令记录超过该时长将会被清除 (影响数据库存储，OSS 等不受影响)"
-
-#: settings/serializers/cleaning.py:53
-msgid "must be greater than {} days."
-msgstr ""
 
 #: settings/serializers/feature.py:16
 msgid "Subject"
@@ -7362,6 +7363,12 @@ msgstr "重置 MFA"
 #: users/serializers/preference/koko.py:10
 msgid "File name conflict resolution"
 msgstr "文件名冲突解决方案"
+
+#: users/serializers/preference/koko.py:14
+#, fuzzy
+#| msgid "Terminal setting"
+msgid "Terminal theme name"
+msgstr "终端设置"
 
 #: users/serializers/preference/lina.py:13
 msgid "New file encryption password"
