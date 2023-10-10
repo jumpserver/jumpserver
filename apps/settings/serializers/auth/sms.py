@@ -7,6 +7,7 @@ from common.serializers.fields import EncryptedField, PhoneField
 from common.validators import PhoneValidator
 
 __all__ = [
+    'BaseSMSSettingSerializer',
     'SMSSettingSerializer', 'AlibabaSMSSettingSerializer', 'TencentSMSSettingSerializer',
     'HuaweiSMSSettingSerializer', 'CMPP2SMSSettingSerializer', 'CustomSMSSettingSerializer',
 ]
@@ -16,6 +17,9 @@ class SMSSettingSerializer(serializers.Serializer):
     SMS_ENABLED = serializers.BooleanField(default=False, label=_('Enable SMS'))
     SMS_BACKEND = serializers.ChoiceField(
         choices=BACKENDS.choices, default=BACKENDS.ALIBABA, label=_('SMS provider / Protocol')
+    )
+    SMS_CODE_LENGTH = serializers.IntegerField(
+        default=4, min_value=4, max_value=16, label=_('SMS code length')
     )
 
 
@@ -102,12 +106,14 @@ class CustomSMSSettingSerializer(BaseSMSSettingSerializer):
         default=RequestType.get, choices=RequestType.choices, label=_("Request method")
     )
 
-    @staticmethod
-    def validate(attrs):
+    def validate(self, attrs):
         need_params = {'{phone_numbers}', '{code}'}
         params = attrs.get('CUSTOM_SMS_API_PARAMS', {})
-        if len(set(params.values()) & need_params) != len(need_params):
-            raise serializers.ValidationError(
+        # 这里用逗号分隔是保证需要的参数必须是完整的，不能分开在不同的参数中首位相连
+        params_string = ','.join(params.values())
+        for param in need_params:
+            if param not in params_string:
+                raise serializers.ValidationError(
                 _('The value in the parameter must contain %s') % ','.join(need_params)
             )
         return attrs

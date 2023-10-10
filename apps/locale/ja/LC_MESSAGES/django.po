@@ -81,7 +81,7 @@ msgid "Collected"
 msgstr "集めました"
 
 #: accounts/const/account.py:27 accounts/serializers/account/account.py:28
-#: settings/serializers/auth/sms.py:75
+#: settings/serializers/auth/sms.py:79
 msgid "Template"
 msgstr "テンプレート"
 
@@ -1325,7 +1325,7 @@ msgid "Script"
 msgstr "脚本"
 
 #: assets/const/category.py:10 assets/models/asset/host.py:8
-#: settings/serializers/auth/radius.py:16 settings/serializers/auth/sms.py:67
+#: settings/serializers/auth/radius.py:16 settings/serializers/auth/sms.py:71
 #: settings/serializers/feature.py:47 terminal/models/component/endpoint.py:13
 #: terminal/serializers/applet.py:17
 #: xpack/plugins/cloud/serializers/account_attrs.py:72
@@ -1616,7 +1616,7 @@ msgid "Cloud"
 msgstr "クラウド サービス"
 
 #: assets/models/asset/common.py:92 assets/models/platform.py:16
-#: settings/serializers/auth/radius.py:17 settings/serializers/auth/sms.py:68
+#: settings/serializers/auth/radius.py:17 settings/serializers/auth/sms.py:72
 #: xpack/plugins/cloud/serializers/account_attrs.py:73
 msgid "Port"
 msgstr "ポート"
@@ -1692,7 +1692,7 @@ msgid "Proxy"
 msgstr "プロキシー"
 
 #: assets/models/automations/base.py:22 ops/models/job.py:223
-#: settings/serializers/auth/sms.py:99
+#: settings/serializers/auth/sms.py:103
 msgid "Parameters"
 msgstr "パラメータ"
 
@@ -2892,7 +2892,7 @@ msgstr "メッセージ検証コードが無効"
 
 #: authentication/mfa/sms.py:12 authentication/serializers/password_mfa.py:16
 #: authentication/serializers/password_mfa.py:24
-#: settings/serializers/auth/sms.py:28 users/forms/profile.py:104
+#: settings/serializers/auth/sms.py:32 users/forms/profile.py:104
 #: users/forms/profile.py:109 users/templates/users/forgot_password.html:112
 #: users/views/profile/reset.py:98
 msgid "SMS"
@@ -3164,7 +3164,7 @@ msgstr "コードエラー"
 #: authentication/templates/authentication/_msg_reset_password_code.html:9
 #: authentication/templates/authentication/_msg_rest_password_success.html:2
 #: authentication/templates/authentication/_msg_rest_public_key_success.html:2
-#: jumpserver/conf.py:447
+#: jumpserver/conf.py:449
 #: perms/templates/perms/_msg_item_permissions_expire.html:3
 #: perms/templates/perms/_msg_permed_items_expire.html:3
 #: tickets/templates/tickets/approve_check_password.html:33
@@ -3674,6 +3674,15 @@ msgstr "SP idは6ビット"
 msgid "Failed to connect to the CMPP gateway server, err: {}"
 msgstr "接続ゲートウェイサーバエラー, 非: {}"
 
+#: common/sdk/sms/custom_file.py:41
+msgid "The custom sms file is invalid"
+msgstr "カスタムショートメッセージファイルが無効です"
+
+#: common/sdk/sms/custom_file.py:47
+#, python-format
+msgid "SMS sending failed[%s]: %s"
+msgstr "ショートメッセージの送信に失敗しました[%s]: %s"
+
 #: common/sdk/sms/endpoint.py:16
 msgid "Alibaba cloud"
 msgstr "アリ雲"
@@ -3690,11 +3699,11 @@ msgstr "華為雲"
 msgid "CMPP v2.0"
 msgstr "CMPP v2.0"
 
-#: common/sdk/sms/endpoint.py:31
+#: common/sdk/sms/endpoint.py:32
 msgid "SMS provider not support: {}"
 msgstr "SMSプロバイダーはサポートしていません: {}"
 
-#: common/sdk/sms/endpoint.py:53
+#: common/sdk/sms/endpoint.py:54
 msgid "SMS verification code signature or template invalid"
 msgstr "SMS検証コードの署名またはテンプレートが無効"
 
@@ -3765,11 +3774,15 @@ msgstr "特殊文字を含むべきではない"
 msgid "The mobile phone number format is incorrect"
 msgstr "携帯電話番号の形式が正しくありません"
 
-#: jumpserver/conf.py:446
+#: jumpserver/conf.py:444
+msgid "The verification code is: {code}"
+msgstr "認証コードは: {code}"
+
+#: jumpserver/conf.py:448
 msgid "Create account successfully"
 msgstr "アカウントを正常に作成"
 
-#: jumpserver/conf.py:448
+#: jumpserver/conf.py:450
 msgid "Your account has been created successfully"
 msgstr "アカウントが正常に作成されました"
 
@@ -4596,7 +4609,7 @@ msgid "View permission tree"
 msgstr "権限ツリーの表示"
 
 #: settings/api/dingtalk.py:31 settings/api/feishu.py:36
-#: settings/api/sms.py:153 settings/api/vault.py:40 settings/api/wecom.py:37
+#: settings/api/sms.py:160 settings/api/vault.py:40 settings/api/wecom.py:37
 msgid "Test success"
 msgstr "テストの成功"
 
@@ -4624,11 +4637,11 @@ msgstr "Ldapユーザーを取得するにはNone"
 msgid "Imported {} users successfully (Organization: {})"
 msgstr "{} 人のユーザーを正常にインポートしました (組織: {})"
 
-#: settings/api/sms.py:135
+#: settings/api/sms.py:142
 msgid "Invalid SMS platform"
 msgstr "無効なショートメッセージプラットフォーム"
 
-#: settings/api/sms.py:141
+#: settings/api/sms.py:148
 msgid "test_phone is required"
 msgstr "携帯番号をテストこのフィールドは必須です"
 
@@ -5034,54 +5047,58 @@ msgstr "SP プライベートキー"
 msgid "SP cert"
 msgstr "SP 証明書"
 
-#: settings/serializers/auth/sms.py:16
+#: settings/serializers/auth/sms.py:17
 msgid "Enable SMS"
 msgstr "SMSの有効化"
 
-#: settings/serializers/auth/sms.py:18
+#: settings/serializers/auth/sms.py:19
 msgid "SMS provider / Protocol"
 msgstr "SMSプロバイダ / プロトコル"
 
-#: settings/serializers/auth/sms.py:23 settings/serializers/auth/sms.py:45
-#: settings/serializers/auth/sms.py:53 settings/serializers/auth/sms.py:62
-#: settings/serializers/auth/sms.py:73 settings/serializers/msg.py:76
+#: settings/serializers/auth/sms.py:22
+msgid "SMS code length"
+msgstr "認証コード長"
+
+#: settings/serializers/auth/sms.py:27 settings/serializers/auth/sms.py:49
+#: settings/serializers/auth/sms.py:57 settings/serializers/auth/sms.py:66
+#: settings/serializers/auth/sms.py:77 settings/serializers/msg.py:76
 msgid "Signature"
 msgstr "署名"
 
-#: settings/serializers/auth/sms.py:24 settings/serializers/auth/sms.py:46
-#: settings/serializers/auth/sms.py:54 settings/serializers/auth/sms.py:63
+#: settings/serializers/auth/sms.py:28 settings/serializers/auth/sms.py:50
+#: settings/serializers/auth/sms.py:58 settings/serializers/auth/sms.py:67
 msgid "Template code"
 msgstr "テンプレートコード"
 
-#: settings/serializers/auth/sms.py:31
+#: settings/serializers/auth/sms.py:35
 msgid "Test phone"
 msgstr "テスト電話"
 
-#: settings/serializers/auth/sms.py:60
+#: settings/serializers/auth/sms.py:64
 msgid "App Access Address"
 msgstr "アプリケーションアドレス"
 
-#: settings/serializers/auth/sms.py:61
+#: settings/serializers/auth/sms.py:65
 msgid "Signature channel number"
 msgstr "署名チャネル番号"
 
-#: settings/serializers/auth/sms.py:69
+#: settings/serializers/auth/sms.py:73
 msgid "Enterprise code(SP id)"
 msgstr "企業コード(SP id)"
 
-#: settings/serializers/auth/sms.py:70
+#: settings/serializers/auth/sms.py:74
 msgid "Shared secret(Shared secret)"
 msgstr "パスワードを共有する(Shared secret)"
 
-#: settings/serializers/auth/sms.py:71
+#: settings/serializers/auth/sms.py:75
 msgid "Original number(Src id)"
 msgstr "元の番号(Src id)"
 
-#: settings/serializers/auth/sms.py:72
+#: settings/serializers/auth/sms.py:76
 msgid "Business type(Service id)"
 msgstr "ビジネス・タイプ(Service id)"
 
-#: settings/serializers/auth/sms.py:76
+#: settings/serializers/auth/sms.py:80
 #, python-brace-format
 msgid ""
 "Template need contain {code} and Signature + template length does not exceed "
@@ -5092,24 +5109,24 @@ msgstr ""
 "満です。たとえば、認証コードは{code}で、有効期間は5分です。他の人には言わない"
 "でください。"
 
-#: settings/serializers/auth/sms.py:85
+#: settings/serializers/auth/sms.py:89
 #, python-brace-format
 msgid "The template needs to contain {code}"
 msgstr "テンプレートには{code}を含める必要があります"
 
-#: settings/serializers/auth/sms.py:88
+#: settings/serializers/auth/sms.py:92
 msgid "Signature + Template must not exceed 65 words"
 msgstr "署名+テンプレートの長さは65文字以内"
 
-#: settings/serializers/auth/sms.py:97
+#: settings/serializers/auth/sms.py:101
 msgid "URL"
 msgstr "URL"
 
-#: settings/serializers/auth/sms.py:102
+#: settings/serializers/auth/sms.py:106
 msgid "Request method"
 msgstr "請求方法です"
 
-#: settings/serializers/auth/sms.py:111
+#: settings/serializers/auth/sms.py:117
 #, python-format
 msgid "The value in the parameter must contain %s"
 msgstr "パラメータの値には必ず %s が含まれます"

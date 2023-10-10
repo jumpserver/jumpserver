@@ -17,7 +17,8 @@ class BACKENDS(TextChoices):
     TENCENT = 'tencent', _('Tencent cloud')
     HUAWEI = 'huawei', _('Huawei Cloud')
     CMPP2 = 'cmpp2', _('CMPP v2.0')
-    Custom = 'custom', _('Custom type')
+    CUSTOM = 'custom', _('Custom type')
+    CUSTOM_FILE = 'custom_file', f"{_('Custom type')}({_('File')})"
 
 
 class SMS:
