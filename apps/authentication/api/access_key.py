@@ -1,25 +1,27 @@
 # -*- coding: utf-8 -*-
 #
 
+from django.utils.translation import gettext as _
+from rest_framework import serializers
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
 
+from common.api import JMSModelViewSet
 from common.permissions import UserConfirmation
 from rbac.permissions import RBACPermission
 from ..const import ConfirmType
 from ..serializers import AccessKeySerializer
 
 
-class AccessKeyViewSet(ModelViewSet):
+class AccessKeyViewSet(JMSModelViewSet):
     serializer_class = AccessKeySerializer
-    search_fields = ['^id', '^secret']
+    search_fields = ['^id']
     permission_classes = [RBACPermission]
 
     def get_queryset(self):
         return self.request.user.access_keys.all()
 
     def get_permissions(self):
-        if getattr(self, 'swagger_fake_view', False) or getattr(self, 'raw_action', '') == 'metadata':
+        if self.is_swagger_request():
             return super().get_permissions()
 
         if self.action == 'create':
@@ -30,6 +32,8 @@ class AccessKeyViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         user = self.request.user
+        if user.access_keys.count() >= 10:
+            raise serializers.ValidationError(_('Access keys can be created at most 10'))
         key = user.create_access_key()
         return key
 

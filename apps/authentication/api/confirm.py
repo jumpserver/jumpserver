@@ -34,7 +34,7 @@ class ConfirmApi(RetrieveAPIView, CreateAPIView):
             return backend
 
     def retrieve(self, request, *args, **kwargs):
-        confirm_type = request.query_params.get('confirm_type')
+        confirm_type = request.query_params.get('confirm_type', 'password')
         backend = self.get_confirm_backend(confirm_type)
         if backend is None:
             msg = _('This action require verify your MFA')
@@ -51,7 +51,7 @@ class ConfirmApi(RetrieveAPIView, CreateAPIView):
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
 
-        confirm_type = validated_data.get('confirm_type')
+        confirm_type = validated_data.get('confirm_type', 'password')
         mfa_type = validated_data.get('mfa_type')
         secret_key = validated_data.get('secret_key')
 
