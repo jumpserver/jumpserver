@@ -11,7 +11,7 @@ CONFIRM_BACKEND_MAP = {backend.name: backend for backend in CONFIRM_BACKENDS}
 
 
 class ConfirmType(TextChoices):
-    ReLogin = ConfirmReLogin.name, ConfirmReLogin.display_name
+    RELOGIN = ConfirmReLogin.name, ConfirmReLogin.display_name
     PASSWORD = ConfirmPassword.name, ConfirmPassword.display_name
     MFA = ConfirmMFA.name, ConfirmMFA.display_name
 
@@ -23,10 +23,11 @@ class ConfirmType(TextChoices):
         return types
 
     @classmethod
-    def get_can_confirm_backend_classes(cls, confirm_type):
+    def get_prop_backends(cls, confirm_type):
         types = cls.get_can_confirm_types(confirm_type)
         backend_classes = [
-            CONFIRM_BACKEND_MAP[tp] for tp in types if tp in CONFIRM_BACKEND_MAP
+            CONFIRM_BACKEND_MAP[tp]
+            for tp in types if tp in CONFIRM_BACKEND_MAP
         ]
         return backend_classes
 

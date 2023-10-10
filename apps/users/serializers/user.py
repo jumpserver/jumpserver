@@ -101,10 +101,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         source="can_use_ssh_key_login", label=_("Can public key authentication"),
         read_only=True
     )
-    password = EncryptedField(
-        label=_("Password"), required=False, allow_blank=True,
-        allow_null=True, max_length=1024,
-    )
+    password = EncryptedField(label=_("Password"), required=False, allow_blank=True, allow_null=True, max_length=1024, )
     phone = PhoneField(
         validators=[PhoneValidator()], required=False, allow_blank=True, allow_null=True, label=_("Phone")
     )
@@ -128,8 +125,8 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
             "created_by", "updated_by", "comment",  # 通用字段
         ]
         fields_date = [
-            "date_expired", "date_joined",
-            "last_login", "date_updated"  # 日期字段
+            "date_expired", "date_joined", "last_login",
+            "date_updated", "date_api_key_last_used",
         ]
         fields_bool = [
             "is_superuser", "is_org_admin",
@@ -155,7 +152,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         read_only_fields = [
             "date_joined", "last_login", "created_by",
             "is_first_login", "wecom_id", "dingtalk_id",
-            "feishu_id",
+            "feishu_id", "date_api_key_last_used",
         ]
         disallow_self_update_fields = ["is_active", "system_roles", "org_roles"]
         extra_kwargs = {

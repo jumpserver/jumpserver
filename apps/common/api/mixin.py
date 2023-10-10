@@ -13,7 +13,7 @@ from common.drf.filters import (
     IDSpmFilterBackend, CustomFilterBackend, IDInFilterBackend,
     IDNotFilterBackend, NotOrRelFilterBackend
 )
-from common.utils import get_logger
+from common.utils import get_logger, lazyproperty
 from .action import RenderToJsonMixin
 from .serializer import SerializerMixin
 
@@ -150,9 +150,9 @@ class OrderingFielderFieldsMixin:
     ordering_fields = None
     extra_ordering_fields = []
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.ordering_fields = self._get_ordering_fields()
+    @lazyproperty
+    def ordering_fields(self):
+        return self._get_ordering_fields()
 
     def _get_ordering_fields(self):
         if isinstance(self.__class__.ordering_fields, (list, tuple)):
@@ -179,7 +179,10 @@ class OrderingFielderFieldsMixin:
             model = self.queryset.model
         else:
             queryset = self.get_queryset()
-            model = queryset.model
+            if isinstance(queryset, list):
+                model = None
+            else:
+                model = queryset.model
 
         if not model:
             return []
@@ -201,4 +204,6 @@ class CommonApiMixin(
     SerializerMixin, ExtraFilterFieldsMixin, OrderingFielderFieldsMixin,
     QuerySetMixin, RenderToJsonMixin, PaginatedResponseMixin
 ):
-    pass
+    def is_swagger_request(self):
+        return getattr(self, 'swagger_fake_view', False) or \
+            getattr(self, 'raw_action', '') == 'metadata'

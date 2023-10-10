@@ -834,11 +834,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
     )
     created_by = models.CharField(max_length=30, default='', blank=True, verbose_name=_('Created by'))
     updated_by = models.CharField(max_length=30, default='', blank=True, verbose_name=_('Updated by'))
-    source = models.CharField(
-        max_length=30, default=Source.local,
-        choices=Source.choices,
-        verbose_name=_('Source')
-    )
+    source = models.CharField(max_length=30, default=Source.local, choices=Source.choices, verbose_name=_('Source'))
     date_password_last_updated = models.DateTimeField(
         auto_now_add=True, blank=True, null=True,
         verbose_name=_('Date password last updated')
@@ -846,6 +842,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
     need_update_password = models.BooleanField(
         default=False, verbose_name=_('Need update password')
     )
+    date_api_key_last_used = models.DateTimeField(null=True, blank=True, verbose_name=_('Date api key used'))
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_('Date updated'))
     wecom_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('WeCom'))
     dingtalk_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('DingTalk'))

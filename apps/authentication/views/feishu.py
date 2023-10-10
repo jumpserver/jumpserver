@@ -69,7 +69,7 @@ class FeiShuQRMixin(UserConfirmRequiredExceptionMixin, PermissionsMixin, FlashMe
 
 
 class FeiShuQRBindView(FeiShuQRMixin, View):
-    permission_classes = (IsAuthenticated, UserConfirmation.require(ConfirmType.ReLogin))
+    permission_classes = (IsAuthenticated, UserConfirmation.require(ConfirmType.RELOGIN))
 
     def get(self, request: HttpRequest):
         redirect_url = request.GET.get('redirect_url')

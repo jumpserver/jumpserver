@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-10 16:19+0800\n"
+"POT-Creation-Date: 2023-10-10 11:13+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,10 +25,11 @@ msgstr "パラメータ 'action' は [{}] でなければなりません。"
 #: accounts/const/account.py:6
 #: accounts/serializers/automations/change_secret.py:32
 #: assets/models/_user.py:24 audits/signal_handlers/login_log.py:37
-#: authentication/confirm/password.py:9 authentication/forms.py:32
+#: authentication/confirm/password.py:9 authentication/confirm/password.py:24
+#: authentication/confirm/password.py:26 authentication/forms.py:32
 #: authentication/templates/authentication/login.html:324
 #: settings/serializers/auth/ldap.py:25 settings/serializers/auth/ldap.py:47
-#: users/forms/profile.py:22 users/serializers/user.py:105
+#: users/forms/profile.py:22 users/serializers/user.py:104
 #: users/templates/users/_msg_user_created.html:13
 #: users/templates/users/user_password_verify.html:18
 #: xpack/plugins/cloud/serializers/account_attrs.py:28
@@ -40,7 +41,7 @@ msgstr "パスワード"
 msgid "SSH key"
 msgstr "SSH キー"
 
-#: accounts/const/account.py:8 authentication/models/access_key.py:33
+#: accounts/const/account.py:8 authentication/models/access_key.py:37
 msgid "Access key"
 msgstr "アクセスキー"
 
@@ -251,7 +252,7 @@ msgid "Version"
 msgstr "バージョン"
 
 #: accounts/models/account.py:56 accounts/serializers/account/account.py:211
-#: users/models/user.py:840
+#: users/models/user.py:837
 msgid "Source"
 msgstr "ソース"
 
@@ -552,7 +553,7 @@ msgstr "特権アカウント"
 #: assets/models/label.py:22
 #: authentication/serializers/connect_token_secret.py:114
 #: terminal/models/applet/applet.py:40
-#: terminal/models/component/endpoint.py:105 users/serializers/user.py:170
+#: terminal/models/component/endpoint.py:105 users/serializers/user.py:167
 msgid "Is active"
 msgstr "アクティブです。"
 
@@ -751,8 +752,8 @@ msgstr "ID"
 #: terminal/notifications.py:205 terminal/serializers/command.py:16
 #: terminal/templates/terminal/_msg_command_warning.html:6
 #: terminal/templates/terminal/_msg_session_sharing.html:6
-#: tickets/models/comment.py:21 users/const.py:14 users/models/user.py:990
-#: users/models/user.py:1026 users/serializers/group.py:18
+#: tickets/models/comment.py:21 users/const.py:14 users/models/user.py:987
+#: users/models/user.py:1023 users/serializers/group.py:18
 msgid "User"
 msgstr "ユーザー"
 
@@ -1006,7 +1007,7 @@ msgstr "1-100、低い値は最初に一致します"
 msgid "Reviewers"
 msgstr "レビュー担当者"
 
-#: acls/models/base.py:43 authentication/models/access_key.py:17
+#: acls/models/base.py:43 authentication/models/access_key.py:20
 #: authentication/models/connection_token.py:53
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/asset_permission.py:76 terminal/models/session/sharing.py:29
@@ -1527,12 +1528,12 @@ msgstr "SSHパブリックキー"
 #: assets/models/_user.py:28 assets/models/automations/base.py:114
 #: assets/models/cmd_filter.py:41 assets/models/group.py:19
 #: audits/models.py:261 common/db/models.py:34 ops/models/base.py:54
-#: ops/models/job.py:227 users/models/user.py:1027
+#: ops/models/job.py:227 users/models/user.py:1024
 msgid "Date created"
 msgstr "作成された日付"
 
 #: assets/models/_user.py:29 assets/models/cmd_filter.py:42
-#: common/db/models.py:35 users/models/user.py:849
+#: common/db/models.py:35 users/models/user.py:846
 msgid "Date updated"
 msgstr "更新日"
 
@@ -1782,7 +1783,7 @@ msgstr "デフォルト"
 msgid "Default asset group"
 msgstr "デフォルトアセットグループ"
 
-#: assets/models/label.py:15 rbac/const.py:6 users/models/user.py:1012
+#: assets/models/label.py:15 rbac/const.py:6 users/models/user.py:1009
 msgid "System"
 msgstr "システム"
 
@@ -2493,7 +2494,7 @@ msgstr "認証トークン"
 #: audits/signal_handlers/login_log.py:40 authentication/notifications.py:73
 #: authentication/views/login.py:77 authentication/views/wecom.py:159
 #: notifications/backends/__init__.py:11 settings/serializers/auth/wecom.py:10
-#: users/models/user.py:745 users/models/user.py:850
+#: users/models/user.py:745 users/models/user.py:847
 msgid "WeCom"
 msgstr "企業微信"
 
@@ -2501,14 +2502,14 @@ msgstr "企業微信"
 #: authentication/views/login.py:89 notifications/backends/__init__.py:14
 #: settings/serializers/auth/feishu.py:10
 #: settings/serializers/auth/feishu.py:13 users/models/user.py:747
-#: users/models/user.py:852
+#: users/models/user.py:849
 msgid "FeiShu"
 msgstr "本を飛ばす"
 
 #: audits/signal_handlers/login_log.py:42 authentication/views/dingtalk.py:159
 #: authentication/views/login.py:83 notifications/backends/__init__.py:12
 #: settings/serializers/auth/dingtalk.py:10 users/models/user.py:746
-#: users/models/user.py:851
+#: users/models/user.py:848
 msgid "DingTalk"
 msgstr "DingTalk"
 
@@ -2599,56 +2600,21 @@ msgstr "認証"
 msgid "User invalid, disabled or expired"
 msgstr "ユーザーが無効、無効、または期限切れです"
 
-#: authentication/backends/drf.py:54
-msgid "Invalid signature header. No credentials provided."
-msgstr "署名ヘッダーが無効です。資格情報は提供されていません。"
-
-#: authentication/backends/drf.py:57
-msgid "Invalid signature header. Signature string should not contain spaces."
-msgstr "署名ヘッダーが無効です。署名文字列にはスペースを含まないでください。"
-
-#: authentication/backends/drf.py:64
-msgid "Invalid signature header. Format like AccessKeyId:Signature"
-msgstr "署名ヘッダーが無効です。AccessKeyIdのような形式: Signature"
-
-#: authentication/backends/drf.py:68
-msgid ""
-"Invalid signature header. Signature string should not contain invalid "
-"characters."
-msgstr ""
-"署名ヘッダーが無効です。署名文字列に無効な文字を含めることはできません。"
-
-#: authentication/backends/drf.py:88 authentication/backends/drf.py:104
-msgid "Invalid signature."
-msgstr "署名が無効です。"
-
-#: authentication/backends/drf.py:95
-msgid "HTTP header: Date not provide or not %a, %d %b %Y %H:%M:%S GMT"
-msgstr "HTTP header: Date not provide or not"
-
-#: authentication/backends/drf.py:100
-msgid "Expired, more than 15 minutes"
-msgstr "期限切れ、15分以上"
-
-#: authentication/backends/drf.py:107
-msgid "User disabled."
-msgstr "ユーザーが無効になりました。"
-
-#: authentication/backends/drf.py:125
+#: authentication/backends/drf.py:39
 msgid "Invalid token header. No credentials provided."
 msgstr "無効なトークンヘッダー。資格情報は提供されていません。"
 
-#: authentication/backends/drf.py:128
+#: authentication/backends/drf.py:42
 msgid "Invalid token header. Sign string should not contain spaces."
 msgstr "無効なトークンヘッダー。記号文字列にはスペースを含めないでください。"
 
-#: authentication/backends/drf.py:135
+#: authentication/backends/drf.py:48
 msgid ""
 "Invalid token header. Sign string should not contain invalid characters."
 msgstr ""
 "無効なトークンヘッダー。署名文字列に無効な文字を含めることはできません。"
 
-#: authentication/backends/drf.py:146
+#: authentication/backends/drf.py:61
 msgid "Invalid token or cache refreshed."
 msgstr "無効なトークンまたはキャッシュの更新。"
 
@@ -2665,6 +2631,8 @@ msgid "Added on"
 msgstr "に追加"
 
 #: authentication/backends/passkey/models.py:14
+#: authentication/models/access_key.py:21
+#: authentication/models/private_token.py:8
 msgid "Date last used"
 msgstr "最後に使用した日付"
 
@@ -3041,7 +3009,7 @@ msgstr "スーパー接続トークンのシークレットを表示できます
 msgid "Super connection token"
 msgstr "スーパー接続トークン"
 
-#: authentication/models/private_token.py:9
+#: authentication/models/private_token.py:11
 msgid "Private Token"
 msgstr "プライベートトークン"
 
@@ -3099,7 +3067,7 @@ msgstr "アクション"
 
 #: authentication/serializers/connection_token.py:42
 #: perms/serializers/permission.py:38 perms/serializers/permission.py:57
-#: users/serializers/user.py:97 users/serializers/user.py:174
+#: users/serializers/user.py:97 users/serializers/user.py:171
 msgid "Is expired"
 msgstr "期限切れです"
 
@@ -3118,9 +3086,9 @@ msgstr "メール"
 msgid "The {} cannot be empty"
 msgstr "{} 空にしてはならない"
 
-#: authentication/serializers/token.py:79 perms/serializers/permission.py:37
+#: authentication/serializers/token.py:80 perms/serializers/permission.py:37
 #: perms/serializers/permission.py:58 users/serializers/user.py:98
-#: users/serializers/user.py:171
+#: users/serializers/user.py:168
 msgid "Is valid"
 msgstr "有効です"
 
@@ -6277,7 +6245,7 @@ msgstr "一括作成非サポート"
 msgid "Storage is invalid"
 msgstr "ストレージが無効です"
 
-#: terminal/models/applet/applet.py:30 xpack/plugins/license/models.py:86
+#: terminal/models/applet/applet.py:30 xpack/plugins/license/models.py:88
 msgid "Community edition"
 msgstr "コミュニティ版"
 
@@ -7411,7 +7379,7 @@ msgstr "ユーザー設定"
 msgid "Force enable"
 msgstr "強制有効"
 
-#: users/models/user.py:804 users/serializers/user.py:172
+#: users/models/user.py:804 users/serializers/user.py:169
 msgid "Is service account"
 msgstr "サービスアカウントです"
 
@@ -7423,7 +7391,7 @@ msgstr "アバター"
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user.py:812 users/serializers/user.py:109
+#: users/models/user.py:812 users/serializers/user.py:106
 msgid "Phone"
 msgstr "電話"
 
@@ -7437,43 +7405,47 @@ msgid "Private key"
 msgstr "ssh秘密鍵"
 
 #: users/models/user.py:830 users/serializers/profile.py:125
-#: users/serializers/user.py:169
+#: users/serializers/user.py:166
 msgid "Is first login"
 msgstr "最初のログインです"
 
-#: users/models/user.py:844
+#: users/models/user.py:840
 msgid "Date password last updated"
 msgstr "最終更新日パスワード"
 
-#: users/models/user.py:847
+#: users/models/user.py:843
 msgid "Need update password"
 msgstr "更新パスワードが必要"
 
-#: users/models/user.py:971
+#: users/models/user.py:845
+msgid "Date api key used"
+msgstr "Api key 最後に使用した日付"
+
+#: users/models/user.py:968
 msgid "Can not delete admin user"
 msgstr "管理者ユーザーを削除できませんでした"
 
-#: users/models/user.py:997
+#: users/models/user.py:994
 msgid "Can invite user"
 msgstr "ユーザーを招待できます"
 
-#: users/models/user.py:998
+#: users/models/user.py:995
 msgid "Can remove user"
 msgstr "ユーザーを削除できます"
 
-#: users/models/user.py:999
+#: users/models/user.py:996
 msgid "Can match user"
 msgstr "ユーザーに一致できます"
 
-#: users/models/user.py:1008
+#: users/models/user.py:1005
 msgid "Administrator"
 msgstr "管理者"
 
-#: users/models/user.py:1011
+#: users/models/user.py:1008
 msgid "Administrator is the super user of system"
 msgstr "管理者はシステムのスーパーユーザーです"
 
-#: users/models/user.py:1036
+#: users/models/user.py:1033
 msgid "User password history"
 msgstr "ユーザーパスワード履歴"
 
@@ -7511,6 +7483,12 @@ msgstr "MFAのリセット"
 #: users/serializers/preference/koko.py:10
 msgid "File name conflict resolution"
 msgstr "ファイル名競合ソリューション"
+
+#: users/serializers/preference/koko.py:14
+#, fuzzy
+#| msgid "Terminal setting"
+msgid "Terminal theme name"
+msgstr "ターミナル設定"
 
 #: users/serializers/preference/lina.py:13
 msgid "New file encryption password"
@@ -7600,7 +7578,7 @@ msgstr "MFAフォース有効化"
 msgid "Login blocked"
 msgstr "ログインがロックされました"
 
-#: users/serializers/user.py:99 users/serializers/user.py:178
+#: users/serializers/user.py:99 users/serializers/user.py:175
 msgid "Is OTP bound"
 msgstr "仮想MFAがバインドされているか"
 
@@ -7608,27 +7586,27 @@ msgstr "仮想MFAがバインドされているか"
 msgid "Can public key authentication"
 msgstr "公開鍵認証が可能"
 
-#: users/serializers/user.py:173
+#: users/serializers/user.py:170
 msgid "Is org admin"
 msgstr "組織管理者です"
 
-#: users/serializers/user.py:175
+#: users/serializers/user.py:172
 msgid "Avatar url"
 msgstr "アバターURL"
 
-#: users/serializers/user.py:179
+#: users/serializers/user.py:176
 msgid "MFA level"
 msgstr "MFA レベル"
 
-#: users/serializers/user.py:285
+#: users/serializers/user.py:282
 msgid "Select users"
 msgstr "ユーザーの選択"
 
-#: users/serializers/user.py:286
+#: users/serializers/user.py:283
 msgid "For security, only list several users"
 msgstr "セキュリティのために、複数のユーザーのみをリストします"
 
-#: users/serializers/user.py:319
+#: users/serializers/user.py:316
 msgid "name not unique"
 msgstr "名前が一意ではない"
 
@@ -8553,7 +8531,7 @@ msgstr "ライセンスのインポートに成功"
 msgid "License is invalid"
 msgstr "ライセンスが無効です"
 
-#: xpack/plugins/license/meta.py:10 xpack/plugins/license/models.py:138
+#: xpack/plugins/license/meta.py:10 xpack/plugins/license/models.py:140
 msgid "License"
 msgstr "ライセンス"
 
@@ -8572,6 +8550,35 @@ msgstr "エンタープライズプロフェッショナル版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "エンタープライズ・フラッグシップ・エディション"
+
+#~ msgid "Invalid signature header. No credentials provided."
+#~ msgstr "署名ヘッダーが無効です。資格情報は提供されていません。"
+
+#~ msgid ""
+#~ "Invalid signature header. Signature string should not contain spaces."
+#~ msgstr ""
+#~ "署名ヘッダーが無効です。署名文字列にはスペースを含まないでください。"
+
+#~ msgid "Invalid signature header. Format like AccessKeyId:Signature"
+#~ msgstr "署名ヘッダーが無効です。AccessKeyIdのような形式: Signature"
+
+#~ msgid ""
+#~ "Invalid signature header. Signature string should not contain invalid "
+#~ "characters."
+#~ msgstr ""
+#~ "署名ヘッダーが無効です。署名文字列に無効な文字を含めることはできません。"
+
+#~ msgid "Invalid signature."
+#~ msgstr "署名が無効です。"
+
+#~ msgid "HTTP header: Date not provide or not %a, %d %b %Y %H:%M:%S GMT"
+#~ msgstr "HTTP header: Date not provide or not"
+
+#~ msgid "Expired, more than 15 minutes"
+#~ msgstr "期限切れ、15分以上"
+
+#~ msgid "User disabled."
+#~ msgstr "ユーザーが無効になりました。"
 
 #~ msgid "Random"
 #~ msgstr "ランダム"
