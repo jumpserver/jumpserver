@@ -27,7 +27,7 @@ class WeComQRUnBindBase(APIView):
 
 
 class WeComQRUnBindForUserApi(RoleUserMixin, WeComQRUnBindBase):
-    permission_classes = (IsValidUser, UserConfirmation.require(ConfirmType.ReLogin),)
+    permission_classes = (IsValidUser, UserConfirmation.require(ConfirmType.RELOGIN),)
 
 
 class WeComQRUnBindForAdminApi(RoleAdminMixin, WeComQRUnBindBase):

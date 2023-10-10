@@ -27,7 +27,7 @@ class FeiShuQRUnBindBase(APIView):
 
 
 class FeiShuQRUnBindForUserApi(RoleUserMixin, FeiShuQRUnBindBase):
-    permission_classes = (IsValidUser, UserConfirmation.require(ConfirmType.ReLogin),)
+    permission_classes = (IsValidUser, UserConfirmation.require(ConfirmType.RELOGIN),)
 
 
 class FeiShuQRUnBindForAdminApi(RoleAdminMixin, FeiShuQRUnBindBase):

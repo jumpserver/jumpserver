@@ -13,7 +13,7 @@ from ..serializers import ConfirmSerializer
 
 
 class ConfirmBindORUNBindOAuth(RetrieveAPIView):
-    permission_classes = (IsValidUser, UserConfirmation.require(ConfirmType.ReLogin),)
+    permission_classes = (IsValidUser, UserConfirmation.require(ConfirmType.RELOGIN),)
 
     def retrieve(self, request, *args, **kwargs):
         return Response('ok')
@@ -24,7 +24,7 @@ class ConfirmApi(RetrieveAPIView, CreateAPIView):
     serializer_class = ConfirmSerializer
 
     def get_confirm_backend(self, confirm_type):
-        backend_classes = ConfirmType.get_can_confirm_backend_classes(confirm_type)
+        backend_classes = ConfirmType.get_prop_backends(confirm_type)
         if not backend_classes:
             return
         for backend_cls in backend_classes:
@@ -34,7 +34,7 @@ class ConfirmApi(RetrieveAPIView, CreateAPIView):
             return backend
 
     def retrieve(self, request, *args, **kwargs):
-        confirm_type = request.query_params.get('confirm_type')
+        confirm_type = request.query_params.get('confirm_type', 'password')
         backend = self.get_confirm_backend(confirm_type)
         if backend is None:
             msg = _('This action require verify your MFA')
@@ -51,7 +51,7 @@ class ConfirmApi(RetrieveAPIView, CreateAPIView):
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
 
-        confirm_type = validated_data.get('confirm_type')
+        confirm_type = validated_data.get('confirm_type', 'password')
         mfa_type = validated_data.get('mfa_type')
         secret_key = validated_data.get('secret_key')
 
