@@ -100,3 +100,4 @@ class SessionErrorReason(TextChoices):
     connect_failed = 'connect_failed', _('Connect Failed')
     replay_create_failed = 'replay_create_failed', _('Replay Create Failed')
     replay_upload_failed = 'replay_upload_failed', _('Replay Upload Failed')
+    replay_convert_failed = 'replay_convert_failed', _('Replay Convert Failed')
