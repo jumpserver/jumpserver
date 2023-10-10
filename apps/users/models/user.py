@@ -805,11 +805,11 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
     avatar = models.ImageField(
         upload_to="avatar", null=True, verbose_name=_('Avatar')
     )
-    wechat = models.CharField(
+    wechat = fields.EncryptCharField(
         max_length=128, blank=True, verbose_name=_('Wechat')
     )
-    phone = models.CharField(
-        max_length=20, blank=True, null=True, verbose_name=_('Phone')
+    phone = fields.EncryptCharField(
+        max_length=128, blank=True, null=True, verbose_name=_('Phone')
     )
     mfa_level = models.SmallIntegerField(
         default=0, choices=MFAMixin.MFA_LEVEL_CHOICES, verbose_name=_('MFA')
