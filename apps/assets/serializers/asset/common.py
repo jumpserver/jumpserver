@@ -159,7 +159,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
             return
         if isinstance(self.initial_data, list):
             return
-        accounts = self.initial_data.pop('accounts', None)
+        accounts = self.initial_data.get('accounts', None)
         self._accounts = accounts
 
     def _get_protocols_required_default(self):

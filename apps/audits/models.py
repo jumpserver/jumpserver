@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.utils.translation import gettext, gettext_lazy as _
 
 from common.db.encoder import ModelJSONFieldEncoder
-from common.utils import lazyproperty
+from common.utils import lazyproperty, i18n_trans
 from ops.models import JobExecution
 from orgs.mixins.models import OrgModelMixin, Organization
 from orgs.utils import current_org
@@ -154,6 +154,10 @@ class ActivityLog(OrgModelMixin):
     class Meta:
         verbose_name = _("Activity log")
         ordering = ('-datetime',)
+
+    def __str__(self):
+        detail = i18n_trans(self.detail)
+        return "{} {}".format(detail, self.resource_id)
 
     def save(self, *args, **kwargs):
         if current_org.is_root() and not self.org_id:
