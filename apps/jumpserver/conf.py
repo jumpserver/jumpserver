@@ -243,13 +243,14 @@ class Config(dict):
         'CONNECTION_TOKEN_EXPIRATION_MAX': 60 * 60 * 24 * 30,  # 最大(old)
         'CONNECTION_TOKEN_REUSABLE': False,
 
-        # Custom Config
+        # Custom Config -> Auth
         'AUTH_CUSTOM': False,
         'AUTH_CUSTOM_FILE_MD5': '',
 
-        # Custom Config
         'MFA_CUSTOM': False,
         'MFA_CUSTOM_FILE_MD5': '',
+
+        'SMS_CUSTOM_FILE_MD5': '',
 
         # 临时密码
         'AUTH_TEMP_TOKEN': False,
@@ -409,6 +410,7 @@ class Config(dict):
 
         'SMS_ENABLED': False,
         'SMS_BACKEND': '',
+        'SMS_CODE_LENGTH': 4,
         'SMS_TEST_PHONE': '',
 
         'ALIBABA_ACCESS_KEY_ID': '',
@@ -439,7 +441,7 @@ class Config(dict):
         'CMPP2_VERIFY_TEMPLATE_CODE': '{code}',
 
         'CUSTOM_SMS_URL': '',
-        'CUSTOM_SMS_API_PARAMS': {'phone_numbers': '{phone_numbers}', 'code': '{code}'},
+        'CUSTOM_SMS_API_PARAMS': {'phone_numbers': '{phone_numbers}', 'content': _('The verification code is: {code}')},
         'CUSTOM_SMS_REQUEST_METHOD': 'get',
 
         # Email

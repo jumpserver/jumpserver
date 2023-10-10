@@ -30,7 +30,7 @@ class CustomSMS(BaseSMSClient):
                 code=template_param.get('code'), phone_numbers=phone_numbers_str
             )
 
-        logger.info(f'Custom sms send: phone_numbers={phone_numbers}param={params}')
+        logger.info(f'Custom sms send: phone_numbers={phone_numbers}, param={params}')
         if settings.CUSTOM_SMS_REQUEST_METHOD == 'post':
             action = requests.post
             kwargs = {'json': params}
