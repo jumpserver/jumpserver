@@ -243,7 +243,7 @@ class Config(dict):
         'CONNECTION_TOKEN_EXPIRATION_MAX': 60 * 60 * 24 * 30,  # 最大(old)
         'CONNECTION_TOKEN_REUSABLE': False,
 
-        # Custom Config -> Auth
+        # Custom Config
         'AUTH_CUSTOM': False,
         'AUTH_CUSTOM_FILE_MD5': '',
 
