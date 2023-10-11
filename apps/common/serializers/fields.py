@@ -218,12 +218,13 @@ class PhoneField(serializers.CharField):
             code = data.get('code')
             phone = data.get('phone', '')
             if code and phone:
-                data = '{}{}'.format(code, phone)
+                code = code.replace('+', '')
+                data = '+{}{}'.format(code, phone)
             else:
                 data = phone
         try:
             phone = phonenumbers.parse(data, 'CN')
-            data = '{}{}'.format(phone.country_code, phone.national_number)
+            data = '+{}{}'.format(phone.country_code, phone.national_number)
         except phonenumbers.NumberParseException:
             data = '+86{}'.format(data)
 
