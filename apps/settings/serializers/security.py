@@ -128,7 +128,7 @@ class SecurityAuthSerializer(serializers.Serializer):
         required=False, max_length=16, label=_('OTP issuer name'),
     )
     OTP_VALID_WINDOW = serializers.IntegerField(
-        min_value=1, max_value=10,
+        min_value=0, max_value=10,
         label=_("OTP valid window")
     )
     SECURITY_MFA_VERIFY_TTL = serializers.IntegerField(
