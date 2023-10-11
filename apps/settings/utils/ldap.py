@@ -350,12 +350,12 @@ class LDAPSyncUtil(object):
         try:
             self.pre_sync()
             self.sync()
-            self.post_sync()
         except Exception as e:
             error_msg = str(e)
             logger.error(error_msg)
             self.set_task_error_msg(error_msg)
         finally:
+            self.post_sync()
             logger.info('End perform sync ldap users from server to cache')
             close_old_connections()
 
