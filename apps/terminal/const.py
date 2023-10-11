@@ -86,18 +86,18 @@ class SessionType(TextChoices):
 
 
 class ActionPermission(TextChoices):
-    readonly = "readonly", _('Read Only')
+    readonly = "readonly", _('Read only')
     writable = "writable", _('Writable')
 
 
 class TaskNameType(TextChoices):
-    kill_session = "kill_session", _('Kill Session')
-    lock_session = "lock_session", _('Lock Session')
-    unlock_session = "unlock_session", _('Unlock Session')
+    kill_session = "kill_session", _('Kill session')
+    lock_session = "lock_session", _('Lock session')
+    unlock_session = "unlock_session", _('Unlock session')
 
 
 class SessionErrorReason(TextChoices):
-    connect_failed = 'connect_failed', _('Connect Failed')
-    replay_create_failed = 'replay_create_failed', _('Replay Create Failed')
-    replay_upload_failed = 'replay_upload_failed', _('Replay Upload Failed')
-    replay_convert_failed = 'replay_convert_failed', _('Replay Convert Failed')
+    connect_failed = 'connect_failed', _('Connect failed')
+    replay_create_failed = 'replay_create_failed', _('Replay create failed')
+    replay_upload_failed = 'replay_upload_failed', _('Replay upload failed')
+    replay_convert_failed = 'replay_convert_failed', _('Replay convert failed')
