@@ -22,6 +22,8 @@ class PasskeyViewSet(AuthMixin, FlashMessageMixin, ModelViewSet):
 
     @action(methods=['get', 'post'], detail=False, url_path='register')
     def register(self, request):
+        if request.user.source != 'local':
+            return JsonResponse({'error': _('Only register passkey for local user')}, status=400)
         if request.method == 'GET':
             register_data, state = register_begin(request)
             return JsonResponse(dict(register_data))
