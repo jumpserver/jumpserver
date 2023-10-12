@@ -41,9 +41,10 @@ class UserLoginReminderMsg(UserMessage):
 class AssetLoginReminderMsg(UserMessage):
     subject = _('Asset login reminder')
 
-    def __init__(self, user, asset: Asset, login_user: User):
+    def __init__(self, user, asset: Asset, login_user: User, account_username):
         self.asset = asset
         self.login_user = login_user
+        self.account_username = account_username
         super().__init__(user)
 
     def get_html_msg(self) -> dict:
@@ -51,6 +52,7 @@ class AssetLoginReminderMsg(UserMessage):
             'recipient': self.user.username,
             'username': self.login_user.username,
             'asset': str(self.asset),
+            'account': self.account_username,
         }
         message = render_to_string('acls/asset_login_reminder.html', context)
 

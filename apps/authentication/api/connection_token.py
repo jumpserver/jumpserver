@@ -419,9 +419,10 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
             reviewers = acl.reviewers.all()
             if not reviewers:
                 return
+            account_username = account.username
             self._record_operate_log(acl, asset)
             for reviewer in reviewers:
-                AssetLoginReminderMsg(reviewer, asset, user).publish_async()
+                AssetLoginReminderMsg(reviewer, asset, user, account_username).publish_async()
 
 
 class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
