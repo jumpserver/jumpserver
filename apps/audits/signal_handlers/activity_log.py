@@ -94,6 +94,8 @@ def after_task_publish_for_activity_log(headers=None, body=None, **kwargs):
         logger.error(f'Get celery task info error: {e}', exc_info=True)
     else:
         logger.debug(f'Create activity log for celery task: {task_id}')
+        if not resource_ids:
+            return
         create_activities(resource_ids, detail, task_id, action=ActivityChoices.task, org_id=org_id)
 
 
