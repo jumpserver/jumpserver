@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='operatelog',
             name='action',
-            field=models.CharField(choices=[('view', 'View'), ('update', 'Update'), ('delete', 'Delete'), ('create', 'Create'), ('download', 'Download'), ('connect', 'Connect'), ('login', 'Login'), ('change_password', 'Change password'), ('reject', 'Reject'), ('accept', 'Accept'), ('review', 'Review')], max_length=16, verbose_name='Action'),
+            field=models.CharField(choices=[('view', 'View'), ('update', 'Update'), ('delete', 'Delete'), ('create', 'Create'), ('download', 'Download'), ('connect', 'Connect'), ('login', 'Login'), ('change_password', 'Change password'), ('reject', 'Reject'), ('accept', 'Accept'), ('review', 'Review'), ('notice', 'Notifications')], max_length=16, verbose_name='Action'),
         ),
         migrations.AlterField(
             model_name='userloginlog',
