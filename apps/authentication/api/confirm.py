@@ -7,7 +7,8 @@ from rest_framework import status
 from rest_framework.generics import RetrieveAPIView, CreateAPIView
 from rest_framework.response import Response
 
-from common.permissions import IsValidUser, UserConfirmation
+from authentication.permissions import UserConfirmation
+from common.permissions import IsValidUser
 from ..const import ConfirmType
 from ..serializers import ConfirmSerializer
 

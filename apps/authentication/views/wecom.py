@@ -13,7 +13,7 @@ from authentication import errors
 from authentication.const import ConfirmType
 from authentication.mixins import AuthMixin
 from authentication.notifications import OAuthBindMessage
-from common.permissions import UserConfirmation
+from authentication.permissions import UserConfirmation
 from common.sdk.im.wecom import URL
 from common.sdk.im.wecom import WeCom
 from common.utils import get_logger

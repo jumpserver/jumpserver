@@ -5,8 +5,8 @@ from django.utils.translation import gettext as _
 from rest_framework import serializers
 from rest_framework.response import Response
 
+from authentication.permissions import UserConfirmation
 from common.api import JMSModelViewSet
-from common.permissions import UserConfirmation
 from rbac.permissions import RBACPermission
 from ..const import ConfirmType
 from ..serializers import AccessKeySerializer
