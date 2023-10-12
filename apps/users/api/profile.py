@@ -5,7 +5,7 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
 from authentication.models import ConnectionToken
-from common.permissions import IsValidUserOrConnectionToken
+from authentication.permissions import IsValidUserOrConnectionToken
 from common.utils import get_object_or_none
 from orgs.utils import tmp_to_root_org
 from users.notifications import (

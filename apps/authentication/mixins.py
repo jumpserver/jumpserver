@@ -111,7 +111,7 @@ class CommonMixin:
 
     def get_request_ip(self):
         if not self._ip:
-            self._ip = get_request_ip(self.request)
+            self._ip = get_request_ip_or_data(self.request)
         return self._ip
 
     def raise_credential_error(self, error):

@@ -2,7 +2,7 @@ from django.conf import settings
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 
-from common.permissions import IsValidUserOrConnectionToken
+from authentication.permissions import IsValidUserOrConnectionToken
 from common.utils import get_logger, lazyproperty
 from common.utils.timezone import local_now
 from jumpserver.utils import has_valid_xpack_license, get_xpack_license_info

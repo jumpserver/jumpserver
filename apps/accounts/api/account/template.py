@@ -8,8 +8,8 @@ from accounts.mixins import AccountRecordViewLogMixin
 from accounts.models import AccountTemplate
 from accounts.tasks import template_sync_related_accounts
 from assets.const import Protocol
+from authentication.permissions import UserConfirmation, ConfirmType
 from common.drf.filters import BaseFilterSet
-from common.permissions import UserConfirmation, ConfirmType
 from orgs.mixins.api import OrgBulkModelViewSet
 from rbac.permissions import RBACPermission
 

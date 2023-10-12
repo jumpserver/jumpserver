@@ -4,8 +4,9 @@ from rest_framework.views import APIView
 
 from authentication import errors
 from authentication.const import ConfirmType
+from authentication.permissions import UserConfirmation
 from common.api import RoleUserMixin, RoleAdminMixin
-from common.permissions import UserConfirmation, IsValidUser
+from common.permissions import IsValidUser
 from common.utils import get_logger
 from users.models import User
 
