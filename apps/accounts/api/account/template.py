@@ -46,7 +46,7 @@ class AccountTemplateViewSet(OrgBulkModelViewSet):
     }
     rbac_perms = {
         'su_from_account_templates': 'accounts.view_accounttemplate',
-        'sync_related_accounts': 'accounts.change_accounttemplate',
+        'sync_related_accounts': 'accounts.change_account',
     }
 
     @action(methods=['get'], detail=False, url_path='su-from-account-templates')
