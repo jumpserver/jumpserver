@@ -17,6 +17,8 @@ import psutil
 from django.conf import settings
 from django.templatetags.static import static
 
+from common.permissions import ServiceAccountSignaturePermission
+
 UUID_PATTERN = re.compile(r'\w{8}(-\w{4}){3}-\w{12}')
 ipip_db = None
 
@@ -153,19 +155,26 @@ def is_uuid(seq):
 
 
 def get_request_ip(request):
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')
+    x_real_ip = request.META.get('HTTP_X_REAL_IP', '')
+    if x_real_ip:
+        return x_real_ip
 
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')
     if x_forwarded_for and x_forwarded_for[0]:
         login_ip = x_forwarded_for[0]
-    else:
-        login_ip = request.META.get('REMOTE_ADDR', '')
+        return login_ip
+
+    login_ip = request.META.get('REMOTE_ADDR', '')
     return login_ip
 
 
 def get_request_ip_or_data(request):
     ip = ''
-    if hasattr(request, 'data'):
-        ip = request.data.get('remote_addr', '')
+
+    if hasattr(request, 'data') and request.data.get('remote_addr', ''):
+        permission = ServiceAccountSignaturePermission()
+        if permission.has_permission(request, None):
+            ip = request.data.get('remote_addr', '')
     ip = ip or get_request_ip(request)
     return ip
 

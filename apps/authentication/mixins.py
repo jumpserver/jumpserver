@@ -19,7 +19,7 @@ from django.utils.translation import gettext as _
 from rest_framework.request import Request
 
 from acls.models import LoginACL
-from common.utils import get_request_ip, get_logger, bulk_get, FlashMessageUtil
+from common.utils import get_request_ip_or_data, get_logger, bulk_get, FlashMessageUtil
 from users.models import User
 from users.utils import LoginBlockUtil, MFABlockUtils, LoginIpBlockUtil
 from . import errors
@@ -107,13 +107,12 @@ auth.authenticate = authenticate
 
 class CommonMixin:
     request: Request
+    _ip = ''
 
     def get_request_ip(self):
-        ip = ''
-        if hasattr(self.request, 'data'):
-            ip = self.request.data.get('remote_addr', '')
-        ip = ip or get_request_ip(self.request)
-        return ip
+        if not self._ip:
+            self._ip = get_request_ip_or_data(self.request)
+        return self._ip
 
     def raise_credential_error(self, error):
         raise self.partial_credential_error(error=error)
