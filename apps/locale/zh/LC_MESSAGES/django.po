@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-10 11:13+0800\n"
+"POT-Creation-Date: 2023-10-12 09:51+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -239,7 +239,7 @@ msgstr "资产"
 #: accounts/models/account.py:52 accounts/models/template.py:15
 #: accounts/serializers/account/account.py:216
 #: accounts/serializers/account/account.py:264
-#: accounts/serializers/account/template.py:27
+#: accounts/serializers/account/template.py:24
 #: authentication/serializers/connect_token_secret.py:49
 msgid "Su from"
 msgstr "切换自"
@@ -334,7 +334,7 @@ msgstr "账号备份快照"
 msgid "Trigger mode"
 msgstr "触发模式"
 
-#: accounts/models/automations/backup_account.py:105 audits/models.py:197
+#: accounts/models/automations/backup_account.py:105 audits/models.py:201
 #: terminal/models/session/sharing.py:125 xpack/plugins/cloud/models.py:205
 msgid "Reason"
 msgstr "原因"
@@ -342,7 +342,7 @@ msgstr "原因"
 #: accounts/models/automations/backup_account.py:107
 #: accounts/serializers/automations/change_secret.py:110
 #: accounts/serializers/automations/change_secret.py:133
-#: ops/serializers/job.py:56 terminal/serializers/session.py:46
+#: ops/serializers/job.py:56 terminal/serializers/session.py:49
 msgid "Is success"
 msgstr "是否成功"
 
@@ -444,7 +444,7 @@ msgstr "最后登录日期"
 #: accounts/serializers/account/virtual.py:21 acls/serializers/base.py:19
 #: acls/serializers/base.py:50 acls/templates/acls/asset_login_reminder.html:5
 #: acls/templates/acls/user_login_reminder.html:5 assets/models/_user.py:23
-#: audits/models.py:182 authentication/forms.py:25 authentication/forms.py:27
+#: audits/models.py:186 authentication/forms.py:25 authentication/forms.py:27
 #: authentication/models/temp_token.py:9
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
@@ -513,7 +513,7 @@ msgstr "密钥"
 msgid "Secret strategy"
 msgstr "密文策略"
 
-#: accounts/models/base.py:44 accounts/serializers/account/template.py:24
+#: accounts/models/base.py:44 accounts/serializers/account/template.py:21
 #: accounts/serializers/automations/change_secret.py:44
 msgid "Password rules"
 msgstr "密码规则"
@@ -738,7 +738,7 @@ msgstr "ID"
 
 #: accounts/serializers/account/account.py:447 acls/serializers/base.py:116
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:52
-#: audits/models.py:88 audits/models.py:166 audits/models.py:264
+#: audits/models.py:88 audits/models.py:170 audits/models.py:268
 #: audits/serializers.py:171 authentication/models/connection_token.py:32
 #: authentication/models/sso_token.py:16
 #: notifications/models/notification.py:12
@@ -819,15 +819,15 @@ msgstr "数字"
 msgid "Special symbol"
 msgstr "特殊字符"
 
-#: accounts/serializers/account/template.py:38
+#: accounts/serializers/account/template.py:35
 msgid "Secret generation strategy for account creation"
 msgstr "密码生成策略，用于账号创建时，设置密码"
 
-#: accounts/serializers/account/template.py:39
+#: accounts/serializers/account/template.py:36
 msgid "Whether to automatically push the account to the asset"
 msgstr "是否自动推送账号到资产"
 
-#: accounts/serializers/account/template.py:42
+#: accounts/serializers/account/template.py:39
 msgid ""
 "Associated platform, you can configure push parameters. If not associated, "
 "default parameters will be used"
@@ -929,6 +929,10 @@ msgstr "收集资产上的账号"
 #: accounts/tasks/push_account.py:15 accounts/tasks/push_account.py:23
 msgid "Push accounts to assets"
 msgstr "推送账号到资产"
+
+#: accounts/tasks/template.py:11
+msgid "Template sync info to related accounts"
+msgstr ""
 
 #: accounts/tasks/vault.py:31
 msgid "Sync secret to vault"
@@ -1179,15 +1183,15 @@ msgstr ""
 msgid "Thank you"
 msgstr "谢谢"
 
-#: acls/templates/acls/user_login_reminder.html:7 audits/models.py:188
-#: audits/models.py:257
+#: acls/templates/acls/user_login_reminder.html:7 audits/models.py:192
+#: audits/models.py:261
 #: authentication/templates/authentication/_msg_different_city.html:11
 #: tickets/models/ticket/login_confirm.py:11
 msgid "Login city"
 msgstr "登录城市"
 
-#: acls/templates/acls/user_login_reminder.html:8 audits/models.py:191
-#: audits/models.py:258 audits/serializers.py:65
+#: acls/templates/acls/user_login_reminder.html:8 audits/models.py:195
+#: audits/models.py:262 audits/serializers.py:65
 msgid "User agent"
 msgstr "用户代理"
 
@@ -1273,7 +1277,7 @@ msgid "Authentication failed"
 msgstr "认证失败"
 
 #: assets/automations/ping_gateway/manager.py:60
-#: assets/automations/ping_gateway/manager.py:86
+#: assets/automations/ping_gateway/manager.py:86 terminal/const.py:100
 msgid "Connect failed"
 msgstr "连接失败"
 
@@ -1519,7 +1523,7 @@ msgstr "SSH公钥"
 # msgstr "备注"
 #: assets/models/_user.py:28 assets/models/automations/base.py:114
 #: assets/models/cmd_filter.py:41 assets/models/group.py:19
-#: audits/models.py:261 common/db/models.py:34 ops/models/base.py:54
+#: audits/models.py:265 common/db/models.py:34 ops/models/base.py:54
 #: ops/models/job.py:227 users/models/user.py:1024
 msgid "Date created"
 msgstr "创建日期"
@@ -1559,7 +1563,7 @@ msgstr "用户名与用户相同"
 #: assets/models/_user.py:52 authentication/models/connection_token.py:41
 #: authentication/serializers/connect_token_secret.py:111
 #: terminal/models/applet/applet.py:42 terminal/serializers/session.py:19
-#: terminal/serializers/session.py:42 terminal/serializers/storage.py:70
+#: terminal/serializers/session.py:45 terminal/serializers/storage.py:70
 msgid "Protocol"
 msgstr "协议"
 
@@ -1696,7 +1700,7 @@ msgstr "自动化任务"
 msgid "Asset automation task"
 msgstr "资产自动化任务"
 
-#: assets/models/automations/base.py:113 audits/models.py:202
+#: assets/models/automations/base.py:113 audits/models.py:206
 #: audits/serializers.py:51 ops/models/base.py:49 ops/models/job.py:220
 #: terminal/models/applet/applet.py:301 terminal/models/applet/host.py:139
 #: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
@@ -2285,7 +2289,7 @@ msgstr "改密"
 
 #: audits/const.py:41 settings/serializers/terminal.py:6
 #: terminal/models/applet/host.py:26 terminal/models/component/terminal.py:164
-#: terminal/serializers/session.py:49 terminal/serializers/session.py:63
+#: terminal/serializers/session.py:52 terminal/serializers/session.py:66
 msgid "Terminal"
 msgstr "终端"
 
@@ -2322,7 +2326,7 @@ msgstr "否"
 msgid "Job audit log"
 msgstr "作业审计日志"
 
-#: audits/models.py:54 audits/models.py:98 audits/models.py:169
+#: audits/models.py:54 audits/models.py:98 audits/models.py:173
 #: terminal/models/session/session.py:38 terminal/models/session/sharing.py:113
 msgid "Remote addr"
 msgstr "远端地址"
@@ -2361,7 +2365,7 @@ msgstr "资源类型"
 msgid "Resource"
 msgstr "资源"
 
-#: audits/models.py:99 audits/models.py:145 audits/models.py:171
+#: audits/models.py:99 audits/models.py:145 audits/models.py:175
 #: terminal/serializers/command.py:75
 msgid "Datetime"
 msgstr "日期"
@@ -2382,59 +2386,59 @@ msgstr "详情 ID"
 msgid "Activity log"
 msgstr "活动日志"
 
-#: audits/models.py:167
+#: audits/models.py:171
 msgid "Change by"
 msgstr "修改者"
 
-#: audits/models.py:177
+#: audits/models.py:181
 msgid "Password change log"
 msgstr "改密日志"
 
-#: audits/models.py:184 audits/models.py:259
+#: audits/models.py:188 audits/models.py:263
 msgid "Login type"
 msgstr "登录方式"
 
-#: audits/models.py:186 audits/models.py:255
+#: audits/models.py:190 audits/models.py:259
 #: tickets/models/ticket/login_confirm.py:10
 msgid "Login IP"
 msgstr "登录 IP"
 
-#: audits/models.py:194 audits/serializers.py:49
+#: audits/models.py:198 audits/serializers.py:49
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
 #: users/forms/profile.py:65 users/models/user.py:815
 #: users/serializers/profile.py:102
 msgid "MFA"
 msgstr "MFA"
 
-#: audits/models.py:204
+#: audits/models.py:208
 msgid "Date login"
 msgstr "登录日期"
 
-#: audits/models.py:206 audits/models.py:260 audits/serializers.py:67
+#: audits/models.py:210 audits/models.py:264 audits/serializers.py:67
 #: audits/serializers.py:183
 msgid "Authentication backend"
 msgstr "认证方式"
 
-#: audits/models.py:250
+#: audits/models.py:254
 msgid "User login log"
 msgstr "用户登录日志"
 
-#: audits/models.py:256
+#: audits/models.py:260
 msgid "Session key"
 msgstr "会话标识"
 
-#: audits/models.py:262 authentication/models/connection_token.py:47
+#: audits/models.py:266 authentication/models/connection_token.py:47
 #: authentication/models/temp_token.py:13 perms/models/asset_permission.py:74
 #: tickets/models/ticket/apply_application.py:31
 #: tickets/models/ticket/apply_asset.py:20 users/models/user.py:833
 msgid "Date expired"
 msgstr "失效日期"
 
-#: audits/models.py:288
+#: audits/models.py:292
 msgid "User session"
 msgstr "用户会话"
 
-#: audits/models.py:290
+#: audits/models.py:294
 msgid "Offline ussr session"
 msgstr "下限用户会话"
 
@@ -2513,6 +2517,10 @@ msgstr "清理审计会话任务日志"
 #: audits/tasks.py:114
 msgid "Upload FTP file to external storage"
 msgstr "上传 FTP 文件到外部存储"
+
+#: authentication/api/access_key.py:36
+msgid "Access keys can be created at most 10"
+msgstr ""
 
 #: authentication/api/confirm.py:40
 msgid "This action require verify your MFA"
@@ -2596,7 +2604,11 @@ msgstr "无效的令牌头。符号字符串不应包含无效字符。"
 msgid "Invalid token or cache refreshed."
 msgstr "刷新的令牌或缓存无效。"
 
-#: authentication/backends/passkey/api.py:52
+#: authentication/backends/passkey/api.py:26
+msgid "Only register passkey for local user"
+msgstr ""
+
+#: authentication/backends/passkey/api.py:54
 msgid "Auth failed"
 msgstr "认证失败"
 
@@ -2880,7 +2892,7 @@ msgstr "设置手机号码启用"
 msgid "Clear phone number to disable"
 msgstr "清空手机号码禁用"
 
-#: authentication/middleware.py:93 settings/utils/ldap.py:661
+#: authentication/middleware.py:93 settings/utils/ldap.py:679
 msgid "Authentication failed (before login check failed): {}"
 msgstr "认证失败 (登录前检查失败): {}"
 
@@ -3729,6 +3741,7 @@ msgid "The mobile phone number format is incorrect"
 msgstr "手机号格式不正确"
 
 #: jumpserver/conf.py:444
+#, python-brace-format
 msgid "The verification code is: {code}"
 msgstr "验证码为: {code}"
 
@@ -4117,7 +4130,7 @@ msgstr "保存后执行"
 msgid "Job type"
 msgstr "任务类型"
 
-#: ops/serializers/job.py:57 terminal/serializers/session.py:50
+#: ops/serializers/job.py:57 terminal/serializers/session.py:53
 msgid "Is finished"
 msgstr "是否完成"
 
@@ -5685,100 +5698,100 @@ msgstr "周期导入 LDAP 用户"
 msgid "Registration periodic import ldap user task"
 msgstr "注册周期导入 LDAP 用户 任务"
 
-#: settings/utils/ldap.py:476
+#: settings/utils/ldap.py:494
 msgid "ldap:// or ldaps:// protocol is used."
 msgstr "使用 ldap:// 或 ldaps:// 协议"
 
-#: settings/utils/ldap.py:487
+#: settings/utils/ldap.py:505
 msgid "Host or port is disconnected: {}"
 msgstr "主机或端口不可连接: {}"
 
-#: settings/utils/ldap.py:489
+#: settings/utils/ldap.py:507
 msgid "The port is not the port of the LDAP service: {}"
 msgstr "端口不是LDAP服务端口: {}"
 
-#: settings/utils/ldap.py:491
+#: settings/utils/ldap.py:509
 msgid "Please add certificate: {}"
 msgstr "请添加证书"
 
-#: settings/utils/ldap.py:495 settings/utils/ldap.py:522
-#: settings/utils/ldap.py:552 settings/utils/ldap.py:580
+#: settings/utils/ldap.py:513 settings/utils/ldap.py:540
+#: settings/utils/ldap.py:570 settings/utils/ldap.py:598
 msgid "Unknown error: {}"
 msgstr "未知错误: {}"
 
-#: settings/utils/ldap.py:509
+#: settings/utils/ldap.py:527
 msgid "Bind DN or Password incorrect"
 msgstr "绑定DN或密码错误"
 
-#: settings/utils/ldap.py:516
+#: settings/utils/ldap.py:534
 msgid "Please enter Bind DN: {}"
 msgstr "请输入绑定DN: {}"
 
-#: settings/utils/ldap.py:518
+#: settings/utils/ldap.py:536
 msgid "Please enter Password: {}"
 msgstr "请输入密码: {}"
 
-#: settings/utils/ldap.py:520
+#: settings/utils/ldap.py:538
 msgid "Please enter correct Bind DN and Password: {}"
 msgstr "请输入正确的绑定DN和密码: {}"
 
-#: settings/utils/ldap.py:538
+#: settings/utils/ldap.py:556
 msgid "Invalid User OU or User search filter: {}"
 msgstr "不合法的用户OU或用户过滤器: {}"
 
-#: settings/utils/ldap.py:569
+#: settings/utils/ldap.py:587
 msgid "LDAP User attr map not include: {}"
 msgstr "LDAP属性映射没有包含: {}"
 
-#: settings/utils/ldap.py:576
+#: settings/utils/ldap.py:594
 msgid "LDAP User attr map is not dict"
 msgstr "LDAP属性映射不合法"
 
-#: settings/utils/ldap.py:595
+#: settings/utils/ldap.py:613
 msgid "LDAP authentication is not enabled"
 msgstr "LDAP认证没有启用"
 
-#: settings/utils/ldap.py:613
+#: settings/utils/ldap.py:631
 msgid "Error (Invalid LDAP server): {}"
 msgstr "错误  (不合法的LDAP服务器地址): {}"
 
-#: settings/utils/ldap.py:615
+#: settings/utils/ldap.py:633
 msgid "Error (Invalid Bind DN): {}"
 msgstr "错误 (不合法的绑定DN): {}"
 
-#: settings/utils/ldap.py:617
+#: settings/utils/ldap.py:635
 msgid "Error (Invalid LDAP User attr map): {}"
 msgstr "错误 (不合法的LDAP属性映射): {}"
 
-#: settings/utils/ldap.py:619
+#: settings/utils/ldap.py:637
 msgid "Error (Invalid User OU or User search filter): {}"
 msgstr "错误 (不合法的用户OU或用户过滤器): {}"
 
-#: settings/utils/ldap.py:621
+#: settings/utils/ldap.py:639
 msgid "Error (Not enabled LDAP authentication): {}"
 msgstr "错误 (没有启用LDAP认证): {}"
 
-#: settings/utils/ldap.py:623
+#: settings/utils/ldap.py:641
 msgid "Error (Unknown): {}"
 msgstr "错误 (未知): {}"
 
-#: settings/utils/ldap.py:626
+#: settings/utils/ldap.py:644
 msgid "Succeed: Match {} s user"
 msgstr "成功匹配 {} 个用户"
 
-#: settings/utils/ldap.py:659
+#: settings/utils/ldap.py:677
 msgid "Authentication failed (configuration incorrect): {}"
 msgstr "认证失败 (配置错误): {}"
 
-#: settings/utils/ldap.py:663
+#: settings/utils/ldap.py:681
 msgid "Authentication failed (username or password incorrect): {}"
 msgstr "认证失败 (用户名或密码不正确): {}"
 
-#: settings/utils/ldap.py:665
+#: settings/utils/ldap.py:683
 msgid "Authentication failed (Unknown): {}"
 msgstr "认证失败: (未知): {}"
 
-#: settings/utils/ldap.py:668
+#: settings/utils/ldap.py:686
 msgid "Authentication success: {}"
 msgstr "认证成功: {}"
 
@@ -6127,7 +6140,7 @@ msgid "SFTP"
 msgstr "SFTP"
 
 #: terminal/const.py:89
-msgid "Read Only"
+msgid "Read only"
 msgstr "只读"
 
 #: terminal/const.py:90
@@ -6135,16 +6148,28 @@ msgid "Writable"
 msgstr "读写"
 
 #: terminal/const.py:94
-msgid "Kill Session"
+msgid "Kill session"
 msgstr "终断会话"
 
 #: terminal/const.py:95
-msgid "Lock Session"
+msgid "Lock session"
 msgstr "锁定会话"
 
 #: terminal/const.py:96
-msgid "Unlock Session"
+msgid "Unlock session"
 msgstr "解锁会话"
+
+#: terminal/const.py:101
+msgid "Replay create failed"
+msgstr "录像创建失败"
+
+#: terminal/const.py:102
+msgid "Replay upload failed"
+msgstr "录像上传失败"
+
+#: terminal/const.py:103
+msgid "Replay convert failed"
+msgstr "录像转码失败"
 
 #: terminal/exceptions.py:8
 msgid "Bulk create not support"
@@ -6369,27 +6394,31 @@ msgstr "回放"
 msgid "Date end"
 msgstr "结束日期"
 
-#: terminal/models/session/session.py:47 terminal/serializers/session.py:62
+#: terminal/models/session/session.py:47 terminal/serializers/session.py:65
 msgid "Command amount"
 msgstr "命令数量"
 
-#: terminal/models/session/session.py:281
+#: terminal/models/session/session.py:48 terminal/serializers/session.py:28
+msgid "Error reason"
+msgstr "错误原因"
+
+#: terminal/models/session/session.py:282
 msgid "Session record"
 msgstr "会话记录"
 
-#: terminal/models/session/session.py:283
+#: terminal/models/session/session.py:284
 msgid "Can monitor session"
 msgstr "可以监控会话"
 
-#: terminal/models/session/session.py:284
+#: terminal/models/session/session.py:285
 msgid "Can share session"
 msgstr "可以分享会话"
 
-#: terminal/models/session/session.py:285
+#: terminal/models/session/session.py:286
 msgid "Can terminate session"
 msgstr "可以终断会话"
 
-#: terminal/models/session/session.py:286
+#: terminal/models/session/session.py:287
 msgid "Can validate session action perm"
 msgstr "可以验证会话动作权限"
 
@@ -6638,31 +6667,31 @@ msgstr "如果不同端点下的资产 IP 有冲突，使用资产标签实现"
 msgid "Asset IP"
 msgstr "资产 IP"
 
-#: terminal/serializers/session.py:23 terminal/serializers/session.py:47
+#: terminal/serializers/session.py:23 terminal/serializers/session.py:50
 msgid "Can replay"
 msgstr "是否可重放"
 
-#: terminal/serializers/session.py:24 terminal/serializers/session.py:48
+#: terminal/serializers/session.py:24 terminal/serializers/session.py:51
 msgid "Can join"
 msgstr "是否可加入"
 
-#: terminal/serializers/session.py:25 terminal/serializers/session.py:51
+#: terminal/serializers/session.py:25 terminal/serializers/session.py:54
 msgid "Can terminate"
 msgstr "是否可中断"
 
-#: terminal/serializers/session.py:43
+#: terminal/serializers/session.py:46
 msgid "User ID"
 msgstr "用户 ID"
 
-#: terminal/serializers/session.py:44
+#: terminal/serializers/session.py:47
 msgid "Asset ID"
 msgstr "资产 ID"
 
-#: terminal/serializers/session.py:45
+#: terminal/serializers/session.py:48
 msgid "Login from display"
 msgstr "登录来源名称"
 
-#: terminal/serializers/session.py:52
+#: terminal/serializers/session.py:55
 msgid "Terminal display"
 msgstr "终端显示"
 
@@ -7382,10 +7411,8 @@ msgid "File name conflict resolution"
 msgstr "文件名冲突解决方案"
 
 #: users/serializers/preference/koko.py:14
-#, fuzzy
-#| msgid "Terminal setting"
 msgid "Terminal theme name"
-msgstr "终端设置"
+msgstr "终端主题名称"
 
 #: users/serializers/preference/lina.py:13
 msgid "New file encryption password"
@@ -7515,25 +7542,29 @@ msgid ""
 msgstr ""
 "管理员已开启'仅允许已存在用户登录'，当前用户不在用户列表中，请联系管理员。"
 
-#: users/tasks.py:23
+#: users/tasks.py:25
 msgid "Check password expired"
 msgstr "校验密码已过期"
 
-#: users/tasks.py:37
+#: users/tasks.py:39
 msgid "Periodic check password expired"
 msgstr "周期校验密码过期"
 
-#: users/tasks.py:51
+#: users/tasks.py:53
 msgid "Check user expired"
 msgstr "校验用户已过期"
 
-#: users/tasks.py:68
+#: users/tasks.py:70
 msgid "Periodic check user expired"
 msgstr "周期检测用户过期"
 
-#: users/tasks.py:82
+#: users/tasks.py:84
 msgid "Check unused users"
 msgstr "校验用户已过期"
+
+#: users/tasks.py:114
+msgid "The user has not logged in recently and has been disabled."
+msgstr "该用户最近未登录，已被禁用。"
 
 #: users/templates/users/_msg_account_expire_reminder.html:7
 msgid "Your account will expire in"
@@ -7998,16 +8029,16 @@ msgid "Task strategy"
 msgstr "任务策略"
 
 #: xpack/plugins/cloud/models.py:285
-msgid "Exact"
-msgstr ""
+msgid "Equal"
+msgstr "等于"
 
 #: xpack/plugins/cloud/models.py:286
-msgid "Not"
-msgstr "否"
+msgid "Not equal"
+msgstr "不等于"
 
 #: xpack/plugins/cloud/models.py:287
 msgid "In"
-msgstr "在..里面"
+msgstr "在...中"
 
 #: xpack/plugins/cloud/models.py:288
 msgid "Contains"
@@ -8015,11 +8046,11 @@ msgstr "包含"
 
 #: xpack/plugins/cloud/models.py:289
 msgid "Startswith"
-msgstr "以..开头"
+msgstr "以...开头"
 
 #: xpack/plugins/cloud/models.py:290
 msgid "Endswith"
-msgstr "以..结尾"
+msgstr "以...结尾"
 
 #: xpack/plugins/cloud/models.py:296
 msgid "Instance platform"
@@ -8431,33 +8462,3 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
-
-#~ msgid "Invalid signature header. No credentials provided."
-#~ msgstr "不合法的签名头"
-
-#~ msgid ""
-#~ "Invalid signature header. Signature string should not contain spaces."
-#~ msgstr "不合法的签名头"
-
-#~ msgid "Invalid signature header. Format like AccessKeyId:Signature"
-#~ msgstr "不合法的签名头"
-
-#~ msgid ""
-#~ "Invalid signature header. Signature string should not contain invalid "
-#~ "characters."
-#~ msgstr "不合法的签名头"
-
-#~ msgid "Invalid signature."
-#~ msgstr "签名无效"
-
-#~ msgid "HTTP header: Date not provide or not %a, %d %b %Y %H:%M:%S GMT"
-#~ msgstr "HTTP header not valid"
-
-#~ msgid "Expired, more than 15 minutes"
-#~ msgstr "已过期，超过15分钟"
-
-#~ msgid "User disabled."
-#~ msgstr "用户已禁用"
-
-#~ msgid "Random"
-#~ msgstr "随机"
