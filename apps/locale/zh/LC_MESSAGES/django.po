@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-12 09:51+0800\n"
+"POT-Creation-Date: 2023-10-13 15:03+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -262,10 +262,12 @@ msgstr "来源 ID"
 #: accounts/models/account.py:60
 #: accounts/serializers/automations/change_secret.py:112
 #: accounts/serializers/automations/change_secret.py:132
-#: acls/serializers/base.py:124 assets/serializers/asset/common.py:125
-#: assets/serializers/gateway.py:28 audits/models.py:57 ops/models/base.py:18
-#: perms/models/asset_permission.py:70 perms/serializers/permission.py:39
-#: terminal/backends/command/models.py:18 terminal/models/session/session.py:33
+#: acls/serializers/base.py:124 acls/templates/acls/asset_login_reminder.html:7
+#: assets/serializers/asset/common.py:125 assets/serializers/gateway.py:28
+#: audits/models.py:57 authentication/api/connection_token.py:391
+#: ops/models/base.py:18 perms/models/asset_permission.py:70
+#: perms/serializers/permission.py:39 terminal/backends/command/models.py:18
+#: terminal/models/session/session.py:33
 #: terminal/templates/terminal/_msg_command_warning.html:8
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:13 xpack/plugins/cloud/models.py:89
@@ -710,7 +712,7 @@ msgstr "已修改"
 #: acls/templates/acls/asset_login_reminder.html:6
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20
-#: authentication/api/connection_token.py:386 ops/models/base.py:17
+#: authentication/api/connection_token.py:390 ops/models/base.py:17
 #: ops/models/job.py:139 ops/serializers/job.py:21
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 msgid "Assets"
@@ -787,7 +789,7 @@ msgid "Key password"
 msgstr "密钥密码"
 
 #: accounts/serializers/account/base.py:78
-#: assets/serializers/asset/common.py:311
+#: assets/serializers/asset/common.py:338
 msgid "Spec info"
 msgstr "特殊信息"
 
@@ -1021,7 +1023,7 @@ msgid "Users"
 msgstr "用户管理"
 
 #: acls/models/base.py:98 assets/models/automations/base.py:17
-#: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:310
+#: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:337
 #: rbac/tree.py:35
 msgid "Accounts"
 msgstr "账号管理"
@@ -1169,16 +1171,16 @@ msgstr "时段"
 msgid "Respectful"
 msgstr "尊敬的"
 
-#: acls/templates/acls/asset_login_reminder.html:9
+#: acls/templates/acls/asset_login_reminder.html:10
 msgid ""
-"The user has just successfully logged into the asset. Please ensure that "
-"this is an authorized operation. If you suspect that this is an unauthorized "
-"access, please take appropriate measures immediately."
+"The user has just logged in to the asset. Please ensure that this is an "
+"authorized operation. If you suspect that this is an unauthorized access, "
+"please take appropriate measures immediately."
 msgstr ""
-"用户刚刚成功登录到资产。请确保这是授权的操作。如果您怀疑这是一个未经授权的访"
-"问，请立即采取适当的措施。"
+"用户刚刚在登录资产。请确保这是授权的操作。如果您怀疑这是一个未经授权的访问，"
+"请立即采取适当的措施。"
 
-#: acls/templates/acls/asset_login_reminder.html:11
+#: acls/templates/acls/asset_login_reminder.html:12
 #: acls/templates/acls/user_login_reminder.html:13
 msgid "Thank you"
 msgstr "谢谢"
@@ -1221,7 +1223,7 @@ msgstr "应用程序"
 msgid "Can match application"
 msgstr "匹配应用"
 
-#: assets/api/asset/asset.py:157
+#: assets/api/asset/asset.py:194
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr "不能直接创建资产, 你应该创建主机或其他资产"
 
@@ -1638,7 +1640,7 @@ msgstr "网域"
 msgid "Labels"
 msgstr "标签管理"
 
-#: assets/models/asset/common.py:158 assets/serializers/asset/common.py:312
+#: assets/models/asset/common.py:158 assets/serializers/asset/common.py:339
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr "收集资产硬件信息"
@@ -1973,7 +1975,7 @@ msgid "Node path"
 msgstr "节点路径"
 
 #: assets/serializers/asset/common.py:145
-#: assets/serializers/asset/common.py:313
+#: assets/serializers/asset/common.py:340
 msgid "Auto info"
 msgstr "自动化信息"
 
@@ -1989,18 +1991,9 @@ msgstr "端口超出范围 (0-65535)"
 msgid "Protocol is required: {}"
 msgstr "协议是必填的: {}"
 
-#: assets/serializers/asset/database.py:13
+#: assets/serializers/asset/database.py:12
 msgid "Default database"
 msgstr "默认数据库"
-
-#: assets/serializers/asset/database.py:28 common/db/fields.py:570
-#: common/db/fields.py:575 common/serializers/fields.py:104
-#: tickets/serializers/ticket/common.py:58
-#: xpack/plugins/cloud/serializers/account_attrs.py:56
-#: xpack/plugins/cloud/serializers/account_attrs.py:79
-#: xpack/plugins/cloud/serializers/account_attrs.py:143
-msgid "This field is required."
-msgstr "该字段是必填项。"
 
 #: assets/serializers/asset/gpt.py:20
 msgid ""
@@ -2522,31 +2515,31 @@ msgstr "上传 FTP 文件到外部存储"
 msgid "Access keys can be created at most 10"
 msgstr ""
 
-#: authentication/api/confirm.py:40
+#: authentication/api/confirm.py:41
 msgid "This action require verify your MFA"
 msgstr "该操作需要验证您的 MFA, 请先开启并配置"
 
-#: authentication/api/connection_token.py:261
+#: authentication/api/connection_token.py:262
 msgid "Reusable connection token is not allowed, global setting not enabled"
 msgstr "不允许使用可重复使用的连接令牌，未启用全局设置"
 
-#: authentication/api/connection_token.py:357
+#: authentication/api/connection_token.py:358
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名账号不支持当前资产"
 
-#: authentication/api/connection_token.py:376
+#: authentication/api/connection_token.py:378
 msgid "Account not found"
 msgstr "账号未找到"
 
-#: authentication/api/connection_token.py:379
+#: authentication/api/connection_token.py:381
 msgid "Permission expired"
 msgstr "授权已过期"
 
-#: authentication/api/connection_token.py:406
+#: authentication/api/connection_token.py:412
 msgid "ACL action is reject: {}({})"
 msgstr "ACL 动作是拒绝: {}({})"
 
-#: authentication/api/connection_token.py:410
+#: authentication/api/connection_token.py:416
 msgid "ACL action is review"
 msgstr "ACL 动作是复核"
 
@@ -2787,15 +2780,15 @@ msgstr "您的密码无效"
 msgid "Please wait for %s seconds before retry"
 msgstr "请在 %s 秒后重试"
 
-#: authentication/errors/redirect.py:85 authentication/mixins.py:324
+#: authentication/errors/redirect.py:85 authentication/mixins.py:323
 msgid "Your password is too simple, please change it for security"
 msgstr "你的密码过于简单，为了安全，请修改"
 
-#: authentication/errors/redirect.py:93 authentication/mixins.py:331
+#: authentication/errors/redirect.py:93 authentication/mixins.py:330
 msgid "You should to change your password before login"
 msgstr "登录完成前，请先修改密码"
 
-#: authentication/errors/redirect.py:101 authentication/mixins.py:338
+#: authentication/errors/redirect.py:101 authentication/mixins.py:337
 msgid "Your password has expired, please reset before logging in"
 msgstr "您的密码已过期，先修改再登录"
 
@@ -2906,11 +2899,11 @@ msgid ""
 "            The current user source is {}. Please contact the administrator."
 msgstr "管理员已开启'仅允许从用户来源登录'，当前用户来源为{}，请联系管理员。"
 
-#: authentication/mixins.py:274
+#: authentication/mixins.py:273
 msgid "The MFA type ({}) is not enabled"
 msgstr "该 MFA ({}) 方式没有启用"
 
-#: authentication/mixins.py:314
+#: authentication/mixins.py:313
 msgid "Please change your password"
 msgstr "请修改密码"
 
@@ -3532,6 +3525,14 @@ msgstr "无效类型，应为 all、ids 或 attrs"
 #: common/db/fields.py:568
 msgid "Invalid ids for ids, should be a list"
 msgstr "无效的ID，应为列表"
+
+#: common/db/fields.py:570 common/db/fields.py:575
+#: common/serializers/fields.py:104 tickets/serializers/ticket/common.py:58
+#: xpack/plugins/cloud/serializers/account_attrs.py:56
+#: xpack/plugins/cloud/serializers/account_attrs.py:79
+#: xpack/plugins/cloud/serializers/account_attrs.py:143
+msgid "This field is required."
+msgstr "该字段是必填项。"
 
 #: common/db/fields.py:573 common/db/fields.py:578
 msgid "Invalid attrs, should be a list of dict"
@@ -8029,12 +8030,14 @@ msgid "Task strategy"
 msgstr "任务策略"
 
 #: xpack/plugins/cloud/models.py:285
-msgid "Equal"
-msgstr "等于"
+msgid "Exact"
+msgstr ""
 
 #: xpack/plugins/cloud/models.py:286
-msgid "Not equal"
-msgstr "不等于"
+#, fuzzy
+#| msgid "No"
+msgid "Not"
+msgstr "否"
 
 #: xpack/plugins/cloud/models.py:287
 msgid "In"
@@ -8462,3 +8465,9 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
+
+#~ msgid "Equal"
+#~ msgstr "等于"
+
+#~ msgid "Not equal"
+#~ msgstr "不等于"
