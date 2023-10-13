@@ -19,6 +19,7 @@ class ConfirmType(TextChoices):
     def get_can_confirm_types(cls, confirm_type):
         start = cls.values.index(confirm_type)
         types = cls.values[start:]
+        types = [tp for tp in types if tp != 'password']
         types.reverse()
         return types
 

@@ -15,6 +15,7 @@ class ConfirmReLogin(BaseConfirm):
     display_name = 'Re-Login'
 
     def check(self):
+        return True
         return not self.user.is_password_authenticate()
 
     def authenticate(self, secret_key, mfa_type):
