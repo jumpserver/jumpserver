@@ -5,15 +5,18 @@ from django.utils.translation import gettext as _
 from rest_framework import serializers
 from rest_framework.response import Response
 
-from authentication.permissions import UserConfirmation
 from common.api import JMSModelViewSet
 from rbac.permissions import RBACPermission
 from ..const import ConfirmType
-from ..serializers import AccessKeySerializer
+from ..permissions import UserConfirmation
+from ..serializers import AccessKeySerializer, AccessKeyCreateSerializer
 
 
 class AccessKeyViewSet(JMSModelViewSet):
-    serializer_class = AccessKeySerializer
+    serializer_classes = {
+        'default': AccessKeySerializer,
+        'create': AccessKeyCreateSerializer
+    }
     search_fields = ['^id']
     permission_classes = [RBACPermission]
 
@@ -41,4 +44,5 @@ class AccessKeyViewSet(JMSModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         key = self.perform_create(serializer)
-        return Response({'secret': key.secret, 'id': key.id}, status=201)
+        serializer = self.get_serializer(instance=key)
+        return Response(serializer.data, status=201)
