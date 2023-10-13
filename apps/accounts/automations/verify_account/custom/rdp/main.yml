@@ -8,7 +8,7 @@
     - name: Verify account (pyfreerdp)
       rdp_ping:
         login_host: "{{ jms_asset.address }}"
-        login_port: "{{ jms_asset.port }}"
+        login_port: "{{ jms_asset.protocols | selectattr('name', 'equalto', 'rdp') | map(attribute='port') | first }}"
         login_user: "{{ account.username }}"
         login_password: "{{ account.secret }}"
         login_secret_type: "{{ account.secret_type }}"
