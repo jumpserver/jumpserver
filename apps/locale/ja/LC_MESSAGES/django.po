@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-12 09:51+0800\n"
+"POT-Creation-Date: 2023-10-13 15:03+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -263,10 +263,12 @@ msgstr "ソース ID"
 #: accounts/models/account.py:60
 #: accounts/serializers/automations/change_secret.py:112
 #: accounts/serializers/automations/change_secret.py:132
-#: acls/serializers/base.py:124 assets/serializers/asset/common.py:125
-#: assets/serializers/gateway.py:28 audits/models.py:57 ops/models/base.py:18
-#: perms/models/asset_permission.py:70 perms/serializers/permission.py:39
-#: terminal/backends/command/models.py:18 terminal/models/session/session.py:33
+#: acls/serializers/base.py:124 acls/templates/acls/asset_login_reminder.html:7
+#: assets/serializers/asset/common.py:125 assets/serializers/gateway.py:28
+#: audits/models.py:57 authentication/api/connection_token.py:391
+#: ops/models/base.py:18 perms/models/asset_permission.py:70
+#: perms/serializers/permission.py:39 terminal/backends/command/models.py:18
+#: terminal/models/session/session.py:33
 #: terminal/templates/terminal/_msg_command_warning.html:8
 #: terminal/templates/terminal/_msg_session_sharing.html:8
 #: tickets/models/ticket/command_confirm.py:13 xpack/plugins/cloud/models.py:89
@@ -712,7 +714,7 @@ msgstr "編集済み"
 #: acls/templates/acls/asset_login_reminder.html:6
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20
-#: authentication/api/connection_token.py:386 ops/models/base.py:17
+#: authentication/api/connection_token.py:390 ops/models/base.py:17
 #: ops/models/job.py:139 ops/serializers/job.py:21
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 msgid "Assets"
@@ -789,7 +791,7 @@ msgid "Key password"
 msgstr "キーパスワード"
 
 #: accounts/serializers/account/base.py:78
-#: assets/serializers/asset/common.py:311
+#: assets/serializers/asset/common.py:338
 msgid "Spec info"
 msgstr "特別情報"
 
@@ -1024,7 +1026,7 @@ msgid "Users"
 msgstr "ユーザー"
 
 #: acls/models/base.py:98 assets/models/automations/base.py:17
-#: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:310
+#: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:337
 #: rbac/tree.py:35
 msgid "Accounts"
 msgstr "アカウント"
@@ -1173,17 +1175,16 @@ msgstr "期間"
 msgid "Respectful"
 msgstr "尊敬する"
 
-#: acls/templates/acls/asset_login_reminder.html:9
+#: acls/templates/acls/asset_login_reminder.html:10
 msgid ""
-"The user has just successfully logged into the asset. Please ensure that "
-"this is an authorized operation. If you suspect that this is an unauthorized "
-"access, please take appropriate measures immediately."
+"The user has just logged in to the asset. Please ensure that this is an "
+"authorized operation. If you suspect that this is an unauthorized access, "
+"please take appropriate measures immediately."
 msgstr ""
-"ユーザーは資産に正常にログインしたばかりです。許可されたアクションであること"
-"を確認してください。不正アクセスが疑われる場合は、すぐに適切な措置を取ってく"
-"ださい。"
+"ユーザーは資産にログインしています。許可されたアクションであることを確認して"
+"ください。不正アクセスが疑われる場合は、すぐに適切な措置を取ってください。"
 
-#: acls/templates/acls/asset_login_reminder.html:11
+#: acls/templates/acls/asset_login_reminder.html:12
 #: acls/templates/acls/user_login_reminder.html:13
 msgid "Thank you"
 msgstr "ありがとうございます。"
@@ -1227,7 +1228,7 @@ msgstr "アプリケーション"
 msgid "Can match application"
 msgstr "アプリケーションを一致させることができます"
 
-#: assets/api/asset/asset.py:157
+#: assets/api/asset/asset.py:194
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr ""
 "資産を直接作成することはできません。ホストまたはその他を作成する必要がありま"
@@ -1646,7 +1647,7 @@ msgstr "ドメイン"
 msgid "Labels"
 msgstr "ラベル"
 
-#: assets/models/asset/common.py:158 assets/serializers/asset/common.py:312
+#: assets/models/asset/common.py:158 assets/serializers/asset/common.py:339
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr "資産ハードウェア情報の収集"
@@ -1983,7 +1984,7 @@ msgid "Node path"
 msgstr "ノードパスです"
 
 #: assets/serializers/asset/common.py:145
-#: assets/serializers/asset/common.py:313
+#: assets/serializers/asset/common.py:340
 msgid "Auto info"
 msgstr "自動情報"
 
@@ -1999,18 +2000,9 @@ msgstr "ポート番号が範囲外です (0-65535)"
 msgid "Protocol is required: {}"
 msgstr "プロトコルが必要です: {}"
 
-#: assets/serializers/asset/database.py:13
+#: assets/serializers/asset/database.py:12
 msgid "Default database"
 msgstr "デフォルト・データベース"
-
-#: assets/serializers/asset/database.py:28 common/db/fields.py:570
-#: common/db/fields.py:575 common/serializers/fields.py:104
-#: tickets/serializers/ticket/common.py:58
-#: xpack/plugins/cloud/serializers/account_attrs.py:56
-#: xpack/plugins/cloud/serializers/account_attrs.py:79
-#: xpack/plugins/cloud/serializers/account_attrs.py:143
-msgid "This field is required."
-msgstr "このフィールドは必須です。"
 
 #: assets/serializers/asset/gpt.py:20
 msgid ""
@@ -2539,33 +2531,33 @@ msgstr "外部ストレージへのFTPファイルのアップロード"
 msgid "Access keys can be created at most 10"
 msgstr ""
 
-#: authentication/api/confirm.py:40
+#: authentication/api/confirm.py:41
 msgid "This action require verify your MFA"
 msgstr "この操作には、MFAを検証する必要があります"
 
-#: authentication/api/connection_token.py:261
+#: authentication/api/connection_token.py:262
 msgid "Reusable connection token is not allowed, global setting not enabled"
 msgstr ""
 "再使用可能な接続トークンの使用は許可されていません。グローバル設定は有効に"
 "なっていません"
 
-#: authentication/api/connection_token.py:357
+#: authentication/api/connection_token.py:358
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名アカウントはこのプロパティではサポートされていません"
 
-#: authentication/api/connection_token.py:376
+#: authentication/api/connection_token.py:378
 msgid "Account not found"
 msgstr "アカウントが見つかりません"
 
-#: authentication/api/connection_token.py:379
+#: authentication/api/connection_token.py:381
 msgid "Permission expired"
 msgstr "承認の有効期限が切れています"
 
-#: authentication/api/connection_token.py:406
+#: authentication/api/connection_token.py:412
 msgid "ACL action is reject: {}({})"
 msgstr "ACL アクションは拒否です: {}({})"
 
-#: authentication/api/connection_token.py:410
+#: authentication/api/connection_token.py:416
 msgid "ACL action is review"
 msgstr "ACL アクションはレビューです"
 
@@ -2815,15 +2807,15 @@ msgstr "パスワードが無効です"
 msgid "Please wait for %s seconds before retry"
 msgstr "%s 秒後に再試行してください"
 
-#: authentication/errors/redirect.py:85 authentication/mixins.py:324
+#: authentication/errors/redirect.py:85 authentication/mixins.py:323
 msgid "Your password is too simple, please change it for security"
 msgstr "パスワードがシンプルすぎるので、セキュリティのために変更してください"
 
-#: authentication/errors/redirect.py:93 authentication/mixins.py:331
+#: authentication/errors/redirect.py:93 authentication/mixins.py:330
 msgid "You should to change your password before login"
 msgstr "ログインする前にパスワードを変更する必要があります"
 
-#: authentication/errors/redirect.py:101 authentication/mixins.py:338
+#: authentication/errors/redirect.py:101 authentication/mixins.py:337
 msgid "Your password has expired, please reset before logging in"
 msgstr ""
 "パスワードの有効期限が切れました。ログインする前にリセットしてください。"
@@ -2938,11 +2930,11 @@ msgstr ""
 "管理者は「ユーザーソースからのみログインを許可」をオンにしており、現在のユー"
 "ザーソースは {} です。管理者に連絡してください。"
 
-#: authentication/mixins.py:274
+#: authentication/mixins.py:273
 msgid "The MFA type ({}) is not enabled"
 msgstr "MFAタイプ ({}) が有効になっていない"
 
-#: authentication/mixins.py:314
+#: authentication/mixins.py:313
 msgid "Please change your password"
 msgstr "パスワードを変更してください"
 
@@ -3576,6 +3568,14 @@ msgstr "無効なタイプです。all、ids、またはattrsでなければな�
 #: common/db/fields.py:568
 msgid "Invalid ids for ids, should be a list"
 msgstr "無効なID、リストでなければなりません"
+
+#: common/db/fields.py:570 common/db/fields.py:575
+#: common/serializers/fields.py:104 tickets/serializers/ticket/common.py:58
+#: xpack/plugins/cloud/serializers/account_attrs.py:56
+#: xpack/plugins/cloud/serializers/account_attrs.py:79
+#: xpack/plugins/cloud/serializers/account_attrs.py:143
+msgid "This field is required."
+msgstr "このフィールドは必須です。"
 
 #: common/db/fields.py:573 common/db/fields.py:578
 msgid "Invalid attrs, should be a list of dict"
@@ -8145,12 +8145,14 @@ msgid "Task strategy"
 msgstr "ミッション戦略です"
 
 #: xpack/plugins/cloud/models.py:285
-msgid "Equal"
-msgstr "等しい"
+msgid "Exact"
+msgstr ""
 
 #: xpack/plugins/cloud/models.py:286
-msgid "Not equal"
-msgstr "不等于"
+#, fuzzy
+#| msgid "No"
+msgid "Not"
+msgstr "否"
 
 #: xpack/plugins/cloud/models.py:287
 msgid "In"
@@ -8581,3 +8583,9 @@ msgstr "エンタープライズプロフェッショナル版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "エンタープライズ・フラッグシップ・エディション"
+
+#~ msgid "Equal"
+#~ msgstr "等しい"
+
+#~ msgid "Not equal"
+#~ msgstr "不等于"

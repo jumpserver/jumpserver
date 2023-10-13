@@ -159,7 +159,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
             return
         if isinstance(self.initial_data, list):
             return
-        accounts = self.initial_data.get('accounts', None)
+        accounts = self.initial_data.pop('accounts', None)
         self._accounts = accounts
 
     def _get_protocols_required_default(self):
@@ -298,10 +298,37 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         self.perform_nodes_display_create(instance, nodes_display)
         return instance
 
+    @staticmethod
+    def sync_platform_protocols(instance, old_platform):
+        platform = instance.platform
+
+        if str(old_platform.id) == str(instance.platform_id):
+            return
+
+        platform_protocols = {
+            p['name']: p['port']
+            for p in platform.protocols.values('name', 'port')
+        }
+
+        protocols = set(instance.protocols.values_list('name', flat=True))
+        protocol_names = set(platform_protocols) - protocols
+        objs = []
+        for name in protocol_names:
+            objs.append(
+                Protocol(
+                    name=name,
+                    port=platform_protocols[name],
+                    asset_id=instance.id,
+                )
+            )
+        Protocol.objects.bulk_create(objs)
+
     @atomic
     def update(self, instance, validated_data):
+        old_platform = instance.platform
         nodes_display = validated_data.pop('nodes_display', '')
         instance = super().update(instance, validated_data)
+        self.sync_platform_protocols(instance, old_platform)
         self.perform_nodes_display_create(instance, nodes_display)
         return instance
 

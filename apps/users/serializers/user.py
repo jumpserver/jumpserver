@@ -293,8 +293,8 @@ class ServiceAccountSerializer(serializers.ModelSerializer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        from authentication.serializers import AccessKeySerializer
-        self.fields["access_key"] = AccessKeySerializer(read_only=True)
+        from authentication.serializers import AccessKeyCreateSerializer
+        self.fields["access_key"] = AccessKeyCreateSerializer(read_only=True)
 
     def get_username(self):
         return self.initial_data.get("name")
