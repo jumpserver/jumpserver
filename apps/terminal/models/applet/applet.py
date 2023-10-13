@@ -163,7 +163,7 @@ class Applet(JMSBaseModel):
             counts[host_id] += 1
 
         hosts = list(sorted(hosts, key=lambda h: counts[h.id]))
-        return hosts[0]
+        return hosts[0] if hosts else None
 
     def select_host(self, user, asset):
         hosts = self.hosts.filter(is_active=True)
@@ -186,6 +186,8 @@ class Applet(JMSBaseModel):
             host = pref_host[0]
         else:
             host = self._select_by_load(hosts)
+            if host is None:
+                return
             cache.set(prefer_key, str(host.id), timeout=None)
         return host
 
