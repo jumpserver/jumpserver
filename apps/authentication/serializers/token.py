@@ -12,6 +12,7 @@ from ..models import AccessKey, TempToken
 __all__ = [
     'AccessKeySerializer', 'BearerTokenSerializer',
     'SSOTokenSerializer', 'TempTokenSerializer',
+    'AccessKeyCreateSerializer'
 ]
 
 
@@ -20,6 +21,11 @@ class AccessKeySerializer(serializers.ModelSerializer):
         model = AccessKey
         fields = ['id', 'is_active', 'date_created', 'date_last_used']
         read_only_fields = ['id', 'date_created', 'date_last_used']
+
+
+class AccessKeyCreateSerializer(AccessKeySerializer):
+    class Meta(AccessKeySerializer.Meta):
+        fields = AccessKeySerializer.Meta.fields + ['secret']
 
 
 class BearerTokenSerializer(serializers.Serializer):
