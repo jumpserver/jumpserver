@@ -6,7 +6,6 @@ from importlib import import_module
 from django.conf import settings
 from django.db.models import F, Value, CharField, Q
 from django.http import HttpResponse, FileResponse
-from django.utils import timezone
 from django.utils.encoding import escape_uri_path
 from rest_framework import generics
 from rest_framework import status
@@ -270,9 +269,7 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         keys = UserSession.get_keys()
-        queryset = UserSession.objects.filter(
-            date_expired__gt=timezone.now(), key__in=keys
-        )
+        queryset = UserSession.objects.filter(key__in=keys)
         if current_org.is_root():
             return queryset
         user_ids = self.org_user_ids
@@ -282,7 +279,9 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
     @action(['POST'], detail=False, url_path='offline')
     def offline(self, request, *args, **kwargs):
         ids = request.data.get('ids', [])
-        queryset = self.get_queryset().exclude(key=request.session.session_key).filter(id__in=ids)
+        queryset = self.get_queryset()
+        session_key = request.session.session_key
+        queryset = queryset.exclude(key=session_key).filter(id__in=ids)
         if not queryset.exists():
             return Response(status=status.HTTP_200_OK)
 

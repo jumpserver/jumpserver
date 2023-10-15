@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-from datetime import timedelta
-from importlib import import_module
 
 from django.conf import settings
 from django.contrib.auth import BACKEND_SESSION_KEY
@@ -86,9 +84,6 @@ def generate_data(username, request, login_type=None):
 
 def create_user_session(request, user_id, instance: UserLoginLog):
     session_key = request.session.session_key or '-'
-    session_store_cls = import_module(settings.SESSION_ENGINE).SessionStore
-    session_store = session_store_cls(session_key=session_key)
-    ttl = session_store.get_expiry_age()
 
     online_session_data = {
         'user_id': user_id,
@@ -99,7 +94,6 @@ def create_user_session(request, user_id, instance: UserLoginLog):
         'backend': instance.backend,
         'user_agent': instance.user_agent,
         'date_created': instance.datetime,
-        'date_expired': instance.datetime + timedelta(seconds=ttl),
     }
     user_session = UserSession.objects.create(**online_session_data)
     request.session['user_session_id'] = user_session.id
