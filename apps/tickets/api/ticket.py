@@ -6,9 +6,10 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
 
+from audits.handler import create_or_update_operate_log
 from common.api import CommonApiMixin
 from common.const.http import POST, PUT, PATCH
-from orgs.utils import tmp_to_root_org
+from orgs.utils import tmp_to_root_org, tmp_to_org
 from rbac.permissions import RBACPermission
 from tickets import filters
 from tickets import serializers
@@ -17,6 +18,7 @@ from tickets.models import (
     ApplyLoginAssetTicket, ApplyCommandTicket
 )
 from tickets.permissions.ticket import IsAssignee, IsApplicant
+from ..const import TicketAction
 
 __all__ = [
     'TicketViewSet', 'ApplyAssetTicketViewSet',
@@ -77,6 +79,21 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         with tmp_to_root_org():
             return super().create(request, *args, **kwargs)
 
+    @staticmethod
+    def _record_operate_log(ticket, action):
+        with tmp_to_org(ticket.org_id):
+            after = {
+                'ID': str(ticket.id),
+                str(_('Name')): ticket.title,
+                str(_('Applicant')): str(ticket.applicant),
+            }
+            object_name = ticket._meta.object_name
+            resource_type = ticket._meta.verbose_name
+            create_or_update_operate_log(
+                action, resource_type, resource=ticket,
+                after=after, object_name=object_name
+            )
+
     @action(detail=True, methods=[PUT, PATCH], permission_classes=[IsAssignee, ])
     def approve(self, request, *args, **kwargs):
         self.ticket_not_allowed()
@@ -88,18 +105,21 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
             serializer.is_valid(raise_exception=True)
             instance = serializer.save()
         instance.approve(processor=request.user)
+        self._record_operate_log(instance, TicketAction.approve)
         return Response('ok')
 
     @action(detail=True, methods=[PUT], permission_classes=[IsAssignee, ])
     def reject(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.reject(processor=request.user)
+        self._record_operate_log(instance, TicketAction.reject)
         return Response('ok')
 
     @action(detail=True, methods=[PUT], permission_classes=[IsAssignee | IsApplicant, ])
     def close(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.close()
+        self._record_operate_log(instance, TicketAction.close)
         return Response('ok')
 
     @action(detail=False, methods=[PUT], permission_classes=[RBACPermission, ])
