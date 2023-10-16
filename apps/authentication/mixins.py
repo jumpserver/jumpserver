@@ -523,7 +523,8 @@ class AuthMixin(CommonMixin, AuthPreCheckMixin, AuthACLMixin, MFAMixin, AuthPost
     def clear_auth_mark(self):
         keys = [
             'auth_password', 'user_id', 'auth_confirm_required',
-            'auth_notice_required', 'auth_ticket_id', 'auth_acl_id'
+            'auth_notice_required', 'auth_ticket_id', 'auth_acl_id',
+            'user_session_id', 'user_log_id', 'can_send_notifications'
         ]
         for k in keys:
             self.request.session.pop(k, '')
