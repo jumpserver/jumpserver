@@ -260,7 +260,7 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
     filterset_fields = ['id', 'ip', 'city', 'type']
     search_fields = ['id', 'ip', 'city']
     rbac_perms = {
-        'offline': ['users.offline_usersession']
+        'offline': ['audits.offline_usersession']
     }
 
     @property
