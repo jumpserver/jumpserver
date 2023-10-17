@@ -18,7 +18,7 @@ from accounts.const import AliasAccount
 from acls.notifications import AssetLoginReminderMsg
 from common.api import JMSModelViewSet
 from common.exceptions import JMSException
-from common.utils import random_string, get_logger, get_request_ip
+from common.utils import random_string, get_logger, get_request_ip_or_data
 from common.utils.django import get_request_os
 from common.utils.http import is_true, is_false
 from orgs.mixins.api import RootOrgViewMixin
@@ -400,7 +400,7 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
     def _validate_acl(self, user, asset, account):
         from acls.models import LoginAssetACL
         acls = LoginAssetACL.filter_queryset(user=user, asset=asset, account=account)
-        ip = get_request_ip(self.request)
+        ip = get_request_ip_or_data(self.request)
         acl = LoginAssetACL.get_match_rule_acls(user, ip, acls)
         if not acl:
             return
