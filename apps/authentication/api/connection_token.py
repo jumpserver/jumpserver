@@ -432,6 +432,14 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
                     reviewer, asset, user, input_username
                 ).publish_async()
 
+    def create(self, request, *args, **kwargs):
+        try:
+            response = super().create(request, *args, **kwargs)
+        except JMSException as e:
+            data = {'code': e.detail.code, 'detail': e.detail}
+            return Response(data, status=e.status_code)
+        return response
+
 
 class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
     serializer_classes = {
