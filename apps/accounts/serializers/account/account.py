@@ -78,7 +78,8 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
     def get_template_attr_for_account(template):
         # Set initial data from template
         field_names = [
-            'username', 'secret', 'secret_type', 'privileged', 'is_active'
+            'name', 'username', 'secret',
+            'secret_type', 'privileged', 'is_active'
         ]
 
         attrs = {}
