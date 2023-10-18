@@ -69,7 +69,7 @@ class ActivityLogHandler:
 
 def create_activities(resource_ids, detail, detail_id, action, org_id):
     if not resource_ids:
-        raise ValueError('resource_ids is empty')
+        return
     if not org_id:
         org_id = Organization.ROOT_ID
     activities = [
