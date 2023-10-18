@@ -1,6 +1,7 @@
 from urllib.parse import urlencode
 
 from django.conf import settings
+from django.contrib.auth import logout as auth_logout
 from django.db.utils import IntegrityError
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseRedirect
@@ -158,6 +159,7 @@ class WeComQRBindCallbackView(WeComQRMixin, View):
         ip = get_request_ip(request)
         OAuthBindMessage(user, ip, _('WeCom'), wecom_userid).publish_async()
         msg = _('Binding WeCom successfully')
+        auth_logout(request)
         response = self.get_success_response(redirect_url, msg, msg)
         return response
 
