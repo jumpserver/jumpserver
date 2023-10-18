@@ -169,6 +169,7 @@ class FileSerializer(serializers.Serializer):
 class UserSessionSerializer(serializers.ModelSerializer):
     type = LabeledChoiceField(choices=LoginTypeChoices.choices, label=_("Type"))
     user = ObjectRelatedField(required=False, queryset=User.objects, label=_('User'))
+    date_expired = serializers.DateTimeField(format="%Y/%m/%d %H:%M:%S", label=_('Date expired'))
     is_current_user_session = serializers.SerializerMethodField()
 
     class Meta:
