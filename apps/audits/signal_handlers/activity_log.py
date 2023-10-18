@@ -114,6 +114,8 @@ def on_session_or_login_log_created(sender, instance=None, created=False, **kwar
         logger.error('Activity log handler not found: {}'.format(sender))
 
     resource_ids, detail, act_type, org_id = func(instance)
+    if not resource_ids:
+        return
     return create_activities(resource_ids, detail, instance.id, act_type, org_id)
 
 
