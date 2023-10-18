@@ -175,6 +175,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         protocols = self.initial_data.get('protocols')
         if protocols is not None:
             return
+        if getattr(self, 'instance', None):
+            return
 
         protocols_required, protocols_default = self._get_protocols_required_default()
         protocol_map = {str(protocol.id): protocol for protocol in protocols_required + protocols_default}
