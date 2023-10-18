@@ -55,6 +55,8 @@ class DatabaseSerializer(AssetSerializer):
 
         if platform.type in ['mysql', 'mariadb']:
             db_field.required = False
+            db_field.allow_blank = True
+            db_field.allow_null = True
 
 
 class DatabaseWithGatewaySerializer(DatabaseSerializer):
