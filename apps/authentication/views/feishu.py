@@ -1,6 +1,7 @@
 from urllib.parse import urlencode
 
 from django.conf import settings
+from django.contrib.auth import logout as auth_logout
 from django.db.utils import IntegrityError
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseRedirect
@@ -121,6 +122,7 @@ class FeiShuQRBindCallbackView(FeiShuQRMixin, View):
         ip = get_request_ip(request)
         OAuthBindMessage(user, ip, _('FeiShu'), user_id).publish_async()
         msg = _('Binding FeiShu successfully')
+        auth_logout(request)
         response = self.get_success_response(redirect_url, msg, msg)
         return response
 
