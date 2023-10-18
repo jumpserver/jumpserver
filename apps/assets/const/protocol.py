@@ -276,7 +276,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
                 }
             }
         }
-        if settings.XPACK_ENABLED:
+        if settings.XPACK_LICENSE_IS_VALID:
             choices = protocols[cls.chatgpt]['setting']['api_mode']['choices']
             choices.extend([
                 ('gpt-4', 'GPT-4'),

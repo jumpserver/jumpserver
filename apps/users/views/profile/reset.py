@@ -90,7 +90,7 @@ class UserForgotPasswordView(FormView):
     @staticmethod
     def get_validate_backends_context(has_phone):
         validate_backends = [{'name': _('Email'), 'is_active': True, 'value': 'email'}]
-        if settings.XPACK_ENABLED:
+        if settings.XPACK_LICENSE_IS_VALID:
             if settings.SMS_ENABLED and has_phone:
                 is_active = True
             else:
