@@ -75,6 +75,8 @@ special_pid_mapper = {
     'xpack.strategyrule': 'cloud_import',
     'terminal.applet': 'remote_application',
     'terminal.applethost': 'remote_application',
+    'terminal.appletpublication': 'remote_application',
+    'terminal.applethostdeployment': 'remote_application',
     'accounts.accountbackupautomation': "backup_account_node",
     'accounts.accountbackupexecution': "backup_account_node",
     "accounts.pushaccountautomation": "push_account_node",
