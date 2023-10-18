@@ -8,6 +8,7 @@ from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import gettext as _
 
 from apps.authentication import mixins
+from audits.signal_handlers import send_login_info_to_reviewers
 from authentication.signals import post_auth_failed
 from common.utils import gen_key_pair
 from common.utils import get_request_ip
@@ -105,6 +106,12 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
                 guard_url = "%s?%s" % (guard_url, args)
             response = redirect(guard_url)
         finally:
+            if request.session.get('can_send_notifications') and \
+                    self.request.session['auth_notice_required']:
+                request.session['can_send_notifications'] = False
+                user_log_id = self.request.session.get('user_log_id')
+                auth_acl_id = self.request.session.get('auth_acl_id')
+                send_login_info_to_reviewers(user_log_id, auth_acl_id)
             return response
 
 

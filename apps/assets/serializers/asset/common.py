@@ -281,14 +281,48 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         return protocols_data_map.values()
 
     @staticmethod
-    def accounts_create(accounts_data, asset):
+    def update_account_su_from(accounts, include_su_from_accounts):
+        if not include_su_from_accounts:
+            return
+        name_map = {account.name: account for account in accounts}
+        username_secret_type_map = {
+            (account.username, account.secret_type): account for account in accounts
+        }
+
+        for name, username_secret_type in include_su_from_accounts.items():
+            account = name_map.get(name)
+            if not account:
+                continue
+            su_from_account = username_secret_type_map.get(username_secret_type)
+            if su_from_account:
+                account.su_from = su_from_account
+                account.save()
+
+    def accounts_create(self, accounts_data, asset):
+        from accounts.models import AccountTemplate
         if not accounts_data:
             return
+        su_from_name_username_secret_type_map = {}
         for data in accounts_data:
             data['asset'] = asset.id
+            name = data.get('name')
+            su_from = data.pop('su_from', None)
+            template_id = data.get('template', None)
+            if template_id:
+                template = AccountTemplate.objects.get(id=template_id)
+                if template and template.su_from:
+                    su_from_name_username_secret_type_map[template.name] = (
+                        template.su_from.username, template.su_from.secret_type
+                    )
+            elif isinstance(su_from, dict):
+                su_from = Account.objects.get(id=su_from.get('id'))
+                su_from_name_username_secret_type_map[name] = (
+                    su_from.username, su_from.secret_type
+                )
         s = AssetAccountSerializer(data=accounts_data, many=True)
         s.is_valid(raise_exception=True)
-        s.save()
+        accounts = s.save()
+        self.update_account_su_from(accounts, su_from_name_username_secret_type_map)
 
     @atomic
     def create(self, validated_data):

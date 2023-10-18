@@ -545,12 +545,12 @@ class Config(dict):
         'MAGNUS_ORACLE_PORTS': '30000-30030',
 
         # 记录清理清理
-        'LOGIN_LOG_KEEP_DAYS': 200,
-        'TASK_LOG_KEEP_DAYS': 90,
-        'OPERATE_LOG_KEEP_DAYS': 200,
-        'ACTIVITY_LOG_KEEP_DAYS': 200,
-        'FTP_LOG_KEEP_DAYS': 200,
-        'CLOUD_SYNC_TASK_EXECUTION_KEEP_DAYS': 30,
+        'LOGIN_LOG_KEEP_DAYS': 180,
+        'TASK_LOG_KEEP_DAYS': 180,
+        'OPERATE_LOG_KEEP_DAYS': 180,
+        'ACTIVITY_LOG_KEEP_DAYS': 180,
+        'FTP_LOG_KEEP_DAYS': 180,
+        'CLOUD_SYNC_TASK_EXECUTION_KEEP_DAYS': 180,
 
         'TICKETS_ENABLED': True,
 

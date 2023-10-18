@@ -18,7 +18,7 @@ from accounts.const import AliasAccount
 from acls.notifications import AssetLoginReminderMsg
 from common.api import JMSModelViewSet
 from common.exceptions import JMSException
-from common.utils import random_string, get_logger, get_request_ip
+from common.utils import random_string, get_logger, get_request_ip_or_data
 from common.utils.django import get_request_os
 from common.utils.http import is_true, is_false
 from orgs.mixins.api import RootOrgViewMixin
@@ -300,6 +300,7 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         'get_rdp_file': 'authentication.add_connectiontoken',
         'get_client_protocol_url': 'authentication.add_connectiontoken',
     }
+    input_username = ''
 
     def get_queryset(self):
         queryset = ConnectionToken.objects \
@@ -335,6 +336,7 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         self._insert_connect_options(data, user)
         asset = data.get('asset')
         account_name = data.get('account')
+        self.input_username = data.get('input_username', '')
         _data = self._validate(user, asset, account_name)
         data.update(_data)
         return serializer
@@ -361,10 +363,9 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         if account.has_secret:
             data['input_secret'] = ''
 
-        input_username = data.get('input_username', '')
         if account.username != AliasAccount.INPUT:
             data['input_username'] = ''
-        ticket = self._validate_acl(user, asset, account, input_username)
+        ticket = self._validate_acl(user, asset, account)
         if ticket:
             data['from_ticket'] = ticket
             data['is_active'] = False
@@ -382,13 +383,12 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
             raise JMSException(code='perm_expired', detail=msg)
         return account
 
-    @staticmethod
-    def _record_operate_log(acl, asset, input_username):
+    def _record_operate_log(self, acl, asset):
         from audits.handler import create_or_update_operate_log
         with tmp_to_org(asset.org_id):
             after = {
                 str(_('Assets')): str(asset),
-                str(_('Account')): input_username
+                str(_('Account')): self.input_username
             }
             object_name = acl._meta.object_name
             resource_type = acl._meta.verbose_name
@@ -397,27 +397,27 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
                 after=after, object_name=object_name
             )
 
-    def _validate_acl(self, user, asset, account, input_username):
+    def _validate_acl(self, user, asset, account):
         from acls.models import LoginAssetACL
         acls = LoginAssetACL.filter_queryset(user=user, asset=asset, account=account)
-        ip = get_request_ip(self.request)
+        ip = get_request_ip_or_data(self.request)
         acl = LoginAssetACL.get_match_rule_acls(user, ip, acls)
         if not acl:
             return
         if acl.is_action(acl.ActionChoices.accept):
-            self._record_operate_log(acl, asset, input_username)
+            self._record_operate_log(acl, asset)
             return
         if acl.is_action(acl.ActionChoices.reject):
-            self._record_operate_log(acl, asset, input_username)
+            self._record_operate_log(acl, asset)
             msg = _('ACL action is reject: {}({})'.format(acl.name, acl.id))
             raise JMSException(code='acl_reject', detail=msg)
         if acl.is_action(acl.ActionChoices.review):
             if not self.request.query_params.get('create_ticket'):
                 msg = _('ACL action is review')
                 raise JMSException(code='acl_review', detail=msg)
-            self._record_operate_log(acl, asset, input_username)
+            self._record_operate_log(acl, asset)
             ticket = LoginAssetACL.create_login_asset_review_ticket(
-                user=user, asset=asset, account_username=input_username,
+                user=user, asset=asset, account_username=self.input_username,
                 assignees=acl.reviewers.all(), org_id=asset.org_id
             )
             return ticket
@@ -426,11 +426,19 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
             if not reviewers:
                 return
 
-            self._record_operate_log(acl, asset, input_username)
+            self._record_operate_log(acl, asset)
             for reviewer in reviewers:
                 AssetLoginReminderMsg(
-                    reviewer, asset, user, input_username
+                    reviewer, asset, user, self.input_username
                 ).publish_async()
+
+    def create(self, request, *args, **kwargs):
+        try:
+            response = super().create(request, *args, **kwargs)
+        except JMSException as e:
+            data = {'code': e.detail.code, 'detail': e.detail}
+            return Response(data, status=e.status_code)
+        return response
 
 
 class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
