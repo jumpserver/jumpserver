@@ -72,12 +72,11 @@ class TicketDirectApproveView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            login_url = reverse('authentication:login')
             direct_url = reverse('tickets:direct-approve', kwargs={'token': kwargs['token']})
             message_data = {
                 'title': _('Ticket approval'),
                 'message': _('After successful authentication, this ticket can be approved directly'),
-                'redirect_url': f'{login_url}?next={direct_url}',
+                'redirect_url': f'{self.login_url}&next={direct_url}',
                 'auto_redirect': True,
             }
             redirect_url = FlashMessageUtil.gen_message_url(message_data)
