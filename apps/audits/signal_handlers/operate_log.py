@@ -39,6 +39,7 @@ def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
         log_id, before_instance = get_instance_dict_from_cache(instance_id)
 
         field_name = str(model._meta.verbose_name)
+        pk_set = pk_set or {}
         objs = model.objects.filter(pk__in=pk_set)
         objs_display = [str(o) for o in objs]
         action = M2M_ACTION[action]
