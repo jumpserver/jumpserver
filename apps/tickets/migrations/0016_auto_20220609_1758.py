@@ -27,6 +27,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'abstract': False,
+                'verbose_name': 'Apply Login Ticket'
             },
             bases=('tickets.ticket',),
         ),
@@ -101,6 +102,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'abstract': False,
+                'verbose_name': 'Apply Login Asset Ticket'
             },
             bases=('tickets.ticket',),
         ),
@@ -130,6 +132,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'abstract': False,
+                'verbose_name': 'Apply Command Ticket'
             },
             bases=('tickets.ticket',),
         ),
