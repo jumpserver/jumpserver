@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 #
+from collections import defaultdict
+
 import django_filters
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
@@ -12,7 +15,7 @@ from accounts.tasks import push_accounts_to_assets_task, verify_accounts_connect
 from assets import serializers
 from assets.exceptions import NotSupportedTemporarilyError
 from assets.filters import IpInFilterBackend, LabelFilterBackend, NodeFilterBackend
-from assets.models import Asset, Gateway, Platform
+from assets.models import Asset, Gateway, Platform, Protocol
 from assets.tasks import test_assets_connectivity_manual, update_assets_hardware_info_manual
 from common.api import SuggestionMixin
 from common.drf.filters import BaseFilterSet, AttrRulesFilterBackend
@@ -115,6 +118,7 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
         ("gateways", "assets.view_gateway"),
         ("spec_info", "assets.view_asset"),
         ("gathered_info", "assets.view_asset"),
+        ("sync_platform_protocols", "assets.change_asset"),
     )
     extra_filter_backends = [
         LabelFilterBackend, IpInFilterBackend,
@@ -151,6 +155,39 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
         else:
             gateways = asset.domain.gateways
         return self.get_paginated_response_from_queryset(gateways)
+
+    @action(methods=['post'], detail=False, url_path='sync-platform-protocols')
+    def sync_platform_protocols(self, request, *args, **kwargs):
+        platform_id = request.data.get('platform_id')
+        platform = get_object_or_404(Platform, pk=platform_id)
+        assets = platform.assets.all()
+
+        platform_protocols = {
+            p['name']: p['port']
+            for p in platform.protocols.values('name', 'port')
+        }
+        asset_protocols_map = defaultdict(set)
+        protocols = assets.prefetch_related('protocols').values_list(
+            'id', 'protocols__name'
+        )
+        for asset_id, protocol in protocols:
+            asset_id = str(asset_id)
+            asset_protocols_map[asset_id].add(protocol)
+        objs = []
+        for asset_id, protocols in asset_protocols_map.items():
+            protocol_names = set(platform_protocols) - protocols
+            if not protocol_names:
+                continue
+            for name in protocol_names:
+                objs.append(
+                    Protocol(
+                        name=name,
+                        port=platform_protocols[name],
+                        asset_id=asset_id,
+                    )
+                )
+        Protocol.objects.bulk_create(objs)
+        return Response(status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
         if request.path.find('/api/v1/assets/assets/') > -1:

@@ -6,7 +6,6 @@ from importlib import import_module
 from django.conf import settings
 from django.db.models import F, Value, CharField, Q
 from django.http import HttpResponse, FileResponse
-from django.utils import timezone
 from django.utils.encoding import escape_uri_path
 from rest_framework import generics
 from rest_framework import status
@@ -185,6 +184,8 @@ class ResourceActivityAPIView(generics.ListAPIView):
             'r_user', 'r_action', 'r_type'
         )
         org_q = Q(org_id=Organization.SYSTEM_ID) | Q(org_id=current_org.id)
+        if resource_id:
+            org_q |= Q(org_id='') | Q(org_id=Organization.ROOT_ID)
         with tmp_to_root_org():
             qs1 = self.get_operate_log_qs(fields, limit, org_q, resource_id=resource_id)
             qs2 = self.get_activity_log_qs(fields, limit, org_q, resource_id=resource_id)
@@ -216,11 +217,10 @@ class OperateLogViewSet(OrgReadonlyModelViewSet):
         return super().get_serializer_class()
 
     def get_queryset(self):
-        org_q = Q(org_id=current_org.id)
+        qs = OperateLog.objects.all()
         if self.is_action_detail:
-            org_q |= Q(org_id=Organization.SYSTEM_ID)
-        with tmp_to_root_org():
-            qs = OperateLog.objects.filter(org_q)
+            with tmp_to_root_org():
+                qs |= OperateLog.objects.filter(org_id=Organization.SYSTEM_ID)
         es_config = settings.OPERATE_LOG_ELASTICSEARCH_CONFIG
         if es_config:
             engine_mod = import_module(TYPE_ENGINE_MAPPING['es'])
@@ -257,9 +257,8 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
     serializer_class = UserSessionSerializer
     filterset_fields = ['id', 'ip', 'city', 'type']
     search_fields = ['id', 'ip', 'city']
-
     rbac_perms = {
-        'offline': ['users.offline_usersession']
+        'offline': ['audits.offline_usersession']
     }
 
     @property
@@ -269,9 +268,7 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         keys = UserSession.get_keys()
-        queryset = UserSession.objects.filter(
-            date_expired__gt=timezone.now(), key__in=keys
-        )
+        queryset = UserSession.objects.filter(key__in=keys)
         if current_org.is_root():
             return queryset
         user_ids = self.org_user_ids
@@ -281,7 +278,9 @@ class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
     @action(['POST'], detail=False, url_path='offline')
     def offline(self, request, *args, **kwargs):
         ids = request.data.get('ids', [])
-        queryset = self.get_queryset().exclude(key=request.session.session_key).filter(id__in=ids)
+        queryset = self.get_queryset()
+        session_key = request.session.session_key
+        queryset = queryset.exclude(key=session_key).filter(id__in=ids)
         if not queryset.exists():
             return Response(status=status.HTTP_200_OK)
 

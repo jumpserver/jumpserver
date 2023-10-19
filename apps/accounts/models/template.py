@@ -49,8 +49,7 @@ class AccountTemplate(BaseAccount, SecretWithRandomMixin):
             ).first()
             return account
 
-    @staticmethod
-    def bulk_update_accounts(accounts, data):
+    def bulk_update_accounts(self, accounts):
         history_model = Account.history.model
         account_ids = accounts.values_list('id', flat=True)
         history_accounts = history_model.objects.filter(id__in=account_ids)
@@ -63,8 +62,7 @@ class AccountTemplate(BaseAccount, SecretWithRandomMixin):
         for account in accounts:
             account_id = str(account.id)
             account.version = account_id_count_map.get(account_id) + 1
-            for k, v in data.items():
-                setattr(account, k, v)
+            account.secret = self.get_secret()
         Account.objects.bulk_update(accounts, ['version', 'secret'])
 
     @staticmethod
@@ -86,7 +84,5 @@ class AccountTemplate(BaseAccount, SecretWithRandomMixin):
 
     def bulk_sync_account_secret(self, accounts, user_id):
         """ 批量同步账号密码 """
-        if not accounts:
-            return
-        self.bulk_update_accounts(accounts, {'secret': self.secret})
+        self.bulk_update_accounts(accounts)
         self.bulk_create_history_accounts(accounts, user_id)

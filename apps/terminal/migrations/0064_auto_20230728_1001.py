@@ -33,6 +33,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='task',
             name='name',
-            field=models.CharField(choices=[('kill_session', 'Kill Session'), ('lock_session', 'Lock Session'), ('unlock_session', 'Unlock Session')], max_length=128, verbose_name='Name'),
+            field=models.CharField(choices=[('kill_session', 'Kill session'), ('lock_session', 'Lock session'), ('unlock_session', 'Unlock session')], max_length=128, verbose_name='Name'),
         ),
     ]

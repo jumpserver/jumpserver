@@ -247,9 +247,10 @@ class Config(dict):
         'AUTH_CUSTOM': False,
         'AUTH_CUSTOM_FILE_MD5': '',
 
-        # Custom Config
         'MFA_CUSTOM': False,
         'MFA_CUSTOM_FILE_MD5': '',
+
+        'SMS_CUSTOM_FILE_MD5': '',
 
         # 临时密码
         'AUTH_TEMP_TOKEN': False,
@@ -409,6 +410,7 @@ class Config(dict):
 
         'SMS_ENABLED': False,
         'SMS_BACKEND': '',
+        'SMS_CODE_LENGTH': 4,
         'SMS_TEST_PHONE': '',
 
         'ALIBABA_ACCESS_KEY_ID': '',
@@ -439,7 +441,7 @@ class Config(dict):
         'CMPP2_VERIFY_TEMPLATE_CODE': '{code}',
 
         'CUSTOM_SMS_URL': '',
-        'CUSTOM_SMS_API_PARAMS': {'phone_numbers': '{phone_numbers}', 'code': '{code}'},
+        'CUSTOM_SMS_API_PARAMS': {'phone_numbers': '{phone_numbers}', 'content': _('The verification code is: {code}')},
         'CUSTOM_SMS_REQUEST_METHOD': 'get',
 
         # Email
@@ -495,7 +497,7 @@ class Config(dict):
         'SECURITY_LUNA_REMEMBER_AUTH': True,
         'SECURITY_WATERMARK_ENABLED': True,
         'SECURITY_MFA_VERIFY_TTL': 3600,
-        'SECURITY_UNCOMMON_USERS_TTL': 30,
+        'SECURITY_UNCOMMON_USERS_TTL': 90,
         'VERIFY_CODE_TTL': 60,
         'SECURITY_SESSION_SHARE': True,
         'SECURITY_CHECK_DIFFERENT_CITY_LOGIN': True,
@@ -543,12 +545,12 @@ class Config(dict):
         'MAGNUS_ORACLE_PORTS': '30000-30030',
 
         # 记录清理清理
-        'LOGIN_LOG_KEEP_DAYS': 200,
-        'TASK_LOG_KEEP_DAYS': 90,
-        'OPERATE_LOG_KEEP_DAYS': 200,
-        'ACTIVITY_LOG_KEEP_DAYS': 200,
-        'FTP_LOG_KEEP_DAYS': 200,
-        'CLOUD_SYNC_TASK_EXECUTION_KEEP_DAYS': 30,
+        'LOGIN_LOG_KEEP_DAYS': 180,
+        'TASK_LOG_KEEP_DAYS': 180,
+        'OPERATE_LOG_KEEP_DAYS': 180,
+        'ACTIVITY_LOG_KEEP_DAYS': 180,
+        'FTP_LOG_KEEP_DAYS': 180,
+        'CLOUD_SYNC_TASK_EXECUTION_KEEP_DAYS': 180,
 
         'TICKETS_ENABLED': True,
 

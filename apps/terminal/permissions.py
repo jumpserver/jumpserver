@@ -9,7 +9,7 @@ __all__ = ['IsSessionAssignee']
 
 class IsSessionAssignee(permissions.IsAuthenticated):
     def has_permission(self, request, view):
-        return False
+        return True
 
     def has_object_permission(self, request, view, obj):
         try:

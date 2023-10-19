@@ -30,8 +30,9 @@ class NodeSerializer(BulkOrgResourceModelSerializer):
         if '/' in data:
             error = _("Can't contains: " + "/")
             raise serializers.ValidationError(error)
-        if self.instance:
-            instance = self.instance
+        view = self.context['view']
+        instance = self.instance or getattr(view, 'instance', None)
+        if instance:
             siblings = instance.get_siblings()
         else:
             instance = Node.org_root()

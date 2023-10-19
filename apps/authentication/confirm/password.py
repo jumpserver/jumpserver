@@ -15,3 +15,14 @@ class ConfirmPassword(BaseConfirm):
         ok = authenticate(self.request, username=self.user.username, password=secret_key)
         msg = '' if ok else _('Authentication failed password incorrect')
         return ok, msg
+
+    @property
+    def content(self):
+        return [
+            {
+                'name': 'password',
+                'display_name': _('Password'),
+                'disabled': False,
+                'placeholder': _('Password'),
+            }
+        ]

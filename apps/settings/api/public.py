@@ -2,10 +2,9 @@ from django.conf import settings
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 
-from common.permissions import IsValidUserOrConnectionToken
+from authentication.permissions import IsValidUserOrConnectionToken
 from common.utils import get_logger, lazyproperty
 from common.utils.timezone import local_now
-from jumpserver.utils import has_valid_xpack_license, get_xpack_license_info
 from .. import serializers
 from ..utils import get_interface_setting_or_default
 
@@ -36,8 +35,8 @@ class PublicSettingApi(OpenPublicSettingApi):
     def get_object(self):
         values = super().get_object()
         values.update({
-            "XPACK_LICENSE_IS_VALID": has_valid_xpack_license(),
-            "XPACK_LICENSE_INFO": get_xpack_license_info(),
+            "XPACK_LICENSE_IS_VALID": settings.XPACK_LICENSE_IS_VALID,
+            "XPACK_LICENSE_INFO": settings.XPACK_LICENSE_INFO,
             "PASSWORD_RULE": {
                 'SECURITY_PASSWORD_MIN_LENGTH': settings.SECURITY_PASSWORD_MIN_LENGTH,
                 'SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH': settings.SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH,

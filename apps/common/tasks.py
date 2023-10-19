@@ -36,8 +36,8 @@ def send_mail_async(*args, **kwargs):
         args[0] = (settings.EMAIL_SUBJECT_PREFIX or '') + args[0]
         from_email = settings.EMAIL_FROM or settings.EMAIL_HOST_USER
         args.insert(2, from_email)
-        args = tuple(args)
 
+    args = tuple(args)
     try:
         return send_mail(*args, **kwargs)
     except Exception as e:

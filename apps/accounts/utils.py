@@ -16,7 +16,7 @@ class SecretGenerator:
 
     @staticmethod
     def generate_ssh_key():
-        private_key, public_key = ssh_key_gen()
+        private_key, __ = ssh_key_gen()
         return private_key
 
     def generate_password(self):

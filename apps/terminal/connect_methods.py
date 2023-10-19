@@ -75,7 +75,7 @@ class NativeClient(TextChoices):
         xpack_protocols = Protocol.xpack_protocols()
 
         for protocol, _clients in clients_map.items():
-            if not settings.XPACK_ENABLED and protocol in xpack_protocols:
+            if not settings.XPACK_LICENSE_IS_VALID and protocol in xpack_protocols:
                 continue
             if isinstance(_clients, dict):
                 if os == 'all':
@@ -83,7 +83,7 @@ class NativeClient(TextChoices):
                 else:
                     _clients = _clients.get(os, _clients['default'])
             for client in _clients:
-                if not settings.XPACK_ENABLED and client in cls.xpack_methods():
+                if not settings.XPACK_LICENSE_IS_VALID and client in cls.xpack_methods():
                     continue
                 methods[protocol].append({
                     'value': client.value,
@@ -144,7 +144,7 @@ class ConnectMethodUtil:
                 'support': [
                     Protocol.mysql, Protocol.postgresql,
                     Protocol.oracle, Protocol.sqlserver,
-                    Protocol.mariadb
+                    Protocol.mariadb, Protocol.db2
                 ],
                 'match': 'm2m'
             },

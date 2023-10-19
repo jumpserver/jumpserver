@@ -18,3 +18,6 @@ class ApplyCommandTicket(Ticket):
         'acls.CommandFilterACL', on_delete=models.SET_NULL,
         null=True, verbose_name=_('Command filter acl')
     )
+
+    class Meta:
+        verbose_name = _('Apply Command Ticket')

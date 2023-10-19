@@ -6,8 +6,8 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from assets.models import Asset
+from authentication.permissions import IsValidUserOrConnectionToken
 from common.api import JMSBulkModelViewSet
-from common.permissions import IsValidUserOrConnectionToken
 from orgs.utils import tmp_to_root_org
 from terminal import serializers
 from terminal.models import Session, Endpoint, EndpointRule

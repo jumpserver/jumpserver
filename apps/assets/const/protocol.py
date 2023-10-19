@@ -22,6 +22,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
     oracle = 'oracle', 'Oracle'
     postgresql = 'postgresql', 'PostgreSQL'
     sqlserver = 'sqlserver', 'SQLServer'
+    db2 = 'db2', 'DB2'
     clickhouse = 'clickhouse', 'ClickHouse'
     redis = 'redis', 'Redis'
     mongodb = 'mongodb', 'MongoDB'
@@ -170,6 +171,12 @@ class Protocol(ChoicesMixin, models.TextChoices):
                     }
                 }
             },
+            cls.db2: {
+                'port': 5000,
+                'required': True,
+                'secret_types': ['password'],
+                'xpack': True,
+            },
             cls.clickhouse: {
                 'port': 9000,
                 'required': True,
@@ -269,7 +276,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
                 }
             }
         }
-        if settings.XPACK_ENABLED:
+        if settings.XPACK_LICENSE_IS_VALID:
             choices = protocols[cls.chatgpt]['setting']['api_mode']['choices']
             choices.extend([
                 ('gpt-4', 'GPT-4'),

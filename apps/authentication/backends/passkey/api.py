@@ -4,24 +4,37 @@ from django.shortcuts import render
 from django.utils.translation import gettext as _
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.viewsets import ModelViewSet
 
 from authentication.mixins import AuthMixin
+from common.api import JMSModelViewSet
 from .fido import register_begin, register_complete, auth_begin, auth_complete
 from .models import Passkey
 from .serializer import PasskeySerializer
+from ...const import ConfirmType
+from ...permissions import UserConfirmation
 from ...views import FlashMessageMixin
 
 
-class PasskeyViewSet(AuthMixin, FlashMessageMixin, ModelViewSet):
+class PasskeyViewSet(AuthMixin, FlashMessageMixin, JMSModelViewSet):
     serializer_class = PasskeySerializer
     permission_classes = (IsAuthenticated,)
+
+    def get_permissions(self):
+        if self.is_swagger_request():
+            return super().get_permissions()
+        if self.action == 'register':
+            self.permission_classes = [
+                IsAuthenticated, UserConfirmation.require(ConfirmType.PASSWORD)
+            ]
+        return super().get_permissions()
 
     def get_queryset(self):
         return Passkey.objects.filter(user=self.request.user)
 
     @action(methods=['get', 'post'], detail=False, url_path='register')
     def register(self, request):
+        if request.user.source != 'local':
+            return JsonResponse({'error': _('Only register passkey for local user')}, status=400)
         if request.method == 'GET':
             register_data, state = register_begin(request)
             return JsonResponse(dict(register_data))

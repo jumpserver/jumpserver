@@ -1,6 +1,7 @@
 from urllib.parse import urlencode
 
 from django.conf import settings
+from django.contrib.auth import logout as auth_logout
 from django.db.utils import IntegrityError
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseRedirect
@@ -13,7 +14,7 @@ from authentication import errors
 from authentication.const import ConfirmType
 from authentication.mixins import AuthMixin
 from authentication.notifications import OAuthBindMessage
-from common.permissions import UserConfirmation
+from authentication.permissions import UserConfirmation
 from common.sdk.im.dingtalk import URL, DingTalk
 from common.utils import get_logger
 from common.utils.common import get_request_ip
@@ -99,7 +100,7 @@ class DingTalkOAuthMixin(DingTalkBaseMixin, View):
 
 
 class DingTalkQRBindView(DingTalkQRMixin, View):
-    permission_classes = (IsAuthenticated, UserConfirmation.require(ConfirmType.ReLogin))
+    permission_classes = (IsAuthenticated, UserConfirmation.require(ConfirmType.RELOGIN))
 
     def get(self, request: HttpRequest):
         user = request.user
@@ -158,6 +159,7 @@ class DingTalkQRBindCallbackView(DingTalkQRMixin, View):
         ip = get_request_ip(request)
         OAuthBindMessage(user, ip, _('DingTalk'), user_id).publish_async()
         msg = _('Binding DingTalk successfully')
+        auth_logout(request)
         response = self.get_success_response(redirect_url, msg, msg)
         return response
 

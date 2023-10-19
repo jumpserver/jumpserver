@@ -2,7 +2,6 @@ import abc
 
 
 class BaseConfirm(abc.ABC):
-
     def __init__(self, user, request):
         self.user = user
         self.request = request
@@ -23,7 +22,7 @@ class BaseConfirm(abc.ABC):
 
     @property
     def content(self):
-        return ''
+        return []
 
     @abc.abstractmethod
     def authenticate(self, secret_key, mfa_type) -> tuple:

@@ -1,5 +1,6 @@
 import os
 import uuid
+from datetime import timedelta
 from importlib import import_module
 
 from django.conf import settings
@@ -10,7 +11,7 @@ from django.utils import timezone
 from django.utils.translation import gettext, gettext_lazy as _
 
 from common.db.encoder import ModelJSONFieldEncoder
-from common.utils import lazyproperty
+from common.utils import lazyproperty, i18n_trans
 from ops.models import JobExecution
 from orgs.mixins.models import OrgModelMixin, Organization
 from orgs.utils import current_org
@@ -155,6 +156,10 @@ class ActivityLog(OrgModelMixin):
         verbose_name = _("Activity log")
         ordering = ('-datetime',)
 
+    def __str__(self):
+        detail = i18n_trans(self.detail)
+        return "{} {}".format(detail, self.resource_id)
+
     def save(self, *args, **kwargs):
         if current_org.is_root() and not self.org_id:
             self.org_id = Organization.ROOT_ID
@@ -259,7 +264,6 @@ class UserSession(models.Model):
     type = models.CharField(choices=LoginTypeChoices.choices, max_length=2, verbose_name=_("Login type"))
     backend = models.CharField(max_length=32, default="", verbose_name=_("Authentication backend"))
     date_created = models.DateTimeField(null=True, blank=True, verbose_name=_('Date created'))
-    date_expired = models.DateTimeField(null=True, blank=True, verbose_name=_("Date expired"), db_index=True)
     user = models.ForeignKey(
         'users.User', verbose_name=_('User'), related_name='sessions', on_delete=models.CASCADE
     )
@@ -271,6 +275,14 @@ class UserSession(models.Model):
     def backend_display(self):
         return gettext(self.backend)
 
+    @property
+    def date_expired(self):
+        session_store_cls = import_module(settings.SESSION_ENGINE).SessionStore
+        session_store = session_store_cls(session_key=self.key)
+        cache_key = session_store.cache_key
+        ttl = caches[settings.SESSION_CACHE_ALIAS].ttl(cache_key)
+        return timezone.now() + timedelta(seconds=ttl)
+
     @staticmethod
     def get_keys():
         session_store_cls = import_module(settings.SESSION_ENGINE).SessionStore
@@ -280,8 +292,8 @@ class UserSession(models.Model):
 
     @classmethod
     def clear_expired_sessions(cls):
-        cls.objects.filter(date_expired__lt=timezone.now()).delete()
-        cls.objects.exclude(key__in=cls.get_keys()).delete()
+        keys = cls.get_keys()
+        cls.objects.exclude(key__in=keys).delete()
 
     class Meta:
         ordering = ['-date_created']

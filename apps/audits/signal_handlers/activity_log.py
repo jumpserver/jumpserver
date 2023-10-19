@@ -70,6 +70,8 @@ class ActivityLogHandler:
 def create_activities(resource_ids, detail, detail_id, action, org_id):
     if not resource_ids:
         return
+    if not org_id:
+        org_id = Organization.ROOT_ID
     activities = [
         ActivityLog(
             resource_id=getattr(resource_id, 'pk', resource_id),
@@ -92,6 +94,8 @@ def after_task_publish_for_activity_log(headers=None, body=None, **kwargs):
         logger.error(f'Get celery task info error: {e}', exc_info=True)
     else:
         logger.debug(f'Create activity log for celery task: {task_id}')
+        if not resource_ids:
+            return
         create_activities(resource_ids, detail, task_id, action=ActivityChoices.task, org_id=org_id)
 
 
@@ -110,6 +114,8 @@ def on_session_or_login_log_created(sender, instance=None, created=False, **kwar
         logger.error('Activity log handler not found: {}'.format(sender))
 
     resource_ids, detail, act_type, org_id = func(instance)
+    if not resource_ids:
+        return
     return create_activities(resource_ids, detail, instance.id, act_type, org_id)
 
 

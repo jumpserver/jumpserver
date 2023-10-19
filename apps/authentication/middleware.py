@@ -8,6 +8,7 @@ from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import gettext as _
 
 from apps.authentication import mixins
+from audits.signal_handlers import send_login_info_to_reviewers
 from authentication.signals import post_auth_failed
 from common.utils import gen_key_pair
 from common.utils import get_request_ip
@@ -92,12 +93,12 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
                 'title': _('Authentication failed'),
                 'message': _('Authentication failed (before login check failed): {}').format(e),
                 'interval': 10,
-                'redirect_url': reverse('authentication:login'),
+                'redirect_url': reverse('authentication:login') + '?admin=1',
                 'auto_redirect': True,
             }
             response = render(request, 'authentication/auth_fail_flash_message_standalone.html', context)
         else:
-            if not self.request.session['auth_confirm_required']:
+            if not self.request.session.get('auth_confirm_required'):
                 return response
             guard_url = reverse('authentication:login-guard')
             args = request.META.get('QUERY_STRING', '')
@@ -105,6 +106,12 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
                 guard_url = "%s?%s" % (guard_url, args)
             response = redirect(guard_url)
         finally:
+            if request.session.get('can_send_notifications') and \
+                    self.request.session.get('auth_notice_required'):
+                request.session['can_send_notifications'] = False
+                user_log_id = self.request.session.get('user_log_id')
+                auth_acl_id = self.request.session.get('auth_acl_id')
+                send_login_info_to_reviewers(user_log_id, auth_acl_id)
             return response
 
 

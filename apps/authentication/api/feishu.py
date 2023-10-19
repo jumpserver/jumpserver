@@ -4,12 +4,13 @@ from rest_framework.views import APIView
 
 from authentication import errors
 from authentication.const import ConfirmType
+from authentication.permissions import UserConfirmation
 from common.api import RoleUserMixin, RoleAdminMixin
-from common.permissions import UserConfirmation, IsValidUser
+from common.permissions import IsValidUser
 from common.utils import get_logger
 from users.models import User
 
-logger = get_logger(__file__)
+logger = get_logger(__name__)
 
 
 class FeiShuQRUnBindBase(APIView):
@@ -27,7 +28,7 @@ class FeiShuQRUnBindBase(APIView):
 
 
 class FeiShuQRUnBindForUserApi(RoleUserMixin, FeiShuQRUnBindBase):
-    permission_classes = (IsValidUser, UserConfirmation.require(ConfirmType.ReLogin),)
+    permission_classes = (IsValidUser, UserConfirmation.require(ConfirmType.RELOGIN),)
 
 
 class FeiShuQRUnBindForAdminApi(RoleAdminMixin, FeiShuQRUnBindBase):

@@ -20,19 +20,22 @@ def check_different_city_login_if_need(user, request):
         return
 
     ip = get_request_ip(request) or '0.0.0.0'
-    if not (ip and validate_ip(ip)):
-        city = DEFAULT_CITY
-    else:
-        city = get_ip_city(ip) or DEFAULT_CITY
-
     city_white = [_('LAN'), 'LAN']
     is_private = ipaddress.ip_address(ip).is_private
-    if not is_private:
-        last_user_login = UserLoginLog.objects.exclude(city__in=city_white) \
-            .filter(username=user.username, status=True).first()
+    if is_private:
+        return
+    last_user_login = UserLoginLog.objects.exclude(
+        city__in=city_white
+    ).filter(username=user.username, status=True).first()
+    if not last_user_login:
+        return
 
-        if last_user_login and last_user_login.city != city:
-            DifferentCityLoginMessage(user, ip, city).publish_async()
+    city = get_ip_city(ip)
+    last_city = get_ip_city(last_user_login.ip)
+    if city == last_city:
+        return
+
+    DifferentCityLoginMessage(user, ip, city).publish_async()
 
 
 def build_absolute_uri(request, path=None):

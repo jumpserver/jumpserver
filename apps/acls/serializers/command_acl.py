@@ -8,6 +8,7 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from orgs.utils import tmp_to_root_org
 from terminal.models import Session
 from .base import BaseUserAssetAccountACLSerializer as BaseSerializer
+from ..const import ActionChoices
 
 __all__ = ["CommandFilterACLSerializer", "CommandGroupSerializer", "CommandReviewSerializer"]
 
@@ -31,8 +32,7 @@ class CommandFilterACLSerializer(BaseSerializer, BulkOrgResourceModelSerializer)
     class Meta(BaseSerializer.Meta):
         model = CommandFilterACL
         fields = BaseSerializer.Meta.fields + ['command_groups']
-        # 默认都支持所有的 actions
-        action_choices_exclude = []
+        action_choices_exclude = [ActionChoices.notice]
 
 
 class CommandReviewSerializer(serializers.Serializer):

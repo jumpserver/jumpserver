@@ -42,7 +42,6 @@ class VerifyAccountManager(AccountBasePlaybookManager):
         if host.get('error'):
             return host
 
-        # host['ssh_args'] = '-o ControlMaster=no -o ControlPersist=no'
         accounts = asset.accounts.all()
         accounts = self.get_accounts(account, accounts)
         inventory_hosts = []
@@ -64,7 +63,8 @@ class VerifyAccountManager(AccountBasePlaybookManager):
                 'username': account.username,
                 'secret_type': account.secret_type,
                 'secret': secret,
-                'private_key_path': private_key_path
+                'private_key_path': private_key_path,
+                'become': account.get_ansible_become_auth(),
             }
             if account.platform.type == 'oracle':
                 h['account']['mode'] = 'sysdba' if account.privileged else None

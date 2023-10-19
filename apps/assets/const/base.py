@@ -1,8 +1,7 @@
+from django.conf import settings
 from django.db import models
 from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
-
-from jumpserver.utils import has_valid_xpack_license
 
 
 class Type:
@@ -113,7 +112,7 @@ class BaseType(TextChoices):
 
     @classmethod
     def get_choices(cls):
-        if not has_valid_xpack_license():
+        if not settings.XPACK_LICENSE_IS_VALID:
             return [
                 (tp.value, tp.label)
                 for tp in cls.get_community_types()

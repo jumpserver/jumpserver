@@ -30,6 +30,13 @@ class ActionChoices(TextChoices):
     login = "login", _("Login")
     change_auth = "change_password", _("Change password")
 
+    accept = 'accept', _('Accept')
+    review = 'review', _('Review')
+    notice = 'notice', _('Notifications')
+    reject = 'reject', _('Reject')
+    approve = 'approve', _('Approve')
+    close = 'close', _('Close')
+
 
 class LoginTypeChoices(TextChoices):
     web = "W", _("Web")

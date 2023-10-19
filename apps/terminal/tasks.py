@@ -43,6 +43,7 @@ def delete_terminal_status_period():
 @register_as_period_task(interval=600)
 @after_app_ready_start
 @after_app_shutdown_clean_periodic
+@tmp_to_root_org()
 def clean_orphan_session():
     active_sessions = Session.objects.filter(is_finished=False)
     for session in active_sessions:

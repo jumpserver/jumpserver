@@ -175,6 +175,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         protocols = self.initial_data.get('protocols')
         if protocols is not None:
             return
+        if getattr(self, 'instance', None):
+            return
 
         protocols_required, protocols_default = self._get_protocols_required_default()
         protocol_map = {str(protocol.id): protocol for protocol in protocols_required + protocols_default}
@@ -281,14 +283,52 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         return protocols_data_map.values()
 
     @staticmethod
-    def accounts_create(accounts_data, asset):
+    def update_account_su_from(accounts, include_su_from_accounts):
+        if not include_su_from_accounts:
+            return
+        name_map = {account.name: account for account in accounts}
+        username_secret_type_map = {
+            (account.username, account.secret_type): account for account in accounts
+        }
+
+        for name, username_secret_type in include_su_from_accounts.items():
+            account = name_map.get(name)
+            if not account:
+                continue
+            su_from_account = username_secret_type_map.get(username_secret_type)
+            if su_from_account:
+                account.su_from = su_from_account
+                account.save()
+
+    def accounts_create(self, accounts_data, asset):
+        from accounts.models import AccountTemplate
         if not accounts_data:
             return
+
+        if not isinstance(accounts_data[0], dict):
+            raise serializers.ValidationError({'accounts': _("Invalid data")})
+
+        su_from_name_username_secret_type_map = {}
         for data in accounts_data:
             data['asset'] = asset.id
+            name = data.get('name')
+            su_from = data.pop('su_from', None)
+            template_id = data.get('template', None)
+            if template_id:
+                template = AccountTemplate.objects.get(id=template_id)
+                if template and template.su_from:
+                    su_from_name_username_secret_type_map[template.name] = (
+                        template.su_from.username, template.su_from.secret_type
+                    )
+            elif isinstance(su_from, dict):
+                su_from = Account.objects.get(id=su_from.get('id'))
+                su_from_name_username_secret_type_map[name] = (
+                    su_from.username, su_from.secret_type
+                )
         s = AssetAccountSerializer(data=accounts_data, many=True)
         s.is_valid(raise_exception=True)
-        s.save()
+        accounts = s.save()
+        self.update_account_su_from(accounts, su_from_name_username_secret_type_map)
 
     @atomic
     def create(self, validated_data):
@@ -298,10 +338,37 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         self.perform_nodes_display_create(instance, nodes_display)
         return instance
 
+    @staticmethod
+    def sync_platform_protocols(instance, old_platform):
+        platform = instance.platform
+
+        if str(old_platform.id) == str(instance.platform_id):
+            return
+
+        platform_protocols = {
+            p['name']: p['port']
+            for p in platform.protocols.values('name', 'port')
+        }
+
+        protocols = set(instance.protocols.values_list('name', flat=True))
+        protocol_names = set(platform_protocols) - protocols
+        objs = []
+        for name in protocol_names:
+            objs.append(
+                Protocol(
+                    name=name,
+                    port=platform_protocols[name],
+                    asset_id=instance.id,
+                )
+            )
+        Protocol.objects.bulk_create(objs)
+
     @atomic
     def update(self, instance, validated_data):
+        old_platform = instance.platform
         nodes_display = validated_data.pop('nodes_display', '')
         instance = super().update(instance, validated_data)
+        self.sync_platform_protocols(instance, old_platform)
         self.perform_nodes_display_create(instance, nodes_display)
         return instance
 

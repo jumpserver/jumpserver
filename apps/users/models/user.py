@@ -606,7 +606,8 @@ class TokenMixin:
 
     def generate_reset_token(self):
         token = random_string(50)
-        self.set_cache(token)
+        key = self.CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
+        cache.set(key, {'id': self.id, 'email': self.email}, 3600)
         return token
 
     @classmethod
@@ -625,10 +626,6 @@ class TokenMixin:
         except (AttributeError, cls.DoesNotExist) as e:
             logger.error(e, exc_info=True)
             return None
-
-    def set_cache(self, token):
-        key = self.CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
-        cache.set(key, {'id': self.id, 'email': self.email}, 3600)
 
     @classmethod
     def expired_reset_password_token(cls, token):
@@ -808,11 +805,11 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
     avatar = models.ImageField(
         upload_to="avatar", null=True, verbose_name=_('Avatar')
     )
-    wechat = models.CharField(
+    wechat = fields.EncryptCharField(
         max_length=128, blank=True, verbose_name=_('Wechat')
     )
-    phone = models.CharField(
-        max_length=20, blank=True, null=True, verbose_name=_('Phone')
+    phone = fields.EncryptCharField(
+        max_length=128, blank=True, null=True, verbose_name=_('Phone')
     )
     mfa_level = models.SmallIntegerField(
         default=0, choices=MFAMixin.MFA_LEVEL_CHOICES, verbose_name=_('MFA')
@@ -837,11 +834,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
     )
     created_by = models.CharField(max_length=30, default='', blank=True, verbose_name=_('Created by'))
     updated_by = models.CharField(max_length=30, default='', blank=True, verbose_name=_('Updated by'))
-    source = models.CharField(
-        max_length=30, default=Source.local,
-        choices=Source.choices,
-        verbose_name=_('Source')
-    )
+    source = models.CharField(max_length=30, default=Source.local, choices=Source.choices, verbose_name=_('Source'))
     date_password_last_updated = models.DateTimeField(
         auto_now_add=True, blank=True, null=True,
         verbose_name=_('Date password last updated')
@@ -849,6 +842,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
     need_update_password = models.BooleanField(
         default=False, verbose_name=_('Need update password')
     )
+    date_api_key_last_used = models.DateTimeField(null=True, blank=True, verbose_name=_('Date api key used'))
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_('Date updated'))
     wecom_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('WeCom'))
     dingtalk_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('DingTalk'))

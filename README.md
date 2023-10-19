@@ -12,8 +12,6 @@
 
 
 <p align="center">
-    JumpServer <a href="https://github.com/jumpserver/jumpserver/releases/tag/v3.0.0">v3.0</a> 正式发布。
-    <br>
     9 年时间，倾情投入，用心做好一款开源堡垒机。
 </p>
 
