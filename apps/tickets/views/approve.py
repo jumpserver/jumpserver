@@ -76,7 +76,7 @@ class TicketDirectApproveView(TemplateView):
             message_data = {
                 'title': _('Ticket approval'),
                 'message': _('After successful authentication, this ticket can be approved directly'),
-                'redirect_url': f'{self.login_url}&next={direct_url}',
+                'redirect_url': f'{self.login_url}&{self.redirect_field_name}={direct_url}',
                 'auto_redirect': True,
             }
             redirect_url = FlashMessageUtil.gen_message_url(message_data)
