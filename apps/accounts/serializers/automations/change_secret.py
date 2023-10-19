@@ -71,7 +71,6 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
             return password_rules
 
         length = password_rules.get('length')
-        symbol_set = password_rules.get('symbol_set', '')
 
         try:
             length = int(length)
@@ -84,10 +83,6 @@ class ChangeSecretAutomationSerializer(AuthValidateMixin, BaseAutomationSerializ
             msg = _('* Password length range 6-30 bits')
             raise serializers.ValidationError(msg)
 
-        if not isinstance(symbol_set, str):
-            symbol_set = str(symbol_set)
-
-        password_rules = {'length': length, 'symbol_set': ''.join(symbol_set)}
         return password_rules
 
     def validate(self, attrs):
