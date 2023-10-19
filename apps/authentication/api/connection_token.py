@@ -330,13 +330,28 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
             connect_options[name] = value
         data['connect_options'] = connect_options
 
+    @staticmethod
+    def get_input_username(data):
+        input_username = data.get('input_username', '')
+        if input_username:
+            return input_username
+
+        account = data.get('account', '')
+        if account == '@USER':
+            input_username = str(data.get('user', ''))
+        elif account == '@INPUT':
+            input_username = '@INPUT'
+        else:
+            input_username = account
+        return input_username
+
     def validate_serializer(self, serializer):
         data = serializer.validated_data
         user = self.get_user(serializer)
         self._insert_connect_options(data, user)
         asset = data.get('asset')
         account_name = data.get('account')
-        self.input_username = data.get('input_username', '')
+        self.input_username = self.get_input_username(data)
         _data = self._validate(user, asset, account_name)
         data.update(_data)
         return serializer
