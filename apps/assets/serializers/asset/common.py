@@ -304,6 +304,10 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
         from accounts.models import AccountTemplate
         if not accounts_data:
             return
+
+        if not isinstance(accounts_data[0], dict):
+            raise serializers.ValidationError({'accounts': _("Invalid data")})
+
         su_from_name_username_secret_type_map = {}
         for data in accounts_data:
             data['asset'] = asset.id
