@@ -107,7 +107,7 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
             response = redirect(guard_url)
         finally:
             if request.session.get('can_send_notifications') and \
-                    self.request.session['auth_notice_required']:
+                    self.request.session.get('auth_notice_required'):
                 request.session['can_send_notifications'] = False
                 user_log_id = self.request.session.get('user_log_id')
                 auth_acl_id = self.request.session.get('auth_acl_id')
