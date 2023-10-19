@@ -22,3 +22,6 @@ class ApplyLoginAssetTicket(Ticket):
             return
         self.connection_token.is_active = True
         self.connection_token.save()
+
+    class Meta:
+        verbose_name = _('Apply Login Asset Ticket')
