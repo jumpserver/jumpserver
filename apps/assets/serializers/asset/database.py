@@ -1,3 +1,4 @@
+from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -34,7 +35,7 @@ class DatabaseSerializer(AssetSerializer):
             if not platform_id and self.instance:
                 platform = self.instance.platform
         elif getattr(self, 'instance', None):
-            if isinstance(self.instance, list):
+            if isinstance(self.instance, (list, QuerySet)):
                 return
             platform = self.instance.platform
         elif self.context.get('request'):
