@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-19 16:21+0800\n"
+"POT-Creation-Date: 2023-10-20 14:50+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -95,7 +95,7 @@ msgid "Update"
 msgstr "更新"
 
 #: accounts/const/account.py:33
-#: accounts/serializers/automations/change_secret.py:155 audits/const.py:62
+#: accounts/serializers/automations/change_secret.py:150 audits/const.py:62
 #: audits/signal_handlers/activity_log.py:33 common/const/choices.py:19
 #: ops/const.py:74 terminal/const.py:77 xpack/plugins/cloud/const.py:43
 msgid "Failed"
@@ -221,8 +221,8 @@ msgstr "ユーザー %s がパスワードを閲覧/導き出しました"
 #: accounts/serializers/account/account.py:210
 #: accounts/serializers/account/account.py:255
 #: accounts/serializers/account/gathered_account.py:10
-#: accounts/serializers/automations/change_secret.py:111
-#: accounts/serializers/automations/change_secret.py:131
+#: accounts/serializers/automations/change_secret.py:106
+#: accounts/serializers/automations/change_secret.py:126
 #: acls/serializers/base.py:123 assets/models/asset/common.py:93
 #: assets/models/asset/common.py:334 assets/models/cmd_filter.py:36
 #: assets/serializers/domain.py:19 assets/serializers/label.py:27
@@ -261,8 +261,8 @@ msgid "Source ID"
 msgstr "ソース ID"
 
 #: accounts/models/account.py:60
-#: accounts/serializers/automations/change_secret.py:112
-#: accounts/serializers/automations/change_secret.py:132
+#: accounts/serializers/automations/change_secret.py:107
+#: accounts/serializers/automations/change_secret.py:127
 #: acls/serializers/base.py:124 acls/templates/acls/asset_login_reminder.html:7
 #: assets/serializers/asset/common.py:125 assets/serializers/gateway.py:28
 #: audits/models.py:58 authentication/api/connection_token.py:406
@@ -343,8 +343,8 @@ msgid "Reason"
 msgstr "理由"
 
 #: accounts/models/automations/backup_account.py:107
-#: accounts/serializers/automations/change_secret.py:110
-#: accounts/serializers/automations/change_secret.py:133
+#: accounts/serializers/automations/change_secret.py:105
+#: accounts/serializers/automations/change_secret.py:128
 #: ops/serializers/job.py:56 terminal/serializers/session.py:49
 msgid "Is success"
 msgstr "成功は"
@@ -884,20 +884,20 @@ msgstr "自動スナップショット"
 msgid "SSH Key strategy"
 msgstr "SSHキー戦略"
 
-#: accounts/serializers/automations/change_secret.py:80
+#: accounts/serializers/automations/change_secret.py:79
 msgid "* Please enter the correct password length"
 msgstr "* 正しいパスワードの長さを入力してください"
 
-#: accounts/serializers/automations/change_secret.py:84
+#: accounts/serializers/automations/change_secret.py:83
 msgid "* Password length range 6-30 bits"
 msgstr "* パスワードの長さの範囲6-30ビット"
 
-#: accounts/serializers/automations/change_secret.py:114
+#: accounts/serializers/automations/change_secret.py:109
 #: assets/models/automations/base.py:127
 msgid "Automation task execution"
 msgstr "自動タスク実行履歴"
 
-#: accounts/serializers/automations/change_secret.py:154 audits/const.py:61
+#: accounts/serializers/automations/change_secret.py:149 audits/const.py:61
 #: audits/models.py:63 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:18 ops/const.py:72 ops/serializers/celery.py:40
 #: terminal/const.py:76 terminal/models/session/sharing.py:121
@@ -4199,29 +4199,33 @@ msgstr "終了しました"
 msgid "Time cost"
 msgstr "時を過ごす"
 
-#: ops/tasks.py:34
+#: ops/tasks.py:36
 msgid "Run ansible task"
 msgstr "Ansible タスクを実行する"
 
-#: ops/tasks.py:68
+#: ops/tasks.py:70
 msgid "Run ansible task execution"
 msgstr "Ansible タスクの実行を開始する"
 
-#: ops/tasks.py:90
+#: ops/tasks.py:92
 msgid "Clear celery periodic tasks"
 msgstr "タスクログを定期的にクリアする"
 
-#: ops/tasks.py:111
+#: ops/tasks.py:113
 msgid "Create or update periodic tasks"
 msgstr "定期的なタスクの作成または更新"
 
-#: ops/tasks.py:119
+#: ops/tasks.py:121
 msgid "Periodic check service performance"
 msgstr "サービスのパフォーマンスを定期的に確認する"
 
-#: ops/tasks.py:125
+#: ops/tasks.py:127
 msgid "Clean up unexpected jobs"
 msgstr "例外ジョブのクリーンアップ"
+
+#: ops/tasks.py:141
+msgid "Clean job_execution db record"
+msgstr "ジョブセンター実行履歴のクリーンアップ"
 
 #: ops/templates/ops/celery_task_log.html:4
 msgid "Task log"
@@ -5257,14 +5261,18 @@ msgid "Cloud sync record keep days (day)"
 msgstr "クラウド同期レコードは日数を保持します（天）"
 
 #: settings/serializers/cleaning.py:35
+msgid "job execution keep days (day)"
+msgstr "ジョブセンターの実行履歴 (天) "
+
+#: settings/serializers/cleaning.py:39
 msgid "Activity log keep days (day)"
 msgstr "活動ログは日数を保持します（天）"
 
-#: settings/serializers/cleaning.py:38
+#: settings/serializers/cleaning.py:42
 msgid "Session keep duration (day)"
 msgstr "セッション維持期間（天）"
 
-#: settings/serializers/cleaning.py:40
+#: settings/serializers/cleaning.py:44
 msgid ""
 "Session, record, command will be delete if more than duration, only in "
 "database, OSS will not be affected."
@@ -8588,7 +8596,7 @@ msgstr "ライセンスのインポートに成功"
 msgid "License is invalid"
 msgstr "ライセンスが無効です"
 
-#: xpack/plugins/license/meta.py:10 xpack/plugins/license/models.py:141
+#: xpack/plugins/license/meta.py:10 xpack/plugins/license/models.py:140
 msgid "License"
 msgstr "ライセンス"
 

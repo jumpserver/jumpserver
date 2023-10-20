@@ -551,6 +551,7 @@ class Config(dict):
         'ACTIVITY_LOG_KEEP_DAYS': 180,
         'FTP_LOG_KEEP_DAYS': 180,
         'CLOUD_SYNC_TASK_EXECUTION_KEEP_DAYS': 180,
+        'JOB_EXECUTION_KEEP_DAYS': 180,
 
         'TICKETS_ENABLED': True,
 

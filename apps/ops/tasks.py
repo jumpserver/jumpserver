@@ -1,15 +1,18 @@
 # coding: utf-8
+import datetime
 
 from celery import shared_task
 from celery.exceptions import SoftTimeLimitExceeded
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 from django_celery_beat.models import PeriodicTask
 
-from common.utils import get_logger, get_object_or_none
+from common.const.crontab import CRONTAB_AT_AM_TWO
+from common.utils import get_logger, get_object_or_none, get_log_keep_day
 from ops.celery import app
 from orgs.utils import tmp_to_org, tmp_to_root_org
 from .celery.decorator import (
-    register_as_period_task, after_app_ready_start
+    register_as_period_task, after_app_ready_start, after_app_shutdown_clean_periodic
 )
 from .celery.utils import (
     create_or_update_celery_periodic_tasks, get_celery_periodic_task,
@@ -127,3 +130,15 @@ def check_server_performance_period():
 def clean_up_unexpected_jobs():
     with tmp_to_root_org():
         JobExecution.clean_unexpected_execution()
+
+
+@shared_task(verbose_name=_('Clean job_execution db record'))
+@register_as_period_task(crontab=CRONTAB_AT_AM_TWO)
+@after_app_shutdown_clean_periodic
+def clean_job_execution_period():
+    logger.info("Start clean job_execution db record")
+    now = timezone.now()
+    days = get_log_keep_day('JOB_EXECUTION_KEEP_DAYS')
+    expired_day = now - datetime.timedelta(days=days)
+    del_res = JobExecution.objects.filter(date_created__lt=expired_day).delete()
+    logger.info(f"clean job_execution db record success! delete {days} days record, delete result: {del_res}")

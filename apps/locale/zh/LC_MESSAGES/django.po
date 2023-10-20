@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-19 16:21+0800\n"
+"POT-Creation-Date: 2023-10-20 14:50+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -94,7 +94,7 @@ msgid "Update"
 msgstr "更新"
 
 #: accounts/const/account.py:33
-#: accounts/serializers/automations/change_secret.py:155 audits/const.py:62
+#: accounts/serializers/automations/change_secret.py:150 audits/const.py:62
 #: audits/signal_handlers/activity_log.py:33 common/const/choices.py:19
 #: ops/const.py:74 terminal/const.py:77 xpack/plugins/cloud/const.py:43
 msgid "Failed"
@@ -220,8 +220,8 @@ msgstr "用户 %s 查看/导出 了密码"
 #: accounts/serializers/account/account.py:210
 #: accounts/serializers/account/account.py:255
 #: accounts/serializers/account/gathered_account.py:10
-#: accounts/serializers/automations/change_secret.py:111
-#: accounts/serializers/automations/change_secret.py:131
+#: accounts/serializers/automations/change_secret.py:106
+#: accounts/serializers/automations/change_secret.py:126
 #: acls/serializers/base.py:123 assets/models/asset/common.py:93
 #: assets/models/asset/common.py:334 assets/models/cmd_filter.py:36
 #: assets/serializers/domain.py:19 assets/serializers/label.py:27
@@ -260,8 +260,8 @@ msgid "Source ID"
 msgstr "来源 ID"
 
 #: accounts/models/account.py:60
-#: accounts/serializers/automations/change_secret.py:112
-#: accounts/serializers/automations/change_secret.py:132
+#: accounts/serializers/automations/change_secret.py:107
+#: accounts/serializers/automations/change_secret.py:127
 #: acls/serializers/base.py:124 acls/templates/acls/asset_login_reminder.html:7
 #: assets/serializers/asset/common.py:125 assets/serializers/gateway.py:28
 #: audits/models.py:58 authentication/api/connection_token.py:406
@@ -342,8 +342,8 @@ msgid "Reason"
 msgstr "原因"
 
 #: accounts/models/automations/backup_account.py:107
-#: accounts/serializers/automations/change_secret.py:110
-#: accounts/serializers/automations/change_secret.py:133
+#: accounts/serializers/automations/change_secret.py:105
+#: accounts/serializers/automations/change_secret.py:128
 #: ops/serializers/job.py:56 terminal/serializers/session.py:49
 msgid "Is success"
 msgstr "是否成功"
@@ -881,20 +881,20 @@ msgstr "自动化快照"
 msgid "SSH Key strategy"
 msgstr "SSH 密钥更改方式"
 
-#: accounts/serializers/automations/change_secret.py:80
+#: accounts/serializers/automations/change_secret.py:79
 msgid "* Please enter the correct password length"
 msgstr "* 请输入正确的密码长度"
 
-#: accounts/serializers/automations/change_secret.py:84
+#: accounts/serializers/automations/change_secret.py:83
 msgid "* Password length range 6-30 bits"
 msgstr "* 密码长度范围 6-30 位"
 
-#: accounts/serializers/automations/change_secret.py:114
+#: accounts/serializers/automations/change_secret.py:109
 #: assets/models/automations/base.py:127
 msgid "Automation task execution"
 msgstr "自动化任务执行历史"
 
-#: accounts/serializers/automations/change_secret.py:154 audits/const.py:61
+#: accounts/serializers/automations/change_secret.py:149 audits/const.py:61
 #: audits/models.py:63 audits/signal_handlers/activity_log.py:33
 #: common/const/choices.py:18 ops/const.py:72 ops/serializers/celery.py:40
 #: terminal/const.py:76 terminal/models/session/sharing.py:121
@@ -4149,29 +4149,33 @@ msgstr "是否完成"
 msgid "Time cost"
 msgstr "花费时间"
 
-#: ops/tasks.py:34
+#: ops/tasks.py:36
 msgid "Run ansible task"
 msgstr "运行 Ansible 任务"
 
-#: ops/tasks.py:68
+#: ops/tasks.py:70
 msgid "Run ansible task execution"
 msgstr "开始执行 Ansible 任务"
 
-#: ops/tasks.py:90
+#: ops/tasks.py:92
 msgid "Clear celery periodic tasks"
 msgstr "清理周期任务"
 
-#: ops/tasks.py:111
+#: ops/tasks.py:113
 msgid "Create or update periodic tasks"
 msgstr "创建或更新周期任务"
 
-#: ops/tasks.py:119
+#: ops/tasks.py:121
 msgid "Periodic check service performance"
 msgstr "周期检测服务性能"
 
-#: ops/tasks.py:125
+#: ops/tasks.py:127
 msgid "Clean up unexpected jobs"
 msgstr "清理异常作业"
+
+#: ops/tasks.py:141
+msgid "Clean job_execution db record"
+msgstr "清理作业中心执行历史"
 
 #: ops/templates/ops/celery_task_log.html:4
 msgid "Task log"
@@ -5202,14 +5206,18 @@ msgid "Cloud sync record keep days (day)"
 msgstr "云同步记录 (天)"
 
 #: settings/serializers/cleaning.py:35
+msgid "job execution keep days (day)"
+msgstr "作业中心执行历史 (天)"
+
+#: settings/serializers/cleaning.py:39
 msgid "Activity log keep days (day)"
 msgstr "活动记录 (天)"
 
-#: settings/serializers/cleaning.py:38
+#: settings/serializers/cleaning.py:42
 msgid "Session keep duration (day)"
 msgstr "会话日志 (天)"
 
-#: settings/serializers/cleaning.py:40
+#: settings/serializers/cleaning.py:44
 msgid ""
 "Session, record, command will be delete if more than duration, only in "
 "database, OSS will not be affected."
@@ -8470,7 +8478,7 @@ msgstr "许可证导入成功"
 msgid "License is invalid"
 msgstr "无效的许可证"
 
-#: xpack/plugins/license/meta.py:10 xpack/plugins/license/models.py:141
+#: xpack/plugins/license/meta.py:10 xpack/plugins/license/models.py:140
 msgid "License"
 msgstr "许可证"
 
