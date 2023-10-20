@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Automation execution',
                 'verbose_name_plural': 'Automation executions',
                 'permissions': [('view_changesecretexecution', 'Can view change secret execution'),
-                                ('add_changesecretexection', 'Can add change secret execution'),
+                                ('add_changesecretexecution', 'Can add change secret execution'),
                                 ('view_gatheraccountsexecution', 'Can view gather accounts execution'),
                                 ('add_gatheraccountsexecution', 'Can add gather accounts execution')],
                 'proxy': True,
@@ -184,7 +184,7 @@ class Migration(migrations.Migration):
         migrations.AlterModelOptions(
             name='automationexecution',
             options={'permissions': [('view_changesecretexecution', 'Can view change secret execution'),
-                                     ('add_changesecretexection', 'Can add change secret execution'),
+                                     ('add_changesecretexecution', 'Can add change secret execution'),
                                      ('view_gatheraccountsexecution', 'Can view gather accounts execution'),
                                      ('add_gatheraccountsexecution', 'Can add gather accounts execution'),
                                      ('view_pushaccountexecution', 'Can view push account execution'),
