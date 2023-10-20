@@ -30,6 +30,10 @@ class CleaningSerializer(serializers.Serializer):
         min_value=MIN_VALUE, max_value=9999,
         label=_("Cloud sync record keep days (day)"),
     )
+    JOB_EXECUTION_KEEP_DAYS = serializers.IntegerField(
+        min_value=MIN_VALUE, max_value=9999,
+        label=_("job execution keep days (day)"),
+    )
     ACTIVITY_LOG_KEEP_DAYS = serializers.IntegerField(
         min_value=MIN_VALUE, max_value=9999,
         label=_("Activity log keep days (day)"),

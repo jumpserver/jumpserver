@@ -10,6 +10,7 @@ from django.core.files.storage import default_storage
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from common.const.crontab import CRONTAB_AT_AM_TWO
 from common.utils import get_log_keep_day, get_logger
 from common.storage.ftp_file import FTPFileStorageHandler
 from ops.celery.decorator import (
@@ -19,7 +20,6 @@ from ops.models import CeleryTaskExecution
 from terminal.models import Session, Command
 from terminal.backends import server_replay_storage
 from .models import UserLoginLog, OperateLog, FTPLog, ActivityLog
-
 
 logger = get_logger(__name__)
 
@@ -99,7 +99,7 @@ def clean_expired_session_period():
 
 
 @shared_task(verbose_name=_('Clean audits session task log'))
-@register_as_period_task(crontab='0 2 * * *')
+@register_as_period_task(crontab=CRONTAB_AT_AM_TWO)
 @after_app_shutdown_clean_periodic
 def clean_audits_log_period():
     print("Start clean audit session task log")
