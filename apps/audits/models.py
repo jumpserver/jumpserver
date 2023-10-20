@@ -287,7 +287,7 @@ class UserSession(models.Model):
     def get_keys():
         session_store_cls = import_module(settings.SESSION_ENGINE).SessionStore
         cache_key_prefix = session_store_cls.cache_key_prefix
-        keys = caches[settings.SESSION_CACHE_ALIAS].keys('*')
+        keys = caches[settings.SESSION_CACHE_ALIAS].iter_keys('*')
         return [k.replace(cache_key_prefix, '') for k in keys]
 
     @classmethod
