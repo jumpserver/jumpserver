@@ -1,5 +1,6 @@
 import os
 import platform
+import re
 
 from redis.sentinel import SentinelManagedSSLConnection
 
@@ -79,8 +80,8 @@ if CONFIG.SITE_URL:
 ALLOWED_DOMAINS = DOMAINS.split(',') if DOMAINS else ['localhost:8080']
 ALLOWED_DOMAINS = [host.strip() for host in ALLOWED_DOMAINS]
 ALLOWED_DOMAINS = [host.replace('http://', '').replace('https://', '') for host in ALLOWED_DOMAINS if host]
-ALLOWED_DOMAINS = [host.replace(':80', '').replace(':443', '') for host in ALLOWED_DOMAINS]
 ALLOWED_DOMAINS = [host.split('/')[0] for host in ALLOWED_DOMAINS if host]
+ALLOWED_DOMAINS = [re.sub(':80$|:443$', '', host) for host in ALLOWED_DOMAINS]
 
 DEBUG_HOSTS = ('127.0.0.1', 'localhost', 'core')
 DEBUG_PORT = ['8080', '80', ]
