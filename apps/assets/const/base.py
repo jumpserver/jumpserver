@@ -64,14 +64,14 @@ class BaseType(TextChoices):
     @classmethod
     def _parse_protocols(cls, protocol, tp):
         from .protocol import Protocol
-        settings = Protocol.settings()
+        _settings = Protocol.settings()
         choices = protocol.get('choices', [])
         if choices == '__self__':
             choices = [tp]
 
         protocols = []
         for name in choices:
-            protocol = {'name': name, **settings.get(name, {})}
+            protocol = {'name': name, **_settings.get(name, {})}
             setting = protocol.pop('setting', {})
             setting_values = {k: v.get('default', None) for k, v in setting.items()}
             protocol['setting'] = setting_values
@@ -112,7 +112,7 @@ class BaseType(TextChoices):
 
     @classmethod
     def get_choices(cls):
-        if not settings.XPACK_LICENSE_IS_VALID:
+        if not settings.XPACK_ENABLED:
             return [
                 (tp.value, tp.label)
                 for tp in cls.get_community_types()
