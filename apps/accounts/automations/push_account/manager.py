@@ -56,7 +56,8 @@ class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
                 'username': account.username,
                 'secret_type': secret_type,
                 'secret': new_secret,
-                'private_key_path': private_key_path
+                'private_key_path': private_key_path,
+                'become': account.get_ansible_become_auth(),
             }
             if asset.platform.type == 'oracle':
                 h['account']['mode'] = 'sysdba' if account.privileged else None
