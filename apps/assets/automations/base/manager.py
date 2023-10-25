@@ -1,8 +1,8 @@
+import hashlib
 import json
 import os
 import shutil
 from collections import defaultdict
-from hashlib import md5
 from socket import gethostname
 
 import yaml
@@ -146,7 +146,7 @@ class BasePlaybookManager:
 
     @staticmethod
     def generate_private_key_path(secret, path_dir):
-        key_name = '.' + md5(secret.encode('utf-8')).hexdigest()
+        key_name = '.' + hashlib.md5(secret.encode('utf-8')).hexdigest()
         key_path = os.path.join(path_dir, key_name)
 
         if not os.path.exists(key_path):
