@@ -226,7 +226,7 @@ AUTHENTICATION_BACKENDS = [
 def get_file_md5(filepath):
     import hashlib
     # 创建md5对象
-    m = hashlib.md5()
+    m = hashlib.md5(usedforsecurity=False)
     with open(filepath, 'rb') as f:
         while True:
             data = f.read(4096)

@@ -146,7 +146,7 @@ class BasePlaybookManager:
 
     @staticmethod
     def generate_private_key_path(secret, path_dir):
-        key_name = '.' + hashlib.md5(secret.encode('utf-8')).hexdigest()
+        key_name = '.' + hashlib.md5(secret.encode('utf-8'), usedforsecurity=False).hexdigest()
         key_path = os.path.join(path_dir, key_name)
 
         if not os.path.exists(key_path):

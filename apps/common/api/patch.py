@@ -9,7 +9,6 @@ from rest_framework.response import Response
 
 from common.utils import lazyproperty
 
-
 __all__ = ['InterceptMixin', 'AsyncApiMixin']
 
 
@@ -17,6 +16,7 @@ class InterceptMixin:
     """
     Hack默认的dispatch, 让用户可以实现 self.do
     """
+
     def dispatch(self, request, *args, **kwargs):
         self.args = args
         self.kwargs = kwargs
@@ -65,7 +65,7 @@ class AsyncApiMixin(InterceptMixin):
         query.pop('refresh', None)
         query = "&".join(["{}={}".format(k, v) for k, v in query.items()])
         full_path = "{}?{}".format(path, query)
-        return md5(full_path.encode()).hexdigest()
+        return md5(full_path.encode(), usedforsecurity=False).hexdigest()
 
     @lazyproperty
     def initial_data(self):
@@ -137,4 +137,3 @@ class AsyncApiMixin(InterceptMixin):
             data["error"] = str(e)
             data["status"] = "error"
             cache.set(key, data, 600)
-

@@ -1,16 +1,14 @@
-import os
 import csv
+import hashlib
+import os
 
 import pyzipper
 import requests
-
-from hashlib import md5
-
 from django.conf import settings
 
 
 def create_csv_file(filename, headers, rows, ):
-    with open(filename, 'w', encoding='utf-8-sig')as f:
+    with open(filename, 'w', encoding='utf-8-sig') as f:
         w = csv.writer(f)
         w.writerow(headers)
         w.writerows(rows)
@@ -40,7 +38,7 @@ def save_content_to_temp_path(content, file_mode=0o400):
 
     project_dir = settings.PROJECT_DIR
     tmp_dir = os.path.join(project_dir, 'tmp')
-    filename = '.' + md5(content.encode('utf-8')).hexdigest()
+    filename = '.' + hashlib.md5(content.encode(), usedforsecurity=False).hexdigest()
     filepath = os.path.join(tmp_dir, filename)
     if not os.path.exists(filepath):
         with open(filepath, 'w') as f:

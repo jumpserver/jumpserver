@@ -145,7 +145,7 @@ class BaseAccount(VaultModelMixin, JMSOrgBaseModel):
             return None
         project_dir = settings.PROJECT_DIR
         tmp_dir = os.path.join(project_dir, 'tmp')
-        key_name = '.' + md5(self.private_key.encode('utf-8')).hexdigest()
+        key_name = '.' + md5(self.private_key.encode('utf-8'), usedforsecurity=False).hexdigest()
         key_path = os.path.join(tmp_dir, key_name)
         if not os.path.exists(key_path):
             # https://github.com/ansible/ansible-runner/issues/544

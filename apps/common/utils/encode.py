@@ -217,7 +217,7 @@ def content_md5(data):
     返回值可以直接作为HTTP Content-Type头部的值
     """
     if isinstance(data, str):
-        data = hashlib.md5(data.encode('utf-8'))
+        data = hashlib.md5(data.encode('utf-8'), usedforsecurity=False)
     value = base64.b64encode(data.hexdigest().encode('utf-8'))
     return value.decode('utf-8')
 

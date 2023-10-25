@@ -2,14 +2,14 @@ import hashlib
 import inspect
 from inspect import Parameter
 
-from common.utils.common import get_logger
 from common.sdk.im import exceptions as exce
+from common.utils.common import get_logger
 
 logger = get_logger(__name__)
 
 
 def digest(corp_id, corp_secret):
-    md5 = hashlib.md5()
+    md5 = hashlib.md5(usedforsecurity=False)
     md5.update(corp_id.encode())
     md5.update(corp_secret.encode())
     dist = md5.hexdigest()
@@ -75,4 +75,5 @@ def as_request(func):
 
         response = self.request(request_method, **parameters)
         return response
+
     return inner
