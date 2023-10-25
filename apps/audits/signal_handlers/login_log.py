@@ -14,7 +14,7 @@ from acls.notifications import UserLoginReminderMsg
 from audits.models import UserLoginLog
 from authentication.signals import post_auth_failed, post_auth_success
 from authentication.utils import check_different_city_login_if_need
-from common.utils import get_request_ip, get_logger
+from common.utils import get_request_ip_or_data, get_logger
 from users.models import User
 from ..const import LoginTypeChoices
 from ..models import UserSession
@@ -60,7 +60,7 @@ def get_login_backend(request):
 
 def generate_data(username, request, login_type=None):
     user_agent = request.META.get('HTTP_USER_AGENT', '')
-    login_ip = get_request_ip(request) or '0.0.0.0'
+    login_ip = get_request_ip_or_data(request) or '0.0.0.0'
 
     if login_type is None and isinstance(request, Request):
         login_type = request.META.get('HTTP_X_JMS_LOGIN_TYPE', 'U')
