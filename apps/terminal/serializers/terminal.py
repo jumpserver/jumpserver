@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from common.drf.serializers import BulkModelSerializer, AdaptedBulkListSerializer
 from common.utils import is_uuid
 from users.serializers import ServiceAccountSerializer
-from common.utils import get_request_ip, pretty_string
+from common.utils import get_request_ip_or_data, pretty_string
 from .. import const
 
 from ..models import (
@@ -129,7 +129,7 @@ class TerminalRegistrationSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         instance.is_accepted = True
         if request:
-            instance.remote_addr = get_request_ip(request)
+            instance.remote_addr = get_request_ip_or_data(request)
         sa = self.service_account.create(validated_data)
         sa.system_roles.add_role_system_component()
         instance.user = sa

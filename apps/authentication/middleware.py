@@ -9,7 +9,7 @@ from django.contrib.auth import logout as auth_logout
 
 from apps.authentication import mixins
 from common.utils import gen_key_pair
-from common.utils import get_request_ip
+from common.utils import get_request_ip_or_data
 from .signals import post_auth_failed
 
 
@@ -73,7 +73,7 @@ class ThirdPartyLoginMiddleware(mixins.AuthMixin):
             if request.path.find(url) > -1:
                 return response
 
-        ip = get_request_ip(request)
+        ip = get_request_ip_or_data(request)
         try:
             self.request = request
             self._check_login_acl(request.user, ip)

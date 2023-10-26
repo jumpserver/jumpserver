@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from .base import BaseACL, BaseACLQuerySet
-from common.utils import get_request_ip, get_ip_city
+from common.utils import get_request_ip_or_data, get_ip_city
 from common.utils.ip import contains_ip
 from common.utils.time_period import contains_time_period
 from common.utils.timezone import local_now_display
@@ -73,7 +73,7 @@ class LoginACL(BaseACL):
         from tickets.models import ApplyLoginTicket
         from orgs.models import Organization
         title = _('Login confirm') + ' {}'.format(self.user)
-        login_ip = get_request_ip(request) if request else ''
+        login_ip = get_request_ip_or_data(request) if request else ''
         login_ip = login_ip or '0.0.0.0'
         login_city = get_ip_city(login_ip)
         login_datetime = local_now_display()

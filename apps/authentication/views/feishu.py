@@ -16,14 +16,13 @@ from common.utils.django import reverse, get_object_or_none
 from common.mixins.views import UserConfirmRequiredExceptionMixin, PermissionsMixin
 from common.permissions import UserConfirmation
 from common.sdk.im.feishu import FeiShu, URL
-from common.utils.common import get_request_ip
+from common.utils.common import get_request_ip_or_data
 from authentication import errors
 from authentication.const import ConfirmType
 from authentication.mixins import AuthMixin
 from authentication.notifications import OAuthBindMessage
 
 logger = get_logger(__file__)
-
 
 FEISHU_STATE_SESSION_KEY = '_feishu_state'
 
@@ -140,7 +139,7 @@ class FeiShuQRBindCallbackView(FeiShuQRMixin, View):
                 return response
             raise e
 
-        ip = get_request_ip(request)
+        ip = get_request_ip_or_data(request)
         OAuthBindMessage(user, ip, _('FeiShu'), user_id).publish_async()
         msg = _('Binding FeiShu successfully')
         response = self.get_success_response(redirect_url, msg, msg)
@@ -165,7 +164,7 @@ class FeiShuEnableStartView(UserVerifyPasswordView):
 class FeiShuQRLoginView(FeiShuQRMixin, View):
     permission_classes = (AllowAny,)
 
-    def get(self,  request: HttpRequest):
+    def get(self, request: HttpRequest):
         redirect_url = request.GET.get('redirect_url') or reverse('index')
         redirect_uri = reverse('authentication:feishu-qr-login-callback', external=True)
         redirect_uri += '?' + urlencode({
