@@ -18,7 +18,7 @@ from django.contrib.auth import (
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import reverse, redirect, get_object_or_404
 
-from common.utils import get_request_ip, get_logger, bulk_get, FlashMessageUtil
+from common.utils import get_request_ip_or_data, get_request_ip, get_logger, bulk_get, FlashMessageUtil
 from acls.models import LoginACL
 from users.models import User
 from users.utils import LoginBlockUtil, MFABlockUtils, LoginIpBlockUtil
@@ -92,13 +92,12 @@ auth.authenticate = authenticate
 
 class CommonMixin:
     request: Request
+    _ip = ''
 
     def get_request_ip(self):
         ip = ''
-        if hasattr(self.request, 'data'):
-            ip = self.request.data.get('remote_addr', '')
-        ip = ip or get_request_ip(self.request)
-        return ip
+        if not self._ip:
+            self._ip = get_request_ip_or_data(self.request)
 
     def raise_credential_error(self, error):
         raise self.partial_credential_error(error=error)
