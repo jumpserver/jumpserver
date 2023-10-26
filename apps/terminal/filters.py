@@ -1,7 +1,7 @@
-from django_filters import rest_framework as filters
 from django.db.models import QuerySet
+from django_filters import rest_framework as filters
 
-from orgs.utils import current_org, filter_org_queryset
+from orgs.utils import filter_org_queryset
 from terminal.models import Command, CommandStorage
 
 
@@ -12,6 +12,7 @@ class CommandFilter(filters.FilterSet):
     command_storage_id = filters.UUIDFilter(method='do_nothing')
     user = filters.CharFilter(lookup_expr='startswith')
     input = filters.CharFilter(lookup_expr='icontains')
+    asset = filters.CharFilter(field_name='asset', lookup_expr='icontains')
 
     class Meta:
         model = Command
