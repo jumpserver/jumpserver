@@ -37,6 +37,7 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
     is_valid = serializers.BooleanField(read_only=True, label=_("Is valid"))
     is_expired = serializers.BooleanField(read_only=True, label=_("Is expired"))
     accounts = serializers.ListField(label=_("Account"), required=False)
+    protocols = serializers.ListField(label=_("Protocols"), required=False)
 
     template_accounts = AccountTemplate.objects.none()
 
@@ -44,7 +45,7 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
         model = AssetPermission
         fields_mini = ["id", "name"]
         fields_generic = [
-            "accounts", "actions", "created_by", "date_created",
+            "accounts", "protocols", "actions", "created_by", "date_created",
             "date_start", "date_expired", "is_active", "is_expired",
             "is_valid", "comment", "from_ticket",
         ]

@@ -295,6 +295,10 @@ class Protocol(ChoicesMixin, models.TextChoices):
         }
 
     @classmethod
+    def protocols(cls):
+        return cls.settings().keys()
+
+    @classmethod
     @cached_method(ttl=600)
     def xpack_protocols(cls):
         return [

@@ -97,10 +97,9 @@ class ConnectionToken(JMSOrgBaseModel):
 
     @lazyproperty
     def permed_account(self):
-        from perms.utils import PermAccountUtil
-        permed_account = PermAccountUtil().validate_permission(
-            self.user, self.asset, self.account
-        )
+        from perms.utils import PermAssetDetailUtil
+        permed_account = PermAssetDetailUtil(self.user, self.asset) \
+            .validate_permission(self.account, self.protocol)
         return permed_account
 
     @lazyproperty
@@ -115,6 +114,7 @@ class ConnectionToken(JMSOrgBaseModel):
         if not self.is_active:
             error = _('Connection token inactive')
             raise PermissionDenied(error)
+
         if self.is_expired:
             error = _('Connection token expired at: {}').format(as_current_tz(self.date_expired))
             raise PermissionDenied(error)
