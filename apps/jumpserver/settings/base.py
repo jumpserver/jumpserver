@@ -73,7 +73,7 @@ for name in ['SERVER_NAME', 'CORE_HOST']:
     env = os.environ.get(name)
     if not env:
         continue
-    DOMAINS += ',{}'.format(env)
+    DOMAINS += ',{}'.format(env.replace(" ", ","))
 if CONFIG.SITE_URL:
     DOMAINS += ',{}'.format(CONFIG.SITE_URL)
 
