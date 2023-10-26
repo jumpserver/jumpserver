@@ -4,7 +4,7 @@ from django.db import transaction
 from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import get_request_ip, get_logger
+from common.utils import get_request_ip_or_data, get_logger
 from common.utils.timezone import as_current_tz
 from common.utils.encode import Singleton
 from common.local import encrypted_field_set
@@ -14,7 +14,6 @@ from audits.models import OperateLog
 from orgs.utils import get_current_org_id
 
 from .backends import get_operate_log_storage
-
 
 logger = get_logger(__name__)
 
@@ -156,7 +155,7 @@ class OperatorLogHandler(metaclass=Singleton):
         if not user or not user.is_authenticated:
             return
 
-        remote_addr = get_request_ip(current_request)
+        remote_addr = get_request_ip_or_data(current_request)
         resource_display = self.get_resource_display(resource)
         before, after = self.data_processing(before, after)
         if not force and not any([before, after]):

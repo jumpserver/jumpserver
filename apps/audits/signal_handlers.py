@@ -38,9 +38,8 @@ from .const import MODELS_NEED_RECORD
 from terminal.backends.command.serializers import SessionCommandSerializer
 from terminal.serializers import SessionSerializer
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR, SKIP_SIGNAL
-from common.utils import get_request_ip, get_logger, get_syslogger
+from common.utils import get_request_ip_or_data, get_logger, get_syslogger
 from common.utils.encode import data_to_json
-
 
 logger = get_logger(__name__)
 sys_logger = get_syslogger(__name__)
@@ -198,7 +197,7 @@ def on_user_change_password(sender, user=None, **kwargs):
         remote_addr = '127.0.0.1'
         change_by = 'System'
     else:
-        remote_addr = get_request_ip(current_request)
+        remote_addr = get_request_ip_or_data(current_request)
         if not current_request.user.is_authenticated:
             change_by = str(user)
         else:
@@ -250,7 +249,7 @@ def get_login_backend(request):
 
 def generate_data(username, request, login_type=None):
     user_agent = request.META.get('HTTP_USER_AGENT', '')
-    login_ip = get_request_ip(request) or '0.0.0.0'
+    login_ip = get_request_ip_or_data(request) or '0.0.0.0'
 
     if login_type is None and isinstance(request, Request):
         login_type = request.META.get('HTTP_X_JMS_LOGIN_TYPE', 'U')

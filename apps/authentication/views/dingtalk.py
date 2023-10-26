@@ -20,12 +20,11 @@ from authentication import errors
 from authentication.mixins import AuthMixin
 from authentication.const import ConfirmType
 from common.sdk.im.dingtalk import DingTalk
-from common.utils.common import get_request_ip
+from common.utils.common import get_request_ip_or_data
 from authentication.notifications import OAuthBindMessage
 from .mixins import METAMixin
 
 logger = get_logger(__file__)
-
 
 DINGTALK_STATE_SESSION_KEY = '_dingtalk_state'
 
@@ -175,7 +174,7 @@ class DingTalkQRBindCallbackView(DingTalkQRMixin, View):
                 return response
             raise e
 
-        ip = get_request_ip(request)
+        ip = get_request_ip_or_data(request)
         OAuthBindMessage(user, ip, _('DingTalk'), user_id).publish_async()
         msg = _('Binding DingTalk successfully')
         response = self.get_success_response(redirect_url, msg, msg)
@@ -200,7 +199,7 @@ class DingTalkEnableStartView(UserVerifyPasswordView):
 class DingTalkQRLoginView(DingTalkQRMixin, METAMixin, View):
     permission_classes = (AllowAny,)
 
-    def get(self,  request: HttpRequest):
+    def get(self, request: HttpRequest):
         redirect_url = request.GET.get('redirect_url') or reverse('index')
         next_url = self.get_next_url_from_meta() or reverse('index')
 
@@ -258,7 +257,7 @@ class DingTalkQRLoginCallbackView(AuthMixin, DingTalkQRMixin, View):
 class DingTalkOAuthLoginView(DingTalkOAuthMixin, View):
     permission_classes = (AllowAny,)
 
-    def get(self,  request: HttpRequest):
+    def get(self, request: HttpRequest):
         redirect_url = request.GET.get('redirect_url')
 
         redirect_uri = reverse('authentication:dingtalk-oauth-login-callback', external=True)
