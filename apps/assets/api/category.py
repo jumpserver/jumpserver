@@ -2,8 +2,8 @@ from rest_framework.decorators import action
 from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
 
-from assets.const import AllTypes, Protocol
-from assets.serializers import CategorySerializer, TypeSerializer, ProtocolSerializer
+from assets.const import AllTypes
+from assets.serializers import CategorySerializer, TypeSerializer
 from common.api import JMSGenericViewSet
 from common.permissions import IsValidUser
 
@@ -14,7 +14,6 @@ class CategoryViewSet(ListModelMixin, JMSGenericViewSet):
     serializer_classes = {
         'default': CategorySerializer,
         'types': TypeSerializer,
-        'protocols': ProtocolSerializer,
     }
     permission_classes = (IsValidUser,)
 
@@ -33,8 +32,3 @@ class CategoryViewSet(ListModelMixin, JMSGenericViewSet):
         tp = request.query_params.get('type')
         constraints = AllTypes.get_constraints(category, tp)
         return Response(constraints)
-
-    @action(methods=['get'], detail=False)
-    def protocols(self, request, *args, **kwargs):
-        protocols = list(Protocol.protocols())
-        return self.get_paginated_response_from_queryset(protocols)

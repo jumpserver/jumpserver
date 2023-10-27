@@ -70,6 +70,7 @@ class AccountsPermedSerializer(serializers.ModelSerializer):
 
 
 class AssetPermedDetailSerializer(AssetPermedSerializer):
+    # 前面特意加了 permed，避免返回的是资产本身的
     permed_protocols = AssetProtocolsPermsSerializer(many=True, required=False, label=_('Protocols'))
     permed_accounts = AccountsPermedSerializer(label=_("Accounts"), required=False, many=True)
 

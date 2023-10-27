@@ -22,4 +22,3 @@ class CategorySerializer(serializers.Serializer):
 class ProtocolSerializer(serializers.Serializer):
     label = serializers.CharField(max_length=64, required=False, allow_blank=True, label=_('Label'))
     value = serializers.CharField(max_length=64, required=False, allow_blank=True, label=_('Value'))
-    category = serializers.CharField(max_length=64, required=False, allow_blank=True, label=_('Category'))
