@@ -1,6 +1,5 @@
 import os
 import time
-from collections import defaultdict
 from copy import deepcopy
 
 from django.conf import settings
@@ -27,7 +26,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.method_hosts_mapper = defaultdict(list)
+        self.record_id = self.execution.snapshot.get('record_id')
         self.secret_type = self.execution.snapshot.get('secret_type')
         self.secret_strategy = self.execution.snapshot.get(
             'secret_strategy', SecretStrategy.custom
@@ -96,17 +95,13 @@ class ChangeSecretManager(AccountBasePlaybookManager):
 
         accounts = self.get_accounts(account)
         if not accounts:
-            print('没有发现待改密账号: %s 用户ID: %s 类型: %s' % (
+            print('没有发现待处理的账号: %s 用户ID: %s 类型: %s' % (
                 asset.name, self.account_ids, self.secret_type
             ))
             return []
 
-        method_attr = getattr(automation, self.method_type() + '_method')
-        method_hosts = self.method_hosts_mapper[method_attr]
-        method_hosts = [h for h in method_hosts if h != host['name']]
-        inventory_hosts = []
         records = []
-
+        inventory_hosts = []
         if asset.type == HostTypes.WINDOWS and self.secret_type == SecretType.SSH_KEY:
             print(f'Windows {asset} does not support ssh key push')
             return inventory_hosts
@@ -116,13 +111,20 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             h = deepcopy(host)
             secret_type = account.secret_type
             h['name'] += '(' + account.username + ')'
-            new_secret = self.get_secret(secret_type)
+            if self.secret_type is None:
+                new_secret = account.secret
+            else:
+                new_secret = self.get_secret(secret_type)
 
-            recorder = ChangeSecretRecord(
-                asset=asset, account=account, execution=self.execution,
-                old_secret=account.secret, new_secret=new_secret,
-            )
-            records.append(recorder)
+            if self.record_id is None:
+                recorder = ChangeSecretRecord(
+                    asset=asset, account=account, execution=self.execution,
+                    old_secret=account.secret, new_secret=new_secret,
+                )
+                records.append(recorder)
+            else:
+                recorder = ChangeSecretRecord.objects.get(id=self.record_id)
+
             self.name_recorder_mapper[h['name']] = recorder
 
             private_key_path = None
@@ -142,8 +144,6 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             if asset.platform.type == 'oracle':
                 h['account']['mode'] = 'sysdba' if account.privileged else None
             inventory_hosts.append(h)
-            method_hosts.append(h['name'])
-        self.method_hosts_mapper[method_attr] = method_hosts
         ChangeSecretRecord.objects.bulk_create(records)
         return inventory_hosts
 
@@ -171,7 +171,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         recorder.save()
 
     def on_runner_failed(self, runner, e):
-        logger.error("Change secret error: ", e)
+        logger.error("Account error: ", e)
 
     def check_secret(self):
         if self.secret_strategy == SecretStrategy.custom \
@@ -181,9 +181,11 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         return True
 
     def run(self, *args, **kwargs):
-        if not self.check_secret():
+        if self.secret_type and not self.check_secret():
             return
         super().run(*args, **kwargs)
+        if self.record_id:
+            return
         recorders = self.name_recorder_mapper.values()
         recorders = list(recorders)
         self.send_recorder_mail(recorders)

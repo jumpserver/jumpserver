@@ -116,7 +116,7 @@ class Migration(migrations.Migration):
                 ('new_secret', common.db.fields.EncryptTextField(blank=True, null=True, verbose_name='New secret')),
                 ('date_started', models.DateTimeField(blank=True, null=True, verbose_name='Date started')),
                 ('date_finished', models.DateTimeField(blank=True, null=True, verbose_name='Date finished')),
-                ('status', models.CharField(default='pending', max_length=16)),
+                ('status', models.CharField(default='pending', max_length=16, verbose_name='Status')),
                 ('error', models.TextField(blank=True, null=True, verbose_name='Error')),
                 ('account',
                  models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='accounts.account')),

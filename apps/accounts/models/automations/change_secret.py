@@ -40,7 +40,7 @@ class ChangeSecretRecord(JMSBaseModel):
     new_secret = fields.EncryptTextField(blank=True, null=True, verbose_name=_('New secret'))
     date_started = models.DateTimeField(blank=True, null=True, verbose_name=_('Date started'))
     date_finished = models.DateTimeField(blank=True, null=True, verbose_name=_('Date finished'))
-    status = models.CharField(max_length=16, default='pending')
+    status = models.CharField(max_length=16, default='pending', verbose_name=_('Status'))
     error = models.TextField(blank=True, null=True, verbose_name=_('Error'))
 
     class Meta:
@@ -49,9 +49,3 @@ class ChangeSecretRecord(JMSBaseModel):
 
     def __str__(self):
         return self.account.__str__()
-
-    @property
-    def timedelta(self):
-        if self.date_started and self.date_finished:
-            return self.date_finished - self.date_started
-        return None
