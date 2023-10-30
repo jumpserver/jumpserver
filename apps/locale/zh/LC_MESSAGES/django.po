@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-20 14:50+0800\n"
+"POT-Creation-Date: 2023-10-30 11:28+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -226,7 +226,7 @@ msgstr "用户 %s 查看/导出 了密码"
 #: assets/models/asset/common.py:334 assets/models/cmd_filter.py:36
 #: assets/serializers/domain.py:19 assets/serializers/label.py:27
 #: audits/models.py:57 authentication/models/connection_token.py:36
-#: perms/models/asset_permission.py:64 perms/serializers/permission.py:34
+#: perms/models/asset_permission.py:68 perms/serializers/permission.py:34
 #: terminal/backends/command/models.py:17 terminal/models/session/session.py:31
 #: terminal/notifications.py:155 terminal/serializers/command.py:17
 #: terminal/serializers/session.py:26
@@ -264,8 +264,8 @@ msgstr "来源 ID"
 #: accounts/serializers/automations/change_secret.py:127
 #: acls/serializers/base.py:124 acls/templates/acls/asset_login_reminder.html:7
 #: assets/serializers/asset/common.py:125 assets/serializers/gateway.py:28
-#: audits/models.py:58 authentication/api/connection_token.py:406
-#: ops/models/base.py:18 perms/models/asset_permission.py:70
+#: audits/models.py:58 authentication/api/connection_token.py:407
+#: ops/models/base.py:18 perms/models/asset_permission.py:74
 #: perms/serializers/permission.py:39 terminal/backends/command/models.py:18
 #: terminal/models/session/session.py:33
 #: terminal/templates/terminal/_msg_command_warning.html:8
@@ -311,7 +311,7 @@ msgstr "账号备份计划"
 #: assets/models/automations/base.py:115 audits/models.py:64
 #: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:228
 #: ops/templates/ops/celery_task_log.html:75
-#: perms/models/asset_permission.py:72 terminal/models/applet/host.py:140
+#: perms/models/asset_permission.py:77 terminal/models/applet/host.py:141
 #: terminal/models/session/session.py:44
 #: tickets/models/ticket/apply_application.py:30
 #: tickets/models/ticket/apply_asset.py:19
@@ -417,7 +417,7 @@ msgstr "开始日期"
 #: accounts/models/automations/change_secret.py:42
 #: assets/models/automations/base.py:116 ops/models/base.py:56
 #: ops/models/celery.py:64 ops/models/job.py:229
-#: terminal/models/applet/host.py:141
+#: terminal/models/applet/host.py:142
 msgid "Date finished"
 msgstr "结束日期"
 
@@ -533,7 +533,7 @@ msgstr "密码规则"
 #: authentication/serializers/connect_token_secret.py:110 ops/mixin.py:21
 #: ops/models/adhoc.py:20 ops/models/celery.py:15 ops/models/celery.py:57
 #: ops/models/job.py:126 ops/models/playbook.py:28 ops/serializers/job.py:20
-#: orgs/models.py:82 perms/models/asset_permission.py:56 rbac/models/role.py:29
+#: orgs/models.py:82 perms/models/asset_permission.py:60 rbac/models/role.py:29
 #: settings/models.py:32 settings/serializers/msg.py:82
 #: terminal/models/applet/applet.py:33 terminal/models/component/endpoint.py:12
 #: terminal/models/component/endpoint.py:94
@@ -662,9 +662,9 @@ msgstr "账号存在策略"
 
 #: accounts/serializers/account/account.py:190 applications/models.py:11
 #: assets/models/label.py:21 assets/models/platform.py:89
-#: assets/serializers/asset/common.py:121 assets/serializers/cagegory.py:8
+#: assets/serializers/asset/common.py:121 assets/serializers/cagegory.py:12
 #: assets/serializers/platform.py:133 assets/serializers/platform.py:229
-#: perms/serializers/user_permission.py:26 settings/models.py:34
+#: perms/serializers/user_permission.py:25 settings/models.py:34
 #: tickets/models/ticket/apply_application.py:13 users/models/preference.py:12
 msgid "Category"
 msgstr "类别"
@@ -678,7 +678,7 @@ msgstr "类别"
 #: assets/serializers/platform.py:132 audits/serializers.py:50
 #: audits/serializers.py:170
 #: authentication/serializers/connect_token_secret.py:123 ops/models/job.py:137
-#: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:39
+#: perms/serializers/user_permission.py:26 terminal/models/applet/applet.py:39
 #: terminal/models/component/storage.py:57
 #: terminal/models/component/storage.py:146 terminal/serializers/applet.py:29
 #: terminal/serializers/session.py:21 terminal/serializers/storage.py:228
@@ -713,7 +713,7 @@ msgstr "已修改"
 #: acls/templates/acls/asset_login_reminder.html:6
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20
-#: authentication/api/connection_token.py:405 ops/models/base.py:17
+#: authentication/api/connection_token.py:406 ops/models/base.py:17
 #: ops/models/job.py:139 ops/serializers/job.py:21
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 msgid "Assets"
@@ -745,7 +745,7 @@ msgstr "ID"
 #: audits/serializers.py:171 authentication/models/connection_token.py:32
 #: authentication/models/sso_token.py:16
 #: notifications/models/notification.py:12
-#: perms/api/user_permission/mixin.py:55 perms/models/asset_permission.py:58
+#: perms/api/user_permission/mixin.py:55 perms/models/asset_permission.py:62
 #: perms/serializers/permission.py:30 rbac/builtin.py:124
 #: rbac/models/rolebinding.py:49 rbac/serializers/rolebinding.py:17
 #: terminal/backends/command/models.py:16 terminal/models/session/session.py:29
@@ -841,7 +841,7 @@ msgstr "关联平台，可配置推送参数，如果不关联，将使用默认
 #: assets/models/group.py:20 common/db/models.py:36 ops/models/adhoc.py:26
 #: ops/models/job.py:145 ops/models/playbook.py:31 rbac/models/role.py:37
 #: settings/models.py:37 terminal/models/applet/applet.py:45
-#: terminal/models/applet/applet.py:304 terminal/models/applet/host.py:142
+#: terminal/models/applet/applet.py:321 terminal/models/applet/host.py:143
 #: terminal/models/component/endpoint.py:24
 #: terminal/models/component/endpoint.py:104
 #: terminal/models/session/session.py:46 tickets/models/comment.py:32
@@ -863,7 +863,7 @@ msgstr ""
 #: accounts/serializers/automations/base.py:23
 #: assets/models/asset/common.py:155 assets/models/automations/base.py:18
 #: assets/models/cmd_filter.py:32 assets/serializers/automations/base.py:21
-#: perms/models/asset_permission.py:67
+#: perms/models/asset_permission.py:71
 msgid "Nodes"
 msgstr "节点"
 
@@ -1014,7 +1014,7 @@ msgstr "审批人"
 #: acls/models/base.py:43 authentication/models/access_key.py:20
 #: authentication/models/connection_token.py:53
 #: authentication/templates/authentication/_access_key_modal.html:32
-#: perms/models/asset_permission.py:76 terminal/models/session/sharing.py:29
+#: perms/models/asset_permission.py:81 terminal/models/session/sharing.py:29
 #: tickets/const.py:37
 msgid "Active"
 msgstr "激活中"
@@ -1025,7 +1025,7 @@ msgstr "用户管理"
 
 #: acls/models/base.py:98 assets/models/automations/base.py:17
 #: assets/models/cmd_filter.py:38 assets/serializers/asset/common.py:377
-#: rbac/tree.py:35
+#: perms/serializers/user_permission.py:75 rbac/tree.py:35
 msgid "Accounts"
 msgstr "账号管理"
 
@@ -1633,7 +1633,7 @@ msgstr "系统平台"
 
 #: assets/models/asset/common.py:153 assets/models/domain.py:21
 #: authentication/serializers/connect_token_secret.py:133
-#: perms/serializers/user_permission.py:29 xpack/plugins/cloud/models.py:323
+#: perms/serializers/user_permission.py:28 xpack/plugins/cloud/models.py:323
 msgid "Domain"
 msgstr "网域"
 
@@ -1705,9 +1705,9 @@ msgstr "资产自动化任务"
 
 #: assets/models/automations/base.py:113 audits/models.py:207
 #: audits/serializers.py:51 ops/models/base.py:49 ops/models/job.py:220
-#: terminal/models/applet/applet.py:303 terminal/models/applet/host.py:139
+#: terminal/models/applet/applet.py:320 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
-#: terminal/serializers/applet_host.py:115 tickets/models/ticket/general.py:283
+#: terminal/serializers/applet_host.py:124 tickets/models/ticket/general.py:283
 #: tickets/serializers/super_ticket.py:13
 #: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:201
 #: xpack/plugins/cloud/models.py:257
@@ -1730,7 +1730,7 @@ msgstr "可连接性"
 msgid "Date verified"
 msgstr "校验日期"
 
-#: assets/models/cmd_filter.py:28 perms/models/asset_permission.py:61
+#: assets/models/cmd_filter.py:28 perms/models/asset_permission.py:65
 #: perms/serializers/permission.py:32 users/models/group.py:25
 #: users/models/user.py:798
 msgid "User group"
@@ -1787,7 +1787,8 @@ msgid "System"
 msgstr "系统"
 
 #: assets/models/label.py:19 assets/models/node.py:539
-#: assets/serializers/cagegory.py:7 assets/serializers/cagegory.py:14
+#: assets/serializers/cagegory.py:11 assets/serializers/cagegory.py:18
+#: assets/serializers/cagegory.py:24
 #: authentication/models/connection_token.py:29
 #: authentication/serializers/connect_token_secret.py:122
 #: common/serializers/common.py:86 settings/models.py:33
@@ -1796,10 +1797,10 @@ msgid "Value"
 msgstr "值"
 
 #: assets/models/label.py:40 assets/serializers/asset/common.py:123
-#: assets/serializers/cagegory.py:6 assets/serializers/cagegory.py:13
-#: assets/serializers/platform.py:112
+#: assets/serializers/cagegory.py:10 assets/serializers/cagegory.py:17
+#: assets/serializers/cagegory.py:23 assets/serializers/platform.py:112
 #: authentication/serializers/connect_token_secret.py:121
-#: common/serializers/common.py:85 perms/serializers/user_permission.py:28
+#: common/serializers/common.py:85 perms/serializers/user_permission.py:27
 #: settings/serializers/msg.py:83
 msgid "Label"
 msgstr "标签"
@@ -1965,7 +1966,8 @@ msgstr "资产中批量更新平台，不符合平台类型跳过的资产"
 #: assets/serializers/asset/common.py:124 assets/serializers/platform.py:134
 #: authentication/serializers/connect_token_secret.py:29
 #: authentication/serializers/connect_token_secret.py:72
-#: perms/serializers/user_permission.py:25 xpack/plugins/cloud/models.py:324
+#: perms/models/asset_permission.py:75 perms/serializers/permission.py:40
+#: perms/serializers/user_permission.py:74 xpack/plugins/cloud/models.py:324
 #: xpack/plugins/cloud/serializers/task.py:31
 msgid "Protocols"
 msgstr "协议组"
@@ -1996,7 +1998,7 @@ msgstr "协议是必填的: {}"
 msgid "Invalid data"
 msgstr "无效的数据"
 
-#: assets/serializers/asset/database.py:12
+#: assets/serializers/asset/database.py:13
 msgid "Default database"
 msgstr "默认数据库"
 
@@ -2066,11 +2068,11 @@ msgstr "系统版本"
 msgid "OS arch"
 msgstr "系统架构"
 
-#: assets/serializers/cagegory.py:9
+#: assets/serializers/cagegory.py:13
 msgid "Constraints"
 msgstr "约束"
 
-#: assets/serializers/cagegory.py:15
+#: assets/serializers/cagegory.py:19
 msgid "Types"
 msgstr "类型"
 
@@ -2314,7 +2316,7 @@ msgstr "会话日志"
 msgid "Login log"
 msgstr "登录日志"
 
-#: audits/const.py:51 terminal/models/applet/host.py:143
+#: audits/const.py:51 terminal/models/applet/host.py:144
 #: terminal/models/component/task.py:22
 msgid "Task"
 msgstr "任务"
@@ -2454,7 +2456,7 @@ msgid "User %s %s this resource"
 msgstr "用户 %s %s 了当前资源"
 
 #: audits/serializers.py:172 authentication/models/connection_token.py:47
-#: authentication/models/temp_token.py:13 perms/models/asset_permission.py:74
+#: authentication/models/temp_token.py:13 perms/models/asset_permission.py:79
 #: tickets/models/ticket/apply_application.py:31
 #: tickets/models/ticket/apply_asset.py:20 users/models/user.py:833
 msgid "Date expired"
@@ -2539,23 +2541,23 @@ msgstr "该操作需要验证您的 MFA, 请先开启并配置"
 msgid "Reusable connection token is not allowed, global setting not enabled"
 msgstr "不允许使用可重复使用的连接令牌，未启用全局设置"
 
-#: authentication/api/connection_token.py:375
+#: authentication/api/connection_token.py:376
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名账号不支持当前资产"
 
-#: authentication/api/connection_token.py:394
+#: authentication/api/connection_token.py:395
 msgid "Account not found"
 msgstr "账号未找到"
 
-#: authentication/api/connection_token.py:397
+#: authentication/api/connection_token.py:398
 msgid "Permission expired"
 msgstr "授权已过期"
 
-#: authentication/api/connection_token.py:427
+#: authentication/api/connection_token.py:428
 msgid "ACL action is reject: {}({})"
 msgstr "ACL 动作是拒绝: {}({})"
 
-#: authentication/api/connection_token.py:431
+#: authentication/api/connection_token.py:432
 msgid "ACL action is review"
 msgstr "ACL 动作是复核"
 
@@ -2958,7 +2960,7 @@ msgid "Reusable"
 msgstr "可以重复使用"
 
 #: authentication/models/connection_token.py:51
-#: perms/models/asset_permission.py:77
+#: perms/models/asset_permission.py:82
 msgid "From ticket"
 msgstr "来自工单"
 
@@ -2974,7 +2976,7 @@ msgstr "可以复用连接令牌"
 msgid "Connection token"
 msgstr "连接令牌"
 
-#: authentication/models/connection_token.py:116
+#: authentication/models/connection_token.py:115
 msgid "Connection token inactive"
 msgstr "连接令牌未激活"
 
@@ -3047,15 +3049,15 @@ msgid "Ticket info"
 msgstr "工单信息"
 
 #: authentication/serializers/connection_token.py:21
-#: perms/models/asset_permission.py:71 perms/serializers/permission.py:36
-#: perms/serializers/permission.py:56
+#: perms/models/asset_permission.py:76 perms/serializers/permission.py:36
+#: perms/serializers/permission.py:57
 #: tickets/models/ticket/apply_application.py:28
 #: tickets/models/ticket/apply_asset.py:18
 msgid "Actions"
 msgstr "动作"
 
 #: authentication/serializers/connection_token.py:42
-#: perms/serializers/permission.py:38 perms/serializers/permission.py:57
+#: perms/serializers/permission.py:38 perms/serializers/permission.py:58
 #: users/serializers/user.py:97 users/serializers/user.py:171
 msgid "Is expired"
 msgstr "已过期"
@@ -3076,7 +3078,7 @@ msgid "The {} cannot be empty"
 msgstr "{} 不能为空"
 
 #: authentication/serializers/token.py:86 perms/serializers/permission.py:37
-#: perms/serializers/permission.py:58 users/serializers/user.py:98
+#: perms/serializers/permission.py:59 users/serializers/user.py:98
 #: users/serializers/user.py:168
 msgid "Is valid"
 msgstr "是否有效"
@@ -4149,31 +4151,31 @@ msgstr "是否完成"
 msgid "Time cost"
 msgstr "花费时间"
 
-#: ops/tasks.py:36
+#: ops/tasks.py:37
 msgid "Run ansible task"
 msgstr "运行 Ansible 任务"
 
-#: ops/tasks.py:70
+#: ops/tasks.py:71
 msgid "Run ansible task execution"
 msgstr "开始执行 Ansible 任务"
 
-#: ops/tasks.py:92
+#: ops/tasks.py:93
 msgid "Clear celery periodic tasks"
 msgstr "清理周期任务"
 
-#: ops/tasks.py:113
+#: ops/tasks.py:114
 msgid "Create or update periodic tasks"
 msgstr "创建或更新周期任务"
 
-#: ops/tasks.py:121
+#: ops/tasks.py:122
 msgid "Periodic check service performance"
 msgstr "周期检测服务性能"
 
-#: ops/tasks.py:127
+#: ops/tasks.py:128
 msgid "Clean up unexpected jobs"
 msgstr "清理异常作业"
 
-#: ops/tasks.py:141
+#: ops/tasks.py:135
 msgid "Clean job_execution db record"
 msgstr "清理作业中心执行历史"
 
@@ -4308,7 +4310,7 @@ msgstr "文件传输"
 msgid "Clipboard"
 msgstr "剪贴板"
 
-#: perms/models/asset_permission.py:83
+#: perms/models/asset_permission.py:88
 msgid "Asset permission"
 msgstr "资产授权"
 
@@ -4561,7 +4563,7 @@ msgid "My assets"
 msgstr "我的资产"
 
 #: rbac/tree.py:56 terminal/models/applet/applet.py:52
-#: terminal/models/applet/applet.py:300 terminal/models/applet/host.py:29
+#: terminal/models/applet/applet.py:317 terminal/models/applet/host.py:30
 #: terminal/serializers/applet.py:15
 msgid "Applet"
 msgstr "远程应用"
@@ -6254,8 +6256,8 @@ msgstr "只支持自定义平台"
 msgid "Missing type in platform.yml"
 msgstr "在 platform.yml 中缺少类型"
 
-#: terminal/models/applet/applet.py:302 terminal/models/applet/host.py:35
-#: terminal/models/applet/host.py:137
+#: terminal/models/applet/applet.py:319 terminal/models/applet/host.py:36
+#: terminal/models/applet/host.py:138
 msgid "Hosting"
 msgstr "宿主机"
 
@@ -6283,7 +6285,11 @@ msgstr "初始化日期"
 msgid "Date synced"
 msgstr "同步日期"
 
-#: terminal/models/applet/host.py:138
+#: terminal/models/applet/host.py:28
+msgid "Using same account"
+msgstr "使用同名账号"
+
+#: terminal/models/applet/host.py:139
 msgid "Initial"
 msgstr "初始化"
 
@@ -6609,7 +6615,7 @@ msgstr "RDS 远程应用注销时间限制"
 msgid "Load status"
 msgstr "负载状态"
 
-#: terminal/serializers/applet_host.py:72
+#: terminal/serializers/applet_host.py:73
 msgid ""
 "These accounts are used to connect to the published application, the account "
 "is now divided into two types, one is dedicated to each account, each user "
@@ -6622,9 +6628,16 @@ msgstr ""
 "使用公共账号连接; <br />注意: 如果不开启自动创建账号, 当前发布机仅能被指定标"
 "签的资产调度到，默认不会放到调度池中"
 
-#: terminal/serializers/applet_host.py:77
+#: terminal/serializers/applet_host.py:80
 msgid "The number of public accounts created automatically"
 msgstr "公用账号自动创建的数量"
+
+#: terminal/serializers/applet_host.py:83
+msgid ""
+"Connect to the host using the same account first. For security reasons, "
+"please set the configuration item CACHE_LOGIN_PASSWORD_ENABLED=true and "
+"restart the service to enable it."
+msgstr "优先使用同名账号连接发布机。为了安全，需配置文件中开启配置 CACHE_LOGIN_PASSWORD_ENABLED=true， 修改后重启服务"
 
 #: terminal/serializers/command.py:19
 msgid "Session ID"
@@ -7323,7 +7336,7 @@ msgid "Public key should not be the same as your old one."
 msgstr "不能和原来的密钥相同"
 
 #: users/forms/profile.py:162 users/serializers/profile.py:76
-#: users/serializers/profile.py:159 users/serializers/profile.py:186
+#: users/serializers/profile.py:164 users/serializers/profile.py:191
 msgid "Not a valid ssh public key"
 msgstr "SSH密钥不合法"
 
@@ -7365,7 +7378,7 @@ msgstr "OTP 密钥"
 msgid "Private key"
 msgstr "ssh私钥"
 
-#: users/models/user.py:830 users/serializers/profile.py:125
+#: users/models/user.py:830 users/serializers/profile.py:128
 #: users/serializers/user.py:166
 msgid "Is first login"
 msgstr "首次登录"
@@ -7505,7 +7518,7 @@ msgstr "命令行"
 msgid "The old password is incorrect"
 msgstr "旧密码错误"
 
-#: users/serializers/profile.py:36 users/serializers/profile.py:173
+#: users/serializers/profile.py:36 users/serializers/profile.py:178
 msgid "Password does not match security rules"
 msgstr "密码不满足安全规则"
 
@@ -8478,7 +8491,7 @@ msgstr "许可证导入成功"
 msgid "License is invalid"
 msgstr "无效的许可证"
 
-#: xpack/plugins/license/meta.py:10 xpack/plugins/license/models.py:140
+#: xpack/plugins/license/meta.py:10 xpack/plugins/license/models.py:144
 msgid "License"
 msgstr "许可证"
 
