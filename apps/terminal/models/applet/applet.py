@@ -162,7 +162,7 @@ class Applet(JMSBaseModel):
         for host_id in using_host_ids.values():
             counts[host_id] += 1
 
-        hosts = list(sorted(hosts, key=lambda h: counts[h.id]))
+        hosts = list(sorted(hosts, key=lambda h: counts[str(h.id)]))
         return hosts[0]
 
     def select_host(self, user, asset):
