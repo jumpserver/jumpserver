@@ -351,8 +351,9 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         self._insert_connect_options(data, user)
         asset = data.get('asset')
         account_name = data.get('account')
+        protocol = data.get('protocol')
         self.input_username = self.get_input_username(data)
-        _data = self._validate(user, asset, account_name)
+        _data = self._validate(user, asset, account_name, protocol)
         data.update(_data)
         return serializer
 
@@ -360,12 +361,12 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         user = token.user
         asset = token.asset
         account_name = token.account
-        _data = self._validate(user, asset, account_name)
+        _data = self._validate(user, asset, account_name, token.protocol)
         for k, v in _data.items():
             setattr(token, k, v)
         return token
 
-    def _validate(self, user, asset, account_name):
+    def _validate(self, user, asset, account_name, protocol):
         data = dict()
         data['org_id'] = asset.org_id
         data['user'] = user
@@ -374,7 +375,7 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         if account_name == AliasAccount.ANON and asset.category not in ['web', 'custom']:
             raise ValidationError(_('Anonymous account is not supported for this asset'))
 
-        account = self._validate_perm(user, asset, account_name)
+        account = self._validate_perm(user, asset, account_name, protocol)
         if account.has_secret:
             data['input_secret'] = ''
 
@@ -387,9 +388,9 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         return data
 
     @staticmethod
-    def _validate_perm(user, asset, account_name):
-        from perms.utils.account import PermAccountUtil
-        account = PermAccountUtil().validate_permission(user, asset, account_name)
+    def _validate_perm(user, asset, account_name, protocol):
+        from perms.utils.asset_perm import PermAssetDetailUtil
+        account = PermAssetDetailUtil(user, asset).validate_permission(account_name, protocol)
         if not account or not account.actions:
             msg = _('Account not found')
             raise JMSException(code='perm_account_invalid', detail=msg)

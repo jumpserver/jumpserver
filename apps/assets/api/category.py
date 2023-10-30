@@ -13,7 +13,7 @@ __all__ = ['CategoryViewSet']
 class CategoryViewSet(ListModelMixin, JMSGenericViewSet):
     serializer_classes = {
         'default': CategorySerializer,
-        'types': TypeSerializer
+        'types': TypeSerializer,
     }
     permission_classes = (IsValidUser,)
 

@@ -21,7 +21,7 @@ from common.utils import get_object_or_none, lazyproperty
 from common.utils.common import timeit
 from perms.hands import Node
 from perms.models import PermNode
-from perms.utils import PermAccountUtil, UserPermNodeUtil
+from perms.utils import PermAssetDetailUtil, UserPermNodeUtil
 from perms.utils import UserPermAssetUtil
 from .mixin import RebuildTreeMixin
 from ..mixin import SelfOrPKUserMixin
@@ -225,8 +225,8 @@ class UserGrantedK8sAsTreeApi(SelfOrPKUserMixin, ListAPIView):
         return token
 
     def get_account_secret(self, token: ConnectionToken):
-        util = PermAccountUtil()
-        accounts = util.get_permed_accounts_for_user(self.user, token.asset)
+        util = PermAssetDetailUtil(self.user, token.asset)
+        accounts = util.get_permed_accounts_for_user()
         account_name = token.account
 
         if account_name in [AliasAccount.INPUT, AliasAccount.USER]:

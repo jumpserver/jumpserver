@@ -6,4 +6,5 @@ from .label import *
 from .mixin import *
 from .node import *
 from .platform import *
+from .protocol import *
 from .tree import *
