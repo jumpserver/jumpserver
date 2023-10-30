@@ -112,8 +112,8 @@ class ChangeSecretRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChangeSecretRecord
         fields = [
-            'id', 'asset', 'account', 'date_started', 'date_finished',
-            'timedelta', 'is_success', 'error', 'execution',
+            'id', 'asset', 'account', 'date_finished',
+            'status', 'is_success', 'error', 'execution',
         ]
         read_only_fields = fields
 

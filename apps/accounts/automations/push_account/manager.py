@@ -1,7 +1,4 @@
-from copy import deepcopy
-
-from accounts.const import AutomationTypes, SecretType, Connectivity
-from assets.const import HostTypes
+from accounts.const import AutomationTypes
 from common.utils import get_logger
 from ..base.manager import AccountBasePlaybookManager
 from ..change_secret.manager import ChangeSecretManager
@@ -10,83 +7,10 @@ logger = get_logger(__name__)
 
 
 class PushAccountManager(ChangeSecretManager, AccountBasePlaybookManager):
-    ansible_account_prefer = ''
 
     @classmethod
     def method_type(cls):
         return AutomationTypes.push_account
-
-    def host_callback(self, host, asset=None, account=None, automation=None, path_dir=None, **kwargs):
-        host = super(ChangeSecretManager, self).host_callback(
-            host, asset=asset, account=account, automation=automation,
-            path_dir=path_dir, **kwargs
-        )
-        if host.get('error'):
-            return host
-
-        accounts = self.get_accounts(account)
-        inventory_hosts = []
-        if asset.type == HostTypes.WINDOWS and self.secret_type == SecretType.SSH_KEY:
-            msg = f'Windows {asset} does not support ssh key push'
-            print(msg)
-            return inventory_hosts
-
-        host['ssh_params'] = {}
-        for account in accounts:
-            h = deepcopy(host)
-            secret_type = account.secret_type
-            h['name'] += '(' + account.username + ')'
-            if self.secret_type is None:
-                new_secret = account.secret
-            else:
-                new_secret = self.get_secret(secret_type)
-
-            self.name_recorder_mapper[h['name']] = {
-                'account': account, 'new_secret': new_secret,
-            }
-
-            private_key_path = None
-            if secret_type == SecretType.SSH_KEY:
-                private_key_path = self.generate_private_key_path(new_secret, path_dir)
-                new_secret = self.generate_public_key(new_secret)
-
-            h['ssh_params'].update(self.get_ssh_params(account, new_secret, secret_type))
-            h['account'] = {
-                'name': account.name,
-                'username': account.username,
-                'secret_type': secret_type,
-                'secret': new_secret,
-                'private_key_path': private_key_path,
-                'become': account.get_ansible_become_auth(),
-            }
-            if asset.platform.type == 'oracle':
-                h['account']['mode'] = 'sysdba' if account.privileged else None
-            inventory_hosts.append(h)
-        return inventory_hosts
-
-    def on_host_success(self, host, result):
-        account_info = self.name_recorder_mapper.get(host)
-        if not account_info:
-            return
-
-        account = account_info['account']
-        new_secret = account_info['new_secret']
-        if not account:
-            return
-        account.secret = new_secret
-        account.save(update_fields=['secret'])
-        account.set_connectivity(Connectivity.OK)
-
-    def on_host_error(self, host, error, result):
-        pass
-
-    def on_runner_failed(self, runner, e):
-        logger.error("Pust account error: {}".format(e))
-
-    def run(self, *args, **kwargs):
-        if self.secret_type and not self.check_secret():
-            return
-        super(ChangeSecretManager, self).run(*args, **kwargs)
 
     # @classmethod
     # def trigger_by_asset_create(cls, asset):
