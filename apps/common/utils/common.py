@@ -171,7 +171,7 @@ def get_request_ip(request):
 def get_request_ip_or_data(request):
     ip = ''
 
-    if hasattr(request, 'data') and request.data.get('remote_addr', ''):
+    if hasattr(request, 'data') and isinstance(request.data, dict) and request.data.get('remote_addr', ''):
         permission = ServiceAccountSignaturePermission()
         if permission.has_permission(request, None):
             ip = request.data.get('remote_addr', '')
