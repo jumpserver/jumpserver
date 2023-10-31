@@ -107,8 +107,9 @@ def create_app_nodes(apps, org_id):
         'key': next_key, 'value': name, 'parent_key': parent_key,
         'full_value': full_value, 'org_id': org_id
     }
-    node, created = node_model.objects.get_or_create(
+    node, __ = node_model.objects.get_or_create(
         defaults=defaults, value=name, org_id=org_id,
+        parent_key=parent_key
     )
     node.parent = parent
     return node
