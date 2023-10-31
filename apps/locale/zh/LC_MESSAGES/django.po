@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-30 11:28+0800\n"
+"POT-Creation-Date: 2023-10-31 14:04+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -40,7 +40,7 @@ msgstr "密码"
 msgid "SSH key"
 msgstr "SSH 密钥"
 
-#: accounts/const/account.py:8 authentication/models/access_key.py:37
+#: accounts/const/account.py:8 authentication/models/access_key.py:42
 msgid "Access key"
 msgstr "Access key"
 
@@ -841,7 +841,7 @@ msgstr "关联平台，可配置推送参数，如果不关联，将使用默认
 #: assets/models/group.py:20 common/db/models.py:36 ops/models/adhoc.py:26
 #: ops/models/job.py:145 ops/models/playbook.py:31 rbac/models/role.py:37
 #: settings/models.py:37 terminal/models/applet/applet.py:45
-#: terminal/models/applet/applet.py:321 terminal/models/applet/host.py:143
+#: terminal/models/applet/applet.py:317 terminal/models/applet/host.py:143
 #: terminal/models/component/endpoint.py:24
 #: terminal/models/component/endpoint.py:104
 #: terminal/models/session/session.py:46 tickets/models/comment.py:32
@@ -1011,7 +1011,7 @@ msgstr "优先级可选范围为 1-100 (数值越小越优先)"
 msgid "Reviewers"
 msgstr "审批人"
 
-#: acls/models/base.py:43 authentication/models/access_key.py:20
+#: acls/models/base.py:43 authentication/models/access_key.py:25
 #: authentication/models/connection_token.py:53
 #: authentication/templates/authentication/_access_key_modal.html:32
 #: perms/models/asset_permission.py:81 terminal/models/session/sharing.py:29
@@ -1705,7 +1705,7 @@ msgstr "资产自动化任务"
 
 #: assets/models/automations/base.py:113 audits/models.py:207
 #: audits/serializers.py:51 ops/models/base.py:49 ops/models/job.py:220
-#: terminal/models/applet/applet.py:320 terminal/models/applet/host.py:140
+#: terminal/models/applet/applet.py:316 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
 #: terminal/serializers/applet_host.py:124 tickets/models/ticket/general.py:283
 #: tickets/serializers/super_ticket.py:13
@@ -2632,7 +2632,7 @@ msgid "Added on"
 msgstr "附加"
 
 #: authentication/backends/passkey/models.py:14
-#: authentication/models/access_key.py:21
+#: authentication/models/access_key.py:26
 #: authentication/models/private_token.py:8
 msgid "Date last used"
 msgstr "最后使用日期"
@@ -2925,6 +2925,11 @@ msgstr "该 MFA ({}) 方式没有启用"
 msgid "Please change your password"
 msgstr "请修改密码"
 
+#: authentication/models/access_key.py:22
+#: terminal/models/component/endpoint.py:95
+msgid "IP group"
+msgstr "IPグループ"
+
 #: authentication/models/connection_token.py:38
 #: terminal/serializers/storage.py:113
 msgid "Account name"
@@ -3077,7 +3082,13 @@ msgstr "邮箱"
 msgid "The {} cannot be empty"
 msgstr "{} 不能为空"
 
-#: authentication/serializers/token.py:86 perms/serializers/permission.py:37
+#: authentication/serializers/token.py:23
+#, fuzzy
+#| msgid "Access key"
+msgid "AccessIP"
+msgstr "アクセスIP"
+
+#: authentication/serializers/token.py:93 perms/serializers/permission.py:37
 #: perms/serializers/permission.py:59 users/serializers/user.py:98
 #: users/serializers/user.py:168
 msgid "Is valid"
@@ -4563,7 +4574,7 @@ msgid "My assets"
 msgstr "我的资产"
 
 #: rbac/tree.py:56 terminal/models/applet/applet.py:52
-#: terminal/models/applet/applet.py:317 terminal/models/applet/host.py:30
+#: terminal/models/applet/applet.py:313 terminal/models/applet/host.py:30
 #: terminal/serializers/applet.py:15
 msgid "Applet"
 msgstr "远程应用"
@@ -6256,7 +6267,7 @@ msgstr "只支持自定义平台"
 msgid "Missing type in platform.yml"
 msgstr "在 platform.yml 中缺少类型"
 
-#: terminal/models/applet/applet.py:319 terminal/models/applet/host.py:36
+#: terminal/models/applet/applet.py:315 terminal/models/applet/host.py:36
 #: terminal/models/applet/host.py:138
 msgid "Hosting"
 msgstr "宿主机"
@@ -6332,10 +6343,6 @@ msgstr "Redis 端口"
 #: terminal/serializers/storage.py:92 terminal/serializers/storage.py:100
 msgid "Endpoint"
 msgstr "端点"
-
-#: terminal/models/component/endpoint.py:95
-msgid "IP group"
-msgstr "IP 组"
 
 #: terminal/models/component/endpoint.py:108
 msgid "Endpoint rule"
@@ -6637,7 +6644,9 @@ msgid ""
 "Connect to the host using the same account first. For security reasons, "
 "please set the configuration item CACHE_LOGIN_PASSWORD_ENABLED=true and "
 "restart the service to enable it."
-msgstr "优先使用同名账号连接发布机。为了安全，需配置文件中开启配置 CACHE_LOGIN_PASSWORD_ENABLED=true， 修改后重启服务"
+msgstr ""
+"优先使用同名账号连接发布机。为了安全，需配置文件中开启配置 "
+"CACHE_LOGIN_PASSWORD_ENABLED=true， 修改后重启服务"
 
 #: terminal/serializers/command.py:19
 msgid "Session ID"

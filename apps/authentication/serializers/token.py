@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from acls.serializers.rules import ip_group_child_validator, ip_group_help_text
 from common.utils import get_object_or_none, random_string
 from users.models import User
 from users.serializers import UserProfileSerializer
@@ -17,9 +18,14 @@ __all__ = [
 
 
 class AccessKeySerializer(serializers.ModelSerializer):
+    ip_group = serializers.ListField(
+        default=['*'], label=_('AccessIP'), help_text=ip_group_help_text,
+        child=serializers.CharField(max_length=1024, validators=[ip_group_child_validator])
+    )
+
     class Meta:
         model = AccessKey
-        fields = ['id', 'is_active', 'date_created', 'date_last_used']
+        fields = ['id', 'is_active', 'date_created', 'date_last_used'] + ['ip_group']
         read_only_fields = ['id', 'date_created', 'date_last_used']
 
 

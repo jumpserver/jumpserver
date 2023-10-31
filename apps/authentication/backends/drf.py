@@ -8,7 +8,7 @@ from django.utils.translation import gettext as _
 from rest_framework import authentication, exceptions
 
 from common.auth import signature
-from common.utils import get_object_or_none
+from common.utils import get_object_or_none, get_request_ip_or_data, contains_ip
 from ..models import AccessKey, PrivateToken
 
 
@@ -122,3 +122,14 @@ class SignatureAuthentication(signature.SignatureAuthentication):
             return user, secret
         except (AccessKey.DoesNotExist, exceptions.ValidationError):
             return None, None
+
+    def is_ip_allow(self, key_id, request):
+        try:
+            ak = AccessKey.objects.get(id=key_id)
+            ip_group = ak.ip_group
+            ip = get_request_ip_or_data(request)
+            if not contains_ip(ip, ip_group):
+                return False
+            return True
+        except (AccessKey.DoesNotExist, exceptions.ValidationError):
+            return False
