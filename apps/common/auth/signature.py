@@ -17,6 +17,7 @@ Reusing failure exceptions serves several purposes:
 
 """
 FAILED = exceptions.AuthenticationFailed('Invalid signature.')
+IP_NOT_ALLOW = exceptions.AuthenticationFailed('Ip is not in access ip list.')
 
 
 class SignatureAuthentication(authentication.BaseAuthentication):
@@ -43,6 +44,9 @@ class SignatureAuthentication(authentication.BaseAuthentication):
         """Returns a tuple (User, secret) or (None, None)."""
         raise NotImplementedError()
 
+    def is_ip_allow(self, key_id, request):
+        raise NotImplementedError()
+
     def authenticate_header(self, request):
         """
         DRF sends this for unauthenticated responses if we're the primary
@@ -50,7 +54,7 @@ class SignatureAuthentication(authentication.BaseAuthentication):
         """
         h = " ".join(self.required_headers)
         return 'Signature realm="%s",headers="%s"' % (
-        self.www_authenticate_realm, h)
+            self.www_authenticate_realm, h)
 
     def authenticate(self, request):
         """
@@ -78,14 +82,18 @@ class SignatureAuthentication(authentication.BaseAuthentication):
         if len({"keyid", "algorithm", "signature"} - set(fields.keys())) > 0:
             raise FAILED
 
+        key_id = fields["keyid"]
         # Fetch the secret associated with the keyid
         user, secret = self.fetch_user_data(
-            fields["keyid"],
+            key_id,
             algorithm=fields["algorithm"]
         )
 
         if not (user and secret):
             raise FAILED
+
+        if not self.is_ip_allow(key_id, request):
+            raise IP_NOT_ALLOW
 
         # Gather all request headers and translate them as stated in the Django docs:
         # https://docs.djangoproject.com/en/1.6/ref/request-response/#django.http.HttpRequest.META
