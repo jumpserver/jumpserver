@@ -201,6 +201,8 @@
     - name: Check and Clean global system path (Chrome)
       ansible.windows.win_path:
         elements:
+          - 'C:\Program Files\Python310\Scripts\'
+          - 'C:\Program Files\Python310\'
           - 'C:\Program Files\JumpServer\drivers\chromedriver-win32'
           - 'C:\Program Files\JumpServer\drivers\chromedriver_win32'
           - 'C:\Program Files\Chrome\chrome-win32'
