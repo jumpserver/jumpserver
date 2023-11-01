@@ -286,24 +286,25 @@ class RelatedManager:
         self.instance.__dict__[self.field.name] = value
 
     @classmethod
-    def get_to_filter_q(cls, value, to_model):
+    def get_to_filter_qs(cls, value, to_model):
         """
         这个是 instance 去查找 to_model 的 queryset 的 Q
         :param value:
         :param to_model:
         :return:
         """
+        default = [Q()]
         if not value or not isinstance(value, dict):
-            return Q()
+            return default
 
         if value["type"] == "all":
-            return Q()
+            return default
         elif value["type"] == "ids" and isinstance(value.get("ids"), list):
-            return Q(id__in=value["ids"])
+            return [Q(id__in=value["ids"])]
         elif value["type"] == "attrs" and isinstance(value.get("attrs"), list):
-            return cls._get_filter_attrs_q(value, to_model)
+            return cls._get_filter_attrs_qs(value, to_model)
         else:
-            return Q()
+            return default
 
     @classmethod
     def filter_queryset_by_model(cls, value, to_model):
@@ -311,8 +312,10 @@ class RelatedManager:
             queryset = to_model.get_queryset()
         else:
             queryset = to_model.objects.all()
-        q = cls.get_to_filter_q(value, to_model)
-        return queryset.filter(q).distinct()
+        qs = cls.get_to_filter_qs(value, to_model)
+        for q in qs:
+            queryset = queryset.filter(q)
+        return queryset.distinct()
 
     @staticmethod
     def get_ip_in_q(name, val):
@@ -343,8 +346,8 @@ class RelatedManager:
         return q
 
     @classmethod
-    def _get_filter_attrs_q(cls, value, to_model):
-        filters = Q()
+    def _get_filter_attrs_qs(cls, value, to_model):
+        filters = []
         # 特殊情况有这几种，
         # 1. 像 资产中的 type 和 category，集成自 Platform。所以不能直接查询
         # 2. 像 资产中的 nodes，不是简单的 m2m，是树 的关系
@@ -364,7 +367,7 @@ class RelatedManager:
             if custom_attr_filter:
                 custom_filter_q = custom_attr_filter(name, val, match)
                 if custom_filter_q:
-                    filters &= custom_filter_q
+                    filters.append(custom_filter_q)
                     continue
 
             if match == 'ip_in':
@@ -381,13 +384,22 @@ class RelatedManager:
                     q = Q(pk__isnull=True)
             elif match == "not":
                 q = ~Q(**{name: val})
-            elif match in ['m2m', 'in']:
+            elif match.startswith('m2m'):
+                if not isinstance(val, list):
+                    val = [val]
+                if match == 'm2m_all':
+                    for v in val:
+                        filters.append(Q(**{"{}__in".format(name): [v]}))
+                    continue
+                else:
+                    q = Q(**{"{}__in".format(name): val})
+            elif match == 'in':
                 if not isinstance(val, list):
                     val = [val]
                 q = Q() if '*' in val else Q(**{"{}__in".format(name): val})
             else:
                 q = Q() if val == '*' else Q(**{name: val})
-            filters &= q
+            filters.append(q)
         return filters
 
     def _get_queryset(self):
@@ -397,8 +409,8 @@ class RelatedManager:
 
     def get_attr_q(self):
         to_model = apps.get_model(self.field.to)
-        q = self._get_filter_attrs_q(self.value, to_model)
-        return q
+        qs = self._get_filter_attrs_qs(self.value, to_model)
+        return qs
 
     def all(self):
         return self._get_queryset()
@@ -491,7 +503,7 @@ class JSONManyToManyDescriptor:
                 if isinstance(rule_value, str):
                     rule_value = [rule_value]
                 res &= '*' in rule_value or contains_ip(value, rule_value)
-            elif rule['match'] == 'm2m':
+            elif rule['match'].startswith('m2m'):
                 if isinstance(value, Manager):
                     value = value.values_list('id', flat=True)
                 elif isinstance(value, QuerySet):
@@ -502,7 +514,12 @@ class JSONManyToManyDescriptor:
                     rule_value = [rule_value]
                 value = set(map(str, value))
                 rule_value = set(map(str, rule_value))
-                res &= bool(value & rule_value)
+
+                if rule['match'] == 'm2m_all':
+                    res &= rule_value.issubset(value)
+                else:
+                    res &= bool(value & rule_value)
+
             else:
                 logging.error("unknown match: {}".format(rule['match']))
                 res &= False
