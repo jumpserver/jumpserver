@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-31 14:04+0800\n"
+"POT-Creation-Date: 2023-11-01 22:13+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -26,7 +26,7 @@ msgstr "参数 'action' 必须是 [{}]"
 #: assets/models/_user.py:24 audits/signal_handlers/login_log.py:34
 #: authentication/confirm/password.py:9 authentication/confirm/password.py:24
 #: authentication/confirm/password.py:26 authentication/forms.py:32
-#: authentication/templates/authentication/login.html:324
+#: authentication/templates/authentication/login.html:330
 #: settings/serializers/auth/ldap.py:25 settings/serializers/auth/ldap.py:47
 #: users/forms/profile.py:22 users/serializers/user.py:104
 #: users/templates/users/_msg_user_created.html:13
@@ -88,7 +88,7 @@ msgstr "模板"
 msgid "Skip"
 msgstr "跳过"
 
-#: accounts/const/account.py:32 audits/const.py:24 rbac/tree.py:236
+#: accounts/const/account.py:32 audits/const.py:24 rbac/tree.py:237
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "更新"
@@ -420,6 +420,18 @@ msgstr "开始日期"
 #: terminal/models/applet/host.py:142
 msgid "Date finished"
 msgstr "结束日期"
+
+#: accounts/models/automations/change_secret.py:43
+#: assets/models/automations/base.py:113 audits/models.py:207
+#: audits/serializers.py:51 ops/models/base.py:49 ops/models/job.py:220
+#: terminal/models/applet/applet.py:316 terminal/models/applet/host.py:140
+#: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
+#: terminal/serializers/applet_host.py:124 tickets/models/ticket/general.py:283
+#: tickets/serializers/super_ticket.py:13
+#: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:201
+#: xpack/plugins/cloud/models.py:257
+msgid "Status"
+msgstr "状态"
 
 #: accounts/models/automations/change_secret.py:44
 #: accounts/serializers/account/account.py:257 assets/const/automation.py:8
@@ -917,9 +929,15 @@ msgstr "添加账号: %s"
 msgid "Delete account: %s"
 msgstr "删除账号: %s"
 
-#: accounts/tasks/automation.py:24
+#: accounts/tasks/automation.py:25
 msgid "Account execute automation"
 msgstr "账号执行自动化"
+
+#: accounts/tasks/automation.py:51 accounts/tasks/automation.py:62
+#, fuzzy
+#| msgid "Asset execute automation"
+msgid "Execute automation record"
+msgstr "资产执行自动化"
 
 #: accounts/tasks/backup_account.py:25
 msgid "Execute account backup plan"
@@ -1252,11 +1270,11 @@ msgstr "同级别节点名字不能重复"
 msgid "App assets"
 msgstr "资产管理"
 
-#: assets/automations/base/manager.py:136
+#: assets/automations/base/manager.py:133
 msgid "{} disabled"
 msgstr "{} 已禁用"
 
-#: assets/automations/base/manager.py:202
+#: assets/automations/base/manager.py:199
 msgid "  - Platform {} ansible disabled"
 msgstr "  - 平台 {} Ansible 已禁用, 无法执行任务"
 
@@ -1702,17 +1720,6 @@ msgstr "自动化任务"
 #: assets/models/automations/base.py:104
 msgid "Asset automation task"
 msgstr "资产自动化任务"
-
-#: assets/models/automations/base.py:113 audits/models.py:207
-#: audits/serializers.py:51 ops/models/base.py:49 ops/models/job.py:220
-#: terminal/models/applet/applet.py:316 terminal/models/applet/host.py:140
-#: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
-#: terminal/serializers/applet_host.py:124 tickets/models/ticket/general.py:283
-#: tickets/serializers/super_ticket.py:13
-#: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:201
-#: xpack/plugins/cloud/models.py:257
-msgid "Status"
-msgstr "状态"
 
 #: assets/models/automations/gather_facts.py:15
 msgid "Gather asset facts"
@@ -2236,7 +2243,7 @@ msgstr "删除目录"
 
 #: audits/const.py:14 audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: perms/const.py:17 rbac/tree.py:237
+#: perms/const.py:17 rbac/tree.py:238
 msgid "Delete"
 msgstr "删除"
 
@@ -2261,7 +2268,7 @@ msgstr "下载"
 msgid "Rename dir"
 msgstr "映射目录"
 
-#: audits/const.py:23 rbac/tree.py:235 terminal/api/session/session.py:257
+#: audits/const.py:23 rbac/tree.py:236 terminal/api/session/session.py:257
 #: terminal/templates/terminal/_msg_command_warning.html:18
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 msgid "View"
@@ -2269,7 +2276,7 @@ msgstr "查看"
 
 #: audits/const.py:26
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:234
+#: rbac/tree.py:235
 msgid "Create"
 msgstr "创建"
 
@@ -2277,8 +2284,8 @@ msgstr "创建"
 msgid "Connect"
 msgstr "连接"
 
-#: audits/const.py:30 authentication/templates/authentication/login.html:290
-#: authentication/templates/authentication/login.html:363
+#: audits/const.py:30 authentication/templates/authentication/login.html:296
+#: authentication/templates/authentication/login.html:369
 #: templates/_header_bar.html:95
 msgid "Login"
 msgstr "登录"
@@ -2581,7 +2588,7 @@ msgid ""
 msgstr "用户来自 {} 请去相应系统修改密码"
 
 #: authentication/api/password.py:67
-#: authentication/templates/authentication/login.html:355
+#: authentication/templates/authentication/login.html:361
 #: users/templates/users/forgot_password.html:27
 #: users/templates/users/forgot_password.html:28
 #: users/templates/users/forgot_password_previewing.html:13
@@ -3082,13 +3089,13 @@ msgstr "邮箱"
 msgid "The {} cannot be empty"
 msgstr "{} 不能为空"
 
-#: authentication/serializers/token.py:23
+#: authentication/serializers/token.py:22
 #, fuzzy
 #| msgid "Access key"
 msgid "AccessIP"
 msgstr "アクセスIP"
 
-#: authentication/serializers/token.py:93 perms/serializers/permission.py:37
+#: authentication/serializers/token.py:92 perms/serializers/permission.py:37
 #: perms/serializers/permission.py:59 users/serializers/user.py:98
 #: users/serializers/user.py:168
 msgid "Is valid"
@@ -3264,17 +3271,17 @@ msgstr "如果这次公钥更新不是由你发起的，那么你的账号可能
 msgid "Cancel"
 msgstr "取消"
 
-#: authentication/templates/authentication/login.html:270
+#: authentication/templates/authentication/login.html:276
 msgid ""
 "Configuration file has problems and cannot be logged in. Please contact the "
 "administrator or view latest docs"
 msgstr "配置文件有问题，无法登录，请联系管理员或查看最新文档"
 
-#: authentication/templates/authentication/login.html:271
+#: authentication/templates/authentication/login.html:277
 msgid "If you are administrator, you can update the config resolve it, set"
 msgstr "如果你是管理员，可以更新配置文件解决，设置配置项"
 
-#: authentication/templates/authentication/login.html:370
+#: authentication/templates/authentication/login.html:376
 msgid "More login options"
 msgstr "其他方式登录"
 
@@ -4248,7 +4255,7 @@ msgstr "LDAP 同步设置组织为当前组织，请切换其他组织后再进�
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "组织存在资源 ({}) 不能被删除"
 
-#: orgs/apps.py:7 rbac/tree.py:125
+#: orgs/apps.py:7 rbac/tree.py:126
 msgid "App organizations"
 msgstr "组织管理"
 
@@ -4461,6 +4468,10 @@ msgstr "Web终端"
 msgid "Can view file manager"
 msgstr "文件管理"
 
+#: rbac/models/menu.py:20
+msgid "Can view System Tools"
+msgstr "系统工具"
+
 #: rbac/models/permission.py:27 rbac/models/role.py:34
 msgid "Permissions"
 msgstr "授权"
@@ -4579,20 +4590,20 @@ msgstr "我的资产"
 msgid "Applet"
 msgstr "远程应用"
 
-#: rbac/tree.py:126
+#: rbac/tree.py:127
 msgid "Ticket comment"
 msgstr "工单评论"
 
-#: rbac/tree.py:127 settings/serializers/feature.py:58
+#: rbac/tree.py:128 settings/serializers/feature.py:58
 #: tickets/models/ticket/general.py:307
 msgid "Ticket"
 msgstr "工单管理"
 
-#: rbac/tree.py:128
+#: rbac/tree.py:129
 msgid "Common setting"
 msgstr "一般设置"
 
-#: rbac/tree.py:129
+#: rbac/tree.py:130
 msgid "View permission tree"
 msgstr "查看授权树"
 
