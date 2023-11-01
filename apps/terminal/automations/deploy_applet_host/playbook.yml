@@ -168,14 +168,24 @@
 
     - name: Download chromedriver (Chrome)
       ansible.windows.win_get_url:
-        url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/chromedriver_win32.zip"
-        dest: "{{ ansible_env.TEMP }}\\chromedriver-win32.zip"
+        url: "{{ APPLET_DOWNLOAD_HOST }}/download/applets/chromedriver-win64.zip"
+        dest: "{{ ansible_env.TEMP }}\\chromedriver-win64.zip"
         validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
+
+    - name: Remove old chromedriver (Chrome)
+      ansible.windows.win_file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - C:\Program Files\JumpServer\drivers\chromedriver-win32
+        - C:\Program Files\JumpServer\drivers\chromedriver_win32
+        - C:\Program Files\JumpServer\drivers\chromedriver-win64
+        - C:\Program Files\JumpServer\drivers\chromedriver_win64
 
     - name: Unzip chromedriver (Chrome)
       community.windows.win_unzip:
-        src: "{{ ansible_env.TEMP }}\\chromedriver-win32.zip"
-        dest: C:\Program Files\JumpServer\drivers\chromedriver-win32
+        src: "{{ ansible_env.TEMP }}\\chromedriver-win64.zip"
+        dest: C:\Program Files\JumpServer\drivers
 
     - name: Stop Chrome before install (jumpserver)
       ansible.windows.win_powershell:
@@ -193,6 +203,16 @@
         dest: "{{ ansible_env.TEMP }}\\chrome-win.zip"
         validate_certs: "{{ not IGNORE_VERIFY_CERTS }}"
 
+    - name: Remove old Chrome (Chrome)
+      ansible.windows.win_file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - C:\Program Files\JumpServer\applications\Chrome
+        - C:\Program Files\Chrome\chrome-win32
+        - C:\Program Files\Chrome\chrome-win
+        - C:\Program Files\chrome-win
+
     - name: Unzip Chrome (Chrome)
       community.windows.win_unzip:
         src: "{{ ansible_env.TEMP }}\\chrome-win.zip"
@@ -201,6 +221,9 @@
     - name: Check and Clean global system path (Chrome)
       ansible.windows.win_path:
         elements:
+          - 'C:\Program Files\Python310\Scripts\'
+          - 'C:\Program Files\Python310\'
+          - 'C:\Program Files\JumpServer\drivers\chromedriver-win32'
           - 'C:\Program Files\JumpServer\drivers\chromedriver_win32'
           - 'C:\Program Files\Chrome\chrome-win32'
           - 'C:\Program Files\Chrome\chrome-win'
@@ -211,7 +234,7 @@
       ansible.windows.win_path:
         elements:
           - 'C:\Program Files\JumpServer\applications\Chrome\Application'
-          - 'C:\Program Files\JumpServer\drivers\chromedriver-win32'
+          - 'C:\Program Files\JumpServer\drivers\chromedriver-win64'
 
     - name: Set Chrome variables disable Google Api (Chrome)
       ansible.windows.win_environment:
