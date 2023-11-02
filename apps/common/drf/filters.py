@@ -235,8 +235,10 @@ class AttrRulesFilterBackend(filters.BaseFilterBackend):
             raise ValidationError({'attr_rules': 'attr_rules should be json'})
 
         logger.debug('attr_rules: %s', attr_rules)
-        q = RelatedManager.get_to_filter_q(attr_rules, queryset.model)
-        return queryset.filter(q).distinct()
+        qs = RelatedManager.get_to_filter_qs(attr_rules, queryset.model)
+        for q in qs:
+            queryset = queryset.filter(q)
+        return queryset.distinct()
 
 
 class NotOrRelFilterBackend(filters.BaseFilterBackend):
