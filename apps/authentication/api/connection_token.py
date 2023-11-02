@@ -27,6 +27,7 @@ from perms.models import ActionChoices
 from terminal.connect_methods import NativeClient, ConnectMethodUtil
 from terminal.models import EndpointRule, Endpoint
 from users.const import FileNameConflictResolution
+from users.const import RDPSmartSize
 from users.models import Preference
 from ..models import ConnectionToken, date_expired_default
 from ..serializers import (
@@ -66,7 +67,6 @@ class RDPFileClientProtocolURLMixin:
             'autoreconnection enabled:i': '1',
             'bookmarktype:i': '3',
             'use redirection server name:i': '0',
-            'smart sizing:i': '1',
         }
         # 设置多屏显示
         multi_mon = is_true(self.request.query_params.get('multi_mon'))
@@ -106,6 +106,7 @@ class RDPFileClientProtocolURLMixin:
             rdp_options['dynamic resolution:i'] = '0'
 
         # 设置其他选项
+        rdp_options['smart sizing:i'] = self.request.query_params.get('rdp_smart_size', RDPSmartSize.DISABLE)
         rdp_options['session bpp:i'] = os.getenv('JUMPSERVER_COLOR_DEPTH', '32')
         rdp_options['audiomode:i'] = self.parse_env_bool('JUMPSERVER_DISABLE_AUDIO', 'false', '2', '0')
 
