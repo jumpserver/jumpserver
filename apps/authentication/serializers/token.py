@@ -19,7 +19,7 @@ __all__ = [
 
 class AccessKeySerializer(serializers.ModelSerializer):
     ip_group = serializers.ListField(
-        default=['*'], label=_('AccessIP'), help_text=ip_group_help_text,
+        default=['*'], label=_('Access IP'), help_text=ip_group_help_text,
         child=serializers.CharField(max_length=1024, validators=[ip_group_child_validator])
     )
 
