@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-31 14:04+0800\n"
+"POT-Creation-Date: 2023-11-02 14:52+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,7 +27,7 @@ msgstr "パラメータ 'action' は [{}] でなければなりません。"
 #: assets/models/_user.py:24 audits/signal_handlers/login_log.py:34
 #: authentication/confirm/password.py:9 authentication/confirm/password.py:24
 #: authentication/confirm/password.py:26 authentication/forms.py:32
-#: authentication/templates/authentication/login.html:324
+#: authentication/templates/authentication/login.html:330
 #: settings/serializers/auth/ldap.py:25 settings/serializers/auth/ldap.py:47
 #: users/forms/profile.py:22 users/serializers/user.py:104
 #: users/templates/users/_msg_user_created.html:13
@@ -421,6 +421,18 @@ msgstr "開始日"
 #: terminal/models/applet/host.py:142
 msgid "Date finished"
 msgstr "終了日"
+
+#: accounts/models/automations/change_secret.py:43
+#: assets/models/automations/base.py:113 audits/models.py:207
+#: audits/serializers.py:51 ops/models/base.py:49 ops/models/job.py:220
+#: terminal/models/applet/applet.py:316 terminal/models/applet/host.py:140
+#: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
+#: terminal/serializers/applet_host.py:124 tickets/models/ticket/general.py:283
+#: tickets/serializers/super_ticket.py:13
+#: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:201
+#: xpack/plugins/cloud/models.py:257
+msgid "Status"
+msgstr "ステータス"
 
 #: accounts/models/automations/change_secret.py:44
 #: accounts/serializers/account/account.py:257 assets/const/automation.py:8
@@ -920,9 +932,15 @@ msgstr "アカウントを追加: %s"
 msgid "Delete account: %s"
 msgstr "アカウントを削除: %s"
 
-#: accounts/tasks/automation.py:24
+#: accounts/tasks/automation.py:25
 msgid "Account execute automation"
 msgstr "アカウント実行の自動化"
+
+#: accounts/tasks/automation.py:51 accounts/tasks/automation.py:62
+#, fuzzy
+#| msgid "Asset execute automation"
+msgid "Execute automation record"
+msgstr "アセット実行の自動化"
 
 #: accounts/tasks/backup_account.py:25
 msgid "Execute account backup plan"
@@ -1259,11 +1277,11 @@ msgstr "同じレベルのノード名を同じにすることはできません
 msgid "App assets"
 msgstr "アプリ資産"
 
-#: assets/automations/base/manager.py:136
+#: assets/automations/base/manager.py:133
 msgid "{} disabled"
 msgstr "{} 無効"
 
-#: assets/automations/base/manager.py:202
+#: assets/automations/base/manager.py:199
 msgid "  - Platform {} ansible disabled"
 msgstr "  - プラットフォーム {} ansible 無効"
 
@@ -1709,17 +1727,6 @@ msgstr "自動化されたタスク"
 #: assets/models/automations/base.py:104
 msgid "Asset automation task"
 msgstr "アセットの自動化タスク"
-
-#: assets/models/automations/base.py:113 audits/models.py:207
-#: audits/serializers.py:51 ops/models/base.py:49 ops/models/job.py:220
-#: terminal/models/applet/applet.py:316 terminal/models/applet/host.py:140
-#: terminal/models/component/status.py:30 terminal/serializers/applet.py:18
-#: terminal/serializers/applet_host.py:124 tickets/models/ticket/general.py:283
-#: tickets/serializers/super_ticket.py:13
-#: tickets/serializers/ticket/ticket.py:20 xpack/plugins/cloud/models.py:201
-#: xpack/plugins/cloud/models.py:257
-msgid "Status"
-msgstr "ステータス"
 
 #: assets/models/automations/gather_facts.py:15
 msgid "Gather asset facts"
@@ -2293,8 +2300,8 @@ msgstr "作成"
 msgid "Connect"
 msgstr "接続"
 
-#: audits/const.py:30 authentication/templates/authentication/login.html:290
-#: authentication/templates/authentication/login.html:363
+#: audits/const.py:30 authentication/templates/authentication/login.html:296
+#: authentication/templates/authentication/login.html:369
 #: templates/_header_bar.html:95
 msgid "Login"
 msgstr "ログイン"
@@ -2601,7 +2608,7 @@ msgstr ""
 "さい。"
 
 #: authentication/api/password.py:67
-#: authentication/templates/authentication/login.html:355
+#: authentication/templates/authentication/login.html:361
 #: users/templates/users/forgot_password.html:27
 #: users/templates/users/forgot_password.html:28
 #: users/templates/users/forgot_password_previewing.html:13
@@ -3113,13 +3120,13 @@ msgstr "メール"
 msgid "The {} cannot be empty"
 msgstr "{} 空にしてはならない"
 
-#: authentication/serializers/token.py:23
+#: authentication/serializers/token.py:22
 #, fuzzy
 #| msgid "Access key"
-msgid "AccessIP"
-msgstr "アクセスキー"
+msgid "Access IP"
+msgstr "IPホワイトリスト"
 
-#: authentication/serializers/token.py:93 perms/serializers/permission.py:37
+#: authentication/serializers/token.py:92 perms/serializers/permission.py:37
 #: perms/serializers/permission.py:59 users/serializers/user.py:98
 #: users/serializers/user.py:168
 msgid "Is valid"
@@ -3303,7 +3310,7 @@ msgstr ""
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: authentication/templates/authentication/login.html:270
+#: authentication/templates/authentication/login.html:276
 msgid ""
 "Configuration file has problems and cannot be logged in. Please contact the "
 "administrator or view latest docs"
@@ -3311,11 +3318,11 @@ msgstr ""
 "設定ファイルに問題があり、ログインできません。管理者に連絡するか、最新のド"
 "キュメントを参照してください。"
 
-#: authentication/templates/authentication/login.html:271
+#: authentication/templates/authentication/login.html:277
 msgid "If you are administrator, you can update the config resolve it, set"
 msgstr "管理者の場合は、configを更新して解決することができます。"
 
-#: authentication/templates/authentication/login.html:370
+#: authentication/templates/authentication/login.html:376
 msgid "More login options"
 msgstr "その他のログインオプション"
 
@@ -3574,7 +3581,7 @@ msgstr "テキストフィールドへのマーシャルデータ"
 msgid "Encrypt field using Secret Key"
 msgstr "Secret Keyを使用したフィールドの暗号化"
 
-#: common/db/fields.py:558
+#: common/db/fields.py:575
 msgid ""
 "Invalid JSON data for JSONManyToManyField, should be like {'type': 'all'} or "
 "{'type': 'ids', 'ids': []} or {'type': 'attrs', 'attrs': [{'name': 'ip', "
@@ -3584,15 +3591,15 @@ msgstr ""
 "｛'type'：'ids'，'ids':[]｝或 ＃タイプ：属性、属性：[＃名前：ip、照合：正確、"
 "値：1.1.1.1｝"
 
-#: common/db/fields.py:565
+#: common/db/fields.py:582
 msgid "Invalid type, should be \"all\", \"ids\" or \"attrs\""
 msgstr "無効なタイプです。all、ids、またはattrsでなければなりません"
 
-#: common/db/fields.py:568
+#: common/db/fields.py:585
 msgid "Invalid ids for ids, should be a list"
 msgstr "無効なID、リストでなければなりません"
 
-#: common/db/fields.py:570 common/db/fields.py:575
+#: common/db/fields.py:587 common/db/fields.py:592
 #: common/serializers/fields.py:104 tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 #: xpack/plugins/cloud/serializers/account_attrs.py:79
@@ -3600,11 +3607,11 @@ msgstr "無効なID、リストでなければなりません"
 msgid "This field is required."
 msgstr "このフィールドは必須です。"
 
-#: common/db/fields.py:573 common/db/fields.py:578
+#: common/db/fields.py:590 common/db/fields.py:595
 msgid "Invalid attrs, should be a list of dict"
 msgstr "無効な属性、dictリストでなければなりません"
 
-#: common/db/fields.py:580
+#: common/db/fields.py:597
 msgid "Invalid attrs, should be has name and value"
 msgstr "名前と値が必要な無効な属性"
 
