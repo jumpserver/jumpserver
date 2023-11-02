@@ -33,6 +33,11 @@ class RDPClientOption(TextChoices):
     DRIVES_REDIRECT = 'drives_redirect', _('Drives redirect')
 
 
+class RDPSmartSize(TextChoices):
+    DISABLE = '0', _('Disable')
+    ENABLE = '1', _('Enable')
+
+
 class KeyboardLayout(TextChoices):
     EN_US_QWERTY = 'en-us-qwerty', 'US English (Qwerty)'
     EN_UK_QWERTY = 'en-gb-qwerty', 'UK English (Qwerty)'

@@ -3,7 +3,10 @@ import json
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from users.const import RDPResolution, KeyboardLayout, RDPClientOption, AppletConnectionMethod
+from users.const import (
+    RDPResolution, RDPSmartSize, KeyboardLayout,
+    RDPClientOption, AppletConnectionMethod
+)
 
 
 class MultipleChoiceField(serializers.MultipleChoiceField):
@@ -36,6 +39,12 @@ class GraphicsSerializer(serializers.Serializer):
     rdp_client_option = MultipleChoiceField(
         choices=RDPClientOption.choices, default={RDPClientOption.FULL_SCREEN},
         label=_('RDP client option'), required=False
+    )
+    rdp_smart_size = serializers.ChoiceField(
+        RDPSmartSize.choices, default=RDPSmartSize.DISABLE,
+        required=False, label=_('Rdp smart size'),
+        help_text=_('Determines whether the client computer should scale the content on the remote '
+                    'computer to fit the window size of the client computer when the window is resized.')
     )
     applet_connection_method = serializers.ChoiceField(
         AppletConnectionMethod.choices, default=AppletConnectionMethod.WEB,
