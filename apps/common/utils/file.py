@@ -3,6 +3,7 @@ import csv
 
 import pyzipper
 import requests
+import zipfile
 
 from hashlib import md5
 
@@ -10,7 +11,7 @@ from django.conf import settings
 
 
 def create_csv_file(filename, headers, rows, ):
-    with open(filename, 'w', encoding='utf-8-sig')as f:
+    with open(filename, 'w', encoding='utf-8-sig') as f:
         w = csv.writer(f)
         w.writerow(headers)
         w.writerows(rows)
@@ -24,6 +25,20 @@ def encrypt_and_compress_zip_file(filename, secret_password, encrypted_filenames
         for encrypted_filename in encrypted_filenames:
             with open(encrypted_filename, 'rb') as f:
                 zf.writestr(os.path.basename(encrypted_filename), f.read())
+
+
+def zip_files(output_file, file_list):
+    """
+    将多个文件打包成zip文件
+    Args:
+        output_file (str): 打包后的zip文件路径
+        file_list (list): 需要打包的文件列表
+    Returns:
+        None
+    """
+    with zipfile.ZipFile(output_file, 'w') as zipf:
+        for file in file_list:
+            zipf.write(file, arcname=os.path.basename(file))
 
 
 def download_file(src, path):

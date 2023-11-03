@@ -6,11 +6,14 @@ from django.conf import settings
 from openpyxl import Workbook
 from rest_framework import serializers
 
-from accounts.notifications import AccountBackupExecutionTaskMsg
+from accounts.const.automation import AccountBackupType
+from accounts.notifications import AccountBackupExecutionTaskMsg, AccountBackupByObjStorageExecutionTaskMsg
 from accounts.serializers import AccountSecretSerializer
+from accounts.models.automations.backup_account import AccountBackupAutomation
 from assets.const import AllTypes
-from common.utils.file import encrypt_and_compress_zip_file
+from common.utils.file import encrypt_and_compress_zip_file, zip_files
 from common.utils.timezone import local_now_display
+from terminal.models.component.storage import ReplayStorage
 from users.models import User
 
 PATH = os.path.join(os.path.dirname(settings.BASE_DIR), 'tmp')
@@ -169,6 +172,29 @@ class AccountBackupHandler:
         for file in files:
             os.remove(file)
 
+    def send_backup_obj_storage(self, files, recipients, password):
+        if not files:
+            return
+        recipients = ReplayStorage.objects.filter(id__in=list(recipients))
+        print(
+            '\n'
+            '\033[32m>>> 发送备份文件到sftp服务器\033[0m'
+            ''
+        )
+        plan_name = self.plan_name
+        for rec in recipients:
+            attachment = os.path.join(PATH, f'{plan_name}-{local_now_display()}-{time.time()}.zip')
+            if password:
+                password = password.encode('utf8')
+                encrypt_and_compress_zip_file(attachment, password, files)
+            else:
+                zip_files(attachment, files)
+            attachment_list = attachment
+            AccountBackupByObjStorageExecutionTaskMsg(plan_name, rec).publish(attachment_list)
+            print('备份文件将发送至{}({})'.format(rec.name, rec.id))
+        for file in files:
+            os.remove(file)
+
     def step_perform_task_update(self, is_success, reason):
         self.execution.reason = reason[:1024]
         self.execution.is_success = is_success
@@ -186,24 +212,11 @@ class AccountBackupHandler:
         is_success = False
         error = '-'
         try:
-            recipients_part_one = self.execution.snapshot.get('recipients_part_one', [])
-            recipients_part_two = self.execution.snapshot.get('recipients_part_two', [])
-            if not recipients_part_one and not recipients_part_two:
-                print(
-                    '\n'
-                    '\033[32m>>> 该备份任务未分配收件人\033[0m'
-                    ''
-                )
-            if recipients_part_one and recipients_part_two:
-                files = self.create_excel(section='front')
-                self.send_backup_mail(files, recipients_part_one)
-
-                files = self.create_excel(section='back')
-                self.send_backup_mail(files, recipients_part_two)
-            else:
-                recipients = recipients_part_one or recipients_part_two
-                files = self.create_excel()
-                self.send_backup_mail(files, recipients)
+            backup_type = self.execution.snapshot.get('backup_type', AccountBackupType.email.value)
+            if backup_type == AccountBackupType.email.value:
+                self.backup_by_email()
+            elif backup_type == AccountBackupType.object_storage.value:
+                self.backup_by_obj_storage()
         except Exception as e:
             self.is_frozen = True
             print('任务执行被异常中断')
@@ -216,6 +229,48 @@ class AccountBackupHandler:
             reason = error
             self.step_perform_task_update(is_success, reason)
             self.step_finished(is_success)
+
+    def backup_by_obj_storage(self):
+        object_id = self.execution.snapshot.get('id')
+        zip_encrypt_password = AccountBackupAutomation.objects.get(id=object_id).zip_encrypt_password
+        obj_recipients_part_one = self.execution.snapshot.get('obj_recipients_part_one', [])
+        obj_recipients_part_two = self.execution.snapshot.get('obj_recipients_part_two', [])
+        if not obj_recipients_part_one and not obj_recipients_part_two:
+            print(
+                '\n'
+                '\033[32m>>> 该备份任务未分配sftp服务器\033[0m'
+                ''
+            )
+        if obj_recipients_part_one and obj_recipients_part_two:
+            files = self.create_excel(section='front')
+            self.send_backup_obj_storage(files, obj_recipients_part_one, zip_encrypt_password)
+
+            files = self.create_excel(section='back')
+            self.send_backup_obj_storage(files, obj_recipients_part_two, zip_encrypt_password)
+        else:
+            recipients = obj_recipients_part_one or obj_recipients_part_two
+            files = self.create_excel()
+            self.send_backup_obj_storage(files, recipients, zip_encrypt_password)
+
+    def backup_by_email(self):
+        recipients_part_one = self.execution.snapshot.get('recipients_part_one', [])
+        recipients_part_two = self.execution.snapshot.get('recipients_part_two', [])
+        if not recipients_part_one and not recipients_part_two:
+            print(
+                '\n'
+                '\033[32m>>> 该备份任务未分配收件人\033[0m'
+                ''
+            )
+        if recipients_part_one and recipients_part_two:
+            files = self.create_excel(section='front')
+            self.send_backup_mail(files, recipients_part_one)
+
+            files = self.create_excel(section='back')
+            self.send_backup_mail(files, recipients_part_two)
+        else:
+            recipients = recipients_part_one or recipients_part_two
+            files = self.create_excel()
+            self.send_backup_mail(files, recipients)
 
     def run(self):
         print('任务开始: {}'.format(local_now_display()))
