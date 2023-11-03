@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-01 22:13+0800\n"
+"POT-Creation-Date: 2023-11-03 16:52+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -264,7 +264,7 @@ msgstr "来源 ID"
 #: accounts/serializers/automations/change_secret.py:127
 #: acls/serializers/base.py:124 acls/templates/acls/asset_login_reminder.html:7
 #: assets/serializers/asset/common.py:125 assets/serializers/gateway.py:28
-#: audits/models.py:58 authentication/api/connection_token.py:407
+#: audits/models.py:58 authentication/api/connection_token.py:408
 #: ops/models/base.py:18 perms/models/asset_permission.py:74
 #: perms/serializers/permission.py:39 terminal/backends/command/models.py:18
 #: terminal/models/session/session.py:33
@@ -725,7 +725,7 @@ msgstr "已修改"
 #: acls/templates/acls/asset_login_reminder.html:6
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20
-#: authentication/api/connection_token.py:406 ops/models/base.py:17
+#: authentication/api/connection_token.py:407 ops/models/base.py:17
 #: ops/models/job.py:139 ops/serializers/job.py:21
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 msgid "Assets"
@@ -1332,7 +1332,7 @@ msgstr "禁用"
 #: assets/const/base.py:33 settings/serializers/basic.py:6
 #: users/serializers/preference/koko.py:19
 #: users/serializers/preference/lina.py:39
-#: users/serializers/preference/luna.py:60
+#: users/serializers/preference/luna.py:69
 msgid "Basic"
 msgstr "基本"
 
@@ -1359,7 +1359,7 @@ msgstr "云服务"
 
 #: assets/const/category.py:14 assets/models/asset/gpt.py:11
 #: assets/models/asset/web.py:16 audits/const.py:42
-#: terminal/models/applet/applet.py:27 users/const.py:47
+#: terminal/models/applet/applet.py:27 users/const.py:52
 msgid "Web"
 msgstr "Web"
 
@@ -2544,27 +2544,27 @@ msgstr ""
 msgid "This action require verify your MFA"
 msgstr "该操作需要验证您的 MFA, 请先开启并配置"
 
-#: authentication/api/connection_token.py:262
+#: authentication/api/connection_token.py:263
 msgid "Reusable connection token is not allowed, global setting not enabled"
 msgstr "不允许使用可重复使用的连接令牌，未启用全局设置"
 
-#: authentication/api/connection_token.py:376
+#: authentication/api/connection_token.py:377
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名账号不支持当前资产"
 
-#: authentication/api/connection_token.py:395
+#: authentication/api/connection_token.py:396
 msgid "Account not found"
 msgstr "账号未找到"
 
-#: authentication/api/connection_token.py:398
+#: authentication/api/connection_token.py:399
 msgid "Permission expired"
 msgstr "授权已过期"
 
-#: authentication/api/connection_token.py:428
+#: authentication/api/connection_token.py:429
 msgid "ACL action is reject: {}({})"
 msgstr "ACL 动作是拒绝: {}({})"
 
-#: authentication/api/connection_token.py:432
+#: authentication/api/connection_token.py:433
 msgid "ACL action is review"
 msgstr "ACL 动作是复核"
 
@@ -3090,10 +3090,8 @@ msgid "The {} cannot be empty"
 msgstr "{} 不能为空"
 
 #: authentication/serializers/token.py:22
-#, fuzzy
-#| msgid "Access key"
-msgid "AccessIP"
-msgstr "アクセスIP"
+msgid "Access IP"
+msgstr "IP 白名单"
 
 #: authentication/serializers/token.py:92 perms/serializers/permission.py:37
 #: perms/serializers/permission.py:59 users/serializers/user.py:98
@@ -3122,13 +3120,13 @@ msgid "Show"
 msgstr "显示"
 
 #: authentication/templates/authentication/_access_key_modal.html:66
-#: users/models/user.py:640 users/serializers/profile.py:92
+#: users/const.py:37 users/models/user.py:640 users/serializers/profile.py:92
 #: users/templates/users/user_verify_mfa.html:36
 msgid "Disable"
 msgstr "禁用"
 
 #: authentication/templates/authentication/_access_key_modal.html:67
-#: users/models/user.py:641 users/serializers/profile.py:93
+#: users/const.py:38 users/models/user.py:641 users/serializers/profile.py:93
 #: users/templates/users/mfa_setting.html:26
 #: users/templates/users/mfa_setting.html:68
 msgid "Enable"
@@ -3538,7 +3536,7 @@ msgstr "编码数据为 text"
 msgid "Encrypt field using Secret Key"
 msgstr "加密的字段"
 
-#: common/db/fields.py:558
+#: common/db/fields.py:575
 msgid ""
 "Invalid JSON data for JSONManyToManyField, should be like {'type': 'all'} or "
 "{'type': 'ids', 'ids': []} or {'type': 'attrs', 'attrs': [{'name': 'ip', "
@@ -3548,15 +3546,15 @@ msgstr ""
 "{'type': 'attrs', 'attrs': [{'name': 'ip', 'match': 'exact', 'value': "
 "'1.1.1.1'}}"
 
-#: common/db/fields.py:565
+#: common/db/fields.py:582
 msgid "Invalid type, should be \"all\", \"ids\" or \"attrs\""
 msgstr "无效类型，应为 all、ids 或 attrs"
 
-#: common/db/fields.py:568
+#: common/db/fields.py:585
 msgid "Invalid ids for ids, should be a list"
 msgstr "无效的ID，应为列表"
 
-#: common/db/fields.py:570 common/db/fields.py:575
+#: common/db/fields.py:587 common/db/fields.py:592
 #: common/serializers/fields.py:104 tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 #: xpack/plugins/cloud/serializers/account_attrs.py:79
@@ -3564,11 +3562,11 @@ msgstr "无效的ID，应为列表"
 msgid "This field is required."
 msgstr "该字段是必填项。"
 
-#: common/db/fields.py:573 common/db/fields.py:578
+#: common/db/fields.py:590 common/db/fields.py:595
 msgid "Invalid attrs, should be a list of dict"
 msgstr "无效的属性，应为dict列表"
 
-#: common/db/fields.py:580
+#: common/db/fields.py:597
 msgid "Invalid attrs, should be has name and value"
 msgstr "无效属性，应具有名称和值"
 
@@ -4469,8 +4467,10 @@ msgid "Can view file manager"
 msgstr "文件管理"
 
 #: rbac/models/menu.py:20
+#, fuzzy
+#| msgid "Can view my assets"
 msgid "Can view System Tools"
-msgstr "系统工具"
+msgstr "可以查看我的资产"
 
 #: rbac/models/permission.py:27 rbac/models/role.py:34
 msgid "Permissions"
@@ -6006,7 +6006,7 @@ msgid "Home page"
 msgstr "首页"
 
 #: templates/resource_download.html:18 templates/resource_download.html:33
-#: users/const.py:48
+#: users/const.py:53
 msgid "Client"
 msgstr "客户端"
 
@@ -7269,11 +7269,11 @@ msgstr "多屏显示"
 msgid "Drives redirect"
 msgstr "磁盘挂载"
 
-#: users/const.py:52
+#: users/const.py:57
 msgid "Replace"
 msgstr "替换"
 
-#: users/const.py:53
+#: users/const.py:58
 msgid "Suffix"
 msgstr "加后缀"
 
@@ -7494,43 +7494,54 @@ msgstr "确认文件加密密码"
 msgid "The newly set password is inconsistent"
 msgstr "两次密码不一致"
 
-#: users/serializers/preference/luna.py:23
+#: users/serializers/preference/luna.py:26
 msgid "Async loading of asset tree"
 msgstr "异步加载资产树"
 
-#: users/serializers/preference/luna.py:30
+#: users/serializers/preference/luna.py:33
 msgid "RDP resolution"
 msgstr "RDP 分辨率"
 
-#: users/serializers/preference/luna.py:34
+#: users/serializers/preference/luna.py:37
 msgid "Keyboard layout"
 msgstr "键盘布局"
 
-#: users/serializers/preference/luna.py:38
+#: users/serializers/preference/luna.py:41
 msgid "RDP client option"
 msgstr "RDP 客户端选项"
 
-#: users/serializers/preference/luna.py:42
+#: users/serializers/preference/luna.py:45
+msgid "Rdp smart size"
+msgstr ""
+
+#: users/serializers/preference/luna.py:46
+msgid ""
+"Determines whether the client computer should scale the content on the "
+"remote computer to fit the window size of the client computer when the "
+"window is resized."
+msgstr ""
+
+#: users/serializers/preference/luna.py:51
 msgid "Remote application connection method"
 msgstr "远程应用连接方式"
 
-#: users/serializers/preference/luna.py:49
+#: users/serializers/preference/luna.py:58
 msgid "Character terminal font size"
 msgstr "字符终端字体大小"
 
-#: users/serializers/preference/luna.py:52
+#: users/serializers/preference/luna.py:61
 msgid "Backspace as Ctrl+H"
 msgstr "字符终端Backspace As Ctrl+H"
 
-#: users/serializers/preference/luna.py:55
+#: users/serializers/preference/luna.py:64
 msgid "Right click quickly paste"
 msgstr "右键快速粘贴"
 
-#: users/serializers/preference/luna.py:61
+#: users/serializers/preference/luna.py:70
 msgid "Graphics"
 msgstr "图形化"
 
-#: users/serializers/preference/luna.py:62
+#: users/serializers/preference/luna.py:71
 msgid "Command line"
 msgstr "命令行"
 

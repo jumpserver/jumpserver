@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-01 22:13+0800\n"
+"POT-Creation-Date: 2023-11-03 16:52+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -265,7 +265,7 @@ msgstr "ソース ID"
 #: accounts/serializers/automations/change_secret.py:127
 #: acls/serializers/base.py:124 acls/templates/acls/asset_login_reminder.html:7
 #: assets/serializers/asset/common.py:125 assets/serializers/gateway.py:28
-#: audits/models.py:58 authentication/api/connection_token.py:407
+#: audits/models.py:58 authentication/api/connection_token.py:408
 #: ops/models/base.py:18 perms/models/asset_permission.py:74
 #: perms/serializers/permission.py:39 terminal/backends/command/models.py:18
 #: terminal/models/session/session.py:33
@@ -727,7 +727,7 @@ msgstr "編集済み"
 #: acls/templates/acls/asset_login_reminder.html:6
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20
-#: authentication/api/connection_token.py:406 ops/models/base.py:17
+#: authentication/api/connection_token.py:407 ops/models/base.py:17
 #: ops/models/job.py:139 ops/serializers/job.py:21
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 msgid "Assets"
@@ -1339,7 +1339,7 @@ msgstr "無効"
 #: assets/const/base.py:33 settings/serializers/basic.py:6
 #: users/serializers/preference/koko.py:19
 #: users/serializers/preference/lina.py:39
-#: users/serializers/preference/luna.py:60
+#: users/serializers/preference/luna.py:69
 msgid "Basic"
 msgstr "基本"
 
@@ -1366,7 +1366,7 @@ msgstr "クラウド サービス"
 
 #: assets/const/category.py:14 assets/models/asset/gpt.py:11
 #: assets/models/asset/web.py:16 audits/const.py:42
-#: terminal/models/applet/applet.py:27 users/const.py:47
+#: terminal/models/applet/applet.py:27 users/const.py:52
 msgid "Web"
 msgstr "Web"
 
@@ -2560,29 +2560,29 @@ msgstr ""
 msgid "This action require verify your MFA"
 msgstr "この操作には、MFAを検証する必要があります"
 
-#: authentication/api/connection_token.py:262
+#: authentication/api/connection_token.py:263
 msgid "Reusable connection token is not allowed, global setting not enabled"
 msgstr ""
 "再使用可能な接続トークンの使用は許可されていません。グローバル設定は有効に"
 "なっていません"
 
-#: authentication/api/connection_token.py:376
+#: authentication/api/connection_token.py:377
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名アカウントはこのプロパティではサポートされていません"
 
-#: authentication/api/connection_token.py:395
+#: authentication/api/connection_token.py:396
 msgid "Account not found"
 msgstr "アカウントが見つかりません"
 
-#: authentication/api/connection_token.py:398
+#: authentication/api/connection_token.py:399
 msgid "Permission expired"
 msgstr "承認の有効期限が切れています"
 
-#: authentication/api/connection_token.py:428
+#: authentication/api/connection_token.py:429
 msgid "ACL action is reject: {}({})"
 msgstr "ACL アクションは拒否です: {}({})"
 
-#: authentication/api/connection_token.py:432
+#: authentication/api/connection_token.py:433
 msgid "ACL action is review"
 msgstr "ACL アクションはレビューです"
 
@@ -3123,8 +3123,8 @@ msgstr "{} 空にしてはならない"
 #: authentication/serializers/token.py:22
 #, fuzzy
 #| msgid "Access key"
-msgid "AccessIP"
-msgstr "アクセスキー"
+msgid "Access IP"
+msgstr "IPホワイトリスト"
 
 #: authentication/serializers/token.py:92 perms/serializers/permission.py:37
 #: perms/serializers/permission.py:59 users/serializers/user.py:98
@@ -3153,13 +3153,13 @@ msgid "Show"
 msgstr "表示"
 
 #: authentication/templates/authentication/_access_key_modal.html:66
-#: users/models/user.py:640 users/serializers/profile.py:92
+#: users/const.py:37 users/models/user.py:640 users/serializers/profile.py:92
 #: users/templates/users/user_verify_mfa.html:36
 msgid "Disable"
 msgstr "無効化"
 
 #: authentication/templates/authentication/_access_key_modal.html:67
-#: users/models/user.py:641 users/serializers/profile.py:93
+#: users/const.py:38 users/models/user.py:641 users/serializers/profile.py:93
 #: users/templates/users/mfa_setting.html:26
 #: users/templates/users/mfa_setting.html:68
 msgid "Enable"
@@ -3581,7 +3581,7 @@ msgstr "テキストフィールドへのマーシャルデータ"
 msgid "Encrypt field using Secret Key"
 msgstr "Secret Keyを使用したフィールドの暗号化"
 
-#: common/db/fields.py:558
+#: common/db/fields.py:575
 msgid ""
 "Invalid JSON data for JSONManyToManyField, should be like {'type': 'all'} or "
 "{'type': 'ids', 'ids': []} or {'type': 'attrs', 'attrs': [{'name': 'ip', "
@@ -3591,15 +3591,15 @@ msgstr ""
 "｛'type'：'ids'，'ids':[]｝或 ＃タイプ：属性、属性：[＃名前：ip、照合：正確、"
 "値：1.1.1.1｝"
 
-#: common/db/fields.py:565
+#: common/db/fields.py:582
 msgid "Invalid type, should be \"all\", \"ids\" or \"attrs\""
 msgstr "無効なタイプです。all、ids、またはattrsでなければなりません"
 
-#: common/db/fields.py:568
+#: common/db/fields.py:585
 msgid "Invalid ids for ids, should be a list"
 msgstr "無効なID、リストでなければなりません"
 
-#: common/db/fields.py:570 common/db/fields.py:575
+#: common/db/fields.py:587 common/db/fields.py:592
 #: common/serializers/fields.py:104 tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 #: xpack/plugins/cloud/serializers/account_attrs.py:79
@@ -3607,11 +3607,11 @@ msgstr "無効なID、リストでなければなりません"
 msgid "This field is required."
 msgstr "このフィールドは必須です。"
 
-#: common/db/fields.py:573 common/db/fields.py:578
+#: common/db/fields.py:590 common/db/fields.py:595
 msgid "Invalid attrs, should be a list of dict"
 msgstr "無効な属性、dictリストでなければなりません"
 
-#: common/db/fields.py:580
+#: common/db/fields.py:597
 msgid "Invalid attrs, should be has name and value"
 msgstr "名前と値が必要な無効な属性"
 
@@ -4520,8 +4520,10 @@ msgid "Can view file manager"
 msgstr "ファイルマネージャを表示できます"
 
 #: rbac/models/menu.py:20
+#, fuzzy
+#| msgid "Can view my assets"
 msgid "Can view System Tools"
-msgstr "システムツール"
+msgstr "私の資産を見ることができます"
 
 #: rbac/models/permission.py:27 rbac/models/role.py:34
 msgid "Permissions"
@@ -6091,7 +6093,7 @@ msgid "Home page"
 msgstr "ホームページ"
 
 #: templates/resource_download.html:18 templates/resource_download.html:33
-#: users/const.py:48
+#: users/const.py:53
 msgid "Client"
 msgstr "クライアント"
 
@@ -7374,11 +7376,11 @@ msgstr "マルチスクリーンディスプレイ"
 msgid "Drives redirect"
 msgstr "ディスクマウント"
 
-#: users/const.py:52
+#: users/const.py:57
 msgid "Replace"
 msgstr "置換"
 
-#: users/const.py:53
+#: users/const.py:58
 msgid "Suffix"
 msgstr "接尾辞を付ける"
 
@@ -7599,43 +7601,54 @@ msgstr "ファイルの暗号化パスワードを確認する"
 msgid "The newly set password is inconsistent"
 msgstr "新しく設定されたパスワードが一致しない"
 
-#: users/serializers/preference/luna.py:23
+#: users/serializers/preference/luna.py:26
 msgid "Async loading of asset tree"
 msgstr "非同期ロード資産ツリー"
 
-#: users/serializers/preference/luna.py:30
+#: users/serializers/preference/luna.py:33
 msgid "RDP resolution"
 msgstr "RDP 解像度"
 
-#: users/serializers/preference/luna.py:34
+#: users/serializers/preference/luna.py:37
 msgid "Keyboard layout"
 msgstr "キーボードレイアウト"
 
-#: users/serializers/preference/luna.py:38
+#: users/serializers/preference/luna.py:41
 msgid "RDP client option"
 msgstr "RDPクライアントオプション"
 
-#: users/serializers/preference/luna.py:42
+#: users/serializers/preference/luna.py:45
+msgid "Rdp smart size"
+msgstr ""
+
+#: users/serializers/preference/luna.py:46
+msgid ""
+"Determines whether the client computer should scale the content on the "
+"remote computer to fit the window size of the client computer when the "
+"window is resized."
+msgstr ""
+
+#: users/serializers/preference/luna.py:51
 msgid "Remote application connection method"
 msgstr "リモートアプリケーション接続方式"
 
-#: users/serializers/preference/luna.py:49
+#: users/serializers/preference/luna.py:58
 msgid "Character terminal font size"
 msgstr "文字終端フォントサイズ"
 
-#: users/serializers/preference/luna.py:52
+#: users/serializers/preference/luna.py:61
 msgid "Backspace as Ctrl+H"
 msgstr "文字終端Backspace As Ctrl+H"
 
-#: users/serializers/preference/luna.py:55
+#: users/serializers/preference/luna.py:64
 msgid "Right click quickly paste"
 msgstr "右クリックでクイック貼り付け"
 
-#: users/serializers/preference/luna.py:61
+#: users/serializers/preference/luna.py:70
 msgid "Graphics"
 msgstr "図形化"
 
-#: users/serializers/preference/luna.py:62
+#: users/serializers/preference/luna.py:71
 msgid "Command line"
 msgstr "コマンドライン"
 

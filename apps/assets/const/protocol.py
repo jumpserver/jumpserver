@@ -27,7 +27,7 @@ class Protocol(ChoicesMixin, models.TextChoices):
     redis = 'redis', 'Redis'
     mongodb = 'mongodb', 'MongoDB'
 
-    k8s = 'k8s', 'K8S'
+    k8s = 'k8s', 'K8s'
     http = 'http', 'HTTP(s)'
 
     chatgpt = 'chatgpt', 'ChatGPT'
@@ -295,15 +295,21 @@ class Protocol(ChoicesMixin, models.TextChoices):
         }
 
     @classmethod
+    @cached_method(ttl=600)
     def protocols(cls):
-        return cls.settings().keys()
+        protocols = []
+        xpack_enabled = settings.XPACK_ENABLED
+        for protocol, config in cls.settings().items():
+            if not xpack_enabled and config.get('xpack', False):
+                continue
+            protocols.append(protocol)
+        return protocols
 
     @classmethod
     @cached_method(ttl=600)
     def xpack_protocols(cls):
         return [
-            protocol
-            for protocol, config in cls.settings().items()
+            protocol for protocol, config in cls.settings().items()
             if config.get('xpack', False)
         ]
 
