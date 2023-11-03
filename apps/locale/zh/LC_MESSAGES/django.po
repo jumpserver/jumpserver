@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-02 14:52+0800\n"
+"POT-Creation-Date: 2023-11-03 16:52+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -88,7 +88,7 @@ msgstr "模板"
 msgid "Skip"
 msgstr "跳过"
 
-#: accounts/const/account.py:32 audits/const.py:24 rbac/tree.py:236
+#: accounts/const/account.py:32 audits/const.py:24 rbac/tree.py:237
 #: templates/_csv_import_export.html:18 templates/_csv_update_modal.html:6
 msgid "Update"
 msgstr "更新"
@@ -264,7 +264,7 @@ msgstr "来源 ID"
 #: accounts/serializers/automations/change_secret.py:127
 #: acls/serializers/base.py:124 acls/templates/acls/asset_login_reminder.html:7
 #: assets/serializers/asset/common.py:125 assets/serializers/gateway.py:28
-#: audits/models.py:58 authentication/api/connection_token.py:407
+#: audits/models.py:58 authentication/api/connection_token.py:408
 #: ops/models/base.py:18 perms/models/asset_permission.py:74
 #: perms/serializers/permission.py:39 terminal/backends/command/models.py:18
 #: terminal/models/session/session.py:33
@@ -725,7 +725,7 @@ msgstr "已修改"
 #: acls/templates/acls/asset_login_reminder.html:6
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20
-#: authentication/api/connection_token.py:406 ops/models/base.py:17
+#: authentication/api/connection_token.py:407 ops/models/base.py:17
 #: ops/models/job.py:139 ops/serializers/job.py:21
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 msgid "Assets"
@@ -1332,7 +1332,7 @@ msgstr "禁用"
 #: assets/const/base.py:33 settings/serializers/basic.py:6
 #: users/serializers/preference/koko.py:19
 #: users/serializers/preference/lina.py:39
-#: users/serializers/preference/luna.py:60
+#: users/serializers/preference/luna.py:69
 msgid "Basic"
 msgstr "基本"
 
@@ -1359,7 +1359,7 @@ msgstr "云服务"
 
 #: assets/const/category.py:14 assets/models/asset/gpt.py:11
 #: assets/models/asset/web.py:16 audits/const.py:42
-#: terminal/models/applet/applet.py:27 users/const.py:47
+#: terminal/models/applet/applet.py:27 users/const.py:52
 msgid "Web"
 msgstr "Web"
 
@@ -2243,7 +2243,7 @@ msgstr "删除目录"
 
 #: audits/const.py:14 audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: perms/const.py:17 rbac/tree.py:237
+#: perms/const.py:17 rbac/tree.py:238
 msgid "Delete"
 msgstr "删除"
 
@@ -2268,7 +2268,7 @@ msgstr "下载"
 msgid "Rename dir"
 msgstr "映射目录"
 
-#: audits/const.py:23 rbac/tree.py:235 terminal/api/session/session.py:257
+#: audits/const.py:23 rbac/tree.py:236 terminal/api/session/session.py:257
 #: terminal/templates/terminal/_msg_command_warning.html:18
 #: terminal/templates/terminal/_msg_session_sharing.html:10
 msgid "View"
@@ -2276,7 +2276,7 @@ msgstr "查看"
 
 #: audits/const.py:26
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: rbac/tree.py:234
+#: rbac/tree.py:235
 msgid "Create"
 msgstr "创建"
 
@@ -2544,27 +2544,27 @@ msgstr ""
 msgid "This action require verify your MFA"
 msgstr "该操作需要验证您的 MFA, 请先开启并配置"
 
-#: authentication/api/connection_token.py:262
+#: authentication/api/connection_token.py:263
 msgid "Reusable connection token is not allowed, global setting not enabled"
 msgstr "不允许使用可重复使用的连接令牌，未启用全局设置"
 
-#: authentication/api/connection_token.py:376
+#: authentication/api/connection_token.py:377
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名账号不支持当前资产"
 
-#: authentication/api/connection_token.py:395
+#: authentication/api/connection_token.py:396
 msgid "Account not found"
 msgstr "账号未找到"
 
-#: authentication/api/connection_token.py:398
+#: authentication/api/connection_token.py:399
 msgid "Permission expired"
 msgstr "授权已过期"
 
-#: authentication/api/connection_token.py:428
+#: authentication/api/connection_token.py:429
 msgid "ACL action is reject: {}({})"
 msgstr "ACL 动作是拒绝: {}({})"
 
-#: authentication/api/connection_token.py:432
+#: authentication/api/connection_token.py:433
 msgid "ACL action is review"
 msgstr "ACL 动作是复核"
 
@@ -3120,13 +3120,13 @@ msgid "Show"
 msgstr "显示"
 
 #: authentication/templates/authentication/_access_key_modal.html:66
-#: users/models/user.py:640 users/serializers/profile.py:92
+#: users/const.py:37 users/models/user.py:640 users/serializers/profile.py:92
 #: users/templates/users/user_verify_mfa.html:36
 msgid "Disable"
 msgstr "禁用"
 
 #: authentication/templates/authentication/_access_key_modal.html:67
-#: users/models/user.py:641 users/serializers/profile.py:93
+#: users/const.py:38 users/models/user.py:641 users/serializers/profile.py:93
 #: users/templates/users/mfa_setting.html:26
 #: users/templates/users/mfa_setting.html:68
 msgid "Enable"
@@ -4253,7 +4253,7 @@ msgstr "LDAP 同步设置组织为当前组织，请切换其他组织后再进�
 msgid "The organization have resource ({}) cannot be deleted"
 msgstr "组织存在资源 ({}) 不能被删除"
 
-#: orgs/apps.py:7 rbac/tree.py:125
+#: orgs/apps.py:7 rbac/tree.py:126
 msgid "App organizations"
 msgstr "组织管理"
 
@@ -4466,6 +4466,12 @@ msgstr "Web终端"
 msgid "Can view file manager"
 msgstr "文件管理"
 
+#: rbac/models/menu.py:20
+#, fuzzy
+#| msgid "Can view my assets"
+msgid "Can view System Tools"
+msgstr "可以查看我的资产"
+
 #: rbac/models/permission.py:27 rbac/models/role.py:34
 msgid "Permissions"
 msgstr "授权"
@@ -4584,20 +4590,20 @@ msgstr "我的资产"
 msgid "Applet"
 msgstr "远程应用"
 
-#: rbac/tree.py:126
+#: rbac/tree.py:127
 msgid "Ticket comment"
 msgstr "工单评论"
 
-#: rbac/tree.py:127 settings/serializers/feature.py:58
+#: rbac/tree.py:128 settings/serializers/feature.py:58
 #: tickets/models/ticket/general.py:307
 msgid "Ticket"
 msgstr "工单管理"
 
-#: rbac/tree.py:128
+#: rbac/tree.py:129
 msgid "Common setting"
 msgstr "一般设置"
 
-#: rbac/tree.py:129
+#: rbac/tree.py:130
 msgid "View permission tree"
 msgstr "查看授权树"
 
@@ -6000,7 +6006,7 @@ msgid "Home page"
 msgstr "首页"
 
 #: templates/resource_download.html:18 templates/resource_download.html:33
-#: users/const.py:48
+#: users/const.py:53
 msgid "Client"
 msgstr "客户端"
 
@@ -7263,11 +7269,11 @@ msgstr "多屏显示"
 msgid "Drives redirect"
 msgstr "磁盘挂载"
 
-#: users/const.py:52
+#: users/const.py:57
 msgid "Replace"
 msgstr "替换"
 
-#: users/const.py:53
+#: users/const.py:58
 msgid "Suffix"
 msgstr "加后缀"
 
@@ -7488,43 +7494,54 @@ msgstr "确认文件加密密码"
 msgid "The newly set password is inconsistent"
 msgstr "两次密码不一致"
 
-#: users/serializers/preference/luna.py:23
+#: users/serializers/preference/luna.py:26
 msgid "Async loading of asset tree"
 msgstr "异步加载资产树"
 
-#: users/serializers/preference/luna.py:30
+#: users/serializers/preference/luna.py:33
 msgid "RDP resolution"
 msgstr "RDP 分辨率"
 
-#: users/serializers/preference/luna.py:34
+#: users/serializers/preference/luna.py:37
 msgid "Keyboard layout"
 msgstr "键盘布局"
 
-#: users/serializers/preference/luna.py:38
+#: users/serializers/preference/luna.py:41
 msgid "RDP client option"
 msgstr "RDP 客户端选项"
 
-#: users/serializers/preference/luna.py:42
+#: users/serializers/preference/luna.py:45
+msgid "Rdp smart size"
+msgstr ""
+
+#: users/serializers/preference/luna.py:46
+msgid ""
+"Determines whether the client computer should scale the content on the "
+"remote computer to fit the window size of the client computer when the "
+"window is resized."
+msgstr ""
+
+#: users/serializers/preference/luna.py:51
 msgid "Remote application connection method"
 msgstr "远程应用连接方式"
 
-#: users/serializers/preference/luna.py:49
+#: users/serializers/preference/luna.py:58
 msgid "Character terminal font size"
 msgstr "字符终端字体大小"
 
-#: users/serializers/preference/luna.py:52
+#: users/serializers/preference/luna.py:61
 msgid "Backspace as Ctrl+H"
 msgstr "字符终端Backspace As Ctrl+H"
 
-#: users/serializers/preference/luna.py:55
+#: users/serializers/preference/luna.py:64
 msgid "Right click quickly paste"
 msgstr "右键快速粘贴"
 
-#: users/serializers/preference/luna.py:61
+#: users/serializers/preference/luna.py:70
 msgid "Graphics"
 msgstr "图形化"
 
-#: users/serializers/preference/luna.py:62
+#: users/serializers/preference/luna.py:71
 msgid "Command line"
 msgstr "命令行"
 
