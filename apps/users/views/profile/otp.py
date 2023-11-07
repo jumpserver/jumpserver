@@ -132,7 +132,7 @@ class UserOtpEnableBindView(AuthMixin, TemplateView, FormView):
 
 
 class UserOtpDisableView(PermissionsMixin, FormView):
-    template_name = 'users/user_verify_mfa.html'
+    template_name = 'users/asset_account_change_info.html'
     form_class = forms.UserCheckOtpCodeForm
     permission_classes = [IsValidUser]
 

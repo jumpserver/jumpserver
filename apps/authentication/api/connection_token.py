@@ -73,11 +73,6 @@ class RDPFileClientProtocolURLMixin:
         if multi_mon:
             rdp_options['use multimon:i'] = '1'
 
-        # 设置多屏显示
-        multi_mon = is_true(self.request.query_params.get('multi_mon'))
-        if multi_mon:
-            rdp_options['use multimon:i'] = '1'
-
         # 设置磁盘挂载
         drives_redirect = is_true(self.request.query_params.get('drives_redirect'))
         if drives_redirect:

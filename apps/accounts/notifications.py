@@ -1,6 +1,8 @@
+from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 
 from common.tasks import send_mail_attachment_async, upload_backup_to_obj_storage
+from notifications.notifications import UserMessage
 from users.models import User
 from terminal.models.component.storage import ReplayStorage
 
@@ -71,3 +73,25 @@ class ChangeSecretExecutionTaskMsg(object):
         send_mail_attachment_async(
             self.subject, self.message, [self.user.email], attachments
         )
+
+
+class GatherAccountChangeMsg(UserMessage):
+    subject = _('Gather account change information')
+
+    def __init__(self, user, change_info: dict):
+        self.change_info = change_info
+        super().__init__(user)
+
+    def get_html_msg(self) -> dict:
+        context = {'change_info': self.change_info}
+        message = render_to_string('accounts/asset_account_change_info.html', context)
+
+        return {
+            'subject': str(self.subject),
+            'message': message
+        }
+
+    @classmethod
+    def gen_test_msg(cls):
+        user = User.objects.first()
+        return cls(user, {})
