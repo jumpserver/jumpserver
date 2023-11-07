@@ -155,7 +155,7 @@ class RDPFileClientProtocolURLMixin:
 
         account = token.account or token.input_username
         datetime = timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H:%M:%S')
-        name = account + '@' + str(asset) + '[' + datetime + ']'
+        name = account + '@' + asset.name + '[' + datetime + ']'
         data = {
             'version': 2,
             'id': str(token.id),  # 兼容老的，未来几个版本删掉
