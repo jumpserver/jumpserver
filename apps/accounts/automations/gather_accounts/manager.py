@@ -1,9 +1,14 @@
+from collections import defaultdict
+
 from accounts.const import AutomationTypes
 from accounts.models import GatheredAccount
+from assets.models import Asset
 from common.utils import get_logger
 from orgs.utils import tmp_to_org
+from users.models import User
 from .filter import GatherAccountsFilter
 from ..base.manager import AccountBasePlaybookManager
+from ...notifications import GatherAccountChangeMsg
 
 logger = get_logger(__name__)
 
@@ -12,6 +17,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.host_asset_mapper = {}
+        self.asset_username_mapper = defaultdict(set)
         self.is_sync_account = self.execution.snapshot.get('is_sync_account')
 
     @classmethod
@@ -26,10 +32,11 @@ class GatherAccountsManager(AccountBasePlaybookManager):
     def filter_success_result(self, tp, result):
         result = GatherAccountsFilter(tp).run(self.method_id_meta_mapper, result)
         return result
-    @staticmethod
-    def generate_data(asset, result):
+
+    def generate_data(self, asset, result):
         data = []
         for username, info in result.items():
+            self.asset_username_mapper[str(asset.id)].add(username)
             d = {'asset': asset, 'username': username, 'present': True}
             if info.get('date'):
                 d['date_last_login'] = info['date']
@@ -60,4 +67,48 @@ class GatherAccountsManager(AccountBasePlaybookManager):
             result = self.filter_success_result(asset.type, info)
             self.update_or_create_accounts(asset, result)
         else:
-            logger.error("Not found info".format(host))
+            logger.error(f'Not found {host} info')
+
+    def run(self, *args, **kwargs):
+        super().run(*args, **kwargs)
+        self.send_email_if_need()
+
+    def send_email_if_need(self):
+        recipients = self.execution.recipients
+        if not self.asset_username_mapper or not recipients:
+            return
+
+        users = User.objects.filter(id__in=recipients)
+        if not users:
+            return
+
+        asset_ids = self.asset_username_mapper.keys()
+        assets = Asset.objects.filter(id__in=asset_ids)
+        asset_id_map = {str(asset.id): asset for asset in assets}
+        asset_qs = assets.values_list('id', 'accounts__username')
+        system_asset_username_mapper = defaultdict(set)
+
+        for asset_id, username in asset_qs:
+            system_asset_username_mapper[str(asset_id)].add(username)
+
+        change_info = {}
+        for asset_id, usernames in self.asset_username_mapper.items():
+            system_usernames = system_asset_username_mapper.get(asset_id)
+
+            if not system_usernames:
+                continue
+
+            add_usernames = usernames - system_usernames
+            remove_usernames = system_usernames - usernames
+            k = f'{asset_id_map[asset_id]}[{asset_id}]'
+
+            change_info[k] = {
+                'add_usernames': ', '.join(add_usernames),
+                'remove_usernames': ', '.join(remove_usernames),
+            }
+
+        if not change_info:
+            return
+
+        for user in users:
+            GatherAccountChangeMsg(user, change_info).publish_async()

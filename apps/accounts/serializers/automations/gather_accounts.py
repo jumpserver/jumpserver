@@ -18,7 +18,7 @@ class GatherAccountAutomationSerializer(BaseAutomationSerializer):
         model = GatherAccountsAutomation
         read_only_fields = BaseAutomationSerializer.Meta.read_only_fields
         fields = BaseAutomationSerializer.Meta.fields \
-                 + ['is_sync_account'] + read_only_fields
+                 + ['is_sync_account', 'recipients'] + read_only_fields
 
         extra_kwargs = BaseAutomationSerializer.Meta.extra_kwargs
 
