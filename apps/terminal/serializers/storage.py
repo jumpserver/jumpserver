@@ -3,6 +3,7 @@
 from urllib.parse import urlparse
 
 from django.db.models import TextChoices
+from django.core.validators import MaxValueValidator, MinValueValidator, validate_ipv46_address
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -118,6 +119,40 @@ class ReplayStorageTypeAzureSerializer(serializers.Serializer):
     )
 
 
+class SftpSecretType(TextChoices):
+    PASSWORD = 'password', _('Password')
+    SSH_KEY = 'ssh_key', _('SSH key')
+
+
+class ReplayStorageTypeSFTPSerializer(serializers.Serializer):
+    SFTP_HOST = serializers.CharField(
+        required=True, max_length=1024, label=_('HOST'), validators=[validate_ipv46_address]
+    )
+    SFTP_PORT = serializers.IntegerField(
+        required=False, default=22, validators=[MaxValueValidator(65535), MinValueValidator(0)],
+        label=_('Port')
+    )
+    SFTP_USERNAME = serializers.CharField(
+        required=True, max_length=1024, label=_('Username')
+    )
+    STP_SECRET_TYPE = serializers.ChoiceField(choices=SftpSecretType.choices,
+                                              default=SftpSecretType.PASSWORD,
+                                              label=_('Secret type'))
+    SFTP_PASSWORD = EncryptedField(
+        allow_blank=True, allow_null=True, required=False, max_length=1024, label=_('Password')
+    )
+    STP_PRIVATE_KEY = serializers.CharField(
+        allow_blank=True, allow_null=True, required=False, max_length=4096,
+        write_only=True, label=_('Private key')
+    )
+    STP_PASSPHRASE = EncryptedField(
+        allow_blank=True, allow_null=True, required=False, max_length=1024, label=_('Key password')
+    )
+    SFTP_ROOT_PATH = serializers.CharField(
+        required=True, max_length=1024, label=_('SFTP Root')
+    )
+
+
 # mapping
 replay_storage_type_serializer_classes_mapping = {
     const.ReplayStorageType.s3.value: ReplayStorageTypeS3Serializer,
@@ -126,7 +161,8 @@ replay_storage_type_serializer_classes_mapping = {
     const.ReplayStorageType.oss.value: ReplayStorageTypeOSSSerializer,
     const.ReplayStorageType.azure.value: ReplayStorageTypeAzureSerializer,
     const.ReplayStorageType.obs.value: ReplayStorageTypeOBSSerializer,
-    const.ReplayStorageType.cos.value: ReplayStorageTypeCOSSerializer
+    const.ReplayStorageType.cos.value: ReplayStorageTypeCOSSerializer,
+    const.ReplayStorageType.sftp.value: ReplayStorageTypeSFTPSerializer
 }
 
 

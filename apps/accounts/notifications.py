@@ -1,9 +1,10 @@
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 
-from common.tasks import send_mail_attachment_async
+from common.tasks import send_mail_attachment_async, upload_backup_to_obj_storage
 from notifications.notifications import UserMessage
 from users.models import User
+from terminal.models.component.storage import ReplayStorage
 
 
 class AccountBackupExecutionTaskMsg(object):
@@ -28,6 +29,25 @@ class AccountBackupExecutionTaskMsg(object):
     def publish(self, attachment_list=None):
         send_mail_attachment_async(
             self.subject, self.message, [self.user.email], attachment_list
+        )
+
+
+class AccountBackupByObjStorageExecutionTaskMsg(object):
+    subject = _('Notification of account backup route task results')
+
+    def __init__(self, name: str, obj_storage: ReplayStorage):
+        self.name = name
+        self.obj_storage = obj_storage
+
+    @property
+    def message(self):
+        name = self.name
+        return _('{} - The account backup passage task has been completed.'
+                 ' See the attachment for details').format(name)
+
+    def publish(self, attachment_list=None):
+        upload_backup_to_obj_storage(
+            self.obj_storage, attachment_list
         )
 
 
