@@ -1,5 +1,6 @@
 import datetime
 import os
+import re
 import shutil
 
 import yaml
@@ -59,7 +60,7 @@ class DeployAppletHostManager:
         download_host = download_host.rstrip("/")
 
         def handler(plays):
-            applet_host_name = self.deployment.host.name
+            applet_host_name = re.sub(r'[^a-zA-Z0-9]', '_', self.deployment.host.name)
             hostname = '{}-{}'.format(applet_host_name, random_string(7))
             for play in plays:
                 play["vars"].update(options)
