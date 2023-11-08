@@ -12,6 +12,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 
 from common.db.encoder import ModelJSONFieldEncoder
 from common.utils import lazyproperty, i18n_trans
+from notifications.ws import WS_SESSION_KEY
 from ops.models import JobExecution
 from orgs.mixins.models import OrgModelMixin, Organization
 from orgs.utils import current_org
@@ -274,6 +275,10 @@ class UserSession(models.Model):
     @property
     def backend_display(self):
         return gettext(self.backend)
+
+    @property
+    def is_active(self):
+        return caches.sismember(WS_SESSION_KEY, self.key)
 
     @property
     def date_expired(self):
