@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('accounts', '0017_alter_automationexecution_options'),
+        ('accounts', '0018_accountbackupautomation_backup_type_and_more'),
     ]
 
     operations = [
