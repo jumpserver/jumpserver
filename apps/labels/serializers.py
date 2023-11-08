@@ -1,6 +1,8 @@
+from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count
 from rest_framework import serializers
 
+from common.serializers.fields import ObjectRelatedField
 from .models import Label, LabeledResource
 
 __all__ = ['LabelSerializer', 'LabeledResourceSerializer']
@@ -19,7 +21,16 @@ class LabelSerializer(serializers.ModelSerializer):
 
 
 class LabeledResourceSerializer(serializers.ModelSerializer):
+    res_type = ObjectRelatedField(queryset=ContentType.objects, attrs=('app_label', 'model', 'name'))
+    label = ObjectRelatedField(queryset=Label.objects, attrs=('name', 'value'))
+
     class Meta:
         model = LabeledResource
         fields = ('id', 'label', 'res_type', 'res_id', 'date_created', 'date_updated')
         read_only_fields = ('date_created', 'date_updated')
+
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        """ Perform necessary eager loading of data. """
+        queryset = queryset.select_related('label', 'res_type')
+        return queryset

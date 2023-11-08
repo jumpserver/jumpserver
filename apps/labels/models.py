@@ -31,3 +31,4 @@ class LabeledResource(JMSOrgBaseModel):
 
     def __str__(self):
         return '{} => {}'.format(self.label, self.resource)
+

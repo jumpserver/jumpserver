@@ -73,7 +73,7 @@ exclude_permissions = (
     ('perms', 'rebuildusertreetask', '*', '*'),
     ('perms', 'permedasset', '*', 'permedasset'),
     ('perms', 'permedapplication', 'add,change,delete', 'permedapplication'),
-    ('rbac', 'contenttype', '*', '*'),
+    ('rbac', 'contenttype', 'add,change,delete', '*'),
     ('rbac', 'permission', 'add,delete,change', 'permission'),
     ('rbac', 'rolebinding', '*', '*'),
     ('rbac', 'systemrolebinding', 'change', 'systemrolebinding'),
