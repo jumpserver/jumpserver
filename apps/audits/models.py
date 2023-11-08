@@ -4,7 +4,7 @@ from datetime import timedelta
 from importlib import import_module
 
 from django.conf import settings
-from django.core.cache import caches
+from django.core.cache import caches, cache
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
@@ -278,7 +278,8 @@ class UserSession(models.Model):
 
     @property
     def is_active(self):
-        return caches.sismember(WS_SESSION_KEY, self.key)
+        redis_client = cache.client.get_client()
+        return redis_client.sismember(WS_SESSION_KEY, self.key)
 
     @property
     def date_expired(self):

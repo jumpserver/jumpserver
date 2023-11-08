@@ -177,7 +177,7 @@ class UserSessionSerializer(serializers.ModelSerializer):
         fields_mini = ['id']
         fields_small = fields_mini + [
             'type', 'ip', 'city', 'user_agent', 'user', 'is_current_user_session',
-            'backend', 'backend_display', 'date_created', 'date_expired'
+            'backend', 'backend_display', 'is_active', 'date_created', 'date_expired'
         ]
         fields = fields_small
         extra_kwargs = {
