@@ -178,7 +178,7 @@ class AccountBackupHandler:
         recipients = ReplayStorage.objects.filter(id__in=list(recipients))
         print(
             '\n'
-            '\033[32m>>> 发送备份文件到sftp服务器\033[0m'
+            '\033[31m>>> 发送备份文件到sftp服务器\033[0m'
             ''
         )
         plan_name = self.plan_name
@@ -204,7 +204,7 @@ class AccountBackupHandler:
     @staticmethod
     def step_finished(is_success):
         if is_success:
-            print('任务执行成功')
+            print('任务执行完成')
         else:
             print('任务执行失败')
 
@@ -238,9 +238,10 @@ class AccountBackupHandler:
         if not obj_recipients_part_one and not obj_recipients_part_two:
             print(
                 '\n'
-                '\033[32m>>> 该备份任务未分配sftp服务器\033[0m'
+                '\033[31m>>> 该备份任务未分配sftp服务器\033[0m'
                 ''
             )
+            return
         if obj_recipients_part_one and obj_recipients_part_two:
             files = self.create_excel(section='front')
             self.send_backup_obj_storage(files, obj_recipients_part_one, zip_encrypt_password)
@@ -258,9 +259,10 @@ class AccountBackupHandler:
         if not recipients_part_one and not recipients_part_two:
             print(
                 '\n'
-                '\033[32m>>> 该备份任务未分配收件人\033[0m'
+                '\033[31m>>> 该备份任务未分配收件人\033[0m'
                 ''
             )
+            return
         if recipients_part_one and recipients_part_two:
             files = self.create_excel(section='front')
             self.send_backup_mail(files, recipients_part_one)
