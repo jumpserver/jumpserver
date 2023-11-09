@@ -61,6 +61,7 @@ JumpServer 堡垒机帮助企业以更安全的方式管控和登录各种类型
 
 ## 案例研究
 
+- [腾讯音乐娱乐集团：基于JumpServer的安全运维审计解决方案](https://blog.fit2cloud.com/?p=a04cdf0d-6704-4d18-9b40-9180baecd0e2)
 - [腾讯海外游戏：基于JumpServer构建游戏安全运营能力](https://blog.fit2cloud.com/?p=3704)
 - [万华化学：通过JumpServer管理全球化分布式IT资产，并且实现与云管平台的联动](https://blog.fit2cloud.com/?p=3504)
 - [雪花啤酒：JumpServer堡垒机使用体会](https://blog.fit2cloud.com/?p=3412)
