@@ -66,6 +66,7 @@ class TerminalType(TextChoices):
     video_worker = 'video_worker', 'Video Worker'
     chen = 'chen', 'Chen'
     kael = 'kael', 'Kael'
+    panda = 'panda', 'Panda'
 
     @classmethod
     def types(cls):

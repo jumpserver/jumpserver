@@ -33,7 +33,7 @@ from ..models import ConnectionToken, date_expired_default
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
     SuperConnectionTokenSerializer, ConnectTokenAppletOptionSerializer,
-    ConnectionTokenReusableSerializer,
+    ConnectionTokenReusableSerializer, ConnectTokenVirtualAppOptionSerializer
 )
 
 __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
@@ -464,6 +464,7 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         'get_secret_detail': 'authentication.view_superconnectiontokensecret',
         'get_applet_info': 'authentication.view_superconnectiontoken',
         'release_applet_account': 'authentication.view_superconnectiontoken',
+        'get_virtual_app_info': 'authentication.view_superconnectiontoken',
     }
 
     def get_queryset(self):
@@ -527,6 +528,16 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
             return Response({'error': 'Token expired'}, status=status.HTTP_400_BAD_REQUEST)
         data = token.get_applet_option()
         serializer = ConnectTokenAppletOptionSerializer(data)
+        return Response(serializer.data)
+
+    @action(methods=['POST'], detail=False, url_path='virtual-app-option')
+    def get_virtual_app_info(self, *args, **kwargs):
+        token_id = self.request.data.get('id')
+        token = get_object_or_404(ConnectionToken, pk=token_id)
+        if token.is_expired:
+            return Response({'error': 'Token expired'}, status=status.HTTP_400_BAD_REQUEST)
+        data = token.get_virtual_app_option()
+        serializer = ConnectTokenVirtualAppOptionSerializer(data)
         return Response(serializer.data)
 
     @action(methods=['DELETE', 'POST'], detail=False, url_path='applet-account/release')

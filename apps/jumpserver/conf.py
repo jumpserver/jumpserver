@@ -598,6 +598,7 @@ class Config(dict):
         'GPT_BASE_URL': '',
         'GPT_PROXY': '',
         'GPT_MODEL': 'gpt-3.5-turbo',
+        'VIRTUAL_APP_ENABLED': False,
     }
 
     old_config_map = {

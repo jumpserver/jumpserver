@@ -30,6 +30,7 @@ router.register(r'applet-hosts', api.AppletHostViewSet, 'applet-host')
 router.register(r'applet-publications', api.AppletPublicationViewSet, 'applet-publication')
 router.register(r'applet-host-deployments', api.AppletHostDeploymentViewSet, 'applet-host-deployment')
 router.register(r'db-listen-ports', api.DBListenPortViewSet, 'db-listen-ports')
+router.register(r'virtual-apps', api.VirtualAppViewSet, 'virtual-app')
 
 urlpatterns = [
     path('my-sessions/', api.MySessionAPIView.as_view(), name='my-session'),
