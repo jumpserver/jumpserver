@@ -9,7 +9,7 @@ from common.utils.random import random_string
 
 
 def default_secret():
-    return random_string(32)
+    return random_string(36)
 
 
 def defatult_ip_group():
