@@ -13,7 +13,7 @@ from accounts.serializers import ChangeSecretRecordBackUpSerializer
 from assets.const import HostTypes
 from common.utils import get_logger
 from common.utils.file import encrypt_and_compress_zip_file
-from common.utils.timezone import local_now_display
+from common.utils.timezone import local_now_filename
 from users.models import User
 from ..base.manager import AccountBasePlaybookManager
 from ...utils import SecretGenerator
@@ -199,7 +199,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
 
         name = self.execution.snapshot['name']
         path = os.path.join(os.path.dirname(settings.BASE_DIR), 'tmp')
-        filename = os.path.join(path, f'{name}-{local_now_display()}-{time.time()}.xlsx')
+        filename = os.path.join(path, f'{name}-{local_now_filename()}-{time.time()}.xlsx')
         if not self.create_file(recorders, filename):
             return
 
@@ -207,7 +207,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             attachments = []
             if user.secret_key:
                 password = user.secret_key.encode('utf8')
-                attachment = os.path.join(path, f'{name}-{local_now_display()}-{time.time()}.zip')
+                attachment = os.path.join(path, f'{name}-{local_now_filename()}-{time.time()}.zip')
                 encrypt_and_compress_zip_file(attachment, password, [filename])
                 attachments = [attachment]
             ChangeSecretExecutionTaskMsg(name, user).publish(attachments)
