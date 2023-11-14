@@ -9,13 +9,13 @@ __all__ = ["ActionChoices"]
 
 
 class ActionChoices(BitChoices):
-    connect = bit(1), _("Connect") + " ({})".format(_("All protocols"))
-    upload = bit(2), _("Upload") + " (RDP, SFTP)"
-    download = bit(3), _("Download") + " (RDP, SFTP)"
-    copy = bit(4), _("Copy") + " (RDP, VNC)"
-    paste = bit(5), _("Paste") + " (RDP, VNC)"
-    delete = bit(6), _("Delete") + " (SFTP)"
-    share = bit(7), _("Share") + " (SSH)"
+    connect = bit(1), _("Connect (All protocols)")
+    upload = bit(2), _("Upload (RDP, SFTP)")
+    download = bit(3), _("Download (RDP, SFTP)")
+    copy = bit(4), _("Copy (RDP, VNC)")
+    paste = bit(5), _("Paste (RDP, VNC)")
+    delete = bit(6), _("Delete (SFTP)")
+    share = bit(7), _("Share (SSH)")
 
     @classmethod
     def is_tree(cls):
