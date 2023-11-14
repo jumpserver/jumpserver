@@ -13,7 +13,6 @@ from .base import (
     AutomationAssetsListApi, AutomationRemoveAssetApi, AutomationAddAssetApi,
     AutomationNodeAddRemoveApi, AutomationExecutionViewSet
 )
-from ...filters import ChangeSecretRecordFilterSet
 
 __all__ = [
     'ChangeSecretAutomationViewSet', 'ChangeSecretRecordViewSet',
@@ -32,7 +31,7 @@ class ChangeSecretAutomationViewSet(OrgBulkModelViewSet):
 
 class ChangeSecretRecordViewSet(mixins.ListModelMixin, OrgGenericViewSet):
     serializer_class = serializers.ChangeSecretRecordSerializer
-    filterset_class = ChangeSecretRecordFilterSet
+    filterset_fields = ('asset_id', 'execution_id')
     search_fields = ('asset__address',)
     tp = AutomationTypes.change_secret
     rbac_perms = {
