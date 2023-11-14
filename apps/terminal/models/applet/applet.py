@@ -265,6 +265,8 @@ class Applet(JMSBaseModel):
         if not host.using_same_account:
             return
         account = VirtualAccount.get_same_account(user, host)
+        if not account.secret:
+            return
         return account
 
     def select_host_account(self, user, asset):
