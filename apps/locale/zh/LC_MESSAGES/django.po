@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-13 17:47+0800\n"
+"POT-Creation-Date: 2023-11-14 10:32+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -2289,11 +2289,11 @@ msgstr "删除目录"
 
 #: audits/const.py:14 audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: perms/const.py:17 rbac/tree.py:238
+#: rbac/tree.py:238
 msgid "Delete"
 msgstr "删除"
 
-#: audits/const.py:15 perms/const.py:13
+#: audits/const.py:15
 msgid "Upload"
 msgstr "上传"
 
@@ -2305,8 +2305,7 @@ msgstr "重命名"
 msgid "Symlink"
 msgstr "建立软链接"
 
-#: audits/const.py:18 audits/const.py:28 perms/const.py:14
-#: terminal/api/session/session.py:146
+#: audits/const.py:18 audits/const.py:28 terminal/api/session/session.py:146
 msgid "Download"
 msgstr "下载"
 
@@ -2326,7 +2325,7 @@ msgstr "查看"
 msgid "Create"
 msgstr "创建"
 
-#: audits/const.py:29 perms/const.py:12
+#: audits/const.py:29
 msgid "Connect"
 msgstr "连接"
 
@@ -4346,21 +4345,31 @@ msgstr "刷新组织缓存"
 msgid "App permissions"
 msgstr "授权管理"
 
-#: perms/const.py:12
-msgid "All protocols"
-msgstr "所有协议"
+msgid "Connect (All protocols)"
+msgstr "连接 (所有协议)"
+
+#: perms/const.py:13
+msgid "Upload (RDP, SFTP)"
+msgstr "上传 (RDP, SFTP)"
+
+#: perms/const.py:14
+msgid "Download (RDP, SFTP)"
+msgstr "下载 (RDP, SFTP)"
 
 #: perms/const.py:15
-msgid "Copy"
-msgstr "复制"
+msgid "Copy (RDP, VNC)"
+msgstr "复制 (RDP, VNC)"
 
 #: perms/const.py:16
-msgid "Paste"
-msgstr "粘贴"
+msgid "Paste (RDP, VNC)"
+msgstr "粘贴 (RDP, VNC)"
+
+msgid "Delete (SFTP)"
+msgstr "删除 (SFTP)"
 
 #: perms/const.py:18
-msgid "Share"
-msgstr ""
+msgid "Share (SSH)"
+msgstr "分享 (SSH)"
 
 #: perms/const.py:28
 msgid "Transfer"
@@ -8582,6 +8591,12 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
+
+#~ msgid "Copy"
+#~ msgstr "复制"
+
+#~ msgid "Paste"
+#~ msgstr "粘贴"
 
 #~ msgid "Password can not contains `'` "
 #~ msgstr "密码不能包含 `'` 字符"

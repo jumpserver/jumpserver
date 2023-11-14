@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-13 17:47+0800\n"
+"POT-Creation-Date: 2023-11-14 10:32+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2305,11 +2305,11 @@ msgstr "Rmdir"
 
 #: audits/const.py:14 audits/const.py:25
 #: authentication/templates/authentication/_access_key_modal.html:65
-#: perms/const.py:17 rbac/tree.py:238
+#: rbac/tree.py:238
 msgid "Delete"
 msgstr "削除"
 
-#: audits/const.py:15 perms/const.py:13
+#: audits/const.py:15
 msgid "Upload"
 msgstr "アップロード"
 
@@ -2321,8 +2321,7 @@ msgstr "名前の変更"
 msgid "Symlink"
 msgstr "Symlink"
 
-#: audits/const.py:18 audits/const.py:28 perms/const.py:14
-#: terminal/api/session/session.py:146
+#: audits/const.py:18 audits/const.py:28 terminal/api/session/session.py:146
 msgid "Download"
 msgstr "ダウンロード"
 
@@ -2342,7 +2341,7 @@ msgstr "表示"
 msgid "Create"
 msgstr "作成"
 
-#: audits/const.py:29 perms/const.py:12
+#: audits/const.py:29
 msgid "Connect"
 msgstr "接続"
 
@@ -4397,21 +4396,31 @@ msgstr "組織キャッシュを更新する"
 msgid "App permissions"
 msgstr "アプリの権限"
 
-#: perms/const.py:12
-msgid "All protocols"
-msgstr "すべてのプロトコル"
+msgid "Connect (All protocols)"
+msgstr "接続（すべてのプロトコル）"
+
+#: perms/const.py:13
+msgid "Upload (RDP, SFTP)"
+msgstr "アップロード（RDP，SFTP）"
+
+#: perms/const.py:14
+msgid "Download (RDP, SFTP)"
+msgstr "ダウンロード（RDP、SFTP）"
 
 #: perms/const.py:15
-msgid "Copy"
-msgstr "コピー"
+msgid "Copy (RDP, VNC)"
+msgstr "レプリケーション（RDP，VNC）"
 
 #: perms/const.py:16
-msgid "Paste"
-msgstr "貼り付け"
+msgid "Paste (RDP, VNC)"
+msgstr "貼り付け（RDP，VNC）"
+
+msgid "Delete (SFTP)"
+msgstr "削除（SFTP）"
 
 #: perms/const.py:18
-msgid "Share"
-msgstr ""
+msgid "Share (SSH)"
+msgstr "共有（SSH）"
 
 #: perms/const.py:28
 msgid "Transfer"
@@ -8701,6 +8710,12 @@ msgstr "エンタープライズプロフェッショナル版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "エンタープライズ・フラッグシップ・エディション"
+
+#~ msgid "Copy"
+#~ msgstr "コピー"
+
+#~ msgid "Paste"
+#~ msgstr "貼り付け"
 
 #~ msgid "Password can not contains `'` "
 #~ msgstr "パスワードには `'` を含まない"
