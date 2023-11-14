@@ -17,6 +17,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.host_asset_mapper = {}
+        self.gathered_accounts = []
         self.asset_username_mapper = defaultdict(set)
         self.is_sync_account = self.execution.snapshot.get('is_sync_account')
 
@@ -48,17 +49,13 @@ class GatherAccountsManager(AccountBasePlaybookManager):
     def update_or_create_accounts(self, asset, result):
         data = self.generate_data(asset, result)
         with tmp_to_org(asset.org_id):
-            gathered_accounts = []
             GatheredAccount.objects.filter(asset=asset, present=True).update(present=False)
             for d in data:
                 username = d['username']
                 gathered_account, __ = GatheredAccount.objects.update_or_create(
                     defaults=d, asset=asset, username=username,
                 )
-                gathered_accounts.append(gathered_account)
-            if not self.is_sync_account:
-                return
-            GatheredAccount.sync_accounts(gathered_accounts)
+                self.gathered_accounts.append(gathered_account)
 
     def on_host_success(self, host, result):
         info = result.get('debug', {}).get('res', {}).get('info', {})
@@ -72,6 +69,9 @@ class GatherAccountsManager(AccountBasePlaybookManager):
     def run(self, *args, **kwargs):
         super().run(*args, **kwargs)
         self.send_email_if_need()
+        if not self.is_sync_account:
+            return
+        GatheredAccount.sync_accounts(self.gathered_accounts)
 
     def send_email_if_need(self):
         recipients = self.execution.recipients
@@ -101,6 +101,9 @@ class GatherAccountsManager(AccountBasePlaybookManager):
             add_usernames = usernames - system_usernames
             remove_usernames = system_usernames - usernames
             k = f'{asset_id_map[asset_id]}[{asset_id}]'
+
+            if not add_usernames and not remove_usernames:
+                continue
 
             change_info[k] = {
                 'add_usernames': ', '.join(add_usernames),
