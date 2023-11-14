@@ -140,5 +140,6 @@ def clean_job_execution_period():
     now = timezone.now()
     days = get_log_keep_day('JOB_EXECUTION_KEEP_DAYS')
     expired_day = now - datetime.timedelta(days=days)
-    del_res = JobExecution.objects.filter(date_created__lt=expired_day).delete()
-    logger.info(f"clean job_execution db record success! delete {days} days record, delete result: {del_res}")
+    with tmp_to_root_org():
+        del_res = JobExecution.objects.filter(date_created__lt=expired_day).delete()
+        logger.info(f"clean job_execution db record success! delete {days} days {del_res[0]} records")
