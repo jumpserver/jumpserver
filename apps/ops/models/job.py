@@ -77,6 +77,7 @@ class JMSPermedInventory(JMSInventory):
             host['login_user'] = account.username
             host['login_password'] = account.secret
             host['login_db'] = asset.spec_info.get('db_name', '')
+            host['ansible_python_interpreter'] = '/opt/py3/bin/python'
             return host
         return super().make_account_vars(host, asset, account, automation, protocol, platform, gateway)
 
@@ -127,7 +128,8 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
 
     instant = models.BooleanField(default=False)
     args = models.CharField(max_length=8192, default='', verbose_name=_('Args'), null=True, blank=True)
-    module = models.CharField(max_length=128, choices=JobModules.choices, default=JobModules.shell, verbose_name=_('Module'),
+    module = models.CharField(max_length=128, choices=JobModules.choices, default=JobModules.shell,
+                              verbose_name=_('Module'),
                               null=True)
     chdir = models.CharField(default="", max_length=1024, verbose_name=_('Chdir'), null=True, blank=True)
     timeout = models.IntegerField(default=-1, verbose_name=_('Timeout (Seconds)'))
