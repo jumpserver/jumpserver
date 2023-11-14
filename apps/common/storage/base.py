@@ -7,7 +7,6 @@ from django.conf import settings
 from terminal.models import default_storage, ReplayStorage
 from common.utils import get_logger, make_dirs
 
-
 logger = get_logger(__name__)
 
 
@@ -26,11 +25,13 @@ class BaseStorageHandler(object):
 
     def download(self):
         replay_storages = ReplayStorage.objects.all()
-        configs = {
-            storage.name: storage.config
-            for storage in replay_storages
-            if not storage.type_null_or_server
-        }
+        configs = {}
+        for storage in replay_storages:
+            if storage.type_sftp:
+                continue
+            if storage.type_null_or_server:
+                continue
+            configs[storage.name] = storage.config
         if settings.SERVER_REPLAY_STORAGE:
             configs['SERVER_REPLAY_STORAGE'] = settings.SERVER_REPLAY_STORAGE
         if not configs:
