@@ -25,10 +25,13 @@ class JobLogSerializer(JobExecutionSerializer):
         read_only_fields = [
             "id", "material", "time_cost", 'date_start',
             'date_finished', 'date_created',
-            'is_finished', 'is_success', 'created_by',
-            'task_id'
+            'is_finished', 'is_success',
+            'task_id', 'creator_name'
         ]
         fields = read_only_fields + []
+        extra_kwargs = {
+            "creator_name": {"label": _("Creator")},
+        }
 
 
 class FTPLogSerializer(serializers.ModelSerializer):
