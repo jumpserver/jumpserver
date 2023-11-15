@@ -63,6 +63,8 @@ class SerializeToTreeNodeMixin:
         return AllTypes.get_types_values(exclude_custom=True)
 
     def get_icon(self, asset):
+        if asset.category == 'device':
+            return 'switch'
         if asset.type in self.support_types:
             return asset.type
         else:
