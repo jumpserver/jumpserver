@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import sys
 import uuid
 from collections import defaultdict
 from datetime import timedelta
@@ -78,7 +79,7 @@ class JMSPermedInventory(JMSInventory):
             host['login_user'] = account.username
             host['login_password'] = account.secret
             host['login_db'] = asset.spec_info.get('db_name', '')
-            host['ansible_python_interpreter'] = '/opt/py3/bin/python'
+            host['ansible_python_interpreter'] = sys.executable
             if gateway:
                 host['gateway'] = {
                     'address': gateway.address, 'port': gateway.port,

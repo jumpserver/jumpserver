@@ -17,7 +17,8 @@ class GatherAccountsManager(AccountBasePlaybookManager):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.host_asset_mapper = {}
-        self.gathered_accounts = []
+        self.asset_account_info = {}
+
         self.asset_username_mapper = defaultdict(set)
         self.is_sync_account = self.execution.snapshot.get('is_sync_account')
 
@@ -46,49 +47,58 @@ class GatherAccountsManager(AccountBasePlaybookManager):
             data.append(d)
         return data
 
-    def update_or_create_accounts(self, asset, result):
+    def collect_asset_account_info(self, asset, result):
         data = self.generate_data(asset, result)
-        with tmp_to_org(asset.org_id):
-            GatheredAccount.objects.filter(asset=asset, present=True).update(present=False)
-            for d in data:
-                username = d['username']
-                gathered_account, __ = GatheredAccount.objects.update_or_create(
-                    defaults=d, asset=asset, username=username,
-                )
-                self.gathered_accounts.append(gathered_account)
+        self.asset_account_info[asset] = data
 
     def on_host_success(self, host, result):
         info = result.get('debug', {}).get('res', {}).get('info', {})
         asset = self.host_asset_mapper.get(host)
         if asset and info:
             result = self.filter_success_result(asset.type, info)
-            self.update_or_create_accounts(asset, result)
+            self.collect_asset_account_info(asset, result)
         else:
             logger.error(f'Not found {host} info')
 
+    def update_or_create_accounts(self):
+        for asset, data in self.asset_account_info.items():
+            with tmp_to_org(asset.org_id):
+                gathered_accounts = []
+                GatheredAccount.objects.filter(asset=asset, present=True).update(present=False)
+                for d in data:
+                    username = d['username']
+                    gathered_account, __ = GatheredAccount.objects.update_or_create(
+                        defaults=d, asset=asset, username=username,
+                    )
+                    gathered_accounts.append(gathered_account)
+                if not self.is_sync_account:
+                    return
+                GatheredAccount.sync_accounts(gathered_accounts)
+
     def run(self, *args, **kwargs):
         super().run(*args, **kwargs)
-        self.send_email_if_need()
-        if not self.is_sync_account:
-            return
-        GatheredAccount.sync_accounts(self.gathered_accounts)
+        users, change_info = self.generate_send_users_and_change_info()
+        self.update_or_create_accounts()
+        self.send_email_if_need(users, change_info)
 
-    def send_email_if_need(self):
+    def generate_send_users_and_change_info(self):
         recipients = self.execution.recipients
         if not self.asset_username_mapper or not recipients:
-            return
+            return None, None
 
         users = User.objects.filter(id__in=recipients)
         if not users:
-            return
+            return users, None
 
         asset_ids = self.asset_username_mapper.keys()
         assets = Asset.objects.filter(id__in=asset_ids)
+        gather_accounts = GatheredAccount.objects.filter(asset_id__in=asset_ids, present=True)
         asset_id_map = {str(asset.id): asset for asset in assets}
-        asset_qs = assets.values_list('id', 'accounts__username')
-        system_asset_username_mapper = defaultdict(set)
+        asset_id_username = list(assets.values_list('id', 'accounts__username'))
+        asset_id_username.extend(list(gather_accounts.values_list('asset_id', 'username')))
 
-        for asset_id, username in asset_qs:
+        system_asset_username_mapper = defaultdict(set)
+        for asset_id, username in asset_id_username:
             system_asset_username_mapper[str(asset_id)].add(username)
 
         change_info = {}
@@ -110,7 +120,11 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                 'remove_usernames': ', '.join(remove_usernames),
             }
 
-        if not change_info:
+        return users, change_info
+
+    @staticmethod
+    def send_email_if_need(users, change_info):
+        if not users or not change_info:
             return
 
         for user in users:
