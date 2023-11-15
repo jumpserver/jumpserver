@@ -19,6 +19,7 @@ from simple_history.models import HistoricalRecords
 from accounts.models import Account
 from acls.models import CommandFilterACL
 from assets.models import Asset
+from assets.automations.base.manager import SSHTunnelManager
 from common.db.encoder import ModelJSONFieldEncoder
 from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner, CommandInBlackListException
 from ops.mixin import PeriodTaskModelMixin
@@ -78,6 +79,13 @@ class JMSPermedInventory(JMSInventory):
             host['login_password'] = account.secret
             host['login_db'] = asset.spec_info.get('db_name', '')
             host['ansible_python_interpreter'] = '/opt/py3/bin/python'
+            if gateway:
+                host['gateway'] = {
+                    'address': gateway.address, 'port': gateway.port,
+                    'username': gateway.username, 'secret': gateway.password,
+                    'private_key_path': gateway.private_key_path
+                }
+                host['jms_asset']['port'] = protocol.port
             return host
         return super().make_account_vars(host, asset, account, automation, protocol, platform, gateway)
 
@@ -520,6 +528,8 @@ class JobExecution(JMSOrgBaseModel):
         self.before_start()
 
         runner = self.get_runner()
+        ssh_tunnel = SSHTunnelManager()
+        ssh_tunnel.local_gateway_prepare(runner)
         try:
             cb = runner.run(**kwargs)
             self.set_result(cb)
@@ -530,6 +540,8 @@ class JobExecution(JMSOrgBaseModel):
         except Exception as e:
             logging.error(e, exc_info=True)
             self.set_error(e)
+        finally:
+            ssh_tunnel.local_gateway_clean(runner)
 
     class Meta:
         verbose_name = _("Job Execution")
