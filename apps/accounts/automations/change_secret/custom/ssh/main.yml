@@ -3,12 +3,13 @@
   vars:
     ansible_connection: local
     ansible_become: false
+    asset_port: "{{ jms_asset.protocols | selectattr('name', 'equalto', 'ssh') | map(attribute='port') | first }}"
 
   tasks:
     - name: Test privileged account (paramiko)
       ssh_ping:
         login_host: "{{ jms_asset.address }}"
-        login_port: "{{ jms_asset.port }}"
+        login_port: "{{ asset_port }}"
         login_user: "{{ jms_account.username }}"
         login_password: "{{ jms_account.secret }}"
         login_secret_type: "{{ jms_account.secret_type }}"
@@ -25,7 +26,7 @@
         login_user: "{{ jms_account.username }}"
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
-        login_port: "{{ jms_asset.port }}"
+        login_port: "{{ asset_port }}"
         login_secret_type: "{{ jms_account.secret_type }}"
         login_private_key_path: "{{ jms_account.private_key_path }}"
         become: "{{ custom_become | default(False) }}"
@@ -46,7 +47,7 @@
         login_user: "{{ account.username }}"
         login_password: "{{ account.secret }}"
         login_host: "{{ jms_asset.address }}"
-        login_port: "{{ jms_asset.port }}"
+        login_port: "{{ asset_port }}"
         become: "{{ account.become.ansible_become | default(False) }}"
         become_method: su
         become_user: "{{ account.become.ansible_user | default('') }}"
