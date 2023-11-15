@@ -6,6 +6,8 @@ __all__ = ['ContentTypeSerializer']
 
 
 class ContentTypeSerializer(serializers.ModelSerializer):
+    app_display = serializers.CharField()
+
     class Meta:
         model = ContentType
-        fields = ('id', 'app_label', 'model', 'name')
+        fields = ('id', 'app_label', 'app_display', 'model', 'name')

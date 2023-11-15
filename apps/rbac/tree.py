@@ -39,6 +39,7 @@ app_nodes_data = [
     {'id': 'rbac', 'view': 'view_console'},
     {'id': 'settings', 'view': 'view_setting'},
     {'id': 'tickets', 'view': 'view_other'},
+    {'id': 'labels', 'view': 'view_label'},
     {'id': 'authentication', 'view': 'view_other'},
 ]
 

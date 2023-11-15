@@ -5,7 +5,7 @@ from rest_framework import serializers
 from common.serializers.fields import ObjectRelatedField
 from .models import Label, LabeledResource
 
-__all__ = ['LabelSerializer', 'LabeledResourceSerializer']
+__all__ = ['LabelSerializer', 'LabeledResourceSerializer', 'ContentTypeResourceSerializer']
 
 
 class LabelSerializer(serializers.ModelSerializer):
@@ -34,3 +34,12 @@ class LabeledResourceSerializer(serializers.ModelSerializer):
         """ Perform necessary eager loading of data. """
         queryset = queryset.select_related('label', 'res_type')
         return queryset
+
+
+class ContentTypeResourceSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    name = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_name(obj):
+        return str(obj)
