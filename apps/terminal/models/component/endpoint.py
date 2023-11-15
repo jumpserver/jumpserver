@@ -41,7 +41,7 @@ class Endpoint(JMSBaseModel):
                 protocol == Protocol.oracle:
             port = db_port_manager.get_port_by_db(target_instance)
         else:
-            if protocol == Protocol.sftp:
+            if protocol == Protocol.sftp or protocol == Protocol.telnet:
                 protocol = Protocol.ssh
             port = getattr(self, f'{protocol}_port', 0)
         return port
