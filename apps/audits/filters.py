@@ -1,11 +1,12 @@
-from django.db.models import F, Value
-from django.db.models.functions import Concat
-from django_filters.rest_framework import CharFilter
+from django.core.cache import cache
+from django_filters import rest_framework as drf_filters
 from rest_framework import filters
 from rest_framework.compat import coreapi, coreschema
 
-from orgs.utils import current_org
 from common.drf.filters import BaseFilterSet
+from notifications.ws import WS_SESSION_KEY
+from orgs.utils import current_org
+from .models import UserSession
 
 __all__ = ['CurrentOrgMembersFilter']
 
@@ -34,21 +35,21 @@ class CurrentOrgMembersFilter(filters.BaseFilterBackend):
             queryset = queryset.filter(user__in=self._get_user_list())
         return queryset
 
-#
-# class CommandExecutionFilter(BaseFilterSet):
-#     hostname_ip = CharFilter(method='filter_hostname_ip')
-#
-#     class Meta:
-#         model = CommandExecution.hosts.through
-#         fields = (
-#             'id', 'asset', 'commandexecution', 'hostname_ip'
-#         )
-#
-#     def filter_hostname_ip(self, queryset, name, value):
-#         queryset = queryset.annotate(
-#             hostname_ip=Concat(
-#                 F('asset__hostname'), Value('('),
-#                 F('asset__address'), Value(')')
-#             )
-#         ).filter(hostname_ip__icontains=value)
-#         return queryset
+
+class UserSessionFilterSet(BaseFilterSet):
+    is_active = drf_filters.BooleanFilter(method='filter_is_active')
+
+    @staticmethod
+    def filter_is_active(queryset, name, is_active):
+        redis_client = cache.client.get_client()
+        members = redis_client.smembers(WS_SESSION_KEY)
+        members = [member.decode('utf-8') for member in members]
+        if is_active:
+            queryset = queryset.filter(key__in=members)
+        else:
+            queryset = queryset.exclude(key__in=members)
+        return queryset
+
+    class Meta:
+        model = UserSession
+        fields = ['id', 'ip', 'city', 'type']

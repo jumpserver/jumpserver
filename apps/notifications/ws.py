@@ -1,23 +1,28 @@
-import threading
 import json
-from channels.generic.websocket import JsonWebsocketConsumer
 
-from common.utils import get_logger
+from channels.generic.websocket import JsonWebsocketConsumer
+from django.core.cache import cache
+
 from common.db.utils import safe_db_connection
-from .site_msg import SiteMessageUtil
+from common.utils import get_logger
 from .signal_handlers import new_site_msg_chan
+from .site_msg import SiteMessageUtil
 
 logger = get_logger(__name__)
+WS_SESSION_KEY = 'ws_session_key'
 
 
 class SiteMsgWebsocket(JsonWebsocketConsumer):
-    refresh_every_seconds = 10
     sub = None
+    refresh_every_seconds = 10
 
     def connect(self):
         user = self.scope["user"]
         if user.is_authenticated:
             self.accept()
+            session = self.scope['session']
+            redis_client = cache.client.get_client()
+            redis_client.sadd(WS_SESSION_KEY, session.session_key)
             self.sub = self.watch_recv_new_site_msg()
         else:
             self.close()
@@ -58,6 +63,9 @@ class SiteMsgWebsocket(JsonWebsocketConsumer):
         return new_site_msg_chan.subscribe(handle_new_site_msg_recv)
 
     def disconnect(self, code):
-        if self.sub:
-            self.sub.unsubscribe()
-
+        if not self.sub:
+            return
+        self.sub.unsubscribe()
+        session = self.scope['session']
+        redis_client = cache.client.get_client()
+        redis_client.srem(WS_SESSION_KEY, session.session_key)

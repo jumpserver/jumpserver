@@ -55,4 +55,4 @@ class IsValidUserOrConnectionToken(IsValidUser):
             return False
         with tmp_to_root_org():
             token = get_object_or_none(ConnectionToken, id=token_id)
-        return token and token.is_valid
+        return token and token.is_valid()

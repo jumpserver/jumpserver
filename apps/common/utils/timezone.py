@@ -20,6 +20,10 @@ def local_now_display(fmt='%Y-%m-%d %H:%M:%S'):
     return local_now().strftime(fmt)
 
 
+def local_now_filename():
+    return local_now().strftime('%Y%m%d-%H%M%S')
+
+
 def local_now_date_display(fmt='%Y-%m-%d'):
     return local_now().strftime(fmt)
 

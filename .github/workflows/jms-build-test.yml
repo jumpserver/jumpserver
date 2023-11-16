@@ -19,8 +19,8 @@ jobs:
       with:
         context: .
         push: false
-        tags: jumpserver/core:test
-        file: Dockerfile
+        tags: jumpserver/core-ce:test
+        file: Dockerfile-ce
         build-args: |
           APT_MIRROR=http://deb.debian.org
           PIP_MIRROR=https://pypi.org/simple

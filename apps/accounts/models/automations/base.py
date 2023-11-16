@@ -33,7 +33,7 @@ class AutomationExecution(AssetAutomationExecution):
         verbose_name_plural = _("Automation executions")
         permissions = [
             ('view_changesecretexecution', _('Can view change secret execution')),
-            ('add_changesecretexection', _('Can add change secret execution')),
+            ('add_changesecretexecution', _('Can add change secret execution')),
 
             ('view_gatheraccountsexecution', _('Can view gather accounts execution')),
             ('add_gatheraccountsexecution', _('Can add gather accounts execution')),

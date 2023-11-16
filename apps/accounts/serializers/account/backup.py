@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from accounts.models import AccountBackupAutomation, AccountBackupExecution
 from common.const.choices import Trigger
-from common.serializers.fields import LabeledChoiceField
+from common.serializers.fields import LabeledChoiceField, EncryptedField
 from common.utils import get_logger
 from ops.mixin import PeriodTaskSerializerMixin
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
@@ -16,6 +16,11 @@ __all__ = ['AccountBackupSerializer', 'AccountBackupPlanExecutionSerializer']
 
 
 class AccountBackupSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSerializer):
+    zip_encrypt_password = EncryptedField(
+        label=_('Zip Encrypt Password'), required=False, max_length=40960, allow_blank=True,
+        allow_null=True, write_only=True,
+    )
+
     class Meta:
         model = AccountBackupAutomation
         read_only_fields = [
@@ -24,7 +29,9 @@ class AccountBackupSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSer
         ]
         fields = read_only_fields + [
             'id', 'name', 'is_periodic', 'interval', 'crontab',
-            'comment', 'types', 'recipients_part_one', 'recipients_part_two'
+            'comment', 'types', 'recipients_part_one', 'recipients_part_two', 'backup_type',
+            'is_password_divided_by_email', 'is_password_divided_by_obj_storage', 'obj_recipients_part_one',
+            'obj_recipients_part_two', 'zip_encrypt_password'
         ]
         extra_kwargs = {
             'name': {'required': True},

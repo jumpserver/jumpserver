@@ -27,6 +27,7 @@ from perms.models import ActionChoices
 from terminal.connect_methods import NativeClient, ConnectMethodUtil
 from terminal.models import EndpointRule, Endpoint
 from users.const import FileNameConflictResolution
+from users.const import RDPSmartSize
 from users.models import Preference
 from ..models import ConnectionToken, date_expired_default
 from ..serializers import (
@@ -66,13 +67,7 @@ class RDPFileClientProtocolURLMixin:
             'autoreconnection enabled:i': '1',
             'bookmarktype:i': '3',
             'use redirection server name:i': '0',
-            'smart sizing:i': '1',
         }
-        # 设置多屏显示
-        multi_mon = is_true(self.request.query_params.get('multi_mon'))
-        if multi_mon:
-            rdp_options['use multimon:i'] = '1'
-
         # 设置多屏显示
         multi_mon = is_true(self.request.query_params.get('multi_mon'))
         if multi_mon:
@@ -106,6 +101,7 @@ class RDPFileClientProtocolURLMixin:
             rdp_options['dynamic resolution:i'] = '0'
 
         # 设置其他选项
+        rdp_options['smart sizing:i'] = self.request.query_params.get('rdp_smart_size', RDPSmartSize.DISABLE)
         rdp_options['session bpp:i'] = os.getenv('JUMPSERVER_COLOR_DEPTH', '32')
         rdp_options['audiomode:i'] = self.parse_env_bool('JUMPSERVER_DISABLE_AUDIO', 'false', '2', '0')
 
@@ -159,7 +155,7 @@ class RDPFileClientProtocolURLMixin:
 
         account = token.account or token.input_username
         datetime = timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H:%M:%S')
-        name = account + '@' + str(asset) + '[' + datetime + ']'
+        name = account + '@' + asset.name + '[' + datetime + ']'
         data = {
             'version': 2,
             'id': str(token.id),  # 兼容老的，未来几个版本删掉
@@ -351,8 +347,9 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         self._insert_connect_options(data, user)
         asset = data.get('asset')
         account_name = data.get('account')
+        protocol = data.get('protocol')
         self.input_username = self.get_input_username(data)
-        _data = self._validate(user, asset, account_name)
+        _data = self._validate(user, asset, account_name, protocol)
         data.update(_data)
         return serializer
 
@@ -360,12 +357,12 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         user = token.user
         asset = token.asset
         account_name = token.account
-        _data = self._validate(user, asset, account_name)
+        _data = self._validate(user, asset, account_name, token.protocol)
         for k, v in _data.items():
             setattr(token, k, v)
         return token
 
-    def _validate(self, user, asset, account_name):
+    def _validate(self, user, asset, account_name, protocol):
         data = dict()
         data['org_id'] = asset.org_id
         data['user'] = user
@@ -374,7 +371,7 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         if account_name == AliasAccount.ANON and asset.category not in ['web', 'custom']:
             raise ValidationError(_('Anonymous account is not supported for this asset'))
 
-        account = self._validate_perm(user, asset, account_name)
+        account = self._validate_perm(user, asset, account_name, protocol)
         if account.has_secret:
             data['input_secret'] = ''
 
@@ -387,9 +384,9 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
         return data
 
     @staticmethod
-    def _validate_perm(user, asset, account_name):
-        from perms.utils.account import PermAccountUtil
-        account = PermAccountUtil().validate_permission(user, asset, account_name)
+    def _validate_perm(user, asset, account_name, protocol):
+        from perms.utils.asset_perm import PermAssetDetailUtil
+        account = PermAssetDetailUtil(user, asset).validate_permission(account_name, protocol)
         if not account or not account.actions:
             msg = _('Account not found')
             raise JMSException(code='perm_account_invalid', detail=msg)

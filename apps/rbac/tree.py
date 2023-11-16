@@ -88,7 +88,7 @@ special_pid_mapper = {
     "accounts.add_gatheraccountsexecution": "gather_account_node",
     "accounts.changesecretautomation": "asset_change_plan_node",
     "accounts.view_changesecretexecution": "asset_change_plan_node",
-    "accounts.add_changesecretexection": "asset_change_plan_node",
+    "accounts.add_changesecretexecution": "asset_change_plan_node",
     "accounts.view_changesecretrecord": "asset_change_plan_node",
     'orgs.organization': 'view_setting',
     'settings.setting': 'view_setting',
@@ -118,6 +118,7 @@ special_pid_mapper = {
     "rbac.view_workbench": "view_workbench",
     "rbac.view_webterminal": "view_workbench",
     "rbac.view_filemanager": "view_workbench",
+    "rbac.view_systemtools": "view_workbench",
     'tickets.view_ticket': 'tickets'
 }
 

@@ -1,4 +1,5 @@
 import ast
+import time
 
 from celery import signals
 from django.core.cache import cache
@@ -82,9 +83,16 @@ def before_task_publish(body=None, **kwargs):
 
 @signals.task_prerun.connect
 def on_celery_task_pre_run(task_id='', kwargs=None, **others):
+    count = 0
+    qs = CeleryTaskExecution.objects.filter(id=task_id)
+    while not qs.exists() and count < 5:
+        count += 1
+        time.sleep(1)
+        qs = CeleryTaskExecution.objects.filter(id=task_id)
+
     # 更新状态
-    CeleryTaskExecution.objects.filter(id=task_id) \
-        .update(state='RUNNING', date_start=timezone.now())
+    qs.update(state='RUNNING', date_start=timezone.now())
+
     # 关闭之前的数据库连接
     close_old_connections()
 

@@ -25,6 +25,7 @@ class AppletHost(Host):
         'terminal.Terminal', on_delete=models.PROTECT, null=True, blank=True,
         related_name='applet_host', verbose_name=_('Terminal')
     )
+    using_same_account = models.BooleanField(default=False, verbose_name=_('Using same account'))
     applets = models.ManyToManyField(
         'Applet', verbose_name=_('Applet'),
         through='AppletPublication', through_fields=('host', 'applet'),

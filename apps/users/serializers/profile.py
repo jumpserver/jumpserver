@@ -113,6 +113,9 @@ class UserProfileSerializer(UserSerializer):
             'console_orgs', 'audit_orgs', 'workbench_orgs',
             'receive_backends', 'perms',
         ]
+        fields_mini = [
+            'id', 'name', 'username', 'email',
+        ]
         fields = UserSerializer.Meta.fields + [
             'public_key_comment', 'public_key_hash_md5', 'guide_url',
         ] + read_only_fields
@@ -141,8 +144,10 @@ class UserProfileSerializer(UserSerializer):
         super().__init__(*args, **kwargs)
         system_roles_field = self.fields.get('system_roles')
         org_roles_field = self.fields.get('org_roles')
-        system_roles_field.read_only = True
-        org_roles_field.read_only = True
+        if system_roles_field:
+            system_roles_field.read_only = True
+        if org_roles_field:
+            org_roles_field.read_only = True
 
     @staticmethod
     def get_guide_url(obj):

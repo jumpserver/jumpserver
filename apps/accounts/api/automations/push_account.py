@@ -42,6 +42,7 @@ class PushAccountExecutionViewSet(AutomationExecutionViewSet):
 
 class PushAccountRecordViewSet(ChangeSecretRecordViewSet):
     serializer_class = serializers.ChangeSecretRecordSerializer
+    tp = AutomationTypes.push_account
 
     def get_queryset(self):
         return ChangeSecretRecord.objects.filter(

@@ -3,7 +3,7 @@ from django.db.models import Q
 
 from assets.models import FavoriteAsset, Asset
 from common.utils.common import timeit
-from perms.models import AssetPermission, PermNode, UserAssetGrantedTreeNodeRelation
+from perms.models import PermNode, UserAssetGrantedTreeNodeRelation
 from .permission import AssetPermissionUtil
 
 __all__ = ['AssetPermissionPermAssetUtil', 'UserPermAssetUtil', 'UserPermNodeUtil']
@@ -218,4 +218,3 @@ class UserPermNodeUtil:
         nodes.extend(list(key_node_mapper.values()))
 
         return nodes
-

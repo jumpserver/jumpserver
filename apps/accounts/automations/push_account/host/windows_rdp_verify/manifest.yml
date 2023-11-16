@@ -1,0 +1,19 @@
+id: push_account_windows_rdp_verify
+name: "{{ 'Windows account push rdp verify' | trans }}"
+version: 1
+method: push_account
+category: host
+type:
+  - windows
+params:
+  - name: groups
+    type: str
+    label: '用户组'
+    default: 'Users,Remote Desktop Users'
+    help_text: '请输入用户组，多个用户组使用逗号分隔（需填写已存在的用户组）'
+
+i18n:
+  Windows account push rdp verify:
+    zh: 使用 Ansible 模块 win_user 执行 Windows 账号推送 RDP 协议测试最后的可连接性
+    ja: Ansibleモジュールwin_userがWindowsアカウントプッシュRDPプロトコルテストを実行する最後の接続性
+    en: Using the Ansible module win_user performs Windows account push RDP protocol testing for final connectivity

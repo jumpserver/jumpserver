@@ -162,7 +162,7 @@ class Applet(JMSBaseModel):
         for host_id in using_host_ids.values():
             counts[host_id] += 1
 
-        hosts = list(sorted(hosts, key=lambda h: counts[h.id]))
+        hosts = list(sorted(hosts, key=lambda h: counts[str(h.id)]))
         return hosts[0] if hosts else None
 
     def select_host(self, user, asset):
@@ -258,6 +258,17 @@ class Applet(JMSBaseModel):
                 account = private_account
         return account
 
+    @staticmethod
+    def try_to_use_same_account(user, host):
+        from accounts.models import VirtualAccount
+
+        if not host.using_same_account:
+            return
+        account = VirtualAccount.get_same_account(user, host)
+        if not account.secret:
+            return
+        return account
+
     def select_host_account(self, user, asset):
         # 选择激活的发布机
         host = self.select_host(user, asset)
@@ -266,7 +277,11 @@ class Applet(JMSBaseModel):
         logger.info('Select applet host: {}'.format(host.name))
 
         valid_accounts = host.accounts.all().filter(is_active=True, privileged=False)
-        account = self.try_to_use_private_account(user, host, valid_accounts)
+        account = self.try_to_use_same_account(user, host)
+        if not account:
+            logger.debug('No same account, try to use private account')
+            account = self.try_to_use_private_account(user, host, valid_accounts)
+
         if not account:
             logger.debug('No private account, try to use public account')
             account = self.select_a_public_account(user, host, valid_accounts)

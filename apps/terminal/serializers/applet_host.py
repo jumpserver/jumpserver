@@ -63,18 +63,27 @@ class AppletHostSerializer(HostSerializer):
         model = AppletHost
         fields = HostSerializer.Meta.fields + [
             'auto_create_accounts', 'accounts_create_amount',
-            'load', 'date_synced', 'deploy_options'
+            'load', 'date_synced', 'deploy_options', 'using_same_account',
         ]
         extra_kwargs = {
             **HostSerializer.Meta.extra_kwargs,
             'date_synced': {'read_only': True},
-            'auto_create_accounts': {'help_text': _(
-                'These accounts are used to connect to the published application, '
-                'the account is now divided into two types, one is dedicated to each account, '
-                'each user has a private account, the other is public, '
-                'when the application does not support multiple open and the special has been used, '
-                'the public account will be used to connect')},
+            'auto_create_accounts': {
+                'help_text': _(
+                    'These accounts are used to connect to the published application, '
+                    'the account is now divided into two types, one is dedicated to each account, '
+                    'each user has a private account, the other is public, '
+                    'when the application does not support multiple open and the special has been used, '
+                    'the public account will be used to connect'
+                )
+            },
             'accounts_create_amount': {'help_text': _('The number of public accounts created automatically')},
+            'using_same_account': {
+                'help_text': _(
+                    'Connect to the host using the same account first. For security reasons, please set the '
+                    'configuration item CACHE_LOGIN_PASSWORD_ENABLED=true and restart the service to enable it.'
+                )
+            }
         }
 
     def __init__(self, *args, data=None, **kwargs):

@@ -105,7 +105,7 @@ class OAuth2Backend(JMSModelBackend):
             'Accept': 'application/json'
         }
         if token_method == 'post':
-            access_token_response = requests_func(access_token_url, headers=headers, json=query_dict)
+            access_token_response = requests_func(access_token_url, headers=headers, data=query_dict)
         else:
             access_token_response = requests_func(access_token_url, headers=headers)
         try:

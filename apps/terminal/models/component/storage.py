@@ -163,6 +163,10 @@ class ReplayStorage(CommonStorageModelMixin, JMSBaseModel):
         return self.type == const.ReplayStorageType.swift.value
 
     @property
+    def type_sftp(self):
+        return self.type == const.ReplayStorageType.sftp.value
+
+    @property
     def type_ceph(self):
         return self.type == const.ReplayStorageType.ceph.value
 

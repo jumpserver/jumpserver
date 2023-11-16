@@ -40,11 +40,16 @@ class Playbook(JMSOrgBaseModel):
         result = []
         for root, dirs, files in os.walk(self.work_dir):
             for f in files:
-                if str(f).endswith('.yml') or str(f).endswith('.yaml'):
-                    lines = self.search_keywords(os.path.join(root, f))
-                    if len(lines) > 0:
-                        for line in lines:
-                            result.append({'file': f, 'line': line[0], 'keyword': line[1]})
+                try:
+                    if str(f).endswith('.yml') or str(f).endswith('.yaml'):
+                        lines = self.search_keywords(os.path.join(root, f))
+                        if len(lines) > 0:
+                            for line in lines:
+                                result.append({'file': f, 'line': line[0], 'keyword': line[1]})
+                # 遇到无法读取的文件，跳过
+                except UnicodeEncodeError:
+                    continue
+
         return result
 
     @staticmethod
@@ -53,12 +58,12 @@ class Playbook(JMSOrgBaseModel):
         with open(file, 'r') as f:
             for line_num, line in enumerate(f):
                 for keyword in dangerous_keywords:
-                    clear_line = line.replace(' ', '')\
-                        .replace('\n', '')\
-                        .replace('\r', '')\
+                    clear_line = line.replace(' ', '') \
+                        .replace('\n', '') \
+                        .replace('\r', '') \
                         .replace('\t', '') \
                         .replace('\'', '') \
-                        .replace('\"', '')\
+                        .replace('\"', '') \
                         .replace('\v', '')
                     if keyword in clear_line:
                         result.append((line_num, keyword))

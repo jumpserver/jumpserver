@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='systemuser',
             name='protocol',
-            field=models.CharField(choices=[('ssh', 'SSH'), ('rdp', 'RDP'), ('telnet', 'Telnet'), ('vnc', 'VNC'), ('mysql', 'MySQL'), ('redis', 'Redis'), ('oracle', 'Oracle'), ('mariadb', 'MariaDB'), ('postgresql', 'PostgreSQL'), ('sqlserver', 'SQLServer'), ('k8s', 'K8S')], default='ssh', max_length=16, verbose_name='Protocol'),
+            field=models.CharField(choices=[('ssh', 'SSH'), ('rdp', 'RDP'), ('telnet', 'Telnet'), ('vnc', 'VNC'), ('mysql', 'MySQL'), ('redis', 'Redis'), ('oracle', 'Oracle'), ('mariadb', 'MariaDB'), ('postgresql', 'PostgreSQL'), ('sqlserver', 'SQLServer'), ('k8s', 'K8s')], default='ssh', max_length=16, verbose_name='Protocol'),
         ),
         migrations.CreateModel(
             name='AccountBackupPlanExecution',

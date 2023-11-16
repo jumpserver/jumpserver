@@ -58,6 +58,8 @@ class _ConnectionTokenAccountSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_su_from(account):
+        if not hasattr(account, 'asset'):
+            return {}
         su_enabled = account.asset.platform.su_enabled
         su_from = account.su_from
         if not su_from or not su_enabled:

@@ -3,12 +3,14 @@
 
 from django.utils.translation import gettext_lazy as _
 from django_filters import utils
+from django_filters import rest_framework as drf_filters
 from rest_framework import viewsets, generics, status
 from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
 
 from common.const.http import GET
+from common.drf.filters import BaseFilterSet
 from terminal import const
 from terminal.filters import CommandStorageFilter, CommandFilter, CommandFilterForStorageTree
 from terminal.models import CommandStorage, ReplayStorage
@@ -102,11 +104,19 @@ class CommandStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
         return Response(data=nodes)
 
 
+class ReplayStorageFilterSet(BaseFilterSet):
+    type_not = drf_filters.CharFilter(field_name='type', exclude=True)
+
+    class Meta:
+        model = ReplayStorage
+        fields = ['name', 'type', 'is_default', 'type_not']
+
+
 class ReplayStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
-    filterset_fields = ('name', 'type', 'is_default')
-    search_fields = filterset_fields
+    search_fields = ('name', 'type', 'is_default')
     queryset = ReplayStorage.objects.all()
     serializer_class = ReplayStorageSerializer
+    filterset_class = ReplayStorageFilterSet
 
 
 class BaseStorageTestConnectiveMixin:
@@ -121,7 +131,7 @@ class BaseStorageTestConnectiveMixin:
             if is_valid:
                 msg = _("Test successful")
             else:
-                msg = _("Test failure: Account invalid")
+                msg = _("Test failure: Please check configuration")
         data = {
             'is_valid': is_valid,
             'msg': msg

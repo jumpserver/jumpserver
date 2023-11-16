@@ -12,9 +12,14 @@ def default_secret():
     return random_string(36)
 
 
+def default_ip_group():
+    return ["*"]
+
+
 class AccessKey(models.Model):
     id = models.UUIDField(verbose_name='AccessKeyID', primary_key=True, default=uuid.uuid4, editable=False)
     secret = models.CharField(verbose_name='AccessKeySecret', default=default_secret, max_length=36)
+    ip_group = models.JSONField(default=default_ip_group, verbose_name=_('IP group'))
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='User',
                              on_delete=common.db.models.CASCADE_SIGNAL_SKIP, related_name='access_keys')
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))

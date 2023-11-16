@@ -52,6 +52,10 @@ class AssetPermissionManager(OrgManager):
         return self.get_queryset().filter(Q(date_start__lte=now) | Q(date_expired__gte=now))
 
 
+def default_protocols():
+    return ['all']
+
+
 class AssetPermission(JMSOrgBaseModel):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     users = models.ManyToManyField(
@@ -68,6 +72,7 @@ class AssetPermission(JMSOrgBaseModel):
     )
     # 特殊的账号: @ALL, @INPUT @USER 默认包含，将来在全局设置中进行控制.
     accounts = models.JSONField(default=list, verbose_name=_("Account"))
+    protocols = models.JSONField(default=default_protocols, verbose_name=_("Protocols"))
     actions = models.IntegerField(default=ActionChoices.connect, verbose_name=_("Actions"))
     date_start = models.DateTimeField(default=timezone.now, db_index=True, verbose_name=_("Date start"))
     date_expired = models.DateTimeField(

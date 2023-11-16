@@ -94,9 +94,16 @@ class PlatformProtocolSerializer(serializers.ModelSerializer):
         setting_fields = protocol_settings.get(protocol, {}).get('setting')
         if not setting_fields:
             return default_field
+
         setting_fields = [{'name': k, **v} for k, v in setting_fields.items()]
         name = '{}ProtocolSettingSerializer'.format(protocol.capitalize())
         return create_serializer_class(name, setting_fields)()
+
+    def validate(self, cleaned_data):
+        name = cleaned_data.get('name')
+        if name in ['winrm']:
+            cleaned_data['public'] = False
+        return cleaned_data
 
     def to_file_representation(self, data):
         return '{name}/{port}'.format(**data)

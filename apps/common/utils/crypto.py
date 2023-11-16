@@ -2,15 +2,14 @@ import base64
 import logging
 import re
 
-from Cryptodome.Cipher import AES, PKCS1_v1_5
-from Cryptodome.Random import get_random_bytes
-from Cryptodome.PublicKey import RSA
-from Cryptodome.Util.Padding import pad
 from Cryptodome import Random
-from gmssl.sm4 import CryptSM4, SM4_ENCRYPT, SM4_DECRYPT
-
+from Cryptodome.Cipher import AES, PKCS1_v1_5
+from Cryptodome.PublicKey import RSA
+from Cryptodome.Random import get_random_bytes
+from Cryptodome.Util.Padding import pad
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from gmssl.sm4 import CryptSM4, SM4_ENCRYPT, SM4_DECRYPT
 
 from common.sdk.gm import piico
 
@@ -248,7 +247,7 @@ class Crypto:
                 continue
 
 
-def gen_key_pair(length=1024):
+def gen_key_pair(length=2048):
     """ 生成加密key
     用于登录页面提交用户名/密码时，对密码进行加密（前端）/解密（后端）
     """

@@ -1,6 +1,5 @@
 import os
 import time
-from collections import defaultdict
 from copy import deepcopy
 
 from django.conf import settings
@@ -14,7 +13,7 @@ from accounts.serializers import ChangeSecretRecordBackUpSerializer
 from assets.const import HostTypes
 from common.utils import get_logger
 from common.utils.file import encrypt_and_compress_zip_file
-from common.utils.timezone import local_now_display
+from common.utils.timezone import local_now_filename
 from users.models import User
 from ..base.manager import AccountBasePlaybookManager
 from ...utils import SecretGenerator
@@ -27,7 +26,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.method_hosts_mapper = defaultdict(list)
+        self.record_id = self.execution.snapshot.get('record_id')
         self.secret_type = self.execution.snapshot.get('secret_type')
         self.secret_strategy = self.execution.snapshot.get(
             'secret_strategy', SecretStrategy.custom
@@ -50,7 +49,9 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         kwargs['exclusive'] = 'yes' if kwargs['strategy'] == SSHKeyStrategy.set else 'no'
 
         if kwargs['strategy'] == SSHKeyStrategy.set_jms:
-            kwargs['dest'] = '/home/{}/.ssh/authorized_keys'.format(account.username)
+            username = account.username
+            path = f'/{username}' if username == "root" else f'/home/{username}'
+            kwargs['dest'] = f'{path}/.ssh/authorized_keys'
             kwargs['regexp'] = '.*{}$'.format(secret.split()[2].strip())
         return kwargs
 
@@ -96,17 +97,13 @@ class ChangeSecretManager(AccountBasePlaybookManager):
 
         accounts = self.get_accounts(account)
         if not accounts:
-            print('没有发现待改密账号: %s 用户ID: %s 类型: %s' % (
+            print('没有发现待处理的账号: %s 用户ID: %s 类型: %s' % (
                 asset.name, self.account_ids, self.secret_type
             ))
             return []
 
-        method_attr = getattr(automation, self.method_type() + '_method')
-        method_hosts = self.method_hosts_mapper[method_attr]
-        method_hosts = [h for h in method_hosts if h != host['name']]
-        inventory_hosts = []
         records = []
-
+        inventory_hosts = []
         if asset.type == HostTypes.WINDOWS and self.secret_type == SecretType.SSH_KEY:
             print(f'Windows {asset} does not support ssh key push')
             return inventory_hosts
@@ -116,13 +113,20 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             h = deepcopy(host)
             secret_type = account.secret_type
             h['name'] += '(' + account.username + ')'
-            new_secret = self.get_secret(secret_type)
+            if self.secret_type is None:
+                new_secret = account.secret
+            else:
+                new_secret = self.get_secret(secret_type)
 
-            recorder = ChangeSecretRecord(
-                asset=asset, account=account, execution=self.execution,
-                old_secret=account.secret, new_secret=new_secret,
-            )
-            records.append(recorder)
+            if self.record_id is None:
+                recorder = ChangeSecretRecord(
+                    asset=asset, account=account, execution=self.execution,
+                    old_secret=account.secret, new_secret=new_secret,
+                )
+                records.append(recorder)
+            else:
+                recorder = ChangeSecretRecord.objects.get(id=self.record_id)
+
             self.name_recorder_mapper[h['name']] = recorder
 
             private_key_path = None
@@ -136,13 +140,12 @@ class ChangeSecretManager(AccountBasePlaybookManager):
                 'username': account.username,
                 'secret_type': secret_type,
                 'secret': new_secret,
-                'private_key_path': private_key_path
+                'private_key_path': private_key_path,
+                'become': account.get_ansible_become_auth(),
             }
             if asset.platform.type == 'oracle':
                 h['account']['mode'] = 'sysdba' if account.privileged else None
             inventory_hosts.append(h)
-            method_hosts.append(h['name'])
-        self.method_hosts_mapper[method_attr] = method_hosts
         ChangeSecretRecord.objects.bulk_create(records)
         return inventory_hosts
 
@@ -170,7 +173,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         recorder.save()
 
     def on_runner_failed(self, runner, e):
-        logger.error("Change secret error: ", e)
+        logger.error("Account error: ", e)
 
     def check_secret(self):
         if self.secret_strategy == SecretStrategy.custom \
@@ -180,9 +183,11 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         return True
 
     def run(self, *args, **kwargs):
-        if not self.check_secret():
+        if self.secret_type and not self.check_secret():
             return
         super().run(*args, **kwargs)
+        if self.record_id:
+            return
         recorders = self.name_recorder_mapper.values()
         recorders = list(recorders)
         self.send_recorder_mail(recorders)
@@ -196,7 +201,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
 
         name = self.execution.snapshot['name']
         path = os.path.join(os.path.dirname(settings.BASE_DIR), 'tmp')
-        filename = os.path.join(path, f'{name}-{local_now_display()}-{time.time()}.xlsx')
+        filename = os.path.join(path, f'{name}-{local_now_filename()}-{time.time()}.xlsx')
         if not self.create_file(recorders, filename):
             return
 
@@ -204,7 +209,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             attachments = []
             if user.secret_key:
                 password = user.secret_key.encode('utf8')
-                attachment = os.path.join(path, f'{name}-{local_now_display()}-{time.time()}.zip')
+                attachment = os.path.join(path, f'{name}-{local_now_filename()}-{time.time()}.zip')
                 encrypt_and_compress_zip_file(attachment, password, [filename])
                 attachments = [attachment]
             ChangeSecretExecutionTaskMsg(name, user).publish(attachments)

@@ -1,8 +1,7 @@
+import hashlib
 import json
 import os
 import shutil
-from collections import defaultdict
-from hashlib import md5
 from socket import gethostname
 
 import yaml
@@ -37,8 +36,6 @@ class BasePlaybookManager:
         }
         # 根据执行方式就行分组, 不同资产的改密、推送等操作可能会使用不同的执行方式
         # 然后根据执行方式分组, 再根据 bulk_size 分组, 生成不同的 playbook
-        # 避免一个 playbook 中包含太多的主机
-        self.method_hosts_mapper = defaultdict(list)
         self.playbooks = []
         self.gateway_servers = dict()
         params = self.execution.snapshot.get('params')
@@ -146,7 +143,7 @@ class BasePlaybookManager:
 
     @staticmethod
     def generate_private_key_path(secret, path_dir):
-        key_name = '.' + md5(secret.encode('utf-8')).hexdigest()
+        key_name = '.' + hashlib.md5(secret.encode('utf-8')).hexdigest()
         key_path = os.path.join(path_dir, key_name)
 
         if not os.path.exists(key_path):

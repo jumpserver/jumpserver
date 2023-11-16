@@ -61,6 +61,7 @@ JumpServer 堡垒机帮助企业以更安全的方式管控和登录各种类型
 
 ## 案例研究
 
+- [腾讯音乐娱乐集团：基于JumpServer的安全运维审计解决方案](https://blog.fit2cloud.com/?p=a04cdf0d-6704-4d18-9b40-9180baecd0e2)
 - [腾讯海外游戏：基于JumpServer构建游戏安全运营能力](https://blog.fit2cloud.com/?p=3704)
 - [万华化学：通过JumpServer管理全球化分布式IT资产，并且实现与云管平台的联动](https://blog.fit2cloud.com/?p=3504)
 - [雪花啤酒：JumpServer堡垒机使用体会](https://blog.fit2cloud.com/?p=3412)
@@ -97,7 +98,7 @@ JumpServer 堡垒机帮助企业以更安全的方式管控和登录各种类型
 | [Magnus](https://github.com/jumpserver/magnus-release) | <a href="https://github.com/jumpserver/magnus-release/releases"><img alt="Magnus release" src="https://img.shields.io/github/release/jumpserver/magnus-release.svg" /> | JumpServer 数据库代理 Connector 项目                                                     |
 | [Chen](https://github.com/jumpserver/chen-release)     | <a href="https://github.com/jumpserver/chen-release/releases"><img alt="Chen release" src="https://img.shields.io/github/release/jumpserver/chen-release.svg" />       | JumpServer Web DB 项目，替代原来的 OmniDB                                                 |
 | [Kael](https://github.com/jumpserver/kael)             | <a href="https://github.com/jumpserver/kael/releases"><img alt="Kael release" src="https://img.shields.io/github/release/jumpserver/kael.svg" />                       | JumpServer 连接 GPT 资产的组件项目                                                         |
-| [Wisp](https://github.com/jumpserver/wisp)             | <a href="https://github.com/jumpserver/wisp/releases"><img alt="Magnus release" src="https://img.shields.io/github/release/jumpserver/wisp.svg" />                     | JumpServer 各系统终端组件和 Core Api 通信的组件项目                                              |
+| [Wisp](https://github.com/jumpserver/wisp)             | <a href="https://github.com/jumpserver/wisp/releases"><img alt="Magnus release" src="https://img.shields.io/github/release/jumpserver/wisp.svg" />                     | JumpServer 各系统终端组件和 Core API 通信的组件项目                                              |
 | [Clients](https://github.com/jumpserver/clients)       | <a href="https://github.com/jumpserver/clients/releases"><img alt="Clients release" src="https://img.shields.io/github/release/jumpserver/clients.svg" />              | JumpServer 客户端 项目                                                                 |
 | [Installer](https://github.com/jumpserver/installer)   | <a href="https://github.com/jumpserver/installer/releases"><img alt="Installer release" src="https://img.shields.io/github/release/jumpserver/installer.svg" />        | JumpServer 安装包 项目                                                                 |
 

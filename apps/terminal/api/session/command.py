@@ -1,26 +1,25 @@
 # -*- coding: utf-8 -*-
 #
-from django.utils import translation
 from django.utils import timezone
 from rest_framework import generics
 from rest_framework.fields import DateTimeField
 from rest_framework.response import Response
 
 from acls.models import CommandFilterACL, CommandGroup
-from terminal.models import CommandStorage, Session, Command
-from terminal.filters import CommandFilter
-from orgs.utils import current_org
 from common.api import JMSBulkModelViewSet
 from common.utils import get_logger
-from terminal.serializers import (
-    SessionCommandSerializer,  InsecureCommandAlertSerializer
-)
-from terminal.exceptions import StorageInvalid
+from orgs.utils import current_org
 from terminal.backends import (
     get_command_storage, get_multi_command_storage
 )
-from terminal.notifications import CommandAlertMessage, CommandWarningMessage
 from terminal.const import RiskLevelChoices
+from terminal.exceptions import StorageInvalid
+from terminal.filters import CommandFilter
+from terminal.models import CommandStorage, Session, Command
+from terminal.notifications import CommandAlertMessage, CommandWarningMessage
+from terminal.serializers import (
+    SessionCommandSerializer, InsecureCommandAlertSerializer
+)
 
 logger = get_logger(__name__)
 __all__ = ['CommandViewSet', 'InsecureCommandAlertAPI']
@@ -140,8 +139,8 @@ class CommandViewSet(JMSBulkModelViewSet):
         if session_id and not command_storage_id:
             # 会话里的命令列表肯定会提供 session_id，这里防止 merge 的时候取全量的数据
             return self.merge_all_storage_list(request, *args, **kwargs)
-
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.get_queryset()
+        queryset = self.filter_queryset(queryset)
 
         page = self.paginate_queryset(queryset)
         if page is not None:

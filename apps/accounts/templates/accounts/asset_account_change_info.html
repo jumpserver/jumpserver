@@ -1,0 +1,20 @@
+{% load i18n %}
+
+
+<table style="width: 100%; border-collapse: collapse; max-width: 100%; text-align: left; margin-top: 20px;">
+    <caption></caption>
+    <tr style="background-color: #f2f2f2;">
+        <th style="border: 1px solid #ddd; padding: 10px; font-weight: bold;">{% trans 'Asset' %}</th>
+        <th style="border: 1px solid #ddd; padding: 10px;">{% trans 'Added account' %}</th>
+        <th style="border: 1px solid #ddd; padding: 10px;">{% trans 'Deleted account' %}</th>
+    </tr>
+    {% for name, change in change_info.items %}
+        <tr style="{% cycle 'background-color: #ebf5ff;' 'background-color: #fff;' %}">
+            <td style="border: 1px solid #ddd; padding: 10px;">{{ name }}</td>
+            <td style="border: 1px solid #ddd; padding: 10px;">{{ change.add_usernames }}</td>
+            <td style="border: 1px solid #ddd; padding: 10px;">{{ change.remove_usernames }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+

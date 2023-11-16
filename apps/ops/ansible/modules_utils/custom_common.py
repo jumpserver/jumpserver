@@ -26,6 +26,9 @@ def common_argument_spec():
 
 
 class SSHClient:
+    SLEEP_INTERVAL = 2
+    COMPLETE_FLAG = 'complete'
+
     def __init__(self, module):
         self.module = module
         self.channel = None
@@ -85,7 +88,10 @@ class SSHClient:
         su_output, err_msg = self.execute(commands)
         if err_msg:
             return err_msg
-        i_output, err_msg = self.execute(['whoami'], delay_time=1)
+        i_output, err_msg = self.execute(
+            [f'whoami && echo "{self.COMPLETE_FLAG}"'],
+            validate_output=True
+        )
         if err_msg:
             return err_msg
 
@@ -153,15 +159,21 @@ class SSHClient:
         output = self.channel.recv(size).decode(encoding)
         return output
 
-    def execute(self, commands, delay_time=0.3):
+    def execute(self, commands, validate_output=False):
         if not self.is_connect:
             self.connect()
         output, error_msg = '', ''
         try:
             for command in commands:
                 self.channel.send(command + '\n')
-                time.sleep(delay_time)
-                output = self._get_recv()
+                if not validate_output:
+                    time.sleep(self.SLEEP_INTERVAL)
+                    output += self._get_recv()
+                    continue
+                while self.COMPLETE_FLAG not in output:
+                    time.sleep(self.SLEEP_INTERVAL)
+                    received_output = self._get_recv().replace(f'"{self.COMPLETE_FLAG}"', '')
+                    output += received_output
         except Exception as e:
             error_msg = str(e)
         return output, error_msg
