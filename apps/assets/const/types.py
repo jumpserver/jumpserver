@@ -61,8 +61,8 @@ class AllTypes(ChoicesMixin):
 
     @classmethod
     def get_automation_methods(cls):
-        from assets.automations.methods import platform_automation_methods as asset_methods
-        from accounts.automations.methods import platform_automation_methods as account_methods
+        from assets.automations import platform_automation_methods as asset_methods
+        from accounts.automations import platform_automation_methods as account_methods
         return asset_methods + account_methods
 
     @classmethod
