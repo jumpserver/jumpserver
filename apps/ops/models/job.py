@@ -298,10 +298,18 @@ class JobExecution(JMSOrgBaseModel):
         db_module_name_map = {
             'mysql': 'community.mysql.mysql_query',
             'postgresql': 'community.postgresql.postgresql_query',
-            'sqlserver': 'community.general.mssql_script:',
+            'sqlserver': 'community.general.mssql_script',
+        }
+        extra_query_token_map = {
+            'sqlserver': 'script'
+        }
+        extra_login_db_token_map = {
+            'sqlserver': 'name'
         }
 
         if module in db_modules:
+            login_db_token = extra_login_db_token_map.get(module, 'login_db')
+            query_token = extra_query_token_map.get(module, 'query')
             module = db_module_name_map.get(module, None)
             if not module:
                 print('not support db module: {}'.format(module))
@@ -311,8 +319,9 @@ class JobExecution(JMSOrgBaseModel):
                          "login_user={{login_user}} " \
                          "login_password={{login_password}} " \
                          "login_port={{login_port}} " \
-                         "login_db={{login_db}}"
-            shell = "{} query=\"{}\" ".format(login_args, self.current_job.args)
+                         "%s={{login_db}}" % login_db_token
+            print(login_args)
+            shell = "{} {}=\"{}\" ".format(login_args, query_token, self.current_job.args)
             return module, shell
 
         if module == 'win_shell':
