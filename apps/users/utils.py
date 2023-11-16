@@ -11,7 +11,7 @@ from django.conf import settings
 from django.core.cache import cache
 
 from common.tasks import send_mail_async
-from common.utils import reverse, get_object_or_none, ip
+from common.utils import reverse, get_object_or_none, ip, safe_next_url
 from .models import User
 
 logger = logging.getLogger('jumpserver.users')
@@ -49,6 +49,7 @@ def redirect_user_first_login_or_index(request, redirect_field_name):
     url = request.POST.get(redirect_field_name)
     if not url:
         url = request.GET.get(redirect_field_name)
+    url = safe_next_url(url, request=request)
     # 防止 next 地址为 None
     if not url or url.lower() in ['none']:
         url = reverse('index')
