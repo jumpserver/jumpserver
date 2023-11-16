@@ -1,9 +1,9 @@
 - hosts: custom
   gather_facts: no
   vars:
+    asset_port: "{{ jms_asset.protocols | selectattr('name', 'equalto', 'ssh') | map(attribute='port') | first }}"
     ansible_connection: local
     ansible_become: false
-    asset_port: "{{ jms_asset.protocols | selectattr('name', 'equalto', 'ssh') | map(attribute='port') | first }}"
 
   tasks:
     - name: Test privileged account (paramiko)
@@ -20,6 +20,7 @@
         become_password: "{{ custom_become_password | default('') }}"
         become_private_key_path: "{{ custom_become_private_key_path | default(None) }}"
       register: ping_info
+      delegate_to: localhost
 
     - name: Change asset password (paramiko)
       custom_command:
@@ -41,6 +42,7 @@
       ignore_errors: true
       when: ping_info is succeeded
       register: change_info
+      delegate_to: localhost
 
     - name: Verify password (paramiko)
       ssh_ping:
@@ -53,3 +55,4 @@
         become_user: "{{ account.become.ansible_user | default('') }}"
         become_password: "{{ account.become.ansible_password | default('') }}"
         become_private_key_path: "{{ account.become.ansible_ssh_private_key_file | default(None) }}"
+      delegate_to: localhost
