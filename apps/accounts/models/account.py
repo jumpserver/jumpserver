@@ -71,7 +71,7 @@ class Account(AbsConnectivity, BaseAccount):
         ]
 
     def __str__(self):
-        return '{}'.format(self.username)
+        return '{}({})'.format(self.name, self.asset.name)
 
     @lazyproperty
     def platform(self):

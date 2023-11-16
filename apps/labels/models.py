@@ -29,6 +29,9 @@ class LabeledResource(JMSOrgBaseModel):
     res_id = models.CharField(max_length=36, verbose_name=_("Resource ID"), db_index=True)
     resource = GenericForeignKey('res_type', 'res_id')
 
+    class Meta:
+        unique_together = [('label', 'res_type', 'res_id', 'org_id')]
+        verbose_name = _('Labeled resource')
+
     def __str__(self):
         return '{} => {}'.format(self.label, self.resource)
-

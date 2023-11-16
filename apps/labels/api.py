@@ -1,4 +1,6 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from common.api.generic import JMSBulkModelViewSet
 from orgs.mixins.api import OrgBulkModelViewSet
@@ -58,6 +60,42 @@ class ContentTypeViewSet(JMSBulkModelViewSet):
         if keyword:
             queryset = content_type.filter_queryset(queryset, keyword)
         return self.get_paginated_response_from_queryset(queryset)
+
+
+class LabelContentTypeResourceViewSet(JMSBulkModelViewSet):
+    serializer_class = serializers.ContentTypeResourceSerializer
+    rbac_perms = {
+        'default': 'labels.view_labeledresource',
+        'update': 'labels.change_labeledresource',
+    }
+
+    def get_queryset(self):
+        label_pk = self.kwargs.get('label')
+        res_type = self.kwargs.get('res_type')
+        label = get_object_or_404(Label, pk=label_pk)
+
+        res_ids = LabeledResource.objects.filter(res_type=res_type, label=label).values_list('res_id', flat=True)
+        content_type = get_object_or_404(ContentType, id=res_type)
+        model = content_type.model_class()
+        queryset = model.objects.filter(id__in=res_ids)
+        keyword = self.request.query_params.get('search')
+        if keyword:
+            queryset = content_type.filter_queryset(queryset, keyword)
+        return queryset
+
+    def update(self, request, *args, **kwargs):
+        label_pk = self.kwargs.get('label')
+        res_type = self.kwargs.get('res_type')
+        content_type = get_object_or_404(ContentType, id=res_type)
+        label = get_object_or_404(Label, pk=label_pk)
+        res_ids = request.data.get('res_ids', [])
+
+        LabeledResource.objects.filter(res_type=content_type, label=label).exclude(res_id__in=res_ids).delete()
+        resources = []
+        for res_id in res_ids:
+            resources.append(LabeledResource(res_type=res_type, res_id=res_id, label=label))
+        LabeledResource.objects.bulk_create(resources, ignore_conflicts=True)
+        return Response(status=200)
 
 
 class LabelViewSet(OrgBulkModelViewSet):
