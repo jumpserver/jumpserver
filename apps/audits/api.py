@@ -29,6 +29,7 @@ from terminal.models import default_storage
 from users.models import User
 from .backends import TYPE_ENGINE_MAPPING
 from .const import ActivityChoices
+from .filters import UserSessionFilterSet
 from .models import (
     FTPLog, UserLoginLog, OperateLog, PasswordChangeLog,
     ActivityLog, JobLog, UserSession
@@ -255,7 +256,7 @@ class PasswordChangeLogViewSet(OrgReadonlyModelViewSet):
 class UserSessionViewSet(CommonApiMixin, viewsets.ModelViewSet):
     http_method_names = ('get', 'post', 'head', 'options', 'trace')
     serializer_class = UserSessionSerializer
-    filterset_fields = ['id', 'ip', 'city', 'type']
+    filterset_class = UserSessionFilterSet
     search_fields = ['id', 'ip', 'city']
     rbac_perms = {
         'offline': ['audits.offline_usersession']
