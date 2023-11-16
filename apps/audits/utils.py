@@ -65,7 +65,11 @@ def _get_instance_field_value(
                         continue
                     data.setdefault(k, v)
                 continue
-            data.setdefault(str(f.verbose_name), value)
+            try:
+                data.setdefault(str(f.verbose_name), value)
+            except Exception as e:
+                print(f.__dict__)
+                raise e
     return data
 
 
