@@ -142,25 +142,3 @@ class EndMiddleware:
         response = self.get_response(request)
         request._e_time_end = time.time()
         return response
-
-
-class TranslatePatchMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        from assets.automations import methods as assets
-        from accounts.automations import methods as accounts
-        language = request.LANGUAGE_CODE
-        if language != settings.LANGUAGE_CODE:
-            settings.LANGUAGE_CODE = language
-            assets.platform_automation_methods = \
-                assets.get_platform_automation_methods(
-                    assets.BASE_DIR
-                )
-            accounts.platform_automation_methods = \
-                accounts.get_platform_automation_methods(
-                    accounts.BASE_DIR
-                )
-        response = self.get_response(request)
-        return response
