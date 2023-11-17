@@ -142,6 +142,9 @@ def delay_run(ttl=5, key=None):
 
     def inner(func):
         suffix_key_func = key if key else default_suffix_key
+        sigs = inspect.signature(func)
+        if len(sigs.parameters) != 0:
+            raise ValueError('Merge delay run must not arguments: %s' % func.__name__)
 
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -201,8 +204,8 @@ def merge_delay_run(ttl=5, key=None):
 
 
 @delay_run(ttl=5)
-def test_delay_run(username):
-    print("Hello, %s, now is %s" % (username, time.time()))
+def test_delay_run():
+    print("Hello,  now is %s" % time.time())
 
 
 @merge_delay_run(ttl=5, key=lambda users=(): users[0][0])
