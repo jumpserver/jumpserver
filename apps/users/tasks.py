@@ -88,8 +88,8 @@ def check_unused_users():
     uncommon_users_ttl = settings.SECURITY_UNCOMMON_USERS_TTL
     seconds_to_subtract = uncommon_users_ttl * 24 * 60 * 60
     t = timezone.now() - timedelta(seconds=seconds_to_subtract)
-    last_login_q = Q(last_login__lte=t) | Q(last_login__isnull=True)
-    api_key_q = Q(date_api_key_last_used__lte=t) | Q(date_api_key_last_used__isnull=True)
+    last_login_q = Q(last_login__lte=t) | (Q(last_login__isnull=True) & Q(date_joined__lte=t))
+    api_key_q = Q(date_api_key_last_used__lte=t) | (Q(date_api_key_last_used__isnull=True) & Q(date_joined__lte=t))
 
     users = User.objects \
         .filter(date_joined__lt=t) \
@@ -99,6 +99,7 @@ def check_unused_users():
 
     if not users:
         return
+
     print("Some users are not used for a long time, and they will be disabled.")
     resource_ids = []
     for user in users:
