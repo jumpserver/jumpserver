@@ -73,6 +73,7 @@ executor = ThreadPoolExecutor(
 )
 _loop_debouncer_func_task_cache = {}
 _loop_debouncer_func_args_cache = {}
+_loop_debouncer_func_task_time_cache = {}
 
 
 def get_loop():
@@ -91,11 +92,19 @@ def cancel_or_remove_debouncer_task(cache_key):
 
 def run_debouncer_func(cache_key, org, ttl, func, *args, **kwargs):
     cancel_or_remove_debouncer_task(cache_key)
+    max_ttl = 2 * ttl
+    current = time.time()
+    first_run_time = _loop_debouncer_func_task_time_cache.get(cache_key, time.time())
+    if current - first_run_time > max_ttl:
+        run_func_partial = functools.partial(_run_func_with_org, cache_key, org, func)
+        executor.submit(run_func_partial)
+        return
     run_func_partial = functools.partial(_run_func_with_org, cache_key, org, func)
     loop = _loop_thread.get_loop()
     _debouncer = Debouncer(run_func_partial, lambda: True, ttl, loop=loop, executor=executor)
     task = asyncio.run_coroutine_threadsafe(_debouncer(*args, **kwargs), loop=loop)
     _loop_debouncer_func_task_cache[cache_key] = task
+    _loop_debouncer_func_task_time_cache[cache_key] = current
 
 
 class Debouncer(object):
@@ -130,6 +139,7 @@ def _run_func_with_org(key, org, func, *args, **kwargs):
         logger.error('delay run error: %s' % e)
     _loop_debouncer_func_task_cache.pop(key, None)
     _loop_debouncer_func_args_cache.pop(key, None)
+    _loop_debouncer_func_task_time_cache.pop(key, None)
 
 
 def delay_run(ttl=5, key=None):
