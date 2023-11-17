@@ -2,6 +2,7 @@ import copy
 from datetime import datetime
 from itertools import chain
 
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.db import models
 
 from common.db.fields import RelatedManager
@@ -64,6 +65,8 @@ def _get_instance_field_value(
                     if exclude_fields and k in exclude_fields:
                         continue
                     data.setdefault(k, v)
+                continue
+            elif isinstance(f, GenericForeignKey):
                 continue
             try:
                 data.setdefault(str(f.verbose_name), value)

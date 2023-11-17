@@ -120,8 +120,9 @@ class LabelViewSet(OrgBulkModelViewSet):
 
 class LabeledResourceViewSet(OrgBulkModelViewSet):
     model = LabeledResource
-    filterset_fields = ("label__name", "label__value", "res_type", "res_id")
+    filterset_fields = ("label__name", "label__value", "res_type", "res_id", "label")
     search_fields = filterset_fields
     serializer_classes = {
         'default': serializers.LabeledResourceSerializer,
     }
+    ordering_fields = ('res_type', 'date_created')
