@@ -26,14 +26,12 @@ def update_token_last_used(tokens=()):
 
 @merge_delay_run(ttl=5)
 def update_user_last_used(users=()):
-    print(">>> Change user last used")
     for user in users:
         user.date_api_key_last_used = timezone.now()
         user.save(update_fields=['date_api_key_last_used'])
 
 
 def after_authenticate_update_date(user, token=None):
-    print("after_authenticate_update_date")
     update_user_last_used((user,))
     if token:
         update_token_last_used((token,))

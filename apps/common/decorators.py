@@ -92,10 +92,14 @@ def cancel_or_remove_debouncer_task(cache_key):
 
 def run_debouncer_func(cache_key, org, ttl, func, *args, **kwargs):
     cancel_or_remove_debouncer_task(cache_key)
-    max_ttl = 2 * ttl
+
     current = time.time()
-    first_run_time = _loop_debouncer_func_task_time_cache.get(cache_key, time.time())
-    if current - first_run_time > max_ttl:
+    first_run_time = _loop_debouncer_func_task_time_cache.get(cache_key, None)
+    if first_run_time is None:
+        _loop_debouncer_func_task_time_cache[cache_key] = current
+        first_run_time = current
+
+    if current - first_run_time > ttl:
         run_func_partial = functools.partial(_run_func_with_org, cache_key, org, func)
         executor.submit(run_func_partial)
         return
@@ -104,7 +108,6 @@ def run_debouncer_func(cache_key, org, ttl, func, *args, **kwargs):
     _debouncer = Debouncer(run_func_partial, lambda: True, ttl, loop=loop, executor=executor)
     task = asyncio.run_coroutine_threadsafe(_debouncer(*args, **kwargs), loop=loop)
     _loop_debouncer_func_task_cache[cache_key] = task
-    _loop_debouncer_func_task_time_cache[cache_key] = current
 
 
 class Debouncer(object):
