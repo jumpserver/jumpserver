@@ -320,7 +320,6 @@ class JobExecution(JMSOrgBaseModel):
                          "login_password={{login_password}} " \
                          "login_port={{login_port}} " \
                          "%s={{login_db}}" % login_db_token
-            print(login_args)
             shell = "{} {}=\"{}\" ".format(login_args, query_token, self.current_job.args)
             return module, shell
 
