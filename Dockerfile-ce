@@ -44,8 +44,8 @@ ARG TOOLS="                           \
         wget"
 
 ARG APT_MIRROR=http://mirrors.ustc.edu.cn
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=core \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core-apt \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=core-apt \
     sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
     && rm -f /etc/apt/apt.conf.d/docker-clean \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
@@ -63,9 +63,9 @@ RUN --mount=type=cache,target=/root/.cache \
     --mount=type=bind,source=pyproject.toml,target=/opt/jumpserver/pyproject.toml \
     set -ex \
     && python3 -m venv /opt/py3 \
-    && . /opt/py3/bin/activate \
     && pip install poetry -i ${PIP_MIRROR} \
     && poetry config virtualenvs.create false \
+    && . /opt/py3/bin/activate \
     && poetry install
 
 FROM python:3.11-slim-bullseye
@@ -75,8 +75,8 @@ ENV LANG=zh_CN.UTF-8 \
 
 ARG DEPENDENCIES="                    \
         libjpeg-dev                   \
-        libxmlsec1-openssl            \
-        libx11-dev"
+        libx11-dev                    \
+        libxmlsec1-openssl"
 
 ARG TOOLS="                           \
         ca-certificates               \
@@ -94,8 +94,8 @@ ARG TOOLS="                           \
         wget"
 
 ARG APT_MIRROR=http://mirrors.ustc.edu.cn
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=core \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core-apt \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=core-apt \
     sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
     && rm -f /etc/apt/apt.conf.d/docker-clean \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
@@ -118,7 +118,6 @@ ARG VERSION
 ENV VERSION=$VERSION
 
 VOLUME /opt/jumpserver/data
-VOLUME /opt/jumpserver/logs
 
 EXPOSE 8080
 
