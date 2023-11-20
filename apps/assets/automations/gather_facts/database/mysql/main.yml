@@ -2,6 +2,7 @@
   gather_facts: no
   vars:
     ansible_python_interpreter: /opt/py3/bin/python
+    jms_use_ssl: "{{ jms_asset.spec_info.use_ssl }}"
 
   tasks:
     - name: Get info
@@ -10,10 +11,10 @@
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
-        check_hostname: "{{ omit if not jms_asset.spec_info.use_ssl else jms_asset.spec_info.allow_invalid_cert }}"
-        ca_cert: "{{ jms_asset.secret_info.ca_cert | default(omit) }}"
-        client_cert: "{{ jms_asset.secret_info.client_cert | default(omit) }}"
-        client_key: "{{ jms_asset.secret_info.client_key  | default(omit) }}"
+        check_hostname: "{{ omit if not jms_use_ssl else jms_asset.spec_info.allow_invalid_cert }}"
+        ca_cert: "{{ omit if not jms_use_ssl else jms_asset.secret_info.ca_cert }}"
+        client_cert: "{{ omit if not jms_use_ssl else jms_asset.secret_info.client_cert }}"
+        client_key: "{{ omit if not jms_use_ssl else jms_asset.secret_info.client_key }}"
         filter: version
       register: db_info
 
