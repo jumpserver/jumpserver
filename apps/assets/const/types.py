@@ -2,9 +2,11 @@ import json
 from collections import defaultdict
 from copy import deepcopy
 
+from django.conf import settings
 from django.utils.translation import gettext as _
 
 from common.db.models import ChoicesMixin
+from jumpserver.utils import get_current_request
 from .category import Category
 from .cloud import CloudTypes
 from .custom import CustomTypes
@@ -22,6 +24,8 @@ class AllTypes(ChoicesMixin):
         CloudTypes, WebTypes, CustomTypes, GPTTypes
     ]
     _category_constrains = {}
+    _automation_methods = None
+    _current_language = settings.LANGUAGE_CODE
 
     @classmethod
     def choices(cls):
@@ -61,9 +65,28 @@ class AllTypes(ChoicesMixin):
 
     @classmethod
     def get_automation_methods(cls):
-        from assets.automations import platform_automation_methods as asset_methods
-        from accounts.automations import platform_automation_methods as account_methods
-        return asset_methods + account_methods
+        from assets.automations import methods as asset
+        from accounts.automations import methods as account
+
+        automation_methods = \
+            asset.platform_automation_methods + \
+            account.platform_automation_methods
+
+        request = get_current_request()
+        if request is None:
+            return automation_methods
+
+        language = request.LANGUAGE_CODE
+        if cls._automation_methods is not None and language == cls._current_language:
+            automation_methods = cls._automation_methods
+        else:
+            automation_methods = \
+                asset.get_platform_automation_methods(asset.BASE_DIR, language) + \
+                account.get_platform_automation_methods(account.BASE_DIR, language)
+
+        cls._current_language = language
+        cls._automation_methods = automation_methods
+        return cls._automation_methods
 
     @classmethod
     def set_automation_methods(cls, category, tp_name, constraints):

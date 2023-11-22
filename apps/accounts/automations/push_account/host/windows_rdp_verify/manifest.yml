@@ -10,10 +10,15 @@ params:
     type: str
     label: '用户组'
     default: 'Users,Remote Desktop Users'
-    help_text: '请输入用户组，多个用户组使用逗号分隔（需填写已存在的用户组）'
+    help_text: "{{ 'Params groups help text' | trans }}"
 
 i18n:
   Windows account push rdp verify:
-    zh: 使用 Ansible 模块 win_user 执行 Windows 账号推送 RDP 协议测试最后的可连接性
-    ja: Ansibleモジュールwin_userがWindowsアカウントプッシュRDPプロトコルテストを実行する最後の接続性
-    en: Using the Ansible module win_user performs Windows account push RDP protocol testing for final connectivity
+    zh: '使用 Ansible 模块 win_user 执行 Windows 账号推送（最后使用 Python 模块 pyfreerdp 验证账号的可连接性）'
+    ja: 'Ansible モジュール win_user を使用して Windows アカウントのプッシュを実行します (最後に Python モジュール pyfreerdp を使用してアカウントの接続性を確認します)'
+    en: 'Use the Ansible module win_user to perform Windows account push (finally use the Python module pyfreerdp to verify the connectability of the account)'
+
+  Params groups help text:
+    zh: '请输入用户组，多个用户组使用逗号分隔（需填写已存在的用户组）'
+    ja: 'グループを入力してください。複数のグループはコンマで区切ってください（既存のグループを入力してください）'
+    en: 'Please enter the group. Multiple groups are separated by commas (please enter the existing group)'
