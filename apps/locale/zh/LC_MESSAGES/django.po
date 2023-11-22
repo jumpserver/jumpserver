@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-16 15:05+0800\n"
+"POT-Creation-Date: 2023-11-22 11:05+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -2656,20 +2656,20 @@ msgstr "认证"
 msgid "User invalid, disabled or expired"
 msgstr "用户无效，已禁用或已过期"
 
-#: authentication/backends/drf.py:39
+#: authentication/backends/drf.py:50
 msgid "Invalid token header. No credentials provided."
 msgstr "无效的令牌头。没有提供任何凭据。"
 
-#: authentication/backends/drf.py:42
+#: authentication/backends/drf.py:53
 msgid "Invalid token header. Sign string should not contain spaces."
 msgstr "无效的令牌头。符号字符串不应包含空格。"
 
-#: authentication/backends/drf.py:48
+#: authentication/backends/drf.py:59
 msgid ""
 "Invalid token header. Sign string should not contain invalid characters."
 msgstr "无效的令牌头。符号字符串不应包含无效字符。"
 
-#: authentication/backends/drf.py:61
+#: authentication/backends/drf.py:72
 msgid "Invalid token or cache refreshed."
 msgstr "刷新的令牌或缓存无效。"
 
@@ -3735,6 +3735,9 @@ msgstr "华为云"
 msgid "CMPP v2.0"
 msgstr "CMPP v2.0"
 
+msgid "Custom type (File)"
+msgstr "自定义 (文件)"
+
 #: common/sdk/sms/endpoint.py:32
 msgid "SMS provider not support: {}"
 msgstr "短信服务商不支持：{}"
@@ -4150,7 +4153,7 @@ msgstr "Material"
 msgid "Material Type"
 msgstr "Material 类型"
 
-#: ops/models/job.py:536
+#: ops/models/job.py:544
 msgid "Job Execution"
 msgstr "作业执行"
 
@@ -7571,7 +7574,9 @@ msgid ""
 "Determines whether the client computer should scale the content on the "
 "remote computer to fit the window size of the client computer when the "
 "window is resized."
-msgstr "确定调整窗口大小时客户端计算机是否应缩放远程计算机上的内容以适应客户端计算机的窗口大小"
+msgstr ""
+"确定调整窗口大小时客户端计算机是否应缩放远程计算机上的内容以适应客户端计算机"
+"的窗口大小"
 
 #: users/serializers/preference/luna.py:51
 msgid "Remote application connection method"
@@ -7693,7 +7698,7 @@ msgstr "周期检测用户过期"
 msgid "Check unused users"
 msgstr "校验用户已过期"
 
-#: users/tasks.py:114
+#: users/tasks.py:115
 msgid "The user has not logged in recently and has been disabled."
 msgstr "该用户最近未登录，已被禁用。"
 
