@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-22 11:05+0800\n"
+"POT-Creation-Date: 2023-11-22 16:42+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -2961,7 +2961,7 @@ msgstr "设置手机号码启用"
 msgid "Clear phone number to disable"
 msgstr "清空手机号码禁用"
 
-#: authentication/middleware.py:94 settings/utils/ldap.py:679
+#: authentication/middleware.py:94 settings/utils/ldap.py:677
 msgid "Authentication failed (before login check failed): {}"
 msgstr "认证失败 (登录前检查失败): {}"
 
@@ -3735,6 +3735,7 @@ msgstr "华为云"
 msgid "CMPP v2.0"
 msgstr "CMPP v2.0"
 
+#: common/sdk/sms/endpoint.py:21
 msgid "Custom type (File)"
 msgstr "自定义 (文件)"
 
@@ -4672,23 +4673,16 @@ msgstr "测试成功"
 msgid "Test mail sent to {}, please check"
 msgstr "邮件已经发送{}, 请检查"
 
-#: settings/api/ldap.py:176
-msgid "Synchronization start, please wait."
-msgstr "同步开始，请稍等"
+#: settings/api/ldap.py:101
+msgid ""
+"Users are not synchronized, please click the user synchronization button"
+msgstr "用户未同步，请点击同步用户按钮"
 
-#: settings/api/ldap.py:180
-msgid "Synchronization is running, please wait."
-msgstr "同步正在运行，请稍等"
-
-#: settings/api/ldap.py:185
-msgid "Synchronization error: {}"
-msgstr "同步错误: {}"
-
-#: settings/api/ldap.py:223
+#: settings/api/ldap.py:137
 msgid "Get ldap users is None"
 msgstr "获取 LDAP 用户为 None"
 
-#: settings/api/ldap.py:233
+#: settings/api/ldap.py:147
 msgid "Imported {} users successfully (Organization: {})"
 msgstr "成功导入 {} 个用户 ( 组织: {} )"
 
@@ -5809,100 +5803,106 @@ msgstr "周期导入 LDAP 用户"
 msgid "Registration periodic import ldap user task"
 msgstr "注册周期导入 LDAP 用户 任务"
 
-#: settings/utils/ldap.py:494
+#: settings/utils/ldap.py:492
 msgid "ldap:// or ldaps:// protocol is used."
 msgstr "使用 ldap:// 或 ldaps:// 协议"
 
-#: settings/utils/ldap.py:505
+#: settings/utils/ldap.py:503
 msgid "Host or port is disconnected: {}"
 msgstr "主机或端口不可连接: {}"
 
-#: settings/utils/ldap.py:507
+#: settings/utils/ldap.py:505
 msgid "The port is not the port of the LDAP service: {}"
 msgstr "端口不是LDAP服务端口: {}"
 
-#: settings/utils/ldap.py:509
+#: settings/utils/ldap.py:507
 msgid "Please add certificate: {}"
 msgstr "请添加证书"
 
-#: settings/utils/ldap.py:513 settings/utils/ldap.py:540
-#: settings/utils/ldap.py:570 settings/utils/ldap.py:598
+#: settings/utils/ldap.py:511 settings/utils/ldap.py:538
+#: settings/utils/ldap.py:568 settings/utils/ldap.py:596
 msgid "Unknown error: {}"
 msgstr "未知错误: {}"
 
-#: settings/utils/ldap.py:527
+#: settings/utils/ldap.py:525
 msgid "Bind DN or Password incorrect"
 msgstr "绑定DN或密码错误"
 
-#: settings/utils/ldap.py:534
+#: settings/utils/ldap.py:532
 msgid "Please enter Bind DN: {}"
 msgstr "请输入绑定DN: {}"
 
-#: settings/utils/ldap.py:536
+#: settings/utils/ldap.py:534
 msgid "Please enter Password: {}"
 msgstr "请输入密码: {}"
 
-#: settings/utils/ldap.py:538
+#: settings/utils/ldap.py:536
 msgid "Please enter correct Bind DN and Password: {}"
 msgstr "请输入正确的绑定DN和密码: {}"
 
-#: settings/utils/ldap.py:556
+#: settings/utils/ldap.py:554
 msgid "Invalid User OU or User search filter: {}"
 msgstr "不合法的用户OU或用户过滤器: {}"
 
-#: settings/utils/ldap.py:587
+#: settings/utils/ldap.py:585
 msgid "LDAP User attr map not include: {}"
 msgstr "LDAP属性映射没有包含: {}"
 
-#: settings/utils/ldap.py:594
+#: settings/utils/ldap.py:592
 msgid "LDAP User attr map is not dict"
 msgstr "LDAP属性映射不合法"
 
-#: settings/utils/ldap.py:613
+#: settings/utils/ldap.py:611
 msgid "LDAP authentication is not enabled"
 msgstr "LDAP认证没有启用"
 
-#: settings/utils/ldap.py:631
+#: settings/utils/ldap.py:629
 msgid "Error (Invalid LDAP server): {}"
 msgstr "错误  (不合法的LDAP服务器地址): {}"
 
-#: settings/utils/ldap.py:633
+#: settings/utils/ldap.py:631
 msgid "Error (Invalid Bind DN): {}"
 msgstr "错误 (不合法的绑定DN): {}"
 
-#: settings/utils/ldap.py:635
+#: settings/utils/ldap.py:633
 msgid "Error (Invalid LDAP User attr map): {}"
 msgstr "错误 (不合法的LDAP属性映射): {}"
 
-#: settings/utils/ldap.py:637
+#: settings/utils/ldap.py:635
 msgid "Error (Invalid User OU or User search filter): {}"
 msgstr "错误 (不合法的用户OU或用户过滤器): {}"
 
-#: settings/utils/ldap.py:639
+#: settings/utils/ldap.py:637
 msgid "Error (Not enabled LDAP authentication): {}"
 msgstr "错误 (没有启用LDAP认证): {}"
 
-#: settings/utils/ldap.py:641
+#: settings/utils/ldap.py:639
 msgid "Error (Unknown): {}"
 msgstr "错误 (未知): {}"
 
-#: settings/utils/ldap.py:644
+#: settings/utils/ldap.py:642
 msgid "Succeed: Match {} s user"
 msgstr "成功匹配 {} 个用户"
 
-#: settings/utils/ldap.py:677
+#: settings/utils/ldap.py:653
+#, fuzzy
+#| msgid "Can test asset connectivity"
+msgid "Please test the connection first"
+msgstr "请先测试连接"
+
+#: settings/utils/ldap.py:675
 msgid "Authentication failed (configuration incorrect): {}"
 msgstr "认证失败 (配置错误): {}"
 
-#: settings/utils/ldap.py:681
+#: settings/utils/ldap.py:679
 msgid "Authentication failed (username or password incorrect): {}"
 msgstr "认证失败 (用户名或密码不正确): {}"
 
-#: settings/utils/ldap.py:683
+#: settings/utils/ldap.py:681
 msgid "Authentication failed (Unknown): {}"
 msgstr "认证失败: (未知): {}"
 
-#: settings/utils/ldap.py:686
+#: settings/utils/ldap.py:684
 msgid "Authentication success: {}"
 msgstr "认证成功: {}"
 
@@ -8598,6 +8598,15 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
+
+#~ msgid "Synchronization start, please wait."
+#~ msgstr "同步开始，请稍等"
+
+#~ msgid "Synchronization is running, please wait."
+#~ msgstr "同步正在运行，请稍等"
+
+#~ msgid "Synchronization error: {}"
+#~ msgstr "同步错误: {}"
 
 #~ msgid "Copy"
 #~ msgstr "复制"
