@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-16 15:05+0800\n"
+"POT-Creation-Date: 2023-11-22 11:05+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2676,21 +2676,21 @@ msgstr "認証"
 msgid "User invalid, disabled or expired"
 msgstr "ユーザーが無効、無効、または期限切れです"
 
-#: authentication/backends/drf.py:39
+#: authentication/backends/drf.py:50
 msgid "Invalid token header. No credentials provided."
 msgstr "無効なトークンヘッダー。資格情報は提供されていません。"
 
-#: authentication/backends/drf.py:42
+#: authentication/backends/drf.py:53
 msgid "Invalid token header. Sign string should not contain spaces."
 msgstr "無効なトークンヘッダー。記号文字列にはスペースを含めないでください。"
 
-#: authentication/backends/drf.py:48
+#: authentication/backends/drf.py:59
 msgid ""
 "Invalid token header. Sign string should not contain invalid characters."
 msgstr ""
 "無効なトークンヘッダー。署名文字列に無効な文字を含めることはできません。"
 
-#: authentication/backends/drf.py:61
+#: authentication/backends/drf.py:72
 msgid "Invalid token or cache refreshed."
 msgstr "無効なトークンまたはキャッシュの更新。"
 
@@ -3780,6 +3780,9 @@ msgstr "華為雲"
 msgid "CMPP v2.0"
 msgstr "CMPP v2.0"
 
+msgid "Custom type (File)"
+msgstr "カスタム（ファイル）"
+
 #: common/sdk/sms/endpoint.py:32
 msgid "SMS provider not support: {}"
 msgstr "SMSプロバイダーはサポートしていません: {}"
@@ -4200,7 +4203,7 @@ msgstr "Material"
 msgid "Material Type"
 msgstr "Material を選択してオプションを設定します。"
 
-#: ops/models/job.py:536
+#: ops/models/job.py:544
 msgid "Job Execution"
 msgstr "ジョブ実行"
 
@@ -7674,7 +7677,10 @@ msgid ""
 "Determines whether the client computer should scale the content on the "
 "remote computer to fit the window size of the client computer when the "
 "window is resized."
-msgstr "ウィンドウサイズを変更するときにクライアントコンピュータがクライアントコンピュータのウィンドウサイズに合わせるためにリモートコンピュータ上のコンテンツをスケーリングすべきかどうかを判断する"
+msgstr ""
+"ウィンドウサイズを変更するときにクライアントコンピュータがクライアントコン"
+"ピュータのウィンドウサイズに合わせるためにリモートコンピュータ上のコンテンツ"
+"をスケーリングすべきかどうかを判断する"
 
 #: users/serializers/preference/luna.py:51
 msgid "Remote application connection method"
@@ -7797,7 +7803,7 @@ msgstr "ユーザーの有効期限の定期的な検出"
 msgid "Check unused users"
 msgstr "未使用のユーザーを確認する"
 
-#: users/tasks.py:114
+#: users/tasks.py:115
 msgid "The user has not logged in recently and has been disabled."
 msgstr "ユーザーは最近ログインしておらず、無効になっています。"
 
