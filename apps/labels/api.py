@@ -22,28 +22,29 @@ class ContentTypeViewSet(JMSModelViewSet):
         'default': 'labels.view_contenttype',
         'resources': 'labels.view_contenttype',
     }
-    exclude_apps = (
-        'admin',
-        'applications',
-        'auth',
-        'authentication',
-        'captcha',
-        'contenttypes',
-        'django_cas_ng',
-        'django_celery_beat',
-        'jms_oidc_rp',
-        'notifications',
-        'passkeys',
-        'rbac',
-        'sessions',
-        'settings',
-        'xpack',
-        'labels',
-    )
     page_default_limit = None
+    can_labeled_content_type = []
+    model = ContentType
+
+    @classmethod
+    def get_can_labeled_content_type_ids(cls):
+        if cls.can_labeled_content_type:
+            return cls.can_labeled_content_type
+        content_types = ContentType.objects.all()
+        for ct in content_types:
+            model_cls = ct.model_class()
+            if not model_cls:
+                continue
+            if model_cls._meta.parents:
+                continue
+            if 'labels' in model_cls._meta._forward_fields_map.keys():
+                # if issubclass(model_cls, LabeledMixin):
+                cls.can_labeled_content_type.append(ct.id)
+        return cls.can_labeled_content_type
 
     def get_queryset(self):
-        queryset = ContentType.objects.all().exclude(app_label__in=self.exclude_apps)
+        ids = self.get_can_labeled_content_type_ids()
+        queryset = ContentType.objects.filter(id__in=ids)
         return queryset
 
     @action(methods=['GET'], detail=True, serializer_class=serializers.ContentTypeResourceSerializer)

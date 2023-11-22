@@ -20,6 +20,7 @@ from accounts.models import Account
 from acls.models import CommandFilterACL
 from assets.models import Asset
 from common.db.encoder import ModelJSONFieldEncoder
+from labels.mixins import LabeledMixin
 from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner, CommandInBlackListException
 from ops.mixin import PeriodTaskModelMixin
 from ops.variables import *
@@ -122,12 +123,13 @@ class JMSPermedInventory(JMSInventory):
         return mapper
 
 
-class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
+class Job(LabeledMixin, JMSOrgBaseModel, PeriodTaskModelMixin):
     name = models.CharField(max_length=128, null=True, verbose_name=_('Name'))
 
     instant = models.BooleanField(default=False)
     args = models.CharField(max_length=8192, default='', verbose_name=_('Args'), null=True, blank=True)
-    module = models.CharField(max_length=128, choices=JobModules.choices, default=JobModules.shell, verbose_name=_('Module'),
+    module = models.CharField(max_length=128, choices=JobModules.choices, default=JobModules.shell,
+                              verbose_name=_('Module'),
                               null=True)
     chdir = models.CharField(default="", max_length=1024, verbose_name=_('Chdir'), null=True, blank=True)
     timeout = models.IntegerField(default=-1, verbose_name=_('Timeout (Seconds)'))

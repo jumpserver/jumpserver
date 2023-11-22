@@ -13,7 +13,9 @@ from django.utils.translation import gettext_lazy as _
 from assets import const
 from common.db.fields import EncryptMixin
 from common.utils import lazyproperty
+from labels.mixins import LabeledMixin
 from orgs.mixins.models import OrgManager, JMSOrgBaseModel
+from rbac.models import ContentType
 from ..base import AbsConnectivity
 from ..platform import Platform
 
@@ -142,7 +144,7 @@ class JSONFilterMixin:
         return None
 
 
-class Asset(NodesRelationMixin, AbsConnectivity, JSONFilterMixin, JMSOrgBaseModel):
+class Asset(NodesRelationMixin, LabeledMixin, AbsConnectivity, JSONFilterMixin, JMSOrgBaseModel):
     Category = const.Category
     Type = const.AllTypes
 
@@ -154,7 +156,6 @@ class Asset(NodesRelationMixin, AbsConnectivity, JSONFilterMixin, JMSOrgBaseMode
     nodes = models.ManyToManyField('assets.Node', default=default_node, related_name='assets',
                                    verbose_name=_("Nodes"))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
-    labels = models.ManyToManyField('assets.Label', blank=True, related_name='assets', verbose_name=_("Labels"))
     gathered_info = models.JSONField(verbose_name=_('Gathered info'), default=dict, blank=True)  # 资产的一些信息，如 硬件信息
     custom_info = models.JSONField(verbose_name=_('Custom info'), default=dict)
 
@@ -162,6 +163,13 @@ class Asset(NodesRelationMixin, AbsConnectivity, JSONFilterMixin, JMSOrgBaseMode
 
     def __str__(self):
         return '{0.name}({0.address})'.format(self)
+
+    def get_labels(self):
+        from labels.models import Label, LabeledResource
+        res_type = ContentType.objects.get_for_model(self.__class__)
+        label_ids = LabeledResource.objects.filter(res_type=res_type, res_id=self.id) \
+            .values_list('label_id', flat=True)
+        return Label.objects.filter(id__in=label_ids)
 
     @staticmethod
     def get_spec_values(instance, fields):

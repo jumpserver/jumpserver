@@ -6,6 +6,7 @@ from common.db.fields import JSONManyToManyField
 from common.db.models import JMSBaseModel
 from common.utils import contains_ip
 from common.utils.time_period import contains_time_period
+from labels.mixins import LabeledMixin
 from orgs.mixins.models import OrgModelMixin, OrgManager
 from ..const import ActionChoices
 
@@ -31,7 +32,7 @@ class BaseACLQuerySet(models.QuerySet):
         return self.inactive()
 
 
-class BaseACL(JMSBaseModel):
+class BaseACL(LabeledMixin, JMSBaseModel):
     name = models.CharField(max_length=128, verbose_name=_('Name'), unique=True)
     priority = models.IntegerField(
         default=50, verbose_name=_("Priority"),

@@ -15,9 +15,10 @@ from common.serializers import (
 )
 from common.serializers.common import DictSerializer
 from common.serializers.fields import LabeledChoiceField
+from labels.models import Label
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ...const import Category, AllTypes
-from ...models import Asset, Node, Platform, Label, Protocol
+from ...models import Asset, Node, Platform, Protocol
 
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',

@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from common.utils import lazyproperty
+from labels.mixins import LabeledMixin
 from orgs.mixins.models import JMSOrgBaseModel
 
 __all__ = ['UserGroup']
 
 
-class UserGroup(JMSOrgBaseModel):
+class UserGroup(LabeledMixin, JMSOrgBaseModel):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
 
     def __str__(self):

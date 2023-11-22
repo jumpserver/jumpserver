@@ -23,6 +23,7 @@ from common.utils import (
     date_expired_default, get_logger, lazyproperty,
     random_string, bulk_create_with_signal
 )
+from labels.mixins import LabeledMixin
 from orgs.utils import current_org
 from rbac.const import Scope
 from ..signals import (
@@ -733,7 +734,7 @@ class JSONFilterMixin:
         return None
 
 
-class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, AbstractUser):
+class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterMixin, AbstractUser):
     class Source(models.TextChoices):
         local = 'local', _('Local')
         ldap = 'ldap', 'LDAP/AD'

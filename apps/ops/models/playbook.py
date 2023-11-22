@@ -6,6 +6,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from private_storage.fields import PrivateFileField
 
+from labels.mixins import LabeledMixin
 from ops.const import CreateMethods
 from ops.exception import PlaybookNoValidEntry
 from orgs.mixins.models import JMSOrgBaseModel
@@ -23,7 +24,7 @@ dangerous_keywords = (
 )
 
 
-class Playbook(JMSOrgBaseModel):
+class Playbook(LabeledMixin, JMSOrgBaseModel):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'), null=True)
     path = PrivateFileField(upload_to='playbooks/')
@@ -53,12 +54,12 @@ class Playbook(JMSOrgBaseModel):
         with open(file, 'r') as f:
             for line_num, line in enumerate(f):
                 for keyword in dangerous_keywords:
-                    clear_line = line.replace(' ', '')\
-                        .replace('\n', '')\
-                        .replace('\r', '')\
+                    clear_line = line.replace(' ', '') \
+                        .replace('\n', '') \
+                        .replace('\r', '') \
                         .replace('\t', '') \
                         .replace('\'', '') \
-                        .replace('\"', '')\
+                        .replace('\"', '') \
                         .replace('\v', '')
                     if keyword in clear_line:
                         result.append((line_num, keyword))
