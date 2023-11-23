@@ -12,6 +12,7 @@ class BACKEND(models.TextChoices):
     DINGTALK = 'dingtalk', _('DingTalk')
     SITE_MSG = 'site_msg', _('Site message')
     FEISHU = 'feishu', _('FeiShu')
+    SLACK = 'slack', _('Slack')
     # SMS = 'sms', _('SMS')
 
     @property

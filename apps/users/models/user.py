@@ -746,6 +746,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
         wecom = 'wecom', _('WeCom')
         dingtalk = 'dingtalk', _('DingTalk')
         feishu = 'feishu', _('FeiShu')
+        slack = 'slack', _('Slack')
         custom = 'custom', 'Custom'
 
     SOURCE_BACKEND_MAPPING = {
@@ -777,6 +778,9 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
         ],
         Source.feishu: [
             settings.AUTH_BACKEND_FEISHU
+        ],
+        Source.slack: [
+            settings.AUTH_BACKEND_SLACK
         ],
         Source.dingtalk: [
             settings.AUTH_BACKEND_DINGTALK
@@ -848,6 +852,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
     wecom_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('WeCom'))
     dingtalk_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('DingTalk'))
     feishu_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('FeiShu'))
+    slack_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('Slack'))
 
     DATE_EXPIRED_WARNING_DAYS = 5
 
@@ -990,6 +995,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
             ('dingtalk_id',),
             ('wecom_id',),
             ('feishu_id',),
+            ('slack_id',),
         )
         permissions = [
             ('invite_user', _('Can invite user')),

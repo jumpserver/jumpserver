@@ -92,6 +92,12 @@ class UserLoginContextMixin:
                 'logo': static('img/login_feishu_logo.png')
             },
             {
+                'name': _('Slack'),
+                'enabled': settings.AUTH_SLACK,
+                'url': reverse('authentication:slack-qr-login'),
+                'logo': static('img/login_slack_logo.png')
+            },
+            {
                 'name': _("Passkey"),
                 'enabled': settings.AUTH_PASSKEY,
                 'url': reverse('api-auth:passkey-login'),

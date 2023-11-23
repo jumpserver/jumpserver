@@ -405,6 +405,12 @@ class Config(dict):
         'FEISHU_APP_SECRET': '',
         'FEISHU_VERSION': 'feishu',
 
+        # Slack
+        'AUTH_SLACK': False,
+        'SLACK_CLIENT_ID': '',
+        'SLACK_CLIENT_SECRET': '',
+        'SLACK_BOT_TOKEN': '',
+
         'LOGIN_REDIRECT_TO_BACKEND': '',  # 'OPENID / CAS / SAML2
         'LOGIN_REDIRECT_MSG_ENABLED': True,
 

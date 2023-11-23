@@ -39,6 +39,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'wecom': serializers.WeComSettingSerializer,
         'dingtalk': serializers.DingTalkSettingSerializer,
         'feishu': serializers.FeiShuSettingSerializer,
+        'slack': serializers.SlackSettingSerializer,
         'auth': serializers.AuthSettingSerializer,
         'oidc': serializers.OIDCSettingSerializer,
         'keycloak': serializers.KeycloakSettingSerializer,

@@ -8,3 +8,4 @@ from .settings import *
 from .sms import *
 from .vault import *
 from .wecom import *
+from .slack import *
