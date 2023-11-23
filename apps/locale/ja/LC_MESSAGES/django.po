@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-22 16:43+0800\n"
+"POT-Creation-Date: 2023-11-24 10:34+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1574,7 +1574,7 @@ msgstr "ボタンセレクターを確認する"
 msgid "API mode"
 msgstr "APIモード"
 
-#: assets/const/types.py:224
+#: assets/const/types.py:247
 msgid "All types"
 msgstr "いろんなタイプ"
 
@@ -4728,7 +4728,9 @@ msgstr "{}に送信されたテストメールを確認してください"
 #: settings/api/ldap.py:101
 msgid ""
 "Users are not synchronized, please click the user synchronization button"
-msgstr "ユーザーは同期されていません。「ユーザーを同期」ボタンをクリックしてください。"
+msgstr ""
+"ユーザーは同期されていません。「ユーザーを同期」ボタンをクリックしてくださ"
+"い。"
 
 #: settings/api/ldap.py:137
 msgid "Get ldap users is None"
@@ -8685,7 +8687,15 @@ msgstr "ログアウトページのロゴ"
 msgid "Theme"
 msgstr "テーマ"
 
-#: xpack/plugins/interface/models.py:44 xpack/plugins/interface/models.py:85
+#: xpack/plugins/interface/models.py:42
+msgid "Beian link"
+msgstr "公安オンライン申告ジャンプリンク"
+
+#: xpack/plugins/interface/models.py:43
+msgid "Beian text"
+msgstr "公安網登録番号"
+
+#: xpack/plugins/interface/models.py:46 xpack/plugins/interface/models.py:87
 msgid "Interface setting"
 msgstr "インターフェイスの設定"
 
