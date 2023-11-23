@@ -8,6 +8,7 @@ from django.utils.translation import gettext as _
 from rest_framework import authentication, exceptions
 
 from common.auth import signature
+from common.decorators import merge_delay_run
 from common.utils import get_object_or_none, get_request_ip_or_data, contains_ip
 from ..models import AccessKey, PrivateToken
 
@@ -16,14 +17,24 @@ def date_more_than(d, seconds):
     return d is None or (timezone.now() - d).seconds > seconds
 
 
-def after_authenticate_update_date(user, token=None):
-    if date_more_than(user.date_api_key_last_used, 60):
+@merge_delay_run(ttl=60)
+def update_token_last_used(tokens=()):
+    for token in tokens:
+        token.date_last_used = timezone.now()
+        token.save(update_fields=['date_last_used'])
+
+
+@merge_delay_run(ttl=60)
+def update_user_last_used(users=()):
+    for user in users:
         user.date_api_key_last_used = timezone.now()
         user.save(update_fields=['date_api_key_last_used'])
 
-    if token and hasattr(token, 'date_last_used') and date_more_than(token.date_last_used, 60):
-        token.date_last_used = timezone.now()
-        token.save(update_fields=['date_last_used'])
+
+def after_authenticate_update_date(user, token=None):
+    update_user_last_used(users=(user,))
+    if token:
+        update_token_last_used(tokens=(token,))
 
 
 class AccessTokenAuthentication(authentication.BaseAuthentication):

@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import sys
 import uuid
 from collections import defaultdict
 from datetime import timedelta
@@ -77,6 +78,7 @@ class JMSPermedInventory(JMSInventory):
             host['login_user'] = account.username
             host['login_password'] = account.secret
             host['login_db'] = asset.spec_info.get('db_name', '')
+            host['ansible_python_interpreter'] = sys.executable
             return host
         return super().make_account_vars(host, asset, account, automation, protocol, platform, gateway)
 
@@ -127,7 +129,8 @@ class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
 
     instant = models.BooleanField(default=False)
     args = models.CharField(max_length=8192, default='', verbose_name=_('Args'), null=True, blank=True)
-    module = models.CharField(max_length=128, choices=JobModules.choices, default=JobModules.shell, verbose_name=_('Module'),
+    module = models.CharField(max_length=128, choices=JobModules.choices, default=JobModules.shell,
+                              verbose_name=_('Module'),
                               null=True)
     chdir = models.CharField(default="", max_length=1024, verbose_name=_('Chdir'), null=True, blank=True)
     timeout = models.IntegerField(default=-1, verbose_name=_('Timeout (Seconds)'))
@@ -295,10 +298,18 @@ class JobExecution(JMSOrgBaseModel):
         db_module_name_map = {
             'mysql': 'community.mysql.mysql_query',
             'postgresql': 'community.postgresql.postgresql_query',
-            'sqlserver': 'community.general.mssql_script:',
+            'sqlserver': 'community.general.mssql_script',
+        }
+        extra_query_token_map = {
+            'sqlserver': 'script'
+        }
+        extra_login_db_token_map = {
+            'sqlserver': 'name'
         }
 
         if module in db_modules:
+            login_db_token = extra_login_db_token_map.get(module, 'login_db')
+            query_token = extra_query_token_map.get(module, 'query')
             module = db_module_name_map.get(module, None)
             if not module:
                 print('not support db module: {}'.format(module))
@@ -308,8 +319,8 @@ class JobExecution(JMSOrgBaseModel):
                          "login_user={{login_user}} " \
                          "login_password={{login_password}} " \
                          "login_port={{login_port}} " \
-                         "login_db={{login_db}}"
-            shell = "{} query=\"{}\" ".format(login_args, self.current_job.args)
+                         "%s={{login_db}}" % login_db_token
+            shell = "{} {}=\"{}\" ".format(login_args, query_token, self.current_job.args)
             return module, shell
 
         if module == 'win_shell':

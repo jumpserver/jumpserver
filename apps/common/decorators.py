@@ -73,6 +73,7 @@ executor = ThreadPoolExecutor(
 )
 _loop_debouncer_func_task_cache = {}
 _loop_debouncer_func_args_cache = {}
+_loop_debouncer_func_task_time_cache = {}
 
 
 def get_loop():
@@ -92,6 +93,17 @@ def cancel_or_remove_debouncer_task(cache_key):
 def run_debouncer_func(cache_key, org, ttl, func, *args, **kwargs):
     cancel_or_remove_debouncer_task(cache_key)
     run_func_partial = functools.partial(_run_func_with_org, cache_key, org, func)
+
+    current = time.time()
+    first_run_time = _loop_debouncer_func_task_time_cache.get(cache_key, None)
+    if first_run_time is None:
+        _loop_debouncer_func_task_time_cache[cache_key] = current
+        first_run_time = current
+
+    if current - first_run_time > ttl:
+        executor.submit(run_func_partial, *args, **kwargs)
+        return
+
     loop = _loop_thread.get_loop()
     _debouncer = Debouncer(run_func_partial, lambda: True, ttl, loop=loop, executor=executor)
     task = asyncio.run_coroutine_threadsafe(_debouncer(*args, **kwargs), loop=loop)
@@ -130,6 +142,7 @@ def _run_func_with_org(key, org, func, *args, **kwargs):
         logger.error('delay run error: %s' % e)
     _loop_debouncer_func_task_cache.pop(key, None)
     _loop_debouncer_func_args_cache.pop(key, None)
+    _loop_debouncer_func_task_time_cache.pop(key, None)
 
 
 def delay_run(ttl=5, key=None):
@@ -142,6 +155,9 @@ def delay_run(ttl=5, key=None):
 
     def inner(func):
         suffix_key_func = key if key else default_suffix_key
+        sigs = inspect.signature(func)
+        if len(sigs.parameters) != 0:
+            raise ValueError('Merge delay run must not arguments: %s' % func.__name__)
 
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -186,12 +202,11 @@ def merge_delay_run(ttl=5, key=None):
             for k, v in kwargs.items():
                 if not isinstance(v, (tuple, list, set)):
                     raise ValueError('func kwargs value must be list or tuple: %s %s' % (func.__name__, v))
+                v = set(v)
                 if k not in cache_kwargs:
                     cache_kwargs[k] = v
-                elif isinstance(v, set):
-                    cache_kwargs[k] = cache_kwargs[k].union(v)
                 else:
-                    cache_kwargs[k] = list(cache_kwargs[k]) + list(v)
+                    cache_kwargs[k] = cache_kwargs[k].union(v)
             _loop_debouncer_func_args_cache[cache_key] = cache_kwargs
             run_debouncer_func(cache_key, org, ttl, func, *args, **cache_kwargs)
 
@@ -201,8 +216,8 @@ def merge_delay_run(ttl=5, key=None):
 
 
 @delay_run(ttl=5)
-def test_delay_run(username):
-    print("Hello, %s, now is %s" % (username, time.time()))
+def test_delay_run():
+    print("Hello,  now is %s" % time.time())
 
 
 @merge_delay_run(ttl=5, key=lambda users=(): users[0][0])

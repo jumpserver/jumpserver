@@ -8,6 +8,6 @@ type:
 method: ping
 i18n:
   Ping by pyfreerdp:
-    zh: 使用 Python 模块 pyfreerdp 测试主机可连接性
-    en: Ping by pyfreerdp module
-    ja: Pyfreerdpモジュールを使用してホストにPingする
+    zh: '使用 Python 模块 pyfreerdp 测试主机可连接性'
+    en: 'Ping by pyfreerdp module'
+    ja: 'Pyfreerdpモジュールを使用してホストにPingする'

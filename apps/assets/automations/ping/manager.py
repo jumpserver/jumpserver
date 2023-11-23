@@ -6,6 +6,8 @@ logger = get_logger(__name__)
 
 
 class PingManager(BasePlaybookManager):
+    ansible_account_prefer = ''
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.host_asset_and_account_mapper = {}

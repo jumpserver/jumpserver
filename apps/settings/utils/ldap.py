@@ -277,6 +277,9 @@ class LDAPCacheUtil(object):
 
 
 class LDAPSyncUtil(object):
+    class LDAPSyncUtilException(Exception):
+        pass
+
     CACHE_KEY_LDAP_USERS_SYNC_TASK_ERROR_MSG = 'CACHE_KEY_LDAP_USERS_SYNC_TASK_ERROR_MSG'
 
     CACHE_KEY_LDAP_USERS_SYNC_TASK_STATUS = 'CACHE_KEY_LDAP_USERS_SYNC_TASK_STATUS'
@@ -328,34 +331,29 @@ class LDAPSyncUtil(object):
 
     def get_task_error_msg(self):
         logger.info('Get task error msg')
-        error_msg = cache.get(self.CACHE_KEY_LDAP_USERS_SYNC_TASK_ERROR_MSG)
+        error_msg = cache.get(self.CACHE_KEY_LDAP_USERS_SYNC_TASK_ERROR_MSG, '')
         return error_msg
 
     def delete_task_error_msg(self):
         logger.info('Delete task error msg')
         cache.delete(self.CACHE_KEY_LDAP_USERS_SYNC_TASK_ERROR_MSG)
 
-    def pre_sync(self):
-        self.set_task_status(self.TASK_STATUS_IS_RUNNING)
-
     def sync(self):
         users = self.server_util.search()
         self.cache_util.set_users(users)
 
-    def post_sync(self):
-        self.set_task_status(self.TASK_STATUS_IS_OVER)
-
     def perform_sync(self):
         logger.info('Start perform sync ldap users from server to cache')
         try:
-            self.pre_sync()
+            ok, msg = LDAPTestUtil().test_config()
+            if not ok:
+                raise self.LDAPSyncUtilException(msg)
             self.sync()
         except Exception as e:
             error_msg = str(e)
             logger.error(error_msg)
             self.set_task_error_msg(error_msg)
         finally:
-            self.post_sync()
             logger.info('End perform sync ldap users from server to cache')
             close_old_connections()
 
@@ -650,9 +648,9 @@ class LDAPTestUtil(object):
     # test login
 
     def _test_before_login_check(self, username, password):
-        ok, msg = self.test_config()
-        if not ok:
-            raise LDAPConfigurationError(msg)
+        from settings.ws import CACHE_KEY_LDAP_TEST_CONFIG_TASK_STATUS, TASK_STATUS_IS_OVER
+        if cache.get(CACHE_KEY_LDAP_TEST_CONFIG_TASK_STATUS) != TASK_STATUS_IS_OVER:
+            raise self.LDAPBeforeLoginCheckError(_('Please test the connection first'))
 
         backend = LDAPAuthorizationBackend()
         ok, msg = backend.pre_check(username, password)

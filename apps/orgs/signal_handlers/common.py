@@ -53,7 +53,7 @@ def subscribe_orgs_mapping_expire(sender, **kwargs):
 
 
 @delay_run(ttl=5)
-def expire_user_orgs(*args):
+def expire_user_orgs():
     User.expire_users_rbac_perms_cache()
 
 

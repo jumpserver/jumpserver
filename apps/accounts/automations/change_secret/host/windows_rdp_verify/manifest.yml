@@ -1,7 +1,7 @@
-id: push_account_local_windows
-name: "{{ 'Windows account push' | trans }}"
+id: change_secret_windows_rdp_verify
+name: "{{ 'Windows account change secret rdp verify' | trans }}"
 version: 1
-method: push_account
+method: change_secret
 category: host
 type:
   - windows
@@ -12,13 +12,15 @@ params:
     default: 'Users,Remote Desktop Users'
     help_text: "{{ 'Params groups help text' | trans }}"
 
+
 i18n:
-  Windows account push:
-    zh: '使用 Ansible 模块 win_user 执行 Windows 账号推送'
-    ja: 'Ansible win_user モジュールを使用して Windows アカウントをプッシュする'
-    en: 'Using Ansible module win_user to push account'
+  Windows account change secret rdp verify:
+    zh: '使用 Ansible 模块 win_user 执行 Windows 账号改密 RDP 协议测试最后的可连接性'
+    ja: 'Ansibleモジュールwin_userはWindowsアカウントの改密RDPプロトコルテストの最後の接続性を実行する'
+    en: 'Using the Ansible module win_user performs Windows account encryption RDP protocol testing for final connectivity'
 
   Params groups help text:
     zh: '请输入用户组，多个用户组使用逗号分隔（需填写已存在的用户组）'
     ja: 'グループを入力してください。複数のグループはコンマで区切ってください（既存のグループを入力してください）'
     en: 'Please enter the group. Multiple groups are separated by commas (please enter the existing group)'
+
