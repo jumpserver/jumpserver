@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-22 11:05+0800\n"
+"POT-Creation-Date: 2023-11-22 16:43+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2990,7 +2990,7 @@ msgstr "電話番号を設定して有効にする"
 msgid "Clear phone number to disable"
 msgstr "無効にする電話番号をクリアする"
 
-#: authentication/middleware.py:94 settings/utils/ldap.py:679
+#: authentication/middleware.py:94 settings/utils/ldap.py:677
 msgid "Authentication failed (before login check failed): {}"
 msgstr "認証に失敗しました (ログインチェックが失敗する前): {}"
 
@@ -3780,6 +3780,7 @@ msgstr "華為雲"
 msgid "CMPP v2.0"
 msgstr "CMPP v2.0"
 
+#: common/sdk/sms/endpoint.py:21
 msgid "Custom type (File)"
 msgstr "カスタム（ファイル）"
 
@@ -4724,23 +4725,16 @@ msgstr "テストの成功"
 msgid "Test mail sent to {}, please check"
 msgstr "{}に送信されたテストメールを確認してください"
 
-#: settings/api/ldap.py:176
-msgid "Synchronization start, please wait."
-msgstr "同期開始、お待ちください。"
+#: settings/api/ldap.py:101
+msgid ""
+"Users are not synchronized, please click the user synchronization button"
+msgstr "ユーザーは同期されていません。「ユーザーを同期」ボタンをクリックしてください。"
 
-#: settings/api/ldap.py:180
-msgid "Synchronization is running, please wait."
-msgstr "同期が実行中です。しばらくお待ちください。"
-
-#: settings/api/ldap.py:185
-msgid "Synchronization error: {}"
-msgstr "同期エラー: {}"
-
-#: settings/api/ldap.py:223
+#: settings/api/ldap.py:137
 msgid "Get ldap users is None"
 msgstr "Ldapユーザーを取得するにはNone"
 
-#: settings/api/ldap.py:233
+#: settings/api/ldap.py:147
 msgid "Imported {} users successfully (Organization: {})"
 msgstr "{} 人のユーザーを正常にインポートしました (組織: {})"
 
@@ -5889,100 +5883,104 @@ msgstr "LDAP ユーザーを定期的にインポートする"
 msgid "Registration periodic import ldap user task"
 msgstr "登録サイクルLDAPユーザータスクのインポート"
 
-#: settings/utils/ldap.py:494
+#: settings/utils/ldap.py:492
 msgid "ldap:// or ldaps:// protocol is used."
 msgstr "ldap:// または ldaps:// プロトコルが使用されます。"
 
-#: settings/utils/ldap.py:505
+#: settings/utils/ldap.py:503
 msgid "Host or port is disconnected: {}"
 msgstr "ホストまたはポートが切断されました: {}"
 
-#: settings/utils/ldap.py:507
+#: settings/utils/ldap.py:505
 msgid "The port is not the port of the LDAP service: {}"
 msgstr "ポートはLDAPサービスのポートではありません: {}"
 
-#: settings/utils/ldap.py:509
+#: settings/utils/ldap.py:507
 msgid "Please add certificate: {}"
 msgstr "証明書を追加してください: {}"
 
-#: settings/utils/ldap.py:513 settings/utils/ldap.py:540
-#: settings/utils/ldap.py:570 settings/utils/ldap.py:598
+#: settings/utils/ldap.py:511 settings/utils/ldap.py:538
+#: settings/utils/ldap.py:568 settings/utils/ldap.py:596
 msgid "Unknown error: {}"
 msgstr "不明なエラー: {}"
 
-#: settings/utils/ldap.py:527
+#: settings/utils/ldap.py:525
 msgid "Bind DN or Password incorrect"
 msgstr "DNまたはパスワードのバインドが正しくありません"
 
-#: settings/utils/ldap.py:534
+#: settings/utils/ldap.py:532
 msgid "Please enter Bind DN: {}"
 msgstr "バインドDN: {} を入力してください"
 
-#: settings/utils/ldap.py:536
+#: settings/utils/ldap.py:534
 msgid "Please enter Password: {}"
 msgstr "パスワードを入力してください: {}"
 
-#: settings/utils/ldap.py:538
+#: settings/utils/ldap.py:536
 msgid "Please enter correct Bind DN and Password: {}"
 msgstr "正しいバインドDNとパスワードを入力してください: {}"
 
-#: settings/utils/ldap.py:556
+#: settings/utils/ldap.py:554
 msgid "Invalid User OU or User search filter: {}"
 msgstr "無効なユーザー OU またはユーザー検索フィルター: {}"
 
-#: settings/utils/ldap.py:587
+#: settings/utils/ldap.py:585
 msgid "LDAP User attr map not include: {}"
 msgstr "LDAP ユーザーattrマップは含まれません: {}"
 
-#: settings/utils/ldap.py:594
+#: settings/utils/ldap.py:592
 msgid "LDAP User attr map is not dict"
 msgstr "LDAPユーザーattrマップはdictではありません"
 
-#: settings/utils/ldap.py:613
+#: settings/utils/ldap.py:611
 msgid "LDAP authentication is not enabled"
 msgstr "LDAP 認証が有効になっていない"
 
-#: settings/utils/ldap.py:631
+#: settings/utils/ldap.py:629
 msgid "Error (Invalid LDAP server): {}"
 msgstr "エラー (LDAPサーバーが無効): {}"
 
-#: settings/utils/ldap.py:633
+#: settings/utils/ldap.py:631
 msgid "Error (Invalid Bind DN): {}"
 msgstr "エラー (DNのバインドが無効): {}"
 
-#: settings/utils/ldap.py:635
+#: settings/utils/ldap.py:633
 msgid "Error (Invalid LDAP User attr map): {}"
 msgstr "エラー (LDAPユーザーattrマップが無効): {}"
 
-#: settings/utils/ldap.py:637
+#: settings/utils/ldap.py:635
 msgid "Error (Invalid User OU or User search filter): {}"
 msgstr "エラー (ユーザーOUまたはユーザー検索フィルターが無効): {}"
 
-#: settings/utils/ldap.py:639
+#: settings/utils/ldap.py:637
 msgid "Error (Not enabled LDAP authentication): {}"
 msgstr "エラー (LDAP認証が有効化されていません): {}"
 
-#: settings/utils/ldap.py:641
+#: settings/utils/ldap.py:639
 msgid "Error (Unknown): {}"
 msgstr "エラー (不明): {}"
 
-#: settings/utils/ldap.py:644
+#: settings/utils/ldap.py:642
 msgid "Succeed: Match {} s user"
 msgstr "成功: {} 人のユーザーに一致"
 
-#: settings/utils/ldap.py:677
+#: settings/utils/ldap.py:653
+msgid "Please test the connection first"
+msgstr "まず接続をテストしてください"
+
+#: settings/utils/ldap.py:675
 msgid "Authentication failed (configuration incorrect): {}"
 msgstr "認証に失敗しました (設定が正しくありません): {}"
 
-#: settings/utils/ldap.py:681
+#: settings/utils/ldap.py:679
 msgid "Authentication failed (username or password incorrect): {}"
 msgstr "認証に失敗しました (ユーザー名またはパスワードが正しくありません): {}"
 
-#: settings/utils/ldap.py:683
+#: settings/utils/ldap.py:681
 msgid "Authentication failed (Unknown): {}"
 msgstr "認証に失敗しました (不明): {}"
 
-#: settings/utils/ldap.py:686
+#: settings/utils/ldap.py:684
 msgid "Authentication success: {}"
 msgstr "認証成功: {}"
 
@@ -8718,6 +8716,15 @@ msgstr "エンタープライズプロフェッショナル版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "エンタープライズ・フラッグシップ・エディション"
+
+#~ msgid "Synchronization start, please wait."
+#~ msgstr "同期開始、お待ちください。"
+
+#~ msgid "Synchronization is running, please wait."
+#~ msgstr "同期が実行中です。しばらくお待ちください。"
+
+#~ msgid "Synchronization error: {}"
+#~ msgstr "同期エラー: {}"
 
 #~ msgid "Copy"
 #~ msgstr "コピー"
