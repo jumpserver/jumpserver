@@ -12,6 +12,8 @@ default_interface = dict((
     ('login_title', _('JumpServer Open Source Bastion Host')),
     ('theme', 'classic_green'),
     ('theme_info', {}),
+    ('beian_link', ''),
+    ('beian_text', '')
 ))
 
 default_context = {
