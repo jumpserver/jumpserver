@@ -62,7 +62,7 @@ class SessionFilterSet(BaseFilterSet):
     class Meta:
         model = Session
         fields = [
-            "user", "asset", "account", "remote_addr",
+            "user", "user_id", "asset", "account", "remote_addr",
             "protocol", "is_finished", 'login_from', 'terminal'
         ]
 
