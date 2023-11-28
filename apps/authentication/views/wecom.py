@@ -15,7 +15,8 @@ from authentication.permissions import UserConfirmation
 from common.sdk.im.wecom import URL
 from common.sdk.im.wecom import WeCom
 from common.utils import get_logger
-from common.utils.django import reverse, get_object_or_none
+from common.utils.common import get_request_ip
+from common.utils.django import reverse, get_object_or_none, safe_next_url
 from common.utils.random import random_string
 from common.views.mixins import UserConfirmRequiredExceptionMixin, PermissionsMixin
 from users.models import User
@@ -135,6 +136,7 @@ class WeComQRLoginView(WeComQRMixin, METAMixin, View):
     def get(self, request: HttpRequest):
         redirect_url = request.GET.get('redirect_url') or reverse('index')
         next_url = self.get_next_url_from_meta() or reverse('index')
+        next_url = safe_next_url(next_url, request=request)
         redirect_uri = reverse('authentication:wecom-qr-login-callback', external=True)
         redirect_uri += '?' + urlencode({
             'redirect_url': redirect_url,

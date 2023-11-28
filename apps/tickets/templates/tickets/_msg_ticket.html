@@ -1,15 +1,20 @@
 {% load i18n %}
-<div>
-    <p>
+<div class="ticket-container">
+    <p class="title">
         {{ title | safe }}
     </p>
     <div>
         {% for child in content %}
-            <h2>{{ child.title }}</h2>
-            <hr>
+            <h4 style="color: #333;
+                font-size: 1.1em;
+                margin-top: 20px;
+                border-bottom: 1px solid #ccc;
+                padding-bottom: 5px;
+                background-color: #f7f7f7;">{{ child.title }}</h4>
             {% for item in child.content %}
-                <li style="list-style-type:none">
-                    <b>{{ item.title }}: </b> {{ item.value }}
+                <li style="overflow: hidden; list-style-type: none;">
+                    <span style="color: #737373;line-height: 2.5em;">{{ item.title }} </span>
+                    <span style="float: right; width: 90%;line-height: 2.5em;">{{ item.value }}</span>
                 </li>
             {% endfor %}
         {% endfor %}

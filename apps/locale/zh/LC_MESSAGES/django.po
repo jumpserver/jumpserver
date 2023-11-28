@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-22 16:42+0800\n"
+"POT-Creation-Date: 2023-11-24 10:34+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1565,7 +1565,7 @@ msgstr "确认按钮选择器"
 msgid "API mode"
 msgstr "API 模式"
 
-#: assets/const/types.py:224
+#: assets/const/types.py:247
 msgid "All types"
 msgstr "所有类型"
 
@@ -8567,7 +8567,15 @@ msgstr "退出页面logo"
 msgid "Theme"
 msgstr "主题"
 
-#: xpack/plugins/interface/models.py:44 xpack/plugins/interface/models.py:85
+#: xpack/plugins/interface/models.py:42
+msgid "Beian link"
+msgstr "公安联网备案跳转链接"
+
+#: xpack/plugins/interface/models.py:43
+msgid "Beian text"
+msgstr "公安联网备案号"
+
+#: xpack/plugins/interface/models.py:46 xpack/plugins/interface/models.py:87
 msgid "Interface setting"
 msgstr "界面设置"
 

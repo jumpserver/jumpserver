@@ -14,7 +14,7 @@ from common.api import JMSGenericViewSet
 from common.const.http import POST, GET
 from common.permissions import OnlySuperUser
 from common.serializers import EmptySerializer
-from common.utils import reverse
+from common.utils import reverse, safe_next_url
 from common.utils.timezone import utc_now
 from users.models import User
 from ..errors import SSOAuthClosed
@@ -45,6 +45,7 @@ class SSOViewSet(AuthMixin, JMSGenericViewSet):
         username = serializer.validated_data['username']
         user = User.objects.get(username=username)
         next_url = serializer.validated_data.get(NEXT_URL)
+        next_url = safe_next_url(next_url, request=request)
 
         operator = request.user.username
         # TODO `created_by` 和 `created_by` 可以通过 `ThreadLocal` 统一处理

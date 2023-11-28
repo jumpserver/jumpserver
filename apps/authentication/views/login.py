@@ -24,7 +24,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import FormView
 
-from common.utils import FlashMessageUtil, static_or_direct
+from common.utils import FlashMessageUtil, static_or_direct, safe_next_url
 from users.utils import (
     redirect_user_first_login_or_index
 )
@@ -208,6 +208,7 @@ class UserLoginView(mixins.AuthMixin, UserLoginContextMixin, FormView):
 
         auth_name, redirect_url = auth_method['name'], auth_method['url']
         next_url = request.GET.get('next') or '/'
+        next_url = safe_next_url(next_url, request=request)
         query_string = request.GET.urlencode()
         redirect_url = '{}?next={}&{}'.format(redirect_url, next_url, query_string)
 
