@@ -56,17 +56,8 @@ class SlackRequests:
         self._client_id = client_id
         self._client_secret = client_secret
         self._bot_token = bot_token
-        self._access_token = None
+        self.access_token = None
         self.user_id = None
-
-    @property
-    def access_token(self):
-        if self._access_token is None:
-            self.request_access_token()
-        return self._access_token
-
-    def set_code(self, code):
-        self.request_access_token(code)
 
     def add_token(self, headers, with_bot_token, with_access_token):
         if with_access_token:
@@ -96,7 +87,7 @@ class SlackRequests:
         response = self.request(
             'post', url=URL().ACCESS_TOKEN, data=data, with_bot_token=False
         )
-        self._access_token = response['access_token']
+        self.access_token = response['access_token']
         self.user_id = response['authed_user']['id']
 
 
@@ -108,7 +99,7 @@ class Slack:
         self.markdown = mistune.Markdown(renderer=SlackRenderer())
 
     def get_user_id_by_code(self, code):
-        self._client.set_code(code)
+        self._client.request_access_token(code)
         response = self._client.request(
             'get', f'{URL().GET_USER_INFO_BY_USER_ID}?user={self._client.user_id}',
             with_bot_token=False, with_access_token=True
