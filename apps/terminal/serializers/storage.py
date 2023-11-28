@@ -281,3 +281,10 @@ class ReplayStorageSerializer(BaseStorageSerializer):
         extra_kwargs = {
             'name': {'validators': [UniqueValidator(queryset=ReplayStorage.objects.all())]}
         }
+
+    def validate_is_default(self, value):
+        if self.initial_data.get('type') == const.ReplayStorageType.sftp.value:
+            # sftp不能设置为默认存储
+            return False
+        else:
+            return value
