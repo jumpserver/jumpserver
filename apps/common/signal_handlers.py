@@ -66,6 +66,10 @@ def digest_sql_query():
     for table_name, queries in table_queries.items():
         if table_name.startswith('rbac_') or table_name.startswith('auth_permission'):
             continue
+
+        for query in queries:
+            sql = query['sql']
+            print("  # {}: {}".format(query['time'], sql))
         if len(queries) < 3:
             continue
         print("- Table: {}".format(table_name))
