@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "jumpserver"
-version = "v3.5"
+version = "v3.9"
 description = "广受欢迎的开源堡垒机"
 authors = ["ibuler <ibuler@qq.com>"]
 license = "GPLv3"
@@ -102,7 +102,7 @@ pytz = "2023.3"
 django-proxy = "1.2.2"
 python-daemon = "3.0.1"
 eventlet = "0.33.3"
-greenlet = "2.0.2"
+greenlet = "3.0.1"
 gunicorn = "21.2.0"
 celery = "5.3.1"
 flower = "2.0.1"
