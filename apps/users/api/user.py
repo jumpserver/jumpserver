@@ -53,7 +53,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
     }
 
     def get_queryset(self):
-        queryset = super().get_queryset().prefetch_related('groups')
+        queryset = super().get_queryset().prefetch_related('groups', 'labels')
         return queryset
 
     def allow_bulk_destroy(self, qs, filtered):

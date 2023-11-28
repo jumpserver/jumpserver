@@ -21,7 +21,7 @@ __all__ = [
     "DatetimeRangeFilterBackend", "IDSpmFilterBackend",
     'IDInFilterBackend', "CustomFilterBackend",
     "BaseFilterSet", 'IDNotFilterBackend',
-    'NotOrRelFilterBackend',
+    'NotOrRelFilterBackend', 'LabelFilterBackend',
 ]
 
 
@@ -165,6 +165,40 @@ class IDNotFilterBackend(filters.BaseFilterBackend):
             return queryset
         id_list = [i.strip() for i in ids.split(',')]
         queryset = queryset.exclude(id__in=id_list)
+        return queryset
+
+
+class LabelFilterBackend(filters.BaseFilterBackend):
+    def get_schema_fields(self, view):
+        return [
+            coreapi.Field(
+                name='label', location='query', required=False,
+                type='string', example='/api/v1/users/users?label=abc',
+                description='Filter by label'
+            )
+        ]
+
+    def filter_queryset(self, request, queryset, view):
+        label_id = request.query_params.get('label')
+        if not label_id:
+            return queryset
+
+        if not hasattr(queryset, 'model'):
+            return queryset
+
+        if hasattr(queryset.model, 'labels'):
+            return queryset
+
+        model = queryset.model
+        labeled_resource_cls = model.labels.field.related_model
+        app_label = model._meta.app_label
+        model_name = model._meta.model_name
+
+        res_ids = labeled_resource_cls.objects.filter(
+            res_type__app_label=app_label, res_type__model=model_name,
+            label_id=label_id
+        ).values_list('res_id', flat=True)
+        queryset = queryset.filter(id__in=set(res_ids))
         return queryset
 
 

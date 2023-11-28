@@ -4,15 +4,17 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers.fields import ObjectRelatedField
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .models import Label, LabeledResource
 
 __all__ = ['LabelSerializer', 'LabeledResourceSerializer', 'ContentTypeResourceSerializer']
 
 
-class LabelSerializer(serializers.ModelSerializer):
+class LabelSerializer(BulkOrgResourceModelSerializer):
     class Meta:
         model = Label
-        fields = ('id', 'name', 'value', 'res_count', 'date_created', 'date_updated')
+        fields = ['id', 'name', 'value', 'res_count', 'date_created', 'date_updated']
+        read_only_fields = ('date_created', 'date_updated', 'res_count')
 
     @classmethod
     def setup_eager_loading(cls, queryset):

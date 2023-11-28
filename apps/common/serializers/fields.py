@@ -20,7 +20,8 @@ __all__ = [
     "TreeChoicesField",
     "LabeledMultipleChoiceField",
     "PhoneField",
-    "JSONManyToManyField"
+    "JSONManyToManyField",
+    "LabelRelatedField"
 ]
 
 
@@ -97,6 +98,17 @@ class LabeledMultipleChoiceField(serializers.MultipleChoiceField):
             return [item.get("value") for item in data]
         else:
             return data
+
+
+class LabelRelatedField(serializers.RelatedField):
+    def __init__(self, **kwargs):
+        kwargs = {**kwargs, "read_only": True}
+        super().__init__(**kwargs)
+
+    def to_representation(self, value):
+        if value is None:
+            return value
+        return str(value.label)
 
 
 class ObjectRelatedField(serializers.RelatedField):

@@ -8,7 +8,7 @@ from rest_framework import serializers
 
 from common.serializers import CommonBulkSerializerMixin
 from common.serializers.fields import (
-    EncryptedField, ObjectRelatedField, LabeledChoiceField, PhoneField
+    EncryptedField, ObjectRelatedField, LabeledChoiceField, PhoneField, LabelRelatedField
 )
 from common.utils import pretty_string, get_logger
 from common.validators import PhoneValidator
@@ -105,6 +105,9 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
     phone = PhoneField(
         validators=[PhoneValidator()], required=False, allow_blank=True, allow_null=True, label=_("Phone")
     )
+    labels = LabelRelatedField(
+        read_only=True, many=True, label=_('Labels'),
+    )
     custom_m2m_fields = {
         "system_roles": [BuiltinRole.system_user],
         "org_roles": [BuiltinRole.org_user],
@@ -143,7 +146,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         # 外键的字段
         fields_fk = []
         # 多对多字段
-        fields_m2m = ["groups", "system_roles", "org_roles", ]
+        fields_m2m = ["groups", "system_roles", "org_roles", "labels"]
         # 在serializer 上定义的字段
         fields_custom = ["login_blocked", "password_strategy"]
         fields = fields_verbose + fields_fk + fields_m2m + fields_custom
