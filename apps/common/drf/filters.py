@@ -186,7 +186,7 @@ class LabelFilterBackend(filters.BaseFilterBackend):
         if not hasattr(queryset, 'model'):
             return queryset
 
-        if hasattr(queryset.model, 'labels'):
+        if not hasattr(queryset.model, 'labels'):
             return queryset
 
         model = queryset.model

@@ -14,7 +14,7 @@ from common.serializers import (
     CommonModelSerializer, MethodSerializer
 )
 from common.serializers.common import DictSerializer
-from common.serializers.fields import LabeledChoiceField
+from common.serializers.fields import LabeledChoiceField, LabelRelatedField
 from labels.models import Label
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ...const import Category, AllTypes
@@ -121,7 +121,7 @@ class AccountSecretSerializer(SecretReadableMixin, CommonModelSerializer):
 class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSerializer):
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
-    labels = AssetLabelSerializer(many=True, required=False, label=_('Label'))
+    labels = LabelRelatedField(read_only=True, many=True, label=_('Labels'), )
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'), default=())
     accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, write_only=True, label=_('Account'))
     nodes_display = serializers.ListField(read_only=False, required=False, label=_("Node path"))

@@ -96,9 +96,10 @@ class LabelContentTypeResourceViewSet(JMSModelViewSet):
         content_type = get_object_or_404(ContentType, id=res_type)
         label = get_object_or_404(Label, pk=label_pk)
         res_ids = request.data.get('res_ids', [])
-        print("res_ids", res_ids)
 
-        LabeledResource.objects.filter(res_type=content_type, label=label).exclude(res_id__in=res_ids).delete()
+        LabeledResource.objects \
+            .filter(res_type=content_type, label=label) \
+            .exclude(res_id__in=res_ids).delete()
         resources = []
         for res_id in res_ids:
             resources.append(LabeledResource(res_type=content_type, res_id=res_id, label=label, org_id=current_org.id))
@@ -116,7 +117,17 @@ class LabelViewSet(OrgBulkModelViewSet):
     }
     rbac_perms = {
         'resource_types': 'labels.view_label',
+        'keys': 'labels.view_label',
     }
+
+    @action(methods=['GET'], detail=False)
+    def keys(self, request, *args, **kwargs):
+        queryset = Label.objects.all()
+        keyword = request.query_params.get('search')
+        if keyword:
+            queryset = queryset.filter(name__icontains=keyword)
+        keys = queryset.values_list('name', flat=True).distinct()
+        return Response(keys)
 
 
 class LabeledResourceViewSet(OrgBulkModelViewSet):
