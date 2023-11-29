@@ -11,3 +11,4 @@ from .saml2 import *
 from .sms import *
 from .sso import *
 from .wecom import *
+from .slack import *

@@ -17,7 +17,8 @@ class AuthSettingSerializer(serializers.Serializer):
     AUTH_RADIUS = serializers.BooleanField(required=False, label=_('RADIUS Auth'))
     AUTH_DINGTALK = serializers.BooleanField(default=False, label=_('DingTalk Auth'))
     AUTH_FEISHU = serializers.BooleanField(default=False, label=_('FeiShu Auth'))
-    AUTH_WECOM = serializers.BooleanField(default=False, label=_('WeCom Auth'))
+    AUTH_WECOM = serializers.BooleanField(default=False, label=_('Slack Auth'))
+    AUTH_SLACK = serializers.BooleanField(default=False, label=_('WeCom Auth'))
     AUTH_SSO = serializers.BooleanField(default=False, label=_("SSO Auth"))
     AUTH_PASSKEY = serializers.BooleanField(default=False, label=_("Passkey Auth"))
     FORGOT_PASSWORD_URL = serializers.CharField(
