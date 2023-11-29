@@ -189,6 +189,14 @@ class LabelFilterBackend(filters.BaseFilterBackend):
         if not hasattr(queryset.model, 'labels'):
             return queryset
 
+        kwargs = {}
+        if ':' in label_id:
+            k, v = label_id.split(':', 1)
+            kwargs['label__name'] = k
+            kwargs['label__value'] = v
+        else:
+            kwargs['label_id'] = label_id
+
         model = queryset.model
         labeled_resource_cls = model.labels.field.related_model
         app_label = model._meta.app_label
@@ -196,8 +204,7 @@ class LabelFilterBackend(filters.BaseFilterBackend):
 
         res_ids = labeled_resource_cls.objects.filter(
             res_type__app_label=app_label, res_type__model=model_name,
-            label_id=label_id
-        ).values_list('res_id', flat=True)
+        ).filter(**kwargs).values_list('res_id', flat=True)
         queryset = queryset.filter(id__in=set(res_ids))
         return queryset
 

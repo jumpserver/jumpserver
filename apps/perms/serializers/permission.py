@@ -131,7 +131,7 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
         """Perform necessary eager loading of data."""
         queryset = queryset.prefetch_related(
             "users", "user_groups", "assets", "nodes",
-        )
+        ).prefetch_related('labels', 'labels__label')
         return queryset
 
     @staticmethod
