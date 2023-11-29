@@ -1,34 +1,31 @@
 {% load i18n %}
 <div class="ticket-container">
-    <p class="title">
+    <h1 class="title">
         {{ title | safe }}
-    </p>
+    </h1>
     <div>
         {% for child in content %}
-            <h4 style="color: #333;
-                font-size: 1.1em;
-                margin-top: 20px;
-                border-bottom: 1px solid #ccc;
-                padding-bottom: 5px;
-                background-color: #f7f7f7;">{{ child.title }}</h4>
-            {% for item in child.content %}
-                <li style="overflow: hidden; list-style-type: none;">
-                    <span style="color: #737373;line-height: 2.5em;">{{ item.title }} </span>
-                    <span style="float: right; width: 90%;line-height: 2.5em;">{{ item.value }}</span>
-                </li>
-            {% endfor %}
+            <div class="card">
+                <h2 class="child_title">{{ child.title }}</h2>
+                {% for item in child.content %}
+                    <p class="field-group">
+                        <span class="field-name"><strong>{{ item.title }}:</strong></span>
+                        <span class="field-value">{{ item.value }}</span>
+                    </p>
+                {% endfor %}
+            </div>
         {% endfor %}
     </div>
-    <br>
-    <div>
-        <a href="{{ ticket_detail_url }}" target="_blank">
+    <div class="action_group">
+        <a class="view-link" href="{{ ticket_detail_url }}" target="_blank" rel="noopener">
             {% trans 'View details' %}
         </a>
         <br>
         {% if ticket_approval_url %}
-            <a href="{{ ticket_approval_url }}" target="_blank">
+            <a href="{{ ticket_approval_url }}" target="_blank" rel="noopener">
                 {% trans 'Direct approval' %}
             </a>
         {% endif %}
     </div>
+    <br>
 </div>
