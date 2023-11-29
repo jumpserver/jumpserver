@@ -3,23 +3,21 @@ import uuid
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from assets.models import Node, Asset
-from perms.models import PermNode
-from perms.utils.user_perm import UserPermAssetUtil
+from assets.models import Asset
+from common.serializers import ResourceLabelsMixin
 from common.serializers.fields import ReadableHiddenField
 from ops.mixin import PeriodTaskSerializerMixin
 from ops.models import Job, JobExecution
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 
-class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
+class JobSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
     run_after_save = serializers.BooleanField(label=_("Run after save"), default=False, required=False)
     nodes = serializers.ListField(required=False, child=serializers.CharField())
     date_last_run = serializers.DateTimeField(label=_('Date last run'), read_only=True)
     name = serializers.CharField(label=_('Name'), max_length=128, allow_blank=True, required=False)
-    assets = serializers.PrimaryKeyRelatedField(label=_('Assets'), queryset=Asset.objects, many=True,
-                                                required=False)
+    assets = serializers.PrimaryKeyRelatedField(label=_('Assets'), queryset=Asset.objects, many=True, required=False)
 
     def to_internal_value(self, data):
         instant = data.get('instant', False)
@@ -36,11 +34,12 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
     class Meta:
         model = Job
         read_only_fields = [
-            "id", "date_last_run", "date_created", "date_updated", "average_time_cost"
+            "id", "date_last_run", "date_created",
+            "date_updated", "average_time_cost"
         ]
         fields = read_only_fields + [
             "name", "instant", "type", "module",
-            "args", "playbook", "assets",
+            "args", "playbook", "assets", "labels",
             "runas_policy", "runas", "creator",
             "use_parameter_define", "parameters_define",
             "timeout", "chdir", "comment", "summary",

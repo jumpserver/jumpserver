@@ -52,10 +52,6 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, SuggestionMixin, BulkModelV
         'bulk_remove': 'users.remove_user',
     }
 
-    def get_queryset(self):
-        queryset = super().get_queryset().prefetch_related('groups', 'labels')
-        return queryset
-
     def allow_bulk_destroy(self, qs, filtered):
         is_valid = filtered.count() < qs.count()
         if not is_valid:

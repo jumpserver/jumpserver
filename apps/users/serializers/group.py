@@ -3,8 +3,8 @@
 from django.db.models import Count
 from django.utils.translation import gettext_lazy as _
 
-from common.serializers.fields import LabelRelatedField
-from common.serializers.mixin import ObjectRelatedField
+from common.serializers.fields import ObjectRelatedField
+from common.serializers.mixin import ResourceLabelsMixin
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .. import utils
 from ..models import User, UserGroup
@@ -14,12 +14,9 @@ __all__ = [
 ]
 
 
-class UserGroupSerializer(BulkOrgResourceModelSerializer):
+class UserGroupSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
     users = ObjectRelatedField(
         required=False, many=True, queryset=User.objects, label=_('User'),
-    )
-    labels = LabelRelatedField(
-        read_only=True, many=True, label=_('Labels'),
     )
 
     class Meta:
@@ -47,5 +44,6 @@ class UserGroupSerializer(BulkOrgResourceModelSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('users', 'labels').annotate(users_amount=Count('users'))
+        queryset = queryset.prefetch_related('users', 'labels', 'labels__label') \
+            .annotate(users_amount=Count('users'))
         return queryset

@@ -6,9 +6,9 @@ from functools import partial
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from common.serializers import CommonBulkSerializerMixin
+from common.serializers import CommonBulkSerializerMixin, ResourceLabelsMixin
 from common.serializers.fields import (
-    EncryptedField, ObjectRelatedField, LabeledChoiceField, PhoneField, LabelRelatedField
+    EncryptedField, ObjectRelatedField, LabeledChoiceField, PhoneField
 )
 from common.utils import pretty_string, get_logger
 from common.validators import PhoneValidator
@@ -81,7 +81,7 @@ class RolesSerializerMixin(serializers.Serializer):
         return fields
 
 
-class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializers.ModelSerializer):
+class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLabelsMixin, serializers.ModelSerializer):
     password_strategy = LabeledChoiceField(
         choices=PasswordStrategy.choices,
         default=PasswordStrategy.email,
@@ -104,9 +104,6 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
     password = EncryptedField(label=_("Password"), required=False, allow_blank=True, allow_null=True, max_length=1024, )
     phone = PhoneField(
         validators=[PhoneValidator()], required=False, allow_blank=True, allow_null=True, label=_("Phone")
-    )
-    labels = LabelRelatedField(
-        read_only=True, many=True, label=_('Labels'),
     )
     custom_m2m_fields = {
         "system_roles": [BuiltinRole.system_user],
@@ -261,6 +258,11 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
             validated_data, save_handler, created=True
         )
         return instance
+
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        queryset = queryset.prefetch_related('groups', 'labels', 'labels__label')
+        return queryset
 
 
 class UserRetrieveSerializer(UserSerializer):
