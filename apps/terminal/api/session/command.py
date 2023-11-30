@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+import uuid
 from django.utils import timezone
 from rest_framework import generics
 from rest_framework.fields import DateTimeField
@@ -166,6 +167,7 @@ class CommandViewSet(JMSBulkModelViewSet):
 
     def get_queryset(self):
         command_storage_id = self.request.query_params.get('command_storage_id')
+        asset_id = self.request.query_params.get('asset_id')
         if not command_storage_id:
             return Command.objects.none()
 
@@ -174,6 +176,9 @@ class CommandViewSet(JMSBulkModelViewSet):
             raise StorageInvalid
         else:
             qs = storage.get_command_queryset()
+        if asset_id:
+            session_ids = Session.objects.filter(asset_id=asset_id).values_list('id', flat=True)
+            qs = qs.filter(session__in=list(session_ids))
         return qs
 
     def create(self, request, *args, **kwargs):
