@@ -13,11 +13,12 @@ class CommandFilter(filters.FilterSet):
     user = filters.CharFilter(lookup_expr='startswith')
     input = filters.CharFilter(lookup_expr='icontains')
     asset = filters.CharFilter(field_name='asset', lookup_expr='icontains')
+    asset_id = filters.UUIDFilter(method='do_nothing')
 
     class Meta:
         model = Command
         fields = [
-            'asset', 'account', 'user', 'session', 'risk_level', 'input',
+            'asset', 'asset_id', 'account', 'user', 'session', 'risk_level', 'input',
             'date_from', 'date_to', 'session_id', 'risk_level', 'command_storage_id',
         ]
 
