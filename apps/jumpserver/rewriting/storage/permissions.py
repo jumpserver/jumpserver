@@ -5,6 +5,7 @@ path_perms_map = {
     'settings': '*',
     'replay': 'default',
     'applets': 'terminal.view_applet',
+    'virtual_apps': 'terminal.view_virtualapp',
     'playbooks': 'ops.view_playbook'
 }
 

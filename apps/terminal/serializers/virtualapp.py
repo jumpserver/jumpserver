@@ -12,17 +12,19 @@ __all__ = [
 
 
 class VirtualAppSerializer(serializers.ModelSerializer):
+    icon = serializers.ReadOnlyField(label=_("Icon"))
     image_protocol = serializers.CharField(max_length=16, default='vnc')
     image_port = serializers.IntegerField(default=5900)
 
     class Meta:
         model = VirtualApp
-        fields_mini = ['id', 'name', 'image_name', 'is_active']
+        fields_mini = ['id', 'display_name', 'name', 'image_name', 'is_active']
         read_only_fields = [
-            'date_created', 'date_updated',
+            'icon', 'readme', 'date_created', 'date_updated',
         ]
         fields = fields_mini + [
-            'image_protocol', 'image_port', 'protocols', 'comment',
+            'version', 'author', 'image_protocol', 'image_port',
+            'protocols', 'tags', 'comment',
         ] + read_only_fields
 
 

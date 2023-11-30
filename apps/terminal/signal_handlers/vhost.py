@@ -19,4 +19,6 @@ def on_virtual_app_create(sender, instance, created=False, **kwargs):
     if not created:
         return
     hosts = VirtualHost.objects.all()
+    if len(hosts) == 0:
+        return
     instance.hosts.set(hosts)
