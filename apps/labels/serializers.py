@@ -15,6 +15,9 @@ class LabelSerializer(BulkOrgResourceModelSerializer):
         model = Label
         fields = ['id', 'name', 'value', 'res_count', 'date_created', 'date_updated']
         read_only_fields = ('date_created', 'date_updated', 'res_count')
+        extra_kwargs = {
+            'res_count': {'label': _('Resource count')},
+        }
 
     @classmethod
     def setup_eager_loading(cls, queryset):
@@ -24,7 +27,9 @@ class LabelSerializer(BulkOrgResourceModelSerializer):
 
 
 class LabeledResourceSerializer(serializers.ModelSerializer):
-    res_type = ObjectRelatedField(queryset=ContentType.objects, attrs=('app_label', 'model', 'name'))
+    res_type = ObjectRelatedField(
+        queryset=ContentType.objects, attrs=('app_label', 'model', 'name'), label=_("Resource type")
+    )
     label = ObjectRelatedField(queryset=Label.objects, attrs=('name', 'value'))
     resource = serializers.CharField(label=_("Resource"))
 

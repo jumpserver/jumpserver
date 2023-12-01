@@ -70,6 +70,7 @@ class LabelContentTypeResourceViewSet(JMSModelViewSet):
         'default': 'labels.view_labeledresource',
         'update': 'labels.change_labeledresource',
     }
+    ordering_fields = ('res_type', 'date_created')
 
     def get_queryset(self):
         label_pk = self.kwargs.get('label')
