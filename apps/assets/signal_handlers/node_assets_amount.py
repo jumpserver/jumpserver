@@ -37,6 +37,7 @@ def on_node_asset_change(sender, action, instance, reverse, pk_set, **kwargs):
         update_nodes_assets_amount(node_ids=node_ids)
 
 
+# verified
 @merge_delay_run(ttl=5)
 def update_nodes_assets_amount(node_ids=()):
     nodes = Node.objects.filter(id__in=node_ids)

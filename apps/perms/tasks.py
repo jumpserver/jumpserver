@@ -34,7 +34,7 @@ def check_asset_permission_expired():
     perm_ids = list(perms.distinct().values_list('id', flat=True))
     show_perm_ids = perm_ids[:5]
     logger.info(f'Checking expired permissions: {show_perm_ids} ...')
-    UserPermTreeExpireUtil().expire_perm_tree_for_perms(perm_ids)
+    UserPermTreeExpireUtil().expire_perm_tree_for_perms(perm_ids=perm_ids)
 
 
 @shared_task(verbose_name=_('Send asset permission expired notification'))

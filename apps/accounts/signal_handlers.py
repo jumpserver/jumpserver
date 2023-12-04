@@ -24,6 +24,7 @@ def on_account_pre_save(sender, instance, **kwargs):
         instance.version = instance.history.count()
 
 
+# verified
 @merge_delay_run(ttl=5)
 def push_accounts_if_need(accounts=()):
     from .models import AccountTemplate

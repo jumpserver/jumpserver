@@ -21,6 +21,7 @@ def on_node_pre_save(sender, instance: Node, **kwargs):
     instance.parent_key = instance.compute_parent_key()
 
 
+# verfied
 @merge_delay_run(ttl=5, key=key_by_org)
 def test_assets_connectivity_handler(assets=()):
     task_name = gettext_noop("Test assets connectivity ")
@@ -28,6 +29,7 @@ def test_assets_connectivity_handler(assets=()):
     test_assets_connectivity_task.delay(asset_ids, str(current_org.id), task_name)
 
 
+# verified
 @merge_delay_run(ttl=5, key=key_by_org)
 def gather_assets_facts_handler(assets=()):
     if not assets:

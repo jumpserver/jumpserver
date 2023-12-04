@@ -35,7 +35,7 @@ def refresh_settings_on_changed(sender, instance=None, **kwargs):
         """ 过期所有用户授权树 """
         logger.debug('Expire all user perm tree')
         from perms.utils import UserPermTreeExpireUtil
-        UserPermTreeExpireUtil().expire_perm_tree_for_all_user()
+        UserPermTreeExpireUtil.expire_perm_tree_for_all_user()
 
 
 @receiver(django_ready)

@@ -3,15 +3,13 @@
 from django.db.models.signals import m2m_changed, pre_delete, pre_save, post_save
 from django.dispatch import receiver
 
-from users.models import User, UserGroup
 from assets.models import Asset
-from common.utils import get_logger, get_object_or_none
-from common.exceptions import M2MReverseNotAllowed
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR
-
+from common.exceptions import M2MReverseNotAllowed
+from common.utils import get_logger, get_object_or_none
 from perms.models import AssetPermission
 from perms.utils import UserPermTreeExpireUtil
-
+from users.models import User, UserGroup
 
 logger = get_logger(__file__)
 
@@ -21,7 +19,7 @@ def on_user_group_delete(sender, instance: UserGroup, using, **kwargs):
     exists = AssetPermission.user_groups.through.objects.filter(usergroup_id=instance.id).exists()
     if not exists:
         return
-    UserPermTreeExpireUtil().expire_perm_tree_for_user_group(instance)
+    UserPermTreeExpireUtil.expire_perm_tree_for_user_group(instance)
 
 
 @receiver(m2m_changed, sender=User.groups.through)
@@ -38,17 +36,17 @@ def on_user_groups_change(sender, instance, action, reverse, pk_set, **kwargs):
         group = UserGroup.objects.get(id=list(group_ids)[0])
         org_id = group.org_id
 
-    has_group_perm = AssetPermission.user_groups.through.objects\
+    has_group_perm = AssetPermission.user_groups.through.objects \
         .filter(usergroup_id__in=group_ids).exists()
     if not has_group_perm:
         return
 
-    UserPermTreeExpireUtil().expire_perm_tree_for_users_orgs(user_ids, [org_id])
+    UserPermTreeExpireUtil.expire_perm_tree_for_users_orgs(user_ids_org_id=[user_ids, org_id])
 
 
 @receiver([pre_delete], sender=AssetPermission)
 def on_asset_perm_pre_delete(sender, instance, **kwargs):
-    UserPermTreeExpireUtil().expire_perm_tree_for_perms([instance.id])
+    UserPermTreeExpireUtil.expire_perm_tree_for_perms(perm_ids=[instance.id])
 
 
 @receiver([pre_save], sender=AssetPermission)
@@ -58,14 +56,14 @@ def on_asset_perm_pre_save(sender, instance, **kwargs):
         return
     if old.is_valid == instance.is_valid:
         return
-    UserPermTreeExpireUtil().expire_perm_tree_for_perms([instance.id])
+    UserPermTreeExpireUtil.expire_perm_tree_for_perms(perm_ids=[instance.id])
 
 
 @receiver([post_save], sender=AssetPermission)
 def on_asset_perm_post_save(sender, instance, created, **kwargs):
     if not created:
         return
-    UserPermTreeExpireUtil().expire_perm_tree_for_perms([instance.id])
+    UserPermTreeExpireUtil.expire_perm_tree_for_perms(perm_ids=[instance.id])
 
 
 def need_rebuild_mapping_node(action):
@@ -78,7 +76,7 @@ def on_permission_nodes_changed(sender, instance, action, reverse, **kwargs):
         return
     if reverse:
         raise M2MReverseNotAllowed
-    UserPermTreeExpireUtil().expire_perm_tree_for_perms([instance.id])
+    UserPermTreeExpireUtil.expire_perm_tree_for_perms(perm_ids=[instance.id])
 
 
 @receiver(m2m_changed, sender=AssetPermission.assets.through)
@@ -87,7 +85,7 @@ def on_permission_assets_changed(sender, instance, action, reverse, pk_set, mode
         return
     if reverse:
         raise M2MReverseNotAllowed
-    UserPermTreeExpireUtil().expire_perm_tree_for_perms([instance.id])
+    UserPermTreeExpireUtil.expire_perm_tree_for_perms(perms_id=[instance.id])
 
 
 @receiver(m2m_changed, sender=AssetPermission.users.through)
@@ -97,7 +95,7 @@ def on_asset_permission_users_changed(sender, action, reverse, instance, pk_set,
     if not need_rebuild_mapping_node(action):
         return
     user_ids = pk_set
-    UserPermTreeExpireUtil().expire_perm_tree_for_users_orgs(user_ids, [instance.org.id])
+    UserPermTreeExpireUtil.expire_perm_tree_for_users_orgs(user_ids_org_id=[user_ids, instance.org.id])
 
 
 @receiver(m2m_changed, sender=AssetPermission.user_groups.through)
@@ -108,7 +106,7 @@ def on_asset_permission_user_groups_changed(sender, instance, action, pk_set, re
         raise M2MReverseNotAllowed
 
     group_ids = pk_set
-    UserPermTreeExpireUtil().expire_perm_tree_for_user_groups_orgs(group_ids, [instance.org.id])
+    UserPermTreeExpireUtil.expire_perm_tree_for_user_groups_orgs(group_ids, instance.org.id)
 
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
@@ -122,4 +120,4 @@ def on_node_asset_change(action, instance, reverse, pk_set, **kwargs):
         asset_ids = [instance.id]
         node_ids = pk_set
 
-    UserPermTreeExpireUtil().expire_perm_tree_for_nodes_assets(node_ids, asset_ids)
+    UserPermTreeExpireUtil.expire_perm_tree_for_nodes_assets(node_ids, asset_ids)

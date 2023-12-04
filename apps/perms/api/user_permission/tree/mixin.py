@@ -1,9 +1,8 @@
 from django.core.cache import cache
-
 from rest_framework.request import Request
 
-from common.utils.http import is_true
 from common.utils import lazyproperty
+from common.utils.http import is_true
 from perms.utils import UserPermTreeRefreshUtil
 from users.models import User
 
@@ -15,7 +14,7 @@ class RebuildTreeMixin:
     request: Request
 
     def get(self, request, *args, **kwargs):
-        UserPermTreeRefreshUtil(self.user).refresh_if_need(force=self.is_force_refresh_tree)
+        UserPermTreeRefreshUtil().refresh_if_need(self.user, force=self.is_force_refresh_tree)
         return super().get(request, *args, **kwargs)
 
     @lazyproperty

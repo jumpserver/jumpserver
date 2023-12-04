@@ -140,6 +140,7 @@ def _run_func_with_org(key, org, func, *args, **kwargs):
         func(*args, **kwargs)
     except Exception as e:
         logger.error('delay run error: %s' % e)
+        raise e
     _loop_debouncer_func_task_cache.pop(key, None)
     _loop_debouncer_func_args_cache.pop(key, None)
     _loop_debouncer_func_task_time_cache.pop(key, None)
@@ -183,9 +184,14 @@ def merge_delay_run(ttl=5, key=None):
 
     def inner(func):
         sigs = inspect.signature(func)
-        if len(sigs.parameters) != 1:
-            raise ValueError('func must have one arguments: %s' % func.__name__)
-        param = list(sigs.parameters.values())[0]
+        if len(sigs.parameters) > 2:
+            print("Signature: ", sigs.parameters)
+            raise ValueError('Func must least 2 arguments: %s' % func.__name__)
+        keys = list(sigs.parameters.keys())
+        if len(keys) == 2 and keys[0] not in ['cls']:
+            raise ValueError('Func first argument must be self or cls if two params: %s' % func.__name__)
+
+        param = list(sigs.parameters.values())[-1]
         if not isinstance(param.default, tuple):
             raise ValueError('func default must be tuple: %s' % param.default)
         suffix_key_func = key if key else default_suffix_key
@@ -199,9 +205,17 @@ def merge_delay_run(ttl=5, key=None):
             cache_key = f'MERGE_DELAY_RUN_{func_name}_{key_suffix}'
             cache_kwargs = _loop_debouncer_func_args_cache.get(cache_key, {})
 
+            if len(args) > 1:
+                raise ValueError('Func args must be less one: %s' % func.__name__)
+            elif len(args) == 1 and not str(args[0]).startswith('<class'):
+                raise ValueError('Func args must be no args : %s' % func.__name__)
+
             for k, v in kwargs.items():
+                if k in ['cls']:
+                    continue
                 if not isinstance(v, (tuple, list, set)):
                     raise ValueError('func kwargs value must be list or tuple: %s %s' % (func.__name__, v))
+                print("Value: ", v)
                 v = set(v)
                 if k not in cache_kwargs:
                     cache_kwargs[k] = v
@@ -220,11 +234,20 @@ def test_delay_run():
     print("Hello,  now is %s" % time.time())
 
 
-@merge_delay_run(ttl=5, key=lambda users=(): users[0][0])
+@merge_delay_run(ttl=10, key=lambda users=(): users[0][0])
 def test_merge_delay_run(users=()):
     name = ','.join(users)
-    time.sleep(2)
     print("Hello, %s, now is %s" % (name, time.time()))
+
+
+class TestMergeRun:
+    prefix = 'test_'
+
+    @classmethod
+    @merge_delay_run(ttl=5)
+    def hello(cls, users=()):
+        name = ','.join(users)
+        print("Hello, %s" % name)
 
 
 def do_test():

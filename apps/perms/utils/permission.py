@@ -2,18 +2,18 @@ from django.db.models import QuerySet
 
 from assets.models import Node, Asset
 from common.utils import get_logger
-
 from perms.models import AssetPermission
 
 logger = get_logger(__file__)
 
-__all__ = ['AssetPermissionUtil']
+__all__ = ['AssetPermissionUtil', ]
 
 
-class AssetPermissionUtil(object):
+class AssetPermissionUtil:
     """ 资产授权相关的方法工具 """
 
-    def get_permissions_for_user(self, user, with_group=True, flat=False):
+    @classmethod
+    def get_permissions_for_user(cls, user, with_group=True, flat=False):
         """ 获取用户的授权规则 """
         perm_ids = set()
         # user
@@ -23,14 +23,15 @@ class AssetPermissionUtil(object):
         # group
         if with_group:
             groups = user.groups.all()
-            group_perm_ids = self.get_permissions_for_user_groups(groups, flat=True)
+            group_perm_ids = cls.get_permissions_for_user_groups(groups, flat=True)
             perm_ids.update(group_perm_ids)
-        perms = self.get_permissions(ids=perm_ids)
+        perms = cls.get_permissions(ids=perm_ids)
         if flat:
             return perms.values_list('id', flat=True)
         return perms
 
-    def get_permissions_for_user_groups(self, user_groups, flat=False):
+    @classmethod
+    def get_permissions_for_user_groups(cls, user_groups, flat=False):
         """ 获取用户组的授权规则 """
         if isinstance(user_groups, list):
             group_ids = [g.id for g in user_groups]
@@ -39,54 +40,58 @@ class AssetPermissionUtil(object):
         perm_ids = AssetPermission.user_groups.through.objects \
             .filter(usergroup_id__in=group_ids) \
             .values_list('assetpermission_id', flat=True).distinct()
-        perms = self.get_permissions(ids=perm_ids)
+        perms = cls.get_permissions(ids=perm_ids)
         if flat:
             return perms.values_list('id', flat=True)
         return perms
 
-    def get_permissions_for_assets(self, assets, with_node=True, flat=False):
+    @classmethod
+    def get_permissions_for_assets(cls, assets, with_node=True, flat=False):
         """ 获取资产的授权规则"""
         perm_ids = set()
-        assets = self.convert_to_queryset_if_need(assets, Asset)
+        assets = cls.convert_to_queryset_if_need(assets, Asset)
         asset_ids = [str(a.id) for a in assets]
         relations = AssetPermission.assets.through.objects.filter(asset_id__in=asset_ids)
         asset_perm_ids = relations.values_list('assetpermission_id', flat=True).distinct()
         perm_ids.update(asset_perm_ids)
         if with_node:
             nodes = Asset.get_all_nodes_for_assets(assets)
-            node_perm_ids = self.get_permissions_for_nodes(nodes, flat=True)
+            node_perm_ids = cls.get_permissions_for_nodes(nodes, flat=True)
             perm_ids.update(node_perm_ids)
-        perms = self.get_permissions(ids=perm_ids)
+        perms = cls.get_permissions(ids=perm_ids)
         if flat:
             return perms.values_list('id', flat=True)
         return perms
 
-    def get_permissions_for_nodes(self, nodes, with_ancestor=False, flat=False):
+    @classmethod
+    def get_permissions_for_nodes(cls, nodes, with_ancestor=False, flat=False):
         """ 获取节点的授权规则 """
-        nodes = self.convert_to_queryset_if_need(nodes, Node)
+        nodes = cls.convert_to_queryset_if_need(nodes, Node)
         if with_ancestor:
             nodes = Node.get_ancestor_queryset(nodes)
         node_ids = nodes.values_list('id', flat=True).distinct()
         relations = AssetPermission.nodes.through.objects.filter(node_id__in=node_ids)
         perm_ids = relations.values_list('assetpermission_id', flat=True).distinct()
-        perms = self.get_permissions(ids=perm_ids)
+        perms = cls.get_permissions(ids=perm_ids)
         if flat:
             return perms.values_list('id', flat=True)
         return perms
 
-    def get_permissions_for_user_asset(self, user, asset):
+    @classmethod
+    def get_permissions_for_user_asset(cls, user, asset):
         """ 获取同时包含用户、资产的授权规则 """
-        user_perm_ids = self.get_permissions_for_user(user, flat=True)
-        asset_perm_ids = self.get_permissions_for_assets([asset], flat=True)
+        user_perm_ids = cls.get_permissions_for_user(user, flat=True)
+        asset_perm_ids = cls.get_permissions_for_assets([asset], flat=True)
         perm_ids = set(user_perm_ids) & set(asset_perm_ids)
-        perms = self.get_permissions(ids=perm_ids)
+        perms = cls.get_permissions(ids=perm_ids)
         return perms
 
-    def get_permissions_for_user_group_asset(self, user_group, asset):
-        user_perm_ids = self.get_permissions_for_user_groups([user_group], flat=True)
-        asset_perm_ids = self.get_permissions_for_assets([asset], flat=True)
+    @classmethod
+    def get_permissions_for_user_group_asset(cls, user_group, asset):
+        user_perm_ids = cls.get_permissions_for_user_groups([user_group], flat=True)
+        asset_perm_ids = cls.get_permissions_for_assets([asset], flat=True)
         perm_ids = set(user_perm_ids) & set(asset_perm_ids)
-        perms = self.get_permissions(ids=perm_ids)
+        perms = cls.get_permissions(ids=perm_ids)
         return perms
 
     @staticmethod

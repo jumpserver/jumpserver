@@ -74,6 +74,7 @@ model_cache_field_mapper = {
 
 
 class OrgResourceStatisticsRefreshUtil:
+    # verified
     @staticmethod
     @merge_delay_run(ttl=5)
     def refresh_org_fields(org_fields=()):
@@ -83,11 +84,11 @@ class OrgResourceStatisticsRefreshUtil:
 
     @classmethod
     def refresh_if_need(cls, instance):
-        cache_field_name = model_cache_field_mapper.get(type(instance))
+        cache_field_name = tuple(model_cache_field_mapper.get(type(instance)))
         if not cache_field_name:
             return
         org = getattr(instance, 'org', None)
-        cls.refresh_org_fields(((org, cache_field_name),))
+        cls.refresh_org_fields(org_fields=[(org, cache_field_name)])
 
 
 @receiver(post_save)
@@ -104,7 +105,7 @@ def on_post_delete_refresh_org_resource_statistics_cache(sender, instance, **kwa
 def _refresh_session_org_resource_statistics_cache(instance: Session):
     cache_field_name = [
         'total_count_online_users', 'total_count_online_sessions',
-        'total_count_today_active_assets','total_count_today_failed_sessions'
+        'total_count_today_active_assets', 'total_count_today_failed_sessions'
     ]
 
     org_cache = OrgResourceStatisticsCache(instance.org)

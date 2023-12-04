@@ -17,6 +17,7 @@ def date_more_than(d, seconds):
     return d is None or (timezone.now() - d).seconds > seconds
 
 
+# verified
 @merge_delay_run(ttl=60)
 def update_token_last_used(tokens=()):
     for token in tokens:
@@ -24,6 +25,7 @@ def update_token_last_used(tokens=()):
         token.save(update_fields=['date_last_used'])
 
 
+# verified
 @merge_delay_run(ttl=60)
 def update_user_last_used(users=()):
     for user in users:
