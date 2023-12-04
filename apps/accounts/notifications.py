@@ -1,7 +1,7 @@
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 
-from common.tasks import send_mail_attachment_async, upload_backup_to_obj_storage
+from common.tasks import send_mail_attachment, upload_backup_to_obj_storage
 from notifications.notifications import UserMessage
 from users.models import User
 from terminal.models.component.storage import ReplayStorage
@@ -27,7 +27,7 @@ class AccountBackupExecutionTaskMsg(object):
                      "to set the encryption password").format(name)
 
     def publish(self, attachment_list=None):
-        send_mail_attachment_async(
+        send_mail_attachment(
             self.subject, self.message, [self.user.email], attachment_list
         )
 
@@ -70,7 +70,7 @@ class ChangeSecretExecutionTaskMsg(object):
                      "file encryption password to set the encryption password").format(name)
 
     def publish(self, attachments=None):
-        send_mail_attachment_async(
+        send_mail_attachment(
             self.subject, self.message, [self.user.email], attachments
         )
 
