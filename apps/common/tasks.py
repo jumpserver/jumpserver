@@ -45,8 +45,7 @@ def send_mail_async(*args, **kwargs):
         logger.error("Sending mail error: {}".format(e))
 
 
-@shared_task(verbose_name=_("Send email attachment"), activity_callback=task_activity_callback)
-def send_mail_attachment_async(subject, message, recipient_list, attachment_list=None):
+def send_mail_attachment(subject, message, recipient_list, attachment_list=None):
     if attachment_list is None:
         attachment_list = []
     from_email = settings.EMAIL_FROM or settings.EMAIL_HOST_USER
@@ -66,7 +65,6 @@ def send_mail_attachment_async(subject, message, recipient_list, attachment_list
         logger.error("Sending mail attachment error: {}".format(e))
 
 
-@shared_task(verbose_name=_('Upload session replay to external storage'))
 def upload_backup_to_obj_storage(recipient, upload_file):
     logger.info(f'Start upload file : {upload_file}')
     remote_path = os.path.join('account_backup', os.path.basename(upload_file))
