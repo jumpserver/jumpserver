@@ -16,13 +16,17 @@ class ContentType(DjangoContentType):
     class Meta:
         proxy = True
 
+    _apps_map = {}
+
     @property
     def app_model(self):
         return '%s.%s' % (self.app_label, self.model)
 
-    @staticmethod
-    def apps_map():
+    @classmethod
+    def apps_map(cls):
         from ..tree import app_nodes_data
+        if cls._apps_map:
+            return cls._apps_map
         mapper = {}
         for d in app_nodes_data:
             i = d['id']
@@ -34,6 +38,7 @@ class ContentType(DjangoContentType):
                     name = config.verbose_name
             if name:
                 mapper[i] = name
+        cls._apps_map = mapper
         return mapper
 
     @property

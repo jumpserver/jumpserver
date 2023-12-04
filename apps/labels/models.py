@@ -10,6 +10,7 @@ from orgs.mixins.models import JMSOrgBaseModel
 class Label(JMSOrgBaseModel):
     name = models.CharField(max_length=64, verbose_name=_("Name"), db_index=True)
     value = models.CharField(max_length=64, unique=False, verbose_name=_("Value"))
+    internal = models.BooleanField(default=False, verbose_name=_("Internal"))
 
     class Meta:
         unique_together = [('name', 'value', 'org_id')]

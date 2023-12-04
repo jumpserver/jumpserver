@@ -22,6 +22,7 @@ class Migration(migrations.Migration):
                 ('date_created', models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date created')),
                 ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
                 ('comment', models.TextField(blank=True, default='', verbose_name='Comment')),
+                ('internal', models.BooleanField(default=False, verbose_name='Internal')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
                 ('name', models.CharField(db_index=True, max_length=64, verbose_name='Name')),

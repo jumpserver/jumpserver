@@ -7,6 +7,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('assets', '0125_auto_20231011_1053'),
+        ('labels', '0002_auto_20231103_1659'),
     ]
 
     operations = [
