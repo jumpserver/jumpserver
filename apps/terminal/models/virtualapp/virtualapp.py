@@ -7,9 +7,9 @@ from django.db import models
 from django.utils._os import safe_join
 from django.utils.translation import gettext_lazy as _
 from rest_framework.serializers import ValidationError
-from common.utils import lazyproperty, get_logger
 
 from common.db.models import JMSBaseModel
+from common.utils import lazyproperty
 from common.utils.yml import yaml_load_with_i18n
 
 __all__ = ['VirtualApp', 'VirtualAppPublication']
@@ -27,9 +27,9 @@ class VirtualApp(JMSBaseModel):
     image_port = models.IntegerField(default=5900, verbose_name=_('Image port'))
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
     tags = models.JSONField(default=list, verbose_name=_('Tags'))
-    hosts = models.ManyToManyField(
-        through_fields=('app', 'vhost',), through='VirtualAppPublication',
-        to='VirtualHost', verbose_name=_('Hosts')
+    providers = models.ManyToManyField(
+        through_fields=('app', 'provider',), through='VirtualAppPublication',
+        to='AppProvider', verbose_name=_('Providers')
     )
 
     class Meta:
@@ -90,8 +90,8 @@ class VirtualApp(JMSBaseModel):
 
 
 class VirtualAppPublication(JMSBaseModel):
-    vhost = models.ForeignKey(
-        'VirtualHost', on_delete=models.CASCADE, related_name='publications', verbose_name=_('Virtual Host')
+    provider = models.ForeignKey(
+        'AppProvider', on_delete=models.CASCADE, related_name='publications', verbose_name=_('App Provider')
     )
     app = models.ForeignKey(
         'VirtualApp', on_delete=models.CASCADE, related_name='publications', verbose_name=_('Virtual App')
@@ -100,4 +100,4 @@ class VirtualAppPublication(JMSBaseModel):
 
     class Meta:
         verbose_name = _('Virtual app publication')
-        unique_together = ('vhost', 'app')
+        unique_together = ('provider', 'app')

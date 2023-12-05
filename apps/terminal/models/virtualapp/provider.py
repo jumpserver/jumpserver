@@ -3,19 +3,19 @@ from django.utils.translation import gettext_lazy as _
 
 from common.db.models import JMSBaseModel
 
-__all__ = ['VirtualHost', ]
+__all__ = ['AppProvider', ]
 
 
-class VirtualHost(JMSBaseModel):
+class AppProvider(JMSBaseModel):
     name = models.CharField(max_length=128, verbose_name=_('Name'), unique=True)
     hostname = models.CharField(max_length=128, verbose_name=_('Hostname'))
     terminal = models.OneToOneField(
         'terminal.Terminal', on_delete=models.CASCADE, null=True, blank=True,
-        related_name='virtual_host', verbose_name=_('Terminal')
+        related_name='app_provider', verbose_name=_('Terminal')
     )
     apps = models.ManyToManyField(
         'VirtualApp', verbose_name=_('VirtualApp'),
-        through='VirtualAppPublication', through_fields=('vhost', 'app'),
+        through='VirtualAppPublication', through_fields=('provider', 'app'),
     )
 
     class Meta:

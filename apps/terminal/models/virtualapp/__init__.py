@@ -1,2 +1,2 @@
-from .vhost import *
+from .provider import *
 from .virtualapp import *

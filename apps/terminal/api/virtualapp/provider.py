@@ -6,21 +6,21 @@ from rest_framework.response import Response
 from common.api import JMSBulkModelViewSet
 from common.permissions import IsServiceAccount
 from orgs.utils import tmp_to_builtin_org
-from terminal.models import VirtualHost
+from terminal.models import AppProvider
 from terminal.serializers import (
-    VirtualHostSerializer, VirtualHostContainerSerializer
+    AppProviderSerializer, AppProviderContainerSerializer
 )
 
-__all__ = ['VirtualHostViewSet', ]
+__all__ = ['AppProviderViewSet', ]
 
 
-class VirtualHostViewSet(JMSBulkModelViewSet):
-    serializer_class = VirtualHostSerializer
-    queryset = VirtualHost.objects.all()
+class AppProviderViewSet(JMSBulkModelViewSet):
+    serializer_class = AppProviderSerializer
+    queryset = AppProvider.objects.all()
     search_fields = ['name', 'hostname', ]
     rbac_perms = {
-        'containers': 'terminal.view_virtualhost',
-        'status': 'terminal.view_virtualhost',
+        'containers': 'terminal.view_appprovider',
+        'status': 'terminal.view_appprovider',
     }
 
     cache_status_key_prefix = 'virtual_host_{}_status'
@@ -44,11 +44,11 @@ class VirtualHostViewSet(JMSBulkModelViewSet):
         data = dict(**validated_data)
         data['terminal'] = request_terminal
         data['id'] = request.user.id
-        instance = VirtualHost.objects.create(**data)
+        instance = AppProvider.objects.create(**data)
         serializer = self.get_serializer(instance=instance)
         return Response(serializer.data, status=201)
 
-    @action(detail=True, methods=['get'], serializer_class=VirtualHostContainerSerializer)
+    @action(detail=True, methods=['get'], serializer_class=AppProviderContainerSerializer)
     def containers(self, request, *args, **kwargs):
         instance = self.get_object()
         key = self.cache_status_key_prefix.format(instance.id)
@@ -62,7 +62,7 @@ class VirtualHostViewSet(JMSBulkModelViewSet):
         serializer = self.get_serializer(data, many=True)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['post'], serializer_class=VirtualHostContainerSerializer)
+    @action(detail=True, methods=['post'], serializer_class=AppProviderContainerSerializer)
     def status(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(data=request.data, many=True)

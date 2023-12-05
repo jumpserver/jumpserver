@@ -73,5 +73,5 @@ class VirtualAppViewSet(UploadMixin, JMSBulkModelViewSet):
 class VirtualAppPublicationViewSet(viewsets.ModelViewSet):
     queryset = VirtualAppPublication.objects.all()
     serializer_class = serializers.VirtualAppPublicationSerializer
-    filterset_fields = ['app__name', 'vhost__name', 'status']
-    search_fields = ['app__name', 'vhost__name', ]
+    filterset_fields = ['app__name', 'provider__name', 'status']
+    search_fields = ['app__name', 'provider__name', ]

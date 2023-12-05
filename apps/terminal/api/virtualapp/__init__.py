@@ -1,3 +1,3 @@
-from .vhost import *
-from .virtualapp import *
+from .provider import *
 from .relation import *
+from .virtualapp import *

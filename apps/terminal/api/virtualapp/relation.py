@@ -8,19 +8,19 @@ from common.api import JMSModelViewSet
 from common.permissions import IsServiceAccount
 from common.utils import is_uuid
 from rbac.permissions import RBACPermission
-from terminal.models import VirtualHost
+from terminal.models import AppProvider
 from terminal.serializers import (
     VirtualAppPublicationSerializer
 )
 
 
-class HostMixin:
+class ProviderMixin:
     request: Request
     permission_denied: Callable
     kwargs: dict
     rbac_perms = (
-        ('list', 'terminal.view_virtualhost'),
-        ('retrieve', 'terminal.view_virtualhost'),
+        ('list', 'terminal.view_appprovider'),
+        ('retrieve', 'terminal.view_appprovider'),
     )
 
     def get_permissions(self):
@@ -29,36 +29,36 @@ class HostMixin:
         else:
             return [IsServiceAccount()]
 
-    def self_host(self):
+    def self_provider(self):
         try:
-            return self.request.user.terminal.virtual_host
+            return self.request.user.terminal.app_provider
         except AttributeError:
-            raise self.permission_denied(self.request, 'User has no virtual host')
+            raise self.permission_denied(self.request, 'User has no app provider')
 
-    def pk_host(self):
-        return get_object_or_404(VirtualHost, id=self.kwargs.get('host'))
+    def pk_provider(self):
+        return get_object_or_404(AppProvider, id=self.kwargs.get('provider'))
 
     @property
-    def host(self):
-        if self.kwargs.get('host'):
-            host = self.pk_host()
+    def provider(self):
+        if self.kwargs.get('provider'):
+            host = self.pk_provider()
         else:
-            host = self.self_host()
+            host = self.self_provider()
         return host
 
 
-class VirtualHostAppViewSet(HostMixin, JMSModelViewSet):
-    host: VirtualHost
+class AppProviderAppViewSet(ProviderMixin, JMSModelViewSet):
+    provider: AppProvider
     serializer_class = VirtualAppPublicationSerializer
-    filterset_fields = ['vhost__name', 'app__name', 'status']
+    filterset_fields = ['provider__name', 'app__name', 'status']
 
     def get_object(self):
         pk = self.kwargs.get('pk')
         if not is_uuid(pk):
-            return self.host.publications.get(app__name=pk)
+            return self.provider.publications.get(app__name=pk)
         else:
-            return self.host.publications.get(id=pk)
+            return self.provider.publications.get(id=pk)
 
     def get_queryset(self):
-        queryset = self.host.publications.all()
+        queryset = self.provider.publications.all()
         return queryset

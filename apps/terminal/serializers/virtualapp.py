@@ -4,7 +4,7 @@ from rest_framework import serializers
 from common.const.choices import Status
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from terminal.const import PublishStatus
-from ..models import VirtualApp, VirtualAppPublication, VirtualHost
+from ..models import VirtualApp, VirtualAppPublication, AppProvider
 
 __all__ = [
     'VirtualAppSerializer', 'VirtualAppPublicationSerializer'
@@ -31,11 +31,11 @@ class VirtualAppSerializer(serializers.ModelSerializer):
 class VirtualAppPublicationSerializer(serializers.ModelSerializer):
     app = ObjectRelatedField(attrs=('id', 'name', 'image_name',), label=_("Virtual App"),
                              queryset=VirtualApp.objects.all())
-    vhost = ObjectRelatedField(queryset=VirtualHost.objects.all(), label=_("Virtual Host"))
+    provider = ObjectRelatedField(queryset=AppProvider.objects.all(), label=_("App Provider"))
     status = LabeledChoiceField(choices=PublishStatus.choices, label=_("Status"), default=Status.pending)
 
     class Meta:
         model = VirtualAppPublication
-        fields_mini = ['id', 'vhost', 'app']
+        fields_mini = ['id', 'provider', 'app']
         read_only_fields = ['date_created', 'date_updated']
         fields = fields_mini + ['status', 'comment'] + read_only_fields
