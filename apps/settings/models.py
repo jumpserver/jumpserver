@@ -163,6 +163,7 @@ class Setting(models.Model):
             ('change_ticket', _('Can change auth ticket')),
             ('change_announcement', _('Can change auth announcement')),
             ('change_vault', _('Can change vault setting')),
+            ('change_chatai', _('Can change chat ai setting')),
             ('change_systemmsgsubscription', _('Can change system msg sub setting')),
             ('change_sms', _('Can change sms setting')),
             ('change_security', _('Can change security setting')),

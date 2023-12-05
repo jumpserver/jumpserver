@@ -1,3 +1,4 @@
+from .chat import *
 from .dingtalk import *
 from .email import *
 from .feishu import *
@@ -5,7 +6,7 @@ from .ldap import *
 from .public import *
 from .security import *
 from .settings import *
+from .slack import *
 from .sms import *
 from .vault import *
 from .wecom import *
-from .slack import *

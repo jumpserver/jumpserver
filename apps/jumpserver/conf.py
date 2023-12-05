@@ -590,6 +590,13 @@ class Config(dict):
         'MAX_LIMIT_PER_PAGE': 100,
 
         'LIMIT_SUPER_PRIV': False,
+
+        # Chat AI
+        'CHAT_AI_ENABLED': False,
+        'GPT_API_KEY': '',
+        'GPT_BASE_URL': '',
+        'GPT_PROXY': '',
+        'GPT_MODEL': 'gpt-3.5-turbo',
     }
 
     old_config_map = {
