@@ -50,7 +50,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='asset',
             name='nodes',
-            field=models.ManyToManyField(default=assets.models.default_node, related_name='assets', to='assets.Node', verbose_name='Nodes'),
+            field=models.ManyToManyField(default=assets.models.default_node, related_name='assets', to='assets.Node', verbose_name='Node'),
         ),
         migrations.AddField(
             model_name='systemuser',

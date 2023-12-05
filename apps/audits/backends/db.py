@@ -2,6 +2,7 @@
 from django.utils.translation import gettext_lazy as _
 
 from audits.models import OperateLog
+from perms.const import ActionChoices
 
 
 class OperateLogStore(object):
@@ -45,20 +46,29 @@ class OperateLogStore(object):
             before[k], after[k] = before_value, after_value
         return before, after
 
+    @staticmethod
+    def _get_special_handler(resource_type):
+        # 根据资源类型，处理特殊字段
+        resource_map = {
+            'Asset permission': lambda k, v: ActionChoices.display(int(v)) if k == 'Actions' else v
+        }
+        return resource_map.get(resource_type, lambda k, v: v)
+
     @classmethod
-    def convert_diff_friendly(cls, raw_diff):
+    def convert_diff_friendly(cls, op_log):
         diff_list = list()
-        for k, v in raw_diff.items():
+        handler = cls._get_special_handler(op_log.resource_type)
+        for k, v in op_log.diff.items():
             before, after = v.split(cls.SEP, 1)
             diff_list.append({
                 'field': _(k),
-                'before': before if before else _('empty'),
-                'after': after if after else _('empty'),
+                'before': handler(k, before) if before else _('empty'),
+                'after': handler(k, after) if after else _('empty'),
             })
         return diff_list
 
     def save(self, **kwargs):
-        log_id = kwargs.pop('id', None)
+        log_id = kwargs.get('id', None)
         before = kwargs.pop('before') or {}
         after = kwargs.pop('after') or {}
 

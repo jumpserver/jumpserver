@@ -29,7 +29,7 @@ class CommandFilter(OrgModelMixin):
     )
     nodes = models.ManyToManyField(
         'assets.Node', related_name='cmd_filters', blank=True,
-        verbose_name=_("Nodes")
+        verbose_name=_("Node")
     )
     assets = models.ManyToManyField(
         'assets.Asset', related_name='cmd_filters', blank=True,

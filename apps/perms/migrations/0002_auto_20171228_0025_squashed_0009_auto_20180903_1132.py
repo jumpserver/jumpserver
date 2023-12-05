@@ -80,7 +80,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='assetpermission',
             name='nodes',
-            field=models.ManyToManyField(blank=True, related_name='granted_by_permissions', to='assets.Node', verbose_name='Nodes'),
+            field=models.ManyToManyField(blank=True, related_name='granted_by_permissions', to='assets.Node', verbose_name='Node'),
         ),
         # migrations.RunPython(
         #     code=migrate_node_permissions,

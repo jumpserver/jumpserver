@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
                 ('type', models.CharField(max_length=16, verbose_name='Type')),
                 ('is_active', models.BooleanField(default=True, verbose_name='Is active')),
                 ('assets', models.ManyToManyField(blank=True, to='assets.Asset', verbose_name='Assets')),
-                ('nodes', models.ManyToManyField(blank=True, to='assets.Node', verbose_name='Nodes')),
+                ('nodes', models.ManyToManyField(blank=True, to='assets.Node', verbose_name='Node')),
             ],
             options={
                 'verbose_name': 'Automation task',
