@@ -48,14 +48,9 @@ class OperateLogStore(object):
 
     @staticmethod
     def _get_special_handler(resource_type):
-        def asset_perm_handler(k, v):
-            if k == 'Actions':
-                return ActionChoices.display(int(v))
-            else:
-                return v
-
+        # 根据资源类型，处理特殊字段
         resource_map = {
-            'Asset permission': asset_perm_handler
+            'Asset permission': lambda k, v: ActionChoices.display(int(v)) if k == 'Actions' else v
         }
         return resource_map.get(resource_type, lambda k, v: v)
 
