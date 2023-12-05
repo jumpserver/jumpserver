@@ -40,7 +40,7 @@ def get_platform_automation_methods(path, lang=None):
                 continue
 
             with open(path, 'r', encoding='utf8') as f:
-                manifest = yaml_load_with_i18n(f, lang)
+                manifest = yaml_load_with_i18n(f, lang=lang)
                 check_platform_method(manifest, path)
                 manifest['dir'] = os.path.dirname(path)
                 manifest['params_serializer'] = generate_serializer(manifest)
