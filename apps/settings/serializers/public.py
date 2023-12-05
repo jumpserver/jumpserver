@@ -53,6 +53,7 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     CONNECTION_TOKEN_REUSABLE = serializers.BooleanField()
     CACHE_LOGIN_PASSWORD_ENABLED = serializers.BooleanField()
     VAULT_ENABLED = serializers.BooleanField()
+    VIRTUAL_APP_ENABLED = serializers.BooleanField()
 
 
 class ServerInfoSerializer(serializers.Serializer):
