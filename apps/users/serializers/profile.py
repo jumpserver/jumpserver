@@ -143,9 +143,9 @@ class UserProfileSerializer(UserSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         system_roles_field = self.fields.get('system_roles')
-        org_roles_field = self.fields.get('org_roles')
         if system_roles_field:
             system_roles_field.read_only = True
+        org_roles_field = self.fields.get('org_roles')
         if org_roles_field:
             org_roles_field.read_only = True
 

@@ -2,11 +2,10 @@
 #
 
 from .asset import *
-from .label import *
-from .node import *
-from .gateway import *
+from .automations import *
+from .cagegory import *
 from .domain import *
 from .favorite_asset import *
+from .gateway import *
+from .node import *
 from .platform import *
-from .cagegory import *
-from .automations import *

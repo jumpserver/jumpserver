@@ -1,8 +1,10 @@
+from django.apps import apps
 from django.contrib.auth.models import ContentType as DjangoContentType
 from django.contrib.auth.models import Permission as DjangoPermission
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
+from common.utils import lazyproperty
 from .. import const
 
 Scope = const.Scope
@@ -14,9 +16,58 @@ class ContentType(DjangoContentType):
     class Meta:
         proxy = True
 
+    _apps_map = {}
+
     @property
     def app_model(self):
         return '%s.%s' % (self.app_label, self.model)
+
+    @classmethod
+    def apps_map(cls):
+        from ..tree import app_nodes_data
+        if cls._apps_map:
+            return cls._apps_map
+        mapper = {}
+        for d in app_nodes_data:
+            i = d['id']
+            name = d.get('name')
+
+            if not name:
+                config = apps.get_app_config(d['id'])
+                if config:
+                    name = config.verbose_name
+            if name:
+                mapper[i] = name
+        cls._apps_map = mapper
+        return mapper
+
+    @property
+    def app_display(self):
+        return self.apps_map().get(self.app_label)
+
+    @lazyproperty
+    def fields(self):
+        model = self.model_class()
+        return model._meta.fields
+
+    @lazyproperty
+    def field_names(self):
+        return [f.name for f in self.fields]
+
+    @lazyproperty
+    def filter_field_names(self):
+        names = []
+        if 'name' in self.field_names:
+            names.append('name')
+        if 'address' in self.field_names:
+            names.append('address')
+        return names
+
+    def filter_queryset(self, queryset, keyword):
+        q = Q()
+        for name in self.filter_field_names:
+            q |= Q(**{name + '__icontains': keyword})
+        return queryset.filter(q)
 
 
 class Permission(DjangoPermission):

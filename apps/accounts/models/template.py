@@ -3,13 +3,14 @@ from django.db.models import Count, Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from labels.mixins import LabeledMixin
 from .account import Account
 from .base import BaseAccount, SecretWithRandomMixin
 
 __all__ = ['AccountTemplate', ]
 
 
-class AccountTemplate(BaseAccount, SecretWithRandomMixin):
+class AccountTemplate(LabeledMixin, BaseAccount, SecretWithRandomMixin):
     su_from = models.ForeignKey(
         'self', related_name='su_to', null=True,
         on_delete=models.SET_NULL, verbose_name=_("Su from")

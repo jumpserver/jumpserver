@@ -5,6 +5,7 @@ from rest_framework import serializers
 from accounts.const import SecretType
 from accounts.models import BaseAccount
 from accounts.utils import validate_password_for_ansible, validate_ssh_key
+from common.serializers import ResourceLabelsMixin
 from common.serializers.fields import EncryptedField, LabeledChoiceField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
@@ -60,8 +61,7 @@ class AuthValidateMixin(serializers.Serializer):
         return super().update(instance, validated_data)
 
 
-class BaseAccountSerializer(AuthValidateMixin, BulkOrgResourceModelSerializer):
-
+class BaseAccountSerializer(AuthValidateMixin, ResourceLabelsMixin, BulkOrgResourceModelSerializer):
     class Meta:
         model = BaseAccount
         fields_mini = ['id', 'name', 'username']
@@ -70,7 +70,7 @@ class BaseAccountSerializer(AuthValidateMixin, BulkOrgResourceModelSerializer):
             'privileged', 'is_active', 'spec_info',
         ]
         fields_other = ['created_by', 'date_created', 'date_updated', 'comment']
-        fields = fields_small + fields_other
+        fields = fields_small + fields_other + ['labels']
         read_only_fields = [
             'spec_info', 'date_verified', 'created_by', 'date_created',
         ]

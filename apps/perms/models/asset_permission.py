@@ -10,6 +10,7 @@ from accounts.models import Account
 from assets.models import Asset
 from common.utils import date_expired_default
 from common.utils.timezone import local_now
+from labels.mixins import LabeledMixin
 from orgs.mixins.models import JMSOrgBaseModel
 from orgs.mixins.models import OrgManager
 from perms.const import ActionChoices
@@ -56,7 +57,7 @@ def default_protocols():
     return ['all']
 
 
-class AssetPermission(JMSOrgBaseModel):
+class AssetPermission(LabeledMixin, JMSOrgBaseModel):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     users = models.ManyToManyField(
         'users.User', related_name='%(class)ss', blank=True, verbose_name=_("User")

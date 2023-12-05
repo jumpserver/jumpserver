@@ -586,8 +586,9 @@ class Config(dict):
         # FTP 文件上传下载备份阈值，单位(M)，当值小于等于0时，不备份
         'FTP_FILE_MAX_STORE': 100,
 
-        # API 请求次数限制
-        'MAX_LIMIT_PER_PAGE': 100,
+        # API 分页
+        'MAX_LIMIT_PER_PAGE': 10000,
+        'DEFAULT_PAGE_SIZE': None,
 
         'LIMIT_SUPER_PRIV': False,
 

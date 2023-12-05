@@ -2,6 +2,7 @@ import copy
 from datetime import datetime
 from itertools import chain
 
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.db import models
 
 from common.db.fields import RelatedManager
@@ -65,13 +66,19 @@ def _get_instance_field_value(
                         continue
                     data.setdefault(k, v)
                 continue
-            data.setdefault(str(f.verbose_name), value)
+            elif isinstance(f, GenericRelation):
+                value = [str(v) for v in value.all()]
+            elif isinstance(f, GenericForeignKey):
+                continue
+            try:
+                data.setdefault(str(f.verbose_name), value)
+            except Exception as e:
+                print(f.__dict__)
+                raise e
     return data
 
 
-def model_to_dict_for_operate_log(
-        instance, include_model_fields=True, include_related_fields=False
-):
+def model_to_dict_for_operate_log(instance, include_model_fields=True, include_related_fields=False):
     model_need_continue_fields = ['date_updated']
     m2m_need_continue_fields = ['history_passwords']
 
