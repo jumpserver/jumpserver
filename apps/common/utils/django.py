@@ -7,6 +7,7 @@ from django.db import models
 from django.db.models.signals import post_save, pre_save
 from django.shortcuts import reverse as dj_reverse
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 
 UUID_PATTERN = re.compile(r'[0-9a-zA-Z\-]{36}')
 
@@ -94,3 +95,12 @@ def get_request_os(request):
         return 'linux'
     else:
         return 'unknown'
+
+
+def safe_next_url(next_url, request=None):
+    safe_hosts = [*settings.ALLOWED_HOSTS]
+    if request:
+        safe_hosts.append(request.get_host())
+    if not next_url or not url_has_allowed_host_and_scheme(next_url, safe_hosts):
+        next_url = '/'
+    return next_url

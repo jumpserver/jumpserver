@@ -133,8 +133,16 @@ class JSONFilterMixin:
             value = [value]
         if name == 'nodes':
             nodes = Node.objects.filter(id__in=value)
-            children = Node.get_nodes_all_children(nodes, with_self=True).values_list('id', flat=True)
-            return Q(nodes__in=children)
+            if match == 'm2m_all':
+                assets = Asset.objects.all()
+                for n in nodes:
+                    children_pattern = Node.get_node_all_children_key_pattern(n.key)
+                    assets = assets.filter(nodes__key__regex=children_pattern)
+                q = Q(id__in=assets.values_list('id', flat=True))
+                return q
+            else:
+                children = Node.get_nodes_all_children(nodes, with_self=True).values_list('id', flat=True)
+                return Q(nodes__in=children)
         elif name == 'category':
             return Q(platform__category__in=value)
         elif name == 'type':

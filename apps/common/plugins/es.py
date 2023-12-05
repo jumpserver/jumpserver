@@ -177,9 +177,10 @@ class ES(object):
         body = self.get_query_body(**query)
 
         data = self.es.search(
-            index=self.query_index, doc_type=self.doc_type, body=body,
+            index=self.query_index, body=body,
             from_=from_, size=size, sort=sort
         )
+
         source_data = []
         for item in data['hits']['hits']:
             if item:
@@ -191,7 +192,7 @@ class ES(object):
     def count(self, **query):
         try:
             body = self.get_query_body(**query)
-            data = self.es.count(index=self.query_index, doc_type=self.doc_type, body=body)
+            data = self.es.count(index=self.query_index, body=body)
             count = data["count"]
         except Exception as e:
             logger.error('ES count error: {}'.format(e))

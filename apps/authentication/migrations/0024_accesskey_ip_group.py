@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('authentication', '0023_auto_20231010_1101'),
     ]
@@ -14,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='accesskey',
             name='ip_group',
-            field=models.JSONField(default=authentication.models.access_key.defatult_ip_group, verbose_name='IP group'),
+            field=models.JSONField(default=authentication.models.access_key.default_ip_group, verbose_name='IP group'),
         ),
     ]

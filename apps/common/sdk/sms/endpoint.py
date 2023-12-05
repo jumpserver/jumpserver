@@ -1,12 +1,12 @@
-from collections import OrderedDict
 import importlib
+from collections import OrderedDict
 
-from django.utils.translation import gettext_lazy as _
-from django.db.models import TextChoices
 from django.conf import settings
+from django.db.models import TextChoices
+from django.utils.translation import gettext_lazy as _
 
-from common.utils import get_logger
 from common.exceptions import JMSException
+from common.utils import get_logger
 from .base import BaseSMSClient
 
 logger = get_logger(__name__)
@@ -18,7 +18,7 @@ class BACKENDS(TextChoices):
     HUAWEI = 'huawei', _('Huawei Cloud')
     CMPP2 = 'cmpp2', _('CMPP v2.0')
     CUSTOM = 'custom', _('Custom type')
-    CUSTOM_FILE = 'custom_file', f"{_('Custom type')}({_('File')})"
+    CUSTOM_FILE = 'custom_file', _('Custom type (File)')
 
 
 class SMS:

@@ -16,7 +16,7 @@ DEFAULT_PASSWORD_RULES = {
 __all__ = [
     'AutomationTypes', 'SecretStrategy', 'SSHKeyStrategy', 'Connectivity',
     'DEFAULT_PASSWORD_LENGTH', 'DEFAULT_PASSWORD_RULES', 'TriggerChoice',
-    'PushAccountActionChoice',
+    'PushAccountActionChoice', 'AccountBackupType'
 ]
 
 
@@ -95,3 +95,10 @@ class TriggerChoice(models.TextChoices, TreeChoices):
 class PushAccountActionChoice(models.TextChoices):
     create_and_push = 'create_and_push', _('Create and push')
     only_create = 'only_create', _('Only create')
+
+
+class AccountBackupType(models.TextChoices):
+    """Backup type"""
+    email = 'email', _('Email')
+    # 目前只支持sftp方式
+    object_storage = 'object_storage', _('SFTP')

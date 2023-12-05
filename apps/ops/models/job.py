@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import sys
 import uuid
 from collections import defaultdict
 from datetime import timedelta
@@ -19,6 +20,7 @@ from simple_history.models import HistoricalRecords
 from accounts.models import Account
 from acls.models import CommandFilterACL
 from assets.models import Asset
+from assets.automations.base.manager import SSHTunnelManager
 from common.db.encoder import ModelJSONFieldEncoder
 from labels.mixins import LabeledMixin
 from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner, CommandInBlackListException
@@ -78,6 +80,14 @@ class JMSPermedInventory(JMSInventory):
             host['login_user'] = account.username
             host['login_password'] = account.secret
             host['login_db'] = asset.spec_info.get('db_name', '')
+            host['ansible_python_interpreter'] = sys.executable
+            if gateway:
+                host['gateway'] = {
+                    'address': gateway.address, 'port': gateway.port,
+                    'username': gateway.username, 'secret': gateway.password,
+                    'private_key_path': gateway.private_key_path
+                }
+                host['jms_asset']['port'] = protocol.port
             return host
         return super().make_account_vars(host, asset, account, automation, protocol, platform, gateway)
 
@@ -297,10 +307,18 @@ class JobExecution(JMSOrgBaseModel):
         db_module_name_map = {
             'mysql': 'community.mysql.mysql_query',
             'postgresql': 'community.postgresql.postgresql_query',
-            'sqlserver': 'community.general.mssql_script:',
+            'sqlserver': 'community.general.mssql_script',
+        }
+        extra_query_token_map = {
+            'sqlserver': 'script'
+        }
+        extra_login_db_token_map = {
+            'sqlserver': 'name'
         }
 
         if module in db_modules:
+            login_db_token = extra_login_db_token_map.get(module, 'login_db')
+            query_token = extra_query_token_map.get(module, 'query')
             module = db_module_name_map.get(module, None)
             if not module:
                 print('not support db module: {}'.format(module))
@@ -310,8 +328,8 @@ class JobExecution(JMSOrgBaseModel):
                          "login_user={{login_user}} " \
                          "login_password={{login_password}} " \
                          "login_port={{login_port}} " \
-                         "login_db={{login_db}}"
-            shell = "{} query=\"{}\" ".format(login_args, self.current_job.args)
+                         "%s={{login_db}}" % login_db_token
+            shell = "{} {}=\"{}\" ".format(login_args, query_token, self.current_job.args)
             return module, shell
 
         if module == 'win_shell':
@@ -520,6 +538,8 @@ class JobExecution(JMSOrgBaseModel):
         self.before_start()
 
         runner = self.get_runner()
+        ssh_tunnel = SSHTunnelManager()
+        ssh_tunnel.local_gateway_prepare(runner)
         try:
             cb = runner.run(**kwargs)
             self.set_result(cb)
@@ -530,6 +550,8 @@ class JobExecution(JMSOrgBaseModel):
         except Exception as e:
             logging.error(e, exc_info=True)
             self.set_error(e)
+        finally:
+            ssh_tunnel.local_gateway_clean(runner)
 
     class Meta:
         verbose_name = _("Job Execution")

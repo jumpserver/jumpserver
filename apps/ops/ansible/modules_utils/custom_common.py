@@ -26,7 +26,7 @@ def common_argument_spec():
 
 
 class SSHClient:
-    SLEEP_INTERVAL = 0.3
+    SLEEP_INTERVAL = 2
     COMPLETE_FLAG = 'complete'
 
     def __init__(self, module):

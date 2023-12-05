@@ -41,11 +41,16 @@ class Playbook(LabeledMixin, JMSOrgBaseModel):
         result = []
         for root, dirs, files in os.walk(self.work_dir):
             for f in files:
-                if str(f).endswith('.yml') or str(f).endswith('.yaml'):
-                    lines = self.search_keywords(os.path.join(root, f))
-                    if len(lines) > 0:
-                        for line in lines:
-                            result.append({'file': f, 'line': line[0], 'keyword': line[1]})
+                try:
+                    if str(f).endswith('.yml') or str(f).endswith('.yaml'):
+                        lines = self.search_keywords(os.path.join(root, f))
+                        if len(lines) > 0:
+                            for line in lines:
+                                result.append({'file': f, 'line': line[0], 'keyword': line[1]})
+                # 遇到无法读取的文件，跳过
+                except UnicodeEncodeError:
+                    continue
+
         return result
 
     @staticmethod

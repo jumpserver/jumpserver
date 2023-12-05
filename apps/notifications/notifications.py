@@ -202,6 +202,9 @@ class Message(metaclass=MessageType):
     def get_site_msg_msg(self) -> dict:
         return self.html_msg
 
+    def get_slack_msg(self) -> dict:
+        return self.markdown_msg
+
     def get_sms_msg(self) -> dict:
         return self.text_msg_with_sign
 

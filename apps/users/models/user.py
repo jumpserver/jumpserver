@@ -12,6 +12,7 @@ from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import AbstractUser
 from django.core.cache import cache
 from django.db import models
+from django.db.models import Count
 from django.shortcuts import reverse
 from django.utils import timezone
 from django.utils.module_loading import import_string
@@ -709,29 +710,29 @@ class MFAMixin:
 
 
 class JSONFilterMixin:
-    """
-    users = JSONManyToManyField('users.User', blank=True, null=True)
-    """
-
     @staticmethod
     def get_json_filter_attr_q(name, value, match):
         from rbac.models import RoleBinding
         from orgs.utils import current_org
 
+        kwargs = {}
         if name == 'system_roles':
-            user_id = RoleBinding.objects \
-                .filter(role__in=value, scope='system') \
-                .values_list('user_id', flat=True)
-            return models.Q(id__in=user_id)
+            kwargs['scope'] = 'system'
         elif name == 'org_roles':
-            kwargs = dict(role__in=value, scope='org')
+            kwargs['scope'] = 'org'
             if not current_org.is_root():
                 kwargs['org_id'] = current_org.id
+        else:
+            return None
 
-            user_id = RoleBinding.objects.filter(**kwargs) \
-                .values_list('user_id', flat=True)
-            return models.Q(id__in=user_id)
-        return None
+        bindings = RoleBinding.objects.filter(**kwargs, role__in=value)
+        if match == 'm2m_all':
+            user_id = bindings.values('user_id').annotate(count=Count('user_id')) \
+                .filter(count=len(value)).values_list('user_id', flat=True)
+        else:
+            user_id = bindings.values_list('user_id', flat=True)
+
+        return models.Q(id__in=user_id)
 
 
 class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterMixin, AbstractUser):
@@ -746,6 +747,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
         wecom = 'wecom', _('WeCom')
         dingtalk = 'dingtalk', _('DingTalk')
         feishu = 'feishu', _('FeiShu')
+        slack = 'slack', _('Slack')
         custom = 'custom', 'Custom'
 
     SOURCE_BACKEND_MAPPING = {
@@ -777,6 +779,9 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
         ],
         Source.feishu: [
             settings.AUTH_BACKEND_FEISHU
+        ],
+        Source.slack: [
+            settings.AUTH_BACKEND_SLACK
         ],
         Source.dingtalk: [
             settings.AUTH_BACKEND_DINGTALK
@@ -848,6 +853,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
     wecom_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('WeCom'))
     dingtalk_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('DingTalk'))
     feishu_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('FeiShu'))
+    slack_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('Slack'))
 
     DATE_EXPIRED_WARNING_DAYS = 5
 
@@ -990,6 +996,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
             ('dingtalk_id',),
             ('wecom_id',),
             ('feishu_id',),
+            ('slack_id',),
         )
         permissions = [
             ('invite_user', _('Can invite user')),

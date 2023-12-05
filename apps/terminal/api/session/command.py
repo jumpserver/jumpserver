@@ -1,26 +1,26 @@
 # -*- coding: utf-8 -*-
 #
-from django.utils import translation
+import uuid
 from django.utils import timezone
 from rest_framework import generics
 from rest_framework.fields import DateTimeField
 from rest_framework.response import Response
 
 from acls.models import CommandFilterACL, CommandGroup
-from terminal.models import CommandStorage, Session, Command
-from terminal.filters import CommandFilter
-from orgs.utils import current_org
 from common.api import JMSBulkModelViewSet
 from common.utils import get_logger
-from terminal.serializers import (
-    SessionCommandSerializer,  InsecureCommandAlertSerializer
-)
-from terminal.exceptions import StorageInvalid
+from orgs.utils import current_org
 from terminal.backends import (
     get_command_storage, get_multi_command_storage
 )
-from terminal.notifications import CommandAlertMessage, CommandWarningMessage
 from terminal.const import RiskLevelChoices
+from terminal.exceptions import StorageInvalid
+from terminal.filters import CommandFilter
+from terminal.models import CommandStorage, Session, Command
+from terminal.notifications import CommandAlertMessage, CommandWarningMessage
+from terminal.serializers import (
+    SessionCommandSerializer, InsecureCommandAlertSerializer
+)
 
 logger = get_logger(__name__)
 __all__ = ['CommandViewSet', 'InsecureCommandAlertAPI']
@@ -140,8 +140,8 @@ class CommandViewSet(JMSBulkModelViewSet):
         if session_id and not command_storage_id:
             # 会话里的命令列表肯定会提供 session_id，这里防止 merge 的时候取全量的数据
             return self.merge_all_storage_list(request, *args, **kwargs)
-
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.get_queryset()
+        queryset = self.filter_queryset(queryset)
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -167,6 +167,7 @@ class CommandViewSet(JMSBulkModelViewSet):
 
     def get_queryset(self):
         command_storage_id = self.request.query_params.get('command_storage_id')
+        asset_id = self.request.query_params.get('asset_id')
         if not command_storage_id:
             return Command.objects.none()
 
@@ -175,6 +176,9 @@ class CommandViewSet(JMSBulkModelViewSet):
             raise StorageInvalid
         else:
             qs = storage.get_command_queryset()
+        if asset_id:
+            session_ids = Session.objects.filter(asset_id=asset_id).values_list('id', flat=True)
+            qs = qs.filter(session__in=list(session_ids))
         return qs
 
     def create(self, request, *args, **kwargs):

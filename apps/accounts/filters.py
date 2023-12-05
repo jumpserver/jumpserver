@@ -5,7 +5,7 @@ from django_filters import rest_framework as drf_filters
 
 from assets.models import Node
 from common.drf.filters import BaseFilterSet
-from .models import Account, GatheredAccount, ChangeSecretRecord
+from .models import Account, GatheredAccount
 
 
 class AccountFilterSet(BaseFilterSet):
@@ -59,10 +59,3 @@ class GatheredAccountFilterSet(BaseFilterSet):
     class Meta:
         model = GatheredAccount
         fields = ['id', 'asset_id', 'username']
-
-
-class ChangeSecretRecordFilterSet(BaseFilterSet):
-
-    class Meta:
-        model = ChangeSecretRecord
-        fields = ['asset_id', 'execution_id']

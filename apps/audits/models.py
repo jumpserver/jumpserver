@@ -4,7 +4,7 @@ from datetime import timedelta
 from importlib import import_module
 
 from django.conf import settings
-from django.core.cache import caches
+from django.core.cache import caches, cache
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
@@ -12,6 +12,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 
 from common.db.encoder import ModelJSONFieldEncoder
 from common.utils import lazyproperty, i18n_trans
+from notifications.ws import WS_SESSION_KEY
 from ops.models import JobExecution
 from orgs.mixins.models import OrgModelMixin, Organization
 from orgs.utils import current_org
@@ -274,6 +275,11 @@ class UserSession(models.Model):
     @property
     def backend_display(self):
         return gettext(self.backend)
+
+    @property
+    def is_active(self):
+        redis_client = cache.client.get_client()
+        return redis_client.sismember(WS_SESSION_KEY, self.key)
 
     @property
     def date_expired(self):

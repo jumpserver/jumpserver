@@ -30,7 +30,8 @@ class SecretGenerator:
             'lower': rules['lowercase'],
             'upper': rules['uppercase'],
             'digit': rules['digit'],
-            'special_char': rules['symbol']
+            'special_char': rules['symbol'],
+            'exclude_chars': rules['exclude_symbols']
         }
         return random_string(**rules)
 
@@ -49,15 +50,15 @@ def validate_password_for_ansible(password):
     # validate password contains left double curly bracket
     # check password not contains `{{`
     # Ansible 推送的时候不支持
-    if '{{' in password:
-        raise serializers.ValidationError(_('Password can not contains `{{` '))
-    if '{%' in password:
-        raise serializers.ValidationError(_('Password can not contains `{%` '))
+    if '{{' in password or '}}' in password:
+        raise serializers.ValidationError(_('Password can not contains `{{` or `}}`'))
+    if '{%' in password or '%}' in password:
+        raise serializers.ValidationError(_('Password can not contains `{%` or `%}`'))
     # Ansible Windows 推送的时候不支持
-    if "'" in password:
-        raise serializers.ValidationError(_("Password can not contains `'` "))
-    if '"' in password:
-        raise serializers.ValidationError(_('Password can not contains `"` '))
+    # if "'" in password:
+    #     raise serializers.ValidationError(_("Password can not contains `'` "))
+    # if '"' in password:
+    #     raise serializers.ValidationError(_('Password can not contains `"` '))
 
 
 def validate_ssh_key(ssh_key, passphrase=None):

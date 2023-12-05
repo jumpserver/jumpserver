@@ -114,8 +114,7 @@ class DateTimeMixin:
     @lazyproperty
     def ftp_logs_queryset(self):
         qs = FTPLog.objects.all()
-        qs = self.get_logs_queryset_filter(qs, 'date_start')
-        return self.get_logs_queryset(qs, 'user')
+        return self.get_logs_queryset_filter(qs, 'date_start')
 
     @lazyproperty
     def command_queryset(self):
@@ -133,7 +132,7 @@ class DatesLoginMetricMixin:
     date_start_end: tuple
     command_queryset: Command.objects
     sessions_queryset: Session.objects
-    ftp_logs_queryset: OperateLog.objects
+    ftp_logs_queryset: FTPLog.objects
     job_logs_queryset: JobLog.objects
     login_logs_queryset: UserLoginLog.objects
     operate_logs_queryset: OperateLog.objects

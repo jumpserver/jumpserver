@@ -262,10 +262,8 @@ class BitChoices(models.IntegerChoices, TreeChoices):
 
     @classmethod
     def all(cls):
-        value = 0
-        for c in cls:
-            value |= c.value
-        return value
+        # 权限 12 位 最大值
+        return 4095
 
 
 class PortRangeField(models.CharField):

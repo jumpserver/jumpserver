@@ -36,6 +36,7 @@ class AuthBackendLabelMapping(LazyObject):
         backend_label_mapping[settings.AUTH_BACKEND_AUTH_TOKEN] = _("Auth Token")
         backend_label_mapping[settings.AUTH_BACKEND_WECOM] = _("WeCom")
         backend_label_mapping[settings.AUTH_BACKEND_FEISHU] = _("FeiShu")
+        backend_label_mapping[settings.AUTH_BACKEND_SLACK] = _("Slack")
         backend_label_mapping[settings.AUTH_BACKEND_DINGTALK] = _("DingTalk")
         backend_label_mapping[settings.AUTH_BACKEND_TEMP_TOKEN] = _("Temporary token")
         backend_label_mapping[settings.AUTH_BACKEND_PASSKEY] = _("Passkey")

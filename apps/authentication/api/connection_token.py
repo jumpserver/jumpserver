@@ -73,11 +73,6 @@ class RDPFileClientProtocolURLMixin:
         if multi_mon:
             rdp_options['use multimon:i'] = '1'
 
-        # 设置多屏显示
-        multi_mon = is_true(self.request.query_params.get('multi_mon'))
-        if multi_mon:
-            rdp_options['use multimon:i'] = '1'
-
         # 设置磁盘挂载
         drives_redirect = is_true(self.request.query_params.get('drives_redirect'))
         if drives_redirect:
@@ -160,7 +155,7 @@ class RDPFileClientProtocolURLMixin:
 
         account = token.account or token.input_username
         datetime = timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H:%M:%S')
-        name = account + '@' + str(asset) + '[' + datetime + ']'
+        name = account + '@' + asset.name + '[' + datetime + ']'
         data = {
             'version': 2,
             'id': str(token.id),  # 兼容老的，未来几个版本删掉
