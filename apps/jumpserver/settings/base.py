@@ -109,6 +109,7 @@ for host_port in ALLOWED_DOMAINS:
             continue
         CSRF_TRUSTED_ORIGINS.append('{}://*.{}'.format(schema, origin))
 
+CORS_ALLOWED_ORIGINS = [o.replace('*.', '') for o in CSRF_TRUSTED_ORIGINS]
 CSRF_FAILURE_VIEW = 'jumpserver.views.other.csrf_failure'
 # print("CSRF_TRUSTED_ORIGINS: ")
 # for origin in CSRF_TRUSTED_ORIGINS:
@@ -134,6 +135,7 @@ INSTALLED_APPS = [
     'acls.apps.AclsConfig',
     'notifications.apps.NotificationsConfig',
     'rbac.apps.RBACConfig',
+    'labels.apps.LabelsConfig',
     'rest_framework',
     'rest_framework_swagger',
     'drf_yasg',
@@ -142,6 +144,7 @@ INSTALLED_APPS = [
     'django_filters',
     'bootstrap3',
     'captcha',
+    'corsheaders',
     'private_storage',
     'django_celery_beat',
     'django.contrib.auth',
@@ -160,6 +163,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',

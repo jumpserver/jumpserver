@@ -66,6 +66,9 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         name = initial_data.get('name')
         if name is not None:
             return
+        request = self.context.get('request')
+        if request and request.method == 'PATCH':
+            return
         if not name:
             name = initial_data.get('username')
         if self.instance and self.instance.name == name:
@@ -238,7 +241,7 @@ class AccountSerializer(AccountCreateUpdateSerializerMixin, BaseAccountSerialize
         queryset = queryset.prefetch_related(
             'asset', 'asset__platform',
             'asset__platform__automation'
-        )
+        ).prefetch_related('labels', 'labels__label')
         return queryset
 
 

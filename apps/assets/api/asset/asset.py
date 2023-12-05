@@ -3,7 +3,6 @@
 from collections import defaultdict
 
 import django_filters
-from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from rest_framework import status
@@ -14,7 +13,7 @@ from rest_framework.status import HTTP_200_OK
 from accounts.tasks import push_accounts_to_assets_task, verify_accounts_connectivity_task
 from assets import serializers
 from assets.exceptions import NotSupportedTemporarilyError
-from assets.filters import IpInFilterBackend, LabelFilterBackend, NodeFilterBackend
+from assets.filters import IpInFilterBackend, NodeFilterBackend
 from assets.models import Asset, Gateway, Platform, Protocol
 from assets.tasks import test_assets_connectivity_manual, update_assets_hardware_info_manual
 from common.api import SuggestionMixin
@@ -33,7 +32,6 @@ __all__ = [
 
 
 class AssetFilterSet(BaseFilterSet):
-    labels = django_filters.CharFilter(method='filter_labels')
     platform = django_filters.CharFilter(method='filter_platform')
     domain = django_filters.CharFilter(method='filter_domain')
     type = django_filters.CharFilter(field_name="platform__type", lookup_expr="exact")
@@ -64,7 +62,7 @@ class AssetFilterSet(BaseFilterSet):
     class Meta:
         model = Asset
         fields = [
-            "id", "name", "address", "is_active", "labels",
+            "id", "name", "address", "is_active",
             "type", "category", "platform",
         ]
 
@@ -86,16 +84,6 @@ class AssetFilterSet(BaseFilterSet):
     def filter_protocols(queryset, name, value):
         value = value.split(',')
         return queryset.filter(protocols__name__in=value).distinct()
-
-    @staticmethod
-    def filter_labels(queryset, name, value):
-        if ':' in value:
-            n, v = value.split(':', 1)
-            queryset = queryset.filter(labels__name=n, labels__value=v)
-        else:
-            q = Q(labels__name__contains=value) | Q(labels__value__contains=value)
-            queryset = queryset.filter(q).distinct()
-        return queryset
 
 
 class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
@@ -121,7 +109,7 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
         ("sync_platform_protocols", "assets.change_asset"),
     )
     extra_filter_backends = [
-        LabelFilterBackend, IpInFilterBackend,
+        IpInFilterBackend,
         NodeFilterBackend, AttrRulesFilterBackend
     ]
 

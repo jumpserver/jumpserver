@@ -20,7 +20,8 @@ __all__ = [
     "TreeChoicesField",
     "LabeledMultipleChoiceField",
     "PhoneField",
-    "JSONManyToManyField"
+    "JSONManyToManyField",
+    "LabelRelatedField",
 ]
 
 
@@ -97,6 +98,33 @@ class LabeledMultipleChoiceField(serializers.MultipleChoiceField):
             return [item.get("value") for item in data]
         else:
             return data
+
+
+class LabelRelatedField(serializers.RelatedField):
+    def __init__(self, **kwargs):
+        queryset = kwargs.pop("queryset", None)
+        if queryset is None:
+            from labels.models import LabeledResource
+            queryset = LabeledResource.objects.all()
+
+        kwargs = {**kwargs}
+        read_only = kwargs.get("read_only", False)
+        if not read_only:
+            kwargs["queryset"] = queryset
+        super().__init__(**kwargs)
+
+    def to_representation(self, value):
+        if value is None:
+            return value
+        return str(value.label)
+
+    def to_internal_value(self, data):
+        from labels.models import LabeledResource, Label
+        if data is None:
+            return data
+        k, v = data.split(":", 1)
+        label, __ = Label.objects.get_or_create(name=k, value=v, defaults={'name': k, 'value': v})
+        return LabeledResource(label=label)
 
 
 class ObjectRelatedField(serializers.RelatedField):

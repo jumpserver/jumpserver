@@ -28,6 +28,7 @@ api_v1 = [
     path('acls/', include('acls.urls.api_urls', namespace='api-acls')),
     path('notifications/', include('notifications.urls.api_urls', namespace='api-notifications')),
     path('rbac/', include('rbac.urls.api_urls', namespace='api-rbac')),
+    path('labels/', include('labels.urls', namespace='api-label')),
     path('prometheus/metrics/', api.PrometheusMetricsApi.as_view()),
 ]
 

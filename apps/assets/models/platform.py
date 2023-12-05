@@ -9,6 +9,7 @@ from common.db.models import JMSBaseModel
 __all__ = ['Platform', 'PlatformProtocol', 'PlatformAutomation']
 
 from common.utils import lazyproperty
+from labels.mixins import LabeledMixin
 
 
 class PlatformProtocol(models.Model):
@@ -74,7 +75,7 @@ class PlatformAutomation(models.Model):
     platform = models.OneToOneField('Platform', on_delete=models.CASCADE, related_name='automation', null=True)
 
 
-class Platform(JMSBaseModel):
+class Platform(LabeledMixin, JMSBaseModel):
     """
     对资产提供 约束和默认值
     对资产进行抽象

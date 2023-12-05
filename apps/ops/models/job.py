@@ -22,6 +22,7 @@ from acls.models import CommandFilterACL
 from assets.models import Asset
 from assets.automations.base.manager import SSHTunnelManager
 from common.db.encoder import ModelJSONFieldEncoder
+from labels.mixins import LabeledMixin
 from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner, CommandInBlackListException
 from ops.mixin import PeriodTaskModelMixin
 from ops.variables import *
@@ -132,7 +133,7 @@ class JMSPermedInventory(JMSInventory):
         return mapper
 
 
-class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
+class Job(LabeledMixin, JMSOrgBaseModel, PeriodTaskModelMixin):
     name = models.CharField(max_length=128, null=True, verbose_name=_('Name'))
 
     instant = models.BooleanField(default=False)

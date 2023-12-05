@@ -4,6 +4,7 @@ from simple_history.models import HistoricalRecords
 
 from assets.models.base import AbsConnectivity
 from common.utils import lazyproperty
+from labels.mixins import LabeledMixin
 from .base import BaseAccount
 from .mixins import VaultModelMixin
 from ..const import Source
@@ -42,7 +43,7 @@ class AccountHistoricalRecords(HistoricalRecords):
         return super().create_history_model(model, inherited)
 
 
-class Account(AbsConnectivity, BaseAccount):
+class Account(AbsConnectivity, LabeledMixin, BaseAccount):
     asset = models.ForeignKey(
         'assets.Asset', related_name='accounts',
         on_delete=models.CASCADE, verbose_name=_('Asset')
@@ -71,7 +72,7 @@ class Account(AbsConnectivity, BaseAccount):
         ]
 
     def __str__(self):
-        return '{}'.format(self.username)
+        return '{}({})'.format(self.name, self.asset.name)
 
     @lazyproperty
     def platform(self):

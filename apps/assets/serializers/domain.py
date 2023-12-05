@@ -3,6 +3,7 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from common.serializers import ResourceLabelsMixin
 from common.serializers.fields import ObjectRelatedField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .gateway import GatewayWithAccountSecretSerializer
@@ -11,7 +12,7 @@ from ..models import Domain, Asset
 __all__ = ['DomainSerializer', 'DomainWithGatewaySerializer']
 
 
-class DomainSerializer(BulkOrgResourceModelSerializer):
+class DomainSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
     gateways = ObjectRelatedField(
         many=True, required=False, label=_('Gateway'), read_only=True,
     )
@@ -40,6 +41,12 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
         validated_data['assets'] = assets
         instance = super().update(instance, validated_data)
         return instance
+
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        queryset = queryset \
+            .prefetch_related('labels', 'labels__label')
+        return queryset
 
 
 class DomainWithGatewaySerializer(serializers.ModelSerializer):

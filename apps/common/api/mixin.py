@@ -11,7 +11,7 @@ from rest_framework.settings import api_settings
 
 from common.drf.filters import (
     IDSpmFilterBackend, CustomFilterBackend, IDInFilterBackend,
-    IDNotFilterBackend, NotOrRelFilterBackend
+    IDNotFilterBackend, NotOrRelFilterBackend, LabelFilterBackend
 )
 from common.utils import get_logger, lazyproperty
 from .action import RenderToJsonMixin
@@ -111,7 +111,7 @@ class ExtraFilterFieldsMixin:
     """
     default_added_filters = (
         CustomFilterBackend, IDSpmFilterBackend, IDInFilterBackend,
-        IDNotFilterBackend,
+        IDNotFilterBackend, LabelFilterBackend
     )
     filter_backends = api_settings.DEFAULT_FILTER_BACKENDS
     extra_filter_fields = []

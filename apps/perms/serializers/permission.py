@@ -7,6 +7,7 @@ from rest_framework import serializers
 from accounts.models import AccountTemplate, Account
 from accounts.tasks import push_accounts_to_assets_task
 from assets.models import Asset, Node
+from common.serializers import ResourceLabelsMixin
 from common.serializers.fields import BitChoicesField, ObjectRelatedField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from perms.models import ActionChoices, AssetPermission
@@ -26,7 +27,7 @@ class ActionChoicesField(BitChoicesField):
         return data
 
 
-class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
+class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
     users = ObjectRelatedField(queryset=User.objects, many=True, required=False, label=_('User'))
     user_groups = ObjectRelatedField(
         queryset=UserGroup.objects, many=True, required=False, label=_('User group')
@@ -50,7 +51,7 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
             "is_valid", "comment", "from_ticket",
         ]
         fields_small = fields_mini + fields_generic
-        fields_m2m = ["users", "user_groups", "assets", "nodes"]
+        fields_m2m = ["users", "user_groups", "assets", "nodes", "labels"]
         fields = fields_mini + fields_m2m + fields_generic
         read_only_fields = ["created_by", "date_created", "from_ticket"]
         extra_kwargs = {
@@ -130,7 +131,7 @@ class AssetPermissionSerializer(BulkOrgResourceModelSerializer):
         """Perform necessary eager loading of data."""
         queryset = queryset.prefetch_related(
             "users", "user_groups", "assets", "nodes",
-        )
+        ).prefetch_related('labels', 'labels__label')
         return queryset
 
     @staticmethod

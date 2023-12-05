@@ -46,6 +46,7 @@ REST_FRAMEWORK = {
     'DATETIME_FORMAT': '%Y/%m/%d %H:%M:%S %z',
     'DATETIME_INPUT_FORMATS': ['%Y/%m/%d %H:%M:%S %z', 'iso-8601', '%Y-%m-%d %H:%M:%S %z'],
     'DEFAULT_PAGINATION_CLASS': 'jumpserver.rewriting.pagination.MaxLimitOffsetPagination',
+    'PAGE_SIZE': CONFIG.DEFAULT_PAGE_SIZE,
     'EXCEPTION_HANDLER': 'common.drf.exc_handlers.common_exception_handler',
 }
 
