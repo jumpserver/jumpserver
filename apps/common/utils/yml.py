@@ -12,7 +12,7 @@ def translate(key, i18n, lang):
     return lang_data.get(lang, key)
 
 
-def yaml_load_with_i18n(stream, lang):
+def yaml_load_with_i18n(stream, lang=None):
     ori_text = stream.read()
     stream = io.StringIO(ori_text)
     yaml_data = yaml.safe_load(stream)
