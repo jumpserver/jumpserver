@@ -21,9 +21,12 @@ class JobSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer, PeriodT
 
     def to_internal_value(self, data):
         instant = data.get('instant', False)
+        job_type = data.get('type', '')
+        _uid = str(uuid.uuid4()).split('-')[-1]
         if instant:
-            _uid = str(uuid.uuid4()).split('-')[-1]
             data['name'] = f'job-{_uid}'
+        if job_type == 'upload_file':
+            data['name'] = f'upload_file-{_uid}'
         return super().to_internal_value(data)
 
     def get_request_user(self):
@@ -44,8 +47,15 @@ class JobSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer, PeriodT
             "use_parameter_define", "parameters_define",
             "timeout", "chdir", "comment", "summary",
             "is_periodic", "interval", "crontab", "nodes",
-            "run_after_save",
+            "run_after_save"
         ]
+
+
+class FileSerializer(serializers.Serializer):
+    files = serializers.FileField(allow_empty_file=True)
+
+    class Meta:
+        ref_name = "JobFileSerializer"
 
 
 class JobExecutionSerializer(BulkOrgResourceModelSerializer):

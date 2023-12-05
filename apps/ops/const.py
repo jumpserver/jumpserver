@@ -37,6 +37,7 @@ class CreateMethods(models.TextChoices):
 class Types(models.TextChoices):
     adhoc = 'adhoc', _('Adhoc')
     playbook = 'playbook', _('Playbook')
+    upload_file = 'upload_file', _('Upload File')
 
 
 class RunasPolicies(models.TextChoices):

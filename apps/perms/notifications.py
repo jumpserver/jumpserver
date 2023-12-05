@@ -41,7 +41,7 @@ class AssetPermsWillExpireForOrgAdminMsg(UserMessage):
         super().__init__(user)
         self.perms = perms
         self.org = org
-        self.day_count = _('today') if day_count == 0 else day_count
+        self.day_count = _('today') if day_count == 0 else day_count + _('day')
 
     def get_items_with_url(self):
         items_with_url = []
