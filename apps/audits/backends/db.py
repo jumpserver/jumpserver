@@ -46,19 +46,29 @@ class OperateLogStore(object):
             before[k], after[k] = before_value, after_value
         return before, after
 
-    @classmethod
-    def convert_diff_friendly(cls, raw_diff):
-        diff_list = list()
-        for k, v in raw_diff.items():
-            before, after = v.split(cls.SEP, 1)
-            if k == 'Actions' and isinstance(before, str) and before.isdigit():
-                before = ActionChoices.display(int(before))
-                after = ActionChoices.display(int(after))
+    @staticmethod
+    def _get_special_handler(resource_type):
+        def asset_perm_handler(k, v):
+            if k == 'Actions':
+                return ActionChoices.display(int(v))
+            else:
+                return v
 
+        resource_map = {
+            'Asset permission': asset_perm_handler
+        }
+        return resource_map.get(resource_type, lambda k, v: v)
+
+    @classmethod
+    def convert_diff_friendly(cls, op_log):
+        diff_list = list()
+        handler = cls._get_special_handler(op_log.resource_type)
+        for k, v in op_log.diff.items():
+            before, after = v.split(cls.SEP, 1)
             diff_list.append({
                 'field': _(k),
-                'before': before if before else _('empty'),
-                'after': after if after else _('empty'),
+                'before': handler(k, before) if before else _('empty'),
+                'after': handler(k, after) if after else _('empty'),
             })
         return diff_list
 

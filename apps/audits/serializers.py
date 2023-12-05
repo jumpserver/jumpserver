@@ -77,10 +77,7 @@ class OperateLogActionDetailSerializer(serializers.ModelSerializer):
         fields = ('diff',)
 
     def to_representation(self, instance):
-        data = super().to_representation(instance)
-        diff = OperateLogStore.convert_diff_friendly(data['diff'])
-        data['diff'] = diff
-        return data
+        return {'diff': OperateLogStore.convert_diff_friendly(instance)}
 
 
 class OperateLogSerializer(BulkOrgResourceModelSerializer):
