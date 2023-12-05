@@ -394,7 +394,7 @@ class CommonBulkModelSerializer(CommonBulkSerializerMixin, serializers.ModelSeri
 
 
 class ResourceLabelsMixin(serializers.Serializer):
-    labels = LabelRelatedField(many=True, label=_('Labels'), )
+    labels = LabelRelatedField(many=True, label=_('Labels'), required=False, allow_null=True)
 
     def update(self, instance, validated_data):
         labels = validated_data.pop('labels', None)

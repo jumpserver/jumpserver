@@ -13,7 +13,7 @@ __all__ = ['LabelSerializer', 'LabeledResourceSerializer', 'ContentTypeResourceS
 class LabelSerializer(BulkOrgResourceModelSerializer):
     class Meta:
         model = Label
-        fields = ['id', 'name', 'value', 'res_count', 'date_created', 'date_updated']
+        fields = ['id', 'name', 'value', 'res_count', 'comment', 'date_created', 'date_updated']
         read_only_fields = ('date_created', 'date_updated', 'res_count')
         extra_kwargs = {
             'res_count': {'label': _('Resource count')},
