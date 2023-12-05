@@ -34,19 +34,14 @@ class AppProviderViewSet(JMSBulkModelViewSet):
             return [IsServiceAccount()]
         return super().get_permissions()
 
-    def create(self, request, *args, **kwargs):
-        request_terminal = getattr(request.user, 'terminal', None)
+    def perform_create(self, serializer):
+        request_terminal = getattr(self.request.user, 'terminal', None)
         if not request_terminal:
             raise ValidationError('Request user has no terminal')
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        validated_data = serializer.validated_data
-        data = dict(**validated_data)
+        data = dict()
         data['terminal'] = request_terminal
-        data['id'] = request.user.id
-        instance = AppProvider.objects.create(**data)
-        serializer = self.get_serializer(instance=instance)
-        return Response(serializer.data, status=201)
+        data['id'] = self.request.user.id
+        serializer.save(**data)
 
     @action(detail=True, methods=['get'], serializer_class=AppProviderContainerSerializer)
     def containers(self, request, *args, **kwargs):
@@ -55,12 +50,7 @@ class AppProviderViewSet(JMSBulkModelViewSet):
         data = cache.get(key)
         if not data:
             data = []
-        page = self.paginate_queryset(data)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = self.get_serializer(data, many=True)
-        return Response(serializer.data)
+        return self.get_paginated_response_from_queryset(data)
 
     @action(detail=True, methods=['post'], serializer_class=AppProviderContainerSerializer)
     def status(self, request, *args, **kwargs):
