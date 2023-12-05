@@ -131,5 +131,11 @@ class EndpointRule(JMSBaseModel):
             endpoint = Endpoint.get_or_create_default(request)
         if not endpoint.host and request:
             # 动态添加 current request host
-            endpoint.host = request.get_host().split(':')[0]
+            host_port = request.get_host()
+            # IPv6
+            if host_port.startswith('['):
+                host = host_port.split(']:')[0].rstrip(']') + ']'
+            else:
+                host = host_port.split(':')[0]
+            endpoint.host = host
         return endpoint
