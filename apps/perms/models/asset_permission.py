@@ -68,7 +68,7 @@ class AssetPermission(JMSOrgBaseModel):
         'assets.Asset', related_name='granted_by_permissions', blank=True, verbose_name=_("Asset")
     )
     nodes = models.ManyToManyField(
-        'assets.Node', related_name='granted_by_permissions', blank=True, verbose_name=_("Nodes")
+        'assets.Node', related_name='granted_by_permissions', blank=True, verbose_name=_("Node")
     )
     # 特殊的账号: @ALL, @INPUT @USER 默认包含，将来在全局设置中进行控制.
     accounts = models.JSONField(default=list, verbose_name=_("Account"))

@@ -33,7 +33,9 @@ def on_m2m_changed(sender, action, instance, reverse, model, pk_set, **kwargs):
 
     with translation.override('en'):
         resource_type = instance._meta.verbose_name
-        current_instance = model_to_dict(instance, include_model_fields=False)
+        current_instance = model_to_dict(
+            instance, include_model_fields=False, include_related_fields=[model]
+        )
 
         instance_id = current_instance.get('id')
         log_id, before_instance = get_instance_dict_from_cache(instance_id)
@@ -176,7 +178,7 @@ def on_django_start_set_operate_log_monitor_models(sender, **kwargs):
         'PermedAsset', 'PermedAccount', 'MenuPermission',
         'Permission', 'TicketSession', 'ApplyLoginTicket',
         'ApplyCommandTicket', 'ApplyLoginAssetTicket',
-        'FavoriteAsset',
+        'FavoriteAsset', 'Asset'
     }
     for i, app in enumerate(apps.get_models(), 1):
         app_name = app._meta.app_label

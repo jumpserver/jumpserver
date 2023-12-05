@@ -2,6 +2,7 @@
 from django.utils.translation import gettext_lazy as _
 
 from audits.models import OperateLog
+from perms.const import ActionChoices
 
 
 class OperateLogStore(object):
@@ -50,6 +51,10 @@ class OperateLogStore(object):
         diff_list = list()
         for k, v in raw_diff.items():
             before, after = v.split(cls.SEP, 1)
+            if k == 'Actions' and isinstance(before, str) and before.isdigit():
+                before = ActionChoices.display(int(before))
+                after = ActionChoices.display(int(after))
+
             diff_list.append({
                 'field': _(k),
                 'before': before if before else _('empty'),
@@ -58,7 +63,7 @@ class OperateLogStore(object):
         return diff_list
 
     def save(self, **kwargs):
-        log_id = kwargs.pop('id', None)
+        log_id = kwargs.get('id', None)
         before = kwargs.pop('before') or {}
         after = kwargs.pop('after') or {}
 

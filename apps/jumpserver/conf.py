@@ -584,7 +584,7 @@ class Config(dict):
         'APPLET_DOWNLOAD_HOST': '',
 
         # FTP 文件上传下载备份阈值，单位(M)，当值小于等于0时，不备份
-        'FTP_FILE_MAX_STORE': 100,
+        'FTP_FILE_MAX_STORE': 0,
 
         # API 请求次数限制
         'MAX_LIMIT_PER_PAGE': 100,

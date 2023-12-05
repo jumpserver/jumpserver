@@ -20,3 +20,6 @@ class Task(JMSBaseModel):
     class Meta:
         db_table = "terminal_task"
         verbose_name = _("Task")
+
+    def __str__(self):
+        return str(dict(SessionTaskChoices.choices).get(self.name))
