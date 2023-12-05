@@ -81,11 +81,26 @@ def _get_instance_field_value(
 def model_to_dict_for_operate_log(
         instance, include_model_fields=True, include_related_fields=None
 ):
-    model_need_continue_fields = ['date_updated']
-    m2m_need_continue_fields = ['history_passwords']
+    def get_related_values(f):
+        value = []
+        if instance.pk is not None:
+            related_name = getattr(f, 'attname', '') or getattr(f, 'related_name', '')
+            if not related_name or related_name in ['history_passwords']:
+                return
+            try:
+                value = [str(i) for i in getattr(instance, related_name).all()]
+            except:
+                pass
+        if not value:
+            return
+        try:
+            field_key = getattr(f, 'verbose_name', None) or f.related_model._meta.verbose_name
+            data.setdefault(str(field_key), value)
+        except:
+            pass
 
     data = _get_instance_field_value(
-        instance, include_model_fields, model_need_continue_fields
+        instance, include_model_fields, ['date_updated']
     )
 
     if include_related_fields:
@@ -94,21 +109,6 @@ def model_to_dict_for_operate_log(
             related_model = getattr(f, 'related_model', None)
             if related_model not in include_related_fields:
                 continue
+            get_related_values(f)
 
-            value = []
-            if instance.pk is not None:
-                related_name = getattr(f, 'attname', '') or getattr(f, 'related_name', '')
-                if not related_name or related_name in m2m_need_continue_fields:
-                    continue
-                try:
-                    value = [str(i) for i in getattr(instance, related_name).all()]
-                except:
-                    pass
-            if not value:
-                continue
-            try:
-                field_key = getattr(f, 'verbose_name', None) or f.related_model._meta.verbose_name
-                data.setdefault(str(field_key), value)
-            except:
-                pass
     return data
