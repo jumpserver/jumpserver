@@ -223,7 +223,9 @@ class Applet(JMSBaseModel):
         accounts = valid_accounts.exclude(username__in=accounts_username_used)
         public_accounts = accounts.filter(username__startswith='jms_')
         if not public_accounts:
-            public_accounts = accounts.exclude(username__in=['Administrator', 'root'])
+            public_accounts = accounts \
+                .exclude(username__in=['Administrator', 'root']) \
+                .exclude(username__startswith='js_')
         account = self.random_select_prefer_account(user, host, public_accounts)
         return account
 
