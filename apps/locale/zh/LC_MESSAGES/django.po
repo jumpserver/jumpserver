@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-08 15:33+0800\n"
+"POT-Creation-Date: 2023-12-11 14:54+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -86,7 +86,7 @@ msgstr "收集"
 msgid "Template"
 msgstr "模板"
 
-#: accounts/const/account.py:31 ops/const.py:45
+#: accounts/const/account.py:31 ops/const.py:46
 msgid "Skip"
 msgstr "跳过"
 
@@ -98,7 +98,7 @@ msgstr "更新"
 #: accounts/const/account.py:33
 #: accounts/serializers/automations/change_secret.py:150 audits/const.py:62
 #: audits/signal_handlers/activity_log.py:33 common/const/choices.py:19
-#: ops/const.py:74 terminal/const.py:79 xpack/plugins/cloud/const.py:46
+#: ops/const.py:75 terminal/const.py:79 xpack/plugins/cloud/const.py:46
 msgid "Failed"
 msgstr "失败"
 
@@ -262,7 +262,7 @@ msgstr "资产"
 #: accounts/models/account.py:53 accounts/models/template.py:16
 #: accounts/serializers/account/account.py:220
 #: accounts/serializers/account/account.py:268
-#: accounts/serializers/account/template.py:25
+#: accounts/serializers/account/template.py:27
 #: authentication/serializers/connect_token_secret.py:50
 msgid "Su from"
 msgstr "切换自"
@@ -394,7 +394,7 @@ msgstr "原因"
 #: accounts/models/automations/backup_account.py:135
 #: accounts/serializers/automations/change_secret.py:105
 #: accounts/serializers/automations/change_secret.py:128
-#: ops/serializers/job.py:55 terminal/serializers/session.py:49
+#: ops/serializers/job.py:65 terminal/serializers/session.py:49
 msgid "Is success"
 msgstr "是否成功"
 
@@ -582,7 +582,7 @@ msgstr "密钥"
 msgid "Secret strategy"
 msgstr "密文策略"
 
-#: accounts/models/base.py:44 accounts/serializers/account/template.py:22
+#: accounts/models/base.py:44 accounts/serializers/account/template.py:24
 #: accounts/serializers/automations/change_secret.py:44
 msgid "Password rules"
 msgstr "密码规则"
@@ -898,19 +898,19 @@ msgstr "数字"
 msgid "Special symbol"
 msgstr "特殊字符"
 
-#: accounts/serializers/account/template.py:18
+#: accounts/serializers/account/template.py:19
 msgid "Exclude symbol"
 msgstr "排除字符"
 
-#: accounts/serializers/account/template.py:36
+#: accounts/serializers/account/template.py:38
 msgid "Secret generation strategy for account creation"
 msgstr "密码生成策略，用于账号创建时，设置密码"
 
-#: accounts/serializers/account/template.py:37
+#: accounts/serializers/account/template.py:39
 msgid "Whether to automatically push the account to the asset"
 msgstr "是否自动推送账号到资产"
 
-#: accounts/serializers/account/template.py:40
+#: accounts/serializers/account/template.py:42
 msgid ""
 "Associated platform, you can configure push parameters. If not associated, "
 "default parameters will be used"
@@ -975,7 +975,7 @@ msgstr "自动化任务执行历史"
 
 #: accounts/serializers/automations/change_secret.py:149 audits/const.py:61
 #: audits/models.py:64 audits/signal_handlers/activity_log.py:33
-#: common/const/choices.py:18 ops/const.py:72 ops/serializers/celery.py:40
+#: common/const/choices.py:18 ops/const.py:73 ops/serializers/celery.py:40
 #: terminal/const.py:78 terminal/models/session/sharing.py:121
 #: tickets/views/approve.py:117
 msgid "Success"
@@ -1113,7 +1113,7 @@ msgid "Accounts"
 msgstr "账号管理"
 
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
-#: ops/serializers/job.py:54 terminal/const.py:86
+#: ops/serializers/job.py:64 terminal/const.py:86
 #: terminal/models/session/session.py:42 terminal/serializers/command.py:18
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
@@ -1659,7 +1659,7 @@ msgstr "协议"
 msgid "Sudo"
 msgstr "Sudo"
 
-#: assets/models/_user.py:55 ops/const.py:49 ops/const.py:59
+#: assets/models/_user.py:55 ops/const.py:50 ops/const.py:60
 msgid "Shell"
 msgstr "Shell"
 
@@ -3594,7 +3594,7 @@ msgstr "准备"
 msgid "Pending"
 msgstr "待定的"
 
-#: common/const/choices.py:17 ops/const.py:71
+#: common/const/choices.py:17 ops/const.py:72
 msgid "Running"
 msgstr "运行中"
 
@@ -4003,6 +4003,10 @@ msgstr "任务 {} 不存在"
 msgid "Task {} args or kwargs error"
 msgstr "任务 {} 执行参数错误"
 
+#: ops/api/job.py:128
+msgid "Duplicate file exists"
+msgstr "存在同名文件"
+
 #: ops/api/playbook.py:39
 msgid "Currently playbook is being used in a job"
 msgstr "当前 playbook 正在作业中使用"
@@ -4075,47 +4079,51 @@ msgstr "命令"
 msgid "Playbook"
 msgstr "Playbook"
 
-#: ops/const.py:43
+#: ops/const.py:40
+msgid "Upload File"
+msgstr "上传"
+
+#: ops/const.py:44
 msgid "Privileged Only"
 msgstr "仅限特权账号"
 
-#: ops/const.py:44
+#: ops/const.py:45
 msgid "Privileged First"
 msgstr "特权账号优先"
 
-#: ops/const.py:50 ops/const.py:60
+#: ops/const.py:51 ops/const.py:61
 msgid "Powershell"
 msgstr "PowerShell"
 
-#: ops/const.py:51 ops/const.py:61
+#: ops/const.py:52 ops/const.py:62
 msgid "Python"
 msgstr "Python"
 
-#: ops/const.py:52 ops/const.py:62
+#: ops/const.py:53 ops/const.py:63
 msgid "MySQL"
 msgstr "MySQL"
 
-#: ops/const.py:53 ops/const.py:64
+#: ops/const.py:54 ops/const.py:65
 msgid "PostgreSQL"
 msgstr "PostgreSQL"
 
-#: ops/const.py:54 ops/const.py:65
+#: ops/const.py:55 ops/const.py:66
 msgid "SQLServer"
 msgstr "SQLServer"
 
-#: ops/const.py:55 ops/const.py:67
+#: ops/const.py:56 ops/const.py:68
 msgid "Raw"
 msgstr "Raw"
 
-#: ops/const.py:63
+#: ops/const.py:64
 msgid "MariaDB"
 msgstr "MariaDB"
 
-#: ops/const.py:66
+#: ops/const.py:67
 msgid "Oracle"
 msgstr "Oracle"
 
-#: ops/const.py:73
+#: ops/const.py:74
 msgid "Timeout"
 msgstr "超时"
 
@@ -4249,7 +4257,7 @@ msgstr "Material"
 msgid "Material Type"
 msgstr "Material 类型"
 
-#: ops/models/job.py:557
+#: ops/models/job.py:565
 msgid "Job Execution"
 msgstr "作业执行"
 
@@ -4293,15 +4301,15 @@ msgstr "CPU 使用率超过 {max_threshold}: => {value}"
 msgid "Run after save"
 msgstr "保存后执行"
 
-#: ops/serializers/job.py:53
+#: ops/serializers/job.py:63
 msgid "Job type"
 msgstr "任务类型"
 
-#: ops/serializers/job.py:56 terminal/serializers/session.py:53
+#: ops/serializers/job.py:66 terminal/serializers/session.py:53
 msgid "Is finished"
 msgstr "是否完成"
 
-#: ops/serializers/job.py:57
+#: ops/serializers/job.py:67
 msgid "Time cost"
 msgstr "花费时间"
 
@@ -4516,7 +4524,8 @@ msgstr "授权账号"
 msgid "today"
 msgstr "今天"
 
-#: perms/notifications.py:12 settings/serializers/feature.py:106
+#: perms/notifications.py:12 perms/notifications.py:44
+#: settings/serializers/feature.py:106
 msgid "day"
 msgstr "天"
 
@@ -4545,20 +4554,6 @@ msgid "Send asset permission expired notification"
 msgstr "发送资产权限过期通知"
 
 #: perms/templates/perms/_msg_item_permissions_expire.html:7
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "        The following %(item_type)s will expire in %(count)s\n"
-#| "    "
-msgid ""
-"\n"
-"        The following %(item_type)s will expire in %(count)s days\n"
-"    "
-msgstr ""
-"\n"
-"        以下 %(item_type)s 即将在 %(count)s 后过期\n"
-"    "
-
 #: perms/templates/perms/_msg_permed_items_expire.html:7
 #, python-format
 msgid ""
@@ -8800,6 +8795,7 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
+
 
 #~ msgid "FeiShu query user failed"
 #~ msgstr "飞书查询用户失败"

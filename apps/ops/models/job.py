@@ -23,7 +23,7 @@ from assets.models import Asset
 from assets.automations.base.manager import SSHTunnelManager
 from common.db.encoder import ModelJSONFieldEncoder
 from labels.mixins import LabeledMixin
-from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner, CommandInBlackListException
+from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner, CommandInBlackListException, UploadFileRunner
 from ops.mixin import PeriodTaskModelMixin
 from ops.variables import *
 from ops.const import Types, RunasPolicies, JobStatus, JobModules
@@ -362,7 +362,7 @@ class JobExecution(JMSOrgBaseModel):
         static_variables = self.gather_static_variables()
         extra_vars.update(static_variables)
 
-        if self.current_job.type == 'adhoc':
+        if self.current_job.type == Types.adhoc:
             module, args = self.compile_shell()
 
             runner = AdHocRunner(
@@ -374,10 +374,18 @@ class JobExecution(JMSOrgBaseModel):
                 project_dir=self.private_dir,
                 extra_vars=extra_vars,
             )
-        elif self.current_job.type == 'playbook':
+        elif self.current_job.type == Types.playbook:
             runner = PlaybookRunner(
                 self.inventory_path, self.current_job.playbook.entry
             )
+        elif self.current_job.type == Types.upload_file:
+            job_id = self.current_job.id
+            args = json.loads(self.current_job.args)
+            dst_path = args.get('dst_path')
+            if dst_path:
+                runner = UploadFileRunner(self.inventory_path, job_id, dst_path)
+            else:
+                raise ValueError("dst_path is null")
         else:
             raise Exception("unsupported job type")
         return runner

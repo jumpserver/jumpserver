@@ -8,8 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-08 14:51+0800\n"
-"POT-Creation-Date: 2023-12-08 15:33+0800\n"
+"POT-Creation-Date: 2023-12-11 14:54+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -88,7 +87,7 @@ msgstr "集めました"
 msgid "Template"
 msgstr "テンプレート"
 
-#: accounts/const/account.py:31 ops/const.py:45
+#: accounts/const/account.py:31 ops/const.py:46
 msgid "Skip"
 msgstr "スキップ"
 
@@ -100,7 +99,7 @@ msgstr "更新"
 #: accounts/const/account.py:33
 #: accounts/serializers/automations/change_secret.py:150 audits/const.py:62
 #: audits/signal_handlers/activity_log.py:33 common/const/choices.py:19
-#: ops/const.py:74 terminal/const.py:79 xpack/plugins/cloud/const.py:46
+#: ops/const.py:75 terminal/const.py:79 xpack/plugins/cloud/const.py:46
 msgid "Failed"
 msgstr "失敗しました"
 
@@ -208,7 +207,6 @@ msgstr "作成のみ"
 msgid "Email"
 msgstr "メール"
 
-#: accounts/const/automation.py:104 terminal/const.py:87
 #: accounts/const/automation.py:105 terminal/const.py:87
 msgid "SFTP"
 msgstr "SFTP"
@@ -265,7 +263,7 @@ msgstr "資産"
 #: accounts/models/account.py:53 accounts/models/template.py:16
 #: accounts/serializers/account/account.py:220
 #: accounts/serializers/account/account.py:268
-#: accounts/serializers/account/template.py:25
+#: accounts/serializers/account/template.py:27
 #: authentication/serializers/connect_token_secret.py:50
 msgid "Su from"
 msgstr "から切り替え"
@@ -397,7 +395,7 @@ msgstr "理由"
 #: accounts/models/automations/backup_account.py:135
 #: accounts/serializers/automations/change_secret.py:105
 #: accounts/serializers/automations/change_secret.py:128
-#: ops/serializers/job.py:55 terminal/serializers/session.py:49
+#: ops/serializers/job.py:65 terminal/serializers/session.py:49
 msgid "Is success"
 msgstr "成功は"
 
@@ -585,7 +583,7 @@ msgstr "ひみつ"
 msgid "Secret strategy"
 msgstr "鍵ポリシー"
 
-#: accounts/models/base.py:44 accounts/serializers/account/template.py:22
+#: accounts/models/base.py:44 accounts/serializers/account/template.py:24
 #: accounts/serializers/automations/change_secret.py:44
 msgid "Password rules"
 msgstr "パスワードルール"
@@ -902,19 +900,19 @@ msgstr "数値＃スウスウ＃"
 msgid "Special symbol"
 msgstr "特殊記号"
 
-#: accounts/serializers/account/template.py:18
+#: accounts/serializers/account/template.py:19
 msgid "Exclude symbol"
 msgstr "除外文字"
 
-#: accounts/serializers/account/template.py:36
+#: accounts/serializers/account/template.py:38
 msgid "Secret generation strategy for account creation"
 msgstr "账号创建时，密文生成策略"
 
-#: accounts/serializers/account/template.py:37
+#: accounts/serializers/account/template.py:39
 msgid "Whether to automatically push the account to the asset"
 msgstr "是否自动推送账号到资产"
 
-#: accounts/serializers/account/template.py:40
+#: accounts/serializers/account/template.py:42
 msgid ""
 "Associated platform, you can configure push parameters. If not associated, "
 "default parameters will be used"
@@ -980,7 +978,7 @@ msgstr "自動タスク実行履歴"
 
 #: accounts/serializers/automations/change_secret.py:149 audits/const.py:61
 #: audits/models.py:64 audits/signal_handlers/activity_log.py:33
-#: common/const/choices.py:18 ops/const.py:72 ops/serializers/celery.py:40
+#: common/const/choices.py:18 ops/const.py:73 ops/serializers/celery.py:40
 #: terminal/const.py:78 terminal/models/session/sharing.py:121
 #: tickets/views/approve.py:117
 msgid "Success"
@@ -1118,7 +1116,7 @@ msgid "Accounts"
 msgstr "アカウント"
 
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
-#: ops/serializers/job.py:54 terminal/const.py:86
+#: ops/serializers/job.py:64 terminal/const.py:86
 #: terminal/models/session/session.py:42 terminal/serializers/command.py:18
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
@@ -1668,7 +1666,7 @@ msgstr "プロトコル"
 msgid "Sudo"
 msgstr "すど"
 
-#: assets/models/_user.py:55 ops/const.py:49 ops/const.py:59
+#: assets/models/_user.py:55 ops/const.py:50 ops/const.py:60
 msgid "Shell"
 msgstr "シェル"
 
@@ -3639,7 +3637,7 @@ msgstr "の準備を"
 msgid "Pending"
 msgstr "未定"
 
-#: common/const/choices.py:17 ops/const.py:71
+#: common/const/choices.py:17 ops/const.py:72
 msgid "Running"
 msgstr "ランニング"
 
@@ -4053,6 +4051,10 @@ msgstr "タスクは存在しません"
 msgid "Task {} args or kwargs error"
 msgstr "タスク実行パラメータエラー"
 
+#: ops/api/job.py:128
+msgid "Duplicate file exists"
+msgstr "重複したファイルが存在する"
+
 #: ops/api/playbook.py:39
 msgid "Currently playbook is being used in a job"
 msgstr "現在プレイブックは1つのジョブで使用されています"
@@ -4125,47 +4127,53 @@ msgstr "コマンド＃コマンド＃"
 msgid "Playbook"
 msgstr "Playbook"
 
-#: ops/const.py:43
+#: ops/const.py:40
+#, fuzzy
+#| msgid "Upload"
+msgid "Upload File"
+msgstr "アップロード"
+
+#: ops/const.py:44
 msgid "Privileged Only"
 msgstr "特権アカウントのみ"
 
-#: ops/const.py:44
+#: ops/const.py:45
 msgid "Privileged First"
 msgstr "特権アカウント優先"
 
-#: ops/const.py:50 ops/const.py:60
+#: ops/const.py:51 ops/const.py:61
 msgid "Powershell"
 msgstr "PowerShell"
 
-#: ops/const.py:51 ops/const.py:61
+#: ops/const.py:52 ops/const.py:62
 msgid "Python"
 msgstr "Python"
 
-#: ops/const.py:52 ops/const.py:62
+#: ops/const.py:53 ops/const.py:63
 msgid "MySQL"
 msgstr "MySQL"
 
-#: ops/const.py:53 ops/const.py:64
+#: ops/const.py:54 ops/const.py:65
 msgid "PostgreSQL"
 msgstr "PostgreSQL"
 
-#: ops/const.py:54 ops/const.py:65
+#: ops/const.py:55 ops/const.py:66
 msgid "SQLServer"
 msgstr "SQLServer"
 
-#: ops/const.py:55 ops/const.py:67
+#: ops/const.py:56 ops/const.py:68
 msgid "Raw"
 msgstr ""
 
-#: ops/const.py:63
+#: ops/const.py:64
 msgid "MariaDB"
 msgstr "MariaDB"
 
-#: ops/const.py:66
+#: ops/const.py:67
 msgid "Oracle"
 msgstr "Oracle"
 
-#: ops/const.py:73
+#: ops/const.py:74
 msgid "Timeout"
 msgstr "タイムアウト"
 
@@ -4299,7 +4307,7 @@ msgstr "Material"
 msgid "Material Type"
 msgstr "Material を選択してオプションを設定します。"
 
-#: ops/models/job.py:557
+#: ops/models/job.py:565
 msgid "Job Execution"
 msgstr "ジョブ実行"
 
@@ -4343,15 +4351,15 @@ msgstr "{max_threshold} を超えるCPUロード: => {value}"
 msgid "Run after save"
 msgstr "保存後に実行"
 
-#: ops/serializers/job.py:53
+#: ops/serializers/job.py:63
 msgid "Job type"
 msgstr "タスクの種類"
 
-#: ops/serializers/job.py:56 terminal/serializers/session.py:53
+#: ops/serializers/job.py:66 terminal/serializers/session.py:53
 msgid "Is finished"
 msgstr "終了しました"
 
-#: ops/serializers/job.py:57
+#: ops/serializers/job.py:67
 msgid "Time cost"
 msgstr "時を過ごす"
 
@@ -4567,7 +4575,8 @@ msgstr "認定アカウント"
 msgid "today"
 msgstr "今日"
 
-#: perms/notifications.py:12 settings/serializers/feature.py:106
+#: perms/notifications.py:12 perms/notifications.py:44
+#: settings/serializers/feature.py:106
 msgid "day"
 msgstr "日"
 
@@ -4595,8 +4604,9 @@ msgstr "アセット認証ルールの有効期限が切れていることを確
 msgid "Send asset permission expired notification"
 msgstr "アセット許可の有効期限通知を送信する"
 
-
+#: perms/templates/perms/_msg_item_permissions_expire.html:7
 #: perms/templates/perms/_msg_permed_items_expire.html:7
+#, python-format
 msgid ""
 "\n"
 "        The following %(item_type)s will expire in %(count)s\n"

@@ -1,16 +1,22 @@
+import json
+import os
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Count
-from django.db.transaction import atomic
 from django.shortcuts import get_object_or_404
+from django.utils._os import safe_join
+from django.utils.translation import gettext_lazy as _
+
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from assets.models import Asset
+from common.const.http import POST
 from common.permissions import IsValidUser
 from ops.const import Types
 from ops.models import Job, JobExecution
-from ops.serializers.job import JobSerializer, JobExecutionSerializer
+from ops.serializers.job import JobSerializer, JobExecutionSerializer, FileSerializer
 
 __all__ = [
     'JobViewSet', 'JobExecutionViewSet', 'JobRunVariableHelpAPIView',
@@ -24,6 +30,7 @@ from orgs.utils import tmp_to_org, get_current_org
 from accounts.models import Account
 from perms.models import PermNode
 from perms.utils import UserPermAssetUtil
+from jumpserver.settings import get_file_md5
 
 
 def set_task_to_serializer_data(serializer, task_id):
@@ -90,6 +97,40 @@ class JobViewSet(OrgBulkModelViewSet):
         set_task_to_serializer_data(serializer, execution.id)
         transaction.on_commit(
             lambda: run_ops_job_execution.apply_async((str(execution.id),), task_id=str(execution.id)))
+
+    @action(methods=[POST], detail=False, serializer_class=FileSerializer, permission_classes=[IsValidUser, ],
+            url_path='upload')
+    def upload(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            msg = 'Upload data invalid: {}'.format(serializer.errors)
+            return Response({'msg': msg}, status=400)
+        uploaded_files = request.FILES.getlist('files')
+        job_id = request.data.get('job_id', '')
+        job = get_object_or_404(Job, pk=job_id)
+        job_args = json.loads(job.args)
+        src_path_info = []
+        filename_set = set()
+        same_filenames = []
+        upload_file_dir = safe_join(settings.DATA_DIR, 'job_upload_file')
+        for uploaded_file in uploaded_files:
+            filename = uploaded_file.name
+            saved_path = safe_join(upload_file_dir, f'{job_id}/{filename}')
+            os.makedirs(os.path.dirname(saved_path), exist_ok=True)
+            with open(saved_path, 'wb+') as destination:
+                for chunk in uploaded_file.chunks():
+                    destination.write(chunk)
+            if filename in filename_set:
+                same_filenames.append(filename)
+            filename_set.add(filename)
+            src_path_info.append({'filename': filename, 'md5': get_file_md5(saved_path)})
+        if same_filenames:
+            return Response({'msg': _("Duplicate file exists")}, status=400)
+        job_args['src_path_info'] = src_path_info
+        job.args = json.dumps(job_args)
+        job.save()
+        self.run_job(job, serializer)
+        return Response({'task_id': serializer.data.get('task_id')}, status=201)
 
 
 class JobExecutionViewSet(OrgBulkModelViewSet):
