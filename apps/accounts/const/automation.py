@@ -24,6 +24,7 @@ class AutomationTypes(models.TextChoices):
     push_account = 'push_account', _('Push account')
     change_secret = 'change_secret', _('Change secret')
     verify_account = 'verify_account', _('Verify account')
+    remove_account = 'remove_account', _('Remove account')
     gather_accounts = 'gather_accounts', _('Gather accounts')
     verify_gateway_account = 'verify_gateway_account', _('Verify gateway account')
 

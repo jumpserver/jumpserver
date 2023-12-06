@@ -1,0 +1,14 @@
+- hosts: sqlserver
+  gather_facts: no
+  vars:
+    ansible_python_interpreter: /opt/py3/bin/python
+
+  tasks:
+    - name: "Remove account"
+      community.general.mssql_script:
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        name: "{{ jms_asset.spec_info.db_name }}"
+        script: "DROP USER {{ account.username }}"

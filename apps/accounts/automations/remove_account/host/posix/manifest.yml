@@ -1,0 +1,13 @@
+id: remove_account_posix
+name: "{{ 'Posix account remove' | trans }}"
+category: host
+type:
+  - linux
+  - unix
+method: remove_account
+
+i18n:
+  Posix account remove:
+    zh: 使用 Ansible 模块 user 删除账号
+    ja: Ansible モジュール ユーザーを使用してアカウントを削除します
+    en: Use the Ansible module user to delete the account

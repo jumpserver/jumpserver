@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('accounts', '0006_gatheredaccount'),
     ]
@@ -12,6 +11,13 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='account',
-            options={'permissions': [('view_accountsecret', 'Can view asset account secret'), ('view_historyaccount', 'Can view asset history account'), ('view_historyaccountsecret', 'Can view asset history account secret'), ('verify_account', 'Can verify account'), ('push_account', 'Can push account')], 'verbose_name': 'Account'},
+            options={'permissions': [
+                ('view_accountsecret', 'Can view asset account secret'),
+                ('view_historyaccount', 'Can view asset history account'),
+                ('view_historyaccountsecret', 'Can view asset history account secret'),
+                ('verify_account', 'Can verify account'),
+                ('push_account', 'Can push account'),
+                ('remove_account', 'Can remove account'),
+            ], 'verbose_name': 'Account'},
         ),
     ]
