@@ -1,9 +1,12 @@
 from rest_framework.generics import CreateAPIView
-from rest_framework.response import Response
 
 from accounts import serializers
-from accounts.tasks import verify_accounts_connectivity_task, push_accounts_to_assets_task
+from accounts.permissions import AccountTaskActionPermission
+from accounts.tasks import (
+    remove_accounts_task, verify_accounts_connectivity_task, push_accounts_to_assets_task
+)
 from assets.exceptions import NotSupportedTemporarilyError
+from authentication.permissions import UserConfirmation, ConfirmType
 
 __all__ = [
     'AccountsTaskCreateAPI',
@@ -12,16 +15,16 @@ __all__ = [
 
 class AccountsTaskCreateAPI(CreateAPIView):
     serializer_class = serializers.AccountTaskSerializer
+    permission_classes = (AccountTaskActionPermission,)
 
-    def check_permissions(self, request):
-        act = request.data.get('action')
-        if act == 'push':
-            code = 'accounts.push_account'
-        else:
-            code = 'accounts.verify_account'
-        has = request.user.has_perm(code)
-        if not has:
-            self.permission_denied(request)
+    def get_permissions(self):
+        act = self.request.data.get('action')
+        if act == 'remove':
+            self.permission_classes = [
+                AccountTaskActionPermission,
+                UserConfirmation.require(ConfirmType.PASSWORD)
+            ]
+        return super().get_permissions()
 
     def perform_create(self, serializer):
         data = serializer.validated_data
@@ -31,6 +34,10 @@ class AccountsTaskCreateAPI(CreateAPIView):
 
         if data['action'] == 'push':
             task = push_accounts_to_assets_task.delay(account_ids, params)
+        elif data['action'] == 'remove':
+            gather_accounts = data.get('gather_accounts', [])
+            gather_account_ids = [str(a.id) for a in gather_accounts]
+            task = remove_accounts_task.delay(gather_account_ids)
         else:
             account = accounts[0]
             asset = account.asset
@@ -43,9 +50,3 @@ class AccountsTaskCreateAPI(CreateAPIView):
         data["task"] = task.id
         setattr(serializer, '_data', data)
         return task
-
-    def get_exception_handler(self):
-        def handler(e, context):
-            return Response({"error": str(e)}, status=401)
-
-        return handler

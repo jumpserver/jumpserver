@@ -1,0 +1,16 @@
+- hosts: oracle
+  gather_facts: no
+  vars:
+    ansible_python_interpreter: /opt/py3/bin/python
+
+  tasks:
+    - name: "Remove account"
+      oracle_user:
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        login_database: "{{ jms_asset.spec_info.db_name }}"
+        mode: "{{ jms_account.mode }}"
+        name: "{{ account.username }}"
+        state: absent

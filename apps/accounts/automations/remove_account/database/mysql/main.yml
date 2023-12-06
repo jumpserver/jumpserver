@@ -1,0 +1,18 @@
+- hosts: mysql
+  gather_facts: no
+  vars:
+    ansible_python_interpreter: /opt/py3/bin/python
+
+  tasks:
+    - name: "Remove account"
+      community.mysql.mysql_user:
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        check_hostname: "{{ check_ssl if check_ssl else omit }}"
+        ca_cert: "{{ jms_asset.secret_info.ca_cert | default(omit) if check_ssl else omit }}"
+        client_cert: "{{ jms_asset.secret_info.client_cert | default(omit) if check_ssl else omit }}"
+        client_key: "{{ jms_asset.secret_info.client_key | default(omit) if check_ssl else omit }}"
+        name: "{{ account.username }}"
+        state: absent

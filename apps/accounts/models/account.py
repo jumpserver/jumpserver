@@ -69,6 +69,7 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount):
             ('view_historyaccountsecret', _('Can view asset history account secret')),
             ('verify_account', _('Can verify account')),
             ('push_account', _('Can push account')),
+            ('remove_account', _('Can remove account')),
         ]
 
     def __str__(self):

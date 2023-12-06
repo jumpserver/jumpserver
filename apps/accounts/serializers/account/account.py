@@ -10,7 +10,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.validators import UniqueTogetherValidator
 
 from accounts.const import SecretType, Source, AccountInvalidPolicy
-from accounts.models import Account, AccountTemplate
+from accounts.models import Account, AccountTemplate, GatheredAccount
 from accounts.tasks import push_accounts_to_assets_task
 from assets.const import Category, AllTypes
 from assets.models import Asset
@@ -458,10 +458,14 @@ class AccountTaskSerializer(serializers.Serializer):
         ('test', 'test'),
         ('verify', 'verify'),
         ('push', 'push'),
+        ('remove', 'remove'),
     )
     action = serializers.ChoiceField(choices=ACTION_CHOICES, write_only=True)
     accounts = serializers.PrimaryKeyRelatedField(
         queryset=Account.objects, required=False, allow_empty=True, many=True
+    )
+    gather_accounts = serializers.PrimaryKeyRelatedField(
+        queryset=GatheredAccount.objects, required=False, allow_empty=True, many=True
     )
     task = serializers.CharField(read_only=True)
     params = serializers.JSONField(

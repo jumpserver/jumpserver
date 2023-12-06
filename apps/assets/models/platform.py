@@ -72,6 +72,12 @@ class PlatformAutomation(models.Model):
         max_length=32, blank=True, null=True, verbose_name=_("Gather facts method")
     )
     gather_accounts_params = models.JSONField(default=dict, verbose_name=_("Gather facts params"))
+
+    remove_account_enabled = models.BooleanField(default=False, verbose_name=_("Remove account enabled"))
+    remove_account_method = models.TextField(
+        max_length=32, blank=True, null=True, verbose_name=_("Remove account method")
+    )
+    remove_account_params = models.JSONField(default=dict, verbose_name=_("Remove account params"))
     platform = models.OneToOneField('Platform', on_delete=models.CASCADE, related_name='automation', null=True)
 
 

@@ -1,0 +1,14 @@
+id: remove_account_mysql
+name: "{{ 'MySQL account remove' | trans }}"
+category: database
+type:
+  - mysql
+  - mariadb
+method: remove_account
+
+i18n:
+  MySQL account remove:
+    zh: 使用 Ansible 模块 mysql_user 删除账号
+    ja: Ansible モジュール mysql_user を使用してアカウントを削除します
+    en: Use the Ansible module mysql_user to delete the account
+
