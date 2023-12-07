@@ -9,6 +9,7 @@ from simple_history.utils import bulk_create_with_history
 from assets.models import Host
 from common.db.models import JMSBaseModel
 from common.utils import random_string
+from orgs.utils import tmp_to_root_org
 from terminal.const import PublishStatus
 
 __all__ = ['AppletHost', 'AppletHostDeployment']
@@ -97,7 +98,7 @@ class AppletHost(Host):
 
         accounts = []
         account_model = self.accounts.model
-        for i in range(need):
+        for __ in range(need):
             username = self.random_username()
             password = self.random_password()
             account = account_model(
@@ -124,13 +125,21 @@ class AppletHost(Host):
 
     def generate_private_accounts(self):
         from users.models import User
+        from perms.models import AssetPermission
         usernames = User.objects \
             .filter(is_active=True, is_service_account=False) \
             .exclude(username__startswith='[') \
             .values_list('username', flat=True)
-        account_usernames = self.accounts.all().values_list('username', flat=True)
-        account_usernames = [username[3:] for username in account_usernames if username.startswith('js_')]
-        not_exist_users = set(usernames) - set(account_usernames)
+        with tmp_to_root_org():
+            perms = AssetPermission.objects.filter(date_expired__gte=timezone.now(), is_active=True)
+            perm_usernames = perms.values_list('users__username', flat=True).union(
+                perms.values_list('user_groups__users__username', flat=True)
+            )
+        usernames = set(usernames) & set(perm_usernames)
+
+        account_usernames = self.accounts.filter(username__startswith='js_').values_list('username', flat=True)
+        account_usernames = [username[3:] for username in account_usernames]
+        not_exist_users = usernames - set(account_usernames)
         self.generate_private_accounts_by_usernames(not_exist_users)
 
 
