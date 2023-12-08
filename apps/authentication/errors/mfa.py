@@ -33,6 +33,11 @@ class FeiShuNotBound(JMSException):
     default_detail = _('FeiShu is not bound')
 
 
+class SlackNotBound(JMSException):
+    default_code = 'slack_not_bound'
+    default_detail = _('Slack is not bound')
+
+
 class PasswordInvalid(JMSException):
     default_code = 'passwd_invalid'
     default_detail = _('Your password is invalid')
