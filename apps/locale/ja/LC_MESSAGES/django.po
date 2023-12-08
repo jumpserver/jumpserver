@@ -9,6 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-08 14:51+0800\n"
+"POT-Creation-Date: 2023-12-08 15:33+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -115,83 +116,88 @@ msgstr "パスワードを変更する"
 msgid "Verify account"
 msgstr "アカウントを確認"
 
-#: accounts/const/automation.py:27
+#: accounts/const/automation.py:27 accounts/tasks/remove_account.py:14
+#: accounts/tasks/remove_account.py:23
+msgid "Remove account"
+msgstr "アカウントの削除"
+
+#: accounts/const/automation.py:28
 msgid "Gather accounts"
 msgstr "アカウントのコレクション"
 
-#: accounts/const/automation.py:28
+#: accounts/const/automation.py:29
 msgid "Verify gateway account"
 msgstr "ゲートウェイ アカウントを確認する"
 
-#: accounts/const/automation.py:46
+#: accounts/const/automation.py:47
 msgid "Specific secret"
 msgstr "特定"
 
-#: accounts/const/automation.py:47
+#: accounts/const/automation.py:48
 msgid "Random generate"
 msgstr "ランダム生成"
 
-#: accounts/const/automation.py:51 ops/const.py:13
+#: accounts/const/automation.py:52 ops/const.py:13
 msgid "Append SSH KEY"
 msgstr "追加"
 
-#: accounts/const/automation.py:52 ops/const.py:14
+#: accounts/const/automation.py:53 ops/const.py:14
 msgid "Empty and append SSH KEY"
 msgstr "すべてクリアして追加"
 
-#: accounts/const/automation.py:53 ops/const.py:15
+#: accounts/const/automation.py:54 ops/const.py:15
 msgid "Replace (Replace only keys pushed by JumpServer) "
 msgstr "置換（JumpServer によってプッシュされたキーのみを置換）"
 
-#: accounts/const/automation.py:58
+#: accounts/const/automation.py:59
 msgid "On asset create"
 msgstr "アセットが作成されたとき"
 
-#: accounts/const/automation.py:61
+#: accounts/const/automation.py:62
 msgid "On perm add user"
 msgstr "承認が変更されたときにユーザーを追加する"
 
-#: accounts/const/automation.py:63
+#: accounts/const/automation.py:64
 msgid "On perm add user group"
 msgstr "権限変更時にユーザーグループを追加"
 
-#: accounts/const/automation.py:65
+#: accounts/const/automation.py:66
 msgid "On perm add asset"
 msgstr "変更の承認時にアセットを追加する"
 
-#: accounts/const/automation.py:67
+#: accounts/const/automation.py:68
 msgid "On perm add node"
 msgstr "承認変更時のノードの追加"
 
-#: accounts/const/automation.py:69
+#: accounts/const/automation.py:70
 msgid "On perm add account"
 msgstr "承認が変更されたときにアカウントを追加する"
 
-#: accounts/const/automation.py:71
+#: accounts/const/automation.py:72
 msgid "On asset join node"
 msgstr "アセットの変更時にノードに追加"
 
-#: accounts/const/automation.py:73
+#: accounts/const/automation.py:74
 msgid "On user join group"
 msgstr "ユーザー変更時にユーザーグループに追加"
 
-#: accounts/const/automation.py:81
+#: accounts/const/automation.py:82
 msgid "On perm change"
 msgstr "権限が変更されたとき"
 
-#: accounts/const/automation.py:88
+#: accounts/const/automation.py:89
 msgid "Inherit from group or node"
 msgstr "ユーザーグループまたはアセットノードから継承"
 
-#: accounts/const/automation.py:96
+#: accounts/const/automation.py:97
 msgid "Create and push"
 msgstr "作成してプッシュ"
 
-#: accounts/const/automation.py:97
+#: accounts/const/automation.py:98
 msgid "Only create"
 msgstr "作成のみ"
 
-#: accounts/const/automation.py:102
+#: accounts/const/automation.py:103
 #: authentication/serializers/password_mfa.py:16
 #: authentication/serializers/password_mfa.py:24
 #: notifications/backends/__init__.py:10 settings/serializers/msg.py:22
@@ -203,6 +209,7 @@ msgid "Email"
 msgstr "メール"
 
 #: accounts/const/automation.py:104 terminal/const.py:87
+#: accounts/const/automation.py:105 terminal/const.py:87
 msgid "SFTP"
 msgstr "SFTP"
 
@@ -313,6 +320,10 @@ msgstr "アカウントを確認できます"
 #: accounts/models/account.py:71
 msgid "Can push account"
 msgstr "アカウントをプッシュできます"
+
+#: accounts/models/account.py:72
+msgid "Can remove account"
+msgstr "アカウントを削除できます"
 
 #: accounts/models/automations/backup_account.py:27
 msgid "Backup Type"
@@ -586,7 +597,7 @@ msgstr "パスワードルール"
 #: assets/models/asset/common.py:159 assets/models/cmd_filter.py:21
 #: assets/models/domain.py:19 assets/models/group.py:17
 #: assets/models/label.py:18 assets/models/platform.py:16
-#: assets/models/platform.py:89 assets/serializers/asset/common.py:146
+#: assets/models/platform.py:95 assets/serializers/asset/common.py:146
 #: assets/serializers/platform.py:118 assets/serializers/platform.py:235
 #: authentication/backends/passkey/models.py:10
 #: authentication/serializers/connect_token_secret.py:113
@@ -730,7 +741,7 @@ msgid "Exist policy"
 msgstr "アカウントの存在ポリシー"
 
 #: accounts/serializers/account/account.py:193 applications/models.py:11
-#: assets/models/label.py:21 assets/models/platform.py:90
+#: assets/models/label.py:21 assets/models/platform.py:96
 #: assets/serializers/asset/common.py:122 assets/serializers/cagegory.py:12
 #: assets/serializers/platform.py:140 assets/serializers/platform.py:236
 #: perms/serializers/user_permission.py:25 settings/models.py:34
@@ -742,7 +753,7 @@ msgstr "カテゴリ"
 #: accounts/serializers/automations/base.py:54 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:19 applications/models.py:14
 #: assets/models/_user.py:50 assets/models/automations/base.py:20
-#: assets/models/cmd_filter.py:74 assets/models/platform.py:91
+#: assets/models/cmd_filter.py:74 assets/models/platform.py:97
 #: assets/serializers/asset/common.py:123 assets/serializers/platform.py:120
 #: assets/serializers/platform.py:139 audits/serializers.py:53
 #: audits/serializers.py:170
@@ -892,10 +903,8 @@ msgid "Special symbol"
 msgstr "特殊記号"
 
 #: accounts/serializers/account/template.py:18
-#, fuzzy
-#| msgid "Special symbol"
 msgid "Exclude symbol"
-msgstr "特殊記号"
+msgstr "除外文字"
 
 #: accounts/serializers/account/template.py:36
 msgid "Secret generation strategy for account creation"
@@ -1710,7 +1719,7 @@ msgstr "ポート"
 msgid "Address"
 msgstr "アドレス"
 
-#: assets/models/asset/common.py:161 assets/models/platform.py:120
+#: assets/models/asset/common.py:161 assets/models/platform.py:126
 #: authentication/backends/passkey/models.py:12
 #: authentication/serializers/connect_token_secret.py:118
 #: perms/serializers/user_permission.py:24 xpack/plugins/cloud/models.py:321
@@ -1997,31 +2006,43 @@ msgstr "アカウント認証方法"
 msgid "Verify account params"
 msgstr "アカウント認証パラメータ"
 
-#: assets/models/platform.py:92 tickets/models/ticket/general.py:300
+#: assets/models/platform.py:76
+msgid "Remove account enabled"
+msgstr "アカウントを開いて削除"
+
+#: assets/models/platform.py:78
+msgid "Remove account method"
+msgstr "アカウントの削除方法"
+
+#: assets/models/platform.py:80
+msgid "Remove account params"
+msgstr "アカウント削除パラメータ"
+
+#: assets/models/platform.py:98 tickets/models/ticket/general.py:300
 msgid "Meta"
 msgstr "メタ"
 
-#: assets/models/platform.py:93 labels/models.py:13
+#: assets/models/platform.py:99 labels/models.py:13
 msgid "Internal"
 msgstr "ビルトイン"
 
-#: assets/models/platform.py:97 assets/serializers/platform.py:138
+#: assets/models/platform.py:103 assets/serializers/platform.py:138
 msgid "Charset"
 msgstr "シャーセット"
 
-#: assets/models/platform.py:99 assets/serializers/platform.py:167
+#: assets/models/platform.py:105 assets/serializers/platform.py:167
 msgid "Domain enabled"
 msgstr "ドメインを有効にする"
 
-#: assets/models/platform.py:101 assets/serializers/platform.py:166
+#: assets/models/platform.py:107 assets/serializers/platform.py:166
 msgid "Su enabled"
 msgstr "アカウントの切り替えを有効にする"
 
-#: assets/models/platform.py:102 assets/serializers/platform.py:144
+#: assets/models/platform.py:108 assets/serializers/platform.py:144
 msgid "Su method"
 msgstr "アカウントの切り替え方法"
 
-#: assets/models/platform.py:103 assets/serializers/platform.py:147
+#: assets/models/platform.py:109 assets/serializers/platform.py:147
 msgid "Custom fields"
 msgstr "カスタムフィールド"
 
@@ -2521,8 +2542,8 @@ msgid "User session"
 msgstr "ユーザーセッション"
 
 #: audits/models.py:308
-msgid "Offline ussr session"
-msgstr "ユーザー・セッションの下限"
+msgid "Offline user session"
+msgstr "オフラインユーザセッション"
 
 #: audits/serializers.py:33 ops/models/adhoc.py:25 ops/models/base.py:16
 #: ops/models/base.py:53 ops/models/job.py:150 ops/models/job.py:238
@@ -3160,6 +3181,21 @@ msgstr "コンポーネント"
 msgid "Expired now"
 msgstr "すぐに期限切れ"
 
+#: authentication/serializers/connect_token_secret.py:169
+#: terminal/models/virtualapp/virtualapp.py:25
+msgid "Image name"
+msgstr "ミラー名"
+
+#: authentication/serializers/connect_token_secret.py:170
+#: terminal/models/virtualapp/virtualapp.py:27
+msgid "Image port"
+msgstr "ミラーポート"
+
+#: authentication/serializers/connect_token_secret.py:171
+#: terminal/models/virtualapp/virtualapp.py:26
+msgid "Image protocol"
+msgstr "ミラープロトコル"
+
 #: authentication/serializers/connection_token.py:16
 msgid "Expired time"
 msgstr "期限切れ時間"
@@ -3446,22 +3482,19 @@ msgid "If you have any question, please contact the administrator"
 msgstr "質問があったら、管理者に連絡して下さい"
 
 #: authentication/views/base.py:138
-#, fuzzy, python-format
-#| msgid "WeCom query user failed"
+#, python-format
 msgid "%s query user failed"
-msgstr "企業微信ユーザーの問合せに失敗しました"
+msgstr "%sユーザーのクエリに失敗しました"
 
 #: authentication/views/base.py:147
-#, fuzzy, python-format
-#| msgid "The WeCom is already bound to another user"
+#, python-format
 msgid "The %s is already bound to another user"
-msgstr "この企業の微信はすでに他のユーザーをバインドしている。"
+msgstr "%sが別のユーザーにバインドされています。"
 
 #: authentication/views/base.py:154
-#, fuzzy, python-format
-#| msgid "Binding WeCom successfully"
+#, python-format
 msgid "Binding %s successfully"
-msgstr "企業の微信のバインドに成功"
+msgstr "バインド%s成功"
 
 #: authentication/views/dingtalk.py:42
 msgid "DingTalk Error, Please contact your system administrator"
@@ -3554,22 +3587,16 @@ msgid "Logout success, return login page"
 msgstr "ログアウト成功、ログインページを返す"
 
 #: authentication/views/slack.py:35 authentication/views/slack.py:126
-#, fuzzy
-#| msgid "DingTalk Error"
 msgid "Slack Error"
-msgstr "DingTalkエラー"
+msgstr "Slack エラー"
 
 #: authentication/views/slack.py:63
-#, fuzzy
-#| msgid "DingTalk is already bound"
 msgid "Slack is already bound"
-msgstr "DingTalkはすでにバインドされています"
+msgstr "Slack はすでにバインドされています"
 
 #: authentication/views/slack.py:128
-#, fuzzy
-#| msgid "Failed to get user from DingTalk"
 msgid "Failed to get user from Slack"
-msgstr "DingTalkからユーザーを取得できませんでした"
+msgstr "Slack からユーザーを取得できませんでした"
 
 #: authentication/views/wecom.py:40
 msgid "WeCom Error, Please contact your system administrator"
@@ -3782,10 +3809,8 @@ msgid "Network error, please contact system administrator"
 msgstr "ネットワークエラー、システム管理者に連絡してください"
 
 #: common/sdk/im/slack/__init__.py:76
-#, fuzzy
-#| msgid "Unknown error: {}"
 msgid "Unknown error occur"
-msgstr "不明なエラー: {}"
+msgstr "不明なエラーが発生しました"
 
 #: common/sdk/im/wecom/__init__.py:16
 msgid "WeCom error, please contact system administrator"
@@ -4787,9 +4812,13 @@ msgstr "共通設定"
 msgid "View permission tree"
 msgstr "権限ツリーの表示"
 
-#: settings/api/dingtalk.py:31 settings/api/feishu.py:36
-#: settings/api/slack.py:34 settings/api/sms.py:160 settings/api/vault.py:40
-#: settings/api/wecom.py:37
+#: settings/api/chat.py:35
+msgid "Chat AI is not enabled"
+msgstr "チャットAIがオンになっていない"
+
+#: settings/api/chat.py:73 settings/api/dingtalk.py:31
+#: settings/api/feishu.py:36 settings/api/slack.py:34 settings/api/sms.py:160
+#: settings/api/vault.py:40 settings/api/wecom.py:37
 msgid "Test success"
 msgstr "テストの成功"
 
@@ -4853,6 +4882,10 @@ msgid "Can change vault setting"
 msgstr "金庫の設定を変えることができます"
 
 #: settings/models.py:166
+msgid "Can change chat ai setting"
+msgstr "チャットAI設定を変更できます"
+
+#: settings/models.py:167
 msgid "Can change system msg sub setting"
 msgstr "システムmsgサブ设定を変更できます"
 
@@ -4917,10 +4950,8 @@ msgid "FeiShu Auth"
 msgstr "飛本 認証"
 
 #: settings/serializers/auth/base.py:20
-#, fuzzy
-#| msgid "CAS Auth"
 msgid "Slack Auth"
-msgstr "CAS 認証"
+msgstr "Slack 認証"
 
 #: settings/serializers/auth/base.py:21
 msgid "WeCom Auth"
@@ -5241,10 +5272,8 @@ msgid "SP cert"
 msgstr "SP 証明書"
 
 #: settings/serializers/auth/slack.py:12
-#, fuzzy
-#| msgid "Enable CAS Auth"
 msgid "Enable Slack Auth"
-msgstr "CAS 認証の有効化"
+msgstr "Slack 認証の有効化"
 
 #: settings/serializers/auth/sms.py:17
 msgid "Enable SMS"
@@ -5460,6 +5489,22 @@ msgid "Mount Point"
 msgstr "マウントポイント"
 
 #: settings/serializers/feature.py:60
+msgid "Chat AI"
+msgstr "チャットAI"
+
+#: settings/serializers/feature.py:67
+msgid "Base Url"
+msgstr "基本的なUrl"
+
+#: settings/serializers/feature.py:70 templates/_header_bar.html:90
+msgid "API Key"
+msgstr "API Key"
+
+#: settings/serializers/feature.py:76
+msgid "GPT Model"
+msgstr "GPTモデル"
+
+#: settings/serializers/feature.py:100
 msgid "Enable tickets"
 msgstr "チケットを有効にする"
 
@@ -6125,10 +6170,6 @@ msgstr "ページの管理"
 msgid "User page"
 msgstr "ユーザーページ"
 
-#: templates/_header_bar.html:90
-msgid "API Key"
-msgstr "API Key"
-
 #: templates/_header_bar.html:91
 msgid "Logout"
 msgstr "ログアウト"
@@ -6760,6 +6801,26 @@ msgstr "検証コードが無効"
 msgid "You have already joined this session"
 msgstr "すでにこのセッションに参加しています"
 
+#: terminal/models/virtualapp/provider.py:17
+#: terminal/models/virtualapp/virtualapp.py:36
+#: terminal/models/virtualapp/virtualapp.py:97
+#: terminal/serializers/virtualapp.py:32
+msgid "Virtual app"
+msgstr "仮想アプリケーション"
+
+#: terminal/models/virtualapp/virtualapp.py:32
+msgid "Providers"
+msgstr "プロバイダ"
+
+#: terminal/models/virtualapp/virtualapp.py:94
+#: terminal/serializers/virtualapp.py:34
+msgid "App Provider"
+msgstr "アプリケーションプロバイダ"
+
+#: terminal/models/virtualapp/virtualapp.py:102
+msgid "Virtual app publication"
+msgstr "仮想アプリケーションの公開"
+
 #: terminal/notifications.py:25
 msgid "Sessions"
 msgstr "セッション"
@@ -7078,6 +7139,26 @@ msgstr "セッション"
 #: terminal/serializers/terminal.py:83 terminal/serializers/terminal.py:91
 msgid "Not found"
 msgstr "見つかりません"
+
+#: terminal/serializers/virtualapp_provider.py:26
+msgid "Container ID"
+msgstr "コンテナID"
+
+#: terminal/serializers/virtualapp_provider.py:27
+msgid "Container Image"
+msgstr "コンテナミラーリング"
+
+#: terminal/serializers/virtualapp_provider.py:28
+msgid "Container Name"
+msgstr "コンテナー名"
+
+#: terminal/serializers/virtualapp_provider.py:29
+msgid "Container Status"
+msgstr "コンテナステータス"
+
+#: terminal/serializers/virtualapp_provider.py:30
+msgid "Container Ports"
+msgstr "コンテナポート"
 
 #: terminal/tasks.py:33
 msgid "Periodic delete terminal status"
@@ -7893,7 +7974,7 @@ msgstr "ユーザーの有効期限の定期的な検出"
 
 #: users/tasks.py:84
 msgid "Check unused users"
-msgstr "未使用のユーザーを確認する"
+msgstr "未使用のユーザーのチェック"
 
 #: users/tasks.py:115
 msgid "The user has not logged in recently and has been disabled."
@@ -8791,7 +8872,15 @@ msgstr "ログアウトページのロゴ"
 msgid "Theme"
 msgstr "テーマ"
 
-#: xpack/plugins/interface/models.py:44 xpack/plugins/interface/models.py:85
+#: xpack/plugins/interface/models.py:42
+msgid "Beian link"
+msgstr "公安オンライン申告ジャンプリンク"
+
+#: xpack/plugins/interface/models.py:43
+msgid "Beian text"
+msgstr "公安網登録番号"
+
+#: xpack/plugins/interface/models.py:46 xpack/plugins/interface/models.py:87
 msgid "Interface setting"
 msgstr "インターフェイスの設定"
 

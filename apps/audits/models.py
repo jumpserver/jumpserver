@@ -305,5 +305,5 @@ class UserSession(models.Model):
         ordering = ['-date_created']
         verbose_name = _('User session')
         permissions = [
-            ('offline_usersession', _('Offline ussr session')),
+            ('offline_usersession', _('Offline user session')),
         ]

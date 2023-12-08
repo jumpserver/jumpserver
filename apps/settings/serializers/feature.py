@@ -67,7 +67,7 @@ class ChatAISettingSerializer(serializers.Serializer):
         max_length=256, allow_blank=True, required=False, label=_('Base Url')
     )
     GPT_API_KEY = EncryptedField(
-        max_length=256, allow_blank=True, required=False, label=_('Api Key'),
+        max_length=256, allow_blank=True, required=False, label=_('API Key'),
     )
     GPT_PROXY = serializers.CharField(
         max_length=256, allow_blank=True, required=False, label=_('Proxy')
