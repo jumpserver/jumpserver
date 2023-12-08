@@ -54,6 +54,8 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     CACHE_LOGIN_PASSWORD_ENABLED = serializers.BooleanField()
     VAULT_ENABLED = serializers.BooleanField()
     VIRTUAL_APP_ENABLED = serializers.BooleanField()
+    CHAT_AI_ENABLED = serializers.BooleanField()
+    GPT_MODEL = serializers.CharField()
 
 
 class ServerInfoSerializer(serializers.Serializer):
