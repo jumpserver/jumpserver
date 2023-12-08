@@ -32,7 +32,7 @@ def migrate_automation_ansible_remove_account(apps, *args):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('assets', '0125_auto_20231011_1053'),
+        ('assets', '0126_remove_asset_labels'),
     ]
 
     operations = [
