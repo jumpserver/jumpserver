@@ -81,10 +81,10 @@ class Endpoint(JMSBaseModel):
             instance = instance.get_asset()
         if not isinstance(instance, Asset):
             return None
-        values = instance.labels.filter(name='endpoint').values_list('value', flat=True)
+        values = instance.labels.filter(label__name='endpoint').values_list('label__value', flat=True)
         if not values:
             return None
-        endpoints = cls.objects.filter(name__in=values).order_by('-date_updated')
+        endpoints = cls.objects.filter(name__in=list(values)).order_by('-date_updated')
         for endpoint in endpoints:
             if endpoint.is_valid_for(instance, protocol):
                 return endpoint
