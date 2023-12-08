@@ -20,6 +20,7 @@ class Endpoint(JMSBaseModel):
     mariadb_port = PortField(default=33062, verbose_name=_('MariaDB port'))
     postgresql_port = PortField(default=54320, verbose_name=_('PostgreSQL port'))
     redis_port = PortField(default=63790, verbose_name=_('Redis port'))
+    sqlserver_port = PortField(default=14330, verbose_name=_('SQLServer port'))
 
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
