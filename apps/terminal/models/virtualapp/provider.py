@@ -14,7 +14,7 @@ class AppProvider(JMSBaseModel):
         related_name='app_provider', verbose_name=_('Terminal')
     )
     apps = models.ManyToManyField(
-        'VirtualApp', verbose_name=_('VirtualApp'),
+        'VirtualApp', verbose_name=_('Virtual app'),
         through='VirtualAppPublication', through_fields=('provider', 'app'),
     )
 

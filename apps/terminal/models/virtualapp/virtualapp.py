@@ -94,7 +94,7 @@ class VirtualAppPublication(JMSBaseModel):
         'AppProvider', on_delete=models.CASCADE, related_name='publications', verbose_name=_('App Provider')
     )
     app = models.ForeignKey(
-        'VirtualApp', on_delete=models.CASCADE, related_name='publications', verbose_name=_('Virtual App')
+        'VirtualApp', on_delete=models.CASCADE, related_name='publications', verbose_name=_('Virtual app')
     )
     status = models.CharField(max_length=16, default='pending', verbose_name=_('Status'))
 

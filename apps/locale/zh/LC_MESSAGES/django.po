@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-08 14:51+0800\n"
+"POT-Creation-Date: 2023-12-08 15:33+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -114,83 +114,88 @@ msgstr "更改密码"
 msgid "Verify account"
 msgstr "验证账号"
 
-#: accounts/const/automation.py:27
+#: accounts/const/automation.py:27 accounts/tasks/remove_account.py:14
+#: accounts/tasks/remove_account.py:23
+msgid "Remove account"
+msgstr "移除账号"
+
+#: accounts/const/automation.py:28
 msgid "Gather accounts"
 msgstr "收集账号"
 
-#: accounts/const/automation.py:28
+#: accounts/const/automation.py:29
 msgid "Verify gateway account"
 msgstr "验证网关账号"
 
-#: accounts/const/automation.py:46
+#: accounts/const/automation.py:47
 msgid "Specific secret"
 msgstr "指定"
 
-#: accounts/const/automation.py:47
+#: accounts/const/automation.py:48
 msgid "Random generate"
 msgstr "随机生成"
 
-#: accounts/const/automation.py:51 ops/const.py:13
+#: accounts/const/automation.py:52 ops/const.py:13
 msgid "Append SSH KEY"
 msgstr "追加"
 
-#: accounts/const/automation.py:52 ops/const.py:14
+#: accounts/const/automation.py:53 ops/const.py:14
 msgid "Empty and append SSH KEY"
 msgstr "清空所有并添加"
 
-#: accounts/const/automation.py:53 ops/const.py:15
+#: accounts/const/automation.py:54 ops/const.py:15
 msgid "Replace (Replace only keys pushed by JumpServer) "
 msgstr "替换 (只替换由 JumpServer 推送的密钥)"
 
-#: accounts/const/automation.py:58
+#: accounts/const/automation.py:59
 msgid "On asset create"
 msgstr "资产创建时"
 
-#: accounts/const/automation.py:61
+#: accounts/const/automation.py:62
 msgid "On perm add user"
 msgstr "授权变更时添加用户"
 
-#: accounts/const/automation.py:63
+#: accounts/const/automation.py:64
 msgid "On perm add user group"
 msgstr "授权变更时添加用户组"
 
-#: accounts/const/automation.py:65
+#: accounts/const/automation.py:66
 msgid "On perm add asset"
 msgstr "授权变更时添加资产"
 
-#: accounts/const/automation.py:67
+#: accounts/const/automation.py:68
 msgid "On perm add node"
 msgstr "授权变更时添加节点"
 
-#: accounts/const/automation.py:69
+#: accounts/const/automation.py:70
 msgid "On perm add account"
 msgstr "授权变更时添加账号"
 
-#: accounts/const/automation.py:71
+#: accounts/const/automation.py:72
 msgid "On asset join node"
 msgstr "资产变更时添加到节点"
 
-#: accounts/const/automation.py:73
+#: accounts/const/automation.py:74
 msgid "On user join group"
 msgstr "用户变更时添加到用户组"
 
-#: accounts/const/automation.py:81
+#: accounts/const/automation.py:82
 msgid "On perm change"
 msgstr "授权变更时"
 
-#: accounts/const/automation.py:88
+#: accounts/const/automation.py:89
 msgid "Inherit from group or node"
 msgstr "继承自用户组或资产节点"
 
-#: accounts/const/automation.py:96
+#: accounts/const/automation.py:97
 msgid "Create and push"
 msgstr "创建并推送"
 
-#: accounts/const/automation.py:97
+#: accounts/const/automation.py:98
 msgid "Only create"
 msgstr "仅创建"
 
-#: accounts/const/automation.py:102
+#: accounts/const/automation.py:103
 #: authentication/serializers/password_mfa.py:16
 #: authentication/serializers/password_mfa.py:24
 #: notifications/backends/__init__.py:10 settings/serializers/msg.py:22
@@ -201,7 +206,7 @@ msgstr "仅创建"
 msgid "Email"
 msgstr "邮箱"
 
-#: accounts/const/automation.py:104 terminal/const.py:87
+#: accounts/const/automation.py:105 terminal/const.py:87
 msgid "SFTP"
 msgstr "SFTP"
 
@@ -312,6 +317,10 @@ msgstr "可以验证账号"
 #: accounts/models/account.py:71
 msgid "Can push account"
 msgstr "可以推送账号"
+
+#: accounts/models/account.py:72
+msgid "Can remove account"
+msgstr "可以移除账号"
 
 #: accounts/models/automations/backup_account.py:27
 msgid "Backup Type"
@@ -585,7 +594,7 @@ msgstr "密码规则"
 #: assets/models/asset/common.py:159 assets/models/cmd_filter.py:21
 #: assets/models/domain.py:19 assets/models/group.py:17
 #: assets/models/label.py:18 assets/models/platform.py:16
-#: assets/models/platform.py:89 assets/serializers/asset/common.py:146
+#: assets/models/platform.py:95 assets/serializers/asset/common.py:146
 #: assets/serializers/platform.py:118 assets/serializers/platform.py:235
 #: authentication/backends/passkey/models.py:10
 #: authentication/serializers/connect_token_secret.py:113
@@ -728,7 +737,7 @@ msgid "Exist policy"
 msgstr "账号存在策略"
 
 #: accounts/serializers/account/account.py:193 applications/models.py:11
-#: assets/models/label.py:21 assets/models/platform.py:90
+#: assets/models/label.py:21 assets/models/platform.py:96
 #: assets/serializers/asset/common.py:122 assets/serializers/cagegory.py:12
 #: assets/serializers/platform.py:140 assets/serializers/platform.py:236
 #: perms/serializers/user_permission.py:25 settings/models.py:34
@@ -740,7 +749,7 @@ msgstr "类别"
 #: accounts/serializers/automations/base.py:54 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:19 applications/models.py:14
 #: assets/models/_user.py:50 assets/models/automations/base.py:20
-#: assets/models/cmd_filter.py:74 assets/models/platform.py:91
+#: assets/models/cmd_filter.py:74 assets/models/platform.py:97
 #: assets/serializers/asset/common.py:123 assets/serializers/platform.py:120
 #: assets/serializers/platform.py:139 audits/serializers.py:53
 #: audits/serializers.py:170
@@ -890,10 +899,8 @@ msgid "Special symbol"
 msgstr "特殊字符"
 
 #: accounts/serializers/account/template.py:18
-#, fuzzy
-#| msgid "Special symbol"
 msgid "Exclude symbol"
-msgstr "特殊字符"
+msgstr "排除字符"
 
 #: accounts/serializers/account/template.py:36
 msgid "Secret generation strategy for account creation"
@@ -1703,7 +1710,7 @@ msgstr "端口"
 msgid "Address"
 msgstr "地址"
 
-#: assets/models/asset/common.py:161 assets/models/platform.py:120
+#: assets/models/asset/common.py:161 assets/models/platform.py:126
 #: authentication/backends/passkey/models.py:12
 #: authentication/serializers/connect_token_secret.py:118
 #: perms/serializers/user_permission.py:24 xpack/plugins/cloud/models.py:321
@@ -1990,31 +1997,43 @@ msgstr "账号验证方式"
 msgid "Verify account params"
 msgstr "账号验证参数"
 
-#: assets/models/platform.py:92 tickets/models/ticket/general.py:300
+#: assets/models/platform.py:76
+msgid "Remove account enabled"
+msgstr "开启账号移除"
+
+#: assets/models/platform.py:78
+msgid "Remove account method"
+msgstr "账号移除方式"
+
+#: assets/models/platform.py:80
+msgid "Remove account params"
+msgstr "账号移除参数"
+
+#: assets/models/platform.py:98 tickets/models/ticket/general.py:300
 msgid "Meta"
 msgstr "元数据"
 
-#: assets/models/platform.py:93 labels/models.py:13
+#: assets/models/platform.py:99 labels/models.py:13
 msgid "Internal"
 msgstr "内置"
 
-#: assets/models/platform.py:97 assets/serializers/platform.py:138
+#: assets/models/platform.py:103 assets/serializers/platform.py:138
 msgid "Charset"
 msgstr "编码"
 
-#: assets/models/platform.py:99 assets/serializers/platform.py:167
+#: assets/models/platform.py:105 assets/serializers/platform.py:167
 msgid "Domain enabled"
 msgstr "启用网域"
 
-#: assets/models/platform.py:101 assets/serializers/platform.py:166
+#: assets/models/platform.py:107 assets/serializers/platform.py:166
 msgid "Su enabled"
 msgstr "启用账号切换"
 
-#: assets/models/platform.py:102 assets/serializers/platform.py:144
+#: assets/models/platform.py:108 assets/serializers/platform.py:144
 msgid "Su method"
 msgstr "账号切换方式"
 
-#: assets/models/platform.py:103 assets/serializers/platform.py:147
+#: assets/models/platform.py:109 assets/serializers/platform.py:147
 msgid "Custom fields"
 msgstr "自定义属性"
 
@@ -2505,8 +2524,8 @@ msgid "User session"
 msgstr "用户会话"
 
 #: audits/models.py:308
-msgid "Offline ussr session"
-msgstr "下限用户会话"
+msgid "Offline user session"
+msgstr "下线用户会话"
 
 #: audits/serializers.py:33 ops/models/adhoc.py:25 ops/models/base.py:16
 #: ops/models/base.py:53 ops/models/job.py:150 ops/models/job.py:238
@@ -3129,6 +3148,21 @@ msgstr "组件"
 msgid "Expired now"
 msgstr "立刻过期"
 
+#: authentication/serializers/connect_token_secret.py:169
+#: terminal/models/virtualapp/virtualapp.py:25
+msgid "Image name"
+msgstr "镜像名称"
+
+#: authentication/serializers/connect_token_secret.py:170
+#: terminal/models/virtualapp/virtualapp.py:27
+msgid "Image port"
+msgstr "镜像端口"
+
+#: authentication/serializers/connect_token_secret.py:171
+#: terminal/models/virtualapp/virtualapp.py:26
+msgid "Image protocol"
+msgstr "镜像协议"
+
 #: authentication/serializers/connection_token.py:16
 msgid "Expired time"
 msgstr "过期时间"
@@ -3403,22 +3437,19 @@ msgid "If you have any question, please contact the administrator"
 msgstr "如果有疑问或需求，请联系系统管理员"
 
 #: authentication/views/base.py:138
-#, fuzzy, python-format
-#| msgid "WeCom query user failed"
+#, python-format
 msgid "%s query user failed"
-msgstr "企业微信查询用户失败"
+msgstr "%s 查询用户失败"
 
 #: authentication/views/base.py:147
-#, fuzzy, python-format
-#| msgid "The WeCom is already bound to another user"
+#, python-format
 msgid "The %s is already bound to another user"
-msgstr "该企业微信已经绑定其他用户"
+msgstr "%s 已绑定到另一个用户"
 
 #: authentication/views/base.py:154
-#, fuzzy, python-format
-#| msgid "Binding WeCom successfully"
+#, python-format
 msgid "Binding %s successfully"
-msgstr "绑定 企业微信 成功"
+msgstr "绑定 %s 成功"
 
 #: authentication/views/dingtalk.py:42
 msgid "DingTalk Error, Please contact your system administrator"
@@ -3512,15 +3543,15 @@ msgstr "退出登录成功，返回到登录页面"
 
 #: authentication/views/slack.py:35 authentication/views/slack.py:126
 msgid "Slack Error"
-msgstr "Slack错误"
+msgstr "Slack 错误"
 
 #: authentication/views/slack.py:63
 msgid "Slack is already bound"
-msgstr "Slack已经绑定"
+msgstr "Slack 已经绑定"
 
 #: authentication/views/slack.py:128
 msgid "Failed to get user from Slack"
-msgstr "从Slack获取用户失败"
+msgstr "从 Slack 获取用户失败"
 
 #: authentication/views/wecom.py:40
 msgid "WeCom Error, Please contact your system administrator"
@@ -3731,10 +3762,8 @@ msgid "Network error, please contact system administrator"
 msgstr "网络错误，请联系系统管理员"
 
 #: common/sdk/im/slack/__init__.py:76
-#, fuzzy
-#| msgid "Unknown error: {}"
 msgid "Unknown error occur"
-msgstr "未知错误: {}"
+msgstr "发生未知错误"
 
 #: common/sdk/im/wecom/__init__.py:16
 msgid "WeCom error, please contact system administrator"
@@ -4731,9 +4760,13 @@ msgstr "一般设置"
 msgid "View permission tree"
 msgstr "查看授权树"
 
-#: settings/api/dingtalk.py:31 settings/api/feishu.py:36
-#: settings/api/slack.py:34 settings/api/sms.py:160 settings/api/vault.py:40
-#: settings/api/wecom.py:37
+#: settings/api/chat.py:35
+msgid "Chat AI is not enabled"
+msgstr "聊天 AI 没有开启"
+
+#: settings/api/chat.py:73 settings/api/dingtalk.py:31
+#: settings/api/feishu.py:36 settings/api/slack.py:34 settings/api/sms.py:160
+#: settings/api/vault.py:40 settings/api/wecom.py:37
 msgid "Test success"
 msgstr "测试成功"
 
@@ -4795,6 +4828,10 @@ msgid "Can change vault setting"
 msgstr "可以更改 vault 设置"
 
 #: settings/models.py:166
+msgid "Can change chat ai setting"
+msgstr "可以修改聊天 AI 设置"
+
+#: settings/models.py:167
 msgid "Can change system msg sub setting"
 msgstr "消息订阅设置"
 
@@ -4859,10 +4896,8 @@ msgid "FeiShu Auth"
 msgstr "飞书 认证"
 
 #: settings/serializers/auth/base.py:20
-#, fuzzy
-#| msgid "CAS Auth"
 msgid "Slack Auth"
-msgstr "CAS 认证"
+msgstr "Slack 认证"
 
 #: settings/serializers/auth/base.py:21
 msgid "WeCom Auth"
@@ -5182,10 +5217,8 @@ msgid "SP cert"
 msgstr "SP 证书"
 
 #: settings/serializers/auth/slack.py:12
-#, fuzzy
-#| msgid "Enable CAS Auth"
 msgid "Enable Slack Auth"
-msgstr "启用 CAS 认证"
+msgstr "启用 Slack 认证"
 
 #: settings/serializers/auth/sms.py:17
 msgid "Enable SMS"
@@ -5398,6 +5431,22 @@ msgid "Mount Point"
 msgstr "挂在点"
 
 #: settings/serializers/feature.py:60
+msgid "Chat AI"
+msgstr "聊天 AI"
+
+#: settings/serializers/feature.py:67
+msgid "Base Url"
+msgstr "基本地址"
+
+#: settings/serializers/feature.py:70 templates/_header_bar.html:90
+msgid "API Key"
+msgstr "API Key"
+
+#: settings/serializers/feature.py:76
+msgid "GPT Model"
+msgstr "GPT 模型"
+
+#: settings/serializers/feature.py:100
 msgid "Enable tickets"
 msgstr "启用工单"
 
@@ -5960,8 +6009,6 @@ msgid "Succeed: Match {} s user"
 msgstr "成功匹配 {} 个用户"
 
 #: settings/utils/ldap.py:653
-#, fuzzy
-#| msgid "Can test asset connectivity"
 msgid "Please test the connection first"
 msgstr "请先测试连接"
 
@@ -6036,10 +6083,6 @@ msgstr "管理页面"
 #: templates/_header_bar.html:86
 msgid "User page"
 msgstr "用户页面"
-
-#: templates/_header_bar.html:90
-msgid "API Key"
-msgstr "API Key"
 
 #: templates/_header_bar.html:91
 msgid "Logout"
@@ -6666,6 +6709,26 @@ msgstr "验证码不正确"
 msgid "You have already joined this session"
 msgstr "您已经加入过此会话"
 
+#: terminal/models/virtualapp/provider.py:17
+#: terminal/models/virtualapp/virtualapp.py:36
+#: terminal/models/virtualapp/virtualapp.py:97
+#: terminal/serializers/virtualapp.py:32
+msgid "Virtual app"
+msgstr "虚拟应用"
+
+#: terminal/models/virtualapp/virtualapp.py:32
+msgid "Providers"
+msgstr "提供商"
+
+#: terminal/models/virtualapp/virtualapp.py:94
+#: terminal/serializers/virtualapp.py:34
+msgid "App Provider"
+msgstr "应用提供商"
+
+#: terminal/models/virtualapp/virtualapp.py:102
+msgid "Virtual app publication"
+msgstr "虚拟应用发布"
+
 #: terminal/notifications.py:25
 msgid "Sessions"
 msgstr "会话管理"
@@ -6977,6 +7040,26 @@ msgstr "会话 ID"
 #: terminal/serializers/terminal.py:83 terminal/serializers/terminal.py:91
 msgid "Not found"
 msgstr "没有发现"
+
+#: terminal/serializers/virtualapp_provider.py:26
+msgid "Container ID"
+msgstr "容器 ID"
+
+#: terminal/serializers/virtualapp_provider.py:27
+msgid "Container Image"
+msgstr "容器镜像"
+
+#: terminal/serializers/virtualapp_provider.py:28
+msgid "Container Name"
+msgstr "容器名称"
+
+#: terminal/serializers/virtualapp_provider.py:29
+msgid "Container Status"
+msgstr "容器状态"
+
+#: terminal/serializers/virtualapp_provider.py:30
+msgid "Container Ports"
+msgstr "容器端口"
 
 #: terminal/tasks.py:33
 msgid "Periodic delete terminal status"
@@ -7781,7 +7864,7 @@ msgstr "周期检测用户过期"
 
 #: users/tasks.py:84
 msgid "Check unused users"
-msgstr "校验用户已过期"
+msgstr "检查未使用的用户"
 
 #: users/tasks.py:115
 msgid "The user has not logged in recently and has been disabled."
@@ -8664,7 +8747,15 @@ msgstr "退出页面logo"
 msgid "Theme"
 msgstr "主题"
 
-#: xpack/plugins/interface/models.py:44 xpack/plugins/interface/models.py:85
+#: xpack/plugins/interface/models.py:42
+msgid "Beian link"
+msgstr "公安联网备案跳转链接"
+
+#: xpack/plugins/interface/models.py:43
+msgid "Beian text"
+msgstr "公安联网备案号"
+
+#: xpack/plugins/interface/models.py:46 xpack/plugins/interface/models.py:87
 msgid "Interface setting"
 msgstr "界面设置"
 

@@ -11,7 +11,7 @@ __all__ = ['remove_accounts_task']
 
 
 @shared_task(
-    queue="ansible", verbose_name=_('Remove accounts'),
+    queue="ansible", verbose_name=_('Remove account'),
     activity_callback=lambda self, gather_account_ids, *args, **kwargs: (gather_account_ids, None)
 )
 def remove_accounts_task(gather_account_ids):
@@ -20,7 +20,7 @@ def remove_accounts_task(gather_account_ids):
     gather_accounts = GatheredAccount.objects.filter(
         id__in=gather_account_ids
     )
-    task_name = gettext_noop("Remove accounts")
+    task_name = gettext_noop("Remove account")
 
     task_snapshot = {
         'assets': [str(i.asset_id) for i in gather_accounts],
