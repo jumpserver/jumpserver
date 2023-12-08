@@ -1,0 +1,12 @@
+id: remove_account_postgresql
+name: "{{ 'PostgreSQL account remove' | trans }}"
+category: database
+type:
+  - postgresql
+method: remove_account
+
+i18n:
+  PostgreSQL account remove:
+    zh: 使用 Ansible 模块 postgresql_user 删除账号
+    ja: Ansible モジュール postgresql_user を使用してアカウントを削除します
+    en: Use the Ansible module postgresql_user to delete the account

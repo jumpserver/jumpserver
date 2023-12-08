@@ -1,0 +1,9 @@
+- hosts: windows
+  gather_facts: no
+  tasks:
+    - name: "Remove account"
+      ansible.windows.win_user:
+        name: "{{ account.username }}"
+        state: absent
+        purge: yes
+        force: yes

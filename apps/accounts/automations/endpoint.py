@@ -1,8 +1,9 @@
-from .push_account.manager import PushAccountManager
-from .change_secret.manager import ChangeSecretManager
-from .verify_account.manager import VerifyAccountManager
 from .backup_account.manager import AccountBackupManager
+from .change_secret.manager import ChangeSecretManager
 from .gather_accounts.manager import GatherAccountsManager
+from .push_account.manager import PushAccountManager
+from .remove_account.manager import RemoveAccountManager
+from .verify_account.manager import VerifyAccountManager
 from .verify_gateway_account.manager import VerifyGatewayAccountManager
 from ..const import AutomationTypes
 
@@ -12,6 +13,7 @@ class ExecutionManager:
         AutomationTypes.push_account: PushAccountManager,
         AutomationTypes.change_secret: ChangeSecretManager,
         AutomationTypes.verify_account: VerifyAccountManager,
+        AutomationTypes.remove_account: RemoveAccountManager,
         AutomationTypes.gather_accounts: GatherAccountsManager,
         AutomationTypes.verify_gateway_account: VerifyGatewayAccountManager,
         # TODO 后期迁移到自动化策略中

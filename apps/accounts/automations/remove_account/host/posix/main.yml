@@ -1,0 +1,25 @@
+- hosts: demo
+  gather_facts: no
+  tasks:
+    - name: "Get user home directory path"
+      ansible.builtin.shell:
+        cmd: "getent passwd {{ account.username }} | cut -d: -f6"
+      register: user_home_dir
+      ignore_errors: yes
+
+    - name: "Check if user home directory exists"
+      ansible.builtin.stat:
+        path: "{{ user_home_dir.stdout }}"
+      register: home_dir
+      when: user_home_dir.stdout != ""
+
+    - name: "Rename user home directory if it exists"
+      ansible.builtin.command:
+        cmd: "mv {{ user_home_dir.stdout }} {{ user_home_dir.stdout }}.bak"
+      when: home_dir.stat.exists and user_home_dir.stdout != ""
+
+    - name: "Remove account"
+      ansible.builtin.user:
+        name: "{{ account.username }}"
+        state: absent
+        remove: "{{ home_dir.stat.exists }}"
