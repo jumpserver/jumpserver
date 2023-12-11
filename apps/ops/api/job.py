@@ -98,34 +98,44 @@ class JobViewSet(OrgBulkModelViewSet):
         transaction.on_commit(
             lambda: run_ops_job_execution.apply_async((str(execution.id),), task_id=str(execution.id)))
 
+    @staticmethod
+    def get_same_filenames(files):
+        filename_set = set()
+        same_filenames = []
+        for file in files:
+            filename = file.name
+            if filename in filename_set:
+                same_filenames.append(filename)
+            filename_set.add(filename)
+        return same_filenames
+
     @action(methods=[POST], detail=False, serializer_class=FileSerializer, permission_classes=[IsValidUser, ],
             url_path='upload')
     def upload(self, request, *args, **kwargs):
+        uploaded_files = request.FILES.getlist('files')
         serializer = self.get_serializer(data=request.data)
+
         if not serializer.is_valid():
             msg = 'Upload data invalid: {}'.format(serializer.errors)
             return Response({'msg': msg}, status=400)
-        uploaded_files = request.FILES.getlist('files')
+
+        same_filenames = self.get_same_filenames(uploaded_files)
+        if same_filenames:
+            return Response({'msg': _("Duplicate file exists")}, status=400)
+
         job_id = request.data.get('job_id', '')
         job = get_object_or_404(Job, pk=job_id)
         job_args = json.loads(job.args)
         src_path_info = []
-        filename_set = set()
-        same_filenames = []
-        upload_file_dir = safe_join(settings.DATA_DIR, 'job_upload_file')
+        upload_file_dir = safe_join(settings.DATA_DIR, 'job_upload_file', job_id)
         for uploaded_file in uploaded_files:
             filename = uploaded_file.name
-            saved_path = safe_join(upload_file_dir, f'{job_id}/{filename}')
+            saved_path = safe_join(upload_file_dir, f'{filename}')
             os.makedirs(os.path.dirname(saved_path), exist_ok=True)
             with open(saved_path, 'wb+') as destination:
                 for chunk in uploaded_file.chunks():
                     destination.write(chunk)
-            if filename in filename_set:
-                same_filenames.append(filename)
-            filename_set.add(filename)
             src_path_info.append({'filename': filename, 'md5': get_file_md5(saved_path)})
-        if same_filenames:
-            return Response({'msg': _("Duplicate file exists")}, status=400)
         job_args['src_path_info'] = src_path_info
         job.args = json.dumps(job_args)
         job.save()
