@@ -18,14 +18,4 @@ class Migration(migrations.Migration):
             name='sqlserver_port',
             field=common.db.fields.PortField(default=14330, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(65535)], verbose_name='SQLServer port'),
         ),
-        migrations.AlterField(
-            model_name='appprovider',
-            name='apps',
-            field=models.ManyToManyField(through='terminal.VirtualAppPublication', to='terminal.virtualapp', verbose_name='Virtual app'),
-        ),
-        migrations.AlterField(
-            model_name='virtualapppublication',
-            name='app',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='publications', to='terminal.virtualapp', verbose_name='Virtual app'),
-        ),
     ]
