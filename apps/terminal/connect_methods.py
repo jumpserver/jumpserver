@@ -49,6 +49,7 @@ class NativeClient(TextChoices):
             Protocol.mongodb: [cls.db_client, cls.db_guide],
             Protocol.oracle: [cls.db_client, cls.db_guide],
             Protocol.postgresql: [cls.db_client, cls.db_guide],
+            Protocol.sqlserver: [cls.db_client, cls.db_guide],
         }
         return clients
 
@@ -180,7 +181,7 @@ class ConnectMethodUtil:
                 'support': [
                     Protocol.mysql, Protocol.postgresql,
                     Protocol.oracle, Protocol.mariadb,
-                    Protocol.redis
+                    Protocol.redis, Protocol.sqlserver
                 ],
                 'match': 'map'
             },
