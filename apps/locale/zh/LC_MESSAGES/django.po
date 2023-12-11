@@ -4516,6 +4516,10 @@ msgstr "授权账号"
 msgid "today"
 msgstr "今天"
 
+#: perms/notifications.py:12 settings/serializers/feature.py:106
+msgid "day"
+msgstr "天"
+
 #: perms/notifications.py:15
 msgid "You permed assets is about to expire"
 msgstr "你授权的资产即将到期"
@@ -4541,15 +4545,29 @@ msgid "Send asset permission expired notification"
 msgstr "发送资产权限过期通知"
 
 #: perms/templates/perms/_msg_item_permissions_expire.html:7
-#: perms/templates/perms/_msg_permed_items_expire.html:7
-#, python-format
+#, fuzzy, python-format
+#| msgid ""
+#| "\n"
+#| "        The following %(item_type)s will expire in %(count)s\n"
+#| "    "
 msgid ""
 "\n"
 "        The following %(item_type)s will expire in %(count)s days\n"
 "    "
 msgstr ""
 "\n"
-"        以下 %(item_type)s 即将在 %(count)s 天后过期\n"
+"        以下 %(item_type)s 即将在 %(count)s 后过期\n"
+"    "
+
+#: perms/templates/perms/_msg_permed_items_expire.html:7
+#, python-format
+msgid ""
+"\n"
+"        The following %(item_type)s will expire in %(count)s\n"
+"    "
+msgstr ""
+"\n"
+"        以下 %(item_type)s 即将在 %(count)s 后过期\n"
 "    "
 
 #: rbac/api/role.py:35
@@ -5453,10 +5471,6 @@ msgstr "启用工单"
 #: settings/serializers/feature.py:103
 msgid "Ticket authorize default time"
 msgstr "默认工单授权时间"
-
-#: settings/serializers/feature.py:106
-msgid "day"
-msgstr "天"
 
 #: settings/serializers/feature.py:106
 msgid "hour"
