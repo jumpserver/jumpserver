@@ -4567,6 +4567,10 @@ msgstr "認定アカウント"
 msgid "today"
 msgstr "今日"
 
+#: perms/notifications.py:12 settings/serializers/feature.py:106
+msgid "day"
+msgstr "日"
+
 #: perms/notifications.py:15
 msgid "You permed assets is about to expire"
 msgstr "パーマ資産の有効期限が近づいています"
@@ -4591,16 +4595,15 @@ msgstr "アセット認証ルールの有効期限が切れていることを確
 msgid "Send asset permission expired notification"
 msgstr "アセット許可の有効期限通知を送信する"
 
-#: perms/templates/perms/_msg_item_permissions_expire.html:7
+
 #: perms/templates/perms/_msg_permed_items_expire.html:7
-#, python-format
 msgid ""
 "\n"
-"        The following %(item_type)s will expire in %(count)s days\n"
+"        The following %(item_type)s will expire in %(count)s\n"
 "    "
 msgstr ""
 "\n"
-"        次の %(item_type)s は %(count)s 日以内に期限切れになります\n"
+"        次の %(item_type)s は %(count)s 以内に期限切れになります\n"
 "    "
 
 #: rbac/api/role.py:35
@@ -5511,10 +5514,6 @@ msgstr "チケットを有効にする"
 #: settings/serializers/feature.py:103
 msgid "Ticket authorize default time"
 msgstr "デフォルト製造オーダ承認時間"
-
-#: settings/serializers/feature.py:106
-msgid "day"
-msgstr "日"
 
 #: settings/serializers/feature.py:106
 msgid "hour"
