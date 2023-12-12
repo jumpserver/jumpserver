@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-11 14:54+0800\n"
+"POT-Creation-Date: 2023-12-12 15:24+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -605,7 +605,7 @@ msgstr "密码规则"
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
 #: settings/models.py:32 settings/serializers/msg.py:82
 #: terminal/models/applet/applet.py:33 terminal/models/component/endpoint.py:12
-#: terminal/models/component/endpoint.py:94
+#: terminal/models/component/endpoint.py:95
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:84
 #: terminal/models/virtualapp/provider.py:10
@@ -626,7 +626,7 @@ msgstr "特权账号"
 #: assets/models/label.py:22
 #: authentication/serializers/connect_token_secret.py:117
 #: terminal/models/applet/applet.py:40
-#: terminal/models/component/endpoint.py:105
+#: terminal/models/component/endpoint.py:106
 #: terminal/models/virtualapp/virtualapp.py:23 users/serializers/user.py:167
 msgid "Is active"
 msgstr "激活"
@@ -922,8 +922,8 @@ msgstr "关联平台，可配置推送参数，如果不关联，将使用默认
 #: ops/models/job.py:157 ops/models/playbook.py:32 rbac/models/role.py:37
 #: settings/models.py:37 terminal/models/applet/applet.py:45
 #: terminal/models/applet/applet.py:321 terminal/models/applet/host.py:143
-#: terminal/models/component/endpoint.py:24
-#: terminal/models/component/endpoint.py:104
+#: terminal/models/component/endpoint.py:25
+#: terminal/models/component/endpoint.py:105
 #: terminal/models/session/session.py:46
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
 #: tickets/models/ticket/general.py:297 users/models/user.py:834
@@ -975,7 +975,7 @@ msgstr "自动化任务执行历史"
 
 #: accounts/serializers/automations/change_secret.py:149 audits/const.py:61
 #: audits/models.py:64 audits/signal_handlers/activity_log.py:33
-#: common/const/choices.py:18 ops/const.py:73 ops/serializers/celery.py:40
+#: common/const/choices.py:18 ops/const.py:73 ops/serializers/celery.py:46
 #: terminal/const.py:78 terminal/models/session/sharing.py:121
 #: tickets/views/approve.py:117
 msgid "Success"
@@ -1078,13 +1078,13 @@ msgid "Notifications"
 msgstr "通知"
 
 #: acls/models/base.py:37 assets/models/_user.py:51
-#: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:97
+#: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:98
 #: xpack/plugins/cloud/models.py:275
 msgid "Priority"
 msgstr "优先级"
 
 #: acls/models/base.py:38 assets/models/_user.py:51
-#: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:98
+#: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:99
 #: xpack/plugins/cloud/models.py:276
 msgid "1-100, the lower the value will be match first"
 msgstr "优先级可选范围为 1-100 (数值越小越优先)"
@@ -3029,7 +3029,7 @@ msgid "Please change your password"
 msgstr "请修改密码"
 
 #: authentication/models/access_key.py:22
-#: terminal/models/component/endpoint.py:95
+#: terminal/models/component/endpoint.py:96
 msgid "IP group"
 msgstr "IPグループ"
 
@@ -3991,19 +3991,19 @@ msgstr "Ansible 已禁用"
 msgid "Skip hosts below:"
 msgstr "跳过以下主机: "
 
-#: ops/api/celery.py:64 ops/api/celery.py:79
+#: ops/api/celery.py:65 ops/api/celery.py:80
 msgid "Waiting task start"
 msgstr "等待任务开始"
 
-#: ops/api/celery.py:162
+#: ops/api/celery.py:203
 msgid "Task {} not found"
 msgstr "任务 {} 不存在"
 
-#: ops/api/celery.py:167
+#: ops/api/celery.py:208
 msgid "Task {} args or kwargs error"
 msgstr "任务 {} 执行参数错误"
 
-#: ops/api/job.py:128
+#: ops/api/job.py:124
 msgid "Duplicate file exists"
 msgstr "存在同名文件"
 
@@ -5435,7 +5435,7 @@ msgstr "公告"
 msgid "Enable announcement"
 msgstr "启用公告"
 
-#: settings/serializers/feature.py:46 settings/serializers/feature.py:64
+#: settings/serializers/feature.py:46
 msgid "Enable Vault"
 msgstr "启用 Vault"
 
@@ -5446,6 +5446,10 @@ msgstr "挂在点"
 #: settings/serializers/feature.py:60
 msgid "Chat AI"
 msgstr "聊天 AI"
+
+#: settings/serializers/feature.py:64
+msgid "Enable Chat AI"
+msgstr "启动聊天 AI"
 
 #: settings/serializers/feature.py:67
 msgid "Base Url"
@@ -6530,15 +6534,21 @@ msgstr "PostgreSQL 端口"
 msgid "Redis port"
 msgstr "Redis 端口"
 
-#: terminal/models/component/endpoint.py:29
-#: terminal/models/component/endpoint.py:102
+#: terminal/models/component/endpoint.py:23
+#, fuzzy
+#| msgid "SQLServer"
+msgid "SQLServer port"
+msgstr "SQLServer"
+
+#: terminal/models/component/endpoint.py:30
+#: terminal/models/component/endpoint.py:103
 #: terminal/serializers/endpoint.py:73 terminal/serializers/storage.py:41
 #: terminal/serializers/storage.py:53 terminal/serializers/storage.py:83
 #: terminal/serializers/storage.py:93 terminal/serializers/storage.py:101
 msgid "Endpoint"
 msgstr "端点"
 
-#: terminal/models/component/endpoint.py:108
+#: terminal/models/component/endpoint.py:109
 msgid "Endpoint rule"
 msgstr "端点规则"
 
@@ -8795,7 +8805,6 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
-
 
 #~ msgid "FeiShu query user failed"
 #~ msgstr "飞书查询用户失败"
