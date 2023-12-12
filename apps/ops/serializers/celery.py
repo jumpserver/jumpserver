@@ -30,9 +30,15 @@ class CeleryPeriodTaskSerializer(serializers.ModelSerializer):
 
 
 class CeleryTaskSerializer(serializers.ModelSerializer):
+    exec_cycle = serializers.CharField(read_only=True)
+    next_exec_time = serializers.DateTimeField(format="%Y/%m/%d %H:%M:%S", read_only=True)
+
     class Meta:
         model = CeleryTask
-        read_only_fields = ['id', 'name', 'meta', 'summary', 'state', 'date_last_publish']
+        read_only_fields = [
+            'id', 'name', 'meta', 'summary', 'state',
+            'date_last_publish', 'exec_cycle', 'next_exec_time'
+        ]
         fields = read_only_fields
 
 
