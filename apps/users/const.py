@@ -46,6 +46,8 @@ class KeyboardLayout(TextChoices):
     FR_CH_QWERTZ = 'fr-ch-qwertz', 'Swiss French (Qwertz)'
     FR_BE_AZERTY = 'fr-be-azerty', 'Belgian French (Azerty)'
     TR_TR_QWERTY = 'tr-tr-qwerty', 'Turkish-Q (Qwerty)'
+    ES_ES_QWERTY = 'es-es-qwerty', 'Spanish'
+    ES_LATAM_QWERTY = 'es-latam-qwerty', 'Spanish (Latin American)'
 
 
 class AppletConnectionMethod(TextChoices):
