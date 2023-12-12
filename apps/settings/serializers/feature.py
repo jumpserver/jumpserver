@@ -61,7 +61,7 @@ class ChatAISettingSerializer(serializers.Serializer):
     GPT_MODEL_CHOICES = []
 
     CHAT_AI_ENABLED = serializers.BooleanField(
-        required=False, label=_('Enable Vault')
+        required=False, label=_('Enable Chat AI')
     )
     GPT_BASE_URL = serializers.CharField(
         max_length=256, allow_blank=True, required=False, label=_('Base Url')
