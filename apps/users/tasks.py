@@ -86,6 +86,13 @@ def check_user_expired_periodic():
 @tmp_to_root_org()
 def check_unused_users():
     uncommon_users_ttl = settings.SECURITY_UNCOMMON_USERS_TTL
+    if not uncommon_users_ttl or not uncommon_users_ttl.isdigit():
+        return
+
+    uncommon_users_ttl = int(uncommon_users_ttl)
+    if uncommon_users_ttl <= 0 or uncommon_users_ttl >= 999:
+        return
+
     seconds_to_subtract = uncommon_users_ttl * 24 * 60 * 60
     t = timezone.now() - timedelta(seconds=seconds_to_subtract)
     last_login_q = Q(last_login__lte=t) | (Q(last_login__isnull=True) & Q(date_joined__lte=t))
