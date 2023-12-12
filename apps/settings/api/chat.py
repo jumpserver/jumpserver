@@ -18,7 +18,8 @@ class ChatAITestingAPI(GenericAPIView):
     def get_config(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        data = serializer.validated_data
+        data = self.serializer_class().data
+        data.update(serializer.validated_data)
         for k, v in data.items():
             if v:
                 continue
