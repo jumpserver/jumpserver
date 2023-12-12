@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-13 16:13+0800\n"
+"POT-Creation-Date: 2023-12-13 18:29+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -4003,9 +4003,15 @@ msgstr "任务 {} 不存在"
 msgid "Task {} args or kwargs error"
 msgstr "任务 {} 执行参数错误"
 
-#: ops/api/job.py:124
+#: ops/api/job.py:132
 msgid "Duplicate file exists"
 msgstr "存在同名文件"
+
+#: ops/api/job.py:137
+#, python-brace-format
+msgid ""
+"File size exceeds maximum limit. Please select a file smaller than {limit}MB"
+msgstr "文件大小超过最大限制。请选择小于 {limit}MB 的文件。"
 
 #: ops/api/playbook.py:39
 msgid "Currently playbook is being used in a job"

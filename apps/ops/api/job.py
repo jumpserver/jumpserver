@@ -99,7 +99,7 @@ class JobViewSet(OrgBulkModelViewSet):
             lambda: run_ops_job_execution.apply_async((str(execution.id),), task_id=str(execution.id)))
 
     @staticmethod
-    def get_duplicates_filenames(files):
+    def get_duplicates_files(files):
         seen = set()
         duplicates = set()
         for file in files:
@@ -109,6 +109,14 @@ class JobViewSet(OrgBulkModelViewSet):
                 seen.add(file)
         return list(duplicates)
 
+    @staticmethod
+    def get_exceeds_limit_files(files):
+        exceeds_limit_files = []
+        for file in files:
+            if file.size > settings.FILE_UPLOAD_SIZE_LIMIT_MB * 1024 * 1024:
+                exceeds_limit_files.append(file)
+        return exceeds_limit_files
+
     @action(methods=[POST], detail=False, serializer_class=FileSerializer, permission_classes=[IsValidUser, ],
             url_path='upload')
     def upload(self, request, *args, **kwargs):
@@ -117,11 +125,18 @@ class JobViewSet(OrgBulkModelViewSet):
 
         if not serializer.is_valid():
             msg = 'Upload data invalid: {}'.format(serializer.errors)
-            return Response({'msg': msg}, status=400)
+            return Response({'error': msg}, status=400)
 
-        same_filenames = self.get_duplicates_filenames(uploaded_files)
-        if same_filenames:
-            return Response({'msg': _("Duplicate file exists")}, status=400)
+        same_files = self.get_duplicates_files(uploaded_files)
+        if same_files:
+            return Response({'error': _("Duplicate file exists")}, status=400)
+
+        exceeds_limit_files = self.get_exceeds_limit_files(uploaded_files)
+        if exceeds_limit_files:
+            return Response(
+                {'error': _("File size exceeds maximum limit. Please select a file smaller than {limit}MB").format(
+                    limit=settings.FILE_UPLOAD_SIZE_LIMIT_MB)},
+                status=400)
 
         job_id = request.data.get('job_id', '')
         job = get_object_or_404(Job, pk=job_id)

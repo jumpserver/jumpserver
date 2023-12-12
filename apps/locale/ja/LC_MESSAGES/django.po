@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-13 16:13+0800\n"
+"POT-Creation-Date: 2023-12-13 18:29+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4051,9 +4051,15 @@ msgstr "タスクは存在しません"
 msgid "Task {} args or kwargs error"
 msgstr "タスク実行パラメータエラー"
 
-#: ops/api/job.py:124
+#: ops/api/job.py:132
 msgid "Duplicate file exists"
 msgstr "重複したファイルが存在する"
+
+#: ops/api/job.py:137
+#, python-brace-format
+msgid ""
+"File size exceeds maximum limit. Please select a file smaller than {limit}MB"
+msgstr "ファイルサイズが最大制限を超えています。{limit}MB より小さいファイルを選択してください。"
 
 #: ops/api/playbook.py:39
 msgid "Currently playbook is being used in a job"
