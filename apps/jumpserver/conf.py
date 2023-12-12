@@ -599,6 +599,8 @@ class Config(dict):
         'GPT_PROXY': '',
         'GPT_MODEL': 'gpt-3.5-turbo',
         'VIRTUAL_APP_ENABLED': False,
+
+        'FILE_UPLOAD_SIZE_LIMIT_MB': 200
     }
 
     old_config_map = {
