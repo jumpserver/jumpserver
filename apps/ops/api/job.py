@@ -99,15 +99,15 @@ class JobViewSet(OrgBulkModelViewSet):
             lambda: run_ops_job_execution.apply_async((str(execution.id),), task_id=str(execution.id)))
 
     @staticmethod
-    def get_same_filenames(files):
-        filename_set = set()
-        same_filenames = []
+    def get_duplicates_filenames(files):
+        seen = set()
+        duplicates = set()
         for file in files:
-            filename = file.name
-            if filename in filename_set:
-                same_filenames.append(filename)
-            filename_set.add(filename)
-        return same_filenames
+            if file in seen:
+                duplicates.add(file)
+            else:
+                seen.add(file)
+        return list(duplicates)
 
     @action(methods=[POST], detail=False, serializer_class=FileSerializer, permission_classes=[IsValidUser, ],
             url_path='upload')
@@ -119,7 +119,7 @@ class JobViewSet(OrgBulkModelViewSet):
             msg = 'Upload data invalid: {}'.format(serializer.errors)
             return Response({'msg': msg}, status=400)
 
-        same_filenames = self.get_same_filenames(uploaded_files)
+        same_filenames = self.get_duplicates_filenames(uploaded_files)
         if same_filenames:
             return Response({'msg': _("Duplicate file exists")}, status=400)
 
