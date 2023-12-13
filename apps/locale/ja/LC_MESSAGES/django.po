@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-12 15:26+0800\n"
+"POT-Creation-Date: 2023-12-13 16:13+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -289,7 +289,7 @@ msgstr "ソース ID"
 #: accounts/serializers/automations/change_secret.py:127
 #: acls/serializers/base.py:124 acls/templates/acls/asset_login_reminder.html:7
 #: assets/serializers/asset/common.py:125 assets/serializers/gateway.py:28
-#: audits/models.py:59 authentication/api/connection_token.py:403
+#: audits/models.py:59 authentication/api/connection_token.py:405
 #: ops/models/base.py:18 perms/models/asset_permission.py:75
 #: perms/serializers/permission.py:40 terminal/backends/command/models.py:18
 #: terminal/models/session/session.py:33
@@ -700,12 +700,12 @@ msgstr ""
 #: accounts/notifications.py:24
 msgid ""
 "{} - The account backup passage task has been completed: the encryption "
-"password has not been set - please go to personal information -> file "
-"encryption password to set the encryption password"
+"password has not been set - please go to personal information -> Basic file "
+"encryption password for preference settings"
 msgstr ""
 "{} -アカウントのバックアップ通過タスクが完了しました: 暗号化パスワードが設定"
-"されていません-個人情報にアクセスしてください-> ファイル暗号化パスワードを設"
-"定してください暗号化パスワード"
+"されていません-個人情報にアクセスしてください-> プリファレンス設定の基本的な"
+"ファイル暗号化パスワードの設定"
 
 #: accounts/notifications.py:55
 msgid "Notification of implementation result of encryption change plan"
@@ -791,7 +791,7 @@ msgstr "編集済み"
 #: acls/templates/acls/asset_login_reminder.html:6
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20
-#: authentication/api/connection_token.py:402 ops/models/base.py:17
+#: authentication/api/connection_token.py:404 ops/models/base.py:17
 #: ops/models/job.py:151 ops/serializers/job.py:20
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 msgid "Assets"
@@ -1404,7 +1404,7 @@ msgstr "無効"
 #: assets/const/base.py:33 settings/serializers/basic.py:6
 #: users/serializers/preference/koko.py:19
 #: users/serializers/preference/lina.py:39
-#: users/serializers/preference/luna.py:69
+#: users/serializers/preference/luna.py:73
 msgid "Basic"
 msgstr "基本"
 
@@ -1431,7 +1431,7 @@ msgstr "クラウド サービス"
 
 #: assets/const/category.py:14 assets/models/asset/gpt.py:11
 #: assets/models/asset/web.py:16 audits/const.py:42
-#: terminal/models/applet/applet.py:27 users/const.py:52
+#: terminal/models/applet/applet.py:27 users/const.py:59
 msgid "Web"
 msgstr "Web"
 
@@ -2652,29 +2652,29 @@ msgstr "パラメータの値には必ず %s が含まれます"
 msgid "This action require verify your MFA"
 msgstr "この操作には、MFAを検証する必要があります"
 
-#: authentication/api/connection_token.py:258
+#: authentication/api/connection_token.py:260
 msgid "Reusable connection token is not allowed, global setting not enabled"
 msgstr ""
 "再使用可能な接続トークンの使用は許可されていません。グローバル設定は有効に"
 "なっていません"
 
-#: authentication/api/connection_token.py:372
+#: authentication/api/connection_token.py:374
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名アカウントはこのプロパティではサポートされていません"
 
-#: authentication/api/connection_token.py:391
+#: authentication/api/connection_token.py:393
 msgid "Account not found"
 msgstr "アカウントが見つかりません"
 
-#: authentication/api/connection_token.py:394
+#: authentication/api/connection_token.py:396
 msgid "Permission expired"
 msgstr "承認の有効期限が切れています"
 
-#: authentication/api/connection_token.py:424
+#: authentication/api/connection_token.py:426
 msgid "ACL action is reject: {}({})"
 msgstr "ACL アクションは拒否です: {}({})"
 
-#: authentication/api/connection_token.py:428
+#: authentication/api/connection_token.py:430
 msgid "ACL action is review"
 msgstr "ACL アクションはレビューです"
 
@@ -4128,10 +4128,8 @@ msgid "Playbook"
 msgstr "Playbook"
 
 #: ops/const.py:40
-#, fuzzy
-#| msgid "Upload"
 msgid "Upload File"
-msgstr "アップロード"
+msgstr "ファイルのアップロード"
 
 #: ops/const.py:44
 msgid "Privileged Only"
@@ -4825,11 +4823,11 @@ msgstr "共通設定"
 msgid "View permission tree"
 msgstr "権限ツリーの表示"
 
-#: settings/api/chat.py:35
+#: settings/api/chat.py:36
 msgid "Chat AI is not enabled"
 msgstr "チャットAIがオンになっていない"
 
-#: settings/api/chat.py:73 settings/api/dingtalk.py:31
+#: settings/api/chat.py:74 settings/api/dingtalk.py:31
 #: settings/api/feishu.py:36 settings/api/slack.py:34 settings/api/sms.py:160
 #: settings/api/vault.py:40 settings/api/wecom.py:37
 msgid "Test success"
@@ -6280,7 +6278,7 @@ msgid "Home page"
 msgstr "ホームページ"
 
 #: templates/resource_download.html:18 templates/resource_download.html:33
-#: users/const.py:53
+#: users/const.py:60
 msgid "Client"
 msgstr "クライアント"
 
@@ -6502,6 +6500,10 @@ msgstr "動画のアップロードに失敗しました"
 msgid "Replay convert failed"
 msgstr "ビデオのトランスコーディングに失敗しました"
 
+#: terminal/const.py:106
+msgid "Replay unsupported"
+msgstr "録画はサポートされていません"
+
 #: terminal/exceptions.py:8
 msgid "Bulk create not support"
 msgstr "一括作成非サポート"
@@ -6627,10 +6629,8 @@ msgid "Redis port"
 msgstr "Redis ポート"
 
 #: terminal/models/component/endpoint.py:23
-#, fuzzy
-#| msgid "SQLServer"
 msgid "SQLServer port"
-msgstr "SQLServer"
+msgstr "SQLServer ポート"
 
 #: terminal/models/component/endpoint.py:30
 #: terminal/models/component/endpoint.py:103
@@ -7617,11 +7617,11 @@ msgstr "マルチスクリーンディスプレイ"
 msgid "Drives redirect"
 msgstr "ディスクマウント"
 
-#: users/const.py:57
+#: users/const.py:64
 msgid "Replace"
 msgstr "置換"
 
-#: users/const.py:58
+#: users/const.py:65
 msgid "Suffix"
 msgstr "接尾辞を付ける"
 
@@ -7856,10 +7856,14 @@ msgid "RDP client option"
 msgstr "RDPクライアントオプション"
 
 #: users/serializers/preference/luna.py:45
+msgid "RDP color quality"
+msgstr ""
+
+#: users/serializers/preference/luna.py:49
 msgid "Rdp smart size"
 msgstr "RDPインテリジェントサイズ"
 
-#: users/serializers/preference/luna.py:46
+#: users/serializers/preference/luna.py:50
 msgid ""
 "Determines whether the client computer should scale the content on the "
 "remote computer to fit the window size of the client computer when the "
@@ -7874,27 +7878,27 @@ msgstr ""
 # "ウィンドウサイズを変更するときにクライアントコンピュータがクライアントコン"
 # "ピュータのウィンドウサイズに合わせるためにリモートコンピュータ上のコンテンツ"
 # "をスケーリングすべきかどうかを判断する"
-#: users/serializers/preference/luna.py:51
+#: users/serializers/preference/luna.py:55
 msgid "Remote application connection method"
 msgstr "リモートアプリケーション接続方式"
 
-#: users/serializers/preference/luna.py:58
+#: users/serializers/preference/luna.py:62
 msgid "Character terminal font size"
 msgstr "文字終端フォントサイズ"
 
-#: users/serializers/preference/luna.py:61
+#: users/serializers/preference/luna.py:65
 msgid "Backspace as Ctrl+H"
 msgstr "文字終端Backspace As Ctrl+H"
 
-#: users/serializers/preference/luna.py:64
+#: users/serializers/preference/luna.py:68
 msgid "Right click quickly paste"
 msgstr "右クリックでクイック貼り付け"
 
-#: users/serializers/preference/luna.py:70
+#: users/serializers/preference/luna.py:74
 msgid "Graphics"
 msgstr "図形化"
 
-#: users/serializers/preference/luna.py:71
+#: users/serializers/preference/luna.py:75
 msgid "Command line"
 msgstr "コマンドライン"
 
@@ -7995,7 +7999,7 @@ msgstr "ユーザーの有効期限の定期的な検出"
 msgid "Check unused users"
 msgstr "未使用のユーザーのチェック"
 
-#: users/tasks.py:115
+#: users/tasks.py:122
 msgid "The user has not logged in recently and has been disabled."
 msgstr "ユーザーは最近ログインしておらず、無効になっています。"
 

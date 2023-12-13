@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-12 15:24+0800\n"
+"POT-Creation-Date: 2023-12-13 16:13+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -288,7 +288,7 @@ msgstr "来源 ID"
 #: accounts/serializers/automations/change_secret.py:127
 #: acls/serializers/base.py:124 acls/templates/acls/asset_login_reminder.html:7
 #: assets/serializers/asset/common.py:125 assets/serializers/gateway.py:28
-#: audits/models.py:59 authentication/api/connection_token.py:403
+#: audits/models.py:59 authentication/api/connection_token.py:405
 #: ops/models/base.py:18 perms/models/asset_permission.py:75
 #: perms/serializers/permission.py:40 terminal/backends/command/models.py:18
 #: terminal/models/session/session.py:33
@@ -699,11 +699,11 @@ msgstr "{} - 账号备份任务已完成, 详情见附件"
 #: accounts/notifications.py:24
 msgid ""
 "{} - The account backup passage task has been completed: the encryption "
-"password has not been set - please go to personal information -> file "
-"encryption password to set the encryption password"
+"password has not been set - please go to personal information -> Basic file "
+"encryption password for preference settings"
 msgstr ""
-"{} - 账号备份任务已完成: 未设置加密密码 - 请前往个人信息 -> 文件加密密码中设"
-"置加密密码"
+"{} - 账号备份任务已完成: 未设置加密密码 - 请前往个人信息 -> 偏好设置的基本中"
+"设置文件加密密码"
 
 #: accounts/notifications.py:55
 msgid "Notification of implementation result of encryption change plan"
@@ -789,7 +789,7 @@ msgstr "已修改"
 #: acls/templates/acls/asset_login_reminder.html:6
 #: assets/models/automations/base.py:19
 #: assets/serializers/automations/base.py:20
-#: authentication/api/connection_token.py:402 ops/models/base.py:17
+#: authentication/api/connection_token.py:404 ops/models/base.py:17
 #: ops/models/job.py:151 ops/serializers/job.py:20
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
 msgid "Assets"
@@ -1397,7 +1397,7 @@ msgstr "禁用"
 #: assets/const/base.py:33 settings/serializers/basic.py:6
 #: users/serializers/preference/koko.py:19
 #: users/serializers/preference/lina.py:39
-#: users/serializers/preference/luna.py:69
+#: users/serializers/preference/luna.py:73
 msgid "Basic"
 msgstr "基本"
 
@@ -1424,7 +1424,7 @@ msgstr "云服务"
 
 #: assets/const/category.py:14 assets/models/asset/gpt.py:11
 #: assets/models/asset/web.py:16 audits/const.py:42
-#: terminal/models/applet/applet.py:27 users/const.py:52
+#: terminal/models/applet/applet.py:27 users/const.py:59
 msgid "Web"
 msgstr "Web"
 
@@ -2636,27 +2636,27 @@ msgstr "参数中的值必须包含 %s"
 msgid "This action require verify your MFA"
 msgstr "该操作需要验证您的 MFA, 请先开启并配置"
 
-#: authentication/api/connection_token.py:258
+#: authentication/api/connection_token.py:260
 msgid "Reusable connection token is not allowed, global setting not enabled"
 msgstr "不允许使用可重复使用的连接令牌，未启用全局设置"
 
-#: authentication/api/connection_token.py:372
+#: authentication/api/connection_token.py:374
 msgid "Anonymous account is not supported for this asset"
 msgstr "匿名账号不支持当前资产"
 
-#: authentication/api/connection_token.py:391
+#: authentication/api/connection_token.py:393
 msgid "Account not found"
 msgstr "账号未找到"
 
-#: authentication/api/connection_token.py:394
+#: authentication/api/connection_token.py:396
 msgid "Permission expired"
 msgstr "授权已过期"
 
-#: authentication/api/connection_token.py:424
+#: authentication/api/connection_token.py:426
 msgid "ACL action is reject: {}({})"
 msgstr "ACL 动作是拒绝: {}({})"
 
-#: authentication/api/connection_token.py:428
+#: authentication/api/connection_token.py:430
 msgid "ACL action is review"
 msgstr "ACL 动作是复核"
 
@@ -4773,11 +4773,11 @@ msgstr "一般设置"
 msgid "View permission tree"
 msgstr "查看授权树"
 
-#: settings/api/chat.py:35
+#: settings/api/chat.py:36
 msgid "Chat AI is not enabled"
 msgstr "聊天 AI 没有开启"
 
-#: settings/api/chat.py:73 settings/api/dingtalk.py:31
+#: settings/api/chat.py:74 settings/api/dingtalk.py:31
 #: settings/api/feishu.py:36 settings/api/slack.py:34 settings/api/sms.py:160
 #: settings/api/vault.py:40 settings/api/wecom.py:37
 msgid "Test success"
@@ -6193,7 +6193,7 @@ msgid "Home page"
 msgstr "首页"
 
 #: templates/resource_download.html:18 templates/resource_download.html:33
-#: users/const.py:53
+#: users/const.py:60
 msgid "Client"
 msgstr "客户端"
 
@@ -6410,6 +6410,10 @@ msgstr "录像上传失败"
 msgid "Replay convert failed"
 msgstr "录像转码失败"
 
+#: terminal/const.py:106
+msgid "Replay unsupported"
+msgstr "不支持录像"
+
 #: terminal/exceptions.py:8
 msgid "Bulk create not support"
 msgstr "不支持批量创建"
@@ -6535,10 +6539,8 @@ msgid "Redis port"
 msgstr "Redis 端口"
 
 #: terminal/models/component/endpoint.py:23
-#, fuzzy
-#| msgid "SQLServer"
 msgid "SQLServer port"
-msgstr "SQLServer"
+msgstr "SQLServer 端口"
 
 #: terminal/models/component/endpoint.py:30
 #: terminal/models/component/endpoint.py:103
@@ -7512,11 +7514,11 @@ msgstr "多屏显示"
 msgid "Drives redirect"
 msgstr "磁盘挂载"
 
-#: users/const.py:57
+#: users/const.py:64
 msgid "Replace"
 msgstr "替换"
 
-#: users/const.py:58
+#: users/const.py:65
 msgid "Suffix"
 msgstr "加后缀"
 
@@ -7751,12 +7753,16 @@ msgid "RDP client option"
 msgstr "RDP 客户端选项"
 
 #: users/serializers/preference/luna.py:45
+msgid "RDP color quality"
+msgstr ""
+
+#: users/serializers/preference/luna.py:49
 msgid "Rdp smart size"
 msgstr ""
 
 # msgid "Rdp smart size"
 # msgstr "RDP 智能大小"
-#: users/serializers/preference/luna.py:46
+#: users/serializers/preference/luna.py:50
 msgid ""
 "Determines whether the client computer should scale the content on the "
 "remote computer to fit the window size of the client computer when the "
@@ -7765,27 +7771,27 @@ msgstr ""
 "确定调整窗口大小时客户端计算机是否应缩放远程计算机上的内容以适应客户端计算机"
 "的窗口大小"
 
-#: users/serializers/preference/luna.py:51
+#: users/serializers/preference/luna.py:55
 msgid "Remote application connection method"
 msgstr "远程应用连接方式"
 
-#: users/serializers/preference/luna.py:58
+#: users/serializers/preference/luna.py:62
 msgid "Character terminal font size"
 msgstr "字符终端字体大小"
 
-#: users/serializers/preference/luna.py:61
+#: users/serializers/preference/luna.py:65
 msgid "Backspace as Ctrl+H"
 msgstr "字符终端Backspace As Ctrl+H"
 
-#: users/serializers/preference/luna.py:64
+#: users/serializers/preference/luna.py:68
 msgid "Right click quickly paste"
 msgstr "右键快速粘贴"
 
-#: users/serializers/preference/luna.py:70
+#: users/serializers/preference/luna.py:74
 msgid "Graphics"
 msgstr "图形化"
 
-#: users/serializers/preference/luna.py:71
+#: users/serializers/preference/luna.py:75
 msgid "Command line"
 msgstr "命令行"
 
@@ -7885,7 +7891,7 @@ msgstr "周期检测用户过期"
 msgid "Check unused users"
 msgstr "检查未使用的用户"
 
-#: users/tasks.py:115
+#: users/tasks.py:122
 msgid "The user has not logged in recently and has been disabled."
 msgstr "该用户最近未登录，已被禁用。"
 
