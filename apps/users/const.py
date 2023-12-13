@@ -38,6 +38,11 @@ class RDPSmartSize(TextChoices):
     ENABLE = '1', _('Enable')
 
 
+class RDPColorQuality(TextChoices):
+    HIGH = '32', 'High（32 bit）'
+    MEDIUM = '16', 'Medium（16 bit）'
+
+
 class KeyboardLayout(TextChoices):
     EN_US_QWERTY = 'en-us-qwerty', 'US English (Qwerty)'
     EN_UK_QWERTY = 'en-gb-qwerty', 'UK English (Qwerty)'

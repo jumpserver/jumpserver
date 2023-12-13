@@ -27,7 +27,7 @@ from perms.models import ActionChoices
 from terminal.connect_methods import NativeClient, ConnectMethodUtil
 from terminal.models import EndpointRule, Endpoint
 from users.const import FileNameConflictResolution
-from users.const import RDPSmartSize
+from users.const import RDPSmartSize, RDPColorQuality
 from users.models import Preference
 from ..models import ConnectionToken, date_expired_default
 from ..serializers import (
@@ -49,7 +49,6 @@ class RDPFileClientProtocolURLMixin:
             'full address:s': '',
             'username:s': '',
             'use multimon:i': '0',
-            'session bpp:i': '32',
             'audiomode:i': '0',
             'disable wallpaper:i': '0',
             'disable full window drag:i': '0',
@@ -100,10 +99,13 @@ class RDPFileClientProtocolURLMixin:
             rdp_options['winposstr:s'] = f'0,1,0,0,{width},{height}'
             rdp_options['dynamic resolution:i'] = '0'
 
+        color_quality = self.request.query_params.get('rdp_color_quality')
+        color_quality = color_quality if color_quality else os.getenv('JUMPSERVER_COLOR_DEPTH', RDPColorQuality.HIGH)
+
         # 设置其他选项
-        rdp_options['smart sizing:i'] = self.request.query_params.get('rdp_smart_size', RDPSmartSize.DISABLE)
-        rdp_options['session bpp:i'] = os.getenv('JUMPSERVER_COLOR_DEPTH', '32')
+        rdp_options['session bpp:i'] = color_quality
         rdp_options['audiomode:i'] = self.parse_env_bool('JUMPSERVER_DISABLE_AUDIO', 'false', '2', '0')
+        rdp_options['smart sizing:i'] = self.request.query_params.get('rdp_smart_size', RDPSmartSize.DISABLE)
 
         # 设置远程应用, 不是 Mstsc
         if token.connect_method != NativeClient.mstsc:
