@@ -3,9 +3,9 @@
 from django.db import migrations
 
 
-def migrate_remove_offline_ussrsession_permission(apps, *args):
+def migrate_update_offline_usersession_permission_name(apps, *args):
     perm_model = apps.get_model('auth', 'Permission')
-    perm_model.objects.filter(codename='offline_ussrsession').delete()
+    perm_model.objects.filter(codename='offline_usersession').update(name='Offline user session')
 
 
 class Migration(migrations.Migration):
@@ -14,5 +14,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(migrate_remove_offline_ussrsession_permission)
+        migrations.RunPython(migrate_update_offline_usersession_permission_name)
     ]
