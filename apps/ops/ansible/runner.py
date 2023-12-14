@@ -93,7 +93,7 @@ class UploadFileRunner:
         self.cb = DefaultCallback()
         upload_file_dir = safe_join(settings.DATA_DIR, 'job_upload_file')
         self.src_paths = safe_join(upload_file_dir, str(job_id))
-        self.dest_path = dest_path
+        self.dest_path = safe_join("/tmp", dest_path)
 
     def run(self, verbosity=0, **kwargs):
         verbosity = get_ansible_log_verbosity(verbosity)
