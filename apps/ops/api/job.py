@@ -68,7 +68,7 @@ class JobViewSet(OrgBulkModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.filter(creator=self.request.user)
+        queryset = queryset.filter(creator=self.request.user).exclude(type=Types.upload_file)
         if self.action != 'retrieve':
             return queryset.filter(instant=False)
         return queryset
