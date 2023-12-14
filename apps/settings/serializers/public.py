@@ -56,6 +56,7 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     VIRTUAL_APP_ENABLED = serializers.BooleanField()
     CHAT_AI_ENABLED = serializers.BooleanField()
     GPT_MODEL = serializers.CharField()
+    FILE_UPLOAD_SIZE_LIMIT_MB = serializers.IntegerField()
 
 
 class ServerInfoSerializer(serializers.Serializer):
