@@ -63,8 +63,8 @@ class UploadMixin:
 class VirtualAppViewSet(UploadMixin, JMSBulkModelViewSet):
     queryset = VirtualApp.objects.all()
     serializer_class = serializers.VirtualAppSerializer
-    filterset_fields = ['name', 'image_name', 'is_active']
-    search_fields = ['name', ]
+    filterset_fields = ['name', 'is_active']
+    search_fields = ['name', 'image_name']
     rbac_perms = {
         'upload': 'terminal.add_virtualapp',
     }
