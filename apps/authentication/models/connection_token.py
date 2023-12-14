@@ -199,28 +199,23 @@ class ConnectionToken(JMSOrgBaseModel):
         if not host_account:
             raise JMSException({'error': 'No host account available'})
 
-        host, account, lock_key, ttl = bulk_get(host_account, ('host', 'account', 'lock_key', 'ttl'))
+        host, account, lock_key = bulk_get(host_account, ('host', 'account', 'lock_key'))
         gateway = host.domain.select_gateway() if host.domain else None
 
         data = {
-            'id': account.id,
+            'id': lock_key,
             'applet': applet,
             'host': host,
             'gateway': gateway,
             'account': account,
             'remote_app_option': self.get_remote_app_option()
         }
-        token_account_relate_key = f'token_account_relate_{account.id}'
-        cache.set(token_account_relate_key, lock_key, ttl)
         return data
 
     @staticmethod
-    def release_applet_account(account_id):
-        token_account_relate_key = f'token_account_relate_{account_id}'
-        lock_key = cache.get(token_account_relate_key)
+    def release_applet_account(lock_key):
         if lock_key:
             cache.delete(lock_key)
-            cache.delete(token_account_relate_key)
             return True
 
     @lazyproperty
