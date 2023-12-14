@@ -1,10 +1,13 @@
 from __future__ import absolute_import
 
 from django.urls import path
+from rest_framework_bulk.routes import BulkRouter
 
 from .. import api
 
 app_name = 'common'
+router = BulkRouter()
+router.register(r'chatai-prompts', api.ChatPromptViewSet, 'chatai-prompt')
 
 urlpatterns = [
     path('mail/testing/', api.MailTestingAPI.as_view(), name='mail-testing'),
@@ -28,3 +31,5 @@ urlpatterns = [
     path('public/open/', api.OpenPublicSettingApi.as_view(), name='open-public-setting'),
     path('server-info/', api.ServerInfoApi.as_view(), name='server-info'),
 ]
+
+urlpatterns += router.urls
