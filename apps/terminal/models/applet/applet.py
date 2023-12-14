@@ -299,8 +299,7 @@ class Applet(JMSBaseModel):
         res = {
             'host': host,
             'account': account,
-            'lock_key': lock_key,
-            'ttl': ttl
+            'lock_key': lock_key
         }
         logger.debug('Select host and account: {}'.format(res))
         return res
