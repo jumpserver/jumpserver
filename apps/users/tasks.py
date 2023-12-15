@@ -102,7 +102,8 @@ def check_unused_users():
         .filter(date_joined__lt=t) \
         .filter(is_active=True) \
         .filter(last_login_q) \
-        .filter(api_key_q)
+        .filter(api_key_q) \
+        .exclude(username='admin')
 
     if not users:
         return
