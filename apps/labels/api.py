@@ -3,7 +3,6 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from common.api.generic import JMSModelViewSet
-from common.utils import is_true
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins.models import OrgModelMixin
 from orgs.utils import current_org
@@ -55,6 +54,8 @@ class ContentTypeViewSet(JMSModelViewSet):
 
         if issubclass(model, OrgModelMixin):
             queryset = model.objects.filter(org_id=current_org.id)
+        elif hasattr(model, 'get_queryset'):
+            queryset = model.get_queryset()
         else:
             queryset = model.objects.all()
 
@@ -78,14 +79,19 @@ class LabelContentTypeResourceViewSet(JMSModelViewSet):
         label = get_object_or_404(Label, pk=label_pk)
         content_type = get_object_or_404(ContentType, id=res_type)
         bound = self.request.query_params.get('bound', '1')
-        res_ids = LabeledResource.objects.filter(res_type=content_type, label=label) \
+        res_ids = LabeledResource.objects \
+            .filter(res_type=content_type, label=label) \
             .values_list('res_id', flat=True)
         res_ids = set(res_ids)
         model = content_type.model_class()
-        if is_true(bound):
-            queryset = model.objects.filter(id__in=list(res_ids))
+        if hasattr(model, 'get_queryset'):
+            queryset = model.get_queryset()
         else:
-            queryset = model.objects.exclude(id__in=list(res_ids))
+            queryset = model.objects.all()
+        if bound == '1':
+            queryset = queryset.filter(id__in=list(res_ids))
+        elif bound == '0':
+            queryset = queryset.exclude(id__in=list(res_ids))
         keyword = self.request.query_params.get('search')
         if keyword:
             queryset = content_type.filter_queryset(queryset, keyword)

@@ -862,6 +862,13 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
 
+    @classmethod
+    def get_queryset(cls):
+        queryset = cls.objects.all()
+        if not current_org.is_root():
+            queryset = current_org.get_members()
+        return queryset
+
     @property
     def secret_key(self):
         instance = self.preferences.filter(name='secret_key').first()
