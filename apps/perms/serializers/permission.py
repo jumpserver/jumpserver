@@ -4,6 +4,7 @@ from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from accounts.const import Source
 from accounts.models import AccountTemplate, Account
 from accounts.tasks import push_accounts_to_assets_task
 from assets.models import Asset, Node
@@ -85,6 +86,7 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
         ]
         for asset in assets:
             asset_exist_accounts = Account.objects.none()
+            asset_exist_account_names = asset.accounts.values_list('name', flat=True)
             for template in self.template_accounts:
                 asset_exist_accounts |= asset.accounts.filter(
                     username=template.username,
@@ -96,11 +98,13 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
                     'username': template.username,
                     'secret_type': template.secret_type
                 }
-                if condition in username_secret_type_dict:
+                if condition in username_secret_type_dict or \
+                        template.name in asset_exist_account_names:
                     continue
                 account_data = {key: getattr(template, key) for key in account_attribute}
                 account_data['su_from'] = template.get_su_from_account(asset)
-                account_data['name'] = f"{account_data['name']}-{_('Account template')}"
+                account_data['source'] = Source.TEMPLATE
+                account_data['source_id'] = str(template.id)
                 need_create_accounts.append(Account(**{'asset_id': asset.id, **account_data}))
         return Account.objects.bulk_create(need_create_accounts)
 
