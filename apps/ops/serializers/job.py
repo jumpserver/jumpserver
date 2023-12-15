@@ -52,7 +52,7 @@ class JobSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer, PeriodT
 
 
 class FileSerializer(serializers.Serializer):
-    files = serializers.FileField(allow_empty_file=True)
+    files = serializers.FileField(allow_empty_file=False, max_length=128)
 
     class Meta:
         ref_name = "JobFileSerializer"
