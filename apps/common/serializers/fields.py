@@ -122,8 +122,12 @@ class LabelRelatedField(serializers.RelatedField):
         from labels.models import LabeledResource, Label
         if data is None:
             return data
-        k, v = data.split(":", 1)
-        label, __ = Label.objects.get_or_create(name=k, value=v, defaults={'name': k, 'value': v})
+        if isinstance(data, dict):
+            pk = data.get("id") or data.get("pk")
+            label = Label.objects.get(pk=pk)
+        else:
+            k, v = data.split(":", 1)
+            label, __ = Label.objects.get_or_create(name=k, value=v, defaults={'name': k, 'value': v})
         return LabeledResource(label=label)
 
 
