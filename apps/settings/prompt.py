@@ -2,22 +2,6 @@ class DefaultChatPrompt:
     DEFAULT = {
         'zh': [
             {
-                'name': '小红书风格',
-                'content': '请使用 Emoji 风格编辑以下段落，该风格以引人入胜的标题、'
-                           '每个段落中包含表情符号和在末尾添加相关标签为特点。请确保保持原文的意思。',
-            },
-            {
-                'name': '写作助理',
-                'content': '作为一名中文写作改进助理，你的任务是改进所提供文本的拼写、语法、清晰、简洁和整体可读性，'
-                           '同时分解长句，减少重复，并提供改进建议。请只提供文本的更正版本，避免包括解释。',
-            },
-            {
-                'name': 'Nature 风格润色',
-                'content': '我希望你能充当专业的拼写和语法校对者，并改进我的文章。'
-                           '我想让你用更美丽、优雅、高级的英语单词和句子替换我的简化 A0 级别的单词和句子，'
-                           '保持意思不变，但使它们更具文学性，在《自然》杂志风格中提高我的表达水平。',
-            },
-            {
                 'name': '周报生成器',
                 'content': '使用下面提供的文本作为中文周报的基础，生成一个简洁的摘要，突出最重要的内容。该报告应以 markdown 格式编写，'
                            '并应易于阅读和理解，以满足一般受众的需要。特别是要注重提供对利益相关者和决策者有用的见解和分析。'
@@ -55,30 +39,24 @@ class DefaultChatPrompt:
                 'content': '我想让你充当 Stackoverflow 的帖子。我将提出与编程有关的问题，你将回答答案是什么。'
                            '我希望你只回答给定的答案，在没有足够的细节时写出解释。当我需要用英语告诉你一些事情时，我会把文字放在大括号里{像这样}。'
             },
+            {
+                'name': '小红书风格',
+                'content': '请使用 Emoji 风格编辑以下段落，该风格以引人入胜的标题、'
+                           '每个段落中包含表情符号和在末尾添加相关标签为特点。请确保保持原文的意思。',
+            },
+            {
+                'name': '写作助理',
+                'content': '作为一名中文写作改进助理，你的任务是改进所提供文本的拼写、语法、清晰、简洁和整体可读性，'
+                           '同时分解长句，减少重复，并提供改进建议。请只提供文本的更正版本，避免包括解释。',
+            },
+            {
+                'name': 'Nature 风格润色',
+                'content': '我希望你能充当专业的拼写和语法校对者，并改进我的文章。'
+                           '我想让你用更美丽、优雅、高级的英语单词和句子替换我的简化 A0 级别的单词和句子，'
+                           '保持意思不变，但使它们更具文学性，在《自然》杂志风格中提高我的表达水平。',
+            },
         ],
         'en': [
-            {
-                "name": "Xiaohongshu Style",
-                "content": "Please edit the following paragraphs in Emoji style. "
-                           "This style is characterized by engaging titles, the inclusion of emojis in each paragraph, "
-                           "and adding related tags at the end. Ensure the original meaning is maintained."
-            },
-            {
-                "name": "Writing Assistant",
-                "content": "As a Chinese writing improvement assistant, "
-                           "your task is to improve the provided text in terms of spelling, grammar, clarity, "
-                           "conciseness, and overall readability. Also, break down long sentences, reduce repetition, "
-                           "and provide suggestions for improvement. Please only provide the corrected version of "
-                           "the text, avoiding including explanations."
-            },
-            {
-                "name": "Nature Style Editing",
-                "content": "I want you to act as a professional spelling and grammar proofreader and improve "
-                           "my article. I want you to replace my simplified A0 level words and sentences with "
-                           "more beautiful, elegant, and advanced English words and sentences. Keep the meaning "
-                           "the same but make them more literary, enhancing my expression in the style of 'Nature' "
-                           "magazine."
-            },
             {
                 "name": "Weekly Report Generator",
                 "content": "Using the text provided below as a basis for a Chinese weekly report, "
@@ -128,26 +106,31 @@ class DefaultChatPrompt:
                            "and you will answer what the answer is. Write out explanations "
                            "when there are not enough details. When I need to tell you something in English, "
                            "I will enclose the text in braces {like this}."
-            }
+            },
+            {
+                "name": "Xiaohongshu Style",
+                "content": "Please edit the following paragraphs in Emoji style. "
+                           "This style is characterized by engaging titles, the inclusion of emojis in each paragraph, "
+                           "and adding related tags at the end. Ensure the original meaning is maintained."
+            },
+            {
+                "name": "Writing Assistant",
+                "content": "As a Chinese writing improvement assistant, "
+                           "your task is to improve the provided text in terms of spelling, grammar, clarity, "
+                           "conciseness, and overall readability. Also, break down long sentences, reduce repetition, "
+                           "and provide suggestions for improvement. Please only provide the corrected version of "
+                           "the text, avoiding including explanations."
+            },
+            {
+                "name": "Nature Style Editing",
+                "content": "I want you to act as a professional spelling and grammar proofreader and improve "
+                           "my article. I want you to replace my simplified A0 level words and sentences with "
+                           "more beautiful, elegant, and advanced English words and sentences. Keep the meaning "
+                           "the same but make them more literary, enhancing my expression in the style of 'Nature' "
+                           "magazine."
+            },
         ],
         'ja': [
-            {
-                "name": "小红书風格",
-                "content": "Emojiスタイルで以下の段落を編集してください。このスタイルは、魅力的なタイトル、"
-                           "各段落に絵文字を含め、関連するタグを末尾に追加することが特徴です。原文の意味を保持してください。"
-            },
-            {
-                "name": "ライティングアシスタント",
-                "content": "中国語のライティング改善アシスタントとして、提供されたテキストのスペル、"
-                           "文法、明瞭さ、簡潔さ、全体的な可読性を改善し、長い文を分解し、重複を減らし、"
-                           "改善提案を提供します。テキストの修正版のみを提供し、説明は含めないでください。"
-            },
-            {
-                "name": "Nature スタイルの編集",
-                "content": "プロのスペルと文法の校正者として機能し、私の記事を改善してください。"
-                           "私の簡素化されたA0レベルの単語や文章を、より美しく、優雅で、"
-                           "高度な英語の単語や文章に置き換えて、文学的な要素を加え、「自然」誌スタイルで表現レベルを高めてください。"
-            },
             {
                 "name": "週報ジェネレータ",
                 "content": "以下のテキストを基にして中国語の週報の簡潔な要約を作成し、最も重要な内容を強調してください。"
@@ -188,7 +171,24 @@ class DefaultChatPrompt:
                 "content": "Stackoverflowの投稿として機能してください。私はプログラミングに関連する質問をします。"
                            "あなたは答えを何であるか答えます。十分な詳細がない場合は説明を書いてください。英語で何かを伝える必要があるときは、"
                            "大括弧でテキストを囲みます{このように}。"
-            }
+            },
+            {
+                "name": "小红书風格",
+                "content": "Emojiスタイルで以下の段落を編集してください。このスタイルは、魅力的なタイトル、"
+                           "各段落に絵文字を含め、関連するタグを末尾に追加することが特徴です。原文の意味を保持してください。"
+            },
+            {
+                "name": "ライティングアシスタント",
+                "content": "中国語のライティング改善アシスタントとして、提供されたテキストのスペル、"
+                           "文法、明瞭さ、簡潔さ、全体的な可読性を改善し、長い文を分解し、重複を減らし、"
+                           "改善提案を提供します。テキストの修正版のみを提供し、説明は含めないでください。"
+            },
+            {
+                "name": "Nature スタイルの編集",
+                "content": "プロのスペルと文法の校正者として機能し、私の記事を改善してください。"
+                           "私の簡素化されたA0レベルの単語や文章を、より美しく、優雅で、"
+                           "高度な英語の単語や文章に置き換えて、文学的な要素を加え、「自然」誌スタイルで表現レベルを高めてください。"
+            },
         ]
     }
 
