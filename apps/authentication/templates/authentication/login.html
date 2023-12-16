@@ -286,9 +286,9 @@
     </div>
     <div class="left-form-box {% if not form.challenge and not form.captcha %} no-captcha-challenge {% endif %}">
         <div class="mobile-logo">
-            <a href="{% if not XPACK_ENABLED %}https://github.com/jumpserver/jumpserver.git{% endif %}">
-                <img src="{% static 'img/logo_text_green.png' %}" class="right-image" alt="screen-image"/>
-            </a>
+	        <div class="jms-title">
+		        <span style="">{{ INTERFACE.login_title }}</span>
+            </div>
         </div>
         <div style="position: relative;top: 50%;transform: translateY(-50%);">
             <div style='padding: 15px 60px; text-align: left'>
