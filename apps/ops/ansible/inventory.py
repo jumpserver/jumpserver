@@ -71,8 +71,9 @@ class JMSInventory:
         }
         if not account.secret:
             return var
+
         if account.secret_type == 'password':
-            var['ansible_password'] = account.secret
+            var['ansible_password'] = account.escape_jinja2_syntax(account.secret)
         elif account.secret_type == 'ssh_key':
             var['ansible_ssh_private_key_file'] = account.private_key_path
         return var
@@ -84,7 +85,7 @@ class JMSInventory:
             'custom_become': True,
             'custom_become_method': su_method,
             'custom_become_user': account.su_from.username,
-            'custom_become_password': account.su_from.secret,
+            'custom_become_password': account.escape_jinja2_syntax(account.su_from.secret),
             'custom_become_private_key_path': account.su_from.private_key_path
         }
         return var
@@ -109,7 +110,7 @@ class JMSInventory:
             host.update(self.make_account_ansible_vars(account))
             host['ansible_become'] = True
             host['ansible_become_user'] = 'root'
-            host['ansible_become_password'] = account.secret
+            host['ansible_become_password'] = account.escape_jinja2_syntax(account.secret)
         else:
             host.update(self.make_account_ansible_vars(account))
 
@@ -173,8 +174,8 @@ class JMSInventory:
             },
             'jms_account': {
                 'id': str(account.id), 'username': account.username,
-                'secret': account.secret, 'secret_type': account.secret_type,
-                'private_key_path': account.private_key_path
+                'secret': account.escape_jinja2_syntax(account.secret),
+                'secret_type': account.secret_type, 'private_key_path': account.private_key_path
             } if account else None
         }
 
