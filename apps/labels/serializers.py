@@ -1,10 +1,10 @@
-from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from common.serializers.fields import ObjectRelatedField
+from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+from .const import label_resource_types
 from .models import Label, LabeledResource
 
 __all__ = ['LabelSerializer', 'LabeledResourceSerializer', 'ContentTypeResourceSerializer']
@@ -27,10 +27,10 @@ class LabelSerializer(BulkOrgResourceModelSerializer):
 
 
 class LabeledResourceSerializer(serializers.ModelSerializer):
-    res_type = ObjectRelatedField(
-        queryset=ContentType.objects, attrs=('app_label', 'model', 'name'), label=_("Resource type")
+    res_type = LabeledChoiceField(
+        choices=[], label=_("Resource type"), source='res_type_id', required=False
     )
-    label = ObjectRelatedField(queryset=Label.objects, attrs=('name', 'value'))
+    label = ObjectRelatedField(queryset=Label.objects, attrs=('name', 'value'), label=_("Label"))
     resource = serializers.CharField(label=_("Resource"))
 
     class Meta:
@@ -43,6 +43,17 @@ class LabeledResourceSerializer(serializers.ModelSerializer):
         """ Perform necessary eager loading of data. """
         queryset = queryset.select_related('label', 'res_type')
         return queryset
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_res_type_choices()
+
+    def set_res_type_choices(self):
+        res_type_field = self.fields.get('res_type')
+        if not res_type_field:
+            return
+
+        res_type_field.choices = [(ct.id, ct.name) for ct in label_resource_types]
 
 
 class ContentTypeResourceSerializer(serializers.Serializer):

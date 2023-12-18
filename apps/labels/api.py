@@ -9,9 +9,10 @@ from orgs.utils import current_org
 from rbac.models import ContentType
 from rbac.serializers import ContentTypeSerializer
 from . import serializers
+from .const import label_resource_types
 from .models import Label, LabeledResource
 
-__all__ = ['LabelViewSet']
+__all__ = ['LabelViewSet', 'ContentTypeViewSet']
 
 
 class ContentTypeViewSet(JMSModelViewSet):
@@ -25,26 +26,8 @@ class ContentTypeViewSet(JMSModelViewSet):
     can_labeled_content_type = []
     model = ContentType
 
-    @classmethod
-    def get_can_labeled_content_type_ids(cls):
-        if cls.can_labeled_content_type:
-            return cls.can_labeled_content_type
-        content_types = ContentType.objects.all()
-        for ct in content_types:
-            model_cls = ct.model_class()
-            if not model_cls:
-                continue
-            if model_cls._meta.parents:
-                continue
-            if 'labels' in model_cls._meta._forward_fields_map.keys():
-                # if issubclass(model_cls, LabeledMixin):
-                cls.can_labeled_content_type.append(ct.id)
-        return cls.can_labeled_content_type
-
     def get_queryset(self):
-        ids = self.get_can_labeled_content_type_ids()
-        queryset = ContentType.objects.filter(id__in=ids)
-        return queryset
+        return label_resource_types
 
     @action(methods=['GET'], detail=True, serializer_class=serializers.ContentTypeResourceSerializer)
     def resources(self, request, *args, **kwargs):
@@ -62,6 +45,7 @@ class ContentTypeViewSet(JMSModelViewSet):
         keyword = request.query_params.get('search')
         if keyword:
             queryset = content_type.filter_queryset(queryset, keyword)
+        queryset = queryset.order_by('res_type')
         return self.get_paginated_response_from_queryset(queryset)
 
 
@@ -145,3 +129,8 @@ class LabeledResourceViewSet(OrgBulkModelViewSet):
         'default': serializers.LabeledResourceSerializer,
     }
     ordering_fields = ('res_type', 'date_created')
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.order_by('res_type')
+        return queryset

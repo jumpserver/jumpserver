@@ -25,7 +25,9 @@ class Label(JMSOrgBaseModel):
 
 
 class LabeledResource(JMSOrgBaseModel):
-    label = models.ForeignKey(Label, on_delete=models.CASCADE, related_name='labeled_resources')
+    label = models.ForeignKey(
+        Label, on_delete=models.CASCADE, related_name='labeled_resources', verbose_name=_("Label")
+    )
     res_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     res_id = models.CharField(max_length=36, verbose_name=_("Resource ID"), db_index=True)
     resource = GenericForeignKey('res_type', 'res_id')

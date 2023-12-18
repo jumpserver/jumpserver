@@ -1,12 +1,12 @@
 import json
 import os
+
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from django.utils._os import safe_join
 from django.utils.translation import gettext_lazy as _
-
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -167,7 +167,7 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
 
     @staticmethod
     def start_deploy(instance, serializer):
-        task = run_ops_job_execution.apply_async((str(instance.id),), task_id=str(instance.id))
+        run_ops_job_execution.apply_async((str(instance.id),), task_id=str(instance.id))
 
     def perform_create(self, serializer):
         instance = serializer.save()
@@ -179,7 +179,8 @@ class JobExecutionViewSet(OrgBulkModelViewSet):
 
         set_task_to_serializer_data(serializer, instance.id)
         transaction.on_commit(
-            lambda: run_ops_job_execution.apply_async((str(instance.id),), task_id=str(instance.id)))
+            lambda: run_ops_job_execution.apply_async((str(instance.id),), task_id=str(instance.id))
+        )
 
     def get_queryset(self):
         queryset = super().get_queryset()

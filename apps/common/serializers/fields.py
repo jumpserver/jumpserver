@@ -59,7 +59,10 @@ class EncryptedField(serializers.CharField):
 class LabeledChoiceField(ChoiceField):
     def __init__(self, *args, **kwargs):
         super(LabeledChoiceField, self).__init__(*args, **kwargs)
-        self.choice_mapper = {
+
+    @property
+    def choice_mapper(self):
+        return {
             key: value for key, value in self.choices.items()
         }
 
