@@ -62,7 +62,7 @@ class VerifyAccountManager(AccountBasePlaybookManager):
                 'name': account.name,
                 'username': account.username,
                 'secret_type': account.secret_type,
-                'secret': secret,
+                'secret':  account.escape_jinja2_syntax(secret),
                 'private_key_path': private_key_path,
                 'become': account.get_ansible_become_auth(),
             }

@@ -97,14 +97,13 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount):
         """ 排除自己和以自己为 su-from 的账号 """
         return self.asset.accounts.exclude(id=self.id).exclude(su_from=self)
 
-    @staticmethod
-    def make_account_ansible_vars(su_from):
+    def make_account_ansible_vars(self, su_from):
         var = {
             'ansible_user': su_from.username,
         }
         if not su_from.secret:
             return var
-        var['ansible_password'] = su_from.secret
+        var['ansible_password'] = self.escape_jinja2_syntax(su_from.secret)
         var['ansible_ssh_private_key_file'] = su_from.private_key_path
         return var
 
@@ -121,8 +120,21 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount):
         auth['ansible_become'] = True
         auth['ansible_become_method'] = become_method
         auth['ansible_become_user'] = self.username
-        auth['ansible_become_password'] = password
+        auth['ansible_become_password'] = self.escape_jinja2_syntax(password)
         return auth
+
+    @staticmethod
+    def escape_jinja2_syntax(value):
+        if not isinstance(value, str):
+            return value
+
+        value = value.replace('{{', '__TEMP_OPEN_BRACES__') \
+            .replace('}}', '__TEMP_CLOSE_BRACES__')
+
+        value = value.replace('__TEMP_OPEN_BRACES__', '{{ "{{" }}') \
+            .replace('__TEMP_CLOSE_BRACES__', '{{ "}}" }}')
+
+        return value.replace('{%', '{{ "{%" }}').replace('%}', '{{ "%}" }}')
 
 
 def replace_history_model_with_mixin():
