@@ -27,7 +27,7 @@ class ContentTypeViewSet(JMSModelViewSet):
     model = ContentType
 
     def get_queryset(self):
-        return label_resource_types
+        return list(label_resource_types)
 
     @action(methods=['GET'], detail=True, serializer_class=serializers.ContentTypeResourceSerializer)
     def resources(self, request, *args, **kwargs):

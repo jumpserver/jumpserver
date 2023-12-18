@@ -1,10 +1,10 @@
-from django.contrib.contenttypes.models import ContentType
 from django.utils.functional import LazyObject
 
 
 class LabeledResourceType(LazyObject):
     @staticmethod
     def get_res_types():
+        from rbac.models import ContentType
         content_types = ContentType.objects.all()
         ids = []
         for ct in content_types:
