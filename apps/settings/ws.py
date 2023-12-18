@@ -161,8 +161,8 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer):
         return cache.get(task_key) == TASK_STATUS_IS_OVER
 
     @staticmethod
-    def set_task_status_over(task_key):
-        cache.set(task_key, TASK_STATUS_IS_OVER, 120)
+    def set_task_status_over(task_key, ttl=120):
+        cache.set(task_key, TASK_STATUS_IS_OVER, ttl)
 
     @staticmethod
     def set_task_msg(task_key, ok, msg):
@@ -192,7 +192,7 @@ class LdapWebsocket(AsyncJsonWebsocketConsumer):
                 username = serializer.validated_data['username']
                 password = serializer.validated_data['password']
                 ok, msg = LDAPTestUtil().test_login(username, password)
-                self.set_task_status_over(CACHE_KEY_LDAP_TEST_LOGIN_TASK_STATUS)
+                self.set_task_status_over(CACHE_KEY_LDAP_TEST_LOGIN_TASK_STATUS, 3)
             self.set_task_msg(CACHE_KEY_LDAP_TEST_LOGIN_MSG, ok, msg)
 
     def run_sync_user(self, data):

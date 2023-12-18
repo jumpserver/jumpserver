@@ -41,6 +41,7 @@ class AuthMixin:
     history_passwords: models.Manager
     need_update_password: bool
     public_key: str
+    username: str
     is_local: bool
     set_password: Callable
     save: Callable
@@ -63,9 +64,10 @@ class AuthMixin:
 
     def set_password(self, raw_password):
         if self.can_update_password():
-            self.date_password_last_updated = timezone.now()
-            post_user_change_password.send(self.__class__, user=self)
-            super().set_password(raw_password)
+            if self.username:
+                self.date_password_last_updated = timezone.now()
+                post_user_change_password.send(self.__class__, user=self)
+            super().set_password(raw_password) # noqa
 
     def set_public_key(self, public_key):
         if self.can_update_ssh_key():
@@ -859,6 +861,13 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
+
+    @classmethod
+    def get_queryset(cls):
+        queryset = cls.objects.all()
+        if not current_org.is_root():
+            queryset = current_org.get_members()
+        return queryset
 
     @property
     def secret_key(self):

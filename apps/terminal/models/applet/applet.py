@@ -171,7 +171,7 @@ class Applet(JMSBaseModel):
         if not hosts:
             return None
 
-        spec_label = asset.labels.filter(name__in=['AppletHost', '发布机']).first()
+        spec_label = asset.labels.filter(label__name__in=['AppletHost', '发布机']).first()
         if spec_label:
             matched = [host for host in hosts if host.name == spec_label.value]
             if matched:
@@ -299,8 +299,7 @@ class Applet(JMSBaseModel):
         res = {
             'host': host,
             'account': account,
-            'lock_key': lock_key,
-            'ttl': ttl
+            'lock_key': lock_key
         }
         logger.debug('Select host and account: {}'.format(res))
         return res

@@ -49,8 +49,20 @@ class DeployOptionsSerializer(serializers.Serializer):
     RDS_LicensingMode = serializers.ChoiceField(choices=LICENSE_MODE_CHOICES, default=2, label=_('RDS Licensing Mode'))
     RDS_fSingleSessionPerUser = serializers.ChoiceField(choices=SESSION_PER_USER, default=1,
                                                         label=_("RDS Single Session Per User"))
-    RDS_MaxDisconnectionTime = serializers.IntegerField(default=60000, label=_("RDS Max Disconnection Time"))
-    RDS_RemoteAppLogoffTimeLimit = serializers.IntegerField(default=0, label=_("RDS Remote App Logoff Time Limit"))
+    RDS_MaxDisconnectionTime = serializers.IntegerField(
+        default=60000, label=_("RDS Max Disconnection Time (ms)"),
+        help_text=_(
+            'Tips: Set the maximum duration for keeping a disconnected session active on the server (log off the '
+            'session after 60000 milliseconds).'
+        )
+    )
+    RDS_RemoteAppLogoffTimeLimit = serializers.IntegerField(
+        default=0, label=_("RDS Remote App Logoff Time Limit (ms)"),
+        help_text=_(
+            'Tips: Set the logoff time for RemoteApp sessions after closing all RemoteApp programs (0 milliseconds, '
+            'log off the session immediately).'
+        )
+    )
 
 
 class AppletHostSerializer(HostSerializer):

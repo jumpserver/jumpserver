@@ -544,12 +544,12 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
 
     @action(methods=['DELETE', 'POST'], detail=False, url_path='applet-account/release')
     def release_applet_account(self, *args, **kwargs):
-        account_id = self.request.data.get('id')
-        released = ConnectionToken.release_applet_account(account_id)
+        lock_key = self.request.data.get('id')
+        released = ConnectionToken.release_applet_account(lock_key)
 
         if released:
-            logger.debug('Release applet account success: {}'.format(account_id))
+            logger.debug('Release applet account success: {}'.format(lock_key))
             return Response({'msg': 'released'})
         else:
-            logger.error('Release applet account error: {}'.format(account_id))
+            logger.error('Release applet account error: {}'.format(lock_key))
             return Response({'error': 'not found or expired'}, status=400)

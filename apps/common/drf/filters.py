@@ -192,9 +192,9 @@ class LabelFilterBackend(filters.BaseFilterBackend):
         kwargs = {}
         if ':' in label_id:
             k, v = label_id.split(':', 1)
-            kwargs['label__name'] = k
+            kwargs['label__name'] = k.strip()
             if v != '*':
-                kwargs['label__value'] = v
+                kwargs['label__value'] = v.strip()
         else:
             kwargs['label_id'] = label_id
 

@@ -95,7 +95,7 @@ def check_password_rules(password, is_org_admin=False):
     if settings.SECURITY_PASSWORD_NUMBER:
         pattern += '(?=.*\d)'
     if settings.SECURITY_PASSWORD_SPECIAL_CHAR:
-        pattern += '(?=.*[`~!@#\$%\^&\*\(\)-=_\+\[\]\{\}\|;:\'\",\.<>\/\?])'
+        pattern += '(?=.*[`~!@#$%^&*()\-=_+\[\]{}|;:\'",.<>/?])'
     pattern += '[a-zA-Z\d`~!@#\$%\^&\*\(\)-=_\+\[\]\{\}\|;:\'\",\.<>\/\?]'
     if is_org_admin:
         min_length = settings.SECURITY_ADMIN_USER_PASSWORD_MIN_LENGTH

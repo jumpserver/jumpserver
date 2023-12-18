@@ -649,7 +649,7 @@ class LDAPTestUtil(object):
 
     def _test_before_login_check(self, username, password):
         from settings.ws import CACHE_KEY_LDAP_TEST_CONFIG_TASK_STATUS, TASK_STATUS_IS_OVER
-        if cache.get(CACHE_KEY_LDAP_TEST_CONFIG_TASK_STATUS) != TASK_STATUS_IS_OVER:
+        if not cache.get(CACHE_KEY_LDAP_TEST_CONFIG_TASK_STATUS):
             raise self.LDAPBeforeLoginCheckError(_('Please test the connection first'))
 
         backend = LDAPAuthorizationBackend()
