@@ -56,8 +56,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='jobexecution',
             name='job_type',
-            field=models.CharField(choices=[('adhoc', 'Adhoc'), ('playbook', 'Playbook')], default='adhoc',
-                                   max_length=128, verbose_name='Material Type'),
+            field=models.CharField(
+                choices=[('adhoc', 'Adhoc'), ('playbook', 'Playbook'), ('upload_file', 'Upload File')],
+                default='adhoc', max_length=128, verbose_name='Material Type'),
         ),
         migrations.AddField(
             model_name='jobexecution',
