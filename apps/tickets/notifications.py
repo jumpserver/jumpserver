@@ -75,6 +75,8 @@ class BaseTicketMessage(UserMessage):
             field = fields[name]
             item = {'name': name, 'title': field.verbose_name}
             value = self.ticket.get_field_display(name, field, data)
+            if not value:
+                continue
             item['value'] = value
             items.append(item)
         return items
