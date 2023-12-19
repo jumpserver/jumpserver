@@ -27,7 +27,7 @@ class ContentTypeViewSet(JMSModelViewSet):
     model = ContentType
 
     def get_queryset(self):
-        return list(label_resource_types)
+        return label_resource_types
 
     @action(methods=['GET'], detail=True, serializer_class=serializers.ContentTypeResourceSerializer)
     def resources(self, request, *args, **kwargs):
@@ -45,7 +45,6 @@ class ContentTypeViewSet(JMSModelViewSet):
         keyword = request.query_params.get('search')
         if keyword:
             queryset = content_type.filter_queryset(queryset, keyword)
-        queryset = queryset.order_by('res_type')
         return self.get_paginated_response_from_queryset(queryset)
 
 
