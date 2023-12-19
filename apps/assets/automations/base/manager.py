@@ -53,8 +53,9 @@ class SSHTunnelManager:
                 print(f'\033[31m {err_msg} 原因: {e} \033[0m\n')
                 not_valid.append(k)
             else:
+                local_bind_port = server.local_bind_port
                 host['ansible_host'] = jms_asset['address'] = host['login_host'] = '127.0.0.1'
-                host['ansible_port'] = jms_asset['port'] = host['login_port'] = server.local_bind_port
+                host['ansible_port'] = jms_asset['port'] = host['login_port'] = local_bind_port
                 servers.append(server)
 
         # 网域不可连接的，就不继续执行此资源的后续任务了
@@ -211,22 +212,19 @@ class BasePlaybookManager:
             os.chmod(key_path, 0o400)
         return key_path
 
-    def generate_inventory(self, platformed_assets, inventory_path):
+    def generate_inventory(self, platformed_assets, inventory_path, protocol):
         inventory = JMSInventory(
             assets=platformed_assets,
             account_prefer=self.ansible_account_prefer,
             account_policy=self.ansible_account_policy,
             host_callback=self.host_callback,
             task_type=self.__class__.method_type(),
+            protocol=protocol,
         )
         inventory.write_to_file(inventory_path)
 
-    def generate_playbook(self, platformed_assets, platform, sub_playbook_dir):
-        method_id = getattr(platform.automation, '{}_method'.format(self.__class__.method_type()))
-        method = self.method_id_meta_mapper.get(method_id)
-        if not method:
-            logger.error("Method not found: {}".format(method_id))
-            return
+    @staticmethod
+    def generate_playbook(method, sub_playbook_dir):
         method_playbook_dir_path = method['dir']
         sub_playbook_path = os.path.join(sub_playbook_dir, 'project', 'main.yml')
         shutil.copytree(method_playbook_dir_path, os.path.dirname(sub_playbook_path))
@@ -258,8 +256,16 @@ class BasePlaybookManager:
                 sub_dir = '{}_{}'.format(platform.name, i)
                 playbook_dir = os.path.join(self.runtime_dir, sub_dir)
                 inventory_path = os.path.join(self.runtime_dir, sub_dir, 'hosts.json')
-                self.generate_inventory(_assets, inventory_path)
-                playbook_path = self.generate_playbook(_assets, platform, playbook_dir)
+
+                method_id = getattr(platform.automation, '{}_method'.format(self.__class__.method_type()))
+                method = self.method_id_meta_mapper.get(method_id)
+
+                if not method:
+                    logger.error("Method not found: {}".format(method_id))
+                    continue
+                protocol = method.get('protocol')
+                self.generate_inventory(_assets, inventory_path, protocol)
+                playbook_path = self.generate_playbook(method, playbook_dir)
                 if not playbook_path:
                     continue
 

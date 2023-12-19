@@ -13,7 +13,7 @@ class JMSInventory:
     def __init__(
             self, assets, account_policy='privileged_first',
             account_prefer='root,Administrator', host_callback=None,
-            exclude_localhost=False, task_type=None
+            exclude_localhost=False, task_type=None, protocol=None
     ):
         """
         :param assets:
@@ -27,6 +27,7 @@ class JMSInventory:
         self.exclude_hosts = {}
         self.exclude_localhost = exclude_localhost
         self.task_type = task_type
+        self.protocol = protocol
 
     @staticmethod
     def clean_assets(assets):
@@ -116,7 +117,7 @@ class JMSInventory:
 
         if gateway:
             ansible_connection = host.get('ansible_connection', 'ssh')
-            if ansible_connection in ('local', 'winrm'):
+            if ansible_connection in ('local', 'winrm', 'rdp'):
                 host['gateway'] = {
                     'address': gateway.address, 'port': gateway.port,
                     'username': gateway.username, 'secret': gateway.password,
@@ -128,19 +129,20 @@ class JMSInventory:
                 host['jms_asset'].update(ansible_ssh_common_args)
                 host.update(ansible_ssh_common_args)
 
-    @staticmethod
-    def get_primary_protocol(ansible_config, protocols):
+    def get_primary_protocol(self, ansible_config, protocols):
         invalid_protocol = type('protocol', (), {'name': 'null', 'port': 0})
         ansible_connection = ansible_config.get('ansible_connection')
         # 数值越小，优先级越高，若用户在 ansible_config 中配置了，则提高用户配置方式的优先级
         protocol_priority = {'ssh': 10, 'winrm': 9, ansible_connection: 1}
+        if self.protocol:
+            protocol_priority.update({self.protocol: 0})
         protocol_sorted = sorted(protocols, key=lambda x: protocol_priority.get(x.name, 999))
         protocol = protocol_sorted[0] if protocol_sorted else invalid_protocol
         return protocol
 
     @staticmethod
     def fill_ansible_config(ansible_config, protocol):
-        if protocol.name in ('ssh', 'winrm'):
+        if protocol.name in ('ssh', 'winrm', 'rdp'):
             ansible_config['ansible_connection'] = protocol.name
         if protocol.name == 'winrm':
             if protocol.setting.get('use_ssl', False):
@@ -179,6 +181,8 @@ class JMSInventory:
             } if account else None
         }
 
+        protocols = host['jms_asset']['protocols']
+        host['jms_asset'].update({f"{p['name']}_port": p['port'] for p in protocols})
         if host['jms_account'] and tp == 'oracle':
             host['jms_account']['mode'] = 'sysdba' if account.privileged else None
 

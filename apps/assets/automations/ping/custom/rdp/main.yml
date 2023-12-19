@@ -10,6 +10,6 @@
         login_user: "{{ jms_account.username }}"
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
-        login_port: "{{ jms_asset.protocols | selectattr('name', 'equalto', 'rdp') | map(attribute='port') | first }}"
+        login_port: "{{ jms_asset.port }}"
         login_secret_type: "{{ jms_account.secret_type }}"
         login_private_key_path: "{{ jms_account.private_key_path }}"
