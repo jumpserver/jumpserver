@@ -47,16 +47,17 @@ class ChatAITestingAPI(GenericAPIView):
             'base_url': config['GPT_BASE_URL'] or None,
             'api_key': config['GPT_API_KEY'],
         }
-        if proxy:
-            kwargs['http_client'] = httpx.Client(
-                proxies=proxy,
-                transport=httpx.HTTPTransport(local_address='0.0.0.0')
-            )
-        client = openai.OpenAI(**kwargs)
-
-        ok = False
-        error = ''
         try:
+            if proxy:
+                kwargs['http_client'] = httpx.Client(
+                    proxies=proxy,
+                    transport=httpx.HTTPTransport(local_address='0.0.0.0')
+                )
+            client = openai.OpenAI(**kwargs)
+
+            ok = False
+            error = ''
+
             client.chat.completions.create(
                 messages=[
                     {
