@@ -45,7 +45,6 @@ class ContentTypeViewSet(JMSModelViewSet):
         keyword = request.query_params.get('search')
         if keyword:
             queryset = content_type.filter_queryset(queryset, keyword)
-        queryset = queryset.order_by('res_type')
         return self.get_paginated_response_from_queryset(queryset)
 
 
