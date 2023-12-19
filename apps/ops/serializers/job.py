@@ -4,14 +4,13 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from assets.models import Asset
-from common.serializers import ResourceLabelsMixin
 from common.serializers.fields import ReadableHiddenField
 from ops.mixin import PeriodTaskSerializerMixin
 from ops.models import Job, JobExecution
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 
-class JobSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
+class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
     run_after_save = serializers.BooleanField(label=_("Run after save"), default=False, required=False)
     nodes = serializers.ListField(required=False, child=serializers.CharField())
@@ -42,7 +41,7 @@ class JobSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer, PeriodT
         ]
         fields = read_only_fields + [
             "name", "instant", "type", "module",
-            "args", "playbook", "assets", "labels",
+            "args", "playbook", "assets",
             "runas_policy", "runas", "creator",
             "use_parameter_define", "parameters_define",
             "timeout", "chdir", "comment", "summary",

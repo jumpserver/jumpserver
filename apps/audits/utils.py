@@ -37,6 +37,9 @@ def _get_instance_field_value(
             if not include_model_fields and not getattr(f, 'primary_key', False):
                 continue
 
+            if isinstance(f, GenericForeignKey):
+                continue
+
             if isinstance(f, (models.FileField, models.ImageField)):
                 continue
 

@@ -30,7 +30,7 @@ class LabeledResourceSerializer(serializers.ModelSerializer):
     res_type = LabeledChoiceField(
         choices=[], label=_("Resource type"), source='res_type_id', required=False
     )
-    label = ObjectRelatedField(queryset=Label.objects, attrs=('name', 'value'), label=_("Label"))
+    label = ObjectRelatedField(queryset=Label.objects, attrs=('id', 'display_name'), label=_("Label"))
     resource = serializers.CharField(label=_("Resource"))
 
     class Meta:

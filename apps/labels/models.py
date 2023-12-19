@@ -20,6 +20,10 @@ class Label(JMSOrgBaseModel):
     def res_count(self):
         return self.labeled_resources.count()
 
+    @lazyproperty
+    def display_name(self):
+        return '{}:{}'.format(self.name, self.value)
+
     def __str__(self):
         return '{}:{}'.format(self.name, self.value)
 
