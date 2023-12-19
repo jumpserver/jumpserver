@@ -61,7 +61,7 @@ class RoleViewSet(JMSModelViewSet):
         if not keyword:
             return queryset
 
-        builtins = list(self.queryset.filter(builtin=True))
+        builtins = list(self.get_queryset().filter(builtin=True))
         matched = [role.id for role in builtins if keyword in role.display_name]
         if not matched:
             return queryset

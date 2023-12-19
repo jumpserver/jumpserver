@@ -13,11 +13,23 @@ __all__ = ['LabelSerializer', 'LabeledResourceSerializer', 'ContentTypeResourceS
 class LabelSerializer(BulkOrgResourceModelSerializer):
     class Meta:
         model = Label
-        fields = ['id', 'name', 'value', 'res_count', 'comment', 'date_created', 'date_updated']
+        fields = [
+            'id', 'name', 'value', 'res_count', 'comment',
+            'date_created', 'date_updated'
+        ]
         read_only_fields = ('date_created', 'date_updated', 'res_count')
         extra_kwargs = {
             'res_count': {'label': _('Resource count')},
         }
+
+    @staticmethod
+    def validate_name(value):
+        if ':' in value or ',' in value:
+            raise serializers.ValidationError(_('Cannot contain ":,"'))
+        return value
+
+    def validate_value(self, value):
+        return self.validate_name(value)
 
     @classmethod
     def setup_eager_loading(cls, queryset):
