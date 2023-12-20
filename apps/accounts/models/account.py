@@ -137,10 +137,7 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount):
 
             return v.replace('{%', '{{ "{%" }}').replace('%}', '{{ "%}" }}')
 
-        if value.startswith('{{') and value.endswith('}}'):
-            return '{{' + escape(value[2:-2]) + '}}'
-        else:
-            return escape(value)
+        return escape(value)
 
 
 def replace_history_model_with_mixin():
