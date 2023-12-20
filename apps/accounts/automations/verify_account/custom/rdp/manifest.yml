@@ -5,6 +5,7 @@ category:
 type:
   - windows
 method: verify_account
+protocol: rdp
 
 i18n:
   Windows rdp account verify:

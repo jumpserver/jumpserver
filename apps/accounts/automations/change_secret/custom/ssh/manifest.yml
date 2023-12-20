@@ -6,6 +6,7 @@ category:
 type:
   - all
 method: change_secret
+protocol: ssh
 params:
   - name: commands
     type: list
