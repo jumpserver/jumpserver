@@ -41,7 +41,7 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
             return
         choices = tp.choices
         choices.pop(TicketType.general, None)
-        tp.choices = choices
+        tp.choices = choices.items()
 
     @classmethod
     def setup_eager_loading(cls, queryset):
