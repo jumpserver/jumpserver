@@ -6904,7 +6904,7 @@ msgstr ""
 "这些账号用于连接发布的应用，账号现在分为两种类型: <br/ >一种是专用的，每个用"
 "户都有一个专用账号。 另一种是公共的，当应用不支持多开且专用的已经被使用时，会"
 "使用公共账号连接; <br />注意: 如果不开启自动创建账号, 当前发布机仅能被指定标"
-"签的资产调度到，默认不会放到调度池中"
+"签的资产调度到，默认不会放到调度池中，且需要手动维护账号"
 
 #: terminal/serializers/applet_host.py:92
 msgid "The number of public accounts created automatically"

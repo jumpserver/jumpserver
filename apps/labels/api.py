@@ -123,13 +123,28 @@ class LabelViewSet(OrgBulkModelViewSet):
 class LabeledResourceViewSet(OrgBulkModelViewSet):
     model = LabeledResource
     filterset_fields = ("label__name", "label__value", "res_type", "res_id", "label")
-    search_fields = filterset_fields
+    search_fields = []
     serializer_classes = {
         'default': serializers.LabeledResourceSerializer,
     }
     ordering_fields = ('res_type', 'date_created')
 
+    def filter_search(self, queryset):
+        keyword = self.request.query_params.get('search')
+        if not keyword:
+            return queryset
+        matched = []
+        for instance in queryset:
+            if keyword.lower() in str(instance.resource).lower():
+                matched.append(instance.id)
+        return queryset.filter(id__in=matched)
+
     def get_queryset(self):
         queryset = super().get_queryset()
         queryset = queryset.order_by('res_type')
+        return queryset
+
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        queryset = self.filter_search(queryset)
         return queryset

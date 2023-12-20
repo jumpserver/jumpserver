@@ -69,7 +69,7 @@ def digest_sql_query():
 
         for query in queries:
             sql = query['sql']
-            print("  # {}: {}".format(query['time'], sql))
+            # print("  # {}: {}".format(query['time'], sql))
         if len(queries) < 3:
             continue
         print("- Table: {}".format(table_name))
@@ -77,7 +77,7 @@ def digest_sql_query():
             sql = query['sql']
             if not sql or not sql.startswith('SELECT'):
                 continue
-            print('\t{}. {}'.format(i, sql))
+            # print('\t{}. {}'.format(i, sql))
 
     logger.debug(">>> [{}] {}".format(method, path))
     for name, counter in counters:
