@@ -5,6 +5,7 @@ class LabeledResourceType(LazyObject):
     @staticmethod
     def get_res_types():
         from rbac.models import ContentType
+        from .mixins import LabeledMixin
         content_types = ContentType.objects.all()
         ids = []
         for ct in content_types:
@@ -13,7 +14,7 @@ class LabeledResourceType(LazyObject):
                 continue
             if model_cls._meta.parents:
                 continue
-            if 'labels' in model_cls._meta._forward_fields_map.keys():
+            if issubclass(model_cls, LabeledMixin):
                 ids.append(ct.id)
         return ContentType.objects.filter(id__in=ids)
 

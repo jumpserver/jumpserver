@@ -223,7 +223,7 @@ class LabelFilterBackend(filters.BaseFilterBackend):
             return queryset
 
         model = queryset.model
-        labeled_resource_cls = model.labels.field.related_model
+        labeled_resource_cls = model._labels.field.related_model
         app_label = model._meta.app_label
         model_name = model._meta.model_name
 
