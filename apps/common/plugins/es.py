@@ -228,6 +228,18 @@ class ES(object):
             datetime_range['lte'] = datetime__lte
         return 'datetime', datetime_range
 
+    @staticmethod
+    def handle_exact_fields(exact):
+        _filter = []
+        for k, v in exact.items():
+            query = 'term'
+            if isinstance(v, list):
+                query = 'terms'
+            _filter.append({
+                query: {k: v}
+            })
+        return _filter
+
     def get_query_body(self, **kwargs):
         new_kwargs = {}
         for k, v in kwargs.items():
@@ -235,6 +247,8 @@ class ES(object):
                 v = str(v)
             if k == 'pk':
                 k = 'id'
+            if k.endswith('__in'):
+                k = k.replace('__in', '')
             new_kwargs[k] = v
         kwargs = new_kwargs
 
@@ -287,11 +301,8 @@ class ES(object):
                         {'match': {k: v}} for k, v in match.items()
                     ],
                     'should': should,
-                    'filter': [
-                                  {
-                                      'term': {k: v}
-                                  } for k, v in exact.items()
-                              ] + [
+                    'filter': self.handle_exact_fields(exact) +
+                              [
                                   {
                                       'range': {
                                           time_field_name: time_range
