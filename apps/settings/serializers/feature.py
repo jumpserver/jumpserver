@@ -9,7 +9,7 @@ from common.serializers.fields import EncryptedField
 __all__ = [
     'AnnouncementSettingSerializer', 'OpsSettingSerializer',
     'VaultSettingSerializer', 'TicketSettingSerializer',
-    'ChatAISettingSerializer'
+    'ChatAISettingSerializer', 'VirtualAppSerializer',
 ]
 
 
@@ -119,4 +119,12 @@ class OpsSettingSerializer(serializers.Serializer):
         child=serializers.CharField(max_length=1024, ),
         label=_('Operation center command blacklist'),
         help_text=_("Commands that are not allowed execute.")
+    )
+
+
+class VirtualAppSerializer(serializers.Serializer):
+    PREFIX_TITLE = _('Virtual app')
+
+    VIRTUAL_APP_ENABLED = serializers.BooleanField(
+        required=False, label=_('Enable virtual app'),
     )
