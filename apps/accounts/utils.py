@@ -31,7 +31,7 @@ class SecretGenerator:
             'upper': rules['uppercase'],
             'digit': rules['digit'],
             'special_char': rules['symbol'],
-            'exclude_chars': rules['exclude_symbols']
+            'exclude_chars': rules.get('exclude_symbols', ''),
         }
         return random_string(**rules)
 
