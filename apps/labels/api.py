@@ -129,6 +129,7 @@ class LabeledResourceViewSet(OrgBulkModelViewSet):
     }
     ordering_fields = ('res_type', 'date_created')
 
+    # Todo: 这里需要优化，查询 sql 太多
     def filter_search(self, queryset):
         keyword = self.request.query_params.get('search')
         if not keyword:
