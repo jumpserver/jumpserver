@@ -162,6 +162,7 @@ class Setting(models.Model):
             ('change_auth', _('Can change auth setting')),
             ('change_ops', _('Can change auth ops')),
             ('change_ticket', _('Can change auth ticket')),
+            ('change_virtualapp', _('Can change virtual app setting')),
             ('change_announcement', _('Can change auth announcement')),
             ('change_vault', _('Can change vault setting')),
             ('change_chatai', _('Can change chat ai setting')),

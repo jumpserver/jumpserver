@@ -61,6 +61,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'announcement': serializers.AnnouncementSettingSerializer,
         'ticket': serializers.TicketSettingSerializer,
         'ops': serializers.OpsSettingSerializer,
+        'virtualapp': serializers.VirtualAppSerializer,
     }
 
     rbac_category_permissions = {
@@ -68,6 +69,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'terminal': 'settings.change_terminal',
         'ops': 'settings.change_ops',
         'ticket': 'settings.change_ticket',
+        'virtualapp': 'settings.change_virtualapp',
         'announcement': 'settings.change_announcement',
         'security': 'settings.change_security',
         'security_basic': 'settings.change_security',
