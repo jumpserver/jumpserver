@@ -40,5 +40,5 @@ class LabeledResource(JMSOrgBaseModel):
         unique_together = [('label', 'res_type', 'res_id', 'org_id')]
         verbose_name = _('Labeled resource')
 
-    def __str__(self):
-        return '{} => {}'.format(self.label, self.resource)
+    # def __str__(self):
+    #     return '{} => {}'.format(self.label, self.resource)
