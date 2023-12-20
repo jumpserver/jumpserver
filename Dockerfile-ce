@@ -76,6 +76,7 @@ ENV LANG=zh_CN.UTF-8 \
 ARG DEPENDENCIES="                    \
         libjpeg-dev                   \
         libx11-dev                    \
+        freerdp2-dev                  \
         libxmlsec1-openssl"
 
 ARG TOOLS="                           \
