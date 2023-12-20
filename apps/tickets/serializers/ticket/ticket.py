@@ -39,10 +39,9 @@ class TicketSerializer(OrgResourceModelSerializerMixin):
         tp = self.fields.get('type')
         if not tp:
             return
-        excluded_value = TicketType.general
-        self.fields['type'].choices = [
-            (value, label) for value, label in tp.choices.items() if value != excluded_value
-        ]
+        choices = tp.choices
+        choices.pop(TicketType.general, None)
+        tp.choices = choices.items()
 
     @classmethod
     def setup_eager_loading(cls, queryset):
