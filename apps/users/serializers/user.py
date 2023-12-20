@@ -147,7 +147,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLa
         # 在serializer 上定义的字段
         fields_custom = ["login_blocked", "password_strategy"]
         fields = fields_verbose + fields_fk + fields_m2m + fields_custom
-        fields_unexport = ["avatar_url", ]
+        fields_unexport = ["avatar_url", "is_service_account"]
 
         read_only_fields = [
             "date_joined", "last_login", "created_by",
