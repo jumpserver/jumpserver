@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-20 16:30+0800\n"
+"POT-Creation-Date: 2023-12-21 16:12+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1401,7 +1401,7 @@ msgstr "資産情報の収集"
 msgid "Disabled"
 msgstr "無効"
 
-#: assets/const/base.py:33 settings/serializers/basic.py:6
+#: assets/const/base.py:33 settings/serializers/basic.py:8
 #: users/serializers/preference/koko.py:19
 #: users/serializers/preference/lina.py:39
 #: users/serializers/preference/luna.py:73
@@ -3707,7 +3707,7 @@ msgid "Invalid ids for ids, should be a list"
 msgstr "無効なID、リストでなければなりません"
 
 #: common/db/fields.py:585 common/db/fields.py:590
-#: common/serializers/fields.py:130 tickets/serializers/ticket/common.py:58
+#: common/serializers/fields.py:134 tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 #: xpack/plugins/cloud/serializers/account_attrs.py:79
 #: xpack/plugins/cloud/serializers/account_attrs.py:150
@@ -3880,25 +3880,25 @@ msgstr "{} 秒待ってから送信してください"
 msgid "Children"
 msgstr "ノード"
 
-#: common/serializers/fields.py:131
+#: common/serializers/fields.py:135
 #, python-brace-format
 msgid "Invalid pk \"{pk_value}\" - object does not exist."
 msgstr "無効な pk \"{pk_value}\" - オブジェクトが存在しません"
 
-#: common/serializers/fields.py:132
+#: common/serializers/fields.py:136
 #, python-brace-format
 msgid "Incorrect type. Expected pk value, received {data_type}."
 msgstr "エラータイプ。 予想される pk 値、受信 {data_type}。"
 
-#: common/serializers/fields.py:206
+#: common/serializers/fields.py:210
 msgid "Invalid data type, should be list"
 msgstr "間違ったデータ タイプです。リストにする必要があります"
 
-#: common/serializers/fields.py:221
+#: common/serializers/fields.py:225
 msgid "Invalid choice: {}"
 msgstr "無効なオプション: {}"
 
-#: common/serializers/mixin.py:397
+#: common/serializers/mixin.py:397 labels/apps.py:8
 msgid "Labels"
 msgstr "ラベル"
 
@@ -5409,11 +5409,11 @@ msgstr "単位: 秒"
 msgid "Enable WeCom Auth"
 msgstr "企業微信認証の有効化"
 
-#: settings/serializers/basic.py:9
+#: settings/serializers/basic.py:11
 msgid "Site url"
 msgstr "サイトURL"
 
-#: settings/serializers/basic.py:11
+#: settings/serializers/basic.py:13
 msgid ""
 "External URL, email links or other system callbacks are used to access it, "
 "eg: http://dev.jumpserver.org:8080"
@@ -5421,37 +5421,41 @@ msgstr ""
 "外部URL、メールリンクまたは他のシステムコールバックにアクセスするには、"
 "http://dev.jumpserver.org:8080などを使用します"
 
-#: settings/serializers/basic.py:16
+#: settings/serializers/basic.py:18
 msgid "User guide url"
 msgstr "ユーザーガイドurl"
 
-#: settings/serializers/basic.py:17
+#: settings/serializers/basic.py:19
 msgid "User first login update profile done redirect to it"
 msgstr "ユーザーの最初のログイン更新プロファイルがリダイレクトされました"
 
-#: settings/serializers/basic.py:20
+#: settings/serializers/basic.py:22
 msgid "Global organization name"
 msgstr "グローバル組織名"
 
-#: settings/serializers/basic.py:21
+#: settings/serializers/basic.py:23
 msgid "The name of global organization to display"
 msgstr "表示するグローバル組織の名前"
 
-#: settings/serializers/basic.py:24
+#: settings/serializers/basic.py:26
 msgid "Help Docs URL"
 msgstr "ドキュメントリンク"
 
-#: settings/serializers/basic.py:25
+#: settings/serializers/basic.py:27
 msgid "default: http://docs.jumpserver.org"
 msgstr "デフォルト: http://docs.jumpserver.org"
 
-#: settings/serializers/basic.py:28
+#: settings/serializers/basic.py:30
 msgid "Help Support URL"
 msgstr "サポートリンク"
 
-#: settings/serializers/basic.py:29
+#: settings/serializers/basic.py:31
 msgid "default: http://www.jumpserver.org/support/"
 msgstr "デフォルト: http://www.jumpserver.org/support/"
+
+#: settings/serializers/basic.py:44
+msgid "Organization name already exists"
+msgstr "組織名はすでに存在します。"
 
 #: settings/serializers/cleaning.py:11
 msgid "Period clean"
@@ -6357,13 +6361,13 @@ msgstr ""
 msgid "Offline video player"
 msgstr "オフラインビデオプレーヤー"
 
-#: terminal/api/applet/applet.py:48 terminal/api/applet/applet.py:51
+#: terminal/api/applet/applet.py:50 terminal/api/applet/applet.py:53
 #: terminal/api/virtualapp/virtualapp.py:43
 #: terminal/api/virtualapp/virtualapp.py:46
 msgid "Invalid zip file"
 msgstr "zip ファイルが無効です"
 
-#: terminal/api/applet/applet.py:65
+#: terminal/api/applet/applet.py:72
 msgid "This is enterprise edition applet"
 msgstr "これはエンタープライズ版アプレットです"
 
@@ -8453,7 +8457,7 @@ msgstr "そして"
 msgid "Or"
 msgstr "または"
 
-#: xpack/plugins/cloud/manager.py:57
+#: xpack/plugins/cloud/manager.py:56
 msgid "Account unavailable"
 msgstr "利用できないアカウント"
 

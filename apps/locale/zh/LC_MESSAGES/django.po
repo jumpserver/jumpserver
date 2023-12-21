@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-20 16:30+0800\n"
+"POT-Creation-Date: 2023-12-21 16:12+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1393,7 +1393,7 @@ msgstr "收集资产信息"
 msgid "Disabled"
 msgstr "禁用"
 
-#: assets/const/base.py:33 settings/serializers/basic.py:6
+#: assets/const/base.py:33 settings/serializers/basic.py:8
 #: users/serializers/preference/koko.py:19
 #: users/serializers/preference/lina.py:39
 #: users/serializers/preference/luna.py:73
@@ -3663,7 +3663,7 @@ msgid "Invalid ids for ids, should be a list"
 msgstr "无效的ID，应为列表"
 
 #: common/db/fields.py:585 common/db/fields.py:590
-#: common/serializers/fields.py:130 tickets/serializers/ticket/common.py:58
+#: common/serializers/fields.py:134 tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 #: xpack/plugins/cloud/serializers/account_attrs.py:79
 #: xpack/plugins/cloud/serializers/account_attrs.py:150
@@ -3834,25 +3834,25 @@ msgstr "请在 {} 秒后发送"
 msgid "Children"
 msgstr "节点"
 
-#: common/serializers/fields.py:131
+#: common/serializers/fields.py:135
 #, python-brace-format
 msgid "Invalid pk \"{pk_value}\" - object does not exist."
 msgstr "错误的 pk \"{pk_value}\" - 对象不存在"
 
-#: common/serializers/fields.py:132
+#: common/serializers/fields.py:136
 #, python-brace-format
 msgid "Incorrect type. Expected pk value, received {data_type}."
 msgstr "错误类型。期望 pk 值，收到 {data_type}。"
 
-#: common/serializers/fields.py:206
+#: common/serializers/fields.py:210
 msgid "Invalid data type, should be list"
 msgstr "错误的数据类型，应该是列表"
 
-#: common/serializers/fields.py:221
+#: common/serializers/fields.py:225
 msgid "Invalid choice: {}"
 msgstr "无效选项: {}"
 
-#: common/serializers/mixin.py:397
+#: common/serializers/mixin.py:397 labels/apps.py:8
 msgid "Labels"
 msgstr "标签管理"
 
@@ -5351,11 +5351,11 @@ msgstr "单位: 秒"
 msgid "Enable WeCom Auth"
 msgstr "启用企业微信认证"
 
-#: settings/serializers/basic.py:9
+#: settings/serializers/basic.py:11
 msgid "Site url"
 msgstr "当前站点 URL"
 
-#: settings/serializers/basic.py:11
+#: settings/serializers/basic.py:13
 msgid ""
 "External URL, email links or other system callbacks are used to access it, "
 "eg: http://dev.jumpserver.org:8080"
@@ -5363,37 +5363,41 @@ msgstr ""
 "外部可访问的 URL, 用于邮件链接或其它系统回调, 例如: http://dev.jumpserver."
 "org:8080"
 
-#: settings/serializers/basic.py:16
+#: settings/serializers/basic.py:18
 msgid "User guide url"
 msgstr "用户向导URL"
 
-#: settings/serializers/basic.py:17
+#: settings/serializers/basic.py:19
 msgid "User first login update profile done redirect to it"
 msgstr "用户第一次登录，修改profile后重定向到地址, 可以是 wiki 或 其他说明文档"
 
-#: settings/serializers/basic.py:20
+#: settings/serializers/basic.py:22
 msgid "Global organization name"
 msgstr "全局组织名"
 
-#: settings/serializers/basic.py:21
+#: settings/serializers/basic.py:23
 msgid "The name of global organization to display"
 msgstr "全局组织的显示名称，默认为 全局组织"
 
-#: settings/serializers/basic.py:24
+#: settings/serializers/basic.py:26
 msgid "Help Docs URL"
 msgstr "文档链接"
 
-#: settings/serializers/basic.py:25
+#: settings/serializers/basic.py:27
 msgid "default: http://docs.jumpserver.org"
 msgstr "默认: http://dev.jumpserver.org:8080"
 
-#: settings/serializers/basic.py:28
+#: settings/serializers/basic.py:30
 msgid "Help Support URL"
 msgstr "支持链接"
 
-#: settings/serializers/basic.py:29
+#: settings/serializers/basic.py:31
 msgid "default: http://www.jumpserver.org/support/"
 msgstr "默认: http://www.jumpserver.org/support/"
+
+#: settings/serializers/basic.py:44
+msgid "Organization name already exists"
+msgstr "组织名称已存在"
 
 #: settings/serializers/cleaning.py:11
 msgid "Period clean"
@@ -6264,13 +6268,13 @@ msgstr "OpenSSH 是在 windows 远程应用发布服务器中用来连接远程�
 msgid "Offline video player"
 msgstr "离线录像播放器"
 
-#: terminal/api/applet/applet.py:48 terminal/api/applet/applet.py:51
+#: terminal/api/applet/applet.py:50 terminal/api/applet/applet.py:53
 #: terminal/api/virtualapp/virtualapp.py:43
 #: terminal/api/virtualapp/virtualapp.py:46
 msgid "Invalid zip file"
 msgstr "无效的 zip 文件"
 
-#: terminal/api/applet/applet.py:65
+#: terminal/api/applet/applet.py:72
 msgid "This is enterprise edition applet"
 msgstr "企业版远程应用，在社区版中不能使用"
 
@@ -8330,7 +8334,7 @@ msgstr "与"
 msgid "Or"
 msgstr "或"
 
-#: xpack/plugins/cloud/manager.py:57
+#: xpack/plugins/cloud/manager.py:56
 msgid "Account unavailable"
 msgstr "账号无效"
 
