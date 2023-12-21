@@ -1,4 +1,6 @@
+import os
 import os.path
+import re
 import shutil
 import zipfile
 from typing import Callable
@@ -51,6 +53,11 @@ class DownloadUploadMixin:
             raise ValidationError({'error': _('Invalid zip file') + ': {}'.format(e)})
 
         tmp_dir = os.path.join(extract_to, file.name.replace('.zip', ''))
+        if not os.path.exists(tmp_dir):
+            name = file.name
+            name = re.match(r"(\w+)", name).group()
+            tmp_dir = os.path.join(extract_to, name)
+
         manifest = Applet.validate_pkg(tmp_dir)
         return manifest, tmp_dir
 
