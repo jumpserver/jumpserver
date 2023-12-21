@@ -73,7 +73,11 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount):
         ]
 
     def __str__(self):
-        return '{}({})'.format(self.name, self.asset.name)
+        if self.asset_id:
+            host = self.asset.name
+        else:
+            host = 'Dynamic'
+        return '{}({})'.format(self.name, host)
 
     @lazyproperty
     def platform(self):

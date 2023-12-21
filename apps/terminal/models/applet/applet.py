@@ -301,7 +301,7 @@ class Applet(JMSBaseModel):
             'account': account,
             'lock_key': lock_key
         }
-        logger.debug('Select host and account: {}'.format(res))
+        logger.debug('Select host and account: {}-{}'.format(host.name, account.username))
         return res
 
     def delete(self, using=None, keep_parents=False):
