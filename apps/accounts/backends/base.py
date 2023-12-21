@@ -8,7 +8,7 @@ __all__ = ['BaseVault']
 class BaseVault(ABC):
 
     def __init__(self, *args, **kwargs):
-        self.enabled = kwargs.get('VAULT_ENABLED')
+        self.enabled = kwargs.get('VAULT_ENABLED') or kwargs.get('RIS_ENABLED')
 
     def get(self, instance):
         """ 返回 secret 值 """

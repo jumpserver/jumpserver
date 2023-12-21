@@ -7,3 +7,4 @@ __all__ = ['VaultTypeChoices']
 class VaultTypeChoices(models.TextChoices):
     local = 'local', _('Database')
     hcp = 'hcp', _('HCP Vault')
+    ris = 'ris', _('Ris')

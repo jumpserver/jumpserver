@@ -261,6 +261,17 @@ class Config(dict):
         'VAULT_HCP_TOKEN': '',
         'VAULT_HCP_MOUNT_POINT': 'jumpserver',
 
+        # 齐治 PAM
+        'RIS_ENABLED': False,
+        'RIS_AUTH_URL': '',
+        'RIS_APP_ID': '',
+        'RIS_ACCESS_KEY_ID': '',
+        'RIS_ACCESS_KEY_SECRET': '',
+        # 齐治 PAM 定时同步
+        'RIS_SYNC_IS_PERIODIC': False,
+        'RIS_SYNC_INTERVAL': None,
+        'RIS_SYNC_CRONTAB': None,
+
         # Cache login password
         'CACHE_LOGIN_PASSWORD_ENABLED': False,
         'CACHE_LOGIN_PASSWORD_TTL': 60 * 60 * 24,
