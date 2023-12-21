@@ -712,17 +712,18 @@ class Config(dict):
         tp = type(default_value)
         # 对bool特殊处理
         if tp is bool and isinstance(v, str):
-            if v.lower() in ("true", "1"):
-                return True
-            else:
-                return False
+            return v.lower() in ("true", "1")
         if tp in [list, dict] and isinstance(v, str):
             try:
                 v = json.loads(v)
-                return v
             except json.JSONDecodeError:
-                return v
-
+                pass
+            return v
+        if isinstance(default_value, int) and isinstance(v, str) and not v.isdigit():
+            try:
+                v = int(v)
+            except ValueError:
+                v = default_value
         try:
             if tp in [list, dict]:
                 v = json.loads(v)
@@ -753,7 +754,6 @@ class Config(dict):
         value = self.get_from_config(item)
         if value is None:
             value = self.get_from_env(item)
-
         # 因为要递归，所以优先从上次返回的递归中获取
         if default is None:
             default = self.defaults.get(item)
@@ -763,6 +763,7 @@ class Config(dict):
             value = default
         if self.secret_encryptor:
             value = self.secret_encryptor.decrypt_if_need(value, item)
+        value = self.convert_type(item, value)
         return value
 
     def __getitem__(self, item):
