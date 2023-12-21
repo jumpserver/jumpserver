@@ -11,13 +11,14 @@ from accounts.serializers import AccountSerializer
 from common.const import UUID_PATTERN
 from common.serializers import (
     WritableNestedModelSerializer, SecretReadableMixin,
-    CommonModelSerializer, MethodSerializer
+    CommonModelSerializer, MethodSerializer, ResourceLabelsMixin
 )
 from common.serializers.common import DictSerializer
 from common.serializers.fields import LabeledChoiceField
+from labels.models import Label
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ...const import Category, AllTypes
-from ...models import Asset, Node, Platform, Label, Protocol
+from ...models import Asset, Node, Platform, Protocol
 
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer', 'MiniAssetSerializer',
@@ -117,10 +118,9 @@ class AccountSecretSerializer(SecretReadableMixin, CommonModelSerializer):
         }
 
 
-class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSerializer):
+class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, WritableNestedModelSerializer):
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
-    labels = AssetLabelSerializer(many=True, required=False, label=_('Label'))
     protocols = AssetProtocolsSerializer(many=True, required=False, label=_('Protocols'), default=())
     accounts = AssetAccountSerializer(many=True, required=False, allow_null=True, write_only=True, label=_('Account'))
     nodes_display = serializers.ListField(read_only=False, required=False, label=_("Node path"))
@@ -201,8 +201,9 @@ class AssetSerializer(BulkOrgResourceModelSerializer, WritableNestedModelSeriali
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('domain', 'nodes', 'labels', 'protocols') \
+        queryset = queryset.prefetch_related('domain', 'nodes', 'protocols', ) \
             .prefetch_related('platform', 'platform__automation') \
+            .prefetch_related('labels', 'labels__label') \
             .annotate(category=F("platform__category")) \
             .annotate(type=F("platform__type"))
         return queryset

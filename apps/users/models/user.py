@@ -24,6 +24,7 @@ from common.utils import (
     date_expired_default, get_logger, lazyproperty,
     random_string, bulk_create_with_signal
 )
+from labels.mixins import LabeledMixin
 from orgs.utils import current_org
 from rbac.const import Scope
 from ..signals import (
@@ -40,6 +41,7 @@ class AuthMixin:
     history_passwords: models.Manager
     need_update_password: bool
     public_key: str
+    username: str
     is_local: bool
     set_password: Callable
     save: Callable
@@ -62,9 +64,10 @@ class AuthMixin:
 
     def set_password(self, raw_password):
         if self.can_update_password():
-            self.date_password_last_updated = timezone.now()
-            post_user_change_password.send(self.__class__, user=self)
-            super().set_password(raw_password)
+            if self.username:
+                self.date_password_last_updated = timezone.now()
+                post_user_change_password.send(self.__class__, user=self)
+            super().set_password(raw_password) # noqa
 
     def set_public_key(self, public_key):
         if self.can_update_ssh_key():
@@ -734,7 +737,7 @@ class JSONFilterMixin:
         return models.Q(id__in=user_id)
 
 
-class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, AbstractUser):
+class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterMixin, AbstractUser):
     class Source(models.TextChoices):
         local = 'local', _('Local')
         ldap = 'ldap', 'LDAP/AD'
@@ -746,6 +749,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
         wecom = 'wecom', _('WeCom')
         dingtalk = 'dingtalk', _('DingTalk')
         feishu = 'feishu', _('FeiShu')
+        slack = 'slack', _('Slack')
         custom = 'custom', 'Custom'
 
     SOURCE_BACKEND_MAPPING = {
@@ -777,6 +781,9 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
         ],
         Source.feishu: [
             settings.AUTH_BACKEND_FEISHU
+        ],
+        Source.slack: [
+            settings.AUTH_BACKEND_SLACK
         ],
         Source.dingtalk: [
             settings.AUTH_BACKEND_DINGTALK
@@ -848,11 +855,19 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
     wecom_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('WeCom'))
     dingtalk_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('DingTalk'))
     feishu_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('FeiShu'))
+    slack_id = models.CharField(null=True, default=None, max_length=128, verbose_name=_('Slack'))
 
     DATE_EXPIRED_WARNING_DAYS = 5
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
+
+    @classmethod
+    def get_queryset(cls):
+        queryset = cls.objects.all()
+        if not current_org.is_root():
+            queryset = current_org.get_members()
+        return queryset
 
     @property
     def secret_key(self):
@@ -990,6 +1005,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, JSONFilterMixin, Abstract
             ('dingtalk_id',),
             ('wecom_id',),
             ('feishu_id',),
+            ('slack_id',),
         )
         permissions = [
             ('invite_user', _('Can invite user')),

@@ -3,6 +3,7 @@
   vars:
     ansible_python_interpreter: /opt/py3/bin/python
     db_name: "{{ jms_asset.spec_info.db_name }}"
+    check_ssl: "{{ jms_asset.spec_info.use_ssl and not jms_asset.spec_info.allow_invalid_cert }}"
 
   tasks:
     - name: Test MySQL connection
@@ -11,10 +12,10 @@
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
-        check_hostname: "{{ omit if not jms_asset.spec_info.use_ssl else jms_asset.spec_info.allow_invalid_cert }}"
-        ca_cert: "{{ jms_asset.secret_info.ca_cert | default(omit) }}"
-        client_cert: "{{ jms_asset.secret_info.client_cert | default(omit) }}"
-        client_key: "{{ jms_asset.secret_info.client_key  | default(omit) }}"
+        check_hostname: "{{ check_ssl if check_ssl else omit }}"
+        ca_cert: "{{ jms_asset.secret_info.ca_cert | default(omit) if check_ssl else omit }}"
+        client_cert: "{{ jms_asset.secret_info.client_cert | default(omit) if check_ssl else omit }}"
+        client_key: "{{ jms_asset.secret_info.client_key | default(omit) if check_ssl else omit }}"
         filter: version
       register: db_info
 
@@ -28,10 +29,10 @@
         login_password: "{{ jms_account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
-        check_hostname: "{{ omit if not jms_asset.spec_info.use_ssl else jms_asset.spec_info.allow_invalid_cert }}"
-        ca_cert: "{{ jms_asset.secret_info.ca_cert | default(omit) }}"
-        client_cert: "{{ jms_asset.secret_info.client_cert | default(omit) }}"
-        client_key: "{{ jms_asset.secret_info.client_key  | default(omit) }}"
+        check_hostname: "{{ check_ssl if check_ssl else omit }}"
+        ca_cert: "{{ jms_asset.secret_info.ca_cert | default(omit) if check_ssl else omit }}"
+        client_cert: "{{ jms_asset.secret_info.client_cert | default(omit) if check_ssl else omit }}"
+        client_key: "{{ jms_asset.secret_info.client_key | default(omit) if check_ssl else omit }}"
         name: "{{ account.username }}"
         password: "{{ account.secret }}"
         host: "%"
@@ -45,8 +46,8 @@
         login_password: "{{ account.secret }}"
         login_host: "{{ jms_asset.address }}"
         login_port: "{{ jms_asset.port }}"
-        check_hostname: "{{ omit if not jms_asset.spec_info.use_ssl else jms_asset.spec_info.allow_invalid_cert }}"
-        ca_cert: "{{ jms_asset.secret_info.ca_cert | default(omit) }}"
-        client_cert: "{{ jms_asset.secret_info.client_cert | default(omit) }}"
-        client_key: "{{ jms_asset.secret_info.client_key  | default(omit) }}"
+        check_hostname: "{{ check_ssl if check_ssl else omit }}"
+        ca_cert: "{{ jms_asset.secret_info.ca_cert | default(omit) if check_ssl else omit }}"
+        client_cert: "{{ jms_asset.secret_info.client_cert | default(omit) if check_ssl else omit }}"
+        client_key: "{{ jms_asset.secret_info.client_key | default(omit) if check_ssl else omit }}"
         filter: version

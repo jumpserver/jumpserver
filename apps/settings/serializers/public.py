@@ -53,6 +53,10 @@ class PrivateSettingSerializer(PublicSettingSerializer):
     CONNECTION_TOKEN_REUSABLE = serializers.BooleanField()
     CACHE_LOGIN_PASSWORD_ENABLED = serializers.BooleanField()
     VAULT_ENABLED = serializers.BooleanField()
+    VIRTUAL_APP_ENABLED = serializers.BooleanField()
+    CHAT_AI_ENABLED = serializers.BooleanField()
+    GPT_MODEL = serializers.CharField()
+    FILE_UPLOAD_SIZE_LIMIT_MB = serializers.IntegerField()
 
 
 class ServerInfoSerializer(serializers.Serializer):

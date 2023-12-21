@@ -18,7 +18,7 @@ from common.utils import lazyproperty, pretty_string, bulk_get
 from common.utils.timezone import as_current_tz
 from orgs.mixins.models import JMSOrgBaseModel
 from orgs.utils import tmp_to_org
-from terminal.models import Applet
+from terminal.models import Applet, VirtualApp
 
 
 def date_expired_default():
@@ -177,6 +177,15 @@ class ConnectionToken(JMSOrgBaseModel):
         }
         return options
 
+    def get_virtual_app_option(self):
+        method = self.connect_method_object
+        if not method or method.get('type') != 'virtual_app' or method.get('disabled', False):
+            return None
+        virtual_app = VirtualApp.objects.filter(name=method.get('value')).first()
+        if not virtual_app:
+            return None
+        return virtual_app
+
     def get_applet_option(self):
         method = self.connect_method_object
         if not method or method.get('type') != 'applet' or method.get('disabled', False):
@@ -190,28 +199,23 @@ class ConnectionToken(JMSOrgBaseModel):
         if not host_account:
             raise JMSException({'error': 'No host account available'})
 
-        host, account, lock_key, ttl = bulk_get(host_account, ('host', 'account', 'lock_key', 'ttl'))
+        host, account, lock_key = bulk_get(host_account, ('host', 'account', 'lock_key'))
         gateway = host.domain.select_gateway() if host.domain else None
 
         data = {
-            'id': account.id,
+            'id': lock_key,
             'applet': applet,
             'host': host,
             'gateway': gateway,
             'account': account,
             'remote_app_option': self.get_remote_app_option()
         }
-        token_account_relate_key = f'token_account_relate_{account.id}'
-        cache.set(token_account_relate_key, lock_key, ttl)
         return data
 
     @staticmethod
-    def release_applet_account(account_id):
-        token_account_relate_key = f'token_account_relate_{account_id}'
-        lock_key = cache.get(token_account_relate_key)
+    def release_applet_account(lock_key):
         if lock_key:
             cache.delete(lock_key)
-            cache.delete(token_account_relate_key)
             return True
 
     @lazyproperty

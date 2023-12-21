@@ -5,20 +5,21 @@ from django.conf import settings
 from jinja2 import Environment
 
 
-def translate(key, i18n):
-    lang = settings.LANGUAGE_CODE[:2]
+def translate(key, i18n, lang):
+    lang = settings.LANGUAGE_CODE if lang is None else lang
+    lang = lang[:2]
     lang_data = i18n.get(key, {})
     return lang_data.get(lang, key)
 
 
-def yaml_load_with_i18n(stream):
+def yaml_load_with_i18n(stream, lang=None):
     ori_text = stream.read()
     stream = io.StringIO(ori_text)
     yaml_data = yaml.safe_load(stream)
     i18n = yaml_data.get('i18n', {})
 
     env = Environment()
-    env.filters['trans'] = lambda key: translate(key, i18n)
+    env.filters['trans'] = lambda key: translate(key, i18n, lang)
     template = env.from_string(ori_text)
     yaml_data = template.render()
     yaml_f = io.StringIO(yaml_data)

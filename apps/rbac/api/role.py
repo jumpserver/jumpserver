@@ -56,9 +56,22 @@ class RoleViewSet(JMSModelViewSet):
             return
         instance.permissions.set(clone.get_permissions())
 
+    def filter_builtins(self, queryset):
+        keyword = self.request.query_params.get('search')
+        if not keyword:
+            return queryset
+
+        builtins = list(self.get_queryset().filter(builtin=True))
+        matched = [role.id for role in builtins if keyword in role.display_name]
+        if not matched:
+            return queryset
+        queryset = list(queryset.exclude(id__in=matched))
+        return queryset + builtins
+
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
         queryset = queryset.order_by(*self.ordering)
+        queryset = self.filter_builtins(queryset)
         return queryset
 
     def set_users_amount(self, queryset):

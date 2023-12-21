@@ -10,6 +10,7 @@ from accounts.models import Account
 from assets.models import Asset
 from common.utils import date_expired_default
 from common.utils.timezone import local_now
+from labels.mixins import LabeledMixin
 from orgs.mixins.models import JMSOrgBaseModel
 from orgs.mixins.models import OrgManager
 from perms.const import ActionChoices
@@ -56,7 +57,7 @@ def default_protocols():
     return ['all']
 
 
-class AssetPermission(JMSOrgBaseModel):
+class AssetPermission(LabeledMixin, JMSOrgBaseModel):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     users = models.ManyToManyField(
         'users.User', related_name='%(class)ss', blank=True, verbose_name=_("User")
@@ -68,7 +69,7 @@ class AssetPermission(JMSOrgBaseModel):
         'assets.Asset', related_name='granted_by_permissions', blank=True, verbose_name=_("Asset")
     )
     nodes = models.ManyToManyField(
-        'assets.Node', related_name='granted_by_permissions', blank=True, verbose_name=_("Nodes")
+        'assets.Node', related_name='granted_by_permissions', blank=True, verbose_name=_("Node")
     )
     # 特殊的账号: @ALL, @INPUT @USER 默认包含，将来在全局设置中进行控制.
     accounts = models.JSONField(default=list, verbose_name=_("Account"))

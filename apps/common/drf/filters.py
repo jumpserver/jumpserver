@@ -6,6 +6,7 @@ import logging
 
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
+from django.db.models import Q, Count
 from django_filters import rest_framework as drf_filters
 from rest_framework import filters
 from rest_framework.compat import coreapi, coreschema
@@ -21,7 +22,7 @@ __all__ = [
     "DatetimeRangeFilterBackend", "IDSpmFilterBackend",
     'IDInFilterBackend', "CustomFilterBackend",
     "BaseFilterSet", 'IDNotFilterBackend',
-    'NotOrRelFilterBackend',
+    'NotOrRelFilterBackend', 'LabelFilterBackend',
 ]
 
 
@@ -165,6 +166,73 @@ class IDNotFilterBackend(filters.BaseFilterBackend):
             return queryset
         id_list = [i.strip() for i in ids.split(',')]
         queryset = queryset.exclude(id__in=id_list)
+        return queryset
+
+
+class LabelFilterBackend(filters.BaseFilterBackend):
+    def get_schema_fields(self, view):
+        return [
+            coreapi.Field(
+                name='label', location='query', required=False,
+                type='string', example='/api/v1/users/users?label=abc',
+                description='Filter by label'
+            )
+        ]
+
+    @staticmethod
+    def filter_resources(resources, labels_id):
+        label_ids = [i.strip() for i in labels_id.split(',')]
+
+        args = []
+        for label_id in label_ids:
+            kwargs = {}
+            if ':' in label_id:
+                k, v = label_id.split(':', 1)
+                kwargs['label__name'] = k.strip()
+                if v != '*':
+                    kwargs['label__value'] = v.strip()
+            else:
+                kwargs['label_id'] = label_id
+            args.append(kwargs)
+
+        if len(args) == 1:
+            resources = resources.filter(**args[0])
+            return resources
+
+        q = Q()
+        for kwarg in args:
+            q |= Q(**kwarg)
+
+        resources = resources.filter(q) \
+            .values('res_id') \
+            .order_by('res_id') \
+            .annotate(count=Count('res_id')) \
+            .values('res_id', 'count') \
+            .filter(count=len(args))
+        return resources
+
+    def filter_queryset(self, request, queryset, view):
+        labels_id = request.query_params.get('labels')
+        if not labels_id:
+            return queryset
+
+        if not hasattr(queryset, 'model'):
+            return queryset
+
+        if not hasattr(queryset.model, 'labels'):
+            return queryset
+
+        model = queryset.model
+        labeled_resource_cls = model._labels.field.related_model
+        app_label = model._meta.app_label
+        model_name = model._meta.model_name
+
+        resources = labeled_resource_cls.objects.filter(
+            res_type__app_label=app_label, res_type__model=model_name,
+        )
+        resources = self.filter_resources(resources, labels_id)
+        res_ids = resources.values_list('res_id', flat=True)
+        queryset = queryset.filter(id__in=set(res_ids))
         return queryset
 
 

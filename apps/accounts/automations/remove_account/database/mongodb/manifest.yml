@@ -1,0 +1,12 @@
+id: remove_account_mongodb
+name: "{{ 'MongoDB account remove' | trans }}"
+category: database
+type:
+  - mongodb
+method: remove_account
+
+i18n:
+  MongoDB account remove:
+    zh: 使用 Ansible 模块 mongodb 删除账号
+    ja: Ansible モジュール mongodb を使用してアカウントを削除する
+    en: Delete account using Ansible module mongodb

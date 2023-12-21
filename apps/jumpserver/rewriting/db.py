@@ -26,7 +26,7 @@ class OneToOneField(models.OneToOneField, ForeignKey):
 def set_db_constraint():
     if os.getenv('DB_CONSTRAINT', '1') != '0':
         return
-    if len(sys.argv) == 2 and sys.argv[1] == 'makemigrations':
+    if len(sys.argv) >= 2 and sys.argv[1] in ['makemigrations', 'check']:
         return
     print("Set foreignkey db constraint False")
     transaction.atomic = atomic

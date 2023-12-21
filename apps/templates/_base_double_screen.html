@@ -22,20 +22,14 @@
 </head>
 
 <body class="gray-bg">
-    <div class="outerBox animated fadeInDown">
-        <div class="row">
-            <div class="col-md-12">
-                    {% block content %} {% endblock %}
-            </div>
-        </div>
-        <hr/>
-        <div class="row">
-            <div class="col-md-12">
-                 {% include '_copyright.html' %}
-            </div>
+<div class="outerBox animated fadeInDown">
+    <div class="row">
+        <div class="col-md-12">
+            {% block content %} {% endblock %}
         </div>
     </div>
+    <hr/>
+</div>
 </body>
-{% include '_foot_js.html' %}
 {% block custom_foot_js %} {% endblock %}
 </html>

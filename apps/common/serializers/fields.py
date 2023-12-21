@@ -20,7 +20,8 @@ __all__ = [
     "TreeChoicesField",
     "LabeledMultipleChoiceField",
     "PhoneField",
-    "JSONManyToManyField"
+    "JSONManyToManyField",
+    "LabelRelatedField",
 ]
 
 
@@ -56,21 +57,18 @@ class EncryptedField(serializers.CharField):
 
 
 class LabeledChoiceField(ChoiceField):
-    def __init__(self, *args, **kwargs):
-        super(LabeledChoiceField, self).__init__(*args, **kwargs)
-        self.choice_mapper = {
-            key: value for key, value in self.choices.items()
-        }
-
     def to_representation(self, key):
         if key is None:
             return key
-        label = self.choice_mapper.get(key, key)
+        label = self.choices.get(key, key)
         return {"value": key, "label": label}
 
     def to_internal_value(self, data):
         if isinstance(data, dict):
             data = data.get("value")
+
+        if isinstance(data, str) and "(" in data and data.endswith(")"):
+            data = data.strip(")").split('(')[-1]
         return super(LabeledChoiceField, self).to_internal_value(data)
 
 
@@ -97,6 +95,37 @@ class LabeledMultipleChoiceField(serializers.MultipleChoiceField):
             return [item.get("value") for item in data]
         else:
             return data
+
+
+class LabelRelatedField(serializers.RelatedField):
+    def __init__(self, **kwargs):
+        queryset = kwargs.pop("queryset", None)
+        if queryset is None:
+            from labels.models import LabeledResource
+            queryset = LabeledResource.objects.all()
+
+        kwargs = {**kwargs}
+        read_only = kwargs.get("read_only", False)
+        if not read_only:
+            kwargs["queryset"] = queryset
+        super().__init__(**kwargs)
+
+    def to_representation(self, value):
+        if value is None:
+            return value
+        return str(value.label)
+
+    def to_internal_value(self, data):
+        from labels.models import LabeledResource, Label
+        if data is None:
+            return data
+        if isinstance(data, dict):
+            pk = data.get("id") or data.get("pk")
+            label = Label.objects.get(pk=pk)
+        else:
+            k, v = data.split(":", 1)
+            label, __ = Label.objects.get_or_create(name=k, value=v, defaults={'name': k, 'value': v})
+        return LabeledResource(label=label)
 
 
 class ObjectRelatedField(serializers.RelatedField):

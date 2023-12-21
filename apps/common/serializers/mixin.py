@@ -7,6 +7,7 @@ else:
     from collections import Iterable
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import NOT_PROVIDED
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SkipField, empty
@@ -14,14 +15,13 @@ from rest_framework.settings import api_settings
 from rest_framework.utils import html
 
 from common.db.fields import EncryptMixin
-from common.serializers.fields import EncryptedField, LabeledChoiceField, ObjectRelatedField
+from common.serializers.fields import EncryptedField, LabeledChoiceField, ObjectRelatedField, LabelRelatedField
 
 __all__ = [
     'BulkSerializerMixin', 'BulkListSerializerMixin',
     'CommonSerializerMixin', 'CommonBulkSerializerMixin',
     'SecretReadableMixin', 'CommonModelSerializer',
-    'CommonBulkModelSerializer',
-
+    'CommonBulkModelSerializer', 'ResourceLabelsMixin',
 ]
 
 
@@ -391,3 +391,25 @@ class CommonBulkSerializerMixin(BulkSerializerMixin, CommonSerializerMixin):
 
 class CommonBulkModelSerializer(CommonBulkSerializerMixin, serializers.ModelSerializer):
     pass
+
+
+class ResourceLabelsMixin(serializers.Serializer):
+    labels = LabelRelatedField(many=True, label=_('Labels'), required=False, allow_null=True)
+
+    def update(self, instance, validated_data):
+        labels = validated_data.pop('labels', None)
+        res = super().update(instance, validated_data)
+        if labels is not None:
+            instance.labels.set(labels, bulk=False)
+        return res
+
+    def create(self, validated_data):
+        labels = validated_data.pop('labels', None)
+        instance = super().create(validated_data)
+        if labels is not None:
+            instance.labels.set(labels, bulk=False)
+        return instance
+
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        return queryset.prefetch_related('labels')

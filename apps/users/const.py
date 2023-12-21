@@ -38,6 +38,11 @@ class RDPSmartSize(TextChoices):
     ENABLE = '1', _('Enable')
 
 
+class RDPColorQuality(TextChoices):
+    HIGH = '32', 'High（32 bit）'
+    MEDIUM = '16', 'Medium（16 bit）'
+
+
 class KeyboardLayout(TextChoices):
     EN_US_QWERTY = 'en-us-qwerty', 'US English (Qwerty)'
     EN_UK_QWERTY = 'en-gb-qwerty', 'UK English (Qwerty)'
@@ -46,6 +51,8 @@ class KeyboardLayout(TextChoices):
     FR_CH_QWERTZ = 'fr-ch-qwertz', 'Swiss French (Qwertz)'
     FR_BE_AZERTY = 'fr-be-azerty', 'Belgian French (Azerty)'
     TR_TR_QWERTY = 'tr-tr-qwerty', 'Turkish-Q (Qwerty)'
+    ES_ES_QWERTY = 'es-es-qwerty', 'Spanish'
+    ES_LATAM_QWERTY = 'es-latam-qwerty', 'Spanish (Latin American)'
 
 
 class AppletConnectionMethod(TextChoices):

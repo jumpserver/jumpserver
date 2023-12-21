@@ -13,7 +13,7 @@ class JMSInventory:
     def __init__(
             self, assets, account_policy='privileged_first',
             account_prefer='root,Administrator', host_callback=None,
-            exclude_localhost=False, task_type=None
+            exclude_localhost=False, task_type=None, protocol=None
     ):
         """
         :param assets:
@@ -27,6 +27,7 @@ class JMSInventory:
         self.exclude_hosts = {}
         self.exclude_localhost = exclude_localhost
         self.task_type = task_type
+        self.protocol = protocol
 
     @staticmethod
     def clean_assets(assets):
@@ -71,8 +72,9 @@ class JMSInventory:
         }
         if not account.secret:
             return var
+
         if account.secret_type == 'password':
-            var['ansible_password'] = account.secret
+            var['ansible_password'] = account.escape_jinja2_syntax(account.secret)
         elif account.secret_type == 'ssh_key':
             var['ansible_ssh_private_key_file'] = account.private_key_path
         return var
@@ -84,7 +86,7 @@ class JMSInventory:
             'custom_become': True,
             'custom_become_method': su_method,
             'custom_become_user': account.su_from.username,
-            'custom_become_password': account.su_from.secret,
+            'custom_become_password': account.escape_jinja2_syntax(account.su_from.secret),
             'custom_become_private_key_path': account.su_from.private_key_path
         }
         return var
@@ -109,13 +111,13 @@ class JMSInventory:
             host.update(self.make_account_ansible_vars(account))
             host['ansible_become'] = True
             host['ansible_become_user'] = 'root'
-            host['ansible_become_password'] = account.secret
+            host['ansible_become_password'] = account.escape_jinja2_syntax(account.secret)
         else:
             host.update(self.make_account_ansible_vars(account))
 
         if gateway:
             ansible_connection = host.get('ansible_connection', 'ssh')
-            if ansible_connection in ('local', 'winrm'):
+            if ansible_connection in ('local', 'winrm', 'rdp'):
                 host['gateway'] = {
                     'address': gateway.address, 'port': gateway.port,
                     'username': gateway.username, 'secret': gateway.password,
@@ -127,19 +129,20 @@ class JMSInventory:
                 host['jms_asset'].update(ansible_ssh_common_args)
                 host.update(ansible_ssh_common_args)
 
-    @staticmethod
-    def get_primary_protocol(ansible_config, protocols):
+    def get_primary_protocol(self, ansible_config, protocols):
         invalid_protocol = type('protocol', (), {'name': 'null', 'port': 0})
         ansible_connection = ansible_config.get('ansible_connection')
         # 数值越小，优先级越高，若用户在 ansible_config 中配置了，则提高用户配置方式的优先级
         protocol_priority = {'ssh': 10, 'winrm': 9, ansible_connection: 1}
+        if self.protocol:
+            protocol_priority.update({self.protocol: 0})
         protocol_sorted = sorted(protocols, key=lambda x: protocol_priority.get(x.name, 999))
         protocol = protocol_sorted[0] if protocol_sorted else invalid_protocol
         return protocol
 
     @staticmethod
     def fill_ansible_config(ansible_config, protocol):
-        if protocol.name in ('ssh', 'winrm'):
+        if protocol.name in ('ssh', 'winrm', 'rdp'):
             ansible_config['ansible_connection'] = protocol.name
         if protocol.name == 'winrm':
             if protocol.setting.get('use_ssl', False):
@@ -173,11 +176,13 @@ class JMSInventory:
             },
             'jms_account': {
                 'id': str(account.id), 'username': account.username,
-                'secret': account.secret, 'secret_type': account.secret_type,
-                'private_key_path': account.private_key_path
+                'secret': account.escape_jinja2_syntax(account.secret),
+                'secret_type': account.secret_type, 'private_key_path': account.private_key_path
             } if account else None
         }
 
+        protocols = host['jms_asset']['protocols']
+        host['jms_asset'].update({f"{p['name']}_port": p['port'] for p in protocols})
         if host['jms_account'] and tp == 'oracle':
             host['jms_account']['mode'] = 'sysdba' if account.privileged else None
 

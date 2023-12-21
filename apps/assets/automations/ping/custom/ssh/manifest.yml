@@ -6,8 +6,10 @@ category:
 type:
   - all
 method: ping
+protocol: ssh
+
 i18n:
   Ping by paramiko:
-    zh: 使用 Python 模块 paramiko 测试主机可连接性
-    en: Ping by paramiko module
-    ja: Paramikoモジュールを使用してホストにPingする
+    zh: '使用 Python 模块 paramiko 测试主机可连接性'
+    en: 'Ping by paramiko module'
+    ja: 'Paramikoモジュールを使用してホストにPingする'

@@ -3,11 +3,13 @@ import uuid
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from assets.const import Protocol
 from common.serializers.fields import EncryptedField
 
 __all__ = [
     'AnnouncementSettingSerializer', 'OpsSettingSerializer',
-    'VaultSettingSerializer', 'TicketSettingSerializer'
+    'VaultSettingSerializer', 'TicketSettingSerializer',
+    'ChatAISettingSerializer', 'VirtualAppSerializer',
 ]
 
 
@@ -54,6 +56,44 @@ class VaultSettingSerializer(serializers.Serializer):
     )
 
 
+class ChatAISettingSerializer(serializers.Serializer):
+    PREFIX_TITLE = _('Chat AI')
+    GPT_MODEL_CHOICES = []
+
+    CHAT_AI_ENABLED = serializers.BooleanField(
+        required=False, label=_('Enable Chat AI')
+    )
+    GPT_BASE_URL = serializers.CharField(
+        max_length=256, allow_blank=True, required=False, label=_('Base Url')
+    )
+    GPT_API_KEY = EncryptedField(
+        max_length=256, allow_blank=True, required=False, label=_('API Key'),
+    )
+    GPT_PROXY = serializers.CharField(
+        max_length=256, allow_blank=True, required=False, label=_('Proxy')
+    )
+    GPT_MODEL = serializers.ChoiceField(
+        default='', choices=GPT_MODEL_CHOICES, label=_("GPT Model"), required=False,
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_GPT_MODEL_choices()
+
+    def set_GPT_MODEL_choices(self):
+        field_gpt_model = self.fields.get("GPT_MODEL")
+        if not field_gpt_model:
+            return
+        gpt_api_model = Protocol.gpt_protocols()[Protocol.chatgpt]['setting']['api_mode']
+        choices = gpt_api_model['choices']
+        field_gpt_model._choices = choices
+        field_gpt_model.default = gpt_api_model['default']
+        cls = self.__class__
+        if cls.GPT_MODEL_CHOICES:
+            return
+        cls.GPT_MODEL_CHOICES.extend(choices)
+
+
 class TicketSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Ticket')
 
@@ -79,4 +119,12 @@ class OpsSettingSerializer(serializers.Serializer):
         child=serializers.CharField(max_length=1024, ),
         label=_('Operation center command blacklist'),
         help_text=_("Commands that are not allowed execute.")
+    )
+
+
+class VirtualAppSerializer(serializers.Serializer):
+    PREFIX_TITLE = _('Virtual app')
+
+    VIRTUAL_APP_ENABLED = serializers.BooleanField(
+        required=False, label=_('Enable virtual app'),
     )

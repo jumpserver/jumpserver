@@ -1,0 +1,15 @@
+- hosts: postgresql
+  gather_facts: no
+  vars:
+    ansible_python_interpreter: /opt/py3/bin/python
+
+  tasks:
+    - name: "Remove account"
+      community.postgresql.postgresql_user:
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        db: "{{ jms_asset.spec_info.db_name }}"
+        name: "{{ account.username }}"
+        state: absent

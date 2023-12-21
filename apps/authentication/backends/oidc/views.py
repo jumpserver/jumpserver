@@ -20,10 +20,11 @@ from django.core.exceptions import SuspiciousOperation
 from django.http import HttpResponseRedirect, QueryDict
 from django.urls import reverse
 from django.utils.crypto import get_random_string
-from django.utils.http import url_has_allowed_host_and_scheme, urlencode
+from django.utils.http import urlencode
 from django.views.generic import View
 
 from authentication.utils import build_absolute_uri_for_oidc
+from common.utils import safe_next_url
 from .utils import get_logger
 
 logger = get_logger(__file__)
@@ -100,8 +101,7 @@ class OIDCAuthRequestView(View):
         # Stores the "next" URL in the session if applicable.
         logger.debug(log_prompt.format('Stores next url in the session'))
         next_url = request.GET.get('next')
-        request.session['oidc_auth_next_url'] = next_url \
-            if url_has_allowed_host_and_scheme(url=next_url, allowed_hosts=(request.get_host(),)) else None
+        request.session['oidc_auth_next_url'] = safe_next_url(next_url, request=request)
 
         # Redirects the user to authorization endpoint.
         logger.debug(log_prompt.format('Construct redirect url'))

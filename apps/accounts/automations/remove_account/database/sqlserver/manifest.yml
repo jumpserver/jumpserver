@@ -1,0 +1,12 @@
+id: remove_account_sqlserver
+name: "{{ 'SQLServer account remove' | trans }}"
+category: database
+type:
+  - sqlserver
+method: remove_account
+
+i18n:
+  SQLServer account remove:
+    zh: 使用 Ansible 模块 mssql 删除账号
+    ja: Ansible モジュール mssql を使用してアカウントを削除する
+    en: Use Ansible module mssql to delete account

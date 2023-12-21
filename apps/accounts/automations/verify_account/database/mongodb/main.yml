@@ -1,4 +1,4 @@
-- hosts: mongdb
+- hosts: mongodb
   gather_facts: no
   vars:
     ansible_python_interpreter: /opt/py3/bin/python

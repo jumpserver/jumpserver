@@ -27,13 +27,13 @@ from perms.models import ActionChoices
 from terminal.connect_methods import NativeClient, ConnectMethodUtil
 from terminal.models import EndpointRule, Endpoint
 from users.const import FileNameConflictResolution
-from users.const import RDPSmartSize
+from users.const import RDPSmartSize, RDPColorQuality
 from users.models import Preference
 from ..models import ConnectionToken, date_expired_default
 from ..serializers import (
     ConnectionTokenSerializer, ConnectionTokenSecretSerializer,
     SuperConnectionTokenSerializer, ConnectTokenAppletOptionSerializer,
-    ConnectionTokenReusableSerializer,
+    ConnectionTokenReusableSerializer, ConnectTokenVirtualAppOptionSerializer
 )
 
 __all__ = ['ConnectionTokenViewSet', 'SuperConnectionTokenViewSet']
@@ -49,7 +49,6 @@ class RDPFileClientProtocolURLMixin:
             'full address:s': '',
             'username:s': '',
             'use multimon:i': '0',
-            'session bpp:i': '32',
             'audiomode:i': '0',
             'disable wallpaper:i': '0',
             'disable full window drag:i': '0',
@@ -100,10 +99,13 @@ class RDPFileClientProtocolURLMixin:
             rdp_options['winposstr:s'] = f'0,1,0,0,{width},{height}'
             rdp_options['dynamic resolution:i'] = '0'
 
+        color_quality = self.request.query_params.get('rdp_color_quality')
+        color_quality = color_quality if color_quality else os.getenv('JUMPSERVER_COLOR_DEPTH', RDPColorQuality.HIGH)
+
         # 设置其他选项
-        rdp_options['smart sizing:i'] = self.request.query_params.get('rdp_smart_size', RDPSmartSize.DISABLE)
-        rdp_options['session bpp:i'] = os.getenv('JUMPSERVER_COLOR_DEPTH', '32')
+        rdp_options['session bpp:i'] = color_quality
         rdp_options['audiomode:i'] = self.parse_env_bool('JUMPSERVER_DISABLE_AUDIO', 'false', '2', '0')
+        rdp_options['smart sizing:i'] = self.request.query_params.get('rdp_smart_size', RDPSmartSize.DISABLE)
 
         # 设置远程应用, 不是 Mstsc
         if token.connect_method != NativeClient.mstsc:
@@ -464,6 +466,7 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         'get_secret_detail': 'authentication.view_superconnectiontokensecret',
         'get_applet_info': 'authentication.view_superconnectiontoken',
         'release_applet_account': 'authentication.view_superconnectiontoken',
+        'get_virtual_app_info': 'authentication.view_superconnectiontoken',
     }
 
     def get_queryset(self):
@@ -529,14 +532,24 @@ class SuperConnectionTokenViewSet(ConnectionTokenViewSet):
         serializer = ConnectTokenAppletOptionSerializer(data)
         return Response(serializer.data)
 
+    @action(methods=['POST'], detail=False, url_path='virtual-app-option')
+    def get_virtual_app_info(self, *args, **kwargs):
+        token_id = self.request.data.get('id')
+        token = get_object_or_404(ConnectionToken, pk=token_id)
+        if token.is_expired:
+            return Response({'error': 'Token expired'}, status=status.HTTP_400_BAD_REQUEST)
+        data = token.get_virtual_app_option()
+        serializer = ConnectTokenVirtualAppOptionSerializer(data)
+        return Response(serializer.data)
+
     @action(methods=['DELETE', 'POST'], detail=False, url_path='applet-account/release')
     def release_applet_account(self, *args, **kwargs):
-        account_id = self.request.data.get('id')
-        released = ConnectionToken.release_applet_account(account_id)
+        lock_key = self.request.data.get('id')
+        released = ConnectionToken.release_applet_account(lock_key)
 
         if released:
-            logger.debug('Release applet account success: {}'.format(account_id))
+            logger.debug('Release applet account success: {}'.format(lock_key))
             return Response({'msg': 'released'})
         else:
-            logger.error('Release applet account error: {}'.format(account_id))
+            logger.error('Release applet account error: {}'.format(lock_key))
             return Response({'error': 'not found or expired'}, status=400)

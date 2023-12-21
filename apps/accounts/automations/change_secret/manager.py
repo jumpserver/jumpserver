@@ -139,7 +139,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
                 'name': account.name,
                 'username': account.username,
                 'secret_type': secret_type,
-                'secret': new_secret,
+                'secret': account.escape_jinja2_syntax(new_secret),
                 'private_key_path': private_key_path,
                 'become': account.get_ansible_become_auth(),
             }

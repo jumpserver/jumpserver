@@ -1,18 +1,37 @@
 # -*- coding: utf-8 -*-
 #
 import json
+import asyncio
 
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
+from django.core.cache import cache
+from django.conf import settings
 
 from common.db.utils import close_old_connections
 from common.utils import get_logger
+from settings.serializers import (
+    LDAPTestConfigSerializer,
+    LDAPTestLoginSerializer
+)
+from settings.tasks import sync_ldap_user
+from settings.utils import (
+    LDAPSyncUtil, LDAPTestUtil
+)
 from .tools import (
     verbose_ping, verbose_telnet, verbose_nmap,
     verbose_tcpdump, verbose_traceroute
 )
 
-
 logger = get_logger(__name__)
+
+CACHE_KEY_LDAP_TEST_CONFIG_MSG = 'CACHE_KEY_LDAP_TEST_CONFIG_MSG'
+CACHE_KEY_LDAP_TEST_LOGIN_MSG = 'CACHE_KEY_LDAP_TEST_LOGIN_MSG'
+CACHE_KEY_LDAP_SYNC_USER_MSG = 'CACHE_KEY_LDAP_SYNC_USER_MSG'
+CACHE_KEY_LDAP_TEST_CONFIG_TASK_STATUS = 'CACHE_KEY_LDAP_TEST_CONFIG_TASK_STATUS'
+CACHE_KEY_LDAP_TEST_LOGIN_TASK_STATUS = 'CACHE_KEY_LDAP_TEST_LOGIN_TASK_STATUS'
+CACHE_KEY_LDAP_SYNC_USER_TASK_STATUS = 'CACHE_KEY_LDAP_SYNC_USER_TASK_STATUS'
+TASK_STATUS_IS_RUNNING = 'RUNNING'
+TASK_STATUS_IS_OVER = 'OVER'
 
 
 class ToolsWebsocket(AsyncJsonWebsocketConsumer):
@@ -60,7 +79,7 @@ class ToolsWebsocket(AsyncJsonWebsocketConsumer):
         logger.info(f'Receive request tcpdump: {params}')
         await verbose_tcpdump(display=self.send_msg, **params)
 
-    async def imitate_traceroute(self,dest_ips):
+    async def imitate_traceroute(self, dest_ips):
         params = {'dest_ips': dest_ips}
         await verbose_traceroute(display=self.send_msg, **params)
 
@@ -78,3 +97,113 @@ class ToolsWebsocket(AsyncJsonWebsocketConsumer):
     async def disconnect(self, code):
         await self.close()
         close_old_connections()
+
+
+class LdapWebsocket(AsyncJsonWebsocketConsumer):
+    async def connect(self):
+        user = self.scope["user"]
+        if user.is_authenticated:
+            await self.accept()
+        else:
+            await self.close()
+
+    async def receive(self, text_data=None, bytes_data=None, **kwargs):
+        data = json.loads(text_data)
+        msg_type = data.pop('msg_type', 'testing_config')
+        try:
+            tool_func = getattr(self, f'run_{msg_type.lower()}')
+            await asyncio.to_thread(tool_func, data)
+            if msg_type == 'testing_config':
+                ok, msg = cache.get(CACHE_KEY_LDAP_TEST_CONFIG_MSG)
+            elif msg_type == 'sync_user':
+                ok, msg = cache.get(CACHE_KEY_LDAP_SYNC_USER_MSG)
+            else:
+                ok, msg = cache.get(CACHE_KEY_LDAP_TEST_LOGIN_MSG)
+            await self.send_msg(ok, msg)
+        except Exception as error:
+            await self.send_msg(msg='Exception: %s' % error)
+
+    async def send_msg(self, ok=True, msg=''):
+        await self.send_json({'ok': ok, 'msg': f'{msg}'})
+
+    async def disconnect(self, code):
+        await self.close()
+        close_old_connections()
+
+    @staticmethod
+    def get_ldap_config(serializer):
+        server_uri = serializer.validated_data["AUTH_LDAP_SERVER_URI"]
+        bind_dn = serializer.validated_data["AUTH_LDAP_BIND_DN"]
+        password = serializer.validated_data["AUTH_LDAP_BIND_PASSWORD"]
+        use_ssl = serializer.validated_data.get("AUTH_LDAP_START_TLS", False)
+        search_ou = serializer.validated_data["AUTH_LDAP_SEARCH_OU"]
+        search_filter = serializer.validated_data["AUTH_LDAP_SEARCH_FILTER"]
+        attr_map = serializer.validated_data["AUTH_LDAP_USER_ATTR_MAP"]
+        auth_ldap = serializer.validated_data.get('AUTH_LDAP', False)
+
+        if not password:
+            password = settings.AUTH_LDAP_BIND_PASSWORD
+
+        config = {
+            'server_uri': server_uri,
+            'bind_dn': bind_dn,
+            'password': password,
+            'use_ssl': use_ssl,
+            'search_ou': search_ou,
+            'search_filter': search_filter,
+            'attr_map': attr_map,
+            'auth_ldap': auth_ldap
+        }
+        return config
+
+    @staticmethod
+    def task_is_over(task_key):
+        return cache.get(task_key) == TASK_STATUS_IS_OVER
+
+    @staticmethod
+    def set_task_status_over(task_key, ttl=120):
+        cache.set(task_key, TASK_STATUS_IS_OVER, ttl)
+
+    @staticmethod
+    def set_task_msg(task_key, ok, msg):
+        cache.set(task_key, (ok, msg), 120)
+
+    def run_testing_config(self, data):
+        while True:
+            if self.task_is_over(CACHE_KEY_LDAP_TEST_CONFIG_TASK_STATUS):
+                break
+            else:
+                serializer = LDAPTestConfigSerializer(data=data)
+                if not serializer.is_valid():
+                    self.send_msg(msg=f'error: {str(serializer.errors)}')
+                config = self.get_ldap_config(serializer)
+                ok, msg = LDAPTestUtil(config).test_config()
+                self.set_task_status_over(CACHE_KEY_LDAP_TEST_CONFIG_TASK_STATUS)
+            self.set_task_msg(CACHE_KEY_LDAP_TEST_CONFIG_MSG, ok, msg)
+
+    def run_testing_login(self, data):
+        while True:
+            if self.task_is_over(CACHE_KEY_LDAP_TEST_LOGIN_TASK_STATUS):
+                break
+            else:
+                serializer = LDAPTestLoginSerializer(data=data)
+                if not serializer.is_valid():
+                    self.send_msg(msg=f'error: {str(serializer.errors)}')
+                username = serializer.validated_data['username']
+                password = serializer.validated_data['password']
+                ok, msg = LDAPTestUtil().test_login(username, password)
+                self.set_task_status_over(CACHE_KEY_LDAP_TEST_LOGIN_TASK_STATUS, 3)
+            self.set_task_msg(CACHE_KEY_LDAP_TEST_LOGIN_MSG, ok, msg)
+
+    def run_sync_user(self, data):
+        while True:
+            if self.task_is_over(CACHE_KEY_LDAP_SYNC_USER_TASK_STATUS):
+                break
+            else:
+                sync_util = LDAPSyncUtil()
+                sync_util.clear_cache()
+                sync_ldap_user()
+                msg = sync_util.get_task_error_msg()
+                ok = False if msg else True
+                self.set_task_status_over(CACHE_KEY_LDAP_SYNC_USER_TASK_STATUS)
+            self.set_task_msg(CACHE_KEY_LDAP_SYNC_USER_MSG, ok, msg)

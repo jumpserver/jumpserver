@@ -39,6 +39,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'wecom': serializers.WeComSettingSerializer,
         'dingtalk': serializers.DingTalkSettingSerializer,
         'feishu': serializers.FeiShuSettingSerializer,
+        'slack': serializers.SlackSettingSerializer,
         'auth': serializers.AuthSettingSerializer,
         'oidc': serializers.OIDCSettingSerializer,
         'keycloak': serializers.KeycloakSettingSerializer,
@@ -56,9 +57,11 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'cmpp2': serializers.CMPP2SMSSettingSerializer,
         'custom': serializers.CustomSMSSettingSerializer,
         'vault': serializers.VaultSettingSerializer,
+        'chat': serializers.ChatAISettingSerializer,
         'announcement': serializers.AnnouncementSettingSerializer,
         'ticket': serializers.TicketSettingSerializer,
         'ops': serializers.OpsSettingSerializer,
+        'virtualapp': serializers.VirtualAppSerializer,
     }
 
     rbac_category_permissions = {
@@ -66,6 +69,7 @@ class SettingsApi(generics.RetrieveUpdateAPIView):
         'terminal': 'settings.change_terminal',
         'ops': 'settings.change_ops',
         'ticket': 'settings.change_ticket',
+        'virtualapp': 'settings.change_virtualapp',
         'announcement': 'settings.change_announcement',
         'security': 'settings.change_security',
         'security_basic': 'settings.change_security',

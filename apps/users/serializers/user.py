@@ -6,7 +6,7 @@ from functools import partial
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from common.serializers import CommonBulkSerializerMixin
+from common.serializers import CommonBulkSerializerMixin, ResourceLabelsMixin
 from common.serializers.fields import (
     EncryptedField, ObjectRelatedField, LabeledChoiceField, PhoneField
 )
@@ -81,7 +81,7 @@ class RolesSerializerMixin(serializers.Serializer):
         return fields
 
 
-class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializers.ModelSerializer):
+class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLabelsMixin, serializers.ModelSerializer):
     password_strategy = LabeledChoiceField(
         choices=PasswordStrategy.choices,
         default=PasswordStrategy.email,
@@ -121,7 +121,7 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         # small 指的是 不需要计算的直接能从一张表中获取到的数据
         fields_small = fields_mini + fields_write_only + [
             "email", "wechat", "phone", "mfa_level", "source",
-            "wecom_id", "dingtalk_id", "feishu_id",
+            "wecom_id", "dingtalk_id", "feishu_id", "slack_id",
             "created_by", "updated_by", "comment",  # 通用字段
         ]
         fields_date = [
@@ -143,11 +143,11 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
         # 外键的字段
         fields_fk = []
         # 多对多字段
-        fields_m2m = ["groups", "system_roles", "org_roles", ]
+        fields_m2m = ["groups", "system_roles", "org_roles", "labels"]
         # 在serializer 上定义的字段
         fields_custom = ["login_blocked", "password_strategy"]
         fields = fields_verbose + fields_fk + fields_m2m + fields_custom
-        fields_unexport = ["avatar_url", ]
+        fields_unexport = ["avatar_url", "is_service_account"]
 
         read_only_fields = [
             "date_joined", "last_login", "created_by",
@@ -258,6 +258,11 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, serializer
             validated_data, save_handler, created=True
         )
         return instance
+
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        queryset = queryset.prefetch_related('groups', 'labels', 'labels__label')
+        return queryset
 
 
 class UserRetrieveSerializer(UserSerializer):

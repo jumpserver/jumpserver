@@ -20,6 +20,7 @@ class Endpoint(JMSBaseModel):
     mariadb_port = PortField(default=33062, verbose_name=_('MariaDB port'))
     postgresql_port = PortField(default=54320, verbose_name=_('PostgreSQL port'))
     redis_port = PortField(default=63790, verbose_name=_('Redis port'))
+    sqlserver_port = PortField(default=14330, verbose_name=_('SQLServer port'))
 
     comment = models.TextField(default='', blank=True, verbose_name=_('Comment'))
 
@@ -81,10 +82,10 @@ class Endpoint(JMSBaseModel):
             instance = instance.get_asset()
         if not isinstance(instance, Asset):
             return None
-        values = instance.labels.filter(name='endpoint').values_list('value', flat=True)
+        values = instance.labels.filter(label__name='endpoint').values_list('label__value', flat=True)
         if not values:
             return None
-        endpoints = cls.objects.filter(name__in=values).order_by('-date_updated')
+        endpoints = cls.objects.filter(name__in=list(values)).order_by('-date_updated')
         for endpoint in endpoints:
             if endpoint.is_valid_for(instance, protocol):
                 return endpoint
@@ -131,5 +132,11 @@ class EndpointRule(JMSBaseModel):
             endpoint = Endpoint.get_or_create_default(request)
         if not endpoint.host and request:
             # 动态添加 current request host
-            endpoint.host = request.get_host().split(':')[0]
+            host_port = request.get_host()
+            # IPv6
+            if host_port.startswith('['):
+                host = host_port.split(']:')[0].rstrip(']') + ']'
+            else:
+                host = host_port.split(':')[0]
+            endpoint.host = host
         return endpoint

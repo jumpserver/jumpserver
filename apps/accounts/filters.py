@@ -51,6 +51,7 @@ class AccountFilterSet(BaseFilterSet):
 
 class GatheredAccountFilterSet(BaseFilterSet):
     node_id = drf_filters.CharFilter(method='filter_nodes')
+    asset_id = drf_filters.CharFilter(field_name='asset_id', lookup_expr='exact')
 
     @staticmethod
     def filter_nodes(queryset, name, value):
@@ -58,4 +59,4 @@ class GatheredAccountFilterSet(BaseFilterSet):
 
     class Meta:
         model = GatheredAccount
-        fields = ['id', 'asset_id', 'username']
+        fields = ['id', 'username']

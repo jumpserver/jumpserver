@@ -5,7 +5,6 @@ from rest_framework import serializers
 from common.serializers.fields import ReadableHiddenField
 from ops.models import Playbook
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
-from django.utils.translation import gettext_lazy as _
 
 
 def parse_playbook_name(path):
@@ -27,5 +26,6 @@ class PlaybookSerializer(BulkOrgResourceModelSerializer):
         model = Playbook
         read_only_fields = ["id", "date_created", "date_updated"]
         fields = read_only_fields + [
-            "id", 'path', "name", "comment", "creator", 'create_method', 'vcs_url',
+            "id", 'path', "name", "comment", "creator",
+            'create_method', 'vcs_url',
         ]

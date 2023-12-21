@@ -1,0 +1,12 @@
+id: remove_account_oracle
+name: "{{ 'Oracle account remove' | trans }}"
+category: database
+type:
+  - oracle
+method: remove_account
+
+i18n:
+  Oracle account remove:
+    zh: 使用 Python 模块 oracledb 删除账号
+    ja: Python モジュール oracledb を使用してアカウントを検証する
+    en: Using Python module oracledb to verify account

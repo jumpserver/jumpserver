@@ -20,8 +20,9 @@ from simple_history.models import HistoricalRecords
 from accounts.models import Account
 from acls.models import CommandFilterACL
 from assets.models import Asset
+from assets.automations.base.manager import SSHTunnelManager
 from common.db.encoder import ModelJSONFieldEncoder
-from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner, CommandInBlackListException
+from ops.ansible import JMSInventory, AdHocRunner, PlaybookRunner, CommandInBlackListException, UploadFileRunner
 from ops.mixin import PeriodTaskModelMixin
 from ops.variables import *
 from ops.const import Types, RunasPolicies, JobStatus, JobModules
@@ -79,6 +80,13 @@ class JMSPermedInventory(JMSInventory):
             host['login_password'] = account.secret
             host['login_db'] = asset.spec_info.get('db_name', '')
             host['ansible_python_interpreter'] = sys.executable
+            if gateway:
+                host['gateway'] = {
+                    'address': gateway.address, 'port': gateway.port,
+                    'username': gateway.username, 'secret': gateway.password,
+                    'private_key_path': gateway.private_key_path
+                }
+                host['jms_asset']['port'] = protocol.port
             return host
         return super().make_account_vars(host, asset, account, automation, protocol, platform, gateway)
 
@@ -126,17 +134,13 @@ class JMSPermedInventory(JMSInventory):
 
 class Job(JMSOrgBaseModel, PeriodTaskModelMixin):
     name = models.CharField(max_length=128, null=True, verbose_name=_('Name'))
-
     instant = models.BooleanField(default=False)
     args = models.CharField(max_length=8192, default='', verbose_name=_('Args'), null=True, blank=True)
     module = models.CharField(max_length=128, choices=JobModules.choices, default=JobModules.shell,
-                              verbose_name=_('Module'),
-                              null=True)
+                              verbose_name=_('Module'), null=True)
     chdir = models.CharField(default="", max_length=1024, verbose_name=_('Chdir'), null=True, blank=True)
     timeout = models.IntegerField(default=-1, verbose_name=_('Timeout (Seconds)'))
-
     playbook = models.ForeignKey('ops.Playbook', verbose_name=_("Playbook"), null=True, on_delete=models.SET_NULL)
-
     type = models.CharField(max_length=128, choices=Types.choices, default=Types.adhoc, verbose_name=_("Type"))
     creator = models.ForeignKey('users.User', verbose_name=_("Creator"), on_delete=models.SET_NULL, null=True)
     assets = models.ManyToManyField('assets.Asset', verbose_name=_("Assets"))
@@ -320,7 +324,6 @@ class JobExecution(JMSOrgBaseModel):
                          "login_password={{login_password}} " \
                          "login_port={{login_port}} " \
                          "%s={{login_db}}" % login_db_token
-            print(login_args)
             shell = "{} {}=\"{}\" ".format(login_args, query_token, self.current_job.args)
             return module, shell
 
@@ -354,7 +357,7 @@ class JobExecution(JMSOrgBaseModel):
         static_variables = self.gather_static_variables()
         extra_vars.update(static_variables)
 
-        if self.current_job.type == 'adhoc':
+        if self.current_job.type == Types.adhoc:
             module, args = self.compile_shell()
 
             runner = AdHocRunner(
@@ -366,10 +369,15 @@ class JobExecution(JMSOrgBaseModel):
                 project_dir=self.private_dir,
                 extra_vars=extra_vars,
             )
-        elif self.current_job.type == 'playbook':
+        elif self.current_job.type == Types.playbook:
             runner = PlaybookRunner(
                 self.inventory_path, self.current_job.playbook.entry
             )
+        elif self.current_job.type == Types.upload_file:
+            job_id = self.current_job.id
+            args = json.loads(self.current_job.args)
+            dst_path = args.get('dst_path', '/')
+            runner = UploadFileRunner(self.inventory_path, job_id, dst_path)
         else:
             raise Exception("unsupported job type")
         return runner
@@ -530,6 +538,8 @@ class JobExecution(JMSOrgBaseModel):
         self.before_start()
 
         runner = self.get_runner()
+        ssh_tunnel = SSHTunnelManager()
+        ssh_tunnel.local_gateway_prepare(runner)
         try:
             cb = runner.run(**kwargs)
             self.set_result(cb)
@@ -540,6 +550,8 @@ class JobExecution(JMSOrgBaseModel):
         except Exception as e:
             logging.error(e, exc_info=True)
             self.set_error(e)
+        finally:
+            ssh_tunnel.local_gateway_clean(runner)
 
     class Meta:
         verbose_name = _("Job Execution")

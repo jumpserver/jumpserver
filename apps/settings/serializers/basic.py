@@ -1,6 +1,8 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from orgs.models import Organization
+
 
 class BasicSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Basic')
@@ -34,3 +36,10 @@ class BasicSettingSerializer(serializers.Serializer):
         if not s:
             return 'http://127.0.0.1'
         return s.strip('/')
+
+    @staticmethod
+    def validate_GLOBAL_ORG_DISPLAY_NAME(s):
+        org_names = Organization.objects.values_list('name', flat=True)
+        if s in org_names:
+            raise serializers.ValidationError(_('Organization name already exists'))
+        return s

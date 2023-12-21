@@ -39,7 +39,9 @@ app_nodes_data = [
     {'id': 'rbac', 'view': 'view_console'},
     {'id': 'settings', 'view': 'view_setting'},
     {'id': 'tickets', 'view': 'view_other'},
+    {'id': 'labels', 'view': 'view_console'},
     {'id': 'authentication', 'view': 'view_other'},
+    {'id': 'ops', 'view': 'view_workbench'},
 ]
 
 # 额外其他节点，可以在不同的层次，需要指定父节点，可以将一些 model 归类到这个节点下面

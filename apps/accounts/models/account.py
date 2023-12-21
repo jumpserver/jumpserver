@@ -4,6 +4,7 @@ from simple_history.models import HistoricalRecords
 
 from assets.models.base import AbsConnectivity
 from common.utils import lazyproperty
+from labels.mixins import LabeledMixin
 from .base import BaseAccount
 from .mixins import VaultModelMixin
 from ..const import Source
@@ -42,7 +43,7 @@ class AccountHistoricalRecords(HistoricalRecords):
         return super().create_history_model(model, inherited)
 
 
-class Account(AbsConnectivity, BaseAccount):
+class Account(AbsConnectivity, LabeledMixin, BaseAccount):
     asset = models.ForeignKey(
         'assets.Asset', related_name='accounts',
         on_delete=models.CASCADE, verbose_name=_('Asset')
@@ -68,10 +69,15 @@ class Account(AbsConnectivity, BaseAccount):
             ('view_historyaccountsecret', _('Can view asset history account secret')),
             ('verify_account', _('Can verify account')),
             ('push_account', _('Can push account')),
+            ('remove_account', _('Can remove account')),
         ]
 
     def __str__(self):
-        return '{}'.format(self.username)
+        if self.asset_id:
+            host = self.asset.name
+        else:
+            host = 'Dynamic'
+        return '{}({})'.format(self.name, host)
 
     @lazyproperty
     def platform(self):
@@ -95,14 +101,13 @@ class Account(AbsConnectivity, BaseAccount):
         """ 排除自己和以自己为 su-from 的账号 """
         return self.asset.accounts.exclude(id=self.id).exclude(su_from=self)
 
-    @staticmethod
-    def make_account_ansible_vars(su_from):
+    def make_account_ansible_vars(self, su_from):
         var = {
             'ansible_user': su_from.username,
         }
         if not su_from.secret:
             return var
-        var['ansible_password'] = su_from.secret
+        var['ansible_password'] = self.escape_jinja2_syntax(su_from.secret)
         var['ansible_ssh_private_key_file'] = su_from.private_key_path
         return var
 
@@ -119,8 +124,24 @@ class Account(AbsConnectivity, BaseAccount):
         auth['ansible_become'] = True
         auth['ansible_become_method'] = become_method
         auth['ansible_become_user'] = self.username
-        auth['ansible_become_password'] = password
+        auth['ansible_become_password'] = self.escape_jinja2_syntax(password)
         return auth
+
+    @staticmethod
+    def escape_jinja2_syntax(value):
+        if not isinstance(value, str):
+            return value
+
+        def escape(v):
+            v = v.replace('{{', '__TEMP_OPEN_BRACES__') \
+                .replace('}}', '__TEMP_CLOSE_BRACES__')
+
+            v = v.replace('__TEMP_OPEN_BRACES__', '{{ "{{" }}') \
+                .replace('__TEMP_CLOSE_BRACES__', '{{ "}}" }}')
+
+            return v.replace('{%', '{{ "{%" }}').replace('%}', '{{ "%}" }}')
+
+        return escape(value)
 
 
 def replace_history_model_with_mixin():

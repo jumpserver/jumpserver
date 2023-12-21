@@ -9,7 +9,7 @@
     - name: Verify account (paramiko)
       ssh_ping:
         login_host: "{{ jms_asset.address }}"
-        login_port: "{{ jms_asset.protocols | selectattr('name', 'equalto', 'ssh') | map(attribute='port') | first }}"
+        login_port: "{{ jms_asset.port }}"
         login_user: "{{ account.username }}"
         login_password: "{{ account.secret }}"
         login_secret_type: "{{ account.secret_type }}"

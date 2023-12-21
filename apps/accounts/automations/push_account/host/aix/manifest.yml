@@ -9,7 +9,7 @@ params:
     type: str
     label: 'Sudo'
     default: '/bin/whoami'
-    help_text: '使用逗号分隔多个命令，如: /bin/whoami,/sbin/ifconfig'
+    help_text: "{{ 'Params sudo help text' | trans }}"
 
   - name: shell
     type: str
@@ -18,19 +18,44 @@ params:
 
   - name: home
     type: str
-    label: '家目录'
+    label: "{{ 'Params home label' | trans }}"
     default: ''
-    help_text: '默认家目录 /home/系统用户名: /home/username'
+    help_text: "{{ 'Params home help text' | trans }}"
 
   - name: groups
     type: str
-    label: '用户组'
+    label: "{{ 'Params groups label' | trans }}"
     default: ''
-    help_text: '请输入用户组，多个用户组使用逗号分隔（需填写已存在的用户组）'
+    help_text: "{{ 'Params groups help text' | trans }}"
 
 i18n:
   Aix account push:
-    zh: 使用 Ansible 模块 user 执行 Aix 账号推送 (DES)
-    ja: Ansible user モジュールを使用して Aix アカウントをプッシュする (DES)
-    en: Using Ansible module user to push account (DES)
+    zh: '使用 Ansible 模块 user 执行 Aix 账号推送 (DES)'
+    ja: 'Ansible user モジュールを使用して Aix アカウントをプッシュする (DES)'
+    en: 'Using Ansible module user to push account (DES)'
+
+  Params sudo help text:
+    zh: '使用逗号分隔多个命令，如: /bin/whoami,/sbin/ifconfig'
+    ja: 'コンマで区切って複数のコマンドを入力してください。例: /bin/whoami,/sbin/ifconfig'
+    en: 'Use commas to separate multiple commands, such as: /bin/whoami,/sbin/ifconfig'
+
+  Params home help text:
+    zh: '默认家目录 /home/{账号用户名}'
+    ja: 'デフォルトのホームディレクトリ /home/{アカウントユーザ名}'
+    en: 'Default home directory /home/{account username}'
+
+  Params groups help text:
+    zh: '请输入用户组，多个用户组使用逗号分隔（需填写已存在的用户组）'
+    ja: 'グループを入力してください。複数のグループはコンマで区切ってください（既存のグループを入力してください）'
+    en: 'Please enter the group. Multiple groups are separated by commas (please enter the existing group)'
+
+  Params home label:
+    zh: '家目录'
+    ja: 'ホームディレクトリ'
+    en: 'Home'
+
+  Params groups label:
+    zh: '用户组'
+    ja: 'グループ'
+    en: 'Groups'
 

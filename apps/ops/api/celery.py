@@ -7,14 +7,15 @@ from celery.result import AsyncResult
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from django_celery_beat.models import PeriodicTask
+from django_filters import rest_framework as drf_filters
 from rest_framework import generics, viewsets, mixins, status
 from rest_framework.response import Response
-from django_filters import rest_framework as drf_filters
 
 from common.api import LogTailApi, CommonApiMixin
+from common.drf.filters import BaseFilterSet
 from common.exceptions import JMSException
 from common.permissions import IsValidUser
-from common.drf.filters import BaseFilterSet
+from common.utils.timezone import local_now
 from ops.celery import app
 from ..ansible.utils import get_ansible_task_log_path
 from ..celery.utils import get_celery_task_log_path
@@ -137,6 +138,46 @@ class CeleryTaskViewSet(
 
     def get_queryset(self):
         return CeleryTask.objects.exclude(name__startswith='celery')
+
+    @staticmethod
+    def extract_schedule(input_string):
+        pattern = r'(\S+ \S+ \S+ \S+ \S+).*'
+        match = re.match(pattern, input_string)
+        if match:
+            return match.group(1)
+        else:
+            return input_string
+
+    def generate_execute_time(self, queryset):
+        names = [i.name for i in queryset]
+        periodic_tasks = PeriodicTask.objects.filter(name__in=names)
+        periodic_task_dict = {task.name: task for task in periodic_tasks}
+        now = local_now()
+        for i in queryset:
+            task = periodic_task_dict.get(i.name)
+            if not task:
+                continue
+            i.exec_cycle = self.extract_schedule(str(task.scheduler))
+
+            last_run_at = task.last_run_at or now
+            next_run_at = task.schedule.remaining_estimate(last_run_at)
+            if next_run_at.total_seconds() < 0:
+                next_run_at = task.schedule.remaining_estimate(now)
+            i.next_exec_time = now + next_run_at
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            page = self.generate_execute_time(page)
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        queryset = self.generate_execute_time(queryset)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class CeleryTaskExecutionViewSet(CommonApiMixin, viewsets.ModelViewSet):

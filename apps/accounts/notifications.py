@@ -3,8 +3,8 @@ from django.utils.translation import gettext_lazy as _
 
 from common.tasks import send_mail_attachment_async, upload_backup_to_obj_storage
 from notifications.notifications import UserMessage
-from users.models import User
 from terminal.models.component.storage import ReplayStorage
+from users.models import User
 
 
 class AccountBackupExecutionTaskMsg(object):
@@ -23,8 +23,8 @@ class AccountBackupExecutionTaskMsg(object):
         else:
             return _("{} - The account backup passage task has been completed: "
                      "the encryption password has not been set - "
-                     "please go to personal information -> file encryption password "
-                     "to set the encryption password").format(name)
+                     "please go to personal information -> Basic file encryption password for preference settings"
+                     ).format(name)
 
     def publish(self, attachment_list=None):
         send_mail_attachment_async(

@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from users.const import (
     RDPResolution, RDPSmartSize, KeyboardLayout,
-    RDPClientOption, AppletConnectionMethod
+    RDPClientOption, AppletConnectionMethod, RDPColorQuality,
 )
 
 
@@ -39,6 +39,10 @@ class GraphicsSerializer(serializers.Serializer):
     rdp_client_option = MultipleChoiceField(
         choices=RDPClientOption.choices, default={RDPClientOption.FULL_SCREEN},
         label=_('RDP client option'), required=False
+    )
+    rdp_color_quality = serializers.ChoiceField(
+        choices=RDPColorQuality.choices, default=RDPColorQuality.HIGH,
+        label=_('RDP color quality'), required=False
     )
     rdp_smart_size = serializers.ChoiceField(
         RDPSmartSize.choices, default=RDPSmartSize.DISABLE,

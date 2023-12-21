@@ -1,0 +1,21 @@
+- hosts: mongodb
+  gather_facts: no
+  vars:
+    ansible_python_interpreter: /opt/py3/bin/python
+
+  tasks:
+    - name: "Remove account"
+      mongodb_user:
+        login_user: "{{ jms_account.username }}"
+        login_password: "{{ jms_account.secret }}"
+        login_host: "{{ jms_asset.address }}"
+        login_port: "{{ jms_asset.port }}"
+        login_database: "{{ jms_asset.spec_info.db_name }}"
+        ssl: "{{ jms_asset.spec_info.use_ssl }}"
+        ssl_ca_certs: "{{ jms_asset.secret_info.ca_cert | default('') }}"
+        ssl_certfile: "{{ jms_asset.secret_info.client_key | default('') }}"
+        connection_options:
+          - tlsAllowInvalidHostnames: "{{ jms_asset.spec_info.allow_invalid_cert}}"
+        db: "{{ jms_asset.spec_info.db_name }}"
+        name: "{{ account.username }}"
+        state: absent

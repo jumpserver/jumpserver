@@ -171,7 +171,7 @@ class Applet(JMSBaseModel):
         if not hosts:
             return None
 
-        spec_label = asset.labels.filter(name__in=['AppletHost', '发布机']).first()
+        spec_label = asset.labels.filter(label__name__in=['AppletHost', '发布机']).first()
         if spec_label:
             matched = [host for host in hosts if host.name == spec_label.value]
             if matched:
@@ -223,7 +223,9 @@ class Applet(JMSBaseModel):
         accounts = valid_accounts.exclude(username__in=accounts_username_used)
         public_accounts = accounts.filter(username__startswith='jms_')
         if not public_accounts:
-            public_accounts = accounts.exclude(username__in=['Administrator', 'root'])
+            public_accounts = accounts \
+                .exclude(username__in=['Administrator', 'root']) \
+                .exclude(username__startswith='js_')
         account = self.random_select_prefer_account(user, host, public_accounts)
         return account
 
@@ -297,10 +299,9 @@ class Applet(JMSBaseModel):
         res = {
             'host': host,
             'account': account,
-            'lock_key': lock_key,
-            'ttl': ttl
+            'lock_key': lock_key
         }
-        logger.debug('Select host and account: {}'.format(res))
+        logger.debug('Select host and account: {}-{}'.format(host.name, account.username))
         return res
 
     def delete(self, using=None, keep_parents=False):

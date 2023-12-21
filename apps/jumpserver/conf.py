@@ -405,6 +405,12 @@ class Config(dict):
         'FEISHU_APP_SECRET': '',
         'FEISHU_VERSION': 'feishu',
 
+        # Slack
+        'AUTH_SLACK': False,
+        'SLACK_CLIENT_ID': '',
+        'SLACK_CLIENT_SECRET': '',
+        'SLACK_BOT_TOKEN': '',
+
         'LOGIN_REDIRECT_TO_BACKEND': '',  # 'OPENID / CAS / SAML2
         'LOGIN_REDIRECT_MSG_ENABLED': True,
 
@@ -497,7 +503,7 @@ class Config(dict):
         'SECURITY_LUNA_REMEMBER_AUTH': True,
         'SECURITY_WATERMARK_ENABLED': True,
         'SECURITY_MFA_VERIFY_TTL': 3600,
-        'SECURITY_UNCOMMON_USERS_TTL': 90,
+        'SECURITY_UNCOMMON_USERS_TTL': 999,
         'VERIFY_CODE_TTL': 60,
         'SECURITY_SESSION_SHARE': True,
         'SECURITY_CHECK_DIFFERENT_CITY_LOGIN': True,
@@ -578,12 +584,23 @@ class Config(dict):
         'APPLET_DOWNLOAD_HOST': '',
 
         # FTP 文件上传下载备份阈值，单位(M)，当值小于等于0时，不备份
-        'FTP_FILE_MAX_STORE': 100,
+        'FTP_FILE_MAX_STORE': 0,
 
-        # API 请求次数限制
-        'MAX_LIMIT_PER_PAGE': 100,
+        # API 分页
+        'MAX_LIMIT_PER_PAGE': 10000,
+        'DEFAULT_PAGE_SIZE': None,
 
         'LIMIT_SUPER_PRIV': False,
+
+        # Chat AI
+        'CHAT_AI_ENABLED': False,
+        'GPT_API_KEY': '',
+        'GPT_BASE_URL': '',
+        'GPT_PROXY': '',
+        'GPT_MODEL': 'gpt-3.5-turbo',
+        'VIRTUAL_APP_ENABLED': False,
+
+        'FILE_UPLOAD_SIZE_LIMIT_MB': 200
     }
 
     old_config_map = {

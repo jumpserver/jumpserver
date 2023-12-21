@@ -49,6 +49,7 @@ class NativeClient(TextChoices):
             Protocol.mongodb: [cls.db_client, cls.db_guide],
             Protocol.oracle: [cls.db_client, cls.db_guide],
             Protocol.postgresql: [cls.db_client, cls.db_guide],
+            Protocol.sqlserver: [cls.db_client, cls.db_guide],
         }
         return clients
 
@@ -113,6 +114,26 @@ class AppletMethod:
         return methods
 
 
+class VirtualAppMethod:
+
+    @classmethod
+    def get_methods(cls):
+        from .models import VirtualApp
+        methods = defaultdict(list)
+        if not getattr(settings, 'VIRTUAL_APP_ENABLED'):
+            return methods
+        virtual_apps = VirtualApp.objects.filter(is_active=True)
+        for virtual_app in virtual_apps:
+            for protocol in virtual_app.protocols:
+                methods[protocol].append({
+                    'value': virtual_app.name,
+                    'label': virtual_app.name,
+                    'type': 'virtual_app',
+                    'disabled': not virtual_app.is_active,
+                })
+        return methods
+
+
 class ConnectMethodUtil:
     _all_methods = {}
 
@@ -160,7 +181,7 @@ class ConnectMethodUtil:
                 'support': [
                     Protocol.mysql, Protocol.postgresql,
                     Protocol.oracle, Protocol.mariadb,
-                    Protocol.redis
+                    Protocol.redis, Protocol.sqlserver
                 ],
                 'match': 'map'
             },
@@ -243,6 +264,7 @@ class ConnectMethodUtil:
         methods = defaultdict(list)
         spec_web_methods = WebMethod.get_spec_methods()
         applet_methods = AppletMethod.get_methods()
+        virtual_app_methods = VirtualAppMethod.get_methods()
         native_methods = NativeClient.get_methods(os=os)
 
         for component, component_protocol in cls.components().items():
@@ -294,6 +316,13 @@ class ConnectMethodUtil:
                 method['listen'] = 'rdp'
                 method['component'] = TerminalType.tinker.value
             methods[asset_protocol].extend(applet_methods)
+
+        # 虚拟应用方式，这个只有 panda 提供，并且协议可能是自定义的
+        for protocol, virtual_app_methods in virtual_app_methods.items():
+            for method in virtual_app_methods:
+                method['listen'] = Protocol.http
+                method['component'] = TerminalType.panda.value
+            methods[protocol].extend(virtual_app_methods)
 
         cls._all_methods[os] = methods
         return methods

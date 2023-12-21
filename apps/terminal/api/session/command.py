@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+import uuid
 from django.utils import timezone
 from rest_framework import generics
 from rest_framework.fields import DateTimeField

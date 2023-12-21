@@ -9,7 +9,7 @@ class PermedAssetsWillExpireUserMsg(UserMessage):
     def __init__(self, user, assets, day_count=0):
         super().__init__(user)
         self.assets = assets
-        self.day_count = _('today') if day_count == 0 else day_count
+        self.day_count = _('today') if day_count == 0 else day_count + _('day')
 
     def get_html_msg(self) -> dict:
         subject = _("You permed assets is about to expire")
@@ -41,7 +41,7 @@ class AssetPermsWillExpireForOrgAdminMsg(UserMessage):
         super().__init__(user)
         self.perms = perms
         self.org = org
-        self.day_count = _('today') if day_count == 0 else day_count
+        self.day_count = _('today') if day_count == 0 else day_count + _('day')
 
     def get_items_with_url(self):
         items_with_url = []

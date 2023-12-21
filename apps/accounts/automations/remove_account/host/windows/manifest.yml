@@ -1,0 +1,13 @@
+id: remove_account_windows
+name: "{{ 'Windows account remove' | trans }}"
+version: 1
+method: remove_account
+category: host
+type:
+  - windows
+
+i18n:
+  Windows account remove:
+    zh: 使用 Ansible 模块 win_user 删除账号
+    ja: Ansible モジュール win_user を使用してアカウントを削除する
+    en: Use the Ansible module win_user to delete an account

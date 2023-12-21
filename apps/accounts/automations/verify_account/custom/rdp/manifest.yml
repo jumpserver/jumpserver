@@ -5,9 +5,10 @@ category:
 type:
   - windows
 method: verify_account
+protocol: rdp
 
 i18n:
   Windows rdp account verify:
-    zh: 使用 Python 模块 pyfreerdp 验证账号
-    ja: Python モジュール pyfreerdp を使用してアカウントを検証する
-    en: Using Python module pyfreerdp to verify account
+    zh: '使用 Python 模块 pyfreerdp 验证账号'
+    ja: 'Python モジュール pyfreerdp を使用してアカウントを検証する'
+    en: 'Using Python module pyfreerdp to verify account'

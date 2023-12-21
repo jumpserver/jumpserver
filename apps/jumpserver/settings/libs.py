@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 import os
-from urllib.parse import urlencode
 
 from .base import (
     REDIS_SSL_CA, REDIS_SSL_CERT, REDIS_SSL_KEY, REDIS_SSL_REQUIRED, REDIS_USE_SSL,
@@ -47,6 +46,7 @@ REST_FRAMEWORK = {
     'DATETIME_FORMAT': '%Y/%m/%d %H:%M:%S %z',
     'DATETIME_INPUT_FORMATS': ['%Y/%m/%d %H:%M:%S %z', 'iso-8601', '%Y-%m-%d %H:%M:%S %z'],
     'DEFAULT_PAGINATION_CLASS': 'jumpserver.rewriting.pagination.MaxLimitOffsetPagination',
+    'PAGE_SIZE': CONFIG.DEFAULT_PAGE_SIZE,
     'EXCEPTION_HANDLER': 'common.drf.exc_handlers.common_exception_handler',
 }
 
@@ -88,7 +88,6 @@ REDIS_LAYERS_HOST = {
 REDIS_LAYERS_SSL_PARAMS = {}
 if REDIS_USE_SSL:
     REDIS_LAYERS_SSL_PARAMS.update({
-        'ssl': REDIS_USE_SSL,
         'ssl_cert_reqs': REDIS_SSL_REQUIRED,
         "ssl_keyfile": REDIS_SSL_KEY,
         "ssl_certfile": REDIS_SSL_CERT,
@@ -115,9 +114,7 @@ else:
         protocol=REDIS_PROTOCOL, password=CONFIG.REDIS_PASSWORD,
         host=CONFIG.REDIS_HOST, port=CONFIG.REDIS_PORT, db=CONFIG.REDIS_DB_WS
     )
-    REDIS_LAYERS_SSL_PARAMS.pop('ssl', None)
-    REDIS_LAYERS_HOST['address'] = '{}?{}'.format(REDIS_LAYERS_ADDRESS,
-                                                  urlencode(REDIS_LAYERS_SSL_PARAMS))
+    REDIS_LAYERS_HOST['address'] = REDIS_LAYERS_ADDRESS
 
 CHANNEL_LAYERS = {
     'default': {
