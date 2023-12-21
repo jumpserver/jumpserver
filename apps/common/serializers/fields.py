@@ -66,6 +66,10 @@ class LabeledChoiceField(ChoiceField):
     def to_internal_value(self, data):
         if isinstance(data, dict):
             data = data.get("value")
+        if "(" in data and data.endswith(")"):
+            d = data.strip(")").split('(')[-1]
+            if d in self.choices:
+                data = d
         return super(LabeledChoiceField, self).to_internal_value(data)
 
 
