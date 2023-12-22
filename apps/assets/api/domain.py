@@ -20,14 +20,15 @@ class DomainViewSet(OrgBulkModelViewSet):
     filterset_fields = ("name",)
     search_fields = filterset_fields
     ordering = ('name',)
+    serializer_classes = {
+        'default': serializers.DomainSerializer,
+        'list': serializers.DomainListSerializer,
+    }
 
     def get_serializer_class(self):
         if self.request.query_params.get('gateway'):
             return serializers.DomainWithGatewaySerializer
-        return serializers.DomainSerializer
-
-    def get_queryset(self):
-        return super().get_queryset().prefetch_related('assets')
+        return super().get_serializer_class()
 
 
 class GatewayViewSet(HostViewSet):

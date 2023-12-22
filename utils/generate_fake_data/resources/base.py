@@ -41,7 +41,7 @@ class FakeDataGenerator:
             start = time.time()
             self.do_generate(batch, self.batch_size)
             end = time.time()
-            using = end - start
+            using = round(end - start, 3)
             from_size = created
             created += len(batch)
             print('Generate %s: %s-%s [%s]' % (self.resource, from_size, created, using))
