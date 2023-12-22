@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db.models import Q
 
 from assets.models import FavoriteAsset, Asset
-from common.utils.common import timeit
+from common.utils.common import timeit, lazyproperty
 from perms.models import PermNode, UserAssetGrantedTreeNodeRelation
 from .permission import AssetPermissionUtil
 
@@ -14,12 +14,16 @@ class AssetPermissionPermAssetUtil:
     def __init__(self, perm_ids):
         self.perm_ids = perm_ids
 
-    def get_all_assets(self):
-        """ 获取所有授权的资产 """
+    @lazyproperty
+    def all_permed_assets_ids(self):
         node_asset_ids = self.get_perm_nodes_assets(flat=True)
         direct_asset_ids = self.get_direct_assets(flat=True)
         asset_ids = list(node_asset_ids) + list(direct_asset_ids)
-        assets = Asset.objects.filter(id__in=asset_ids)
+        return [str(i) for i in asset_ids]
+
+    def get_all_assets(self):
+        """ 获取所有授权的资产 """
+        assets = Asset.objects.filter(id__in=self.all_permed_assets_ids)
         return assets
 
     def get_perm_nodes_assets(self, flat=False):

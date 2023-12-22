@@ -87,13 +87,15 @@ class UserPermedNodesWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
             .prefetch_related('platform')
         return [node], assets
 
+    @timeit
     def _get_nodes_assets_for_all(self):
+        max_offset = settings.TREE_ASSETS_MAX_NUM
         nodes = self.query_node_util.get_whole_tree_nodes(with_special=False)
         if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
             assets = self.query_asset_util.get_perm_nodes_assets()
         else:
             assets = self.query_asset_util.get_all_assets()
-        assets = assets.annotate(parent_key=F('nodes__key')).prefetch_related('platform')
+        assets = assets.annotate(parent_key=F('nodes__key')).prefetch_related('platform')[:max_offset]
         return nodes, assets
 
 
@@ -146,8 +148,10 @@ class UserPermedNodeChildrenWithAssetsAsCategoryTreeApi(
 ):
     @property
     def is_sync(self):
+        from assets.models import Asset
+        asset_amount = Asset.objects.all().count()
         sync = self.request.query_params.get('sync', 0)
-        return int(sync) == 1
+        return int(sync) == 1 and asset_amount < 5000
 
     @property
     def tp(self):
@@ -162,6 +166,18 @@ class UserPermedNodeChildrenWithAssetsAsCategoryTreeApi(
         else:
             assets = Asset.objects.none()
         return assets
+
+    def platform_to_tree_node(self):
+        pass
+
+    def to_tree_nodes_async(self, assets):
+        pass
+
+    def to_tree_nodes_sync(self, assets):
+        asset_type_map = defaultdict(list)
+        assets = assets.annotate(tp=F('platform__type'))
+        for asset in assets:
+            asset_type_map[asset.tp].append(asset)
 
     def to_tree_nodes(self, assets):
         if not assets:

@@ -1,5 +1,6 @@
 from typing import List
 
+from django.conf import settings
 from rest_framework.request import Request
 
 from assets.models import Node, Protocol
@@ -72,6 +73,8 @@ class SerializeToTreeNodeMixin:
 
     @timeit
     def serialize_assets(self, assets, node_key=None, pid=None):
+        max_offset = settings.TREE_ASSETS_MAX_NUM or 2000
+        assets = assets[:max_offset]
         if node_key is None:
             get_pid = lambda asset: getattr(asset, 'parent_key', '')
         else:
