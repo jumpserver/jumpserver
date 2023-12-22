@@ -2,6 +2,7 @@
 #
 from django.db.models import Count
 from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers
 
 from common.serializers.mixin import ObjectRelatedField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
@@ -9,7 +10,7 @@ from .. import utils
 from ..models import User, UserGroup
 
 __all__ = [
-    'UserGroupSerializer',
+    'UserGroupSerializer', 'UserGroupListSerializer',
 ]
 
 
@@ -27,7 +28,6 @@ class UserGroupSerializer(BulkOrgResourceModelSerializer):
         fields = fields_mini + fields_small + ['users']
         extra_kwargs = {
             'created_by': {'label': _('Created by'), 'read_only': True},
-            'users_amount': {'label': _('Users amount')},
             'id': {'label': _('ID')},
         }
 
@@ -43,5 +43,16 @@ class UserGroupSerializer(BulkOrgResourceModelSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('users').annotate(users_amount=Count('users'))
+        queryset = queryset.annotate(users_amount=Count('users'))
         return queryset
+
+
+class UserGroupListSerializer(UserGroupSerializer):
+    users_amount = serializers.IntegerField(label=_('Users amount'), read_only=True)
+
+    class Meta(UserGroupSerializer.Meta):
+        fields = list(set(UserGroupSerializer.Meta.fields + ['users_amount']) - {'users'})
+        extra_kwargs = {
+            **UserGroupSerializer.Meta.extra_kwargs,
+            'users_amount': {'label': _('Users amount')},
+        }

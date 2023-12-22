@@ -64,11 +64,10 @@ class NodeFilterBackend(filters.BaseFilterBackend):
         query_all = is_query_node_all_assets(request)
         if query_all:
             return queryset.filter(
-                Q(nodes__key__istartswith=f'{node.key}:') |
+                Q(nodes__key__startswith=f'{node.key}:') |
                 Q(nodes__key=node.key)
             ).distinct()
         else:
-            print("Query query origin: ", queryset.count())
             return queryset.filter(nodes__key=node.key).distinct()
 
 

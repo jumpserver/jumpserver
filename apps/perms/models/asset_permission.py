@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from accounts.const import AliasAccount
 from accounts.models import Account
 from assets.models import Asset
-from common.utils import date_expired_default
+from common.utils import date_expired_default, lazyproperty
 from common.utils.timezone import local_now
 from orgs.mixins.models import JMSOrgBaseModel
 from orgs.mixins.models import OrgManager
@@ -104,6 +104,22 @@ class AssetPermission(JMSOrgBaseModel):
             return True
         return False
 
+    @lazyproperty
+    def users_amount(self):
+        return self.users.count()
+
+    @lazyproperty
+    def user_groups_amount(self):
+        return self.user_groups.count()
+
+    @lazyproperty
+    def assets_amount(self):
+        return self.assets.count()
+
+    @lazyproperty
+    def nodes_amount(self):
+        return self.nodes.count()
+
     def get_all_users(self):
         from users.models import User
         user_ids = self.users.all().values_list('id', flat=True)
@@ -142,11 +158,14 @@ class AssetPermission(JMSOrgBaseModel):
 
     @classmethod
     def get_all_users_for_perms(cls, perm_ids, flat=False):
-        user_ids = cls.users.through.objects.filter(assetpermission_id__in=perm_ids) \
+        user_ids = cls.users.through.objects \
+            .filter(assetpermission_id__in=perm_ids) \
             .values_list('user_id', flat=True).distinct()
-        group_ids = cls.user_groups.through.objects.filter(assetpermission_id__in=perm_ids) \
+        group_ids = cls.user_groups.through.objects \
+            .filter(assetpermission_id__in=perm_ids) \
             .values_list('usergroup_id', flat=True).distinct()
-        group_user_ids = User.groups.through.objects.filter(usergroup_id__in=group_ids) \
+        group_user_ids = User.groups.through.objects \
+            .filter(usergroup_id__in=group_ids) \
             .values_list('user_id', flat=True).distinct()
         user_ids = set(user_ids) | set(group_user_ids)
         if flat:

@@ -1,22 +1,20 @@
 # -*- coding: utf-8 -*-
 #
+from django.db.models import Count
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers.fields import ObjectRelatedField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from .gateway import GatewayWithAccountSecretSerializer
-from ..models import Domain, Asset
+from ..models import Domain
 
-__all__ = ['DomainSerializer', 'DomainWithGatewaySerializer']
+__all__ = ['DomainSerializer', 'DomainWithGatewaySerializer', 'DomainListSerializer']
 
 
 class DomainSerializer(BulkOrgResourceModelSerializer):
     gateways = ObjectRelatedField(
         many=True, required=False, label=_('Gateway'), read_only=True,
-    )
-    assets = ObjectRelatedField(
-        many=True, required=False, queryset=Asset.objects, label=_('Asset')
     )
 
     class Meta:
@@ -29,7 +27,9 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        assets = data['assets']
+        assets = data.get('assets')
+        if assets is None:
+            return data
         gateway_ids = [str(i['id']) for i in data['gateways']]
         data['assets'] = [i for i in assets if str(i['id']) not in gateway_ids]
         return data
@@ -40,6 +40,20 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
         validated_data['assets'] = assets
         instance = super().update(instance, validated_data)
         return instance
+
+
+class DomainListSerializer(DomainSerializer):
+    assets_amount = serializers.IntegerField(label=_('Assets amount'), read_only=True)
+
+    class Meta(DomainSerializer.Meta):
+        fields = list(set(DomainSerializer.Meta.fields + ['assets_amount']) - {'assets'})
+
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        queryset = queryset.annotate(
+            assets_amount=Count('assets'),
+        )
+        return queryset
 
 
 class DomainWithGatewaySerializer(serializers.ModelSerializer):

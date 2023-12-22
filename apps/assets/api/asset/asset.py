@@ -22,7 +22,6 @@ from common.drf.filters import BaseFilterSet, AttrRulesFilterBackend
 from common.utils import get_logger, is_uuid
 from orgs.mixins import generics
 from orgs.mixins.api import OrgBulkModelViewSet
-from ..mixin import NodeFilterMixin
 from ...notifications import BulkUpdatePlatformSkipAssetUserMsg
 
 logger = get_logger(__file__)
@@ -98,13 +97,17 @@ class AssetFilterSet(BaseFilterSet):
         return queryset
 
 
-class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
+class AssetViewSet(SuggestionMixin, OrgBulkModelViewSet):
     """
     API endpoint that allows Asset to be viewed or edited.
     """
     model = Asset
     filterset_class = AssetFilterSet
     search_fields = ("name", "address", "comment")
+    extra_filter_backends = [
+        LabelFilterBackend, IpInFilterBackend,
+        NodeFilterBackend, AttrRulesFilterBackend
+    ]
     ordering_fields = ('name', 'connectivity', 'platform', 'date_updated')
     serializer_classes = (
         ("default", serializers.AssetSerializer),
@@ -120,15 +123,9 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
         ("gathered_info", "assets.view_asset"),
         ("sync_platform_protocols", "assets.change_asset"),
     )
-    extra_filter_backends = [
-        LabelFilterBackend, IpInFilterBackend,
-        NodeFilterBackend, AttrRulesFilterBackend
-    ]
 
     def get_queryset(self):
-        queryset = super().get_queryset() \
-            .prefetch_related('nodes', 'protocols') \
-            .select_related('platform', 'domain')
+        queryset = super().get_queryset()
         if queryset.model is not Asset:
             queryset = queryset.select_related('asset_ptr')
         return queryset
