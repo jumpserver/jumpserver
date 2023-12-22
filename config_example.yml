@@ -98,13 +98,3 @@ REDIS_PORT: 6379
 
 # 开启 Vault 账号存储
 # VAULT_ENABLED: False
-
-# 开启齐治 PAM
-# RIS_ENABLED: False
-# 定时同步账号密码
-# 启用 / 禁用
-# RIS_SYNC_IS_PERIODIC: True
-# 同步间隔 (单位: 时) (优先）
-# RIS_SYNC_INTERVAL: 12
-# Crontab 表达式
-# RIS_SYNC_CRONTAB: 0 1 * * *
