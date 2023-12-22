@@ -84,9 +84,10 @@ class OrgResourceStatisticsRefreshUtil:
 
     @classmethod
     def refresh_if_need(cls, instance):
-        cache_field_name = tuple(model_cache_field_mapper.get(type(instance)))
+        cache_field_name = model_cache_field_mapper.get(type(instance))
         if not cache_field_name:
             return
+        cache_field_name = tuple(cache_field_name)
         org = getattr(instance, 'org', None)
         cls.refresh_org_fields(org_fields=[(org, cache_field_name)])
 

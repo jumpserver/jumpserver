@@ -2,6 +2,8 @@
 #
 from collections import defaultdict
 
+from django.utils.translation import gettext as _
+
 from common.db.models import output_as_string
 from common.struct import Stack
 from common.utils import get_logger, dict_get_any, is_uuid, get_object_or_none, timeit
@@ -39,7 +41,7 @@ def check_node_assets_amount():
     for node in nodes:
         assets_amount = util.get_assets_amount(node.key)
         if node.assets_amount != assets_amount:
-            logger.error(f'Node[{node.key}] assets amount error {node.assets_amount} != {assets_amount}')
+            print(_("Update node assets amount, {}: {} -> {}").format(node.name, node.assets_amount, assets_amount))
             node.assets_amount = assets_amount
             to_updates.append(node)
     Node.objects.bulk_update(to_updates, fields=('assets_amount',))

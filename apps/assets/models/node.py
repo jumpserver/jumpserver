@@ -195,11 +195,6 @@ class FamilyMixin:
         ancestor_keys = self.get_ancestor_keys(with_self=with_self)
         return self.__class__.objects.filter(key__in=ancestor_keys)
 
-    # @property
-    # def parent_key(self):
-    #     parent_key = ":".join(self.key.split(":")[:-1])
-    #     return parent_key
-
     def compute_parent_key(self):
         return compute_parent_key(self.key)
 
@@ -559,11 +554,6 @@ class Node(JMSOrgBaseModel, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
     def __str__(self):
         return self.full_value
 
-    # def __eq__(self, other):
-    #     if not other:
-    #         return False
-    #     return self.id == other.id
-    #
     def __gt__(self, other):
         self_key = [int(k) for k in self.key.split(':')]
         other_key = [int(k) for k in other.key.split(':')]
@@ -648,6 +638,8 @@ class Node(JMSOrgBaseModel, SomeNodesMixin, FamilyMixin, NodeAssetsMixin):
 
     def save(self, *args, **kwargs):
         self.full_value = self.computed_full_value()
+        self.parent_key = self.compute_parent_key()
         instance = super().save(*args, **kwargs)
-        self.update_child_full_value()
+        # Todo: 移动到信号中
+        # self.update_child_full_value()
         return instance

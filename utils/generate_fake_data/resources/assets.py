@@ -48,7 +48,7 @@ class AssetsGenerator(FakeDataGenerator):
 
     def pre_generate(self):
         self.node_ids = list(Node.objects.all().values_list('id', flat=True))
-        self.platform_ids = list(Platform.objects.all().values_list('id', flat=True))
+        self.platform_ids = list(Platform.objects.filter(category='host').values_list('id', flat=True))
 
     def set_assets_nodes(self, assets):
         for asset in assets:
@@ -72,6 +72,19 @@ class AssetsGenerator(FakeDataGenerator):
             assets.append(Asset(**data))
         creates = Asset.objects.bulk_create(assets, ignore_conflicts=True)
         self.set_assets_nodes(creates)
+        self.set_asset_platform(creates)
+
+    def set_asset_platform(self, assets):
+        protocol = random.choice(['ssh', 'rdp', 'telnet', 'vnc'])
+        protocols = []
+
+        for asset in assets:
+            if protocol == 'ssh':
+                port = 22
+            else:
+                port = 3389
+            protocols.append(Protocol(asset=asset, name=protocol, port=port))
+        Protocol.objects.bulk_create(protocols, ignore_conflicts=True)
 
     def after_generate(self):
         pass
