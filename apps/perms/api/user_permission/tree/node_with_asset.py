@@ -105,6 +105,7 @@ class UserPermedNodeChildrenWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
     # 默认展开的节点key
     default_unfolded_node_key = None
 
+    @timeit
     def get_nodes_assets(self):
         query_node_util = UserPermNodeUtil(self.user)
         query_asset_util = UserPermAssetUtil(self.user)
@@ -166,18 +167,6 @@ class UserPermedNodeChildrenWithAssetsAsCategoryTreeApi(
         else:
             assets = Asset.objects.none()
         return assets
-
-    def platform_to_tree_node(self):
-        pass
-
-    def to_tree_nodes_async(self, assets):
-        pass
-
-    def to_tree_nodes_sync(self, assets):
-        asset_type_map = defaultdict(list)
-        assets = assets.annotate(tp=F('platform__type'))
-        for asset in assets:
-            asset_type_map[asset.tp].append(asset)
 
     def to_tree_nodes(self, assets):
         if not assets:

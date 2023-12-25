@@ -3,15 +3,13 @@
 from django.db.models.signals import m2m_changed, pre_delete, pre_save, post_save
 from django.dispatch import receiver
 
-from users.models import User, UserGroup
 from assets.models import Asset
-from common.utils import get_logger, get_object_or_none
-from common.exceptions import M2MReverseNotAllowed
 from common.const.signals import POST_ADD, POST_REMOVE, POST_CLEAR
-
+from common.exceptions import M2MReverseNotAllowed
+from common.utils import get_logger, get_object_or_none
 from perms.models import AssetPermission
 from perms.utils import UserPermTreeExpireUtil
-
+from users.models import User, UserGroup
 
 logger = get_logger(__file__)
 
@@ -38,7 +36,7 @@ def on_user_groups_change(sender, instance, action, reverse, pk_set, **kwargs):
         group = UserGroup.objects.get(id=list(group_ids)[0])
         org_id = group.org_id
 
-    has_group_perm = AssetPermission.user_groups.through.objects\
+    has_group_perm = AssetPermission.user_groups.through.objects \
         .filter(usergroup_id__in=group_ids).exists()
     if not has_group_perm:
         return
@@ -113,6 +111,7 @@ def on_asset_permission_user_groups_changed(sender, instance, action, pk_set, re
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
 def on_node_asset_change(action, instance, reverse, pk_set, **kwargs):
+    print("Asset node changed: ", action)
     if not need_rebuild_mapping_node(action):
         return
     if reverse:

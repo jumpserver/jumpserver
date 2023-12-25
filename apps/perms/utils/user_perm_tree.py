@@ -3,11 +3,12 @@ from collections import defaultdict
 
 from django.conf import settings
 from django.core.cache import cache
+from django.db import transaction
 
-from assets.models import Asset
+from assets.models import Asset, FavoriteAsset
 from assets.utils import NodeAssetsUtil
 from common.db.models import output_as_string
-from common.decorators import on_transaction_commit
+from common.decorators import on_transaction_commit, merge_delay_run
 from common.utils import get_logger
 from common.utils.common import lazyproperty, timeit
 from orgs.models import Organization
@@ -23,6 +24,7 @@ from perms.models import (
     PermNode
 )
 from users.models import User
+from . import UserPermAssetUtil
 from .permission import AssetPermissionUtil
 
 logger = get_logger(__name__)
@@ -50,24 +52,67 @@ class UserPermTreeRefreshUtil(_UserPermTreeCacheMixin):
 
     def __init__(self, user):
         self.user = user
-        self.orgs = self.user.orgs.distinct()
-        self.org_ids = [str(o.id) for o in self.orgs]
+
+    @lazyproperty
+    def orgs(self):
+        return self.user.orgs.distinct()
+
+    @lazyproperty
+    def org_ids(self):
+        return [str(o.id) for o in self.orgs]
 
     @lazyproperty
     def cache_key_user(self):
         return self.get_cache_key(self.user.id)
 
+    @lazyproperty
+    def cache_key_time(self):
+        key = 'perms.user.node_tree.built_time.{}'.format(self.user.id)
+        return key
+
     @timeit
     def refresh_if_need(self, force=False):
-        self._clean_user_perm_tree_for_legacy_org()
+        built_just_now = cache.get(self.cache_key_time)
+        if built_just_now:
+            logger.info('Refresh user perm tree just now, pass: {}'.format(built_just_now))
+            return
         to_refresh_orgs = self.orgs if force else self._get_user_need_refresh_orgs()
         if not to_refresh_orgs:
             logger.info('Not have to refresh orgs')
             return
+        logger.info("Delay refresh user orgs: {} {}".format(self.user, [o.name for o in to_refresh_orgs]))
+        refresh_user_orgs_perm_tree(user_orgs=((self.user, tuple(to_refresh_orgs)),))
+        refresh_user_favorite_assets(users=(self.user,))
+
+    def perform_refresh_user_tree(self, to_refresh_orgs):
+        # 再判断一次，毕竟构建树比较慢
+        built_just_now = cache.get(self.cache_key_time)
+        if built_just_now:
+            logger.info('Refresh user perm tree just now, pass: {}'.format(built_just_now))
+            return
+
+        self._clean_user_perm_tree_for_legacy_org()
+        ttl = settings.PERM_TREE_REGEN_INTERVAL
+        cache.set(self.cache_key_time, time.time(), ttl)
+
         with UserGrantedTreeRebuildLock(self.user.id):
             for org in to_refresh_orgs:
                 self._rebuild_user_perm_tree_for_org(org)
         self._mark_user_orgs_refresh_finished(to_refresh_orgs)
+
+    def perform_refresh_favorite_assets(self):
+        query_asset_util = UserPermAssetUtil(self.user)
+        favor_ids = FavoriteAsset.objects.filter(user=self.user).values_list('asset_id', flat=True)
+        favor_ids = set(favor_ids)
+
+        with tmp_to_root_org():
+            valid_ids = query_asset_util.get_all_assets() \
+                .filter(id__in=favor_ids) \
+                .values_list('id', flat=True)
+            valid_ids = set(valid_ids)
+
+        invalid_ids = favor_ids - valid_ids
+        FavoriteAsset.objects.filter(user=self.user, asset_id__in=invalid_ids).delete()
 
     def _rebuild_user_perm_tree_for_org(self, org):
         with tmp_to_org(org):
@@ -75,7 +120,7 @@ class UserPermTreeRefreshUtil(_UserPermTreeCacheMixin):
             UserPermTreeBuildUtil(self.user).rebuild_user_perm_tree()
             end = time.time()
             logger.info(
-                'Refresh user [{user}] org [{org}] perm tree, user {use_time:.2f}s'
+                'Refresh user [{user}] org [{org}] perm tree, use {use_time:.2f}s'
                 ''.format(user=self.user, org=org, use_time=end - start)
             )
 
@@ -128,7 +173,8 @@ class UserPermTreeExpireUtil(_UserPermTreeCacheMixin):
         self.expire_perm_tree_for_user_groups_orgs(group_ids, org_ids)
 
     def expire_perm_tree_for_user_groups_orgs(self, group_ids, org_ids):
-        user_ids = User.groups.through.objects.filter(usergroup_id__in=group_ids) \
+        user_ids = User.groups.through.objects \
+            .filter(usergroup_id__in=group_ids) \
             .values_list('user_id', flat=True).distinct()
         self.expire_perm_tree_for_users_orgs(user_ids, org_ids)
 
@@ -151,6 +197,20 @@ class UserPermTreeExpireUtil(_UserPermTreeCacheMixin):
         logger.info('Expire all user perm tree')
 
 
+@merge_delay_run(ttl=20)
+def refresh_user_orgs_perm_tree(user_orgs=()):
+    for user, orgs in user_orgs:
+        util = UserPermTreeRefreshUtil(user)
+        util.perform_refresh_user_tree(orgs)
+
+
+@merge_delay_run(ttl=20)
+def refresh_user_favorite_assets(users=()):
+    for user in users:
+        util = UserPermTreeRefreshUtil(user)
+        util.perform_refresh_favorite_assets()
+
+
 class UserPermTreeBuildUtil(object):
     node_only_fields = ('id', 'key', 'parent_key', 'org_id')
 
@@ -161,13 +221,14 @@ class UserPermTreeBuildUtil(object):
         self._perm_nodes_key_node_mapper = {}
 
     def rebuild_user_perm_tree(self):
-        self.clean_user_perm_tree()
-        if not self.user_perm_ids:
-            logger.info('User({}) not have permissions'.format(self.user))
-            return
-        self.compute_perm_nodes()
-        self.compute_perm_nodes_asset_amount()
-        self.create_mapping_nodes()
+        with transaction.atomic():
+            self.clean_user_perm_tree()
+            if not self.user_perm_ids:
+                logger.info('User({}) not have permissions'.format(self.user))
+                return
+            self.compute_perm_nodes()
+            self.compute_perm_nodes_asset_amount()
+            self.create_mapping_nodes()
 
     def clean_user_perm_tree(self):
         UserAssetGrantedTreeNodeRelation.objects.filter(user=self.user).delete()

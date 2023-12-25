@@ -1,18 +1,16 @@
-from functools import wraps
 import threading
+from functools import wraps
 
+from django.db import transaction
 from redis_lock import (
     Lock as RedisLock, NotAcquired, UNLOCK_SCRIPT,
     EXTEND_SCRIPT, RESET_SCRIPT, RESET_ALL_SCRIPT
 )
-from redis import Redis
-from django.db import transaction
 
-from common.utils import get_logger
-from common.utils.inspect import copy_function_args
-from common.utils.connection import get_redis_client
-from jumpserver.const import CONFIG
 from common.local import thread_local
+from common.utils import get_logger
+from common.utils.connection import get_redis_client
+from common.utils.inspect import copy_function_args
 
 logger = get_logger(__file__)
 
@@ -76,6 +74,7 @@ class DistributedLock(RedisLock):
             # 要创建一个新的锁对象
             with self.__class__(**self.kwargs_copy):
                 return func(*args, **kwds)
+
         return inner
 
     @classmethod
@@ -140,14 +139,16 @@ class DistributedLock(RedisLock):
             logger.debug(f'Released reentrant-lock: lock_id={self.id} owner_id={self.get_owner_id()} lock={self.name}')
             return
         else:
-            self._raise_exc_with_log(f'Reentrant-lock is not acquired: lock_id={self.id} owner_id={self.get_owner_id()} lock={self.name}')
+            self._raise_exc_with_log(
+                f'Reentrant-lock is not acquired: lock_id={self.id} owner_id={self.get_owner_id()} lock={self.name}')
 
     def _release_on_reentrant_locked_by_me(self):
         logger.debug(f'Release reentrant-lock locked by me: lock_id={self.id} lock={self.name}')
 
         id = getattr(thread_local, self.name, None)
         if id != self.id:
-            raise PermissionError(f'Reentrant-lock is not locked by me: lock_id={self.id} owner_id={self.get_owner_id()} lock={self.name}')
+            raise PermissionError(
+                f'Reentrant-lock is not locked by me: lock_id={self.id} owner_id={self.get_owner_id()} lock={self.name}')
         try:
             # 这里要保证先删除 thread_local 的标记，
             delattr(thread_local, self.name)
@@ -191,7 +192,7 @@ class DistributedLock(RedisLock):
         # 处理是否在事务提交时才释放锁
         if self._release_on_transaction_commit:
             logger.debug(
-                f'Release lock on transaction commit ... :lock_id={self.id} lock={self.name}')
+                f'Release lock on transaction commit:lock_id={self.id} lock={self.name}')
             transaction.on_commit(_release)
         else:
             _release()

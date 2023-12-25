@@ -81,7 +81,7 @@ class SerializeToTreeNodeMixin:
             get_pid = lambda asset: node_key
         sftp_asset_ids = Protocol.objects.filter(name='sftp') \
             .values_list('asset_id', flat=True)
-        sftp_asset_ids = list(sftp_asset_ids)
+        sftp_asset_ids = set(sftp_asset_ids)
         data = [
             {
                 'id': str(asset.id),

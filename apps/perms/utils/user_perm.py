@@ -56,8 +56,9 @@ class UserPermAssetUtil(AssetPermissionPermAssetUtil):
     def get_ungroup_assets(self):
         return self.get_direct_assets()
 
+    @timeit
     def get_favorite_assets(self):
-        assets = self.get_all_assets()
+        assets = Asset.objects.all().valid()
         asset_ids = FavoriteAsset.objects.filter(user=self.user).values_list('asset_id', flat=True)
         assets = assets.filter(id__in=list(asset_ids))
         return assets
@@ -138,7 +139,11 @@ class UserPermNodeUtil:
         self.perm_ids = AssetPermissionUtil().get_permissions_for_user(self.user, flat=True)
 
     def get_favorite_node(self):
-        assets_amount = UserPermAssetUtil(self.user).get_favorite_assets().count()
+        favor_ids = FavoriteAsset.objects \
+            .filter(user=self.user) \
+            .values_list('asset_id') \
+            .distinct()
+        assets_amount = Asset.objects.all().valid().filter(id__in=favor_ids).count()
         return PermNode.get_favorite_node(assets_amount)
 
     def get_ungrouped_node(self):
