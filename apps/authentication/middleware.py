@@ -152,6 +152,8 @@ class SessionCookieMiddleware(MiddlewareMixin):
             value = 'close'
 
         age = request.session.get_expiry_age()
+        expire_timestamp = request.session.get_expiry_date().timestamp()
+        response.set_cookie('jms_session_expire_timestamp', expire_timestamp)
         response.set_cookie('jms_session_expire', value, max_age=age)
         request.session.pop('auth_session_expiration_required', None)
 
