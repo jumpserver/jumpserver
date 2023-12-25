@@ -86,7 +86,7 @@ class ChatAISettingSerializer(serializers.Serializer):
             return
         gpt_api_model = Protocol.gpt_protocols()[Protocol.chatgpt]['setting']['api_mode']
         choices = gpt_api_model['choices']
-        field_gpt_model._choices = choices
+        field_gpt_model.choices = choices
         field_gpt_model.default = gpt_api_model['default']
         cls = self.__class__
         if cls.GPT_MODEL_CHOICES:
