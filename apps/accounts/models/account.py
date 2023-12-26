@@ -73,7 +73,11 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount):
         ]
 
     def __str__(self):
-        return '{}({})'.format(self.name, self.asset.name)
+        if self.asset_id:
+            host = self.asset.name
+        else:
+            host = 'Dynamic'
+        return '{}({})'.format(self.name, host)
 
     @lazyproperty
     def platform(self):
@@ -128,13 +132,16 @@ class Account(AbsConnectivity, LabeledMixin, BaseAccount):
         if not isinstance(value, str):
             return value
 
-        value = value.replace('{{', '__TEMP_OPEN_BRACES__') \
-            .replace('}}', '__TEMP_CLOSE_BRACES__')
+        def escape(v):
+            v = v.replace('{{', '__TEMP_OPEN_BRACES__') \
+                .replace('}}', '__TEMP_CLOSE_BRACES__')
 
-        value = value.replace('__TEMP_OPEN_BRACES__', '{{ "{{" }}') \
-            .replace('__TEMP_CLOSE_BRACES__', '{{ "}}" }}')
+            v = v.replace('__TEMP_OPEN_BRACES__', '{{ "{{" }}') \
+                .replace('__TEMP_CLOSE_BRACES__', '{{ "}}" }}')
 
-        return value.replace('{%', '{{ "{%" }}').replace('%}', '{{ "%}" }}')
+            return v.replace('{%', '{{ "{%" }}').replace('%}', '{{ "%}" }}')
+
+        return escape(value)
 
 
 def replace_history_model_with_mixin():

@@ -10,6 +10,7 @@ __all__ = [
     'AnnouncementSettingSerializer', 'OpsSettingSerializer',
     'VaultSettingSerializer', 'TicketSettingSerializer',
     'ChatAISettingSerializer', 'RisSettingSerializer'
+    'ChatAISettingSerializer', 'VirtualAppSerializer',
 ]
 
 
@@ -86,7 +87,7 @@ class ChatAISettingSerializer(serializers.Serializer):
             return
         gpt_api_model = Protocol.gpt_protocols()[Protocol.chatgpt]['setting']['api_mode']
         choices = gpt_api_model['choices']
-        field_gpt_model._choices = choices
+        field_gpt_model.choices = choices
         field_gpt_model.default = gpt_api_model['default']
         cls = self.__class__
         if cls.GPT_MODEL_CHOICES:
@@ -121,6 +122,7 @@ class OpsSettingSerializer(serializers.Serializer):
         help_text=_("Commands that are not allowed execute.")
     )
 
+
 class RisSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('RIS')
 
@@ -140,3 +142,10 @@ class RisSettingSerializer(serializers.Serializer):
         max_length=128, allow_blank=True, required=False, label=_('Access key secret'), default=''
     )
 
+    
+class VirtualAppSerializer(serializers.Serializer):
+    PREFIX_TITLE = _('Virtual app')
+
+    VIRTUAL_APP_ENABLED = serializers.BooleanField(
+        required=False, label=_('Enable virtual app'),
+    )

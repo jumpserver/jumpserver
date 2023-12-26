@@ -6,6 +6,8 @@ category:
 type:
   - windows
 method: ping
+protocol: rdp
+
 i18n:
   Ping by pyfreerdp:
     zh: '使用 Python 模块 pyfreerdp 测试主机可连接性'

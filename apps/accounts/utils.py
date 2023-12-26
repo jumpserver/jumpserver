@@ -31,7 +31,7 @@ class SecretGenerator:
             'upper': rules['uppercase'],
             'digit': rules['digit'],
             'special_char': rules['symbol'],
-            'exclude_chars': rules['exclude_symbols']
+            'exclude_chars': rules.get('exclude_symbols', ''),
         }
         return random_string(**rules)
 
@@ -47,7 +47,10 @@ class SecretGenerator:
 
 def validate_password_for_ansible(password):
     """ 校验 Ansible 不支持的特殊字符 """
-    pass
+    if password.startswith('{{') and password.endswith('}}'):
+        raise serializers.ValidationError(
+            _('If the password starts with {{` and ends with }} `, then the password is not allowed.')
+        )
 
 
 def validate_ssh_key(ssh_key, passphrase=None):

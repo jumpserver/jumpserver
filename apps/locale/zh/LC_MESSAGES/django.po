@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-19 16:25+0800\n"
+"POT-Creation-Date: 2023-12-26 14:13+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -401,7 +401,7 @@ msgstr "原因"
 #: accounts/models/automations/backup_account.py:135
 #: accounts/serializers/automations/change_secret.py:105
 #: accounts/serializers/automations/change_secret.py:128
-#: ops/serializers/job.py:65 terminal/serializers/session.py:49
+#: ops/serializers/job.py:64 terminal/serializers/session.py:49
 msgid "Is success"
 msgstr "是否成功"
 
@@ -482,7 +482,7 @@ msgstr "结束日期"
 #: accounts/models/automations/change_secret.py:43
 #: assets/models/automations/base.py:113 audits/models.py:208
 #: audits/serializers.py:54 ops/models/base.py:49 ops/models/job.py:227
-#: terminal/models/applet/applet.py:319 terminal/models/applet/host.py:140
+#: terminal/models/applet/applet.py:320 terminal/models/applet/host.py:140
 #: terminal/models/component/status.py:30
 #: terminal/models/virtualapp/virtualapp.py:99
 #: terminal/serializers/applet.py:18 terminal/serializers/applet_host.py:136
@@ -747,7 +747,7 @@ msgstr "账号存在策略"
 #: assets/models/label.py:21 assets/models/platform.py:96
 #: assets/serializers/asset/common.py:122 assets/serializers/cagegory.py:12
 #: assets/serializers/platform.py:140 assets/serializers/platform.py:236
-#: perms/serializers/user_permission.py:25 settings/models.py:35
+#: perms/serializers/user_permission.py:26 settings/models.py:35
 #: tickets/models/ticket/apply_application.py:13 users/models/preference.py:12
 msgid "Category"
 msgstr "类别"
@@ -761,7 +761,7 @@ msgstr "类别"
 #: assets/serializers/platform.py:139 audits/serializers.py:53
 #: audits/serializers.py:170
 #: authentication/serializers/connect_token_secret.py:126 ops/models/job.py:144
-#: perms/serializers/user_permission.py:26 terminal/models/applet/applet.py:39
+#: perms/serializers/user_permission.py:27 terminal/models/applet/applet.py:39
 #: terminal/models/component/storage.py:57
 #: terminal/models/component/storage.py:146 terminal/serializers/applet.py:29
 #: terminal/serializers/session.py:21 terminal/serializers/storage.py:264
@@ -928,7 +928,7 @@ msgstr "关联平台，可配置推送参数，如果不关联，将使用默认
 #: assets/models/group.py:20 common/db/models.py:36 ops/models/adhoc.py:26
 #: ops/models/job.py:152 ops/models/playbook.py:31 rbac/models/role.py:37
 #: settings/models.py:38 terminal/models/applet/applet.py:45
-#: terminal/models/applet/applet.py:320 terminal/models/applet/host.py:143
+#: terminal/models/applet/applet.py:321 terminal/models/applet/host.py:143
 #: terminal/models/component/endpoint.py:25
 #: terminal/models/component/endpoint.py:105
 #: terminal/models/session/session.py:46
@@ -1059,7 +1059,13 @@ msgstr "新增账号"
 msgid "Deleted account"
 msgstr "删除账号"
 
-#: accounts/utils.py:56
+#: accounts/utils.py:52
+msgid ""
+"If the password starts with {{` and ends with }} `, then the password is not "
+"allowed."
+msgstr "如果密码以 `{{` 开始，并且以 `}}` 结束，则该密码是不允许的。"
+
+#: accounts/utils.py:59
 msgid "private key invalid or passphrase error"
 msgstr "密钥不合法或密钥密码错误"
 
@@ -1124,7 +1130,7 @@ msgid "Accounts"
 msgstr "账号管理"
 
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
-#: ops/serializers/job.py:64 terminal/const.py:86
+#: ops/serializers/job.py:63 terminal/const.py:86
 #: terminal/models/session/session.py:42 terminal/serializers/command.py:18
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
@@ -1347,11 +1353,11 @@ msgstr "同级别节点名字不能重复"
 msgid "App assets"
 msgstr "资产管理"
 
-#: assets/automations/base/manager.py:187
+#: assets/automations/base/manager.py:188
 msgid "{} disabled"
 msgstr "{} 已禁用"
 
-#: assets/automations/base/manager.py:253
+#: assets/automations/base/manager.py:251
 msgid "  - Platform {} ansible disabled"
 msgstr "  - 平台 {} Ansible 已禁用, 无法执行任务"
 
@@ -1406,7 +1412,7 @@ msgstr "收集资产信息"
 msgid "Disabled"
 msgstr "禁用"
 
-#: assets/const/base.py:33 settings/serializers/basic.py:6
+#: assets/const/base.py:33 settings/serializers/basic.py:8
 #: users/serializers/preference/koko.py:19
 #: users/serializers/preference/lina.py:39
 #: users/serializers/preference/luna.py:73
@@ -1725,7 +1731,7 @@ msgstr "地址"
 #: assets/models/asset/common.py:161 assets/models/platform.py:126
 #: authentication/backends/passkey/models.py:12
 #: authentication/serializers/connect_token_secret.py:118
-#: perms/serializers/user_permission.py:24 xpack/plugins/cloud/models.py:329
+#: perms/serializers/user_permission.py:25 xpack/plugins/cloud/models.py:329
 msgid "Platform"
 msgstr "系统平台"
 
@@ -1890,9 +1896,9 @@ msgstr "值"
 #: assets/serializers/cagegory.py:17 assets/serializers/cagegory.py:23
 #: assets/serializers/platform.py:119
 #: authentication/serializers/connect_token_secret.py:124
-#: common/serializers/common.py:85 labels/models.py:17 labels/models.py:29
-#: labels/serializers.py:33 perms/serializers/user_permission.py:27
-#: settings/serializers/msg.py:83
+#: common/serializers/common.py:85 labels/models.py:17 labels/models.py:33
+#: labels/serializers.py:45 settings/serializers/msg.py:83
+settings/serializers/msg.py:83
 msgid "Label"
 msgstr "标签"
 
@@ -2466,7 +2472,7 @@ msgid "Resource Type"
 msgstr "资源类型"
 
 #: audits/models.py:95 audits/models.py:98 audits/models.py:144
-#: audits/serializers.py:85 labels/serializers.py:34
+#: audits/serializers.py:85 labels/serializers.py:46
 msgid "Resource"
 msgstr "资源"
 
@@ -3719,7 +3725,7 @@ msgstr "组织 ID"
 msgid "The file content overflowed (The maximum length `{}` bytes)"
 msgstr "文件内容太大 (最大长度 `{}` 字节)"
 
-#: common/drf/parsers/base.py:195
+#: common/drf/parsers/base.py:199
 msgid "Parse file error: {}"
 msgstr "解析文件错误: {}"
 
@@ -3727,7 +3733,7 @@ msgstr "解析文件错误: {}"
 msgid "Invalid excel file"
 msgstr "无效的 excel 文件"
 
-#: common/drf/renders/base.py:206
+#: common/drf/renders/base.py:207
 msgid ""
 "{} - The encryption password has not been set - please go to personal "
 "information -> file encryption password to set the encryption password"
@@ -3774,7 +3780,7 @@ msgstr "不支持 Elasticsearch8"
 msgid "Network error, please contact system administrator"
 msgstr "网络错误，请联系系统管理员"
 
-#: common/sdk/im/slack/__init__.py:76
+#: common/sdk/im/slack/__init__.py:79
 msgid "Unknown error occur"
 msgstr "发生未知错误"
 
@@ -3848,6 +3854,8 @@ msgid "Children"
 msgstr "节点"
 
 #: common/serializers/fields.py:140
+
+
 #, python-brace-format
 msgid "Invalid pk \"{pk_value}\" - object does not exist."
 msgstr "错误的 pk \"{pk_value}\" - 对象不存在"
@@ -3865,7 +3873,7 @@ msgstr "错误的数据类型，应该是列表"
 msgid "Invalid choice: {}"
 msgstr "无效选项: {}"
 
-#: common/serializers/mixin.py:397
+#: common/serializers/mixin.py:397 labels/apps.py:8
 msgid "Labels"
 msgstr "标签管理"
 
@@ -3952,19 +3960,23 @@ msgstr ""
 "div><div>如果你看到了这个页面，证明你访问的不是nginx监听的端口，祝你好运</"
 "div>"
 
-#: labels/models.py:32
+#: labels/models.py:36
 msgid "Resource ID"
 msgstr "资源 ID"
 
-#: labels/models.py:37
+#: labels/models.py:41
 msgid "Labeled resource"
 msgstr "关联的资源"
 
-#: labels/serializers.py:19
+#: labels/serializers.py:22
 msgid "Resource count"
 msgstr "资源数量"
 
-#: labels/serializers.py:31
+#: labels/serializers.py:28
+msgid "Cannot contain \":,\""
+msgstr "不能包含\"：，\""
+
+#: labels/serializers.py:43
 msgid "Resource type"
 msgstr "资源类型"
 
@@ -3992,15 +4004,15 @@ msgstr "系统信息"
 msgid "Publish the station message"
 msgstr "发布站内消息"
 
-#: ops/ansible/inventory.py:96 ops/models/job.py:62
+#: ops/ansible/inventory.py:97 ops/models/job.py:62
 msgid "No account available"
 msgstr "无可用账号"
 
-#: ops/ansible/inventory.py:260
+#: ops/ansible/inventory.py:264
 msgid "Ansible disabled"
 msgstr "Ansible 已禁用"
 
-#: ops/ansible/inventory.py:276
+#: ops/ansible/inventory.py:280
 msgid "Skip hosts below:"
 msgstr "跳过以下主机: "
 
@@ -4198,7 +4210,7 @@ msgstr "账号策略"
 msgid "Last execution"
 msgstr "最后执行"
 
-#: ops/models/base.py:22 ops/serializers/job.py:18
+#: ops/models/base.py:22 ops/serializers/job.py:17
 msgid "Date last run"
 msgstr "最后运行日期"
 
@@ -4316,19 +4328,19 @@ msgstr "内存使用率超过 {max_threshold}%: => {value}"
 msgid "CPU load more than {max_threshold}: => {value}"
 msgstr "CPU 使用率超过 {max_threshold}: => {value}"
 
-#: ops/serializers/job.py:16
+#: ops/serializers/job.py:15
 msgid "Run after save"
 msgstr "保存后执行"
 
-#: ops/serializers/job.py:63
+#: ops/serializers/job.py:62
 msgid "Job type"
 msgstr "任务类型"
 
-#: ops/serializers/job.py:66 terminal/serializers/session.py:53
+#: ops/serializers/job.py:65 terminal/serializers/session.py:53
 msgid "Is finished"
 msgstr "是否完成"
 
-#: ops/serializers/job.py:67
+#: ops/serializers/job.py:66
 msgid "Time cost"
 msgstr "花费时间"
 
@@ -4771,7 +4783,7 @@ msgid "My assets"
 msgstr "我的资产"
 
 #: rbac/tree.py:58 terminal/models/applet/applet.py:52
-#: terminal/models/applet/applet.py:316 terminal/models/applet/host.py:30
+#: terminal/models/applet/applet.py:317 terminal/models/applet/host.py:30
 #: terminal/serializers/applet.py:15
 msgid "Applet"
 msgstr "远程应用"
@@ -4797,7 +4809,7 @@ msgstr "查看授权树"
 msgid "Chat AI is not enabled"
 msgstr "聊天 AI 没有开启"
 
-#: settings/api/chat.py:78 settings/api/dingtalk.py:31
+#: settings/api/chat.py:79 settings/api/dingtalk.py:31
 #: settings/api/feishu.py:36 settings/api/slack.py:34 settings/api/sms.py:160
 #: settings/api/vault.py:41 settings/api/wecom.py:37
 msgid "Test success"
@@ -4853,46 +4865,50 @@ msgid "Can change auth ticket"
 msgstr "工单设置"
 
 #: settings/models.py:165
+msgid "Can change virtual app setting"
+msgstr "可以更改虚拟应用设置"
+
+#: settings/models.py:166
 msgid "Can change auth announcement"
 msgstr "公告设置"
 
-#: settings/models.py:166
+#: settings/models.py:167
 msgid "Can change vault setting"
 msgstr "可以更改 vault 设置"
 
-#: settings/models.py:167
+#: settings/models.py:168
 msgid "Can change chat ai setting"
 msgstr "可以修改聊天 AI 设置"
 
-#: settings/models.py:168
+#: settings/models.py:169
 msgid "Can change system msg sub setting"
 msgstr "消息订阅设置"
 
-#: settings/models.py:169
+#: settings/models.py:170
 msgid "Can change sms setting"
 msgstr "短信设置"
 
-#: settings/models.py:170
+#: settings/models.py:171
 msgid "Can change security setting"
 msgstr "安全设置"
 
-#: settings/models.py:171
+#: settings/models.py:172
 msgid "Can change clean setting"
 msgstr "定期清理"
 
-#: settings/models.py:172
+#: settings/models.py:173
 msgid "Can change interface setting"
 msgstr "界面设置"
 
-#: settings/models.py:173
+#: settings/models.py:174
 msgid "Can change license setting"
 msgstr "许可证设置"
 
-#: settings/models.py:174
+#: settings/models.py:175
 msgid "Can change terminal setting"
 msgstr "终端设置"
 
-#: settings/models.py:175
+#: settings/models.py:176
 msgid "Can change other setting"
 msgstr "其它设置"
 
@@ -5362,11 +5378,11 @@ msgstr "单位: 秒"
 msgid "Enable WeCom Auth"
 msgstr "启用企业微信认证"
 
-#: settings/serializers/basic.py:9
+#: settings/serializers/basic.py:11
 msgid "Site url"
 msgstr "当前站点 URL"
 
-#: settings/serializers/basic.py:11
+#: settings/serializers/basic.py:13
 msgid ""
 "External URL, email links or other system callbacks are used to access it, "
 "eg: http://dev.jumpserver.org:8080"
@@ -5374,37 +5390,41 @@ msgstr ""
 "外部可访问的 URL, 用于邮件链接或其它系统回调, 例如: http://dev.jumpserver."
 "org:8080"
 
-#: settings/serializers/basic.py:16
+#: settings/serializers/basic.py:18
 msgid "User guide url"
 msgstr "用户向导URL"
 
-#: settings/serializers/basic.py:17
+#: settings/serializers/basic.py:19
 msgid "User first login update profile done redirect to it"
 msgstr "用户第一次登录，修改profile后重定向到地址, 可以是 wiki 或 其他说明文档"
 
-#: settings/serializers/basic.py:20
+#: settings/serializers/basic.py:22
 msgid "Global organization name"
 msgstr "全局组织名"
 
-#: settings/serializers/basic.py:21
+#: settings/serializers/basic.py:23
 msgid "The name of global organization to display"
 msgstr "全局组织的显示名称，默认为 全局组织"
 
-#: settings/serializers/basic.py:24
+#: settings/serializers/basic.py:26
 msgid "Help Docs URL"
 msgstr "文档链接"
 
-#: settings/serializers/basic.py:25
+#: settings/serializers/basic.py:27
 msgid "default: http://docs.jumpserver.org"
 msgstr "默认: http://dev.jumpserver.org:8080"
 
-#: settings/serializers/basic.py:28
+#: settings/serializers/basic.py:30
 msgid "Help Support URL"
 msgstr "支持链接"
 
-#: settings/serializers/basic.py:29
+#: settings/serializers/basic.py:31
 msgid "default: http://www.jumpserver.org/support/"
 msgstr "默认: http://www.jumpserver.org/support/"
+
+#: settings/serializers/basic.py:44
+msgid "Organization name already exists"
+msgstr "组织名称已存在"
 
 #: settings/serializers/cleaning.py:11
 msgid "Period clean"
@@ -5471,7 +5491,7 @@ msgstr "启用 Vault"
 
 #: settings/serializers/feature.py:55
 msgid "Mount Point"
-msgstr "挂在点"
+msgstr "挂载点"
 
 #: settings/serializers/feature.py:60
 msgid "Chat AI"
@@ -5552,6 +5572,17 @@ msgstr ""
 #: xpack/plugins/cloud/serializers/account_attrs.py:20
 msgid "Access key secret"
 msgstr "Access key secret(SK)"
+#: settings/serializers/feature.py:126
+#: terminal/models/virtualapp/provider.py:17
+#: terminal/models/virtualapp/virtualapp.py:36
+#: terminal/models/virtualapp/virtualapp.py:97
+#: terminal/serializers/virtualapp.py:32
+msgid "Virtual app"
+msgstr "虚拟应用"
+
+#: settings/serializers/feature.py:129
+msgid "Enable virtual app"
+msgstr "启用虚拟应用"
 
 #: settings/serializers/msg.py:24
 msgid "SMTP host"
@@ -6287,13 +6318,13 @@ msgstr "OpenSSH 是在 windows 远程应用发布服务器中用来连接远程�
 msgid "Offline video player"
 msgstr "离线录像播放器"
 
-#: terminal/api/applet/applet.py:48 terminal/api/applet/applet.py:51
+#: terminal/api/applet/applet.py:50 terminal/api/applet/applet.py:53
 #: terminal/api/virtualapp/virtualapp.py:43
 #: terminal/api/virtualapp/virtualapp.py:46
 msgid "Invalid zip file"
 msgstr "无效的 zip 文件"
 
-#: terminal/api/applet/applet.py:65
+#: terminal/api/applet/applet.py:72
 msgid "This is enterprise edition applet"
 msgstr "企业版远程应用，在社区版中不能使用"
 
@@ -6523,7 +6554,7 @@ msgstr "只支持自定义平台"
 msgid "Missing type in platform.yml"
 msgstr "在 platform.yml 中缺少类型"
 
-#: terminal/models/applet/applet.py:318 terminal/models/applet/host.py:36
+#: terminal/models/applet/applet.py:319 terminal/models/applet/host.py:36
 #: terminal/models/applet/host.py:138
 msgid "Hosting"
 msgstr "宿主机"
@@ -6784,13 +6815,6 @@ msgstr "验证码不正确"
 msgid "You have already joined this session"
 msgstr "您已经加入过此会话"
 
-#: terminal/models/virtualapp/provider.py:17
-#: terminal/models/virtualapp/virtualapp.py:36
-#: terminal/models/virtualapp/virtualapp.py:97
-#: terminal/serializers/virtualapp.py:32
-msgid "Virtual app"
-msgstr "虚拟应用"
-
 #: terminal/models/virtualapp/virtualapp.py:32
 msgid "Providers"
 msgstr "提供商"
@@ -6934,7 +6958,7 @@ msgstr ""
 "这些账号用于连接发布的应用，账号现在分为两种类型: <br/ >一种是专用的，每个用"
 "户都有一个专用账号。 另一种是公共的，当应用不支持多开且专用的已经被使用时，会"
 "使用公共账号连接; <br />注意: 如果不开启自动创建账号, 当前发布机仅能被指定标"
-"签的资产调度到，默认不会放到调度池中"
+"签的资产调度到，默认不会放到调度池中，且需要手动维护账号"
 
 #: terminal/serializers/applet_host.py:92
 msgid "The number of public accounts created automatically"
@@ -7424,19 +7448,19 @@ msgstr "工单基本信息"
 msgid "Ticket applied info"
 msgstr "工单申请信息"
 
-#: tickets/notifications.py:109
+#: tickets/notifications.py:111
 msgid "Your has a new ticket, applicant - {}"
 msgstr "你有一个新的工单, 申请人 - {}"
 
-#: tickets/notifications.py:113
+#: tickets/notifications.py:115
 msgid "{}: New Ticket - {} ({})"
 msgstr "新工单 - {} ({})"
 
-#: tickets/notifications.py:157
+#: tickets/notifications.py:159
 msgid "Your ticket has been processed, processor - {}"
 msgstr "你的工单已被处理, 处理人 - {}"
 
-#: tickets/notifications.py:161
+#: tickets/notifications.py:163
 msgid "Ticket has processed - {} ({})"
 msgstr "你的工单已被处理, 处理人 - {} ({})"
 
@@ -8355,7 +8379,7 @@ msgstr "与"
 msgid "Or"
 msgstr "或"
 
-#: xpack/plugins/cloud/manager.py:57
+#: xpack/plugins/cloud/manager.py:56
 msgid "Account unavailable"
 msgstr "账号无效"
 

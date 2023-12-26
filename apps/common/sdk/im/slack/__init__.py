@@ -38,6 +38,9 @@ class SlackRenderer(mistune.Renderer):
             lines[i] = prefix + line[4:-5]
         return '\n'.join(lines)
 
+    def block_code(self, code, lang=None):
+        return f'`{code}`'
+
     def link(self, link, title, content):
         if title or content:
             label = str(title or content).strip()

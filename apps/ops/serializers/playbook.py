@@ -2,7 +2,6 @@ import os
 
 from rest_framework import serializers
 
-from common.serializers import ResourceLabelsMixin
 from common.serializers.fields import ReadableHiddenField
 from ops.models import Playbook
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
@@ -13,7 +12,7 @@ def parse_playbook_name(path):
     return file_name.split(".")[-2]
 
 
-class PlaybookSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
+class PlaybookSerializer(BulkOrgResourceModelSerializer):
     creator = ReadableHiddenField(default=serializers.CurrentUserDefault())
     path = serializers.FileField(required=False)
 
@@ -28,5 +27,5 @@ class PlaybookSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
         read_only_fields = ["id", "date_created", "date_updated"]
         fields = read_only_fields + [
             "id", 'path', "name", "comment", "creator",
-            'create_method', 'vcs_url', 'labels'
+            'create_method', 'vcs_url',
         ]

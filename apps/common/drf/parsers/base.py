@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.exceptions import ParseError, APIException
 from rest_framework.parsers import BaseParser
 
-from common.serializers.fields import ObjectRelatedField
+from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from common.utils import get_logger
 
 logger = get_logger(__file__)
@@ -126,6 +126,10 @@ class BaseFileParser(BaseParser):
                 value = [self.id_name_to_obj(v) for v in value]
             else:
                 value = self.id_name_to_obj(value)
+        elif isinstance(field, LabeledChoiceField):
+            value = self.id_name_to_obj(value)
+            if isinstance(value, dict) and value.get('pk'):
+                value = value.get('pk')
         elif isinstance(field, serializers.ListSerializer):
             value = [self.parse_value(field.child, v) for v in value]
         elif isinstance(field, serializers.Serializer):

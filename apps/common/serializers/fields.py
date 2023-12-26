@@ -57,24 +57,18 @@ class EncryptedField(serializers.CharField):
 
 
 class LabeledChoiceField(ChoiceField):
-    def __init__(self, *args, **kwargs):
-        super(LabeledChoiceField, self).__init__(*args, **kwargs)
-
-    @property
-    def choice_mapper(self):
-        return {
-            key: value for key, value in self.choices.items()
-        }
-
     def to_representation(self, key):
         if key is None:
             return key
-        label = self.choice_mapper.get(key, key)
+        label = self.choices.get(key, key)
         return {"value": key, "label": label}
 
     def to_internal_value(self, data):
         if isinstance(data, dict):
             data = data.get("value")
+
+        if isinstance(data, str) and "(" in data and data.endswith(")"):
+            data = data.strip(")").split('(')[-1]
         return super(LabeledChoiceField, self).to_internal_value(data)
 
 

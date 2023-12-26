@@ -1,10 +1,10 @@
 {% load i18n %}
 
-<h3>{% trans 'Respectful' %}{{ recipient }}，</h3>
+<h3>{% trans 'Respectful' %}: {{ recipient.name }}[{{ recipient.username }}]</h3>
 <hr>
-<p><strong>{% trans 'Username' %}:</strong> [{{ username }}]</p>
+<p><strong>{% trans 'User' %}:</strong> [{{ name }}({{ username }})]</p>
 <p><strong>{% trans 'Assets' %}:</strong> [{{ asset }}]</p>
-<p><strong>{% trans 'Account' %}:</strong> [{{ account }}]</p>
+<p><strong>{% trans 'Account' %}:</strong> [{{ account_name }}({{ account }})]</p>
 <hr>
 
 <p>{% trans 'The user has just logged in to the asset. Please ensure that this is an authorized operation. If you suspect that this is an unauthorized access, please take appropriate measures immediately.' %}</p>

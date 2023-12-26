@@ -105,7 +105,8 @@ class BaseFileRenderer(BaseRenderer):
         elif isinstance(value, bool):
             value = 'Yes' if value else 'No'
         elif isinstance(field, LabeledChoiceField):
-            value = value.get('value', '')
+            value = value or {}
+            value = '{}({})'.format(value.get('label'), value.get('value'))
         elif isinstance(field, ObjectRelatedField):
             if field.many:
                 value = [self.to_id_name(v) for v in value]

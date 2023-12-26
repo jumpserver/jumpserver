@@ -172,8 +172,9 @@ class Applet(JMSBaseModel):
             return None
 
         spec_label = asset.labels.filter(label__name__in=['AppletHost', '发布机']).first()
-        if spec_label:
-            matched = [host for host in hosts if host.name == spec_label.value]
+        if spec_label and spec_label.label:
+            label_value = spec_label.label.value
+            matched = [host for host in hosts if host.name == label_value]
             if matched:
                 return matched[0]
 
@@ -301,7 +302,7 @@ class Applet(JMSBaseModel):
             'account': account,
             'lock_key': lock_key
         }
-        logger.debug('Select host and account: {}'.format(res))
+        logger.debug('Select host and account: {}-{}'.format(host.name, account.username))
         return res
 
     def delete(self, using=None, keep_parents=False):

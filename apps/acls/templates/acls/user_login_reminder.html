@@ -1,8 +1,8 @@
 {% load i18n %}
 
-<h3>{% trans 'Respectful' %}{{ recipient }}，</h3>
+<h3>{% trans 'Respectful' %}: {{ recipient.name }}[{{ recipient.username }}]</h3>
 <hr>
-<p><strong>{% trans 'Username' %}:</strong> [{{ username }}]</p>
+<p><strong>{% trans 'User' %}:</strong> [{{ username }}]</p>
 <p><strong>IP:</strong> [{{ ip }}]</p>
 <p><strong>{% trans 'Login city' %}:</strong> [{{ city }}]</p>
 <p><strong>{% trans 'User agent' %}:</strong> [{{ user_agent }}]</p>
