@@ -111,9 +111,9 @@ def on_asset_permission_user_groups_changed(sender, instance, action, pk_set, re
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
 def on_node_asset_change(action, instance, reverse, pk_set, **kwargs):
-    print("Asset node changed: ", action)
     if not need_rebuild_mapping_node(action):
         return
+    print("Asset node changed: ", action)
     if reverse:
         asset_ids = pk_set
         node_ids = [instance.id]

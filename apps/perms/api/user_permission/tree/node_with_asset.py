@@ -1,5 +1,4 @@
 import abc
-import re
 from collections import defaultdict
 from urllib.parse import parse_qsl
 
@@ -13,7 +12,6 @@ from rest_framework.response import Response
 
 from accounts.const import AliasAccount
 from assets.api import SerializeToTreeNodeMixin
-from assets.const import AllTypes
 from assets.models import Asset
 from assets.utils import KubernetesTree
 from authentication.models import ConnectionToken
@@ -156,55 +154,45 @@ class UserPermedNodeChildrenWithAssetsAsCategoryTreeApi(
 
     @property
     def tp(self):
-        return self.request.query_params.get('type')
-
-    def get_assets(self):
-        query_asset_util = UserPermAssetUtil(self.user)
-        node = PermNode.objects.filter(
-            granted_node_rels__user=self.user, parent_key='').first()
-        if node:
-            __, assets = query_asset_util.get_node_all_assets(node.id)
-        else:
-            assets = Asset.objects.none()
-        return assets
-
-    def to_tree_nodes(self, assets):
-        if not assets:
-            return []
-        assets = assets.annotate(tp=F('platform__type'))
-        asset_type_map = defaultdict(list)
-        for asset in assets:
-            asset_type_map[asset.tp].append(asset)
-        tp = self.tp
-        if tp:
-            assets = asset_type_map.get(tp, [])
-            if not assets:
-                return []
-            pid = f'ROOT_{str(assets[0].category).upper()}_{tp}'
-            return self.serialize_assets(assets, pid=pid)
         params = self.request.query_params
-        get_root = not list(filter(lambda x: params.get(x), ('type', 'n')))
-        resource_platforms = assets.order_by('id').values_list('platform_id', flat=True)
-        node_all = AllTypes.get_tree_nodes(resource_platforms, get_root=get_root)
-        pattern = re.compile(r'\(0\)?')
-        nodes = []
-        for node in node_all:
-            meta = node.get('meta', {})
-            if pattern.search(node['name']) or meta.get('type') == 'platform':
-                continue
-            _type = meta.get('_type')
-            if _type:
-                node['type'] = _type
-            meta.setdefault('data', {})
-            node['meta'] = meta
-            nodes.append(node)
+        return [params.get('category'), params.get('type')]
 
-        if not self.is_sync:
+    @lazyproperty
+    def query_asset_util(self):
+        return UserPermAssetUtil(self.user)
+
+    @timeit
+    def get_assets(self):
+        return self.query_asset_util.get_all_assets()
+
+    def to_tree_nodes_async(self):
+        if not self.tp or not all(self.tp):
+            nodes = UserPermAssetUtil.get_type_nodes_tree_or_cached(self.user)
             return nodes
 
+        assets = self.get_assets().prefetch_related('platform')
+        category, tp = self.tp
+        assets = assets.filter(platform__type=tp, platform__category=category)
+        pid = f'ROOT_{category.upper()}_{tp}'
+        return self.serialize_assets(assets, pid=pid)
+
+    def to_tree_nodes_sync(self):
+        if self.request.query_params.get('lv'):
+            return []
+        nodes = self.query_asset_util.get_type_nodes_tree()
+        assets = self.get_assets().prefetch_related('platform').annotate(tp=F('platform__type'))
+        asset_type_map = defaultdict(list)
+        for asset in assets:
+            if len(asset_type_map[asset.tp]) >= 2000:
+                continue
+            asset_type_map[asset.tp].append(asset)
         asset_nodes = []
         for node in nodes:
-            node['open'] = True
+            node_tp = node.get('meta', {}).get('type')
+            if node_tp == 'type':
+                node['open'] = False
+            else:
+                node['open'] = True
             tp = node.get('meta', {}).get('_type')
             if not tp:
                 continue
@@ -212,9 +200,14 @@ class UserPermedNodeChildrenWithAssetsAsCategoryTreeApi(
             asset_nodes += self.serialize_assets(assets, pid=node['id'])
         return nodes + asset_nodes
 
+    def to_tree_nodes(self):
+        if self.is_sync:
+            return self.to_tree_nodes_sync()
+        else:
+            return self.to_tree_nodes_async()
+
     def list(self, request, *args, **kwargs):
-        assets = self.get_assets()
-        nodes = self.to_tree_nodes(assets)
+        nodes = self.to_tree_nodes()
         return Response(data=nodes)
 
 

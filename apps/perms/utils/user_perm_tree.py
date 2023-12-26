@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.db import transaction
 
-from assets.models import Asset, FavoriteAsset
+from assets.models import Asset
 from assets.utils import NodeAssetsUtil
 from common.db.models import output_as_string
 from common.decorators import on_transaction_commit, merge_delay_run
@@ -84,6 +84,19 @@ class UserPermTreeRefreshUtil(_UserPermTreeCacheMixin):
         refresh_user_orgs_perm_tree(user_orgs=((self.user, tuple(to_refresh_orgs)),))
         refresh_user_favorite_assets(users=(self.user,))
 
+    @timeit
+    def refresh_tree_manual(self):
+        built_just_now = cache.get(self.cache_key_time)
+        if built_just_now:
+            logger.info('Refresh just now, pass: {}'.format(built_just_now))
+            return
+        to_refresh_orgs = self._get_user_need_refresh_orgs()
+        if not to_refresh_orgs:
+            logger.info('Not have to refresh orgs for user: {}'.format(self.user))
+            return
+        self.perform_refresh_user_tree(to_refresh_orgs)
+
+    @timeit
     def perform_refresh_user_tree(self, to_refresh_orgs):
         # 再判断一次，毕竟构建树比较慢
         built_just_now = cache.get(self.cache_key_time)
@@ -93,26 +106,20 @@ class UserPermTreeRefreshUtil(_UserPermTreeCacheMixin):
 
         self._clean_user_perm_tree_for_legacy_org()
         ttl = settings.PERM_TREE_REGEN_INTERVAL
-        cache.set(self.cache_key_time, time.time(), ttl)
+        cache.set(self.cache_key_time, int(time.time()), ttl)
 
-        with UserGrantedTreeRebuildLock(self.user.id):
+        lock = UserGrantedTreeRebuildLock(self.user.id)
+        got = lock.acquire(blocking=False)
+        if not got:
+            logger.info('User perm tree rebuild lock not acquired, pass')
+            return
+
+        try:
             for org in to_refresh_orgs:
                 self._rebuild_user_perm_tree_for_org(org)
-        self._mark_user_orgs_refresh_finished(to_refresh_orgs)
-
-    def perform_refresh_favorite_assets(self):
-        query_asset_util = UserPermAssetUtil(self.user)
-        favor_ids = FavoriteAsset.objects.filter(user=self.user).values_list('asset_id', flat=True)
-        favor_ids = set(favor_ids)
-
-        with tmp_to_root_org():
-            valid_ids = query_asset_util.get_all_assets() \
-                .filter(id__in=favor_ids) \
-                .values_list('id', flat=True)
-            valid_ids = set(valid_ids)
-
-        invalid_ids = favor_ids - valid_ids
-        FavoriteAsset.objects.filter(user=self.user, asset_id__in=invalid_ids).delete()
+            self._mark_user_orgs_refresh_finished(to_refresh_orgs)
+        finally:
+            lock.release()
 
     def _rebuild_user_perm_tree_for_org(self, org):
         with tmp_to_org(org):
@@ -120,7 +127,7 @@ class UserPermTreeRefreshUtil(_UserPermTreeCacheMixin):
             UserPermTreeBuildUtil(self.user).rebuild_user_perm_tree()
             end = time.time()
             logger.info(
-                'Refresh user [{user}] org [{org}] perm tree, use {use_time:.2f}s'
+                'Refresh user perm tree: [{user}] of [{org}] {use_time:.2f}s'
                 ''.format(user=self.user, org=org, use_time=end - start)
             )
 
@@ -207,8 +214,9 @@ def refresh_user_orgs_perm_tree(user_orgs=()):
 @merge_delay_run(ttl=20)
 def refresh_user_favorite_assets(users=()):
     for user in users:
-        util = UserPermTreeRefreshUtil(user)
-        util.perform_refresh_favorite_assets()
+        util = UserPermAssetUtil(user)
+        util.refresh_favorite_assets()
+        util.refresh_type_nodes_tree_cache()
 
 
 class UserPermTreeBuildUtil(object):

@@ -94,7 +94,6 @@ class DistributedLock(RedisLock):
         if self.locked():
             owner_id = self.get_owner_id()
             local_owner_id = getattr(thread_local, self.name, None)
-
             if local_owner_id and owner_id == local_owner_id:
                 return True
         return False

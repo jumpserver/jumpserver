@@ -1,12 +1,21 @@
-from django.conf import settings
-from django.db.models import Q
+import json
+import re
 
+from django.conf import settings
+from django.core.cache import cache
+from django.db.models import Q
+from rest_framework.utils.encoders import JSONEncoder
+
+from assets.const import AllTypes
 from assets.models import FavoriteAsset, Asset
-from common.utils.common import timeit, lazyproperty
+from common.utils.common import timeit, get_logger
+from orgs.utils import current_org, tmp_to_root_org
 from perms.models import PermNode, UserAssetGrantedTreeNodeRelation
 from .permission import AssetPermissionUtil
 
 __all__ = ['AssetPermissionPermAssetUtil', 'UserPermAssetUtil', 'UserPermNodeUtil']
+
+logger = get_logger(__name__)
 
 
 class AssetPermissionPermAssetUtil:
@@ -14,35 +23,33 @@ class AssetPermissionPermAssetUtil:
     def __init__(self, perm_ids):
         self.perm_ids = perm_ids
 
-    @lazyproperty
-    def all_permed_assets_ids(self):
-        node_asset_ids = self.get_perm_nodes_assets(flat=True)
-        direct_asset_ids = self.get_direct_assets(flat=True)
-        asset_ids = list(node_asset_ids) + list(direct_asset_ids)
-        return [str(i) for i in asset_ids]
-
     def get_all_assets(self):
         """ 获取所有授权的资产 """
-        assets = Asset.objects.filter(id__in=self.all_permed_assets_ids)
-        return assets
+        node_assets = self.get_perm_nodes_assets()
+        direct_assets = self.get_direct_assets()
+        return (node_assets | direct_assets).distinct()
 
+    @timeit
     def get_perm_nodes_assets(self, flat=False):
         """ 获取所有授权节点下的资产 """
         from assets.models import Node
-        nodes = Node.objects.prefetch_related('granted_by_permissions').filter(
-            granted_by_permissions__in=self.perm_ids).only('id', 'key')
+        nodes = Node.objects \
+            .prefetch_related('granted_by_permissions') \
+            .filter(granted_by_permissions__in=self.perm_ids) \
+            .only('id', 'key')
         assets = PermNode.get_nodes_all_assets(*nodes)
         if flat:
-            return assets.values_list('id', flat=True)
+            return set(assets.values_list('id', flat=True))
         return assets
 
+    @timeit
     def get_direct_assets(self, flat=False):
         """ 获取直接授权的资产 """
         assets = Asset.objects.order_by() \
             .filter(granted_by_permissions__id__in=self.perm_ids) \
             .distinct()
         if flat:
-            return assets.values_list('id', flat=True)
+            return set(assets.values_list('id', flat=True))
         return assets
 
 
@@ -62,6 +69,55 @@ class UserPermAssetUtil(AssetPermissionPermAssetUtil):
         asset_ids = FavoriteAsset.objects.filter(user=self.user).values_list('asset_id', flat=True)
         assets = assets.filter(id__in=list(asset_ids))
         return assets
+
+    def get_type_nodes_tree(self):
+        assets = self.get_all_assets()
+        resource_platforms = assets.order_by('id').values_list('platform_id', flat=True)
+        node_all = AllTypes.get_tree_nodes(resource_platforms, get_root=True)
+        pattern = re.compile(r'\(0\)?')
+        nodes = []
+        for node in node_all:
+            meta = node.get('meta', {})
+            if pattern.search(node['name']) or meta.get('type') == 'platform':
+                continue
+            _type = meta.get('_type')
+            if _type:
+                node['type'] = _type
+                node['category'] = meta.get('category')
+            meta.setdefault('data', {})
+            node['meta'] = meta
+            nodes.append(node)
+        return nodes
+
+    @classmethod
+    def get_type_nodes_tree_or_cached(cls, user):
+        key = f'perms:type-nodes-tree:{user.id}:{current_org.id}'
+        nodes = cache.get(key)
+        if nodes is None:
+            nodes = cls(user).get_type_nodes_tree()
+            nodes_json = json.dumps(nodes, cls=JSONEncoder)
+            cache.set(key, nodes_json, 60 * 60 * 24)
+        else:
+            nodes = json.loads(nodes)
+        return nodes
+
+    def refresh_type_nodes_tree_cache(self):
+        logger.debug("Refresh type nodes tree cache")
+        key = f'perms:type-nodes-tree:{self.user.id}:{current_org.id}'
+        cache.delete(key)
+
+    def refresh_favorite_assets(self):
+        favor_ids = FavoriteAsset.objects.filter(user=self.user).values_list('asset_id', flat=True)
+        favor_ids = set(favor_ids)
+
+        with tmp_to_root_org():
+            valid_ids = self.get_all_assets() \
+                .filter(id__in=favor_ids) \
+                .values_list('id', flat=True)
+            valid_ids = set(valid_ids)
+
+        invalid_ids = favor_ids - valid_ids
+        FavoriteAsset.objects.filter(user=self.user, asset_id__in=invalid_ids).delete()
 
     def get_node_assets(self, key):
         node = PermNode.objects.get(key=key)
