@@ -72,7 +72,7 @@ class GatherAccountsManager(AccountBasePlaybookManager):
                     )
                     gathered_accounts.append(gathered_account)
                 if not self.is_sync_account:
-                    return
+                    continue
                 GatheredAccount.sync_accounts(gathered_accounts)
 
     def run(self, *args, **kwargs):
