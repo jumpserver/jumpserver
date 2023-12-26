@@ -265,6 +265,7 @@ class FamilyMixin:
 class NodeAllAssetsMappingMixin:
     # { org_id: { node_key: [ asset1_id, asset2_id ] } }
     orgid_nodekey_assetsid_mapping = defaultdict(dict)
+    orgid_nodekey_children_mapping = defaultdict(dict)
     locks_for_get_mapping_from_cache = defaultdict(threading.Lock)
 
     @classmethod
@@ -292,21 +293,6 @@ class NodeAllAssetsMappingMixin:
     @classmethod
     def set_node_all_asset_ids_mapping_to_memory(cls, org_id, mapping):
         cls.orgid_nodekey_assetsid_mapping[org_id] = mapping
-
-    @classmethod
-    def update_assets_mapping(cls, nodes):
-        keys = [n.key for n in nodes]
-        all_ancestor_keys_map = defaultdict(set)
-        all_ancestor_keys = set()
-
-        for key in keys:
-            ancestor_keys = set(Node.get_node_ancestor_keys(key, with_self=True))
-            all_ancestor_keys.update(ancestor_keys)
-            all_ancestor_keys_map[key] = ancestor_keys
-
-        rels = cls.assets.through.objects \
-            .filter(node__key__in=all_ancestor_keys) \
-            .values_list('node__key', 'asset_id')
 
     @classmethod
     def expire_node_all_asset_ids_memory_mapping(cls, org_id):
@@ -359,9 +345,8 @@ class NodeAllAssetsMappingMixin:
         return 'ASSETS_ORG_NODE_ALL_ASSET_ids_MAPPING_{}'.format(org_id)
 
     @classmethod
+    @timeit
     def generate_node_all_asset_ids_mapping(cls, org_id):
-        from .asset import Asset
-
         logger.info(f'Generate node asset mapping: org_id={org_id}')
         t1 = time.time()
         with tmp_to_org(org_id):
@@ -375,7 +360,7 @@ class NodeAllAssetsMappingMixin:
             }
 
             # * 直接取出全部. filter(node__org_id=org_id)(大规模下会更慢)
-            nodes_asset_ids = Asset.nodes.through.objects.all() \
+            nodes_asset_ids = cls.assets.through.objects.all() \
                 .annotate(char_node_id=output_as_string('node_id')) \
                 .annotate(char_asset_id=output_as_string('asset_id')) \
                 .values_list('char_node_id', 'char_asset_id')

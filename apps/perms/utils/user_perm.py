@@ -27,6 +27,7 @@ class AssetPermissionPermAssetUtil:
         """ 获取所有授权的资产 """
         node_assets = self.get_perm_nodes_assets()
         direct_assets = self.get_direct_assets()
+        # 比原来的查到所有 asset id 再搜索块很多，因为当资产量大的时候，搜索会很慢
         return (node_assets | direct_assets).distinct()
 
     @timeit
