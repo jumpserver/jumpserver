@@ -26,10 +26,11 @@
     - name: Verify password (pyfreerdp)
       rdp_ping:
         login_host: "{{ jms_asset.address }}"
-        login_port: "{{ jms_asset.protocols | selectattr('name', 'equalto', 'rdp') | map(attribute='port') | first }}"
+        login_port: "{{ jms_asset.rdp_port }}"
         login_user: "{{ account.username }}"
         login_password: "{{ account.secret }}"
         login_secret_type: "{{ account.secret_type }}"
         login_private_key_path: "{{ account.private_key_path }}"
+        gateway_args: "{{ jms_asset.ansible_ssh_common_args | default('') }}"
       when: account.secret_type == "password"
       delegate_to: localhost

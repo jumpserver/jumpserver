@@ -31,5 +31,6 @@
         login_password: "{{ account.secret }}"
         login_secret_type: "{{ account.secret_type }}"
         login_private_key_path: "{{ account.private_key_path }}"
+        gateway_args: "{{ jms_asset.ansible_ssh_common_args | default('') }}"
       when: account.secret_type == "password"
       delegate_to: localhost

@@ -124,10 +124,10 @@ class JMSInventory:
                     'private_key_path': gateway.private_key_path
                 }
                 host['jms_asset']['port'] = port
-            else:
-                ansible_ssh_common_args = self.make_proxy_command(gateway)
-                host['jms_asset'].update(ansible_ssh_common_args)
-                host.update(ansible_ssh_common_args)
+
+            ansible_ssh_common_args = self.make_proxy_command(gateway)
+            host['jms_asset'].update(ansible_ssh_common_args)
+            host.update(ansible_ssh_common_args)
 
     def get_primary_protocol(self, ansible_config, protocols):
         invalid_protocol = type('protocol', (), {'name': 'null', 'port': 0})
@@ -182,6 +182,7 @@ class JMSInventory:
         }
 
         protocols = host['jms_asset']['protocols']
+        host['jms_asset'].update({f'{i["name"]}_port': i["port"] for i in protocols})
         host['jms_asset'].update({f"{p['name']}_port": p['port'] for p in protocols})
         if host['jms_account'] and tp == 'oracle':
             host['jms_account']['mode'] = 'sysdba' if account.privileged else None
