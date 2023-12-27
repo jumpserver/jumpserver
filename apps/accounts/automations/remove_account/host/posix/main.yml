@@ -16,10 +16,11 @@
     - name: "Rename user home directory if it exists"
       ansible.builtin.command:
         cmd: "mv {{ user_home_dir.stdout }} {{ user_home_dir.stdout }}.bak"
-      when: home_dir.stat.exists and user_home_dir.stdout != ""
+      when: home_dir.stat | default(false) and user_home_dir.stdout != ""
 
     - name: "Remove account"
       ansible.builtin.user:
         name: "{{ account.username }}"
         state: absent
         remove: "{{ home_dir.stat.exists }}"
+      when: home_dir.stat | default(false)
