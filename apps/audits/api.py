@@ -5,6 +5,7 @@ from importlib import import_module
 
 from django.conf import settings
 from django.db.models import F, Value, CharField, Q
+from django.db.models.functions import Cast
 from django.http import HttpResponse, FileResponse
 from django.utils.encoding import escape_uri_path
 from rest_framework import generics
@@ -163,7 +164,7 @@ class ResourceActivityAPIView(generics.ListAPIView):
             q |= Q(user=str(user))
         queryset = OperateLog.objects.filter(q, org_q).annotate(
             r_type=Value(ActivityChoices.operate_log, CharField()),
-            r_detail_id=F('id'), r_detail=Value(None, CharField()),
+            r_detail_id=Cast(F('id'), CharField()), r_detail=Value(None, CharField()),
             r_user=F('user'), r_action=F('action'),
         ).values(*fields)[:limit]
         return queryset
