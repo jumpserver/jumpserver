@@ -18,7 +18,7 @@ class UserUserGroupRelationViewSet(JMSBulkRelationModelViewSet):
     m2m_field = User.groups.field
     rbac_perms = {
         'create': 'users.change_usergroup',
-        'destroy': 'users.change_usergroup'
+        'bulk_destroy': 'users.change_usergroup',
     }
 
     def get_queryset(self):
