@@ -16,7 +16,8 @@ __all__ = [
 
 class UserGroupSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
     users = ObjectRelatedField(
-        required=False, many=True, queryset=User.objects, label=_('User'),
+        required=False, many=True, queryset=User.objects,
+        attrs=("id", "name", "is_service_account"), label=_('User'),
     )
 
     class Meta:
