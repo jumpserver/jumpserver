@@ -145,6 +145,7 @@ user-agents = "^2.2.0"
 django-cors-headers = "^4.3.0"
 mistune = "0.8.4"
 openai = "^1.3.7"
+xlsxwriter = "^3.1.9"
 
 
 [tool.poetry.group.xpack.dependencies]

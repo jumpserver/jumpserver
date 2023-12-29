@@ -7,14 +7,14 @@ from ..models import Permission
 __all__ = ['PermissionSerializer', 'UserPermsSerializer']
 
 
-class ContentTypeSerializer(serializers.ModelSerializer):
+class PermissionContentTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContentType
         fields = ['id', 'app_label', 'model']
 
 
 class PermissionSerializer(serializers.ModelSerializer):
-    content_type = ContentTypeSerializer(read_only=True)
+    content_type = PermissionContentTypeSerializer(read_only=True)
 
     class Meta:
         model = Permission

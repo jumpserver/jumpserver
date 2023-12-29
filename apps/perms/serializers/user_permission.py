@@ -10,6 +10,7 @@ from assets.const import Category, AllTypes
 from assets.models import Node, Asset, Platform
 from assets.serializers.asset.common import AssetLabelSerializer, AssetProtocolsPermsSerializer
 from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
+from common.serializers import ResourceLabelsMixin
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from perms.serializers.permission import ActionChoicesField
 
@@ -19,12 +20,11 @@ __all__ = [
 ]
 
 
-class AssetPermedSerializer(OrgResourceModelSerializerMixin):
+class AssetPermedSerializer(OrgResourceModelSerializerMixin, ResourceLabelsMixin):
     """ 被授权资产的数据结构 """
     platform = ObjectRelatedField(required=False, queryset=Platform.objects, label=_('Platform'))
     category = LabeledChoiceField(choices=Category.choices, read_only=True, label=_('Category'))
     type = LabeledChoiceField(choices=AllTypes.choices(), read_only=True, label=_('Type'))
-    labels = AssetLabelSerializer(many=True, required=False, label=_('Label'))
     domain = ObjectRelatedField(required=False, queryset=Node.objects, label=_('Domain'))
 
     class Meta:
