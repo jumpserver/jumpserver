@@ -26,6 +26,7 @@ def common_argument_spec():
 
 
 class SSHClient:
+    TIMEOUT = 20
     SLEEP_INTERVAL = 2
     COMPLETE_FLAG = 'complete'
 
@@ -170,7 +171,12 @@ class SSHClient:
                     time.sleep(self.SLEEP_INTERVAL)
                     output += self._get_recv()
                     continue
+                start_time = time.time()
                 while self.COMPLETE_FLAG not in output:
+                    if time.time() - start_time > self.TIMEOUT:
+                        error_msg = output
+                        print("切换用户操作超时，跳出循环。")
+                        break
                     time.sleep(self.SLEEP_INTERVAL)
                     received_output = self._get_recv().replace(f'"{self.COMPLETE_FLAG}"', '')
                     output += received_output

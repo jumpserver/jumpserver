@@ -217,6 +217,7 @@ class JobExecutionTaskDetail(APIView):
             'is_success': execution.is_success,
             'time_cost': execution.time_cost,
             'job_id': execution.job.id,
+            'summary': execution.summary
         })
 
 

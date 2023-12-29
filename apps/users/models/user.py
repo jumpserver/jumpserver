@@ -867,6 +867,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, LabeledMixin, JSONFilterM
         queryset = cls.objects.all()
         if not current_org.is_root():
             queryset = current_org.get_members()
+        queryset = queryset.exclude(is_service_account=True)
         return queryset
 
     @property
