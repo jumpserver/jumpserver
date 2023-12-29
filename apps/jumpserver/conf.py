@@ -17,7 +17,7 @@ import re
 import sys
 import types
 from importlib import import_module
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, quote
 
 import yaml
 from django.urls import reverse_lazy
@@ -693,6 +693,13 @@ class Config(dict):
         if openid_config:
             self.set_openid_config(openid_config)
 
+    def compatible_redis(self):
+        redis_config = {
+            'REDIS_PASSWORD': quote(str(self.REDIS_PASSWORD)),
+        }
+        for key, value in redis_config.items():
+            self[key] = value
+
     def compatible(self):
         """
         对配置做兼容处理
@@ -704,6 +711,8 @@ class Config(dict):
         """
         # 兼容 OpenID 配置
         self.compatible_auth_openid()
+        # 兼容 Redis 配置
+        self.compatible_redis()
 
     def convert_type(self, k, v):
         default_value = self.defaults.get(k)
