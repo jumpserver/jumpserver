@@ -2,13 +2,23 @@ import os
 
 from celery import shared_task
 from django.conf import settings
-from django.core.mail import send_mail, EmailMultiAlternatives
+from django.core.mail import send_mail, EmailMultiAlternatives, get_connection
 from django.utils.translation import gettext_lazy as _
 import jms_storage
 
 from .utils import get_logger
 
 logger = get_logger(__file__)
+
+
+def get_email_connection(**kwargs):
+    email_backend_map = {
+        'smtp': 'django.core.mail.backends.smtp.EmailBackend',
+        'exchange': 'jumpserver.rewriting.exchange.EmailBackend'
+    }
+    return get_connection(
+        backend=email_backend_map.get(settings.EMAIL_PROTOCOL), **kwargs
+    )
 
 
 def task_activity_callback(self, subject, message, recipient_list, *args, **kwargs):
@@ -40,7 +50,7 @@ def send_mail_async(*args, **kwargs):
 
     args = tuple(args)
     try:
-        return send_mail(*args, **kwargs)
+        return send_mail(connection=get_email_connection(), *args, **kwargs)
     except Exception as e:
         logger.error("Sending mail error: {}".format(e))
 
@@ -55,7 +65,8 @@ def send_mail_attachment_async(subject, message, recipient_list, attachment_list
         subject=subject,
         body=message,
         from_email=from_email,
-        to=recipient_list
+        to=recipient_list,
+        connection=get_email_connection(),
     )
     for attachment in attachment_list:
         email.attach_file(attachment)
