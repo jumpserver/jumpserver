@@ -265,7 +265,6 @@ class FamilyMixin:
 class NodeAllAssetsMappingMixin:
     # { org_id: { node_key: [ asset1_id, asset2_id ] } }
     orgid_nodekey_assetsid_mapping = defaultdict(dict)
-    orgid_nodekey_children_mapping = defaultdict(dict)
     locks_for_get_mapping_from_cache = defaultdict(threading.Lock)
 
     @classmethod
