@@ -22,15 +22,15 @@ class URL:
     AUTH_TEST = 'https://slack.com/api/auth.test'
 
 
-class SlackRenderer(mistune.Renderer):
-    def header(self, text, level, raw=None):
+class SlackRenderer(mistune.renderers.HTMLRenderer):
+    def heading(self, text, level):
         return '*' + text + '*\n'
 
-    def double_emphasis(self, text):
+    def strong(self, text):
         return '*' + text + '*'
 
-    def list(self, body, ordered=True):
-        lines = body.split('\n')
+    def list(self, text, **kwargs):
+        lines = text.split('\n')
         for i, line in enumerate(lines):
             if not line:
                 continue
@@ -41,9 +41,9 @@ class SlackRenderer(mistune.Renderer):
     def block_code(self, code, lang=None):
         return f'`{code}`'
 
-    def link(self, link, title, content):
-        if title or content:
-            label = str(title or content).strip()
+    def link(self, link, text=None, title=None):
+        if title or text:
+            label = str(title or text).strip()
             return f'<{link}|{label}>'
         return f'<{link}>'
 
