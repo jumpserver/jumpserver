@@ -21,7 +21,6 @@ from common.drf.filters import BaseFilterSet, AttrRulesFilterBackend
 from common.utils import get_logger, is_uuid
 from orgs.mixins import generics
 from orgs.mixins.api import OrgBulkModelViewSet
-from ..mixin import NodeFilterMixin
 from ...notifications import BulkUpdatePlatformSkipAssetUserMsg
 
 logger = get_logger(__file__)
@@ -86,7 +85,7 @@ class AssetFilterSet(BaseFilterSet):
         return queryset.filter(protocols__name__in=value).distinct()
 
 
-class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
+class AssetViewSet(SuggestionMixin, OrgBulkModelViewSet):
     """
     API endpoint that allows Asset to be viewed or edited.
     """
@@ -114,9 +113,7 @@ class AssetViewSet(SuggestionMixin, NodeFilterMixin, OrgBulkModelViewSet):
     ]
 
     def get_queryset(self):
-        queryset = super().get_queryset() \
-            .prefetch_related('nodes', 'protocols') \
-            .select_related('platform', 'domain')
+        queryset = super().get_queryset()
         if queryset.model is not Asset:
             queryset = queryset.select_related('asset_ptr')
         return queryset

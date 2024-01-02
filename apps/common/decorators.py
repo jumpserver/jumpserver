@@ -65,7 +65,7 @@ class EventLoopThread(threading.Thread):
 
 
 _loop_thread = EventLoopThread()
-_loop_thread.setDaemon(True)
+_loop_thread.daemon = True
 _loop_thread.start()
 executor = ThreadPoolExecutor(
     max_workers=10,

@@ -17,6 +17,7 @@ from resources.assets import AssetsGenerator, NodesGenerator, PlatformGenerator
 from resources.users import UserGroupGenerator, UserGenerator
 from resources.perms import AssetPermissionGenerator
 from resources.terminal import CommandGenerator, SessionGenerator
+from resources.accounts import AccountGenerator
 
 resource_generator_mapper = {
     'asset': AssetsGenerator,
@@ -27,6 +28,7 @@ resource_generator_mapper = {
     'asset_permission': AssetPermissionGenerator,
     'command': CommandGenerator,
     'session': SessionGenerator,
+    'account': AccountGenerator,
     'all': None
     # 'stat': StatGenerator
 }
@@ -45,6 +47,7 @@ def main():
     parser.add_argument('-o', '--org', type=str, default='')
     args = parser.parse_args()
     resource, count, batch_size, org_id = args.resource, args.count, args.batch_size, args.org
+    resource = resource.lower().rstrip('s')
 
     generator_cls = []
     if resource == 'all':

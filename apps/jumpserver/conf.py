@@ -531,6 +531,7 @@ class Config(dict):
         'SYSLOG_SOCKTYPE': 2,
 
         'PERM_EXPIRED_CHECK_PERIODIC': 60 * 60,
+        'PERM_TREE_REGEN_INTERVAL': 1,
         'FLOWER_URL': "127.0.0.1:5555",
         'LANGUAGE_CODE': 'zh',
         'TIME_ZONE': 'Asia/Shanghai',

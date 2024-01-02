@@ -2,7 +2,7 @@ from typing import List
 
 from rest_framework.request import Request
 
-from assets.models import Node, Protocol
+from assets.models import Node, Platform, Protocol
 from assets.utils import get_node_from_request, is_query_node_all_assets
 from common.utils import lazyproperty, timeit
 
@@ -71,37 +71,43 @@ class SerializeToTreeNodeMixin:
             return 'file'
 
     @timeit
-    def serialize_assets(self, assets, node_key=None, pid=None):
-        if node_key is None:
-            get_pid = lambda asset: getattr(asset, 'parent_key', '')
-        else:
-            get_pid = lambda asset: node_key
+    def serialize_assets(self, assets, node_key=None, get_pid=None):
+        if not get_pid and not node_key:
+            get_pid = lambda asset, platform: getattr(asset, 'parent_key', '')
+
         sftp_asset_ids = Protocol.objects.filter(name='sftp') \
             .values_list('asset_id', flat=True)
-        sftp_asset_ids = list(sftp_asset_ids)
-        data = [
-            {
+        sftp_asset_ids = set(sftp_asset_ids)
+        platform_map = {p.id: p for p in Platform.objects.all()}
+
+        data = []
+        for asset in assets:
+            platform = platform_map.get(asset.platform_id)
+            if not platform:
+                continue
+            pid = node_key or get_pid(asset, platform)
+            if not pid or pid.isdigit():
+                continue
+            data.append({
                 'id': str(asset.id),
                 'name': asset.name,
-                'title': f'{asset.address}\n{asset.comment}',
-                'pId': pid or get_pid(asset),
+                'title': f'{asset.address}\n{asset.comment}'.strip(),
+                'pId': pid,
                 'isParent': False,
                 'open': False,
-                'iconSkin': self.get_icon(asset),
+                'iconSkin': self.get_icon(platform),
                 'chkDisabled': not asset.is_active,
                 'meta': {
                     'type': 'asset',
                     'data': {
-                        'platform_type': asset.platform.type,
+                        'platform_type': platform.type,
                         'org_name': asset.org_name,
                         'sftp': asset.id in sftp_asset_ids,
                         'name': asset.name,
                         'address': asset.address
                     },
                 }
-            }
-            for asset in assets
-        ]
+            })
         return data
 
 
