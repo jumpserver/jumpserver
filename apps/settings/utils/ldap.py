@@ -423,12 +423,11 @@ class LDAPImportUtil(object):
         logger.info('End perform import ldap users')
         return errors
 
-    @staticmethod
-    def exit_user_group(user_groups_mapper):
+    def exit_user_group(self, user_groups_mapper):
         # 通过对比查询本次导入用户需要移除的用户组
         group_remove_users_mapper = defaultdict(set)
         for user, current_groups in user_groups_mapper.items():
-            old_groups = set(user.groups.all())
+            old_groups = set(user.groups.filter(name__startswith=self.user_group_name_prefix))
             exit_groups = old_groups - current_groups
             logger.debug(f'Ldap user {user} exits user groups {exit_groups}')
             for g in exit_groups:
