@@ -55,6 +55,17 @@ class VaultSettingSerializer(serializers.Serializer):
         max_length=256, allow_blank=True, required=False, label=_('Mount Point')
     )
 
+    HISTORY_ACCOUNT_CLEAN_LIMIT = serializers.IntegerField(
+        default=999, max_value=999, min_value=1,
+        required=False, label=_('History Account Count'),
+        help_text=_(
+            'If the specific value is less than 999, '
+            'the system will automatically perform a task every night: '
+            'check and delete historical accounts that exceed the predetermined number. '
+            'If the value reaches or exceeds 999, no historical account deletion will be performed.'
+        )
+    )
+
 
 class ChatAISettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Chat AI')
