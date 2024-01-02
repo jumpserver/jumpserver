@@ -1,10 +1,11 @@
 # coding: utf-8
 #
-
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers.fields import EncryptedField
+
 
 __all__ = [
     'MailTestSerializer', 'EmailSettingSerializer',
@@ -18,14 +19,20 @@ class MailTestSerializer(serializers.Serializer):
 
 
 class EmailSettingSerializer(serializers.Serializer):
-    # encrypt_fields 现在使用 write_only 来判断了
     PREFIX_TITLE = _('Email')
 
-    EMAIL_HOST = serializers.CharField(max_length=1024, required=True, label=_("SMTP host"))
-    EMAIL_PORT = serializers.CharField(max_length=5, required=True, label=_("SMTP port"))
-    EMAIL_HOST_USER = serializers.CharField(max_length=128, required=True, label=_("SMTP account"))
+    class EmailProtocol(models.TextChoices):
+        smtp = 'smtp',  _('SMTP')
+        exchange = 'exchange', _('EXCHANGE')
+
+    EMAIL_PROTOCOL = serializers.ChoiceField(
+        choices=EmailProtocol.choices, label=_("Protocol"), default=EmailProtocol.smtp
+    )
+    EMAIL_HOST = serializers.CharField(max_length=1024, required=True, label=_("Host"))
+    EMAIL_PORT = serializers.CharField(max_length=5, required=True, label=_("Port"))
+    EMAIL_HOST_USER = serializers.CharField(max_length=128, required=True, label=_("Account"))
     EMAIL_HOST_PASSWORD = EncryptedField(
-        max_length=1024, required=False, label=_("SMTP password"),
+        max_length=1024, required=False, label=_("Password"),
         help_text=_("Tips: Some provider use token except password")
     )
     EMAIL_FROM = serializers.CharField(
