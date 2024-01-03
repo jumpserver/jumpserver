@@ -69,7 +69,7 @@ def digest_sql_query():
 
         for query in queries:
             sql = query['sql']
-            print("  # {}: {}".format(query['time'], sql))
+            print("  # {}: {}".format(query['time'], sql[:1000]))
         if len(queries) < 3:
             continue
         print("- Table: {}".format(table_name))

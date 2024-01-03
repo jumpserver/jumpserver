@@ -200,12 +200,6 @@ class PlatformSerializer(ResourceLabelsMixin, WritableNestedModelSerializer):
         constraints = AllTypes.get_constraints(category, tp)
         return constraints
 
-    @classmethod
-    def setup_eager_loading(cls, queryset):
-        queryset = queryset.prefetch_related('protocols', 'automation') \
-            .prefetch_related('labels', 'labels__label')
-        return queryset
-
     def validate_protocols(self, protocols):
         if not protocols:
             raise serializers.ValidationError(_("Protocols is required"))
