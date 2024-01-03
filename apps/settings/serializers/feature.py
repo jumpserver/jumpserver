@@ -57,7 +57,7 @@ class VaultSettingSerializer(serializers.Serializer):
 
     HISTORY_ACCOUNT_CLEAN_LIMIT = serializers.IntegerField(
         default=999, max_value=999, min_value=1,
-        required=False, label=_('History Account Count'),
+        required=False, label=_('Historical accounts retained count'),
         help_text=_(
             'If the specific value is less than 999, '
             'the system will automatically perform a task every night: '
