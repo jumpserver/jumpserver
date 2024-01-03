@@ -312,12 +312,17 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
 
-# Media files (File, ImageField) will be save these
+# Media files (File, ImageField) will be safe these
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(PROJECT_DIR, 'data', 'media').replace('\\', '/') + '/'
 
 PRIVATE_STORAGE_ROOT = MEDIA_ROOT
 PRIVATE_STORAGE_AUTH_FUNCTION = 'jumpserver.rewriting.storage.permissions.allow_access'
+PRIVATE_STORAGE_INTERNAL_URL = '/private-media/'
+PRIVATE_STORAGE_SERVER = 'nginx'
+if DEBUG_DEV:
+    PRIVATE_STORAGE_SERVER = 'django'
+
 
 # Use django-bootstrap-form to format template, input max width arg
 # BOOTSTRAP_COLUMN_COUNT = 11
