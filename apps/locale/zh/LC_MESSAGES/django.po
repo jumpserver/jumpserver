@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-26 14:13+0800\n"
+"POT-Creation-Date: 2024-01-03 11:23+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -115,8 +115,8 @@ msgstr "更改密码"
 msgid "Verify account"
 msgstr "验证账号"
 
-#: accounts/const/automation.py:27 accounts/tasks/remove_account.py:14
-#: accounts/tasks/remove_account.py:23
+#: accounts/const/automation.py:27 accounts/tasks/remove_account.py:24
+#: accounts/tasks/remove_account.py:33
 msgid "Remove account"
 msgstr "移除账号"
 
@@ -254,8 +254,7 @@ msgstr "用户 %s 查看/导出 了密码"
 #: accounts/templates/accounts/asset_account_change_info.html:7
 #: acls/serializers/base.py:123 assets/models/asset/common.py:95
 #: assets/models/asset/common.py:350 assets/models/cmd_filter.py:36
-#: assets/serializers/domain.py:20 audits/models.py:58
-#: authentication/models/connection_token.py:36
+#: audits/models.py:58 authentication/models/connection_token.py:36
 #: perms/models/asset_permission.py:69 perms/serializers/permission.py:36
 #: terminal/backends/command/models.py:17 terminal/models/session/session.py:31
 #: terminal/notifications.py:155 terminal/serializers/command.py:17
@@ -516,9 +515,8 @@ msgstr "最后登录日期"
 #: accounts/models/automations/gather_account.py:17
 #: accounts/models/automations/push_account.py:15 accounts/models/base.py:65
 #: accounts/serializers/account/virtual.py:21 acls/serializers/base.py:19
-#: acls/serializers/base.py:50 acls/templates/acls/asset_login_reminder.html:5
-#: acls/templates/acls/user_login_reminder.html:5 assets/models/_user.py:23
-#: audits/models.py:188 authentication/forms.py:25 authentication/forms.py:27
+#: acls/serializers/base.py:50 assets/models/_user.py:23 audits/models.py:188
+#: authentication/forms.py:25 authentication/forms.py:27
 #: authentication/models/temp_token.py:9
 #: authentication/templates/authentication/_msg_different_city.html:9
 #: authentication/templates/authentication/_msg_oauth_bind.html:9
@@ -818,11 +816,13 @@ msgstr "账号已存在"
 #: accounts/serializers/account/account.py:441
 #: authentication/serializers/connect_token_secret.py:159
 #: authentication/templates/authentication/_access_key_modal.html:30
-#: perms/models/perm_node.py:21 users/serializers/group.py:32
+#: perms/models/perm_node.py:21 users/serializers/group.py:33
 msgid "ID"
 msgstr "ID"
 
 #: accounts/serializers/account/account.py:451 acls/serializers/base.py:116
+#: acls/templates/acls/asset_login_reminder.html:5
+#: acls/templates/acls/user_login_reminder.html:5
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:54
 #: audits/models.py:90 audits/models.py:172 audits/models.py:269
 #: audits/serializers.py:171 authentication/models/connection_token.py:32
@@ -836,8 +836,8 @@ msgstr "ID"
 #: terminal/notifications.py:205 terminal/serializers/command.py:16
 #: terminal/templates/terminal/_msg_command_warning.html:6
 #: terminal/templates/terminal/_msg_session_sharing.html:6
-#: tickets/models/comment.py:21 users/const.py:14 users/models/user.py:1003
-#: users/models/user.py:1040 users/serializers/group.py:19
+#: tickets/models/comment.py:21 users/const.py:14 users/models/user.py:1004
+#: users/models/user.py:1041 users/serializers/group.py:21
 msgid "User"
 msgstr "用户"
 
@@ -1035,6 +1035,14 @@ msgstr "同步齐治 PAM 账号密码到 JumpServer"
 msgid "Registration periodic sync account secret from ris task"
 msgstr "注册同步齐治 PAM 账号密码任务"
 
+#: accounts/tasks/remove_account.py:44
+msgid "Clean historical accounts"
+msgstr "清理历史账号"
+
+#: accounts/tasks/remove_account.py:76
+msgid "Remove historical accounts that are out of range."
+msgstr "删除超出范围的历史帐户。"
+
 #: accounts/tasks/template.py:11
 msgid "Template sync info to related accounts"
 msgstr "同步信息到关联的账号"
@@ -1206,7 +1214,7 @@ msgstr "登录资产访问控制"
 msgid "Login asset confirm"
 msgstr "登录资产复核"
 
-#: acls/notifications.py:11
+#: acls/notifications.py:12
 msgid "User login reminder"
 msgstr "用户登录提醒"
 
@@ -1325,11 +1333,11 @@ msgstr "应用程序"
 msgid "Can match application"
 msgstr "匹配应用"
 
-#: assets/api/asset/asset.py:182
+#: assets/api/asset/asset.py:179
 msgid "Cannot create asset directly, you should create a host or other"
 msgstr "不能直接创建资产, 你应该创建主机或其他资产"
 
-#: assets/api/domain.py:63
+#: assets/api/domain.py:64
 msgid "Number required"
 msgstr "需要为数字"
 
@@ -1628,7 +1636,7 @@ msgstr "SSH公钥"
 #: assets/models/_user.py:28 assets/models/automations/base.py:114
 #: assets/models/cmd_filter.py:41 assets/models/group.py:19
 #: audits/models.py:267 common/db/models.py:34 ops/models/base.py:54
-#: ops/models/job.py:234 users/models/user.py:1041
+#: ops/models/job.py:234 users/models/user.py:1042
 msgid "Date created"
 msgstr "创建日期"
 
@@ -1640,7 +1648,7 @@ msgstr "更新日期"
 #: assets/models/_user.py:30 assets/models/cmd_filter.py:44
 #: assets/models/cmd_filter.py:91 assets/models/group.py:18
 #: common/db/models.py:32 users/models/user.py:843
-#: users/serializers/group.py:30
+#: users/serializers/group.py:32
 msgid "Created by"
 msgstr "创建者"
 
@@ -1742,7 +1750,7 @@ msgid "Domain"
 msgstr "网域"
 
 #: assets/models/asset/common.py:165 assets/models/automations/base.py:18
-#: assets/models/cmd_filter.py:32 assets/models/node.py:553
+#: assets/models/cmd_filter.py:32 assets/models/node.py:546
 #: perms/models/asset_permission.py:72 perms/serializers/permission.py:37
 #: tickets/models/ticket/apply_asset.py:14 xpack/plugins/cloud/models.py:330
 msgid "Node"
@@ -1793,7 +1801,7 @@ msgstr "客户端密钥"
 msgid "Allow invalid cert"
 msgstr "忽略证书校验"
 
-#: assets/models/asset/gpt.py:8 settings/serializers/feature.py:73
+#: assets/models/asset/gpt.py:8 settings/serializers/feature.py:84
 msgid "Proxy"
 msgstr "代理"
 
@@ -1860,7 +1868,7 @@ msgstr "命令过滤规则"
 msgid "Favorite asset"
 msgstr "收藏的资产"
 
-#: assets/models/gateway.py:34 assets/serializers/domain.py:17
+#: assets/models/gateway.py:34 assets/serializers/domain.py:18
 msgid "Gateway"
 msgstr "网关"
 
@@ -1878,11 +1886,11 @@ msgstr "默认"
 msgid "Default asset group"
 msgstr "默认资产组"
 
-#: assets/models/label.py:15 rbac/const.py:6 users/models/user.py:1026
+#: assets/models/label.py:15 rbac/const.py:6 users/models/user.py:1027
 msgid "System"
 msgstr "系统"
 
-#: assets/models/label.py:19 assets/models/node.py:539
+#: assets/models/label.py:19 assets/models/node.py:532
 #: assets/serializers/cagegory.py:11 assets/serializers/cagegory.py:18
 #: assets/serializers/cagegory.py:24
 #: authentication/models/connection_token.py:29
@@ -1906,23 +1914,23 @@ msgstr "标签"
 msgid "New node"
 msgstr "新节点"
 
-#: assets/models/node.py:467 audits/backends/db.py:65 audits/backends/db.py:66
+#: assets/models/node.py:460 audits/backends/db.py:65 audits/backends/db.py:66
 msgid "empty"
 msgstr "空"
 
-#: assets/models/node.py:538 perms/models/perm_node.py:28
+#: assets/models/node.py:531 perms/models/perm_node.py:28
 msgid "Key"
 msgstr "键"
 
-#: assets/models/node.py:540 assets/serializers/node.py:20
+#: assets/models/node.py:533 assets/serializers/node.py:20
 msgid "Full value"
 msgstr "全称"
 
-#: assets/models/node.py:544 perms/models/perm_node.py:30
+#: assets/models/node.py:537 perms/models/perm_node.py:30
 msgid "Parent key"
 msgstr "ssh私钥"
 
-#: assets/models/node.py:556
+#: assets/models/node.py:549
 msgid "Can match node"
 msgstr "可以匹配节点"
 
@@ -2179,6 +2187,10 @@ msgstr "约束"
 #: assets/serializers/cagegory.py:19
 msgid "Types"
 msgstr "类型"
+
+#: assets/serializers/domain.py:53 perms/serializers/permission.py:188
+msgid "Assets amount"
+msgstr "资产数量"
 
 #: assets/serializers/gateway.py:23 common/validators.py:34
 msgid "This field must be unique."
@@ -3025,7 +3037,7 @@ msgstr "设置手机号码启用"
 msgid "Clear phone number to disable"
 msgstr "清空手机号码禁用"
 
-#: authentication/middleware.py:94 settings/utils/ldap.py:677
+#: authentication/middleware.py:94 settings/utils/ldap.py:676
 msgid "Authentication failed (before login check failed): {}"
 msgstr "认证失败 (登录前检查失败): {}"
 
@@ -3921,11 +3933,11 @@ msgstr "手机号格式不正确"
 msgid "The verification code is: {code}"
 msgstr "验证码为: {code}"
 
-#: jumpserver/conf.py:465
+#: jumpserver/conf.py:467
 msgid "Create account successfully"
 msgstr "创建账号成功"
 
-#: jumpserver/conf.py:467
+#: jumpserver/conf.py:458
 msgid "Your account has been created successfully"
 msgstr "你的账号已创建成功"
 
@@ -4557,7 +4569,7 @@ msgid "today"
 msgstr "今天"
 
 #: perms/notifications.py:12 perms/notifications.py:44
-#: settings/serializers/feature.py:106
+#: settings/serializers/feature.py:117
 msgid "day"
 msgstr "天"
 
@@ -4576,6 +4588,19 @@ msgstr "资产授权规则将要过期"
 #: perms/notifications.py:64
 msgid "asset permissions of organization {}"
 msgstr "组织 ({}) 的资产授权"
+
+#: perms/serializers/permission.py:186 rbac/serializers/role.py:27
+#: users/serializers/group.py:54 users/serializers/group.py:60
+msgid "Users amount"
+msgstr "用户数量"
+
+#: perms/serializers/permission.py:187
+msgid "User groups amount"
+msgstr "用户组数量"
+
+#: perms/serializers/permission.py:189
+msgid "Nodes amount"
+msgstr "节点数量"
 
 #: perms/tasks.py:27
 msgid "Check asset permission expired"
@@ -4717,10 +4742,6 @@ msgstr "系统角色绑定"
 msgid "Perms"
 msgstr "权限"
 
-#: rbac/serializers/role.py:27 users/serializers/group.py:31
-msgid "Users amount"
-msgstr "用户数量"
-
 #: rbac/serializers/role.py:28 terminal/models/applet/applet.py:34
 #: terminal/models/virtualapp/virtualapp.py:20
 msgid "Display name"
@@ -4792,7 +4813,7 @@ msgstr "远程应用"
 msgid "Ticket comment"
 msgstr "工单评论"
 
-#: rbac/tree.py:130 settings/serializers/feature.py:98
+#: rbac/tree.py:130 settings/serializers/feature.py:109
 #: tickets/models/ticket/general.py:307
 msgid "Ticket"
 msgstr "工单管理"
@@ -5494,58 +5515,72 @@ msgid "Mount Point"
 msgstr "挂载点"
 
 #: settings/serializers/feature.py:60
+msgid "Historical accounts retained count"
+msgstr "历史账号保留数量"
+
+#: settings/serializers/feature.py:62
+msgid ""
+"If the specific value is less than 999, the system will automatically "
+"perform a task every night: check and delete historical accounts that exceed "
+"the predetermined number. If the value reaches or exceeds 999, no historical "
+"account deletion will be performed."
+msgstr ""
+"若特定数值小于999，系统将在每日晚间自动执行任务：检查并删除超出预定数量的历史"
+"账号。如果该数值达到或超过999，则不进行任何历史账号的删除操作。"
+
+#: settings/serializers/feature.py:71
 msgid "Chat AI"
 msgstr "聊天 AI"
 
-#: settings/serializers/feature.py:64
+#: settings/serializers/feature.py:75
 msgid "Enable Chat AI"
 msgstr "启动聊天 AI"
 
-#: settings/serializers/feature.py:67
+#: settings/serializers/feature.py:78
 msgid "Base Url"
 msgstr "基本地址"
 
-#: settings/serializers/feature.py:70 templates/_header_bar.html:90
+#: settings/serializers/feature.py:81 templates/_header_bar.html:90
 msgid "API Key"
 msgstr "API Key"
 
-#: settings/serializers/feature.py:76
+#: settings/serializers/feature.py:87
 msgid "GPT Model"
 msgstr "GPT 模型"
 
-#: settings/serializers/feature.py:100
+#: settings/serializers/feature.py:111
 msgid "Enable tickets"
 msgstr "启用工单"
 
-#: settings/serializers/feature.py:103
+#: settings/serializers/feature.py:114
 msgid "Ticket authorize default time"
 msgstr "默认工单授权时间"
 
-#: settings/serializers/feature.py:106
+#: settings/serializers/feature.py:117
 msgid "hour"
 msgstr "时"
 
-#: settings/serializers/feature.py:107
+#: settings/serializers/feature.py:118
 msgid "Ticket authorize default time unit"
 msgstr "默认工单授权时间单位"
 
-#: settings/serializers/feature.py:112
+#: settings/serializers/feature.py:123
 msgid "Feature"
 msgstr "功能"
 
-#: settings/serializers/feature.py:115
+#: settings/serializers/feature.py:126
 msgid "Operation center"
 msgstr "作业中心"
 
-#: settings/serializers/feature.py:116
+#: settings/serializers/feature.py:127
 msgid "Allow user run batch command or not using ansible"
 msgstr "是否允许用户使用 ansible 执行批量命令"
 
-#: settings/serializers/feature.py:120
+#: settings/serializers/feature.py:131
 msgid "Operation center command blacklist"
 msgstr "作业中心命令黑名单"
 
-#: settings/serializers/feature.py:121
+#: settings/serializers/feature.py:132
 msgid "Commands that are not allowed execute."
 msgstr "不允许执行的命令"
 
@@ -5572,7 +5607,8 @@ msgstr ""
 #: xpack/plugins/cloud/serializers/account_attrs.py:20
 msgid "Access key secret"
 msgstr "Access key secret(SK)"
-#: settings/serializers/feature.py:126
+
+#: settings/serializers/feature.py:137
 #: terminal/models/virtualapp/provider.py:17
 #: terminal/models/virtualapp/virtualapp.py:36
 #: terminal/models/virtualapp/virtualapp.py:97
@@ -5580,7 +5616,7 @@ msgstr "Access key secret(SK)"
 msgid "Virtual app"
 msgstr "虚拟应用"
 
-#: settings/serializers/feature.py:129
+#: settings/serializers/feature.py:140
 msgid "Enable virtual app"
 msgstr "启用虚拟应用"
 
@@ -6025,104 +6061,104 @@ msgstr "周期导入 LDAP 用户"
 msgid "Registration periodic import ldap user task"
 msgstr "注册周期导入 LDAP 用户 任务"
 
-#: settings/utils/ldap.py:492
+#: settings/utils/ldap.py:491
 msgid "ldap:// or ldaps:// protocol is used."
 msgstr "使用 ldap:// 或 ldaps:// 协议"
 
-#: settings/utils/ldap.py:503
+#: settings/utils/ldap.py:502
 msgid "Host or port is disconnected: {}"
 msgstr "主机或端口不可连接: {}"
 
-#: settings/utils/ldap.py:505
+#: settings/utils/ldap.py:504
 msgid "The port is not the port of the LDAP service: {}"
 msgstr "端口不是LDAP服务端口: {}"
 
-#: settings/utils/ldap.py:507
+#: settings/utils/ldap.py:506
 msgid "Please add certificate: {}"
 msgstr "请添加证书"
 
-#: settings/utils/ldap.py:511 settings/utils/ldap.py:538
-#: settings/utils/ldap.py:568 settings/utils/ldap.py:596
+#: settings/utils/ldap.py:510 settings/utils/ldap.py:537
+#: settings/utils/ldap.py:567 settings/utils/ldap.py:595
 msgid "Unknown error: {}"
 msgstr "未知错误: {}"
 
-#: settings/utils/ldap.py:525
+#: settings/utils/ldap.py:524
 msgid "Bind DN or Password incorrect"
 msgstr "绑定DN或密码错误"
 
-#: settings/utils/ldap.py:532
+#: settings/utils/ldap.py:531
 msgid "Please enter Bind DN: {}"
 msgstr "请输入绑定DN: {}"
 
-#: settings/utils/ldap.py:534
+#: settings/utils/ldap.py:533
 msgid "Please enter Password: {}"
 msgstr "请输入密码: {}"
 
-#: settings/utils/ldap.py:536
+#: settings/utils/ldap.py:535
 msgid "Please enter correct Bind DN and Password: {}"
 msgstr "请输入正确的绑定DN和密码: {}"
 
-#: settings/utils/ldap.py:554
+#: settings/utils/ldap.py:553
 msgid "Invalid User OU or User search filter: {}"
 msgstr "不合法的用户OU或用户过滤器: {}"
 
-#: settings/utils/ldap.py:585
+#: settings/utils/ldap.py:584
 msgid "LDAP User attr map not include: {}"
 msgstr "LDAP属性映射没有包含: {}"
 
-#: settings/utils/ldap.py:592
+#: settings/utils/ldap.py:591
 msgid "LDAP User attr map is not dict"
 msgstr "LDAP属性映射不合法"
 
-#: settings/utils/ldap.py:611
+#: settings/utils/ldap.py:610
 msgid "LDAP authentication is not enabled"
 msgstr "LDAP认证没有启用"
 
-#: settings/utils/ldap.py:629
+#: settings/utils/ldap.py:628
 msgid "Error (Invalid LDAP server): {}"
 msgstr "错误  (不合法的LDAP服务器地址): {}"
 
-#: settings/utils/ldap.py:631
+#: settings/utils/ldap.py:630
 msgid "Error (Invalid Bind DN): {}"
 msgstr "错误 (不合法的绑定DN): {}"
 
-#: settings/utils/ldap.py:633
+#: settings/utils/ldap.py:632
 msgid "Error (Invalid LDAP User attr map): {}"
 msgstr "错误 (不合法的LDAP属性映射): {}"
 
-#: settings/utils/ldap.py:635
+#: settings/utils/ldap.py:634
 msgid "Error (Invalid User OU or User search filter): {}"
 msgstr "错误 (不合法的用户OU或用户过滤器): {}"
 
-#: settings/utils/ldap.py:637
+#: settings/utils/ldap.py:636
 msgid "Error (Not enabled LDAP authentication): {}"
 msgstr "错误 (没有启用LDAP认证): {}"
 
-#: settings/utils/ldap.py:639
+#: settings/utils/ldap.py:638
 msgid "Error (Unknown): {}"
 msgstr "错误 (未知): {}"
 
-#: settings/utils/ldap.py:642
+#: settings/utils/ldap.py:641
 msgid "Succeed: Match {} s user"
 msgstr "成功匹配 {} 个用户"
 
-#: settings/utils/ldap.py:653
+#: settings/utils/ldap.py:652
 msgid "Please test the connection first"
 msgstr "请先测试连接"
 
-#: settings/utils/ldap.py:675
+#: settings/utils/ldap.py:674
 msgid "Authentication failed (configuration incorrect): {}"
 msgstr "认证失败 (配置错误): {}"
 
-#: settings/utils/ldap.py:679
+#: settings/utils/ldap.py:678
 msgid "Authentication failed (username or password incorrect): {}"
 msgstr "认证失败 (用户名或密码不正确): {}"
 
-#: settings/utils/ldap.py:681
+#: settings/utils/ldap.py:680
 msgid "Authentication failed (Unknown): {}"
 msgstr "认证失败: (未知): {}"
 
-#: settings/utils/ldap.py:684
+#: settings/utils/ldap.py:683
 msgid "Authentication success: {}"
 msgstr "认证成功: {}"
 
@@ -7746,31 +7782,31 @@ msgstr "需要更新密码"
 msgid "Date api key used"
 msgstr "Api key 最后使用日期"
 
-#: users/models/user.py:984
+#: users/models/user.py:985
 msgid "Can not delete admin user"
 msgstr "无法删除管理员用户"
 
-#: users/models/user.py:1011
+#: users/models/user.py:1012
 msgid "Can invite user"
 msgstr "可以邀请用户"
 
-#: users/models/user.py:1012
+#: users/models/user.py:1013
 msgid "Can remove user"
 msgstr "可以移除用户"
 
-#: users/models/user.py:1013
+#: users/models/user.py:1014
 msgid "Can match user"
 msgstr "可以匹配用户"
 
-#: users/models/user.py:1022
+#: users/models/user.py:1023
 msgid "Administrator"
 msgstr "管理员"
 
-#: users/models/user.py:1025
+#: users/models/user.py:1026
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
-#: users/models/user.py:1050
+#: users/models/user.py:1051
 msgid "User password history"
 msgstr "用户密码历史"
 

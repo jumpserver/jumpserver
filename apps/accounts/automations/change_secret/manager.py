@@ -4,7 +4,7 @@ from copy import deepcopy
 
 from django.conf import settings
 from django.utils import timezone
-from openpyxl import Workbook
+from xlsxwriter import Workbook
 
 from accounts.const import AutomationTypes, SecretType, SSHKeyStrategy, SecretStrategy
 from accounts.models import ChangeSecretRecord
@@ -227,8 +227,9 @@ class ChangeSecretManager(AccountBasePlaybookManager):
 
         rows.insert(0, header)
         wb = Workbook(filename)
-        ws = wb.create_sheet('Sheet1')
+        ws = wb.add_worksheet('Sheet1')
         for row in rows:
-            ws.append(row)
-        wb.save(filename)
+            for col, data in enumerate(row):
+                ws.write_string(0, col, data)
+        wb.close()
         return True

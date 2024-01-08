@@ -3,13 +3,13 @@ import time
 from collections import defaultdict, OrderedDict
 
 from django.conf import settings
-from openpyxl import Workbook
 from rest_framework import serializers
+from xlsxwriter import Workbook
 
 from accounts.const.automation import AccountBackupType
+from accounts.models.automations.backup_account import AccountBackupAutomation
 from accounts.notifications import AccountBackupExecutionTaskMsg, AccountBackupByObjStorageExecutionTaskMsg
 from accounts.serializers import AccountSecretSerializer
-from accounts.models.automations.backup_account import AccountBackupAutomation
 from assets.const import AllTypes
 from common.utils.file import encrypt_and_compress_zip_file, zip_files
 from common.utils.timezone import local_now_filename, local_now_display
@@ -144,10 +144,11 @@ class AccountBackupHandler:
 
         wb = Workbook(filename)
         for sheet, data in data_map.items():
-            ws = wb.create_sheet(str(sheet))
+            ws = wb.add_worksheet(str(sheet))
             for row in data:
-                ws.append(row)
-        wb.save(filename)
+                for col, _data in enumerate(row):
+                    ws.write_string(0, col, _data)
+        wb.close()
         files.append(filename)
         timedelta = round((time.time() - time_start), 2)
         print('创建备份文件完成: 用时 {}s'.format(timedelta))

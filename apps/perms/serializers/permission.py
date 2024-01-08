@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -14,7 +14,7 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from perms.models import ActionChoices, AssetPermission
 from users.models import User, UserGroup
 
-__all__ = ["AssetPermissionSerializer", "ActionChoicesField"]
+__all__ = ["AssetPermissionSerializer", "ActionChoicesField", "AssetPermissionListSerializer"]
 
 
 class ActionChoicesField(BitChoicesField):
@@ -142,8 +142,8 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
     def perform_display_create(instance, **kwargs):
         # 用户
         users_to_set = User.objects.filter(
-            Q(name__in=kwargs.get("users_display"))
-            | Q(username__in=kwargs.get("users_display"))
+            Q(name__in=kwargs.get("users_display")) |
+            Q(username__in=kwargs.get("users_display"))
         ).distinct()
         instance.users.add(*users_to_set)
         # 用户组
@@ -153,8 +153,8 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
         instance.user_groups.add(*user_groups_to_set)
         # 资产
         assets_to_set = Asset.objects.filter(
-            Q(address__in=kwargs.get("assets_display"))
-            | Q(name__in=kwargs.get("assets_display"))
+            Q(address__in=kwargs.get("assets_display")) |
+            Q(name__in=kwargs.get("assets_display"))
         ).distinct()
         instance.assets.add(*assets_to_set)
         # 节点
@@ -180,3 +180,26 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
         instance = super().create(validated_data)
         self.perform_display_create(instance, **display)
         return instance
+
+
+class AssetPermissionListSerializer(AssetPermissionSerializer):
+    users_amount = serializers.IntegerField(read_only=True, label=_("Users amount"))
+    user_groups_amount = serializers.IntegerField(read_only=True, label=_("User groups amount"))
+    assets_amount = serializers.IntegerField(read_only=True, label=_("Assets amount"))
+    nodes_amount = serializers.IntegerField(read_only=True, label=_("Nodes amount"))
+
+    class Meta(AssetPermissionSerializer.Meta):
+        amount_fields = ["users_amount", "user_groups_amount", "assets_amount", "nodes_amount"]
+        remove_fields = {"users", "assets", "nodes", "user_groups"}
+        fields = list(set(AssetPermissionSerializer.Meta.fields + amount_fields) - remove_fields)
+
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        """Perform necessary eager loading of data."""
+        queryset = queryset.annotate(
+            users_amount=Count("users"),
+            user_groups_amount=Count("user_groups"),
+            assets_amount=Count("assets"),
+            nodes_amount=Count("nodes"),
+        )
+        return queryset

@@ -21,7 +21,7 @@ LOGGING = {
         },
         'main': {
             'datefmt': '%Y-%m-%d %H:%M:%S',
-            'format': '%(asctime)s [%(module)s %(levelname)s] %(message)s',
+            'format': '%(asctime)s [%(levelname).4s] %(message)s',
         },
         'exception': {
             'datefmt': '%Y-%m-%d %H:%M:%S',

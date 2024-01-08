@@ -73,7 +73,7 @@ class LabelContentTypeResourceViewSet(JMSModelViewSet):
             queryset = model.objects.all()
         if bound == '1':
             queryset = queryset.filter(id__in=list(res_ids))
-        elif bound == '0':
+        else:
             queryset = queryset.exclude(id__in=list(res_ids))
         keyword = self.request.query_params.get('search')
         if keyword:
@@ -90,9 +90,10 @@ class LabelContentTypeResourceViewSet(JMSModelViewSet):
         LabeledResource.objects \
             .filter(res_type=content_type, label=label) \
             .exclude(res_id__in=res_ids).delete()
-        resources = []
-        for res_id in res_ids:
-            resources.append(LabeledResource(res_type=content_type, res_id=res_id, label=label, org_id=current_org.id))
+        resources = [
+            LabeledResource(res_type=content_type, res_id=res_id, label=label, org_id=current_org.id)
+            for res_id in res_ids
+        ]
         LabeledResource.objects.bulk_create(resources, ignore_conflicts=True)
         return Response({"total": len(res_ids)})
 
@@ -129,15 +130,22 @@ class LabeledResourceViewSet(OrgBulkModelViewSet):
     }
     ordering_fields = ('res_type', 'date_created')
 
-    # Todo: 这里需要优化，查询 sql 太多
     def filter_search(self, queryset):
         keyword = self.request.query_params.get('search')
         if not keyword:
             return queryset
+        keyword = keyword.strip().lower()
         matched = []
-        for instance in queryset:
-            if keyword.lower() in str(instance.resource).lower():
-                matched.append(instance.id)
+        offset = 0
+        limit = 10000
+        while True:
+            page = queryset[offset:offset + limit]
+            if not page:
+                break
+            offset += limit
+            for instance in page:
+                if keyword in str(instance.resource).lower():
+                    matched.append(instance.id)
         return queryset.filter(id__in=matched)
 
     def get_queryset(self):

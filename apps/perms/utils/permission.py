@@ -1,8 +1,7 @@
 from django.db.models import QuerySet
 
 from assets.models import Node, Asset
-from common.utils import get_logger
-
+from common.utils import get_logger, timeit
 from perms.models import AssetPermission
 
 logger = get_logger(__file__)
@@ -13,6 +12,7 @@ __all__ = ['AssetPermissionUtil']
 class AssetPermissionUtil(object):
     """ 资产授权相关的方法工具 """
 
+    @timeit
     def get_permissions_for_user(self, user, with_group=True, flat=False):
         """ 获取用户的授权规则 """
         perm_ids = set()

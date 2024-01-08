@@ -17,7 +17,7 @@ import re
 import sys
 import types
 from importlib import import_module
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, quote
 
 import yaml
 from django.urls import reverse_lazy
@@ -271,6 +271,7 @@ class Config(dict):
         'RIS_SYNC_IS_PERIODIC': False,
         'RIS_SYNC_INTERVAL': None,
         'RIS_SYNC_CRONTAB': None,
+        'HISTORY_ACCOUNT_CLEAN_LIMIT': 999,
 
         # Cache login password
         'CACHE_LOGIN_PASSWORD_ENABLED': False,
@@ -542,6 +543,7 @@ class Config(dict):
         'SYSLOG_SOCKTYPE': 2,
 
         'PERM_EXPIRED_CHECK_PERIODIC': 60 * 60,
+        'PERM_TREE_REGEN_INTERVAL': 1,
         'FLOWER_URL': "127.0.0.1:5555",
         'LANGUAGE_CODE': 'zh',
         'TIME_ZONE': 'Asia/Shanghai',
@@ -704,6 +706,13 @@ class Config(dict):
         if openid_config:
             self.set_openid_config(openid_config)
 
+    def compatible_redis(self):
+        redis_config = {
+            'REDIS_PASSWORD': quote(str(self.REDIS_PASSWORD)),
+        }
+        for key, value in redis_config.items():
+            self[key] = value
+
     def compatible(self):
         """
         对配置做兼容处理
@@ -715,6 +724,8 @@ class Config(dict):
         """
         # 兼容 OpenID 配置
         self.compatible_auth_openid()
+        # 兼容 Redis 配置
+        self.compatible_redis()
 
     def convert_type(self, k, v):
         default_value = self.defaults.get(k)

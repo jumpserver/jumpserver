@@ -1,6 +1,4 @@
 import abc
-import re
-from collections import defaultdict
 from urllib.parse import parse_qsl
 
 from django.conf import settings
@@ -13,7 +11,6 @@ from rest_framework.response import Response
 
 from accounts.const import AliasAccount
 from assets.api import SerializeToTreeNodeMixin
-from assets.const import AllTypes
 from assets.models import Asset
 from assets.utils import KubernetesTree
 from authentication.models import ConnectionToken
@@ -38,21 +35,36 @@ class BaseUserNodeWithAssetAsTreeApi(
     SelfOrPKUserMixin, RebuildTreeMixin,
     SerializeToTreeNodeMixin, ListAPIView
 ):
+    page_limit = 10000
 
     def list(self, request, *args, **kwargs):
-        nodes, assets = self.get_nodes_assets()
-        tree_nodes = self.serialize_nodes(nodes, with_asset_amount=True)
-        tree_assets = self.serialize_assets(assets, node_key=self.node_key_for_serialize_assets)
-        data = list(tree_nodes) + list(tree_assets)
-        return Response(data=data)
+        offset = int(request.query_params.get('offset', 0))
+        page_assets = self.get_page_assets()
+
+        if not offset:
+            nodes, assets = self.get_nodes_assets()
+            page = page_assets[:self.page_limit]
+            assets = [*assets, *page]
+            tree_nodes = self.serialize_nodes(nodes, with_asset_amount=True)
+            tree_assets = self.serialize_assets(assets, **self.serialize_asset_kwargs)
+            data = list(tree_nodes) + list(tree_assets)
+        else:
+            page = page_assets[offset:(offset + self.page_limit)]
+            data = self.serialize_assets(page, **self.serialize_asset_kwargs) if page else []
+        offset += len(page)
+        headers = {'X-JMS-TREE-OFFSET': offset} if offset else {}
+        return Response(data=data, headers=headers)
 
     @abc.abstractmethod
     def get_nodes_assets(self):
         return [], []
 
-    @lazyproperty
-    def node_key_for_serialize_assets(self):
-        return None
+    def get_page_assets(self):
+        return []
+
+    @property
+    def serialize_asset_kwargs(self):
+        return {}
 
 
 class UserPermedNodesWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
@@ -61,7 +73,6 @@ class UserPermedNodesWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
 
     def get_nodes_assets(self):
         self.query_node_util = UserPermNodeUtil(self.request.user)
-        self.query_asset_util = UserPermAssetUtil(self.request.user)
         ung_nodes, ung_assets = self._get_nodes_assets_for_ungrouped()
         fav_nodes, fav_assets = self._get_nodes_assets_for_favorite()
         all_nodes, all_assets = self._get_nodes_assets_for_all()
@@ -69,31 +80,37 @@ class UserPermedNodesWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
         assets = list(ung_assets) + list(fav_assets) + list(all_assets)
         return nodes, assets
 
+    def get_page_assets(self):
+        return self.query_asset_util.get_all_assets().annotate(parent_key=F('nodes__key'))
+
     @timeit
     def _get_nodes_assets_for_ungrouped(self):
         if not settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
             return [], []
         node = self.query_node_util.get_ungrouped_node()
         assets = self.query_asset_util.get_ungroup_assets()
-        assets = assets.annotate(parent_key=Value(node.key, output_field=CharField())) \
-            .prefetch_related('platform')
+        assets = assets.annotate(parent_key=Value(node.key, output_field=CharField()))
         return [node], assets
+
+    @lazyproperty
+    def query_asset_util(self):
+        return UserPermAssetUtil(self.user)
 
     @timeit
     def _get_nodes_assets_for_favorite(self):
         node = self.query_node_util.get_favorite_node()
         assets = self.query_asset_util.get_favorite_assets()
-        assets = assets.annotate(parent_key=Value(node.key, output_field=CharField())) \
-            .prefetch_related('platform')
+        assets = assets.annotate(parent_key=Value(node.key, output_field=CharField()))
         return [node], assets
 
+    @timeit
     def _get_nodes_assets_for_all(self):
         nodes = self.query_node_util.get_whole_tree_nodes(with_special=False)
         if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
             assets = self.query_asset_util.get_perm_nodes_assets()
         else:
-            assets = self.query_asset_util.get_all_assets()
-        assets = assets.annotate(parent_key=F('nodes__key')).prefetch_related('platform')
+            assets = Asset.objects.none()
+        assets = assets.annotate(parent_key=F('nodes__key'))
         return nodes, assets
 
 
@@ -103,6 +120,7 @@ class UserPermedNodeChildrenWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
     # 默认展开的节点key
     default_unfolded_node_key = None
 
+    @timeit
     def get_nodes_assets(self):
         query_node_util = UserPermNodeUtil(self.user)
         query_asset_util = UserPermAssetUtil(self.user)
@@ -136,14 +154,14 @@ class UserPermedNodeChildrenWithAssetsAsTreeApi(BaseUserNodeWithAssetAsTreeApi):
             node_key = getattr(node, 'key', None)
         return node_key
 
-    @lazyproperty
-    def node_key_for_serialize_assets(self):
-        return self.query_node_key or self.default_unfolded_node_key
+    @property
+    def serialize_asset_kwargs(self):
+        return {
+            'node_key': self.query_node_key or self.default_unfolded_node_key
+        }
 
 
-class UserPermedNodeChildrenWithAssetsAsCategoryTreeApi(
-    SelfOrPKUserMixin, SerializeToTreeNodeMixin, ListAPIView
-):
+class UserPermedNodeChildrenWithAssetsAsCategoryTreeApi(BaseUserNodeWithAssetAsTreeApi):
     @property
     def is_sync(self):
         sync = self.request.query_params.get('sync', 0)
@@ -151,66 +169,52 @@ class UserPermedNodeChildrenWithAssetsAsCategoryTreeApi(
 
     @property
     def tp(self):
-        return self.request.query_params.get('type')
-
-    def get_assets(self):
-        query_asset_util = UserPermAssetUtil(self.user)
-        node = PermNode.objects.filter(
-            granted_node_rels__user=self.user, parent_key='').first()
-        if node:
-            __, assets = query_asset_util.get_node_all_assets(node.id)
-        else:
-            assets = Asset.objects.none()
-        return assets
-
-    def to_tree_nodes(self, assets):
-        if not assets:
-            return []
-        assets = assets.annotate(tp=F('platform__type'))
-        asset_type_map = defaultdict(list)
-        for asset in assets:
-            asset_type_map[asset.tp].append(asset)
-        tp = self.tp
-        if tp:
-            assets = asset_type_map.get(tp, [])
-            if not assets:
-                return []
-            pid = f'ROOT_{str(assets[0].category).upper()}_{tp}'
-            return self.serialize_assets(assets, pid=pid)
         params = self.request.query_params
-        get_root = not list(filter(lambda x: params.get(x), ('type', 'n')))
-        resource_platforms = assets.order_by('id').values_list('platform_id', flat=True)
-        node_all = AllTypes.get_tree_nodes(resource_platforms, get_root=get_root)
-        pattern = re.compile(r'\(0\)?')
-        nodes = []
-        for node in node_all:
-            meta = node.get('meta', {})
-            if pattern.search(node['name']) or meta.get('type') == 'platform':
-                continue
-            _type = meta.get('_type')
-            if _type:
-                node['type'] = _type
-            meta.setdefault('data', {})
-            node['meta'] = meta
-            nodes.append(node)
+        return [params.get('category'), params.get('type')]
 
-        if not self.is_sync:
-            return nodes
+    @lazyproperty
+    def query_asset_util(self):
+        return UserPermAssetUtil(self.user)
 
-        asset_nodes = []
-        for node in nodes:
-            node['open'] = True
-            tp = node.get('meta', {}).get('_type')
-            if not tp:
-                continue
-            assets = asset_type_map.get(tp, [])
-            asset_nodes += self.serialize_assets(assets, pid=node['id'])
-        return nodes + asset_nodes
+    @timeit
+    def get_assets(self):
+        return self.query_asset_util.get_all_assets()
 
-    def list(self, request, *args, **kwargs):
-        assets = self.get_assets()
-        nodes = self.to_tree_nodes(assets)
-        return Response(data=nodes)
+    def _get_tree_nodes_async(self):
+        if not self.tp or not all(self.tp):
+            nodes = UserPermAssetUtil.get_type_nodes_tree_or_cached(self.user)
+            return nodes, []
+
+        category, tp = self.tp
+        assets = self.get_assets().filter(platform__type=tp, platform__category=category)
+        return [], assets
+
+    def _get_tree_nodes_sync(self):
+        if self.request.query_params.get('lv'):
+            return []
+        nodes = self.query_asset_util.get_type_nodes_tree()
+        return nodes, []
+
+    @property
+    def serialize_asset_kwargs(self):
+        return {
+            'get_pid': lambda asset, platform: 'ROOT_{}_{}'.format(platform.category.upper(), platform.type),
+        }
+
+    def serialize_nodes(self, nodes, with_asset_amount=False):
+        return nodes
+
+    def get_nodes_assets(self):
+        if self.is_sync:
+            return self._get_tree_nodes_sync()
+        else:
+            return self._get_tree_nodes_async()
+
+    def get_page_assets(self):
+        if self.is_sync:
+            return self.get_assets()
+        else:
+            return []
 
 
 class UserGrantedK8sAsTreeApi(SelfOrPKUserMixin, ListAPIView):
