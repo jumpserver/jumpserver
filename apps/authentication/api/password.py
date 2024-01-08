@@ -28,9 +28,13 @@ class UserResetPasswordSendCodeApi(CreateAPIView):
     serializer_class = ResetPasswordCodeSerializer
 
     @staticmethod
-    def is_valid_user(**kwargs):
-        user = get_object_or_none(User, **kwargs)
-        if not user:
+    def is_valid_user(username, **attr_query):
+        user = get_object_or_none(User, username=username)
+        valid = True
+        for attr, value in attr_query.items():
+            if getattr(user, attr, None) != value:
+                valid = False
+        if not valid:
             err_msg = _('User does not exist: {}').format(_("No user matched"))
             return None, err_msg
         if not user.is_local:
@@ -56,7 +60,6 @@ class UserResetPasswordSendCodeApi(CreateAPIView):
         target = serializer.validated_data[form_type]
         if form_type == 'sms':
             query_key = 'phone'
-            target = target.lstrip('+')
         else:
             query_key = form_type
         user, err = self.is_valid_user(username=username, **{query_key: target})
