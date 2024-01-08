@@ -1,15 +1,13 @@
-import requests
 import mistune
-
-from rest_framework.exceptions import APIException
+import requests
 from django.utils.translation import gettext_lazy as _
+from rest_framework.exceptions import APIException
 
-from users.utils import construct_user_email
 from common.utils.common import get_logger
 from jumpserver.utils import get_current_request
+from users.utils import construct_user_email
 
 logger = get_logger(__name__)
-
 
 SLACK_REDIRECT_URI_SESSION_KEY = '_slack_redirect_uri'
 
@@ -22,7 +20,7 @@ class URL:
     AUTH_TEST = 'https://slack.com/api/auth.test'
 
 
-class SlackRenderer(mistune.renderers.HTMLRenderer):
+class SlackRenderer(mistune.HTMLRenderer):
     def heading(self, text, level):
         return '*' + text + '*\n'
 
