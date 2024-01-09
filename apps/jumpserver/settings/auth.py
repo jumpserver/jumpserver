@@ -99,6 +99,8 @@ AUTH_RADIUS_BACKEND = 'authentication.backends.radius.RadiusBackend'
 RADIUS_SERVER = CONFIG.RADIUS_SERVER
 RADIUS_PORT = CONFIG.RADIUS_PORT
 RADIUS_SECRET = CONFIG.RADIUS_SECRET
+# https://github.com/robgolding/django-radius/blob/develop/radiusauth/backends/radius.py#L15-L52
+RADIUS_ATTRIBUTES = CONFIG.RADIUS_ATTRIBUTES
 
 # CAS Auth
 AUTH_CAS = CONFIG.AUTH_CAS
