@@ -17,6 +17,7 @@ from assets.models import Asset
 from audits.api import OperateLogViewSet
 from audits.const import LoginStatusChoices
 from audits.models import UserLoginLog, PasswordChangeLog, OperateLog, FTPLog, JobLog
+from audits.utils import construct_userlogin_usernames
 from common.utils import lazyproperty
 from common.utils.timezone import local_now, local_zero_hour
 from ops.const import JobStatus
@@ -79,7 +80,7 @@ class DateTimeMixin:
         if not self.org.is_root():
             if query_params == 'username':
                 query = {
-                    f'{query_params}__in': users.values_list('username', flat=True)
+                    f'{query_params}__in': construct_userlogin_usernames(users)
                 }
             else:
                 query = {

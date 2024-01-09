@@ -41,6 +41,7 @@ from .serializers import (
     PasswordChangeLogSerializer, ActivityUnionLogSerializer,
     FileSerializer, UserSessionSerializer
 )
+from .utils import construct_userlogin_usernames
 
 logger = get_logger(__name__)
 
@@ -126,15 +127,16 @@ class UserLoginCommonMixin:
 
 class UserLoginLogViewSet(UserLoginCommonMixin, OrgReadonlyModelViewSet):
     @staticmethod
-    def get_org_members():
-        users = current_org.get_members().values_list('username', flat=True)
+    def get_org_member_usernames():
+        user_queryset = current_org.get_members()
+        users = construct_userlogin_usernames(user_queryset)
         return users
 
     def get_queryset(self):
         queryset = super().get_queryset()
         if current_org.is_root():
             return queryset
-        users = self.get_org_members()
+        users = self.get_org_member_usernames()
         queryset = queryset.filter(username__in=users)
         return queryset
 

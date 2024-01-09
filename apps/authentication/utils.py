@@ -25,9 +25,10 @@ def check_different_city_login_if_need(user, request):
     is_private = ipaddress.ip_address(ip).is_private
     if is_private:
         return
+    usernames = [user.username, f"{user.name}({user.username})"]
     last_user_login = UserLoginLog.objects.exclude(
         city__in=city_white
-    ).filter(username=user.username, status=True).first()
+    ).filter(username__in=usernames, status=True).first()
     if not last_user_login:
         return
 
