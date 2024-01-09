@@ -143,7 +143,7 @@ fido2 = "^1.1.2"
 ua-parser = "^0.18.0"
 user-agents = "^2.2.0"
 django-cors-headers = "^4.3.0"
-mistune = "0.8.4"
+mistune = "2.0.3"
 openai = "^1.3.7"
 xlsxwriter = "^3.1.9"
 

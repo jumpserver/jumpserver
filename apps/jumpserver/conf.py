@@ -257,9 +257,16 @@ class Config(dict):
 
         # Vault
         'VAULT_ENABLED': False,
+        'VAULT_TYPE': '',
         'VAULT_HCP_HOST': '',
         'VAULT_HCP_TOKEN': '',
         'VAULT_HCP_MOUNT_POINT': 'jumpserver',
+
+        # 齐治 PAM
+        'VAULT_RIS_AUTH_URL': '',
+        'VAULT_RIS_APP_ID': '',
+        'VAULT_RIS_ACCESS_KEY_ID': '',
+        'VAULT_RIS_ACCESS_KEY_SECRET': '',
 
         'HISTORY_ACCOUNT_CLEAN_LIMIT': 999,
 

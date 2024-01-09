@@ -3,6 +3,7 @@ import uuid
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from accounts.const import VaultTypeChoices
 from assets.const import Protocol
 from common.serializers.fields import EncryptedField
 
@@ -10,6 +11,7 @@ __all__ = [
     'AnnouncementSettingSerializer', 'OpsSettingSerializer',
     'VaultSettingSerializer', 'TicketSettingSerializer',
     'ChatAISettingSerializer', 'VirtualAppSerializer',
+    'RisSettingSerializer'
 ]
 
 
@@ -44,6 +46,9 @@ class VaultSettingSerializer(serializers.Serializer):
 
     VAULT_ENABLED = serializers.BooleanField(
         required=False, label=_('Enable Vault'), read_only=True
+    )
+    VAULT_TYPE = serializers.CharField(
+        max_length=30, allow_blank=True, required=False, label=_('Type'), default=VaultTypeChoices.hcp
     )
     VAULT_HCP_HOST = serializers.CharField(
         max_length=256, allow_blank=True, required=False, label=_('Host')
@@ -138,4 +143,27 @@ class VirtualAppSerializer(serializers.Serializer):
 
     VIRTUAL_APP_ENABLED = serializers.BooleanField(
         required=False, label=_('Enable virtual app'),
+    )
+
+
+class RisSettingSerializer(serializers.Serializer):
+    PREFIX_TITLE = _('RIS')
+
+    VAULT_ENABLED = serializers.BooleanField(
+        required=False, label=_('Enable Vault'), read_only=True
+    )
+    VAULT_TYPE = serializers.CharField(
+        max_length=30, allow_blank=True, required=False, label=_('Type'), default=VaultTypeChoices.ris
+    )
+    VAULT_RIS_AUTH_URL = serializers.CharField(
+        max_length=128, allow_blank=True, required=False, label=_('Auth url'), default=''
+    )
+    VAULT_RIS_APP_ID = serializers.CharField(
+        max_length=64, allow_blank=True, required=False, label=_('APP ID'), default=''
+    )
+    VAULT_RIS_ACCESS_KEY_ID = serializers.CharField(
+        max_length=128, allow_blank=True, required=False, label=_('Access key'), default=''
+    )
+    VAULT_RIS_ACCESS_KEY_SECRET = EncryptedField(
+        max_length=128, allow_blank=True, required=False, label=_('Access key secret'), default=''
     )
