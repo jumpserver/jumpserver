@@ -145,9 +145,9 @@ class AccountBackupHandler:
         wb = Workbook(filename)
         for sheet, data in data_map.items():
             ws = wb.add_worksheet(str(sheet))
-            for row in data:
-                for col, _data in enumerate(row):
-                    ws.write_string(0, col, _data)
+            for row_index, row_data in enumerate(data):
+                for col_index, col_data in enumerate(row_data):
+                    ws.write_string(row_index, col_index, col_data)
         wb.close()
         files.append(filename)
         timedelta = round((time.time() - time_start), 2)
