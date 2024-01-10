@@ -228,8 +228,8 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         rows.insert(0, header)
         wb = Workbook(filename)
         ws = wb.add_worksheet('Sheet1')
-        for row in rows:
-            for col, data in enumerate(row):
-                ws.write_string(0, col, data)
+        for row_index, row_data in enumerate(rows):
+            for col_index, col_data in enumerate(row_data):
+                ws.write_string(row_index, col_index, col_data)
         wb.close()
         return True
