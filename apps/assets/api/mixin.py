@@ -81,13 +81,19 @@ class SerializeToTreeNodeMixin:
         platform_map = {p.id: p for p in Platform.objects.all()}
 
         data = []
+        root_assets_count = 0
         for asset in assets:
             platform = platform_map.get(asset.platform_id)
             if not platform:
                 continue
             pid = node_key or get_pid(asset, platform)
-            if not pid or pid.isdigit():
+            if not pid:
                 continue
+            # 根节点最多显示 1000 个资产
+            if pid.isdigit():
+                if root_assets_count > 1000:
+                    continue
+                root_assets_count += 1
             data.append({
                 'id': str(asset.id),
                 'name': asset.name,

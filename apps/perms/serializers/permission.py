@@ -196,10 +196,11 @@ class AssetPermissionListSerializer(AssetPermissionSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         """Perform necessary eager loading of data."""
-        queryset = queryset.annotate(
-            users_amount=Count("users"),
-            user_groups_amount=Count("user_groups"),
-            assets_amount=Count("assets"),
-            nodes_amount=Count("nodes"),
-        )
+        queryset = queryset \
+            .prefetch_related('labels', 'labels__label') \
+            .annotate(users_amount=Count("users"),
+                      user_groups_amount=Count("user_groups"),
+                      assets_amount=Count("assets"),
+                      nodes_amount=Count("nodes"),
+                      )
         return queryset
