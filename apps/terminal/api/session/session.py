@@ -18,10 +18,11 @@ from rest_framework.response import Response
 
 from audits.const import ActionChoices
 from common.api import AsyncApiMixin
-from common.const.http import GET
+from common.const.http import GET, POST
 from common.drf.filters import BaseFilterSet
 from common.drf.filters import DatetimeRangeFilterBackend
 from common.drf.renders import PassthroughRenderer
+from common.permissions import IsServiceAccount
 from common.storage.replay import ReplayStorageHandler
 from common.utils import data_to_json, is_uuid, i18n_fmt
 from common.utils import get_logger, get_object_or_none
@@ -33,6 +34,7 @@ from terminal import serializers
 from terminal.const import TerminalType
 from terminal.models import Session
 from terminal.permissions import IsSessionAssignee
+from terminal.session_lifecycle import lifecycle_events_map, reasons_map
 from terminal.utils import is_session_approver
 from users.models import User
 
@@ -79,6 +81,7 @@ class SessionViewSet(RecordViewLogMixin, OrgBulkModelViewSet):
     serializer_classes = {
         'default': serializers.SessionSerializer,
         'display': serializers.SessionDisplaySerializer,
+        'lifecycle_log': serializers.SessionLifecycleLogSerializer,
     }
     search_fields = [
         "user", "asset", "account", "remote_addr",
@@ -167,6 +170,23 @@ class SessionViewSet(RecordViewLogMixin, OrgBulkModelViewSet):
             queryset = queryset.filter(account__endswith='({})'.format(account))
         count = queryset.count()
         return Response({'count': count})
+
+    @action(methods=[POST], detail=True, permission_classes=[IsServiceAccount], url_path='lifecycle_log',
+            url_name='lifecycle_log')
+    def lifecycle_log(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+        event = validated_data.pop('event', None)
+        event_class = lifecycle_events_map.get(event, None)
+        if not event_class:
+            return Response({'msg': f'event_name {event} invalid'}, status=400)
+        session = self.get_object()
+        reason = validated_data.pop('reason', None)
+        reason = reasons_map.get(reason, reason)
+        event_obj = event_class(session, reason, **validated_data)
+        activity_log = event_obj.create_activity_log()
+        return Response({'msg': 'ok', 'id': activity_log.id})
 
     def get_queryset(self):
         queryset = super().get_queryset() \
