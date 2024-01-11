@@ -104,9 +104,11 @@ class QuerySetMixin:
         page = super().paginate_queryset(queryset)
         serializer_class = self.get_serializer_class()
         if page and serializer_class and hasattr(serializer_class, 'setup_eager_loading'):
-            ids = [i.id for i in page]
+            ids = [str(obj.id) for obj in page]
             page = self.get_queryset().filter(id__in=ids)
             page = serializer_class.setup_eager_loading(page)
+            page_mapper = {str(obj.id): obj for obj in page}
+            page = [page_mapper.get(_id) for _id in ids if _id in page_mapper]
         return page
 
 
