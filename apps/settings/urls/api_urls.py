@@ -30,6 +30,7 @@ urlpatterns = [
     path('public/', api.PublicSettingApi.as_view(), name='public-setting'),
     path('public/open/', api.OpenPublicSettingApi.as_view(), name='open-public-setting'),
     path('server-info/', api.ServerInfoApi.as_view(), name='server-info'),
+    path('i18n/<str:name>/', api.ComponentI18nApi.as_view(), name='i18n-data'),
 ]
 
 urlpatterns += router.urls

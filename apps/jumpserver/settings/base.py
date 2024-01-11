@@ -298,7 +298,7 @@ USE_TZ = True
 
 # I18N translation
 LOCALE_PATHS = [
-    os.path.join(BASE_DIR, 'locale'),
+    os.path.join(BASE_DIR, 'locale', 'core'),
 ]
 
 # Static files (CSS, JavaScript, Images)
@@ -322,7 +322,6 @@ PRIVATE_STORAGE_INTERNAL_URL = '/private-media/'
 PRIVATE_STORAGE_SERVER = 'nginx'
 if DEBUG_DEV:
     PRIVATE_STORAGE_SERVER = 'django'
-
 
 # Use django-bootstrap-form to format template, input max width arg
 # BOOTSTRAP_COLUMN_COUNT = 11

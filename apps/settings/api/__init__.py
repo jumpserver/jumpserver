@@ -2,6 +2,7 @@ from .chat import *
 from .dingtalk import *
 from .email import *
 from .feishu import *
+from .i18n import *
 from .ldap import *
 from .public import *
 from .security import *
