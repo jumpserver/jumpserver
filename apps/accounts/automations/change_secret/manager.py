@@ -161,7 +161,8 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             print("Account not found, deleted ?")
             return
         account.secret = recorder.new_secret
-        account.save(update_fields=['secret'])
+        account.date_updated = timezone.now()
+        account.save(update_fields=['secret', 'date_updated'])
 
     def on_host_error(self, host, error, result):
         recorder = self.name_recorder_mapper.get(host)
