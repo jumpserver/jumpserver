@@ -400,11 +400,14 @@ class LDAPImportUtil(object):
         logger.info('Start perform import ldap users, count: {}'.format(len(users)))
         errors = []
         objs = []
+        new_users = []
         group_users_mapper = defaultdict(set)
         for user in users:
             groups = user.pop('groups', [])
             try:
                 obj, created = self.update_or_create(user)
+                if created:
+                    new_users.append(obj)
                 objs.append(obj)
             except Exception as e:
                 errors.append({user['username']: str(e)})
@@ -421,7 +424,7 @@ class LDAPImportUtil(object):
         for org in orgs:
             self.bind_org(org, objs, group_users_mapper)
         logger.info('End perform import ldap users')
-        return errors
+        return new_users, errors
 
     def exit_user_group(self, user_groups_mapper):
         # 通过对比查询本次导入用户需要移除的用户组
