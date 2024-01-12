@@ -90,6 +90,6 @@ class MFAChallengeVerifyApi(AuthMixin, CreateAPIView):
             return Response({'msg': 'ok'})
         except errors.AuthFailedError as e:
             data = {"error": e.error, "msg": e.msg}
-            raise ValidationError(data)
+            return Response(data, status=401)
         except errors.NeedMoreInfoError as e:
             return Response(e.as_data(), status=200)
