@@ -4,6 +4,21 @@ import time
 import paramiko
 from sshtunnel import SSHTunnelForwarder
 
+from packaging import version
+
+if version.parse(paramiko.__version__) > version.parse("2.8.1"):
+    _preferred_pubkeys = (
+        "ssh-ed25519",
+        "ecdsa-sha2-nistp256",
+        "ecdsa-sha2-nistp384",
+        "ecdsa-sha2-nistp521",
+        "ssh-rsa",
+        "rsa-sha2-256",
+        "rsa-sha2-512",
+        "ssh-dss",
+    )
+    paramiko.transport.Transport._preferred_pubkeys = _preferred_pubkeys
+
 
 def common_argument_spec():
     options = dict(
