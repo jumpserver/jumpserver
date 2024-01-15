@@ -5019,7 +5019,7 @@ msgid "Passkey Auth"
 msgstr "Passkey 認証"
 
 #: settings/serializers/auth/base.py:26
-msgid "Forgot password url"
+msgid "Forgot Password URL"
 msgstr "パスワードのURLを忘れた"
 
 #: settings/serializers/auth/base.py:29
@@ -5184,7 +5184,7 @@ msgid "OIDC"
 msgstr "OIDC"
 
 #: settings/serializers/auth/oidc.py:16
-msgid "Base site url"
+msgid "Base site URL"
 msgstr "ベースサイトのアドレス"
 
 #: settings/serializers/auth/oidc.py:32
@@ -5430,7 +5430,7 @@ msgid "Enable WeCom Auth"
 msgstr "企業微信認証の有効化"
 
 #: settings/serializers/basic.py:11
-msgid "Site url"
+msgid "Site URL"
 msgstr "サイトURL"
 
 #: settings/serializers/basic.py:13
@@ -5450,7 +5450,7 @@ msgid "User first login update profile done redirect to it"
 msgstr "ユーザーの最初のログイン更新プロファイルがリダイレクトされました"
 
 #: settings/serializers/basic.py:22
-msgid "Global organization name"
+msgid "Global organization"
 msgstr "グローバル組織名"
 
 #: settings/serializers/basic.py:23
@@ -5526,7 +5526,7 @@ msgid "Subject"
 msgstr "件名"
 
 #: settings/serializers/feature.py:22
-msgid "More url"
+msgid "More URL"
 msgstr "もっとURL"
 
 #: settings/serializers/feature.py:36 settings/serializers/feature.py:39
@@ -5569,7 +5569,7 @@ msgid "Enable Chat AI"
 msgstr "チャットAIを起動する"
 
 #: settings/serializers/feature.py:78
-msgid "Base Url"
+msgid "Base URL"
 msgstr "基本的なUrl"
 
 #: settings/serializers/feature.py:81 templates/_header_bar.html:90

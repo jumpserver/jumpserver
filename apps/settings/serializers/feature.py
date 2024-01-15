@@ -19,7 +19,7 @@ class AnnouncementSerializer(serializers.Serializer):
     CONTENT = serializers.CharField(label=_("Content"))
     LINK = serializers.URLField(
         required=False, allow_null=True, allow_blank=True,
-        label=_("More url"), default='',
+        label=_("More URL"), default='',
     )
 
     def to_representation(self, instance):
@@ -75,7 +75,7 @@ class ChatAISettingSerializer(serializers.Serializer):
         required=False, label=_('Enable Chat AI')
     )
     GPT_BASE_URL = serializers.CharField(
-        max_length=256, allow_blank=True, required=False, label=_('Base Url')
+        max_length=256, allow_blank=True, required=False, label=_('Base URL')
     )
     GPT_API_KEY = EncryptedField(
         max_length=256, allow_blank=True, required=False, label=_('API Key'),

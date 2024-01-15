@@ -13,7 +13,7 @@ class CommonSettingSerializer(serializers.Serializer):
     # OpenID 公有配置参数 (version <= 1.5.8 或 version >= 1.5.8)
     BASE_SITE_URL = serializers.CharField(
         required=False, allow_null=True, allow_blank=True,
-        max_length=1024, label=_('Base site url')
+        max_length=1024, label=_('Base site URL')
     )
     AUTH_OPENID_CLIENT_ID = serializers.CharField(
         required=False, max_length=1024, label=_('Client Id')

@@ -8,7 +8,7 @@ class BasicSettingSerializer(serializers.Serializer):
     PREFIX_TITLE = _('Basic')
 
     SITE_URL = serializers.URLField(
-        required=True, label=_("Site url"),
+        required=True, label=_("Site URL"),
         help_text=_(
             'External URL, email links or other system callbacks are used to access it, '
             'eg: http://dev.jumpserver.org:8080'
@@ -19,7 +19,7 @@ class BasicSettingSerializer(serializers.Serializer):
         help_text=_('User first login update profile done redirect to it')
     )
     GLOBAL_ORG_DISPLAY_NAME = serializers.CharField(
-        required=False, max_length=1024, allow_blank=True, allow_null=True, label=_("Global organization name"),
+        required=False, max_length=1024, allow_blank=True, allow_null=True, label=_("Global organization"),
         help_text=_('The name of global organization to display')
     )
     HELP_DOCUMENT_URL = serializers.URLField(
