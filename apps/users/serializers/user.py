@@ -162,6 +162,9 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLa
                 "allow_null": True,
                 "allow_blank": True,
             },
+            "groups": {
+                "label": _("Groups"),
+            },
             "public_key": {"write_only": True},
             "is_first_login": {"label": _("Is first login"), "read_only": True},
             "is_active": {"label": _("Is active")},
