@@ -181,6 +181,8 @@ class UserPermedNodeChildrenWithAssetsAsCategoryTreeApi(BaseUserNodeWithAssetAsT
         return self.query_asset_util.get_all_assets()
 
     def _get_tree_nodes_async(self):
+        if self.request.query_params.get('lv') == '0':
+            return [], []
         if not self.tp or not all(self.tp):
             nodes = UserPermAssetUtil.get_type_nodes_tree_or_cached(self.user)
             return nodes, []
