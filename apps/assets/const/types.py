@@ -169,10 +169,10 @@ class AllTypes(ChoicesMixin):
             (Category.HOST, HostTypes),
             (Category.DEVICE, DeviceTypes),
             (Category.DATABASE, DatabaseTypes),
-            (Category.CLOUD, CloudTypes),
-            (Category.WEB, WebTypes),
-            (Category.GPT, GPTTypes),
-            (Category.CUSTOM, CustomTypes),
+            # (Category.CLOUD, CloudTypes),
+            # (Category.WEB, WebTypes),
+            # (Category.GPT, GPTTypes),
+            # (Category.CUSTOM, CustomTypes),
         )
 
     @classmethod
