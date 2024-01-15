@@ -4964,7 +4964,7 @@ msgid "Passkey Auth"
 msgstr "Passkey 认证"
 
 #: settings/serializers/auth/base.py:26
-msgid "Forgot password url"
+msgid "Forgot Password URL"
 msgstr "忘记密码 URL"
 
 #: settings/serializers/auth/base.py:29
@@ -5129,7 +5129,7 @@ msgid "OIDC"
 msgstr "OIDC"
 
 #: settings/serializers/auth/oidc.py:16
-msgid "Base site url"
+msgid "Base site URL"
 msgstr "JumpServer 地址"
 
 #: settings/serializers/auth/oidc.py:32
@@ -5372,7 +5372,7 @@ msgid "Enable WeCom Auth"
 msgstr "启用企业微信认证"
 
 #: settings/serializers/basic.py:11
-msgid "Site url"
+msgid "Site URL"
 msgstr "当前站点 URL"
 
 #: settings/serializers/basic.py:13
@@ -5392,7 +5392,7 @@ msgid "User first login update profile done redirect to it"
 msgstr "用户第一次登录，修改profile后重定向到地址, 可以是 wiki 或 其他说明文档"
 
 #: settings/serializers/basic.py:22
-msgid "Global organization name"
+msgid "Global organization"
 msgstr "全局组织名"
 
 #: settings/serializers/basic.py:23
@@ -5467,7 +5467,7 @@ msgid "Subject"
 msgstr "主题"
 
 #: settings/serializers/feature.py:22
-msgid "More url"
+msgid "More URL"
 msgstr "更多信息 URL"
 
 #: settings/serializers/feature.py:36 settings/serializers/feature.py:39
@@ -5509,7 +5509,7 @@ msgid "Enable Chat AI"
 msgstr "启动聊天 AI"
 
 #: settings/serializers/feature.py:78
-msgid "Base Url"
+msgid "Base URL"
 msgstr "基本地址"
 
 #: settings/serializers/feature.py:81 templates/_header_bar.html:90
