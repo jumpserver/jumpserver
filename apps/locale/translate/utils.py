@@ -2,8 +2,8 @@ from openai import AsyncOpenAI
 
 
 class OpenAITranslate:
-    def __init__(self, key: str | None = None):
-        self.client = AsyncOpenAI(api_key=key)
+    def __init__(self, key: str | None = None, base_url: str | None = None):
+        self.client = AsyncOpenAI(api_key=key, base_url=base_url)
 
     async def translate_text(self, text, target_lang="English") -> str | None:
         try:
