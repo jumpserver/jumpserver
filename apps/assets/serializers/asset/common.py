@@ -206,9 +206,12 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         """ Perform necessary eager loading of data. """
         queryset = queryset.prefetch_related('domain', 'nodes', 'protocols', ) \
             .prefetch_related('platform', 'platform__automation') \
-            .prefetch_related('labels', 'labels__label') \
             .annotate(category=F("platform__category")) \
             .annotate(type=F("platform__type"))
+        if queryset.model is Asset:
+            queryset = queryset.prefetch_related('labels__label', 'labels')
+        else:
+            queryset = queryset.prefetch_related('asset_ptr__labels__label', 'asset_ptr__labels')
         return queryset
 
     @staticmethod
