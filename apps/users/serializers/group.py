@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -46,7 +46,7 @@ class UserGroupSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
         queryset = queryset.prefetch_related('labels', 'labels__label') \
-            .annotate(users_amount=Count('users'))
+            .annotate(users_amount=Count('users', filter=Q(users__is_service_account=False)))
         return queryset
 
 
