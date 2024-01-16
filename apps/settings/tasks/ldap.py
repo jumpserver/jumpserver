@@ -57,6 +57,7 @@ def import_ldap_user():
             'time_start_display': time_start_display,
             'new_users': new_users,
             'errors': errors,
+            'cost_time': end_time - start_time,
         }
         for user in recipient_list:
             LDAPImportMessage(user, extra_kwargs).publish()
