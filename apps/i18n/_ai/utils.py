@@ -16,7 +16,10 @@ class OpenAITranslate:
                                    f"I provided you and translate it into {target_lang}. "
                                    f"Please do not use a translation accent when translating, "
                                    f"but translate naturally, smoothly and authentically, "
-                                   f"using beautiful and elegant words. way of expression.",
+                                   f"using beautiful and elegant words. way of expression,"
+                                   f"If you found word '动作' please translate it to 'Action', because it's short,"
+                                   f"If you found word '管理' in menu, you can not translate it, because management is too long in menu"
+                        ,
                     },
                     {
                         "role": "user",

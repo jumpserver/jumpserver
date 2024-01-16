@@ -1,9 +1,9 @@
 import asyncio
 import os
 
-from apps.locale.translate import LOCALE_DIR
-from apps.locale.translate.manager import OtherTranslateManager, CoreTranslateManager
-from apps.locale.translate.utils import OpenAITranslate
+from _ai import LOCALE_DIR
+from _ai.manager import OtherTranslateManager, CoreTranslateManager
+from _ai.utils import OpenAITranslate
 
 
 class Translate:
@@ -22,6 +22,7 @@ class Translate:
         return dir_names
 
     async def core_trans(self, dir_name):
+        return
         _dir = os.path.join(LOCALE_DIR, dir_name)
         zh_file = os.path.join(_dir, 'zh', 'LC_MESSAGES', 'django.po')
         if not os.path.exists(zh_file):
@@ -45,6 +46,8 @@ class Translate:
             return
 
         for dir_name in dir_names:
+            if dir_name.startswith('_'):
+                continue
             if hasattr(self, f'{dir_name}_trans'):
                 await getattr(self, f'{dir_name}_trans')(dir_name)
             else:
