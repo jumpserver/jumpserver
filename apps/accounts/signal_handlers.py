@@ -21,7 +21,8 @@ def on_account_pre_save(sender, instance, **kwargs):
     if instance.version == 0:
         instance.version = 1
     else:
-        instance.version = instance.history.count()
+        history_account = instance.history.first()
+        instance.version = history_account.version + 1 if history_account else 0
 
 
 @merge_delay_run(ttl=5)
