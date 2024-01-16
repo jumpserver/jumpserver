@@ -17,6 +17,7 @@ class LDAPImportMessage(UserMessage):
         self.time_start_display = extra_kwargs.pop('time_start_display', '')
         self.new_users = extra_kwargs.pop('new_users', [])
         self.errors = extra_kwargs.pop('errors', [])
+        self.cost_time = extra_kwargs.pop('cost_time', '')
 
     def get_html_msg(self) -> dict:
         subject = _('Notification of Synchronized LDAP User Task Results')
@@ -24,7 +25,7 @@ class LDAPImportMessage(UserMessage):
             'orgs': self.orgs,
             'start_time': self.time_start_display,
             'end_time': local_now_display(),
-            'cost_time': self.end_time - self.start_time,
+            'cost_time': self.cost_time,
             'users': self.new_users,
             'errors': self.errors
         }
