@@ -2,13 +2,14 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import OneToOneField
 
+from common.utils import lazyproperty
 from .models import LabeledResource
 
 __all__ = ['LabeledMixin']
 
 
 class LabeledMixin(models.Model):
-    _labels = GenericRelation(LabeledResource, object_id_field='res_id', content_type_field='res_type')
+    labels = GenericRelation(LabeledResource, object_id_field='res_id', content_type_field='res_type')
 
     class Meta:
         abstract = True
@@ -21,7 +22,7 @@ class LabeledMixin(models.Model):
             model = pk_field.related_model
         return model
 
-    @property
+    @lazyproperty
     def real(self):
         pk_field = self._meta.pk
         if isinstance(pk_field, OneToOneField):
@@ -29,9 +30,9 @@ class LabeledMixin(models.Model):
         return self
 
     @property
-    def labels(self):
-        return self.real._labels
+    def res_labels(self):
+        return self.real.labels
 
-    @labels.setter
-    def labels(self, value):
-        self.real._labels.set(value, bulk=False)
+    @res_labels.setter
+    def res_labels(self, value):
+        self.real.labels.set(value, bulk=False)
