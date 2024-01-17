@@ -7,7 +7,7 @@ from .const import RED, GREEN, RESET
 
 
 class BaseTranslateManager:
-    bulk_size = 30
+    bulk_size = 15
     SEPARATOR = "<SEP>"
     LANG_MAPPER = {
         # 'ja': 'Japanese',

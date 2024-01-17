@@ -3,7 +3,7 @@ import os
 import polib
 
 from .base import BaseTranslateManager
-from .const import RED, GREEN
+from .const import RED, GREEN, MAGENTA
 
 
 class CoreTranslateManager(BaseTranslateManager):
