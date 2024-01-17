@@ -14,6 +14,7 @@ from assets.api import SerializeToTreeNodeMixin
 from assets.models import Asset
 from assets.utils import KubernetesTree
 from authentication.models import ConnectionToken
+from common.exceptions import JMSException
 from common.utils import get_object_or_none, lazyproperty
 from common.utils.common import timeit
 from perms.hands import Node
@@ -264,5 +265,8 @@ class UserGrantedK8sAsTreeApi(SelfOrPKUserMixin, ListAPIView):
         if not any([namespace, pod]) and not key:
             asset_node = k8s_tree_instance.as_asset_tree_node()
             tree.append(asset_node)
-        tree.extend(k8s_tree_instance.async_tree_node(namespace, pod))
-        return Response(data=tree)
+        try:
+            tree.extend(k8s_tree_instance.async_tree_node(namespace, pod))
+            return Response(data=tree)
+        except Exception as e:
+            raise JMSException(e)
