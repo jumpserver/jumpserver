@@ -101,7 +101,7 @@ def collect_static():
 
 
 def compile_i18n_file():
-    django_mo_file = os.path.join(BASE_DIR, 'apps', 'locale', 'zh', 'LC_MESSAGES', 'django.mo')
+    django_mo_file = os.path.join(BASE_DIR, 'apps', 'core', 'locale', 'zh', 'LC_MESSAGES', 'django.mo')
     if os.path.exists(django_mo_file):
         return
     os.chdir(os.path.join(BASE_DIR, 'apps'))

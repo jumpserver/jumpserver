@@ -2,8 +2,8 @@ import os
 
 import polib
 
-from apps.locale.translate import RED, MAGENTA, GREEN
 from .base import BaseTranslateManager
+from .const import RED, GREEN
 
 
 class CoreTranslateManager(BaseTranslateManager):

@@ -1,8 +1,8 @@
 import json
 import os
 
-from apps.locale.translate import RED, GREEN
 from .base import BaseTranslateManager
+from .const import RED, GREEN
 
 
 class OtherTranslateManager(BaseTranslateManager):

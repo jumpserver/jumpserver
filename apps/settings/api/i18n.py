@@ -14,9 +14,13 @@ class ComponentI18nApi(RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         name = kwargs.get('name')
-        component_dir = safe_join(settings.APPS_DIR, 'locale', name)
+        component_dir = safe_join(settings.APPS_DIR, 'i18n', name)
         lang = request.query_params.get('lang')
-        files = os.listdir(component_dir)
+
+        if os.path.exists(component_dir):
+            files = os.listdir(component_dir)
+        else:
+            files = []
         data = {}
         for file in files:
             if not file.endswith('.json'):
