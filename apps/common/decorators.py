@@ -101,7 +101,10 @@ def run_debouncer_func(cache_key, org, ttl, func, *args, **kwargs):
         first_run_time = current
 
     if current - first_run_time > ttl:
+        _loop_debouncer_func_args_cache.pop(cache_key, None)
+        _loop_debouncer_func_task_time_cache.pop(cache_key, None)
         executor.submit(run_func_partial, *args, **kwargs)
+        logger.debug('executor submit run {}'.format(func.__name__,))
         return
 
     loop = _loop_thread.get_loop()
@@ -136,10 +139,12 @@ class Debouncer(object):
 def _run_func_with_org(key, org, func, *args, **kwargs):
     from orgs.utils import set_current_org
     try:
-        set_current_org(org)
-        func(*args, **kwargs)
+        with transaction.atomic():
+            set_current_org(org)
+            func(*args, **kwargs)
     except Exception as e:
-        logger.error('delay run error: %s' % e)
+        logger.error('thread {} delay run {} error: {}'.format(
+            threading.current_thread(), func.__name__, e))
     _loop_debouncer_func_task_cache.pop(key, None)
     _loop_debouncer_func_args_cache.pop(key, None)
     _loop_debouncer_func_task_time_cache.pop(key, None)
