@@ -165,6 +165,9 @@ class UserSerializer(RolesSerializerMixin, CommonBulkSerializerMixin, ResourceLa
             "groups": {
                 "label": _("Groups"),
             },
+            "is_superuser": {
+                "label": _("Superuser")
+            },
             "public_key": {"write_only": True},
             "is_first_login": {"label": _("Is first login"), "read_only": True},
             "is_active": {"label": _("Is active")},
