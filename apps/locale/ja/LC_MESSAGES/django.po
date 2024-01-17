@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-11 18:58+0800\n"
+"POT-Creation-Date: 2024-01-17 19:11+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -363,7 +363,7 @@ msgstr "アカウントバックアップ計画"
 #: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:235
 #: ops/templates/ops/celery_task_log.html:75
 #: perms/models/asset_permission.py:78
-#: settings/templates/ldap/_msg_import_ldap_user.html:25
+#: settings/templates/ldap/_msg_import_ldap_user.html:5
 #: terminal/models/applet/host.py:141 terminal/models/session/session.py:44
 #: tickets/models/ticket/apply_application.py:30
 #: tickets/models/ticket/apply_asset.py:19
@@ -373,7 +373,7 @@ msgstr "開始日"
 #: accounts/models/automations/backup_account.py:122
 #: authentication/templates/authentication/_msg_oauth_bind.html:11
 #: notifications/notifications.py:186
-#: settings/templates/ldap/_msg_import_ldap_user.html:23
+#: settings/templates/ldap/_msg_import_ldap_user.html:3
 msgid "Time"
 msgstr "時間"
 
@@ -495,7 +495,7 @@ msgstr "ステータス"
 #: authentication/templates/authentication/passkey.html:173
 #: authentication/views/base.py:42 authentication/views/base.py:43
 #: authentication/views/base.py:44 common/const/choices.py:20
-#: settings/templates/ldap/_msg_import_ldap_user.html:16
+#: settings/templates/ldap/_msg_import_ldap_user.html:22
 msgid "Error"
 msgstr "間違い"
 
@@ -873,7 +873,7 @@ msgid "Key password"
 msgstr "キーパスワード"
 
 #: accounts/serializers/account/base.py:78
-#: assets/serializers/asset/common.py:381
+#: assets/serializers/asset/common.py:384
 msgid "Spec info"
 msgstr "特別情報"
 
@@ -989,17 +989,17 @@ msgstr "自動タスク実行履歴"
 msgid "Success"
 msgstr "成功"
 
-#: accounts/signal_handlers.py:46
+#: accounts/signal_handlers.py:47
 #, python-format
 msgid "Push related accounts to assets: %s, by system"
 msgstr "関連するアカウントをアセットにプッシュ: %s, by system"
 
-#: accounts/signal_handlers.py:55
+#: accounts/signal_handlers.py:56
 #, python-format
 msgid "Add account: %s"
 msgstr "アカウントを追加: %s"
 
-#: accounts/signal_handlers.py:57
+#: accounts/signal_handlers.py:58
 #, python-format
 msgid "Delete account: %s"
 msgstr "アカウントを削除: %s"
@@ -1750,7 +1750,7 @@ msgstr "ドメイン"
 msgid "Node"
 msgstr "ノード"
 
-#: assets/models/asset/common.py:167 assets/serializers/asset/common.py:382
+#: assets/models/asset/common.py:167 assets/serializers/asset/common.py:385
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr "資産ハードウェア情報の収集"
@@ -2085,23 +2085,23 @@ msgid "Node path"
 msgstr "ノードパスです"
 
 #: assets/serializers/asset/common.py:148
-#: assets/serializers/asset/common.py:383
+#: assets/serializers/asset/common.py:386
 msgid "Auto info"
 msgstr "自動情報"
 
-#: assets/serializers/asset/common.py:242
+#: assets/serializers/asset/common.py:245
 msgid "Platform not exist"
 msgstr "プラットフォームが存在しません"
 
-#: assets/serializers/asset/common.py:278
+#: assets/serializers/asset/common.py:281
 msgid "port out of range (0-65535)"
 msgstr "ポート番号が範囲外です (0-65535)"
 
-#: assets/serializers/asset/common.py:285
+#: assets/serializers/asset/common.py:288
 msgid "Protocol is required: {}"
 msgstr "プロトコルが必要です: {}"
 
-#: assets/serializers/asset/common.py:313
+#: assets/serializers/asset/common.py:316
 msgid "Invalid data"
 msgstr "無効なデータ"
 
@@ -2611,8 +2611,8 @@ msgstr "認証トークン"
 
 #: audits/signal_handlers/login_log.py:37 authentication/notifications.py:73
 #: authentication/views/login.py:77 notifications/backends/__init__.py:11
-#: settings/notifications.py:68 settings/serializers/auth/wecom.py:10
-#: users/models/user.py:749 users/models/user.py:855
+#: settings/serializers/auth/wecom.py:10 users/models/user.py:749
+#: users/models/user.py:855
 msgid "WeCom"
 msgstr "企業微信"
 
@@ -2648,9 +2648,9 @@ msgstr "仮パスワード"
 msgid "Passkey"
 msgstr "Passkey"
 
-#: audits/tasks.py:101 users/signal_handlers.py:166
+#: audits/tasks.py:101
 msgid "Clean audits session task log"
-msgstr "監査セッション タスク ログのクリーンアップ"
+msgstr "資産監査セッションタスクログのクリーンアップ"
 
 #: audits/tasks.py:114
 msgid "Upload FTP file to external storage"
@@ -3176,7 +3176,7 @@ msgstr "確認済み"
 msgid "Different city login reminder"
 msgstr "異なる都市ログインのリマインダー"
 
-#: authentication/notifications.py:52 settings/notifications.py:47
+#: authentication/notifications.py:52
 msgid "binding reminder"
 msgstr "バインディングリマインダー"
 
@@ -4387,7 +4387,7 @@ msgid "Is finished"
 msgstr "終了しました"
 
 #: ops/serializers/job.py:66
-#: settings/templates/ldap/_msg_import_ldap_user.html:27
+#: settings/templates/ldap/_msg_import_ldap_user.html:7
 msgid "Time cost"
 msgstr "時を過ごす"
 
@@ -4976,7 +4976,7 @@ msgstr "他の設定を変えることができます"
 msgid "Chat prompt"
 msgstr "チャットのヒント"
 
-#: settings/notifications.py:22
+#: settings/notifications.py:23
 msgid "Notification of Synchronized LDAP User Task Results"
 msgstr "LDAPユーザータスクの結果通知を同期する"
 
@@ -5639,10 +5639,8 @@ msgid "Enable virtual app"
 msgstr "仮想アプリケーションの有効化"
 
 #: settings/serializers/msg.py:25
-#, fuzzy
-#| msgid "SMTP host"
 msgid "SMTP"
-msgstr "SMTPホスト"
+msgstr "SMTP"
 
 #: settings/serializers/msg.py:26
 msgid "EXCHANGE"
@@ -6089,7 +6087,7 @@ msgstr "Razor の有効化"
 msgid "Enable SSH Client"
 msgstr "SSH Clientの有効化"
 
-#: settings/tasks/ldap.py:29
+#: settings/tasks/ldap.py:28
 msgid "Periodic import ldap user"
 msgstr "LDAP ユーザーを定期的にインポートする"
 
@@ -6101,18 +6099,18 @@ msgstr "登録サイクルLDAPユーザータスクのインポート"
 msgid "Sync task Finish"
 msgstr "同期タスクが完了しました"
 
-#: settings/templates/ldap/_msg_import_ldap_user.html:3
-msgid "Synced Organization"
-msgstr "組織が同期されました"
-
-#: settings/templates/ldap/_msg_import_ldap_user.html:9
-msgid "Synced User"
-msgstr "同期されたユーザー"
-
-#: settings/templates/ldap/_msg_import_ldap_user.html:26
+#: settings/templates/ldap/_msg_import_ldap_user.html:6
 #: terminal/models/session/session.py:45
 msgid "Date end"
 msgstr "終了日"
+
+#: settings/templates/ldap/_msg_import_ldap_user.html:9
+msgid "Synced Organization"
+msgstr "組織が同期されました"
+
+#: settings/templates/ldap/_msg_import_ldap_user.html:15
+msgid "Synced User"
+msgstr "同期されたユーザー"
 
 #: settings/utils/ldap.py:494
 msgid "ldap:// or ldaps:// protocol is used."
@@ -8078,6 +8076,10 @@ msgstr ""
 "管理者は「既存のユーザーのみログインを許可」をオンにしており、現在のユーザー"
 "はユーザーリストにありません。管理者に連絡してください。"
 
+#: users/signal_handlers.py:166
+msgid "Clean up expired user sessions"
+msgstr "期限切れのユーザー・セッションのパージ"
+
 #: users/tasks.py:25
 msgid "Check password expired"
 msgstr "パスワードの有効期限が切れていることを確認する"
@@ -8509,7 +8511,7 @@ msgstr "そして"
 msgid "Or"
 msgstr "または"
 
-#: xpack/plugins/cloud/manager.py:57
+#: xpack/plugins/cloud/manager.py:56
 msgid "Account unavailable"
 msgstr "利用できないアカウント"
 

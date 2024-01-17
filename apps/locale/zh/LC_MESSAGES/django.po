@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-11 18:58+0800\n"
+"POT-Creation-Date: 2024-01-17 19:11+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -362,7 +362,7 @@ msgstr "账号备份计划"
 #: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:235
 #: ops/templates/ops/celery_task_log.html:75
 #: perms/models/asset_permission.py:78
-#: settings/templates/ldap/_msg_import_ldap_user.html:25
+#: settings/templates/ldap/_msg_import_ldap_user.html:5
 #: terminal/models/applet/host.py:141 terminal/models/session/session.py:44
 #: tickets/models/ticket/apply_application.py:30
 #: tickets/models/ticket/apply_asset.py:19
@@ -372,7 +372,7 @@ msgstr "开始日期"
 #: accounts/models/automations/backup_account.py:122
 #: authentication/templates/authentication/_msg_oauth_bind.html:11
 #: notifications/notifications.py:186
-#: settings/templates/ldap/_msg_import_ldap_user.html:23
+#: settings/templates/ldap/_msg_import_ldap_user.html:3
 msgid "Time"
 msgstr "时间"
 
@@ -494,7 +494,7 @@ msgstr "状态"
 #: authentication/templates/authentication/passkey.html:173
 #: authentication/views/base.py:42 authentication/views/base.py:43
 #: authentication/views/base.py:44 common/const/choices.py:20
-#: settings/templates/ldap/_msg_import_ldap_user.html:16
+#: settings/templates/ldap/_msg_import_ldap_user.html:22
 msgid "Error"
 msgstr "错误"
 
@@ -871,7 +871,7 @@ msgid "Key password"
 msgstr "密钥密码"
 
 #: accounts/serializers/account/base.py:78
-#: assets/serializers/asset/common.py:381
+#: assets/serializers/asset/common.py:384
 msgid "Spec info"
 msgstr "特殊信息"
 
@@ -986,17 +986,17 @@ msgstr "自动化任务执行历史"
 msgid "Success"
 msgstr "成功"
 
-#: accounts/signal_handlers.py:46
+#: accounts/signal_handlers.py:47
 #, python-format
 msgid "Push related accounts to assets: %s, by system"
 msgstr "推送账号到资产: %s, 由系统执行"
 
-#: accounts/signal_handlers.py:55
+#: accounts/signal_handlers.py:56
 #, python-format
 msgid "Add account: %s"
 msgstr "添加账号: %s"
 
-#: accounts/signal_handlers.py:57
+#: accounts/signal_handlers.py:58
 #, python-format
 msgid "Delete account: %s"
 msgstr "删除账号: %s"
@@ -1742,7 +1742,7 @@ msgstr "网域"
 msgid "Node"
 msgstr "节点"
 
-#: assets/models/asset/common.py:167 assets/serializers/asset/common.py:382
+#: assets/models/asset/common.py:167 assets/serializers/asset/common.py:385
 #: assets/serializers/asset/host.py:11
 msgid "Gathered info"
 msgstr "收集资产硬件信息"
@@ -2075,23 +2075,23 @@ msgid "Node path"
 msgstr "节点路径"
 
 #: assets/serializers/asset/common.py:148
-#: assets/serializers/asset/common.py:383
+#: assets/serializers/asset/common.py:386
 msgid "Auto info"
 msgstr "自动化信息"
 
-#: assets/serializers/asset/common.py:242
+#: assets/serializers/asset/common.py:245
 msgid "Platform not exist"
 msgstr "平台不存在"
 
-#: assets/serializers/asset/common.py:278
+#: assets/serializers/asset/common.py:281
 msgid "port out of range (0-65535)"
 msgstr "端口超出范围 (0-65535)"
 
-#: assets/serializers/asset/common.py:285
+#: assets/serializers/asset/common.py:288
 msgid "Protocol is required: {}"
 msgstr "协议是必填的: {}"
 
-#: assets/serializers/asset/common.py:313
+#: assets/serializers/asset/common.py:316
 msgid "Invalid data"
 msgstr "无效的数据"
 
@@ -2594,8 +2594,8 @@ msgstr "认证令牌"
 
 #: audits/signal_handlers/login_log.py:37 authentication/notifications.py:73
 #: authentication/views/login.py:77 notifications/backends/__init__.py:11
-#: settings/notifications.py:68 settings/serializers/auth/wecom.py:10
-#: users/models/user.py:749 users/models/user.py:855
+#: settings/serializers/auth/wecom.py:10 users/models/user.py:749
+#: users/models/user.py:855
 msgid "WeCom"
 msgstr "企业微信"
 
@@ -2631,9 +2631,9 @@ msgstr "临时密码"
 msgid "Passkey"
 msgstr "Passkey"
 
-#: audits/tasks.py:101 users/signal_handlers.py:166
+#: audits/tasks.py:101
 msgid "Clean audits session task log"
-msgstr "清理审计会话任务日志"
+msgstr "清理资产审计会话任务日志"
 
 #: audits/tasks.py:114
 msgid "Upload FTP file to external storage"
@@ -3144,7 +3144,7 @@ msgstr "已校验"
 msgid "Different city login reminder"
 msgstr "异地登录提醒"
 
-#: authentication/notifications.py:52 settings/notifications.py:47
+#: authentication/notifications.py:52
 msgid "binding reminder"
 msgstr "绑定提醒"
 
@@ -4336,7 +4336,7 @@ msgid "Is finished"
 msgstr "是否完成"
 
 #: ops/serializers/job.py:66
-#: settings/templates/ldap/_msg_import_ldap_user.html:27
+#: settings/templates/ldap/_msg_import_ldap_user.html:7
 msgid "Time cost"
 msgstr "花费时间"
 
@@ -4921,7 +4921,7 @@ msgstr "其它设置"
 msgid "Chat prompt"
 msgstr "聊天提示"
 
-#: settings/notifications.py:22
+#: settings/notifications.py:23
 msgid "Notification of Synchronized LDAP User Task Results"
 msgstr "同步LDAP用户任务结果通知"
 
@@ -5579,10 +5579,8 @@ msgid "Enable virtual app"
 msgstr "启用虚拟应用"
 
 #: settings/serializers/msg.py:25
-#, fuzzy
-#| msgid "SMTP host"
 msgid "SMTP"
-msgstr "SMTP 主机"
+msgstr "SMTP"
 
 #: settings/serializers/msg.py:26
 msgid "EXCHANGE"
@@ -6005,7 +6003,7 @@ msgstr "启用 Razor 服务"
 msgid "Enable SSH Client"
 msgstr "启用 SSH Client"
 
-#: settings/tasks/ldap.py:29
+#: settings/tasks/ldap.py:28
 msgid "Periodic import ldap user"
 msgstr "周期导入 LDAP 用户"
 
@@ -6017,18 +6015,18 @@ msgstr "注册周期导入 LDAP 用户 任务"
 msgid "Sync task Finish"
 msgstr "同步任务完成"
 
-#: settings/templates/ldap/_msg_import_ldap_user.html:3
-msgid "Synced Organization"
-msgstr "已同步组织"
-
-#: settings/templates/ldap/_msg_import_ldap_user.html:9
-msgid "Synced User"
-msgstr "已同步用户"
-
-#: settings/templates/ldap/_msg_import_ldap_user.html:26
+#: settings/templates/ldap/_msg_import_ldap_user.html:6
 #: terminal/models/session/session.py:45
 msgid "Date end"
 msgstr "结束日期"
+
+#: settings/templates/ldap/_msg_import_ldap_user.html:9
+msgid "Synced Organization"
+msgstr "已同步组织"
+
+#: settings/templates/ldap/_msg_import_ldap_user.html:15
+msgid "Synced User"
+msgstr "已同步用户"
 
 #: settings/utils/ldap.py:494
 msgid "ldap:// or ldaps:// protocol is used."
@@ -7966,6 +7964,10 @@ msgid ""
 msgstr ""
 "管理员已开启'仅允许已存在用户登录'，当前用户不在用户列表中，请联系管理员。"
 
+#: users/signal_handlers.py:166
+msgid "Clean up expired user sessions"
+msgstr "清除过期的用户会话"
+
 #: users/tasks.py:25
 msgid "Check password expired"
 msgstr "校验密码已过期"
@@ -8385,7 +8387,7 @@ msgstr "与"
 msgid "Or"
 msgstr "或"
 
-#: xpack/plugins/cloud/manager.py:57
+#: xpack/plugins/cloud/manager.py:56
 msgid "Account unavailable"
 msgstr "账号无效"
 
