@@ -397,17 +397,17 @@ class ResourceLabelsMixin(serializers.Serializer):
     labels = LabelRelatedField(many=True, label=_('Labels'), required=False, allow_null=True, source='res_labels')
 
     def update(self, instance, validated_data):
-        labels = validated_data.pop('labels', None)
+        labels = validated_data.pop('res_labels', None)
         res = super().update(instance, validated_data)
         if labels is not None:
-            instance.labels.set(labels, bulk=False)
+            instance.res_labels.set(labels, bulk=False)
         return res
 
     def create(self, validated_data):
-        labels = validated_data.pop('labels', None)
+        labels = validated_data.pop('res_labels', None)
         instance = super().create(validated_data)
         if labels is not None:
-            instance.labels.set(labels, bulk=False)
+            instance.res_labels.set(labels, bulk=False)
         return instance
 
     @classmethod
