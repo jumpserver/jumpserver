@@ -7,8 +7,7 @@ from assets.models import Asset, Node
 from common.utils import get_logger, lazyproperty, is_uuid
 from orgs.utils import tmp_to_root_org
 from perms import serializers
-from perms.pagination import AllPermedAssetPagination
-from perms.pagination import NodePermedAssetPagination
+from perms.pagination import NodePermedAssetPagination, AllPermedAssetPagination
 from perms.utils import UserPermAssetUtil, PermAssetDetailUtil
 from .mixin import (
     SelfOrPKUserMixin

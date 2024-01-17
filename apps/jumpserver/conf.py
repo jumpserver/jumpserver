@@ -17,7 +17,7 @@ import re
 import sys
 import types
 from importlib import import_module
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, quote
 
 import yaml
 from django.urls import reverse_lazy
@@ -261,6 +261,8 @@ class Config(dict):
         'VAULT_HCP_TOKEN': '',
         'VAULT_HCP_MOUNT_POINT': 'jumpserver',
 
+        'HISTORY_ACCOUNT_CLEAN_LIMIT': 999,
+
         # Cache login password
         'CACHE_LOGIN_PASSWORD_ENABLED': False,
         'CACHE_LOGIN_PASSWORD_TTL': 60 * 60 * 24,
@@ -280,6 +282,7 @@ class Config(dict):
         'AUTH_LDAP_SYNC_INTERVAL': None,
         'AUTH_LDAP_SYNC_CRONTAB': None,
         'AUTH_LDAP_SYNC_ORG_IDS': ['00000000-0000-0000-0000-000000000002'],
+        'AUTH_LDAP_SYNC_RECEIVERS': [],
         'AUTH_LDAP_USER_LOGIN_ONLY_IN_USERS': False,
         'AUTH_LDAP_OPTIONS_OPT_REFERRALS': -1,
 
@@ -325,6 +328,7 @@ class Config(dict):
         'RADIUS_SERVER': 'localhost',
         'RADIUS_PORT': 1812,
         'RADIUS_SECRET': '',
+        'RADIUS_ATTRIBUTES': {},
         'RADIUS_ENCRYPT_PASSWORD': True,
         'OTP_IN_RADIUS': False,
 
@@ -451,6 +455,7 @@ class Config(dict):
         'CUSTOM_SMS_REQUEST_METHOD': 'get',
 
         # Email
+        'EMAIL_PROTOCOL': 'smtp',
         'EMAIL_CUSTOM_USER_CREATED_SUBJECT': _('Create account successfully'),
         'EMAIL_CUSTOM_USER_CREATED_HONORIFIC': _('Hello'),
         'EMAIL_CUSTOM_USER_CREATED_BODY': _('Your account has been created successfully'),
@@ -531,6 +536,7 @@ class Config(dict):
         'SYSLOG_SOCKTYPE': 2,
 
         'PERM_EXPIRED_CHECK_PERIODIC': 60 * 60,
+        'PERM_TREE_REGEN_INTERVAL': 1,
         'FLOWER_URL': "127.0.0.1:5555",
         'LANGUAGE_CODE': 'zh',
         'TIME_ZONE': 'Asia/Shanghai',
@@ -693,6 +699,13 @@ class Config(dict):
         if openid_config:
             self.set_openid_config(openid_config)
 
+    def compatible_redis(self):
+        redis_config = {
+            'REDIS_PASSWORD': quote(str(self.REDIS_PASSWORD)),
+        }
+        for key, value in redis_config.items():
+            self[key] = value
+
     def compatible(self):
         """
         对配置做兼容处理
@@ -704,6 +717,8 @@ class Config(dict):
         """
         # 兼容 OpenID 配置
         self.compatible_auth_openid()
+        # 兼容 Redis 配置
+        self.compatible_redis()
 
     def convert_type(self, k, v):
         default_value = self.defaults.get(k)

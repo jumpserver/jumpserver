@@ -100,7 +100,10 @@ class AssetAccountSerializer(AccountSerializer):
     class Meta(AccountSerializer.Meta):
         fields = [
             f for f in AccountSerializer.Meta.fields
-            if f not in ['spec_info']
+            if f not in [
+                'spec_info', 'connectivity', 'labels', 'created_by',
+                'date_update', 'date_created'
+            ]
         ]
         extra_kwargs = {
             **AccountSerializer.Meta.extra_kwargs,
@@ -203,9 +206,12 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
         """ Perform necessary eager loading of data. """
         queryset = queryset.prefetch_related('domain', 'nodes', 'protocols', ) \
             .prefetch_related('platform', 'platform__automation') \
-            .prefetch_related('labels', 'labels__label') \
             .annotate(category=F("platform__category")) \
             .annotate(type=F("platform__type"))
+        if queryset.model is Asset:
+            queryset = queryset.prefetch_related('labels__label', 'labels')
+        else:
+            queryset = queryset.prefetch_related('asset_ptr__labels__label', 'asset_ptr__labels')
         return queryset
 
     @staticmethod
@@ -375,7 +381,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer, ResourceLabelsMixin, Writa
 
 
 class DetailMixin(serializers.Serializer):
-    accounts = AssetAccountSerializer(many=True, required=False, label=_('Accounts'))
     spec_info = MethodSerializer(label=_('Spec info'), read_only=True)
     gathered_info = MethodSerializer(label=_('Gathered info'), read_only=True)
     auto_config = serializers.DictField(read_only=True, label=_('Auto info'))
@@ -390,8 +395,7 @@ class DetailMixin(serializers.Serializer):
     def get_field_names(self, declared_fields, info):
         names = super().get_field_names(declared_fields, info)
         names.extend([
-            'accounts', 'gathered_info', 'spec_info',
-            'auto_config',
+            'gathered_info', 'spec_info', 'auto_config',
         ])
         return names
 

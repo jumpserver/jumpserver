@@ -15,8 +15,8 @@ from ..tasks import check_node_assets_amount_task
 logger = get_logger(__file__)
 
 
-@on_transaction_commit
 @receiver(m2m_changed, sender=Asset.nodes.through)
+@on_transaction_commit
 def on_node_asset_change(sender, action, instance, reverse, pk_set, **kwargs):
     # 不允许 `pre_clear` ，因为该信号没有 `pk_set`
     # [官网](https://docs.djangoproject.com/en/3.1/ref/signals/#m2m-changed)
@@ -37,7 +37,7 @@ def on_node_asset_change(sender, action, instance, reverse, pk_set, **kwargs):
         update_nodes_assets_amount(node_ids=node_ids)
 
 
-@merge_delay_run(ttl=5)
+@merge_delay_run(ttl=30)
 def update_nodes_assets_amount(node_ids=()):
     nodes = Node.objects.filter(id__in=node_ids)
     nodes = Node.get_ancestor_queryset(nodes)

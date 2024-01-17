@@ -191,7 +191,6 @@ class PlatformSerializer(ResourceLabelsMixin, WritableNestedModelSerializer):
     def add_type_choices(self, name, label):
         tp = self.fields['type']
         tp.choices[name] = label
-        tp.choice_mapper[name] = label
         tp.choice_strings_to_values[name] = label
 
     @lazyproperty
@@ -199,12 +198,6 @@ class PlatformSerializer(ResourceLabelsMixin, WritableNestedModelSerializer):
         category, tp = self.platform_category_type
         constraints = AllTypes.get_constraints(category, tp)
         return constraints
-
-    @classmethod
-    def setup_eager_loading(cls, queryset):
-        queryset = queryset.prefetch_related('protocols', 'automation') \
-            .prefetch_related('labels', 'labels__label')
-        return queryset
 
     def validate_protocols(self, protocols):
         if not protocols:
