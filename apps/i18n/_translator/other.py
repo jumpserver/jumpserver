@@ -2,6 +2,7 @@ import json
 import os
 
 from .base import BaseTranslateManager
+from .const import RED, GREEN
 
 
 class OtherTranslateManager(BaseTranslateManager):
@@ -20,7 +21,7 @@ class OtherTranslateManager(BaseTranslateManager):
             with open(file_path, 'r', encoding='utf-8') as f:
                 return json.load(f)
         except Exception as e:
-            print(f'File: {file_path} load error: {e}')
+            print(f'{RED}File: {file_path} load error: {e}{RED}')
             return {}
 
     def save_dict_as_json(self, data, file_prefix='ja'):
@@ -29,7 +30,7 @@ class OtherTranslateManager(BaseTranslateManager):
             with open(file_path, 'w', encoding='utf-8') as f:
                 json.dump(data, f, ensure_ascii=False, sort_keys=True, indent=4)
         except Exception as e:
-            print(f'File: {file_path} save error: {e}')
+            print(f'{RED}File: {file_path} save error: {e}{RED}')
 
     async def run(self):
         zh_dict = self.load_json_as_dict()
@@ -37,9 +38,9 @@ class OtherTranslateManager(BaseTranslateManager):
         for file_prefix, target_lang in self.LANG_MAPPER.items():
             other_dict = self.load_json_as_dict(file_prefix)
             need_trans_dict = self.get_need_trans_dict(zh_dict, other_dict)
-            print(f'File: {file_prefix}.json need to translate: {len(need_trans_dict)}')
+            print(f'{GREEN}Translate: {self.dir_name} {file_prefix} need to translate '
+                  f'{len(need_trans_dict)}{GREEN}\n')
             if not need_trans_dict:
-                print(f'File: {file_prefix}.json is already translated.')
                 continue
             translated_dict = await self.bulk_translate(need_trans_dict, target_lang)
             other_dict.update(translated_dict)

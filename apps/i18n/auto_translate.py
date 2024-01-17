@@ -1,9 +1,10 @@
 import asyncio
 import os
 
-from _ai import LOCALE_DIR
-from _ai.manager import OtherTranslateManager, CoreTranslateManager
-from _ai.utils import OpenAITranslate
+from _translator.const import LOCALE_DIR, RED
+from _translator.core import CoreTranslateManager
+from _translator.other import OtherTranslateManager
+from _translator.utils import OpenAITranslate
 
 
 class Translate:
@@ -26,7 +27,7 @@ class Translate:
         _dir = os.path.join(LOCALE_DIR, dir_name)
         zh_file = os.path.join(_dir, 'zh', 'LC_MESSAGES', 'django.po')
         if not os.path.exists(zh_file):
-            print(f'File: {zh_file} not exists.')
+            print(f'{RED}File: {zh_file} not exists.{RED}')
             return
 
         await CoreTranslateManager(_dir, self.oai_trans).run()
@@ -35,7 +36,7 @@ class Translate:
         _dir = os.path.join(LOCALE_DIR, dir_name)
         zh_file = os.path.join(_dir, 'zh.json')
         if not os.path.exists(zh_file):
-            print(f'File: {zh_file} not exists.')
+            print(f'{RED}File: {zh_file} not exists.{RED}\n')
             return
 
         await OtherTranslateManager(_dir, self.oai_trans).run()
