@@ -98,11 +98,18 @@ class QuerySetMixin:
             return queryset
         if self.action == 'metadata':
             queryset = queryset.none()
-        if self.action in ['list', 'metadata']:
-            serializer_class = self.get_serializer_class()
-            if serializer_class and hasattr(serializer_class, 'setup_eager_loading'):
-                queryset = serializer_class.setup_eager_loading(queryset)
         return queryset
+
+    def paginate_queryset(self, queryset):
+        page = super().paginate_queryset(queryset)
+        serializer_class = self.get_serializer_class()
+        if page and serializer_class and hasattr(serializer_class, 'setup_eager_loading'):
+            ids = [str(obj.id) for obj in page]
+            page = self.get_queryset().filter(id__in=ids)
+            page = serializer_class.setup_eager_loading(page)
+            page_mapper = {str(obj.id): obj for obj in page}
+            page = [page_mapper.get(_id) for _id in ids if _id in page_mapper]
+        return page
 
 
 class ExtraFilterFieldsMixin:

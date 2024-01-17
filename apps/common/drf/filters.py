@@ -219,11 +219,11 @@ class LabelFilterBackend(filters.BaseFilterBackend):
         if not hasattr(queryset, 'model'):
             return queryset
 
-        if not hasattr(queryset.model, 'labels'):
+        if not hasattr(queryset.model, 'label_model'):
             return queryset
 
-        model = queryset.model
-        labeled_resource_cls = model._labels.field.related_model
+        model = queryset.model.label_model()
+        labeled_resource_cls = model.labels.field.related_model
         app_label = model._meta.app_label
         model_name = model._meta.model_name
 

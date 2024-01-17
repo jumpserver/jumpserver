@@ -29,7 +29,10 @@ class AssetPlatformViewSet(JMSModelViewSet):
     }
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        # 因为没有走分页逻辑，所以需要这里 prefetch
+        queryset = super().get_queryset().prefetch_related(
+            'protocols', 'automation', 'labels', 'labels__label',
+        )
         queryset = queryset.filter(type__in=AllTypes.get_types_values())
         return queryset
 

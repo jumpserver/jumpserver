@@ -12,6 +12,7 @@ from django.utils.translation import gettext as _
 from django.views.generic import FormView, RedirectView
 
 from authentication.errors import IntervalTooShort
+from authentication.utils import check_user_property_is_correct
 from common.utils import FlashMessageUtil, get_object_or_none, random_string
 from common.utils.verify_code import SendAndVerifyCodeUtil
 from users.notifications import ResetPasswordSuccessMsg
@@ -148,7 +149,6 @@ class UserForgotPasswordView(FormView):
         query_key = form_type
         if form_type == 'sms':
             query_key = 'phone'
-            target = target.lstrip('+')
 
         try:
             self.safe_verify_code(token, target, form_type, code)
@@ -158,7 +158,7 @@ class UserForgotPasswordView(FormView):
             form.add_error('code', str(e))
             return super().form_invalid(form)
 
-        user = get_object_or_none(User, **{'username': username, query_key: target})
+        user = check_user_property_is_correct(username, **{query_key: target})
         if not user:
             form.add_error('code', _('No user matched'))
             return super().form_invalid(form)

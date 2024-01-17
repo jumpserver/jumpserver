@@ -15,12 +15,11 @@ from authentication.mixins import authenticate
 from authentication.serializers import (
     PasswordVerifySerializer, ResetPasswordCodeSerializer
 )
+from authentication.utils import check_user_property_is_correct
 from common.permissions import IsValidUser
-from common.utils import get_object_or_none
 from common.utils.random import random_string
 from common.utils.verify_code import SendAndVerifyCodeUtil
 from settings.utils import get_login_title
-from users.models import User
 
 
 class UserResetPasswordSendCodeApi(CreateAPIView):
@@ -28,8 +27,8 @@ class UserResetPasswordSendCodeApi(CreateAPIView):
     serializer_class = ResetPasswordCodeSerializer
 
     @staticmethod
-    def is_valid_user(**kwargs):
-        user = get_object_or_none(User, **kwargs)
+    def is_valid_user(username, **properties):
+        user = check_user_property_is_correct(username, **properties)
         if not user:
             err_msg = _('User does not exist: {}').format(_("No user matched"))
             return None, err_msg
@@ -56,7 +55,6 @@ class UserResetPasswordSendCodeApi(CreateAPIView):
         target = serializer.validated_data[form_type]
         if form_type == 'sms':
             query_key = 'phone'
-            target = target.lstrip('+')
         else:
             query_key = form_type
         user, err = self.is_valid_user(username=username, **{query_key: target})

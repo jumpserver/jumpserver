@@ -4,7 +4,6 @@ from urllib.parse import urlencode, urlparse
 from kubernetes import client
 from kubernetes.client import api_client
 from kubernetes.client.api import core_v1_api
-from kubernetes.client.exceptions import ApiException
 from sshtunnel import SSHTunnelForwarder, BaseSSHTunnelForwarderError
 
 from common.utils import get_logger
@@ -88,8 +87,9 @@ class KubernetesClient:
         if hasattr(self, func_name):
             try:
                 data = getattr(self, func_name)(*args)
-            except ApiException as e:
-                logger.error(e.reason)
+            except Exception as e:
+                logger.error(e)
+                raise e
 
         if self.server:
             self.server.stop()

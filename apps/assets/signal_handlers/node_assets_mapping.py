@@ -21,7 +21,7 @@ logger = get_logger(__name__)
 node_assets_mapping_pub_sub = lazy(lambda: RedisPubSub('fm.node_asset_mapping'), RedisPubSub)()
 
 
-@merge_delay_run(ttl=5)
+@merge_delay_run(ttl=30)
 def expire_node_assets_mapping(org_ids=()):
     logger.debug("Recv asset nodes changed signal, expire memery node asset mapping")
     # 所有进程清除(自己的 memory 数据)
@@ -53,8 +53,9 @@ def on_node_post_delete(sender, instance, **kwargs):
 
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
-def on_node_asset_change(sender, instance, **kwargs):
-    expire_node_assets_mapping(org_ids=(instance.org_id,))
+def on_node_asset_change(sender, instance, action='pre_remove', **kwargs):
+    if action.startswith('post'):
+        expire_node_assets_mapping(org_ids=(instance.org_id,))
 
 
 @receiver(django_ready)

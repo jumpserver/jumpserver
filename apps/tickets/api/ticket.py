@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from audits.handler import create_or_update_operate_log
@@ -41,7 +42,6 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
     ordering = ('-date_created',)
     rbac_perms = {
         'open': 'tickets.view_ticket',
-        'bulk': 'tickets.change_ticket',
     }
 
     def retrieve(self, request, *args, **kwargs):
@@ -122,7 +122,7 @@ class TicketViewSet(CommonApiMixin, viewsets.ModelViewSet):
         self._record_operate_log(instance, TicketAction.close)
         return Response('ok')
 
-    @action(detail=False, methods=[PUT], permission_classes=[RBACPermission, ])
+    @action(detail=False, methods=[PUT], permission_classes=[IsAuthenticated, ])
     def bulk(self, request, *args, **kwargs):
         self.ticket_not_allowed()
 

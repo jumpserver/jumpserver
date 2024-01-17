@@ -7,8 +7,9 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 from audits.const import DEFAULT_CITY
+from users.models import User
 from audits.models import UserLoginLog
-from common.utils import get_logger
+from common.utils import get_logger, get_object_or_none
 from common.utils import validate_ip, get_ip_city, get_request_ip
 from .notifications import DifferentCityLoginMessage
 
@@ -24,9 +25,10 @@ def check_different_city_login_if_need(user, request):
     is_private = ipaddress.ip_address(ip).is_private
     if is_private:
         return
+    usernames = [user.username, f"{user.name}({user.username})"]
     last_user_login = UserLoginLog.objects.exclude(
         city__in=city_white
-    ).filter(username=user.username, status=True).first()
+    ).filter(username__in=usernames, status=True).first()
     if not last_user_login:
         return
 
@@ -59,3 +61,12 @@ def build_absolute_uri_for_oidc(request, path=None):
         redirect_uri = urljoin(settings.BASE_SITE_URL, path)
         return redirect_uri
     return build_absolute_uri(request, path=path)
+
+
+def check_user_property_is_correct(username, **properties):
+    user = get_object_or_none(User, username=username)
+    for attr, value in properties.items():
+        if getattr(user, attr, None) != value:
+            user = None
+            break
+    return user

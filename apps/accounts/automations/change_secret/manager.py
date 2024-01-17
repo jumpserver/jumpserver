@@ -161,7 +161,8 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             print("Account not found, deleted ?")
             return
         account.secret = recorder.new_secret
-        account.save(update_fields=['secret'])
+        account.date_updated = timezone.now()
+        account.save(update_fields=['secret', 'date_updated'])
 
     def on_host_error(self, host, error, result):
         recorder = self.name_recorder_mapper.get(host)
@@ -228,8 +229,8 @@ class ChangeSecretManager(AccountBasePlaybookManager):
         rows.insert(0, header)
         wb = Workbook(filename)
         ws = wb.add_worksheet('Sheet1')
-        for row in rows:
-            for col, data in enumerate(row):
-                ws.write_string(0, col, data)
+        for row_index, row_data in enumerate(rows):
+            for col_index, col_data in enumerate(row_data):
+                ws.write_string(row_index, col_index, col_data)
         wb.close()
         return True

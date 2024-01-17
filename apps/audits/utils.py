@@ -4,6 +4,8 @@ from itertools import chain
 
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.db import models
+from django.db.models import F, Value, CharField
+from django.db.models.functions import Concat
 
 from common.db.fields import RelatedManager
 from common.utils import validate_ip, get_ip_city, get_logger
@@ -115,3 +117,12 @@ def model_to_dict_for_operate_log(
             get_related_values(f)
 
     return data
+
+
+def construct_userlogin_usernames(user_queryset):
+    usernames_original = user_queryset.values_list('username', flat=True)
+    usernames_combined = user_queryset.annotate(
+        usernames_combined_field=Concat(F('name'), Value('('), F('username'), Value(')'), output_field=CharField())
+    ).values_list("usernames_combined_field", flat=True)
+    usernames = list(chain(usernames_original, usernames_combined))
+    return usernames
