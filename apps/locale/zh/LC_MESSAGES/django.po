@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-17 19:11+0800\n"
+"POT-Creation-Date: 2024-01-18 10:44+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -494,7 +494,7 @@ msgstr "状态"
 #: authentication/templates/authentication/passkey.html:173
 #: authentication/views/base.py:42 authentication/views/base.py:43
 #: authentication/views/base.py:44 common/const/choices.py:20
-#: settings/templates/ldap/_msg_import_ldap_user.html:22
+#: settings/templates/ldap/_msg_import_ldap_user.html:26
 msgid "Error"
 msgstr "错误"
 
@@ -6028,6 +6028,10 @@ msgstr "已同步组织"
 msgid "Synced User"
 msgstr "已同步用户"
 
+#: settings/templates/ldap/_msg_import_ldap_user.html:22
+msgid "No user synchronization required"
+msgstr "没有用户需要同步"
+
 #: settings/utils/ldap.py:494
 msgid "ldap:// or ldaps:// protocol is used."
 msgstr "使用 ldap:// 或 ldaps:// 协议"
@@ -8387,7 +8391,7 @@ msgstr "与"
 msgid "Or"
 msgstr "或"
 
-#: xpack/plugins/cloud/manager.py:56
+#: xpack/plugins/cloud/manager.py:57
 msgid "Account unavailable"
 msgstr "账号无效"
 
