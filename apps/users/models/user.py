@@ -729,7 +729,7 @@ class JSONFilterMixin:
 
         bindings = RoleBinding.objects.filter(**kwargs, role__in=value)
         if match == 'm2m_all':
-            user_id = bindings.values('user_id').annotate(count=Count('user_id')) \
+            user_id = bindings.values('user_id').annotate(count=Count('user_id', distinct=True)) \
                 .filter(count=len(value)).values_list('user_id', flat=True)
         else:
             user_id = bindings.values_list('user_id', flat=True)

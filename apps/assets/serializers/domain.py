@@ -58,7 +58,7 @@ class DomainListSerializer(DomainSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         queryset = queryset.annotate(
-            assets_amount=Count('assets'),
+            assets_amount=Count('assets', distinct=True),
         )
         return queryset
 
