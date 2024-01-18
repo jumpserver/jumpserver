@@ -206,7 +206,7 @@ class LabelFilterBackend(filters.BaseFilterBackend):
         resources = resources.filter(q) \
             .values('res_id') \
             .order_by('res_id') \
-            .annotate(count=Count('res_id')) \
+            .annotate(count=Count('res_id', distinct=True)) \
             .values('res_id', 'count') \
             .filter(count=len(args))
         return resources
