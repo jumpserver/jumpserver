@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-17 19:11+0800\n"
+"POT-Creation-Date: 2024-01-18 10:45+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -495,7 +495,7 @@ msgstr "ステータス"
 #: authentication/templates/authentication/passkey.html:173
 #: authentication/views/base.py:42 authentication/views/base.py:43
 #: authentication/views/base.py:44 common/const/choices.py:20
-#: settings/templates/ldap/_msg_import_ldap_user.html:22
+#: settings/templates/ldap/_msg_import_ldap_user.html:26
 msgid "Error"
 msgstr "間違い"
 
@@ -6112,6 +6112,10 @@ msgstr "組織が同期されました"
 msgid "Synced User"
 msgstr "同期されたユーザー"
 
+#: settings/templates/ldap/_msg_import_ldap_user.html:22
+msgid "No user synchronization required"
+msgstr "ユーザーの同期は必要ありません"
+
 #: settings/utils/ldap.py:494
 msgid "ldap:// or ldaps:// protocol is used."
 msgstr "ldap:// または ldaps:// プロトコルが使用されます。"
@@ -8511,7 +8515,7 @@ msgstr "そして"
 msgid "Or"
 msgstr "または"
 
-#: xpack/plugins/cloud/manager.py:56
+#: xpack/plugins/cloud/manager.py:57
 msgid "Account unavailable"
 msgstr "利用できないアカウント"
 
