@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-17 16:12+0800\n"
+"POT-Creation-Date: 2024-01-18 16:36+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -240,8 +240,8 @@ msgstr "用户 %s 查看/导出 了密码"
 
 #: accounts/models/account.py:49
 #: accounts/models/automations/gather_account.py:16
-#: accounts/serializers/account/account.py:213
-#: accounts/serializers/account/account.py:258
+#: accounts/serializers/account/account.py:215
+#: accounts/serializers/account/account.py:260
 #: accounts/serializers/account/gathered_account.py:10
 #: accounts/serializers/automations/change_secret.py:106
 #: accounts/serializers/automations/change_secret.py:126
@@ -260,8 +260,8 @@ msgid "Asset"
 msgstr "资产"
 
 #: accounts/models/account.py:53 accounts/models/template.py:16
-#: accounts/serializers/account/account.py:220
-#: accounts/serializers/account/account.py:268
+#: accounts/serializers/account/account.py:222
+#: accounts/serializers/account/account.py:270
 #: accounts/serializers/account/template.py:27
 #: authentication/serializers/connect_token_secret.py:50
 msgid "Su from"
@@ -274,7 +274,7 @@ msgstr "切换自"
 msgid "Version"
 msgstr "版本"
 
-#: accounts/models/account.py:57 accounts/serializers/account/account.py:215
+#: accounts/models/account.py:57 accounts/serializers/account/account.py:217
 #: users/models/user.py:845
 msgid "Source"
 msgstr "来源"
@@ -379,10 +379,10 @@ msgid "Account backup snapshot"
 msgstr "账号备份快照"
 
 #: accounts/models/automations/backup_account.py:130
-#: accounts/serializers/account/backup.py:49
-#: accounts/serializers/automations/base.py:55
+#: accounts/serializers/account/backup.py:48
+#: accounts/serializers/automations/base.py:54
 #: assets/models/automations/base.py:122
-#: assets/serializers/automations/base.py:40
+#: assets/serializers/automations/base.py:39
 msgid "Trigger mode"
 msgstr "触发模式"
 
@@ -444,7 +444,7 @@ msgstr "SSH 密钥推送方式"
 
 #: accounts/models/automations/change_secret.py:15
 #: accounts/models/automations/gather_account.py:58
-#: accounts/serializers/account/backup.py:41
+#: accounts/serializers/account/backup.py:40
 #: accounts/serializers/automations/change_secret.py:56
 msgid "Recipient"
 msgstr "收件人"
@@ -487,7 +487,7 @@ msgid "Status"
 msgstr "状态"
 
 #: accounts/models/automations/change_secret.py:44
-#: accounts/serializers/account/account.py:260 assets/const/automation.py:8
+#: accounts/serializers/account/account.py:262 assets/const/automation.py:8
 #: authentication/templates/authentication/passkey.html:173
 #: authentication/views/base.py:42 authentication/views/base.py:43
 #: authentication/views/base.py:44 common/const/choices.py:20
@@ -559,7 +559,7 @@ msgid "Verify asset account"
 msgstr "账号验证"
 
 #: accounts/models/base.py:37 accounts/models/base.py:67
-#: accounts/serializers/account/account.py:440
+#: accounts/serializers/account/account.py:442
 #: accounts/serializers/account/base.py:17
 #: accounts/serializers/automations/change_secret.py:45
 #: authentication/serializers/connect_token_secret.py:42
@@ -636,7 +636,7 @@ msgstr "自动推送"
 
 #: accounts/models/template.py:21
 msgid "Platforms"
-msgstr "系统平台"
+msgstr "平台"
 
 #: accounts/models/template.py:23
 msgid "Push params"
@@ -731,11 +731,15 @@ msgstr "账号变更信息"
 msgid "Push now"
 msgstr "立即推送"
 
-#: accounts/serializers/account/account.py:38
+#: accounts/serializers/account/account.py:36
+msgid "Params"
+msgstr "参数"
+
+#: accounts/serializers/account/account.py:40
 msgid "Exist policy"
 msgstr "账号存在策略"
 
-#: accounts/serializers/account/account.py:193 applications/models.py:11
+#: accounts/serializers/account/account.py:195 applications/models.py:11
 #: assets/models/label.py:21 assets/models/platform.py:96
 #: assets/serializers/asset/common.py:125 assets/serializers/cagegory.py:12
 #: assets/serializers/platform.py:140 assets/serializers/platform.py:230
@@ -744,8 +748,8 @@ msgstr "账号存在策略"
 msgid "Category"
 msgstr "类别"
 
-#: accounts/serializers/account/account.py:194
-#: accounts/serializers/automations/base.py:54 acls/models/command_acl.py:24
+#: accounts/serializers/account/account.py:196
+#: accounts/serializers/automations/base.py:53 acls/models/command_acl.py:24
 #: acls/serializers/command_acl.py:19 applications/models.py:14
 #: assets/models/_user.py:50 assets/models/automations/base.py:20
 #: assets/models/cmd_filter.py:74 assets/models/platform.py:97
@@ -764,26 +768,26 @@ msgstr "类别"
 msgid "Type"
 msgstr "类型"
 
-#: accounts/serializers/account/account.py:209
+#: accounts/serializers/account/account.py:211
 msgid "Asset not found"
 msgstr "资产不存在"
 
-#: accounts/serializers/account/account.py:249
+#: accounts/serializers/account/account.py:251
 msgid "Has secret"
 msgstr "已托管密码"
 
-#: accounts/serializers/account/account.py:259 ops/models/celery.py:60
+#: accounts/serializers/account/account.py:261 ops/models/celery.py:60
 #: tickets/models/comment.py:13 tickets/models/ticket/general.py:45
 #: tickets/models/ticket/general.py:279 tickets/serializers/super_ticket.py:14
 #: tickets/serializers/ticket/ticket.py:21
 msgid "State"
 msgstr "状态"
 
-#: accounts/serializers/account/account.py:261
+#: accounts/serializers/account/account.py:263
 msgid "Changed"
 msgstr "已修改"
 
-#: accounts/serializers/account/account.py:271
+#: accounts/serializers/account/account.py:273
 #: accounts/serializers/automations/base.py:22 acls/models/base.py:97
 #: acls/templates/acls/asset_login_reminder.html:6
 #: assets/models/automations/base.py:19
@@ -794,27 +798,27 @@ msgstr "已修改"
 msgid "Assets"
 msgstr "资产"
 
-#: accounts/serializers/account/account.py:326
+#: accounts/serializers/account/account.py:328
 msgid "Account already exists"
 msgstr "账号已存在"
 
-#: accounts/serializers/account/account.py:376
+#: accounts/serializers/account/account.py:378
 #, python-format
 msgid "Asset does not support this secret type: %s"
 msgstr "资产不支持账号类型: %s"
 
-#: accounts/serializers/account/account.py:408
+#: accounts/serializers/account/account.py:410
 msgid "Account has exist"
 msgstr "账号已存在"
 
-#: accounts/serializers/account/account.py:441
+#: accounts/serializers/account/account.py:443
 #: authentication/serializers/connect_token_secret.py:159
 #: authentication/templates/authentication/_access_key_modal.html:30
 #: perms/models/perm_node.py:21 users/serializers/group.py:33
 msgid "ID"
 msgstr "ID"
 
-#: accounts/serializers/account/account.py:451 acls/serializers/base.py:116
+#: accounts/serializers/account/account.py:453 acls/serializers/base.py:116
 #: acls/templates/acls/asset_login_reminder.html:5
 #: acls/templates/acls/user_login_reminder.html:5
 #: assets/models/cmd_filter.py:24 assets/models/label.py:16 audits/models.py:54
@@ -835,7 +839,7 @@ msgstr "ID"
 msgid "User"
 msgstr "用户"
 
-#: accounts/serializers/account/account.py:452
+#: accounts/serializers/account/account.py:454
 #: authentication/templates/authentication/_access_key_modal.html:33
 #: terminal/notifications.py:158 terminal/notifications.py:207
 msgid "Date"
@@ -843,22 +847,15 @@ msgstr "日期"
 
 #: accounts/serializers/account/backup.py:38
 #: accounts/serializers/automations/base.py:36
-#: assets/serializers/automations/base.py:34 ops/mixin.py:23 ops/mixin.py:104
-#: settings/serializers/auth/ldap.py:66
-msgid "Periodic perform"
-msgstr "定时执行"
-
-#: accounts/serializers/account/backup.py:39
-#: accounts/serializers/automations/base.py:37
 msgid "Executed amount"
 msgstr "执行次数"
 
-#: accounts/serializers/account/backup.py:42
+#: accounts/serializers/account/backup.py:41
 #: accounts/serializers/automations/change_secret.py:57
 msgid "Currently only mail sending is supported"
 msgstr "当前只支持邮件发送"
 
-#: accounts/serializers/account/backup.py:44
+#: accounts/serializers/account/backup.py:43
 msgid "Asset type"
 msgstr "资产类型"
 
@@ -947,13 +944,13 @@ msgstr ""
 msgid "Nodes"
 msgstr "节点"
 
-#: accounts/serializers/automations/base.py:44
+#: accounts/serializers/automations/base.py:43
 msgid "Name already exists"
 msgstr "名称已存在"
 
-#: accounts/serializers/automations/base.py:53
+#: accounts/serializers/automations/base.py:52
 #: assets/models/automations/base.py:118
-#: assets/serializers/automations/base.py:39
+#: assets/serializers/automations/base.py:38
 msgid "Automation snapshot"
 msgstr "自动化快照"
 
@@ -1111,8 +1108,7 @@ msgstr "审批人"
 msgid "Active"
 msgstr "激活中"
 
-#: acls/models/base.py:81 rbac/serializers/role.py:27
-#: users/models/preference.py:16
+#: acls/models/base.py:81 users/models/preference.py:16
 msgid "Users"
 msgstr "用户"
 
@@ -2174,7 +2170,8 @@ msgstr "约束"
 msgid "Types"
 msgstr "类型"
 
-#: assets/serializers/domain.py:53 perms/serializers/permission.py:188
+#: assets/serializers/domain.py:20 orgs/serializers.py:13
+#: perms/serializers/permission.py:188
 msgid "Assets amount"
 msgstr "资产数量"
 
@@ -4174,29 +4171,36 @@ msgstr "超时"
 msgid "no valid program entry found."
 msgstr "没有可用程序入口"
 
-#: ops/mixin.py:26 ops/mixin.py:90 settings/serializers/auth/ldap.py:73
-msgid "Cycle perform"
+#: ops/mixin.py:23 ops/mixin.py:104 settings/serializers/auth/ldap.py:66
+msgid "Periodic run"
 msgstr "周期执行"
 
-#: ops/mixin.py:30 ops/mixin.py:88 ops/mixin.py:107
-#: settings/serializers/auth/ldap.py:70
-msgid "Regularly perform"
-msgstr "定期执行"
-
-#: ops/mixin.py:110
+#: ops/mixin.py:26 ops/mixin.py:90 ops/mixin.py:110
+#: settings/serializers/auth/ldap.py:73
 msgid "Interval"
 msgstr "间隔"
 
-#: ops/mixin.py:120
+#: ops/mixin.py:30 ops/mixin.py:88 ops/mixin.py:107
+#: settings/serializers/auth/ldap.py:70
+msgid "Crontab"
+msgstr "Crontab"
+
+#: ops/mixin.py:112
+msgid "Run period"
+msgstr "执行周期"
+
+#: ops/mixin.py:121
 msgid "* Please enter a valid crontab expression"
 msgstr "* 请输入有效的 crontab 表达式"
 
-#: ops/mixin.py:127
+#: ops/mixin.py:128
 msgid "Range {} to {}"
 msgstr "输入在 {} - {} 范围之间"
 
-#: ops/mixin.py:138
-msgid "Require periodic or regularly perform setting"
+#: ops/mixin.py:139
+#, fuzzy
+#| msgid "Require periodic or regularly perform setting"
+msgid "Require interval or crontab setting"
 msgstr "需要周期或定期设置"
 
 #: ops/models/adhoc.py:21
@@ -4492,6 +4496,37 @@ msgstr "可以查看所有加入的组织"
 msgid "Can not delete virtual org"
 msgstr "无法删除虚拟组织"
 
+#: orgs/serializers.py:10 perms/serializers/permission.py:186
+#: rbac/serializers/role.py:27 users/serializers/group.py:54
+msgid "Users amount"
+msgstr "用户数量"
+
+#: orgs/serializers.py:11 perms/serializers/permission.py:187
+msgid "User groups amount"
+msgstr "用户组数量"
+
+#: orgs/serializers.py:14 perms/serializers/permission.py:189
+msgid "Nodes amount"
+msgstr "节点数量"
+
+#: orgs/serializers.py:15
+#, fuzzy
+#| msgid "Command amount"
+msgid "Domains amount"
+msgstr "命令数量"
+
+#: orgs/serializers.py:16
+#, fuzzy
+#| msgid "Gather account"
+msgid "Gateways amount"
+msgstr "收集账号"
+
+#: orgs/serializers.py:18
+#, fuzzy
+#| msgid "Asset permission"
+msgid "Asset permissions amount"
+msgstr "资产授权"
+
 #: orgs/tasks.py:9
 msgid "Refresh organization cache"
 msgstr "刷新组织缓存"
@@ -4592,19 +4627,6 @@ msgstr "资产授权规则将要过期"
 #: perms/notifications.py:64
 msgid "asset permissions of organization {}"
 msgstr "组织 ({}) 的资产授权"
-
-#: perms/serializers/permission.py:186 users/serializers/group.py:54
-#: users/serializers/group.py:60
-msgid "Users amount"
-msgstr "用户数量"
-
-#: perms/serializers/permission.py:187
-msgid "User groups amount"
-msgstr "用户组数量"
-
-#: perms/serializers/permission.py:189
-msgid "Nodes amount"
-msgstr "节点数量"
 
 #: perms/tasks.py:27
 msgid "Check asset permission expired"
@@ -8956,6 +8978,18 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
+
+#~ msgid "Period"
+#~ msgstr "周期"
+
+#~ msgid "Run interval"
+#~ msgstr "运行间隔"
+
+#~ msgid "Regularly perform"
+#~ msgstr "定期执行"
+
+#~ msgid "Cycle perform"
+#~ msgstr "周期执行"
 
 #~ msgid "Applications"
 #~ msgstr "应用管理"

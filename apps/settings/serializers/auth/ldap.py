@@ -63,14 +63,14 @@ class LDAPSettingSerializer(serializers.Serializer):
         required=False, label=_('Organization'), max_length=36
     )
     AUTH_LDAP_SYNC_IS_PERIODIC = serializers.BooleanField(
-        required=False, label=_('Periodic perform')
+        required=False, label=_('Periodic run')
     )
     AUTH_LDAP_SYNC_CRONTAB = serializers.CharField(
         required=False, max_length=128, allow_null=True, allow_blank=True,
-        label=_('Regularly perform')
+        label=_('Crontab')
     )
     AUTH_LDAP_SYNC_INTERVAL = serializers.IntegerField(
-        required=False, default=24, allow_null=True, label=_('Cycle perform')
+        required=False, default=24, allow_null=True, label=_('Interval')
     )
     AUTH_LDAP_CONNECT_TIMEOUT = serializers.IntegerField(
         min_value=1, max_value=300,
