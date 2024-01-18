@@ -75,7 +75,20 @@ class Endpoint(JMSBaseModel):
         return endpoint
 
     @classmethod
-    def match_by_instance_label(cls, instance, protocol):
+    def handle_endpoint_host(cls, endpoint, request=None):
+        if not endpoint.host and request:
+            # 动态添加 current request host
+            host_port = request.get_host()
+            # IPv6
+            if host_port.startswith('['):
+                host = host_port.split(']:')[0].rstrip(']') + ']'
+            else:
+                host = host_port.split(':')[0]
+            endpoint.host = host
+        return endpoint
+
+    @classmethod
+    def match_by_instance_label(cls, instance, protocol, request=None):
         from assets.models import Asset
         from terminal.models import Session
         if isinstance(instance, Session):
@@ -88,6 +101,7 @@ class Endpoint(JMSBaseModel):
         endpoints = cls.objects.filter(name__in=list(values)).order_by('-date_updated')
         for endpoint in endpoints:
             if endpoint.is_valid_for(instance, protocol):
+                endpoint = cls.handle_endpoint_host(endpoint, request)
                 return endpoint
 
 
@@ -130,13 +144,5 @@ class EndpointRule(JMSBaseModel):
             endpoint = endpoint_rule.endpoint
         else:
             endpoint = Endpoint.get_or_create_default(request)
-        if not endpoint.host and request:
-            # 动态添加 current request host
-            host_port = request.get_host()
-            # IPv6
-            if host_port.startswith('['):
-                host = host_port.split(']:')[0].rstrip(']') + ']'
-            else:
-                host = host_port.split(':')[0]
-            endpoint.host = host
+        endpoint = Endpoint.handle_endpoint_host(endpoint, request)
         return endpoint
