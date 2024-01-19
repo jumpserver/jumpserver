@@ -80,9 +80,11 @@ class RoleViewSet(JMSModelViewSet):
         queryset = Role.objects.filter(id__in=ids).order_by(*self.ordering)
         org_id = current_org.id
         q = Q(role__scope=Role.Scope.system) | Q(role__scope=Role.Scope.org, org_id=org_id)
-        role_bindings = RoleBinding.objects.filter(q).values_list('role_id').annotate(user_count=Count('user_id'))
+        role_bindings = RoleBinding.objects.filter(q).values_list('role_id').annotate(
+            user_count=Count('user_id', distinct=True)
+        )
         role_user_amount_mapper = {role_id: user_count for role_id, user_count in role_bindings}
-        queryset = queryset.annotate(permissions_amount=Count('permissions'))
+        queryset = queryset.annotate(permissions_amount=Count('permissions', distinct=True))
         queryset = list(queryset)
         for role in queryset:
             role.users_amount = role_user_amount_mapper.get(role.id, 0)

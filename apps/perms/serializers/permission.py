@@ -198,9 +198,9 @@ class AssetPermissionListSerializer(AssetPermissionSerializer):
         """Perform necessary eager loading of data."""
         queryset = queryset \
             .prefetch_related('labels', 'labels__label') \
-            .annotate(users_amount=Count("users"),
-                      user_groups_amount=Count("user_groups"),
-                      assets_amount=Count("assets"),
-                      nodes_amount=Count("nodes"),
+            .annotate(users_amount=Count("users", distinct=True),
+                      user_groups_amount=Count("user_groups", distinct=True),
+                      assets_amount=Count("assets", distinct=True),
+                      nodes_amount=Count("nodes", distinct=True),
                       )
         return queryset

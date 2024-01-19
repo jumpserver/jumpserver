@@ -3,6 +3,7 @@
 import asyncio
 import functools
 import inspect
+import os
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -101,7 +102,11 @@ def run_debouncer_func(cache_key, org, ttl, func, *args, **kwargs):
         first_run_time = current
 
     if current - first_run_time > ttl:
+        _loop_debouncer_func_args_cache.pop(cache_key, None)
+        _loop_debouncer_func_task_time_cache.pop(cache_key, None)
         executor.submit(run_func_partial, *args, **kwargs)
+        logger.debug('pid {} executor submit run {}'.format(
+            os.getpid(), func.__name__, ))
         return
 
     loop = _loop_thread.get_loop()
@@ -133,13 +138,26 @@ class Debouncer(object):
         return await self.loop.run_in_executor(self.executor, func)
 
 
+ignore_err_exceptions = (
+    "(3101, 'Plugin instructed the server to rollback the current transaction.')",
+)
+
+
 def _run_func_with_org(key, org, func, *args, **kwargs):
     from orgs.utils import set_current_org
     try:
-        set_current_org(org)
-        func(*args, **kwargs)
+        with transaction.atomic():
+            set_current_org(org)
+            func(*args, **kwargs)
     except Exception as e:
-        logger.error('delay run error: %s' % e)
+        msg = str(e)
+        log_func = logger.error
+        if msg in ignore_err_exceptions:
+            log_func = logger.info
+        pid = os.getpid()
+        thread_name = threading.current_thread()
+        log_func('pid {} thread {} delay run {} error: {}'.format(
+            pid, thread_name, func.__name__, msg))
     _loop_debouncer_func_task_cache.pop(key, None)
     _loop_debouncer_func_args_cache.pop(key, None)
     _loop_debouncer_func_task_time_cache.pop(key, None)
