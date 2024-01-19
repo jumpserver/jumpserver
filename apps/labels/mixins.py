@@ -53,13 +53,13 @@ class LabeledMixin(models.Model):
         resources = resources.filter(label_id__in=label_ids) \
             .values('res_id') \
             .order_by('res_id') \
-            .annotate(count=Count('res_id')) \
+            .annotate(count=Count('res_id', distinct=True)) \
             .values('res_id', 'count') \
             .filter(count=len(label_ids))
         return resources
 
     @classmethod
-    def get_filter_labels_attr_q(cls, value, match):
+    def get_labels_filter_attr_q(cls, value, match):
         resources = LabeledResource.objects.all()
         if not value:
             return None

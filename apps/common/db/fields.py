@@ -363,7 +363,7 @@ class RelatedManager:
                 continue
 
             custom_filter_q = None
-            spec_attr_filter = getattr(to_model, "get_filter_{}_attr_q".format(name), None)
+            spec_attr_filter = getattr(to_model, "get_{}_filter_attr_q".format(name), None)
             if spec_attr_filter:
                 custom_filter_q = spec_attr_filter(val, match)
             elif custom_attr_filter:
