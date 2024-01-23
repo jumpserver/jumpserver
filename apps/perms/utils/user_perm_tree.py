@@ -72,7 +72,7 @@ class UserPermTreeRefreshUtil(_UserPermTreeCacheMixin):
 
     @timeit
     def refresh_if_need(self, force=False):
-        built_just_now = cache.get(self.cache_key_time)
+        built_just_now = False if settings.ASSET_SIZE == 'small' else cache.get(self.cache_key_time)
         if built_just_now:
             logger.info('Refresh user perm tree just now, pass: {}'.format(built_just_now))
             return
@@ -80,12 +80,18 @@ class UserPermTreeRefreshUtil(_UserPermTreeCacheMixin):
         if not to_refresh_orgs:
             logger.info('Not have to refresh orgs')
             return
+
         logger.info("Delay refresh user orgs: {} {}".format(self.user, [o.name for o in to_refresh_orgs]))
-        refresh_user_orgs_perm_tree(user_orgs=((self.user, tuple(to_refresh_orgs)),))
-        refresh_user_favorite_assets(users=(self.user,))
+        sync = True if settings.ASSET_SIZE == 'small' else False
+        refresh_user_orgs_perm_tree.apply(sync=sync, user_orgs=((self.user, tuple(to_refresh_orgs)),))
+        refresh_user_favorite_assets.apply(sync=sync, users=(self.user,))
 
     @timeit
     def refresh_tree_manual(self):
+        """
+        用来手动 debug
+        :return:
+        """
         built_just_now = cache.get(self.cache_key_time)
         if built_just_now:
             logger.info('Refresh just now, pass: {}'.format(built_just_now))
@@ -105,8 +111,9 @@ class UserPermTreeRefreshUtil(_UserPermTreeCacheMixin):
             return
 
         self._clean_user_perm_tree_for_legacy_org()
-        ttl = settings.PERM_TREE_REGEN_INTERVAL
-        cache.set(self.cache_key_time, int(time.time()), ttl)
+        if settings.ASSET_SIZE != 'small':
+            ttl = settings.PERM_TREE_REGEN_INTERVAL
+            cache.set(self.cache_key_time, int(time.time()), ttl)
 
         lock = UserGrantedTreeRebuildLock(self.user.id)
         got = lock.acquire(blocking=False)
