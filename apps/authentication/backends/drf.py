@@ -34,9 +34,9 @@ def update_user_last_used(users=()):
 
 
 def after_authenticate_update_date(user, token=None):
-    update_user_last_used(users=(user.id,))
+    update_user_last_used.delay(users=(user.id,))
     if token:
-        update_token_last_used(tokens=(token,))
+        update_token_last_used.delay(tokens=(token,))
 
 
 class AccessTokenAuthentication(authentication.BaseAuthentication):

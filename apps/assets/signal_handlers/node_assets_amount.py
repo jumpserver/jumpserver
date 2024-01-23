@@ -2,14 +2,16 @@
 #
 from operator import add, sub
 
+from django.conf import settings
 from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
 
 from assets.models import Asset, Node
 from common.const.signals import PRE_CLEAR, POST_ADD, PRE_REMOVE
 from common.decorators import on_transaction_commit, merge_delay_run
+from common.signals import django_ready
 from common.utils import get_logger
-from orgs.utils import tmp_to_org
+from orgs.utils import tmp_to_org, tmp_to_root_org
 from ..tasks import check_node_assets_amount_task
 
 logger = get_logger(__file__)
@@ -34,7 +36,7 @@ def on_node_asset_change(sender, action, instance, reverse, pk_set, **kwargs):
             node_ids = [instance.id]
         else:
             node_ids = list(pk_set)
-        update_nodes_assets_amount(node_ids=node_ids)
+        update_nodes_assets_amount.delay(node_ids=node_ids)
 
 
 @merge_delay_run(ttl=30)
@@ -52,3 +54,18 @@ def update_nodes_assets_amount(node_ids=()):
         node.assets_amount = node.get_assets_amount()
 
     Node.objects.bulk_update(nodes, ['assets_amount'])
+
+
+@receiver(django_ready)
+def set_assets_size_to_setting(sender, **kwargs):
+    from assets.models import Asset
+    try:
+        with tmp_to_root_org():
+            amount = Asset.objects.order_by().count()
+    except:
+        amount = 0
+
+    if amount > 20000:
+        settings.ASSET_SIZE = 'large'
+    elif amount > 2000:
+        settings.ASSET_SIZE = 'medium'

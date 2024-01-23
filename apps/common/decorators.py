@@ -199,6 +199,32 @@ def merge_delay_run(ttl=5, key=None):
     :return:
     """
 
+    def delay(func, *args, **kwargs):
+        from orgs.utils import get_current_org
+        suffix_key_func = key if key else default_suffix_key
+        org = get_current_org()
+        func_name = f'{func.__module__}_{func.__name__}'
+        key_suffix = suffix_key_func(*args, **kwargs)
+        cache_key = f'MERGE_DELAY_RUN_{func_name}_{key_suffix}'
+        cache_kwargs = _loop_debouncer_func_args_cache.get(cache_key, {})
+
+        for k, v in kwargs.items():
+            if not isinstance(v, (tuple, list, set)):
+                raise ValueError('func kwargs value must be list or tuple: %s %s' % (func.__name__, v))
+            v = set(v)
+            if k not in cache_kwargs:
+                cache_kwargs[k] = v
+            else:
+                cache_kwargs[k] = cache_kwargs[k].union(v)
+        _loop_debouncer_func_args_cache[cache_key] = cache_kwargs
+        run_debouncer_func(cache_key, org, ttl, func, *args, **cache_kwargs)
+
+    def apply(func, sync=False, *args, **kwargs):
+        if sync:
+            return func(*args, **kwargs)
+        else:
+            return delay(func, *args, **kwargs)
+
     def inner(func):
         sigs = inspect.signature(func)
         if len(sigs.parameters) != 1:
@@ -206,27 +232,12 @@ def merge_delay_run(ttl=5, key=None):
         param = list(sigs.parameters.values())[0]
         if not isinstance(param.default, tuple):
             raise ValueError('func default must be tuple: %s' % param.default)
-        suffix_key_func = key if key else default_suffix_key
+        func.delay = functools.partial(delay, func)
+        func.apply = functools.partial(apply, func)
 
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            from orgs.utils import get_current_org
-            org = get_current_org()
-            func_name = f'{func.__module__}_{func.__name__}'
-            key_suffix = suffix_key_func(*args, **kwargs)
-            cache_key = f'MERGE_DELAY_RUN_{func_name}_{key_suffix}'
-            cache_kwargs = _loop_debouncer_func_args_cache.get(cache_key, {})
-
-            for k, v in kwargs.items():
-                if not isinstance(v, (tuple, list, set)):
-                    raise ValueError('func kwargs value must be list or tuple: %s %s' % (func.__name__, v))
-                v = set(v)
-                if k not in cache_kwargs:
-                    cache_kwargs[k] = v
-                else:
-                    cache_kwargs[k] = cache_kwargs[k].union(v)
-            _loop_debouncer_func_args_cache[cache_key] = cache_kwargs
-            run_debouncer_func(cache_key, org, ttl, func, *args, **cache_kwargs)
+            return func(*args, **kwargs)
 
         return wrapper
 
