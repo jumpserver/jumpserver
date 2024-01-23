@@ -86,7 +86,7 @@ def check_user_expired_periodic():
 @tmp_to_root_org()
 def check_unused_users():
     uncommon_users_ttl = settings.SECURITY_UNCOMMON_USERS_TTL
-    if not uncommon_users_ttl or not uncommon_users_ttl.isdigit():
+    if not uncommon_users_ttl:
         return
 
     uncommon_users_ttl = int(uncommon_users_ttl)
