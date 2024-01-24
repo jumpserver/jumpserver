@@ -38,7 +38,7 @@ class UserPermedAssetRetrieveApi(SelfOrPKUserMixin, RetrieveAPIView):
 
 
 class BaseUserPermedAssetsApi(SelfOrPKUserMixin, ListAPIView):
-    ordering = ('name',)
+    ordering = []
     search_fields = ('name', 'address', 'comment')
     ordering_fields = ("name", "address")
     filterset_class = AssetFilterSet
