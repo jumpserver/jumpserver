@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-18 10:44+0800\n"
+"POT-Creation-Date: 2024-01-24 14:55+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -20,6 +20,11 @@ msgstr ""
 #: accounts/api/automations/base.py:79 tickets/api/ticket.py:132
 msgid "The parameter 'action' must be [{}]"
 msgstr "参数 'action' 必须是 [{}]"
+
+#: accounts/automations/change_secret/manager.py:197
+#, python-format
+msgid "Success: %s, Failed: %s, Total: %s"
+msgstr "成功: %s, 失败: %s, 总数: %s"
 
 #: accounts/const/account.py:6
 #: accounts/serializers/automations/change_secret.py:32
@@ -359,7 +364,7 @@ msgstr "账号备份计划"
 
 #: accounts/models/automations/backup_account.py:119
 #: assets/models/automations/base.py:115 audits/models.py:65
-#: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:235
+#: ops/models/base.py:55 ops/models/celery.py:86 ops/models/job.py:235
 #: ops/templates/ops/celery_task_log.html:75
 #: perms/models/asset_permission.py:78
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
@@ -470,7 +475,7 @@ msgstr "开始日期"
 
 #: accounts/models/automations/change_secret.py:42
 #: assets/models/automations/base.py:116 ops/models/base.py:56
-#: ops/models/celery.py:64 ops/models/job.py:236
+#: ops/models/celery.py:87 ops/models/job.py:236
 #: terminal/models/applet/host.py:142
 msgid "Date finished"
 msgstr "结束日期"
@@ -603,12 +608,12 @@ msgstr "密码规则"
 #: authentication/serializers/connect_token_secret.py:113
 #: authentication/serializers/connect_token_secret.py:168 labels/models.py:11
 #: ops/mixin.py:21 ops/models/adhoc.py:20 ops/models/celery.py:15
-#: ops/models/celery.py:57 ops/models/job.py:136 ops/models/playbook.py:28
+#: ops/models/celery.py:80 ops/models/job.py:136 ops/models/playbook.py:28
 #: ops/serializers/job.py:18 orgs/models.py:82
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
 #: settings/models.py:33 settings/models.py:181 settings/serializers/msg.py:89
 #: terminal/models/applet/applet.py:33 terminal/models/component/endpoint.py:12
-#: terminal/models/component/endpoint.py:95
+#: terminal/models/component/endpoint.py:109
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:84
 #: terminal/models/virtualapp/provider.py:10
@@ -629,7 +634,7 @@ msgstr "特权账号"
 #: assets/models/label.py:22
 #: authentication/serializers/connect_token_secret.py:117
 #: terminal/models/applet/applet.py:40
-#: terminal/models/component/endpoint.py:106
+#: terminal/models/component/endpoint.py:120
 #: terminal/models/virtualapp/virtualapp.py:23 users/serializers/user.py:167
 msgid "Is active"
 msgstr "激活"
@@ -712,13 +717,13 @@ msgstr ""
 msgid "Notification of implementation result of encryption change plan"
 msgstr "改密计划任务结果通知"
 
-#: accounts/notifications.py:65
+#: accounts/notifications.py:66
 msgid ""
 "{} - The encryption change task has been completed. See the attachment for "
 "details"
 msgstr "{} - 改密任务已完成, 详情见附件"
 
-#: accounts/notifications.py:68
+#: accounts/notifications.py:70
 msgid ""
 "{} - The encryption change task has been completed: the encryption password "
 "has not been set - please go to personal information -> file encryption "
@@ -727,7 +732,7 @@ msgstr ""
 "{} - 改密任务已完成: 未设置加密密码 - 请前往个人信息 -> 文件加密密码中设置加"
 "密密码"
 
-#: accounts/notifications.py:79
+#: accounts/notifications.py:82
 msgid "Gather account change information"
 msgstr "账号变更信息"
 
@@ -776,7 +781,7 @@ msgstr "资产不存在"
 msgid "Has secret"
 msgstr "已托管密码"
 
-#: accounts/serializers/account/account.py:259 ops/models/celery.py:60
+#: accounts/serializers/account/account.py:259 ops/models/celery.py:83
 #: tickets/models/comment.py:13 tickets/models/ticket/general.py:45
 #: tickets/models/ticket/general.py:279 tickets/serializers/super_ticket.py:14
 #: tickets/serializers/ticket/ticket.py:21
@@ -928,7 +933,7 @@ msgstr "关联平台，可配置推送参数，如果不关联，将使用默认
 #: settings/models.py:38 terminal/models/applet/applet.py:45
 #: terminal/models/applet/applet.py:321 terminal/models/applet/host.py:143
 #: terminal/models/component/endpoint.py:25
-#: terminal/models/component/endpoint.py:105
+#: terminal/models/component/endpoint.py:119
 #: terminal/models/session/session.py:46
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
 #: tickets/models/ticket/general.py:297 users/models/user.py:836
@@ -1089,13 +1094,13 @@ msgid "Notifications"
 msgstr "通知"
 
 #: acls/models/base.py:37 assets/models/_user.py:51
-#: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:98
+#: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:112
 #: xpack/plugins/cloud/models.py:282
 msgid "Priority"
 msgstr "优先级"
 
 #: acls/models/base.py:38 assets/models/_user.py:51
-#: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:99
+#: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:113
 #: xpack/plugins/cloud/models.py:283
 msgid "1-100, the lower the value will be match first"
 msgstr "优先级可选范围为 1-100 (数值越小越优先)"
@@ -2713,20 +2718,20 @@ msgstr "认证"
 msgid "User invalid, disabled or expired"
 msgstr "用户无效，已禁用或已过期"
 
-#: authentication/backends/drf.py:50
+#: authentication/backends/drf.py:52
 msgid "Invalid token header. No credentials provided."
 msgstr "无效的令牌头。没有提供任何凭据。"
 
-#: authentication/backends/drf.py:53
+#: authentication/backends/drf.py:55
 msgid "Invalid token header. Sign string should not contain spaces."
 msgstr "无效的令牌头。符号字符串不应包含空格。"
 
-#: authentication/backends/drf.py:59
+#: authentication/backends/drf.py:61
 msgid ""
 "Invalid token header. Sign string should not contain invalid characters."
 msgstr "无效的令牌头。符号字符串不应包含无效字符。"
 
-#: authentication/backends/drf.py:72
+#: authentication/backends/drf.py:74
 msgid "Invalid token or cache refreshed."
 msgstr "刷新的令牌或缓存无效。"
 
@@ -3045,7 +3050,7 @@ msgid "Please change your password"
 msgstr "请修改密码"
 
 #: authentication/models/access_key.py:22
-#: terminal/models/component/endpoint.py:96
+#: terminal/models/component/endpoint.py:110
 msgid "IP group"
 msgstr "IPグループ"
 
@@ -3660,7 +3665,7 @@ msgstr "编码数据为 text"
 msgid "Encrypt field using Secret Key"
 msgstr "加密的字段"
 
-#: common/db/fields.py:573
+#: common/db/fields.py:580
 msgid ""
 "Invalid JSON data for JSONManyToManyField, should be like {'type': 'all'} or "
 "{'type': 'ids', 'ids': []} or {'type': 'attrs', 'attrs': [{'name': 'ip', "
@@ -3670,15 +3675,15 @@ msgstr ""
 "{'type': 'attrs', 'attrs': [{'name': 'ip', 'match': 'exact', 'value': "
 "'1.1.1.1'}}"
 
-#: common/db/fields.py:580
+#: common/db/fields.py:587
 msgid "Invalid type, should be \"all\", \"ids\" or \"attrs\""
 msgstr "无效类型，应为 all、ids 或 attrs"
 
-#: common/db/fields.py:583
+#: common/db/fields.py:590
 msgid "Invalid ids for ids, should be a list"
 msgstr "无效的ID，应为列表"
 
-#: common/db/fields.py:585 common/db/fields.py:590
+#: common/db/fields.py:592 common/db/fields.py:597
 #: common/serializers/fields.py:133 tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 #: xpack/plugins/cloud/serializers/account_attrs.py:79
@@ -3686,11 +3691,11 @@ msgstr "无效的ID，应为列表"
 msgid "This field is required."
 msgstr "该字段是必填项。"
 
-#: common/db/fields.py:588 common/db/fields.py:593
+#: common/db/fields.py:595 common/db/fields.py:600
 msgid "Invalid attrs, should be a list of dict"
 msgstr "无效的属性，应为dict列表"
 
-#: common/db/fields.py:595
+#: common/db/fields.py:602
 msgid "Invalid attrs, should be has name and value"
 msgstr "无效属性，应具有名称和值"
 
@@ -4011,15 +4016,15 @@ msgstr "Ansible 已禁用"
 msgid "Skip hosts below:"
 msgstr "跳过以下主机: "
 
-#: ops/api/celery.py:65 ops/api/celery.py:80
+#: ops/api/celery.py:66 ops/api/celery.py:81
 msgid "Waiting task start"
 msgstr "等待任务开始"
 
-#: ops/api/celery.py:203
+#: ops/api/celery.py:246
 msgid "Task {} not found"
 msgstr "任务 {} 不存在"
 
-#: ops/api/celery.py:208
+#: ops/api/celery.py:251
 msgid "Task {} args or kwargs error"
 msgstr "任务 {} 执行参数错误"
 
@@ -4190,7 +4195,7 @@ msgstr "模式"
 msgid "Module"
 msgstr "模块"
 
-#: ops/models/adhoc.py:24 ops/models/celery.py:58 ops/models/job.py:138
+#: ops/models/adhoc.py:24 ops/models/celery.py:81 ops/models/job.py:138
 #: terminal/models/component/task.py:14
 msgid "Args"
 msgstr "参数"
@@ -4222,28 +4227,28 @@ msgstr "汇总"
 msgid "Date last publish"
 msgstr "发布日期"
 
-#: ops/models/celery.py:47
+#: ops/models/celery.py:70
 msgid "Celery Task"
 msgstr "Celery 任务"
 
-#: ops/models/celery.py:50
+#: ops/models/celery.py:73
 msgid "Can view task monitor"
 msgstr "可以查看任务监控"
 
-#: ops/models/celery.py:59 terminal/models/component/task.py:15
+#: ops/models/celery.py:82 terminal/models/component/task.py:15
 msgid "Kwargs"
 msgstr "其它参数"
 
-#: ops/models/celery.py:61 terminal/models/session/sharing.py:128
+#: ops/models/celery.py:84 terminal/models/session/sharing.py:128
 #: tickets/const.py:25
 msgid "Finished"
 msgstr "结束"
 
-#: ops/models/celery.py:62
+#: ops/models/celery.py:85
 msgid "Date published"
 msgstr "发布日期"
 
-#: ops/models/celery.py:87
+#: ops/models/celery.py:110
 msgid "Celery Task Execution"
 msgstr "Celery 任务执行"
 
@@ -4614,7 +4619,7 @@ msgstr "内部角色，不能删除"
 msgid "The role has been bound to users, can't be destroy"
 msgstr "角色已绑定用户，不能删除"
 
-#: rbac/api/role.py:100
+#: rbac/api/role.py:102
 msgid "Internal role, can't be update"
 msgstr "内部角色，不能更新"
 
@@ -6635,14 +6640,14 @@ msgid "SQLServer port"
 msgstr "SQLServer 端口"
 
 #: terminal/models/component/endpoint.py:30
-#: terminal/models/component/endpoint.py:103
+#: terminal/models/component/endpoint.py:117
 #: terminal/serializers/endpoint.py:73 terminal/serializers/storage.py:41
 #: terminal/serializers/storage.py:53 terminal/serializers/storage.py:83
 #: terminal/serializers/storage.py:93 terminal/serializers/storage.py:101
 msgid "Endpoint"
 msgstr "端点"
 
-#: terminal/models/component/endpoint.py:109
+#: terminal/models/component/endpoint.py:123
 msgid "Endpoint rule"
 msgstr "端点规则"
 
@@ -8391,7 +8396,7 @@ msgstr "与"
 msgid "Or"
 msgstr "或"
 
-#: xpack/plugins/cloud/manager.py:57
+#: xpack/plugins/cloud/manager.py:56
 msgid "Account unavailable"
 msgstr "账号无效"
 

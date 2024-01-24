@@ -4,6 +4,7 @@ from copy import deepcopy
 
 from django.conf import settings
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from xlsxwriter import Workbook
 
 from accounts.const import AutomationTypes, SecretType, SSHKeyStrategy, SecretStrategy
@@ -183,17 +184,33 @@ class ChangeSecretManager(AccountBasePlaybookManager):
             return False
         return True
 
+    @staticmethod
+    def get_summary(recorders):
+        total, succeed, failed = 0, 0, 0
+        for recorder in recorders:
+            if recorder.status == 'success':
+                succeed += 1
+            else:
+                failed += 1
+            total += 1
+
+        summary = _('Success: %s, Failed: %s, Total: %s') % (succeed, failed, total)
+        return summary
+
     def run(self, *args, **kwargs):
         if self.secret_type and not self.check_secret():
             return
         super().run(*args, **kwargs)
+        recorders = list(self.name_recorder_mapper.values())
+        summary = self.get_summary(recorders)
+        print(summary, end='')
+
         if self.record_id:
             return
-        recorders = self.name_recorder_mapper.values()
-        recorders = list(recorders)
-        self.send_recorder_mail(recorders)
 
-    def send_recorder_mail(self, recorders):
+        self.send_recorder_mail(recorders, summary)
+
+    def send_recorder_mail(self, recorders, summary):
         recipients = self.execution.recipients
         if not recorders or not recipients:
             return
@@ -213,7 +230,7 @@ class ChangeSecretManager(AccountBasePlaybookManager):
                 attachment = os.path.join(path, f'{name}-{local_now_filename()}-{time.time()}.zip')
                 encrypt_and_compress_zip_file(attachment, password, [filename])
                 attachments = [attachment]
-            ChangeSecretExecutionTaskMsg(name, user).publish(attachments)
+            ChangeSecretExecutionTaskMsg(name, user, summary).publish(attachments)
         os.remove(filename)
 
     @staticmethod

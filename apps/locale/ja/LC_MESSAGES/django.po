@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-18 10:45+0800\n"
+"POT-Creation-Date: 2024-01-24 14:55+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,6 +21,11 @@ msgstr ""
 #: accounts/api/automations/base.py:79 tickets/api/ticket.py:132
 msgid "The parameter 'action' must be [{}]"
 msgstr "パラメータ 'action' は [{}] でなければなりません。"
+
+#: accounts/automations/change_secret/manager.py:197
+#, python-format
+msgid "Success: %s, Failed: %s, Total: %s"
+msgstr "成功: %s、失敗: %s、合計: %s"
 
 #: accounts/const/account.py:6
 #: accounts/serializers/automations/change_secret.py:32
@@ -360,7 +365,7 @@ msgstr "アカウントバックアップ計画"
 
 #: accounts/models/automations/backup_account.py:119
 #: assets/models/automations/base.py:115 audits/models.py:65
-#: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:235
+#: ops/models/base.py:55 ops/models/celery.py:86 ops/models/job.py:235
 #: ops/templates/ops/celery_task_log.html:75
 #: perms/models/asset_permission.py:78
 #: settings/templates/ldap/_msg_import_ldap_user.html:5
@@ -471,7 +476,7 @@ msgstr "開始日"
 
 #: accounts/models/automations/change_secret.py:42
 #: assets/models/automations/base.py:116 ops/models/base.py:56
-#: ops/models/celery.py:64 ops/models/job.py:236
+#: ops/models/celery.py:87 ops/models/job.py:236
 #: terminal/models/applet/host.py:142
 msgid "Date finished"
 msgstr "終了日"
@@ -604,12 +609,12 @@ msgstr "パスワードルール"
 #: authentication/serializers/connect_token_secret.py:113
 #: authentication/serializers/connect_token_secret.py:168 labels/models.py:11
 #: ops/mixin.py:21 ops/models/adhoc.py:20 ops/models/celery.py:15
-#: ops/models/celery.py:57 ops/models/job.py:136 ops/models/playbook.py:28
+#: ops/models/celery.py:80 ops/models/job.py:136 ops/models/playbook.py:28
 #: ops/serializers/job.py:18 orgs/models.py:82
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
 #: settings/models.py:33 settings/models.py:181 settings/serializers/msg.py:89
 #: terminal/models/applet/applet.py:33 terminal/models/component/endpoint.py:12
-#: terminal/models/component/endpoint.py:95
+#: terminal/models/component/endpoint.py:109
 #: terminal/models/component/storage.py:26 terminal/models/component/task.py:13
 #: terminal/models/component/terminal.py:84
 #: terminal/models/virtualapp/provider.py:10
@@ -630,7 +635,7 @@ msgstr "特権アカウント"
 #: assets/models/label.py:22
 #: authentication/serializers/connect_token_secret.py:117
 #: terminal/models/applet/applet.py:40
-#: terminal/models/component/endpoint.py:106
+#: terminal/models/component/endpoint.py:120
 #: terminal/models/virtualapp/virtualapp.py:23 users/serializers/user.py:167
 msgid "Is active"
 msgstr "アクティブです。"
@@ -714,13 +719,13 @@ msgstr ""
 msgid "Notification of implementation result of encryption change plan"
 msgstr "暗号化変更プランの実装結果の通知"
 
-#: accounts/notifications.py:65
+#: accounts/notifications.py:66
 msgid ""
 "{} - The encryption change task has been completed. See the attachment for "
 "details"
 msgstr "{} -暗号化変更タスクが完了しました。詳細は添付ファイルをご覧ください"
 
-#: accounts/notifications.py:68
+#: accounts/notifications.py:70
 msgid ""
 "{} - The encryption change task has been completed: the encryption password "
 "has not been set - please go to personal information -> file encryption "
@@ -729,7 +734,7 @@ msgstr ""
 "{} -暗号化変更タスクが完了しました: 暗号化パスワードが設定されていません-個人"
 "情報にアクセスしてください-> ファイル暗号化パスワードを設定してください"
 
-#: accounts/notifications.py:79
+#: accounts/notifications.py:82
 msgid "Gather account change information"
 msgstr "アカウント変更情報"
 
@@ -778,7 +783,7 @@ msgstr "資産が存在しません"
 msgid "Has secret"
 msgstr "エスクローされたパスワード"
 
-#: accounts/serializers/account/account.py:259 ops/models/celery.py:60
+#: accounts/serializers/account/account.py:259 ops/models/celery.py:83
 #: tickets/models/comment.py:13 tickets/models/ticket/general.py:45
 #: tickets/models/ticket/general.py:279 tickets/serializers/super_ticket.py:14
 #: tickets/serializers/ticket/ticket.py:21
@@ -930,7 +935,7 @@ msgstr "关联平台，可以配置推送参数，如果不关联，则使用默
 #: settings/models.py:38 terminal/models/applet/applet.py:45
 #: terminal/models/applet/applet.py:321 terminal/models/applet/host.py:143
 #: terminal/models/component/endpoint.py:25
-#: terminal/models/component/endpoint.py:105
+#: terminal/models/component/endpoint.py:119
 #: terminal/models/session/session.py:46
 #: terminal/models/virtualapp/virtualapp.py:28 tickets/models/comment.py:32
 #: tickets/models/ticket/general.py:297 users/models/user.py:836
@@ -1093,13 +1098,13 @@ msgid "Notifications"
 msgstr "通知"
 
 #: acls/models/base.py:37 assets/models/_user.py:51
-#: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:98
+#: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:112
 #: xpack/plugins/cloud/models.py:282
 msgid "Priority"
 msgstr "優先順位"
 
 #: acls/models/base.py:38 assets/models/_user.py:51
-#: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:99
+#: assets/models/cmd_filter.py:76 terminal/models/component/endpoint.py:113
 #: xpack/plugins/cloud/models.py:283
 msgid "1-100, the lower the value will be match first"
 msgstr "1-100、低い値は最初に一致します"
@@ -2734,21 +2739,21 @@ msgstr "認証"
 msgid "User invalid, disabled or expired"
 msgstr "ユーザーが無効、無効、または期限切れです"
 
-#: authentication/backends/drf.py:50
+#: authentication/backends/drf.py:52
 msgid "Invalid token header. No credentials provided."
 msgstr "無効なトークンヘッダー。資格情報は提供されていません。"
 
-#: authentication/backends/drf.py:53
+#: authentication/backends/drf.py:55
 msgid "Invalid token header. Sign string should not contain spaces."
 msgstr "無効なトークンヘッダー。記号文字列にはスペースを含めないでください。"
 
-#: authentication/backends/drf.py:59
+#: authentication/backends/drf.py:61
 msgid ""
 "Invalid token header. Sign string should not contain invalid characters."
 msgstr ""
 "無効なトークンヘッダー。署名文字列に無効な文字を含めることはできません。"
 
-#: authentication/backends/drf.py:72
+#: authentication/backends/drf.py:74
 msgid "Invalid token or cache refreshed."
 msgstr "無効なトークンまたはキャッシュの更新。"
 
@@ -3077,7 +3082,7 @@ msgid "Please change your password"
 msgstr "パスワードを変更してください"
 
 #: authentication/models/access_key.py:22
-#: terminal/models/component/endpoint.py:96
+#: terminal/models/component/endpoint.py:110
 msgid "IP group"
 msgstr "IP グループ"
 
@@ -3704,7 +3709,7 @@ msgstr "テキストフィールドへのマーシャルデータ"
 msgid "Encrypt field using Secret Key"
 msgstr "Secret Keyを使用したフィールドの暗号化"
 
-#: common/db/fields.py:573
+#: common/db/fields.py:580
 msgid ""
 "Invalid JSON data for JSONManyToManyField, should be like {'type': 'all'} or "
 "{'type': 'ids', 'ids': []} or {'type': 'attrs', 'attrs': [{'name': 'ip', "
@@ -3714,15 +3719,15 @@ msgstr ""
 "｛'type'：'ids'，'ids':[]｝或 ＃タイプ：属性、属性：[＃名前：ip、照合：正確、"
 "値：1.1.1.1｝"
 
-#: common/db/fields.py:580
+#: common/db/fields.py:587
 msgid "Invalid type, should be \"all\", \"ids\" or \"attrs\""
 msgstr "無効なタイプです。all、ids、またはattrsでなければなりません"
 
-#: common/db/fields.py:583
+#: common/db/fields.py:590
 msgid "Invalid ids for ids, should be a list"
 msgstr "無効なID、リストでなければなりません"
 
-#: common/db/fields.py:585 common/db/fields.py:590
+#: common/db/fields.py:592 common/db/fields.py:597
 #: common/serializers/fields.py:133 tickets/serializers/ticket/common.py:58
 #: xpack/plugins/cloud/serializers/account_attrs.py:56
 #: xpack/plugins/cloud/serializers/account_attrs.py:79
@@ -3730,11 +3735,11 @@ msgstr "無効なID、リストでなければなりません"
 msgid "This field is required."
 msgstr "このフィールドは必須です。"
 
-#: common/db/fields.py:588 common/db/fields.py:593
+#: common/db/fields.py:595 common/db/fields.py:600
 msgid "Invalid attrs, should be a list of dict"
 msgstr "無効な属性、dictリストでなければなりません"
 
-#: common/db/fields.py:595
+#: common/db/fields.py:602
 msgid "Invalid attrs, should be has name and value"
 msgstr "名前と値が必要な無効な属性"
 
@@ -4060,15 +4065,15 @@ msgstr "Ansible 無効"
 msgid "Skip hosts below:"
 msgstr "次のホストをスキップします: "
 
-#: ops/api/celery.py:65 ops/api/celery.py:80
+#: ops/api/celery.py:66 ops/api/celery.py:81
 msgid "Waiting task start"
 msgstr "タスク開始待ち"
 
-#: ops/api/celery.py:203
+#: ops/api/celery.py:246
 msgid "Task {} not found"
 msgstr "タスクは存在しません"
 
-#: ops/api/celery.py:208
+#: ops/api/celery.py:251
 msgid "Task {} args or kwargs error"
 msgstr "タスク実行パラメータエラー"
 
@@ -4241,7 +4246,7 @@ msgstr "パターン"
 msgid "Module"
 msgstr "モジュール"
 
-#: ops/models/adhoc.py:24 ops/models/celery.py:58 ops/models/job.py:138
+#: ops/models/adhoc.py:24 ops/models/celery.py:81 ops/models/job.py:138
 #: terminal/models/component/task.py:14
 msgid "Args"
 msgstr "アルグ"
@@ -4273,28 +4278,28 @@ msgstr "概要"
 msgid "Date last publish"
 msgstr "発売日"
 
-#: ops/models/celery.py:47
+#: ops/models/celery.py:70
 msgid "Celery Task"
 msgstr "Celery タスク＃タスク＃"
 
-#: ops/models/celery.py:50
+#: ops/models/celery.py:73
 msgid "Can view task monitor"
 msgstr "タスクモニターを表示できます"
 
-#: ops/models/celery.py:59 terminal/models/component/task.py:15
+#: ops/models/celery.py:82 terminal/models/component/task.py:15
 msgid "Kwargs"
 msgstr "クワーグ"
 
-#: ops/models/celery.py:61 terminal/models/session/sharing.py:128
+#: ops/models/celery.py:84 terminal/models/session/sharing.py:128
 #: tickets/const.py:25
 msgid "Finished"
 msgstr "終了"
 
-#: ops/models/celery.py:62
+#: ops/models/celery.py:85
 msgid "Date published"
 msgstr "発売日"
 
-#: ops/models/celery.py:87
+#: ops/models/celery.py:110
 msgid "Celery Task Execution"
 msgstr "Celery タスク実行"
 
@@ -4666,7 +4671,7 @@ msgstr "内部の役割は、破壊することはできません"
 msgid "The role has been bound to users, can't be destroy"
 msgstr "ロールはユーザーにバインドされており、破壊することはできません"
 
-#: rbac/api/role.py:100
+#: rbac/api/role.py:102
 msgid "Internal role, can't be update"
 msgstr "内部ロール、更新できません"
 
@@ -6729,14 +6734,14 @@ msgid "SQLServer port"
 msgstr "SQLServer ポート"
 
 #: terminal/models/component/endpoint.py:30
-#: terminal/models/component/endpoint.py:103
+#: terminal/models/component/endpoint.py:117
 #: terminal/serializers/endpoint.py:73 terminal/serializers/storage.py:41
 #: terminal/serializers/storage.py:53 terminal/serializers/storage.py:83
 #: terminal/serializers/storage.py:93 terminal/serializers/storage.py:101
 msgid "Endpoint"
 msgstr "エンドポイント"
 
-#: terminal/models/component/endpoint.py:109
+#: terminal/models/component/endpoint.py:123
 msgid "Endpoint rule"
 msgstr "エンドポイントルール"
 
@@ -8515,7 +8520,7 @@ msgstr "そして"
 msgid "Or"
 msgstr "または"
 
-#: xpack/plugins/cloud/manager.py:57
+#: xpack/plugins/cloud/manager.py:56
 msgid "Account unavailable"
 msgstr "利用できないアカウント"
 
