@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db.models import TextChoices, IntegerChoices
 from django.utils.translation import gettext_lazy as _
 
@@ -56,3 +57,21 @@ class TicketApprovalStrategy(TextChoices):
     custom_user = 'custom_user', _("Custom user")
     super_admin = 'super_admin', _("Super admin")
     super_org_admin = 'super_org_admin', _("Super admin and org admin")
+
+
+class TicketApplyAssetScope(TextChoices):
+    all = 'all', _("All assets")
+    permed = 'permed', _("Permed assets")
+    permed_valid = 'permed_valid', _('Permed valid assets')
+
+    @classmethod
+    def get_scope(cls):
+        return settings.TICKET_APPLY_ASSET_SCOPE.lower()
+
+    @classmethod
+    def is_permed(cls):
+        return cls.get_scope() == cls.permed
+
+    @classmethod
+    def is_permed_valid(cls):
+        return cls.get_scope() == cls.permed_valid

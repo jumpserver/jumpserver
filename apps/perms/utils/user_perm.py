@@ -29,14 +29,19 @@ class AssetPermissionPermAssetUtil:
         # 比原来的查到所有 asset id 再搜索块很多，因为当资产量大的时候，搜索会很慢
         return (node_assets | direct_assets).order_by().distinct()
 
-    @timeit
-    def get_perm_nodes_assets(self):
-        """ 获取所有授权节点下的资产 """
+    def get_perm_nodes(self):
+        """ 获取所有授权节点 """
         nodes_ids = AssetPermission.objects \
             .filter(id__in=self.perm_ids) \
             .values_list('nodes', flat=True)
         nodes_ids = set(nodes_ids)
         nodes = Node.objects.filter(id__in=nodes_ids).only('id', 'key')
+        return nodes
+
+    @timeit
+    def get_perm_nodes_assets(self):
+        """ 获取所有授权节点下的资产 """
+        nodes = self.get_perm_nodes()
         assets = PermNode.get_nodes_all_assets(*nodes, distinct=False)
         return assets
 

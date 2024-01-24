@@ -606,7 +606,9 @@ class Config(dict):
         'GPT_MODEL': 'gpt-3.5-turbo',
         'VIRTUAL_APP_ENABLED': False,
 
-        'FILE_UPLOAD_SIZE_LIMIT_MB': 200
+        'FILE_UPLOAD_SIZE_LIMIT_MB': 200,
+
+        'TICKET_APPLY_ASSET_SCOPE': 'all'
     }
 
     old_config_map = {
