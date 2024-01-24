@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-24 14:55+0800\n"
+"POT-Creation-Date: 2024-01-24 19:44+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -728,11 +728,11 @@ msgstr "{} -暗号化変更タスクが完了しました。詳細は添付フ�
 #: accounts/notifications.py:70
 msgid ""
 "{} - The encryption change task has been completed: the encryption password "
-"has not been set - please go to personal information -> file encryption "
-"password to set the encryption password"
+"has not been set - please go to personal information -> set encryption "
+"password in preferences"
 msgstr ""
 "{} -暗号化変更タスクが完了しました: 暗号化パスワードが設定されていません-個人"
-"情報にアクセスしてください-> ファイル暗号化パスワードを設定してください"
+"情報にアクセスしてください-> 環境設定で暗号化パスワードを設定する"
 
 #: accounts/notifications.py:82
 msgid "Gather account change information"
@@ -1749,7 +1749,7 @@ msgid "Domain"
 msgstr "ドメイン"
 
 #: assets/models/asset/common.py:165 assets/models/automations/base.py:18
-#: assets/models/cmd_filter.py:32 assets/models/node.py:546
+#: assets/models/cmd_filter.py:32 assets/models/node.py:549
 #: perms/models/asset_permission.py:72 perms/serializers/permission.py:37
 #: tickets/models/ticket/apply_asset.py:14 xpack/plugins/cloud/models.py:330
 msgid "Node"
@@ -1889,7 +1889,7 @@ msgstr "デフォルトアセットグループ"
 msgid "System"
 msgstr "システム"
 
-#: assets/models/label.py:19 assets/models/node.py:532
+#: assets/models/label.py:19 assets/models/node.py:535
 #: assets/serializers/cagegory.py:11 assets/serializers/cagegory.py:18
 #: assets/serializers/cagegory.py:24
 #: authentication/models/connection_token.py:29
@@ -1912,23 +1912,23 @@ msgstr "ラベル"
 msgid "New node"
 msgstr "新しいノード"
 
-#: assets/models/node.py:460 audits/backends/db.py:65 audits/backends/db.py:66
+#: assets/models/node.py:463 audits/backends/db.py:65 audits/backends/db.py:66
 msgid "empty"
 msgstr "空"
 
-#: assets/models/node.py:531 perms/models/perm_node.py:28
+#: assets/models/node.py:534 perms/models/perm_node.py:28
 msgid "Key"
 msgstr "キー"
 
-#: assets/models/node.py:533 assets/serializers/node.py:20
+#: assets/models/node.py:536 assets/serializers/node.py:20
 msgid "Full value"
 msgstr "フルバリュー"
 
-#: assets/models/node.py:537 perms/models/perm_node.py:30
+#: assets/models/node.py:540 perms/models/perm_node.py:30
 msgid "Parent key"
 msgstr "親キー"
 
-#: assets/models/node.py:549
+#: assets/models/node.py:552
 msgid "Can match node"
 msgstr "ノードを一致させることができます"
 

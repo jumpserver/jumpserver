@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-24 14:55+0800\n"
+"POT-Creation-Date: 2024-01-24 19:44+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -726,11 +726,11 @@ msgstr "{} - 改密任务已完成, 详情见附件"
 #: accounts/notifications.py:70
 msgid ""
 "{} - The encryption change task has been completed: the encryption password "
-"has not been set - please go to personal information -> file encryption "
-"password to set the encryption password"
+"has not been set - please go to personal information -> set encryption "
+"password in preferences"
 msgstr ""
-"{} - 改密任务已完成: 未设置加密密码 - 请前往个人信息 -> 文件加密密码中设置加"
-"密密码"
+"{} - 改密任务已完成: 未设置加密密码 - 请前往个人信息 -> 偏好设置中设置加密密"
+"码"
 
 #: accounts/notifications.py:82
 msgid "Gather account change information"
@@ -1741,7 +1741,7 @@ msgid "Domain"
 msgstr "网域"
 
 #: assets/models/asset/common.py:165 assets/models/automations/base.py:18
-#: assets/models/cmd_filter.py:32 assets/models/node.py:546
+#: assets/models/cmd_filter.py:32 assets/models/node.py:549
 #: perms/models/asset_permission.py:72 perms/serializers/permission.py:37
 #: tickets/models/ticket/apply_asset.py:14 xpack/plugins/cloud/models.py:330
 msgid "Node"
@@ -1881,7 +1881,7 @@ msgstr "默认资产组"
 msgid "System"
 msgstr "系统"
 
-#: assets/models/label.py:19 assets/models/node.py:532
+#: assets/models/label.py:19 assets/models/node.py:535
 #: assets/serializers/cagegory.py:11 assets/serializers/cagegory.py:18
 #: assets/serializers/cagegory.py:24
 #: authentication/models/connection_token.py:29
@@ -1904,23 +1904,23 @@ msgstr "标签"
 msgid "New node"
 msgstr "新节点"
 
-#: assets/models/node.py:460 audits/backends/db.py:65 audits/backends/db.py:66
+#: assets/models/node.py:463 audits/backends/db.py:65 audits/backends/db.py:66
 msgid "empty"
 msgstr "空"
 
-#: assets/models/node.py:531 perms/models/perm_node.py:28
+#: assets/models/node.py:534 perms/models/perm_node.py:28
 msgid "Key"
 msgstr "键"
 
-#: assets/models/node.py:533 assets/serializers/node.py:20
+#: assets/models/node.py:536 assets/serializers/node.py:20
 msgid "Full value"
 msgstr "全称"
 
-#: assets/models/node.py:537 perms/models/perm_node.py:30
+#: assets/models/node.py:540 perms/models/perm_node.py:30
 msgid "Parent key"
 msgstr "ssh私钥"
 
-#: assets/models/node.py:549
+#: assets/models/node.py:552
 msgid "Can match node"
 msgstr "可以匹配节点"
 
