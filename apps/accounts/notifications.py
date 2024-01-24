@@ -54,20 +54,23 @@ class AccountBackupByObjStorageExecutionTaskMsg(object):
 class ChangeSecretExecutionTaskMsg(object):
     subject = _('Notification of implementation result of encryption change plan')
 
-    def __init__(self, name: str, user: User):
+    def __init__(self, name: str, user: User, summary):
         self.name = name
         self.user = user
+        self.summary = summary
 
     @property
     def message(self):
         name = self.name
         if self.user.secret_key:
-            return _('{} - The encryption change task has been completed. '
-                     'See the attachment for details').format(name)
+            default_message = _('{} - The encryption change task has been completed. '
+                                'See the attachment for details').format(name)
+
         else:
-            return _("{} - The encryption change task has been completed: the encryption "
-                     "password has not been set - please go to personal information -> "
-                     "file encryption password to set the encryption password").format(name)
+            default_message = _("{} - The encryption change task has been completed: the encryption "
+                                "password has not been set - please go to personal information -> "
+                                "file encryption password to set the encryption password").format(name)
+        return self.summary + '\n' + default_message
 
     def publish(self, attachments=None):
         send_mail_attachment_async(
