@@ -69,7 +69,7 @@ class ChangeSecretExecutionTaskMsg(object):
         else:
             default_message = _("{} - The encryption change task has been completed: the encryption "
                                 "password has not been set - please go to personal information -> "
-                                "file encryption password to set the encryption password").format(name)
+                                "set encryption password in preferences").format(name)
         return self.summary + '\n' + default_message
 
     def publish(self, attachments=None):
