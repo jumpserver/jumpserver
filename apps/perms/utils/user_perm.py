@@ -7,10 +7,10 @@ from django.db.models import Q
 from rest_framework.utils.encoders import JSONEncoder
 
 from assets.const import AllTypes
-from assets.models import FavoriteAsset, Asset
+from assets.models import FavoriteAsset, Asset, Node
 from common.utils.common import timeit, get_logger
 from orgs.utils import current_org, tmp_to_root_org
-from perms.models import PermNode, UserAssetGrantedTreeNodeRelation
+from perms.models import PermNode, UserAssetGrantedTreeNodeRelation, AssetPermission
 from .permission import AssetPermissionUtil
 
 __all__ = ['AssetPermissionPermAssetUtil', 'UserPermAssetUtil', 'UserPermNodeUtil']
@@ -21,38 +21,32 @@ logger = get_logger(__name__)
 class AssetPermissionPermAssetUtil:
 
     def __init__(self, perm_ids):
-        self.perm_ids = perm_ids
+        self.perm_ids = set(perm_ids)
 
     def get_all_assets(self):
         node_assets = self.get_perm_nodes_assets()
         direct_assets = self.get_direct_assets()
         # 比原来的查到所有 asset id 再搜索块很多，因为当资产量大的时候，搜索会很慢
-        return (node_assets | direct_assets).distinct()
+        return (node_assets | direct_assets).order_by().distinct()
 
     @timeit
-    def get_perm_nodes_assets(self, flat=False):
+    def get_perm_nodes_assets(self):
         """ 获取所有授权节点下的资产 """
-        from assets.models import Node
-        from ..models import AssetPermission
         nodes_ids = AssetPermission.objects \
             .filter(id__in=self.perm_ids) \
             .values_list('nodes', flat=True)
+        nodes_ids = set(nodes_ids)
         nodes = Node.objects.filter(id__in=nodes_ids).only('id', 'key')
-        assets = PermNode.get_nodes_all_assets(*nodes)
-        if flat:
-            return set(assets.values_list('id', flat=True))
+        assets = PermNode.get_nodes_all_assets(*nodes, distinct=False)
         return assets
 
     @timeit
-    def get_direct_assets(self, flat=False):
+    def get_direct_assets(self):
         """ 获取直接授权的资产 """
-        from ..models import AssetPermission
-        asset_ids = AssetPermission.objects \
-            .filter(id__in=self.perm_ids) \
-            .values_list('assets', flat=True)
-        assets = Asset.objects.filter(id__in=asset_ids).distinct()
-        if flat:
-            return set(assets.values_list('id', flat=True))
+        asset_ids = AssetPermission.assets.through.objects \
+            .filter(assetpermission_id__in=self.perm_ids) \
+            .values_list('asset_id', flat=True)
+        assets = Asset.objects.filter(id__in=asset_ids)
         return assets
 
 

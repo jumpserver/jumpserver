@@ -8,9 +8,9 @@ from rest_framework import serializers
 from accounts.models import Account
 from assets.const import Category, AllTypes
 from assets.models import Node, Asset, Platform
-from assets.serializers.asset.common import AssetLabelSerializer, AssetProtocolsPermsSerializer
-from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
+from assets.serializers.asset.common import AssetProtocolsPermsSerializer
 from common.serializers import ResourceLabelsMixin
+from common.serializers.fields import ObjectRelatedField, LabeledChoiceField
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
 from perms.serializers.permission import ActionChoicesField
 
