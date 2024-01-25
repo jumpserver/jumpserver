@@ -98,7 +98,7 @@ class OAuth2Backend(JMSModelBackend):
         access_token_url = '{url}{separator}{query}'.format(
             url=settings.AUTH_OAUTH2_ACCESS_TOKEN_ENDPOINT, separator=separator, query=urlencode(query_dict)
         )
-        # token_method -> GET, POST(POST_DATA), POST_JSON
+        # token_method -> get, post(post_data), post_json
         token_method = settings.AUTH_OAUTH2_ACCESS_TOKEN_METHOD.lower()
         logger.debug(log_prompt.format('Call the access token endpoint[method: %s]' % token_method))
         headers = {
