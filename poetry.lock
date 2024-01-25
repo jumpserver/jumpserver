@@ -3582,12 +3582,12 @@ reference = "tsinghua"
 
 [[package]]
 name = "jms-storage"
-version = "0.0.53"
+version = "0.0.55"
 description = "Jumpserver storage python sdk tools"
 optional = false
 python-versions = "*"
 files = [
-    {file = "jms-storage-0.0.53.tar.gz", hash = "sha256:d197816b3edc6a370892d5a246265ea7ae7267159b1a4ad88a14ae56e92013be"},
+    {file = "jms-storage-0.0.55.tar.gz", hash = "sha256:cab3ac01b9733dd30101b59dd21de104543355c010ca0024cfaed3069e392cfa"},
 ]
 
 [package.dependencies]
@@ -7876,4 +7876,4 @@ reference = "tsinghua"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "3d6e2ccd4d1c1943d9bda901601872db7eb0564858a258372ad7ccf02c978378"
+content-hash = "ae542c3660a6fc5fde022a23cc23b0f7be1229a0e4249f924f07d1bd8d4efc95"
