@@ -98,16 +98,19 @@ class OAuth2Backend(JMSModelBackend):
         access_token_url = '{url}{separator}{query}'.format(
             url=settings.AUTH_OAUTH2_ACCESS_TOKEN_ENDPOINT, separator=separator, query=urlencode(query_dict)
         )
+        # token_method -> GET, POST(POST_DATA), POST_JSON
         token_method = settings.AUTH_OAUTH2_ACCESS_TOKEN_METHOD.lower()
-        requests_func = getattr(requests, token_method, requests.get)
         logger.debug(log_prompt.format('Call the access token endpoint[method: %s]' % token_method))
         headers = {
             'Accept': 'application/json'
         }
-        if token_method == 'post':
-            access_token_response = requests_func(access_token_url, headers=headers, json=query_dict)
+        if token_method.startswith('post'):
+            body_key = 'json' if token_method.endswith('json') else 'data'
+            access_token_response = requests.post(
+                access_token_url, headers=headers, **{body_key: query_dict}
+            )
         else:
-            access_token_response = requests_func(access_token_url, headers=headers)
+            access_token_response = requests.get(access_token_url, headers=headers)
         try:
             access_token_response.raise_for_status()
             access_token_response_data = access_token_response.json()
