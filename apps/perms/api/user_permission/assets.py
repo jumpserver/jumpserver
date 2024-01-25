@@ -1,5 +1,6 @@
 import abc
 
+from django.conf import settings
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from assets.api.asset.asset import AssetFilterSet
@@ -47,6 +48,8 @@ class BaseUserPermedAssetsApi(SelfOrPKUserMixin, ListAPIView):
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return Asset.objects.none()
+        if settings.ASSET_SIZE == 'small':
+            self.ordering = ['name']
         assets = self.get_assets()
         assets = self.serializer_class.setup_eager_loading(assets)
         return assets
