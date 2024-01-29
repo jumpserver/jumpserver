@@ -67,6 +67,7 @@ class JMSPermedInventory(JMSInventory):
             'postgresql': ['postgresql'],
             'sqlserver': ['sqlserver'],
             'ssh': ['shell', 'python', 'win_shell', 'raw'],
+            'winrm': ['win_shell'],
         }
 
         if self.module not in protocol_supported_modules_mapping.get(protocol.name, []):
