@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.files.storage import default_storage
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _, get_language
 from rest_framework.serializers import ValidationError
 
 from assets.models import Platform
@@ -84,6 +84,14 @@ class Applet(JMSBaseModel):
             return None
         return os.path.join(settings.MEDIA_URL, 'applets', self.name, 'icon.png')
 
+    @property
+    def meta(self):
+        lang = get_language()
+        manifest = self.read_manifest_with_i18n(self.path, lang)
+        return {
+            "comment": manifest.get('comment', '')
+        }
+
     @staticmethod
     def validate_pkg(d):
         files = ['manifest.yml', 'icon.png', 'setup.yml']
@@ -92,11 +100,16 @@ class Applet(JMSBaseModel):
             if not os.path.exists(path):
                 raise ValidationError({'error': _('Applet pkg not valid, Missing file {}').format(name)})
 
-        with open(os.path.join(d, 'manifest.yml'), encoding='utf8') as f:
-            manifest = yaml_load_with_i18n(f)
+        manifest = Applet.read_manifest_with_i18n(d, 'en')
 
         if not manifest.get('name', ''):
             raise ValidationError({'error': 'Missing name in manifest.yml'})
+        return manifest
+
+    @staticmethod
+    def read_manifest_with_i18n(path, lang=None):
+        with open(os.path.join(path, 'manifest.yml'), encoding='utf8') as f:
+            manifest = yaml_load_with_i18n(f, lang)
         return manifest
 
     def load_platform_if_need(self, d):
