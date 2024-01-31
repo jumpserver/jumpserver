@@ -455,12 +455,14 @@ class AccountHistorySerializer(serializers.ModelSerializer):
 
 class AccountTaskSerializer(serializers.Serializer):
     ACTION_CHOICES = (
-        ('test', 'test'),
         ('verify', 'verify'),
         ('push', 'push'),
         ('remove', 'remove'),
     )
     action = serializers.ChoiceField(choices=ACTION_CHOICES, write_only=True)
+    assets = serializers.PrimaryKeyRelatedField(
+        queryset=Asset.objects, required=False, allow_empty=True, many=True
+    )
     accounts = serializers.PrimaryKeyRelatedField(
         queryset=Account.objects, required=False, allow_empty=True, many=True
     )
