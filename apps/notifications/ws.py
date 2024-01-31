@@ -1,28 +1,32 @@
 import json
+import time
+from threading import Thread
 
 from channels.generic.websocket import JsonWebsocketConsumer
-from django.core.cache import cache
+from django.conf import settings
 
 from common.db.utils import safe_db_connection
+from common.sessions.cache import user_session_manager
 from common.utils import get_logger
 from .signal_handlers import new_site_msg_chan
 from .site_msg import SiteMessageUtil
 
 logger = get_logger(__name__)
-WS_SESSION_KEY = 'ws_session_key'
 
 
 class SiteMsgWebsocket(JsonWebsocketConsumer):
     sub = None
     refresh_every_seconds = 10
 
+    @property
+    def session(self):
+        return self.scope['session']
+
     def connect(self):
         user = self.scope["user"]
         if user.is_authenticated:
             self.accept()
-            session = self.scope['session']
-            redis_client = cache.client.get_client()
-            redis_client.sadd(WS_SESSION_KEY, session.session_key)
+            user_session_manager.add_or_increment(self.session.session_key)
             self.sub = self.watch_recv_new_site_msg()
         else:
             self.close()
@@ -66,6 +70,32 @@ class SiteMsgWebsocket(JsonWebsocketConsumer):
         if not self.sub:
             return
         self.sub.unsubscribe()
-        session = self.scope['session']
-        redis_client = cache.client.get_client()
-        redis_client.srem(WS_SESSION_KEY, session.session_key)
+
+        user_session_manager.decrement_or_remove(self.session.session_key)
+        if self.should_delete_session():
+            thread = Thread(target=self.delay_delete_session)
+            thread.start()
+
+    def should_delete_session(self):
+        return (self.session.modified or settings.SESSION_SAVE_EVERY_REQUEST) and \
+            not self.session.is_empty() and \
+            self.session.get_expire_at_browser_close() and \
+            not user_session_manager.check_active(self.session.session_key)
+
+    def delay_delete_session(self):
+        timeout = 3
+        check_interval = 0.5
+
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            time.sleep(check_interval)
+            if user_session_manager.check_active(self.session.session_key):
+                return
+
+        self.delete_session()
+
+    def delete_session(self):
+        try:
+            self.session.delete()
+        except Exception as e:
+            logger.info(f'delete session error: {e}')
