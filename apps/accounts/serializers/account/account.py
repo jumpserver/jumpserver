@@ -58,7 +58,7 @@ class AccountCreateUpdateSerializerMixin(serializers.Serializer):
         for data in initial_data:
             if not data.get('asset') and not self.instance:
                 raise serializers.ValidationError({'asset': UniqueTogetherValidator.missing_message})
-            asset = data.get('asset') or self.instance.asset
+            asset = data.get('asset') or getattr(self.instance, 'asset', None)
             self.from_template_if_need(data)
             self.set_uniq_name_if_need(data, asset)
 
