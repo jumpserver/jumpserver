@@ -1,10 +1,9 @@
-from django.core.cache import cache
 from django_filters import rest_framework as drf_filters
 from rest_framework import filters
 from rest_framework.compat import coreapi, coreschema
 
 from common.drf.filters import BaseFilterSet
-from notifications.ws import WS_SESSION_KEY
+from common.sessions.cache import user_session_manager
 from orgs.utils import current_org
 from .models import UserSession
 
@@ -41,13 +40,11 @@ class UserSessionFilterSet(BaseFilterSet):
 
     @staticmethod
     def filter_is_active(queryset, name, is_active):
-        redis_client = cache.client.get_client()
-        members = redis_client.smembers(WS_SESSION_KEY)
-        members = [member.decode('utf-8') for member in members]
+        keys = user_session_manager.get_active_keys()
         if is_active:
-            queryset = queryset.filter(key__in=members)
+            queryset = queryset.filter(key__in=keys)
         else:
-            queryset = queryset.exclude(key__in=members)
+            queryset = queryset.exclude(key__in=keys)
         return queryset
 
     class Meta:
