@@ -48,6 +48,9 @@ class JobSerializer(BulkOrgResourceModelSerializer, PeriodTaskSerializerMixin):
             "is_periodic", "interval", "crontab", "nodes",
             "run_after_save"
         ]
+        extra_kwargs = {
+            'average_time_cost': {'label': _('Average time cost')},
+        }
 
 
 class FileSerializer(serializers.Serializer):

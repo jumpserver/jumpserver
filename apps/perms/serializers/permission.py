@@ -35,6 +35,10 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
     )
     assets = ObjectRelatedField(queryset=Asset.objects, many=True, required=False, label=_('Asset'))
     nodes = ObjectRelatedField(queryset=Node.objects, many=True, required=False, label=_('Node'))
+    users_amount = serializers.IntegerField(read_only=True, label=_("Users amount"))
+    user_groups_amount = serializers.IntegerField(read_only=True, label=_("User groups amount"))
+    assets_amount = serializers.IntegerField(read_only=True, label=_("Assets amount"))
+    nodes_amount = serializers.IntegerField(read_only=True, label=_("Nodes amount"))
     actions = ActionChoicesField(required=False, allow_null=True, label=_("Actions"))
     is_valid = serializers.BooleanField(read_only=True, label=_("Is valid"))
     is_expired = serializers.BooleanField(read_only=True, label=_("Is expired"))
@@ -46,13 +50,14 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
     class Meta:
         model = AssetPermission
         fields_mini = ["id", "name"]
+        amount_fields = ["users_amount", "user_groups_amount", "assets_amount", "nodes_amount"]
         fields_generic = [
             "accounts", "protocols", "actions", "created_by", "date_created",
             "date_start", "date_expired", "is_active", "is_expired",
             "is_valid", "comment", "from_ticket",
         ]
         fields_small = fields_mini + fields_generic
-        fields_m2m = ["users", "user_groups", "assets", "nodes", "labels"]
+        fields_m2m = ["users", "user_groups", "assets", "nodes", "labels"] + amount_fields
         fields = fields_mini + fields_m2m + fields_generic
         read_only_fields = ["created_by", "date_created", "from_ticket"]
         extra_kwargs = {
@@ -183,15 +188,9 @@ class AssetPermissionSerializer(ResourceLabelsMixin, BulkOrgResourceModelSeriali
 
 
 class AssetPermissionListSerializer(AssetPermissionSerializer):
-    users_amount = serializers.IntegerField(read_only=True, label=_("Users amount"))
-    user_groups_amount = serializers.IntegerField(read_only=True, label=_("User groups amount"))
-    assets_amount = serializers.IntegerField(read_only=True, label=_("Assets amount"))
-    nodes_amount = serializers.IntegerField(read_only=True, label=_("Nodes amount"))
-
     class Meta(AssetPermissionSerializer.Meta):
-        amount_fields = ["users_amount", "user_groups_amount", "assets_amount", "nodes_amount"]
         remove_fields = {"users", "assets", "nodes", "user_groups"}
-        fields = list(set(AssetPermissionSerializer.Meta.fields + amount_fields) - remove_fields)
+        fields = list(set(AssetPermissionSerializer.Meta.fields) - remove_fields)
 
     @classmethod
     def setup_eager_loading(cls, queryset):

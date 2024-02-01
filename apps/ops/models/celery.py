@@ -32,7 +32,9 @@ class CeleryTask(models.Model):
 
     @property
     def state(self):
-        last_five_executions = CeleryTaskExecution.objects.filter(name=self.name).order_by('-date_published')[:5]
+        last_five_executions = CeleryTaskExecution.objects \
+                                   .filter(name=self.name) \
+                                   .order_by('-date_published')[:5]
 
         if len(last_five_executions) > 0:
             if last_five_executions[0].state == 'FAILURE':

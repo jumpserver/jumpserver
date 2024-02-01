@@ -31,7 +31,6 @@ class BaseAutomationSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSe
         extra_kwargs = {
             'name': {'required': True},
             'type': {'read_only': True},
-            'periodic_display': {'label': _('Periodic perform')},
         }
 
 

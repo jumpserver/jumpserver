@@ -57,5 +57,4 @@ class UserGroupListSerializer(UserGroupSerializer):
         fields = list(set(UserGroupSerializer.Meta.fields + ['users_amount']) - {'users'})
         extra_kwargs = {
             **UserGroupSerializer.Meta.extra_kwargs,
-            'users_amount': {'label': _('Users amount')},
         }

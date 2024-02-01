@@ -1,3 +1,4 @@
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
@@ -6,15 +7,15 @@ from .utils import get_current_org
 
 
 class ResourceStatisticsSerializer(serializers.Serializer):
-    users_amount = serializers.IntegerField(required=False)
-    groups_amount = serializers.IntegerField(required=False)
+    users_amount = serializers.IntegerField(required=False, label=_('Users amount'))
+    groups_amount = serializers.IntegerField(required=False, label=_('User groups amount'))
 
-    assets_amount = serializers.IntegerField(required=False)
-    nodes_amount = serializers.IntegerField(required=False)
-    domains_amount = serializers.IntegerField(required=False)
-    gateways_amount = serializers.IntegerField(required=False)
+    assets_amount = serializers.IntegerField(required=False, label=_('Assets amount'))
+    nodes_amount = serializers.IntegerField(required=False, label=_('Nodes amount'))
+    domains_amount = serializers.IntegerField(required=False, label=_('Domains amount'))
+    gateways_amount = serializers.IntegerField(required=False, label=_('Gateways amount'))
 
-    asset_perms_amount = serializers.IntegerField(required=False)
+    asset_perms_amount = serializers.IntegerField(required=False, label=_('Asset permissions amount'))
 
 
 class OrgSerializer(ModelSerializer):

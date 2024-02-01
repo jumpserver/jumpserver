@@ -13,11 +13,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='task',
             name='crontab',
-            field=models.CharField(blank=True, max_length=128, null=True, verbose_name='Regularly perform'),
+            field=models.CharField(blank=True, max_length=128, null=True, verbose_name='Crontab'),
         ),
         migrations.AlterField(
             model_name='task',
             name='interval',
-            field=models.IntegerField(blank=True, default=24, null=True, verbose_name='Cycle perform'),
+            field=models.IntegerField(blank=True, default=24, null=True, verbose_name='Interval'),
         ),
     ]
