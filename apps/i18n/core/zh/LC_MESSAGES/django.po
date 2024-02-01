@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-18 16:36+0800\n"
+"POT-Creation-Date: 2024-01-31 19:55+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -290,7 +290,7 @@ msgstr "来源 ID"
 #: assets/serializers/asset/common.py:128 assets/serializers/gateway.py:28
 #: audits/models.py:59 authentication/api/connection_token.py:405
 #: ops/models/base.py:18 perms/models/asset_permission.py:75
-#: perms/serializers/permission.py:41 settings/serializers/msg.py:33
+#: perms/serializers/permission.py:45 settings/serializers/msg.py:33
 #: terminal/backends/command/models.py:18 terminal/models/session/session.py:33
 #: terminal/templates/terminal/_msg_command_warning.html:8
 #: terminal/templates/terminal/_msg_session_sharing.html:8
@@ -359,7 +359,7 @@ msgstr "账号备份计划"
 
 #: accounts/models/automations/backup_account.py:119
 #: assets/models/automations/base.py:115 audits/models.py:65
-#: ops/models/base.py:55 ops/models/celery.py:63 ops/models/job.py:235
+#: ops/models/base.py:55 ops/models/celery.py:65 ops/models/job.py:235
 #: ops/templates/ops/celery_task_log.html:75
 #: perms/models/asset_permission.py:78 terminal/models/applet/host.py:141
 #: terminal/models/session/session.py:44
@@ -394,7 +394,7 @@ msgstr "原因"
 #: accounts/models/automations/backup_account.py:135
 #: accounts/serializers/automations/change_secret.py:105
 #: accounts/serializers/automations/change_secret.py:128
-#: ops/serializers/job.py:64 terminal/serializers/session.py:49
+#: ops/serializers/job.py:67 terminal/serializers/session.py:49
 msgid "Is success"
 msgstr "是否成功"
 
@@ -467,7 +467,7 @@ msgstr "开始日期"
 
 #: accounts/models/automations/change_secret.py:42
 #: assets/models/automations/base.py:116 ops/models/base.py:56
-#: ops/models/celery.py:64 ops/models/job.py:236
+#: ops/models/celery.py:66 ops/models/job.py:236
 #: terminal/models/applet/host.py:142
 msgid "Date finished"
 msgstr "结束日期"
@@ -599,7 +599,7 @@ msgstr "密码规则"
 #: authentication/serializers/connect_token_secret.py:113
 #: authentication/serializers/connect_token_secret.py:168 labels/models.py:11
 #: ops/mixin.py:21 ops/models/adhoc.py:20 ops/models/celery.py:15
-#: ops/models/celery.py:57 ops/models/job.py:136 ops/models/playbook.py:28
+#: ops/models/celery.py:59 ops/models/job.py:136 ops/models/playbook.py:28
 #: ops/serializers/job.py:18 orgs/models.py:82
 #: perms/models/asset_permission.py:61 rbac/models/role.py:29
 #: settings/models.py:33 settings/models.py:181 settings/serializers/msg.py:89
@@ -776,7 +776,7 @@ msgstr "资产不存在"
 msgid "Has secret"
 msgstr "已托管密码"
 
-#: accounts/serializers/account/account.py:261 ops/models/celery.py:60
+#: accounts/serializers/account/account.py:261 ops/models/celery.py:62
 #: tickets/models/comment.py:13 tickets/models/ticket/general.py:45
 #: tickets/models/ticket/general.py:279 tickets/serializers/super_ticket.py:14
 #: tickets/serializers/ticket/ticket.py:21
@@ -791,7 +791,7 @@ msgstr "已修改"
 #: accounts/serializers/automations/base.py:22 acls/models/base.py:97
 #: acls/templates/acls/asset_login_reminder.html:6
 #: assets/models/automations/base.py:19
-#: assets/serializers/automations/base.py:20
+#: assets/serializers/automations/base.py:20 assets/serializers/domain.py:30
 #: authentication/api/connection_token.py:404 ops/models/base.py:17
 #: ops/models/job.py:146 ops/serializers/job.py:19
 #: terminal/templates/terminal/_msg_command_execute_alert.html:16
@@ -973,7 +973,7 @@ msgstr "自动化任务执行历史"
 
 #: accounts/serializers/automations/change_secret.py:149 audits/const.py:61
 #: audits/models.py:64 audits/signal_handlers/activity_log.py:33
-#: common/const/choices.py:18 ops/const.py:73 ops/serializers/celery.py:46
+#: common/const/choices.py:18 ops/const.py:73 ops/serializers/celery.py:48
 #: terminal/const.py:78 terminal/models/session/sharing.py:121
 #: tickets/views/approve.py:117
 msgid "Success"
@@ -1057,8 +1057,6 @@ msgid "private key invalid or passphrase error"
 msgstr "密钥不合法或密钥密码错误"
 
 #: acls/apps.py:7
-#, fuzzy
-#| msgid "Acls"
 msgid "App Acls"
 msgstr "访问控制"
 
@@ -1119,7 +1117,7 @@ msgid "Accounts"
 msgstr "账号"
 
 #: acls/models/command_acl.py:16 assets/models/cmd_filter.py:60
-#: ops/serializers/job.py:63 terminal/const.py:86
+#: ops/serializers/job.py:66 terminal/const.py:86
 #: terminal/models/session/session.py:42 terminal/serializers/command.py:18
 #: terminal/templates/terminal/_msg_command_alert.html:12
 #: terminal/templates/terminal/_msg_command_execute_alert.html:10
@@ -1298,10 +1296,8 @@ msgstr ""
 "问，请立即采取适当的措施。"
 
 #: applications/apps.py:9
-#, fuzzy
-#| msgid "Apply applications"
 msgid "App Applications"
-msgstr "申请应用"
+msgstr "应用管理"
 
 #: applications/models.py:16 xpack/plugins/cloud/models.py:37
 #: xpack/plugins/cloud/serializers/account.py:67
@@ -2060,7 +2056,7 @@ msgstr "资产中批量更新平台，不符合平台类型跳过的资产"
 #: assets/serializers/asset/common.py:127 assets/serializers/platform.py:141
 #: authentication/serializers/connect_token_secret.py:30
 #: authentication/serializers/connect_token_secret.py:75
-#: perms/models/asset_permission.py:76 perms/serializers/permission.py:42
+#: perms/models/asset_permission.py:76 perms/serializers/permission.py:46
 #: perms/serializers/user_permission.py:74 xpack/plugins/cloud/models.py:332
 #: xpack/plugins/cloud/serializers/task.py:33
 msgid "Protocols"
@@ -2171,7 +2167,7 @@ msgid "Types"
 msgstr "类型"
 
 #: assets/serializers/domain.py:20 orgs/serializers.py:13
-#: perms/serializers/permission.py:188
+#: perms/serializers/permission.py:40
 msgid "Assets amount"
 msgstr "资产数量"
 
@@ -2310,8 +2306,6 @@ msgid "No assets matched, stop task"
 msgstr "没有匹配到资产，结束任务"
 
 #: audits/apps.py:9
-#, fuzzy
-#| msgid "Audits"
 msgid "App Audits"
 msgstr "日志审计"
 
@@ -2705,10 +2699,8 @@ msgid "Forgot password"
 msgstr "忘记密码"
 
 #: authentication/apps.py:7
-#, fuzzy
-#| msgid "Authentication"
 msgid "App Authentication"
-msgstr "认证"
+msgstr "认证管理"
 
 #: authentication/backends/custom.py:59
 #: authentication/backends/oauth2/backends.py:170
@@ -3190,15 +3182,15 @@ msgid "Ticket info"
 msgstr "工单信息"
 
 #: authentication/serializers/connection_token.py:21
-#: perms/models/asset_permission.py:77 perms/serializers/permission.py:38
-#: perms/serializers/permission.py:59
+#: perms/models/asset_permission.py:77 perms/serializers/permission.py:42
+#: perms/serializers/permission.py:64
 #: tickets/models/ticket/apply_application.py:28
 #: tickets/models/ticket/apply_asset.py:18
 msgid "Actions"
 msgstr "动作"
 
 #: authentication/serializers/connection_token.py:42
-#: perms/serializers/permission.py:40 perms/serializers/permission.py:60
+#: perms/serializers/permission.py:44 perms/serializers/permission.py:65
 #: users/serializers/user.py:97 users/serializers/user.py:177
 msgid "Is expired"
 msgstr "已过期"
@@ -3212,8 +3204,8 @@ msgstr "{} 不能为空"
 msgid "Access IP"
 msgstr "IP 白名单"
 
-#: authentication/serializers/token.py:92 perms/serializers/permission.py:39
-#: perms/serializers/permission.py:61 users/serializers/user.py:98
+#: authentication/serializers/token.py:92 perms/serializers/permission.py:43
+#: perms/serializers/permission.py:66 users/serializers/user.py:98
 #: users/serializers/user.py:174
 msgid "Is valid"
 msgstr "是否有效"
@@ -3956,10 +3948,8 @@ msgstr ""
 "div>"
 
 #: labels/apps.py:8
-#, fuzzy
-#| msgid "Labels"
 msgid "App Labels"
-msgstr "标签"
+msgstr "标签管理"
 
 #: labels/models.py:36
 msgid "Resource ID"
@@ -3982,10 +3972,8 @@ msgid "Resource type"
 msgstr "资源类型"
 
 #: notifications/apps.py:7
-#, fuzzy
-#| msgid "Notifications"
 msgid "App Notifications"
-msgstr "通知"
+msgstr "通知管理"
 
 #: notifications/backends/__init__.py:13
 msgid "Site message"
@@ -4074,8 +4062,6 @@ msgid "This file can not be delete"
 msgstr "无法删除此文件"
 
 #: ops/apps.py:9
-#, fuzzy
-#| msgid "App ops"
 msgid "App Ops"
 msgstr "作业中心"
 
@@ -4198,8 +4184,6 @@ msgid "Range {} to {}"
 msgstr "输入在 {} - {} 范围之间"
 
 #: ops/mixin.py:139
-#, fuzzy
-#| msgid "Require periodic or regularly perform setting"
 msgid "Require interval or crontab setting"
 msgstr "需要周期或定期设置"
 
@@ -4211,7 +4195,7 @@ msgstr "模式"
 msgid "Module"
 msgstr "模块"
 
-#: ops/models/adhoc.py:24 ops/models/celery.py:58 ops/models/job.py:138
+#: ops/models/adhoc.py:24 ops/models/celery.py:60 ops/models/job.py:138
 #: terminal/models/component/task.py:14
 msgid "Args"
 msgstr "参数"
@@ -4243,28 +4227,28 @@ msgstr "汇总"
 msgid "Date last publish"
 msgstr "发布日期"
 
-#: ops/models/celery.py:47
+#: ops/models/celery.py:49
 msgid "Celery Task"
 msgstr "Celery 任务"
 
-#: ops/models/celery.py:50
+#: ops/models/celery.py:52
 msgid "Can view task monitor"
 msgstr "可以查看任务监控"
 
-#: ops/models/celery.py:59 terminal/models/component/task.py:15
+#: ops/models/celery.py:61 terminal/models/component/task.py:15
 msgid "Kwargs"
 msgstr "其它参数"
 
-#: ops/models/celery.py:61 terminal/models/session/sharing.py:128
+#: ops/models/celery.py:63 terminal/models/session/sharing.py:128
 #: tickets/const.py:25
 msgid "Finished"
 msgstr "结束"
 
-#: ops/models/celery.py:62
+#: ops/models/celery.py:64
 msgid "Date published"
 msgstr "发布日期"
 
-#: ops/models/celery.py:87
+#: ops/models/celery.py:89
 msgid "Celery Task Execution"
 msgstr "Celery 任务执行"
 
@@ -4348,19 +4332,31 @@ msgstr "内存使用率超过 {max_threshold}%: => {value}"
 msgid "CPU load more than {max_threshold}: => {value}"
 msgstr "CPU 使用率超过 {max_threshold}: => {value}"
 
+#: ops/serializers/celery.py:33
+msgid "Execution cycle"
+msgstr "周期执行"
+
+#: ops/serializers/celery.py:35
+msgid "Next execution time"
+msgstr "下次执行时间"
+
 #: ops/serializers/job.py:15
 msgid "Run after save"
 msgstr "保存后执行"
 
-#: ops/serializers/job.py:62
+#: ops/serializers/job.py:52
+msgid "Average time cost"
+msgstr "平均耗时"
+
+#: ops/serializers/job.py:65
 msgid "Job type"
 msgstr "任务类型"
 
-#: ops/serializers/job.py:65 terminal/serializers/session.py:53
+#: ops/serializers/job.py:68 terminal/serializers/session.py:53
 msgid "Is finished"
 msgstr "是否完成"
 
-#: ops/serializers/job.py:66
+#: ops/serializers/job.py:69
 msgid "Time cost"
 msgstr "花费时间"
 
@@ -4496,36 +4492,30 @@ msgstr "可以查看所有加入的组织"
 msgid "Can not delete virtual org"
 msgstr "无法删除虚拟组织"
 
-#: orgs/serializers.py:10 perms/serializers/permission.py:186
+#: orgs/serializers.py:10 perms/serializers/permission.py:38
 #: rbac/serializers/role.py:27 users/serializers/group.py:54
 msgid "Users amount"
 msgstr "用户数量"
 
-#: orgs/serializers.py:11 perms/serializers/permission.py:187
+#: orgs/serializers.py:11 perms/serializers/permission.py:39
 msgid "User groups amount"
 msgstr "用户组数量"
 
-#: orgs/serializers.py:14 perms/serializers/permission.py:189
+#: orgs/serializers.py:14 perms/serializers/permission.py:41
 msgid "Nodes amount"
 msgstr "节点数量"
 
 #: orgs/serializers.py:15
-#, fuzzy
-#| msgid "Command amount"
 msgid "Domains amount"
-msgstr "命令数量"
+msgstr "网域数量"
 
 #: orgs/serializers.py:16
-#, fuzzy
-#| msgid "Gather account"
 msgid "Gateways amount"
-msgstr "收集账号"
+msgstr "网关数量"
 
 #: orgs/serializers.py:18
-#, fuzzy
-#| msgid "Asset permission"
 msgid "Asset permissions amount"
-msgstr "资产授权"
+msgstr "资产授权数量"
 
 #: orgs/tasks.py:9
 msgid "Refresh organization cache"
@@ -4892,8 +4882,6 @@ msgid "test_phone is required"
 msgstr "测试手机号 该字段是必填项。"
 
 #: settings/apps.py:7
-#, fuzzy
-#| msgid "Settings"
 msgid "App Settings"
 msgstr "系统设置"
 
@@ -5627,10 +5615,8 @@ msgid "Enable virtual app"
 msgstr "启用虚拟应用"
 
 #: settings/serializers/msg.py:25
-#, fuzzy
-#| msgid "SMTP host"
 msgid "SMTP"
-msgstr "SMTP 主机"
+msgstr "SMTP"
 
 #: settings/serializers/msg.py:26
 msgid "EXCHANGE"
@@ -7187,6 +7173,18 @@ msgstr "文档类型"
 #: terminal/serializers/task.py:9
 msgid "Session id"
 msgstr "会话 ID"
+
+#: terminal/serializers/terminal.py:42
+msgid "Online sessions"
+msgstr "在线会话"
+
+#: terminal/serializers/terminal.py:43
+msgid "Is alive"
+msgstr "在线"
+
+#: terminal/serializers/terminal.py:49
+msgid "Stat"
+msgstr "状态"
 
 #: terminal/serializers/terminal.py:83 terminal/serializers/terminal.py:91
 msgid "Not found"
@@ -8929,13 +8927,14 @@ msgstr "网站图标"
 
 #: xpack/plugins/interface/models.py:35
 msgid "Logo of management page"
-msgstr "管理页面logo"
+msgstr "管理页面 Logo"
 
 #: xpack/plugins/interface/models.py:39
 msgid "Logo of logout page"
-msgstr "退出页面logo"
+msgstr "退出页面 Logo"
 
 #: xpack/plugins/interface/models.py:41
+#: xpack/plugins/interface/serializers/interface.py:26
 msgid "Theme"
 msgstr "主题"
 
@@ -8950,6 +8949,14 @@ msgstr "公安联网备案号"
 #: xpack/plugins/interface/models.py:46 xpack/plugins/interface/models.py:87
 msgid "Interface setting"
 msgstr "界面设置"
+
+#: xpack/plugins/interface/serializers/interface.py:37
+msgid "Wide logo on top"
+msgstr "顶部宽 Logo"
+
+#: xpack/plugins/interface/serializers/interface.py:38
+msgid "Small logo without text"
+msgstr "方形小 Logo"
 
 #: xpack/plugins/license/api.py:52
 msgid "License import successfully"

@@ -26,6 +26,9 @@ class DomainSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
         fields_m2m = ['assets', 'gateways', 'assets_amount']
         read_only_fields = ['date_created']
         fields = fields_small + fields_m2m + read_only_fields
+        extra_kwargs = {
+            'assets': {'label': _("Assets")}
+        }
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
