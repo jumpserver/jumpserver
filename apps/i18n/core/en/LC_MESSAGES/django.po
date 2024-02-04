@@ -4127,7 +4127,7 @@ msgstr ""
 
 #: ops/mixin.py:23 ops/mixin.py:104 settings/serializers/auth/ldap.py:66
 msgid "Periodic run"
-msgstr ""
+msgstr "Periodic"
 
 #: ops/mixin.py:26 ops/mixin.py:90 ops/mixin.py:110
 #: settings/serializers/auth/ldap.py:73
@@ -4141,7 +4141,7 @@ msgstr ""
 
 #: ops/mixin.py:112
 msgid "Run period"
-msgstr ""
+msgstr "Period"
 
 #: ops/mixin.py:121
 msgid "* Please enter a valid crontab expression"
