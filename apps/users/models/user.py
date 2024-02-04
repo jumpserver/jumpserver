@@ -34,6 +34,7 @@ class AuthMixin:
     history_passwords: models.Manager
     need_update_password: bool
     public_key: str
+    username: str
     is_local: bool
     set_password: Callable
     save: Callable
@@ -54,8 +55,9 @@ class AuthMixin:
 
     def set_password(self, raw_password):
         if self.can_update_password():
-            self.date_password_last_updated = timezone.now()
-            post_user_change_password.send(self.__class__, user=self)
+            if self.username:
+                self.date_password_last_updated = timezone.now()
+                post_user_change_password.send(self.__class__, user=self)
             super().set_password(raw_password)
 
     def set_public_key(self, public_key):
