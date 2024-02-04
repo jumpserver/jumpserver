@@ -22,6 +22,7 @@
     "AccountPushCreate": "账号推送创建",
     "AccountPushExecutionList": "执行列表",
     "AccountPushList": "账号推送",
+    "FieldRequiredError": "此字段是必填项",
     "AccountPushUpdate": "账号推送更新",
     "AccountStorage": "账号存储",
     "AccountTemplate": "账号模版",

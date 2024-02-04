@@ -266,7 +266,7 @@ msgstr ""
 #: accounts/serializers/account/template.py:27
 #: authentication/serializers/connect_token_secret.py:50
 msgid "Su from"
-msgstr ""
+msgstr "Switch from"
 
 #: accounts/models/account.py:55 assets/const/protocol.py:169
 #: settings/serializers/auth/cas.py:20 settings/serializers/auth/feishu.py:20
@@ -631,7 +631,7 @@ msgstr ""
 #: terminal/models/component/endpoint.py:106
 #: terminal/models/virtualapp/virtualapp.py:23 users/serializers/user.py:173
 msgid "Is active"
-msgstr ""
+msgstr "Active"
 
 #: accounts/models/template.py:18 assets/models/_user.py:53
 msgid "Auto push"
@@ -842,7 +842,7 @@ msgstr ""
 #: accounts/serializers/account/backup.py:38
 #: accounts/serializers/automations/base.py:36
 msgid "Executed amount"
-msgstr ""
+msgstr "Executions"
 
 #: accounts/serializers/account/backup.py:41
 #: accounts/serializers/automations/change_secret.py:57
@@ -855,7 +855,7 @@ msgstr ""
 
 #: accounts/serializers/account/base.py:25 terminal/serializers/storage.py:149
 msgid "Key password"
-msgstr ""
+msgstr "Passphrase"
 
 #: accounts/serializers/account/base.py:78
 #: assets/serializers/asset/common.py:381
