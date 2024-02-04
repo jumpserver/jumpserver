@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-31 19:55+0800\n"
+"POT-Creation-Date: 2024-02-02 11:06+0800\n"
 "PO-Revision-Date: 2021-05-20 10:54+0800\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -1107,6 +1107,7 @@ msgid "Active"
 msgstr "激活中"
 
 #: acls/models/base.py:81 users/models/preference.py:16
+#: users/serializers/user.py:293
 msgid "Users"
 msgstr "用户"
 
@@ -7991,13 +7992,11 @@ msgstr "头像路径"
 msgid "MFA level"
 msgstr "MFA"
 
-#: users/serializers/user.py:293
-msgid "Select users"
-msgstr "选择用户"
-
 #: users/serializers/user.py:294
-msgid "For security, only list several users"
-msgstr "为了安全，仅列出几个用户"
+msgid ""
+"For security, only a partial list of users is displayed. You can try to "
+"search for more"
+msgstr ""
 
 #: users/serializers/user.py:327
 msgid "name not unique"
@@ -8985,6 +8984,12 @@ msgstr "企业专业版"
 #: xpack/plugins/license/models.py:86
 msgid "Ultimate edition"
 msgstr "企业旗舰版"
+
+#~ msgid "Select users"
+#~ msgstr "选择用户"
+
+#~ msgid "For security, only list several users"
+#~ msgstr "为了安全，仅列出几个用户"
 
 #~ msgid "Period"
 #~ msgstr "周期"

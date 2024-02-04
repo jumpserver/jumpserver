@@ -629,6 +629,7 @@
     "MatchedCount": "匹配结果",
     "Members": "成员",
     "MenuAccounts": "账号管理",
+    "MenuAcls": "访问控制",
     "MenuAssets": "资产管理",
     "MenuMore": "更多...",
     "MenuPermissions": "授权管理",
@@ -677,6 +678,7 @@
     "NotSet": "未设置",
     "NotSpecialEmoji": "不允许输入特殊表情符号",
     "Nothing": "无",
+    "Notifications": "通知设置",
     "Now": "现在",
     "Number": "编号",
     "NumberOfVisits": "访问次数",
@@ -1207,6 +1209,5 @@
     "Workbench": "工作台",
     "Workspace": "工作空间",
     "Yes": "是",
-    "Notifications": "通知设置",
     "ZStack": "ZStack"
 }
