@@ -200,7 +200,13 @@ class UserPermTreeExpireUtil(_UserPermTreeCacheMixin):
                 cache_key = self.get_cache_key(uid)
                 p.srem(cache_key, *org_ids)
             p.execute()
-        logger.info('Expire perm tree for users: [{}], orgs: [{}]'.format(user_ids, org_ids))
+        users_display = ','.join([str(i) for i in user_ids[:3]])
+        if len(user_ids) > 3:
+            users_display += '...'
+        orgs_display = ','.join([str(i) for i in org_ids[:3]])
+        if len(org_ids) > 3:
+            orgs_display += '...'
+        logger.info('Expire perm tree for users: [{}], orgs: [{}]'.format(users_display, orgs_display))
 
     def expire_perm_tree_for_all_user(self):
         keys = self.client.keys(self.cache_key_all_user)
