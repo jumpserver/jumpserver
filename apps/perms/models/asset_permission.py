@@ -130,7 +130,7 @@ class AssetPermission(LabeledMixin, JMSOrgBaseModel):
         qs1_ids = User.objects.filter(id__in=user_ids).distinct().values_list('id', flat=True)
         qs2_ids = User.objects.filter(groups__id__in=group_ids).distinct().values_list('id', flat=True)
         qs_ids = list(qs1_ids) + list(qs2_ids)
-        qs = User.objects.filter(id__in=qs_ids)
+        qs = User.objects.filter(id__in=qs_ids, is_service_account=False)
         return qs
 
     def get_all_assets(self, flat=False):

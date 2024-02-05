@@ -6,7 +6,7 @@ import logging
 
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
-from django.db.models import Q, Count
+from django.db.models import Q
 from django_filters import rest_framework as drf_filters
 from rest_framework import filters
 from rest_framework.compat import coreapi, coreschema
@@ -180,36 +180,30 @@ class LabelFilterBackend(filters.BaseFilterBackend):
         ]
 
     @staticmethod
-    def filter_resources(resources, labels_id):
+    def parse_label_ids(labels_id):
+        from labels.models import Label
         label_ids = [i.strip() for i in labels_id.split(',')]
+        cleaned = []
 
         args = []
         for label_id in label_ids:
             kwargs = {}
             if ':' in label_id:
                 k, v = label_id.split(':', 1)
-                kwargs['label__name'] = k.strip()
+                kwargs['name'] = k.strip()
                 if v != '*':
-                    kwargs['label__value'] = v.strip()
+                    kwargs['value'] = v.strip()
+                args.append(kwargs)
             else:
-                kwargs['label_id'] = label_id
-            args.append(kwargs)
+                cleaned.append(label_id)
 
-        if len(args) == 1:
-            resources = resources.filter(**args[0])
-            return resources
-
-        q = Q()
-        for kwarg in args:
-            q |= Q(**kwarg)
-
-        resources = resources.filter(q) \
-            .values('res_id') \
-            .order_by('res_id') \
-            .annotate(count=Count('res_id')) \
-            .values('res_id', 'count') \
-            .filter(count=len(args))
-        return resources
+        if len(args) != 0:
+            q = Q()
+            for kwarg in args:
+                q |= Q(**kwarg)
+            ids = Label.objects.filter(q).values_list('id', flat=True)
+            cleaned.extend(list(ids))
+        return cleaned
 
     def filter_queryset(self, request, queryset, view):
         labels_id = request.query_params.get('labels')
@@ -223,14 +217,15 @@ class LabelFilterBackend(filters.BaseFilterBackend):
             return queryset
 
         model = queryset.model.label_model()
-        labeled_resource_cls = model._labels.field.related_model
+        labeled_resource_cls = model.labels.field.related_model
         app_label = model._meta.app_label
         model_name = model._meta.model_name
 
         resources = labeled_resource_cls.objects.filter(
             res_type__app_label=app_label, res_type__model=model_name,
         )
-        resources = self.filter_resources(resources, labels_id)
+        label_ids = self.parse_label_ids(labels_id)
+        resources = model.filter_resources_by_labels(resources, label_ids)
         res_ids = resources.values_list('res_id', flat=True)
         queryset = queryset.filter(id__in=set(res_ids))
         return queryset

@@ -28,9 +28,10 @@ class ErrorCode:
 
 
 class URL:
-    QR_CONNECT = 'https://oapi.dingtalk.com/connect/qrconnect'
+    QR_CONNECT = 'https://login.dingtalk.com/oauth2/auth'
     OAUTH_CONNECT = 'https://oapi.dingtalk.com/connect/oauth2/sns_authorize'
-    GET_USER_INFO_BY_CODE = 'https://oapi.dingtalk.com/sns/getuserinfo_bycode'
+    GET_USER_ACCESSTOKEN = 'https://api.dingtalk.com/v1.0/oauth2/userAccessToken'
+    GET_USER_INFO = 'https://api.dingtalk.com/v1.0/contact/users/me'
     GET_TOKEN = 'https://oapi.dingtalk.com/gettoken'
     SEND_MESSAGE_BY_TEMPLATE = 'https://oapi.dingtalk.com/topapi/message/corpconversation/sendbytemplate'
     SEND_MESSAGE = 'https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2'
@@ -72,8 +73,9 @@ class DingTalkRequests(BaseRequest):
     def get(self, url, params=None,
             with_token=False, with_sign=False,
             check_errcode_is_0=True,
-            **kwargs):
+            **kwargs) -> dict:
         pass
+
     get = as_request(get)
 
     def post(self, url, json=None, params=None,
@@ -81,6 +83,7 @@ class DingTalkRequests(BaseRequest):
              check_errcode_is_0=True,
              **kwargs) -> dict:
         pass
+
     post = as_request(post)
 
     def _add_sign(self, kwargs: dict):
@@ -123,17 +126,22 @@ class DingTalk:
         )
 
     def get_userinfo_bycode(self, code):
-        # https://developers.dingtalk.com/document/app/obtain-the-user-information-based-on-the-sns-temporary-authorization?spm=ding_open_doc.document.0.0.3a256573y8Y7yg#topic-1995619
         body = {
-            "tmp_auth_code": code
+            'clientId': self._appid,
+            'clientSecret': self._appsecret,
+            'code': code,
+            'grantType': 'authorization_code'
         }
+        data = self._request.post(URL.GET_USER_ACCESSTOKEN, json=body, check_errcode_is_0=False)
+        token = data['accessToken']
 
-        data = self._request.post(URL.GET_USER_INFO_BY_CODE, json=body, with_sign=True)
-        return data['user_info']
+        user = self._request.get(URL.GET_USER_INFO,
+                                 headers={'x-acs-dingtalk-access-token': token}, check_errcode_is_0=False)
+        return user
 
     def get_user_id_by_code(self, code):
         user_info = self.get_userinfo_bycode(code)
-        unionid = user_info['unionid']
+        unionid = user_info['unionId']
         userid = self.get_userid_by_unionid(unionid)
         return userid, None
 

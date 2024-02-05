@@ -42,7 +42,7 @@ class SmartEndpointViewMixin:
         return endpoint
 
     def match_endpoint_by_label(self):
-        return Endpoint.match_by_instance_label(self.target_instance, self.target_protocol)
+        return Endpoint.match_by_instance_label(self.target_instance, self.target_protocol, self.request)
 
     def match_endpoint_by_target_ip(self):
         target_ip = self.request.GET.get('target_ip', '')  # 支持target_ip参数，用来方便测试

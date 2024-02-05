@@ -246,6 +246,6 @@ class UsernameHintsAPI(APIView):
                            .filter(username__icontains=query) \
                            .filter(asset__in=assets) \
                            .values('username') \
-                           .annotate(total=Count('username')) \
+                           .annotate(total=Count('username', distinct=True)) \
                            .order_by('total', '-username')[:10]
         return Response(data=top_accounts)

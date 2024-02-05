@@ -21,7 +21,8 @@ def on_account_pre_save(sender, instance, **kwargs):
     if instance.version == 0:
         instance.version = 1
     else:
-        instance.version = instance.history.count()
+        history_account = instance.history.first()
+        instance.version = history_account.version + 1 if history_account else 0
 
 
 @merge_delay_run(ttl=5)
@@ -62,7 +63,7 @@ def create_accounts_activities(account, action='create'):
 def on_account_create_by_template(sender, instance, created=False, **kwargs):
     if not created or instance.source != 'template':
         return
-    push_accounts_if_need(accounts=(instance,))
+    push_accounts_if_need.delay(accounts=(instance,))
     create_accounts_activities(instance, action='create')
 
 

@@ -163,9 +163,9 @@ def on_openid_create_or_update_user(sender, request, user, created, name, userna
         user.save()
 
 
-@shared_task(verbose_name=_('Clean audits session task log'))
+@shared_task(verbose_name=_('Clean up expired user sessions'))
 @register_as_period_task(crontab=CRONTAB_AT_PM_TWO)
-def clean_audits_log_period():
+def clean_expired_user_session_period():
     UserSession.clear_expired_sessions()
 
 

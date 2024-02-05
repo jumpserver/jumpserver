@@ -1,8 +1,8 @@
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.request import Request
 
-from common.utils import get_logger
 from assets.models import Node
+from common.utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -28,6 +28,7 @@ class AssetPaginationBase(LimitOffsetPagination):
             'key', 'all', 'show_current_asset',
             'cache_policy', 'display', 'draw',
             'order', 'node', 'node_id', 'fields_size',
+            'asset'
         }
         for k, v in self._request.query_params.items():
             if k not in exclude_query_params and v is not None:

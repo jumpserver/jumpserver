@@ -11,6 +11,7 @@ __all__ = [
 class PublicSettingSerializer(serializers.Serializer):
     XPACK_ENABLED = serializers.BooleanField()
     INTERFACE = serializers.DictField()
+    COUNTRY_CALLING_CODES = serializers.ListField()
 
 
 class PrivateSettingSerializer(PublicSettingSerializer):

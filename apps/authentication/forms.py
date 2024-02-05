@@ -18,7 +18,7 @@ class EncryptedField(forms.CharField):
 
 class UserLoginForm(forms.Form):
     days_auto_login = int(settings.SESSION_COOKIE_AGE / 3600 / 24)
-    disable_days_auto_login = settings.SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE \
+    disable_days_auto_login = settings.SESSION_EXPIRE_AT_BROWSER_CLOSE \
                               or days_auto_login < 1
 
     username = forms.CharField(
