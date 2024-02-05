@@ -563,6 +563,7 @@ class Config(dict):
         'FTP_LOG_KEEP_DAYS': 180,
         'CLOUD_SYNC_TASK_EXECUTION_KEEP_DAYS': 180,
         'JOB_EXECUTION_KEEP_DAYS': 180,
+        'PASSWORD_CHANGE_LOG_KEEP_DAYS': 999,
 
         'TICKETS_ENABLED': True,
 
