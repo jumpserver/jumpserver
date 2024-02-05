@@ -19,7 +19,7 @@ from ops.celery.decorator import (
 from ops.models import CeleryTaskExecution
 from terminal.models import Session, Command
 from terminal.backends import server_replay_storage
-from .models import UserLoginLog, OperateLog, FTPLog, ActivityLog
+from .models import UserLoginLog, OperateLog, FTPLog, ActivityLog, PasswordChangeLog
 
 logger = get_logger(__name__)
 
@@ -36,6 +36,13 @@ def clean_operation_log_period():
     days = get_log_keep_day('OPERATE_LOG_KEEP_DAYS')
     expired_day = now - datetime.timedelta(days=days)
     OperateLog.objects.filter(datetime__lt=expired_day).delete()
+
+
+def clean_password_change_log_period():
+    now = timezone.now()
+    days = get_log_keep_day('PASSWORD_CHANGE_LOG_KEEP_DAYS')
+    expired_day = now - datetime.timedelta(days=days)
+    PasswordChangeLog.objects.filter(datetime__lt=expired_day).delete()
 
 
 def clean_activity_log_period():
@@ -109,6 +116,7 @@ def clean_audits_log_period():
     clean_activity_log_period()
     clean_celery_tasks_period()
     clean_expired_session_period()
+    clean_password_change_log_period()
 
 
 @shared_task(verbose_name=_('Upload FTP file to external storage'))
