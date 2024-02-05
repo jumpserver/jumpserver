@@ -7710,14 +7710,12 @@ msgstr ""
 
 #: users/models/user.py:838 users/serializers/profile.py:128
 #: users/serializers/user.py:172
-#, fuzzy
-#| msgid "First login"
 msgid "Is first login"
 msgstr "First login"
 
 #: users/models/user.py:848
 msgid "Date password last updated"
-msgstr ""
+msgstr "Password last updated"
 
 #: users/models/user.py:851
 msgid "Need update password"
@@ -7898,14 +7896,12 @@ msgid "Login blocked"
 msgstr ""
 
 #: users/serializers/user.py:99 users/serializers/user.py:181
-#, fuzzy
-#| msgid "OTP bound"
 msgid "Is OTP bound"
 msgstr "OTP bound"
 
 #: users/serializers/user.py:101
 msgid "Can public key authentication"
-msgstr ""
+msgstr "Public key auth"
 
 #: users/serializers/user.py:166
 msgid "Groups"
