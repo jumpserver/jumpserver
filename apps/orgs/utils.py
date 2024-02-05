@@ -6,6 +6,7 @@ from functools import wraps
 from inspect import signature
 
 from werkzeug.local import LocalProxy
+from django.conf import settings
 
 from common.local import thread_local
 from .models import Organization
@@ -14,7 +15,6 @@ from .models import Organization
 def get_org_from_request(request):
     # query中优先级最高
     oid = request.GET.get("oid")
-
     # 其次header
     if not oid:
         oid = request.META.get("HTTP_X_JMS_ORG")
@@ -24,14 +24,33 @@ def get_org_from_request(request):
     # 其次session
     if not oid:
         oid = request.session.get("oid")
+    
+    if oid and oid.lower() == 'default':
+        return Organization.default()
 
-    if not oid:
-        oid = Organization.DEFAULT_ID
-    if oid.lower() == "default":
-        oid = Organization.DEFAULT_ID
-    elif oid.lower() == "root":
-        oid = Organization.ROOT_ID
-    org = Organization.get_instance(oid, default=Organization.default())
+    if oid and oid.lower() == 'root':
+        return Organization.root()
+    
+    if oid and oid.lower() == 'system':
+        return Organization.system()
+
+    org = Organization.get_instance(oid)
+
+    if org and org.internal:
+        # 内置组织直接返回
+        return org
+    
+    if not settings.XPACK_ENABLED:
+        # 社区版用户只能使用默认组织
+        return Organization.default()
+    
+    if not org and request.user.is_authenticated:
+        # 企业版用户优先从自己有权限的组织中获取
+        org = request.user.orgs.first()
+
+    if not org:
+        org = Organization.default()
+
     return org
 
 
