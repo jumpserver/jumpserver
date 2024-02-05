@@ -66,11 +66,6 @@ class RequestMiddleware:
     def __call__(self, request):
         set_current_request(request)
         response = self.get_response(request)
-        is_request_api = request.path.startswith('/api')
-        if not settings.SESSION_EXPIRE_AT_BROWSER_CLOSE and \
-                not is_request_api:
-            age = request.session.get_expiry_age()
-            request.session.set_expiry(age)
         return response
 
 

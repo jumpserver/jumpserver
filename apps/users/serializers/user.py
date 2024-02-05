@@ -290,8 +290,8 @@ class InviteSerializer(RolesSerializerMixin, serializers.Serializer):
     users = serializers.PrimaryKeyRelatedField(
         queryset=User.get_nature_users(),
         many=True,
-        label=_("Select users"),
-        help_text=_("For security, only list several users"),
+        label=_("Users"),
+        help_text=_("For security, only a partial list of users is displayed. You can try to search for more"),
     )
     system_roles = None
 

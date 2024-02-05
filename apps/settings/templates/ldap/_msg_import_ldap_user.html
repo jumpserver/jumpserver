@@ -1,0 +1,34 @@
+{% load i18n %}
+<p>{% trans "Sync task Finish" %}</p>
+<b>{% trans 'Time' %}:</b>
+<ul>
+    <li>{% trans 'Date start' %}: {{ start_time }}</li>
+    <li>{% trans 'Date end' %}: {{ end_time }}</li>
+    <li>{% trans 'Time cost' %}: {{ cost_time| floatformat:0 }}s</li>
+</ul>
+<b>{% trans "Synced Organization" %}:</b>
+<ul>
+    {% for org in orgs %}
+        <li>{{ org }}</li>
+    {% endfor %}
+</ul>
+<b>{% trans "Synced User" %}:</b>
+<ul>
+    {% if users %}
+        {% for user in users %}
+            <li>{{ user }}</li>
+        {% endfor %}
+    {% else %}
+        <li>{% trans 'No user synchronization required' %}</li>
+    {% endif %}
+</ul>
+{% if errors %}
+    <b>{% trans 'Error' %}:</b>
+    <ul>
+        {% for error in errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+

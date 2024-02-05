@@ -37,9 +37,6 @@ def on_user_auth_login_success(sender, user, request, **kwargs):
             UserSession.objects.filter(key=session_key).delete()
         cache.set(lock_key, request.session.session_key, None)
 
-    # 标记登录，设置 cookie，前端可以控制刷新, Middleware 会拦截这个生成 cookie
-    request.session['auth_session_expiration_required'] = 1
-
 
 @receiver(cas_user_authenticated)
 def on_cas_user_login_success(sender, request, user, **kwargs):

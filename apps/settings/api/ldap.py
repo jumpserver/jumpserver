@@ -137,7 +137,7 @@ class LDAPUserImportAPI(APIView):
             return Response({'msg': _('Get ldap users is None')}, status=400)
 
         orgs = self.get_orgs()
-        errors = LDAPImportUtil().perform_import(users, orgs)
+        new_users, errors = LDAPImportUtil().perform_import(users, orgs)
         if errors:
             return Response({'errors': errors}, status=400)
 

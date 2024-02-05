@@ -282,6 +282,7 @@ class Config(dict):
         'AUTH_LDAP_SYNC_INTERVAL': None,
         'AUTH_LDAP_SYNC_CRONTAB': None,
         'AUTH_LDAP_SYNC_ORG_IDS': ['00000000-0000-0000-0000-000000000002'],
+        'AUTH_LDAP_SYNC_RECEIVERS': [],
         'AUTH_LDAP_USER_LOGIN_ONLY_IN_USERS': False,
         'AUTH_LDAP_OPTIONS_OPT_REFERRALS': -1,
 
@@ -546,7 +547,6 @@ class Config(dict):
         'REFERER_CHECK_ENABLED': False,
         'SESSION_ENGINE': 'cache',
         'SESSION_SAVE_EVERY_REQUEST': True,
-        'SESSION_EXPIRE_AT_BROWSER_CLOSE_FORCE': False,
         'SERVER_REPLAY_STORAGE': {},
         'SECURITY_DATA_CRYPTO_ALGO': None,
         'GMSSL_ENABLED': False,
@@ -605,7 +605,9 @@ class Config(dict):
         'GPT_MODEL': 'gpt-3.5-turbo',
         'VIRTUAL_APP_ENABLED': False,
 
-        'FILE_UPLOAD_SIZE_LIMIT_MB': 200
+        'FILE_UPLOAD_SIZE_LIMIT_MB': 200,
+
+        'TICKET_APPLY_ASSET_SCOPE': 'all'
     }
 
     old_config_map = {

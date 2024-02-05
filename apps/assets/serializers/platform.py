@@ -191,7 +191,6 @@ class PlatformSerializer(ResourceLabelsMixin, WritableNestedModelSerializer):
     def add_type_choices(self, name, label):
         tp = self.fields['type']
         tp.choices[name] = label
-        tp.choice_mapper[name] = label
         tp.choice_strings_to_values[name] = label
 
     @lazyproperty

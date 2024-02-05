@@ -24,7 +24,8 @@ class BaseAutomationSerializer(PeriodTaskSerializerMixin, BulkOrgResourceModelSe
 
     class Meta:
         read_only_fields = [
-            'date_created', 'date_updated', 'created_by', 'periodic_display', 'executed_amount'
+            'date_created', 'date_updated', 'created_by',
+            'periodic_display', 'executed_amount'
         ]
         fields = read_only_fields + [
             'id', 'name', 'is_periodic', 'interval', 'crontab', 'comment',

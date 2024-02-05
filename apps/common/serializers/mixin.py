@@ -347,6 +347,7 @@ class SomeFieldsMixin:
     def order_fields(fields):
         bool_fields = []
         datetime_fields = []
+        common_fields = []
         other_fields = []
 
         for name, field in fields.items():
@@ -355,9 +356,11 @@ class SomeFieldsMixin:
                 bool_fields.append(to_add)
             elif isinstance(field, serializers.DateTimeField):
                 datetime_fields.append(to_add)
+            elif name in ('comment', 'created_by', 'updated_by'):
+                common_fields.append(to_add)
             else:
                 other_fields.append(to_add)
-        _fields = [*other_fields, *bool_fields, *datetime_fields]
+        _fields = [*other_fields, *bool_fields, *datetime_fields, *common_fields]
         fields = OrderedDict()
         for name, field in _fields:
             fields[name] = field
@@ -394,20 +397,20 @@ class CommonBulkModelSerializer(CommonBulkSerializerMixin, serializers.ModelSeri
 
 
 class ResourceLabelsMixin(serializers.Serializer):
-    labels = LabelRelatedField(many=True, label=_('Labels'), required=False, allow_null=True)
+    labels = LabelRelatedField(many=True, label=_('Labels'), required=False, allow_null=True, source='res_labels')
 
     def update(self, instance, validated_data):
-        labels = validated_data.pop('labels', None)
+        labels = validated_data.pop('res_labels', None)
         res = super().update(instance, validated_data)
         if labels is not None:
-            instance.labels.set(labels, bulk=False)
+            instance.res_labels.set(labels, bulk=False)
         return res
 
     def create(self, validated_data):
-        labels = validated_data.pop('labels', None)
+        labels = validated_data.pop('res_labels', None)
         instance = super().create(validated_data)
         if labels is not None:
-            instance.labels.set(labels, bulk=False)
+            instance.res_labels.set(labels, bulk=False)
         return instance
 
     @classmethod

@@ -56,7 +56,14 @@ class DomainSerializer(ResourceLabelsMixin, BulkOrgResourceModelSerializer):
 
 class DomainListSerializer(DomainSerializer):
     class Meta(DomainSerializer.Meta):
-        fields = list(set(DomainSerializer.Meta.fields) - {'assets'})
+        fields = list(set(DomainSerializer.Meta.fields + ['assets_amount']) - {'assets'})
+
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        queryset = queryset.annotate(
+            assets_amount=Count('assets', distinct=True),
+        )
+        return queryset
 
 
 class DomainWithGatewaySerializer(serializers.ModelSerializer):
