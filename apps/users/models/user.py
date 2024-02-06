@@ -67,7 +67,7 @@ class AuthMixin:
             if self.username:
                 self.date_password_last_updated = timezone.now()
                 post_user_change_password.send(self.__class__, user=self)
-            super().set_password(raw_password) # noqa
+            super().set_password(raw_password)  # noqa
 
     def set_public_key(self, public_key):
         if self.can_update_ssh_key():
@@ -381,15 +381,15 @@ class RoleMixin:
 
     @lazyproperty
     def console_orgs(self):
-        return self.cached_orgs['console_orgs']
+        return self.cached_orgs.get('console_orgs', [])
 
     @lazyproperty
     def audit_orgs(self):
-        return self.cached_orgs['audit_orgs']
+        return self.cached_orgs.get('audit_orgs', [])
 
     @lazyproperty
     def workbench_orgs(self):
-        return self.cached_orgs['workbench_orgs']
+        return self.cached_orgs.get('workbench_orgs', [])
 
     @lazyproperty
     def joined_orgs(self):
