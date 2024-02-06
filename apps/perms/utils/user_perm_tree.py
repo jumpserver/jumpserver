@@ -194,6 +194,7 @@ class UserPermTreeExpireUtil(_UserPermTreeCacheMixin):
 
     @on_transaction_commit
     def expire_perm_tree_for_users_orgs(self, user_ids, org_ids):
+        user_ids = list(user_ids)
         org_ids = [str(oid) for oid in org_ids]
         with self.client.pipeline() as p:
             for uid in user_ids:

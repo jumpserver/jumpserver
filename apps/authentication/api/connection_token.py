@@ -443,7 +443,7 @@ class ConnectionTokenViewSet(ExtraActionApiMixin, RootOrgViewMixin, JMSModelView
             self._record_operate_log(acl, asset)
             for reviewer in reviewers:
                 AssetLoginReminderMsg(
-                    reviewer, asset, user, self.input_username
+                    reviewer, asset, user, account, self.input_username
                 ).publish_async()
 
     def create(self, request, *args, **kwargs):
