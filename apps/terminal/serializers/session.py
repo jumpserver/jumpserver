@@ -4,6 +4,7 @@ from rest_framework import serializers
 from common.serializers.fields import LabeledChoiceField
 from common.utils import pretty_string
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+from terminal.session_lifecycle import lifecycle_events_map
 from .terminal import TerminalSmallSerializer
 from ..const import SessionType, SessionErrorReason
 from ..models import Session
@@ -11,6 +12,7 @@ from ..models import Session
 __all__ = [
     'SessionSerializer', 'SessionDisplaySerializer',
     'ReplaySerializer', 'SessionJoinValidateSerializer',
+    'SessionLifecycleLogSerializer'
 ]
 
 
@@ -77,3 +79,9 @@ class ReplaySerializer(serializers.Serializer):
 class SessionJoinValidateSerializer(serializers.Serializer):
     user_id = serializers.UUIDField()
     session_id = serializers.UUIDField()
+
+
+class SessionLifecycleLogSerializer(serializers.Serializer):
+    event = serializers.ChoiceField(choices=list(lifecycle_events_map.keys()))
+    reason = serializers.CharField(required=False)
+    user = serializers.CharField(required=False)
