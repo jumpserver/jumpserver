@@ -156,6 +156,7 @@ reasons_map = {
     'admin_terminate': gettext_noop('admin terminated'),
     'max_session_timeout': gettext_noop('maximum session time has been reached'),
     'permission_expired': gettext_noop('permission has expired'),
+    'null_storage': gettext_noop('storage is null'),
 }
 
 lifecycle_events_map = {
