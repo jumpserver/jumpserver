@@ -154,6 +154,8 @@ reasons_map = {
     'user_close': gettext_noop('user closed'),
     'idle_disconnect': gettext_noop('idle disconnect'),
     'admin_terminate': gettext_noop('admin terminated'),
+    'max_session_timeout': gettext_noop('maximum session time has been reached'),
+    'permission_expired': gettext_noop('permission has expired'),
 }
 
 lifecycle_events_map = {

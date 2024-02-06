@@ -82,6 +82,6 @@ class SessionJoinValidateSerializer(serializers.Serializer):
 
 
 class SessionLifecycleLogSerializer(serializers.Serializer):
-    event = serializers.ChoiceField(choices=lifecycle_events_map.keys())
+    event = serializers.ChoiceField(choices=list(lifecycle_events_map.keys()))
     reason = serializers.CharField(required=False)
     user = serializers.CharField(required=False)
