@@ -7,6 +7,7 @@ type:
   - all
 method: verify_account
 protocol: ssh
+priority: 50
 
 i18n:
   SSH account verify:
